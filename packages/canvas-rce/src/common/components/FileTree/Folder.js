@@ -24,7 +24,7 @@ import Loading from "../Loading";
 import { css } from "aphrodite";
 import styles from "./styles";
 import IconMiniArrowDownLine from "@instructure/ui-icons/lib/Line/IconMiniArrowDown";
-import IconMiniArrowRightLine from "@instructure/ui-icons/lib/Line/IconMiniArrowRight";
+import IconMiniArrowEndLine from "@instructure/ui-icons/lib/Line/IconMiniArrowEnd";
 import IconFolderLine from "@instructure/ui-icons/lib/Line/IconFolder";
 
 export default class Folder extends Component {
@@ -49,7 +49,7 @@ export default class Folder extends Component {
 
   toggleIcon() {
     const { expanded } = this.props.folder;
-    return expanded ? <IconMiniArrowDownLine /> : <IconMiniArrowRightLine />;
+    return expanded ? <IconMiniArrowDownLine /> : <IconMiniArrowEndLine />;
   }
 
   render() {

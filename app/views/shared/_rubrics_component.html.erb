@@ -39,6 +39,9 @@
     <%= render :partial => "shared/rubric_criterion_dialog" %>
   </div>
   <%= render :partial => "shared/rubric", :object => nil, :locals => {:association => @assignment, :editable => can_do(@assignment, @current_user, :update), :has_assessments => false, :edit_view => true} %>
+
+  <div id="assignment_external_tools"></div>
+
   <% if can_do(@assignment, @current_user, :update) %>
     <div style="text-align: center; font-size: 1.2em; margin-top: 10px; display: none;">
       <a href="<%= context_url(@context, :context_rubrics_url) %>" class="add_rubric_link rubric" style="<%= hidden if @assignment.rubric_association %>"><%= t 'links.assign_rubric', 'Assign Rubric' %></a>

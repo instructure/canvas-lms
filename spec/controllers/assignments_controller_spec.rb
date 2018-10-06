@@ -157,6 +157,23 @@ describe AssignmentsController do
       expect(assigns[:js_env][:QUIZ_LTI_ENABLED]).to be true
     end
 
+    it "should not set QUIZ_LTI_ENABLED in js_env if url is voided" do
+      user_session @teacher
+      @course.context_external_tools.create!(
+        :name => 'Quizzes.Next',
+        :consumer_key => 'test_key',
+        :shared_secret => 'test_secret',
+        :tool_id => 'Quizzes 2',
+        :url => 'http://void.url.inseng.net'
+      )
+      @course.root_account.settings[:provision] = {'lti' => 'lti url'}
+      @course.root_account.save!
+      @course.root_account.enable_feature! :quizzes_next
+      @course.enable_feature! :quizzes_next
+      get 'index', params: {course_id: @course.id}
+      expect(assigns[:js_env][:QUIZ_LTI_ENABLED]).to be false
+    end
+
     it "should not set QUIZ_LTI_ENABLED in js_env if quizzes 2 is not available" do
       user_session @teacher
       get 'index', params: {course_id: @course.id}
@@ -998,6 +1015,40 @@ describe AssignmentsController do
       user_session(@teacher)
       get :edit, params: { course_id: @course.id, id: @assignment.id }
       expect(assigns[:js_env][:MODERATED_GRADING_MAX_GRADER_COUNT]).to eq @assignment.moderated_grading_max_grader_count
+    end
+
+    describe 'js_env ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED' do
+      before(:each) do
+        user_session(@teacher)
+      end
+
+      it 'is true when the course has anonymous_instructor_annotations on' do
+        @course.enable_feature!(:anonymous_instructor_annotations)
+        get 'edit', params: { course_id: @course.id, id: @assignment.id }
+
+        expect(assigns[:js_env][:ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED]).to be true
+      end
+
+      it 'is true when the account has anonymous_instructor_annotations on' do
+        @course.account.enable_feature!(:anonymous_instructor_annotations)
+        get 'edit', params: { course_id: @course.id, id: @assignment.id }
+
+        expect(assigns[:js_env][:ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED]).to be true
+      end
+
+      it 'is false when the course has anonymous_instructor_annotations off' do
+        @course.disable_feature!(:anonymous_instructor_annotations)
+        get 'edit', params: { course_id: @course.id, id: @assignment.id }
+
+        expect(assigns[:js_env][:ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED]).to be false
+      end
+
+      it 'is false when the account has anonymous_instructor_annotations off' do
+        @course.account.disable_feature!(:anonymous_instructor_annotations)
+        get 'edit', params: { course_id: @course.id, id: @assignment.id }
+
+        expect(assigns[:js_env][:ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED]).to be false
+      end
     end
 
     context 'plagiarism detection platform' do

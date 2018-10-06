@@ -21,55 +21,54 @@ import PropTypes from 'prop-types'
 import I18n from 'i18n!editor'
 import RichContentEditor from '../shared/rce/RichContentEditor'
 
-  var SwitchEditorControl = React.createClass({
-    displayName: 'SwitchEditor',
-    propTypes: {
-      textarea: PropTypes.object.isRequired
-    },
+class SwitchEditorControl extends React.Component {
+  static displayName = 'SwitchEditor'
 
-    getInitialState () {
-      return { mode: "rce" };
-    },
+  static propTypes = {
+    textarea: PropTypes.object.isRequired
+  }
 
-    toggle(e){
-      e.preventDefault()
-      RichContentEditor.callOnRCE(this.props.textarea, 'toggle')
-      if(this.state.mode == "rce"){
-        this.setState({mode: "html"})
-      }else{
-        this.setState({mode: "rce"})
-      }
-    },
+  state = {mode: 'rce'}
 
-    //
-    // Rendering
-    //
-
-    switchLinkText(){
-      if(this.state.mode == 'rce'){
-        return I18n.t('switch_editor_html', 'HTML Editor')
-      }else {
-        return I18n.t('switch_editor_rich_text', 'Rich Content Editor')
-      }
-    },
-
-    linkClass(){
-      if(this.state.mode == 'rce'){
-        return "switch-views__link__html"
-      }else {
-        return "switch-views__link__rce"
-      }
-    },
-
-    render() {
-      return (
-        <div style={{float: "right"}}>
-          <a href="#" className={this.linkClass()} onClick={this.toggle}>
-            {this.switchLinkText()}
-          </a>
-        </div>
-      );
+  toggle = e => {
+    e.preventDefault()
+    RichContentEditor.callOnRCE(this.props.textarea, 'toggle')
+    if (this.state.mode == 'rce') {
+      this.setState({mode: 'html'})
+    } else {
+      this.setState({mode: 'rce'})
     }
-  });
+  }
+
+  //
+  // Rendering
+  //
+
+  switchLinkText = () => {
+    if (this.state.mode == 'rce') {
+      return I18n.t('switch_editor_html', 'HTML Editor')
+    } else {
+      return I18n.t('switch_editor_rich_text', 'Rich Content Editor')
+    }
+  }
+
+  linkClass = () => {
+    if (this.state.mode == 'rce') {
+      return 'switch-views__link__html'
+    } else {
+      return 'switch-views__link__rce'
+    }
+  }
+
+  render() {
+    return (
+      <div style={{float: 'right'}}>
+        <a href="#" className={this.linkClass()} onClick={this.toggle}>
+          {this.switchLinkText()}
+        </a>
+      </div>
+    )
+  }
+}
 
 export default SwitchEditorControl

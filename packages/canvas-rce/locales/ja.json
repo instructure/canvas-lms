@@ -29,9 +29,6 @@
   "insert_equella_links_49a8dacd": {
     "message": "Equella リンクを挿入してください"
   },
-  "assignment_list_a833f59d": {
-    "message": "課題リスト"
-  },
   "alternative_text_a834dcad": {
     "message": "代替テキスト："
   },
@@ -161,9 +158,6 @@
   "close_flickr_form_b32e600a": {
     "message": "Flickr フォームを閉じる"
   },
-  "course_syllabus_5de1b0af": {
-    "message": "コース要綱"
-  },
   "upload_8b403d05": {
     "message": "アップロード"
   },
@@ -205,9 +199,6 @@
   },
   "cc_attribution_non_commercial_39e0d30d": {
     "message": "CC 属性 非営利"
-  },
-  "quizzes_list_d812caa6": {
-    "message": "クイズリスト"
   },
   "image_upload_form_7b74079a": {
     "message": "画像アップロードフォーム"

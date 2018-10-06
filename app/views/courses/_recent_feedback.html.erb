@@ -25,10 +25,9 @@
   grade = nil
   score = nil
 
-  # current user needs to be in the cache key to bust the cache when they change course nicknames
-  cache(['recent_feedback_render3', @current_user, recent_feedback || 'blank_feedback', Time.zone.utc_offset].cache_key) do
-    context = recent_feedback.context
+  cache(['recent_feedback_render3', @current_user&.course_nickname_hash, recent_feedback || 'blank_feedback', Time.zone.utc_offset].cache_key) do
     assignment = recent_feedback.assignment
+    context = recent_feedback.assignment.context
     url = context_url(context, :context_assignment_submission_url, :assignment_id => recent_feedback.assignment_id, :id=>@current_user.id)
     grade = readable_grade(recent_feedback)
     score = recent_feedback.score
@@ -72,5 +71,4 @@
   <div class="clear"></div>
 
 <% end %>
-
 </li>

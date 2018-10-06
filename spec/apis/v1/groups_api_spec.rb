@@ -1008,4 +1008,25 @@ describe "Groups API", type: :request do
 
     end
   end
+
+  context "permissions" do
+    before :once do
+      course_with_student(:active_all => true)
+      @group = @course.groups.create!
+    end
+
+    it "returns permissions" do
+      @group.add_user(@student)
+      json = api_call(:get, "/api/v1/groups/#{@group.id}/permissions?permissions[]=send_messages&permissions[]=manage_blarghs",
+                      :controller => 'groups', :action => 'permissions', :group_id => @group.to_param,
+                      :format => 'json', :permissions => %w(send_messages manage_blarghs))
+      expect(json).to eq({"send_messages"=>true, "manage_blarghs"=>false})
+    end
+
+    it "requires :read permission on the group" do
+      api_call(:get, "/api/v1/groups/#{@group.id}/permissions?permissions[]=send_messages",
+               { :controller => 'groups', :action => 'permissions', :group_id => @group.to_param, :format => 'json',
+                 :permissions => %w(send_messages) }, {}, {}, { :expected_status => 401 })
+    end
+  end
 end

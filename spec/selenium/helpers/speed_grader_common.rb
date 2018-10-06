@@ -24,13 +24,6 @@ module SpeedGraderCommon
     submission_model({:assignment => @assignment, :body => "first student submission text"}.merge(options))
   end
 
-  def goto_section(section_id)
-    f("#combo_box_container .ui-selectmenu-icon").click
-    driver.execute_script("$('#section-menu-link').trigger('mouseenter')")
-    f("#section-menu .section_#{section_id}").click
-    wait_for_ajaximations
-  end
-
   def goto_student(student_name)
     f("#combo_box_container .ui-selectmenu-icon").click
     student_selection = ff(".ui-selectmenu-item-header").find do |option|
@@ -74,9 +67,8 @@ module SpeedGraderCommon
 
     f('.toggle_full_rubric').click
     wait_for_ajaximations
-    rubric = f('#rubric_full')
 
-    rubric_inputs = rubric.find_elements(:css, 'input.criterion_points')
+    rubric_inputs = ff('td.criterion_points input')
     rubric_inputs[0].send_keys(score1)
     rubric_inputs[1].send_keys(score2)
   end
@@ -95,7 +87,7 @@ module SpeedGraderCommon
     # attempting to click things that were on the very edge of the page
     # was causing certain specs to flicker. this fixes that issue by
     # increasing the width of the right pane
-    driver.execute_script("$('#right_side').width('500px')")
+    driver.execute_script("$('#right_side').width('900px')")
   end
 
   def submit_comment(text)

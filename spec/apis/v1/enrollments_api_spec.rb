@@ -285,7 +285,7 @@ describe EnrollmentsApiController, type: :request do
 
       it "should throw an error if no params are given" do
         raw_api_call :post, @path, @path_options, { :enrollment => {  } }
-        expect(response.code).to eql '403'
+        expect(response.code).to eql '400'
         expect(JSON.parse(response.body)).to eq({
           'message' => 'No parameters given'
         })
@@ -314,7 +314,7 @@ describe EnrollmentsApiController, type: :request do
 
       it "should return an error if no user_id is given" do
         raw_api_call :post, @path, @path_options, { :enrollment => { :type => 'StudentEnrollment' } }
-        expect(response.code).to eql '403'
+        expect(response.code).to eql '400'
         expect(JSON.parse(response.body)).to eq({
           'message' => "Can't create an enrollment without a user. Include enrollment[user_id] to create an enrollment"
         })
@@ -466,7 +466,7 @@ describe EnrollmentsApiController, type: :request do
                   :course_section_id                  => @section.id,
                   :limit_privileges_to_course_section => true
               }
-          }, {}, :expected_status => 403
+          }, {}, :expected_status => 400
           expect(json['message']).to eql 'The specified type must match the base type for the role'
         end
 
@@ -479,7 +479,7 @@ describe EnrollmentsApiController, type: :request do
                   :course_section_id                  => @section.id,
                   :limit_privileges_to_course_section => true
               }
-          }, {}, :expected_status => 403
+          }, {}, :expected_status => 400
           expect(json['message']).to eql 'Invalid role'
         end
 
@@ -493,7 +493,7 @@ describe EnrollmentsApiController, type: :request do
                   :course_section_id                  => @section.id,
                   :limit_privileges_to_course_section => true
               }
-          }, {}, :expected_status => 403
+          }, {}, :expected_status => 400
           expect(json['message']).to eql 'Cannot create an enrollment with this role because it is inactive.'
         end
 
@@ -507,7 +507,7 @@ describe EnrollmentsApiController, type: :request do
                   :course_section_id                  => @section.id,
                   :limit_privileges_to_course_section => true
               }
-          }, {}, :expected_status => 403
+          }, {}, :expected_status => 400
           expect(json['message']).to eql 'Invalid role'
         end
 
@@ -690,7 +690,7 @@ describe EnrollmentsApiController, type: :request do
               self_enrollment_code: 'invalid'
             }
           }
-        expect(response.code).to eql '403'
+        expect(response.code).to eql '400'
         json = JSON.parse(response.body)
         expect(json["message"]).to be_include "enrollment[self_enrollment_code] is invalid"
         expect(json["message"]).to be_include "enrollment[user_id] must be 'self' when self-enrolling"
@@ -780,7 +780,7 @@ describe EnrollmentsApiController, type: :request do
       it "returns an error message with insufficient permissions" do
         @params[:sis_user_id] = '12345'
 
-        json = api_call(:get, @path, @params, {}, {}, { expected_status: 403 })
+        json = api_call(:get, @path, @params, {}, {}, { expected_status: 400 })
         expect(json['message']).to eq 'Insufficient permissions to filter by SIS fields'
       end
     end

@@ -16,6 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
+<%
+  js_env ga_page_title: "Outcomes for Student"
+%>
 <% css_bundle :learning_outcomes %>
 <% js_bundle :rubric_assessment %>
 <% content_for :page_title do %><%= t :outcomes_for, "Outcomes for %{user_name}", :user_name => @user.name %><% end %>

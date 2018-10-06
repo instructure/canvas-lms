@@ -50,7 +50,13 @@ describe Api::V1::Submission do
     describe 'speedgrader_url' do
       it "links to the speed grader for a student's submission" do
         expect(assignment).to receive(:can_view_student_names?).with(user).and_return true
-        json = fake_controller.provisional_grade_json(provisional_grade, submission, assignment, user)
+        json = fake_controller.provisional_grade_json(
+          course: course,
+          assignment: assignment,
+          submission: submission,
+          provisional_grade: provisional_grade,
+          current_user: user
+        )
         path = "/courses/#{course.id}/gradebook/speed_grader"
         query = { 'assignment_id' => assignment.id.to_s }
         fragment = { 'provisional_grade_id' => provisional_grade.id, 'student_id' => user.id }
@@ -59,7 +65,13 @@ describe Api::V1::Submission do
 
       it "links to the speed grader for a student's anonymous submission when grader cannot view student names" do
         expect(assignment).to receive(:can_view_student_names?).with(user).and_return false
-        json = fake_controller.provisional_grade_json(provisional_grade, submission, assignment, user)
+        json = fake_controller.provisional_grade_json(
+          course: course,
+          assignment: assignment,
+          submission: submission,
+          provisional_grade: provisional_grade,
+          current_user: user
+        )
         path = "/courses/#{course.id}/gradebook/speed_grader"
         query = { 'assignment_id' => assignment.id.to_s }
         fragment = { 'provisional_grade_id' => provisional_grade.id, 'anonymous_id' => submission.anonymous_id }
@@ -404,6 +416,26 @@ describe Api::V1::Submission do
           submission.score = 10
           expect(grading_status.call(submission)).to be :graded
         end
+      end
+    end
+
+    describe "canvadoc url" do
+      let(:course) { Course.create! }
+      let(:assignment) { course.assignments.create! }
+      let(:teacher) { course_with_user("TeacherEnrollment", course: course, active_all: true, name: "Teacher").user }
+      let(:student) { course_with_user("StudentEnrollment", course: course, active_all: true, name: "Student").user }
+      let(:attachment) { attachment_model(content_type: "application/pdf", context: student) }
+      let(:submission) { assignment.submit_homework(student, submission_type: 'online_upload', attachments: [attachment]) }
+      let(:json) { fake_controller.submission_json(submission, assignment, teacher, session) }
+
+      before(:each) do
+        allow(Canvadocs).to receive(:annotations_supported?).and_return(true)
+        allow(Canvadocs).to receive(:enabled?).and_return(true)
+        Canvadoc.create!(document_id: "abc123#{attachment.id}", attachment_id: attachment.id)
+      end
+
+      it "includes the submission id in the attachment's preview url" do
+        expect(json.fetch(:attachments).first.fetch(:preview_url)).to include("submission_id%22:#{submission.id}")
       end
     end
   end

@@ -24,6 +24,9 @@ import keycode from 'keycode';
 
 import Opportunity from '../Opportunity';
 import Button from '@instructure/ui-buttons/lib/components/Button';
+import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList';
+import AccessibleContent from   '@instructure/ui-a11y/lib/components/AccessibleContent';
+import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton';
 import { findDOMNode } from 'react-dom';
 import { array, string, func, number, oneOfType} from 'prop-types';
 import formatMessage from '../../format-message';
@@ -37,7 +40,8 @@ export const OPPORTUNITY_SPECIAL_FALLBACK_FOCUS_ID = specialFallbackFocusId('opp
 
 export class Opportunities extends Component {
   static propTypes = {
-    opportunities: array.isRequired,
+    newOpportunities: array.isRequired,
+    dismissedOpportunities: array.isRequired,
     timeZone: string.isRequired,
     courses: array.isRequired,
     dismiss: func.isRequired,
@@ -53,13 +57,24 @@ export class Opportunities extends Component {
     deregisterAnimatable: () => {},
   }
 
+  constructor (props) {
+    super(props);
+
+    this.state = {
+      innerMaxHeight: "auto"
+    }
+    this.closeButtonRef = null;
+    this.tabPanelContentDiv = null;
+  }
+
   componentDidMount () {
     this.props.registerAnimatable('opportunity', this, -1, [OPPORTUNITY_SPECIAL_FALLBACK_FOCUS_ID]);
-    setTimeout(() =>{
-      // eslint-disable-next-line react/no-find-dom-node
-      let closeButtonRef = findDOMNode(this.closeButton);
-      closeButtonRef.focus();
-    }, 200);
+    this.setMaxHeight(this.props);
+    this.closeButtonRef.focus();
+  }
+
+  componentWillReceiveProps (nextProps) {
+    this.setMaxHeight(nextProps);
   }
 
   componentWillUnmount () {
@@ -67,7 +82,7 @@ export class Opportunities extends Component {
   }
 
   getFocusable () {
-    return this.closeButton;
+    return this.newTabRef;
   }
 
   handleKeyDown = (event) => {
@@ -86,25 +101,85 @@ export class Opportunities extends Component {
     return course[attr];
   }
 
-  renderOpportunity = () => {
+  // the only place on the TabList heirarchy where we can set a maxHeight is on 
+  // TabPanel, which puts the style on it's child content-holding div.
+  // To keep the scrolling area w/in the TabPanel's content so that
+  // the TabList doesn't outgrow its parent and the user winds up scrolling the tabs
+  // out of view, we need to subtract out how much space the TabList's boilerplate takes
+  // up to set the TabPanel's maxHeight appropriately.
+  // Unfortunately TabPanel's tabRef returns a ref to the Tab, and TabPanel's ref returns
+  // a ref to the TabPanel component. Even if we get it's div, it doesn't have it's padding
+  // at the time when the component mounts and our calculation is off.
+  setMaxHeight (props) {
+    let mxht = 'auto';
+    if (this.tabPanelContentDiv) {
+      const style = window.getComputedStyle(this.tabPanelContentDiv);
+      const padding = parseInt(style['padding-top']) + parseInt(style['padding-bottom']);
+      const border =  parseInt(style['border-top-width']) + parseInt(style['border-bottom-width']);
+      mxht = `${props.maxHeight - this.tabPanelContentDiv.offsetTop - padding - border}px`;
+    }
+    this.setState({innerMaxHeight: mxht});
+  }
+
+  // the parent of the <ol> holding the opportunities is the div TabPanel will assign 
+  // TabPanel's maxHeight prop to.
+   getTabPanelContentDivRefFromList = (ol) => {
+    this.tabPanelContentDiv = ol && ol.parentElement;
+  }
+
+  renderOpportunities (opportunities, dismissed) {
     return (
-      this.props.opportunities.map((opportunity, oppIndex) =>
-        <li key={opportunity.id} className={styles.item}>
-          <Opportunity
-            id={opportunity.id}
-            dueAt={opportunity.due_at}
-            points={opportunity.points_possible}
-            courseName={this.courseAttr(opportunity.course_id, 'shortName')}
-            opportunityTitle={opportunity.name}
-            timeZone={this.props.timeZone}
-            dismiss={this.props.dismiss}
-            plannerOverride={opportunity.planner_override}
-            url={opportunity.html_url}
-            animatableIndex={oppIndex}
-          />
-        </li>
-      )
+      <ol className={styles.list} ref={this.getTabPanelContentDivRefFromList}>
+        {opportunities.map((opportunity, oppIndex) =>
+          <li key={opportunity.id} className={styles.item}>
+            <Opportunity
+              id={opportunity.id}
+              dueAt={opportunity.due_at}
+              points={opportunity.points_possible}
+              courseName={this.courseAttr(opportunity.course_id, 'shortName')}
+              opportunityTitle={opportunity.name}
+              timeZone={this.props.timeZone}
+              dismiss={dismissed ? null : this.props.dismiss}
+              plannerOverride={opportunity.planner_override}
+              url={opportunity.html_url}
+              animatableIndex={oppIndex}
+            />
+          </li>
+        )}
+      </ol>
     );
+  }
+
+  renderNewOpportunities () {
+    return this.props.newOpportunities.length ?
+      this.renderOpportunities(this.props.newOpportunities, false) :
+      <div>{formatMessage('Nothing new needs attention.')}</div>
+  }
+
+  renderDismissedOpportunities () {
+    return this.props.dismissedOpportunities.length ?
+      this.renderOpportunities(this.props.dismissedOpportunities, true) :
+      <div>{formatMessage('Nothing here needs attention.')}</div>
+  }
+
+  renderTitle (which) {
+    const srtitle = (which === "new") ? formatMessage("New Opportunities") : formatMessage("Dismissed Opportunities");
+    const title = (which === "new") ? formatMessage("New") : formatMessage("Dismissed");
+    return <AccessibleContent alt={srtitle}>{title}</AccessibleContent>;
+  }
+
+  renderCloseButton () {
+    return (
+      <CloseButton
+        placement="end"
+        offset="x-small"
+        variant="icon"
+        onClick={this.props.togglePopover}
+        buttonRef={(el) => {this.closeButtonRef = el}}
+      >
+        {formatMessage('Close Opportunity Center popup')}
+      </CloseButton>
+    )
   }
 
   render () {
@@ -116,24 +191,15 @@ export class Opportunities extends Component {
         ref={(c) => {this._content=c;}}
         style={{maxHeight: this.props.maxHeight}}
       >
-        <div className={styles.header}>
-          <Button
-            variant="link"
-            title={formatMessage('Close opportunities popover')}
-            ref={(btnRef) =>{this.closeButton = btnRef;}}
-            onClick={this.props.togglePopover}
-          >
-            <div className={styles.closeButtonContainer}>
-              <span className={styles.closeButtonText}>
-                {formatMessage('Close')}
-              </span>
-              <IconXLine className={styles.closeButtonIcon} />
-            </div>
-          </Button>
-        </div>
-        <ol className={styles.list}>
-          {this.props.opportunities.length ? this.renderOpportunity() : formatMessage('Nothing new needs attention.')}
-        </ol>
+        {this.renderCloseButton()}
+        <TabList variant="minimal" focus={false}>
+          <TabPanel title={this.renderTitle("new")} maxHeight={this.state.innerMaxHeight}>
+            {this.renderNewOpportunities()}
+          </TabPanel>
+          <TabPanel title={this.renderTitle("dismissed")} maxHeight={this.state.innerMaxHeight}>
+              {this.renderDismissedOpportunities()}
+          </TabPanel>
+        </TabList>
       </div>
     );
   }

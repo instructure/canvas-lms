@@ -42,6 +42,7 @@ en:
   LongTextEditor: 
     cancel: Cancel
     save: Save
+  _2d4c0d31: …
   _at_the_bottom__4360f2b4: "-- At the bottom --"
   _b4455c8b: "%"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "A calculation value is not used with this calculation method"
@@ -76,6 +77,7 @@ en:
         partner_key: "Partner Key"
   accept_2fdd362e: Accept
   accept_grades_4d56a3dd: "Accept Grades"
+  accept_grades_by_gradername_7a98b969: "Accept grades by %{graderName}"
   acceptable_use_policy_29a28124: "Acceptable Use Policy"
   accepted_c9f8ab87: Accepted
   accepted_formats_hex_rgba_rgb_hsl_42a37ef7: "accepted formats: hex, rgba, rgb, hsl"
@@ -1079,7 +1081,6 @@ en:
       created_at: "created %{at}"
       created_at_by: "created %{at} by [%{teacher}](%{url})"
       download_csv_link: "Download csv"
-      file_storage_header: "File Storage"
       general_numbers_title: "General Numbers"
       labels: 
         courses: Courses
@@ -1456,7 +1457,6 @@ en:
   allow_passive_acceptance_of_terms_of_service_63ef5994: "Allow passive acceptance of Terms of Service"
   allow_reorder_dashboard_cards_78215947: "Allow Reorder Dashboard Cards"
   allow_replies_for_title_cfe7af6c: "Allow replies for %{title}"
-  allow_rtl_users_to_see_rtl_interface_3c4f8b86: "Allow RTL users to see RTL interface"
   allow_students_to_download_course_content_and_view_810e66ec: "Allow students to download course content and view offline"
   allow_students_to_see_who_has_signed_up_for_time_s_497f4a46: "Allow students to see who has signed up for time slots."
   allow_students_to_see_who_was_signed_up_for_time_s_160ba252: "Allow students to see who was signed up for time slots"
@@ -1562,6 +1562,7 @@ en:
       Allows user to manage Blueprint Course settings in Course Settings.
       Allows user to add associated courses.
   allows_user_to_differentiate_assignments_to_indivi_37f701a5: "Allows user to differentiate assignments to individual students."
+  allows_user_to_download_all_comments_in_a_student__33b36d0a: "Allows user to download all comments in a student’s submission."
   allows_user_to_edit_assignment_details_on_individu_3e50993a: "Allows user to edit assignment details on individual discussions. Modules: Allows user to add new assignments to a module."
   allows_user_to_edit_assignment_details_on_individu_ecf19e63: "Allows user to edit assignment details on individual discussions."
   allows_user_to_edit_blueprint_content_lock_setting_25128c82: "Allows user to edit blueprint content lock settings on individual discussions."
@@ -1600,7 +1601,7 @@ en:
       publish/unpublish, etc.).
   allows_user_to_manage_observers_associated_with_st_4b45f2be: "Allows user to manage observers associated with students in the account."
   allows_user_to_manage_rubrics_326eedc2: "Allows user to manage rubrics."
-  allows_user_to_manually_add_an_app_in_account_sett_c5ce3789: "Allows user to manually add an app in Account Settings."
+  allows_user_to_manually_add_and_delete_an_app_in_a_402d3d91: "Allows user to manually add and delete an app in Account Settings."
   allows_user_to_manually_add_and_delete_an_app_in_c_18250cad: "Allows user to manually add and delete an app in Course Settings."
   allows_user_to_moderate_a_quiz_6953d369: "Allows user to moderate a quiz."
   allows_user_to_publish_conclude_and_delete_courses_336cf352: "Allows user to publish, conclude, and delete courses."
@@ -1839,6 +1840,9 @@ en:
   anonymous_grading_cannot_be_enabled_for_group_assi_faa33494: "Anonymous grading cannot be enabled for group assignments"
   anonymous_grading_ccb5045c: "Anonymous Grading"
   anonymous_instructor_annotations_2b6c822: "Anonymous Instructor Annotations"
+  anonymous_instructor_annotations_is_a_setting_on_a_f7a2e36a: |-
+      Anonymous Instructor Annotations is a setting on assignments allowing
+      instructors to leave annotations that are anonymous to students.
   anonymous_mode_on_2dd9b94a: "Anonymous Mode On"
   anonymous_mode_on_feb53729: "Anonymous Mode On:"
   anonymous_moderated_assignments_cannot_be_unmuted__8f7b09e7: "Anonymous moderated assignments cannot be unmuted until grades are posted"
@@ -2077,6 +2081,7 @@ en:
     total_graded_submissions: "Total Graded Submissions:"
   assignment_details_expanded_20c6f0c7: "assignment details expanded"
   assignment_does_not_exist_74178c34: "assignment does not exist"
+  assignment_edit_6dced39f: "Assignment Edit"
   assignment_excused_eb6c08fa: "Assignment Excused"
   assignment_graded_grade_on_assignment_name_in_cour_5082fd1: "Assignment graded: %{grade} on %{assignment_name} in %{course_code}"
   assignment_grades_have_already_been_published_ff2d84c6: "Assignment grades have already been published."
@@ -2137,6 +2142,7 @@ en:
   assignment_title_8a707dd2: "assignment title"
   assignment_title_e3192978: "Assignment: %{title}"
   assignment_url_37c849c6: "assignment url"
+  assignment_view_1206a60b: "Assignment View"
   assignment_was_deleted_8320d26d: "Assignment was deleted"
   assignment_weights_d4bcf9ab: "Assignment Weights"
   assignments: 
@@ -2395,7 +2401,7 @@ en:
       peer_reviews_header: "Peer Reviews"
       reviews_per_user: "Reviews Per User"
     points_possible_number: "Points possible must be a number"
-    processing_submission: "Canvas is currently processing your submission. You can safely navigate away from this page and we will email you when the submission has processed."
+    processing_submission: "Canvas is currently processing your submission. You can safely navigate away from this page and we will email you if the submission fails to process."
     redirect_page: 
       redirect_message: |-
           This submission was a url, we're taking you to the url link now.  
@@ -3423,6 +3429,7 @@ en:
   cannot_change_the_due_date_to_a_date_within_a_clos_61eb0951: "Cannot change the due date to a date within a closed grading period"
   cannot_change_the_due_date_when_due_in_a_closed_gr_965b99cb: "Cannot change the due date when due in a closed grading period"
   cannot_create_an_appointment_group_for_a_concluded_f4da02e3: "cannot create an appointment group for a concluded course"
+  cannot_create_event_for_deleted_course_c800f310: "cannot create event for deleted course"
   cannot_delete_a_file_that_has_been_submitted_as_pa_fda24c4: "Cannot delete a file that has been submitted as part of an assignment"
   cannot_delete_an_override_with_a_due_date_within_a_fa94ca3b: "Cannot delete an override with a due date within a closed grading period"
   cannot_give_outcomes_extra_credit_696208f0: "Cannot give outcomes extra credit"
@@ -3436,6 +3443,7 @@ en:
   cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: "Cannot set override due date to a date within a closed grading period"
   cannot_set_sis_account_id_on_a_root_account_dc7a969e: "Cannot set sis_account_id on a root_account."
   cannot_set_the_due_date_to_a_date_within_a_closed__8c88c45d: "Cannot set the due date to a date within a closed grading period"
+  cannot_view_detailed_reports_for_anonymous_assignm_33ed6c3e: "Cannot view detailed reports for anonymous assignments until grades are unmuted."
   canvas: 
     migration: 
       errors: 
@@ -5413,6 +5421,7 @@ en:
   courses_account_navigation_f84fdec3: "Courses (Account Navigation)"
   courses_add_edit_delete_aa2b55d3: "Courses - add / edit / delete"
   courses_navigation_menu_b3638384: "Courses Navigation Menu"
+  courses_over_time_41dc0428: "courses over time"
   courses_undelete_1f689a97: "Courses - undelete"
   courses_view_change_logs_25af6a45: "Courses - view change logs"
   courses_view_list_47885585: "Courses - view list"
@@ -6581,7 +6590,7 @@ en:
   enter_grades_as_e113e606: "Enter Grades as"
   enter_or_find_an_external_tool_url_6aebbd0d: "Enter or find an External Tool URL"
   enter_specific_phrase_9b686755: "Enter specific phrase"
-  enter_the_access_token_for_your_organization_from__cc77493d: "Enter the access token for your organization from                         *eduappcenter.com*. Once applied, only apps your organization has approved in the                         EduAppCenter will be listed on the External Apps page.                         Learn how to **generate an access token**."
+  enter_the_access_token_for_your_organization_from__f1c71941: "Enter the access token for your organization from                       *eduappcenter.com*. Once applied, only apps your organization has approved in the                       EduAppCenter will be listed on the External Apps page.                       Learn how to **generate an access token**."
   enter_the_email_addresses_of_the_users_you_would_l_f76448a6: "Enter the email addresses of the users you would like to add, separated by commas or line breaks"
   enter_the_login_ids_of_the_users_you_would_like_to_502fcbc5: "Enter the login IDs of the users you would like to add, separated by commas or line breaks"
   enter_the_sis_ids_of_the_users_you_would_like_to_a_25e441f1: "Enter the SIS IDs of the users you would like to add, separated by commas or line breaks"
@@ -6840,6 +6849,7 @@ en:
   error_message_2b9d12ee: "Error: %{message}"
   error_rendering_duplicated_module_db821097: "Error rendering duplicated module"
   error_reports_7d6c8b1e: "Error Reports"
+  error_retrieving_assignment_external_tools_9102d343: "Error retrieving assignment external tools"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "Error retrieving similarity detection tools"
   error_running_quizzes_2_export_cfecedba: "Error running Quizzes 2 export."
   error_saving_discussion_settings_3360661d: "Error saving discussion settings"
@@ -6967,6 +6977,7 @@ en:
   external_feeds_77f57c7d: "External feeds"
   external_integration_keys_8b4f4548: "External Integration Keys"
   external_tool_c5a6410a: "External Tool"
+  external_tool_tool_id_6028b3b1: "External Tool %{tool_id}"
   external_tool_url_cannot_be_left_blank_a34b6bb2: "External Tool URL cannot be left blank"
   external_tools: 
     cannot_locate_launch_request: "Cannot locate launch request, please try again."
@@ -7102,6 +7113,7 @@ en:
     published_status: Published
     restricted_status: "Available from %{from_date} until %{until_date}"
     unpublished_status: Unpublished
+  file_storage_32477f6: "File Storage"
   file_upload_submission_740711f: "File Upload Submission"
   filename_has_been_published_with_the_following_usa_fbd8b39f: "%{filename} has been published with the following usage right: %{usage_right}"
   filename_is_hidden_available_with_a_link_click_to__3e328e8f: "%{fileName} is Hidden. Available with a link - Click to modify"
@@ -7222,6 +7234,7 @@ en:
   full_name_is_required_8efbdc84: "Full name is required"
   future_5416ea92: Future
   future_terms_7fba2ae6: "Future Terms"
+  gathering_files_933551d9: "Gathering Files..."
   general_locked_objects_6a9adafb: "General Locked Objects"
   generate_activity_for_user_2b0af749: "Generate Activity for %{user}"
   generate_epub_80e89ea4: "Generate ePub"
@@ -7417,7 +7430,6 @@ en:
       tooltip: 
         error: "Similarity Score - See submission error details"
         pending: "Similarity Score - Submission pending"
-        score: "Similarity Score - See detailed report"
     unmute_assignment: "Unmute Assignment"
     vericite: 
       error_message: "There was an error submitting to VeriCite. Please try resubmitting the file before contacting support"
@@ -7426,7 +7438,6 @@ en:
       tooltip: 
         error: "VeriCite Similarity Score - See submission error details"
         pending: "VeriCite Similarity Score - Submission pending"
-        score: "VeriCite Similarity Score - See detailed report"
   gradebook_1620a0aa: Gradebook
   gradebook_5fd8ef0: Gradebook…
   gradebook_and_speedgrader_will_be_inaccessible_if__4de0e869: "Gradebook and SpeedGrader will be inaccessible if both Grades - edit​ and Grades - view all grades​ are disabled."
@@ -7625,7 +7636,6 @@ en:
   grades_edit_773dfc24: "Grades - edit"
   grades_for_student_aff00ba: "Grades for %{student}"
   grades_for_this_assignment_are_now_visible_to_stud_623efda0: "Grades for this assignment are now visible to students."
-  grades_moderate_317fce84: "Grades - moderate"
   grades_posted_c274d9f8: "Grades Posted"
   grades_posting_bc7cfc1a: "Grades Posting"
   grades_saved_5954b0bb: "Grades saved."
@@ -7768,7 +7778,6 @@ en:
   group_group_name_is_full_297880d6: "Group %{group_name} is full"
   group_group_name_is_joined_by_invitation_only_4ac2a9e5: "Group %{group_name} is joined by invitation only"
   group_group_name_is_not_available_at_this_time_971001c1: "Group %{group_name} is not available at this time"
-  group_guid_exists_in_incorrect_context_64263138: "Group \"%{guid}\" exists in incorrect context"
   group_guid_has_already_appeared_in_this_import_78f35ff3: "Group \"%{guid}\" has already appeared in this import"
   group_is_full_56849d78: "Group is full"
   group_is_joined_by_invitation_only_d00f5a63: "Group is joined by invitation only"
@@ -7796,6 +7805,7 @@ en:
   group_select_330df8bd: "Group Select"
   group_set_name_2aed2347: "Group Set Name"
   group_weight_for_d46c5db4: "Group weight for:"
+  group_with_id_guid_already_exists_in_another_unrel_be1baf71: "Group with ID %{guid} already exists in another unrelated course or account (%{name})"
   groups: 
     add_group: "Add Group"
     context_groups: 
@@ -7989,12 +7999,12 @@ en:
     unassigned_users: "Unassigned Users (%{count})"
   groups_6c90e26a: Groups
   groups_add_edit_delete_1536bbb4: "Groups - add / edit / delete"
-  groups_are_a_good_place_to_collaborate_on_projects_7386830f: |-
+  groups_are_a_good_place_to_collaborate_on_projects_fdfe57a9: |-
       Groups are a good place to collaborate on projects or to figure out schedules for study sessions
-                      and the like.  Every group gets a calendar, a wiki, discussions, and a little bit of space to store
-                      files.  Groups can collaborate on documents, or even schedule web conferences.
-                      It's really like a mini-course where you can work with a smaller number of students on a
-                      more focused project.
+                    and the like.  Every group gets a calendar, a wiki, discussions, and a little bit of space to store
+                    files.  Groups can collaborate on documents, or even schedule web conferences.
+                    It's really like a mini-course where you can work with a smaller number of students on a
+                    more focused project.
   groups_cannot_have_size_restrictions_to_assign_by__7d36fa32: "Groups cannot have size restrictions to assign by section"
   groups_course_c73e4c2c: "Groups (Course)"
   groups_must_be_empty_to_assign_by_section_a9fafa72: "Groups must be empty to assign by section"
@@ -8526,6 +8536,7 @@ en:
         original_job_id: "Original Job ID"
         priority: Priority
         run_at: "Run At"
+        shard: shard
         source: Source
         strand: strand
         tag: tag
@@ -9086,6 +9097,7 @@ en:
     upload: Upload
     uploading: Uploading...
   media_has_been_queued_for_conversion_please_try_ag_74343bbd: "Media has been queued for conversion, please try again in a little bit."
+  media_over_time_d9332e25: "media over time"
   media_recording_77cddc52: "Media Recording"
   media_recording_submission_b7fd1491: "Media Recording Submission"
   media_recordings_749aef6d: "Media Recordings"
@@ -10098,10 +10110,6 @@ en:
     index: 
       titles: 
         messages: "Messages for %{name}"
-    layout: 
-      email: 
-        html: 
-          click_to_preferences: "Update your notification settings"
     merge_email_communication_channel: 
       email: 
         body: "An account has been created for you at %{host}, but you already have a Canvas account.  If you would like to merge them together, please visit the following url:"
@@ -10760,7 +10768,6 @@ en:
   model_is_already_located_in_newgroup_e5cea361: "%{model} is already located in %{newGroup}"
   moderate_assignment_ccb00173: "Moderate %{assignment}"
   moderate_d0c85e92: Moderate
-  moderate_grades_4f43f85d: "Moderate Grades"
   moderated_assignment_12873e87: "Moderated Assignment"
   moderated_grading_cannot_be_enabled_for_group_assi_7e947ab7: "Moderated grading cannot be enabled for group assignments"
   moderated_grading_cannot_be_enabled_for_peer_revie_6b7eedc1: "Moderated grading cannot be enabled for peer reviewed assignments"
@@ -11111,6 +11118,7 @@ en:
   not_submitted_7d05fdb4: "Not Submitted"
   not_synced_529cbf29: "Not Synced"
   not_synced_message_a343fe5e: "Not Synced: %{message}"
+  not_yet_assessed_9362f199: "Not yet assessed"
   not_yet_completed_345a0bca: "Not yet completed"
   note_8b73ce09: Note
   note_for_differentiated_group_topics_some_threads__90adbb21: "Note: for differentiated group topics, some threads may not have any students assigned."
@@ -11556,7 +11564,6 @@ en:
   outcome_groups_api: 
     account_group_description: "Account level outcomes group."
   outcome_guid_has_already_appeared_in_this_import_b9b8b34: "Outcome \"%{guid}\" has already appeared in this import"
-  outcome_guid_not_in_visible_context_36269663: "Outcome \"%{guid}\" not in visible context"
   outcome_imports_c496a81f: "Outcome Imports"
   outcome_path_mastery_points: "%{path} mastery points"
   outcome_path_result: "%{path} result"
@@ -11567,6 +11574,7 @@ en:
   outcome_score_141cf00a: "outcome score"
   outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Outcome: %{title} has a status of %{statusTooltip}"
   outcome_with_canvas_id_id_not_found_215c5227: "Outcome with canvas id \"%{id}\" not found"
+  outcome_with_id_guid_already_exists_in_another_unr_ee551c9d: "Outcome with ID %{guid} already exists in another unrelated course or account (%{name})"
   outcomes: 
     account_standards: "Account Standards"
     account_standards_description: "To the left you'll notice the standards your institution has created for you to use in your courses."
@@ -12714,7 +12722,6 @@ en:
   publishing_item_name_is_disabled_8207a9e7: "Publishing %{item_name} is disabled"
   pumpkin_904428d5: Pumpkin
   purple_7678a9fc: Purple
-  q_what_goes_black_white_black_white_a_a_panda_roll_c682ee13: "Q: What goes black, white, black, white?  A: A panda rolling down a hill."
   qatar_974_7e9684ca: "Qatar (+974)"
   qti_display: QTI
   qti_export_from_date_8f018de5: "*QTI Export from %{date}*"
@@ -15342,6 +15349,7 @@ en:
   similarity_detection_dcada48: "Similarity Detection"
   similarity_detection_platform_9e424d70: "Similarity Detection Platform"
   similarity_score_more_information_b7010a87: "Similarity score -- more information"
+  similarity_score_see_detailed_report_a113dac0: "Similarity Score - See detailed report"
   simple_tls_45df2648: "Simple TLS"
   singapore_65_b4927585: "Singapore (+65)"
   sis_2164965: SIS
@@ -15610,6 +15618,7 @@ en:
   students_have_either_already_taken_or_started_taki_a076336: "Students have either already taken or started taking this quiz, so be careful about editing it. If you change any quiz questions in a significant way, you may want to consider regrading students who took the old version of the quiz."
   students_must_complete_all_of_these_requirements_15fa97f7: "Students must complete all of these requirements"
   students_must_sign_up_in_groups_681206ac: "Students must sign up in groups"
+  students_over_time_7ec52f7a: "students over time"
   students_who_have_taken_the_quiz_count_69dbbda0: 
     one: "Students who have taken the quiz (%{count})"
     other: "Students who have taken the quiz (%{count})"
@@ -15776,7 +15785,6 @@ en:
     still_zipping: "File zipping still in process..."
     submission_download: 
       download_message: "**Your student submissions are being gathered** and compressed into a zip file. This may take some time, depending on the size and number of submission files."
-      gathering_files: "Gathering Files..."
   submissions_11e96106: Submissions
   submissions_base: 
     assignment_submitted: "Assignment submitted."
@@ -15908,6 +15916,7 @@ en:
   teacher_s_fdefb2c: Teacher(s)
   teacher_view_b2047bc6: "Teacher View"
   teachers_52e2423f: Teachers
+  teachers_over_time_1905603b: "teachers over time"
   teal_f729a294: Teal
   tell_us_how_and_when_you_would_like_to_be_notified_de3ed2bc: "Tell us how and when you would like to be notified of events in Canvas."
   templates_4ca13d07: Templates
@@ -16181,7 +16190,6 @@ en:
   this_feature_can_t_be_disabled_because_there_is_at_a015b943: "This feature can't be disabled because there is at least one sub-account or course with this feature enabled."
   this_feature_can_t_be_enabled_while_autodetection__a3552fb4: "This feature can't be enabled while autodetection of field separators is enabled"
   this_feature_can_t_be_enabled_while_semicolons_are_2e0adb54: "This feature can't be enabled while semicolons are forced to be field separators"
-  this_feature_enables_users_of_right_to_left_rtl_la_17bd0fae: "This feature enables users of right-to-left (RTL) languages to see the RTL layout under development. Eventually, this will become the default behavior and this option will be removed."
   this_field_is_required_fa58c4a: "This field is required"
   this_field_name_is_required_988caebc: "This field \"%{name}\" is required."
   this_field_name_is_required_b9196401: "This field \"name\" is required."
@@ -16571,7 +16579,7 @@ en:
       obtain a Client ID and Client Secret.
       
       If the provider can configure valid callback or redirect URIs, use %{callback_url}.
-  to_create_announcements_discussions_manage_must_al_932ac38f: "To create announcements, Discussions - manage must also be enabled."
+  to_create_announcements_discussions_moderate_must__8a8278f2: "To create announcements, Discussions - moderate must also be enabled."
   to_cross_list_a_section_course_sections_add_edit_d_160006f7: "To cross-list a section, Course Sections - add / edit / delete must also be enabled. To edit the course SIS ID, SIS Data - manage must also be enabled. To allow an account-level user to delete a course, Course State - manage must also be enabled."
   to_cross_list_a_section_course_sections_add_edit_d_20b5fd9d: "To cross-list a section, Course Sections - add / edit / delete ​must also be enabled. To edit the course SIS ID, SIS Data - manage​ must also be enabled. To allow an account-level user to delete a course, Course State - manage​ must also be enabled."
   to_cross_list_sections_course_add_edit_delete_must_a024d5b9: "To cross-list sections, Course - add / edit / delete must also be enabled."
@@ -16616,16 +16624,13 @@ en:
       
       To reply to a discussion, Discussions - post must also be enabled.
   to_manage_discussions_discussions_post_and_discuss_a27d31c4: "To manage discussions, Discussions - post and Discussions - moderate must also be enabled. To reply to a discussion, Discussions - post must also be enabled."
-  to_manage_moderated_grading_grades_moderate_must_a_6502844b: "To manage moderated grading, Grades - moderate ​must also be enabled."
-  to_manage_moderated_grading_grades_moderate_must_a_ed821722: |-
-      To manage moderated grading, Grades - moderate must also be enabled.
-      NOTE: This permission will replace Grades - moderate, which is being deprecated.
   to_manage_sis_data_sis_data_manage_must_also_be_en_cc52f042: "To manage SIS data, SIS Data - manage​ must also be enabled."
   to_manage_sis_data_sis_data_manage_must_be_enabled_23f57d2: "To manage SIS data, SIS Data - manage​ must be enabled. If SIS Data - manage ​is enabled and SIS Data - read is disabled, the account permission overrides the course permission. If SIS Data - manage ​is disabled and SIS Data - read​ is enabled, users can only view course, user, and subaccount SIS IDs. To disallow users from viewing any SIS IDs at the course level, SIS Data - manage​ and SIS Data - read​ must both be disabled."
   to_minscore_43e5452e: "to %{minScore}%"
   to_moderate_a_quiz_assignments_and_quizzes_add_edi_9747d5fb: "To moderate a quiz, Assignments and Quizzes - add / edit / delete​ must also be enabled."
   to_moderate_a_quiz_assignments_and_quizzes_add_edi_ebdecaf8: "To moderate a quiz, Assignments and Quizzes - add / edit / delete must also be enabled."
   to_moderate_a_quiz_grades_edit_must_also_be_enable_72ca6ca1: "To moderate a quiz, Grades - edit​ must also be enabled."
+  to_moderate_grades_grades_select_final_grade_for_m_8c605763: "To moderate grades, Grades - Select final grade for moderation must also be enabled."
   to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "To pin a discussion to the top of the page, drag a discussion here, or select Pin from the discussion settings menu."
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: "To preview Theme Editor branding, you will need to *turn off High Contrast UI*."
   to_publish_and_unpublish_module_content_courses_ad_4c7fc3c9: |-
@@ -16663,9 +16668,9 @@ en:
   to_view_discussions_in_a_course_discussions_view_m_18c3fa0b: |-
       To view discussions in a course, Discussions - view​ must also be enabled.
       To manage discussions, Discussions - moderate must be enabled.
-  to_view_discussions_in_a_course_discussions_view_m_b7e742bd: |-
+  to_view_discussions_in_a_course_discussions_view_m_aa57dee7: |-
       To view discussions in a course, Discussions - view must be enabled.
-              Both Discussions - create and Discussions - moderate allow a user to create a discussion in the Discussions page. To manage discussions, Discussions - manage must also be enabled.
+              Both Discussions - create and Discussions - moderate allow a user to create a discussion in the Discussions page. To manage discussions, Discussions - moderate must also be enabled.
   to_view_discussions_in_a_course_discussions_view_m_bf14b0e: |-
       To view discussions in a course, Discussions - view must also be enabled.
       To manage discussions, Discussions - moderate must be enabled.
@@ -16906,9 +16911,9 @@ en:
   update_link_b7cab181: "Update link"
   update_rating_6d29c2ef: "Update Rating"
   update_tool_7d48ef2a: "Update %{tool}"
+  update_your_notification_settings_ed9564f3: "Update your notification settings"
   updated_2c1e8615: Updated
   updated_group_group_name_727b1d98: "Updated Group %{group_name}"
-  updated_permissions_page_f2e91060: "Updated Permissions Page"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Updated UI for searching and displaying users and courses within an account."
   updating_6edbab78: Updating
   updating_discussion_failed_aadb2d35: "Updating discussion failed"
@@ -16925,6 +16930,7 @@ en:
   upload_media_ce31135a: "Upload Media"
   upload_successful_ca47465f: "Upload successful"
   upload_your_outcomes_bceeadbe: "Upload your Outcomes!"
+  uploaded_over_time_d59abb68: "uploaded over time"
   upper_limit_of_range_c454a8f2: "Upper limit of range"
   upper_lower_56cad16c: "%{upper} - %{lower}"
   uri_redirect_uri_d4aad2b9: "URI: %{redirect_uri}"
@@ -16944,11 +16950,11 @@ en:
   use_mathman_to_convert_latex_to_svg_3f61c9b: "Use MathMan to convert LaTeX to SVG?"
   use_new_folder_tree_in_files_bc0ea09f: "Use New Folder Tree in Files"
   use_new_rich_content_editor_with_enhanced_sidebar__8e0bfedd: "Use new rich content editor with enhanced sidebar everywhere"
+  use_parent_account_setting_f25a721f: "Use parent account setting"
   use_remote_service_for_notifications_9fe667c6: "Use remote service for notifications"
   use_semicolons_instead_of_commas_to_separate_field_f50945f2: "Use semicolons instead of commas to separate fields in Gradebook exports so they can be imported into Excel for users in some locales."
   use_semicolons_to_separate_fields_in_gradebook_exp_5fb3b39d: "Use semicolons to separate fields in Gradebook Exports"
   use_the_new_collaborations_external_tool_enabling__5f0ed73: "Use the new Collaborations external tool enabling more options for tools to use to collaborate"
-  use_the_new_interface_for_managing_permissions_907e8e8f: "Use the new interface for managing permissions"
   use_the_new_quiz_lti_tool_in_place_of_regular_canv_d7cb0c7f: "Use the new quiz LTI tool in place of regular canvas quizzes"
   use_the_new_scheduler_1273b832: "Use the new scheduler"
   use_this_list_to_remove_assigned_students_add_new__ad6205ad: "Use this list to remove assigned students. Add new students with combo box after list."
@@ -17359,6 +17365,7 @@ en:
   users_manage_login_details_9462b30f: "Users - manage login details"
   users_matching_search_term_c604db9e: "Users Matching \"%{search_term}\""
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Users of screen readers may need to turn off the virtual cursor in order to use these keyboard shortcuts"
+  users_over_time_9a2ee74a: "users over time"
   users_view_list_861c7a3f: "Users - view list"
   users_view_login_ids_a2e6a85: "Users - view login IDs"
   users_view_primary_email_address_14f4978f: "Users - view primary email address"
@@ -17376,6 +17383,7 @@ en:
   vericite_info: 
     buttons: 
       resubmit_to_vericite: "Resubmit to VeriCite"
+  vericite_similarity_score_see_detailed_report_390ab687: "VeriCite Similarity Score - See detailed report"
   video_b9f27375: Video
   video_content_is_not_supported_by_your_device_or_a_25214f57: "Video content is not supported by your device or app."
   video_player_b371005: "Video Player"

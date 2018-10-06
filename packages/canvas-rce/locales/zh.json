@@ -29,9 +29,6 @@
   "insert_equella_links_49a8dacd": {
     "message": "插入 Equella 链接"
   },
-  "assignment_list_a833f59d": {
-    "message": "作业列表"
-  },
   "alternative_text_a834dcad": {
     "message": "替代文本："
   },
@@ -161,9 +158,6 @@
   "close_flickr_form_b32e600a": {
     "message": "关闭 Flickr 窗体"
   },
-  "course_syllabus_5de1b0af": {
-    "message": "课程大纲"
-  },
   "upload_8b403d05": {
     "message": "上传"
   },
@@ -205,9 +199,6 @@
   },
   "cc_attribution_non_commercial_39e0d30d": {
     "message": "CC 署名、非商业"
-  },
-  "quizzes_list_d812caa6": {
-    "message": "测验列表"
   },
   "image_upload_form_7b74079a": {
     "message": "图片上传窗体"

@@ -17,8 +17,9 @@
  */
 
 import React from 'react'
-import { mount, ReactWrapper, shallow } from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme'
+import { mount, ReactWrapper, shallow } from 'enzyme'
 import merge from 'lodash/merge'
+import $ from 'jquery'
 
 import DiscussionSettings from 'jsx/discussions/components/DiscussionSettings'
 
@@ -120,9 +121,7 @@ QUnit.module('DiscussionSettings component', suiteHooks => {
       collapse_global_nav: false,
     }
     tree.setProps({userSettings, courseSettings})
-    const instance = tree.instance()
-    const saveWrapper = new ReactWrapper(instance.saveBtn, instance.saveBtn)
-    saveWrapper.simulate('click')
+    $("#submit_discussion_settings").click()
     deepEqual(saveSpy.args[0][1], courseSettings)
   })
 
@@ -141,9 +140,7 @@ QUnit.module('DiscussionSettings component', suiteHooks => {
       collapse_global_nav: false,
     }
     tree.setProps({userSettings, courseSettings})
-    const instance = tree.instance()
-    const saveWrapper = new ReactWrapper(instance.saveBtn, instance.saveBtn)
-    saveWrapper.simulate('click')
+    $("#submit_discussion_settings").click()
     deepEqual(saveSpy.args[0][1], courseSettings)
   })
 

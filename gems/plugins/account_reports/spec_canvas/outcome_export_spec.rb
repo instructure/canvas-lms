@@ -310,8 +310,8 @@ describe "Outcome Reports" do
         it 'exports successfully with no ratings' do
           @root_outcome_1.data = nil
           @root_outcome_1.save!
-          expect(first_outcome.length).to eq RATING_INDEX + 1
-          expect(first_outcome[RATING_INDEX]).to eq nil
+          default_count = LearningOutcome.default_rubric_criterion[:ratings].length
+          expect(first_outcome.length).to eq RATING_INDEX + (default_count * 2)
         end
       end
 

@@ -157,6 +157,21 @@ describe Enrollment do
     expect(e.readable_type).to eql('Student')
   end
 
+  describe "#student_or_fake_student?" do
+    it "returns true for students" do
+      expect(StudentEnrollment.create!(valid_enrollment_attributes).student_or_fake_student?).to be true
+    end
+
+    it "returns true for fake students" do
+      fake_student_enrollment = @course.enroll_user(@enrollment.user, "StudentViewEnrollment")
+      expect(fake_student_enrollment.student_or_fake_student?).to be true
+    end
+
+    it "returns false for non-students" do
+      expect(TaEnrollment.create!(valid_enrollment_attributes).student_or_fake_student?).to be false
+    end
+  end
+
   describe "sis_role" do
     it "should return role_name if present" do
       role = custom_account_role('Assistant Grader', :account => Account.default)

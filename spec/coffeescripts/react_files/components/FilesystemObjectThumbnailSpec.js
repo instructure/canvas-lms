@@ -42,20 +42,20 @@ QUnit.module('Filesystem Object Thumbnail: file', {
   },
   teardown() {
     this.clock.restore()
-    ReactDOM.unmountComponentAtNode(this.thumbnail.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.thumbnail).parentNode)
   }
 })
 
 test('displays the thumbnail image', function() {
   equal(
-    $(this.thumbnail.getDOMNode()).attr('style'),
+    $(ReactDOM.findDOMNode(this.thumbnail)).attr('style'),
     "background-image:url('sweet_thumbnail_url');",
     'set background image to correct url'
   )
 })
 
 test('adds class name from props to the span', function() {
-  ok($(this.thumbnail.getDOMNode()).hasClass('customClassname'), 'finds the custom className')
+  ok($(ReactDOM.findDOMNode(this.thumbnail)).hasClass('customClassname'), 'finds the custom className')
 })
 
 QUnit.module('Filesystem Object Thumbnail: folder', {
@@ -73,16 +73,16 @@ QUnit.module('Filesystem Object Thumbnail: folder', {
   },
   teardown() {
     this.clock.restore()
-    ReactDOM.unmountComponentAtNode(this.thumbnail.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.thumbnail).parentNode)
   }
 })
 
 test("adds mimeClass-Folder if it's a folder", function() {
-  ok($(this.thumbnail.getDOMNode()).hasClass('mimeClass-folder'), 'adds mimeClass for folder')
+  ok($(ReactDOM.findDOMNode(this.thumbnail)).hasClass('mimeClass-folder'), 'adds mimeClass for folder')
 })
 
 test('adds on className to i tag if set in props', function() {
-  ok($(this.thumbnail.getDOMNode()).hasClass('customClassname'), 'finds the custom className')
+  ok($(ReactDOM.findDOMNode(this.thumbnail)).hasClass('customClassname'), 'finds the custom className')
 })
 
 QUnit.module('Filesystem Object Thumbnail: other')
@@ -99,9 +99,9 @@ test('adds on className to i tag if set in props', function() {
     })
   )
   clock.tick(20000)
-  ok($(thumbnail.getDOMNode()).hasClass('customClassname'), 'finds the custom className')
+  ok($(ReactDOM.findDOMNode(thumbnail)).hasClass('customClassname'), 'finds the custom className')
   clock.restore()
-  ReactDOM.unmountComponentAtNode(thumbnail.getDOMNode().parentNode)
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(thumbnail).parentNode)
 })
 
 QUnit.module('Filesystem Object Thumbnail: checkForThumbnail', {
@@ -123,7 +123,7 @@ QUnit.module('Filesystem Object Thumbnail: checkForThumbnail', {
   teardown() {
     this.server.restore()
     this.clock.restore()
-    ReactDOM.unmountComponentAtNode(this.thumbnail.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.thumbnail).parentNode)
   }
 })
 

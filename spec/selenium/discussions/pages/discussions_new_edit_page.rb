@@ -55,6 +55,14 @@ class DiscussionNewEdit
       f('#sections_autocomplete_root').text
     end
 
+    def section_disabled_item
+      f('#disabled_sections_autocomplete')
+    end
+
+    def graded_checkbox
+      f('#use_for_grading')
+    end
+
     def select_a_section(section_name)
       fj(section_autocomplete_css).click
       if !section_name.empty?

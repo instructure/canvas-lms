@@ -1,171 +1,183 @@
 {
-  "group_navigation_99f191a": {
-    "message": "Gruppenavigering"
-  },
-  "cc_attribution_share_alike_669e7f16": {
-    "message": "CC Namngjeving - Del på same vilkår BY-SA"
-  },
-  "link_to_url_52dd935c": {
-    "message": "Link til URL"
-  },
-  "quizzes_7e598f57": {
-    "message": "Quizar"
-  },
-  "cc_attribution_non_commercial_no_derivatives_9fe74c00": {
-    "message": "CC Namngjeving – Ikkje-kommersiell - Ingen behandling BY-NC-ND "
-  },
-  "c_2001_acme_inc_283f7f80": {
-    "message": "(c) 2001 Acme Inc."
-  },
-  "upload_a_new_file_96e6d4ff": {
-    "message": "Last opp ei ny fil"
-  },
-  "file_upload_form_4aaad554": {
-    "message": "Filopplastingsdialog"
-  },
-  "folder_705fd2d7": {
-    "message": "Mappe"
-  },
-  "insert_equella_links_49a8dacd": {
-    "message": "Set in Equella-lenker"
-  },
-  "assignment_list_a833f59d": {
-    "message": "Oppgåveliste"
-  },
   "alternative_text_a834dcad": {
     "message": "Alternativ tekst: "
   },
-  "discussions_a5f96392": {
-    "message": "Diskusjonar"
-  },
-  "cc_attribution_no_derivatives_b006744f": {
-    "message": "CC Namngjeving – Ikkje-kommersiell - Del på same vilkår BY-NC-SA"
-  },
-  "usage_right_ff96f3e2": {
-    "message": "Bruksrett:"
-  },
-  "click_to_embed_image_33107dd8": {
-    "message": "Klikk for å sette inn bilde"
-  },
-  "i_hold_the_copyright_71ee91b1": {
-    "message": "Eg er rettshavar"
-  },
-  "files_c300e900": {
-    "message": "Filer"
-  },
-  "cancel_image_upload_2c771950": {
-    "message": "Avbryt bildeopplasting"
-  },
-  "people_b4ebb13c": {
-    "message": "Personar"
-  },
-  "check_if_the_image_is_decorative_283649b7": {
-    "message": "Sjekk om bildet har ein dekorativ funksjon"
-  },
-  "loading_25990131": {
-    "message": "Lastar..."
+  "announcement_list_da155734": {
+    "message": "Kunngjeringsliste"
   },
   "announcements_a4b8ed4a": {
     "message": "Kunngjeringar"
   },
-  "select_a_file_53ba40ac": {
-    "message": "Vel ei fil"
-  },
-  "formatting_press_down_to_select_df728c30": {
-    "message": "Formatering, trykk ned for å velje"
+  "assignments_1e02582c": {
+    "message": "Oppgåver"
   },
   "background_color_press_down_to_select_ef99fdac": {
-    "message": "Bakgrunnsfarge, trykk ned for å velje"
+    "message": "Bakgrunnsfarge, klikk for å velje"
   },
-  "files_index_af7c662b": {
-    "message": "Filoversikt"
+  "c_2001_acme_inc_283f7f80": {
+    "message": "(c) 2001 Acme Inc."
   },
   "cancel_file_upload_9903e7b9": {
     "message": "Avbryt filopplasting"
   },
-  "the_material_is_subject_to_fair_use_exception_41bc6a4b": {
-    "message": "Materialet er brukt i samsvar med sitatretten"
-  },
-  "enter_the_alternative_text_for_this_image_88047c47": {
-    "message": "Legg inn alternativ tekst som skildrar bildet"
-  },
-  "link_to_other_content_in_the_group_3fe25379": {
-    "message": "Lenke til anna innhald i gruppa. "
-  },
-  "discussions_index_6c36ced": {
-    "message": "Diskusjonsoversikt"
-  },
-  "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
-    "message": "Klikk på ei fil for å sette inn ei nedlastingslenke for fila. "
-  },
-  "copyright_holder_66ee111": {
-    "message": "Rettshavar:"
-  },
-  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
-    "message": "Område for rik tekst-format. Trykk ALT+F8 for hjelp"
-  },
-  "enter_search_terms_e397b1f0": {
-    "message": "oppgi søkeord"
-  },
-  "pages_e5414c2c": {
-    "message": "Sider"
+  "cancel_image_upload_2c771950": {
+    "message": "Avbryt bildeopplasting"
   },
   "cc_attribution_f6de631f": {
     "message": " CC Namngjeving BY"
   },
-  "insert_link_6dc23cae": {
-    "message": "Sett inn lenke"
+  "cc_attribution_no_derivatives_b006744f": {
+    "message": "CC Namngjeving – Ikkje-kommersiell - Del på same vilkår BY-NC-SA"
   },
-  "collaborations_5c56c15f": {
-    "message": "Samarbeid"
+  "cc_attribution_non_commercial_39e0d30d": {
+    "message": "CC Namngjeving - Ingen behandling BY-ND"
   },
-  "what_would_you_like_to_call_the_new_page_d7e4488a": {
-    "message": "Kva vil du kalle den nye sida? "
+  "cc_attribution_non_commercial_no_derivatives_9fe74c00": {
+    "message": "CC Namngjeving – Ikkje-kommersiell - Ingen behandling BY-NC-ND "
+  },
+  "cc_attribution_non_commercial_share_alike_c7edb1e5": {
+    "message": "CC Namngjeving – Ikkje-kommersiell BY-NC"
+  },
+  "cc_attribution_share_alike_669e7f16": {
+    "message": "CC Namngjeving - Del på same vilkår BY-SA"
+  },
+  "check_if_the_image_is_decorative_283649b7": {
+    "message": "Sjekk om bildet har ein dekorativ funksjon"
+  },
+  "choose_usage_rights_33683854": {
+    "message": "Vel bruksrett..."
+  },
+  "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
+    "message": "Klikk på ei fil for å sette inn ei nedlastingslenke for fila. "
   },
   "click_any_image_to_embed_the_image_in_the_page_2cdd1136": {
     "message": "Klikk på eit bilde for å inkludere det på sida. "
   },
-  "search_flickr_6884b518": {
-    "message": "Søk i Flickr"
-  },
   "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
     "message": "Klikk på eit sidenamn for å sette inn ei lenke til sida. "
   },
-  "click_to_insert_a_link_into_the_editor_c19613aa": {
-    "message": "Klikk for å setje inn ei lenke i editoren. "
-  },
-  "decorative_image_fde98579": {
-    "message": "Dekorativt bilde"
-  },
-  "click_to_insert_a_link_to_this_item_39794098": {
-    "message": "Klikk for å sette inn ei lenke til dette elementet. "
-  },
-  "load_more_results_460f49a9": {
-    "message": "Last fleire resultat"
-  },
-  "link_7262adec": {
-    "message": "Lenke"
-  },
-  "grades_a61eba0a": {
-    "message": "Karakterar"
-  },
-  "links_14b70841": {
-    "message": "Lenker"
-  },
-  "loading_failed_b3524381": {
-    "message": "Opplasting mislukkast..."
+  "click_to_embed_image_33107dd8": {
+    "message": "Klikk for å sette inn bilde"
   },
   "click_to_embed_imagename_c41ea8df": {
     "message": "Klikk for å sette inn { imageName }"
   },
+  "click_to_insert_a_link_into_the_editor_c19613aa": {
+    "message": "Klikk for å setje inn ei lenke i editoren. "
+  },
+  "click_to_insert_a_link_to_this_item_39794098": {
+    "message": "Klikk for å setje inn ei lenke til dette elementet. "
+  },
   "close_flickr_form_b32e600a": {
     "message": "Lukk Flickr-dialog"
   },
-  "course_syllabus_5de1b0af": {
-    "message": "Emneoversikt"
+  "collaborations_5c56c15f": {
+    "message": "Samarbeid"
   },
-  "upload_8b403d05": {
-    "message": "Last opp"
+  "copyright_holder_66ee111": {
+    "message": "Rettshavar:"
+  },
+  "course_navigation_dd035109": {
+    "message": "Emnenavigering"
+  },
+  "creative_commons_license_725584ae": {
+    "message": "Creative Commons-lisens:"
+  },
+  "decorative_image_fde98579": {
+    "message": "Dekorativt bilde"
+  },
+  "discussions_a5f96392": {
+    "message": "Diskusjonar"
+  },
+  "discussions_index_6c36ced": {
+    "message": "Diskusjonsoversikt"
+  },
+  "embed_image_1080badc": {
+    "message": "Sett inn bilde"
+  },
+  "enter_search_terms_e397b1f0": {
+    "message": "oppgi søkeord"
+  },
+  "enter_the_alternative_text_for_this_image_88047c47": {
+    "message": "Legg inn alternativ tekst som skildrar bildet"
+  },
+  "file_upload_form_4aaad554": {
+    "message": "Filopplastingsdialog"
+  },
+  "files_c300e900": {
+    "message": "Filer"
+  },
+  "files_index_af7c662b": {
+    "message": "Filoversikt"
+  },
+  "folder_705fd2d7": {
+    "message": "Mappe"
+  },
+  "font_size_press_down_to_select_6c25dc2d": {
+    "message": "Skriftstorleik, klikk for å velje"
+  },
+  "formatting_press_down_to_select_df728c30": {
+    "message": "Formatering, klikk for å velje"
+  },
+  "grades_a61eba0a": {
+    "message": "Karakterar"
+  },
+  "group_navigation_99f191a": {
+    "message": "Gruppenavigering"
+  },
+  "i_have_obtained_permission_to_use_this_file_6386f087": {
+    "message": "Eg har løyve til å bruke denne fila. "
+  },
+  "i_hold_the_copyright_71ee91b1": {
+    "message": "Eg er rettshavar"
+  },
+  "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
+    "message": "Om du ikkje vel bruksrettar no, vil ikkje fila bli publisert etter at ho er lasta opp. "
+  },
+  "image_upload_form_7b74079a": {
+    "message": "Bildeopplastingsdialog"
+  },
+  "images_7ce26570": {
+    "message": "Bilde"
+  },
+  "insert_equella_links_49a8dacd": {
+    "message": "Sett inn Equella-lenker"
+  },
+  "insert_link_6dc23cae": {
+    "message": "Sett inn lenke"
+  },
+  "insert_math_equation_57c6e767": {
+    "message": "Sett inn matematikklikning"
+  },
+  "link_7262adec": {
+    "message": "Lenke"
+  },
+  "link_to_a_new_page_6c4ad034": {
+    "message": "Lenke til ei ny side"
+  },
+  "link_to_other_content_in_the_course_879163b5": {
+    "message": "Opprett ei lenke til anna emneinnhald. "
+  },
+  "link_to_other_content_in_the_group_3fe25379": {
+    "message": "Lenke til anna innhald i gruppa. "
+  },
+  "link_to_url_52dd935c": {
+    "message": "Lenke til URL"
+  },
+  "links_14b70841": {
+    "message": "Lenker"
+  },
+  "load_more_results_460f49a9": {
+    "message": "Last fleire resultat"
+  },
+  "loading_25990131": {
+    "message": "Lastar..."
+  },
+  "loading_failed_b3524381": {
+    "message": "Opplasting mislukkast..."
+  },
+  "loading_folders_8d4d5d5a": {
+    "message": "Lastar mapper..."
   },
   "modules_c4325335": {
     "message": "Modular"
@@ -173,76 +185,64 @@
   "no_results_940393cf": {
     "message": "Utan resultat. "
   },
-  "announcement_list_da155734": {
-    "message": "Kunngjeringsliste"
+  "pages_e5414c2c": {
+    "message": "Sider"
   },
-  "link_to_a_new_page_6c4ad034": {
-    "message": "Lenke til ei ny side"
+  "people_b4ebb13c": {
+    "message": "Personar"
   },
-  "insert_math_equation_57c6e767": {
-    "message": "Set inn matematikklikning"
+  "quizzes_7e598f57": {
+    "message": "Quizar"
   },
-  "i_have_obtained_permission_to_use_this_file_6386f087": {
-    "message": "Eg har løyve til å bruke denne fila. "
-  },
-  "cc_attribution_non_commercial_share_alike_c7edb1e5": {
-    "message": "CC Namngjeving – Ikkje-kommersiell BY-NC"
-  },
-  "wiki_home_9cd54d0": {
-    "message": "Wiki-startside"
-  },
-  "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
-    "message": "Om du ikkje vel bruksrettar no, vil ikkje fila bli publisert etter at ho er lasta opp. "
-  },
-  "upload_a_new_image_890df275": {
-    "message": "Last opp eit nytt bilde"
+  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
+    "message": "Område for rik tekst-format. Trykk ALT+F8 for hjelp"
   },
   "search_280d00bd": {
     "message": "Søk"
   },
-  "assignments_1e02582c": {
-    "message": "Oppgåver"
+  "search_flickr_6884b518": {
+    "message": "Søk i Flickr"
   },
-  "cc_attribution_non_commercial_39e0d30d": {
-    "message": "CC Namngjeving - Ingen behandling BY-ND"
-  },
-  "quizzes_list_d812caa6": {
-    "message": "Quiz-liste"
-  },
-  "image_upload_form_7b74079a": {
-    "message": "Bildeopplastingsdialog"
-  },
-  "the_material_is_licensed_under_creative_commons_3242cb5e": {
-    "message": "Materialet er lisensiert under Creative Commons"
-  },
-  "images_7ce26570": {
-    "message": "Bilde"
-  },
-  "link_to_other_content_in_the_course_879163b5": {
-    "message": "Opprett ei lenke til anna emneinnhald. "
-  },
-  "font_size_press_down_to_select_6c25dc2d": {
-    "message": "Skriftstorleik, trykk ned for å velje"
+  "select_a_file_53ba40ac": {
+    "message": "Vel ei fil"
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Vel ei mappe å laste opp fila til"
   },
-  "course_navigation_dd035109": {
-    "message": "Emnenavigering"
-  },
-  "choose_usage_rights_33683854": {
-    "message": "Vel bruksrett..."
+  "syllabus_f191f65b": {
+    "message": "Emneoversikt"
   },
   "text_color_press_down_to_select_8f5ad9b5": {
-    "message": "Tekstfarge, trykk ned for å velje"
-  },
-  "embed_image_1080badc": {
-    "message": "Sett inn bilde"
-  },
-  "creative_commons_license_725584ae": {
-    "message": "Creative Commons-lisens:"
+    "message": "Tekstfarge, klikk for å velje"
   },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Materialet er ikkje opphavsrettbeskytta"
+  },
+  "the_material_is_licensed_under_creative_commons_3242cb5e": {
+    "message": "Materialet er lisensiert under Creative Commons"
+  },
+  "the_material_is_subject_to_fair_use_exception_41bc6a4b": {
+    "message": "Materialet er brukt i samsvar med sitatretten"
+  },
+  "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
+    "message": "Opplastinga har ein storleik som overskrid lagringskvoten. Ta kontakt med systemadministrator. "
+  },
+  "upload_8b403d05": {
+    "message": "Last opp"
+  },
+  "upload_a_new_file_96e6d4ff": {
+    "message": "Last opp ei ny fil"
+  },
+  "upload_a_new_image_890df275": {
+    "message": "Last opp eit nytt bilde"
+  },
+  "usage_right_ff96f3e2": {
+    "message": "Bruksrett:"
+  },
+  "what_would_you_like_to_call_the_new_page_d7e4488a": {
+    "message": "Kva vil du kalle den nye sida? "
+  },
+  "wiki_home_9cd54d0": {
+    "message": "Wiki-startside"
   }
 }

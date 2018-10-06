@@ -33,10 +33,6 @@ class RoleOverride < ActiveRecord::Base
     self.role.touch
   end
 
-  def self.v2_labels(context, has_v2)
-    context.feature_enabled?(:permissions_v2_ui) && has_v2
-  end
-
   def must_apply_to_something
     self.errors.add(nil, "Must apply to something") unless applies_to_self? || applies_to_descendants?
   end
@@ -608,12 +604,6 @@ class RoleOverride < ActiveRecord::Base
         'AccountAdmin'
       ]
      },
-    :moderate_grades => {
-      :label => -> { t('Moderate Grades') },
-      :label_v2 => -> { t('Grades - moderate') },
-      :true_for => %w(AccountAdmin TeacherEnrollment),
-      :available_to => %w(AccountAdmin AccountMembership TeacherEnrollment TaEnrollment)
-     },
     :view_all_grades => {
       :label => lambda { t('permissions.view_all_grades', "View all grades") },
       :label_v2 => lambda { t("Grades - view all grades") },
@@ -979,7 +969,7 @@ class RoleOverride < ActiveRecord::Base
     permissions.map do |k, p|
       {
         name: "#{ACCESS_TOKEN_SCOPE_PREFIX}.#{k}",
-        label:  v2_labels(@context, p.key?(label_v2)) ? p[:label_v2].call : p[:label].call
+        label:  p.key?(label_v2) ? p[:label_v2].call : p[:label].call
       }
     end
   end

@@ -45,6 +45,7 @@ Array.prototype.forEach.call(rubricElements, (rubricElement) => {
       rubricAssessment={fillAssessment(rubric, assessment || {})}
       rubricAssociation={assessment.rubric_association}
       customRatings={ENV.outcome_proficiency ? ENV.outcome_proficiency.ratings : []}
+      flexWidth={ENV.gradebook_non_scoring_rubrics_enabled}
     />
   ), rubricElement)
 })

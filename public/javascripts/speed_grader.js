@@ -50,8 +50,7 @@ import SpeedgraderHelpers, {
   setupAnonymizableUserId,
   setupAnonymizableAuthorId,
   setupAnonymousGraders,
-  setupIsAnonymous,
-  setupIsModerated
+  setupIsAnonymous
 } from './speed_grader_helpers';
 import turnitinInfoTemplate from 'jst/_turnitinInfo';
 import turnitinScoreTemplate from 'jst/_turnitinScore';
@@ -88,7 +87,6 @@ let anonymizableId
 let anonymizableUserId
 let anonymizableStudentId
 let anonymizableAuthorId
-let isModerated
 
 let $window
 let $full_width_container
@@ -174,6 +172,9 @@ let showSubmissionOverride
 let provisionalGraderDisplayNames
 let EG
 const customProvisionalGraderLabel = I18n.t('Custom')
+const anonymousAssignmentDetailedReportTooltip = I18n.t(
+  'Cannot view detailed reports for anonymous assignments until grades are unmuted.'
+)
 
 function setupHandleFragmentChanged () {
   window.addEventListener('hashchange', EG.handleFragmentChanged);
@@ -838,10 +839,7 @@ function handleSelectedRubricAssessmentChanged({validateEnteredData = true} = {}
     editingData
   );
 
-  let showEditButton = true
-  if (isModerated) {
-    showEditButton = !selectedAssessment || assessmentBelongsToCurrentUser(selectedAssessment)
-  }
+  const showEditButton = !selectedAssessment || assessmentBelongsToCurrentUser(selectedAssessment)
   $('#rubric_assessments_list_and_edit_button_holder .edit').showIf(showEditButton)
 }
 
@@ -1165,7 +1163,6 @@ EG = {
 
   jsonReady: function(){
     isAnonymous = setupIsAnonymous(jsonData)
-    isModerated = setupIsModerated(jsonData)
     anonymousGraders = setupAnonymousGraders(jsonData)
     anonymizableId = setupAnonymizableId(isAnonymous)
     anonymizableUserId = setupAnonymizableUserId(isAnonymous)
@@ -1600,14 +1597,28 @@ EG = {
 
     // build up new values based on this asset
     if (turnitinAsset.status == 'scored' || (turnitinAsset.status == null && turnitinAsset.similarity_score != null)) {
-      var urlContainer = SpeedgraderHelpers.urlContainer(submission,
-                                                         $assignment_submission_turnitin_report_url,
-                                                         $assignment_submission_originality_report_url)
+      const urlContainer = SpeedgraderHelpers.urlContainer(
+        submission,
+        $assignment_submission_turnitin_report_url,
+        $assignment_submission_originality_report_url
+      )
+      let reportUrl
+      let tooltip
+
+      if (!isAnonymous) {
+        reportUrl = $.replaceTags(
+          urlContainer.attr('href'),
+          { user_id: submission.user_id, asset_string: assetString }
+        )
+        tooltip = I18n.t('Similarity Score - See detailed report')
+      } else {
+        tooltip = anonymousAssignmentDetailedReportTooltip
+      }
 
       $turnitinScoreContainer.html(turnitinScoreTemplate({
         state: (turnitinAsset.state || 'no') + '_score',
-        reportUrl: $.replaceTags(urlContainer.attr('href'), { user_id: submission.user_id, asset_string: assetString }),
-        tooltip: I18n.t('turnitin.tooltip.score', 'Similarity Score - See detailed report'),
+        reportUrl,
+        tooltip,
         score: turnitinAsset.similarity_score + '%'
       }));
     } else if (turnitinAsset.status) {
@@ -1648,10 +1659,22 @@ EG = {
 
     // build up new values based on this asset
     if (vericiteAsset.status == 'scored' || (vericiteAsset.status == null && vericiteAsset.similarity_score != null)) {
+      let reportUrl
+      let tooltip
+      if (!isAnonymous) {
+        reportUrl = $.replaceTags(
+          $assignment_submission_vericite_report_url.attr('href'),
+          { user_id: submission.user_id, asset_string: assetString }
+        )
+        tooltip = I18n.t('VeriCite Similarity Score - See detailed report')
+      } else {
+        tooltip = anonymousAssignmentDetailedReportTooltip
+      }
+
       $vericiteScoreContainer.html(vericiteScoreTemplate({
         state: (vericiteAsset.state || 'no') + '_score',
-        reportUrl: $.replaceTags($assignment_submission_vericite_report_url.attr('href'), { user_id: submission.user_id, asset_string: assetString }),
-        tooltip: I18n.t('vericite.tooltip.score', 'VeriCite Similarity Score - See detailed report'),
+        reportUrl,
+        tooltip,
         score: vericiteAsset.similarity_score + '%'
       }));
     } else if (vericiteAsset.status) {

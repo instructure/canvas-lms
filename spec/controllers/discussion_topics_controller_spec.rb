@@ -27,6 +27,8 @@ describe DiscussionTopicsController do
     student_in_course(active_all: true, course: @course)
   end
 
+  let(:now) { Time.zone.now.change(usec: 0) }
+
   def course_topic(opts={})
     @topic = @course.discussion_topics.build(:title => "some topic", :pinned => opts.fetch(:pinned, false))
     user = opts[:user] || @user
@@ -124,10 +126,13 @@ describe DiscussionTopicsController do
       end
 
       it "should not assign the create permission if the term and course are concluded" do
-        term = @course.account.enrollment_terms.create!(:name => 'mew', :start_at => Time.now.utc - 10.minutes, :end_at => Time.now.utc - 1.minute)
+        term = @course.account.enrollment_terms.create!(
+          :name => 'mew',
+          :start_at => 6.months.ago(now),
+          :end_at => 1.months.ago(now)
+        )
         @course.enrollment_term = term
-        @course.update_attribute(:conclude_at, Time.now.utc - 1.minute)
-        @course.save!
+        @course.update!(start_at: 5.months.ago(now), conclude_at: 2.months.ago(now))
         user_session(@teacher)
 
         get 'index', params: {:course_id => @course.id}
@@ -474,6 +479,24 @@ describe DiscussionTopicsController do
       expect(@topic.read_state(@student)).to eq 'unread'
       get 'show', params: {:course_id => @course.id, :id => @topic.id}
       expect(@topic.reload.read_state(@student)).to eq 'read'
+    end
+
+    it "should mark as read when topic is in the future as teacher" do
+      course_topic(:skip_set_user => true)
+      teacher2 = @course.shard.activate { user_factory() }
+      teacher2enrollment = @course.enroll_user(teacher2, "TeacherEnrollment")
+      teacher2.save!
+      teacher2enrollment.course = @course # set the reverse association
+      teacher2enrollment.workflow_state = 'active'
+      teacher2enrollment.save!
+      @course.reload
+      @topic.available_from = 1.day.from_now
+      @topic.save!
+      @topic.reload
+      expect(@topic.read_state(teacher2)).to eq 'unread'
+      user_session(teacher2)
+      get 'show', params: {:course_id => @course.id, :id => @topic.id}
+      expect(@topic.reload.read_state(teacher2)).to eq 'read'
     end
 
     it "should not mark as read if not visible" do

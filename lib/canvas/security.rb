@@ -25,6 +25,9 @@ module Canvas::Security
   class TokenExpired < RuntimeError
   end
 
+  class InvalidJwtKey < RuntimeError
+  end
+
   def self.encryption_key
     @encryption_key ||= begin
       res = config && config['encryption_key']
@@ -138,6 +141,7 @@ module Canvas::Security
   #
   # Returns the token as a string.
   def self.create_encrypted_jwt(payload, signing_secret, encryption_secret, alg = nil)
+    raise InvalidJwtKey unless signing_secret && encryption_secret
     jwt = JSON::JWT.new(payload)
     jws = jwt.sign(signing_secret, alg || :HS256)
     jwe = jws.encrypt(encryption_secret, 'dir', :A256GCM)

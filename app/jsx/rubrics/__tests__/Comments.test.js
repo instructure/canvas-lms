@@ -67,6 +67,17 @@ describe('The Comments component', () => {
     ])
   })
 
+  it('truncates long saved comments', () => {
+    const long = `
+    this is the song that never ends, yes it goes on and on my friends
+    some people started singing it not knowing what it was
+    and they'll continue singing it forever just because
+    `.trim().repeat(50)
+    const el = editor({ savedComments: [long] })
+    const option = el.find('option').last()
+    expect(option.text()).toHaveLength(100) // includes the trailing '…'
+  })
+
   it('can check / uncheck save for later', () => {
     const setSaveLater = sinon.spy()
     const el = editor({ setSaveLater })

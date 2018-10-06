@@ -18,7 +18,7 @@
 
 define([
   'react',
-  'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme',
+  'enzyme',
   'jquery',
   'underscore',
   'jsx/grading/CourseTabContainer',
@@ -45,10 +45,11 @@ define([
 
   test('tabs are present when there are grading periods', function () {
     this.renderComponent({ hasGradingPeriods: true });
-    equal(this.wrapper.find('.ui-tabs').length, 1);
-    equal(this.wrapper.find('.ui-tabs ul.ui-tabs-nav li').length, 2);
-    equal(this.wrapper.find('#grading-periods-tab').getDOMNode().getAttribute('style'), 'display: block;');
-    equal(this.wrapper.find('#grading-standards-tab').getDOMNode().getAttribute('style'), 'display: none;')
+    const $el = this.wrapper.getDOMNode()
+    strictEqual($el.querySelectorAll('.ui-tabs').length, 1);
+    strictEqual($el.querySelectorAll('.ui-tabs ul.ui-tabs-nav li').length, 2);
+    equal($el.querySelector('#grading-periods-tab').getAttribute('style'), 'display: block;');
+    equal($el.querySelector('#grading-standards-tab').getAttribute('style'), 'display: none;')
   });
 
   test('tabs are not present when there are no grading periods', function () {
@@ -70,21 +71,21 @@ define([
 
   test('does not render grading periods if there are no grading periods', function () {
     this.renderComponent({ hasGradingPeriods: false });
-    notOk(this.wrapper.node.gradingPeriods);
+    notOk(this.wrapper.instance().gradingPeriods);
   });
 
   test('renders the grading periods if there are grading periods', function () {
     this.renderComponent({ hasGradingPeriods: true });
-    ok(this.wrapper.node.gradingPeriods);
+    ok(this.wrapper.instance().gradingPeriods);
   });
 
   test('renders the grading standards if there are no grading periods', function () {
     this.renderComponent({ hasGradingPeriods: false });
-    ok(this.wrapper.node.gradingStandards);
+    ok(this.wrapper.instance().gradingStandards);
   });
 
   test('renders the grading standards if there are grading periods', function () {
     this.renderComponent({ hasGradingPeriods: true });
-    ok(this.wrapper.node.gradingStandards);
+    ok(this.wrapper.instance().gradingStandards);
   });
 });

@@ -18,8 +18,6 @@
 require_relative '../spec_helper'
 
 describe PlannerNotesController do
-  include PlannerHelper
-
   before :once do
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
@@ -160,8 +158,7 @@ describe PlannerNotesController do
         end
 
         it "invalidates the planner cache" do
-          @current_user = @user
-          expect(Rails.cache).to receive(:delete).with(planner_meta_cache_key)
+          expect(Rails.cache).to receive(:delete).with(/#{controller.planner_meta_cache_key}/)
           put :update, params: {id: @student_note.id, title: 'update'}
         end
 
@@ -213,8 +210,7 @@ describe PlannerNotesController do
         end
 
         it "invalidates the planner cache" do
-          @current_user = @user
-          expect(Rails.cache).to receive(:delete).with(planner_meta_cache_key)
+          expect(Rails.cache).to receive(:delete).with(/#{controller.planner_meta_cache_key}/)
           post :create, params: {title: "A title about things", details: "Details about now", todo_date: 1.day.from_now}
         end
 
@@ -398,8 +394,7 @@ describe PlannerNotesController do
         end
 
         it "invalidates the planner cache" do
-          @current_user = @user
-          expect(Rails.cache).to receive(:delete).with(planner_meta_cache_key)
+          expect(Rails.cache).to receive(:delete).with(/#{controller.planner_meta_cache_key}/)
           delete :destroy, params: {id: @student_note.id}
         end
       end
@@ -444,8 +439,7 @@ describe PlannerNotesController do
         end
 
         it "invalidates the planner cache" do
-          @current_user = @teacher
-          expect(Rails.cache).to receive(:delete).with(planner_meta_cache_key)
+          expect(Rails.cache).to receive(:delete).with(/#{controller.planner_meta_cache_key}/)
           put :update, params: {id: @teacher_note.id, title: 'updated title'}
         end
       end
@@ -458,8 +452,7 @@ describe PlannerNotesController do
         end
 
         it "invalidates the planner cache" do
-          @current_user = @teacher
-          expect(Rails.cache).to receive(:delete).with(planner_meta_cache_key)
+          expect(Rails.cache).to receive(:delete).with(/#{controller.planner_meta_cache_key}/)
           post :create, params: {title: "A title about things", details: "Details about now", todo_date: 1.day.from_now}
         end
       end
@@ -472,8 +465,7 @@ describe PlannerNotesController do
         end
 
         it "invalidates the planner cache" do
-          @current_user = @teacher
-          expect(Rails.cache).to receive(:delete).with(planner_meta_cache_key)
+          expect(Rails.cache).to receive(:delete).with(/#{controller.planner_meta_cache_key}/)
           delete :destroy, params: {id: @teacher_note.id}
         end
       end

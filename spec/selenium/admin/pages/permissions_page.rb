@@ -22,12 +22,7 @@ class PermissionsIndex
     include SeleniumDependencies
 
     def visit(account)
-      set_permission_ui_flag(account, "on")
       get("/accounts/#{account.id}/permissions")
-    end
-
-    def set_permission_ui_flag(account, state)
-      account.set_feature_flag! :permissions_v2_ui, state
     end
 
     # ---------------------- Controls ----------------------

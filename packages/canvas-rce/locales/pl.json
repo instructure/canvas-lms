@@ -29,9 +29,6 @@
   "insert_equella_links_49a8dacd": {
     "message": "Wstaw łącza Equella"
   },
-  "assignment_list_a833f59d": {
-    "message": "Lista zadań"
-  },
   "alternative_text_a834dcad": {
     "message": "Alternatywny tekst:"
   },
@@ -161,9 +158,6 @@
   "close_flickr_form_b32e600a": {
     "message": "Zamknij formularz Flickr"
   },
-  "course_syllabus_5de1b0af": {
-    "message": "Program kursu"
-  },
   "upload_8b403d05": {
     "message": "Pobierz"
   },
@@ -205,9 +199,6 @@
   },
   "cc_attribution_non_commercial_39e0d30d": {
     "message": "Niekomercyjne przypisanie CC"
-  },
-  "quizzes_list_d812caa6": {
-    "message": "Lista testów"
   },
   "image_upload_form_7b74079a": {
     "message": "Formularz przesyłania obrazów"

@@ -22,36 +22,41 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Header from '../../external_apps/components/Header'
 import ExternalToolsTable from '../../external_apps/components/ExternalToolsTable'
-export default React.createClass({
-    displayName: 'ConfigurationTypeSelector',
 
-    propTypes: {
-      handleChange: PropTypes.func.isRequired,
-      configurationType: PropTypes.string.isRequired
-    },
+export default class ConfigurationTypeSelector extends React.Component {
+  static propTypes = {
+    handleChange: PropTypes.func.isRequired,
+    configurationType: PropTypes.string.isRequired
+  }
 
-    componentDidMount() {
-      var configSelector = $("#configuration_type_selector");
-      if (configSelector && configSelector.length >= 0) {
-        configSelector.change(this.props.handleChange);
-      }
-    },
-
-    render() {
-      return (
-        <div className="ConfigurationsTypeSelector">
-          <div className="form-group">
-            <label>
-              {I18n.t('Configuration Type')}
-              <select id='configuration_type_selector' ref="configurationType" aria-haspopup="true" defaultValue={this.props.configurationType} className="input-block-level show-tick">
-                <option value="manual">{I18n.t('Manual Entry')}</option>
-                <option value="url">{I18n.t('By URL')}</option>
-                <option value="xml">{I18n.t('Paste XML')}</option>
-                <option value="lti2">{I18n.t('By LTI 2 Registration URL')}</option>
-              </select>
-            </label>
-          </div>
-        </div>
-      );
+  componentDidMount() {
+    const configSelector = $('#configuration_type_selector')
+    if (configSelector && configSelector.length >= 0) {
+      configSelector.change(this.props.handleChange)
     }
-  });
+  }
+
+  render() {
+    return (
+      <div className="ConfigurationsTypeSelector">
+        <div className="form-group">
+          <label>
+            {I18n.t('Configuration Type')}
+            <select
+              id="configuration_type_selector"
+              ref="configurationType"
+              aria-haspopup="true"
+              defaultValue={this.props.configurationType}
+              className="input-block-level show-tick"
+            >
+              <option value="manual">{I18n.t('Manual Entry')}</option>
+              <option value="url">{I18n.t('By URL')}</option>
+              <option value="xml">{I18n.t('Paste XML')}</option>
+              <option value="lti2">{I18n.t('By LTI 2 Registration URL')}</option>
+            </select>
+          </label>
+        </div>
+      </div>
+    )
+  }
+}

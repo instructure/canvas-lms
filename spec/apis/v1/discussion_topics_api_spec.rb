@@ -186,11 +186,6 @@ describe DiscussionTopicsController, type: :request do
     @user = user
   end
 
-  # need for user_display_json
-  def blank_fallback
-    nil
-  end
-
   describe "user_display_json" do
     it "should return a html_url based on parent_context" do
       expect(user_display_json(@user)[:html_url]).to eq "http://www.example.com/users/#{@user.id}"
@@ -382,6 +377,7 @@ describe DiscussionTopicsController, type: :request do
                           "url" => "http://www.example.com/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}",
                           "filename" => "content.txt",
                           "display_name" => "content.txt",
+                          "workflow_state" => "processed",
                           "id" => @attachment.id,
                           "uuid" => @attachment.uuid,
                           "folder_id" => @attachment.folder_id,
@@ -1506,6 +1502,7 @@ describe DiscussionTopicsController, type: :request do
           "url" => "http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}",
           "filename" => "content.txt",
           "display_name" => "content.txt",
+          "workflow_state" => "processed",
           "id" => attachment.id,
           "uuid" => attachment.uuid,
           "folder_id" => attachment.folder_id,
@@ -2584,6 +2581,7 @@ describe DiscussionTopicsController, type: :request do
         "url" => "http://www.example.com/files/#{@attachment.id}/download?download_frd=1&verifier=#{@attachment.uuid}",
         "filename" => "unknown.loser",
         "display_name" => "unknown.loser",
+        "workflow_state" => "pending_upload",
         "id" => @attachment.id,
         "uuid" => @attachment.uuid,
         "folder_id" => @attachment.folder_id,

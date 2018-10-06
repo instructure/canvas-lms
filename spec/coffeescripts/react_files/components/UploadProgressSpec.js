@@ -24,14 +24,14 @@ import FileUploader from 'compiled/react_files/modules/FileUploader'
 
 QUnit.module('UploadProgress', {
   setup() {
-    const ProgressContainer = React.createClass({
-      getInitialState() {
-        return {uploader: this.props.uploader}
-      },
+    class ProgressContainer extends React.Component {
+      state = {uploader: this.props.uploader};
+
       render() {
         return <UploadProgress ref="prog" uploader={this.state.uploader} />
       }
-    })
+    }
+
     this.uploader = this.mockUploader('filename', 35)
     this.node = $('<div>').appendTo('#fixtures')[0]
     this.progressContainer = ReactDOM.render(
@@ -41,7 +41,7 @@ QUnit.module('UploadProgress', {
     this.prog = this.progressContainer.refs.prog
   },
   teardown() {
-    ReactDOM.unmountComponentAtNode(this.progressContainer.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.progressContainer).parentNode)
     $('#fixtures').empty()
   },
   mockUploader(name, progress) {
@@ -53,7 +53,7 @@ QUnit.module('UploadProgress', {
 })
 
 test('getLabel displays file name', function() {
-  equal(this.prog.refs.fileName.getDOMNode().textContent, 'filename')
+  equal(this.prog.refs.fileName.textContent, 'filename')
 })
 
 test('announces upload progress to screen reader when queue changes', function() {

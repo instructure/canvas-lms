@@ -90,8 +90,8 @@ module Canvas::Migration::ExternalContent
 
     def get_migration_id_from_canvas_id(obj_class, canvas_id)
       if content_export&.for_master_migration?
-        obj = obj_class.find(canvas_id)
-        content_export.create_key(obj)
+        obj = obj_class.where(obj_class.primary_key => canvas_id).first
+        obj ? content_export.create_key(obj) : NOT_FOUND
       else
         CC::CCHelper.create_key("#{obj_class.reflection_type_name}_#{canvas_id}")
       end
@@ -100,6 +100,7 @@ module Canvas::Migration::ExternalContent
     NOT_FOUND = "$OBJECT_NOT_FOUND"
 
     def get_canvas_id_from_migration_id(obj_class, migration_id)
+      return NOT_FOUND if migration_id == NOT_FOUND
       if item = content_migration.find_imported_migration_item(obj_class, migration_id)
         return item.id
       end

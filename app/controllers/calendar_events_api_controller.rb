@@ -268,6 +268,7 @@ class CalendarEventsApiController < ApplicationController
 
   before_action :require_user, :except => %w(public_feed index)
   before_action :get_calendar_context, :only => :create
+  before_action :require_context, :only => [:user_index]
   before_action :require_user_or_observer, :only => [:user_index]
   before_action :require_authorization, :only => %w(index user_index)
 
@@ -441,6 +442,10 @@ class CalendarEventsApiController < ApplicationController
   #        -F 'calendar_event[end_at]=2012-07-19T22:00:00Z' \
   #        -H "Authorization: Bearer <token>"
   def create
+    if @context.is_a?(Course) && @context.deleted?
+      return render json: { error: t('cannot create event for deleted course') }, status: :bad_request
+    end
+
     params_for_create = calendar_event_params
     if params_for_create[:description].present?
       params_for_create[:description] = process_incoming_html_content(params_for_create[:description])

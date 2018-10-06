@@ -22,77 +22,77 @@ import classnames from 'classnames'
 import filesEnv from 'compiled/react_files/modules/filesEnv'
 import customPropTypes from 'compiled/react_files/modules/customPropTypes'
 
-  const BreadcrumbCollapsedContainer = React.createClass({
+class BreadcrumbCollapsedContainer extends React.Component {
+  static displayName = 'BreadcrumbCollapsedContainer'
 
-    displayName: 'BreadcrumbCollapsedContainer',
+  static propTypes = {
+    foldersToContain: PropTypes.arrayOf(customPropTypes.folder).isRequired
+  }
 
-    propTypes: {
-      foldersToContain: PropTypes.arrayOf(customPropTypes.folder).isRequired
-    },
+  state = {
+    open: false
+  }
 
-    getInitialState () {
-      return {
-        open: false
-      };
-    },
+  open = () => {
+    window.clearTimeout(this.timeout)
+    this.setState({
+      open: true
+    })
+  }
 
-    open () {
-      window.clearTimeout(this.timeout);
+  close = () => {
+    this.timeout = window.setTimeout(() => {
       this.setState({
-        open: true
-      });
-    },
+        open: false
+      })
+    }, 100)
+  }
 
-    close () {
-      this.timeout = window.setTimeout(() => {
-        this.setState({
-          open: false
-        });
-      }, 100);
-    },
+  render() {
+    const divClasses = classnames({
+      open: this.state.open,
+      closed: !this.state.open,
+      popover: true,
+      bottom: true,
+      'ef-breadcrumb-popover': true
+    })
 
-    render () {
-      var divClasses = classnames({
-        'open': this.state.open,
-        'closed': !this.state.open,
-        'popover': true,
-        'bottom': true,
-        'ef-breadcrumb-popover': true
-      });
-
-      return (
-        <li href = '#'
-          onMouseEnter={this.open}
-          onMouseLeave={this.close}
-          onFocus={this.open}
-          onBlur={this.close}
-          style={{position: 'relative'}}
-        >
-          <a href='#'>…</a>
-          <div className={divClasses}>
-            <div className='arrow' />
-            <div className='popover-content'>
-              <ul>
-                {this.props.foldersToContain.map((folder) => {
-                  return (
-                    <li key={folder.cid}>
-                      <a
-                        href={(folder.urlPath()) ? `${filesEnv.baseUrl}/folder/${folder.urlPath()}`: filesEnv.baseUrl}
-                        activeClassName='active'
-                        className='ellipsis'
-                      >
-                        <i className='ef-big-icon icon-folder' />
-                        <span>{folder.get('name')}</span>
-                      </a>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
+    return (
+      <li
+        href="#"
+        onMouseEnter={this.open}
+        onMouseLeave={this.close}
+        onFocus={this.open}
+        onBlur={this.close}
+        style={{position: 'relative'}}
+      >
+        <a href="#">…</a>
+        <div className={divClasses}>
+          <div className="arrow" />
+          <div className="popover-content">
+            <ul>
+              {this.props.foldersToContain.map(folder => (
+                <li key={folder.cid}>
+                  <a
+                    href={
+                      folder.urlPath()
+                        ? `${filesEnv.baseUrl}/folder/${folder.urlPath()}`
+                        : filesEnv.baseUrl
+                    }
+                    activeClassName="active"
+                    className="ellipsis"
+                  >
+                    <i className="ef-big-icon icon-folder" />
+                    <span>{folder.get('name')}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
-        </li>
-      );
-    }
-  });
+        </div>
+      </li>
+    )
+  }
+}
 
 export default BreadcrumbCollapsedContainer

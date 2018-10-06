@@ -67,12 +67,25 @@ describe Canvas::Security do
       describe ".create_encrypted_jwt" do
         let(:signing_secret){ "asdfasdfasdfasdfasdfasdfasdfasdf" }
         let(:encryption_secret){ "jkl;jkl;jkl;jkl;jkl;jkl;jkl;jkl;" }
+        let(:payload) { { arbitrary: "data" } }
 
         it "builds up an encrypted token" do
-          payload = {arbitrary: "data"}
           jwt = Canvas::Security.create_encrypted_jwt(payload, signing_secret, encryption_secret)
           expect(jwt.length).to eq(225)
         end
+
+        it "raises InvalidJwtKey if encryption_secret is nil" do
+          expect do
+            Canvas::Security.create_encrypted_jwt(payload, signing_secret, nil)
+          end.to raise_error(Canvas::Security::InvalidJwtKey)
+        end
+
+        it "raises InvalidJwtKey if signing_secret is nil" do
+          expect do
+            Canvas::Security.create_encrypted_jwt(payload, nil, encryption_secret)
+          end.to raise_error(Canvas::Security::InvalidJwtKey)
+        end
+
       end
     end
 

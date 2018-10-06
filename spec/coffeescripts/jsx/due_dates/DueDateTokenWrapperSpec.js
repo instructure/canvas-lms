@@ -71,11 +71,11 @@ QUnit.module('DueDateTokenWrapper', {
 })
 
 test('renders', function() {
-  ok(this.DueDateTokenWrapper.isMounted())
+  ok(this.DueDateTokenWrapper)
 })
 
 test('renders a TokenInput', function() {
-  ok(this.TokenInput.isMounted())
+  ok(this.TokenInput)
 })
 
 test('call to fetchStudents on input changes', function() {

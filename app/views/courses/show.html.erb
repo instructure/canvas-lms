@@ -133,7 +133,12 @@
     <% locals = {:title => t("Coming Up"), :contexts_to_link_to => @context, :upcoming => true, :period => :one_week} %>
     <% if @current_user %>
       <% cache([@current_user, safe_cache_key(@contexts), 'course_upcoming_events' ].cache_key) do %>
-        <%= render :partial => "shared/event_list", :object => @current_user.upcoming_events(:contexts => @contexts), :locals => locals %>
+        <%
+          events = @current_user.upcoming_events(:contexts => @contexts)
+          assignments = events.select{|e| e.is_a?(Assignment)}
+          @current_user_submissions = Submission.where(:assignment_id => assignments, :user_id => @current_user).to_a if assignments.any?
+        %>
+        <%= render :partial => "shared/event_list", :object => events, :locals => locals %>
       <% end %>
     <% else %>
       <%= render :partial => "shared/event_list", :object => [], :locals => locals %>

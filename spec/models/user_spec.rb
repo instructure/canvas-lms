@@ -820,29 +820,33 @@ describe User do
 
   context "check_courses_right?" do
     before :once do
-      course_with_teacher(:active_all => true)
-      @student = user_model
-    end
+      course_with_teacher(active_all: true)
+      course_with_student(course: @course, active_all: true)
+      @teacher1 = @teacher
+      @student1 = @student
+      @active_course = @course
 
-    before :each do
-      allow(@course).to receive(:grants_right?).and_return(true)
+      course_with_teacher(active_all: true)
+      course_with_student(course: @course, active_all: true)
+      @teacher2 = @teacher
+      @student2 = @student
+      @concluded_course = @course
+      @concluded_course.complete!
     end
 
     it "should require parameters" do
-      expect(@student.check_courses_right?(nil, :some_right)).to be_falsey
-      expect(@student.check_courses_right?(@teacher, nil)).to be_falsey
+      expect(@student1.check_courses_right?(nil, :some_right)).to be_falsey
+      expect(@student1.check_courses_right?(@teacher1, nil)).to be_falsey
     end
 
-    it "should check current courses" do
-      expect(@student).to receive(:courses).once.and_return([@course])
-      expect(@student).to receive(:concluded_courses).never
-      expect(@student.check_courses_right?(@teacher, :some_right)).to be_truthy
+    it "should check both active and concluded courses" do
+      expect(@student1.check_courses_right?(@teacher1, :manage_wiki)).to be_truthy
+      expect(@student2.check_courses_right?(@teacher2, :read_forum)).to be_truthy
+      @concluded_course.grants_right?(@teacher2, :manage_wiki)
     end
 
-    it "should check concluded courses" do
-      expect(@student).to receive(:courses).once.and_return([])
-      expect(@student).to receive(:concluded_courses).once.and_return([@course])
-      expect(@student.check_courses_right?(@teacher, :some_right)).to be_truthy
+    it "allows for narrowing courses by enrollments" do
+      expect(@student2.check_courses_right?(@teacher2, :manage_account_memberships, @student2.enrollments.concluded)).to be_falsey
     end
   end
 
@@ -1282,9 +1286,6 @@ describe User do
       expect(User.avatar_fallback_url('%{fallback}')).to eq(
         '%{fallback}'
       )
-      expect(User.avatar_fallback_url("http://somedomain/path",
-                                      OpenObject.new(:host => "somedomain", :protocol => "http://",
-                                                     :params => {:no_avatar_fallback => 1}))).to be_nil
     end
 
     describe "#clear_avatar_image_url_with_uuid" do
@@ -1692,41 +1693,6 @@ describe User do
   end
 
   describe "event methods" do
-    describe "calendar_events_for_calendar" do
-      before(:once) { course_with_student(:active_all => true) }
-      it "should include own scheduled appointments" do
-        ag = AppointmentGroup.create!(:title => 'test appointment', :contexts => [@course], :new_appointments => [[Time.now, Time.now + 1.hour], [Time.now + 1.hour, Time.now + 2.hour]])
-        ag.appointments.first.reserve_for(@user, @user)
-        events = @user.calendar_events_for_calendar
-        expect(events.size).to eql 1
-        expect(events.first.title).to eql 'test appointment'
-      end
-
-      it "should include manageable appointments" do
-        @user = @course.instructors.first
-        ag = AppointmentGroup.create!(:title => 'test appointment', :contexts => [@course], :new_appointments => [[Time.now, Time.now + 1.hour]])
-        events = @user.calendar_events_for_calendar
-        expect(events.size).to eql 1
-        expect(events.first.title).to eql 'test appointment'
-      end
-
-      it "should not include unpublished assignments" do
-        as = @course.assignments.create!({:title => "Published", :due_at => 2.days.from_now})
-        as.publish
-        as2 = @course.assignments.create!({:title => "Unpublished", :due_at => 2.days.from_now})
-        as2.unpublish
-        events = @user.calendar_events_for_calendar(:contexts => [@course])
-        expect(events.size).to eql 1
-        expect(events.first.title).to eql 'Published'
-      end
-
-      it "should not include events for the user if the user asset string is not included" do
-        user_event = @user.calendar_events.create!(context: @user, start_at: 1.minute.from_now, end_at: 5.minutes.from_now)
-        events = @user.calendar_events_for_calendar(contexts: [@course])
-        expect(events).not_to include user_event
-      end
-    end
-
     describe "upcoming_events" do
       before(:once) { course_with_teacher(:active_all => true) }
       it "handles assignments where the applied due_at is nil" do
@@ -1817,25 +1783,29 @@ describe User do
   describe "select_upcoming_assignments" do
     it "filters based on assignment date for asignments the user cannot delete" do
       time = Time.now + 1.day
+      context = double
       assignments = [double, double, double]
       user = User.new
+      allow(context).to receive(:grants_right?).with(user, :manage_assignments).and_return false
       assignments.each do |assignment|
         allow(assignment).to receive_messages(:due_at => time)
-        expect(assignment).to receive(:grants_right?).with(user, :delete).and_return false
+        allow(assignment).to receive(:context).and_return(context)
       end
       expect(user.select_upcoming_assignments(assignments,{:end_at => time})).to eq assignments
     end
 
     it "returns assignments that have an override between now and end_at opt" do
       assignments = [double, double, double, double]
+      context = double
       Timecop.freeze(Time.utc(2013,3,13,0,0)) do
         user = User.new
+        allow(context).to receive(:grants_right?).with(user, :manage_assignments).and_return true
         due_date1 = {:due_at => Time.now + 1.day}
         due_date2 = {:due_at => Time.now + 1.week}
         due_date3 = {:due_at => 2.weeks.from_now }
         due_date4 = {:due_at => nil }
         assignments.each do |assignment|
-          expect(assignment).to receive(:grants_right?).with(user, :delete).and_return true
+          allow(assignment).to receive(:context).and_return(context)
         end
         expect(assignments.first).to receive(:dates_hash_visible_to).with(user).
           and_return [due_date1]
@@ -2534,6 +2504,60 @@ describe User do
       it "is not granted to sub-account admins w/o :generate_observer_pairing_code" do
         @root_account.role_overrides.create!(role: admin_role, enabled: false, permission: :generate_observer_pairing_code)
         expect(@student.grants_right?(@sub_admin, :generate_observer_pairing_code)).to eq false
+      end
+    end
+  end
+
+  describe ":read_as_parent" do
+    before :once do
+      @student = course_with_student(active_all: true).user
+    end
+
+    context "as manually enrolled observer" do
+      before :once do
+        course_with_observer(course: @course, active_enrollment: true, associated_user_id: @student.id)
+      end
+
+      it "is granted" do
+        expect(@student.grants_right?(@observer, :read_as_parent)).to eq true
+      end
+    end
+
+    context "as super observer" do
+      before :once do
+        @observer = user_model
+        UserObservationLink.create(student: @student, observer: @observer)
+      end
+
+      it "is granted" do
+        expect(@student.grants_right?(@observer, :read_as_parent)).to eq true
+      end
+    end
+  end
+
+  describe ":read" do
+    before :once do
+      @student = course_with_student(active_all: true).user
+    end
+
+    context "as manually enrolled observer" do
+      before :once do
+        course_with_observer(course: @course, active_enrollment: true, associated_user_id: @student.id)
+      end
+
+      it "is granted" do
+        expect(@student.grants_right?(@observer, :read)).to eq true
+      end
+    end
+
+    context "as super observer" do
+      before :once do
+        @observer = user_model
+        UserObservationLink.create(student: @student, observer: @observer)
+      end
+
+      it "is granted" do
+        expect(@student.grants_right?(@observer, :read)).to eq true
       end
     end
   end

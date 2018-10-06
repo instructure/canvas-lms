@@ -514,6 +514,7 @@ describe Quizzes::Quiz do
 
     expect(q.assignment_id).not_to be_nil
     expect(q.assignment.published?).to be false
+    q = Quizzes::Quiz.find(q.id) # reload
     expect(q.assignment).to receive(:save_without_broadcasting!).never
 
     q.publish!

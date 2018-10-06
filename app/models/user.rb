@@ -1011,14 +1011,13 @@ class User < ActiveRecord::Base
     self.courses
   end
 
-  def check_courses_right?(user, sought_right)
+  def check_courses_right?(user, sought_right, enrollments_to_check=nil)
+    enrollments_to_check ||= enrollments.current_and_concluded
     # Look through the currently enrolled courses first.  This should
     # catch most of the calls.  If none of the current courses grant
     # the right then look at the concluded courses.
-    user && sought_right && (
-      self.courses.any?{ |c| c.grants_right?(user, sought_right) } ||
-      self.concluded_courses.any?{ |c| c.grants_right?(user, sought_right) }
-    )
+    user && sought_right &&
+      self.courses_for_enrollments(enrollments_to_check).any?{ |c| c.grants_right?(user, sought_right) }
   end
 
   def check_accounts_right?(user, sought_right)
@@ -1064,7 +1063,7 @@ class User < ActiveRecord::Base
     given { |user| self.check_courses_right?(user, :manage_user_notes) }
     can :create_user_notes and can :read_user_notes
 
-    given { |user| self.check_courses_right?(user, :generate_observer_pairing_code) }
+    given { |user| self.check_courses_right?(user, :generate_observer_pairing_code, enrollments.not_deleted) }
     can :generate_observer_pairing_code
 
     given {|user| self.check_accounts_right?(user, :manage_user_notes) }
@@ -1118,7 +1117,7 @@ class User < ActiveRecord::Base
     end
     can :reset_mfa
 
-    given { |user| user && user.as_observer_observation_links.where(user_id: self.id).exists? }
+    given { |user| user && (user.as_observer_observation_links.where(user_id: self.id).exists? || self.check_courses_right?(user, :read, user.observer_enrollments)) }
     can :read and can :read_as_parent
   end
 
@@ -1312,6 +1311,10 @@ class User < ActiveRecord::Base
     [:approved, :locked, :re_reported].include?(avatar_state)
   end
 
+  def avatar_locked?
+    avatar_state == :locked
+  end
+
   def self.avatar_key(user_id)
     user_id = user_id.to_s
     if !user_id.blank? && user_id != '0'
@@ -1327,11 +1330,11 @@ class User < ActiveRecord::Base
   end
 
   AVATAR_SETTINGS = ['enabled', 'enabled_pending', 'sis_only', 'disabled']
-  def avatar_url(size=nil, avatar_setting=nil, fallback=nil, request=nil)
+  def avatar_url(size=nil, avatar_setting=nil, fallback=nil, request=nil, use_fallback=true)
     return fallback if avatar_setting == 'disabled'
     size ||= 50
     avatar_setting ||= 'enabled'
-    fallback = self.class.avatar_fallback_url(fallback, request)
+    fallback = use_fallback ? self.class.avatar_fallback_url(fallback, request) : nil
     if avatar_setting == 'enabled' || (avatar_setting == 'enabled_pending' && avatar_approved?) || (avatar_setting == 'sis_only')
       @avatar_url ||= self.avatar_image_url
     end
@@ -1352,7 +1355,6 @@ class User < ActiveRecord::Base
 
   def self.avatar_fallback_url(fallback=nil, request=nil)
     return fallback if fallback == '%{fallback}'
-    return nil if Canvas::Plugin.value_to_boolean(request&.params&.[](:no_avatar_fallback))
     if fallback and uri = URI.parse(fallback) rescue nil
       uri.scheme ||= request ? request.protocol[0..-4] : HostUrl.protocol # -4 to chop off the ://
       if HostUrl.cdn_host
@@ -1436,6 +1438,10 @@ class User < ActiveRecord::Base
 
   def course_nicknames
     preferences[:course_nicknames] ||= {}
+  end
+
+  def course_nickname_hash
+    course_nicknames.any? ? Digest::MD5.hexdigest(course_nicknames.sort.join(",")) : "default"
   end
 
   def course_nickname(course)
@@ -1828,7 +1834,7 @@ class User < ActiveRecord::Base
           submissions = submissions.uniq
           submissions.first(opts[:limit])
 
-          ActiveRecord::Associations::Preloader.new.preload(submissions, [:assignment, :user, :submission_comments])
+          ActiveRecord::Associations::Preloader.new.preload(submissions, [{:assignment => :context}, :user, :submission_comments])
           submissions
         end
       end
@@ -1916,20 +1922,6 @@ class User < ActiveRecord::Base
       updated_after(opts[:updated_at])
   end
 
-  def calendar_events_for_calendar(opts={})
-    opts = opts.dup
-    context_codes = opts[:context_codes] || (opts[:contexts] ? setup_context_lookups(opts[:contexts]) : self.cached_context_codes)
-    return [] if !context_codes || context_codes.empty?
-    opts[:start_at] ||= 2.weeks.ago
-    opts[:end_at] ||= 1.week.from_now
-
-    events = []
-    events += calendar_events_for_contexts(context_codes, opts)
-    events += Assignment.published.for_context_codes(context_codes).due_between(opts[:start_at], opts[:end_at]).
-      updated_after(opts[:updated_at]).with_just_calendar_attributes
-    events.sort_by{|e| [e.start_at, Canvas::ICU.collation_key(e.title || CanvasSort::First)] }.uniq
-  end
-
   def upcoming_events(opts={})
     context_codes = opts[:context_codes] || (opts[:contexts] ? setup_context_lookups(opts[:contexts]) : self.cached_context_codes)
     return [] if (!context_codes || context_codes.empty?)
@@ -2001,7 +1993,7 @@ class User < ActiveRecord::Base
   def select_upcoming_assignments(assignments,opts)
     time = opts[:time] || Time.zone.now
     assignments.select do |a|
-      if a.grants_right?(self, :delete)
+      if a.context.grants_right?(self, :manage_assignments)
         a.dates_hash_visible_to(self).any? do |due_hash|
           due_hash[:due_at] && due_hash[:due_at] >= time && due_hash[:due_at] <= opts[:end_at]
         end

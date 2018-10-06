@@ -83,22 +83,27 @@ module AvatarHelper
     end
   end
 
-  def avatar_url_for_group(blank_fallback=false)
-    request.base_url + (blank_fallback ?
-      "/images/blank.png" :
-      "/images/messages/avatar-group-50.png" # always fall back to -50, it'll get scaled down if a smaller size is wanted
-    )
+  def avatar_url_for_group
+    request.base_url + "/images/messages/avatar-group-50.png" # always fall back to -50, it'll get scaled down if a smaller size is wanted
   end
 
-  def self.avatar_url_for_user(user, request, blank_fallback=false)
-    default_avatar = User.avatar_fallback_url(
-        blank_fallback ? '/images/blank.png' : User.default_avatar_fallback,
-        request)
-    url = if (@domain_root_account || user.account).service_enabled?(:avatars)
+  def self.avatars_enabled_for_user?(user)
+    (@domain_root_account || user.account).service_enabled?(:avatars)
+  end
+
+  def avatars_enabled_for_user?(user)
+    AvatarHelper.avatars_enabled_for_user?(user)
+  end
+
+  def self.avatar_url_for_user(user, request, use_fallback: true)
+    use_fallback = false if Canvas::Plugin.value_to_boolean(request&.params&.[](:no_avatar_fallback))
+    default_avatar = use_fallback ? User.avatar_fallback_url(User.default_avatar_fallback, request) : nil
+    url = if avatars_enabled_for_user?(user)
       user.avatar_url(nil,
                       (@domain_root_account && @domain_root_account.settings[:avatars] || 'enabled'),
                       default_avatar,
-                      request)
+                      request,
+                      use_fallback)
     else
       default_avatar
     end
@@ -111,12 +116,8 @@ module AvatarHelper
     url
   end
 
-  def avatar_url_for_user(user, blank_fallback=false)
-    AvatarHelper.avatar_url_for_user(user, request, blank_fallback)
-  end
-
-  def blank_fallback
-    params[:blank_avatar_fallback].nil? ? @blank_fallback : value_to_boolean(params[:blank_avatar_fallback])
+  def avatar_url_for_user(user)
+    AvatarHelper.avatar_url_for_user(user, request)
   end
 
 end

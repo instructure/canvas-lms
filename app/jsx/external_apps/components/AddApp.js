@@ -97,7 +97,7 @@ export default React.createClass({
 
       if (this.isMounted()) {
         this.setState({fields: fields}, this.validateConfig);
-        this.refs.addTool.getDOMNode().focus();
+        this.refs.addTool.focus();
       }
     },
 
@@ -190,14 +190,14 @@ export default React.createClass({
     },
 
     onSaveSuccess(tool) {
-      $(this.refs.addButton.getDOMNode()).removeAttr('disabled');
+      $(this.refs.addButton).removeAttr('disabled');
       tool.off('sync', this.onSaveSuccess);
       this.setState({ errorMessage: null });
       this.closeModal(this.props.handleToolInstalled);
     },
 
     onSaveFail(tool) {
-      $(this.refs.addButton.getDOMNode()).removeAttr('disabled');
+      $(this.refs.addButton).removeAttr('disabled');
       this.setState({
         errorMessage: I18n.t('There was an error in processing your request')
       });

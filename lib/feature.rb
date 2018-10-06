@@ -116,13 +116,6 @@ class Feature
   # TODO: register built-in features here
   # (plugins may register additional features during application initialization)
   register(
-    'permissions_v2_ui' =>
-    {
-      display_name: -> { I18n.t('Updated Permissions Page') },
-      description: -> { I18n.t('Use the new interface for managing permissions') },
-      applies_to: 'Account',
-      state: 'allowed',
-    },
     'google_docs_domain_restriction' =>
     {
       display_name: -> { I18n.t('features.google_docs_domain_restriction', 'Google Docs Domain Restriction') },
@@ -224,6 +217,17 @@ END
       state: 'hidden',
       root_opt_in: true,
       beta: true
+    },
+    'anonymous_instructor_annotations' =>
+    {
+      display_name: -> { I18n.t('Anonymous Instructor Annotations') },
+      description:  -> { I18n.t(<<~END) },
+        Anonymous Instructor Annotations is a setting on assignments allowing
+        instructors to leave annotations that are anonymous to students.
+      END
+      applies_to: 'Course',
+      state: 'allowed',
+      root_opt_in: false,
     },
     'new_gradebook' =>
     {
@@ -465,14 +469,6 @@ END
       development: true,
       root_opt_in: false
     },
-    'allow_rtl' =>
-    {
-      display_name: -> { I18n.t('Allow RTL users to see RTL interface') },
-      description: -> { I18n.t('This feature enables users of right-to-left (RTL) languages to see the RTL layout under development. Eventually, this will become the default behavior and this option will be removed.') },
-      applies_to: 'RootAccount',
-      state: 'allowed',
-      beta: true,
-    },
     'force_rtl' =>
     {
       display_name: -> { I18n.t('Turn on RTL Even For Non-RTL Languages') },
@@ -603,9 +599,7 @@ END
       display_name: -> { I18n.t('To Do List Dashboard')},
       description: -> { I18n.t('Provides users with a To Do List Dashboard option.')},
       applies_to: "RootAccount",
-      state: "hidden",
-      beta: true,
-      development: false
+      state: "hidden"
     },
     'rubric_criterion_range' =>
     {
@@ -664,7 +658,7 @@ END
       display_name: -> { I18n.t('Non-scoring Rubrics')},
       description: -> { I18n.t('If enabled, the option will be presented to have non-scoring rubrics.') },
       applies_to: 'RootAccount',
-      state: 'allowed'
+      state: 'on'
     }
   )
 

@@ -17,7 +17,7 @@
  */
 
 import React from 'react';
-import { mount, shallow } from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme';
+import { mount, shallow } from 'enzyme';
 import { SearchFormComponent } from 'jsx/gradebook-history/SearchForm';
 import Button from '@instructure/ui-buttons/lib/components/Button';
 import DateInput from '@instructure/ui-forms/lib/components/DateInput';
@@ -206,7 +206,7 @@ test('dispatches with the state of input', function () {
     selected
   }, () => {
     this.wrapper.find(Button).simulate('click');
-    deepEqual(this.props.getGradebookHistory.firstCall.args[0], selected);
+    deepEqual(this.props.getGradebookHistory.lastCall.args[0], selected);
   });
 });
 
@@ -249,19 +249,19 @@ QUnit.module('SearchForm Autocomplete', {
 });
 
 test('typing more than two letters for assignments hits getSearchOptions prop', function () {
-  const input = this.wrapper.find('#assignments');
+  const input = this.wrapper.find('#assignments').last();
   input.simulate('change', { target: { id: 'assignments', value: 'Chapter 11 Questions' } });
   strictEqual(this.props.getSearchOptions.callCount, 1);
 });
 
 test('typing more than two letters for graders hits getSearchOptions prop', function () {
-  const input = this.wrapper.find('#graders');
+  const input = this.wrapper.find('#graders').last();
   input.simulate('change', { target: { id: 'graders', value: 'Norval' } });
   strictEqual(this.props.getSearchOptions.callCount, 1);
 });
 
 test('typing more than two letters for students hits getSearchOptions prop if not empty', function () {
-  const input = this.wrapper.find('#students');
+  const input = this.wrapper.find('#students').last();
   input.simulate('change', { target: {id: 'students', value: 'Norval' } });
   strictEqual(this.props.getSearchOptions.callCount, 1);
 });
@@ -274,7 +274,7 @@ test('typing two or fewer letters for assignments hits clearSearchOptions prop i
       nextPage: ''
     }
   });
-  const input = this.wrapper.find('#assignments');
+  const input = this.wrapper.find('#assignments').last();
   input.simulate('change', { target: { id: 'assignments', value: 'ab' } });
   strictEqual(this.props.clearSearchOptions.callCount, 1);
 });
@@ -287,7 +287,7 @@ test('typing two or fewer letters for graders hits clearSearchOptions prop', fun
       nextPage: ''
     }
   });
-  const input = this.wrapper.find('#graders');
+  const input = this.wrapper.find('#graders').last();
   input.simulate('change', { target: { id: 'graders', value: 'ab' } });
   strictEqual(this.props.clearSearchOptions.callCount, 1);
 });
@@ -300,13 +300,13 @@ test('typing two or fewer letters for students hits clearSearchOptions prop if n
       nextPage: ''
     }
   });
-  const input = this.wrapper.find('#students');
+  const input = this.wrapper.find('#students').last();
   input.simulate('change', { target: { id: 'students', value: 'ab' } });
   strictEqual(this.props.clearSearchOptions.callCount, 1);
 });
 
 test('getSearchOptions is called with search term and input id', function () {
-  const input = this.wrapper.find('#graders');
+  const input = this.wrapper.find('#graders').last();
   const inputId = 'graders';
   const searchTerm = 'Norval Abbott';
   input.simulate('change', { target: { id: inputId, value: searchTerm } });
@@ -349,11 +349,11 @@ test('selecting a grader from options sets state to its id', function () {
     }
   });
 
-  const input = this.wrapper.find('#graders').node;
+  const input = this.wrapper.find('#graders').last().instance();
   input.click();
 
   const graderNames = this.graders.map(grader => (grader.name));
-  [...document.getElementsByTagName('span')].find(span => graderNames.includes(span.innerHTML)).click();
+  [...document.getElementsByTagName('span')].find(span => graderNames.includes(span.innerHTML) || graderNames.includes(span.innerText)).click();
 
   strictEqual(this.wrapper.state().selected.grader, this.graders[0].id);
 });
@@ -367,12 +367,11 @@ test('selecting a student from options sets state to its id', function () {
     }
   });
 
-  const input = this.wrapper.find('#students').node;
+  const input = this.wrapper.find('#students').last().instance();
   input.click();
+  const studentNames = this.students.map(student => student.name);
 
-  const studentNames = this.students.map(student => (student.name));
-  [...document.getElementsByTagName('span')].find(span => studentNames.includes(span.innerHTML)).click();
-
+  [...document.getElementsByTagName('span')].find(span => studentNames.includes(span.innerHTML) || studentNames.includes(span.innerText)).click();
   strictEqual(this.wrapper.state().selected.student, this.students[0].id);
 });
 
@@ -385,11 +384,11 @@ test('selecting an assignment from options sets state to its id', function () {
     }
   });
 
-  const input = this.wrapper.find('#assignments').node;
+  const input = this.wrapper.find('#assignments').last().instance();
   input.click();
 
   const assignmentNames = this.assignments.map(assignment => (assignment.name));
-  [...document.getElementsByTagName('span')].find(span => assignmentNames.includes(span.innerHTML)).click();
+  [...document.getElementsByTagName('span')].find(span => assignmentNames.includes(span.innerHTML) || assignmentNames.includes(span.innerText)).click();
 
   strictEqual(this.wrapper.state().selected.assignment, this.assignments[0].id);
 });
@@ -403,11 +402,11 @@ test('selecting an assignment from options clears options for assignments', func
     }
   });
 
-  const input = this.wrapper.find('#assignments').node;
+  const input = this.wrapper.find('#assignments').last().instance();
   input.click();
 
   const assignmentNames = this.assignments.map(assignment => (assignment.name));
-  [...document.getElementsByTagName('span')].find(span => assignmentNames.includes(span.innerHTML)).click();
+  [...document.getElementsByTagName('span')].find(span => assignmentNames.includes(span.innerHTML) || assignmentNames.includes(span.innerText)).click();
 
   ok(this.props.clearSearchOptions.called);
   strictEqual(this.props.clearSearchOptions.firstCall.args[0], 'assignments');
@@ -422,11 +421,11 @@ test('selecting a grader from options clears options for graders', function () {
     }
   });
 
-  const input = this.wrapper.find('#graders').node;
+  const input = this.wrapper.find('#graders').last().instance();
   input.click();
 
   const graderNames = this.graders.map(grader => (grader.name));
-  [...document.getElementsByTagName('span')].find(span => graderNames.includes(span.innerHTML)).click();
+  [...document.getElementsByTagName('span')].find(span => graderNames.includes(span.innerHTML) || graderNames.includes(span.innerText)).click();
 
   ok(this.props.clearSearchOptions.called);
   strictEqual(this.props.clearSearchOptions.firstCall.args[0], 'graders');
@@ -441,12 +440,12 @@ test('selecting a student from options clears options for students', function ()
     }
   });
 
-  const input = this.wrapper.find('#students').node;
+  const input = this.wrapper.find('#students').last().instance();
   input.click();
 
   const studentNames = this.students.map(student => (student.name));
-  [...document.getElementsByTagName('span')].find(span => studentNames.includes(span.innerHTML)).click();
 
+  [...document.getElementsByTagName('span')].find(span => studentNames.includes(span.innerHTML) || studentNames.includes(span.innerText)).click();
   ok(this.props.clearSearchOptions.called);
   strictEqual(this.props.clearSearchOptions.firstCall.args[0], 'students');
 });
@@ -460,7 +459,7 @@ test('no search records found for students results in a message instead', functi
     }
   });
 
-  this.wrapper.find('#students').node.click();
+  this.wrapper.find('#students').last().instance().click();
 
   const noRecords = [...document.getElementsByTagName('span')].find(
                       span => span.textContent === 'No students with that name found'
@@ -478,7 +477,7 @@ test('no search records found for graders results in a message instead', functio
     }
   });
 
-  this.wrapper.find('#graders').node.click();
+  this.wrapper.find('#graders').last().instance().click();
 
   const noRecords = [...document.getElementsByTagName('span')].find(
                       span => span.textContent === 'No graders with that name found'
@@ -496,7 +495,7 @@ test('no search records found for assignments results in a message instead', fun
     }
   });
 
-  this.wrapper.find('#assignments').node.click();
+  this.wrapper.find('#assignments').last().instance().click();
 
   const noRecords = [...document.getElementsByTagName('span')].find(
                       span => span.textContent === 'No assignments with that name found'

@@ -56,18 +56,11 @@ import ReactDOM from 'react-dom'
 
     var meridianSelect = '';
     if (tz.useMeridian()) {
-      // TODO: Change this select to work as described here:
-      // http://facebook.github.io/react/docs/forms.html#why-select-value
-      //
-      // As of React 0.13.3 this issue: https://github.com/facebook/react/issues/1398
-      // has not been fixed and released, which makes React.renderToStaticMarkup not
-      // carry things through properly. So once that is done, we can fix the warning
-      // here.
       meridianSelect = (
-        <select className='ui-datepicker-time-ampm un-bootrstrapify' title={STRINGS.selectTitle}>
+        <select defaultValue={data.ampm} className='ui-datepicker-time-ampm un-bootrstrapify' title={STRINGS.selectTitle}>
           <option value='' key='unset'>&nbsp;</option>
-          <option value={STRINGS.AM} selected={data.ampm == 'am'} key='am'>{STRINGS.AM}</option>
-          <option value={STRINGS.PM} selected={data.ampm == 'pm'} key='pm'>{STRINGS.PM}</option>
+          <option value={STRINGS.AM} key='am'>{STRINGS.AM}</option>
+          <option value={STRINGS.PM} key='pm'>{STRINGS.PM}</option>
         </select>
       );
     }

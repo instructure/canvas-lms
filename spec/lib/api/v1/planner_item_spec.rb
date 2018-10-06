@@ -21,13 +21,10 @@ describe Api::V1::PlannerItem do
   class PlannerItemHarness
     include Api::V1::PlannerItem
 
-    def assignment_json(*args); end
-    def quiz_json(*args); end
-    def wiki_page_json(*args); end
-    def discussion_topic_api_json(*args); end
+    def submission_json(*args); end
     def named_context_url(*args); "named_context_url"; end
     def course_assignment_submission_url(*args); 'course_assignment_submission_url'; end
-    def calendar_event_json(*args); end
+    def calendar_url_for(*args); end
   end
 
   before :once do
@@ -35,7 +32,8 @@ describe Api::V1::PlannerItem do
     @course.root_account.enable_feature!(:student_planner)
 
     teacher_in_course active_all: true
-    student_in_course course: @course, active_all: true
+    @reviewer = student_in_course(course: @course, active_all: true).user
+    @student = student_in_course(course: @course, active_all: true).user
     for_course = { course: @course }
 
     assignment_quiz [], for_course
@@ -57,26 +55,49 @@ describe Api::V1::PlannerItem do
       asg = assignment_model course: @course, submission_types: 'online_text_entry', due_at: asg_due_at
       asg_hash = api.planner_item_json(asg, @student, session)
       expect(asg_hash[:plannable_date]).to eq asg_due_at
+      expect(asg_hash[:plannable]).to include('id', 'title', 'due_at', 'points_possible')
 
       dt_todo_date = 1.week.from_now
       dt = discussion_topic_model course: @course, todo_date: dt_todo_date
       dt_hash = api.planner_item_json(dt, @student, session)
       expect(dt_hash[:plannable_date]).to eq dt_todo_date
+      expect(dt_hash[:plannable]).to include('id', 'title', 'todo_date', 'assignment_id')
 
       wiki_todo_date = 1.day.ago
       wiki = wiki_page_model course: @course, todo_date: wiki_todo_date
       wiki_hash = api.planner_item_json(wiki, @student, session)
       expect(wiki_hash[:plannable_date]).to eq wiki_todo_date
+      expect(wiki_hash[:plannable]).to include('id', 'title', 'todo_date')
 
       annc_post_date = 1.day.from_now
       annc = announcement_model context: @course, posted_at: annc_post_date
       annc_hash = api.planner_item_json(annc, @student, session)
       expect(annc_hash[:plannable_date]).to eq annc_post_date
+      expect(annc_hash[:plannable]).not_to include 'todo_date'
+      expect(annc_hash[:plannable]).to include('id', 'title', 'created_at')
 
       event_start_date = 2.days.from_now
       event = calendar_event_model(start_at: event_start_date)
       event_hash = api.planner_item_json(event, @student, session)
       expect(event_hash[:plannable_date]).to eq event_start_date
+      expect(event_hash[:plannable].keys).to include('id', 'title', 'start_at', 'end_at', 'all_day', 'description')
+    end
+
+    it 'should return with a context_name and context_image for the respective item' do
+      asg_hash = api.planner_item_json(@assignment, @student, session)
+      expect(asg_hash[:context_name]).to eq @course.name
+      expect(asg_hash[:context_image]).to be_nil
+
+      @course.name = "test course name"
+      expect(api.planner_item_json(@assignment, @student, session)[:context_name]).to eq "test course name"
+
+      # still no image if feature flag is off
+      @course.image_url = "path/to/course/image.png"
+      expect(api.planner_item_json(@assignment, @student, session)[:context_image]).to be_nil
+
+      # ok, now that course has an image and the feature flag is on there should be an image
+      @course.enable_feature!(:course_card_images)
+      expect(api.planner_item_json(@assignment, @student, session)[:context_image]).to eq "path/to/course/image.png"
     end
 
     context 'planner overrides' do
@@ -91,6 +112,18 @@ describe Api::V1::PlannerItem do
       it 'should have a nil planner_override value' do
         json = api.planner_item_json(@quiz.assignment, @student, session)
         expect(json[:planner_override]).to be_nil
+      end
+    end
+
+    context 'peer reviews' do
+      it 'should include submissions needing peer review' do
+        submission = @assignment.submit_homework(@student, body: "the stuff")
+        assessor_submission = @assignment.find_or_create_submission(@reviewer)
+        @peer_review = AssessmentRequest.create!(user: @student, asset: submission, assessor_asset: assessor_submission, assessor: @reviewer)
+        json = api.planner_item_json(@peer_review, @student, session, { start_at: 1.week.ago })
+        expect(json[:plannable_type]).to eq "assessment_request"
+        expect(json[:plannable][:title]).to eq @assignment.title
+        expect(json[:plannable][:todo_date]).to eq @assignment.due_at
       end
     end
 
@@ -222,7 +255,7 @@ describe Api::V1::PlannerItem do
                                                     })
       end
 
-      it 'should include indicate is_media if comment has a media_comment_id' do
+      it 'should include is_media if comment has a media_comment_id' do
         submission = @assignment.submit_homework(@student, body: "the stuff")
         submission.add_comment(user: @teacher, comment: "nice work, fam", media_comment_id: 2)
         submission.update(score: 10)
@@ -236,6 +269,19 @@ describe Api::V1::PlannerItem do
                                                       author_avatar_url: @teacher.avatar_url,
                                                       is_media: true
                                                     })
+      end
+
+      it 'should not include an author_name or author_avatar_url if comment is anonymous' do
+        @assignment.anonymous_peer_reviews = true
+        @assignment.save!
+        submission = @assignment.submit_homework(@student, body: "the stuff")
+        submission.add_comment(user: @reviewer, comment: "nice work, fam")
+        submission.update(score: 10)
+        submission.grade_it!
+
+        json = api.planner_item_json(@assignment, @student, session, { start_at: 1.week.ago })
+        expect(json[:submissions][:has_feedback]).to be true
+        expect(json[:submissions][:feedback].keys).not_to include(:author_name, :author_avatar_url)
       end
     end
   end

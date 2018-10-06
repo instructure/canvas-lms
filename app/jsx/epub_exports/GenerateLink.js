@@ -23,83 +23,75 @@ import classnames from 'classnames'
 import _ from 'underscore'
 import CourseEpubExportStore from '../epub_exports/CourseStore'
 
-  var GenerateLink = React.createClass({
-    displayName: 'GenerateLink',
-    propTypes: {
-      course: PropTypes.object.isRequired
-    },
+class GenerateLink extends React.Component {
+  static displayName = 'GenerateLink'
 
-    epubExport () {
-      return this.props.course.epub_export || {};
-    },
-    showGenerateLink () {
-      return _.isEmpty(this.epubExport()) || (
-        _.isObject(this.epubExport().permissions) &&
-        this.epubExport().permissions.regenerate
-      );
-    },
+  static propTypes = {
+    course: PropTypes.object.isRequired
+  }
 
-    //
-    // Preparation
-    //
+  //
+  // Preparation
+  //
 
-    getInitialState: function() {
-      return {
-        triggered: false
-      };
-    },
+  state = {
+    triggered: false
+  }
 
-    //
-    // Rendering
-    //
+  epubExport = () => this.props.course.epub_export || {}
 
-    render: function() {
-      var text = {};
+  showGenerateLink = () =>
+    _.isEmpty(this.epubExport()) ||
+    (_.isObject(this.epubExport().permissions) && this.epubExport().permissions.regenerate)
 
-      if (!this.showGenerateLink() && !this.state.triggered)
-        return null;
+  //
+  // Rendering
+  //
 
-      text[I18n.t("Regenerate ePub")] =
-        _.isObject(this.props.course.epub_export) &&
-        !this.state.triggered;
-      text[I18n.t("Generate ePub")] =
-        !_.isObject(this.props.course.epub_export) &&
-        !this.state.triggered;
-      text[I18n.t("Generating...")] = this.state.triggered;
+  render() {
+    const text = {}
 
-      if (this.state.triggered) {
-        return (
-          <span>
-            <i className="icon-refresh" aria-hidden="true"></i>
-            {classnames(text)}
-          </span>
-        );
-      } else {
-        return (
-          <button className="Button Button--link" onClick={this._onClick}>
-            <i className="icon-refresh" aria-hidden="true"></i>
-            {classnames(text)}
-          </button>
-        );
-      };
-    },
+    if (!this.showGenerateLink() && !this.state.triggered) return null
 
-    //
-    // Event handling
-    //
+    text[I18n.t('Regenerate ePub')] =
+      _.isObject(this.props.course.epub_export) && !this.state.triggered
+    text[I18n.t('Generate ePub')] =
+      !_.isObject(this.props.course.epub_export) && !this.state.triggered
+    text[I18n.t('Generating...')] = this.state.triggered
 
-    _onClick: function(e) {
-      e.preventDefault();
-      this.setState({
-        triggered: true
-      });
-      setTimeout(function() {
-        this.setState({
-          triggered: false
-        });
-      }.bind(this), 800);
-      CourseEpubExportStore.create(this.props.course.id);
+    if (this.state.triggered) {
+      return (
+        <span>
+          <i className="icon-refresh" aria-hidden="true" />
+          {classnames(text)}
+        </span>
+      )
+    } else {
+      return (
+        <button className="Button Button--link" onClick={this._onClick}>
+          <i className="icon-refresh" aria-hidden="true" />
+          {classnames(text)}
+        </button>
+      )
     }
-  });
+  }
+
+  //
+  // Event handling
+  //
+
+  _onClick = e => {
+    e.preventDefault()
+    this.setState({
+      triggered: true
+    })
+    setTimeout(() => {
+      this.setState({
+        triggered: false
+      })
+    }, 800)
+    CourseEpubExportStore.create(this.props.course.id)
+  }
+}
 
 export default GenerateLink

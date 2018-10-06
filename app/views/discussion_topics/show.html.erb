@@ -105,7 +105,7 @@
             </a>
           <% end %>
 
-          <% if @current_user.present? && !@initial_post_required %>
+          <% if @current_user.present? %>
             <div class="admin-links">
               <a class="al-trigger btn announcement_cog" href="#" role="button">
                 <i class="icon-more" aria-hidden="true"></i>
@@ -118,9 +118,11 @@
                   </span>
               </a>
               <ul class="al-options">
-                <li><a href="#" class="mark_all_as_read"><i class="icon-mark-as-read" aria-hidden="hidden"></i> <%= t :mark_all_as_read, 'Mark All as Read' %></a></li>
-                <% if false # keep this command out of the interface for now %>
-                  <li><a href="#" class="mark_all_as_unread"><%#= <i class="icon-mark-as-unread" aria-hidden="hidden"></i> %> <%= t :mark_all_as_unread, 'Mark All as Unread' %></a></li>
+                <% unless @initial_post_required %>
+                  <li><a href="#" class="mark_all_as_read"><i class="icon-mark-as-read" aria-hidden="hidden"></i> <%= t :mark_all_as_read, 'Mark All as Read' %></a></li>
+                  <% if false # keep this command out of the interface for now %>
+                    <li><a href="#" class="mark_all_as_unread"><%#= <i class="icon-mark-as-unread" aria-hidden="hidden"></i> %> <%= t :mark_all_as_unread, 'Mark All as Unread' %></a></li>
+                  <% end %>
                 <% end %>
 
                 <% if !editing_restricted?(@topic) && can_do(@topic, @current_user, :delete)%>
@@ -354,6 +356,8 @@
     <div id="filterResults" class="discussion_subentries hidden"></div>
 
   </div>
+
+  <div id="assignment_external_tools"></div>
 
   <% if @headers != false %>
     <div id="module_sequence_footer"></div>

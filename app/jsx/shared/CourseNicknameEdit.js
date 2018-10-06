@@ -22,84 +22,83 @@ import PropTypes from 'prop-types'
 import I18n from 'i18n!course_nickname_edit'
 import TextInput from '@instructure/ui-forms/lib/components/TextInput'
 
-  var CourseNicknameEdit = React.createClass({
+class CourseNicknameEdit extends React.Component {
+  // ===============
+  //     CONFIG
+  // ===============
 
-    // ===============
-    //     CONFIG
-    // ===============
+  static displayName = 'CourseNicknameEdit'
 
-    displayName: 'CourseNicknameEdit',
+  static propTypes = {
+    nicknameInfo: PropTypes.object.isRequired,
+    onEnter: PropTypes.func
+  }
 
-    propTypes: {
-      nicknameInfo: PropTypes.object.isRequired,
-      onEnter: PropTypes.func
-    },
+  constructor(props) {
+    super(props)
+    const nickname =
+      props.nicknameInfo.nickname == props.nicknameInfo.originalName
+        ? ''
+        : props.nicknameInfo.nickname
+    this.state = {nickname, originalNickname: nickname}
+  }
 
-    // ===============
-    //    LIFECYCLE
-    // ===============
+  // ===============
+  //     ACTIONS
+  // ===============
 
-    getInitialState () {
-      var nickname = (this.props.nicknameInfo.nickname == this.props.nicknameInfo.originalName) ?
-        '' : this.props.nicknameInfo.nickname;
-      return {nickname: nickname, originalNickname: nickname};
-    },
-
-    // ===============
-    //     ACTIONS
-    // ===============
-
-    onKeyPress (event) {
-      if (this.props.onEnter && event.charCode == 13) {
-        this.props.onEnter();
-      }
-    },
-
-    handleChange (event) {
-      this.setState({nickname:event.target.value});
-    },
-
-    setCourseNickname () {
-      if (this.state.originalNickname != this.state.nickname) {
-        return $.ajax({
-            url: '/api/v1/users/self/course_nicknames/' + this.props.nicknameInfo.courseId,
-            type: (this.state.nickname.length > 0) ? 'PUT' : 'DELETE',
-            data: {
-              nickname: this.state.nickname
-            },
-            success: (data) => {
-              this.props.nicknameInfo.onNicknameChange(data.nickname || data.name);
-            },
-            error: () => {
-            }
-        });
-      }
-    },
-
-    focus () {
-      if (this.nicknameInput) {
-        this.nicknameInput.focus();
-      }
-    },
-
-    // ===============
-    //    RENDERING
-    // ===============
-
-    render () {
-      return (
-        <TextInput
-          id="NicknameInput"
-          label={ I18n.t('Nickname') }
-          placeholder={this.props.nicknameInfo.originalName}
-          value={this.state.nickname}
-          onChange={this.handleChange}
-          onKeyPress={this.onKeyPress}
-          inputRef={(c) => { this.nicknameInput = c }}
-          size="small"
-        />
-      );
+  onKeyPress = event => {
+    if (this.props.onEnter && event.charCode == 13) {
+      this.props.onEnter()
     }
+  }
 
-  });
+  handleChange = event => {
+    this.setState({nickname: event.target.value})
+  }
+
+  setCourseNickname = () => {
+    if (this.state.originalNickname != this.state.nickname) {
+      return $.ajax({
+        url: `/api/v1/users/self/course_nicknames/${this.props.nicknameInfo.courseId}`,
+        type: this.state.nickname.length > 0 ? 'PUT' : 'DELETE',
+        data: {
+          nickname: this.state.nickname
+        },
+        success: data => {
+          this.props.nicknameInfo.onNicknameChange(data.nickname || data.name)
+        },
+        error: () => {}
+      })
+    }
+  }
+
+  focus = () => {
+    if (this.nicknameInput) {
+      this.nicknameInput.focus()
+    }
+  }
+
+  // ===============
+  //    RENDERING
+  // ===============
+
+  render() {
+    return (
+      <TextInput
+        id="NicknameInput"
+        label={I18n.t('Nickname')}
+        placeholder={this.props.nicknameInfo.originalName}
+        value={this.state.nickname}
+        onChange={this.handleChange}
+        onKeyPress={this.onKeyPress}
+        inputRef={c => {
+          this.nicknameInput = c
+        }}
+        size="small"
+      />
+    )
+  }
+}
+
 export default CourseNicknameEdit

@@ -26,74 +26,66 @@ import IconAssignment from '@instructure/ui-icons/lib/Line/IconAssignment'
 import IconDiscussion from '@instructure/ui-icons/lib/Line/IconDiscussion'
 import IconFolder from '@instructure/ui-icons/lib/Line/IconFolder'
 
-  var DashboardCardAction = React.createClass({
-    displayName: 'DashboardCardAction',
+class DashboardCardAction extends React.Component {
+  static displayName = 'DashboardCardAction'
 
-    propTypes: {
-      unreadCount: PropTypes.number,
-      iconClass: PropTypes.string,
-      linkClass: PropTypes.string,
-      path: PropTypes.string,
-      screenReaderLabel: PropTypes.string
-    },
+  static propTypes = {
+    unreadCount: PropTypes.number,
+    iconClass: PropTypes.string,
+    linkClass: PropTypes.string,
+    path: PropTypes.string,
+    screenReaderLabel: PropTypes.string
+  }
 
-    getDefaultProps: function() {
-      return {
-        unreadCount: 0
-      }
-    },
+  static defaultProps = {
+    unreadCount: 0
+  }
 
-    unreadCountLimiter: function() {
-      var count = this.props.unreadCount
-      count = (count < 100) ? count : '99+'
-      return (
-        <span className="unread_count">{count}</span>
-      )
-    },
+  unreadCountLimiter = () => {
+    let count = this.props.unreadCount
+    count = count < 100 ? count : '99+'
+    return <span className="unread_count">{count}</span>
+  }
 
-    renderIcon: function(iconClass) {
-      switch (iconClass) {
-        case 'icon-announcement':
-          return <IconAnnouncement/>
-        case 'icon-assignment':
-          return <IconAssignment/>
-        case 'icon-discussion':
-          return <IconDiscussion/>
-        case 'icon-folder':
-          return <IconFolder/>
-        default:
-          // fallback in case I missed one of the icons
-          return <i className={iconClass}/>
-      }
-    },
-
-    render: function () {
-      return (
-        <a href={this.props.path} className={classnames('ic-DashboardCard__action', this.props.linkClass)}
-           title={this.props.screenReaderLabel}>
-          { this.props.screenReaderLabel ? (
-            <span className="screenreader-only">{
-              this.props.screenReaderLabel
-            }</span>
-            ) : null
-          }
-
-          <div className="ic-DashboardCard__action-layout">
-            {this.renderIcon(this.props.iconClass)}
-            {
-              (this.props.unreadCount > 0) ? (
-                <span className="ic-DashboardCard__action-badge">
-                  { this.unreadCountLimiter() }
-                  <span className="screenreader-only">{
-                    I18n.t("Unread")
-                  }</span>
-                </span>
-              ) : null
-            }
-          </div>
-        </a>
-      );
+  renderIcon = iconClass => {
+    switch (iconClass) {
+      case 'icon-announcement':
+        return <IconAnnouncement />
+      case 'icon-assignment':
+        return <IconAssignment />
+      case 'icon-discussion':
+        return <IconDiscussion />
+      case 'icon-folder':
+        return <IconFolder />
+      default:
+        // fallback in case I missed one of the icons
+        return <i className={iconClass} />
     }
-  });
+  }
+
+  render() {
+    return (
+      <a
+        href={this.props.path}
+        className={classnames('ic-DashboardCard__action', this.props.linkClass)}
+        title={this.props.screenReaderLabel}
+      >
+        {this.props.screenReaderLabel ? (
+          <span className="screenreader-only">{this.props.screenReaderLabel}</span>
+        ) : null}
+
+        <div className="ic-DashboardCard__action-layout">
+          {this.renderIcon(this.props.iconClass)}
+          {this.props.unreadCount > 0 ? (
+            <span className="ic-DashboardCard__action-badge">
+              {this.unreadCountLimiter()}
+              <span className="screenreader-only">{I18n.t('Unread')}</span>
+            </span>
+          ) : null}
+        </div>
+      </a>
+    )
+  }
+}
 
 export default DashboardCardAction

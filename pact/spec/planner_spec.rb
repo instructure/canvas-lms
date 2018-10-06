@@ -40,6 +40,8 @@ describe 'Student Planner', :pact do
         status: 200,
         body: Pact.each_like(
           "context_type":"Course",
+          "context_name":"Untitled Course",
+          "context_image":"/path/to/course/image.png",
           "course_id":1,
           "plannable_id":1,
           "new_activity":false,

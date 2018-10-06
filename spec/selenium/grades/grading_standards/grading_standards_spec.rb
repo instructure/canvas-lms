@@ -45,8 +45,8 @@ describe "grading standards" do
     first_grading_standard = @new_grading_standard
     should_add_a_grading_scheme(name: "Second Grading Standard")
     second_grading_standard = @new_grading_standard
-    expect(fj("#grading_standard_#{first_grading_standard.id} span:eq(1)").text).to eq("First Grading Standard")
-    expect(fj("#grading_standard_#{second_grading_standard.id} span:eq(1)").text).to eq("Second Grading Standard")
+    expect(fj("#grading_standard_#{first_grading_standard.id} .standard_title .title")).to include_text("First Grading Standard")
+    expect(fj("#grading_standard_#{second_grading_standard.id} .standard_title .title")).to include_text("Second Grading Standard")
   end
 
   it "should allow setting a grading standard for an assignment", priority: "1", test_id: 217599 do

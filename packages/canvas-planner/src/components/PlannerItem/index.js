@@ -33,6 +33,7 @@ import Discussion from '@instructure/ui-icons/lib/Line/IconDiscussion';
 import Calendar from '@instructure/ui-icons/lib/Line/IconCalendarMonth';
 import Page from '@instructure/ui-icons/lib/Line/IconMsWord';
 import Edit from '@instructure/ui-icons/lib/Line/IconEdit';
+import PeerReview from '@instructure/ui-icons/lib/Line/IconPeerReview';
 import NotificationBadge, { MissingIndicator, NewActivityIndicator } from '../NotificationBadge';
 import BadgeList from '../BadgeList';
 import responsiviser from '../responsiviser';
@@ -167,6 +168,8 @@ export class PlannerItem extends Component {
         return formatMessage('To Do');
       case 'Calendar Event':
         return formatMessage('Calendar Event');
+      case 'Peer Review':
+        return formatMessage('Peer Review')
       default:
         return formatMessage('Task');
     }
@@ -190,14 +193,16 @@ export class PlannerItem extends Component {
       }
 
       if (this.hasDueTime()) {
-        if (this.props.dateStyle === 'todo') {
+        if (this.props.associated_item === "Peer Review") {
+          return formatMessage("Reminder: {date}", {date: this.props.date.format("LT")});
+        } else if (this.props.dateStyle === 'todo') {
           return formatMessage("To Do: {date}", {date: this.props.date.format("LT")});
-        } else {
-          return formatMessage("Due: {date}", {date: this.props.date.format("LT")});  
+        }  else {
+          return formatMessage("Due: {date}", {date: this.props.date.format("LT")});
         }
       }
-      
-      
+
+
       return this.props.date.format("LT");
     }
     return null;
@@ -229,13 +234,15 @@ export class PlannerItem extends Component {
       if (this.hasDueTime()) {
         if (this.props.dateStyle === 'todo') {
           return formatMessage('{assignmentType} {title} has a to do time at {datetime}.', params);
+        } else if (this.props.associated_item === 'Peer Review') {
+          return formatMessage('{assignmentType} {title}, reminder {datetime}.', params);
         } else {
           return formatMessage('{assignmentType} {title}, due {datetime}.', params);
         }
       }
 
       if (this.props.associated_item === "Announcement") {
-        return formatMessage('{assignmentType} {title} posted {datetime}.', params);    
+        return formatMessage('{assignmentType} {title} posted {datetime}.', params);
       }
     }
     return formatMessage('{assignmentType} {title}.', params);
@@ -257,6 +264,8 @@ export class PlannerItem extends Component {
           return <Calendar />;
         case "Page":
           return <Page />;
+        case "Peer Review":
+          return <PeerReview />;
         default:
           return <Avatar name={currentUser.displayName || '?'} src={currentUser.avatarUrl} size="small" />;
     }

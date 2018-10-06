@@ -47,7 +47,7 @@ class Enrollment::BatchStateUpdater
       students = Enrollment.of_student_type.where(id: batch).preload(user: :linked_observers).to_a
       students.each{|e| e.workflow_state = 'deleted'; e.readonly!}
       user_course_tuples = Enrollment.where(id: batch).active.select(%i(user_id course_id)).distinct.to_a
-      user_ids = Enrollment.where(id: batch).distinct.pluck(:user_id)
+      user_ids = Enrollment.where(id: batch).order(:user_id).distinct.pluck(:user_id)
       courses = Course.where(id: Enrollment.where(id: batch).select(:course_id).distinct).to_a
       root_account = courses.first.root_account
       data = mark_enrollments_as_deleted(batch, sis_batch: sis_batch, batch_mode: batch_mode)

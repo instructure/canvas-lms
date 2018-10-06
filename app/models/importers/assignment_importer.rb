@@ -206,26 +206,28 @@ module Importers
       # workflow_state) that it did
       item.reload
 
-      rubric = nil
-      rubric = context.rubrics.where(migration_id: hash[:rubric_migration_id]).first if hash[:rubric_migration_id]
-      rubric ||= context.available_rubric(hash[:rubric_id]) if hash[:rubric_id]
-      if rubric
-        assoc = rubric.associate_with(item, context, :purpose => 'grading', :skip_updating_points_possible => true)
-        assoc.use_for_grading = !!hash[:rubric_use_for_grading] if hash.key?(:rubric_use_for_grading)
-        assoc.hide_score_total = !!hash[:rubric_hide_score_total] if hash.key?(:rubric_hide_score_total)
-        assoc.hide_points = !!hash[:rubric_hide_points] if hash.key?(:rubric_hide_points)
-        assoc.hide_outcome_results = !!hash[:rubric_hide_outcome_results] if hash.key?(:rubric_hide_outcome_results)
-        if hash[:saved_rubric_comments]
-          assoc.summary_data ||= {}
-          assoc.summary_data[:saved_comments] ||= {}
-          assoc.summary_data[:saved_comments] = hash[:saved_rubric_comments]
-        end
-        assoc.skip_updating_points_possible = true
-        assoc.save
+      unless master_migration && migration.master_course_subscription.content_tag_for(item)&.downstream_changes&.include?("rubric")
+        rubric = nil
+        rubric = context.rubrics.where(migration_id: hash[:rubric_migration_id]).first if hash[:rubric_migration_id]
+        rubric ||= context.available_rubric(hash[:rubric_id]) if hash[:rubric_id]
+        if rubric
+          assoc = rubric.associate_with(item, context, :purpose => 'grading', :skip_updating_points_possible => true)
+          assoc.use_for_grading = !!hash[:rubric_use_for_grading] if hash.key?(:rubric_use_for_grading)
+          assoc.hide_score_total = !!hash[:rubric_hide_score_total] if hash.key?(:rubric_hide_score_total)
+          assoc.hide_points = !!hash[:rubric_hide_points] if hash.key?(:rubric_hide_points)
+          assoc.hide_outcome_results = !!hash[:rubric_hide_outcome_results] if hash.key?(:rubric_hide_outcome_results)
+          if hash[:saved_rubric_comments]
+            assoc.summary_data ||= {}
+            assoc.summary_data[:saved_comments] ||= {}
+            assoc.summary_data[:saved_comments] = hash[:saved_rubric_comments]
+          end
+          assoc.skip_updating_points_possible = true
+          assoc.save
 
-        item.points_possible ||= rubric.points_possible if item.infer_grading_type == "points"
-      elsif master_migration && item.rubric
-        item.rubric_association.destroy
+          item.points_possible ||= rubric.points_possible if item.infer_grading_type == "points"
+        elsif master_migration && item.rubric
+          item.rubric_association.destroy
+        end
       end
 
       if hash[:assignment_overrides]
@@ -334,23 +336,31 @@ module Importers
       item.save_without_broadcasting!
       item.skip_schedule_peer_reviews = nil
 
-      if item.submission_types == 'external_tool'
-        tag = item.create_external_tool_tag(:url => hash[:external_tool_url], :new_tab => hash[:external_tool_new_tab])
-        if hash[:external_tool_id] && migration && !migration.cross_institution?
-          tool_id = hash[:external_tool_id].to_i
-          tag.content_id = tool_id if ContextExternalTool.all_tools_for(context).where(id: tool_id).exists?
-        elsif hash[:external_tool_migration_id]
-          tool = context.context_external_tools.where(migration_id: hash[:external_tool_migration_id]).first
-          tag.content_id = tool.id if tool
-        end
-        tag.content_type = 'ContextExternalTool'
-        if !tag.save
-          if tag.errors["url"]
-            migration.add_warning(t('errors.import.external_tool_url',
-              "The url for the external tool assignment \"%{assignment_name}\" wasn't valid.",
-              :assignment_name => item.title))
+      if item.submission_types == 'external_tool' && (hash[:external_tool_url] || hash[:external_tool_id] || hash[:external_tool_migration_id])
+        current_tag = item.external_tool_tag
+        needs_new_tag = !current_tag ||
+          (hash[:external_tool_url] && current_tag.url != hash[:external_tool_url]) ||
+          (hash[:external_tool_id] && current_tag.content_id != hash[:external_tool_id]) ||
+          (hash[:external_tool_migration_id] && current_tag.content&.migration_id != hash[:external_tool_migration_id])
+
+        if needs_new_tag
+          tag = item.create_external_tool_tag(:url => hash[:external_tool_url], :new_tab => hash[:external_tool_new_tab])
+          if hash[:external_tool_id] && migration && !migration.cross_institution?
+            tool_id = hash[:external_tool_id].to_i
+            tag.content_id = tool_id if ContextExternalTool.all_tools_for(context).where(id: tool_id).exists?
+          elsif hash[:external_tool_migration_id]
+            tool = context.context_external_tools.where(migration_id: hash[:external_tool_migration_id]).first
+            tag.content_id = tool.id if tool
           end
-          item.association(:external_tool_tag).target = nil # otherwise it will trigger destroy on the tag
+          tag.content_type = 'ContextExternalTool'
+          if !tag.save
+            if tag.errors["url"]
+              migration.add_warning(t('errors.import.external_tool_url',
+                "The url for the external tool assignment \"%{assignment_name}\" wasn't valid.",
+                :assignment_name => item.title))
+            end
+            item.association(:external_tool_tag).target = nil # otherwise it will trigger destroy on the tag
+          end
         end
       end
 

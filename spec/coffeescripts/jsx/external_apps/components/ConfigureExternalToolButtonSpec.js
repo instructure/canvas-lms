@@ -29,8 +29,7 @@ const createElement = tool => <ConfigureExternalToolButton tool={tool} />
 const renderComponent = data => ReactDOM.render(createElement(data), wrapper)
 const getDOMNodes = function(data) {
   const component = renderComponent(data)
-  const btnTriggerModal =
-    component.refs.btnTriggerModal != null ? component.refs.btnTriggerModal.getDOMNode() : undefined
+  const btnTriggerModal = component.refs.btnTriggerModal
   return [component, btnTriggerModal]
 }
 
@@ -78,7 +77,7 @@ test('open and close modal', () => {
   Simulate.click(btnTriggerModal)
   ok(component.state.modalIsOpen, 'modal is open')
   ok(component.refs.btnClose)
-  Simulate.click(component.refs.btnClose.getDOMNode())
+  Simulate.click(component.refs.btnClose)
   ok(!component.state.modalIsOpen, 'modal is not open')
   ok(!component.refs.btnClose)
 })

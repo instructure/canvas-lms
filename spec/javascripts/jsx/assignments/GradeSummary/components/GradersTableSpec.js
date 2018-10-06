@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {mount} from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme'
+import {mount} from 'enzyme'
 import {Provider} from 'react-redux'
 
 import * as GradeActions from 'jsx/assignments/GradeSummary/grades/GradeActions'
@@ -105,6 +105,7 @@ QUnit.module('GradeSummary GradersTable', suiteHooks => {
     mountComponent()
     store.dispatch(GradeActions.addProvisionalGrades(provisionalGrades))
     store.dispatch(StudentActions.setLoadStudentsStatus(StudentActions.SUCCESS))
+    wrapper.update()
   }
 
   function getGraderRow(graderId) {
@@ -192,6 +193,7 @@ QUnit.module('GradeSummary GradersTable', suiteHooks => {
       store.dispatch(
         GradeActions.setBulkSelectProvisionalGradesStatus('1101', GradeActions.STARTED)
       )
+      wrapper.update()
       const button = getGraderAcceptGradesButton('1101')
       equal(button.prop('acceptGradesStatus'), GradeActions.STARTED)
     })

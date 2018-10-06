@@ -51,7 +51,7 @@ class ModeratePage
     end
 
     def click_student_link(student)
-      wait_for_new_page_load(student_link(student).click)
+      wait_for_new_page_load{ student_link(student).click }
     end
 
     def fetch_selected_final_grade_text(student)
@@ -64,6 +64,8 @@ class ModeratePage
 
     def accept_grades_for_grader(grader)
       accept_grades_button(grader).click
+      # wait for Accepted button to exist
+      fj("tr#grader-row-#{grader.id} button:contains('Accepted')")
     end
 
     # Methods

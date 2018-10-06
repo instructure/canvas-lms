@@ -28,6 +28,7 @@ CanvasRails::Application.routes.draw do
 
   resources :submissions, only: [] do
     resources :submission_comments, path: :comments, only: :index, defaults: { format: :pdf }
+    resources :docviewer_audit_events, only: [:create], constraints: { format: :json }
   end
   resources :submission_comments, only: [:update, :destroy]
 
@@ -1526,6 +1527,7 @@ CanvasRails::Application.routes.draw do
       get 'accounts/:account_id/groups', action: :context_index, as: 'account_user_groups'
       get 'courses/:course_id/groups', action: :context_index, as: 'course_user_groups'
       get 'groups/:group_id/users', action: :users, as: 'group_users'
+      get 'groups/:group_id/permissions', action: :permissions
       post 'groups/:group_id/invite', action: :invite
       post 'groups/:group_id/files', action: :create_file
       post 'groups/:group_id/preview_html', action: :preview_html
@@ -1584,6 +1586,20 @@ CanvasRails::Application.routes.draw do
       get 'files/:id', action: :api_show, as: 'attachment'
       delete 'files/:id', action: :destroy
       put 'files/:id', action: :api_update
+
+      # exists as an alias of GET for backwards compatibility
+      #
+      # older API clients were told to POST to the value of the Location header
+      # returned after upload to S3, when that was the create_success URL.
+      # that's no longer necessary, but they are still given a Location header
+      # pointed at this endpoint which they can GET for the file details (which
+      # create_success would have provided). for those that are still POSTing,
+      # we'll allow this but it's a noop (as far as side effects)
+      #
+      # to actually change the file metadata (e.g. rename), the PUT route above
+      # must be used.
+      post 'files/:id', action: :api_show
+
       get 'files/:id/:uuid/status', action: :api_file_status, as: 'file_status'
       get 'files/:id/public_url', action: :public_url
       %w(course group user).each do |context|
@@ -1849,6 +1865,7 @@ CanvasRails::Application.routes.draw do
       get "outcomes/:id", action: :show, as: "outcome"
       put "outcomes/:id", action: :update
       delete "outcomes/:id", action: :destroy
+      get "courses/:course_id/outcome_alignments", action: :outcome_alignments
     end
 
     scope(controller: :outcome_results) do

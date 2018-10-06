@@ -161,7 +161,7 @@ test('calls onDeleteRow when the delete button is clicked', function() {
   const deleteRow = sandbox.spy(this.props, 'onDeleteRow')
   const DataRowElement = <DataRow {...this.props} />
   this.dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
-  Simulate.click(this.dataRow.refs.deleteButton.getDOMNode())
+  Simulate.click(this.dataRow.refs.deleteButton)
   ok(deleteRow.calledOnce)
 })
 

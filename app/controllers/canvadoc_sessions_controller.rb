@@ -49,6 +49,9 @@ class CanvadocSessionsController < ApplicationController
         opts[:enrollment_type] = blob["enrollment_type"]
         # If we STILL don't have a role, something went way wrong so let's be unauthorized.
         return render(plain: 'unauthorized', status: :unauthorized) if opts[:enrollment_type].blank?
+
+        assignment = submission.assignment
+        opts[:audit_url] = submission_docviewer_audit_events_url(submission_id) if assignment.auditable?
         opts[:anonymous_instructor_annotations] = !!blob["anonymous_instructor_annotations"] if blob["anonymous_instructor_annotations"]
       end
 

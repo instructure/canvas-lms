@@ -29,9 +29,6 @@
   "insert_equella_links_49a8dacd": {
     "message": "Вставить ссылки на Equella"
   },
-  "assignment_list_a833f59d": {
-    "message": "Список заданий"
-  },
   "alternative_text_a834dcad": {
     "message": "Альтернативный текст:"
   },
@@ -161,9 +158,6 @@
   "close_flickr_form_b32e600a": {
     "message": "Закрыть форму Flickr"
   },
-  "course_syllabus_5de1b0af": {
-    "message": "Программа обучения курса"
-  },
   "upload_8b403d05": {
     "message": "Загрузить"
   },
@@ -205,9 +199,6 @@
   },
   "cc_attribution_non_commercial_39e0d30d": {
     "message": "Принадлежность CC, некоммерческий"
-  },
-  "quizzes_list_d812caa6": {
-    "message": "Список тестов"
   },
   "image_upload_form_7b74079a": {
     "message": "Форма отправки изображения"

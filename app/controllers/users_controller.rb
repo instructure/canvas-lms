@@ -553,10 +553,13 @@ class UsersController < ApplicationController
     end
   end
 
-  def dashboard_cards
-    cancel_cache_buster
+  DASHBOARD_CARD_TABS = [
+    Course::TAB_DISCUSSIONS, Course::TAB_ASSIGNMENTS,
+    Course::TAB_ANNOUNCEMENTS, Course::TAB_FILES
+  ].freeze
 
-    dashboard_courses = map_courses_for_menu(@current_user.menu_courses, :include_section_tabs => true)
+  def dashboard_cards
+    dashboard_courses = map_courses_for_menu(@current_user.menu_courses, tabs: DASHBOARD_CARD_TABS)
     Rails.cache.write(['last_known_dashboard_cards_count', @current_user].cache_key, dashboard_courses.count)
     render json: dashboard_courses
   end
@@ -2490,8 +2493,14 @@ class UsersController < ApplicationController
         @pseudonym.save!
         @user = @pseudonym.user
         @user.workflow_state = 'registered'
-
         @user.update_account_associations
+        if params[:user][:skip_registration] && params[:communication_channel][:skip_confirmation]
+          cc = CommunicationChannel.where(user_id: @user.id, path_type: :email).order(updated_at: :desc).first
+          return if cc.nil?
+          cc.pseudonym = @pseudonym
+          cc.workflow_state = 'active'
+          cc.save!
+        end
       end
     end
 

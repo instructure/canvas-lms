@@ -17,6 +17,9 @@
 %>
 
 <%
+  js_env ga_page_title: "Grades for Student"
+%>
+<%
   js_bundle :grade_summary, :rubric_assessment
   css_bundle :grade_summary
   content_for :page_title, join_title(t(:page_title, "Grades for %{student}", :student => @presenter.student_name), @context.name)

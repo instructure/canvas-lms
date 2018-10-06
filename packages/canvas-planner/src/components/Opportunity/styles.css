@@ -22,6 +22,7 @@
   letter-spacing: 0.0625rem;
   color: var(--secondaryColor);
   font-size: var(--nameFontSize);
+  margin-right: var(--closeButtonIconSize);
 }
 
 .title {

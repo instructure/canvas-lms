@@ -28,6 +28,7 @@ import CyoeStats from '../conditional_release_stats/index'
 import 'compiled/jquery/ModuleSequenceFooter'
 import 'jquery.instructure_forms'
 import LockManager from '../blueprint_courses/apps/LockManager'
+import AssignmentExternalTools from 'jsx/assignments/AssignmentExternalTools'
 
 const lockManager = new LockManager()
 lockManager.init({ itemType: 'assignment', page: 'show' })
@@ -108,4 +109,11 @@ $(() => {
   const graphsRoot = document.getElementById('crs-graphs')
   const detailsParent = document.getElementById('not_right_side')
   CyoeStats.init(graphsRoot, detailsParent)
+  if (document.getElementById('assignment_external_tools')) {
+    AssignmentExternalTools.attach(
+      document.getElementById('assignment_external_tools'),
+      "assignment_view",
+      parseInt(ENV.COURSE_ID, 10),
+      parseInt(ENV.ASSIGNMENT_ID, 10));
+  }
 })

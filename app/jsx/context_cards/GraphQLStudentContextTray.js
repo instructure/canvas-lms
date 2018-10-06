@@ -50,42 +50,6 @@ const SCC_QUERY = gql`
           view_all_grades: viewAllGrades
           view_analytics: viewAnalytics
         }
-        usersConnection(filter: {userIds: [$studentId], enrollmentStates: [invited, creation_pending, active, completed, inactive]}) {
-          edges {
-            node {
-              _id
-              short_name: shortName
-              avatar_url: avatarUrl
-              enrollments(courseId: $courseId) {
-                last_activity_at: lastActivityAt
-                section {
-                  name
-                }
-                grades {
-                  current_grade: currentGrade
-                  current_score: currentScore
-                }
-              }
-              analytics: summaryAnalytics(courseId: $courseId) {
-                page_views: pageViews {
-                  total
-                  max
-                  level
-                }
-                participations {
-                  total
-                  max
-                  level
-                }
-                tardiness_breakdown: tardinessBreakdown {
-                  late
-                  missing
-                  on_time: onTime
-                }
-              }
-            }
-          }
-        }
         submissionsConnection(
           first: 10
           orderBy: [{field: gradedAt, direction: descending}]
@@ -110,6 +74,40 @@ const SCC_QUERY = gql`
         }
       }
     }
+    user: legacyNode(type: User, _id: $studentId) {
+      ... on User {
+        _id
+        short_name: shortName
+        avatar_url: avatarUrl
+        enrollments(courseId: $courseId) {
+          last_activity_at: lastActivityAt
+          section {
+            name
+          }
+          grades {
+            current_grade: currentGrade
+            current_score: currentScore
+          }
+        }
+        analytics: summaryAnalytics(courseId: $courseId) {
+          page_views: pageViews {
+            total
+            max
+            level
+          }
+          participations {
+            total
+            max
+            level
+          }
+          tardiness_breakdown: tardinessBreakdown {
+            late
+            missing
+            on_time: onTime
+          }
+        }
+      }
+    }
   }
 `
 
@@ -118,8 +116,7 @@ export default props => {
     <ApolloProvider client={client}>
       <Query query={SCC_QUERY} variables={{courseId: props.courseId, studentId: props.studentId}}>
         {({data, loading}) => {
-          const {course} = data
-          const user = course && course.usersConnection.edges[0].node
+          const {course, user} = data
           return <StudentContextTray data={{loading, course, user}} {...props} />
         }}
       </Query>

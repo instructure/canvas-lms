@@ -240,7 +240,7 @@ RSpec.describe Outcomes::Import do
         existing_outcome.update! context: other_context
         expect do
           importer.import_outcome(**outcome_attributes, vendor_guid: magic_guid)
-        end.to raise_error(TestImporter::InvalidDataError, /not in visible context/)
+        end.to raise_error(TestImporter::InvalidDataError, /in another unrelated course or account/)
       end
 
       it 'updates description if outcome in current context' do
@@ -283,7 +283,7 @@ RSpec.describe Outcomes::Import do
         existing_outcome.update! context: other_context
         expect do
           importer.import_outcome(**outcome_attributes)
-        end.to raise_error(TestImporter::InvalidDataError, /not in visible context/)
+        end.to raise_error(TestImporter::InvalidDataError, /in another unrelated course or account/)
       end
 
       it 'updates if outcome in current context' do

@@ -24,14 +24,27 @@ describe Types::GroupType do
     course_with_student(active_all: true)
     @group_set = @course.group_categories.create! name: "asdf"
     @group = @group_set.groups.create! name: "group 1", context: @course
-    @group.add_user(@student)
+    @membership = @group.add_user(@student)
   end
 
-  let(:group_type) { GraphQLTypeTester.new(Types::GroupType, @group) }
+  let(:group_type) { GraphQLTypeTester.new(@group, current_user: @teacher) }
 
   it "works" do
-    expect(group_type._id).to eq @group.id
-    expect(group_type.name).to eq @group.name
-    expect(group_type.membersConnection(current_user: @teacher)).to eq @group.group_memberships
+    expect(group_type.resolve("_id")).to eq @group.id.to_s
+    expect(group_type.resolve("name")).to eq @group.name
+    expect(group_type.resolve("membersConnection { edges { node { _id } } }")).
+      to eq @group.group_memberships.map(&:to_param)
+  end
+
+  it "requires permission" do
+  end
+
+  describe Types::GroupMembershipType do
+    let(:group_membership_type) { GraphQLTypeTester.new(@membership, current_user: @teacher) }
+
+    it "works" do
+      expect(group_type.resolve("membersConnection { edges { node { user { _id } } } }")).to eq [@membership.user_id.to_s]
+      expect(group_type.resolve("membersConnection { edges { node { state } } }")).to eq [@membership.workflow_state]
+    end
   end
 end

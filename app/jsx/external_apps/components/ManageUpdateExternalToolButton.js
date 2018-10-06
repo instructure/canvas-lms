@@ -23,28 +23,36 @@ import PropTypes from 'prop-types'
 import Lti2ReregistrationUpdateModal from '../../external_apps/components/Lti2ReregistrationUpdateModal'
 import store from '../../external_apps/lib/ExternalAppsStore'
 
-export default React.createClass({
-    displayName: 'ManageUpdateExternalToolButton',
+export default class ManageUpdateExternalToolButton extends React.Component {
+  static propTypes = {
+    tool: PropTypes.object.isRequired
+  }
 
-    propTypes: {
-      tool: PropTypes.object.isRequired
-    },
+  openReregModal = e => {
+    this.refs.reregModal.openModal(e)
+  }
 
-    openReregModal(e) {
-      this.refs.reregModal.openModal(e)
-    },
+  render() {
+    const updateAriaLabel = I18n.t('Manage update for %{toolName}', {
+      toolName: this.props.tool.name
+    })
 
-    render() {
-      var updateAriaLabel = I18n.t('Manage update for %{toolName}', { toolName: this.props.tool.name });
-
-      var cssClassName = this.props.tool.has_update ? "" : " hide"
-      return (
-        <li role="presentation" className={"EditExternalToolButton ui-menu-item" + cssClassName}  >
-          <a href="#" ref="updateButton" tabIndex="-1" role="menuitem" aria-label={updateAriaLabel} className="icon-upload" onClick={this.openReregModal}>
-            {I18n.t('Manage Update')}
-          </a>
-          <Lti2ReregistrationUpdateModal ref="reregModal" tool={this.props.tool}  />
-        </li>
-      )
-    }
-  });
+    const cssClassName = this.props.tool.has_update ? '' : ' hide'
+    return (
+      <li role="presentation" className={`EditExternalToolButton ui-menu-item${cssClassName}`}>
+        <a
+          href="#"
+          ref="updateButton"
+          tabIndex="-1"
+          role="menuitem"
+          aria-label={updateAriaLabel}
+          className="icon-upload"
+          onClick={this.openReregModal}
+        >
+          {I18n.t('Manage Update')}
+        </a>
+        <Lti2ReregistrationUpdateModal ref="reregModal" tool={this.props.tool} />
+      </li>
+    )
+  }
+}

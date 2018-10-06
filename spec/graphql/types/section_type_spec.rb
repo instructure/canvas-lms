@@ -20,12 +20,16 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../helpers/graphql_type_tester')
 
 describe Types::SectionType do
-  let_once(:course) { Course.create! name: "Foo" }
+  let_once(:course) { course_with_student(active_all: true); @course }
   let_once(:section) { course.course_sections.create! name: "Whatever" }
-  let(:section_type) { GraphQLTypeTester.new(Types::SectionType, section) }
+  let(:section_type) { GraphQLTypeTester.new(section, current_user: @teacher) }
 
   it "works" do
-    expect(section_type._id).to eq section.id
-    expect(section_type.name).to eq section.name
+    expect(section_type.resolve("_id")).to eq section.id.to_s
+    expect(section_type.resolve("name")).to eq section.name
+  end
+
+  it "requires read permission" do
+    expect(section_type.resolve("_id", current_user: @student)).to be_nil
   end
 end

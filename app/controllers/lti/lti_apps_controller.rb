@@ -18,7 +18,7 @@
 module Lti
   class LtiAppsController < ApplicationController
     before_action :require_context
-    before_action :require_user
+    before_action :require_user, except: [:launch_definitions]
 
     def index
       if authorized_action(@context, @current_user, :read_as_admin)
@@ -37,7 +37,9 @@ module Lti
     def launch_definitions
       placements = params['placements'] || []
       if authorized_for_launch_definitions(@context, @current_user, placements)
-        collection = AppLaunchCollator.bookmarked_collection(@context, placements, current_user: @current_user)
+        # only_visible requires that specific placements are requested.  If a user is not read_admin, and they request only_visible
+        # without placements, an empty array will be returned.
+        collection = AppLaunchCollator.bookmarked_collection(@context, placements, {current_user: @current_user, session: session, only_visible: true})
         pagination_args = {max_per_page: 100}
         respond_to do |format|
           launch_defs = Api.paginate(
@@ -68,7 +70,7 @@ module Lti
         placements == ['global_navigation'] && \
         user_in_account?(user, context)
 
-      authorized_action(context, user, :read_as_admin)
+      authorized_action(context, user, :read)
     end
 
     def user_in_account?(user, account)

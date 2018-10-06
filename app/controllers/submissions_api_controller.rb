@@ -892,7 +892,14 @@ class SubmissionsApiController < ApplicationController
           selection = submission.provisional_grades.find(&:selection)
           json.merge!(in_moderation_set: selection.present?,
                       selected_provisional_grade_id: selection&.provisional_grade_id)
-          pg_list = submission_provisional_grades_json(submission, @assignment, @current_user, includes)
+          pg_list = submission_provisional_grades_json(
+            course: @context,
+            assignment: @assignment,
+            submission: submission,
+            current_user: @current_user,
+            avatars: service_enabled?(:avatars) && !@assignment.grade_as_group?,
+            includes: includes
+          )
           json.merge!({ provisional_grades: pg_list })
         end
         json

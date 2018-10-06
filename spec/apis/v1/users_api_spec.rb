@@ -558,6 +558,24 @@ describe "Users API", type: :request do
       expect(json['permissions']).to eq({'can_update_name' => false, 'can_update_avatar' => true})
     end
 
+    it "should retrieve the right avatar permissions" do
+      @user = @other_user
+      json = api_call(:get, "/api/v1/users/self",
+                      { :controller => 'users', :action => 'api_show', :id => 'self', :format => 'json' })
+      expect(json['permissions']['can_update_avatar']).to eq(false)
+
+      Account.default.tap { |a| a.enable_service(:avatars) }.save
+      json = api_call(:get, "/api/v1/users/self",
+                      { :controller => 'users', :action => 'api_show', :id => 'self', :format => 'json' })
+      expect(json['permissions']['can_update_avatar']).to eq(true)
+
+      @user.avatar_state = :locked
+      @user.save
+      json = api_call(:get, "/api/v1/users/self",
+                      { :controller => 'users', :action => 'api_show', :id => 'self', :format => 'json' })
+      expect(json['permissions']['can_update_avatar']).to eq(false)
+    end
+
     it "requires :read_roster or :manage_user_logins permission from the account" do
       account_admin_user_with_role_changes(:role_changes => {:read_roster => false, :manage_user_logins => false})
       api_call(:get, "/api/v1/users/#{@other_user.id}",
@@ -641,7 +659,7 @@ describe "Users API", type: :request do
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/users",
         { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param },
         { :role_filter_id => student_role.id.to_s, :sort => "sis_id"})
-      
+
       expect(json.map{|r| r['id']}).to eq [@student.id]
 
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/users",
@@ -870,13 +888,16 @@ describe "Users API", type: :request do
           other_user = user_with_pseudonym(:active_all => true)
           @pseudonym.sis_user_id = "12345"
           @pseudonym.save!
+          @user.communication_channel.workflow_state = 'registered'
           other_user.remove_from_root_account(Account.default)
+          expect(other_user.communication_channel).to be_nil
 
           @user = @site_admin
           json = api_call(:post, "/api/v1/accounts/#{Account.default.id}/users",
             { :controller => 'users', :action => 'create', :format => 'json', :account_id => Account.default.id.to_s },
-            { :enable_sis_reactivation => '1', :user => { :name => "Test User" },
+            { :enable_sis_reactivation => '1', :user => { :name => "Test User", :skip_registration => true },
               :pseudonym => { :unique_id => "test@example.com", :password => "password123", :sis_user_id => "12345"},
+              :communication_channel => { :skip_confirmation => true}
             }
           )
 
@@ -886,6 +907,8 @@ describe "Users API", type: :request do
           expect(other_user).to be_registered
           expect(other_user.user_account_associations.where(:account_id => Account.default).first).to_not be_nil
           expect(@pseudonym).to be_active
+          expect(other_user.communication_channel).to be_present
+          expect(other_user.communication_channel.workflow_state).to eq('active')
         end
 
         it "should raise an error trying to reactivate an active section" do

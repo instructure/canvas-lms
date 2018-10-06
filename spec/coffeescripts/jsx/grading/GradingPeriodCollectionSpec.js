@@ -127,7 +127,7 @@ QUnit.module('GradingPeriodCollection', {
     return this.server.respond()
   },
   teardown() {
-    ReactDOM.unmountComponentAtNode(this.gradingPeriodCollection.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.gradingPeriodCollection).parentNode)
     fakeENV.teardown()
     return this.server.restore()
   }
@@ -215,9 +215,9 @@ test('given two overlapping grading periods, areNoDatesOverlapping returns false
       weight: null,
       title: 'Spring',
       permissions: {
-        read: false,
-        update: false,
-        delete: false
+        read: true,
+        update: true,
+        delete: true
       }
     },
     {
@@ -227,9 +227,9 @@ test('given two overlapping grading periods, areNoDatesOverlapping returns false
       weight: null,
       title: 'Summer',
       permissions: {
-        read: false,
-        update: false,
-        delete: false
+        read: true,
+        update: true,
+        delete: true
       }
     }
   ]
@@ -494,7 +494,7 @@ QUnit.module('GradingPeriodCollection with read-only grading periods', {
     this.server.respond()
   },
   teardown() {
-    ReactDOM.unmountComponentAtNode(this.gradingPeriodCollection.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.gradingPeriodCollection).parentNode)
     fakeENV.teardown()
     this.server.restore()
   }

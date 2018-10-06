@@ -20,12 +20,12 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../helpers/graphql_type_tester')
 
 describe Types::ModuleType do
-  let_once(:course) { course_factory(active_all: true) }
+  let_once(:course) { course_with_teacher(active_all: true); @course }
   let_once(:mod) { course.context_modules.create! name: "module", unlock_at: 1.week.from_now }
-  let(:module_type) { GraphQLTypeTester.new(Types::ModuleType, mod) }
+  let(:module_type) { GraphQLTypeTester.new(mod, current_user: @teacher) }
 
   it "works" do
-    expect(module_type.name).to eq mod.name
-    expect(module_type.unlockAt).to eq mod.unlock_at
+    expect(module_type.resolve("name")).to eq mod.name
+    expect(module_type.resolve("unlockAt")).to eq mod.unlock_at.iso8601
   end
 end

@@ -45,7 +45,8 @@ const Rubric = (props) => {
     rubric,
     rubricAssessment,
     rubricAssociation,
-    isSummary
+    isSummary,
+    flexWidth
   } = props
   const assessing = onAssessmentChange !== null
   const priorData = _.get(rubricAssessment, 'data', [])
@@ -108,7 +109,7 @@ const Rubric = (props) => {
   const criteriaClass = (isSummary || !showPointsColumn()) ? 'rubric-larger-criteria' : undefined
   const maxRatings = _.max(rubric.criteria.map((c) => c.ratings.length))
   const minSize = () => {
-    if (isSummary) return {}
+    if (isSummary || flexWidth) return {}
     else {
       const ratingCorrection = freeForm ? 0 : 7.5 * maxRatings
       return { 'minWidth': `${30 + (ratingCorrection)}rem` }
@@ -137,7 +138,7 @@ const Rubric = (props) => {
             <tr>
               <td colSpan="3">
                 <Flex justifyItems="end">
-                  <FlexItem>
+                  <FlexItem data-selenium="rubric_total">
                     {hideScoreTotal || noScore ? null : total}
                   </FlexItem>
                 </Flex>
@@ -160,7 +161,8 @@ Rubric.propTypes = {
     return PropTypes.checkPropTypes({ rubricAssessment }, props, 'prop', 'Rubric')
   },
   rubricAssociation: PropTypes.shape(rubricAssociationShape),
-  isSummary: PropTypes.bool
+  isSummary: PropTypes.bool,
+  flexWidth: PropTypes.bool
 }
 Rubric.defaultProps = {
   allowExtraCredit: false,
@@ -168,7 +170,8 @@ Rubric.defaultProps = {
   onAssessmentChange: null,
   rubricAssessment: null,
   rubricAssociation: {},
-  isSummary: false
+  isSummary: false,
+  flexWidth: false
 }
 
 export default Rubric

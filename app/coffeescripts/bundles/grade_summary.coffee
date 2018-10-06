@@ -45,7 +45,7 @@ require [
       course_id = ENV.context_asset_string.replace('course_', '')
       user_id = ENV.student_id
 
-      if ENV.non_scoring_rubrics_enabled
+      if ENV.gradebook_non_scoring_rubrics_enabled
         @outcomeView = new IndividualStudentView
           el: $('#outcomes'),
           course_id: course_id,

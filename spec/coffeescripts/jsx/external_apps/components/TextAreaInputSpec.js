@@ -37,9 +37,8 @@ const createElement = data => (
 const renderComponent = data => ReactDOM.render(createElement(data), wrapper)
 const getDOMNodes = function(data) {
   const component = renderComponent(data)
-  const inputNode = component.refs.input != null ? component.refs.input.getDOMNode() : undefined
-  const hintNode =
-    component.refs.hintText != null ? component.refs.hintText.getDOMNode() : undefined
+  const inputNode = component.refs.input
+  const hintNode = component.refs.hintText
   return [component, inputNode, hintNode]
 }
 

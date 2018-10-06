@@ -1,99 +1,48 @@
 {
-  "group_navigation_99f191a": {
-    "message": "Csoportnavigáció"
-  },
-  "cc_attribution_share_alike_669e7f16": {
-    "message": "CC Nevezd meg!-Így add tovább!"
-  },
-  "quizzes_7e598f57": {
-    "message": "Kvízek"
-  },
-  "cc_attribution_non_commercial_no_derivatives_9fe74c00": {
-    "message": "CC Nevezd meg!-Ne add el!-Ne változtasd!"
-  },
-  "c_2001_acme_inc_283f7f80": {
-    "message": "(c) 2001 Acme Inc."
-  },
-  "upload_a_new_file_96e6d4ff": {
-    "message": "Új fájl feltöltése"
-  },
-  "folder_705fd2d7": {
-    "message": "Mappa"
-  },
-  "assignment_list_a833f59d": {
-    "message": "Feladatok"
-  },
-  "discussions_a5f96392": {
-    "message": "Fórumok"
-  },
-  "cc_attribution_no_derivatives_b006744f": {
-    "message": "CC Nevezd meg!-Ne változtasd!"
-  },
-  "usage_right_ff96f3e2": {
-    "message": "Felhasználási jog:"
-  },
-  "click_to_embed_image_33107dd8": {
-    "message": "Kattintson a beágyazott képhez"
-  },
-  "i_hold_the_copyright_71ee91b1": {
-    "message": "Megtartom a szerzői jogot"
-  },
-  "files_c300e900": {
-    "message": "Fájlok"
-  },
-  "people_b4ebb13c": {
-    "message": "Résztvevők"
-  },
-  "loading_25990131": {
-    "message": "Betöltés..."
+  "announcement_list_da155734": {
+    "message": "Hirdetménylista"
   },
   "announcements_a4b8ed4a": {
     "message": "Hirdetmények"
   },
-  "formatting_press_down_to_select_df728c30": {
-    "message": "Formázás, nyomja le a kiválasztáshoz"
+  "assignments_1e02582c": {
+    "message": "Feladatok"
   },
   "background_color_press_down_to_select_ef99fdac": {
     "message": "Háttérszín, nyomja le a kiválasztáshoz"
   },
-  "files_index_af7c662b": {
-    "message": "Fájlok indexe"
+  "c_2001_acme_inc_283f7f80": {
+    "message": "(c) 2001 Acme Inc."
   },
-  "the_material_is_subject_to_fair_use_exception_41bc6a4b": {
-    "message": "Az anyag a méltányos használat elve alapján készült"
+  "cancel_file_upload_9903e7b9": {
+    "message": "Cancel file upload"
   },
-  "link_to_other_content_in_the_group_3fe25379": {
-    "message": "Más tartalomhoz kapcsolás a csoportban."
-  },
-  "discussions_index_6c36ced": {
-    "message": "Fórumok indexe"
-  },
-  "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
-    "message": "Letöltési link beszúrásához kattintson az adott fájlra."
-  },
-  "copyright_holder_66ee111": {
-    "message": "Jog tulajdonosa:"
-  },
-  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
-    "message": "Vizuális szövegterület, nyomja le az ALT+F8-at a segítséghez"
-  },
-  "enter_search_terms_e397b1f0": {
-    "message": "keresőszavak megadása"
-  },
-  "pages_e5414c2c": {
-    "message": "Oldalak"
+  "cancel_image_upload_2c771950": {
+    "message": "Cancel image upload"
   },
   "cc_attribution_f6de631f": {
     "message": "CC Nevezd meg!"
   },
-  "insert_link_6dc23cae": {
-    "message": "Link beszúrása"
+  "cc_attribution_no_derivatives_b006744f": {
+    "message": "CC Nevezd meg!-Ne változtasd!"
   },
-  "collaborations_5c56c15f": {
-    "message": "Együttműködés"
+  "cc_attribution_non_commercial_39e0d30d": {
+    "message": "CC Nevezd meg!-Ne add el!"
   },
-  "what_would_you_like_to_call_the_new_page_d7e4488a": {
-    "message": "Mi legyen az új oldal neve?"
+  "cc_attribution_non_commercial_no_derivatives_9fe74c00": {
+    "message": "CC Nevezd meg!-Ne add el!-Ne változtasd!"
+  },
+  "cc_attribution_non_commercial_share_alike_c7edb1e5": {
+    "message": "CC Nevezd meg!-Ne add el!-Így add tovább!"
+  },
+  "cc_attribution_share_alike_669e7f16": {
+    "message": "CC Nevezd meg!-Így add tovább!"
+  },
+  "choose_usage_rights_33683854": {
+    "message": "Válasszon a felhasználói jogokból..."
+  },
+  "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
+    "message": "Letöltési link beszúrásához kattintson az adott fájlra."
   },
   "click_any_image_to_embed_the_image_in_the_page_2cdd1136": {
     "message": "Kattintson ide bármilyen kép beszúrásához az oldalra."
@@ -101,82 +50,172 @@
   "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
     "message": "Az oldalra mutató link beszúrásához kattintson a kívánt oldalra."
   },
-  "link_7262adec": {
-    "message": "Hivatkozás"
+  "click_to_embed_image_33107dd8": {
+    "message": "Kattintson a beágyazott képhez"
   },
-  "grades_a61eba0a": {
-    "message": "Értékelések"
+  "click_to_embed_imagename_c41ea8df": {
+    "message": "Click to embed { imageName }"
   },
-  "links_14b70841": {
-    "message": "Linkek"
+  "click_to_insert_a_link_into_the_editor_c19613aa": {
+    "message": "Click to insert a link into the editor."
   },
-  "course_syllabus_5de1b0af": {
-    "message": "Kurzustematika"
+  "click_to_insert_a_link_to_this_item_39794098": {
+    "message": "Click to insert a link to this item."
   },
-  "upload_8b403d05": {
-    "message": "Feltöltés"
+  "close_flickr_form_b32e600a": {
+    "message": "Close Flickr form"
   },
-  "modules_c4325335": {
-    "message": "Modulok"
+  "collaborations_5c56c15f": {
+    "message": "Együttműködés"
   },
-  "announcement_list_da155734": {
-    "message": "Hirdetménylista"
-  },
-  "link_to_a_new_page_6c4ad034": {
-    "message": "Link egy új oldalra"
-  },
-  "insert_math_equation_57c6e767": {
-    "message": "Matematikai képlet beszúrása"
-  },
-  "i_have_obtained_permission_to_use_this_file_6386f087": {
-    "message": "Szereztem jogosultságot ennek a fájlnak a használatához."
-  },
-  "cc_attribution_non_commercial_share_alike_c7edb1e5": {
-    "message": "CC Nevezd meg!-Ne add el!-Így add tovább!"
-  },
-  "wiki_home_9cd54d0": {
-    "message": "Wiki kezdőlap"
-  },
-  "upload_a_new_image_890df275": {
-    "message": "Új kép feltöltése"
-  },
-  "search_280d00bd": {
-    "message": "Keresés"
-  },
-  "assignments_1e02582c": {
-    "message": "Feladatok"
-  },
-  "cc_attribution_non_commercial_39e0d30d": {
-    "message": "CC Nevezd meg!-Ne add el!"
-  },
-  "the_material_is_licensed_under_creative_commons_3242cb5e": {
-    "message": "Ezt az anyagot Creative Commons licenc alatt tették közzé."
-  },
-  "images_7ce26570": {
-    "message": "Képek"
-  },
-  "link_to_other_content_in_the_course_879163b5": {
-    "message": "Linkelés más kurzustartalomhoz."
-  },
-  "font_size_press_down_to_select_6c25dc2d": {
-    "message": "Betűméret, nyomja le a kiválasztáshoz"
+  "copyright_holder_66ee111": {
+    "message": "Jog tulajdonosa:"
   },
   "course_navigation_dd035109": {
     "message": "Kurzusnavigáció"
   },
-  "choose_usage_rights_33683854": {
-    "message": "Válasszon a felhasználói jogokból..."
+  "creative_commons_license_725584ae": {
+    "message": "Creative Commons licenc:"
   },
-  "text_color_press_down_to_select_8f5ad9b5": {
-    "message": "Szövegszín, nyomja le a kiválasztáshoz"
+  "discussions_a5f96392": {
+    "message": "Fórumok"
+  },
+  "discussions_index_6c36ced": {
+    "message": "Fórumok indexe"
   },
   "embed_image_1080badc": {
     "message": "Beágyazott kép"
   },
-  "creative_commons_license_725584ae": {
-    "message": "Creative Commons licenc:"
+  "enter_search_terms_e397b1f0": {
+    "message": "keresőszavak megadása"
+  },
+  "file_upload_form_4aaad554": {
+    "message": "File Upload Form"
+  },
+  "files_c300e900": {
+    "message": "Fájlok"
+  },
+  "files_index_af7c662b": {
+    "message": "Fájlok indexe"
+  },
+  "folder_705fd2d7": {
+    "message": "Mappa"
+  },
+  "font_size_press_down_to_select_6c25dc2d": {
+    "message": "Betűméret, nyomja le a kiválasztáshoz"
+  },
+  "formatting_press_down_to_select_df728c30": {
+    "message": "Formázás, nyomja le a kiválasztáshoz"
+  },
+  "grades_a61eba0a": {
+    "message": "Értékelések"
+  },
+  "group_navigation_99f191a": {
+    "message": "Csoportnavigáció"
+  },
+  "i_have_obtained_permission_to_use_this_file_6386f087": {
+    "message": "Szereztem jogosultságot ennek a fájlnak a használatához."
+  },
+  "i_hold_the_copyright_71ee91b1": {
+    "message": "Megtartom a szerzői jogot"
+  },
+  "image_upload_form_7b74079a": {
+    "message": "Image Upload Form"
+  },
+  "images_7ce26570": {
+    "message": "Képek"
+  },
+  "insert_equella_links_49a8dacd": {
+    "message": "Insert Equella Links"
+  },
+  "insert_link_6dc23cae": {
+    "message": "Link beszúrása"
+  },
+  "insert_math_equation_57c6e767": {
+    "message": "Matematikai képlet beszúrása"
+  },
+  "link_7262adec": {
+    "message": "Hivatkozás"
+  },
+  "link_to_a_new_page_6c4ad034": {
+    "message": "Link egy új oldalra"
+  },
+  "link_to_other_content_in_the_course_879163b5": {
+    "message": "Linkelés más kurzustartalomhoz."
+  },
+  "link_to_other_content_in_the_group_3fe25379": {
+    "message": "Más tartalomhoz kapcsolás a csoportban."
+  },
+  "links_14b70841": {
+    "message": "Linkek"
+  },
+  "load_more_results_460f49a9": {
+    "message": "Load more results"
+  },
+  "loading_25990131": {
+    "message": "Betöltés..."
+  },
+  "loading_failed_b3524381": {
+    "message": "Loading failed..."
+  },
+  "modules_c4325335": {
+    "message": "Modulok"
+  },
+  "no_results_940393cf": {
+    "message": "No results."
+  },
+  "pages_e5414c2c": {
+    "message": "Oldalak"
+  },
+  "people_b4ebb13c": {
+    "message": "Résztvevők"
+  },
+  "quizzes_7e598f57": {
+    "message": "Kvízek"
+  },
+  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
+    "message": "Vizuális szövegterület, nyomja le az ALT+F8-at a segítséghez"
+  },
+  "search_280d00bd": {
+    "message": "Keresés"
+  },
+  "search_flickr_6884b518": {
+    "message": "Search Flickr"
+  },
+  "select_a_folder_to_upload_your_file_into_b82d12b": {
+    "message": "Select a folder to upload your file into"
+  },
+  "syllabus_f191f65b": {
+    "message": "Tematika"
+  },
+  "text_color_press_down_to_select_8f5ad9b5": {
+    "message": "Szövegszín, nyomja le a kiválasztáshoz"
   },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Az anyag a közkincs kategóriába tartozik"
+  },
+  "the_material_is_licensed_under_creative_commons_3242cb5e": {
+    "message": "Ezt az anyagot Creative Commons licenc alatt tették közzé."
+  },
+  "the_material_is_subject_to_fair_use_exception_41bc6a4b": {
+    "message": "Az anyag a méltányos használat elve alapján készült"
+  },
+  "upload_8b403d05": {
+    "message": "Feltöltés"
+  },
+  "upload_a_new_file_96e6d4ff": {
+    "message": "Új fájl feltöltése"
+  },
+  "upload_a_new_image_890df275": {
+    "message": "Új kép feltöltése"
+  },
+  "usage_right_ff96f3e2": {
+    "message": "Felhasználási jog:"
+  },
+  "what_would_you_like_to_call_the_new_page_d7e4488a": {
+    "message": "Mi legyen az új oldal neve?"
+  },
+  "wiki_home_9cd54d0": {
+    "message": "Wiki kezdőlap"
   }
 }

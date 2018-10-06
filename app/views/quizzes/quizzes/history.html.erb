@@ -17,6 +17,13 @@
 %>
 
 <%
+  if @quiz.survey? 
+    js_env ga_page_title: "User's Survey History"
+  else
+    js_env ga_page_title: "User's Quiz History"
+  end
+%>
+<%
   hide_student_name = params[:hide_student_name]&.to_i&.nonzero?
   user_name = if hide_student_name || @quiz.anonymous_survey?
     t('Student')
@@ -28,7 +35,6 @@
     user_name = t('Logged Out User %{index}', index: @logged_out_user_index)
   end
 %>
-
 <% content_for :page_title, (@quiz.survey? ?
      join_title(t(:page_title_survey, "%{user}'s Survey History", :user => user_name), @quiz.quiz_title || t(:default_survey_name, "Survey %{course_name}", :course_name => @context.name)) :
      join_title(t(:page_title_quiz, "%{user}'s Quiz History", :user => user_name), @quiz.quiz_title || t(:default_quiz_name, "Quiz %{course_name}", :course_name => @context.name)))

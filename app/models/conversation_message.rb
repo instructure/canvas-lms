@@ -289,7 +289,13 @@ class ConversationMessage < ActiveRecord::Base
     # It would be nice to have group conversations via e-mail, but if so, we need to make it much more obvious
     # that replies to the e-mail will be sent to multiple recipients.
     recipients = [author]
-    conversation.reply_from(opts.merge(:root_account_id => self.root_account_id, :only_users => recipients))
+    tags = conversation.conversation_participants.where(user_id: author.id).pluck(:tags)
+    opts = opts.merge(
+      :root_account_id => self.root_account_id,
+      :only_users => recipients,
+      :tags => tags
+    )
+    conversation.reply_from(opts)
   end
 
   def forwarded_messages

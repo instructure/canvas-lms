@@ -14,18 +14,23 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-require_relative '../common'
+require_relative '../../common'
 
 module NewUserSearchPage
 
   # ---------------------- Page ----------------------
-  def visit(account)
+  def visit_users(account)
     get("/accounts/#{account.id}/users")
     wait_for_ajaximations
   end
 
   def visit_subaccount(sub_account)
     get("/accounts/#{sub_account.id}/users")
+    wait_for_ajaximations
+  end
+
+  def visit_courses(account)
+    get("/accounts/#{account.id}/")
     wait_for_ajaximations
   end
 
@@ -86,12 +91,20 @@ module NewUserSearchPage
     fj("[data-automation='users list'] tr:contains('#{user_name}') [role=button]:has([name='IconEdit'])")
   end
 
+  def page_previous_jqcss
+    'button:has([name="IconArrowOpenStart"])'
+  end
+
   def page_previous_button
-    fj("[role=button]:has([title='Previous Page'])")
+    fj(page_previous_jqcss)
   end
 
   def page_next_button
-    fj("[role=button]:has([title='Next Page'])")
+    fj("[role=button]:has([name='IconArrowOpenEnd'])")
+  end
+
+  def page_number_button(number)
+    fj("nav button:contains(\"#{number}\")")
   end
 
   def results_alert
@@ -100,6 +113,14 @@ module NewUserSearchPage
 
   def results_body
     f('#content')
+  end
+
+  def all_results_users
+    f('[data-automation="users list"]')
+  end
+
+  def all_results_courses
+    f('[data-automation="courses list"]')
   end
 
   def results_row
@@ -112,6 +133,18 @@ module NewUserSearchPage
 
   def left_navigation
     f('#left-side #section-tabs')
+  end
+
+  def users_left_navigation
+    f('#section-tabs .users')
+  end
+
+  def courses_left_navigation
+    f('#section-tabs .courses')
+  end
+
+  def breadcrumbs
+    f("#breadcrumbs")
   end
 
   # ---------------------- Actions ----------------------
@@ -163,6 +196,10 @@ module NewUserSearchPage
     page_next_button.click
   end
 
+  def click_page_number_button(number)
+    page_number_button(number).click
+  end
+
   def click_people_more_options
     more_options_button.click
   end
@@ -173,5 +210,13 @@ module NewUserSearchPage
 
   def click_manage_profile_pictures_option
     more_options_profile_pictures.click
+  end
+
+  def click_left_nav_users
+    users_left_navigation.click
+  end
+
+  def click_left_nav_courses
+    courses_left_navigation.click
   end
 end

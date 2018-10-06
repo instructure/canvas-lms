@@ -155,7 +155,7 @@ test('removes non-text content from announcement message', () => {
     <p>foo bar</p>
   `
   const tree = mount(<AnnouncementRow {...makeProps({ announcement: { message: messageHtml } })} />)
-  const node = tree.find('.ic-announcement-row__content').getDOMNode()
+  const node = tree.find('.ic-announcement-row__content').instance()
   equal(node.childNodes.length, 1)
   equal(node.childNodes[0].nodeType, 3) // nodeType === 3 is text node type
   ok(node.textContent.includes('Hello World!'))

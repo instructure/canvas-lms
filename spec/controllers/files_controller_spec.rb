@@ -212,6 +212,7 @@ describe FilesController do
       end
 
       it "should not show restricted external tools to students" do
+        course_file
         @course.enroll_student(@user).accept!
 
         get 'index', params: {:course_id => @course.id}

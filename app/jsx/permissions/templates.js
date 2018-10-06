@@ -882,7 +882,7 @@ To edit blueprint lock settings on an individual quiz, or on the Quizzes index p
     },
     {
       title: I18n.t('Grades'),
-      description: I18n.t('To manage moderated grading, Grades - moderate ​must also be enabled.')
+      description: I18n.t(`To moderate grades, Grades - Select final grade for moderation must also be enabled.`)
     },
     {
       title: I18n.t('Quizzes'),
@@ -945,7 +945,7 @@ To edit blueprint lock settings on an individual quiz, or on the Quizzes index p
     },
     {
       title: I18n.t('Grades'),
-      description: I18n.t('To manage moderated grading, Grades - moderate ​must also be enabled.')
+      description: I18n.t(`To moderate grades, Grades - Select final grade for moderation must also be enabled.`)
     },
     {
       title: I18n.t('Quizzes'),
@@ -1722,33 +1722,54 @@ const finalGradePermissions = generateActionTemplates(
     {
       title: I18n.t('Grades'),
       description: I18n.t(
-        `Allows user to select final grade for moderated assignments.`
-      )
+        `Allows user to select final grade for moderated assignments.`)
     }
   ],
   [
     {
+      title: I18n.t('Assignments'),
+      description: I18n.t(
+        `To allow a user to add students to a moderation set, Grades - view all grades must also be enabled.`
+      )
+    },
+    {
+      title: I18n.t('SpeedGrader'),
+      description: I18n.t(
+        `To allow a user to review a moderated assignment in SpeedGrader, Grades - edit must also be enabled.`
+      )
+    },
+    {
       title: I18n.t('Grades'),
-      description: I18n.t(`To manage moderated grading, Grades - moderate must also be enabled.
-NOTE: This permission will replace Grades - moderate, which is being deprecated.`)
+      description: I18n.t(
+      `To allow a user to publish final grades for a moderated assignment, Grades - edit must also be enabled.`
+    )
     }
   ],
   [
     {
       title: I18n.t('Grades'),
       description: I18n.t(
-        `Allows user to select final grade for moderated assignments.`
-      )
+        `Allows user to select final grade for moderated assignments.`)
     }
   ],
   [
-    {
-      title: I18n.t('Grades'),
-      description: I18n.t(`To manage moderated grading, Grades - moderate must also be enabled.
-NOTE: This permission will replace Grades - moderate, which is being deprecated.`)
-    }
-  ]
-)
+      {
+        title: I18n.t('Assignments'),
+        description: I18n.t(
+          `To allow a user to add students to a moderation set, Grades - view all grades must also be enabled.`)
+      },
+      {
+        title: I18n.t('SpeedGrader'),
+        description: I18n.t(
+          `To allow a user to review a moderated assignment in SpeedGrader, Grades - edit must also be enabled.`)
+      },
+      {
+        title: I18n.t('Grades'),
+        description: I18n.t(
+        `To allow a user to publish final grades for a moderated assignment, Grades - edit must also be enabled.`)
+      }
+    ]
+  )
 
 const gradeAuditTrailPermissions = generateActionTemplates(
   'view_audit_trail',

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2017 - present Instructure, Inc.
+# Copyright (C) 2018 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,13 +14,22 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-require_relative '../common'
+#
 
-module NewUserEditModalPage
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-  # ---------------------- Controls ----------------------
+describe AccountsHelper do
+  include AccountsHelper
 
-  def full_name_input
-    fj('label:contains("Full Name") input')
+  describe 'turnitin_originality_options' do
+    it 'contains the expected options' do
+      expect(turnitin_originality_options.map(&:first)).to match_array [
+        'Use parent account setting',
+        'Immediately',
+        'After the assignment is graded',
+        'After the Due Date',
+        'Never'
+      ]
+    end
   end
 end

@@ -30,6 +30,7 @@ class SubmissionCommentsController < ApplicationController
   def update
     submission_comment = SubmissionComment.find(params[:id])
     if authorized_action(submission_comment, @current_user, :update)
+      submission_comment.updating_user = @current_user
       submission_comment.reload unless submission_comment.update(submission_comment_params)
 
       respond_to do |format|
@@ -41,6 +42,7 @@ class SubmissionCommentsController < ApplicationController
   def destroy
     submission_comment = SubmissionComment.find(params[:id])
     if authorized_action(submission_comment, @current_user, :delete)
+      submission_comment.updating_user = @current_user
       submission_comment.destroy
       respond_to do |format|
         format.json { render json: submission_comment }

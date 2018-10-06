@@ -29,8 +29,10 @@ define [
   '../../widget/assignmentRubricDialog'
   'jsx/shared/rce/RceCommandShim'
   'str/htmlEscape'
+  'jsx/assignments/AssignmentExternalTools'
 ], (I18n, $, Backbone, _, DiscussionTopic, EntriesView, EntryView, PublishButtonView,
-    replyTemplate, Reply, assignmentRubricDialog, RceCommandShim, htmlEscape) ->
+    replyTemplate, Reply, assignmentRubricDialog, RceCommandShim, htmlEscape,
+    AssignmentExternalTools) ->
 
   class TopicView extends Backbone.View
 
@@ -57,6 +59,7 @@ define [
       '.topic-subscribe-button': '$subscribeButton'
       '.topic-unsubscribe-button': '$unsubscribeButton'
       '.announcement_cog': '$announcementCog'
+      '#assignment_external_tools' : '$AssignmentExternalTools'
 
     initialize: ->
       super
@@ -90,6 +93,14 @@ define [
       if $el = @$('#topic_publish_button')
         @topic.set(unpublishable: ENV.DISCUSSION.TOPIC.CAN_UNPUBLISH, published: ENV.DISCUSSION.TOPIC.IS_PUBLISHED)
         new PublishButtonView(model: @topic, el: $el).render()
+
+      [context, context_id] = ENV.context_asset_string.split("_")
+      if context == 'course'
+        @AssignmentExternalTools = AssignmentExternalTools.attach(
+          @$AssignmentExternalTools.get(0),
+          "assignment_view",
+          parseInt(context_id),
+          (if ENV.DISCUSSION.IS_ASSIGNMENT then parseInt(ENV.DISCUSSION.ASSIGNMENT_ID) else undefined))
 
     filter: @::afterRender
 

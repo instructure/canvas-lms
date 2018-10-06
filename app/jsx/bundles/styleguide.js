@@ -23,7 +23,6 @@ import ReactDOM from 'react-dom'
 import preventDefault from 'compiled/fn/preventDefault'
 import PublishButtonView from 'compiled/views/PublishButtonView'
 import PublishIconView from 'compiled/views/PublishIconView'
-import ReactModalExample from '../styleguide/ReactModalExample'
 import Backbone from 'Backbone'
 import 'jqueryui/accordion'
 import 'jqueryui/tabs'
@@ -36,24 +35,6 @@ const dialog = $('#dialog-buttons-dialog').dialog({
   height: 200
 }).data('dialog')
 $('#show-dialog-buttons-dialog').click(() => dialog.open())
-
-// React Modal
-ReactDOM.render(
-  <ReactModalExample
-    className="ReactModal__Content--canvas"
-    overlayClassName="ReactModal__Overlay--canvas"
-  />,
-  document.getElementById('react-modal-example')
-)
-
-ReactDOM.render(
-  <ReactModalExample
-    label="Trigger Confirm Dialog"
-    className="ReactModal__Content--canvas ReactModal__Content--mini-modal"
-    overlayClassName="ReactModal__Overlay--canvas"
-  />,
-  document.getElementById('react-modal-confirm-example')
-)
 
 // # OLD STYLEGUIDE ##
 

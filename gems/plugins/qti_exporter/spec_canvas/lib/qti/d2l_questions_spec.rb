@@ -291,7 +291,7 @@ module D2LExpected
                    {:scale=>0, :min=>100, :max=>150, :name=>"z"}],
           :correct_comments=>""}
 
-  SIMPLE_MATH = {:answers=>[],
+  SIMPLE_MATH = {
     :question_type=>"numerical_question",
     :question_bank_id=>"SECT_3981973",
     :incorrect_comments=>"",

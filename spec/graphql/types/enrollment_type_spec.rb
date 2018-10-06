@@ -21,15 +21,15 @@ require File.expand_path(File.dirname(__FILE__) + '/../../helpers/graphql_type_t
 
 describe Types::EnrollmentType do
   let_once(:enrollment) { student_in_course(active_all: true) }
-  let(:enrollment_type) { GraphQLTypeTester.new(Types::EnrollmentType, enrollment) }
+  let(:enrollment_type) { GraphQLTypeTester.new(enrollment, current_user: @student) }
 
   it "works" do
-    expect(enrollment_type._id).to eq enrollment.id
-    expect(enrollment_type.type).to eq "StudentEnrollment"
-    expect(enrollment_type.state).to eq "active"
+    expect(enrollment_type.resolve("_id")).to eq enrollment.id.to_s
+    expect(enrollment_type.resolve("type")).to eq "StudentEnrollment"
+    expect(enrollment_type.resolve("state")).to eq "active"
   end
 
-  context "grades" do
+  describe Types::GradesType do
     before(:once) do
       gpg = GradingPeriodGroup.create!(account_id: Account.default)
       @course.enrollment_term.update_attribute :grading_period_group, gpg
@@ -38,32 +38,73 @@ describe Types::EnrollmentType do
     end
 
     it "uses the current grading period by default" do
-      grades = enrollment_type.grades(current_user: @teacher)
-      expect(grades.enrollment).to eq enrollment
-      expect(grades.grading_period_id).to eq @gp1.id
+      expect(
+        enrollment_type.resolve(
+          "grades { gradingPeriod { _id } }",
+        )
+      ).to eq @gp1.id.to_s
     end
 
     it "lets you specify a different grading period" do
-      grades = enrollment_type.grades(current_user: @teacher, args: {
-        gradingPeriodId: @gp2.id.to_s
-      })
-      expect(grades.enrollment).to eq enrollment
-      expect(grades.grading_period_id).to eq @gp2.id
+      expect(
+        enrollment_type.resolve(<<~GQL, current_user: @teacher)
+          grades(gradingPeriodId: "#{@gp2.id}") {
+            gradingPeriod { _id }
+          }
+        GQL
+      ).to eq @gp2.id.to_s
     end
 
     it "works for courses with no grading periods" do
       @course.enrollment_term.update_attribute :grading_period_group, nil
-      grades = enrollment_type.grades(current_user: @teacher)
-      expect(grades.enrollment).to eq enrollment
-      expect(grades.grading_period_id).to eq nil
+      expect(
+        enrollment_type.resolve(
+          "grades { gradingPeriod { _id } }",
+          current_user: @teacher
+        )
+      ).to be_nil
     end
 
-    it "returns a dummy object when scores don't exist" do
+    it "works even when no scores exist" do
       ScoreMetadata.delete_all
       Score.delete_all
 
-      grades = enrollment_type.grades(current_user: @teacher)
-      expect(grades.id).to be_nil
+      expect(
+        enrollment_type.resolve(
+          "grades { currentScore }" ,
+          current_user: @teacher
+        )
+      ).to be_nil
+    end
+
+    describe Types::GradingPeriodType do
+      it "works" do
+        expect(
+          enrollment_type.resolve(<<~GQL, current_user: @teacher)
+            grades { gradingPeriod { title } }
+          GQL
+        ).to eq @gp1.title
+
+        expect(
+          enrollment_type.resolve(<<~GQL, current_user: @teacher)
+            grades { gradingPeriod { startDate } }
+          GQL
+        ).to eq @gp1.start_date.iso8601
+
+        expect(
+          enrollment_type.resolve(<<~GQL, current_user: @teacher)
+            grades { gradingPeriod { endDate } }
+          GQL
+        ).to eq @gp1.end_date.iso8601
+      end
+    end
+  end
+
+  context "section" do
+    it "works" do
+      expect(
+        enrollment_type.resolve("section { _id }")
+      ).to eq enrollment.course_section.id.to_s
     end
   end
 end

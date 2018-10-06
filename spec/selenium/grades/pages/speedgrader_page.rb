@@ -296,7 +296,7 @@ class Speedgrader
     def visit_section(section)
       students_dropdown_button.click
       hover(sections_menu_link)
-      wait_for_new_page_load(section.click)
+      wait_for_new_page_load{ section.click }
     end
 
     def enter_grade(grade)
@@ -363,6 +363,10 @@ class Speedgrader
 
     def grade_rubric_criteria(criteria_id, grade)
       rubric_grade_input(criteria_id).send_keys(grade)
+    end
+
+    def select_rubric_criterion(criterion)
+      fj("span:contains('#{criterion}'):visible").click
     end
 
     def clear_new_comment
@@ -452,8 +456,8 @@ class Speedgrader
       f('button.toggle_full_rubric')
     end
 
-    def view_longer_description_link
-      f('#criterion_crit1 .long_description_link')
+    def view_longer_description_link(index = 0)
+      ffj("span:contains('view longer description'):visible")[index]
     end
 
     def rating(rat_num)
@@ -465,7 +469,7 @@ class Speedgrader
     end
 
     def rubric_total_points
-      f('#grading span.rubric_total')
+      fj("span[data-selenium='rubric_total']:visible")
     end
 
     def rating_tiers
@@ -481,15 +485,23 @@ class Speedgrader
     end
 
     def learning_outcome_points
-      f('.learning_outcome_criterion input.criterion_points')
+      f('.criterion_points input')
     end
 
     def enter_rubric_points(points)
       replace_content(learning_outcome_points, points)
     end
 
+    def rubric_criterion_points(index = 0)
+      ff('.criterion_points')[index]
+    end
+
     def rubric_grade_input(criteria_id)
-      f("#criterion_#{criteria_id} input.criterion_points")
+      f("#criterion_#{criteria_id} td.criterion_points input")
+    end
+
+    def rubric_graded_points(index = 0)
+      ffj('.react-rubric-cell.graded-points:visible')[index]
     end
   end
 end

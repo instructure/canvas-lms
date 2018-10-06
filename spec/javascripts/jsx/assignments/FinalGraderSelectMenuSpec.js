@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {mount} from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme'
+import {mount} from 'enzyme'
 import FinalGraderSelectMenu from 'jsx/assignments/FinalGraderSelectMenu'
 
 QUnit.module('FinalGraderSelectMenu', hooks => {
@@ -31,12 +31,15 @@ QUnit.module('FinalGraderSelectMenu', hooks => {
   function selectMenuOptions() {
     return selectMenu()
       .find('option')
-      .map(({node: option}) => ({
-        hidden: option.hidden,
-        selected: option.selected,
-        text: option.innerText,
-        value: option.value
-      }))
+      .map(option => {
+        const $option = option.instance()
+        return {
+          hidden: $option.hidden,
+          selected: $option.selected,
+          text: $option.innerText,
+          value: $option.value
+        }
+      })
   }
 
   function mountComponent() {

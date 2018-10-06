@@ -27,6 +27,7 @@ const defaultProps = (props = {}) => (
   Object.assign({
     outcome: {
       id: 1,
+      assignments: [],
       expansionId: 100,
       mastered: false,
       mastery_points: 3,

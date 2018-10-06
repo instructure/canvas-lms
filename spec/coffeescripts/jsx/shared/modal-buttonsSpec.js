@@ -27,9 +27,9 @@ QUnit.module('ModalButtons')
 test('applies className', () => {
   const ModalButtonsElement = <ModalButtons className="cat" footerClassName="dog" />
   const component = TestUtils.renderIntoDocument(ModalButtonsElement)
-  ok($(component.getDOMNode()).hasClass('cat'), 'has parent class')
-  ok($(component.getDOMNode()).find('.dog').length === 1, 'Finds footer class name')
-  ReactDOM.unmountComponentAtNode(component.getDOMNode().parentNode)
+  ok($(ReactDOM.findDOMNode(component)).hasClass('cat'), 'has parent class')
+  ok($(ReactDOM.findDOMNode(component)).find('.dog').length === 1, 'Finds footer class name')
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
 })
 
 test('renders children', () => {
@@ -39,6 +39,6 @@ test('renders children', () => {
     </ModalButtons>
   )
   const component = TestUtils.renderIntoDocument(mB)
-  ok($(component.getDOMNode()).find('.cool_div').length === 1, 'renders the child component')
-  ReactDOM.unmountComponentAtNode(component.getDOMNode().parentNode)
+  ok($(ReactDOM.findDOMNode(component)).find('.cool_div').length === 1, 'renders the child component')
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
 })

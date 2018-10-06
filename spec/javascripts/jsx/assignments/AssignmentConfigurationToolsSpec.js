@@ -151,7 +151,7 @@ test('it renders "none" for tool type when no tool is selected', () => {
     />
   )
   wrapper.setState({tools: toolDefinitions})
-  const toolType = wrapper.find('#configuration-tool-type').getDOMNode()
+  const toolType = wrapper.find('#configuration-tool-type').instance()
   equal(toolType.value, 'none')
 })
 
@@ -204,9 +204,9 @@ test('it renders the proper tool type for LTI 1.x tools', () => {
   const toolSelect = wrapper.find('#similarity_detection_tool')
   const toolType = wrapper.find('#configuration-tool-type')
 
-  toolSelect.getDOMNode().options[1].selected = 'selected'
+  toolSelect.instance().options[1].selected = 'selected'
   wrapper.instance().setToolLaunchUrl()
-  equal(toolType.getDOMNode().value, 'ContextExternalTool')
+  equal(toolType.instance().value, 'ContextExternalTool')
 })
 
 test('it renders the proper tool type for LTI 2 tools', () => {
@@ -219,9 +219,9 @@ test('it renders the proper tool type for LTI 2 tools', () => {
   wrapper.setState({tools: toolDefinitions})
   const toolSelect = wrapper.find('#similarity_detection_tool')
   const toolType = wrapper.find('#configuration-tool-type')
-  toolSelect.getDOMNode().options[4].selected = 'selected'
+  toolSelect.instance().options[4].selected = 'selected'
   wrapper.instance().setToolLaunchUrl()
-  equal(toolType.getDOMNode().value, 'Lti::MessageHandler')
+  equal(toolType.instance().value, 'Lti::MessageHandler')
 })
 
 test('it renders proper tool when duplicate IDs but unique tool types are present', () => {

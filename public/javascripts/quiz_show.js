@@ -32,6 +32,7 @@ import 'compiled/jquery.rails_flash_notifications'
 import './jquery.instructure_misc_plugins' /* ifExists, confirmDelete */
 import './jquery.disableWhileLoading'
 import 'message_students' /* messageStudents */
+import AssignmentExternalTools from 'jsx/assignments/AssignmentExternalTools'
 
 
   $(document).ready(function () {
@@ -210,4 +211,12 @@ import 'message_students' /* messageStudents */
     var graphsRoot = document.getElementById('crs-graphs')
     var detailsParent = document.getElementById('not_right_side')
     CyoeStats.init(graphsRoot, detailsParent)
+
+    if ($('#assignment_external_tools').length) {
+      AssignmentExternalTools.attach(
+        $('#assignment_external_tools')[0],
+        "assignment_view",
+        parseInt(ENV.COURSE_ID, 10),
+        parseInt(ENV.QUIZ.assignment_id, 10));
+    }
   });

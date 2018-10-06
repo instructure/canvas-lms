@@ -512,12 +512,13 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def duplicated_in_context?
-    self.class.all_tools_for(context).where.not(id: id).any? do |other_tool|
-      settings_equal = other_tool.settings == settings
-      launch_urls_equal = other_tool.url == url && settings.values.all?(&:blank?)
+    duplicate_tool = self.class.find_external_tool(url, context, nil, self.id)
 
-      other_tool.settings.values.any?(&:present?) ? settings_equal : launch_urls_equal
-    end
+    # If tool with same launch URL is found in the context
+    return true if url.present? && duplicate_tool.present?
+
+    # If tool with same domain is found in the context
+    self.class.all_tools_for(context).where.not(id: id).where(domain: domain).present? && domain.present?
   end
 
   def self.contexts_to_search(context)
@@ -561,6 +562,9 @@ class ContextExternalTool < ActiveRecord::Base
       scope = ContextExternalTool.shard(context.shard).polymorphic_where(context: contexts).active
       scope = scope.placements(*placements)
       scope = scope.selectable if Canvas::Plugin.value_to_boolean(options[:selectable])
+      if Canvas::Plugin.value_to_boolean(options[:only_visible])
+        scope = scope.visible(options[:current_user], context, options[:session], options[:visibility_placements], scope)
+      end
       scope.order(ContextExternalTool.best_unicode_collation_key('context_external_tools.name')).order(Arel.sql('context_external_tools.id'))
     end
   end
@@ -585,7 +589,9 @@ class ContextExternalTool < ActiveRecord::Base
   # as configured by an admin.  If there is still no match
   # then check for a match on the current context (configured by
   # the teacher).
-  def self.find_external_tool(url, context, preferred_tool_id=nil)
+  #
+  # Tools with exclude_tool_id as their ID will never be returned.
+  def self.find_external_tool(url, context, preferred_tool_id=nil, exclude_tool_id=nil)
     contexts = contexts_to_search(context)
     preferred_tool = ContextExternalTool.active.where(id: preferred_tool_id).first if preferred_tool_id
     if preferred_tool && contexts.member?(preferred_tool.context) && (url == nil || preferred_tool.matches_domain?(url))
@@ -597,14 +603,14 @@ class ContextExternalTool < ActiveRecord::Base
     all_external_tools = ContextExternalTool.shard(context.shard).polymorphic_where(context: contexts).active.to_a
     sorted_external_tools = all_external_tools.sort_by { |t| [contexts.index { |c| c.id == t.context_id && c.class.name == t.context_type }, t.precedence, t.id == preferred_tool_id ? CanvasSort::First : CanvasSort::Last] }
 
-    res = sorted_external_tools.detect{|tool| tool.url && tool.matches_url?(url) }
+    res = sorted_external_tools.detect{ |tool| tool.url && tool.matches_url?(url) && tool.id != exclude_tool_id }
     return res if res
 
     # If exactly match doesn't work, try to match by ignoring extra query parameters
-    res = sorted_external_tools.detect{|tool| tool.url && tool.matches_url?(url, false) }
+    res = sorted_external_tools.detect{ |tool| tool.url && tool.matches_url?(url, false) && tool.id != exclude_tool_id }
     return res if res
 
-    res = sorted_external_tools.detect{|tool| tool.domain && tool.matches_url?(url) }
+    res = sorted_external_tools.detect{ |tool| tool.domain && tool.matches_url?(url) && tool.id != exclude_tool_id }
     return res if res
 
     nil
@@ -632,6 +638,32 @@ class ContextExternalTool < ActiveRecord::Base
   }
 
   scope :selectable, lambda { where("context_external_tools.not_selectable IS NOT TRUE") }
+
+  scope :visible, lambda { |user, context, session, placements, current_scope=ContextExternalTool.all|
+    if context.grants_right?(user, session, :read_as_admin)
+      all
+    elsif !placements
+      none
+    else
+      allowed_visibility = ['public']
+      allowed_visibility.push('members') if context.grants_any_right?(user, session, :participate_as_student, :read_as_admin)
+      allowed_visibility.push('admins') if context.grants_right?(user, session, :read_as_admin)
+      # To get at the visibility setting for each tool we need to use active record.  We will limit this to just the candidate tools using the current scope.
+      valid_tools = current_scope.select{|cet|
+        include_tool = false
+        placements.each do |placement|
+          tool_settings = cet.settings.with_indifferent_access
+          # The tool must have no visibility settings, or else a visibility threshold met by the current user.
+          if tool_settings[placement] && (!tool_settings[placement][:visibility] || allowed_visibility.include?(tool_settings[placement][:visibility]))
+            include_tool = true
+          end
+          break if include_tool
+        end
+        include_tool
+      }.pluck(:id)
+      where(id: valid_tools)
+    end
+  }
 
   def self.find_for(id, context, type, raise_error=true)
     id = id[Api::ID_REGEX] if id.is_a?(String)

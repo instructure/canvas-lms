@@ -113,7 +113,7 @@ module AccountReports
       ContentTag.active.where(
         context: account,
         tag_type: 'learning_outcome_association'
-      ).joins(:learning_outcome_content)
+      ).joins(:learning_outcome_content).preload(:learning_outcome_content)
     end
 
     def outcome_scope
@@ -124,16 +124,12 @@ module AccountReports
         where("learning_outcomes.workflow_state <> 'deleted'").
         order('learning_outcomes.id').
         group('learning_outcomes.id').
+        group('content_tags.content_id').
         select(<<~SQL)
-          learning_outcomes.workflow_state,
+          content_tags.content_id,
+          learning_outcomes.*,
           #{vendor_guid_field('learning_outcomes', prefix: 'canvas_outcome')} AS vendor_guid,
           learning_outcomes.short_description AS title,
-          learning_outcomes.description,
-          learning_outcomes.data,
-          learning_outcomes.workflow_state,
-          learning_outcomes.display_name,
-          learning_outcomes.calculation_method,
-          learning_outcomes.calculation_int,
           STRING_AGG(
             CASE WHEN learning_outcome_groups.learning_outcome_group_id IS NULL THEN NULL
                  ELSE #{vendor_guid_field('learning_outcome_groups')}
@@ -146,14 +142,14 @@ module AccountReports
     def export_outcomes(csv)
       I18n.locale = account.default_locale if account.default_locale.present?
       outcome_scope.find_each do |row|
+        outcome_model = row.learning_outcome_content
         outcome = row.attributes.dup
         outcome['object_type'] = 'outcome'
-        outcome_data = outcome['data'].present? ? YAML.safe_load(outcome['data']) : {}
-        outcome['mastery_points'] = outcome_data.dig(:rubric_criterion, :mastery_points)
-        outcome['mastery_points'] = I18n.n(outcome['mastery_points']) if outcome['mastery_points']
+        criterion = outcome_model.rubric_criterion
+        outcome['mastery_points'] = I18n.n(criterion[:mastery_points])
 
         csv_row = OUTCOME_EXPORT_SCALAR_HEADERS.map { |h| outcome[h] }
-        ratings = outcome_data.dig(:rubric_criterion, :ratings)
+        ratings = criterion[:ratings]
         if ratings.present?
           csv_row += ratings.flat_map do |r|
             r.values_at(:points, :description).tap do |p|

@@ -77,6 +77,7 @@ function sortItems (items) {
 function savedItemReducer (state, action) {
   if (!state) return undefined;
   if (!state.loaded || action.type !== 'SAVED_PLANNER_ITEM') return state;
+  if (!action.payload.item || !action.payload.item.uniqueId) return state;
 
   const newItem = action.payload.item;
   let newItems = state.items.slice();

@@ -84,7 +84,7 @@ export function getFirstNewActivityDate (fromMoment) {
   // specifically so we know what the very oldest new activity is
   return (dispatch, getState) => {
     fromMoment = fromMoment.clone().subtract(6, 'months');
-    return axios.get('api/v1/planner/items', { params: {
+    return axios.get('/api/v1/planner/items', { params: {
       start_date: fromMoment.toISOString(),
       filter: 'new_activity',
       order: 'asc'

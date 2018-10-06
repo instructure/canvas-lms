@@ -64,7 +64,7 @@ test('renders manual form with new tool', () => {
     showConfigurationSelector: true
   }
   const nodes = getDOMNodes(data)
-  ok(nodes.component.isMounted())
+  ok(nodes.component)
   ok(TestUtils.isCompositeComponentWithType(nodes.component, ConfigurationForm))
   ok(nodes.configurationTypeSelector)
   ok(nodes.configurationFormManual)

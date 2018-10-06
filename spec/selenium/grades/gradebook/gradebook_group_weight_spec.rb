@@ -32,10 +32,10 @@ describe "group weights" do
   end
 
   def toggle_group_weight
-    Gradebook::MultipleGradingPeriods.settings_cog.click
+    Gradebook.settings_cog.click
     set_group_weights.click
     group_weighting_scheme.click
-    Gradebook::MultipleGradingPeriods.save_button_click
+    Gradebook.save_button_click
     wait_for_ajax_requests
   end
 
@@ -72,7 +72,7 @@ describe "group weights" do
     @course.update_attributes(group_weighting_scheme: 'points')
 
     # Displays total column as points
-    Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
+    Gradebook.visit_gradebook(@course)
     expect(student_totals).to eq(["25"])
   end
 
@@ -84,7 +84,7 @@ describe "group weights" do
     @course.update_attributes(group_weighting_scheme: 'percent')
 
     # Displays total column as points
-    Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
+    Gradebook.visit_gradebook(@course)
     expect(student_totals).to eq(["45%"])
   end
 
@@ -116,7 +116,7 @@ describe "group weights" do
 
     it 'should display triangle warnings for assignment groups with 0 points possible', priority: "1", test_id: 164013 do
 
-      Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
+      Gradebook.visit_gradebook(@course)
       expect(ff('.icon-warning').count).to eq(2)
     end
 
@@ -124,13 +124,13 @@ describe "group weights" do
 
       @course.apply_assignment_group_weights = false
       @course.save!
-      Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
+      Gradebook.visit_gradebook(@course)
       expect(f("body")).not_to contain_css('.icon-warning')
     end
 
     it 'should not display triangle warnings if an assignment is muted in both header and total column' do
-      Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
-      Gradebook::MultipleGradingPeriods.toggle_assignment_mute_option(@assignment2.id)
+      Gradebook.visit_gradebook(@course)
+      Gradebook.toggle_assignment_mute_option(@assignment2.id)
       expect(f("#content")).not_to contain_jqcss('.total-cell .icon-warning')
       expect(f("#content")).not_to contain_jqcss(".container_1 .slick-header-column[id*='assignment_#{@assignment2.id}'] .icon-warning")
     end
@@ -138,8 +138,8 @@ describe "group weights" do
     it 'should display triangle warnings if an assignment is unmuted in both header and total column' do
       @assignment2.muted = true
       @assignment2.save!
-      Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
-      Gradebook::MultipleGradingPeriods.toggle_assignment_mute_option(@assignment2.id)
+      Gradebook.visit_gradebook(@course)
+      Gradebook.toggle_assignment_mute_option(@assignment2.id)
       expect(f('.total-cell .icon-warning')).to be_displayed
       expect(fj(".container_1 .slick-header-column[id*='assignment_#{@assignment2.id}'] .icon-warning")).to be_displayed
       expect(f("#content")).not_to contain_jqcss(".container_1 .slick-header-column[id*='assignment_#{@assignment2.id}'] .muted")

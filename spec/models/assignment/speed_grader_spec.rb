@@ -368,17 +368,6 @@ describe Assignment::SpeedGrader do
       expect(canvadoc_url.include?("enrollment_type%22:%22teacher%22")).to eq true
     end
 
-    it "includes submission missing status in each submission history version" do
-      json = Assignment::SpeedGrader.new(@assignment, @teacher).json
-      json[:submissions].each do |submission|
-        user = [@student_1, @student_2].detect { |s| s.id.to_s == submission[:user_id] }
-        next unless user
-        submission[:submission_history].each_with_index do |version, idx|
-          expect(version[:submission][:missing]).to eq user.submissions.first.submission_history[idx].missing?
-        end
-      end
-    end
-
     it "passes submission id to DocViewer" do
       course = student_in_course(active_all: true).course
       assignment = assignment_model(course: course)
@@ -394,6 +383,17 @@ describe Assignment::SpeedGrader do
       canvadoc_url = sub_json[:versioned_attachments].first.fetch(:attachment).fetch(:canvadoc_url)
 
       expect(canvadoc_url.include?("%22submission_id%22:#{submission.id}")).to be true
+    end
+
+    it "includes submission missing status in each submission history version" do
+      json = Assignment::SpeedGrader.new(@assignment, @teacher).json
+      json[:submissions].each do |submission|
+        user = [@student_1, @student_2].detect { |s| s.id.to_s == submission[:user_id] }
+        next unless user
+        submission[:submission_history].each_with_index do |version, idx|
+          expect(version[:submission][:missing]).to eq user.submissions.first.submission_history[idx].missing?
+        end
+      end
     end
 
     it "includes submission late status in each submission history version" do

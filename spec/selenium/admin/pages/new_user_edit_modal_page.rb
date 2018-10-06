@@ -14,13 +14,40 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-require_relative '../common'
+require_relative '../../common'
 
-module MasqueradePage
+module NewUserEditModalPage
 
   # ---------------------- Controls ----------------------
 
-  def act_as_label
-    f('.ActAs__text')
+  def modal_object
+    f('[aria-label="Add a New User"]')
+  end
+
+  def full_name_input
+    fj('label:contains("Full Name") input', modal_object)
+  end
+
+  def email_input
+    fj('label:contains("Email") input', modal_object)
+  end
+
+  def email_about_creation_check
+    fj('label:contains("Email the user about this account creation")')
+  end
+
+  def modal_submit_button
+    f('button[type="submit"]')
+  end
+
+  # ---------------------- Actions ----------------------
+
+  def click_email_creation_check
+    email_about_creation_check.click
+  end
+
+  def click_modal_submit
+    modal_submit_button.click
+    wait_for_ajaximations
   end
 end

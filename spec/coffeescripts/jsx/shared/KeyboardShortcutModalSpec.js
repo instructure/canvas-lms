@@ -29,7 +29,7 @@ QUnit.module('KeyboardShortcutModal#handleKeydown', {
     this.component = TestUtils.renderIntoDocument(KeyboardShortcutModalElement)
   },
   teardown() {
-    ReactDOM.unmountComponentAtNode(this.component.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.component).parentNode)
     $('#fixtures').empty()
   }
 })
@@ -56,7 +56,7 @@ QUnit.module('KeyboardShortcutModal#render', {
     return $('#fixtures').append('<div id="application" />')
   },
   teardown() {
-    ReactDOM.unmountComponentAtNode(this.component.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.component).parentNode)
     $('#fixtures').empty()
   }
 })

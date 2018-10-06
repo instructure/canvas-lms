@@ -25,7 +25,8 @@ class PlannerOverride < ActiveRecord::Base
   before_validation :link_to_parent_topic, :link_to_submittable
 
   belongs_to :plannable, polymorphic:
-    [:announcement, :assignment, :discussion_topic, :planner_note, :wiki_page, :calendar_event, quiz: 'Quizzes::Quiz']
+    [:announcement, :assignment, :discussion_topic, :planner_note, :wiki_page, :calendar_event, :assessment_request,
+     quiz: 'Quizzes::Quiz']
   belongs_to :user
   validates :plannable_id, :plannable_type, :workflow_state, :user_id, presence: true
   validates :plannable_id, uniqueness: {scope: [:user_id, :plannable_type]}
@@ -66,6 +67,11 @@ class PlannerOverride < ActiveRecord::Base
       self.plannable_type = PLANNABLE_TYPES['wiki_page']
       self.plannable_id = plannable.wiki_page.id
     end
+  end
+
+  def associated_assignment_id
+    return self.plannable.id if self.plannable_type == 'Assignment'
+    self.plannable.assignment_id if self.plannable.respond_to? :assignment_id
   end
 
   def self.update_for(obj)

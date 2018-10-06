@@ -73,6 +73,9 @@ type AssignmentConnection {
   # A list of edges.
   edges: [AssignmentEdge]
 
+  # A list of nodes.
+  nodes: [Assignment]
+
   # Information to aid in pagination.
   pageInfo: PageInfo!
 }
@@ -119,8 +122,6 @@ type AssignmentGroup implements AssignmentsConnectionInterface & Node & Timestam
   ): AssignmentConnection
   createdAt: DateTime
   groupWeight: Float
-
-  # ID of the object.
   id: ID!
   name: String
   position: Int
@@ -133,6 +134,9 @@ type AssignmentGroup implements AssignmentsConnectionInterface & Node & Timestam
 type AssignmentGroupConnection {
   # A list of edges.
   edges: [AssignmentGroupEdge]
+
+  # A list of nodes.
+  nodes: [AssignmentGroup]
 
   # Information to aid in pagination.
   pageInfo: PageInfo!
@@ -162,18 +166,16 @@ enum AssignmentGroupState {
   deleted
 }
 
-input AssignmentInput {
-  courseId: ID!
-  name: String!
-}
-
-type AssignmentOverride implements Timestamped {
+type AssignmentOverride implements Node & Timestamped {
   # legacy canvas id
   _id: ID!
   allDay: Boolean
   assignment: Assignment
   createdAt: DateTime
   dueAt: DateTime
+
+  # ID of the object.
+  id: ID!
   lockAt: DateTime
 
   # This object specifies what students this override applies to
@@ -187,6 +189,9 @@ type AssignmentOverride implements Timestamped {
 type AssignmentOverrideConnection {
   # A list of edges.
   edges: [AssignmentOverrideEdge]
+
+  # A list of nodes.
+  nodes: [AssignmentOverride]
 
   # Information to aid in pagination.
   pageInfo: PageInfo!
@@ -452,12 +457,14 @@ enum EnrollmentWorkflowState {
 type Grades {
   currentGrade: String
 
-  #     The current score includes all graded assignments
+  # The current score includes all graded assignments
   currentScore: Float
   finalGrade: String
 
-  #     The final score includes all assignments (ungraded assignments are counted as 0 points)
+  # The final score includes all assignments
+  # (ungraded assignments are counted as 0 points)
   finalScore: Float
+  gradingPeriod: GradingPeriod
 }
 
 type GradingPeriod implements Node & Timestamped {
@@ -505,10 +512,13 @@ enum GradingType {
   points
 }
 
-type Group implements Timestamped {
+type Group implements Node & Timestamped {
   # legacy canvas id
   _id: ID!
   createdAt: DateTime
+
+  # ID of the object.
+  id: ID!
   membersConnection(
     # Returns the elements in the list that come after the specified cursor.
     after: String
@@ -530,6 +540,9 @@ type Group implements Timestamped {
 type GroupConnection {
   # A list of edges.
   edges: [GroupEdge]
+
+  # A list of nodes.
+  nodes: [Group]
 
   # Information to aid in pagination.
   pageInfo: PageInfo!
@@ -601,10 +614,6 @@ type Module implements Node & Timestamped {
   updatedAt: DateTime
 }
 
-type Mutation {
-  createAssignment(assignment: AssignmentInput!): Assignment
-}
-
 # An object with an ID.
 interface Node {
   # ID of the object.
@@ -613,9 +622,11 @@ interface Node {
 
 enum NodeType {
   Assignment
+  AssignmentGroup
   Course
   Enrollment
   GradingPeriod
+  Group
   Module
   Page
   Section
@@ -664,7 +675,7 @@ type PageViewAnalysis {
 
 type Query {
   # All courses viewable by the current user
-  allCourses: [Course]
+  allCourses: [Course!]
 
   # Fetches an object given its type and legacy ID
   legacyNode(_id: ID!, type: NodeType!): Node
@@ -719,6 +730,8 @@ type StudentSummaryAnalytics {
 }
 
 type Submission implements Node & Timestamped {
+  # legacy canvas id
+  _id: ID!
   assignment: Assignment
   createdAt: DateTime
 
@@ -749,6 +762,9 @@ type Submission implements Node & Timestamped {
 type SubmissionConnection {
   # A list of edges.
   edges: [SubmissionEdge]
+
+  # A list of nodes.
+  nodes: [Submission]
 
   # Information to aid in pagination.
   pageInfo: PageInfo!
@@ -820,7 +836,10 @@ scalar URL
 type User implements Node & Timestamped {
   # legacy canvas id
   _id: ID!
-  avatarUrl: URL
+  avatarUrl(
+    # return a generic image if the user has no custom avatar image
+    useFallback: Boolean = true
+  ): URL
   createdAt: DateTime
   email: String
   enrollments(
@@ -846,6 +865,9 @@ type User implements Node & Timestamped {
 type UserConnection {
   # A list of edges.
   edges: [UserEdge]
+
+  # A list of nodes.
+  nodes: [User]
 
   # Information to aid in pagination.
   pageInfo: PageInfo!

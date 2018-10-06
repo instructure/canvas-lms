@@ -84,6 +84,28 @@ describe('fetchOutcomes', () => {
           ]
         }
       }
+    },
+    alignmentsResponse: {
+      1: [{
+        assignment_id: 1,
+        learning_outcome_id: 1,
+        submission_types: "online_text_entry",
+        title: "Assignment 1",
+        url: "http://example.com"
+      }, {
+        assignment_id: 2,
+        learning_outcome_id: 1,
+        submission_types: "online_text_entry",
+        title: "Assignment 2",
+        url: "http://example2.com"
+      }],
+      2: [{
+        assignment_id: 1,
+        learning_outcome_id: 2,
+        submission_types: "online_text_entry",
+        title: "Assignment 1",
+        url: "http://example.com"
+      }]
     }
   })
 
@@ -120,10 +142,11 @@ describe('fetchOutcomes', () => {
     }
   ]
 
-  const mockAll = ({ groupsResponse, linksResponse, rollupsResponse, resultsResponses }) => {
+  const mockAll = ({ groupsResponse, linksResponse, rollupsResponse, resultsResponses, alignmentsResponse }) => {
     fetchMock.mock('/api/v1/courses/1/outcome_groups?per_page=100', groupsResponse)
     fetchMock.mock('/api/v1/courses/1/outcome_group_links?outcome_style=full&per_page=100', linksResponse)
     fetchMock.mock('/api/v1/courses/1/outcome_rollups?user_ids[]=2&per_page=100', rollupsResponse)
+    fetchMock.mock('/api/v1/courses/1/outcome_alignments?student_id=2', alignmentsResponse)
     Object.keys(resultsResponses).forEach((id) => {
       fetchMock.mock(
         `/api/v1/courses/1/outcome_results?user_ids[]=2&outcome_ids[]=${id}&include[]=assignments&per_page=100`,

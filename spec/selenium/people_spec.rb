@@ -576,7 +576,7 @@ describe "people" do
 
       open_role_dialog(@teacher)
 
-      expect(f("#edit_roles #role_id option[selected]")).to include_text("Teacher")
+      expect(fj("#edit_roles #role_id option:selected")).to include_text("Teacher")
       expect(f("#edit_roles #role_id option[value='#{student_role.id}']")).to be_present
       expect(f("#edit_roles #role_id option[value='#{observer_role.id}']")).to be_present
     end

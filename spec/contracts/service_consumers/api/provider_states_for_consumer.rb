@@ -139,7 +139,7 @@ module Pact::Canvas
         admin_name = "Admin#{index}"
         admin_email = "#{admin_name}@instructure.com"
         admin = account_admin_user(account: @account, email: admin_email, name: admin_name)
-        admin.pseudonyms.create!(unique_id: admin_email, password: 'password', password_confirmation: 'password')
+        admin.pseudonyms.create!(unique_id: admin_email, password: 'password', password_confirmation: 'password', sis_user_id: "SIS_#{admin_name}")
         admin.email = admin_email
         admin.accept_terms
         account_admins << admin
@@ -154,7 +154,7 @@ module Pact::Canvas
         teacher_name = "Teacher#{index}"
         teacher_email = "#{teacher_name}@instructure.com"
         teacher = user_factory(active_all: true, course: @course, name: teacher_name)
-        teacher.pseudonyms.create!(unique_id: teacher_email, password: 'password', password_confirmation: 'password')
+        teacher.pseudonyms.create!(unique_id: teacher_email, password: 'password', password_confirmation: 'password', sis_user_id: "SIS_#{teacher_name}")
         teacher.email = teacher_email
         teacher.accept_terms
         course.enroll_teacher(teacher).accept!
@@ -170,7 +170,7 @@ module Pact::Canvas
         ta_name = "TeacherAssistant#{index}"
         ta_email = "#{ta_name}@instructure.com"
         ta = user_factory(active_all: true, course: @course, name: ta_name)
-        ta.pseudonyms.create!(unique_id: ta_email, password: 'password', password_confirmation: 'password')
+        ta.pseudonyms.create!(unique_id: ta_email, password: 'password', password_confirmation: 'password', sis_user_id: "SIS_#{ta_name}")
         ta.email = ta_email
         ta.accept_terms
         course.enroll_ta(ta).accept!
@@ -186,7 +186,7 @@ module Pact::Canvas
         student_name = "Student#{index}"
         student_email = "#{student_name}@instructure.com"
         student = user_factory(active_all: true, course: @course, name: student_name)
-        student.pseudonyms.create!(unique_id: student_email, password: 'password', password_confirmation: 'password')
+        student.pseudonyms.create!(unique_id: student_email, password: 'password', password_confirmation: 'password', sis_user_id: "SIS_#{student_name}")
         student.email = student_email
         student.accept_terms
         course.enroll_student(student).accept!
@@ -202,7 +202,7 @@ module Pact::Canvas
         observer_name = "Observer#{index}"
         observer_email = "#{observer_name}@instructure.com"
         observer = user_factory(active_all: true, course: @course, name: observer_name)
-        observer.pseudonyms.create!(unique_id: observer_email, password: 'password', password_confirmation: 'password')
+        observer.pseudonyms.create!(unique_id: observer_email, password: 'password', password_confirmation: 'password', sis_user_id: "SIS_#{observer_name}")
         observer.email = observer_email
         observer.accept_terms
         enroll_observer(observer: observer)

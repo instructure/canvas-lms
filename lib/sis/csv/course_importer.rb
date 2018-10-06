@@ -34,8 +34,8 @@ module SIS
         messages = []
         count = SIS::CourseImporter.new(@root_account, importer_opts).process(messages) do |importer|
           csv_rows(csv, index, count) do |row|
-            start_date = nil
-            end_date = nil
+            start_date = (row.key? 'start_date') ? nil : 'not_present'
+            end_date = (row.key? 'end_date') ? nil : 'not_present'
             begin
               start_date = Time.zone.parse(row['start_date']) if row['start_date'].present?
               end_date = Time.zone.parse(row['end_date']) if row['end_date'].present?

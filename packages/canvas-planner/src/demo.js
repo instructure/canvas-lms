@@ -41,7 +41,6 @@ const COURSES = [{
   shortName: "World History I",
   href: "https://en.wikipedia.org/wiki/World_history",
   image: "https://c1.staticflickr.com/6/5473/14502036741_b3d9f4f345_n.jpg",
-  informStudentsOfOverdueSubmissions: true,
   color: "#BE0EAA"
 }, {
   id: "2",
@@ -49,7 +48,6 @@ const COURSES = [{
   shortName: "English Literature",
   href: "https://en.wikipedia.org/wiki/English_literature",
   image: "https://c1.staticflickr.com/7/6238/6363562459_7399ee3c3e_n.jpg",
-  informStudentsOfOverdueSubmissions: false,
   color: "#19C3B4"
 }];
 

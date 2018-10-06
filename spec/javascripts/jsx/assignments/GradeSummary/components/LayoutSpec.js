@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {mount} from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme'
+import {mount} from 'enzyme'
 import {Provider} from 'react-redux'
 
 import * as GradeActions from 'jsx/assignments/GradeSummary/grades/GradeActions'
@@ -111,12 +111,14 @@ QUnit.module('GradeSummary Layout', suiteHooks => {
     test('renders the GradesGrid', () => {
       mountComponent()
       store.dispatch(StudentActions.addStudents(students))
+      wrapper.update()
       strictEqual(wrapper.find('GradesGrid').length, 1)
     })
 
     test('does not display a spinner', () => {
       mountComponent()
       store.dispatch(StudentActions.addStudents(students))
+      wrapper.update()
       strictEqual(wrapper.find('Spinner').length, 0)
     })
   })
@@ -135,6 +137,7 @@ QUnit.module('GradeSummary Layout', suiteHooks => {
         {grade: 'A', graderId: '1101', id: '4601', score: 10, selected: false, studentId: '1111'}
       ]
       store.dispatch(GradeActions.addProvisionalGrades(grades))
+      wrapper.update()
     }
 
     test('receives the final grader id from the assignment', () => {

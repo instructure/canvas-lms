@@ -30,7 +30,7 @@ describe "gradebook" do
 
     get "/courses/#{@course.id}/gradebook"
 
-    dialog = Gradebook::MultipleGradingPeriods.open_comment_dialog
+    dialog = Gradebook.open_comment_dialog
     set_value(dialog.find_element(:id, "add_a_comment"), comment_text)
     f("form.submission_details_add_comment_form.clearfix > button.btn").click
     wait_for_ajax_requests
@@ -38,7 +38,7 @@ describe "gradebook" do
     # make sure it is still there if you reload the page
     refresh_page
 
-    comment = Gradebook::MultipleGradingPeriods.open_comment_dialog.find_element(:css, '.comment')
+    comment = Gradebook.open_comment_dialog.find_element(:css, '.comment')
     expect(comment).to include_text(comment_text)
   end
 
@@ -60,7 +60,7 @@ describe "gradebook" do
 
     get "/courses/#{@course.id}/gradebook"
 
-    dialog = Gradebook::MultipleGradingPeriods.open_comment_dialog(3)
+    dialog = Gradebook.open_comment_dialog(3)
     set_value(dialog.find_element(:id, "add_a_comment"), comment_text)
     f('label[for="group_comment"]').click
     f("form.submission_details_add_comment_form.clearfix > button.btn").click
@@ -70,7 +70,7 @@ describe "gradebook" do
     expect(f('body')).not_to contain_css('.submission_details_add_comment_form')
 
     # make sure it's on the other student's submission
-    Gradebook::MultipleGradingPeriods.open_comment_dialog(3, 1)
+    Gradebook.open_comment_dialog(3, 1)
     comment = fj(".submission_details_dialog:visible .comment")
     expect(comment).to include_text(comment_text)
   end

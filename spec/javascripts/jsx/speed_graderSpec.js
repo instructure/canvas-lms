@@ -4530,7 +4530,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       }
 
       testJsonData = {
-        moderated_grading: true,
         context: {
           students: [student],
           enrollments: [{user_id: '10', workflow_state: 'active', course_setion_id: 1}],
@@ -4657,19 +4656,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         notOk($('#rubric_assessments_list_and_edit_button_holder .edit').is(':visible'))
       })
 
-      test('shows a button to edit', () => {
-        finishSetup()
-
-        ok($('#rubric_assessments_list_and_edit_button_holder .edit').is(':visible'))
-      })
-
-      test('shows a button to edit if moderated_grading disabled', () => {
-        testJsonData.moderated_grading = false
-        finishSetup()
-
-        ok($('#rubric_assessments_list_and_edit_button_holder .edit').is(':visible'))
-      })
-
       test('labels the moderator-submitted assessment as "Custom"', () => {
         finishSetup()
         strictEqual($('#rubric_assessments_select option[value="1"]').text(), 'Custom')
@@ -4705,6 +4691,162 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         finishSetup()
         strictEqual($('#rubric_assessments_select').val(), '3')
       })
+    })
+  })
+
+  QUnit.module('originality reports', originalityHooks => {
+    const turnitinData = {
+      submission_1: {
+        similarity_score: '60'
+      }
+    }
+    const vericiteData = {
+      provider: 'vericite',
+      submission_1: {
+        similarity_score: '99'
+      }
+    }
+    const student = {id: '1', name: 'Original and Insightful Scholar'}
+    let submission
+
+    const gradeSimilaritySelector = '#grade_container .turnitin_score_container .turnitin_similarity_score'
+    let testJsonData
+
+    originalityHooks.beforeEach(() => {
+      // Both Turnitin and VeriCite use elements with "turnitin" as the class
+      setupFixtures(`
+        <div id='grade_container'>
+          <span class='turnitin_score_container'></span>
+          <span class='turnitin_info_container'></span>
+        </div>
+        <div id='submission_files_container'>
+          <span class='turnitin_info_container'></span>
+        </div>
+        <a id='assignment_submission_originality_report_url' href='#'></a>
+        <a id='assignment_submission_turnitin_report_url' href='#'></a>
+        <a id='assignment_submission_vericite_report_url' href='#'></a>
+      `)
+
+      fakeENV.setup({
+        current_user_id: '1'
+      })
+
+      submission = {
+        grading_period_id: 8,
+        id: '1',
+        user_id: '1',
+        submission_type: 'online_text_entry',
+        submission_history: [{
+          grading_period_id: 8,
+          id: '1',
+          user_id: '1',
+          submission_type: 'online_text_entry',
+        }]
+      }
+      testJsonData = {
+        context: {
+          active_course_sections: [],
+          enrollments: [{user_id: '1', course_section_id: '1'}],
+          students: [student]
+        },
+        gradingPeriods: [],
+        submissions: [submission]
+      }
+
+      sinon.stub(SpeedGrader.EG, 'handleFragmentChanged')
+      sinon.stub(SpeedGrader.EG, 'loadSubmissionPreview')
+
+      SpeedGrader.setup()
+    })
+
+    originalityHooks.afterEach(() => {
+      SpeedGrader.EG.loadSubmissionPreview.restore()
+      SpeedGrader.EG.handleFragmentChanged.restore()
+
+      fakeENV.teardown()
+      SpeedGrader.teardown()
+      window.location.hash = ''
+      teardownFixtures()
+    })
+
+    QUnit.module('when anonymous grading is inactive', () => {
+      test('links to a detailed report for Turnitin submissions', () => {
+        submission.submission_history[0].turnitin_data = turnitinData
+        submission.submission_history[0].has_originality_score = true
+
+        window.jsonData = testJsonData
+        SpeedGrader.EG.jsonReady()
+        SpeedGrader.EG.currentStudent = {
+          ...student,
+          submission
+        }
+        SpeedGrader.EG.handleSubmissionSelectionChange()
+
+        strictEqual(document.querySelector(gradeSimilaritySelector).tagName, 'A')
+      })
+
+      test('links to a detailed report for VeriCite submissions', () => {
+        submission.submission_history[0].turnitin_data = vericiteData
+        submission.submission_history[0].has_originality_score = true
+
+        window.jsonData = testJsonData
+        SpeedGrader.EG.jsonReady()
+        SpeedGrader.EG.currentStudent = {
+          ...student,
+          submission
+        }
+        SpeedGrader.EG.handleSubmissionSelectionChange()
+
+        strictEqual(document.querySelector(gradeSimilaritySelector).tagName, 'A')
+      })
+    })
+
+    QUnit.module('when anonymous grading is active', hooks => {
+      hooks.beforeEach(() => {
+        testJsonData.anonymize_students = true
+      })
+
+      test('does not link to a report for Turnitin submissions', () => {
+        submission.submission_history[0].turnitin_data = turnitinData
+        submission.submission_history[0].has_originality_score = true
+
+        window.jsonData = testJsonData
+        SpeedGrader.EG.jsonReady()
+        SpeedGrader.EG.currentStudent = {
+          ...student,
+          submission
+        }
+        SpeedGrader.EG.handleSubmissionSelectionChange()
+
+        strictEqual(document.querySelector(gradeSimilaritySelector).tagName, 'SPAN')
+      })
+
+      test('does not link to a report for VeriCite submissions', () => {
+        submission.submission_history[0].turnitin_data = vericiteData
+        submission.submission_history[0].has_originality_score = true
+
+        window.jsonData = testJsonData
+        SpeedGrader.EG.jsonReady()
+        SpeedGrader.EG.currentStudent = {
+          ...student,
+          submission
+        }
+        SpeedGrader.EG.handleSubmissionSelectionChange()
+
+        strictEqual(document.querySelector(gradeSimilaritySelector).tagName, 'SPAN')
+      })
+    })
+
+    test('does not show an originality score if originality data is not present', () => {
+      window.jsonData = testJsonData
+      SpeedGrader.EG.jsonReady()
+      SpeedGrader.EG.currentStudent = {
+        ...student,
+        submission
+      }
+      SpeedGrader.EG.handleSubmissionSelectionChange()
+
+      strictEqual(document.querySelector(gradeSimilaritySelector), null)
     })
   })
 })

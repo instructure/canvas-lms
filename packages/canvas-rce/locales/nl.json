@@ -18,7 +18,7 @@
     "message": "(c) 2001 Acme Inc."
   },
   "upload_a_new_file_96e6d4ff": {
-    "message": "Een nieuwe afbeelding uploaden"
+    "message": "Een nieuwe bestand uploaden"
   },
   "file_upload_form_4aaad554": {
     "message": "Formulier voor bestand uploaden"
@@ -28,9 +28,6 @@
   },
   "insert_equella_links_49a8dacd": {
     "message": "Equella-koppelingen invoegen"
-  },
-  "assignment_list_a833f59d": {
-    "message": "Opdrachtenlijst"
   },
   "alternative_text_a834dcad": {
     "message": "Alternatieve tekst:"
@@ -161,9 +158,6 @@
   "close_flickr_form_b32e600a": {
     "message": "Flickr-formulier sluiten"
   },
-  "course_syllabus_5de1b0af": {
-    "message": "Cursussyllabus"
-  },
   "upload_8b403d05": {
     "message": "Uploaden"
   },
@@ -205,9 +199,6 @@
   },
   "cc_attribution_non_commercial_39e0d30d": {
     "message": "CC-bijdrage, niet-commercieel"
-  },
-  "quizzes_list_d812caa6": {
-    "message": "Lijst met toetsen"
   },
   "image_upload_form_7b74079a": {
     "message": "Formulier voor afbeelding uploaden"

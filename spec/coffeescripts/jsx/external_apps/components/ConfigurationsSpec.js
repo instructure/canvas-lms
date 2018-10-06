@@ -33,7 +33,7 @@ QUnit.module('ExternalApps.Configurations', {
 
 test('renders', () => {
   const component = renderComponent({env: {APP_CENTER: {enabled: true}}})
-  ok(component.isMounted())
+  ok(component)
   ok(TestUtils.isCompositeComponentWithType(component, Configurations))
 })
 

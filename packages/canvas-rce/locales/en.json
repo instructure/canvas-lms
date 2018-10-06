@@ -9,9 +9,6 @@
     "message": "Announcements",
     "description": "Title of Sidebar accordion tab containing links to announcements."
   },
-  "assignment_list_a833f59d": {
-    "message": "Assignment List"
-  },
   "assignments_1e02582c": {
     "message": "Assignments",
     "description": "Title of Sidebar accordion tab containing links to assignments."
@@ -85,9 +82,6 @@
   "course_navigation_dd035109": {
     "message": "Course Navigation",
     "description": "Title of Sidebar accordion tab containing links to course pages."
-  },
-  "course_syllabus_5de1b0af": {
-    "message": "Course Syllabus"
   },
   "creative_commons_license_725584ae": {
     "message": "Creative Commons License:"
@@ -195,6 +189,9 @@
   "loading_failed_b3524381": {
     "message": "Loading failed..."
   },
+  "loading_folders_8d4d5d5a": {
+    "message": "Loading folders..."
+  },
   "modules_c4325335": {
     "message": "Modules",
     "description": "Title of Sidebar accordion tab containing links to course modules."
@@ -213,9 +210,6 @@
     "message": "Quizzes",
     "description": "Title of Sidebar accordion tab containing links to quizzes."
   },
-  "quizzes_list_d812caa6": {
-    "message": "Quizzes List"
-  },
   "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
     "message": "Rich Text Area. Press ALT+F8 for help"
   },
@@ -231,6 +225,9 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Select a folder to upload your file into"
   },
+  "syllabus_f191f65b": {
+    "message": "Syllabus"
+  },
   "text_color_press_down_to_select_8f5ad9b5": {
     "message": "Text Color, press down to select"
   },
@@ -242,6 +239,9 @@
   },
   "the_material_is_subject_to_fair_use_exception_41bc6a4b": {
     "message": "The material is subject to fair use exception"
+  },
+  "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
+    "message": "This upload exceeds the file storage quota. Please speak to your system administrator."
   },
   "upload_8b403d05": {
     "message": "Upload"

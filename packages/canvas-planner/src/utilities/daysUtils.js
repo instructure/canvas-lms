@@ -144,7 +144,7 @@ export function groupAndSortDayItems (items) {
 
 // ----- grouping and sorting helpers -----
 const cmpopts = {numeric: true};
-const locale =(window.ENV && window.ENV.LOCALE) || 'en';
+const locale =(window.ENV && window.ENV.MOMENT_LOCALE) || 'en';
 
 // order items by their grouping
 function getItemGroupTitle(item) {

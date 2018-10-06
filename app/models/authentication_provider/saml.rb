@@ -298,7 +298,9 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     entity
   end
 
-  def generate_authn_request_redirect(host: nil, parent_registration: false)
+  def generate_authn_request_redirect(host: nil,
+                                      parent_registration: false,
+                                      relay_state: nil)
     sp_metadata = self.class.sp_metadata_for_account(account, host).service_providers.first
     authn_request = SAML2::AuthnRequest.initiate(SAML2::NameID.new(entity_id),
                                                  idp_metadata.identity_providers.first,
@@ -312,7 +314,10 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     authn_request.force_authn = true if parent_registration
     private_key = self.class.private_key
     private_key = nil if sig_alg.nil?
-    forward_url = SAML2::Bindings::HTTPRedirect.encode(authn_request, private_key: private_key, sig_alg: sig_alg)
+    forward_url = SAML2::Bindings::HTTPRedirect.encode(authn_request,
+                                                       private_key: private_key,
+                                                       sig_alg: sig_alg,
+                                                       relay_state: relay_state)
 
     if debugging? && !debug_get(:request_id)
       debug_set(:request_id, authn_request.id)

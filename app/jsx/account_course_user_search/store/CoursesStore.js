@@ -29,7 +29,8 @@ export default createStore({
     const params = {
       ...originalParams,
       include: ['total_students', 'teachers', 'subaccount', 'term'],
-      per_page: COURSES_TO_FETCH_PER_PAGE
+      per_page: COURSES_TO_FETCH_PER_PAGE,
+      no_avatar_fallback: '1'
     }
     const propsToCleanUp = [
       'enrollment_term_id',

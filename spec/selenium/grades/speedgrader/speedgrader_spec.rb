@@ -192,14 +192,15 @@ describe 'Speedgrader' do
         Speedgrader.visit(@course.id, @assignment.id)
 
         Speedgrader.view_rubric_button.click
-        expect(Speedgrader.view_longer_description_link).to be_displayed
+        expect(Speedgrader.view_longer_description_link(0)).to be_displayed
       end
 
       context 'saves grades in' do
         before :each do
           Speedgrader.visit(@course.id, @assignment.id)
           Speedgrader.view_rubric_button.click
-          [Speedgrader.rating(1), Speedgrader.rating(5)].each(&:click)
+          Speedgrader.select_rubric_criterion('Much Awesome')
+          Speedgrader.select_rubric_criterion('So Wow')
           Speedgrader.save_rubric_button.click
           wait_for_ajax_requests
         end
@@ -214,8 +215,8 @@ describe 'Speedgrader' do
 
           f("#submission_#{@assignment.id}  i.icon-rubric").click
 
-          expect(f('#criterion_crit1 span.criterion_rating_points')).to include_text '10'
-          expect(f('#criterion_crit2 span.criterion_rating_points')).to include_text '5'
+          expect(ff('.react-rubric-cell.graded-points').first).to include_text '10'
+          expect(ff('.react-rubric-cell.graded-points').second).to include_text '5'
         end
 
         it 'submissions page', priority: "1", test_id: 217612 do
@@ -223,10 +224,10 @@ describe 'Speedgrader' do
           f('a.assess_submission_link').click
           wait_for_animations
 
-          expect(f('#criterion_crit1 input.criterion_points')).to have_value '10'
-          expect(f('#criterion_crit2 input.criterion_points')).to have_value '5'
+          expect(ff('.criterion_points input').first).to have_value '10'
+          expect(ff('.criterion_points input').second).to have_value '5'
 
-          replace_content f('#criterion_crit1 input.criterion_points'), '5'
+          replace_content ff('.criterion_points input').first, '5'
           scroll_into_view('button.save_rubric_button')
           f('button.save_rubric_button').click
 
@@ -238,7 +239,6 @@ describe 'Speedgrader' do
 
     context 'rubric with points removed' do
       before :once do
-        @course.root_account.enable_feature!(:non_scoring_rubrics)
         @assignment = @course.assignments.create!(
           title: 'Rubric with points removed'
         )
@@ -336,20 +336,16 @@ describe 'Speedgrader' do
           Speedgrader.visit(@course.id, @assignment.id)
           Speedgrader.view_rubric_button.click
           Speedgrader.enter_rubric_points('5')
-          Speedgrader.save_rubric_button.click
-          wait_for_ajax_requests
-          expect_flash_message :warning
+          wait_for_ajaximations
+          expect(Speedgrader.rubric_criterion_points(0)).to include_text('Cannot give outcomes extra credit')
         end
 
         it 'submissions page' do
           get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@students[0].id}"
           f('a.assess_submission_link').click
           wait_for_animations
-          replace_content f('.learning_outcome_criterion input.criterion_points'), '5'
-          scroll_into_view('button.save_rubric_button')
-          f('button.save_rubric_button').click
-          wait_for_ajax_requests
-          expect_flash_message :warning
+          replace_content fj('.react-rubric-cell.graded-points:visible input'), '5'
+          expect(Speedgrader.rubric_criterion_points(0)).to include_text('Cannot give outcomes extra credit')
         end
       end
     end
@@ -387,10 +383,10 @@ describe 'Speedgrader' do
         )
         get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@students.first.id}"
         f('a.assess_submission_link').click
-        expect(ff("#criterion_#{criterion1[:id]} .selected").length).to eq 1
-        expect(f("#criterion_#{criterion1[:id]} .selected")).to include_text('3')
-        expect(ff("#criterion_#{criterion2[:id]} .selected").length).to eq 1
-        expect(f("#criterion_#{criterion2[:id]} .selected")).to include_text('0')
+        expect(ff('.rubric-criterion:nth-of-type(1) .rating-tier.selected').length).to eq 1
+        expect(f('.rubric-criterion:nth-of-type(1) .rating-tier.selected')).to include_text('3 pts')
+        expect(ff('.rubric-criterion:nth-of-type(2) .rating-tier.selected').length).to eq 1
+        expect(f('.rubric-criterion:nth-of-type(2) .rating-tier.selected')).to include_text('0 pts')
       end
     end
   end
@@ -680,7 +676,7 @@ describe 'Speedgrader' do
     it 'navigates to gradebook via link' do
       # make sure gradebook link works
       expect_new_page_load {Speedgrader.gradebook_link.click}
-      expect(Gradebook::MultipleGradingPeriods.grade_grid).to be_displayed
+      expect(Gradebook.grade_grid).to be_displayed
     end
   end
 

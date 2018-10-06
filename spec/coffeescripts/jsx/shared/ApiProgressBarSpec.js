@@ -50,8 +50,8 @@ QUnit.module('ApiProgressBarSpec', {
 })
 
 test('shouldComponentUpdate', function() {
-  const ApiProgressBarElement = <ApiProgressBar />
-  const component = TestUtils.renderIntoDocument(ApiProgressBarElement)
+  let ApiProgressBarElement = <ApiProgressBar />
+  let component = TestUtils.renderIntoDocument(ApiProgressBarElement)
   ok(
     component.shouldComponentUpdate({progress_id: this.progress_id}, {}),
     'should update when progress_id prop changes'
@@ -64,7 +64,9 @@ test('shouldComponentUpdate', function() {
     component.shouldComponentUpdate({}, {completion: 10}),
     'should update when completion level changes'
   )
-  component.setProps({progress_id: this.progress_id})
+
+  ApiProgressBarElement = <ApiProgressBar progress_id={this.progress_id} />
+  component = TestUtils.renderIntoDocument(ApiProgressBarElement)
   component.setState({workflow_state: 'running'})
   ok(
     !component.shouldComponentUpdate(
@@ -116,7 +118,7 @@ test('handleStoreChange', function() {
       `component ${stateName} should equal progress ${stateName}`
     )
   )
-  ReactDOM.unmountComponentAtNode(component.getDOMNode().parentNode)
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
 })
 
 test('isComplete', function() {
@@ -146,21 +148,23 @@ test('isInProgress', function() {
 })
 
 test('poll', function() {
-  const ApiProgressBarElement = <ApiProgressBar />
-  const component = TestUtils.renderIntoDocument(ApiProgressBarElement)
+  let ApiProgressBarElement = <ApiProgressBar />
+  let component = TestUtils.renderIntoDocument(ApiProgressBarElement)
   component.poll()
   ok(!this.storeSpy.called, 'should not fetch from progress store without progress id')
-  component.setProps({progress_id: this.progress_id})
+
+  ApiProgressBarElement = <ApiProgressBar progress_id={this.progress_id}/>
+  component = TestUtils.renderIntoDocument(ApiProgressBarElement)
   component.poll()
   ok(this.storeSpy.called, 'should fetch when progress id is present')
-  ReactDOM.unmountComponentAtNode(component.getDOMNode().parentNode)
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
 })
 
 test('render', function() {
   const ApiProgressBarElement = <ApiProgressBar progress_id={this.progress_id} />
   const component = TestUtils.renderIntoDocument(ApiProgressBarElement)
-  ok(isNull(component.getDOMNode()), 'should not render to DOM if is not in progress')
+  ok(isNull(ReactDOM.findDOMNode(component)), 'should not render to DOM if is not in progress')
   this.clock.tick(component.props.delay + 5)
-  ok(!isNull(component.getDOMNode()), 'should render to DOM if is not in progress')
-  ReactDOM.unmountComponentAtNode(component.getDOMNode().parentNode)
+  ok(!isNull(ReactDOM.findDOMNode(component)), 'should render to DOM if is not in progress')
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(component).parentNode)
 })

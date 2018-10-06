@@ -39,7 +39,8 @@ class ConversationBatch < ActiveRecord::Base
 
     @conversations = []
     self.user = user_map[user_id]
-    existing_conversations = Conversation.find_all_private_conversations(self.user, recipient_ids.map { |id| user_map[id] })
+    existing_conversations = Conversation.find_all_private_conversations(self.user, recipient_ids.map { |id| user_map[id] },
+      context_type: self.context_type, context_id: self.context_id)
     update_attribute :workflow_state, 'sending'
 
     ModelCache.with_cache(:conversations => existing_conversations, :users => {:id => user_map}) do

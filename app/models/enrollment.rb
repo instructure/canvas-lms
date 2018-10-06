@@ -1380,6 +1380,10 @@ class Enrollment < ActiveRecord::Base
     end
   end
 
+  def student_or_fake_student?
+    ['StudentEnrollment', 'StudentViewEnrollment'].include?(type)
+  end
+
   private
 
   def enrollments_exist_for_user_in_course?
@@ -1435,10 +1439,6 @@ class Enrollment < ActiveRecord::Base
       Score.where(grading_period: grading_periods)
     ).where(enrollment_id: id, workflow_state: "deleted").
       update_all(workflow_state: "active")
-  end
-
-  def student_or_fake_student?
-    ['StudentEnrollment', 'StudentViewEnrollment'].include?(type)
   end
 
   def other_enrollment_of_same_type

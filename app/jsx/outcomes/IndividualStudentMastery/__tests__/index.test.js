@@ -94,6 +94,7 @@ describe('expand and contract', () => {
           mastery_points: 0,
           points_possible: 0,
           calculation_method: 'highest',
+          assignments: [],
           results: [],
           ratings: []
         }

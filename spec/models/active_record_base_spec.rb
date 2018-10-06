@@ -671,7 +671,7 @@ describe ActiveRecord::Base do
     end
 
     it "prefixes specific associations" do
-      expect(AssessmentRequest.reflections.keys).to be_include('assessor_asset_user')
+      expect(AssessmentRequest.reflections.keys).to be_include('assessor_asset_submission')
     end
 
     it "prefixes specific associations with an explicit name" do

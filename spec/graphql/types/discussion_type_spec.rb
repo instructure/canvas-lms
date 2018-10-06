@@ -20,11 +20,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../helpers/graphql_type_tester')
 
 describe Types::DiscussionType do
-  let_once(:discussion) { group_discussion_assignment()}
+  let_once(:discussion) { group_discussion_assignment }
 
-  let(:discussion_type) { GraphQLTypeTester.new(Types::QuizType, discussion) }
+  let(:discussion_type) { GraphQLTypeTester.new(discussion, current_user: @teacher) }
 
   it "works" do
-    expect(discussion_type._id).to eq discussion.id
+    expect(discussion_type.resolve("_id")).to eq discussion.id.to_s
   end
 end

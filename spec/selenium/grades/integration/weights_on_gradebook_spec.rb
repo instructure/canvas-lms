@@ -26,12 +26,12 @@ describe 'classic gradebook' do
   let(:total_grade) do
     grading_period_ids = [0, @gp1.id, @gp2.id]
     user_session(@teacher)
-    Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
+    Gradebook.visit_gradebook(@course)
 
     if @grading_period_index
-      Gradebook::MultipleGradingPeriods.select_grading_period(grading_period_ids[@grading_period_index])
+      Gradebook.select_grading_period(grading_period_ids[@grading_period_index])
     end
-    Gradebook::MultipleGradingPeriods.total_score_for_row(1)
+    Gradebook.total_score_for_row(1)
   end
 
   let(:individual_view) { false }

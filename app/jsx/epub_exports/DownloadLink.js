@@ -21,48 +21,46 @@ import PropTypes from 'prop-types'
 import I18n from 'i18n!epub_exports'
 import _ from 'underscore'
 
-  var DownloadLink = React.createClass({
-    displayName: 'DownloadLink',
-    propTypes: {
-      course: PropTypes.object.isRequired
-    },
+class DownloadLink extends React.Component {
+  static displayName = 'DownloadLink'
 
-    epubExport () {
-      return this.props.course.epub_export || {};
-    },
-    showDownloadLink () {
-      return _.isObject(this.epubExport().permissions) &&
-        this.epubExport().permissions.download;
-    },
+  static propTypes = {
+    course: PropTypes.object.isRequired
+  }
 
-    //
-    // Rendering
-    //
+  epubExport = () => this.props.course.epub_export || {}
 
-    downloadLink (attachment, message) {
-      if (_.isObject(attachment)) {
-        return (
-          <a href={attachment.url} className="icon-download">
-            {message}
-          </a>
-        );
-      } else {
-        return null;
-      };
-    },
+  showDownloadLink = () =>
+    _.isObject(this.epubExport().permissions) && this.epubExport().permissions.download
 
-    render() {
-      if (!this.showDownloadLink()) {
-        return null;
-      };
+  //
+  // Rendering
+  //
 
+  downloadLink = (attachment, message) => {
+    if (_.isObject(attachment)) {
       return (
-        <span>
-          {this.downloadLink(this.epubExport().epub_attachment, I18n.t("Download ePub"))}
-          {this.downloadLink(this.epubExport().zip_attachment, I18n.t("Download Associated Files"))}
-        </span>
-      );
+        <a href={attachment.url} className="icon-download">
+          {message}
+        </a>
+      )
+    } else {
+      return null
     }
-  });
+  }
+
+  render() {
+    if (!this.showDownloadLink()) {
+      return null
+    }
+
+    return (
+      <span>
+        {this.downloadLink(this.epubExport().epub_attachment, I18n.t('Download ePub'))}
+        {this.downloadLink(this.epubExport().zip_attachment, I18n.t('Download Associated Files'))}
+      </span>
+    )
+  }
+}
 
 export default DownloadLink

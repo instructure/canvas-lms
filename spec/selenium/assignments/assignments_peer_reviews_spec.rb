@@ -109,7 +109,7 @@ describe "assignments" do
 
         f('.assess_submission_link').click
         wait_for_animations
-        f('.rubric_table .criterion .rating').click
+        f('.rating-description').click
         f('#rubric_holder .save_rubric_button').click
         wait_for_ajaximations
 
@@ -137,7 +137,7 @@ describe "assignments" do
 
       f('.assess_submission_link').click
       wait_for_animations
-      f('.rubric_table .criterion .rating').click
+      f('.rating-description').click
       f('.save_rubric_button').click
       wait_for_ajaximations
 

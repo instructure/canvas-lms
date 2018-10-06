@@ -18,7 +18,7 @@
 module Api::V1
   class CourseJson
 
-    BASE_ATTRIBUTES = %w(id name course_code account_id start_at default_view enrollment_term_id is_public
+    BASE_ATTRIBUTES = %w(id name course_code account_id created_at start_at default_view enrollment_term_id is_public
                          grading_standard_id root_account_id uuid).freeze
 
     INCLUDE_CHECKERS = {grading: 'needs_grading_count', syllabus: 'syllabus_body',
@@ -28,11 +28,12 @@ module Api::V1
 
     attr_reader :course, :user, :includes, :enrollments, :hash
 
-    def initialize(course, user, includes, enrollments)
+    def initialize(course, user, includes, enrollments, precalculated_permissions: nil)
       @course = course
       @user = user
       @includes = includes.map{ |include_key| include_key.to_sym }
       @enrollments = enrollments
+      @precalculated_permissions = precalculated_permissions
       if block_given?
         @hash = yield(self, self.allowed_attributes, self.methods_to_send, self.permissions_to_include)
       else
@@ -52,8 +53,8 @@ module Api::V1
     end
 
     def to_hash
-      set_sis_course_id(@hash, @course, @user)
-      set_integration_id(@hash, @course, @user)
+      set_sis_course_id(@hash)
+      set_integration_id(@hash)
       @hash['enrollments'] = extract_enrollments(@enrollments)
       @hash['needs_grading_count'] = needs_grading_count(@enrollments, @course)
       @hash['public_description'] = description(@course)
@@ -69,8 +70,8 @@ module Api::V1
       clear_unneeded_fields(@hash)
     end
 
-    def self.to_hash(course, user, includes, enrollments, &block)
-      self.new(course, user, includes, enrollments, &block).to_hash
+    def self.to_hash(course, user, includes, enrollments, precalculated_permissions: nil, &block)
+      self.new(course, user, includes, enrollments, precalculated_permissions: precalculated_permissions, &block).to_hash
     end
 
     def clear_unneeded_fields(hash)
@@ -81,18 +82,28 @@ module Api::V1
       course.public_description if include_description
     end
 
-    def set_sis_course_id(hash, course, user)
-      if course.grants_any_right?(user, :read_sis, :manage_sis)
-        hash['sis_course_id'] = course.sis_source_id
-      end
-      if course.root_account.grants_right?(user, :manage_sis)
-        hash['sis_import_id'] = course.sis_batch_id
+    def has_permission?(*permissions)
+      permissions.any? do |permission|
+        if @precalculated_permissions&.has_key?(permission)
+          @precalculated_permissions[permission]
+        else
+          @course.grants_right?(@user, permission)
+        end
       end
     end
 
-    def set_integration_id(hash, course, user)
-      if course.grants_any_right?(user, :read_sis, :manage_sis)
-        hash['integration_id'] = course.integration_id
+    def set_sis_course_id(hash)
+      if has_permission?(:read_sis, :manage_sis)
+        hash['sis_course_id'] = @course.sis_source_id
+      end
+      if has_permission?(:manage_sis)
+        hash['sis_import_id'] = @course.sis_batch_id
+      end
+    end
+
+    def set_integration_id(hash)
+      if has_permission?(:read_sis, :manage_sis)
+        hash['integration_id'] = @course.integration_id
       end
     end
 

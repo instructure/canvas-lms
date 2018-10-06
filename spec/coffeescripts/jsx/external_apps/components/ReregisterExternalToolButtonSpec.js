@@ -32,9 +32,7 @@ const renderComponent = data => ReactDOM.render(createElement(data), wrapper)
 
 const getDOMNodes = function(data) {
   const component = renderComponent(data)
-  const btnTriggerReregister =
-    component.refs.reregisterExternalToolButton &&
-    component.refs.reregisterExternalToolButton.getDOMNode()
+  const btnTriggerReregister = component.refs.reregisterExternalToolButton
   return [component, btnTriggerReregister]
 }
 
@@ -67,7 +65,7 @@ test('open and close modal', function() {
   ok(component.state.modalIsOpen, 'modal is open')
   ok(component.refs.btnClose)
   ok(component.refs.reregisterExternalToolButton)
-  Simulate.click(component.refs.btnClose.getDOMNode())
+  Simulate.click(component.refs.btnClose)
   ok(!component.state.modalIsOpen, 'modal is not open')
   ok(!component.refs.btnClose)
 })

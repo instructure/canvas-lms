@@ -25,14 +25,16 @@ import sinon from "sinon";
 import skin from "tinymce-light-skin";
 import ReactDOM from "react-dom";
 
-const fakeRCEWrapper = React.createClass({
-  render: () => {
-    return null;
-  },
-  displayName: () => {
+class fakeRCEWrapper extends React.Component {
+  static displayName() {
     return "FakeRCEWrapper";
   }
-});
+
+  render() {
+    return null;
+  }
+}
+
 fakeRCEWrapper["@noCallThru"] = true;
 
 const RceModule = proxyquire("../../src/rce/root", {

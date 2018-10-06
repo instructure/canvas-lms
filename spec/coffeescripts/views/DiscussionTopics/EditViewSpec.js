@@ -549,3 +549,31 @@ test('Does not change the locked status of an existing discussion topic', functi
   const view = this.editView({}, {locked: true})
   equal(true, view.model.get('locked'))
 })
+
+QUnit.module('EditView: Assignment External Tools', {
+  setup() {
+    fakeENV.setup({})
+    this.server = sinon.fakeServer.create()
+  },
+
+  teardown() {
+    this.server.restore()
+    fakeENV.teardown()
+  },
+
+  editView() {
+    return editView.apply(this, arguments)
+  }
+})
+
+test('it attaches assignment external tools component in course context', function() {
+  ENV.context_asset_string = "course_1"
+  const view = this.editView()
+  equal(view.$AssignmentExternalTools.children().size(), 1)
+})
+
+test('it does not attach assignment external tools component in group context', function() {
+  ENV.context_asset_string = "group_1"
+  const view = this.editView()
+  equal(view.$AssignmentExternalTools.children().size(), 0)
+})

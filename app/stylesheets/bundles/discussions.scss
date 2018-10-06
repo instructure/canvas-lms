@@ -137,7 +137,7 @@ $discussion-dark-text: $ic-color-dark;
 }
 
 .discussion-section {
-  padding: 4px 10px 3px 10px;
+  padding: 4px 10px 3px;
 }
 
 .peer-review-alert {
@@ -414,7 +414,7 @@ $discussion-dark-text: $ic-color-dark;
   margin: 0;
   border-top: 1px solid $border;
   background: white;
-  padding: 10px 10px 13px 10px;
+  padding: 10px 10px 13px;
   @include fontSize(10px);
   font-weight: bold;
   @include clearfix;
@@ -431,7 +431,7 @@ $discussion-dark-text: $ic-color-dark;
       height: 0px;
       width: 0px;
       border-style: solid;
-      border-color: #396eb2 transparent transparent transparent;
+      border-color: #396eb2 transparent transparent;
       border-width: 5px;
       vertical-align: middle;
     }
@@ -576,7 +576,7 @@ $discussion-dark-text: $ic-color-dark;
     height: 0px;
     width: 0px;
     border-style: solid;
-    border-color: transparent transparent #396eb2 transparent;
+    border-color: transparent transparent #396eb2;
     border-width: 8px;
   }
 }
@@ -591,7 +591,7 @@ $discussion-dark-text: $ic-color-dark;
 
 .collapsed .collapsable:before {
   top: 10px;
-  border-color: #396eb2 transparent transparent transparent;
+  border-color: #396eb2 transparent transparent;
 }
 
 .bootstrap-form {
@@ -607,7 +607,7 @@ $discussion-dark-text: $ic-color-dark;
   }
 
   #keyboard-shortcut-modal-info {
-    padding: 4px 0px 3px 0px;
+    padding: 4px 0px 3px;
 
     .accessibility-warning {
       display: none;

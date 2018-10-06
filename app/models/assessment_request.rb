@@ -19,10 +19,11 @@
 class AssessmentRequest < ActiveRecord::Base
   include Workflow
   include SendToStream
+  include Plannable
 
   belongs_to :user
   belongs_to :asset, polymorphic: [:submission]
-  belongs_to :assessor_asset, polymorphic: [:submission, :user], polymorphic_prefix: true
+  belongs_to :assessor_asset, polymorphic: [:submission], polymorphic_prefix: true
   belongs_to :assessor, :class_name => 'User'
   belongs_to :rubric_association
   has_many :submission_comments, -> { published }
@@ -32,6 +33,7 @@ class AssessmentRequest < ActiveRecord::Base
 
   before_save :infer_uuid
   after_save :delete_ignores
+  after_save :update_planner_override
   has_a_broadcast_policy
 
   def infer_uuid
@@ -141,4 +143,11 @@ class AssessmentRequest < ActiveRecord::Base
   end
 
   def self.serialization_excludes; [:uuid]; end
+
+  def update_planner_override
+    if saved_change_to_workflow_state? && workflow_state_before_last_save == 'assigned' && workflow_state == 'completed'
+      override = PlannerOverride.find_by(plannable_id: self.id, plannable_type: 'AssessmentRequest', user: assessor)
+      override.update_attributes(marked_complete: true) if override.present?
+    end
+  end
 end

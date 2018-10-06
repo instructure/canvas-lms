@@ -43,6 +43,7 @@ module Api::V1::Attachment
       'folder_id' => attachment.folder_id,
       'display_name' => attachment.display_name,
       'filename' => attachment.filename,
+      'workflow_state' => attachment.workflow_state
     }
     return hash if options[:only] && options[:only].include?('names')
 
@@ -122,7 +123,8 @@ module Api::V1::Attachment
         moderated_grading_whitelist: options[:moderated_grading_whitelist],
         enable_annotations: options[:enable_annotations],
         enrollment_type: options[:enrollment_type],
-        anonymous_instructor_annotations: options[:anonymous_instructor_annotations]
+        anonymous_instructor_annotations: options[:anonymous_instructor_annotations],
+        submission_id: options[:submission_id]
       }
       hash['preview_url'] = attachment.crocodoc_url(user, url_opts) ||
                             attachment.canvadoc_url(user, url_opts)

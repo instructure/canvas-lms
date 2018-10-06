@@ -48,6 +48,12 @@ describe Auditors::Course do
       @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
       expect(@event.request_id).to eq request_id.to_s
     end
+
+    it "should truncate super long changes" do
+      @course.syllabus_body = "ohnoes" * 10_000
+      @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
+      expect(@event.attributes["data"].length < 3_000).to be_truthy
+    end
   end
 
   context "event source" do

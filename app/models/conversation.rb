@@ -51,9 +51,9 @@ class Conversation < ActiveRecord::Base
     private_hash.present?
   end
 
-  def self.find_all_private_conversations(user, other_users)
-    user.all_conversations.preload(:conversation).where(:private_hash => other_users.map { |u| private_hash_for([user, u]) }).
-      map(&:conversation)
+  def self.find_all_private_conversations(user, other_users, context_type: nil, context_id: nil)
+    code = "#{context_type}_#{context_id}" if context_type && context_id
+    user.all_conversations.where(:private_hash => other_users.map { |u| private_hash_for([user, u], code)}).map(&:conversation)
   end
 
   def self.private_hash_for(users_or_user_ids, context_code=nil)
@@ -87,13 +87,14 @@ class Conversation < ActiveRecord::Base
     private_hash = private ? private_hash_for(users, context_code) : nil
     transaction do
       if private
-        conversation = users.first.all_conversations.where(private_hash: private_hash).first.try(:conversation)
+        conversation = users.first.all_conversations.except(:preload).where(private_hash: private_hash).first.try(:conversation)
         if !conversation && context_code
           # try to match with an existing conversation but make sure the context matches
-          conversation = users.first.all_conversations.where(private_hash: private_hash_for(users)).joins(:conversation).
+          conversation = users.first.all_conversations.except(:preload).where(private_hash: private_hash_for(users)).joins(:conversation).
             where(:conversations => {:context_type => options[:context_type], :context_id => options[:context_id]}).first.try(:conversation)
         end
       end
+
       unless conversation
         conversation = new
         conversation.private_hash = private_hash

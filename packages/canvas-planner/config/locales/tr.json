@@ -62,17 +62,26 @@
   "missing_1a256b3b": {
     "message": "Eksik"
   },
+  "new_13daf639": {
+    "message": "Yeni"
+  },
   "new_activity_8b84847d": {
     "message": "Yeni Etkinlik"
   },
   "next_month_749b1778": {
     "message": "Sonraki Hafta"
   },
+  "nothing_for_now_e3e3ce2a": {
+    "message": "Şimdilik bir şey yok"
+  },
   "optional_add_course_ef0d70fc": {
     "message": "Tercihen: Kurs Ekle"
   },
   "page_50c4823d": {
     "message": "Sayfa"
+  },
+  "peer_review_74f26a13": {
+    "message": "Akran Değerlendirme"
   },
   "points_bceb5005": {
     "message": "puanlar"

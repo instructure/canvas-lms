@@ -49,7 +49,7 @@ export function showPillForOverdueStatus(status, item) {
   if (!['late', 'missing'].includes(status)) {
     throw new Error(`Expected status to be 'late' or 'missing', but it was ${status}`);
   }
-  return (!!item.context && !!item.status && item.status[status]);
+  return (!!item.status && item.status[status]);
 }
 
 /**

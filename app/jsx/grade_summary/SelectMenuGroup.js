@@ -20,7 +20,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 
 import Button from '@instructure/ui-buttons/lib/components/Button';
-import View from '@instructure/ui-layout/lib/components/View';
+import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex';
 import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent';
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
 import Text from '@instructure/ui-elements/lib/components/Text';
@@ -139,24 +139,24 @@ export default class SelectMenuGroup extends React.Component {
 
   render () {
     return (
-      <View>
-        {this.props.students.length > 1 &&
-          <SelectMenu
-            defaultValue={this.props.selectedStudentID}
-            disabled={this.anySelectMenuChanged(['courseID'])}
-            id="student_select_menu"
-            label={I18n.t('Student')}
-            onChange={this.onSelectStudent}
-            options={this.props.students}
-            textAttribute="name"
-            valueAttribute="id"
-          />
-        }
+      <Flex
+        alignItems="end"
+        wrapItems="true">
 
-        <View
-          as="span"
-          style={{ display: "flex", flexWrap: "wrap", alignContent: "flex-end", alignItems: "flex-end"}}
-        >
+        <FlexItem>
+          {this.props.students.length > 1 &&
+            <SelectMenu
+              defaultValue={this.props.selectedStudentID}
+              disabled={this.anySelectMenuChanged(['courseID'])}
+              id="student_select_menu"
+              label={I18n.t('Student')}
+              onChange={this.onSelectStudent}
+              options={this.props.students}
+              textAttribute="name"
+              valueAttribute="id"
+            />
+          }
+
           {this.props.gradingPeriods.length > 0 &&
             <SelectMenu
               defaultValue={this.props.selectedGradingPeriodID}
@@ -193,24 +193,24 @@ export default class SelectMenuGroup extends React.Component {
             textAttribute={0}
             valueAttribute={1}
           />
+        </FlexItem>
 
-          <View as="div" margin="small small small 0">
-            <Button
-              disabled={this.state.processing || this.noSelectMenuChanged()}
-              id="apply_select_menus"
-              onClick={this.onSubmit}
-              type="submit"
-              size="medium"
-              variant="primary"
-            >
-              <PresentationContent><Text>{I18n.t('Apply')}</Text></PresentationContent>
-              <ScreenReaderContent>
-                {I18n.t('Apply filters. Note: clicking this button will cause the page to reload.')}
-              </ScreenReaderContent>
-            </Button>
-          </View>
-        </View>
-      </View>
+        <FlexItem margin="0 0 0 small">
+          <Button
+            disabled={this.state.processing || this.noSelectMenuChanged()}
+            id="apply_select_menus"
+            onClick={this.onSubmit}
+            type="submit"
+            size="medium"
+            variant="primary"
+          >
+            <PresentationContent><Text>{I18n.t('Apply')}</Text></PresentationContent>
+            <ScreenReaderContent>
+              {I18n.t('Apply filters. Note: clicking this button will cause the page to reload.')}
+            </ScreenReaderContent>
+          </Button>
+        </FlexItem>
+      </Flex>
     );
   }
 }

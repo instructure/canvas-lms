@@ -1161,9 +1161,12 @@ class Attachment < ActiveRecord::Base
     can :read_as_admin
 
     given { |user, session|
-      self.context.grants_right?(user, session, :read) && !self.locked_for?(user, :check_policies => true)
+      (
+        self.context.grants_right?(user, session, :read) ||
+        (self.context.is_a?(AssessmentQuestion) && self.context.user_can_see_through_quiz_question?(user, session))
+      ) && !self.locked_for?(user, :check_policies => true)
     }
-    can :download
+    can :read and can :download
 
     given { |user, session| self.context_type == 'Submission' && self.context.grant_right?(user, session, :comment) }
     can :create

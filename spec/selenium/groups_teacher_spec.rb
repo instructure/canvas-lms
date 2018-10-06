@@ -267,6 +267,7 @@ describe "new groups" do
       f('.ui-menu-item .edit-group-assignment').click
       wait_for_ajaximations
 
+      f('.move-select .move-select__group') # fixes flakiness since the ff below doesn't wait for the element to appear
       ff('.move-select .move-select__group option').last.click
       wait_for_ajaximations
 

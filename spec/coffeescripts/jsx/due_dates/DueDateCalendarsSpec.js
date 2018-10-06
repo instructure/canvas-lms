@@ -19,7 +19,6 @@
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {Simulate, SimulateNative} from 'react-addons-test-utils'
 import DueDateCalendars from 'jsx/due_dates/DueDateCalendars'
 import fakeENV from 'helpers/fakeENV'
 
@@ -49,13 +48,13 @@ QUnit.module('DueDateCalendars', {
   },
   teardown() {
     fakeENV.teardown()
-    ReactDOM.unmountComponentAtNode(this.dueDateCalendars.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.dueDateCalendars).parentNode)
     return wrapper.remove()
   }
 })
 
 test('renders', function() {
-  ok(this.dueDateCalendars.isMounted())
+  ok(this.dueDateCalendars)
 })
 
 test('can get the date for a datetype', function() {

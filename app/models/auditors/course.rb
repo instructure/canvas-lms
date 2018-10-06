@@ -181,6 +181,11 @@ class Auditors::Course
 
   def self.record(course, user, event_type, data={}, opts = {})
     return unless course
+    data.each do |k, change|
+      if change.is_a?(Array) && change.any?{|v| v.is_a?(String) && v.length > 1000}
+        data[k] = change.map{|v| v.is_a?(String) ? CanvasTextHelper.truncate_text(v, :max_length => 1000) : v}
+      end
+    end
     course.shard.activate do
       record = Auditors::Course::Record.generate(course, user, event_type, data, opts)
       Auditors::Course::Stream.insert(record)

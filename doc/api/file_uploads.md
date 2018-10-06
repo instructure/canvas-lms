@@ -76,7 +76,7 @@ upload the actual file data, by POSTing a specially formulated request to
 the URL given in the `upload_url` field of the response.
 
 Depending on how Canvas is configured, this upload URL might be another URL
-in the same domain, or a Amazon S3 bucket, or some other URL.  In order to
+in the same domain, or a Amazon S3 bucket, or some other URL. In order to
 work with all Canvas installations, applications should be very careful to
 follow this documentation and not make any undocumented assumptions about
 the upload workflow.
@@ -119,11 +119,20 @@ current directory.
 If Step 2 is successful, the response will be either a 3XX redirect or
 201 Created with a Location header set as normal.
 
-In the case of a 3XX redirect, the application needs to perform a POST
-to this location in order to complete the upload, otherwise the new file
+In the case of a 3XX redirect, the application needs to perform a GET to
+this location in order to complete the upload, otherwise the new file
 may not be marked as available. This request is back against Canvas
 again, and needs to be authenticated using the normal API access token
 authentication.
+
+<p class="note deprecated">
+[DEPRECATED] While a POST would be truer to REST semantics, and was
+previously called for by this documentation, a GET is recommended at
+this point for forwards compatibility with the 201 Created response
+described below. POST requests are currently supported for backwards
+compatibility at all endpoints that may appear in the Location header,
+but are deprecated effective 2019-04-21 (notice given 2018-10-06).
+</p>
 
 In the case of a 201 Created, the upload has been complete and the
 Canvas JSON representation of the file can be retrieved with a GET from
@@ -153,20 +162,17 @@ Example Response:
 <a name="method.file_uploads.url" href="#method.file_uploads.url">Uploading via URL</a>
 </h2>
 
-If the file is accessible through a public HTTP or HTTPS URL,
-Canvas can download it directly. However, Canvas downloads
-the file in the background, so unlike the POST workflow above, the file
-won't be immediately available when the API call completes. Applications
-can poll the API to check on the status of the upload.
+Instead of uploading a file directly, you can also provide Canvas a
+public HTTP or HTTPS URL from which to retrieve the file.
 
-### Step 1: Posting the file URL to Canvas
+### Step 1a: Posting the file URL to Canvas
 
 The first step is the same as with the "Uploading via POST" flow above,
 with the addition of one new parameter:
 
 <dl>
   <dt>url</dt>
-  <dd>The full URL to the file to be uploaded. This URL must be accessible by Canvas.</dd>
+  <dd>The full URL to the file to be uploaded. This URL must be publicly accessible.</dd>
 </dl>
 
 Example Request:
@@ -185,58 +191,69 @@ Example Response:
 
 ```json
 {
-  "id": 1234,
-  "upload_status": "pending",
-  "status_url": "...url to check status..."
-}
-```
-
-Canvas will return a status_url parameter, which is a Canvas
-API endpoint that the application can periodically poll to check on the
-status of the upload. Note that the id given in the response will be
-treated like a deleted file, until the upload completes successfully.
-
-### Step 2: Check the status_url to see when the upload is complete
-
-If the application needs to know the outcome of the upload, it can check
-the status_url.
-
-Example Request:
-
-```bash
-curl 'https://<canvas>/api/v1/files/1234/5678/status' \
-     -H "Authorization: Bearer <token>"
-```
-
-When still pending:
-
-```json
-{
-  "upload_status": "pending"
-}
-```
-
-When complete:
-
-```json
-{
-  "upload_status": "ready",
-  // This is the normal attachment JSON response object
-  "attachment": {
-    "id": 1234,
-    "url": "...url to download the file...",
-    "content-type": "image/jpeg",
-    "display_name": "profile_pic.jpg",
-    "size": 302185
+  "upload_url": "https://file-service.url/opaque",
+  "upload_params": {
+    /* unspecified parameters; contents should be treated as opaque */
+  },
+  "progress": {
+    /* amongst other tags, see the Progress API... */
+    "url": "https://canvas.example.edu/api/v1/progress/1"
+    "workflow_state": "running"
   }
 }
 ```
 
-On error:
+### Step 1b: Understanding the response
 
-```json
-{
-  "upload_status": "errored",
-  "message": "Invalid response code, expected 200 got 404"
-}
+Canvas' file management is in a moment of transition. For the duration
+of this transition, there are two possible behaviors. The newer behavior
+includes additional fields in the response to the first request and
+expects an additional action from the application.
+
+In the deprecated behavior, Canvas will initiate a "cloning" of the
+provided URL by downloading it via Canvas servers. The initial POST was
+sufficient to start this and no other action is necessary from the
+application.
+
+In the newer behavior, Canvas delegates the cloning of the URL to the
+same service that accepts direct uploads. The cloning is kicked off by a
+POST by the application to the provided `upload_url` with the provided
+`upload_params`, in parallel with a direct upload. The service then
+informs Canvas directly when it is complete.
+
+In either case, the cloning of the URL will be performed in the background,
+and the file will not necessarily be immediately available when the API
+calls complete. Instead, a `progress` object is provided which can be
+periodically polled to check the status of the upload.
+
+You can distinguish the new behavior (and expected follow up)
+from the old behavior precisely by the presence or absence of the
+`upload_url` key.
+
+### Step 2: POST to the URL given in the previous response
+
+If the response to the initial POST includes an `upload_url`, you must
+POST to it with the `upload_params` just as if you were performing a
+direct upload. The only exception is that the `file` parameter is
+omitted. The `Content-Type` is still expected to be multipart/form-data.
+
+Example Request:
+
+```bash
+curl '<upload_url>' \
+     -F 'target_url=http://example.com/my_pic.jpg' \
+     <any other parameters specified in the upload_params response>
 ```
+
+Example Response:
+
+    HTTP/1.1 201 Created
+
+This step is not necessary with the old behavior.
+
+### Step 3: Check to see when the upload is complete
+
+If the application needs to know the outcome of the upload, it can use
+the {api:ProgressController#Show Progress endpoint} to query the status.
+On success, the created attachment's id will be returned in the results
+of the Progress object as `id`.

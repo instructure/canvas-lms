@@ -23,7 +23,7 @@ import Link from '@instructure/ui-elements/lib/components/Link'
 export default function UserLink({size, avatar_url, name, ...propsToPassOnToLink}) {
   return (
     <Link {...propsToPassOnToLink} size={size}>
-      <Avatar size={size} name={name} src={avatar_url} margin="0 xxx-small xxx-small 0" />
+      <Avatar size={size} name={name} src={avatar_url} margin="0 x-small xxx-small 0" />
       {name}
     </Link>
   )

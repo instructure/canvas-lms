@@ -35,15 +35,15 @@ QUnit.module('DueDateRemoveRowLink', {
     )
   },
   teardown() {
-    ReactDOM.unmountComponentAtNode(this.DueDateRemoveRowLink.getDOMNode().parentNode)
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.DueDateRemoveRowLink).parentNode)
   }
 })
 
 test('renders', function() {
-  ok(this.DueDateRemoveRowLink.isMounted())
+  ok(this.DueDateRemoveRowLink)
 })
 
 test('calls handleClick prop when clicked', function() {
-  Simulate.click(this.DueDateRemoveRowLink.refs.removeRowIcon.getDOMNode())
+  Simulate.click(this.DueDateRemoveRowLink.refs.removeRowIcon)
   ok(this.handleClick.calledOnce)
 })

@@ -38,7 +38,7 @@ describe "gradebook" do
 
   context "export menu" do
     before do
-      Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
+      Gradebook.visit_gradebook(@course)
       f('#download_csv').click
     end
 
@@ -68,7 +68,7 @@ describe "gradebook" do
 
   context "return focus to settings menu when it closes" do
     before do
-      Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
+      Gradebook.visit_gradebook(@course)
       f('#gradebook_settings').click
     end
 
@@ -89,7 +89,7 @@ describe "gradebook" do
   end
 
   context 'settings menu is accessible' do
-    before { Gradebook::MultipleGradingPeriods.visit_gradebook(@course) }
+    before { Gradebook.visit_gradebook(@course) }
 
     it 'hides the icon from screen readers' do
       expect(f('#gradebook_settings .icon-settings')).to have_attribute('aria-hidden', 'true')
@@ -106,21 +106,21 @@ describe "gradebook" do
     context "without high contrast mode" do
       before do
         @teacher.disable_feature!(:high_contrast)
-        Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
+        Gradebook.visit_gradebook(@course)
       end
 
       it 'meets 3:1 contrast for column headers' do
-        bg_color = rgba_to_hex Gradebook::MultipleGradingPeriods.assignment_header(assignment_title).style('background-color')
-        text_color = rgba_to_hex Gradebook::MultipleGradingPeriods.assignment_header_label(assignment_title).style('color')
+        bg_color = rgba_to_hex Gradebook.assignment_header(assignment_title).style('background-color')
+        text_color = rgba_to_hex Gradebook.assignment_header_label(assignment_title).style('color')
 
         expect(LuminosityContrast.ratio(bg_color, text_color).round(2)).to be >= 3
       end
 
       it 'meets 3:1 contrast for hovered column headers' do
-        hover Gradebook::MultipleGradingPeriods.assignment_header(assignment_title)
+        hover Gradebook.assignment_header(assignment_title)
 
-        bg_color = rgba_to_hex Gradebook::MultipleGradingPeriods.assignment_header(assignment_title).style('background-color')
-        text_color = rgba_to_hex Gradebook::MultipleGradingPeriods.assignment_header_label(assignment_title).style('color')
+        bg_color = rgba_to_hex Gradebook.assignment_header(assignment_title).style('background-color')
+        text_color = rgba_to_hex Gradebook.assignment_header_label(assignment_title).style('color')
 
         expect(LuminosityContrast.ratio(bg_color, text_color).round(2)).to be >= 3
       end
@@ -129,21 +129,21 @@ describe "gradebook" do
     context "with high contrast mode" do
       before do
         @teacher.enable_feature!(:high_contrast)
-        Gradebook::MultipleGradingPeriods.visit_gradebook(@course)
+        Gradebook.visit_gradebook(@course)
       end
 
       it 'meets 4.5:1 contrast for column headers' do
-        bg_color = rgba_to_hex Gradebook::MultipleGradingPeriods.assignment_header(assignment_title).style('background-color')
-        text_color = rgba_to_hex Gradebook::MultipleGradingPeriods.assignment_header_label(assignment_title).style('color')
+        bg_color = rgba_to_hex Gradebook.assignment_header(assignment_title).style('background-color')
+        text_color = rgba_to_hex Gradebook.assignment_header_label(assignment_title).style('color')
 
         expect(LuminosityContrast.ratio(bg_color, text_color).round(2)).to be >= 4.5
       end
 
       it 'meets 4.5:1 contrast for hovered column headers' do
-        hover Gradebook::MultipleGradingPeriods.assignment_header(assignment_title)
+        hover Gradebook.assignment_header(assignment_title)
 
-        bg_color = rgba_to_hex Gradebook::MultipleGradingPeriods.assignment_header(assignment_title).style('background-color')
-        text_color = rgba_to_hex Gradebook::MultipleGradingPeriods.assignment_header_label(assignment_title).style('color')
+        bg_color = rgba_to_hex Gradebook.assignment_header(assignment_title).style('background-color')
+        text_color = rgba_to_hex Gradebook.assignment_header_label(assignment_title).style('color')
 
         expect(LuminosityContrast.ratio(bg_color, text_color).round(2)).to be >= 4.5
       end
@@ -151,16 +151,16 @@ describe "gradebook" do
   end
 
   context 'cell tooltip' do
-    before { Gradebook::MultipleGradingPeriods.visit_gradebook(@course) }
+    before { Gradebook.visit_gradebook(@course) }
 
     it 'is shown on hover' do
-      Gradebook::MultipleGradingPeriods.cell_hover(0, 0)
-      expect(Gradebook::MultipleGradingPeriods.cell_tooltip(0, 0)).to be_displayed
+      Gradebook.cell_hover(0, 0)
+      expect(Gradebook.cell_tooltip(0, 0)).to be_displayed
     end
 
     it 'is shown on focus' do
-      Gradebook::MultipleGradingPeriods.cell_click(0, 0)
-      expect(Gradebook::MultipleGradingPeriods.cell_tooltip(0, 0)).to be_displayed
+      Gradebook.cell_click(0, 0)
+      expect(Gradebook.cell_tooltip(0, 0)).to be_displayed
     end
   end
 end

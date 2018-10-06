@@ -50,7 +50,7 @@ test('renders', () => {
     handleInstall() {}
   }
   const component = renderComponent(data)
-  ok(component.isMounted())
+  ok(component)
   ok(TestUtils.isCompositeComponentWithType(component, Lti2Iframe))
 })
 
@@ -61,7 +61,7 @@ test('renders any children after the iframe', () => {
     </Lti2Iframe>
   )
   const component = TestUtils.renderIntoDocument(element)
-  ok($(component.getDOMNode()).find('#test-child').length === 1)
+  ok($(ReactDOM.findDOMNode(component)).find('#test-child').length === 1)
 })
 
 test('getLaunchUrl returns the launch url if doing reregistration', () => {

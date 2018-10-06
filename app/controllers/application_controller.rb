@@ -153,7 +153,7 @@ class ApplicationController < ActionController::Base
           enable_profiles: (@domain_root_account && @domain_root_account.settings[:enable_profiles] != false)
         },
       }
-      @js_env[:current_user] = @current_user ? Rails.cache.fetch(['user_display_json', @current_user].cache_key, :expires_in => 1.hour) { user_display_json(@current_user, :profile) } : {}
+      @js_env[:current_user] = @current_user ? Rails.cache.fetch(['user_display_json', @current_user].cache_key, :expires_in => 1.hour) { user_display_json(@current_user, :profile, [:avatar_is_fallback]) } : {}
       @js_env[:page_view_update_url] = page_view_path(@page_view.id, page_view_token: @page_view.token) if @page_view
       @js_env[:IS_LARGE_ROSTER] = true if !@js_env[:IS_LARGE_ROSTER] && @context.respond_to?(:large_roster?) && @context.large_roster?
       @js_env[:context_asset_string] = @context.try(:asset_string) if !@js_env[:context_asset_string]
@@ -533,21 +533,16 @@ class ApplicationController < ActionController::Base
   end
 
   def tab_enabled?(id, opts = {})
-    return true unless @context && @context.respond_to?(:tabs_available)
-    tabs = Rails.cache.fetch(['tabs_available', @context, @current_user, @domain_root_account,
-      session[:enrollment_uuid]].cache_key, expires_in: 1.hour) do
+    return true unless @context&.respond_to?(:tabs_available)
 
-      precalculated_permissions = @context.is_a?(Course) && @current_user &&
-        @current_user.precalculate_permissions_for_courses([@context], SectionTabHelper::PERMISSIONS_TO_PRECALCULATE, [@domain_root_account])&.values&.first
-
+    valid = Rails.cache.fetch(['tab_enabled', id, @context, @current_user, @domain_root_account, session[:enrollment_uuid]].cache_key) do
       @context.tabs_available(@current_user,
-        :session => session,
-        :include_hidden_unused => true,
-        :root_account => @domain_root_account,
-        :precalculated_permissions => precalculated_permissions
-      )
+        session: session,
+        include_hidden_unused: true,
+        root_account: @domain_root_account,
+        only_check: [id]
+      ).any?{|t| t[:id] == id }
     end
-    valid = tabs.any?{|t| t[:id] == id }
     render_tab_disabled unless valid || opts[:no_render]
     return valid
   end
@@ -1234,22 +1229,28 @@ class ApplicationController < ActionController::Base
     # or it's not an update to an already-existing page_view.  We check to make sure
     # it's not an update because if the page_view already existed, we don't want to
     # double-count it as multiple views when it's really just a single view.
-    if @accessed_asset && (@accessed_asset[:level] == 'participate' || !@page_view_update)
-      @access = AssetUserAccess.where(user_id: user.id, asset_code: @accessed_asset[:code]).first_or_initialize
-      @accessed_asset[:level] ||= 'view'
-      @access.log @context, @accessed_asset
-
-      if @page_view.nil? && page_views_enabled? && %w{participate submit}.include?(@accessed_asset[:level])
-        generate_page_view(user)
-      end
-
-      if @page_view
-        @page_view.participated = %w{participate submit}.include?(@accessed_asset[:level])
-        @page_view.asset_user_access = @access
-      end
-
-      @page_view_update = true
+    return unless @accessed_asset && (@accessed_asset[:level] == 'participate' || !@page_view_update)
+    if @accessed_asset[:category] == "files" && @accessed_asset[:code].starts_with?('attachment')
+      attachment_id = @accessed_asset[:code].match(/\A\w+_(\d+)\z/)[1]
+      @file_context = Attachment.find_by(id: attachment_id)&.context || @context
     end
+    if @context
+      @access = AssetUserAccess.where(user_id: user.id, asset_code: @accessed_asset[:code]).
+        polymorphic_where(context: @file_context || @context).first_or_initialize
+      @accessed_asset[:level] ||= 'view'
+      @access.log @file_context || @context, @accessed_asset
+    end
+
+    if @page_view.nil? && page_views_enabled? && %w{participate submit}.include?(@accessed_asset[:level])
+      generate_page_view(user)
+    end
+
+    if @page_view
+      @page_view.participated = %w{participate submit}.include?(@accessed_asset[:level])
+      @page_view.asset_user_access = @access
+    end
+
+    @page_view_update = true
   end
 
   def log_gets
@@ -1671,9 +1672,9 @@ class ApplicationController < ActionController::Base
     options[:query] ||= {}
     contexts_to_link_to = Array(contexts_to_link_to)
     unless contexts_to_link_to.empty?
-      options[:anchor] = "#{contexts_to_link_to.first.asset_string}"
+      options[:anchor] = contexts_to_link_to.first.asset_string
     end
-    options[:query][:include_contexts] = contexts_to_link_to.map{|c| c.asset_string}.join(",") unless contexts_to_link_to.empty?
+    options[:query][:include_contexts] = contexts_to_link_to.map{|c| c.is_a? String ? c : c.asset_string}.join(",") unless contexts_to_link_to.empty?
     url_for(
       options[:query].merge({
         :controller => 'files',

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import $ from 'jquery'
-import {mount} from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme'
+import {mount} from 'enzyme'
 import GradingPeriodForm from 'jsx/grading/GradingPeriodForm'
 import chicago from 'timezone/America/Chicago'
 import tz from 'timezone'
@@ -68,8 +68,8 @@ QUnit.module('GradingPeriodForm', suiteHooks => {
 
   function getDateInput(inputLabel) {
     const labels = wrapper.find('label')
-    const $label = labels.filterWhere(label => label.text() === inputLabel).get(0)
-    return wrapper.find(`input[aria-labelledby="${$label.id}"]`).get(0)
+    const $label = labels.filterWhere(label => label.text() === inputLabel).at(0).instance()
+    return wrapper.find(`input[aria-labelledby="${$label.id}"]`).at(0).instance()
   }
 
   function getDateTimeSuggestions(inputLabel) {
@@ -82,7 +82,7 @@ QUnit.module('GradingPeriodForm', suiteHooks => {
   }
 
   function getInput(id) {
-    return wrapper.find(`input#${id}`).get(0)
+    return wrapper.find(`input#${id}`).at(0).instance()
   }
 
   function setDateInputValue(label, value) {
@@ -93,8 +93,8 @@ QUnit.module('GradingPeriodForm', suiteHooks => {
 
   function setInputValue(id, value) {
     // Using Enzyme here is a workaround for React 14 swallowing input events.
-    const input = wrapper.find(`input#${id}`)
-    input.get(0).value = value
+    const input = wrapper.find(`input#${id}`).at(0)
+    input.instance().value = value
     input.simulate('change', {target: {value}})
   }
 

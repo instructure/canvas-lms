@@ -19,57 +19,62 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-export default React.createClass({
-    displayName: 'ConfigOptionField',
+export default class ConfigOptionField extends React.Component {
+  static propTypes = {
+    handleChange: PropTypes.func.isRequired,
+    name: PropTypes.string.isRequired,
+    type: PropTypes.string.isRequired,
+    value: PropTypes.any,
+    required: PropTypes.bool,
+    description: PropTypes.string.isRequired
+  }
 
-    propTypes: {
-      handleChange: PropTypes.func.isRequired,
-      name: PropTypes.string.isRequired,
-      type: PropTypes.string.isRequired,
-      value: PropTypes.any,
-      required: PropTypes.bool,
-      description: PropTypes.string.isRequired
-    },
-
-    checkbox() {
-      var checked = this.props.value ? "checked" : "";
-      return (
-        <div className="grid-row">
-          <div className="col-xs-12">
-            <label className="checkbox">
-              <input type="checkbox" name={this.props.name}  data-rel={this.props.name} onChange={this.props.handleChange} checked={checked}/> {this.props.description}
-            </label>
-          </div>
+  checkbox = () => {
+    const checked = this.props.value ? 'checked' : ''
+    return (
+      <div className="grid-row">
+        <div className="col-xs-12">
+          <label className="checkbox">
+            <input
+              type="checkbox"
+              name={this.props.name}
+              data-rel={this.props.name}
+              onChange={this.props.handleChange}
+              checked={checked}
+            />{' '}
+            {this.props.description}
+          </label>
         </div>
-      );
-    },
+      </div>
+    )
+  }
 
-    text() {
-      return (
-        <div className="grid-row">
-          <div className="col-xs-12">
-            <label>
-              {this.props.description}
-              <input type="text"
-                className="form-control input-block-level"
-                placeholder={this.props.description}
-                defaultValue={this.props.value}
-                required={this.props.required}
-                aria-required={this.props.required}
-                data-rel={this.props.name}
-                name={this.props.name}
-                onChange={this.props.handleChange} />
-            </label>
-          </div>
-        </div>
-      );
-    },
+  text = () => (
+    <div className="grid-row">
+      <div className="col-xs-12">
+        <label>
+          {this.props.description}
+          <input
+            type="text"
+            className="form-control input-block-level"
+            placeholder={this.props.description}
+            defaultValue={this.props.value}
+            required={this.props.required}
+            aria-required={this.props.required}
+            data-rel={this.props.name}
+            name={this.props.name}
+            onChange={this.props.handleChange}
+          />
+        </label>
+      </div>
+    </div>
+  )
 
-    render() {
-      return (
-        <div className="form-group">
-          {this.props.type === 'checkbox' ? this.checkbox() : this.text()}
-        </div>
-      )
-    }
-  });
+  render() {
+    return (
+      <div className="form-group">
+        {this.props.type === 'checkbox' ? this.checkbox() : this.text()}
+      </div>
+    )
+  }
+}

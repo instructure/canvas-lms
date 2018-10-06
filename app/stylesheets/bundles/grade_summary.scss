@@ -260,7 +260,7 @@
     color: $ic-color-light;
     #{direction(left)}: 0px;
     max-width: 250px;
-    padding: 2px 7px 2px;
+    padding: 2px 7px;
     white-space: nowrap;
     table tr td {
       background-color: transparent;
@@ -363,7 +363,7 @@ $outcome-border: 1px solid #BCC2CA;
   .group-description {
     cursor: pointer;
     overflow: hidden;
-    padding: 10px 15px 10px 15px;
+    padding: 10px 15px;
     &:hover {
       background-color: #f7f7f7;
     }
@@ -450,7 +450,7 @@ $outcome-border: 1px solid #BCC2CA;
     }
   }
   li.outcome {
-    padding: 20px 15px 20px 15px;
+    padding: 20px 15px;
     border-top: $outcome-border;
     display: none;
     .outcome-properties {
