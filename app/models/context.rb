@@ -108,48 +108,22 @@ module Context
     Canvas::ICU.collate_by(contexts) { |r| r[:name] }
   end
 
-  def active_record_types(only_check: nil)
-    only_check = only_check.sort if only_check.present? # so that we always have consistent cache keys
-    @active_record_types ||= {}
-    return @active_record_types[only_check] if @active_record_types[only_check]
-
-    possible_types = {
-      files: -> { self.respond_to?(:attachments) && self.attachments.active.exists? },
-      modules: -> { self.respond_to?(:context_modules) && self.context_modules.active.exists? },
-      quizzes: -> { self.respond_to?(:quizzes) && self.quizzes.active.exists? },
-      assignments: -> { self.respond_to?(:assignments) && self.assignments.active.exists? },
-      pages: -> { self.respond_to?(:wiki_pages) && self.wiki_pages.active.exists? },
-      conferences: -> { self.respond_to?(:web_conferences) && self.web_conferences.active.exists? },
-      announcements: -> { self.respond_to?(:announcements) && self.announcements.active.exists? },
-      outcomes: -> { self.respond_to?(:has_outcomes?) && self.has_outcomes? },
-      discussions: -> { self.respond_to?(:discussion_topics) && self.discussion_topics.only_discussion_topics.except(:preload).exists? }
-    }
-    cache_key = ['active_record_types', only_check, self].cache_key
-
-    # if it exists in redis, return that
-    if (cached = Rails.cache.read(cache_key))
-      return @active_record_types[only_check] = cached
-    end
-
-    # if we're only asking for a subset but the full set is cached return that, but filtered with just what we want
-    if only_check.present? && (cache_with_everything = Rails.cache.read(['active_record_types', nil, self].cache_key))
-      return @active_record_types[only_check] = cache_with_everything.select { |k,_v| only_check.include?(k) }
-    end
-
-    # otherwise compute it and store it in the cache
-    value_to_cache = ActiveRecord::Base.uncached do
-      types_to_check = if only_check
-        possible_types.select { |k| only_check.include?(k) }
-      else
-        possible_types
+  def active_record_types
+    @active_record_types ||= Rails.cache.fetch(['active_record_types2', self].cache_key) do
+      res = {}
+      ActiveRecord::Base.uncached do
+        res[:files] = self.respond_to?(:attachments) && self.attachments.active.exists?
+        res[:modules] = self.respond_to?(:context_modules) && self.context_modules.active.exists?
+        res[:quizzes] = self.respond_to?(:quizzes) && self.quizzes.active.exists?
+        res[:assignments] = self.respond_to?(:assignments) && self.assignments.active.exists?
+        res[:pages] = self.respond_to?(:wiki_pages) && self.wiki_pages.active.exists?
+        res[:conferences] = self.respond_to?(:web_conferences) && self.web_conferences.active.exists?
+        res[:announcements] = self.respond_to?(:announcements) && self.announcements.active.exists?
+        res[:outcomes] = self.respond_to?(:has_outcomes?) && self.has_outcomes?
+        res[:discussions] = self.respond_to?(:discussion_topics) && self.discussion_topics.only_discussion_topics.except(:preload).exists?
       end
-
-      types_to_check.each_with_object({}) do |(key, type_to_check), memo|
-        memo[key] = type_to_check.call
-      end
+      res
     end
-    Rails.cache.write(cache_key, value_to_cache)
-    @active_record_types[only_check] = value_to_cache
   end
 
   def allow_wiki_comments

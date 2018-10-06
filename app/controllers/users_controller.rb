@@ -553,13 +553,10 @@ class UsersController < ApplicationController
     end
   end
 
-  DASHBOARD_CARD_TABS = [
-    Course::TAB_DISCUSSIONS, Course::TAB_ASSIGNMENTS,
-    Course::TAB_ANNOUNCEMENTS, Course::TAB_FILES
-  ].freeze
-
   def dashboard_cards
-    dashboard_courses = map_courses_for_menu(@current_user.menu_courses, tabs: DASHBOARD_CARD_TABS)
+    cancel_cache_buster
+
+    dashboard_courses = map_courses_for_menu(@current_user.menu_courses, :include_section_tabs => true)
     Rails.cache.write(['last_known_dashboard_cards_count', @current_user].cache_key, dashboard_courses.count)
     render json: dashboard_courses
   end
