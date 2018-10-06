@@ -131,7 +131,7 @@ module Lti::Messages
     end
 
     def include_names_and_roles_service_claims?
-      (@context.is_a?(Course) || @context.is_a?(Group)) && @tool.names_and_roles_service_enabled?
+      (@context.is_a?(Course) || @context.is_a?(Group)) && @tool.lti_1_3_enabled?
     end
 
     def add_names_and_roles_service_claims!

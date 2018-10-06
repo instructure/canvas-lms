@@ -1401,7 +1401,7 @@ describe ContextExternalTool do
     end
   end
 
-  describe '#names_and_roles_service_enabled?' do
+  describe '#lti_1_3_enabled?' do
 
     context 'when the tool is not configured for LTI 1.3 but the account is' do
       let(:tool) do
@@ -1411,7 +1411,7 @@ describe ContextExternalTool do
       end
 
       it 'returns false' do
-        expect(tool).to_not be_names_and_roles_service_enabled
+        expect(tool).to_not be_lti_1_3_enabled
       end
     end
 
@@ -1424,7 +1424,7 @@ describe ContextExternalTool do
       end
 
       it 'returns false' do
-        expect(tool).to_not be_names_and_roles_service_enabled
+        expect(tool).to_not be_lti_1_3_enabled
       end
     end
 
@@ -1439,7 +1439,7 @@ describe ContextExternalTool do
       end
 
       it 'returns true' do
-        expect(tool).to be_names_and_roles_service_enabled
+        expect(tool).to be_lti_1_3_enabled
       end
     end
   end

@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/concerns/advantage_services_shared_context')
+require File.expand_path(File.dirname(__FILE__) + '/concerns/advantage_services_shared_examples')
 require_dependency "lti/ims/names_and_roles_controller.rb"
 require_dependency "lti/ims/providers/course_memberships_provider.rb"
 require_dependency "lti/ims/providers/group_memberships_provider.rb"
@@ -23,474 +25,10 @@ require_dependency "lti/ims/providers/group_memberships_provider.rb"
 describe Lti::Ims::NamesAndRolesController do
   include Lti::Ims::NamesAndRolesMatchers
 
-  let(:root_account) do
-    enable_1_3(Account.default)
-  end
-  let(:course_account) do
-    root_account
-  end
-  let(:developer_key_account) do
-    root_account
-  end
-  let(:course) { course_factory(active_course: true, account: course_account) }
+  include_context 'advantage services context'
+
   let(:group_record) { group(context: course) } # _record suffix to avoid conflict with group() factory mtd
-
-  let(:developer_key) { DeveloperKey.create!(account: developer_key_account) }
-  let(:access_token_subject) { developer_key.global_id }
-  let(:access_token_scopes) do
-    %w(https://purl.imsglobal.org/spec/lti-ags/scope/lineitem
-       https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly
-       https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly).join(' ')
-  end
-  let(:access_token_signing_key) { Canvas::Security.encryption_key }
-  let(:access_token_jwt_hash) do
-    timestamp = Time.zone.now.to_i
-    {
-      iss: 'https://canvas.instructure.com',
-      sub: access_token_subject,
-      aud: 'https://canvas.instructure.com/login/oauth2/token',
-      iat: timestamp,
-      exp: (timestamp + 1.hour.to_i),
-      nbf: (timestamp - 30),
-      jti: SecureRandom.uuid,
-      scopes: access_token_scopes
-    }
-  end
-  let(:access_token_jwt) do
-    return nil if access_token_jwt_hash.blank?
-    JSON::JWT.new(access_token_jwt_hash).sign(access_token_signing_key, :HS256).to_s
-  end
-
-  let(:tool_context) { root_account }
-  let!(:tool) do
-    ContextExternalTool.create!(
-      context: tool_context,
-      consumer_key: 'key',
-      shared_secret: 'secret',
-      name: 'test tool',
-      url: 'http://www.tool.com/launch',
-      developer_key: developer_key,
-      settings: { use_1_3: true },
-      workflow_state: 'public'
-    )
-  end
-
-  let(:context) { raise 'Override in spec' }
-  let(:context_id) { context.id }
-  let(:unknown_context_id) { raise 'Override in spec' }
   let(:context_param_name) { raise 'Override in spec' }
-  let(:action) { raise 'Override in spec'}
-  let(:params_overrides) { {} }
-  let(:json) { JSON.parse(response.body).with_indifferent_access }
-
-  shared_examples 'mime_type check' do
-    it 'does not return ims mime_type' do
-      expect(response.headers['Content-Type']).not_to include described_class::MIME_TYPE
-    end
-  end
-
-  shared_examples 'common request and response check' do
-    # #around and #before(:context) don't have access to the right scope, #before(:example) runs too late,
-    # so hack our own lifecycle hook
-    let(:before_send_request) { ->{} }
-    before do
-      before_send_request.call
-      send_request
-    end
-
-    it 'returns correct mime_type' do
-      expect(response.headers['Content-Type']).to include described_class::MIME_TYPE
-    end
-
-    it 'returns 200 success' do
-      expect(response).to have_http_status :ok
-    end
-
-    it 'returns request url in payload' do
-      expect(json[:id]).to eq request.url
-    end
-
-    it 'returns an empty members array' do
-      expect_empty_members_array
-    end
-
-    context 'with unknown context' do
-      let(:context_id) { unknown_context_id }
-
-      it_behaves_like 'mime_type check'
-
-      it 'returns 404 not found' do
-        expect(response).to have_http_status :not_found
-      end
-    end
-
-    context 'with no access token' do
-      let(:access_token_jwt_hash) { nil }
-
-      it_behaves_like 'mime_type check'
-
-      it 'returns 401 unauthorized and complains about missing access token' do
-        expect(response).to have_http_status :unauthorized
-        expect(json).to be_nrps_error_response_body('unauthorized', 'Missing Access Token')
-      end
-    end
-
-    context 'with no NRPS V2 scope grant' do
-      let(:access_token_scopes) do
-        super().
-          split(' ').
-          reject { |s| s == 'https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly' }.
-          join(' ')
-      end
-
-      it_behaves_like 'mime_type check'
-
-      it 'returns 401 unauthorized and complains about missing scope' do
-        expect(response).to have_http_status :unauthorized
-        expect(json).to be_nrps_error_response_body('unauthorized', 'NRPS v2 scope not granted')
-      end
-    end
-
-    context 'with inactive developer key' do
-      let(:before_send_request) do
-        -> do
-          developer_key.workflow_state = :inactive
-          developer_key.save!
-        end
-      end
-
-      it_behaves_like 'mime_type check'
-
-      it 'returns 401 unauthorized and complains about missing developer key' do
-        expect(response).to have_http_status :unauthorized
-        expect(json).to be_nrps_error_response_body('unauthorized', 'Unknown or inactive Developer Key')
-      end
-    end
-
-    context 'with deleted developer key' do
-      let(:before_send_request) { -> { developer_key.destroy! } }
-
-      it_behaves_like 'mime_type check'
-
-      it 'returns 401 unauthorized and complains about missing developer key' do
-        expect(response).to have_http_status :unauthorized
-        expect(json).to be_nrps_error_response_body('unauthorized', 'Unknown or inactive Developer Key')
-      end
-    end
-
-    context 'with deleted tool' do
-      let(:before_send_request) { -> { tool.destroy! } }
-
-      it_behaves_like 'mime_type check'
-
-      it 'returns 401 unauthorized and complains about missing tool' do
-        expect(response).to have_http_status :unauthorized
-        expect(json).to be_nrps_error_response_body('unauthorized', 'Access Token not linked to a Tool associated with this Context')
-      end
-    end
-
-    context 'with no tool' do
-      let(:tool) { nil }
-
-      it_behaves_like 'mime_type check'
-
-      it 'returns 401 unauthorized and complains about missing tool' do
-        expect(response).to have_http_status :unauthorized
-        expect(json).to be_nrps_error_response_body('unauthorized', 'Access Token not linked to a Tool associated with this Context')
-      end
-    end
-
-    context 'with disabled LTI 1.3/Advantage account-level features' do
-      # Would also work to just override :root_account, but let's have all the setup run w/ 1.3 enabled in case
-      # that has any side-effects, _then_ suddenly disable features before a NRPS call arrives... as if a customer
-      # had a change of heart after initially turning on LTI/Advantage 1.3 features.
-      let(:before_send_request) { -> { disable_1_3(root_account) } }
-
-      it_behaves_like 'mime_type check'
-
-      it 'returns 401 unauthorized and complains about disabled LTI 1.3/Advantage features' do
-        expect(response).to have_http_status :unauthorized
-        expect(json).to be_nrps_error_response_body('unauthorized', 'LTI 1.3/Advantage features not enabled')
-      end
-    end
-
-    context 'with disabled LTI 1.3/Advantage tool-level features' do
-      # Would also work to just override :root_account, but let's have all the setup run w/ 1.3 enabled in case
-      # that has any side-effects, _then_ suddenly disable features before a NRPS call arrives... as if a customer
-      # had a change of heart after initially turning on LTI/Advantage 1.3 features.
-      let(:before_send_request) { -> { disable_1_3(tool) } }
-
-      it_behaves_like 'mime_type check'
-
-      it 'returns 401 unauthorized and complains about disabled LTI 1.3/Advantage features' do
-        expect(response).to have_http_status :unauthorized
-        expect(json).to be_nrps_error_response_body('unauthorized', 'LTI 1.3/Advantage features not enabled')
-      end
-    end
-
-    context 'with tool and course attached to root account with no sub-accounts' do
-      # the simple happy-path case.... by default :course and :developer_key are attached directly to the smae Account,
-      # which has no subaccounts
-      it 'returns 200 and finds the correct tool' do
-        expect(response).to have_http_status :ok
-        expect(controller.send(:tool)).to eq tool
-      end
-    end
-
-    # want to use let! specifically to set up data that should never be read, so rubocop gets upset
-    # rubocop:disable RSpec/LetSetup
-    context 'with tool attached to root account and course attached to deeply nested sub-account' do
-      # child 1
-      let(:sub_account_1) { root_account.sub_accounts.create!(:name => "sub-account-1") }
-      # child 2
-      let(:sub_account_2) { root_account.sub_accounts.create!(:name => "sub-account-2") }
-      # grand-child of child 1
-      let(:sub_account_1_1) { sub_account_1.sub_accounts.create!(:name => "sub-account-1-1") }
-      # place :course at the very bottom of account hierarchy. tool we care about will be way up at :root_account
-      let(:course_account) { sub_account_1_1 }
-      # place another tool (associated w same developer key) in a separate branch of the account hierarchy to make
-      # sure we're just walking straght up the tree
-      let!(:tool_that_should_not_be_resolved_from_nrps_request) do
-        ContextExternalTool.create!(
-          context: sub_account_2,
-          consumer_key: 'key2',
-          shared_secret: 'secret2',
-          name: 'test tool 2',
-          url: 'http://www.tool2.com/launch',
-          developer_key: developer_key,
-          settings: { use_1_3: true },
-          workflow_state: 'public'
-        )
-      end
-
-      it 'returns 200 and walks up account chain to find the correct tool' do
-        expect(response).to have_http_status :ok
-        expect(controller.send(:tool)).to eq tool
-      end
-    end
-
-    context 'with tool attached to sub-account and course attached to another sub-account thereof' do
-      # child 1
-      let(:sub_account_1) { root_account.sub_accounts.create!(:name => "sub-account-1") }
-      # child 2
-      let(:sub_account_2) { root_account.sub_accounts.create!(:name => "sub-account-2") }
-      # grand-child of child 1
-      let(:sub_account_1_1) { sub_account_1.sub_accounts.create!(:name => "sub-account-1-1") }
-      # place :tool in the middle of the account hierarchy
-      let(:tool_context) { sub_account_1 }
-      # place :course at the very bottom of account hierarchy. tool we care about will be one level up at :sub_account_1
-      let(:course_account) { sub_account_1_1 }
-      # place another tool (associated w same developer key) in a separate branch of the account hierarchy to make
-      # sure we're just walking straght up the tree
-      let!(:tool_that_should_not_be_resolved_from_nrps_request) do
-        ContextExternalTool.create!(
-          context: sub_account_2,
-          consumer_key: 'key2',
-          shared_secret: 'secret2',
-          name: 'test tool 2',
-          url: 'http://www.tool2.com/launch',
-          developer_key: developer_key,
-          settings: { use_1_3: true },
-          workflow_state: 'public'
-        )
-      end
-
-      it 'returns 200 and walks up account chain to find the correct tool' do
-        expect(response).to have_http_status :ok
-        expect(controller.send(:tool)).to eq tool
-      end
-    end
-
-    context 'with tool and course attached to same deeply nested sub-account' do
-      # child 1
-      let(:sub_account_1) { root_account.sub_accounts.create!(:name => "sub-account-1") }
-      # child 2
-      let(:sub_account_2) { root_account.sub_accounts.create!(:name => "sub-account-2") }
-      # grand-child of child 1
-      let(:sub_account_1_1) { sub_account_1.sub_accounts.create!(:name => "sub-account-1-1") }
-      # place :tool iat the very bottom of account hierarchy
-      let(:tool_context) { sub_account_1_1 }
-      # also place :course at the very bottom of account hierarchy. tool we care about is at the same level
-      let(:course_account) { sub_account_1_1 }
-      # place another tool (associated w same developer key) one level higher in the account hierarchy to make
-      # sure we're just walking the tree bottom-up
-      let!(:tool_that_should_not_be_resolved_from_nrps_request) do
-        ContextExternalTool.create!(
-          context: sub_account_1,
-          consumer_key: 'key2',
-          shared_secret: 'secret2',
-          name: 'test tool 2',
-          url: 'http://www.tool2.com/launch',
-          developer_key: developer_key,
-          settings: { use_1_3: true },
-          workflow_state: 'public'
-        )
-      end
-
-      it 'returns 200 and finds the tool in the same sub-sub-account as the course' do
-        expect(response).to have_http_status :ok
-        expect(controller.send(:tool)).to eq tool
-      end
-    end
-
-    # reversal of 'with tool attached to sub-account and course attached to another sub-account thereof'. should result
-    # in a tool lookup miss (:tool is "lower" than :course in account hierarchy)
-    context 'with course attached to sub-account and tool attached to another sub-account thereof' do
-      # child 1
-      let(:sub_account_1) { root_account.sub_accounts.create!(:name => "sub-account-1") }
-      # child 2
-      let(:sub_account_2) { root_account.sub_accounts.create!(:name => "sub-account-2") }
-      # grand-child of child 1
-      let(:sub_account_1_1) { sub_account_1.sub_accounts.create!(:name => "sub-account-1-1") }
-      # place :course in the middle of the account hierarchy. tool we care about will be one level down at sub_account_1_1
-      let(:course_account) { sub_account_1 }
-      # place :tool at the very bottom of account hierarchy. course care about will be one level up at :sub_account_1
-      let(:tool_context) { sub_account_1_1 }
-      # place another tool (associated w same developer key) in a separate branch of the account hierarchy to make
-      # sure we're just walking straght up the tree
-      let!(:tool_that_should_not_be_resolved_from_nrps_request) do
-        ContextExternalTool.create!(
-          context: sub_account_2,
-          consumer_key: 'key2',
-          shared_secret: 'secret2',
-          name: 'test tool 2',
-          url: 'http://www.tool2.com/launch',
-          developer_key: developer_key,
-          settings: { use_1_3: true },
-          workflow_state: 'public'
-        )
-      end
-
-      it_behaves_like 'mime_type check'
-
-      it 'returns 401 unauthorized and complains about missing tool' do
-        expect(response).to have_http_status :unauthorized
-        expect(json).to be_nrps_error_response_body('unauthorized', 'Access Token not linked to a Tool associated with this Context')
-      end
-    end
-
-    # another negative test, this time where :course and :tool are in completely disjoint account hierarchy branches
-    context 'with course attached to sub-account and tool attached to another sub-account thereof' do
-      # child 1
-      let(:sub_account_1) { root_account.sub_accounts.create!(:name => "sub-account-1") }
-      # child 2
-      let(:sub_account_2) { root_account.sub_accounts.create!(:name => "sub-account-2") }
-      # place :course in one account hierarchy branch
-      let(:course_account) { sub_account_1 }
-      # place :tool in the other account hierarchy branch
-      let(:tool_context) { sub_account_2 }
-      # place another tool (associated w same developer key) in a separate branch of the account hierarchy to make
-      # sure we're just walking straght up the tree
-      let!(:tool_that_should_not_be_resolved_from_nrps_request) do
-        ContextExternalTool.create!(
-          context: sub_account_2,
-          consumer_key: 'key2',
-          shared_secret: 'secret2',
-          name: 'test tool 2',
-          url: 'http://www.tool2.com/launch',
-          developer_key: developer_key,
-          settings: { use_1_3: true },
-          workflow_state: 'public'
-        )
-      end
-
-      it_behaves_like 'mime_type check'
-
-      it 'returns 401 unauthorized and complains about missing tool' do
-        expect(response).to have_http_status :unauthorized
-        expect(json).to be_nrps_error_response_body('unauthorized', 'Access Token not linked to a Tool associated with this Context')
-      end
-    end
-
-    context 'with tool attached directly to a course' do
-      # place :tool in the other account hierarchy branch
-      let(:tool_context) { course }
-      # place another tool (associated w same developer key) in the same account that owns the course... tool search
-      # should find the course-scoped tool instead
-      let!(:tool_that_should_not_be_resolved_from_nrps_request) do
-        ContextExternalTool.create!(
-          context: course_account,
-          consumer_key: 'key2',
-          shared_secret: 'secret2',
-          name: 'test tool 2',
-          url: 'http://www.tool2.com/launch',
-          developer_key: developer_key,
-          settings: { use_1_3: true },
-          workflow_state: 'public'
-        )
-      end
-
-      it 'returns 200 and finds the tool attached directly to the course, ignoring the account-level tool' do
-        expect(response).to have_http_status :ok
-        expect(controller.send(:tool)).to eq tool
-      end
-    end
-    # rubocop:enable RSpec/LetSetup
-
-    it_behaves_like 'extra developer key and account tool check'
-    it_behaves_like 'extra developer key and course tool check'
-
-  end
-
-  shared_examples 'extra developer key and account tool check' do
-    let(:extra_tool_context) { course_account }
-
-    it_behaves_like 'extra developer key and tool check'
-  end
-
-  shared_examples 'extra developer key and course tool check' do
-    let(:extra_tool_context) { course }
-
-    it_behaves_like 'extra developer key and tool check'
-  end
-
-  shared_examples 'extra developer key and tool check' do
-    # When including, define the following:
-    #   extra_tool_context: context into which to place a Tool associated with the "extra" developer key
-
-    context 'a account chain-reachable tool is associated with a different developer key' do
-      let(:developer_key_that_should_not_be_resolved_from_nrps_request) { DeveloperKey.create!(account: developer_key_account) }
-      let(:tool_that_should_not_be_resolved_from_nrps_request) do
-        ContextExternalTool.create!(
-          context: extra_tool_context,
-          consumer_key: 'key2',
-          shared_secret: 'secret2',
-          name: 'test tool 2',
-          url: 'http://www.tool2.com/launch',
-          developer_key: developer_key_that_should_not_be_resolved_from_nrps_request,
-          settings: { use_1_3: true },
-          workflow_state: 'public'
-        )
-      end
-
-      it 'returns 200 and finds the tool associated with the access token\'s developer key, ignoring other the other developer key and its tool' do
-        expect(response).to have_http_status :ok
-        expect(controller.send(:tool)).to eq tool
-      end
-
-      context 'and that developer key is the only developer key' do
-        let(:before_send_request) { -> { developer_key.destroy! } }
-
-        it_behaves_like 'mime_type check'
-
-        it 'returns 401 unauthorized and complains about missing developer key' do
-          expect(response).to have_http_status :unauthorized
-          expect(json).to be_nrps_error_response_body('unauthorized', 'Unknown or inactive Developer Key')
-        end
-      end
-
-      context 'and that tool is the only tool' do
-        let(:before_send_request) { -> { tool.destroy! } }
-
-        it_behaves_like 'mime_type check'
-
-        it 'returns 401 unauthorized and complains about missing tool' do
-          expect(response).to have_http_status :unauthorized
-          expect(json).to be_nrps_error_response_body('unauthorized', 'Access Token not linked to a Tool associated with this Context')
-        end
-      end
-    end
-  end
 
   shared_examples 'page size check' do
     # Needs all the same variables as 'multiple enrollments check', plus:
@@ -591,7 +129,7 @@ describe Lti::Ims::NamesAndRolesController do
     let(:context_param_name) { :course_id }
     let(:unknown_context_id) { course && Course.maximum(:id) + 1 }
 
-    it_behaves_like 'common request and response check'
+    it_behaves_like 'advantage services'
 
     # Bunch of single-enrollment tests b/c they're just so much easier to
     # debug as compared to multi-enrollment tests
@@ -870,7 +408,7 @@ describe Lti::Ims::NamesAndRolesController do
     let(:context_param_name) { :group_id }
     let(:unknown_context_id) { group_record && Group.maximum(:id) + 1 }
 
-    it_behaves_like 'common request and response check'
+    it_behaves_like 'advantage services'
 
     context 'when a group has a single membership' do
       let(:group_record) { group_with_user(active_all: true).group }
@@ -1009,9 +547,12 @@ describe Lti::Ims::NamesAndRolesController do
     end
   end
 
-  def send_request
-    request.headers['Authorization'] = "Bearer #{access_token_jwt}" if access_token_jwt
+  def send_http
     get action, params: { context_param_name => context_id }.merge(params_overrides)
+  end
+
+  def expect_empty_response
+    expect_empty_members_array
   end
 
   def expect_single_member(*enrollment)
@@ -1088,25 +629,10 @@ describe Lti::Ims::NamesAndRolesController do
     response.headers["Link"].split(",")
   end
 
-  def enable_1_3(enableable)
-    if enableable.is_a?(ContextExternalTool)
-      enableable.use_1_3 = true
-    elsif enableable.is_a?(Account)
-      enableable.enable_feature!(:lti_1_3)
-    else raise "LTI 1.3/Advantage features not relevant for #{enableable.class}"
-    end
-    enableable.save!
-    enableable
-  end
-
-  def disable_1_3(enableable)
-    if enableable.is_a?(ContextExternalTool)
-      enableable.use_1_3 = false
-    elsif enableable.is_a?(Account)
-      enableable.disable_feature!(:lti_1_3)
-    else raise "LTI 1.3/Advantage features not relevant for #{enableable.class}"
-    end
-    enableable.save!
-    enableable
+  def remove_access_token_scope(default_scopes)
+    default_scopes.
+      split(' ').
+      reject { |s| s == 'https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly' }.
+      join(' ')
   end
 end

@@ -112,7 +112,7 @@ module Lti::Ims::NamesAndRolesMatchers
     attr_reader :actual, :expected
   end
 
-  RSpec::Matchers.define :be_nrps_error_response_body do |expected_type, expected_message|
+  RSpec::Matchers.define :be_lti_advantage_error_response_body do |expected_type, expected_message|
     match do |actual|
       @expected = {
         'errors' => {

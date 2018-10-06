@@ -60,10 +60,6 @@ module Lti
         raise InvalidTokenError, e
       end
 
-      def claim(name)
-        decoded_jwt[name]
-      end
-
       def to_s
         jwt
       end
