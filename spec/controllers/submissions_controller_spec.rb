@@ -818,7 +818,7 @@ describe SubmissionsController do
     it "returns the assignment audit events" do
       get :audit_events, params: params, format: :json
       assignment_audit_events = json_parse(response.body).fetch("audit_events").select do |event|
-        event.fetch("anonymous_or_moderation_event").fetch("event_type").include?("assignment_")
+        event.fetch("event_type").include?("assignment_")
       end
       expect(assignment_audit_events.count).to be 1
     end
@@ -826,7 +826,7 @@ describe SubmissionsController do
     it "returns the submission audit events" do
       get :audit_events, params: params, format: :json
       submission_audit_events = json_parse(response.body).fetch("audit_events").select do |event|
-        event.fetch("anonymous_or_moderation_event").fetch("event_type").include?("submission_")
+        event.fetch("event_type").include?("submission_")
       end
       expect(submission_audit_events.count).to be 2
     end
@@ -834,7 +834,7 @@ describe SubmissionsController do
     it "returns the audit events in order of created at" do
       get :audit_events, params: params, format: :json
       audit_event_ids = json_parse(response.body).fetch("audit_events").map do |event|
-        event.fetch("anonymous_or_moderation_event").fetch("id")
+        event.fetch("id")
       end
       expect(audit_event_ids).to eql audit_event_ids.sort
     end

@@ -295,7 +295,7 @@ class SubmissionsController < SubmissionsBaseController
     )
 
     respond_to do |format|
-      format.json { render json: { audit_events: audit_events }, status: :ok }
+      format.json { render json: { audit_events: audit_events.as_json(include_root: false) }, status: :ok }
     end
   end
 
