@@ -20,11 +20,25 @@ require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe CourseForMenuPresenter do
   let_once(:course) { course_model }
-  let_once(:user) { user_model }
-  let(:dashboard_card_tabs) { UsersController::DASHBOARD_CARD_TABS }
-
+  let_once(:available_section_tabs) do
+    Course.default_tabs.select do |tab|
+      [ Course::TAB_ASSIGNMENTS, Course::TAB_HOME ].include?(tab[:id])
+    end
+  end
   let_once(:presenter) do
-    CourseForMenuPresenter.new(course, user, nil, nil, {tabs: dashboard_card_tabs})
+    CourseForMenuPresenter.new(
+      course, available_section_tabs
+    )
+  end
+
+  describe '#initialize' do
+    it 'should limit available_section_tabs to be those for dashboard' do
+      available_section_tab_ids = presenter.available_section_tabs.map do |tab|
+        tab[:id]
+      end
+      expect(available_section_tab_ids).to include(Course::TAB_ASSIGNMENTS)
+      expect(available_section_tab_ids).not_to include(Course::TAB_HOME)
+    end
   end
 
   describe '#to_h' do
@@ -32,40 +46,15 @@ describe CourseForMenuPresenter do
       expect(presenter.to_h).to be_a Hash
     end
 
-    it 'shouldnt include tab links to unenrolled users' do
-      expect(presenter.to_h[:links]).to be_empty
-    end
-
-    it 'should show all the tab links to a teacher' do
-      course.enroll_teacher(user).accept
-      course.assignments.create!
-      course.discussion_topics.create!
-      course.announcements.create! title: 'hear ye!', message: 'wat'
-      course.attachments.create! filename: 'blah', uploaded_data: StringIO.new('blah')
-
-      expect(presenter.to_h[:links]).to match_array([
-        a_hash_including({css_class: "announcements", icon: "icon-announcement", label: "Announcements"}),
-        a_hash_including({css_class: "discussions", icon: "icon-discussion", label: "Discussions"}),
-        a_hash_including({css_class: "assignments", icon: "icon-assignment", label: "Assignments"}),
-        a_hash_including({css_class: "files", icon: "icon-folder", label: "Files"})
-      ])
-    end
-
-    it 'should only show the tabs a student has access to to students' do
-      course.enroll_student(user).accept
-      course.assignments.create!
-      course.attachments.create! filename: 'blah', uploaded_data: StringIO.new('blah')
-
-      expect(presenter.to_h[:links]).to match_array([
-        a_hash_including({css_class: "assignments", icon: "icon-assignment", label: "Assignments"}),
-        a_hash_including({css_class: "files", icon: "icon-folder", label: "Files"})
-      ])
+    it 'should include available_section_tabs as link element of hash' do
+      expect(presenter.to_h[:links].length).to eq presenter.available_section_tabs.length
     end
 
     it 'returns the course nickname if one is set' do
+      user = user_model
       user.course_nicknames[course.id] = 'nickname'
       user.save!
-      cs_presenter = CourseForMenuPresenter.new(course, user)
+      cs_presenter = CourseForMenuPresenter.new(course, nil, user)
       h = cs_presenter.to_h
       expect(h[:originalName]).to eq course.name
       expect(h[:shortName]).to eq 'nickname'
@@ -78,15 +67,17 @@ describe CourseForMenuPresenter do
       end
 
       it 'returns a position if one is set' do
+        user = user_model
         user.dashboard_positions[course.asset_string] = 3
         user.save!
-        cs_presenter = CourseForMenuPresenter.new(course, user, @account)
+        cs_presenter = CourseForMenuPresenter.new(course, nil, user, @account)
         h = cs_presenter.to_h
         expect(h[:position]).to eq 3
       end
 
       it 'returns nil when no position is set' do
-        cs_presenter = CourseForMenuPresenter.new(course, user, @account)
+        user = user_model
+        cs_presenter = CourseForMenuPresenter.new(course, nil, user, @account)
         h = cs_presenter.to_h
         expect(h[:position]).to eq nil
       end
@@ -106,7 +97,7 @@ describe CourseForMenuPresenter do
         @cs_course = account.courses.create!
         @cs_course.primary_enrollment_role_id = @role.local_id
       end
-      cs_presenter = CourseForMenuPresenter.new(@cs_course)
+      cs_presenter = CourseForMenuPresenter.new(@cs_course, available_section_tabs)
       expect(cs_presenter.send(:role)).to eq @role
     end
   end
