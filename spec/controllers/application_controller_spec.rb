@@ -356,22 +356,6 @@ RSpec.describe ApplicationController do
     end
   end
 
-  describe 'log_participation' do
-    it "should find file's context instead of user" do
-      course_model
-      student_in_course
-      attachment_model(context: @course)
-      controller.instance_variable_set(:@domain_root_account, Account.default)
-      controller.instance_variable_set(:@context, @student)
-      controller.instance_variable_set(:@accessed_asset, {level: 'participate', code: @attachment.asset_string, category: 'files'})
-      allow(controller).to receive(:named_context_url).with(@attachment, :context_url).and_return("/files/#{@attachment.id}")
-      allow(controller).to receive(:params).and_return({file_id: @attachment.id, id: @attachment.id})
-      allow(controller.request).to receive(:path).and_return("/files/#{@attachment.id}")
-      controller.send(:log_participation, @student)
-      expect(AssetUserAccess.where(user: @student, asset_code: @attachment.asset_string).take.context).to eq @course
-    end
-  end
-
   describe 'rescue_action_in_public' do
     context 'sharding' do
       require_relative '../sharding_spec_helper'
