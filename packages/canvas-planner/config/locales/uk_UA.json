@@ -2,6 +2,9 @@
   "add_to_do_7def3c37": {
     "message": "Додайте до плану роботи"
   },
+  "address_3159962f": {
+    "message": "Адреса:"
+  },
   "all_day_fb42c4fc": {
     "message": "Весь день"
   },
@@ -53,6 +56,9 @@
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Початок вашої історії завдань"
   },
+  "calendar_a8563bb2": {
+    "message": "Календар:"
+  },
   "calendar_event_89aadc1c": {
     "message": "Календарна подія"
   },
@@ -94,6 +100,9 @@
   },
   "details_98a31b68": {
     "message": "Подробиці"
+  },
+  "details_a6f427c3": {
+    "message": "Подробиці:"
   },
   "discussion_6719c51d": {
     "message": "Обговорення"
@@ -190,6 +199,9 @@
   },
   "loading_planner_items_947a813d": {
     "message": "Завантаження елементів планувальника"
+  },
+  "location_3b6ff307": {
+    "message": "Місцезнаходження:"
   },
   "looks_like_there_isn_t_anything_here_d9bcef49": {
     "message": "Виглядає наче тут нічого немає"

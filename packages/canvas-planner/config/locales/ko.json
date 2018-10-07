@@ -5,6 +5,9 @@
   "assignment_976578a8": {
     "message": "과제"
   },
+  "calendar_a8563bb2": {
+    "message": "달력:"
+  },
   "calendar_event_89aadc1c": {
     "message": "행사"
   },
@@ -23,6 +26,9 @@
   "details_98a31b68": {
     "message": "세부 정보"
   },
+  "details_a6f427c3": {
+    "message": "세부 정보:"
+  },
   "discussion_6719c51d": {
     "message": "토론"
   },
@@ -40,6 +46,9 @@
   },
   "loading_25990131": {
     "message": "로드하는 중..."
+  },
+  "location_3b6ff307": {
+    "message": "위치:"
   },
   "new_13daf639": {
     "message": "새 항목"

@@ -2,6 +2,9 @@
   "add_to_do_7def3c37": {
     "message": "Legg til gjeremål"
   },
+  "address_3159962f": {
+    "message": "Adresse:"
+  },
   "all_day_fb42c4fc": {
     "message": "Heile dagen"
   },
@@ -53,6 +56,9 @@
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Starten på gjeremålshistorikken din"
   },
+  "calendar_a8563bb2": {
+    "message": "Kalender:"
+  },
   "calendar_event_89aadc1c": {
     "message": "Kalenderhending"
   },
@@ -94,6 +100,9 @@
   },
   "details_98a31b68": {
     "message": "Detaljar"
+  },
+  "details_a6f427c3": {
+    "message": "Detaljar:"
   },
   "discussion_6719c51d": {
     "message": "Diskusjon"
@@ -190,6 +199,9 @@
   },
   "loading_planner_items_947a813d": {
     "message": "Lastar planelement"
+  },
+  "location_3b6ff307": {
+    "message": "Plassering:"
   },
   "looks_like_there_isn_t_anything_here_d9bcef49": {
     "message": "Ser ikkje ut som om det finns noko her"

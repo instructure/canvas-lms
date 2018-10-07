@@ -1,4 +1,7 @@
 {
+  "address_3159962f": {
+    "message": "نشانی:"
+  },
   "all_day_fb42c4fc": {
     "message": "تمام روز"
   },
@@ -7,6 +10,9 @@
   },
   "assignment_976578a8": {
     "message": "تکلیف"
+  },
+  "calendar_a8563bb2": {
+    "message": "تقویم:"
   },
   "calendar_event_89aadc1c": {
     "message": "رویداد تقویم"
@@ -25,6 +31,9 @@
   },
   "details_98a31b68": {
     "message": "اطلاعات"
+  },
+  "details_a6f427c3": {
+    "message": "جزئیات:"
   },
   "discussion_6719c51d": {
     "message": "بحث"
@@ -52,6 +61,9 @@
   },
   "loading_725811ca": {
     "message": "در حال بارگذاری"
+  },
+  "location_3b6ff307": {
+    "message": "مکان:"
   },
   "missing_1a256b3b": {
     "message": "جا افتاده"
