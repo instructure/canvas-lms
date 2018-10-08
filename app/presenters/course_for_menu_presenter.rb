@@ -19,20 +19,14 @@ class CourseForMenuPresenter
   include I18nUtilities
   include Rails.application.routes.url_helpers
 
-  DASHBOARD_CARD_TABS = [
-    Course::TAB_DISCUSSIONS, Course::TAB_ASSIGNMENTS,
-    Course::TAB_ANNOUNCEMENTS, Course::TAB_FILES
-  ].freeze
-
-  def initialize(course, available_section_tabs, user = nil, context = nil)
+  def initialize(course, user = nil, context = nil, session = nil, opts={})
     @course = course
     @user = user
     @context = context
-    @available_section_tabs = (available_section_tabs || []).select do |tab|
-      DASHBOARD_CARD_TABS.include?(tab[:id])
-    end
+    @session = session
+    @opts = opts
   end
-  attr_reader :course, :available_section_tabs
+  attr_reader :course
 
   def to_h
     {
@@ -47,13 +41,25 @@ class CourseForMenuPresenter
       enrollmentType: course.primary_enrollment_type,
       id: course.id,
       image: course.feature_enabled?(:course_card_images) ? course.image : nil,
-      position: (@context && @context.feature_enabled?(:dashcard_reordering)) ? @user.dashboard_positions[course.asset_string] : nil,
-      links: available_section_tabs.map do |tab|
-        presenter = SectionTabPresenter.new(tab, course)
-        presenter.to_h
+      position: @context&.feature_enabled?(:dashcard_reordering) ? @user.dashboard_positions[course.asset_string] : nil,
+    }.tap do |hash|
+      if @opts[:tabs]
+        tabs = course.tabs_available(@user, {
+          session: @session,
+          only_check: @opts[:tabs],
+          precalculated_permissions: {
+            # we can assume they can read the course at this point
+            read: true,
+          },
+          include_external: false,
+          include_hidden_unused: false,
+        })
+        hash[:links] = tabs.map do |tab|
+          presenter = SectionTabPresenter.new(tab, course)
+          presenter.to_h
+        end
       end
-
-    }
+    end
   end
 
   private

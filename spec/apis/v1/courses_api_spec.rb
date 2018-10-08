@@ -590,7 +590,13 @@ describe CoursesController, type: :request do
     c1 = course_with_student(course_name: 'def', active_all: true).course
 
     json = api_call(:get, "/api/v1/courses.json?include[]=tabs", controller: 'courses', action: 'index', format: 'json', include: ['tabs'])
-    expect(json.first['tabs']).to be_present
+    expect(json.first['tabs']).to match_array([
+      a_hash_including({"id" => "home"}),
+      a_hash_including({"id" => "discussions"}),
+      a_hash_including({"id" => "grades"}),
+      a_hash_including({"id" => "people"}),
+      a_hash_including({"id" => "syllabus"}),
+    ])
   end
 
   describe "user index" do
