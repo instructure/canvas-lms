@@ -18,9 +18,8 @@
 
 class PlannerOverride < ActiveRecord::Base
   include Workflow
-  include ::PlannerHelper
 
-  CONTENT_TYPES = PLANNABLE_TYPES.values
+  CONTENT_TYPES = PlannerHelper::PLANNABLE_TYPES.values
 
   before_validation :link_to_parent_topic, :link_to_submittable
 
@@ -58,13 +57,13 @@ class PlannerOverride < ActiveRecord::Base
     return unless self.plannable_type == 'Assignment'
     plannable = Assignment.find_by(id: self.plannable_id)
     if plannable&.quiz?
-      self.plannable_type = PLANNABLE_TYPES['quiz']
+      self.plannable_type = PlannerHelper::PLANNABLE_TYPES['quiz']
       self.plannable_id = plannable.quiz.id
     elsif plannable&.discussion_topic?
-      self.plannable_type = PLANNABLE_TYPES['discussion_topic']
+      self.plannable_type = PlannerHelper::PLANNABLE_TYPES['discussion_topic']
       self.plannable_id = plannable.discussion_topic.id
     elsif plannable&.wiki_page?
-      self.plannable_type = PLANNABLE_TYPES['wiki_page']
+      self.plannable_type = PlannerHelper::PLANNABLE_TYPES['wiki_page']
       self.plannable_id = plannable.wiki_page.id
     end
   end
