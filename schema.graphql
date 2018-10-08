@@ -747,6 +747,18 @@ type PageViewAnalysis {
 type Query {
   # All courses viewable by the current user
   allCourses: [Course!]
+  assignment(
+    # a graphql or legacy id
+    id: ID!
+  ): Assignment
+  assignmentGroup(
+    # a graphql or legacy id
+    id: ID!
+  ): AssignmentGroup
+  course(
+    # a graphql or legacy id
+    id: ID!
+  ): Course
 
   # Fetches an object given its type and legacy ID
   legacyNode(_id: ID!, type: NodeType!): Node

@@ -33,11 +33,21 @@ describe Types::CourseType do
     expect(course_type.resolve("name")).to eq course.name
   end
 
-  it "needs read permission" do
-    course_with_student
-    @course2, @student2 = @course, @student
+  context "top-level permissions" do
+    it "needs read permission" do
+      course_with_student
+      @course2, @student2 = @course, @student
 
-    expect(course_type.resolve("_id", current_user: @student2)).to be_nil
+      # node / legacy node
+      expect(course_type.resolve("_id", current_user: @student2)).to be_nil
+
+      # course
+      expect(
+        CanvasSchema.execute(<<~GQL, context: {current_user: @student2}).dig("data", "course")
+          query { course(id: "#{course.id.to_s}") { id } }
+        GQL
+      ).to be_nil
+    end
   end
 
   describe "assignmentsConnection" do

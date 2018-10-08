@@ -31,6 +31,30 @@ module Types
       GraphQLNodeLoader.load(type, _id, context)
     end
 
+    field :course, Types::CourseType, null: true do
+      argument :id, ID, "a graphql or legacy id", required: true,
+        prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
+    end
+    def course(id:)
+      GraphQLNodeLoader.load("Course", id, context)
+    end
+
+    field :assignment, Types::AssignmentType, null: true do
+      argument :id, ID, "a graphql or legacy id", required: true,
+        prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
+    end
+    def assignment(id:)
+      GraphQLNodeLoader.load("Assignment", id, context)
+    end
+
+    field :assignment_group, Types::AssignmentGroupType, null: true do
+      argument :id, ID, "a graphql or legacy id", required: true,
+        prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
+    end
+    def assignment_group(id:)
+      GraphQLNodeLoader.load("AssignmentGroup", id, context)
+    end
+
     field :all_courses, [CourseType],
       "All courses viewable by the current user",
       null: true
