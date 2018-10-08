@@ -61,6 +61,10 @@ module PlannerPageObject
     "span:contains('Reminder:')"
   end
 
+  def new_activity_button_selector
+    "button:contains('New Activity')"
+  end
+
   #------------------------- Elements --------------------------
 
   def peer_review_item(course_name)
@@ -69,6 +73,10 @@ module PlannerPageObject
 
   def planner_app_div
     f('.PlannerApp')
+  end
+
+  def planner_header_container
+    f("#dashboard_header_container")
   end
 
   def select_dashboard_view_menuitem
@@ -84,7 +92,7 @@ module PlannerPageObject
   end
 
   def items_displayed
-    ff('li', planner_app_div)
+    ff('li .planner-item', planner_app_div)
   end
 
   def title_input(title = nil)
@@ -190,6 +198,10 @@ module PlannerPageObject
 
   def list_view_planner_items
     ff('div.planner-item')
+  end
+
+  def planner_item_status_checkbox(object_type, object_name)
+    fj("div label:contains('#{object_type} #{object_name} is not marked as done.')")
   end
 
   #----------------------- Actions & Methods -------------------------

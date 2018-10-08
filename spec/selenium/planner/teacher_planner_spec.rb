@@ -40,13 +40,13 @@ describe "teacher planner" do
       user_session(@teacher)
     end
 
-    it "displays todo items in the card view dashboard" do
+    it "displays todo items in the card view dashboard", priority: "1", test_id: 216397 do
       go_to_dashcard_view
 
       expect(card_view_todo_items.first).to contain_jqcss("a:contains('Grade #{@assignment1.name}')")
     end
 
-    it "displays todo items in course homepage" do
+    it "displays todo items in course homepage", priority: "1", test_id: 216397 do
       get "/courses/#{@course.id}"
 
       expect(card_view_todo_items.first).to contain_jqcss("a:contains('Grade #{@assignment1.name}')")
