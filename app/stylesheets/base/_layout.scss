@@ -30,15 +30,25 @@ body {
     min-width: 768px;
   }
 
+  &.ic-Login-Body {
+    .ic-app-nav-toggle-and-crumbs { display: none; }
+  }
+
   &.no-headers, &.embedded {
-    #header { transform: translateX(-200px); }
-    .ic-app-nav-toggle-and-crumbs { transform: translateY(-53px); }
+
+    .ic-app-header { width: 60px; }
+    .ReactTray__Content { left: 60px; }
+    .menu-item__text { display: none; }
+
     #footer { display: none; }
   }
 
   &.no-headers.distraction-free {
-    #header { transform: translateX(-200px); }
-  }
+
+    .ic-app-header { width: 60px; }
+    .ReactTray__Content { left: 60px; }
+    .menu-item__text { display: none; }
+}
 
   &.embedded {
     #application {

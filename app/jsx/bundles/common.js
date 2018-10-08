@@ -163,8 +163,6 @@ $(document).ready(() => {
     $('body').toggleClass('no-headers distraction-free');
     $('#distraction-free-toggle-icon-state').toggleClass('icon-arrow-open-right');
   }
+
   $('body').fadeIn(500)
-
-
-
 })
