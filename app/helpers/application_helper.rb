@@ -562,24 +562,6 @@ module ApplicationHelper
     super
   end
 
-  def map_courses_for_menu(courses, opts={})
-    precalculated_tab_permissions = opts[:include_section_tabs] && @current_user &&
-      Rails.cache.fetch(['precalculated_permissions_for_menu', @current_user, collection_cache_key(courses)]) do
-        @current_user.precalculate_permissions_for_courses(courses, SectionTabHelper::PERMISSIONS_TO_PRECALCULATE)
-      end
-    mapped = courses.map do |course|
-      tabs = opts[:include_section_tabs] && available_section_tabs(course, precalculated_tab_permissions&.dig(course.global_id))
-      presenter = CourseForMenuPresenter.new(course, tabs, @current_user, @domain_root_account)
-      presenter.to_h
-    end
-
-    if @domain_root_account.feature_enabled?(:dashcard_reordering)
-      mapped = mapped.sort_by {|h| h[:position] || ::CanvasSort::Last}
-    end
-
-    mapped
-  end
-
   # return enough group data for the planner to display items associated with groups
   def map_groups_for_planner(groups)
     mapped = groups.map do |g|
