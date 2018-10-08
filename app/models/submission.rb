@@ -24,7 +24,7 @@ class Submission < ActiveRecord::Base
   include CustomValidations
   include SendToStream
   include Workflow
-  include PlannerHelper
+  include ::PlannerHelper
 
   GRADE_STATUS_MESSAGES_MAP = {
     success: {

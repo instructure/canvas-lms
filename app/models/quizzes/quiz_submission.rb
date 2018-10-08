@@ -22,7 +22,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   self.table_name = 'quiz_submissions'
 
   include Workflow
-  include PlannerHelper
+  include ::PlannerHelper
 
   attr_readonly :quiz_id, :user_id
   attr_accessor :grader_id

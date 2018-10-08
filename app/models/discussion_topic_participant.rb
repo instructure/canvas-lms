@@ -18,7 +18,7 @@
 
 class DiscussionTopicParticipant < ActiveRecord::Base
   include Workflow
-  include PlannerHelper
+  include ::PlannerHelper
 
   belongs_to :discussion_topic
   belongs_to :user

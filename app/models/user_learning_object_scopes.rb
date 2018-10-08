@@ -17,7 +17,7 @@
 #
 
 module UserLearningObjectScopes
-  include PlannerHelper
+  include ::PlannerHelper
 
   ULOS_DEFAULT_LIMIT = 15
 

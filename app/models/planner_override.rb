@@ -18,7 +18,7 @@
 
 class PlannerOverride < ActiveRecord::Base
   include Workflow
-  include PlannerHelper
+  include ::PlannerHelper
 
   CONTENT_TYPES = PLANNABLE_TYPES.values
 

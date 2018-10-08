@@ -18,7 +18,7 @@
 
 module Api::V1::PlannerOverride
   include Api::V1::Json
-  include PlannerHelper
+  include ::PlannerHelper
 
   def planner_override_json(override, user, session, type=nil)
     return if override.blank?

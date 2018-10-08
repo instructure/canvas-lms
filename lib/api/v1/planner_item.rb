@@ -27,7 +27,7 @@ module Api::V1::PlannerItem
   include Api::V1::CalendarEvent
   include Api::V1::PlannerNote
   include Api::V1::AssessmentRequest
-  include PlannerHelper
+  include ::PlannerHelper
 
   API_PLANNABLE_FIELDS = [:id, :title, :course_id, :location_name, :todo_date, :details, :url, :unread_count,
                           :read_state, :created_at, :updated_at].freeze
