@@ -71,7 +71,7 @@ class CompiledReferencePlugin {
         if (
           requestString.startsWith('.') &&
           path.join(input.context, input.request).includes('app/coffeescripts') &&
-          !/\.coffee$/.test(requestString)
+          !/\.coffee$/.test(requestString) && !/\.js$/.test(requestString)
         ) {
           // this is a relative require to  a compiled coffeescript (or hbs) file
           result.request = addExt(requestString, input.context)

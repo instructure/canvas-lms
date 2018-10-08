@@ -1,78 +1,86 @@
-#
-# Copyright (C) 2011 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// Copyright (C) 2011 - present Instructure, Inc.
+//
+// This file is part of Canvas.
+//
+// Canvas is free software: you can redistribute it and/or modify it under
+// the terms of the GNU Affero General Public License as published by the Free
+// Software Foundation, version 3 of the License.
+//
+// Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+// details.
+//
+// You should have received a copy of the GNU Affero General Public License along
+// with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require [
-  'jquery'
-  'underscore'
-  'Backbone'
-  'react'
-  'react-dom'
-  '../userSettings'
-  '../collections/OutcomeSummaryCollection'
-  '../views/grade_summary/OutcomeSummaryView'
-  '../views/grade_summary/IndividualStudentView'
-  'jsx/grading/GradeSummary'
-  'jqueryui/tabs'
-  'jquery.disableWhileLoading'
-], ($, _, Backbone, React, ReactDOM, userSettings, OutcomeSummaryCollection,
-  OutcomeSummaryView, IndividualStudentView, GradeSummary) ->
-  # Ensure the gradebook summary code has had a chance to setup all its handlers
-  GradeSummary.setup()
+import $ from 'jquery'
+import Backbone from 'Backbone'
+import userSettings from '../userSettings'
+import OutcomeSummaryCollection from '../collections/OutcomeSummaryCollection'
+import OutcomeSummaryView from '../views/grade_summary/OutcomeSummaryView'
+import IndividualStudentView from '../views/grade_summary/IndividualStudentView'
+import GradeSummary from 'jsx/grading/GradeSummary'
+import 'jqueryui/tabs'
+import 'jquery.disableWhileLoading'
 
-  class GradebookSummaryRouter extends Backbone.Router
-    routes:
-      '': 'tab'
+// Ensure the gradebook summary code has had a chance to setup all its handlers
+GradeSummary.setup()
+
+class GradebookSummaryRouter extends Backbone.Router {
+  static initClass() {
+    this.prototype.routes = {
+      '': 'tab',
       'tab-:route(/*path)': 'tab'
+    }
+  }
 
-    initialize: ->
-      return unless ENV.student_outcome_gradebook_enabled
-      $('#content').tabs(activate: @activate)
+  initialize() {
+    if (!ENV.student_outcome_gradebook_enabled) return
+    $('#content').tabs({activate: this.activate})
 
-      course_id = ENV.context_asset_string.replace('course_', '')
-      user_id = ENV.student_id
+    const course_id = ENV.context_asset_string.replace('course_', '')
+    const user_id = ENV.student_id
 
-      if ENV.gradebook_non_scoring_rubrics_enabled
-        @outcomeView = new IndividualStudentView
-          el: $('#outcomes'),
-          course_id: course_id,
-          student_id: user_id
-      else
-        @outcomes = new OutcomeSummaryCollection([], course_id: course_id, user_id: user_id)
-        @outcomeView = new OutcomeSummaryView
-          el: $('#outcomes'),
-          collection: @outcomes,
-          toggles: $('.outcome-toggles')
+    if (ENV.gradebook_non_scoring_rubrics_enabled) {
+      this.outcomeView = new IndividualStudentView({
+        el: $('#outcomes'),
+        course_id,
+        student_id: user_id
+      })
+    } else {
+      this.outcomes = new OutcomeSummaryCollection([], {course_id, user_id})
+      this.outcomeView = new OutcomeSummaryView({
+        el: $('#outcomes'),
+        collection: this.outcomes,
+        toggles: $('.outcome-toggles')
+      })
+    }
+  }
 
-    tab: (tab, path) ->
-      if tab != 'outcomes' && tab != 'assignments'
-        tab = userSettings.contextGet('grade_summary_tab') || 'assignments'
-      $("a[href='##{tab}']").click()
-      if tab == 'outcomes'
-        @outcomeView.show(path)
-        $('.outcome-toggles').show()
-      else
-        $('.outcome-toggles').hide()
+  tab(tab, path) {
+    if (tab !== 'outcomes' && tab !== 'assignments') {
+      tab = userSettings.contextGet('grade_summary_tab') || 'assignments'
+    }
+    $(`a[href='#${tab}']`).click()
+    if (tab === 'outcomes') {
+      this.outcomeView.show(path)
+      $('.outcome-toggles').show()
+    } else {
+      $('.outcome-toggles').hide()
+    }
+  }
 
-    activate: (event, ui) ->
-      tab = ui.newPanel.attr('id')
-      router.navigate("#tab-#{tab}", {trigger: true})
-      userSettings.contextSet('grade_summary_tab', tab)
+  activate(event, ui) {
+    const tab = ui.newPanel.attr('id')
+    router.navigate(`#tab-${tab}`, {trigger: true})
+    return userSettings.contextSet('grade_summary_tab', tab)
+  }
+}
+GradebookSummaryRouter.initClass()
 
-  GradeSummary.renderSelectMenuGroup()
+GradeSummary.renderSelectMenuGroup()
 
-  router = new GradebookSummaryRouter
-  Backbone.history.start()
+var router = new GradebookSummaryRouter()
+Backbone.history.start()
