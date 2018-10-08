@@ -117,8 +117,26 @@ import 'compiled/jquery.rails_flash_notifications'
     });
   };
 
-  store.installTool = function () {
-    console.log('i did something')
+  store.installTool = function (developerKeyId) {
+    const toggleValue = (value) => {
+      const oldTools = this.getState().lti13Tools
+      const installedToolIndex = oldTools.findIndex((tool) => tool.app_id === developerKeyId)
+      const tool = Object.assign({}, oldTools[installedToolIndex], {installed_locally: value, enabled: value})
+      const lti13Tools = oldTools.slice()
+      lti13Tools.splice(installedToolIndex, 1, tool)
+      this.setState({lti13Tools})
+    }
+    toggleValue(true)
+    const url = `/api/v1${ENV.CONTEXT_BASE_URL}/developer_keys/${developerKeyId}/create_tool`;
+    $.ajax({
+      url,
+      type: 'POST',
+      success: () => {},
+      error: () => {
+        $.flashError('Failed to install tool.')
+        toggleValue(false)
+      }
+    });
   }
 
   store.removeTool = function () {

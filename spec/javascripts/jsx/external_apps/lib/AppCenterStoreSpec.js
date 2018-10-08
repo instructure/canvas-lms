@@ -101,12 +101,16 @@ const defaultApps = () => [
   }
 ]
 
+const ltiTools = () => (
+  defaultApps().concat([{app_id: '1', enabled: false, installed_locally: false, name: 'tool'}])
+)
+
 QUnit.module('ExternalApps.AppCenterStore', {
   setup() {
     this.server = sinon.fakeServer.create()
     store.reset()
     this.apps = defaultApps()
-    this.lti13Tools = defaultApps()
+    this.lti13Tools = ltiTools()
     this.response = [200, {'Content-Type': 'application/json'}, JSON.stringify(this.apps)]
   },
   teardown() {
@@ -163,6 +167,20 @@ test('fetch13Tools', function() {
   ])
   store.fetch13Tools()
   this.server.respond()
-  equal(store.getState().lti13Tools.length, 3)
+  equal(store.getState().lti13Tools.length, 4)
   equal(store.getState().lti13LoadStatus, 'success')
+})
+
+test('installTool', function() {
+  notOk(store.getState().lti13Tools.find(tool => tool.app_id === '1').enabled)
+  notOk(store.getState().lti13Tools.find(tool => tool.app_id === '1').installed_locally)
+  this.server.respondWith('POST',  /\/create_tool/, [
+    200,
+    {'Content-Type': 'application/json'},
+    JSON.stringify(this.lti13Tools)
+  ])
+  store.installTool('1')
+  this.server.respond()
+  ok(store.getState().lti13Tools.find(tool => tool.app_id === '1').enabled)
+  ok(store.getState().lti13Tools.find(tool => tool.app_id === '1').installed_locally)
 })
