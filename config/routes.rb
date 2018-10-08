@@ -283,6 +283,7 @@ CanvasRails::Application.routes.draw do
         get 'turnitin/:asset_string' => 'submissions#turnitin_report', as: :turnitin_report
         post 'vericite/resubmit' => 'submissions#resubmit_to_vericite', as: :resubmit_to_vericite
         get 'vericite/:asset_string' => 'submissions#vericite_report', as: :vericite_report
+        get 'audit_events' => 'submissions#audit_events', as: :audit_events
       end
       get :rubric
       resource :rubric_association, path: :rubric do
@@ -623,13 +624,15 @@ CanvasRails::Application.routes.draw do
     put 'sso_settings' => 'authentication_providers#update_sso_settings',
         as: :update_sso_settings
 
-    resources :authentication_providers, only: [:index, :create, :update, :destroy]
+    resources :authentication_providers, only: [:index, :create, :update, :destroy] do
+      get :debugging, action: :debug_data
+      put :debugging, action: :start_debugging
+      delete :debugging, action: :stop_debugging
+    end
     get 'test_ldap_connections' => 'authentication_providers#test_ldap_connection'
     get 'test_ldap_binds' => 'authentication_providers#test_ldap_bind'
     get 'test_ldap_searches' => 'authentication_providers#test_ldap_search'
     match 'test_ldap_logins' => 'authentication_providers#test_ldap_login', via: [:get, :post]
-    get 'saml_testing' => 'authentication_providers#saml_testing'
-    get 'saml_testing_stop' => 'authentication_providers#saml_testing_stop'
 
     get 'external_tools/sessionless_launch' => 'external_tools#sessionless_launch'
     resources :external_tools do
@@ -1225,6 +1228,8 @@ CanvasRails::Application.routes.draw do
         post "#{context}s/:#{context}_id/create_tool_with_verification", action: :create_tool_with_verification, as: "#{context}_create_tool_with_verification"
         put "#{context}s/:#{context}_id/external_tools/:external_tool_id", action: :update, as: "#{context}_external_tools_update"
         delete "#{context}s/:#{context}_id/external_tools/:external_tool_id", action: :destroy, as: "#{context}_external_tools_delete"
+        post "#{context}s/:#{context}_id/developer_keys/:developer_key_id/create_tool", action: :create_tool_from_tool_config
+        post "#{context}s/:#{context}_id/developer_keys/:developer_key_id/create_tool", action: :create_tool_from_tool_config
       end
 
       get "groups/:group_id/external_tools", action: :index, as: "group_external_tools"
@@ -2146,6 +2151,13 @@ CanvasRails::Application.routes.draw do
 
   ApiRouteSet.draw(self, "/api/lti") do
 
+    scope(controller: 'lti/tool_configurations_api') do
+      put 'developer_keys/:developer_key_id/tool_configuration', action: :update
+      post 'accounts/:account_id/developer_keys/tool_configuration', action: :create
+      get 'developer_keys/:developer_key_id/tool_configuration', action: :show
+      delete 'developer_keys/:developer_key_id/tool_configuration', action: :destroy
+    end
+
     scope(controller: 'lti/subscriptions_api') do
       post "subscriptions", action: :create
       delete "subscriptions/:id", action: :destroy
@@ -2225,6 +2237,12 @@ CanvasRails::Application.routes.draw do
     scope(controller: 'lti/ims/results') do
       get "courses/:course_id/line_items/:line_item_id/results/:id", action: :show, as: :lti_result_show
       get "courses/:course_id/line_items/:line_item_id/results", action: :index
+    end
+
+    # Names and Roles Provisioning (NRPS) v2 Service
+    scope(controller: 'lti/ims/names_and_roles') do
+      get "courses/:course_id/names_and_roles", controller: "lti/ims/names_and_roles", action: :course_index, as: :course_names_and_roles
+      get "groups/:group_id/names_and_roles", controller: "lti/ims/names_and_roles", action: :group_index, as: :group_names_and_roles
     end
 
     # Security

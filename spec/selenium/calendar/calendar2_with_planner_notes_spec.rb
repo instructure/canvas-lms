@@ -53,7 +53,7 @@ describe "calendar2" do
       get '/calendar2'
       wait_for_ajax_requests
       f('.fc-week td').click # click the first day of the month
-      f('li[aria-controls="edit_planner_note_form_holder"]').click # the To Do tab
+      f('li[aria-controls="edit_planner_note_form_holder"]').click # the My To Do tab
       replace_content(f('#planner_note_date'), 0.days.from_now.to_date.iso8601)
       replace_content(f('#planner_note_title'), title)
       f('button.save_note').click
@@ -148,20 +148,6 @@ describe "calendar2" do
       expect(note).to contain_link(@course.name)
       expect(f('.event-details-timestring')).to include_text(format_date_for_view(discussion.todo_date))
     end
-
-    context "with student planner disabled" do
-      before :each do
-        Account.default.disable_feature!(:student_planner)
-      end
-
-      it "should not show todo tab" do
-        get '/calendar2'
-        wait_for_ajax_requests
-        f('.fc-week td').click # click the first day of the month
-        expect(f('#edit_event_tabs')).to be_displayed
-        expect(f('#edit_event_tabs')).not_to contain_css('[aria-controls="edit_planner_note_form_holder"]')
-      end
-    end
   end
 
   context "as the teacher" do
@@ -229,18 +215,34 @@ describe "calendar2" do
   end
 
   context "with teacher and student enrollments" do
-    it "includes todo items from both" do
-      course1 = @course
-      course2 = course_with_student(user: @user, active_all: true).course
-      page1 = course1.wiki_pages.create!(title: 'Page1', todo_date: Date.today, workflow_state: 'unpublished')
-      page2 = course2.wiki_pages.create!(title: 'Page2', todo_date: Date.today, workflow_state: 'published')
+    before :once do
+      @course1 = @course
+      @course2 = course_with_student(user: @user, active_all: true).course
+    end
+
+    before :each do
       user_session(@user)
+    end
+
+    it "includes todo items from both" do
+      page1 = @course1.wiki_pages.create!(title: 'Page1', todo_date: Date.today, workflow_state: 'unpublished')
+      page2 = @course2.wiki_pages.create!(title: 'Page2', todo_date: Date.today, workflow_state: 'published')
       get '/calendar2'
       wait_for_ajax_requests
       fj('.fc-title:contains("Page1")').click
       expect(f('.event-details')).to contain_css('.edit_event_link')
+      driver.action.send_keys(:escape).perform
       fj('.fc-title:contains("Page2")').click
       expect(f('.event-details')).not_to contain_css('.edit_event_link')
+    end
+
+    it "only offers user and student contexts for planner notes" do
+      get '/calendar2'
+      wait_for_ajax_requests
+      f('.fc-week td').click # click the first day of the month
+      f('li[aria-controls="edit_planner_note_form_holder"]').click # the My To Do tab
+      context_codes = ff('#planner_note_context option').map { |el| el['value'] }
+      expect(context_codes).to match_array([@user.asset_string, @course2.asset_string])
     end
   end
 end

@@ -85,7 +85,7 @@ export default class AssignmentCellEditor {
    * SlickGrid Editor Interface Method (required)
    */
   isValueChanged () {
-    return this.component.isValueChanged();
+    return !!this.component && this.component.isValueChanged();
   }
 
   /*

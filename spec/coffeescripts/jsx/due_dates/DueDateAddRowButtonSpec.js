@@ -19,7 +19,6 @@
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {Simulate, SimulateNative} from 'react-addons-test-utils'
 import DueDateAddRowButton from 'jsx/due_dates/DueDateAddRowButton'
 
 QUnit.module('DueDateAddRowButton with true display prop', {

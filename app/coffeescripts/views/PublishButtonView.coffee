@@ -53,12 +53,12 @@ define [
     initialize: ->
       super
       @model?.on 'change:unpublishable', =>
-        @disable() if !@model.get('unpublishable')
+        @disable() if !@model.get('unpublishable') && @model.get('published')
 
     setElement: ->
       super
       @$el.attr 'data-tooltip', ''
-      @disable() if !@model.get('unpublishable')
+      @disable() if !@model.get('unpublishable') && @model.get('published')
 
     # events
 
@@ -229,7 +229,7 @@ define [
 
       # editable, but cannot be unpublished because submissions exist
       else
-        @disableWithMessage(@model.disabledMessage())
+        @disableWithMessage(@model.disabledMessage()) if @model.get('published')
 
     disableWithMessage: (message) ->
       @disable()

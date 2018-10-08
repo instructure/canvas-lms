@@ -19,6 +19,24 @@
 module UserLearningObjectScopes
   include PlannerHelper
 
+  ULOS_DEFAULT_LIMIT = 15
+
+  # This is a helper method for converting a method call's regular parameters
+  # and named parameters into a hash. `opts` is considered to be a keyword that
+  # contains the rest of the named parameters passed to the method. The `opts`
+  # parameter is merged into the return value.
+  #
+  # This is useful for using the parameters as a cache key and for forwarding
+  # named parameters to another method.
+  def _params_hash(parent_binding)
+    caller_method = method(caller_locations(1, 1).first.base_label)
+    caller_param_names = caller_method.parameters.map(&:last)
+    param_values = caller_param_names.each_with_object({}) { |v, h| h[v] = parent_binding.local_variable_get(v) }
+    opts = param_values[:opts]
+    param_values = param_values.except(:opts).merge(opts) if opts
+    param_values
+  end
+
   def ignore_item!(asset, purpose, permanent = false)
     begin
       # more likely this doesn't exist, so try the create first
@@ -43,10 +61,10 @@ module UserLearningObjectScopes
     published_visible_assignments
   end
 
-  def course_ids_for_todo_lists(participation_type, opts)
+  def course_ids_for_todo_lists(participation_type, course_ids: nil, contexts: nil, include_concluded: false)
     shard.activate do
-      course_ids = Shackles.activate(:slave) do
-        if opts[:include_concluded]
+      course_ids_result = Shackles.activate(:slave) do
+        if include_concluded
           participated_course_ids
         else
           case participation_type
@@ -58,29 +76,32 @@ module UserLearningObjectScopes
         end
       end
 
-      course_ids &= opts[:course_ids] if opts[:course_ids]
-      course_ids &= Array.wrap(opts[:contexts]).select{|c| c.is_a? Course}.map(&:id) if opts[:contexts]
-      course_ids
+      course_ids_result &= course_ids if course_ids
+      course_ids_result &= Array.wrap(contexts).select{|c| c.is_a? Course}.map(&:id) if contexts
+      course_ids_result
     end
   end
 
-  def group_ids_for_todo_lists(opts)
+  def group_ids_for_todo_lists(group_ids: nil, contexts: nil)
     shard.activate do
-      group_ids = cached_current_group_memberships.map(&:group_id)
-      group_ids &= opts[:group_ids] if opts[:group_ids]
-      group_ids &= opts[:contexts].select{|g| g.is_a? Group}.map(&:id) if opts[:contexts]
-      group_ids
+      group_ids_result = cached_current_group_memberships.map(&:group_id)
+      group_ids_result &= group_ids if group_ids
+      group_ids_result &= contexts.select{|g| g.is_a? Group}.map(&:id) if contexts
+      group_ids_result
     end
   end
 
-  def objects_needing(object_type, purpose, participation_type, expires_in, opts={})
+  def objects_needing(
+    object_type, purpose, participation_type, params_cache_key, expires_in,
+    limit: ULOS_DEFAULT_LIMIT, scope_only: false,
+    course_ids: nil, group_ids: nil, contexts: nil, include_concluded: false,
+    include_ignored: false, include_ungraded: false
+  )
     original_shard = Shard.current
     shard.activate do
-      course_ids = course_ids_for_todo_lists(participation_type, opts)
-      group_ids = group_ids_for_todo_lists(opts)
-      opts = {limit: 15}.merge(opts.slice(:due_after, :due_before, :limit, :include_ungraded, :ungraded_quizzes,
-                                          :include_ignored, :include_locked, :include_concluded, :scope_only,
-                                          :needing_submitting, :role))
+      course_ids = course_ids_for_todo_lists(participation_type,
+         course_ids: course_ids, contexts: contexts, include_concluded: include_concluded)
+      group_ids = group_ids_for_todo_lists(group_ids: group_ids, contexts: contexts)
       ids_by_shard = Hash.new({course_ids: [], group_ids: []})
       Shard.partition_by_shard(course_ids) do |shard_course_ids|
         ids_by_shard[Shard.current] = { course_ids: shard_course_ids, group_ids: [] }
@@ -91,104 +112,144 @@ module UserLearningObjectScopes
         ids_by_shard[Shard.current] = shard_hash
       end
 
-      if opts[:scope_only]
+      if scope_only
         original_shard.activate do
           # only provide scope on current shard
           shard_course_ids = ids_by_shard.dig(original_shard, :course_ids)
-          opts[:group_ids] = ids_by_shard.dig(original_shard, :group_ids)
-          if shard_course_ids.present? || opts[:group_ids].present?
-            return yield(*arguments_for_objects_needing(object_type, purpose, shard_course_ids, participation_type, opts))
+          shard_group_ids = ids_by_shard.dig(original_shard, :group_ids)
+          if shard_course_ids.present? || shard_group_ids.present?
+            return yield(*arguments_for_objects_needing(
+              object_type, purpose, shard_course_ids, shard_group_ids, participation_type,
+              include_ignored: include_ignored,
+              include_ungraded: include_ungraded,
+            ))
           end
           return object_type.constantize.none # fallback
         end
       else
         course_ids_cache_key = Digest::MD5.hexdigest(course_ids.sort.join('/'))
-        cache_key = [self, "#{object_type}_needing_#{purpose}", course_ids_cache_key, opts].cache_key
+        cache_key = [self, "#{object_type}_needing_#{purpose}", course_ids_cache_key, params_cache_key].cache_key
         Rails.cache.fetch(cache_key, expires_in: expires_in) do
           result = Shackles.activate(:slave) do
             ids_by_shard.flat_map do |shard, shard_hash|
               shard.activate do
-                opts[:group_ids] = shard_hash[:group_ids]
-                yield(*arguments_for_objects_needing(object_type, purpose, shard_hash[:course_ids], participation_type, opts))
+                yield(*arguments_for_objects_needing(
+                  object_type, purpose, shard_hash[:course_ids], shard_hash[:group_ids], participation_type,
+                  include_ignored: include_ignored,
+                  include_ungraded: include_ungraded
+                ))
               end
             end
           end
-          result = result[0...opts[:limit]] if opts[:limit]
+          result = result[0...limit] if limit # limit is sometimes passed in as nil explicitly
           result
         end
       end
     end
   end
 
-  def arguments_for_objects_needing(object_type, purpose, shard_course_ids, participation_type, opts)
+  def arguments_for_objects_needing(
+    object_type, purpose, shard_course_ids, shard_group_ids, participation_type,
+    include_ignored: false,
+    include_ungraded: false
+  )
     scope = object_type.constantize
-    scope = scope.not_ignored_by(self, purpose) unless opts[:include_ignored]
+    scope = scope.not_ignored_by(self, purpose) unless include_ignored
     scope = scope.for_course(shard_course_ids) if ['Assignment', 'Quizzes::Quiz'].include?(object_type)
     if object_type == 'Assignment'
       scope = participation_type == :student ? scope.published : scope.active
-      scope = scope.expecting_submission unless opts[:include_ungraded]
+      scope = scope.expecting_submission unless include_ungraded
     end
-    [scope, opts.merge(shard_course_ids: shard_course_ids)]
+    [scope, shard_course_ids, shard_group_ids]
   end
 
-  def assignments_for_student(purpose, opts={})
-    opts[:due_after] ||= 2.weeks.ago
-    opts[:due_before] ||= 2.weeks.from_now
-    cache_timeout = opts[:cache_timeout] || 120.minutes
-    objects_needing('Assignment', purpose, :student, cache_timeout, opts) do |assignment_scope, options|
-      assignments = assignment_scope.due_between_for_user(options[:due_after], options[:due_before], self)
-      assignments = assignments.need_submitting_info(id, options[:limit]) if purpose == 'submitting'
-      assignments = assignments.submittable.or(assignments.where('due_at > ?', Time.zone.now)) if purpose == 'submitting'
+  def assignments_for_student(
+    purpose,
+    limit: ULOS_DEFAULT_LIMIT,
+    due_after: 2.weeks.ago,
+    due_before: 2.weeks.from_now,
+    cache_timeout: 120.minutes,
+    include_locked: false,
+    **opts # arguments that are just forwarded to objects_needing
+  )
+    params = _params_hash(binding)
+    objects_needing('Assignment', purpose, :student, params, cache_timeout,
+      limit: limit, **opts) do |assignment_scope|
+      assignments = assignment_scope.due_between_for_user(due_after, due_before, self)
+      assignments = assignments.need_submitting_info(id, limit) if purpose == 'submitting'
+      assignments = assignments.submittable.or(assignments.where('assignments.due_at > ?', Time.zone.now)) if purpose == 'submitting'
       assignments = assignments.having_submissions_for_user(id) if purpose == 'submitted'
-      assignments = assignments.not_locked unless options[:include_locked]
+      assignments = assignments.not_locked unless include_locked
       assignments
     end
   end
 
-  def assignments_needing_submitting(opts={})
-    opts[:due_after] ||= 4.weeks.ago
-    opts[:due_before] ||= 1.week.from_now
+  def assignments_needing_submitting(
+    due_after: 4.weeks.ago,
+    due_before: 1.week.from_now,
+    scope_only: false,
+    include_concluded: false,
+    **opts # forward args to assignments_for_student
+  )
     opts[:cache_timeout] = 15.minutes
-    assignments = assignments_for_student('submitting', opts)
-    return assignments if opts[:scope_only]
-    select_available_assignments(assignments, opts)
+    params = _params_hash(binding)
+    assignments = assignments_for_student('submitting', **params)
+    return assignments if scope_only
+    select_available_assignments(assignments, include_concluded: include_concluded)
   end
 
-  def submitted_assignments(opts={})
-    assignments = assignments_for_student('submitted', opts)
-    return assignments if opts[:scope_only]
-    select_available_assignments(assignments, opts)
+  def submitted_assignments(
+    scope_only: false,
+    include_concluded: false,
+    **opts # forward args to assignments_for_student
+  )
+    params = _params_hash(binding)
+    assignments = assignments_for_student('submitted', **params)
+    return assignments if scope_only
+    select_available_assignments(assignments, include_concluded: include_concluded)
   end
 
-  def ungraded_quizzes(opts={})
-    objects_needing('Quizzes::Quiz', 'viewing', :student, 15.minutes, opts) do |quiz_scope, options|
-      due_after = options[:due_after] || Time.zone.now
-      due_before = options[:due_before] || 1.week.from_now
-
+  def ungraded_quizzes(
+    limit: ULOS_DEFAULT_LIMIT,
+    due_after: Time.zone.now,
+    due_before: 1.week.from_now,
+    needing_submitting: false,
+    scope_only: false,
+    include_locked: false,
+    include_concluded: false,
+    **opts # arguments that are just forwarded to objects_needing
+  )
+    params = _params_hash(binding)
+    opts.merge!(params.slice(:limit, :scope_only, :include_concluded))
+    objects_needing('Quizzes::Quiz', 'viewing', :student, params, 15.minutes, **opts) do |quiz_scope|
       quizzes = quiz_scope.available
-      quizzes = quizzes.not_locked unless opts[:include_locked]
+      quizzes = quizzes.not_locked unless include_locked
       quizzes = quizzes.
         ungraded_due_between_for_user(due_after, due_before, self).
         preload(:context)
-      quizzes = quizzes.need_submitting_info(id, options[:limit]) if options[:needing_submitting]
-      if options[:scope_only]
-        quizzes
-      else
-        select_available_assignments(quizzes, options)
-      end
+      quizzes = quizzes.need_submitting_info(id, limit) if needing_submitting
+      return quizzes if scope_only
+      select_available_assignments(quizzes, include_concluded: include_concluded)
     end
   end
 
-  def submissions_needing_peer_review(opts={})
-    opts[:due_after] ||= 2.weeks.ago
-    opts[:due_before] ||= 2.weeks.from_now
-    objects_needing('AssessmentRequest', 'peer_review', :student, 15.minutes, opts) do |ar_scope, options|
+  def submissions_needing_peer_review(
+    limit: ULOS_DEFAULT_LIMIT,
+    due_after: 2.weeks.ago,
+    due_before: 2.weeks.from_now,
+    scope_only: false,
+    include_ignored: false,
+    **opts # arguments that are just forwarded to objects_needing
+  )
+    params = _params_hash(binding)
+    opts.merge!(params.slice(:limit, :scope_only, :include_ignored))
+    objects_needing('AssessmentRequest', 'reviewing', :student, params, 15.minutes, **opts) do |ar_scope, shard_course_ids|
       ar_scope = ar_scope.joins(submission: :assignment).
-        joins("INNER JOIN #{Submission.quoted_table_name} AS assessor_asset ON assessment_requests.assessor_asset_id = assessor_asset.id").
+        joins("INNER JOIN #{Submission.quoted_table_name} AS assessor_asset ON assessment_requests.assessor_asset_id = assessor_asset.id
+               AND assessor_asset.assignment_id = assignments.id").
         where(assessor_id: id)
-      ar_scope = ar_scope.incomplete unless options[:scope_only]
-      ar_scope = ar_scope.not_ignored_by(self, 'reviewing') unless options[:include_ignored]
-      ar_scope = ar_scope.for_context_codes(options[:shard_course_ids].map { |course_id| "course_#{course_id}"})
+      ar_scope = ar_scope.incomplete unless scope_only
+      ar_scope = ar_scope.for_context_codes(shard_course_ids.map { |course_id| "course_#{course_id}"})
 
       # The below merging of scopes mimics a portion of the behavior for checking the access policy
       # for the submissions, ensuring that the user has access and can read & comment on them.
@@ -197,25 +258,26 @@ module UserLearningObjectScopes
       ar_scope = ar_scope.merge(Submission.active).
         merge(Assignment.published.where(peer_reviews: true))
 
-      if options[:due_before]
-        ar_scope = ar_scope.where("COALESCE(assignments.peer_reviews_due_at, assessor_asset.cached_due_date) <= ?", options[:due_before])
+      if due_before
+        ar_scope = ar_scope.where("COALESCE(assignments.peer_reviews_due_at, assessor_asset.cached_due_date) <= ?", due_before)
       end
 
-      if options[:due_after]
-        ar_scope = ar_scope.where("COALESCE(assignments.peer_reviews_due_at, assessor_asset.cached_due_date) > ?", options[:due_after])
+      if due_after
+        ar_scope = ar_scope.where("COALESCE(assignments.peer_reviews_due_at, assessor_asset.cached_due_date) > ?", due_after)
       end
 
-      if options[:scope_only]
+      if scope_only
         ar_scope
       else
-        result = options[:limit] ? ar_scope.take(options[:limit]) : ar_scope.to_a
+        result = limit ? ar_scope.take(limit) : ar_scope.to_a
         result
       end
     end
   end
 
-  def assignments_needing_grading_count(opts={})
-    course_ids = course_ids_for_todo_lists(:instructor, opts)
+  # opts forwaded to course_ids_for_todo_lists
+  def assignments_needing_grading_count(**opts)
+    course_ids = course_ids_for_todo_lists(:instructor, **opts)
     Submission.active.
       needs_grading.
       joins(assignment: :course).
@@ -228,23 +290,33 @@ module UserLearningObjectScopes
                      purpose: 'grading').where('asset_id=submissions.assignment_id')).count
   end
 
-  def assignments_needing_grading(opts={})
+  def assignments_needing_grading(
+    limit: ULOS_DEFAULT_LIMIT,
+    scope_only: false,
+    **opts # arguments that are just forwarded to objects_needing
+  )
+    params = _params_hash(binding)
     # not really any harm in extending the expires_in since we touch the user anyway when grades change
-    objects_needing('Assignment', 'grading', :instructor, 120.minutes, opts) do |assignment_scope, options|
+    objects_needing('Assignment', 'grading', :instructor, params, 120.minutes, **params) do |assignment_scope|
       as = assignment_scope.active.
         expecting_submission.
         need_grading_info
       ActiveRecord::Associations::Preloader.new.preload(as, :context)
-      if options[:scope_only]
+      if scope_only
         as # This needs the below `select` somehow to work
       else
-        as.lazy.reject{|a| Assignments::NeedsGradingCountQuery.new(a, self).count == 0 }.take(options[:limit]).to_a
+        as.lazy.reject{|a| Assignments::NeedsGradingCountQuery.new(a, self).count == 0 }.take(limit).to_a
       end
     end
   end
 
-  def assignments_needing_moderation(opts={})
-    objects_needing('Assignment', 'moderation', :instructor, 120.minutes, opts) do |assignment_scope, options|
+  def assignments_needing_moderation(
+    limit: ULOS_DEFAULT_LIMIT,
+    scope_only: false,
+    **opts # arguments that are just forwarded to objects_needing
+  )
+    params = _params_hash(binding)
+    objects_needing('Assignment', 'moderation', :instructor, params, 120.minutes, **params) do |assignment_scope|
       scope = assignment_scope.active.
         expecting_submission.
         where(final_grader: self, moderated_grading: true).
@@ -253,41 +325,58 @@ module UserLearningObjectScopes
           where("submissions.assignment_id=assignments.id").
           where(Submission.needs_grading_conditions).distinct.select(:assignment_id)).
         preload(:context)
-      if options[:scope_only]
+      if scope_only
         scope # Also need to check the rights like below
       else
-        scope.lazy.select{|a| a.permits_moderation?(self)}.take(options[:limit]).to_a
+        scope.lazy.select{|a| a.permits_moderation?(self)}.take(limit).to_a
       end
     end
   end
 
-  def discussion_topics_needing_viewing(opts={})
-    objects_needing('DiscussionTopic', 'viewing', :student, 120.minutes, opts) do |topics_context, options|
+  def discussion_topics_needing_viewing(
+    due_after:,
+    due_before:,
+    **opts # arguments that are just forwarded to objects_needing
+  )
+    params = _params_hash(binding)
+    objects_needing('DiscussionTopic', 'viewing', :student, params, 120.minutes, **opts) do |topics_context, shard_course_ids, shard_group_ids|
       topics_context.
         active.
         published.
-        for_courses_and_groups(options[:shard_course_ids], options[:group_ids]).
-        todo_date_between(opts[:due_after], opts[:due_before]).
+        for_courses_and_groups(shard_course_ids, shard_group_ids).
+        todo_date_between(due_after, due_before).
         visible_to_student_sections(self)
     end
   end
 
-  def wiki_pages_needing_viewing(opts={})
-    objects_needing('WikiPage', 'viewing', :student, 120.minutes, opts) do |wiki_pages_context, options|
+  def wiki_pages_needing_viewing(
+    due_after:,
+    due_before:,
+    **opts # arguments that are just forwarded to objects_needing
+  )
+    params = _params_hash(binding)
+    objects_needing('WikiPage', 'viewing', :student, params, 120.minutes, **opts) do |wiki_pages_context, shard_course_ids, shard_group_ids|
       wiki_pages_context.
         available_to_planner.
         visible_to_user(self).
-        for_courses_and_groups(options[:shard_course_ids], options[:group_ids]).
-        todo_date_between(opts[:due_after], opts[:due_before])
+        for_courses_and_groups(shard_course_ids, shard_group_ids).
+        todo_date_between(due_after, due_before)
     end
   end
 
-  def submission_statuses(opts = {})
-    Rails.cache.fetch(['assignment_submission_statuses', self, get_planner_cache_id(self), opts].cache_key, :expires_in => 120.minutes) do
-      opts[:due_after] ||= 2.weeks.ago
-
+  def submission_statuses(
+    limit: ULOS_DEFAULT_LIMIT,
+    due_after: 2.weeks.ago,
+    due_before: 2.weeks.from_now, # not used but helps with signature matching
+    cache_timeout: 120.minutes,
+    scope_only: false,
+    include_concluded: false,
+    include_locked: false
+  )
+    params = _params_hash(binding)
+    Rails.cache.fetch(['assignment_submission_statuses', self, get_planner_cache_id(self), params].cache_key, :expires_in => 120.minutes) do
       {
-        submitted: Set.new(submitted_assignments(opts).pluck(:id)),
+        submitted: Set.new(submitted_assignments(**params).pluck(:id)),
         excused: Set.new(Submission.active.with_assignment.where(excused: true, user_id: self).pluck(:assignment_id)),
         graded: Set.new(Submission.active.with_assignment.where(user_id: self).
           where("submissions.excused = true OR (submissions.score IS NOT NULL AND submissions.workflow_state = 'graded')").
@@ -299,7 +388,7 @@ module UserLearningObjectScopes
         # new feedback and new grades if there is already feedback. that's OK for now, since the "New" was
         # removed from the "New Grades" and "New Feedback" pills in the UI to simply indicate if there
         # is _any_ feedback or grade.
-        has_feedback: Set.new((self.recent_feedback(start_at: opts[:due_after]).
+        has_feedback: Set.new((self.recent_feedback(start_at: due_after).
           select { |feedback| feedback[:submission_comments_count].to_i > 0 }).pluck(:assignment_id)),
         new_activity: Set.new(Submission.active.with_assignment.unread_for(self).pluck(:assignment_id))
       }.with_indifferent_access

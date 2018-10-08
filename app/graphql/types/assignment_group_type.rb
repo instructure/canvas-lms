@@ -19,7 +19,7 @@ module Types
   class AssignmentGroupType < ApplicationObjectType
     graphql_name "AssignmentGroup"
 
-    implements GraphQL::Relay::Node.interface
+    implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
 
     AssignmentGroupState = GraphQL::EnumType.define do

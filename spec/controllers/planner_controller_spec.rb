@@ -43,17 +43,6 @@ describe PlannerController do
     end
   end
 
-  context "feature disabled" do
-    before :each do
-      user_session(@student)
-    end
-
-    it "should return forbidden" do
-      get :index
-      assert_forbidden
-    end
-  end
-
   context "as student" do
     before :each do
       user_session(@student)
@@ -114,6 +103,23 @@ describe PlannerController do
         user_event = response_json.find { |i| i['plannable_type'] == 'calendar_event' && i['plannable_id'] == ue.id }
         expect(course_event['plannable']['title']).to eq ce.title
         expect(user_event['plannable']['title']).to eq 'user_event'
+      end
+
+      it "shows the appropriate section-specific event for the user" do
+        other_section = @course.course_sections.create!(name: 'Other Section')
+        event = @course.calendar_events.build(:title => 'event', :child_event_data =>
+          {"0" => {:start_at => 1.hour.from_now.iso8601, :end_at => 2.hours.from_now.iso8601, :context_code => @course.default_section.asset_string},
+           "1" => {:start_at => 2.hours.from_now.iso8601, :end_at => 3.hours.from_now.iso8601, :context_code => other_section.asset_string}})
+        event.updating_user = @teacher
+        event.save!
+
+        get :index
+        json = json_parse(response.body)
+        event_ids = json.select { |thing| thing['plannable_type'] == 'calendar_event' }.map { |thing| thing['plannable_id'] }
+
+        my_event_id = @course.default_section.calendar_events.where(parent_calendar_event_id: event).pluck(:id).first
+        expect(event_ids).not_to include event.id
+        expect(event_ids).to include my_event_id
       end
 
       it "should show appointment group reservations" do
@@ -559,7 +565,7 @@ describe PlannerController do
           it "should order graded discussions with overridden due dates correctly" do
             topic1 = discussion_topic_model(context: @course, todo_date: Time.zone.now)
             topic2 = group_assignment_discussion(course: @course)
-            topic2_override_due_at = 2.days.from_now
+            topic2_override_due_at = 2.days.from_now.change(min: 1)
             create_group_override_for_assignment(topic2.assignment, {user: @student, group: @group, due_at: topic2_override_due_at})
             topic2_assign = topic2.assignment
             topic2_assign.due_at = 2.days.ago

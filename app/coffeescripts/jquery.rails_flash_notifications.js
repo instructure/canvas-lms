@@ -65,13 +65,13 @@ function renderServerNotifications () {
   if ((typeof ENV !== 'undefined') && ENV && ENV.notices) {
     ENV.notices.forEach(notice => {
       helper.createNode(notice.type, notice.content)
-      createScreenreaderNodeWithDelay(notice.content)
+      createScreenreaderNodeWithDelay(notice.content, false)
     })
   }
 }
 
-function createScreenreaderNodeWithDelay (content) {
-  setTimeout(() => helper.createScreenreaderNode(content), 100)
+function createScreenreaderNodeWithDelay (content, closable = true) {
+  setTimeout(() => helper.createScreenreaderNode(content, closable), 100)
 }
 
 $(() => setTimeout(renderServerNotifications, 500))

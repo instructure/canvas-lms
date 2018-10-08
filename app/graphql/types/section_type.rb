@@ -20,7 +20,7 @@ module Types
   SectionType = GraphQL::ObjectType.define do
     name "Section"
 
-    implements GraphQL::Relay::Node.interface
+    implements GraphQL::Types::Relay::Node
     interfaces [Interfaces::TimestampInterface]
 
     global_id_field :id

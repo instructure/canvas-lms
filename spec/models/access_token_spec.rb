@@ -167,6 +167,27 @@ describe AccessToken do
     end
   end
 
+  describe "Third party" do
+    before do
+      @trustedkey = DeveloperKey.new(internal_service: true)
+      @trustedkey.save!
+
+      @untrustedkey = DeveloperKey.new()
+      @untrustedkey.save!
+
+      @trusted_access_token = AccessToken.new({developer_key: @trustedkey})
+      @trusted_access_token.save!
+
+      @third_party_access_token = AccessToken.new({developer_key: @untrustedkey})
+      @third_party_access_token.save!
+    end
+
+    it "only displays integrations from untrusted developer keys" do
+      expect(AccessToken.visible.length).to eq 1
+      expect(AccessToken.visible.first.id).to eq @third_party_access_token.id
+    end
+  end
+
   describe "token scopes" do
     let_once(:token) do
       token = AccessToken.new

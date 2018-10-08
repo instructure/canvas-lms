@@ -132,6 +132,7 @@ class ExternalFeed < ActiveRecord::Base
       uuid = item.id || Digest::MD5.hexdigest("#{item.title}#{item.published.utc.strftime('%Y-%m-%d')}")
       entry = self.external_feed_entries.where(uuid: uuid).first
       entry ||= self.external_feed_entries.where(url: item.links.alternate.to_s).first
+      author = item.authors.first || OpenObject.new
       description = entry && entry.message
       if !description || description.empty?
         description = "<a href='#{ERB::Util.h(item.links.alternate.to_s)}'>#{ERB::Util.h(t(:original_article, "Original article"))}</a><br/><br/>"
@@ -150,7 +151,6 @@ class ExternalFeed < ActiveRecord::Base
       end
       return nil if self.header_match && !item.title.downcase.include?(self.header_match.downcase)
       return nil if (item.published && self.created_at > item.published rescue false)
-      author = item.authors.first || OpenObject.new
       description = "<a href='#{ERB::Util.h(item.links.alternate.to_s)}'>#{ERB::Util.h(t(:original_article, "Original article"))}</a><br/><br/>"
       description += format_description(item.content || item.title)
       entry = self.external_feed_entries.new(

@@ -1758,7 +1758,7 @@ describe EnrollmentsApiController, type: :request do
       end
 
       context "when scoped by a user" do
-        it "returns enrollments from all of a user's associated shards" do
+        it "returns enrollments from all of the current user's associated shards" do
           # create a user on a different shard
           @shard1.activate { @user = User.create!(name: 'outofshard') }
 
@@ -1773,6 +1773,21 @@ describe EnrollmentsApiController, type: :request do
           expect(json.length).to eq 1
           expect(json.first['course_id']).to eq(@course.id)
           expect(json.first['user_id']).to eq(@user.global_id)
+        end
+
+        it "returns enrollments from all of another user's associated shards" do
+          @shard1.activate { @other_course = Course.create! account: Account.create! }
+          @course.enroll_student(@user, enrollment_state: 'active')
+          @other_course.enroll_student(@user, enrollment_state: 'active')
+          @student = @user
+          @observer = user_factory
+          @student.linked_observers << @observer
+          json = api_call_as_user(@observer, :get, "/api/v1/users/#{@student.id}/enrollments",
+                          { :controller => "enrollments_api", :action => "index", :user_id => @student.to_param,
+                            :format => "json" })
+          courses = json.map { |el| el['course_id'] }
+          expect(courses).to include @course.id
+          expect(courses).to include @other_course.id
         end
       end
     end

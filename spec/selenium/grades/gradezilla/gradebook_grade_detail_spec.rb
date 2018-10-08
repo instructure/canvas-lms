@@ -158,7 +158,12 @@ describe 'Grade Detail Tray:' do
 
       it 'assignment left arrow loads the previous assignment in the tray', test_id: 3337217, priority: '1' do
         Gradezilla::Cells.open_tray(@course.students.first, @a2)
-        Gradezilla::GradeDetailTray.previous_assignment_button.click
+        button = Gradezilla::GradeDetailTray.previous_assignment_button
+        # have to wait for InstUI animations
+        keep_trying_until {
+          button.click
+          true
+        }
 
         expect(Gradezilla::GradeDetailTray.assignment_link(@a1.name)).to be_displayed
       end

@@ -1,9 +1,15 @@
 {
+  "address_3159962f": {
+    "message": "Հասցե"
+  },
   "announcement_fb4cb645": {
     "message": "Հայտարարություն"
   },
   "assignment_976578a8": {
     "message": "Հանձնարարություն"
+  },
+  "calendar_a8563bb2": {
+    "message": "Օրացույց"
   },
   "calendar_event_89aadc1c": {
     "message": "Օրացուցային միջոցառում"
@@ -21,6 +27,9 @@
     "message": "Ջնջել"
   },
   "details_98a31b68": {
+    "message": "Մանրամասներ"
+  },
+  "details_a6f427c3": {
     "message": "Մանրամասներ"
   },
   "discussion_6719c51d": {
@@ -43,6 +52,9 @@
   },
   "loading_25990131": {
     "message": "Բեռնում է..."
+  },
+  "location_3b6ff307": {
+    "message": "Գտնվելու վայրը"
   },
   "new_13daf639": {
     "message": "Նոր"

@@ -651,4 +651,22 @@ describe Oauth2ProviderController do
     end
 
   end
+
+  describe 'GET deny' do
+    let_once(:key) { DeveloperKey.create! }
+    let(:session_hash) { { :oauth2 => { :client_id => key.id, :redirect_uri => Canvas::Oauth::Provider::OAUTH2_OOB_URI  } } }
+
+    it 'forwards the oauth state if it was provided' do
+      session_hash[:oauth2][:state] = '1234567890'
+      get 'deny', session: session_hash
+      expect(response).to be_redirect
+      expect(response.location).to match(/state=1234567890/)
+    end
+
+    it "does not provide state if there wasn't one provided" do
+      get 'deny', session: session_hash
+      expect(response).to be_redirect
+      expect(response.location).not_to match(/state=/)
+    end
+  end
 end

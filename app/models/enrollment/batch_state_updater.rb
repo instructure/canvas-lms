@@ -174,11 +174,15 @@ class Enrollment::BatchStateUpdater
     end
   end
 
-  def self.update_cached_due_dates(students, root_account)
+  def self.update_cached_due_dates(students, root_account, updating_user: nil)
     students.group_by(&:course_id).each do |course, studs|
-      DueDateCacher.recompute_users_for_course(studs.map(&:user_id), course, nil,
-                                               singleton: ('EnrollmentBatchStateUpdater_' +
-                                                 root_account.global_id.to_s))
+      DueDateCacher.recompute_users_for_course(
+        studs.map(&:user_id),
+        course,
+        nil,
+        singleton: ('EnrollmentBatchStateUpdater_' + root_account.global_id.to_s),
+        executing_user: updating_user
+      )
     end
   end
 

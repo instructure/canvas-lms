@@ -18,7 +18,7 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import TestUtils from 'react-addons-test-utils';
+import TestUtils from 'react-dom/test-utils';
 import { DragDropContext } from 'react-dnd';
 import ReactDndTestBackend from 'react-dnd-test-backend';
 import DraggableDashboardCard from 'jsx/dashboard_card/DraggableDashboardCard';

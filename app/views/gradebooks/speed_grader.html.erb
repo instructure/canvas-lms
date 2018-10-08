@@ -215,6 +215,7 @@
                 <a class="submission-file-download icon-download" title="<%= t("Download this file") %>" href="<%= download_url %>"></a>
                 <span class="turnitin_score_container"></span>
                 <a class="display_name no-hover" href="<%= preview_url %>" title="<%= t('titles.preview_file', "Preview this File") %>">???</a>
+                <span id="react_pill_container"></span>
               </div>
             </div>
             <% if @assignment.assignment_configuration_tool_lookup_ids.present? %>
@@ -268,8 +269,10 @@
                 <a style="display: none;" title="POST" href="<%= context_url(@context, :update_submission_context_gradebook_url) %>" class="update_submission_grade_url">&nbsp;</a>
                 <div class="turnitin_info_container"></div>
               </div>
+
               <div id="grading_details_mount_point"></div>
             <% end %>
+
             <% if @assignment.rubric_association %>
               <div id="rubric_summary_holder">
                 <div id="rubric_assessments_list_and_edit_button_holder">
@@ -283,6 +286,8 @@
                 </div>
               </div>
             <% end %>
+
+            <div id="speed_grader_assessment_audit_button_mount_point"></div>
           </div><!-- end #grading -->
           <% end %>
         </div>
@@ -448,6 +453,8 @@
     </ul>
   </li>
 </ul>
+
+<div id="speed_grader_assessment_audit_tray_mount_point"></div>
 
 <span id="aria_name_alert" class="screenreader-only" aria-live="polite"></span>
 <% keyboard_navigation([

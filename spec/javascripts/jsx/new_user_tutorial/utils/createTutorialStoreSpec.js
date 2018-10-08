@@ -16,13 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jsx/new_user_tutorial/utils/createTutorialStore'
-], (createTutorialStore) => {
-  QUnit.module('createTutorialStore test');
+import createTutorialStore from 'jsx/new_user_tutorial/utils/createTutorialStore'
 
-  test('sets isCollapsed to false initially', () => {
-    const store = createTutorialStore();
-    ok(!store.getState().isCollapsed);
-  });
-});
+QUnit.module('createTutorialStore test')
+
+test('sets isCollapsed to false initially', () => {
+  const store = createTutorialStore()
+  ok(!store.getState().isCollapsed)
+})

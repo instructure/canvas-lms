@@ -34,6 +34,7 @@ import Text from '@instructure/ui-elements/lib/components/Text'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import Tray from '@instructure/ui-overlays/lib/components/Tray'
+import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
 
 const courseShape = PropTypes.shape({
   permissions: PropTypes.shape({}).isRequired,
@@ -96,10 +97,6 @@ export default class StudentContextTray extends React.Component {
     /**
      * Handlers
      */
-
-    getCloseButtonRef = (ref) => {
-      this.closeButtonRef = ref
-    }
 
     handleRequestClose = (e) => {
       e.preventDefault()
@@ -183,13 +180,16 @@ export default class StudentContextTray extends React.Component {
 
           <Tray
             label={I18n.t('Student Details')}
-            closeButtonLabel={I18n.t('Close')}
-            closeButtonRef={this.getCloseButtonRef}
             open={this.state.isOpen}
             onDismiss={this.handleRequestClose}
             placement='end'
-            zIndex='1000'
           >
+            <CloseButton
+              placement='start'
+              onClick={this.handleRequestClose}
+            >
+              {I18n.t('Close')}
+            </CloseButton>
             <aside
               className={user && user.avatar_url
                 ? 'StudentContextTray StudentContextTray--withAvatar'

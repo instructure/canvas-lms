@@ -49,7 +49,9 @@ function getProps (column, gradebook, gridSupport, options) {
     onHeaderKeyDown: (event) => {
       gradebook.handleHeaderKeyDown(event, columnId);
     },
-    onMenuDismiss: gradebook.handleColumnHeaderMenuClose,
+    onMenuDismiss() {
+      setTimeout(gradebook.handleColumnHeaderMenuClose)
+    },
 
     position: {
       isInBack,

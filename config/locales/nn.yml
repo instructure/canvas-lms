@@ -6486,7 +6486,7 @@ nn:
       font_size: "Skriftstorleik, trykk ned for å velje"
       formatting: "Formatering, trykk ned for å velje"
       rte_help: "Område for rikt tekstformat. Trykk ALT+F8 for hjelp"
-  editor_button_6647db9c: Redigeringsknapp
+  editor_button_6647db9c: Editorknapp
   either_the_url_or_domain_should_be_set_c29cf8c1: "Du må oppgi anten URL-en eller domenet."
   either_you_re_a_new_user_or_the_terms_of_use_have__14f0d0d0: "Enten er du ny brukar eller så er *vilkår for bruk* endra sidan siste du godtok dei. Du må samtykke i *vilkår for bruk* og **retningslinjer for personvern** før du kan halde fram."
   el_salvador_503_b0907d30: "El Salvador (+503)"
@@ -7011,7 +7011,7 @@ nn:
       course_navigation_configured: "Emnenavigasjon er konfigurert"
       delete_tool: "Slett verktøy"
       edit_tool: "Rediger verktøy"
-      editor_button_configured: "Redigeringsknapp er konfigurert"
+      editor_button_configured: "Editorknapp er konfigurert"
       homework_submission_configured: "Innlevering av heimeoppgåve er konfigurert"
       labels: 
         consumer_key: Forbrukarnøkkel

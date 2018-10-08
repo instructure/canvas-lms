@@ -454,6 +454,7 @@ describe ContentMigration do
       @copy_from.show_total_grade_as_points = true
       @copy_from.organize_epub_by_content_type = true
       @copy_from.enable_offline_web_export = true
+      @copy_from.is_public_to_auth_users = true
       @copy_from.save!
 
       run_course_copy

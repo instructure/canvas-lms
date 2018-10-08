@@ -16,57 +16,49 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'react',
-  'react-addons-test-utils',
-  'jsx/conditional_release_stats/components/breakdown-graph-bar',
-], (React, TestUtils, BreakdownBarComponent) => {
+import React from 'react'
 
-  QUnit.module('Breakdown Stats Graph Bar')
+import TestUtils from 'react-dom/test-utils'
+import BreakdownBarComponent from 'jsx/conditional_release_stats/components/breakdown-graph-bar'
 
-  const renderComponent = (props) => {
-    return TestUtils.renderIntoDocument(
-      <BreakdownBarComponent {...props} />
-    )
-  }
+QUnit.module('Breakdown Stats Graph Bar')
 
-  const defaultProps = () => {
-    return {
-      upperBound: '100',
-      lowerBound: '70',
-      rangeStudents: 50,
-      totalStudents: 100,
-      rangeIndex: 0,
-      selectRange: () => {},
-      openSidebar: () => {}
-    }
-  }
+const renderComponent = props => TestUtils.renderIntoDocument(<BreakdownBarComponent {...props} />)
 
-  test('renders bar component correctly', () => {
-    const component = renderComponent(defaultProps())
+const defaultProps = () => ({
+  upperBound: '100',
+  lowerBound: '70',
+  rangeStudents: 50,
+  totalStudents: 100,
+  rangeIndex: 0,
+  selectRange: () => {},
+  openSidebar: () => {}
+})
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-bar__container')
-    equal(renderedList.length, 1, 'renders full component')
-  })
+test('renders bar component correctly', () => {
+  const component = renderComponent(defaultProps())
 
-  test('renders bar inner-components correctly', () => {
-    const component = renderComponent(defaultProps())
+  const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-bar__container')
+  equal(renderedList.length, 1, 'renders full component')
+})
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-link-button')
-    equal(renderedList.length, 1, 'renders full component')
-  })
+test('renders bar inner-components correctly', () => {
+  const component = renderComponent(defaultProps())
 
-  test('renders bounds correctly', () => {
-    const component = renderComponent(defaultProps())
+  const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-link-button')
+  equal(renderedList.length, 1, 'renders full component')
+})
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-bar__info')
-    equal(renderedList[0].textContent, '70+ to 100', 'renders full component')
-  })
+test('renders bounds correctly', () => {
+  const component = renderComponent(defaultProps())
 
-  test('renders students in range correctly', () => {
-    const component = renderComponent(defaultProps())
+  const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-bar__info')
+  equal(renderedList[0].textContent, '70+ to 100', 'renders full component')
+})
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-link-button')
-    equal(renderedList[0].textContent, '50 out of 100 students', 'renders correct amount of students')
-  })
+test('renders students in range correctly', () => {
+  const component = renderComponent(defaultProps())
+
+  const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-link-button')
+  equal(renderedList[0].textContent, '50 out of 100 students', 'renders correct amount of students')
 })

@@ -16,45 +16,46 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define(['axios', 'moxios'], (axios, moxios) => {
-  QUnit.module('Custom Axios Tests', {
-    setup () {
-      moxios.install();
-    },
-    teardown () {
-      moxios.uninstall();
-    }
-  });
+import axios from 'axios'
+import moxios from 'moxios'
 
-  test('Accept headers request stringified ids', (assert) => {
-    const done = assert.async();
+QUnit.module('Custom Axios Tests', {
+  setup() {
+    moxios.install()
+  },
+  teardown() {
+    moxios.uninstall()
+  }
+})
 
-    moxios.stubRequest('/some/url', {
-      status: 200,
-      responseText: 'hello'
-    });
+test('Accept headers request stringified ids', assert => {
+  const done = assert.async()
 
-    axios.get('/some/url').then((response) => {
-      ok(response.config.headers.Accept.includes('application/json+canvas-string-ids'));
-      done();
-    });
+  moxios.stubRequest('/some/url', {
+    status: 200,
+    responseText: 'hello'
+  })
 
-    moxios.wait(() => {});
-  });
+  axios.get('/some/url').then(response => {
+    ok(response.config.headers.Accept.includes('application/json+canvas-string-ids'))
+    done()
+  })
 
-  test('passes X-Requested-With header', (assert) => {
-    const done = assert.async();
+  moxios.wait(() => {})
+})
 
-    moxios.stubRequest('/some/url', {
-      status: 200,
-      responseText: 'hello'
-    });
+test('passes X-Requested-With header', assert => {
+  const done = assert.async()
 
-    axios.get('/some/url').then((response) => {
-      ok(response.config.headers['X-Requested-With'] === 'XMLHttpRequest');
-      done();
-    });
+  moxios.stubRequest('/some/url', {
+    status: 200,
+    responseText: 'hello'
+  })
 
-    moxios.wait(() => {});
-  });
-});
+  axios.get('/some/url').then(response => {
+    ok(response.config.headers['X-Requested-With'] === 'XMLHttpRequest')
+    done()
+  })
+
+  moxios.wait(() => {})
+})

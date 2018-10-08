@@ -43,13 +43,13 @@ describe "teacher planner" do
     it "displays todo items in the card view dashboard" do
       go_to_dashcard_view
 
-      expect(card_view_todo_item_list.first).to contain_jqcss("a:contains('Grade #{@assignment1.name}')")
+      expect(card_view_todo_items.first).to contain_jqcss("a:contains('Grade #{@assignment1.name}')")
     end
 
     it "displays todo items in course homepage" do
       get "/courses/#{@course.id}"
 
-      expect(card_view_todo_item_list.first).to contain_jqcss("a:contains('Grade #{@assignment1.name}')")
+      expect(card_view_todo_items.first).to contain_jqcss("a:contains('Grade #{@assignment1.name}')")
     end
   end
 end

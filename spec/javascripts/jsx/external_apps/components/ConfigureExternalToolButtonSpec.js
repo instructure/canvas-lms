@@ -49,24 +49,26 @@ test('shows beginning info alert and adds styles to iframe', () => {
   const wrapper = mount(
     <ConfigureExternalToolButton
       tool={tool}
+      modalIsOpen
     />
   )
-  wrapper.instance().openModal(event)
   wrapper.instance().handleAlertFocus({ target: { className: "before" } })
   equal(wrapper.state().beforeExternalContentAlertClass, '')
   deepEqual(wrapper.state().iframeStyle, { border: '2px solid #008EE2', width: '300px' })
+  wrapper.unmount()
 })
 
 test('shows ending info alert and adds styles to iframe', () => {
   const wrapper = mount(
     <ConfigureExternalToolButton
       tool={tool}
+      modalIsOpen
     />
   )
-  wrapper.instance().openModal(event)
   wrapper.instance().handleAlertFocus({ target: { className: "after" } })
   equal(wrapper.state().afterExternalContentAlertClass, '')
   deepEqual(wrapper.state().iframeStyle, { border: '2px solid #008EE2', width: '300px' })
+  wrapper.unmount()
 })
 
 test('hides beginning info alert and adds styles to iframe', () => {
@@ -80,6 +82,7 @@ test('hides beginning info alert and adds styles to iframe', () => {
   wrapper.instance().handleAlertBlur({ target: { className: "before" } })
   equal(wrapper.state().beforeExternalContentAlertClass, 'screenreader-only')
   deepEqual(wrapper.state().iframeStyle, { border: 'none', width: '100%' })
+  wrapper.unmount()
 })
 
 test('hides ending info alert and adds styles to iframe', () => {
@@ -92,6 +95,7 @@ test('hides ending info alert and adds styles to iframe', () => {
   wrapper.instance().handleAlertBlur({ target: { className: "after" } })
   equal(wrapper.state().afterExternalContentAlertClass, 'screenreader-only')
   deepEqual(wrapper.state().iframeStyle, { border: 'none', width: '100%' })
+  wrapper.unmount()
 })
 
 test("doesn't show alerts or add border to iframe by default", () => {
@@ -104,17 +108,19 @@ test("doesn't show alerts or add border to iframe by default", () => {
   equal(wrapper.state().beforeExternalContentAlertClass, 'screenreader-only')
   equal(wrapper.state().afterExternalContentAlertClass, 'screenreader-only')
   deepEqual(wrapper.state().iframeStyle, {})
+  wrapper.unmount()
 })
 
 test('sets the iframe allowances', () => {
   const wrapper = mount(
     <ConfigureExternalToolButton
       tool={tool}
+      modalIsOpen
     />
   )
 
-  wrapper.instance().openModal(event)
   wrapper.instance().handleAlertFocus({ target: { className: "before" } })
   equal(wrapper.state().beforeExternalContentAlertClass, '')
   ok(wrapper.instance().iframe.getAttribute('allow'), ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; '))
+  wrapper.unmount()
 })

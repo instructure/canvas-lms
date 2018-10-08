@@ -32,6 +32,22 @@ class AuthenticationProvider::CAS < AuthenticationProvider::Delegated
     [ :unknown_user_url ].freeze
   end
 
+  def self.supports_debugging?
+    true
+  end
+
+  def self.debugging_sections
+    [nil]
+  end
+
+  def self.debugging_keys
+    [{
+       debugging: -> { t("Testing state") },
+       ticket_received: -> { t("Received CAS Ticket") },
+       validate_service_ticket: -> { t("Validated Service Ticket") },
+     }]
+  end
+
   def auth_provider_filter
     [nil, self]
   end

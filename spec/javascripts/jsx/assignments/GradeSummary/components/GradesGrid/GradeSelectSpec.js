@@ -161,7 +161,7 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
   }
 
   function getOptionList() {
-    const controlledContentId = wrapper.find('input').prop('aria-controls')
+    const controlledContentId = wrapper.find('input').instance().getAttribute('aria-controls')
     return document.getElementById(controlledContentId)
   }
 

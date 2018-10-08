@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import Enzyme from 'enzyme'
-import Adapter from 'enzyme-adapter-react-14'
+import Adapter from 'enzyme-adapter-react-16'
 import { canvas } from '@instructure/ui-themes/lib'
 import en_US from 'timezone/en_US'
 import './jsx/spec-support/specProtection'

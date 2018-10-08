@@ -161,8 +161,7 @@ describe "gradebook uploads" do
     expect(ff('.slick-header-column.assignment').length).to eq 1
 
     assignment_count = @course.assignments.count
-    submit_form('#gradebook_grid_form')
-    wait_for_ajaximations
+    wait_for_new_page_load { submit_form('#gradebook_grid_form') }
     run_jobs
     expect(@course.assignments.count).to eql (assignment_count + 1)
     assignment = @course.assignments.order(:created_at).last

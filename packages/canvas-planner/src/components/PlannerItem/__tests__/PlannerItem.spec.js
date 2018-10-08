@@ -35,7 +35,8 @@ function defaultProps (option = {}) {
       completed: !!option.completed,
       title: option.title || "This Assignment is about awesome stuff",
       points: option.points,
-      html_url: option.html_url,
+      html_url: option.html_url || 'http://example.com',
+      timeZone: option.timeZone || 'America/Denver',
       toggleCompletion: () => {},
       updateTodo: () => {},
       currentUser: user,
@@ -49,6 +50,7 @@ function noteProps (option) {
       uniqueId: "twenty-two",
       associated_item: null,
       date: DEFAULT_DATE,
+      timeZone: option.timeZone || 'America/Denver',
       courseName: option.courseName,
       completed: !!option.completed,
       title: option.title || "A note about note taking",
@@ -78,6 +80,7 @@ function groupProps (option) {
     "associated_item": "Page",
     "title": "this is an account-level group page",
     "html_url": "/groups/9/pages/this-is-an-account-level-group-page",
+    "timeZone": 'America/Denver',
     "badges": [],
     toggleCompletion: () => {},
     updateTodo: () => {},
@@ -480,6 +483,7 @@ it('renders Page correctly with just date', () => {
       completed: false,
       title: "I am a Page",
       date: DEFAULT_DATE,
+      timeZone: 'America/Denver',
     }
   );
   props.courseName = null;
@@ -581,7 +585,7 @@ it('disables the checkbox when toggleAPIPending is true', () => {
     />
   );
   wrapper.find('Checkbox').simulate('change');
-  expect(wrapper.find('Checkbox').node.props.disabled).toBe(true);
+  expect(wrapper.find('Checkbox').prop('disabled')).toBe(true);
 });
 
 it('registers itself as animatable', () => {

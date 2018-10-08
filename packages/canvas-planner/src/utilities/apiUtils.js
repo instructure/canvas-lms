@@ -35,6 +35,7 @@ const getItemDetailsFromPlannable = (apiResponse, timeZone) => {
     id: plannableId,
     uniqueId: `${plannable_type}-${plannableId}`,
     location: plannable.location_name || null,
+    address: plannable.location_address || null,
     dateStyle: plannable.todo_date ? 'todo' : 'due'
   };
   details.originallyCompleted = details.completed;
@@ -49,6 +50,7 @@ const getItemDetailsFromPlannable = (apiResponse, timeZone) => {
   }
 
   if (plannable_type === 'calendar_event') {
+    details.details = plannable.description;
     details.allDay = plannable.all_day;
     if (!details.allDay && plannable.end_at && plannable.end_at !== apiResponse.plannable_date ) {
       details.endTime = moment(plannable.end_at);

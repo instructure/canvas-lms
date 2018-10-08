@@ -73,6 +73,18 @@ describe GradeSummaryAssignmentPresenter do
     end
   end
 
+  describe '#upload_status' do
+    it 'returns attachment workflow_state when workflow_state is pending_upload' do
+      expect(presenter.upload_status).to eq(@submission.attachments.first.workflow_state)
+    end
+
+    it 'returns attachment workflow_state when workflow_state is errored' do
+      @attachment.workflow_state = 'errored'
+      @attachment.save!
+      expect(presenter.upload_status).to eq(@submission.attachments.first.workflow_state)
+    end
+  end
+
   describe '#originality_report' do
     it 'returns true when an originality report exists' do
       OriginalityReport.create(originality_score: 0.8,

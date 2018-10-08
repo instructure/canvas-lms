@@ -56,6 +56,10 @@ All of these settings are contained under "course_navigation"
 
       Includes Canvas global navigation but does not include breadcrumb or course navigation
 
+    * full_width_in_context
+
+      Includes Canvas global navigation, breadcrumb, and course navigation, and gives the tool access to the rest of the horizontal screen width.
+
     * borderless
 
       Does not include Canvas global navigation, course navigation, or breadcrumbs
@@ -99,6 +103,10 @@ All of these settings are contained under "account_navigation"
     * full_width
 
       Includes Canvas global navigation but does not include breadcrumb or account navigation
+
+    * full_width_in_context
+
+      Includes Canvas global navigation, breadcrumb, and account navigation, and gives the tool access to the rest of the horizontal screen width.
 
     * borderless
 

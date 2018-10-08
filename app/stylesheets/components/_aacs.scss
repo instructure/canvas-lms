@@ -24,21 +24,14 @@
   }
 }
 
-#saml_debug_info {
-  .debug_xml {
-    overflow: auto;
-    font-family: monospace;
-    border: 1px solid #ccc;
-  }
+.debug_data {
   .debug_label{
     font-weight: bold;
   }
   pre {
     margin: auto;
+    overflow: auto;
     margin-#{direction(left)}: 10px;
     font-family: monospace;
-  }
-  h3{
-    margin-top: 10px;
   }
 }

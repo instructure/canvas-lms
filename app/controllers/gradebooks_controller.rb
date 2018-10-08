@@ -16,9 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_dependency 'assignment/speed_grader'
-require_dependency 'speed_grader/submission'
-
 class GradebooksController < ApplicationController
   include ActionView::Helpers::NumberHelper
   include GradebooksHelper
@@ -564,16 +561,6 @@ class GradebooksController < ApplicationController
       }
       json = submission.as_json(Submission.json_serialization_full_parameters.merge(json_params))
 
-      provisional_grade = if provisional_grader_or_moderator?(assignment: assignment)
-        submission.provisional_grade(@current_user, preloaded_grades: preloaded_provisional_grades(assignment: assignment))
-      end
-
-      comments = SpeedGrader::Submission.new(
-        submission: submission,
-        current_user: @current_user,
-        provisional_grade: provisional_grade
-      ).comments
-
       json[:submission].tap do |submission_json|
         submission_json[:assignment_visible] = submission.assignment_visible_to_user?(submission.user)
         submission_json[:provisional_grade_id] = submission.provisional_grade_id if submission.provisional_grade_id
@@ -581,7 +568,7 @@ class GradebooksController < ApplicationController
           assignment: submission.assignment,
           avatars: service_enabled?(:avatars),
           submissions: submissions,
-          submission_comments: comments,
+          submission_comments: submission.visible_submission_comments_for(@current_user),
           current_user: @current_user,
           course: @context
         ).map { |c| {submission_comment: c} }
@@ -620,11 +607,6 @@ class GradebooksController < ApplicationController
 
     @assignment = @context.assignments.active.find(params[:assignment_id])
 
-    unless @assignment.can_view_speed_grader?(@current_user)
-      flash[:notice] = t('The maximum number of graders for this assignment has been reached.')
-      return redirect_to(course_gradebook_path(@context))
-    end
-
     if @assignment.unpublished?
       flash[:notice] = t(:speedgrader_enabled_only_for_published_content,
                          'SpeedGrader is enabled only for published content.')
@@ -646,6 +628,7 @@ class GradebooksController < ApplicationController
         log_asset_access([ "speed_grader", @context ], "grades", "other")
         env = {
           CONTEXT_ACTION_SOURCE: :speed_grader,
+          can_view_audit_trail: @assignment.can_view_audit_trail?(@current_user),
           settings_url: speed_grader_settings_course_gradebook_path,
           new_gradebook_enabled: new_gradebook_enabled?,
           force_anonymous_grading: force_anonymous_grading?(@assignment),
@@ -664,7 +647,8 @@ class GradebooksController < ApplicationController
           can_comment_on_submission: @can_comment_on_submission,
           show_help_menu_item: show_help_link?,
           help_url: help_link_url,
-          outcome_proficiency: outcome_proficiency
+          outcome_proficiency: outcome_proficiency,
+          ARC_RECORDING_FEATURE_ENABLED: @context.root_account.feature_enabled?(:integrate_arc_rce),
         }
         if grading_role(assignment: @assignment) == :moderator
           env[:provisional_copy_url] = api_v1_copy_to_final_mark_path(@context.id, @assignment.id, "{{provisional_grade_id}}")
@@ -691,7 +675,7 @@ class GradebooksController < ApplicationController
       end
 
       format.json do
-        render json: Assignment::SpeedGrader.new(
+        render json: SpeedGrader::Assignment.new(
           @assignment,
           @current_user,
           avatars: service_enabled?(:avatars),
@@ -715,13 +699,18 @@ class GradebooksController < ApplicationController
         params[:selected_section_id]
       end
 
-      gradebook_settings.deep_merge!({
+      settings = gradebook_settings(create_if_missing: true)
+      settings.deep_merge!({
         @context.id => {
           'filter_rows_by' => {
             'section_id' => section_to_show
           }
         }
       })
+
+      # Showing a specific section should always display the "Sections" filter
+      # in New Gradebook
+      ensure_section_view_filter_enabled if section_to_show.present?
       @current_user.save!
     end
 
@@ -1015,8 +1004,21 @@ class GradebooksController < ApplicationController
     )
   end
 
-  def gradebook_settings
-    @current_user.preferences.fetch(:gradebook_settings, {})
+  def gradebook_settings(create_if_missing: false)
+    preferences = @current_user.preferences
+    if !preferences.include?(:gradebook_settings) && create_if_missing
+      preferences[:gradebook_settings] = {}
+    end
+
+    preferences.fetch(:gradebook_settings, {})
+  end
+
+  def ensure_section_view_filter_enabled
+    context_settings = gradebook_settings.fetch(@context.id)
+    filter_settings = context_settings.fetch('selected_view_options_filters', [])
+    return if filter_settings&.include?('sections')
+
+    context_settings['selected_view_options_filters'] = filter_settings.append('sections')
   end
 
   def courses_with_grades_json
@@ -1063,10 +1065,6 @@ class GradebooksController < ApplicationController
     end
   end
 
-  def provisional_grader_or_moderator?(assignment:)
-    [:provisional_grader, :moderator].include?(grading_role(assignment: assignment))
-  end
-
   def grading_role(assignment:)
     if moderated_grading_enabled_and_no_grades_published?
       if assignment.permits_moderation?(@current_user)
@@ -1077,14 +1075,5 @@ class GradebooksController < ApplicationController
     else
       :grader
     end
-  end
-
-  def preloaded_provisional_grades(assignment:)
-    @preloaded_provisional_grades ||= Assignment::SpeedGrader.new(
-      assignment,
-      @current_user,
-      avatars: service_enabled?(:avatars),
-      grading_role: grading_role(assignment: assignment)
-    ).preloaded_provisional_grades
   end
 end

@@ -56,7 +56,7 @@ class CourseWizard extends React.Component {
   }
 
   componentDidMount() {
-    this.closeLink.focus()
+    this.closeLink && this.closeLink.focus()
     $(this.wizardBox).removeClass('ic-wizard-box--is-closed')
     $.screenReaderFlashMessageExclusive(I18n.t('Course Setup Wizard is showing.'))
   }

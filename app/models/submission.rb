@@ -71,6 +71,7 @@ class Submission < ActiveRecord::Base
   # policy deductions don't happen again if the submission object is
   # saved again.
   attr_writer :regraded
+  attr_writer :audit_grade_changes
 
   belongs_to :attachment # this refers to the screenshot of the submission if it is a url submission
   belongs_to :assignment, inverse_of: :submissions
@@ -325,6 +326,7 @@ class Submission < ActiveRecord::Base
   after_save :delete_ignores
   after_save :create_alert
   after_save :reset_regraded
+  after_save :create_audit_event!
 
   def reset_regraded
     @regraded = false
@@ -578,16 +580,32 @@ class Submission < ActiveRecord::Base
       prev_percentage = prev_score.present? ? prev_score.to_f / self.assignment.points_possible * 100 : nil
       percentage = self.score.present? ? self.score.to_f / self.assignment.points_possible * 100 : nil
       next unless threshold.did_pass_threshold(prev_percentage, percentage)
-      next unless threshold.observer.enrollments.where(course_id: self.assignment.context_id).first.present?
 
-      ObserverAlert.create!(observer: threshold.observer, student: self.user,
-                            observer_alert_threshold: threshold,
-                            context: self.assignment, alert_type: threshold.alert_type, action_date: self.graded_at,
-                            title: I18n.t("Assignment graded: %{grade} on %{assignment_name} in %{course_code}", {
-                              grade: self.grade,
-                              assignment_name: self.assignment.title,
-                              course_code: self.assignment.course.course_code
-                            }))
+      observer = threshold.observer
+      next unless observer
+      next unless observer.observer_enrollments.active.
+          where(course_id: self.assignment.context_id, associated_user: self.user).any?
+
+      begin
+        ObserverAlert.create!(
+          observer: observer,
+          student: self.user,
+          observer_alert_threshold: threshold,
+          context: self.assignment,
+          alert_type: threshold.alert_type,
+          action_date: self.graded_at,
+          title: I18n.t("Assignment graded: %{grade} on %{assignment_name} in %{course_code}",
+            {
+              grade: self.grade,
+              assignment_name: self.assignment.title,
+              course_code: self.assignment.course.course_code
+            })
+        )
+      rescue ActiveRecord::RecordInvalid
+        Rails.logger.error(
+          "Couldn't create ObserverAlert for submission #{self.id} observer #{threshold.observer_id}"
+        )
+      end
     end
   end
 
@@ -2058,6 +2076,50 @@ class Submission < ActiveRecord::Base
     res
   end
 
+  def visible_submission_comments_for(current_user)
+    return all_submission_comments.for_groups if assignment.grade_as_group?
+    visible_users = users_with_visible_submission_comments(current_user)
+
+    all_submission_comments.select do |submission_comment|
+      if assignment.muted? && user == current_user
+        submission_comment.author == user
+      elsif assignment.grades_published? && grader == submission_comment.author
+        submission_comment.provisional_grade_id.nil?
+      else
+        visible_users.include?(submission_comment.author)
+      end
+    end
+  end
+
+  def users_with_visible_submission_comments(current_user)
+    comment_authors = all_submission_comments.map(&:author).compact.uniq
+    is_student = current_user == user
+    is_admin = assignment.course.account_membership_allows(current_user)
+
+    # If the user is the final grader or an admin, they see every comment.
+    return comment_authors if current_user == assignment.final_grader || is_admin
+    # Students only see their own comments when assignment is muted.
+    return [user] if is_student && assignment.muted?
+
+    if assignment.moderated_grading?
+      if assignment.grades_published?
+        return [user] if assignment.muted? && is_student
+        return [grader, assignment.final_grader, user].compact.uniq if is_student
+
+        if assignment.grader_comments_visible_to_graders?
+          return comment_authors
+        else
+          return [user, current_user, assignment.final_grader, grader].compact.uniq
+        end
+      end
+
+      return [user, current_user].compact.uniq unless assignment.grader_comments_visible_to_graders?
+    end
+
+    comment_authors
+  end
+  private :users_with_visible_submission_comments
+
   def assessment_request_count
     @assessment_requests_count ||= self.assessment_requests.length
   end
@@ -2537,5 +2599,21 @@ class Submission < ActiveRecord::Base
     pg.graded_anonymously = attrs[:graded_anonymously] unless attrs[:graded_anonymously].nil?
     pg.force_save = !!attrs[:force_save]
     pg
+  end
+
+  def create_audit_event!
+    return unless assignment&.auditable? && @audit_grade_changes
+
+    auditable_attributes = %w[score grade excused]
+    auditable_changes = saved_changes.slice(*auditable_attributes)
+    return if auditable_changes.empty?
+
+    AnonymousOrModerationEvent.create!(
+      assignment: assignment,
+      submission: self,
+      user: grader,
+      event_type: 'submission_updated',
+      payload: auditable_changes
+    )
   end
 end

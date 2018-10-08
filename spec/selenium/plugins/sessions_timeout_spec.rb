@@ -37,6 +37,7 @@ describe "Sessions Timeout" do
           f(".copy_settings_button").click
         end
         f("#plugin_setting_disabled").click
+        f('#settings_session_timeout').clear
         f('#settings_session_timeout').send_keys('19')
         expect_new_page_load{ f('.save_button').click }
         assert_flash_error_message "There was an error saving the plugin settings"

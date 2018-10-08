@@ -78,7 +78,7 @@ it('renders page icon for pages', () => {
   const wrapper = shallow(
     <ToDoItem {...getDefaultProps({ type: 'Page' })} />
   );
-  expect(wrapper.find('IconMsWord').exists()).toBe(true);
+  expect(wrapper.find('IconDocument').exists()).toBe(true);
 });
 
 it('renders peer review icon for peer reviews', () => {

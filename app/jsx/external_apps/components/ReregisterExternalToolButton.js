@@ -20,7 +20,7 @@ import $ from 'jquery'
 import _ from 'underscore'
 import I18n from 'i18n!external_tools'
 import React from 'react'
-import ReactModal from 'react-modal'
+import Modal, {ModalBody} from '../../shared/components/InstuiModal'
 import Lti2Iframe from '../../external_apps/components/Lti2Iframe'
 import Lti2ReregistrationUpdateModal from '../../external_apps/components/Lti2ReregistrationUpdateModal'
 import store from '../../external_apps/lib/ExternalAppsStore'
@@ -67,40 +67,21 @@ export default class ReregisterExternalToolButton extends React.Component {
   }
 
   getModal = () => (
-    <ReactModal
+    <Modal
       ref="reactModal"
-      isOpen={this.state.modalIsOpen}
-      onRequestClose={this.closeModal}
-      className="ReactModal__Content--canvas"
-      overlayClassName="ReactModal__Overlay--canvas"
+      open={this.state.modalIsOpen}
+      onDismiss={this.closeModal}
+      label={I18n.t('App Reregistration')}
     >
-      <div id={`${this.state.tool.name}Heading`} className="ReactModal__Layout">
-        <div className="ReactModal__Header">
-          <div className="ReactModal__Header-Title">
-            <h4 tabIndex="-1">{I18n.t('App Reregistration')}</h4>
-          </div>
-          <div className="ReactModal__Header-Actions">
-            <button
-              className="Button Button--icon-action"
-              ref="btnClose"
-              type="button"
-              onClick={this.closeModal}
-            >
-              <i className="icon-x" />
-              <span className="screenreader-only">Close</span>
-            </button>
-          </div>
-        </div>
-        <div tabIndex="-1" className="ReactModal__Body">
-          <Lti2Iframe
-            ref="lti2Iframe"
-            handleInstall={this.handleReregistration}
-            registrationUrl={this.props.tool.reregistration_url}
-            reregistration
-          />
-        </div>
-      </div>
-    </ReactModal>
+      <ModalBody>
+        <Lti2Iframe
+          ref="lti2Iframe"
+          handleInstall={this.handleReregistration}
+          registrationUrl={this.props.tool.reregistration_url}
+          reregistration
+        />
+      </ModalBody>
+    </Modal>
   )
 
   getButton = () => {

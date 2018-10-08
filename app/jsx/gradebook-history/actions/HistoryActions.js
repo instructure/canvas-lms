@@ -46,12 +46,25 @@ function formatHistoryItems (data) {
   const users = indexById(data.users);
   const assignments = indexById(data.assignments);
 
-  return historyItems.map(item => (
-    {
-      anonymous: item.graded_anonymously,
-      assignment: assignments[item.links.assignment] ? assignments[item.links.assignment].name : '',
+  return historyItems.map(item => {
+    let assignment;
+
+    if (assignments[item.links.assignment]) {
+      assignment = {
+        anonymousGrading: assignments[item.links.assignment].anonymous_grading,
+        gradingType: assignments[item.links.assignment].grading_type,
+        muted: assignments[item.links.assignment].muted,
+        name: assignments[item.links.assignment].name
+      };
+    } else {
+      assignment = {};
+    }
+
+    return {
+      assignment,
       date: item.created_at,
-      displayAsPoints: assignments[item.links.assignment] ? assignments[item.links.assignment].grading_type === 'points' : false,
+      displayAsPoints: assignment ? assignment.gradingType === 'points' : false,
+      gradedAnonymously: item.graded_anonymously,
       grader: users[item.links.grader] ? users[item.links.grader].name : '',
       gradeAfter: item.grade_after || '',
       gradeBefore: item.grade_before || '',
@@ -61,8 +74,8 @@ function formatHistoryItems (data) {
       pointsPossibleBefore: item.points_possible_before ? item.points_possible_before.toString() : '–',
       pointsPossibleCurrent: pointsPossibleCurrent(assignments, item),
       student: users[item.links.student] ? users[item.links.student].name : '',
-    }
-  ));
+    };
+  });
 }
 
 function fetchHistoryStart () {

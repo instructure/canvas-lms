@@ -19,7 +19,6 @@
 import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {Simulate, SimulateNative} from 'react-addons-test-utils'
 import DueDateRow from 'jsx/due_dates/DueDateRow'
 import fakeENV from 'helpers/fakeENV'
 

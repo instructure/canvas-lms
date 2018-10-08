@@ -177,42 +177,143 @@ module Lti
     end
 
     describe '#index' do
+      subject { api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps", params) }
 
-      before do
-        @tp = create_tool_proxy
-        @tp.bindings.create(context: account)
-        @external_tool = new_valid_external_tool(account)
-      end
-
-      it 'returns a list of app definitions for a context' do
-        course_with_teacher(active_all: true, user: user_with_pseudonym, account: account)
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps",
-                        {controller: 'lti/lti_apps', action: 'index', format: 'json',
-                         course_id: @course.id.to_s})
-        expect(json.select {|j| j['app_type'] == @tp.class.name && j['app_id'] == @tp.id.to_s}).not_to be_nil
-        expect(json.select {|j| j['app_type'] == @external_tool.class.name && j['app_id'] == @external_tool.id.to_s}).not_to be_nil
-      end
-
-      it 'paginates the launch definitions' do
-        5.times { |_| new_valid_external_tool(account) }
-        course_with_teacher(active_all: true, user: user_with_pseudonym, account: account)
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps?per_page=3",
-                        {controller: 'lti/lti_apps', action: 'index', format: 'json',
-                         course_id: @course.id.to_s, per_page: '3'})
-
-        json_next = follow_pagination_link('next', {
+      let(:params) do
+        {
           controller: 'lti/lti_apps',
           action: 'index',
           format: 'json',
           course_id: @course.id.to_s
-        })
-        expect(json.count).to eq 3
-        expect(json_next.count).to eq 3
-        json
+        }
+      end
+      let(:settings) do
+        {
+          'title' => 'LTI 1.3 Tool',
+          'description' => '1.3 Tool',
+          'launch_url' => 'http://lti13testtool.docker/blti_launch',
+          'custom_fields' => {'has_expansion' => '$Canvas.user.id', 'no_expansion' => 'foo'},
+          'public_jwk' => {
+            "kty" => "RSA",
+            "e" => "AQAB",
+            "n" => "2YGluUtCi62Ww_TWB38OE6wTaN...",
+            "kid" => "2018-09-18T21:55:18Z",
+            "alg" => "RS256",
+            "use" => "sig"
+          },
+          'extensions' =>  [
+            {
+              'platform' => 'canvas.instructure.com',
+              'privacy_level' => 'public',
+              'tool_id' => 'LTI 1.3 Test Tool',
+              'domain' => 'http://lti13testtool.docker',
+              'settings' =>  {
+                'icon_url' => 'https://static.thenounproject.com/png/131630-200.png',
+                'selection_height' => 500,
+                'selection_width' => 500,
+                'text' => 'LTI 1.3 Test Tool Extension text',
+                'course_navigation' =>  {
+                  'message_type' => 'LtiResourceLinkRequest',
+                  'canvas_icon_class' => 'icon-lti',
+                  'icon_url' => 'https://static.thenounproject.com/png/131630-211.png',
+                  'text' => 'LTI 1.3 Test Tool Course Navigation',
+                  'url' =>
+                  'http://lti13testtool.docker/launch?placement=course_navigation',
+                  'enabled' => true
+                }
+              }
+            }
+          ]
+        }
       end
 
+      before do
+        course_with_teacher(active_all: true, user: user_with_pseudonym, account: account)
+      end
+
+      context 'lti 1.1 and 2.0 tools' do
+        before do
+          @tp = create_tool_proxy
+          @tp.bindings.create(context: account)
+          @external_tool = new_valid_external_tool(account)
+        end
+
+        it 'returns a list of app definitions for a context' do
+          expect(subject.select {|j| j['app_type'] == @tp.class.name && j['app_id'] == @tp.id.to_s}).not_to be_nil
+          expect(subject.select {|j| j['app_type'] == @external_tool.class.name && j['app_id'] == @external_tool.id.to_s}).not_to be_nil
+        end
+
+        context 'with pagination limit request' do
+          let(:params) { super().merge per_page: '3' }
+          let(:json) { subject }
+          let(:json_next) do
+            follow_pagination_link('next', {
+              controller: 'lti/lti_apps',
+              action: 'index',
+              format: 'json',
+              course_id: @course.id.to_s
+            })
+          end
+
+          before { 5.times { |_| new_valid_external_tool(account) } }
+
+          it 'paginates the launch definitions' do
+            expect(subject.count).to eq 3
+            expect(json_next.count).to eq 3
+            json
+          end
+        end
+      end
+
+      context 'lti 1.3 tools' do
+        let(:params) { super().merge lti_1_3_tool_configurations: true }
+        let(:dev_key) { DeveloperKey.create! account: account }
+        let(:tool_config) { dev_key.create_tool_configuration! settings: settings }
+        let(:enable_binding) { dev_key.developer_key_account_bindings.first.update! workflow_state: DeveloperKeyAccountBinding::ON_STATE }
+
+        before { 2.times { |_| new_valid_external_tool(account) } }
+
+        context 'with no 1.3 tools' do
+          it 'makes successful request' do
+            subject
+            expect(response).to have_http_status :ok
+          end
+
+          it { is_expected.to be_empty }
+        end
+
+        context 'with 1.3 tools' do
+          before do
+            enable_binding
+            tool_config
+          end
+
+          it 'makes successful request' do
+            subject
+            expect(response).to have_http_status :ok
+          end
+
+          it { is_expected.to_not be_empty }
+          it { is_expected.to have(1).items }
+
+          it 'is not enabled' do
+            expect(subject.first['enabled']).to be false
+          end
+
+          context 'with an enabled tool' do
+            before do
+              tool = ContextExternalTool.first
+              tool.use_1_3 = true
+              tool.developer_key = dev_key
+              tool.save!
+            end
+
+            it 'is enabled' do
+              expect(subject.first['enabled']).to be true
+            end
+          end
+        end
+      end
     end
-
-
   end
 end

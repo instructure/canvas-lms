@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import createReactClass from 'create-react-class';
 import _ from 'underscore'
 import classnames from 'classnames'
 import I18n from 'i18n!react_files'
@@ -169,4 +170,4 @@ import FocusStore from 'compiled/react_files/modules/FocusStore'
     );
   }
 
-export default React.createClass(ShowFolder)
+export default createReactClass(ShowFolder);

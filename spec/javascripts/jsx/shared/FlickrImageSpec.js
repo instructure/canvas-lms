@@ -16,32 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'react',
-  'react-addons-test-utils',
-  'jsx/shared/FlickrImage'
-], (React, TestUtils, FlickrImage) => {
+import React from 'react'
 
-  QUnit.module('FlickrImage View');
+import TestUtils from 'react-dom/test-utils'
+import FlickrImage from 'jsx/shared/FlickrImage'
 
-  test('it renders', () => {
-    const flickrImage = TestUtils.renderIntoDocument(
-      <FlickrImage />
-    );
-    ok(flickrImage);
-  });
+QUnit.module('FlickrImage View')
 
-  test('it calls selectImage when clicked', () => {
-    let called = false;
-    const selectImage = (flickrUrl) => called = true;
+test('it renders', () => {
+  const flickrImage = TestUtils.renderIntoDocument(<FlickrImage />)
+  ok(flickrImage)
+})
 
-    const flickrImage = TestUtils.renderIntoDocument(
-      <FlickrImage url={'http://imageUrl'} selectImage={selectImage} />
-    );
-    
-    TestUtils.Simulate.click(flickrImage.refs.flickrImage);
+test('it calls selectImage when clicked', () => {
+  let called = false
+  const selectImage = flickrUrl => (called = true)
 
-    ok(called, 'selectImage was called');
-  });
+  const flickrImage = TestUtils.renderIntoDocument(
+    <FlickrImage url="http://imageUrl" selectImage={selectImage} />
+  )
 
-});
+  TestUtils.Simulate.click(flickrImage.refs.flickrImage)
+
+  ok(called, 'selectImage was called')
+})

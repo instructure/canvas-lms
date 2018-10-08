@@ -16,23 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'underscore',
-  'react',
-  'react-dom',
-  'react-addons-test-utils',
-  'jsx/add_people/components/people_validation_issues',
-], (_, React, ReactDOM, TestUtils, PeopleValidationIssues) => {
-  QUnit.module('PeopleValidationIssues')
+import React from 'react'
+import TestUtils from 'react-dom/test-utils'
+import PeopleValidationIssues from 'jsx/add_people/components/people_validation_issues'
 
-  const duplicates = {
-    addr1: {
-      address: 'addr1',
-      selectedUserId: -1,
-      skip: false,
-      createNew: false,
-      newUserInfo: undefined,
-      userList: [{
+QUnit.module('PeopleValidationIssues')
+
+const duplicates = {
+  addr1: {
+    address: 'addr1',
+    selectedUserId: -1,
+    skip: false,
+    createNew: false,
+    newUserInfo: undefined,
+    userList: [
+      {
         address: 'addr1',
         user_id: 1,
         user_name: 'Addr1 User1',
@@ -49,15 +47,17 @@ define([
         account_name: 'School of Rock',
         email: 'addr1@foo.com',
         login_id: 'addr1'
-      }]
-    },
-    addr2: {
-      address: 'addr2',
-      selectedUserId: -1,
-      skip: false,
-      createNew: false,
-      newUserInfo: undefined,
-      userList: [{
+      }
+    ]
+  },
+  addr2: {
+    address: 'addr2',
+    selectedUserId: -1,
+    skip: false,
+    createNew: false,
+    newUserInfo: undefined,
+    userList: [
+      {
         address: 'addr2',
         user_id: 3,
         user_name: 'addr2User',
@@ -74,32 +74,48 @@ define([
         account_name: 'School of Rock',
         email: 'addr2@foo.com',
         login_id: 'addr1'
-      }]
-    }
-  };
-  const missing = {
-    addr3: {address: 'addr3', type: 'unique_id', createNew: false, newUserInfo: undefined},
-    addr4: {address: 'addr4', type: 'unique_id', createNew: true, newUserInfo: {name: 'the name2', email: 'email2'}}
+      }
+    ]
   }
-  const noop = function () {};
-  const inviteUsersURL = '/courses/#/invite_users';
+}
+const missing = {
+  addr3: {address: 'addr3', type: 'unique_id', createNew: false, newUserInfo: undefined},
+  addr4: {
+    address: 'addr4',
+    type: 'unique_id',
+    createNew: true,
+    newUserInfo: {name: 'the name2', email: 'email2'}
+  }
+}
+const noop = function() {}
+const inviteUsersURL = '/courses/#/invite_users'
 
-  test('renders the component', () => {
-    const component = TestUtils.renderIntoDocument(
-      <PeopleValidationIssues
-        duplicates={duplicates}
-        missing={missing}
-        searchType="unique_id"
-        inviteUsersURL={inviteUsersURL}
-        onChangeDuplicate={noop}
-        onChangeMissing={noop}
-      />
-    );
-    const peopleValidationIssues = TestUtils.findRenderedDOMComponentWithClass(component, 'addpeople__peoplevalidationissues');
-    ok(peopleValidationIssues, 'PeopleValidationIssues panel rendered');
-    ok(peopleValidationIssues.querySelector('.peopleValidationissues__duplicates'), 'duplicates section rendered');
-    ok(peopleValidationIssues.querySelector('.peoplevalidationissues__missing'), 'missing section rendered');
-    const dupeSets = peopleValidationIssues.querySelectorAll('.peopleValidationissues__duplicates .namelist');
-    equal(dupeSets.length, 2, 'there are 2 sets of duplicates');
-  });
+test('renders the component', () => {
+  const component = TestUtils.renderIntoDocument(
+    <PeopleValidationIssues
+      duplicates={duplicates}
+      missing={missing}
+      searchType="unique_id"
+      inviteUsersURL={inviteUsersURL}
+      onChangeDuplicate={noop}
+      onChangeMissing={noop}
+    />
+  )
+  const peopleValidationIssues = TestUtils.findRenderedDOMComponentWithClass(
+    component,
+    'addpeople__peoplevalidationissues'
+  )
+  ok(peopleValidationIssues, 'PeopleValidationIssues panel rendered')
+  ok(
+    peopleValidationIssues.querySelector('.peopleValidationissues__duplicates'),
+    'duplicates section rendered'
+  )
+  ok(
+    peopleValidationIssues.querySelector('.peoplevalidationissues__missing'),
+    'missing section rendered'
+  )
+  const dupeSets = peopleValidationIssues.querySelectorAll(
+    '.peopleValidationissues__duplicates .namelist'
+  )
+  equal(dupeSets.length, 2, 'there are 2 sets of duplicates')
 })

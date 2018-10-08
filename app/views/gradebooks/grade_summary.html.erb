@@ -135,6 +135,7 @@
         <th scope="col" class="assignment_score"><%= t('headers.score', "Score") %></th>
         <th scope="col" class="possible"><%= t('headers.out_of', "Out of") %></th>
         <th scope="col"><span class="screenreader-only"><%= t('headers.details', "Details") %></span></th>
+        <th scope="col"><span class="screenreader-only"><%= t('headers.submission_progress_status', "Submission Progress Status") %></span></th>
       </tr>
     </thead>
     <% @presenter.assignment_presenters.each do |assignment_presenter| %>
@@ -181,9 +182,13 @@
             <% end %>
           </td>
         <% end %>
-
         <td class="assignment_score" title="<%= t(:click_to_change, "Click to test a different score") unless assignment_presenter.unchangeable? %>">
           <div style="position: relative; height: 100%;" class="score_holder">
+            <% if !assignment_presenter.upload_status.present?  %>
+              <% js_bundle 'progress_pill' %>
+              <span class="assignment_presenter_for_submission" style="display: none;"><%= assignment_presenter.upload_status %></span>
+              <span class="react_pill_container"></span>
+            <% end %>
             <span class="tooltip">
               <span
                 class="grade"

@@ -22,14 +22,10 @@ module Lti
 
     def index
       if authorized_action(@context, @current_user, :read_as_admin)
-        app_collator = AppCollator.new(@context, method(:reregistration_url_builder))
-        collection = app_collator.bookmarked_collection
-
-        respond_to do |format|
-          app_defs = Api.paginate(collection, self, named_context_url(@context, :api_v1_context_app_definitions_url, include_host: true))
-
-          mc_status = setup_master_course_restrictions(app_defs.select{|o| o.is_a?(ContextExternalTool)}, @context)
-          format.json {render json: app_collator.app_definitions(app_defs, :master_course_status => mc_status)}
+        if params.key? :lti_1_3_tool_configurations
+          lti_tools_1_3
+        else
+          lti_tools_1_1_and_2_0
         end
       end
     end
@@ -55,6 +51,52 @@ module Lti
 
 
     private
+
+    def lti_tools_1_3
+      collection = tool_configs.each_with_object([]) do |tool, memo|
+        config = {}
+        config[:config] = tool
+        config[:enabled] = dev_key_ids_of_installed_tools.include?(tool.developer_key_id)
+        memo << config
+      end
+
+      respond_to do |format|
+        format.json {render json: app_collator.app_definitions(collection)}
+      end
+    end
+
+    def dev_key_ids_of_installed_tools
+      @installed_tools ||= ContextExternalTool.where(developer_key: dev_keys).pluck(:developer_key_id)
+    end
+
+    def tool_configs
+      @tool_configs ||= dev_keys.map(&:tool_configuration)
+    end
+
+    def dev_keys
+      @dev_keys ||= begin
+        context = @context.is_a?(Account) ? @context : @context.account
+        bindings = DeveloperKeyAccountBinding.lti_1_3_tools(context)
+        (bindings + Account.site_admin.shard.activate { DeveloperKeyAccountBinding.lti_1_3_tools(Account.site_admin) }).
+          map(&:developer_key).
+          select(&:usable?)
+      end
+    end
+
+    def lti_tools_1_1_and_2_0
+      collection = app_collator.bookmarked_collection
+
+      respond_to do |format|
+        app_defs = Api.paginate(collection, self, named_context_url(@context, :api_v1_context_app_definitions_url, include_host: true))
+
+        mc_status = setup_master_course_restrictions(app_defs.select{|o| o.is_a?(ContextExternalTool)}, @context)
+        format.json {render json: app_collator.app_definitions(app_defs, :master_course_status => mc_status)}
+      end
+    end
+
+    def app_collator
+      @app_collator = AppCollator.new(@context, method(:reregistration_url_builder))
+    end
 
     def reregistration_url_builder(context, tool_proxy_id)
         polymorphic_url([context, :tool_proxy_reregistration], tool_proxy_id: tool_proxy_id)

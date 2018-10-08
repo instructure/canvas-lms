@@ -310,6 +310,12 @@ describe RubricAssociation do
           assignment.reload
         end
 
+        it "does not record a rubric_updated event when no updating_user present" do
+          ra = old_rubric.rubric_associations.last
+          ra.update!(updating_user: nil)
+          expect{ ra.update!(skip_updating_points_possible: true) }.not_to change{ AnonymousOrModerationEvent.count }
+        end
+
         it 'records a rubric_updated event for the assignment' do
           expect {
             RubricAssociation.generate(teacher, rubric, course, association_object: assignment, purpose: 'grading')
@@ -365,6 +371,36 @@ describe RubricAssociation do
           expect(last_created_event.assignment_id).to eq assignment.id
         end
       end
+    end
+  end
+
+  describe "#auditable?" do
+    let(:course) { Course.create! }
+    let(:teacher) { course.enroll_teacher(User.create!, active_all: true).user }
+    let(:rubric) { Rubric.create!(title: 'hi', context: course) }
+
+    it "is auditable when assignment is auditable" do
+      assignment = course.assignments.create!(name: "anonymous", anonymous_grading: true)
+      ra = RubricAssociation.generate(
+        teacher,
+        rubric,
+        course,
+        association_object: assignment,
+        purpose: "grading"
+      )
+      expect(ra).to be_auditable
+    end
+
+    it "is not auditable when assignment is not auditable" do
+      assignment = course.assignments.create!(name: "plain")
+      ra = RubricAssociation.generate(
+        teacher,
+        rubric,
+        course,
+        association_object: assignment,
+        purpose: "grading"
+      )
+      expect(ra).not_to be_auditable
     end
   end
 end

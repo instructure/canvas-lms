@@ -23,10 +23,10 @@ import './jquery.instructure_forms' /* formSubmit */
 import 'jqueryui/dialog'
 import './jquery.instructure_misc_plugins' /* showIf */
 
-  var $message_students_dialog = $("#message_students_dialog");
-  var $sendButton = $message_students_dialog.find(".send_button");
-  var currentSettings = {};
-  var checkSendable = function() {
+  let currentSettings = {}
+
+  function checkSendable() {
+    const $message_students_dialog = messageStudentsDialog()
     disableSend(
       $message_students_dialog.find("#body").val().length == 0 ||
       $message_students_dialog.find(".student:not(.blank):visible").length == 0
@@ -35,6 +35,7 @@ import './jquery.instructure_misc_plugins' /* showIf */
 
   /*global messageStudents*/
   window.messageStudents = function(settings) {
+    const $message_students_dialog = messageStudentsDialog()
     currentSettings = settings;
     $message_students_dialog.find(".message_types").empty();
     for(var idx=0, l=settings.options.length; idx < l; idx++) {
@@ -82,6 +83,8 @@ import './jquery.instructure_misc_plugins' /* showIf */
 
     $ul.show();
 
+    const dialogTitle = I18n.t('message_student', 'Message Students for %{course_name}', {course_name: title})
+
     $message_students_dialog.data('students_hash', students_hash),
     $message_students_dialog.find(".asset_title").text(title);
     $message_students_dialog.find(".out_of").showIf(settings.points_possible != null);
@@ -94,14 +97,25 @@ import './jquery.instructure_misc_plugins' /* showIf */
     $message_students_dialog.find("select").change();
     $message_students_dialog.dialog({
       width: 600,
-      modal: true
+      modal: true,
+      open: (_event, _ui) => {
+        $message_students_dialog.closest('.ui-dialog')
+          .attr('role', 'dialog')
+          .attr('aria-label', dialogTitle)
+      },
+      close: (_event, _ui) => {
+        $message_students_dialog.closest('.ui-dialog')
+          .removeAttr('role')
+          .removeAttr('aria-label')
+      }
     })
     .dialog('open')
-    .dialog('option', 'title', I18n.t('message_student', 'Message Students for %{course_name}', {course_name: title}))
+    .dialog('option', 'title', dialogTitle)
     .on('dialogclose', settings.onClose);
   };
 
   $(document).ready(function() {
+    const $message_students_dialog = messageStudentsDialog()
     $message_students_dialog.find("button").click(function(e) {
       var btn = $(e.target);
       if (btn.hasClass("disabled")) {
@@ -189,7 +203,7 @@ import './jquery.instructure_misc_plugins' /* showIf */
 
   function disableButtons(disabled, buttons) {
     if (buttons == null) {
-      buttons = $message_students_dialog.find("button");
+      buttons = messageStudentsDialog().find("button");
     }
     buttons
       .toggleClass("disabled", disabled)
@@ -197,7 +211,11 @@ import './jquery.instructure_misc_plugins' /* showIf */
   }
 
   function disableSend(disabled) {
-    disableButtons(disabled, $sendButton);
+    disableButtons(disabled, messageStudentsDialog().find(".send_button"));
+  }
+
+  function messageStudentsDialog() {
+    return $('#message_students_dialog')
   }
 
 export default messageStudents;

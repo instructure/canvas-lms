@@ -22,6 +22,13 @@ class TokenScopes
     verb: "GET",
     scope: "#{OAUTH2_SCOPE_NAMESPACE}userinfo"
   }.freeze
+  LTI_SCOPES = {
+    "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem" => I18n.t("Manage Line Items"),
+    "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly" => I18n.t("Read Line Items"),
+    "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly" => I18n.t("Read Line Item Results"),
+    "https://purl.imsglobal.org/spec/lti-ags/scope/score" => I18n.t("Create/Edit Line Item Scores"),
+    "https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly" => I18n.t("Read Context Membership")
+  }.freeze
 
   def self.named_scopes
     return @_named_scopes if @_named_scopes
@@ -37,7 +44,7 @@ class TokenScopes
   end
 
   def self.all_scopes
-    @_all_scopes ||= [USER_INFO_SCOPE[:scope], *api_routes.map {|route| route[:scope]}].freeze
+    @_all_scopes ||= [USER_INFO_SCOPE[:scope], *api_routes.map {|route| route[:scope]}, *LTI_SCOPES.values].freeze
   end
 
   def self.detailed_scopes

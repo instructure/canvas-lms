@@ -53,8 +53,9 @@ module Quizzes
       end
       @submission.with_versioning(true) do |s|
         original_score = s.kept_score
+        original_workflow_state = s.workflow_state
         if s.save
-          track_outcomes(s.attempt) if outcomes_require_update(s, original_score)
+          track_outcomes(s.attempt) if outcomes_require_update(s, original_score, original_workflow_state)
         end
       end
       @submission.context_module_action
@@ -96,11 +97,11 @@ module Quizzes
       }
       result[:answer_id] = user_answer.answer_id if user_answer.answer_id
       result.merge!(user_answer.answer_details)
-      return result
+      result
     end
 
-    def outcomes_require_update(submission, original_score)
-      submission.quiz.assignment? && kept_score_updating?(original_score)
+    def outcomes_require_update(submission, original_score, original_workflow_state)
+      submission.quiz.assignment? && kept_score_updating?(original_score, original_workflow_state)
     end
 
     def track_outcomes(attempt)
@@ -127,13 +128,17 @@ module Quizzes
 
     private
 
-    def kept_score_updating?(original_score)
+    def kept_score_updating?(original_score, original_workflow_state)
       # three scoring policies exist, highest, latest, and avg.
       # for the latter two, the kept score is always updating and
       # we'll need this method to return true. if the method is highest,
       # the kept score only updates if it's higher than the original score
       quiz = @submission.quiz
       return true if quiz.scoring_policy != 'keep_highest' || quiz.points_possible.to_i == 0 || original_score.nil?
+      # when a submission is pending review, no outcome results are generated.
+      # if the submission transitions to completed, then we need this method
+      # to return true, even if the kept score isn't changing, so outcome results are generated.
+      return true if original_workflow_state == 'pending_review' && @submission.workflow_state == 'complete'
       @submission.kept_score && @submission.kept_score > original_score
     end
 

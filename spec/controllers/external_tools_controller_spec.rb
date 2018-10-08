@@ -107,7 +107,7 @@ describe ExternalToolsController do
         )
         tool.url = "http://www.example.com/basic_lti"
         tool.course_navigation = { enabled: true }
-        tool.settings['use_1_3'] = true
+        tool.use_1_3 = true
         tool.developer_key = DeveloperKey.create!
         tool.save!
         tool
@@ -1490,6 +1490,34 @@ describe ExternalToolsController do
       expect(tool_settings["resource_link_id"]).to eq opaque_id(@assignment.external_tool_tag)
     end
 
+    it 'passes whitelisted `platform` query param to lti launch body' do
+      tool = new_valid_tool(@course)
+      assignment_model(:course => @course,
+                       :name => 'tool assignment',
+                       :submission_types => 'external_tool',
+                       :points_possible => 20,
+                       :grading_type => 'points')
+      tag = @assignment.build_external_tool_tag(:url => tool.url)
+      tag.content_type = 'ContextExternalTool'
+      tag.save!
+
+      get :generate_sessionless_launch, params: {
+        course_id: @course.id,
+        launch_type: 'assessment',
+        assignment_id: @assignment.id,
+        platform: 'mobile'
+      }
+      expect(response).to be_successful
+
+      json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
+      verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
+      redis_key = "#{@course.class.name}:#{ExternalToolsController::REDIS_PREFIX}#{verifier}"
+      launch_settings = JSON.parse(Canvas.redis.get(redis_key))
+      tool_settings = launch_settings['tool_settings']
+
+      expect(tool_settings['ext_platform']).to eq 'mobile'
+    end
+
     it "requires context_module_id for module_item launch type" do
       @tool = new_valid_tool(@course)
       @cm = ContextModule.create(context: @course)
@@ -1579,6 +1607,148 @@ describe ExternalToolsController do
       expect(get :generate_sessionless_launch, params: params).to redirect_to course_url(@course)
     end
 
+  end
+
+  describe '#create_tool_from_tool_config' do
+    subject {  post :create_tool_from_tool_config, params: params }
+
+    let_once(:account) { Account.default }
+    let_once(:sub_account) { account_model(root_account: account) }
+    let_once(:admin) { account_admin_user(account: account) }
+    let_once(:student) do
+      student_in_course
+      @student
+    end
+    let(:developer_key) { DeveloperKey.create!(account: account) }
+    let(:tool_configuration) do
+      Lti::ToolConfiguration.create!(
+        developer_key: developer_key,
+        settings: settings
+      )
+    end
+    let(:settings) do
+      {
+        'title' => 'LTI 1.3 Tool',
+        'description' => '1.3 Tool',
+        'launch_url' => 'http://lti13testtool.docker/blti_launch',
+        'custom_fields' => {'has_expansion' => '$Canvas.user.id', 'no_expansion' => 'foo'},
+        'public_jwk' => {
+          "kty" => "RSA",
+          "e" => "AQAB",
+          "n" => "2YGluUtCi62Ww_TWB38OE6wTaN...",
+          "kid" => "2018-09-18T21:55:18Z",
+          "alg" => "RS256",
+          "use" => "sig"
+        },
+        'extensions' =>  [
+          {
+            'platform' => 'canvas.instructure.com',
+            'privacy_level' => 'public',
+            'tool_id' => 'LTI 1.3 Test Tool',
+            'domain' => 'http://lti13testtool.docker',
+            'settings' =>  {
+              'icon_url' => 'https://static.thenounproject.com/png/131630-200.png',
+              'selection_height' => 500,
+              'selection_width' => 500,
+              'text' => 'LTI 1.3 Test Tool Extension text',
+              'course_navigation' =>  {
+                'message_type' => 'LtiResourceLinkRequest',
+                'canvas_icon_class' => 'icon-lti',
+                'icon_url' => 'https://static.thenounproject.com/png/131630-211.png',
+                'text' => 'LTI 1.3 Test Tool Course Navigation',
+                'url' =>
+                'http://lti13testtool.docker/launch?placement=course_navigation',
+                'enabled' => true
+              }
+            }
+          }
+        ]
+      }
+    end
+    let(:dev_key_id) { developer_key.id }
+
+    let(:params) { { account_id: sub_account.id, developer_key_id: dev_key_id } }
+
+    before do
+      user_session(admin)
+      tool_configuration
+    end
+
+    context 'when the user has manage_developer_keys' do
+      it { is_expected.to be_success }
+    end
+
+    context 'when the user is not an admin' do
+      before { user_session(student) }
+
+      it { is_expected.to be_unauthorized }
+    end
+
+    context 'when the developer key does not exist' do
+      before { developer_key.destroy! }
+
+      it { is_expected.to be_not_found }
+    end
+
+    context 'when the tool configuration does not exist' do
+      let(:tool_configuration) { nil }
+
+      it { is_expected.to be_not_found }
+    end
+
+    shared_examples_for 'reuses an exisiting ContextExternalTool' do
+      let(:tool_context) { raise 'Override in spec' }
+      let(:cet) do
+        cet = tool_configuration.new_external_tool(tool_context)
+        cet.save!
+        cet
+      end
+
+      before do
+        cet
+        subject
+      end
+
+      it 'returns the existing tool' do
+        expect(json_parse['id']).to eq cet.id
+      end
+    end
+
+    shared_examples_for 'a context that can create a tool' do
+      let(:context) { raise 'Override in spec' }
+
+      it 'creates a ContextExternalTool' do
+        expect { subject }.to change { ContextExternalTool.count }.by(1)
+        expect(ContextExternalTool.first.context_id).to eq context.id
+      end
+
+      it_behaves_like 'reuses an exisiting ContextExternalTool' do
+        let(:tool_context) { context }
+      end
+    end
+
+    context 'when an account' do
+      it_behaves_like 'a context that can create a tool' do
+        let(:context) { sub_account }
+      end
+    end
+
+    context 'when a course' do
+      let_once(:course) { course_model account: sub_account }
+
+      it_behaves_like 'a context that can create a tool' do
+        let(:params) { { course_id: course.id, developer_key_id: dev_key_id } }
+        let(:context) { course }
+      end
+
+      it_behaves_like 'reuses an exisiting ContextExternalTool' do
+        let(:tool_context) { sub_account }
+      end
+
+      it_behaves_like 'reuses an exisiting ContextExternalTool' do
+        let(:tool_context) { account }
+      end
+    end
   end
 
   def opaque_id(asset)

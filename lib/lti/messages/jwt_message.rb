@@ -38,6 +38,7 @@ module Lti::Messages
       add_include_name_claims! if @tool.include_name?
       add_resource_claims!
       add_private_claims!
+      add_names_and_roles_service_claims! if include_names_and_roles_service_claims?
 
       @expander.expand_variables!(@message.extensions)
       { id_token: @message.to_jws(Lti::KeyStorage.present_key) }
@@ -127,6 +128,16 @@ module Lti::Messages
         add_extension('content_file_extensions', 'zip,imscc')
         add_extension('content_return_url', @return_url)
       end
+    end
+
+    def include_names_and_roles_service_claims?
+      (@context.is_a?(Course) || @context.is_a?(Group)) && @tool.names_and_roles_service_enabled?
+    end
+
+    def add_names_and_roles_service_claims!
+      @message.names_and_roles_service.context_memberships_url =
+        @expander.controller.polymorphic_url([@context, :names_and_roles])
+      @message.names_and_roles_service.service_version = '2.0'
     end
 
     def expand_variable(variable)

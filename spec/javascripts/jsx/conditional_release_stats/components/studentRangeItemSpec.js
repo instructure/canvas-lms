@@ -16,69 +16,75 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'react',
-  'react-addons-test-utils',
-  'jsx/conditional_release_stats/components/student-range-item',
-], (React, TestUtils, StudentRangeItem) => {
+import React from 'react'
 
-  QUnit.module('Student Range Item')
+import TestUtils from 'react-dom/test-utils'
+import StudentRangeItem from 'jsx/conditional_release_stats/components/student-range-item'
 
-  const defaultProps = () => ({
-    studentIndex: 0,
-    student: {
-      user: { name: 'Foo Bar' },
-      trend: 0,
-    },
-    selectStudent: () => {},
-  })
+QUnit.module('Student Range Item')
 
-  const renderComponent = (props) => {
-    return TestUtils.renderIntoDocument(
-      <StudentRangeItem {...props} />
-    )
-  }
+const defaultProps = () => ({
+  studentIndex: 0,
+  student: {
+    user: {name: 'Foo Bar'},
+    trend: 0
+  },
+  selectStudent: () => {}
+})
 
-  test('renders name correctly', () => {
-    const component = renderComponent(defaultProps())
+const renderComponent = props => TestUtils.renderIntoDocument(<StudentRangeItem {...props} />)
 
-    const renderedList = TestUtils.findRenderedDOMComponentWithClass(component, 'crs-student__name')
-    equal(renderedList.textContent, 'Foo Bar', 'renders student name')
-  })
+test('renders name correctly', () => {
+  const component = renderComponent(defaultProps())
 
-  test('renders no trend correctly', () => {
-    const props = defaultProps()
-    props.student.trend = null
-    const component = renderComponent(props)
+  const renderedList = TestUtils.findRenderedDOMComponentWithClass(component, 'crs-student__name')
+  equal(renderedList.textContent, 'Foo Bar', 'renders student name')
+})
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-student__trend-icon')
-    equal(renderedList.length, 0, 'renders component')
-  })
+test('renders no trend correctly', () => {
+  const props = defaultProps()
+  props.student.trend = null
+  const component = renderComponent(props)
 
-  test('renders positive trend correctly', () => {
-    const props = defaultProps()
-    props.student.trend = 1
-    const component = renderComponent(props)
+  const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(
+    component,
+    'crs-student__trend-icon'
+  )
+  equal(renderedList.length, 0, 'renders component')
+})
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-student__trend-icon__positive')
-    equal(renderedList.length, 1, 'renders component')
-  })
+test('renders positive trend correctly', () => {
+  const props = defaultProps()
+  props.student.trend = 1
+  const component = renderComponent(props)
 
-  test('renders neutral trend correctly', () => {
-    const props = defaultProps()
-    props.student.trend = 0
-    const component = renderComponent(props)
+  const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(
+    component,
+    'crs-student__trend-icon__positive'
+  )
+  equal(renderedList.length, 1, 'renders component')
+})
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-student__trend-icon__neutral')
-    equal(renderedList.length, 1, 'renders component')
-  })
+test('renders neutral trend correctly', () => {
+  const props = defaultProps()
+  props.student.trend = 0
+  const component = renderComponent(props)
 
-  test('renders negative trend correctly', () => {
-    const props = defaultProps()
-    props.student.trend = -1
-    const component = renderComponent(props)
+  const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(
+    component,
+    'crs-student__trend-icon__neutral'
+  )
+  equal(renderedList.length, 1, 'renders component')
+})
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-student__trend-icon__negative')
-    equal(renderedList.length, 1, 'renders component')
-  })
+test('renders negative trend correctly', () => {
+  const props = defaultProps()
+  props.student.trend = -1
+  const component = renderComponent(props)
+
+  const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(
+    component,
+    'crs-student__trend-icon__negative'
+  )
+  equal(renderedList.length, 1, 'renders component')
 })

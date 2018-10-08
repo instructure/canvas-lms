@@ -480,7 +480,10 @@ class GroupsController < ApplicationController
       end
       respond_to do |format|
         if @group.save
-          @group.add_user(@current_user, 'accepted', true) if @group.should_add_creator?(@current_user)
+          DueDateCacher.with_executing_user(@current_user) do
+            @group.add_user(@current_user, 'accepted', true) if @group.should_add_creator?(@current_user)
+          end
+
           @group.invitees = params[:invitees]
           flash[:notice] = t('notices.create_success', 'Group was successfully created.')
           format.html { redirect_to group_url(@group) }
@@ -675,12 +678,14 @@ class GroupsController < ApplicationController
   def add_user
     @group = @context
     if authorized_action(@group, @current_user, :manage)
-      @membership = @group.add_user(User.find(params[:user_id]))
-      if @membership.valid?
-        @group.touch
-        render :json => @membership
-      else
-        render :json => @membership.errors, :status => :bad_request
+      DueDateCacher.with_executing_user(@current_user) do
+        @membership = @group.add_user(User.find(params[:user_id]))
+        if @membership.valid?
+          @group.touch
+          render :json => @membership
+        else
+          render :json => @membership.errors, :status => :bad_request
+        end
       end
     end
   end

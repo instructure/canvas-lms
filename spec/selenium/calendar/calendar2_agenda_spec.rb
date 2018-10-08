@@ -377,7 +377,7 @@ describe "calendar2" do
         wait_for_ajaximations
         expect(f('#content')).not_to contain_css('.agenda-event__item')
         find_appointment_button.click
-        f('.ReactModalPortal button[type="submit"]').click
+        f('[role="dialog"][aria-label="Select Course"] button[type="submit"]').click
         expect(all_agenda_items.count).to equal(2)
       end
 
@@ -385,7 +385,7 @@ describe "calendar2" do
         get "/calendar2#view_name=agenda&view_start=#{(Time.zone.today + 1.day).strftime}"
         wait_for_ajaximations
         find_appointment_button.click
-        f('.ReactModalPortal button[type="submit"]').click
+        f('[role="dialog"][aria-label="Select Course"] button[type="submit"]').click
         wait_for_ajaximations
         agenda_item.click
         f('.reserve_event_link').click

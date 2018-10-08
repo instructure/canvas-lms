@@ -100,4 +100,46 @@ describe AnonymousOrModerationEvent do
       end
     end
   end
+
+  describe "#events_for_submission" do
+    let(:course) { Course.create! }
+    let(:teacher) { course_with_user("TeacherEnrollment", name: "Teacher", course: course, active_all: true).user }
+    let(:student) { course_with_user("StudentEnrollment", name: "Student", course: course, active_all: true).user }
+    let(:assignment) { course.assignments.create!(name: "anonymous", anonymous_grading: true, updating_user: teacher) }
+    let(:submission) { assignment.submit_homework(student, body: "please give good grade") }
+    let(:events) do
+      AnonymousOrModerationEvent.events_for_submission(assignment_id: assignment.id, submission_id: submission.id)
+    end
+
+    before :each do
+      submission.submission_comments.create!(author: teacher, comment: "no")
+    end
+
+    it "includes AnonymousOrModerationEvents related to assignment and submission" do
+      expect(events.count).to be 2
+    end
+
+    it "includes AnonymousOrModerationEvents of event_type assignment_*" do
+      assignment_events = events.select { |event| event.event_type.include?("assignment_") }
+      expect(assignment_events.count).to be 1
+    end
+
+    it "includes AnonymousOrModerationEvents of event_type submission_comment_*" do
+      submission_comment_events = events.select { |event| event.event_type.include?("submission_comment_") }
+      expect(submission_comment_events.count).to be 1
+    end
+
+    it "does not include AnonymousOrModerationEvents not related to assignment" do
+      expect {
+        course.assignments.create!(name: "another assignment", anonymous_grading: true, updating_user: teacher)
+      }.not_to change { events.count }
+    end
+
+    it "does not include AnonymousOrModerationEvents not related to submission" do
+      second_student = course_with_user("StudentEnrollment", name: "Student", course: course, active_all: true).user
+      expect {
+        assignment.submit_homework(second_student, body: "please give bad grade")
+      }.not_to change { events.count }
+    end
+  end
 end

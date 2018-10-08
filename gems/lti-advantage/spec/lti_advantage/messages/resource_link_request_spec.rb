@@ -46,6 +46,11 @@ module LtiAdvantage::Messages
         message.tool_platform.name = 'foo'
         expect(message.tool_platform.name).to eq 'foo'
       end
+
+      it 'initializes "names_and_roles_service" when it is referenced' do
+        message.names_and_roles_service.context_memberships_url = 'http://some.meaningless.url.com'
+        expect(message.names_and_roles_service.context_memberships_url).to eq 'http://some.meaningless.url.com'
+      end
     end
 
     describe 'validations' do
@@ -81,7 +86,7 @@ module LtiAdvantage::Messages
         message.aud = 'invalid-claim'
         message.validate
         expect(message.errors.messages[:aud]).to match_array [
-          'aud must be an intance of Array'
+          'aud must be an instance of Array'
         ]
       end
 
@@ -89,7 +94,7 @@ module LtiAdvantage::Messages
         message.extensions = 'invalid-claim'
         message.validate
         expect(message.errors.messages[:extensions]).to match_array [
-          'extensions must be an intance of Hash'
+          'extensions must be an instance of Hash'
         ]
       end
 
@@ -97,7 +102,7 @@ module LtiAdvantage::Messages
         message.roles = 'invalid-claim'
         message.validate
         expect(message.errors.messages[:roles]).to match_array [
-          'roles must be an intance of Array'
+          'roles must be an instance of Array'
         ]
       end
 
@@ -105,7 +110,7 @@ module LtiAdvantage::Messages
         message.role_scope_mentor = 'invalid-claim'
         message.validate
         expect(message.errors.messages[:role_scope_mentor]).to match_array [
-          'role_scope_mentor must be an intance of Array'
+          'role_scope_mentor must be an instance of Array'
         ]
       end
 
@@ -113,7 +118,7 @@ module LtiAdvantage::Messages
         message.context = 'foo'
         message.validate
         expect(message.errors.messages[:context]).to match_array [
-          'context must be an intance of LtiAdvantage::Claims::Context'
+          'context must be an instance of LtiAdvantage::Claims::Context'
         ]
       end
 
@@ -121,7 +126,7 @@ module LtiAdvantage::Messages
         message.launch_presentation = 'foo'
         message.validate
         expect(message.errors.messages[:launch_presentation]).to match_array [
-          'launch_presentation must be an intance of LtiAdvantage::Claims::LaunchPresentation'
+          'launch_presentation must be an instance of LtiAdvantage::Claims::LaunchPresentation'
         ]
       end
 
@@ -129,7 +134,7 @@ module LtiAdvantage::Messages
         message.lis = 'foo'
         message.validate
         expect(message.errors.messages[:lis]).to match_array [
-          'lis must be an intance of LtiAdvantage::Claims::Lis'
+          'lis must be an instance of LtiAdvantage::Claims::Lis'
         ]
       end
 
@@ -137,7 +142,7 @@ module LtiAdvantage::Messages
         message.tool_platform = 'foo'
         message.validate
         expect(message.errors.messages[:tool_platform]).to match_array [
-          'tool_platform must be an intance of LtiAdvantage::Claims::Platform'
+          'tool_platform must be an instance of LtiAdvantage::Claims::Platform'
         ]
       end
 
@@ -145,7 +150,15 @@ module LtiAdvantage::Messages
         message.resource_link = 'foo'
         message.validate
         expect(message.errors.messages[:resource_link]).to match_array [
-          'resource_link must be an intance of LtiAdvantage::Claims::ResourceLink'
+          'resource_link must be an instance of LtiAdvantage::Claims::ResourceLink'
+        ]
+      end
+
+      it 'verifies that "names_and_roles_service" is a NamesAndRolesService' do
+        message.names_and_roles_service = 'foo'
+        message.validate
+        expect(message.errors.messages[:names_and_roles_service]).to match_array [
+          'names_and_roles_service must be an instance of LtiAdvantage::Claims::NamesAndRolesService'
         ]
       end
     end

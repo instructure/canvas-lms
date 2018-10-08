@@ -17,9 +17,10 @@
  */
 
 import React from 'react'
-import TestUtils from 'react-addons-test-utils'
+import TestUtils from 'react-dom/test-utils'
 import DeveloperKeyFormFields from 'jsx/developer_keys/NewKeyForm'
 import fakeENV from 'helpers/fakeENV'
+import { mount } from 'enzyme'
 
 QUnit.module('NewKeyForm')
 
@@ -43,7 +44,7 @@ const developerKey = {
   test_cluster_only: true
 }
 
-function formFieldOfTypeAndName(devKey, fieldType, name) {
+function formFieldOfTypeAndName(devKey, fieldType, name, isLtiKey, customizing) {
   const component = TestUtils.renderIntoDocument(
     <DeveloperKeyFormFields
       availableScopes={{}}
@@ -51,6 +52,7 @@ function formFieldOfTypeAndName(devKey, fieldType, name) {
       developerKey={devKey}
       dispatch={ () => {} }
       listDeveloperKeyScopesSet={ () => {} }
+      createLtiKeyState={ {customizing, isLtiKey} }
     />
   )
   return TestUtils.scryRenderedDOMComponentsWithTag(component, fieldType).
@@ -107,4 +109,69 @@ test('populates the key test_cluster_only', () => {
   const input = formFieldOfTypeAndName(developerKey, 'input', 'test_cluster_only')
   equal(input.checked, developerKey.test_cluster_only)
   fakeENV.teardown()
+})
+
+test('does not include legacy redirect uri if lti key', () => {
+  notOk(formFieldOfTypeAndName(developerKey, 'input', 'redirect_uri', true))
+})
+
+test('does not include redirect uris if lti key', () => {
+  notOk(formFieldOfTypeAndName(developerKey, 'textarea', 'redirect_uris', true))
+})
+
+test('does not include vendor code if lti key', () => {
+  notOk(formFieldOfTypeAndName(developerKey, 'input', 'vendor_code', true))
+})
+
+test('does not include icon URL if lti key', () => {
+  notOk(formFieldOfTypeAndName(developerKey, 'input', 'icon_url', true))
+})
+
+test('populates the key name when lti key', () => {
+  const input = formFieldOfTypeAndName(developerKey, 'input', 'name', true)
+  equal(input.value, developerKey.name)
+})
+
+test('defaults name to "Unnamed Tool" when lti key', () => {
+  const input = formFieldOfTypeAndName({id: 123}, 'input', 'name', true)
+  equal(input.value, 'Unnamed Tool')
+})
+
+test('populates the key owner email when lti key', () => {
+  const input = formFieldOfTypeAndName(developerKey, 'input', 'email', true)
+  equal(input.value, developerKey.email)
+})
+
+test('populates the key notes when lti key', () => {
+  const textarea = formFieldOfTypeAndName(developerKey, 'textarea', 'notes', true)
+  equal(textarea.value, developerKey.notes)
+})
+
+test('renders the tool configuration form if isLtiKey is true', () => {
+  const wrapper = mount(
+    <DeveloperKeyFormFields
+      availableScopes={{}}
+      availableScopesPending={false}
+      developerKey={developerKey}
+      dispatch={ () => {} }
+      listDeveloperKeyScopesSet={ () => {} }
+      createLtiKeyState={ {customizing: false, isLtiKey: true} }
+    />
+  )
+  ok(wrapper.find('ToolConfiguration').exists())
+})
+
+test('renders the developer key scopes form if isLtiKey is false', () => {
+  const wrapper = mount(
+    <DeveloperKeyFormFields
+      availableScopes={{}}
+      availableScopesPending={false}
+      developerKey={developerKey}
+      dispatch={ () => {} }
+      listDeveloperKeyScopesSet={ () => {} }
+      createLtiKeyState={ {customizing: false, isLtiKey: false} }
+    />
+  )
+  ok(wrapper.find('DeveloperKeyScopes').exists())
+  wrapper.unmount()
 })

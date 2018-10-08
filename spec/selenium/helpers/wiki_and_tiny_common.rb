@@ -89,8 +89,7 @@ module WikiAndTinyCommon
   end
 
   def save_wiki
-    f('form.edit-form button.submit').click
-    wait_for_ajax_requests
+    wait_for_new_page_load { f('form.edit-form button.submit').click }
     get "/courses/#{@course.id}/pages/front-page/edit"
   end
 

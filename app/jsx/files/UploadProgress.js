@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import createReactClass from 'create-react-class';
 import I18n from 'i18n!react_files'
 import classnames from 'classnames'
 import UploadProgress from 'compiled/react_files/components/UploadProgress'
@@ -76,4 +77,4 @@ import mimeClass from 'compiled/util/mimeClass'
       );
     };
 
-export default React.createClass(UploadProgress)
+export default createReactClass(UploadProgress);

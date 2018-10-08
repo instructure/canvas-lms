@@ -1,5 +1,2 @@
-define(['./messenger'], function(Messenger){
-
-  return  new Messenger();
-
-});
+import Messenger from "./messenger";
+export default new Messenger();

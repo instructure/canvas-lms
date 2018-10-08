@@ -16,119 +16,154 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jsx/grading/quizzesNextSpeedGrading'
-], (quizzesNextSpeedGrading) => {
+import quizzesNextSpeedGrading from 'jsx/grading/quizzesNextSpeedGrading'
 
-  let postMessageStub = sinon.stub()
-  let fakeIframeHolder = {
-    children: sinon.stub().returns([
-      {
-        contentWindow: {
-          postMessage: postMessageStub
-        }
+const postMessageStub = sinon.stub()
+const fakeIframeHolder = {
+  children: sinon.stub().returns([
+    {
+      contentWindow: {
+        postMessage: postMessageStub
       }
-    ])
-  }
-
-  let registerCbStub = sinon.stub()
-  let refreshGradesCbStub = sinon.stub()
-  let addEventListenerStub = sinon.stub()
-  let speedGraderWindow = {
-    addEventListener: addEventListenerStub
-  }
-
-  const refreshSubmissionsToViewStub = sinon.stub()
-  const showGradeStub = sinon.stub()
-  const showDiscussionStub = sinon.stub()
-  const showRubricStub = sinon.stub()
-  const updateStatsInHeaderStub = sinon.stub()
-  const refreshFullRubricStub = sinon.stub()
-  const setGradeReadOnlStub = sinon.stub()
-  const showSubmissionDetailsStub = sinon.stub()
-
-  let fakeEG = {
-    refreshSubmissionsToView: refreshSubmissionsToViewStub,
-    showGrade: showGradeStub,
-    showDiscussion: showDiscussionStub,
-    showRubric: showRubricStub,
-    updateStatsInHeader: updateStatsInHeaderStub,
-    refreshFullRubric: refreshFullRubricStub,
-    setGradeReadOnly: setGradeReadOnlStub,
-    showSubmissionDetails: showSubmissionDetailsStub
-  }
-
-  let resetStubs = function () {
-    registerCbStub.reset()
-    refreshGradesCbStub.reset()
-    addEventListenerStub.reset()
-    refreshSubmissionsToViewStub.reset()
-    showGradeStub.reset()
-    showDiscussionStub.reset()
-    showRubricStub.reset()
-    updateStatsInHeaderStub.reset()
-    refreshFullRubricStub.reset()
-    setGradeReadOnlStub.reset()
-    showSubmissionDetailsStub.reset()
-  }
-
-  QUnit.module("quizzesNextSpeedGrading", {
-    teardown: function () {
-      resetStubs();
     }
-  });
+  ])
+}
 
-  test("adds a message event listener to window", function() {
-    let fns = quizzesNextSpeedGrading(fakeEG, fakeIframeHolder, registerCbStub, refreshGradesCbStub, speedGraderWindow)
-    ok(addEventListenerStub.calledWith('message'))
-  });
+const registerCbStub = sinon.stub()
+const refreshGradesCbStub = sinon.stub()
+const addEventListenerStub = sinon.stub()
+const speedGraderWindow = {
+  addEventListener: addEventListenerStub
+}
 
-  test("sets grade to read only with a quizzesNext.register message", function() {
-    let fns = quizzesNextSpeedGrading(fakeEG, fakeIframeHolder, registerCbStub, refreshGradesCbStub, speedGraderWindow)
-    fns.onMessage({data: {subject: 'quizzesNext.register'}})
-    ok(fakeEG.setGradeReadOnly.calledWith(true))
-  });
+const refreshSubmissionsToViewStub = sinon.stub()
+const showGradeStub = sinon.stub()
+const showDiscussionStub = sinon.stub()
+const showRubricStub = sinon.stub()
+const updateStatsInHeaderStub = sinon.stub()
+const refreshFullRubricStub = sinon.stub()
+const setGradeReadOnlStub = sinon.stub()
+const showSubmissionDetailsStub = sinon.stub()
 
-  test("calls the registerCallback with a quizzesNext.register message", function() {
-    let fns = quizzesNextSpeedGrading(fakeEG, fakeIframeHolder, registerCbStub, refreshGradesCbStub, speedGraderWindow)
-    fns.onMessage({data: {subject: 'quizzesNext.register'}})
-    ok(registerCbStub.calledWith(fns.postChangeSubmissionMessage))
-  });
+const fakeEG = {
+  refreshSubmissionsToView: refreshSubmissionsToViewStub,
+  showGrade: showGradeStub,
+  showDiscussion: showDiscussionStub,
+  showRubric: showRubricStub,
+  updateStatsInHeader: updateStatsInHeaderStub,
+  refreshFullRubric: refreshFullRubricStub,
+  setGradeReadOnly: setGradeReadOnlStub,
+  showSubmissionDetails: showSubmissionDetailsStub
+}
 
-  test("calls the refreshGradesCb with a quizzesNext.submissionUpdate message", function() {
-    let fns = quizzesNextSpeedGrading(fakeEG, fakeIframeHolder, registerCbStub, refreshGradesCbStub, speedGraderWindow)
-    fns.onMessage({data: {subject: 'quizzesNext.submissionUpdate'}})
-    ok(refreshGradesCbStub.calledWith(fns.quizzesNextChange))
-  });
+const resetStubs = function() {
+  registerCbStub.reset()
+  refreshGradesCbStub.reset()
+  addEventListenerStub.reset()
+  refreshSubmissionsToViewStub.reset()
+  showGradeStub.reset()
+  showDiscussionStub.reset()
+  showRubricStub.reset()
+  updateStatsInHeaderStub.reset()
+  refreshFullRubricStub.reset()
+  setGradeReadOnlStub.reset()
+  showSubmissionDetailsStub.reset()
+}
 
-  test("calls the correct functions on EG", function() {
-    let fnsToCallOnEG = [
-      'refreshSubmissionsToView',
-      'showGrade',
-      'showDiscussion',
-      'showRubric',
-      'updateStatsInHeader',
-      'refreshFullRubric',
-      'setGradeReadOnly'
-    ]
+QUnit.module('quizzesNextSpeedGrading', {
+  teardown() {
+    resetStubs()
+  }
+})
 
-    let fns = quizzesNextSpeedGrading(fakeEG, fakeIframeHolder, registerCbStub, refreshGradesCbStub, speedGraderWindow)
-    let fakeSubmissionData = {}
-    fns.quizzesNextChange(fakeSubmissionData)
+test('adds a message event listener to window', function() {
+  const fns = quizzesNextSpeedGrading(
+    fakeEG,
+    fakeIframeHolder,
+    registerCbStub,
+    refreshGradesCbStub,
+    speedGraderWindow
+  )
+  ok(addEventListenerStub.calledWith('message'))
+})
 
-    fnsToCallOnEG.forEach(function (egFunction) {
-      ok(fakeEG[egFunction].called)
-    })
-  });
+test('sets grade to read only with a quizzesNext.register message', function() {
+  const fns = quizzesNextSpeedGrading(
+    fakeEG,
+    fakeIframeHolder,
+    registerCbStub,
+    refreshGradesCbStub,
+    speedGraderWindow
+  )
+  fns.onMessage({data: {subject: 'quizzesNext.register'}})
+  ok(fakeEG.setGradeReadOnly.calledWith(true))
+})
 
-  test("postChangeSubmissionMessage postMessage with the submission data", function() {
-    let fns = quizzesNextSpeedGrading(fakeEG, fakeIframeHolder, registerCbStub, refreshGradesCbStub, speedGraderWindow)
-    let arbitrarySubmissionData = {}
-    fns.postChangeSubmissionMessage(arbitrarySubmissionData)
-    ok(showSubmissionDetailsStub.called)
-    ok(postMessageStub.calledWith({
+test('calls the registerCallback with a quizzesNext.register message', function() {
+  const fns = quizzesNextSpeedGrading(
+    fakeEG,
+    fakeIframeHolder,
+    registerCbStub,
+    refreshGradesCbStub,
+    speedGraderWindow
+  )
+  fns.onMessage({data: {subject: 'quizzesNext.register'}})
+  ok(registerCbStub.calledWith(fns.postChangeSubmissionMessage))
+})
+
+test('calls the refreshGradesCb with a quizzesNext.submissionUpdate message', function() {
+  const fns = quizzesNextSpeedGrading(
+    fakeEG,
+    fakeIframeHolder,
+    registerCbStub,
+    refreshGradesCbStub,
+    speedGraderWindow
+  )
+  fns.onMessage({data: {subject: 'quizzesNext.submissionUpdate'}})
+  ok(refreshGradesCbStub.calledWith(fns.quizzesNextChange))
+})
+
+test('calls the correct functions on EG', function() {
+  const fnsToCallOnEG = [
+    'refreshSubmissionsToView',
+    'showGrade',
+    'showDiscussion',
+    'showRubric',
+    'updateStatsInHeader',
+    'refreshFullRubric',
+    'setGradeReadOnly'
+  ]
+
+  const fns = quizzesNextSpeedGrading(
+    fakeEG,
+    fakeIframeHolder,
+    registerCbStub,
+    refreshGradesCbStub,
+    speedGraderWindow
+  )
+  const fakeSubmissionData = {}
+  fns.quizzesNextChange(fakeSubmissionData)
+
+  fnsToCallOnEG.forEach(function(egFunction) {
+    ok(fakeEG[egFunction].called)
+  })
+})
+
+test('postChangeSubmissionMessage postMessage with the submission data', function() {
+  const fns = quizzesNextSpeedGrading(
+    fakeEG,
+    fakeIframeHolder,
+    registerCbStub,
+    refreshGradesCbStub,
+    speedGraderWindow
+  )
+  const arbitrarySubmissionData = {}
+  fns.postChangeSubmissionMessage(arbitrarySubmissionData)
+  ok(showSubmissionDetailsStub.called)
+  ok(
+    postMessageStub.calledWith({
       submission: arbitrarySubmissionData,
       subject: 'canvas.speedGraderSubmissionChange'
-    }))
-  });
-});
+    })
+  )
+})

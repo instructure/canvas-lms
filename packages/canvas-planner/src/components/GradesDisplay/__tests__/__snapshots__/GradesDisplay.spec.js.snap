@@ -28,6 +28,7 @@ exports[`does not render caveat if no courses have grading periods 1`] = `
   <View
     as="div"
     display="auto"
+    key="1"
     margin="0 0 large 0"
   >
     <div
@@ -41,7 +42,7 @@ exports[`does not render caveat if no courses have grading periods 1`] = `
       <Link
         as="button"
         ellipsis={false}
-        href="/courses/1"
+        href="/courses/1/grades"
         iconPlacement="start"
         linkRef={[Function]}
         variant="default"
@@ -171,6 +172,7 @@ exports[`renders some course grades 1`] = `
   <View
     as="div"
     display="auto"
+    key="1"
     margin="0 0 large 0"
   >
     <div
@@ -184,7 +186,7 @@ exports[`renders some course grades 1`] = `
       <Link
         as="button"
         ellipsis={false}
-        href="/courses/1"
+        href="/courses/1/grades"
         iconPlacement="start"
         linkRef={[Function]}
         variant="default"
@@ -212,6 +214,7 @@ exports[`renders some course grades 1`] = `
   <View
     as="div"
     display="auto"
+    key="2"
     margin="0 0 large 0"
   >
     <div
@@ -225,7 +228,7 @@ exports[`renders some course grades 1`] = `
       <Link
         as="button"
         ellipsis={false}
-        href="/courses/2"
+        href="/courses/2/grades"
         iconPlacement="start"
         linkRef={[Function]}
         variant="default"
@@ -253,6 +256,7 @@ exports[`renders some course grades 1`] = `
   <View
     as="div"
     display="auto"
+    key="3"
     margin="0 0 large 0"
   >
     <div
@@ -266,7 +270,7 @@ exports[`renders some course grades 1`] = `
       <Link
         as="button"
         ellipsis={false}
-        href="/courses/3"
+        href="/courses/3/grades"
         iconPlacement="start"
         linkRef={[Function]}
         variant="default"

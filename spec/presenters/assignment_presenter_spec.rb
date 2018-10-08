@@ -37,23 +37,14 @@ describe AssignmentPresenter do
       expect(@assignment_presenter.can_view_speed_grader_link?(@student)).to be true
     end
 
+    it 'returns false when the user cannot view or managed grades' do
+      expect(@assignment_presenter.can_view_speed_grader_link?(@student)).to be false
+    end
+
     it 'returns true if concluded course but user can read as admin' do
       @course.soft_conclude!
       allow(@course).to receive(:grants_right?).with(@student, :read_as_admin).and_return true
       expect(@assignment_presenter.can_view_speed_grader_link?(@student)).to be true
-    end
-
-    it 'returns false if moderated and grader limit reached' do
-      @assignment.update_attributes!(moderated_grading: true, grader_count: 2)
-      allow(@course).to receive(:grants_any_right?).with(@student, :manage_grades, :view_all_grades).and_return true
-      allow(@assignment).to receive(:moderated_grader_limit_reached?).and_return true
-      expect(@assignment_presenter.can_view_speed_grader_link?(@student)).to be false
-    end
-
-    it 'returns true if moderated and grader limit reached but user is final grader' do
-      @assignment.update_attributes!(moderated_grading: true, grader_count: 2, final_grader: @ta)
-      allow(@assignment).to receive(:moderated_grader_limit_reached?).and_return true
-      expect(@assignment_presenter.can_view_speed_grader_link?(@ta)).to be true
     end
   end
 end

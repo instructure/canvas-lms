@@ -23,6 +23,7 @@ import {
   getFirstLoadedMoment, getLastLoadedMoment,
   getFullDateAndTime,
   isMidnight, makeEndOfDayIfMidnight,
+  dateRangeString, dateString, timeString, dateTimeString,
 } from '../dateUtils';
 
 describe('isToday', () => {
@@ -187,5 +188,27 @@ describe('getLastLoadedMoment', () => {
     result = makeEndOfDayIfMidnight(midnight, TZ);
     expect(result.hours()).toEqual(23);
     expect(result.minutes()).toEqual(59);
+  });
+});
+
+describe('dateRangeString', () => {
+  it('shows just the date if start == end', () => {
+    const date = moment.tz('2018-10-04T12:42:00', 'UTC');
+    const result = dateRangeString(date, date.clone(), 'UTC');
+    expect(result).toBe(dateTimeString(date));
+  });
+
+  it('shows date t1 - t2 if dates are on the same day', () => {
+    const start = moment.tz('2018-10-04T12:42:00', 'UTC');
+    const end = start.clone().add(1, 'hour');
+    const result = dateRangeString(start, end, 'UTC');
+    expect(result).toBe(`${dateTimeString(start)} - ${timeString(end)}`);
+  });
+
+  it('shows full dates if start and end are on separate days', () => {
+    const start = moment.tz('2018-10-04T12:42:00', 'UTC');
+    const end = start.clone().add(1, 'day');
+    const result = dateRangeString(start, end, 'UTC');
+    expect(result).toBe(`${dateTimeString(start)} - ${dateTimeString(end)}`);
   });
 });

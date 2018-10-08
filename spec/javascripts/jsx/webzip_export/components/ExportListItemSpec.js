@@ -16,47 +16,44 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'react',
-  'react-dom',
-  'enzyme',
-  'jsx/webzip_export/components/ExportListItem',
-], (React, ReactDOM, enzyme, ExportListItem) => {
-  QUnit.module('ExportListItem')
+import React from 'react'
+import enzyme from 'enzyme'
+import ExportListItem from 'jsx/webzip_export/components/ExportListItem'
 
-  test('renders the ExportListItem component', () => {
-    const props = {
-      date: 'Sept 11, 2001 at 8:46am',
-      link: 'https://example.com/neverforget',
-      workflowState: 'generated',
-      newExport: false
-    }
-    const tree = enzyme.shallow(<ExportListItem {...props} />)
-    const node = tree.find('.webzipexport__list__item')
-    ok(node.exists())
-  })
+QUnit.module('ExportListItem')
 
-  test('renders different text for last success', () => {
-    const props = {
-      date: '2017-01-13T2:30:00Z',
-      link: 'https://example.com/alwaysremember',
-      workflowState: 'generated',
-      newExport: true
-    }
-    const tree = enzyme.shallow(<ExportListItem {...props} />)
-    const node = tree.find('.webzipexport__list__item')
-    ok(node.text().startsWith('Most recent export'))
-  })
+test('renders the ExportListItem component', () => {
+  const props = {
+    date: 'Sept 11, 2001 at 8:46am',
+    link: 'https://example.com/neverforget',
+    workflowState: 'generated',
+    newExport: false
+  }
+  const tree = enzyme.shallow(<ExportListItem {...props} />)
+  const node = tree.find('.webzipexport__list__item')
+  ok(node.exists())
+})
 
-  test('renders error text if last object failed', () => {
-    const props = {
-      date: '2017-01-13T2:30:00Z',
-      link: 'https://example.com/alwaysremember',
-      workflowState: 'failed',
-      newExport: true
-    }
-    const tree = enzyme.shallow(<ExportListItem {...props} />)
-    const node = tree.find('.text-error')
-    ok(node.text().startsWith('Export failed'))
-  })
+test('renders different text for last success', () => {
+  const props = {
+    date: '2017-01-13T2:30:00Z',
+    link: 'https://example.com/alwaysremember',
+    workflowState: 'generated',
+    newExport: true
+  }
+  const tree = enzyme.shallow(<ExportListItem {...props} />)
+  const node = tree.find('.webzipexport__list__item')
+  ok(node.text().startsWith('Most recent export'))
+})
+
+test('renders error text if last object failed', () => {
+  const props = {
+    date: '2017-01-13T2:30:00Z',
+    link: 'https://example.com/alwaysremember',
+    workflowState: 'failed',
+    newExport: true
+  }
+  const tree = enzyme.shallow(<ExportListItem {...props} />)
+  const node = tree.find('.text-error')
+  ok(node.text().startsWith('Export failed'))
 })

@@ -20,7 +20,7 @@ module Types
   class AssignmentType < ApplicationObjectType
     graphql_name "Assignment"
 
-    implements GraphQL::Relay::Node.interface
+    implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
 
     alias :assignment :object

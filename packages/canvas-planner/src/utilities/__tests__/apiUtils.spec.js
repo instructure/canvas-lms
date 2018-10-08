@@ -142,6 +142,7 @@ function makeCalendarEvent(overrides = {}) {
     id: 1,
     title: 'calendar_event title',
     location_name: 'Home',
+    location_address: 'Here',
     created_at: "2018-04-28 00:36:25Z",
     start_at: '2018-05-04 19:00:00Z',
     description: 'calendar event description',

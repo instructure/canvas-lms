@@ -61,6 +61,50 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     nil
   end
 
+  def self.supports_debugging?
+    true
+  end
+
+  def self.debugging_sections
+    [nil,
+     -> { t("AuthnRequest sent to IdP") },
+     -> { t("AuthnResponse from IdP") },
+     -> { t("LogoutRequest sent to IdP") },
+     -> { t("LogoutResponse from IdP") },
+    ]
+  end
+
+  def self.debugging_keys
+    [{
+      debugging: -> { t("Testing state") },
+     }, {
+      request_id: -> { t("Request ID") },
+      to_idp_url: -> { t("LoginRequest encoded URL") },
+      to_idp_xml: -> { t("LoginRequest XML sent to IdP") },
+     }, {
+      idp_in_response_to: -> { t("IdP InResponseTo") },
+      idp_login_destination: -> { t("IdP LoginResponse destination") },
+      fingerprint_from_idp: -> { t("IdP certificate fingerprint") },
+      is_valid_login_response: -> { t("Canvas thinks response is valid") },
+      login_response_validation_error: -> { t("Validation Error") },
+      login_to_canvas_success: -> { t("User succesfully logged into Canvas") },
+      canvas_login_fail_message: -> { t("Canvas Login failure message") },
+      logged_in_user_id: -> { t("Logged in user id") },
+      idp_response_encoded: -> { t("IdP LoginResponse encoded") },
+      idp_response_xml_encrypted: -> { t("IdP LoginResponse encrypted") },
+      idp_response_xml_decrypted: -> { t("IdP LoginResponse Decrypted") },
+     }, {
+      logout_request_id: -> { t("Logout request id") },
+      logout_to_idp_url: -> { t("LogoutRequest encoded URL") },
+      logout_to_idp_xml: -> { t("LogoutRequest XML sent to IdP") },
+     }, {
+      idp_logout_in_response_to: -> { t("IdP Logout InResponseTo") },
+      idp_logout_destination: -> { t("IdP LogoutResponse Destination") },
+      idp_logout_response_encoded: -> { t("IdP LogoutResponse encoded") },
+      idp_logout_response_xml_encrypted: -> { t("IdP LogoutResponse XML") },
+     }]
+  end
+
   SENSITIVE_PARAMS = [:metadata].freeze
 
   before_validation :set_saml_defaults
@@ -319,8 +363,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
                                                        sig_alg: sig_alg,
                                                        relay_state: relay_state)
 
-    if debugging? && !debug_get(:request_id)
-      debug_set(:request_id, authn_request.id)
+    if debugging? && debug_set(:request_id, authn_request.id, overwrite: false)
       debug_set(:to_idp_url, forward_url)
       debug_set(:to_idp_xml, authn_request.to_s)
       debug_set(:debugging, "Forwarding user to IdP for authentication")
@@ -414,45 +457,6 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     end
 
     path.exist? ? path.to_s : nil
-  end
-
-  def debugging?
-    !!Rails.cache.fetch(debug_key(:debugging))
-  end
-
-  def debugging_keys
-    [:debugging, :request_id, :to_idp_url, :to_idp_xml, :idp_response_encoded,
-     :idp_in_response_to, :fingerprint_from_idp, :idp_response_xml_encrypted,
-     :idp_response_xml_decrypted, :idp_login_destination, :is_valid_login_response,
-     :login_response_validation_error, :login_to_canvas_success, :canvas_login_fail_message,
-     :logged_in_user_id, :logout_request_id, :logout_to_idp_url, :logout_to_idp_xml,
-     :idp_logout_response_encoded, :idp_logout_in_response_to,
-     :idp_logout_response_xml_encrypted, :idp_logout_destination]
-  end
-
-  def finish_debugging
-    debugging_keys.each { |key| Rails.cache.delete(debug_key(key)) }
-  end
-
-  def start_debugging
-    finish_debugging # clear old data
-    debug_set(:debugging, t('debug.wait_for_login', "Waiting for attempted login"))
-  end
-
-  def debug_get(key)
-    Rails.cache.fetch(debug_key(key))
-  end
-
-  def debug_set(key, value)
-    Rails.cache.write(debug_key(key), value, :expires_in => debug_expire)
-  end
-
-  def debug_key(key)
-    ['aac_debugging', self.id, key.to_s].cache_key
-  end
-
-  def debug_expire
-    Setting.get('aac_debug_expire_minutes', 30).to_i.minutes
   end
 
   def user_logout_redirect(controller, current_user)

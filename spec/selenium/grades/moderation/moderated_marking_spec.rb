@@ -84,51 +84,24 @@ describe 'Moderated Marking' do
     end
   end
 
-  context 'with max grader count reached' do
-    before(:once) do
-
-      # grader-count = 1, final_grader = Teacher1
-      @moderated_assignment.update(grader_count: 1)
-
-      # give a grade as non-final grader
-      @student1_submission = @moderated_assignment.grade_student(@student1, grade: 13, grader: @teacher3, provisional: true).first
-    end
-
-    it 'final-grader can access speedgrader', priority: '1', test_id: 3496271 do
-      user_session(@teacher1)
-      AssignmentPage.visit(@moderated_course.id, @moderated_assignment.id)
-
-      expect(AssignmentPage.page_action_list.text).to include 'SpeedGrader™'
-    end
-
-    it 'speedgrader link not visible to non-final-grader' do # test_id: 3496271
-      user_session(@teacher2)
-      AssignmentPage.visit(@moderated_course.id, @moderated_assignment.id)
-
-      expect(AssignmentPage.page_action_list.text).not_to include 'SpeedGrader™'
-    end
-
-    it 'informs user that maximum number of grades has been reached for the submission' do # test_id: 3496271
-      user_session(@teacher2)
-      get "/courses/#{@moderated_course.id}/gradebook/speed_grader?assignment_id=#{@moderated_assignment.id}"
-      wait_for_ajaximations
-
-      expect_flash_message :success, 'The maximum number of graders for this assignment has been reached.'
-    end
-  end
-
   context 'moderation page' do
     before(:once) do
       # update the grader count
       @moderated_assignment.update(grader_count: 2)
 
       # grade both students provisionally with teacher 2
-      @moderated_assignment.grade_student(@student1, grade: 15, grader: @teacher2, provisional: true)
-      @moderated_assignment.grade_student(@student2, grade: 14, grader: @teacher2, provisional: true)
+      @submissions2 = []
+      sub = @moderated_assignment.grade_student(@student1, grade: 15, grader: @teacher2, provisional: true).first
+      @submissions2.push sub
+      sub = @moderated_assignment.grade_student(@student2, grade: 14, grader: @teacher2, provisional: true).first
+      @submissions2.push sub
 
       # grade both students provisionally with teacher 3
-      @moderated_assignment.grade_student(@student1, grade: 13, grader: @teacher3, provisional: true)
-      @moderated_assignment.grade_student(@student2, grade: 12, grader: @teacher3, provisional: true)
+      @submissions3 = []
+      @moderated_assignment.grade_student(@student1, grade: 13, grader: @teacher3, provisional: true).first
+      @submissions3.push sub
+      @moderated_assignment.grade_student(@student2, grade: 12, grader: @teacher3, provisional: true).first
+      @submissions3.push sub
     end
 
     before(:each) do
@@ -182,12 +155,14 @@ describe 'Moderated Marking' do
     end
 
     it 'displays comments from chosen grader', priority: "1", test_id: 3513994 do
-      skip('Unskip in GRADE-1326')
-      submissions = @moderated_assignment.find_or_create_submissions([@student1, @student2])
+      @submissions2.each do |submission|
+        submission.submission_comments.create!(comment: 'Just a comment by teacher 2', author: @teacher2)
+        submission.save!
+      end
 
-      submissions.each do |submission|
-        submission.add_comment(author: @teacher1, comment: 'Just a comment by teacher1')
-        submission.add_comment(author: @teacher2, comment: 'Just a comment by teacher2')
+      @submissions3.each do |submission|
+        submission.submission_comments.create!(comment: 'Just a comment by teacher 3', author: @teacher3)
+        submission.save!
       end
 
       # select a provisional grade for each student
@@ -215,7 +190,7 @@ describe 'Moderated Marking' do
       StudentGradesPage.comment_button.click
 
       expect(StudentGradesPage.comments(@moderated_assignment).count).to eq 1
-      expect(StudentGradesPage.comments(@moderated_assignment).first).to include_text 'Just a comment by teacher1'
+      expect(StudentGradesPage.comments(@moderated_assignment).first).to include_text 'Just a comment by teacher 2'
     end
 
     it 'display to students button disabled until grades are posted', priority: '1', test_id: 3513991 do
@@ -264,10 +239,14 @@ describe 'Moderated Marking' do
     context 'when a custom grade is entered' do
       before(:each) do
         ModeratePage.enter_custom_grade(@student1, 4)
+        wait_for_ajaximations
       end
       it 'selects the custom grade', priority: '1', test_id: 3505170 do
+        skip('unskip this in GRADE-1615 once this is not flaky using using the most recent InstUI')
         # the aria-activedescendant will be the id of the selected option
         selected_id = ModeratePage.grade_input(@student1).attribute("aria-activedescendant")
+
+        expect(selected_id).to be_present
         ModeratePage.grade_input(@student1).click
         expect(f("##{selected_id}").text).to eq "4 (Custom)"
       end

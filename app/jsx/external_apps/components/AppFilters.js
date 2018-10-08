@@ -95,6 +95,20 @@ export default class AppFilters extends React.Component {
                     {I18n.t('Installed')}
                   </a>
                 </li>
+                {
+                  window.ENV.LTI_13_TOOLS_FEATURE_FLAG_ENABLED &&
+                  <li className={activeFilter === 'lti_1_3_tools' ? 'active' : ''}>
+                    <a
+                      ref="tabLti13Tools"
+                      onClick={this.handleFilterClick.bind(this, 'lti_1_3_tools')}
+                      href="#"
+                      role="tab"
+                      aria-selected={activeFilter === 'lti_1_3_tools' ? 'true' : 'false'}
+                    >
+                      {I18n.t('LTI 1.3')}
+                    </a>
+                  </li>
+                }
               </ul>
             </div>
             <div className="col-xs-5">

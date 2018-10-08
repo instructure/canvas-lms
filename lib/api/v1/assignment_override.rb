@@ -330,16 +330,22 @@ module Api::V1::AssignmentOverride
     end
   end
 
-  def update_assignment_override(override, override_data)
-    override.transaction do
-      update_assignment_override_without_save(override, override_data)
-      override.save!
+  def update_assignment_override(override, override_data, updating_user: nil)
+    DueDateCacher.with_executing_user(updating_user) do
+      override.transaction do
+        update_assignment_override_without_save(override, override_data)
+        override.save!
+      end
+      if override.set_type == 'ADHOC' && override.changed_student_ids.present?
+        override.assignment.run_if_overrides_changed_later!(
+          student_ids: override.changed_student_ids.to_a,
+          updating_user: updating_user
+        )
+      else
+        override.assignment.run_if_overrides_changed_later!(updating_user: updating_user)
+      end
     end
-    if override.set_type == 'ADHOC' && override.changed_student_ids.present?
-      override.assignment.run_if_overrides_changed_later!(override.changed_student_ids.to_a)
-    else
-      override.assignment.run_if_overrides_changed_later!
-    end
+
     true
   rescue ActiveRecord::RecordInvalid
     false
@@ -348,7 +354,7 @@ module Api::V1::AssignmentOverride
   # updates only the selected overrides; compare with
   # batch_update_assignment_overrides below, which updates
   # all overrides for assignment
-  def update_assignment_overrides(overrides, overrides_data)
+  def update_assignment_overrides(overrides, overrides_data, updating_user: nil)
     overrides.zip(overrides_data).each do |override, data|
       update_assignment_override_without_save(override, data)
     end
@@ -357,7 +363,9 @@ module Api::V1::AssignmentOverride
     AssignmentOverride.transaction do
       overrides.each(&:save!)
     end
-    overrides.map(&:assignment).uniq.each(&:run_if_overrides_changed_later!)
+    overrides.map(&:assignment).uniq.each do |assignment|
+      assignment.run_if_overrides_changed_later!(updating_user: updating_user)
+    end
   rescue ActiveRecord::RecordInvalid
     false
   end
@@ -424,7 +432,7 @@ module Api::V1::AssignmentOverride
     }
   end
 
-  def perform_batch_update_assignment_overrides(assignment, prepared_overrides)
+  def perform_batch_update_assignment_overrides(assignment, prepared_overrides, updating_user: nil)
     prepared_overrides[:override_errors].each do |error|
       assignment.errors.add(:base, error)
     end
@@ -444,12 +452,12 @@ module Api::V1::AssignmentOverride
       prepared_overrides[:overrides_to_create].size + prepared_overrides[:overrides_to_update].size
 
     assignment.touch # invalidate cached list of overrides for the assignment
-    assignment.run_if_overrides_changed_later!
+    assignment.run_if_overrides_changed_later!(updating_user: updating_user)
   end
 
   def batch_update_assignment_overrides(assignment, overrides_params, user)
     prepared_overrides = prepare_assignment_overrides_for_batch_update(assignment, overrides_params, user)
-    perform_batch_update_assignment_overrides(assignment, prepared_overrides)
+    perform_batch_update_assignment_overrides(assignment, prepared_overrides, updating_user: user)
   end
 
   def get_override_from_params(override_params, assignment, potential_overrides)

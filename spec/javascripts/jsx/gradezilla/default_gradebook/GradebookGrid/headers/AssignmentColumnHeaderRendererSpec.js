@@ -373,10 +373,24 @@ QUnit.module('AssignmentColumnHeaderRenderer', function (suiteHooks) {
     });
 
     test('includes a callback for closing the column header menu', function () {
+      const clock = sinon.useFakeTimers();
       sinon.stub(gradebook, 'handleColumnHeaderMenuClose');
       render();
       component.props.onMenuDismiss();
+      clock.tick(0);
       strictEqual(gradebook.handleColumnHeaderMenuClose.callCount, 1);
+      clock.restore();
+    });
+
+    test('does not call the menu close handler synchronously', function () {
+      // The React render lifecycle is not yet complete at this time.
+      // The callback must begin after React finishes to avoid conflicts.
+      const clock = sinon.useFakeTimers();
+      sinon.stub(gradebook, 'handleColumnHeaderMenuClose');
+      render();
+      component.props.onMenuDismiss();
+      strictEqual(gradebook.handleColumnHeaderMenuClose.callCount, 0);
+      clock.restore();
     });
 
     test('includes a callback for removing elements to the Gradebook KeyboardNav', function () {

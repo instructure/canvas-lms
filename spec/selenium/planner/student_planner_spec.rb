@@ -18,6 +18,7 @@
 require_relative '../common'
 require_relative 'pages/student_planner_page'
 require_relative '../admin/pages/student_context_tray_page'
+require_relative '../assignments/page_objects/assignment_page'
 
 describe "student planner" do
   include_context "in-process server selenium tests"
@@ -60,7 +61,7 @@ describe "student planner" do
     event.save!
     go_to_list_view
     validate_object_displayed(@course.name,'Calendar Event')
-    validate_link_to_url(event, 'calendar_events')
+    validate_link_to_calendar(event)
   end
 
   it "shows course images when the feature is enabled", priority: "1", test_id: 3306206 do
@@ -138,25 +139,38 @@ describe "student planner" do
 
   context "Peer Reviews" do
     before :once do
-      @reviewee = User.create!(name: 'Student 2')
+      @reviewee= user_factory(:active_all => true)
       @course.enroll_student(@reviewee).accept!
       @assignment = @course.assignments.create({
                                                  name: 'Peer Review Assignment',
                                                  due_at: 1.day.from_now,
+                                                 peer_reviews: true,
+                                                 automatic_peer_reviews: false,
                                                  submission_types: 'online_text_entry'
                                                })
-      submission = @assignment.submit_homework(@reviewee, body: "review this")
-      assessor_submission = @assignment.find_or_create_submission(@student1)
-      @peer_review = AssessmentRequest.create!({
-                                                 user: @reviewee,
-                                                 asset: submission,
-                                                 assessor_asset: assessor_submission,
-                                                 assessor: @student1
-                                               })
+      @assignment.assign_peer_review(@student1, @reviewee)
     end
 
-    it "shows and navigates to peer review submissions from the student planner" do
-      skip("unskip with ADMIN-1306")
+    it "shows peer review submissions" do
+      go_to_list_view
+
+      validate_object_displayed(@course.name,'Peer Review')
+      expect(list_view_planner_items.second).to contain_css(peer_review_icon_selector)
+      expect(list_view_planner_items.second).to contain_jqcss(peer_review_reminder_selector)
+    end
+
+    it "navigates to peer review submission when clicked" do
+      go_to_list_view
+      click_peer_review(@course.name, @assignment.name)
+
+      expect(driver.current_url).to include "courses/#{@course.id}/assignments/#{@assignment.id}/submissions"
+    end
+
+    it "marks peer review as completed" do
+      go_to_list_view
+      mark_peer_review_as_complete(@course.name)
+
+      expect(peer_review_item(@course.name)).to contain_jqcss("span:contains('Peer Review #{@assignment.name} is marked as done.')")
     end
   end
 
@@ -240,7 +254,7 @@ describe "student planner" do
       todo_item =todo_info_holder
       expect(todo_item).to include_text("To Do")
       expect(todo_item).to include_text("Title Text")
-      fj("a:contains('Title Text')", todo_item).click
+      click_item_button("Title Text")
 
       # gives the To Do a new name and saves it
       element = title_input("Title Text")
@@ -271,7 +285,7 @@ describe "student planner" do
       todo_item =todo_info_holder
       expect(todo_item).to include_text("To Do")
       expect(todo_item).to include_text("Title Text")
-      fj("a:contains('Title Text')", todo_item).click
+      click_item_button('Title Text')
 
       # gives the To Do a new name and saves it
       element = title_input("Title Text")
@@ -294,7 +308,7 @@ describe "student planner" do
       todo_item =todo_info_holder
       expect(todo_item).to include_text("To Do")
       expect(todo_item).to include_text("Title Text")
-      fj("a:contains('Title Text')", todo_item).click
+      click_item_button('Title Text')
       fj("button:contains('Delete')").click
       alert = driver.switch_to.alert
       expect(alert.text).to eq("Are you sure you want to delete this planner item?")
@@ -370,7 +384,7 @@ describe "student planner" do
       expect(title_input[:value]).to eq(@student_to_do.title)
       expect(course_name_dropdown[:value]).to eq("#{@course.name} - #{@course.short_name}")
 
-      flnpt(student_to_do2.title).click
+      click_item_button(student_to_do2.title)
       expect(title_input[:value]).to eq(student_to_do2.title)
       expect(course_name_dropdown[:value]).to eq("Optional: Add Course")
     end
@@ -395,15 +409,13 @@ describe "student planner" do
                                                      title: "Title Text")
       go_to_list_view
       # Opens the To Do edit sidebar
-      expect(planner_app_div).to contain_link_partial_text(planner_note.title)
-      flnpt(planner_note.title).click
+      click_item_button(planner_note.title)
       @modal = todo_sidebar_modal(planner_note.title)
       expect(ff('input', @modal)[1][:value]).to eq format_date_for_view(planner_note.todo_date, :long)
       @student1.time_zone = 'Minsk'
       @student1.save!
       refresh_page
-      expect(planner_app_div).to contain_link_partial_text(planner_note.title)
-      flnpt(planner_note.title).click
+      click_item_button(planner_note.title)
       @modal = todo_sidebar_modal(planner_note.title)
       expect(ff('input', @modal)[1][:value]).to eq format_date_for_view(planner_note.todo_date, :long)
     end
@@ -418,7 +430,7 @@ describe "student planner" do
 
   context "with existing assignment, open opportunities" do
     before :once do
-      @course.assignments.create!(name: 'assignmentThatHasToBeDoneNow',
+      @assignment_opportunity = @course.assignments.create!(name: 'assignmentThatHasToBeDoneNow',
                                   description: 'This will take a long time',
                                   submission_types: 'online_text_entry',
                                   due_at: Time.zone.now - 2.days)
@@ -428,29 +440,33 @@ describe "student planner" do
       go_to_list_view
       open_opportunities_dropdown
       close_opportunities_dropdown
+
       expect(f('body')).not_to contain_jqcss(close_opportunities_selector)
     end
 
     it "links opportunity to the correct assignment page.", priority: "1", test_id: 3281712 do
       go_to_list_view
       open_opportunities_dropdown
-      parent = f('#opportunities_parent')
-      flnpt('assignmentThatHasToBeDoneNow', parent).click
-      expect(f('.description.user_content')).to include_text("This will take a long time")
+      click_opportunity(@assignment_opportunity.name)
+
+      expect(driver.current_url).to include "courses/#{@course.id}/assignments/#{@assignment_opportunity.id}"
+      expect(AssignmentPage.assignment_description.text).to eq @assignment_opportunity.description
     end
 
     it "dismisses assignment from opportunity dropdown.", priority: "1", test_id: 3281713 do
       go_to_list_view
       open_opportunities_dropdown
-      fj('button:contains("Dismiss assignmentThatHasToBeDoneNow")').click
-      expect(f('#opportunities_parent')).not_to contain_jqcss('div:contains("assignmentThatHasToBeDoneNow")')
-      expect(f('#opportunities_parent')).not_to contain_jqcss('button:contains("Dismiss assignmentThatHasToBeDoneNow")')
+      dismiss_opportunity_button(@assignment_opportunity.name).click
+
+      expect(opportunities_parent).to contain_jqcss(no_new_opportunity_msg_selector)
+      expect(opportunities_parent).not_to contain_jqcss(opportunity_item_selector(@assignment_opportunity.name))
+      expect(opportunities_parent).not_to contain_jqcss(dismiss_opportunity_button_selector(@assignment_opportunity.name))
     end
 
     it "shows missing pill in the opportunities dropdown.", priority: "1", test_id: 3281710 do
       go_to_list_view
       open_opportunities_dropdown
-      expect(f('#opportunities_parent')).to contain_jqcss('span:contains("Missing")')
+      expect(opportunities_parent).to contain_jqcss('span:contains("Missing")')
     end
   end
 
@@ -590,3 +606,4 @@ describe "student planner" do
     end
   end
 end
+

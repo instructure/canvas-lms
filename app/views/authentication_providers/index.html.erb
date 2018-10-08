@@ -112,9 +112,4 @@
              locals: { account: @account, presenter: @presenter } %>
 <% end %>
 
-<% if @presenter.saml_enabled? && @presenter.saml_configs.size > 0 %>
-  <%= render partial: 'saml_settings_test',
-             locals: { account: @account, presenter: @presenter } %>
-<% end %>
-
 <% js_bundle :authentication_providers %>

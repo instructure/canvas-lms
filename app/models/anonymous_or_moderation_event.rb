@@ -51,6 +51,7 @@ class AnonymousOrModerationEvent < ApplicationRecord
     submission_comment_created
     submission_comment_deleted
     submission_comment_updated
+    submission_updated
   ].freeze
   SUBMISSION_ID_EXCLUDED_EVENT_TYPES = %w[
     assignment_created
@@ -102,6 +103,10 @@ class AnonymousOrModerationEvent < ApplicationRecord
     validates :submission_id, presence: true
     validate :payload_id_present
     validate :payload_student_id_present
+  end
+
+  def self.events_for_submission(assignment_id:, submission_id:)
+    self.where(assignment_id: assignment_id, submission_id: [nil, submission_id]).order(:created_at)
   end
 
   EVENT_TYPES.each do |event_type|

@@ -163,6 +163,7 @@ define [
         @grid.setColumns(columns)
       else
         @grid.setColumns(@columns)
+      Grid.View.redrawHeader(@grid, Grid.averageFn)
 
     _toggleStudentsWithNoResults: (enabled) ->
       @_setFilterSetting('students_no_results', enabled)

@@ -40,7 +40,7 @@ module Importers
       end
     end
 
-    def self.import_from_migration(hash, context, migration, item=nil)
+    def self.import_from_migration(hash, context, migration, item=nil, persist = true)
       hash = hash.with_indifferent_access
       return nil if hash[:migration_id] && hash[:external_tools_to_import] && !hash[:external_tools_to_import][hash[:migration_id]]
 
@@ -72,7 +72,7 @@ module Importers
         item.settings[:custom_fields].merge! hash[:custom_fields]
       end
 
-      item.save!
+      item.save! if persist
       migration.add_imported_item(item) if migration
       item
     end

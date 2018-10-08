@@ -101,13 +101,13 @@ module SIS
               # but the course id we were given didn't match the crosslist info
               # we have, so, uncrosslist and move
               @course_ids_to_update_associations.merge [course.id, section.course_id, section.nonxlist_course_id]
-              section.uncrosslist(:run_jobs_immediately)
-              section.move_to_course(course, :run_jobs_immediately)
+              section.uncrosslist(run_jobs_immediately: true)
+              section.move_to_course(course, run_jobs_immediately: true)
             end
           elsif !section.stuck_sis_fields.include?(:course_id)
             # this section isn't crosslisted and lives on the wrong course. move
             @course_ids_to_update_associations.merge [section.course_id, course.id]
-            section.move_to_course(course, :run_jobs_immediately)
+            section.move_to_course(course, run_jobs_immediately: true)
           end
         end
         if section.course_id_changed?

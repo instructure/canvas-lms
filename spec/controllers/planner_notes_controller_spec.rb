@@ -41,20 +41,6 @@ describe PlannerNotesController do
     end
   end
 
-  context "feature disabled" do
-    before :each do
-      user_session(@student)
-    end
-
-    it "should return forbidden" do
-      get :index
-      assert_forbidden
-
-      post :create, params: {title: 'thing', todo_date: 1.day.from_now}
-      assert_forbidden
-    end
-  end
-
   context "authenticated" do
     before :once do
       @course_1.root_account.enable_feature!(:student_planner)

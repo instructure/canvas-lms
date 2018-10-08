@@ -34,6 +34,7 @@ export const badgeShape = {
 export const courseShape = {
   id: PropTypes.string,
   longName: PropTypes.string,
+  enrollmentType: PropTypes.string
 };
 
 export const itemShape = {

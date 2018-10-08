@@ -42,7 +42,9 @@ function getProps (column, gradebook, options) {
     onHeaderKeyDown: (event) => {
       gradebook.handleHeaderKeyDown(event, columnId);
     },
-    onMenuDismiss: gradebook.handleColumnHeaderMenuClose,
+    onMenuDismiss() {
+      setTimeout(gradebook.handleColumnHeaderMenuClose)
+    },
     removeGradebookElement: gradebook.keyboardNav.removeGradebookElement,
 
     sortBySetting: {

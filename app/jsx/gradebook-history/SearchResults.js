@@ -51,10 +51,13 @@ class SearchResultsComponent extends Component {
     fetchHistoryStatus: string.isRequired,
     caption: node.isRequired,
     historyItems: arrayOf(shape({
-      anonymous: bool.isRequired,
-      assignment: string.isRequired,
+      assignment: shape({
+        name: string.isRequired,
+        muted: bool.isRequired
+      }),
       date: string.isRequired,
       displayAsPoints: bool.isRequired,
+      gradedAnonymously: bool.isRequired,
       grader: string.isRequired,
       gradeAfter: string.isRequired,
       gradeBefore: string.isRequired,

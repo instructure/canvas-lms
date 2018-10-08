@@ -23,13 +23,18 @@
 # NOTE: Placements not documented here should be considered beta features and are not officially supported.
 class ExternalToolsController < ApplicationController
   before_action :require_context
+  before_action :require_tool_create_rights, only: [:create, :create_tool_from_tool_config]
+  before_action :require_tool_configuration, only: [:create_tool_from_tool_config]
   before_action :require_access_to_context, except: [:index, :sessionless_launch]
   before_action :require_user, only: [:generate_sessionless_launch]
   before_action :get_context, :only => [:retrieve, :show, :resource_selection]
   skip_before_action :verify_authenticity_token, only: :resource_selection
   include Api::V1::ExternalTools
 
-  REDIS_PREFIX = 'external_tool:sessionless_launch:'
+  REDIS_PREFIX = 'external_tool:sessionless_launch:'.freeze
+  WHITELISTED_QUERY_PARAMS = [
+    :platform
+  ].freeze
 
   # @API List external tools
   # Returns the paginated list of external tools for the current context.
@@ -488,7 +493,7 @@ class ExternalToolsController < ApplicationController
     assignment = @context.assignments.active.find(params[:assignment_id]) if params[:assignment_id]
     expander = variable_expander(assignment: assignment, tool: tool, launch: lti_launch, post_message_token: opts[:launch_token])
 
-    adapter = if tool.settings.fetch('use_1_3', false)
+    adapter = if tool.use_1_3?
       Lti::LtiAdvantageAdapter.new(
         tool: tool,
         user: @current_user,
@@ -529,8 +534,8 @@ class ExternalToolsController < ApplicationController
       media_types.to_unsafe_h,
       params["export_type"]
     )
-    params = Lti::ContentItemSelectionRequest.default_lti_params(@context, @domain_root_account, @current_user).merge(
-      {
+    params = Lti::ContentItemSelectionRequest.default_lti_params(@context, @domain_root_account, @current_user).
+      merge({
         #required params
         lti_message_type: message_type,
         lti_version: 'LTI-1p0',
@@ -540,7 +545,9 @@ class ExternalToolsController < ApplicationController
         context_title: @context.name,
         tool_consumer_instance_name: @domain_root_account.name,
         tool_consumer_instance_contact_email: HostUrl.outgoing_email_address,
-      }).merge(variable_expander(tool: tool, attachment: content_item_response.file).expand_variables!(tool.set_custom_fields(placement)))
+      }).
+      merge(variable_expander(tool: tool, attachment: content_item_response.file).
+      expand_variables!(tool.set_custom_fields(placement)))
 
     lti_launch = @tool.settings['post_only'] ? Lti::Launch.new(post_only: true) : Lti::Launch.new
     lti_launch.resource_url = opts[:launch_url] || tool.extension_setting(placement, :url)
@@ -649,7 +656,7 @@ class ExternalToolsController < ApplicationController
   #
   # @argument account_navigation[display_type] [String]
   #   The layout type to use when launching the tool. Must be
-  #   "full_width", "borderless", or "default"
+  #   "full_width", "full_width_in_context", "borderless", or "default"
   #
   # @argument user_navigation[url] [String]
   #   The url of the external tool for user navigation
@@ -697,7 +704,7 @@ class ExternalToolsController < ApplicationController
   #
   # @argument course_navigation[display_type] [String]
   #   The layout type to use when launching the tool. Must be
-  #   "full_width", "borderless", or "default"
+  #   "full_width", "full_width_in_context", "borderless", or "default"
   #
   # @argument editor_button[url] [String]
   #   The url of the external tool
@@ -848,26 +855,24 @@ class ExternalToolsController < ApplicationController
   #        -F 'config_type=by_url' \
   #        -F 'config_url=https://example.com/ims/lti/tool_config.xml'
   def create
-    if authorized_action(@context, @current_user, :create_tool_manually)
-      external_tool_params = (params[:external_tool] || params).to_unsafe_h
-      @tool = @context.context_external_tools.new
-      if request.content_type == 'application/x-www-form-urlencoded'
-        custom_fields = Lti::AppUtil.custom_params(request.raw_post)
-        external_tool_params[:custom_fields] = custom_fields if custom_fields.present?
-      end
-      set_tool_attributes(@tool, external_tool_params)
-      check_for_duplication(@tool)
-      if @tool.errors.blank? && @tool.save
-        invalidate_nav_tabs_cache(@tool)
-        if api_request?
-          render :json => external_tool_json(@tool, @context, @current_user, session)
-        else
-          render :json => @tool.as_json(:methods => [:readable_state, :custom_fields_string, :vendor_help_link], :include_root => false)
-        end
+    external_tool_params = (params[:external_tool] || params).to_unsafe_h
+    @tool = @context.context_external_tools.new
+    if request.content_type == 'application/x-www-form-urlencoded'
+      custom_fields = Lti::AppUtil.custom_params(request.raw_post)
+      external_tool_params[:custom_fields] = custom_fields if custom_fields.present?
+    end
+    set_tool_attributes(@tool, external_tool_params)
+    check_for_duplication(@tool)
+    if @tool.errors.blank? && @tool.save
+      invalidate_nav_tabs_cache(@tool)
+      if api_request?
+        render :json => external_tool_json(@tool, @context, @current_user, session)
       else
-        render :json => @tool.errors, :status => :bad_request
-        @tool.destroy if @tool.persisted?
+        render :json => @tool.as_json(:methods => [:readable_state, :custom_fields_string, :vendor_help_link], :include_root => false)
       end
+    else
+      render :json => @tool.errors, :status => :bad_request
+      @tool.destroy if @tool.persisted?
     end
   end
 
@@ -915,6 +920,31 @@ class ExternalToolsController < ApplicationController
         end
       end
     end
+  end
+
+  # @API Create Tool from ToolConfiguration
+  # Creates context_external_tool from attached tool_configuration of
+  # the provided developer_key if not already present in context.
+  # DeveloperKey must have a ToolConfiguration to create tool or 404 will be raised.
+  # Will return an existing ContextExternalTool if one already exists.
+  #
+  # @argument account_id [String]
+  #    if account
+  #
+  # @argument course_id [String]
+  #    if course
+  #
+  # @argument developer_key_id [String]
+  #
+  # @returns ContextExternalTool
+  def create_tool_from_tool_config
+    cet = fetch_existing_tool_in_context_chain
+    if cet.nil?
+      cet = developer_key.tool_configuration.new_external_tool(@context)
+      cet.save!
+      invalidate_nav_tabs_cache(cet)
+    end
+    render json: external_tool_json(cet, @context, @current_user, session)
   end
 
   # @API Edit an external tool
@@ -1089,6 +1119,8 @@ class ExternalToolsController < ApplicationController
       opts[:link_code] = @tool.opaque_identifier_for(options[:assignment].external_tool_tag)
     end
 
+    opts[:overrides] = whitelisted_query_params if whitelisted_query_params.any?
+
     adapter = Lti::LtiOutboundAdapter.new(
       @tool,
       @current_user,
@@ -1173,8 +1205,30 @@ class ExternalToolsController < ApplicationController
     Lti::VariableExpander.new(@domain_root_account, @context, self, default_opts.merge(opts))
   end
 
+  def require_tool_create_rights
+    authorized_action(@context, @current_user, :create_tool_manually)
+  end
+
+  def require_tool_configuration
+    return if developer_key.tool_configuration.present?
+    head :not_found
+  end
+
+  def fetch_existing_tool_in_context_chain
+    ContextExternalTool.all_tools_for(@context).where(developer_key: developer_key).take
+  end
+
+  def developer_key
+    @_developer_key = DeveloperKey.nondeleted.find(params[:developer_key_id])
+  end
+
   def placement_from_params
     params[:placement] || params[:launch_type] || "#{@context.class.base_class.to_s.downcase}_navigation"
   end
 
+  def whitelisted_query_params
+    @_whitelisted_query_params ||= WHITELISTED_QUERY_PARAMS.each_with_object({}) do |query_param, h|
+      h[query_param] = params[query_param] if params.key?(query_param)
+    end
+  end
 end

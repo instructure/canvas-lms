@@ -16,35 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'react',
-  'react-addons-test-utils',
-  'jsx/course_settings/components/UploadArea',
-], (React, TestUtils, UploadArea) => {
+import React from 'react'
 
-  QUnit.module('UploadArea Component');
+import TestUtils from 'react-dom/test-utils'
+import UploadArea from 'jsx/course_settings/components/UploadArea'
 
-  test('it renders', () => {
-    const component = TestUtils.renderIntoDocument(
-      <UploadArea />
-    );
+QUnit.module('UploadArea Component')
 
-    ok(component);
-  });
+test('it renders', () => {
+  const component = TestUtils.renderIntoDocument(<UploadArea />)
 
-  test('calls the handleFileUpload prop when change occurs on the file input', () => {
-    let called = false;
-    const handleFileUploadFunc = () => called = true;
-    const component = TestUtils.renderIntoDocument(
-      <UploadArea
-        courseId="101"
-        handleFileUpload={handleFileUploadFunc}
-      />
-    );
+  ok(component)
+})
 
-    const input = TestUtils.findRenderedDOMComponentWithClass(component, 'FileUpload__Input');
-    TestUtils.Simulate.change(input);
-    ok(called, 'handleFileUpload was called');
-  });
+test('calls the handleFileUpload prop when change occurs on the file input', () => {
+  let called = false
+  const handleFileUploadFunc = () => (called = true)
+  const component = TestUtils.renderIntoDocument(
+    <UploadArea courseId="101" handleFileUpload={handleFileUploadFunc} />
+  )
 
-});
+  const input = TestUtils.findRenderedDOMComponentWithClass(component, 'FileUpload__Input')
+  TestUtils.Simulate.change(input)
+  ok(called, 'handleFileUpload was called')
+})

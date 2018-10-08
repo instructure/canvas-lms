@@ -25,7 +25,7 @@ module SupportHelpers
 
     def course
       if params[:course_id]
-        run_fixer(SupportHelpers::DueDateCache::CourseFixer, params[:course_id].to_i)
+        run_fixer(SupportHelpers::DueDateCache::CourseFixer, params[:course_id].to_i, @current_user.id)
       else
         render plain: "Missing course id parameter", status: 400
       end

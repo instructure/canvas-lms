@@ -216,7 +216,7 @@ define [
             RichContentEditor.callOnRCE($textarea, 'toggle')
             # hide the clicked link, and show the other toggle link.
             # todo: replace .andSelf with .addBack when JQuery is upgraded.
-            $(event.currentTarget).siblings('.rte_switch_views_link').andSelf().toggle()
+            $(event.currentTarget).siblings('.rte_switch_views_link').andSelf().toggle().focus()
       if @assignmentGroupCollection
         (@assignmentGroupFetchDfd ||= @assignmentGroupCollection.fetch()).done @renderAssignmentGroupOptions
 

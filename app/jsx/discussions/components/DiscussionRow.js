@@ -236,7 +236,7 @@ export class DiscussionRow extends Component {
         : ' '
     result += dueDateString
     const lastReplyAtDate = $.datetimeString(this.props.discussion.last_reply_at)
-    if (lastReplyAtDate.length > 0) {
+    if (lastReplyAtDate.length > 0 && this.props.discussion.discussion_subentry_count > 0) {
       result += I18n.t('Last post at %{date}', {date: lastReplyAtDate})
     }
     return result
@@ -595,7 +595,7 @@ export class DiscussionRow extends Component {
 
   renderLastReplyAt = () => {
     const datetimeString = $.datetimeString(this.props.discussion.last_reply_at)
-    if (!datetimeString.length) {
+    if (!datetimeString.length || this.props.discussion.discussion_subentry_count === 0) {
       return null
     }
     return (

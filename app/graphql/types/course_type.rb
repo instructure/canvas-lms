@@ -73,7 +73,7 @@ module Types
         required: false
     end
 
-    implements GraphQL::Relay::Node.interface
+    implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
 
     field :_id, ID, "legacy canvas id", method: :id, null: false

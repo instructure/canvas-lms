@@ -33,11 +33,11 @@ describe "dashboard" do
       end
 
       get "/"
-
-      expect(ffj(".to-do-list li:visible")).to have_size(5 + 1) # +1 is the see more link
-      f(".more_link").click
       wait_for_ajaximations
-      expect(ffj(".to-do-list li:visible")).to have_size(20)
+      expect(ff("#planner-todosidebar-item-list>li")).to have_size(7)
+      fj(".Sidebar__TodoListContainer button:contains('Show All')").click
+      wait_for_ajaximations
+      expect(ff("#dashboard-planner-header button")).to have_size(3)
     end
 
     it "should display assignments to do in to do list for a student", priority: "1", test_id: 216406 do
@@ -56,8 +56,7 @@ describe "dashboard" do
       f('.stream-assignment .stream_header').click
       expect(f('#assignment-details')).to include_text('Assignment Due Date Changed')
       # verify assignment is in to do list
-      expect(f('.to-do-list > li')).to include_text(assignment.submission_action_string)
-      expect(f('.coming_up')).to include_text(assignment.title)
+      expect(f('#planner-todosidebar-item-list>li')).to include_text(assignment.title)
     end
 
     it "should not display assignments for soft-concluded courses in to do list for a student", priority: "1", test_id: 216407 do
@@ -76,10 +75,9 @@ describe "dashboard" do
       get "/"
 
       expect(f("#content")).not_to contain_css('.to-do-list')
-      expect(f('.coming_up')).to_not include_text(assignment.title)
     end
 
-    it "should allow to do list items to be ignored", priority: "1", test_id: 216408 do
+    it "should allow to do list items to be hidden", priority: "1", test_id: 216408 do
       notification_model(:name => 'Assignment Due Date Changed')
       notification_policy_model(:notification_id => @notification.id)
       assignment = assignment_model({:submission_types => 'online_text_entry', :course => @course})
@@ -88,15 +86,15 @@ describe "dashboard" do
       assignment.save!
 
       get "/"
-
-      expect(f('.to-do-list > li')).to include_text(assignment.submission_action_string)
-      f('.to-do-list .disable_item_link').click
       wait_for_ajaximations
-      expect(f("#content")).not_to contain_css('.to-do-list > li')
+      expect(f('#planner-todosidebar-item-list>li')).to include_text(assignment.title)
+      f('.ToDoSidebarItem__Close button').click
+      wait_for_ajaximations
+      expect(f("#content")).not_to contain_css('#planner-todosidebar-item-list>li')
 
       get "/"
 
-      expect(f("#content")).not_to contain_css('.to-do-list')
+      expect(f("#content")).not_to contain_css('#planner-todosidebar-item-list')
     end
 
   end

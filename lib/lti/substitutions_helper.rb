@@ -58,6 +58,35 @@ module Lti
 
     LIS_V2_ROLE_NONE = 'http://purl.imsglobal.org/vocab/lis/v2/person#None'
 
+    LIS_ADVANTAGE_ROLE_MAP = {
+      TaEnrollment => [
+        'http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#TeachingAssistant',
+        'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor'
+      ].freeze,
+      StudentEnrollment => [ 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner' ].freeze,
+      TeacherEnrollment => [ 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor' ].freeze,
+      DesignerEnrollment => [ 'http://purl.imsglobal.org/vocab/lis/v2/membership#ContentDeveloper' ].freeze,
+      ObserverEnrollment => [ 'http://purl.imsglobal.org/vocab/lis/v2/membership#Mentor' ].freeze,
+      :group_member => [ 'http://purl.imsglobal.org/vocab/lis/v2/membership#Member' ].freeze,
+      :group_leader => [
+        'http://purl.imsglobal.org/vocab/lis/v2/membership#Member',
+        'http://purl.imsglobal.org/vocab/lis/v2/membership#Manager'
+      ].freeze
+    }.freeze
+
+    # Inversion of LIS_ADVANTAGE_ROLE_MAP, i.e.:
+    #
+    #   {
+    #     '<lis-url>' => [<enrollment-class>, <enrollment-class>],
+    #     '<lis-url>' => [<group-membership-type-symbol>, <group-membership-type-symbol>],
+    #     ...
+    #   }
+    #
+    # (Extra copy at the end is to undo the default value ([]))
+    INVERTED_LIS_ADVANTAGE_ROLE_MAP = LIS_ADVANTAGE_ROLE_MAP.each_with_object(Hash.new([])) do |(key,values), memo|
+      values.each { |value| memo[value] += [key] }
+    end.reverse_merge({}).freeze
+
     def initialize(context, root_account, user, tool = nil)
       @context = context
       @root_account = root_account

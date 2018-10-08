@@ -19,7 +19,6 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import TestUtils from 'react-addons-test-utils';
 import { shallow } from 'enzyme';
 import jQuery from 'jquery';
 import SaveThemeButton from 'jsx/theme_editor/SaveThemeButton';
@@ -103,35 +102,21 @@ test('modal visibility', function () {
 })
 
 test('disabling button', () => {
-  const shallowRenderer = TestUtils.createRenderer()
-  shallowRenderer.render(<SaveThemeButton {...props} />)
-  const button = shallowRenderer.getRenderOutput().props.children.find(isType('button'))
-  equal(button.props.disabled, false, 'not disabled by default')
+  const wrapper = shallow(<SaveThemeButton {...props} />)
+  notOk(wrapper.find('.Button--primary').first().prop('disabled'), 'not disabled by default')
 })
 
 test('disabling button: disabled if userNeedsToPreviewFirst', () => {
-  const shallowRenderer = TestUtils.createRenderer()
-  shallowRenderer.render(<SaveThemeButton {...props} userNeedsToPreviewFirst={true} />)
-  const button = shallowRenderer.getRenderOutput().props.children.find(isType('button'))
-  ok(button.props.disabled)
+  const wrapper = shallow(<SaveThemeButton {...props} userNeedsToPreviewFirst />)
+  ok(wrapper.find('.Button--primary').first().prop('disabled'))
 })
 
 test('disabling button: disabled if there are no unsaved changes', () => {
-  const shallowRenderer = TestUtils.createRenderer()
-  shallowRenderer.render(<SaveThemeButton
-    {...props}
-    brandConfigMd5={props.sharedBrandConfigBeingEdited.brand_config_md5}
-  />)
-  const button = shallowRenderer.getRenderOutput().props.children.find(isType('button'))
-  ok(button.props.disabled)
+  const wrapper = shallow(<SaveThemeButton {...props} brandConfigMd5={props.sharedBrandConfigBeingEdited.brand_config_md5} />)
+  ok(wrapper.find('.Button--primary').first().prop('disabled'))
 })
 
 test('disabling button: disabled if everything is default', () => {
-  const shallowRenderer = TestUtils.createRenderer()
-  shallowRenderer.render(<SaveThemeButton
-    {...props}
-    brandConfigMd5={null}
-  />)
-  const button = shallowRenderer.getRenderOutput().props.children.find(isType('button'))
-  ok(button.props.disabled)
+  const wrapper = shallow(<SaveThemeButton {...props} brandConfigMd5={null} />)
+  ok(wrapper.find('.Button--primary').first().prop('disabled'))
 })

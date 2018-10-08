@@ -18,6 +18,7 @@
 
 import _ from 'underscore'
 import React from 'react'
+import createReactClass from 'create-react-class';
 import I18n from 'i18n!restrict_student_access'
 import $ from 'jquery'
 import classNames from 'classnames'
@@ -120,4 +121,4 @@ import RestrictedDialogForm from 'compiled/react_files/components/RestrictedDial
     );
   };
 
-export default React.createClass(RestrictedDialogForm)
+export default createReactClass(RestrictedDialogForm);

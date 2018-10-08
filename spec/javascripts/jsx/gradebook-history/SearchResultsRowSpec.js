@@ -33,8 +33,12 @@ QUnit.module('SearchResultsRow', {
     document.body.appendChild(tbody);
 
     this.item = {
-      anonymous: false,
-      assignment: 'Rustic Rubber Duck',
+      assignment: {
+        anonymousGrading: false,
+        gradingType: 'points',
+        muted: false,
+        name: 'Rustic Rubber Duck'
+      },
       date: '2017-05-30T23:16:59Z',
       displayAsPoints: true,
       grader: 'Ms. Lopez',
@@ -69,7 +73,7 @@ test('has text for when not anonymously graded', function () {
 });
 
 test('has text for when anonymously graded', function () {
-  const item = { ...this.item, anonymous: true };
+  const item = { ...this.item, gradedAnonymously: true };
   const wrapper = mountComponent({ item });
   const anonymous = wrapper.find('td').at(1).instance().innerText;
   strictEqual(anonymous.trim(), 'Anonymously graded');
@@ -80,6 +84,21 @@ test('displays the history student', function () {
   strictEqual(student, this.item.student);
 });
 
+test('displays placeholder text if assignment is anonymous and muted', function () {
+  const item = { ...this.item, assignment: { anonymousGrading: true, muted: true } };
+  const wrapper = mountComponent({ item });
+  const text = wrapper.find('td').at(2).instance().textContent;
+  strictEqual(text, 'Not available; assignment is anonymous');
+});
+
+test('displays placeholder text if student name is missing', function () {
+  const item = { ...this.item };
+  delete item.student;
+  const wrapper = mountComponent({ item });
+  const text = wrapper.find('td').at(2).instance().textContent;
+  strictEqual(text, 'Not available');
+});
+
 test('displays the history grader', function () {
   const grader = this.wrapper.find('td').at(3).instance().innerText;
   strictEqual(grader, this.item.grader);
@@ -87,7 +106,7 @@ test('displays the history grader', function () {
 
 test('displays the history assignment', function () {
   const assignment = this.wrapper.find('td').at(4).instance().innerText;
-  strictEqual(assignment, this.item.assignment.toString());
+  strictEqual(assignment, this.item.assignment.name.toString());
 });
 
 test('displays the history grade before and points possible before if points based and grade is numeric', function () {

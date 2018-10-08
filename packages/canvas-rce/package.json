@@ -176,7 +176,6 @@
     "nyc": "^12",
     "prettier": "^1.12.1",
     "proxyquire": "1.7.4",
-    "react-addons-test-utils": "^15.0.0",
     "sinon": "^6",
     "skin-deep": "^1",
     "webpack": "^4",

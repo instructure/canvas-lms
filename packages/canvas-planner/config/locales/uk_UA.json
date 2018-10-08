@@ -2,6 +2,9 @@
   "add_to_do_7def3c37": {
     "message": "Додайте до плану роботи"
   },
+  "address_3159962f": {
+    "message": "Адреса:"
+  },
   "all_day_fb42c4fc": {
     "message": "Весь день"
   },
@@ -47,8 +50,14 @@
   "assignmenttype_title_posted_datetime_cab69444": {
     "message": "{ assignmentType } { title } розміщено { datetime }."
   },
+  "assignmenttype_title_reminder_datetime_33fa66d5": {
+    "message": "{ assignmentType } { title }, нагадування { datetime }."
+  },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Початок вашої історії завдань"
+  },
+  "calendar_a8563bb2": {
+    "message": "Календар:"
   },
   "calendar_event_89aadc1c": {
     "message": "Календарна подія"
@@ -58,6 +67,12 @@
   },
   "close_d634289d": {
     "message": "Закрити"
+  },
+  "close_opportunity_center_popup_9907d981": {
+    "message": "Закрити спливаюче вікно Центру можливостей"
+  },
+  "count_plural_0_opportunities_one_opportunity_other_bb1698f6": {
+    "message": "{ count, plural,\n     =0 {# opportunities}\n    one {# opportunity}\n  other {# opportunities}\n}. Натисніть для відкриття спливаючого вікна Центру можливостей."
   },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Show # completed item}\n  other {Show # completed items}\n}"
@@ -86,6 +101,9 @@
   "details_98a31b68": {
     "message": "Подробиці"
   },
+  "details_a6f427c3": {
+    "message": "Подробиці:"
+  },
   "discussion_6719c51d": {
     "message": "Обговорення"
   },
@@ -94,6 +112,12 @@
   },
   "dismiss_opportunityname_5995176f": {
     "message": "Відхилити { opportunityName }"
+  },
+  "dismissed_8b0b1fc9": {
+    "message": "Відхилено"
+  },
+  "dismissed_opportunities_f0826640": {
+    "message": "Відхилені можливості"
   },
   "due_5d7267be": {
     "message": "Очікується:"
@@ -176,6 +200,9 @@
   "loading_planner_items_947a813d": {
     "message": "Завантаження елементів планувальника"
   },
+  "location_3b6ff307": {
+    "message": "Місцезнаходження:"
+  },
   "looks_like_there_isn_t_anything_here_d9bcef49": {
     "message": "Виглядає наче тут нічого немає"
   },
@@ -197,6 +224,9 @@
   "new_activity_for_title_14c9c3af": {
     "message": "Нова діяльність для { title }"
   },
+  "new_opportunities_7d349c4d": {
+    "message": "Нові можливості"
+  },
   "next_month_749b1778": {
     "message": "Наступний місяць"
   },
@@ -208,6 +238,9 @@
   },
   "nothing_for_now_e3e3ce2a": {
     "message": "Зараз нічого"
+  },
+  "nothing_here_needs_attention_c4eaded6": {
+    "message": "Тут ніщо не вимагає уваги."
   },
   "nothing_more_to_do_b665da42": {
     "message": "План роботи порожній"
@@ -254,6 +287,9 @@
   "quiz_e0dcce8f": {
     "message": "Контрольна робота"
   },
+  "reminder_date_4564d12d": {
+    "message": "Нагадування: { date }"
+  },
   "replies_4a8577c8": {
     "message": "Відповіді"
   },
@@ -289,6 +325,9 @@
   },
   "the_date_and_time_this_to_do_is_due_74c823d4": {
     "message": "Дата та час, до якого це потрібно виконати"
+  },
+  "there_are_no_points_associated_with_this_item_449c712a": {
+    "message": "З цим елементом не пов''язані бали"
   },
   "time_2b5aac58": {
     "message": "Час"

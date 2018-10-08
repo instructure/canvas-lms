@@ -72,14 +72,19 @@ module Importers
 
         item.data = hash[:data]
         item.data.each do |crit|
-          if crit[:learning_outcome_migration_id]
+          if crit[:learning_outcome_migration_id].present?
             if migration.respond_to?(:outcome_to_id_map) && id = migration.outcome_to_id_map[crit[:learning_outcome_migration_id]]
               crit[:learning_outcome_id] = id
             elsif lo = context.created_learning_outcomes.where(migration_clause(crit[:learning_outcome_migration_id])).first
               crit[:learning_outcome_id] = lo.id
             end
-            crit.delete :learning_outcome_migration_id
+          elsif crit[:learning_outcome_external_identifier].present? && !migration.cross_institution?
+            if lo = context.available_outcome(crit[:learning_outcome_external_identifier])
+              crit[:learning_outcome_id] = lo.id
+            end
           end
+          crit.delete(:learning_outcome_migration_id)
+          crit.delete(:learning_outcome_external_identifier)
         end
 
         item.skip_updating_points_possible = true

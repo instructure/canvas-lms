@@ -37,7 +37,35 @@ module PlannerPageObject
     "button:contains('Close Opportunity Center popup')"
   end
 
+  def opportunity_item_selector(item_name)
+    "span:contains('#{item_name}')"
+  end
+
+  def dismiss_opportunity_button_selector(item_name)
+    "button[title='Dismiss #{item_name}']"
+  end
+
+  def no_new_opportunity_msg_selector
+    "div:contains('Nothing new needs attention.')"
+  end
+
+  def peer_review_icon_selector
+    "svg[name='IconPeerReview']"
+  end
+
+  def peer_review_name_selector(course_name)
+    "span:contains('#{course_name} Peer Review')"
+  end
+
+  def peer_review_reminder_selector
+    "span:contains('Reminder:')"
+  end
+
   #------------------------- Elements --------------------------
+
+  def peer_review_item(course_name)
+    fj("li:contains('#{course_name} Peer Review')")
+  end
 
   def planner_app_div
     f('.PlannerApp')
@@ -148,11 +176,39 @@ module PlannerPageObject
     fj("button:contains('Load more')")
   end
 
-  def card_view_todo_item_list
+  def card_view_todo_items
     ff("ul.to-do-list li")
   end
 
+  def opportunities_parent
+    f('#opportunities_parent')
+  end
+
+  def dismiss_opportunity_button(item_name)
+    f(dismiss_opportunity_button_selector(item_name))
+  end
+
+  def list_view_planner_items
+    ff('div.planner-item')
+  end
+
   #----------------------- Actions & Methods -------------------------
+
+  def mark_peer_review_as_complete(course)
+    f("span[aria-hidden='true']", peer_review_item(course)).click
+  end
+
+  def click_peer_review(course, assignment)
+    flnpt(assignment, peer_review_item(course)).click
+  end
+
+  def click_opportunity(item_name)
+    flnpt(item_name, opportunities_parent).click
+  end
+
+  def click_item_button(item_name)
+    fj("button:contains('#{item_name}')").click
+  end
 
   def dismiss_todo_item(todo_title)
     dismiss_todo_item_button(todo_title).click
@@ -175,6 +231,13 @@ module PlannerPageObject
   def navigate_to_course_object(object)
     expect_new_page_load do
       flnpt(object.title.to_s).click
+    end
+  end
+
+  def navigate_to_calendar_event(object)
+    expect_new_page_load do
+      click_item_button(object.title)
+      flnpt(object.title).click
     end
   end
 
@@ -253,6 +316,11 @@ module PlannerPageObject
     object.is_a?(CalendarEvent) ? validate_calendar_url(object) : validate_url(url_type, object)
   end
 
+  def validate_link_to_calendar(object)
+    navigate_to_calendar_event(object)
+    validate_calendar_url(object)
+  end
+
   def validate_link_to_submissions(object, user, url_type)
     navigate_to_course_object(object)
     validate_submissions_url(url_type, object, user)
@@ -262,7 +330,7 @@ module PlannerPageObject
     @student_to_do = @student1.planner_notes.create!(todo_date: Time.zone.now,
                                                      title: "Student to do", course_id: @course.id)
     go_to_list_view
-    flnpt(@student_to_do.title).click
+    click_item_button(@student_to_do.title)
     @modal = todo_sidebar_modal(@student_to_do.title)
   end
 
@@ -302,7 +370,11 @@ module PlannerPageObject
   end
 
   def wait_for_spinner
-    fj("title:contains('Loading')", planner_app_div) # the loading spinner appears
+    begin
+      fj("title:contains('Loading')", planner_app_div) # the loading spinner appears
+    rescue Selenium::WebDriver::Error::NoSuchElementError
+      # ignore - sometimes spinner is too quick
+    end
     expect(planner_app_div).not_to contain_jqcss("title:contains('Loading')")
   end
 

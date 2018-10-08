@@ -26,6 +26,7 @@ import createOrEditDeveloperKeyReducer from '../reducers/createOrEditReducer'
 import makeVisibleDeveloperKeyReducer from '../reducers/makeVisibleReducer'
 import makeInvisibleDeveloperKeyReducer from '../reducers/makeInvisibleReducer'
 import listDeveloperKeyScopesReducer from '../reducers/listScopesReducer'
+import createLtiKeyReducer from '../reducers/createLtiKeyReducer'
 
 const middleware = [
   ReduxThunk,
@@ -43,7 +44,8 @@ const developerKeysReducer = combineReducers({
   createOrEditDeveloperKey: createOrEditDeveloperKeyReducer,
   makeVisibleDeveloperKey: makeVisibleDeveloperKeyReducer,
   makeInvisibleDeveloperKey: makeInvisibleDeveloperKeyReducer,
-  listDeveloperKeyScopes: listDeveloperKeyScopesReducer
+  listDeveloperKeyScopes: listDeveloperKeyScopesReducer,
+  createLtiKey: createLtiKeyReducer
 })
 
 export default createStoreWithMiddleware(developerKeysReducer)

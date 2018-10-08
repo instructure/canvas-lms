@@ -50,6 +50,9 @@
   "assignmenttype_title_posted_datetime_cab69444": {
     "message": "{ assignmentType } { title }发布了{ datetime }。"
   },
+  "assignmenttype_title_reminder_datetime_33fa66d5": {
+    "message": "{ assignmentType }{ title }，提醒{ datetime }。"
+  },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "您的待办事项历史记录的开始"
   },
@@ -61,6 +64,12 @@
   },
   "close_d634289d": {
     "message": "关闭"
+  },
+  "close_opportunity_center_popup_9907d981": {
+    "message": "关闭机会中心弹出窗口"
+  },
+  "count_plural_0_opportunities_one_opportunity_other_bb1698f6": {
+    "message": "{ count, plural,\n     =0 {#个机会}\n    one {#个机会}\n  other {#个机会}\n}。点击以打开机会中心弹出窗口。"
   },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {显示#个已完成项目}\n  other {显示#个已完成项目}\n}"
@@ -97,6 +106,12 @@
   },
   "dismiss_opportunityname_5995176f": {
     "message": "拒绝 { opportunityName }"
+  },
+  "dismissed_8b0b1fc9": {
+    "message": "已拒绝"
+  },
+  "dismissed_opportunities_f0826640": {
+    "message": "已拒绝的机会"
   },
   "due_5d7267be": {
     "message": "到期："
@@ -191,11 +206,17 @@
   "my_grades_98834476": {
     "message": "我的评分"
   },
+  "new_13daf639": {
+    "message": "新建"
+  },
   "new_activity_8b84847d": {
     "message": "新活动"
   },
   "new_activity_for_title_14c9c3af": {
     "message": "{ title } 的新活动"
+  },
+  "new_opportunities_7d349c4d": {
+    "message": "新机会"
   },
   "next_month_749b1778": {
     "message": "下个月"
@@ -208,6 +229,9 @@
   },
   "nothing_for_now_e3e3ce2a": {
     "message": "目前没有任何内容"
+  },
+  "nothing_here_needs_attention_c4eaded6": {
+    "message": "此处没有需要关注的。"
   },
   "nothing_more_to_do_b665da42": {
     "message": "没有更多待办事项"
@@ -236,6 +260,9 @@
   "page_50c4823d": {
     "message": "页面"
   },
+  "peer_review_74f26a13": {
+    "message": "同侪审阅"
+  },
   "points_bceb5005": {
     "message": "分值"
   },
@@ -250,6 +277,9 @@
   },
   "quiz_e0dcce8f": {
     "message": "测验"
+  },
+  "reminder_date_4564d12d": {
+    "message": "提醒：{ date }"
   },
   "replies_4a8577c8": {
     "message": "回复"
@@ -286,6 +316,9 @@
   },
   "the_date_and_time_this_to_do_is_due_74c823d4": {
     "message": "完成该事项的日期和时间已截止"
+  },
+  "there_are_no_points_associated_with_this_item_449c712a": {
+    "message": "没有与此项目相关的分数"
   },
   "time_2b5aac58": {
     "message": "时间"

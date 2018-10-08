@@ -46,6 +46,10 @@
           <%= render partial: "federated_attributes", locals: { aac: aac, presenter: presenter, f: f } %>
         <% end %>
 
+        <% if !aac.new_record? && aac.class.supports_debugging? %>
+          <%= render partial: "debugging", locals: { provider: aac } %>
+        <% end %>
+
         <% if presenter.configs.length > 1 %>
           <div class="ic-Form-control">
             <%= f.label(:position,

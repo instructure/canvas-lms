@@ -7,7 +7,7 @@
  * http://benalman.com/about/license/
  */
 
-define(['jquery'], function($){
+const $ = require('jquery')
 
   // Create a "dummy" jQuery object on which to bind, unbind and trigger event
   // handlers. Note that $({}) works in jQuery 1.4.3+.
@@ -47,10 +47,9 @@ define(['jquery'], function($){
     o.trigger.apply( o, arguments );
   };
 
-  return {
+  module.exports = {
     subscribe: subscribe,
     unsubscribe: unsubscribe,
     publish: publish
   };
 
-});

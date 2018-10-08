@@ -166,8 +166,10 @@ class TabsController < ApplicationController
         tab[:position] = new_pos
       end
 
-      @context.tab_configuration = tab_config
-      @context.save!
+      if @context.tab_configuration != tab_config
+        @context.tab_configuration = tab_config
+        @context.save!
+      end
       render json: tab_json(tab, @context, @current_user, session)
     end
   end

@@ -67,13 +67,10 @@ define [
 
       @assignmentSubmission = modelData
       # build the params for submitting the assignment
-      # TODO: The `submit_assignment` param is used to help in backwards compat for fixing auto submissions,
-      # can be removed in the next release.
       preflightData =
         url: @assignmentSubmission.get('url')
         name: @assignmentSubmission.get('text')
         content_type: ''
-        submit_assignment: true
         eula_agreement_timestamp: @assignmentSubmission.get('eula_agreement_timestamp')
 
       if ENV.SUBMIT_ASSIGNMENT.GROUP_ID_FOR_USER?

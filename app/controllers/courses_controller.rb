@@ -1077,17 +1077,16 @@ class CoursesController < ApplicationController
   def todo_items
     get_context
     if authorized_action(@context, @current_user, :read)
-      bookmark = BookmarkedCollection::SimpleBookmarker.new(Assignment, :due_at, :id)
+      bookmark = Plannable::Bookmarker.new(Assignment, false, :due_at, :id)
 
       grading_scope = @current_user.assignments_needing_grading(:contexts => [@context], scope_only: true).
-        reorder(:due_at, :id)
+        reorder(:due_at, :id).preload(:external_tool_tag, :rubric_association, :rubric, :discussion_topic, :quiz).eager_load(:duplicate_of)
       submitting_scope = @current_user.
         assignments_needing_submitting(
           :contexts => [@context],
           include_ungraded: true,
-          limit: ToDoListPresenter::ASSIGNMENT_LIMIT,
           scope_only: true).
-        reorder(:due_at, :id)
+        reorder(:due_at, :id).preload(:external_tool_tag, :rubric_association, :rubric, :discussion_topic, :quiz).eager_load(:duplicate_of)
 
       grading_collection = BookmarkedCollection.wrap(bookmark, grading_scope)
       grading_collection = BookmarkedCollection.transform(grading_collection) do |a|
@@ -1104,7 +1103,7 @@ class CoursesController < ApplicationController
       ]
 
       if Array(params[:include]).include? 'ungraded_quizzes'
-        quizzes_bookmark = BookmarkedCollection::SimpleBookmarker.new(Quizzes::Quiz, :due_at, :id)
+        quizzes_bookmark = Plannable::Bookmarker.new(Quizzes::Quiz, false, :due_at, :id)
         quizzes_scope = @current_user.
           ungraded_quizzes(
             :contexts => [@context],
@@ -1245,6 +1244,7 @@ class CoursesController < ApplicationController
         },
         LTI_LAUNCH_URL: course_tool_proxy_registration_path(@context),
         MEMBERSHIP_SERVICE_FEATURE_FLAG_ENABLED: @context.root_account.feature_enabled?(:membership_service_for_lti_tools),
+        LTI_13_TOOLS_FEATURE_FLAG_ENABLED: @context.root_account.feature_enabled?(:lti_1_3),
         CONTEXT_BASE_URL: "/courses/#{@context.id}",
         PUBLISHING_ENABLED: @publishing_enabled,
         COURSE_IMAGES_ENABLED: @context.feature_enabled?(:course_card_images)
@@ -1341,11 +1341,13 @@ class CoursesController < ApplicationController
     @course.send_later_if_production_enqueue_args(:touch_content_if_public_visibility_changed,
       { :priority => Delayed::LOW_PRIORITY }, changes)
 
-    if @course.save
-      Auditors::Course.record_updated(@course, @current_user, changes, source: :api)
-      render :json => course_settings_json(@course)
-    else
-      render :json => @course.errors, :status => :bad_request
+    DueDateCacher.with_executing_user(@current_user) do
+      if @course.save
+        Auditors::Course.record_updated(@course, @current_user, changes, source: :api)
+        render :json => course_settings_json(@course)
+      else
+        render :json => @course.errors, :status => :bad_request
+      end
     end
   end
 
@@ -1396,7 +1398,9 @@ class CoursesController < ApplicationController
   def accept_enrollment(enrollment)
     if @current_user && enrollment.user == @current_user
       if enrollment.workflow_state == 'invited'
-        enrollment.accept!
+        DueDateCacher.with_executing_user(@current_user) do
+          enrollment.accept!
+        end
         @pending_enrollment = nil
         flash[:notice] = t('notices.invitation_accepted', 'Invitation accepted!  Welcome to %{course}!', :course => @context.name)
       end
@@ -1948,6 +1952,7 @@ class CoursesController < ApplicationController
       limit_privileges = value_to_boolean(enrollment_options[:limit_privileges_to_course_section])
       enrollment_options[:limit_privileges_to_course_section] = limit_privileges
       enrollment_options[:role] = custom_role if custom_role
+      enrollment_options[:updating_user] = @current_user
 
       list =
         if params[:user_tokens]

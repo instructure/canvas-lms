@@ -16,66 +16,65 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'react',
-  'enzyme',
-  'jquery',
-  'axios',
-  'underscore',
-  'jsx/grading/AccountTabContainer',
-  'jqueryui/tabs',
-], (React, { mount }, $, axios, _, AccountTabContainer) => {
-  QUnit.module('AccountTabContainer', {
-    renderComponent (props = {}) {
-      const defaults = {
-        readOnly: false,
-        urls: {
-          gradingPeriodSetsURL: 'api/v1/accounts/1/grading_period_sets',
-          gradingPeriodsUpdateURL:
-            'api/v1/grading_period_sets/%7B%7B%20set_id%20%7D%7D/grading_periods/batch_update',
-          enrollmentTermsURL: 'api/v1/accounts/1/enrollment_terms',
-          deleteGradingPeriodURL: 'api/v1/accounts/1/grading_periods/%7B%7B%20id%20%7D%7D'
-        },
-      };
-      const mergedProps = _.defaults(props, defaults);
+import React from 'react'
 
-      this.wrapper = mount(<AccountTabContainer {...mergedProps} />)
-    },
+import {mount} from 'enzyme'
+import $ from 'jquery'
+import axios from 'axios'
+import _ from 'underscore'
+import AccountTabContainer from 'jsx/grading/AccountTabContainer'
+import 'jqueryui/tabs'
 
-    setup () {
-      const response = {};
-      const successPromise = new Promise(resolve => resolve(response));
-      sandbox.stub(axios, 'get').returns(successPromise);
-      sandbox.stub($, 'ajax').returns({ done () {} });
-    },
-
-    teardown () {
-      this.wrapper.unmount();
+QUnit.module('AccountTabContainer', {
+  renderComponent(props = {}) {
+    const defaults = {
+      readOnly: false,
+      urls: {
+        gradingPeriodSetsURL: 'api/v1/accounts/1/grading_period_sets',
+        gradingPeriodsUpdateURL:
+          'api/v1/grading_period_sets/%7B%7B%20set_id%20%7D%7D/grading_periods/batch_update',
+        enrollmentTermsURL: 'api/v1/accounts/1/enrollment_terms',
+        deleteGradingPeriodURL: 'api/v1/accounts/1/grading_periods/%7B%7B%20id%20%7D%7D'
+      }
     }
-  });
+    const mergedProps = _.defaults(props, defaults)
 
-  test('tabs are present', function () {
-    this.renderComponent();
-    const $el = this.wrapper.getDOMNode()
-    strictEqual($el.querySelectorAll('.ui-tabs').length, 1);
-    strictEqual($el.querySelectorAll('.ui-tabs ul.ui-tabs-nav li').length, 2);
-    equal($el.querySelector('#grading-periods-tab').getAttribute('style'), 'display: block;');
-    equal($el.querySelector('#grading-standards-tab').getAttribute('style'), 'display: none;')
-  });
+    this.wrapper = mount(<AccountTabContainer {...mergedProps} />)
+  },
 
-  test('jquery-ui tabs() is called', function () {
-    const tabsSpy = sandbox.spy($.fn, 'tabs');
-    this.renderComponent();
-    ok(tabsSpy.calledOnce);
-  });
+  setup() {
+    const response = {}
+    const successPromise = new Promise(resolve => resolve(response))
+    sandbox.stub(axios, 'get').returns(successPromise)
+    sandbox.stub($, 'ajax').returns({done() {}})
+  },
 
-  test('renders the grading periods', function () {
-    this.renderComponent();
-    ok(this.wrapper.at(0).instance().gradingPeriods);
-  });
+  teardown() {
+    this.wrapper.unmount()
+  }
+})
 
-  test('renders the grading standards', function () {
-    this.renderComponent();
-    ok(this.wrapper.at(0).instance().gradingStandards);
-  });
-});
+test('tabs are present', function() {
+  this.renderComponent()
+  const $el = this.wrapper.getDOMNode()
+  strictEqual($el.querySelectorAll('.ui-tabs').length, 1)
+  strictEqual($el.querySelectorAll('.ui-tabs ul.ui-tabs-nav li').length, 2)
+  equal($el.querySelector('#grading-periods-tab').getAttribute('style'), 'display: block;')
+  equal($el.querySelector('#grading-standards-tab').getAttribute('style'), 'display: none;')
+})
+
+test('jquery-ui tabs() is called', function() {
+  const tabsSpy = sandbox.spy($.fn, 'tabs')
+  this.renderComponent()
+  ok(tabsSpy.calledOnce)
+})
+
+test('renders the grading periods', function() {
+  this.renderComponent()
+  ok(this.wrapper.at(0).instance().gradingPeriods)
+})
+
+test('renders the grading standards', function() {
+  this.renderComponent()
+  ok(this.wrapper.at(0).instance().gradingStandards)
+})

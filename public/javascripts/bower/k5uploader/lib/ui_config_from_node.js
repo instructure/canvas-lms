@@ -1,22 +1,20 @@
-define([
-  './ui_config',
-  './filter_from_node'
-], function(UiConfig, filterFromNode){
-  return function(xml) {
-    var limits = xml.find('limits');
+import UiConfig from "./ui_config";
+import filterFromNode from "./filter_from_node";
 
-    var config = new UiConfig({
-      maxUploads: limits.attr('maxUploads'),
-      maxFileSize: limits.attr('maxFileSize'),
-      maxTotalSize: limits.attr('maxTotalSize')
-    });
+export default function(xml) {
+  var limits = xml.find('limits');
 
-    var filters = xml.find('fileFilters').children();
+  var config = new UiConfig({
+    maxUploads: limits.attr('maxUploads'),
+    maxFileSize: limits.attr('maxFileSize'),
+    maxTotalSize: limits.attr('maxTotalSize')
+  });
 
-    for(var i=0, l=filters.length; i<l; i++) {
-      var filter = filterFromNode(filters[i]);
-      config.addFileFilter(filter);
-    }
-    return config;
+  var filters = xml.find('fileFilters').children();
+
+  for(var i=0, l=filters.length; i<l; i++) {
+    var filter = filterFromNode(filters[i]);
+    config.addFileFilter(filter);
   }
-});
+  return config;
+};

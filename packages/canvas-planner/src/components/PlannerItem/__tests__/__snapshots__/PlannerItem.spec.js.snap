@@ -7,7 +7,16 @@ exports[`does not render end time if the same as start time 1`] = `
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": "#d71f85",
+            "checkedBackground": "#d71f85",
+            "checkedBorderColor": "#d71f85",
+            "hoverBorderColor": "#d71f85",
+          },
+        }
+      }
     >
       <Checkbox
         checked={false}
@@ -62,9 +71,9 @@ exports[`does not render end time if the same as start time 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
             iconPlacement="start"
             linkRef={[Function]}
+            onClick={[Function]}
             variant="default"
           >
             <ScreenReaderContent
@@ -84,6 +93,25 @@ exports[`does not render end time if the same as start time 1`] = `
                 This Assignment is about awesome stuff
               </Text>
             </PresentationContent>
+            <CalendarEventModal
+              allDay={false}
+              courseName="A Course about being Diffrient"
+              currentUser={
+                Object {
+                  "avatarUrl": "/picture/is/here",
+                  "color": "#00AC18",
+                  "displayName": "Jane",
+                  "id": "1",
+                }
+              }
+              endTime={"2011-12-17T11:30:00.000Z"}
+              html_url="http://example.com"
+              open={false}
+              requestClose={[Function]}
+              startTime={"2011-12-17T11:30:00.000Z"}
+              timeZone="America/Denver"
+              title="This Assignment is about awesome stuff"
+            />
           </Link>
         </div>
       </div>
@@ -115,141 +143,6 @@ exports[`does not render end time if the same as start time 1`] = `
 </div>
 `;
 
-exports[`renders feedback anonymously according to the assignment settings 1`] = `
-<div
-  className="planner-item"
->
-  <div>
-    <ApplyTheme
-      immutable={false}
-      theme={Object {}}
-    >
-      <Checkbox
-        checked={false}
-        disabled={false}
-        indeterminate={false}
-        inline={false}
-        label={
-          <ScreenReaderContent
-            as="span"
-          >
-            Assignment This Assignment is about awesome stuff is not marked as done.
-          </ScreenReaderContent>
-        }
-        onChange={[Function]}
-        size="medium"
-        variant="simple"
-      />
-    </ApplyTheme>
-  </div>
-  <div
-    aria-hidden="true"
-    style={
-      Object {
-        "color": "#d71f85",
-      }
-    }
-  >
-    <IconAssignment />
-  </div>
-  <div>
-    <div>
-      <div
-        className=""
-      >
-        <div>
-          <Text
-            as="span"
-            color="secondary"
-            letterSpacing="normal"
-            size="x-small"
-          >
-            A Course about being Diffrient Assignment
-          </Text>
-        </div>
-        <div
-          style={
-            Object {
-              "position": "relative",
-            }
-          }
-        >
-          <Link
-            as="button"
-            ellipsis={true}
-            href="#"
-            iconPlacement="start"
-            linkRef={[Function]}
-            variant="default"
-          >
-            <ScreenReaderContent
-              as="span"
-            >
-              Assignment This Assignment is about awesome stuff, due Saturday, December 17, 2011 3:30 AM.
-            </ScreenReaderContent>
-            <PresentationContent
-              as="span"
-            >
-              <Text
-                as="span"
-                color="primary"
-                letterSpacing="normal"
-                size="medium"
-              >
-                This Assignment is about awesome stuff
-              </Text>
-            </PresentationContent>
-          </Link>
-        </div>
-      </div>
-      <div
-        className=""
-      >
-        <div />
-        <div
-          className=""
-        >
-          <div>
-            <Text
-              as="span"
-              color="secondary"
-              letterSpacing="normal"
-              size="x-small"
-            >
-              <PresentationContent
-                as="span"
-              >
-                Due: 3:30 AM
-              </PresentationContent>
-            </Text>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div>
-      <span>
-        <Avatar
-          inline={true}
-          name="?"
-          size="small"
-          variant="circle"
-        />
-      </span>
-      <span>
-        <Text
-          as="span"
-          fontStyle="italic"
-          letterSpacing="normal"
-          size="medium"
-        >
-          Open the pod bay doors, HAL.
-        </Text>
-      </span>
-    </div>
-  </div>
-</div>
-`;
-
 exports[`prefers to render feedback if it and the location are available 1`] = `
 <div
   className="planner-item"
@@ -257,7 +150,16 @@ exports[`prefers to render feedback if it and the location are available 1`] = `
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": "#d71f85",
+            "checkedBackground": "#d71f85",
+            "checkedBorderColor": "#d71f85",
+            "hoverBorderColor": "#d71f85",
+          },
+        }
+      }
     >
       <Checkbox
         checked={false}
@@ -312,7 +214,7 @@ exports[`prefers to render feedback if it and the location are available 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -393,7 +295,16 @@ exports[`renders Announcement correctly with everything 1`] = `
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": "#d71f85",
+            "checkedBackground": "#d71f85",
+            "checkedBorderColor": "#d71f85",
+            "hoverBorderColor": "#d71f85",
+          },
+        }
+      }
     >
       <Checkbox
         checked={true}
@@ -448,7 +359,7 @@ exports[`renders Announcement correctly with everything 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -532,7 +443,16 @@ exports[`renders Announcement correctly with just date 1`] = `
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": "#d71f85",
+            "checkedBackground": "#d71f85",
+            "checkedBorderColor": "#d71f85",
+            "hoverBorderColor": "#d71f85",
+          },
+        }
+      }
     >
       <Checkbox
         checked={false}
@@ -587,7 +507,7 @@ exports[`renders Announcement correctly with just date 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -647,7 +567,16 @@ exports[`renders Announcement correctly with just points 1`] = `
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": "#d71f85",
+            "checkedBackground": "#d71f85",
+            "checkedBorderColor": "#d71f85",
+            "hoverBorderColor": "#d71f85",
+          },
+        }
+      }
     >
       <Checkbox
         checked={false}
@@ -702,7 +631,7 @@ exports[`renders Announcement correctly with just points 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -786,7 +715,16 @@ exports[`renders Announcement correctly without right side content 1`] = `
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": "#d71f85",
+            "checkedBackground": "#d71f85",
+            "checkedBorderColor": "#d71f85",
+            "hoverBorderColor": "#d71f85",
+          },
+        }
+      }
     >
       <Checkbox
         checked={false}
@@ -841,7 +779,7 @@ exports[`renders Announcement correctly without right side content 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -901,7 +839,16 @@ exports[`renders Assignment correctly with everything 1`] = `
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": "#d71f85",
+            "checkedBackground": "#d71f85",
+            "checkedBorderColor": "#d71f85",
+            "hoverBorderColor": "#d71f85",
+          },
+        }
+      }
     >
       <Checkbox
         checked={true}
@@ -1040,7 +987,16 @@ exports[`renders Assignment correctly with just date 1`] = `
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": "#d71f85",
+            "checkedBackground": "#d71f85",
+            "checkedBorderColor": "#d71f85",
+            "hoverBorderColor": "#d71f85",
+          },
+        }
+      }
     >
       <Checkbox
         checked={false}
@@ -1095,7 +1051,7 @@ exports[`renders Assignment correctly with just date 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -1155,7 +1111,16 @@ exports[`renders Assignment correctly with just points 1`] = `
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": "#d71f85",
+            "checkedBackground": "#d71f85",
+            "checkedBorderColor": "#d71f85",
+            "hoverBorderColor": "#d71f85",
+          },
+        }
+      }
     >
       <Checkbox
         checked={false}
@@ -1210,7 +1175,7 @@ exports[`renders Assignment correctly with just points 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -1294,7 +1259,16 @@ exports[`renders Assignment correctly without right side content 1`] = `
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": "#d71f85",
+            "checkedBackground": "#d71f85",
+            "checkedBorderColor": "#d71f85",
+            "hoverBorderColor": "#d71f85",
+          },
+        }
+      }
     >
       <Checkbox
         checked={false}
@@ -1349,7 +1323,7 @@ exports[`renders Assignment correctly without right side content 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -1409,7 +1383,16 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": "#d71f85",
+            "checkedBackground": "#d71f85",
+            "checkedBorderColor": "#d71f85",
+            "hoverBorderColor": "#d71f85",
+          },
+        }
+      }
     >
       <Checkbox
         checked={false}
@@ -1464,9 +1447,9 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
             iconPlacement="start"
             linkRef={[Function]}
+            onClick={[Function]}
             variant="default"
           >
             <ScreenReaderContent
@@ -1486,6 +1469,24 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
                 I am a Calendar Event
               </Text>
             </PresentationContent>
+            <CalendarEventModal
+              allDay={true}
+              courseName="A Course about being Diffrient"
+              currentUser={
+                Object {
+                  "avatarUrl": "/picture/is/here",
+                  "color": "#00AC18",
+                  "displayName": "Jane",
+                  "id": "1",
+                }
+              }
+              html_url="http://example.com"
+              open={false}
+              requestClose={[Function]}
+              startTime={"2011-12-17T11:30:00.000Z"}
+              timeZone="America/Denver"
+              title="I am a Calendar Event"
+            />
           </Link>
         </div>
       </div>
@@ -1524,7 +1525,16 @@ exports[`renders Calendar Event correctly with everything 1`] = `
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": "#d71f85",
+            "checkedBackground": "#d71f85",
+            "checkedBorderColor": "#d71f85",
+            "hoverBorderColor": "#d71f85",
+          },
+        }
+      }
     >
       <Checkbox
         checked={true}
@@ -1579,9 +1589,9 @@ exports[`renders Calendar Event correctly with everything 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
             iconPlacement="start"
             linkRef={[Function]}
+            onClick={[Function]}
             variant="default"
           >
             <ScreenReaderContent
@@ -1601,6 +1611,24 @@ exports[`renders Calendar Event correctly with everything 1`] = `
                 I am a Calendar Event
               </Text>
             </PresentationContent>
+            <CalendarEventModal
+              allDay={false}
+              courseName="A Course about being Diffrient"
+              currentUser={
+                Object {
+                  "avatarUrl": "/picture/is/here",
+                  "color": "#00AC18",
+                  "displayName": "Jane",
+                  "id": "1",
+                }
+              }
+              html_url="http://example.com"
+              open={false}
+              requestClose={[Function]}
+              startTime={"2011-12-17T11:30:00.000Z"}
+              timeZone="America/Denver"
+              title="I am a Calendar Event"
+            />
           </Link>
         </div>
       </div>
@@ -1663,7 +1691,16 @@ exports[`renders Calendar Event correctly with just date 1`] = `
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": "#d71f85",
+            "checkedBackground": "#d71f85",
+            "checkedBorderColor": "#d71f85",
+            "hoverBorderColor": "#d71f85",
+          },
+        }
+      }
     >
       <Checkbox
         checked={false}
@@ -1718,9 +1755,9 @@ exports[`renders Calendar Event correctly with just date 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
             iconPlacement="start"
             linkRef={[Function]}
+            onClick={[Function]}
             variant="default"
           >
             <ScreenReaderContent
@@ -1740,6 +1777,24 @@ exports[`renders Calendar Event correctly with just date 1`] = `
                 I am a Calendar Event
               </Text>
             </PresentationContent>
+            <CalendarEventModal
+              allDay={false}
+              courseName="A Course about being Diffrient"
+              currentUser={
+                Object {
+                  "avatarUrl": "/picture/is/here",
+                  "color": "#00AC18",
+                  "displayName": "Jane",
+                  "id": "1",
+                }
+              }
+              html_url="http://example.com"
+              open={false}
+              requestClose={[Function]}
+              startTime={"2011-12-17T11:30:00.000Z"}
+              timeZone="America/Denver"
+              title="I am a Calendar Event"
+            />
           </Link>
         </div>
       </div>
@@ -1778,7 +1833,16 @@ exports[`renders Calendar Event correctly with start and end time 1`] = `
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": "#d71f85",
+            "checkedBackground": "#d71f85",
+            "checkedBorderColor": "#d71f85",
+            "hoverBorderColor": "#d71f85",
+          },
+        }
+      }
     >
       <Checkbox
         checked={false}
@@ -1833,9 +1897,9 @@ exports[`renders Calendar Event correctly with start and end time 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
             iconPlacement="start"
             linkRef={[Function]}
+            onClick={[Function]}
             variant="default"
           >
             <ScreenReaderContent
@@ -1855,6 +1919,25 @@ exports[`renders Calendar Event correctly with start and end time 1`] = `
                 I am a Calendar Event
               </Text>
             </PresentationContent>
+            <CalendarEventModal
+              allDay={false}
+              courseName="A Course about being Diffrient"
+              currentUser={
+                Object {
+                  "avatarUrl": "/picture/is/here",
+                  "color": "#00AC18",
+                  "displayName": "Jane",
+                  "id": "1",
+                }
+              }
+              endTime={"2011-12-17T13:30:00.000Z"}
+              html_url="http://example.com"
+              open={false}
+              requestClose={[Function]}
+              startTime={"2011-12-17T11:30:00.000Z"}
+              timeZone="America/Denver"
+              title="I am a Calendar Event"
+            />
           </Link>
         </div>
       </div>
@@ -1893,7 +1976,16 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": "#d71f85",
+            "checkedBackground": "#d71f85",
+            "checkedBorderColor": "#d71f85",
+            "hoverBorderColor": "#d71f85",
+          },
+        }
+      }
     >
       <Checkbox
         checked={false}
@@ -1948,9 +2040,9 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
             iconPlacement="start"
             linkRef={[Function]}
+            onClick={[Function]}
             variant="default"
           >
             <ScreenReaderContent
@@ -1970,6 +2062,24 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
                 I am a Calendar Event
               </Text>
             </PresentationContent>
+            <CalendarEventModal
+              allDay={false}
+              courseName="A Course about being Diffrient"
+              currentUser={
+                Object {
+                  "avatarUrl": "/picture/is/here",
+                  "color": "#00AC18",
+                  "displayName": "Jane",
+                  "id": "1",
+                }
+              }
+              html_url="http://example.com"
+              open={false}
+              requestClose={[Function]}
+              startTime={"2011-12-17T11:30:00.000Z"}
+              timeZone="America/Denver"
+              title="I am a Calendar Event"
+            />
           </Link>
         </div>
       </div>
@@ -2008,7 +2118,16 @@ exports[`renders Discussion correctly with everything 1`] = `
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": "#d71f85",
+            "checkedBackground": "#d71f85",
+            "checkedBorderColor": "#d71f85",
+            "hoverBorderColor": "#d71f85",
+          },
+        }
+      }
     >
       <Checkbox
         checked={true}
@@ -2063,7 +2182,7 @@ exports[`renders Discussion correctly with everything 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -2147,7 +2266,16 @@ exports[`renders Discussion correctly with just date 1`] = `
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": "#d71f85",
+            "checkedBackground": "#d71f85",
+            "checkedBorderColor": "#d71f85",
+            "hoverBorderColor": "#d71f85",
+          },
+        }
+      }
     >
       <Checkbox
         checked={false}
@@ -2202,7 +2330,7 @@ exports[`renders Discussion correctly with just date 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -2262,7 +2390,16 @@ exports[`renders Discussion correctly with just points 1`] = `
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": "#d71f85",
+            "checkedBackground": "#d71f85",
+            "checkedBorderColor": "#d71f85",
+            "hoverBorderColor": "#d71f85",
+          },
+        }
+      }
     >
       <Checkbox
         checked={false}
@@ -2317,7 +2454,7 @@ exports[`renders Discussion correctly with just points 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -2401,7 +2538,16 @@ exports[`renders Discussion correctly without right side content 1`] = `
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": "#d71f85",
+            "checkedBackground": "#d71f85",
+            "checkedBorderColor": "#d71f85",
+            "hoverBorderColor": "#d71f85",
+          },
+        }
+      }
     >
       <Checkbox
         checked={false}
@@ -2456,7 +2602,7 @@ exports[`renders Discussion correctly without right side content 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -2516,7 +2662,16 @@ exports[`renders Note correctly with Group 1`] = `
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": "#F06291",
+            "checkedBackground": "#F06291",
+            "checkedBorderColor": "#F06291",
+            "hoverBorderColor": "#F06291",
+          },
+        }
+      }
     >
       <Checkbox
         checked={false}
@@ -2544,7 +2699,7 @@ exports[`renders Note correctly with Group 1`] = `
       }
     }
   >
-    <IconMsWord />
+    <IconDocument />
   </div>
   <div>
     <div>
@@ -2631,7 +2786,16 @@ exports[`renders Note correctly with everything 1`] = `
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": undefined,
+            "checkedBackground": undefined,
+            "checkedBorderColor": undefined,
+            "hoverBorderColor": undefined,
+          },
+        }
+      }
     >
       <Checkbox
         checked={true}
@@ -2692,7 +2856,6 @@ exports[`renders Note correctly with everything 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
             iconPlacement="start"
             linkRef={[Function]}
             onClick={[Function]}
@@ -2728,7 +2891,13 @@ exports[`renders Note correctly with everything 1`] = `
           <div>
             <ApplyTheme
               immutable={false}
-              theme={Object {}}
+              theme={
+                Object {
+                  Symbol(Button): Object {
+                    "iconColor": undefined,
+                  },
+                }
+              }
             >
               <Button
                 as="button"
@@ -2778,7 +2947,16 @@ exports[`renders Note correctly without Course 1`] = `
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": undefined,
+            "checkedBackground": undefined,
+            "checkedBorderColor": undefined,
+            "hoverBorderColor": undefined,
+          },
+        }
+      }
     >
       <Checkbox
         checked={false}
@@ -2839,7 +3017,6 @@ exports[`renders Note correctly without Course 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
             iconPlacement="start"
             linkRef={[Function]}
             onClick={[Function]}
@@ -2875,7 +3052,13 @@ exports[`renders Note correctly without Course 1`] = `
           <div>
             <ApplyTheme
               immutable={false}
-              theme={Object {}}
+              theme={
+                Object {
+                  Symbol(Button): Object {
+                    "iconColor": undefined,
+                  },
+                }
+              }
             >
               <Button
                 as="button"
@@ -2925,7 +3108,16 @@ exports[`renders Page correctly with everything 1`] = `
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": "#d71f85",
+            "checkedBackground": "#d71f85",
+            "checkedBorderColor": "#d71f85",
+            "hoverBorderColor": "#d71f85",
+          },
+        }
+      }
     >
       <Checkbox
         checked={true}
@@ -2953,7 +3145,7 @@ exports[`renders Page correctly with everything 1`] = `
       }
     }
   >
-    <IconMsWord />
+    <IconDocument />
   </div>
   <div>
     <div>
@@ -2980,7 +3172,7 @@ exports[`renders Page correctly with everything 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -3064,7 +3256,16 @@ exports[`renders Page correctly with just date 1`] = `
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": "#d71f85",
+            "checkedBackground": "#d71f85",
+            "checkedBorderColor": "#d71f85",
+            "hoverBorderColor": "#d71f85",
+          },
+        }
+      }
     >
       <Checkbox
         checked={false}
@@ -3092,7 +3293,7 @@ exports[`renders Page correctly with just date 1`] = `
       }
     }
   >
-    <IconMsWord />
+    <IconDocument />
   </div>
   <div>
     <div>
@@ -3119,7 +3320,7 @@ exports[`renders Page correctly with just date 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -3179,7 +3380,16 @@ exports[`renders Page correctly with just points 1`] = `
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": "#d71f85",
+            "checkedBackground": "#d71f85",
+            "checkedBorderColor": "#d71f85",
+            "hoverBorderColor": "#d71f85",
+          },
+        }
+      }
     >
       <Checkbox
         checked={false}
@@ -3207,7 +3417,7 @@ exports[`renders Page correctly with just points 1`] = `
       }
     }
   >
-    <IconMsWord />
+    <IconDocument />
   </div>
   <div>
     <div>
@@ -3234,7 +3444,7 @@ exports[`renders Page correctly with just points 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -3318,7 +3528,16 @@ exports[`renders Page correctly without right side content 1`] = `
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": "#d71f85",
+            "checkedBackground": "#d71f85",
+            "checkedBorderColor": "#d71f85",
+            "hoverBorderColor": "#d71f85",
+          },
+        }
+      }
     >
       <Checkbox
         checked={false}
@@ -3346,7 +3565,7 @@ exports[`renders Page correctly without right side content 1`] = `
       }
     }
   >
-    <IconMsWord />
+    <IconDocument />
   </div>
   <div>
     <div>
@@ -3373,7 +3592,7 @@ exports[`renders Page correctly without right side content 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -3433,7 +3652,16 @@ exports[`renders Quiz correctly with everything 1`] = `
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": "#d71f85",
+            "checkedBackground": "#d71f85",
+            "checkedBorderColor": "#d71f85",
+            "hoverBorderColor": "#d71f85",
+          },
+        }
+      }
     >
       <Checkbox
         checked={true}
@@ -3488,7 +3716,7 @@ exports[`renders Quiz correctly with everything 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -3572,7 +3800,16 @@ exports[`renders Quiz correctly with just date 1`] = `
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": "#d71f85",
+            "checkedBackground": "#d71f85",
+            "checkedBorderColor": "#d71f85",
+            "hoverBorderColor": "#d71f85",
+          },
+        }
+      }
     >
       <Checkbox
         checked={false}
@@ -3627,7 +3864,7 @@ exports[`renders Quiz correctly with just date 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -3687,7 +3924,16 @@ exports[`renders Quiz correctly with just points 1`] = `
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": "#d71f85",
+            "checkedBackground": "#d71f85",
+            "checkedBorderColor": "#d71f85",
+            "hoverBorderColor": "#d71f85",
+          },
+        }
+      }
     >
       <Checkbox
         checked={false}
@@ -3742,7 +3988,7 @@ exports[`renders Quiz correctly with just points 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -3826,7 +4072,16 @@ exports[`renders Quiz correctly without right side content 1`] = `
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": "#d71f85",
+            "checkedBackground": "#d71f85",
+            "checkedBorderColor": "#d71f85",
+            "hoverBorderColor": "#d71f85",
+          },
+        }
+      }
     >
       <Checkbox
         checked={false}
@@ -3881,7 +4136,7 @@ exports[`renders Quiz correctly without right side content 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -3941,7 +4196,16 @@ exports[`renders assignment peer reviews correctly 1`] = `
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": "#d71f85",
+            "checkedBackground": "#d71f85",
+            "checkedBorderColor": "#d71f85",
+            "hoverBorderColor": "#d71f85",
+          },
+        }
+      }
     >
       <Checkbox
         checked={false}
@@ -3996,7 +4260,7 @@ exports[`renders assignment peer reviews correctly 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -4056,7 +4320,16 @@ exports[`renders correctly 1`] = `
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": "#d71f85",
+            "checkedBackground": "#d71f85",
+            "checkedBorderColor": "#d71f85",
+            "hoverBorderColor": "#d71f85",
+          },
+        }
+      }
     >
       <Checkbox
         checked={false}
@@ -4111,7 +4384,7 @@ exports[`renders correctly 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -4188,14 +4461,23 @@ exports[`renders correctly 1`] = `
 </div>
 `;
 
-exports[`renders feedback if available 1`] = `
+exports[`renders feedback anonymously according to the assignment settings 1`] = `
 <div
   className="planner-item"
 >
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": "#d71f85",
+            "checkedBackground": "#d71f85",
+            "checkedBorderColor": "#d71f85",
+            "hoverBorderColor": "#d71f85",
+          },
+        }
+      }
     >
       <Checkbox
         checked={false}
@@ -4250,7 +4532,151 @@ exports[`renders feedback if available 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
+            iconPlacement="start"
+            linkRef={[Function]}
+            variant="default"
+          >
+            <ScreenReaderContent
+              as="span"
+            >
+              Assignment This Assignment is about awesome stuff, due Saturday, December 17, 2011 3:30 AM.
+            </ScreenReaderContent>
+            <PresentationContent
+              as="span"
+            >
+              <Text
+                as="span"
+                color="primary"
+                letterSpacing="normal"
+                size="medium"
+              >
+                This Assignment is about awesome stuff
+              </Text>
+            </PresentationContent>
+          </Link>
+        </div>
+      </div>
+      <div
+        className=""
+      >
+        <div />
+        <div
+          className=""
+        >
+          <div>
+            <Text
+              as="span"
+              color="secondary"
+              letterSpacing="normal"
+              size="x-small"
+            >
+              <PresentationContent
+                as="span"
+              >
+                Due: 3:30 AM
+              </PresentationContent>
+            </Text>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <span>
+        <Avatar
+          inline={true}
+          name="?"
+          size="small"
+          variant="circle"
+        />
+      </span>
+      <span>
+        <Text
+          as="span"
+          fontStyle="italic"
+          letterSpacing="normal"
+          size="medium"
+        >
+          Open the pod bay doors, HAL.
+        </Text>
+      </span>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`renders feedback if available 1`] = `
+<div
+  className="planner-item"
+>
+  <div>
+    <ApplyTheme
+      immutable={false}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": "#d71f85",
+            "checkedBackground": "#d71f85",
+            "checkedBorderColor": "#d71f85",
+            "hoverBorderColor": "#d71f85",
+          },
+        }
+      }
+    >
+      <Checkbox
+        checked={false}
+        disabled={false}
+        indeterminate={false}
+        inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Assignment This Assignment is about awesome stuff is not marked as done.
+          </ScreenReaderContent>
+        }
+        onChange={[Function]}
+        size="medium"
+        variant="simple"
+      />
+    </ApplyTheme>
+  </div>
+  <div
+    aria-hidden="true"
+    style={
+      Object {
+        "color": "#d71f85",
+      }
+    }
+  >
+    <IconAssignment />
+  </div>
+  <div>
+    <div>
+      <div
+        className=""
+      >
+        <div>
+          <Text
+            as="span"
+            color="secondary"
+            letterSpacing="normal"
+            size="x-small"
+          >
+            A Course about being Diffrient Assignment
+          </Text>
+        </div>
+        <div
+          style={
+            Object {
+              "position": "relative",
+            }
+          }
+        >
+          <Link
+            as="button"
+            ellipsis={true}
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -4331,7 +4757,16 @@ exports[`renders media feedback if available 1`] = `
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": "#d71f85",
+            "checkedBackground": "#d71f85",
+            "checkedBorderColor": "#d71f85",
+            "hoverBorderColor": "#d71f85",
+          },
+        }
+      }
     >
       <Checkbox
         checked={false}
@@ -4386,7 +4821,7 @@ exports[`renders media feedback if available 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -4467,7 +4902,16 @@ exports[`renders the end time if available 1`] = `
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": "#d71f85",
+            "checkedBackground": "#d71f85",
+            "checkedBorderColor": "#d71f85",
+            "hoverBorderColor": "#d71f85",
+          },
+        }
+      }
     >
       <Checkbox
         checked={false}
@@ -4522,9 +4966,9 @@ exports[`renders the end time if available 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
             iconPlacement="start"
             linkRef={[Function]}
+            onClick={[Function]}
             variant="default"
           >
             <ScreenReaderContent
@@ -4544,6 +4988,25 @@ exports[`renders the end time if available 1`] = `
                 This Assignment is about awesome stuff
               </Text>
             </PresentationContent>
+            <CalendarEventModal
+              allDay={false}
+              courseName="A Course about being Diffrient"
+              currentUser={
+                Object {
+                  "avatarUrl": "/picture/is/here",
+                  "color": "#00AC18",
+                  "displayName": "Jane",
+                  "id": "1",
+                }
+              }
+              endTime={"2011-12-17T13:30:00.000Z"}
+              html_url="http://example.com"
+              open={false}
+              requestClose={[Function]}
+              startTime={"2011-12-17T11:30:00.000Z"}
+              timeZone="America/Denver"
+              title="This Assignment is about awesome stuff"
+            />
           </Link>
         </div>
       </div>
@@ -4582,7 +5045,16 @@ exports[`renders the location if available 1`] = `
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": "#d71f85",
+            "checkedBackground": "#d71f85",
+            "checkedBorderColor": "#d71f85",
+            "hoverBorderColor": "#d71f85",
+          },
+        }
+      }
     >
       <Checkbox
         checked={false}
@@ -4637,7 +5109,7 @@ exports[`renders the location if available 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"
@@ -4707,7 +5179,16 @@ exports[`renders user-created Todo correctly 1`] = `
   <div>
     <ApplyTheme
       immutable={false}
-      theme={Object {}}
+      theme={
+        Object {
+          Symbol(CheckboxFacade): Object {
+            "borderColor": null,
+            "checkedBackground": null,
+            "checkedBorderColor": null,
+            "hoverBorderColor": null,
+          },
+        }
+      }
     >
       <Checkbox
         checked={false}
@@ -4768,7 +5249,7 @@ exports[`renders user-created Todo correctly 1`] = `
           <Link
             as="button"
             ellipsis={true}
-            href="#"
+            href="http://example.com"
             iconPlacement="start"
             linkRef={[Function]}
             variant="default"

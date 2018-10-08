@@ -22,7 +22,14 @@ class Login::Oauth2Controller < Login::OauthBaseController
     nonce = session[:oauth2_nonce] = SecureRandom.hex(24)
     expiry = Time.zone.now + Setting.get('oauth2_client_timeout', 10.minutes.to_i).to_i
     jwt = Canvas::Security.create_jwt({ aac_id: @aac.global_id, nonce: nonce, host: request.host_with_port }, expiry)
-    redirect_to delegated_auth_redirect_uri(@aac.generate_authorize_url(oauth2_login_callback_url, jwt))
+    authorize_url = @aac.generate_authorize_url(oauth2_login_callback_url, jwt)
+
+    if @aac.debugging? && @aac.debug_set(:nonce, nonce, overwrite: false)
+      @aac.debug_set(:debugging, t("Redirected to identity provider"))
+      @aac.debug_set(:authorize_url, authorize_url)
+    end
+
+    redirect_to delegated_auth_redirect_uri(authorize_url)
   end
 
   def create
@@ -30,13 +37,28 @@ class Login::Oauth2Controller < Login::OauthBaseController
 
     @aac = AuthenticationProvider.find(jwt['aac_id'])
     raise ActiveRecord::RecordNotFound unless @aac.is_a?(AuthenticationProvider::Oauth2)
+    debugging = @aac.debugging? && jwt['nonce'] == @aac.debug_get(:nonce)
+    if debugging
+      @aac.debug_set(:debugging, t("Received callback from identity provider"))
+      @aac.instance_debugging = true
+    end
 
     unique_id = nil
     provider_attributes = {}
     return unless timeout_protection do
-      token = @aac.get_token(params[:code], oauth2_login_callback_url)
-      unique_id = @aac.unique_id(token)
-      provider_attributes = @aac.provider_attributes(token)
+      begin
+        token = @aac.get_token(params[:code], oauth2_login_callback_url)
+      rescue => e
+        @aac.debug_set(:get_token_response, e) if debugging
+        raise
+      end
+      begin
+        unique_id = @aac.unique_id(token)
+        provider_attributes = @aac.provider_attributes(token)
+      rescue => e
+        @aac.debug_set(:claims_response, e) if debugging
+        raise
+      end
     end
 
     find_pseudonym(unique_id, provider_attributes)

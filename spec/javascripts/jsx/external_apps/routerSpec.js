@@ -16,42 +16,38 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'react',
-  'jsx/external_apps/lib/regularizePathname',
-], (React, regularizePathname) => {
+import regularizePathname from 'jsx/external_apps/lib/regularizePathname'
 
-  QUnit.module('External Apps Client-side Router', {
-    before () {
-      window.ENV = window.ENV || {};
-      window.ENV.TESTING_PATH = '/settings/something';
-    }
-  });
+QUnit.module('External Apps Client-side Router', {
+  before() {
+    window.ENV = window.ENV || {}
+    window.ENV.TESTING_PATH = '/settings/something'
+  }
+})
 
-  test('regularizePathname removes trailing slash', () => {
-    const fakeCtx = {
-      pathname: '/app/something/else/',
-    };
+test('regularizePathname removes trailing slash', () => {
+  const fakeCtx = {
+    pathname: '/app/something/else/'
+  }
 
-    // No op for next().
-    const fakeNext = () => {};
+  // No op for next().
+  const fakeNext = () => {}
 
-    regularizePathname(fakeCtx, fakeNext);
+  regularizePathname(fakeCtx, fakeNext)
 
-    equal(fakeCtx.pathname, '/app/something/else', 'trailing slash is gone');
-  });
+  equal(fakeCtx.pathname, '/app/something/else', 'trailing slash is gone')
+})
 
-  test('regularizePathname removes url hash fragment', () => {
-    const fakeCtx = {
-      hash: 'blah-ha-ba',
-      pathname: '/app/something/else/#blah-ha-ba',
-    };
+test('regularizePathname removes url hash fragment', () => {
+  const fakeCtx = {
+    hash: 'blah-ha-ba',
+    pathname: '/app/something/else/#blah-ha-ba'
+  }
 
-    // No op for next().
-    const fakeNext = () => {};
+  // No op for next().
+  const fakeNext = () => {}
 
-    regularizePathname(fakeCtx, fakeNext);
+  regularizePathname(fakeCtx, fakeNext)
 
-    equal(fakeCtx.pathname, '/app/something/else', 'url hash fragment is gone');
-  });
-});
+  equal(fakeCtx.pathname, '/app/something/else', 'url hash fragment is gone')
+})

@@ -16,149 +16,168 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  '../../../../coffeescripts/react_files/mockFilesENV',
-  'react',
-  'react-dom',
-  'react-addons-test-utils',
-  'jquery',
-  'jsx/files/ItemCog',
-  'compiled/models/Folder'
-], (mockFilesENV, React, ReactDOM, TestUtils, $, ItemCog, Folder) => {
-  const { Simulate } = TestUtils;
+import React from 'react'
+import ReactDOM from 'react-dom'
+import TestUtils from 'react-dom/test-utils'
+import $ from 'jquery'
+import ItemCog from 'jsx/files/ItemCog'
+import Folder from 'compiled/models/Folder'
+import mockFilesENV from '../../../../coffeescripts/react_files/mockFilesENV'
 
-  let itemCog = null;
-  let fakeServer = null;
+const {Simulate} = TestUtils
 
-  const readOnlyConfig = {
-    download: true,
-    editName: false,
-    restrictedDialog: false,
-    move: false,
-    deleteLink: false
-  };
+let itemCog = null
+const fakeServer = null
 
-  const manageFilesConfig = {
-    download: true,
-    editName: true,
-    usageRights: true,
-    move: true,
-    deleteLink: true
-  };
+const readOnlyConfig = {
+  download: true,
+  editName: false,
+  restrictedDialog: false,
+  move: false,
+  deleteLink: false
+}
 
-  const buttonsEnabled = (itemCog, config) => {
-    let valid = true;
-    for (const prop in config) {
-      let button = null;
-      if (itemCog.refs && itemCog.refs[prop]) {
-        button = $(itemCog.refs[prop]).length;
-      } else {
-        button = false;
-      }
-      if ((config[prop] && !!button) || (!config[prop] && !button)) {
-        continue;
-      } else {
-        valid = false;
-      }
+const manageFilesConfig = {
+  download: true,
+  editName: true,
+  usageRights: true,
+  move: true,
+  deleteLink: true
+}
+
+const buttonsEnabled = (itemCog, config) => {
+  let valid = true
+  for (const prop in config) {
+    let button = null
+    if (itemCog.refs && itemCog.refs[prop]) {
+      button = $(itemCog.refs[prop]).length
+    } else {
+      button = false
     }
-    return valid;
-  };
-
-  const sampleProps = (canManageFiles = false) => {
-    return {
-      model: new Folder({id: 999}),
-      modalOptions: {
-        closeModal () {},
-        openModal () {}
-      },
-      startEditingName () {},
-      userCanManageFilesForContext: canManageFiles,
-      usageRightsRequiredForContext: true
-    };
-  };
-
-  QUnit.module('ItemCog', {
-    setup () {
-      itemCog = ReactDOM.render(<ItemCog {...sampleProps(true)} />, $('<div>').appendTo('#fixtures')[0]);
-    },
-    teardown () {
-      ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(itemCog).parentNode);
-      $('#fixtures').empty();
+    if ((config[prop] && !!button) || (!config[prop] && !button)) {
+      continue
+    } else {
+      valid = false
     }
-  });
+  }
+  return valid
+}
 
+const sampleProps = (canManageFiles = false) => ({
+  model: new Folder({id: 999}),
+  modalOptions: {
+    closeModal() {},
+    openModal() {}
+  },
+  startEditingName() {},
+  userCanManageFilesForContext: canManageFiles,
+  usageRightsRequiredForContext: true
+})
 
-  test('deletes model when delete link is pressed', () => {
-    const ajaxSpy = sinon.spy($, 'ajax');
-    sinon.stub(window, 'confirm').returns(true);
-    Simulate.click(ReactDOM.findDOMNode(itemCog.refs.deleteLink));
-    ok(window.confirm.calledOnce, 'confirms before deleting');
-    ok(ajaxSpy.calledWithMatch({url: '/api/v1/folders/999', data: {force: 'true'}}), 'sends DELETE to right url');
-    $.ajax.restore();
-    window.confirm.restore();
-  });
+QUnit.module('ItemCog', {
+  setup() {
+    itemCog = ReactDOM.render(
+      <ItemCog {...sampleProps(true)} />,
+      $('<div>').appendTo('#fixtures')[0]
+    )
+  },
+  teardown() {
+    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(itemCog).parentNode)
+    $('#fixtures').empty()
+  }
+})
 
-  test('only shows download button for limited users', () => {
-    const readOnlyItemCog = ReactDOM.render(<ItemCog {...sampleProps(false)} />, $('<div>').appendTo('#fixtures')[0]);
-    ok(buttonsEnabled(readOnlyItemCog, readOnlyConfig), 'only download button is shown');
-  });
+test('deletes model when delete link is pressed', () => {
+  const ajaxSpy = sinon.spy($, 'ajax')
+  sinon.stub(window, 'confirm').returns(true)
+  Simulate.click(ReactDOM.findDOMNode(itemCog.refs.deleteLink))
+  ok(window.confirm.calledOnce, 'confirms before deleting')
+  ok(
+    ajaxSpy.calledWithMatch({url: '/api/v1/folders/999', data: {force: 'true'}}),
+    'sends DELETE to right url'
+  )
+  $.ajax.restore()
+  window.confirm.restore()
+})
 
-  test('shows all buttons for users with manage_files permissions', () => {
-    ok(buttonsEnabled(itemCog, manageFilesConfig), 'all buttons are shown');
-  });
+test('only shows download button for limited users', () => {
+  const readOnlyItemCog = ReactDOM.render(
+    <ItemCog {...sampleProps(false)} />,
+    $('<div>').appendTo('#fixtures')[0]
+  )
+  ok(buttonsEnabled(readOnlyItemCog, readOnlyConfig), 'only download button is shown')
+})
 
-  test('downloading a file returns focus back to the item cog', () => {
-    Simulate.click(ReactDOM.findDOMNode(itemCog.refs.download));
-    equal(document.activeElement, $(ReactDOM.findDOMNode(itemCog)).find('.al-trigger')[0], 'the cog has focus');
-  });
+test('shows all buttons for users with manage_files permissions', () => {
+  ok(buttonsEnabled(itemCog, manageFilesConfig), 'all buttons are shown')
+})
 
-  test('deleting a file returns focus to the previous item cog when there are more items', () => {
-    const props = sampleProps(true);
-    props.model.destroy = function () { return true; };
-    sinon.stub(window, 'confirm').returns(true);
+test('downloading a file returns focus back to the item cog', () => {
+  Simulate.click(ReactDOM.findDOMNode(itemCog.refs.download))
+  equal(
+    document.activeElement,
+    $(ReactDOM.findDOMNode(itemCog)).find('.al-trigger')[0],
+    'the cog has focus'
+  )
+})
 
-    class ContainerApp extends React.Component {
-      render () {
-        return (
-          <div>
-            <ItemCog {...props} />
-            <ItemCog {...props} />
+test('deleting a file returns focus to the previous item cog when there are more items', () => {
+  const props = sampleProps(true)
+  props.model.destroy = function() {
+    return true
+  }
+  sinon.stub(window, 'confirm').returns(true)
+
+  class ContainerApp extends React.Component {
+    render() {
+      return (
+        <div>
+          <ItemCog {...props} />
+          <ItemCog {...props} />
+        </div>
+      )
+    }
+  }
+
+  const itemCogs = ReactDOM.render(<ContainerApp />, document.getElementById('fixtures'))
+  const renderedCogs = TestUtils.scryRenderedComponentsWithType(itemCogs, ItemCog)
+  Simulate.click(ReactDOM.findDOMNode(renderedCogs[1].refs.deleteLink))
+  equal(
+    document.activeElement,
+    $(ReactDOM.findDOMNode(renderedCogs[0])).find('.al-trigger')[0],
+    'the cog has focus'
+  )
+  window.confirm.restore()
+  ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
+})
+
+test('deleting a file returns focus to the name column header when there are no items left', () => {
+  $('#fixtures').empty()
+  const props = sampleProps(true)
+  props.model.destroy = function() {
+    return true
+  }
+  sinon.stub(window, 'confirm').returns(true)
+
+  class ContainerApp extends React.Component {
+    render() {
+      return (
+        <div>
+          <div className="ef-name-col">
+            <a href="#" className="someFakeLink">
+              Name column header
+            </a>
           </div>
-        );
-      }
+          <ItemCog {...props} />
+        </div>
+      )
     }
+  }
 
-    const itemCogs = ReactDOM.render(<ContainerApp />, $('#fixtures')[0]);
-    const renderedCogs = TestUtils.scryRenderedComponentsWithType(itemCogs, ItemCog)
-    Simulate.click(ReactDOM.findDOMNode(renderedCogs[1].refs.deleteLink));
-    equal(document.activeElement, $(ReactDOM.findDOMNode(renderedCogs[0])).find('.al-trigger')[0], 'the cog has focus');
-    window.confirm.restore();
-  });
-
-  test('deleting a file returns focus to the name column header when there are no items left', () => {
-    $('#fixtures').empty();
-    const props = sampleProps(true);
-    props.model.destroy = function () { return true; };
-    sinon.stub(window, 'confirm').returns(true);
-
-    class ContainerApp extends React.Component {
-      render () {
-        return (
-          <div>
-            <div className="ef-name-col">
-              <a href="#" className="someFakeLink">Name column header</a>
-            </div>
-            <ItemCog {...props} />
-          </div>
-        );
-      }
-    }
-
-    const container = ReactDOM.render(<ContainerApp />, $('#fixtures')[0]);
-    const renderedCog = TestUtils.findRenderedComponentWithType(container, ItemCog);
-    Simulate.click(ReactDOM.findDOMNode(renderedCog.refs.deleteLink));
-    equal(document.activeElement, $('.someFakeLink')[0], 'the name column has focus');
-    window.confirm.restore();
-  });
-
-});
+  const container = ReactDOM.render(<ContainerApp />, document.getElementById('fixtures'))
+  const renderedCog = TestUtils.findRenderedComponentWithType(container, ItemCog)
+  Simulate.click(ReactDOM.findDOMNode(renderedCog.refs.deleteLink))
+  equal(document.activeElement, $('.someFakeLink')[0], 'the name column has focus')
+  window.confirm.restore()
+  ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
+})

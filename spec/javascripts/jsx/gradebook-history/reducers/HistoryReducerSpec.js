@@ -42,7 +42,12 @@ const defaultPayload = () => (
   {
     items: [
       {
-        assignment: 'Rustic Rubber Car',
+        assignment: {
+          anonymousGrading: false,
+          gradingType: 'points',
+          muted: false,
+          name: 'Rustic Rubber Car'
+        },
         grader: 'Ms. Casey',
         gradeAfter: '25',
         gradeBefore: '20',

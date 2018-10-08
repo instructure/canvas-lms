@@ -294,7 +294,11 @@ module SIS
             if enrollment.id.nil?
               enrollment.workflow_state = 'deleted'
             else
-              @enrollments_to_delete << enrollment if enrollment.workflow_state != 'deleted'
+              if enrollment.workflow_state != 'deleted'
+                @enrollments_to_delete << enrollment
+              else
+                @success_count += 1
+              end
               next
             end
           elsif enrollment_info.status =~ /\Acompleted/i

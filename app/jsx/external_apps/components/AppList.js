@@ -24,6 +24,7 @@ import AppTile from '../../external_apps/components/AppTile'
 import Header from '../../external_apps/components/Header'
 import AppFilters from '../../external_apps/components/AppFilters'
 import ManageAppListButton from '../../external_apps/components/ManageAppListButton'
+import Lti13Apps from './Lti13Apps'
 import splitAssetString from 'compiled/str/splitAssetString'
 
 export default class AppList extends React.Component {
@@ -61,6 +62,8 @@ export default class AppList extends React.Component {
   apps = () => {
     if (store.getState().isLoading) {
       return <div ref="loadingIndicator" className="loadingIndicator" />
+    } else if (store.getState().filter === 'lti_1_3_tools' && window.ENV.LTI_13_TOOLS_FEATURE_FLAG_ENABLED) {
+      return <Lti13Apps store={store} />
     } else {
       return store
         .filteredApps()

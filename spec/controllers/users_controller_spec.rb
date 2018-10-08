@@ -88,7 +88,7 @@ describe UsersController do
       end
 
       before do
-        tool.settings['use_1_3'] = true
+        tool.use_1_3 = true
         tool.developer_key = DeveloperKey.create!
         tool.save!
       end

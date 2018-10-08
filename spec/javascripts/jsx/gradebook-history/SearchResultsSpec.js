@@ -26,8 +26,12 @@ import { SearchResultsComponent } from 'jsx/gradebook-history/SearchResults';
 function defaultHistoryItems () {
   return [
     {
-      anonymous: false,
-      assignment: 'Rustic Rubber Duck',
+      assignment: {
+        anonymousGrading: false,
+        gradingType: 'points',
+        muted: false,
+        name: 'Rustic Rubber Duck'
+      },
       date: 'May 30, 2017',
       displayAsPoints: true,
       grader: 'Ms. Twillie Jones',

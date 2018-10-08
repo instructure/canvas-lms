@@ -20,6 +20,7 @@ Object {
 
 exports[`transformApiToInternalItem copes with a non-existent (e.g. concluded) course 1`] = `
 Object {
+  "address": null,
   "completed": false,
   "context": undefined,
   "course_id": 999,
@@ -46,6 +47,7 @@ Object {
 
 exports[`transformApiToInternalItem extracts and transforms the proper data for a calendar event response 1`] = `
 Object {
+  "address": "Here",
   "allDay": false,
   "completed": false,
   "context": Object {
@@ -60,6 +62,7 @@ Object {
   "date": "2018-03-27T18:58:51.000Z",
   "dateBucketMoment": "2018-03-27T00:00:00.000Z",
   "dateStyle": "due",
+  "details": "calendar event description",
   "feedback": undefined,
   "html_url": "/calendar?event_id=1&include_contexts=course_1",
   "id": 1,
@@ -79,6 +82,7 @@ Object {
 
 exports[`transformApiToInternalItem extracts and transforms the proper data for a calendar event response with an all day date 1`] = `
 Object {
+  "address": "Here",
   "allDay": true,
   "completed": false,
   "context": Object {
@@ -93,6 +97,7 @@ Object {
   "date": "2018-03-27T18:58:51.000Z",
   "dateBucketMoment": "2018-03-27T00:00:00.000Z",
   "dateStyle": "due",
+  "details": "calendar event description",
   "feedback": undefined,
   "html_url": "/calendar?event_id=1&include_contexts=course_1",
   "id": 1,
@@ -112,6 +117,7 @@ Object {
 
 exports[`transformApiToInternalItem extracts and transforms the proper data for a discussion response 1`] = `
 Object {
+  "address": null,
   "completed": false,
   "context": Object {
     "color": "#abffaa",
@@ -145,6 +151,7 @@ Object {
 
 exports[`transformApiToInternalItem extracts and transforms the proper data for a graded discussion response 1`] = `
 Object {
+  "address": null,
   "completed": false,
   "context": Object {
     "color": "#abffaa",
@@ -178,6 +185,7 @@ Object {
 
 exports[`transformApiToInternalItem extracts and transforms the proper data for a graded discussion response with an unread count 1`] = `
 Object {
+  "address": null,
   "completed": true,
   "context": Object {
     "color": "#abffaa",
@@ -214,6 +222,7 @@ Object {
 
 exports[`transformApiToInternalItem extracts and transforms the proper data for a planner_note response 1`] = `
 Object {
+  "address": null,
   "completed": false,
   "context": Object {
     "color": "#abffaa",
@@ -247,6 +256,7 @@ Object {
 
 exports[`transformApiToInternalItem extracts and transforms the proper data for a planner_note response without an associated course 1`] = `
 Object {
+  "address": null,
   "completed": false,
   "course_id": undefined,
   "date": "2018-03-27T18:58:51.000Z",
@@ -272,6 +282,7 @@ Object {
 
 exports[`transformApiToInternalItem extracts and transforms the proper data for a quiz response 1`] = `
 Object {
+  "address": null,
   "completed": false,
   "context": Object {
     "color": "#abffaa",
@@ -304,6 +315,7 @@ Object {
 
 exports[`transformApiToInternalItem extracts and transforms the proper data for an assignment response 1`] = `
 Object {
+  "address": null,
   "completed": false,
   "context": Object {
     "color": "#abffaa",
@@ -336,6 +348,7 @@ Object {
 
 exports[`transformApiToInternalItem extracts and transforms the proper data for an ungraded discussion reponse with an unread count 1`] = `
 Object {
+  "address": null,
   "completed": false,
   "context": Object {
     "color": "#abffaa",
@@ -371,6 +384,7 @@ Object {
 
 exports[`transformApiToInternalItem extracts and transforms the proper date for a peer review 1`] = `
 Object {
+  "address": null,
   "completed": false,
   "context": Object {
     "color": "#abffaa",
@@ -403,6 +417,7 @@ Object {
 
 exports[`transformApiToInternalItem handles account-level group items 1`] = `
 Object {
+  "address": null,
   "completed": false,
   "context": Object {
     "color": "#ffeeee",
@@ -435,6 +450,7 @@ Object {
 
 exports[`transformApiToInternalItem includes location and endTime if given 1`] = `
 Object {
+  "address": "Here",
   "allDay": false,
   "completed": false,
   "context": Object {
@@ -449,6 +465,7 @@ Object {
   "date": "2018-01-12T05:00:00.000Z",
   "dateBucketMoment": "2018-01-12T00:00:00.000Z",
   "dateStyle": "due",
+  "details": "calendar event description",
   "endTime": "2018-01-12T07:00:00.000Z",
   "feedback": undefined,
   "html_url": "/calendar?event_id=1&include_contexts=course_1",

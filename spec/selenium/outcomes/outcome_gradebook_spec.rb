@@ -188,6 +188,25 @@ describe "outcome gradebook" do
           result(@student_3, align2, 1)
         end
 
+        it 'keeps course mean after outcomes without results filter enabled' do
+          get "/courses/#{@course.id}/gradebook"
+          f('a[data-id=outcome]').click
+          wait_for_ajax_requests
+
+          # mean
+          expect(ff('.outcome-gradebook-container .headerRow_1 .outcome-score')).to have_size 2
+          expect(ff('.outcome-gradebook-container .headerRow_1 .outcome-score').first.text).to eq '2.33'
+          expect(ff('.outcome-gradebook-container .headerRow_1 .outcome-score').second.text).to eq '2.67'
+
+          f('#no_results_outcomes').click
+          wait_for_ajax_requests
+
+          # mean
+          expect(ff('.outcome-gradebook-container .headerRow_1 .outcome-score')).to have_size 2
+          expect(ff('.outcome-gradebook-container .headerRow_1 .outcome-score').first.text).to eq '2.33'
+          expect(ff('.outcome-gradebook-container .headerRow_1 .outcome-score').second.text).to eq '2.67'
+        end
+
         it "displays course mean and median" do
           get "/courses/#{@course.id}/gradebook"
           f('a[data-id=outcome]').click

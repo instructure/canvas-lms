@@ -64,6 +64,7 @@ class AssignmentsController < ApplicationController
         HAS_ASSIGNMENTS: @context.active_assignments.count > 0,
         QUIZ_LTI_ENABLED: quiz_lti_tool_enabled?,
         DUE_DATE_REQUIRED_FOR_ACCOUNT: due_date_required_for_account,
+        ARC_RECORDING_FEATURE_ENABLED: @context.root_account.feature_enabled?(:integrate_arc_rce),
       }
       js_env(hash)
 
@@ -144,7 +145,8 @@ class AssignmentsController < ApplicationController
         :COURSE_ID => @context.id,
         :ASSIGNMENT_ID => @assignment.id,
         :EXTERNAL_TOOLS => external_tools_json(@external_tools, @context, @current_user, session),
-        :EULA_URL => tool_eula_url
+        :EULA_URL => tool_eula_url,
+        ARC_RECORDING_FEATURE_ENABLED: @context.root_account.feature_enabled?(:integrate_arc_rce),
       })
       set_master_course_js_env_data(@assignment, @context)
       conditional_release_js_env(@assignment, includes: :rule)
@@ -397,14 +399,16 @@ class AssignmentsController < ApplicationController
     # if no due_at was given, set it to 11:59 pm in the creator's time zone
     @assignment.infer_times
     if authorized_action(@assignment, @current_user, :create)
-      respond_to do |format|
-        if @assignment.save
-          flash[:notice] = t 'notices.created', "Assignment was successfully created."
-          format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment.id) }
-          format.json { render :json => @assignment.as_json(:permissions => {:user => @current_user, :session => session}), :status => :created}
-        else
-          format.html { render :new }
-          format.json { render :json => @assignment.errors, :status => :bad_request }
+      DueDateCacher.with_executing_user(@current_user) do
+        respond_to do |format|
+          if @assignment.save
+            flash[:notice] = t 'notices.created', "Assignment was successfully created."
+            format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment.id) }
+            format.json { render :json => @assignment.as_json(:permissions => {:user => @current_user, :session => session}), :status => :created}
+          else
+            format.html { render :new }
+            format.json { render :json => @assignment.errors, :status => :bad_request }
+          end
         end
       end
     end
@@ -498,6 +502,7 @@ class AssignmentsController < ApplicationController
           }
         end,
         VALID_DATE_RANGE: CourseDateRange.new(@context),
+        ARC_RECORDING_FEATURE_ENABLED: @context.root_account.feature_enabled?(:integrate_arc_rce),
       }
 
       add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
@@ -550,7 +555,10 @@ class AssignmentsController < ApplicationController
     @assignment = @context.assignments.active.api_id(params[:id])
     if authorized_action(@assignment, @current_user, :delete)
       return render_unauthorized_action if editing_restricted?(@assignment)
-      @assignment.destroy
+
+      DueDateCacher.with_executing_user(@current_user) do
+        @assignment.destroy
+      end
 
       respond_to do |format|
         format.html { redirect_to(named_context_url(@context, :context_assignments_url)) }

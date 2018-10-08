@@ -71,7 +71,7 @@ it('renders out ToDoItems for each item', () => {
   expect(wrapper.find('ToDoItem')).toHaveLength(2);
 });
 
-it('initially renders out 5 ToDoItems', () => {
+it('initially renders out 7 ToDoItems', () => {
   const items = [{
     uniqueId: '1',
     type: 'Assignment',
@@ -80,33 +80,43 @@ it('initially renders out 5 ToDoItems', () => {
   }, {
     uniqueId: '2',
     type: 'Quiz',
-    date: moment('2017-07-15T20:00:00Z'),
+    date: moment('2017-07-16T20:00:00Z'),
     title: 'Glory to Orange County',
   }, {
     uniqueId: '3',
     type: 'Assignment',
-    date: moment('2017-07-15T20:00:00Z'),
+    date: moment('2017-07-17T20:00:00Z'),
     title: 'Glory to China',
   }, {
     uniqueId: '4',
     type: 'Quiz',
-    date: moment('2017-07-15T20:00:00Z'),
+    date: moment('2017-07-18T20:00:00Z'),
     title: 'Glory to Egypt',
   }, {
     uniqueId: '5',
     type: 'Assignment',
-    date: moment('2017-07-15T20:00:00Z'),
+    date: moment('2017-07-19T20:00:00Z'),
     title: 'Glory to Sacramento',
   }, {
     uniqueId: '6',
     type: 'Quiz',
-    date: moment('2017-07-15T20:00:00Z'),
+    date: moment('2017-07-20T20:00:00Z'),
     title: 'Glory to Atlantis',
   }, {
     uniqueId: '7',
     type: 'Quiz',
-    date: moment('2017-07-15T20:00:00Z'),
+    date: moment('2017-07-21T20:00:00Z'),
     title: 'Glory to Hoboville',
+  }, {
+    uniqueId: '8',
+    type: 'Quiz',
+    date: moment('2017-07-22T20:00:00Z'),
+    title: 'Glory to Big Cottonwood Canyon',
+  }, {
+    uniqueId: '9',
+    type: 'Quiz',
+    date: moment('2017-07-23T20:00:00Z'),
+    title: 'Glory to Small Cottonwood Canyon',
   }];
 
   const wrapper = shallow(
@@ -115,7 +125,7 @@ it('initially renders out 5 ToDoItems', () => {
       items={items}
     />
   );
-  expect(wrapper.find('ToDoItem')).toHaveLength(5);
+  expect(wrapper.find('ToDoItem')).toHaveLength(7);
 });
 
 it('invokes change dashboard view when link is clicked', () => {

@@ -12,7 +12,7 @@
     "message": "Завдання"
   },
   "background_color_press_down_to_select_ef99fdac": {
-    "message": "Колір фону, натисніть внизу, щоб обрати"
+    "message": "Колір фону, натисніть, щоб обрати"
   },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
@@ -48,7 +48,7 @@
     "message": "Виберіть права використання..."
   },
   "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
-    "message": "Натисніть на будь-який файл, щоб вставити посилання на нього."
+    "message": "Натисніть на будь-який файл, щоб вставити посилання для його завантаження."
   },
   "click_any_image_to_embed_the_image_in_the_page_2cdd1136": {
     "message": "Натисніть будь-яке зображення, щоб вставити зображення на сторінку."
@@ -114,10 +114,10 @@
     "message": "Папка"
   },
   "font_size_press_down_to_select_6c25dc2d": {
-    "message": "Розмір шрифту, натисніть внизу, щоб обрати"
+    "message": "Розмір шрифту, натисніть, щоб обрати"
   },
   "formatting_press_down_to_select_df728c30": {
-    "message": "Форматування, натисніть кнопку Вниз, щоб вибрати"
+    "message": "Форматування, натисніть, щоб вибрати"
   },
   "grades_a61eba0a": {
     "message": "Оцінки"
@@ -176,6 +176,9 @@
   "loading_failed_b3524381": {
     "message": "Невдале завантаження..."
   },
+  "loading_folders_8d4d5d5a": {
+    "message": "Завантаження папок ..."
+  },
   "modules_c4325335": {
     "message": "Розділи"
   },
@@ -207,10 +210,10 @@
     "message": "Виберіть теку, до якої завантажити ваш файл"
   },
   "syllabus_f191f65b": {
-    "message": "навчальний план"
+    "message": "Навчальний план"
   },
   "text_color_press_down_to_select_8f5ad9b5": {
-    "message": "Колір тексту, натисніть внизу, щоб обрати"
+    "message": "Колір тексту, натисніть, щоб обрати"
   },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Матеріал в публічному домені"
@@ -220,6 +223,9 @@
   },
   "the_material_is_subject_to_fair_use_exception_41bc6a4b": {
     "message": "Матеріал є предметом виключно сумлінного використання"
+  },
+  "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
+    "message": "Це завантаження перевищує квоту для зберігання файлів. Будь ласка, зверніться до свого системного адміністратора."
   },
   "upload_8b403d05": {
     "message": "Завантажити"

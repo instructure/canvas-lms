@@ -203,6 +203,7 @@ test('renders the StatusesModal', function () {
   const renderStatusesModalStub = sandbox.stub(gradebook, 'renderStatusesModal');
   gradebook.gridReady.reject();
   gradebook.initialize();
+  loaderPromises.gotContextModules.resolve([])
   loaderPromises.gotCustomColumns.resolve([]);
   loaderPromises.gotAssignmentGroups.resolve([]);
   loaderPromises.gotStudentIds.resolve({ user_ids: [] });
@@ -1478,7 +1479,8 @@ QUnit.module('Gradebook#rowFilter', {
       login_id: 'charlie.xi@example.com',
       name: 'Charlie Xi',
       short_name: 'Chuck Xi',
-      sortable_name: 'Xi, Charlie'
+      sortable_name: 'Xi, Charlie',
+      sis_user_id: '123456789'
     };
   }
 });
@@ -1500,6 +1502,12 @@ test('returns true when search term matches the student short name', function ()
 
 test('returns true when search term matches the student sortable name', function () {
   this.gradebook.userFilterTerm = 'Xi, Charlie';
+  strictEqual(this.gradebook.rowFilter(this.student), true);
+});
+
+
+test('returns true when search term matches the student sis id', function () {
+  this.gradebook.userFilterTerm = '123456789';
   strictEqual(this.gradebook.rowFilter(this.student), true);
 });
 
@@ -3538,7 +3546,8 @@ test('StatusesModal is mounted on renderStatusesModal', function () {
   const statusModal = this.gradebook.renderStatusesModal();
   statusModal.open();
   clock.tick(500); // wait for Modal to transition open
-  const header = document.querySelector('h3');
+
+  const header = document.querySelector('[aria-label="Statuses"][role="dialog"] h2');
   equal(header.innerText, 'Statuses');
 
   const statusesModalMountPoint = document.querySelector("[data-component='StatusesModal']");

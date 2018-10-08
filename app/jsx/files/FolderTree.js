@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import createReactClass from 'create-react-class';
 import FolderTree from 'compiled/react_files/components/FolderTree'
 
   FolderTree.render =  function () {
@@ -29,4 +30,4 @@ import FolderTree from 'compiled/react_files/components/FolderTree'
     );
   };
 
-export default React.createClass(FolderTree)
+export default createReactClass(FolderTree);

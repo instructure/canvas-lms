@@ -105,24 +105,6 @@ describe WikiPagesController do
           end
         end
       end
-
-      context "feature disabled" do
-        describe "GET 'index" do
-          it "should render" do
-            get 'index', params: {course_id: @course.id}
-            expect(response).to be_successful
-            expect(controller.js_env[:STUDENT_PLANNER_ENABLED]).to be_falsey
-          end
-        end
-
-        describe "GET 'show" do
-          it "should render" do
-            get 'show', params: {course_id: @course.id, id: @page.url}
-            expect(response).to be_successful
-            expect(controller.js_env[:STUDENT_PLANNER_ENABLED]).to be_falsey
-          end
-        end
-      end
     end
 
     context "differentiated assignments" do

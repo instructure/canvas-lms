@@ -40,8 +40,7 @@ describe "master courses - settings" do
     get "/courses/#{@test_course.id}/settings"
     fj('label:contains("Enable course as a Blueprint Course")').click
     wait_for_ajaximations
-    submit_form('#course_form')
-    wait_for_ajaximations
+    wait_for_new_page_load { submit_form('#course_form') }
     expect(MasterCourses::MasterTemplate).not_to be_is_master_course @course
     expect(is_checked('input[type=checkbox][name=course[blueprint]]')).not_to be_truthy
   end

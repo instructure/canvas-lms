@@ -19,7 +19,7 @@
 define([
   'react',
   'react-dom',
-  'react-addons-test-utils',
+  'react-dom/test-utils',
   'jsx/due_dates/DisabledTokenInput'
 ], (React, ReactDOM, {scryRenderedDOMComponentsWithTag}, DisabledTokenInput) => {
   const wrapper = document.getElementById("fixtures");

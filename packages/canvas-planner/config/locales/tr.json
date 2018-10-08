@@ -1,4 +1,7 @@
 {
+  "address_3159962f": {
+    "message": "Adres:"
+  },
   "all_day_fb42c4fc": {
     "message": "Tüm Gün"
   },
@@ -7,6 +10,9 @@
   },
   "assignment_976578a8": {
     "message": "Ödev"
+  },
+  "calendar_a8563bb2": {
+    "message": "Takvim:"
   },
   "calendar_event_89aadc1c": {
     "message": "Takvim Olayı"
@@ -28,6 +34,9 @@
   },
   "details_98a31b68": {
     "message": "Ayrıntılar"
+  },
+  "details_a6f427c3": {
+    "message": "Ayrıntılar:"
   },
   "discussion_6719c51d": {
     "message": "Tartışma"
@@ -58,6 +67,9 @@
   },
   "loading_planner_items_947a813d": {
     "message": "Planlayıcı öğeleri yükleniyor"
+  },
+  "location_3b6ff307": {
+    "message": "Konum:"
   },
   "missing_1a256b3b": {
     "message": "Eksik"

@@ -27,6 +27,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import DeveloperKeyScopes from './Scopes'
+import ToolConfiguration from './ToolConfiguration'
 
 export default class DeveloperKeyFormFields extends React.Component {
   constructor (props) {
@@ -82,6 +83,28 @@ export default class DeveloperKeyFormFields extends React.Component {
     }
   }
 
+  formBody() {
+    const { createLtiKeyState } = this.props
+
+    if (!createLtiKeyState.isLtiKey) {
+      return <DeveloperKeyScopes
+        availableScopes={this.props.availableScopes}
+        availableScopesPending={this.props.availableScopesPending}
+        developerKey={this.props.developerKey}
+        requireScopes={this.state.requireScopes}
+        onRequireScopesChange={this.handleRequireScopesChange}
+        dispatch={this.props.dispatch}
+        listDeveloperKeyScopesSet={this.props.listDeveloperKeyScopesSet}
+      />
+    }
+    return <ToolConfiguration
+      createLtiKeyState={createLtiKeyState}
+      setEnabledScopes={this.props.setEnabledScopes}
+      setDisabledPlacements={this.props.setDisabledPlacements}
+      dispatch={this.props.dispatch}
+    />
+  }
+
   render() {
     return (
       <form ref={this.setKeyFormRef}>
@@ -103,27 +126,31 @@ export default class DeveloperKeyFormFields extends React.Component {
                   name="developer_key[email]"
                   defaultValue={this.fieldValue('email')}
                 />
-                <TextInput
-                  label={I18n.t('Redirect URI (Legacy):')}
-                  name="developer_key[redirect_uri]"
-                  defaultValue={this.fieldValue('redirect_uri')}
-                />
-                <TextArea
-                  label={I18n.t('Redirect URIs:')}
-                  name="developer_key[redirect_uris]"
-                  defaultValue={this.fieldValue('redirect_uris')}
-                  resize="both"
-                />
-                <TextInput
-                  label={I18n.t('Vendor Code (LTI 2):')}
-                  name="developer_key[vendor_code]"
-                  defaultValue={this.fieldValue('vendor_code')}
-                />
-                <TextInput
-                  label={I18n.t('Icon URL:')}
-                  name="developer_key[icon_url]"
-                  defaultValue={this.fieldValue('icon_url')}
-                />
+                {!this.props.createLtiKeyState.isLtiKey &&
+                  <div>
+                    <TextInput
+                      label={I18n.t('Redirect URI (Legacy):')}
+                      name="developer_key[redirect_uri]"
+                      defaultValue={this.fieldValue('redirect_uri')}
+                    />
+                    <TextArea
+                      label={I18n.t('Redirect URIs:')}
+                      name="developer_key[redirect_uris]"
+                      defaultValue={this.fieldValue('redirect_uris')}
+                      resize="both"
+                    />
+                    <TextInput
+                      label={I18n.t('Vendor Code (LTI 2):')}
+                      name="developer_key[vendor_code]"
+                      defaultValue={this.fieldValue('vendor_code')}
+                    />
+                    <TextInput
+                      label={I18n.t('Icon URL:')}
+                      name="developer_key[icon_url]"
+                      defaultValue={this.fieldValue('icon_url')}
+                    />
+                  </div>
+                }
                 <TextArea
                   label={I18n.t('Notes:')}
                   name="developer_key[notes]"
@@ -134,15 +161,7 @@ export default class DeveloperKeyFormFields extends React.Component {
               </FormFieldGroup>
             </GridCol>
             <GridCol width={8}>
-              <DeveloperKeyScopes
-                availableScopes={this.props.availableScopes}
-                availableScopesPending={this.props.availableScopesPending}
-                developerKey={this.props.developerKey}
-                requireScopes={this.state.requireScopes}
-                onRequireScopesChange={this.handleRequireScopesChange}
-                dispatch={this.props.dispatch}
-                listDeveloperKeyScopesSet={this.props.listDeveloperKeyScopesSet}
-              />
+              {this.formBody()}
             </GridCol>
           </GridRow>
         </Grid>
@@ -152,12 +171,19 @@ export default class DeveloperKeyFormFields extends React.Component {
 }
 
 DeveloperKeyFormFields.defaultProps = {
-  developerKey: {}
+  developerKey: {},
+  ltiKey: false
 }
 
 DeveloperKeyFormFields.propTypes = {
   dispatch: PropTypes.func.isRequired,
   listDeveloperKeyScopesSet: PropTypes.func.isRequired,
+  setDisabledPlacements: PropTypes.func.isRequired,
+  setEnabledScopes: PropTypes.func.isRequired,
+  createLtiKeyState: PropTypes.shape({
+    isLtiKey: PropTypes.bool.isRequired,
+    customizing: PropTypes.bool.isRequired
+  }).isRequired,
   developerKey: PropTypes.shape({
     notes: PropTypes.string,
     icon_url: PropTypes.string,

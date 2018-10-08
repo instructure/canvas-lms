@@ -54,7 +54,7 @@ describe Api::V1::DiscussionTopics do
   describe 'include root data if requested' do
     before :once do
       @delayed_post_time = 1.day.from_now
-      @lock_at_time = 2.days.from_now
+      @lock_at_time = 2.days.from_now.change(min: 1)
       @group_topic = group_discussion_topic_model(:delayed_post_at => @delayed_post_time, :lock_at => @lock_at_time)
     end
 
@@ -409,6 +409,7 @@ describe DiscussionTopicsController, type: :request do
        "allow_rating" => false,
        "only_graders_can_rate" => false,
        "sort_by_rating" => false,
+       "todo_date" => nil,
       }
     end
 
@@ -1536,6 +1537,7 @@ describe DiscussionTopicsController, type: :request do
       "allow_rating" => false,
       "only_graders_can_rate" => false,
       "sort_by_rating" => false,
+      "todo_date" => nil,
     }
     expect(json.sort.to_h).to eq expected.sort.to_h
   end

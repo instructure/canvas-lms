@@ -18,7 +18,7 @@
 
 import React from 'react'
 import KeyboardShortcutModal from '../shared/KeyboardShortcutModal'
-import I18n from 'i18n!react_files'
+import I18n from 'i18n!discussionTopicKeyboradShortcutModal'
 
 const SHORTCUTS = [
   {keycode: 'j', description: I18n.t('Next Message')},

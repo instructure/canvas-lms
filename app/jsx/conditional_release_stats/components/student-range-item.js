@@ -17,26 +17,19 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
+import { object, func, number } from 'prop-types'
 import classNames from 'classnames'
 import I18n from 'i18n!cyoe_assignment_sidebar'
 
-  const { object, func, number } = PropTypes
 
 export default class StudentRangeItem extends React.Component {
     static propTypes = {
       student: object.isRequired,
       studentIndex: number.isRequired,
-
       selectStudent: func.isRequired,
     }
 
-    constructor () {
-      super()
-      this.selectStudent = this.selectStudent.bind(this)
-    }
-
-    selectStudent () {
+    selectStudent = () => {
       this.props.selectStudent(this.props.studentIndex)
     }
 

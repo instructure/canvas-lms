@@ -17,7 +17,7 @@
  */
 
 import Enzyme from 'enzyme'
-import Adapter from 'enzyme-adapter-react-14'
+import Adapter from 'enzyme-adapter-react-16'
 
 Enzyme.configure({ adapter: new Adapter() })
 
@@ -34,4 +34,9 @@ if (process.env.DEPRECATION_SENTRY_DSN) {
 
   const setupRavenConsoleLoggingPlugin = require('../app/jsx/shared/helpers/setupRavenConsoleLoggingPlugin');
   setupRavenConsoleLoggingPlugin(Raven, { loggerName: 'console-jest' });
+}
+
+// set up mocks for native APIs
+if (!('MutationObserver' in window)) {
+  Object.defineProperty(window, 'MutationObserver', { value: require('mutation-observer') })
 }

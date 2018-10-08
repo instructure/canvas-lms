@@ -21,6 +21,7 @@ import $ from 'jquery'
 import I18n from 'i18n!new_nav'
 import React from 'react'
 import Tray from '@instructure/ui-overlays/lib/components/Tray'
+import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
 import CoursesTray from './trays/CoursesTray'
 import GroupsTray from './trays/GroupsTray'
 import AccountsTray from './trays/AccountsTray'
@@ -98,12 +99,12 @@ export default class Navigation extends React.Component {
     // give the trays that slide out from the the nav bar
     // a place to mount. It has to be outside the <div id=application>
     // to aria-hide everything but the tray when open.
-    let portal = document.getElementById('nav-tray-portal');
+    let portal = document.getElementById('nav-tray-portal')
     if (!portal) {
-      portal = document.createElement('div');
-      portal.id = 'nav-tray-portal';
+      portal = document.createElement('div')
+      portal.id = 'nav-tray-portal'
       // the <header> has z-index: 100. This has to be behind it,
-      portal.setAttribute('style', 'position: relative; z-index: 99;');
+      portal.setAttribute('style', 'position: relative; z-index: 99;')
       document.body.appendChild(portal)
     }
   }
@@ -123,7 +124,9 @@ export default class Navigation extends React.Component {
   componentWillUpdate(newProps, newState) {
     if (newState.activeItem !== this.state.activeItem) {
       $(`.${ACTIVE_CLASS}`).removeClass(ACTIVE_CLASS)
-      $(`#global_nav_${ newState.activeItem }_link`).closest('li').addClass(ACTIVE_CLASS)
+      $(`#global_nav_${newState.activeItem}_link`)
+        .closest('li')
+        .addClass(ACTIVE_CLASS)
     }
   }
 
@@ -182,7 +185,10 @@ export default class Navigation extends React.Component {
   }
 
   unreadCountElement() {
-    return this.$unreadCount || (this.$unreadCount = $('#global_nav_conversations_link').find('.menu-item__badge'))
+    return (
+      this.$unreadCount ||
+      (this.$unreadCount = $('#global_nav_conversations_link').find('.menu-item__badge'))
+    )
   }
 
   updateUnreadCount(count) {
@@ -260,7 +266,11 @@ export default class Navigation extends React.Component {
         return (
           <ProfileTray
             userDisplayName={window.ENV.current_user.display_name}
-            userAvatarURL={window.ENV.current_user.avatar_is_fallback ? null : window.ENV.current_user.avatar_image_url}
+            userAvatarURL={
+              window.ENV.current_user.avatar_is_fallback
+                ? null
+                : window.ENV.current_user.avatar_image_url
+            }
             profileEnabled={window.ENV.SETTINGS.enable_profiles}
             eportfoliosEnabled={window.ENV.SETTINGS.eportfolios_enabled}
             closeTray={this.closeTray}
@@ -284,32 +294,17 @@ export default class Navigation extends React.Component {
     return (
       <Tray
         label={I18n.t('Global navigation tray')}
-        closeButtonLabel={I18n.t('Close')}
         size="small"
         open={this.state.isTrayOpen}
         onDismiss={this.closeTray}
         shouldCloseOnDocumentClick
         mountNode={document.getElementById('nav-tray-portal')}
-        closeButtonRef={element => {
-          // work around https://github.com/facebook/react/issues/6212 where in IE11, the <svg>
-          // for the "x" grabs tab focus and breaks the shouldContainFocus logic
-          // in ui-utils/utilities/DOM/scopeTab.js So it never tabs to the contents.
-          // When we either upgrade to react >=15, drop ie11, or instructure-icons works around it, we can delete this.
-          let svg
-          if (
-            React.version.startsWith('0.14') &&
-            element &&
-            element.querySelector &&
-            (svg = element.querySelector('svg'))
-          ) {
-            svg.setAttribute('disabled', true)
-          }
-        }}
         theme={{smallWidth: '28em'}}
       >
-        <div className="tray-with-space-for-global-nav">
-          {this.renderTrayContent()}
-        </div>
+        <CloseButton placement="end" onClick={this.closeTray}>
+          {I18n.t('Close')}
+        </CloseButton>
+        <div className="tray-with-space-for-global-nav">{this.renderTrayContent()}</div>
       </Tray>
     )
   }

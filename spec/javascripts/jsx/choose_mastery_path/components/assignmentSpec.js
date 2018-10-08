@@ -16,83 +16,85 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'react',
-  'react-addons-test-utils',
-  'jsx/choose_mastery_path/components/assignment',
-], (React, TestUtils, Assignment) => {
+import React from 'react'
+import TestUtils from 'react-dom/test-utils'
+import Assignment from 'jsx/choose_mastery_path/components/assignment'
 
-  QUnit.module('Assignment')
+QUnit.module('Assignment')
 
-  const defaultProps = () => ({
-    isSelected: false,
-    assignment: {
-      name: 'Ch 2 Quiz',
-      type: 'quiz',
-      points_possible: 10,
-      due_at: new Date(),
-      itemId: 1,
-      description: 'a quiz',
-      category: {
-        id: 'other',
-        label: 'Other',
-      },
-    },
-  })
-
-  const renderComponent = (props) => {
-    return TestUtils.renderIntoDocument(
-      <Assignment {...props} />
-    )
+const defaultProps = () => ({
+  isSelected: false,
+  assignment: {
+    name: 'Ch 2 Quiz',
+    type: 'quiz',
+    points_possible: 10,
+    due_at: new Date(),
+    itemId: 1,
+    description: 'a quiz',
+    category: {
+      id: 'other',
+      label: 'Other'
+    }
   }
+})
 
-  test('renders component', () => {
-    const props = defaultProps()
-    const component = renderComponent(props)
+const renderComponent = props => TestUtils.renderIntoDocument(<Assignment {...props} />)
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'cmp-assignment')
-    equal(renderedList.length, 1, 'renders component')
-  })
+test('renders component', () => {
+  const props = defaultProps()
+  const component = renderComponent(props)
 
-  test('renders title', () => {
-    const props = defaultProps()
-    const component = renderComponent(props)
+  const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'cmp-assignment')
+  equal(renderedList.length, 1, 'renders component')
+})
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'item_name')
-    equal(renderedList[0].textContent, 'Ch 2 Quiz', 'renders title')
-  })
+test('renders title', () => {
+  const props = defaultProps()
+  const component = renderComponent(props)
 
-  test('renders points', () => {
-    const pointyProps = defaultProps()
-    const component = renderComponent(pointyProps)
+  const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'item_name')
+  equal(renderedList[0].textContent, 'Ch 2 Quiz', 'renders title')
+})
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'points_possible_display')
-    equal(renderedList[0].textContent, '10 pts', 'renders points')
-  })
+test('renders points', () => {
+  const pointyProps = defaultProps()
+  const component = renderComponent(pointyProps)
 
-  test('omits points', () => {
-    const pointlessProps = defaultProps()
-    pointlessProps.assignment.points_possible = null
-    const component = renderComponent(pointlessProps)
+  const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(
+    component,
+    'points_possible_display'
+  )
+  equal(renderedList[0].textContent, '10 pts', 'renders points')
+})
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'points_possible_display')
-    equal(renderedList.length, 0, 'omits points')
-  })
+test('omits points', () => {
+  const pointlessProps = defaultProps()
+  pointlessProps.assignment.points_possible = null
+  const component = renderComponent(pointlessProps)
 
-  test('renders link title when selected', () => {
-    const props = defaultProps()
-    props.isSelected = true
-    const component = renderComponent(props)
+  const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(
+    component,
+    'points_possible_display'
+  )
+  equal(renderedList.length, 0, 'omits points')
+})
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'cmp-assignment__title-link')
-    equal(renderedList.length, 1, 'renders link title')
-  })
+test('renders link title when selected', () => {
+  const props = defaultProps()
+  props.isSelected = true
+  const component = renderComponent(props)
 
-  test('renders description', () => {
-    const props = defaultProps()
-    const component = renderComponent(props)
+  const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(
+    component,
+    'cmp-assignment__title-link'
+  )
+  equal(renderedList.length, 1, 'renders link title')
+})
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'ig-description')
-    equal(renderedList.length, 1, 'renders link description')
-  })
+test('renders description', () => {
+  const props = defaultProps()
+  const component = renderComponent(props)
+
+  const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'ig-description')
+  equal(renderedList.length, 1, 'renders link description')
 })

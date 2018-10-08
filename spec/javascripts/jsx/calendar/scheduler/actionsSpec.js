@@ -16,30 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jsx/calendar/scheduler/actions',
-], (Actions) => {
+import Actions from 'jsx/calendar/scheduler/actions'
 
-  QUnit.module('Scheduler Actions');
+QUnit.module('Scheduler Actions')
 
-  test('setFindAppointmentMode returns the proper action', () => {
-    const actual = Actions.actions.setFindAppointmentMode(true);
-    const expected = {
-      type: 'SET_FIND_APPOINTMENT_MODE',
-      payload: true
-    };
+test('setFindAppointmentMode returns the proper action', () => {
+  const actual = Actions.actions.setFindAppointmentMode(true)
+  const expected = {
+    type: 'SET_FIND_APPOINTMENT_MODE',
+    payload: true
+  }
 
-    deepEqual(actual, expected);
-  })
+  deepEqual(actual, expected)
+})
 
-  test('setCourse returns the proper action', () => {
-    const actual = Actions.actions.setCourse({id: 4, name:'blah'});
-    const expected = {
-      type: 'SET_COURSE',
-      payload: {id: 4, name:'blah'}
-    };
+test('setCourse returns the proper action', () => {
+  const actual = Actions.actions.setCourse({id: 4, name: 'blah'})
+  const expected = {
+    type: 'SET_COURSE',
+    payload: {id: 4, name: 'blah'}
+  }
 
-    deepEqual(actual, expected)
-  })
-
+  deepEqual(actual, expected)
 })

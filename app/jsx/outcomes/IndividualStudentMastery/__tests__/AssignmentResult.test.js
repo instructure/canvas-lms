@@ -37,8 +37,8 @@ const defaultProps = (props = {}) => (
     },
     result: {
       id: 1,
-      score: 1,
-      percent: 0.1,
+      score: 2,
+      percent: 0.2,
       assignment: {
         id: 1,
         html_url: 'http://foo',
@@ -75,4 +75,38 @@ it('does not show scores when points are hidden', () => {
   const wrapper = render(<AssignmentResult {...props}/>)
   expect(wrapper.text()).toMatch('Your score')
   expect(wrapper.text()).not.toMatch('Your score: 1')
+})
+
+it('falls back to using raw score if percent is not available', () => {
+  const props = defaultProps()
+  props.result.percent = null
+  const wrapper = render(<AssignmentResult {...props}/>)
+  expect(wrapper.text()).toMatch('Your score: 2')
+})
+
+it('falls back to using mastery points if points possible is 0', () => {
+  const props = defaultProps()
+  props.outcome = {
+    id: 1,
+    mastered: false,
+    calculation_method: 'highest',
+    ratings: [
+      { description: 'My first rating' },
+      { description: 'My second rating' }
+    ],
+    results: [],
+    title: 'foo',
+    mastery_points: 3,
+    points_possible: 0
+  }
+  const wrapper = render(<AssignmentResult {...props}/>)
+  expect(wrapper.text()).toMatch('Your score: 0.6')
+})
+
+
+it('correctly rounds to two decimal places', () => {
+  const props = defaultProps()
+  props.result.percent = 0.257
+  const wrapper = render(<AssignmentResult {...props}/>)
+  expect(wrapper.text()).toMatch('Your score: 1.29')
 })

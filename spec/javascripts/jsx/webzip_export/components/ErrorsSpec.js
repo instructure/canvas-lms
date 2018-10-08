@@ -16,18 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'react',
-  'react-dom',
-  'enzyme',
-  'jsx/webzip_export/components/Errors',
-], (React, ReactDOM, enzyme, Errors) => {
-  QUnit.module('Web Zip Export Errors')
+import React from 'react'
+import enzyme from 'enzyme'
+import Errors from 'jsx/webzip_export/components/Errors'
 
-  test('renders the Error component', () => {
-    const errors = [{response: 'Instance of demon found in code', code: 666}];
-    const tree = enzyme.shallow(<Errors errors={errors} />)
-    const node = tree.find('.webzipexport__errors')
-    ok(node.exists())
-  })
+QUnit.module('Web Zip Export Errors')
+
+test('renders the Error component', () => {
+  const errors = [{response: 'Instance of demon found in code', code: 666}]
+  const tree = enzyme.shallow(<Errors errors={errors} />)
+  const node = tree.find('.webzipexport__errors')
+  ok(node.exists())
 })

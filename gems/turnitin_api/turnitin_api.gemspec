@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency 'simple_oauth', '0.2'
-  spec.add_dependency 'webmock', '1.21'
+  spec.add_dependency 'webmock', '3.3.0'
   spec.add_dependency 'faraday', '~> 0.8'
   spec.add_dependency 'faraday_middleware', '~> 0.8'
 

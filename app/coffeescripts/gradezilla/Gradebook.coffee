@@ -413,6 +413,7 @@ define [
 
       @renderedGrid = $.when(
         dataLoader.gotStudentIds,
+        dataLoader.gotContextModules,
         dataLoader.gotCustomColumns,
         dataLoader.gotAssignmentGroups,
         dataLoader.gotGradingPeriodAssignments
@@ -846,7 +847,7 @@ define [
     rowFilter: (student) =>
       return true unless @isFilteringRowsBySearchTerm()
 
-      propertiesToMatch = ['name', 'login_id', 'short_name', 'sortable_name']
+      propertiesToMatch = ['name', 'login_id', 'short_name', 'sortable_name', 'sis_user_id']
       pattern = new RegExp(@userFilterTerm, 'i')
       _.any propertiesToMatch, (prop) ->
         student[prop]?.match pattern

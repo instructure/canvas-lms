@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import TestUtils from 'react-addons-test-utils'
+import TestUtils from 'react-dom/test-utils'
 import $ from 'jquery'
 import axios from 'axios'
 import EditPage from 'jsx/calendar/scheduler/components/appointment_groups/EditPage'
@@ -123,6 +123,7 @@ test('clicking message users button opens message students modal', () => {
   const messageModal = document.querySelector('#message_participants_form')
 
   ok(messageModal)
+  ReactDOM.unmountComponentAtNode(container)
   $(".ui-dialog").remove()
 })
 

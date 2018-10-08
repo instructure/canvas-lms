@@ -27,7 +27,7 @@ module Types
     #
     graphql_name "User"
 
-    implements GraphQL::Relay::Node.interface
+    implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
 
     global_id_field :id
@@ -41,16 +41,11 @@ module Types
       "A short name the user has selected, for use in conversations or other less formal places through the site.",
       null: true
 
-    field :avatar_url, UrlType, null: true do
-      argument :use_fallback, Boolean,
-        "return a generic image if the user has no custom avatar image",
-        required: false,
-        default_value: true
-    end
+    field :avatar_url, UrlType, null: true
 
-    def avatar_url(use_fallback: true)
+    def avatar_url
       object.account.service_enabled?(:avatars) ?
-        AvatarHelper.avatar_url_for_user(object, context[:request], use_fallback: use_fallback) :
+        AvatarHelper.avatar_url_for_user(object, context[:request], use_fallback: false) :
         nil
     end
 

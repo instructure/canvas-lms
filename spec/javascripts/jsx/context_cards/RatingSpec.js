@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import TestUtils from 'react-addons-test-utils'
+import TestUtils from 'react-dom/test-utils'
 import Rating from 'jsx/context_cards/Rating'
 import InstUIRating from '@instructure/ui-elements/lib/components/Rating'
 
@@ -28,7 +28,7 @@ QUnit.module('StudentContextTray/Rating', () => {
   QUnit.module('formatValueText', hooks => {
     hooks.beforeEach(() => {
       subject = TestUtils.renderIntoDocument(
-        <Rating metric={{level: 1}} />
+        <Rating label="whatever" metric={{level: 1}} />
       )
     })
 

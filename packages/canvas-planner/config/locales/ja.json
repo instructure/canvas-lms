@@ -50,6 +50,9 @@
   "assignmenttype_title_posted_datetime_cab69444": {
     "message": "{ assignmentType } { title }は{ datetime }を掲示しました。"
   },
+  "assignmenttype_title_reminder_datetime_33fa66d5": {
+    "message": "{ assignmentType } { title }、リマインダ{ datetime }."
+  },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "あなたのタスク履歴の始まり"
   },
@@ -61,6 +64,12 @@
   },
   "close_d634289d": {
     "message": "閉じる"
+  },
+  "close_opportunity_center_popup_9907d981": {
+    "message": "「機会」センターポップアップを閉じる"
+  },
+  "count_plural_0_opportunities_one_opportunity_other_bb1698f6": {
+    "message": "{ count, plural,\n     =0 {# 機会}\n    one {# 機会}\n  other {# 機会}\n}。クリックして「機会」センターポップアップを開きます。"
   },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {表示する# （完了したアイテムを}\n  other {表示する # （完了したアイテムを）}\n}"
@@ -97,6 +106,12 @@
   },
   "dismiss_opportunityname_5995176f": {
     "message": "{ opportunityName }を却下する"
+  },
+  "dismissed_8b0b1fc9": {
+    "message": "却下された"
+  },
+  "dismissed_opportunities_f0826640": {
+    "message": "却下された機会"
   },
   "due_5d7267be": {
     "message": "期限："
@@ -191,11 +206,17 @@
   "my_grades_98834476": {
     "message": "私の成績"
   },
+  "new_13daf639": {
+    "message": "新規作成"
+  },
   "new_activity_8b84847d": {
     "message": "新規アクティビティ"
   },
   "new_activity_for_title_14c9c3af": {
     "message": "{ title }の新規アクティビティ"
+  },
+  "new_opportunities_7d349c4d": {
+    "message": "新しい機会"
   },
   "next_month_749b1778": {
     "message": "翌月"
@@ -208,6 +229,9 @@
   },
   "nothing_for_now_e3e3ce2a": {
     "message": "今のところ何もなし"
+  },
+  "nothing_here_needs_attention_c4eaded6": {
+    "message": "ここには注意を必要する新しいものは何もない。"
   },
   "nothing_more_to_do_b665da42": {
     "message": "他にタスクはありません"
@@ -236,6 +260,9 @@
   "page_50c4823d": {
     "message": "ページ"
   },
+  "peer_review_74f26a13": {
+    "message": "ピア レビュー"
+  },
   "points_bceb5005": {
     "message": "ポイント"
   },
@@ -250,6 +277,9 @@
   },
   "quiz_e0dcce8f": {
     "message": "クイズ"
+  },
+  "reminder_date_4564d12d": {
+    "message": "リマインダ（お知らせ）：{ date }"
   },
   "replies_4a8577c8": {
     "message": "返信"
@@ -286,6 +316,9 @@
   },
   "the_date_and_time_this_to_do_is_due_74c823d4": {
     "message": "これを行う日時が期限を過ぎています"
+  },
+  "there_are_no_points_associated_with_this_item_449c712a": {
+    "message": "このアイテムに関連付けられているポイントはありません。"
   },
   "time_2b5aac58": {
     "message": "時間"

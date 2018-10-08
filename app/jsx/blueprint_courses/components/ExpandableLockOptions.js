@@ -23,7 +23,7 @@ import cx from 'classnames'
 
 import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import IconArrowOpenRightSolid from '@instructure/ui-icons/lib/Solid/IconArrowOpenRight'
+import IconArrowOpenEnd from '@instructure/ui-icons/lib/Solid/IconArrowOpenEnd'
 import IconArrowOpenDownSolid from '@instructure/ui-icons/lib/Solid/IconArrowOpenDown'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import Text from '@instructure/ui-elements/lib/components/Text'
@@ -91,7 +91,7 @@ export default class ExpandableLockOptions extends React.Component {
   }
 
   renderIndicatorIcon () {
-    const Icon = this.state.open ? IconArrowOpenDownSolid : IconArrowOpenRightSolid
+    const Icon = this.state.open ? IconArrowOpenDownSolid : IconArrowOpenEnd
     return (
       <div className="bcs_tab_indicator-icon" onKeyDown={this.onKeyDown}>
         <Button variant="icon" onClick={this.toggle} >

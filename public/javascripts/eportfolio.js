@@ -284,7 +284,7 @@ import 'jqueryui/sortable'
       event.preventDefault();
       RichContentEditor.callOnRCE($("#edit_page_content"), "toggle")
       //  todo: replace .andSelf with .addBack when JQuery is upgraded.
-      $(this).siblings(".switch_views_link").andSelf().toggle();
+      $(this).siblings(".switch_views_link").andSelf().toggle().focus();
     });
     $("#edit_page_sidebar .add_content_link").click(function(event) {
       event.preventDefault();

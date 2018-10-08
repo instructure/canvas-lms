@@ -25,57 +25,9 @@ describe "courses/_to_do_list.html.erb" do
     describe "with no assignments" do
       it "shows the new planner to do list anyway" do
         course_with_student(active_all: true)
-        @course.root_account.enable_feature!(:student_planner)
         view_context
         render partial: "courses/to_do_list", locals: {contexts: nil}
         expect(response).to include '<div class="todo-list">'
-      end
-    end
-
-    describe "assignments due" do
-      it "shows assignment data" do
-        course_with_student(active_all: true)
-        @user.course_nicknames[@course.id] = "My Awesome Course"
-        @user.save!
-        due_date = 2.days.from_now
-        assignment_model(course: @course,
-                         due_at: due_date,
-                         submission_types: "online_text_entry",
-                         points_possible: 15,
-                         title: "SubmitMe")
-        view_context
-        # title, course nickname, points, due date
-        render partial: "courses/to_do_list", locals: {contexts: nil}
-        expect(response).to include "Turn in SubmitMe"
-        expect(response).to include "15 points"
-        expect(response).to include "My Awesome Course"
-        expect(response).to include due_at(@assignment, @user)
-        expect(response).to include "Ignore SubmitMe"
-      end
-    end
-    describe "submissions to review" do
-      it "shows peer reviews" do
-        course_factory(active_all: true)
-        due_date = 2.days.from_now
-        assignment_model(course: @course,
-                         due_at: due_date,
-                         submission_types: "online_text_entry",
-                         points_possible: 15,
-                         title: "ReviewMe",
-                         peer_reviews: true)
-        @submission = submission_model(assignment: @assignment, body: "my submission")
-        @submitter = @user
-        @assessor_submission = submission_model(assignment: @assignment, user: @user, body: "my other submission")
-        @assessor = @user
-        @assessor.course_nicknames[@course.id] = "My Awesome Course"
-        @assessor.save!
-        @assessment_request = AssessmentRequest.create!(assessor: @assessor, asset: @submission, user: @submitter, assessor_asset: @assessor_submission)
-        @assessment_request.workflow_state = "assigned"
-        @assessment_request.save!
-        view_context
-        render partial: "courses/to_do_list", locals: {contexts: nil}
-        expect(response).to include "Peer Review for ReviewMe"
-        expect(response).to include "Ignore ReviewMe"
       end
     end
   end
@@ -101,7 +53,7 @@ describe "courses/_to_do_list.html.erb" do
         @user.save!
         view_context
         # title, course nickname, points, due date, number of submissions to grade
-        render partial: "courses/to_do_list", locals: {contexts: nil}
+        render partial: "courses/to_do_list", locals: {contexts: nil, show_legacy_todo_list: true}
         expect(response).to include "Grade GradeMe"
         expect(response).to include "15 points"
         expect(response).to include "My Awesome Course"
@@ -126,7 +78,7 @@ describe "courses/_to_do_list.html.erb" do
         @user.save!
         view_context
         # title, course nickname, points, due date, number of submissions to grade
-        render partial: "courses/to_do_list", locals: {contexts: nil}
+        render partial: "courses/to_do_list", locals: {contexts: nil, show_legacy_todo_list: true}
         expect(response).to include "Grade GradeMe"
         expect(response).to include "15 points"
         expect(response).to include "My Awesome Course"
@@ -157,7 +109,7 @@ describe "courses/_to_do_list.html.erb" do
         @user.course_nicknames[@course.id] = "My Awesome Course"
         @user.save!
         view_context
-        render partial: "courses/to_do_list", locals: {contexts: nil}
+        render partial: "courses/to_do_list", locals: {contexts: nil, show_legacy_todo_list: true}
         expect(response).to include "Moderate ModerateMe"
         expect(response).to include "Ignore ModerateMe until new mark"
       end
@@ -176,7 +128,7 @@ describe "courses/_to_do_list.html.erb" do
         submission = submission_model(assignment: @assignment, body: "my submission")
         submission.find_or_create_provisional_grade!(@teacher, grade: 5)
         view_context
-        render partial: "courses/to_do_list", locals: {contexts: nil}
+        render partial: "courses/to_do_list", locals: {contexts: nil, show_legacy_todo_list: true}
         expect(response).not_to include "Moderate ModerateMe"
       end
     end

@@ -36,6 +36,13 @@ class ToDoListPresenter
       @needs_reviewing = assessment_requests.map do |ar|
         AssessmentRequestPresenter.new(view, ar, user) if ar.asset.assignment.published?
       end.compact
+
+      # we need a complete list of courses first because we only care about the courses
+      # from the assignments involved. not just the contexts handed in.
+      deduped_courses = (@needs_grading.map(&:context) + @needs_moderation.map(&:context) +
+        @needs_submitting.map(&:context) + @needs_reviewing.map(&:context)).uniq
+      course_to_permissions = @user.precalculate_permissions_for_courses(deduped_courses, [:manage_grades])
+      @needs_grading = @needs_grading.select {|assignment| course_to_permissions[assignment.context.global_id]&.fetch(:manage_grades, false)}
     else
       @needs_grading = []
       @needs_moderation = []
@@ -95,7 +102,7 @@ class ToDoListPresenter
   class AssignmentPresenter
     attr_reader :assignment
     protected :assignment
-    delegate :title, :submission_action_string, :points_possible, :due_at, :updated_at, :peer_reviews_due_at, to: :assignment
+    delegate :title, :submission_action_string, :points_possible, :due_at, :updated_at, :peer_reviews_due_at, :context, to: :assignment
 
     def initialize(view, assignment, user, type)
       @view = view

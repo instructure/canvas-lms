@@ -24,11 +24,10 @@
 // or with a custom accessor:
 //
 // _.sum([[2,3], [3,4]], (a) -> a[0]) #=> 5
+import _ from 'underscore'
 
-define(['underscore'], _ =>
-  _.mixin({
-    sum (array, accessor = null, start = 0) {
-      return _.reduce(array, (memo, el) => (accessor != null ? accessor(el) : el) + memo, start)
-    },
-  })
-)
+export default _.mixin({
+  sum(array, accessor = null, start = 0) {
+    return _.reduce(array, (memo, el) => (accessor != null ? accessor(el) : el) + memo, start)
+  }
+})

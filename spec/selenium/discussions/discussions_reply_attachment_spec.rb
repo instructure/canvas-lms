@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require File.expand_path(File.dirname(__FILE__) + '/../helpers/discussions_common')
+require_relative '../discussions/pages/discussion_page.rb'
 
 describe "reply attachment" do
   include_context "in-process server selenium tests"
@@ -29,7 +30,7 @@ describe "reply attachment" do
   end
 
   it "should create a discussion" do
-    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    Discussion.visit(@course, @topic)
 
     expect(f('.discussion-title').text).to eq @topic_title
   end
@@ -52,7 +53,7 @@ describe "reply attachment" do
   it "should reply to the discussion with attachment" do
     file_attachment = "graded.png"
     entry_text = 'new entry'
-    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    Discussion.visit(@course, @topic)
 
     add_reply(entry_text, file_attachment)
     expect(get_all_replies.count).to eq 1
@@ -65,7 +66,7 @@ describe "reply attachment" do
     skip_if_chrome('Cancel button click does not reliably happen')
     file_attachment = "graded.png"
     entry_text = 'new entry'
-    get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+    Discussion.visit(@course, @topic)
 
     add_reply(entry_text, file_attachment)
 
@@ -84,4 +85,10 @@ describe "reply attachment" do
     expect(@last_entry).not_to contain_css('.comment_attachments')
   end
 
+  it 'media attachment modal can be opened' do
+    Account.default.enable_feature!(:integrate_arc_rce)
+    Discussion.visit(@course, @topic)
+    Discussion.start_reply_with_media
+    expect(Discussion.media_modal).to be_displayed
+  end
 end

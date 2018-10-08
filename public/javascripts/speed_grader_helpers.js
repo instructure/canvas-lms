@@ -22,6 +22,10 @@ import I18n from 'i18n!gradebook'
 import './jquery.instructure_date_and_time'
 import './jquery.instructure_misc_helpers'
 
+export function setupIsModerated ({moderated_grading}) {
+  return moderated_grading
+}
+
 export function setupIsAnonymous ({anonymize_students}) {
   return anonymize_students
 }
@@ -177,6 +181,7 @@ export function setupAnonymizableAuthorId (isAnonymous) {
       window.location.reload();
     },
 
+    setupIsModerated,
     setupIsAnonymous,
     setupAnonymousGraders,
     setupAnonymizableId,

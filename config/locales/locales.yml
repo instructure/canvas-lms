@@ -3,7 +3,7 @@ ar:
   bigeasy_locale: ar_SA
   date:
     abbr_month_names:
-    -
+    - 
     - يناير
     - فبراير
     - مارس
@@ -26,7 +26,7 @@ ar:
       medium: "%-d %b %Y"
       medium_month: "%b %Y"
       medium_with_weekday: "%a %-d %b %Y"
-      short: "%b %-d"
+      short: "%-d %b"
       short_month: "%b"
       short_weekday: "%a"
       short_with_weekday: "%a، %-d %b"
@@ -48,24 +48,24 @@ cy:
   bigeasy_locale: cy_GB
   date:
     formats:
-      date_at_time: "%b %-d %l:%M%P"
+      date_at_time: "%b %-d %k:%M"
       default: "%Y-%m-%d"
-      full: "%b %-d, %Y %-l:%M%P"
-      full_with_weekday: "%a %b %-d, %Y %-l:%M%P"
+      full: "%-d %b %Y %k:%M"
+      full_with_weekday: "%a, %-d %b %Y %k:%M"
       long: "%B %-d, %Y"
       long_with_weekday: "%A, %B %-d"
-      medium: "%b %-d, %Y"
+      medium: "%-d %b %Y"
       medium_month: "%b %Y"
-      medium_with_weekday: "%a %b %-d, %Y"
-      short: "%b %-d"
+      medium_with_weekday: "%a, %-d %b %Y"
+      short: "%-d %b"
       short_month: "%b"
       short_weekday: "%a"
       short_with_weekday: "%a, %b %-d"
       weekday: "%A"
     abbr_month_names:
-    -
+    - 
     - Ion
-    - Chw
+    - Chwe
     - Maw
     - Ebr
     - Mai
@@ -79,13 +79,13 @@ cy:
   time:
     event: "%{date} am %{time}"
     formats:
-      tiny: "%l:%M%P"
-      tiny_on_the_hour: "%l%P"
+      tiny: "%k:%M"
+      tiny_on_the_hour: "%k:%M"
 da:
   bigeasy_locale: da_DK
   date:
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -101,14 +101,14 @@ da:
     formats:
       date_at_time: "%b %-d kl. %k:%M"
       default: "%Y-%m-%d"
-      full: "%b %-d, %Y %-k:%M"
-      full_with_weekday: "%a %b %-d, %Y %-k:%M"
+      full: "%-d. %b %Y %k.%M"
+      full_with_weekday: "%a den %-d. %b %Y %k.%M"
       long: "%B %-d, %Y"
       long_with_weekday: "%A, %B %-d"
-      medium: "%b %-d, %Y"
+      medium: "%-d. %b %Y"
       medium_month: "%b %Y"
-      medium_with_weekday: "%a %b %-d, %Y"
-      short: "%b %-d"
+      medium_with_weekday: "%a den %-d. %b %Y"
+      short: "%-d. %b"
       short_month: "%b"
       short_weekday: "%a"
       short_with_weekday: "%a, %b %-d"
@@ -119,13 +119,13 @@ da:
   time:
     event: "%{date} kl. %{time}"
     formats:
-      tiny: "%k:%M"
+      tiny: "%k.%M"
       tiny_on_the_hour: "%k:%M"
 da-x-k12:
   bigeasy_locale: da_DK
   date:
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -141,14 +141,14 @@ da-x-k12:
     formats:
       date_at_time: "%b %-d kl. %k:%M"
       default: "%Y-%m-%d"
-      full: "%b %-d, %Y %-k:%M"
-      full_with_weekday: "%a %b %-d, %Y %-k:%M"
+      full: "%-d. %b %Y %k.%M"
+      full_with_weekday: "%a den %-d. %b %Y %k.%M"
       long: "%B %-d, %Y"
       long_with_weekday: "%A, %B %-d"
-      medium: "%b %-d, %Y"
+      medium: "%-d. %b %Y"
       medium_month: "%b %Y"
-      medium_with_weekday: "%a %b %-d, %Y"
-      short: "%b %-d"
+      medium_with_weekday: "%a den %-d. %b %Y"
+      short: "%-d. %b"
       short_month: "%b"
       short_weekday: "%a"
       short_with_weekday: "%a, %b %-d"
@@ -161,13 +161,13 @@ da-x-k12:
   time:
     event: "%{date} kl. %{time}"
     formats:
-      tiny: "%k:%M"
+      tiny: "%k.%M"
       tiny_on_the_hour: "%k:%M"
 de:
   bigeasy_locale: de_DE
   date:
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - März
@@ -183,14 +183,14 @@ de:
     formats:
       date_at_time: "%-d %b um %k:%M"
       default: "%d/%m/%Y"
-      full: "%-d %b, %Y %-k:%M"
-      full_with_weekday: "%a %-d %b, %Y %-k:%M"
+      full: "%-d. %b %Y %k:%M"
+      full_with_weekday: "%a., %-d. %b %Y %k:%M"
       long: "%-d %B, %Y"
       long_with_weekday: "%A, %-d %B"
-      medium: "%-d %b, %Y"
+      medium: "%-d. %b %Y"
       medium_month: "%b %Y"
-      medium_with_weekday: "%a %-d %b, %Y"
-      short: "%-d %b"
+      medium_with_weekday: "%a., %-d. %b %Y"
+      short: "%-d. %b"
       short_month: "%b"
       short_weekday: "%a"
       short_with_weekday: "%a, %-d %b"
@@ -208,19 +208,19 @@ el:
   crowdsourced: true
   date:
     abbr_month_names:
-      - ~
-      - Ιαν
-      - Φεβ
-      - Μαρ
-      - Απρ
-      - Μαι
-      - Ιουν
-      - Ιουλ
-      - Αυγ
-      - Σεπ
-      - Οκτ
-      - Νοε
-      - Δεκ
+    - 
+    - Ιαν
+    - Φεβ
+    - Μαρ
+    - Απρ
+    - Μαϊ
+    - Ιουν
+    - Ιουλ
+    - Αυγ
+    - Σεπ
+    - Οκτ
+    - Νοε
+    - Δεκ
     formats:
       date_at_time: "%b %-d at %l:%M%P"
       default: "%Y-%m-%d"
@@ -251,7 +251,7 @@ en:
 en-AU:
   date:
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -290,7 +290,7 @@ en-AU:
 en-CA:
   date:
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -328,7 +328,7 @@ en-CA:
 en-GB:
   date:
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -368,7 +368,7 @@ es:
   bigeasy_locale: es_ES
   date:
     abbr_month_names:
-    -
+    - 
     - ene
     - feb
     - mar
@@ -384,14 +384,14 @@ es:
     formats:
       date_at_time: "%-d %b en %k:%M"
       default: "%d/%m/%Y"
-      full: "%-d %b, %Y %-k:%M"
-      full_with_weekday: "%a %-d %b, %Y %-k:%M"
+      full: "%-d de %b de %Y %k:%M"
+      full_with_weekday: "%a %-d de %b de %Y %k:%M"
       long: "%-d %B %Y"
       long_with_weekday: "%A, %-d %B"
-      medium: "%-d %b %Y"
+      medium: "%-d de %b de %Y"
       medium_month: "%b %Y"
-      medium_with_weekday: "%a %-d %b %Y"
-      short: "%-d %b"
+      medium_with_weekday: "%a %-d de %b de %Y"
+      short: "%-d de %b"
       short_month: "%b"
       short_weekday: "%a"
       short_with_weekday: "%a, %-d %b"
@@ -409,7 +409,7 @@ fa:
   crowdsourced: true
   date:
     abbr_month_names:
-    -
+    - 
     - ژانویه
     - فوریه
     - مارس
@@ -450,7 +450,7 @@ fr:
   bigeasy_locale: fr_FR
   date:
     abbr_month_names:
-    -
+    - 
     - Janv
     - Févr
     - Mars
@@ -466,8 +466,8 @@ fr:
     formats:
       date_at_time: "%-d %b à %k:%M"
       default: "%d/%m/%Y"
-      full: "%b %-d, %Y %-k:%M"
-      full_with_weekday: "%a %-d %b, %Y %-k:%M"
+      full: "%-d %b %Y %k:%M"
+      full_with_weekday: "%a %-d %b %Y %k:%M"
       long: le %-d %B %Y
       long_with_weekday: "%A, %-d %B"
       medium: "%-d %b %Y"
@@ -490,7 +490,7 @@ fr-CA:
   bigeasy_locale: fr_CA
   date:
     abbr_month_names:
-    -
+    - 
     - Jan
     - Fév
     - Mar
@@ -506,11 +506,11 @@ fr-CA:
     formats:
       date_at_time: "%-d %b à %k:%M"
       default: "%d/%m/%Y"
-      full: "%b %-d, %Y %-k:%M"
-      full_with_weekday: "%a %-d %b, %Y %-k:%M"
+      full: "%-d %b %Y %k:%M"
+      full_with_weekday: "%a %-d %b %Y %k:%M"
       long: le %-d %B %Y
       long_with_weekday: "%A, %-d %B"
-      medium: le %-d %b %Y
+      medium: "%-d %b %Y"
       medium_month: "%b %Y"
       medium_with_weekday: "%a %-d %b %Y"
       short: "%-d %b"
@@ -531,7 +531,7 @@ he:
   crowdsourced: true
   date:
     abbr_month_names:
-    -
+    - 
     - ינו׳
     - פבר׳
     - מרץ
@@ -571,7 +571,7 @@ ht:
   bigeasy_locale: ht_HT
   date:
     abbr_month_names:
-    -
+    - 
     - jan
     - fev
     - mas
@@ -587,14 +587,14 @@ ht:
     formats:
       date_at_time: "%b %-d at %H:%M"
       default: "%m/%d/%Y"
-      full: "%b %-d, %Y %-H:%M"
-      full_with_weekday: "%a %b %-d, %Y %-H:%M"
+      full: "%-d %b %Y %k:%M"
+      full_with_weekday: "%a %-d %b %Y %k:%M"
       long: "%B %-d, %Y"
       long_with_weekday: "%A, %B %-d"
-      medium: "%b %-d, %Y"
+      medium: "%-d %b %Y"
       medium_month: "%b %Y"
-      medium_with_weekday: "%a %b %-d, %Y"
-      short: "%b %-d"
+      medium_with_weekday: "%a %-d %b %Y"
+      short: "%-d %b"
       short_month: "%b"
       short_weekday: "%a"
       short_with_weekday: "%a, %b %-d"
@@ -613,19 +613,19 @@ hu:
   crowdsourced: true
   date:
     abbr_month_names:
-      - ~
-      - jan
-      - feb
-      - márc
-      - ápr
-      - máj
-      - jún
-      - júl
-      - aug
-      - szept
-      - okt
-      - nov
-      - dec
+    - 
+    - jan
+    - feb
+    - márc
+    - ápr
+    - máj
+    - jún
+    - júl
+    - aug
+    - szept
+    - okt
+    - nov
+    - dec
     formats:
       date_at_time: "%b %-d, %H:%M"
       default: "%Y. %m. %d."
@@ -654,7 +654,7 @@ hy:
   crowdsourced: true
   date:
     abbr_month_names:
-    -
+    - 
     - Հնվ
     - Փտր
     - Մրտ
@@ -670,13 +670,13 @@ hy:
     formats:
       date_at_time: "%-d %b ի %k:%M"
       default: "%d.%m.%Y"
-      full: "%b %-d, %Y %-k:%M"
-      full_with_weekday: "%a %b %-d, %Y %-k:%M"
+      full: "%-d %b, %Y %k:%M"
+      full_with_weekday: "%a %-d %b, %Y %k:%M"
       long: "%-d %B %Y"
       long_with_weekday: "%A, %-d %B"
-      medium: "%-d %b %Y"
+      medium: "%-d %b, %Y"
       medium_month: "%b %Y"
-      medium_with_weekday: "%a %-d %b %Y"
+      medium_with_weekday: "%a %-d %b, %Y"
       short: "%-d %b"
       short_month: "%b"
       short_weekday: "%a"
@@ -696,7 +696,7 @@ is:
   bigeasy_locale: is_IS
   date:
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -712,14 +712,14 @@ is:
     formats:
       date_at_time: "%b %-d við %k:%M"
       default: "%Y-%m-%d"
-      full: "%b %-d, %Y %-k:%M"
-      full_with_weekday: "%a %b %-d, %Y %-k:%M"
+      full: "%-d. %b %Y %k:%M"
+      full_with_weekday: "%a %-d. %b %Y %k:%M"
       long: "%B %-d, %Y"
       long_with_weekday: "%A, %B %-d"
-      medium: "%b %-d, %Y"
+      medium: "%-d. %b %Y"
       medium_month: "%b %Y"
-      medium_with_weekday: "%a %b %-d, %Y"
-      short: "%b %-d"
+      medium_with_weekday: "%a %-d, %b %Y"
+      short: "%-d. %b"
       short_month: "%b"
       short_weekday: "%a"
       short_with_weekday: "%a, %b %-d"
@@ -736,7 +736,7 @@ it:
   bigeasy_locale: it_IT
   date:
     abbr_month_names:
-    -
+    - 
     - gen
     - feb
     - mar
@@ -776,7 +776,7 @@ ja:
   bigeasy_locale: ja_JP
   date:
     abbr_month_names:
-    -
+    - 
     - 1月
     - 2月
     - 3月
@@ -792,14 +792,14 @@ ja:
     formats:
       date_at_time: "%b %-d %l:%M%P"
       default: "%Y年%m月%d日"
-      full: "%b %-d, %Y %-l:%M%P"
-      full_with_weekday: "%a %b %-d, %Y %-l:%M%P"
+      full: "%Y年%b%-d日 %k,%M"
+      full_with_weekday: "%a %Y年%b%-d日 %k.%M"
       long: "%Y %B %-d"
       long_with_weekday: "%A %B %-d"
-      medium: "%Y %b %-d"
+      medium: "%Y年%b%-d日"
       medium_month: "%Y %b"
-      medium_with_weekday: "%a %Y %b %-d"
-      short: "%b %-d"
+      medium_with_weekday: "%a %Y年%b%-d日"
+      short: "%b%-d日"
       short_month: "%b"
       short_weekday: "%a"
       short_with_weekday: "%a %b %-d"
@@ -809,14 +809,23 @@ ja:
   time:
     event: "%{date} 日  %{time}"
     formats:
-      tiny: "%l:%M%P"
-      tiny_on_the_hour: "%l:%M%P"
+      tiny: "%k.%M"
+      tiny_on_the_hour: "%k.%M"
 ko:
   bigeasy_locale: ko_KR
   crowdsourced: true
   date:
+    datepicker:
+      column_headings:
+      - 일
+      - 월
+      - 화
+      - 수
+      - 목
+      - 금
+      - 토
     abbr_month_names:
-    -
+    - 
     - 1월
     - 2월
     - 3월
@@ -832,25 +841,27 @@ ko:
     formats:
       date_at_time: "%b %-d at %l:%M%P"
       default: "%Y-%m-%d"
-      medium: "%b %-d, %Y"
+      medium: "%Y %b%-d일"
       medium_month: "%b %Y"
-      medium_with_weekday: "%a %b %-d, %Y"
-      short: "%b %-d"
+      medium_with_weekday: "%Y %b%-d일 %a"
+      short: "%b%-d일"
       short_month: "%b"
       short_weekday: "%a"
       weekday: "%A"
+      full: "%Y.%-m.%-d. %P %l:%M"
+      full_with_weekday: "%Y.%-m.%-d. %a %P %l:%M"
   locales:
     ko: 한국말
   time:
     event: "%{date} %{time}"
     formats:
-      tiny: "%l:%M%P"
+      tiny: "%P %l:%M"
       tiny_on_the_hour: "%l%P"
 mi:
   bigeasy_locale: mi_NZ
   date:
     abbr_month_names:
-    -
+    - 
     - Hān
     - Pēp
     - Māe
@@ -866,14 +877,14 @@ mi:
     formats:
       date_at_time: "%b %-d i %l:%M%P"
       default: "%Y-%m-%d"
-      full: "%b %-d, %Y %-l:%M%P"
-      full_with_weekday: "%a %b %-d, %Y %-l:%M%P"
+      full: "%-d %b, %Y %l:%M%P"
+      full_with_weekday: "%a %-d %b, %Y %l:%M%P"
       long: "%B %-d, %Y"
       long_with_weekday: "%A, %B %-d"
-      medium: "%b %-d, %Y"
+      medium: "%-d %b, %Y"
       medium_month: "%b %Y"
-      medium_with_weekday: "%a %b %-d, %Y"
-      short: "%b %-d"
+      medium_with_weekday: "%a %-d %b, %Y"
+      short: "%-d %b"
       short_month: "%b"
       short_weekday: "%a"
       short_with_weekday: "%a, %b %-d"
@@ -891,30 +902,30 @@ nb:
   bigeasy_locale: nb_NO
   date:
     abbr_month_names:
-    -
-    - jan
-    - feb
-    - mar
-    - apr
+    - 
+    - jan.
+    - feb.
+    - mars
+    - april
     - mai
-    - jun
-    - jul
-    - aug
-    - sep
-    - okt
-    - nov
-    - des
+    - juni
+    - juli
+    - aug.
+    - sep.
+    - okt.
+    - nov.
+    - des.
     formats:
       date_at_time: "%-d. %b %k:%M"
       default: "%d.%m.%Y"
-      full: "%b %-d, %Y %-k:%M"
-      full_with_weekday: "%a %b %-d, %Y %-k:%M"
+      full: "%-d. %b %Y %k.%M"
+      full_with_weekday: "%a %-d. %b %Y %k.%M"
       long: "%-d %B %Y"
       long_with_weekday: "%A %-d. %B"
-      medium: "%-d %b %Y"
+      medium: "%-d. %b %Y"
       medium_month: "%b %Y"
-      medium_with_weekday: "%a %-d %b %Y"
-      short: "%-d %b"
+      medium_with_weekday: "%a %-d. %b %Y"
+      short: "%-d. %b"
       short_month: "%b"
       short_weekday: "%a"
       short_with_weekday: "%a %-d %b"
@@ -925,36 +936,36 @@ nb:
   time:
     event: "%{date} i %{time}"
     formats:
-      tiny: "%k:%M"
+      tiny: "%k.%M"
       tiny_on_the_hour: "%k:%M"
 nb-x-k12:
   bigeasy_locale: nb_NO
   date:
     abbr_month_names:
-    -
-    - jan
-    - feb
-    - mar
-    - apr
+    - 
+    - jan.
+    - feb.
+    - mars
+    - april
     - mai
-    - jun
-    - jul
-    - aug
-    - sep
-    - okt
-    - nov
-    - des
+    - juni
+    - juli
+    - aug.
+    - sep.
+    - okt.
+    - nov.
+    - des.
     formats:
       date_at_time: "%-d. %b %k:%M"
       default: "%d.%m.%Y"
-      full: "%b %-d, %Y %-k:%M"
-      full_with_weekday: "%a %b %-d, %Y %-k:%M"
+      full: "%-d. %b %Y %k.%M"
+      full_with_weekday: "%a %-d. %b %Y %k.%M"
       long: "%-d %B %Y"
       long_with_weekday: "%A %-d. %B"
-      medium: "%-d %b %Y"
+      medium: "%-d. %b %Y"
       medium_month: "%b %Y"
-      medium_with_weekday: "%a %-d %b %Y"
-      short: "%-d %b"
+      medium_with_weekday: "%a %-d. %b %Y"
+      short: "%-d. %b"
       short_month: "%b"
       short_weekday: "%a"
       short_with_weekday: "%a %-d %b"
@@ -967,14 +978,14 @@ nb-x-k12:
   time:
     event: "%{date} i %{time}"
     formats:
-      tiny: "%k:%M"
+      tiny: "%k.%M"
       tiny_on_the_hour: "%k:%M"
 nl:
   bigeasy_locale: nl_NL
   crowdsourced: false
   date:
     abbr_month_names:
-    -
+    - 
     - jan
     - feb
     - mrt
@@ -990,8 +1001,8 @@ nl:
     formats:
       date_at_time: "%b %-d om %k:%M"
       default: "%d-%m-%Y"
-      full: "%b %-d, %Y %-k:%M"
-      full_with_weekday: "%a %b %-d, %Y %-k:%M"
+      full: "%-d %b %Y %k:%M"
+      full_with_weekday: "%a %-d %b %Y %k:%M"
       long: "%-d %B %Y"
       long_with_weekday: "%A, %-d %B"
       medium: "%-d %b %Y"
@@ -1015,7 +1026,7 @@ nn:
   crowdsourced: true
   date:
     abbr_month_names:
-    -
+    - 
     - jan
     - feb
     - mars
@@ -1031,8 +1042,8 @@ nn:
     formats:
       date_at_time: "%b %-d %k:%M"
       default: "%d.%m.%Y"
-      full: "%b %-d, %Y %-k:%M"
-      full_with_weekday: "%a %b %-d, %Y %-k:%M"
+      full: "%b %-d, %Y %k:%M"
+      full_with_weekday: "%a %b %-d, %Y %k:%M"
       long: "%-d %B %Y"
       long_with_weekday: "%A %-d. %B"
       medium: "%-d %b %Y"
@@ -1056,7 +1067,7 @@ pl:
   bigeasy_locale: pl_PL
   date:
     abbr_month_names:
-    -
+    - 
     - Sty
     - Lut
     - Mar
@@ -1072,13 +1083,13 @@ pl:
     formats:
       date_at_time: "%-d %b at %k:%M"
       default: "%d.%m.%Y"
-      full: "%b %-d, %Y %-k:%M"
-      full_with_weekday: "%a %b %-d, %Y %-k:%M"
+      full: "%-d %b %Y %k:%M"
+      full_with_weekday: "%a., %-d %b %Y %k:%M"
       long: "%-d %B %Y"
       long_with_weekday: "%A, %-d %B"
       medium: "%-d %b %Y"
       medium_month: "%b %Y"
-      medium_with_weekday: "%a %-d %b %Y"
+      medium_with_weekday: "%a., %-d %b %Y"
       short: "%-d %b"
       short_month: "%b"
       short_weekday: "%a"
@@ -1096,7 +1107,7 @@ pt:
   bigeasy_locale: pt_PT
   date:
     abbr_month_names:
-    -
+    - 
     - jan
     - fev
     - mar
@@ -1112,14 +1123,14 @@ pt:
     formats:
       date_at_time: "%-d %b em %k:%M"
       default: "%d/%m/%Y"
-      full: "%b %-d, %Y %-k:%M"
-      full_with_weekday: "%a %b %-d, %Y %-k:%M"
+      full: "%-d de %b de %Y %k:%M"
+      full_with_weekday: "%a %-d de %b de %Y %k:%M"
       long: "%-d %B %Y"
       long_with_weekday: "%A, %-d %B"
-      medium: "%-d %b %Y"
+      medium: "%-d de %b de %Y"
       medium_month: "%b %Y"
-      medium_with_weekday: "%a %-d %b %Y"
-      short: "%-d %b"
+      medium_with_weekday: "%a %-d de %b de %Y"
+      short: "%-d de %b"
       short_month: "%b"
       short_weekday: "%a"
       short_with_weekday: "%a, %-d %b"
@@ -1135,7 +1146,7 @@ pt:
 pt-BR:
   date:
     abbr_month_names:
-    -
+    - 
     - jan
     - fev
     - mar
@@ -1151,13 +1162,13 @@ pt-BR:
     formats:
       date_at_time: "%-d %b em %k:%M"
       default: "%d/%m/%Y"
-      full: " %-d %b, %Y %-k:%M"
-      full_with_weekday: "%a %-d %b , %Y %-k:%M"
+      full: "%-d de %b de %Y %k:%M"
+      full_with_weekday: "%a %-d de %b de %Y %k:%M"
       long: "%-d %B %Y"
       long_with_weekday: "%A, %-d %B"
-      medium: "%-d %b %Y"
+      medium: "%-d de %b de %Y"
       medium_month: "%b %Y"
-      medium_with_weekday: "%a %-d %b %Y"
+      medium_with_weekday: "%a %-d de %b de %Y"
       short: "%-d %b"
       short_month: "%b"
       short_weekday: "%a"
@@ -1174,7 +1185,7 @@ ru:
   bigeasy_locale: ru_RU
   date:
     abbr_month_names:
-    -
+    - 
     - Янв
     - Фев
     - Мар
@@ -1190,13 +1201,13 @@ ru:
     formats:
       date_at_time: "%-d %b в %k:%M"
       default: "%d.%m.%Y"
-      full: "%b %-d, %Y %-k:%M"
-      full_with_weekday: "%a %b %-d, %Y %-k:%M"
+      full: "%-d %b %Y r. %k:%M"
+      full_with_weekday: "%a %-d %b %Y r. %k:%M"
       long: "%-d %B %Y"
       long_with_weekday: "%A, %-d %B"
-      medium: "%-d %b %Y"
+      medium: "%-d %b %Y r."
       medium_month: "%b %Y"
-      medium_with_weekday: "%a %-d %b %Y"
+      medium_with_weekday: "%a %-d %b %Y r."
       short: "%-d %b"
       short_month: "%b"
       short_weekday: "%a"
@@ -1214,7 +1225,7 @@ sv:
   bigeasy_locale: sv_SE
   date:
     abbr_month_names:
-    -
+    - 
     - jan
     - feb
     - mar
@@ -1230,14 +1241,14 @@ sv:
     formats:
       date_at_time: "%b %-d at %k:%M"
       default: "%Y-%m-%d"
-      full: "%Y %b %-d, %-k:%M"
-      full_with_weekday: "%a %Y %b %-d, %-k:%M"
+      full: "%-d %b %Y %k.%M"
+      full_with_weekday: "%a den %-d %b %Y %k.%M"
       long: "%Y %B %-d,"
       long_with_weekday: "%A, %B %-d"
-      medium: "%Y %b %-d,"
+      medium: "%-d %b %Y"
       medium_month: "%Y %b"
-      medium_with_weekday: "%a %Y %b %-d,"
-      short: "%b %-d"
+      medium_with_weekday: "%a den %-d %b %Y"
+      short: "%-d %b"
       short_month: "%b"
       short_weekday: "%a"
       short_with_weekday: "%a, %b %-d"
@@ -1248,13 +1259,13 @@ sv:
   time:
     event: "%{date} kl %{time}"
     formats:
-      tiny: "%k:%M"
+      tiny: "%k.%M"
       tiny_on_the_hour: "%k:%M"
 sv-x-k12:
   bigeasy_locale: sv_SE
   date:
     abbr_month_names:
-    -
+    - 
     - jan
     - feb
     - mar
@@ -1268,16 +1279,16 @@ sv-x-k12:
     - nov
     - dec
     formats:
-      date_at_time: "%b % -d vid %l:%M%P"
+      date_at_time: "%b % -d vid  %k.%M"
       default: "%Y-%m-%d"
-      full: "%Y %b %-d, %-k:%M"
-      full_with_weekday: "%a %Y %b %-d, %-k:%M"
+      full: "%-d %b %Y %k.%M"
+      full_with_weekday: "%a den %-d %b %Y %k.%M"
       long: "%B %-d, %Y"
       long_with_weekday: "%A,  %B %-d"
-      medium: "%b %-d, %Y"
+      medium: "%-d %b %Y"
       medium_month: "%b %Y"
-      medium_with_weekday: "%a %b %-d, %Y"
-      short: "%b %-d,"
+      medium_with_weekday: "%a den %-d %b %Y"
+      short: "%-d %b"
       short_month: "%b"
       short_weekday: "%a"
       short_with_weekday: "%a,  %b %-d"
@@ -1290,14 +1301,14 @@ sv-x-k12:
   time:
     event: "%{date} kl %{time}"
     formats:
-      tiny: "%l:%M%P"
-      tiny_on_the_hour: "%l%P"
+      tiny: "%k.%M"
+      tiny_on_the_hour: "%k.%M"
 tr:
   bigeasy_locale: tr_TR
   crowdsourced: true
   date:
     abbr_month_names:
-    -
+    - 
     - Oca
     - Şub
     - Mar
@@ -1313,14 +1324,14 @@ tr:
     formats:
       date_at_time: "%b %-d at %l:%M%P"
       default: "%Y-%m-%d"
-      full: "%b %-d, %Y %-k:%M"
-      full_with_weekday: "%a %b %-d, %Y %-k:%M"
+      full: "%-d %b %Y %k:%M"
+      full_with_weekday: "%-d %b %Y %a %k:%M"
       long: "%B %-d, %Y"
       long_with_weekday: "%A, %B %-d"
-      medium: "%b %-d, %Y"
+      medium: "%-d %b %Y"
       medium_month: "%b %Y"
-      medium_with_weekday: "%a %b %-d, %Y"
-      short: "%b %-d"
+      medium_with_weekday: "%-d %b %Y %a"
+      short: "%-d %b"
       short_month: "%b"
       short_weekday: "%a"
       short_with_weekday: "%a, %b %-d"
@@ -1331,31 +1342,31 @@ tr:
   time:
     event: "%{date} %{time}"
     formats:
-      tiny: "%l:%M%P"
+      tiny: "%k:%M"
       tiny_on_the_hour: "%l%P"
 uk:
   bigeasy_locale: uk_UA
   crowdsourced: true
   date:
     abbr_month_names:
-      - ~
-      - Jan
-      - Feb
-      - Mar
-      - Apr
-      - May
-      - Jun
-      - Jul
-      - Aug
-      - Sep
-      - Oct
-      - Nov
-      - Dec
+    - 
+    - січ
+    - лют
+    - бер
+    - квіт
+    - трав
+    - черв
+    - лип
+    - серп
+    - вер
+    - жовт
+    - лист
+    - груд
     formats:
-      date_at_time: "%b %-d at %l:%M%P"
+      date_at_time: "%b %-d at %k:%M"
       default: "%Y-%m-%d"
-      full: "%b %-d, %Y %-l:%M%P"
-      full_with_weekday: "%a %b %-d, %Y %-l:%M%P"
+      full: "%b %-d, %Y %k:%M"
+      full_with_weekday: "%a %b %-d, %Y %k:%M"
       long: "%B %-d, %Y"
       long_with_weekday: "%A, %B %-d"
       medium: "%b %-d, %Y"
@@ -1372,14 +1383,14 @@ uk:
   time:
     event: "%{date} о %{time}"
     formats:
-      tiny: "%l:%M%P"
-      tiny_on_the_hour: "%l%P"
+      tiny: "%k:%M"
+      tiny_on_the_hour: "%k:%M"
 zh-Hans:
   aliases: zh-CN
   bigeasy_locale: zh_CN
   date:
     abbr_month_names:
-    -
+    - 
     - 1月
     - 2月
     - 3月
@@ -1395,14 +1406,14 @@ zh-Hans:
     formats:
       date_at_time: "%b %-d 于 %H:%M"
       default: "%Y-%m-%d"
-      full: "%Y %b %-d %-k:%M"
-      full_with_weekday: "%Y %a %b %-d %-k:%M"
+      full: "%Y年%b%-d日 %k:%M"
+      full_with_weekday: "%a %Y年%b%-d日 %k:%M"
       long: "%Y %B %-d"
       long_with_weekday: "%A, %B %-d"
-      medium: "%Y %b %-d"
+      medium: "%Y年%b%-d日"
       medium_month: "%Y %b"
-      medium_with_weekday: "%a %Y %b %-d"
-      short: "%b %-d"
+      medium_with_weekday: "%a %Y年%b%-d日"
+      short: "%b%-d日"
       short_month: "%b"
       short_weekday: "%a"
       short_with_weekday: "%a, %b %-d"
@@ -1415,14 +1426,14 @@ zh-Hans:
   time:
     event: "%{date} %{time}"
     formats:
-      tiny: "%H:%M"
+      tiny: "%k:%M"
       tiny_on_the_hour: "%k:%M"
 zh-Hant:
   aliases: zh-TW
   bigeasy_locale: zh_HK
   date:
     abbr_month_names:
-    -
+    - 
     - 1月
     - 2月
     - 3月
@@ -1438,14 +1449,14 @@ zh-Hant:
     formats:
       date_at_time: "%b %-d at %k:%M"
       default: "%Y-%m-%d"
-      full: "%b %-d, %Y %-k:%M"
-      full_with_weekday: "%a %b %-d, %Y %-k:%M"
+      full: "%Y年%b%-d日 %k:%M"
+      full_with_weekday: "%a %Y年%b%-d日 %k:%M"
       long: "%Y %B %-d"
       long_with_weekday: "%A, %B %-d"
-      medium: "%Y %b %-d"
+      medium: "%Y年%b%-d日"
       medium_month: "%Y %b"
-      medium_with_weekday: "%a %Y %b %-d"
-      short: "%b %-d"
+      medium_with_weekday: "%a %Y年%b%-d日"
+      short: "%b%-d日"
       short_month: "%b"
       short_weekday: "%a"
       short_with_weekday: "%a, %b %-d"

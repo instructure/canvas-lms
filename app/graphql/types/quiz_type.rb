@@ -21,7 +21,7 @@ module Types
   class QuizType < ApplicationObjectType
     graphql_name "Quiz"
 
-    implements GraphQL::Relay::Node.interface
+    implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
 
     global_id_field :id

@@ -19,7 +19,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {mount} from 'enzyme'
-import TestUtils from 'react-addons-test-utils'
 import ReactModal from 'react-modal'
 import FilePreview from 'jsx/files/FilePreview'
 import Folder from 'compiled/models/Folder'

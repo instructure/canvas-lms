@@ -16,11 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jsx/quizzes/question_bank/addBank'
-], (addBank) => {
-  QUnit.module("addBank")
-  test("is a function", () => {
-    ok(typeof addBank === 'function')
-  });
-});
+import addBank from 'jsx/quizzes/question_bank/addBank'
+
+QUnit.module('addBank')
+test('is a function', () => {
+  ok(typeof addBank === 'function')
+})

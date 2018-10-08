@@ -17,11 +17,24 @@
  */
 
 import React from 'react'
-import Modal from './modal'
-import ModalContent from './modal-content'
-import I18n from 'i18n!react_files'
+import {shape, string, arrayOf} from 'prop-types'
+import Modal, {ModalBody} from '../shared/components/InstuiModal'
+import I18n from 'i18n!keyboardShortcutModal'
 
-class KeyboardShortcutModal extends React.Component {
+export default class KeyboardShortcutModal extends React.Component {
+  static propTypes = {
+    shortcuts: arrayOf(
+      shape({
+        keycode: string.isRequired,
+        description: string.isRequired
+      })
+    )
+  }
+
+  static defaultProps = {
+    shortcuts: []
+  }
+
   state = {
     isOpen: false
   }
@@ -47,45 +60,35 @@ class KeyboardShortcutModal extends React.Component {
     }
   }
 
-  shortcuts = () => {
-    if (this.props.shortcuts) {
-      return this.props.shortcuts.map(shortcut => (
-        <li key={shortcut.keycode}>
-          <span className="keycode">{shortcut.keycode}</span>
-          <span className="colon">:</span>
-          <span className="description">{shortcut.description}</span>
-        </li>
-      ))
-    }
-  }
-
   render() {
-    const {title, className, styles, ...other} = this.props
     return (
       <Modal
-        isOpen={this.state.isOpen}
-        title={I18n.t('Keyboard Shortcuts')}
-        className="ReactModal__Content--canvas ReactModal__Content--mini-modal"
-        overlayClassName="ReactModal__Overlay--canvas"
-        onRequestClose={this.closeModal}
-        {...other}
+        open={this.state.isOpen}
+        label={I18n.t('Keyboard Shortcuts')}
+        onDismiss={this.closeModal}
       >
-        <ModalContent>
+        <ModalBody>
           <div className="keyboard_navigation">
             <span className="screenreader-only">
               {I18n.t(
                 'Users of screen readers may need to turn off the virtual cursor in order to use these keyboard shortcuts'
               )}
             </span>
-            <ul className="navigation_list">{this.shortcuts()}</ul>
+            <ul className="navigation_list">
+              {this.props.shortcuts.map(shortcut => (
+                <li key={shortcut.keycode}>
+                  <span className="keycode">{shortcut.keycode}</span>
+                  <span className="colon">:</span>
+                  <span className="description">{shortcut.description}</span>
+                </li>
+              ))}
+            </ul>
             <span className="screenreader-only">
               {I18n.t('Press the esc key to close this modal')}
             </span>
           </div>
-        </ModalContent>
+        </ModalBody>
       </Modal>
     )
   }
 }
-
-export default KeyboardShortcutModal

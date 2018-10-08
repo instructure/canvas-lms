@@ -22,6 +22,7 @@ describe Submissions::AnonymousDownloadsController do
   describe 'GET :show' do
     before do
       course_with_student_and_submitted_homework
+      @course.account.enable_service(:avatars)
       @context = @course
       user_session(@student)
     end
@@ -103,6 +104,7 @@ describe Submissions::AnonymousDownloadsController do
         @original_context = @context
         @original_student = @student
         course_with_student(active_all:true)
+        @course.account.enable_service(:avatars)
         submission_comment_model
         @attachment = attachment_model(context: @assignment)
         @submission_comment.attachments = [@attachment]
@@ -132,6 +134,7 @@ describe Submissions::AnonymousDownloadsController do
     it "should redirect download requests with the download_frd parameter" do
       # This is because the files controller looks for download_frd to indicate a forced download
       course_with_teacher_logged_in
+      @course.account.enable_service(:avatars)
       assignment = assignment_model(course: @course)
       student_in_course
       att = attachment_model(:uploaded_data => stub_file_data('test.txt', 'asdf', 'text/plain'), :context => @student)

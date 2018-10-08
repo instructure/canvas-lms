@@ -272,7 +272,10 @@ class GroupCategoriesController < ApplicationController
         if (sis_id = params[:sis_group_category_id])
           if @group_category.root_account.grants_right?(@current_user, :manage_sis)
             @group_category.sis_source_id = sis_id
-            @group_category.save!
+
+            DueDateCacher.with_executing_user(@current_user) do
+              @group_category.save!
+            end
           else
             return render json: { message: "You must have manage_sis permission to set sis attributes" }, status: :unauthorized
           end
@@ -491,7 +494,7 @@ class GroupCategoriesController < ApplicationController
 
     if value_to_boolean(params[:sync])
       # do the distribution and note the changes
-      memberships = @group_category.assign_unassigned_members(by_section)
+      memberships = @group_category.assign_unassigned_members(by_section, updating_user: @current_user)
 
       # render the changes
       json = memberships.group_by{ |m| m.group_id }.map do |group_id, new_members|
@@ -499,7 +502,7 @@ class GroupCategoriesController < ApplicationController
       end
       render :json => json
     else
-      @group_category.assign_unassigned_members_in_background(by_section)
+      @group_category.assign_unassigned_members_in_background(by_section, updating_user: @current_user)
       render :json => progress_json(@group_category.current_progress, @current_user, session)
     end
   end
@@ -507,9 +510,12 @@ class GroupCategoriesController < ApplicationController
   def populate_group_category_from_params
     args = api_request? ? params : (params[:category] || {})
     @group_category = GroupCategories::ParamsPolicy.new(@group_category, @context).populate_with(args)
-    unless @group_category.save
-      render :json => @group_category.errors, :status => :bad_request
-      return false
+
+    DueDateCacher.with_executing_user(@current_user) do
+      unless @group_category.save
+        render :json => @group_category.errors, :status => :bad_request
+        return false
+      end
     end
     true
   end
@@ -521,8 +527,10 @@ class GroupCategoriesController < ApplicationController
         new_group_category = group_category.dup
         new_group_category.name = params[:name]
         begin
-          new_group_category.save!
-          group_category.clone_groups_and_memberships(new_group_category)
+          DueDateCacher.with_executing_user(@current_user) do
+            new_group_category.save!
+            group_category.clone_groups_and_memberships(new_group_category)
+          end
           render :json => new_group_category
         rescue ActiveRecord::RecordInvalid
           render :json => new_group_category.errors, :status => :bad_request

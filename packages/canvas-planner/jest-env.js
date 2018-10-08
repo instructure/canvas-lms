@@ -21,6 +21,14 @@ import generateId from 'format-message-generate-id/underscored_crc32';
 import formatMessage from './src/format-message';
 import translations from './src/i18n/indexLocales';
 
+import Enzyme from 'enzyme';
+import Adapter from 'enzyme-adapter-react-16';
+
+Enzyme.configure({
+  disableLifecycleMethods: true,
+  adapter: new Adapter()
+});
+
 formatMessage.setup({
   generateId,
   translations,

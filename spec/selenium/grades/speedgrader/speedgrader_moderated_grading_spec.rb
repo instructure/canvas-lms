@@ -72,9 +72,9 @@ describe "speed grader" do
       time = 5.minutes.from_now
       Timecop.freeze(time) do
         replace_content f('#grading-box-extended'), "8", tab_out: false
-        wait_for_ajaximations
         f('.gradebookHeader--rightside').click
       end
+      wait_for_ajaximations
       provisional_grade = @submission.provisional_grades.find_by!(scorer: @user)
       expect(provisional_grade.grade).to eq '8'
 
@@ -150,7 +150,8 @@ describe "speed grader" do
       @assignment.grade_student(@student, grader: other_ta, provisional: true, score: 7)
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-      expect(driver.current_url).to_not match %r{/courses/#{@course.id}/gradebook/speed_grader}
+      expect(f('#grading-box-extended')).not_to be_displayed
+      expect(f('#not_gradeable_message')).to be_displayed
     end
 
     it "should lock a provisional grader out if graded by someone else while switching students" do
