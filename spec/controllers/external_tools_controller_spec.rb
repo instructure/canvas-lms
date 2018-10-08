@@ -1609,11 +1609,10 @@ describe ExternalToolsController do
 
   end
 
-  describe '#create_tool_from_tool_config' do
-    subject {  post :create_tool_from_tool_config, params: params }
-
+  describe 'lti 1.3' do
     let_once(:account) { Account.default }
     let_once(:sub_account) { account_model(root_account: account) }
+    let_once(:course) { course_model account: sub_account }
     let_once(:admin) { account_admin_user(account: account) }
     let_once(:student) do
       student_in_course
@@ -1667,86 +1666,156 @@ describe ExternalToolsController do
     end
     let(:dev_key_id) { developer_key.id }
 
-    let(:params) { { account_id: sub_account.id, developer_key_id: dev_key_id } }
-
     before do
       user_session(admin)
       tool_configuration
     end
 
-    context 'when the user has manage_developer_keys' do
-      it { is_expected.to be_success }
-    end
-
-    context 'when the user is not an admin' do
-      before { user_session(student) }
-
-      it { is_expected.to be_unauthorized }
-    end
-
-    context 'when the developer key does not exist' do
-      before { developer_key.destroy! }
-
-      it { is_expected.to be_not_found }
-    end
-
-    context 'when the tool configuration does not exist' do
-      let(:tool_configuration) { nil }
-
-      it { is_expected.to be_not_found }
-    end
-
-    shared_examples_for 'reuses an exisiting ContextExternalTool' do
-      let(:tool_context) { raise 'Override in spec' }
-      let(:cet) do
-        cet = tool_configuration.new_external_tool(tool_context)
-        cet.save!
-        cet
+    shared_examples_for 'basic devkey behavior' do
+      context 'when the user is an admin' do
+        it { is_expected.to have_http_status :success }
       end
 
-      before do
-        cet
-        subject
+      context 'when the user is not an admin' do
+        before { user_session(student) }
+
+        it { is_expected.to be_unauthorized }
       end
 
-      it 'returns the existing tool' do
-        expect(json_parse['id']).to eq cet.id
+      context 'when the developer key does not exist' do
+        before { developer_key.destroy! }
+
+        it { is_expected.to be_not_found }
       end
     end
 
-    shared_examples_for 'a context that can create a tool' do
-      let(:context) { raise 'Override in spec' }
+    describe '#create_tool_from_tool_config' do
+      subject {  post :create_tool_from_tool_config, params: params }
 
-      it 'creates a ContextExternalTool' do
-        expect { subject }.to change { ContextExternalTool.count }.by(1)
-        expect(ContextExternalTool.first.context_id).to eq context.id
+      shared_examples_for 'tool configuration does not exist' do
+        let(:tool_configuration) { nil }
+
+        it { is_expected.to be_not_found }
       end
 
-      it_behaves_like 'reuses an exisiting ContextExternalTool' do
-        let(:tool_context) { context }
+      shared_examples_for 'reuses an exisiting ContextExternalTool' do
+        let(:tool_context) { raise 'Override in spec' }
+        let(:cet) do
+          cet = tool_configuration.new_external_tool(tool_context)
+          cet.save!
+          cet
+        end
+
+        before do
+          cet
+          subject
+        end
+
+        it 'returns the existing tool' do
+          expect(json_parse['id']).to eq cet.id
+        end
       end
-    end
 
-    context 'when an account' do
-      it_behaves_like 'a context that can create a tool' do
-        let(:context) { sub_account }
+      shared_examples_for 'a context that can create a tool' do
+        let(:create_tool_context) { raise 'Override in spec' }
+
+        it 'creates a ContextExternalTool' do
+          expect { subject }.to change { ContextExternalTool.count }.by(1)
+          expect(ContextExternalTool.first.context_id).to eq create_tool_context.id
+        end
+
+        it_behaves_like 'reuses an exisiting ContextExternalTool' do
+          let(:tool_context) { create_tool_context }
+        end
       end
-    end
 
-    context 'when a course' do
-      let_once(:course) { course_model account: sub_account }
+      context 'when an account' do
+        let(:params) { { account_id: sub_account.id, developer_key_id: dev_key_id } }
 
-      it_behaves_like 'a context that can create a tool' do
+        it_behaves_like 'basic devkey behavior'
+
+        it_behaves_like 'tool configuration does not exist'
+
+        it_behaves_like 'a context that can create a tool' do
+          let(:create_tool_context) { sub_account }
+        end
+      end
+
+      context 'when a course' do
         let(:params) { { course_id: course.id, developer_key_id: dev_key_id } }
-        let(:context) { course }
+
+        it_behaves_like 'basic devkey behavior'
+
+        it_behaves_like 'tool configuration does not exist'
+
+        it_behaves_like 'a context that can create a tool' do
+          let(:create_tool_context) { course }
+        end
+
+        it_behaves_like 'reuses an exisiting ContextExternalTool' do
+          let(:tool_context) { sub_account }
+        end
+
+        it_behaves_like 'reuses an exisiting ContextExternalTool' do
+          let(:tool_context) { account }
+        end
+      end
+    end
+
+    context '#delete_tool_from_tool_config' do
+      subject {  delete :delete_tool_from_tool_config, params: params, format: 'json' }
+
+      let(:cet) do
+        tool = tool_configuration.new_external_tool(create_tool_context)
+        tool.save!
+        tool
       end
 
-      it_behaves_like 'reuses an exisiting ContextExternalTool' do
-        let(:tool_context) { sub_account }
+      shared_examples_for 'deletes a tool from dev key' do
+        context 'with existing cet' do
+          before do
+            cet
+          end
+
+          it_behaves_like 'basic devkey behavior'
+
+          it 'removes a ContextExternalTool' do
+            expect { subject }.to change { ContextExternalTool.active.count }.by(-1)
+          end
+
+          context 'on double deletion' do
+            before do
+              delete :delete_tool_from_tool_config, params: params
+            end
+
+            it { is_expected.to have_http_status :not_found }
+          end
+        end
+
+        context 'with no cet' do
+          it { is_expected.to have_http_status :not_found }
+        end
       end
 
-      it_behaves_like 'reuses an exisiting ContextExternalTool' do
-        let(:tool_context) { account }
+      context 'when an account' do
+        let(:create_tool_context) { account }
+        let(:params) { { account_id: account.id, developer_key_id: dev_key_id } }
+
+        it_behaves_like 'deletes a tool from dev key'
+      end
+
+      context 'when a subaccount' do
+        let(:create_tool_context) { sub_account }
+        let(:params) { { account_id: sub_account.id, developer_key_id: dev_key_id } }
+
+        it_behaves_like 'deletes a tool from dev key'
+      end
+
+      context 'when a course' do
+        let(:create_tool_context) { course }
+        let(:params) { { course_id: course.id, developer_key_id: dev_key_id } }
+
+        it_behaves_like 'deletes a tool from dev key'
       end
     end
   end

@@ -24,11 +24,11 @@ import ExternalAppsStore from '../../external_apps/lib/ExternalAppsStore'
 import parseLinkHeader from 'compiled/fn/parseLinkHeader'
 import 'compiled/jquery.rails_flash_notifications'
 
-  var PER_PAGE = 250;
+  const PER_PAGE = 250;
 
-  var sort = function(apps) {
+  const sort = function(apps) {
     if (apps) {
-      return _.sortBy(apps, function (app) {
+      return _.sortBy(apps, (app) => {
         if (app.name) {
           return app.name.toUpperCase();
         } else {
@@ -52,17 +52,17 @@ import 'compiled/jquery.rails_flash_notifications'
     hasMore: false       // flag to indicate if there are more pages of external tools
   }
 
-  var store = createStore(defaultState);
+  const store = createStore(defaultState);
 
   store.reset = function() {
     this.setState(defaultState)
   };
 
   store.fetch = function () {
-    var url = this.getState().links.next || '/api/v1' + ENV.CONTEXT_BASE_URL + '/app_center/apps?per_page=' + PER_PAGE;
+    const url = this.getState().links.next || `/api/v1${ENV.CONTEXT_BASE_URL}/app_center/apps?per_page=${PER_PAGE}`;
     this.setState({ isLoading: true });
     $.ajax({
-      url: url,
+      url,
       type: 'GET',
       success: this._fetchSuccessHandler.bind(this),
       error: this._fetchErrorHandler.bind(this)
@@ -104,28 +104,19 @@ import 'compiled/jquery.rails_flash_notifications'
   };
 
   store.findAppByShortName = function (shortName) {
-    return _.find(this.getState().apps, function (app) {
-      return app.short_name === shortName;
-    });
+    return _.find(this.getState().apps, (app) => app.short_name === shortName);
   };
 
   store.flagAppAsInstalled = function (shortName) {
-    _.find(this.getState().apps, function (app) {
-      if (app.short_name == shortName) {
+    _.find(this.getState().apps, (app) => {
+      if (app.short_name === shortName) {
         app.is_installed = true;
       }
     });
   };
 
   store.installTool = function (developerKeyId) {
-    const toggleValue = (value) => {
-      const oldTools = this.getState().lti13Tools
-      const installedToolIndex = oldTools.findIndex((tool) => tool.app_id === developerKeyId)
-      const tool = Object.assign({}, oldTools[installedToolIndex], {installed_locally: value, enabled: value})
-      const lti13Tools = oldTools.slice()
-      lti13Tools.splice(installedToolIndex, 1, tool)
-      this.setState({lti13Tools})
-    }
+    const toggleValue = store._toggle_lti_1_3_tool_enabled(developerKeyId).bind(this)
     toggleValue(true)
     const url = `/api/v1${ENV.CONTEXT_BASE_URL}/developer_keys/${developerKeyId}/create_tool`;
     $.ajax({
@@ -139,20 +130,31 @@ import 'compiled/jquery.rails_flash_notifications'
     });
   }
 
-  store.removeTool = function () {
-    console.log('i tried to did something')
+  store.removeTool = function (developerKeyId) {
+    const toggleValue = store._toggle_lti_1_3_tool_enabled(developerKeyId).bind(this)
+    toggleValue(false)
+    const url = `/api/v1${ENV.CONTEXT_BASE_URL}/developer_keys/${developerKeyId}/delete_tool`;
+    $.ajax({
+      url,
+      type: 'DELETE',
+      success: () => {},
+      error: () => {
+        $.flashError('Failed to remove tool.')
+        toggleValue(true)
+      }
+    });
   }
 
-  //*** CALLBACK HANDLERS ***/
+  // *** CALLBACK HANDLERS ***/
 
   store._fetchSuccessHandler = function (apps, status, xhr) {
-    var links = parseLinkHeader(xhr);
+    const links = parseLinkHeader(xhr);
     if (links.current !== links.first) {
       tools = this.getState().apps.concat(apps);
     }
 
     this.setState({
-      links: links,
+      links,
       isLoading: false,
       isLoaded: true,
       apps: sort(apps),
@@ -185,5 +187,16 @@ import 'compiled/jquery.rails_flash_notifications'
       lti13LoadStatus: 'error'
     });
   };
+
+  store._toggle_lti_1_3_tool_enabled = function(developerKeyId) {
+    return (value) => {
+      const oldTools = this.getState().lti13Tools
+      const installedToolIndex = oldTools.findIndex((tool) => tool.app_id === developerKeyId)
+      const tool = Object.assign({}, oldTools[installedToolIndex], {installed_locally: value, enabled: value})
+      const lti13Tools = oldTools.slice()
+      lti13Tools.splice(installedToolIndex, 1, tool)
+      this.setState({lti13Tools})
+    }
+  }
 
 export default store

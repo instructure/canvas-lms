@@ -184,3 +184,18 @@ test('installTool', function() {
   ok(store.getState().lti13Tools.find(tool => tool.app_id === '1').enabled)
   ok(store.getState().lti13Tools.find(tool => tool.app_id === '1').installed_locally)
 })
+
+test('removeTool', function() {
+  store._toggle_lti_1_3_tool_enabled('1')(true)
+  ok(store.getState().lti13Tools.find(tool => tool.app_id === '1').enabled)
+  ok(store.getState().lti13Tools.find(tool => tool.app_id === '1').installed_locally)
+  this.server.respondWith('DELETE',  /\/delete_tool/, [
+    200,
+    {'Content-Type': 'application/json'},
+    JSON.stringify(this.lti13Tools)
+  ])
+  store.removeTool('1')
+  this.server.respond()
+  notOk(store.getState().lti13Tools.find(tool => tool.app_id === '1').enabled)
+  notOk(store.getState().lti13Tools.find(tool => tool.app_id === '1').installed_locally)
+})
