@@ -7,8 +7,8 @@ module LtiAdvantage::Claims
     include ActiveModel::Model
 
     attr_accessor :context_memberships_url,
-                  :service_version
+                  :service_versions
 
-    validates_presence_of :context_memberships_url, :service_version
+    validates_presence_of :context_memberships_url, :service_versions
   end
 end

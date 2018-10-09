@@ -248,6 +248,16 @@ describe Lti::Messages::JwtMessage do
       end
     end
 
+    shared_examples 'names and roles claim check' do
+      it 'sets the NRPS url' do
+        expect(message_names_and_roles_service['context_memberships_url']).to eq 'polymorphic_url'
+      end
+
+      it 'sets the NRPS version' do
+        expect(message_names_and_roles_service['service_versions']).to eq ['2.0']
+      end
+    end
+
     describe 'names and roles' do
       let(:message_names_and_roles_service) { decoded_jwt['https://purl.imsglobal.org/spec/lti-nrps/claim/namesroleservice'] }
 
@@ -285,12 +295,8 @@ describe Lti::Messages::JwtMessage do
         course.root_account.save!
       end
 
-      it 'sets the NRPS url' do
-        expect(message_names_and_roles_service['context_memberships_url']).to eq 'polymorphic_url'
-      end
-
-      it 'sets the NRPS version' do
-        expect(message_names_and_roles_service['service_version']).to eq '2.0'
+      context 'when context is a course' do
+        it_behaves_like 'names and roles claim check'
       end
 
       context 'when context is an account' do
@@ -330,13 +336,7 @@ describe Lti::Messages::JwtMessage do
           )
         end
 
-        it 'sets the NRPS url' do
-          expect(message_names_and_roles_service['context_memberships_url']).to eq 'polymorphic_url'
-        end
-
-        it 'sets the NRPS version' do
-          expect(message_names_and_roles_service['service_version']).to eq '2.0'
-        end
+        it_behaves_like 'names and roles claim check'
       end
     end
   end

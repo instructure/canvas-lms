@@ -137,7 +137,7 @@ module Lti::Messages
     def add_names_and_roles_service_claims!
       @message.names_and_roles_service.context_memberships_url =
         @expander.controller.polymorphic_url([@context, :names_and_roles])
-      @message.names_and_roles_service.service_version = '2.0'
+      @message.names_and_roles_service.service_versions = ['2.0']
     end
 
     def expand_variable(variable)
