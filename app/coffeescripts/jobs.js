@@ -1,390 +1,583 @@
-#
-# Copyright (C) 2011 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// Copyright (C) 2011 - present Instructure, Inc.
+//
+// This file is part of Canvas.
+//
+// Canvas is free software: you can redistribute it and/or modify it under
+// the terms of the GNU Affero General Public License as published by the Free
+// Software Foundation, version 3 of the License.
+//
+// Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+// details.
+//
+// You should have received a copy of the GNU Affero General Public License along
+// with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'i18n!jobs'
-  'jquery'
-  'vendor/slickgrid'
-  'jquery.ajaxJSON'
-  'jqueryui/dialog'
-], (I18n, $, Slick) ->
-  ###
-  xsslint safeString.identifier klass d out_of runtime_string
-  ###
+import I18n from 'i18n!jobs'
 
-  fillin_job_data = (job) ->
-    $('#show-job .show-field').each (idx, field) =>
-      field_name = field.id.replace("job-", '')
-      $(field).text(job[field_name] || '')
-    $('#job-id-link').attr('href', "/jobs?flavor=id&q=#{job.id}")
+import $ from 'jquery'
+import Slick from 'vendor/slickgrid'
+import 'jquery.ajaxJSON'
+import 'jqueryui/dialog'
+/*
+xsslint safeString.identifier klass d out_of runtime_string
+*/
 
-  selected_job = null
+function fillin_job_data(job) {
+  $('#show-job .show-field').each((idx, field) => {
+    const field_name = field.id.replace('job-', '')
+    $(field).text(job[field_name] || '')
+  })
+  $('#job-id-link').attr('href', `/jobs?flavor=id&q=${job.id}`)
+}
 
-  class FlavorGrid
-    constructor: (@options, @type_name, @grid_name) ->
-      @data = []
-      @$element = $(@grid_name)
-      setTimeout @refresh, 0
-      @setTimer() if @options.refresh_rate
-      @query = ''
+let selected_job = null
 
-    setTimer: () =>
-      setTimeout (=> @refresh(@setTimer)), @options.refresh_rate
+class FlavorGrid {
+  constructor(options, type_name, grid_name) {
+    this.setTimer = this.setTimer.bind(this)
+    this.saveSelection = this.saveSelection.bind(this)
+    this.restoreSelection = this.restoreSelection.bind(this)
+    this.refresh = this.refresh.bind(this)
+    this.change_flavor = this.change_flavor.bind(this)
+    this.options = options
+    this.type_name = type_name
+    this.grid_name = grid_name
+    this.data = []
+    this.$element = $(this.grid_name)
+    setTimeout(this.refresh, 0)
+    if (this.options.refresh_rate) {
+      this.setTimer()
+    }
+    this.query = ''
+  }
 
-    saveSelection: =>
-      if @type_name == 'running'
-        @oldSelected = {}
-        for row in @grid.getSelectedRows()
-          @oldSelected[@data[row]['id']] = true
+  setTimer() {
+    return setTimeout(() => this.refresh(this.setTimer), this.options.refresh_rate)
+  }
 
-    restoreSelection: =>
-      if @type_name == 'running'
-        index = 0
-        newSelected = []
-        for item in @data
-          newSelected.push index if @oldSelected[item['id']]
-          index += 1
-        @restoringSelection = true
-        @grid.setSelectedRows(newSelected)
-        @restoringSelection = false
+  saveSelection() {
+    if (this.type_name === 'running') {
+      this.oldSelected = {}
+      return this.grid.getSelectedRows().map(row => (this.oldSelected[this.data[row].id] = true))
+    }
+  }
 
-    refresh: (cb) =>
-      @$element.queue () =>
-        $.ajaxJSON @options.url, "GET", { flavor: @options.flavor, q: @query }, (data) =>
-          @saveSelection()
-          @data.length = 0
-          @loading = {}
-          @data.push item for item in data[@type_name]
-          if data.total && data.total > @data.length
-            @data.push({}) for i in [@data.length ... data.total]
+  restoreSelection() {
+    if (this.type_name === 'running') {
+      let index = 0
+      const newSelected = []
+      for (const item of this.data) {
+        if (this.oldSelected[item.id]) {
+          newSelected.push(index)
+        }
+        index += 1
+      }
+      this.restoringSelection = true
+      this.grid.setSelectedRows(newSelected)
+      return (this.restoringSelection = false)
+    }
+  }
 
-          if (@sortData)
-            @sort(null, @sortData)
-          else
-            @grid.invalidate()
-            @restoreSelection()
+  refresh(cb) {
+    return this.$element.queue(() =>
+      $.ajaxJSON(this.options.url, 'GET', {flavor: this.options.flavor, q: this.query}, data => {
+        this.saveSelection()
+        this.data.length = 0
+        this.loading = {}
+        for (const item of data[this.type_name]) {
+          this.data.push(item)
+        }
+        if (data.total && data.total > this.data.length) {
+          for (
+            let i = this.data.length, end = data.total, asc = this.data.length <= end;
+            asc ? i < end : i > end;
+            asc ? i++ : i--
+          ) {
+            this.data.push({})
+          }
+        }
 
-          cb?()
-          @updated?()
-          @$element.dequeue()
+        if (this.sortData) {
+          this.sort(null, this.sortData)
+        } else {
+          this.grid.invalidate()
+          this.restoreSelection()
+        }
 
-    change_flavor: (flavor) =>
-      @options.flavor = flavor
-      @grid.setSelectedRows []
-      @refresh()
+        if (typeof cb === 'function') {
+          cb()
+        }
+        if (typeof this.updated === 'function') {
+          this.updated()
+        }
+        return this.$element.dequeue()
+      })
+    )
+  }
 
-    grid_options: () ->
-      { rowHeight: 20 }
+  change_flavor(flavor) {
+    this.options.flavor = flavor
+    this.grid.setSelectedRows([])
+    return this.refresh()
+  }
 
-    init: () ->
-      @columns = @build_columns()
-      @loading = {}
-      @grid = new Slick.Grid(@grid_name, @data, @columns, @grid_options())
-      this
+  grid_options() {
+    return {rowHeight: 20}
+  }
 
-  class window.Jobs extends FlavorGrid
-    constructor: (options, type_name = 'jobs', grid_name = '#jobs-grid') ->
-      Jobs.max_attempts = options.max_attempts if options.max_attempts
-      super(options, type_name, grid_name)
-      if options.starting_query
-        @query = options.starting_query
-      @show_search($('#jobs-flavor').val())
+  init() {
+    this.columns = this.build_columns()
+    this.loading = {}
+    this.grid = new Slick.Grid(this.grid_name, this.data, this.columns, this.grid_options())
+    return this
+  }
+}
 
-    search: (query) ->
-      @query = query
-      @refresh()
+window.Jobs = class Jobs extends FlavorGrid {
+  constructor(options, type_name = 'jobs', grid_name = '#jobs-grid') {
+    {
+      // Hack: trick Babel/TypeScript into allowing this before super.
+      if (false) {
+        super()
+      }
+      const thisFn = (() => this).toString()
+      const thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim()
+      eval(`${thisName} = this;`)
+    }
+    this.show_search = this.show_search.bind(this)
+    this.change_flavor = this.change_flavor.bind(this)
+    this.attempts_formatter = this.attempts_formatter.bind(this)
+    this.load = this.load.bind(this)
+    this.id_formatter = this.id_formatter.bind(this)
+    if (options.max_attempts) {
+      Jobs.max_attempts = options.max_attempts
+    }
+    super(options, type_name, grid_name)
+    if (options.starting_query) {
+      this.query = options.starting_query
+    }
+    this.show_search($('#jobs-flavor').val())
+  }
 
-    show_search: (flavor) =>
-      switch flavor
-        when "id", "strand", "tag"
-          $('#jobs-search').show()
-          $('#jobs-search').attr('placeholder', flavor)
-        else
-          $('#jobs-search').hide()
+  search(query) {
+    this.query = query
+    return this.refresh()
+  }
 
-    change_flavor: (flavor) =>
-      @show_search(flavor)
-      super(flavor)
+  show_search(flavor) {
+    switch (flavor) {
+      case 'id':
+      case 'strand':
+      case 'tag':
+        $('#jobs-search').show()
+        $('#jobs-search').attr('placeholder', flavor)
+      default:
+        $('#jobs-search').hide()
+    }
+  }
 
-    attempts_formatter: (r,c,d) =>
-      return '' unless @data[r].id
-      max = (@data[r].max_attempts || Jobs.max_attempts)
-      if d == 0
-        klass = ''
-      else if d < max
-        klass = 'has-failed-attempts'
-      else if d == @options.on_hold_attempt_count
-        klass = 'on-hold'
-        d = 'hold'
-      else
-        klass = 'has-failed-max-attempts'
-      out_of = if d == 'hold' then '' else "/ #{max}"
-      "<span class='#{klass}'>#{d}#{out_of}</span>"
+  change_flavor(flavor) {
+    this.show_search(flavor)
+    return super.change_flavor(flavor)
+  }
 
-    load: (row) =>
-      @$element.queue () =>
-        row = row - (row % @options.limit)
-        if @loading[row]
-          @$element.dequeue()
-          return
-        @loading[row] = true
-        $.ajaxJSON @options.url, "GET", { flavor: @options.flavor, q: @query, offset: row }, (data) =>
-          @data[row ... row + data[@type_name].length] = data[@type_name]
-          @grid.invalidate()
-          @$element.dequeue()
+  attempts_formatter(r, c, d) {
+    let klass
+    if (!this.data[r].id) {
+      return ''
+    }
+    const max = this.data[r].max_attempts || Jobs.max_attempts
+    if (d === 0) {
+      klass = ''
+    } else if (d < max) {
+      klass = 'has-failed-attempts'
+    } else if (d === this.options.on_hold_attempt_count) {
+      klass = 'on-hold'
+      d = 'hold'
+    } else {
+      klass = 'has-failed-max-attempts'
+    }
+    const out_of = d === 'hold' ? '' : `/ ${max}`
+    return `<span class='${klass}'>${d}${out_of}</span>`
+  }
 
-    id_formatter: (r,c,d) =>
-      if @data[r].id
-        @data[r].id
-      else
-        @load(r)
-        "<span class='unloaded-id'>-</span>"
-
-    build_columns: () ->
-      [
-        id: 'id'
-        name: I18n.t('columns.id', 'id')
-        field: 'id'
-        width: 100
-        formatter: @id_formatter
-      ,
-        id: 'tag'
-        name: I18n.t('columns.tag', 'tag')
-        field: 'tag'
-        width: 200
-      ,
-        id: 'attempts'
-        name: I18n.t('columns.attempt', 'attempt')
-        field: 'attempts'
-        width: 65
-        formatter: @attempts_formatter
-      ,
-        id: 'priority'
-        name: I18n.t('columns.priority', 'priority')
-        field: 'priority'
-        width: 60
-      ,
-        id: 'strand'
-        name: I18n.t('columns.strand', 'strand')
-        field: 'strand'
-        width: 100
-      ,
-        id: 'run_at'
-        name: I18n.t('columns.run_at', 'run at')
-        field: 'run_at'
-        width: 165
-      ]
-
-    init: () ->
-      super()
-      @grid.setSelectionModel(new Slick.RowSelectionModel())
-      @grid.onSelectedRowsChanged.subscribe =>
-        return if @restoringSelection
-        rows = @grid.getSelectedRows()
-        row = if rows?.length == 1 then rows[0] else -1
-        selected_job = @data[rows[0]] || {}
-        fillin_job_data(selected_job)
-      this
-
-    selectAll: () ->
-      @grid.setSelectedRows([0...@data.length])
-      @grid.onSelectedRowsChanged.notify()
-
-    onSelected: (action) ->
-      params =
-        flavor: @options.flavor
-        q: @query
-        update_action: action
-
-      if @grid.getSelectedRows().length < 1
-        alert('No jobs are selected')
+  load(row) {
+    return this.$element.queue(() => {
+      row -= row % this.options.limit
+      if (this.loading[row]) {
+        this.$element.dequeue()
         return
+      }
+      this.loading[row] = true
+      return $.ajaxJSON(
+        this.options.url,
+        'GET',
+        {flavor: this.options.flavor, q: this.query, offset: row},
+        data => {
+          this.data.splice(
+            row,
+            row + data[this.type_name].length - row,
+            ...[].concat(data[this.type_name])
+          )
+          this.grid.invalidate()
+          return this.$element.dequeue()
+        }
+      )
+    })
+  }
 
-      all_jobs = @grid.getSelectedRows().length > 1 && @grid.getSelectedRows().length == @data.length
+  id_formatter(r, c, d) {
+    if (this.data[r].id) {
+      return this.data[r].id
+    } else {
+      this.load(r)
+      return "<span class='unloaded-id'>-</span>"
+    }
+  }
 
-      if all_jobs
-        message = switch action
-          when 'hold' then I18n.t 'confirm.hold_all', "Are you sure you want to hold *all* jobs of this type and matching this query?"
-          when 'unhold' then I18n.t 'confirm.unhold_all', "Are you sure you want to unhold *all* jobs of this type and matching this query?"
-          when 'destroy' then I18n.t 'confirm.destroy_all', "Are you sure you want to destroy *all* jobs of this type and matching this query?"
-        return unless confirm(message)
+  build_columns() {
+    return [
+      {
+        id: 'id',
+        name: I18n.t('columns.id', 'id'),
+        field: 'id',
+        width: 100,
+        formatter: this.id_formatter
+      },
+      {
+        id: 'tag',
+        name: I18n.t('columns.tag', 'tag'),
+        field: 'tag',
+        width: 200
+      },
+      {
+        id: 'attempts',
+        name: I18n.t('columns.attempt', 'attempt'),
+        field: 'attempts',
+        width: 65,
+        formatter: this.attempts_formatter
+      },
+      {
+        id: 'priority',
+        name: I18n.t('columns.priority', 'priority'),
+        field: 'priority',
+        width: 60
+      },
+      {
+        id: 'strand',
+        name: I18n.t('columns.strand', 'strand'),
+        field: 'strand',
+        width: 100
+      },
+      {
+        id: 'run_at',
+        name: I18n.t('columns.run_at', 'run at'),
+        field: 'run_at',
+        width: 165
+      }
+    ]
+  }
 
-      # special case -- if they've selected all, then don't send the ids so that
-      # we can operate on jobs that match the query but haven't even been loaded
-      # yet
-      unless all_jobs
-        params.job_ids = (@data[row].id for row in @grid.getSelectedRows())
+  init() {
+    super.init()
+    this.grid.setSelectionModel(new Slick.RowSelectionModel())
+    this.grid.onSelectedRowsChanged.subscribe(() => {
+      if (this.restoringSelection) return
+      const rows = this.grid.getSelectedRows()
+      const row = (rows != null ? rows.length : undefined) === 1 ? rows[0] : -1
+      selected_job = this.data[rows[0]] || {}
+      return fillin_job_data(selected_job)
+    })
+    return this
+  }
 
-      $.ajaxJSON @options.batch_update_url, "POST", params, @refresh
-      @grid.setSelectedRows []
+  selectAll() {
+    this.grid.setSelectedRows(__range__(0, this.data.length, false))
+    return this.grid.onSelectedRowsChanged.notify()
+  }
 
-    updated: () ->
-      $('#jobs-total').text @data.length
-      if @data.length == 1 && @type_name == 'jobs'
-        @grid.setSelectedRows [0]
-        @grid.onSelectedRowsChanged.notify()
+  onSelected(action) {
+    const params = {
+      flavor: this.options.flavor,
+      q: this.query,
+      update_action: action
+    }
 
-    getFullJobDetails: (cb) ->
-      if !selected_job || selected_job.handler
-        cb()
-      else
-        $.ajaxJSON "#{@options.job_url}/#{selected_job.id}", "GET", {flavor: @options.flavor}, (data) =>
+    if (this.grid.getSelectedRows().length < 1) {
+      alert('No jobs are selected')
+      return
+    }
+
+    const all_jobs =
+      this.grid.getSelectedRows().length > 1 &&
+      this.grid.getSelectedRows().length === this.data.length
+
+    if (all_jobs) {
+      const message = (() => {
+        switch (action) {
+          case 'hold':
+            return I18n.t(
+              'confirm.hold_all',
+              'Are you sure you want to hold *all* jobs of this type and matching this query?'
+            )
+          case 'unhold':
+            return I18n.t(
+              'confirm.unhold_all',
+              'Are you sure you want to unhold *all* jobs of this type and matching this query?'
+            )
+          case 'destroy':
+            return I18n.t(
+              'confirm.destroy_all',
+              'Are you sure you want to destroy *all* jobs of this type and matching this query?'
+            )
+        }
+      })()
+      if (!confirm(message)) return
+    }
+
+    // special case -- if they've selected all, then don't send the ids so that
+    // we can operate on jobs that match the query but haven't even been loaded
+    // yet
+    if (!all_jobs) {
+      params.job_ids = this.grid.getSelectedRows().map(row => this.data[row].id)
+    }
+
+    $.ajaxJSON(this.options.batch_update_url, 'POST', params, this.refresh)
+    return this.grid.setSelectedRows([])
+  }
+
+  updated() {
+    $('#jobs-total').text(this.data.length)
+    if (this.data.length === 1 && this.type_name === 'jobs') {
+      this.grid.setSelectedRows([0])
+      return this.grid.onSelectedRowsChanged.notify()
+    }
+  }
+
+  getFullJobDetails(cb) {
+    if (!selected_job || selected_job.handler) {
+      return cb()
+    } else {
+      return $.ajaxJSON(
+        `${this.options.job_url}/${selected_job.id}`,
+        'GET',
+        {flavor: this.options.flavor},
+        data => {
           selected_job.handler = data.handler
           selected_job.last_error = data.last_error
           fillin_job_data(selected_job)
-          cb()
-
-  class Workers extends Jobs
-    constructor: (options) ->
-      super(options, 'running', '#running-grid')
-
-    runtime_formatter: (r,c,d) =>
-      runtime = (new Date() - Date.parse(d)) / 1000
-      if runtime >= @options.super_slow_threshold
-        klass = 'super-slow'
-      else if runtime > @options.slow_threshold
-        klass = 'slow'
-      else
-        klass = ''
-      format = 'HH:mm:ss'
-      format = 'd\\dHH:mm:ss' if runtime > 86400
-      runtime_string = new Date(null, null, null, null, null, runtime).toString(format)
-      runtime_string = 'FOREVA' if runtime > 86400 * 28
-      "<span class='#{klass}'>#{runtime_string}</span>"
-
-    build_columns: () ->
-      cols = [
-        id: 'worker'
-        name: I18n.t('columns.worker', 'worker')
-        field: 'locked_by'
-        width: 90
-      ].concat(super())
-      cols.pop()
-      cols.push(
-        id: 'runtime',
-        name: I18n.t('columns.runtime', 'runtime')
-        field: 'locked_at'
-        width: 85
-        formatter: @runtime_formatter
+          return cb()
+        }
       )
-      for col in cols
-        col.sortable = true
-      cols
+    }
+  }
+}
 
-    updated: () ->
-
-    init: () ->
-      super()
-      @sort = (event, data) =>
-        @sortData = data
-        @saveSelection() if event
-        field = data.sortCol.field
-
-        @data.sort (a, b) =>
-          aField = a[field] || ''
-          bField = b[field] || ''
-          if aField > bField
-            result = 1
-          else if aField < bField
-            result = -1
-          else
-            result = 0
-
-          result = -result unless data.sortAsc
-          result = -result if field == 'locked_at'
-          result
-
-        @grid.invalidate()
-        @restoreSelection()
-      @grid.onSort.subscribe(@sort)
-      @grid.setSortColumn('runtime', false)
-      @sortData = {
-        sortCol:
-          field: 'locked_at'
-        sortAsc: false
+class Workers extends Jobs {
+  constructor(options) {
+    {
+      // Hack: trick Babel/TypeScript into allowing this before super.
+      if (false) {
+        super()
       }
+      const thisFn = (() => this).toString()
+      const thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim()
+      eval(`${thisName} = this;`)
+    }
+    this.runtime_formatter = this.runtime_formatter.bind(this)
+    super(options, 'running', '#running-grid')
+  }
 
-  class Tags extends FlavorGrid
-    constructor: (options) ->
-      super(options, 'tags', '#tags-grid')
+  runtime_formatter(r, c, d) {
+    let klass
+    const runtime = (new Date() - Date.parse(d)) / 1000
+    if (runtime >= this.options.super_slow_threshold) {
+      klass = 'super-slow'
+    } else if (runtime > this.options.slow_threshold) {
+      klass = 'slow'
+    } else {
+      klass = ''
+    }
+    let format = 'HH:mm:ss'
+    if (runtime > 86400) {
+      format = 'd\\dHH:mm:ss'
+    }
+    let runtime_string = new Date(null, null, null, null, null, runtime).toString(format)
+    if (runtime > 86400 * 28) {
+      runtime_string = 'FOREVA'
+    }
+    return `<span class='${klass}'>${runtime_string}</span>`
+  }
 
-    build_columns: () ->
-      [
-        id: 'tag'
-        name: I18n.t('columns.tag', 'tag')
-        field: 'tag'
+  build_columns() {
+    const cols = [
+      {
+        id: 'worker',
+        name: I18n.t('columns.worker', 'worker'),
+        field: 'locked_by',
+        width: 90
+      }
+    ].concat(super.build_columns())
+    cols.pop()
+    cols.push({
+      id: 'runtime',
+      name: I18n.t('columns.runtime', 'runtime'),
+      field: 'locked_at',
+      width: 85,
+      formatter: this.runtime_formatter
+    })
+    for (const col of cols) {
+      col.sortable = true
+    }
+    return cols
+  }
+
+  updated() {}
+
+  init() {
+    super.init()
+    this.sort = (event, data) => {
+      this.sortData = data
+      if (event) {
+        this.saveSelection()
+      }
+      const {field} = data.sortCol
+
+      this.data.sort((a, b) => {
+        let result
+        const aField = a[field] || ''
+        const bField = b[field] || ''
+        if (aField > bField) {
+          result = 1
+        } else if (aField < bField) {
+          result = -1
+        } else {
+          result = 0
+        }
+
+        if (!data.sortAsc) {
+          result = -result
+        }
+        if (field === 'locked_at') {
+          result = -result
+        }
+        return result
+      })
+
+      this.grid.invalidate()
+      return this.restoreSelection()
+    }
+    this.grid.onSort.subscribe(this.sort)
+    this.grid.setSortColumn('runtime', false)
+    return (this.sortData = {
+      sortCol: {
+        field: 'locked_at'
+      },
+      sortAsc: false
+    })
+  }
+}
+
+class Tags extends FlavorGrid {
+  constructor(options) {
+    super(options, 'tags', '#tags-grid')
+  }
+
+  build_columns() {
+    return [
+      {
+        id: 'tag',
+        name: I18n.t('columns.tag', 'tag'),
+        field: 'tag',
         width: 200
-      ,
-        id: 'count'
-        name: I18n.t('columns.count', 'count')
-        field: 'count'
+      },
+      {
+        id: 'count',
+        name: I18n.t('columns.count', 'count'),
+        field: 'count',
         width: 50
-      ]
+      }
+    ]
+  }
 
-    grid_options: () ->
-      $.extend(super(), { enableCellNavigation: false })
+  grid_options() {
+    return $.extend(super.grid_options(), {enableCellNavigation: false})
+  }
 
-    init: () ->
-      super()
-      @grid.setSelectionModel(new Slick.RowSelectionModel())
-      this
+  init() {
+    super.init()
+    this.grid.setSelectionModel(new Slick.RowSelectionModel())
+    return this
+  }
+}
 
-  $.extend(window,
-    Jobs: Jobs
-    Workers: Workers
-    Tags: Tags
-  )
+$.extend(window, {
+  Jobs,
+  Workers,
+  Tags
+})
 
-  $(document).ready () ->
-    $('#tags-flavor').change () ->
-      window.tags.change_flavor($(this).val())
-    $('#jobs-flavor').change () ->
-      window.jobs.change_flavor($(this).val())
+$(document).ready(() => {
+  $('#tags-flavor').change(function() {
+    return window.tags.change_flavor($(this).val())
+  })
+  $('#jobs-flavor').change(function() {
+    return window.jobs.change_flavor($(this).val())
+  })
 
-    $('#jobs-refresh').click () ->
-      window.jobs.refresh()
+  $('#jobs-refresh').click(() => window.jobs.refresh())
 
-    search_event = if $('#jobs-search')[0].onsearch == undefined then 'change' else 'search'
-    $('#jobs-search').bind search_event, () ->
-      window.jobs.search $(this).val()
+  const search_event = $('#jobs-search')[0].onsearch === undefined ? 'change' : 'search'
+  $('#jobs-search').bind(search_event, function() {
+    return window.jobs.search($(this).val())
+  })
 
-    $('#select-all-jobs').click () -> window.jobs.selectAll()
+  $('#select-all-jobs').click(() => window.jobs.selectAll())
 
-    $('#hold-jobs').click () -> window.jobs.onSelected('hold')
-    $('#un-hold-jobs').click () -> window.jobs.onSelected('unhold')
-    $('#delete-jobs').click () -> window.jobs.onSelected('destroy')
+  $('#hold-jobs').click(() => window.jobs.onSelected('hold'))
+  $('#un-hold-jobs').click(() => window.jobs.onSelected('unhold'))
+  $('#delete-jobs').click(() => window.jobs.onSelected('destroy'))
 
-    $('#job-handler-show').click () ->
-      window.jobs.getFullJobDetails () ->
-        $('#job-handler-wrapper').clone().dialog
-          title: I18n.t('titles.job_handler', 'Job Handler')
-          width: 900
-          height: 700
+  $('#job-handler-show').click(() => {
+    window.jobs.getFullJobDetails(() =>
+      $('#job-handler-wrapper')
+        .clone()
+        .dialog({
+          title: I18n.t('titles.job_handler', 'Job Handler'),
+          width: 900,
+          height: 700,
           modal: true
-      false
+        })
+    )
+    return false
+  })
 
-    $('#job-last_error-show').click () ->
-      window.jobs.getFullJobDetails () ->
-        $('#job-last_error-wrapper').clone().dialog
-          title: I18n.t('titles.last_error', 'Last Error')
-          width: 900
-          height: 700
+  $('#job-last_error-show').click(() => {
+    window.jobs.getFullJobDetails(() =>
+      $('#job-last_error-wrapper')
+        .clone()
+        .dialog({
+          title: I18n.t('titles.last_error', 'Last Error'),
+          width: 900,
+          height: 700,
           modal: true
-      false
+        })
+    )
+    return false
+  })
+})
 
-  { Jobs, Workers, Tags }
+export default {Jobs, Workers, Tags}
 
+function __range__(left, right, inclusive) {
+  const range = []
+  const ascending = left < right
+  const end = !inclusive ? right : ascending ? right + 1 : right - 1
+  for (let i = left; ascending ? i < end : i > end; ascending ? i++ : i--) {
+    range.push(i)
+  }
+  return range
+}

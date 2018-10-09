@@ -1,378 +1,591 @@
-#
-# Copyright (C) 2012 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
-#
+//
+// Copyright (C) 2012 - present Instructure, Inc.
+//
+// This file is part of Canvas.
+//
+// Canvas is free software: you can redistribute it and/or modify it under
+// the terms of the GNU Affero General Public License as published by the Free
+// Software Foundation, version 3 of the License.
+//
+// Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+// details.
+//
+// You should have received a copy of the GNU Affero General Public License along
+// with this program. If not, see <http://www.gnu.org/licenses/>.
+//
 
-define [
-  'jquery'
-  'underscore'
-  '../widget/TokenSelectorList'
-  '../collections/RecipientCollection'
-  'jquery.instructure_misc_helpers'
-  '../jquery/scrollIntoView'
-], ($, _, TokenSelectorList, RecipientCollection) ->
+import $ from 'jquery'
+import _ from 'underscore'
+import TokenSelectorList from '../widget/TokenSelectorList'
+import RecipientCollection from '../collections/RecipientCollection'
+import 'jquery.instructure_misc_helpers'
+import '../jquery/scrollIntoView'
 
-  class
+export default class TokenSelector {
+  static initClass() {
+    this.prototype.lastFetch = null
+  }
 
-    constructor: (@input, @url, @options={}) ->
-      @stack = []
-      @cache = {}
-      @$container = $('<div />').addClass('autocomplete_menu')
-      @$menu = $('<div />')
-      @$container.append($('<div />').append(@$menu))
-      @$container.css('top', 0).css('left', 0)
-      @mode = 'input'
-      $('body').append(@$container)
+  constructor(input, url, options) {
+    this.autoSelectFirst = this.autoSelectFirst.bind(this)
+    this.mouseMove = this.mouseMove.bind(this)
+    this.mouseDown = this.mouseDown.bind(this)
+    this.click = this.click.bind(this)
+    this.close = this.close.bind(this)
+    this.select = this.select.bind(this)
+    this.input = input
+    this.url = url
+    if (options == null) {
+      options = {}
+    }
+    this.options = options
+    this.stack = []
+    this.cache = {}
+    this.$container = $('<div />').addClass('autocomplete_menu')
+    this.$menu = $('<div />')
+    this.$container.append($('<div />').append(this.$menu))
+    this.$container.css('top', 0).css('left', 0)
+    this.mode = 'input'
+    $('body').append(this.$container)
 
-      @reposition = =>
-        offset = @input.bottomOffset()
-        @$container.css('top', offset.top)
-        @$container.css('left', offset.left)
-      $(window).resize @reposition
-      @close()
+    this.reposition = () => {
+      const offset = this.input.bottomOffset()
+      this.$container.css('top', offset.top)
+      return this.$container.css('left', offset.left)
+    }
+    $(window).resize(this.reposition)
+    this.close()
+  }
 
-    autoSelectFirst: (list=@list) =>
-      if list is @list and not @selection?
-        @select(list.first(), true)
+  autoSelectFirst(list) {
+    if (list == null) {
+      ;({list} = this)
+    }
+    if (list === this.list && this.selection == null) {
+      return this.select(list.first(), true)
+    }
+  }
 
-    browse: (data) ->
-      return if @uiLocked
-      # prevent pending searches
-      @clear()
-      @close()
-      @open()
-      @list = @listForQuery(@preparePost(data))
-      @list.appendTo(@$menu)
-      @autoSelectFirst()
-      true
+  browse(data) {
+    if (this.uiLocked) return
+    // prevent pending searches
+    this.clear()
+    this.close()
+    this.open()
+    this.list = this.listForQuery(this.preparePost(data))
+    this.list.appendTo(this.$menu)
+    this.autoSelectFirst()
+    return true
+  }
 
-    mouseMove: (e) =>
-      return if @uiLocked
-      $li = $(e.target).closest('li')
-      $li = null unless $li.hasClass('selectable')
-      @select($li)
+  mouseMove(e) {
+    if (this.uiLocked) return
+    let $li = $(e.target).closest('li')
+    if (!$li.hasClass('selectable')) {
+      $li = null
+    }
+    return this.select($li)
+  }
 
-    mouseDown: (e) =>
-      # sooper hacky... prevent the menu closing on scrollbar drag
-      setTimeout =>
-        @input.focus()
-      , 0
+  mouseDown(e) {
+    // sooper hacky... prevent the menu closing on scrollbar drag
+    return setTimeout(() => this.input.focus(), 0)
+  }
 
-    click: (e) =>
-      return if @uiLocked
-      @mouseMove(e)
-      if @selection
-        if $(e.target).closest('a.expand').length
-          if @selectionExpanded()
-            @collapse()
-          else
-            @expandSelection()
-        else if @selectionToggleable() and $(e.target).closest('a.toggle').length
-          @toggleSelection()
-        else
-          if @selectionExpanded()
-            @collapse()
-          else if @selectionExpandable()
-            @expandSelection()
-          else
-            @toggleSelection(on)
-            @clear()
-            @close()
-      @input.focus()
+  click(e) {
+    if (this.uiLocked) return
+    this.mouseMove(e)
+    if (this.selection) {
+      if ($(e.target).closest('a.expand').length) {
+        if (this.selectionExpanded()) {
+          this.collapse()
+        } else {
+          this.expandSelection()
+        }
+      } else if (this.selectionToggleable() && $(e.target).closest('a.toggle').length) {
+        this.toggleSelection()
+      } else {
+        if (this.selectionExpanded()) {
+          this.collapse()
+        } else if (this.selectionExpandable()) {
+          this.expandSelection()
+        } else {
+          this.toggleSelection(true)
+          this.clear()
+          this.close()
+        }
+      }
+    }
+    return this.input.focus()
+  }
 
-    captureKeyDown: (e) ->
-      keyCode = e.originalEvent?.keyIdentifier ? e.which
+  captureKeyDown(e) {
+    const keyCode =
+      (e.originalEvent != null ? e.originalEvent.keyIdentifier : undefined) != null
+        ? e.originalEvent != null
+          ? e.originalEvent.keyIdentifier
+          : undefined
+        : e.which
 
-      return true if @uiLocked
-      if @$menu.find('.no-results').length > 0 and _.include([13, 'Enter'], keyCode)
-        return e.preventDefault()
+    if (this.uiLocked) {
+      return true
+    }
+    if (this.$menu.find('.no-results').length > 0 && _.include([13, 'Enter'], keyCode)) {
+      return e.preventDefault()
+    }
 
-      switch keyCode
-        when 'Backspace', 'U+0008', 8
-          if @input.val() is ''
-            if @listExpanded()
-              @collapse()
-            else if @$menu.is(":visible")
-              @close()
-            else
-              @input.removeLastToken()
-            return true
-        when 'Tab', 'U+0009', 9
-          if @selection and (@selectionToggleable() or not @selectionExpandable())
-            @toggleSelection(on)
-          @clear()
-          @close()
-          return true if @selection
-        when 'Enter', 13
-          if @selectionExpanded()
-            @collapse()
-            return true
-          else if @selectionExpandable() and not @selectionToggleable()
-            @expandSelection()
-            return true
-          else if @selection
-            @toggleSelection(on)
-            @clear()
-          @close()
+    switch (keyCode) {
+      case 'Backspace':
+      case 'U+0008':
+      case 8:
+        if (this.input.val() === '') {
+          if (this.listExpanded()) {
+            this.collapse()
+          } else if (this.$menu.is(':visible')) {
+            this.close()
+          } else {
+            this.input.removeLastToken()
+          }
           return true
-        when 'Shift', 16 # noop, but we don't want to set the mode to input
+        }
+        break
+      case 'Tab':
+      case 'U+0009':
+      case 9:
+        if (this.selection && (this.selectionToggleable() || !this.selectionExpandable())) {
+          this.toggleSelection(true)
+        }
+        this.clear()
+        this.close()
+        if (this.selection) {
+          return true
+        }
+        break
+      case 'Enter':
+      case 13:
+        if (this.selectionExpanded()) {
+          this.collapse()
+          return true
+        } else if (this.selectionExpandable() && !this.selectionToggleable()) {
+          this.expandSelection()
+          return true
+        } else if (this.selection) {
+          this.toggleSelection(true)
+          this.clear()
+        }
+        this.close()
+        return true
+        break
+      case 'Shift':
+      case 16: // noop, but we don't want to set the mode to input
+        return false
+        break
+      case 'Esc':
+      case 'U+001B':
+      case 27:
+        if (this.$menu.is(':visible')) {
+          this.close()
+          return true
+        } else {
           return false
-        when 'Esc', 'U+001B', 27
-          if @$menu.is(":visible")
-            @close()
-            return true
-          else
-            return false
-        when 'U+0020', 32 # space
-          if @selectionToggleable() and @mode is 'menu'
-            @toggleSelection()
-            return true
-        when 'Left', 37
-          if @listExpanded() and @input.caret() is 0
-            if @selectionExpanded() or @input.val() is ''
-              @collapse()
-            else
-              @select(@list.first())
-            return true
-        when 'Up', 38
-          @selectPrev()
+        }
+        break
+      case 'U+0020':
+      case 32: // space
+        if (this.selectionToggleable() && this.mode === 'menu') {
+          this.toggleSelection()
           return true
-        when 'Right', 39
-          return true if @input.caret() is @input.val().length and @expandSelection()
-        when 'Down', 40
-          @selectNext()
+        }
+        break
+      case 'Left':
+      case 37:
+        if (this.listExpanded() && this.input.caret() === 0) {
+          if (this.selectionExpanded() || this.input.val() === '') {
+            this.collapse()
+          } else {
+            this.select(this.list.first())
+          }
           return true
-        when 'U+002B', 187, 107 # plus
-          if @selectionToggleable() and @mode is 'menu'
-            @toggleSelection(on)
-            return true
-        when 'U+002D', 189, 109 # minus
-          if @selectionToggleable() and @mode is 'menu'
-            @toggleSelection(off)
-            return true
-      @mode = 'input'
-      @updateSearch()
-      false
+        }
+        break
+      case 'Up':
+      case 38:
+        this.selectPrev()
+        return true
+        break
+      case 'Right':
+      case 39:
+        if (this.input.caret() === this.input.val().length && this.expandSelection()) {
+          return true
+        }
+        break
+      case 'Down':
+      case 40:
+        this.selectNext()
+        return true
+        break
+      case 'U+002B':
+      case 187:
+      case 107: // plus
+        if (this.selectionToggleable() && this.mode === 'menu') {
+          this.toggleSelection(true)
+          return true
+        }
+        break
+      case 'U+002D':
+      case 189:
+      case 109: // minus
+        if (this.selectionToggleable() && this.mode === 'menu') {
+          this.toggleSelection(false)
+          return true
+        }
+        break
+    }
+    this.mode = 'input'
+    this.updateSearch()
+    return false
+  }
 
-    open: ->
-      @$container.show()
-      @reposition()
+  open() {
+    this.$container.show()
+    return this.reposition()
+  }
 
-    close: =>
-      @uiLocked = false
-      @$container.hide()
-      @list?.remove()
-      for [$selection, list], i in @stack
-        list.remove()
-      @list = null
-      @stack = []
-      @$menu.css('left', 0)
-      @select(null)
-      @input.selectorClosed()
+  close() {
+    let list
+    this.uiLocked = false
+    this.$container.hide()
+    if (this.list != null) {
+      this.list.remove()
+    }
+    for (let i = 0; i < this.stack.length; i++) {
+      let $selection
+      ;[$selection, list] = this.stack[i]
+      list.remove()
+    }
+    this.list = null
+    this.stack = []
+    this.$menu.css('left', 0)
+    this.select(null)
+    return this.input.selectorClosed()
+  }
 
-    clear: ->
-      clearTimeout @timeout
-      @input.val('')
-      @select(null)
+  clear() {
+    clearTimeout(this.timeout)
+    this.input.val('')
+    return this.select(null)
+  }
 
-    blur: ->
-      # It seems we can't check focus while it is being changed, so check it later.
-      setTimeout =>
-        unless @input.hasFocus() || @$container.find(':focus').length > 0
-          @close()
-      , 0
+  blur() {
+    // It seems we can't check focus while it is being changed, so check it later.
+    return setTimeout(() => {
+      if (!this.input.hasFocus() && !(this.$container.find(':focus').length > 0)) {
+        return this.close()
+      }
+    }, 0)
+  }
 
-    listExpanded: ->
-      if @stack.length then true else false
+  listExpanded() {
+    if (this.stack.length) {
+      return true
+    } else {
+      return false
+    }
+  }
 
-    parent: ->
-      if @listExpanded() then @stack[@stack.length - 1][0] else null
+  parent() {
+    if (this.listExpanded()) {
+      return this.stack[this.stack.length - 1][0]
+    } else {
+      return null
+    }
+  }
 
-    selectionExpanded: ->
-      @selection?.hasClass('expanded') ? false
+  selectionExpanded() {
+    let left
+    return (left = this.selection != null ? this.selection.hasClass('expanded') : undefined) != null
+      ? left
+      : false
+  }
 
-    selectionExpandable: ->
-      @selection?.hasClass('expandable') ? false
+  selectionExpandable() {
+    let left
+    return (left = this.selection != null ? this.selection.hasClass('expandable') : undefined) !=
+      null
+      ? left
+      : false
+  }
 
-    selectionToggleable: ($node=@selection) ->
-      ($node?.hasClass('toggleable') ? false) and not @selectionExpanded()
+  selectionToggleable($node) {
+    let left
+    if ($node == null) {
+      $node = this.selection
+    }
+    return (
+      ((left = $node != null ? $node.hasClass('toggleable') : undefined) != null ? left : false) &&
+      !this.selectionExpanded()
+    )
+  }
 
-    expandSelection: ->
-      return false unless @selectionExpandable() and not @selectionExpanded()
-      @stack.push [@selection, @list]
-      @clear()
-      @$menu.css('width', ((@stack.length + 1) * 100) + '%')
+  expandSelection() {
+    if (!this.selectionExpandable() || !!this.selectionExpanded()) {
+      return false
+    }
+    this.stack.push([this.selection, this.list])
+    this.clear()
+    this.$menu.css('width', (this.stack.length + 1) * 100 + '%')
 
-      @uiLocked = true
-      list = @listForQuery(@preparePost())
-      list.insertAfter(@list)
-      @$menu.animate {left: '-=' + @$menu.parent().css('width')}, 'fast', =>
-        @list.hide =>
-          @list = list
-          @autoSelectFirst()
-          @uiLocked = false
+    this.uiLocked = true
+    const list = this.listForQuery(this.preparePost())
+    list.insertAfter(this.list)
+    return this.$menu.animate({left: `-=${this.$menu.parent().css('width')}`}, 'fast', () => {
+      return this.list.hide(() => {
+        this.list = list
+        this.autoSelectFirst()
+        return (this.uiLocked = false)
+      })
+    })
+  }
 
-    collapse: ->
-      return false unless @listExpanded()
-      [$selection, list] = @stack.pop()
-      @uiLocked = true
-      list.restore()
-      @$menu.animate {left: '+=' + @$menu.parent().css('width')}, 'fast', =>
-        @list.remove()
-        @list = list
-        @input.val(@list.query.search)
-        @select $selection
-        @uiLocked = false
+  collapse() {
+    if (!this.listExpanded()) {
+      return false
+    }
+    const [$selection, list] = Array.from(this.stack.pop())
+    this.uiLocked = true
+    list.restore()
+    return this.$menu.animate({left: `+=${this.$menu.parent().css('width')}`}, 'fast', () => {
+      this.list.remove()
+      this.list = list
+      this.input.val(this.list.query.search)
+      this.select($selection)
+      return (this.uiLocked = false)
+    })
+  }
 
-    toggleSelection: (state, $node=@selection, toggleOnly=false) ->
-      return false unless state? or @selectionToggleable($node)
-      id = $node.data('id')
-      state = !$node.hasClass('on') unless state?
-      if state
-        $node.addClass('on') if @selectionToggleable($node) and not toggleOnly
-        @input.addToken
-          value: id
-          text: $node.data('text') ? $node.text()
-          noClear: true
-          data: $node.data('user_data')
-      else
-        $node.removeClass('on') unless toggleOnly
-        @input.removeToken value: id
-      @updateSelectAll($node) unless toggleOnly
+  toggleSelection(state, $node, toggleOnly) {
+    if ($node == null) {
+      $node = this.selection
+    }
+    if (toggleOnly == null) {
+      toggleOnly = false
+    }
+    if (state == null && !this.selectionToggleable($node)) {
+      return false
+    }
+    const id = $node.data('id')
+    if (state == null) {
+      state = !$node.hasClass('on')
+    }
+    if (state) {
+      let left
+      if (this.selectionToggleable($node) && !toggleOnly) {
+        $node.addClass('on')
+      }
+      this.input.addToken({
+        value: id,
+        text: (left = $node.data('text')) != null ? left : $node.text(),
+        noClear: true,
+        data: $node.data('user_data')
+      })
+    } else {
+      if (!toggleOnly) {
+        $node.removeClass('on')
+      }
+      this.input.removeToken({value: id})
+    }
+    if (!toggleOnly) {
+      return this.updateSelectAll($node)
+    }
+  }
 
-    updateSelectAll: ($node, offset=0) ->
-      selectAllToggled = $node.data('user_data').selectAll
-      list = if offset then @stack[@stack.length - offset][1] else @list
-      return unless list.canSelectAll()
-      list.updateSelectAll selectAllToggled, (state, $node) =>
-        @toggleSelection state, $node, true
+  updateSelectAll($node, offset = 0) {
+    const selectAllToggled = $node.data('user_data').selectAll
+    const list = offset ? this.stack[this.stack.length - offset][1] : this.list
+    if (!list.canSelectAll()) {
+      return
+    }
+    list.updateSelectAll(selectAllToggled, (state, $node) => {
+      return this.toggleSelection(state, $node, true)
+    })
 
-      if offset < @stack.length
-        offset++
-        $parentNode = @stack[@stack.length - offset][0]
-        if @selectionToggleable($parentNode)
-          if list.selectAllActive()
-            $parentNode.addClass('on')
-          else
-            $parentNode.removeClass('on')
-          @updateSelectAll($parentNode, offset)
+    if (offset < this.stack.length) {
+      offset++
+      const $parentNode = this.stack[this.stack.length - offset][0]
+      if (this.selectionToggleable($parentNode)) {
+        if (list.selectAllActive()) {
+          $parentNode.addClass('on')
+        } else {
+          $parentNode.removeClass('on')
+        }
+        return this.updateSelectAll($parentNode, offset)
+      }
+    }
+  }
 
-    select: ($node, preserveMode = false) =>
-      return if $node?[0] is @selection?[0]
-      @selection = if $node?.length
+  select($node, preserveMode = false) {
+    if (
+      ($node != null ? $node[0] : undefined) ===
+      (this.selection != null ? this.selection[0] : undefined)
+    ) {
+      return
+    }
+    this.selection = (() => {
+      if ($node != null ? $node.length : undefined) {
         $node.focus()
-        $node.scrollIntoView(ignore: {border: on})
-        $node
-      else
-        null
-      @mode = (if $node then 'menu' else 'input') unless preserveMode
+        $node.scrollIntoView({ignore: {border: true}})
+        return $node
+      } else {
+        return null
+      }
+    })()
+    if (!preserveMode) {
+      return (this.mode = $node ? 'menu' : 'input')
+    }
+  }
 
-    selectNext: (preserveMode = false) ->
-      @select(if @selection
-        if @selection.next().length
-          @selection.next()
-        else if @selection.parent('ul').next().length
-          @selection.parent('ul').next().find('li').first()
-        else
-          null
-      else
-        @list?.first()
-      , preserveMode)
-      @selectNext(preserveMode) if @selection?.hasClass('message')
+  selectNext(preserveMode = false) {
+    this.select(
+      this.selection
+        ? this.selection.next().length
+          ? this.selection.next()
+          : this.selection.parent('ul').next().length
+            ? this.selection
+                .parent('ul')
+                .next()
+                .find('li')
+                .first()
+            : null
+        : this.list != null
+          ? this.list.first()
+          : undefined,
+      preserveMode
+    )
+    if (this.selection != null ? this.selection.hasClass('message') : undefined) {
+      return this.selectNext(preserveMode)
+    }
+  }
 
-    selectPrev: ->
-      @select(if @selection
-        if @selection?.prev().length
-          @selection.prev()
-        else if @selection.parent('ul').prev().length
-          @selection.parent('ul').prev().find('li').last()
-        else
-          null
-      else
-        @list?.last()
+  selectPrev() {
+    this.select(
+      this.selection
+        ? (this.selection != null
+          ? this.selection.prev().length
+          : undefined)
+          ? this.selection.prev()
+          : this.selection.parent('ul').prev().length
+            ? this.selection
+                .parent('ul')
+                .prev()
+                .find('li')
+                .last()
+            : null
+        : this.list != null
+          ? this.list.last()
+          : undefined
+    )
+    if (this.selection != null ? this.selection.hasClass('message') : undefined) {
+      return this.selectPrev()
+    }
+  }
+
+  updateSearch() {
+    // do it in a timeout both so (1) the triggering keystroke can make it
+    // into @input before we try and use it, and (2) a rapid sequence of keys
+    // only executes the block once at the end.
+    clearTimeout(this.timeout)
+    this.select(null)
+    return (this.timeout = setTimeout(() => {
+      if (this.lastFetch && !this.lastFetch.isResolved()) {
+        this.nextRequest = true
+        return
+      }
+      const list = this.listForQuery(this.preparePost())
+      if (list === this.list) {
+        // no change
+      } else if (list.query.search === '' && !this.listExpanded()) {
+        // changed to where we don't need the menu open anymore
+        if (this.$menu.is(':visible')) {
+          return this.close()
+        }
+      } else {
+        // activate a new list for the updated search
+        if (this.list) {
+          list.insertAfter(this.list)
+          this.list.remove()
+        } else {
+          this.open()
+          list.appendTo(this.$menu)
+        }
+        this.list = list
+        return this.autoSelectFirst()
+      }
+    }, 200))
+  }
+
+  preparePost(data) {
+    const postData = $.extend(
+      {},
+      this.options.baseData != null ? this.options.baseData : {},
+      data != null ? data : {},
+      {search: this.input.val().replace(/^\s+|\s+$/g, '')}
+    )
+    if (postData.exclude == null) {
+      postData.exclude = []
+    }
+    postData.exclude = postData.exclude.concat(this.input.baseExclude)
+    if (this.listExpanded()) {
+      postData.context = this.parent().data('id')
+    } else {
+      postData.exclude = postData.exclude.concat(this.input.tokenValues())
+    }
+    return postData
+  }
+  collectionForQuery(query) {
+    if (this.lastFetch != null) {
+      this.lastFetch.abort()
+    }
+    const cacheKey = JSON.stringify(query)
+    if (this.cache[cacheKey] == null) {
+      const collection = new RecipientCollection()
+      collection.url = this.url
+      this.lastFetch = collection.fetch({data: query})
+      this.cache[cacheKey] = collection
+    }
+    return this.cache[cacheKey]
+  }
+
+  listForQuery(query) {
+    const collection = this.collectionForQuery(query)
+    const list = new TokenSelectorList({
+      selector: this,
+      parent: this.parent(),
+      ancestors: Array.from(this.stack).map(ancestor => ancestor[0].data('id')),
+      collection,
+      query
+    })
+    list.render()
+
+    if (!collection.atLeastOnePageFetched) {
+      collection.on(
+        'fetch',
+        _.once(() => {
+          this.autoSelectFirst(list)
+          if (this.nextRequest) {
+            this.updateSearch()
+          }
+          return delete this.nextRequest
+        })
       )
-      @selectPrev() if @selection?.hasClass('message')
+    }
 
-    updateSearch: ->
-      # do it in a timeout both so (1) the triggering keystroke can make it
-      # into @input before we try and use it, and (2) a rapid sequence of keys
-      # only executes the block once at the end.
-      clearTimeout @timeout
-      @select(null)
-      @timeout = setTimeout =>
-        if @lastFetch and !@lastFetch.isResolved()
-          @nextRequest = true
-          return
-        list = @listForQuery(@preparePost())
-        if list is @list
-          # no change
-        else if list.query.search is '' and not @listExpanded()
-          # changed to where we don't need the menu open anymore
-          @close() if @$menu.is(":visible")
-        else
-          # activate a new list for the updated search
-          if @list
-            list.insertAfter(@list)
-            @list.remove()
-          else
-            @open()
-            list.appendTo(@$menu)
-          @list = list
-          @autoSelectFirst()
-      , 200
+    return list
+  }
 
-    preparePost: (data) ->
-      postData = $.extend({}, @options.baseData ? {}, data ? {}, {search: @input.val().replace(/^\s+|\s+$/g, "")})
-      postData.exclude ?= []
-      postData.exclude = postData.exclude.concat @input.baseExclude
-      if @listExpanded()
-        postData.context = @parent().data('id')
-      else
-        postData.exclude = postData.exclude.concat @input.tokenValues()
-      postData
-
-    lastFetch: null
-    collectionForQuery: (query) ->
-      @lastFetch?.abort()
-      cacheKey = JSON.stringify(query)
-      unless @cache[cacheKey]?
-        collection = new RecipientCollection
-        collection.url = @url
-        @lastFetch = collection.fetch data: query
-        @cache[cacheKey] = collection
-      @cache[cacheKey]
-
-    listForQuery: (query) ->
-      collection = @collectionForQuery(query)
-      list = new TokenSelectorList
-        selector: this
-        parent: @parent()
-        ancestors: (ancestor[0].data('id') for ancestor in @stack)
-        collection: collection
-        query: query
-      list.render()
-
-      unless collection.atLeastOnePageFetched
-        collection.on 'fetch', _.once =>
-          @autoSelectFirst list
-          @updateSearch() if @nextRequest
-          delete @nextRequest
-
-      list
-
-    teardown: ->
-      @$container.remove()
-
+  teardown() {
+    return this.$container.remove()
+  }
+}
+TokenSelector.initClass()

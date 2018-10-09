@@ -1,66 +1,76 @@
-#
-# Copyright (C) 2014 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// Copyright (C) 2014 - present Instructure, Inc.
+//
+// This file is part of Canvas.
+//
+// Canvas is free software: you can redistribute it and/or modify it under
+// the terms of the GNU Affero General Public License as published by the Free
+// Software Foundation, version 3 of the License.
+//
+// Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+// details.
+//
+// You should have received a copy of the GNU Affero General Public License along
+// with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'i18n!feature_flags'
-  '../DialogBaseView'
-  'jst/feature_flags/featureFlagDialog'
-], (I18n, DialogBaseView, template) ->
+import I18n from 'i18n!feature_flags'
+import DialogBaseView from '../DialogBaseView'
+import template from 'jst/feature_flags/featureFlagDialog'
 
-  class FeatureFlagDialog extends DialogBaseView
+export default class FeatureFlagDialog extends DialogBaseView {
+  static initClass() {
+    this.optionProperty('deferred')
 
-    @optionProperty 'deferred'
+    this.optionProperty('message')
 
-    @optionProperty 'message'
+    this.optionProperty('title')
 
-    @optionProperty 'title'
+    this.optionProperty('hasCancelButton')
 
-    @optionProperty 'hasCancelButton'
+    this.prototype.template = template
 
-    template: template
+    this.prototype.labels = {
+      okay: I18n.t('#buttons.okay', 'Okay'),
+      cancel: I18n.t('#buttons.cancel', 'Cancel')
+    }
+  }
 
-    labels:
-      okay   : I18n.t('#buttons.okay', 'Okay')
-      cancel : I18n.t('#buttons.cancel', 'Cancel')
+  dialogOptions() {
+    const options = {
+      title: this.title,
+      height: 300,
+      width: 500,
+      buttons: [{text: this.labels.okay, click: this.onConfirm, class: 'btn-primary'}],
+      open: this.onOpen,
+      close: this.onClose
+    }
+    if (this.hasCancelButton) {
+      options.buttons.unshift({text: this.labels.cancel, click: this.onCancel})
+    }
+    return options
+  }
 
-    dialogOptions: ->
-      options =
-        title   : @title
-        height  : 300
-        width   : 500
-        buttons : [text: @labels.okay, click: @onConfirm, class: 'btn-primary']
-        open    : @onOpen
-        close   : @onClose
-      if @hasCancelButton
-        options.buttons.unshift(text: @labels.cancel, click: @onCancel)
-      options
+  onOpen = e => this.okay = false
 
-    onOpen: (e) =>
-      @okay = false
+  onClose = e => {
+    if (this.okay) {
+      return this.deferred.resolve()
+    } else {
+      return this.deferred.reject()
+    }
+  }
 
-    onClose: (e) =>
-      if @okay then @deferred.resolve() else @deferred.reject()
+  onCancel = e => this.close()
 
-    onCancel: (e) =>
-      @close()
+  onConfirm = e => {
+    this.okay = this.hasCancelButton
+    return this.close()
+  }
 
-    onConfirm: (e) =>
-      @okay = @hasCancelButton
-      @close()
-
-    toJSON: ->
-      message: @message
+  toJSON() {
+    return {message: this.message}
+  }
+}
+FeatureFlagDialog.initClass()

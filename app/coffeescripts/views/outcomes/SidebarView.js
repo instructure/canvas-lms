@@ -1,244 +1,336 @@
-#
-# Copyright (C) 2012 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
-#
+//
+// Copyright (C) 2012 - present Instructure, Inc.
+//
+// This file is part of Canvas.
+//
+// Canvas is free software: you can redistribute it and/or modify it under
+// the terms of the GNU Affero General Public License as published by the Free
+// Software Foundation, version 3 of the License.
+//
+// Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+// details.
+//
+// You should have received a copy of the GNU Affero General Public License along
+// with this program. If not, see <http://www.gnu.org/licenses/>.
+//
 
-define [
-  'i18n!outcomes'
-  'jquery'
-  'underscore'
-  'Backbone'
-  '../../models/Outcome'
-  '../../models/OutcomeGroup'
-  './OutcomesDirectoryView'
-  './FindDirectoryView'
-], (I18n, $, _, Backbone, Outcome, OutcomeGroup, OutcomesDirectoryView, FindDirectoryView) ->
+import I18n from 'i18n!outcomes'
+import $ from 'jquery'
+import _ from 'underscore'
+import Backbone from 'Backbone'
+import Outcome from '../../models/Outcome'
+import OutcomeGroup from '../../models/OutcomeGroup'
+import OutcomesDirectoryView from './OutcomesDirectoryView'
+import FindDirectoryView from './FindDirectoryView'
 
-  findDialog = undefined
+let findDialog
 
-  # Manages the directory views.
-  class SidebarView extends Backbone.View
+export default class SidebarView extends Backbone.View {
+  constructor(...args) {
+    {
+      // Hack: trick Babel/TypeScript into allowing this before super.
+      if (false) { super(); }
+      let thisFn = (() => { return this; }).toString();
+      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
+      eval(`${thisName} = this;`);
+    }
+    this.resetSidebar = this.resetSidebar.bind(this)
+    this.addAndSelect = this.addAndSelect.bind(this)
+    this.selectDir = this.selectDir.bind(this)
+    this.refreshSelection = this.refreshSelection.bind(this)
+    this.clearOutcomeSelection = this.clearOutcomeSelection.bind(this)
+    this.goBack = this.goBack.bind(this)
+    this.renderDir = this.renderDir.bind(this)
+    this.findDialog = this.findDialog.bind(this)
+    super(...args)
+  }
 
-    directoryWidth: 200
-    entryHeight: 30
+  static initClass() {
+    this.prototype.directoryWidth = 200
+    this.prototype.entryHeight = 30
 
-    events:
-      'click .outcome-level': 'clickOutcomeLevel'
+    this.prototype.events = {'click .outcome-level': 'clickOutcomeLevel'}
+  }
 
-    # options must include rootOutcomeGroup or directoryView
-    initialize: (opts) ->
-      super
-      @inFindDialog = opts.inFindDialog
-      @readOnly = opts.readOnly
-      @selectFirstItem = opts.selectFirstItem
-      @directories = []
-      @cachedDirectories = {}
-      @$sidebar = @$el.parent()
-      @$sidebar.width @directoryWidth
-      if @rootOutcomeGroup = opts.rootOutcomeGroup
-        @addDirFor @rootOutcomeGroup, true
-      else
-        @addDir opts.directoryView
-      @render()
+  // options must include rootOutcomeGroup or directoryView
+  initialize(opts) {
+    super.initialize(...arguments)
+    this.inFindDialog = opts.inFindDialog
+    this.readOnly = opts.readOnly
+    this.selectFirstItem = opts.selectFirstItem
+    this.directories = []
+    this.cachedDirectories = {}
+    this.$sidebar = this.$el.parent()
+    this.$sidebar.width(this.directoryWidth)
+    if ((this.rootOutcomeGroup = opts.rootOutcomeGroup)) {
+      this.addDirFor(this.rootOutcomeGroup, true)
+    } else {
+      this.addDir(opts.directoryView)
+    }
+    return this.render()
+  }
 
-    clickOutcomeLevel: (e) ->
-      clickedOutside = e.target is e.currentTarget
-      return unless clickedOutside
-      dir = $(e.target).data 'view'
-      @selectDir dir
+  clickOutcomeLevel(e) {
+    const clickedOutside = e.target === e.currentTarget
+    if (!clickedOutside) return
+    const dir = $(e.target).data('view')
+    return this.selectDir(dir)
+  }
 
-    resetSidebar: () =>
-      _.each @directories, (d) -> d.remove()
-      @directories = []
-      @cachedDirectories = {}
-      @addDirFor @rootOutcomeGroup, true
+  resetSidebar() {
+    _.each(this.directories, d => d.remove())
+    this.directories = []
+    this.cachedDirectories = {}
+    return this.addDirFor(this.rootOutcomeGroup, true)
+  }
 
-    # Adds a directory view for an outcome group.
-    # Returns the directory view.
-    addDirFor: (outcomeGroup, isRoot = false) ->
-      if @cachedDirectories[outcomeGroup.id]
-        dir = @cachedDirectories[outcomeGroup.id]
-      else
-        parent = _.last @directories
-        directoryClass = outcomeGroup.get('directoryClass') || OutcomesDirectoryView
-        i = _.indexOf @directories, @selectedDir()
-        dir = new directoryClass {outcomeGroup, parent, @readOnly, selectFirstItem: isRoot && @selectFirstItem, inFindDialog: @inFindDialog, directoryDepth: i + 1}
-        @firstDir = false
-      @addDir dir
+  // Adds a directory view for an outcome group.
+  // Returns the directory view.
+  addDirFor(outcomeGroup, isRoot = false) {
+    let dir
+    if (this.cachedDirectories[outcomeGroup.id]) {
+      dir = this.cachedDirectories[outcomeGroup.id]
+    } else {
+      const parent = _.last(this.directories)
+      const directoryClass = outcomeGroup.get('directoryClass') || OutcomesDirectoryView
+      const i = _.indexOf(this.directories, this.selectedDir())
+      dir = new directoryClass({
+        outcomeGroup,
+        parent,
+        readOnly: this.readOnly,
+        selectFirstItem: isRoot && this.selectFirstItem,
+        inFindDialog: this.inFindDialog,
+        directoryDepth: i + 1
+      })
+      this.firstDir = false
+    }
+    return this.addDir(dir)
+  }
 
-    # Adds a directory view.
-    # Returns the directory view.
-    addDir: (dir) ->
-      @cachedDirectories[dir.outcomeGroup.id] = dir if dir.outcomeGroup
-      dir.off 'select'
-      dir.on 'select', @selectDir
-      dir.sidebar = this
+  // Adds a directory view.
+  // Returns the directory view.
+  addDir(dir) {
+    if (dir.outcomeGroup) this.cachedDirectories[dir.outcomeGroup.id] = dir
+    dir.off('select')
+    dir.on('select', this.selectDir)
+    dir.sidebar = this
+    dir.clearSelection()
+    this.directories.push(dir)
+    this.updateSidebarWidth()
+    this.renderDir(dir)
+    return dir
+  }
+
+  // Insert and select a newly created/imported outcome or group.
+  addAndSelect(model) {
+    // verify outcomeGroup is set
+    if (model instanceof Outcome) {
+      model.outcomeGroup = this.selectedGroup().toJSON()
+    } else {
+      model.set('parent_outcome_group', this.selectedGroup().toJSON())
+    }
+
+    // add to collection
+    const dir = this._findLastDir(d => !d.selectedModel || d.selectedModel instanceof Outcome)
+    if (model instanceof Outcome) {
+      dir.outcomes.add(model)
+    } else {
+      dir.groups.add(model)
+    }
+    this._scrollToDir(_.indexOf(this.directories, dir), model)
+
+    // select the view
+    return model.trigger('select')
+  }
+
+  // Select the directory view and optionally select an Outcome or Group.
+  selectDir(dir, selectedModel) {
+    // If root selection is an outcome, don't have a dir. Get root most dir to clear selection.
+    const useDir = dir ? dir : this.directories[0]
+    if (useDir && !selectedModel) useDir.clearSelection()
+
+    // remove all directories after the selected dir from @directories and the view
+    const i = _.indexOf(this.directories, useDir)
+    const dirsToRemove = this.directories.splice(i + 1, this.directories.length - (i + 1))
+    _.each(dirsToRemove, d => d.remove())
+    const isAddingDir = selectedModel instanceof OutcomeGroup && !selectedModel.isNew()
+    if (isAddingDir) this.addDirFor(selectedModel)
+    this.updateSidebarWidth()
+    const scrollIndex = isAddingDir ? i + 1 : i
+    this._scrollToDir(scrollIndex, selectedModel)
+    // Determine which model to select based on going forward/backward and where we are in the tree.
+    let wantSelectModel = selectedModel
+    if (this.goingBack) {
+      if (!useDir.parent) {
+        wantSelectModel = null
+      } else {
+        wantSelectModel = useDir.outcomeGroup
+      }
+    }
+    return this.trigger('select', wantSelectModel, this.directories)
+  }
+
+  refreshSelection(model) {
+    const dir = this.selectedDir()
+    if (model === dir.selectedModel) {
       dir.clearSelection()
-      @directories.push dir
-      @updateSidebarWidth()
-      @renderDir dir
-      dir
+      return model.trigger('select')
+    }
+  }
 
-    # Insert and select a newly created/imported outcome or group.
-    addAndSelect: (model) =>
-      # verify outcomeGroup is set
-      if model instanceof Outcome
-        model.outcomeGroup = @selectedGroup().toJSON()
-      else
-        model.set 'parent_outcome_group', @selectedGroup().toJSON()
+  selectedDir() {
+    return this._findLastDir(d => d.selectedModel)
+  }
 
-      # add to collection
-      dir = @_findLastDir (d) -> ! d.selectedModel or d.selectedModel instanceof Outcome
-      if model instanceof Outcome
-        dir.outcomes.add model
-      else
-        dir.groups.add model
-      @_scrollToDir _.indexOf(@directories, dir), model
+  selectedModel() {
+    return __guard__(this.selectedDir(), x => x.selectedModel)
+  }
 
-      # select the view
-      model.trigger 'select'
+  selectedGroup() {
+    let g = null
+    this._findLastDir((d) => {
+        if (d.selectedModel instanceof OutcomeGroup) {
+          return g = d.selectedModel;
+        }
+      });
+    return g || this.rootOutcomeGroup
+  }
 
-    # Select the directory view and optionally select an Outcome or Group.
-    selectDir: (dir, selectedModel) =>
-      # If root selection is an outcome, don't have a dir. Get root most dir to clear selection.
-      useDir = if dir then dir else @directories[0]
-      useDir.clearSelection() if useDir and !selectedModel
+  clearOutcomeSelection() {
+    return _.last(this.directories).clearOutcomeSelection()
+  }
 
-      # remove all directories after the selected dir from @directories and the view
-      i = _.indexOf @directories, useDir
-      dirsToRemove = @directories.splice(i + 1, @directories.length - (i + 1))
-      _.each dirsToRemove, (d) -> d.remove()
-      isAddingDir = selectedModel instanceof OutcomeGroup and !selectedModel.isNew()
-      @addDirFor selectedModel if isAddingDir
-      @updateSidebarWidth()
-      scrollIndex = if isAddingDir then i + 1 else i
-      @_scrollToDir scrollIndex, selectedModel
-      # Determine which model to select based on going forward/backward and where we are in the tree.
-      wantSelectModel = selectedModel
-      if @goingBack
-        if !useDir.parent
-          wantSelectModel = null
-        else
-          wantSelectModel = useDir.outcomeGroup
-      @trigger 'select', wantSelectModel, @directories
+  // Go up a directory.
+  goBack() {
+    this.goingBack = true
+    if (this.selectedModel() instanceof OutcomeGroup) {
+      this.selectDir(this.selectedDir())
+    } else {
+      const i = _.indexOf(this.directories, this.selectedDir())
+      this.selectDir(this.directories[i - 1])
+    }
 
-    refreshSelection: (model) =>
-      dir = @selectedDir()
-      if model is dir.selectedModel
-        dir.clearSelection()
-        model.trigger 'select'
+    this.selectedDir().makeFocusable()
 
-    selectedDir: ->
-      @_findLastDir (d) -> d.selectedModel
+    return (this.goingBack = false)
+  }
+  //      if @selectedModel() instanceof OutcomeGroup
+  //        parentDir = @selectedDir().parent
+  // #        @selectDir @selectedDir(), @selectedDir().parent?.selectedModel
+  //      else
+  //        i = _.indexOf @directories, @selectedDir()
+  //        @selectDir @directories[i - 1]
+  //      @goingBack = false
 
-    selectedModel: ->
-      @selectedDir()?.selectedModel
+  updateSidebarWidth() {
+    const sidebarWidth =
+      this.directories.length === 1 ? this.directoryWidth : this.directoryWidth * 2
+    this.$el.css({width: this.directoryWidth * this.directories.length})
+    return this.$sidebar.animate({width: sidebarWidth})
+  }
 
-    selectedGroup: ->
-      g = null
-      @_findLastDir (d) ->
-        if d.selectedModel instanceof OutcomeGroup
-          g = d.selectedModel
-      g || @rootOutcomeGroup
+  renderDir(dir) {
+    return this.$el.append(dir.render().el)
+  }
 
-    clearOutcomeSelection: =>
-      _.last(@directories).clearOutcomeSelection()
+  render() {
+    this.$el.empty()
+    _.each(this.directories, this.renderDir)
+    return this
+  }
 
-    # Go up a directory.
-    goBack: =>
-      @goingBack = true
-      if @selectedModel() instanceof OutcomeGroup
-        @selectDir @selectedDir()
-      else
-        i = _.indexOf @directories, @selectedDir()
-        @selectDir @directories[i - 1]
+  // passing in FindDialog because of circular dependency
+  findDialog(FindDialog) {
+    if (!findDialog) {
+      findDialog = new FindDialog({
+        title: I18n.t('titles.find_outcomes', 'Find Outcomes'),
+        selectedGroup: this.selectedGroup(),
+        directoryView: new FindDirectoryView({
+          outcomeGroup: this.selectedGroup()
+        })
+      })
+      findDialog.on('import', this.addAndSelect, this)
+    } else {
+      findDialog.updateSelection(this.selectedGroup())
+    }
+    return findDialog.show()
+  }
 
-      @selectedDir().makeFocusable()
+  // Find a directory for a given outcome group or add a new directory view.
+  dirForGroup(outcomeGroup) {
+    return (
+      _.find(this.directories, d => d.outcomeGroup === outcomeGroup) || this.addDirFor(outcomeGroup)
+    )
+  }
 
-      @goingBack = false
-#      if @selectedModel() instanceof OutcomeGroup
-#        parentDir = @selectedDir().parent
-##        @selectDir @selectedDir(), @selectedDir().parent?.selectedModel
-#      else
-#        i = _.indexOf @directories, @selectedDir()
-#        @selectDir @directories[i - 1]
-#      @goingBack = false
+  moveItem(model, newGroup) {
+    let dfd
+    const originalGroup = model.get('parent_outcome_group') || model.outcomeGroup
+    const originalDir = this.cachedDirectories[originalGroup.id]
+    const targetDir = this.cachedDirectories[newGroup.id]
+    if (originalGroup.id === newGroup.id) {
+      $.flashError(
+        I18n.t('%{model} is already located in %{newGroup}', {
+          model: model.get('title'),
+          newGroup: newGroup.get('title')
+        })
+      )
+      return
+    }
+    if (model instanceof OutcomeGroup) {
+      dfd = originalDir.moveGroup(model, newGroup.toJSON())
+    } else {
+      dfd = originalDir.changeLink(model, newGroup.toJSON())
+    }
+    return dfd.done(() => {
+      const itemType = model instanceof OutcomeGroup ? 'groups' : 'outcomes'
+      if (targetDir) {
+        dfd = targetDir[itemType].fetch()
+        dfd.done(() => {
+          return (targetDir.needsReset = true)
+        })
+      }
+      originalDir[itemType].fetch()
+      const parentDir = originalDir.parent
+      if (parentDir) {
+        this.selectDir(parentDir, parentDir.selectedModel)
+      }
+      model.trigger('finishedMoving')
+      $('.selected:last').focus()
+      // timeout necessary to announce move after modal closes following finishedMoving event
+      return setTimeout(
+        () =>
+          $.flashMessage(
+            I18n.t('Successfully moved %{model} to %{newGroup}', {
+              model: model.get('title'),
+              newGroup: newGroup.get('title')
+            })
+          ),
+        1500
+      )
+    })
+  }
 
-    updateSidebarWidth: ->
-      sidebarWidth = if @directories.length is 1 then @directoryWidth else (@directoryWidth * 2)
-      @$el.css width: (@directoryWidth * @directories.length)
-      @$sidebar.animate width: sidebarWidth
+  _scrollToDir(dirIndex, model) {
+    const scrollLeft = this.directoryWidth * (model instanceof Outcome ? dirIndex - 1 : dirIndex)
+    this.$sidebar.animate({scrollLeft}, {duration: 200})
+    const scrollTop =
+      (this.entryHeight + 1) *
+      _.indexOf(
+        this.directories[dirIndex].views(),
+        _.find(this.directories[dirIndex].views(), v => v.model === model)
+      )
+    return this.directories[dirIndex].$el.animate({scrollTop}, {duration: 200})
+  }
 
-    renderDir: (dir) =>
-      @$el.append dir.render().el
+  _findLastDir(f) {
+    return _.find(_.clone(this.directories).reverse(), f) || _.last(this.directories)
+  }
+}
+SidebarView.initClass()
 
-    render: ->
-      @$el.empty()
-      _.each @directories, @renderDir
-      this
-
-    # passing in FindDialog because of circular dependency
-    findDialog: (FindDialog) =>
-      if !findDialog
-        findDialog = new FindDialog
-          title: I18n.t 'titles.find_outcomes', 'Find Outcomes'
-          selectedGroup: @selectedGroup()
-          directoryView: new FindDirectoryView
-            outcomeGroup: @selectedGroup()
-        findDialog.on 'import', @addAndSelect, this
-      else
-        findDialog.updateSelection(@selectedGroup())
-      findDialog.show()
-
-    # Find a directory for a given outcome group or add a new directory view.
-    dirForGroup: (outcomeGroup) ->
-      _.find(@directories, (d) -> d.outcomeGroup is outcomeGroup) || @addDirFor(outcomeGroup)
-
-    moveItem: (model, newGroup) ->
-      originalGroup = model.get('parent_outcome_group') || model.outcomeGroup
-      originalDir = @cachedDirectories[originalGroup.id]
-      targetDir =  @cachedDirectories[newGroup.id]
-      if originalGroup.id == newGroup.id
-        $.flashError I18n.t("%{model} is already located in %{newGroup}", {model: model.get('title'), newGroup: newGroup.get('title')})
-        return
-      if model instanceof OutcomeGroup
-        dfd = originalDir.moveGroup(model, newGroup.toJSON())
-      else
-        dfd = originalDir.changeLink(model, newGroup.toJSON())
-      dfd.done =>
-        itemType = if model instanceof OutcomeGroup then 'groups' else 'outcomes'
-        if targetDir
-          dfd = targetDir[itemType].fetch()
-          dfd.done => targetDir.needsReset = true
-        originalDir[itemType].fetch()
-        parentDir = originalDir.parent
-        if parentDir
-          @selectDir(parentDir, parentDir.selectedModel)
-        model.trigger 'finishedMoving'
-        $(".selected:last").focus()
-        #timeout necessary to announce move after modal closes following finishedMoving event
-        setTimeout (->
-          $.flashMessage I18n.t("Successfully moved %{model} to %{newGroup}", {model: model.get('title'), newGroup: newGroup.get('title')})
-        ), 1500
-
-    _scrollToDir: (dirIndex, model) ->
-      scrollLeft = @directoryWidth * (if model instanceof Outcome then dirIndex - 1 else dirIndex)
-      @$sidebar.animate {scrollLeft: scrollLeft}, duration: 200
-      scrollTop = (@entryHeight + 1) * _.indexOf(@directories[dirIndex].views(), _.find(@directories[dirIndex].views(), (v) -> v.model is model))
-      @directories[dirIndex].$el.animate {scrollTop: scrollTop}, duration: 200
-
-    _findLastDir: (f) ->
-      _.find(_.clone(@directories).reverse(), f) || _.last @directories
+function __guard__(value, transform) {
+  return typeof value !== 'undefined' && value !== null ? transform(value) : undefined
+}

@@ -1,119 +1,137 @@
-#
-# Copyright (C) 2014 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// Copyright (C) 2014 - present Instructure, Inc.
+//
+// This file is part of Canvas.
+//
+// Canvas is free software: you can redistribute it and/or modify it under
+// the terms of the GNU Affero General Public License as published by the Free
+// Software Foundation, version 3 of the License.
+//
+// Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+// details.
+//
+// You should have received a copy of the GNU Affero General Public License along
+// with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'jquery',
-  '../media_comments/dialog_manager',
-  '../media_comments/comment_ui_loader',
-  'bower/k5uploader/k5uploader',
-  '../media_comments/upload_view_manager',
-  '../media_comments/kaltura_session_loader',
-  '../media_comments/file_input_manager'
-], ($,
-    DialogManager,
-    CommentUiLoader,
-    {default: K5Uploader},
-    UploadViewManager,
-    KalturaSessionLoader,
-    FileInputManager
-) ->
+import DialogManager from '../media_comments/dialog_manager'
+import CommentUiLoader from '../media_comments/comment_ui_loader'
+import K5Uploader from 'bower/k5uploader/k5uploader'
+import UploadViewManager from '../media_comments/upload_view_manager'
+import KalturaSessionLoader from '../media_comments/kaltura_session_loader'
+import FileInputManager from '../media_comments/file_input_manager'
 
-  ###
-  # Creates and Mediates between various upload ui and actors
-  ###
-  class JsUploader
-    constructor: ->
-      @dialogManager = new DialogManager()
-      @commentUiLoader = new CommentUiLoader()
-      @kSession = new KalturaSessionLoader()
-      @uploadViewManager = new UploadViewManager()
-      @fileInputManager = new FileInputManager()
-      @dialogManager.initialize()
-      @loadSession()
+/*
+   * Creates and Mediates between various upload ui and actors
+   */
+export default class JsUploader {
+  constructor() {
+    this.initialize = this.initialize.bind(this)
+    this.doUpload = this.doUpload.bind(this)
+    this.doUploadByFile = this.doUploadByFile.bind(this)
+    this.onFileError = this.onFileError.bind(this)
+    this.onUploadComplete = this.onUploadComplete.bind(this)
+    this.onUploaderReady = this.onUploaderReady.bind(this)
+    this.resetUploader = this.resetUploader.bind(this)
+    this.dialogManager = new DialogManager()
+    this.commentUiLoader = new CommentUiLoader()
+    this.kSession = new KalturaSessionLoader()
+    this.uploadViewManager = new UploadViewManager()
+    this.fileInputManager = new FileInputManager()
+    this.dialogManager.initialize()
+    this.loadSession()
+  }
 
-    loadSession: ->
-      @kSession.loadSession('/api/v1/services/kaltura_session',
-                            @initialize,
-                            @uploadViewManager.showConfigError)
+  loadSession() {
+    return this.kSession.loadSession(
+      '/api/v1/services/kaltura_session',
+      this.initialize,
+      this.uploadViewManager.showConfigError
+    )
+  }
 
-    onReady: ->
-      # override this
+  onReady() {}
+  // override this
 
-    initialize: (mediaType, opts) =>
-      @commentUiLoader.loadTabs (html) =>
-        @onReady()
-        @dialogManager.displayContent(html)
-        @dialogManager.activateTabs()
-        @dialogManager.mediaReady(mediaType, opts)
-        @createNeededFields()
-        @bindEvents()
+  initialize(mediaType, opts) {
+    return this.commentUiLoader.loadTabs(html => {
+      this.onReady()
+      this.dialogManager.displayContent(html)
+      this.dialogManager.activateTabs()
+      this.dialogManager.mediaReady(mediaType, opts)
+      this.createNeededFields()
+      return this.bindEvents()
+    })
+  }
 
+  getKs() {
+    return this.kSession.kalturaSession.ks
+  }
 
-    getKs: ->
-      @kSession.kalturaSession.ks
+  getUid() {
+    return this.kSession.kalturaSession.uid
+  }
 
-    getUid: ->
-      @kSession.kalturaSession.uid
+  bindEvents() {
+    this.fileInputManager.setUpInputTrigger('#audio_upload_holder', ['audio'])
+    return this.fileInputManager.setUpInputTrigger('#video_upload_holder', ['video'])
+  }
 
-    bindEvents: ->
-      @fileInputManager.setUpInputTrigger('#audio_upload_holder', ['audio'])
-      @fileInputManager.setUpInputTrigger('#video_upload_holder', ['video'])
+  createNeededFields() {
+    return this.fileInputManager.resetFileInput(this.doUpload)
+  }
 
-    createNeededFields: ->
-      @fileInputManager.resetFileInput(@doUpload)
+  doUpload() {
+    this.file = this.fileInputManager.getSelectedFile()
+    if (this.uploader) this.resetUploader()
+    const session = this.kSession.generateUploadOptions(this.fileInputManager.allowedMedia)
+    this.uploader = new K5Uploader(session)
+    this.uploader.addEventListener('K5.fileError', this.onFileError)
+    this.uploader.addEventListener('K5.complete', this.onUploadComplete)
+    this.uploader.addEventListener('K5.ready', this.onUploaderReady)
 
-    doUpload: =>
-      @file = @fileInputManager.getSelectedFile()
-      @resetUploader() if @uploader
-      session = @kSession.generateUploadOptions(@fileInputManager.allowedMedia)
-      @uploader = new K5Uploader(session)
-      @uploader.addEventListener 'K5.fileError', @onFileError
-      @uploader.addEventListener 'K5.complete', @onUploadComplete
-      @uploader.addEventListener 'K5.ready', @onUploaderReady
+    this.uploadViewManager = new UploadViewManager()
+    return this.uploadViewManager.monitorUpload(
+      this.uploader,
+      this.fileInputManager.allowedMedia,
+      this.file
+    )
+  }
 
-      @uploadViewManager = new UploadViewManager()
-      @uploadViewManager.monitorUpload(@uploader,
-                                       @fileInputManager.allowedMedia,
-                                       @file)
+  doUploadByFile(inputFile) {
+    this.file = inputFile
+    if (this.uploader) {
+      this.resetUploader()
+    }
+    const session = this.kSession.generateUploadOptions(['video', 'audio', 'webm'])
+    this.uploader = new K5Uploader(session)
+    this.uploader.addEventListener('K5.fileError', this.onFileError)
+    this.uploader.addEventListener('K5.complete', this.onUploadComplete)
+    return this.uploader.addEventListener('K5.ready', this.onUploaderReady)
+  }
 
-    doUploadByFile: (inputFile) =>
-      @file = inputFile
-      @resetUploader() if @uploader
-      session = @kSession.generateUploadOptions(["video", "audio", "webm"])
-      @uploader = new K5Uploader(session)
-      @uploader.addEventListener 'K5.fileError', @onFileError
-      @uploader.addEventListener 'K5.complete', @onUploadComplete
-      @uploader.addEventListener 'K5.ready', @onUploaderReady
+  onFileError() {
+    return this.createNeededFields()
+  }
 
-    onFileError: =>
-      @createNeededFields()
+  onUploadComplete(e) {
+    this.resetUploader()
+    if (!((e.title != null ? e.title.length : undefined) > 0)) {
+      e.title = this.file.name
+    }
+    this.addEntry(e)
+    return this.dialogManager.hide()
+  }
 
-    onUploadComplete: (e)=>
-      @resetUploader()
-      unless e.title?.length > 0
-        e.title = @file.name
-      @addEntry(e)
-      @dialogManager.hide()
+  onUploaderReady() {
+    return this.uploader.uploadFile(this.file)
+  }
 
-    onUploaderReady: =>
-      @uploader.uploadFile(@file)
-
-    resetUploader: =>
-      @uploader.removeEventListener 'K5.fileError', @onFileError
-      @uploader.removeEventListener 'K5.complete', @onUploadComplete
-      @uploader.removeEventListener 'K5.ready', @onUploaderReady
-      @uploader.destroy()
+  resetUploader() {
+    this.uploader.removeEventListener('K5.fileError', this.onFileError)
+    this.uploader.removeEventListener('K5.complete', this.onUploadComplete)
+    this.uploader.removeEventListener('K5.ready', this.onUploaderReady)
+    return this.uploader.destroy()
+  }
+}

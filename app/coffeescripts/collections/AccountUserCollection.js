@@ -1,33 +1,32 @@
-#
-# Copyright (C) 2013 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// Copyright (C) 2013 - present Instructure, Inc.
+//
+// This file is part of Canvas.
+//
+// Canvas is free software: you can redistribute it and/or modify it under
+// the terms of the GNU Affero General Public License as published by the Free
+// Software Foundation, version 3 of the License.
+//
+// Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+// details.
+//
+// You should have received a copy of the GNU Affero General Public License along
+// with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  '../collections/PaginatedCollection'
-  '../models/AccountUser'
-], (PaginatedCollection, AccountUser) ->
+import PaginatedCollection from '../collections/PaginatedCollection'
 
-  class AccountUserCollection extends PaginatedCollection
+import AccountUser from '../models/AccountUser'
 
-    model: AccountUser
+export default class AccountUserCollection extends PaginatedCollection {
+  url() {
+    return `/api/v1/accounts/${this.options.account_id}/users`
+  }
+}
 
-    ##
-    # The account id of this user collection
+AccountUserCollection.prototype.model = AccountUser
 
-    @optionProperty 'account_id'
-
-    url: ->
-      "/api/v1/accounts/#{@options.account_id}/users"
+// #
+// The account id of this user collection
+AccountUserCollection.optionProperty('account_id')

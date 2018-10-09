@@ -1,245 +1,326 @@
-#
-# Copyright (C) 2012 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
-#
+//
+// Copyright (C) 2012 - present Instructure, Inc.
+//
+// This file is part of Canvas.
+//
+// Canvas is free software: you can redistribute it and/or modify it under
+// the terms of the GNU Affero General Public License as published by the Free
+// Software Foundation, version 3 of the License.
+//
+// Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+// details.
+//
+// You should have received a copy of the GNU Affero General Public License along
+// with this program. If not, see <http://www.gnu.org/licenses/>.
+//
 
-define [
-  'i18n!outcomes'
-  'jquery'
-  'underscore'
-  '../PaginatedView'
-  '../../models/OutcomeGroup'
-  '../../collections/OutcomeCollection'
-  '../../collections/OutcomeGroupCollection'
-  './OutcomeGroupIconView'
-  './OutcomeIconView'
-  'str/htmlEscape'
-  'jquery.disableWhileLoading'
-  'jqueryui/droppable'
-  '../../jquery.rails_flash_notifications'
-], (I18n, $, _, PaginatedView, OutcomeGroup, OutcomeCollection, OutcomeGroupCollection, OutcomeGroupIconView, OutcomeIconView, htmlEscape) ->
+import I18n from 'i18n!outcomes'
+import $ from 'jquery'
+import _ from 'underscore'
+import htmlEscape from 'str/htmlEscape'
+import PaginatedView from '../PaginatedView'
+import OutcomeGroup from '../../models/OutcomeGroup'
+import OutcomeCollection from '../../collections/OutcomeCollection'
+import OutcomeGroupCollection from '../../collections/OutcomeGroupCollection'
+import OutcomeGroupIconView from './OutcomeGroupIconView'
+import OutcomeIconView from './OutcomeIconView'
+import 'jquery.disableWhileLoading'
+import 'jqueryui/droppable'
+import '../../jquery.rails_flash_notifications'
 
-  # The outcome group "directory" browser.
-  class OutcomesDirectoryView extends PaginatedView
-    tagName: 'ul'
-    className: 'outcome-level'
+// The outcome group "directory" browser.
+export default class OutcomesDirectoryView extends PaginatedView {
+  constructor(...args) {
+    {
+      // Hack: trick Babel/TypeScript into allowing this before super.
+      if (false) { super(); }
+      let thisFn = (() => { return this; }).toString();
+      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
+      eval(`${thisName} = this;`);
+    }
+    this.moveModelHere = this.moveModelHere.bind(this)
+    this.makeFocusable = this.makeFocusable.bind(this)
+    this.selectFirstOutcome = this.selectFirstOutcome.bind(this)
+    this.triggerSelect = this.triggerSelect.bind(this)
+    this.reset = this.reset.bind(this)
+    this.render = this.render.bind(this)
+    this.handleWarning = this.handleWarning.bind(this)
+    super(...args)
+  }
 
-    # if opts includes 'outcomeGroup', an instance of OutcomeGroup,
-    # then the groups and the outcomes for the outcomeGroup will be fetched.
-    initialize: (opts) ->
-      @inFindDialog = opts.inFindDialog
-      @readOnly = opts.readOnly
-      @parent = opts.parent
-      outcomeGroupTitle = opts.outcomeGroup.attributes.title
-      ariaLabel = 'directory ' + outcomeGroupTitle + ': depth ' + opts.directoryDepth + ','
-      @$el.attr('aria-label', ariaLabel)
-      # the way the event listeners work between OutcomeIconView, OutcomesDirectoryView
-      # and SidebarView can cause items to become unselectable following a move. The
-      # below attribute is using brute-force to make the view reset to address this problem
-      # until we can find a better solution
-      @needsReset = false
+  static initClass() {
+    this.prototype.tagName = 'ul'
+    this.prototype.className = 'outcome-level'
+  }
 
-      if @outcomeGroup = opts.outcomeGroup
-        unless @groups
-          @groups = new OutcomeGroupCollection
-          @groups.url = @outcomeGroup.get('subgroups_url')
-        @groups.on 'add reset', @reset, this # TODO: make add more efficient
-        @groups.on 'remove', @removeGroup, this
-        @groups.on 'fetched:last', @fetchOutcomes, this
+  // if opts includes 'outcomeGroup', an instance of OutcomeGroup,
+  // then the groups and the outcomes for the outcomeGroup will be fetched.
+  initialize(opts) {
+    this.inFindDialog = opts.inFindDialog
+    this.readOnly = opts.readOnly
+    this.parent = opts.parent
+    const outcomeGroupTitle = opts.outcomeGroup.attributes.title
+    const ariaLabel = `directory ${outcomeGroupTitle}: depth ${opts.directoryDepth},`
+    this.$el.attr('aria-label', ariaLabel)
+    // the way the event listeners work between OutcomeIconView, OutcomesDirectoryView
+    // and SidebarView can cause items to become unselectable following a move. The
+    // below attribute is using brute-force to make the view reset to address this problem
+    // until we can find a better solution
+    this.needsReset = false
 
-        unless @outcomes
-          @outcomes = new OutcomeCollection
-          @outcomes.url = @outcomeGroup.get('outcomes_url')+'?outcome_style=full'
-        @outcomes.on 'add remove reset', @reset, this
+    if ((this.outcomeGroup = opts.outcomeGroup)) {
+      if (!this.groups) {
+        this.groups = new OutcomeGroupCollection()
+        this.groups.url = this.outcomeGroup.get('subgroups_url')
+      }
+      this.groups.on('add reset', this.reset, this) // TODO: make add more efficient
+      this.groups.on('remove', this.removeGroup, this)
+      this.groups.on('fetched:last', this.fetchOutcomes, this)
 
-      # for PaginatedView
-      # @collection starts as @groups but can later change to @outcomes
-      @collection = @groups
-      @paginationScrollContainer = @$el
-      super opts
+      if (!this.outcomes) {
+        this.outcomes = new OutcomeCollection()
+        this.outcomes.url = this.outcomeGroup.get('outcomes_url') + '?outcome_style=full'
+      }
+      this.outcomes.on('add remove reset', this.reset, this)
+    }
 
-      @loadDfd = $.Deferred()
+    // for PaginatedView
+    // @collection starts as @groups but can later change to @outcomes
+    this.collection = this.groups
+    this.paginationScrollContainer = this.$el
+    super.initialize(opts)
 
-      if @outcomeGroup
-        @$el.disableWhileLoading(dfd = @groups.fetch())
+    this.loadDfd = $.Deferred()
 
-      @loadDfd.done(@selectFirstOutcome) if opts.selectFirstItem
+    if (this.outcomeGroup) {
+      let dfd
+      this.$el.disableWhileLoading((dfd = this.groups.fetch()))
+    }
 
-    initDroppable: ->
-      @$el.droppable
-        scope: 'outcomes'
-        hoverClass: 'outcome-level-hover'
-        drop: (e, ui) =>
-          # don't re-add to this group
-          return if ui.draggable.parent().get(0) == e.target
-          model = ui.draggable.data('view').model
-          @moveModelHere model
+    if (opts.selectFirstItem) return this.loadDfd.done(this.selectFirstOutcome)
+  }
 
-    # use this promise to know when both groups and outcomes have been loaded
-    promise: ->
-      @loadDfd.promise()
+  initDroppable() {
+    return this.$el.droppable({
+      scope: 'outcomes',
+      hoverClass: 'outcome-level-hover',
+      drop: (e, ui) => {
+        // don't re-add to this group
+        if (ui.draggable.parent().get(0) === e.target) return
+        const {model} = ui.draggable.data('view')
+        return this.moveModelHere(model)
+      }
+    })
+  }
 
-    # Public: move a model from some dir to this
-    moveModelHere: (model, originalDir) =>
-      model.collection.remove model
-      if model instanceof OutcomeGroup
-        @groups.add model
-        dfd = @moveGroup model, @outcomeGroup.toJSON()
-      else
-        @outcomes.add model
-        dfd = @changeLink model, @outcomeGroup.toJSON()
-      dfd.done ->
-        model.trigger 'select'
-        originalDir.needsReset = true if originalDir
+  // use this promise to know when both groups and outcomes have been loaded
+  promise() {
+    return this.loadDfd.promise()
+  }
 
-    # Internal: change the outcome link to the newGroup
-    changeLink: (outcome, newGroup) ->
-      disablingDfd = new $.Deferred()
-      @$el.disableWhileLoading disablingDfd
+  // Public: move a model from some dir to this
+  moveModelHere(model, originalDir) {
+    let dfd
+    model.collection.remove(model)
+    if (model instanceof OutcomeGroup) {
+      this.groups.add(model)
+      dfd = this.moveGroup(model, this.outcomeGroup.toJSON())
+    } else {
+      this.outcomes.add(model)
+      dfd = this.changeLink(model, this.outcomeGroup.toJSON())
+    }
+    return dfd.done(() => {
+      model.trigger('select')
+      if (originalDir) return (originalDir.needsReset = true)
+    })
+  }
 
-      onFail = (m, r) ->
-        disablingDfd.reject()
-        $.flashError I18n.t 'flash.error', "An error occurred. Please refresh the page and try again."
+  // Internal: change the outcome link to the newGroup
+  changeLink(outcome, newGroup) {
+    const disablingDfd = new $.Deferred()
+    this.$el.disableWhileLoading(disablingDfd)
 
-      # create new link
-      oldGroup = outcome.outcomeGroup
-      outcome.outcomeGroup = newGroup
-      outcome.setUrlTo 'add'
-      $.ajaxJSON(outcome.url, 'POST', {outcome_id: outcome.get('id'), move_from: oldGroup.id})
-        .done( (modelData) ->
-          # reset urls etc.
-          outcome.set outcome.parse(modelData)
-          $.flashMessage I18n.t 'flash.updateSuccess', 'Update successful'
-          disablingDfd.resolve())
-        .fail onFail
+    function onFail(m, r) {
+      disablingDfd.reject()
+      return $.flashError(
+        I18n.t('flash.error', 'An error occurred. Please refresh the page and try again.')
+      )
+    }
 
-      disablingDfd
+    // create new link
+    const oldGroup = outcome.outcomeGroup
+    outcome.outcomeGroup = newGroup
+    outcome.setUrlTo('add')
+    $.ajaxJSON(outcome.url, 'POST', {outcome_id: outcome.get('id'), move_from: oldGroup.id})
+      .done(modelData => {
+        // reset urls etc.
+        outcome.set(outcome.parse(modelData))
+        $.flashMessage(I18n.t('flash.updateSuccess', 'Update successful'))
+        return disablingDfd.resolve()
+      })
+      .fail(onFail)
 
-    # Internal: change the group's parent to the newGroup
-    moveGroup: (group, newGroup) ->
-      disablingDfd = new $.Deferred()
+    return disablingDfd
+  }
 
-      onFail = (m, r) ->
-        disablingDfd.reject()
-        $.flashError I18n.t 'flash.error', "An error occurred. Please refresh the page and try again."
+  // Internal: change the group's parent to the newGroup
+  moveGroup(group, newGroup) {
+    const disablingDfd = new $.Deferred()
 
-      group.setUrlTo 'edit'
-      $.ajaxJSON(group.url, 'PUT', parent_outcome_group_id: newGroup.id)
-        .done( (modelData) ->
-          # reset urls etc.
-          group.set group.parse(modelData)
-          $.flashMessage I18n.t 'flash.updateSuccess', 'Update successful'
-          disablingDfd.resolve())
-        .fail onFail
+    function onFail(m, r) {
+      disablingDfd.reject()
+      return $.flashError(
+        I18n.t('flash.error', 'An error occurred. Please refresh the page and try again.')
+      )
+    }
 
-      @$el.disableWhileLoading disablingDfd
-      disablingDfd
+    group.setUrlTo('edit')
+    $.ajaxJSON(group.url, 'PUT', {parent_outcome_group_id: newGroup.id})
+      .done(modelData => {
+        // reset urls etc.
+        group.set(group.parse(modelData))
+        $.flashMessage(I18n.t('flash.updateSuccess', 'Update successful'))
+        return disablingDfd.resolve()
+      })
+      .fail(onFail)
 
-    makeFocusable: =>
-      return if @$el.find('[tabindex=0]').length > 0
-      if (@views().length > 0)
-        @views()[0].makeFocusable()
+    this.$el.disableWhileLoading(disablingDfd)
+    return disablingDfd
+  }
 
-    selectFirstOutcome: =>
-      $('ul.outcome-level li:first').click()
+  makeFocusable() {
+    if (this.$el.find('[tabindex=0]').length > 0) return
+    if (this.views().length > 0) {
+      return this.views()[0].makeFocusable()
+    }
+  }
 
-    # Overriding
-    paginationLoaderTemplate: ->
-      "<li><span class='loading-more'>
-        #{htmlEscape I18n.t("Loading more results")}</span></li>"
+  selectFirstOutcome() {
+    $('ul.outcome-level li:first').click()
+  }
 
-    # Overriding to insert into the ul.
-    showPaginationLoader: ->
-      @$paginationLoader ?= $(@paginationLoaderTemplate())
-      @$el.append(@$paginationLoader)
+  // Overriding
+  paginationLoaderTemplate() {
+    return `<li><span class='loading-more'> \
+${htmlEscape(I18n.t('Loading more results'))}</span></li>`
+  }
 
-    # Fetch outcomes after all the groups have been fetched.
-    fetchOutcomes: ->
-      @collection = @outcomes
-      @bindPaginationEvents()
-      @outcomes.fetch(success: => @loadDfd.resolve(this))
-      @startPaginationListener()
-      @showPaginationLoader()
+  // Overriding to insert into the ul.
+  showPaginationLoader() {
+    if (this.$paginationLoader == null) {
+      this.$paginationLoader = $(this.paginationLoaderTemplate())
+    }
+    return this.$el.append(this.$paginationLoader)
+  }
 
-    triggerSelect: (sv) =>
-      @clearSelection()
-      @selectedModel = sv.model
-      sv.select()
-      @trigger 'select', this, sv.model
+  // Fetch outcomes after all the groups have been fetched.
+  fetchOutcomes() {
+    this.collection = this.outcomes
+    this.bindPaginationEvents()
+    this.outcomes.fetch({success: () => this.loadDfd.resolve(this)})
+    this.startPaginationListener()
+    return this.showPaginationLoader()
+  }
 
-    # Cache the backbone views for outcomes and groups.
-    # Groups are shown first.
-    views: ->
-      return @_views if @_views and not _.isEmpty @_views
+  triggerSelect(sv) {
+    this.clearSelection()
+    this.selectedModel = sv.model
+    sv.select()
+    return this.trigger('select', this, sv.model)
+  }
 
-      @_views = @_viewsFor(@groups.models, OutcomeGroupIconView)
-        .concat @_viewsFor(@outcomes.models, OutcomeIconView)
-      for v in @_views
-        v.on 'select', @triggerSelect
-        v.select() if v.model is @selectedModel
-      @_views
+  // Cache the backbone views for outcomes and groups.
+  // Groups are shown first.
+  views() {
+    if (this._views && !_.isEmpty(this._views)) {
+      return this._views
+    }
 
-    reset: =>
-      @needsReset = false
-      @_clearViews()
-      @render()
+    this._views = this._viewsFor(this.groups.models, OutcomeGroupIconView).concat(
+      this._viewsFor(this.outcomes.models, OutcomeIconView)
+    )
+    for (const v of this._views) {
+      v.on('select', this.triggerSelect)
+      if (v.model === this.selectedModel) v.select()
+    }
+    return this._views
+  }
 
-    removeGroup: (group) ->
-      @reset()
-      if group is _.last(@sidebar.directories)?.outcomeGroup
-        @trigger 'select', this, null
+  reset() {
+    this.needsReset = false
+    this._clearViews()
+    return this.render()
+  }
 
-    remove: ->
-      @_clearViews()
-      @selectedModel = null
-      super arguments...
+  removeGroup(group) {
+    this.reset()
+    if (group === __guard__(_.last(this.sidebar.directories), x => x.outcomeGroup)) {
+      return this.trigger('select', this, null)
+    }
+  }
 
-    clearSelection: (e) ->
-      e?.preventDefault()
-      @prevSelectedModel = @selectedModel
-      @selectedModel = null
-      _.each @views(), (v) -> v.unSelect()
+  remove() {
+    this._clearViews()
+    this.selectedModel = null
+    return super.remove(...arguments)
+  }
 
-    clearOutcomeSelection: ->
-      if @selectedModel instanceof Outcome
-        @clearSelection()
+  clearSelection(e) {
+    if (e != null) {
+      e.preventDefault()
+    }
+    this.prevSelectedModel = this.selectedModel
+    this.selectedModel = null
+    return _.each(this.views(), v => v.unSelect())
+  }
 
-    render: =>
-      @$el.empty()
-      return @reset() if @needsReset
-      _.each @views(), (v) => @$el.append v.render().el
-      @handleWarning() if @inFindDialog
-      @initDroppable() unless @readOnly
-      @startPaginationListener()
-      # Make the first <li /> tabbable for accessibility purposes.
-      @$('li:first').attr('tabindex', 0)
-      @$el.data 'view', this
-      this
+  clearOutcomeSelection() {
+    if (this.selectedModel instanceof Outcome) {
+      return this.clearSelection()
+    }
+  }
 
-    handleWarning: =>
-      if !@parent && _.isEmpty(@groups.models) && _.isEmpty(@outcomes.models) && _.isEmpty(@views())
-        $.publish("renderNoOutcomeWarning")
-      else
-        $.publish("clearNoOutcomeWarning")
+  render() {
+    this.$el.empty()
+    if (this.needsReset) return this.reset()
+    _.each(this.views(), v => this.$el.append(v.render().el))
+    if (this.inFindDialog) this.handleWarning()
+    if (!this.readOnly) this.initDroppable()
+    this.startPaginationListener()
+    // Make the first <li /> tabbable for accessibility purposes.
+    this.$('li:first').attr('tabindex', 0)
+    this.$el.data('view', this)
+    return this
+  }
 
-    # private
-    _viewsFor: (models, viewClass) ->
-      _.map models, (model) => new viewClass {model: model, readOnly: @readOnly, dir: this}
+  handleWarning() {
+    if (
+      !this.parent &&
+      _.isEmpty(this.groups.models) &&
+      _.isEmpty(this.outcomes.models) &&
+      _.isEmpty(this.views())
+    ) {
+      return $.publish('renderNoOutcomeWarning')
+    } else {
+      return $.publish('clearNoOutcomeWarning')
+    }
+  }
 
-    # private
-    _clearViews: ->
-      _.each @_views, (v) -> v.remove()
-      @_views = null
+  // private
+  _viewsFor(models, viewClass) {
+    return _.map(models, model => new viewClass({model, readOnly: this.readOnly, dir: this}))
+  }
+
+  // private
+  _clearViews() {
+    _.each(this._views, v => v.remove())
+    return (this._views = null)
+  }
+}
+OutcomesDirectoryView.initClass()
+
+function __guard__(value, transform) {
+  return typeof value !== 'undefined' && value !== null ? transform(value) : undefined
+}

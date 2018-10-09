@@ -1,223 +1,299 @@
-#
-# Copyright (C) 2013 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
-#
+//
+// Copyright (C) 2013 - present Instructure, Inc.
+//
+// This file is part of Canvas.
+//
+// Canvas is free software: you can redistribute it and/or modify it under
+// the terms of the GNU Affero General Public License as published by the Free
+// Software Foundation, version 3 of the License.
+//
+// Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+// details.
+//
+// You should have received a copy of the GNU Affero General Public License along
+// with this program. If not, see <http://www.gnu.org/licenses/>.
+//
 
-define [
-  'i18n!profile'
-  'jquery'
-  'underscore'
-  '../DialogBaseView'
-  './UploadFileView'
-  './TakePictureView'
-  './GravatarView'
-  'jsx/shared/upload_file'
-  'jst/profiles/avatarDialog'
-  'jst/profiles/avatar'
-], (I18n, $, _, DialogBaseView, UploadFileView, TakePictureView, GravatarView, uploader, template, avatarTemplate) ->
+import I18n from 'i18n!profile'
+import $ from 'jquery'
+import _ from 'underscore'
+import DialogBaseView from '../DialogBaseView'
+import UploadFileView from './UploadFileView'
+import TakePictureView from './TakePictureView'
+import GravatarView from './GravatarView'
+import {completeUpload} from 'jsx/shared/upload_file'
+import template from 'jst/profiles/avatarDialog'
 
-  class AvatarDialogView extends DialogBaseView
+export default class AvatarDialogView extends DialogBaseView {
+  constructor(...args) {
+    {
+      // Hack: trick Babel/TypeScript into allowing this before super.
+      if (false) { super(); }
+      let thisFn = (() => { return this; }).toString();
+      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
+      eval(`${thisName} = this;`);
+    }
+    this.updateAvatar = this.updateAvatar.bind(this)
+    this.preflightRequest = this.preflightRequest.bind(this)
+    this.onPreflight = this.onPreflight.bind(this)
+    this.onUploadSuccess = this.onUploadSuccess.bind(this)
+    this.waitAndSaveUserAvatar = this.waitAndSaveUserAvatar.bind(this)
+    this.saveUserAvatar = this.saveUserAvatar.bind(this)
+    this.updateDomAvatar = this.updateDomAvatar.bind(this)
+    this.checkFocusDeferred = this.checkFocusDeferred.bind(this)
+    super(...args)
+  }
 
-    template: template
+  static initClass() {
+    this.prototype.template = template
 
-    AVATAR_SIZE:
-      h: 128
+    this.prototype.AVATAR_SIZE = {
+      h: 128,
       w: 128
+    }
 
-    @child 'uploadFileView',  '#upload-picture'
-    @child 'takePictureView', '#take-picture'
-    @child 'gravatarView', '#from-gravatar'
+    this.child('uploadFileView', '#upload-picture')
+    this.child('takePictureView', '#take-picture')
+    this.child('gravatarView', '#from-gravatar')
 
-    dialogOptions: ->
-      title: @messages.selectAvatar
-      buttons: [
-        text: @messages.cancel
-        click: @cancel
-      ,
-        text: @messages.selectImage
-        class: 'btn-primary select_button'
-        click: @updateAvatar
-      ]
-      height: 500
-      width: 600
-
-    messages:
-      selectAvatar:    I18n.t('buttons.select_profile_picture', 'Select Profile Picture')
-      cancel:         I18n.t('#buttons.cancel', 'Cancel')
-      selectImage:    I18n.t('buttons.save', 'Save')
+    this.prototype.messages = {
+      selectAvatar: I18n.t('buttons.select_profile_picture', 'Select Profile Picture'),
+      cancel: I18n.t('#buttons.cancel', 'Cancel'),
+      selectImage: I18n.t('buttons.save', 'Save'),
       selectingImage: I18n.t('buttons.selecting_image', 'Selecting Image...')
+    }
 
-    events:
-      'click .nav-pills a'       : 'onNav'
-      'click .select-photo-link' : 'onUploadClick'
-      'change #selected-photo'   : 'onSelectAvatar'
+    this.prototype.events = {
+      'click .nav-pills a': 'onNav',
+      'click .select-photo-link': 'onUploadClick',
+      'change #selected-photo': 'onSelectAvatar'
+    }
+  }
 
-    initialize: () ->
-      @uploadFileView = new UploadFileView(avatarSize: @AVATAR_SIZE)
-      @takePictureView = new TakePictureView(avatarSize: @AVATAR_SIZE)
-      @gravatarView   = new GravatarView(avatarSize: @AVATAR_SIZE)
-      super
+  dialogOptions() {
+    return {
+      title: this.messages.selectAvatar,
+      buttons: [
+        {
+          text: this.messages.cancel,
+          click: this.cancel
+        },
+        {
+          text: this.messages.selectImage,
+          class: 'btn-primary select_button',
+          click: this.updateAvatar
+        }
+      ],
+      height: 500,
+      width: 600
+    }
+  }
 
-    show: ->
-      @render()
-      _.each(@children, (child) => @listenTo(child, 'ready', @onReady))
-      @togglePane(@$('.nav-pills a')[0])
-      super
+  initialize() {
+    this.uploadFileView = new UploadFileView({avatarSize: this.AVATAR_SIZE})
+    this.takePictureView = new TakePictureView({avatarSize: this.AVATAR_SIZE})
+    this.gravatarView = new GravatarView({avatarSize: this.AVATAR_SIZE})
+    return super.initialize(...arguments)
+  }
 
-    cancel: ->
-      @teardown()
-      super
+  show() {
+    this.render()
+    _.each(this.children, child => this.listenTo(child, 'ready', this.onReady))
+    this.togglePane(this.$('.nav-pills a')[0])
+    return super.show(...arguments)
+  }
 
-    close: ->
-      @teardown()
-      @enableSelectButton()
-      super
+  cancel() {
+    this.teardown()
+    return super.cancel(...arguments)
+  }
 
-    getImage: ->
-      (@currentView || @$('.avatar-content > div:first-child').data('view')).getImage()
+  close() {
+    this.teardown()
+    this.enableSelectButton()
+    return super.close(...arguments)
+  }
 
-    updateAvatar: =>
-      @disableSelectButton()
-      if @currentView?.updateAvatar
-        @viewUpdateAvatar()
-      else
-        @imageUpdateAvatar()
+  getImage() {
+    return (this.currentView || this.$('.avatar-content > div:first-child').data('view')).getImage()
+  }
 
-    enableSelectButton: ->
-      $('.select_button')
-        .prop('disabled', false)
-        .removeClass('ui-state-hover')
-        .text(@messages.selectImage)
+  updateAvatar() {
+    this.disableSelectButton()
+    if (this.currentView != null ? this.currentView.updateAvatar : undefined) {
+      return this.viewUpdateAvatar()
+    } else {
+      return this.imageUpdateAvatar()
+    }
+  }
 
-    disableSelectButton: ->
-      $('.select_button').prop('disabled', true).text(@messages.selectingImage)
+  enableSelectButton() {
+    $('.select_button')
+      .prop('disabled', false)
+      .removeClass('ui-state-hover')
+      .text(this.messages.selectImage)
+  }
 
-    viewUpdateAvatar: ->
-      @currentView.updateAvatar().then((response) =>
-        @updateDomAvatar(response.avatar_url))
+  disableSelectButton() {
+    $('.select_button')
+      .prop('disabled', true)
+      .text(this.messages.selectingImage)
+  }
 
-    imageUpdateAvatar: ->
-      $.when(@getImage(), @preflightRequest()).then(@onPreflight)
+  viewUpdateAvatar() {
+    return this.currentView.updateAvatar().then(response => {
+      return this.updateDomAvatar(response.avatar_url)
+    })
+  }
 
-    handleErrorUpdating: (response) ->
-      if (response)
-        # try to get an error message out of JSON string
-        errors = try
-          JSON.parse(response).errors
-        catch error
-          undefined
+  imageUpdateAvatar() {
+    return $.when(this.getImage(), this.preflightRequest()).then(this.onPreflight)
+  }
 
-        if errors
-          errorReducer = (errorString, currentError) ->
-            errorString += currentError.message
+  handleErrorUpdating(response) {
+    if (response) {
+      // try to get an error message out of JSON string
+      const errors = (() => {
+        try {
+          return JSON.parse(response).errors
+        } catch (error) {
+          return undefined
+        }
+      })()
 
-          message = if _.isString(errors.base)
-            errors.base
-          else if _.isArray(errors.base)
-            errors.base.reduce(errorReducer, '')
-          else
-            I18n.t('Your profile photo could not be uploaded. You may have exceeded your upload limit.')
+      if (errors) {
+        const errorReducer = (errorString, currentError) => (errorString += currentError.message)
 
-          $.flashError(message)
-          @enableSelectButton()
+        const message = _.isString(errors.base)
+          ? errors.base
+          : _.isArray(errors.base)
+            ? errors.base.reduce(errorReducer, '')
+            : I18n.t(
+                'Your profile photo could not be uploaded. You may have exceeded your upload limit.'
+              )
 
-    preflightRequest: =>
-      # not using uploader.uploadFile because need to have completeUpload also
-      # wait on @getImage in imageUpdateAvatar
-      $.post('/files/pending', {
-        name: 'profile.jpg'
-        format: 'text'
-        no_redirect: true
-        'attachment[on_duplicate]': 'overwrite'
-        'attachment[folder_id]': ENV.folder_id
-        'attachment[filename]': 'profile.jpg'
-        'attachment[context_code]': 'user_'+ENV.current_user_id
-      }).fail((xhr) => @handleErrorUpdating(xhr.responseText))
+        $.flashError(message)
+        return this.enableSelectButton()
+      }
+    }
+  }
 
-    onPreflight: (image, response) =>
-      preflight = response[0]
-      uploader.completeUpload(preflight, image, filename: 'profile.jpg', includeAvatar: true)
-        .then(@onUploadSuccess)
-        .catch((xhr) => @handleErrorUpdating(xhr.responseText))
+  preflightRequest() {
+    // not using uploader.uploadFile because need to have completeUpload also
+    // wait on @getImage in imageUpdateAvatar
+    return $.post('/files/pending', {
+      name: 'profile.jpg',
+      format: 'text',
+      no_redirect: true,
+      'attachment[on_duplicate]': 'overwrite',
+      'attachment[folder_id]': ENV.folder_id,
+      'attachment[filename]': 'profile.jpg',
+      'attachment[context_code]': `user_${ENV.current_user_id}`
+    }).fail(xhr => this.handleErrorUpdating(xhr.responseText))
+  }
 
-    onUploadSuccess: (response) =>
-      @waitAndSaveUserAvatar(response.avatar.token, response.avatar.url, 0)
+  onPreflight(image, response) {
+    const preflight = response[0]
+    return completeUpload(preflight, image, {filename: 'profile.jpg', includeAvatar: true})
+      .then(this.onUploadSuccess)
+      .catch(xhr => this.handleErrorUpdating(xhr.responseText))
+  }
 
-    # need to wait for the avatar to get processed by background jobs before
-    # it will save properly.
-    # wait 5 seconds and then error out
-    waitAndSaveUserAvatar: (token, url, count) =>
-      $.getJSON('/api/v1/users/self/avatars').then((avatarList) =>
-        processedAvatar = _.find(avatarList, (avatar) -> avatar.token == token)
-        if processedAvatar
-          @saveUserAvatar(token, url)
-        else if count < 50
-          window.setTimeout((=> @waitAndSaveUserAvatar(token, url, count + 1)), 100)
-        else
-          @handleErrorUpdating(JSON.stringify({
-            errors: { 
-              base: I18n.t("Profile photo save failed too many times")
+  onUploadSuccess(response) {
+    return this.waitAndSaveUserAvatar(response.avatar.token, response.avatar.url, 0)
+  }
+
+  // need to wait for the avatar to get processed by background jobs before
+  // it will save properly.
+  // wait 5 seconds and then error out
+  waitAndSaveUserAvatar(token, url, count) {
+    return $.getJSON('/api/v1/users/self/avatars').then(avatarList => {
+      const processedAvatar = _.find(avatarList, avatar => avatar.token === token)
+      if (processedAvatar) {
+        return this.saveUserAvatar(token, url)
+      } else if (count < 50) {
+        return window.setTimeout(() => this.waitAndSaveUserAvatar(token, url, count + 1), 100)
+      } else {
+        return this.handleErrorUpdating(
+          JSON.stringify({
+            errors: {
+              base: I18n.t('Profile photo save failed too many times')
             }
-          }))
-      )
+          })
+        )
+      }
+    })
+  }
 
-    saveUserAvatar: (token, url) =>
-      $.ajax('/api/v1/users/self', {
-        data: { 'user[avatar][token]': token }
-        dataType: 'json'
-        type: 'PUT'
-      }).then(_.partial(@updateDomAvatar, url))
+  saveUserAvatar(token, url) {
+    return $.ajax('/api/v1/users/self', {
+      data: {'user[avatar][token]': token},
+      dataType: 'json',
+      type: 'PUT'
+    }).then(_.partial(this.updateDomAvatar, url))
+  }
 
-    updateDomAvatar: (url) =>
-      $('.profile_pic_link, .profile-link')
-        .css('background-image', "url('#{url}')")
-      @close()
+  updateDomAvatar(url) {
+    $('.profile_pic_link, .profile-link').css('background-image', `url('${url}')`)
+    return this.close()
+  }
 
-    onNav: (e) ->
-      e.preventDefault()
-      @togglePane(e.target)
+  onNav(e) {
+    e.preventDefault()
+    return this.togglePane(e.target)
+  }
 
-    togglePane: (link) ->
-      $target  = @$(link).parent()
-      $content = @$(link.getAttribute('href'))
-      $target.siblings().removeClass('active')
-      $target.addClass('active')
-      @teardown()
-      $('.select_button').prop('disabled', true)
-      @$('.avatar-content div').removeClass('active')
-      $content.addClass('active').data('view')?.setup()
-      @currentView = $content.data('view')
+  togglePane(link) {
+    const $target = this.$(link).parent()
+    const $content = this.$(link.getAttribute('href'))
+    $target.siblings().removeClass('active')
+    $target.addClass('active')
+    this.teardown()
+    $('.select_button').prop('disabled', true)
+    this.$('.avatar-content div').removeClass('active')
+    __guard__($content.addClass('active').data('view'), x => x.setup())
+    return (this.currentView = $content.data('view'))
+  }
 
-    onReady: (ready = true) ->
-      $('.select_button').prop('disabled', !ready)
-      @checkFocus()
+  onReady(ready = true) {
+    $('.select_button').prop('disabled', !ready)
+    return this.checkFocus()
+  }
 
-    checkFocus: () ->
-      # deferring this makes it work more reliably because in some cases (like
-      # visibility updates) the focus isn't lost immediately.
-      _.defer(@checkFocusDeferred)
+  checkFocus() {
+    // deferring this makes it work more reliably because in some cases (like
+    // visibility updates) the focus isn't lost immediately.
+    return _.defer(this.checkFocusDeferred)
+  }
 
-    checkFocusDeferred: () =>
-      unless $.contains(@$el[0], document.activeElement) && $(document.activeElement).is(':visible')
-        $('.ui-dialog-titlebar-close').focus()
+  checkFocusDeferred() {
+    if (
+      !$.contains(this.$el[0], document.activeElement) ||
+      !$(document.activeElement).is(':visible')
+    ) {
+      $('.ui-dialog-titlebar-close').focus()
+    }
+  }
 
-    teardown: ->
-      _.each(@children, (child) -> child.teardown())
+  teardown() {
+    return _.each(this.children, child => child.teardown())
+  }
 
-    toJSON: ->
-      hasFileReader = !!window.FileReader
-      hasUserMedia = !!(navigator.getUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia || navigator.webkitGetUserMedia)
-      { hasFileReader: hasFileReader, hasGetUserMedia: hasUserMedia, enableGravatar: ENV.enable_gravatar }
+  toJSON() {
+    const hasFileReader = !!window.FileReader
+    const hasUserMedia = !!(
+      navigator.getUserMedia ||
+      navigator.mozGetUserMedia ||
+      navigator.msGetUserMedia ||
+      navigator.webkitGetUserMedia
+    )
+    return {hasFileReader, hasGetUserMedia: hasUserMedia, enableGravatar: ENV.enable_gravatar}
+  }
+}
+AvatarDialogView.initClass()
+
+function __guard__(value, transform) {
+  return typeof value !== 'undefined' && value !== null ? transform(value) : undefined
+}

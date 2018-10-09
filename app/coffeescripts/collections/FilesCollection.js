@@ -1,65 +1,74 @@
-#
-# Copyright (C) 2012 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
-#
+//
+// Copyright (C) 2012 - present Instructure, Inc.
+//
+// This file is part of Canvas.
+//
+// Canvas is free software: you can redistribute it and/or modify it under
+// the terms of the GNU Affero General Public License as published by the Free
+// Software Foundation, version 3 of the License.
+//
+// Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+// details.
+//
+// You should have received a copy of the GNU Affero General Public License along
+// with this program. If not, see <http://www.gnu.org/licenses/>.
+//
 
-define [
-  '../collections/PaginatedCollection'
-  'underscore'
-  '../models/File'
-], (PaginatedCollection, _, File) ->
+import PaginatedCollection from '../collections/PaginatedCollection'
+import _ from 'underscore'
+import File from '../models/File'
 
-  class FilesCollection extends PaginatedCollection
-    @optionProperty 'parentFolder'
+export default class FilesCollection extends PaginatedCollection {
+  initialize() {
+    this.on('change:sort change:order', this.setQueryStringParams)
+    return super.initialize(...arguments)
+  }
 
-    model: File
+  fetch(options = {}) {
+    let res
+    options.data = _.extend(
+      {content_types: this.parentFolder != null ? this.parentFolder.contentTypes : undefined},
+      options.data || {}
+    )
+    if (this.parentFolder != null ? this.parentFolder.useVerifiers : undefined) {
+      options.data.use_verifiers = 1
+    }
+    return (res = super.fetch(options))
+  }
 
-    initialize: ->
-      @on 'change:sort change:order', @setQueryStringParams
-      super
+  parse(response) {
+    if (response && this.parentFolder) {
+      const previewUrl = this.parentFolder.previewUrl()
+      _.each(
+        response,
+        file =>
+          (file.rce_preview_url = previewUrl
+            ? previewUrl.replace('{{id}}', file.id.toString())
+            : file.url)
+      )
+    }
+    return super.parse(...arguments)
+  }
 
-    fetch: (options = {}) ->
-      options.data = _.extend content_types: @parentFolder?.contentTypes, options.data || {}
-      options.data.use_verifiers = 1 if @parentFolder?.useVerifiers
-      res = super options
+  // TODO: This is duplicate code from Folder.coffee, can we DRY?
+  setQueryStringParams() {
+    const newParams = {
+      include: ['user'],
+      per_page: 20,
+      sort: this.get('sort'),
+      order: this.get('order')
+    }
 
-    parse: (response) ->
-      if response and @parentFolder
-        previewUrl = @parentFolder.previewUrl()
-        _.each response, (file) ->
-          file.rce_preview_url = if previewUrl
-            previewUrl.replace('{{id}}', file.id.toString())
-          else
-            file.url
-      super
+    if (this.loadedAll) return
+    const url = new URL(this.url)
+    const params = deparam(url.search)
+    url.search = $.param(_.extend(params, newParams))
+    this.url = url.toString()
+    return this.reset()
+  }
+}
+FilesCollection.optionProperty('parentFolder')
 
-    # TODO: This is duplicate code from Folder.coffee, can we DRY?
-    setQueryStringParams: ->
-      newParams =
-        include: ['user']
-        per_page: 20
-        sort: @get('sort')
-        order: @get('order')
-
-      return if @loadedAll
-      url = new URL(@url)
-      params = deparam(url.search)
-      url.search = $.param _.extend(params, newParams)
-      @url = url.toString()
-      @reset()
-
-
-
+FilesCollection.prototype.model = File

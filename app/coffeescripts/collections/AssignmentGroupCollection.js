@@ -1,105 +1,119 @@
-#
-# Copyright (C) 2012 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// Copyright (C) 2012 - present Instructure, Inc.
+//
+// This file is part of Canvas.
+//
+// Canvas is free software: you can redistribute it and/or modify it under
+// the terms of the GNU Affero General Public License as published by the Free
+// Software Foundation, version 3 of the License.
+//
+// Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+// details.
+//
+// You should have received a copy of the GNU Affero General Public License along
+// with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'jquery'
-  'Backbone'
-  '../collections/PaginatedCollection'
-  '../models/AssignmentGroup'
-  'underscore'
-  '../collections/SubmissionCollection'
-  '../collections/ModuleCollection'
-], ($, Backbone, PaginatedCollection, AssignmentGroup, _, SubmissionCollection, ModuleCollection) ->
+import PaginatedCollection from '../collections/PaginatedCollection'
+import AssignmentGroup from '../models/AssignmentGroup'
+import _ from 'underscore'
+import SubmissionCollection from '../collections/SubmissionCollection'
+import ModuleCollection from '../collections/ModuleCollection'
 
-  PER_PAGE_LIMIT = 50
+const PER_PAGE_LIMIT = 50
 
-  class AssignmentGroupCollection extends PaginatedCollection
+export default class AssignmentGroupCollection extends PaginatedCollection {
+  loadModuleNames() {
+    const modules = new ModuleCollection([], {course_id: this.course.id})
+    modules.loadAll = true
+    modules.skip_items = true
+    modules.fetch()
+    modules.on('fetched:last', () => {
+      const moduleNames = {}
+      for (const m of modules.toJSON()) {
+        moduleNames[m.id] = m.name
+      }
 
-    loadAll: true
-    model: AssignmentGroup
+      for (const assignment of this.assignments()) {
+        const assignmentModuleNames = _(assignment.get('module_ids')).map(id => moduleNames[id])
+        assignment.set('modules', assignmentModuleNames)
+      }
+    })
+  }
 
-    @optionProperty 'course'
-    @optionProperty 'courseSubmissionsURL'
+  assignments() {
+    return this.chain()
+      .map(ag => ag.get('assignments').toArray())
+      .flatten()
+      .value()
+  }
 
-    # TODO: this will also return the assignments discussion_topic if it is of
-    # that type, which we don't need.
-    defaults:
-      params:
-        include: ["assignments"]
+  canReadGrades() {
+    return ENV.PERMISSIONS.read_grades
+  }
 
-    loadModuleNames: ->
-      modules = new ModuleCollection([], {course_id: @course.id})
-      modules.loadAll = true
-      modules.skip_items = true
-      modules.fetch()
-      modules.on 'fetched:last', =>
-        moduleNames = {}
-        for m in modules.toJSON()
-          moduleNames[m.id] = m.name
+  getGrades() {
+    if (this.canReadGrades() && ENV.observed_student_ids.length <= 1) {
+      const collection = new SubmissionCollection()
+      if (ENV.observed_student_ids.length === 1) {
+        collection.url = () =>
+          `${this.courseSubmissionsURL}?student_ids[]=${
+            ENV.observed_student_ids[0]
+          }&per_page=${PER_PAGE_LIMIT}`
+      } else {
+        collection.url = () => `${this.courseSubmissionsURL}?per_page=${PER_PAGE_LIMIT}`
+      }
+      collection.loadAll = true
+      collection.on('fetched:last', () => this.loadGradesFromSubmissions(collection.toArray()))
+      return collection.fetch()
+    } else {
+      return this.trigger('change:submissions')
+    }
+  }
 
-        for assignment in @assignments()
-          assignmentModuleNames = _(assignment.get 'module_ids')
-            .map (id) -> moduleNames[id]
-          assignment.set('modules', assignmentModuleNames)
+  loadGradesFromSubmissions(submissions) {
+    const submissionsHash = {}
+    for (const submission of submissions) {
+      submissionsHash[submission.get('assignment_id')] = submission
+    }
 
-    assignments: ->
-      @chain()
-        .map((ag) -> ag.get('assignments').toArray())
-        .flatten()
-        .value()
+    for (const assignment of this.assignments()) {
+      const submission = submissionsHash[assignment.get('id')]
+      if (submission) {
+        if (submission.get('grade') != null) {
+          const grade = parseFloat(submission.get('grade'))
+          // may be a letter grade like 'A-'
+          if (!isNaN(grade)) {
+            submission.set('grade', grade)
+          }
+        } else {
+          submission.set('notYetGraded', true)
+        }
+        assignment.set('submission', submission)
+      } else {
+        // manually trigger a change so the UI can update appropriately.
+        assignment.set('submission', null)
+        assignment.trigger('change:submission')
+      }
+    }
 
-    comparator: 'position'
+    return this.trigger('change:submissions')
+  }
+}
 
-    canReadGrades: ->
-      ENV.PERMISSIONS.read_grades
+AssignmentGroupCollection.prototype.loadAll = true
+AssignmentGroupCollection.prototype.model = AssignmentGroup
 
-    getGrades: ->
-      if @canReadGrades() && ENV.observed_student_ids.length <= 1
-        collection = new SubmissionCollection
-        if ENV.observed_student_ids.length == 1
-          collection.url = => "#{@courseSubmissionsURL}?student_ids[]=#{ENV.observed_student_ids[0]}&per_page=#{PER_PAGE_LIMIT}"
-        else
-          collection.url = => "#{@courseSubmissionsURL}?per_page=#{PER_PAGE_LIMIT}"
-        collection.loadAll = true
-        collection.on 'fetched:last', =>
-          @loadGradesFromSubmissions(collection.toArray())
-        collection.fetch()
-      else
-        @trigger 'change:submissions'
+AssignmentGroupCollection.optionProperty('course')
+AssignmentGroupCollection.optionProperty('courseSubmissionsURL')
 
-    loadGradesFromSubmissions: (submissions) ->
-      submissionsHash = {}
-      for submission in submissions
-        submissionsHash[submission.get('assignment_id')] = submission
+// TODO: this will also return the assignments discussion_topic if it is of
+// that type, which we don't need.
+AssignmentGroupCollection.prototype.defaults = {
+  params: {
+    include: ['assignments']
+  }
+}
 
-      for assignment in @assignments()
-        submission = submissionsHash[assignment.get('id')]
-        if submission
-          if submission.get('grade')?
-            grade = parseFloat submission.get('grade')
-            # may be a letter grade like 'A-'
-            if !isNaN grade
-              submission.set 'grade', grade
-          else
-            submission.set 'notYetGraded', true
-          assignment.set 'submission', submission
-        else
-          # manually trigger a change so the UI can update appropriately.
-          assignment.set 'submission', null
-          assignment.trigger 'change:submission'
-
-      @trigger 'change:submissions'
+AssignmentGroupCollection.prototype.comparator = 'position'

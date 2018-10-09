@@ -1,105 +1,130 @@
-#
-# Copyright (C) 2014 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// Copyright (C) 2014 - present Instructure, Inc.
+//
+// This file is part of Canvas.
+//
+// Canvas is free software: you can redistribute it and/or modify it under
+// the terms of the GNU Affero General Public License as published by the Free
+// Software Foundation, version 3 of the License.
+//
+// Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+// details.
+//
+// You should have received a copy of the GNU Affero General Public License along
+// with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'jquery'
-  'underscore'
-  'Backbone'
-  '../models/grade_summary/Section'
-  '../models/grade_summary/Group'
-  '../models/grade_summary/Outcome'
-  '../collections/PaginatedCollection'
-  '../collections/WrappedCollection'
-  '../util/natcompare'
-], ($, _, {Collection}, Section, Group, Outcome, PaginatedCollection, WrappedCollection, natcompare) ->
-  class GroupCollection extends PaginatedCollection
-    @optionProperty 'course_id'
-    model: Group
-    url: -> "/api/v1/courses/#{@course_id}/outcome_groups"
+import $ from 'jquery'
 
-  class LinkCollection extends PaginatedCollection
-    @optionProperty 'course_id'
-    url: -> "/api/v1/courses/#{@course_id}/outcome_group_links?outcome_style=full"
+import _ from 'underscore'
+import {Collection} from 'Backbone'
+import Section from '../models/grade_summary/Section'
+import Group from '../models/grade_summary/Group'
+import Outcome from '../models/grade_summary/Outcome'
+import PaginatedCollection from '../collections/PaginatedCollection'
+import WrappedCollection from '../collections/WrappedCollection'
+import natcompare from '../util/natcompare'
 
-  class RollupCollection extends WrappedCollection
-    @optionProperty 'course_id'
-    @optionProperty 'user_id'
-    key: 'rollups'
-    url: -> "/api/v1/courses/#{@course_id}/outcome_rollups?user_ids[]=#{@user_id}"
+class GroupCollection extends PaginatedCollection {
+  url() {
+    return `/api/v1/courses/${this.course_id}/outcome_groups`
+  }
+}
+GroupCollection.optionProperty('course_id')
+GroupCollection.prototype.model = Group
 
-  class OutcomeSummaryCollection extends Collection
-    @optionProperty 'course_id'
-    @optionProperty 'user_id'
+class LinkCollection extends PaginatedCollection {
+  url() {
+    return `/api/v1/courses/${this.course_id}/outcome_group_links?outcome_style=full`
+  }
+}
+LinkCollection.optionProperty('course_id')
 
-    comparator: natcompare.byGet('path')
+class RollupCollection extends WrappedCollection {
+  url() {
+    return `/api/v1/courses/${this.course_id}/outcome_rollups?user_ids[]=${this.user_id}`
+  }
+}
+RollupCollection.optionProperty('course_id')
+RollupCollection.optionProperty('user_id')
+RollupCollection.prototype.key = 'rollups'
 
-    initialize: ->
-      super
-      @rawCollections =
-        groups: new GroupCollection([], course_id: @course_id)
-        links: new LinkCollection([], course_id: @course_id)
-        rollups: new RollupCollection([], course_id: @course_id, user_id: @user_id)
-      @outcomeCache = new Collection()
+export default class OutcomeSummaryCollection extends Collection {
+  initialize() {
+    super.initialize(...arguments)
+    this.rawCollections = {
+      groups: new GroupCollection([], {course_id: this.course_id}),
+      links: new LinkCollection([], {course_id: this.course_id}),
+      rollups: new RollupCollection([], {course_id: this.course_id, user_id: this.user_id})
+    }
+    return (this.outcomeCache = new Collection())
+  }
 
-    fetch: ->
-      dfd = $.Deferred()
-      requests = _.values(@rawCollections).map (collection) -> collection.loadAll = true; collection.fetch()
-      $.when.apply($, requests).done(=> @processCollections(dfd))
-      dfd
+  fetch = () => {
+    const dfd = $.Deferred()
+    const requests = _.values(this.rawCollections).map(collection => {
+      collection.loadAll = true
+      return collection.fetch()
+    })
+    $.when(...requests).done(() => this.processCollections(dfd))
+    return dfd
+  }
 
-    rollups: ->
-      studentRollups = @rawCollections.rollups.at(0).get('scores')
-      pairs = studentRollups.map((x) -> [x.links.outcome, x])
-      _.object(pairs)
+  rollups() {
+    const studentRollups = this.rawCollections.rollups.at(0).get('scores')
+    const pairs = studentRollups.map(x => [x.links.outcome, x])
+    return _.object(pairs)
+  }
 
-    populateGroupOutcomes: ->
-      rollups = @rollups()
-      @outcomeCache.reset()
-      @rawCollections.links.each (link) =>
-        outcome = new Outcome(link.get('outcome'))
-        parent = @rawCollections.groups.get(link.get('outcome_group').id)
-        rollup = rollups[outcome.id]
-        outcome.set('score', rollup?.score)
-        outcome.set('result_title', rollup?.title)
-        outcome.set('submission_time', rollup?.submitted_at)
-        outcome.set('count', rollup?.count || 0)
-        outcome.group = parent
-        parent.get('outcomes').add(outcome)
-        @outcomeCache.add(outcome)
+  populateGroupOutcomes() {
+    const rollups = this.rollups()
+    this.outcomeCache.reset()
+    this.rawCollections.links.each(link => {
+      const outcome = new Outcome(link.get('outcome'))
+      const parent = this.rawCollections.groups.get(link.get('outcome_group').id)
+      const rollup = rollups[outcome.id]
+      outcome.set('score', rollup != null ? rollup.score : undefined)
+      outcome.set('result_title', rollup != null ? rollup.title : undefined)
+      outcome.set('submission_time', rollup != null ? rollup.submitted_at : undefined)
+      outcome.set('count', (rollup != null ? rollup.count : undefined) || 0)
+      outcome.group = parent
+      parent.get('outcomes').add(outcome)
+      this.outcomeCache.add(outcome)
+    })
+  }
 
-    populateSectionGroups: ->
-      tmp = new Collection()
-      @rawCollections.groups.each (group) =>
-        return unless group.get('outcomes').length
-        parentObj = group.get('parent_outcome_group')
-        parentId = if parentObj then parentObj.id else group.id
-        unless parent = tmp.get(parentId)
-          parent = tmp.add(new Section(id: parentId, path: @getPath(parentId)))
-        parent.get('groups').add(group)
-      @reset(tmp.models)
+  populateSectionGroups() {
+    const tmp = new Collection()
+    this.rawCollections.groups.each(group => {
+      let parent
+      if (!group.get('outcomes').length) return
+      const parentObj = group.get('parent_outcome_group')
+      const parentId = parentObj ? parentObj.id : group.id
+      if (!(parent = tmp.get(parentId))) {
+        parent = tmp.add(new Section({id: parentId, path: this.getPath(parentId)}))
+      }
+      parent.get('groups').add(group)
+    })
+    return this.reset(tmp.models)
+  }
 
-    processCollections: (dfd) =>
-      @populateGroupOutcomes()
-      @populateSectionGroups()
-      dfd.resolve(@models)
+  processCollections(dfd) {
+    this.populateGroupOutcomes()
+    this.populateSectionGroups()
+    return dfd.resolve(this.models)
+  }
 
-    getPath: (id) ->
-      group = @rawCollections.groups.get(id)
-      parent = group.get('parent_outcome_group')
-      return '' unless parent
-      parentPath = @getPath(parent.id)
-      (if parentPath then parentPath + ': ' else '') + group.get('title')
+  getPath(id) {
+    const group = this.rawCollections.groups.get(id)
+    const parent = group.get('parent_outcome_group')
+    if (!parent) return ''
+    const parentPath = this.getPath(parent.id)
+    return (parentPath ? `${parentPath}: ` : '') + group.get('title')
+  }
+}
+
+OutcomeSummaryCollection.optionProperty('course_id')
+OutcomeSummaryCollection.optionProperty('user_id')
+
+OutcomeSummaryCollection.prototype.comparator = natcompare.byGet('path')

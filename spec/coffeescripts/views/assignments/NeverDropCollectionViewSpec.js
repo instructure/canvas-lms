@@ -32,7 +32,7 @@ class AssignmentStub extends Backbone.Model {
       const thisFn = (() => {
         this
       }).toString()
-      const thisName = thisFn.slice(thisFn.indexOf('{') + 1, thisFn.indexOf(';')).trim()
+      const thisName = thisFn.slice(thisFn.indexOf('{') + 1, thisFn.lastIndexOf(';')).trim()
       eval(`${thisName} = this;`)
     }
     this.toView = this.toView.bind(this)

@@ -1,123 +1,163 @@
-#
-# Copyright (C) 2013 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// Copyright (C) 2013 - present Instructure, Inc.
+//
+// This file is part of Canvas.
+//
+// Canvas is free software: you can redistribute it and/or modify it under
+// the terms of the GNU Affero General Public License as published by the Free
+// Software Foundation, version 3 of the License.
+//
+// Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+// details.
+//
+// You should have received a copy of the GNU Affero General Public License along
+// with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'jquery'
-  'underscore'
-  'Backbone'
-  '../CollectionView'
-  './WikiPageRevisionView'
-  'jst/wiki/WikiPageRevisions'
-  '../../jquery/floatingSticky'
-], ($, _, Backbone, CollectionView, WikiPageRevisionView, template) ->
+import $ from 'jquery'
+import _ from 'underscore'
+import CollectionView from '../CollectionView'
+import WikiPageRevisionView from './WikiPageRevisionView'
+import template from 'jst/wiki/WikiPageRevisions'
+import '../../jquery/floatingSticky'
 
-  class WikiPageRevisionsView extends CollectionView
-    className: 'show-revisions'
-    template: template
-    itemView: WikiPageRevisionView
+export default class WikiPageRevisionsView extends CollectionView {
+  static initClass() {
+    this.prototype.className = 'show-revisions'
+    this.prototype.template = template
+    this.prototype.itemView = WikiPageRevisionView
 
-    @mixin
-      events:
-        'click .prev-button': 'prevPage'
-        'click .next-button': 'nextPage'
+    this.mixin({
+      events: {
+        'click .prev-button': 'prevPage',
+        'click .next-button': 'nextPage',
         'click .close-button': 'close'
-      els:
-        '#ticker': '$ticker'
-        'aside': '$aside'
+      },
+      els: {
+        '#ticker': '$ticker',
+        aside: '$aside',
         '.revisions-list': '$revisionsList'
+      }
+    })
 
-    @optionProperty 'pages_path'
+    this.optionProperty('pages_path')
+  }
 
-    initialize: (options) ->
-      super
-      @selectedRevision = null
+  initialize(options) {
+    super.initialize(...arguments)
+    this.selectedRevision = null
 
-      # handle selection changes
-      @on 'selectionChanged', (newSelection, oldSelection) =>
-        oldSelection.model?.set('selected', false)
-        newSelection.model?.set('selected', true)
+    // handle selection changes
+    this.on('selectionChanged', (newSelection, oldSelection) => {
+      if (oldSelection.model != null) {
+        oldSelection.model.set('selected', false)
+      }
+      return newSelection.model != null ? newSelection.model.set('selected', true) : undefined
+    })
 
-      # reposition after rendering
-      @on 'render renderItem', => @reposition()
+    // reposition after rendering
+    return this.on('render renderItem', () => this.reposition())
+  }
 
-    afterRender: ->
-      super
-      $.publish('userContent/change')
-      @trigger('render')
+  afterRender() {
+    super.afterRender(...arguments)
+    $.publish('userContent/change')
+    this.trigger('render')
 
-      @floatingSticky = @$aside.floatingSticky('#main', {top: '#content'})
+    return (this.floatingSticky = this.$aside.floatingSticky('#main', {top: '#content'}))
+  }
 
-    remove: ->
-      if @floatingSticky
-        _.each @floatingSticky, (sticky) -> sticky.remove()
-        @floatingSticky = null
+  remove() {
+    if (this.floatingSticky) {
+      _.each(this.floatingSticky, sticky => sticky.remove())
+      this.floatingSticky = null
+    }
 
-      super
+    return super.remove(...arguments)
+  }
 
-    renderItem: ->
-      super
-      @trigger('renderItem')
+  renderItem() {
+    super.renderItem(...arguments)
+    return this.trigger('renderItem')
+  }
 
-    attachItemView: (model, view) ->
-      if !!@selectedRevision && @selectedRevision.get('revision_id') == model.get('revision_id')
-        model.set(@selectedRevision.attributes)
-        model.set('selected', true)
-        @setSelectedModelAndView(model, view)
-      else
-        model.set('selected', false)
+  attachItemView(model, view) {
+    if (
+      !!this.selectedRevision &&
+      this.selectedRevision.get('revision_id') === model.get('revision_id')
+    ) {
+      model.set(this.selectedRevision.attributes)
+      model.set('selected', true)
+      this.setSelectedModelAndView(model, view)
+    } else {
+      model.set('selected', false)
+    }
 
-      selectModel = =>
-        @setSelectedModelAndView(model, view)
-      selectModel() unless @selectedModel
+    const selectModel = () => {
+      return this.setSelectedModelAndView(model, view)
+    }
+    if (!this.selectedModel) {
+      selectModel()
+    }
 
-      view.pages_path = @pages_path
-      view.$el.on 'click', selectModel
-      view.$el.on 'keypress', (e) =>
-        if (e.keyCode == 13 || e.keyCode == 27)
-          e.preventDefault()
-          selectModel()
+    view.pages_path = this.pages_path
+    view.$el.on('click', selectModel)
+    return view.$el.on('keypress', e => {
+      if (e.keyCode === 13 || e.keyCode === 27) {
+        e.preventDefault()
+        return selectModel()
+      }
+    })
+  }
 
-    setSelectedModelAndView: (model, view) ->
-      oldSelectedModel = @selectedModel
-      oldSelectedView = @selectedView
-      @selectedModel = model
-      @selectedView = view
-      @selectedRevision = model
-      @trigger 'selectionChanged', {model: model, view: view}, {model: oldSelectedModel, view: oldSelectedView}
+  setSelectedModelAndView(model, view) {
+    const oldSelectedModel = this.selectedModel
+    const oldSelectedView = this.selectedView
+    this.selectedModel = model
+    this.selectedView = view
+    this.selectedRevision = model
+    return this.trigger(
+      'selectionChanged',
+      {model, view},
+      {model: oldSelectedModel, view: oldSelectedView}
+    )
+  }
 
-    reposition: ->
-      if @floatingSticky
-        _.each @floatingSticky, (sticky) -> sticky.reposition()
+  reposition() {
+    if (this.floatingSticky) {
+      return _.each(this.floatingSticky, sticky => sticky.reposition())
+    }
+  }
 
-    prevPage: (ev) ->
-      ev?.preventDefault()
-      @$el.disableWhileLoading @collection.fetch page: 'prev', reset: true
+  prevPage(ev) {
+    if (ev != null) {
+      ev.preventDefault()
+    }
+    return this.$el.disableWhileLoading(this.collection.fetch({page: 'prev', reset: true}))
+  }
 
-    nextPage: (ev) ->
-      ev?.preventDefault()
-      @$el.disableWhileLoading @collection.fetch page: 'next', reset: true
+  nextPage(ev) {
+    if (ev != null) {
+      ev.preventDefault()
+    }
+    return this.$el.disableWhileLoading(this.collection.fetch({page: 'next', reset: true}))
+  }
 
-    close: (ev) ->
-      ev?.preventDefault()
-      window.location.href = @collection.parentModel.get('html_url')
+  close(ev) {
+    if (ev != null) {
+      ev.preventDefault()
+    }
+    return (window.location.href = this.collection.parentModel.get('html_url'))
+  }
 
-    toJSON: ->
-      json = super
-      json.CAN =
-        FETCH_PREV: @collection.canFetch('prev')
-        FETCH_NEXT: @collection.canFetch('next')
-      json
+  toJSON() {
+    const json = super.toJSON(...arguments)
+    json.CAN = {
+      FETCH_PREV: this.collection.canFetch('prev'),
+      FETCH_NEXT: this.collection.canFetch('next')
+    }
+    return json
+  }
+}
+WikiPageRevisionsView.initClass()

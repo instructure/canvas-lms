@@ -1,154 +1,196 @@
-#
-# Copyright (C) 2014 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
-#
+//
+// Copyright (C) 2014 - present Instructure, Inc.
+//
+// This file is part of Canvas.
+//
+// Canvas is free software: you can redistribute it and/or modify it under
+// the terms of the GNU Affero General Public License as published by the Free
+// Software Foundation, version 3 of the License.
+//
+// Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+// details.
+//
+// You should have received a copy of the GNU Affero General Public License along
+// with this program. If not, see <http://www.gnu.org/licenses/>.
+//
 
-define [
-  'jquery'
-  'underscore'
-  './AvatarUploadBaseView'
-  'jst/profiles/takePictureView'
-  '../../util/BlobFactory'
-], ($, _, BaseView, template, BlobFactory) ->
+import $ from 'jquery'
+import _ from 'underscore'
+import BaseView from './AvatarUploadBaseView'
+import template from 'jst/profiles/takePictureView'
+import BlobFactory from '../../util/BlobFactory'
 
-  class TakePictureView extends BaseView
+export default class TakePictureView extends BaseView {
+  static initClass() {
+    this.optionProperty('avatarSize')
 
-    @optionProperty 'avatarSize'
+    this.prototype.template = template
 
-    template: template
+    this.prototype.events = {
+      'click .take-snapshot-btn': 'onSnapshot',
+      'click .retry-snapshot-btn': 'onRetry'
+    }
 
-    events:
-      'click .take-snapshot-btn'  : 'onSnapshot'
-      'click .retry-snapshot-btn' : 'onRetry'
+    this.prototype.els = {
+      '.webcam-live-preview': '$video',
+      '.webcam-clip': '$clip',
+      '.webcam-preview': '$preview',
+      '.webcam-capture-wrapper': '$captureWrapper',
+      '.webcam-preview-wrapper': '$previewWrapper',
+      '.webcam-preview-staging-area': '$canvas'
+    }
 
-    els:
-      '.webcam-live-preview'         : '$video'
-      '.webcam-clip'                 : '$clip'
-      '.webcam-preview'              : '$preview'
-      '.webcam-capture-wrapper'      : '$captureWrapper'
-      '.webcam-preview-wrapper'      : '$previewWrapper'
-      '.webcam-preview-staging-area' : '$canvas'
+    this.prototype.getUserMedia = (
+      navigator.getUserMedia ||
+      navigator.mozGetUserMedia ||
+      navigator.msGetUserMedia ||
+      navigator.webkitGetUserMedia ||
+      $.noop
+    ).bind(navigator)
+  }
 
-    getUserMedia: (navigator.getUserMedia or navigator.mozGetUserMedia or
-      navigator.msGetUserMedia or navigator.webkitGetUserMedia or $.noop).bind(navigator)
+  setup() {
+    return this.startMedia()
+  }
 
-    setup: ->
-      @startMedia()
+  teardown() {
+    delete this.img
+    delete this.preview
+    if (this.stream != null ? this.stream.stop : undefined) {
+      return this.stream != null ? this.stream.stop() : undefined
+    } else if (this.stream != null ? this.stream.getTracks : undefined) {
+      // MediaStream.stop is deprecated in Chrome 45
+      return this.stream != null
+        ? this.stream.getTracks().forEach(track => track.stop())
+        : undefined
+    }
+  }
 
-    teardown: ->
-      delete @img
-      delete @preview
-      if @stream?.stop
-        @stream?.stop()
-      else if @stream?.getTracks # MediaStream.stop is deprecated in Chrome 45
-        @stream?.getTracks().forEach (track) -> track.stop()
+  startMedia() {
+    return this.getUserMedia({video: true}, this.displayMedia.bind(this), $.noop)
+  }
 
-    startMedia: ->
-      @getUserMedia(video: true, @displayMedia, $.noop)
+  displayMedia(stream) {
+    this.stream = stream
+    this.$video.removeClass('pending')
+    try {
+      this.$video.get(0).srcObject = this.stream
+    } catch (err) {
+      this.$video.attr('src', window.URL.createObjectURL(this.stream))
+    }
+    return this.$video.on(
+      'onloadedmetadata loadedmetadata',
+      _.once(this.onMediaMetadata).bind(this)
+    )
+  }
 
-    displayMedia: (@stream) =>
-      @$video.removeClass('pending')
-      try @$video.get(0).srcObject = @stream
-      catch err then @$video.attr('src', window.URL.createObjectURL(@stream))
-      @$video.on('onloadedmetadata loadedmetadata', _.once(@onMediaMetadata).bind(this))
+  onMediaMetadata(e) {
+    let wait
+    return (wait = window.setInterval(() => {
+      if (this.$video[0].videoHeight === 0) return
+      window.clearInterval(wait)
 
-    onMediaMetadata: (e) ->
-      wait = window.setInterval(=>
-        return unless @$video[0].videoHeight != 0
-        window.clearInterval(wait)
+      const clipSize = _.min([this.$video.height(), this.$video.width()])
+      this.$clip.height(clipSize).width(clipSize)
 
-        clipSize  = _.min([@$video.height(), @$video.width()])
-        @$clip.height(clipSize).width(clipSize)
+      if (this.$video.width() > clipSize) {
+        const adjustment = ((this.$video.width() - clipSize) / 2) * -1
+        return this.$video.css('left', adjustment)
+      }
+    }, 100))
+  }
 
-        if @$video.width() > clipSize
-          adjustment = ((@$video.width() - clipSize) / 2) * -1
-          @$video.css('left', adjustment)
-      , 100)
+  toggleView() {
+    this.$captureWrapper.toggle()
+    this.$previewWrapper.toggle()
+    return this.trigger('ready', !!this.preview)
+  }
 
-    toggleView: ->
-      @$captureWrapper.toggle()
-      @$previewWrapper.toggle()
-      @trigger('ready', !!@preview)
+  getImage() {
+    const dfd = $.Deferred()
+    return dfd.resolve(this.img)
+  }
 
-    getImage: ->
-      dfd = $.Deferred()
-      dfd.resolve(@img)
+  onSnapshot() {
+    const canvas = this.$canvas[0]
+    const video = this.$video[0]
+    const img = new Image()
+    const context = canvas.getContext('2d')
 
-    onSnapshot: ->
-      canvas  = @$canvas[0]
-      video   = @$video[0]
-      img     = new Image
-      context = canvas.getContext('2d')
+    canvas.height = video.clientHeight
+    canvas.width = video.clientWidth
+    context.drawImage(
+      // source
+      video,
 
-      canvas.height = video.clientHeight
-      canvas.width = video.clientWidth
+      // x and y coordinates of the top-left corner of the source image to draw to destination
+      0,
+      0,
+
+      // width and height of the source image to draw to the destination
+      canvas.width,
+      canvas.height
+    )
+    const url = canvas.toDataURL()
+
+    img.onload = e => {
+      const sX = (video.clientWidth - this.$clip.width()) / 2
+      const sY = (video.clientHeight - this.$clip.height()) / 2
+
+      canvas.height = this.$clip.height()
+      canvas.width = this.$clip.width()
+
       context.drawImage(
-        # source
-        video,
+        // source
+        img,
 
-        # x and y coordinates of the top-left corner of the source image to draw to destination
-        0, 0,
+        // x and y coordinates of the top-left corner of the source image to draw to destination
+        sX,
+        sY,
 
-        # width and height of the source image to draw to the destination
-        canvas.width, canvas.height
+        // width and height of the source image to draw to the destination
+        this.$clip.width(),
+        this.$clip.height(),
+
+        // x and y coordinates to start drawing to in the destination
+        0,
+        0,
+
+        // width and height of the image in the destination
+        this.$clip.width(),
+        this.$clip.height()
       )
-      url = canvas.toDataURL()
 
-      img.onload = (e) =>
-        sX = (video.clientWidth - @$clip.width())   / 2
-        sY = (video.clientHeight - @$clip.height()) / 2
+      this.preview = canvas.toDataURL()
+      this.toggleView()
+      this.$preview.attr('src', this.preview)
+      return (this.img = BlobFactory.fromCanvas(canvas))
+    }
 
-        canvas.height = @$clip.height()
-        canvas.width  = @$clip.width()
+    return (img.src = url)
+  }
 
-        context.drawImage(
-          # source
-          img,
+  onRetry(e) {
+    return this.resetSnapshot()
+  }
 
-          # x and y coordinates of the top-left corner of the source image to draw to destination
-          sX, sY,
+  resetSnapshot() {
+    delete this.preview
+    delete this.img
+    return this.toggleView()
+  }
 
-          # width and height of the source image to draw to the destination
-          @$clip.width(), @$clip.height(),
+  previewSrc() {
+    if (!this.preview) {
+      return ''
+    }
+    return this.preview.split(',')[1]
+  }
 
-          # x and y coordinates to start drawing to in the destination
-          0, 0,
-
-          # width and height of the image in the destination
-          @$clip.width(), @$clip.height()
-        )
-
-        @preview = canvas.toDataURL()
-        @toggleView()
-        @$preview.attr('src', @preview)
-        @img = BlobFactory.fromCanvas(canvas)
-
-      img.src = url
-
-    onRetry: (e) ->
-      @resetSnapshot()
-
-    resetSnapshot: ->
-      delete @preview
-      delete @img
-      @toggleView()
-
-    previewSrc: ->
-      return '' unless @preview
-      @preview.split(',')[1]
-
-    toJSON: ->
-      { hasPreview: !!@preview, previewURL: @preview }
+  toJSON() {
+    return {hasPreview: !!this.preview, previewURL: this.preview}
+  }
+}
+TakePictureView.initClass()
