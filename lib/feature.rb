@@ -664,6 +664,7 @@ END
       display_name: -> { I18n.t('LTI 1.3 and LTI Advantage')},
       description: -> { I18n.t('If enabled, access to LTI 1.3 and LTI Advantage will be enabled.') },
       applies_to: 'RootAccount',
+      development: true,
       state: 'allowed'
     }
   )
