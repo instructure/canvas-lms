@@ -340,7 +340,7 @@ module Importers
         current_tag = item.external_tool_tag
         needs_new_tag = !current_tag ||
           (hash[:external_tool_url] && current_tag.url != hash[:external_tool_url]) ||
-          (hash[:external_tool_id] && current_tag.content_id != hash[:external_tool_id]) ||
+          (hash[:external_tool_id] && current_tag.content_id != hash[:external_tool_id].to_i) ||
           (hash[:external_tool_migration_id] && current_tag.content&.migration_id != hash[:external_tool_migration_id])
 
         if needs_new_tag
