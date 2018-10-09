@@ -152,13 +152,18 @@
   }
 }
 
-.user_content iframe,
-.user_content video
- {
-  border: 0;
-  padding: 0;
-  margin: 0;
-  max-width: 100%;
+.user_content {
+
+    iframe, video {
+        border: 0;
+        padding: 0;
+        margin: 0;
+        max-width: 100%;
+    }
+
+    iframe {
+        height: calc(100vh - 180px);
+    }
 }
 
 .reminder, .reminder-content {

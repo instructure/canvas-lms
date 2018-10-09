@@ -40,8 +40,8 @@ hr.sm-divider {
 body {
     opacity: 1;
     transition-property: opacity;
-    transition-delay: .24s;
-    transition-duration: .48s;
+    transition-delay: .48s;
+    transition-duration: .24s;
     transition-timing-function: ease-in;
 
     &.hide-interface {
