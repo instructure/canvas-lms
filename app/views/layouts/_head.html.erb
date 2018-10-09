@@ -55,14 +55,9 @@
       ))
     end
   %>
-  <%=
-    # Load the fontface observer for lato async and as fast as possible so it doesn't flicker with fallback font.
-    # That's why we don't load it in a 'require' at the bottom of the page
-    javascript_include_tag("/lato-fontfaceobserver.js", async: true)
-  %>
   <%= yield :meta_tags %>
   <%= include_custom_meta_tags %>
-  <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,900|Open+Sans:300,400,400i,600,700" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,600|Open+Sans:300,400,700" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="<%= brand_variable('ic-brand-primary') %>">
   <%= include_css_bundles %>

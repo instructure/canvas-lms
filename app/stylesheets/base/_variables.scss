@@ -268,11 +268,11 @@ $sm-body-background-color: $ic-brand-white;
 // Once all of those have been adjusted to use the new variable we can get rid of this
 $ic-line-height: 1.5;
 
-$ic-font-family: 'Montserrat', "LatoWeb", "Helvetica Neue", Helvetica, Arial, sans-serif;// "LatoWeb", "Helvetica Neue", Helvetica, Arial, sans-serif;
+$ic-font-family: 'Montserrat', sans-serif;
 
-$ic-font-family-fallback: 'Open Sans', Helvetica, Arial, sans-serif; // "Helvetica Neue", Helvetica, Arial, sans-serif;
+$ic-font-family-reading: 'Open Sans', sans-serif;
 
-$ic-font-weight: 500; // we can phase this var out now we're on Lato
+$ic-font-weight: 400; // we can phase this var out now we're on Lato
 
 $ic-font-size: 16px;
 

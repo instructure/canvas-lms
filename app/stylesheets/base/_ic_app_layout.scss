@@ -153,10 +153,12 @@ body:not(.course-menu-expanded) {
 
 .ic-Layout-wrapper {
   box-sizing: border-box;
-  margin: 0 auto;
-  max-width: calc(100% - 160px);
+  max-width: calc(100% - 200px);
   min-height: 100vh;
-  transform: translateX(30px);
+  transform: translateX(200px);
+  transition-duration: .24s;
+  transition-property: transform;
+  transition-timing-function: ease-in;
 
   body:not(.ic-no-flex-layout):not(.embedded) & {
     display: flex;

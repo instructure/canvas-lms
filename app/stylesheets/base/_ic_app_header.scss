@@ -41,7 +41,6 @@ $ic-tooltip-arrow-size: 0.375rem;
 
 
 .ic-app-header {
-  box-sizing: border-box;
   position: fixed;
   top: 0; left: 0;
   height: 100%;
@@ -50,11 +49,15 @@ $ic-tooltip-arrow-size: 0.375rem;
   width: $ic-header-primary-width;
   z-index: 100;
   background-color: $sm-brand-dark;
+  transition-duration: .24s;
+  transition-property: width;
+  transition-timing-function: ease-in;
 }
 
 .ic-app-header__main-navigation {
   box-sizing: border-box;
   flex: 1 0 auto;
+  overflow: hidden;
 }
 
 .ic-app-header__secondary-navigation {
@@ -69,11 +72,11 @@ $ic-tooltip-arrow-size: 0.375rem;
 
 .ic-app-header__menu-list {
   @include reset-list;
+  width: 200px;
 }
 
 li.ic-app-header__menu-list-item {
   box-sizing: border-box;
-  overflow: hidden;
   margin-bottom: 10px;
 
   &.ic-app-header__menu-list-item--active {
@@ -241,23 +244,7 @@ button.ic-app-header__menu-list-link {
 }
 
 .menu-item__text {
-  // set up properties to transition on hover/focus
-  transform: translate3d(-100%,0,0);
-  opacity: 0;
-
-  pointer-events: none;
-  box-sizing: border-box;
-  background-color: $ic-brand-global-nav-ic-icon-svg-fill--active;
-  position: absolute;
-  left: 100%;
-  top: 50%;
   padding: 0 $ic-sp;
-  line-height: 1.8rem;
-  margin-top: -0.9rem;
-  @include fontSize($ic-font-size--xsmall);
-  border-radius: $ic-border-radius / 2;
-  color: $ic-color-light;
-  white-space: nowrap;
 
   // this class is added after a 1s delay because the
   // transitions look weird when the nav is being closed
@@ -390,23 +377,17 @@ body.primary-nav-expanded {
   }
 
   .menu-item__text {
-    transition: none;
-    position: static;
     float: left;
-    transform: none;
     text-transform: uppercase;
-    font-family: $ic-font-family;
     opacity: 1;
-    text-align: left;
-    display: block;
     line-height: normal;
     border-radius: 0;
     margin: 5px 0 0 0;
-    background: transparent;
     color: $ic-brand-global-nav-menu-item__text-color;
-    white-space: normal;
-    word-wrap: break-word;
     font-size: 16px;
+    transition-duration: .24s;
+    transition-property: opacity;
+    transition-timing-function: ease-in;
 
     &::after {
       display: none;
@@ -438,6 +419,10 @@ body.primary-nav-expanded {
   width: $ic-sp*28;
   top: 0; bottom: 0;
   left: $ic-header-primary-width - 30;
+  transition-duration: .24s;
+  transition-property: left;
+  transition-timing-function: ease-in;
+
   @if $use_high_contrast == false {
     &:focus { outline: none; }
   }

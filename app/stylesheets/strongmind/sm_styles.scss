@@ -30,16 +30,21 @@
     }
 }
 
-#header {
-    transform: translateX(0);
-    transition-duration: .24s;
-    transition-property: transform;
-    transition-timing-function: ease-in;
-}
-
 hr.sm-divider {
     border: none;
     border-bottom: 1px #454950 solid;
     margin: 12px auto;
     max-width: calc(100% - 24px);
+}
+
+body {
+    opacity: 1;
+    transition-property: opacity;
+    transition-delay: .24s;
+    transition-duration: .48s;
+    transition-timing-function: ease-in;
+
+    &.hide-interface {
+        opacity: 0;
+    }
 }

@@ -36,18 +36,20 @@ body {
 
   &.no-headers, &.embedded {
 
+    .ic-Layout-wrapper { transform: translateX(140px); }
     .ic-app-header { width: 60px; }
     .ReactTray__Content { left: 60px; }
-    .menu-item__text { display: none; }
+    .menu-item__text { opacity: 0; }
 
     #footer { display: none; }
   }
 
   &.no-headers.distraction-free {
 
+    .ic-Layout-wrapper { transform: translateX(140px); }
     .ic-app-header { width: 60px; }
     .ReactTray__Content { left: 60px; }
-    .menu-item__text { display: none; }
+    .menu-item__text { opacity: 0; }
 }
 
   &.embedded {
@@ -140,7 +142,6 @@ iframe.info_alert_outline {
   border: 2px solid #008EE2 !important;
 }
 
-// gets rid of ugly border
 iframe {
   border: none;
   height: 100%;
