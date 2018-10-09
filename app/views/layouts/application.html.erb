@@ -67,6 +67,7 @@
     @body_classes << 'primary-nav-transitions' if @collapse_global_nav
     # We probably want to consider doing this everywhere, all the time.
     @body_classes << 'full-width' if @domain_root_account.try(:feature_enabled?, :new_user_tutorial)
+    @body_classes << 'no-animations' if true
   end
 
   css_bundle(:instructure_eportfolio) if @eportfolio_view === true
@@ -77,10 +78,7 @@
   load_blueprint_courses_ui
 -%>
 <%= render :partial => "layouts/head" %>
-<body
-  class="<%= (@body_classes).uniq.join(" ") %>"
-  <% if @distraction_free %> style="display:none;" <% end %>
->
+<body class="<%= (@body_classes).uniq.join(' ') %>">
 <%if @real_current_user && @real_current_user != @current_user %>
   <div class="screenreader-only">
     <% if @current_user.fake_student? %>
