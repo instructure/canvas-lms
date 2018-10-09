@@ -24,11 +24,20 @@ module Lti::Ims
     def as_json
       {
         id: page[:url],
+        context: serialize_context,
         members: serialize_memberships,
       }.compact
     end
 
     private
+
+    def serialize_context
+      {
+        id: lti_id_for(page[:context]),
+        label: page[:context].context_label,
+        title: page[:context].context_title,
+      }.compact
+    end
 
     def serialize_memberships
       page[:memberships] ? page[:memberships].collect { |m| serialize_membership(m) } : []
@@ -39,10 +48,6 @@ module Lti::Ims
       # to make them behave more or less the same for our purposes
       {
         status: 'Active',
-        context_id: lti_id_for(page[:context]),
-        context_label: page[:context].context_label,
-        context_title: page[:context].context_title,
-        # TODO: check privacy settings and suppress attributes accordingly
         name: enrollment.user.name,
         picture: enrollment.user.avatar_image_url,
         given_name: enrollment.user.first_name,

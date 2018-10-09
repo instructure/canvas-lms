@@ -21,7 +21,7 @@ module Lti::Ims
 
     skip_before_action :load_user
 
-    MIME_TYPE = 'application/vnd.ims.lis.v2.membershipcontainer+json'.freeze
+    MIME_TYPE = 'application/vnd.ims.lti-nrps.v2.membershipcontainer+json'.freeze
 
     def course_index
       render_memberships

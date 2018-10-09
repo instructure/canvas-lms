@@ -63,13 +63,45 @@ module Lti::Ims::NamesAndRolesMatchers
     membership.group.leader_id == membership.user.id
   end
 
+  def expected_group_membership_context(context)
+    {
+      'id' => expected_lti_id(context),
+      'title' => context.name
+    }.compact
+  end
+
+  def expected_course_membership_context(context)
+    expected_group_membership_context(context).merge!({'label' => context.course_code}).compact
+  end
+
+  RSpec::Matchers.define :be_lti_course_membership_context do |expected|
+    match do |actual|
+      @expected = expected_course_membership_context(expected)
+      values_match? @expected, actual
+    end
+
+    diffable
+
+    # Make sure a failure diffs the two JSON structs (w/o this will compare 'actual' JSON to 'expected' AR model)
+    attr_reader :actual, :expected
+  end
+
+  RSpec::Matchers.define :be_lti_group_membership_context do |expected|
+    match do |actual|
+      @expected = expected_group_membership_context(expected)
+      values_match? @expected, actual
+    end
+
+    diffable
+
+    # Make sure a failure diffs the two JSON structs (w/o this will compare 'actual' JSON to 'expected' AR model)
+    attr_reader :actual, :expected
+  end
+
   RSpec::Matchers.define :be_lti_course_membership do |*expected|
     match do |actual|
       @expected = {
         'status' => 'Active',
-        'context_id' => expected_lti_id(expected.first.context),
-        'context_label' => expected.first.context.course_code,
-        'context_title' => expected.first.context.name,
         'name' => expected.first.user.name,
         'picture' => expected.first.user.avatar_image_url,
         'given_name' => expected.first.user.first_name,
@@ -92,8 +124,6 @@ module Lti::Ims::NamesAndRolesMatchers
     match do |actual|
       @expected = {
         'status' => 'Active',
-        'context_id' => expected_lti_id(expected.context),
-        'context_title' => expected.context.name,
         'name' => expected.user.name,
         'picture' => expected.user.avatar_image_url,
         'given_name' => expected.user.first_name,
