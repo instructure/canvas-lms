@@ -72,7 +72,7 @@ describe UsersController, type: :request do
                    ]
   end
 
-  context "cross-shard activity stream summary" do
+  context "cross-shard activity stream" do
     specs_require_sharding
     it "should return the activity stream summary with cross-shard items" do
       @student = user_factory(active_all: true)
@@ -103,6 +103,27 @@ describe UsersController, type: :request do
             {"type" => "DiscussionTopic", "count" => 2, "unread_count" => 1, "notification_category" => nil},
             {"type" => "Message", "count" => 2, "unread_count" => 0, "notification_category" => "TestImmediately"} # check a broadcast-policy-based one
           ]
+    end
+
+    it "should filter the activity stream to currently active courses if requested" do
+      @student = user_factory(active_all: true)
+      @shard1.activate do
+        @account = Account.create!
+        @course1 = course_factory(active_all: true, :account => @account)
+        @course1.enroll_student(@student).accept!
+        @course2 = course_factory(active_all: true, :account => @account)
+        @course2.enroll_student(@student).accept!
+        @dt1 = discussion_topic_model(:context => @course1)
+        @dt2 = discussion_topic_model(:context => @course2)
+        @course2.update_attributes(:start_at => 2.weeks.ago, :conclude_at => 1.week.ago, :restrict_enrollments_to_course_dates => true)
+      end
+      json = api_call(:get, "/api/v1/users/self/activity_stream",
+        { :controller => "users", :action => "activity_stream", :format => 'json' })
+      expect(json.map{|r| r["discussion_topic_id"]}).to match_array([@dt1.id, @dt2.id])
+
+      json = api_call(:get, "/api/v1/users/self/activity_stream?only_active_courses=1",
+        { :controller => "users", :action => "activity_stream", :format => 'json', :only_active_courses => "1"})
+      expect(json.map{|r| r["discussion_topic_id"]}).to eq([@dt1.id])
     end
 
     it "should find cross-shard submission comments" do

@@ -63,7 +63,7 @@ module UserLearningObjectScopes
     shard.activate do
       course_ids_result = Shackles.activate(:slave) do
         if include_concluded
-          participated_course_ids
+          all_course_ids
         else
           case participation_type
           when :student

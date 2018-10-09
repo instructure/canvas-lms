@@ -636,6 +636,9 @@ class UsersController < ApplicationController
   # @API List the activity stream
   # Returns the current user's global activity stream, paginated.
   #
+  # @argument only_active_courses [Boolean]
+  #   If true, will only return objects for courses the user is actively participating in
+  #
   # There are many types of objects that can be returned in the activity
   # stream. All object types have the same basic set of shared attributes:
   #   !!!javascript
@@ -742,6 +745,7 @@ class UsersController < ApplicationController
       opts[:asset_type] = params[:asset_type] if params.has_key?(:asset_type)
       opts[:context] = Context.find_by_asset_string(params[:context_code]) if params[:context_code]
       opts[:submission_user_id] = params[:submission_user_id] if params.has_key?(:submission_user_id)
+      opts[:only_active_courses] = value_to_boolean(params[:only_active_courses]) if params.has_key?(:only_active_courses)
       api_render_stream(opts)
     else
       render_unauthorized_action
