@@ -606,7 +606,7 @@
                 <tr>
                   <td><%= f.blabel :originality_report_visibility, :en => "Students can see the originality report" %></td>
                   <td>
-                    <%= f.select :turnitin_originality, options_for_select(turnitin_originality_options, @account.turnitin_originality)%>
+                    <%= f.select :turnitin_originality, options_for_select(turnitin_originality_options(@account), @account.turnitin_originality)%>
                   </td>
                 </tr>
               </table>
