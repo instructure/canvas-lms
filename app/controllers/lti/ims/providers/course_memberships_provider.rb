@@ -19,7 +19,7 @@ module Lti::Ims::Providers
   class CourseMembershipsProvider < MembershipsProvider
 
     def context
-      CourseContextDecorator.new(super)
+      @_context ||= CourseContextDecorator.new(super)
     end
 
     protected
@@ -64,32 +64,33 @@ module Lti::Ims::Providers
       enrollments.
         group_by(&:user_id).
         values.
-        map { |user_enrollments| CourseEnrollmentsDecorator.new(user_enrollments, tool) }
+        map { |user_enrollments| CourseEnrollmentsDecorator.new(user_enrollments, tool, self) }
     end
 
     # *Decorators fix up models to conforms to interfaces expected by Lti::Ims::NamesAndRolesSerializer
     class CourseEnrollmentsDecorator
       attr_reader :enrollments
 
-      def initialize(enrollments, tool)
+      def initialize(enrollments, tool, user_factory)
         @enrollments = enrollments
         @tool = tool
+        @user_factory = user_factory
       end
 
       def user
-        MembershipsProvider::UserDecorator.new(enrollments.first.user, @tool)
+        @_user ||= @user_factory.user(enrollments.first.user)
       end
 
       def context
-        CourseContextDecorator.new(enrollments.first.context)
+        @_context ||= CourseContextDecorator.new(enrollments.first.context)
       end
 
       def course
-        CourseContextDecorator.new(enrollments.first.course)
+        @_course ||= CourseContextDecorator.new(enrollments.first.course)
       end
 
       def lti_roles
-        enrollments.map { |e| Lti::SubstitutionsHelper::LIS_ADVANTAGE_ROLE_MAP[e.class] }.compact.flatten.uniq
+        @_lti_roles ||= enrollments.map { |e| Lti::SubstitutionsHelper::LIS_ADVANTAGE_ROLE_MAP[e.class] }.compact.flatten.uniq
       end
     end
 

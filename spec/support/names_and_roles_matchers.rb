@@ -63,15 +63,49 @@ module Lti::Ims::NamesAndRolesMatchers
     membership.group.leader_id == membership.user.id
   end
 
-  def expected_group_membership_context(context)
+  def expected_base_membership_context(context)
     {
       'id' => expected_lti_id(context),
       'title' => context.name
     }.compact
   end
 
+  def expected_group_membership_context(context)
+    expected_base_membership_context(context)
+  end
+
   def expected_course_membership_context(context)
-    expected_group_membership_context(context).merge!({'label' => context.course_code}).compact
+    expected_base_membership_context(context).merge!({'label' => context.course_code}).compact
+  end
+
+  def expected_sourced_id(user)
+    return user.sourced_id if user.respond_to?(:sourced_id)
+    SisPseudonym.for(user, Account.default, type: :trusted, require_sis: false)&.sis_user_id
+  end
+
+  def expected_base_membership(user)
+    {
+      'status' => 'Active',
+      'name' => user.name,
+      'picture' => user.avatar_image_url,
+      'given_name' => user.first_name,
+      'family_name' => user.last_name,
+      'email' => user.email,
+      'lis_person_sourcedid' => expected_sourced_id(user),
+      'user_id' => expected_lti_id(unwrap_user(user))
+    }.compact
+  end
+
+  def expected_course_membership(user, *enrollments)
+    expected_base_membership(user).merge!('roles' => match_array(expected_course_lti_roles(*enrollments))).compact
+  end
+
+  def expected_group_membership(user, membership)
+    expected_base_membership(user).merge!('roles' => match_array(expected_group_lti_roles(membership))).compact
+  end
+
+  def unwrap_user(user)
+    user.respond_to?(:user) ? user.user : user
   end
 
   RSpec::Matchers.define :be_lti_course_membership_context do |expected|
@@ -100,17 +134,7 @@ module Lti::Ims::NamesAndRolesMatchers
 
   RSpec::Matchers.define :be_lti_course_membership do |*expected|
     match do |actual|
-      @expected = {
-        'status' => 'Active',
-        'name' => expected.first.user.name,
-        'picture' => expected.first.user.avatar_image_url,
-        'given_name' => expected.first.user.first_name,
-        'family_name' => expected.first.user.last_name,
-        'email' => expected.first.user.email,
-        'user_id' => expected_lti_id(expected.first.user.respond_to?(:user) ? expected.first.user.user : expected.first.user),
-        'roles' => match_array(expected_course_lti_roles(*expected))
-      }.compact
-
+      @expected = expected_course_membership(expected.first.user, *expected)
       values_match? @expected, actual
     end
 
@@ -122,17 +146,7 @@ module Lti::Ims::NamesAndRolesMatchers
 
   RSpec::Matchers.define :be_lti_group_membership do |expected|
     match do |actual|
-      @expected = {
-        'status' => 'Active',
-        'name' => expected.user.name,
-        'picture' => expected.user.avatar_image_url,
-        'given_name' => expected.user.first_name,
-        'family_name' => expected.user.last_name,
-        'email' => expected.user.email,
-        'user_id' => expected_lti_id(expected.user.respond_to?(:user) ? expected.user.user : expected.user),
-        'roles' => match_array(expected_group_lti_roles(expected))
-      }.compact
-
+      @expected = expected_group_membership(expected.user, expected)
       values_match? @expected, actual
     end
 

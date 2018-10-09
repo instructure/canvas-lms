@@ -19,7 +19,7 @@ module Lti::Ims::Providers
   class GroupMembershipsProvider < MembershipsProvider
 
     def context
-      GroupContextDecorator.new(super)
+      @_context ||= GroupContextDecorator.new(super)
     end
 
     protected
@@ -56,31 +56,32 @@ module Lti::Ims::Providers
     end
 
     def to_memberships(enrollments)
-      enrollments.map { |e| GroupMembershipDecorator.new(e, tool) }
+      enrollments.map { |e| GroupMembershipDecorator.new(e, tool, self) }
     end
 
     # *Decorators fix up models to conforms to interface expected by Lti::Ims::NamesAndRolesSerializer
     class GroupMembershipDecorator < SimpleDelegator
 
-      def initialize(membership, tool)
+      def initialize(membership, tool, user_factory)
         super(membership)
         @tool = tool
+        @user_factory = user_factory
       end
 
       def context
-        GroupContextDecorator.new(super)
+        @_context ||= GroupContextDecorator.new(super)
       end
 
       def group
-        GroupContextDecorator.new(super)
+        @_group ||= GroupContextDecorator.new(super)
       end
 
       def user
-        MembershipsProvider::UserDecorator.new(super, @tool)
+        @_user ||= @user_factory.user(super)
       end
 
       def lti_roles
-        user.id == context.leader_id ? group_leader_role_urns : group_member_role_urns
+        @_lti_roles ||= user.id == context.leader_id ? group_leader_role_urns : group_member_role_urns
       end
 
       private

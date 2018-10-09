@@ -43,6 +43,22 @@ module Lti::Ims::Providers
       }
     end
 
+    def user(user)
+      UserDecorator.new(
+        user,
+        tool,
+        Lti::VariableExpander.new(
+          course.root_account,
+          course,
+          controller,
+          {
+            current_user: user,
+            tool: tool
+          }
+        )
+      )
+    end
+
     protected
 
     def validate_rlid!
@@ -68,7 +84,9 @@ module Lti::Ims::Providers
     end
 
     def preload_enrollments(enrollments)
-      user_json_preloads(enrollments.map(&:user), true, { accounts: false })
+      user_json_preloads(enrollments.map(&:user),
+                         true,
+                         { accounts: tool.include_name?, pseudonyms: tool.include_name? })
       enrollments
     end
 
@@ -102,9 +120,10 @@ module Lti::Ims::Providers
     class UserDecorator
       attr_reader :user # Intentional backdoor. See Lti::Ims::NamesAndRolesSerializer for use case/s.
 
-      def initialize(user, tool)
+      def initialize(user, tool, expander)
         @user = user
         @tool = tool
+        @expander = expander
       end
 
       def id
@@ -129,6 +148,14 @@ module Lti::Ims::Providers
 
       def avatar_image_url
         user.avatar_image_url if @tool.public?
+      end
+
+      def sourced_id
+        return nil unless @tool.include_name?
+        @_sourced_id ||= begin
+          expanded = @expander.expand_variables!({value: '$Person.sourcedId'})[:value]
+          expanded == '$Person.sourcedId' ? nil : expanded
+        end
       end
     end
   end

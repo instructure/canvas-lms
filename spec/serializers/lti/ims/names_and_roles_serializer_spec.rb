@@ -53,6 +53,17 @@ describe Lti::Ims::NamesAndRolesSerializer do
     be_lti_group_membership(decorated_group_member)
   end
 
+  def create_pseudonym!(user)
+    user.pseudonyms.create!({
+      account: course.account,
+      unique_id: 'user1@example.com',
+      password: 'asdfasdf',
+      password_confirmation: 'asdfasdf',
+      workflow_state: 'active',
+      sis_user_id: 'user-1-sis-user-id-1'
+    })
+  end
+
   shared_examples 'enrollment serialization' do
     it 'properly formats NRPS json' do
       json = serialize
@@ -66,42 +77,42 @@ describe Lti::Ims::NamesAndRolesSerializer do
   # know nothing about privacy policies... they just know that if a model provides a value, it should appear in the
   # resulting json/hash. So you could have an incorrectly implemented privacy policy, but all the serialization tests
   # would still pass. Hence the explicit checks here for user fields specific to each policy.
-  shared_examples '\'public\' privacy policy' do
+  shared_examples 'public privacy policy' do
     it 'properly formats NRPS json' do
       json = serialize
       expect(json[:id]).to eq url
       expect(json[:context]).to be_lti_membership_context
-      expect(json[:members][0]).to include(:status, :name, :picture, :given_name, :family_name, :email, :user_id, :roles)
+      expect(json[:members][0]).to include(:status, :name, :picture, :given_name, :family_name, :email, :lis_person_sourcedid, :user_id, :roles)
     end
   end
 
-  shared_examples '\'anonymous\' privacy policy' do
+  shared_examples 'anonymous privacy policy' do
     it 'properly formats NRPS json' do
       json = serialize
       expect(json[:id]).to eq url
       expect(json[:context]).to be_lti_membership_context
       expect(json[:members][0]).to include(:status, :user_id, :roles)
-      expect(json[:members][0]).not_to include(:name, :picture, :given_name, :family_name, :email)
+      expect(json[:members][0]).not_to include(:name, :picture, :given_name, :family_name, :email, :lis_person_sourcedid)
     end
   end
 
-  shared_examples '\'name_only\' privacy policy' do
+  shared_examples 'name_only privacy policy' do
     it 'properly formats NRPS json' do
       json = serialize
       expect(json[:id]).to eq url
       expect(json[:context]).to be_lti_membership_context
-      expect(json[:members][0]).to include(:status, :name, :given_name, :family_name, :user_id, :roles)
+      expect(json[:members][0]).to include(:status, :name, :given_name, :family_name, :lis_person_sourcedid, :user_id, :roles)
       expect(json[:members][0]).not_to include(:picture, :email)
     end
   end
 
-  shared_examples '\'email_only\' privacy policy' do
+  shared_examples 'email_only privacy policy' do
     it 'properly formats NRPS json' do
       json = serialize
       expect(json[:id]).to eq url
       expect(json[:context]).to be_lti_membership_context
       expect(json[:members][0]).to include(:status, :email, :user_id, :roles)
-      expect(json[:members][0]).not_to include(:name, :picture, :given_name, :family_name)
+      expect(json[:members][0]).not_to include(:name, :picture, :given_name, :family_name, :lis_person_sourcedid)
     end
   end
 
@@ -114,9 +125,19 @@ describe Lti::Ims::NamesAndRolesSerializer do
         user.email = 'marta.perkins@school.edu'
         user.avatar_image_url = 'http://school.edu/image/url.png'
         user.save!
+        create_pseudonym!(user)
         enrollment
       end
-      let(:decorated_enrollment) { Lti::Ims::Providers::CourseMembershipsProvider::CourseEnrollmentsDecorator.new([enrollment], tool) }
+      let(:decorated_user_factory) do
+        Lti::Ims::Providers::CourseMembershipsProvider.new(course, nil, tool)
+      end
+      let(:decorated_enrollment) do
+        Lti::Ims::Providers::CourseMembershipsProvider::CourseEnrollmentsDecorator.new(
+          [enrollment],
+          tool,
+          decorated_user_factory
+        )
+      end
       let(:decorated_course) { Lti::Ims::Providers::CourseMembershipsProvider::CourseContextDecorator.new(course) }
       let(:page) do
         {
@@ -126,45 +147,55 @@ describe Lti::Ims::NamesAndRolesSerializer do
         }
       end
 
-      context 'and a \'public\' tool' do
+      context 'and a public tool' do
         it_behaves_like 'enrollment serialization'
-        it_behaves_like '\'public\' privacy policy'
+        it_behaves_like 'public privacy policy'
       end
 
-      context 'and an \'anonymous\' tool' do
+      context 'and an anonymous tool' do
         let(:privacy_level) { 'anonymous' }
 
-        it_behaves_like 'enrollment serialization'
-        it_behaves_like '\'anonymous\' privacy policy'
+          it_behaves_like 'enrollment serialization'
+        it_behaves_like 'anonymous privacy policy'
       end
 
-      context 'and a \'name_only\' tool' do
+      context 'and a name_only tool' do
         let(:privacy_level) { 'name_only' }
 
         it_behaves_like 'enrollment serialization'
-        it_behaves_like '\'name_only\' privacy policy'
+        it_behaves_like 'name_only privacy policy'
       end
 
-      context 'and a \'email_only\' tool' do
+      context 'and an email_only tool' do
         let(:privacy_level) { 'email_only' }
 
         it_behaves_like 'enrollment serialization'
-        it_behaves_like '\'email_only\' privacy policy'
+        it_behaves_like 'email_only privacy policy'
       end
     end
 
     context 'with a group' do
       let(:context_type) { :group }
-      let(:group_record) { group_with_user(active_all: true, name: 'Marta Perkins').group }
+      let(:group_record) { group_with_user(context: course, active_all: true, name: 'Marta Perkins').group }
       let(:group_member) do
         enrollment = group_record.group_memberships.first
         user = enrollment.user
         user.email = 'marta.perkins@school.edu'
         user.avatar_image_url = 'http://school.edu/image/url.png'
         user.save!
+        create_pseudonym!(user)
         enrollment
       end
-      let(:decorated_group_member) { Lti::Ims::Providers::GroupMembershipsProvider::GroupMembershipDecorator.new(group_member, tool) }
+      let(:decorated_user_factory) do
+        Lti::Ims::Providers::GroupMembershipsProvider.new(group_record, nil, tool)
+      end
+      let(:decorated_group_member) do
+        Lti::Ims::Providers::GroupMembershipsProvider::GroupMembershipDecorator.new(
+          group_member,
+          tool,
+          decorated_user_factory
+        )
+      end
       let(:decorated_group) { Lti::Ims::Providers::GroupMembershipsProvider::GroupContextDecorator.new(group_record) }
       let(:page) do
         {
@@ -174,30 +205,30 @@ describe Lti::Ims::NamesAndRolesSerializer do
         }
       end
 
-      context 'and a \'public\' tool' do
+      context 'and a public tool' do
         it_behaves_like 'enrollment serialization'
-        it_behaves_like '\'public\' privacy policy'
+        it_behaves_like 'public privacy policy'
       end
 
-      context 'and an \'anonymous\' tool' do
+      context 'and an anonymous tool' do
         let(:privacy_level) { 'anonymous' }
 
         it_behaves_like 'enrollment serialization'
-        it_behaves_like '\'anonymous\' privacy policy'
+        it_behaves_like 'anonymous privacy policy'
       end
 
-      context 'and a \'name_only\' tool' do
+      context 'and a name_only tool' do
         let(:privacy_level) { 'name_only' }
 
         it_behaves_like 'enrollment serialization'
-        it_behaves_like '\'name_only\' privacy policy'
+        it_behaves_like 'name_only privacy policy'
       end
 
-      context 'and a \'email_only\' tool' do
+      context 'and an email_only tool' do
         let(:privacy_level) { 'email_only' }
 
         it_behaves_like 'enrollment serialization'
-        it_behaves_like '\'email_only\' privacy policy'
+        it_behaves_like 'email_only privacy policy'
       end
     end
   end

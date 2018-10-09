@@ -32,7 +32,9 @@ module Api::V1::User
 
     # pseudonyms for SisPseudonym
     # pseudonyms account for Pseudonym#works_for_account?
-    ActiveRecord::Associations::Preloader.new.preload(users, pseudonyms: :account) if opts.fetch(:accounts, true) && user_json_is_admin?
+    ActiveRecord::Associations::Preloader.new.preload(users, pseudonyms: :account) if opts.fetch(:accounts, true) &&
+      (opts.fetch(:pseudonyms, false) || user_json_is_admin?)
+    
     if preload_email && (no_email_users = users.reject(&:email_cached?)).present?
       # communication_channels for User#email if it is not cached
       ActiveRecord::Associations::Preloader.new.preload(no_email_users, :communication_channels)
