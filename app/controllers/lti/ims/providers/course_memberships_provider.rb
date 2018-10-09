@@ -25,10 +25,13 @@ module Lti::Ims::Providers
     protected
 
     def find_memberships
-      # Users can have more than once active Enrollment in a Course. So first find all Users with such an
-      # Enrollment, page on *those*, then find and group the enrollments for each.
+      # TODO: queries likely change dramatically if rlid matches an Assignment ResourceLink b/c scope needs to be
+      # further narrowed to only those users having access to the Assignment.
       scope = base_users_scope
       scope = apply_role_param(scope) if controller.params.key?(:role)
+
+      # Users can have more than once active Enrollment in a Course. So first find all Users with such an
+      # Enrollment, page on *those*, then find and group the enrollments for each.
       user_ids, users_metadata = paginate(scope)
 
       enrollments = base_enrollments_scope(user_ids)
@@ -36,6 +39,10 @@ module Lti::Ims::Providers
 
       memberships = to_memberships(enrollments)
       [ memberships, users_metadata ]
+    end
+
+    def course
+      context
     end
 
     private

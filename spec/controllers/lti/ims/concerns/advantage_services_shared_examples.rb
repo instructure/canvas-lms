@@ -19,15 +19,15 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../../spec_helper')
 require_dependency "lti/ims/concerns/advantage_services"
 
+shared_examples 'mime_type check' do
+  it 'does not return ims mime_type' do
+    expect(response.headers['Content-Type']).not_to include described_class::MIME_TYPE
+  end
+end
+
 shared_examples_for "advantage services" do
 
   let(:extra_tool_context) { raise 'Override in spec' }
-
-  shared_examples 'mime_type check' do
-    it 'does not return ims mime_type' do
-      expect(response.headers['Content-Type']).not_to include described_class::MIME_TYPE
-    end
-  end
 
   shared_examples 'extra developer key and account tool check' do
     let(:extra_tool_context) { course_account }

@@ -123,6 +123,37 @@ describe Lti::Ims::NamesAndRolesController do
     end
   end
 
+  shared_examples 'rlid check' do
+    let(:rlid_param) { raise 'Override in example' }
+    let(:params_overrides) { super().merge(rlid: rlid_param) }
+
+    context 'when the rlid param specifies the course context LTI ID' do
+      let(:rlid_param) { expected_lti_id(course) }
+
+      it 'behaves just like a \'normal\' NRPS course membership lookup' do
+        send_request
+        expect_single_member(enrollment)
+      end
+    end
+
+    # Always an error at this writing b/c we don't yet support rlid=assignment.lti_context_id
+    context 'when the rlid param does not specify the course context LTI ID' do
+      let(:rlid_param) { "nonsense-#{expected_lti_id(course)}" }
+
+      # mime_type check needs the request to have already been sent
+      before do
+        send_request
+      end
+
+      it_behaves_like 'mime_type check'
+
+      it 'returns a 400 bad_request and descriptive error message' do
+        expect(json).to be_lti_advantage_error_response_body('bad_request', 'Invalid \'rlid\' parameter')
+      end
+    end
+  end
+
+
   describe '#course_index' do
     let(:action) { :course_index }
     let(:context) { course }
@@ -257,8 +288,17 @@ describe Lti::Ims::NamesAndRolesController do
       end
     end
 
-    context 'when a course has multiple enrollments' do
+    context 'when the rlid param is specified' do
+      # rubocop:disable RSpec/LetSetup
+      # rubocop:disable RSpec/EmptyLineAfterFinalLet
+      let!(:enrollment) { teacher_in_course(course: course, active_all: true) }
+      # rubocop:enable RSpec/EmptyLineAfterFinalLet
+      # rubocop:enable RSpec/LetSetup
 
+      it_behaves_like 'rlid check'
+    end
+
+    context 'when a course has multiple enrollments' do
       let!(:teacher_enrollment) { teacher_in_course(course: course, active_all: true) }
       let!(:student_enrollment) { student_in_course(course: course, active_all: true) }
       let!(:ta_enrollment) { ta_in_course(course: course, active_all: true) }
@@ -411,7 +451,7 @@ describe Lti::Ims::NamesAndRolesController do
     it_behaves_like 'advantage services'
 
     context 'when a group has a single membership' do
-      let(:group_record) { group_with_user(active_all: true).group }
+      let(:group_record) { group_with_user(active_all: true, context: course).group }
       let(:group_member) { group_record.group_memberships.first }
 
       it 'returns that membership' do
@@ -421,7 +461,7 @@ describe Lti::Ims::NamesAndRolesController do
     end
 
     context 'when a group has a deleted membership' do
-      let(:group_record) { group_with_user(active_all: true).group }
+      let(:group_record) { group_with_user(active_all: true, context: course).group }
       let(:group_member) { group_record.group_memberships.first }
 
       it 'does not return the deleted membership' do
@@ -432,7 +472,7 @@ describe Lti::Ims::NamesAndRolesController do
     end
 
     context 'when a group has a pending membership' do
-      let(:group_record) { group_with_user(join_level: 'invitation_only').group }
+      let(:group_record) { group_with_user(join_level: 'invitation_only', context: course).group }
       let(:group_member) { group_record.group_memberships.first }
 
       it 'does not return the pending membership' do
@@ -442,8 +482,19 @@ describe Lti::Ims::NamesAndRolesController do
       end
     end
 
-    context 'when a group has multiple memberships' do
+    context 'when the rlid param is specified' do
+      let(:group_record) { group_with_user(active_all: true, context: course).group }
+      let(:group_member) { group_record.group_memberships.first }
+      # rubocop:disable RSpec/LetSetup
+      # rubocop:disable RSpec/EmptyLineAfterFinalLet
+      let!(:enrollment) { group_member }
+      # rubocop:enable RSpec/EmptyLineAfterFinalLet
+      # rubocop:enable RSpec/LetSetup
 
+      it_behaves_like 'rlid check'
+    end
+
+    context 'when a group has multiple memberships' do
       let!(:group_leadership) do
         leader = group_membership_model(group: group_record, user: user_model)
         group_record.leader = leader.user

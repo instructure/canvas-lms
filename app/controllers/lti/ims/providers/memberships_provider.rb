@@ -19,6 +19,8 @@ module Lti::Ims::Providers
   class MembershipsProvider
     include Api::V1::User
 
+    class InvalidResourceLinkIdFilter < StandardError; end
+
     attr_reader :context, :controller, :tool
 
     def initialize(context, controller, tool)
@@ -28,6 +30,7 @@ module Lti::Ims::Providers
     end
 
     def find
+      validate_rlid! if controller.params.key?(:rlid)
       memberships, api_metadata = find_memberships
       # NB Api#jsonapi_paginate has already written the Link header into the response.
       # That makes the `api_metadata` field here redundant, but we include it anyway
@@ -41,6 +44,20 @@ module Lti::Ims::Providers
     end
 
     protected
+
+    def validate_rlid!
+      # TODO: check if rlid matches an Assignment ResourceLink
+      rlid = controller.params[:rlid]
+      raise InvalidResourceLinkIdFilter if rlid.present? && course_rlid != rlid
+    end
+
+    def course
+      raise 'Abstract Method'
+    end
+
+    def course_rlid
+      Lti::Asset.opaque_identifier_for(course)
+    end
 
     def find_memberships
       throw 'Abstract Method'

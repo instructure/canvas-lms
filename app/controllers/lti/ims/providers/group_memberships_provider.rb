@@ -25,6 +25,8 @@ module Lti::Ims::Providers
     protected
 
     def find_memberships
+      # TODO: queries likely change dramatically if rlid matches an Assignment ResourceLink b/c scope needs to be
+      # further narrowed to only those users having access to the Assignment.
       scope = base_scope
       scope = apply_role_param(scope) if controller.params.key?(:role)
       enrollments, metadata = paginate(scope)
@@ -32,6 +34,10 @@ module Lti::Ims::Providers
 
       memberships = to_memberships(enrollments)
       [ memberships, metadata ]
+    end
+
+    def course
+      context.course
     end
 
     private

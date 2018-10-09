@@ -17,7 +17,7 @@
 
 module Lti::Ims
   class NamesAndRolesController < ApplicationController
-    include Lti::Ims::Concerns::AdvantageServices
+    include Concerns::AdvantageServices
 
     skip_before_action :load_user
 
@@ -48,7 +48,9 @@ module Lti::Ims
 
     def render_memberships
       page = find_memberships_page
-      render json: Lti::Ims::NamesAndRolesSerializer.new(page).as_json, content_type: MIME_TYPE
+      render json: NamesAndRolesSerializer.new(page).as_json, content_type: MIME_TYPE
+    rescue Providers::MembershipsProvider::InvalidResourceLinkIdFilter
+      render_error 'Invalid \'rlid\' parameter', :bad_request
     end
 
     def find_memberships_page
@@ -58,6 +60,5 @@ module Lti::Ims
     def new_provider
       Providers.const_get("#{context.class}MembershipsProvider").new(context, self, tool)
     end
-
   end
 end
