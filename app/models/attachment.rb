@@ -1140,6 +1140,11 @@ class Attachment < ActiveRecord::Base
     @associated_with_submission ||= self.attachment_associations.where(context_type: 'Submission').exists?
   end
 
+  def user_can_read_through_context?(user, session)
+    self.context.grants_right?(user, session, :read) ||
+      (self.context.is_a?(AssessmentQuestion) && self.context.user_can_see_through_quiz_question?(user, session))
+  end
+
   set_policy do
     given { |user, session|
       self.context.grants_right?(user, session, :manage_files) &&
@@ -1161,10 +1166,7 @@ class Attachment < ActiveRecord::Base
     can :read_as_admin
 
     given { |user, session|
-      (
-        self.context.grants_right?(user, session, :read) ||
-        (self.context.is_a?(AssessmentQuestion) && self.context.user_can_see_through_quiz_question?(user, session))
-      ) && !self.locked_for?(user, :check_policies => true)
+      user_can_read_through_context?(user, session) && !self.locked_for?(user, :check_policies => true)
     }
     can :read and can :download
 
@@ -1174,7 +1176,7 @@ class Attachment < ActiveRecord::Base
     given { |user, session|
         session && session['file_access_user_id'].present? &&
         (u = User.where(id: session['file_access_user_id']).first) &&
-        (self.context.grants_right?(u, session, :read) ||
+        (user_can_read_through_context?(u, session) ||
           (self.context.respond_to?(:is_public_to_auth_users?) && self.context.is_public_to_auth_users?)) &&
         session['file_access_expiration'] && session['file_access_expiration'].to_i > Time.now.to_i
     }
@@ -1183,7 +1185,7 @@ class Attachment < ActiveRecord::Base
     given { |user, session|
         session && session['file_access_user_id'].present? &&
         (u = User.where(id: session['file_access_user_id']).first) &&
-        (self.context.grants_right?(u, session, :read) ||
+        (user_can_read_through_context?(u, session) ||
           (self.context.respond_to?(:is_public_to_auth_users?) && self.context.is_public_to_auth_users?)) &&
         !self.locked_for?(u, :check_policies => true) &&
         session['file_access_expiration'] && session['file_access_expiration'].to_i > Time.now.to_i
