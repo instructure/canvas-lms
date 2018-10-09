@@ -80,21 +80,21 @@ const defaultProps = (props = {}) => (
 
 it('renders the OutcomePopover component', () => {
   const wrapper = shallow(<OutcomePopover {...defaultProps()}/>)
-  expect(wrapper.debug()).toMatchSnapshot()
+  expect(wrapper).toMatchSnapshot()
 })
 
 it('renders correctly with no results', () => {
   const props = defaultProps()
   props.outcome.results = []
   const wrapper = shallow(<OutcomePopover {...props}/>)
-  expect(wrapper.debug()).toMatchSnapshot()
+  expect(wrapper).toMatchSnapshot()
 })
 
 it('renders correctly with no custom outcomeProficiency', () => {
   const props = defaultProps()
   props.outcomeProficiency = null
   const wrapper = shallow(<OutcomePopover {...props}/>)
-  expect(wrapper.debug()).toMatchSnapshot()
+  expect(wrapper).toMatchSnapshot()
 })
 
 it('properly expands details for screenreader users', () => {

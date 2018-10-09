@@ -1,40 +1,137 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`The CommentButton component renders the root component as expected 1`] = `
-"<div>
-  <Button variant=\\"icon\\" icon={{...}} margin=\\"0 x-small 0 0\\" onClick={[Function: onClick]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" fluidWidth={false} buttonRef={[Function: buttonRef]} cursor=\\"pointer\\">
-    <ScreenReaderContent as=\\"span\\">
+<div>
+  <Button
+    as="button"
+    buttonRef={[Function]}
+    cursor="pointer"
+    fluidWidth={false}
+    icon={<IconFeedback />}
+    margin="0 x-small 0 0"
+    onClick={[Function]}
+    size="medium"
+    type="button"
+    variant="icon"
+  >
+    <ScreenReaderContent
+      as="span"
+    >
       Additional Comments
     </ScreenReaderContent>
   </Button>
-  <CommentDialog description=\\"Criterion description\\" open={false} comments=\\"some things\\" finalize={[Function: proxy]} setComments={[Function: proxy]} />
-</div>"
+  <CommentDialog
+    comments="some things"
+    description="Criterion description"
+    finalize={[Function]}
+    open={false}
+    setComments={[Function]}
+  />
+</div>
 `;
 
 exports[`The CommentButton component renders the root component as expected 2`] = `
-"<Modal open={false} onDismiss={[Function: close]} size=\\"medium\\" label=\\"Additional Comments\\" defaultFocusElement={[Function: defaultFocusElement]} shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} constrain=\\"window\\">
+<Modal
+  constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={[Function]}
+  insertAt="bottom"
+  label="Additional Comments"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
+  onDismiss={[Function]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
+  open={false}
+  shouldCloseOnDocumentClick={true}
+  shouldReturnFocus={true}
+  size="medium"
+  transition="fade"
+>
   <ModalHeader>
-    <CloseButton placement=\\"end\\" offset=\\"medium\\" variant=\\"icon\\" onClick={[Function: close]} buttonRef={[Function: buttonRef]} size=\\"small\\" margin=\\"0\\">
+    <CloseButton
+      buttonRef={[Function]}
+      margin="0"
+      offset="medium"
+      onClick={[Function]}
+      placement="end"
+      size="small"
+      variant="icon"
+    >
       Close
     </CloseButton>
-    <Heading border=\\"none\\" color=\\"inherit\\" level=\\"h2\\" ellipsis={false}>
+    <Heading
+      border="none"
+      color="inherit"
+      ellipsis={false}
+      level="h2"
+    >
       Additional Comments
     </Heading>
-    <Heading level=\\"h3\\" border=\\"none\\" color=\\"inherit\\" ellipsis={false}>
+    <Heading
+      border="none"
+      color="inherit"
+      ellipsis={false}
+      level="h3"
+    >
       Criterion description
     </Heading>
   </ModalHeader>
-  <ModalBody padding=\\"medium\\" as=\\"div\\">
-    <TextArea data-selenium=\\"criterion_comments_text\\" label=\\"Comments\\" maxHeight=\\"50rem\\" onChange={[Function: onChange]} value=\\"some things\\" size=\\"medium\\" autoGrow={true} resize=\\"none\\" inline={false} messages={{...}} disabled={false} readOnly={false} textareaRef={[Function: textareaRef]} layout=\\"stacked\\" />
+  <ModalBody
+    as="div"
+    padding="medium"
+  >
+    <TextArea
+      autoGrow={true}
+      data-selenium="criterion_comments_text"
+      disabled={false}
+      inline={false}
+      label="Comments"
+      layout="stacked"
+      maxHeight="50rem"
+      messages={Array []}
+      onChange={[Function]}
+      readOnly={false}
+      resize="none"
+      size="medium"
+      textareaRef={[Function]}
+      value="some things"
+    />
   </ModalBody>
   <ModalFooter>
-    <Button variant=\\"light\\" margin=\\"0 x-small 0 0\\" onClick={[Function: close]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" fluidWidth={false} buttonRef={[Function: buttonRef]} cursor=\\"pointer\\">
+    <Button
+      as="button"
+      buttonRef={[Function]}
+      cursor="pointer"
+      fluidWidth={false}
+      margin="0 x-small 0 0"
+      onClick={[Function]}
+      size="medium"
+      type="button"
+      variant="light"
+    >
       Cancel
     </Button>
      
-    <Button variant=\\"primary\\" margin=\\"0 x-small 0 0\\" onClick={[Function: onClick]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" fluidWidth={false} buttonRef={[Function: buttonRef]} cursor=\\"pointer\\">
+    <Button
+      as="button"
+      buttonRef={[Function]}
+      cursor="pointer"
+      fluidWidth={false}
+      margin="0 x-small 0 0"
+      onClick={[Function]}
+      size="medium"
+      type="button"
+      variant="primary"
+    >
       Update Comment
     </Button>
   </ModalFooter>
-</Modal>"
+</Modal>
 `;

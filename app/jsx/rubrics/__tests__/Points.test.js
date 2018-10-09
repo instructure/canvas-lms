@@ -29,7 +29,7 @@ describe('The Points component', () => {
     expect(component({
       assessment: { ...id, points: validPoints('1') },
       pointsPossible: 2
-    }).debug()).toMatchSnapshot()
+    })).toMatchSnapshot()
   })
 
   it('renders the component when assessing with the expected layout', () => {
@@ -37,7 +37,7 @@ describe('The Points component', () => {
       assessment: { ...id, points: validPoints('1') },
       assessing: true,
       pointsPossible: 2
-    }).debug()).toMatchSnapshot()
+    })).toMatchSnapshot()
   })
 
   it('renders the right text for fractional points', () => {

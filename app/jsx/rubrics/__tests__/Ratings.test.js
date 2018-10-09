@@ -42,13 +42,13 @@ describe('The Ratings component', () => {
 
   const component = (mods) => shallow(<Ratings {...{ ...props, ...mods }} />)
   it('renders the root component as expected', () => {
-    expect(component().debug()).toMatchSnapshot()
+    expect(component()).toMatchSnapshot()
   })
 
   it('renders the Rating sub-components as expected when range rating enabled', () => {
     const useRange = true
     component({ useRange }).find('Rating')
-      .forEach((el) => expect(el.shallow().debug()).toMatchSnapshot())
+      .forEach((el) => expect(el.shallow()).toMatchSnapshot())
   })
 
   it('properly selects ratings when two tiers have the same point value', () => {
@@ -174,7 +174,7 @@ describe('The Ratings component', () => {
     expect(ratings).toHaveLength(1)
 
     const rating = ratings.at(0)
-    expect(rating.shallow().debug()).toMatchSnapshot()
+    expect(rating.shallow()).toMatchSnapshot()
   })
 
   it('renders a default rating if none of the ratings are selected', () => {
@@ -184,7 +184,7 @@ describe('The Ratings component', () => {
     expect(ratings).toHaveLength(1)
 
     const rating = ratings.at(0)
-    expect(rating.shallow().debug()).toMatchSnapshot()
+    expect(rating.shallow()).toMatchSnapshot()
   })
 
   it('hides points on the default rating if points are hidden', () => {

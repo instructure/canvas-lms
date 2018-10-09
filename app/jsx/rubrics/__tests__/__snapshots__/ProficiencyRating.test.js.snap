@@ -1,39 +1,277 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`renders the ProficiencyRating component 1`] = `
-"<tr>
-  <td style={{...}}>
-    <div style={{...}}>
-      <RadioInput label={{...}} checked={false} onChange={[Function]} onClick={[Function: onClick]} variant=\\"simple\\" size=\\"medium\\" disabled={false} inline={false} context=\\"success\\" readOnly={false} />
+<tr>
+  <td
+    style={
+      Object {
+        "padding": "1.1rem 0 0 0",
+        "textAlign": "center",
+        "verticalAlign": "top",
+      }
+    }
+  >
+    <div
+      style={
+        Object {
+          "display": "inline-block",
+        }
+      }
+    >
+      <RadioInput
+        checked={false}
+        context="success"
+        disabled={false}
+        inline={false}
+        label={
+          <ScreenReaderContent
+            as="span"
+          >
+            Change mastery
+          </ScreenReaderContent>
+        }
+        onChange={[Function]}
+        onClick={[Function]}
+        readOnly={false}
+        size="medium"
+        variant="simple"
+      />
     </div>
   </td>
-  <td className=\\"description\\" style={{...}}>
-    <TextInput label={{...}} messages={{...}} onChange={[Function]} defaultValue=\\"Stellar\\" inline={false} type=\\"text\\" size=\\"medium\\" textAlign=\\"start\\" disabled={false} readOnly={false} inputRef={[Function: inputRef]} layout=\\"stacked\\" />
+  <td
+    className="description"
+    style={
+      Object {
+        "verticalAlign": "top",
+      }
+    }
+  >
+    <TextInput
+      defaultValue="Stellar"
+      disabled={false}
+      inline={false}
+      inputRef={[Function]}
+      label={
+        <ScreenReaderContent
+          as="span"
+        >
+          Change description
+        </ScreenReaderContent>
+      }
+      layout="stacked"
+      messages={null}
+      onChange={[Function]}
+      readOnly={false}
+      size="medium"
+      textAlign="start"
+      type="text"
+    />
   </td>
-  <td className=\\"points\\" style={{...}}>
-    <TextInput label={{...}} messages={{...}} onChange={[Function]} defaultValue=\\"10\\" width=\\"4rem\\" inline={false} type=\\"text\\" size=\\"medium\\" textAlign=\\"start\\" disabled={false} readOnly={false} inputRef={[Function: inputRef]} layout=\\"stacked\\" />
+  <td
+    className="points"
+    style={
+      Object {
+        "verticalAlign": "top",
+      }
+    }
+  >
+    <TextInput
+      defaultValue="10"
+      disabled={false}
+      inline={false}
+      inputRef={[Function]}
+      label={
+        <ScreenReaderContent
+          as="span"
+        >
+          Change points
+        </ScreenReaderContent>
+      }
+      layout="stacked"
+      messages={null}
+      onChange={[Function]}
+      readOnly={false}
+      size="medium"
+      textAlign="start"
+      type="text"
+      width="4rem"
+    />
   </td>
-  <td className=\\"color\\" style={{...}}>
-    <Popover on=\\"click\\" show={false} onToggle={[Function]} onClick={[Function: onClick]} onFocus={[Function: onFocus]} onBlur={[Function: onBlur]} onMouseOver={[Function: onMouseOver]} onMouseOut={[Function: onMouseOut]} onShow={[Function: onShow]} onDismiss={[Function: onDismiss]} placement=\\"bottom center\\" stacking=\\"topmost\\" offsetX={0} offsetY={0} variant=\\"default\\" contentRef={[Function: contentRef]} defaultShow={false} withArrow={true} trackPosition={true} constrain=\\"window\\" onPositioned={[Function: onPositioned]} onPositionChanged={[Function: onPositionChanged]} shouldRenderOffscreen={false} shouldContainFocus={false} shouldReturnFocus={true} shouldCloseOnDocumentClick={true} shouldCloseOnEscape={true} defaultFocusElement={{...}} label={{...}} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} positionTarget={{...}} alignArrow={false}>
+  <td
+    className="color"
+    style={
+      Object {
+        "verticalAlign": "top",
+      }
+    }
+  >
+    <Popover
+      alignArrow={false}
+      constrain="window"
+      contentRef={[Function]}
+      defaultFocusElement={null}
+      defaultShow={false}
+      insertAt="bottom"
+      label={null}
+      liveRegion={null}
+      mountNode={null}
+      offsetX={0}
+      offsetY={0}
+      on="click"
+      onBlur={[Function]}
+      onClick={[Function]}
+      onDismiss={[Function]}
+      onFocus={[Function]}
+      onMouseOut={[Function]}
+      onMouseOver={[Function]}
+      onPositionChanged={[Function]}
+      onPositioned={[Function]}
+      onShow={[Function]}
+      onToggle={[Function]}
+      placement="bottom center"
+      positionTarget={null}
+      shouldCloseOnDocumentClick={true}
+      shouldCloseOnEscape={true}
+      shouldContainFocus={false}
+      shouldRenderOffscreen={false}
+      shouldReturnFocus={true}
+      show={false}
+      stacking="topmost"
+      trackPosition={true}
+      variant="default"
+      withArrow={true}
+    >
       <PopoverTrigger>
-        <Button variant=\\"link\\" as=\\"button\\" type=\\"button\\" size=\\"medium\\" margin=\\"0\\" fluidWidth={false} buttonRef={[Function: buttonRef]} cursor=\\"pointer\\">
+        <Button
+          as="button"
+          buttonRef={[Function]}
+          cursor="pointer"
+          fluidWidth={false}
+          margin="0"
+          size="medium"
+          type="button"
+          variant="link"
+        >
           <div>
-            <span className=\\"colorPickerIcon\\" style={{...}} />
+            <span
+              className="colorPickerIcon"
+              style={
+                Object {
+                  "background": "#00ff00",
+                }
+              }
+            />
             Change
           </div>
         </Button>
       </PopoverTrigger>
       <PopoverContent>
-        <ColorPicker parentComponent=\\"ProficiencyRating\\" colors={{...}} currentColor=\\"#00ff00\\" isOpen={true} hidePrompt={true} nonModal={true} hideOnScroll={false} withAnimation={false} withBorder={false} withBoxShadow={false} withArrow={false} focusOnMount={false} afterClose={[Function]} setStatusColor={[Function]} withDarkCheck={false} allowWhite={false} />
+        <ColorPicker
+          afterClose={[Function]}
+          allowWhite={false}
+          colors={
+            Array [
+              Object {
+                "hexcode": "#BD3C14",
+                "name": "Brick",
+              },
+              Object {
+                "hexcode": "#FF2717",
+                "name": "Red",
+              },
+              Object {
+                "hexcode": "#E71F63",
+                "name": "Magenta",
+              },
+              Object {
+                "hexcode": "#8F3E97",
+                "name": "Purple",
+              },
+              Object {
+                "hexcode": "#65499D",
+                "name": "Deep Purple",
+              },
+              Object {
+                "hexcode": "#4554A4",
+                "name": "Indigo",
+              },
+              Object {
+                "hexcode": "#1770AB",
+                "name": "Blue",
+              },
+              Object {
+                "hexcode": "#0B9BE3",
+                "name": "Light Blue",
+              },
+              Object {
+                "hexcode": "#06A3B7",
+                "name": "Cyan",
+              },
+              Object {
+                "hexcode": "#009688",
+                "name": "Teal",
+              },
+              Object {
+                "hexcode": "#009606",
+                "name": "Green",
+              },
+              Object {
+                "hexcode": "#8D9900",
+                "name": "Olive",
+              },
+              Object {
+                "hexcode": "#D97900",
+                "name": "Pumpkin",
+              },
+              Object {
+                "hexcode": "#FD5D10",
+                "name": "Orange",
+              },
+              Object {
+                "hexcode": "#F06291",
+                "name": "Pink",
+              },
+            ]
+          }
+          currentColor="#00ff00"
+          focusOnMount={false}
+          hideOnScroll={false}
+          hidePrompt={true}
+          isOpen={true}
+          nonModal={true}
+          parentComponent="ProficiencyRating"
+          setStatusColor={[Function]}
+          withAnimation={false}
+          withArrow={false}
+          withBorder={false}
+          withBoxShadow={false}
+          withDarkCheck={false}
+        />
       </PopoverContent>
     </Popover>
-    <div className=\\"delete\\">
-      <Button disabled={false} buttonRef={[Function]} onClick={[Function]} variant=\\"icon\\" icon={{...}} as=\\"button\\" type=\\"button\\" size=\\"medium\\" margin=\\"0\\" fluidWidth={false} cursor=\\"pointer\\">
-        <ScreenReaderContent as=\\"span\\">
+    <div
+      className="delete"
+    >
+      <Button
+        as="button"
+        buttonRef={[Function]}
+        cursor="pointer"
+        disabled={false}
+        fluidWidth={false}
+        icon={<IconTrash />}
+        margin="0"
+        onClick={[Function]}
+        size="medium"
+        type="button"
+        variant="icon"
+      >
+        <ScreenReaderContent
+          as="span"
+        >
           Delete proficiency rating
         </ScreenReaderContent>
       </Button>
     </div>
   </td>
-</tr>"
+</tr>
 `;

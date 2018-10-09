@@ -1,18 +1,66 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`properly renders the UnassessedAssignment component 1`] = `
-"<ListItem>
-  <View padding=\\"small\\" display=\\"auto\\">
-    <ApplyTheme theme={{...}} immutable={false}>
-      <Link href=\\"www.example.com\\" variant=\\"default\\" as=\\"button\\" linkRef={[Function: linkRef]} ellipsis={false} iconPlacement=\\"start\\">
-        <Flex alignItems=\\"center\\" as=\\"span\\" direction=\\"row\\" justifyItems=\\"start\\" inline={false} visualDebug={false} wrapItems={false}>
-          <FlexItem padding=\\"0 0 0 small\\" as=\\"span\\" grow={false} shrink={false}>
-            <Text size=\\"medium\\" as=\\"span\\" letterSpacing=\\"normal\\">
+<ListItem
+  key="1"
+>
+  <View
+    display="auto"
+    padding="small"
+  >
+    <ApplyTheme
+      immutable={false}
+      theme={
+        Object {
+          Symbol(Link): Object {
+            "color": "#68777D",
+          },
+        }
+      }
+    >
+      <Link
+        as="button"
+        ellipsis={false}
+        href="www.example.com"
+        iconPlacement="start"
+        linkRef={[Function]}
+        variant="default"
+      >
+        <Flex
+          alignItems="center"
+          as="span"
+          direction="row"
+          inline={false}
+          justifyItems="start"
+          visualDebug={false}
+          wrapItems={false}
+        >
+          <FlexItem
+            as="span"
+            grow={false}
+            padding="0 0 0 small"
+            shrink={false}
+          >
+            <Text
+              as="span"
+              letterSpacing="normal"
+              size="medium"
+            >
               <IconAssignment />
             </Text>
           </FlexItem>
-          <FlexItem padding=\\"0 x-small\\" as=\\"span\\" grow={false} shrink={false}>
-            <Text weight=\\"bold\\" as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\">
+          <FlexItem
+            as="span"
+            grow={false}
+            padding="0 x-small"
+            shrink={false}
+          >
+            <Text
+              as="span"
+              letterSpacing="normal"
+              size="medium"
+              weight="bold"
+            >
               example
                (
               Not yet assessed
@@ -23,5 +71,5 @@ exports[`properly renders the UnassessedAssignment component 1`] = `
       </Link>
     </ApplyTheme>
   </View>
-</ListItem>"
+</ListItem>
 `;

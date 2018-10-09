@@ -125,6 +125,7 @@
     "ember-template-compiler": "^1.8.0",
     "enzyme": "^3",
     "enzyme-adapter-react-16": "^1",
+    "enzyme-to-json": "^3.3.4",
     "es-check": "^2.1.0",
     "eslint": "^4",
     "eslint-config-airbnb": "^16.1.0",

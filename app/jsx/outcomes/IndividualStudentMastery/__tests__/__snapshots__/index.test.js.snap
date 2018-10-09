@@ -1,9 +1,27 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`renders the component 1`] = `
-"<Flex justifyItems=\\"center\\" alignItems=\\"center\\" padding=\\"medium\\" as=\\"span\\" direction=\\"row\\" inline={false} visualDebug={false} wrapItems={false}>
-  <FlexItem as=\\"span\\" grow={false} shrink={false}>
-    <Spinner size=\\"large\\" title=\\"Loading outcome results\\" as=\\"div\\" variant=\\"default\\" />
+<Flex
+  alignItems="center"
+  as="span"
+  direction="row"
+  inline={false}
+  justifyItems="center"
+  padding="medium"
+  visualDebug={false}
+  wrapItems={false}
+>
+  <FlexItem
+    as="span"
+    grow={false}
+    shrink={false}
+  >
+    <Spinner
+      as="div"
+      size="large"
+      title="Loading outcome results"
+      variant="default"
+    />
   </FlexItem>
-</Flex>"
+</Flex>
 `;

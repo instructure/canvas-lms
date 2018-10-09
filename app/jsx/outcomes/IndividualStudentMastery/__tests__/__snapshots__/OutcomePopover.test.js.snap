@@ -1,50 +1,163 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`renders correctly with no custom outcomeProficiency 1`] = `
-"<span>
-  <Popover placement=\\"bottom\\" onToggle={[Function: onToggle]} onClick={[Function: onClick]} onFocus={[Function: onFocus]} onBlur={[Function: onBlur]} onMouseOver={[Function: onMouseOver]} onMouseOut={[Function: onMouseOut]} onShow={[Function: onShow]} onDismiss={[Function: onDismiss]} stacking=\\"topmost\\" offsetX={0} offsetY={0} variant=\\"default\\" on={{...}} contentRef={[Function: contentRef]} defaultShow={false} withArrow={true} trackPosition={true} constrain=\\"window\\" onPositioned={[Function: onPositioned]} onPositionChanged={[Function: onPositionChanged]} shouldRenderOffscreen={false} shouldContainFocus={false} shouldReturnFocus={true} shouldCloseOnDocumentClick={true} shouldCloseOnEscape={true} defaultFocusElement={{...}} label={{...}} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} positionTarget={{...}} alignArrow={false}>
+<span>
+  <Popover
+    alignArrow={false}
+    constrain="window"
+    contentRef={[Function]}
+    defaultFocusElement={null}
+    defaultShow={false}
+    insertAt="bottom"
+    label={null}
+    liveRegion={null}
+    mountNode={null}
+    offsetX={0}
+    offsetY={0}
+    on={
+      Array [
+        "hover",
+        "focus",
+      ]
+    }
+    onBlur={[Function]}
+    onClick={[Function]}
+    onDismiss={[Function]}
+    onFocus={[Function]}
+    onMouseOut={[Function]}
+    onMouseOver={[Function]}
+    onPositionChanged={[Function]}
+    onPositioned={[Function]}
+    onShow={[Function]}
+    onToggle={[Function]}
+    placement="bottom"
+    positionTarget={null}
+    shouldCloseOnDocumentClick={true}
+    shouldCloseOnEscape={true}
+    shouldContainFocus={false}
+    shouldRenderOffscreen={false}
+    shouldReturnFocus={true}
+    stacking="topmost"
+    trackPosition={true}
+    variant="default"
+    withArrow={true}
+  >
     <PopoverTrigger>
-      <Link onClick={[Function: onClick]} variant=\\"default\\" as=\\"button\\" linkRef={[Function: linkRef]} ellipsis={false} iconPlacement=\\"start\\">
-        <span style={{...}}>
+      <Link
+        as="button"
+        ellipsis={false}
+        iconPlacement="start"
+        linkRef={[Function]}
+        onClick={[Function]}
+        variant="default"
+      >
+        <span
+          style={
+            Object {
+              "color": "black",
+            }
+          }
+        >
           <IconInfo />
         </span>
         <span>
-          <ScreenReaderContent as=\\"span\\">
+          <ScreenReaderContent
+            as="span"
+          >
             Click to expand outcome details
           </ScreenReaderContent>
         </span>
       </Link>
     </PopoverTrigger>
     <PopoverContent>
-      <View as=\\"div\\" padding=\\"small\\" maxWidth=\\"30rem\\" display=\\"auto\\">
-        <Text size=\\"small\\" as=\\"span\\" letterSpacing=\\"normal\\">
-          <Flex alignItems=\\"stretch\\" direction=\\"row\\" justifyItems=\\"space-between\\" as=\\"span\\" inline={false} visualDebug={false} wrapItems={false}>
-            <FlexItem grow={true} shrink={true} as=\\"span\\">
+      <View
+        as="div"
+        display="auto"
+        maxWidth="30rem"
+        padding="small"
+      >
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="small"
+        >
+          <Flex
+            alignItems="stretch"
+            as="span"
+            direction="row"
+            inline={false}
+            justifyItems="space-between"
+            visualDebug={false}
+            wrapItems={false}
+          >
+            <FlexItem
+              as="span"
+              grow={true}
+              shrink={true}
+            >
               <div>
                 Last Assessment: 
-                <DatetimeDisplay datetime={{...}} format=\\"%b %d, %l:%M %p\\" />
+                <DatetimeDisplay
+                  datetime={2018-02-01T07:01:00.000Z}
+                  format="%b %d, %l:%M %p"
+                />
               </div>
             </FlexItem>
-            <FlexItem grow={true} shrink={true} align=\\"stretch\\" as=\\"span\\">
-              <Text size=\\"small\\" weight=\\"bold\\" as=\\"span\\" letterSpacing=\\"normal\\">
+            <FlexItem
+              align="stretch"
+              as="span"
+              grow={true}
+              shrink={true}
+            >
+              <Text
+                as="span"
+                letterSpacing="normal"
+                size="small"
+                weight="bold"
+              >
                 <div>
-                  <div style={{...}}>
+                  <div
+                    style={
+                      Object {
+                        "color": "#00AC18",
+                        "textAlign": "end",
+                      }
+                    }
+                  >
                     Meets Mastery
                   </div>
                 </div>
               </Text>
             </FlexItem>
           </Flex>
-          <hr role=\\"presentation\\" />
+          <hr
+            role="presentation"
+          />
           <div>
-            <Text size=\\"small\\" weight=\\"bold\\" as=\\"span\\" letterSpacing=\\"normal\\">
+            <Text
+              as="span"
+              letterSpacing="normal"
+              size="small"
+              weight="bold"
+            >
               Calculation Method
             </Text>
             <div>
               Highest Score
             </div>
-            <div style={{...}}>
-              <Text size=\\"small\\" weight=\\"bold\\" as=\\"span\\" letterSpacing=\\"normal\\">
+            <div
+              style={
+                Object {
+                  "padding": "0.5rem 0 0 0",
+                }
+              }
+            >
+              <Text
+                as="span"
+                letterSpacing="normal"
+                size="small"
+                weight="bold"
+              >
                 Example
               </Text>
             </div>
@@ -62,55 +175,169 @@ exports[`renders correctly with no custom outcomeProficiency 1`] = `
       </View>
     </PopoverContent>
   </Popover>
-  <FlexItem as=\\"span\\" grow={false} shrink={false} />
-</span>"
+  <FlexItem
+    as="span"
+    grow={false}
+    shrink={false}
+  />
+</span>
 `;
 
 exports[`renders correctly with no results 1`] = `
-"<span>
-  <Popover placement=\\"bottom\\" onToggle={[Function: onToggle]} onClick={[Function: onClick]} onFocus={[Function: onFocus]} onBlur={[Function: onBlur]} onMouseOver={[Function: onMouseOver]} onMouseOut={[Function: onMouseOut]} onShow={[Function: onShow]} onDismiss={[Function: onDismiss]} stacking=\\"topmost\\" offsetX={0} offsetY={0} variant=\\"default\\" on={{...}} contentRef={[Function: contentRef]} defaultShow={false} withArrow={true} trackPosition={true} constrain=\\"window\\" onPositioned={[Function: onPositioned]} onPositionChanged={[Function: onPositionChanged]} shouldRenderOffscreen={false} shouldContainFocus={false} shouldReturnFocus={true} shouldCloseOnDocumentClick={true} shouldCloseOnEscape={true} defaultFocusElement={{...}} label={{...}} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} positionTarget={{...}} alignArrow={false}>
+<span>
+  <Popover
+    alignArrow={false}
+    constrain="window"
+    contentRef={[Function]}
+    defaultFocusElement={null}
+    defaultShow={false}
+    insertAt="bottom"
+    label={null}
+    liveRegion={null}
+    mountNode={null}
+    offsetX={0}
+    offsetY={0}
+    on={
+      Array [
+        "hover",
+        "focus",
+      ]
+    }
+    onBlur={[Function]}
+    onClick={[Function]}
+    onDismiss={[Function]}
+    onFocus={[Function]}
+    onMouseOut={[Function]}
+    onMouseOver={[Function]}
+    onPositionChanged={[Function]}
+    onPositioned={[Function]}
+    onShow={[Function]}
+    onToggle={[Function]}
+    placement="bottom"
+    positionTarget={null}
+    shouldCloseOnDocumentClick={true}
+    shouldCloseOnEscape={true}
+    shouldContainFocus={false}
+    shouldRenderOffscreen={false}
+    shouldReturnFocus={true}
+    stacking="topmost"
+    trackPosition={true}
+    variant="default"
+    withArrow={true}
+  >
     <PopoverTrigger>
-      <Link onClick={[Function: onClick]} variant=\\"default\\" as=\\"button\\" linkRef={[Function: linkRef]} ellipsis={false} iconPlacement=\\"start\\">
-        <span style={{...}}>
+      <Link
+        as="button"
+        ellipsis={false}
+        iconPlacement="start"
+        linkRef={[Function]}
+        onClick={[Function]}
+        variant="default"
+      >
+        <span
+          style={
+            Object {
+              "color": "black",
+            }
+          }
+        >
           <IconInfo />
         </span>
         <span>
-          <ScreenReaderContent as=\\"span\\">
+          <ScreenReaderContent
+            as="span"
+          >
             Click to expand outcome details
           </ScreenReaderContent>
         </span>
       </Link>
     </PopoverTrigger>
     <PopoverContent>
-      <View as=\\"div\\" padding=\\"small\\" maxWidth=\\"30rem\\" display=\\"auto\\">
-        <Text size=\\"small\\" as=\\"span\\" letterSpacing=\\"normal\\">
-          <Flex alignItems=\\"stretch\\" direction=\\"row\\" justifyItems=\\"space-between\\" as=\\"span\\" inline={false} visualDebug={false} wrapItems={false}>
-            <FlexItem grow={true} shrink={true} as=\\"span\\">
+      <View
+        as="div"
+        display="auto"
+        maxWidth="30rem"
+        padding="small"
+      >
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="small"
+        >
+          <Flex
+            alignItems="stretch"
+            as="span"
+            direction="row"
+            inline={false}
+            justifyItems="space-between"
+            visualDebug={false}
+            wrapItems={false}
+          >
+            <FlexItem
+              as="span"
+              grow={true}
+              shrink={true}
+            >
               <div>
                 Last Assessment: 
                 No submissions
               </div>
             </FlexItem>
-            <FlexItem grow={true} shrink={true} align=\\"stretch\\" as=\\"span\\">
-              <Text size=\\"small\\" weight=\\"bold\\" as=\\"span\\" letterSpacing=\\"normal\\">
+            <FlexItem
+              align="stretch"
+              as="span"
+              grow={true}
+              shrink={true}
+            >
+              <Text
+                as="span"
+                letterSpacing="normal"
+                size="small"
+                weight="bold"
+              >
                 <div>
-                  <div style={{...}}>
+                  <div
+                    style={
+                      Object {
+                        "color": "#green",
+                        "textAlign": "end",
+                      }
+                    }
+                  >
                     I am Groot
                   </div>
                 </div>
               </Text>
             </FlexItem>
           </Flex>
-          <hr role=\\"presentation\\" />
+          <hr
+            role="presentation"
+          />
           <div>
-            <Text size=\\"small\\" weight=\\"bold\\" as=\\"span\\" letterSpacing=\\"normal\\">
+            <Text
+              as="span"
+              letterSpacing="normal"
+              size="small"
+              weight="bold"
+            >
               Calculation Method
             </Text>
             <div>
               Highest Score
             </div>
-            <div style={{...}}>
-              <Text size=\\"small\\" weight=\\"bold\\" as=\\"span\\" letterSpacing=\\"normal\\">
+            <div
+              style={
+                Object {
+                  "padding": "0.5rem 0 0 0",
+                }
+              }
+            >
+              <Text
+                as="span"
+                letterSpacing="normal"
+                size="small"
+                weight="bold"
+              >
                 Example
               </Text>
             </div>
@@ -128,55 +355,172 @@ exports[`renders correctly with no results 1`] = `
       </View>
     </PopoverContent>
   </Popover>
-  <FlexItem as=\\"span\\" grow={false} shrink={false} />
-</span>"
+  <FlexItem
+    as="span"
+    grow={false}
+    shrink={false}
+  />
+</span>
 `;
 
 exports[`renders the OutcomePopover component 1`] = `
-"<span>
-  <Popover placement=\\"bottom\\" onToggle={[Function: onToggle]} onClick={[Function: onClick]} onFocus={[Function: onFocus]} onBlur={[Function: onBlur]} onMouseOver={[Function: onMouseOver]} onMouseOut={[Function: onMouseOut]} onShow={[Function: onShow]} onDismiss={[Function: onDismiss]} stacking=\\"topmost\\" offsetX={0} offsetY={0} variant=\\"default\\" on={{...}} contentRef={[Function: contentRef]} defaultShow={false} withArrow={true} trackPosition={true} constrain=\\"window\\" onPositioned={[Function: onPositioned]} onPositionChanged={[Function: onPositionChanged]} shouldRenderOffscreen={false} shouldContainFocus={false} shouldReturnFocus={true} shouldCloseOnDocumentClick={true} shouldCloseOnEscape={true} defaultFocusElement={{...}} label={{...}} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} positionTarget={{...}} alignArrow={false}>
+<span>
+  <Popover
+    alignArrow={false}
+    constrain="window"
+    contentRef={[Function]}
+    defaultFocusElement={null}
+    defaultShow={false}
+    insertAt="bottom"
+    label={null}
+    liveRegion={null}
+    mountNode={null}
+    offsetX={0}
+    offsetY={0}
+    on={
+      Array [
+        "hover",
+        "focus",
+      ]
+    }
+    onBlur={[Function]}
+    onClick={[Function]}
+    onDismiss={[Function]}
+    onFocus={[Function]}
+    onMouseOut={[Function]}
+    onMouseOver={[Function]}
+    onPositionChanged={[Function]}
+    onPositioned={[Function]}
+    onShow={[Function]}
+    onToggle={[Function]}
+    placement="bottom"
+    positionTarget={null}
+    shouldCloseOnDocumentClick={true}
+    shouldCloseOnEscape={true}
+    shouldContainFocus={false}
+    shouldRenderOffscreen={false}
+    shouldReturnFocus={true}
+    stacking="topmost"
+    trackPosition={true}
+    variant="default"
+    withArrow={true}
+  >
     <PopoverTrigger>
-      <Link onClick={[Function: onClick]} variant=\\"default\\" as=\\"button\\" linkRef={[Function: linkRef]} ellipsis={false} iconPlacement=\\"start\\">
-        <span style={{...}}>
+      <Link
+        as="button"
+        ellipsis={false}
+        iconPlacement="start"
+        linkRef={[Function]}
+        onClick={[Function]}
+        variant="default"
+      >
+        <span
+          style={
+            Object {
+              "color": "black",
+            }
+          }
+        >
           <IconInfo />
         </span>
         <span>
-          <ScreenReaderContent as=\\"span\\">
+          <ScreenReaderContent
+            as="span"
+          >
             Click to expand outcome details
           </ScreenReaderContent>
         </span>
       </Link>
     </PopoverTrigger>
     <PopoverContent>
-      <View as=\\"div\\" padding=\\"small\\" maxWidth=\\"30rem\\" display=\\"auto\\">
-        <Text size=\\"small\\" as=\\"span\\" letterSpacing=\\"normal\\">
-          <Flex alignItems=\\"stretch\\" direction=\\"row\\" justifyItems=\\"space-between\\" as=\\"span\\" inline={false} visualDebug={false} wrapItems={false}>
-            <FlexItem grow={true} shrink={true} as=\\"span\\">
+      <View
+        as="div"
+        display="auto"
+        maxWidth="30rem"
+        padding="small"
+      >
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="small"
+        >
+          <Flex
+            alignItems="stretch"
+            as="span"
+            direction="row"
+            inline={false}
+            justifyItems="space-between"
+            visualDebug={false}
+            wrapItems={false}
+          >
+            <FlexItem
+              as="span"
+              grow={true}
+              shrink={true}
+            >
               <div>
                 Last Assessment: 
-                <DatetimeDisplay datetime={{...}} format=\\"%b %d, %l:%M %p\\" />
+                <DatetimeDisplay
+                  datetime={2018-02-01T07:01:00.000Z}
+                  format="%b %d, %l:%M %p"
+                />
               </div>
             </FlexItem>
-            <FlexItem grow={true} shrink={true} align=\\"stretch\\" as=\\"span\\">
-              <Text size=\\"small\\" weight=\\"bold\\" as=\\"span\\" letterSpacing=\\"normal\\">
+            <FlexItem
+              align="stretch"
+              as="span"
+              grow={true}
+              shrink={true}
+            >
+              <Text
+                as="span"
+                letterSpacing="normal"
+                size="small"
+                weight="bold"
+              >
                 <div>
-                  <div style={{...}}>
+                  <div
+                    style={
+                      Object {
+                        "color": "#green",
+                        "textAlign": "end",
+                      }
+                    }
+                  >
                     I am Groot
                   </div>
                 </div>
               </Text>
             </FlexItem>
           </Flex>
-          <hr role=\\"presentation\\" />
+          <hr
+            role="presentation"
+          />
           <div>
-            <Text size=\\"small\\" weight=\\"bold\\" as=\\"span\\" letterSpacing=\\"normal\\">
+            <Text
+              as="span"
+              letterSpacing="normal"
+              size="small"
+              weight="bold"
+            >
               Calculation Method
             </Text>
             <div>
               Highest Score
             </div>
-            <div style={{...}}>
-              <Text size=\\"small\\" weight=\\"bold\\" as=\\"span\\" letterSpacing=\\"normal\\">
+            <div
+              style={
+                Object {
+                  "padding": "0.5rem 0 0 0",
+                }
+              }
+            >
+              <Text
+                as="span"
+                letterSpacing="normal"
+                size="small"
+                weight="bold"
+              >
                 Example
               </Text>
             </div>
@@ -194,6 +538,10 @@ exports[`renders the OutcomePopover component 1`] = `
       </View>
     </PopoverContent>
   </Popover>
-  <FlexItem as=\\"span\\" grow={false} shrink={false} />
-</span>"
+  <FlexItem
+    as="span"
+    grow={false}
+    shrink={false}
+  />
+</span>
 `;
