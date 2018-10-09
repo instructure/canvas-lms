@@ -74,7 +74,7 @@ export default class LoadingPastIndicator extends Component {
   renderLoading () {
     if (this.props.loadingPast && !this.props.allPastItemsLoaded) {
       return (
-        <View as="div" padding="small" textAlign="center">
+        <View as="div" padding="medium small small small" textAlign="center">
           <Spinner size="small" margin="0 x-small 0 0" title={formatMessage('Loading past items')}/>
           <Text size="small" color="secondary">
             {formatMessage('Loading past items')}

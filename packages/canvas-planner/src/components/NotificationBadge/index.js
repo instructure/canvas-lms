@@ -22,24 +22,30 @@ import classnames from 'classnames';
 import themeable from '@instructure/ui-themeable/lib';
 import MissingIndicator from './MissingIndicator';
 import NewActivityIndicator from './NewActivityIndicator';
+import { sizeShape } from '../plannerPropTypes';
 import styles from './styles.css';
 import theme from './theme.js';
 
 class NotificationBadge extends React.Component {
   static propTypes = {
-    children: PropTypes.element
+    responsiveSize: sizeShape,
+    children: PropTypes.element,
   };
+  static defaultProps = {
+    responsiveSize: 'large',
+  }
 
   render () {
     const indicator = this.props.children ? React.Children.only(this.props.children) : null;
 
-    const activityIndicatorClasses = {
-      [styles.activityIndicator]: true,
-      [styles.hasBadge]: indicator != null
-    };
+    const activityIndicatorClasses = classnames(
+      styles.activityIndicator,
+      indicator != null && styles.hasBadge,
+      styles[this.props.responsiveSize]
+    );
 
     return (
-      <div className={classnames(activityIndicatorClasses)}>
+      <div className={activityIndicatorClasses}>
         {indicator}
       </div>
     );

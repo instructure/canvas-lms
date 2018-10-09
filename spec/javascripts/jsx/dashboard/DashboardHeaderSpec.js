@@ -23,7 +23,7 @@ import { shallow } from 'enzyme'
 import moxios from 'moxios'
 import sinon from 'sinon'
 import $ from 'jquery'
-import DashboardHeader from 'jsx/dashboard/DashboardHeader'
+import { DashboardHeader } from 'jsx/dashboard/DashboardHeader'
 import { resetPlanner } from 'canvas-planner'
 
 const container = document.getElementById('fixtures')

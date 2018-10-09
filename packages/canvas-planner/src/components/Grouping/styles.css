@@ -108,7 +108,7 @@
   min-width: 1px;
 }
 
-.medium {
+.medium, .small {
   &.root {
     display: block;
     margin: 0;

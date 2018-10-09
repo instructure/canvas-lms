@@ -29,9 +29,6 @@ body {
   &:not(.is-inside-submission-frame):not(.embedded):not(.dashboard-is-planner) {
     min-width: 768px;
   }
-  &.dashboard-is-planner {
-    min-width: 470px; /* or the dashboard header starts to wrap */
-  }
 
   &.no-headers, &.embedded {
     #header, #topbar, #left-side, #breadcrumbs { display: none !important; }
