@@ -6,6 +6,51 @@ The Change Log Archive page displays previous API changes in the <a href="file.c
 
 <h2>Prior Updates</h2>
 
+<h2>2018-08-04</h2>
+
+<h3>Changes</h3>
+<table class="changelog">
+<tr>
+<th>API Calls</th>
+<th>Function</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="outcome_results.html">Outcome Results API</a></td>
+<td>Get Outcome Result Rollups</td>
+<td>Aggregate parameter: Clarified that the median is a separate parameter.</td>
+</tr>
+</table>
+<p></p>
+<table class="changelog">
+<tr>
+<th>CSV Format</th>
+<th>File</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="outcomes_csv.html">Outcomes Data Format</td>
+<td>outcomes.csv</td>
+<td>Vendor_guid field: Clarified that vendor_guid IDs will prefix “canvas_outcome:” and “canvas_outcome_group:” for outcomes and groups, respectively. In addition, these prefixes are reserved; newly created outcomes and groups may not have vendor_guid fields with these prefixes./td>
+</tr>
+</table>
+
+<h3>Additions</h3>
+<table class="changelog">
+<tr>
+<th>API Calls</th>
+<th>Function</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="Outcome_results.html">Outcome Results API</a></td>
+<td>Get Outcome Result Rollups</td>
+<td>Exclude parameter: Specified additional values to exclude. “Missing_user_rollups” excludes rollups for users without results.<br><br>
+  Aggregate_stat parameter: If aggregate rollups requested, then this value determines what statistic is used for the aggregate. Defaults to “mean” if this value is not specified.
+</td>
+</tr>
+</table>
+
 <h2>2018-07-14</h2>
   <h3>Changes</h3>
 <table class="changelog">
