@@ -133,6 +133,17 @@ shared_examples_for "advantage services" do
       end
     end
 
+    context 'with malformed access token' do
+      let(:access_token_jwt) { 'gibberish' }
+
+      it_behaves_like 'mime_type check'
+
+      it 'returns 401 unauthorized and complains about missing access token' do
+        expect(response).to have_http_status :unauthorized
+        expect(json).to be_lti_advantage_error_response_body('unauthorized', 'Invalid access token format')
+      end
+    end
+
     context 'with no access token scope grant' do
       let(:access_token_scopes) do
         remove_access_token_scope(super())
