@@ -509,12 +509,16 @@ describe "student planner" do
     it "scrolls to the next new activity", priority: "1", test_id: 3468774 do
       go_to_list_view
       wait_for_spinner
+      expect(items_displayed.count).to eq 1
+      expect(scroll_height).to eq 0
 
-      expect(items_displayed[2]).to contain_link_partial_text(@old.title.to_s)
       new_activity_button.click
-      expect(items_displayed[1]).to contain_link_partial_text(@older.title.to_s)
+      wait_for_spinner
+      expect(items_displayed.count).to eq 4
+      expect{scroll_height}.to become_between 600, 620  # 609
+
       new_activity_button.click
-      expect(items_displayed[0]).to contain_link_partial_text(@oldest.title.to_s)
+      expect{scroll_height}.to become_between 520, 540  # 529
     end
 
     it "shows any new activity above the current scroll position", priority: "1", test_id: 3468775 do
