@@ -15,9 +15,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../common')
+require_relative '../common'
+require_relative 'pages/new_course_search_page.rb'
+require_relative 'pages/new_course_add_people_modal.rb'
 
 describe "new account course search" do
+  include NewCourseSearchPage
+  include NewCourseAddPeopleModal
+
   include_context "in-process server selenium tests"
 
   before :once do
@@ -208,9 +213,8 @@ describe "new account course search" do
   it "should list course name at top of add user modal", priority: "1", test_id: 3391719 do
     named_course = course_factory(:account => @account, :course_name => "course factory with name")
 
-    get "/accounts/#{@account.id}"
-    el = get_rows.first.find('[name="IconPlus"]')
-    move_to_click_element(el)
-    expect(f('#add_people_modal h2')).to include_text(named_course.name)
+    visit_courses(@account)
+    click_add_user_button(named_course.name)
+    expect(add_people_header).to include_text(named_course.name)
   end
 end
