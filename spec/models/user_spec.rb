@@ -2468,6 +2468,13 @@ describe User do
         expect(@student.grants_right?(@sub_admin, :manage_user_details)).to eq false
       end
 
+      it "is not granted to custom sub-account admins with inherited roles" do
+        custom_role = custom_account_role("somerole", :account => @root_account)
+        @root_account.role_overrides.create!(role: custom_role, enabled: true, permission: :manage_user_logins)
+        @custom_sub_admin = account_admin_user(account: @sub_account, role: custom_role)
+        expect(@student.grants_right?(@custom_sub_admin, :manage_user_details)).to eq false
+      end
+
       it "is not granted to root account admins on other root account admins who are invited as students" do
         other_admin = account_admin_user account: Account.create!
         course_with_student account: @root_account, user: other_admin, enrollment_state: 'invited'
