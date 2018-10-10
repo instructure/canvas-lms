@@ -82,6 +82,7 @@ module.exports = {
         "import/no-commonjs": "error",
         "import/no-extraneous-dependencies": "off", // allows 'i18n!webzip_exports' and 'compiled/foo/bar'
         "import/no-nodejs-modules": "error",
+        'import/order': 'off', // because it thinks 'jsx/whatever' and 'compiled/baz' should go in their groups. we don't want to encourage people to do that just so they move them back together once  those everything is in same dir
         "import/no-unresolved": "off",
         "import/no-webpack-loader-syntax": "off"
       },
