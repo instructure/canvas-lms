@@ -118,10 +118,10 @@ class Feature
   register(
     'integrate_arc_rce' =>
     {
-      display_name: -> { I18n.t('Arc Media Recorder in RCE') },
+      display_name: -> { I18n.t('HTML5 Media Recorder in RCE') },
       description: -> { I18n.t('Use HTML5 Recorder in Content Editor instead of Flash') },
       applies_to: 'RootAccount',
-      state: 'hidden',
+      state: 'allowed',
       root_opt_in: true,
       development: true
     },
