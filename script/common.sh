@@ -5,6 +5,12 @@
 # *be careful* when you modify these functions as doing so will impact multiple
 # scripts that likely aren't used or tested in continuous integration builds.
 
+function create_log_file {
+  if [ ! -f "$LOG" ]; then
+    echo "" > "$LOG"
+  fi
+}
+
 function echo_console_and_log {
   echo "$1"
   echo "$1" >>"$LOG"

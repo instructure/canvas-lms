@@ -27,6 +27,16 @@ quite recall all the database migration and asset compilation tasks.
 It can also nuke your Javascript dependencies, force re-install them, and more.
 See the full feature list below.
 
+## What does it NOT do?
+
+We assume the following:
+
+  - you've already installed Postgres (postgresapp.com is an excellent option
+    for Mac users)
+  - postgres is running
+  - you've already installed Node.js
+  - you've already installed Yarn
+
 ## Setup
 
 Add a symlink to `prepare` in your /usr/local/bin/ directory, like so:
@@ -57,6 +67,10 @@ Or, if you just want to checkout master, do this:
 $ git checkout master
 $ prepare
 ```
+
+You might encounter problems with some Ruby dependencies. The ["Dependency
+Installation" section](https://github.com/instructure/canvas-lms/wiki/Quick-Start#dependency-installation)
+in the public Canvas LMS Github wiki has some useful tips.
 
 ## What else can it do for me?
 
@@ -97,6 +111,7 @@ Current and planned:
 - [x] Supports a fresh installation of Javascript dependencies (useful for new Canvas setups)
 - [ ] Supports `git cherry-pick`
 - [ ] Supports a "quick" option, i.e. skipping asset compilation entirely
+- [ ] Run delayed jobs in the background
 
 ## Code Credit
 

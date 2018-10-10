@@ -113,7 +113,7 @@ done
 
 if [ "$PERFORM_UPDATE" == "true" ]; then
   trap print_results INT TERM EXIT
-
+  create_log_file
   patchset_id="$1"
 
   if [ "$patchset_id" == "-i" ] || [ "$patchset_id" == "-n" ]; then

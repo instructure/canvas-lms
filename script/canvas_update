@@ -91,5 +91,6 @@ done
 
 if [ "$PERFORM_UPDATE" == "true" ]; then
   trap print_results INT TERM EXIT
+  create_log_file
   update_canvas
 fi
