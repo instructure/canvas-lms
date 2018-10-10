@@ -22,7 +22,8 @@
   <% cache([ContextExternalTool.global_navigation_menu_cache_key(@domain_root_account, visibility)]) do %>
     <% tools = ContextExternalTool.global_navigation_tools(@domain_root_account, visibility) %>
     <% tools.each do |tool|
-        tool_path = account_external_tool_path(@domain_root_account, tool, :launch_type => 'global_navigation')
+        tool_display = tool.extension_setting('global_navigation', 'windowTarget') == '_blank' ? 'borderless' : nil
+        tool_path = account_external_tool_path(@domain_root_account, tool, :launch_type => 'global_navigation', display: tool_display)
     %>
       <li id="<%= tool.asset_string %>_menu_item" class="menu-item ic-app-header__menu-list-item<% if current_page?(tool_path)%> ic-app-header__menu-list-item--active<% end %>">
         <a class='ic-app-header__menu-list-link' href="<%= tool_path %>">
