@@ -24,7 +24,6 @@ import FilePreview from 'jsx/files/FilePreview'
 import Folder from 'compiled/models/Folder'
 import File from 'compiled/models/File'
 import FilesCollection from 'compiled/collections/FilesCollection'
-import FoldersCollection from 'compiled/collections/FoldersCollection'
 
 let filesCollection = {}
 let folderCollection = {}
