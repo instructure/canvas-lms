@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!external_tools'
 import React from 'react'
-import store from '../../external_apps/lib/AppCenterStore'
+import store from '../lib/AppCenterStore'
 import $ from 'jquery'
 import 'compiled/jquery.rails_flash_notifications'
 
@@ -64,7 +64,7 @@ export default class AppFilters extends React.Component {
               <ul className="nav nav-pills" role="tablist">
                 <li className={activeFilter === 'all' ? 'active' : ''}>
                   <a
-                    ref="tabAll"
+                    ref={c => (this.tabAll = c)}
                     onClick={this.handleFilterClick.bind(this, 'all')}
                     href="#"
                     role="tab"
@@ -75,7 +75,7 @@ export default class AppFilters extends React.Component {
                 </li>
                 <li className={activeFilter === 'not_installed' ? 'active' : ''}>
                   <a
-                    ref="tabNotInstalled"
+                    ref={c => (this.tabNotInstalled = c)}
                     onClick={this.handleFilterClick.bind(this, 'not_installed')}
                     href="#"
                     role="tab"
@@ -86,7 +86,7 @@ export default class AppFilters extends React.Component {
                 </li>
                 <li className={activeFilter === 'installed' ? 'active' : ''}>
                   <a
-                    ref="tabInstalled"
+                    ref={c => (this.tabInstalled = c)}
                     onClick={this.handleFilterClick.bind(this, 'installed')}
                     href="#"
                     role="tab"
@@ -99,7 +99,7 @@ export default class AppFilters extends React.Component {
                   window.ENV.LTI_13_TOOLS_FEATURE_FLAG_ENABLED &&
                   <li className={activeFilter === 'lti_1_3_tools' ? 'active' : ''}>
                     <a
-                      ref="tabLti13Tools"
+                      ref={c => (this.tabLti13Tools = c)}
                       onClick={this.handleFilterClick.bind(this, 'lti_1_3_tools')}
                       href="#"
                       role="tab"

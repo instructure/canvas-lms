@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - present Instructure, Inc.
+ * Copyright (C) 2018 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,7 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import store from 'jsx/external_apps/lib/AppCenterStore'
+import React from 'react'
+import {mount} from 'enzyme'
+import store from '../../lib/AppCenterStore'
+import AppFilters from '../AppFilters'
 
 const defaultApps = () => [
   {
@@ -101,103 +104,35 @@ const defaultApps = () => [
   }
 ]
 
-const ltiTools = () => (
-  defaultApps().concat([{app_id: '1', enabled: false, installed_locally: false, name: 'tool'}])
-)
+let wrapper = 'empty wrapper'
 
-QUnit.module('ExternalApps.AppCenterStore', {
-  setup() {
-    this.server = sinon.fakeServer.create()
-    store.reset()
-    this.apps = defaultApps()
-    this.lti13Tools = ltiTools()
-    this.response = [200, {'Content-Type': 'application/json'}, JSON.stringify(this.apps)]
-  },
-  teardown() {
-    this.server.restore()
-    return store.reset()
-  }
+beforeEach(() => {
+  window.ENV = {LTI_13_TOOLS_FEATURE_FLAG_ENABLED: true}
+  store.setState({apps: defaultApps()})
 })
 
-test('findAppByShortName', function() {
-  store.setState({apps: this.apps})
-  equal(store.getState().apps.length, 3)
-  const thisApp = store.findAppByShortName('aleks')
-  equal(thisApp.id, 66)
+afterEach(() => {
+  wrapper.unmount()
+  store.reset()
 })
 
-test('flagAppAsInstalled', function() {
-  store.setState({apps: this.apps})
-  ok(!store.findAppByShortName('apprennet').is_installed)
-  store.flagAppAsInstalled('apprennet')
-  ok(store.findAppByShortName('apprennet').is_installed)
+it('changes the filter to not_installed on Not Installed tab click', () => {
+  wrapper = mount(<AppFilters />)
+
+  wrapper.find('a[children="Not Installed"]').simulate('click')
+  expect(store.getState().filter).toEqual('not_installed')
 })
 
-test('filteredApps', function() {
-  store.setState({apps: this.apps})
-  equal(store.filteredApps().length, 3)
-  store.setState({filterText: 'e'})
-  equal(store.filteredApps().length, 2)
-  store.setState({filter: 'not_installed'})
-  equal(store.filteredApps().length, 1)
+it('changes the filter to installed on Installed tab click', () => {
+  wrapper = mount(<AppFilters />)
+
+  wrapper.find('a[children="Installed"]').simulate('click')
+  expect(store.getState().filter).toEqual('installed')
 })
 
-test('filteredApps of lti 1.3 tools', function() {
-  store.setState({filterText: 'tool', lti13Tools: this})
-  equal(store.filteredApps(this.lti13Tools).length, 1)
-})
+it('changes the filter to lti_1_3_tools on LTI 1.3 tab click', () => {
+  wrapper = mount(<AppFilters />)
 
-test('fetch', function() {
-  this.server.respondWith('GET', /\/app_center\/apps/, [
-    200,
-    {'Content-Type': 'application/json'},
-    JSON.stringify(this.apps)
-  ])
-  store.fetch()
-  this.server.respond()
-  equal(store.getState().apps.length, 3)
-})
-
-test('fetch13Tools', function() {
-  equal(store.getState().lti13LoadStatus, 'pending')
-  this.server.respondWith('GET', /\/lti_apps/, [
-    200,
-    {'Content-Type': 'application/json'},
-    JSON.stringify(this.lti13Tools)
-  ])
-  store.fetch13Tools()
-  this.server.respond()
-  equal(store.getState().lti13Tools.length, 4)
-  equal(store.getState().lti13LoadStatus, 'success')
-})
-
-test('installTool', function() {
-  store.setState({lti13Tools: this.lti13Tools})
-  notOk(store.getState().lti13Tools.find(tool => tool.app_id === '1').enabled)
-  notOk(store.getState().lti13Tools.find(tool => tool.app_id === '1').installed_locally)
-  this.server.respondWith('POST',  /\/create_tool/, [
-    200,
-    {'Content-Type': 'application/json'},
-    JSON.stringify(this.lti13Tools)
-  ])
-  store.installTool('1')
-  this.server.respond()
-  ok(store.getState().lti13Tools.find(tool => tool.app_id === '1').enabled)
-  ok(store.getState().lti13Tools.find(tool => tool.app_id === '1').installed_locally)
-})
-
-test('removeTool', function() {
-  store.setState({lti13Tools: this.lti13Tools})
-  store._toggle_lti_1_3_tool_enabled('1')(true)
-  ok(store.getState().lti13Tools.find(tool => tool.app_id === '1').enabled)
-  ok(store.getState().lti13Tools.find(tool => tool.app_id === '1').installed_locally)
-  this.server.respondWith('DELETE',  /\/delete_tool/, [
-    200,
-    {'Content-Type': 'application/json'},
-    JSON.stringify(this.lti13Tools)
-  ])
-  store.removeTool('1')
-  this.server.respond()
-  notOk(store.getState().lti13Tools.find(tool => tool.app_id === '1').enabled)
-  notOk(store.getState().lti13Tools.find(tool => tool.app_id === '1').installed_locally)
+  wrapper.find('a[children="LTI 1.3"]').simulate('click')
+  expect(store.getState().filter).toEqual('lti_1_3_tools')
 })

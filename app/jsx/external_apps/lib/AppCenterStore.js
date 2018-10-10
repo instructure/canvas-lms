@@ -19,8 +19,8 @@
 import $ from 'jquery'
 import I18n from 'i18n!external_tools'
 import _ from 'underscore'
-import createStore from '../../shared/helpers/createStore'
-import ExternalAppsStore from '../../external_apps/lib/ExternalAppsStore'
+import createStore from '../../shared/helpers/createStoreJestCompatible'
+import ExternalAppsStore from './ExternalAppsStore'
 import parseLinkHeader from 'compiled/fn/parseLinkHeader'
 import 'compiled/jquery.rails_flash_notifications'
 
