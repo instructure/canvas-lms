@@ -30,8 +30,8 @@
 ///////==============
 
 body {
-  @include fontSize($ic-font-size);
   font-family: $ic-font-family-reading;
+  font-size: $ic-font-size;
   font-weight: 400;
   margin: 0;
   line-height: $ic-line-height;

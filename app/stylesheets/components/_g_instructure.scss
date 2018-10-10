@@ -162,7 +162,7 @@
     }
 
     iframe {
-        height: calc(100vh - 180px);
+        height: calc(100vh - 64px);
     }
 }
 
@@ -369,6 +369,7 @@ table.summary {
   td, tbody th {
     border-bottom: 1px solid $ic-border-light;
     background-color: $ic-color-light;
+    hyphens: auto;
   }
   table.subtable {
     th, td {
