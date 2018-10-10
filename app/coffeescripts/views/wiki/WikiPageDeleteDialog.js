@@ -1,98 +1,130 @@
-#
-# Copyright (C) 2013 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// Copyright (C) 2013 - present Instructure, Inc.
+//
+// This file is part of Canvas.
+//
+// Canvas is free software: you can redistribute it and/or modify it under
+// the terms of the GNU Affero General Public License as published by the Free
+// Software Foundation, version 3 of the License.
+//
+// Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+// details.
+//
+// You should have received a copy of the GNU Affero General Public License along
+// with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'jquery'
-  'underscore'
-  'i18n!pages'
-  'str/htmlEscape'
-  '../DialogFormView'
-], ($, _, I18n, htmlEscape, DialogFormView) ->
+import $ from 'jquery'
+import _ from 'underscore'
+import I18n from 'i18n!pages'
+import DialogFormView from '../DialogFormView'
 
-  dialogDefaults =
-    fixDialogButtons: false
-    title: I18n.t 'delete_dialog_title', 'Delete Page'
-    width: 400
-    height: 'auto'
+const dialogDefaults = {
+  fixDialogButtons: false,
+  title: I18n.t('delete_dialog_title', 'Delete Page'),
+  width: 400,
+  height: 'auto'
+}
 
-  class WikiPageDeleteDialog extends DialogFormView
-    setViewProperties: false
-    wrapperTemplate: -> '<div class="outlet"></div>'
-    template: -> I18n.t 'delete_confirmation', 'Are you sure you want to delete this page?'
+export default class WikiPageDeleteDialog extends DialogFormView {
+  static initClass() {
+    this.prototype.setViewProperties = false
 
-    @optionProperty 'wiki_pages_path'
-    @optionProperty 'focusOnCancel'
-    @optionProperty 'focusOnDelete'
+    this.optionProperty('wiki_pages_path')
+    this.optionProperty('focusOnCancel')
+    this.optionProperty('focusOnDelete')
+  }
 
-    initialize: (options) ->
-      super _.extend {}, dialogDefaults, options
+  wrapperTemplate() {
+    return '<div class="outlet"></div>'
+  }
 
-    submit: (event) ->
-      event?.preventDefault()
+  template() {
+    return I18n.t('delete_confirmation', 'Are you sure you want to delete this page?')
+  }
 
-      destroyDfd = @model.destroy(wait: true)
+  initialize(options) {
+    return super.initialize(_.extend({}, dialogDefaults, options))
+  }
 
-      dfd = $.Deferred()
-      page_title = @model.get('title')
-      wiki_pages_path = @wiki_pages_path
+  submit(event) {
+    if (event != null) {
+      event.preventDefault()
+    }
 
-      destroyDfd.then =>
-        if wiki_pages_path
-          expires = new Date
-          expires.setMinutes(expires.getMinutes() + 1)
-          path = '/' # should be wiki_pages_path, but IE will only allow *sub*directries to read the cookie, not the directory itself...
-          $.cookie 'deleted_page_title', page_title, expires: expires, path: path
-          window.location.href = wiki_pages_path
-        else
-          $.flashMessage I18n.t 'notices.page_deleted', 'The page "%{title}" has been deleted.', title: page_title
-          dfd.resolve()
-          @close()
+    const destroyDfd = this.model.destroy({wait: true})
 
-      destroyDfd.fail =>
-        $.flashError I18n.t('notices.delete_failed', 'The page "%{title}" could not be deleted.', title: page_title)
-        dfd.reject()
+    const dfd = $.Deferred()
+    const page_title = this.model.get('title')
+    const {wiki_pages_path} = this
 
-      @$el.disableWhileLoading dfd
+    destroyDfd.then(() => {
+      if (wiki_pages_path) {
+        const expires = new Date()
+        expires.setMinutes(expires.getMinutes() + 1)
+        const path = '/' // should be wiki_pages_path, but IE will only allow *sub*directries to read the cookie, not the directory itself...
+        $.cookie('deleted_page_title', page_title, {expires, path})
+        return (window.location.href = wiki_pages_path)
+      } else {
+        $.flashMessage(
+          I18n.t('notices.page_deleted', 'The page "%{title}" has been deleted.', {
+            title: page_title
+          })
+        )
+        dfd.resolve()
+        return this.close()
+      }
+    })
 
-    close: ->
-      if @dialog?.isOpen()
-        @dialog.close()
-      if @buttonClicked == 'delete'
-        @focusOnDelete?.focus()
-      else
-        @focusOnCancel?.focus()
+    destroyDfd.fail(() => {
+      $.flashError(
+        I18n.t('notices.delete_failed', 'The page "%{title}" could not be deleted.', {
+          title: page_title
+        })
+      )
+      return dfd.reject()
+    })
 
-    setupDialog: ->
-      super
+    return this.$el.disableWhileLoading(dfd)
+  }
 
-      form = @
+  close() {
+    if (this.dialog != null ? this.dialog.isOpen() : undefined) {
+      this.dialog.close()
+    }
+    if (this.buttonClicked === 'delete') {
+      return this.focusOnDelete != null ? this.focusOnDelete.focus() : undefined
+    } else {
+      return this.focusOnCancel != null ? this.focusOnCancel.focus() : undefined
+    }
+  }
 
-      buttons = [
-        class: 'btn'
-        text: I18n.t 'cancel_button', 'Cancel'
-        click: =>
-          @buttonClicked = 'cancel'
-          form.$el.dialog 'close'
-      ,
-        class: 'btn btn-danger'
-        text: I18n.t 'delete_button', 'Delete'
-        'data-text-while-loading': I18n.t 'deleting_button', 'Deleting...'
-        click: =>
-          @buttonClicked = 'delete'
-          form.submit()
-      ]
-      @$el.dialog 'option', 'buttons', buttons
+  setupDialog() {
+    super.setupDialog(...arguments)
+
+    const form = this
+
+    const buttons = [
+      {
+        class: 'btn',
+        text: I18n.t('cancel_button', 'Cancel'),
+        click: () => {
+          this.buttonClicked = 'cancel'
+          return form.$el.dialog('close')
+        }
+      },
+      {
+        class: 'btn btn-danger',
+        text: I18n.t('delete_button', 'Delete'),
+        'data-text-while-loading': I18n.t('deleting_button', 'Deleting...'),
+        click: () => {
+          this.buttonClicked = 'delete'
+          return form.submit()
+        }
+      }
+    ]
+    return this.$el.dialog('option', 'buttons', buttons)
+  }
+}
+WikiPageDeleteDialog.initClass()

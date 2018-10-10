@@ -15,70 +15,50 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {View} from "Backbone";
+import {View} from 'Backbone'
+import _ from 'underscore'
+import CollectionView from '../../CollectionView'
+import template from 'jst/groups/manage/addUnassignedUsers'
+import itemTemplate from 'jst/groups/manage/addUnassignedUser'
 
-import _ from "underscore";
-import CollectionView from "../../CollectionView";
-import template from "jst/groups/manage/addUnassignedUsers";
-import itemTemplate from "jst/groups/manage/addUnassignedUser";
-
-let AddUnassignedUsersView;
-
-export default AddUnassignedUsersView = (function() {
-  AddUnassignedUsersView = class AddUnassignedUsersView extends CollectionView {
-    constructor(...args) {
-      {
-        // Hack: trick Babel/TypeScript into allowing this before super.
-        if (false) { super(); }
-        let thisFn = (() => { return this; }).toString();
-        let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
-        eval(`${thisName} = this;`);
-      }
-      this.checkParam = this.checkParam.bind(this);
-      super(...args);
-    }
-
-    static initClass() {
-
-      this.prototype.template = template;
-    }
-
-    initialize(options) {
-      return super.initialize(_.extend({}, options, {
+export default class AddUnassignedUsersView extends CollectionView {
+  initialize(options) {
+    return super.initialize(
+      _.extend({}, options, {
         itemView: View.extend({tagName: 'li'}),
         itemViewOptions: {
           template: itemTemplate
         }
-      }
-      )
-      );
-    }
+      })
+    )
+  }
 
-    attach() {
-      this.collection.on('add remove change reset', this.render);
-      return this.collection.on('setParam deleteParam', this.checkParam);
-    }
+  attach() {
+    this.collection.on('add remove change reset', this.render)
+    this.collection.on('setParam deleteParam', this.checkParam, this)
+  }
 
-    checkParam(param, value) {
-      if (this.lastRequest != null) {
-        this.lastRequest.abort();
-      }
-      this.collection.termError = value === false;
-      if (value) {
-        return this.lastRequest = this.collection.fetch();
-      } else {
-        return this.render();
-      }
+  checkParam(param, value) {
+    if (this.lastRequest != null) {
+      this.lastRequest.abort()
     }
+    this.collection.termError = value === false
+    if (value) {
+      return (this.lastRequest = this.collection.fetch())
+    } else {
+      return this.render()
+    }
+  }
 
-    toJSON() {
-      return {
-        users: this.collection.toJSON(),
-        term: (this.collection.options.params != null ? this.collection.options.params.search_term : undefined),
-        termError: this.collection.termError
-      };
+  toJSON() {
+    return {
+      users: this.collection.toJSON(),
+      term:
+        this.collection.options.params != null
+          ? this.collection.options.params.search_term
+          : undefined,
+      termError: this.collection.termError
     }
-  };
-  AddUnassignedUsersView.initClass();
-  return AddUnassignedUsersView;
-})();
+  }
+}
+AddUnassignedUsersView.prototype.template = template

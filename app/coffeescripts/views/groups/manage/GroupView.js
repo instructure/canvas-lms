@@ -1,140 +1,187 @@
-#
-# Copyright (C) 2013 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// Copyright (C) 2013 - present Instructure, Inc.
+//
+// This file is part of Canvas.
+//
+// Canvas is free software: you can redistribute it and/or modify it under
+// the terms of the GNU Affero General Public License as published by the Free
+// Software Foundation, version 3 of the License.
+//
+// Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+// details.
+//
+// You should have received a copy of the GNU Affero General Public License along
+// with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'jquery'
-  'Backbone'
-  'jst/groups/manage/group'
-  './GroupUsersView'
-  './GroupDetailView'
-  './GroupCategoryCloneView'
-  '../../../util/groupHasSubmissions'
-], ($, {View}, template, GroupUsersView, GroupDetailView, GroupCategoryCloneView, groupHasSubmissions) ->
+import $ from 'jquery'
+import {View} from 'Backbone'
+import template from 'jst/groups/manage/group'
+import GroupUsersView from './GroupUsersView'
+import GroupDetailView from './GroupDetailView'
+import GroupCategoryCloneView from './GroupCategoryCloneView'
+import groupHasSubmissions from '../../../util/groupHasSubmissions'
 
-  class GroupView extends View
+export default class GroupView extends View {
+  constructor(...args) {
+    {
+      // Hack: trick Babel/TypeScript into allowing this before super.
+      if (false) { super(); }
+      let thisFn = (() => { return this; }).toString();
+      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
+      eval(`${thisName} = this;`);
+    }
+    this.groupsAreDifferent = this.groupsAreDifferent.bind(this)
+    this.eitherGroupHasSubmission = this.eitherGroupHasSubmission.bind(this)
+    this.isUnassignedUserWithSubmission = this.isUnassignedUserWithSubmission.bind(this)
+    this._onDrop = this._onDrop.bind(this)
+    super(...args)
+  }
 
-    tagName: 'li'
+  static initClass() {
+    this.prototype.tagName = 'li'
 
-    className: 'group'
+    this.prototype.className = 'group'
 
-    attributes: ->
-      "data-id": @model.id
+    this.prototype.template = template
 
-    template: template
+    this.optionProperty('expanded')
 
-    @optionProperty 'expanded'
+    this.optionProperty('addUnassignedMenu')
 
-    @optionProperty 'addUnassignedMenu'
+    this.child('groupUsersView', '[data-view=groupUsers]')
+    this.child('groupDetailView', '[data-view=groupDetail]')
 
-    @child 'groupUsersView', '[data-view=groupUsers]'
-    @child 'groupDetailView', '[data-view=groupDetail]'
-
-    events:
-      'click .toggle-group': 'toggleDetails'
-      'click .add-user': 'showAddUser'
-      'focus .add-user': 'showAddUser'
+    this.prototype.events = {
+      'click .toggle-group': 'toggleDetails',
+      'click .add-user': 'showAddUser',
+      'focus .add-user': 'showAddUser',
       'blur .add-user': 'hideAddUser'
+    }
 
-    dropOptions:
-      accept: '.group-user'
-      activeClass: 'droppable'
-      hoverClass: 'droppable-hover'
+    this.prototype.dropOptions = {
+      accept: '.group-user',
+      activeClass: 'droppable',
+      hoverClass: 'droppable-hover',
       tolerance: 'pointer'
+    }
+  }
 
-    attach: ->
-      @expanded = false
-      @users = @model.users()
-      @model.on 'destroy', @remove, this
-      @model.on 'change:members_count', @updateFullState, this
-      @model.on 'change:max_membership', @updateFullState, this
+  attributes() {
+    return {'data-id': this.model.id}
+  }
 
-    afterRender: ->
-      @$el.toggleClass 'group-expanded', @expanded
-      @$el.toggleClass 'group-collapsed', !@expanded
-      @groupDetailView.$toggleGroup.attr 'aria-expanded', '' + @expanded
-      @updateFullState()
+  attach() {
+    this.expanded = false
+    this.users = this.model.users()
+    this.model.on('destroy', this.remove, this)
+    this.model.on('change:members_count', this.updateFullState, this)
+    return this.model.on('change:max_membership', this.updateFullState, this)
+  }
 
-    updateFullState: ->
-      return if @model.isLocked()
-      if @model.isFull()
-        @$el.droppable("destroy") if @$el.data('droppable')
-        @$el.addClass('slots-full')
-      else
-        # enable droppable on the child GroupView (view)
-        if !@$el.data('droppable')
-          @$el.droppable(Object.assign({}, @dropOptions))
-            .on('drop', @_onDrop)
-        @$el.removeClass('slots-full')
+  afterRender() {
+    this.$el.toggleClass('group-expanded', this.expanded)
+    this.$el.toggleClass('group-collapsed', !this.expanded)
+    this.groupDetailView.$toggleGroup.attr('aria-expanded', `${this.expanded}`)
+    return this.updateFullState()
+  }
 
-    toggleDetails: (e) ->
-      e.preventDefault()
-      @expanded = not @expanded
-      if @expanded and not @users.loaded
-        @users.load(if @model.usersCount() then 'all' else 'none')
-      @afterRender()
+  updateFullState() {
+    if (this.model.isLocked()) return
+    if (this.model.isFull()) {
+      if (this.$el.data('droppable')) this.$el.droppable('destroy')
+      return this.$el.addClass('slots-full')
+    } else {
+      // enable droppable on the child GroupView (view)
+      if (!this.$el.data('droppable')) {
+        this.$el.droppable(Object.assign({}, this.dropOptions)).on('drop', this._onDrop)
+      }
+      return this.$el.removeClass('slots-full')
+    }
+  }
 
-    showAddUser: (e) ->
-      e.preventDefault()
-      e.stopPropagation()
-      $target = $(e.currentTarget)
-      @addUnassignedMenu.group = @model
-      @addUnassignedMenu.showBy $target, e.type is 'click'
+  toggleDetails(e) {
+    e.preventDefault()
+    this.expanded = !this.expanded
+    if (this.expanded && !this.users.loaded) {
+      this.users.load(this.model.usersCount() ? 'all' : 'none')
+    }
+    return this.afterRender()
+  }
 
-    hideAddUser: (e) ->
-      @addUnassignedMenu.hide()
+  showAddUser(e) {
+    e.preventDefault()
+    e.stopPropagation()
+    const $target = $(e.currentTarget)
+    this.addUnassignedMenu.group = this.model
+    return this.addUnassignedMenu.showBy($target, e.type === 'click')
+  }
 
-    closeMenus: ->
-      @groupDetailView.closeMenu()
-      @groupUsersView.closeMenus()
+  hideAddUser(e) {
+    return this.addUnassignedMenu.hide()
+  }
 
-    groupsAreDifferent: (user) =>
-      !user.has('group') || (user.get('group').get("id") != @model.get("id"))
+  closeMenus() {
+    this.groupDetailView.closeMenu()
+    return this.groupUsersView.closeMenus()
+  }
 
-    eitherGroupHasSubmission: (user) =>
-      (user.has('group') && groupHasSubmissions user.get('group')) || groupHasSubmissions @model
+  groupsAreDifferent(user) {
+    return !user.has('group') || user.get('group').get('id') !== this.model.get('id')
+  }
 
-    isUnassignedUserWithSubmission: (user) =>
-      !user.has('group') && user.has('group_submissions') && user.get('group_submissions').length > 0
+  eitherGroupHasSubmission(user) {
+    return (
+      (user.has('group') && groupHasSubmissions(user.get('group'))) ||
+      groupHasSubmissions(this.model)
+    )
+  }
 
-    ##
-    # handle drop events on a GroupView
-    # e - Event object.
-    #   e.currentTarget - group the user is dropped on
-    # ui - jQuery UI object.
-    #   ui.draggable - the user being dragged
-    _onDrop: (e, ui) =>
-      user = ui.draggable.data('model')
-      diffGroupsWithSubmission = @groupsAreDifferent(user) && @eitherGroupHasSubmission(user)
-      unassignedWithSubmission = @isUnassignedUserWithSubmission(user) && @model.usersCount() > 0
+  isUnassignedUserWithSubmission(user) {
+    return (
+      !user.has('group') &&
+      user.has('group_submissions') &&
+      user.get('group_submissions').length > 0
+    )
+  }
 
-      if diffGroupsWithSubmission || unassignedWithSubmission
-        @cloneCategoryView = new GroupCategoryCloneView
-          model: @model.collection.category,
-          openedFromCaution: true
-        @cloneCategoryView.open()
-        @cloneCategoryView.on "close", =>
-          if @cloneCategoryView.cloneSuccess
-            window.location.reload()
-          else if @cloneCategoryView.changeGroups
-            @moveUser(e, user)
-      else
-        @moveUser(e, user)
+  // #
+  // handle drop events on a GroupView
+  // e - Event object.
+  //   e.currentTarget - group the user is dropped on
+  // ui - jQuery UI object.
+  //   ui.draggable - the user being dragged
+  _onDrop(e, ui) {
+    const user = ui.draggable.data('model')
+    const diffGroupsWithSubmission =
+      this.groupsAreDifferent(user) && this.eitherGroupHasSubmission(user)
+    const unassignedWithSubmission =
+      this.isUnassignedUserWithSubmission(user) && this.model.usersCount() > 0
 
-    moveUser: (e, user) ->
-      newGroupId = $(e.currentTarget).data('id')
-      setTimeout =>
-        @model.collection.category.reassignUser(user, @model.collection.get(newGroupId))
+    if (diffGroupsWithSubmission || unassignedWithSubmission) {
+      this.cloneCategoryView = new GroupCategoryCloneView({
+        model: this.model.collection.category,
+        openedFromCaution: true
+      })
+      this.cloneCategoryView.open()
+      return this.cloneCategoryView.on('close', () => {
+        if (this.cloneCategoryView.cloneSuccess) {
+          return window.location.reload()
+        } else if (this.cloneCategoryView.changeGroups) {
+          return this.moveUser(e, user)
+        }
+      })
+    } else {
+      return this.moveUser(e, user)
+    }
+  }
+
+  moveUser(e, user) {
+    const newGroupId = $(e.currentTarget).data('id')
+    return setTimeout(() =>
+      this.model.collection.category.reassignUser(user, this.model.collection.get(newGroupId))
+    )
+  }
+}
+GroupView.initClass()

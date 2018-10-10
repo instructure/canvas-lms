@@ -72,7 +72,7 @@ export default class ProfileShow extends Backbone.View {
   }
 
   initEdit() {
-    if (this.options.links != null ? this.options.links.length : undefined) {
+    if (this.options.links && this.options.links.length) {
       for (const {title, url} of this.options.links) {
         this.addLinkField(null, null, title, url)
       }

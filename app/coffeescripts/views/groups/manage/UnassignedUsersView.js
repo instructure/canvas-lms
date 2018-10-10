@@ -1,183 +1,235 @@
-#
-# Copyright (C) 2013 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// Copyright (C) 2013 - present Instructure, Inc.
+//
+// This file is part of Canvas.
+//
+// Canvas is free software: you can redistribute it and/or modify it under
+// the terms of the GNU Affero General Public License as published by the Free
+// Software Foundation, version 3 of the License.
+//
+// Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+// details.
+//
+// You should have received a copy of the GNU Affero General Public License along
+// with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'jquery'
-  './GroupUsersView'
-  './AssignToGroupMenu'
-  './Scrollable'
-  './GroupCategoryCloneView'
-  'jst/groups/manage/groupUsers'
-  '../../../util/groupHasSubmissions'
-], ($, GroupUsersView, AssignToGroupMenu, Scrollable, GroupCategoryCloneView, template, groupHasSubmissions) ->
+import $ from 'jquery'
+import GroupUsersView from './GroupUsersView'
+import AssignToGroupMenu from './AssignToGroupMenu'
+import Scrollable from './Scrollable'
+import GroupCategoryCloneView from './GroupCategoryCloneView'
+import groupHasSubmissions from '../../../util/groupHasSubmissions'
 
-  class UnassignedUsersView extends GroupUsersView
+export default class UnassignedUsersView extends GroupUsersView {
+  static initClass() {
+    this.optionProperty('groupsCollection')
+    this.optionProperty('category')
 
-    @optionProperty 'groupsCollection'
-    @optionProperty 'category'
-
-    defaults: Object.assign {},
-      GroupUsersView::defaults,
-      autoFetch: true # load until below the viewport, don't wait for the user to scroll
-      itemViewOptions:
-        canAssignToGroup: true
+    this.prototype.defaults = {
+      ...GroupUsersView.prototype.defaults,
+      autoFetch: true, // load until below the viewport, don't wait for the user to scroll
+      itemViewOptions: {
+        canAssignToGroup: true,
         canEditGroupAssignment: false
+      }
+    }
 
-    els: Object.assign {},
-      GroupUsersView::els,
-      '.no-results-wrapper': '$noResultsWrapper'
-      '.no-results': '$noResults'
+    this.prototype.els = {
+      ...GroupUsersView.prototype.els,
+      '.no-results-wrapper': '$noResultsWrapper',
+      '.no-results': '$noResults',
       '.invalid-filter': '$invalidFilter'
+    }
 
-    @mixin Scrollable
+    this.mixin(Scrollable)
 
-    elementIndex: -1
-    fromAddButton: false
+    this.prototype.elementIndex = -1
+    this.prototype.fromAddButton = false
 
-    dropOptions:
-      accept: '.group-user'
-      activeClass: 'droppable'
-      hoverClass: 'droppable-hover'
+    this.prototype.dropOptions = {
+      accept: '.group-user',
+      activeClass: 'droppable',
+      hoverClass: 'droppable-hover',
       tolerance: 'pointer'
+    }
 
-    attach: ->
-      @collection.on 'reset', @render
-      @collection.on 'remove', @render
-      @collection.on 'moved', @highlightUser
-      @on 'renderedItems', @realAfterRender
+    this.prototype.events = {
+      'click .assign-to-group': 'focusAssignToGroup',
+      'focus .assign-to-group': 'showAssignToGroup',
+      'blur .assign-to-group': 'hideAssignToGroup',
+      scroll: 'hideAssignToGroup'
+    }
+  }
 
-      @collection.once 'fetch', => @$noResultsWrapper.hide()
-      @collection.on 'fetched:last', => @$noResultsWrapper.show()
+  attach() {
+    this.collection.on('reset', this.render)
+    this.collection.on('remove', this.render)
+    this.collection.on('moved', this.highlightUser)
+    this.on('renderedItems', this.realAfterRender, this)
 
-    afterRender: ->
-      super
-      @collection.load('first')
-      @$el.parent().droppable(Object.assign({}, @dropOptions)).unbind('drop')
-                   .on('drop', @_onDrop)
-      @scrollContainer = @heightContainer = @$el
-      @$scrollableElement = @$el.find("ul")
+    this.collection.once('fetch', () => this.$noResultsWrapper.hide())
+    return this.collection.on('fetched:last', () => this.$noResultsWrapper.show())
+  }
 
-    realAfterRender: =>
-      listElements = $("ul.collectionViewItems li.group-user", @$el)
-      if @elementIndex > -1 and listElements.length > 0
-        focusElement = $(listElements[@elementIndex] || listElements[listElements.length - 1])
-        focusElement.find("a.assign-to-group").focus()
+  afterRender() {
+    super.afterRender(...arguments)
+    this.collection.load('first')
+    this.$el
+      .parent()
+      .droppable(Object.assign({}, this.dropOptions))
+      .unbind('drop')
+      .on('drop', this._onDrop.bind(this))
+    this.scrollContainer = this.heightContainer = this.$el
+    return (this.$scrollableElement = this.$el.find('ul'))
+  }
 
-    toJSON: ->
-      loading: !@collection.loadedAll
-      count: @collection.length
-      ENV: ENV
+  realAfterRender() {
+    const listElements = $('ul.collectionViewItems li.group-user', this.$el)
+    if (this.elementIndex > -1 && listElements.length > 0) {
+      const focusElement = $(
+        listElements[this.elementIndex] || listElements[listElements.length - 1]
+      )
+      return focusElement.find('a.assign-to-group').focus()
+    }
+  }
 
-    remove: ->
-      @assignToGroupMenu?.remove()
-      super
+  toJSON() {
+    return {
+      loading: !this.collection.loadedAll,
+      count: this.collection.length,
+      ENV
+    }
+  }
 
-    events:
-      'click .assign-to-group': 'focusAssignToGroup'
-      'focus .assign-to-group': 'showAssignToGroup'
-      'blur .assign-to-group':  'hideAssignToGroup'
-      'scroll':                 'hideAssignToGroup'
+  remove() {
+    if (this.assignToGroupMenu != null) {
+      this.assignToGroupMenu.remove()
+    }
+    return super.remove(...arguments)
+  }
 
-    focusAssignToGroup: (e) ->
+  focusAssignToGroup(e) {
+    e.preventDefault()
+    e.stopPropagation()
+    const $target = $(e.currentTarget)
+    this.fromAddButton = true
+    const assignToGroupMenu = this._getAssignToGroup()
+    assignToGroupMenu.model = this.collection.getUser($target.data('user-id'))
+    return assignToGroupMenu.showBy($target, true)
+  }
+
+  showAssignToGroup(e) {
+    if (this.elementIndex === -1) {
       e.preventDefault()
       e.stopPropagation()
-      $target = $(e.currentTarget)
-      @fromAddButton = true
-      assignToGroupMenu = @_getAssignToGroup()
-      assignToGroupMenu.model = @collection.getUser($target.data('user-id'))
-      assignToGroupMenu.showBy($target, true)
+    }
+    const $target = $(e.currentTarget)
 
-    showAssignToGroup: (e) ->
-      if @elementIndex == -1
-        e.preventDefault()
-        e.stopPropagation()
-      $target = $(e.currentTarget)
+    const assignToGroupMenu = this._getAssignToGroup()
+    assignToGroupMenu.model = this.collection.getUser($target.data('user-id'))
+    return assignToGroupMenu.showBy($target)
+  }
 
-      assignToGroupMenu = @_getAssignToGroup()
-      assignToGroupMenu.model = @collection.getUser($target.data('user-id'))
-      assignToGroupMenu.showBy($target)
-
-
-    _getAssignToGroup: ->
-      if(!@assignToGroupMenu)
-        @assignToGroupMenu = new AssignToGroupMenu collection: @groupsCollection
-        @assignToGroupMenu.on("open", (options) =>
-          @elementIndex = Array.prototype.indexOf.apply($("ul.collectionViewItems li.group-user", @$el), $(options.target).parent("li"))
-        )
-        @assignToGroupMenu.on("close", (options) =>
-          studentElements = $("li.group-user a.assign-to-group", @$el)
-          if @elementIndex != -1
-            if studentElements.length == 0
+  _getAssignToGroup() {
+    if (!this.assignToGroupMenu) {
+      this.assignToGroupMenu = new AssignToGroupMenu({collection: this.groupsCollection})
+      this.assignToGroupMenu.on(
+        'open',
+        options =>
+          (this.elementIndex = Array.prototype.indexOf.apply(
+            $('ul.collectionViewItems li.group-user', this.$el),
+            $(options.target).parent('li')
+          ))
+      )
+      this.assignToGroupMenu.on('close', options => {
+        const studentElements = $('li.group-user a.assign-to-group', this.$el)
+        if (this.elementIndex !== -1) {
+          if (studentElements.length === 0) {
+            $('.filterable-unassigned-users').focus()
+          } else if (options.escapePressed) {
+            $(
+              studentElements[this.elementIndex] || studentElements[studentElements.length - 1]
+            ).focus()
+          } else if (options.userMoved) {
+            if (this.elementIndex === 0) {
               $('.filterable-unassigned-users').focus()
-            else if options.escapePressed
-              $(studentElements[@elementIndex] || studentElements[studentElements.length - 1]).focus()
-            else if options.userMoved
-              if @elementIndex == 0
-                $('.filterable-unassigned-users').focus()
-              else
-                $(studentElements[@elementIndex - 1] || studentElements[studentElements.length - 1]).focus()
-            @elementIndex = -1
-        )
-      return @assignToGroupMenu
+            } else {
+              $(
+                studentElements[this.elementIndex - 1] ||
+                  studentElements[studentElements.length - 1]
+              ).focus()
+            }
+          }
+          return (this.elementIndex = -1)
+        }
+      })
+    }
+    return this.assignToGroupMenu
+  }
 
-    hideAssignToGroup: (e) ->
-      if !@fromAddButton
-        @assignToGroupMenu?.hide()
-        setTimeout => # Element with next focus will not get focus until _after_ 'focusout' and 'blur' have been called.
-          @elementIndex = -1 if !@$el.find("a.assign-to-group").is(":focus")
-        , 100
-      @fromAddButton = false
+  hideAssignToGroup(e) {
+    if (!this.fromAddButton) {
+      if (this.assignToGroupMenu != null) {
+        this.assignToGroupMenu.hide()
+      }
+      setTimeout(() => {
+        // Element with next focus will not get focus until _after_ 'focusout' and 'blur' have been called.
+        if (!this.$el.find('a.assign-to-group').is(':focus')) return (this.elementIndex = -1)
+      }, 100)
+    }
+    return (this.fromAddButton = false)
+  }
 
-    setFilter: (search_term, options) ->
-      searchDefer = @collection.search(search_term, options)
-      searchDefer.always(=>
-        if search_term.length < 3
-          shouldShow = search_term.length > 0
-          @$invalidFilter.toggleClass("hidden", !shouldShow)
-          @$noResultsWrapper.toggle(shouldShow)
-      ) if searchDefer
+  setFilter(search_term, options) {
+    const searchDefer = this.collection.search(search_term, options)
+    if (searchDefer) {
+      return searchDefer.always(() => {
+        if (search_term.length < 3) {
+          const shouldShow = search_term.length > 0
+          this.$invalidFilter.toggleClass('hidden', !shouldShow)
+          return this.$noResultsWrapper.toggle(shouldShow)
+        }
+      })
+    }
+  }
 
-    canAssignToGroup: ->
-      @options.canAssignToGroup and @groupsCollection.length
+  canAssignToGroup() {
+    return this.options.canAssignToGroup && this.groupsCollection.length
+  }
 
-    ##
-    # handle drop events on '.unassigned-students'
-    # ui.draggable: the user being dragged
-    _onDrop: (e, ui) =>
-      user = ui.draggable.data('model')
+  // #
+  // handle drop events on '.unassigned-students'
+  // ui.draggable: the user being dragged
+  _onDrop(e, ui) {
+    const user = ui.draggable.data('model')
 
-      if user.has('group') and groupHasSubmissions user.get('group')
-        @cloneCategoryView = new GroupCategoryCloneView
-          model: @collection.category
-          openedFromCaution: true
-        @cloneCategoryView.open()
-        @cloneCategoryView.on "close", =>
-            if @cloneCategoryView.cloneSuccess
-              window.location.reload()
-            else if @cloneCategoryView.changeGroups
-              @moveUser(user)
-      else
-        @moveUser(user)
+    if (user.has('group') && groupHasSubmissions(user.get('group'))) {
+      this.cloneCategoryView = new GroupCategoryCloneView({
+        model: this.collection.category,
+        openedFromCaution: true
+      })
+      this.cloneCategoryView.open()
+      return this.cloneCategoryView.on('close', () => {
+        if (this.cloneCategoryView.cloneSuccess) {
+          return window.location.reload()
+        } else if (this.cloneCategoryView.changeGroups) {
+          return this.moveUser(user)
+        }
+      })
+    } else {
+      return this.moveUser(user)
+    }
+  }
 
-    moveUser: (user) ->
-      setTimeout =>
-        @category.reassignUser(user, null)
+  moveUser(user) {
+    return setTimeout(() => this.category.reassignUser(user, null))
+  }
 
-    _initDrag: (view) ->
-      super
-      view.$el.on 'dragstart', (event, ui) =>
-        @elementIndex = -1
+  _initDrag(view) {
+    super._initDrag(...arguments)
+    return view.$el.on('dragstart', (event, ui) => (this.elementIndex = -1))
+  }
+}
+UnassignedUsersView.initClass()

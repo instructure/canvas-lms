@@ -1,82 +1,102 @@
-#
-# Copyright (C) 2013 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// Copyright (C) 2013 - present Instructure, Inc.
+//
+// This file is part of Canvas.
+//
+// Canvas is free software: you can redistribute it and/or modify it under
+// the terms of the GNU Affero General Public License as published by the Free
+// Software Foundation, version 3 of the License.
+//
+// Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+// details.
+//
+// You should have received a copy of the GNU Affero General Public License along
+// with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'i18nObj'
-  '../PaginatedCollectionView'
-  '../conversations/MessageView'
-  'jst/conversations/messageList'
-], (I18n, PaginatedCollectionView, MessageView, template) ->
+import I18n from 'i18nObj'
+import PaginatedCollectionView from '../PaginatedCollectionView'
+import MessageView from './MessageView'
+import template from 'jst/conversations/messageList'
 
-  class MessageListView extends PaginatedCollectionView
+export default class MessageListView extends PaginatedCollectionView {
+  static initClass() {
+    this.prototype.tagName = 'div'
 
-    tagName: 'div'
+    this.prototype.itemView = MessageView
 
-    itemView: MessageView
+    this.prototype.template = template
 
-    template: template
+    this.prototype.course = {}
 
-    course: {}
+    this.prototype.selectedMessages = []
 
-    selectedMessages: []
+    this.prototype.autoFetch = true
 
-    autoFetch: true
+    this.prototype.events = {click: 'onClick'}
+  }
 
-    events:
-      'click': 'onClick'
+  constructor() {
+    {
+      // Hack: trick Babel/TypeScript into allowing this before super.
+      if (false) { super(); }
+      let thisFn = (() => { return this; }).toString();
+      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
+      eval(`${thisName} = this;`);
+    }
+    this.trackSelectedMessages = this.trackSelectedMessages.bind(this)
+    this.updateMessage = this.updateMessage.bind(this)
+    super(...arguments)
+    this.attachEvents()
+  }
 
-    constructor: ->
-      super
-      @attachEvents()
+  attachEvents() {
+    return this.collection.on('change:selected', this.trackSelectedMessages)
+  }
 
-    attachEvents: ->
-      @collection.on('change:selected', @trackSelectedMessages)
+  trackSelectedMessages(model) {
+    if (model.get('selected')) {
+      return this.selectedMessages.push(model)
+    } else {
+      return this.selectedMessages.splice(this.selectedMessages.indexOf(model), 1)
+    }
+  }
 
-    trackSelectedMessages: (model) =>
-      if model.get('selected')
-        @selectedMessages.push(model)
-      else
-        @selectedMessages.splice(@selectedMessages.indexOf(model), 1)
+  onClick(e) {
+    if (e.target !== this.el) return
+    return this.collection.each(m => m.set('selected', false))
+  }
 
-    onClick: (e) ->
-      return unless e.target is @el
-      @collection.each((m) -> m.set('selected', false))
+  updateCourse(course) {
+    return (this.course = course)
+  }
 
-    updateCourse: (course) ->
-      @course = course
+  selectedMessage() {
+    return this.selectedMessages[0]
+  }
 
-    selectedMessage: ->
-      @selectedMessages[0]
+  updateMessage(message, thread) {
+    const selectedThread = this.collection.where({selected: true})[0]
+    const updatedThread = this.collection.get(thread.id)
+    updatedThread.set({
+      last_message: thread.last_message,
+      last_authored_message_at: new Date().toString(),
+      message_count: I18n.n(updatedThread.get('messages').length)
+    })
+    this.collection.sort()
+    this.render()
+    return selectedThread != null ? selectedThread.view.select() : undefined
+  }
 
-    updateMessage: (message, thread) =>
-      selectedThread = @collection.where(selected: true)[0]
-      updatedThread = @collection.get(thread.id)
-      updatedThread.set
-        last_message:  thread.last_message
-        last_authored_message_at: new Date().toString()
-        message_count: I18n.n(updatedThread.get('messages').length)
-      @collection.sort()
-      @render()
-      selectedThread?.view.select()
+  afterRender() {
+    super.afterRender(...arguments)
+    this.$('.current-context').text(this.course.name)
+    return this.$('.list-header')[this.course.name ? 'show' : 'hide']()
+  }
 
-    afterRender: ->
-      super
-      @$('.current-context').text(@course.name)
-      @$('.list-header')[if @course.name then 'show' else 'hide']()
-
-    selectAll: ->
-      @collection.each (x) -> x.set('selected', true)
+  selectAll() {
+    return this.collection.each(x => x.set('selected', true))
+  }
+}
+MessageListView.initClass()

@@ -15,117 +15,128 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import I18n from "i18n!groups";
+import I18n from 'i18n!groups'
+import _ from 'underscore'
+import DialogFormView from '../../DialogFormView'
+import GroupCategoryCloneView from './GroupCategoryCloneView'
+import template from 'jst/groups/manage/randomlyAssignMembers'
+import wrapper from 'jst/EmptyDialogFormWrapper'
+import groupHasSubmissions from '../../../util/groupHasSubmissions'
 
-import _ from "underscore";
-import DialogFormView from "../../DialogFormView";
-import GroupCategoryCloneView from "./GroupCategoryCloneView";
-import template from "jst/groups/manage/randomlyAssignMembers";
-import wrapper from "jst/EmptyDialogFormWrapper";
-import groupHasSubmissions from "../../../util/groupHasSubmissions";
+export default class RandomlyAssignMembersView extends DialogFormView {
+  constructor(...args) {
+    {
+      // Hack: trick Babel/TypeScript into allowing this before super.
+      if (false) { super(); }
+      let thisFn = (() => { return this; }).toString();
+      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
+      eval(`${thisName} = this;`);
+    }
+    this.openAgain = this.openAgain.bind(this)
+    super(...args)
+  }
 
-let RandomlyAssignMembersView;
+  static initClass() {
+    this.prototype.defaults = {
+      title: I18n.t('randomly_assigning_members', 'Randomly Assigning Students'),
+      width: 450,
+      height: 250
+    }
 
-export default RandomlyAssignMembersView = (function() {
-  RandomlyAssignMembersView = class RandomlyAssignMembersView extends DialogFormView {
-    constructor(...args) {
-      {
-        // Hack: trick Babel/TypeScript into allowing this before super.
-        if (false) { super(); }
-        let thisFn = (() => { return this; }).toString();
-        let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
-        eval(`${thisName} = this;`);
+    this.prototype.template = template
+
+    this.prototype.wrapperTemplate = wrapper
+
+    this.prototype.className = 'form-dialog'
+
+    this.prototype.events = {
+      'click .dialog_closer': 'close',
+      'click .randomly-assign-members-confirm': 'randomlyAssignMembers'
+    }
+
+    this.prototype.els = {'input[name=group_by_section]': '$group_by_section'}
+  }
+
+  openAgain() {
+    super.openAgain(...arguments)
+    const groups = this.model.groups().models
+    if (_.any(groups, group => group.usersCount() > 0 || !!group.get('max_membership'))) {
+      return this.disableCheckbox(
+        this.$group_by_section,
+        I18n.t('Cannot restrict by section unless groups are empty and not limited in size')
+      )
+    } else if (ENV.student_section_count && ENV.student_section_count > groups.length) {
+      return this.disableCheckbox(
+        this.$group_by_section,
+        I18n.t('Must have at least 1 group per section')
+      )
+    } else {
+      return this.enableCheckbox(this.$group_by_section)
+    }
+  }
+
+  randomlyAssignMembers(e) {
+    e.preventDefault()
+    e.stopPropagation()
+    this.close()
+
+    let groupHasSubmission = false
+    for (const group of this.model.groups().models) {
+      if (groupHasSubmissions(group)) {
+        groupHasSubmission = true
+        break
       }
-      this.openAgain = this.openAgain.bind(this);
-      super(...args);
     }
-
-    static initClass() {
-
-      this.prototype.defaults = {
-        title: I18n.t("randomly_assigning_members", "Randomly Assigning Students"),
-        width: 450,
-        height: 250
-      };
-
-      this.prototype.template = template;
-
-      this.prototype.wrapperTemplate = wrapper;
-
-      this.prototype.className = 'form-dialog';
-
-      this.prototype.events = {
-        'click .dialog_closer': 'close',
-        'click .randomly-assign-members-confirm': 'randomlyAssignMembers'
-      };
-
-      this.prototype.els =
-        {'input[name=group_by_section]': '$group_by_section'};
-    }
-
-    openAgain() {
-      super.openAgain(...arguments);
-      const groups = this.model.groups().models;
-      if (_.any(groups, group => (group.usersCount() > 0) || !!group.get('max_membership'))) {
-        return this.disableCheckbox(this.$group_by_section, I18n.t("Cannot restrict by section unless groups are empty and not limited in size"));
-      } else if (ENV.student_section_count && (ENV.student_section_count > groups.length)) {
-        return this.disableCheckbox(this.$group_by_section, I18n.t("Must have at least 1 group per section"));
-      } else {
-        return this.enableCheckbox(this.$group_by_section);
-      }
-    }
-
-    randomlyAssignMembers(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      this.close();
-
-      let groupHasSubmission = false;
-      for (let group of this.model.groups().models) {
-        if (groupHasSubmissions(group)) {
-          groupHasSubmission = true;
-          break;
+    if (groupHasSubmission) {
+      this.cloneCategoryView = new GroupCategoryCloneView({
+        model: this.model,
+        openedFromCaution: true
+      })
+      this.cloneCategoryView.open()
+      return this.cloneCategoryView.on('close', () => {
+        if (this.cloneCategoryView.cloneSuccess) {
+          return window.location.reload()
+        } else if (this.cloneCategoryView.changeGroups) {
+          return this.model.assignUnassignedMembers()
         }
-      }
-      if (groupHasSubmission) {
-        this.cloneCategoryView = new GroupCategoryCloneView({
-          model: this.model,
-          openedFromCaution: true
-        });
-        this.cloneCategoryView.open();
-        return this.cloneCategoryView.on("close", () => {
-          if (this.cloneCategoryView.cloneSuccess) {
-            return window.location.reload();
-          } else if (this.cloneCategoryView.changeGroups) {
-            return this.model.assignUnassignedMembers();
-          }
-        });
-      } else {
-        return this.model.assignUnassignedMembers(this.getFormData().group_by_section === "1");
-      }
+      })
+    } else {
+      return this.model.assignUnassignedMembers(this.getFormData().group_by_section === '1')
     }
+  }
 
-    disableCheckbox(box, message) {
-      // shamelessly copypasted from assignments/EditView
-      box.prop('checked', false).prop("disabled", true).parent().attr('data-tooltip', 'top').data('tooltip', {disabled: false}).attr('title', message);
-      const label = box.parent();
-      return this.checkboxAccessibleAdvisory(box).text(message);
-    }
+  disableCheckbox(box, message) {
+    // shamelessly copypasted from assignments/EditView
+    box
+      .prop('checked', false)
+      .prop('disabled', true)
+      .parent()
+      .attr('data-tooltip', 'top')
+      .data('tooltip', {disabled: false})
+      .attr('title', message)
+    const label = box.parent()
+    return this.checkboxAccessibleAdvisory(box).text(message)
+  }
 
-    enableCheckbox(box) {
-      if (box.prop("disabled")) {
-        box.removeProp("disabled").parent().timeoutTooltip().timeoutTooltip('disable').removeAttr('data-tooltip').removeAttr('title');
-        return this.checkboxAccessibleAdvisory(box).text('');
-      }
+  enableCheckbox(box) {
+    if (box.prop('disabled')) {
+      box
+        .removeProp('disabled')
+        .parent()
+        .timeoutTooltip()
+        .timeoutTooltip('disable')
+        .removeAttr('data-tooltip')
+        .removeAttr('title')
+      return this.checkboxAccessibleAdvisory(box).text('')
     }
+  }
 
-    checkboxAccessibleAdvisory(box) {
-      const label = box.parent();
-      let advisory = label.find('span.screenreader-only.accessible_label');
-      if (!advisory.length) advisory = $('<span class="screenreader-only accessible_label"></span>').appendTo(label);
-      return advisory;
-    }
-  };
-  RandomlyAssignMembersView.initClass();
-  return RandomlyAssignMembersView;
-})();
+  checkboxAccessibleAdvisory(box) {
+    const label = box.parent()
+    let advisory = label.find('span.screenreader-only.accessible_label')
+    if (!advisory.length)
+      advisory = $('<span class="screenreader-only accessible_label"></span>').appendTo(label)
+    return advisory
+  }
+}
+RandomlyAssignMembersView.initClass()

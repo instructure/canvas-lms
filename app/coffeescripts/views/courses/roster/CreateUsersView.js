@@ -1,103 +1,142 @@
-#
-# Copyright (C) 2013 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// Copyright (C) 2013 - present Instructure, Inc.
+//
+// This file is part of Canvas.
+//
+// Canvas is free software: you can redistribute it and/or modify it under
+// the terms of the GNU Affero General Public License as published by the Free
+// Software Foundation, version 3 of the License.
+//
+// Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+// details.
+//
+// You should have received a copy of the GNU Affero General Public License along
+// with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  '../../../models/CreateUserList'
-  'underscore'
-  'i18n!create_users_view'
-  '../../DialogFormView'
-  'jst/courses/roster/createUsers'
-  'jst/EmptyDialogFormWrapper'
-], (CreateUserList, _, I18n, DialogFormView, template, wrapper) ->
+import CreateUserList from '../../../models/CreateUserList'
+import _ from 'underscore'
+import I18n from 'i18n!create_users_view'
+import DialogFormView from '../../DialogFormView'
+import template from 'jst/courses/roster/createUsers'
+import wrapper from 'jst/EmptyDialogFormWrapper'
 
-  class CreateUsersView extends DialogFormView
-    @optionProperty 'rolesCollection'
-    @optionProperty 'courseModel'
+export default class CreateUsersView extends DialogFormView {
+  constructor(...args) {
+    {
+      // Hack: trick Babel/TypeScript into allowing this before super.
+      if (false) { super(); }
+      let thisFn = (() => { return this; }).toString();
+      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
+      eval(`${thisName} = this;`);
+    }
+    this.toJSON = this.toJSON.bind(this)
+    super(...args)
+  }
 
-    defaults:
-      width: 700
+  static initClass() {
+    this.optionProperty('rolesCollection')
+    this.optionProperty('courseModel')
+
+    this.prototype.defaults = {
+      width: 700,
       height: 500
+    }
 
-    els:
-      '#privileges': '$privileges'
+    this.prototype.els = {
+      '#privileges': '$privileges',
       '#user_list_textarea': '$textarea'
+    }
 
-    events: _.extend({}, @::events,
-      'click .createUsersStartOver': 'startOver'
-      'click .createUsersStartOverFrd': 'startOverFrd'
-      'change #role_id': 'changeEnrollment'
-      'click #role_id': 'changeEnrollment'
+    this.prototype.events = _.extend({}, this.prototype.events, {
+      'click .createUsersStartOver': 'startOver',
+      'click .createUsersStartOverFrd': 'startOverFrd',
+      'change #role_id': 'changeEnrollment',
+      'click #role_id': 'changeEnrollment',
       'click .dialog_closer': 'close'
-    )
+    })
 
-    template: template
+    this.prototype.template = template
 
-    wrapperTemplate: wrapper
+    this.prototype.wrapperTemplate = wrapper
+  }
 
-    initialize: ->
-      @model ?= new CreateUserList
-      super
+  initialize() {
+    if (this.model == null) this.model = new CreateUserList()
+    return super.initialize(...arguments)
+  }
 
-    attach: ->
-      @model.on 'change:step', @render, this
-      @model.on 'change:step', @focusX, this
+  attach() {
+    this.model.on('change:step', this.render, this)
+    return this.model.on('change:step', this.focusX, this)
+  }
 
-    changeEnrollment: (event) ->
-      @model.set 'role_id', event.target.value
+  changeEnrollment(event) {
+    return this.model.set('role_id', event.target.value)
+  }
 
-    openAgain: ->
-      @startOverFrd()
-      super
-      @focusX()
+  openAgain() {
+    this.startOverFrd()
+    super.openAgain(...arguments)
+    return this.focusX()
+  }
 
-    hasUsers: ->
-      @model.get('users')?.length
+  hasUsers() {
+    return __guard__(this.model.get('users'), x => x.length)
+  }
 
-    onSaveSuccess: ->
-      @model.incrementStep()
-      if @model.get('step') is 3
-        role = @rolesCollection.where({id: @model.get('role_id')})[0]
-        role?.increment 'count', @model.get('users').length
-        newUsers = @model.get('users').length
-        @courseModel?.increment 'pendingInvitationsCount', newUsers
+  onSaveSuccess() {
+    this.model.incrementStep()
+    if (this.model.get('step') === 3) {
+      const role = this.rolesCollection.where({id: this.model.get('role_id')})[0]
+      if (role != null) {
+        role.increment('count', this.model.get('users').length)
+      }
+      const newUsers = this.model.get('users').length
+      return this.courseModel && this.courseModel.increment('pendingInvitationsCount', newUsers)
+    }
+  }
 
-    validateBeforeSave: (data) ->
-      if @model.get('step') is 1 and !data.user_list
-        user_list: [{
-          type: 'required'
-          message: I18n.t('required', 'Please enter some email addresses')
-        }]
-      else
-        {}
+  validateBeforeSave(data) {
+    if (this.model.get('step') === 1 && !data.user_list) {
+      return {
+        user_list: [
+          {
+            type: 'required',
+            message: I18n.t('required', 'Please enter some email addresses')
+          }
+        ]
+      }
+    } else {
+      return {}
+    }
+  }
 
-    startOver: ->
-      @model.startOver()
+  startOver() {
+    return this.model.startOver()
+  }
 
-    startOverFrd: ->
-      @model.startOver()
-      @$textarea?.val ''
+  startOverFrd() {
+    this.model.startOver()
+    return this.$textarea && this.$textarea.val('')
+  }
 
-    toJSON: =>
-      json = super
-      json.course_section_id = "#{json.course_section_id}"
-      json.limit_privileges_to_course_section = json.limit_privileges_to_course_section == true ||
-                                                    json.limit_privileges_to_course_section == "1"
-      json
+  toJSON() {
+    const json = super.toJSON(...arguments)
+    json.course_section_id = `${json.course_section_id}`
+    json.limit_privileges_to_course_section =
+      json.limit_privileges_to_course_section === true ||
+      json.limit_privileges_to_course_section === '1'
+    return json
+  }
 
-    focusX: ->
-      $('.ui-dialog-titlebar-close', @el.parentElement).focus()
+  focusX() {
+    $('.ui-dialog-titlebar-close', this.el.parentElement).focus()
+  }
+}
+CreateUsersView.initClass()
 
+function __guard__(value, transform) {
+  return typeof value !== 'undefined' && value !== null ? transform(value) : undefined
+}

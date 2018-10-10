@@ -1,101 +1,129 @@
-#
-# Copyright (C) 2012 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// Copyright (C) 2012 - present Instructure, Inc.
+//
+// This file is part of Canvas.
+//
+// Canvas is free software: you can redistribute it and/or modify it under
+// the terms of the GNU Affero General Public License as published by the Free
+// Software Foundation, version 3 of the License.
+//
+// Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+// details.
+//
+// You should have received a copy of the GNU Affero General Public License along
+// with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'i18n!roster'
-  'jquery'
-  'Backbone'
-  'jst/courses/roster/index'
-  '../../ValidatedMixin'
-  '../../../models/GroupCategory'
-  'jsx/add_people/add_people_app'
-], (I18n, $, Backbone, template, ValidatedMixin, GroupCategory, AddPeopleApp) ->
+import I18n from 'i18n!roster'
+import $ from 'jquery'
+import Backbone from 'Backbone'
+import template from 'jst/courses/roster/index'
+import ValidatedMixin from '../../ValidatedMixin'
+import AddPeopleApp from 'jsx/add_people/add_people_app'
 
-  class RosterView extends Backbone.View
+export default class RosterView extends Backbone.View {
+  constructor(...args) {
+    {
+      // Hack: trick Babel/TypeScript into allowing this before super.
+      if (false) { super(); }
+      let thisFn = (() => { return this; }).toString();
+      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
+      eval(`${thisName} = this;`);
+    }
+    this.fetchOnCreateUsersClose = this.fetchOnCreateUsersClose.bind(this)
+    this.fetch = this.fetch.bind(this)
+    this.onFail = this.onFail.bind(this)
+    super(...args)
+  }
 
-    @mixin ValidatedMixin
+  static initClass() {
+    this.mixin(ValidatedMixin)
 
-    @child 'usersView', '[data-view=users]'
+    this.child('usersView', '[data-view=users]')
 
-    @child 'inputFilterView', '[data-view=inputFilter]'
+    this.child('inputFilterView', '[data-view=inputFilter]')
 
-    @child 'roleSelectView', '[data-view=roleSelect]'
+    this.child('roleSelectView', '[data-view=roleSelect]')
 
-    @child 'resendInvitationsView', '[data-view=resendInvitations]'
+    this.child('resendInvitationsView', '[data-view=resendInvitations]')
 
-    @child 'rosterTabsView', '[data-view=rosterTabs]'
+    this.child('rosterTabsView', '[data-view=rosterTabs]')
 
-    @optionProperty 'roles'
+    this.optionProperty('roles')
 
-    @optionProperty 'permissions'
+    this.optionProperty('permissions')
 
-    @optionProperty 'course'
+    this.optionProperty('course')
 
+    this.prototype.template = template
 
-    template: template
-
-    els:
-      '#addUsers': '$addUsersButton'
+    this.prototype.els = {
+      '#addUsers': '$addUsersButton',
       '#createUsersModalHolder': '$createUsersModalHolder'
+    }
+  }
 
-    afterRender: ->
-      @$addUsersButton.on('click', @showCreateUsersModal.bind(this))
+  afterRender() {
+    this.$addUsersButton.on('click', this.showCreateUsersModal.bind(this))
 
-      canReadSIS = if 'permissions' of ENV
-        !!ENV.permissions.read_sis
-      else
-        true
+    const canReadSIS = 'permissions' in ENV ? !!ENV.permissions.read_sis : true
 
-      @addPeopleApp = new AddPeopleApp(@$createUsersModalHolder[0], {
-        courseId: (ENV.course && ENV.course.id) || 0,
-        defaultInstitutionName: ENV.ROOT_ACCOUNT_NAME || '',
-        roles: ((ENV.ALL_ROLES || []).filter (role) -> role.manageable_by_user),
-        sections: ENV.SECTIONS || [],
-        onClose: @fetchOnCreateUsersClose,
-        inviteUsersURL: ENV.INVITE_USERS_URL,
-        canReadSIS: canReadSIS
-      })
+    return (this.addPeopleApp = new AddPeopleApp(this.$createUsersModalHolder[0], {
+      courseId: (ENV.course && ENV.course.id) || 0,
+      defaultInstitutionName: ENV.ROOT_ACCOUNT_NAME || '',
+      roles: (ENV.ALL_ROLES || []).filter(role => role.manageable_by_user),
+      sections: ENV.SECTIONS || [],
+      onClose: this.fetchOnCreateUsersClose,
+      inviteUsersURL: ENV.INVITE_USERS_URL,
+      canReadSIS
+    }))
+  }
 
-    attach: ->
-      @collection.on 'setParam deleteParam', @fetch
+  attach() {
+    return this.collection.on('setParam deleteParam', this.fetch)
+  }
 
-    fetchOnCreateUsersClose: =>
-      @collection.fetch() if @addPeopleApp.usersHaveBeenEnrolled()
+  fetchOnCreateUsersClose() {
+    if (this.addPeopleApp.usersHaveBeenEnrolled()) return this.collection.fetch()
+  }
 
-    fetch: =>
-      @lastRequest?.abort()
-      @lastRequest = @collection.fetch().fail @onFail
+  fetch() {
+    if (this.lastRequest != null) {
+      this.lastRequest.abort()
+    }
+    return (this.lastRequest = this.collection.fetch().fail(this.onFail))
+  }
 
-    course_id: ->
-      ENV.context_asset_string.split('_')[1]
+  course_id() {
+    return ENV.context_asset_string.split('_')[1]
+  }
 
-    canAddCategories: ->
-      ENV.canManageCourse
+  canAddCategories() {
+    return ENV.canManageCourse
+  }
 
-    toJSON: -> this
+  toJSON() {
+    return this
+  }
 
-    onFail: (xhr) =>
-      return if xhr.statusText is 'abort'
-      parsed = $.parseJSON xhr.responseText
-      message = if parsed?.errors?[0].message is "3 or more characters is required"
-        I18n.t('greater_than_three', 'Please enter a search term with three or more characters')
-      else
-        I18n.t('unknown_error', 'Something went wrong with your search, please try again.')
-      @showErrors search_term: [{message}]
+  onFail(xhr) {
+    if (xhr.statusText === 'abort') return
+    const parsed = $.parseJSON(xhr.responseText)
+    const message =
+      __guard__(parsed != null ? parsed.errors : undefined, x => x[0].message) ===
+      '3 or more characters is required'
+        ? I18n.t('greater_than_three', 'Please enter a search term with three or more characters')
+        : I18n.t('unknown_error', 'Something went wrong with your search, please try again.')
+    return this.showErrors({search_term: [{message}]})
+  }
 
-    showCreateUsersModal: ->
-      @addPeopleApp.open();
+  showCreateUsersModal() {
+    return this.addPeopleApp.open()
+  }
+}
+RosterView.initClass()
+
+function __guard__(value, transform) {
+  return typeof value !== 'undefined' && value !== null ? transform(value) : undefined
+}
