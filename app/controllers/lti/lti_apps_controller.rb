@@ -71,7 +71,7 @@ module Lti
     end
 
     def dev_key_ids_of_installed_tools
-      @installed_tools ||= ContextExternalTool.where(developer_key: dev_keys).pluck(:developer_key_id)
+      @installed_tools ||= ContextExternalTool.active.where(developer_key: dev_keys, context_id: [@context.id] + @context.account_chain_ids).pluck(:developer_key_id)
     end
 
     def tool_configs

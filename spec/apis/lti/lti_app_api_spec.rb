@@ -322,6 +322,19 @@ module Lti
             expect(subject.first['enabled']).to be false
           end
 
+          context 'with a deleted tool in context chain' do
+            before do
+              tool = ContextExternalTool.first
+              tool.use_1_3 = true
+              tool.developer_key = dev_key
+              tool.save!
+              tool.destroy!
+            end
+
+            it { is_expected.to_not be_empty }
+            it { is_expected.to have(1).items }
+          end
+
           context 'with an enabled tool' do
             before do
               tool = ContextExternalTool.first
