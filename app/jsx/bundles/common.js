@@ -151,12 +151,6 @@ if (!supportsCSSVars) {
   }, 'canvasCssVariablesPolyfill')
 }
 
-// On load, check to see what the status is of the toggle for distractionFree
-
-// Set the classes on the dom to reflect the state
-
-// Document then shows.
-
 $(document).ready(() => {
   if (mathml.isMathMLOnPage()) {
     mathml.loadMathJax('MML_HTMLorMML.js')
