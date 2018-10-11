@@ -328,6 +328,10 @@ button.ic-app-header__menu-list-link {
   background-repeat: no-repeat;
   background-size: contain;
   transition: transform 0.3s;
+
+  body.primary-nav-expanded & {
+    /*height: 70px;*/
+  }
 }
 
 .ic-wizard-box  .ic-app-header__logomark {
@@ -341,6 +345,10 @@ button.ic-app-header__menu-list-link {
   background-size: contain;
   transition: transform 0.3s;
   height: 50px;
+
+  body.primary-nav-expanded & {
+    /*height: 70px;*/
+  }
 }
 
 // set to block to avoid any extra inline spacing at bottom
@@ -351,6 +359,7 @@ body.primary-nav-expanded {
 
   .ic-app-header {
     width: $ic-header-primary-width;
+    overflow-y: auto;
     -ms-overflow-style: none; // IE11 and below was throwing on scrollbars no matter if needed or not
   }
 

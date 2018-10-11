@@ -94,22 +94,26 @@ function resetMenuItemTabIndexes () {
 $(resetMenuItemTabIndexes)
 $(window).on('resize', _.debounce(resetMenuItemTabIndexes, 50))
 $('body').on('click', '#distractionFreeToggle', () => {
-  $('body').toggleClass('no-headers distraction-free');
+  $('body').toggleClass('no-headers distraction-free')
 
   if($('body').hasClass('no-headers distraction-free')){
-    window.localStorage.setItem("distraction_free", true);
-    $('#distraction-free-toggle-icon-state').removeClass('icon-arrow-open-left').addClass('icon-arrow-open-right');
+    window.localStorage.setItem("distraction_free", true)
+  }else{
+    window.localStorage.removeItem("distraction_free")
   }
-  else{
-    window.localStorage.removeItem("distraction_free");
-    $('#distraction-free-toggle-icon-state').removeClass('icon-arrow-open-right').addClass('icon-arrow-open-left');
-  }
-
   resetMenuItemTabIndexes()
   var $tool_content_wrapper = $('.tool_content_wrapper');
 
-  var min_tool_height;
+  var min_tool_height, canvas_chrome_height;
   const toolResizer = new ToolLaunchResizer(min_tool_height);
+
+  if ( !$('body').hasClass('ic-full-screen-lti-tool') ) {
+    canvas_chrome_height = $tool_content_wrapper.offset().top + $('#footer').outerHeight(true);
+  }
+
+  if (!$tool_content_wrapper.data('height_overridden')) {
+    // toolResizer.resize_tool_content_wrapper($(window).height() - canvas_chrome_height - $('#sequence_footer').outerHeight(true));
+  }
 })
 
 // Backbone routes
@@ -157,11 +161,10 @@ $(document).ready(() => {
   }
 
   let distractionFree = window.localStorage.getItem("distraction_free");
-  let toggleButton = $("#distractionFreeToggle").length === 0;
+  let toggleButton = $("#distractionFreeToggle").length === 0
 
   if (distractionFree && !toggleButton){
-    $('body').toggleClass('no-headers distraction-free');
-    $('#distraction-free-toggle-icon-state').toggleClass('icon-arrow-open-right');
+    $('body').toggleClass('no-headers distraction-free')
   }
   $('body').fadeIn(500)
 
