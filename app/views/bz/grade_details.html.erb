@@ -52,7 +52,7 @@
 </div>
 
 <% if (@gradebook_grade.nil? ? 0.0 : @gradebook_grade.to_f.round(2)) != @response_object["total_score"].round(2) %>
-  <p><strong>Please note:</strong> Your grade has been specially adjusted by staff. The details below show the first assessment, but the total score shown above is what actually appears in the final gradebook.</p>
+  <p><strong>Please note:</strong> Your grade may have been specially adjusted by staff. The details below show the first assessment, but the total score shown above is what actually appears in the final gradebook.</p>
 <% end %>
 
 
