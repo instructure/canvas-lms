@@ -36,13 +36,13 @@ class Setting < ActiveRecord::Base
           if !object && set_if_nx
             Setting.create!(name: name, value: default&.to_s)
           end
-          object&.value || default&.to_s
+          object&.value
         end
 
         if @skip_cache
-          check.call
+          check.call || default&.to_s
         else
-          MultiCache.fetch(["settings", name], cache_options) { check.call }
+          MultiCache.fetch(["settings", name], cache_options) { check.call } || default&.to_s
         end
       end
     rescue ActiveRecord::StatementInvalid, ActiveRecord::ConnectionNotEstablished => e
