@@ -5459,4 +5459,35 @@ describe Submission do
                               turnitin_shared_secret: 'skeret',
                               settings: account.settings.merge(enable_turnitin: true))
   end
+
+  context 'generated observer alerts' do
+    before :once do
+      course_with_teacher
+      @threshold = observer_alert_threshold_model(alert_type: 'assignment_grade_high', threshold: '80', course: @course)
+      @assignment = assignment_model(context: @course, points_possible: 10)
+    end
+
+    it "doesn't create an alert if the observer has been deleted" do
+      # This sets up the environment for an error we've seen in the wild
+      observer_user_ids = @course.observer_enrollments.pluck(:user_id).uniq
+      User.where(id: observer_user_ids).destroy_all
+
+      expect {
+        @assignment.grade_student(@threshold.student, score: 10, grader: @teacher)
+      }.not_to change {
+        ObserverAlert.where(context: @assignment, alert_type: :assignment_grade_high).count
+      }
+    end
+
+    it "logs if it can't create an observer alert" do
+      allow(ObserverAlert).to receive(:create!).and_raise(ActiveRecord::RecordInvalid.new)
+      submission_id = @assignment.submissions.find_by(user: @threshold.student).id
+
+      expect(Rails.logger).to receive(:error).
+        with("Couldn't create ObserverAlert for submission #{submission_id} observer #{@threshold.observer_id}")
+
+      @assignment.grade_student(@threshold.student, score: 10, grader: @teacher)
+    end
+
+  end
 end

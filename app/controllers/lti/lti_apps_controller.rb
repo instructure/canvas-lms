@@ -39,7 +39,12 @@ module Lti
       if authorized_for_launch_definitions(@context, @current_user, placements)
         # only_visible requires that specific placements are requested.  If a user is not read_admin, and they request only_visible
         # without placements, an empty array will be returned.
-        collection = AppLaunchCollator.bookmarked_collection(@context, placements, {current_user: @current_user, session: session, only_visible: true})
+        if placements == ['global_navigation']
+          # We allow global_navigation to pull all the launch_definitions, even if they are not explicitly visible to user.
+          collection = AppLaunchCollator.bookmarked_collection(@context, placements, {current_user: @current_user, session: session, only_visible: false})
+        else
+          collection = AppLaunchCollator.bookmarked_collection(@context, placements, {current_user: @current_user, session: session, only_visible: true})
+        end
         pagination_args = {max_per_page: 100}
         respond_to do |format|
           launch_defs = Api.paginate(

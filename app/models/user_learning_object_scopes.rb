@@ -182,12 +182,12 @@ module UserLearningObjectScopes
   def submissions_needing_peer_review(opts={})
     opts[:due_after] ||= 2.weeks.ago
     opts[:due_before] ||= 2.weeks.from_now
-    objects_needing('AssessmentRequest', 'peer_review', :student, 15.minutes, opts) do |ar_scope, options|
+    objects_needing('AssessmentRequest', 'reviewing', :student, 15.minutes, opts) do |ar_scope, options|
       ar_scope = ar_scope.joins(submission: :assignment).
-        joins("INNER JOIN #{Submission.quoted_table_name} AS assessor_asset ON assessment_requests.assessor_asset_id = assessor_asset.id").
+        joins("INNER JOIN #{Submission.quoted_table_name} AS assessor_asset ON assessment_requests.assessor_asset_id = assessor_asset.id
+               AND assessor_asset.assignment_id = assignments.id").
         where(assessor_id: id)
       ar_scope = ar_scope.incomplete unless options[:scope_only]
-      ar_scope = ar_scope.not_ignored_by(self, 'reviewing') unless options[:include_ignored]
       ar_scope = ar_scope.for_context_codes(options[:shard_course_ids].map { |course_id| "course_#{course_id}"})
 
       # The below merging of scopes mimics a portion of the behavior for checking the access policy
