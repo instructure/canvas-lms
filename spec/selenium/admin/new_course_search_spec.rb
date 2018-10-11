@@ -142,13 +142,11 @@ describe "new account course search" do
 
   it "should show teachers" do
     course_factory(:account => @account)
-    user_factory(:name => "some teacher")
-    teacher_in_course(:course => @course, :user => @user)
+    teacher = user_factory(:name => "some teacher")
+    teacher_in_course(:course => @course, :user => teacher)
 
-    get "/accounts/#{@account.id}"
-
-    user_link = get_rows.first.find("a[href='#{user_url(@user)}']")
-    expect(user_link).to include_text(@user.name)
+    visit_courses(@account)
+    expect(course_teacher_link(teacher)).to include_text(teacher.name)
   end
 
   it "should show manageable roles in new enrollment dialog" do

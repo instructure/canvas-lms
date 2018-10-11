@@ -34,6 +34,10 @@ module NewCourseSearchPage
     fj("[data-automation='courses list'] tr:contains('#{course_name}') button:has([name='IconPlus'])")
   end
 
+  def course_teacher_link(teacher_name)
+    ff("[data-automation='courses list'] tr").first.find("a[href='#{user_url(teacher_name)}']")
+  end
+
   # ---------------------- Actions ----------------------
   def click_add_user_button(course_name)
     add_user_button(course_name).click
