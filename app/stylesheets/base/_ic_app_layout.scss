@@ -163,7 +163,7 @@ body:not(.course-menu-expanded) {
   // body:not(.full-width):not(.outcomes) & {
     // We want to add a max size to most pages in canvas
     // unless it's a full-width app
-    // max-width: 100%;
+    // max-width: calc(100% - 200px);
   // }
 
   body:not(.ic-no-flex-layout):not(.embedded) & {
@@ -411,12 +411,6 @@ body:not(.course-menu-expanded) {
   align-items: center;
   border-bottom: 1px solid $ic-border-light;
   padding: $ic-sp/2 $ic-sp*2;
-  transform: translateY(0);
-  transition-delay: .24s;
-  transition-duration: .24s;
-  transition-property: transform;
-  transition-timing-function: ease-in;
-  z-index: 100;
 }
 
 .ic-app-course-nav-toggle {

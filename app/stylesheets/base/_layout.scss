@@ -32,7 +32,6 @@ body {
 
   &.no-headers, &.embedded {
     #header { transform: translateX(-200px); }
-    .ic-app-nav-toggle-and-crumbs { transform: translateY(-53px); }
     #footer { display: none; }
   }
 
