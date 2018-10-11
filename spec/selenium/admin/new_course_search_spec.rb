@@ -133,11 +133,10 @@ describe "new account course search" do
 
   it "should search but not find bogus course", priority: "1", test_id: 3415214 do
     bogus = 'jtsdumbthing'
-    get "/accounts/#{@account.id}"
+    visit_courses(@account)
 
-    f('input[placeholder="Search courses..."]').send_keys(bogus)
-
-    expect(f("#content")).not_to contain_css("[data-automation='courses list'] tr")
+    enter_search(bogus)
+    expect(results_body).not_to contain_css(results_list_css)
   end
 
   it "should show teachers" do

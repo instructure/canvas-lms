@@ -38,8 +38,26 @@ module NewCourseSearchPage
     ff("[data-automation='courses list'] tr").first.find("a[href='#{user_url(teacher_name)}']")
   end
 
+  def course_search_box
+    f('input[placeholder="Search courses..."]')
+  end
+
+  def results_body
+    f('#content')
+  end
+
+  def results_list_css
+    "[data-automation='courses list'] tr"
+  end
+
   # ---------------------- Actions ----------------------
   def click_add_user_button(course_name)
     add_user_button(course_name).click
+  end
+
+  def enter_search(search_name)
+    set_value(course_search_box, search_name)
+    driver.action.send_keys(:enter).perform
+    wait_for_ajaximations
   end
 end
