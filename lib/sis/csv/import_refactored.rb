@@ -69,7 +69,7 @@ module SIS
         @finished = false
 
         settings = PluginSetting.settings_for_plugin('sis_import')
-        parallel = Setting.get("sis_parallel_import/#{@root_account.global_id}_num_strands", "1")
+        parallel = Setting.get("sis_parallel_import/#{@root_account.global_id}_num_strands", nil).presence || "1"
         if settings.dig(:parallelism).to_i > 1 && settings[:parallelism] != parallel
           Setting.set("sis_parallel_import/#{@root_account.global_id}_num_strands", settings[:parallelism])
         end
