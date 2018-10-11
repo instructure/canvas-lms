@@ -46,6 +46,7 @@ module.exports = {
     "no-else-return": [0],
     "no-nested-ternary": "off",
     "no-plusplus": [0],
+    'no-prototype-builtins': 'off',
     "no-return-assign": "off",
     "no-underscore-dangle": [0],
     "no-unused-vars": [2, { "argsIgnorePattern": "^_"}],
