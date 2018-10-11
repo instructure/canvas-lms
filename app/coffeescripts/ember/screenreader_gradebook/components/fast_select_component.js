@@ -1,129 +1,161 @@
-#
-# Copyright (C) 2013 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// Copyright (C) 2013 - present Instructure, Inc.
+//
+// This file is part of Canvas.
+//
+// Canvas is free software: you can redistribute it and/or modify it under
+// the terms of the GNU Affero General Public License as published by the Free
+// Software Foundation, version 3 of the License.
+//
+// Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+// details.
+//
+// You should have received a copy of the GNU Affero General Public License along
+// with this program. If not, see <http://www.gnu.org/licenses/>.
 
-#converted to coffeescript from:
-#https://gist.github.com/kselden/7758990
+// converted to coffeescript from:
+// https://gist.github.com/kselden/7758990
 
-define [
-  'ember'
-], ({Component, get, set}) ->
-  doc = document
+import {Component, get, set} from 'ember'
 
-  FastSelectComponent = Component.extend
+const doc = document
 
-    initialized: false
-    items: null
-    valuePath: 'value'
-    labelPath: 'label'
-    labelDefault: null
-    valueDefault: ''
-    value: null
-    selected: null
+const FastSelectComponent = Component.extend({
+  initialized: false,
+  items: null,
+  valuePath: 'value',
+  labelPath: 'label',
+  labelDefault: null,
+  valueDefault: '',
+  value: null,
+  selected: null,
 
-    tagName: 'select'
+  tagName: 'select',
 
-    didInsertElement: ->
-      self = this
-      @$().on('change', ->
-        set(self, 'value', @value)
-      )
+  didInsertElement() {
+    const self = this
+    return this.$().on('change', function() {
+      return set(self, 'value', this.value)
+    })
+  },
 
-    valueDidChange: (->
-      items = @items
-      value = @value
-      selected = null
-      if (value && items)
-        selected = items.findBy(@valuePath, value)
-      set(this, 'selected', selected)
-    ).observes('value').on('init')
+  valueDidChange: function() {
+    const {items} = this
+    const {value} = this
+    let selected = null
+    if (value && items) {
+      selected = items.findBy(this.valuePath, value)
+    }
+    set(this, 'selected', selected)
+  }
+    .observes('value')
+    .on('init'),
 
-    itemsWillChange: (->
-      items = @items
-      if (items)
-        items.removeArrayObserver(this)
-        @arrayWillChange(items, 0, get(items, 'length'), 0)
-    ).observesBefore('items').on('willDestroyElement')
+  itemsWillChange: function() {
+    const {items} = this
+    if (items) {
+      items.removeArrayObserver(this)
+      this.arrayWillChange(items, 0, get(items, 'length'), 0)
+    }
+  }
+    .observesBefore('items')
+    .on('willDestroyElement'),
 
-    itemsDidChange: (->
-      items = @items
-      if (items)
-        items.addArrayObserver(this)
-        @arrayDidChange(items, 0, 0, get(items, 'length'))
-    ).observes('items').on('didInsertElement')
+  itemsDidChange: function() {
+    const {items} = this
+    if (items) {
+      items.addArrayObserver(this)
+      this.arrayDidChange(items, 0, 0, get(items, 'length'))
+    }
+  }
+    .observes('items')
+    .on('didInsertElement'),
 
-    arrayWillChange: (items, start, removeCount, addCount) ->
-      select = get(this, 'element')
-      options = select.childNodes
-      i = start + removeCount - 1
-      if get(this, 'hasDefaultOption')
-        start = start + 1
-        i = i + 1
-      while i >= start
+  arrayWillChange(items, start, removeCount, addCount) {
+    const select = get(this, 'element')
+    const options = select.childNodes
+    let i = start + removeCount - 1
+    if (get(this, 'hasDefaultOption')) {
+      start += 1
+      i += 1
+    }
+    return (() => {
+      const result = []
+      while (i >= start) {
         select.removeChild(options[i])
-        i--
+        result.push(i--)
+      }
+      return result
+    })()
+  },
 
-    updateSelection: (->
-      selected = get this, 'selected'
-      return unless selected
-      currentValue = get(selected, @valuePath)
-      select = @$("[value=#{currentValue}]")
-      select?[0]?.selected = true
-      if currentValue and currentValue != @value
-        set this, 'value', currentValue
-    ).observes('selected')
+  updateSelection: function() {
+    const selected = get(this, 'selected')
+    if (!selected) {
+      return
+    }
+    const currentValue = get(selected, this.valuePath)
+    const select = this.$(`[value=${currentValue}]`)
+    __guard__(select != null ? select[0] : undefined, x => (x.selected = true))
+    if (currentValue && currentValue !== this.value) {
+      set(this, 'value', currentValue)
+    }
+  }.observes('selected'),
 
-    updateOptions: (->
-      @arrayWillChange(@items, 0, get(@items, 'length'), 0)
-      @arrayDidChange(@items, 0, 0, get(@items, 'length'))
-    ).observes('labelPath')
+  updateOptions: function() {
+    this.arrayWillChange(this.items, 0, get(this.items, 'length'), 0)
+    this.arrayDidChange(this.items, 0, 0, get(this.items, 'length'))
+  }.observes('labelPath'),
 
-    arrayDidChange: (items, start, removeCount, addCount) ->
-      select = get(this, 'element')
-      hasDefault = get(this, 'hasDefaultOption')
-      if hasDefault
-        start = start + 1
-      i = start
-      l = start + addCount
+  arrayDidChange(items, start, removeCount, addCount) {
+    let value
+    const select = get(this, 'element')
+    const hasDefault = get(this, 'hasDefaultOption')
+    if (hasDefault) {
+      start += 1
+    }
+    let i = start
+    const l = start + addCount
 
-      while i < l
-        ind = if hasDefault then i-1 else i
-        item = items.objectAt(ind)
-        value = get(item, @valuePath)
-        label = get(item, @labelPath)
-        option = doc.createElement("option")
-        option.textContent = label
-        option.value = value
-        if (@value == value)
-          option.selected = true
-          set(this, 'selected', item)
-        select.appendChild(option)
-        i++
-
-      set(this, 'value', select.value)
-
-    insertDefaultOption: (->
-      return unless @labelDefault and not @hasDefaultOption
-      select = get(this, 'element')
-      option = doc.createElement("option")
-      option.textContent = @labelDefault
-      option.value = @valueDefault
+    while (i < l) {
+      const ind = hasDefault ? i - 1 : i
+      const item = items.objectAt(ind)
+      value = get(item, this.valuePath)
+      const label = get(item, this.labelPath)
+      const option = doc.createElement('option')
+      option.textContent = label
+      option.value = value
+      if (this.value === value) {
+        option.selected = true
+        set(this, 'selected', item)
+      }
       select.appendChild(option)
+      i++
+    }
 
-      set(this, 'hasDefaultOption', true)
-    ).observes('items').on('didInsertElement')
+    set(this, 'value', select.value)
+  },
 
+  insertDefaultOption: function() {
+    if (!this.labelDefault || !!this.hasDefaultOption) {
+      return
+    }
+    const select = get(this, 'element')
+    const option = doc.createElement('option')
+    option.textContent = this.labelDefault
+    option.value = this.valueDefault
+    select.appendChild(option)
 
+    set(this, 'hasDefaultOption', true)
+  }
+    .observes('items')
+    .on('didInsertElement')
+})
+
+export default FastSelectComponent
+
+function __guard__(value, transform) {
+  return typeof value !== 'undefined' && value !== null ? transform(value) : undefined
+}

@@ -1,200 +1,254 @@
-#
-# Copyright (C) 2014 - present Instructure, Inc.
-#
-# This file is part of Canvas.
-#
-# Canvas is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, version 3 of the License.
-#
-# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
+//
+// Copyright (C) 2014 - present Instructure, Inc.
+//
+// This file is part of Canvas.
+//
+// Canvas is free software: you can redistribute it and/or modify it under
+// the terms of the GNU Affero General Public License as published by the Free
+// Software Foundation, version 3 of the License.
+//
+// Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+// WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+// A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+// details.
+//
+// You should have received a copy of the GNU Affero General Public License along
+// with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'i18n!grading_cell'
-  '../../../gradebook/GradebookTranslations'
-  '../../../gradebook/GradebookHelpers'
-  'jsx/gradebook/shared/helpers/GradeFormatHelper'
-  'jsx/grading/helpers/OutlierScoreHelper'
-  'jsx/shared/helpers/numberHelper'
-  'underscore'
-  'ember'
-  'jquery'
-  'jquery.ajaxJSON'
-], (I18n, GRADEBOOK_TRANSLATIONS, GradebookHelpers, GradeFormatHelper,
-  { default:  OutlierScoreHelper }, numberHelper, _, Ember, $) ->
+import I18n from 'i18n!grading_cell'
+import GRADEBOOK_TRANSLATIONS from '../../../gradebook/GradebookTranslations'
+import GradebookHelpers from '../../../gradebook/GradebookHelpers'
+import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
+import OutlierScoreHelper from 'jsx/grading/helpers/OutlierScoreHelper'
+import numberHelper from 'jsx/shared/helpers/numberHelper'
+import _ from 'underscore'
+import Ember from 'ember'
+import $ from 'jquery'
+import 'jquery.ajaxJSON'
 
-  GradingCellComponent = Ember.Component.extend
+const GradingCellComponent = Ember.Component.extend({
+  value: null,
+  excused: null,
+  shouldSaveExcused: false,
 
-    value: null
-    excused: null
-    shouldSaveExcused: false
+  isPoints: Ember.computed.equal('assignment.grading_type', 'points'),
+  isPercent: Ember.computed.equal('assignment.grading_type', 'percent'),
+  isLetterGrade: Ember.computed.equal('assignment.grading_type', 'letter_grade'),
+  isPassFail: Ember.computed.equal('assignment.grading_type', 'pass_fail'),
+  isInPastGradingPeriodAndNotAdmin: function() {
+    return this.submission != null ? this.submission.gradeLocked : undefined
+  }.property('submission'),
+  nilPointsPossible: Ember.computed.none('assignment.points_possible'),
+  isGpaScale: Ember.computed.equal('assignment.grading_type', 'gpa_scale'),
 
-    isPoints: Ember.computed.equal('assignment.grading_type', 'points')
-    isPercent: Ember.computed.equal('assignment.grading_type', 'percent')
-    isLetterGrade: Ember.computed.equal('assignment.grading_type', 'letter_grade')
-    isPassFail: Ember.computed.equal('assignment.grading_type', 'pass_fail')
-    isInPastGradingPeriodAndNotAdmin: (->
-      @submission?.gradeLocked
-    ).property('submission')
-    nilPointsPossible: Ember.computed.none('assignment.points_possible')
-    isGpaScale: Ember.computed.equal('assignment.grading_type', 'gpa_scale')
+  passFailGrades: [
+    {
+      label: I18n.t('grade_ungraded', 'Ungraded'),
+      value: '-'
+    },
+    {
+      label: I18n.t('grade_complete', 'Complete'),
+      value: 'complete'
+    },
+    {
+      label: I18n.t('grade_incomplete', 'Incomplete'),
+      value: 'incomplete'
+    },
+    {
+      label: I18n.t('Excused'),
+      value: 'EX'
+    }
+  ],
 
-    passFailGrades: [
-        {
-          label: I18n.t "grade_ungraded", "Ungraded"
-          value: "-"
-        }
-        {
-          label: I18n.t "grade_complete", "Complete"
-          value: "complete"
-        }
-        {
-          label: I18n.t "grade_incomplete", "Incomplete"
-          value: "incomplete"
-        }
-        {
-          label: I18n.t "Excused"
-          value: 'EX'
-        }
-    ]
+  outOfText: function() {
+    if (this.submission && this.submission.excused) {
+      return I18n.t('Excused')
+    } else if (this.get('isGpaScale')) {
+      return ''
+    } else if (this.get('isLetterGrade') || this.get('isPassFail')) {
+      return I18n.t('(%{score} out of %{points})', {
+        points: I18n.n(this.assignment.points_possible),
+        score: this.get('entered_score')
+      })
+    } else if (this.get('nilPointsPossible')) {
+      return I18n.t('No points possible')
+    } else {
+      return I18n.t('(out of %{points})', {points: I18n.n(this.assignment.points_possible)})
+    }
+  }.property('submission.score', 'assignment'),
 
-    outOfText: (->
-      if @submission && @submission.excused
-        I18n.t "Excused"
-      else if @get('isGpaScale')
-        ""
-      else if @get('isLetterGrade') or @get('isPassFail')
-        I18n.t(
-          "(%{score} out of %{points})",
-          points: I18n.n @assignment.points_possible
-          score: @get('entered_score')
-        )
-      else if @get('nilPointsPossible')
-        I18n.t("No points possible")
-      else
-        I18n.t("(out of %{points})", points: I18n.n(@assignment.points_possible))
-    ).property('submission.score', 'assignment')
+  changeGradeURL() {
+    return ENV.GRADEBOOK_OPTIONS.change_grade_url
+  },
 
-    changeGradeURL: ->
-      ENV.GRADEBOOK_OPTIONS.change_grade_url
+  saveURL: function() {
+    const submission = this.get('submission')
+    return this.changeGradeURL()
+      .replace(':assignment', submission.assignment_id)
+      .replace(':submission', submission.user_id)
+  }.property('submission.assignment_id', 'submission.user_id'),
 
-    saveURL: (->
-      submission = @get('submission')
-      this.changeGradeURL()
-        .replace(":assignment", submission.assignment_id)
-        .replace(":submission", submission.user_id)
-    ).property('submission.assignment_id', 'submission.user_id')
+  score: function() {
+    if (this.submission.score != null) {
+      return I18n.n(this.submission.score)
+    } else {
+      return ' -'
+    }
+  }.property('submission.score'),
 
-    score: (->
-      if @submission.score? then I18n.n(@submission.score) else ' -'
-    ).property('submission.score')
+  entered_score: function() {
+    if (this.submission.entered_score != null) {
+      return I18n.n(this.submission.entered_score)
+    } else {
+      return ' -'
+    }
+  }.property('submission.entered_score'),
 
-    entered_score: (->
-      if @submission.entered_score? then I18n.n(@submission.entered_score) else ' -'
-    ).property('submission.entered_score')
+  late_penalty: function() {
+    if (this.submission.points_deducted != null) {
+      return I18n.n(-1 * this.submission.points_deducted)
+    } else {
+      return ' -'
+    }
+  }.property('submission.points_deducted'),
 
-    late_penalty: (->
-      if @submission.points_deducted? then I18n.n(-1 * @submission.points_deducted) else ' -'
-    ).property('submission.points_deducted')
+  points_possible: function() {
+    if (this.assignment.points_possible != null) {
+      return I18n.n(this.assignment.points_possible)
+    } else {
+      return ' -'
+    }
+  }.property('assignment.points_possible'),
 
-    points_possible: (->
-      if @assignment.points_possible? then I18n.n(@assignment.points_possible) else ' -'
-    ).property('assignment.points_possible')
+  final_grade: function() {
+    if (this.submission.grade != null) {
+      return GradeFormatHelper.formatGrade(this.submission.grade)
+    } else {
+      return ' -'
+    }
+  }.property('submission.grade'),
 
-    final_grade: (->
-      if @submission.grade? then GradeFormatHelper.formatGrade(@submission.grade) else ' -'
-    ).property('submission.grade')
+  ajax(url, options) {
+    const {type, data} = options
+    return $.ajaxJSON(url, type, data)
+  },
 
-    ajax: (url, options) ->
-      {type, data} = options
-      $.ajaxJSON url, type, data
+  excusedToggled: function() {
+    if (this.shouldSaveExcused) {
+      this.updateSubmissionExcused()
+    }
+  }.observes('excused'),
 
-    excusedToggled: (->
-      @updateSubmissionExcused() if @shouldSaveExcused
-    ).observes('excused')
+  updateSubmissionExcused() {
+    const url = this.get('saveURL')
+    const value = __guard__(this.$('#submission-excused'), x => x[0].checked)
 
-    updateSubmissionExcused: () ->
-      url   = @get('saveURL')
-      value = @$('#submission-excused')?[0].checked
+    const save = this.ajax(url, {
+      type: 'PUT',
+      data: {'submission[excuse]': value}
+    })
+    return save.then(this.boundUpdateSuccess, this.onUpdateError)
+  },
 
-      save = @ajax url,
-        type: "PUT"
-        data: {'submission[excuse]': value}
-      save.then @boundUpdateSuccess, @onUpdateError
+  setExcusedWithoutTriggeringSave(isExcused) {
+    this.shouldSaveExcused = false
+    this.set('excused', isExcused)
+    return (this.shouldSaveExcused = true)
+  },
 
-    setExcusedWithoutTriggeringSave: (isExcused) ->
-      @shouldSaveExcused = false
-      @set 'excused', isExcused
-      @shouldSaveExcused = true
+  submissionDidChange: function() {
+    const newVal = (this.submission != null
+    ? this.submission.excused
+    : undefined)
+      ? 'EX'
+      : (this.submission != null ? this.submission.entered_grade : undefined) || '-'
 
-    submissionDidChange: (->
-      newVal = if @submission?.excused
-                 'EX'
-               else
-                 @submission?.entered_grade || '-'
+    this.setExcusedWithoutTriggeringSave(
+      this.submission != null ? this.submission.excused : undefined
+    )
+    if (this.get('isPassFail')) {
+      this.set('value', newVal)
+    } else {
+      this.set('value', GradeFormatHelper.formatGrade(newVal))
+    }
+  }
+    .observes('submission')
+    .on('init'),
 
-      @setExcusedWithoutTriggeringSave(@submission?.excused)
-      if @get('isPassFail')
-        @set 'value', newVal
-      else
-        @set 'value', GradeFormatHelper.formatGrade(newVal)
-    ).observes('submission').on('init')
+  onUpdateSuccess(submission) {
+    this.sendAction('on-submit-grade', submission.all_submissions)
+    if (!submission.excused) {
+      const outlierScoreHelper = new OutlierScoreHelper(
+        submission.score,
+        this.assignment.points_possible
+      )
+      if (outlierScoreHelper.hasWarning()) {
+        $.flashWarning(outlierScoreHelper.warningMessage())
+      }
+    }
+  },
 
-    onUpdateSuccess: (submission) ->
-      @sendAction 'on-submit-grade', submission.all_submissions
-      unless submission.excused
-        outlierScoreHelper = new OutlierScoreHelper(submission.score, @assignment.points_possible)
-        $.flashWarning(outlierScoreHelper.warningMessage()) if outlierScoreHelper.hasWarning()
+  onUpdateError() {
+    $.flashError(GRADEBOOK_TRANSLATIONS.submission_update_error)
+  },
 
-    onUpdateError: ->
-      $.flashError(GRADEBOOK_TRANSLATIONS.submission_update_error)
+  focusOut(event) {
+    const isGradeInput = event.target.id === 'student_and_assignment_grade'
+    const submission = this.get('submission')
 
-    focusOut:(event) ->
-      isGradeInput = event.target.id == 'student_and_assignment_grade'
-      submission   = @get('submission')
+    if (!submission || !isGradeInput) {
+      return
+    }
 
-      return unless submission && isGradeInput
+    const url = this.get('saveURL')
+    let value = this.$('input, select').val()
 
-      url = @get('saveURL')
-      value = @$('input, select').val()
+    const excused = typeof value === 'string' && value.toUpperCase() === 'EX'
+    this.setExcusedWithoutTriggeringSave(excused)
 
-      excused = typeof value == 'string' && value.toUpperCase() == 'EX'
-      @setExcusedWithoutTriggeringSave(excused)
+    if (this.get('isPassFail') && value === '-') {
+      value = ''
+    }
 
-      if @get('isPassFail') and value == '-'
-        value = ''
+    value = GradeFormatHelper.delocalizeGrade(value)
 
-      value = GradeFormatHelper.delocalizeGrade(value)
+    if (value === submission.grade) {
+      return
+    }
+    const data =
+      typeof value === 'string' && value.toUpperCase() === 'EX'
+        ? {'submission[excuse]': true}
+        : {'submission[posted_grade]': value}
+    const save = this.ajax(url, {
+      type: 'PUT',
+      data
+    })
+    return save.then(this.boundUpdateSuccess, this.onUpdateError)
+  },
 
-      return if value == submission.grade
-      data = if typeof value == 'string' && value.toUpperCase() == 'EX'
-               { "submission[excuse]": true }
-             else
-               { "submission[posted_grade]": value }
-      save = @ajax url,
-        type: "PUT"
-        data: data
-      save.then @boundUpdateSuccess, @onUpdateError
+  bindSave: function() {
+    this.boundUpdateSuccess = _.bind(this.onUpdateSuccess, this)
+  }.on('init'),
 
-    bindSave: (->
-      @boundUpdateSuccess = _.bind(@onUpdateSuccess, this)
-    ).on('init')
+  click(event) {
+    const {target} = event
+    const hasCheckboxClass = target.classList[0] === 'checkbox'
+    const isCheckBox = target.type === 'checkbox'
 
-    click: (event) ->
-      target = event.target
-      hasCheckboxClass = target.classList[0] == 'checkbox'
-      isCheckBox = target.type == 'checkbox'
+    if (hasCheckboxClass || isCheckBox) {
+      return this.$('#submission-excused').focus()
+    } else {
+      return this.$('input, select').select()
+    }
+  },
 
-      if hasCheckboxClass || isCheckBox
-        @$('#submission-excused').focus()
-      else
-        @$('input, select').select()
+  focus() {
+    return this.$('input, select').select()
+  }
+})
 
-    focus: ->
-      @$('input, select').select()
+export default GradingCellComponent
+
+function __guard__(value, transform) {
+  return typeof value !== 'undefined' && value !== null ? transform(value) : undefined
+}
