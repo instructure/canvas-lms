@@ -44,6 +44,11 @@
 <div class="bz-grade-details-total-score">
   <span class="label">Total score:</span>
   <span class="number"><%= @gradebook_grade.nil? ? "0.0" : @gradebook_grade.to_f.round(2) %></span>
+
+  <% if @is_staff %>
+    <span class="label">Total score would be if completed on-time:</span>
+    <span class="number"><%= @if_on_time_score.to_f.round(2) %></span>
+  <% end %>
 </div>
 
 <% if (@gradebook_grade.nil? ? 0.0 : @gradebook_grade.to_f.round(2)) != @response_object["total_score"].round(2) %>
