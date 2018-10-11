@@ -30,15 +30,27 @@ body {
     min-width: 768px;
   }
 
+  &.ic-Login-Body {
+    .ic-app-nav-toggle-and-crumbs { display: none; }
+  }
+
   &.no-headers, &.embedded {
-    #header { transform: translateX(-200px); }
-    .ic-app-nav-toggle-and-crumbs { transform: translateY(-53px); }
+
+    .ic-Layout-wrapper { transform: translateX(140px); }
+    .ic-app-header { width: 60px; }
+    .ReactTray__Content { left: 60px; }
+    .menu-item__text { opacity: 0; }
+
     #footer { display: none; }
   }
 
   &.no-headers.distraction-free {
-    #header { transform: translateX(-200px); }
-  }
+
+    .ic-Layout-wrapper { transform: translateX(140px); }
+    .ic-app-header { width: 60px; }
+    .ReactTray__Content { left: 60px; }
+    .menu-item__text { opacity: 0; }
+}
 
   &.embedded {
     #application {
@@ -130,7 +142,6 @@ iframe.info_alert_outline {
   border: 2px solid #008EE2 !important;
 }
 
-// gets rid of ugly border
 iframe {
   border: none;
   height: 100%;
@@ -139,7 +150,7 @@ iframe {
   &#file_content,
   &#tool_content,
   &.tool_launch {
-      height: calc(100vh - 170px); // This is for when the iframeResizer isn't supported. The iframeResizer will override this via inline styles.
+      height: calc(100vh - 180px); // This is for when the iframeResizer isn't supported. The iframeResizer will override this via inline styles.
   }
 }
 

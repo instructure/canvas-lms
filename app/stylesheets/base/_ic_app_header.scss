@@ -41,20 +41,23 @@ $ic-tooltip-arrow-size: 0.375rem;
 
 
 .ic-app-header {
-  box-sizing: border-box;
   position: fixed;
   top: 0; left: 0;
   height: 100%;
   display: flex;
   flex-direction: column;
-  width: $ic-header-primary-width - 30;
+  width: $ic-header-primary-width;
   z-index: 100;
-  background-color: $ic-brand-global-nav-bgd;
+  background-color: $sm-brand-dark;
+  transition-duration: .24s;
+  transition-property: width;
+  transition-timing-function: ease-in-out;
 }
 
 .ic-app-header__main-navigation {
   box-sizing: border-box;
   flex: 1 0 auto;
+  overflow: hidden;
 }
 
 .ic-app-header__secondary-navigation {
@@ -69,16 +72,16 @@ $ic-tooltip-arrow-size: 0.375rem;
 
 .ic-app-header__menu-list {
   @include reset-list;
+  width: 200px;
 }
 
 li.ic-app-header__menu-list-item {
   box-sizing: border-box;
-  overflow: hidden;
   margin-bottom: 10px;
 
   &.ic-app-header__menu-list-item--active {
     .ic-app-header__menu-list-link {
-      background: $ic-brand-white;
+      background: $sm-gray-6;
       display: block;
       overflow: hidden;
 
@@ -94,7 +97,7 @@ li.ic-app-header__menu-list-item {
       }
     }
     .ic-icon-svg {
-      fill: $ic-brand-global-nav-ic-icon-svg-fill--active;
+      fill: #F5F5F6;
     }
     .ic-avatar {
       border-color: $ic-border-light;
@@ -103,7 +106,7 @@ li.ic-app-header__menu-list-item {
       }
     }
     .menu-item-icon-container {
-      color: $ic-brand-global-nav-ic-icon-svg-fill--active;
+      color: #F5F5F6;
 
       .menu-item__badge {
         @include primary-nav-badge-border($ic-color-light);
@@ -241,23 +244,7 @@ button.ic-app-header__menu-list-link {
 }
 
 .menu-item__text {
-  // set up properties to transition on hover/focus
-  transform: translate3d(-100%,0,0);
-  opacity: 0;
-
-  pointer-events: none;
-  box-sizing: border-box;
-  background-color: $ic-brand-global-nav-ic-icon-svg-fill--active;
-  position: absolute;
-  left: 100%;
-  top: 50%;
   padding: 0 $ic-sp;
-  line-height: 1.8rem;
-  margin-top: -0.9rem;
-  @include fontSize($ic-font-size--xsmall);
-  border-radius: $ic-border-radius / 2;
-  color: $ic-color-light;
-  white-space: nowrap;
 
   // this class is added after a 1s delay because the
   // transitions look weird when the nav is being closed
@@ -302,7 +289,7 @@ button.ic-app-header__menu-list-link {
   width: 100%;
   background-color: $sm-brand-dark;
   box-sizing: border-box;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 
   @if $ic-brand-header-image != $ic-logomark-url {
     padding: 0;
@@ -311,7 +298,7 @@ button.ic-app-header__menu-list-link {
     padding: 0 $ic-sp/2;
 
     body.primary-nav-expanded & {
-      padding: 20px $ic-sp + 2;
+      padding: 24px $ic-sp/2;
     }
   }
   padding: 0;
@@ -320,11 +307,11 @@ button.ic-app-header__menu-list-link {
 .ic-app-header__logomark {
   display: block;
   width: 100%;
-  height: 70px;
+  height: 64px;
   overflow: hidden;
-  margin: 0 auto 20px auto;
+  margin: 0 auto;
   background-image: $ic-brand-header-image;
-  background-position: 50%;
+  background-position: center;
   background-repeat: no-repeat;
   background-size: contain;
   transition: transform 0.3s;
@@ -368,9 +355,6 @@ body.primary-nav-expanded {
       @if $use_high_contrast {
         color: var(--ic-link-color);
       }
-      @else {
-        color: $ic-brand-global-nav-menu-item__text-color--active;
-      }
     }
   }
 
@@ -393,27 +377,17 @@ body.primary-nav-expanded {
   }
 
   .menu-item__text {
-    transition: none;
-    position: static;
     float: left;
-    transform: none;
     text-transform: uppercase;
-    font-weight: 500;
-    font-family: $ic-font-family;
     opacity: 1;
-    text-align: left;
-    display: block;
-    line-height: 1.4;
+    line-height: normal;
     border-radius: 0;
-    margin: 5px 0 0 10px;
-    padding: 0;
-    background: transparent;
+    margin: 5px 0 0 0;
     color: $ic-brand-global-nav-menu-item__text-color;
-    white-space: normal;
-    word-wrap: break-word;
-    padding-left: 0.25rem;
-    padding-right: 0.25rem;
     font-size: 16px;
+    transition-duration: .24s;
+    transition-property: opacity;
+    transition-timing-function: ease-in;
 
     &::after {
       display: none;
@@ -444,22 +418,22 @@ body.primary-nav-expanded {
   overflow-x: hidden;
   width: $ic-sp*28;
   top: 0; bottom: 0;
-  left: $ic-header-primary-width - 30;
+  left: $ic-header-primary-width;
+  transform: translateX($ic-header-primary-width);
+  transition-duration: .24s;
+  transition-property: left, opacity, transform;
+  transition-timing-function: ease-in-out;
+
   @if $use_high_contrast == false {
     &:focus { outline: none; }
-  }
-  body.primary-nav-expanded & {
-    left: $ic-header-primary-width;
   }
 }
 
 .ReactTray__Content--after-open {
-  transition: transform 0.2s ease-out;
-  transform: translate3d(0,0,0);
+    transform: translate3d(0,0,0);
 }
 
 .ReactTray__Content--before-close {
-  transition: all 0.2s ease-in;
   transform: translate3d(-100%,0,0);
   opacity: 0;
 }

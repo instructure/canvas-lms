@@ -24,8 +24,9 @@
     padding: 0;
     > li {
       display: inline-block;
+      font-family: 'Montserrat', sans-serif;
       font-size: .875rem;
-      font-weight: 300;
+      font-weight: 400;
       white-space: nowrap;
       vertical-align: middle;
       // temporary solution for new styles before crumbs are re-done:

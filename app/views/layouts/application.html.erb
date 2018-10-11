@@ -77,10 +77,7 @@
   load_blueprint_courses_ui
 -%>
 <%= render :partial => "layouts/head" %>
-<body
-  class="<%= (@body_classes).uniq.join(" ") %>"
-  <% if @distraction_free %> style="display:none;" <% end %>
->
+<body class="<%= (@body_classes).uniq.join(' ') %> hide-interface">
 <%if @real_current_user && @real_current_user != @current_user %>
   <div class="screenreader-only">
     <% if @current_user.fake_student? %>

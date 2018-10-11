@@ -1,8 +1,8 @@
 #distractionFreeToggle {
-    background-color: #33373F;
+    background-color: #212329;
     border-radius: 4px;
     bottom: 0;
-    height: 48px;
+    height: 38px;
     line-height: 0;
     margin: auto auto 24px;
     padding: 2px;
@@ -13,23 +13,38 @@
 
     i {
         color: #F5F5F6;
+        transition-duration: .24s;
+        transition-property: color;
+        transition-timing-function: ease-in;
 
         &::before {
             font-size: 1.2rem;
         }
     }
-}
 
-#header {
-    transform: translateX(0);
-    transition-duration: .24s;
-    transition-property: transform;
-    transition-timing-function: ease-in;
+    &:hover {
+
+        i {
+            color: #FDB414;
+        }
+    }
 }
 
 hr.sm-divider {
     border: none;
-    border-bottom: 1px #B4B6B9 solid;
+    border-bottom: 1px #454950 solid;
     margin: 12px auto;
     max-width: calc(100% - 24px);
+}
+
+body {
+    opacity: 1;
+    transition-property: opacity;
+    transition-delay: .48s;
+    transition-duration: .24s;
+    transition-timing-function: ease-in;
+
+    &.hide-interface {
+        opacity: 0;
+    }
 }
