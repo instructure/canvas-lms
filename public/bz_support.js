@@ -77,6 +77,19 @@ function expandCohortMagicFields(ele) {
 	}
 }
 
+var magicFieldsSaveInProgress = 0;
+var delayedMagicFieldSaves = 0;
+
+window.addEventListener("beforeunload", function(event) {
+  if(magicFieldsSaveInProgress > 0) {
+    event.preventDefault();
+    event.returnValue = 'Your work is not fully saved yet! Give it a few more seconds to finish before you leave.';
+  } else if(delayedMagicFieldSaves > 0) {
+    event.preventDefault();
+    event.returnValue = 'Your work is not fully saved yet! Work through to the "Next" button before you leave.';
+  }
+});
+
 function bzRetainedInfoSetup(readonly) {
   function lockRelatedCheckboxes(el) {
     // or if we are a graded checkbox, disable other graded checkboxes inside the same bz-box since they are all related
@@ -198,6 +211,7 @@ function bzRetainedInfoSetup(readonly) {
         };
 
 	var actualSave = function() {
+		magicFieldsSaveInProgress += 1;
 		if(el.type == "file") {
 			// upload first, then set the magic field to the URL
 			var http = new XMLHttpRequest();
@@ -270,11 +284,13 @@ function bzRetainedInfoSetup(readonly) {
           if(p) {
             var btn = p.querySelector(".bz-toggle-all-next");
             var wrapper = function() {
+	      delayedMagicFieldSaves -= 1;
               actualSave();
               btn.removeEventListener("click", wrapper);
               window.bzQueuedListeners[name] = null;
             };
             if(btn) {
+	      delayedMagicFieldSaves += 1;
               if(window.bzQueuedListeners[name])
                 btn.removeEventListener("click", window.bzQueuedListeners[name]);
               btn.addEventListener("click", wrapper);
@@ -740,6 +756,9 @@ function BZ_SaveMagicField(field_name, field_value, optional, type, answer, weig
           if(lateWarning)
             lateWarning.style.display = "";
         }
+
+	if(magicFieldsSaveInProgress > 0)
+		magicFieldsSaveInProgress -= 1;
       }
     }
   };

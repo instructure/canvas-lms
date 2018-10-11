@@ -294,6 +294,20 @@ class BzController < ApplicationController
       i += 1
     end
 
+    if @is_staff
+      @if_on_time_score = 0.0
+      @response_object["audit_trace"].each do |at|
+        #results << "#{at["points_given"]} #{at["points_amount"]} #{at["points_possible"]} via #{at["points_reason"]}"
+        # if at["points_amount"] == at["points_amount_if_on_time"]
+        if at["points_amount"] != 0
+          @if_on_time_score += at["points_amount"]
+        elsif at["points_reason"] == "past_due"
+          @if_on_time_score += at["points_possible"] # allow for past due
+        end
+      end
+    end
+
+
     cm = bzg.get_context_module(module_item_id)
     submission = bzg.get_participation_assignment(cm.course, cm).find_or_create_submission(user)
     @gradebook_grade = submission.nil? ? nil : submission.grade

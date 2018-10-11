@@ -78,3 +78,40 @@
   padding: 0.25em;
   padding-top: 0.5em;
 }
+
+/*
+ The point of this is to hide the element for a while until the scripts get a chance to run,
+ so it doesn't freak out students by flashing it for a while.
+
+ Supported browsers will support this fancy feature too, so by the time the script cancels
+ the alarm, the animation will not even roll it in.
+
+ Unsupported browsers will show it (at worst, after a few seconds, hopefully immediately),
+ even if javascript totally fails.
+
+ {
+*/
+@keyframes nonSupportedBrowserAnimation {
+  0% {
+    transform: translateX(-400%);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
+#bz-non-supported-browser {
+  position: fixed;
+  z-index: 1000;
+  top: 6em;
+  width: 400px;
+  background: yellow;
+  color: black;
+  padding: 2em;
+  margin: 0px auto;
+
+  animation: 15s ease-in 0s 1 nonSupportedBrowserAnimation;
+}
+
+/* } done with the above */
