@@ -50,7 +50,7 @@ export default class GradeChangeLoggingContentView extends Backbone.View {
       // Hack: trick Babel/TypeScript into allowing this before super.
       if (false) { super(); }
       let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.indexOf(';')).trim();
+      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
       eval(`${thisName} = this;`);
     }
     this.fetch = this.fetch.bind(this)
