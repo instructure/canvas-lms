@@ -4,12 +4,11 @@
     bottom: 0;
     height: 48px;
     line-height: 0;
-    margin: auto;
+    margin: auto auto 24px;
     padding: 2px;
     position: absolute;
     right: -24px;
     text-align: right;
-    top: 0;
     width: 48px;
 
     i {
@@ -26,4 +25,11 @@
     transition-duration: .24s;
     transition-property: transform;
     transition-timing-function: ease-in;
+}
+
+hr.sm-divider {
+    border: none;
+    border-bottom: 1px #B4B6B9 solid;
+    margin: 12px auto;
+    max-width: calc(100% - 24px);
 }
