@@ -47,6 +47,7 @@ module.exports = {
     "no-cond-assign": ["warn", "except-parens"],
     "no-else-return": [0],
     "no-nested-ternary": "off",
+    'no-param-reassign': 'off',
     "no-plusplus": [0],
     'no-prototype-builtins': 'off',
     "no-restricted-syntax": [
