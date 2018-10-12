@@ -3102,8 +3102,8 @@ fr:
         originality_report_visible_immediately: Immédiatement
         settings_exclude_fewer_than_count: "Moins de %{wordsInput} mots"
         settings_exclude_less_than_percent: "Moins de %{percentInput} du document"
-    undated_assignments: "Tâches non datés"
-    upcoming_assignments: "Prochains tâches"
+    undated_assignments: "Tâches non datées"
+    upcoming_assignments: "Prochaines tâches"
     veri_cite_settings_dialog: 
       buttons: 
         update_settings: "Mettre à jour les paramètres"
