@@ -322,6 +322,26 @@ module Lti
             expect(subject.first['enabled']).to be false
           end
 
+          it 'is not installed in a course' do
+            expect(subject.first['installed_in_current_course']).to eq false
+          end
+
+          context 'when a tool is installed in a course' do
+            let(:tool) { ContextExternalTool.first }
+            let(:course) { course_model(account: tool.account) }
+
+            before do
+              tool.context = course
+              tool.use_1_3 = true
+              tool.developer_key = dev_key
+              tool.save!
+            end
+
+            it 'is installed in a course' do
+              expect(subject.first['installed_in_current_course']).to eq true
+            end
+          end
+
           context 'with a deleted tool in context chain' do
             before do
               tool = ContextExternalTool.first

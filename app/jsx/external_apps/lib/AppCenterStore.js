@@ -192,7 +192,11 @@ import 'compiled/jquery.rails_flash_notifications'
     return (value) => {
       const oldTools = this.getState().lti13Tools
       const installedToolIndex = oldTools.findIndex((tool) => tool.app_id === developerKeyId)
-      const tool = Object.assign({}, oldTools[installedToolIndex], {installed_locally: value, enabled: value})
+      const tool = Object.assign(
+        {},
+        oldTools[installedToolIndex],
+        {installed_locally: value, enabled: value, installed_in_current_course: true}
+      )
       const lti13Tools = oldTools.slice()
       lti13Tools.splice(installedToolIndex, 1, tool)
       this.setState({lti13Tools})

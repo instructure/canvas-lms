@@ -54,7 +54,7 @@ const defaultApps = () => [
   }
 ]
 
-function newProps(overrides) {
+function newProps(overrides, contextType = 'Account') {
   return {
     store: {
       getState: () => ({
@@ -66,7 +66,8 @@ function newProps(overrides) {
       installTool: jest.fn(),
       removeTool: jest.fn(),
       fetch13Tools: jest.fn()
-    }
+    },
+    contextType
   }
 }
 
@@ -95,6 +96,24 @@ it('renders correct number of checked checkboxes', () => {
   wrapper = mount(<Lti13Apps {...props} />)
 
   expect(wrapper.find('Checkbox').filterWhere(c => c.prop('checked'))).toHaveLength(2)
+})
+
+it('enables the checkbox when tool is installed in account', () => {
+  const props = newProps({})
+  wrapper = mount(<Lti13Apps {...props} />)
+  expect(wrapper.instance().isDisabled({enabled: true, installed_in_current_course: false})).not.toBeTruthy()
+})
+
+it('enables the checkbox when context is course and tool is installed in course', () => {
+  const props = newProps({}, 'course')
+  wrapper = mount(<Lti13Apps {...props} />)
+  expect(wrapper.instance().isDisabled({enabled: true, installed_in_current_course: true})).not.toBeTruthy()
+})
+
+it('disables the checkbox when context is course and tool is not in course', () => {
+  const props = newProps({}, 'course')
+  wrapper = mount(<Lti13Apps {...props} />)
+  expect(wrapper.instance().isDisabled({enabled: true, installed_in_current_course: false})).toBeTruthy()
 })
 
 it('calls install tool on unchecked checkbox click', () => {

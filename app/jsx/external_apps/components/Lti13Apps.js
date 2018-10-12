@@ -30,7 +30,8 @@ export default class Lti13Apps extends React.Component {
       filteredApps: PropTypes.func,
       installTool: PropTypes.func,
       removeTool: PropTypes.func
-    }).isRequired
+    }).isRequired,
+    contextType: PropTypes.string.isRequired
   }
 
   componentWillMount () {
@@ -52,6 +53,11 @@ export default class Lti13Apps extends React.Component {
     return this.props.store.getState()
   }
 
+  isDisabled({enabled, installed_in_current_course}) {
+    const { contextType } = this.props
+    return enabled && !installed_in_current_course && contextType === 'course'
+  }
+
   renderLti13Tool (tool) {
     return (
       <tr key={tool.app_id}>
@@ -71,6 +77,7 @@ export default class Lti13Apps extends React.Component {
             variant="toggle"
             checked={tool.enabled}
             onChange={this.onAppToggle(tool)}
+            disabled={this.isDisabled(tool)}
           />
         </td>
       </tr>

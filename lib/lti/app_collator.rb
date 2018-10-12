@@ -63,6 +63,7 @@ module Lti
         description: config[:settings]['description'],
         installed_locally: tool_configuration[:enabled],
         enabled: tool_configuration[:enabled],
+        installed_in_current_course: tool_configuration[:installed_in_current_course],
         tool_configuration: nil,
         context: 'Account',
         context_id: config.developer_key.account_id,
