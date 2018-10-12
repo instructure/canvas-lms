@@ -1401,7 +1401,7 @@ describe MasterCourses::MasterMigration do
       tag2 = mod.add_item(type: 'context_module_sub_header', title: 'header2')
 
       run_master_migration
-      
+
       tag1_to = @copy_to.context_module_tags.where(:migration_id => mig_id(tag1)).first
       tag2_to = @copy_to.context_module_tags.where(:migration_id => mig_id(tag2)).first
       expect(tag1_to.position).to eq 1
@@ -1412,7 +1412,7 @@ describe MasterCourses::MasterMigration do
         mod.touch
       end
       run_master_migration
-      
+
       expect(tag1_to.reload.position).to eq 2
       expect(tag2_to.reload.position).to eq 1
     end
@@ -1505,6 +1505,30 @@ describe MasterCourses::MasterMigration do
       student2 = user_factory
       sub = quiz_to.generate_submission(student2)
       expect(sub.quiz_data.first["question_text"]).to eq new_text
+    end
+
+    it "preserves assessment question links for quiz question re-import" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+
+      bank = @copy_from.assessment_question_banks.create!(:title => 'bank')
+      data = {'question_name' => 'test question', 'question_type' => 'essay_question', 'question_text' => "text"}
+      aq = bank.assessment_questions.create!(:question_data => data)
+      quiz = @copy_from.quizzes.create!(:title => 'quiz')
+      qq = quiz.quiz_questions.create!(:question_data => data, :assessment_question => aq)
+      quiz.publish!
+
+      run_master_migration
+
+      quiz_to = @copy_to.quizzes.where(migration_id: mig_id(quiz)).first
+      qq_to = quiz_to.quiz_questions.first
+      aq_to = @copy_to.assessment_questions.first
+      expect(qq_to.assessment_question).to eq aq_to
+
+      Quizzes::Quiz.where(:id => quiz).update_all(:updated_at => 2.minutes.from_now) # sync just the quiz
+
+      run_master_migration
+      expect(qq_to.reload.assessment_question).to eq aq_to # should leave unchanged
     end
 
     it "syncs quiz_groups with points locked" do
