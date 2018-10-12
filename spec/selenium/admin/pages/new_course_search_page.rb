@@ -34,8 +34,8 @@ module NewCourseSearchPage
     fj("[data-automation='courses list'] tr:contains('#{course_name}') button:has([name='IconPlus'])")
   end
 
-  def course_teacher_link(teacher_name)
-    ff("[data-automation='courses list'] tr").first.find("a[href='#{user_url(teacher_name)}']")
+  def course_teacher_link(teacher)
+    ff("[data-automation='courses list'] tr").first.find("a[href='#{user_url(teacher)}']")
   end
 
   def course_page_link(course_name)
@@ -58,6 +58,18 @@ module NewCourseSearchPage
     f('#left-side #section-tabs')
   end
 
+  def results_row_css
+    '[data-automation="courses list"] tr'
+  end
+
+  def results_rows
+    ff(results_row_css)
+  end
+
+  def hide_courses_without_students
+    fj('label:contains("Hide courses without students")')
+  end
+
   # ---------------------- Actions ----------------------
   def click_add_user_button(course_name)
     add_user_button(course_name).click
@@ -71,5 +83,9 @@ module NewCourseSearchPage
 
   def click_course_link(course_name)
     course_page_link(course_name).click
+  end
+
+  def click_hide_courses_without_students
+    hide_courses_without_students.click
   end
 end

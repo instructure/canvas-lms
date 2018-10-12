@@ -57,17 +57,17 @@ describe "new account course search" do
     not_empty_course = course_factory(:account => @account, :course_name => "yess enrollments", :active_all => true)
     student_in_course(:course => not_empty_course, :active_all => true)
 
-    get "/accounts/#{@account.id}"
+    visit_courses(@account)
 
-    rows = get_rows
+    rows = results_rows
     expect(rows.count).to eq 2
     expect(rows[0]).to include_text(empty_course.name)
     expect(rows[1]).to include_text(not_empty_course.name)
 
-    fj('label:contains("Hide courses without students")').click
+    click_hide_courses_without_students
     wait_for_loading_to_disappear
 
-    rows = get_rows
+    rows = results_rows
     expect(rows.count).to eq 1
     expect(rows[0]).to include_text(not_empty_course.name)
     expect(rows[0]).not_to include_text(empty_course.name)
