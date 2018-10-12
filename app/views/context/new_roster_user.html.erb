@@ -136,7 +136,7 @@
             </td>
             <td style="width: 70px;">
               <div>
-                <% if enrollment.defined_by_sis? %>
+                <% if enrollment.defined_by_sis? && !@context.grants_any_right?(@current_user, session, :manage_account_settings, :manage_sis) %>
                   <a href="#" title="<%= t('links.title.enrollment_sis_defined', %{This enrollment was defined by the university, and can't be deleted}) %>"><%= t('links.cant_delete', %{Can't Delete}) %></a>
                 <% else %>
                   <a class="delete_enrollment_link" href="<%= context_url(@context, :context_unenroll_url, enrollment.id) %>"><%= t('links.delete_enrollment', %{Delete}) %></a>

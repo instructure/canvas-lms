@@ -263,14 +263,14 @@ module Api::V1::User
       json[:user] = user_json(enrollment.user, user, session, user_includes, @context, nil, []) if includes.include?(:user)
       if includes.include?('locked')
         lockedbysis = enrollment.defined_by_sis?
-        lockedbysis &&= !enrollment.course.account.grants_right?(@current_user, session, :manage_account_settings)
+        lockedbysis &&= !enrollment.course.account.grants_any_right?(@current_user, session, :manage_account_settings, :manage_sis)
         json[:locked] = lockedbysis
       end
       if includes.include?('observed_users') && enrollment.observer? && enrollment.associated_user && !enrollment.associated_user.deleted?
         json[:observed_user] = user_json(enrollment.associated_user, user, session, user_includes, @context, enrollment.associated_user.not_ended_enrollments.all_student.shard(enrollment).where(:course_id => enrollment.course_id))
       end
       if includes.include?('can_be_removed')
-        json[:can_be_removed] = (!enrollment.defined_by_sis? || context.grants_right?(@current_user, session, :manage_account_settings)) &&
+        json[:can_be_removed] = (!enrollment.defined_by_sis? || context.grants_any_right?(@current_user, session, :manage_account_settings, :manage_sis)) &&
                                   enrollment.can_be_deleted_by(@current_user, @context, session)
       end
     end

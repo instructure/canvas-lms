@@ -1911,7 +1911,7 @@ class CoursesController < ApplicationController
     get_context
     @enrollment = @context.enrollments.find(params[:id])
     if @enrollment.can_be_deleted_by(@current_user, @context, session)
-      if (!@enrollment.defined_by_sis? || @context.grants_right?(@current_user, session, :manage_account_settings)) && @enrollment.destroy
+      if (!@enrollment.defined_by_sis? || @context.grants_any_right?(@current_user, session, :manage_account_settings, :manage_sis)) && @enrollment.destroy
         render :json => @enrollment
       else
         render :json => @enrollment, :status => :bad_request
@@ -2011,7 +2011,7 @@ class CoursesController < ApplicationController
     @enrollment = @context.enrollments.find(params[:id])
     can_move = [StudentEnrollment, ObserverEnrollment].include?(@enrollment.class) && @context.grants_right?(@current_user, session, :manage_students)
     can_move ||= @context.grants_right?(@current_user, session, :manage_admin_users)
-    can_move &&= @context.grants_right?(@current_user, session, :manage_account_settings) if @enrollment.defined_by_sis?
+    can_move &&= @context.grants_any_right?(@current_user, session, :manage_account_settings, :manage_sis) if @enrollment.defined_by_sis?
     if can_move
       respond_to do |format|
         # ensure user_id,section_id,type,associated_user_id is unique (this
