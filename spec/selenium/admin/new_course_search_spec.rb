@@ -18,10 +18,12 @@
 require_relative '../common'
 require_relative 'pages/new_course_search_page.rb'
 require_relative 'pages/new_course_add_people_modal.rb'
+require_relative 'pages/course_page.rb'
 
 describe "new account course search" do
   include NewCourseSearchPage
   include NewCourseAddPeopleModal
+  include CourseHomePage
 
   include_context "in-process server selenium tests"
 
@@ -124,11 +126,10 @@ describe "new account course search" do
     named_course = course_factory(:account => @account, :course_name => "named_course")
     named_course.default_view = 'feed'
     named_course.save
-    get "/accounts/#{@account.id}"
+    visit_courses(@account)
 
-    fj("[data-automation='courses list'] tr a:contains(#{named_course.name})").click
-    wait_for_ajax_requests
-    expect(f("#content h2")).to include_text named_course.name
+    click_course_link(named_course.name)
+    expect(course_header).to include_text named_course.name
   end
 
   it "should search but not find bogus course", priority: "1", test_id: 3415214 do
