@@ -48,8 +48,8 @@ describe "new account course search" do
   it "should not show the courses tab without permission" do
     @account.role_overrides.create! :role => admin_role, :permission => 'read_course_list', :enabled => false
 
-    get "/accounts/#{@account.id}"
-    expect(f("#left-side #section-tabs")).not_to include_text("Courses")
+    visit_courses(@account)
+    expect(left_navigation).not_to include_text("Courses")
   end
 
   it "should hide courses without enrollments if checked", test_id: 3454769, priority: 1 do

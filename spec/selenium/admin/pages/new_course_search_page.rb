@@ -54,6 +54,10 @@ module NewCourseSearchPage
     "[data-automation='courses list'] tr"
   end
 
+  def left_navigation
+    f('#left-side #section-tabs')
+  end
+
   # ---------------------- Actions ----------------------
   def click_add_user_button(course_name)
     add_user_button(course_name).click
