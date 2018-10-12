@@ -104,7 +104,7 @@
 #bz-non-supported-browser {
   position: fixed;
   z-index: 1000;
-  top: 6em;
+  font-size: 16px;
   width: 400px;
   background: yellow;
   color: black;
