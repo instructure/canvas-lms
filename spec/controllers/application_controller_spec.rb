@@ -26,7 +26,8 @@ RSpec.describe ApplicationController do
       host: "www.example.com",
       headers: {},
       format: double(:html? => true),
-      user_agent: nil
+      user_agent: nil,
+      remote_ip: '0.0.0.0'
     )
     allow(controller).to receive(:request).and_return(request_double)
   end
@@ -316,12 +317,6 @@ RSpec.describe ApplicationController do
       acct.default_locale = "es"
       acct.save!
       controller.instance_variable_set(:@domain_root_account, acct)
-      req = double()
-
-      allow(req).to receive(:host).and_return('www.example.com')
-      allow(req).to receive(:headers).and_return({})
-      allow(req).to receive(:format).and_return(double(:html? => true))
-      allow(controller).to receive(:request).and_return(req)
       controller.send(:assign_localizer)
       I18n.set_locale_with_localizer # this is what t() triggers
       expect(I18n.locale.to_s).to eq "es"
@@ -970,6 +965,7 @@ describe ApplicationController do
       {
         hostname: 'test.host',
         user_agent: 'Rails Testing',
+        client_ip: '0.0.0.0',
         producer: 'canvas'
       }
     end
