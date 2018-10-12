@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe SectionsController, type: :request do
   describe '#index' do
-    let(:user_api_fields) { %w(id name sortable_name short_name) }
+    let(:user_api_fields) {%w(id name sortable_name short_name created_at)}
 
     before :once do
       course_with_teacher(:active_all => true, :user => user_with_pseudonym(:name => 'UWP'))
@@ -171,7 +171,8 @@ describe SectionsController, type: :request do
           'restrict_enrollments_to_section_dates' => nil,
           'integration_id' => nil,
           'sis_course_id' => nil,
-          'sis_section_id' => nil
+          'sis_section_id' => nil,
+          'created_at' => @section.created_at.iso8601
         })
       end
 
@@ -206,7 +207,8 @@ describe SectionsController, type: :request do
           'restrict_enrollments_to_section_dates' => nil,
           'integration_id' => nil,
           'sis_course_id' => nil,
-          'sis_section_id' => 'my_section'
+          'sis_section_id' => 'my_section',
+          'created_at' => @section.created_at.iso8601
         })
       end
 
@@ -236,7 +238,8 @@ describe SectionsController, type: :request do
           'restrict_enrollments_to_section_dates' => nil,
           'integration_id' => nil,
           'sis_course_id' => nil,
-          'sis_section_id' => nil
+          'sis_section_id' => nil,
+          'created_at' => @section.created_at.iso8601
         })
       end
 
@@ -253,7 +256,8 @@ describe SectionsController, type: :request do
           'restrict_enrollments_to_section_dates' => nil,
           'integration_id' => nil,
           'sis_course_id' => nil,
-          'sis_section_id' => 'my_section'
+          'sis_section_id' => 'my_section',
+          'created_at' => @section.created_at.iso8601
         })
       end
 
@@ -270,7 +274,8 @@ describe SectionsController, type: :request do
             'restrict_enrollments_to_section_dates' => nil,
             'integration_id' => 'my_section',
             'sis_course_id' => nil,
-            'sis_section_id' => nil
+            'sis_section_id' => nil,
+          'created_at' => @section.created_at.iso8601
         })
       end
 
@@ -301,7 +306,8 @@ describe SectionsController, type: :request do
           'nonxlist_course_id' => nil,
           'start_at' => nil,
           'end_at' => nil,
-          'restrict_enrollments_to_section_dates' => nil
+          'restrict_enrollments_to_section_dates' => nil,
+          'created_at' => @section.created_at.iso8601
         })
       end
     end

@@ -83,11 +83,12 @@ describe "Admins API", type: :request do
                            "role" => admin.role.name,
                            "user" => {
                              "id" => @new_user.id,
+                             "created_at" => @new_user.created_at.iso8601,
                              "name" => @new_user.name,
                              "short_name" => @new_user.short_name,
-                             "sis_user_id"=>nil,
-                             "integration_id"=>nil,
-                             "sis_import_id"=>nil,
+                             "sis_user_id" => nil,
+                             "integration_id" => nil,
+                             "sis_import_id" => nil,
                              "sortable_name" => @new_user.sortable_name,
                              "login_id" => "user",
                            },
@@ -282,12 +283,13 @@ describe "Admins API", type: :request do
                                     "role_id" => admin_role.id,
                                     "user" =>
                                       {"id" => @admin.id,
+                                       "created_at" => @admin.created_at.iso8601,
                                        "name" => @admin.name,
                                        "sortable_name" => @admin.sortable_name,
                                        "short_name" => @admin.short_name,
-                                       "sis_user_id"=>nil,
-                                       "integration_id"=>nil,
-                                       "sis_import_id"=>nil,
+                                       "sis_user_id" => nil,
+                                       "integration_id" => nil,
+                                       "sis_import_id" => nil,
                                        "login_id" => @admin.pseudonym.unique_id},
                                     "workflow_state" => 'active'})
       end
@@ -299,12 +301,13 @@ describe "Admins API", type: :request do
                              "role_id" => admin_role.id,
                              "user" =>
                                {"id" => @admin.id,
+                                "created_at" => @admin.created_at.iso8601,
                                 "name" => @admin.name,
                                 "sortable_name" => @admin.sortable_name,
                                 "short_name" => @admin.short_name,
-                                "sis_user_id"=>nil,
-                                "integration_id"=>nil,
-                                "sis_import_id"=>nil,
+                                "sis_user_id" => nil,
+                                "integration_id" => nil,
+                                "sis_import_id" => nil,
                                 "login_id" => @admin.pseudonym.unique_id},
                              "workflow_state" => 'active'}]
       end
@@ -316,12 +319,13 @@ describe "Admins API", type: :request do
                              "role_id" => admin_role.id,
                              "user" =>
                                {"id" => @admin.id,
+                                "created_at" => @admin.created_at.iso8601,
                                 "name" => @admin.name,
                                 "sortable_name" => @admin.sortable_name,
                                 "short_name" => @admin.short_name,
-                                "sis_user_id"=>nil,
-                                "integration_id"=>nil,
-                                "sis_import_id"=>nil,
+                                "sis_user_id" => nil,
+                                "integration_id" => nil,
+                                "sis_import_id" => nil,
                                 "login_id" => @admin.pseudonym.unique_id},
                              "workflow_state" => 'active'},
                             {"id" => @another_admin.account_users.first.id,
@@ -329,11 +333,12 @@ describe "Admins API", type: :request do
                              "role_id" => @roles[1].id,
                              "user" =>
                                {"id" => @another_admin.id,
+                                "created_at" => @another_admin.created_at.iso8601,
                                 "name" => @another_admin.name,
                                 "sortable_name" => @another_admin.sortable_name,
-                                "sis_user_id"=>nil,
-                                "integration_id"=>nil,
-                                "sis_import_id"=>nil,
+                                "sis_user_id" => nil,
+                                "integration_id" => nil,
+                                "sis_import_id" => nil,
                                 "short_name" => @another_admin.short_name},
                              "workflow_state" => 'active'}]
       end

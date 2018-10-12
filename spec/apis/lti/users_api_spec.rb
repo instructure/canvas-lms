@@ -62,6 +62,7 @@ module Lti
       let(:expected_student) do
         {
           "id" => student.id,
+          "created_at" => @student.created_at.iso8601,
           "name" => student.name,
           "sortable_name" => student.sortable_name,
           "short_name" => student.short_name,

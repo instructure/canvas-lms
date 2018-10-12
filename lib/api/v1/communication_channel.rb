@@ -32,8 +32,9 @@ module Api::V1::CommunicationChannel
   #   :position
   #   :user_id
   #   :workflow_state
+  #   :created_at
   def communication_channel_json(channel, current_user, session)
-    only = %w{ id path_type position workflow_state user_id }
+    only = %w{ id path_type position workflow_state user_id created_at }
     # Uses the method "path_description" instead of the field "path" because
     # when path_type is twitter or yo, it goes and fetches tha user's account
     # name with a fallback display value.
@@ -55,7 +56,7 @@ module Api::V1::CommunicationChannel
     api_json(channel, current_user, session, only: only, methods: methods).tap do |json|
       # Rename attributes for mass-consumption
       json[:address] = json.delete(:path_description)
-      json[:type]    = json.delete(:path_type)
+      json[:type] = json.delete(:path_type)
     end
   end
 

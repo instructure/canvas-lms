@@ -24,7 +24,8 @@ module Api::V1::Pseudonym
                              :unique_id,
                              :sis_user_id,
                              :integration_id,
-                             :authentication_provider_id].freeze
+                             :authentication_provider_id,
+                             :created_at].freeze
 
   def pseudonym_json(pseudonym, current_user, session)
     opts = API_PSEUDONYM_JSON_OPTS
