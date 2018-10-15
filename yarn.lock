@@ -17506,7 +17506,7 @@ timers-ext@0.1, timers-ext@^0.1.5:
     es5-ext "~0.10.46"
     next-tick "1"
 
-timezone@^1.0.13:
+timezone@^1.0.18:
   version "1.0.18"
   resolved "https://registry.yarnpkg.com/timezone/-/timezone-1.0.18.tgz#683ec740f51fb242ad72788d81e8c888797cf812"
   integrity sha512-iUauLPXDdDhXcP3UPAYf8TxAahnvA6fIFfdo5iFJ1bnXdZmakIMRG6XzE2EJzFWq6dYnWY9jJwpbyBrpmwHRFQ==
