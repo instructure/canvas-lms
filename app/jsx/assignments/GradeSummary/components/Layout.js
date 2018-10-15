@@ -63,9 +63,7 @@ class Layout extends Component {
   }
 
   componentDidMount() {
-    if (this.props.graders.length) {
-      this.props.loadStudents()
-    }
+    this.props.loadStudents()
   }
 
   render() {
@@ -77,44 +75,40 @@ class Layout extends Component {
 
         <Header />
 
-        {this.props.graders.length > 0 && (
-          <View as="div" margin="large 0 0 0">
-            {this.props.students.length > 0 ? (
-              <GradesGrid
-                anonymousStudents={!this.props.canViewStudentIdentities}
-                assignment={this.props.assignment}
-                disabledCustomGrade={!this.props.canEditCustomGrades}
-                finalGrader={this.props.finalGrader}
-                graders={this.props.graders}
-                grades={this.props.provisionalGrades}
-                onGradeSelect={onGradeSelect}
-                selectProvisionalGradeStatuses={this.props.selectProvisionalGradeStatuses}
-                students={this.props.students}
-              />
-            ) : (
-              <Spinner title={I18n.t('Students are loading')} />
-            )}
-          </View>
-        )}
+        <View as="div" margin="large 0 0 0">
+          {this.props.students.length > 0 ? (
+            <GradesGrid
+              anonymousStudents={!this.props.canViewStudentIdentities}
+              assignment={this.props.assignment}
+              disabledCustomGrade={!this.props.canEditCustomGrades}
+              finalGrader={this.props.finalGrader}
+              graders={this.props.graders}
+              grades={this.props.provisionalGrades}
+              onGradeSelect={onGradeSelect}
+              selectProvisionalGradeStatuses={this.props.selectProvisionalGradeStatuses}
+              students={this.props.students}
+            />
+          ) : (
+            <Spinner title={I18n.t('Students are loading')} />
+          )}
+        </View>
       </div>
     )
   }
 }
 
 function mapStateToProps(state) {
-  const {currentUser, finalGrader} = state.context
+  const {currentUser, finalGrader, graders} = state.context
   const {assignment} = state.assignment
+
+  const currentUserIsFinalGrader = !!finalGrader && currentUser.id === finalGrader.id
 
   return {
     assignment,
-    canEditCustomGrades: !(
-      assignment.gradesPublished ||
-      !finalGrader ||
-      currentUser.id !== finalGrader.id
-    ),
+    canEditCustomGrades: !assignment.gradesPublished && currentUserIsFinalGrader,
     canViewStudentIdentities: currentUser.canViewStudentIdentities,
     finalGrader,
-    graders: state.context.graders,
+    graders,
     provisionalGrades: state.grades.provisionalGrades,
     selectProvisionalGradeStatuses: state.grades.selectProvisionalGradeStatuses,
     students: state.students.list
