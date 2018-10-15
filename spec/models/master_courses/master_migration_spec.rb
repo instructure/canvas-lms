@@ -387,6 +387,36 @@ describe MasterCourses::MasterMigration do
       expect(aq4_to.reload).to_not be_deleted # should have been left alone
     end
 
+    it "should preserve all answer ids on re-copy" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+
+      q = @copy_from.quizzes.create!(:title => "q")
+      datas = [
+        multiple_choice_question_data,
+        true_false_question_data,
+        short_answer_question_data,
+        calculated_question_data,
+        numerical_question_data,
+        multiple_answers_question_data,
+        multiple_dropdowns_question_data,
+        matching_question_data
+      ]
+      datas.each{|d| q.quiz_questions.create!(:question_data => d)}
+
+      run_master_migration
+
+      q_to = @copy_to.quizzes.where(:migration_id => mig_id(q)).first
+      copied_answers = Hash[q_to.quiz_questions.to_a.map{|qq| [qq.id, qq.question_data.to_hash["answers"]]}]
+
+      Quizzes::Quiz.where(:id => q).update_all(:updated_at => 1.minute.from_now) # recopy
+      run_master_migration
+
+      q_to.reload.quiz_questions.to_a.each do |qq_to|
+        expect(copied_answers[qq_to.id]).to eq qq_to.question_data.to_hash["answers"] # should be unchanged
+      end
+    end
+
     it "should sync quiz group attributes (unless changed downstream)" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)

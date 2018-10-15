@@ -108,8 +108,8 @@ class ChoiceInteraction < AssessmentItemConverter
       ci.search('simpleChoice').each do |choice|
         answer = {}
         answer[:weight] = AssessmentItemConverter::DEFAULT_INCORRECT_WEIGHT
-        answer[:id] = unique_local_id
         answer[:migration_id] = choice['identifier']
+        answer[:id] = get_or_generate_answer_id(answer[:migration_id])
 
         if feedback = choice.at_css('feedbackInline')
           # weird Angel feedback
