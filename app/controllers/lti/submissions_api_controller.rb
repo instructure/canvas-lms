@@ -24,6 +24,14 @@ module Lti
 #       "id": "Submission",
 #       "description": "",
 #       "properties": {
+#         "lti_course_id": {
+#           "example": "66157096483e6b3a50bfedc6bac902c0b20a8241",
+#           "type": "string"
+#         },
+#         "course_id": {
+#           "example": 10000000000060,
+#           "type": "integer"
+#         },
 #         "assignment_id": {
 #           "description": "The submission's assignment id",
 #           "example": 23,
@@ -226,6 +234,8 @@ module Lti
       end
       attachments = submission.versioned_attachments
       sub_hash[:attachments] = attachments.map { |a| attachment_json(a) }
+      sub_hash[:course_id] = submission.assignment.context.global_id
+      sub_hash[:lti_course_id] = Lti::Asset.opaque_identifier_for(submission.assignment.context)
       sub_hash
     end
 
