@@ -1,7 +1,7 @@
 <% # evizitei: this template is used for submissions AND quiz_submissions, make sure methods used are available on both models %>
 
 <% define_content :link do %>
-  <%= polymorphic_url([asset.assignment.context, asset.assignment, :submission], id: asset.user) %>
+  <%= course_assignment_submission_url(asset.assignment.context, asset.assignment, asset.user_id) %>
 <% end %>
 
 <% define_content :subject do %>
