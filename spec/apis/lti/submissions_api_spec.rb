@@ -133,6 +133,8 @@ module Lti
                  "submission_type" => "online_upload",
                  "workflow_state" => "submitted",
                  "attempt" => 1,
+                 "course_id" => assignment.context.global_id,
+                 "lti_course_id" => Lti::Asset.opaque_identifier_for(assignment.context),
                  "attachments" =>
                    [
                      {
@@ -187,6 +189,8 @@ module Lti
                  "submission_type" => "online_upload",
                  "workflow_state" => "submitted",
                  "attempt" => 1,
+                 "course_id" => assignment.context.global_id,
+                 "lti_course_id" => Lti::Asset.opaque_identifier_for(assignment.context),
                  "attachments" =>
                    [
                      {
