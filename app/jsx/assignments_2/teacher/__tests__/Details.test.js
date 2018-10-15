@@ -17,15 +17,21 @@
  */
 
 import React from 'react'
-import { shallow } from 'enzyme'
-import { CoreTeacherView } from '../TeacherView'
+import {shallow} from 'enzyme'
+import apiUserContent from 'compiled/str/apiUserContent'
+import Details from '../Details'
 
-it('renders normally', () => {
-  const wrapper = shallow(<CoreTeacherView data={{assignment: {
-    name: 'What is the Answer?',
-    dueAt: 'The Future',
+jest.mock('compiled/str/apiUserContent')
+apiUserContent.convert = jest.fn(arg => `converted ${arg}`)
+
+it('renders and converts', () => {
+  const assignment = {
+    name: 'title',
     pointsPossible: 42,
-    description: 'an assignment',
-  }}} />)
+    dueAt: 'due',
+    description: '<p>some assignment description</p>',
+  }
+  const wrapper = shallow(<Details assignment={assignment} />)
+  // snapshot also tests that the content was converted
   expect(wrapper).toMatchSnapshot()
 })

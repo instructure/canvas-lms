@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders and converts 1`] = `
+<div
+  dangerouslySetInnerHTML={
+    Object {
+      "__html": "converted <p>some assignment description</p>",
+    }
+  }
+/>
+`;

@@ -24,7 +24,8 @@ it('renders normally', () => {
   const assignment = {
     name: 'an assignment',
     pointsPossible: 42,
-    dueAt: 'some time'
+    dueAt: 'some time',
+    description: 'an assignment',
   }
   const wrapper = shallow(<AssignmentHeader assignment={assignment}/>)
   expect(wrapper).toMatchSnapshot()

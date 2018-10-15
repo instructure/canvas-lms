@@ -41,4 +41,5 @@ export const AssignmentShape = shape({
   name: string.isRequired,
   pointsPossible: number.isRequired,
   dueAt: string.isRequired, // temporary
+  description: string.isRequired,
 })

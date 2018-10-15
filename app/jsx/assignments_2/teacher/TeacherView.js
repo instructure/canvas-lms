@@ -23,6 +23,7 @@ import gql from 'graphql-tag'
 
 import { AssignmentShape } from '../shared/shapes'
 import AssignmentHeader from '../shared/AssignmentHeader'
+import ContentTabs from './ContentTabs'
 
 export class CoreTeacherView extends React.Component {
   static propTypes = {
@@ -49,6 +50,7 @@ export class CoreTeacherView extends React.Component {
     return <div>
       Assignments 2 Teacher View
       <AssignmentHeader assignment={assignment} />
+      <ContentTabs assignment={assignment} />
     </div>
   }
 }

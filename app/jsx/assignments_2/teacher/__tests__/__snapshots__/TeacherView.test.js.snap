@@ -6,6 +6,17 @@ exports[`renders normally 1`] = `
   <AssignmentHeader
     assignment={
       Object {
+        "description": "an assignment",
+        "dueAt": "The Future",
+        "name": "What is the Answer?",
+        "pointsPossible": 42,
+      }
+    }
+  />
+  <ContentTabs
+    assignment={
+      Object {
+        "description": "an assignment",
         "dueAt": "The Future",
         "name": "What is the Answer?",
         "pointsPossible": 42,

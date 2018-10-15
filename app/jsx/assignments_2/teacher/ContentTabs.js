@@ -17,15 +17,28 @@
  */
 
 import React from 'react'
-import { shallow } from 'enzyme'
-import { CoreTeacherView } from '../TeacherView'
+import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
+import {AssignmentShape} from '../shared/shapes'
+import Details from './Details'
 
-it('renders normally', () => {
-  const wrapper = shallow(<CoreTeacherView data={{assignment: {
-    name: 'What is the Answer?',
-    dueAt: 'The Future',
-    pointsPossible: 42,
-    description: 'an assignment',
-  }}} />)
-  expect(wrapper).toMatchSnapshot()
-})
+ContentTabs.propTypes = {
+  assignment: AssignmentShape.isRequired
+}
+
+export default function ContentTabs (props) {
+  const {assignment} = props
+  return <TabList defaultSelectedIndex={0} variant="minimal">
+    <TabPanel title="Details">
+      <Details assignment={assignment} />
+    </TabPanel>
+    <TabPanel title="Students">
+      Students
+    </TabPanel>
+    <TabPanel title="Rubric">
+      Rubric
+    </TabPanel>
+    <TabPanel title="Settings">
+      Settings
+    </TabPanel>
+  </TabList>
+}

@@ -17,15 +17,15 @@
  */
 
 import React from 'react'
-import { shallow } from 'enzyme'
-import { CoreTeacherView } from '../TeacherView'
+import {shallow} from 'enzyme'
+import ContentTabs from '../ContentTabs'
 
-it('renders normally', () => {
-  const wrapper = shallow(<CoreTeacherView data={{assignment: {
-    name: 'What is the Answer?',
-    dueAt: 'The Future',
+it('renders', () => {
+  const assignment = {
+    name: 'title',
     pointsPossible: 42,
-    description: 'an assignment',
-  }}} />)
-  expect(wrapper).toMatchSnapshot()
+    dueAt: 'due',
+    description: '<p>some assignment description</p>',
+  }
+  expect(shallow(<ContentTabs assignment={assignment} />)).toMatchSnapshot()
 })

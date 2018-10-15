@@ -17,15 +17,18 @@
  */
 
 import React from 'react'
-import { shallow } from 'enzyme'
-import { CoreTeacherView } from '../TeacherView'
+import apiUserContent from 'compiled/str/apiUserContent'
+import {AssignmentShape} from '../shared/shapes'
 
-it('renders normally', () => {
-  const wrapper = shallow(<CoreTeacherView data={{assignment: {
-    name: 'What is the Answer?',
-    dueAt: 'The Future',
-    pointsPossible: 42,
-    description: 'an assignment',
-  }}} />)
-  expect(wrapper).toMatchSnapshot()
-})
+Details.propTypes = {
+  assignment: AssignmentShape.isRequired
+}
+
+export default function Details (props) {
+  const {assignment: {description}} = props
+  const convertedHtml = apiUserContent.convert(description);
+
+  // html is sanitized on the server side
+  // eslint-disable-next-line react/no-danger
+  return <div dangerouslySetInnerHTML={{__html: convertedHtml}} />
+}
