@@ -42,6 +42,7 @@ module.exports = {
     'guard-for-in': 'off',
     "max-len": [1, {"code": 140}],
     "no-continue": [0],
+    "react/destructuring-assignment": [0],
     "react/no-typos": [0],
     "no-cond-assign": ["warn", "except-parens"],
     "no-else-return": [0],
