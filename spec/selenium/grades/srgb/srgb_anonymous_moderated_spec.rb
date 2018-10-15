@@ -141,8 +141,7 @@ describe "Individual View Gradebook" do
       # Open speedgrader for the anonymous assignment
       SRGB.select_assignment(@anonymous_assignment)
       scroll_into_view('#assignment-speedgrader-link')
-      SRGB.speedgrader_link.click
-      wait_for_ajaximations
+      wait_for_new_page_load(SRGB.speedgrader_link.click)
 
       # open the student list dropdown
       Speedgrader.students_dropdown_button.click

@@ -86,9 +86,8 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
 
         click_option("select[name=\"editing_roles\"]", permission)
         #form id is set like this because the id iterator is in the form but im not sure how to grab it directly before committed to the DB with the save
-        f('form.edit-form button.submit').click
+        wait_for_new_page_load(f('form.edit-form button.submit').click)
 
-        wait_for_ajaximations
         p.reload
         expect(p.editing_roles).to eq validations[i]
       end
