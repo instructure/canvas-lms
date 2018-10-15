@@ -1722,7 +1722,9 @@ class Course < ActiveRecord::Base
                      :grade_publishing_message => nil,
                      :last_publish_attempt_at => last_publish_attempt_at)
 
-    send_later_if_production(:send_final_grades_to_endpoint, publishing_user, user_ids_to_publish)
+    send_later_if_production_enqueue_args(:send_final_grades_to_endpoint,
+                                          { n_strand: ["send_final_grades_to_endpoint", global_root_account_id] },
+                                          publishing_user, user_ids_to_publish)
     send_at(last_publish_attempt_at + settings[:success_timeout].to_i.seconds, :expire_pending_grade_publishing_statuses, last_publish_attempt_at) if should_kick_off_grade_publishing_timeout?
   end
 
@@ -1760,11 +1762,17 @@ class Course < ActiveRecord::Base
       raise e
     end
 
+    default_timeout = Setting.get('send_final_grades_to_endpoint_timelimit', 15.seconds.to_s).to_f
+
+    timeout_options = { raise_on_timeout: true, fallback_timeout_length: default_timeout }
+
     posts_to_make.each do |enrollment_ids, res, mime_type, headers={}|
       begin
         posted_enrollment_ids += enrollment_ids
         if res
-          SSLCommon.post_data(settings[:publish_endpoint], res, mime_type, headers )
+          Canvas.timeout_protection("send_final_grades_to_endpoint:#{global_root_account_id}", timeout_options) do
+            SSLCommon.post_data(settings[:publish_endpoint], res, mime_type, headers )
+          end
         end
         Enrollment.where(:id => enrollment_ids).update_all(:grade_publishing_status => (should_kick_off_grade_publishing_timeout? ? "publishing" : "published"), :grade_publishing_message => nil)
       rescue => e
