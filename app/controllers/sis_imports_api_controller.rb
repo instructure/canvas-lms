@@ -287,6 +287,23 @@ class SisImportsApiController < ApplicationController
     end
   end
 
+  # @API Get the current importing SIS import
+  #
+  # Returns the SIS imports that are currently processing for an account. If no
+  # imports are running, will return an empty array.
+  #
+  # Example:
+  #   curl https://<canvas>/api/v1/accounts/<account_id>/sis_imports/importing \
+  #     -H 'Authorization: Bearer <token>'
+  #
+  # @returns SisImport
+  def importing
+    if authorized_action(@account, @current_user, [:import_sis, :manage_sis])
+      batches = @account.sis_batches.importing
+      render json: {sis_imports: sis_imports_json(batches, @current_user, session)}
+    end
+  end
+
   # @API Import SIS data
   #
   # Import SIS data into Canvas. Must be on a root account with SIS imports

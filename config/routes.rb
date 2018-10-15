@@ -1270,6 +1270,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: :sis_imports_api) do
       post 'accounts/:account_id/sis_imports', action: :create
       put 'accounts/:account_id/sis_imports/abort_all_pending', action: :abort_all_pending
+      get 'accounts/:account_id/sis_imports/importing', action: :importing
       get 'accounts/:account_id/sis_imports/:id', action: :show
       get 'accounts/:account_id/sis_imports', action: :index, as: "account_sis_imports"
       put 'accounts/:account_id/sis_imports/:id/abort', action: :abort
