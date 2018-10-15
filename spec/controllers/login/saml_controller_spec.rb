@@ -270,6 +270,30 @@ describe Login::SamlController do
     expect(response.location).to match(%r{^https://otheraccount/courses/1\?session_token=})
   end
 
+  it "ignores empty string relay state" do
+    account = account_with_saml
+    user_with_pseudonym(active_all: 1, account: account)
+
+    allow(Onelogin::Saml::Response).to receive(:new).and_return(
+      double('response', issuer: "saml_entity")
+    )
+    saml_response = SAML2::Response.new
+    saml_response.assertions << (assertion = SAML2::Assertion.new)
+    assertion.subject = SAML2::Subject.new
+    assertion.subject.name_id = SAML2::NameID.new(@pseudonym.unique_id)
+    assertion.statements << SAML2::AttributeStatement.new([SAML2::Attribute.create('eduPersonNickname', "Cody Cutrer")])
+    allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
+      [saml_response, ""]
+    )
+    allow_any_instance_of(SAML2::Entity).to receive(:valid_response?)
+    allow(LoadAccount).to receive(:default_domain_root_account).and_return(account)
+
+    session[:return_to] = '/courses/1'
+    post :create, params: {:SAMLResponse => "foo", :RelayState => ""}
+    expect(response).to be_redirect
+    expect(response.location).to match(%r{/courses/1$})
+  end
+
   it "disallows redirects to non-trusted accounts" do
     account = account_with_saml
     user_with_pseudonym(active_all: 1, account: account)
