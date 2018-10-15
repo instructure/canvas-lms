@@ -357,7 +357,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def locked_for?(user, opts={})
-    return unless self.context_module
+    return unless self.context_module && !self.context_module.deleted?
     self.context_module.locked_for?(user, opts.merge({:tag => self}))
   end
 
