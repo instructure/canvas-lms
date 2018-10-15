@@ -55,7 +55,6 @@
 #     }
 class DeveloperKeyAccountBindingsController < ApplicationController
   before_action :require_context
-  before_action :verify_feature_flags
   before_action :require_manage_developer_keys
   before_action :developer_key_in_account, only: :create_or_update
 
@@ -168,11 +167,5 @@ class DeveloperKeyAccountBindingsController < ApplicationController
 
   def require_manage_developer_keys
     require_context_with_permission(account, :manage_developer_keys)
-  end
-
-  def verify_feature_flags
-    return if account.site_admin? && Setting.get(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES, nil).present?
-    return if account.root_account.feature_enabled?(:developer_key_management_and_scoping)
-    head :unauthorized
   end
 end

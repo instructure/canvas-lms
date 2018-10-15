@@ -26,10 +26,6 @@ describe DeveloperKeysController do
     DeveloperKey.create!(name: 'Root Account Key', account: test_domain_root_account, visible: true)
   end
 
-  before do
-    Setting.set(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES, 'true')
-  end
-
   context "Site admin" do
     before do
       account_admin_user(:account => Account.site_admin)
@@ -53,6 +49,7 @@ describe DeveloperKeysController do
 
           it 'sets the scopes to empty' do
             dk = DeveloperKey.create!
+            enable_developer_key_account_binding!(dk)
             get 'index', params: { account_id: Account.site_admin.id, format: :json}
             expect(response).to be_successful
             developer_key = json_parse(response.body).first
@@ -81,9 +78,8 @@ describe DeveloperKeysController do
           render_views
 
           it 'includes developer_keys' do
-            Setting.remove(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES)
             get 'index', params: { account_id: Account.site_admin.id }
-            expect(response).to render_template(:index)
+            expect(response).to render_template(:index_react)
             expect(response).to be_successful
           end
         end
@@ -112,6 +108,7 @@ describe DeveloperKeysController do
 
         it "should include the key's 'visibility'" do
           key = DeveloperKey.create!
+          enable_developer_key_account_binding! key
           get 'index', params: { account_id: Account.site_admin.id }, format: :json
           developer_key = json_parse(response.body).first
           expect(developer_key['visible']).to eq(key.visible)
@@ -127,7 +124,6 @@ describe DeveloperKeysController do
           before do
             site_admin_key
             root_account_key
-            test_domain_root_account.enable_feature!(:developer_key_management_and_scoping)
           end
 
           context 'on site_admin account' do
@@ -142,6 +138,7 @@ describe DeveloperKeysController do
             context 'with site_admin key visible' do
               it 'returns only the keys from site_admin' do
                 dev_key = DeveloperKey.create!(name: 'Site Admin Key 2')
+                enable_developer_key_account_binding! dev_key
                 dev_key.update!(visible: true)
                 get 'index', params: { inherited: true, account_id: test_domain_root_account.id, format: 'json' }
                 developer_keys = json_parse(response.body)
@@ -189,8 +186,6 @@ describe DeveloperKeysController do
         let(:root_account) { account_model }
 
         before do
-          Account.site_admin.allow_feature!(:developer_key_management_and_scoping)
-          allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_and_scoping).and_return(true)
           user_session(@admin)
         end
 
@@ -209,13 +204,6 @@ describe DeveloperKeysController do
             post 'create', params: { account_id: root_account.id, developer_key: { scopes: invalid_scopes.concat(valid_scopes) } }
           end.not_to change(DeveloperKey, :count)
         end
-
-        it 'does not set scopes if the "developer_key_management_and_scoping" flag is disabled' do
-          allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_and_scoping).and_return(false)
-          post 'create', params: { account_id: root_account.id, developer_key: { scopes: valid_scopes } }
-          expect(DeveloperKey.find(json_parse['id']).scopes).to be_blank
-        end
-
       end
     end
 
@@ -250,7 +238,6 @@ describe DeveloperKeysController do
         let(:site_admin_key) { DeveloperKey.create! }
 
         before do
-          allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_and_scoping).and_return(true)
           user_session(@admin)
         end
 
@@ -271,12 +258,6 @@ describe DeveloperKeysController do
 
         it 'does not persist scopes if any are invalid' do
           put 'update', params: { id: developer_key.id, developer_key: { scopes: invalid_scopes.concat(valid_scopes) } }
-          expect(developer_key.reload.scopes).to be_blank
-        end
-
-        it 'does not set scopes if the "developer_key_management_and_scoping" flag is disabled' do
-          allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_and_scoping).and_return(false)
-          put 'update', params: { id: developer_key.id, developer_key: { scopes: valid_scopes } }
           expect(developer_key.reload.scopes).to be_blank
         end
 
@@ -313,7 +294,6 @@ describe DeveloperKeysController do
         site_admin_key
         root_account_key
         allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
-        allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_and_scoping).and_return(true)
       end
 
       it 'responds with not found if the account is a sub account' do

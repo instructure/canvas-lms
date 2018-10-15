@@ -648,12 +648,6 @@ END
       state: 'hidden',
       beta: true
     },
-    'developer_key_management_and_scoping' => {
-      display_name: -> { I18n.t('Developer key management and scoping')},
-      description: -> { I18n.t('If enabled, developer key management options and token scoping will be used.') },
-      applies_to: 'RootAccount',
-      state: 'allowed'
-    },
     'non_scoring_rubrics' => {
       display_name: -> { I18n.t('Non-scoring Rubrics')},
       description: -> { I18n.t('If enabled, the option will be presented to have non-scoring rubrics.') },

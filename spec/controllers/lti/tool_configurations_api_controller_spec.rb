@@ -294,10 +294,6 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
         json_parse['errors'].first['message']
       end
 
-      before do
-        allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_and_scoping).and_return(true)
-      end
-
       it { is_expected.to eq 'cannot contain invalid scope' }
     end
   end

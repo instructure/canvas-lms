@@ -61,7 +61,6 @@
 class ScopesApiController < ApplicationController
   before_action :require_context
   before_action :require_user
-  before_action :check_feature_flag
 
   # @API List scopes
   # A list of scopes that can be applied to developer keys and access tokens.
@@ -76,13 +75,5 @@ class ScopesApiController < ApplicationController
       scopes = params[:group_by] == "resource_name" ? named_scopes.group_by {|route| route[:resource_name]} : named_scopes
       render json: scopes
     end
-  end
-
-  private
-
-  def check_feature_flag
-    return if @context.try(:site_admin?) && Setting.get(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES, nil).present?
-    return if @context.root_account.feature_enabled?(:developer_key_management_and_scoping)
-    render json: [], status: :forbidden
   end
 end

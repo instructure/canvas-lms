@@ -21,6 +21,7 @@ require_relative '../sharding_spec_helper'
 describe 'session token', type: :request do
   before do
     user_with_pseudonym
+    enable_default_developer_key!
   end
 
   let(:access_token) { @user.access_tokens.create!(:purpose => "test").full_token }

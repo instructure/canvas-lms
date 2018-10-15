@@ -37,7 +37,7 @@ class Oauth2ProviderController < ApplicationController
 
     raise Canvas::Oauth::RequestError, :invalid_client_id unless provider.has_valid_key?
     raise Canvas::Oauth::RequestError, :invalid_redirect unless provider.has_valid_redirect?
-    if developer_key_management_and_scoping_enabled? provider
+    if provider.key.require_scopes?
       raise Canvas::Oauth::RequestError, :invalid_scope unless provider.valid_scopes?
     end
 
@@ -128,16 +128,5 @@ class Oauth2ProviderController < ApplicationController
         !params[:grant_type] && params[:code] ? "authorization_code" : "__UNSUPPORTED_PLACEHOLDER__"
       )
     )
-  end
-
-  def developer_key_management_and_scoping_enabled?(provider)
-    (
-      (
-        @domain_root_account.site_admin? &&
-        Setting.get(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES, nil).present?
-      ) ||
-      @domain_root_account.feature_enabled?(:developer_key_management_and_scoping)
-    ) &&
-    provider.key.require_scopes?
   end
 end

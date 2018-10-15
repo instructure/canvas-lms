@@ -37,16 +37,12 @@ class DeveloperKeysController < ApplicationController
           validLtiPlacements: Lti::ResourcePlacement::PLACEMENTS
         )
 
-        if use_new_dev_key_features?
-          render :index_react
-        else
-          render :index
-        end
+        render :index_react
       end
 
       format.json do
         render :json => developer_keys_json(
-          @keys, @current_user, session, account_context, use_new_dev_key_features?, inherited: params[:inherited].present?
+          @keys, @current_user, session, account_context, inherited: params[:inherited].present?
         )
       end
     end
@@ -56,7 +52,7 @@ class DeveloperKeysController < ApplicationController
     @key = DeveloperKey.new(developer_key_params)
     @key.account = @context if params[:account_id] && @context != Account.site_admin
     if @key.save
-      render :json => developer_key_json(@key, @current_user, session, account_context, use_new_dev_key_features?)
+      render :json => developer_key_json(@key, @current_user, session, account_context)
     else
       render :json => @key.errors, :status => :bad_request
     end
@@ -66,7 +62,7 @@ class DeveloperKeysController < ApplicationController
     @key.process_event!(params[:developer_key].delete(:event)) if params[:developer_key].key?(:event)
     @key.attributes = developer_key_params unless params[:developer_key].empty?
     if @key.save
-      render :json => developer_key_json(@key, @current_user, session, account_context, use_new_dev_key_features?)
+      render :json => developer_key_json(@key, @current_user, session, account_context)
     else
       render :json => @key.errors, :status => :bad_request
     end
@@ -74,7 +70,7 @@ class DeveloperKeysController < ApplicationController
 
   def destroy
     @key.destroy
-    render :json => developer_key_json(@key, @current_user, session, account_context, use_new_dev_key_features?)
+    render :json => developer_key_json(@key, @current_user, session, account_context)
   end
 
   protected
@@ -87,9 +83,6 @@ class DeveloperKeysController < ApplicationController
   private
 
   def index_scope
-    unless use_new_dev_key_features?
-      return @context.site_admin? ? DeveloperKey : @context.developer_keys
-    end
     if params[:inherited].present?
       return DeveloperKey.none if @context.site_admin?
       Account.site_admin.shard.activate do
@@ -103,24 +96,6 @@ class DeveloperKeysController < ApplicationController
     end
   end
 
-  def account_from_params
-    return Account.site_admin if params[:account_id] == 'site_admin'
-    Account.find_by(id: params[:account_id])
-  end
-
-  def use_new_dev_key_features?
-    @_use_new_dev_key_features ||= begin
-      requested_context = @context || account_from_params || @key&.owner_account
-      return if requested_context.blank?
-      has_site_admin_access?(requested_context) ||
-        requested_context.root_account.feature_enabled?(:developer_key_management_and_scoping)
-    end
-  end
-
-  def has_site_admin_access?(requested_context)
-    requested_context.site_admin? && Setting.get(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES, nil).present?
-  end
-
   def set_key
     @key = DeveloperKey.nondeleted.find(params[:id])
   end
@@ -130,11 +105,15 @@ class DeveloperKeysController < ApplicationController
       return @key.account || Account.site_admin
     elsif params[:account_id]
       require_account_context
-      return @context if @context == @domain_root_account
+      return @context if context_is_domain_root_account?
     end
 
     # failover to what require_site_admin_with_permission uses
     return Account.site_admin
+  end
+
+  def context_is_domain_root_account?
+    @context == @domain_root_account
   end
 
   def require_manage_developer_keys
@@ -142,23 +121,6 @@ class DeveloperKeysController < ApplicationController
   end
 
   def developer_key_params
-    if use_new_dev_key_features?
-      return params.require(:developer_key).permit(
-        :auto_expire_tokens,
-        :email,
-        :icon_url,
-        :name,
-        :notes,
-        :redirect_uri,
-        :redirect_uris,
-        :vendor_code,
-        :visible,
-        :test_cluster_only,
-        :require_scopes,
-        scopes: []
-      )
-    end
-
     params.require(:developer_key).permit(
       :auto_expire_tokens,
       :email,
@@ -168,7 +130,10 @@ class DeveloperKeysController < ApplicationController
       :redirect_uri,
       :redirect_uris,
       :vendor_code,
-      :visible
+      :visible,
+      :test_cluster_only,
+      :require_scopes,
+      scopes: []
     )
   end
 end

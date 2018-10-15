@@ -96,12 +96,12 @@ describe DeveloperKey do
       end
     end
 
-    it 'does not validate scopes' do
+    it 'does validate scopes' do
       expect do
         DeveloperKey.create!(
           scopes: ['not_a_valid_scope']
         )
-      end.not_to raise_exception
+      end.to raise_exception ActiveRecord::RecordInvalid
     end
 
     context 'when api token scoping FF is enabled' do
@@ -109,8 +109,6 @@ describe DeveloperKey do
         %w(url:POST|/api/v1/courses/:course_id/quizzes/:id/validate_access_code
           url:GET|/api/v1/audit/grade_change/courses/:course_id/assignments/:assignment_id/graders/:grader_id)
       end
-
-      before { Account.site_admin.enable_feature!(:developer_key_management_and_scoping) }
 
       describe 'after_update' do
         let(:user) { user_model }
@@ -142,12 +140,6 @@ describe DeveloperKey do
 
         it 'does not delete its associated access tokens if a new scope was added' do
           developer_key_with_scopes.update!(scopes: valid_scopes.push("url:PUT|/api/v1/courses/:course_id/quizzes/:id"))
-          expect(developer_key_with_scopes.access_tokens).to match_array [access_token]
-        end
-
-        it 'does not delete the associated access tokens if feature flags are off' do
-          Account.site_admin.disable_feature!(:developer_key_management_and_scoping)
-          developer_key_with_scopes.update!(scopes: [valid_scopes.first])
           expect(developer_key_with_scopes.access_tokens).to match_array [access_token]
         end
       end
@@ -486,7 +478,6 @@ describe DeveloperKey do
 
   context "Account scoped keys" do
     shared_examples "authorized_for_account?" do
-
       it "should allow access to its own account" do
         expect(@key.authorized_for_account?(Account.find(@account.id))).to be true
       end
@@ -509,6 +500,7 @@ describe DeveloperKey do
 
         @not_sub_account = Account.create!
         @key = DeveloperKey.create!(:redirect_uri => "http://example.com/a/b", account: @account)
+        enable_developer_key_account_binding!(@key)
       end
 
       include_examples "authorized_for_account?"
@@ -542,6 +534,7 @@ describe DeveloperKey do
 
         @not_sub_account = Account.create!
         @key = DeveloperKey.create!(:redirect_uri => "http://example.com/a/b", account: @account)
+        enable_developer_key_account_binding!(@key)
       end
 
       include_examples "authorized_for_account?"

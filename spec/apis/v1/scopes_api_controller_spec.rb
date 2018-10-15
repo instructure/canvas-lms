@@ -28,7 +28,6 @@ describe ScopesApiController, type: :request do
   describe "index" do
     before do
       allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
-      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_and_scoping).and_return(true)
     end
 
     let(:account) { account_model }
@@ -69,12 +68,6 @@ describe ScopesApiController, type: :request do
                                         "scope"=>"/auth/userinfo",
                                         "resource_name"=>"oauth2"
                                       }]
-      end
-
-      it "returns 403 when feature flag is disabled" do
-        allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
-        api_call(:get, api_url, scope_params)
-        expect(response.code).to eql '403'
       end
 
       it "returns expected scopes when flag is disabled and Setting is set" do

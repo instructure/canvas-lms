@@ -39,7 +39,7 @@ module PactConfig
       # internal consumers
       ANDROID_STUDENT = 'Android Student'.freeze
       ANDROID_TEACHER = 'Android Teacher'.freeze
-      ANDROID_PARENT = 'Android Parent'.freeze 
+      ANDROID_PARENT = 'Android Parent'.freeze
       GENERIC_CONSUMER = 'Generic Consumer'.freeze
       QUIZ_LTI = 'Quiz LTI'.freeze
       SISTEMIC = 'Sistemic'.freeze

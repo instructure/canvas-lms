@@ -93,6 +93,7 @@ module Pact::Canvas
       @account = opts[:account] || Account.default
       @course = opts[:course] || seed_course
       seed_users(opts)
+      enable_default_developer_key!
       enable_features
     end
 
