@@ -203,7 +203,7 @@ export default class EditAppointmentGroupDetails {
     this.checkBoxInputChange(checkbox, input)
     const apptLimit = parseInt(input.val())
     const apptCounts = {}
-    this.apptGroup.appointments.forEach(a => {
+    this.apptGroup.appointments && this.apptGroup.appointments.forEach(a => {
       a.child_events.forEach(e => {
         if (!apptCounts[e.user.id]) apptCounts[e.user.id] = 0
         apptCounts[e.user.id] += 1

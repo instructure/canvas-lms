@@ -29,12 +29,6 @@ import 'jquery.disableWhileLoading'
 GradeSummary.setup()
 
 class GradebookSummaryRouter extends Backbone.Router {
-  static initClass() {
-    this.prototype.routes = {
-      '': 'tab',
-      'tab-:route(/*path)': 'tab'
-    }
-  }
 
   initialize() {
     if (!ENV.student_outcome_gradebook_enabled) return
@@ -65,6 +59,7 @@ class GradebookSummaryRouter extends Backbone.Router {
     }
     $(`a[href='#${tab}']`).click()
     if (tab === 'outcomes') {
+      if (!this.outcomeView) return
       this.outcomeView.show(path)
       $('.outcome-toggles').show()
     } else {
@@ -78,7 +73,10 @@ class GradebookSummaryRouter extends Backbone.Router {
     return userSettings.contextSet('grade_summary_tab', tab)
   }
 }
-GradebookSummaryRouter.initClass()
+GradebookSummaryRouter.prototype.routes = {
+  '': 'tab',
+  'tab-:route(/*path)': 'tab'
+}
 
 GradeSummary.renderSelectMenuGroup()
 
