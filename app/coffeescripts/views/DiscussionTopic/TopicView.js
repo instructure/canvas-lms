@@ -18,7 +18,6 @@
 import I18n from 'i18n!discussions'
 import $ from 'jquery'
 import Backbone from 'Backbone'
-import _ from 'underscore'
 import DiscussionTopic from '../../models/DiscussionTopic'
 import EntryView from '../DiscussionTopic/EntryView'
 import PublishButtonView from '../PublishButtonView'
@@ -120,14 +119,17 @@ export default class TopicView extends Backbone.View {
       new PublishButtonView({model: this.topic, el: $el}).render()
     }
 
-    const [context, context_id] = Array.from(ENV.context_asset_string.split('_'))
+    const [context, context_id] = ENV.context_asset_string.split('_')
     if (context === 'course') {
-      return (this.AssignmentExternalTools = AssignmentExternalTools.attach(
-        this.$AssignmentExternalTools.get(0),
-        'assignment_view',
-        parseInt(context_id),
-        ENV.DISCUSSION.IS_ASSIGNMENT ? parseInt(ENV.DISCUSSION.ASSIGNMENT_ID) : undefined
-      ))
+      const elementToRenderInto = this.$AssignmentExternalTools.get(0)
+      if (elementToRenderInto) {
+        this.AssignmentExternalTools = AssignmentExternalTools.attach(
+          elementToRenderInto,
+          'assignment_view',
+          parseInt(context_id),
+          ENV.DISCUSSION.IS_ASSIGNMENT ? parseInt(ENV.DISCUSSION.ASSIGNMENT_ID) : undefined
+        )
+      }
     }
   }
 
