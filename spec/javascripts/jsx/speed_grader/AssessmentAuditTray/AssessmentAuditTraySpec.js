@@ -93,7 +93,7 @@ QUnit.module('AssessmentAuditTray', suiteHooks => {
   }
 
   function getAssessmentAuditTrailContainer() {
-    return getTrayContainer().querySelector('ul')
+    return getTrayContainer().querySelector('#assessment-audit-trail')
   }
 
   function getCloseButton() {

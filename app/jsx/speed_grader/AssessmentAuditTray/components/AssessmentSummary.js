@@ -66,13 +66,7 @@ export default function AssessmentSummary(props) {
         </Text>
       </FlexItem>
 
-      <FlexItem
-        as="div"
-        background="transparent"
-        borderWidth="none none small"
-        margin="small none"
-        padding="none"
-      />
+      <FlexItem as="div" borderWidth="none none small" margin="small none" padding="none" />
 
       <FlexItem>
         <Text as="div">{I18n.t('Posted to student')}</Text>

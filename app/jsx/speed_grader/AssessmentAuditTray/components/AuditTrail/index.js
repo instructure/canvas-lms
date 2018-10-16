@@ -17,25 +17,42 @@
  */
 
 import React, {PureComponent} from 'react'
-import {arrayOf, shape, string} from 'prop-types'
 import View from '@instructure/ui-layout/lib/components/View'
+import I18n from 'i18n!speed_grader'
+
+import UserEventGroup from './UserEventGroup'
+import * as propTypes from './propTypes'
 
 export default class AuditTrail extends PureComponent {
+  static propTypes = {
+    auditTrail: propTypes.auditTrail.isRequired
+  }
+
   render() {
+    const {userEventGroups} = this.props.auditTrail
+    const userEventGroupData = []
+
+    Object.keys(userEventGroups).forEach(userId => {
+      userEventGroupData.push({
+        userEventGroup: userEventGroups[userId],
+        userId,
+        // A user could be unknown in the event we do not have user info loaded
+        // for this user id. Display "Unknown User" as a fallback.
+        userName: I18n.t('Unknown User')
+      })
+    })
+
     return (
-      <View as="ul">
-        {this.props.auditEvents.map(auditEvent => (
-          <li key={auditEvent.id}>{auditEvent.eventType}</li>
+      <View as="div" id="assessment-audit-trail">
+        {userEventGroupData.map(datum => (
+          <UserEventGroup
+            key={datum.userId}
+            userEventGroup={datum.userEventGroup}
+            userId={datum.userId}
+            userName={datum.userName}
+          />
         ))}
       </View>
     )
   }
-}
-
-AuditTrail.propTypes = {
-  auditEvents: arrayOf(
-    shape({
-      eventType: string.isRequired
-    })
-  ).isRequired
 }

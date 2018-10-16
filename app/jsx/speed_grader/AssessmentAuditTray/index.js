@@ -29,6 +29,7 @@ import I18n from 'i18n!speed_grader'
 import AssessmentSummary from './components/AssessmentSummary'
 import AuditTrail from './components/AuditTrail'
 import Api from './Api'
+import buildAuditTrail from './buildAuditTrail'
 
 export default class AssessmentAuditTray extends Component {
   static propTypes = {
@@ -50,8 +51,8 @@ export default class AssessmentAuditTray extends Component {
     this.show = this.show.bind(this)
 
     this.state = {
-      auditEvents: [],
       auditEventsLoaded: false,
+      auditTrail: buildAuditTrail([]),
       open: false
     }
   }
@@ -63,8 +64,8 @@ export default class AssessmentAuditTray extends Component {
   show(context) {
     this.setState({
       ...context,
-      auditEvents: [],
       auditEventsLoaded: false,
+      auditTrail: buildAuditTrail([]),
       open: true
     })
 
@@ -75,8 +76,8 @@ export default class AssessmentAuditTray extends Component {
       .then(auditEvents => {
         if (this.state.open && this.state.submission.id === submission.id) {
           this.setState({
-            auditEvents,
-            auditEventsLoaded: true
+            auditEventsLoaded: true,
+            auditTrail: buildAuditTrail(auditEvents)
           })
         }
       })
@@ -120,7 +121,7 @@ export default class AssessmentAuditTray extends Component {
               </View>
 
               <View as="div" margin="small">
-                <AuditTrail auditEvents={this.state.auditEvents} />
+                <AuditTrail auditTrail={this.state.auditTrail} />
               </View>
             </Fragment>
           ) : (
