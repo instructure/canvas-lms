@@ -166,8 +166,6 @@
 
 - category: Membership Update
   notifications:
-    - name: Enrollment Accepted
-      delay_for: 0
     - name: New Context Group Membership
       delay_for: 0
     - name: Group Membership Accepted
@@ -201,6 +199,8 @@
     - name: New User
       delay_for: 0
     - name: New Student Organized Group
+      delay_for: 0
+    - name: Enrollment Accepted
       delay_for: 0
 
 - category: Registration
