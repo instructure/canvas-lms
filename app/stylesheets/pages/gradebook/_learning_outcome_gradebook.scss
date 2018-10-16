@@ -344,7 +344,7 @@ $page-dark: #ebeff2;
 
 .outcome-description {
   width: 70%;
-  float: left;
+  float: direction(left);
   display: inline-block;
   white-space: nowrap;
   overflow: hidden;

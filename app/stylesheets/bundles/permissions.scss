@@ -154,7 +154,7 @@ $darkRowBg: #f9f9f9;
     .ic-permissions__left-header__col-wrapper {
 
       .ic-permissions__header-content {
-        text-align: right;
+        text-align: direction(right);
       }
     }
   }
@@ -205,7 +205,7 @@ $darkRowBg: #f9f9f9;
     background: $lightRowBg;
 
     .ic-permissions__header-content {
-      text-align: left;
+      text-align: direction(left);
 
       // that border shadow effect on the left side header
       border-right: 1px solid #ddd;

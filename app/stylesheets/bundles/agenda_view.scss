@@ -273,7 +273,7 @@ span.agendaView--no-assignments {
     line-height: 1.3;
     padding: $ic-sp/4;
     i {
-      margin-right: 2px;
+      margin-#{direction(right)}: 2px;
     }
   }
 
