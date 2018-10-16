@@ -550,7 +550,7 @@ test('renders due dates in appropriate time zone', function() {
 })
 
 QUnit.module('due_at', (hooks) => {
-  const date = '2000-08-28T11:59:23'
+  const date = '2000-08-28T11:00:23'
   const assignment = {
     id: 1,
     name: 'Charlie Brown Quiz',
@@ -566,44 +566,28 @@ QUnit.module('due_at', (hooks) => {
     view.$el.toJSON.restore()
   })
 
-  test('sets due_at seconds to 59 if the year has changed', function() {
-    sinon.stub(view.$el, 'toJSON').returns({due_at: new Date('2001-08-28T11:59:00').toISOString()})
-    strictEqual(view.getFormData().due_at, '2001-08-28T11:59:59.000Z')
+  QUnit.module('when the due date has changed', () => {
+    test('sets due_at seconds to 59 if the new minute value is 59', () => {
+      sinon.stub(view.$el, 'toJSON').returns({due_at: new Date('2000-08-28T11:59:00').toISOString()})
+      strictEqual(view.getFormData().due_at, '2000-08-28T11:59:59.000Z')
+    })
+
+    test('sets due_at seconds to 0 if the new minute value is not 59', () => {
+      sinon.stub(view.$el, 'toJSON').returns({due_at: new Date('2000-08-28T11:58:00').toISOString()})
+      strictEqual(view.getFormData().due_at, '2000-08-28T11:58:00.000Z')
+    })
+
+    // Seems counterintuitive, but the UI doesn't allow updating the seconds
+    // value, but the form will always return a seconds value of 00. In the case
+    // that the due_at had seconds set to non-00, we should ignore that.
+    test('keeps original due_at seconds if only the seconds value has changed', () => {
+      sinon.stub(view.$el, 'toJSON').returns({due_at: new Date('2000-08-28T11:00:00').toISOString()})
+      strictEqual(view.getFormData().due_at, '2000-08-28T11:00:23.000Z')
+    })
   })
 
-  test('sets due_at seconds to 59 if the month has changed', function() {
-    sinon.stub(view.$el, 'toJSON').returns({due_at: new Date('2000-09-28T11:59:00').toISOString()})
-    strictEqual(view.getFormData().due_at, '2000-09-28T11:59:59.000Z')
-  })
-
-  test('sets due_at seconds to 59 if the day has changed', function() {
-    sinon.stub(view.$el, 'toJSON').returns({due_at: new Date('2000-08-29T11:59:00').toISOString()})
-    strictEqual(view.getFormData().due_at, '2000-08-29T11:59:59.000Z')
-  })
-
-  test('sets due_at seconds to 59 if the hour has changed', function() {
-    sinon.stub(view.$el, 'toJSON').returns({due_at: new Date('2000-08-28T10:59:00').toISOString()})
-    strictEqual(view.getFormData().due_at, '2000-08-28T10:59:59.000Z')
-  })
-
-  test('sets due_at seconds to 59 if the minute has changed', function() {
-    sinon.stub(view.$el, 'toJSON').returns({due_at: new Date('2000-08-28T11:58:00').toISOString()})
-    strictEqual(view.getFormData().due_at, '2000-08-28T11:58:59.000Z')
-  })
-
-  test('keeps original due_at seconds if the date has not changed', function() {
+  test('keeps original due_at seconds if the date has not changed', () => {
     sinon.stub(view.$el, 'toJSON').returns({due_at: new Date(date).toISOString()})
-    strictEqual(view.getFormData().due_at, '2000-08-28T11:59:23.000Z')
-  })
-
-  // Seems counterintuitive, but the UI doesn't allow updating the seconds
-  // value, but the form will always return a seconds value of 00. In the case
-  // that the due_at had seconds set to non-00, we should ignore that.
-  test('keeps the original due_at seconds even if the seconds value has changed', function() {
-    const expectedDate = $.unfudgeDateForProfileTimezone(new Date(date))
-    const changedSecondsDate = new Date(date)
-    changedSecondsDate.setSeconds((changedSecondsDate.getSeconds() + 1) % 60)
-    sinon.stub(view.$el, 'toJSON').returns({due_at: changedSecondsDate.toISOString()})
-    strictEqual(view.getFormData().due_at, expectedDate.toISOString())
+    strictEqual(view.getFormData().due_at, '2000-08-28T11:00:23.000Z')
   })
 })
