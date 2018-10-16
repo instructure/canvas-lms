@@ -20,8 +20,8 @@ $bar-height: 64px;
 
 .module-sequence-footer {
   position: relative;
-  left: 0;
-  right: 0;
+  #{direction(left)}: 0;
+  #{direction(right)}: 0;
   bottom: 0;
   height: $bar-height+1;
   overflow: hidden;

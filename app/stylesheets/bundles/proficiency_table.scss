@@ -30,14 +30,14 @@
   display: inline-block;
   height: 18px;
   width: 18px;
-  margin-left: 10px;
-  margin-right: 10px;
+  margin-#{direction(left)}: 10px;
+  margin-#{direction(right)}: 10px;
   vertical-align: text-top;
 }
 
 .delete {
   display: inline-block;
-  margin-left: 20px;
+  margin-#{direction(left)}: 20px;
 }
 
 .save {

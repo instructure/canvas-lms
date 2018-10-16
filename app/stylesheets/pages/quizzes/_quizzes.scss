@@ -384,8 +384,8 @@ li.quiz {
     display: none;
   }
   .group_placeholder {
-    border-right: 1px solid #aaa;
-    border-left: 1px solid #aaa;
+    border-#{direction(right)}: 1px solid #aaa;
+    border-#{direction(left)}: 1px solid #aaa;
   }
   .group_top {
     border: 1px solid #aaa;
@@ -466,8 +466,8 @@ li.quiz {
     border: 1px solid #aaa;
     border-top-width: 0;
     margin-bottom: 30px;
-    -moz-border-radius-bottomright: 5px;
-    -moz-border-radius-bottomleft: 5px;
+    -moz-border-radius-bottom#{direction(right)}: 5px;
+    -moz-border-radius-bottom#{direction(left)}: 5px;
   }
   .question_holder.ui-sortable-placeholder {
     .question_placeholder {
@@ -477,11 +477,11 @@ li.quiz {
     }
   }
   .assessment_question_bank, .question_holder.group, .insufficient_count_warning {
-    border-left: 1px solid #aaa;
-    border-right: 1px solid #aaa;
+    border-#{direction(left)}: 1px solid #aaa;
+    border-#{direction(right)}: 1px solid #aaa;
     border-top: 0;
-    padding-left: 20px;
-    padding-right: 20px;
+    padding-#{direction(left)}: 20px;
+    padding-#{direction(right)}: 20px;
     padding-top: 1em;
     -moz-border-radius: 0;
   }
@@ -622,8 +622,8 @@ li.quiz {
       th {
         text-align: direction(left);
         font-weight: normal;
-        padding-left: 5px;
-        padding-right: 5px;
+        padding-#{direction(left)}: 5px;
+        padding-#{direction(right)}: 5px;
       }
       td {
         border-top: 1px solid #ccc;
@@ -1345,7 +1345,7 @@ ul#quiz_versions {
             position: absolute;
             z-index: -1;
             top: -10px;
-            right: -10px;
+            #{direction(right)}: -10px;
             bottom: -10px;
             #{direction(left)}: -10px;
             background: #E7F4FF;
@@ -1480,8 +1480,8 @@ ul#quiz_versions {
     width: 10%;
   }
   .combinations th {
-    padding-right: 5px;
-    padding-left: 5px;
+    padding-#{direction(right)}: 5px;
+    padding-#{direction(left)}: 5px;
   }
   .combinations td.final_answer, .combinations th.final_answer {
     width: 1%;
@@ -2172,8 +2172,8 @@ ul#quiz_versions {
 #ldb_deauthorized_dialog {
   position: absolute;
   top: 0;
-  left: 0;
-  right: 0;
+  #{direction(left)}: 0;
+  #{direction(right)}: 0;
   bottom: 0;
   background-color: #4b555d;
   background: url("/images/Money_Noise_tm.png"), radial-gradient(50% -100px, circle cover, rgba(255, 255, 255, 0.6) 0%, transparent 100%), linear-gradient(to bottom, #59656e, #3e464c);

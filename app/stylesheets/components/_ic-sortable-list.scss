@@ -92,8 +92,8 @@
 }
 
 .ic-Sortable-sort-controls__button {
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-#{direction(left)}: 2px;
+  padding-#{direction(right)}: 2px;
 }
 
 .ic-Sortable-item__Add-link-fieldset {

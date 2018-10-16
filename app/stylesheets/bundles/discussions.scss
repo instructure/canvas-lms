@@ -467,8 +467,8 @@ $discussion-dark-text: $ic-color-dark;
 
   .entry-content {
     padding: $ic-sp;
-    border-left: 1px solid $ic-border-light;
-    border-right: 1px solid $ic-border-light;
+    border-#{direction(left)}: 1px solid $ic-border-light;
+    border-#{direction(right)}: 1px solid $ic-border-light;
   }
 }
 
@@ -666,7 +666,7 @@ $discussion-dark-text: $ic-color-dark;
   }
   .sticky {
     position: fixed;
-    top: 0; left: 0; right: 0;
+    top: 0; #{direction(left)}: 0; #{direction(right)}: 0;
     z-index: 15; // increase for discussions sticky toolbar
     border-color: $ic-border-light;
     background: $lightBackground;

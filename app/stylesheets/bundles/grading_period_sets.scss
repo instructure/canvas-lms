@@ -111,8 +111,8 @@
 // GRADING PERIOD LIST
 
 .GradingPeriodList {
-  border-left: 1px solid $ic-border-light;
-  border-right: 1px solid $ic-border-light;
+  border-#{direction(left)}: 1px solid $ic-border-light;
+  border-#{direction(right)}: 1px solid $ic-border-light;
 }
 
 // GRADING PERIOD LIST -- PERIOD
@@ -172,7 +172,7 @@
 }
 
 .GradingPeriodList__new-period--editing {
-  border-left: 1px solid $ic-border-light;
-  border-right: 1px solid $ic-border-light;
+  border-#{direction(left)}: 1px solid $ic-border-light;
+  border-#{direction(right)}: 1px solid $ic-border-light;
   border-bottom: 1px solid $ic-border-light;
 }

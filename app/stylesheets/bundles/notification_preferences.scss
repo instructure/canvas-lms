@@ -104,13 +104,13 @@ thead th {
 
 .notification-prefs-table {
   .ui-button {
-    margin-left: 0;
-    margin-right: 0;
+    margin-#{direction(left)}: 0;
+    margin-#{direction(right)}: 0;
     padding: 2px; // fixes FF padding issues
   }
   .ui-buttonset {
-    margin-left: 0;
-    margin-right: 0;
+    margin-#{direction(left)}: 0;
+    margin-#{direction(right)}: 0;
   }
   .grouping > td:first-child {
     min-width: 205px;

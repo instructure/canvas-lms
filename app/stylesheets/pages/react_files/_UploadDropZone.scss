@@ -19,9 +19,9 @@
 .UploadDropZone {
   position: absolute;
   top: 0px;
-  right: 0px;
+  #{direction(right)}: 0px;
   bottom: 0px;
-  left: 0px;
+  #{direction(left)}: 0px;
   background: rgba(254, 254, 254, 0);
   z-index: -1;
 }

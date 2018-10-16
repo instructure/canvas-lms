@@ -35,8 +35,8 @@
     .ic-Layout-columns {
       position: absolute;
       top: 0;
-      left: 0;
-      right: 0;
+      #{direction(left)}: 0;
+      #{direction(right)}: 0;
       bottom: 0;
       /*max-width: 100%;*/
       min-width: 320px !important;
@@ -64,8 +64,8 @@
     #not_right_side {
       position: absolute;
       top: 0;
-      left: 0;
-      right: 0;
+      #{direction(left)}: 0;
+      #{direction(right)}: 0;
       top: 45px;
       bottom: 0;
       overflow: auto;
@@ -86,8 +86,8 @@
       display: block;
       position: fixed;
       top: 0;
-      right: 0;
-      left: 0;
+      #{direction(right)}: 0;
+      #{direction(left)}: 0;
       background: #fff;
       border: 1px solid #ccc;
     }

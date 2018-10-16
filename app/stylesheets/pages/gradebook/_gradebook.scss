@@ -261,7 +261,7 @@ $cell_height: 33px;
 
 .slick-cell {
   // we're adding this further in
-  // border-right: none
+  // border-#{direction(right)}: none
 }
 
 .slick-cell.editable {

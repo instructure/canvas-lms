@@ -152,8 +152,8 @@
   &.sticky {
     position: fixed;
     top: 0;
-    left: 0;
-    right: 0;
+    #{direction(left)}: 0;
+    #{direction(right)}: 0;
     margin-#{direction(left)}: $left_side_width + 1;
     margin-#{direction(right)}: $right_side_width + 1;
     z-index: 3;

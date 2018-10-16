@@ -218,8 +218,8 @@ $icon-size: 1.4rem;
   position: absolute;
   top: $gradebook_header_height + 0.0625em;
   bottom: 0;
-  left: 0;
-  right: 0;
+  #{direction(left)}: 0;
+  #{direction(right)}: 0;
   min-width: 960px;
   &.with_moderation_tabs {
     top: $gradebook_header_height * 2;
@@ -943,7 +943,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 }
 
 #grading-box-selected-grader {
-  margin-left: 10px;
+  margin-#{direction(left)}: 10px;
   font-style: italic;
 }
 

@@ -30,8 +30,8 @@
 
 // unfortunately, we used the same class name as bootstrap's .container, need to reset it's effects
 @mixin revert_bootstrap_container {
-  margin-left: 0;
-  margin-right: 0;
+  margin-#{direction(left)}: 0;
+  margin-#{direction(right)}: 0;
   width: auto;
 }
 
@@ -109,8 +109,8 @@
   .rubric_title {
     background-color: $ic-color-medium-light;
     border-top: 1px solid $ic-border-color;
-    border-left: 1px solid $ic-border-color;
-    border-right: 1px solid $ic-border-color;
+    border-#{direction(left)}: 1px solid $ic-border-color;
+    border-#{direction(right)}: 1px solid $ic-border-color;
     padding: 5px;
     font-weight: bold;
   }
@@ -264,8 +264,8 @@
       display: table-cell;
     }
     table.ratings td {
-      border-left: 1px dashed $ic-border-dark;
-      border-right: 1px dashed $ic-border-dark;
+      border-#{direction(left)}: 1px dashed $ic-border-dark;
+      border-#{direction(right)}: 1px dashed $ic-border-dark;
     }
     table.ratings td:nth-of-type(1) {
       border-#{direction(left)}: 0;

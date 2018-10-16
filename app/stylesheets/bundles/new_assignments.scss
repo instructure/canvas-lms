@@ -188,8 +188,8 @@
 .draggable-dropzone {
   height: 40px;
   background-color: lighten($ic-color-dark, 15%);
-  border-right: 1px dashed $ic-border-dark;
-  border-left: 1px dashed $ic-border-dark;
+  border-#{direction(right)}: 1px dashed $ic-border-dark;
+  border-#{direction(left)}: 1px dashed $ic-border-dark;
 }
 
 .ag-header-controls .tooltip_link {

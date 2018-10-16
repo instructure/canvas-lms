@@ -247,8 +247,8 @@ span.agendaView--no-assignments {
     .fc-widget-header {
       background: none;
       text-transform: uppercase;
-      border-left: none;
-      border-right: none;
+      border-#{direction(left)}: none;
+      border-#{direction(right)}: none;
     }
 
     .fc-body {

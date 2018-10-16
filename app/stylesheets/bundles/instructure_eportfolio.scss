@@ -122,12 +122,12 @@ a {
     }
     textarea.edit_section {
       width: 95%;
-      margin-left: auto;
-      margin-right: auto;
+      margin-#{direction(left)}: auto;
+      margin-#{direction(right)}: auto;
     }
     table.mceLayout {
-      margin-left: auto;
-      margin-right: auto;
+      margin-#{direction(left)}: auto;
+      margin-#{direction(right)}: auto;
     }
   }
 }

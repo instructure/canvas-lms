@@ -120,8 +120,8 @@
     }
   }
   .undo-main-margins {
-    margin-left: -1em;
-    margin-right: -1em;
+    margin-#{direction(left)}: -1em;
+    margin-#{direction(right)}: -1em;
     margin-bottom: -1em;
   }
   .student-assignment-overview {

@@ -120,10 +120,10 @@ $darkRowBg: #f9f9f9;
   // STICKY PROPERTIES
   .ic-permissions__corner-stone {
     width: 300px;
-    border-right: 1px solid #ddd;
+    border-#{direction(right)}: 1px solid #ddd;
     box-shadow: 3px 4px 5px 0 #e8e8e8, inset 0 1px 0 0 #ddd;
     position: sticky;
-    left: 0;
+    #{direction(left)}: 0;
     top: 0;
     z-index: 100;
     background-color: $lightRowBg;
@@ -135,21 +135,21 @@ $darkRowBg: #f9f9f9;
   .ic-permissions__corner-stone:after{
     content:'';
     position: absolute;
-    left: 0;
+    #{direction(left)}: 0;
     bottom: 0;
     width: 100%;
   }
 
   .ic-permissions__main-left-header {
     position: sticky;
-    left: 0;
+    #{direction(left)}: 0;
     z-index: 9;
   }
 
   // the header cells of the expanded row
   .ic-permissions__left-header__expanded {
     position: sticky;
-    left: 0;
+    #{direction(left)}: 0;
 
     .ic-permissions__left-header__col-wrapper {
 
@@ -183,7 +183,7 @@ $darkRowBg: #f9f9f9;
   .ic-permissions__top-header__col-wrapper-th:after{
     content:'';
     position: absolute;
-    left: 0;
+    #{direction(left)}: 0;
     bottom: 0;
     width: 100%;
     border-bottom: 1px solid $border-color;
@@ -191,8 +191,8 @@ $darkRowBg: #f9f9f9;
 
   // the top "fixed" header
   .ic-permissions__top-header__col-wrapper {
-    margin-left: auto;
-    margin-right: auto;
+    margin-#{direction(left)}: auto;
+    margin-#{direction(right)}: auto;
     height: 50px;
     width: 140px;
     background: transparent;
@@ -208,7 +208,7 @@ $darkRowBg: #f9f9f9;
       text-align: direction(left);
 
       // that border shadow effect on the left side header
-      border-right: 1px solid #ddd;
+      border-#{direction(right)}: 1px solid #ddd;
       box-shadow: 3px 4px 5px 0 #e8e8e8, $borderShadow;
     }
   }

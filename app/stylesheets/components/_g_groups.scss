@@ -167,8 +167,8 @@
     padding: direction-sides(10px 130px 0 1em);
   }
   > .roster-tab {
-    padding-left: 1em;
-    padding-right: 1em;
+    padding-#{direction(left)}: 1em;
+    padding-#{direction(right)}: 1em;
   }
 }
 

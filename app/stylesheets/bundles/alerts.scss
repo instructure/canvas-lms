@@ -26,8 +26,8 @@
 }
 
 .alert {
-  padding-left: 40px;
-  padding-right: 40px;
+  padding-#{direction(left)}: 40px;
+  padding-#{direction(right)}: 40px;
   margin: 1px 2px 2px;
   width: auto;
   padding: direction-sides(20px 20px 6px 6px);

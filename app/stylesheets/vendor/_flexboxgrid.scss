@@ -3,13 +3,13 @@
 
 <br/>
 
-We use a slightly modified version of [Flexbox Grid](http://flexboxgrid.com) as Canvas' grid. 
+We use a slightly modified version of [Flexbox Grid](http://flexboxgrid.com) as Canvas' grid.
 
 *Important!* Flexbox Grid's default `.row` class has been changed to `*.grid-row*` due to previous usage of Bootstrap 2.x grid in small parts of the application.
 
 Flexbox Grid is a lot like Bootstrap 3's 12-column grid, with different column widths available for `.xs-`, `.sm-`, `.md-`, and `.lg-` screen sizes.
 
-To create vertical space between grid rows, consider using the `.content-box` and its variants. 
+To create vertical space between grid rows, consider using the `.content-box` and its variants.
 
 
 ## Basic usage
@@ -177,8 +177,8 @@ $c-grid-columns: 12;
     flex-direction: column;
     flex-grow: 0;
     flex-shrink: 0;
-    padding-right: $c-grid-sp;
-    padding-left: $c-grid-sp;
+    padding-#{direction(right)}: $c-grid-sp;
+    padding-#{direction(left)}: $c-grid-sp;
   }
   .col-#{$size} {
     @extend %base-#{$size};
@@ -223,8 +223,8 @@ $c-grid-columns: 12;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  margin-right: -$c-grid-sp;
-  margin-left: -$c-grid-sp;
+  margin-#{direction(right)}: -$c-grid-sp;
+  margin-#{direction(left)}: -$c-grid-sp;
 
   &.reverse {
     flex-direction: row-reverse;

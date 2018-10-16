@@ -500,7 +500,7 @@ body .disabled_link {
 .error_box {
   position: absolute;
   top: -1000px;
-  left: -100px;
+  #{direction(left)}: -100px;
   z-index: 11;
   max-width: 200px;
   min-width: 100px;
@@ -516,7 +516,7 @@ body .disabled_link {
   .error_bottom {
     position: absolute;
     bottom: 0;
-    left: 4px;
+    #{direction(left)}: 4px;
   }
 }
 
@@ -1633,8 +1633,8 @@ body > #ui-datepicker-div {
 body.padless-content .ic-Layout-contentMain,
 .ic-Layout-contentMain.padless {
   #sequence_footer {
-    margin-left: 10px;
-    margin-right: 10px;
+    margin-#{direction(left)}: 10px;
+    margin-#{direction(right)}: 10px;
     padding-top: 0;
   }
 }

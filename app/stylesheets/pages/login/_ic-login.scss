@@ -193,8 +193,8 @@ body.ic-Login-Body { // apply the background to the body element so that you don
       content: "";
       position: absolute;
       top: -0.375rem;
-      left: -0.375rem;
-      right: -0.375rem;
+      #{direction(left)}: -0.375rem;
+      #{direction(right)}: -0.375rem;
       bottom: -0.375rem;
       border: 1px solid var(--ic-brand-Login-Content-password-text-color);
       border-radius: 0.375rem;
@@ -212,8 +212,8 @@ body.ic-Login-Body { // apply the background to the body element so that you don
       content: "";
       position: absolute;
       top: 0;
-      left: 0;
-      right: 0;
+      #{direction(left)}: 0;
+      #{direction(right)}: 0;
       bottom: 0;
       border-radius: 0.175rem;
     }

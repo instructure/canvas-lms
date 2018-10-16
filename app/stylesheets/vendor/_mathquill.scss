@@ -3,9 +3,9 @@
  * v0.xa
  * by Jay and Han
  * Lesser GPL Licensed: http: //www.gnu.org/licenses/lgpl.html
- * 
+ *
  * This file is automatically included by mathquill.js
- * 
+ *
  */
 
 .mathquill-editable,
@@ -305,8 +305,8 @@
   padding-top: .075em;
 }
 .mathquill-rendered-math .numerator {
-  padding-left: .1em;
-  padding-right: .1em;
+  padding-#{direction(left)}: .1em;
+  padding-#{direction(right)}: .1em;
 }
 .mathquill-rendered-math .denominator {
   border-top: 1px solid;
@@ -380,7 +380,7 @@
 }
 
 /*.mathquill-rendered-math .not {
-  margin-right: -.75em;
+  margin-#{direction(right)}: -.75em;
 }*/
 
 
@@ -415,10 +415,10 @@
   border-color: #999;
   border-width: 1px 1px 0 1px;
   border-style: solid;
-  -moz-border-radius-topright: 4px;
-  -moz-border-radius-topleft: 4px;
-  -webkit-border-radius-topright: 4px;
-  -webkit-border-radius-topleft: 4px;
+  -moz-border-radius-top#{direction(right)}: 4px;
+  -moz-border-radius-top#{direction(left)}: 4px;
+  -webkit-border-radius-top#{direction(right)}: 4px;
+  -webkit-border-radius-top#{direction(left)}: 4px;
   border-top-right-radius: 4px;
   border-top-left-radius: 4px;
   margin: direction-sides(0 4px 0 0);

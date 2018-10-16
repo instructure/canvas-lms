@@ -22,8 +22,8 @@
   @include border-radius(3px);
 }
 .badge {
-  padding-left: 9px;
-  padding-right: 9px;
+  padding-#{direction(left)}: 9px;
+  padding-#{direction(right)}: 9px;
   @include border-radius(9px);
 }
 

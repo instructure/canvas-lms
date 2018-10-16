@@ -7,8 +7,8 @@
       margin-top:1.5em;
     }
     fieldset.peoplesearch__selections {
-      margin-right: auto;
-      margin-left: auto;
+      margin-#{direction(right)}: auto;
+      margin-#{direction(left)}: auto;
       margin-top: .5rem;
       text-align: center;
       &>div {
