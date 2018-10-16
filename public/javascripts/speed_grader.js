@@ -1816,9 +1816,12 @@ EG = {
     var turnitinEnabled = submission.turnitin_data && (typeof submission.turnitin_data.provider === 'undefined');
     var vericiteEnabled = submission.turnitin_data && submission.turnitin_data.provider === 'vericite';
 
-    if (submission.has_originality_score) {
-      $('#plagiarism_platform_info_container').hide();
-    } else {
+    SpeedgraderHelpers.plagiarismResubmitButton(
+      submission.has_originality_score,
+      $('#plagiarism_platform_info_container')
+    )
+
+    if (!submission.has_originality_score) {
       const resubmitUrl = SpeedgraderHelpers.plagiarismResubmitUrl(submission, anonymizableUserId)
       $('#plagiarism_resubmit_button').on('click', (e) => { SpeedgraderHelpers.plagiarismResubmitHandler(e, resubmitUrl, anonymizableUserId) })
     }
