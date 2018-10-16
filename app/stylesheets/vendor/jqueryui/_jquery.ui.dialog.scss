@@ -98,7 +98,7 @@
 .ui-datepicker .ui-datepicker-header,
 .ui-dialog .ui-dialog-titlebar {
   border-top: 0; border-#{direction(left)}: 0; border-#{direction(right)}: 0;
-  border-bottom-left-radius: 0; border-bottom-right-radius: 0;
+  border-bottom-#{direction(left)}-radius: 0; border-bottom-#{direction(right)}-radius: 0;
   font-weight: bold;
   @include fontSize(14px);
 }

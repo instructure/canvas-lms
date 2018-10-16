@@ -379,8 +379,8 @@ body.body--login-confirmation {
 
 .ic-Login-confirmation__header {
   background: $ic-Login-confirmation-bgd;
-  border-top-left-radius: $baseBorderRadius;
-  border-top-right-radius: $baseBorderRadius;
+  border-top-#{direction(left)}-radius: $baseBorderRadius;
+  border-top-#{direction(right)}-radius: $baseBorderRadius;
   padding: $ic-sp*1.5;
 }
 
@@ -391,8 +391,8 @@ body.body--login-confirmation {
 .ic-Login-confirmation__content {
   padding: $ic-sp*2;
   background: $ic-color-light;
-  border-bottom-left-radius: $baseBorderRadius;
-  border-bottom-right-radius: $baseBorderRadius;
+  border-bottom-#{direction(left)}-radius: $baseBorderRadius;
+  border-bottom-#{direction(right)}-radius: $baseBorderRadius;
 
   .terms_of_service_link {
     position: relative;

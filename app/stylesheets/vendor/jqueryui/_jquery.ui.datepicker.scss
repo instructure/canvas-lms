@@ -8,7 +8,7 @@
  * http://docs.jquery.com/UI/Datepicker#theming
  */
 .ui-datepicker { width: 17em; padding: 0; display: none; }
-.ui-datepicker .ui-datepicker-header { position:relative; padding: 4px 0; border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+.ui-datepicker .ui-datepicker-header { position:relative; padding: 4px 0; border-bottom-#{direction(left)}-radius: 0; border-bottom-#{direction(right)}-radius: 0; }
 .ui-datepicker .ui-datepicker-prev, .ui-datepicker .ui-datepicker-next { position:absolute; top: 5px; width: 1.8em; height: 1.8em; }
 .ui-datepicker .ui-datepicker-prev-hover, .ui-datepicker .ui-datepicker-next-hover { top: 4px; }
 .ui-datepicker .ui-datepicker-prev { #{direction(left)}:4px; }

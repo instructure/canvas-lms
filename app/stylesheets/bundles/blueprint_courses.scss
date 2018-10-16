@@ -102,13 +102,13 @@
   }
 
   &:first-of-type {
-    border-top-right-radius: 3px;
-    border-top-left-radius: 3px;
+    border-top-#{direction(right)}-radius: 3px;
+    border-top-#{direction(left)}-radius: 3px;
   }
 
   &:last-of-type {
-    border-bottom-right-radius: 3px;
-    border-bottom-left-radius: 3px;
+    border-bottom-#{direction(right)}-radius: 3px;
+    border-bottom-#{direction(left)}-radius: 3px;
   }
 
   &.bcs__history-item__change__expanded {

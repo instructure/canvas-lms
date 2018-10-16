@@ -79,10 +79,10 @@
     #{direction(left)}: -$popoverArrowWidth;
     margin-top: -$popoverArrowWidth;
     border-width: $popoverArrowWidth $popoverArrowWidth $popoverArrowWidth 0;
-    border-right-color: $popoverArrowColor;
+    border-#{direction(right)}-color: $popoverArrowColor;
     &:after {
       border-width: $popoverArrowOuterWidth $popoverArrowOuterWidth $popoverArrowOuterWidth 0;
-      border-right-color: $popoverArrowOuterColor;
+      border-#{direction(right)}-color: $popoverArrowOuterColor;
       bottom: -$popoverArrowOuterWidth;
       #{direction(left)}: -1px;
     }
@@ -105,10 +105,10 @@
     #{direction(right)}: -$popoverArrowWidth;
     margin-top: -$popoverArrowWidth;
     border-width: $popoverArrowWidth 0 $popoverArrowWidth $popoverArrowWidth;
-    border-left-color: $popoverArrowColor;
+    border-#{direction(left)}-color: $popoverArrowColor;
     &:after {
       border-width: $popoverArrowOuterWidth 0 $popoverArrowOuterWidth $popoverArrowOuterWidth;
-      border-left-color: $popoverArrowOuterColor;
+      border-#{direction(left)}-color: $popoverArrowOuterColor;
       bottom: -$popoverArrowOuterWidth;
       #{direction(right)}: -1px;
     }

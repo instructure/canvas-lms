@@ -41,14 +41,14 @@
   border-#{direction(right)}: 1px solid $ic-border-color;
 
     &:first-of-type {
-      border-top-right-radius: 3px;
-      border-top-left-radius: 3px;
+      border-top-#{direction(right)}-radius: 3px;
+      border-top-#{direction(left)}-radius: 3px;
     }
 
     &:last-of-type {
       border-bottom: 1px solid $ic-border-color;
-      border-bottom-right-radius: 3px;
-      border-bottom-left-radius: 3px;
+      border-bottom-#{direction(right)}-radius: 3px;
+      border-bottom-#{direction(left)}-radius: 3px;
     }
 
     .bcs_tab-icon {

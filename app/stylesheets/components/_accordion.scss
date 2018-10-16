@@ -101,8 +101,8 @@ Simply add the **.ui-accordion--mini** class to the parent **.accordion** elemen
     top: 0;
     border-color: $ic-border-color;
     &.ui-accordion-content-active {
-      border-bottom-left-radius: $ic-border-radius;
-      border-bottom-right-radius: $ic-border-radius;
+      border-bottom-#{direction(left)}-radius: $ic-border-radius;
+      border-bottom-#{direction(right)}-radius: $ic-border-radius;
     }
   }
 
@@ -122,8 +122,8 @@ Simply add the **.ui-accordion--mini** class to the parent **.accordion** elemen
       }
       &.ui-state-hover { background: $ic-color-neutral; }
       &.ui-state-active {
-        border-bottom-left-radius: 0;
-        border-bottom-right-radius: 0;
+        border-bottom-#{direction(left)}-radius: 0;
+        border-bottom-#{direction(right)}-radius: 0;
         border-color: var(--ic-brand-primary-darkened-5);
         border-bottom: 1px solid var(--ic-brand-primary-darkened-5);
         background: var(--ic-brand-primary);
@@ -163,8 +163,8 @@ Simply add the **.ui-accordion--mini** class to the parent **.accordion** elemen
     }
     .ui-accordion-content {
       &.ui-accordion-content-active {
-        border-bottom-left-radius: $ic-border-radius/2;
-        border-bottom-right-radius: $ic-border-radius/2;
+        border-bottom-#{direction(left)}-radius: $ic-border-radius/2;
+        border-bottom-#{direction(right)}-radius: $ic-border-radius/2;
       }
     }
   }

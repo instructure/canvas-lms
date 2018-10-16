@@ -46,8 +46,8 @@
     .some-left {
       height: 20px;
       border-width: 2px 0pt 2px 2px;
-      border-top-left-radius: 3px;
-      border-bottom-left-radius: 3px;
+      border-top-#{direction(left)}-radius: 3px;
+      border-bottom-#{direction(left)}-radius: 3px;
       background: #fff;
       z-index: 2;
     }
@@ -55,8 +55,8 @@
       height: 20px;
       border-width: 2px;
       overflow: hidden;
-      border-top-right-radius: 3px;
-      border-bottom-right-radius: 3px;
+      border-top-#{direction(right)}-radius: 3px;
+      border-bottom-#{direction(right)}-radius: 3px;
       background: #fff;
       z-index: 2;
     }

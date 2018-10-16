@@ -24,18 +24,18 @@
 
   border-radius: 0.6em;
   li:first-child {
-    border-top-right-radius: 0.6em;
-    border-top-left-radius: 0.6em;
+    border-top-#{direction(right)}-radius: 0.6em;
+    border-top-#{direction(left)}-radius: 0.6em;
   }
   li:last-child  {
-    border-bottom-right-radius: 0.6em;
-    border-bottom-left-radius: 0.6em;
+    border-bottom-#{direction(right)}-radius: 0.6em;
+    border-bottom-#{direction(left)}-radius: 0.6em;
   }
 
   &.ui-listview-no-rounded-bottom {
     &, li:last-child {
-      border-bottom-right-radius: 0;
-      border-bottom-left-radius: 0;
+      border-bottom-#{direction(right)}-radius: 0;
+      border-bottom-#{direction(left)}-radius: 0;
     }
   }
 

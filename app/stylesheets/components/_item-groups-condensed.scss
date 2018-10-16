@@ -281,8 +281,8 @@
   .ig-list li:first-child .ig-row,
   .ig-list li:first-of-type .ig-row,
   .first_visible .ig-row {
-    border-top-left-radius: $baseBorderRadius;
-    border-top-right-radius: $baseBorderRadius;
+    border-top-#{direction(left)}-radius: $baseBorderRadius;
+    border-top-#{direction(right)}-radius: $baseBorderRadius;
     border-top: 1px solid $ic-border-light;
     &.ig-row-empty { border-top: 1px solid #dcdee0; }
   }
@@ -290,8 +290,8 @@
   .ig-list li:last-child .ig-row,
   .ig-list li:last-of-type .ig-row,
   .last_visible .ig-row {
-    border-bottom-left-radius: $baseBorderRadius;
-    border-bottom-right-radius: $baseBorderRadius;
+    border-bottom-#{direction(left)}-radius: $baseBorderRadius;
+    border-bottom-#{direction(right)}-radius: $baseBorderRadius;
     &.ig-row-empty { border-bottom: 1px solid $ic-border-light; }
   }
 
@@ -315,8 +315,8 @@
 
       li:last-child .ig-sublist,
       li:last-of-type .ig-sublist {
-        border-bottom-left-radius: $baseBorderRadius;
-        border-bottom-right-radius: $baseBorderRadius;
+        border-bottom-#{direction(left)}-radius: $baseBorderRadius;
+        border-bottom-#{direction(right)}-radius: $baseBorderRadius;
         border-bottom: none;
       }
     }

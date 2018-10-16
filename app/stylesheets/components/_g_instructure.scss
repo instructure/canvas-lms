@@ -175,8 +175,8 @@
     padding: 0px 10px;
     border-bottom: 1px solid #aaa;
     font-size: 1.2em;
-    border-top-right-radius: 4px;
-    border-top-left-radius: 4px;
+    border-top-#{direction(right)}-radius: 4px;
+    border-top-#{direction(left)}-radius: 4px;
   }
   .body {
     width: auto;
@@ -1181,9 +1181,6 @@ $wizard-bg-color: $ic-color-dark;
     &.base_links {
       font-size: 1.5em;
       text-align: center;
-    }
-    &.subcontent {
-      /* :border-left 1px solid #ddd */
     }
   }
   &.pinned_notification {

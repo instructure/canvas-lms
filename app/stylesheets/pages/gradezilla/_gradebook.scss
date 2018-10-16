@@ -380,8 +380,8 @@ $gradebook_cell_padding_top: 8px;
     #{direction(left)}: 15px;
     content: "";
     border-top-color: transparent;
-    border-left-color: transparent;
-    border-right-color: transparent;
+    border-#{direction(left)}-color: transparent;
+    border-#{direction(right)}-color: transparent;
     border-bottom: 5px solid #444444;
     top: -10px;
   }

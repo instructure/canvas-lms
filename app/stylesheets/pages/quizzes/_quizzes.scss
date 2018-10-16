@@ -1999,8 +1999,8 @@ ul#quiz_versions {
     padding: 5px;
     .icon-end {
       color: grey;
-      border-top-left-radius: 0;
-      border-bottom-left-radius: 0;
+      border-top-#{direction(left)}-radius: 0;
+      border-bottom-#{direction(left)}-radius: 0;
     }
   }
   .file-upload-box {
@@ -2008,8 +2008,8 @@ ul#quiz_versions {
     position: relative;
     display: inline-block;
     width: 85%;
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
+    border-top-#{direction(left)}-radius: 5px;
+    border-bottom-#{direction(left)}-radius: 5px;
   }
   .controls {
     margin: 0 auto 30px;
