@@ -325,6 +325,12 @@ module SeleniumDriverSetup
       chrome_options = Selenium::WebDriver::Chrome::Options.new
       chrome_options.add_argument('--disable-impl-side-painting')
 
+      # put `auto_open_devtools: true` in your selenium.yml if you want to have
+      # the chrome dev tools open by default by selenium
+      if CONFIG[:auto_open_devtools]
+        chrome_options.add_argument('--auto-open-devtools-for-tabs')
+      end
+
       Selenium::WebDriver.for :chrome, options: chrome_options
     end
 

@@ -1,6 +1,7 @@
 test:
   host: "localhost"
   browser: "chrome"
+  #auto_open_devtools: true
   #version: "45.0"
   #platform: "Windows 10"
   #remote_url: "https://instructure:secret_key@ondemand.saucelabs.com:80/wd/hub"
