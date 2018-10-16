@@ -102,7 +102,8 @@ export class PlannerHeader extends Component {
       gradesLoadingError: PropTypes.string,
     }).isRequired,
     ariaHideElement: PropTypes.instanceOf(Element).isRequired,
-    auxElement: PropTypes.instanceOf(Element).isRequired
+    auxElement: PropTypes.instanceOf(Element).isRequired,
+    stickyButtonId: PropTypes.string.isRequired,
   };
 
   static defaultProps = {
@@ -299,7 +300,7 @@ export class PlannerHeader extends Component {
     return (
       <Portal mountNode={this.props.auxElement} open={this.newActivityAboveView()}>
         <StickyButton
-          id="new_activity_button"
+          id={this.props.stickyButtonId}
           direction="up"
           onClick={this.handleNewActivityClick}
           zIndex={this.props.stickyZIndex}

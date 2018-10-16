@@ -52,6 +52,7 @@ function defaultProps (options) {
     cancelEditingPlannerItem: () => {},
     ariaHideElement: document.createElement('div'),
     stickyZIndex: 3,
+    stickyButtonId: 'new_activity_button',
     firstNewActivityDate: null,
     loading: {
       isLoading: false,

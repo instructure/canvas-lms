@@ -518,7 +518,7 @@ describe "student planner" do
       expect{scroll_height}.to become_between 600, 620  # 609
 
       new_activity_button.click
-      expect{scroll_height}.to become_between 520, 540  # 529
+      expect{scroll_height}.to become_between 450, 470  # 457
     end
 
     it "shows any new activity above the current scroll position", priority: "1", test_id: 3468775 do
