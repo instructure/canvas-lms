@@ -5,7 +5,7 @@ exports[`the Rubric component hides the score total when needed 1`] = `
   className="react-rubric"
   style={
     Object {
-      "minWidth": "52.5rem",
+      "minWidth": "37.5rem",
     }
   }
 >
@@ -17,6 +17,7 @@ exports[`the Rubric component hides the score total when needed 1`] = `
     <thead>
       <tr>
         <th
+          className="rubric-criteria"
           scope="col"
         >
           Criteria
@@ -28,6 +29,7 @@ exports[`the Rubric component hides the score total when needed 1`] = `
           Ratings
         </th>
         <th
+          className="rubric-points"
           scope="col"
         >
           Pts
@@ -167,7 +169,7 @@ exports[`the Rubric component renders as expected 1`] = `
   className="react-rubric"
   style={
     Object {
-      "minWidth": "52.5rem",
+      "minWidth": "37.5rem",
     }
   }
 >
@@ -179,6 +181,7 @@ exports[`the Rubric component renders as expected 1`] = `
     <thead>
       <tr>
         <th
+          className="rubric-criteria"
           scope="col"
         >
           Criteria
@@ -190,6 +193,7 @@ exports[`the Rubric component renders as expected 1`] = `
           Ratings
         </th>
         <th
+          className="rubric-points"
           scope="col"
         >
           Pts
@@ -353,7 +357,7 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
   className="react-rubric"
   style={
     Object {
-      "minWidth": "52.5rem",
+      "minWidth": "37.5rem",
     }
   }
 >
@@ -365,6 +369,7 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
     <thead>
       <tr>
         <th
+          className="rubric-criteria"
           scope="col"
         >
           Criteria
@@ -376,6 +381,7 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
           Ratings
         </th>
         <th
+          className="rubric-points"
           scope="col"
         >
           Pts
@@ -510,7 +516,7 @@ exports[`the Rubric component updates the total score when an individual criteri
   className="react-rubric"
   style={
     Object {
-      "minWidth": "52.5rem",
+      "minWidth": "37.5rem",
     }
   }
 >
@@ -522,6 +528,7 @@ exports[`the Rubric component updates the total score when an individual criteri
     <thead>
       <tr>
         <th
+          className="rubric-criteria"
           scope="col"
         >
           Criteria
@@ -533,6 +540,7 @@ exports[`the Rubric component updates the total score when an individual criteri
           Ratings
         </th>
         <th
+          className="rubric-points"
           scope="col"
         >
           Pts

@@ -27,12 +27,12 @@
   table-layout: fixed;
 }
 
-.react-rubric th.ratings {
-  width: 60%;
+.react-rubric th.rubric-criteria {
+  width: 8rem;
 }
 
-.react-rubric th.rubric-larger-criteria {
-  width: 40%;
+.react-rubric th.rubric-points {
+  width: 6rem;
 }
 
 .react-rubric .react-rubric-cell {
