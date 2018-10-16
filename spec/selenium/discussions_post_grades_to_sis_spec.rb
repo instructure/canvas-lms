@@ -16,13 +16,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require File.expand_path(File.dirname(__FILE__) + '/helpers/discussions_common')
+require_relative '../feature_flag_helper'
 
 describe "sync grades to sis" do
+  include FeatureFlagHelper
   include_context "in-process server selenium tests"
 
   before :each do
     course_with_admin_logged_in
-    Account.default.set_feature_flag!('post_grades', 'on')
+    mock_feature_flag(:post_grades, true)
     @course.sis_source_id = 'xyz'
     @course.save
     @assignment_group = @course.assignment_groups.create!(name: 'Assignment Group')
@@ -48,7 +50,7 @@ describe "sync grades to sis" do
   end
 
   it "does not display Sync to SIS option when feature not configured", priority: "1", test_id: 246614 do
-    Account.default.set_feature_flag!('post_grades', 'off')
+    mock_feature_flag(:post_grades, false)
     get "/courses/#{@course.id}/discussion_topics/new"
     f('#use_for_grading').click
     expect(f("#content")).not_to contain_css('#assignment_post_to_sis')
@@ -62,7 +64,6 @@ describe "sync grades to sis" do
 
     def get_post_grades_dialog
       get "/courses/#{@course.id}/gradebook"
-      wait_for_ajaximations
       expect(f('.post-grades-placeholder > button')).to be_displayed
       f('.post-grades-placeholder > button').click
       wait_for_ajaximations
