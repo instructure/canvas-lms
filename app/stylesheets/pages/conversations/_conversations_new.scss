@@ -313,7 +313,7 @@
     @include fontSize(16px);
     color: $ic-color-medium;
     height: 40px;
-    margin: 0 24px 0 0;
+    margin: direction-sides(0 24px 0 0);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -524,7 +524,7 @@
     #{direction(right)}: 9999em;
     position: relative;
     top: 0;
-    margin: 20px 10px 0 8px;
+    margin: direction-sides(20px 10px 0 8px);
   }
 
   .actions li {

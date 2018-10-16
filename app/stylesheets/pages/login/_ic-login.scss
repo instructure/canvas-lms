@@ -98,7 +98,7 @@ body.ic-Login-Body { // apply the background to the body element so that you don
 .ic-Login__body {
   background: var(--ic-brand-Login-Content-inner-body-bgd);
   border: 2px solid var(--ic-brand-Login-Content-inner-body-border);
-  padding: $ic-sp*1.5 $ic-sp*1.5 $ic-sp $ic-sp*1.5;
+  padding: direction-sides($ic-sp*1.5 $ic-sp*1.5 $ic-sp $ic-sp*1.5);
   margin-top: $ic-sp;
 }
 // these have !important because Canvas specificity on labels and
@@ -230,7 +230,7 @@ body.ic-Login-Body { // apply the background to the body element so that you don
 .ic-Login__forgot-text {
   color: var(--ic-brand-Login-Content-password-text-color);
   @include fontSize($ic-font-size--small);
-  padding: 0 0 $ic-sp*2 0;
+  padding: direction-sides(0 0 $ic-sp*2 0);
   margin: 0;
   line-height: $ic-sp*2;
 }
@@ -338,12 +338,12 @@ body.ic-Login-Body #footer.ic-Login-footer {
     }
     h2, .h2 {
       height: 41px;
-      margin: 0 0 -5px 0;
-      padding: 0 0 0 60px;
+      margin: direction-sides(0 0 -5px 0);
+      padding: direction-sides(0 0 0 60px);
       color: #000;
     }
     p {
-      padding: 0 0 0 60px;
+      padding: direction-sides(0 0 0 60px);
       margin: 0;
       font-size: 1.25em;
       font-weight: normal;

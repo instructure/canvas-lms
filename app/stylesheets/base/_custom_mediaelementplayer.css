@@ -36,7 +36,7 @@
 /* Subtitile upload link */
 .mejs-captions-selector .upload-track {
   color: white;
-  margin: 3px 0 5px 5px;
+  margin: direction-sides(3px 0 5px 5px);
   float: direction(left);
 }
 

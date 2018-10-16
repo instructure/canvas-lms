@@ -56,7 +56,7 @@
       display: block;
       position: relative;
       height: 100%;
-      padding: .7em 15px .7em 44px;
+      padding: direction-sides(.7em 15px .7em 44px);
       text-overflow: ellipsis; overflow: hidden; white-space: nowrap;
       font-size: 1em; /*this is to override the .file, .pdf, .doc etc 10px size*/
       background-position: 15px center; /*overrides background-position left of attachment_links*/

@@ -36,7 +36,7 @@
   .navbar .brand {
     padding-left: 10px;
     padding-right: 10px;
-    margin: 0 0 0 -5px;
+    margin: direction-sides(0 0 0 -5px);
   }
 
   // COLLAPSIBLE NAVBAR

@@ -141,7 +141,7 @@ $headerBorderColor: rgb(199, 205, 209);
 
 .GradesGrid__FinalGradeCell {
   max-width: $finalGradeColumnWidth;
-  padding: 0 0 0 $ic-sp;
+  padding: direction-sides(0 0 0 $ic-sp);
   text-align: center;
 }
 

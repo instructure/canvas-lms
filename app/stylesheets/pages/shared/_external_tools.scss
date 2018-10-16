@@ -143,7 +143,7 @@ $app_height: 143px;
         position: relative;
         float: direction(left);
         border: thin solid #eeeeee;
-        margin: 0 2px 2px 0;
+        margin: direction-sides(0 2px 2px 0);
         .installed-ribbon {
           position: absolute;
           width: 100%;
@@ -244,7 +244,7 @@ $app_height: 143px;
     margin: 0 0 10px;
     td {
       &.image-and-stars {
-        padding: 10px 0 0 10px;
+        padding: direction-sides(10px 0 0 10px);
         width: 58px;
         img {
           max-width: 50px;

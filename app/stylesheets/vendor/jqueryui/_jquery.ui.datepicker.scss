@@ -26,7 +26,7 @@
 .ui-datepicker td { border: 0; }
 .ui-datepicker td span, .ui-datepicker td a { display: block; padding: 2px; text-align: center; text-decoration: none; border-color: transparent; }
 .ui-datepicker .ui-datepicker-buttonpane { background-image: none; margin: .7em 0 0 0; padding:0 .2em; border-left: 0; border-right: 0; border-bottom: 0; }
-.ui-datepicker .ui-datepicker-buttonpane button { float: direction(right); margin: .5em .2em .4em; cursor: pointer; padding: .2em .6em .3em .6em; width:auto; overflow:visible; }
+.ui-datepicker .ui-datepicker-buttonpane button { float: direction(right); margin: .5em .2em .4em; cursor: pointer; padding: direction-sides(.2em .6em .3em .6em); width:auto; overflow:visible; }
 .ui-datepicker .ui-datepicker-buttonpane button.ui-datepicker-current { float: direction(left); }
 
 /* with multiple calendars */

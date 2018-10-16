@@ -108,7 +108,7 @@ $mini-cal-highlight-border: #fa0;
   }
 
   .fc-basic-view td.fc-day-number {
-    padding: 3px 2px 2px 0;
+    padding: direction-sides(3px 2px 2px 0);
   }
 
   .event {

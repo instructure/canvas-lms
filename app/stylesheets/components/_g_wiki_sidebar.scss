@@ -155,7 +155,7 @@
     overflow: auto;
     li {
       cursor: pointer;
-      padding: 0 8px 0 39px;
+      padding: direction-sides(0 8px 0 39px);
       position: relative;
       margin: 0;
       height: 33px;

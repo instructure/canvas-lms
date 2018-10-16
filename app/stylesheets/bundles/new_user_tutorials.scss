@@ -31,7 +31,7 @@
 }
 
 .NewUserTutorialTray__Subheading {
-  margin: ($ic-sp / 2) 0 ($ic-sp * 1.5) 0;
+  margin: direction-sides(($ic-sp / 2) 0 ($ic-sp * 1.5) 0);
 }
 
 .NewUserTutorialTray__ButtonContainer {

@@ -28,7 +28,7 @@
     font-size: 1.2em;
     width: auto;
     list-style-type: none;
-    padding: 3px 5px 3px 30px;
+    padding: direction-sides(3px 5px 3px 30px);
     background-position: 5px center;
     background-repeat: no-repeat;
     background-color: #fff;
@@ -89,7 +89,7 @@
     margin: 0px;
     list-style-type: none;
     li.tag {
-      padding: 4px 5px 4px 35px;
+      padding: direction-sides(4px 5px 4px 35px);
       cursor: pointer;
       background-image: url(/images/tag_icon.png);
       background-position: 2px 2px;
@@ -131,7 +131,7 @@
         margin-#{direction(left)}: 10px;
       }
       .folder_name {
-        padding: 5px 5px 5px 30px;
+        padding: direction-sides(5px 5px 5px 30px);
         cursor: pointer;
         background-image: url(/images/folder_closed.png);
         background-position: 7px center;

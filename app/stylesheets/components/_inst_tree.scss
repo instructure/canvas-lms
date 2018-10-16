@@ -108,7 +108,7 @@ ul.instTree {
 }
 
 #instTree-drag {
-  padding: 3px 3px 3px 30px;
+  padding: direction-sides(3px 3px 3px 30px);
   z-index: 1000;
   position: absolute;
   &.node {

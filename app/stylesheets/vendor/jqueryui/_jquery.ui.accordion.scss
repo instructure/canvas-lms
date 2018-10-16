@@ -13,7 +13,7 @@
   .ui-accordion-header { cursor: pointer; position: relative; margin-top: 1px; zoom: 1; }
   .ui-accordion-li-fix { display: inline; }
   .ui-accordion-header-active { border-bottom: 0 !important; }
-  .ui-accordion-header a { display: block; font-size: 1em; padding: .5em .5em .5em .7em;
+  .ui-accordion-header a { display: block; font-size: 1em; padding: direction-sides(.5em .5em .5em .7em);
     font-weight: bold;
   }
 }

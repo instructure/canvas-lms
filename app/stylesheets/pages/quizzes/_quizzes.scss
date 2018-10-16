@@ -2107,7 +2107,7 @@ ul#quiz_versions {
   .checkbox {
     input {
       height: 16px;
-      margin: 0 9px 0 0;
+      margin: direction-sides(0 9px 0 0);
     }
   }
   label {
@@ -2193,7 +2193,7 @@ ul#quiz_versions {
     padding-#{direction(left)}: 80px;
     h2 {
       font-size: 1.5em;
-      margin: 0 0 -10px 0;
+      margin: direction-sides(0 0 -10px 0);
       height: 41px;
     }
     p {

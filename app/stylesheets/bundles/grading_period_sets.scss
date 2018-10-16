@@ -62,7 +62,7 @@
 .ic-Form-actions.below-line {
   border: none;
   border-top: 1px solid $ic-border-light;
-  padding: $spacing-width 0 0 0;
+  padding: direction-sides($spacing-width 0 0 0);
   background: none;
 }
 
