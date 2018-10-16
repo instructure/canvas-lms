@@ -419,7 +419,6 @@ body.primary-nav-expanded {
   width: $ic-sp*28;
   top: 0; bottom: 0;
   left: $ic-header-primary-width;
-  transform: translateX($ic-header-primary-width);
   transition-duration: .24s;
   transition-property: left, opacity, transform;
   transition-timing-function: ease-in-out;
@@ -430,7 +429,7 @@ body.primary-nav-expanded {
 }
 
 .ReactTray__Content--after-open {
-    transform: translate3d(0,0,0);
+  transform: translate3d(0,0,0);
 }
 
 .ReactTray__Content--before-close {
@@ -444,9 +443,6 @@ body.primary-nav-expanded {
   display: flex;
   flex-direction: column;
 }
-
-
-// Nav menu styles
 
 .ic-NavMenu__primary-content {
   flex: 1 0 auto;

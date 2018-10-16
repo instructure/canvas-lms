@@ -41,7 +41,19 @@ body {
     .ReactTray__Content { left: 60px; }
     .menu-item__text { opacity: 0; }
 
+    .ic-app-nav-toggle-and-crumbs { margin-top: -53px; }
+
     #footer { display: none; }
+
+    iframe {
+
+        &#file_content,
+        &#tool_content,
+        &.tool_launch {
+            height: calc(100vh - 127px);
+            transition-delay: .48s;
+        }
+    }
   }
 
   &.no-headers.distraction-free {
@@ -50,6 +62,24 @@ body {
     .ic-app-header { width: 60px; }
     .ReactTray__Content { left: 60px; }
     .menu-item__text { opacity: 0; }
+
+    iframe {
+
+        &#file_content,
+        &#tool_content,
+        &.tool_launch {
+            height: calc(100vh - 127px);
+            transition-delay: .48s;
+        }
+    }
+}
+
+&.full-width {
+
+    .ic-Layout-wrapper {
+        max-width: unset;
+        transform: unset;
+    }
 }
 
   &.embedded {
@@ -145,6 +175,10 @@ iframe.info_alert_outline {
 iframe {
   border: none;
   height: 100%;
+  transition-delay: 0s;
+  transition-duration: .24s;
+  transition-property: height;
+  transition-timing-function: ease-in-out;
   width: 100%;
 
   &#file_content,
