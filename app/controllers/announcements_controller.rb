@@ -48,7 +48,6 @@ class AnnouncementsController < ApplicationController
         js_env atom_feed_url: feeds_announcements_format_path((@context_enrollment || @context).feed_code, :atom)
         js_env(COURSE_ID: @context.id.to_s) if @context.is_a?(Course)
         js_env ANNOUNCEMENTS_LOCKED: announcements_locked?
-        js_env ARC_RECORDING_FEATURE_ENABLED: @context.root_account.feature_enabled?(:integrate_arc_rce)
 
         js_bundle :announcements_index_v2
         css_bundle :announcements_index
