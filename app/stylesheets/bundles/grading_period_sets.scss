@@ -88,7 +88,7 @@
 
 .GradingPeriodSet--expanded {
   .ItemGroup__header {
-    border-radius: $baseBorderRadius $baseBorderRadius 0 0;
+    border-radius: direction-corners($baseBorderRadius $baseBorderRadius 0 0);
   }
 }
 

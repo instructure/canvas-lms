@@ -65,7 +65,7 @@
     overflow-y: hidden;
     padding-bottom: 15px;
     border: none;
-    border-radius: 0px 0px 0px 5px;
+    border-radius: direction-corners(0px 0px 0px 5px);
     .wrapper {
       width: 201px;
     }

@@ -159,7 +159,7 @@ $discussion-dark-text: $ic-color-dark;
 }
 
 .reply-textarea {
-  border-radius: 5px 5px 0 0;
+  border-radius: direction-corners(5px 5px 0 0);
   box-sizing: border-box;
   min-height: 155px;
   width: 100%;
@@ -324,7 +324,7 @@ $discussion-dark-text: $ic-color-dark;
     .discussion-entry-reply-area {
       padding: 0 0.8em;
       border-top: 1px solid #d4d5d7;
-      border-radius: 0 0 3px 3px;
+      border-radius: direction-corners(0 0 3px 3px);
 
       &.reply-box-container {
         padding: 15px 0.8em;

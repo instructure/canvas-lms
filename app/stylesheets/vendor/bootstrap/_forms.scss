@@ -504,9 +504,9 @@ This is the standard form actions button bar at the bottom of every content form
   input,
   select,
   .uneditable-input {
-    border-radius: $inputBorderRadius 0 0 $inputBorderRadius;
+    border-radius: direction-corners($inputBorderRadius 0 0 $inputBorderRadius);
     + .btn-group .btn {
-      border-radius: 0 $inputBorderRadius $inputBorderRadius 0;
+      border-radius: direction-corners(0 $inputBorderRadius $inputBorderRadius 0);
     }
   }
   .add-on,
@@ -527,7 +527,7 @@ This is the standard form actions button bar at the bottom of every content form
   .uneditable-input {
     border-radius: 0;
     + .btn-group .btn {
-      border-radius: 0 $inputBorderRadius $inputBorderRadius 0;
+      border-radius: direction-corners(0 $inputBorderRadius $inputBorderRadius 0);
     }
   }
   .add-on:#{direction-if(rtl, last, first)}-child,
