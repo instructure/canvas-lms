@@ -52,14 +52,6 @@ body {
     .ic-app-nav-toggle-and-crumbs { display: flex !important; }
 }
 
-&.full-width {
-
-    .ic-Layout-wrapper {
-        max-width: unset;
-        transform: unset;
-    }
-}
-
   &.embedded {
     #application {
       height: 100%;
