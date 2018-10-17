@@ -84,7 +84,7 @@ const recognized = [
   "sr",
   "sv",
   "tr",
-  "uk-UA",
+  "uk",
   "vi",
   "zh-Hans",
   "zh-Hant"

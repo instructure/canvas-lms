@@ -19,4 +19,4 @@
 import formatMessage from "../format-message";
 import locale from "../../locales/uk_UA.json";
 import "../rce/languages/uk_UA";
-formatMessage.addLocale({ "uk-UA": locale });
+formatMessage.addLocale({ "uk": locale });

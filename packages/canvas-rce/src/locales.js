@@ -53,7 +53,7 @@ import sq from "../locales/sq.json";
 import sr from "../locales/sr.json";
 import sv from "../locales/sv.json";
 import tr from "../locales/tr.json";
-import uk_UA from "../locales/uk_UA.json";
+import uk from "../locales/uk_UA.json";
 import vi from "../locales/vi.json";
 import zh from "../locales/zh.json";
 import zh_HK from "../locales/zh_HK.json";
@@ -96,7 +96,7 @@ export default {
   sr,
   sv,
   tr,
-  "uk-UA": uk_UA,
+  uk,
   vi,
   "zh-Hans": zh,
   "zh-Hant": zh_HK
