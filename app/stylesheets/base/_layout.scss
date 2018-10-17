@@ -40,16 +40,6 @@ body {
     .ic-app-nav-toggle-and-crumbs { display: none; }
 
     #footer { display: none; }
-
-    iframe {
-
-        &#file_content,
-        &#tool_content,
-        &.tool_launch {
-            height: calc(100vh - 127px);
-            transition-delay: .48s;
-        }
-    }
   }
 
   &.no-headers.distraction-free {
@@ -59,15 +49,7 @@ body {
     .ReactTray__Content { left: 60px; }
     .menu-item__text { opacity: 0; }
 
-    iframe {
-
-        &#file_content,
-        &#tool_content,
-        &.tool_launch {
-            height: calc(100vh - 127px);
-            transition-delay: .48s;
-        }
-    }
+    .ic-app-nav-toggle-and-crumbs { display: flex !important; margin-bottom: 20px; }
 }
 
 &.full-width {
@@ -171,10 +153,6 @@ iframe.info_alert_outline {
 iframe {
   border: none;
   height: 100%;
-  transition-delay: 0s;
-  transition-duration: .24s;
-  transition-property: height;
-  transition-timing-function: ease-in-out;
   width: 100%;
 
   &#file_content,
