@@ -15,7 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import { defaultCriteria, fillAssessment } from '../helpers'
+import {
+  defaultCriteria,
+  fillAssessment,
+  getSavedComments,
+  updateAssociationData
+} from '../helpers'
 import { assessments, rubrics } from './fixtures'
 
 describe('defaultCriteria', () => {
@@ -58,5 +63,26 @@ describe('fillAssessment', () => {
       { text: '--', valid: false, value: null },
       { text: '', valid: true },
     ])
+  })
+})
+
+describe('updateAssociationData', () => {
+  it('updates saved comments', () => {
+    const assessment = {
+      score: 0,
+      data: [
+        {
+          ...defaultCriteria('_1384'),
+          comments: 'for later',
+          saveCommentsForLater: true
+        },
+        defaultCriteria('7_391'),
+      ]
+    }
+
+    const association = { }
+    expect(getSavedComments(association, '_1384')).toBeUndefined()
+    updateAssociationData(association, assessment)
+    expect(getSavedComments(association, '_1384')).toEqual(['for later'])
   })
 })

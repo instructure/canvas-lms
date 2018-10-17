@@ -45,3 +45,16 @@ export const fillAssessment = (rubric, partialAssessment) => {
     )
   }
 }
+
+const savedCommentPath = (id) => ['summary_data', 'saved_comments', id]
+export const getSavedComments = (association, id) =>
+  _.get(association, savedCommentPath(id), undefined)
+
+export const updateAssociationData = (association, assessment) => {
+  assessment.data
+    .filter(({ saveCommentsForLater }) => saveCommentsForLater)
+    .forEach(({ criterion_id: id, comments }) => {
+      const prior = getSavedComments(association, id) || []
+      _.set(association, savedCommentPath(id), _.uniq([...prior, comments]))
+    })
+}

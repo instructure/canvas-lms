@@ -120,14 +120,24 @@ module Lti
           context: @context
         )
         jwt_validator.validate!
-        file_host, _ = HostUrl.file_host_with_shard(@domain_root_account || Account.default, request.host_with_port)
-        aud = [request.host, file_host]
         reg_key = code || jwt_validator.sub
         render json: {
           access_token: Lti::Oauth2::AccessToken.create_jwt(aud: aud, sub: jwt_validator.sub, reg_key: reg_key).to_s,
           token_type: 'bearer',
           expires_in: Setting.get('lti.oauth2.access_token.expiration', 1.hour.to_s)
         }
+      end
+
+      private
+
+      def aud
+        # This will include domains for test, staging, and beta. LTI 2 service controllers are responsible
+        # for verifying the "sub" is associated with the requested resource in the requested env.
+        [
+          HostUrl.file_host_with_shard(@domain_root_account || Account.default, request.host_with_port).first,
+          request.host,
+          *HostUrl.context_hosts(@domain_root_account)
+        ].uniq
       end
     end
   end

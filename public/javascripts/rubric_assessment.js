@@ -31,7 +31,7 @@ import './jquery.templateData'
 import './vendor/jquery.scrollTo'
 import 'compiled/jquery.rails_flash_notifications' // eslint-disable-line
 import Rubric from 'jsx/rubrics/Rubric'
-import { fillAssessment } from 'jsx/rubrics/helpers'
+import { fillAssessment, updateAssociationData } from 'jsx/rubrics/helpers'
 
 // TODO: stop managing this in the view and get it out of the global scope submissions/show.html.erb
 /*global rubricAssessment*/
@@ -258,7 +258,10 @@ window.rubricAssessment = {
 
   updateRubricAssociation: function($rubric, data) {
     var summary_data = data.summary_data;
-    if (summary_data && summary_data.saved_comments) {
+    if (ENV.nonScoringRubrics && this.currentAssessment !== undefined) {
+      const assessment = this.currentAssessment
+      updateAssociationData(this.currentAssociation, assessment)
+    } else if (summary_data && summary_data.saved_comments) {
       for(var id in summary_data.saved_comments) {
         var comments = summary_data.saved_comments[id],
             $holder = $rubric.find("#criterion_" + id).find(".saved_custom_rating_holder").hide(),
@@ -285,6 +288,9 @@ window.rubricAssessment = {
         rubricAssessment.currentAssessment = currentAssessment
         render(currentAssessment)
       }
+
+      const association = rubricAssessment.currentAssociation || rubricAssociation
+      rubricAssessment.currentAssociation = association
 
       const render = (currentAssessment) => {
         ReactDOM.render(<Rubric

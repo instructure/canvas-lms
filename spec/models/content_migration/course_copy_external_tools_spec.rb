@@ -88,6 +88,22 @@ describe ContentMigration do
       expect(tag_to.new_tab).to eq tag_from.new_tab
     end
 
+    it "should copy account-level external tool assignments" do
+      account_tool = @copy_from.account.context_external_tools.build name: 'blah', url: 'https://blah.example.com', shared_secret: '123', consumer_key: '456'
+      assignment_model(:course => @copy_from, :points_possible => 40, :submission_types => 'external_tool', :grading_type => 'points')
+      tag_from = @assignment.create_external_tool_tag(:url => "http://blah.example.com/one", :new_tab => true, :content => account_tool)
+
+      run_course_copy
+
+      asmnt_2 = @copy_to.assignments.first
+      tag_to = asmnt_2.external_tool_tag
+      expect(tag_to.content).to eq account_tool
+
+      run_course_copy
+
+      expect(asmnt_2.reload.external_tool_tag).to eq tag_to # don't recreate the tag
+    end
+
     it "should copy vendor extensions" do
       @tool_from.settings[:vendor_extensions] = [{:platform=>"my.lms.com", :custom_fields=>{"key"=>"value"}}]
       @tool_from.save!

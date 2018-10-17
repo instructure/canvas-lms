@@ -93,7 +93,7 @@
     "spin.js": "2.3.2",
     "swfobject": "^2.2.1",
     "tablesorter": "^2.28.5",
-    "timezone": "1.0.13",
+    "timezone": "^1.0.18",
     "tinycolor2": "1.4.1",
     "tinymce": "^4.8.0",
     "tinymce-a11y-checker": "^1.6.0",
