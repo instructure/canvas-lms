@@ -15,19 +15,15 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
-
-<% if can_do(@context, @current_user, :participate_as_student) %>
-  <a href="<%= context_url(@context, :context_grades_url) %>" class="btn button-sidebar-wide">
-    <i class="icon-check-plus" role="presentation"></i>
-    <%= t 'links.see_current_grades', "See my grades so far" %>
-  </a>
+<% if !can_do(@context, @current_user, :participate_as_student) %>
+  <%= render :partial => "shared/event_list",
+             :object  => @upcoming_assignments,
+             :locals  => {
+               :title         => t('titles.upcoming_assignments', "Upcoming Assignments"),
+               :contexts_to_link_to => @context,
+               :show_context  => true,
+               :upcoming      => true,
+               :show_more     => false,
+               :period        => :next_week,
+             } %>
 <% end %>
-<%= render :partial => "shared/event_list", 
-           :object  => @upcoming_assignments, 
-           :locals  => {
-             :title         => t('titles.upcoming_assignments', "Upcoming Assignments"),
-             :show_context  => true, 
-             :upcoming      => true,
-             :show_more     => false,
-             :period        => :next_week,
-           } %>
