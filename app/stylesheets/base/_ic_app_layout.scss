@@ -397,6 +397,7 @@ body:not(.course-menu-expanded) {
   display: flex;
   align-items: center;
   border-bottom: 1px solid $ic-border-light;
+  margin-bottom: 20px;
   padding: $ic-sp/2 $ic-sp*2;
 }
 

@@ -49,7 +49,7 @@ body {
     .ReactTray__Content { left: 60px; }
     .menu-item__text { opacity: 0; }
 
-    .ic-app-nav-toggle-and-crumbs { display: flex !important; margin-bottom: 20px; }
+    .ic-app-nav-toggle-and-crumbs { display: flex !important; }
 }
 
 &.full-width {
@@ -158,7 +158,7 @@ iframe {
   &#file_content,
   &#tool_content,
   &.tool_launch {
-      height: calc(100vh - 180px); // This is for when the iframeResizer isn't supported. The iframeResizer will override this via inline styles.
+      height: calc(100vh - 160px); // This is for when the iframeResizer isn't supported. The iframeResizer will override this via inline styles.
   }
 }
 
