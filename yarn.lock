@@ -15339,13 +15339,10 @@ timers-ext@0.1, timers-ext@^0.1.5:
     es5-ext "~0.10.14"
     next-tick "1"
 
-timespan@2.3.x:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/timespan/-/timespan-2.3.0.tgz#4902ce040bd13d845c8f59b27e9d59bad6f39929"
-
-timezone@1.0.13:
-  version "1.0.13"
-  resolved "https://registry.yarnpkg.com/timezone/-/timezone-1.0.13.tgz#38d3c2e4ff7947b1f4bd6ac6e000c2461483f8b3"
+timezone@^1.0.18:
+  version "1.0.18"
+  resolved "https://registry.yarnpkg.com/timezone/-/timezone-1.0.18.tgz#683ec740f51fb242ad72788d81e8c888797cf812"
+  integrity sha512-iUauLPXDdDhXcP3UPAYf8TxAahnvA6fIFfdo5iFJ1bnXdZmakIMRG6XzE2EJzFWq6dYnWY9jJwpbyBrpmwHRFQ==
 
 tiny-lr@^0.2.1:
   version "0.2.1"

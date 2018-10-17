@@ -8040,7 +8040,7 @@ ru:
       section_name_invalid: "Недопустимое название раздела"
       section_name_too_long: "Слишком длинное название раздела"
       upload_failed: "Ошибка загрузки."
-    first_category: "В начало"
+    first_category: "Домашняя страница"
     first_entry: 
       content: "Ничего не введено"
       title: Приветствие
@@ -9810,7 +9810,7 @@ ru:
     tabs: 
       discussions: Обсуждения
       files: Файлы
-      home: "В начало"
+      home: "Домашняя страница"
       pages: Страницы
       people: Пользователи
   group_a8f5ed9c: Группа
@@ -19711,7 +19711,7 @@ ru:
     eportfolios: ePortfolio
     files: Файлы
     grades: Оценки
-    home: "В начало"
+    home: "Домашняя страница"
     logout: "Выход из системы"
     modules: Модули
     observees: Наблюдение
@@ -21370,7 +21370,7 @@ ru:
       welcome_to_happiness: "Вас приветствует Canvas!"
   users_act_as_d922940: "Пользователи - в качестве"
   users_add_remove_observers_d1273d9: "Пользователи - добавить / удалить наблюдателей"
-  users_add_remove_students_in_courses_efe7e748: "Пользователи - добавить / удалить наблюдателей из курсов"
+  users_add_remove_students_in_courses_efe7e748: "Пользователи - добавить / удалить студентов из курсов"
   users_add_remove_teachers_course_designers_or_tas__b480dd9: "Курсы - добавить / удалить преподавателей, разработчиков курсов или ассистентов преподавателей из курсов"
   users_and_terms_are_located_at_the_account_so_the__4184557b: |-
       Пользователи и условия находятся в учетной записи, поэтому конечная точка SIS всегда подтверждает разрешения пользователя в соответствии с учетной записью. Субучетные записи могут владеть только курсами и разделами; они не владеют пользовательскими данными.

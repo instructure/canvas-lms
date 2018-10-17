@@ -157,6 +157,28 @@ module Lti
         # expect(json.detect {|j| j.key?('name') && j.key?('domain')}).not_to be_nil
       end
 
+      # Some tools like arc, gauge have visibility settings on global_navigation placements.
+      # For global_navigation we want to return all the launches, even if we are unsure what
+      # visibility the user should have access to.
+      it 'returns global_navigation launches for a student even when visibility should not allow it' do
+        course_with_student(active_all: true, user: user_with_pseudonym, account: account)
+
+        tool = new_valid_external_tool(@course.root_account)
+        tool.global_navigation = {
+          :text => "Global Nav",
+          :visibility => "admins"
+        }
+        tool.save!
+
+        json = api_call(:get, "/api/v1/accounts/#{account.id}/lti_apps/launch_definitions",
+          {controller: 'lti/lti_apps', action: 'launch_definitions', :account_id => account.id.to_param, format: 'json'},
+          placements: ['global_navigation'])
+
+        expect(response.status).to eq 200
+        expect(json.count).to eq 1
+        expect(json.first['definition_id']).to eq tool.id
+      end
+
       it 'paginates the launch definitions' do
         5.times { |_| new_valid_external_tool(account) }
         course_with_teacher(active_all: true, user: user_with_pseudonym, account: account)

@@ -75,9 +75,6 @@ class PseudonymsController < ApplicationController
     @ccs = []
     if email.present?
       @ccs = CommunicationChannel.email.by_path(email).active.to_a
-      if @ccs.empty?
-        @ccs += CommunicationChannel.email.by_path(email).to_a
-      end
       if @domain_root_account
         @domain_root_account.pseudonyms.active.by_unique_id(email).each do |p|
           cc = p.communication_channel if p.communication_channel && p.user

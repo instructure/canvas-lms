@@ -125,6 +125,27 @@ module Lti
           expect(jwt["aud"]).to match_array [request.host, file_host]
         end
 
+        context 'when the account has a vanity domain' do
+          subject do
+            post auth_endpoint, params: params
+            JSON::JWT.decode(JSON.parse(response.body)["access_token"], :skip_verification)
+          end
+
+          let(:vanity_domain) { 'canvas.school.com' }
+
+          before do
+            allow(HostUrl).to receive(:context_hosts).and_return([vanity_domain])
+          end
+
+          it 'includes both domains in the aud' do
+            expect(subject['aud']).to match_array [
+              'www.example.com',
+              'localhost',
+              'canvas.school.com'
+            ]
+          end
+        end
+
         context 'error reports' do
           it 'creates an error report with error as the message' do
             params[:assertion] = '12ad3.4fgs56'

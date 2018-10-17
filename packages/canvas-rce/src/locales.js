@@ -17,55 +17,87 @@
  */
 
 import ar from "../locales/ar.json";
+import bg from "../locales/bg.json";
+import cs from "../locales/cs.json";
+import cy from "../locales/cy.json";
 import da from "../locales/da.json";
 import de from "../locales/de.json";
-import en_AU from "../locales/en-AU.json";
-import en_GB from "../locales/en-GB.json";
-import en_CY from '../locales/en_CY.json';
-import en_GB_x_lbs from "../locales/en-GB-x-lbs.json";
+import el from "../locales/el.json";
+import en_AU from "../locales/en_AU.json";
+import en_CY from "../locales/en_CY.json";
+import en_GB from "../locales/en_GB.json";
+import en_IE from "../locales/en_IE";
 import es from "../locales/es.json";
 import fa from "../locales/fa.json";
+import fa_IR from "../locales/fa_IR.json";
 import fr from "../locales/fr.json";
+import fr_CA from "../locales/fr_CA.json";
 import he from "../locales/he.json";
+import ht from "../locales/ht.json";
+import hu from "../locales/hu.json";
 import hy from "../locales/hy.json";
+import is from "../locales/is.json";
+import it from "../locales/it.json";
 import ja from "../locales/ja.json";
 import ko from "../locales/ko.json";
 import mi from "../locales/mi.json";
 import nb from "../locales/nb.json";
 import nl from "../locales/nl.json";
+import nn from "../locales/nn.json";
 import pl from "../locales/pl.json";
-import pt_BR from "../locales/pt-BR.json";
 import pt from "../locales/pt.json";
+import pt_BR from "../locales/pt_BR.json";
+import ro from "../locales/ro.json";
 import ru from "../locales/ru.json";
+import sq from "../locales/sq.json";
+import sr from "../locales/sr.json";
 import sv from "../locales/sv.json";
 import tr from "../locales/tr.json";
-import zh_Hans from "../locales/zh-Hans.json";
-import zh_Hant from "../locales/zh-Hant.json";
+import uk_UA from "../locales/uk_UA.json";
+import vi from "../locales/vi.json";
+import zh from "../locales/zh.json";
+import zh_HK from "../locales/zh_HK.json";
 
 export default {
-  ar: ar,
-  da: da,
-  de: de,
+  ar,
+  bg,
+  cs,
+  cy,
+  da,
+  de,
   "en-AU": en_AU,
   "en-GB": en_GB,
-  "en-GB-x-lbs": en_GB_x_lbs,
+  "en-GB-x-lbs": en_IE,
   "en-GB-x-ukhe": en_CY,
-  es: es,
-  fa: fa,
-  fr: fr,
-  he: he,
-  hy: hy,
-  ja: ja,
-  ko: ko,
-  mi: mi,
-  nb: nb,
-  nl: nl,
-  pl: pl,
+  el,
+  es,
+  fa,
+  "fa-IR": fa_IR,
+  fr,
+  "fr-CA": fr_CA,
+  he,
+  ht,
+  hu,
+  hy,
+  is,
+  it,
+  ja,
+  ko,
+  mi,
+  nb,
+  nl,
+  nn,
+  pl,
   "pt-BR": pt_BR,
-  pt: pt,
-  ru: ru,
-  sv: sv,
-  tr: tr,
-  "zh-Hans": zh_Hans,
-  "zh-Hant": zh_Hant
+  pt,
+  ro,
+  ru,
+  sq,
+  sr,
+  sv,
+  tr,
+  "uk-UA": uk_UA,
+  vi,
+  "zh-Hans": zh,
+  "zh-Hant": zh_HK
 };
