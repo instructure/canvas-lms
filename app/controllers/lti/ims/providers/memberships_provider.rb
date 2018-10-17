@@ -28,7 +28,7 @@ module Lti::Ims::Providers
     end
 
     def find
-      validate_rlid! if controller.params.key?(:rlid)
+      validate!
       memberships, api_metadata = find_memberships
       # NB Api#jsonapi_paginate has already written the Link header into the response.
       # That makes the `api_metadata` field here redundant, but we include it anyway
@@ -59,10 +59,101 @@ module Lti::Ims::Providers
 
     protected
 
+    def users_scope
+      rlid? ? rlid_users_scope : apply_role_filter(base_users_scope)
+    end
+
+    def base_users_scope
+      raise 'Abstract Method'
+    end
+
+    def rlid_users_scope
+      raise 'Abstract Method'
+    end
+
+    # rubocop:disable Lint/UnusedMethodArgument
+    def apply_role_filter(scope)
+      raise 'Abstract Method'
+    end
+    # rubocop:enable Lint/UnusedMethodArgument
+
+    def correlated_assignment_submissions(outer_user_id_column)
+      Submission.active.for_assignment(assignment).where("#{outer_user_id_column} = submissions.user_id").select(:user_id)
+    end
+
+    def validate!
+      validate_rlid!
+    end
+
     def validate_rlid!
-      # TODO: check if rlid matches an Assignment ResourceLink
-      rlid = controller.params[:rlid]
-      raise Lti::Ims::AdvantageErrors::InvalidResourceLinkIdFilter if rlid.present? && course_rlid != rlid
+      return unless rlid?
+      validate_tool_for_assignment!
+      validate_course_for_rlid!
+    end
+
+    def rlid
+      controller.params[:rlid]
+    end
+
+    def rlid?
+      rlid.present?
+    end
+
+    def role
+      controller.params[:role]
+    end
+
+    def role?
+      role.present?
+    end
+
+    def lti_roles
+      Lti::SubstitutionsHelper::INVERTED_LIS_ADVANTAGE_ROLE_MAP[role]
+    end
+
+    def nonsense_role_filter?
+      role? && lti_roles.blank?
+    end
+
+    def assignment
+      @_assignment ||= begin
+        return nil unless rlid?
+        assignment = Assignment.active.for_course(course.id).where(lti_context_id: rlid).take
+        return nil if assignment.blank?
+        assignment
+      end
+    end
+
+    def assignment?
+      assignment.present?
+    end
+
+    def validate_tool_for_assignment!
+      return unless assignment?
+      # TODO: all of this might need to change once the LTI 1.3 tool<->resourcelink<->assignment binding mechanism is finalized
+      tool_tag = assignment.external_tool_tag
+      if tool_tag.blank?
+        raise Lti::Ims::AdvantageErrors::InvalidResourceLinkIdFilter.new(
+          "Assignment (id: #{assignment.id}, rlid: #{rlid}) is not bound to an external tool",
+          api_message: 'Requested assignment not bound to an external tool'
+        )
+      end
+      if tool_tag.content_type != "ContextExternalTool"
+        raise Lti::Ims::AdvantageErrors::InvalidResourceLinkIdFilter.new(
+          "Assignment (id: #{assignment.id}, rlid: #{rlid}) needs content tag type 'ContextExternalTool' but found #{tool_tag.content_type}",
+          api_message: 'Requested assignment has unexpected content type'
+        )
+      end
+      if tool_tag.content_id != tool.id
+        raise Lti::Ims::AdvantageErrors::InvalidResourceLinkIdFilter.new(
+          "Assignment (id: #{assignment.id}, rlid: #{rlid}) needs binding to external tool #{tool.id} but found #{tool_tag.content_id}",
+          api_message: 'Requested assignment bound to unexpected external tool'
+        )
+      end
+    end
+
+    def validate_course_for_rlid!
+      raise Lti::Ims::AdvantageErrors::InvalidResourceLinkIdFilter if rlid? && !assignment? && course_rlid != rlid
     end
 
     def course

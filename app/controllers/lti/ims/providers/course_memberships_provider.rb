@@ -25,10 +25,7 @@ module Lti::Ims::Providers
     protected
 
     def find_memberships
-      # TODO: queries likely change dramatically if rlid matches an Assignment ResourceLink b/c scope needs to be
-      # further narrowed to only those users having access to the Assignment.
-      scope = base_users_scope
-      scope = apply_role_param(scope) if controller.params.key?(:role)
+      scope = users_scope
 
       # Users can have more than once active Enrollment in a Course. So first find all Users with such an
       # Enrollment, page on *those*, then find and group the enrollments for each.
@@ -51,9 +48,42 @@ module Lti::Ims::Providers
       context.active_users.order(:id).select(:id)
     end
 
-    def apply_role_param(users_scope)
-      enrollment_type = Lti::SubstitutionsHelper::INVERTED_LIS_ADVANTAGE_ROLE_MAP[controller.params[:role]]
-      enrollment_type ? users_scope.where(enrollments: { type: enrollment_type }) : users_scope.none
+    def rlid_users_scope
+      if !assignment? || filter_students? || nonsense_role_filter?
+        # No point in applying assignment rlid filter since either:
+        #   a) the `rlid` param isn't present or doesn't refer to an assignment, not
+        #   a) the `role` param is already excluding all students (assignment rlid filters only impact students), or
+        #   b) the `role` param is junk, in which case it filters out *everybody*
+        apply_role_filter(base_users_scope)
+      else
+        # Non-active students get an active ('submitted') Submission, so join on base_users_scope to narrow down
+        # Submissions to only active students.
+        students_scope = base_users_scope.where(enrollments: {type: student_lti_roles})
+        narrowed_students_scope = students_scope.where(correlated_assignment_submissions('users.id').exists)
+        # If we only care about students, this scope is sufficient and can avoid the ugly union down below
+        return narrowed_students_scope if filter_non_students?
+
+        non_students_scope = apply_role_filter(base_users_scope.where.not(enrollments: {type: student_lti_roles}))
+        non_students_scope.union(narrowed_students_scope).distinct.order(:id).select(:id)
+      end
+    end
+
+    def student_lti_roles
+      Lti::SubstitutionsHelper::INVERTED_LIS_ADVANTAGE_ROLE_MAP['http://purl.imsglobal.org/vocab/lis/v2/membership#Learner']
+    end
+
+    def filter_students?
+      role? && (student_lti_roles != lti_roles)
+    end
+
+    def filter_non_students?
+      role? && (student_lti_roles == lti_roles)
+    end
+
+    def apply_role_filter(scope)
+      return scope unless role?
+      enrollment_types = lti_roles
+      enrollment_types.present? ? scope.where(enrollments: { type: enrollment_types }) : scope.none
     end
 
     def base_enrollments_scope(user_ids)

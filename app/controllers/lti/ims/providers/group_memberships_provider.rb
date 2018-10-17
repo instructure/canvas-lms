@@ -25,15 +25,33 @@ module Lti::Ims::Providers
     protected
 
     def find_memberships
-      # TODO: queries likely change dramatically if rlid matches an Assignment ResourceLink b/c scope needs to be
-      # further narrowed to only those users having access to the Assignment.
-      scope = base_scope
-      scope = apply_role_param(scope) if controller.params.key?(:role)
+      scope = users_scope
       enrollments, metadata = paginate(scope)
       enrollments = preload_enrollments(enrollments)
 
       memberships = to_memberships(enrollments)
       [ memberships, metadata ]
+    end
+
+    def base_users_scope
+      context.participating_group_memberships.order(:user_id).preload(:user)
+    end
+
+    def rlid_users_scope
+      scope = base_users_scope
+      if assignment? && !nonsense_role_filter?
+        scope = scope.where(correlated_assignment_submissions('group_memberships.user_id').exists)
+      end
+      apply_role_filter(scope)
+    end
+
+    def apply_role_filter(scope)
+      return scope unless role?
+      enrollment_types = lti_roles
+      if enrollment_types.present? && group_role?(enrollment_types)
+        enrollment_types == [:group_leader] ? scope.where(user: context.leader_id) : scope
+      else scope.none
+      end
     end
 
     def course
@@ -42,17 +60,8 @@ module Lti::Ims::Providers
 
     private
 
-    def base_scope
-      context.participating_group_memberships.order(:user_id).preload(:user)
-    end
-
-    def apply_role_param(scope)
-      enrollment_type = Lti::SubstitutionsHelper::INVERTED_LIS_ADVANTAGE_ROLE_MAP[controller.params[:role]]
-      if enrollment_type
-        # using context.leader_id instead of context.leader saves one redundant User query
-        (enrollment_type == [:group_leader] ? scope.where(user: context.leader_id) : scope)
-      else scope.none
-      end
+    def group_role?(enrollment_types)
+      (enrollment_types & [:group_leader, :group_member]).present?
     end
 
     def to_memberships(enrollments)

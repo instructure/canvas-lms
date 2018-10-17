@@ -135,8 +135,28 @@
         "user_input": "User.sortable_name_order_by_clause(User.quoted_table_name)",
         "confidence": "High",
         "note": "No user input is passed in"
+      },
+      {
+        "warning_type": "SQL Injection",
+        "warning_code": 0,
+        "fingerprint": "799a44268d5cfe1ff43bcd239e02e4dc5fc10545c370095aaed3ec7e9975df6e",
+        "check_name": "SQL",
+        "message": "Possible SQL injection",
+        "file": "app/controllers/lti/ims/providers/memberships_provider.rb",
+        "line": 81,
+        "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+        "code": "Submission.active.for_assignment(assignment).where(\"#{outer_user_id_column} = submissions.user_id\")",
+        "render_path": null,
+        "location": {
+          "type": "method",
+          "class": "Lti::Ims::Providers::MembershipsProvider",
+          "method": "correlated_assignment_submissions"
+        },
+        "user_input": "outer_user_id_column",
+        "confidence": "Medium",
+        "note": "No user input is passed in"
       }
     ],
-    "updated": "2018-08-09 00:31:51 +0000",
+    "updated": "2018-10-17 14:57:27 -0700",
     "brakeman_version": "4.3.1"
 }

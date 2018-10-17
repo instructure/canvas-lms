@@ -30,6 +30,36 @@ describe Lti::Ims::NamesAndRolesController do
   let(:group_record) { group(context: course) } # _record suffix to avoid conflict with group() factory mtd
   let(:context_param_name) { raise 'Override in spec' }
 
+  # rubocop:disable RSpec/LetSetup
+  shared_context 'assignment context' do
+    let!(:student_enrollment_1) { student_in_course(course: course, active_all: true) }
+    let!(:student_enrollment_2) { student_in_course(course: course, active_all: true) }
+    let!(:student_enrollment_3) { student_in_course(course: course, active_all: true) }
+    let!(:student_enrollment_4) { student_in_course(course: course, active_all: true) }
+    let!(:student_enrollment_5) { student_in_course(course: course, active_all: true) }
+    let!(:student_enrollments) {
+      [ student_enrollment_1, student_enrollment_2, student_enrollment_3, student_enrollment_4, student_enrollment_5 ]
+    }
+    let!(:enrollments) {
+      super().push(student_enrollment_2, student_enrollment_3, student_enrollment_4, student_enrollment_5)
+    }
+    let(:rlid_param_1) { SecureRandom.hex }
+    let(:rlid_param_2) { SecureRandom.hex }
+    let!(:assignment_with_rlid_1) { assignment_with_rlid(rlid_param_1) }
+    let!(:assignment_with_rlid_2) { assignment_with_rlid(rlid_param_2) }
+    let(:rlid_param) { raise 'Override in example' }
+    let(:pass_thru_params) { super().merge(rlid: rlid_param) }
+  end
+
+  shared_context 'assignment assigned to specific students' do
+    let!(:assignment_with_rlid_1) do
+      assignment = super()
+      assignment = assign(assignment, student_enrollment_1, student_enrollment_3, student_enrollment_5)
+      assignment
+    end
+  end
+  # rubocop:enable RSpec/LetSetup
+
   shared_examples 'page size check' do
     # Needs all the same variables as 'multiple enrollments check', plus:
     #
@@ -46,7 +76,8 @@ describe Lti::Ims::NamesAndRolesController do
 
     context 'when the page size parameter is too large' do
       let(:rqst_page_size) { 4611686018427387903 }
-      let(:rsp_page_size) { 50 } # system max
+      let(:effective_page_size) { 50 } # system max
+      let(:rsp_page_size) { total_items }
 
       it 'defaults to the system maximum page size' do
         send_request
@@ -69,7 +100,8 @@ describe Lti::Ims::NamesAndRolesController do
       context 'and when the page index parameter is too large ' do
         let(:rqst_page) { total_items + 1 } # cant have more pages than there are items
         let(:rsp_page) { rqst_page }
-        let(:rsp_page_size) { 30 } # don't know why, Api just does this
+        let(:effective_page_size) { 30 } # don't know why, Api just does this
+        let(:rsp_page_size) { 0 }
 
         it 'returns an empty members array, with the correct size and proper navigation links' do
           send_request
@@ -85,7 +117,8 @@ describe Lti::Ims::NamesAndRolesController do
     #   enrollments: array of context enrollments
     #   total_items: context's active enrollment count
     #   rsp_page: expected response page index
-    #   rsp_page_size: expected response page size
+    #   effective_page_size: either user- or system-enforced max page size,
+    #   rsp_page_size: expected actual response page size, i.e. actual items on the page
     #   pass_through_param: hash of query params to be written through to pagination links
     #   params_overrides: hash of all request params
 
@@ -97,7 +130,8 @@ describe Lti::Ims::NamesAndRolesController do
 
     context 'when a limit page size parameter is specified' do
       let(:rqst_page_size) { 2 }
-      let(:rsp_page_size) { 2 }
+      let(:effective_page_size) { rqst_page_size }
+      let(:rsp_page_size) { rqst_page_size }
       let(:page_size_param_name) { :limit }
 
       it_behaves_like 'page size check'
@@ -105,7 +139,8 @@ describe Lti::Ims::NamesAndRolesController do
 
     context 'when a per_page parameter is specified' do
       let(:rqst_page_size) { 2 }
-      let(:rsp_page_size) { 2 }
+      let(:effective_page_size) { rqst_page_size }
+      let(:rsp_page_size) { rqst_page_size }
       let(:page_size_param_name) { :per_page }
 
       it_behaves_like 'page size check'
@@ -113,7 +148,8 @@ describe Lti::Ims::NamesAndRolesController do
 
     context 'when a limit param overrides a per_page param' do
       let(:rqst_page_size) { 2 }
-      let(:rsp_page_size) { 2 }
+      let(:effective_page_size) { rqst_page_size }
+      let(:rsp_page_size) { rqst_page_size }
       let(:page_size_param_name) { :limit }
 
       # limit=2, per_page=3 ... latter should be ignored
@@ -323,7 +359,8 @@ describe Lti::Ims::NamesAndRolesController do
       end
       let(:total_items) { enrollments.length }
       let(:rsp_page) { 1 }
-      let(:rsp_page_size) { 10 } # system default
+      let(:rsp_page_size) { [total_items, effective_page_size].min }
+      let(:effective_page_size) { 10 } # system default
       let(:pass_thru_params) { { pass: 'thru' } }
       let(:params_overrides) { super().merge(pass_thru_params) }
 
@@ -392,7 +429,7 @@ describe Lti::Ims::NamesAndRolesController do
         let(:student_enrollment_2) { student_in_course(course: course, user: teacher_enrollment.user, active_all: true) }
         let(:enrollments) { super().push(student_enrollment_2) }
 
-        context 'and the role parameter specifies the first enrollment role' do
+        context 'and the role param specifies the first enrollment role' do
           let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor') }
 
           it 'returns matching NRPS memberships grouped by user' do
@@ -403,7 +440,7 @@ describe Lti::Ims::NamesAndRolesController do
           end
         end
 
-        context 'and the role parameter specifies the second enrollment role' do
+        context 'and the role param specifies the second enrollment role' do
           let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner') }
 
           it 'returns matching NRPS memberships grouped by user' do
@@ -415,10 +452,11 @@ describe Lti::Ims::NamesAndRolesController do
         end
       end
 
-      context 'and role and pagination parameters are specified' do
+      context 'and role and pagination params are specified' do
         let(:total_items) { 2 }
         let(:rsp_page_size) { 1 }
         let(:rqst_page_size) { 1 }
+        let(:effective_page_size) { rqst_page_size }
         let(:rqst_page) { 1 }
         let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor') }
         let(:params_overrides) do
@@ -447,6 +485,260 @@ describe Lti::Ims::NamesAndRolesController do
           end
         end
       end
+
+      # rubocop:disable RSpec/LetSetup
+      # rubocop:disable RSpec/NestedGroups
+      context 'and an assignment rlid param is specified' do
+
+        include_context 'assignment context'
+        let(:rlid_param) { rlid_param_1 }
+        let!(:student_enrollment_1) { student_enrollment } # no need to create an extra enrollment
+
+        context 'for an assignment assigned to everyone' do
+
+          it 'returns all course members' do
+            send_request
+            expect_enrollment_response_page
+            expect(response_links).to have_correct_pagination_urls
+          end
+
+          context 'and a student role param is specified' do
+            let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner') }
+            let(:total_items) { 5 }
+
+            it 'returns only student enrollments' do
+              send_request
+              expect_enrollment_response_page_of(student_enrollments)
+              expect(response_links).to have_correct_pagination_urls
+            end
+          end
+
+          context 'and a non-student role param is specified' do
+            let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor') }
+            let(:total_items) { 2 }
+
+            it 'returns only the non-student enrollments' do
+              send_request
+              expect_enrollment_response_page_of([teacher_enrollment, ta_enrollment])
+              expect(response_links).to have_correct_pagination_urls
+            end
+          end
+
+          context 'and a nonsense role param is specified' do
+            let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/total/nonsense') }
+
+            it 'returns no course members' do
+              send_request
+              expect_empty_members_array
+            end
+          end
+
+          context 'and pagination params are specified' do
+            let(:rsp_page_size) { 5 }
+            let(:rqst_page_size) { 5 }
+            let(:effective_page_size) { rqst_page_size }
+            let(:rqst_page) { raise 'Override in example' }
+            let(:params_overrides) { super().merge(limit: rqst_page_size, page: rqst_page) }
+
+            context 'and page 1 is requested' do
+              let(:rqst_page) { 1 }
+              let(:rsp_page) { 1 }
+
+              it 'returns page 1' do
+                send_request
+                expect_enrollment_response_page_of([
+                  teacher_enrollment,
+                  student_enrollment_1,
+                  ta_enrollment,
+                  observer_enrollment,
+                  designer_enrollment
+                ])
+                expect(response_links).to have_correct_pagination_urls
+              end
+            end
+
+            context 'and page 2 is requested' do
+              let(:rqst_page) { 2 }
+              let(:rsp_page) { 2 }
+              let(:rsp_page_size) { 4 }
+
+              it 'returns page 2' do
+                send_request
+                expect_enrollment_response_page_of([
+                  student_enrollment_2,
+                  student_enrollment_3,
+                  student_enrollment_4,
+                  student_enrollment_5,
+                ])
+                expect(response_links).to have_correct_pagination_urls
+              end
+            end
+          end
+
+          context 'and a role and pagination params are specified' do
+            let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner') }
+            let(:rsp_page_size) { 3 }
+            let(:rqst_page_size) { 3 }
+            let(:effective_page_size) { rqst_page_size }
+            let(:total_items) { 5 }
+            let(:rqst_page) { raise 'Override in example' }
+            let(:params_overrides) { super().merge(limit: rqst_page_size, page: rqst_page) }
+
+            context 'and page 1 is requested' do
+              let(:rqst_page) { 1 }
+              let(:rsp_page) { 1 }
+
+              it 'returns page 1' do
+                send_request
+                expect_enrollment_response_page_of([student_enrollment_1, student_enrollment_2, student_enrollment_3])
+                expect(response_links).to have_correct_pagination_urls
+              end
+            end
+
+            context 'and page 2 is requested' do
+              let(:rqst_page) { 2 }
+              let(:rsp_page) { 2 }
+              let(:rsp_page_size) { 2 }
+
+              it 'returns page 2' do
+                send_request
+                expect_enrollment_response_page_of([student_enrollment_4, student_enrollment_5])
+                expect(response_links).to have_correct_pagination_urls
+              end
+            end
+          end
+        end
+
+        context 'for an assignment assigned to specific students' do
+          include_context 'assignment assigned to specific students'
+
+          context 'and a student role param is specified' do
+            let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner') }
+            let(:total_items) { 3 }
+
+            it 'returns only assigned student enrollments' do
+              send_request
+              expect_enrollment_response_page_of([student_enrollment_1, student_enrollment_3, student_enrollment_5])
+              expect(response_links).to have_correct_pagination_urls
+            end
+          end
+
+          context 'and a non-student role param is specified' do
+            let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor') }
+            let(:total_items) { 2 }
+
+            it 'returns only the non-student enrollments' do
+              send_request
+              expect_enrollment_response_page_of([teacher_enrollment, ta_enrollment])
+              expect(response_links).to have_correct_pagination_urls
+            end
+          end
+
+          context 'and rlid references an assignment assigned to everyone' do
+            let(:rlid_param) { rlid_param_2 }
+
+            it 'returns all course members' do
+              send_request
+              expect_enrollment_response_page
+              expect(response_links).to have_correct_pagination_urls
+            end
+          end
+
+          context 'and pagination params are specified' do
+            let(:rsp_page_size) { 4 }
+            let(:rqst_page_size) { 4 }
+            let(:effective_page_size) { rqst_page_size }
+            let(:total_items) { 7 }
+            let(:rqst_page) { raise 'Override in example' }
+            let(:params_overrides) { super().merge(limit: rqst_page_size, page: rqst_page) }
+
+            context 'and page 1 is requested' do
+              let(:rqst_page) { 1 }
+              let(:rsp_page) { 1 }
+
+              it 'returns page 1' do
+                send_request
+                expect_enrollment_response_page_of([
+                  teacher_enrollment,
+                  student_enrollment_1,
+                  ta_enrollment,
+                  observer_enrollment,
+                ])
+                expect(response_links).to have_correct_pagination_urls
+              end
+            end
+
+            context 'and page 2 is requested' do
+              let(:rqst_page) { 2 }
+              let(:rsp_page) { 2 }
+              let(:rsp_page_size) { 3 }
+
+              it 'returns page 2' do
+                send_request
+                expect_enrollment_response_page_of([
+                  designer_enrollment,
+                  student_enrollment_3,
+                  student_enrollment_5
+                ])
+                expect(response_links).to have_correct_pagination_urls
+              end
+            end
+          end
+
+          context 'and a role and pagination params are specified' do
+            let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner') }
+            let(:rsp_page_size) { 2 }
+            let(:rqst_page_size) { 2 }
+            let(:effective_page_size) { rqst_page_size }
+            let(:total_items) { 3 }
+            let(:rqst_page) { raise 'Override in example' }
+            let(:params_overrides) { super().merge(limit: rqst_page_size, page: rqst_page) }
+
+            context 'and page 1 is requested' do
+              let(:rqst_page) { 1 }
+              let(:rsp_page) { 1 }
+
+              it 'returns page 1' do
+                send_request
+                expect_enrollment_response_page_of([student_enrollment_1, student_enrollment_3])
+                expect(response_links).to have_correct_pagination_urls
+              end
+            end
+
+            context 'and page 2 is requested' do
+              let(:rqst_page) { 2 }
+              let(:rsp_page) { 2 }
+              let(:rsp_page_size) { 1 }
+
+              it 'returns page 2' do
+                send_request
+                expect_enrollment_response_page_of([student_enrollment_5])
+                expect(response_links).to have_correct_pagination_urls
+              end
+            end
+          end
+
+          context 'for an assignment assigned to an inactive enrollment' do
+            # student 5 is assigned, but lets deactivate his enrollment
+            let!(:student_enrollment_5) { student_in_course(course: course, active_all: false) }
+
+            # Really just specifying the role so we can focus on verifying the enrollments we care about
+            context 'and a student role param is specified' do
+              let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner') }
+              let(:total_items) { 2 }
+
+              it 'returns only assigned _active_ student enrollments' do
+                send_request
+                # NB student_enrollment_4 should _not_ be present
+                expect_enrollment_response_page_of([student_enrollment_1, student_enrollment_3])
+                expect(response_links).to have_correct_pagination_urls
+              end
+            end
+          end
+        end
+      end
+      # rubocop:enable RSpec/LetSetup
+      # rubocop:enable RSpec/NestedGroups
     end
   end
 
@@ -524,7 +816,8 @@ describe Lti::Ims::NamesAndRolesController do
       end
       let(:total_items) { enrollments.length }
       let(:rsp_page) { 1 }
-      let(:rsp_page_size) { 10 } # system default
+      let(:rsp_page_size) { [total_items, effective_page_size].min }
+      let(:effective_page_size) { 10 } # system default
       let(:pass_thru_params) { { pass: 'thru' } }
       let(:params_overrides) { super().merge(pass_thru_params) }
 
@@ -558,12 +851,22 @@ describe Lti::Ims::NamesAndRolesController do
         end
       end
 
+      context 'and the role param specifies a valid but non-Group LIS value' do
+        let(:params_overrides) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor')}
+
+        it 'returns no group members' do
+          send_request
+          expect_empty_members_array
+        end
+      end
+
       # Somewhat redundant for groups which just have two roles, one of which everyone in the group shares. But
       # still useful for anti-regression purposes to at least verify that combining role + pagination params doesn't
       # break anything
-      context 'and role and pagination parameters are specified' do
+      context 'and role and pagination params are specified' do
         let(:rsp_page_size) { 1 }
         let(:rqst_page_size) { 1 }
+        let(:effective_page_size) { rqst_page_size }
         let(:rqst_page) { 1 }
         let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Member') }
         let(:params_overrides) do
@@ -603,6 +906,216 @@ describe Lti::Ims::NamesAndRolesController do
           end
         end
       end
+
+      # Group Assignments can't be associated to external tools, so this is basically the same set of tests as
+      # for Course contexts, except that we're just checking to see if we can narrow results even further based
+      # on group memberships
+      # rubocop:disable RSpec/LetSetup
+      # rubocop:disable RSpec/NestedGroups
+      context 'and an assignment rlid param is specified' do
+
+        include_context 'assignment context'
+        let(:rlid_param) { rlid_param_1 }
+        let!(:group_leadership) do
+          leader = group_membership_model(group: group_record, user: student_enrollment_1.user)
+          group_record.leader = leader.user
+          group_record.save
+          leader
+        end
+        # student 1 is our leader, add another rando student as group member 1
+        let!(:group_membership_1) {
+          group_membership_model(group: group_record, user: student_in_course(course: course, active_all: true).user)
+        }
+        let!(:group_membership_2) { group_membership_model(group: group_record, user: student_enrollment_2.user) }
+        # to test 'narrowing', leave student 3 out, add another rando student as group member 3
+        let!(:group_membership_3) {
+          group_membership_model(group: group_record, user: student_in_course(course: course, active_all: true).user)
+        }
+        let!(:group_membership_4) { group_membership_model(group: group_record, user: student_enrollment_4.user) }
+        let!(:group_membership_5) { group_membership_model(group: group_record, user: student_enrollment_5.user) }
+        let!(:enrollments) do # cant just append to super() b/c this gets clobbered by 'assignment context'
+          [
+            group_leadership,
+            group_membership_1,
+            group_membership_2,
+            group_membership_3,
+            group_membership_4,
+            group_membership_5
+          ]
+        end
+
+        shared_context 'returns all paginated group members' do
+          let(:rsp_page_size) { 3 }
+          let(:rqst_page_size) { 3 }
+          let(:effective_page_size) { rqst_page_size }
+          let(:rqst_page) { raise 'Override in example' }
+          let(:params_overrides) { super().merge(limit: rqst_page_size, page: rqst_page) }
+
+          context 'and page 1 is requested' do
+            let(:rqst_page) { 1 }
+            let(:rsp_page) { 1 }
+
+            it 'returns page 1' do
+              send_request
+              expect_enrollment_response_page
+              # expect_enrollment_response_page_of([group_leadership, group_membership_1, group_membership_2])
+              expect(response_links).to have_correct_pagination_urls
+            end
+          end
+
+          context 'and page 2 is requested' do
+            let(:rqst_page) { 2 }
+            let(:rsp_page) { 2 }
+
+            it 'returns page 2' do
+              send_request
+              expect_enrollment_response_page
+              # expect_enrollment_response_page_of([group_membership_3, group_membership_4])
+              expect(response_links).to have_correct_pagination_urls
+            end
+          end
+        end
+
+        shared_context 'returns assigned paginated group members' do
+          let(:rsp_page_size) { 1 }
+          let(:rqst_page_size) { 1 }
+          let(:effective_page_size) { rqst_page_size }
+          let(:total_items) { 2 }
+          let(:rqst_page) { raise 'Override in example' }
+          let(:params_overrides) { super().merge(limit: rqst_page_size, page: rqst_page) }
+
+          context 'and page 1 is requested' do
+            let(:rqst_page) { 1 }
+            let(:rsp_page) { 1 }
+
+            it 'returns page 1' do
+              send_request
+              expect_enrollment_response_page_of([group_leadership])
+              expect(response_links).to have_correct_pagination_urls
+            end
+          end
+
+          context 'and page 2 is requested' do
+            let(:rqst_page) { 2 }
+            let(:rsp_page) { 2 }
+
+            it 'returns page 2' do
+              send_request
+              expect_enrollment_response_page_of([group_membership_5])
+              expect(response_links).to have_correct_pagination_urls
+            end
+          end
+        end
+
+        context 'for an assignment assigned to everyone' do
+
+          it 'returns all group members' do
+            send_request
+            expect_enrollment_response_page
+            expect(response_links).to have_correct_pagination_urls
+          end
+
+          context 'and a member role param is specified' do
+            let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Member') }
+            let(:total_items) { 6 }
+
+            it 'returns all group members' do
+              send_request
+              expect_enrollment_response_page
+              expect(response_links).to have_correct_pagination_urls
+            end
+          end
+
+          context 'and a manager role param is specified' do
+            let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Manager') }
+            let(:total_items) { 1 }
+
+            it 'returns only the group leader' do
+              send_request
+              expect_enrollment_response_page_of([group_leadership])
+              expect(response_links).to have_correct_pagination_urls
+            end
+          end
+
+          context 'and the role param specifies an unknown value' do
+            let(:params_overrides) { super().merge(role: 'http://purl.imsglobal.org/total/nonsense')}
+
+            it 'returns no group members' do
+              send_request
+              expect_empty_members_array
+            end
+          end
+
+          context 'and pagination params are specified' do
+
+            it_behaves_like 'returns all paginated group members'
+
+            context 'and a role param is specified' do
+              let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Member') }
+
+              it_behaves_like 'returns all paginated group members'
+            end
+          end
+        end
+
+        context 'for an assignment assigned to specific students' do
+
+          # included context assigns to students 1, 3, and 5, but student 3 is not in our group
+          include_context 'assignment assigned to specific students'
+
+          context 'and a member role param is specified' do
+            let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Member') }
+            let(:total_items) { 2 }
+
+            it 'returns only assigned students further narrowed to current group' do
+              send_request
+              expect_enrollment_response_page_of([group_leadership, group_membership_5])
+              expect(response_links).to have_correct_pagination_urls
+            end
+          end
+
+          context 'and a manager role param is specified' do
+            let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Manager') }
+            let(:total_items) { 1 }
+
+            it 'returns only assigned students further narrowed to current group' do
+              send_request
+              expect_enrollment_response_page_of([group_leadership])
+              expect(response_links).to have_correct_pagination_urls
+            end
+          end
+
+          context 'and the role param specifies an unknown value' do
+            let(:params_overrides) { super().merge(role: 'http://purl.imsglobal.org/total/nonsense')}
+
+            it 'returns no group members' do
+              send_request
+              expect_empty_members_array
+            end
+          end
+
+          context 'and rlid references an assignment assigned to everyone' do
+            let(:rlid_param) { rlid_param_2 }
+
+            it 'returns all course members' do
+              send_request
+              expect_enrollment_response_page
+              expect(response_links).to have_correct_pagination_urls
+            end
+          end
+
+          it_behaves_like 'returns assigned paginated group members'
+
+          context 'and a role and pagination params are specified' do
+            let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Member') }
+
+            it_behaves_like 'returns assigned paginated group members'
+          end
+        end
+
+      end
+      # rubocop:enable RSpec/LetSetup
+      # rubocop:enable RSpec/NestedGroups
     end
   end
 
@@ -649,7 +1162,7 @@ describe Lti::Ims::NamesAndRolesController do
   def expect_enrollment_response_page
     expect_enrollment_response_page_of(enrollments.
       sort_by { |e| e.user.id }.
-      slice(rsp_page_size*(rsp_page-1), rsp_page_size))
+      slice(effective_page_size*(rsp_page-1), effective_page_size))
   end
 
   def expect_enrollment_response_page_of(scoped_enrollments)
@@ -658,17 +1171,18 @@ describe Lti::Ims::NamesAndRolesController do
   end
 
   def have_correct_pagination_urls
-    total_pages = page_count(total_items, rsp_page_size)
+    total_pages = page_count(total_items, effective_page_size)
     pass_thrus = as_query_params(pass_thru_params)
 
     # rubocop:disable Metrics/LineLength
     expected_links = [
-      "<http://test.host/api/lti/#{context.class.to_s.downcase}s/#{context_id}/names_and_roles?#{pass_thrus}page=#{rsp_page}&per_page=#{rsp_page_size}>; rel=\"current\"",
-      "<http://test.host/api/lti/#{context.class.to_s.downcase}s/#{context_id}/names_and_roles?#{pass_thrus}page=#{rsp_page+1}&per_page=#{rsp_page_size}>; rel=\"next\"",
-      "<http://test.host/api/lti/#{context.class.to_s.downcase}s/#{context_id}/names_and_roles?#{pass_thrus}page=#{rsp_page-1}&per_page=#{rsp_page_size}>; rel=\"prev\"",
-      "<http://test.host/api/lti/#{context.class.to_s.downcase}s/#{context_id}/names_and_roles?#{pass_thrus}page=1&per_page=#{rsp_page_size}>; rel=\"first\"",
-      "<http://test.host/api/lti/#{context.class.to_s.downcase}s/#{context_id}/names_and_roles?#{pass_thrus}page=#{total_pages}&per_page=#{rsp_page_size}>; rel=\"last\""
+      "<http://test.host/api/lti/#{context.class.to_s.downcase}s/#{context_id}/names_and_roles?#{pass_thrus}page=#{rsp_page}&per_page=#{effective_page_size}>; rel=\"current\"",
+      "<http://test.host/api/lti/#{context.class.to_s.downcase}s/#{context_id}/names_and_roles?#{pass_thrus}page=#{rsp_page+1}&per_page=#{effective_page_size}>; rel=\"next\"",
+      "<http://test.host/api/lti/#{context.class.to_s.downcase}s/#{context_id}/names_and_roles?#{pass_thrus}page=#{rsp_page-1}&per_page=#{effective_page_size}>; rel=\"prev\"",
+      "<http://test.host/api/lti/#{context.class.to_s.downcase}s/#{context_id}/names_and_roles?#{pass_thrus}page=1&per_page=#{effective_page_size}>; rel=\"first\"",
+      "<http://test.host/api/lti/#{context.class.to_s.downcase}s/#{context_id}/names_and_roles?#{pass_thrus}page=#{total_pages}&per_page=#{effective_page_size}>; rel=\"last\""
     ]
+
     # rubocop:enable Metrics/LineLength
     expected_links.reject! {|el| el.include?('rel="next"')} if rsp_page == total_pages
     expected_links.reject! {|el| el.include?('rel="prev"')} if rsp_page <= 1
@@ -693,5 +1207,29 @@ describe Lti::Ims::NamesAndRolesController do
       split(' ').
       reject { |s| s == 'https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly' }.
       join(' ')
+  end
+
+  def assignment_with_rlid(rlid)
+    assignment_model({
+      course: course,
+      lti_context_id: rlid,
+      submission_types: 'external_tool',
+      external_tool_tag_attributes: {
+        url: tool.url,
+        content_type: 'context_external_tool',
+        content_id: tool.id
+      }
+    })
+  end
+
+  def assign(assignment, *users_or_user_containers)
+    assignment.only_visible_to_overrides = true
+    assignment.save!
+    create_adhoc_override_for_assignment(assignment, users_from(*users_or_user_containers))
+    assignment
+  end
+
+  def users_from(*users_or_user_containers)
+    users_or_user_containers.map { |uoe| uoe.respond_to?(:user) ? uoe.user : uoe }
   end
 end
