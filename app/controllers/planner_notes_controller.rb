@@ -16,7 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# @API Planner Note
+# @API Planner
+# @subtopic Planner Notes
 #
 # API for creating, accessing and updating Planner Notes. PlannerNote are used
 # to set reminders and notes to self about courses or general events.

@@ -16,7 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# @API Planner override
+# @API Planner
+# @subtopic Planner Overrides
 #
 # API for creating, accessing and updating planner override. PlannerOverrides are used
 # to control the visibility of objects displayed on the Planner.
@@ -91,7 +92,6 @@ class PlannerOverridesController < ApplicationController
   before_action :require_planner_enabled
 
   # @API List planner overrides
-  # @beta
   #
   # Retrieve a planner override for the current user
   #
@@ -102,7 +102,6 @@ class PlannerOverridesController < ApplicationController
   end
 
   # @API Show a planner override
-  # @beta
   #
   # Retrieve a planner override for the current user
   #
@@ -113,7 +112,6 @@ class PlannerOverridesController < ApplicationController
   end
 
   # @API Update a planner override
-  # @beta
   #
   # Update a planner override's visibilty for the current user
   #
@@ -139,7 +137,6 @@ class PlannerOverridesController < ApplicationController
   end
 
   # @API Create a planner override
-  # @beta
   #
   # Create a planner override for the current user
   #
@@ -173,7 +170,6 @@ class PlannerOverridesController < ApplicationController
   end
 
   # @API Delete a planner override
-  # @beta
   #
   # Delete a planner override for the current user
   #

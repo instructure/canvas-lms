@@ -32,7 +32,6 @@ class PlannerController < ApplicationController
               :include_concluded
 
   # @API List planner items
-  # @beta
   #
   # Retrieve the paginated list of objects to be shown on the planner for the
   # current user with the associated planner override to override an item's
