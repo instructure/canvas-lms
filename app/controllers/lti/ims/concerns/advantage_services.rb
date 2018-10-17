@@ -19,13 +19,6 @@ module Lti::Ims::Concerns
   module AdvantageServices
     extend ActiveSupport::Concern
 
-    class InvalidAccessToken < StandardError; end
-    class InvalidAccessTokenSignature < InvalidAccessToken; end
-    class InvalidAccessTokenSignatureType < InvalidAccessToken; end
-    class MalformedAccessToken < InvalidAccessToken; end
-    class InvalidAccessTokenErrorWithApiSafeMessage < InvalidAccessToken; end
-    class InvalidAccessTokenClaims < InvalidAccessTokenErrorWithApiSafeMessage; end
-
     class AccessToken
       def initialize(raw_jwt_str)
         @raw_jwt_str = raw_jwt_str
@@ -37,20 +30,22 @@ module Lti::Ims::Concerns
       rescue Canvas::Security::InvalidToken => e
         case e.cause
         when JSON::JWT::InvalidFormat
-          raise MalformedAccessToken, e
+          raise Lti::Ims::AdvantageErrors::MalformedAccessToken, e
         when JSON::JWS::UnexpectedAlgorithm
-          raise InvalidAccessTokenSignatureType, e
+          raise Lti::Ims::AdvantageErrors::InvalidAccessTokenSignatureType, e
         when JSON::JWS::VerificationFailed
-          raise InvalidAccessTokenSignature, e
+          raise Lti::Ims::AdvantageErrors::InvalidAccessTokenSignature, e
         else
-          raise InvalidAccessTokenErrorWithApiSafeMessage, 'Access token invalid - signature likely incorrect'
+          raise Lti::Ims::AdvantageErrors::InvalidAccessToken.new(e, api_message: 'Access token invalid - signature likely incorrect')
         end
-      rescue Canvas::Security::TokenExpired
-        raise InvalidAccessTokenClaims, 'Access token expired'
-      rescue InvalidAccessToken
+      rescue JSON::JWT::Exception => e
+        raise Lti::Ims::AdvantageErrors::InvalidAccessToken, e
+      rescue Canvas::Security::TokenExpired => e
+        raise Lti::Ims::AdvantageErrors::InvalidAccessTokenClaims.new(e, api_message: 'Access token expired')
+      rescue Lti::Ims::AdvantageErrors::AdvantageServiceError
         raise
       rescue => e
-        raise InvalidAccessToken, e
+        raise Lti::Ims::AdvantageErrors::AdvantageServiceError, e
       end
 
       def validate_claims!(expected_audience)
@@ -59,7 +54,15 @@ module Lti::Ims::Concerns
           expected_aud: expected_audience,
           require_iss: true
         )
-        raise InvalidAccessTokenClaims, "Invalid access token field/s: #{validator.error_message}" unless validator.valid?
+
+        # In this case we know the error message can just be safely shunted into the API response (in other cases
+        # we're more wary about leaking impl details)
+        unless validator.valid?
+          raise Lti::Ims::AdvantageErrors::InvalidAccessTokenClaims.new(
+            nil,
+            api_message: "Invalid access token field/s: #{validator.error_message}"
+          )
+        end
       end
 
       def claim(name)
@@ -91,27 +94,13 @@ module Lti::Ims::Concerns
 
       def verify_access_token
         if access_token.blank?
-          render_error("Missing Access Token", :unauthorized)
+          render_error("Missing access token", :unauthorized)
         else
           begin
             access_token.validate!(expected_access_token_audience)
-          rescue InvalidAccessTokenSignature => e
-            access_token_validation_error(e)
-            render_error("Invalid access token signature", :unauthorized)
-          rescue InvalidAccessTokenSignatureType => e
-            access_token_validation_error(e)
-            render_error("Access token signature algorithm not allowed", :unauthorized)
-          rescue MalformedAccessToken => e
-            access_token_validation_error(e)
-            render_error("Invalid access token format", :unauthorized)
-          rescue InvalidAccessTokenErrorWithApiSafeMessage => e
-            # In this case we know the error message can just be safely shunted into the API response (in other cases
-            # we're more wary about leaking impl details)
-            access_token_validation_error(e)
-            render_error(e.message, :unauthorized)
-          rescue => e
-            access_token_validation_error(e)
-            render_error("Invalid access token", :unauthorized)
+          rescue Lti::Ims::AdvantageErrors::AdvantageClientError => e # otherwise it's a system error, so we want normal error trapping and rendering to kick in
+            handled_error(e)
+            render_error(e.api_message, e.status_code)
           end
         end
       end
@@ -183,11 +172,14 @@ module Lti::Ims::Concerns
         render json: error_response, status: status
       end
 
-      def access_token_validation_error(e)
-        # These are all 'handled errors' so don't typically warrant logging in production envs, but in lower envs it
-        # can be very handy to see exactly what went wrong. This specific log mechanism is nice, too, b/c it logs
-        # backtraces from nested errors.
-        ErrorReport.log_exception(nil, e) unless Rails.env.production?
+      def handled_error(e)
+        unless Rails.env.production?
+          # These are all 'handled errors' so don't typically warrant logging in production envs, but in lower envs it
+          # can be very handy to see exactly what went wrong. This specific log mechanism is nice, too, b/c it logs
+          # backtraces from nested errors.
+          logger.error(e.message)
+          ErrorReport.log_exception(nil, e)
+        end
       end
     end
     # rubocop:enable Metrics/BlockLength

@@ -153,6 +153,14 @@ describe Lti::Ims::NamesAndRolesController do
     end
   end
 
+  describe '#tmp' do
+    let(:action) { :course_index }
+    let(:context) { course }
+    let(:context_param_name) { :course_id }
+    let(:unknown_context_id) { course && Course.maximum(:id) + 1 }
+
+    it_behaves_like 'advantage services'
+  end
 
   describe '#course_index' do
     let(:action) { :course_index }

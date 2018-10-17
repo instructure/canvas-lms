@@ -122,6 +122,22 @@ shared_examples_for "advantage services" do
       end
     end
 
+    context 'with system failure during access token validation' do
+      let(:jwt_validator) { instance_double(Canvas::Security::JwtValidator) }
+      let(:before_send_request) do
+        -> do
+          allow(Canvas::Security::JwtValidator).to receive(:new).and_return(jwt_validator)
+          expect(jwt_validator).to receive(:valid?).and_raise(StandardError)
+        end
+      end
+
+      it_behaves_like 'mime_type check'
+
+      it 'returns 500 not found' do
+        expect(response).to have_http_status :internal_server_error
+      end
+    end
+
     context 'with no access token' do
       let(:access_token_jwt_hash) { nil }
 
@@ -129,7 +145,7 @@ shared_examples_for "advantage services" do
 
       it 'returns 401 unauthorized and complains about missing access token' do
         expect(response).to have_http_status :unauthorized
-        expect(json).to be_lti_advantage_error_response_body('unauthorized', 'Missing Access Token')
+        expect(json).to be_lti_advantage_error_response_body('unauthorized', 'Missing access token')
       end
     end
 
@@ -173,7 +189,7 @@ shared_examples_for "advantage services" do
 
       it_behaves_like 'mime_type check'
 
-      it 'returns 401 unauthorized and complains about an incorrect signature' do
+      it 'returns 401 unauthorized and complains about missing assertions' do
         expect(response).to have_http_status :unauthorized
         expect(json).to be_lti_advantage_error_response_body(
           'unauthorized',
@@ -187,7 +203,7 @@ shared_examples_for "advantage services" do
 
       it_behaves_like 'mime_type check'
 
-      it 'returns 401 unauthorized and complains about an incorrect signature' do
+      it 'returns 401 unauthorized and complains about an invalid aud field' do
         expect(response).to have_http_status :unauthorized
         expect(json).to be_lti_advantage_error_response_body('unauthorized', 'Invalid access token field/s: the \'aud\' must be the LTI Authorization endpoint')
       end
@@ -198,7 +214,7 @@ shared_examples_for "advantage services" do
 
       it_behaves_like 'mime_type check'
 
-      it 'returns 401 unauthorized and complains about an incorrect signature' do
+      it 'returns 401 unauthorized and complains about an expired access token' do
         expect(response).to have_http_status :unauthorized
         expect(json).to be_lti_advantage_error_response_body('unauthorized', 'Access token expired')
       end
@@ -207,7 +223,7 @@ shared_examples_for "advantage services" do
     context 'with invalid access token issuance timestamp (\'iat\')' do
       let(:access_token_jwt_hash) { super().merge(iat: (Time.zone.now.to_i + 1.hour.to_i)) }
 
-      it 'returns 401 unauthorized and complains about an incorrect signature' do
+      it 'returns 401 unauthorized and complains about an invalid iat field' do
         expect(response).to have_http_status :unauthorized
         expect(json).to be_lti_advantage_error_response_body('unauthorized', 'Invalid access token field/s: the \'iat\' must not be in the future')
       end

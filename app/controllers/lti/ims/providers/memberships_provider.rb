@@ -19,8 +19,6 @@ module Lti::Ims::Providers
   class MembershipsProvider
     include Api::V1::User
 
-    class InvalidResourceLinkIdFilter < StandardError; end
-
     attr_reader :context, :controller, :tool
 
     def initialize(context, controller, tool)
@@ -64,7 +62,7 @@ module Lti::Ims::Providers
     def validate_rlid!
       # TODO: check if rlid matches an Assignment ResourceLink
       rlid = controller.params[:rlid]
-      raise InvalidResourceLinkIdFilter if rlid.present? && course_rlid != rlid
+      raise Lti::Ims::AdvantageErrors::InvalidResourceLinkIdFilter if rlid.present? && course_rlid != rlid
     end
 
     def course

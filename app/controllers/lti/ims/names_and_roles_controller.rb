@@ -49,8 +49,9 @@ module Lti::Ims
     def render_memberships
       page = find_memberships_page
       render json: NamesAndRolesSerializer.new(page).as_json, content_type: MIME_TYPE
-    rescue Providers::MembershipsProvider::InvalidResourceLinkIdFilter
-      render_error 'Invalid \'rlid\' parameter', :bad_request
+    rescue AdvantageErrors::AdvantageClientError => e # otherwise it's a system error, so we want normal error trapping and rendering to kick in
+      handled_error(e)
+      render_error e.api_message, e.status_code
     end
 
     def find_memberships_page
