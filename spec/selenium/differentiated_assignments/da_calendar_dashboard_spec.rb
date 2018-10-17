@@ -46,6 +46,8 @@ describe "interaction with differentiated assignments on the dashboard and calen
         get "/"
         f('#DashboardOptionsMenu_Container button').click
         fj('span[role="menuitemradio"]:contains("Recent Activity")').click
+        dashboard = f('#dashboard-activity')
+        keep_trying_until { dashboard.displayed? }
         expect(f("#not_right_side .no_recent_messages")).to include_text("No Recent Messages")
       end
     end
@@ -111,6 +113,8 @@ describe "interaction with differentiated assignments on the dashboard and calen
         get "/"
         f('#DashboardOptionsMenu_Container button').click
         fj('span[role="menuitemradio"]:contains("Recent Activity")').click
+        dashboard = f('#dashboard-activity')
+        keep_trying_until { dashboard.displayed? }
         expect(f("#not_right_side .no_recent_messages")).to include_text("No Recent Messages")
       end
     end
