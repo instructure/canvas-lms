@@ -37,7 +37,7 @@
     }
     .bar-left {
       #{direction(left)}: 0;
-      border-width: 2px 0 2px 2px;
+      border-width: direction-sides(2px 0 2px 2px);
     }
     .none-left, .none-right {
       height: 11px;
@@ -45,7 +45,7 @@
     }
     .some-left {
       height: 20px;
-      border-width: 2px 0pt 2px 2px;
+      border-width: direction-sides(2px 0pt 2px 2px);
       border-top-#{direction(left)}-radius: 3px;
       border-bottom-#{direction(left)}-radius: 3px;
       background: #fff;
@@ -65,7 +65,7 @@
       height: 10px;
       margin: 5px 0;
       #{direction(right)}: 0;
-      border-width: 2px 2px 2px 0;
+      border-width: direction-sides(2px 2px 2px 0);
     }
   }
 }

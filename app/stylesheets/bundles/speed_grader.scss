@@ -813,7 +813,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
     height: 19px;
     margin-#{direction(left)}: 8px;
     padding-#{direction(left)}: 29px;
-    background: url("/images/arrow_left.png") no-repeat center left;
+    background: url("/images/arrow_#{direction(left)}.png") no-repeat center direction(left);
     overflow: hidden;
     white-space: nowrap;
     color: $ic-font-color-dark;

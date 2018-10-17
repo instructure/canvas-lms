@@ -413,7 +413,7 @@
   color: #555;
   background: #ccc;
   border-color: #999;
-  border-width: 1px 1px 0 1px;
+  border-width: direction-sides(1px 1px 0 1px);
   border-style: solid;
   -moz-border-radius-top#{direction(right)}: 4px;
   -moz-border-radius-top#{direction(left)}: 4px;

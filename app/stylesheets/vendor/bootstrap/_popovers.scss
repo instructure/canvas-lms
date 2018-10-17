@@ -78,10 +78,10 @@
     top: 50%;
     #{direction(left)}: -$popoverArrowWidth;
     margin-top: -$popoverArrowWidth;
-    border-width: $popoverArrowWidth $popoverArrowWidth $popoverArrowWidth 0;
+    border-width: direction-sides($popoverArrowWidth $popoverArrowWidth $popoverArrowWidth 0);
     border-#{direction(right)}-color: $popoverArrowColor;
     &:after {
-      border-width: $popoverArrowOuterWidth $popoverArrowOuterWidth $popoverArrowOuterWidth 0;
+      border-width: direction-sides($popoverArrowOuterWidth $popoverArrowOuterWidth $popoverArrowOuterWidth 0);
       border-#{direction(right)}-color: $popoverArrowOuterColor;
       bottom: -$popoverArrowOuterWidth;
       #{direction(left)}: -1px;
@@ -104,10 +104,10 @@
     top: 50%;
     #{direction(right)}: -$popoverArrowWidth;
     margin-top: -$popoverArrowWidth;
-    border-width: $popoverArrowWidth 0 $popoverArrowWidth $popoverArrowWidth;
+    border-width: direction-sides($popoverArrowWidth 0 $popoverArrowWidth $popoverArrowWidth);
     border-#{direction(left)}-color: $popoverArrowColor;
     &:after {
-      border-width: $popoverArrowOuterWidth 0 $popoverArrowOuterWidth $popoverArrowOuterWidth;
+      border-width: direction-sides($popoverArrowOuterWidth 0 $popoverArrowOuterWidth $popoverArrowOuterWidth);
       border-#{direction(left)}-color: $popoverArrowOuterColor;
       bottom: -$popoverArrowOuterWidth;
       #{direction(right)}: -1px;

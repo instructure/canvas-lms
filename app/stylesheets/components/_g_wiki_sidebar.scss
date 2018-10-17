@@ -82,7 +82,7 @@
       font-size: 1.4em;
       font-weight: bold;
       padding-#{direction(left)}: 20px;
-      background: transparent url(/images/page_white_get.png) no-repeat left center;
+      background: transparent url(/images/page_white_get.png) no-repeat direction(left) center;
     }
   }
 }
@@ -138,7 +138,7 @@
       font-size: 1.4em;
       font-weight: bold;
       padding-#{direction(left)}: 20px;
-      background: transparent url(/images/page_white_get.png) no-repeat left center;
+      background: transparent url(/images/page_white_get.png) no-repeat direction(left) center;
     }
   }
 }

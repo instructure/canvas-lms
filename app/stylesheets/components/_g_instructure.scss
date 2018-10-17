@@ -299,7 +299,7 @@
         height: 100%;
         width: $ic-sp;
         background: linear-gradient(
-          to right, rgba(255, 255, 255, 0) 0%,
+          to direction(right), rgba(255, 255, 255, 0) 0%,
           rgba(255, 255, 255, 1) 80%);
       }
     }
@@ -310,7 +310,7 @@
       &:after {
         width: $ic-sp * 2.5;
         background: linear-gradient(
-          to right, rgba(255, 255, 255, 0) 0%,
+          to direction(right), rgba(255, 255, 255, 0) 0%,
           rgba(255, 255, 255, 1) 50%);
       }
     }
@@ -1554,7 +1554,7 @@ html > body .new_activity_message form textarea {
         img {
           visibility: hidden;
         }
-        background: url(/images/pass.png) no-repeat left top;
+        background: url(/images/pass.png) no-repeat direction(left) top;
         &:hover {
           img {
             visibility: visible;
