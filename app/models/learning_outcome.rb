@@ -47,6 +47,7 @@ class LearningOutcome < ActiveRecord::Base
 
   validates :description, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
   validates :short_description, length: { maximum: maximum_string_length }
+  validates :vendor_guid, length: { maximum: maximum_string_length, allow_nil: true }
   validates :display_name, length: { maximum: maximum_string_length, allow_nil: true, allow_blank: true }
   validates :calculation_method, inclusion: { in: CALCULATION_METHODS.keys,
     message: -> { t(

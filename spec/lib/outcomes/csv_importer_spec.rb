@@ -428,6 +428,18 @@ describe Outcomes::CsvImporter do
       )
     end
 
+    it 'raises a line error when vendor_guid is too long' do
+      expect_import_error(
+        [
+          headers,
+          outcome_row(vendor_guid: 'long-' * 200),
+        ],
+        [
+          [2, "Vendor guid is too long (maximum is 255 characters)"],
+        ]
+      )
+    end
+
     it 'if a group receives invalid fields' do
       expect_import_error(
         [
