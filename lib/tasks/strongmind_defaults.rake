@@ -6,7 +6,7 @@ namespace :strongmind_defaults do
     puts "Api page limit set to: #{limit}"
   end
 
-  desc "create dynomo db tables"
+  desc "create dynamo db tables"
   task :create_dynamo_db_tables => :environment do
     ['assignment', 'user', 'enrollment', 'student_assignment'].each do |obj|
       begin
