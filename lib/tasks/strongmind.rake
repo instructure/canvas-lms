@@ -6,13 +6,19 @@ namespace :strongmind do
     puts "[Finished] canvas:compile_assets\n\n"
     sleep(10)
     puts "[Starting] brand_configs:generate_and_upload_all"
-    ::Rake::Task['brand_configs:generate_and_upload_all'].invoke    
+    ::Rake::Task['brand_configs:generate_and_upload_all'].invoke
     sleep(10)
-    puts "[Finished] brand_configs:generate_and_upload_all" 
+    puts "[Finished] brand_configs:generate_and_upload_all"
 
-    puts "canvas:compile_assets and brand_configs:generate_and_upload_all ran successfully." 
+    puts "canvas:compile_assets and brand_configs:generate_and_upload_all ran successfully."
 
-    puts "running the rails server"     
+    puts "running the rails server"
     exec("rails server")
   end
+
+  desc "Upload courseware assets to S3"
+  task :upload_assets => :environment do
+    CanvasShimAssetUploader.new.upload!
+  end
+
 end
