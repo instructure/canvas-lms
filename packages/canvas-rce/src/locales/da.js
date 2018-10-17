@@ -19,4 +19,4 @@
 import formatMessage from "../format-message";
 import locale from "../../locales/da.json";
 import "../rce/languages/da";
-formatMessage.addLocale({ ar: locale });
+formatMessage.addLocale({ da: locale });
