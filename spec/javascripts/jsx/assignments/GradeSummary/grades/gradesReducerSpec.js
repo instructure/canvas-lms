@@ -103,6 +103,12 @@ QUnit.module('GradeSummary gradesReducer()', suiteHooks => {
       deepEqual(getProvisionalGrades()[1112][1102], provisionalGrades[1])
     })
 
+    test('does not key a grade to the grader id if the grade is null', () => {
+      provisionalGrades[2].grade = null
+      store.dispatch(GradeActions.addProvisionalGrades(provisionalGrades))
+      strictEqual(getProvisionalGrades()[1111][1102], undefined)
+    })
+
     test('updates .bulkSelectionDetails', () => {
       store.dispatch(GradeActions.addProvisionalGrades(provisionalGrades))
       deepEqual(getBulkSelectionDetails(1103).provisionalGradeIds, ['4604'])

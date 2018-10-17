@@ -1553,6 +1553,60 @@ describe Assignment do
       end
     end
 
+    context "moderated assignment" do
+      let_once(:assignment) do
+        @course.assignments.create!(moderated_grading: true, grader_count: 1, final_grader: @teacher)
+      end
+      let_once(:student) { course_with_user("StudentEnrollment", course: @course, active_all: true, name: "Stu").user }
+      let_once(:ta) { course_with_user("TaEnrollment", course: @course, active_all: true, name: "Ta").user }
+      let(:pg) { @result.first.provisional_grades.find_by!(scorer: ta) }
+
+      before(:each) do
+        @result = assignment.grade_student(student, grade: "10", grader: ta, provisional: true)
+      end
+
+      it "allows for grades to be deleted" do
+        expect{
+          assignment.grade_student(student, grade: "", grader: ta, provisional: true)
+        }.to change{
+          pg.reload.grade
+        }.from("10").to(nil)
+      end
+
+      it "keeps the provisional grader's slot after grade deletion" do
+        assignment.grade_student(student, grade: "10", grader: ta, provisional: true)
+        expect{
+          assignment.grade_student(student, grade: "", grader: ta, provisional: true)
+        }.not_to change{
+          assignment.provisional_moderation_graders.first.slot_taken
+        }
+      end
+
+      it "does not allow grade to be deleted if grade was selected" do
+        selection = assignment.moderated_grading_selections.where(student_id: student.id).first
+        selection.provisional_grade = pg
+        selection.save!
+
+        expect{
+          assignment.grade_student(student, grade: "", grader: ta, provisional: true)
+        }.to raise_error(Assignment::GradeError) do |error|
+          expect(error.error_code).to eq Assignment::GradeError::PROVISIONAL_GRADE_MODIFY_SELECTED
+        end
+      end
+
+      it "does not allow grade to be changed if grade was selected" do
+        selection = assignment.moderated_grading_selections.where(student_id: student.id).first
+        selection.provisional_grade = pg
+        selection.save!
+
+        expect{
+          assignment.grade_student(student, grade: "23", grader: ta, provisional: true)
+        }.to raise_error(Assignment::GradeError) do |error|
+          expect(error.error_code).to eq Assignment::GradeError::PROVISIONAL_GRADE_MODIFY_SELECTED
+        end
+      end
+    end
+
     context 'with an excused assignment' do
       before :once do
         @result = @assignment.grade_student(@user, grader: @teacher, excuse: true)
@@ -1634,7 +1688,7 @@ describe Assignment do
       it 'raises an error if an invalid score is passed for a provisional grade' do
         expect { @assignment.grade_student(@student, grader: @first_teacher, provisional: true, grade: 'bad') }.
           to raise_error(Assignment::GradeError) do |error|
-            expect(error.error_code).to eq 'PROVISIONAL_GRADE_INVALID_SCORE'
+            expect(error.error_code).to eq Assignment::GradeError::PROVISIONAL_GRADE_INVALID_SCORE
           end
       end
 

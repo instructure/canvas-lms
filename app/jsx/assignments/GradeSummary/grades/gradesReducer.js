@@ -147,7 +147,7 @@ const handlers = {}
 handlers[ADD_PROVISIONAL_GRADES] = (currentState, {payload}) =>
   pipeState(
     currentState,
-    state => addProvisionalGrades(state, payload.provisionalGrades),
+    state => addProvisionalGrades(state, payload.provisionalGrades.filter(pg => pg.grade !== null)),
     state => updateBulkSelectionDetails(state)
   )
 

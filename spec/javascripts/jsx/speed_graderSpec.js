@@ -1375,6 +1375,10 @@ QUnit.module('SpeedGrader#formatGradeForSubmission', {
   }
 });
 
+test('returns empty string if input is empty string', () => {
+  strictEqual(SpeedGrader.EG.formatGradeForSubmission(''), '');
+});
+
 test('should call numberHelper#parse if grading type is points', () => {
   ENV.grading_type = 'points';
   const result = SpeedGrader.EG.formatGradeForSubmission('1,000');
@@ -3887,6 +3891,12 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
 
       const [errorMessage] = $.flashError.firstCall.args
       strictEqual(errorMessage, 'An error occurred updating this assignment.')
+    })
+
+    test('warns the user that a selected grade cannot be altered', () => {
+      SpeedGrader.EG.handleGradingError({errors: {error_code: 'PROVISIONAL_GRADE_MODIFY_SELECTED'}})
+      const [errorMessage] = $.flashError.firstCall.args
+      strictEqual(errorMessage, 'The grade you entered has been selected and can no longer be changed.')
     })
   })
 

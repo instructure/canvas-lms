@@ -1603,6 +1603,8 @@ class Assignment < ActiveRecord::Base
   end
 
   def compute_grade_and_score(grade, score)
+    grade = nil if grade == ''
+
     if grade
       score = self.grade_to_score(grade)
     end
@@ -1757,9 +1759,12 @@ class Assignment < ActiveRecord::Base
     submission.audit_grade_changes = false
 
     if opts[:provisional]
-      raise GradeError, error_code: 'PROVISIONAL_GRADE_INVALID_SCORE' unless score.present? || submission.excused
+      unless score.present? || submission.excused
+        raise GradeError, error_code: GradeError::PROVISIONAL_GRADE_INVALID_SCORE unless opts[:grade] == ""
+      end
 
-      submission.find_or_create_provisional_grade!(grader,
+      submission.find_or_create_provisional_grade!(
+        grader,
         grade: grade,
         score: score,
         force_save: true,

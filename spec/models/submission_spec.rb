@@ -3837,6 +3837,19 @@ describe Submission do
           "Cannot give a final mark for a student with no other provisional grades")
     end
 
+    it "raises an exception if the grade has been selected" do
+      pg = @submission.find_or_create_provisional_grade!(@teacher, grade: "2", score: 2)
+      selection = @assignment.moderated_grading_selections.where(student: @submission.user).first
+      selection.provisional_grade = pg
+      selection.save!
+
+      expect{
+        @submission.find_or_create_provisional_grade!(@teacher, grade: "3", score: 3)
+      }.to raise_error(Assignment::GradeError) do |error|
+        expect(error.error_code).to eq Assignment::GradeError::PROVISIONAL_GRADE_MODIFY_SELECTED
+      end
+    end
+
     it 'sets the source provisional grade if one is provided' do
       new_source = ModeratedGrading::ProvisionalGrade.new
       provisional_grade = @submission.find_or_create_provisional_grade!(@teacher, source_provisional_grade: new_source)
