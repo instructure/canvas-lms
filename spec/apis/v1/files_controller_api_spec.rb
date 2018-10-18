@@ -835,7 +835,9 @@ describe "Files API", type: :request do
               'thumbnail_url' => thumbnail_image_url(@att, @att.uuid, host: 'www.example.com'),
               'modified_at' => @att.modified_at.as_json,
               'mime_class' => @att.mime_class,
-              'media_entry_id' => @att.media_entry_id
+              'media_entry_id' => @att.media_entry_id,
+              "canvadoc_session_url" => nil,
+              "crocodoc_session_url" => nil,
       })
     end
 
