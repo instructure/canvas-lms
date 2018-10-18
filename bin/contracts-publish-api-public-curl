@@ -1,0 +1,16 @@
+#!/bin/bash 
+
+generic_consumer_version='0.15'
+sha=$(git rev-parse --short HEAD)
+version="$generic_consumer_version+$sha"
+
+echo Publishing version: $version
+
+set -e
+
+curl -v -XPUT \
+-u $PACT_BROKER_PUBLIC_USERNAME:$PACT_BROKER_PUBLIC_PASSWORD \
+-H "Content-Type: application/json" \
+-d@pacts/generic_consumer-canvas_lms_api.json \
+http://pact-broker.instructure.com/pacts/provider/Canvas%20LMS%20API/consumer/Generic%20Consumer/version/$version
+
