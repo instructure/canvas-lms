@@ -873,22 +873,24 @@ class BzController < ApplicationController
   
   class ExportGrades
     def initialize(user_id, params)
-      @user = User.find(user_id)
+      @user_id = user_id
       @params = params
     end
     
     def perform
-      csv = Export::GradeDownload.csv(@user, @params)
+      user = User.find(@user_id)
+      csv = Export::GradeDownload.csv(user, @params)
       Mailer.bz_message(@params[:email], "Export Success: Course #{@params[:course_id]}", "Attached is your export data", "grades_download.csv" => csv).deliver
       
       csv
     end
 
     def on_permanent_failure(error)
+      user = User.find(@user_id)
       er_id = Canvas::Errors.capture_exception("BzController::ExportGrades", error)[:error_report]
       # email us?
       Mailer.debug_message("Export FAIL", error.to_s).deliver
-      Mailer.bz_message(@user.email, "Export Failed :(", "Your grades download export didn't work. The tech team was also emailed to look into why.")
+      Mailer.bz_message(user.email, "Export Failed :(", "Your grades download export didn't work. The tech team was also emailed to look into why.")
     end
   end
   
