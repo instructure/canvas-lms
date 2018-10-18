@@ -609,6 +609,15 @@ Returns the first name of the launching user.
 ```
 John
 ```
+## com.instructure.Person.name_sortable
+Returns the sortable name of the launching user.
+
+**Availability**: *when launched by a logged in user*  
+**Launch Parameter**: *com_instructure_person_name_sortable*  
+
+```
+Doe, John
+```
 ## Person.email.primary
 Returns the primary email of the launching user.
 

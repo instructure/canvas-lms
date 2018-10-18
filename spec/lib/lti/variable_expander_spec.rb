@@ -1190,6 +1190,13 @@ module Lti
           expect(exp_hash[:test]).to eq 'Uncle'
         end
 
+        it 'has substitution for $com.instructure.Person.name_sortable' do
+          user.sortable_name = 'Jake, Uncle'
+          exp_hash = {test: '$com.instructure.Person.name_sortable'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq 'Jake, Uncle'
+        end
+
         it 'has substitution for $Person.email.primary' do
           allow(substitution_helper).to receive(:email).and_return('someone@somewhere')
           allow(SubstitutionsHelper).to receive(:new).and_return(substitution_helper)

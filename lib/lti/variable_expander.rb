@@ -664,6 +664,17 @@ module Lti
                        USER_GUARD,
                        default_name: 'lis_person_name_given'
 
+    # Returns the sortable name of the launching user.
+    # @launch_parameter com_instructure_person_name_sortable
+    # @example
+    #   ```
+    #   Doe, John
+    #   ```
+    register_expansion 'com.instructure.Person.name_sortable', [],
+                       -> { @current_user.sortable_name },
+                       USER_GUARD,
+                       default_name: 'com_instructure_person_name_sortable'
+
     # Returns the primary email of the launching user.
     # @launch_parameter lis_person_contact_email_primary
     # @example
