@@ -117,6 +117,7 @@ class Sidebar extends Component {
         <TabList
           selectedIndex={this.props.selectedTabIndex}
           onChange={this.props.onChangeTab}
+          focus
         >
           {panels}
         </TabList>
