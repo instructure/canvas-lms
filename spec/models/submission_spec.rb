@@ -3669,6 +3669,15 @@ describe Submission do
       expect(@a1.submission_for_student(@u2).grade).to eql "10"
     end
 
+    it 'only recalculates scores for users with changed submissions' do
+      data1 = {@a1.id.to_s => {@u1.id => {posted_grade: 5}, @u2.id => {posted_grade: 10}}}
+      data2 = {@a1.id.to_s => {@u1.id => {posted_grade: 5}, @u2.id => {posted_grade: 11}}} # leave u1 the same
+      Submission.process_bulk_update(@progress, @course, nil, @teacher, data1)
+
+      expect_any_instantiation_of(@course).to receive(:recompute_student_scores).with([@u2.id])
+      Submission.process_bulk_update(@progress, @course, nil, @teacher, data2)
+    end
+
     it 'updates submissions on multiple assignments' do
       Submission.process_bulk_update(@progress, @course, nil, @teacher, {
         @a1.id => {
