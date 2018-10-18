@@ -473,9 +473,17 @@ class Group < ActiveRecord::Base
   # if you modify this set_policy block, note that we've denormalized this
   # permission check for efficiency -- see User#cached_contexts
   set_policy do
+
     # Participate means the user is connected to the group somehow and can be
-    given { |user| user && can_participate?(user) }
-    can :participate
+    given { |user| user && can_participate?(user) && self.has_member?(user) }
+    can :participate and
+    can :manage_calendar and
+    can :manage_content and
+    can :manage_files and
+    can :manage_wiki and
+    can :post_to_forum and
+    can :create_collaborations and
+    can :create_forum
 
     # Course-level groups don't grant any permissions besides :participate (because for a teacher to add a student to a
     # group, the student must be able to :participate, and the teacher should be able to add students while the course
@@ -485,15 +493,8 @@ class Group < ActiveRecord::Base
 
     use_additional_policy do
       given { |user| user && self.has_member?(user) }
-      can :create_collaborations and
-      can :manage_calendar and
-      can :manage_content and
-      can :manage_files and
-      can :manage_wiki and
-      can :post_to_forum and
-      can :create_forum and
-      can :read and
       can :read_forum and
+      can :read and
       can :read_announcements and
       can :read_roster and
       can :view_unpublished_items
