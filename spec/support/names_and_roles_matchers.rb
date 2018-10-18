@@ -96,16 +96,37 @@ module Lti::Ims::NamesAndRolesMatchers
     }.compact
   end
 
+  def expected_message_array(message_matcher)
+    [
+      {
+        'https://purl.imsglobal.org/spec/lti/claim/message_type' => 'LtiResourceLinkRequest',
+        'https://purl.imsglobal.org/spec/lti/claim/custom' => {}
+      }.merge!(message_matcher.presence || {})
+    ]
+  end
+
   def expected_course_membership(user, *enrollments)
     expected_base_membership(user).merge!('roles' => match_array(expected_course_lti_roles(*enrollments))).compact
+  end
+
+  def expected_course_membership_for_rlid(message_matcher, user, *enrollments)
+    expected_course_membership(user, *enrollments).
+      merge('message' => match_array(expected_message_array(message_matcher))).
+      compact
   end
 
   def expected_group_membership(user, membership)
     expected_base_membership(user).merge!('roles' => match_array(expected_group_lti_roles(membership))).compact
   end
 
+  def expected_group_membership_for_rlid(message_matcher, user, membership)
+    expected_group_membership(user, membership).
+      merge('message' => match_array(expected_message_array(message_matcher))).
+      compact
+  end
+
   def unwrap_user(user)
-    user.respond_to?(:user) ? user.user : user
+    user.respond_to?(:unwrap) ? user.unwrap : user
   end
 
   RSpec::Matchers.define :be_lti_course_membership_context do |expected|
@@ -144,9 +165,33 @@ module Lti::Ims::NamesAndRolesMatchers
     attr_reader :actual, :expected
   end
 
+  RSpec::Matchers.define :be_lti_course_membership_for_rlid do |message_matcher, *expected|
+    match do |actual|
+      @expected = expected_course_membership_for_rlid(message_matcher, expected.first.user, *expected)
+      values_match? @expected, actual
+    end
+
+    diffable
+
+    # Make sure a failure diffs the two JSON structs (w/o this will compare 'actual' JSON to 'expected' AR model)
+    attr_reader :actual, :expected
+  end
+
   RSpec::Matchers.define :be_lti_group_membership do |expected|
     match do |actual|
       @expected = expected_group_membership(expected.user, expected)
+      values_match? @expected, actual
+    end
+
+    diffable
+
+    # Make sure a failure diffs the two JSON structs (w/o this will compare 'actual' JSON to 'expected' AR model)
+    attr_reader :actual, :expected
+  end
+
+  RSpec::Matchers.define :be_lti_group_membership_for_rlid do |message_matcher, expected|
+    match do |actual|
+      @expected = expected_group_membership_for_rlid(message_matcher, expected.user, expected)
       values_match? @expected, actual
     end
 

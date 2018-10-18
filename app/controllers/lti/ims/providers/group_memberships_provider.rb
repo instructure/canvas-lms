@@ -77,6 +77,10 @@ module Lti::Ims::Providers
         @user_factory = user_factory
       end
 
+      def unwrap
+        __getobj__
+      end
+
       def context
         @_context ||= GroupContextDecorator.new(super)
       end
@@ -105,6 +109,10 @@ module Lti::Ims::Providers
     end
 
     class GroupContextDecorator < SimpleDelegator
+      def unwrap
+        __getobj__
+      end
+
       def context_label
         nil
       end

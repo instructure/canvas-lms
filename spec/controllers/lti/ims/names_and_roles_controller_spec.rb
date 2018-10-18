@@ -159,20 +159,83 @@ describe Lti::Ims::NamesAndRolesController do
     end
   end
 
+  # rubocop:disable RSpec/LetSetup
   shared_examples 'rlid check' do
-    let(:rlid_param) { raise 'Override in example' }
+    let(:rlid_param) { expected_lti_id(course) }
     let(:params_overrides) { super().merge(rlid: rlid_param) }
+    let(:user_full_name) { 'Marta Perkins' }
 
     context 'when the rlid param specifies the course context LTI ID' do
-      let(:rlid_param) { expected_lti_id(course) }
-
       it 'behaves just like a \'normal\' NRPS course membership lookup' do
         send_request
         expect_single_member(enrollment)
       end
-    end
 
-    # Always an error at this writing b/c we don't yet support rlid=assignment.lti_context_id
+      context 'and the tool is configured with a mix of supported and unsupported custom parameters' do
+        let!(:tool) do
+          tool = super()
+          tool.settings[:custom_fields] = {
+            person_name_full: '$Person.name.full',
+            person_name_display: '$Person.name.display',
+            person_name_family: '$Person.name.family',
+            person_name_given: '$Person.name.given',
+            user_image: '$User.image',
+            user_id: '$User.id',
+            canvas_user_id: '$Canvas.user.id',
+            vns_instructure_user_uuid: '$vnd.instructure.User.uuid',
+            canvas_user_globalid: '$Canvas.user.globalId',
+            canvas_user_sissourceid: '$Canvas.user.sisSourceId',
+            person_sourced_id: '$Person.sourcedId',
+            unsupported_param_1: '$unsupported.param.1',
+            unsupported_param_2: '$unsupported.param.2'
+          }
+          tool.save!
+          tool
+        end
+        let!(:user) do
+          user = enrollment.user
+          user.email = 'marta.perkins@school.edu'
+          user.avatar_image_url = 'http://school.edu/image/url.png'
+          user.save!
+          user.pseudonyms.create!({
+            account: course.account,
+            unique_id: 'user1@example.com',
+            password: 'asdfasdf',
+            password_confirmation: 'asdfasdf',
+            workflow_state: 'active',
+            sis_user_id: 'user-1-sis-user-id-1'
+          })
+          user
+        end
+
+        it 'expands the supported parameters and echoes the rest' do
+          send_request
+          expect(json[:members][0]).to match_enrollment_for_rlid(
+            {
+              'https://purl.imsglobal.org/spec/lti/claim/custom' => {
+                'person_name_full' => 'Marta Perkins',
+                'person_name_display' => 'Marta Perkins',
+                'person_name_family' => 'Perkins',
+                'person_name_given' => 'Marta',
+                'user_image' => 'http://school.edu/image/url.png',
+                'user_id' => user.id,
+                'canvas_user_id' => user.id,
+                'vns_instructure_user_uuid' => user.uuid,
+                'canvas_user_globalid' => user.global_id,
+                'canvas_user_sissourceid' => 'user-1-sis-user-id-1',
+                'person_sourced_id' => 'user-1-sis-user-id-1',
+                'unsupported_param_1' => '$unsupported.param.1',
+                'unsupported_param_2' => '$unsupported.param.2'
+              }
+            },
+            enrollment
+          )
+          expect_member_count(1)
+        end
+      end
+    end
+    # rubocop:enable RSpec/LetSetup
+
     context 'when the rlid param does not specify the course context LTI ID' do
       let(:rlid_param) { "nonsense-#{expected_lti_id(course)}" }
 
@@ -332,15 +395,13 @@ describe Lti::Ims::NamesAndRolesController do
       end
     end
 
+    # rubocop:disable RSpec/LetSetup
     context 'when the rlid param is specified' do
-      # rubocop:disable RSpec/LetSetup
-      # rubocop:disable RSpec/EmptyLineAfterFinalLet
-      let!(:enrollment) { teacher_in_course(course: course, active_all: true) }
-      # rubocop:enable RSpec/EmptyLineAfterFinalLet
-      # rubocop:enable RSpec/LetSetup
+      let!(:enrollment) { teacher_in_course(course: course, active_all: true, name: user_full_name) }
 
       it_behaves_like 'rlid check'
     end
+    # rubocop:enable RSpec/LetSetup
 
     context 'when a course has multiple enrollments' do
       let!(:teacher_enrollment) { teacher_in_course(course: course, active_all: true) }
@@ -782,17 +843,15 @@ describe Lti::Ims::NamesAndRolesController do
       end
     end
 
+    # rubocop:disable RSpec/LetSetup
     context 'when the rlid param is specified' do
-      let(:group_record) { group_with_user(active_all: true, context: course).group }
+      let(:group_record) { group_with_user(active_all: true, context: course, name: user_full_name).group }
       let(:group_member) { group_record.group_memberships.first }
-      # rubocop:disable RSpec/LetSetup
-      # rubocop:disable RSpec/EmptyLineAfterFinalLet
       let!(:enrollment) { group_member }
-      # rubocop:enable RSpec/EmptyLineAfterFinalLet
-      # rubocop:enable RSpec/LetSetup
 
       it_behaves_like 'rlid check'
     end
+    # rubocop:enable RSpec/LetSetup
 
     context 'when a group has multiple memberships' do
       let!(:group_leadership) do
@@ -1156,7 +1215,18 @@ describe Lti::Ims::NamesAndRolesController do
   end
 
   def match_enrollment(*enrollment)
-    enrollment.first.is_a?(Enrollment) ? be_lti_course_membership(*enrollment) : be_lti_group_membership(*enrollment)
+    if self.respond_to?(:rlid_param) && rlid_param.present?
+      match_enrollment_for_rlid({}, *enrollment)
+    else
+      enrollment.first.is_a?(Enrollment) ? be_lti_course_membership(*enrollment) : be_lti_group_membership(*enrollment)
+    end
+  end
+
+  def match_enrollment_for_rlid(message_matcher, *enrollment)
+    if enrollment.first.is_a?(Enrollment)
+      be_lti_course_membership_for_rlid(message_matcher, *enrollment)
+    else be_lti_group_membership_for_rlid(message_matcher, *enrollment)
+    end
   end
 
   def expect_enrollment_response_page
@@ -1230,6 +1300,6 @@ describe Lti::Ims::NamesAndRolesController do
   end
 
   def users_from(*users_or_user_containers)
-    users_or_user_containers.map { |uoe| uoe.respond_to?(:user) ? uoe.user : uoe }
+    users_or_user_containers.map { |uc| uc.respond_to?(:user) ? uc.user : uc }
   end
 end

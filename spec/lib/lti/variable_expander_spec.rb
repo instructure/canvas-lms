@@ -144,6 +144,44 @@ module Lti
       expect(expanded[:some_name]).to eq "my variable is buried in here ${tests_expan} can you find it?"
     end
 
+    it 'echoes registered variable if blacklisted' do
+      VariableExpander.register_expansion('test_expan', ['a'], -> { @context })
+      VariableExpander.register_expansion('variable1', ['a'], -> { 1 })
+      variable_expander.variable_blacklist = ['test_expan']
+      expanded1 = variable_expander.expand_variables!({some_name: '$test_expan'})
+      expanded2 = variable_expander.expand_variables!({some_name: '$variable1'})
+      expect(expanded1.count).to eq 1
+      expect(expanded1[:some_name]).to eq '$test_expan'
+      expect(expanded2.count).to eq 1
+      expect(expanded2[:some_name]).to eq 1
+    end
+
+    it 'echoes substring variable if blacklisted' do
+      allow(account).to receive(:id).and_return(42)
+      VariableExpander.register_expansion('test_expan', ['a'], -> { @context.id })
+      VariableExpander.register_expansion('variable1', ['a'], -> { 1 })
+      variable_expander.variable_blacklist = ['test_expan']
+      expanded1 = variable_expander.expand_variables!({some_name: 'my variable is buried in here ${test_expan} can you find it?'})
+      expanded2 = variable_expander.expand_variables!({some_name: 'my variable is buried in here ${variable1} can you find it?'})
+      expect(expanded1.count).to eq 1
+      expect(expanded1[:some_name]).to eq 'my variable is buried in here $test_expan can you find it?'
+      expect(expanded2.count).to eq 1
+      expect(expanded2[:some_name]).to eq 'my variable is buried in here 1 can you find it?'
+    end
+
+    it 'echoes multiple substring variables if blacklisted' do
+      allow(account).to receive(:id).and_return(42)
+      VariableExpander.register_expansion('test_expan', ['a'], -> { @context.id })
+      VariableExpander.register_expansion('variable1', ['a'], -> { 1 })
+      VariableExpander.register_expansion('other_variable', ['a'], -> { 2 })
+      variable_expander.variable_blacklist = ['test_expan','variable1']
+      expanded = variable_expander.expand_variables!(
+        {some_name: 'my variables ${variable1} is buried ${other_variable} in here ${test_expan} can you find them?'}
+      )
+      expect(expanded.count).to eq 1
+      expect(expanded[:some_name]).to eq 'my variables $variable1 is buried 2 in here $test_expan can you find them?'
+    end
+
     describe '#self.expansion_keys' do
       let(:expected_keys) do
         VariableExpander.expansions.keys.map { |c| c.to_s[1..-1] }

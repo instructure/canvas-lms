@@ -107,6 +107,10 @@ module Lti::Ims::Providers
         @user_factory = user_factory
       end
 
+      def unwrap
+        enrollments
+      end
+
       def user
         @_user ||= @user_factory.user(enrollments.first.user)
       end
@@ -125,6 +129,10 @@ module Lti::Ims::Providers
     end
 
     class CourseContextDecorator < SimpleDelegator
+      def unwrap
+        __getobj__
+      end
+
       def context_label
         course_code
       end

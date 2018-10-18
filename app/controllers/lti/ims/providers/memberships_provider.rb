@@ -37,7 +37,15 @@ module Lti::Ims::Providers
       {
           memberships: memberships,
           context: context,
-          api_metadata: api_metadata
+          assignment: assignment,
+          api_metadata: api_metadata,
+          controller: controller,
+          tool: tool,
+          opts: {
+            rlid: rlid,
+            role: role,
+            limit: limit
+          }.compact
       }
     end
 
@@ -45,15 +53,32 @@ module Lti::Ims::Providers
       UserDecorator.new(
         user,
         tool,
-        Lti::VariableExpander.new(
-          course.root_account,
-          course,
-          controller,
-          {
-            current_user: user,
-            tool: tool
-          }
-        )
+        user_variable_expander(user)
+      )
+    end
+
+    def user_variable_expander(user)
+      Lti::VariableExpander.new(
+        course.root_account,
+        course,
+        controller,
+        {
+          current_user: user,
+          tool: tool,
+          variable_whitelist: %w(
+            Person.name.full
+            Person.name.display
+            Person.name.family
+            Person.name.given
+            User.image
+            User.id
+            Canvas.user.id
+            vnd.instructure.User.uuid
+            Canvas.user.globalId
+            Canvas.user.sisSourceId
+            Person.sourcedId
+          )
+        }
       )
     end
 
@@ -179,6 +204,10 @@ module Lti::Ims::Providers
       enrollments
     end
 
+    def limit
+      controller.params[:limit].to_i
+    end
+
     def paginate(scope)
       Api.jsonapi_paginate(scope, controller, base_url, pagination_args)
     end
@@ -186,7 +215,7 @@ module Lti::Ims::Providers
     def pagination_args
       # Treat LTI's `limit` param as override of std `per_page` API pagination param. Is no LTI override for `page`.
       pagination_args = {}
-      if (limit = controller.params[:limit].to_i) > 0
+      if limit > 0
         pagination_args[:per_page] = [limit, Api.max_per_page].min
         # Ensure page size reset isn't accidentally clobbered by other pagination API params
         clear_request_param :per_page
@@ -207,12 +236,16 @@ module Lti::Ims::Providers
     # has to change if more custom param support is added in the future. But that day may never come, so err on the
     # side of making it very hard to leak user attributes.
     class UserDecorator
-      attr_reader :user # Intentional backdoor. See Lti::Ims::NamesAndRolesSerializer for use case/s.
+      attr_reader :user, :expander, :tool
 
       def initialize(user, tool, expander)
         @user = user
         @tool = tool
         @expander = expander
+      end
+
+      def unwrap
+        user
       end
 
       def id

@@ -38,6 +38,7 @@ describe Lti::Ims::NamesAndRolesSerializer do
       workflow_state: privacy_level
     )
   end
+  let(:message_matcher) { {} }
 
   def serialize
     subject.as_json.with_indifferent_access
@@ -48,7 +49,12 @@ describe Lti::Ims::NamesAndRolesSerializer do
     be_lti_group_membership_context(decorated_group)
   end
 
-  def be_lti_membership
+  def be_lti_membership(for_rlid=false)
+    if for_rlid
+      return be_lti_course_membership_for_rlid(message_matcher, decorated_enrollment) if context_type == :course
+      return be_lti_group_membership_for_rlid(message_matcher, decorated_group_member)
+    end
+
     return be_lti_course_membership(decorated_enrollment) if context_type == :course
     be_lti_group_membership(decorated_group_member)
   end
@@ -64,13 +70,42 @@ describe Lti::Ims::NamesAndRolesSerializer do
     })
   end
 
-  shared_examples 'enrollment serialization' do
+  shared_examples 'enrollment serialization' do |for_rlid=false|
     it 'properly formats NRPS json' do
       json = serialize
       expect(json[:id]).to eq url
       expect(json[:context]).to be_lti_membership_context
-      expect(json[:members][0]).to be_lti_membership
+      expect(json[:members][0]).to be_lti_membership(for_rlid)
     end
+  end
+
+  shared_examples 'serializes message array if rlid param present' do
+    let(:tool) do
+      tool = super()
+      tool.settings[:custom_fields] = {
+        user_id: '$User.id',
+        canvas_user_id: '$Canvas.user.id',
+        unsupported_param_1: '$unsupported.param.1',
+        unsupported_param_2: '$unsupported.param.2'
+      }
+      tool.save!
+      tool
+    end
+    let(:page) do
+      super().merge(opts: { rlid: 'rlid-value' })
+    end
+    let(:message_matcher) do
+      {
+        'https://purl.imsglobal.org/spec/lti/claim/custom' => {
+          'user_id' => user.id,
+          'canvas_user_id' => user.id,
+          'unsupported_param_1' => '$unsupported.param.1',
+          'unsupported_param_2' => '$unsupported.param.2'
+        }
+      }
+    end
+
+    it_behaves_like 'enrollment serialization', true
   end
 
   # Technically all these '...privacy policy' examples are redundant w/r/t be_lti_*_membership(). But those matchers
@@ -128,6 +163,7 @@ describe Lti::Ims::NamesAndRolesSerializer do
         create_pseudonym!(user)
         enrollment
       end
+      let(:user) { enrollment.user }
       let(:decorated_user_factory) do
         Lti::Ims::Providers::CourseMembershipsProvider.new(course, nil, tool)
       end
@@ -141,9 +177,14 @@ describe Lti::Ims::NamesAndRolesSerializer do
       let(:decorated_course) { Lti::Ims::Providers::CourseMembershipsProvider::CourseContextDecorator.new(course) }
       let(:page) do
         {
-          memberships: [decorated_enrollment],
           url: url,
-          context: decorated_course
+          memberships: [decorated_enrollment],
+          context: decorated_course,
+          assignment: nil,
+          api_metadata: nil,
+          controller: nil,
+          tool: tool,
+          opts: {}
         }
       end
 
@@ -155,7 +196,7 @@ describe Lti::Ims::NamesAndRolesSerializer do
       context 'and an anonymous tool' do
         let(:privacy_level) { 'anonymous' }
 
-          it_behaves_like 'enrollment serialization'
+        it_behaves_like 'enrollment serialization'
         it_behaves_like 'anonymous privacy policy'
       end
 
@@ -172,6 +213,8 @@ describe Lti::Ims::NamesAndRolesSerializer do
         it_behaves_like 'enrollment serialization'
         it_behaves_like 'email_only privacy policy'
       end
+
+      it_behaves_like 'serializes message array if rlid param present'
     end
 
     context 'with a group' do
@@ -186,6 +229,7 @@ describe Lti::Ims::NamesAndRolesSerializer do
         create_pseudonym!(user)
         enrollment
       end
+      let(:user) { group_member.user }
       let(:decorated_user_factory) do
         Lti::Ims::Providers::GroupMembershipsProvider.new(group_record, nil, tool)
       end
@@ -199,9 +243,14 @@ describe Lti::Ims::NamesAndRolesSerializer do
       let(:decorated_group) { Lti::Ims::Providers::GroupMembershipsProvider::GroupContextDecorator.new(group_record) }
       let(:page) do
         {
-          memberships: [decorated_group_member],
           url: url,
-          context: decorated_group
+          memberships: [decorated_group_member],
+          context: decorated_group,
+          assignment: nil,
+          api_metadata: nil,
+          controller: nil,
+          tool: tool,
+          opts: {}
         }
       end
 
@@ -230,6 +279,8 @@ describe Lti::Ims::NamesAndRolesSerializer do
         it_behaves_like 'enrollment serialization'
         it_behaves_like 'email_only privacy policy'
       end
+
+      it_behaves_like 'serializes message array if rlid param present'
     end
   end
 end

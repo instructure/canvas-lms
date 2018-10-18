@@ -122,6 +122,14 @@ describe Lti::Messages::ResourceLinkRequest do
     it 'sets the resource link id' do
       expect(jws.dig('https://purl.imsglobal.org/spec/lti/claim/resource_link', 'id')).to eq course.lti_context_id
     end
+
+    context 'when rlid claim group disabled' do
+      let(:opts) { super().merge({claim_group_blacklist: [:rlid]}) }
+
+      it 'does not set the resource link id' do
+        expect(jws).not_to include('https://purl.imsglobal.org/spec/lti/claim/resource_link')
+      end
+    end
   end
 
   describe '#generate_post_payload_for_assignment' do
