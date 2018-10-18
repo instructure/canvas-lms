@@ -162,6 +162,7 @@ class PermissionsIndex
       permission_tray_button(permission_name, role_id).click()
       ff('[role="menuitemradio"]')[2].click()
       permission_tray_button(permission_name, role_id)
+      wait_for_ajaximations
     end
 
     def open_edit_role_tray(role)
