@@ -16,9 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require File.expand_path(File.dirname(__FILE__) + '/../common')
+require_relative 'pages/admin_developer_keys_page.rb'
 
 describe 'developer keys' do
   include_context 'in-process server selenium tests'
+  include AdminDeveloperKeysPage
 
   before(:each) do
     admin_logged_in
@@ -34,7 +36,7 @@ describe 'developer keys' do
   end
 
   it "allows creation through 'add developer key button'", test_id: 344077 do
-    get "/accounts/#{Account.default.id}/developer_keys"
+    visit_developer_page(Account.default.id)
     expect(f("#keys")).not_to contain_css("tbody tr")
 
     f(".add_key").click
@@ -58,7 +60,7 @@ describe 'developer keys' do
 
   it "allows update through 'edit this key button'", test_id: 344078 do
     developer_key
-    get "/accounts/#{Account.default.id}/developer_keys"
+    visit_developer_page(Account.default.id)
     f("#keys tbody tr.key .edit_link").click
     expect(f("#edit_dialog")).to be_displayed
     replace_content(f("#key_name"), "Cooler Tool")
@@ -81,7 +83,7 @@ describe 'developer keys' do
   it 'allows editing of legacy redirect URI', test_id: 3469351 do
     dk = developer_key
     dk.update_attribute(:redirect_uri, "http://a/")
-    get "/accounts/#{Account.default.id}/developer_keys"
+    visit_developer_page(Account.default.id)
     f("#keys tbody tr.key .edit_link").click
     expect(f("#edit_dialog")).to be_displayed
     replace_content(f("#key_name"), "Cooler Tool")
@@ -104,7 +106,7 @@ describe 'developer keys' do
 
   it "allows deactivation through 'deactivate this key button'", test_id: 3469389 do
     developer_key
-    get "/accounts/#{Account.default.id}/developer_keys"
+    visit_developer_page(Account.default.id)
     f("#keys tbody tr.key .icon-lock").click
     expect(f("#keys tbody")).to contain_css(".key.inactive")
     expect(developer_key.reload.workflow_state).to eq 'inactive'
@@ -112,7 +114,7 @@ describe 'developer keys' do
 
   it "allows activation through 'activate this key button'", test_id: 3469390 do
     developer_key.update(workflow_state: 'inactive')
-    get "/accounts/#{Account.default.id}/developer_keys"
+    visit_developer_page(Account.default.id)
     f("#keys tbody tr.key .icon-unlock").click
     expect(f("#keys tbody")).not_to contain_css(".key.inactive")
     expect(developer_key.reload.workflow_state).to eq 'active'
@@ -121,7 +123,7 @@ describe 'developer keys' do
   it "allows deletion through 'delete this key button'", test_id: 344079 do
     skip_if_safari(:alert)
     developer_key
-    get "/accounts/#{Account.default.id}/developer_keys"
+    visit_developer_page(Account.default.id)
     f("#keys tbody tr.key .edit_link").click
     expect(f("#edit_dialog")).to be_displayed
     f("#icon_url").clear
@@ -143,7 +145,7 @@ describe 'developer keys' do
 
   it "allows for pagination", test_id: 344532 do
     11.times { |i| Account.default.developer_keys.create!(name: "tool #{i}") }
-    get "/accounts/#{Account.default.id}/developer_keys"
+    visit_developer_page(Account.default.id)
     expect(f("#loading")).not_to have_class('loading')
     expect(ff("#keys tbody tr")).to have_size(10)
     expect(f('#loading')).to have_class('show_more')
