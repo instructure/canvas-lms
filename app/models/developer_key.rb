@@ -144,6 +144,7 @@ class DeveloperKey < ActiveRecord::Base
         end
         return @special_keys[default_key_name] = key if key
         key = DeveloperKey.create!(:name => default_key_name)
+        key.developer_key_account_bindings.update_all(workflow_state: 'on')
         Setting.set("#{default_key_name}_developer_key_id", key.id)
         return @special_keys[default_key_name] = key
       end
