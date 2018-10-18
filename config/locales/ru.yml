@@ -3419,7 +3419,7 @@ ru:
   between_2_and_5_c34f5152: "Между 2 и 5"
   big_blue_button_conference: 
     recording_setting: Запись
-    recording_setting_enabled_description: "Невозможно записать эту конференцию"
+    recording_setting_enabled_description: "Включить запись для этой конференции"
   blackboard: 
     no_manifest: "Этот zip-архив системы Blackboard не содержит файла imsmanifest.xml в корневом каталоге."
   blank_38df4238: "не заполнен"
