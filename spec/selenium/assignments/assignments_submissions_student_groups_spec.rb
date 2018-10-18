@@ -52,8 +52,8 @@ describe 'submissions' do
         fj('.plus').click
         fj('.pdf > span.text.name').click
 
-        f('button[type="submit"]').click
-        wait_for_ajaximations
+        wait_for_new_page_load(f('button[type="submit"]').click)
+
 
         expect(f('#sidebar_content .header')).to include_text 'Submitted!'
       end
