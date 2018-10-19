@@ -138,6 +138,10 @@
 #         "ratings": {
 #           "type": "array",
 #           "items": { "$ref": "RubricRating" }
+#         },
+#         "ignore_for_scoring": {
+#           "type": "boolean",
+#           "example": true
 #         }
 #       }
 #     }
