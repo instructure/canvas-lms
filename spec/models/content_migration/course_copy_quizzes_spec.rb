@@ -324,7 +324,6 @@ describe ContentMigration do
       q1 = @copy_from.quizzes.create!(:title => 'quiz1')
       bank = different_course.assessment_question_banks.create!(:title => 'bank')
       bank2 = @copy_from.account.assessment_question_banks.create!(:title => 'bank2')
-      bank2.assessment_question_bank_users.create!(:user => @user)
       bank3 = different_account.assessment_question_banks.create!(:title => 'bank3')
       group = q1.quiz_groups.create!(:name => "group", :pick_count => 3, :question_points => 5.0)
       group.assessment_question_bank = bank
