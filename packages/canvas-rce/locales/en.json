@@ -210,6 +210,10 @@
     "message": "Quizzes",
     "description": "Title of Sidebar accordion tab containing links to quizzes."
   },
+  "record_upload_media_5fdce166": {
+    "message": "Record/Upload Media",
+    "description": "Title for RCE button to insert or record media"
+  },
   "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
     "message": "Rich Text Area. Press ALT+F8 for help"
   },
