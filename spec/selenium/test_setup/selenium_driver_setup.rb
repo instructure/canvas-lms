@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require "fileutils"
-require "chromedriver/helper"
+require 'chromedriver-helper'
 require_relative "common_helper_methods/custom_alert_actions"
 
 # WebDriver uses port 7054 (the "locking port") as a mutex to ensure
