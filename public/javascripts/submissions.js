@@ -368,7 +368,7 @@ import './rubric_assessment' /*global rubricAssessment*/
           event.preventDefault();
           var comment_id = $(this).parents(".comment_media").getTemplateData({textValues: ['media_comment_id']}).media_comment_id;
           if(comment_id) {
-            $(this).parents(".comment_media").find(".media_comment_content").mediaComment('show', comment_id, 'video');
+            $(this).parents(".comment_media").find(".media_comment_content").mediaComment('show', comment_id, 'video', this);
           }
         })
 

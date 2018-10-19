@@ -2968,7 +2968,9 @@ EG = {
     });
     $right_side.delegate(".play_comment_link", 'click', function() {
       if($(this).data('media_comment_id')) {
-        $(this).parents(".comment").find(".media_comment_content").show().mediaComment('show', $(this).data('media_comment_id'), $(this).data('media_comment_type'));
+        $(this).parents(".comment").find(".media_comment_content")
+          .show()
+          .mediaComment('show', $(this).data('media_comment_id'), $(this).data('media_comment_type'), this)
       }
       return false; // so that it doesn't hit the $("a.instructure_inline_media_comment").live('click' event handler
     });

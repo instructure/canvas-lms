@@ -31,32 +31,37 @@ QUnit.module('submissions', {
       assignment_id: 27,
       submission: {}
     }
-    $('#fixtures').html(
-      "<div id='preview_frame'>" +
-        "  <div id='rubric_holder'>" +
-        '  </div>' +
-        "  <div class='save_rubric_button'>" +
-        '  </div>' +
-        "  <a class='update_submission_url'" +
-        "   href='submission_data_url.com' title='POST'></a>" +
-        "  <textarea class='grading_value'>A</textarea>" +
-        "  <div class='submission_header'>" +
-        '  </div>' +
-        "  <div class='comments_link'>" +
-        '  </div>' +
-        "  <div class='attach_comment_file_link'>" +
-        '  </div>' +
-        "  <div class='delete_comment_attachment_link'>" +
-        '  </div>' +
-        "  <div class='comments'>" +
-        '  </div>' +
-        "  <textarea class='grading_comment'>" +
-        '  Hello again.</textarea>' +
-        "  <input type='checkbox' id='submission_group_comment' checked>" +
-        "  <div class='save_comment_button'>" +
-        '  </div>' +
-        '</div>'
-    )
+    $('#fixtures').html(`
+      <div id='preview_frame'>
+        <div id='rubric_holder'>
+        </div>
+        <div class='save_rubric_button'>
+        </div>
+        <a class='update_submission_url' href='submission_data_url.com' title='POST'></a>
+        <textarea class='grading_value'>A</textarea>
+        <div class='submission_header'>
+        </div>
+        <div class='comments_link'>
+        </div>
+        <div class='attach_comment_file_link'>
+        </div>
+        <div class='delete_comment_attachment_link'>
+        </div>
+        <div class='comments'>
+          <div class='comment_list'>
+            <div class='comment_media'>
+              <span class='media_comment_id'>my_comment_id</span>
+              <div class='media_comment_content'></div>
+              <div class='play_comment_link'></div>
+            </div>
+          </div>
+        </div>
+        <textarea class='grading_comment'>Hello again.</textarea>
+        <input type='checkbox' id='submission_group_comment' checked>
+        <div class='save_comment_button'>
+        </div>
+      </div>
+    `)
     setup()
   },
 
@@ -103,4 +108,15 @@ test('grading_change submits the grade but not grading_comment', () => {
   equal($.ajaxJSON.getCall(0).args[2]['submission[assignment_id]'], 27)
   equal($.ajaxJSON.getCall(0).args[2]['submission[grade]'], 'A')
   equal($.ajaxJSON.getCall(0).args[2]['submission[comment]'], undefined)
+})
+
+test('clicking a media comment passes the opening element to the window', () => {
+  const commentLink = $('#preview_frame .play_comment_link')
+  sinon.stub($.fn, 'mediaComment')
+
+  commentLink.click()
+  const [,,,openingElement] = $.fn.mediaComment.firstCall.args
+  strictEqual(openingElement, commentLink.get(0))
+
+  $.fn.mediaComment.restore()
 })

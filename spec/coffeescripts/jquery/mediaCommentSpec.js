@@ -18,6 +18,8 @@
 
 import $ from 'jquery'
 import MediaUtils from 'compiled/jquery/mediaComment'
+import 'jqueryui/dialog';
+import 'jquery.disableWhileLoading';
 
 QUnit.module('mediaComment', {
   setup() {
@@ -81,6 +83,19 @@ test('video player includes url sources provided by the server', function() {
     'http://some_mp4_url.com',
     'Video contains the mp4 source'
   )
+})
+
+test('dialog returns focus to opening element when closed', function() {
+  $('<span id="opening-element"></span>').appendTo('#fixtures')
+  const openingElement = document.getElementById('opening-element')
+  sinon.spy(openingElement, 'focus')
+
+  this.$holder.mediaComment('show', 0, 'video', openingElement)
+  $('.ui-dialog-titlebar-close').click()
+
+  equal(openingElement.focus.callCount, 1)
+  openingElement.remove()
+  $('.ui-dialog').remove()
 })
 
 QUnit.module('MediaCommentUtils functions', {
