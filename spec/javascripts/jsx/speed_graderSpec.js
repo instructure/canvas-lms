@@ -22,6 +22,7 @@ import ReactDOM from 'react-dom';
 import SpeedGrader from 'speed_grader';
 import SpeedGraderHelpers from 'speed_grader_helpers';
 
+import _ from 'underscore';
 import JQuerySelectorCache from 'jsx/shared/helpers/JQuerySelectorCache';
 import fakeENV from 'helpers/fakeENV';
 import natcompare from 'compiled/util/natcompare';
@@ -61,6 +62,19 @@ function teardownFixtures() {
 
 QUnit.module('SpeedGrader#showDiscussion', {
   setup () {
+    const commentBlankHtml = `
+      <div id="comments">
+      </div>
+      <div id="comment_blank">
+        <a class="play_comment_link"></a>
+        <div class="comment">
+          <div class="comment_flex">
+            <span class="comment"></span>
+          </div>
+        </div>
+      </div>
+    `;
+
     fakeENV.setup({
       assignment_id: '17',
       course_id: '29',
@@ -68,7 +82,7 @@ QUnit.module('SpeedGrader#showDiscussion', {
       help_url: 'example.com/support',
       show_help_menu_item: false
     })
-    setupFixtures();
+    setupFixtures(commentBlankHtml);
     sandbox.stub($, 'ajaxJSON');
     sandbox.spy($.fn, 'append');
     this.originalWindowJSONData = window.jsonData;
@@ -93,12 +107,14 @@ QUnit.module('SpeedGrader#showDiscussion', {
           attachment_ids: '',
           author_id: 1000,
           author_name: 'An Author',
-          comment: 'test',
+          comment: 'a comment!',
           context_id: 1,
           context_type: 'Course',
           created_at: '2016-07-12T23:47:34Z',
           hidden: false,
           id: 11,
+          media_comment_id: 3,
+          media_comment_type: 'video',
           posted_at: 'Jul 12 at 5:47pm',
           submission_id: 1,
           teacher_only_comment: false,
@@ -140,7 +156,7 @@ test('showDiscussion should show group comments for group assignments', () => {
   window.jsonData.GROUP_GRADING_MODE = true;
   SpeedGrader.EG.currentStudent.submission.submission_comments[0].group_comment_id = 'hippo';
   SpeedGrader.EG.showDiscussion();
-  sinon.assert.calledTwice($.fn.append);
+  strictEqual(document.querySelector('.comment').innerText, 'a comment!')
 });
 
 test('showDiscussion should show private comments for non group assignments', () => {
@@ -149,6 +165,18 @@ test('showDiscussion should show private comments for non group assignments', ()
   SpeedGrader.EG.showDiscussion();
   sinon.assert.calledTwice($.fn.append);
 });
+
+test('thumbnails of media comments have screenreader text', () => {
+  const originalKalturaSettings = INST.kalturaSettings
+  INST.kalturaSettings = { resource_domain: "example.com", partner_id: "asdf" }
+  sinon.stub(_, 'defer').callsFake((func, elem, size, keepOriginalText) => {
+    func(elem, size, keepOriginalText)
+  })
+  SpeedGrader.EG.showDiscussion()
+  const screenreaderText = document.querySelector(".play_comment_link .screenreader-only").innerText
+  strictEqual(screenreaderText, "Play media comment by An Author from Jul 12, 2016 at 11:47pm.")
+  INST.kalturaSettings = originalKalturaSettings
+})
 
 QUnit.module('SpeedGrader#refreshSubmissionsToView', {
   setup () {

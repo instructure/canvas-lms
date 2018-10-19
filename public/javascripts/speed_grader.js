@@ -2518,7 +2518,10 @@ EG = {
 
         if (commentElement) {
           $comments.append($(commentElement).show());
-          $comments.find('.play_comment_link').mediaCommentThumbnail('normal');
+          const $commentLink = $comments.find('.play_comment_link').last();
+          $commentLink.data('author', comment.author_name);
+          $commentLink.data('created_at', comment.posted_at);
+          $commentLink.mediaCommentThumbnail('normal');
         }
       });
     }
