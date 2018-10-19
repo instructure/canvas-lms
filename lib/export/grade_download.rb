@@ -145,16 +145,16 @@ module Export
         if rubric
           rubric.data.each do |criterion|
             obj = {}
-            obj["description"] = criterion["description"]
-            obj["criterion_id"] = criterion["id"]
+            obj["description"] = criterion[:description]
+            obj["criterion_id"] = criterion[:id]
             if criterion["description"]
-              obj["section"] = criterion["description"][/^([0-9]+)/, 1]
-              obj["subsection"] = criterion["description"][/^[0-9]+\.([0-9]+)/, 1]
+              obj["section"] = criterion[:description][/^([0-9]+)/, 1]
+              obj["subsection"] = criterion[:description][/^[0-9]+\.([0-9]+)/, 1]
             else
               obj["section"] = 0
               obj["subsection"] = 0
             end
-            obj["points_available"] = criterion["points"]
+            obj["points_available"] = criterion[:points]
             criteria << obj
           end
         end
