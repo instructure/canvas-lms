@@ -63,9 +63,9 @@ describe "speed grader - rubrics" do
     wait_for_ajaximations
     scroll_into_view('.save_rubric_button')
     wait_for_ajaximations
-    sleep 0.5
     f('#rubric_full .save_rubric_button').click
     wait_for_ajaximations
+    scroll_into_view('.save_rubric_button')
     expect(f('#rubric_summary_container > .rubric_container')).to be_displayed
     expect(f('#rubric_summary_container')).to include_text(@rubric.title)
     expect(fj("span[data-selenium='rubric_total']:visible")).to include_text('8')
