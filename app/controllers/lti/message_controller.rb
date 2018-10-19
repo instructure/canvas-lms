@@ -179,7 +179,8 @@ module Lti
         custom_param_opts[:secure_params] = params[:secure_params] if params[:secure_params].present?
         variable_expander = create_variable_expander(custom_param_opts.merge(tool: tool_proxy,
                                                                              originality_report: lti_link&.originality_report,
-                                                                             launch: @lti_launch))
+                                                                             launch: @lti_launch,
+                                                                             assignment: assignment))
         launch_attrs.merge! enabled_parameters(tool_proxy, message_handler, variable_expander)
 
         message = IMS::LTI::Models::Messages::BasicLTILaunchRequest.new(launch_attrs)

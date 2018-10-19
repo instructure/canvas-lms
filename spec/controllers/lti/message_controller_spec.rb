@@ -287,6 +287,13 @@ module Lti
               resource_link_id: link_id}
           expect(response).to be_not_found
         end
+
+        it 'adds assignment substitutions' do
+          assignment.update!(anonymous_grading: true)
+          message_handler.update!(parameters: [{"name"=>"anonymous_grading", "variable"=>"com.instructure.Assignment.anonymous_grading"}])
+          get 'basic_lti_launch_request', params: {course_id: course.id, message_handler_id: message_handler.id, assignment_id: assignment.id}
+          expect(assigns[:lti_launch].params[:custom_anonymous_grading]).to eq true
+        end
       end
 
       context 'search account chain' do
