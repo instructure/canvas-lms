@@ -147,7 +147,7 @@ module Export
             obj = {}
             obj["description"] = criterion[:description]
             obj["criterion_id"] = criterion[:id]
-            if criterion["description"]
+            if criterion[:description]
               obj["section"] = criterion[:description][/^([0-9]+)/, 1]
               obj["subsection"] = criterion[:description][/^[0-9]+\.([0-9]+)/, 1]
             else
