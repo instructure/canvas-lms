@@ -155,7 +155,6 @@ listen to the "click" and "keyclick" events and add `tabindex="0"` and `role="bu
   position: relative;
   padding: 8px 14px;
   margin-bottom: 0; // For input.btn
-  @include fontSize($ic-font-size--small);
   line-height: $baseLineHeight;
   text-align: center;
   vertical-align: middle;
@@ -401,7 +400,6 @@ input[type="button"] {
 .ui-button {
   position: relative;
   @extend .Button;
-  @include fontSize(14px);
   &.ui-state-hover { @extend .Button:hover }
   &.ui-state-focus { @extend .Button:focus }
   &.ui-state-active {

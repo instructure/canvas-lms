@@ -454,7 +454,6 @@ body.primary-nav-expanded {
 
 .ic-NavMenu__link-list {
   @include reset-list;
-  @include fontSize($ic-font-size--small);
   .ic-NavMenu-list-item {
     line-height: 1.3;
     margin-bottom: $ic-sp;

@@ -305,7 +305,7 @@ $sp-table: 14px; // Will replace this with global spacing variable, when it hits
   &.ic-Table--condensed {
     td {
       padding: $sp-table/2;
-      @include fontSize($ic-font-size--xsmall);
+      font-size: 12px;
     }
     th {
       padding: $sp-table/2;

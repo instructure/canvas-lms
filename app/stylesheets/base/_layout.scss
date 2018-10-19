@@ -50,7 +50,7 @@ body {
     .menu-item__text { opacity: 0; }
 
     .ic-app-nav-toggle-and-crumbs { display: flex !important; }
-}
+  }
 
   &.embedded {
     #application {
@@ -73,6 +73,14 @@ body {
       background: $layout-modal-bg !important;
       color: $layout-modal-font-color !important;
       height: auto !important;
+    }
+  }
+
+  &.full-width.grades { // Speedgrader
+
+    .ic-Layout-wrapper {
+        max-width: unset !important;
+        transform: unset !important;
     }
   }
 }
@@ -150,7 +158,7 @@ iframe {
   &#file_content,
   &#tool_content,
   &.tool_launch {
-      height: calc(100vh - 160px); // This is for when the iframeResizer isn't supported. The iframeResizer will override this via inline styles.
+      height: calc(100vh - 200px); // This is for when the iframeResizer isn't supported. The iframeResizer will override this via inline styles.
   }
 }
 

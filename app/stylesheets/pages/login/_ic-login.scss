@@ -109,7 +109,6 @@ body.ic-Login-Body { // apply the background to the body element so that you don
 .ic-Login__link {
   color: var(--ic-brand-white);
   text-decoration: underline;
-  @include fontSize($ic-font-size--small);
   transition-duration: .3s;
   transition-timing-function: ease-in-out;
   transition-property: color;
