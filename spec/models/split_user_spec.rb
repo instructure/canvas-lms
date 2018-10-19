@@ -320,6 +320,29 @@ describe SplitUsers do
       expect(submission2.reload.user).to eq user2
     end
 
+    it 'should handle conflicting submissions other way too' do
+      course1.enroll_student(user1, enrollment_state: 'active')
+      course1.enroll_student(user2, enrollment_state: 'active')
+      assignment = course1.assignments.new(title: "some assignment")
+      assignment.workflow_state = "published"
+      assignment.save
+      valid_attributes = {
+        grade: "1.5",
+        grader: @teacher,
+        url: "www.instructure.com"
+      }
+      submission1 = assignment.submissions.find_by!(user: user1)
+      submission1.update!(valid_attributes)
+      submission2 = assignment.submissions.find_by!(user: user2)
+
+      UserMerge.from(user1).into(user2)
+      expect(submission1.reload.user).to eq user2
+      expect(submission2.reload.user).to eq user1
+      SplitUsers.split_db_users(user2)
+      expect(submission1.reload.user).to eq user1
+      expect(submission2.reload.user).to eq user2
+    end
+
     it 'should not blow up on deleted courses' do
       course1.enroll_student(user1, enrollment_state: 'active')
       UserMerge.from(user1).into(user2)
