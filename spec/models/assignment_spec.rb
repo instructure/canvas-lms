@@ -1039,6 +1039,36 @@ describe Assignment do
         expect(assignment.duplicate.duplication_started_at).to be_within(5).of(Time.zone.now)
       end
     end
+
+    context 'with a plagiarism detection tool' do
+      subject { assignment.duplicate.assignment_configuration_tool_lookups.first }
+
+      let(:assignment) { assignment_model }
+      let(:lookup) { assignment.assignment_configuration_tool_lookups.first }
+      let(:subscription_helper) { double(create_subscription: SecureRandom.uuid) }
+
+      before do
+        allow(Lti::AssignmentSubscriptionsHelper).to receive(:new).and_return(subscription_helper)
+        assignment.assignment_configuration_tool_lookups.create!(
+          tool_vendor_code: product_family.vendor_code,
+          tool_product_code: product_family.product_code,
+          tool_resource_type_code: resource_handler.resource_type_code,
+          tool_type: 'Lti::MessageHandler'
+        )
+      end
+
+      it 'uses the correct product code' do
+        expect(subject.tool_product_code).to eq product_family.product_code
+      end
+
+      it 'uses the correct vendor code' do
+        expect(subject.tool_vendor_code).to eq product_family.vendor_code
+      end
+
+      it 'uses the correct resource type code' do
+        expect(subject.tool_resource_type_code).to eq resource_handler.resource_type_code
+      end
+    end
   end
 
   describe "#can_duplicate?" do
