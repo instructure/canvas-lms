@@ -27,7 +27,8 @@ import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReade
 
 export default class ExternalToolsTable extends React.Component {
   static propTypes = {
-    canAddEdit: PropTypes.bool.isRequired
+    canAddEdit: PropTypes.bool.isRequired,
+    setFocusAbove: PropTypes.func.isRequired
   }
 
   state = store.getState()
@@ -53,15 +54,39 @@ export default class ExternalToolsTable extends React.Component {
 
   loader = () => <div className="loadingIndicator" />
 
+  setFocusAbove = (tool) => () => {
+    if (tool) {
+      this[`externalTool${tool.app_id}`].focus()
+    } else {
+      this.props.setFocusAbove()
+    }
+  }
+
+  setToolRowRef = (tool) => (node) => {
+    this[`externalTool${tool.app_id}`] = node
+  }
+
   trs = () => {
-    if (store.getState().externalTools.length == 0) {
+    if (store.getState().externalTools.length === 0) {
       return null
     }
+    let t = null
     return store
       .getState()
-      .externalTools.map((tool, idx) => (
-        <ExternalToolsTableRow key={idx} tool={tool} canAddEdit={this.props.canAddEdit} />
-      ))
+      .externalTools
+      .map((tool) => {
+        const toRender = <ExternalToolsTableRow
+          key={tool.app_id}
+          ref={this.setToolRowRef(tool)}
+          tool={tool}
+          canAddEdit={this.props.canAddEdit}
+          setFocusAbove={this.setFocusAbove(t)}
+        />
+        if (tool.lti_version !== '1.3') {
+          t = tool
+        }
+        return toRender
+      })
   }
 
   render() {

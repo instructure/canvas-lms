@@ -20,8 +20,6 @@ import I18n from 'i18n!external_tools'
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
-import Header from '../../external_apps/components/Header'
-import ExternalToolsTable from '../../external_apps/components/ExternalToolsTable'
 
 export default class ConfigurationTypeSelector extends React.Component {
   static propTypes = {

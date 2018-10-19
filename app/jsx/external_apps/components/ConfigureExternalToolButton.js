@@ -19,14 +19,15 @@
 import $ from 'jquery'
 import I18n from 'i18n!external_tools'
 import React from 'react'
-import {shape} from 'prop-types'
+import {shape, func} from 'prop-types'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import Modal, {ModalBody, ModalFooter}  from '../../shared/components/InstuiModal'
 import iframeAllowances from '../lib/iframeAllowances'
 
 export default class ConfigureExternalToolButton extends React.Component {
   static propTypes = {
-    tool: shape({}).isRequired
+    tool: shape({}).isRequired,
+    returnFocus: func.isRequired
   }
 
   constructor (props) {
@@ -57,6 +58,7 @@ export default class ConfigureExternalToolButton extends React.Component {
     } else {
       this.setState({modalIsOpen: false})
     }
+    this.props.returnFocus()
   }
 
   handleAlertFocus = event => {

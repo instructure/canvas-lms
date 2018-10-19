@@ -18,13 +18,18 @@
 
 import I18n from 'i18n!external_tools'
 import React from 'react'
+import IconExternalLink from '@instructure/ui-icons/lib/Line/IconExternalLink'
+import Link from '@instructure/ui-elements/lib/components/Link'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
 
 export default class Header extends React.Component {
-  render() {
-    const paragraph = I18n.t('*See some LTI tools* that work great with Canvas.', {
-      wrappers: ['<a href="https://www.eduappcenter.com/">$1</a>']
-    })
+  focus = () => {
+    this.linkRef.focus()
+  }
 
+  setLinkRef = (node) => this.linkRef = node
+
+  render() {
     return (
       <div className="Header">
         <h2 className="page-header" ref="pageHeader">
@@ -38,7 +43,17 @@ export default class Header extends React.Component {
               'Apps are an easy way to add new features to Canvas. They can be added to individual courses, or to all courses in an account. Once configured, you can link to them through course modules and create assignments for assessment tools.'
             )}
           </p>
-          <p dangerouslySetInnerHTML={{__html: paragraph}} />
+          <p>
+            <Link
+              icon={IconExternalLink}
+              href="https://www.eduappcenter.com/"
+              linkRef={this.setLinkRef}
+            >
+              <ScreenReaderContent>{I18n.t('Link to lti tools.')}</ScreenReaderContent>
+            </Link>
+            &nbsp;
+            {I18n.t('See some LTI tools that work great with Canvas.')}
+          </p>
         </div>
       </div>
     )

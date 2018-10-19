@@ -33,7 +33,8 @@ import 'jquery.instructure_misc_helpers'
 export default class ExternalToolsTableRow extends React.Component {
   static propTypes = {
     tool: PropTypes.object.isRequired,
-    canAddEdit: PropTypes.bool.isRequired
+    canAddEdit: PropTypes.bool.isRequired,
+    setFocusAbove: PropTypes.func.isRequired
   }
 
   onModalClose = () => {
@@ -91,6 +92,17 @@ export default class ExternalToolsTableRow extends React.Component {
     }
   }
 
+  returnFocus = (opts = {}) => {
+    if (opts.passFocusUp) {
+      this.props.setFocusAbove()
+    } else {
+      this.button.focus()
+    }
+  }
+
+  focus () {
+    this.button.focus()
+  }
 
   renderButtons = () => {
     if (this.props.tool.lti_version === '1.3') {
@@ -104,7 +116,7 @@ export default class ExternalToolsTableRow extends React.Component {
 
       if (this.props.tool.tool_configuration) {
         configureButton = (
-          <ConfigureExternalToolButton ref="configureExternalToolButton" tool={this.props.tool} />
+          <ConfigureExternalToolButton ref="configureExternalToolButton" tool={this.props.tool} returnFocus={this.returnFocus} />
         )
       }
 
@@ -141,26 +153,33 @@ export default class ExternalToolsTableRow extends React.Component {
               aria-expanded="false"
             >
               {configureButton}
-              <ManageUpdateExternalToolButton tool={this.props.tool} />
+              <ManageUpdateExternalToolButton
+                tool={this.props.tool}
+                returnFocus={this.returnFocus}
+              />
               <EditExternalToolButton
                 ref="editExternalToolButton"
                 tool={this.props.tool}
                 canAddEdit={this.props.canAddEdit}
+                returnFocus={this.returnFocus}
               />
               <ExternalToolPlacementButton
                 ref="externalToolPlacementButton"
                 tool={this.props.tool}
                 onClose={this.onModalClose}
+                returnFocus={this.returnFocus}
               />
               <ReregisterExternalToolButton
                 ref="reregisterExternalToolButton"
                 tool={this.props.tool}
                 canAddEdit={this.props.canAddEdit}
+                returnFocus={this.returnFocus}
               />
               <DeleteExternalToolButton
                 ref="deleteExternalToolButton"
                 tool={this.props.tool}
                 canAddEdit={this.props.canAddEdit}
+                returnFocus={this.returnFocus}
               />
             </ul>
           </div>
@@ -173,6 +192,7 @@ export default class ExternalToolsTableRow extends React.Component {
             ref="externalToolPlacementButton"
             tool={this.props.tool}
             type="button"
+            returnFocus={this.returnFocus}
           />
         </td>
       )

@@ -31,7 +31,8 @@ export default class ExternalToolPlacementButton extends React.Component {
   static propTypes = {
     tool: PropTypes.object.isRequired,
     type: PropTypes.string, // specify "button" if this is not a menu item
-    onClose: PropTypes.func
+    onClose: PropTypes.func,
+    returnFocus: PropTypes.func.isRequired
   }
 
   state = {
@@ -70,6 +71,7 @@ export default class ExternalToolPlacementButton extends React.Component {
     this.setState({modalIsOpen: false}, () => {
       if (this.props.onClose) this.props.onClose()
     })
+    this.props.returnFocus()
   }
 
   placements = () => {

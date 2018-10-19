@@ -53,6 +53,7 @@ export default class ReregisterExternalToolButton extends React.Component {
 
   closeModal = () => {
     this.setState({modalIsOpen: false})
+    this.props.returnFocus()
   }
 
   handleReregistration = (_message, e) => {

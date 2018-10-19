@@ -23,7 +23,7 @@ import Store from 'jsx/external_apps/lib/ExternalAppsStore.js'
 
 const wrapper = document.getElementById('fixtures')
 const prevEnvironment = ENV
-const createElement = (data = {}) => <EditExternalToolButton {...data} />
+const createElement = (data = {}) => <EditExternalToolButton {...data} returnFocus={()=>{}} />
 const renderComponent = (data = {}) => ReactDOM.render(createElement(data), wrapper)
 
 QUnit.module('ExternalApps.EditExternalToolButton', {
