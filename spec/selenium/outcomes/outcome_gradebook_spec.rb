@@ -283,12 +283,12 @@ describe "outcome gradebook" do
       it "should allow showing only a certain section" do
         get "/courses/#{@course.id}/gradebook"
         f('a[data-id=outcome]').click
-
         expect(ff('.outcome-student-cell-content')).to have_size 3
 
         choose_section = ->(name) do
           fj('.section-select-button:visible').click
           fj(".section-select-menu:visible a:contains('#{name}')").click
+          wait_for_ajaximations
         end
 
         choose_section.call "All Sections"
@@ -296,7 +296,6 @@ describe "outcome gradebook" do
 
         choose_section.call @other_section.name
         expect(fj('.section-select-button:visible')).to include_text(@other_section.name)
-
         expect(ff('.outcome-student-cell-content')).to have_size 1
 
         # verify that it remembers the section to show across page loads
