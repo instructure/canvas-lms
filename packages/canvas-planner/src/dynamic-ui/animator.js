@@ -41,7 +41,9 @@ export class Animator {
     // focusing an element causes it to scroll into view, so do the focus first so it doesn't
     // override maintaining the viewport position.
     if (!elt) console.error(`${elt} passed to Animator#focusElement`);
-    else this.queueAnimation(() => elt.focus(), 'unshift');
+    else this.queueAnimation(() => {
+      (typeof elt.focus === 'function') && elt.focus()
+    }, 'unshift');
   }
 
   elementPositionMemo (elt) {

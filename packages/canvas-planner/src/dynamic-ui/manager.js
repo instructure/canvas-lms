@@ -210,7 +210,9 @@ export class DynamicUiManager {
   }
 
   handleDismissedOpportunity = (action) => {
-    const doomedComponentId = action.payload.plannable_id;
+    // for graded discussions and quizzes, the assignment_id is different
+    // and is what is registered
+    const doomedComponentId = action.payload.assignment_id || action.payload.plannable_id;
     this.planDeletedComponent('opportunity', doomedComponentId);
   }
 
