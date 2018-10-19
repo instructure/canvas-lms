@@ -67,6 +67,37 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
     end
   end
 
+  def relativize_ids(ids)
+    if self.shard.id == Shard.current.id
+      ids
+    else
+      ids.map { |id| Shard.relative_id_for(id, self.shard, Shard.current) }
+    end
+  end
+
+  def recursively_relativize_json_ids(data)
+    data.map do |entry|
+      entry["id"] = Shard.relative_id_for(entry["id"], self.shard, Shard.current).to_s
+      if entry.key? "user_id"
+        entry["user_id"] = Shard.relative_id_for(entry["user_id"], self.shard, Shard.current).to_s
+      end
+      if entry["replies"]
+        entry["replies"] = recursively_relativize_json_ids(entry["replies"])
+      end
+      entry
+    end
+  end
+
+  def relativize_json_structure_ids
+    if self.shard.id == Shard.current.id
+      self.json_structure
+    else
+      data = JSON.parse(self.json_structure)
+      relativized = recursively_relativize_json_ids(data)
+      JSON.dump(relativized)
+    end
+  end
+
   # this view is eventually consistent -- once we've generated the view, we
   # continue serving the view to clients even once it's become outdated, while
   # the background job runs to generate the new view. this is preferred over
@@ -80,9 +111,10 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
       update_materialized_view(xlog_location: self.class.current_xlog_location)
     end
 
-    if json_structure.present?
-      participant_ids = self.participants_array
-      entry_ids = self.entry_ids_array
+    if self.json_structure.present?
+      json_structure = relativize_json_structure_ids()
+      participant_ids = relativize_ids(self.participants_array)
+      entry_ids = relativize_ids(self.entry_ids_array)
 
       if opts[:include_new_entries]
         @for_mobile = true if opts[:include_mobile_overrides]
@@ -95,7 +127,7 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
         new_entries_json_structure = []
       end
 
-      return self.json_structure, participant_ids, entry_ids, new_entries_json_structure
+      return json_structure, participant_ids, entry_ids, new_entries_json_structure
     else
       return nil
     end
