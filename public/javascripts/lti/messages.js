@@ -74,6 +74,18 @@ export function ltiMessageHandler(e) {
       }
       break;
 
+      case 'lti.fetchWindowSize':
+          const iframe = findDomForWindow(e.source);
+          if (iframe) {
+              message.height = window.innerHeight;
+              message.width = window.innerWidth;
+              message.offset = $('.tool_content_wrapper').offset();
+              var strMessage = JSON.stringify(message);
+
+              iframe.contentWindow.postMessage(strMessage, '*');
+          }
+        break;
+
       case 'lti.showModuleNavigation':
         if(message.show === true || message.show === false){
           $('.module-sequence-footer').toggle(message.show);
