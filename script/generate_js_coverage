@@ -10,13 +10,17 @@
 
 export COVERAGE=true
 
+last_status=0
+
 if [ "$RUN_TESTS_FIRST" ]; then
     echo '========== Running tests with coverage ==========='
     yarn test
+    if [ "$?" -eq "0" ]; then
+        exit $?
+    fi
 fi
 
 echo '========== Merging all coverage reports =========='
 ./node_modules/.bin/istanbul-merge --out .nyc_output/total-coverage.json "{coverage-karma,coverage-jest,packages/*/coverage}/**/coverage*.json"
-
 echo '============= Generating HTML Report ============='
 ./node_modules/.bin/nyc report --reporter=html --report-dir coverage-js
