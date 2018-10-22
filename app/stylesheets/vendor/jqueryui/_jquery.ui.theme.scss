@@ -13,8 +13,6 @@
 
 /* Component containers
 ----------------------------------*/
-.ui-widget { @include fontSize($fsDefault); }
-.ui-widget .ui-widget { font-size: 1em; }
 .ui-widget-content { border: 1px solid $borderColorContent;
   background: $bgColorContent;
   color: $fcContent;

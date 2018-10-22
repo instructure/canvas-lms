@@ -153,7 +153,7 @@ body:not(.course-menu-expanded) {
 
 .ic-Layout-wrapper {
   box-sizing: border-box;
-  max-width: calc(100% - 200px);
+  max-width: calc(100% - 202px);
   min-height: 100vh;
   transform: translateX(200px);
   transition-duration: .24s;
@@ -397,13 +397,8 @@ body:not(.course-menu-expanded) {
   display: flex;
   align-items: center;
   border-bottom: 1px solid $ic-border-light;
+  margin-bottom: 20px;
   padding: $ic-sp/2 $ic-sp*2;
-  transform: translateY(0);
-  transition-delay: .24s;
-  transition-duration: .24s;
-  transition-property: margin-top;
-  transition-timing-function: ease-in-out;
-  z-index: 100;
 }
 
 .ic-app-course-nav-toggle {
