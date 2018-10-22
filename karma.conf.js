@@ -41,13 +41,23 @@ const karmaConfig = {
   // - Safari (only Mac; has to be installed with `npm install karma-safari-launcher`)
   // - PhantomJS (has to be installed with `npm install karma-phantomjs-launcher`))
   // - IE (only Windows; has to be installed with `npm install karma-ie-launcher`)
-  browsers: ['Chrome'],
+  browsers: ['ChromeWithoutBackground'],
 
-  // Run headless chrome with `karma start --browsers ChromeHeadlessNoSandbox`
   customLaunchers: {
+    // Chrome will sometimes be in the background when specs are running,
+    // leading to different behavior with things like event propagation, which
+    // leads easily to bugs in production and/or spec code. To decrease the
+    // chances of this, render backgrounding must be disabled when launching
+    // Chrome.
+    ChromeWithoutBackground: {
+      base: 'Chrome',
+      flags: ['--disable-renderer-backgrounding']
+    },
+
+    // Run headless chrome with `karma start --browsers ChromeHeadlessNoSandbox`
     ChromeHeadlessNoSandbox: {
       base: 'ChromeHeadless',
-      flags: ['--no-sandbox'] // needed for running tests in local docker
+      flags: ['--no-sandbox', '--disable-renderer-backgrounding'] // needed for running tests in local docker
     }
   },
 
