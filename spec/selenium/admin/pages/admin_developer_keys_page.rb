@@ -27,7 +27,9 @@ module AdminDeveloperKeysPage
 
   # ------------------ Actions & Methods -------------------
   def visit_developer_page(account_id)
-    wait_for_new_page_load(get("/accounts/#{account_id}/developer_keys"))
+    wait_for_new_page_load(true) do
+      get("/accounts/#{account_id}/developer_keys")
+    end
   end
 
 end
