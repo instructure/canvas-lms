@@ -674,6 +674,17 @@ END
       state: 'hidden',
       development: true,
       beta: true
+    },
+    'restrict_students_from_annotating' => {
+      display_name: -> { I18n.t('Restrict Students from Annotating') },
+      description: -> {
+        I18n.t <<~DESCRIPTION
+          Prevents students from leaving annotations in assignments. Does not apply to peer-reviewed assignments.
+        DESCRIPTION
+      },
+      applies_to: 'Course',
+      state: 'allowed',
+      development: true
     }
   )
 
