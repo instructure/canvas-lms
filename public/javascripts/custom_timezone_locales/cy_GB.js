@@ -1,5 +1,5 @@
 module.exports = {
-  "name": "cy",
+  "name": "cy_GB",
   "day": {
     "abbrev": [
       "Sul",

@@ -19,7 +19,7 @@ module.exports = { // eslint-disable-line import/no-commonjs
       'Mar',
       'Kwi',
       'Maj',
-      'Czer',
+      'Cze',
       'Lip',
       'Sie',
       'Wrz',

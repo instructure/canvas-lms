@@ -9,7 +9,7 @@ data._monthsShort = [
   'Mar',
   'Kwi',
   'Maj',
-  'Czer',
+  'Cze',
   'Lip',
   'Sie',
   'Wrz',
