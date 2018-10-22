@@ -17,7 +17,7 @@
 module QuizzesNext
   class Service
     def self.enabled_in_context?(context)
-      context&.feature_enabled?(:quizzes_next)
+      context&.feature_enabled?(:quizzes_next) || context&.root_account&.feature_allowed?(:quizzes_next)
     end
 
     def self.active_lti_assignments_for_course(course, selected_assignment_ids: nil)
