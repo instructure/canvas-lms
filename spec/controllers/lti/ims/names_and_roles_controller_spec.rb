@@ -187,6 +187,7 @@ describe Lti::Ims::NamesAndRolesController do
             canvas_user_sissourceid: '$Canvas.user.sisSourceId',
             person_sourced_id: '$Person.sourcedId',
             message_locale: '$Message.locale',
+            vnd_canvas_person_email_sis: '$vnd.Canvas.Person.email.sis',
             unsupported_param_1: '$unsupported.param.1',
             unsupported_param_2: '$unsupported.param.2'
           }
@@ -207,6 +208,18 @@ describe Lti::Ims::NamesAndRolesController do
             workflow_state: 'active',
             sis_user_id: 'user-1-sis-user-id-1'
           })
+          sis_email = 'sis@example.com'
+          cc = user.communication_channels.email.create!(path: sis_email)
+          cc.user = user
+          cc.save!
+          user.pseudonyms.create!({
+            account: course.account,
+            unique_id: cc.path,
+            sis_communication_channel_id: cc.id,
+            communication_channel_id: cc.id,
+            workflow_state: 'active',
+            sis_user_id: 'user-1-sis-user-id-2'
+          })
           user
         end
 
@@ -224,9 +237,10 @@ describe Lti::Ims::NamesAndRolesController do
                 'canvas_user_id' => user.id,
                 'vns_instructure_user_uuid' => user.uuid,
                 'canvas_user_globalid' => user.global_id,
-                'canvas_user_sissourceid' => 'user-1-sis-user-id-1',
-                'person_sourced_id' => 'user-1-sis-user-id-1',
+                'canvas_user_sissourceid' => 'user-1-sis-user-id-2',
+                'person_sourced_id' => 'user-1-sis-user-id-2',
                 'message_locale' => 'de',
+                'vnd_canvas_person_email_sis' => 'sis@example.com',
                 'unsupported_param_1' => '$unsupported.param.1',
                 'unsupported_param_2' => '$unsupported.param.2'
               }
