@@ -193,6 +193,7 @@ describe "manage groups" do
 
       # Move the user from one group into the other
       f(".groups .group .group-user .group-user-actions").click
+      scroll_into_view('.edit-group-assignment:first')
       fj(".edit-group-assignment:first").click
       f("span[aria-label='Move Student']") # wait for element
       f(".move-select .move-select__group option:last-child").click
@@ -205,6 +206,7 @@ describe "manage groups" do
 
       # Move the user back
       f(".groups .group .group-user .group-user-actions").click
+      scroll_into_view('.edit-group-assignment:first')
       fj(".edit-group-assignment:first").click
       f("span[aria-label='Move Student']") # wait for element
       ff(".move-select .move-select__group option").last.click
