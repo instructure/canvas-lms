@@ -366,6 +366,9 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
       f('#new_page_link').click
       expect(f('#new_page_name')).to be_displayed
+      in_frame wiki_page_body_ifr_id do
+        wait_for_dom_ready
+      end
       f('#new_page_name').send_keys(title)
       submit_form("#new_page_drop_down")
 
