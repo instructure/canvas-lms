@@ -96,10 +96,11 @@ module Lti::Ims::NamesAndRolesMatchers
     }.compact
   end
 
-  def expected_message_array(message_matcher)
+  def expected_message_array(message_matcher, user)
     [
       {
         'https://purl.imsglobal.org/spec/lti/claim/message_type' => 'LtiResourceLinkRequest',
+        'locale' => (user.locale || I18n.default_locale.to_s),
         'https://purl.imsglobal.org/spec/lti/claim/custom' => {}
       }.merge!(message_matcher.presence || {})
     ]
@@ -111,7 +112,7 @@ module Lti::Ims::NamesAndRolesMatchers
 
   def expected_course_membership_for_rlid(message_matcher, user, *enrollments)
     expected_course_membership(user, *enrollments).
-      merge('message' => match_array(expected_message_array(message_matcher))).
+      merge('message' => match_array(expected_message_array(message_matcher, user))).
       compact
   end
 
@@ -121,7 +122,7 @@ module Lti::Ims::NamesAndRolesMatchers
 
   def expected_group_membership_for_rlid(message_matcher, user, membership)
     expected_group_membership(user, membership).
-      merge('message' => match_array(expected_message_array(message_matcher))).
+      merge('message' => match_array(expected_message_array(message_matcher, user))).
       compact
   end
 

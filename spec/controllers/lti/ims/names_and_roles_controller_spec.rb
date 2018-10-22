@@ -186,6 +186,7 @@ describe Lti::Ims::NamesAndRolesController do
             canvas_user_globalid: '$Canvas.user.globalId',
             canvas_user_sissourceid: '$Canvas.user.sisSourceId',
             person_sourced_id: '$Person.sourcedId',
+            message_locale: '$Message.locale',
             unsupported_param_1: '$unsupported.param.1',
             unsupported_param_2: '$unsupported.param.2'
           }
@@ -196,6 +197,7 @@ describe Lti::Ims::NamesAndRolesController do
           user = enrollment.user
           user.email = 'marta.perkins@school.edu'
           user.avatar_image_url = 'http://school.edu/image/url.png'
+          user.locale = :de
           user.save!
           user.pseudonyms.create!({
             account: course.account,
@@ -224,6 +226,7 @@ describe Lti::Ims::NamesAndRolesController do
                 'canvas_user_globalid' => user.global_id,
                 'canvas_user_sissourceid' => 'user-1-sis-user-id-1',
                 'person_sourced_id' => 'user-1-sis-user-id-1',
+                'message_locale' => 'de',
                 'unsupported_param_1' => '$unsupported.param.1',
                 'unsupported_param_2' => '$unsupported.param.2'
               }

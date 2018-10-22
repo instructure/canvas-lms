@@ -67,18 +67,24 @@ module Lti::Ims
 
     def message(enrollment)
       return {} if page[:opts].blank? || page[:opts][:rlid].blank?
-      launch = Lti::Messages::ResourceLinkRequest.new(
-        tool: page[:tool],
-        context: unwrap(page[:context]),
-        user: enrollment.user,
-        expander: enrollment.user.expander,
-        return_url: nil,
-        opts: {
-          # See Lti::Ims::Providers::MembershipsProvider for additional constraints on custom param expansion
-          # already baked into `enrollment.user.expander`
-          claim_group_whitelist: [ :custom_params ]
-        }
-      ).generate_post_payload_message
+      begin
+        orig_locale = I18n.locale
+        I18n.locale = enrollment.user.locale || I18n.default_locale
+        launch = Lti::Messages::ResourceLinkRequest.new(
+          tool: page[:tool],
+          context: unwrap(page[:context]),
+          user: enrollment.user,
+          expander: enrollment.user.expander,
+          return_url: nil,
+          opts: {
+            # See Lti::Ims::Providers::MembershipsProvider for additional constraints on custom param expansion
+            # already baked into `enrollment.user.expander`
+            claim_group_whitelist: [ :custom_params, :i18n ]
+          }
+        ).generate_post_payload_message
+      ensure
+        I18n.locale = orig_locale
+      end
 
       # One straggler field we can't readily control via white/blacklists
       launch_hash = launch.to_h.except!("#{LtiAdvantage::Serializers::JwtMessageSerializer::IMS_CLAIM_PREFIX}version")

@@ -77,6 +77,7 @@ module Lti::Ims::Providers
             Canvas.user.globalId
             Canvas.user.sisSourceId
             Person.sourcedId
+            Message.locale
           )
         }
       )
@@ -278,6 +279,10 @@ module Lti::Ims::Providers
           expanded = @expander.expand_variables!({value: '$Person.sourcedId'})[:value]
           expanded == '$Person.sourcedId' ? nil : expanded
         end
+      end
+
+      def locale
+        user.locale
       end
     end
   end
