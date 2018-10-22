@@ -40,7 +40,7 @@ describe "announcements" do
       AnnouncementNewEdit.select_a_section("Section")
       AnnouncementNewEdit.add_message("Announcement Body")
       AnnouncementNewEdit.add_title("Announcement Title")
-      expect_new_page_load {AnnouncementNewEdit.submit_announcement_form}
+      AnnouncementNewEdit.submit_announcement_form
       expect(driver.current_url).to include(AnnouncementNewEdit.
                                             individual_announcement_url(Announcement.last))
     end
