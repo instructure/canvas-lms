@@ -21,6 +21,10 @@ module Lti::Ims::Providers
 
     attr_reader :context, :controller, :tool
 
+    def self.unwrap(wrapped)
+      wrapped&.respond_to?(:unwrap) ? wrapped.unwrap : wrapped
+    end
+
     def initialize(context, controller, tool)
       @context = context
       @controller = controller
@@ -60,10 +64,10 @@ module Lti::Ims::Providers
     def user_variable_expander(user)
       Lti::VariableExpander.new(
         course.root_account,
-        course,
+        Lti::Ims::Providers::MembershipsProvider.unwrap(context),
         controller,
         {
-          current_user: user,
+          current_user: Lti::Ims::Providers::MembershipsProvider.unwrap(user),
           tool: tool,
           variable_whitelist: %w(
             Person.name.full
@@ -84,6 +88,8 @@ module Lti::Ims::Providers
             User.username
             Canvas.user.loginId
             Canvas.user.sisIntegrationId
+            Canvas.xapi.url
+            Caliper.url
           )
         }
       )

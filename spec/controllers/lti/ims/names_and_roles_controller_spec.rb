@@ -193,6 +193,8 @@ describe Lti::Ims::NamesAndRolesController do
             user_username: '$User.username',
             canvas_user_sisintegrationid: '$Canvas.user.sisIntegrationId',
             canvas_user_loginid: '$Canvas.user.loginId',
+            canvas_xapi_url: '$Canvas.xapi.url',
+            caliper_url: '$Caliper.url',
             unsupported_param_1: '$unsupported.param.1',
             unsupported_param_2: '$unsupported.param.2'
           }
@@ -231,6 +233,26 @@ describe Lti::Ims::NamesAndRolesController do
           user
         end
 
+        def be_xapi_url
+          if context.is_a?(Course)
+            return be_analytics_url(controller.lti_xapi_url(Lti::AnalyticsService.create_token(tool, user, context)))
+          end
+          eq '$Canvas.xapi.url'
+        end
+
+        def be_caliper_url
+          if context.is_a?(Course)
+            return be_analytics_url(controller.lti_caliper_url(Lti::AnalyticsService.create_token(tool, user, context)))
+          end
+          eq '$Caliper.url'
+        end
+
+        # analytics URLs end with a time value, a random value, and a signature... we really dont care about testing
+        # all the details of how those URLs are created, just that they are. chop off the problematic substrings.
+        def be_analytics_url(url)
+          start_with(url.gsub(/-.+-.+-.+$/, ''))
+        end
+
         it 'expands the supported parameters and echoes the rest' do
           send_request
           expect(json[:members][0]).to match_enrollment_for_rlid(
@@ -254,6 +276,8 @@ describe Lti::Ims::NamesAndRolesController do
                 'user_username' => 'sis@example.com',
                 'canvas_user_loginid' => 'sis@example.com',
                 'canvas_user_sisintegrationid' => 'user-1-sis-integration-id-2',
+                'canvas_xapi_url' => be_xapi_url,
+                'caliper_url' => be_caliper_url,
                 'unsupported_param_1' => '$unsupported.param.1',
                 'unsupported_param_2' => '$unsupported.param.2'
               }
@@ -280,15 +304,6 @@ describe Lti::Ims::NamesAndRolesController do
         expect(json).to be_lti_advantage_error_response_body('bad_request', 'Invalid \'rlid\' parameter')
       end
     end
-  end
-
-  describe '#tmp' do
-    let(:action) { :course_index }
-    let(:context) { course }
-    let(:context_param_name) { :course_id }
-    let(:unknown_context_id) { course && Course.maximum(:id) + 1 }
-
-    it_behaves_like 'advantage services'
   end
 
   describe '#course_index' do

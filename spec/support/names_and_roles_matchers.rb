@@ -92,7 +92,7 @@ module Lti::Ims::NamesAndRolesMatchers
       'family_name' => user.last_name,
       'email' => user.email,
       'lis_person_sourcedid' => expected_sourced_id(user),
-      'user_id' => expected_lti_id(unwrap_user(user))
+      'user_id' => expected_lti_id(Lti::Ims::Providers::MembershipsProvider.unwrap(user))
     }.compact
   end
 
@@ -124,10 +124,6 @@ module Lti::Ims::NamesAndRolesMatchers
     expected_group_membership(user, membership).
       merge('message' => match_array(expected_message_array(message_matcher, user))).
       compact
-  end
-
-  def unwrap_user(user)
-    user.respond_to?(:unwrap) ? user.unwrap : user
   end
 
   RSpec::Matchers.define :be_lti_course_membership_context do |expected|

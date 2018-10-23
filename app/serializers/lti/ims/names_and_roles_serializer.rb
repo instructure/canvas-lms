@@ -99,7 +99,7 @@ module Lti::Ims
     end
 
     def unwrap(wrapped)
-      wrapped&.respond_to?(:unwrap) ? wrapped.unwrap : wrapped
+      Lti::Ims::Providers::MembershipsProvider.unwrap(wrapped)
     end
 
     attr_reader :page
