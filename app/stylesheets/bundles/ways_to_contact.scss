@@ -32,6 +32,10 @@
   display: block;
   opacity: 0.5;
 }
+.channel_list .channel .default_link:focus {
+  display: block;
+  opacity: 0.5;
+}
 .channel_list .channel.unconfirmed .default_link {
   display: none;
 }
