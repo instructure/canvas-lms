@@ -182,13 +182,14 @@ describe Lti::Ims::NamesAndRolesController do
             user_image: '$User.image',
             user_id: '$User.id',
             canvas_user_id: '$Canvas.user.id',
-            vns_instructure_user_uuid: '$vnd.instructure.User.uuid',
+            vnd_instructure_user_uuid: '$vnd.instructure.User.uuid',
             canvas_user_globalid: '$Canvas.user.globalId',
             canvas_user_sissourceid: '$Canvas.user.sisSourceId',
             person_sourced_id: '$Person.sourcedId',
             message_locale: '$Message.locale',
             vnd_canvas_person_email_sis: '$vnd.Canvas.Person.email.sis',
             person_email_primary: '$Person.email.primary',
+            person_address_timezone: '$Person.address.timezone',
             unsupported_param_1: '$unsupported.param.1',
             unsupported_param_2: '$unsupported.param.2'
           }
@@ -200,6 +201,7 @@ describe Lti::Ims::NamesAndRolesController do
           user.email = 'marta.perkins@school.edu'
           user.avatar_image_url = 'http://school.edu/image/url.png'
           user.locale = :de
+          user.time_zone = 'Europe/Berlin'
           user.save!
           user.pseudonyms.create!({
             account: course.account,
@@ -236,13 +238,14 @@ describe Lti::Ims::NamesAndRolesController do
                 'user_image' => 'http://school.edu/image/url.png',
                 'user_id' => user.id,
                 'canvas_user_id' => user.id,
-                'vns_instructure_user_uuid' => user.uuid,
+                'vnd_instructure_user_uuid' => user.uuid,
                 'canvas_user_globalid' => user.global_id,
                 'canvas_user_sissourceid' => 'user-1-sis-user-id-2',
                 'person_sourced_id' => 'user-1-sis-user-id-2',
                 'message_locale' => 'de',
                 'vnd_canvas_person_email_sis' => 'sis@example.com',
                 'person_email_primary' => 'marta.perkins@school.edu',
+                'person_address_timezone' => 'Europe/Berlin',
                 'unsupported_param_1' => '$unsupported.param.1',
                 'unsupported_param_2' => '$unsupported.param.2'
               }

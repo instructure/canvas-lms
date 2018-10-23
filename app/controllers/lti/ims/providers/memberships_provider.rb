@@ -80,6 +80,7 @@ module Lti::Ims::Providers
             Message.locale
             vnd.Canvas.Person.email.sis
             Person.email.primary
+            Person.address.timezone
           )
         }
       )
@@ -285,6 +286,10 @@ module Lti::Ims::Providers
 
       def locale
         user.locale
+      end
+
+      def time_zone
+        user.time_zone
       end
     end
   end

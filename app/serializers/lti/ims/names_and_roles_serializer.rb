@@ -67,9 +67,11 @@ module Lti::Ims
 
     def message(enrollment)
       return {} if page[:opts].blank? || page[:opts][:rlid].blank?
+      orig_locale = I18n.locale
+      orig_time_zone = Time.zone
       begin
-        orig_locale = I18n.locale
-        I18n.locale = enrollment.user.locale || I18n.default_locale
+        I18n.locale = enrollment.user.locale || orig_locale
+        Time.zone = enrollment.user.time_zone || orig_time_zone
         launch = Lti::Messages::ResourceLinkRequest.new(
           tool: page[:tool],
           context: unwrap(page[:context]),
@@ -84,6 +86,7 @@ module Lti::Ims
         ).generate_post_payload_message
       ensure
         I18n.locale = orig_locale
+        Time.zone = orig_time_zone
       end
 
       # One straggler field we can't readily control via white/blacklists
