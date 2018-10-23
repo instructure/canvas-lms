@@ -220,7 +220,8 @@ shared_context "in-process server selenium tests" do
         "isMounted is deprecated. Instead, make sure to clean up subscriptions and pending requests in componentWillUnmount to prevent memory leaks",
         "https://www.gstatic.com/_/apps-viewer/_/js/k=apps-viewer.standalone.en_US",
         "In webpack, loading timezones on-demand is not",
-        "Uncaught RangeError: Maximum call stack size exceeded"
+        "Uncaught RangeError: Maximum call stack size exceeded",
+        "Warning: React does not recognize the `%s` prop on a DOM element."
       ].freeze
 
       javascript_errors = browser_logs.select do |e|

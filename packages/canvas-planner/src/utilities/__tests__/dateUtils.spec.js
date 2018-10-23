@@ -22,9 +22,10 @@ import {
   getFriendlyDate, getFullDate,
   getFirstLoadedMoment, getLastLoadedMoment,
   getFullDateAndTime,
-  isMidnight, makeEndOfDayIfMidnight,
-  dateRangeString, dateString, timeString, dateTimeString,
+  dateRangeString, timeString, dateTimeString,
 } from '../dateUtils';
+
+const TZ = 'Asia/Tokyo';
 
 describe('isToday', () => {
   it('returns true when the date passed in is the current date', () => {
@@ -169,25 +170,6 @@ describe('getLastLoadedMoment', () => {
       ['some date', [{dateBucketMoment: expected}]],
     ], 'Asia/Tokyo');
     expect(result === expected).toBeFalsy();
-  });
-
-  it('returns true if at midnight, false if not', () => {
-    const TZ = 'Asia/Tokyo';
-    const midnight = moment.tz(TZ).startOf('day');
-    expect(isMidnight(midnight, TZ)).toBeTruthy();
-    const now = moment.tz(TZ).seconds(1); // just in case the test runs exactly at midnight
-    expect(isMidnight(now, TZ)).toBeFalsy();
-  });
-
-  it('sets time to 11:59pm if at midnight', () => {
-    const TZ = 'Asia/Tokyo';
-    const now = moment.tz(TZ).seconds(1);
-    let result = makeEndOfDayIfMidnight(now, TZ);
-    expect(result).toEqual(now);
-    const midnight = moment.tz(TZ).startOf('day');
-    result = makeEndOfDayIfMidnight(midnight, TZ);
-    expect(result.hours()).toEqual(23);
-    expect(result.minutes()).toEqual(59);
   });
 });
 

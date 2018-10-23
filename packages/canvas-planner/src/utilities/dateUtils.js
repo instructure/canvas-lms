@@ -173,26 +173,3 @@ export function getLastLoadedMoment (days, timeZone) {
   if (loadedItem) return loadedItem.dateBucketMoment.clone();
   return moment.tz(lastLoadedDay[0], timeZone).startOf('day');
 }
-
-// datetime: iso8601 string or moment
-// timeZone: user's timeZone
-// returns: true if datetime is at midnight in the timeZone
-export function isMidnight(datetime, timeZone) {
-  if (typeof(datetime) === 'string') datetime = moment(datetime);
-  const localDay = moment(datetime).tz(timeZone);
-  return localDay.hours() === 0 &&
-         localDay.minutes() === 0 &&
-         localDay.seconds() === 0;
-}
-
-// if incoming datetime is at midnight user's time, convert to 11:59pm
-// datetime: moment or iso8601 string
-// timeZone: user's timeZone
-// returns: moment of the result
-export function makeEndOfDayIfMidnight(datetime, timeZone) {
-  datetime = moment(datetime);
-  if (isMidnight(datetime, timeZone)) {
-    return moment(datetime).tz(timeZone).endOf('day');
-  }
-  return datetime;
-}

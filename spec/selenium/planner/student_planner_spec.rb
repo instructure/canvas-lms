@@ -430,7 +430,7 @@ describe "student planner" do
     end
 
     it "ensures time zones with offsets higher than UTC update the planner items" do
-      planner_note = @student1.planner_notes.create!(todo_date: (Time.zone.now + 1.day).beginning_of_day,
+      planner_note = @student1.planner_notes.create!(todo_date: (Time.zone.now + 1.day),
                                                      title: "Title Text")
       go_to_list_view
       # Opens the To Do edit sidebar
@@ -596,7 +596,7 @@ describe "student planner" do
       end
     end
 
-    it "shows correct default time in a ungraded discussion" do
+    it "shows correct default time in an ungraded discussion" do
       Timecop.freeze(Time.zone.today) do
         @discussion = @course.discussion_topics.create!(title: "Default Time Discussion", message: "here is a message", user: @teacher)
         get("/courses/#{@course.id}/discussion_topics/#{@discussion.id}/edit")
