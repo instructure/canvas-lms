@@ -190,6 +190,8 @@ describe Lti::Ims::NamesAndRolesController do
             vnd_canvas_person_email_sis: '$vnd.Canvas.Person.email.sis',
             person_email_primary: '$Person.email.primary',
             person_address_timezone: '$Person.address.timezone',
+            user_username: '$User.username',
+            canvas_user_loginid: '$Canvas.user.loginId',
             unsupported_param_1: '$unsupported.param.1',
             unsupported_param_2: '$unsupported.param.2'
           }
@@ -246,6 +248,8 @@ describe Lti::Ims::NamesAndRolesController do
                 'vnd_canvas_person_email_sis' => 'sis@example.com',
                 'person_email_primary' => 'marta.perkins@school.edu',
                 'person_address_timezone' => 'Europe/Berlin',
+                'user_username' => 'sis@example.com',
+                'canvas_user_loginid' => 'sis@example.com',
                 'unsupported_param_1' => '$unsupported.param.1',
                 'unsupported_param_2' => '$unsupported.param.2'
               }

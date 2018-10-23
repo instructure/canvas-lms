@@ -81,6 +81,8 @@ module Lti::Ims::Providers
             vnd.Canvas.Person.email.sis
             Person.email.primary
             Person.address.timezone
+            User.username
+            Canvas.user.loginId
           )
         }
       )
