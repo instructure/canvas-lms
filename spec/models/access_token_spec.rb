@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe AccessToken do
 
@@ -167,24 +168,38 @@ describe AccessToken do
     end
   end
 
-  describe "Third party" do
-    before do
-      @trustedkey = DeveloperKey.new(internal_service: true)
-      @trustedkey.save!
+  describe "visible tokens" do
+    specs_require_sharding
+    it "only displays integrations from non-internal developer keys" do
+      user = User.create!
+      trustedkey = DeveloperKey.create!(internal_service: true)
+      trusted_access_token = user.access_tokens.create!({developer_key: trustedkey})
 
-      @untrustedkey = DeveloperKey.new()
-      @untrustedkey.save!
+      untrustedkey = DeveloperKey.create!()
+      third_party_access_token = user.access_tokens.create!({developer_key: untrustedkey})
 
-      @trusted_access_token = AccessToken.new({developer_key: @trustedkey})
-      @trusted_access_token.save!
-
-      @third_party_access_token = AccessToken.new({developer_key: @untrustedkey})
-      @third_party_access_token.save!
+      expect(AccessToken.visible_tokens(user.access_tokens).length).to eq 1
+      expect(AccessToken.visible_tokens(user.access_tokens).first.id).to eq third_party_access_token.id
     end
 
-    it "only displays integrations from untrusted developer keys" do
-      expect(AccessToken.visible.length).to eq 1
-      expect(AccessToken.visible.first.id).to eq @third_party_access_token.id
+    it "access token and developer key scoping work cross-shard" do
+      trustedkey = DeveloperKey.new(internal_service: true)
+      untrustedkey = DeveloperKey.new()
+
+      @shard1.activate do
+        trustedkey.save!
+        untrustedkey.save!
+      end
+
+      @shard2.activate do
+        user = User.create!
+        trusted_access_token = user.access_tokens.create!({developer_key: trustedkey})
+        third_party_access_token = user.access_tokens.create!({developer_key: untrustedkey})
+        user.save!
+
+        expect(AccessToken.visible_tokens(user.access_tokens).length).to eq 1
+        expect(AccessToken.visible_tokens(user.access_tokens).first.id).to eq third_party_access_token.id
+      end
     end
   end
 
