@@ -433,7 +433,7 @@ class Course < ActiveRecord::Base
   end
 
   def image
-    if self.image_id.present?
+    @image ||= if self.image_id.present?
       self.shard.activate do
         self.attachments.active.where(id: self.image_id).take&.public_download_url
       end
