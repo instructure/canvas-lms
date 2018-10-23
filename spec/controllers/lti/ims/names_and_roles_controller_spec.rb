@@ -191,6 +191,7 @@ describe Lti::Ims::NamesAndRolesController do
             person_email_primary: '$Person.email.primary',
             person_address_timezone: '$Person.address.timezone',
             user_username: '$User.username',
+            canvas_user_sisintegrationid: '$Canvas.user.sisIntegrationId',
             canvas_user_loginid: '$Canvas.user.loginId',
             unsupported_param_1: '$unsupported.param.1',
             unsupported_param_2: '$unsupported.param.2'
@@ -211,7 +212,8 @@ describe Lti::Ims::NamesAndRolesController do
             password: 'asdfasdf',
             password_confirmation: 'asdfasdf',
             workflow_state: 'active',
-            sis_user_id: 'user-1-sis-user-id-1'
+            sis_user_id: 'user-1-sis-user-id-1',
+            integration_id: 'user-1-sis-integration-id-1',
           })
           sis_email = 'sis@example.com'
           cc = user.communication_channels.email.create!(path: sis_email)
@@ -223,7 +225,8 @@ describe Lti::Ims::NamesAndRolesController do
             sis_communication_channel_id: cc.id,
             communication_channel_id: cc.id,
             workflow_state: 'active',
-            sis_user_id: 'user-1-sis-user-id-2'
+            sis_user_id: 'user-1-sis-user-id-2',
+            integration_id: 'user-1-sis-integration-id-2',
           })
           user
         end
@@ -250,6 +253,7 @@ describe Lti::Ims::NamesAndRolesController do
                 'person_address_timezone' => 'Europe/Berlin',
                 'user_username' => 'sis@example.com',
                 'canvas_user_loginid' => 'sis@example.com',
+                'canvas_user_sisintegrationid' => 'user-1-sis-integration-id-2',
                 'unsupported_param_1' => '$unsupported.param.1',
                 'unsupported_param_2' => '$unsupported.param.2'
               }

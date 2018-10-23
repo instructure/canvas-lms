@@ -83,6 +83,7 @@ module Lti::Ims::Providers
             Person.address.timezone
             User.username
             Canvas.user.loginId
+            Canvas.user.sisIntegrationId
           )
         }
       )
