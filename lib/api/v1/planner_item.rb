@@ -37,9 +37,11 @@ module Api::V1::PlannerItem
   ASSESSMENT_REQUEST_FIELDS = [:workflow_state].freeze
 
   def planner_item_json(item, user, session, opts = {})
+    planner_override = item.planner_override_for(user)
+    planner_override.plannable = item if planner_override
     context_data(item, use_effective_code: true).merge({
       :plannable_id => item.id,
-      :planner_override => planner_override_json(item.planner_override_for(user), user, session, item.class_name),
+      :planner_override => planner_override_json(planner_override, user, session, item.class_name),
       :plannable_type => PlannerHelper::PLANNABLE_TYPES.key(item.class_name),
       :new_activity => new_activity(item, user, opts)
     }).merge(submission_statuses_for(user, item, opts)).tap do |hash|
@@ -106,15 +108,11 @@ module Api::V1::PlannerItem
   end
 
   def planner_items_json(items, user, session, opts = {})
-    preload_items = items.map do |i|
-      if i.try(:wiki_page?)
-        i.wiki_page
-      elsif i.try(:discussion_topic?)
-        i.discussion_topic
-      elsif i.try(:quiz?)
-        i.quiz
-      else
-        i
+    preload_items = items.each_with_object([]) do |item, memo|
+      memo << item
+      if item.try(:submittable_object)
+        item.submittable_object.assignment = item # fixes loading for inverse associations that don't seem to be working
+        memo << item.submittable_object
       end
     end
 
@@ -122,14 +120,12 @@ module Api::V1::PlannerItem
     events, other_items = preload_items.partition{|i| i.is_a?(::CalendarEvent)}
     ActiveRecord::Associations::Preloader.new.preload(events, :context) if events.any?
     assessment_requests, plannable_items = other_items.partition{|i| i.is_a?(::AssessmentRequest)}
-    ActiveRecord::Associations::Preloader.new.preload(assessment_requests, [:assessor_asset, submission: {assignment: :context}]) if assessment_requests.any?
+    ActiveRecord::Associations::Preloader.new.preload(assessment_requests, [:assessor_asset, asset: {assignment: :context}]) if assessment_requests.any?
     notes, context_items = plannable_items.partition{|i| i.is_a?(::PlannerNote)}
     ActiveRecord::Associations::Preloader.new.preload(notes, user: {pseudonym: :account}) if notes.any?
-    wiki_pages, other_context_items = context_items.partition{|i| i.is_a?(::WikiPage)}
-    ActiveRecord::Associations::Preloader.new.preload(wiki_pages, {context: :root_account}) if wiki_pages.any?
-    ActiveRecord::Associations::Preloader.new.preload(other_context_items, {context: :root_account}) if other_context_items.any?
-    ss = user&.submission_statuses(opts)
-    discussions, _assign_quiz_items = other_context_items.partition{|i| i.is_a?(::DiscussionTopic)}
+    ActiveRecord::Associations::Preloader.new.preload(context_items, {context: :root_account}) if context_items.any?
+    ss = submission_statuses(context_items.select{|i| i.is_a?(::Assignment)}, user)
+    discussions = context_items.select{|i| i.is_a?(::DiscussionTopic)}
     topics_status = topics_status_for(user, discussions.map(&:id))
 
     items.map do |item|
@@ -149,42 +145,46 @@ module Api::V1::PlannerItem
   def submission_statuses_for(user, item, opts = {})
     submission_status = {submissions: false}
     return submission_status unless item.is_a?(Assignment)
-    ss = opts[:submission_statuses] || user&.submission_statuses(opts)
-    submission_status[:submissions] = {
-      submitted: ss[:submitted].include?(item.id),
-      excused: ss[:excused].include?(item.id),
-      graded: ss[:graded].include?(item.id),
-      late: ss[:late].include?(item.id),
-      missing: ss[:missing].include?(item.id),
-      needs_grading: ss[:needs_grading].include?(item.id),
-      has_feedback: ss[:has_feedback].include?(item.id)
-    }
-
-    # planner will display the most recent comment not made by the user herself
-    if submission_status[:submissions][:has_feedback]
-      relevant_submissions = user.recent_feedback(start_at: opts[:due_after]).select {|s| s.assignment_id == item.id}
-      ActiveRecord::Associations::Preloader.new.preload(relevant_submissions, [visible_submission_comments: [:author, submission: :assignment]])
-      feedback_data = relevant_submissions.
-        flat_map(&:visible_submission_comments).
-        reject{|comment| comment.author_id == user.id}. # omit comments by the user's own self
-        sort_by(&:updated_at).
-        last
-
-      if feedback_data.present?
-        submission_status[:submissions][:feedback] = {
-          comment: feedback_data.comment,
-          is_media: feedback_data.media_comment_id?
-        }
-        if feedback_data.can_read_author?(user, nil)
-          submission_status[:submissions][:feedback].merge!({
-            author_name: feedback_data.author_name,
-            author_avatar_url: feedback_data.author.avatar_url,
-          })
-        end
-      end
-    end
-
+    ss = opts[:submission_statuses] || submission_statuses(item, user)
+    submission_status[:submissions] = ss[item.id]&.except(:new_activity)
     submission_status
+  end
+
+  def submission_statuses(assignments, user)
+    subs = Submission.where(assignment: assignments, user: user).
+      preload([:content_participations, visible_submission_comments: :author])
+    subs_hash = subs.index_by(&:assignment_id)
+    subs_data_hash = {}
+    Array(assignments).each do |assign|
+      submission = subs_hash[assign.id]
+      submission.assignment = assign if submission # fixes loading for inverse associations that don't seem to be working
+      sub_data_hash = {
+        submitted: submission&.has_submission?,
+        excused: submission&.excused?,
+        graded: submission&.graded?,
+        late: submission&.late?,
+        missing: submission&.missing?,
+        needs_grading: submission&.needs_grading?,
+        has_feedback: submission&.last_teacher_comment.present?,
+        new_activity: submission&.unread?(user),
+      }
+      sub_data_hash[:feedback] = feedback_data(submission, user) if sub_data_hash[:has_feedback]
+      subs_data_hash[assign.id] = sub_data_hash
+    end
+    subs_data_hash
+  end
+
+  def feedback_data(submission, user)
+    feedback_hash = {}
+    last_teacher_comment = submission.last_teacher_comment
+    last_teacher_comment.submission = submission # otherwise you get a couple more queries, because the association is lost somehow
+    feedback_hash[:comment] = last_teacher_comment.comment
+    feedback_hash[:is_media] = last_teacher_comment.media_comment_id?
+    if last_teacher_comment.can_read_author?(user, nil)
+      feedback_hash[:author_name] = last_teacher_comment.author_name
+      feedback_hash[:author_avatar_url] = last_teacher_comment.author&.avatar_url
+    end
+    feedback_hash
   end
 
   def topics_status_for(user, topic_ids, topics_status={})
@@ -210,9 +210,9 @@ module Api::V1::PlannerItem
 
   def new_activity(item, user, opts = {})
     if item.is_a?(Assignment) || item.try(:assignment)
-      ss = opts[:submission_statuses] || user.submission_statuses(opts)
       assign = item.try(:assignment) || item
-      return true if ss.dig(:new_activity).include?(assign.id)
+      ss = opts[:submission_statuses] || submission_statuses(assign, user)
+      return true if ss.dig(assign.id, :new_activity)
     end
     if item.is_a?(DiscussionTopic) || item.try(:discussion_topic)
       topic = item.try(:discussion_topic) || item

@@ -1878,8 +1878,10 @@ class Submission < ActiveRecord::Base
   def last_teacher_comment
     if association(:submission_comments).loaded?
       submission_comments.reverse.detect{ |com| !com.draft && com.author_id != user_id }
+    elsif association(:visible_submission_comments).loaded?
+      visible_submission_comments.reverse.detect{ |com| com.author_id != user_id }
     else
-      submission_comments.published.where.not(:author_id => user_id).order(:created_at => :desc).first
+      submission_comments.published.where.not(:author_id => user_id).reorder(:created_at => :desc).first
     end
   end
 

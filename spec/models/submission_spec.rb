@@ -4597,8 +4597,9 @@ describe Submission do
       end
 
       it 'does not create audit events when the assignment is not auditable' do
-        assignment.update!(anonymous_grading: false)
-        expect { submission.add_comment(comment_params) }.not_to change(audit_events, :count)
+        assignment1 = course.assignments.create!(title: 'ok', anonymous_grading: false)
+        submission1 = assignment1.submission_for_student(student)
+        expect { submission1.add_comment(comment_params) }.not_to change(audit_events, :count)
       end
     end
   end

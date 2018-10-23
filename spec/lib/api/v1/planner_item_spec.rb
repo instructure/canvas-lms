@@ -244,7 +244,6 @@ describe Api::V1::PlannerItem do
       end
 
       it 'should include comment data from before the assignment is due' do
-        skip 'skipped because this does not work yet. see ADMIN-1464'
         assignment_model(course: @course, submission_types: 'online_text_entry', due_at: 2.weeks.from_now)
         @assignment.workflow_state = "published"
         @assignment.save!
