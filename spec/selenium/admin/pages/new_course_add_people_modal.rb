@@ -18,9 +18,21 @@ require_relative '../../common'
 
 module NewCourseAddPeopleModal
 
+
   # ---------------------- Controls ----------------------
+  def add_people_modal
+    f('#add_people_modal')
+  end
 
   def add_people_header
     f('#add_people_modal h2')
+  end
+
+  def role_options
+    ff('#peoplesearch_select_role option', add_people_modal).map(&:text)
+  end
+
+  def section_options
+    ff('#peoplesearch_select_section option', add_people_modal).map(&:text)
   end
 end
