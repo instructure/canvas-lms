@@ -76,7 +76,7 @@ body {
     }
   }
 
-  &.full-width.grades { // Speedgrader
+  &.full-width.grades:not(.gradebook) { // Speedgrader
 
     .ic-Layout-wrapper {
         max-width: unset !important;
