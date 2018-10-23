@@ -105,8 +105,7 @@ class EditorToggle {
     if (!this.infoIcon) {
       this.infoIcon = new KeyboardShortcuts().render().$el
     }
-    this.infoIcon.css('float', 'right')
-    this.infoIcon.insertAfter(this.switchViews)
+    this.infoIcon.insertBefore($('.switch-views__link'))
     $('<div/>', {style: 'clear: both'}).insertBefore(this.textAreaContainer)
     this.done.insertAfter(this.textAreaContainer)
     RichContentEditor.initSidebar()

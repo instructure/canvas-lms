@@ -167,3 +167,15 @@ test('edit', function() {
   ok(RichContentEditor.freshNode.calledWith(textArea), 'gets fresh node')
   equal(et.textArea, fresh, 'sets @textArea to fresh node')
 })
+
+test('shows keyboard shortcuts and toggle link in the appropriate tab order', () => {
+  const fresh = {}
+  sandbox.stub(RichContentEditor, 'loadNewEditor')
+  sandbox.stub(RichContentEditor, 'freshNode').returns(fresh)
+
+  const et = new EditorToggle(containerDiv)
+  et.edit();
+  const focusableItems = $(':focusable').toArray()
+  ok(focusableItems[0].className, 'tinymce-keyboard-shortcuts-toggle')
+  ok(focusableItems[1].className, 'switch-views__link switch-views__link__html')
+})

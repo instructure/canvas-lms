@@ -54,9 +54,9 @@ class SwitchEditorControl extends React.Component {
 
   linkClass = () => {
     if (this.state.mode == 'rce') {
-      return 'switch-views__link__html'
+      return 'switch-views__link switch-views__link__html'
     } else {
-      return 'switch-views__link__rce'
+      return 'switch-views__link switch-views__link__rce'
     }
   }
 
