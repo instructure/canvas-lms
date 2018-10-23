@@ -99,13 +99,15 @@ export default class TokenInput {
       delete this.options.selector.type
       if ((this.browser = this.options.selector.browser)) {
         delete this.options.selector.browser
-        $('<a class="browser">browse</a>')
-          .click(() => {
-            if (this.selector.browse(this.browser.data)) {
-              return this.$fakeInput.addClass('browse')
-            }
-          })
-          .prependTo(this.$fakeInput)
+        const activateBrowse = () => {
+          if (this.selector.browse(this.browser.data)) {
+            return this.$fakeInput.addClass('browse')
+          }
+        }
+        $('<a href="#" class="browser">browse</a>')
+          .click(activateBrowse)
+          .keypress(activateBrowse)
+          .appendTo(this.$fakeInput)
         this.$fakeInput.addClass('browsable')
       }
       this.selector = new type(this, this.$node.data('finder_url'), this.options.selector)
