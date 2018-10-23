@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2012 - present Instructure, Inc.
+# Copyright (C) 2018 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -26,131 +26,137 @@ describe 'developer keys' do
     admin_logged_in
   end
 
-  let(:developer_key) do
-    Account.default.developer_keys.create!(
-      name: 'Cool Tool',
-      email: 'admin@example.com',
-      redirect_uris: ['http://example.com'],
-      icon_url: '/images/delete.png'
-    )
+  context "with new key" do
+    it "key settings dialog is displayed when opened" do
+      visit_developer_page(Account.default.id)
+
+      add_key_button.click
+      expect(f("body")).to contain_css(".ui-dialog[aria-hidden='false']")
+      close_dialog_button.click
+      expect(f("body")).to contain_css(".ui-dialog[aria-hidden='true']")
+    end
+
+    it "allows creation through 'add developer key button'", test_id: 344077 do
+      visit_developer_page(Account.default.id)
+      expect(keys_table).not_to contain_css("tbody tr")
+
+      add_key_button.click
+      edit_key_name("Cool Tool")
+      edit_key_email("admin@example.com")
+      edit_key_redirect_uris("http://example.com")
+      edit_key_icon_url("/images/delete.png")
+      submit_dialog(key_settings_dialog_selector, '.submit')
+      wait_for_ajaximations
+
+      expect(Account.default.developer_keys.count).to eq 1
+      key = Account.default.developer_keys.last
+      expect(key.name).to eq "Cool Tool"
+      expect(key.email).to eq "admin@example.com"
+      expect(key.redirect_uris).to eq ["http://example.com"]
+      expect(key.icon_url).to eq "/images/delete.png"
+      expect(all_keys.count).to eq 1
+    end
   end
 
-  it "allows creation through 'add developer key button'", test_id: 344077 do
-    visit_developer_page(Account.default.id)
-    expect(f("#keys")).not_to contain_css("tbody tr")
+  context "with existing key" do
+    before(:each) do
+      @new_key = Account.default.developer_keys.create!(
+        name: 'Cool Tool',
+        email: 'admin@example.com',
+        redirect_uris: ['http://example.com'],
+        icon_url: '/images/delete.png'
+      )
+    end
 
-    f(".add_key").click
-    expect(f("#edit_dialog")).to be_displayed
-    f("#key_name").send_keys("Cool Tool")
-    f("#email").send_keys("admin@example.com")
-    f("#redirect_uris").send_keys("http://example.com")
-    f("#icon_url").send_keys("/images/delete.png")
-    submit_dialog("#edit_dialog", '.submit')
-    wait_for_ajaximations
+    it "edit key settings dialog is displayed when opened" do
+      visit_developer_page(Account.default.id)
 
-    expect(f("#edit_dialog")).not_to be_displayed
-    expect(Account.default.developer_keys.count).to eq 1
-    key = Account.default.developer_keys.last
-    expect(key.name).to eq "Cool Tool"
-    expect(key.email).to eq "admin@example.com"
-    expect(key.redirect_uris).to eq ["http://example.com"]
-    expect(key.icon_url).to eq "/images/delete.png"
-    expect(ff("#keys tbody tr").length).to eq 1
-  end
+      edit_key_button(@new_key.id).click
+      expect(f("body")).to contain_css(".ui-dialog[aria-hidden='false']")
+      close_dialog_button.click
+      expect(f("body")).to contain_css(".ui-dialog[aria-hidden='true']")
+    end
 
-  it "allows update through 'edit this key button'", test_id: 344078 do
-    developer_key
-    visit_developer_page(Account.default.id)
-    f("#keys tbody tr.key .edit_link").click
-    expect(f("#edit_dialog")).to be_displayed
-    replace_content(f("#key_name"), "Cooler Tool")
-    replace_content(f("#email"), "admins@example.com")
-    replace_content(f("#redirect_uris"), "http://b/")
-    replace_content(f("#icon_url"), "/images/add.png")
-    submit_dialog("#edit_dialog", '.submit')
-    wait_for_ajaximations
+    it "allows update through 'edit this key button'", test_id: 344078 do
+      visit_developer_page(Account.default.id)
 
-    expect(f("#edit_dialog")).not_to be_displayed
-    expect(Account.default.developer_keys.count).to eq 1
-    key = Account.default.developer_keys.last
-    expect(key.name).to eq "Cooler Tool"
-    expect(key.email).to eq "admins@example.com"
-    expect(key.redirect_uris).to eq ["http://b/"]
-    expect(key.icon_url).to eq "/images/add.png"
-    expect(ff("#keys tbody tr").length).to eq 1
-  end
+      edit_key_button(@new_key.id).click
+      edit_key_name("Cooler Tool")
+      edit_key_email("admins@example.com")
+      edit_key_redirect_uris("http://b/")
+      edit_key_icon_url("/images/add.png")
+      submit_dialog(key_settings_dialog_selector, '.submit')
+      wait_for_ajaximations
 
-  it 'allows editing of legacy redirect URI', test_id: 3469351 do
-    dk = developer_key
-    dk.update_attribute(:redirect_uri, "http://a/")
-    visit_developer_page(Account.default.id)
-    f("#keys tbody tr.key .edit_link").click
-    expect(f("#edit_dialog")).to be_displayed
-    replace_content(f("#key_name"), "Cooler Tool")
-    replace_content(f("#email"), "admins@example.com")
-    expect(f(".key_form")).to contain_css("#redirect_uri")
-    replace_content(f("#redirect_uri"), "https://b/")
-    replace_content(f("#icon_url"), "/images/add.png")
-    submit_dialog("#edit_dialog", '.submit')
-    wait_for_ajaximations
+      expect(Account.default.developer_keys.count).to eq 1
+      key = Account.default.developer_keys.last
+      expect(key.name).to eq "Cooler Tool"
+      expect(key.email).to eq "admins@example.com"
+      expect(key.redirect_uris).to eq ["http://b/"]
+      expect(key.icon_url).to eq "/images/add.png"
+      expect(all_keys.count).to eq 1
+    end
 
-    expect(f("#edit_dialog")).not_to be_displayed
-    expect(Account.default.developer_keys.count).to eq 1
-    key = Account.default.developer_keys.last
-    expect(key.name).to eq "Cooler Tool"
-    expect(key.email).to eq "admins@example.com"
-    expect(key.redirect_uri).to eq "https://b/"
-    expect(key.icon_url).to eq "/images/add.png"
-    expect(ff("#keys tbody tr").length).to eq 1
-  end
+    it "allows editing of legacy redirect URI", test_id: 3469351 do
+      @new_key.update_attribute(:redirect_uri, "http://a/")
+      visit_developer_page(Account.default.id)
+      edit_key_button(@new_key.id).click
+      edit_key_name("Cooler Tool")
+      edit_key_email("admins@example.com")
+      edit_key_legacy_redirect_uri("http://b/")
+      edit_key_icon_url("/images/add.png")
+      submit_dialog(key_settings_dialog_selector, '.submit')
+      wait_for_ajaximations
 
-  it "allows deactivation through 'deactivate this key button'", test_id: 3469389 do
-    developer_key
-    visit_developer_page(Account.default.id)
-    f("#keys tbody tr.key .icon-lock").click
-    expect(f("#keys tbody")).to contain_css(".key.inactive")
-    expect(developer_key.reload.workflow_state).to eq 'inactive'
-  end
+      expect(Account.default.developer_keys.count).to eq 1
+      key = Account.default.developer_keys.last
+      expect(key.name).to eq "Cooler Tool"
+      expect(key.email).to eq "admins@example.com"
+      expect(key.redirect_uri).to eq "http://b/"
+      expect(key.icon_url).to eq "/images/add.png"
+      expect(all_keys.count).to eq 1
+    end
 
-  it "allows activation through 'activate this key button'", test_id: 3469390 do
-    developer_key.update(workflow_state: 'inactive')
-    visit_developer_page(Account.default.id)
-    f("#keys tbody tr.key .icon-unlock").click
-    expect(f("#keys tbody")).not_to contain_css(".key.inactive")
-    expect(developer_key.reload.workflow_state).to eq 'active'
-  end
+    it "allows deactivation through 'deactivate this key button'", test_id: 3469389 do
+      visit_developer_page(Account.default.id)
 
-  it "allows deletion through 'delete this key button'", test_id: 344079 do
-    skip_if_safari(:alert)
-    developer_key
-    visit_developer_page(Account.default.id)
-    f("#keys tbody tr.key .edit_link").click
-    expect(f("#edit_dialog")).to be_displayed
-    f("#icon_url").clear
-    submit_dialog("#edit_dialog", '.submit')
-    wait_for_ajaximations
+      deactivate_key_button(@new_key.id).click
+      wait_for_ajaximations
+      expect(key_row(@new_key.id)).to include_text 'inactive'
+      expect(@new_key.reload.workflow_state).to eq 'inactive'
+    end
 
-    expect(f("#edit_dialog")).not_to be_displayed
-    expect(Account.default.developer_keys.count).to eq 1
-    key = Account.default.developer_keys.last
-    expect(key.icon_url).to eq nil
-    expect(ff("#keys tbody tr").length).to eq 1
+    it "allows activation through 'activate this key button'", test_id: 3469390 do
+      @new_key.update(workflow_state: 'inactive')
+      visit_developer_page(Account.default.id)
 
-    f("#keys tbody tr.key .delete_link").click
-    driver.switch_to.alert.accept
-    driver.switch_to.default_content
-    expect(f("#keys")).not_to contain_css("tbody tr")
-    expect(Account.default.developer_keys.nondeleted.count).to eq 0
-  end
+      activate_key_button(@new_key.id).click
+      expect(key_row(@new_key.id)).not_to include_text 'inactive'
+      expect(@new_key.reload.workflow_state).to eq 'active'
+    end
 
-  it "allows for pagination", test_id: 344532 do
-    11.times { |i| Account.default.developer_keys.create!(name: "tool #{i}") }
-    visit_developer_page(Account.default.id)
-    expect(f("#loading")).not_to have_class('loading')
-    expect(ff("#keys tbody tr")).to have_size(10)
-    expect(f('#loading')).to have_class('show_more')
-    f("#loading .show_all").click
-    expect(f("#loading")).not_to have_class('loading')
-    expect(ff("#keys tbody tr")).to have_size(11)
+    it "allows deletion through 'delete this key button'", test_id: 344079 do
+      skip_if_safari(:alert)
+      visit_developer_page(Account.default.id)
+
+      delete_key_button(@new_key.id).click
+      driver.switch_to.alert.accept
+      driver.switch_to.default_content
+      expect(keys_table).not_to contain_css("tbody tr")
+      expect(Account.default.developer_keys.nondeleted.count).to eq 0
+    end
+
+    it "allows for pagination", test_id: 344532 do
+      11.times { |i| Account.default.developer_keys.create!(name: "tool #{i}") }
+      visit_developer_page(Account.default.id)
+
+      expect(loading_div).not_to contain_css('.loading')
+      expect(all_keys.count).to eq 10
+      scroll_to(all_keys.last)
+      show_all_keys_button.click
+
+      expect(loading_div).not_to have_class('loading')
+      expect(all_keys.count).to eq 12
+    end
   end
 end
