@@ -4061,6 +4061,7 @@ describe AssignmentsApiController, type: :request do
           'assignment_id' => @assignment.id,
           'delayed_post_at' => nil,
           'lock_at' => nil,
+          'created_at' => @topic.created_at.iso8601,
           'user_name' => @topic.user_name,
           'pinned' => !!@topic.pinned,
           'position' => @topic.position,
