@@ -646,9 +646,9 @@ class AssignmentsController < ApplicationController
   end
 
   def pledge_text
-    (@assignment.turnitin_enabled? && @context.turnitin_pledge) ||
-    (@assignment.vericite_enabled? && @context.vericite_pledge) ||
-    @assignment.course.account.closest_turnitin_pledge
+    pledge = @context.turnitin_pledge if @context.turnitin_pledge.present? && @assignment.turnitin_enabled?
+    pledge ||= @context.vericite_pledge if @context.vericite_pledge.present? && @assignment.vericite_enabled?
+    pledge || @assignment.course.account.closest_turnitin_pledge
   end
 
   def quiz_lti_tool_enabled?

@@ -530,6 +530,14 @@ describe AssignmentsController do
       expect(assigns[:similarity_pledge]).to eq pledge
     end
 
+    it 'uses the closest pledge when vericite is enabled but no pledge is set' do
+      user_session(@student)
+      a = @course.assignments.create(:title => "some assignment", vericite_enabled: true)
+      allow(@course).to receive(:vericite_pledge).and_return("")
+      get 'show', params: {:course_id => @course.id, :id => a.id}
+      expect(assigns[:similarity_pledge]).to eq "This assignment submission is my own, original work"
+    end
+
     it 'uses the turnitin pledge if turnitin is enabled' do
       user_session(@student)
       a = @course.assignments.create(:title => "some assignment")
