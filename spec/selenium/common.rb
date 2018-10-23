@@ -195,25 +195,6 @@ shared_context "in-process server selenium tests" do
     end
   end
 
-  BROWSER_ERRORS_WE_DONT_CARE_ABOUT = [
-    "Blocked attempt to show a 'beforeunload' confirmation panel for a frame that never had a user gesture since its load",
-    "Error: <path> attribute d: Expected number",
-    "elements with non-unique id #",
-    "Failed to load http://www.example.com/",
-    "Failed to load http://example.com/",
-    "Uncaught Error: cannot call methods on timeoutTooltip prior to initialization; attempted to call method 'close'",
-    "Failed to load resource",
-    "Request failed with status code 503",
-    "Deprecated use of magic jQueryUI widget markup detected",
-    "Uncaught SG: Did not receive drive#about kind when fetching import",
-    "Failed prop type",
-    "undefined passed to Animator#focusElement",
-    "isMounted is deprecated. Instead, make sure to clean up subscriptions and pending requests in componentWillUnmount to prevent memory leaks",
-    "https://www.gstatic.com/_/apps-viewer/_/js/k=apps-viewer.standalone.en_US",
-    "In webpack, loading timezones on-demand is not",
-    "Uncaught RangeError: Maximum call stack size exceeded"
-  ].freeze
-
   # logs everything that showed up in the browser console during selenium tests
   after(:each) do |example|
     browser_logs = driver.manage.logs.get(:browser)
@@ -223,10 +204,30 @@ shared_context "in-process server selenium tests" do
       Rails.logger.info(msg)
       # puts msg
 
+      # if you run into something that doesn't make sense t
+      browser_errors_we_dont_care_about = [
+        "Blocked attempt to show a 'beforeunload' confirmation panel for a frame that never had a user gesture since its load",
+        "Error: <path> attribute d: Expected number",
+        "elements with non-unique id #",
+        "Failed to load http://www.example.com/",
+        "Failed to load http://example.com/",
+        "Uncaught Error: cannot call methods on timeoutTooltip prior to initialization; attempted to call method 'close'",
+        "Failed to load resource",
+        "Request failed with status code 503",
+        "Deprecated use of magic jQueryUI widget markup detected",
+        "Uncaught SG: Did not receive drive#about kind when fetching import",
+        "Failed prop type",
+        "undefined passed to Animator#focusElement",
+        "isMounted is deprecated. Instead, make sure to clean up subscriptions and pending requests in componentWillUnmount to prevent memory leaks",
+        "https://www.gstatic.com/_/apps-viewer/_/js/k=apps-viewer.standalone.en_US",
+        "In webpack, loading timezones on-demand is not",
+        "Uncaught RangeError: Maximum call stack size exceeded"
+      ].freeze
+
       javascript_errors = browser_logs.select do |e|
         e.level == "SEVERE" &&
         e.message.present? &&
-        BROWSER_ERRORS_WE_DONT_CARE_ABOUT.none? {|s| e.message.include?(s)}
+        browser_errors_we_dont_care_about.none? {|s| e.message.include?(s)}
       end
 
       if javascript_errors.present?
