@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 ###
 # This script does the work of combining various coverage JS code coverage files
 # together to produce one common html (and json) coverage report for the entire
@@ -10,14 +12,9 @@
 
 export COVERAGE=true
 
-last_status=0
-
 if [ "$RUN_TESTS_FIRST" ]; then
     echo '========== Running tests with coverage ==========='
     yarn test
-    if [ "$?" -eq "0" ]; then
-        exit $?
-    fi
 fi
 
 echo '========== Merging all coverage reports =========='
