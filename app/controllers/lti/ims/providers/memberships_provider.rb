@@ -53,48 +53,6 @@ module Lti::Ims::Providers
       }
     end
 
-    def user(user)
-      UserDecorator.new(
-        user,
-        tool,
-        user_variable_expander(user)
-      )
-    end
-
-    def user_variable_expander(user)
-      Lti::VariableExpander.new(
-        course.root_account,
-        Lti::Ims::Providers::MembershipsProvider.unwrap(context),
-        controller,
-        {
-          current_user: Lti::Ims::Providers::MembershipsProvider.unwrap(user),
-          tool: tool,
-          variable_whitelist: %w(
-            Person.name.full
-            Person.name.display
-            Person.name.family
-            Person.name.given
-            User.image
-            User.id
-            Canvas.user.id
-            vnd.instructure.User.uuid
-            Canvas.user.globalId
-            Canvas.user.sisSourceId
-            Person.sourcedId
-            Message.locale
-            vnd.Canvas.Person.email.sis
-            Person.email.primary
-            Person.address.timezone
-            User.username
-            Canvas.user.loginId
-            Canvas.user.sisIntegrationId
-            Canvas.xapi.url
-            Caliper.url
-          )
-        }
-      )
-    end
-
     protected
 
     def users_scope
@@ -156,9 +114,7 @@ module Lti::Ims::Providers
     def assignment
       @_assignment ||= begin
         return nil unless rlid?
-        assignment = Assignment.active.for_course(course.id).where(lti_context_id: rlid).take
-        return nil if assignment.blank?
-        assignment
+        Assignment.active.for_course(course.id).where(lti_context_id: rlid).take
       end
     end
 
@@ -243,63 +199,6 @@ module Lti::Ims::Providers
     def clear_request_param(param)
       controller.params.delete param
       controller.request.query_parameters.delete param
-    end
-
-    # Purposefully conservative and limiting in what we allow to be output into NRPS v2 responses. Obviously
-    # has to change if more custom param support is added in the future. But that day may never come, so err on the
-    # side of making it very hard to leak user attributes.
-    class UserDecorator
-      attr_reader :user, :expander, :tool
-
-      def initialize(user, tool, expander)
-        @user = user
-        @tool = tool
-        @expander = expander
-      end
-
-      def unwrap
-        user
-      end
-
-      def id
-        user.id
-      end
-
-      def name
-        user.name if @tool.include_name?
-      end
-
-      def first_name
-        user.first_name if @tool.include_name?
-      end
-
-      def last_name
-        user.last_name if @tool.include_name?
-      end
-
-      def email
-        user.email if @tool.include_email?
-      end
-
-      def avatar_image_url
-        user.avatar_image_url if @tool.public?
-      end
-
-      def sourced_id
-        return nil unless @tool.include_name?
-        @_sourced_id ||= begin
-          expanded = @expander.expand_variables!({value: '$Person.sourcedId'})[:value]
-          expanded == '$Person.sourcedId' ? nil : expanded
-        end
-      end
-
-      def locale
-        user.locale
-      end
-
-      def time_zone
-        user.time_zone
-      end
     end
   end
 end

@@ -1262,16 +1262,17 @@ describe Lti::Ims::NamesAndRolesController do
   def match_enrollment(*enrollment)
     if self.respond_to?(:rlid_param) && rlid_param.present?
       match_enrollment_for_rlid({}, *enrollment)
+    elsif enrollment.first.is_a?(Enrollment)
+      be_lti_course_membership({expected: enrollment})
     else
-      enrollment.first.is_a?(Enrollment) ? be_lti_course_membership(*enrollment) : be_lti_group_membership(*enrollment)
+      be_lti_group_membership({expected: enrollment.first})
     end
   end
 
   def match_enrollment_for_rlid(message_matcher, *enrollment)
-    if enrollment.first.is_a?(Enrollment)
-      be_lti_course_membership_for_rlid(message_matcher, *enrollment)
-    else be_lti_group_membership_for_rlid(message_matcher, *enrollment)
-    end
+    opts = { message_matcher: message_matcher }
+    return be_lti_course_membership(opts.merge!(expected: enrollment)) if enrollment.first.is_a?(Enrollment)
+    be_lti_group_membership(opts.merge!(expected: enrollment.first))
   end
 
   def expect_enrollment_response_page

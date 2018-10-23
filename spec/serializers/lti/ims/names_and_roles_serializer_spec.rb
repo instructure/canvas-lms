@@ -49,14 +49,19 @@ describe Lti::Ims::NamesAndRolesSerializer do
     be_lti_group_membership_context(decorated_group)
   end
 
-  def be_lti_membership(for_rlid=false)
-    if for_rlid
-      return be_lti_course_membership_for_rlid(message_matcher, decorated_enrollment) if context_type == :course
-      return be_lti_group_membership_for_rlid(message_matcher, decorated_group_member)
+  def be_lti_membership
+    matcher_opts = {
+      privacy_level: privacy_level
+    }
+    if page[:opts].present? && page[:opts][:rlid].present?
+      matcher_opts[:message_matcher] = message_matcher
     end
 
-    return be_lti_course_membership(decorated_enrollment) if context_type == :course
-    be_lti_group_membership(decorated_group_member)
+    if context_type == :course
+      be_lti_course_membership(matcher_opts.merge!(expected: [ decorated_enrollment ]))
+    else
+      be_lti_group_membership(matcher_opts.merge!(expected: decorated_group_member))
+    end
   end
 
   def create_pseudonym!(user)
@@ -70,12 +75,12 @@ describe Lti::Ims::NamesAndRolesSerializer do
     })
   end
 
-  shared_examples 'enrollment serialization' do |for_rlid=false|
+  shared_examples 'enrollment serialization' do
     it 'properly formats NRPS json' do
       json = serialize
       expect(json[:id]).to eq url
       expect(json[:context]).to be_lti_membership_context
-      expect(json[:members][0]).to be_lti_membership(for_rlid)
+      expect(json[:members][0]).to be_lti_membership
     end
   end
 
@@ -109,9 +114,8 @@ describe Lti::Ims::NamesAndRolesSerializer do
   end
 
   # Technically all these '...privacy policy' examples are redundant w/r/t be_lti_*_membership(). But those matchers
-  # know nothing about privacy policies... they just know that if a model provides a value, it should appear in the
-  # resulting json/hash. So you could have an incorrectly implemented privacy policy, but all the serialization tests
-  # would still pass. Hence the explicit checks here for user fields specific to each policy.
+  # basically just echo logic from the serializer, so we want this additional set of declarative expectations to
+  # confirm that the logic is actually right.
   shared_examples 'public privacy policy' do
     it 'properly formats NRPS json' do
       json = serialize
@@ -164,15 +168,8 @@ describe Lti::Ims::NamesAndRolesSerializer do
         enrollment
       end
       let(:user) { enrollment.user }
-      let(:decorated_user_factory) do
-        Lti::Ims::Providers::CourseMembershipsProvider.new(course, nil, tool)
-      end
       let(:decorated_enrollment) do
-        Lti::Ims::Providers::CourseMembershipsProvider::CourseEnrollmentsDecorator.new(
-          [enrollment],
-          tool,
-          decorated_user_factory
-        )
+        Lti::Ims::Providers::CourseMembershipsProvider::CourseEnrollmentsDecorator.new([enrollment], tool)
       end
       let(:decorated_course) { Lti::Ims::Providers::CourseMembershipsProvider::CourseContextDecorator.new(course) }
       let(:page) do
@@ -230,15 +227,8 @@ describe Lti::Ims::NamesAndRolesSerializer do
         enrollment
       end
       let(:user) { group_member.user }
-      let(:decorated_user_factory) do
-        Lti::Ims::Providers::GroupMembershipsProvider.new(group_record, nil, tool)
-      end
       let(:decorated_group_member) do
-        Lti::Ims::Providers::GroupMembershipsProvider::GroupMembershipDecorator.new(
-          group_member,
-          tool,
-          decorated_user_factory
-        )
+        Lti::Ims::Providers::GroupMembershipsProvider::GroupMembershipDecorator.new(group_member, tool)
       end
       let(:decorated_group) { Lti::Ims::Providers::GroupMembershipsProvider::GroupContextDecorator.new(group_record) }
       let(:page) do

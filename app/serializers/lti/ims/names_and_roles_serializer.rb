@@ -46,26 +46,64 @@ module Lti::Ims
     def serialize_membership(enrollment)
       # Inbound model is either an ActiveRecord Enrollment or GroupMembership, with delegations in place
       # to make them behave more or less the same for our purposes
-      member(enrollment).merge!(message(enrollment)).compact
+      expander = variable_expander(enrollment.user)
+      member(enrollment, expander).merge!(message(enrollment, expander))
     end
 
-    def member(enrollment)
+    def variable_expander(user)
+      Lti::VariableExpander.new(
+        page[:context].root_account,
+        Lti::Ims::Providers::MembershipsProvider.unwrap(page[:context]),
+        page[:controller],
+        {
+          current_user: Lti::Ims::Providers::MembershipsProvider.unwrap(user),
+          tool: page[:tool],
+          variable_whitelist: %w(
+            Person.name.full
+            Person.name.display
+            Person.name.family
+            Person.name.given
+            User.image
+            User.id
+            Canvas.user.id
+            vnd.instructure.User.uuid
+            Canvas.user.globalId
+            Canvas.user.sisSourceId
+            Person.sourcedId
+            Message.locale
+            vnd.Canvas.Person.email.sis
+            Person.email.primary
+            Person.address.timezone
+            User.username
+            Canvas.user.loginId
+            Canvas.user.sisIntegrationId
+            Canvas.xapi.url
+            Caliper.url
+          )
+        }
+      )
+    end
+
+    def member(enrollment, expander)
       {
         status: 'Active',
-        name: enrollment.user.name,
-        picture: enrollment.user.avatar_image_url,
-        given_name: enrollment.user.first_name,
-        family_name: enrollment.user.last_name,
-        email: enrollment.user.email,
-        lis_person_sourcedid: enrollment.user.sourced_id,
-        # enrollment.user often wrapped for privacy policy reasons, but calculating the LTI ID really needs
-        # access to underlying AR model.
+        name: (enrollment.user.name if page[:tool].include_name?),
+        picture: (enrollment.user.avatar_image_url if page[:tool].public?),
+        given_name: (enrollment.user.first_name if page[:tool].include_name?),
+        family_name: (enrollment.user.last_name if page[:tool].include_name?),
+        email: (enrollment.user.email if page[:tool].include_email?),
+        lis_person_sourcedid: (member_sourced_id(expander) if page[:tool].include_name?),
         user_id: lti_id(enrollment.user),
         roles: enrollment.lti_roles
-      }
+      }.compact
     end
 
-    def message(enrollment)
+    def member_sourced_id(expander)
+      expanded = expander.expand_variables!({value: '$Person.sourcedId'})[:value]
+      expanded == '$Person.sourcedId' ? nil : expanded
+    end
+
+    def message(enrollment, expander)
       return {} if page[:opts].blank? || page[:opts][:rlid].blank?
       orig_locale = I18n.locale
       orig_time_zone = Time.zone
@@ -76,11 +114,10 @@ module Lti::Ims
           tool: page[:tool],
           context: unwrap(page[:context]),
           user: enrollment.user,
-          expander: enrollment.user.expander,
+          expander: expander,
           return_url: nil,
           opts: {
-            # See Lti::Ims::Providers::MembershipsProvider for additional constraints on custom param expansion
-            # already baked into `enrollment.user.expander`
+            # See #variable_expander for additional constraints on custom param expansion
             claim_group_whitelist: [ :custom_params, :i18n ]
           }
         ).generate_post_payload_message

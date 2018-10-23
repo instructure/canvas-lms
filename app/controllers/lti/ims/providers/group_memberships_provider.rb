@@ -65,16 +65,15 @@ module Lti::Ims::Providers
     end
 
     def to_memberships(enrollments)
-      enrollments.map { |e| GroupMembershipDecorator.new(e, tool, self) }
+      enrollments.map { |e| GroupMembershipDecorator.new(e, tool) }
     end
 
     # *Decorators fix up models to conforms to interface expected by Lti::Ims::NamesAndRolesSerializer
     class GroupMembershipDecorator < SimpleDelegator
 
-      def initialize(membership, tool, user_factory)
+      def initialize(membership, tool)
         super(membership)
         @tool = tool
-        @user_factory = user_factory
       end
 
       def unwrap
@@ -87,10 +86,6 @@ module Lti::Ims::Providers
 
       def group
         @_group ||= GroupContextDecorator.new(super)
-      end
-
-      def user
-        @_user ||= @user_factory.user(super)
       end
 
       def lti_roles
