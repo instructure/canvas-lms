@@ -502,9 +502,7 @@ describe Lti::Messages::JwtMessage do
       expect(decoded_jwt.dig('https://purl.imsglobal.org/spec/lti/claim/lis', 'course_offering_sourcedid')).to eq course.sis_source_id
     end
 
-    context 'when name claim group disabled' do
-      let(:opts) { super().merge({claim_group_blacklist: [:name]}) }
-
+    shared_examples 'does not set name claim group' do
       it 'does not set the name claim' do
         expect(decoded_jwt).not_to include 'name'
       end
@@ -521,6 +519,18 @@ describe Lti::Messages::JwtMessage do
         expect(decoded_jwt).not_to include 'https://purl.imsglobal.org/spec/lti/claim/lis'
       end
     end
+
+    context 'when name claim group disabled' do
+      let(:opts) { super().merge({claim_group_blacklist: [:name]}) }
+
+      it_behaves_like 'does not set name claim group'
+    end
+
+    context 'when tool privacy policy does not allow name release' do
+      before { tool.update!(workflow_state: 'anonymous') }
+
+      it_behaves_like 'does not set name claim group'
+    end
   end
 
   describe 'include email claims' do
@@ -531,12 +541,22 @@ describe Lti::Messages::JwtMessage do
       expect(decoded_jwt['email']).to eq user.email
     end
 
-    context 'when email claim group disabled' do
-      let(:opts) { super().merge({claim_group_blacklist: [:email]}) }
-
+    shared_examples 'does not set email claims' do
       it 'does not set the email claim' do
         expect(decoded_jwt).not_to include 'email'
       end
+    end
+
+    context 'when email claim group disabled' do
+      let(:opts) { super().merge({claim_group_blacklist: [:email]}) }
+
+      it_behaves_like 'does not set email claims'
+    end
+
+    context 'when tool privacy policy does not allow email release' do
+      before { tool.update!(workflow_state: 'anonymous') }
+
+      it_behaves_like 'does not set email claims'
     end
   end
 
@@ -553,27 +573,6 @@ describe Lti::Messages::JwtMessage do
     shared_examples 'skips picture' do
       it 'does not add the user picture' do
         expect(decoded_jwt).not_to include 'picture'
-      end
-    end
-
-    shared_examples 'sets role scope mentor' do
-      it 'adds role scope mentor' do
-        course
-        observer = user_factory
-        observer.update!(lti_context_id: SecureRandom.uuid)
-        observer_enrollment = course.enroll_user(observer, 'ObserverEnrollment')
-        observer_enrollment.update_attribute(:associated_user_id, user.id)
-        allow(jwt_message).to receive(:current_observee_list).and_return([observer.lti_context_id])
-
-        expect(decoded_jwt['https://purl.imsglobal.org/spec/lti/claim/role_scope_mentor']).to match_array [
-          observer.lti_context_id
-        ]
-      end
-    end
-
-    shared_examples 'skips role scope mentor' do
-      it 'does not add role scope mentor' do
-        expect(decoded_jwt).not_to include 'https://purl.imsglobal.org/spec/lti/claim/role_scope_mentor'
       end
     end
 
@@ -658,7 +657,6 @@ describe Lti::Messages::JwtMessage do
     end
 
     it_behaves_like 'sets picture'
-    it_behaves_like 'sets role scope mentor'
 
     context 'extensions' do
       context 'when context is a course' do
@@ -673,11 +671,8 @@ describe Lti::Messages::JwtMessage do
       end
     end
 
-    context 'when public claim group disabled' do
-      let(:opts) { super().merge({claim_group_blacklist: [:public]}) }
-
+    shared_examples 'does not set public claims group' do
       it_behaves_like 'skips picture'
-      it_behaves_like 'skips role scope mentor'
 
       context 'extensions' do
         context 'when context is a course' do
@@ -693,11 +688,22 @@ describe Lti::Messages::JwtMessage do
       end
     end
 
+    context 'when public claim group disabled' do
+      let(:opts) { super().merge({claim_group_blacklist: [:public]}) }
+
+      it_behaves_like 'does not set public claims group'
+    end
+
+    context 'when tool privacy policy does not allow public claim release' do
+      before { tool.update!(workflow_state: 'name_only') }
+
+      it_behaves_like 'does not set public claims group'
+    end
+
     context 'when canvas course id extension disabled' do
       let(:opts) { super().merge({extension_blacklist: [:canvas_course_id]}) }
 
       it_behaves_like 'sets picture'
-      it_behaves_like 'sets role scope mentor'
 
       context 'extensions' do
         context 'when context is a course' do
@@ -717,7 +723,6 @@ describe Lti::Messages::JwtMessage do
       let(:opts) { super().merge({extension_blacklist: [:canvas_workflow_state]}) }
 
       it_behaves_like 'sets picture'
-      it_behaves_like 'sets role scope mentor'
 
       context 'extensions' do
         context 'when context is a course' do
@@ -737,7 +742,6 @@ describe Lti::Messages::JwtMessage do
       let(:opts) { super().merge({extension_blacklist: [:lis_course_offering_sourcedid]}) }
 
       it_behaves_like 'sets picture'
-      it_behaves_like 'sets role scope mentor'
 
       context 'extensions' do
         context 'when context is a course' do
@@ -757,7 +761,6 @@ describe Lti::Messages::JwtMessage do
       let(:opts) { super().merge({extension_blacklist: [:canvas_account_id]}) }
 
       it_behaves_like 'sets picture'
-      it_behaves_like 'sets role scope mentor'
 
       context 'extensions' do
         context 'when context is a course' do
@@ -777,7 +780,6 @@ describe Lti::Messages::JwtMessage do
       let(:opts) { super().merge({extension_blacklist: [:canvas_account_sis_id]}) }
 
       it_behaves_like 'sets picture'
-      it_behaves_like 'sets role scope mentor'
 
       context 'extensions' do
         context 'when context is a course' do
@@ -791,6 +793,45 @@ describe Lti::Messages::JwtMessage do
           it_behaves_like 'skips the canvas account sis id'
         end
       end
+    end
+  end
+
+  describe 'mentorship claims' do
+    before { tool.update!(workflow_state: 'public') }
+
+    shared_examples 'sets role scope mentor' do
+      it 'adds role scope mentor' do
+        course
+        observer = user_factory
+        observer.update!(lti_context_id: SecureRandom.uuid)
+        observer_enrollment = course.enroll_user(observer, 'ObserverEnrollment')
+        observer_enrollment.update_attribute(:associated_user_id, user.id)
+        allow(jwt_message).to receive(:current_observee_list).and_return([observer.lti_context_id])
+
+        expect(decoded_jwt['https://purl.imsglobal.org/spec/lti/claim/role_scope_mentor']).to match_array [
+          observer.lti_context_id
+        ]
+      end
+    end
+
+    shared_examples 'skips role scope mentor' do
+      it 'does not add role scope mentor' do
+        expect(decoded_jwt).not_to include 'https://purl.imsglobal.org/spec/lti/claim/role_scope_mentor'
+      end
+    end
+
+    it_behaves_like 'sets role scope mentor'
+
+    context 'when mentorship claim group disabled' do
+      let(:opts) { super().merge({claim_group_blacklist: [:mentorship]}) }
+
+      it_behaves_like 'skips role scope mentor'
+    end
+
+    context 'when tool privacy policy does not allow mentorship claim release' do
+      before { tool.update!(workflow_state: 'name_only') }
+
+      it_behaves_like 'skips role scope mentor'
     end
   end
 

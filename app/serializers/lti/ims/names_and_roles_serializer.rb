@@ -88,7 +88,7 @@ module Lti::Ims
       {
         status: 'Active',
         name: (enrollment.user.name if page[:tool].include_name?),
-        picture: (enrollment.user.avatar_image_url if page[:tool].public?),
+        picture: (enrollment.user.avatar_url if page[:tool].public?),
         given_name: (enrollment.user.first_name if page[:tool].include_name?),
         family_name: (enrollment.user.last_name if page[:tool].include_name?),
         email: (enrollment.user.email if page[:tool].include_email?),
@@ -118,7 +118,8 @@ module Lti::Ims
           return_url: nil,
           opts: {
             # See #variable_expander for additional constraints on custom param expansion
-            claim_group_whitelist: [ :custom_params, :i18n ]
+            claim_group_whitelist: [ :public, :i18n, :custom_params ],
+            extension_whitelist: [ :canvas_user_id, :canvas_user_login_id ]
           }
         ).generate_post_payload_message
       ensure
@@ -126,8 +127,10 @@ module Lti::Ims
         Time.zone = orig_time_zone
       end
 
-      # One straggler field we can't readily control via white/blacklists
-      launch_hash = launch.to_h.except!("#{LtiAdvantage::Serializers::JwtMessageSerializer::IMS_CLAIM_PREFIX}version")
+      # A few straggler fields we can't readily control via white/blacklists
+      launch_hash = launch.to_h.
+        except!("#{LtiAdvantage::Serializers::JwtMessageSerializer::IMS_CLAIM_PREFIX}version").
+        except!("picture")
       { message: [ launch_hash ] }
     end
 

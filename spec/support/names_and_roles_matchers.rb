@@ -83,34 +83,45 @@ module Lti::Ims::NamesAndRolesMatchers
     SisPseudonym.for(user, Account.default, type: :trusted, require_sis: false)&.sis_user_id
   end
 
-  def expected_base_membership(user, privacy_level)
-    privacy_level = privacy_level.presence || 'public'
+  # Special defaulting as compared to #expected_sourced_id b/c that field is effectively NRPS-only and has special
+  # logic in NamesAndRolesSerializer to just suppress the field if it's either disallowed or blank. But here, for
+  # login ID, we're verifying existing extension rendering behaviors which rely on `$Canvas.user.loginId` expansion
+  # which is guarded by a rule that requires a SIS Pseudonym. So even though the expansion might be _allowed_, if the
+  # expanded field is blank, you'll get the custom param echoed back. (This way we get symmetry between NRPS and
+  # LTI launches for this particular field.)
+  def expected_login_id_extension(user)
+    SisPseudonym.for(user, Account.default, type: :trusted, require_sis: false)&.unique_id.presence || '$Canvas.user.loginId'
+  end
+
+  def expected_base_membership(user, opts)
     {
       'status' => 'Active',
-      'name' => (user.name if %w(public name_only).include?(privacy_level)),
-      'picture' => (user.avatar_image_url if privacy_level == 'public'),
-      'given_name' => (user.first_name if %w(public name_only).include?(privacy_level)),
-      'family_name' => (user.last_name if %w(public name_only).include?(privacy_level)),
-      'email' => (user.email if %w(public email_only).include?(privacy_level)),
-      'lis_person_sourcedid' => (expected_sourced_id(user) if %w(public name_only).include?(privacy_level)),
+      'name' => (user.name if %w(public name_only).include?(privacy(opts))),
+      'picture' => (user.avatar_url if privacy(opts) == 'public'),
+      'given_name' => (user.first_name if %w(public name_only).include?(privacy(opts))),
+      'family_name' => (user.last_name if %w(public name_only).include?(privacy(opts))),
+      'email' => (user.email if %w(public email_only).include?(privacy(opts))),
+      'lis_person_sourcedid' => (expected_sourced_id(user) if %w(public name_only).include?(privacy(opts))),
       'user_id' => expected_lti_id(Lti::Ims::Providers::MembershipsProvider.unwrap(user))
     }.compact
   end
 
-  def expected_message_array(message_matcher, user)
+  def expected_message_array(user, opts)
     [
       {
         'https://purl.imsglobal.org/spec/lti/claim/message_type' => 'LtiResourceLinkRequest',
         'locale' => (user.locale || I18n.default_locale.to_s),
-        'https://purl.imsglobal.org/spec/lti/claim/custom' => {}
-      }.merge!(message_matcher.presence || {})
+        'https://purl.imsglobal.org/spec/lti/claim/custom' => {},
+        'https://www.instructure.com/canvas_user_id' => user.id,
+        'https://www.instructure.com/canvas_user_login_id' => (expected_login_id_extension(user) if privacy(opts) == 'public')
+      }.merge!(opts[:message_matcher].presence || {}).compact
     ]
   end
 
   def expected_context_membership(user, roles_matcher, opts)
-    expected_base_membership(user, opts[:privacy_level]).
+    expected_base_membership(user, opts).
       merge!('roles' => roles_matcher.call).
-      merge('message' => opts[:message_matcher] ? match_array(expected_message_array(opts[:message_matcher], user)) : nil).
+      merge('message' => opts[:message_matcher] ? match_array(expected_message_array(user, opts)) : nil).
       compact
   end
 
@@ -128,6 +139,10 @@ module Lti::Ims::NamesAndRolesMatchers
       -> { match_array(expected_group_lti_roles(opts[:expected])) },
       opts
     )
+  end
+
+  def privacy(opts)
+    opts[:privacy_level].presence || 'public'
   end
 
   RSpec::Matchers.define :be_lti_course_membership_context do |expected|

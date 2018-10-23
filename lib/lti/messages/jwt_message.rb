@@ -34,6 +34,7 @@ module Lti::Messages
     def generate_post_payload_message
       add_security_claims! if include_claims?(:security)
       add_public_claims! if @tool.public? && include_claims?(:public)
+      add_mentorship_claims! if @tool.public? && include_claims?(:mentorship)
       add_include_email_claims! if @tool.include_email? && include_claims?(:email)
       add_include_name_claims! if @tool.include_name? && include_claims?(:name)
       add_resource_claims! if include_claims?(:resource)
@@ -117,7 +118,6 @@ module Lti::Messages
 
     def add_public_claims!
       @message.picture = @user.avatar_url
-      @message.role_scope_mentor = current_observee_list if current_observee_list.present?
       add_extension('canvas_user_id', '$Canvas.user.id')
       add_extension('canvas_user_login_id', '$Canvas.user.loginId')
       add_extension('canvas_api_domain', '$Canvas.api.domain')
@@ -130,6 +130,10 @@ module Lti::Messages
         add_extension('canvas_account_id', '$Canvas.account.id')
         add_extension('canvas_account_sis_id', '$Canvas.account.sisSourceId')
       end
+    end
+
+    def add_mentorship_claims!
+      @message.role_scope_mentor = current_observee_list if current_observee_list.present?
     end
 
     def add_resource_claims!
