@@ -79,6 +79,7 @@ module Lti::Ims::Providers
             Person.sourcedId
             Message.locale
             vnd.Canvas.Person.email.sis
+            Person.email.primary
           )
         }
       )

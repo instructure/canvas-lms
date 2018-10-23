@@ -188,6 +188,7 @@ describe Lti::Ims::NamesAndRolesController do
             person_sourced_id: '$Person.sourcedId',
             message_locale: '$Message.locale',
             vnd_canvas_person_email_sis: '$vnd.Canvas.Person.email.sis',
+            person_email_primary: '$Person.email.primary',
             unsupported_param_1: '$unsupported.param.1',
             unsupported_param_2: '$unsupported.param.2'
           }
@@ -241,6 +242,7 @@ describe Lti::Ims::NamesAndRolesController do
                 'person_sourced_id' => 'user-1-sis-user-id-2',
                 'message_locale' => 'de',
                 'vnd_canvas_person_email_sis' => 'sis@example.com',
+                'person_email_primary' => 'marta.perkins@school.edu',
                 'unsupported_param_1' => '$unsupported.param.1',
                 'unsupported_param_2' => '$unsupported.param.2'
               }
