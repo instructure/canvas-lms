@@ -90,14 +90,27 @@
   <% if @domain_root_account.self_registration_type == 'observer' %>
     <% js_env :ACCOUNT => account_json(@domain_root_account, nil, session, ['registration_settings']),
               :PASSWORD_POLICY => @domain_root_account.password_policy %>
-    <div id='coenrollment_link'>
+    <div id='coenrollment_link' class='enrollment_link'>
       <div class="ic-Login__banner-title">
         <%= t('Parent of a Canvas User?') %>
       </div>
       <%= link_to '#',
           :class => "ic-Login__link ic-Login__register-banner ic-Login__banner-subtitle",
-          data: reg_link_data(@domain_root_account.parent_auth_type)  do %>
+          data: reg_link_data(nil)  do %>
         <%= t('Create Account') %>
+      <% end %>
+    </div>
+  <% else %>
+    <div class='enrollment_link'>
+      <%= link_to Setting.get("registration_link", "/register_from_website"),
+                  :id => 'register_link',
+                  :class => "ic-Login__link ic-Login__register-banner" do %>
+        <div class="ic-Login__banner-title">
+          <%= t('Need a Canvas Account?') %>
+        </div>
+        <div class="ic-Login__banner-subtitle">
+          <%= t("Click Here, It's Free!") %>
+        </div>
       <% end %>
     </div>
   <% end %>
