@@ -55,7 +55,7 @@ export default class AppFilters extends React.Component {
   }
 
   render() {
-    const activeFilter = this.state.filter || 'all'
+    const activeFilter = store.getState().filter || 'all'
     return (
       <div className="AppFilters">
         <div className="content-box">
