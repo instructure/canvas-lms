@@ -25,12 +25,6 @@ xsslint jqueryObject.identifier dragObject current_item
 
 export default class NavigationView extends Backbone.View {
   static initClass() {
-    this.prototype.keyCodes = {
-      32: 'Space',
-      38: 'UpArrow',
-      40: 'DownArrow'
-    }
-
     this.prototype.events = {
       'click .disable_nav_item_link': 'disableNavLink',
       'click .move_nav_item_link': 'moveNavLink',
@@ -102,108 +96,8 @@ export default class NavigationView extends Backbone.View {
   }
 
   afterRender() {
-    this.keyCodes = typeof Object.freeze === 'function' ? Object.freeze(this.keyCodes) : undefined
-    $('li.navitem').on('keydown', this.onKeyDown)
     $('#navigation_tab').on('blur', this.focusKeyboardHelp)
     $('.drag_and_drop_warning').on('blur', this.hideKeyboardHelp)
-  }
-
-  onKeyDown = e => {
-    const $target = $(e.target)
-    const fn = `on${this.keyCodes[e.keyCode]}Key`
-    if (this[fn]) {
-      return this[fn].call(this, e, $target) && e.preventDefault()
-    }
-  }
-
-  // Internal: move to the previous element
-  // or up to the enabled list if at the top of the disabled list
-  // returns nothing
-  onUpArrowKey(e, $target) {
-    let prev = $target.prev('li.navitem')
-
-    if (this.empty(prev)) {
-      prev = $target.children('li.navitem').first()
-    }
-
-    if (this.empty(prev) && this.disabled($target)) {
-      prev = this.$enabled_list.children('li.navitem').last()
-
-      if (this.empty(prev)) {
-        prev = this.$enabled_list
-        prev.attr('tabindex', 0)
-        prev.bind('keydown', this.onKeyDown)
-      }
-    }
-
-    return prev.focus()
-  }
-
-  // Internal: move to the next element
-  // or down to the disabled list if at the bottom of the enabled list
-  // returns nothing
-  onDownArrowKey(e, $target) {
-    let next = $target.next('li.navitem')
-
-    if (this.empty(next)) {
-      next = $target.children('li.navitem').first()
-    }
-
-    if (this.empty(next) && this.enabled($target)) {
-      next = this.$disabled_list.children('li.navitem').first()
-
-      if (this.empty(next)) {
-        next = this.$disabled_list
-        next.attr('tabindex', -1)
-        next.bind('keydown', this.onKeyDown)
-      }
-    }
-
-    return next.focus()
-  }
-
-  // Internal: mark the current element to begin dragging
-  // or drop the current element
-  // returns nothing
-  onSpaceKey(e, $target) {
-    let dragObject
-    if ((dragObject = this.$el.data('drag'))) {
-      if (!$target.is(dragObject)) {
-        // drop
-        if ($target.is('li.navitem')) {
-          $target.after(dragObject)
-        } else {
-          $target.append(dragObject)
-          $target.attr('tabindex', -1)
-          $target.unbind('keydown')
-        }
-      }
-
-      dragObject.attr('aria-grabbed', false)
-      this.$el.data('drag', null)
-      return dragObject.focus()
-    } else if ($target.is('li.navitem')) {
-      $target.attr('aria-grabbed', true)
-      dragObject = $target
-      this.$el.data('drag', dragObject)
-      dragObject.blur()
-      return dragObject.focus()
-    }
-  }
-
-  // Internal: returns whether the selector is empty
-  empty(selector) {
-    return selector.length === 0
-  }
-
-  // Internal: returns whether the element is inside the enabled list
-  enabled(el) {
-    return el.parent().attr('id') === this.$enabled_list.attr('id')
-  }
-
-  // Internal: returns whether the element is inside the enabled list
-  disabled(el) {
-    return el.parent().attr('id') === this.$disabled_list.attr('id')
   }
 }
 NavigationView.initClass()

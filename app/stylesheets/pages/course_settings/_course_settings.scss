@@ -220,7 +220,7 @@ ul.user_list div.enrollment_type.pending {
     padding: direction-sides(4px 0 4px 25px);
     border: solid $section_tabs_border_bottom_color;
     border-width: 0 1px 1px;
-    &:hover, &:focus {
+    &:hover {
       background-color: $section_tabs_hover_background_color;
       z-index: 0;
       position: static;
