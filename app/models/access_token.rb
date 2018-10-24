@@ -43,7 +43,6 @@ class AccessToken < ActiveRecord::Base
 
   scope :active, -> { not_deleted.where("expires_at IS NULL OR expires_at>?", DateTime.now.utc) }
   scope :not_deleted, -> { where(:workflow_state => "active") }
-  scope :visible, -> { joins(:developer_key).where('developer_keys.internal_service is not true') }
 
   TOKEN_SIZE = 64
 
@@ -85,6 +84,10 @@ class AccessToken < ActiveRecord::Base
 
   def self.all_hashed_tokens(token)
     Canvas::Security.encryption_keys.map { |key| Canvas::Security.hmac_sha1(token, key) }
+  end
+
+  def self.visible_tokens(tokens)
+    tokens.reject { |token| token.developer_key.internal_service }
   end
 
   def usable?(token_key = :crypted_token)

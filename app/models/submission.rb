@@ -62,7 +62,8 @@ class Submission < ActiveRecord::Base
   attr_readonly :assignment_id
   attr_accessor :visible_to_user,
                 :skip_grade_calc,
-                :grade_posting_in_progress
+                :grade_posting_in_progress,
+                :score_unchanged
   attr_writer :versioned_originality_reports,
               :text_entry_originality_reports
   # This can be set to true to force late policy behaviour that would
@@ -2499,8 +2500,8 @@ class Submission < ActiveRecord::Base
               assignment.grade_student(user, :grader => grader,
                                        :grade => user_data[:posted_grade],
                                        :excuse => Canvas::Plugin.value_to_boolean(user_data[:excuse]),
-                                       :skip_grade_calc => true)
-            submissions.each { |s| graded_user_ids << s.user_id }
+                                       :skip_grade_calc => true, :return_if_score_unchanged => true)
+            submissions.each { |s| graded_user_ids << s.user_id unless s.score_unchanged }
             submission = submissions.first
           end
           submission.user = user
@@ -2550,8 +2551,10 @@ class Submission < ActiveRecord::Base
   ensure
     context.touch_admins_later
     user_ids = graded_user_ids.to_a
-    Rails.logger.debug "GRADES: recomputing scores in course #{context.id} for users #{user_ids} because of bulk submission update"
-    context.recompute_student_scores(user_ids)
+    if user_ids.any?
+      Rails.logger.debug "GRADES: recomputing scores in course #{context.id} for users #{user_ids} because of bulk submission update"
+      context.recompute_student_scores(user_ids)
+    end
   end
 
   def submission_status

@@ -2197,7 +2197,7 @@ nb-x-k12:
   assignment_assignment_submission_paper_view_8a4c9776: "Oppgaver %{assignment} innlevering Papirvisning"
   assignment_assignment_submission_plain_text_view_b217d372: "Oppgaver %{assignment} innlevering ren tekstvisning"
   assignment_comments_e43ed898: "Kommentarer til oppgaven"
-  assignment_created_assignment_name_course_name_324a5639: "Oppdraget Laget - %{assignment_name}, %{course_name}"
+  assignment_created_assignment_name_course_name_324a5639: "Ny oppgave - %{assignment_name}, %{course_name}"
   assignment_d8387b78: Oppgave
   assignment_details_collapsed_55b67150: "oppgavedetaljer sammentrukket"
   assignment_details_dialog: 
@@ -6521,7 +6521,7 @@ nb-x-k12:
   dominican_republic_1_3cef4021: "Dominikanske Republikk (+ 1)"
   don_t_add_this_user_for_now_32912974: "Ikke legg til denne brukeren nå."
   don_t_move_lti_query_params_to_post_body_5c80e037: "Ikke flytt LTI spørreparametere til POST-Body"
-  don_t_post_outcomes_results_to_learning_mastery_gr_d0b85a19: "Ikke legg ut resultater fra mål til oversikt over læringsmestringsvurderinger"
+  don_t_post_outcomes_results_to_learning_mastery_gr_d0b85a19: "Ikke vis i oversikten over måloppnåelse"
   done_54e3d4b6: Ferdig
   done_8af51c9b: Ferdig.
   done_editing_9f7379d9: "Ferdig med redigering."
@@ -8623,7 +8623,7 @@ nb-x-k12:
   importing_name_8f2b131d: "Importerer «%{name}»"
   importing_outcomes_e62a0375: "importerer mål"
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "For å fullføre prosessen blir du omdirigert til en påloggingsside der du vil trenge og logge inn med ditt barns opplysninger."
-  in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: "For å kunne importere en stor mengde mål samtidig, eller oppdatere eksisterende mål, *følg CSV-formatet*."
+  in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: "*Bruk CSV-formatet* for å importere eller oppdatere en stor mengde mål samtidig."
   in_progress_9d1ce8b9: Pågår
   inactive_cd40317f: inaktiv
   inactive_enrollments_3b84be3d: "Inaktive innskrivninger"
@@ -12027,7 +12027,7 @@ nb-x-k12:
         outcome: Mål
   outcomes_and_rubrics_account_course_68d0bf1d: "Mål og vurderingskriterier (konto/fag)"
   outcomes_and_rubrics_f893d141: "Mål og vurderingskriterier"
-  outcomes_are_created_here_to_track_mastery_in_a_co_2f487549: "Resultater opprettes her for å spore mål i et fag. For å komme i gang, se menylinjen langs toppen. Klikk på Nytt resultat for å opprette et nytt resultat, eller Ny gruppe for å opprette en ny gruppe der du kan organisere resultater. Finn-knappen lar deg bruke resultater som allerede har blitt opprettet i institusjonen. Ettersom du oppretter og bruker resultater kan du bruke panelet til venstre å navigere gjennom resultater. Du kan dra og slippe resultater mellom de forskjellige nivåene for å lage en struktur."
+  outcomes_are_created_here_to_track_mastery_in_a_co_2f487549: "Mål opprettes her for å spore måloppnåelse i et fag. For å komme i gang, se menylinjen langs toppen. Klikk på Nytt mål-knappen for å opprette et nytt mål, eller Ny gruppe for å opprette en ny gruppe der du kan organisere resultater. Finn-knappen lar deg hente mål som allerede er opprettet av institusjonen din. Når du oppretter og bruker mål, finner du dem i panelet til venstre. Du kan dra og slippe målene mellom de ulike nivåene for å lage en struktur."
   outcomes_csv_format_9005acfb: "Mål CSV-format"
   outcomes_d1b18d33: Mål
   outcomes_import_completed_baff5cb0: "Fullført import av mål"
@@ -12662,7 +12662,7 @@ nb-x-k12:
       Aspire (SIS2000), JMC, og eventuelle andre SIF-aktivert SIS som aksepterer SIF elementer GradingCategory,
       GradingAssignment, GradingAssignmentScore.
   post_to_961f8937: "Post til"
-  posted_on_e1010e1e: "Postet på:"
+  posted_on_e1010e1e: "Lagt ut"
   powerschool_a30f0bfc: PowerSchool
   practice_quiz_19a8505d: "Test uten vurdering"
   pre_processing_92865c1d: Forbehandling
@@ -13669,7 +13669,7 @@ nb-x-k12:
         explanation: 
           generate_possible_solutions: "Til slutt, lag så mange variabler av løsningskombinasjoner som du trenger i testen din."
         explanations: 
-          calculated: "Skriv inn spørsmålet ditt, lag en formel, og generer et sett av mulige svarkombinasjoner. Elevene vil se spørsmålet med et tilfeldig utvalgt sett av variabler fylt inn, og må skrive inn det riktige svarnummeret."
+          calculated: "Skriv inn spørsmålet ditt, lag en formel, og generer et sett av mulige svarkombinasjoner. Elevene vil se spørsmålet med et tilfeldig utvalgt sett av variabler fylt inn, og må skrive inn det riktige tallsvaret."
           equations: "Du kan definere variabler ved å skrive inn variabelnavn omgitt av parenteser."
           essay: "Elevene blir gitt ett tekstfelt for å utarbeide sitt svar."
           file_upload: "Elevene vil kunne svare ved å laste opp en fil."
@@ -15439,7 +15439,7 @@ nb-x-k12:
       buttons: 
         create: "Opprett vurderingskriterier"
       defaults: 
-        rubric_title: "En vurderingskriterier"
+        rubric_title: "En vurderingskriterium"
       headers: 
         criteria: Kriterier
         points: Poeng

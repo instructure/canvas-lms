@@ -141,7 +141,7 @@ export default class FilePreview extends React.PureComponent {
 
   getNavigationParams = (opts = {id: null, except: []}) => {
     const obj = {
-      preview: opts.id ? opts.id : undefined,
+      preview: opts && opts.id,
       search_term: this.props.query.search_term ? this.props.query.search_term : undefined,
       only_preview: this.state.otherItemsString ? this.state.otherItemsString : undefined,
       sort: this.props.query.sort ? this.props.query.sort : undefined,
@@ -216,6 +216,9 @@ export default class FilePreview extends React.PureComponent {
       direction === 'left'
         ? CollectionHandler.getPreviousInRelationTo(this.state.otherItems, this.state.displayedItem)
         : CollectionHandler.getNextInRelationTo(this.state.otherItems, this.state.displayedItem)
+    if (!nextItem) {
+      return null
+    }
 
     const linkText = direction === 'left' ? I18n.t('View previous file') : I18n.t('View next file')
     const baseUrl = page.base()
@@ -223,7 +226,7 @@ export default class FilePreview extends React.PureComponent {
       <div className="col-xs-1 ef-file-arrow_container">
         <a
           href={`${baseUrl}${this.getRouteIdentifier()}?${$.param(
-            this.getNavigationParams(nextItem ? {id: nextItem.id} : null)
+            this.getNavigationParams({id: nextItem.id})
           )}`}
           className="ef-file-preview-container-arrow-link"
         >

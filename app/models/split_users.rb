@@ -232,7 +232,7 @@ class SplitUsers
 
         (ids_by_shard.keys + other_ids_by_shard.keys).uniq.each do |shard|
           ids = ids_by_shard[shard] || []
-          other_ids = ids_by_shard[shard] || []
+          other_ids = other_ids_by_shard[shard] || []
           shard.activate do
             model.transaction do
               # there is a unique index on assignment_id and user_id or quiz_id

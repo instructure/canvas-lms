@@ -110,6 +110,7 @@ module Lti
     ].freeze
 
     skip_before_action :load_user
+    skip_before_action :verify_authenticity_token
     before_action :authorized_lti2_tool
     before_action :attachment_in_context, only: [:create]
     before_action :find_originality_report
