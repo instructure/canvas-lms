@@ -58,31 +58,31 @@ module Lti::Ims::Providers
       else
         # Non-active students get an active ('submitted') Submission, so join on base_users_scope to narrow down
         # Submissions to only active students.
-        students_scope = base_users_scope.where(enrollments: {type: student_lti_roles})
+        students_scope = base_users_scope.where(enrollments: {type: student_queryable_roles})
         narrowed_students_scope = students_scope.where(correlated_assignment_submissions('users.id').exists)
         # If we only care about students, this scope is sufficient and can avoid the ugly union down below
         return narrowed_students_scope if filter_non_students?
 
-        non_students_scope = apply_role_filter(base_users_scope.where.not(enrollments: {type: student_lti_roles}))
+        non_students_scope = apply_role_filter(base_users_scope.where.not(enrollments: {type: student_queryable_roles}))
         non_students_scope.union(narrowed_students_scope).distinct.order(:id).select(:id)
       end
     end
 
-    def student_lti_roles
-      Lti::SubstitutionsHelper::INVERTED_LIS_ADVANTAGE_ROLE_MAP['http://purl.imsglobal.org/vocab/lis/v2/membership#Learner']
+    def student_queryable_roles
+      queryable_roles('http://purl.imsglobal.org/vocab/lis/v2/membership#Learner')
     end
 
     def filter_students?
-      role? && (student_lti_roles != lti_roles)
+      role? && (student_queryable_roles != queryable_roles(role))
     end
 
     def filter_non_students?
-      role? && (student_lti_roles == lti_roles)
+      role? && (student_queryable_roles == queryable_roles(role))
     end
 
     def apply_role_filter(scope)
       return scope unless role?
-      enrollment_types = lti_roles
+      enrollment_types = queryable_roles(role)
       enrollment_types.present? ? scope.where(enrollments: { type: enrollment_types }) : scope.none
     end
 
@@ -123,7 +123,7 @@ module Lti::Ims::Providers
       end
 
       def lti_roles
-        @_lti_roles ||= enrollments.map { |e| Lti::SubstitutionsHelper::LIS_ADVANTAGE_ROLE_MAP[e.class] }.compact.flatten.uniq
+        @_lti_roles ||= enrollments.map { |e| Lti::SubstitutionsHelper::LIS_V2_LTI_ADVANTAGE_ROLE_MAP[e.class] }.compact.flatten.uniq
       end
     end
 

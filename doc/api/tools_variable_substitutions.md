@@ -710,6 +710,7 @@ returns the context ids for the groups the user belongs to in the course.
 ```
 ## Membership.role
 Returns the [IMS LTI membership service](https://www.imsglobal.org/specs/ltimemv1p0/specification-3) roles for filtering via query parameters.
+Or, for LTI 1.3 tools, returns the [IMS LTI Names and Role Provisioning Service](https://www.imsglobal.org/spec/lti-nrps/v2p0) roles for filtering via query parameters.
 
 **Availability**: *when launched by a logged in user*  
 **Launch Parameter**: *roles*  

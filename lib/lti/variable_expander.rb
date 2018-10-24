@@ -572,7 +572,7 @@ module Lti
     #   http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student
     #   ```
     register_expansion 'com.Instructure.membership.roles', [],
-                       -> { lti_helper.current_canvas_roles_lis_v2 },
+                       -> { lti_helper.current_canvas_roles_lis_v2(lti_1_3? ? 'lti1_3' : 'lis2')},
                        ROLES_GUARD,
                        default_name: 'com_instructure_membership_roles'
 
@@ -784,13 +784,14 @@ module Lti
                        -> { @current_user && @context.is_a?(Course) }
 
     # Returns the [IMS LTI membership service](https://www.imsglobal.org/specs/ltimemv1p0/specification-3) roles for filtering via query parameters.
+    # Or, for LTI 1.3 tools, returns the [IMS LTI Names and Role Provisioning Service](https://www.imsglobal.org/spec/lti-nrps/v2p0) roles for filtering via query parameters.
     # @launch_parameter roles
     # @example
     #   ```
     #   http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator
     #   ```
     register_expansion 'Membership.role', [],
-                       -> { lti_helper.all_roles('lis2') },
+                       -> { lti_helper.all_roles(lti_1_3? ? 'lti1_3' : 'lis2') },
                        USER_GUARD,
                        default_name: 'roles'
 
@@ -1236,6 +1237,10 @@ module Lti
         substring = "${#{match}}"
         v.gsub(substring, (self[match] || substring).to_s)
       end
+    end
+
+    def lti_1_3?
+      @tool && @tool.respond_to?(:use_1_3?) && @tool.use_1_3?
     end
   end
 end

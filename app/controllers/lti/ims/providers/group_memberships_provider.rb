@@ -47,7 +47,7 @@ module Lti::Ims::Providers
 
     def apply_role_filter(scope)
       return scope unless role?
-      enrollment_types = lti_roles
+      enrollment_types = queryable_roles(role)
       if enrollment_types.present? && group_role?(enrollment_types)
         enrollment_types == [:group_leader] ? scope.where(user: context.leader_id) : scope
       else scope.none
@@ -95,11 +95,11 @@ module Lti::Ims::Providers
       private
 
       def group_leader_role_urns
-        Lti::SubstitutionsHelper::LIS_ADVANTAGE_ROLE_MAP[:group_leader]
+        Lti::SubstitutionsHelper::LIS_V2_LTI_ADVANTAGE_ROLE_MAP[:group_leader]
       end
 
       def group_member_role_urns
-        Lti::SubstitutionsHelper::LIS_ADVANTAGE_ROLE_MAP[:group_member]
+        Lti::SubstitutionsHelper::LIS_V2_LTI_ADVANTAGE_ROLE_MAP[:group_member]
       end
     end
 

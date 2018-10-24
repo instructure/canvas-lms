@@ -155,6 +155,35 @@ module Lti
         expect(roles.split(',')).to match_array expected_roles
       end
 
+      it 'converts multiple roles for lti 1.3' do
+        allow(subject).to receive(:course_enrollments).and_return([StudentEnrollment.new, TeacherEnrollment.new, DesignerEnrollment.new, ObserverEnrollment.new, TaEnrollment.new, AccountUser.new])
+        allow(user).to receive(:roles).and_return(['user', 'student', 'teacher', 'admin'])
+        roles = subject.all_roles('lti1_3')
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/system/person#User'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Instructor'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/membership#ContentDeveloper'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/membership#Mentor'
+        expect(roles).to include 'http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#TeachingAssistant' # only difference btwn lis2 and lti1_3 modes
+      end
+
+      it "returns none if no user for lti 1.3" do
+        helper = SubstitutionsHelper.new(course, root_account, nil)
+        expect(helper.all_roles('lti1_3')).to eq 'http://purl.imsglobal.org/vocab/lis/v2/system/person#None'
+      end
+
+      it "includes main and subrole for TeachingAssistant for lti 1.3" do
+        allow(subject).to receive(:course_enrollments).and_return([TaEnrollment.new])
+        roles = subject.all_roles('lti1_3')
+        expected_roles = ["http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#TeachingAssistant", # only difference btwn lis2 and lti1_3 modes
+                          "http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor",
+                          "http://purl.imsglobal.org/vocab/lis/v2/system/person#User"]
+        expect(roles.split(',')).to match_array expected_roles
+      end
+
       it 'does not include admin role if user has a sub-account admin user record in deleted account' do
         sub_account = account.sub_accounts.create!
         sub_account.account_users.create!(user: user, role: admin_role)
@@ -311,6 +340,38 @@ module Lti
         roles = subject.current_canvas_roles_lis_v2
 
         expect(roles).to eq 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner'
+      end
+
+      it 'can be directed to use the LIS 2 role map' do
+        set_up_persistance!
+
+        ta_in_course(user: user, course: course, active_enrollment: true)
+        course_with_designer(user: user, course: course, active_enrollment: true)
+        account_admin_user(user: user, account: account)
+        roles = subject.current_canvas_roles_lis_v2('lis2')
+
+        expect(roles.split(',')).to match_array [
+          "http://purl.imsglobal.org/vocab/lis/v2/membership#ContentDeveloper",
+          "http://purl.imsglobal.org/vocab/lis/v2/membership/instructor#TeachingAssistant", # only difference btwn lis2 and lti1_3 modes
+          "http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor",
+          "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator"
+        ]
+      end
+
+      it 'can be directed to use the LTI 1.3 role map' do
+        set_up_persistance!
+
+        ta_in_course(user: user, course: course, active_enrollment: true)
+        course_with_designer(user: user, course: course, active_enrollment: true)
+        account_admin_user(user: user, account: account)
+        roles = subject.current_canvas_roles_lis_v2('lti1_3')
+
+        expect(roles.split(',')).to match_array [
+          "http://purl.imsglobal.org/vocab/lis/v2/membership#ContentDeveloper",
+          "http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#TeachingAssistant", # only difference btwn lis2 and lti1_3 modes
+          "http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor",
+          "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator"
+        ]
       end
     end
 
