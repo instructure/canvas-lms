@@ -86,6 +86,12 @@ describe 'ToDoListPresenter' do
       expect(presenter.needs_grading.map(&:title)).to contain_exactly('assignment1', 'assignment2')
     end
 
+    it 'does not explode if the teacher is also a cross-shard site admin' do
+      expect_any_instantiation_of(grader).to receive(:roles).and_return(['consortium_admin'])
+      presenter = ToDoListPresenter.new(nil, grader, nil)
+      expect(presenter.needs_grading.map(&:title)).to contain_exactly('assignment1', 'assignment2')
+    end
+
     it 'doesnt returns for assignments that need grading for a teacher that isnt a grader' do
       RoleOverride.create!(:context => course1.account,
                            :permission => 'manage_grades',
