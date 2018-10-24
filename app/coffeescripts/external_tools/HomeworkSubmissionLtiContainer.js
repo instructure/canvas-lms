@@ -91,21 +91,22 @@ export default class HomeworkSubmissionLtiContainer {
       displayAsModal: false
     })
 
-    returnView.on('ready', data => {
-      tool = this.model // this will return the model from returnView
-      const homeworkSubmissionView = this.createHomeworkSubmissionView(tool, data)
-      homeworkSubmissionView.parentView = this
-
-      this.remove()
-      $(`#submit_from_external_tool_form_${tool.get('id')}`).append(homeworkSubmissionView.el)
-
-      this.cleanupViewsForTool(tool)
-      this.renderedViews[tool.get('id')].push(homeworkSubmissionView)
-      homeworkSubmissionView.render()
-      $('input.turnitin_pledge').click(e =>
-        recordEulaAgreement('#eula_agreement_timestamp', e.target.checked)
-      )
-    })
+    returnView.on('ready', (function(_this) {
+      return function(data) {
+        var homeworkSubmissionView;
+        tool = this.model; // this will return the model from returnView
+        homeworkSubmissionView = _this.createHomeworkSubmissionView(tool, data);
+        homeworkSubmissionView.parentView = _this;
+        this.remove();
+        $('#submit_from_external_tool_form_' + tool.get('id')).append(homeworkSubmissionView.el);
+        _this.cleanupViewsForTool(tool);
+        _this.renderedViews[tool.get('id')].push(homeworkSubmissionView);
+        homeworkSubmissionView.render();
+        return $('input.turnitin_pledge').click(function(e) {
+          return SubmitAssignmentHelper.recordEulaAgreement('#eula_agreement_timestamp', e.target.checked);
+        });
+      };
+    })(this));
 
     returnView.on('cancel', data => {})
 
