@@ -99,7 +99,7 @@ describe Lti::Messages::JwtMessage do
 
   describe 'security claims' do
     it 'sets the "aud" claim' do
-      expect(decoded_jwt['aud']).to eq developer_key.global_id
+      expect(decoded_jwt['aud']).to eq developer_key.global_id.to_s
     end
 
     it 'sets the "deployment_id" claim' do
