@@ -1,0 +1,2 @@
+module MagicFieldSchemaHelper
+end
