@@ -40,7 +40,7 @@ module BroadcastPolicies
     def should_dispatch_submission_needs_grading?
       !quiz.survey? &&
       quiz_is_accepting_messages_for_admin? &&
-      quiz_submission.pending_review? &&
+      quiz_submission.changed_state_to(:pending_review) &&
       user_has_visibility?
     end
 

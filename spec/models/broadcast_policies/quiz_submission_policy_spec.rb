@@ -92,7 +92,9 @@ module BroadcastPolicies
     end
 
     describe '#should_dispatch_submission_needs_grading?' do
-      before { allow(quiz_submission).to receive(:pending_review?).and_return true }
+      before do
+        allow(quiz_submission).to receive(:changed_state_to).with(:pending_review).and_return true
+      end
       def wont_send_when
         yield
         expect(policy.should_dispatch_submission_needs_grading?).to be_falsey
@@ -103,18 +105,21 @@ module BroadcastPolicies
       end
 
       it "is true when quiz is muted" do
-        allow(quiz_submission).to receive(:pending_review?).and_return true
         allow(quiz).to receive(:muted?).and_return true
         expect(policy.should_dispatch_submission_needs_grading?).to eq true
       end
 
-      specify { wont_send_when { allow(quiz_submission).to receive(:pending_review?).and_return false } }
       specify { wont_send_when { allow(quiz).to receive(:assignment).and_return nil } }
       specify { wont_send_when { allow(quiz).to receive(:survey?).and_return true} }
       specify { wont_send_when { allow(course).to receive(:available?).and_return false} }
       specify { wont_send_when { allow(quiz).to receive(:deleted?).and_return true } }
-
       specify { wont_send_when { allow(policy).to receive(:user_has_visibility?).and_return(false) }}
+
+      specify do
+        wont_send_when do
+          allow(quiz_submission).to receive(:changed_state_to).with(:pending_review).and_return false
+        end
+      end
     end
 
 
