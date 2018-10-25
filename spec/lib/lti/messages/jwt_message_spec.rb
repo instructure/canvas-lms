@@ -288,6 +288,39 @@ describe Lti::Messages::JwtMessage do
       end
     end
 
+    let(:nrps_tool) do
+      tool = course.context_external_tools.new(
+        name: 'bob',
+        consumer_key: 'key',
+        shared_secret: 'secret',
+        url: 'http://www.example.com/basic_lti',
+        developer_key: nrps_developer_key
+      )
+      tool.use_1_3 = true
+      tool.save!
+      tool
+    end
+    let(:ags_scopes) { ['https://purl.imsglobal.org/spec/lti-ags/scope/lineitem', 'https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly'] }
+    let(:nrps_scopes) { ['https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly'] }
+    let(:nrps_developer_key_scopes) { ags_scopes + nrps_scopes }
+    let(:nrps_developer_key) do
+      DeveloperKey.create!(
+        name: 'Developer Key With Scopes',
+        account: course.root_account,
+        scopes: nrps_developer_key_scopes,
+        require_scopes: true
+      )
+    end
+    let(:jwt_message) do
+      Lti::Messages::JwtMessage.new(
+        tool: nrps_tool,
+        context: course,
+        user: user,
+        expander: expander,
+        return_url: return_url,
+        opts: opts
+      )
+    end
     let(:message_names_and_roles_service) { decoded_jwt['https://purl.imsglobal.org/spec/lti-nrps/claim/namesroleservice'] }
 
     # All this setup just so we can stub out controller.polymorphic_url
@@ -314,7 +347,7 @@ describe Lti::Messages::JwtMessage do
         controller,
         {
           current_user: user,
-          tool: tool
+          tool: nrps_tool
         }
       )
     end
@@ -331,7 +364,7 @@ describe Lti::Messages::JwtMessage do
     context 'when context is an account' do
       let(:account_jwt_message) do
         Lti::Messages::JwtMessage.new(
-          tool: tool,
+          tool: nrps_tool,
           context: course.root_account,
           user: user,
           expander: expander,
@@ -356,7 +389,7 @@ describe Lti::Messages::JwtMessage do
 
       let(:jwt_message) do
         Lti::Messages::JwtMessage.new(
-          tool: tool,
+          tool: nrps_tool,
           context: group_record,
           user: user,
           expander: expander,
@@ -370,6 +403,14 @@ describe Lti::Messages::JwtMessage do
 
     context 'when names and roles claim group disabled' do
       let(:opts) { super().merge({claim_group_blacklist: [:names_and_roles_service]}) }
+
+      it 'does not set the NRPS claim' do
+        expect(message_names_and_roles_service).to be_nil
+      end
+    end
+
+    context 'when names and roles scope missing from developer key' do
+      let(:nrps_developer_key_scopes) { ags_scopes }
 
       it 'does not set the NRPS claim' do
         expect(message_names_and_roles_service).to be_nil

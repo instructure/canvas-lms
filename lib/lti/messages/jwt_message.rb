@@ -163,7 +163,8 @@ module Lti::Messages
     def include_names_and_roles_service_claims?
       include_claims?(:names_and_roles_service) &&
         (@context.is_a?(Course) || @context.is_a?(Group)) &&
-        @tool.lti_1_3_enabled?
+        @tool.lti_1_3_enabled? &&
+        @tool.developer_key&.scopes&.include?(TokenScopes::LTI_NRPS_V2_SCOPE)
     end
 
     def add_names_and_roles_service_claims!
