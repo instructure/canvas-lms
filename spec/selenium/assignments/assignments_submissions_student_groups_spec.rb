@@ -49,8 +49,8 @@ describe 'submissions' do
         wait_for_ajaximations
 
         # clicking the add file button and selecting the fake pdf I uploaded
-        fj('.plus').click
-        fj('.pdf > span.text.name').click
+        f('li[aria-label="My files"] button').click
+        f('li[aria-label="example.pdf"] button').click
 
         wait_for_new_page_load(f('button[type="submit"]').click)
 

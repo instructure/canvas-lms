@@ -22,7 +22,8 @@ import FileBrowser from '../FileBrowser'
 
 const getProps = (overrides) => ({
   selectFile: () => {},
-  type: 'image/*',
+  contentTypes: ['image/*'],
+  useContextAssets: true,
   ...overrides
 })
 
@@ -194,7 +195,7 @@ describe('FileBrowser', () => {
       wrapper.update()
       const spy = sinon.spy(wrapper.instance(), 'getFolderData')
       wrapper.find('TreeButton').first().simulate('click')
-      expect(spy.calledTwice).toBeTruthy()
+      expect(spy.called).toBeTruthy()
       moxios.wait(() => {
         const node = wrapper.find('TreeBrowser')
         expect(node.instance().props.collections[4].collections).toEqual([6])
@@ -470,6 +471,11 @@ describe('FileBrowser', () => {
   })
 
   describe('upload dialog', () => {
+    it('does not show upload button if disallowed', () => {
+      const wrapper = shallow(<FileBrowser { ...getProps({allowUpload: false}) } />)
+      expect(wrapper.instance().renderUploadDialog()).toBe(null)
+    })
+
     it('activates upload button for folders user can upload to', () => {
       const wrapper = mount(<FileBrowser { ...getProps() } />)
       const collections = {
@@ -610,4 +616,29 @@ describe('FileBrowser', () => {
       })
     })
   })
+
+describe('FileBrowser content type filtering', () => {
+  it ('allows all content types by default', () => {
+    const no_type_param = {selectFile: () => {}}
+    const wrapper = shallow(<FileBrowser { ...no_type_param } />)
+    expect(wrapper.instance().contentTypeIsAllowed('image/png')).toBeTruthy()
+    expect(wrapper.instance().contentTypeIsAllowed('some/not-real-thing')).toBeTruthy()
+  })
+
+  it ('can restrict to one content type pattern', () => {
+    const wrapper = shallow(<FileBrowser { ...getProps({contentTypes: ['image/*']}) } />)
+    expect(wrapper.instance().contentTypeIsAllowed('image/png')).toBeTruthy()
+    expect(wrapper.instance().contentTypeIsAllowed('image/jpeg')).toBeTruthy()
+    expect(wrapper.instance().contentTypeIsAllowed('video/mp4')).toBeFalsy()
+    expect(wrapper.instance().contentTypeIsAllowed('not/allowed')).toBeFalsy()
+  })
+
+  it ('can restrict to multiple content type patterns', () => {
+    const wrapper = shallow(<FileBrowser { ...getProps({contentTypes: ['image/*', 'video/*']}) } />)
+    expect(wrapper.instance().contentTypeIsAllowed('image/png')).toBeTruthy()
+    expect(wrapper.instance().contentTypeIsAllowed('image/jpeg')).toBeTruthy()
+    expect(wrapper.instance().contentTypeIsAllowed('video/mp4')).toBeTruthy()
+    expect(wrapper.instance().contentTypeIsAllowed('not/allowed')).toBeFalsy()
+  })
+})
 })

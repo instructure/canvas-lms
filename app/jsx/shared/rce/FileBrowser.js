@@ -19,6 +19,7 @@ import React from 'react'
 import _ from 'lodash'
 import $ from 'jquery'
 import axios from 'axios'
+import minimatch from 'minimatch'
 import TreeBrowser from '@instructure/ui-tree-browser/lib/components/TreeBrowser'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import Button from '@instructure/ui-buttons/lib/components/Button'
@@ -29,7 +30,7 @@ import splitAssetString from 'compiled/str/splitAssetString'
 import IconOpenFolderSolid from '@instructure/ui-icons/lib/Solid/IconOpenFolder'
 import IconUploadSolid from '@instructure/ui-icons/lib/Solid/IconUpload'
 import IconImageSolid from '@instructure/ui-icons/lib/Solid/IconImage'
-import { string, func } from 'prop-types';
+import PropTypes from 'prop-types'
 import { getRootFolder, uploadFile } from 'jsx/files/utils/apiFileUtils'
 import parseLinkHeader from '../parseLinkHeader'
 import { showFlashSuccess, showFlashError } from '../FlashAlert'
@@ -38,12 +39,16 @@ import natcompare from '../../../coffeescripts/util/natcompare'
 
 class FileBrowser extends React.Component {
   static propTypes = {
-    selectFile: func.isRequired,
-    type: string,
+    allowUpload: PropTypes.bool,
+    selectFile: PropTypes.func.isRequired,
+    contentTypes: PropTypes.arrayOf(PropTypes.string),
+    useContextAssets: PropTypes.bool,
   }
 
   static defaultProps = {
-    type: '*',
+    allowUpload: true,
+    contentTypes: ['*/*'],
+    useContextAssets: true
   }
 
   constructor (props) {
@@ -62,20 +67,38 @@ class FileBrowser extends React.Component {
     this.getRootFolders()
   }
 
+  getContextName (contextType) {
+    if (contextType === 'courses') {
+      return I18n.t('Course files')
+    } else {
+      return I18n.t('Group files')
+    }
+  }
+
   getContextInfo (assetString) {
-    const contextTypeAndId = splitAssetString(ENV.context_asset_string)
-    if (contextTypeAndId[0] && contextTypeAndId[1]) {
-      const contextName = contextTypeAndId[0] === 'courses' ? I18n.t('Course files') : I18n.t('Group files')
+    const contextTypeAndId = splitAssetString(assetString)
+    if (contextTypeAndId && contextTypeAndId[0] && contextTypeAndId[1]) {
+      const contextName = this.getContextName(contextTypeAndId[0])
       return {name: contextName, type: contextTypeAndId[0], id: contextTypeAndId[1]}
     }
   }
 
   getRootFolders () {
+    if (this.props.useContextAssets) {
+      this.getContextFolders()
+    }
+    this.getUserFolders()
+  }
+
+  getUserFolders() {
+    this.getRootFolderData('users', 'self', {name: I18n.t('My files')})
+  }
+
+  getContextFolders() {
     const contextInfo = this.getContextInfo(ENV.context_asset_string)
-    if (contextInfo.type && contextInfo.id) {
+    if (contextInfo && contextInfo.type && contextInfo.id) {
       this.getRootFolderData(contextInfo.type, contextInfo.id, {name: contextInfo.name})
     }
-    this.getRootFolderData('users', 'self', {name: I18n.t('My files')})
   }
 
   increaseLoadingCount () {
@@ -145,15 +168,26 @@ class FileBrowser extends React.Component {
     })
     this.setState({collections: newCollections})
     folderList.forEach(folder => {
-      if (this.state.openFolders.includes(folder.parent_folder_id)) this.getFolderData(folder.id)
+      if (this.state.openFolders.includes(folder.parent_folder_id)) {
+        this.getFolderData(folder.id)
+      }
     })
+  }
+
+  contentTypeIsAllowed (contentType) {
+    for (let pattern of this.props.contentTypes) {
+      if (minimatch(contentType, pattern)) {
+        return true
+      }
+    }
+    return false
   }
 
   populateItemsList = (fileList) => {
     const newItems = _.cloneDeep(this.state.items)
     const newCollections = _.cloneDeep(this.state.collections)
     fileList.forEach((file) => {
-      if (file["content-type"].match(new RegExp(this.props.type))) {
+      if (this.contentTypeIsAllowed(file["content-type"])) {
         const item = this.formatFileInfo(file)
         newItems[item.id] = item
         const folder_id = file.folder_id
@@ -212,7 +246,11 @@ class FileBrowser extends React.Component {
     }
   }
 
-  onFolderClick = (folderId) => {
+  onFolderToggle = (folder) => {
+    return this.onFolderClick(folder.id, folder)
+  }
+
+  onFolderClick = (folderId, folder) => {
     const collection = this.state.collections[folderId]
     let newFolders = []
     const { openFolders } = this.state
@@ -221,7 +259,7 @@ class FileBrowser extends React.Component {
     } else if (!collection.locked) {
       newFolders = newFolders.concat(openFolders)
       newFolders.push(folderId)
-      collection.collections.forEach(folder => this.getFolderData(folder))
+      collection.collections.forEach(id => this.getFolderData(id))
     }
     return this.setState({openFolders: newFolders, uploadFolder: folderId})
   }
@@ -290,16 +328,20 @@ class FileBrowser extends React.Component {
   }
 
   renderUploadDialog () {
+    if (!this.props.allowUpload) {
+      return null
+    }
     const uploadFolder = this.state.collections[this.state.uploadFolder]
     const disabled = !uploadFolder || uploadFolder.locked || !uploadFolder.canUpload
     const srError = disabled ? <ScreenReaderContent>{I18n.t('Upload not available for this folder')}</ScreenReaderContent> : ''
+    const acceptContentTypes = this.props.contentTypes.join(',')
     return (
       <div className="image-upload__form">
         <input
           onChange={(e) => this.onInputChange(e.target.files)}
           ref={i => {this.uploadInput = i}}
           type="file"
-          accept={this.props.type}
+          accept={acceptContentTypes}
           className="hidden"
         />
         <Button id="image-upload__upload" onClick={this.selectLocalFile} disabled={disabled} variant="ghost" icon={IconUploadSolid}>
@@ -334,6 +376,7 @@ class FileBrowser extends React.Component {
             collections={this.state.collections}
             items={this.state.items}
             size="medium"
+            onCollectionToggle={this.onFolderToggle}
             onCollectionClick={this.onFolderClick}
             onItemClick={this.onFileClick}
             treeLabel={I18n.t('Folder tree')}
