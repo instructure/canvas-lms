@@ -93,6 +93,7 @@ describe 'Moderation Page' do
   end
 
   it 'navigates to an anonymous student submission in speedgrader', priority: "1", test_id: 3638364 do
+    skip('Skipping this until GRADE-1691 is resolved')
     @assignment.update!(anonymous_grading: true)
     ModeratePage.visit(@moderated_course.id, @assignment.id)
     ModeratePage.click_student_link("Student 1")
