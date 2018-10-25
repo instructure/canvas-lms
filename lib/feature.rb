@@ -679,6 +679,18 @@ END
       applies_to: 'Course',
       state: 'allowed',
       development: true
+    },
+    'final_grade_override' => {
+      display_name: -> { I18n.t('Final Grade Override') },
+      description: -> {
+        I18n.t <<~DESCRIPTION
+          Enable ability to alter the final grade for the entire course without changing scores for assignments.
+        DESCRIPTION
+      },
+      applies_to: 'Course',
+      state: 'allowed',
+      development: true,
+      beta: true
     }
   )
 
