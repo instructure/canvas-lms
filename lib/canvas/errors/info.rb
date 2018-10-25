@@ -47,6 +47,7 @@ module Canvas
             account_id: @account.try(:global_id),
             user_id: @user.try(:global_id),
             type: @type,
+            canvas_domain: ENV['CANVAS_DOMAIN']
           },
           extra: {
             request_context_id: @rci,

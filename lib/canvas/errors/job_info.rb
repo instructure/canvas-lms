@@ -29,6 +29,7 @@ module Canvas
           tags: {
             process_type: "BackgroundJob",
             job_tag: @job.tag,
+            canvas_domain: ENV['CANVAS_DOMAIN']
           },
           extra: extras_hash
         }
