@@ -78,13 +78,8 @@ module Lti::Ims::Providers
     end
 
     def validate!
-      validate_rlid!
-    end
-
-    def validate_rlid!
-      return unless rlid?
+      return if !rlid? || (rlid == course_rlid)
       validate_tool_for_assignment!
-      validate_course_for_rlid!
     end
 
     def rlid
@@ -125,7 +120,7 @@ module Lti::Ims::Providers
     end
 
     def validate_tool_for_assignment!
-      return unless assignment?
+      raise Lti::Ims::AdvantageErrors::InvalidResourceLinkIdFilter unless assignment?
       # TODO: all of this might need to change once the LTI 1.3 tool<->resourcelink<->assignment binding mechanism is finalized
       tool_tag = assignment.external_tool_tag
       if tool_tag.blank?
@@ -146,10 +141,6 @@ module Lti::Ims::Providers
           api_message: 'Requested assignment bound to unexpected external tool'
         )
       end
-    end
-
-    def validate_course_for_rlid!
-      raise Lti::Ims::AdvantageErrors::InvalidResourceLinkIdFilter if rlid? && !assignment? && course_rlid != rlid
     end
 
     def course

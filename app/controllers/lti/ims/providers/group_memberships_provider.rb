@@ -50,7 +50,8 @@ module Lti::Ims::Providers
       enrollment_types = queryable_roles(role)
       if enrollment_types.present? && group_role?(enrollment_types)
         enrollment_types == [:group_leader] ? scope.where(user: context.leader_id) : scope
-      else scope.none
+      else
+        scope.none
       end
     end
 
