@@ -545,6 +545,7 @@ $discussion-dark-text: $ic-color-dark;
 }
 
 .message_wrapper {
+  word-break: break-word;
   padding-top: 2px;
   padding-bottom: 2px;
 }
