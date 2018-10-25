@@ -112,6 +112,13 @@
   align-items: center;
   background-color: $ic-color-light;
   border: 1px dashed #ccc;
+
+  // flip the discussion images horizontally in RTL
+  @include direction-if(rtl) {
+    img {
+      transform: scaleX(-1);
+    }
+  }
 }
 
 .discussions-v2__placeholder {
