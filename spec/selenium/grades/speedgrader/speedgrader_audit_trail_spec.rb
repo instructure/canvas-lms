@@ -64,11 +64,38 @@ describe 'Audit Trail' do
 
   before :each do
     user_session(@teacher3)
+    Speedgrader.visit(@course.id, @assignment.id)
+  end
 
+  it 'shows entry for submission comments', priority: "1", test_id: 3513995 do
+    @assignment.update!(grades_published_at: Time.zone.now)
+    @assignment.unmute!
+
+    user_session(@auditor)
+    Speedgrader.visit(@course.id, @assignment.id)
+    Speedgrader.open_assessment_audit
+    Speedgrader.expand_assessment_audit_user_events(@teacher1)
+    expect(Speedgrader.audit_entries).to include_text("Just a comment by teacher1")
+  end
+
+  it 'shows entry for submission comments deleted', priority: "1", test_id: 3513995 do
+    Speedgrader.delete_comment[0].click
+    accept_alert
+    wait_for_ajaximations
+    @assignment.update!(grades_published_at: Time.zone.now)
+    @assignment.unmute!
+
+    user_session(@auditor)
+    Speedgrader.visit(@course.id, @assignment.id)
+    Speedgrader.open_assessment_audit
+    Speedgrader.expand_assessment_audit_user_events(@teacher3)
+    expect(Speedgrader.audit_entries).to include_text("Submission comment deleted")
+  end
+
+  it 'shows entry for grades posted', priority: "1", test_id: 3513995 do
     ModeratePage.visit(@course.id, @assignment.id)
     ModeratePage.select_provisional_grade_for_student_by_position(@student1, 1)
     ModeratePage.select_provisional_grade_for_student_by_position(@student2, 2)
-
     # post the grades
     ModeratePage.click_post_grades_button
     driver.switch_to.alert.accept
@@ -82,39 +109,35 @@ describe 'Audit Trail' do
     # wait for element to exist, means page has loaded
     ModeratePage.grades_visible_to_students_button
 
-    # change sesison to auditor
     user_session(@auditor)
     Speedgrader.visit(@course.id, @assignment.id)
-  end
-
-  it 'shows entry for submission comments', priority: "1", test_id: 3513995 do
-    skip('Unskip with GRADE-1670')
     Speedgrader.open_assessment_audit
-    # verify that the submission comments created above show in audit trail
-    expect(Speedgrader.audit_entries).to include_text("Just a comment by teacher1")
-  end
-
-  it 'shows entry for submission comments deleted', priority: "1", test_id: 3513995 do
-    skip('Unskip with GRADE-1672')
-    Speedgrader.delete_comment[0].click
-    accept_alert
-    wait_for_ajaximations
-    Speedgrader.open_assessment_audit
-    Speedgrader.expand_assessment_audit_user_events(@teacher1)
-    # delete a comment, verify there is an entry
-    expect(Speedgrader.audit_entries).to include_text("Submission comment deleted")
-  end
-
-  it 'shows entry for grades posted', priority: "1", test_id: 3513995 do
-    skip('Unskip with GRADE-1672')
-    Speedgrader.open_assessment_audit
-    # verify there is an entry for when the grades were posted
+    Speedgrader.expand_assessment_audit_user_events(@teacher3)
     expect(Speedgrader.audit_entries).to include_text("Grades posted")
   end
 
   it 'show entry for grades displayed to students', priority: "1", test_id: 3513995 do
     skip('Unskip with GRADE-1667')
+    ModeratePage.visit(@course.id, @assignment.id)
+    ModeratePage.select_provisional_grade_for_student_by_position(@student1, 1)
+    ModeratePage.select_provisional_grade_for_student_by_position(@student2, 2)
+    # post the grades
+    ModeratePage.click_post_grades_button
+    driver.switch_to.alert.accept
+    wait_for_ajaximations
+    # wait for element to exist, means page has loaded
+    ModeratePage.grades_posted_button
+    # unmute using Display to Students button
+    ModeratePage.click_display_to_students_button
+    driver.switch_to.alert.accept
+    wait_for_ajaximations
+    # wait for element to exist, means page has loaded
+    ModeratePage.grades_visible_to_students_button
+
+    user_session(@auditor)
+    Speedgrader.visit(@course.id, @assignment.id)
     Speedgrader.open_assessment_audit
+    Speedgrader.expand_assessment_audit_user_events(@teacher3)
     # verify there is an entry for when unmuted
     expect(Speedgrader.audit_entries).to include_text("Assignment unmuted")
   end
