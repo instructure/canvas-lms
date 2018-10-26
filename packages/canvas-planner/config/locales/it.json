@@ -5,6 +5,9 @@
   "add_to_do_7def3c37": {
     "message": "Aggiungi elenco attività"
   },
+  "address_3159962f": {
+    "message": "Indirizzo:"
+  },
   "all_day_fb42c4fc": {
     "message": "Tutto il giorno"
   },
@@ -56,6 +59,9 @@
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Inizio della cronologia delle cose da fare"
   },
+  "calendar_a8563bb2": {
+    "message": "Calendario:"
+  },
   "calendar_event_89aadc1c": {
     "message": "Evento del calendario"
   },
@@ -92,11 +98,17 @@
   "date_is_required_8660ec22": {
     "message": "Data obbligatoria"
   },
+  "date_time_d9fbf2d7": {
+    "message": "Data e ora:"
+  },
   "delete_a6efa79d": {
     "message": "Elimina"
   },
   "details_98a31b68": {
     "message": "Dettagli"
+  },
+  "details_a6f427c3": {
+    "message": "Dettagli:"
   },
   "discussion_6719c51d": {
     "message": "Discussione"
@@ -193,6 +205,9 @@
   },
   "loading_planner_items_947a813d": {
     "message": "Caricamento voci agenda"
+  },
+  "location_3b6ff307": {
+    "message": "Posizione:"
   },
   "looks_like_there_isn_t_anything_here_d9bcef49": {
     "message": "Sembra non ci sia nulla qui"
@@ -301,6 +316,12 @@
   },
   "startdate_to_enddate_d245175b": {
     "message": "{ startDate } alle { endDate }"
+  },
+  "startdatetime_enddatetime_20abc10e": {
+    "message": "{ startDateTime } - { endDateTime }"
+  },
+  "startdatetime_endtime_49741bbe": {
+    "message": "{ startDateTime } - { endTime }"
   },
   "starttime_to_endtime_d7cc249d": {
     "message": "Dalle { startTime } alle { endTime }"

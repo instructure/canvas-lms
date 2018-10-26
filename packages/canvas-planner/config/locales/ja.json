@@ -5,6 +5,9 @@
   "add_to_do_7def3c37": {
     "message": "タスクに追加"
   },
+  "address_3159962f": {
+    "message": "住所:"
+  },
   "all_day_fb42c4fc": {
     "message": "全日"
   },
@@ -56,6 +59,9 @@
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "あなたのタスク履歴の始まり"
   },
+  "calendar_a8563bb2": {
+    "message": "カレンダー:"
+  },
   "calendar_event_89aadc1c": {
     "message": "予定表のイベント"
   },
@@ -92,11 +98,17 @@
   "date_is_required_8660ec22": {
     "message": "日付は必須です"
   },
+  "date_time_d9fbf2d7": {
+    "message": "日付 & 時間:"
+  },
   "delete_a6efa79d": {
     "message": "削除"
   },
   "details_98a31b68": {
     "message": "詳細"
+  },
+  "details_a6f427c3": {
+    "message": "詳細:"
   },
   "discussion_6719c51d": {
     "message": "ディスカッション"
@@ -193,6 +205,9 @@
   },
   "loading_planner_items_947a813d": {
     "message": "プランナーアイテムをもっと読み込む"
+  },
+  "location_3b6ff307": {
+    "message": "場所:"
   },
   "looks_like_there_isn_t_anything_here_d9bcef49": {
     "message": "ここに何もないようです"
@@ -301,6 +316,12 @@
   },
   "startdate_to_enddate_d245175b": {
     "message": "{ startDate } - { endDate }"
+  },
+  "startdatetime_enddatetime_20abc10e": {
+    "message": "{ startDateTime } - { endDateTime }"
+  },
+  "startdatetime_endtime_49741bbe": {
+    "message": "{ startDateTime } - { endTime }"
   },
   "starttime_to_endtime_d7cc249d": {
     "message": "{ startTime } - { endTime }"

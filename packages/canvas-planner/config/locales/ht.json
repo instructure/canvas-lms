@@ -5,6 +5,9 @@
   "add_to_do_7def3c37": {
     "message": "Ajoute Lis Tach"
   },
+  "address_3159962f": {
+    "message": "Adrès:"
+  },
   "all_day_fb42c4fc": {
     "message": "Tout Jounen"
   },
@@ -12,7 +15,7 @@
     "message": "Tout eleman yo chaje"
   },
   "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
-    "message": "GEn yon erè ki fèt pandan tantativ pou rejte opòtinite a."
+    "message": "Gen yon erè ki fèt pandan tantativ pou rejte opòtinite a."
   },
   "announcement_fb4cb645": {
     "message": "Anons"
@@ -56,6 +59,9 @@
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Kòmansman Istwa Tach ou yo"
   },
+  "calendar_a8563bb2": {
+    "message": "Kalandriye:"
+  },
   "calendar_event_89aadc1c": {
     "message": "Kalandriye Aktivite"
   },
@@ -92,11 +98,17 @@
   "date_is_required_8660ec22": {
     "message": "Dat obligatwa"
   },
+  "date_time_d9fbf2d7": {
+    "message": "Dat ak Lè:"
+  },
   "delete_a6efa79d": {
     "message": "Efase"
   },
   "details_98a31b68": {
     "message": "Detay"
+  },
+  "details_a6f427c3": {
+    "message": "Detay:"
   },
   "discussion_6719c51d": {
     "message": "Diskisyon"
@@ -193,6 +205,9 @@
   },
   "loading_planner_items_947a813d": {
     "message": "Chajman Eleman Planifikatè"
+  },
+  "location_3b6ff307": {
+    "message": "Anplasman:"
   },
   "looks_like_there_isn_t_anything_here_d9bcef49": {
     "message": "Ta sanble pa gen anyen la a"
@@ -301,6 +316,12 @@
   },
   "startdate_to_enddate_d245175b": {
     "message": "{ startDate } a { endDate }"
+  },
+  "startdatetime_enddatetime_20abc10e": {
+    "message": "{ startDateTime } - { endDateTime }"
+  },
+  "startdatetime_endtime_49741bbe": {
+    "message": "{ startDateTime } - { endTime }"
   },
   "starttime_to_endtime_d7cc249d": {
     "message": "{ startTime } a { endTime }"
