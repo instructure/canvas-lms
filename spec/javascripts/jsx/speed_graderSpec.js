@@ -3179,6 +3179,15 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         strictEqual(classList.contains('with_enrollment_notice'), true)
       })
 
+      test('removes existing event listeners for resubmit button', () => {
+        const spy = sinon.spy($.prototype, "off")
+        SpeedGrader.EG.currentStudent = alphaStudent
+        window.jsonData.context.enrollments[0].workflow_state = 'inactive'
+        SpeedGrader.EG.currentStudent.submission.has_originality_score = true
+        SpeedGrader.EG.handleSubmissionSelectionChange()
+        ok(spy.called)
+      })
+
       test('isStudentConcluded is called with anonymous id', () => {
         SpeedGrader.EG.currentStudent = alphaStudent
         const isStudentConcluded = sinon.stub(SpeedGrader.EG, 'isStudentConcluded')

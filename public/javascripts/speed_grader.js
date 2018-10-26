@@ -1792,6 +1792,7 @@ EG = {
 
     if (!submission.has_originality_score) {
       const resubmitUrl = SpeedgraderHelpers.plagiarismResubmitUrl(submission, anonymizableUserId)
+      $('#plagiarism_resubmit_button').off('click')
       $('#plagiarism_resubmit_button').on('click', (e) => { SpeedgraderHelpers.plagiarismResubmitHandler(e, resubmitUrl, anonymizableUserId) })
     }
 
