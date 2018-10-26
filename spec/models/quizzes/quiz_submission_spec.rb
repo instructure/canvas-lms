@@ -1462,6 +1462,22 @@ describe Quizzes::QuizSubmission do
         expect(@other_observer.messages.where(notification_name: "Submission Grade Changed").length).to eq 0
       end
 
+      it 'does not send a grade changed notification for an inactive user' do
+        expect(@student.messages.where(notification_name: "Submission Grade Changed").length).to eq 0
+
+        enrollment = @student.student_enrollments.first
+        enrollment.workflow_state = 'inactive'
+        enrollment.save!
+        Quizzes::SubmissionGrader.new(@submission).grade_submission
+        @submission.score = @submission.score + 5
+        @submission.save!
+
+        expect(@submission.reload.messages_sent.keys).not_to include('Submission Graded')
+        expect(@submission.reload.messages_sent.keys).not_to include('Submission Grade Changed')
+        expect(@student.messages.where(notification_name: "Submission Graded").length).to eq 0
+        expect(@student.messages.where(notification_name: "Submission Grade Changed").length).to eq 0
+      end
+
       it 'does not send any "graded" or "grade changed" notifications for a submission with essay questions before they have been graded' do
         quiz_with_graded_submission([{:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question'}}])
         expect(@quiz_submission.reload.messages_sent).not_to include 'Submission Graded'
