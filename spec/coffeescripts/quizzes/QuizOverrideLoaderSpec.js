@@ -41,9 +41,15 @@ test('can select the earliest date from a group', function() {
   equal(this.loader._chooseEarliest(this.dates, 'unlock_at'), this.earliestDate)
 })
 
-test('ignores null dates and handles empty arrays', function() {
+test('handles null dates and handles empty arrays', function() {
   let dates = [{}, {}]
   equal(this.loader._chooseLatest(dates, 'due_at'), null)
   dates = []
   equal(this.loader._chooseLatest(dates, 'due_at'), null)
+})
+
+test('returns null if any argument is null', function() {
+  const dates = [...this.dates, {}]
+  equal(this.loader._chooseLatest(dates, 'due_at'), null)
+  equal(this.loader._chooseEarliest(dates, 'due_at'), null)
 })
