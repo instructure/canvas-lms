@@ -22,6 +22,7 @@ module SpeedGrader
     include CoursesHelper
     include Api::V1::SubmissionComment
     include CanvadocsHelper
+    include Rails.application.routes.url_helpers
 
     def initialize(assignment, current_user, avatars: false, grading_role: :grader)
       @assignment = assignment
@@ -231,8 +232,8 @@ module SpeedGrader
                     # we'll use to create custom crocodoc urls for each prov grade
                     sub_attachments << a
                   end
-                  a.as_json(only: attachment_json_fields,
-                            methods: [:view_inline_ping_url]).tap do |json|
+                  a.as_json(only: attachment_json_fields).tap do |json|
+                    json[:attachment][:view_inline_ping_url] = assignment_file_inline_view_path(@assignment.id, a.id)
                     json[:attachment][:canvadoc_url] = a.canvadoc_url(@current_user, url_opts)
                     json[:attachment][:crocodoc_url] = a.crocodoc_url(@current_user, url_opts)
                     json[:attachment][:submitted_to_crocodoc] = a.crocodoc_document.present?

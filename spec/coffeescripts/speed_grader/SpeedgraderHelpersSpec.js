@@ -93,7 +93,7 @@ test('populateTurnitin sets correct URL for OriginalityReports', () => {
           display_name: 'Untitled-2.rtf',
           workflow_state: 'pending_upload',
           viewed_at: null,
-          view_inline_ping_url: '/users/2/files/103/inline_view',
+          view_inline_ping_url: '/assignments/52/files/103/inline_view',
           mime_class: 'doc',
           currently_locked: false,
           'crocodoc_available?': null,

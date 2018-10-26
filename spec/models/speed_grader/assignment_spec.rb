@@ -473,7 +473,7 @@ describe SpeedGrader::Assignment do
     assignment.submit_homework @student, :submission_type => :online_upload, :attachments => [attachment]
     json = SpeedGrader::Assignment.new(assignment, @teacher).json
     attachment_json = json['submissions'][0]['submission_history'][0]['submission']['versioned_attachments'][0]['attachment']
-    expect(attachment_json['view_inline_ping_url']).to match %r{/users/#{@student.id}/files/#{attachment.id}/inline_view\z}
+    expect(attachment_json['view_inline_ping_url']).to match %r{/assignments/#{assignment.id}/files/#{attachment.id}/inline_view\z}
   end
 
   it "includes lti launch url in submission history" do

@@ -497,14 +497,9 @@ class FilesController < ApplicationController
       return
     end
 
-
-    verifier_checker = Attachments::Verification.new(@attachment)
-    if (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :read, session)) ||
-        @attachment.attachment_associations.where(:context_type => 'Submission').
-          any? { |aa| aa.context && aa.context.grants_right?(@current_user, session, :read) } ||
-        authorized_action(@attachment, @current_user, :read)
-
+    if read_allowed(@attachment, @current_user, session, params)
       @attachment.ensure_media_object
+      verifier_checker = Attachments::Verification.new(@attachment)
 
       if params[:download]
         if (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download, session)) ||
@@ -1198,6 +1193,21 @@ class FilesController < ApplicationController
     headers['Access-Control-Allow-Methods'] = 'POST, PUT, DELETE, GET, OPTIONS'
     headers['Access-Control-Request-Method'] = '*'
     headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Accept-Encoding'
+  end
+
+  def read_allowed(attachment, user, session, params)
+    if params[:verifier]
+      verifier_checker = Attachments::Verification.new(attachment)
+      return true if verifier_checker.valid_verifier_for_permission?(params[:verifier], :read, session)
+    end
+
+    submissions = attachment.attachment_associations.where(context_type: "Submission").preload(:context).map(&:context).compact
+    return true if submissions.any? { |submission| submission.grants_right?(user, session, :read) }
+
+    course = Assignment.find(params[:assignment_id]).course unless params[:assignment_id].nil?
+    return true if course&.grants_right?(user, session, :read)
+
+    authorized_action(attachment, user, :read)
   end
 
   def strong_attachment_params
