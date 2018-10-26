@@ -1010,4 +1010,9 @@ module ApplicationHelper
     # after a direct link to attachment.thumbnail_url would have expired
     super(attachment, uuid || attachment.uuid, url_options)
   end
+
+  def browser_performance_monitor_embed
+    # stub
+  end
+
 end
