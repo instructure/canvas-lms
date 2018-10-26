@@ -237,11 +237,22 @@ describe ObserverAlert do
       expect(alert).to be_nil
     end
 
-    it 'doesnt create an alert for if there is no threshold' do
-      ObserverAlert.create_assignment_missing_alerts
+    it 'doesnt create an alert if there is no threshold' do
       alert = ObserverAlert.where(student: @student2).first
 
       expect(alert).to be_nil
+    end
+
+    it 'doesnt create an alert if the assignment is not published' do
+      @course = course_factory()
+      @student = student_in_course(active_all: true, course: @course).user
+      observer = course_with_observer(course: @course, associated_user_id: @student.id, active_all: true).user
+      ObserverAlertThreshold.create(observer: observer, student: @student, alert_type: 'assignment_missing')
+      assignment_model(context: @course, due_at: 5.minutes.ago, submission_types: 'online_text_entry', workflow_state: 'unpublished')
+
+      ObserverAlert.create_assignment_missing_alerts
+
+      expect(ObserverAlert.where(student: @student).count).to eq 0
     end
 
     it 'creates an alert for each observer' do
