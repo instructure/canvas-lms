@@ -333,13 +333,12 @@ describe PlannerController do
           expect(response_hash.length).to be 5
         end
 
-        it "should not return any data if context_codes are specified but none are valid for the user" do
+        it "returns unauthorized if the user doesn't have read permission on a context_code" do
           course_with_teacher(active_all: true)
           assignment_model(course: @course, due_at: 1.day.from_now)
 
           get :index, params: {context_codes: [@course.asset_string]}
-          response_json = json_parse(response.body)
-          expect(response_json).to eq []
+          assert_unauthorized
         end
 
         it "filters ungraded_todo_items" do
@@ -372,6 +371,58 @@ describe PlannerController do
              ['wiki_page', @course_page.id],
              ['wiki_page', @group_page.id]]
           )
+        end
+
+        describe "with public syllabus courses" do
+          before :once do
+            @ps_topic = @course2.discussion_topics.create! title: 'ohai', todo_date: 1.day.from_now
+            @ps_page = @course2.wiki_pages.create! title: 'kthxbai', todo_date: 1.day.from_now
+            @course2.public_syllabus = true
+            @course2.save!
+          end
+
+          it "allows unauthenticated users to view all_ungraded_todo_items" do
+            remove_user_session
+            get :index, params: {
+              filter: 'all_ungraded_todo_items',
+              context_codes: [@course2.asset_string],
+              start_date: 2.weeks.ago.iso8601,
+              end_date: 2.weeks.from_now.iso8601
+            }
+            response_json = json_parse(response.body)
+            items = response_json.map{|i| [i['plannable_type'], i['plannable_id']]}
+            expect(items).to match_array(
+              [['discussion_topic', @ps_topic.id],
+               ['wiki_page', @ps_page.id]]
+            )
+          end
+
+          it "allows unenrolled users to view all_ungraded_todo_items" do
+            user_session(user_factory)
+            get :index, params: {
+              filter: 'all_ungraded_todo_items',
+              context_codes: [@course2.asset_string],
+              start_date: 2.weeks.ago.iso8601,
+              end_date: 2.weeks.from_now.iso8601
+            }
+            response_json = json_parse(response.body)
+            items = response_json.map{|i| [i['plannable_type'], i['plannable_id']]}
+            expect(items).to match_array(
+              [['discussion_topic', @ps_topic.id],
+               ['wiki_page', @ps_page.id]]
+            )
+          end
+
+          it "returns unauthorized if the course isn't public syllabus" do
+            user_session(user_factory)
+            get :index, params: {
+              filter: 'all_ungraded_todo_items',
+              context_codes: [@course1.asset_string],
+              start_date: 2.weeks.ago.iso8601,
+              end_date: 2.weeks.from_now.iso8601
+            }
+            assert_unauthorized
+          end
         end
 
         it "filters out unpublished todo items for students" do

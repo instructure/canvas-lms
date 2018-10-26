@@ -23,7 +23,7 @@
 class PlannerController < ApplicationController
   include Api::V1::PlannerItem
 
-  before_action :require_user
+  before_action :require_user, unless: :public_access?
   before_action :require_planner_enabled
   before_action :set_date_range
   before_action :set_params, only: [:index]
@@ -145,6 +145,11 @@ class PlannerController < ApplicationController
   end
 
   private
+
+  def public_access?
+    # this is for things that are visible on courses with a public syllabus
+    params[:filter] == 'all_ungraded_todo_items'
+  end
 
   def collection_for_filter(filter)
     case filter
@@ -308,8 +313,10 @@ class PlannerController < ApplicationController
     @per_page = params[:per_page] || 50
     @page = params[:page] || 'first'
     @include_concluded = includes.include? 'concluded'
-    if params[:context_codes]
-      @contexts = Context.from_context_codes(Array(params[:context_codes])).select{ |c| c.grants_right?(@current_user, :read) }
+    if params[:context_codes].present?
+      @contexts = Context.from_context_codes(Array(params[:context_codes]))
+      perms = public_access? ? [:read, :read_syllabus] : [:read]
+      render_json_unauthorized and return false unless @contexts.all? { |c| c.grants_any_right?(@current_user, *perms) }
       @course_ids = @contexts.select{ |c| c.is_a? Course }.map(&:id)
       @group_ids = @contexts.select{ |c| c.is_a? Group }.map(&:id)
       @user_ids = @contexts.select{ |c| c.is_a? User }.map(&:id)

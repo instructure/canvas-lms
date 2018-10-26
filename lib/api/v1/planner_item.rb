@@ -128,7 +128,7 @@ module Api::V1::PlannerItem
     wiki_pages, other_context_items = context_items.partition{|i| i.is_a?(::WikiPage)}
     ActiveRecord::Associations::Preloader.new.preload(wiki_pages, {context: :root_account}) if wiki_pages.any?
     ActiveRecord::Associations::Preloader.new.preload(other_context_items, {context: :root_account}) if other_context_items.any?
-    ss = user.submission_statuses(opts)
+    ss = user&.submission_statuses(opts)
     discussions, _assign_quiz_items = other_context_items.partition{|i| i.is_a?(::DiscussionTopic)}
     topics_status = topics_status_for(user, discussions.map(&:id))
 
@@ -149,7 +149,7 @@ module Api::V1::PlannerItem
   def submission_statuses_for(user, item, opts = {})
     submission_status = {submissions: false}
     return submission_status unless item.is_a?(Assignment)
-    ss = opts[:submission_statuses] || user.submission_statuses(opts)
+    ss = opts[:submission_statuses] || user&.submission_statuses(opts)
     submission_status[:submissions] = {
       submitted: ss[:submitted].include?(item.id),
       excused: ss[:excused].include?(item.id),
