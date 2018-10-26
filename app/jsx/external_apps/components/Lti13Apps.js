@@ -70,7 +70,7 @@ export default class Lti13Apps extends React.Component {
                 {
                   tool.enabled
                     ? I18n.t('Disable %{toolName}', {toolName: tool.name})
-                    : I18n.t('Enable %{toolName)', {toolName: tool.name})
+                    : I18n.t('Enable %{toolName}', {toolName: tool.name})
                 }
               </ScreenReaderContent>
             }
