@@ -125,6 +125,18 @@ describe LearningOutcomeGroup do
       expect(group.child_outcome_links.map(&:content_id)).to include(outcome.id)
     end
 
+    it 'touches context when adding outcome to group' do
+      group = @course.learning_outcome_groups.create!(:title => 'groupage')
+      outcome = @course.created_learning_outcomes.create!(:title => 'o1')
+      expect { group.add_outcome(outcome) }.to change { group.context.reload.updated_at }
+    end
+
+    it 'does not touch context if skip_touch is true' do
+      group = @course.learning_outcome_groups.create!(:title => 'groupage')
+      outcome = @course.created_learning_outcomes.create!(:title => 'o1')
+      expect { group.add_outcome(outcome, skip_touch: true) }.not_to change { group.context.reload.updated_at }
+    end
+
     it 'no-ops if a link already exists' do
       group = @course.learning_outcome_groups.create!(:title => 'groupage')
       outcome = @course.created_learning_outcomes.create!(:title => 'o1')
@@ -154,6 +166,12 @@ describe LearningOutcomeGroup do
       expect(child_outcome_group.child_outcome_links.map(&:content_id)).to eq(
         @group2.child_outcome_links.map(&:content_id)
       )
+    end
+
+    it 'touches context exactly once' do
+      expect(@group1.child_outcome_groups).to be_empty
+      expect(@group1.context).to receive(:touch).once.and_return true
+      @group1.add_outcome_group(@group2)
     end
   end
 
