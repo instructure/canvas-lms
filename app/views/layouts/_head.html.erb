@@ -26,6 +26,7 @@
   <meta charset="utf-8">
   <title><%= (yield :page_title).presence || @page_title || t('default_page_title', "Canvas LMS") %></title>
   <!--[if lte IE 9]> <meta http-equiv=refresh content="0; URL=/ie-9-is-not-supported.html" /> <![endif]-->
+  <%= browser_performance_monitor_embed %>
   <link rel="preload" href="<%= font_path("lato/latin/LatoLatin-Regular.woff2") %>" as="font" type="font/woff2" crossorigin>
   <%= favicon_link_tag(favicon) %>
   <%= favicon_link_tag(brand_variable('ic-brand-apple-touch-icon'), rel: 'apple-touch-icon', type: nil) %>
