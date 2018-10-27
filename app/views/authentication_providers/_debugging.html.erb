@@ -1,0 +1,58 @@
+<%
+# Copyright (C) 2015 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<% debugging = provider.debugging? %>
+<div class="debugging">
+  <h4>
+    <%= t("Debugging") %>
+  </h4>
+
+  <div>
+    <p>
+      <%= t <<-TEXT
+          Once you start debugging all info about the next attempted login attempt
+          will be collected. Click "Refresh" to see if more data has been collected or
+          "Stop Debugging" to clear the collected data and stop the current debug attempt.
+          TEXT
+       %>
+    </p>
+    <p>
+      <a href="<%= account_authentication_provider_debugging_url(provider.account, provider) %>"
+         class="start_debugging btn"
+         style="<%= hidden(!debugging) %>">
+        <%= t('start_debugging', 'Start Debugging') %>
+      </a>
+      <a href="<%= account_authentication_provider_debugging_url(provider.account, provider) %>"
+         class="refresh_debugging btn"
+         style="<%= hidden(debugging) %>">
+        <%= t('refresh_debugging', 'Refresh') %>
+      </a>
+      <a href="<%= account_authentication_provider_debugging_url(provider.account, provider) %>"
+         class="stop_debugging btn"
+         style="<%= hidden(debugging) %>">
+        <%= t('stop_debugging', 'Stop Debugging') %>
+      </a>
+    </p>
+
+    <div class="debug_data" style="<%= hidden(debugging) %>">
+      <% if debugging %>
+        <%= render partial: 'debug_data', locals: { provider: provider } %>
+      <% end %>
+    </div>
+  </div>
+</div>

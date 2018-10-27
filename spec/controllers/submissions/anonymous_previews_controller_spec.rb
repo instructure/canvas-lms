@@ -22,6 +22,7 @@ RSpec.describe Submissions::AnonymousPreviewsController do
   describe 'GET :show' do
     before do
       course_with_student_and_submitted_homework
+      @course.account.enable_service(:avatars)
       @context = @course
       user_session(@student)
     end

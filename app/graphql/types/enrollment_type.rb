@@ -41,7 +41,7 @@ module Types
   class EnrollmentType < ApplicationObjectType
     graphql_name "Enrollment"
 
-    implements GraphQL::Relay::Node.interface
+    implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
 
     alias :enrollment :object

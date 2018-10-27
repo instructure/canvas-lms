@@ -186,7 +186,22 @@ describe "admin settings tab" do
         test_checkbox_off(allow_sis_import)
       end
 
-      context "persists SIS syncing settings on refresh" do
+      context "SIS post grades disabled" do
+        before do
+          account.set_feature_flag! 'post_grades', 'off'
+          get_settings_page(account)
+        end
+
+        it "does not display SIS Syncing option" do
+          expect(f("body")).not_to contain_css(sis_syncing)
+        end
+
+        it "does not display the 'Sync Grades to SIS' option" do
+          expect(f("body")).not_to contain_css(default_grade_export)
+        end
+      end
+
+      context "SIS post grades enabled" do
         before do
           account.set_feature_flag! 'post_grades', 'on'
         end
@@ -199,6 +214,18 @@ describe "admin settings tab" do
         it "persists SIS import setting is off" do
           get_settings_page(account)
           test_checkbox_off(sis_syncing)
+        end
+
+        context "SIS syncing => false" do
+          before do
+            account.settings = { sis_syncing: { value: false } }
+            account.save
+            get_settings_page(account)
+          end
+
+          it "does not display the 'Sync Grades to SIS' option" do
+            expect(f(default_grade_export)).not_to be_displayed
+          end
         end
 
         context "SIS syncing => true" do
@@ -238,47 +265,6 @@ describe "admin settings tab" do
             f("#account_settings_sis_assignment_name_length_input_value").send_keys(name_length)
             click_submit
             expect(f("#account_settings_sis_assignment_name_length_input_value")).to have_value(name_length.to_s)
-          end
-        end
-      end
-
-      context "SIS post grades disabled" do
-        before do
-          account.set_feature_flag! 'post_grades', 'off'
-          get_settings_page(account)
-        end
-
-        it "does not display SIS Syncing option" do
-          expect(f("body")).not_to contain_css(sis_syncing)
-        end
-
-        it "does not display the 'Sync Grades to SIS' option" do
-          expect(f("body")).not_to contain_css(default_grade_export)
-        end
-      end
-
-      context "SIS post grades enabled" do
-        before do
-          account.set_feature_flag! 'post_grades', 'on'
-        end
-
-        context "SIS syncing => false" do
-          before do
-            account.settings = { sis_syncing: { value: false } }
-            account.save
-            get_settings_page(account)
-          end
-
-          it "does not display the 'Sync Grades to SIS' option" do
-            expect(f(default_grade_export)).not_to be_displayed
-          end
-        end
-
-        context "SIS syncing => true" do
-          before do
-            account.settings = { sis_syncing: { value: true } }
-            account.save
-            get_settings_page(account)
           end
 
           it "persists 'Sync Grades to SIS' on" do

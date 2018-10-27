@@ -21,6 +21,7 @@ import { arrayOf, bool, func, number, oneOf, shape, string } from 'prop-types';
 import I18n from 'i18n!gradebook';
 import Avatar from '@instructure/ui-elements/lib/components/Avatar';
 import Button from '@instructure/ui-buttons/lib/components/Button';
+import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
 import View from '@instructure/ui-layout/lib/components/View';
 import Heading from '@instructure/ui-elements/lib/components/Heading';
 import Link from '@instructure/ui-elements/lib/components/Link';
@@ -259,13 +260,15 @@ export default class SubmissionTray extends React.Component {
       <Tray
         contentRef={this.props.contentRef}
         label={I18n.t('Submission tray')}
-        closeButtonLabel={I18n.t('Close submission tray')}
         open={this.props.isOpen}
         shouldContainFocus
         placement="end"
         onDismiss={this.props.onRequestClose}
         onClose={this.props.onClose}
       >
+        <CloseButton placement="start" onClick={this.props.onRequestClose}>
+          {I18n.t('Close submission tray')}
+        </CloseButton>
         <div className="SubmissionTray__Container">
           <div id="SubmissionTray__Content" style={{ display: 'flex', flexDirection: 'column' }}>
             <View as="div" padding={carouselContainerStyleOverride}>

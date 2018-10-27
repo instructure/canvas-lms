@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {shallow, mount} from 'enzyme'
-import TestUtils from 'react-addons-test-utils'
 import Cropper from 'jsx/canvas_cropper/cropper'
 
 let file, wrapper

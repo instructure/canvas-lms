@@ -81,7 +81,7 @@ describe Lti::Messages::JwtMessage do
         no_expansion: 'foo'
       }
     }
-    tool.settings['use_1_3'] = true
+    tool.use_1_3 = true
     tool.save!
     tool
   end
@@ -245,6 +245,98 @@ describe Lti::Messages::JwtMessage do
       it 'expands variable expansions' do
         jwt_message.generate_post_payload
         expect(message_custom['has_expansion']).to eq user.id
+      end
+    end
+
+    describe 'names and roles' do
+      let(:message_names_and_roles_service) { decoded_jwt['https://purl.imsglobal.org/spec/lti-nrps/claim/namesroleservice'] }
+
+      # All this setup just so we can stub out controller.polymorphic_url
+      let(:request) do
+        request = double('request')
+        allow(request).to receive(:url).and_return('https://localhost')
+        allow(request).to receive(:host).and_return('/my/url')
+        allow(request).to receive(:scheme).and_return('https')
+        request
+      end
+
+      let(:controller) do
+        controller = double('controller')
+        allow(controller).to receive(:polymorphic_url).and_return('polymorphic_url')
+        allow(controller).to receive(:request).and_return(request)
+        controller
+      end
+
+      # override b/c all the rest of the tests fail if a Controller is injected into the 'top-level' expander def
+      let(:expander) do
+        Lti::VariableExpander.new(
+          course.root_account,
+          course,
+          controller,
+          {
+            current_user: user,
+            tool: tool
+          }
+        )
+      end
+
+      before(:each) do
+        course.root_account.enable_feature!(:lti_1_3)
+        course.root_account.save!
+      end
+
+      it 'sets the NRPS url' do
+        expect(message_names_and_roles_service['context_memberships_url']).to eq 'polymorphic_url'
+      end
+
+      it 'sets the NRPS version' do
+        expect(message_names_and_roles_service['service_version']).to eq '2.0'
+      end
+
+      context 'when context is an account' do
+        let(:account_jwt_message) do
+          Lti::Messages::JwtMessage.new(
+            tool: tool,
+            context: course.root_account,
+            user: user,
+            expander: expander,
+            return_url: return_url,
+            opts: opts
+          )
+        end
+
+        let(:decoded_jwt) do
+          jws = account_jwt_message.generate_post_payload
+          JSON::JWT.decode(jws[:id_token], pub_key)
+        end
+
+        it 'does not set the NRPS claim' do
+          expect(message_names_and_roles_service).to be_nil
+        end
+      end
+
+      context 'when context is a group' do
+
+        let_once(:group_record) { group(context: course) } # _record suffix to avoid conflict with group() factory mtd
+
+        let(:jwt_message) do
+          Lti::Messages::JwtMessage.new(
+            tool: tool,
+            context: group_record,
+            user: user,
+            expander: expander,
+            return_url: return_url,
+            opts: opts
+          )
+        end
+
+        it 'sets the NRPS url' do
+          expect(message_names_and_roles_service['context_memberships_url']).to eq 'polymorphic_url'
+        end
+
+        it 'sets the NRPS version' do
+          expect(message_names_and_roles_service['service_version']).to eq '2.0'
+        end
       end
     end
   end

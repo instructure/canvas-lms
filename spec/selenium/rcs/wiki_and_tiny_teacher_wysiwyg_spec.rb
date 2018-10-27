@@ -489,8 +489,8 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       expect(mathjax_defined).to eq true
     end
 
-    it "should not load mathjax if displaying an equation editor image and mathml" do
-      text = '<p><math> <mi>&pi;</mi> <mo>⁢</mo> <msup> <mi>r</mi> <mn>2</mn> </msup> </math></p>'
+    it "should not load mathjax if displaying an equation editor image and non-visible mathml" do
+      text = '<p><div class="hidden-readable"><math> <mi>&pi;</mi> <mo>⁢</mo> <msup> <mi>r</mi> <mn>2</mn> </msup> </math></div></p>'
       mathmanImg = '<p><img class="equation_image" title="\infty" src="/equation_images/%255Cinfty" alt="LaTeX: \infty" data-equation-content="\infty" /></p>'
       get "/courses/#{@course.id}/pages/front-page/edit"
       add_html_to_tiny(text+mathmanImg)

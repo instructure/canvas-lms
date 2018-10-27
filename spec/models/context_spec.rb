@@ -221,6 +221,42 @@ describe Context do
     end
   end
 
+  describe "#active_record_types" do
+    let(:course) { Course.create! }
+
+    it "looks at the 'everything' cache if asking for just one thing and doesn't have a cache for that" do
+
+      # it should look first for the cache for just the thing we are asking for
+      expect(Rails.cache).to receive(:read).
+        with(['active_record_types3', [:assignments], course].cache_key).
+        and_return(nil)
+
+      # if that ^ returns nil, it should then look for for the "everything" cache
+      expect(Rails.cache).to receive(:read).
+        with(['active_record_types3', 'everything', course].cache_key).
+        and_return({
+          other_thing_we_are_not_asking_for: true,
+          assignments: "the cached value for :assignments from the 'everything' cache"
+        })
+
+      expect(course.active_record_types(only_check: [:assignments])).to eq({
+        assignments: "the cached value for :assignments from the 'everything' cache"
+      })
+    end
+
+    it "raises an ArgumentError if you pass (only_check: [])" do
+      expect{
+        course.active_record_types(only_check: [])
+      }.to raise_exception ArgumentError
+    end
+
+    it "raises an ArgumentError if you pass bogus values as only_check" do
+      expect{
+        course.active_record_types(only_check: [:bogus_type, :other_bogus_tab])
+      }.to raise_exception ArgumentError
+    end
+  end
+
   describe "last_updated_at" do
     before :once do
       @course1 = Course.create!(name: "course1", updated_at: 1.year.ago)

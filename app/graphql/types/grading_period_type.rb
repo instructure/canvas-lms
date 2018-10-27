@@ -20,7 +20,7 @@ module Types
   GradingPeriodType = GraphQL::ObjectType.define do
     name "GradingPeriod"
 
-    implements GraphQL::Relay::Node.interface
+    implements GraphQL::Types::Relay::Node
     interfaces [Interfaces::TimestampInterface]
 
     global_id_field :id

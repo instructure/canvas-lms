@@ -1400,4 +1400,47 @@ describe ContextExternalTool do
       end
     end
   end
+
+  describe '#names_and_roles_service_enabled?' do
+
+    context 'when the tool is not configured for LTI 1.3 but the account is' do
+      let(:tool) do
+        @root_account.enable_feature!(:lti_1_3)
+        @root_account.save!
+        @root_account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "www.example.com")
+      end
+
+      it 'returns false' do
+        expect(tool).to_not be_names_and_roles_service_enabled
+      end
+    end
+
+    context 'when the account is not configured for LTI 1.3 but the tool is' do
+      let(:tool) do
+        tool = @root_account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "www.example.com")
+        tool.use_1_3 = true
+        tool.save!
+        tool
+      end
+
+      it 'returns false' do
+        expect(tool).to_not be_names_and_roles_service_enabled
+      end
+    end
+
+    context 'when both the tool and account are configured for LTI 1.3' do
+      let(:tool) do
+        @root_account.enable_feature!(:lti_1_3)
+        @root_account.save!
+        tool = @root_account.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob", :domain => "www.example.com")
+        tool.settings['use_1_3'] = true
+        tool.save!
+        tool
+      end
+
+      it 'returns true' do
+        expect(tool).to be_names_and_roles_service_enabled
+      end
+    end
+  end
 end

@@ -229,7 +229,7 @@ class PlannerController < ApplicationController
 
   def unread_discussion_topic_collection
     item_collection('unread_discussion_topics',
-                    @current_user.discussion_topics_needing_viewing(default_opts).
+                    @current_user.discussion_topics_needing_viewing(default_opts.except(:include_locked)).
                       unread_for(@current_user),
                     DiscussionTopic, [:todo_date, :posted_at, :delayed_post_at, :created_at], :id)
   end
@@ -260,24 +260,25 @@ class PlannerController < ApplicationController
   end
 
   def page_collection
-    item_collection('pages', @current_user.wiki_pages_needing_viewing(default_opts),
+    item_collection('pages', @current_user.wiki_pages_needing_viewing(default_opts.except(:include_locked)),
       WikiPage, [:todo_date, :created_at], :id)
   end
 
   def ungraded_discussion_collection
-    item_collection('ungraded_discussions', @current_user.discussion_topics_needing_viewing(default_opts),
+    item_collection('ungraded_discussions', @current_user.discussion_topics_needing_viewing(default_opts.except(:include_locked)),
       DiscussionTopic, [:todo_date, :posted_at, :created_at], :id)
   end
 
   def calendar_events_collection
-    item_collection('calendar_events', @current_user.calendar_events_for_contexts(@context_codes, start_at: start_date,
-      end_at: end_date),
+    item_collection('calendar_events',
+      CalendarEvent.active.not_hidden.for_user_and_context_codes(@current_user, @context_codes).
+         between(@start_date, @end_date),
       CalendarEvent, [:start_at, :created_at], :id)
   end
 
   def peer_reviews_collection
     item_collection('peer_reviews',
-      @current_user.submissions_needing_peer_review(default_opts),
+      @current_user.submissions_needing_peer_review(default_opts.except(:include_locked)),
       AssessmentRequest, [{submission: {assignment: :peer_reviews_due_at}},
                           {assessor_asset: :cached_due_date}, :created_at], :id)
   end
@@ -315,8 +316,8 @@ class PlannerController < ApplicationController
       @group_ids = @contexts.select{ |c| c.is_a? Group }.map(&:id)
       @user_ids = @contexts.select{ |c| c.is_a? User }.map(&:id)
     else
-      @course_ids = @current_user.course_ids_for_todo_lists(:student, default_opts)
-      @group_ids = @current_user.group_ids_for_todo_lists(default_opts)
+      @course_ids = @current_user.course_ids_for_todo_lists(:student, default_opts.slice(:course_ids, :include_concluded))
+      @group_ids = @current_user.group_ids_for_todo_lists(default_opts.slice(:group_ids))
       @user_ids = [@current_user.id]
     end
     @context_codes = @course_ids.map{|id| "course_#{id}"} || []
@@ -341,7 +342,6 @@ class PlannerController < ApplicationController
       scope_only: true,
       course_ids: @course_ids,
       group_ids: @group_ids,
-      user_ids: @user_ids,
       limit: per_page.to_i + 1, # needs a + 1 because otherwise folio might think there aren't any more objects
     }
   end

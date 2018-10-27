@@ -395,6 +395,148 @@ describe "assignments" do
           end
         end
       end
+
+      context 'when on index page' do
+        let(:assignment_name) { "Test Assignment"}
+        let(:settings_enable) { { :sis_require_assignment_due_date => { value: true } } }
+        let(:expected_date) { format_date_for_view(Time.zone.now - 1.month) }
+        let(:assignment_id) { @assignment.id }
+        let(:assignment_entry) { f("\#assignment_#{assignment_id}") }
+        let(:post_to_sis_button) { f('.post-to-sis-status', assignment_entry) }
+        let(:due_date_error) { f('#flash_message_holder') }
+        let(:sis_state_text) { f('.icon-post-to-sis', post_to_sis_button).attribute(:alt) }
+        let(:due_date_display) { true }
+        let(:sis_state) { due_date_display ? "disabled" : "enabled" }
+        let(:set_date) { due_date_display ? nil : 1.day.ago}
+        let(:params) { { name: assignment_name} }
+        let(:type) { @course.assignments }
+
+        before(:each) do
+          account_model
+          turn_on_sis
+        end
+
+        def create_hash(due_date = nil)
+          { post_to_sis: false, points_possible: 10 }.merge(due_date_params(due_date))
+        end
+
+        def create_assignment(due_date = nil)
+          @assignment = type.create(create_hash(due_date).merge(params))
+          @assignment.publish! unless @assignment.published?
+        end
+
+        def due_date_params(due_date = nil)
+          due_date ? { due_at: due_date } : { due_at: nil, only_visible_to_overrides: true }
+        end
+
+        def override_create(section_name, due_date = Timecop.freeze(1.day.ago))
+          section = @course.course_sections.create! name: section_name
+
+          @assignment.assignment_overrides.create! do |override|
+            override.set = section
+            override.due_at = due_date
+            override.due_at_overridden = true
+          end
+        end
+
+        def click_sync_to_sis
+          post_to_sis_button.click
+          wait_for_ajaximations
+        end
+
+        def validate
+          get "/courses/#{@course.id}/assignments"
+          click_sync_to_sis
+          expect(due_date_error.displayed?).to be due_date_display
+          expect(sis_state_text).to include(sis_state)
+        end
+
+        describe "when there are due dates" do
+          it 'where there are no overrides' do
+            create_assignment(set_date)
+            validate
+          end
+
+          it 'when there are overrides and no base' do
+            create_assignment
+            override_create("A", set_date)
+            validate
+          end
+
+          it 'when there is a base and overrides' do
+            create_assignment(expected_date)
+            override_create("A", set_date)
+            validate
+          end
+        end
+
+        describe "when there are not due dates" do
+          let(:due_date_display) { false }
+
+          it 'where there are no overrides' do
+            create_assignment(set_date)
+            validate
+          end
+
+          it 'when there are overrides and no base' do
+            create_assignment
+            override_create("A", set_date)
+            validate
+          end
+
+          it 'when there is a base and overrides' do
+            create_assignment(expected_date)
+            override_create("A", set_date)
+            validate
+          end
+        end
+
+        describe 'when due dates for quizzes' do
+          let(:assignment_id) { @assignment.assignment.id }
+          let(:type) { @course.quizzes }
+          let(:assignment_group) { @course.assignment_groups.create!(name: "default") }
+          let(:params) { { title: assignment_name, assignment_group: assignment_group } }
+
+          it 'when there are no overrides' do
+            create_assignment(set_date)
+            validate
+          end
+
+          it 'when there are overrides and no base' do
+            create_assignment
+            override_create("A", set_date)
+            validate
+          end
+          it 'when there is a base and overrides' do
+            create_assignment(expected_date)
+            override_create("A", set_date)
+            validate
+          end
+        end
+
+        describe 'when no due dates for quizzes' do
+          let(:assignment_id) { @assignment.assignment.id }
+          let(:type) { @course.quizzes }
+          let(:assignment_group) { @course.assignment_groups.create!(name: "default") }
+          let(:params) { { title: assignment_name, assignment_group: assignment_group } }
+
+          it 'when there are no overrides' do
+            create_assignment(set_date)
+            validate
+          end
+
+          it 'when there are overrides and no base' do
+            create_assignment
+            override_create("A", set_date)
+            validate
+          end
+          it 'when there is a base and overrides' do
+            create_assignment(expected_date)
+            override_create("A", set_date)
+            validate
+          end
+        end
+      end
     end
 
     it "should create an assignment with more options", priority: "2", test_id: 622614 do

@@ -382,7 +382,7 @@ define [
         e.preventDefault()
         RichContentEditor.callOnRCE(@$description, 'toggle')
         # hide the clicked link, and show the other toggle link.
-        $(e.currentTarget).siblings('.rte_switch_views_link').andSelf().toggle()
+        $(e.currentTarget).siblings('.rte_switch_views_link').andSelf().toggle().focus()
 
     addTinyMCEKeyboardShortcuts: =>
       keyboardShortcutsView = new RCEKeyboardShortcuts()

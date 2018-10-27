@@ -18,6 +18,7 @@
 
 import $ from 'jquery'
 import React from 'react'
+import createReactClass from 'create-react-class';
 import ReactModal from 'react-modal'
 import page from 'page'
 import FilesApp from 'compiled/react_files/components/FilesApp'
@@ -133,26 +134,21 @@ import Toolbar from '../files/Toolbar'
           showingSearchResults={this.state.showingSearchResults}
         />
         <div className='ef-main'>
-          {filesEnv.newFolderTree && (
-            <p>New folder tree goes here</p>
-          )}
-          {!filesEnv.newFolderTree && (
-            <aside
-              className='visible-desktop ef-folder-content'
-              role='region'
-              aria-label={I18n.t('Folder Browsing Tree')}
-            >
-              <FolderTree
-                rootTillCurrentFolder={this.state.rootTillCurrentFolder}
-                rootFoldersToShow={filesEnv.rootFolders}
-                dndOptions={{
-                  onItemDragEnterOrOver: this.onItemDragEnterOrOver,
-                  onItemDragLeaveOrEnd: this.onItemDragLeaveOrEnd,
-                  onItemDrop: this.onItemDrop
-                }}
-              />
-            </aside>
-          )}
+          <aside
+            className='visible-desktop ef-folder-content'
+            role='region'
+            aria-label={I18n.t('Folder Browsing Tree')}
+          >
+            <FolderTree
+              rootTillCurrentFolder={this.state.rootTillCurrentFolder}
+              rootFoldersToShow={filesEnv.rootFolders}
+              dndOptions={{
+                onItemDragEnterOrOver: this.onItemDragEnterOrOver,
+                onItemDragLeaveOrEnd: this.onItemDragLeaveOrEnd,
+                onItemDrop: this.onItemDrop
+              }}
+            />
+          </aside>
           <div
             className='ef-directory'
             role='region'
@@ -228,4 +224,4 @@ import Toolbar from '../files/Toolbar'
     );
   };
 
-export default React.createClass(FilesApp)
+export default createReactClass(FilesApp);

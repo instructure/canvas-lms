@@ -18,9 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {Simulate, SimulateNative} from 'react-addons-test-utils'
 import DueDateTokenWrapper from 'jsx/due_dates/DueDateTokenWrapper'
-import OverrideStudentStore from 'jsx/due_dates/OverrideStudentStore'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('DueDateTokenWrapper', {

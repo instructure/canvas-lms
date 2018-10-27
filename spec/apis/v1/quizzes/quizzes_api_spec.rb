@@ -18,8 +18,12 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../locked_spec')
+require File.expand_path(File.dirname(__FILE__) + '/../../../file_upload_helper')
+
 
 describe Quizzes::QuizzesApiController, type: :request do
+
+  include FileUploadHelper
 
   context 'locked api item' do
     let(:item_type) { 'quiz' }
@@ -436,6 +440,14 @@ describe Quizzes::QuizzesApiController, type: :request do
           expect(new_quiz.allowed_attempts).to eq 1
         end
       end
+
+      it 'removes domain from URLs in description' do
+        file = create_fixture_attachment(@course, 'test_image.jpg')
+        file_link = get_file_link(file)
+        api_create_quiz({description: file_link})
+        link_without_domain = "<a href=\"/courses/#{@course.id}/files/#{file.id}/download\">Link</a>"
+        expect(Quizzes::Quiz.last.description).to eq(link_without_domain)
+      end
     end
 
     context "with grading periods" do
@@ -577,6 +589,14 @@ describe Quizzes::QuizzesApiController, type: :request do
     it "allows quiz attribute \'only_visible_to_overrides\' to be updated to false with PUT request " do
       api_update_quiz({'only_visible_to_overrides' => 'true'}, {'only_visible_to_overrides' => 'false'})
       expect(updated_quiz.only_visible_to_overrides).to eq false
+    end
+
+    it 'removes domain from URLs' do
+      file = create_fixture_attachment(@course, 'test_image.jpg')
+      file_link = get_file_link(file)
+      api_update_quiz({}, {description: file_link})
+      link_without_domain = "<a href=\"/courses/#{@course.id}/files/#{file.id}/download\">Link</a>"
+      expect(Quizzes::Quiz.last.description).to eq(link_without_domain)
     end
 
     context "jsonapi style request" do

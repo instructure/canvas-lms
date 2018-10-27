@@ -24,6 +24,7 @@ describe 'Anonymous Provisional Grades API', type: :request do
   describe 'status' do
     before(:once) do
       course_with_teacher(active_all: true)
+      @course.account.enable_service(:avatars)
       ta_in_course(active_all: true)
       @student = student_in_course(active_all: true).user
       @assignment = @course.assignments.create!(moderated_grading: true, grader_count: 1)

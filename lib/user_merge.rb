@@ -124,7 +124,7 @@ class UserMerge
           Rails.logger.error "migrating #{table} column user_id failed: #{e}"
         end
       end
-      from_user.all_conversations.find_each { |c| c.move_to_user(target_user) } unless Shard.current != target_user.shard
+      from_user.all_conversations.find_each { |c| c.move_to_user(target_user) }
 
       # all topics changing ownership or with entries changing ownership need to be
       # flagged as updated so the materialized views update

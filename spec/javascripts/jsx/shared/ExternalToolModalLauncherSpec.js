@@ -16,104 +16,124 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'react',
-  'react-addons-test-utils',
-  'jquery',
-  'jsx/shared/ExternalToolModalLauncher',
-  'jsx/shared/modal',
-], (React, TestUtils, $, ExternalToolModalLauncher, Modal) => {
-  const defaultWidth = 700;
-  const defaultHeight = 700;
-  QUnit.module('ExternalToolModalLauncher', hooks => {
-    hooks.beforeEach(() => {
-      ENV.LTI_LAUNCH_FRAME_ALLOWANCES = ['midi', 'media']
-    })
-    hooks.afterEach(() => {
-      ENV.LTI_LAUNCH_FRAME_ALLOWANCES = undefined
-    })
+import React from 'react'
 
-    function generateProps (overrides = {}) {
-      return {
-        tool: { placements: { course_assignments_menu: {} } },
-        isOpen: false,
-        onRequestClose: () => {},
-        contextType: 'course',
-        contextId: 5,
-        launchType: 'course_assignments_menu',
-        ...overrides
-      };
+import TestUtils from 'react-dom/test-utils'
+import $ from 'jquery'
+import ExternalToolModalLauncher from 'jsx/shared/ExternalToolModalLauncher'
+import Modal from 'jsx/shared/modal'
+
+const defaultWidth = 700
+const defaultHeight = 700
+QUnit.module('ExternalToolModalLauncher', hooks => {
+  hooks.beforeEach(() => {
+    ENV.LTI_LAUNCH_FRAME_ALLOWANCES = ['midi', 'media']
+  })
+  hooks.afterEach(() => {
+    ENV.LTI_LAUNCH_FRAME_ALLOWANCES = undefined
+  })
+
+  function generateProps(overrides = {}) {
+    return {
+      tool: {placements: {course_assignments_menu: {}}},
+      isOpen: false,
+      onRequestClose: () => {},
+      contextType: 'course',
+      contextId: 5,
+      launchType: 'course_assignments_menu',
+      ...overrides
+    }
+  }
+
+  test('renders a Modal', () => {
+    const component = TestUtils.renderIntoDocument(
+      <ExternalToolModalLauncher {...generateProps()} />
+    )
+    const modalCount = TestUtils.scryRenderedComponentsWithType(component, Modal).length
+
+    equal(modalCount, 1)
+  })
+
+  test('getDimensions returns the modalStyle', () => {
+    const component = TestUtils.renderIntoDocument(
+      <ExternalToolModalLauncher {...generateProps()} />
+    )
+
+    deepEqual(component.getDimensions().modalStyle, {width: defaultWidth})
+  })
+
+  test('getDimensions returns the modalBodyStyle', () => {
+    const component = TestUtils.renderIntoDocument(
+      <ExternalToolModalLauncher {...generateProps()} />
+    )
+
+    deepEqual(component.getDimensions().modalBodyStyle, {
+      width: defaultWidth,
+      height: defaultHeight,
+      padding: 0,
+      display: 'flex',
+      flexDirection: 'column'
+    })
+  })
+
+  test('getDimensions returns the modalLaunchStyle', () => {
+    const component = TestUtils.renderIntoDocument(
+      <ExternalToolModalLauncher {...generateProps()} />
+    )
+
+    deepEqual(component.getDimensions().modalLaunchStyle, {
+      width: defaultWidth,
+      height: defaultHeight,
+      border: 'none'
+    })
+  })
+
+  test('getDimensions returns the modalLaunchStyle with custom height & width', () => {
+    const height = 111
+    const width = 222
+
+    const overrides = {
+      tool: {placements: {course_assignments_menu: {launch_width: width, launch_height: height}}},
+      isOpen: true
     }
 
-    test('renders a Modal', () => {
-      const component = TestUtils.renderIntoDocument(<ExternalToolModalLauncher {...generateProps()} />);
-      const modalCount = TestUtils.scryRenderedComponentsWithType(component, Modal).length;
+    const component = TestUtils.renderIntoDocument(
+      <ExternalToolModalLauncher {...generateProps(overrides)} />
+    )
 
-      equal(modalCount, 1);
-    });
+    deepEqual(component.getDimensions().modalLaunchStyle, {width, height, border: 'none'})
+  })
 
-    test('getDimensions returns the modalStyle', () => {
-      const component = TestUtils.renderIntoDocument(<ExternalToolModalLauncher {...generateProps()} />);
+  test('invokes onRequestClose prop when window receives externalContentReady event', () => {
+    const sandbox = sinon.sandbox.create()
+    const stub = sandbox.stub()
+    const props = generateProps({onRequestClose: stub})
 
-      deepEqual(component.getDimensions().modalStyle, {width: defaultWidth});
-    });
+    $(window).off('externalContentReady')
+    TestUtils.renderIntoDocument(<ExternalToolModalLauncher {...props} />)
+    $(window).trigger('externalContentReady')
 
-    test('getDimensions returns the modalBodyStyle', () => {
-      const component = TestUtils.renderIntoDocument(<ExternalToolModalLauncher {...generateProps()} />);
+    equal(1, stub.callCount)
+    sandbox.restore()
+  })
 
-      deepEqual(
-        component.getDimensions().modalBodyStyle,
-        {width: defaultWidth, height: defaultHeight, padding: 0, display: 'flex', flexDirection: 'column'});
-    });
+  test('invokes onRequestClose prop when window receives externalContentCancel event', () => {
+    const sandbox = sinon.sandbox.create()
+    const stub = sandbox.stub()
+    const props = generateProps({onRequestClose: stub})
 
-    test('getDimensions returns the modalLaunchStyle', () => {
-      const component = TestUtils.renderIntoDocument(<ExternalToolModalLauncher {...generateProps()} />);
+    $(window).off('externalContentCancel')
+    TestUtils.renderIntoDocument(<ExternalToolModalLauncher {...props} />)
+    $(window).trigger('externalContentCancel')
 
-      deepEqual(component.getDimensions().modalLaunchStyle, {width: defaultWidth, height: defaultHeight, border: 'none'});
-    });
+    equal(1, stub.callCount)
+    sandbox.restore()
+  })
 
-    test('getDimensions returns the modalLaunchStyle with custom height & width', () => {
-      const height = 111;
-      const width = 222;
-
-      const overrides = {
-        tool: { placements: { course_assignments_menu: { launch_width: width, launch_height: height } } },
-        isOpen: true }
-
-      const component = TestUtils.renderIntoDocument(<ExternalToolModalLauncher {...generateProps(overrides)} />);
-
-      deepEqual(component.getDimensions().modalLaunchStyle, {width: width, height: height, border: 'none'});
-    });
-
-    test('invokes onRequestClose prop when window receives externalContentReady event', () => {
-      const sandbox = sinon.sandbox.create();
-      const stub = sandbox.stub();
-      const props = generateProps({ onRequestClose: stub });
-
-      $(window).off('externalContentReady');
-      TestUtils.renderIntoDocument(<ExternalToolModalLauncher {...props} />);
-      $(window).trigger('externalContentReady');
-
-      equal(1, stub.callCount);
-      sandbox.restore();
-    });
-
-    test('invokes onRequestClose prop when window receives externalContentCancel event', () => {
-      const sandbox = sinon.sandbox.create();
-      const stub = sandbox.stub();
-      const props = generateProps({ onRequestClose: stub });
-
-      $(window).off('externalContentCancel');
-      TestUtils.renderIntoDocument(<ExternalToolModalLauncher {...props} />);
-      $(window).trigger('externalContentCancel');
-
-      equal(1, stub.callCount);
-      sandbox.restore();
-    });
-
-    test('sets the iframe allowances', () => {
-      const component = TestUtils.renderIntoDocument(<ExternalToolModalLauncher {...generateProps({isOpen: true})} />);
-      equal(component.iframe.getAttribute('allow'), ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; '));
-    });
-  });
-});
+  test('sets the iframe allowances', () => {
+    const component = TestUtils.renderIntoDocument(
+      <ExternalToolModalLauncher {...generateProps({isOpen: true})} />
+    )
+    equal(component.iframe.getAttribute('allow'), ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; '))
+  })
+})

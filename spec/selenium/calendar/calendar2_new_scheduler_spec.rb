@@ -51,9 +51,8 @@ describe "scheduler" do
     it 'changes the Find Appointment button to a close button once the modal to select courses is closed', priority: "1", test_id: 2916527 do
       get "/calendar2"
       f('#FindAppointmentButton').click
-      expect(f('.ReactModalPortal')).to contain_css('.ReactModal__Layout')
-      expect(f('.ReactModal__Header')).to include_text('Select Course')
-      f('.ReactModal__Footer-Actions .btn').click
+      expect(f('[role="dialog"][aria-label="Select Course"]')).to contain_css('select')
+      f('[role="dialog"][aria-label="Select Course"] button[type="submit"]').click
       expect(f('#FindAppointmentButton')).to include_text('Close')
     end
 

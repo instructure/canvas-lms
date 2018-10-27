@@ -531,6 +531,26 @@ This text has a http://www.google.com link in it...
     end
   end
 
+  describe "#auditable?" do
+    it "is auditable if it is not a draft and the assignment is auditable" do
+      @assignment.update!(anonymous_grading: true)
+      comment = @submission.submission_comments.create!(valid_attributes)
+      expect(comment).to be_auditable
+    end
+
+    it "is not auditable if it is a draft and the assignment is auditable" do
+      @assignment.update!(anonymous_grading: true)
+      comment = @submission.submission_comments.create!(valid_attributes.merge(draft: true))
+      expect(comment).not_to be_auditable
+    end
+
+    it "is not auditable if it is not a draft and the assignment is not auditable" do
+      @assignment.update!(anonymous_grading: false, moderated_grading: false)
+      comment = @submission.submission_comments.create!(valid_attributes)
+      expect(comment).not_to be_auditable
+    end
+  end
+
   describe "#edited_at" do
     before(:once) do
       @comment = @submission.submission_comments.create!(valid_attributes)
@@ -575,6 +595,17 @@ This text has a http://www.google.com link in it...
       @submission.submission_comments.create!(author: @student, anonymous: false)
       payload = AnonymousOrModerationEvent.where(assignment: @assignment).last.payload
       expect(payload).to include('anonymous' => false)
+    end
+
+    it "does not create an event on creation when no author present" do
+      expect {
+        @submission.submission_comments.create!(comment: "a comment")
+      }.not_to change { AnonymousOrModerationEvent.count }
+    end
+
+    it "does not create an event when no updating_user present" do
+      comment = @submission.submission_comments.create!(author: @student)
+      expect{ comment.update!(comment: "changing the comment!") }.not_to change{ AnonymousOrModerationEvent.count }
     end
   end
 end

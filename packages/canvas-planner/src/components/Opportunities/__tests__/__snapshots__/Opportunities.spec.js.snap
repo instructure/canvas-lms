@@ -116,7 +116,9 @@ exports[`renders the base component correctly with one of each kind of opportuni
       variant="simple"
     >
       <ol>
-        <li>
+        <li
+          key="1"
+        >
           <Animatable(Opportunity)
             animatableIndex={0}
             courseName="Course Short Name"
@@ -148,7 +150,9 @@ exports[`renders the base component correctly with one of each kind of opportuni
       variant="simple"
     >
       <ol>
-        <li>
+        <li
+          key="2"
+        >
           <Animatable(Opportunity)
             animatableIndex={0}
             courseName="Course Short Name"
@@ -210,7 +214,9 @@ exports[`renders the right course with the right opportunity 1`] = `
       variant="simple"
     >
       <ol>
-        <li>
+        <li
+          key="1"
+        >
           <Animatable(Opportunity)
             animatableIndex={0}
             courseName="Course Short Name"
@@ -222,7 +228,9 @@ exports[`renders the right course with the right opportunity 1`] = `
             url="http://www.non_default_url.com"
           />
         </li>
-        <li>
+        <li
+          key="2"
+        >
           <Animatable(Opportunity)
             animatableIndex={1}
             courseName="A different Course Name"
@@ -254,7 +262,9 @@ exports[`renders the right course with the right opportunity 1`] = `
       variant="simple"
     >
       <ol>
-        <li>
+        <li
+          key="2"
+        >
           <Animatable(Opportunity)
             animatableIndex={0}
             courseName="Course Short Name"

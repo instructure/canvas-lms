@@ -111,7 +111,7 @@ describe('PlannerApp', () => {
     const wrapper = shallow(<PlannerApp
       {...getDefaultValues({isLoading: true})}
       triggerDynamicUiUpdates={mockUpdate} />,
-      {lifecycleExperimental: true}); // so componentDidUpdate gets called on setProps
+      { disableLifecycleMethods: false }); // so componentDidUpdate gets called on setProps
     wrapper.setProps({isLoading: false});
     expect(mockUpdate).toHaveBeenCalledTimes(1);
     expect(mockUpdate).toHaveBeenCalledWith(0);

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import TestUtils from 'react-addons-test-utils'
+import TestUtils from 'react-dom/test-utils'
 import AppDetails from 'jsx/external_apps/components/AppDetails'
 
 QUnit.module('External Apps App Details')

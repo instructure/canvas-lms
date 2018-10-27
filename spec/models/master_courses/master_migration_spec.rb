@@ -649,6 +649,40 @@ describe MasterCourses::MasterMigration do
       expect(rub_to.data.first["learning_outcome_id"]).to eq lo.id
     end
 
+    it "copies links to account outcomes in imported groups on rubrics" do
+      @copy_to = course_factory
+      @template.add_child_course!(@copy_to)
+
+      account = @copy_from.account
+      a_group = account.root_outcome_group
+      lo = account.created_learning_outcomes.create!({:title => 'new outcome'})
+      a_group.add_outcome(lo)
+
+      root = @copy_from.root_outcome_group
+      root.add_outcome_group(a_group) # add the group - not the outcome
+
+      run_master_migration
+
+      rub = Rubric.new(:context => @copy_from)
+      rub.data = [
+        {
+          :points => 3,
+          :description => "Outcome row",
+          :id => 1,
+          :ratings => [{:points => 3,:description => "Rockin'",:criterion_id => 1,:id => 2}],
+          :learning_outcome_id => lo.id
+        }
+      ]
+      rub.save!
+      rub.associate_with(@copy_from, @copy_from)
+      Rubric.where(:id => rub.id).update_all(:updated_at => 5.minute.from_now)
+
+      run_master_migration
+
+      rub_to = @copy_to.rubrics.first
+      expect(rub_to.data.first["learning_outcome_id"]).to eq lo.id
+    end
+
     it "doesn't restore deleted associated files unless relocked" do
       @copy_to = course_factory
       @template.add_child_course!(@copy_to)
@@ -1357,6 +1391,30 @@ describe MasterCourses::MasterMigration do
       end
       run_master_migration
       expect(tag.reload).to_not be_deleted
+    end
+
+    it "should sync module item positions properly" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+      mod = @copy_from.context_modules.create!(:name => "module")
+      tag1 = mod.add_item(type: 'context_module_sub_header', title: 'header')
+      tag2 = mod.add_item(type: 'context_module_sub_header', title: 'header2')
+
+      run_master_migration
+      
+      tag1_to = @copy_to.context_module_tags.where(:migration_id => mig_id(tag1)).first
+      tag2_to = @copy_to.context_module_tags.where(:migration_id => mig_id(tag2)).first
+      expect(tag1_to.position).to eq 1
+      expect(tag2_to.position).to eq 2
+      Timecop.freeze(2.seconds.from_now) do
+        ContentTag.where(:id => tag1).update_all(:position => 2)
+        ContentTag.where(:id => tag2).update_all(:position => 1)
+        mod.touch
+      end
+      run_master_migration
+      
+      expect(tag1_to.reload.position).to eq 2
+      expect(tag2_to.reload.position).to eq 1
     end
 
     it "should be able to delete modules" do

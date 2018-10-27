@@ -19,6 +19,8 @@
 import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
+import Text from '@instructure/ui-elements/lib/components/Text'
+
 import EditExternalToolButton from '../../external_apps/components/EditExternalToolButton'
 import ManageUpdateExternalToolButton from '../../external_apps/components/ManageUpdateExternalToolButton'
 import ExternalToolPlacementButton from '../../external_apps/components/ExternalToolPlacementButton'
@@ -38,13 +40,67 @@ export default class ExternalToolsTableRow extends React.Component {
     this.button.focus()
   }
 
+  nameClassNames = () => classMunger('external_tool', {muted: this.props.tool.enabled === false})
+
+  disabledFlag = () => {
+    if (this.props.tool.enabled === false) {
+      return I18n.t('(disabled)')
+    }
+  }
+
+  locked = () => {
+    if (!this.props.tool.installed_locally) {
+      return (
+        <span className="text-muted">
+          <i
+            className="icon-lock"
+            ref="lockIcon"
+            data-tooltip="top"
+            title={I18n.t('%{app} was installed by Admin and is locked', {
+              app: this.props.tool.name
+            })}
+          />
+        </span>
+      )
+    } else if (this.props.tool.is_master_course_child_content) {
+      if (this.props.tool.restricted_by_master_course) {
+        return (
+          <span className="master-course-cell">
+            <i
+              className="icon-blueprint-lock"
+              data-tooltip="top"
+              title={I18n.t('%{app} was installed by the master course and is locked', {
+                app: this.props.tool.name
+              })}
+            />
+          </span>
+        )
+      } else {
+        return (
+          <span className="master-course-cell">
+            <i
+              className="icon-blueprint"
+              data-tooltip="top"
+              title={I18n.t('%{app} was installed by the master course', {
+                app: this.props.tool.name
+              })}
+            />
+          </span>
+        )
+      }
+    }
+  }
+
+
   renderButtons = () => {
+    if (this.props.tool.lti_version === '1.3') {
+      return <td className="links text-right" nowrap="nowrap">
+        <Text>LTI 1.3</Text>
+      </td>
+    }
     if (this.props.tool.installed_locally && !this.props.tool.restricted_by_master_course) {
-      let configureButton,
-        updateBadge,
-        updateOption,
-        dimissUpdateOption = null
-      const reregistrationButton = null
+      let configureButton= null
+      let updateBadge = null
 
       if (this.props.tool.tool_configuration) {
         configureButton = (
@@ -123,63 +179,11 @@ export default class ExternalToolsTableRow extends React.Component {
     }
   }
 
-  nameClassNames = () => classMunger('external_tool', {muted: this.props.tool.enabled === false})
-
-  disabledFlag = () => {
-    if (this.props.tool.enabled === false) {
-      return I18n.t('(disabled)')
-    }
-  }
-
-  locked = () => {
-    if (!this.props.tool.installed_locally) {
-      return (
-        <span className="text-muted">
-          <i
-            className="icon-lock"
-            ref="lockIcon"
-            data-tooltip="top"
-            title={I18n.t('%{app} was installed by Admin and is locked', {
-              app: this.props.tool.name
-            })}
-          />
-        </span>
-      )
-    } else if (this.props.tool.is_master_course_child_content) {
-      if (this.props.tool.restricted_by_master_course) {
-        return (
-          <span className="master-course-cell">
-            <i
-              className="icon-blueprint-lock"
-              data-tooltip="top"
-              title={I18n.t('%{app} was installed by the master course and is locked', {
-                app: this.props.tool.name
-              })}
-            />
-          </span>
-        )
-      } else {
-        return (
-          <span className="master-course-cell">
-            <i
-              className="icon-blueprint"
-              data-tooltip="top"
-              title={I18n.t('%{app} was installed by the master course', {
-                app: this.props.tool.name
-              })}
-            />
-          </span>
-        )
-      }
-    }
-  }
-
   render() {
     return (
       <tr className="ExternalToolsTableRow external_tool_item">
         <td className="e-tool-table-data center-text">{this.locked()}</td>
         <td
-          scope="row"
           nowrap="nowrap"
           className={`${this.nameClassNames()} e-tool-table-data`}
           title={this.props.tool.name}

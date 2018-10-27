@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import TestUtils from 'react-addons-test-utils'
+import TestUtils from 'react-dom/test-utils'
 import $ from 'jquery'
 import FilePreviewInfoPanel from 'jsx/files/FilePreviewInfoPanel'
 import File from 'compiled/models/File'

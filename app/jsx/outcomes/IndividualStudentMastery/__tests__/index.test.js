@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { mount, shallow } from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme'
+import { mount, shallow } from 'enzyme'
 import { Set } from 'immutable'
 import IndividualStudentMastery from '../index'
 import fetchOutcomes from '../fetchOutcomes'
@@ -176,7 +176,7 @@ it('renders outcome groups in alphabetical order by title', (done) => {
     ],
     outcomes: []
   }))
-  const wrapper = mount(<IndividualStudentMastery {...props} />)
+  const wrapper = shallow(<IndividualStudentMastery {...props} />)
   setTimeout(() => {
     const groups = wrapper.find('OutcomeGroup')
     expect(groups).toHaveLength(4)

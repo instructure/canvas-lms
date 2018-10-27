@@ -34,8 +34,8 @@ export const {
   'SIDEBAR_ENOUGH_ITEMS_LOADED',
 );
 
-export const ENOUGH_ITEMS_TO_SHOW_LIST = 5;
-export const DESIRED_ITEMS_TO_HAVE_LOADED = 10;
+export const ENOUGH_ITEMS_TO_SHOW_LIST = 7;
+export const DESIRED_ITEMS_TO_HAVE_LOADED = 14;
 
 function incompleteItems (state) {
   return state.sidebar.items.filter(item => !item.completed)
@@ -82,11 +82,9 @@ export const sidebarLoadNextItems = identifiableThunk(() => (dispatch, getState)
 export const sidebarLoadInitialItems = (currentMoment, course_id) => (
   (dispatch, getState) => {
     const firstMomentDate = currentMoment.clone().subtract(2, 'weeks');
-    const lastMomentDate = currentMoment.clone().add(2, 'weeks');
-    dispatch(sidebarItemsLoading({firstMoment: firstMomentDate, lastMoment: lastMomentDate, course_id}));
+    dispatch(sidebarItemsLoading({firstMoment: firstMomentDate, course_id}));
     const params = {
       start_date: firstMomentDate.toISOString(),
-      end_date: lastMomentDate.toISOString(),
       order: 'asc',
     };
     if (course_id) {

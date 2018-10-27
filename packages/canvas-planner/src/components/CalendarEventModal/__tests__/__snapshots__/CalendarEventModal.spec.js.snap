@@ -1,0 +1,1184 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders 1`] = `
+<Modal
+  constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
+  insertAt="bottom"
+  label="Calendar Event Details"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
+  onDismiss={[MockFunction]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
+  open={true}
+  shouldCloseOnDocumentClick={true}
+  shouldReturnFocus={true}
+  size="small"
+  transition="fade"
+>
+  <ModalHeader>
+    <Heading
+      border="none"
+      color="inherit"
+      ellipsis={false}
+      level="h2"
+    >
+      <Link
+        as="button"
+        ellipsis={false}
+        href="http://example.com"
+        iconPlacement="start"
+        linkRef={[Function]}
+        variant="default"
+      >
+        event title
+      </Link>
+    </Heading>
+    <CloseButton
+      buttonRef={[Function]}
+      margin="0"
+      offset="x-small"
+      onClick={[MockFunction]}
+      placement="end"
+      size="small"
+      variant="icon"
+    >
+      Close
+    </CloseButton>
+  </ModalHeader>
+  <ModalBody
+    as="div"
+    padding="medium"
+  >
+    <List
+      as="ul"
+      delimiter="none"
+      itemSpacing="small"
+      margin="none"
+      size="medium"
+      variant="unstyled"
+    >
+      <ListItem>
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="medium"
+          weight="bold"
+        >
+          Calendar:
+        </Text>
+        <View
+          display="auto"
+          margin="0 0 0 x-small"
+        >
+          <Text
+            as="span"
+            letterSpacing="normal"
+            size="medium"
+          >
+            the course
+          </Text>
+        </View>
+      </ListItem>
+      <ListItem>
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="medium"
+          weight="bold"
+        >
+          Date & Time:
+        </Text>
+        <View
+          display="auto"
+          margin="0 0 0 x-small"
+        >
+          <Text
+            as="span"
+            letterSpacing="normal"
+            size="medium"
+          >
+            Sep 27, 2018 1:00 PM - 2:00 PM
+          </Text>
+        </View>
+      </ListItem>
+      <ListItem>
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="medium"
+          weight="bold"
+        >
+          Location:
+        </Text>
+        <View
+          display="auto"
+          margin="0 0 0 x-small"
+        >
+          <Text
+            as="span"
+            letterSpacing="normal"
+            size="medium"
+          >
+            somewhere
+          </Text>
+        </View>
+      </ListItem>
+      <ListItem>
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="medium"
+          weight="bold"
+        >
+          Address:
+        </Text>
+        <View
+          display="auto"
+          margin="0 0 0 x-small"
+        >
+          <Text
+            as="span"
+            letterSpacing="normal"
+            size="medium"
+          >
+            here, specifically
+          </Text>
+        </View>
+      </ListItem>
+      <ListItem
+        margin="large 0 0 0"
+      >
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="medium"
+          weight="bold"
+        >
+          Details:
+        </Text>
+        <div
+          dangerouslySetInnerHTML={
+            Object {
+              "__html": "about this event",
+            }
+          }
+        />
+      </ListItem>
+    </List>
+  </ModalBody>
+</Modal>
+`;
+
+exports[`renders with allDay 1`] = `
+<Modal
+  constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
+  insertAt="bottom"
+  label="Calendar Event Details"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
+  onDismiss={[MockFunction]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
+  open={true}
+  shouldCloseOnDocumentClick={true}
+  shouldReturnFocus={true}
+  size="small"
+  transition="fade"
+>
+  <ModalHeader>
+    <Heading
+      border="none"
+      color="inherit"
+      ellipsis={false}
+      level="h2"
+    >
+      <Link
+        as="button"
+        ellipsis={false}
+        href="http://example.com"
+        iconPlacement="start"
+        linkRef={[Function]}
+        variant="default"
+      >
+        event title
+      </Link>
+    </Heading>
+    <CloseButton
+      buttonRef={[Function]}
+      margin="0"
+      offset="x-small"
+      onClick={[MockFunction]}
+      placement="end"
+      size="small"
+      variant="icon"
+    >
+      Close
+    </CloseButton>
+  </ModalHeader>
+  <ModalBody
+    as="div"
+    padding="medium"
+  >
+    <List
+      as="ul"
+      delimiter="none"
+      itemSpacing="small"
+      margin="none"
+      size="medium"
+      variant="unstyled"
+    >
+      <ListItem>
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="medium"
+          weight="bold"
+        >
+          Calendar:
+        </Text>
+        <View
+          display="auto"
+          margin="0 0 0 x-small"
+        >
+          <Text
+            as="span"
+            letterSpacing="normal"
+            size="medium"
+          >
+            the course
+          </Text>
+        </View>
+      </ListItem>
+      <ListItem>
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="medium"
+          weight="bold"
+        >
+          Date & Time:
+        </Text>
+        <View
+          display="auto"
+          margin="0 0 0 x-small"
+        >
+          <Text
+            as="span"
+            letterSpacing="normal"
+            size="medium"
+          >
+            Sep 27, 2018
+          </Text>
+        </View>
+      </ListItem>
+      <ListItem>
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="medium"
+          weight="bold"
+        >
+          Location:
+        </Text>
+        <View
+          display="auto"
+          margin="0 0 0 x-small"
+        >
+          <Text
+            as="span"
+            letterSpacing="normal"
+            size="medium"
+          >
+            somewhere
+          </Text>
+        </View>
+      </ListItem>
+      <ListItem>
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="medium"
+          weight="bold"
+        >
+          Address:
+        </Text>
+        <View
+          display="auto"
+          margin="0 0 0 x-small"
+        >
+          <Text
+            as="span"
+            letterSpacing="normal"
+            size="medium"
+          >
+            here, specifically
+          </Text>
+        </View>
+      </ListItem>
+      <ListItem
+        margin="large 0 0 0"
+      >
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="medium"
+          weight="bold"
+        >
+          Details:
+        </Text>
+        <div
+          dangerouslySetInnerHTML={
+            Object {
+              "__html": "about this event",
+            }
+          }
+        />
+      </ListItem>
+    </List>
+  </ModalBody>
+</Modal>
+`;
+
+exports[`renders with only the startTime 1`] = `
+<Modal
+  constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
+  insertAt="bottom"
+  label="Calendar Event Details"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
+  onDismiss={[MockFunction]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
+  open={true}
+  shouldCloseOnDocumentClick={true}
+  shouldReturnFocus={true}
+  size="small"
+  transition="fade"
+>
+  <ModalHeader>
+    <Heading
+      border="none"
+      color="inherit"
+      ellipsis={false}
+      level="h2"
+    >
+      <Link
+        as="button"
+        ellipsis={false}
+        href="http://example.com"
+        iconPlacement="start"
+        linkRef={[Function]}
+        variant="default"
+      >
+        event title
+      </Link>
+    </Heading>
+    <CloseButton
+      buttonRef={[Function]}
+      margin="0"
+      offset="x-small"
+      onClick={[MockFunction]}
+      placement="end"
+      size="small"
+      variant="icon"
+    >
+      Close
+    </CloseButton>
+  </ModalHeader>
+  <ModalBody
+    as="div"
+    padding="medium"
+  >
+    <List
+      as="ul"
+      delimiter="none"
+      itemSpacing="small"
+      margin="none"
+      size="medium"
+      variant="unstyled"
+    >
+      <ListItem>
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="medium"
+          weight="bold"
+        >
+          Calendar:
+        </Text>
+        <View
+          display="auto"
+          margin="0 0 0 x-small"
+        >
+          <Text
+            as="span"
+            letterSpacing="normal"
+            size="medium"
+          >
+            the course
+          </Text>
+        </View>
+      </ListItem>
+      <ListItem>
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="medium"
+          weight="bold"
+        >
+          Date & Time:
+        </Text>
+        <View
+          display="auto"
+          margin="0 0 0 x-small"
+        >
+          <Text
+            as="span"
+            letterSpacing="normal"
+            size="medium"
+          >
+            Sep 27, 2018 1:00 PM
+          </Text>
+        </View>
+      </ListItem>
+      <ListItem>
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="medium"
+          weight="bold"
+        >
+          Location:
+        </Text>
+        <View
+          display="auto"
+          margin="0 0 0 x-small"
+        >
+          <Text
+            as="span"
+            letterSpacing="normal"
+            size="medium"
+          >
+            somewhere
+          </Text>
+        </View>
+      </ListItem>
+      <ListItem>
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="medium"
+          weight="bold"
+        >
+          Address:
+        </Text>
+        <View
+          display="auto"
+          margin="0 0 0 x-small"
+        >
+          <Text
+            as="span"
+            letterSpacing="normal"
+            size="medium"
+          >
+            here, specifically
+          </Text>
+        </View>
+      </ListItem>
+      <ListItem
+        margin="large 0 0 0"
+      >
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="medium"
+          weight="bold"
+        >
+          Details:
+        </Text>
+        <div
+          dangerouslySetInnerHTML={
+            Object {
+              "__html": "about this event",
+            }
+          }
+        />
+      </ListItem>
+    </List>
+  </ModalBody>
+</Modal>
+`;
+
+exports[`renders with user displayName for calendar 1`] = `
+<Modal
+  constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
+  insertAt="bottom"
+  label="Calendar Event Details"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
+  onDismiss={[MockFunction]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
+  open={true}
+  shouldCloseOnDocumentClick={true}
+  shouldReturnFocus={true}
+  size="small"
+  transition="fade"
+>
+  <ModalHeader>
+    <Heading
+      border="none"
+      color="inherit"
+      ellipsis={false}
+      level="h2"
+    >
+      <Link
+        as="button"
+        ellipsis={false}
+        href="http://example.com"
+        iconPlacement="start"
+        linkRef={[Function]}
+        variant="default"
+      >
+        event title
+      </Link>
+    </Heading>
+    <CloseButton
+      buttonRef={[Function]}
+      margin="0"
+      offset="x-small"
+      onClick={[MockFunction]}
+      placement="end"
+      size="small"
+      variant="icon"
+    >
+      Close
+    </CloseButton>
+  </ModalHeader>
+  <ModalBody
+    as="div"
+    padding="medium"
+  >
+    <List
+      as="ul"
+      delimiter="none"
+      itemSpacing="small"
+      margin="none"
+      size="medium"
+      variant="unstyled"
+    >
+      <ListItem>
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="medium"
+          weight="bold"
+        >
+          Calendar:
+        </Text>
+        <View
+          display="auto"
+          margin="0 0 0 x-small"
+        >
+          <Text
+            as="span"
+            letterSpacing="normal"
+            size="medium"
+          >
+            me
+          </Text>
+        </View>
+      </ListItem>
+      <ListItem>
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="medium"
+          weight="bold"
+        >
+          Date & Time:
+        </Text>
+        <View
+          display="auto"
+          margin="0 0 0 x-small"
+        >
+          <Text
+            as="span"
+            letterSpacing="normal"
+            size="medium"
+          >
+            Sep 27, 2018 1:00 PM - 2:00 PM
+          </Text>
+        </View>
+      </ListItem>
+      <ListItem>
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="medium"
+          weight="bold"
+        >
+          Location:
+        </Text>
+        <View
+          display="auto"
+          margin="0 0 0 x-small"
+        >
+          <Text
+            as="span"
+            letterSpacing="normal"
+            size="medium"
+          >
+            somewhere
+          </Text>
+        </View>
+      </ListItem>
+      <ListItem>
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="medium"
+          weight="bold"
+        >
+          Address:
+        </Text>
+        <View
+          display="auto"
+          margin="0 0 0 x-small"
+        >
+          <Text
+            as="span"
+            letterSpacing="normal"
+            size="medium"
+          >
+            here, specifically
+          </Text>
+        </View>
+      </ListItem>
+      <ListItem
+        margin="large 0 0 0"
+      >
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="medium"
+          weight="bold"
+        >
+          Details:
+        </Text>
+        <div
+          dangerouslySetInnerHTML={
+            Object {
+              "__html": "about this event",
+            }
+          }
+        />
+      </ListItem>
+    </List>
+  </ModalBody>
+</Modal>
+`;
+
+exports[`renders without address 1`] = `
+<Modal
+  constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
+  insertAt="bottom"
+  label="Calendar Event Details"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
+  onDismiss={[MockFunction]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
+  open={true}
+  shouldCloseOnDocumentClick={true}
+  shouldReturnFocus={true}
+  size="small"
+  transition="fade"
+>
+  <ModalHeader>
+    <Heading
+      border="none"
+      color="inherit"
+      ellipsis={false}
+      level="h2"
+    >
+      <Link
+        as="button"
+        ellipsis={false}
+        href="http://example.com"
+        iconPlacement="start"
+        linkRef={[Function]}
+        variant="default"
+      >
+        event title
+      </Link>
+    </Heading>
+    <CloseButton
+      buttonRef={[Function]}
+      margin="0"
+      offset="x-small"
+      onClick={[MockFunction]}
+      placement="end"
+      size="small"
+      variant="icon"
+    >
+      Close
+    </CloseButton>
+  </ModalHeader>
+  <ModalBody
+    as="div"
+    padding="medium"
+  >
+    <List
+      as="ul"
+      delimiter="none"
+      itemSpacing="small"
+      margin="none"
+      size="medium"
+      variant="unstyled"
+    >
+      <ListItem>
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="medium"
+          weight="bold"
+        >
+          Calendar:
+        </Text>
+        <View
+          display="auto"
+          margin="0 0 0 x-small"
+        >
+          <Text
+            as="span"
+            letterSpacing="normal"
+            size="medium"
+          >
+            the course
+          </Text>
+        </View>
+      </ListItem>
+      <ListItem>
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="medium"
+          weight="bold"
+        >
+          Date & Time:
+        </Text>
+        <View
+          display="auto"
+          margin="0 0 0 x-small"
+        >
+          <Text
+            as="span"
+            letterSpacing="normal"
+            size="medium"
+          >
+            Sep 27, 2018 1:00 PM - 2:00 PM
+          </Text>
+        </View>
+      </ListItem>
+      <ListItem>
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="medium"
+          weight="bold"
+        >
+          Location:
+        </Text>
+        <View
+          display="auto"
+          margin="0 0 0 x-small"
+        >
+          <Text
+            as="span"
+            letterSpacing="normal"
+            size="medium"
+          >
+            somewhere
+          </Text>
+        </View>
+      </ListItem>
+      <ListItem
+        margin="large 0 0 0"
+      >
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="medium"
+          weight="bold"
+        >
+          Details:
+        </Text>
+        <div
+          dangerouslySetInnerHTML={
+            Object {
+              "__html": "about this event",
+            }
+          }
+        />
+      </ListItem>
+    </List>
+  </ModalBody>
+</Modal>
+`;
+
+exports[`renders without details 1`] = `
+<Modal
+  constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
+  insertAt="bottom"
+  label="Calendar Event Details"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
+  onDismiss={[MockFunction]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
+  open={true}
+  shouldCloseOnDocumentClick={true}
+  shouldReturnFocus={true}
+  size="small"
+  transition="fade"
+>
+  <ModalHeader>
+    <Heading
+      border="none"
+      color="inherit"
+      ellipsis={false}
+      level="h2"
+    >
+      <Link
+        as="button"
+        ellipsis={false}
+        href="http://example.com"
+        iconPlacement="start"
+        linkRef={[Function]}
+        variant="default"
+      >
+        event title
+      </Link>
+    </Heading>
+    <CloseButton
+      buttonRef={[Function]}
+      margin="0"
+      offset="x-small"
+      onClick={[MockFunction]}
+      placement="end"
+      size="small"
+      variant="icon"
+    >
+      Close
+    </CloseButton>
+  </ModalHeader>
+  <ModalBody
+    as="div"
+    padding="medium"
+  >
+    <List
+      as="ul"
+      delimiter="none"
+      itemSpacing="small"
+      margin="none"
+      size="medium"
+      variant="unstyled"
+    >
+      <ListItem>
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="medium"
+          weight="bold"
+        >
+          Calendar:
+        </Text>
+        <View
+          display="auto"
+          margin="0 0 0 x-small"
+        >
+          <Text
+            as="span"
+            letterSpacing="normal"
+            size="medium"
+          >
+            the course
+          </Text>
+        </View>
+      </ListItem>
+      <ListItem>
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="medium"
+          weight="bold"
+        >
+          Date & Time:
+        </Text>
+        <View
+          display="auto"
+          margin="0 0 0 x-small"
+        >
+          <Text
+            as="span"
+            letterSpacing="normal"
+            size="medium"
+          >
+            Sep 27, 2018 1:00 PM - 2:00 PM
+          </Text>
+        </View>
+      </ListItem>
+      <ListItem>
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="medium"
+          weight="bold"
+        >
+          Location:
+        </Text>
+        <View
+          display="auto"
+          margin="0 0 0 x-small"
+        >
+          <Text
+            as="span"
+            letterSpacing="normal"
+            size="medium"
+          >
+            somewhere
+          </Text>
+        </View>
+      </ListItem>
+      <ListItem>
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="medium"
+          weight="bold"
+        >
+          Address:
+        </Text>
+        <View
+          display="auto"
+          margin="0 0 0 x-small"
+        >
+          <Text
+            as="span"
+            letterSpacing="normal"
+            size="medium"
+          >
+            here, specifically
+          </Text>
+        </View>
+      </ListItem>
+    </List>
+  </ModalBody>
+</Modal>
+`;
+
+exports[`renders without location 1`] = `
+<Modal
+  constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
+  insertAt="bottom"
+  label="Calendar Event Details"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
+  onDismiss={[MockFunction]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
+  open={true}
+  shouldCloseOnDocumentClick={true}
+  shouldReturnFocus={true}
+  size="small"
+  transition="fade"
+>
+  <ModalHeader>
+    <Heading
+      border="none"
+      color="inherit"
+      ellipsis={false}
+      level="h2"
+    >
+      <Link
+        as="button"
+        ellipsis={false}
+        href="http://example.com"
+        iconPlacement="start"
+        linkRef={[Function]}
+        variant="default"
+      >
+        event title
+      </Link>
+    </Heading>
+    <CloseButton
+      buttonRef={[Function]}
+      margin="0"
+      offset="x-small"
+      onClick={[MockFunction]}
+      placement="end"
+      size="small"
+      variant="icon"
+    >
+      Close
+    </CloseButton>
+  </ModalHeader>
+  <ModalBody
+    as="div"
+    padding="medium"
+  >
+    <List
+      as="ul"
+      delimiter="none"
+      itemSpacing="small"
+      margin="none"
+      size="medium"
+      variant="unstyled"
+    >
+      <ListItem>
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="medium"
+          weight="bold"
+        >
+          Calendar:
+        </Text>
+        <View
+          display="auto"
+          margin="0 0 0 x-small"
+        >
+          <Text
+            as="span"
+            letterSpacing="normal"
+            size="medium"
+          >
+            the course
+          </Text>
+        </View>
+      </ListItem>
+      <ListItem>
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="medium"
+          weight="bold"
+        >
+          Date & Time:
+        </Text>
+        <View
+          display="auto"
+          margin="0 0 0 x-small"
+        >
+          <Text
+            as="span"
+            letterSpacing="normal"
+            size="medium"
+          >
+            Sep 27, 2018 1:00 PM - 2:00 PM
+          </Text>
+        </View>
+      </ListItem>
+      <ListItem>
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="medium"
+          weight="bold"
+        >
+          Address:
+        </Text>
+        <View
+          display="auto"
+          margin="0 0 0 x-small"
+        >
+          <Text
+            as="span"
+            letterSpacing="normal"
+            size="medium"
+          >
+            here, specifically
+          </Text>
+        </View>
+      </ListItem>
+      <ListItem
+        margin="large 0 0 0"
+      >
+        <Text
+          as="span"
+          letterSpacing="normal"
+          size="medium"
+          weight="bold"
+        >
+          Details:
+        </Text>
+        <div
+          dangerouslySetInnerHTML={
+            Object {
+              "__html": "about this event",
+            }
+          }
+        />
+      </ListItem>
+    </List>
+  </ModalBody>
+</Modal>
+`;

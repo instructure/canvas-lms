@@ -223,7 +223,7 @@ class CourseSection < ActiveRecord::Base
     @section_display_name ||= self.name
   end
 
-  def move_to_course(course, *opts)
+  def move_to_course(course, **opts)
     return self if self.course_id == course.id
     old_course = self.course
     self.course = course
@@ -232,14 +232,21 @@ class CourseSection < ActiveRecord::Base
     old_course.course_sections.reset
     course.course_sections.reset
     assignment_overrides.active.destroy_all
-    user_ids = self.all_enrollments.map(&:user_id).uniq
+
+    enrollment_data = self.all_enrollments.pluck(:id, :user_id)
+    enrollment_ids = enrollment_data.map(&:first)
+    user_ids = enrollment_data.map(&:last).uniq
 
     all_attrs = { course_id: course.id }
     if self.root_account_id_changed?
       all_attrs[:root_account_id] = self.root_account_id
     end
     self.save!
-    self.all_enrollments.update_all all_attrs
+    if enrollment_ids.any?
+      self.all_enrollments.update_all all_attrs
+      Enrollment.send_later_if_production(:batch_add_to_favorites, enrollment_ids)
+    end
+
     Assignment.suspend_due_date_caching do
       Assignment.where(context: [old_course, self.course]).touch_all
     end
@@ -250,16 +257,23 @@ class CourseSection < ActiveRecord::Base
     end
 
     run_immediately = opts.include?(:run_jobs_immediately)
-    DueDateCacher.recompute_users_for_course(user_ids, course, nil, run_immediately: run_immediately, update_grades: true)
+    DueDateCacher.recompute_users_for_course(
+      user_ids,
+      course,
+      nil,
+      run_immediately: run_immediately,
+      update_grades: true,
+      executing_user: opts[:updating_user]
+    )
   end
 
-  def crosslist_to_course(course, *opts)
+  def crosslist_to_course(course, **opts)
     return self if self.course_id == course.id
     self.nonxlist_course_id ||= self.course_id
-    self.move_to_course(course, *opts)
+    self.move_to_course(course, **opts)
   end
 
-  def uncrosslist(*opts)
+  def uncrosslist(**opts)
     return unless self.nonxlist_course_id
     if self.nonxlist_course.workflow_state == "deleted"
       self.nonxlist_course.workflow_state = "claimed"
@@ -267,7 +281,7 @@ class CourseSection < ActiveRecord::Base
     end
     nonxlist_course = self.nonxlist_course
     self.nonxlist_course = nil
-    self.move_to_course(nonxlist_course, *opts)
+    self.move_to_course(nonxlist_course, **opts)
   end
 
   def crosslisted?

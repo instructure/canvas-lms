@@ -50,4 +50,21 @@ describe Lti::AppUtil do
 
   end
 
+  describe ".display_template" do
+    it "renders the default template if the type is invalid" do
+      expect(Lti::AppUtil.display_template("blah_blah_blah")).to eq(Lti::AppUtil::TOOL_DISPLAY_TEMPLATES["default"])
+    end
+
+    it "renders the specified display_type if the type is valid" do
+      acceptable_types = %w[borderless full_width in_context default full_width_in_context]
+
+      acceptable_types.each do |type|
+        expect(Lti::AppUtil.display_template(type)).to eq(Lti::AppUtil::TOOL_DISPLAY_TEMPLATES[type])
+      end
+    end
+
+    it "renders the display_override if provided" do
+      expect(Lti::AppUtil.display_template("default", display_override: "full_width")).to eq(Lti::AppUtil::TOOL_DISPLAY_TEMPLATES["full_width"])
+    end
+  end
 end

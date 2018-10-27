@@ -50,14 +50,14 @@ it('calls changeDashboardView on link click', () => {
   const mockDispatch = jest.fn();
   const changeDashboardView = mockDispatch;
   const wrapper = mount(<PlannerEmptyState {...defaultProps({changeDashboardView, isCompletelyEmpty: true})} /> );
-  const button = wrapper.find('#PlannerEmptyState_CardView');
+  const button = wrapper.find('button#PlannerEmptyState_CardView');
   button.simulate('click');
   expect(changeDashboardView).toHaveBeenCalledWith('cards');
 });
 
 it('does not call changeDashboardView on false prop', () => {
   const wrapper = mount(<PlannerEmptyState {...defaultProps({isCompletelyEmpty:true})} /> );
-  const button = wrapper.find('#PlannerEmptyState_CardView');
+  const button = wrapper.find('button#PlannerEmptyState_CardView');
   button.simulate('click');
   expect(() => {
     button.simulate('click');

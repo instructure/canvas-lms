@@ -18,6 +18,7 @@
 
 import $ from 'jquery'
 import React from 'react'
+import createReactClass from 'create-react-class';
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
 import ReactModal from 'react-modal'
@@ -55,7 +56,7 @@ import 'compiled/jquery.rails_flash_notifications'
     return this.state.currentColor === color.hexcode;
   }
 
-  var ColorPicker = React.createClass({
+  var ColorPicker = createReactClass({
 
     // ===============
     //     CONFIG

@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import TestUtils from 'react-addons-test-utils'
 import {has, isEmpty} from 'lodash'
 import CourseActivitySummaryStore from 'jsx/dashboard_card/CourseActivitySummaryStore'
 

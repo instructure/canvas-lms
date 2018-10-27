@@ -47,6 +47,7 @@ describe "discussion permissions" do
         DiscussionHelpers.disable_moderate_discussions(@course, context_role)
         DiscussionHelpers.disable_post_to_discussions(@course, context_role)
         DiscussionHelpers.disable_create_discussions(@course, context_role)
+        context_user.touch
         user_session(context_user)
       end
 
@@ -89,7 +90,7 @@ describe "discussion permissions" do
         DiscussionHelpers.disable_view_discussions(@course, context_role)
         DiscussionHelpers.disable_moderate_discussions(@course, context_role)
         DiscussionHelpers.disable_post_to_discussions(@course, context_role)
-
+        context_user.touch
         user_session(context_user)
       end
 
@@ -121,7 +122,7 @@ describe "discussion permissions" do
         DiscussionHelpers.enable_view_discussions(@course, context_role)
         DiscussionHelpers.disable_moderate_discussions(@course, context_role)
         DiscussionHelpers.disable_post_to_discussions(@course, context_role)
-
+        context_user.touch
         user_session(context_user)
       end
 
@@ -155,6 +156,7 @@ describe "discussion permissions" do
         DiscussionHelpers.enable_view_discussions(@course, context_role)
         DiscussionHelpers.disable_moderate_discussions(@course, context_role)
         DiscussionHelpers.enable_post_to_discussions(@course, context_role)
+        context_user.touch
         user_session(context_user)
       end
 
@@ -193,7 +195,7 @@ describe "discussion permissions" do
         DiscussionHelpers.enable_view_discussions(@course, context_role)
         DiscussionHelpers.enable_moderate_discussions(@course, context_role)
         DiscussionHelpers.disable_post_to_discussions(@course, context_role)
-
+        context_user.touch
         user_session(context_user)
       end
 
@@ -227,6 +229,7 @@ describe "discussion permissions" do
         DiscussionHelpers.enable_view_discussions(@course, context_role)
         DiscussionHelpers.enable_moderate_discussions(@course, context_role)
         DiscussionHelpers.enable_post_to_discussions(@course, context_role)
+        context_user.touch
         user_session(context_user)
       end
 
@@ -279,7 +282,7 @@ describe "discussion permissions" do
         DiscussionHelpers.disable_view_discussions(@course, context_role)
         DiscussionHelpers.disable_moderate_discussions(@course, context_role)
         DiscussionHelpers.disable_post_to_discussions(@course, context_role)
-
+        context_user.touch
         user_session(context_user)
       end
 
@@ -316,7 +319,7 @@ describe "discussion permissions" do
         DiscussionHelpers.disable_view_discussions(@course, context_role)
         DiscussionHelpers.disable_moderate_discussions(@course, context_role)
         DiscussionHelpers.disable_post_to_discussions(@course, context_role)
-
+        context_user.touch
         user_session(context_user)
       end
 
@@ -348,7 +351,7 @@ describe "discussion permissions" do
         DiscussionHelpers.enable_view_discussions(@course, context_role)
         DiscussionHelpers.disable_moderate_discussions(@course, context_role)
         DiscussionHelpers.disable_post_to_discussions(@course, context_role)
-
+        context_user.touch
         user_session(context_user)
       end
 
@@ -382,6 +385,7 @@ describe "discussion permissions" do
         DiscussionHelpers.enable_view_discussions(@course, context_role)
         DiscussionHelpers.disable_moderate_discussions(@course, context_role)
         DiscussionHelpers.enable_post_to_discussions(@course, context_role)
+        context_user.touch
         user_session(context_user)
       end
 
@@ -415,7 +419,7 @@ describe "discussion permissions" do
         DiscussionHelpers.enable_view_discussions(@course, context_role)
         DiscussionHelpers.enable_moderate_discussions(@course, context_role)
         DiscussionHelpers.disable_post_to_discussions(@course, context_role)
-
+        context_user.touch
         user_session(context_user)
       end
 
@@ -449,6 +453,7 @@ describe "discussion permissions" do
         DiscussionHelpers.enable_view_discussions(@course, context_role)
         DiscussionHelpers.enable_moderate_discussions(@course, context_role)
         DiscussionHelpers.enable_post_to_discussions(@course, context_role)
+        context_user.touch
         user_session(context_user)
       end
 
@@ -492,6 +497,7 @@ describe "discussion permissions" do
         DiscussionHelpers.disable_view_discussions(@course, context_role)
         DiscussionHelpers.disable_moderate_discussions(@course, context_role)
         DiscussionHelpers.disable_post_to_discussions(@course, context_role)
+        context_user.touch
         user_session(context_user)
       end
 

@@ -27,15 +27,15 @@
   <div class="Sidebar__TodoListContainer"></div>
 <% else %>
   <%= render :partial => 'courses/to_do_list', :locals => {:contexts => nil, :show_legacy_todo_list => true} %>
-<% end %>
-<% locals = {
-    :title => t('coming_up', "Coming Up"),
-    :period => :one_week,
-    :show_context => true,
-    :upcoming => true
+  <% locals = {
+      :title => t('coming_up', "Coming Up"),
+      :period => :one_week,
+      :show_context => true,
+      :upcoming => true
   }
-%>
-<%= render :partial => "shared/event_list", :object => @upcoming_events, :locals => locals %>
+  %>
+  <%= render :partial => "shared/event_list", :object => @upcoming_events, :locals => locals %>
+<% end %>
 <% if @show_recent_feedback %>
 <%= render :partial => "shared/event_list", :object => @recent_feedback, :locals => {:title => t('recent_feedback', "Recent Feedback"), :period => :two_weeks, :show_context => true, :is_recent_feedback => true} %>
 <% end %>

@@ -21,27 +21,12 @@ import _ from 'underscore'
 import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
-import Modal from 'react-modal'
+import Modal from '../../shared/components/InstuiModal'
+import {ModalBody} from '@instructure/ui-overlays/lib/components/Modal'
 import 'compiled/jquery.rails_flash_notifications'
 import store from '../../external_apps/lib/ExternalAppsStore'
 import ConfigurationForm from '../../external_apps/components/ConfigurationForm'
 import Lti2Edit from '../../external_apps/components/Lti2Edit'
-
-const modalOverrides = {
-  overlay: {
-    backgroundColor: 'rgba(0,0,0,0.5)'
-  },
-  content: {
-    position: 'static',
-    top: '0',
-    left: '0',
-    right: 'auto',
-    bottom: 'auto',
-    borderRadius: '0',
-    border: 'none',
-    padding: '0'
-  }
-}
 
 export default class EditExternalToolButton extends React.Component {
   static propTypes = {
@@ -179,31 +164,11 @@ export default class EditExternalToolButton extends React.Component {
             {I18n.t('Edit')}
           </a>
           <Modal
-            className="ReactModal__Content--canvas"
-            overlayClassName="ReactModal__Overlay--canvas"
-            style={modalOverrides}
-            isOpen={this.state.modalIsOpen}
-            onRequestClose={this.closeModal}
+            label={I18n.t('Edit App')}
+            open={this.state.modalIsOpen}
+            onDismiss={this.closeModal}
           >
-            <div className="ReactModal__Layout">
-              <div className="ReactModal__Header">
-                <div className="ReactModal__Header-Title">
-                  <h4>{I18n.t('Edit App')}</h4>
-                </div>
-                <div className="ReactModal__Header-Actions">
-                  <button
-                    className="Button Button--icon-action"
-                    type="button"
-                    onClick={this.closeModal}
-                  >
-                    <i className="icon-x" />
-                    <span className="screenreader-only">Close</span>
-                  </button>
-                </div>
-              </div>
-
-              {this.form()}
-            </div>
+            <ModalBody>{this.form()}</ModalBody>
           </Modal>
         </li>
       )

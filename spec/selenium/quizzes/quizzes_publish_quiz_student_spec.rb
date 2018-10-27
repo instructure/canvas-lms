@@ -36,7 +36,8 @@ describe 'when a quiz is published' do
       before(:each) { get "/courses/#{@course.id}" }
 
       it 'To Do List includes published, untaken quizzes that are due soon for students', priority: "1", test_id: 140613 do
-        expect(f('.right-side-list.to-do-list')).to include_text 'Take Test Quiz'
+        wait_for_ajaximations
+        expect(f('#planner-todosidebar-item-list')).to include_text 'Test Quiz'
       end
     end
   end

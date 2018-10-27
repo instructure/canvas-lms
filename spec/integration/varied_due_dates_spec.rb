@@ -137,38 +137,6 @@ describe "varied due dates" do
       response
     end
 
-    context "as a student" do
-      context "in the base section" do
-        it "shows the course due date in 'todo'" do
-          create_student_todo_assignment
-          user_session(@student1)
-          get '/dashboard-sidebar'
-          assert_todo_due_date wrap_partial(response), @student_todo_course_due_at
-        end
-
-        it "shows the course due date in 'coming up'" do
-          user_session(@student1)
-          get '/dashboard-sidebar'
-          assert_coming_up_due_date wrap_partial(response), @course_due_date
-        end
-      end
-
-      context "in the overridden section" do
-        it "shows the section due date in 'todo'" do
-          create_student_todo_assignment
-          user_session(@student2)
-          get '/dashboard-sidebar'
-          assert_todo_due_date wrap_partial(response), @student_todo_section_due_at
-        end
-
-        it "shows the section due date in 'coming up" do
-          user_session(@student2)
-          get '/dashboard-sidebar'
-          assert_coming_up_due_date wrap_partial(response), @section_due_date
-        end
-      end
-    end
-
     context "as the teacher" do
       it "shows multiple due dates in 'coming up'" do
         user_session(@teacher)

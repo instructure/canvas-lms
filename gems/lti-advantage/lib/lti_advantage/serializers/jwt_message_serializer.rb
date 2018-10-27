@@ -19,6 +19,7 @@ module LtiAdvantage::Serializers
   class JwtMessageSerializer
     IMS_CLAIM_PREFIX = 'https://purl.imsglobal.org/spec/lti/claim/'.freeze
     DL_CLAIM_PREFIX = 'https://purl.imsglobal.org/spec/lti-dl/claim/'.freeze
+    NRPS_CLAIM_URL = 'https://purl.imsglobal.org/spec/lti-nrps/claim/namesroleservice'.freeze
 
     STANDARD_IMS_CLAIMS = %w(
       context
@@ -39,6 +40,8 @@ module LtiAdvantage::Serializers
       deep_linking_settings
       content_items
     ).freeze
+
+    NAMES_AND_ROLES_SERVICE_CLAIM = 'names_and_roles_service'.freeze
 
     def initialize(object)
       @object = object
@@ -62,6 +65,8 @@ module LtiAdvantage::Serializers
           "#{IMS_CLAIM_PREFIX}#{key}"
         elsif DEEP_LINKING_CLAIMS.include?(key)
           "#{DL_CLAIM_PREFIX}#{key}"
+        elsif NAMES_AND_ROLES_SERVICE_CLAIM == key
+          NRPS_CLAIM_URL
         else
           key
         end

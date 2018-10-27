@@ -1661,10 +1661,6 @@ function scrollTo ($thing, time = 500) {
 
       if (data.published) { row.addClass('ig-published'); }
       // TODO: need to go find this item in other modules and update their state
-      model.on('change:published', function() {
-        view.$el.closest('.ig-row').toggleClass('ig-published', model.get('published'));
-        view.render();
-      });
       view.render();
       return view;
     }

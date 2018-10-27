@@ -42,7 +42,7 @@ const render = (props = defaultProps(), children = <p>content</p>) => (
 
 test('renders the BlueprintModal component', () => {
   const tree = enzyme.shallow(render())
-  const node = tree.find('Modal')
+  const node = tree.find('ModalBody')
   ok(node.exists())
   tree.unmount()
 })

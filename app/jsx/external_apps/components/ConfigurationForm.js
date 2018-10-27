@@ -262,6 +262,7 @@ export default class ConfigurationForm extends React.Component {
           <div className="ReactModal__Footer">
             <div className="ReactModal__Footer-Actions">
               {this.props.children}
+              &nbsp;
               {this.submitButton()}
             </div>
           </div>

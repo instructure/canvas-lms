@@ -28,11 +28,21 @@ import StatusPill from 'jsx/grading/StatusPill';
 import JQuerySelectorCache from 'jsx/shared/helpers/JQuerySelectorCache';
 import numberHelper from 'jsx/shared/helpers/numberHelper';
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper';
+import AssessmentAuditButton from 'jsx/speed_grader/AssessmentAuditTray/components/AssessmentAuditButton'
+import AssessmentAuditTray from 'jsx/speed_grader/AssessmentAuditTray'
 import SpeedGraderProvisionalGradeSelector from 'jsx/speed_grader/SpeedGraderProvisionalGradeSelector'
 import SpeedGraderSettingsMenu from 'jsx/speed_grader/SpeedGraderSettingsMenu'
 import studentViewedAtTemplate from 'jst/speed_grader/student_viewed_at';
 import submissionsDropdownTemplate from 'jst/speed_grader/submissions_dropdown';
 import speechRecognitionTemplate from 'jst/speed_grader/speech_recognition';
+import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
+import IconUpload from '@instructure/ui-icons/lib/Line/IconUpload'
+import IconWarning from '@instructure/ui-icons/lib/Line/IconWarning'
+import IconCheckMarkIndeterminate from '@instructure/ui-icons/lib/Line/IconCheckMarkIndeterminate'
+import FailedUploadTreeKite from 'jsx/speed_grader/FailedUploadTreeKite'
+import WaitingWristWatch from 'jsx/speed_grader/WaitingWristWatch'
+import View from '@instructure/ui-layout/lib/components/View'
+import Text from '@instructure/ui-elements/lib/components/Text'
 import round from 'compiled/util/round';
 import _ from 'underscore';
 import INST from './INST';
@@ -81,6 +91,8 @@ const selectors = new JQuerySelectorCache();
 const SPEED_GRADER_COMMENT_TEXTAREA_MOUNT_POINT = 'speed_grader_comment_textarea_mount_point';
 const SPEED_GRADER_SUBMISSION_COMMENTS_DOWNLOAD_MOUNT_POINT = 'speed_grader_submission_comments_download_mount_point';
 const SPEED_GRADER_SETTINGS_MOUNT_POINT = 'speed_grader_settings_mount_point';
+const ASSESSMENT_AUDIT_BUTTON_MOUNT_POINT = 'speed_grader_assessment_audit_button_mount_point'
+const ASSESSMENT_AUDIT_TRAY_MOUNT_POINT = 'speed_grader_assessment_audit_tray_mount_point'
 
 let isAnonymous
 let anonymousGraders
@@ -282,6 +294,9 @@ function mergeStudentsAndSubmission() {
     jsonData.submissionsMap[submission[anonymizableUserId]] = submission;
   });
 
+  // need to presort by anonymous_id for anonymous assignments so that the index property can be consistent
+  if (isAnonymous) jsonData.studentsWithSubmissions.sort((a, b) => a.anonymous_id > b.anonymous_id ? 1 : -1)
+
   jsonData.studentsWithSubmissions.forEach((student, index) => {
     /* eslint-disable no-param-reassign */
     student.enrollments = jsonData.studentEnrollmentMap[student[anonymizableId]];
@@ -295,7 +310,6 @@ function mergeStudentsAndSubmission() {
   });
 
   // handle showing students only in a certain section.
-
   if (!jsonData.GROUP_GRADING_MODE) {
     if (ENV.new_gradebook_enabled) {
       sectionToShow = ENV.selected_section_id
@@ -315,16 +329,6 @@ function mergeStudentsAndSubmission() {
       alert(I18n.t('alerts.no_students_in_section', "Could not find any students in that section, falling back to showing all sections."));
       EG.changeToSection('all')
     }
-  }
-
-  if (isAnonymous) {
-    // When student anonymity is enabled, the students must be indexed
-    // consistently. For a given anonymous id, the student name (e.g. Student 1)
-    // must be consistent regardless of how the students are sorted.
-    const orderedIds = Object.keys(window.jsonData.studentMap).sort()
-    orderedIds.forEach((id, index) => {
-      window.jsonData.studentMap[id].index = index
-    })
   }
 
   switch(userSettings.get("eg_sort_by")) {
@@ -355,18 +359,11 @@ function mergeStudentsAndSubmission() {
       break;
     }
 
+    // The list of students is sorted alphabetically on the server by student last name.
     default: {
-      // The list of students is sorted alphabetically on the server by student
-      // last name.
-
-      if (isAnonymous) {
-        // When student anonymity is enabled, sort by the student's related
-        // anonymous id.
-        window.jsonData.studentsWithSubmissions.sort(EG.compareStudentsBy(student => student.anonymous_id))
-      } else if (utils.shouldHideStudentNames()) {
-        window.jsonData.studentsWithSubmissions.sort(EG.compareStudentsBy(student => (
-          student && student.submission && student.submission.id
-        )));
+      // sorting for isAnonymous occurred earlier before setting up studentMap
+      if (!isAnonymous && utils.shouldHideStudentNames()) {
+        window.jsonData.studentsWithSubmissions.sort(EG.compareStudentsBy(student => student.submission.id))
       }
     }
   }
@@ -376,7 +373,7 @@ function initDropdown(){
   var hideStudentNames = utils.shouldHideStudentNames();
   $("#hide_student_names").attr('checked', hideStudentNames);
 
-  const optionsArray = jsonData.studentsWithSubmissions.map((student, index) => {
+  const optionsArray = jsonData.studentsWithSubmissions.map(student => {
     const {submission_state, submission} = student
     let {name} = student
     const className = SpeedgraderHelpers.classNameBasedOnStudent({submission_state, submission})
@@ -616,6 +613,29 @@ function setupHeader () {
 function unmountCommentTextArea () {
   const node = document.getElementById(SPEED_GRADER_COMMENT_TEXTAREA_MOUNT_POINT);
   ReactDOM.unmountComponentAtNode(node);
+}
+
+function renderProgressIcon (attachment) {
+  const mountPoint = document.getElementById('react_pill_container');
+  let icon = [];
+  switch(attachment.workflow_state) {
+    case 'pending_upload':
+      icon = [<IconUpload />, I18n.t("Uploading Submission")];
+      break;
+    case 'errored':
+      icon = [<IconWarning />, I18n.t("Submission Failed to Submit")];
+      break;
+    case 'processed':
+      break;
+    default:
+      icon = [<IconCheckMarkIndeterminate />, I18n.t("No File Submitted")];
+  };
+
+  ReactDOM.render((
+    <Tooltip tip={ icon[1] }>
+      { icon[0] }
+    </Tooltip>
+  ), mountPoint);
 }
 
 function renderCommentTextArea () {
@@ -1176,6 +1196,7 @@ EG = {
     anonymizableAuthorId = setupAnonymizableAuthorId(isAnonymous)
 
     mergeStudentsAndSubmission();
+
     if (jsonData.GROUP_GRADING_MODE && !jsonData.studentsWithSubmissions.length) {
       if (window.history.length === 1) {
         alert(I18n.t('alerts.no_students_in_groups_close', "Sorry, submissions for this assignment cannot be graded in Speedgrader because there are no assigned users. Please assign users to this group set and try again. Click 'OK' to close this window."))
@@ -1585,6 +1606,41 @@ EG = {
     }
   },
 
+  setUpAssessmentAuditTray() {
+    const bindRef = ref => {
+      EG.assessmentAuditTray = ref
+    }
+
+    const tray = <AssessmentAuditTray ref={bindRef} />
+    ReactDOM.render(tray, document.getElementById(ASSESSMENT_AUDIT_TRAY_MOUNT_POINT))
+
+    const onClick = () => {
+      const {submission} = this.currentStudent
+
+      EG.assessmentAuditTray.show({
+        assignment: {
+          gradesPublishedAt: jsonData.grades_published_at,
+          id: ENV.assignment_id,
+          pointsPossible: jsonData.points_possible
+        },
+        courseId: ENV.course_id,
+        submission: {
+          id: submission.id,
+          score: submission.score
+        }
+      })
+    }
+
+    const button = <AssessmentAuditButton onClick={onClick} />
+    ReactDOM.render(button, document.getElementById(ASSESSMENT_AUDIT_BUTTON_MOUNT_POINT))
+  },
+
+  tearDownAssessmentAuditTray() {
+    ReactDOM.unmountComponentAtNode(document.getElementById(ASSESSMENT_AUDIT_TRAY_MOUNT_POINT))
+    ReactDOM.unmountComponentAtNode(document.getElementById(ASSESSMENT_AUDIT_BUTTON_MOUNT_POINT))
+    EG.assessmentAuditTray = null
+  },
+
   setReadOnly: function(readonly) {
     if (readonly) {
       EG.setGradeReadOnly(true);
@@ -1830,7 +1886,8 @@ EG = {
         data: {
           [anonymizableSubmissionIdKey]: submission[anonymizableUserId],
           attachmentId: attachment.id,
-          display_name: attachment.display_name
+          display_name: attachment.display_name,
+          attachmentWorkflow: attachment.workflow_state
         },
         hrefValues: [anonymizableSubmissionIdKey, 'attachmentId']
       }).appendTo($submission_files_list)
@@ -1862,6 +1919,8 @@ EG = {
       if (vericiteAsset) {
         EG.populateVeriCite(submission, assetString, vericiteAsset, $vericiteScoreContainer, $vericiteInfoContainer, isMostRecent);
       }
+
+      renderProgressIcon(attachment);
     });
 
     $submission_files_container.showIf(submission.versioned_attachments && submission.versioned_attachments.length);
@@ -2071,11 +2130,29 @@ EG = {
     };
   },
 
+  progressSubmissionPreview (attachment) {
+    if (attachment === undefined) {
+      return [
+        <FailedUploadTreeKite />,
+        I18n.t("Upload Failed"),
+        I18n.t("Please have the student submit the file again")
+      ]
+    } else {
+      return [
+        <WaitingWristWatch />,
+        I18n.t("Uploading"),
+        I18n.t("Canvas is attempting to retreive the submissions. Please check back again later.")
+      ]
+    }
+  },
+
   loadSubmissionPreview: function(attachment, submission) {
     clearInterval(sessionTimer);
     $submissions_container.children().hide();
     $(".speedgrader_alert").hide();
-    if (!this.currentStudent.submission || !this.currentStudent.submission.submission_type || this.currentStudent.submission.workflow_state == 'unsubmitted') {
+    if (!this.currentStudent.submission ||
+        !this.currentStudent.submission.submission_type ||
+        this.currentStudent.submission.workflow_state === 'unsubmitted') {
       $this_student_does_not_have_a_submission.show();
       this.emptyIframeHolder()
     } else if (this.currentStudent.submission && this.currentStudent.submission.submitted_at && jsonData.context.quiz && jsonData.context.quiz.anonymous_submissions) {
@@ -2084,9 +2161,32 @@ EG = {
       this.renderAttachment(attachment);
     } else if (submission && submission.submission_type === 'basic_lti_launch') {
       this.renderLtiLaunch($iframe_holder, ENV.lti_retrieve_url, submission.external_tool_url || submission.url);
+    } else if (this.canDisplaySpeedGraderImagePreview(jsonData.context, attachment, submission)){
+        this.emptyIframeHolder()
+        const mountPoint = document.getElementById('iframe_holder');
+        mountPoint.style = "";
+        const state = this.progressSubmissionPreview(attachment);
+        ReactDOM.render((
+          <View margin="large" display="block" as="div" textAlign="center">
+            { state[0] }
+            <Text weight="bold" size="large" as="div">
+              { state[1] }
+            </Text>
+            <Text size="medium" as="div">
+              { state[2] }
+            </Text>
+          </View>
+        ), mountPoint);
     } else {
       this.renderSubmissionPreview();
     }
+  },
+
+  canDisplaySpeedGraderImagePreview (context, attachment, submission) {
+    return !context.quiz &&
+           submission.submission_type !== 'online_text_entry' &&
+           attachment === undefined &&
+           (submission !== undefined || attachment.workflow_state === 'pending_upload')
   },
 
   emptyIframeHolder: function(elem) {
@@ -2871,6 +2971,7 @@ EG = {
     });
   },
 
+  // Note: do not use compareStudentsBy if your dataset includes 0.
   compareStudentsBy: function (f) {
     const secondaryAttr = isAnonymous ? 'anonymous_id' : 'sortable_name'
 
@@ -2879,8 +2980,7 @@ EG = {
       var b = f(studentB);
 
       if ((!a && !b) || a === b) {
-        // chrome / safari sort isn't stable, so we need to sort by name in
-        // case of tie
+        // sort isn't guaranteed to be stable, so we need to sort by name in case of tie
         return natcompare.strings(studentA[secondaryAttr], studentB[secondaryAttr]);
       } else if (!a || a > b) {
         return 1;
@@ -3291,6 +3391,10 @@ export default {
     setupSelectors()
     renderSettingsMenu()
 
+    if (ENV.can_view_audit_trail) {
+      EG.setUpAssessmentAuditTray()
+    }
+
     function registerQuizzesNext (overriddenShowSubmission) {
       showSubmissionOverride = overriddenShowSubmission;
     }
@@ -3310,6 +3414,10 @@ export default {
   },
 
   teardown() {
+    if (ENV.can_view_audit_trail) {
+      EG.tearDownAssessmentAuditTray()
+    }
+
     teardownHandleFragmentChanged()
     teardownBeforeLeavingSpeedgrader()
   },

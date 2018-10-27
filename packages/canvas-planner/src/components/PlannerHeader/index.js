@@ -38,7 +38,7 @@ import StickyButton from '../StickyButton';
 import { isFutureEmpty } from '../../utilities/statusUtils';
 
 import {
-  addDay, savePlannerItem, deletePlannerItem, cancelEditingPlannerItem, openEditingPlannerItem, getNextOpportunities,
+  savePlannerItem, deletePlannerItem, cancelEditingPlannerItem, openEditingPlannerItem, getNextOpportunities,
   getInitialOpportunities, dismissOpportunity, clearUpdateTodo, startLoadingGradesSaga, scrollToToday,
   scrollToNewActivity
 } from '../../actions';
@@ -55,7 +55,6 @@ export class PlannerHeader extends Component {
 
   static propTypes = {
     courses: PropTypes.arrayOf(PropTypes.shape(courseShape)).isRequired,
-    addDay: PropTypes.func,
     savePlannerItem: PropTypes.func.isRequired,
     deletePlannerItem: PropTypes.func.isRequired,
     cancelEditingPlannerItem: PropTypes.func,
@@ -179,9 +178,9 @@ export class PlannerHeader extends Component {
 
   // segregate new and dismissed opportunities
   segregateOpportunities (opportunities) {
-    const newOpportunities = []; 
+    const newOpportunities = [];
     const dismissedOpportunities = [];
-    
+
     opportunities.items.forEach(opportunity => {
       if (opportunity.planner_override && opportunity.planner_override.dismissed) {
         dismissedOpportunities.push(opportunity)
@@ -462,7 +461,7 @@ export const NotifierPlannerHeader = notifier(ThemedPlannerHeader);
 const mapStateToProps = ({opportunities, loading, courses, todo, days, timeZone, ui, firstNewActivityDate}) =>
   ({opportunities, loading, courses, todo, days, timeZone, ui, firstNewActivityDate});
 const mapDispatchToProps = {
-  addDay, savePlannerItem, deletePlannerItem, cancelEditingPlannerItem, openEditingPlannerItem,
+  savePlannerItem, deletePlannerItem, cancelEditingPlannerItem, openEditingPlannerItem,
   getInitialOpportunities, getNextOpportunities, dismissOpportunity, clearUpdateTodo,
   startLoadingGradesSaga, scrollToToday, scrollToNewActivity
 };

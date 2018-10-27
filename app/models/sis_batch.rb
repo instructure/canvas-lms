@@ -69,7 +69,7 @@ class SisBatch < ActiveRecord::Base
       batch.user = user
       batch.save
 
-      att = create_data_attachment(batch, attachment, t(:upload_filename, "sis_upload_%{id}.zip", :id => batch.id))
+      att = create_data_attachment(batch, attachment)
       batch.attachment = att
 
       yield batch if block_given?
@@ -80,12 +80,12 @@ class SisBatch < ActiveRecord::Base
     end
   end
 
-  def self.create_data_attachment(batch, data, display_name)
+  def self.create_data_attachment(batch, data, display_name=nil)
     batch.shard.activate do
       Attachment.new.tap do |att|
         Attachment.skip_3rd_party_submits(true)
         att.context = batch
-        att.display_name = display_name
+        att.display_name = display_name if display_name
         Attachments::Storage.store_for_attachment(att, data)
         att.save!
       end

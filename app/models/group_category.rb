@@ -434,21 +434,23 @@ class GroupCategory < ActiveRecord::Base
     context.users_not_in_groups(allows_multiple_memberships? ? [] : groups.active)
   end
 
-  def assign_unassigned_members(by_section=false)
+  def assign_unassigned_members(by_section=false, updating_user: nil)
     Delayed::Batch.serial_batch do
-      if by_section
-        distribute_members_among_groups_by_section
-        finish_group_member_assignment
-        if current_progress
-          if self.errors.any?
-            current_progress.message = self.errors.full_messages
-            current_progress.fail
-          else
-            complete_progress
+      DueDateCacher.with_executing_user(updating_user) do
+        if by_section
+          distribute_members_among_groups_by_section
+          finish_group_member_assignment
+          if current_progress
+            if self.errors.any?
+              current_progress.message = self.errors.full_messages
+              current_progress.fail
+            else
+              complete_progress
+            end
           end
+        else
+          distribute_members_among_groups(unassigned_users, groups.active)
         end
-      else
-        distribute_members_among_groups(unassigned_users, groups.active)
       end
     end
   rescue => e
@@ -458,9 +460,9 @@ class GroupCategory < ActiveRecord::Base
     end
   end
 
-  def assign_unassigned_members_in_background(by_section=false)
+  def assign_unassigned_members_in_background(by_section=false, updating_user: nil)
     start_progress
-    send_later_enqueue_args(:assign_unassigned_members, {:priority => Delayed::LOW_PRIORITY}, by_section)
+    send_later_enqueue_args(:assign_unassigned_members, {:priority => Delayed::LOW_PRIORITY}, by_section, updating_user: updating_user)
   end
 
   def clone_groups_and_memberships(new_group_category)

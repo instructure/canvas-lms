@@ -292,7 +292,7 @@ module Importers
         course.touch
       end
 
-      DueDateCacher.recompute_course(course, update_grades: true)
+      DueDateCacher.recompute_course(course, update_grades: true, executing_user: migration.user)
 
       Auditors::Course.record_copied(migration.source_course, course, migration.user, source: migration.initiated_source)
       migration.imported_migration_items

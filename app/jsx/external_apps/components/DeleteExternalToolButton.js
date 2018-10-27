@@ -20,24 +20,9 @@ import $ from 'jquery'
 import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
-import Modal from 'react-modal'
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import Modal, {ModalBody, ModalFooter} from '../../shared/components/InstuiModal'
 import store from '../../external_apps/lib/ExternalAppsStore'
-
-const modalOverrides = {
-  overlay: {
-    backgroundColor: 'rgba(0,0,0,0.5)'
-  },
-  content: {
-    position: 'static',
-    top: '0',
-    left: '0',
-    right: 'auto',
-    bottom: 'auto',
-    borderRadius: '0',
-    border: 'none',
-    padding: '0'
-  }
-}
 
 export default class DeleteExternalToolButton extends React.Component {
   static propTypes = {
@@ -92,49 +77,18 @@ export default class DeleteExternalToolButton extends React.Component {
             {I18n.t('Delete')}
           </a>
           <Modal
-            className="ReactModal__Content--canvas ReactModal__Content--mini-modal"
-            overlayClassName="ReactModal__Overlay--canvas"
-            style={modalOverrides}
-            isOpen={this.state.modalIsOpen}
-            onRequestClose={this.closeModal}
+            open={this.state.modalIsOpen}
+            onDismiss={this.closeModal}
+            label={I18n.t('Delete %{tool} App?', {tool: this.props.tool.name})}
           >
-            <div className="ReactModal__Layout">
-              <div className="ReactModal__Header">
-                <div className="ReactModal__Header-Title">
-                  <h4>{I18n.t('Delete %{tool} App?', {tool: this.props.tool.name})}</h4>
-                </div>
-                <div className="ReactModal__Header-Actions">
-                  <button
-                    className="Button Button--icon-action"
-                    type="button"
-                    onClick={this.closeModal}
-                  >
-                    <i className="icon-x" />
-                    <span className="screenreader-only">Close</span>
-                  </button>
-                </div>
-              </div>
-
-              <div className="ReactModal__Body">
-                {I18n.t('Are you sure you want to remove this tool?')}
-              </div>
-
-              <div className="ReactModal__Footer">
-                <div className="ReactModal__Footer-Actions">
-                  <button ref="btnClose" type="button" className="Button" onClick={this.closeModal}>
-                    {I18n.t('Close')}
-                  </button>
-                  <button
-                    ref="btnDelete"
-                    type="button"
-                    className="Button Button--danger"
-                    onClick={this.deleteTool}
-                  >
-                    {I18n.t('Delete')}
-                  </button>
-                </div>
-              </div>
-            </div>
+            <ModalBody>
+              {I18n.t('Are you sure you want to remove this tool?')}
+            </ModalBody>
+            <ModalFooter>
+              <Button onClick={this.closeModal}>{I18n.t('Close')}</Button>
+              &nbsp;
+              <Button onClick={this.deleteTool} variant="danger">{I18n.t('Delete')}</Button>
+            </ModalFooter>
           </Modal>
         </li>
       )

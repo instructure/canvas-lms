@@ -2,6 +2,9 @@
   "add_to_do_7def3c37": {
     "message": "הוספת מטלה לביצוע"
   },
+  "address_3159962f": {
+    "message": "כתובת:"
+  },
   "all_day_fb42c4fc": {
     "message": "כל היום"
   },
@@ -19,6 +22,9 @@
   },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "התחלת ההיסטוריה של המטלות לביצוע שלך"
+  },
+  "calendar_a8563bb2": {
+    "message": "יומן:"
   },
   "calendar_event_89aadc1c": {
     "message": "אירוע יומן"
@@ -49,6 +55,9 @@
   },
   "details_98a31b68": {
     "message": "פרטים"
+  },
+  "details_a6f427c3": {
+    "message": "פרטים:"
   },
   "discussion_6719c51d": {
     "message": "דיון"
@@ -115,6 +124,9 @@
   },
   "loading_planner_items_947a813d": {
     "message": "טעינת פריטי המתכנן"
+  },
+  "location_3b6ff307": {
+    "message": "מיקום:"
   },
   "looks_like_there_isn_t_anything_here_d9bcef49": {
     "message": "נראה שאין פה כלום"

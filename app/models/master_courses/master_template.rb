@@ -222,7 +222,6 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
     # even if there are no default restrictions we should still create the tags initially so know to touch the content if we lock it later
     load_tags! # does nothing if already loaded
     content_tag_for(obj)
-    # TODO: make a thing if we change the defaults at some point and want to force them on all the existing tags
   end
 
   def preload_restrictions!

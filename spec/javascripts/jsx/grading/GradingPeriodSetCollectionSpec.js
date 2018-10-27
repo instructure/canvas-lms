@@ -20,7 +20,7 @@ import _ from 'underscore';
 import $ from 'jquery';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Simulate, findRenderedDOMComponentWithTag } from 'react-addons-test-utils';
+import { Simulate, findRenderedDOMComponentWithTag } from 'react-dom/test-utils';
 import gradingPeriodSetsApi from 'compiled/api/gradingPeriodSetsApi';
 import enrollmentTermsApi from 'compiled/api/enrollmentTermsApi';
 import GradingPeriodSetCollection from 'jsx/grading/GradingPeriodSetCollection';

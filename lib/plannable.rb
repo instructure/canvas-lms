@@ -92,51 +92,6 @@ module Plannable
       col.to_s
     end
 
-    # Retrieves the associated object or objects' attributes and values to be used
-    # in the bookmark for comparison
-    def associations_attributes(object, col)
-      return unless col.is_a?(Hash)
-      association = association_to_preload(col)
-      item = object.class.eager_load(association).find(object.id)
-
-      if association.is_a?(Hash)
-        object_or_array = associated_object(item, association)
-      elsif association.is_a?(Symbol)
-        object_or_array = item.send(association)
-      end
-
-      if object_or_array.is_a? ActiveRecord::Associations::CollectionProxy
-        association_pairs = object_or_array.collect { |o| [o.id, o.attributes] }
-        pairs = [association, Hash[association_pairs]]
-      else
-        pairs = [association, object_or_array.attributes]
-      end
-
-      Hash[*pairs.flatten(1)]
-    end
-
-    # Loops through our association array (e.g. [:submission, :assignment, :course]) and grabs the
-    # deepest associated object (e.g. `course` in this example)
-    def associated_object(item, association)
-      result = item
-      association_array(association).each do |relation|
-        result = result.send(relation)
-      end
-      result
-    end
-
-    # Turns an association hash into an array to be used for accessing the deepest
-    # associated object, eg:
-    #   {submission: {assignment: :course}} => [:submission, :assignment, :course]
-    def association_array(obj)
-      assoc = []
-      obj.each_pair do |key, value|
-        assoc << key
-        assoc << value.is_a?(Hash) ? association_array(value) : value
-      end
-      assoc.flatten
-    end
-
     # Gets the association from a hash or single nested hash to use for preloading
     # e.g. {submission: :cached_due_date} => :submission
     # or   {submission: {assignment: :due_at}} => {submission: :assignment}
@@ -150,14 +105,20 @@ module Plannable
       result
     end
 
-    # Retrieves the value from the association if the column specified calls for it
-    # e.g. for an assessment request object with a column specified as {submission: {assignment: :due_at}}, fetch
-    # the value of the due_at column for the assignment that's associated through the submission for the
-    # assessment request
     def association_value(object, col)
-      return unless col.is_a?(Hash)
-      _table, column = associated_table_column(col)
-      associations_attributes(object, col).values.flat_map {|h| h.slice(column).values}
+      rel_array = []
+      rel_hash = col.clone
+      while rel_hash
+        rel_array << rel_hash.keys.first
+        curr_val = rel_hash[rel_array.last]
+        if curr_val.is_a?(Hash)
+          rel_hash = curr_val
+        else
+          rel_array << curr_val
+          rel_hash = nil
+        end
+      end
+      rel_array.reduce(object) {|val, key| val = val.send(key)}
     end
 
     # Grabs the value to use for the bookmark & comparison
@@ -165,7 +126,7 @@ module Plannable
       if col.is_a?(Array)
         object.attributes.values_at(*col).compact.first # coalesce nulls
       elsif col.is_a?(Hash)
-        association_value(object, col).compact.first
+        association_value(object, col)
       else
         object.attributes[col]
       end
@@ -174,12 +135,18 @@ module Plannable
     def bookmark_for(object)
       bookmark = Bookmark.new
       bookmark.descending = @descending
-      @columns.each do |col|
+      # coming from users_controller, @columns looks like ["due_at", "id"]
+      # coming from planner_controller, like [[:due_at, :created_at], :id]
+      #   or [[{:submission=>{:assignment=>:peer_reviews_due_at}}, {:assessor_asset=>:cached_due_date}, "created_at"], "id"]
+      @columns.flatten.each do |col|
         val = column_value(object, col)
         val = val.utc.strftime("%Y-%m-%d %H:%M:%S.%6N") if val.respond_to?(:strftime)
-        bookmark << val
+        if !val.nil?
+          bookmark << val
+          break
+        end
       end
-      bookmark
+      bookmark << object.id
     end
 
     TYPE_MAP = {

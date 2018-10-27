@@ -457,7 +457,7 @@ TEXT
 <% end %>
 <h2><%= before_label(:'headers.approved_integrations', "Approved Integrations") %></h2>
 <div style="margin-<%= direction('left') %>: 20px;">
-  <% if @user.access_tokens.empty? %>
+  <% if AccessToken.visible_tokens(@user.access_tokens).empty? %>
     <div id="no_approved_integrations"><%= t(:no_approved_integrations, <<-TEXT)
       Third-party applications can request permission to access
       the Canvas site on your behalf.  As you begin authorizing
@@ -465,7 +465,7 @@ TEXT
       TEXT
     %></div>
   <% end %>
-  <div id="access_tokens_holder" style="<%= hidden if @user.access_tokens.empty? %>">
+  <div id="access_tokens_holder" style="<%= hidden if AccessToken.visible_tokens(@user.access_tokens).empty? %>">
     <%= t(:approved_integrations, <<-TEXT)
     These are the third-party applications you have authorized
     to access the Canvas site on your behalf:
@@ -482,7 +482,7 @@ TEXT
         </tr>
       </thead>
       <tbody>
-        <%= render :partial => "access_token", :collection => @user.access_tokens %>
+        <%= render :partial => "access_token", :collection => AccessToken.visible_tokens(@user.access_tokens) %>
         <%= render :partial => "access_token" %>
       </tbody>
     </table>

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import TestUtils from 'react-addons-test-utils'
+import TestUtils from 'react-dom/test-utils'
 import $ from 'jquery'
 import GradingPeriodCollection from 'jsx/grading/gradingPeriodCollection'
 import fakeENV from 'helpers/fakeENV'

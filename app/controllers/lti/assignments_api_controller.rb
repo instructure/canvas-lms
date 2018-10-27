@@ -48,6 +48,14 @@ module Lti
 #         "lti_id": {
 #           "example": "86157096483e6b3a50bfedc6bac902c0b20a824f",
 #           "type": "string"
+#         },
+#         "course_id": {
+#            "example": 10000000000060,
+#            "type": "integer"
+#         },
+#         "lti_course_id": {
+#           "example": "66157096483e6b3a50bfedc6bac902c0b20a8241",
+#           "type": "string"
 #         }
 #       }
 #     }
@@ -92,7 +100,8 @@ module Lti
         'due_at' => assignment_instance.due_at,
         'points_possible' => assignment_instance.points_possible,
         'lti_id' => assignment_instance.lti_context_id,
-        'lti_course_id' => Lti::Asset.opaque_identifier_for(assignment_instance.context)
+        'lti_course_id' => Lti::Asset.opaque_identifier_for(assignment_instance.context),
+        'course_id' => assignment_instance.context.global_id
       }
     end
 

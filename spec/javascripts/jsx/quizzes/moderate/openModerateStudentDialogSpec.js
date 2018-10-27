@@ -16,35 +16,33 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jsx/quizzes/moderate/openModerateStudentDialog'
-], (openModerateStudentDialog) => {
-  let $fixture = null
-  QUnit.module('openModerateStudentDialog', {
-    setup() {
-      $fixture = $('#fixtures').html(`
-        <div id='parent'>
-           <div id='moderate_student_dialog'>   
-            </div>               
-            <a class='ui-dialog-titlebar-close' href='#'>
-            </a>                                           
-            </div>                                         
-          </div>`
-      )
-    },
+import openModerateStudentDialog from 'jsx/quizzes/moderate/openModerateStudentDialog'
+import $ from 'jquery'
 
-    teardown() {
-      $('#fixtures').empty()
-    }
-  })
+let $fixture = null
+QUnit.module('openModerateStudentDialog', {
+  setup() {
+    $fixture = $('#fixtures').html(`
+      <div id='parent'>
+         <div id='moderate_student_dialog'>   
+          </div>               
+          <a class='ui-dialog-titlebar-close' href='#'>
+          </a>                                           
+          </div>                                         
+        </div>`)
+  },
 
-  test('is a function', () => {
-    ok(typeof openModerateStudentDialog === 'function')
-  })
+  teardown() {
+    $('#fixtures').empty()
+  }
+})
 
-  test('focues on close button when opened', () => {
-    let dialog = openModerateStudentDialog($('#moderate_student_dialog'), 500)
-    let focusButton = dialog.parent().find('.ui-dialog-titlebar-close')[0]
-    ok(focusButton === document.activeElement)
-  })
+test('is a function', () => {
+  ok(typeof openModerateStudentDialog === 'function')
+})
+
+test('focues on close button when opened', () => {
+  const dialog = openModerateStudentDialog($('#moderate_student_dialog'), 500)
+  const focusButton = dialog.parent().find('.ui-dialog-titlebar-close')[0]
+  ok(focusButton === document.activeElement)
 })

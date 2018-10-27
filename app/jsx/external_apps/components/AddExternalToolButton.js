@@ -19,43 +19,30 @@
 import $ from 'jquery'
 import I18n from 'i18n!external_tools'
 import React from 'react'
-import Modal from 'react-modal'
-import ExternalTool from 'compiled/models/ExternalTool'
+import Modal from '../../shared/components/InstuiModal'
 import store from 'jsx/external_apps/lib/ExternalAppsStore'
 import ConfigurationForm from 'jsx/external_apps/components/ConfigurationForm'
 import Lti2Iframe from 'jsx/external_apps/components/Lti2Iframe'
 import Lti2Permissions from 'jsx/external_apps/components/Lti2Permissions'
 import DuplicateConfirmationForm from 'jsx/external_apps/components/DuplicateConfirmationForm'
 import 'compiled/jquery.rails_flash_notifications'
-
-const modalOverrides = {
-  overlay: {
-    backgroundColor: 'rgba(0,0,0,0.5)'
-  },
-  content: {
-    position: 'static',
-    top: '0',
-    left: '0',
-    right: 'auto',
-    bottom: 'auto',
-    borderRadius: '0',
-    border: 'none',
-    padding: '0'
-  }
-}
+import ModalBody from '@instructure/ui-overlays/lib/components/Modal/ModalBody';
 
 export default class AddExternalToolButton extends React.Component {
   static propTypes = {}
 
-  state = {
-    modalIsOpen: false,
-    tool: {},
-    isLti2: false,
-    lti2RegistrationUrl: 'about:blank',
-    configurationType: '',
-    duplicateTool: false,
-    attemptedToolSaveData: {},
-    attemptedToolConfigurationType: ''
+  constructor (props) {
+    super(props)
+    this.state = {
+      modalIsOpen: props.modalIsOpen,
+      tool: {},
+      isLti2: props.isLti2,
+      lti2RegistrationUrl: 'about:blank',
+      configurationType: props.configurationType || '',
+      duplicateTool: props.duplicateTool,
+      attemptedToolSaveData: {},
+      attemptedToolConfigurationType: ''
+    }
   }
 
   throttleCreation = false
@@ -237,31 +224,14 @@ export default class AddExternalToolButton extends React.Component {
           {I18n.t('App')}
         </a>
         <Modal
-          className="ReactModal__Content--canvas"
-          overlayClassName="ReactModal__Overlay--canvas"
-          style={modalOverrides}
-          isOpen={this.state.modalIsOpen}
-          onRequestClose={this.closeModal}
+          open={this.state.modalIsOpen}
+          onDismiss={this.closeModal}
+          label={I18n.t('Add App')}
+          size={this.state.isLti2 ? 'auto' : 'large'}
         >
-          <div className="ReactModal__Layout">
-            <div className="ReactModal__Header">
-              <div className="ReactModal__Header-Title">
-                <h4>{I18n.t('Add App')}</h4>
-              </div>
-              <div className="ReactModal__Header-Actions">
-                <button
-                  className="Button Button--icon-action"
-                  type="button"
-                  onClick={this.closeModal}
-                >
-                  <i className="icon-x" />
-                  <span className="screenreader-only">Close</span>
-                </button>
-              </div>
-            </div>
-
+          <ModalBody>
             {this.renderForm()}
-          </div>
+          </ModalBody>
         </Modal>
       </span>
     )

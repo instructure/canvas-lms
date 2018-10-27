@@ -151,13 +151,18 @@ describe "CanvasHttp" do
 
   describe '#insecure_host?' do
     it "should check for insecure hosts" do
-      CanvasHttp.blocked_ip_filters = -> { ['127.0.0.1/8', '42.42.42.42/16']}
-      expect(CanvasHttp.insecure_host?('www.example.com')).to eq false
-      expect(CanvasHttp.insecure_host?('localhost')).to eq true
-      expect(CanvasHttp.insecure_host?('127.0.0.1')).to eq true
-      expect(CanvasHttp.insecure_host?('42.42.42.42')).to eq true
-      expect(CanvasHttp.insecure_host?('42.42.1.1')).to eq true
-      expect(CanvasHttp.insecure_host?('42.1.1.1')).to eq false
+      begin
+        old_filters = CanvasHttp.blocked_ip_filters
+        CanvasHttp.blocked_ip_filters = -> { ['127.0.0.1/8', '42.42.42.42/16']}
+        expect(CanvasHttp.insecure_host?('www.example.com')).to eq false
+        expect(CanvasHttp.insecure_host?('localhost')).to eq true
+        expect(CanvasHttp.insecure_host?('127.0.0.1')).to eq true
+        expect(CanvasHttp.insecure_host?('42.42.42.42')).to eq true
+        expect(CanvasHttp.insecure_host?('42.42.1.1')).to eq true
+        expect(CanvasHttp.insecure_host?('42.1.1.1')).to eq false
+      ensure
+        CanvasHttp.blocked_ip_filters = old_filters
+      end
     end
   end
 

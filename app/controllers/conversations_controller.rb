@@ -317,7 +317,9 @@ class ConversationsController < ApplicationController
   # @argument recipients[] [Required, String]
   #   An array of recipient ids. These may be user ids or course/group ids
   #   prefixed with "course_" or "group_" respectively, e.g.
-  #   recipients[]=1&recipients[]=2&recipients[]=course_3
+  #   recipients[]=1&recipients[]=2&recipients[]=course_3. If the course/group
+  #   has over 100 enrollments, 'bulk_message' and 'group_conversation' must be
+  #   set to true.
   #
   # @argument subject [String]
   #   The subject of the conversation. This is ignored when reusing a

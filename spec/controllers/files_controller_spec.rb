@@ -212,6 +212,7 @@ describe FilesController do
       end
 
       it "should not show restricted external tools to students" do
+        course_file
         @course.enroll_student(@user).accept!
 
         get 'index', params: {:course_id => @course.id}
@@ -252,6 +253,13 @@ describe FilesController do
     it "should require authorization" do
       get 'show', params: {:course_id => @course.id, :id => @file.id}
       assert_unauthorized
+    end
+
+    it "should respect user context" do
+      user_session(@teacher)
+      assert_page_not_found do
+        get 'show', params: {:user_id => @user.id, :id => @file.id}, :format => 'html'
+      end
     end
 
     describe "with verifiers" do
@@ -1343,7 +1351,6 @@ describe FilesController do
           let(:progress_params) do
             assignment_params.merge(
               progress_id: progress.id,
-              submit_assignment: true,
               eula_agreement_timestamp: eula_agreement_timestamp
             )
           end
@@ -1379,31 +1386,6 @@ describe FilesController do
             request
 
             expect(progress.reload.workflow_state).to eq 'failed'
-          end
-        end
-
-        context 'with Progress but submit_assignment not set' do
-          let(:progress) do
-            ::Progress.
-              new(context: assignment, user: user, tag: :upload_via_url).
-              tap(&:start).
-              tap(&:save!)
-          end
-          let(:progress_params) do
-            assignment_params.merge(
-              progress_id: progress.id
-            )
-          end
-          let(:request) { post "api_capture", params: progress_params }
-
-          it 'should not submit the attachment' do
-            expect(homework_service).not_to receive(:submit)
-            request
-          end
-
-          it "returns a 201 http status" do
-            request
-            assert_status(201)
           end
         end
       end

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import TestUtils from 'react-addons-test-utils'
+import TestUtils from 'react-dom/test-utils'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import {mount} from 'enzyme'
 
@@ -46,6 +46,7 @@ function generateKeyList(numKeys = 10) {
 
 function initialApplicationState(list = null, inheritedList = null) {
   return {
+    createLtiKey: {isLtiKey: false},
     createOrEditDeveloperKey: {},
     listDeveloperKeyScopes,
     listDeveloperKeys: {
@@ -234,6 +235,7 @@ test('displays the show more button', () => {
   const list = generateKeyList()
 
   const applicationState = {
+    createLtiKey: {isLtiKey: false},
     listDeveloperKeyScopes,
     createOrEditDeveloperKey: {},
     listDeveloperKeys: {
@@ -252,6 +254,7 @@ test('displays the show more button', () => {
 
 test('renders the list of developer_keys when there are some', () => {
   const applicationState = {
+    createLtiKey: {isLtiKey: false},
     listDeveloperKeyScopes,
     createOrEditDeveloperKey: {},
     listDeveloperKeys: {
@@ -274,6 +277,7 @@ test('renders the list of developer_keys when there are some', () => {
 
 test('displays the developer key on click of show key button', () => {
   const applicationState = {
+    createLtiKey: {isLtiKey: false},
     listDeveloperKeyScopes,
     createOrEditDeveloperKey: {},
     listDeveloperKeys: {
@@ -309,6 +313,7 @@ test('displays the developer key on click of show key button', () => {
 
 test('renders the spinner', () => {
   const applicationState = {
+    createLtiKey: {isLtiKey: false},
     listDeveloperKeyScopes,
     createOrEditDeveloperKey: {},
     listDeveloperKeys: {
@@ -330,36 +335,47 @@ test('renders the spinner', () => {
   ok(spinner)
 })
 
-test('opens the modal when the create button is clicked', () => {
-  const openSpy = sinon.spy()
+test('opens the key selection menu when the create button is clicked', () => {
+  window.ENV = {
+    LTI_1_3_ENABLED: true
+  }
 
-  const overrides = {
-    applicationState: {
-      listDeveloperKeyScopes,
-      createOrEditDeveloperKey: {},
-      listDeveloperKeys: {
-        listDeveloperKeysPending: true,
-        listDeveloperKeysSuccessful: false,
-        list: [
-          {
-            id: "111",
-            api_key: "abc12345678",
-            created_at: "2012-06-07T20:36:50Z"
-          }
-        ]
-      }
-    },
-    actions: {
-      developerKeysModalOpen: openSpy
+  const applicationState = {
+    listDeveloperKeyScopes,
+    createOrEditDeveloperKey: {},
+    createLtiKey: {isLtiKey: false},
+    listDeveloperKeys: {
+      listDeveloperKeysPending: true,
+      listDeveloperKeysSuccessful: false,
+      list: [
+        {
+          id: "111",
+          api_key: "abc12345678",
+          created_at: "2012-06-07T20:36:50Z"
+        }
+      ]
     }
   }
 
-  const component = renderComponent(overrides)
-  const componentNode = ReactDOM.findDOMNode(component)
-  const button = componentNode.querySelector('button')
-  TestUtils.Simulate.click(button)
+  const props = {
+    applicationState,
+    actions: { developerKeysModalOpen: () => {} },
+    store: fakeStore(),
+    ctx: {
+      params: {
+        contextId: ""
+      }
+    }
+  }
+  const wrapper = mount(
+    <DeveloperKeysApp {...props} />
+  )
 
-  ok(openSpy.called)
+  notOk(wrapper.find('Menu').first().find('Portal').exists())
+  wrapper.find('Button').first().simulate('click')
+  ok(wrapper.find('Menu').first().find('Portal').prop('open'))
+  wrapper.unmount()
+  window.ENV = {}
 })
 
 test('does not have the create button on inherited tab', () => {
@@ -367,6 +383,7 @@ test('does not have the create button on inherited tab', () => {
 
   const overrides = {
     applicationState: {
+      createLtiKey: {isLtiKey: false},
       listDeveloperKeyScopes,
       createOrEditDeveloperKey: {},
       listDeveloperKeys: {

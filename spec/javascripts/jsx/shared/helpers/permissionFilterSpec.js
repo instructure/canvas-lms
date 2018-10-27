@@ -16,73 +16,65 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jsx/shared/helpers/permissionFilter'
-], (applyPermissions) => {
+import applyPermissions from 'jsx/shared/helpers/permissionFilter'
 
+QUnit.module('Permissions Filter Helper Function')
 
-  QUnit.module('Permissions Filter Helper Function');
+test('Item requires no permissions', () => {
+  const items = [
+    {
+      permissions: []
+    }
+  ]
 
-  test('Item requires no permissions', () => {
-    const items = [
-      {
-        permissions: []
-      }
-    ];
+  const permissions = {}
+  const results = applyPermissions(items, permissions)
 
-    const permissions = {};
-    const results = applyPermissions(items, permissions);
+  equal(results.length, 1, 'item is not filtered')
+})
 
-    equal(results.length, 1, 'item is not filtered');
-  });
+test('User permissions fully match item permissions', () => {
+  const items = [
+    {
+      permissions: ['perm1', 'perm2']
+    }
+  ]
 
+  const permissions = {
+    perm2: true,
+    perm1: true
+  }
 
-  test('User permissions fully match item permissions', () => {
-    const items = [
-      {
-        permissions: ['perm1', 'perm2']
-      }
-    ];
+  const results = applyPermissions(items, permissions)
 
-    const permissions = {
-      perm2: true,
-      perm1: true
-    };
+  equal(results.length, 1, 'item is not filetered')
+})
 
-    const results = applyPermissions(items, permissions);
+test('User permissions partially match item permissions', () => {
+  const items = [
+    {
+      permissions: ['perm1', 'perm2']
+    }
+  ]
 
-    equal(results.length, 1, 'item is not filetered');
-  });
+  const permissions = {
+    perm1: true
+  }
 
+  const results = applyPermissions(items, permissions)
 
-  test('User permissions partially match item permissions', () => {
-    const items = [
-      {
-        permissions: ['perm1', 'perm2']
-      }
-    ];
+  equal(results.length, 0, 'item is filtered')
+})
 
-    const permissions = {
-      perm1: true
-    };
+test('User permissions fully mismatch required permissions', () => {
+  const items = [
+    {
+      permissions: ['perm1', 'perm2']
+    }
+  ]
 
-    const results = applyPermissions(items, permissions);
+  const permissions = {}
+  const results = applyPermissions(items, permissions)
 
-    equal(results.length, 0, 'item is filtered');
-  });
-
-
-  test('User permissions fully mismatch required permissions', () => {
-    const items = [
-      {
-        permissions: ['perm1', 'perm2']
-      }
-    ];
-
-    const permissions = {};
-    const results = applyPermissions(items, permissions);
-
-    equal(results.length, 0, 'item is filtered');
-  });
-
-});
+  equal(results.length, 0, 'item is filtered')
+})

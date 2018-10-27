@@ -98,7 +98,8 @@ it('toggles the new item tray', () => {
   const wrapper = mount(
     <PlannerHeader {...defaultProps()} cancelEditingPlannerItem={mockCancel} />
   );
-  const button = wrapper.find('[children="Add To Do"]');
+  const button = wrapper.find('ScreenReaderContent [children="Add To Do"]').closest('button');
+
   button.simulate('click');
   expect(findEditTray(wrapper).props().open).toEqual(true);
   expect(mockCancel).not.toHaveBeenCalled();
@@ -145,7 +146,7 @@ it('toggles aria-hidden on the ariaHideElement when opening the add to do item t
     <PlannerHeader {...defaultProps()} ariaHideElement={fakeElement} />
   );
 
-  const button = wrapper.find('IconPlus').parent();
+  const button = wrapper.find('IconPlus').closest('button');
 
   button.simulate('click');
   expect(fakeElement.getAttribute('aria-hidden')).toBe('true');
@@ -383,7 +384,7 @@ it('toggles the grades tray', () => {
   const wrapper = mount(
     <PlannerHeader {...defaultProps()} />
   );
-  const button = wrapper.find('[children="Show My Grades"]');
+  const button = wrapper.find('button [children="Show My Grades"]').first();
   button.simulate('click');
   expect(findGradesTray(wrapper).props().open).toEqual(true);
   button.simulate('click');

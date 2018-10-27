@@ -59,6 +59,30 @@ describe DueDateCacher do
         and_return(@instance)
       DueDateCacher.recompute(@assignment, update_grades: false)
     end
+
+    it "initializes a DueDateCacher with the value of executing_user if it is passed as an argument" do
+      expect(DueDateCacher).to receive(:new).
+        with(@course, [@assignment.id], hash_including(executing_user: @student)).
+        and_return(@instance)
+      DueDateCacher.recompute(@assignment, executing_user: @student)
+    end
+
+    it "initializes a DueDateCacher with the user set by with_executing_user if executing_user is not passed" do
+      expect(DueDateCacher).to receive(:new).
+        with(@course, [@assignment.id], hash_including(executing_user: @student)).
+        and_return(@instance)
+
+      DueDateCacher.with_executing_user(@student) do
+        DueDateCacher.recompute(@assignment)
+      end
+    end
+
+    it "initializes a DueDateCacher with a nil executing_user if no user has been specified at all" do
+      expect(DueDateCacher).to receive(:new).
+        with(@course, [@assignment.id], hash_including(executing_user: nil)).
+        and_return(@instance)
+      DueDateCacher.recompute(@assignment)
+    end
   end
 
   describe ".recompute_course" do
@@ -131,6 +155,30 @@ describe DueDateCacher do
         with(:recompute, singleton: "cached_due_date:calculator:Course:#{@course.global_id}")
       DueDateCacher.recompute_course(@course.id)
     end
+
+    it "initializes a DueDateCacher with the value of executing_user if it is passed in as an argument" do
+      expect(DueDateCacher).to receive(:new).
+        with(@course, match_array(@assignments.map(&:id)), hash_including(executing_user: @student)).
+        and_return(@instance)
+      DueDateCacher.recompute_course(@course, executing_user: @student, run_immediately: true)
+    end
+
+    it "initializes a DueDateCacher with the user set by with_executing_user if executing_user is not passed" do
+      expect(DueDateCacher).to receive(:new).
+        with(@course, match_array(@assignments.map(&:id)), hash_including(executing_user: @student)).
+        and_return(@instance)
+
+      DueDateCacher.with_executing_user(@student) do
+        DueDateCacher.recompute_course(@course, run_immediately: true)
+      end
+    end
+
+    it "initializes a DueDateCacher with a nil executing_user if no user has been specified" do
+      expect(DueDateCacher).to receive(:new).
+        with(@course, match_array(@assignments.map(&:id)), hash_including(executing_user: nil)).
+        and_return(@instance)
+      DueDateCacher.recompute_course(@course, run_immediately: true)
+    end
   end
 
   describe ".recompute_users_for_course" do
@@ -197,6 +245,103 @@ describe DueDateCacher do
       expect(instance).to receive(:send_later_if_production_enqueue_args).
         with(:recompute, singleton: "what:up:dog")
       DueDateCacher.recompute_users_for_course(student_1.id, @course, nil, singleton: "what:up:dog")
+    end
+
+    it "initializes a DueDateCacher with the value of executing_user if set" do
+      expect(DueDateCacher).to receive(:new).
+        with(@course, match_array(assignments.map(&:id)), [student_1.id], hash_including(executing_user: student_1)).
+        and_return(instance)
+
+      DueDateCacher.recompute_users_for_course(student_1.id, @course, nil, executing_user: student_1)
+    end
+
+    it "initializes a DueDateCacher with the user set by with_executing_user if executing_user is not passed" do
+      expect(DueDateCacher).to receive(:new).
+        with(@course, match_array(assignments.map(&:id)), [student_1.id], hash_including(executing_user: student_1)).
+        and_return(instance)
+
+      DueDateCacher.with_executing_user(student_1) do
+        DueDateCacher.recompute_users_for_course(student_1.id, @course, nil)
+      end
+    end
+
+    it "initializes a DueDateCacher with a nil executing_user if no user has been specified" do
+      expect(DueDateCacher).to receive(:new).
+        with(@course, match_array(assignments.map(&:id)), hash_including(executing_user: nil)).
+        and_return(instance)
+      DueDateCacher.recompute_course(@course, run_immediately: true)
+    end
+  end
+
+  describe ".with_executing_user" do
+    let(:student) { User.create! }
+    let(:other_student) { User.create! }
+    let(:course) { Course.create! }
+    let(:assignment) { course.assignments.create!(title: 'hi') }
+    let(:instance) { instance_double("DueDateCacher", recompute: nil) }
+
+    it "accepts a User" do
+      expect {
+        DueDateCacher.with_executing_user(student) do
+          DueDateCacher.recompute_course(course, run_immediately: true)
+        end
+      }.not_to raise_error
+    end
+
+    it "accepts a user ID" do
+      expect {
+        DueDateCacher.with_executing_user(student) do
+          DueDateCacher.recompute_course(course, run_immediately: true)
+        end
+      }.not_to raise_error
+    end
+
+    it "accepts a nil value" do
+      expect {
+        DueDateCacher.with_executing_user(nil) do
+          DueDateCacher.recompute_course(course, run_immediately: true)
+        end
+      }.not_to raise_error
+    end
+
+    it "raises an error if no argument is given" do
+      expect {
+        DueDateCacher.with_executing_user do
+          DueDateCacher.recompute_course(course, run_immediately: true)
+        end
+      }.to raise_error(ArgumentError)
+    end
+  end
+
+  describe ".current_executing_user" do
+    let(:student) { User.create! }
+    let(:other_student) { User.create! }
+
+    it "returns the user set by with_executing_user" do
+      DueDateCacher.with_executing_user(student) do
+        expect(DueDateCacher.current_executing_user).to eq student
+      end
+    end
+
+    it "returns nil if no user has been set" do
+      expect(DueDateCacher.current_executing_user).to be nil
+    end
+
+    it "returns the user in the closest scope when multiple calls are nested" do
+      DueDateCacher.with_executing_user(student) do
+        DueDateCacher.with_executing_user(other_student) do
+          expect(DueDateCacher.current_executing_user).to eq other_student
+        end
+      end
+    end
+
+    it "does not consider users who are no longer in scope" do
+      DueDateCacher.with_executing_user(student) do
+        DueDateCacher.with_executing_user(other_student) do
+        end
+
+        expect(DueDateCacher.current_executing_user).to eq student
+      end
     end
   end
 
@@ -709,13 +854,13 @@ describe DueDateCacher do
       it "does not run the GradeCalculator inline when update_grades is false" do
         expect(@course).not_to receive(:recompute_student_scores_without_send_later)
 
-        DueDateCacher.new(@course, [@assignment1, @assignment2], update_grades: false).recompute
+        DueDateCacher.new(@course, [@assignment], update_grades: false).recompute
       end
 
       it "does not run the GradeCalculator inline when update_grades is not specified" do
         expect(@course).not_to receive(:recompute_student_scores_without_send_later)
 
-        DueDateCacher.new(@course, [@assignment1, @assignment2]).recompute
+        DueDateCacher.new(@course, [@assignment]).recompute
       end
 
       context "when called for specific users" do
@@ -753,6 +898,150 @@ describe DueDateCacher do
           expect(submission_count).to eq 2
         end
       end
+    end
+  end
+
+  describe "AnonymousOrModerationEvent logging" do
+    let(:course) { Course.create! }
+    let(:teacher) { User.create! }
+    let(:student) { User.create! }
+
+    let(:original_due_at) { Time.zone.now }
+    let(:due_at) { Time.zone.now + 1.day }
+
+    # Remove seconds, following the lead of EffectiveDueDates
+    let(:original_due_at_formatted) { original_due_at.change(sec: 0).iso8601 }
+    let(:due_at_formatted) { due_at.change(sec: 0).iso8601 }
+
+    let(:event_type) { 'submission_updated' }
+
+    before(:each) do
+      course.enroll_teacher(teacher, active_all: true)
+      course.enroll_student(student, active_all: true)
+    end
+
+    context "when an executing user is supplied" do
+      context "when the due date changes on an auditable assignment" do
+        let!(:assignment) do
+          course.assignments.create!(
+            title: 'zzz',
+            anonymous_grading: true,
+            due_at: original_due_at
+          )
+        end
+        let(:last_event) { AnonymousOrModerationEvent.where(assignment: assignment, event_type: event_type).last }
+
+        before(:each) do
+          Assignment.suspend_due_date_caching do
+            assignment.update!(due_at: due_at)
+          end
+        end
+
+        it "creates an AnonymousOrModerationEvent for each updated submission" do
+          expect {
+            DueDateCacher.recompute(assignment, executing_user: teacher)
+          }.to change {
+            AnonymousOrModerationEvent.where(assignment: assignment, event_type: event_type).count
+          }.by(1)
+        end
+
+        it "includes the old due date in the payload" do
+          DueDateCacher.recompute(assignment, executing_user: teacher)
+          expect(last_event.payload['due_at'].first).to eq original_due_at_formatted
+        end
+
+        it "includes the new due date in the payload" do
+          DueDateCacher.recompute(assignment, executing_user: teacher)
+          expect(last_event.payload['due_at'].second).to eq due_at_formatted
+        end
+      end
+
+      context "when a due date is added to an auditable assignment" do
+        let!(:assignment) { course.assignments.create!(title: 'zzz', anonymous_grading: true) }
+        let(:last_event) { AnonymousOrModerationEvent.where(assignment: assignment, event_type: event_type).last }
+
+        before(:each) do
+          Assignment.suspend_due_date_caching do
+            assignment.update!(due_at: due_at)
+          end
+        end
+
+        it "creates an AnonymousOrModerationEvent for each updated submission" do
+          expect {
+            DueDateCacher.recompute(assignment, executing_user: teacher)
+          }.to change {
+            AnonymousOrModerationEvent.where(assignment: assignment, event_type: event_type).count
+          }.by(1)
+        end
+
+        it "includes nil as the old due date in the payload" do
+          DueDateCacher.recompute(assignment, executing_user: teacher)
+          expect(last_event.payload['due_at'].first).to be nil
+        end
+
+        it "includes the new due date in the payload" do
+          DueDateCacher.recompute(assignment, executing_user: teacher)
+          expect(last_event.payload['due_at'].second).to eq due_at_formatted
+        end
+      end
+
+      context "when a due date is removed from an auditable assignment" do
+        let!(:assignment) { course.assignments.create!(title: 'z!', anonymous_grading: true, due_at: original_due_at) }
+        let(:last_event) { AnonymousOrModerationEvent.where(assignment: assignment, event_type: event_type).last }
+
+        before(:each) do
+          Assignment.suspend_due_date_caching do
+            assignment.update!(due_at: nil)
+          end
+        end
+
+        it "creates an AnonymousOrModerationEvent for each updated submission" do
+          expect {
+            DueDateCacher.recompute(assignment, executing_user: teacher)
+          }.to change {
+            AnonymousOrModerationEvent.where(assignment: assignment, event_type: event_type).count
+          }.by(1)
+        end
+
+        it "includes the old due date in the payload" do
+          DueDateCacher.recompute(assignment, executing_user: teacher)
+          expect(last_event.payload['due_at'].first).to eq original_due_at_formatted
+        end
+
+        it "includes nil as the new due date in the payload" do
+          DueDateCacher.recompute(assignment, executing_user: teacher)
+          expect(last_event.payload['due_at'].second).to be nil
+        end
+      end
+
+      it "does not create AnonymousOrModerationEvents for non-auditable assignments" do
+        assignment = nil
+        Assignment.suspend_due_date_caching do
+          assignment = course.assignments.create!(
+            title: 'zzz',
+            due_at: due_at
+          )
+        end
+
+        expect {
+          DueDateCacher.recompute(assignment, executing_user: teacher)
+        }.not_to change {
+          AnonymousOrModerationEvent.where(assignment: assignment, event_type: 'submission_updated').count
+        }
+      end
+    end
+
+    it "does not create AnonymousOrModerationEvents when no executing user is supplied" do
+      assignment = nil
+      Assignment.suspend_due_date_caching do
+        assignment = course.assignments.create!(title: 'zzz', anonymous_grading: true)
+      end
+
+      expect {
+        DueDateCacher.recompute(assignment)
+      }.not_to change {
+        AnonymousOrModerationEvent.where(assignment: assignment, event_type: 'submission_updated').count
+      }
     end
   end
 end

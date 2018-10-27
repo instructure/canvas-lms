@@ -100,7 +100,7 @@ module SIS
 
             begin
               @course_ids_to_update_associations.merge [@course.id, section.course_id, section.nonxlist_course_id].compact
-              section.crosslist_to_course(@course, :run_jobs_immediately)
+              section.crosslist_to_course(@course, run_jobs_immediately: true)
             rescue => e
               raise ImportError, "An active cross-listing failed: #{e}"
             end
@@ -113,7 +113,7 @@ module SIS
 
             begin
               @course_ids_to_update_associations.merge [section.course_id, section.nonxlist_course_id]
-              section.uncrosslist(:run_jobs_immediately)
+              section.uncrosslist(run_jobs_immediately: true)
             rescue => e
               raise ImportError, "A deleted cross-listing failed: #{e}"
             end

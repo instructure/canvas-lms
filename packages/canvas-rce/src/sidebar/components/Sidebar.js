@@ -56,59 +56,69 @@ class Sidebar extends Component {
         "Title of Sidebar tab containing uploaded images and image services."
     });
 
+    const panels = [
+      <TabPanel title={linksTitle} key="linksPanel">
+        <LinksPanel
+          selectedIndex={this.props.selectedAccordionIndex}
+          onChange={this.props.onChangeAccordion}
+          fetchInitialPage={this.props.fetchInitialPage}
+          fetchNextPage={this.props.fetchNextPage}
+          contextType={this.props.contextType}
+          contextId={this.props.contextId}
+          collections={this.props.collections}
+          onLinkClick={this.props.onLinkClick}
+          toggleNewPageForm={this.props.toggleNewPageForm}
+          newPageLinkExpanded={this.props.newPageLinkExpanded}
+          canCreatePages={this.props.session.canCreatePages}
+        />
+      </TabPanel>,
+      !this.props.filesTabDisabled && (
+        <TabPanel
+          title={filesTitle}
+          key="filesPanel"
+          disabled={this.disableFilesPanel()}
+        >
+          <FilesPanel
+            withUploadForm={this.props.canUploadFiles}
+            files={this.props.files}
+            folders={this.props.folders}
+            fetchFolders={this.props.fetchFolders}
+            rootFolderId={this.props.rootFolderId}
+            startUpload={this.props.startUpload.bind(null, "files")}
+            onLinkClick={this.props.onLinkClick}
+            toggleFolder={this.props.toggleFolder}
+            upload={this.props.upload}
+            toggleUploadForm={this.props.toggleUploadForm}
+            canUploadFiles={this.props.session.canUploadFiles}
+            usageRightsRequired={this.props.session.usageRightsRequired}
+          />
+        </TabPanel>
+      ),
+      <TabPanel id="ImagesSidebarPanel" key="imagesPanel" title={imagesTitle}>
+        <ImagesPanel
+          withUploadForm={this.props.canUploadFiles}
+          upload={this.props.upload}
+          images={this.props.images}
+          startUpload={this.props.startUpload.bind(null, "images")}
+          fetchFolders={this.props.fetchFolders}
+          fetchImages={this.props.fetchImages}
+          flickr={this.props.flickr}
+          flickrSearch={this.props.flickrSearch}
+          toggleUploadForm={this.props.toggleUploadForm}
+          toggleFlickrForm={this.props.toggleFlickrForm}
+          onImageEmbed={this.props.onImageEmbed}
+          usageRightsRequired={this.props.session.usageRightsRequired}
+        />
+      </TabPanel>
+    ].filter(Boolean);
+
     return (
       <ApplyTheme theme={{ [Tab.theme]: { fontSize: "0.8125rem" } }}>
         <TabList
           selectedIndex={this.props.selectedTabIndex}
           onChange={this.props.onChangeTab}
         >
-          <TabPanel title={linksTitle}>
-            <LinksPanel
-              selectedIndex={this.props.selectedAccordionIndex}
-              onChange={this.props.onChangeAccordion}
-              fetchInitialPage={this.props.fetchInitialPage}
-              fetchNextPage={this.props.fetchNextPage}
-              contextType={this.props.contextType}
-              contextId={this.props.contextId}
-              collections={this.props.collections}
-              onLinkClick={this.props.onLinkClick}
-              toggleNewPageForm={this.props.toggleNewPageForm}
-              newPageLinkExpanded={this.props.newPageLinkExpanded}
-              canCreatePages={this.props.session.canCreatePages}
-            />
-          </TabPanel>
-          <TabPanel title={filesTitle} disabled={this.disableFilesPanel()}>
-            <FilesPanel
-              withUploadForm={this.props.canUploadFiles}
-              files={this.props.files}
-              folders={this.props.folders}
-              fetchFolders={this.props.fetchFolders}
-              rootFolderId={this.props.rootFolderId}
-              startUpload={this.props.startUpload.bind(null, "files")}
-              onLinkClick={this.props.onLinkClick}
-              toggleFolder={this.props.toggleFolder}
-              upload={this.props.upload}
-              toggleUploadForm={this.props.toggleUploadForm}
-              canUploadFiles={this.props.session.canUploadFiles}
-              usageRightsRequired={this.props.session.usageRightsRequired}
-            />
-          </TabPanel>
-          <TabPanel id="ImagesSidebarPanel" title={imagesTitle}>
-            <ImagesPanel
-              withUploadForm={this.props.canUploadFiles}
-              upload={this.props.upload}
-              images={this.props.images}
-              startUpload={this.props.startUpload.bind(null, "images")}
-              fetchFolders={this.props.fetchFolders}
-              fetchImages={this.props.fetchImages}
-              flickr={this.props.flickr}
-              flickrSearch={this.props.flickrSearch}
-              toggleUploadForm={this.props.toggleUploadForm}
-              toggleFlickrForm={this.props.toggleFlickrForm}
-              onImageEmbed={this.props.onImageEmbed}
-              usageRightsRequired={this.props.session.usageRightsRequired}
-            />
-          </TabPanel>
+          {panels}
         </TabList>
       </ApplyTheme>
     );
@@ -138,6 +148,7 @@ Sidebar.propTypes = {
   fetchFolders: ImagesPanel.propTypes.fetchFolders,
   flickrSearch: ImagesPanel.propTypes.flickrSearch,
   canUploadFiles: ImagesPanel.propTypes.withUploadForm,
+  filesTabDisabled: PropTypes.bool,
   toggleFlickrForm: ImagesPanel.propTypes.toggleFlickrForm,
   upload: UploadForm.propTypes.upload,
   startUpload: UploadForm.propTypes.startUpload,
@@ -156,6 +167,7 @@ Sidebar.defaultProps = {
   hidden: false,
   selectedTabIndex: 0,
   selectedAccordionIndex: "",
+  filesTabDisabled: false,
   canUploadFiles: false,
   files: {},
   folders: {}

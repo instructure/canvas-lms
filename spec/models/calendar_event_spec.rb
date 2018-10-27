@@ -115,6 +115,32 @@ describe CalendarEvent do
     end
   end
 
+  describe "default_values during update" do
+    before(:once) do
+      course_model
+      @original_start_at = Time.at(1220443500) # 3 Sep 2008 12:05pm (UTC)
+      @original_end_at = @original_start_at + 2.hours
+      @midnight = Time.at(1220421600)
+      @event = calendar_event_model(
+        :start_at => @original_start_at,
+        :end_at => @original_end_at,
+        :time_zone_edited => "Mountain Time (US & Canada)"
+      )
+    end
+
+    it "should not retain all day flag when times are changed (calls :default_values)" do
+      # set the start and end to midnight and make sure all_day is automatically set
+      @event.update_attributes({ :start_at => @midnight, :end_at => @midnight })
+      expect(@event.all_day?).to be_truthy
+      expect(@event.all_day_date.strftime("%Y-%m-%d")).to eq "2008-09-03"
+
+      # set the start and end to different times and then make sure all_day is automatically unset
+      @event.update_attributes({ :start_at => @original_start_at, :end_at => @original_end_at })
+      expect(@event.all_day?).to be_falsey
+    end
+  end
+
+
   context "ical" do
     describe "to_ics" do
       it "should not fail for null times" do

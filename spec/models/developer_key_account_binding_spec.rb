@@ -17,15 +17,101 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
+settings = {
+  'title' => 'LTI 1.3 Tool',
+  'description' => '1.3 Tool',
+  'launch_url' => 'http://lti13testtool.docker/blti_launch',
+  'custom_fields' => {'has_expansion' => '$Canvas.user.id', 'no_expansion' => 'foo'},
+  'public_jwk' => {
+    "kty" => "RSA",
+    "e" => "AQAB",
+    "n" => "2YGluUtCi62Ww_TWB38OE6wTaN...",
+    "kid" => "2018-09-18T21:55:18Z",
+    "alg" => "RS256",
+    "use" => "sig"
+  },
+  'extensions' =>  [
+    {
+      'platform' => 'canvas.instructure.com',
+      'privacy_level' => 'public',
+      'tool_id' => 'LTI 1.3 Test Tool',
+      'domain' => 'http://lti13testtool.docker',
+      'settings' =>  {
+        'icon_url' => 'https://static.thenounproject.com/png/131630-200.png',
+        'selection_height' => 500,
+        'selection_width' => 500,
+        'text' => 'LTI 1.3 Test Tool Extension text',
+        'course_navigation' =>  {
+          'message_type' => 'LtiResourceLinkRequest',
+          'canvas_icon_class' => 'icon-lti',
+          'icon_url' => 'https://static.thenounproject.com/png/131630-211.png',
+          'text' => 'LTI 1.3 Test Tool Course Navigation',
+          'url' =>
+          'http://lti13testtool.docker/launch?placement=course_navigation',
+          'enabled' => true
+        }
+      }
+    }
+  ]
+}
+
 RSpec.describe DeveloperKeyAccountBinding, type: :model do
   let(:account) { account_model }
   let(:developer_key) { DeveloperKey.create! }
-
   let(:dev_key_binding) do
     DeveloperKeyAccountBinding.new(
       account: account,
       developer_key: developer_key
     )
+  end
+  let(:params) { {} }
+  let(:root_account_key) { DeveloperKey.create!(account: account, **params) }
+  let(:root_account_binding) { root_account_key.developer_key_account_bindings.first }
+
+  describe '#lti_1_3_tools' do
+    subject do
+      expect(DeveloperKey.count > 1).to be true
+      described_class.lti_1_3_tools(account)
+    end
+    let(:params) { { visible: true } }
+    let(:workflow_state) { described_class::ON_STATE }
+
+    before do
+      dev_keys = []
+      3.times { dev_keys << DeveloperKey.create!(account: account, **params) }
+      dev_keys.each do |dk|
+        dk.developer_key_account_bindings.first.update! workflow_state: workflow_state
+      end
+    end
+
+    context 'with no visible dev keys' do
+      let(:params) { { visible: false } }
+
+      it { is_expected.to be_empty }
+    end
+
+    context 'with visible dev keys but no ON_STATE keys' do
+      let(:workflow_state) { described_class::ALLOW_STATE }
+
+      it { is_expected.to be_empty }
+    end
+
+    context 'with visible dev keys in ON_STATE but no tool_configurations' do
+      it { is_expected.to be_empty }
+    end
+
+    context 'with visible dev keys in ON_STATE and tool_configurations' do
+      let(:first_key) { DeveloperKey.first }
+      before do
+        first_key.create_tool_configuration! settings: settings
+      end
+
+      it { is_expected.not_to be_empty }
+
+      it 'returns only the visible, turned on, with tool configuration key' do
+        expect(first_key).to eq subject.first.developer_key
+      end
+    end
   end
 
   describe 'validations and callbacks' do
@@ -81,8 +167,6 @@ RSpec.describe DeveloperKeyAccountBinding, type: :model do
     describe 'after_save' do
       let(:site_admin_key) { DeveloperKey.create! }
       let(:site_admin_binding) { site_admin_key.developer_key_account_bindings.find_by(account: Account.site_admin) }
-      let(:root_account_key) { DeveloperKey.create!(account: account_model) }
-      let(:root_account_binding) { root_account_key.developer_key_account_bindings.first }
 
       it 'clears the site admin binding cache if the account is site admin' do
         allow(MultiCache).to receive(:delete).and_return(true)

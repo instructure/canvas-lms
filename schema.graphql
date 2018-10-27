@@ -516,8 +516,6 @@ type Group implements Node & Timestamped {
   # legacy canvas id
   _id: ID!
   createdAt: DateTime
-
-  # ID of the object.
   id: ID!
   membersConnection(
     # Returns the elements in the list that come after the specified cursor.
@@ -836,10 +834,7 @@ scalar URL
 type User implements Node & Timestamped {
   # legacy canvas id
   _id: ID!
-  avatarUrl(
-    # return a generic image if the user has no custom avatar image
-    useFallback: Boolean = true
-  ): URL
+  avatarUrl: URL
   createdAt: DateTime
   email: String
   enrollments(

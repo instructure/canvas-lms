@@ -71,18 +71,28 @@ describe DeveloperKey do
 
   describe 'callbacks' do
     describe 'public_jwk validations' do
-      subject { developer_key_saved }
-
-      before { subject.public_jwk = {invalid: 'test'} }
-
-      it 'verifies public_jwk kty is "RSA"' do
-        expect(subject.save).to eq false
+      subject do
+        developer_key_saved.save
       end
 
-      it 'adds an error message whn public_jwk is invalid' do
-        subject.public_jwk = {invalid: 'test'}
-        subject.save
-        expect(subject.errors[:public_jwk]).to include 'Must use RSA kty'
+      before { developer_key_saved.generate_rsa_keypair! }
+
+      context 'when the kty is not "RSA"' do
+        before { developer_key_saved.public_jwk['kty'] = 'foo' }
+
+        it { is_expected.to eq false }
+      end
+
+      context 'when the alg is not "RS256"' do
+        before { developer_key_saved.public_jwk['alg'] = 'foo' }
+
+        it { is_expected.to eq false }
+      end
+
+      context 'when required claims are missing' do
+        before { developer_key_saved.update public_jwk: {foo: 'bar'} }
+
+        it { is_expected.to eq false }
       end
     end
 

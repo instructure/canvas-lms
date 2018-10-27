@@ -42,6 +42,7 @@ export function renderIntoDiv(target, props = {}, renderCallback) {
           onLinkClick={props.onLinkClick}
           onImageEmbed={props.onImageEmbed}
           canUploadFiles={props.canUploadFiles}
+          filesTabDisabled={props.filesTabDisabled}
         />
       </Provider>,
       target

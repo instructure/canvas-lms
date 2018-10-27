@@ -100,7 +100,7 @@ $.widget('custom.timeoutTooltip', $.ui.tooltip, {
       // remove extra handlers we added, super will add them back
       this._off(target, 'mouseleave focusout keyup')
       apply()
-    }, 20)
+    }, 200)
     // this is from the jquery ui tooltip _open
     // we need to bind events to trigger close so that the
     // timeout is cleared when we mouseout / or leave focus
@@ -123,7 +123,7 @@ $.widget('custom.timeoutTooltip', $.ui.tooltip, {
       delete this.timeout
       return
     }
-    return this._superApply(arguments)
+    return this._superApply([event, true])
   },
 })
 

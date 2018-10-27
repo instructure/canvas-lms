@@ -187,7 +187,7 @@ describe 'account authentication' do
             start_saml_debug
             wait_for_ajaximations
 
-            debug_info = f("#saml_debug_info")
+            debug_info = f(".debug_data")
             expect(debug_info.text).to match('Waiting for attempted login')
           end
         end
@@ -198,17 +198,17 @@ describe 'account authentication' do
             wait_for_ajaximations
 
             aac = Account.default.authentication_providers.active.last
-            aac.debugging_keys.each_with_index do |key, i|
+            aac.class.debugging_keys.map(&:keys).flatten.each_with_index do |key, i|
               aac.debug_set(key, "testvalue#{i}")
             end
 
-            refresh = f("#refresh_saml_debugging")
+            refresh = f(".refresh_debugging")
             refresh.click
             wait_for_ajaximations
 
-            debug_info = f("#saml_debug_info")
+            debug_info = f(".debug_data")
 
-            aac.debugging_keys.each_with_index do |_, i|
+            aac.class.debugging_keys.map(&:keys).flatten.each_with_index do |_, i|
               expect(debug_info.text).to match("testvalue#{i}")
             end
           end
@@ -219,7 +219,7 @@ describe 'account authentication' do
             start_saml_debug
             wait_for_ajaximations
 
-            stop = f("#stop_saml_debugging")
+            stop = f(".stop_debugging")
 
             stop.click
             wait_for_ajaximations
@@ -227,7 +227,7 @@ describe 'account authentication' do
             aac = Account.default.authentication_providers.active.last
             expect(aac.debugging?).to eq false
 
-            aac.debugging_keys.each do |key|
+            aac.class.debugging_keys.map(&:keys).flatten.each do |key|
               expect(aac.debug_get(key)).to eq nil
             end
           end

@@ -23,7 +23,7 @@ import PropTypes from 'prop-types'
 export default function NoResults({search_term}) {
   return (
     <div>
-      <p ref="yourSearch">
+      <p>
         {I18n.t(
           'errors.no_match.your_search',
           'Your search - "%{search_term}" - did not match any files.',

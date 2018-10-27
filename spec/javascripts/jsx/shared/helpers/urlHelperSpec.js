@@ -16,16 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jsx/shared/helpers/urlHelper',
-], ({ encodeSpecialChars, decodeSpecialChars }) => {
-  QUnit.module('Url Helper')
+import {encodeSpecialChars, decodeSpecialChars} from 'jsx/shared/helpers/urlHelper'
 
-  test('encodes % properly', () => {
-    equal(encodeSpecialChars('/some/path%thing'), '/some/path&#37;thing')
-  })
+QUnit.module('Url Helper')
 
-  test('decodes the encoded % properly', () => {
-    equal(decodeSpecialChars('/some/path%26%2337%3Bthing'), '/some/path%25thing')
-  })
+test('encodes % properly', () => {
+  equal(encodeSpecialChars('/some/path%thing'), '/some/path&#37;thing')
+})
+
+test('decodes the encoded % properly', () => {
+  equal(decodeSpecialChars('/some/path%26%2337%3Bthing'), '/some/path%25thing')
 })

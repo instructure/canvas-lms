@@ -20,11 +20,8 @@ import Folder from '../../models/Folder'
 import splitAssetString from '../../str/splitAssetString'
 
 const fileContexts = ENV.FILES_CONTEXTS || []
-let newFolderTree = ENV.NEW_FOLDER_TREE
-if (newFolderTree === undefined) newFolderTree = false
 
 const filesEnv = {
-  newFolderTree,
   contexts: fileContexts,
   contextsDictionary: fileContexts.reduce(function(dict, context) {
     const [contextType, contextId] = Array.from(splitAssetString(context.asset_string))

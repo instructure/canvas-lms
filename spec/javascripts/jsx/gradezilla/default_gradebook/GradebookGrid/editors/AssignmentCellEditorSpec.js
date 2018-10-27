@@ -224,6 +224,12 @@ QUnit.module('AssignmentCellEditor', (suiteHooks) => {
       sinon.stub(editor.component, 'isValueChanged').returns(true)
       strictEqual(editor.isValueChanged(), true)
     })
+
+    test('returns false when the component has not yet rendered', () => {
+      createEditor()
+      editor.component = null
+      strictEqual(editor.isValueChanged(), false)
+    })
   });
 
   QUnit.module('#serializeValue', () => {

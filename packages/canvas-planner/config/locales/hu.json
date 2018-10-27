@@ -1,4 +1,7 @@
 {
+  "address_3159962f": {
+    "message": "Cím:"
+  },
   "all_day_fb42c4fc": {
     "message": "Egész nap"
   },
@@ -7,6 +10,9 @@
   },
   "assignment_976578a8": {
     "message": "Feladat"
+  },
+  "calendar_a8563bb2": {
+    "message": "Naptár"
   },
   "calendar_event_89aadc1c": {
     "message": "Naptáresemény"
@@ -25,6 +31,9 @@
   },
   "details_98a31b68": {
     "message": "Részletek"
+  },
+  "details_a6f427c3": {
+    "message": "Részletek:"
   },
   "discussion_6719c51d": {
     "message": "Fórum"
@@ -52,6 +61,9 @@
   },
   "loading_725811ca": {
     "message": "betöltés"
+  },
+  "location_3b6ff307": {
+    "message": "Helyszín:"
   },
   "missing_1a256b3b": {
     "message": "Hiányzik"

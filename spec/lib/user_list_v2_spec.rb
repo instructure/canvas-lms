@@ -276,6 +276,7 @@ describe UserListV2 do
       end
 
       it "should look on every shard if there aren't that many shards to look on" do
+        skip("stubbing prepended class methods is broken in 2.5.1") if RUBY_VERSION == '2.5.1'
         Setting.set('global_lookups_shard_threshold', '3') # i.e. if we'd have to look on more than 3 shards, we should use global lookups
 
         expect(Pseudonym).to receive(:associated_shards_for_column).never
@@ -286,6 +287,7 @@ describe UserListV2 do
       end
 
       it "should use the global lookups to restrict searched shard if there are enough shards to look on" do
+        skip("stubbing prepended class methods is broken in 2.5.1") if RUBY_VERSION == '2.5.1'
         Setting.set('global_lookups_shard_threshold', '1') # i.e. if we'd have to look on more than 1 shards, we should use global lookups
 
         expect(Pseudonym).to receive(:associated_shards_for_column).once.with(:unique_id, 'jt@instructure.com').and_return([@shard1]) # don't look on shard2

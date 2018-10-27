@@ -59,6 +59,9 @@ define(function(require) {
     },
 
     renderLinkButton: function() {
+      if (!this.props.speedGraderUrl) {
+        return null
+      }
       return (
         <a className="btn" href={this.props.speedGraderUrl} target="_blank" style={{marginBottom: "20px", maxWidth: "50%"}}>
           {I18n.t('speedgrader', 'View in SpeedGrader')}

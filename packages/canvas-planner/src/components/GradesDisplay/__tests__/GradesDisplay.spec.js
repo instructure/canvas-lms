@@ -36,7 +36,7 @@ it('renders some course grades', () => {
 it('does not render caveat if no courses have grading periods', () => {
   const mockCourses = [
     {id: '1', shortName: 'Ticket to Ride 101', color: 'blue', href: '/courses/1',
-      score: null, grade: null, hasGradingPeriods: false},
+      score: null, grade: null, hasGradingPeriods: false, enrollmentType: 'StudentEnrollment'},
   ];
   const wrapper = shallow(<GradesDisplay courses={mockCourses} />);
   expect(wrapper).toMatchSnapshot();

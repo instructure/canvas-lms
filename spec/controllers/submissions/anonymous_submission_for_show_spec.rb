@@ -23,6 +23,7 @@ describe Submissions::AnonymousSubmissionForShow do
 
   let(:course) do
     course_with_student
+    @course.account.enable_service(:avatars)
     @course
   end
 
@@ -68,6 +69,7 @@ describe Submissions::AnonymousSubmissionForShow do
     context "when the assignment is not a quiz" do
       before :once do
         course_with_student
+        @course.account.enable_service(:avatars)
         assignment = @course.assignments.create!
         submission = Timecop.freeze(2.hours.ago) do
           assignment.submit_homework(@student, { body: 'hello' })

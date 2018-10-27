@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {Simulate} from 'react-addons-test-utils'
+import {Simulate} from 'react-dom/test-utils'
 import $ from 'jquery'
 import RestrictedRadioButtons from 'jsx/files/RestrictedRadioButtons'
 import Folder from 'compiled/models/Folder'

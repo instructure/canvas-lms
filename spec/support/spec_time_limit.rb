@@ -53,6 +53,8 @@ module SpecTimeLimit
     def timeout_for(example)
       if ENV.fetch("SELENIUM_REMOTE_URL", "undefined remote url").include? "saucelabs"
         [:status_quo, SAUCELABS_ABSOLUTE_TIMEOUT]
+      elsif example.file_path.include? "./spec/selenium/performance/"
+        [:status_quo, PERFORMANCE_TIMEOUT]
       elsif (timeout = typical_time_for(example))
         [:status_quo, [timeout, ABSOLUTE_TIMEOUT].min]
       elsif commit_modifies_spec?(example)
@@ -66,6 +68,7 @@ module SpecTimeLimit
     end
 
     SAUCELABS_ABSOLUTE_TIMEOUT = ENV.fetch("SAUCELABS_SPEC_TIME_LIMIT_ABSOLUTE", 240).to_i
+    PERFORMANCE_TIMEOUT = ENV.fetch("SPEC_TIME_LIMIT_PERFORMANCE", 120).to_i
     ABSOLUTE_TIMEOUT = ENV.fetch("SPEC_TIME_LIMIT_ABSOLUTE", 60).to_i
     TARGET_TIMEOUT = ENV.fetch("SPEC_TIME_LIMIT_TARGET", 15).to_i
 

@@ -82,7 +82,7 @@ describe "scheduler" do
       get "/calendar2#view_name=week&view_start=#{(Date.today + 1.day).strftime}"
       wait_for_ajaximations
       find_appointment_button.click
-      f('.ReactModalPortal button[type="submit"]').click
+      f('[role="dialog"][aria-label="Select Course"] button[type="submit"]').click
       scheduler_event.click
       wait_for_ajaximations
       force_click('.reserve_event_link') # force the click because the button can move unexpectedly.
@@ -100,7 +100,7 @@ describe "scheduler" do
       get "/calendar2#view_name=week&view_start=#{(Date.today + 1.day).strftime}"
       wait_for_ajax_requests
       find_appointment_button.click
-      f('.ReactModalPortal button[type="submit"]').click
+      f('[role="dialog"][aria-label="Select Course"] button[type="submit"]').click
       scheduler_event.click
       wait_for_ajaximations
       force_click('.reserve_event_link') # force the click because the button can move unexpectedly.

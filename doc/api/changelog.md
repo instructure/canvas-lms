@@ -7,6 +7,33 @@ The API Change Log includes adjustments to the Canvas API documentation as part 
 <li>This page documents API changes for the last four releases. For prior releases, view the <a href="file.changelog_archive.html">API Change Log archive page</a>.</li>
 </ul>
 
+<h2>2018-10-27</h2>
+
+<h3>Changes</h3>
+<table class="changelog">
+<tr>
+<th>API Calls</th>
+<th>Function</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="conversations.html">Conversations API</a></td>
+<td>Create a Conversation Endpoint</td>
+<td>Recipients parameter: Added clarification when the course/group has over 100 enrollments, bulk_message and group_conversation must be set to true
+</tr>
+<tr>
+<td><a href="quiz_extensions.html">Quiz Extensions API</a></td>
+<td>Set Extensions for Student Quiz Submissions Endpoint</td>
+<td>All parameters: Added quiz_extensions to parameter name</td>
+</tr>
+<tr>
+<td><a href="quiz_submissions.html">Quiz Submissions API</a></td>
+<td>Update Student Question Scores and Comment Endpoint</td>
+<td>All parameters: Added quiz_submissions to parameter name</td>
+</tr>
+</table>
+
+
 <h2>2018-10-06</h2>
 
 <h3>Changes</h3>
@@ -62,6 +89,10 @@ The API Change Log includes adjustments to the Canvas API documentation as part 
 <th>API Calls</th>
 <th>Function</th>
 <th></th>
+<tr>
+<td><a href="file.assignment_external_tools.html">Assignment External Tools</a></td>
+<td></td>
+<td>Added content page</td>
 </tr>
 <tr>
 <td><a href="groups.html">Groups API</a></td>
@@ -146,50 +177,5 @@ The API Change Log includes adjustments to the Canvas API documentation as part 
     List Blueprint Subscriptions Endpoint</td>
 <td>Returns the ID of the blueprint course and blueprint template the associated course is subscribed to<br><br>
   Returns a list of blueprint subscriptions for the given course (currently a course may have no more than one)</td>
-</tr>
-</table>
-
-<h2>2018-08-04</h2>
-
-<h3>Changes</h3>
-<table class="changelog">
-<tr>
-<th>API Calls</th>
-<th>Function</th>
-<th></th>
-</tr>
-<tr>
-<td><a href="outcome_results.html">Outcome Results API</a></td>
-<td>Get Outcome Result Rollups</td>
-<td>Aggregate parameter: Clarified that the median is a separate parameter.</td>
-</tr>
-</table>
-<p></p>
-<table class="changelog">
-<tr>
-<th>CSV Format</th>
-<th>File</th>
-<th></th>
-</tr>
-<tr>
-<td><a href="outcomes_csv.html">Outcomes Data Format</td>
-<td>outcomes.csv</td>
-<td>Vendor_guid field: Clarified that vendor_guid IDs will prefix “canvas_outcome:” and “canvas_outcome_group:” for outcomes and groups, respectively. In addition, these prefixes are reserved; newly created outcomes and groups may not have vendor_guid fields with these prefixes./td>
-</tr>
-</table>
-
-<h3>Additions</h3>
-<table class="changelog">
-<tr>
-<th>API Calls</th>
-<th>Function</th>
-<th></th>
-</tr>
-<tr>
-<td><a href="Outcome_results.html">Outcome Results API</a></td>
-<td>Get Outcome Result Rollups</td>
-<td>Exclude parameter: Specified additional values to exclude. “Missing_user_rollups” excludes rollups for users without results.<br><br>
-  Aggregate_stat parameter: If aggregate rollups requested, then this value determines what statistic is used for the aggregate. Defaults to “mean” if this value is not specified.
-</td>
 </tr>
 </table>

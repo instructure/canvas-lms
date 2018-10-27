@@ -241,7 +241,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
     return unless @export_type == :selective
     @export_count += 1
     return if @export_count > Setting.get('master_courses_history_count', '150').to_i
-    set = asset.created_at >= last_export_at ? @creations : @updates
+    set = (last_export_at.nil? || asset.created_at >= last_export_at) ? @creations : @updates
     set[asset.class.name] ||= []
     set[asset.class.name] << master_template.content_tag_for(asset).migration_id
   end

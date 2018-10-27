@@ -1,4 +1,3 @@
-define('k5uploader', ['./lib/k5uploader'], function(K5Uploader) {
-  return K5Uploader;
-});
+import K5Uploader from "./lib/k5uploader";
+export default K5Uploader;
 

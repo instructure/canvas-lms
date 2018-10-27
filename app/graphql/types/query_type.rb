@@ -22,7 +22,7 @@ module Types
 
     field :node, field: GraphQL::Relay::Node.field
 
-    field :legacy_node, GraphQL::Relay::Node.interface, null: true do
+    field :legacy_node, GraphQL::Types::Relay::Node, null: true do
       description "Fetches an object given its type and legacy ID"
       argument :_id, ID, required: true
       argument :type, LegacyNodeType, required: true

@@ -45,7 +45,7 @@ group :test do
   gem 'selenium-webdriver', '3.14.0'
     gem 'childprocess', '0.9.0', require: false
     gem 'websocket', '1.2.5', require: false
-  gem 'chromedriver-helper', require: false
+  gem 'chromedriver-helper', '1.2.0', require: false
   gem 'selinimum', '0.0.1', require: false, path: 'gems/selinimum'
   gem 'test-queue', github: 'instructure/test-queue', ref: 'd35166408df3a5396cd809e85dcba175136a69ba', require: false
   gem 'testrailtagging', '0.3.8.4', require: false

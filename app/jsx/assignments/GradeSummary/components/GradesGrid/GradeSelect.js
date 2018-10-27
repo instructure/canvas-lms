@@ -134,10 +134,10 @@ export default class GradeSelect extends Component {
     this.handleClose = this.handleClose.bind(this)
     this.handleInputChange = this.handleInputChange.bind(this)
 
-    this.state = this.constructor.getDerivedStateFromProps(props)
+    this.state = this.constructor.createStateFromProps(props)
   }
 
-  static getDerivedStateFromProps(props) {
+  static createStateFromProps(props) {
     const graderOptions = optionsForGraders(props.graders, props.grades)
     const options = [...graderOptions]
 
@@ -166,7 +166,7 @@ export default class GradeSelect extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState(this.constructor.getDerivedStateFromProps(nextProps))
+    this.setState(this.constructor.createStateFromProps(nextProps))
   }
 
   shouldComponentUpdate(nextProps, nextState) {

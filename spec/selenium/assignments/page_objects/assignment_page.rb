@@ -63,6 +63,10 @@ class AssignmentPage
       f("#content")
     end
 
+    def assignment_description
+      f(".description.user_content")
+    end
+
     def assignment_edit_permission_error_text
       f("#unauthorized_message")
     end

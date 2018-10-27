@@ -21,7 +21,7 @@ module LtiAdvantage
       expected_type = record.class::TYPED_ATTRIBUTES[attr]
       return if value.nil? || expected_type.nil?
       return if value.instance_of? expected_type
-      record.errors.add(attr, "#{attr} must be an intance of #{expected_type}")
+      record.errors.add(attr, "#{attr} must be an instance of #{expected_type}")
     end
 
     def validate_nested_models(attr, value, record)

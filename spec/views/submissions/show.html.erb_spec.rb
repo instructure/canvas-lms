@@ -296,6 +296,48 @@ describe "/submissions/show" do
           render 'submissions/show'
           expect(comment_contents).to match_array ['I did a great job!']
         end
+
+        context "for a moderated assignment" do
+          let(:moderated_assignment) do
+            course.assignments.create!(
+              name: "moderated",
+              moderated_grading: true,
+              final_grader: teacher,
+              grader_count: 2
+            )
+          end
+          let(:moderated_submission) { moderated_assignment.submission_for_student(student) }
+          let(:first_ta) { course_with_user("TaEnrollment", course: course, active_all: true).user }
+          let(:second_ta) { course_with_user("TaEnrollment", course: course, active_all: true).user }
+
+          before(:each) do
+            moderated_submission.add_comment(author: student, comment: "I did a great job!")
+            moderated_submission.add_comment(author: teacher, comment: "No, you did not.")
+            moderated_submission.add_comment(author: first_ta, comment: "Maybe they did?")
+            moderated_submission.add_comment(author: second_ta, comment: "Who cares?")
+            moderated_assignment.grade_student(student, grade: 1, grader: second_ta, provisional: true)
+            assign(:assignment, moderated_assignment)
+            assign(:submission, moderated_submission)
+          end
+
+          it "shows only the student's comments while muted" do
+            render "submissions/show"
+            expect(comment_contents).to match_array(["I did a great job!"])
+          end
+
+          it "shows the student's, chosen grader's, and final grader's comments when unmuted" do
+            ModeratedGrading::ProvisionalGrade.find_by(submission: moderated_submission, scorer: second_ta).publish!
+            moderated_assignment.update!(grades_published_at: 1.hour.ago, muted: false)
+            moderated_submission.reload
+
+            render "submissions/show"
+            expect(comment_contents).to match_array([
+              "I did a great job!",
+              "No, you did not.",
+              "Who cares?"
+            ])
+          end
+        end
       end
     end
   end

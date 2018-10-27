@@ -16,50 +16,47 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'react',
-  'react-addons-test-utils',
-  'jsx/conditional_release_stats/components/student-range',
-], (React, TestUtils, StudentRange) => {
+import React from 'react'
 
-  QUnit.module('Student Range')
+import TestUtils from 'react-dom/test-utils'
+import StudentRange from 'jsx/conditional_release_stats/components/student-range'
 
-  const defaultProps = () => ({
-    range: {
-      scoring_range: {
-        id: 1,
-        rule_id: 1,
-        lower_bound: 0.7,
-        upper_bound: 1.0,
-        created_at: null,
-        updated_at: null,
-        position: null,
-      },
-      size: 0,
-      students: [
-        {
-          user: { name: 'Foo Bar' },
-        },
-        {
-          user: { name: 'Bar Foo' },
-        },
-      ],
+QUnit.module('Student Range')
+
+const defaultProps = () => ({
+  range: {
+    scoring_range: {
+      id: 1,
+      rule_id: 1,
+      lower_bound: 0.7,
+      upper_bound: 1.0,
+      created_at: null,
+      updated_at: null,
+      position: null
     },
-    loadStudent: () => {},
-    onStudentSelect: () => {},
-  })
+    size: 0,
+    students: [
+      {
+        user: {name: 'Foo Bar', id: 1}
+      },
+      {
+        user: {name: 'Bar Foo', id: 2}
+      }
+    ]
+  },
+  loadStudent: () => {},
+  onStudentSelect: () => {}
+})
 
-  const renderComponent = (props) => {
-    return TestUtils.renderIntoDocument(
-      <StudentRange {...props} />
-    )
-  }
+const renderComponent = props => TestUtils.renderIntoDocument(<StudentRange {...props} />)
 
-  test('renders items correctly', () => {
-    const props = defaultProps()
-    const component = renderComponent(props)
+test('renders items correctly', () => {
+  const props = defaultProps()
+  const component = renderComponent(props)
 
-    const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(component, 'crs-student-range__item')
-    equal(renderedList.length, props.range.students.length, 'renders full component')
-  })
+  const renderedList = TestUtils.scryRenderedDOMComponentsWithClass(
+    component,
+    'crs-student-range__item'
+  )
+  equal(renderedList.length, props.range.students.length, 'renders full component')
 })

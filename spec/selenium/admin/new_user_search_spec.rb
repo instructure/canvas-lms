@@ -24,6 +24,11 @@ require_relative '../conversations/conversations_new_message_modal_page.rb'
 
 describe "new account user search" do
   include_context "in-process server selenium tests"
+  include NewUserSearchPage
+  include NewUserEditModalPage
+  include MasqueradePage
+  include ConversationsNewMessageModalPage
+  include EditExistingUserModalPage
 
   before :once do
     @account = Account.default
@@ -42,52 +47,14 @@ describe "new account user search" do
     expect(f('[data-automation="users list"]')).not_to contain_css('tr:nth-child(2)')
   end
 
-  it "should be able to create users" do
-    get "/accounts/#{@account.id}/users"
-
-    fj('button:has([name="IconPlus"]):contains("People")').click
-    modal = f('[aria-label="Add a New User"]')
-    expect(modal).to be_displayed
-
-    name = 'Test User'
-    set_value(fj('label:contains("Full Name") input', modal), name)
-    expect(fj('label:contains("Sortable Name") input', modal).attribute('value')).to eq "User, Test"
-
-    email = 'someemail@example.com'
-    set_value(fj('label:contains("Email") input', modal), email)
-
-    f('button[type="submit"]', modal).click
-    wait_for_ajaximations
-
-    new_pseudonym = Pseudonym.where(:unique_id => email).first
-    expect(new_pseudonym.user.name).to eq name
-
-    # should refresh the users list
-    expect(f('[data-automation="users list"]')).to include_text(name)
-    expect(get_rows.count).to eq 2 # the first user is the admin
-    new_row = get_rows.detect{|r| r.text.include?(name)}
-    expect(new_row).to include_text(email)
-
-    # should clear out the inputs
-    fj('button:has([name="IconPlus"]):contains("People")').click
-    expect(fj('[aria-label="Add a New User"] label:contains("Full Name") input').attribute('value')).to eq('')
-  end
-
-  # This describe block will be removed once all tests are converted
-  describe 'Page Object Converted Tests Root Account' do
-    include NewUserSearchPage
-    include NewUserEditModalPage
-    include MasqueradePage
-    include ConversationsNewMessageModalPage
-    include EditExistingUserModalPage
-
+  describe "with default page visit" do
     before do
       @user.update_attribute(:name, "Test User")
       visit_users(@account)
     end
 
     it "should bring up user page when clicking name", priority: "1", test_id: 3399648 do
-      click_user_link(@user.name)
+      click_user_link(@user.sortable_name)
       expect(f("#content h2")).to include_text @user.name
     end
 
@@ -134,12 +101,7 @@ describe "new account user search" do
     end
   end
 
-  describe 'Page Object Converted No Default Page Visit' do
-    include NewUserSearchPage
-    include NewUserEditModalPage
-    include MasqueradePage
-    include ConversationsNewMessageModalPage
-
+  describe "with no default visit" do
     before do
       @sub_account = Account.create!(name: "sub", parent_account: @account)
     end
@@ -163,23 +125,25 @@ describe "new account user search" do
     end
 
     it "should paginate" do
+      @user.update_attribute(:sortable_name, "Admin")
       ('A'..'Z').each do |letter|
-        user_with_pseudonym(:account => @account, :name => "Test User #{letter}")
+        user_with_pseudonym(:account => @account, :name => "Test User#{letter}")
       end
       visit_users(@account)
 
       expect(get_rows.count).to eq 15
-      expect(get_rows.first).to include_text("Test User A")
-      expect(all_results_users).to_not include_text("Test User O")
+      expect(get_rows.first).to include_text("Admin")
+      expect(get_rows[1]).to include_text("UserA, Test")
+      expect(all_results_users).to_not include_text("UserO, Test")
       expect(results_body).not_to contain_jqcss(page_previous_jqcss)
 
       click_page_number_button("2")
       wait_for_ajaximations
 
       expect(get_rows.count).to eq 12
-      expect(get_rows.first).to include_text("Test User O")
-      expect(get_rows.last).to include_text("Test User Z")
-      expect(all_results_users).not_to include_text("Test User A")
+      expect(get_rows.first).to include_text("UserO, Test")
+      expect(get_rows.last).to include_text("UserZ, Test")
+      expect(all_results_users).not_to include_text("UserA, Test")
     end
 
     it "should be able to toggle between 'People' and 'Courses' tabs" do
@@ -196,10 +160,38 @@ describe "new account user search" do
         expect(driver.current_url).to include("/accounts/#{@account.id}/users")
         expect(breadcrumbs).to include_text("People")
         expect(breadcrumbs).not_to include_text("Courses")
-        expect(all_results_users).to include_text("Test User")
+        expect(all_results_users).to include_text("User, Test")
 
         click_left_nav_courses
       end
+    end
+
+    it "should be able to create users" do
+      name = 'Test User'
+      email = 'someemail@example.com'
+      visit_users(@account)
+
+      click_add_user
+      expect(modal_object).to be_displayed
+
+      set_value(full_name_input, name)
+      expect(sortable_name_input.attribute('value')).to eq "User, Test"
+
+      set_value(email_input, email)
+
+      click_modal_submit
+
+      new_pseudonym = Pseudonym.where(:unique_id => email).first
+      expect(new_pseudonym.user.name).to eq name
+
+      # should refresh the users list
+      expect(all_results_users).to include_text(new_pseudonym.user.sortable_name)
+      expect(get_rows.count).to eq 2 # the first user is the admin
+      expect(user_row(name)).to include_text(email)
+
+      # should clear out the inputs
+      click_add_user
+      expect(full_name_input.attribute('value')).to eq('')
     end
 
     it "should be able to create users with confirmation disabled", priority: "1", test_id: 3399311 do

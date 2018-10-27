@@ -106,9 +106,6 @@ function responsiviser () {
         ...ComposedComponent.propTypes
       }
       static defaultProps = ComposedComponent.defaultProps ? {...ComposedComponent.defaultProps} : null;
-      static name() {
-        return `Responsive${ComposedComponent.displayName}`;
-      }
 
       constructor (props) {
         super(props);
@@ -131,7 +128,7 @@ function responsiviser () {
         return <ComposedComponent {...this.props} responsiveSize={this.state.size} />;
       }
     }
-    ResponsiveComponent.displayName = ResponsiveComponent.name();
+    ResponsiveComponent.displayName = `Responsive${ComposedComponent.displayName}`;
     return ResponsiveComponent;
   };
 }

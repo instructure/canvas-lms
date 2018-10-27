@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Simulate, SimulateNative} from 'react-addons-test-utils'
 import _ from 'underscore'
 import OverrideStudentStore from 'jsx/due_dates/OverrideStudentStore'
 import fakeENV from 'helpers/fakeENV'

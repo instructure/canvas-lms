@@ -16,45 +16,38 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'react',
-  'enzyme',
-  'jsx/add_people/components/add_people',
-], (React, enzyme, AddPeople) => {
-  QUnit.module('AddPeople');
+import React from 'react'
+import enzyme from 'enzyme'
+import AddPeople from 'jsx/add_people/components/add_people'
 
-  const props = {
-    isOpen: true,
-    courseParams: {
-      roles: [],
-      sections: []
-    },
-    apiState: {
-      isPending: 0
-    },
-    inputParams: {
-      nameList: '',
-    }
-  };
+QUnit.module('AddPeople')
 
-  test('renders the component', () => {
-    const container = document.createElement('div');
-    container.id = 'application';
-    document.body.appendChild(container);
+const props = {
+  isOpen: true,
+  courseParams: {
+    roles: [],
+    sections: []
+  },
+  apiState: {
+    isPending: 0
+  },
+  inputParams: {
+    nameList: ''
+  }
+}
 
-    const wrapper = enzyme.mount(
-      <AddPeople
-        validateUsers={() => {}}
-        enrollUsers={() => {}}
-        reset={() => {}}
-        {...props}
-      />,
-      { attachTo: document.getElementById('fixtures') }
-    );
+test('renders the component', () => {
+  const container = document.createElement('div')
+  container.id = 'application'
+  document.body.appendChild(container)
 
-    ok(document.getElementById('add_people_modal'));
+  const wrapper = enzyme.mount(
+    <AddPeople validateUsers={() => {}} enrollUsers={() => {}} reset={() => {}} {...props} />,
+    {attachTo: document.getElementById('fixtures')}
+  )
 
-    wrapper.unmount();
-    document.body.removeChild(container);
-  });
-});
+  ok(document.getElementById('add_people_modal'))
+
+  wrapper.unmount()
+  document.body.removeChild(container)
+})

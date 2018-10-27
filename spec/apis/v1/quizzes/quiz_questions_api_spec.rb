@@ -17,8 +17,12 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../../file_upload_helper')
+
 
 describe Quizzes::QuizQuestionsController, type: :request do
+
+  include FileUploadHelper
 
   context 'as a teacher' do
     before :once do
@@ -99,6 +103,63 @@ describe Quizzes::QuizQuestionsController, type: :request do
           question_ids = json.collect {|q| q['id'] }.sort
           expect(question_ids).to eq [question1.id, question2.id]
         end
+      end
+    end
+
+    describe "POST /courses/course_id/quizzes/:quiz_id/questions" do
+      it 'removes the hostname from URLs' do
+        file = create_fixture_attachment(@course, 'test_image.jpg')
+        file_link = get_file_link(file)
+
+        request_data = {
+          question: {
+            'question_text': file_link,
+          }
+        }
+        json = api_call(
+          :post,
+          "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions", {
+            controller: 'quizzes/quiz_questions',
+            action: 'create',
+            format: 'json',
+            course_id: @course.id,
+            quiz_id: @quiz.id,
+          },
+          request_data
+        )
+        link_without_domain = "<a href=\"/courses/#{@course.id}/files/#{file.id}/download\">Link</a>"
+        expect(json['question_text']).to eq(link_without_domain)
+      end
+    end
+
+    describe "PUT /courses/:course_id/quizzes/:quiz_id/questions/:id" do
+      it 'removes the hostname from URLs' do
+        file = create_fixture_attachment(@course, 'test_image.jpg')
+        file_link = get_file_link(file)
+
+        question = Quizzes::QuizQuestion.create!(
+          quiz: @quiz,
+          question_data: {
+            question_text: 'some text',
+          }
+        )
+
+        request_data = {question: {question_text: file_link}}
+        json = api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions/#{question.id}",
+          {
+            controller: 'quizzes/quiz_questions',
+            action: 'update',
+            format: 'json',
+            course_id: @course.id,
+            quiz_id: @quiz.id,
+            id: question.id,
+          },
+          request_data
+        )
+        link_without_domain = "<a href=\"/courses/#{@course.id}/files/#{file.id}/download\">Link</a>"
+        expect(json['question_text']).to eq(link_without_domain)
       end
     end
 

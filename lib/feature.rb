@@ -116,6 +116,15 @@ class Feature
   # TODO: register built-in features here
   # (plugins may register additional features during application initialization)
   register(
+    'integrate_arc_rce' =>
+    {
+      display_name: -> { I18n.t('HTML5 Media Recorder in RCE') },
+      description: -> { I18n.t('Use HTML5 Recorder in Content Editor instead of Flash') },
+      applies_to: 'RootAccount',
+      state: 'allowed',
+      root_opt_in: true,
+      development: true
+    },
     'google_docs_domain_restriction' =>
     {
       display_name: -> { I18n.t('features.google_docs_domain_restriction', 'Google Docs Domain Restriction') },
@@ -432,15 +441,6 @@ END
       development: false,
       root_opt_in: false
     },
-    'use_new_tree' =>
-    {
-      display_name: -> { I18n.t('Use New Folder Tree in Files')},
-      description: -> {I18n.t('Replaces the current folder tree with a new accessible and more feature rich folder tree.')},
-      applies_to: 'Course',
-      state: 'hidden',
-      development: true,
-      root_opt_in: true
-    },
     'course_card_images' =>
     {
       display_name: -> { I18n.t('Enable Dashboard Images for Courses')},
@@ -599,7 +599,7 @@ END
       display_name: -> { I18n.t('To Do List Dashboard')},
       description: -> { I18n.t('Provides users with a To Do List Dashboard option.')},
       applies_to: "RootAccount",
-      state: "hidden"
+      state: "on"
     },
     'rubric_criterion_range' =>
     {
@@ -659,6 +659,13 @@ END
       description: -> { I18n.t('If enabled, the option will be presented to have non-scoring rubrics.') },
       applies_to: 'RootAccount',
       state: 'on'
+    },
+    'lti_1_3' => {
+      display_name: -> { I18n.t('LTI 1.3 and LTI Advantage')},
+      description: -> { I18n.t('If enabled, access to LTI 1.3 and LTI Advantage will be enabled.') },
+      applies_to: 'RootAccount',
+      development: true,
+      state: 'allowed'
     }
   )
 

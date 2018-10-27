@@ -156,8 +156,10 @@ export class Grouping extends Component {
           currentUser={this.props.currentUser}
           feedback={item.feedback}
           location={item.location}
+          address={item.address}
           endTime={item.endTime}
           dateStyle={item.dateStyle}
+          timeZone={this.props.timeZone}
         />
       </li>
     ));

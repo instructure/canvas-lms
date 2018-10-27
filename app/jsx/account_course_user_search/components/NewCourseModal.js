@@ -96,63 +96,63 @@ export default class NewCourseModal extends React.Component {
     return (
       <span>
         <InstuiModal
+          as="form"
+          onSubmit={preventDefault(this.onSubmit)}
           open={isOpen}
           onDismiss={this.closeModal}
           onOpen={() => AccountsTreeStore.loadTree()}
           size="small"
           label={I18n.t('Add a New Course')}
         >
-          <form onSubmit={preventDefault(this.onSubmit)} style={{margin: 0}}>
-            <ModalBody>
-              <FormFieldGroup layout="stacked" rowSpacing="small" description="">
-                <TextInput
-                  label={I18n.t('Course Name')}
-                  value={data.name}
-                  onChange={onChange('name')}
-                  required
-                  messages={errors.name && [{type: 'error', text: errors.name}]}
-                />
+          <ModalBody>
+            <FormFieldGroup layout="stacked" rowSpacing="small" description="">
+              <TextInput
+                label={I18n.t('Course Name')}
+                value={data.name}
+                onChange={onChange('name')}
+                required
+                messages={errors.name && [{type: 'error', text: errors.name}]}
+              />
 
-                <TextInput
-                  label={I18n.t('Reference Code')}
-                  value={data.course_code}
-                  onChange={onChange('course_code')}
-                  required
-                  messages={errors.course_code && [{type: 'error', text: errors.course_code}]}
-                />
+              <TextInput
+                label={I18n.t('Reference Code')}
+                value={data.course_code}
+                onChange={onChange('course_code')}
+                required
+                messages={errors.course_code && [{type: 'error', text: errors.course_code}]}
+              />
 
-                <Select
-                  label={I18n.t('Subaccount')}
-                  value={data.account_id}
-                  onChange={onChange('account_id')}
-                >
-                  {renderAccountOptions(accountTree.accounts)}
-                  {accountTree.loading && (
-                    <option disabled>{I18n.t('Loading more sub accounts...')}</option>
-                  )}
-                </Select>
+              <Select
+                label={I18n.t('Subaccount')}
+                value={data.account_id}
+                onChange={onChange('account_id')}
+              >
+                {renderAccountOptions(accountTree.accounts)}
+                {accountTree.loading && (
+                  <option disabled>{I18n.t('Loading more sub accounts...')}</option>
+                )}
+              </Select>
 
-                <Select
-                  label={I18n.t('Enrollment Term')}
-                  value={data.enrollment_term_id}
-                  onChange={onChange('enrollment_term_id')}
-                >
-                  {(terms.data || []).map(term => (
-                    <option key={term.id} value={term.id}>
-                      {term.name}
-                    </option>
-                  ))}
-                  {terms.loading && <option disabled>{I18n.t('Loading more terms...')}</option>}
-                </Select>
-              </FormFieldGroup>
-            </ModalBody>
-            <ModalFooter>
-              <Button onClick={this.closeModal}>{I18n.t('Cancel')}</Button> &nbsp;
-              <Button type="submit" variant="primary">
-                {I18n.t('Add Course')}
-              </Button>
-            </ModalFooter>
-          </form>
+              <Select
+                label={I18n.t('Enrollment Term')}
+                value={data.enrollment_term_id}
+                onChange={onChange('enrollment_term_id')}
+              >
+                {(terms.data || []).map(term => (
+                  <option key={term.id} value={term.id}>
+                    {term.name}
+                  </option>
+                ))}
+                {terms.loading && <option disabled>{I18n.t('Loading more terms...')}</option>}
+              </Select>
+            </FormFieldGroup>
+          </ModalBody>
+          <ModalFooter>
+            <Button onClick={this.closeModal}>{I18n.t('Cancel')}</Button> &nbsp;
+            <Button type="submit" variant="primary">
+              {I18n.t('Add Course')}
+            </Button>
+          </ModalFooter>
         </InstuiModal>
         {React.Children.map(children, child =>
           // when you click whatever is the child element to this, open the modal

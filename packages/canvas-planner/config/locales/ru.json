@@ -50,6 +50,9 @@
   "assignmenttype_title_posted_datetime_cab69444": {
     "message": "{ assignmentType } { title } опубликован { datetime }."
   },
+  "assignmenttype_title_reminder_datetime_33fa66d5": {
+    "message": "{ assignmentType } { title }, напоминание { datetime }."
+  },
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Начало вашей истории задач"
   },
@@ -61,6 +64,12 @@
   },
   "close_d634289d": {
     "message": "Закрыть"
+  },
+  "close_opportunity_center_popup_9907d981": {
+    "message": "Закройте всплывающее окно Центр возможностей"
+  },
+  "count_plural_0_opportunities_one_opportunity_other_bb1698f6": {
+    "message": "{ count, plural,\n     =0 {# возможности}\n    one {# возможность}\n  other {# возможности}\n}. Щелкните, чтобы открыть всплывающее окно Центр возможностей."
   },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Показать # завершенный элемент}\n  other {Показать # завершенные элементы}\n}"
@@ -97,6 +106,12 @@
   },
   "dismiss_opportunityname_5995176f": {
     "message": "Исключить { opportunityName }"
+  },
+  "dismissed_8b0b1fc9": {
+    "message": "Упущенный"
+  },
+  "dismissed_opportunities_f0826640": {
+    "message": "Упущенные возможности"
   },
   "due_5d7267be": {
     "message": "Срок выполнения:"
@@ -191,11 +206,17 @@
   "my_grades_98834476": {
     "message": "Мои оценки"
   },
+  "new_13daf639": {
+    "message": "Новый"
+  },
   "new_activity_8b84847d": {
     "message": "Новая активность"
   },
   "new_activity_for_title_14c9c3af": {
     "message": "Новая активность для { title }"
+  },
+  "new_opportunities_7d349c4d": {
+    "message": "Новые возможности"
   },
   "next_month_749b1778": {
     "message": "Следующий месяц"
@@ -208,6 +229,9 @@
   },
   "nothing_for_now_e3e3ce2a": {
     "message": "Сейчас ничего"
+  },
+  "nothing_here_needs_attention_c4eaded6": {
+    "message": "Нет ничего, требующего внимания."
   },
   "nothing_more_to_do_b665da42": {
     "message": "Все задания выполнены"
@@ -236,6 +260,9 @@
   "page_50c4823d": {
     "message": "Страница"
   },
+  "peer_review_74f26a13": {
+    "message": "Рассмотрение коллегами"
+  },
   "points_bceb5005": {
     "message": "баллы"
   },
@@ -250,6 +277,9 @@
   },
   "quiz_e0dcce8f": {
     "message": "Тест"
+  },
+  "reminder_date_4564d12d": {
+    "message": "Оповещение: { date }"
   },
   "replies_4a8577c8": {
     "message": "Ответы"
@@ -286,6 +316,9 @@
   },
   "the_date_and_time_this_to_do_is_due_74c823d4": {
     "message": "Дата и время выполнения этого установлены на"
+  },
+  "there_are_no_points_associated_with_this_item_449c712a": {
+    "message": "Нет пунктов, связанных с этим элементом"
   },
   "time_2b5aac58": {
     "message": "Время"

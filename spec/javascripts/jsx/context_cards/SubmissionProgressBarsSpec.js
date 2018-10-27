@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import TestUtils from 'react-addons-test-utils'
+import TestUtils from 'react-dom/test-utils'
 import SubmissionProgressBars from 'jsx/context_cards/SubmissionProgressBars'
 import InstUIProgress from '@instructure/ui-elements/lib/components/Progress'
 import { shallow } from 'enzyme'

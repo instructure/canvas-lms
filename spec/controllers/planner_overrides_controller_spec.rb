@@ -52,17 +52,6 @@ describe PlannerOverridesController do
     end
   end
 
-  context "feature disabled" do
-    it "should return forbidden" do
-      user_session(@student)
-      get :index
-      assert_forbidden
-
-      post :create, params: {plannable: @assignment, marked_complete: false}
-      assert_forbidden
-    end
-  end
-
   context "as student" do
     before :each do
       user_session(@student)

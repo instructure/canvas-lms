@@ -43,7 +43,7 @@ test('renders the ToggleMenuTab component', () => {
 
 test('renders the closed toggle Icon', () => {
   const tree = enzyme.shallow(<ExpandableLockOptions {...defaultProps()} />)
-  const icon = tree.find('.bcs_tab_indicator-icon IconArrowOpenRight')
+  const icon = tree.find('.bcs_tab_indicator-icon IconArrowOpenEnd')
   equal(icon.length, 1)
 })
 

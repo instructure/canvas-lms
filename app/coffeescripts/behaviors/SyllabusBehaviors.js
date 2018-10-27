@@ -283,7 +283,7 @@ const bindToEditSyllabus = function () {
     RichContentEditor.callOnRCE($course_syllabus_body, 'toggle')
     // hide the clicked link, and show the other toggle link.
     // todo: replace .andSelf with .addBack when JQuery is upgraded.
-    $(ev.currentTarget).siblings('.toggle_views_link').andSelf().toggle()
+    $(ev.currentTarget).siblings('.toggle_views_link').andSelf().toggle().focus();
   })
 
   $edit_course_syllabus_form.on('click', '.cancel_button', (ev) => {

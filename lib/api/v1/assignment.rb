@@ -464,7 +464,7 @@ module Api::V1::Assignment
     end
 
     calc_grades = calculate_grades ? value_to_boolean(calculate_grades) : true
-    DueDateCacher.recompute(prepared_create[:assignment], update_grades: calc_grades)
+    DueDateCacher.recompute(prepared_create[:assignment], update_grades: calc_grades, executing_user: user)
     response
   rescue ActiveRecord::RecordInvalid
     false
@@ -498,7 +498,7 @@ module Api::V1::Assignment
     end
 
     if @overrides_affected.to_i > 0 || cached_due_dates_changed
-      DueDateCacher.recompute(prepared_update[:assignment], update_grades: true)
+      DueDateCacher.recompute(prepared_update[:assignment], update_grades: true, executing_user: user)
     end
 
     response

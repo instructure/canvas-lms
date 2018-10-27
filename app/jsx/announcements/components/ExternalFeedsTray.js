@@ -27,6 +27,7 @@ import Heading from '@instructure/ui-elements/lib/components/Heading'
 import View from '@instructure/ui-layout/lib/components/View'
 import IconRssLine from '@instructure/ui-icons/lib/Line/IconRss'
 import Text from '@instructure/ui-elements/lib/components/Text'
+import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
 
 import {ConnectedAddExternalFeed} from './AddExternalFeed'
 import propTypes from '../propTypes'
@@ -111,26 +112,22 @@ export default class ExternalFeedsTray extends Component {
       <View display="block" textAlign="end">
         <Button
           id="external_feed"
-          buttonRef={link => {
-            this.externalFeedRef = link
-          }}
-          onClick={() => {
-            this.setState({open: !this.state.open})
-          }}
+          buttonRef={link => (this.externalFeedRef = link)}
+          onClick={() => this.setState({open: !this.state.open})}
           variant="link"
         >
           {I18n.t('External feeds')}
         </Button>
         <Tray
           label={I18n.t('External feeds')}
-          closeButtonLabel={I18n.t('Close')}
           open={this.state.open}
           size="small"
-          onDismiss={() => {
-            this.setState({open: false})
-          }}
+          onDismiss={() => this.setState({open: false})}
           placement="end"
         >
+          <CloseButton placement="start" onClick={() => this.setState({open: false})}>
+            {I18n.t('Close')}
+          </CloseButton>
           {this.renderTrayContent()}
         </Tray>
       </View>

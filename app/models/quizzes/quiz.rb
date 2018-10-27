@@ -1442,8 +1442,13 @@ class Quizzes::Quiz < ActiveRecord::Base
     self.assignment.relock_modules! if self.assignment
   end
 
-  def run_if_overrides_changed_later!
-    self.send_later_if_production_enqueue_args(:run_if_overrides_changed!, {:singleton => "quiz_overrides_changed_#{self.global_id}"})
+  # Assignment#run_if_overrides_changed_later! uses its keyword arguments, but
+  # this method does not
+  def run_if_overrides_changed_later!(**)
+    self.send_later_if_production_enqueue_args(
+      :run_if_overrides_changed!,
+      {:singleton => "quiz_overrides_changed_#{self.global_id}"}
+    )
   end
 
   # This alias exists to handle cases where a method that expects an

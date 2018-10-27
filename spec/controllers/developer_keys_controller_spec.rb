@@ -67,6 +67,16 @@ describe DeveloperKeysController do
           expect(assigns[:keys]).to be_include(dk)
         end
 
+        it 'includes valid LTI scopes in js env' do
+          get 'index', params: { account_id: Account.site_admin.id }
+          expect(assigns[:js_env][:validLtiScopes]).to eq TokenScopes::LTI_SCOPES
+        end
+
+        it 'includes all valid LTI placements in js env' do
+          get 'index', params: { account_id: Account.site_admin.id }
+          expect(assigns.dig(:js_env, :validLtiPlacements)).to match_array Lti::ResourcePlacement::PLACEMENTS
+        end
+
         describe "js bundles" do
           render_views
 

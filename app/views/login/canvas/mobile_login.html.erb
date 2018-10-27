@@ -59,7 +59,7 @@
     <% if url = params[:canvas_login].blank? && @domain_root_account.try(:forgot_password_external_url) %>
       <%= link_to t('dont_know_password', "Forgot Password?"), url, :class => 'forgot-password' %>
     <% else %>
-      <a class="forgot-password flip-to-back"><%= t('dont_know_password', "Forgot Password?") %></a>
+      <a tabindex="0" role="link" class="forgot-password flip-to-back"><%= t('dont_know_password', "Forgot Password?") %></a>
     <% end %>
   </div>
 <% end %>
@@ -82,7 +82,7 @@
     data-text-while-loading="<%= t :sending, "Sending..." %>" class="request-password-button"><%= t('buttons.request_password', 'Request Password') %>
   </button>
   <div class="forgotBlock">
-    <a class="flip-to-front"><%= t('back_to_login', "Back to Login") %></a>
+    <a tabindex="0" role="link" class="flip-to-front"><%= t('back_to_login', "Back to Login") %></a>
   </div>
 <% end %>
 

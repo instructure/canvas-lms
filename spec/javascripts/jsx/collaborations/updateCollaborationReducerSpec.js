@@ -16,62 +16,59 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-define([
-  'jsx/collaborations/reducers/updateCollaborationReducer',
-  'jsx/collaborations/actions/collaborationsActions'
-], (reducer, actions) => {
+import reducer from 'jsx/collaborations/reducers/updateCollaborationReducer'
 
-  QUnit.module('updateCollaborationReducer');
+import actions from 'jsx/collaborations/actions/collaborationsActions'
 
-  let defaultState = reducer(undefined, {});
+QUnit.module('updateCollaborationReducer')
 
-  test('has defaults', () => {
-    equal(defaultState.updateCollaborationPending, false);
-    equal(defaultState.updateCollaborationSuccessful, false);
-    equal(defaultState.updateCollaborationError, null);
-  });
+const defaultState = reducer(undefined, {})
 
-  test('responds to updateCollaborationStart', () => {
-    let initialState = {
-      updateCollaborationPending: false,
-      updateCollaborationSuccessful: false,
-      updateCollaborationError: {}
-    };
+test('has defaults', () => {
+  equal(defaultState.updateCollaborationPending, false)
+  equal(defaultState.updateCollaborationSuccessful, false)
+  equal(defaultState.updateCollaborationError, null)
+})
 
-    let action = actions.updateCollaborationStart();
-    let newState = reducer(initialState, action);
+test('responds to updateCollaborationStart', () => {
+  const initialState = {
+    updateCollaborationPending: false,
+    updateCollaborationSuccessful: false,
+    updateCollaborationError: {}
+  }
 
-    equal(newState.updateCollaborationPending, true);
-    equal(newState.updateCollaborationSuccessful, false);
-    equal(newState.updateCollaborationError, null);
-  });
+  const action = actions.updateCollaborationStart()
+  const newState = reducer(initialState, action)
 
-  test('responds to updateCollaborationSuccessful', () => {
-    let initialState = {
-      updateCollaborationPending: true,
-      updateCollaborationSuccessful: false
-    };
+  equal(newState.updateCollaborationPending, true)
+  equal(newState.updateCollaborationSuccessful, false)
+  equal(newState.updateCollaborationError, null)
+})
 
-    let action = actions.updateCollaborationSuccessful({});
-    let newState = reducer(initialState, action);
+test('responds to updateCollaborationSuccessful', () => {
+  const initialState = {
+    updateCollaborationPending: true,
+    updateCollaborationSuccessful: false
+  }
 
-    equal(newState.updateCollaborationPending, false);
-    equal(newState.updateCollaborationSuccessful, true);
-  });
+  const action = actions.updateCollaborationSuccessful({})
+  const newState = reducer(initialState, action)
 
-  test('responds to updateCollaborationFailed', () => {
-    let initialState = {
-      updateCollaborationPending: true,
-      updateCollaborationError: null
-    };
+  equal(newState.updateCollaborationPending, false)
+  equal(newState.updateCollaborationSuccessful, true)
+})
 
-    let error = {}
+test('responds to updateCollaborationFailed', () => {
+  const initialState = {
+    updateCollaborationPending: true,
+    updateCollaborationError: null
+  }
 
-    let action = actions.updateCollaborationFailed(error);
-    let newState = reducer(initialState, action);
+  const error = {}
 
-    equal(newState.updateCollaborationPending, false);
-    equal(newState.updateCollaborationError, error);
-  });
+  const action = actions.updateCollaborationFailed(error)
+  const newState = reducer(initialState, action)
 
+  equal(newState.updateCollaborationPending, false)
+  equal(newState.updateCollaborationError, error)
 })

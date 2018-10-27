@@ -91,7 +91,7 @@ test('Individual Gradebook Menu Item is second in the Menu', function () {
 });
 
 test('Menu Item Separator is third in the Menu', function () {
-  equal(this.menuItems[2].getAttribute('role'), 'presentation');
+  equal(this.menuItems[2].firstElementChild.getAttribute('role'), 'presentation');
 });
 
 test('Gradebook History Menu Item is fourth in the Menu', function () {
@@ -121,7 +121,7 @@ test('Individual Gradebook Menu Item is first in the Menu', function () {
 });
 
 test('Menu Item Separator is second in the Menu', function () {
-  equal(this.menuItems[1].getAttribute('role'), 'presentation');
+  equal(this.menuItems[1].firstElementChild.getAttribute('role'), 'presentation');
 });
 
 test('Gradebook History Menu Item is second in the Menu', function () {
@@ -165,7 +165,7 @@ test('Individual Gradebook Menu Item is second in the Menu', function () {
 });
 
 test('Menu Item Separator is third in the Menu', function () {
-  equal(this.menuItems[2].getAttribute('role'), 'presentation');
+  equal(this.menuItems[2].firstElementChild.getAttribute('role'), 'presentation');
 });
 
 test('Gradebook History Menu Item is fourth in the Menu', function () {

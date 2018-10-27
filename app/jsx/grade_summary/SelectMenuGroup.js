@@ -141,7 +141,9 @@ export default class SelectMenuGroup extends React.Component {
     return (
       <Flex
         alignItems="end"
-        wrapItems="true">
+        wrapItems={true}
+        margin="0 0 small 0"
+      >
 
         <FlexItem>
           {this.props.students.length > 1 &&

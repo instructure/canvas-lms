@@ -58,7 +58,7 @@ module AssignmentsHelper
   end
 
   def assignment_publishing_enabled?(assignment, user)
-    assignment.grants_right?(user, :update) && !assignment.has_student_submissions?
+    assignment.grants_right?(user, :update)
   end
 
   def assignment_submission_button(assignment, user, user_submission)

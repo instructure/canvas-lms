@@ -130,6 +130,8 @@ module LtiOutbound
       set_resource_type_keys()
       hash['oauth_callback'] = 'about:blank'
 
+      hash['ext_platform'] = overrides[:platform] if overrides.key?(:platform)
+
       @variable_expander.expand_variables!(hash)
       hash
     end

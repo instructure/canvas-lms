@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import createReactClass from 'create-react-class';
 import I18n from 'i18n!react_files'
 import FilesUsage from 'compiled/react_files/components/FilesUsage'
 import friendlyBytes from 'compiled/util/friendlyBytes'
@@ -56,4 +57,4 @@ import friendlyBytes from 'compiled/util/friendlyBytes'
     }
   };
 
-export default React.createClass(FilesUsage)
+export default createReactClass(FilesUsage);

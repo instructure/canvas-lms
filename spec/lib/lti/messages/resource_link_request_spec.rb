@@ -69,7 +69,7 @@ describe Lti::Messages::ResourceLinkRequest do
         no_expansion: 'foo'
       }
     }
-    tool.settings['use_1_3'] = true
+    tool.use_1_3 = true
     tool.developer_key = DeveloperKey.create!
     tool.save!
     tool

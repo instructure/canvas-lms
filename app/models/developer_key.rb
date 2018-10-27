@@ -30,8 +30,8 @@ class DeveloperKey < ActiveRecord::Base
   has_many :developer_key_account_bindings, inverse_of: :developer_key, dependent: :destroy
   has_many :context_external_tools
 
-  has_one :tool_consumer_profile, :class_name => 'Lti::ToolConsumerProfile'
-  has_one :tool_configuration, class_name: 'Lti::ToolConfiguration'
+  has_one :tool_consumer_profile, :class_name => 'Lti::ToolConsumerProfile', inverse_of: :developer_key
+  has_one :tool_configuration, class_name: 'Lti::ToolConfiguration', dependent: :destroy, inverse_of: :developer_key
   serialize :scopes, Array
 
   before_validation :validate_scopes!
@@ -241,13 +241,10 @@ class DeveloperKey < ActiveRecord::Base
   def validate_public_jwk
     return true if public_jwk.blank?
 
-    if public_jwk['kty'] != Lti::RSAKeyPair::KTY
-      errors.add :public_jwk, "Must use #{Lti::RSAKeyPair::KTY} kty"
-    end
+    jwk_errors = Schemas::Lti::PublicJwk.simple_validation_errors(public_jwk)
+    return true if jwk_errors.blank?
 
-    if public_jwk['alg'] != Lti::RSAKeyPair::ALG
-      errors.add :public_jwk, "Must use #{Lti::RSAKeyPair::ALG} alg"
-    end
+    errors.add :public_jwk, jwk_errors
   end
 
   def invalidate_access_tokens_if_scopes_removed!

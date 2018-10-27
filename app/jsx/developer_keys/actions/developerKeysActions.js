@@ -21,7 +21,9 @@ import $ from 'jquery'
 import axios from 'axios'
 import parseLinkHeader from '../../shared/parseLinkHeader'
 
-const actions = {}
+import ltiKeyActions from './ltiKeyActions'
+
+const actions = {...ltiKeyActions}
 
 actions.LIST_DEVELOPER_KEYS_START = 'LIST_DEVELOPER_KEYS_START'
 actions.listDeveloperKeysStart = payload => ({type: actions.LIST_DEVELOPER_KEYS_START, payload})

@@ -124,18 +124,9 @@ class SubmissionsBaseController < ApplicationController
 
           format.html { redirect_to course_assignment_url(@context, @assignment) }
 
-          comments_include = if @assignment.can_view_other_grader_comments?(@current_user)
-            :all_submission_comments
-          elsif admin_in_context
-            :submission_comments
-          else
-            :visible_submission_comments
-          end
-
           json_args = Submission.json_serialization_full_parameters({
-            :except => [:quiz_submission,:submission_history],
-            :comments => comments_include
-          }).merge(:permissions => { :user => @current_user, :session => session, :include_permissions => false })
+            except: [:quiz_submission, :submission_history]
+          }).merge(permissions: { user: @current_user, session: session, include_permissions: false })
           json_args[:methods] << :provisional_grade_id if provisional
 
           submissions_json = @submissions.map do |submission|
@@ -144,7 +135,7 @@ class SubmissionsBaseController < ApplicationController
               assignment: @assignment,
               avatars: service_enabled?(:avatars),
               submissions: @submissions,
-              submission_comments: submission_json[:submission].delete(comments_include),
+              submission_comments: submission.visible_submission_comments_for(@current_user),
               current_user: @current_user,
               course: @context
             )

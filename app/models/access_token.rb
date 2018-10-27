@@ -86,6 +86,10 @@ class AccessToken < ActiveRecord::Base
     Canvas::Security.encryption_keys.map { |key| Canvas::Security.hmac_sha1(token, key) }
   end
 
+  def self.visible_tokens(tokens)
+    tokens.reject { |token| token.developer_key.internal_service }
+  end
+
   def usable?(token_key = :crypted_token)
     # true if
     # developer key is usable AND

@@ -47,4 +47,96 @@ describe 'ToDoListPresenter' do
       expect(presenter.needs_moderation).to be_empty
     end
   end
+
+  context 'grading assignments' do
+    let(:course1) { Course.create! }
+    let(:course2) { Course.create! }
+    let(:student) { user_with_multiple_enrollments('StudentEnrollment') }
+    let(:student2) { user_with_multiple_enrollments('StudentEnrollment') }
+    let(:grader) { user_with_multiple_enrollments('TeacherEnrollment') }
+    let(:final_grader) { user_with_multiple_enrollments('TeacherEnrollment') }
+
+
+    def user_with_multiple_enrollments(enrollment_type)
+      result = course_with_user(enrollment_type, course: course1, active_all: true).user
+      course_with_user(enrollment_type, user: result, course: course2, active_all: true).user
+    end
+
+    before :each do
+      Assignment.create!(
+        context: course1,
+        title: 'assignment1',
+        submission_types: 'online_text_entry',
+        moderated_grading: true,
+        grader_count: 2,
+        final_grader: final_grader
+      ).submit_homework(student, body: 'biscuits!!! and potatoes')
+      Assignment.create!(
+        context: course2,
+        title: 'assignment2',
+        submission_types: 'online_text_entry',
+        moderated_grading: true,
+        grader_count: 2,
+        final_grader: final_grader
+      ).submit_homework(student, body: 'i really like potatoes')
+    end
+
+    it 'returns for assignments that need grading for a teacher that is a grader' do
+      presenter = ToDoListPresenter.new(nil, grader, nil)
+      expect(presenter.needs_grading.map(&:title)).to contain_exactly('assignment1', 'assignment2')
+    end
+
+    it 'does not explode if the teacher is also a cross-shard site admin' do
+      expect_any_instantiation_of(grader).to receive(:roles).and_return(['consortium_admin'])
+      presenter = ToDoListPresenter.new(nil, grader, nil)
+      expect(presenter.needs_grading.map(&:title)).to contain_exactly('assignment1', 'assignment2')
+    end
+
+    it 'doesnt returns for assignments that need grading for a teacher that isnt a grader' do
+      RoleOverride.create!(:context => course1.account,
+                           :permission => 'manage_grades',
+                           :role => teacher_role,
+                           :enabled => false)
+
+      presenter = ToDoListPresenter.new(nil, grader, nil)
+      expect(presenter.needs_grading.size).to eq(0)
+    end
+
+    it 'returns assignments from multiple types' do
+      grading = Assignment.where(:title => 'assignment1').first
+      grading.grade_student(student, grade: '1', grader: grader, provisional: true)
+
+      presenter = ToDoListPresenter.new(nil, grader, nil)
+      expect(presenter.needs_grading.map(&:title)).to contain_exactly('assignment2')
+
+      presenter = ToDoListPresenter.new(nil, final_grader, nil)
+      expect(presenter.needs_moderation.map(&:title)).to contain_exactly('assignment1')
+    end
+  end
+
+  context "peer reviews" do
+    let(:course1) { Course.create! }
+    let(:reviewer) { course_with_user('StudentEnrollment', course: course1, active_all: true).user }
+    let(:reviewee) { course_with_user('StudentEnrollment', course: course1, active_all: true).user }
+
+    before :each do
+      course1.offer!
+      assignment = Assignment.create({
+        context: course1,
+        title: 'assignment3',
+        submission_types: 'online_text_entry',
+        due_at: 1.day.from_now,
+        peer_reviews: true
+      })
+      assignment.publish
+      assessment = assignment.assign_peer_review(reviewer, reviewee)
+      assignment.submit_homework(reviewee, body: 'you say potato...')
+    end
+
+    it "does not blow up" do
+      presenter = ToDoListPresenter.new(nil, reviewer, [course1])
+      # basically checking that ToDoListPresenter.initialize didn't raise and error
+      expect(presenter).not_to be_nil
+    end
+  end
 end

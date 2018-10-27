@@ -32,10 +32,23 @@ class ToDoListPresenter
       @needs_submitting = assignments_needing(:submitting, include_ungraded: true)
       @needs_submitting += ungraded_quizzes_needing_submitting
       @needs_submitting.sort_by! { |a| a.due_at || a.updated_at }
+
       assessment_requests = user.submissions_needing_peer_review(contexts: contexts, limit: ASSIGNMENT_LIMIT)
       @needs_reviewing = assessment_requests.map do |ar|
         AssessmentRequestPresenter.new(view, ar, user) if ar.asset.assignment.published?
       end.compact
+
+      # we need a complete list of courses first because we only care about the courses
+      # from the assignments involved. not just the contexts handed in.
+      deduped_courses = (@needs_grading.map(&:context) + @needs_moderation.map(&:context) +
+        @needs_submitting.map(&:context) + @needs_reviewing.map(&:context)).uniq
+      course_to_permissions = @user.precalculate_permissions_for_courses(deduped_courses, [:manage_grades])
+
+      @needs_grading = @needs_grading.select {|assignment|
+        course_to_permissions ?
+          course_to_permissions[assignment.context.global_id]&.fetch(:manage_grades, false) :
+          assignment.context.grants_right?(@user, :manage_grades)
+      }
     else
       @needs_grading = []
       @needs_moderation = []
@@ -95,7 +108,7 @@ class ToDoListPresenter
   class AssignmentPresenter
     attr_reader :assignment
     protected :assignment
-    delegate :title, :submission_action_string, :points_possible, :due_at, :updated_at, :peer_reviews_due_at, to: :assignment
+    delegate :title, :submission_action_string, :points_possible, :due_at, :updated_at, :peer_reviews_due_at, :context, to: :assignment
 
     def initialize(view, assignment, user, type)
       @view = view
@@ -206,8 +219,7 @@ class ToDoListPresenter
   end
 
   class AssessmentRequestPresenter
-    delegate :context_name, to: :assignment_presenter
-    delegate :short_context_name, to: :assignment_presenter
+    delegate :context, :context_name, :short_context_name, to: :assignment_presenter
     attr_reader :assignment
 
     def initialize(view, assessment_request, user)

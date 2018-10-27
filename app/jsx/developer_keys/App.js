@@ -17,13 +17,10 @@
  */
 
 import Button from '@instructure/ui-buttons/lib/components/Button'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
 import View from '@instructure/ui-layout/lib/components/View'
-
-import IconPlusLine from '@instructure/ui-icons/lib/Line/IconPlus'
 
 import I18n from 'i18n!react_developer_keys'
 import React from 'react'
@@ -31,6 +28,7 @@ import PropTypes from 'prop-types'
 import DeveloperKeysTable from './AdminTable'
 import DeveloperKey from './DeveloperKey'
 import DeveloperKeyModal from './NewKeyModal'
+import DeveloperKeyModalTrigger from "./NewKeyTrigger"
 
 class DeveloperKeysApp extends React.Component {
   state = {
@@ -48,10 +46,6 @@ class DeveloperKeysApp extends React.Component {
 
   focusDevKeyButton = () => { this.addDevKeyButton.focus() }
   focusInheritedTab = () => { this.setState({focusTab: true}) }
-
-  showCreateDeveloperKey = () => {
-    this.props.store.dispatch(this.props.actions.developerKeysModalOpen())
-  }
 
   showMoreButtonHandler = _event => {
     const {
@@ -110,6 +104,7 @@ class DeveloperKeysApp extends React.Component {
           listDeveloperKeysPending,
           listInheritedDeveloperKeysPending
         },
+        createLtiKey,
         createOrEditDeveloperKey,
         listDeveloperKeyScopes
       },
@@ -128,25 +123,15 @@ class DeveloperKeysApp extends React.Component {
         </View>
         <TabList variant="minimal" focus={this.state.focusTab}>
           <TabPanel title={I18n.t('Account')}>
-            <View
-              as="div"
-              margin="0 0 small 0"
-              padding="none"
-              textAlign="end"
-            >
-              <Button
-                variant="primary"
-                onClick={this.showCreateDeveloperKey}
-                buttonRef={this.setAddKeyButtonRef}
-              >
-                <ScreenReaderContent>{I18n.t('Create a')}</ScreenReaderContent>
-                <IconPlusLine />
-                { I18n.t('Developer Key') }
-              </Button>
-            </View>
+            <DeveloperKeyModalTrigger
+              store={store}
+              actions={actions}
+              setAddKeyButtonRef={this.setAddKeyButtonRef}
+            />
             <DeveloperKeyModal
               store={store}
               actions={actions}
+              createLtiKeyState={createLtiKey}
               createOrEditDeveloperKeyState={createOrEditDeveloperKey}
               availableScopes={listDeveloperKeyScopes.availableScopes}
               availableScopesPending={listDeveloperKeyScopes.listDeveloperKeyScopesPending}

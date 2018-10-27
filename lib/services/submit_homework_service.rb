@@ -44,7 +44,9 @@ module Services
       end
 
       def assignment
-        @assignment ||= progress.context
+        @assignment ||= begin
+          progress.context if progress.context.is_a? Assignment
+        end
       end
 
       def homework_service
@@ -56,8 +58,11 @@ module Services
         clone_url_executor.execute(attachment)
         progress.reload
 
-        homework_service.submit(progress.created_at, eula_agreement_timestamp)
-        homework_service.deliver_email
+        # If the assignment exists, submit it
+        if assignment
+          homework_service.submit(progress.created_at, eula_agreement_timestamp)
+          homework_service.deliver_email
+        end
 
         progress.complete unless progress.failed?
       rescue => error

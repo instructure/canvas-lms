@@ -21,15 +21,16 @@ describe SupportHelpers::DueDateCache do
   describe "CourseFixer" do
 
     let(:course) { Account.default.courses.create!(name: 'ddc') }
+    let(:user) { User.create! }
 
     it 'calls DueDateCacher recompute course for a given course' do
-      fixer = SupportHelpers::DueDateCache::CourseFixer.new('email', nil, course.id)
-      expect(DueDateCacher).to receive(:recompute_course).with(course, update_grades: true)
+      fixer = SupportHelpers::DueDateCache::CourseFixer.new('email', nil, course.id, user.id)
+      expect(DueDateCacher).to receive(:recompute_course).with(course, update_grades: true, executing_user: user.id)
       fixer.fix
     end
 
     it 'raises record not found for a bad course id' do
-      fixer = SupportHelpers::DueDateCache::CourseFixer.new('email', nil, 1234)
+      fixer = SupportHelpers::DueDateCache::CourseFixer.new('email', nil, 1234, user.id)
       expect { fixer.fix }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end

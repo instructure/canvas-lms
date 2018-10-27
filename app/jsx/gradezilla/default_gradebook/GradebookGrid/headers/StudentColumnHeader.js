@@ -88,13 +88,11 @@ export default class StudentColumnHeader extends ColumnHeader {
   }
 
   bindDisplayAsMenuContent = (ref) => {
-    this.displayAsMenuContent = ref;
-    this.bindFlyoutMenu(ref, this.displayAsMenuContent);
+    this.bindFlyoutMenu(ref, 'displayAsMenuContent');
   };
 
   bindSecondaryInfoMenuContent = (ref) => {
-    this.secondaryInfoMenuContent = ref;
-    this.bindFlyoutMenu(ref, this.secondaryInfoMenuContent);
+    this.bindFlyoutMenu(ref, 'secondaryInfoMenuContent');
   };
 
   render () {

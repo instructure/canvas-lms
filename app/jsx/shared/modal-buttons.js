@@ -18,23 +18,19 @@
 
 import React from 'react'
 
-  var ModalButtons = React.createClass({
-    displayName: 'ModalButtons',
-    getDefaultProps(){
-      return {
-        className: "ReactModal__Footer",
-        footerClassName: "ReactModal__Footer-Actions"
-      }
-    },
-    render() {
-      return (
-        <div className={this.props.className} >
-          <div className={this.props.footerClassName}>
-            {this.props.children}
-          </div>
-        </div>
-      );
-    }
-  });
+export default class ModalButtons extends React.Component {
+  static displayName = 'ModalButtons'
 
-export default ModalButtons
+  static defaultProps = {
+    className: 'ReactModal__Footer',
+    footerClassName: 'ReactModal__Footer-Actions'
+  }
+
+  render() {
+    return (
+      <div className={this.props.className}>
+        <div className={this.props.footerClassName}>{this.props.children}</div>
+      </div>
+    )
+  }
+}

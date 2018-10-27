@@ -102,6 +102,16 @@ module Factories
     course_with_ta(opts)
   end
 
+  def observer_in_course(opts={})
+    opts[:course] = @course if @course && !opts[:course]
+    course_with_observer(opts)
+  end
+
+  def designer_in_course(opts={})
+    opts[:course] = @course if @course && !opts[:course]
+    course_with_designer(opts)
+  end
+
   def student_in_section(section, opts={})
     student = opts.fetch(:user) { user_factory }
     enrollment = section.course.enroll_user(student, 'StudentEnrollment', :section => section, :force_update => true)

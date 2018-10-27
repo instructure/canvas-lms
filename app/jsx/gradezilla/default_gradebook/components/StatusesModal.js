@@ -22,7 +22,7 @@ import { func, shape, string } from 'prop-types';
 import update from 'immutability-helper';
 import I18n from 'i18n!gradebook';
 import Button from '@instructure/ui-buttons/lib/components/Button';
-import Modal, { ModalBody, ModalFooter, ModalHeader } from '@instructure/ui-overlays/lib/components/Modal';
+import Modal, { ModalBody, ModalFooter } from '../../../shared/components/InstuiModal';
 import Heading from '@instructure/ui-elements/lib/components/Heading';
 import Text from '@instructure/ui-elements/lib/components/Text';
 import { statuses } from '../../../gradezilla/default_gradebook/constants/statuses';
@@ -96,7 +96,6 @@ class StatusesModal extends React.Component {
 
 
   bindDoneButton = (button) => { this.doneButton = button; };
-  bindCloseButton = (button) => { this.closeButton = button; };
   bindContentRef = (content) => { this.modalContentRef = content; };
 
   open = () => {
@@ -128,7 +127,6 @@ class StatusesModal extends React.Component {
       state: { isOpen },
       props: { onClose },
       close,
-      bindCloseButton,
       bindDoneButton,
       bindContentRef
     } = this;
@@ -137,17 +135,11 @@ class StatusesModal extends React.Component {
       <Modal
         open={isOpen}
         label={I18n.t('Statuses')}
-        closeButtonLabel={I18n.t('Close')}
-        closeButtonRef={bindCloseButton}
         onDismiss={close}
         onExited={onClose}
         contentRef={bindContentRef}
         shouldCloseOnDocumentClick={false}
       >
-        <ModalHeader>
-          <Heading level="h3">{I18n.t('Statuses')}</Heading>
-        </ModalHeader>
-
         <ModalBody>
           <ul className="Gradebook__StatusModalList">
             <Text>

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import TestUtils from 'react-addons-test-utils'
+import TestUtils from 'react-dom/test-utils'
 import _ from 'lodash'
 import MoveToDialog from 'jsx/eportfolios/MoveToDialog'
 import assertions from 'helpers/assertions'

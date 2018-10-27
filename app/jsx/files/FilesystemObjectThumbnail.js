@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import createReactClass from 'create-react-class';
 import Folder from 'compiled/models/Folder'
 import mimeClass from 'compiled/util/mimeClass'
 import FilesystemObjectThumbnail from 'compiled/react_files/components/FilesystemObjectThumbnail'
@@ -43,4 +44,4 @@ import FilesystemObjectThumbnail from 'compiled/react_files/components/Filesyste
     }
   };
 
-export default React.createClass(FilesystemObjectThumbnail)
+export default createReactClass(FilesystemObjectThumbnail);

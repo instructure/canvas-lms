@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import sinon from 'sinon'
-import { render, shallow } from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme'
+import { render, shallow } from 'enzyme'
 import { merge } from 'lodash'
 import OutcomesImporter, { showOutcomesImporterIfInProgress } from '../OutcomesImporter'
 
@@ -44,13 +44,13 @@ const defaultProps = (props = {}) => (
 )
 
 it('renders the OutcomesImporter component', () => {
-  const modal = shallow(<OutcomesImporter {...defaultProps()}/>)
+  const modal = shallow(<OutcomesImporter {...defaultProps()}/>, {disableLifecycleMethods: true})
   expect(modal.exists()).toBe(true)
 })
 
 it('disables the Outcome Views when upload starts', () => {
   const disableOutcomeViews = jest.fn()
-  const modal = shallow(<OutcomesImporter {...defaultProps({ disableOutcomeViews })}/>)
+  const modal = shallow(<OutcomesImporter {...defaultProps({ disableOutcomeViews })}/>, {disableLifecycleMethods: true})
   apiClient.createImport.mockReturnValue(Promise.resolve({data: {id: 3}}))
   modal.instance().beginUpload()
   expect(disableOutcomeViews).toBeCalled()

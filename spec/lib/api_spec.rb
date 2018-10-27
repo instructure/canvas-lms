@@ -755,14 +755,15 @@ describe Api do
       specs_require_sharding
 
       it 'transposes ids in urls' do
-        @shard1.activate do
+        html = @shard1.activate do
           a = Account.create!
-          student_in_course(account: a)
+          student_in_course(account: a, active_all: true)
+          @file = attachment_model(context: @course, folder: Folder.root_folders(@course).first)
+          <<-HTML
+<img src="/courses/#{@course.id}/files/#{@file.id}/download?wrap=1" data-api-returntype="File" data-api-endpoint="https://canvas.vanity.edu/api/v1/courses/#{@course.id}/files/#{@file.id}">
+<a href="/courses/#{@course.id}/pages/module-1" data-api-returntype="Page" data-api-endpoint="https://canvas.vanity.edu/api/v1/courses/#{@course.id}/pages/module-1">link</a>
+          HTML
         end
-        html = <<-HTML
-<img src="/courses/34/files/2082/download?wrap=1" data-api-returntype="File" data-api-endpoint="https://canvas.vanity.edu/api/v1/courses/34/files/2082">
-<a href="/courses/34/pages/module-1" data-api-returntype="Page" data-api-endpoint="https://canvas.vanity.edu/api/v1/courses/34/pages/module-1">link</a>
-        HTML
 
         @k = klass.new
         @k.instance_variable_set(:@domain_root_account, Account.default)
@@ -774,8 +775,8 @@ describe Api do
 
         res = @k.api_user_content(html, @course, @student)
         expect(res).to eq <<-HTML
-<img src="https://school.instructure.com/courses/#{@shard1.id}~34/files/#{@shard1.id}~2082/download?wrap=1" data-api-returntype="File" data-api-endpoint="https://school.instructure.com/api/v1/courses/#{@shard1.id}~34/files/#{@shard1.id}~2082">
-<a href="https://school.instructure.com/courses/#{@shard1.id}~34/pages/module-1" data-api-returntype="Page" data-api-endpoint="https://school.instructure.com/api/v1/courses/#{@shard1.id}~34/pages/module-1">link</a>
+<img src="https://school.instructure.com/courses/#{@shard1.id}~#{@course.local_id}/files/#{@shard1.id}~#{@file.local_id}/download?verifier=#{@file.uuid}&amp;wrap=1" data-api-returntype="File" data-api-endpoint="https://school.instructure.com/api/v1/courses/#{@shard1.id}~#{@course.local_id}/files/#{@shard1.id}~#{@file.local_id}">
+<a href="https://school.instructure.com/courses/#{@shard1.id}~#{@course.local_id}/pages/module-1" data-api-returntype="Page" data-api-endpoint="https://school.instructure.com/api/v1/courses/#{@shard1.id}~#{@course.local_id}/pages/module-1">link</a>
         HTML
       end
     end

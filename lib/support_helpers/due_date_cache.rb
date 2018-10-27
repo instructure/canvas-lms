@@ -18,14 +18,15 @@
 module SupportHelpers
   module DueDateCache
     class CourseFixer < Fixer
-      def initialize(email, after_time, course_id)
+      def initialize(email, after_time, course_id, executing_user_id)
         @course_id = course_id
+        @executing_user_id = executing_user_id
         super(email, after_time)
       end
 
       def fix
         course = Course.find(@course_id)
-        DueDateCacher.recompute_course(course, update_grades: true)
+        DueDateCacher.recompute_course(course, update_grades: true, executing_user: @executing_user_id)
       end
     end
   end

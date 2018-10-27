@@ -56,6 +56,7 @@ module Lti
         launch_presentation_locale: I18n.locale.to_s || I18n.default_locale.to_s,
         launch_presentation_document_target: 'iframe',
         ext_roles: lti_helper.all_roles,
+        oauth_callback: 'about:blank'
       }
 
       params[:user_id] = Lti::Asset.opaque_identifier_for(user) if user

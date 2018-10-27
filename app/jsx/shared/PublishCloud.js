@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import createReactClass from 'create-react-class';
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
 import I18n from 'i18n!publish_cloud'
@@ -132,4 +133,4 @@ import RestrictedDialogForm from '../files/RestrictedDialogForm'
 
   };
 
-export default React.createClass(PublishCloud)
+export default createReactClass(PublishCloud);

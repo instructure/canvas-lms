@@ -353,7 +353,7 @@ test('selecting a grader from options sets state to its id', function () {
   input.click();
 
   const graderNames = this.graders.map(grader => (grader.name));
-  [...document.getElementsByTagName('span')].find(span => graderNames.includes(span.innerHTML) || graderNames.includes(span.innerText)).click();
+  [...document.getElementsByTagName('span')].find(span => graderNames.includes(span.textContent)).click();
 
   strictEqual(this.wrapper.state().selected.grader, this.graders[0].id);
 });
@@ -371,7 +371,7 @@ test('selecting a student from options sets state to its id', function () {
   input.click();
   const studentNames = this.students.map(student => student.name);
 
-  [...document.getElementsByTagName('span')].find(span => studentNames.includes(span.innerHTML) || studentNames.includes(span.innerText)).click();
+  [...document.getElementsByTagName('span')].find(span => studentNames.includes(span.textContent)).click();
   strictEqual(this.wrapper.state().selected.student, this.students[0].id);
 });
 
@@ -388,7 +388,7 @@ test('selecting an assignment from options sets state to its id', function () {
   input.click();
 
   const assignmentNames = this.assignments.map(assignment => (assignment.name));
-  [...document.getElementsByTagName('span')].find(span => assignmentNames.includes(span.innerHTML) || assignmentNames.includes(span.innerText)).click();
+  [...document.getElementsByTagName('span')].find(span => assignmentNames.includes(span.textContent)).click();
 
   strictEqual(this.wrapper.state().selected.assignment, this.assignments[0].id);
 });
@@ -406,7 +406,7 @@ test('selecting an assignment from options clears options for assignments', func
   input.click();
 
   const assignmentNames = this.assignments.map(assignment => (assignment.name));
-  [...document.getElementsByTagName('span')].find(span => assignmentNames.includes(span.innerHTML) || assignmentNames.includes(span.innerText)).click();
+  [...document.getElementsByTagName('span')].find(span => assignmentNames.includes(span.textContent)).click();
 
   ok(this.props.clearSearchOptions.called);
   strictEqual(this.props.clearSearchOptions.firstCall.args[0], 'assignments');
@@ -425,7 +425,7 @@ test('selecting a grader from options clears options for graders', function () {
   input.click();
 
   const graderNames = this.graders.map(grader => (grader.name));
-  [...document.getElementsByTagName('span')].find(span => graderNames.includes(span.innerHTML) || graderNames.includes(span.innerText)).click();
+  [...document.getElementsByTagName('span')].find(span => graderNames.includes(span.textContent)).click();
 
   ok(this.props.clearSearchOptions.called);
   strictEqual(this.props.clearSearchOptions.firstCall.args[0], 'graders');
@@ -445,7 +445,7 @@ test('selecting a student from options clears options for students', function ()
 
   const studentNames = this.students.map(student => (student.name));
 
-  [...document.getElementsByTagName('span')].find(span => studentNames.includes(span.innerHTML) || studentNames.includes(span.innerText)).click();
+  [...document.getElementsByTagName('span')].find(span => studentNames.includes(span.textContent)).click();
   ok(this.props.clearSearchOptions.called);
   strictEqual(this.props.clearSearchOptions.firstCall.args[0], 'students');
 });

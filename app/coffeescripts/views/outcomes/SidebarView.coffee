@@ -49,7 +49,7 @@ define [
       @$sidebar = @$el.parent()
       @$sidebar.width @directoryWidth
       if @rootOutcomeGroup = opts.rootOutcomeGroup
-        @addDirFor @rootOutcomeGroup
+        @addDirFor @rootOutcomeGroup, true
       else
         @addDir opts.directoryView
       @render()
@@ -64,18 +64,18 @@ define [
       _.each @directories, (d) -> d.remove()
       @directories = []
       @cachedDirectories = {}
-      @addDirFor @rootOutcomeGroup
+      @addDirFor @rootOutcomeGroup, true
 
     # Adds a directory view for an outcome group.
     # Returns the directory view.
-    addDirFor: (outcomeGroup) ->
+    addDirFor: (outcomeGroup, isRoot = false) ->
       if @cachedDirectories[outcomeGroup.id]
         dir = @cachedDirectories[outcomeGroup.id]
       else
         parent = _.last @directories
         directoryClass = outcomeGroup.get('directoryClass') || OutcomesDirectoryView
         i = _.indexOf @directories, @selectedDir()
-        dir = new directoryClass {outcomeGroup, parent, @readOnly, selectFirstItem: @selectFirstItem, inFindDialog: @inFindDialog, directoryDepth: i + 1}
+        dir = new directoryClass {outcomeGroup, parent, @readOnly, selectFirstItem: isRoot && @selectFirstItem, inFindDialog: @inFindDialog, directoryDepth: i + 1}
         @firstDir = false
       @addDir dir
 

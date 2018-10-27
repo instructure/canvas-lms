@@ -20,7 +20,7 @@ module Types
   class DiscussionType < ApplicationObjectType
     graphql_name "Discussion"
 
-    implements GraphQL::Relay::Node.interface
+    implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
 
     global_id_field :id

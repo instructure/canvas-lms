@@ -76,24 +76,6 @@ describe "speed grader" do
     end
   end
 
-  context "url submissions" do
-    before do
-      @assignment.update_attributes! submission_types: 'online_url',
-                                     title: "url submission"
-      student_in_course
-      @assignment.submit_homework(@student, submission_type: "online_url", workflow_state: "submitted", url: "http://www.instructure.com")
-    end
-
-    it "properly shows and hides student name when name hidden toggled", priority: "2", test_id: 283741 do
-      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-
-      in_frame 'speedgrader_iframe', '.is-inside-submission-frame' do
-        expect(f('.not_external')).to include_text("instructure")
-        expect(f('.open_in_a_new_tab')).to include_text("View")
-      end
-    end
-  end
-
   it "does not show students in other sections if visibility is limited", priority: "1", test_id: 283758 do
     @enrollment.update_attribute(:limit_privileges_to_course_section, true)
     student_submission

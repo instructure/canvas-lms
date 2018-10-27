@@ -16,47 +16,51 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import DiscussionTopicKeyboardShortcutModal from 'jsx/discussion_topics/DiscussionTopicKeyboardShortcutModal'
 import React from 'react'
 import {mount} from 'enzyme'
-import I18n from 'i18n!KeyboardShortcutModal'
 
 const SHORTCUTS = [
   {
     keycode: 'j',
-    description: I18n.t('Next Message')
+    description: 'Next Message'
   },
   {
     keycode: 'k',
-    description: I18n.t('Previous Message')
+    description: 'Previous Message'
   },
   {
     keycode: 'e',
-    description: I18n.t('Edit Current Message')
+    description: 'Edit Current Message'
   },
   {
     keycode: 'd',
-    description: I18n.t('Delete Current Message')
+    description: 'Delete Current Message'
   },
   {
     keycode: 'r',
-    description: I18n.t('Reply to Current Message')
+    description: 'Reply to Current Message'
   },
   {
     keycode: 'n',
-    description: I18n.t('Reply to Topic')
+    description: 'Reply to Topic'
   }
 ]
 
 QUnit.module('DiscussionTopicKeyboardShortcutModal#render')
 
-test('renders shortcuts', function() {
-  const DiscussionTopicKeyboardShortcutModalElement = (
-    <DiscussionTopicKeyboardShortcutModal isOpen />
-  )
-  const wrapper = mount(DiscussionTopicKeyboardShortcutModalElement)
-  const list = $('.ReactModalPortal').find('.navigation_list li')
+test('renders shortcuts', async function() {
+  const wrapper = mount(<DiscussionTopicKeyboardShortcutModal />)
+
+  // open the modal by pressing ";"
+  const e = new Event('keydown')
+  e.which = 188
+  document.dispatchEvent(e)
+
+  // have to wait for instUI modal css transitions
+  await new Promise(res => setTimeout(res, 1))
+
+  const list = $('.navigation_list li')
   equal(SHORTCUTS.length, list.length)
   ok(
     SHORTCUTS.every(sc =>

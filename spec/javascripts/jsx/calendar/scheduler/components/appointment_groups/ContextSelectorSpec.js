@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import TestUtils from 'react-addons-test-utils'
+import TestUtils from 'react-dom/test-utils'
 import {mount} from 'enzyme'
 import ContextSelector from 'jsx/calendar/scheduler/components/appointment_groups/ContextSelector'
 

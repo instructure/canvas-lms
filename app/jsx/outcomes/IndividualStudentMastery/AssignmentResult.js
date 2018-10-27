@@ -28,11 +28,20 @@ import IconQuiz from '@instructure/ui-icons/lib/Line/IconQuiz'
 import * as shapes from './shapes'
 import Ratings from '../../rubrics/Ratings'
 
+const scoreFromPercent = (percent, outcome) => {
+  if (outcome.points_possible > 0) {
+    return +(percent * outcome.points_possible).toFixed(2)
+  }
+  else {
+    return +(percent * outcome.mastery_points).toFixed(2)
+  }
+}
+
 const AssignmentResult = ({ outcome, result, outcomeProficiency }) => {
   const { ratings } = outcome
   const { html_url: url, name, submission_types: types } = result.assignment
   const isQuiz = types && types.indexOf('online_quiz') >= 0
-
+  const score = result.percent ? scoreFromPercent(result.percent, outcome) : result.score
   return (
     <Flex padding="small" direction="column" alignItems="stretch">
       <FlexItem>
@@ -50,7 +59,7 @@ const AssignmentResult = ({ outcome, result, outcomeProficiency }) => {
       <FlexItem padding="x-small 0">
         <View padding="x-small 0 0 0">
           <Text size="small" fontStyle="italic" weight="bold">{
-            result.hide_points ? I18n.t('Your score') : I18n.t('Your score: %{score}', { score: result.score })
+            result.hide_points ? I18n.t('Your score') : I18n.t('Your score: %{score}', { score })
           }</Text>
         </View>
       </FlexItem>
@@ -59,7 +68,7 @@ const AssignmentResult = ({ outcome, result, outcomeProficiency }) => {
           <div className="ratings">
             <Ratings
               tiers={ratings}
-              points={result.score}
+              points={score}
               hidePoints={result.hide_points}
               useRange={false}
               customRatings={_.get(outcomeProficiency, 'ratings')}

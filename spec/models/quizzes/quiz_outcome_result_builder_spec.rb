@@ -30,8 +30,8 @@ describe Quizzes::QuizOutcomeResultBuilder do
     scoring_policy = opts[:scoring_policy] || "keep_highest"
     course_with_student(:active_all => true)
     @quiz = @course.quizzes.create!(:title => "new quiz", :shuffle_answers => true, :quiz_type => "assignment", scoring_policy: scoring_policy)
-    @q1 = @quiz.quiz_questions.create!(:question_data => question_data(true, data))
-    @q2 = @quiz.quiz_questions.create!(:question_data => question_data(false, data))
+    @q1 = @quiz.quiz_questions.create!(:question_data => question_data(true, data[:q1] || data))
+    @q2 = @quiz.quiz_questions.create!(:question_data => question_data(false, data[:q2] || data))
     @outcome = @course.created_learning_outcomes.create!(:short_description => 'new outcome')
     @bank = @q1.assessment_question.assessment_question_bank
     @outcome.align(@bank, @bank.context, :mastery_score => 0.7)
@@ -243,6 +243,32 @@ describe Quizzes::QuizOutcomeResultBuilder do
     end
   end
 
+  describe "quizzes with a mix of auto-gradeable and non-auto-gradeable questions" do
+    before :once do
+      build_course_quiz_questions_and_a_bank(q2: {'question_type' => 'essay_question', 'answers' => []})
+      @quiz.generate_quiz_data(:persist => true)
+      @quiz.save!
+      @sub = @quiz.generate_submission(@user)
+      @sub.submission_data = {}
+      answer_a_question(@q1, @sub)
+      answer_a_question(@q2, @sub)
+      Quizzes::SubmissionGrader.new(@sub).grade_submission
+      @outcome.reload
+    end
+
+    it "creates an outcome result even if the total score doesn't increase after grading an essay question" do
+      expect(@outcome.learning_outcome_results.where(user_id: @user).count).to equal 0
+      @sub.update_scores({
+        'context_id' => @course.id,
+        'override_scores' => true,
+        'context_type' => 'Course',
+        'submission_version_number' => '1',
+        "question_score_#{@q2.id}" => "0"
+      })
+      expect(@outcome.learning_outcome_results.where(user_id: @user).count).to equal 1
+    end
+  end
+
   describe "quizzes that aren't graded or complete" do
     before :once do
       build_course_quiz_questions_and_a_bank({'question_type' => 'essay_question', 'answers' => []})
@@ -253,10 +279,6 @@ describe Quizzes::QuizOutcomeResultBuilder do
       answer_a_question(@q2, @sub, correct: false)
       Quizzes::SubmissionGrader.new(@sub).grade_submission
       @outcome.reload
-    end
-
-    it "does not create an outcome result" do
-      expect(@outcome.learning_outcome_results.where(user_id: @user).count).to equal 0
     end
 
     it "creates and updates an outcome result once fully manually graded" do

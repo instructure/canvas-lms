@@ -19,7 +19,7 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 import Text from '@instructure/ui-elements/lib/components/Text';
-import IconDiscussionReplySolid from '@instructure/ui-icons/lib/Solid/IconDiscussionReply';
+import IconMore from '@instructure/ui-icons/lib/Solid/IconMore';
 import StatusColorListItem from 'jsx/gradezilla/default_gradebook/components/StatusColorListItem';
 
 function defaultProps (props = {}) {
@@ -60,7 +60,7 @@ test('status is displayed', function () {
 });
 
 test('popover trigger is a kabob', function () {
-  ok(this.wrapper.find('PopoverTrigger Button').contains(<IconDiscussionReplySolid />));
+  ok(this.wrapper.find('PopoverTrigger Button').contains(<IconMore />));
 });
 
 test('setColor sets the ColorPicker color', function () {

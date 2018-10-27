@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {mount} from 'old-enzyme-2.x-you-need-to-upgrade-this-spec-to-enzyme-3.x-by-importing-just-enzyme'
+import {mount} from 'enzyme'
 import SearchMessage from '../SearchMessage'
 
 const getProps = () => ({
@@ -72,15 +72,6 @@ describe('Pagination Handling', () => {
 
     const buttons = wrapper.find('PaginationButton').map(x => x.text())
     expect(buttons).toEqual(['1', '4', '5', '6', '7', '8', '1,000'])
-  })
-
-  it('shows the loading spinner on the page that is becoming current', () => {
-    const props = getProps()
-    const wrapper = mount(<SearchMessage {...props} />)
-    wrapper.setProps({}) // Make sure it triggers componentWillReceiveProps
-    wrapper.instance().handleSetPage(6)
-    const buttons = wrapper.find('PaginationButton').map(x => x.text())
-    expect(buttons).toEqual(['1', '5', 'Loading...', '7', '8', '9', '10'])
   })
 
   it('sets state to lastUnknown if there is no last link', () => {

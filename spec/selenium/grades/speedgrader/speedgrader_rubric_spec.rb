@@ -98,27 +98,25 @@ describe "speed grader - rubrics" do
     @rubric.data.detect{ |row| row[:learning_outcome_id] == @outcome.id }[:ignore_for_scoring] = true
     @rubric.save!
 
-    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    Speedgrader.visit(@course.id, @assignment.id)
 
     to_comment = 'special rubric comment'
-    scroll_into_view('.toggle_full_rubric')
-    f('.toggle_full_rubric').click
+    Speedgrader.view_rubric_button.click
     expect(f('#rubric_full')).to be_displayed
-    expand_right_pane
-    f('svg[name="IconFeedback"]').find_element(:xpath, '../../parent::button').click
-    f("textarea[data-selenium='criterion_comments_text']").send_keys(to_comment)
-    fj("button:contains('Update Comment'):visible").click
+
+    Speedgrader.expand_right_pane
+    Speedgrader.comment_button_for_row("no outcome row").click
+    Speedgrader.additional_comment_textarea.send_keys(to_comment)
+    Speedgrader.update_comment_button.click
     wait_for_ajaximations
-    f('.criterion_points input').send_keys('1')
-    f('.criterion_points input').send_keys(:tab)
+    Speedgrader.enter_rubric_points('1')
+    button = Speedgrader.save_rubric_button
+    keep_trying_until {
+      button.click
+      true
+    }
     wait_for_ajaximations
-    scroll_into_view('.save_rubric_button')
-    wait_for_dom_ready
-    save_rubric_button = f('#rubric_full .save_rubric_button')
-    save_rubric_button.click
-    wait_for_ajaximations
-    saved_comment = f('.react-rubric-break-words')
-    expect(saved_comment.text).to eq to_comment
+    expect(Speedgrader.rubric_comment_for_row("no outcome row").text).to eq to_comment
   end
 
   it "should not convert invalid text to 0", priority: "2", test_id: 283751 do

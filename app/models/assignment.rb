@@ -101,6 +101,10 @@ class Assignment < ActiveRecord::Base
   has_many :moderation_graders, inverse_of: :assignment
   has_many :moderation_grader_users, through: :moderation_graders, source: :user
 
+  scope :anonymous, -> { where(anonymous_grading: true) }
+  scope :moderated, -> { where(moderated_grading: true) }
+  scope :auditable, -> { anonymous.or(moderated) }
+
   validates_associated :external_tool_tag, :if => :external_tool?
   validate :group_category_changes_ok?
   validate :anonymous_grading_changes_ok?
@@ -463,8 +467,6 @@ class Assignment < ActiveRecord::Base
     write_attribute(:allowed_extensions, new_value)
   end
 
-  after_create :create_assignment_created_audit_event!
-
   before_save :ensure_post_to_sis_valid,
               :process_if_quiz,
               :default_values,
@@ -486,7 +488,8 @@ class Assignment < ActiveRecord::Base
               :apply_late_policy,
               :touch_submissions_if_muted_changed
 
-  with_options if: :auditable? do
+  with_options if: -> { auditable? && @updating_user.present? } do
+    after_create :create_assignment_created_audit_event!
     after_update :create_assignment_updated_audit_event!
     after_save :create_grades_posted_audit_event!, if: :saved_change_to_grades_published_at
   end
@@ -494,9 +497,6 @@ class Assignment < ActiveRecord::Base
   has_a_broadcast_policy
 
   def create_assignment_created_audit_event!
-    return if @updating_user.nil?
-    return unless auditable?
-
     auditable_changes = AUDITABLE_ATTRIBUTES.each_with_object({}) do |attribute, map|
       map[attribute] = attributes[attribute] unless attributes[attribute].nil?
     end
@@ -506,8 +506,6 @@ class Assignment < ActiveRecord::Base
   private :create_assignment_created_audit_event!
 
   def create_assignment_updated_audit_event!
-    return if @updating_user.nil?
-
     auditable_changes = if became_auditable?
       AUDITABLE_ATTRIBUTES.each_with_object({}) do |attribute, map|
         next if attributes[attribute].nil?
@@ -1713,8 +1711,11 @@ class Assignment < ActiveRecord::Base
     did_grade = false
     submission.attributes = opts.slice(:submission_type, :url, :body)
 
-    # Only moderators or admins may excuse an assignment under moderation
+    # A moderated assignment cannot be assigned a score directly, but may be
+    # (un)excused by a moderator or admin. Even though this isn't *really*
+    # a grading action, it needs to be captured for auditing purposes.
     if !opts[:provisional] || permits_moderation?(grader)
+      submission.grader = grader
       submission.excused = opts[:excused] && score.blank?
     end
 
@@ -1735,6 +1736,7 @@ class Assignment < ActiveRecord::Base
       submission.grade_matches_current_submission = true
       submission.regraded = true
     end
+    submission.audit_grade_changes = did_grade || submission.excused_changed?
 
     if (submission.score_changed? ||
         submission.grade_matches_current_submission) &&
@@ -1744,6 +1746,7 @@ class Assignment < ActiveRecord::Base
     submission.group = group
     submission.graded_at = Time.zone.now if did_grade
     previously_graded ? submission.with_versioning(:explicit => true) { submission.save! } : submission.save!
+    submission.audit_grade_changes = false
 
     if opts[:provisional]
       raise GradeError, error_code: 'PROVISIONAL_GRADE_INVALID_SCORE' unless score.present? || submission.excused
@@ -2832,7 +2835,7 @@ class Assignment < ActiveRecord::Base
       Lti::AppLaunchCollator.any?(context, [:post_grades])
   end
 
-  def run_if_overrides_changed!(student_ids=nil)
+  def run_if_overrides_changed!(student_ids=nil, updating_user=nil)
     relocked_modules = []
     self.relock_modules!(relocked_modules, student_ids)
     each_submission_type { |submission| submission&.relock_modules!(relocked_modules, student_ids)}
@@ -2844,10 +2847,10 @@ class Assignment < ActiveRecord::Base
       false
     end
 
-    DueDateCacher.recompute(self, update_grades: update_grades)
+    DueDateCacher.recompute(self, update_grades: update_grades, executing_user: updating_user)
   end
 
-  def run_if_overrides_changed_later!(student_ids=nil)
+  def run_if_overrides_changed_later!(student_ids: nil, updating_user: nil)
     return if self.class.suspended_callback?(:update_cached_due_dates, :save)
 
     enqueuing_args = if student_ids
@@ -2856,7 +2859,7 @@ class Assignment < ActiveRecord::Base
       { singleton: "assignment_overrides_changed_#{self.global_id}" }
     end
 
-    self.send_later_if_production_enqueue_args(:run_if_overrides_changed!, enqueuing_args, student_ids)
+    self.send_later_if_production_enqueue_args(:run_if_overrides_changed!, enqueuing_args, student_ids, updating_user)
   end
 
   def validate_overrides_for_sis(overrides)
@@ -2941,7 +2944,12 @@ class Assignment < ActiveRecord::Base
   end
 
   def can_view_speed_grader?(user)
-    context.allows_speed_grader? && can_be_moderated_grader?(user)
+    context.allows_speed_grader? && context.grants_any_right?(user, :manage_grades, :view_all_grades)
+  end
+
+  def can_view_audit_trail?(user)
+    return false unless context.account.feature_enabled?(:anonymous_moderated_marking_audit_trail)
+    auditable? && !muted? && grades_published? && context.grants_right?(user, :view_audit_trail)
   end
 
   def can_view_other_grader_identities?(user)

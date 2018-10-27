@@ -287,6 +287,18 @@ class SubmissionsController < SubmissionsBaseController
     super
   end
 
+  def audit_events
+    return render_unauthorized_action unless @context.grants_right?(@current_user, :view_audit_trail)
+    audit_events = AnonymousOrModerationEvent.events_for_submission(
+      assignment_id: params[:assignment_id],
+      submission_id: params[:submission_id]
+    )
+
+    respond_to do |format|
+      format.json { render json: { audit_events: audit_events }, status: :ok }
+    end
+  end
+
   def lookup_existing_attachments
     if params[:submission][:file_ids].is_a?(Array)
       attachment_ids = params[:submission][:file_ids]

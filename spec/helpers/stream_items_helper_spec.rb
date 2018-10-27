@@ -168,6 +168,20 @@ describe StreamItemsHelper do
     end
   end
 
+  context "extract_updated_at" do
+    it "should find the correct updated_at time for a conversation participant" do
+      @conversation.updated_at = 1.hour.ago
+      @conversation.save!
+
+      @items = @teacher.recent_stream_items
+      @categorized = helper.categorize_stream_items(@items, @teacher)
+      @convo_participant = @conversation.conversation_participants.find_by(user: @teacher)
+      @stream_item_updated_at = @categorized["Conversation"].first.updated_at
+      expect(@stream_item_updated_at).not_to eq @conversation.updated_at
+      expect(@stream_item_updated_at).to eq @convo_participant.last_message_at
+    end
+  end
+
   context "extract_summary" do
     it "should find the right content" do
       @items = @teacher.recent_stream_items

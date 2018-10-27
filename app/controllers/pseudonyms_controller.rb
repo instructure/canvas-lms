@@ -75,9 +75,6 @@ class PseudonymsController < ApplicationController
     @ccs = []
     if email.present?
       @ccs = CommunicationChannel.email.by_path(email).active.to_a
-      if @ccs.empty?
-        @ccs += CommunicationChannel.email.by_path(email).to_a
-      end
       if @domain_root_account
         @domain_root_account.pseudonyms.active.by_unique_id(email).each do |p|
           cc = p.communication_channel if p.communication_channel && p.user
@@ -103,7 +100,7 @@ class PseudonymsController < ApplicationController
       @ccs.each do |cc|
         cc.forgot_password!
       end
-      format.html { redirect_to(login_url) }
+      format.html { redirect_to(canvas_login_url) }
       format.json { render :json => {:requested => true} }
       format.js { render :json => {:requested => true} }
     end

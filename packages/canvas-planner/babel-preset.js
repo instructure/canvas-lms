@@ -22,7 +22,7 @@ if (env === 'test') {
     presets: [[ require('@instructure/ui-presets/babel'), {
       themeable: true,
       coverage: false,
-      esModules: Boolean(process.env.ES_MODULES)
+      esModules: true
     }]]
   };
 }

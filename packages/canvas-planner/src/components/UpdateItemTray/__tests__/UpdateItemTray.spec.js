@@ -46,7 +46,7 @@ it('renders the item to update if provided', () => {
   const wrapper = shallow(
     <UpdateItemTray {...defaultProps}
       noteItem={noteItem}
-      courses={[{id: '1', longName: 'a course'}]} />
+      courses={[{id: '1', longName: 'a course', enrollmentType: 'StudentEnrollment'}, {id: '2', longName: 'a course I teach', enrollmentType: 'TeacherEnrollment'}]} />
   );
   expect(wrapper).toMatchSnapshot();
 });
@@ -73,7 +73,7 @@ it('shows title inputs', () => {
   expect(wrapper.find('TextInput')).toHaveLength(2);
   const input = wrapper.find('TextInput').first();
   input.find('input').simulate('change', {target: {value: 'New Text'}});
-  expect(input.props().value).toEqual('New Text');
+  expect(input.instance().props.value).toEqual('New Text');
 });
 
 it('shows details inputs', () => {
@@ -82,7 +82,7 @@ it('shows details inputs', () => {
   );
   const input = wrapper.find('TextArea');
   input.find('textarea').simulate('change', {target: {value: 'New Details'}});
-  expect(input.props().value).toEqual('New Details');
+  expect(input.instance().props.value).toEqual('New Details');
 });
 
 it('disables the save button when title is empty', () => {
@@ -206,8 +206,8 @@ it('updates state when new note is passed in', () => {
     details: "You made this item to remind you of something, but you forgot what."
   });
   const wrapper = shallow(<UpdateItemTray {...defaultProps} noteItem={noteItem1} courses={[
-    {id: '1', longName: 'first course'},
-    {id: '2', longName: 'second course'},
+    {id: '1', longName: 'first course', enrollmentType: 'StudentEnrollment'},
+    {id: '2', longName: 'second course', enrollmentType: 'StudentEnrollment'},
   ]}/>);
   expect(wrapper).toMatchSnapshot();
 
@@ -257,8 +257,8 @@ it('renders just an optional option when no courses', () => {
 
 it('renders course options plus an optional option when provided with courses', () => {
   const wrapper = shallow(<UpdateItemTray {...defaultProps} courses={[
-    {id: '1', longName: 'first course'},
-    {id: '2', longName: 'second course'},
+    {id: '1', longName: 'first course', enrollmentType: 'StudentEnrollment'},
+    {id: '2', longName: 'second course', enrollmentType: 'StudentEnrollment'},
   ]} />);
   expect(wrapper.find('option')).toHaveLength(3);
 });
@@ -269,7 +269,7 @@ it('invokes save callback with updated data', () => {
     noteItem={{
       uniqueId: "1", title: 'title', date: moment('2017-04-27T13:00:00Z'), courseId: '42', details: 'details',
     }}
-    courses={[{id: '42', longName: 'first'}, {id: '43', longName: 'second'}]}
+    courses={[{id: '42', longName: 'first', enrollmentType: 'StudentEnrollment'}, {id: '43', longName: 'second', enrollmentType: 'StudentEnrollment'}]}
     onSavePlannerItem={saveMock}
   />);
   wrapper.instance().handleTitleChange({target: {value: 'new title'}});

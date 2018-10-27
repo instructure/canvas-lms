@@ -897,18 +897,18 @@ class User < ActiveRecord::Base
   end
 
   # avoid extraneous callbacks when enrolled in multiple sections
-  def delete_enrollments(enrollment_scope=self.enrollments)
+  def delete_enrollments(enrollment_scope=self.enrollments, updating_user: nil)
     courses_to_update = enrollment_scope.active.distinct.pluck(:course_id)
     Enrollment.suspend_callbacks(:set_update_cached_due_dates) do
       enrollment_scope.preload(:course, :enrollment_state).each{ |e| e.destroy }
     end
     user_ids = enrollment_scope.pluck(:user_id).uniq
     courses_to_update.each do |course|
-      DueDateCacher.recompute_users_for_course(user_ids, course)
+      DueDateCacher.recompute_users_for_course(user_ids, course, nil, executing_user: updating_user)
     end
   end
 
-  def remove_from_root_account(root_account)
+  def remove_from_root_account(root_account, updating_user: nil)
     ActiveRecord::Base.transaction do
       if root_account == :all
         # make sure to hit all shards
@@ -934,7 +934,7 @@ class User < ActiveRecord::Base
         has_other_root_accounts = self.associated_accounts.shard(self).where('accounts.id <> ?', root_account).exists?
       end
 
-      self.delete_enrollments(enrollment_scope)
+      self.delete_enrollments(enrollment_scope, updating_user: updating_user)
       user_observer_scope.destroy_all
       user_observee_scope.destroy_all
       pseudonym_scope.each(&:destroy)
@@ -1808,31 +1808,30 @@ class User < ActiveRecord::Base
     end
   end
 
-  def submissions_for_context_codes(context_codes, opts={})
+  def submissions_for_context_codes(context_codes, start_at: nil, limit: 20)
     return [] unless context_codes.present?
 
-    opts = {limit: 20}.merge(opts.slice(:start_at, :limit))
     shard.activate do
-      Rails.cache.fetch([self, 'submissions_for_context_codes', context_codes, opts].cache_key, expires_in: 15.minutes) do
-        opts[:start_at] ||= 4.weeks.ago
+      Rails.cache.fetch([self, 'submissions_for_context_codes', context_codes, start_at, limit].cache_key, expires_in: 15.minutes) do
+        start_at ||= 4.weeks.ago
 
         Shackles.activate(:slave) do
           submissions = []
-          submissions += self.submissions.where("GREATEST(submissions.submitted_at, submissions.created_at) > ?", opts[:start_at]).
+          submissions += self.submissions.where("GREATEST(submissions.submitted_at, submissions.created_at) > ?", start_at).
             for_context_codes(context_codes).eager_load(:assignment).
             where("submissions.score IS NOT NULL AND assignments.workflow_state=? AND assignments.muted=?", 'published', false).
             order('submissions.created_at DESC').
-            limit(opts[:limit]).to_a
+            limit(limit).to_a
 
           submissions += Submission.active.where(user_id: self).for_context_codes(context_codes).
             joins(:assignment).
             where(assignments: {muted: false, workflow_state: 'published'}).
-            where('last_comment_at > ?', opts[:start_at]).
-            limit(opts[:limit]).order("last_comment_at").to_a
+            where('last_comment_at > ?', start_at).
+            limit(limit).order("last_comment_at").to_a
 
           submissions = submissions.sort_by{|t| t.last_comment_at || t.created_at}.reverse
           submissions = submissions.uniq
-          submissions.first(opts[:limit])
+          submissions.first(limit)
 
           ActiveRecord::Associations::Preloader.new.preload(submissions, [{:assignment => :context}, :user, :submission_comments])
           submissions
@@ -1842,14 +1841,17 @@ class User < ActiveRecord::Base
   end
 
   # This is only feedback for student contexts (unless specific contexts are passed in)
-  def recent_feedback(opts={})
-    context_codes = opts[:context_codes]
-    context_codes ||= if opts[:contexts]
-        setup_context_lookups(opts[:contexts])
+  def recent_feedback(
+    context_codes: nil,
+    contexts: nil,
+    **opts # forwarded to submissions_for_context_codes
+  )
+    context_codes ||= if contexts
+        setup_context_lookups(contexts)
       else
         self.participating_student_course_ids.map { |id| "course_#{id}" }
       end
-    submissions_for_context_codes(context_codes, opts)
+    submissions_for_context_codes(context_codes, **opts)
   end
 
   def visible_stream_item_instances(opts={})
@@ -1915,13 +1917,6 @@ class User < ActiveRecord::Base
     end
   end
 
-  def calendar_events_for_contexts(context_codes, opts={})
-    event_codes = context_codes
-    event_codes += AppointmentGroup.manageable_by(self, context_codes).intersecting(opts[:start_at], opts[:end_at]).map(&:asset_string)
-    CalendarEvent.active.for_user_and_context_codes(self, event_codes, []).between(opts[:start_at], opts[:end_at]).
-      updated_after(opts[:updated_at])
-  end
-
   def upcoming_events(opts={})
     context_codes = opts[:context_codes] || (opts[:contexts] ? setup_context_lookups(opts[:contexts]) : self.cached_context_codes)
     return [] if (!context_codes || context_codes.empty?)
@@ -1977,9 +1972,9 @@ class User < ActiveRecord::Base
     events.sort_by{|e| [e.start_at ? 0: 1,e.start_at || 0, Canvas::ICU.collation_key(e.title)] }.uniq.first(opts[:limit])
   end
 
-  def select_available_assignments(assignments, opts = {})
+  def select_available_assignments(assignments, include_concluded: false)
     return [] if assignments.empty?
-    available_course_ids = if opts[:include_concluded]
+    available_course_ids = if include_concluded
                             participated_course_ids
                           else
                             Shard.partition_by_shard(assignments.map(&:context_id).uniq) do |course_ids|

@@ -32,6 +32,10 @@ module NewUserEditModalPage
     fj('label:contains("Email") input', modal_object)
   end
 
+  def sortable_name_input
+    fj('label:contains("Sortable Name") input', modal_object)
+  end
+
   def email_about_creation_check
     fj('label:contains("Email the user about this account creation")')
   end

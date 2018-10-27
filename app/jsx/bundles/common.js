@@ -128,5 +128,5 @@ if (!supportsCSSVars) {
 }
 
 $(() => {
-  if (isMathMLOnPage()) loadMathJax('MML_HTMLorMML.js')
+  if (isMathMLOnPage()) loadMathJax('TeX-MML-AM_HTMLorMML')
 })

@@ -103,10 +103,6 @@ class AuthenticationProvidersPresenter
     Onelogin::Saml::NameIdentifiers::ALL_IDENTIFIERS
   end
 
-  def saml_debugging?
-     !saml_configs.empty? && saml_configs.any?(&:debugging?)
-  end
-
   def login_attribute_for(config)
     saml_login_attributes.invert[config.login_attribute]
   end

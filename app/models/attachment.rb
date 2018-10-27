@@ -1476,6 +1476,7 @@ class Attachment < ActiveRecord::Base
     return unless root
     self.root_attachment_id = nil
     root.copy_attachment_content(self)
+    self.run_after_attachment_saved
   end
 
   def restore
@@ -1835,9 +1836,8 @@ class Attachment < ActiveRecord::Base
   end
 
   def crocodoc_url(user, opts={})
-    opts[:enable_annotations] = true
     return unless crocodoc_available?
-    "/api/v1/crocodoc_session?#{preview_params(user, 'crocodoc', opts)}"
+    "/api/v1/crocodoc_session?#{preview_params(user, 'crocodoc', opts.merge(enable_annotations: true))}"
   end
 
   def previewable_media?

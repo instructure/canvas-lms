@@ -379,7 +379,6 @@ class FilesController < ApplicationController
       css_bundle :react_files
       js_env({
         :FILES_CONTEXTS => files_contexts,
-        :NEW_FOLDER_TREE => @context.feature_enabled?(:use_new_tree),
         :COURSE_ID => context.id.to_s
       })
       log_asset_access([ "files", @context ], "files", "other")
@@ -471,12 +470,12 @@ class FilesController < ApplicationController
     # @current_user.attachments.find , since it might not actually be a user
     # attachment.
     # this implicit context magic happens in ApplicationController#get_context
-    if @context && !@context.is_a?(User)
-      # note that Attachment#find has special logic to find overwriting files; see FindInContextAssociation
-      @attachment = @context.attachments.find(params[:id])
-    else
+    if @context.nil? || @current_user.nil? || @context == @current_user
       @attachment = Attachment.find(params[:id])
       @skip_crumb = true unless @context
+    else
+      # note that Attachment#find has special logic to find overwriting files; see FindInContextAssociation
+      @attachment = @context.attachments.find(params[:id])
     end
 
     params[:download] ||= params[:preview]
@@ -870,25 +869,22 @@ class FilesController < ApplicationController
     if params[:progress_id]
       progress = Progress.find(params[:progress_id])
 
-      # TODO: The `submit_assignment` param is used to help in backwards compat for fixing auto submissions,
-      # can be removed in the next release.
-      if params[:submit_assignment].to_s == 'true'
-        if progress.tag == 'upload_via_url'
-          assignment = progress.context
-          homework_service = Services::SubmitHomeworkService.new(@attachment, assignment)
-          begin
-            homework_service.submit(progress.created_at, params[:eula_agreement_timestamp])
-            homework_service.deliver_email
+      # If the upload is for an Assignment, submit it
+      if progress.tag == 'upload_via_url' && progress.context.is_a?(Assignment)
+        assignment = progress.context
+        homework_service = Services::SubmitHomeworkService.new(@attachment, assignment)
+        begin
+          homework_service.submit(progress.created_at, params[:eula_agreement_timestamp])
+          homework_service.deliver_email
 
-            progress.complete unless progress.failed?
-          rescue => error
-            error_id = Canvas::Errors.capture_exception(self.class.name, error)[:error_report]
-            progress.message = "Unexpected error, ID: #{error_id || 'unknown'}"
-            progress.save
-            progress.fail
-            logger.error "Error submitting a file: #{error} - #{error.backtrace}"
-            homework_service.failure_email
-          end
+          progress.complete unless progress.failed?
+        rescue => error
+          error_id = Canvas::Errors.capture_exception(self.class.name, error)[:error_report]
+          progress.message = "Unexpected error, ID: #{error_id || 'unknown'}"
+          progress.save
+          progress.fail
+          logger.error "Error submitting a file: #{error} - #{error.backtrace}"
+          homework_service.failure_email
         end
       end
 

@@ -7,8 +7,6 @@
  * See http://pajhome.org.uk/crypt/md5 for more info.
  */
 
-// wrap as amd
-define([], function(){
 
 /*
  * Configurable variables. You may need to tweak these to be compatible with
@@ -381,7 +379,6 @@ function bit_rol(num, cnt)
   return (num << cnt) | (num >>> (32 - cnt));
 }
 
-return {
+module.exports = {
   encrypt: hex_md5
 }
-});

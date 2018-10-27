@@ -19,7 +19,7 @@
 import {isNull} from 'lodash'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import TestUtils from 'react-addons-test-utils'
+import TestUtils from 'react-dom/test-utils'
 import DownloadLink from 'jsx/epub_exports/DownloadLink'
 import I18n from 'i18n!epub_exports'
 

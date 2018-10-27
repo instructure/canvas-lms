@@ -20,8 +20,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!new_user_tutorial'
 import Button from '@instructure/ui-buttons/lib/components/Button'
-import IconMoveLeftLine from '@instructure/ui-icons/lib/Line/IconMoveLeft'
-import IconMoveRightLine from '@instructure/ui-icons/lib/Line/IconMoveRight'
+import IconMoveStart from '@instructure/ui-icons/lib/Line/IconMoveStart'
+import IconMoveEnd from '@instructure/ui-icons/lib/Line/IconMoveEnd'
 import plainStoreShape from '../shared/proptypes/plainStoreShape'
 
   class NewUserTutorialToggleButton extends React.Component {
@@ -69,8 +69,8 @@ import plainStoreShape from '../shared/proptypes/plainStoreShape'
         >
           {
             (this.state.isCollapsed) ?
-            (<IconMoveLeftLine title={I18n.t('Expand tutorial tray')} />) :
-            (<IconMoveRightLine title={I18n.t('Collapse tutorial tray')} />)
+            (<IconMoveStart title={I18n.t('Expand tutorial tray')} />) :
+            (<IconMoveEnd title={I18n.t('Collapse tutorial tray')} />)
           }
         </Button>
       );
