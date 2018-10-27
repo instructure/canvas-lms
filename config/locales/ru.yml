@@ -7998,6 +7998,7 @@ ru:
   enable_the_creation_of_blueprint_courses_79f91c30: "Активировать создание концептуальных курсов"
   enable_the_creation_of_master_courses_8205b155: "Разрешить создание основных курсов"
   enable_the_plagiarism_detection_platform_7c3b6195: "Активировать систему обнаружения плагиата"
+  enable_toolname_b06257b7: "Включить %{toolName}"
   enabled_and_locked_49ff3de4: "Включено и заблокировано"
   enabled_ba7cab66: Включено
   enabled_by_default_e530d6ed: "Включено по умолчанию"
