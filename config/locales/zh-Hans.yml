@@ -7826,6 +7826,7 @@ zh-Hans:
   enable_the_creation_of_blueprint_courses_79f91c30: 启用创建蓝图课程
   enable_the_creation_of_master_courses_8205b155: 启用创建主课程
   enable_the_plagiarism_detection_platform_7c3b6195: 启用剽窃检测平台
+  enable_toolname_b06257b7: "启用%{toolName}"
   enabled_and_locked_49ff3de4: 已启用并锁定
   enabled_ba7cab66: 已启用
   enabled_by_default_e530d6ed: 默认启用
