@@ -790,6 +790,8 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
         overflow: hidden;
       }
       .display_name {
+        display: block;
+        margin-#{direction(right)}: 28px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
