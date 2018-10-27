@@ -8021,6 +8021,7 @@ pl:
   enable_the_creation_of_blueprint_courses_79f91c30: "Włącz tworzenie kursów wzorcowych"
   enable_the_creation_of_master_courses_8205b155: "Włącz tworzenie kursów głównych"
   enable_the_plagiarism_detection_platform_7c3b6195: "Włącz platformę wykrywania plagiatów"
+  enable_toolname_b06257b7: "Włącz %{toolName}"
   enabled_and_locked_49ff3de4: "Włączono i zablokowano"
   enabled_ba7cab66: Włączono
   enabled_by_default_e530d6ed: "Włączone domyślnie"
