@@ -33,9 +33,9 @@ describe UsersController, type: :request do
   end
 
   before :once do
-    @teacher = course_with_teacher(:active_all => true, :user => user_with_pseudonym(:active_all => true))
+    course_with_teacher(:active_all => true, :user => user_with_pseudonym(:active_all => true))
     @teacher_course = @course
-    @student_course = course_factory(active_all: true)
+    @student_course = course_factory(active_course: true)
     @student_course.enroll_student(@user).accept!
     # an assignment i need to submit (needs_submitting)
     @a1 = Assignment.create!(:context => @student_course, :due_at => 6.days.from_now, :title => 'required work', :submission_types => 'online_text_entry', :points_possible => 10)
@@ -135,6 +135,24 @@ describe UsersController, type: :request do
     expect(strip_secure_params(json.second)).to eq strip_secure_params(@a2_json)
   end
 
+  it 'should not crash when mixing items with/without due dates (users controller)' do
+    @a2.update_attributes(due_at: nil)
+    api_call(:get, "/api/v1/users/self/todo",
+             controller: "users", action: "todo_items", format: "json")
+    expect(response).to be_successful
+  end
+
+  it 'should not crash when mixing items with/without due dates (courses controller)' do
+    @teacher_course.enroll_student(@teacher).accept!
+    @a2.update_attributes(due_at: nil)
+    Assignment.create!(context: @teacher_course, due_at: 1.day.from_now, title: 'text', submission_types: 'online_text_entry', points_possible: 15)
+    api_call(:get, "/api/v1/courses/#{@teacher_course.id}/todo",
+             controller: "courses", action: "todo_items",
+             format: "json", per_page: 5,
+             course_id: @teacher_course.to_param)
+    expect(response).to be_successful
+  end
+
   it "should ignore a todo item permanently" do
     api_call(:delete, @a2_json['ignore_permanently'],
              :controller => "users", :action => "ignore_item",
@@ -174,6 +192,7 @@ describe UsersController, type: :request do
   end
 
   it "should ignore excused assignments for students" do
+    @student_course.enroll_teacher(@teacher)
     @a1.grade_student(@me, excuse: true, grader: @teacher)
 
     json = api_call(:get, "/api/v1/courses/#{@student_course.id}/todo",
