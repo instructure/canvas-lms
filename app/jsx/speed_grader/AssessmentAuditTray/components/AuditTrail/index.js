@@ -30,26 +30,13 @@ export default class AuditTrail extends PureComponent {
 
   render() {
     const {userEventGroups} = this.props.auditTrail
-    const userEventGroupData = []
-
-    Object.keys(userEventGroups).forEach(userId => {
-      userEventGroupData.push({
-        userEventGroup: userEventGroups[userId],
-        userId,
-        // A user could be unknown in the event we do not have user info loaded
-        // for this user id. Display "Unknown User" as a fallback.
-        userName: I18n.t('Unknown User')
-      })
-    })
 
     return (
       <View as="div" id="assessment-audit-trail">
-        {userEventGroupData.map(datum => (
+        {Object.values(userEventGroups).map(group => (
           <UserEventGroup
-            key={datum.userId}
-            userEventGroup={datum.userEventGroup}
-            userId={datum.userId}
-            userName={datum.userName}
+            key={group.user.id}
+            userEventGroup={group}
           />
         ))}
       </View>

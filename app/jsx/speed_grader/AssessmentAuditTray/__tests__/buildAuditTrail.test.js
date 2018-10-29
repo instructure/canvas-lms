@@ -30,12 +30,17 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
   let auditEvents
   let auditTrail
   let timezoneSnapshot
+  let users
+
+  const firstUser = {id: '1109', name: 'An extraordinarily prolific user', role: 'grader'}
+  const secondUser = {id: '1101', name: 'A somewhat less prolific user', role: 'grader'}
 
   beforeEach(() => {
     timezoneSnapshot = timezone.snapshot()
     timezone.changeZone(newYork, 'America/New_York')
 
     auditEvents = []
+    users = [firstUser, secondUser]
     auditTrail = null
   })
 
@@ -66,7 +71,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
   }
 
   function getAuditEvents() {
-    auditTrail = auditTrail || buildAuditTrail(auditEvents)
+    auditTrail = auditTrail || buildAuditTrail({auditEvents, users})
     const {dateEventGroups} = auditTrail.userEventGroups['1101']
     return dateEventGroups.reduce(
       (allEvents, dateEventGroup) => allEvents.concat(dateEventGroup.auditEvents),
@@ -102,13 +107,35 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
     }
 
     it('is undefined when the user has no events', () => {
-      auditTrail = buildAuditTrail([buildUnknownEvent('4901', '2018-09-01T12:00:00Z')])
+      auditTrail = buildAuditTrail({
+        auditEvents: [buildUnknownEvent('4901', '2018-09-01T12:00:00Z')],
+        users: [firstUser]
+      })
       expect(auditTrail.userEventGroups['1109']).toBeUndefined()
+    })
+
+    it('sets .user with the related user data when the specified user is known', () => {
+      auditTrail = buildAuditTrail({
+        auditEvents: [buildEvent()],
+        users: [secondUser]
+      })
+      expect(auditTrail.userEventGroups['1101'].user).toEqual(secondUser)
+    })
+
+    it('sets .user with "unknown user" data when the specified user is not known', () => {
+      auditTrail = buildAuditTrail({
+        auditEvents: [buildEvent()],
+        users: []
+      })
+      expect(auditTrail.userEventGroups['1101'].user).toEqual({id: '1101', name: 'Unknown User', role: 'unknown'})
     })
 
     describe('when the user has only one event', () => {
       beforeEach(() => {
-        auditTrail = buildAuditTrail([buildUnknownEvent('4901', '2018-09-01T12:00:00Z')])
+        auditTrail = buildAuditTrail({
+          auditEvents: [buildUnknownEvent('4901', '2018-09-01T12:00:00Z')],
+          users: [firstUser]
+        })
       })
 
       it('includes one group of events when the user has only one event', () => {
@@ -124,11 +151,14 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
 
     describe('when all events occurred on the same date', () => {
       beforeEach(() => {
-        auditTrail = buildAuditTrail([
+        auditEvents = [
           buildUnknownEvent('4903', '2018-09-01T14:00:00Z'),
           buildUnknownEvent('4901', '2018-09-01T12:00:00Z'),
           buildUnknownEvent('4902', '2018-09-01T13:00:00Z')
-        ])
+        ]
+        users = [firstUser, secondUser]
+
+        auditTrail = buildAuditTrail({auditEvents, users})
       })
 
       it('includes one group of events', () => {
@@ -156,10 +186,11 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           buildUnknownEvent('4903', '2018-09-02T12:00:00Z'),
           buildUnknownEvent('4902', '2018-09-01T13:00:00Z')
         ]
+        users = [firstUser, secondUser]
       })
 
       function getDateEventGroups() {
-        auditTrail = buildAuditTrail(auditEvents)
+        auditTrail = buildAuditTrail({auditEvents, users})
         return auditTrail.userEventGroups['1101'].dateEventGroups
       }
 
@@ -226,7 +257,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       })
 
       it('sets .anonymousGradingWasUsed to true', () => {
-        auditTrail = buildAuditTrail(auditEvents)
+        auditTrail = buildAuditTrail({auditEvents, users})
         expect(auditTrail.anonymousGradingWasUsed).toBe(true)
       })
 
@@ -279,7 +310,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       })
 
       it('sets .anonymousGradingWasUsed to true', () => {
-        auditTrail = buildAuditTrail(auditEvents)
+        auditTrail = buildAuditTrail({auditEvents, users})
         expect(auditTrail.anonymousGradingWasUsed).toBe(true)
       })
 
@@ -427,7 +458,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       })
 
       it('sets .anonymousGradingWasUsed to false', () => {
-        auditTrail = buildAuditTrail(auditEvents)
+        auditTrail = buildAuditTrail({auditEvents, users})
         expect(auditTrail.anonymousGradingWasUsed).toBe(false)
       })
     })
@@ -437,7 +468,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
     describe('when moderated grading is initially enabled', () => {
       it('sets .moderatedGradingWasUsed to true', () => {
         buildCreateEvent({moderated_grading: true})
-        auditTrail = buildAuditTrail(auditEvents)
+        auditTrail = buildAuditTrail({auditEvents, users})
         expect(auditTrail.moderatedGradingWasUsed).toBe(true)
       })
 
@@ -656,7 +687,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
 
       it('sets .moderatedGradingWasUsed to true', () => {
         enabledModeratedGradingWith({})
-        auditTrail = buildAuditTrail(auditEvents)
+        auditTrail = buildAuditTrail({auditEvents, users})
         expect(auditTrail.moderatedGradingWasUsed).toBe(true)
       })
 
@@ -1123,7 +1154,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       })
 
       it('sets .moderatedGradingWasUsed to false', () => {
-        auditTrail = buildAuditTrail(auditEvents)
+        auditTrail = buildAuditTrail({auditEvents, users})
         expect(auditTrail.moderatedGradingWasUsed).toBe(false)
       })
 
@@ -1157,7 +1188,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       })
 
       it('sets .mutingWasUsed to true', () => {
-        auditTrail = buildAuditTrail(auditEvents)
+        auditTrail = buildAuditTrail({auditEvents, users})
         expect(auditTrail.mutingWasUsed).toBe(true)
       })
 
@@ -1232,7 +1263,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       })
 
       it('sets .mutingWasUsed to true', () => {
-        auditTrail = buildAuditTrail(auditEvents)
+        auditTrail = buildAuditTrail({auditEvents, users})
         expect(auditTrail.mutingWasUsed).toBe(true)
       })
 
@@ -1298,7 +1329,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       })
 
       it('sets .mutingWasUsed to false', () => {
-        auditTrail = buildAuditTrail(auditEvents)
+        auditTrail = buildAuditTrail({auditEvents, users})
         expect(auditTrail.mutingWasUsed).toBe(false)
       })
 

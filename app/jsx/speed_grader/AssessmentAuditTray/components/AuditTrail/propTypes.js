@@ -33,8 +33,15 @@ export const dateEventGroup = shape({
   startDateKey: string.isRequired
 })
 
+export const user = shape({
+  id: string.isRequired,
+  name: string.isRequired,
+  role: string.isRequired
+})
+
 export const userEventGroup = shape({
-  dateEventGroups: arrayOf(dateEventGroup).isRequired
+  dateEventGroups: arrayOf(dateEventGroup).isRequired,
+  user: user.isRequired
 })
 
 export const auditTrail = shape({

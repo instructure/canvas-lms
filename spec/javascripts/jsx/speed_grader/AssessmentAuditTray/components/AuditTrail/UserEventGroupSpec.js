@@ -26,6 +26,7 @@ import buildAuditTrail from 'jsx/speed_grader/AssessmentAuditTray/buildAuditTrai
 QUnit.module('AssessmentAuditTray UserEventGroup', suiteHooks => {
   let $container
   let auditEvents
+  let users
   let props
 
   suiteHooks.beforeEach(() => {
@@ -36,11 +37,7 @@ QUnit.module('AssessmentAuditTray UserEventGroup', suiteHooks => {
       buildEvent({id: '4902', userId: '1101', createdAt: '2018-09-02T12:00:00Z'}),
       buildEvent({id: '4903', userId: '1101', createdAt: '2018-09-02T12:00:00Z'})
     ]
-
-    props = {
-      userId: '1101',
-      userName: 'Adam Jones'
-    }
+    users = [{id: '1101', name: 'A fatalistic final-grader', role: 'final_grader'}]
   })
 
   suiteHooks.afterEach(() => {
@@ -49,8 +46,8 @@ QUnit.module('AssessmentAuditTray UserEventGroup', suiteHooks => {
   })
 
   function buildAuditTrailAndMountComponent() {
-    const auditTrail = buildAuditTrail(auditEvents)
-    props.userEventGroup = auditTrail.userEventGroups[1101]
+    const auditTrail = buildAuditTrail({auditEvents, users})
+    props = {userEventGroup: auditTrail.userEventGroups[1101]}
     ReactDOM.render(<UserEventGroup {...props} />, $container)
   }
 
@@ -70,7 +67,7 @@ QUnit.module('AssessmentAuditTray UserEventGroup', suiteHooks => {
   test('displays the user name', () => {
     buildAuditTrailAndMountComponent()
     const $heading = $container.querySelector('h3')
-    equal($heading.textContent, 'Adam Jones')
+    ok($heading.textContent.includes('A fatalistic final-grader'))
   })
 
   QUnit.module('"Toggle Details" button', hooks => {
@@ -80,7 +77,7 @@ QUnit.module('AssessmentAuditTray UserEventGroup', suiteHooks => {
 
     test('is labeled with the user name', () => {
       const buttonText = getToggleDetailsButton().textContent
-      equal(buttonText, 'Assessment audit events for Adam Jones')
+      equal(buttonText, 'Assessment audit events for A fatalistic final-grader')
     })
 
     test('expands the collapsed details section when clicked', () => {

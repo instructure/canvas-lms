@@ -26,6 +26,7 @@ import I18n from 'i18n!speed_grader'
 
 import DateEventGroup from './DateEventGroup'
 import * as propTypes from './propTypes'
+import {roleLabelFor} from '../../AuditTrailHelpers'
 
 const themeOverride = {
   [View.theme]: {
@@ -36,27 +37,25 @@ const themeOverride = {
 export default class UserEventGroup extends PureComponent {
   static propTypes = {
     userEventGroup: propTypes.userEventGroup.isRequired,
-    userId: string.isRequired,
-    userName: string.isRequired
   }
 
   render() {
-    const {dateEventGroups} = this.props.userEventGroup
+    const {dateEventGroups, user} = this.props.userEventGroup
+    const userName = user.name || I18n.t('Unknown User')
+    const roleLabel = roleLabelFor(user)
 
     return (
       <View as="div">
         <ApplyTheme theme={themeOverride}>
           <ToggleDetails
             border={false}
-            id={`user-event-group-${this.props.userId}`}
+            id={`user-event-group-${user.id}`}
             summary={
-              <Text as="h3" weight="bold">
-                {this.props.userName}
+              <Text as="h3">
+                <Text weight="bold">{userName}</Text> ({roleLabel})
               </Text>
             }
-            toggleLabel={I18n.t('Assessment audit events for %{userName}', {
-              userName: this.props.userName
-            })}
+            toggleLabel={I18n.t('Assessment audit events for %{userName}', { userName })}
           >
             <div>
               {dateEventGroups.map(dateEventGroup => (

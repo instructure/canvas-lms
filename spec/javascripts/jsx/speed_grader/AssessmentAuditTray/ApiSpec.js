@@ -41,6 +41,7 @@ QUnit.module('AssessmentAuditTray Api', suiteHooks => {
     const url = '/courses/1201/assignments/2301/submissions/2501/audit_events'
 
     let auditEvents
+    let users
 
     hooks.beforeEach(() => {
       auditEvents = [
@@ -57,6 +58,8 @@ QUnit.module('AssessmentAuditTray Api', suiteHooks => {
           user_id: '1101'
         }
       ]
+
+      users = [{ id: '1101', name: 'The Greatest Grader', role: 'grader' }]
     })
 
     async function loadAssessmentAuditTrail() {
@@ -64,14 +67,14 @@ QUnit.module('AssessmentAuditTray Api', suiteHooks => {
     }
 
     test('sends a request to the "assessment audit events" url', async () => {
-      server.for(url).respond({status: 200, body: {audit_events: auditEvents}})
+      server.for(url).respond({status: 200, body: {audit_events: auditEvents, users}})
       await loadAssessmentAuditTrail()
       const requests = server.receivedRequests.filter(request => request.url === url)
       strictEqual(requests.length, 1)
     })
 
     test('sends a GET request', async () => {
-      server.for(url).respond({status: 200, body: {audit_events: auditEvents}})
+      server.for(url).respond({status: 200, body: {audit_events: auditEvents, users}})
       await loadAssessmentAuditTrail()
       const {method} = server.receivedRequests.find(request => pathFromRequest(request) === url)
       equal(method, 'GET')
@@ -79,38 +82,58 @@ QUnit.module('AssessmentAuditTray Api', suiteHooks => {
 
     QUnit.module('when the request succeeds', contextHooks => {
       let event
+      let user
 
       contextHooks.beforeEach(async () => {
-        server.for(url).respond({status: 200, body: {audit_events: auditEvents}})
-        event = (await loadAssessmentAuditTrail())[0]
+        server.for(url).respond({status: 200, body: {audit_events: auditEvents, users}})
+
+        const returnData = await loadAssessmentAuditTrail()
+        event = returnData.auditEvents[0]
+        user = returnData.users[0]
       })
 
-      test('normalizes the assignment id', () => {
-        strictEqual(event.assignmentId, '2301')
+      QUnit.module('returned event data', () => {
+        test('normalizes the assignment id', () => {
+          strictEqual(event.assignmentId, '2301')
+        })
+
+        test('normalizes the canvadoc id', () => {
+          strictEqual(event.canvadocId, null)
+        })
+
+        test('normalizes the creation date', () => {
+          deepEqual(event.createdAt, new Date('2018-08-28T16:46:44Z'))
+        })
+
+        test('normalizes the event type', () => {
+          equal(event.eventType, 'grades_posted')
+        })
+
+        test('includes the payload', () => {
+          deepEqual(event.payload, {grades_published_at: [null, '2018-08-28T16:46:43Z']})
+        })
+
+        test('normalizes the submission id', () => {
+          strictEqual(event.submissionId, '2501')
+        })
+
+        test('normalizes the user id', () => {
+          strictEqual(event.userId, '1101')
+        })
       })
 
-      test('normalizes the canvadoc id', () => {
-        strictEqual(event.canvadocId, null)
-      })
+      QUnit.module('returned user data', () => {
+        test('includes the user id', () => {
+          strictEqual(user.id, '1101')
+        })
 
-      test('normalizes the creation date', () => {
-        deepEqual(event.createdAt, new Date('2018-08-28T16:46:44Z'))
-      })
+        test('includes the user name', () => {
+          strictEqual(user.name, 'The Greatest Grader')
+        })
 
-      test('normalizes the event type', () => {
-        equal(event.eventType, 'grades_posted')
-      })
-
-      test('includes the payload', () => {
-        deepEqual(event.payload, {grades_published_at: [null, '2018-08-28T16:46:43Z']})
-      })
-
-      test('normalizes the submission id', () => {
-        strictEqual(event.submissionId, '2501')
-      })
-
-      test('normalizes the user id', () => {
-        strictEqual(event.userId, '1101')
+        test('includes the user role', () => {
+          strictEqual(user.role, 'grader')
+        })
       })
     })
 

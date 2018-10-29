@@ -17,6 +17,7 @@
  */
 
 import timezone from 'timezone_core'
+import I18n from 'i18n!speed_grader'
 
 function getDateKey(date) {
   return timezone.format(date, '%F')
@@ -200,7 +201,15 @@ function extractEvents(eventDatum, featureTracking) {
  *   auditEvent: `AuditEvent`
  * }
  */
-export default function buildAuditTrail(auditEvents) {
+export default function buildAuditTrail(auditData) {
+  const {auditEvents, users} = auditData
+  if (!auditEvents) {
+    return {}
+  }
+
+  const usersById = {}
+  users.forEach(user => { usersById[user.id] = user })
+
   // sort in ascending order (earliest event to most recent)
   const sortedEvents = [...auditEvents].sort((a, b) => a.createdAt - b.createdAt)
   const userEventGroups = {}
@@ -208,8 +217,13 @@ export default function buildAuditTrail(auditEvents) {
   const featureTracking = trackFeaturesOverall(sortedEvents)
 
   sortedEvents.forEach(auditEvent => {
-    userEventGroups[auditEvent.userId] = userEventGroups[auditEvent.userId] || {dateEventGroups: []}
-    const {dateEventGroups} = userEventGroups[auditEvent.userId]
+    const {userId} = auditEvent
+    // We hope we won't ever get events keyed to a user that doesn't exist, but
+    // better safe than sorry
+    const user = usersById[userId] || {id: userId, name: I18n.t('Unknown User'), role: 'unknown'}
+
+    userEventGroups[userId] = userEventGroups[userId] || {dateEventGroups: [], user}
+    const {dateEventGroups} = userEventGroups[userId]
 
     const dateKey = getDateKey(auditEvent.createdAt)
 

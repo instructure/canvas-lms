@@ -539,4 +539,36 @@ describe('AuditTrailHelpers', () => {
       expect(AuditTrailHelpers.snippetFor(event)).toEqual('Good job!')
     })
   })
+
+  describe('.roleLabelFor()', () => {
+    it('returns a suitable label for a user of type "grader"', () => {
+      const user = { id: '1', name: 'An unassuming grader', role: 'grader' }
+      expect(AuditTrailHelpers.roleLabelFor(user)).toEqual('Grader')
+    })
+
+    it('returns a suitable label for a user of type "student"', () => {
+      const user = { id: '1', name: 'A froward student', role: 'student' }
+      expect(AuditTrailHelpers.roleLabelFor(user)).toEqual('Student')
+    })
+
+    it('returns a suitable label for a user of type "final_grader"', () => {
+      const user = { id: '1', name: 'A grader who brooks no opposition', role: 'final_grader' }
+      expect(AuditTrailHelpers.roleLabelFor(user)).toEqual('Final Grader')
+    })
+
+    it('returns a suitable label for a user of type "admin"', () => {
+      const user = { id: '1', name: 'A pleonectic administrator', role: 'admin' }
+      expect(AuditTrailHelpers.roleLabelFor(user)).toEqual('Administrator')
+    })
+
+    it('returns a suitable label for a user with an unrecognized role', () => {
+      const user = { id: '1', name: 'An incorrigible miscreant', role: 'miscreant' }
+      expect(AuditTrailHelpers.roleLabelFor(user)).toEqual('Unknown Role')
+    })
+
+    it('returns a suitable label if the role field is missing', () => {
+      const user = { id: '1', name: 'No one, no one at all' }
+      expect(AuditTrailHelpers.roleLabelFor(user)).toEqual('Unknown Role')
+    })
+  })
 })

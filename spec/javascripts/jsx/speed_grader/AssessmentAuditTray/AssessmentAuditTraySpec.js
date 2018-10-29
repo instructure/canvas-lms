@@ -159,7 +159,8 @@ QUnit.module('AssessmentAuditTray', suiteHooks => {
       contextHooks.beforeEach(async () => {
         tray.show(context)
         await onEntered
-        resolveAuditTrail([
+
+        const auditEvents = [
           {
             assignmentId: '2301',
             canvadocId: null,
@@ -172,7 +173,9 @@ QUnit.module('AssessmentAuditTray', suiteHooks => {
             submissionId: '2501',
             userId: '1101'
           }
-        ])
+        ]
+        const users = [{id: '1101', name: 'A mildly discomfited grader', role: 'grader'}]
+        resolveAuditTrail({auditEvents, users})
       })
 
       test('shows the assessment summary', () => {

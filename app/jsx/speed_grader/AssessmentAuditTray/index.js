@@ -52,7 +52,7 @@ export default class AssessmentAuditTray extends Component {
 
     this.state = {
       auditEventsLoaded: false,
-      auditTrail: buildAuditTrail([]),
+      auditTrail: buildAuditTrail({}),
       open: false
     }
   }
@@ -65,7 +65,7 @@ export default class AssessmentAuditTray extends Component {
     this.setState({
       ...context,
       auditEventsLoaded: false,
-      auditTrail: buildAuditTrail([]),
+      auditTrail: buildAuditTrail({}),
       open: true
     })
 
@@ -73,11 +73,11 @@ export default class AssessmentAuditTray extends Component {
 
     this.props.api
       .loadAssessmentAuditTrail(courseId, assignment.id, submission.id)
-      .then(auditEvents => {
+      .then(auditData => {
         if (this.state.open && this.state.submission.id === submission.id) {
           this.setState({
             auditEventsLoaded: true,
-            auditTrail: buildAuditTrail(auditEvents)
+            auditTrail: buildAuditTrail(auditData)
           })
         }
       })
