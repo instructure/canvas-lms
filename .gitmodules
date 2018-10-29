@@ -1,6 +1,0 @@
-[submodule "vendor/canvas_shim"]
-	path = vendor/canvas_shim
-	url = git@github.com:StrongMind/canvas_shim.git
-[submodule "vendor/pipeline-publisher-ruby"]
-	path = vendor/pipeline-publisher-ruby
-	url = git@github.com:StrongMind/pipeline-publisher-ruby.git

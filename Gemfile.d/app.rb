@@ -163,7 +163,4 @@ gem 'utf8_cleaner', path: 'gems/utf8_cleaner'
 gem 'workflow', path: 'gems/workflow'
 
 # StrongMind
-gem 'canvas_shim', :path => 'vendor/canvas_shim'
-gem 'pipeline_publisher_ruby', :path => 'vendor/pipeline-publisher-ruby'
-gem 'aws-sdk-dynamodb', '~> 1.6'
-gem 'business'
+gem 'canvas_shim', '0.1.4'
