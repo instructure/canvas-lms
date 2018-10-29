@@ -102,16 +102,12 @@ actions.saveLtiToolConfiguration = ({
       developer_key
     })
     .then(response => {
+      const newKey = response.data.developer_key
       dispatch(actions.saveLtiToolConfigurationSuccessful())
       dispatch(actions.setLtiToolConfiguration(response.data.tool_configuration.settings))
       dispatch(actions.ltiKeysSetCustomizing(true))
-
-      const newDevKey = {
-        ...developer_key,
-        id: response.data.tool_configuration.developer_key_id
-      }
-      dispatch(developerKeysActions.setEditingDeveloperKey(newDevKey))
-      dispatch(developerKeysActions.listDeveloperKeysPrepend(newDevKey))
+      dispatch(developerKeysActions.setEditingDeveloperKey(newKey))
+      dispatch(developerKeysActions.listDeveloperKeysPrepend(newKey))
     })
     .catch(error => {
       dispatch(actions.saveLtiToolConfigurationFailed(error))

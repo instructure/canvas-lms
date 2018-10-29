@@ -25,7 +25,10 @@ const dispatch = jest.fn()
 describe('saveLtiToolConfiguration', () => {
   beforeAll(() => {
     axios.post = jest.fn().mockResolvedValue({
-      data: {tool_configuration: {settings: {test: 'config'}, developer_key_id: '1'}}
+      data: {
+        tool_configuration: {settings: {test: 'config'}, developer_key_id: '1'},
+        developer_key: {id: 100000000087, name: 'test key'}
+      }
     })
   })
 
@@ -59,24 +62,28 @@ describe('saveLtiToolConfiguration', () => {
 
     it('prepends the developer key to the list', () => {
       expect(dispatch).toBeCalledWith(
-        developerKeysActions.listDeveloperKeysPrepend({name: 'test', id: '1'})
+        developerKeysActions.listDeveloperKeysPrepend({id: 100000000087, name: 'test key'})
       )
     })
   })
 })
 
 describe('ltiKeysUpdateCustomizations', () => {
-  beforeAll(() => { axios.put = jest.fn().mockResolvedValue({}) })
+  beforeAll(() => {
+    axios.put = jest.fn().mockResolvedValue({})
+  })
 
-  afterAll(() => { axios.put.mockRestore() })
+  afterAll(() => {
+    axios.put.mockRestore()
+  })
 
   const scopes = ['https://www.test.com/scope']
   const disabledPlacements = ['account_navigation', 'course_navigaiton']
   const developerKeyId = 123
   const toolConfiguration = {}
-  const customFields = "foo=bar\r\nkey=value"
+  const customFields = 'foo=bar\r\nkey=value'
 
-  const update = (dispatch) => {
+  const update = dispatch => {
     actions.ltiKeysUpdateCustomizations(
       scopes,
       disabledPlacements,

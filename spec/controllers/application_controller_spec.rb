@@ -569,6 +569,8 @@ RSpec.describe ApplicationController do
             enable_developer_key_account_binding! d
             d
           end
+          let_once(:account) { Account.default }
+
           include_context 'lti_1_3_spec_helper'
 
           before do

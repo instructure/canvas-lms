@@ -87,7 +87,7 @@ class Lti::ToolConfigurationsApiController < ApplicationController
       custom_fields: tool_configuration_params[:custom_fields]
     )
     update_developer_key!(tool_config)
-    render json: tool_config
+    render json: Lti::ToolConfigurationSerializer.new(tool_config)
   end
 
   # @API Update Tool configuration
@@ -135,7 +135,7 @@ class Lti::ToolConfigurationsApiController < ApplicationController
     )
     update_developer_key!(tool_config)
 
-    render json: tool_config
+    render json: Lti::ToolConfigurationSerializer.new(tool_config)
   end
 
   # @API Show Tool configuration
@@ -143,7 +143,7 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   #
   # @returns ToolConfiguration
   def show
-    render json: developer_key.tool_configuration
+    render json: Lti::ToolConfigurationSerializer.new(developer_key.tool_configuration)
   end
 
   # @API Show Tool configuration
