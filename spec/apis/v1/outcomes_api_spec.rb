@@ -700,6 +700,9 @@ describe "Outcomes API", type: :request do
     describe "alignments_for_student" do
       before :once do
         student_in_course(active_all: true)
+        observer_in_course(active_all: true).tap do |enrollment|
+          enrollment.update_attribute(:associated_user_id, @student.id)
+        end
         @assignment1 = assignment_model({:course => @course})
         @assignment2 = assignment_model({:course => @course})
         outcome_with_rubric
@@ -711,6 +714,28 @@ describe "Outcomes API", type: :request do
       end
 
       it "should return aligned assignments for a student" do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/outcome_alignments?student_id=#{@student.id}",
+                       :controller => 'outcomes_api',
+                       :action => 'outcome_alignments',
+                       :course_id => @course.id.to_s,
+                       :student_id => @student.id.to_s,
+                       :format => 'json')
+        expect(json.map{ |j| j["assignment_id"] }.sort).to eq([@assignment1.id, @assignment2.id, @quiz.assignment_id].sort)
+      end
+
+      it "should allow teacher to return aligned assignments for a student" do
+        @user = @teacher
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/outcome_alignments?student_id=#{@student.id}",
+                       :controller => 'outcomes_api',
+                       :action => 'outcome_alignments',
+                       :course_id => @course.id.to_s,
+                       :student_id => @student.id.to_s,
+                       :format => 'json')
+        expect(json.map{ |j| j["assignment_id"] }.sort).to eq([@assignment1.id, @assignment2.id, @quiz.assignment_id].sort)
+      end
+
+      it "should allow observer to return aligned assignments for a student" do
+        @user = @observer
         json = api_call(:get, "/api/v1/courses/#{@course.id}/outcome_alignments?student_id=#{@student.id}",
                        :controller => 'outcomes_api',
                        :action => 'outcome_alignments',

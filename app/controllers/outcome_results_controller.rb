@@ -186,6 +186,7 @@
 
 class OutcomeResultsController < ApplicationController
   include Api::V1::OutcomeResults
+  include Outcomes::Enrollments
   include Outcomes::ResultAnalytics
 
   before_action :require_user
@@ -453,12 +454,7 @@ class OutcomeResultsController < ApplicationController
     reject! "users not specified and no access to all grades", :forbidden unless params[:user_ids]
     user_id_params = Api.value_to_array(params[:user_ids])
     user_ids = Api.map_ids(user_id_params, users_for_outcome_context, @domain_root_account, @current_user)
-    enrollments = @context.enrollments.where(user_id: user_ids)
-    enrollment_user_ids = enrollments.map(&:user_id).uniq
-    reject! "specified users not enrolled" unless enrollment_user_ids.length == user_ids.length
-    reject! "not authorized to read grades for specified users", :forbidden unless enrollments.all? do |e|
-      e.grants_right?(@current_user, session, :read_grades)
-    end
+    verify_readable_grade_enrollments(user_ids)
   end
 
   def verify_aggregate_parameter
