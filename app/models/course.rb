@@ -2376,7 +2376,7 @@ class Course < ActiveRecord::Base
     case visibility_level
     when :full, :limited
       scope
-    when :sections
+    when :sections, :sections_limited
       scope.where("enrollments.course_section_id IN (?) OR (enrollments.limit_privileges_to_course_section=? AND enrollments.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'))",
                   visibilities.map{|s| s[:course_section_id]}, false)
     when :restricted
@@ -2422,6 +2422,8 @@ class Course < ActiveRecord::Base
     when :sections then scope.where(enrollments: { course_section_id: visibilities.map {|s| s[:course_section_id] } })
     when :restricted then scope.where(enrollments: { user_id: (visibilities.map { |s| s[:associated_user_id] }.compact + [user]) })
     when :limited then scope.where(enrollments: { type: ['StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'StudentViewEnrollment'] })
+    when :sections_limited then scope.where(enrollments: { course_section_id: visibilities.map {|s| s[:course_section_id] } }).
+      where(enrollments: { type: ['StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'StudentViewEnrollment'] })
     else scope.none
     end
   end
@@ -2479,7 +2481,11 @@ class Course < ActiveRecord::Base
     if granted_permissions.empty?
       :restricted # e.g. observer, can only see admins in the course
     elsif visibilities.present? && visibility_limited_to_course_sections?(user, visibilities)
-      :sections
+      if granted_permissions.eql? [:read_roster]
+        :sections_limited
+      else
+        :sections
+      end
     elsif granted_permissions.eql? [:read_roster]
       :limited
     else

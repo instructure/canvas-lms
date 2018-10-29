@@ -3986,6 +3986,22 @@ describe Course, "section_visibility" do
       expect(@course.users_visible_to(@teacher)).not_to include(@student2)
     end
 
+    it "should not return observers to section-restricted students" do
+      section2 = @course.course_sections.create!
+      limited_student = user_factory(:active_all => true)
+      @course.enroll_user(limited_student, "StudentEnrollment", :enrollment_state => "active",
+        :section => section2, :limit_privileges_to_course_section => true)
+
+      limited_teacher = user_factory(:active_all => true)
+      @course.enroll_user(limited_teacher, "TeacherEnrollment", :enrollment_state => "active",
+        :section => section2, :limit_privileges_to_course_section => true)
+      
+      observer = user_factory(:active_all => true)
+      @course.enroll_user(observer, "ObserverEnrollment", :enrollment_state => "active", :section => section2)
+      expect(@course.users_visible_to(limited_student)).not_to include(observer)
+      expect(@course.users_visible_to(limited_teacher)).to include(observer)
+    end
+
     it "should return student view students to account admins" do
       @course.student_view_student
       @admin = account_admin_user
