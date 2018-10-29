@@ -110,7 +110,7 @@ describe "student planner" do
 
   context "wiki_pages" do
     before :once do
-      @wiki_page = @course.wiki_pages.create!(title: 'Page1', todo_date: Time.zone.now + 2.days)
+      @wiki_page = @course.wiki_pages.create!(title: 'Page1', todo_date: DateTime.current.change({min: 5}) + 2.days)
     end
 
     it 'shows the date in the index page' do
