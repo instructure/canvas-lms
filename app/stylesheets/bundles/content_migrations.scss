@@ -19,7 +19,7 @@
 @import "base/_environment.scss";
 
 [type=radio].styled-radio {
-  margin: 4px 7px 2px 2px;
+  margin: direction-sides(4px 7px 2px 2px);
   float: direction(left);
 }
 
@@ -105,7 +105,7 @@ hr {
     min-height: 22px;
   }
   input[type=checkbox] {
-    margin: 0 10px 3px 0px;
+    margin: direction-sides(0 10px 3px 0px);
     float: none;
     padding-#{direction(right)}: 5px;
   }
@@ -191,7 +191,7 @@ hr {
 
 i.course_select_warning {
   display: none;
-  padding: 8px 0 0 8px;
+  padding: direction-sides(8px 0 0 8px);
   color: $ic-color-alert;
 }
 

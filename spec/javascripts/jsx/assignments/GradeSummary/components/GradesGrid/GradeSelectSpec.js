@@ -45,7 +45,6 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
   let $container
   let props
   let qunitTimeout
-  let resolveOpenCloseState
   let resolvePositioned
   let selectedGrade
   let wrapper
@@ -97,12 +96,6 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
           studentId: '1111'
         }
       },
-      onClose() {
-        resolveOpenCloseState()
-      },
-      onOpen() {
-        resolveOpenCloseState()
-      },
       onPositioned() {
         resolvePositioned()
       },
@@ -115,7 +108,10 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
     }
   })
 
-  suiteHooks.afterEach(() => {
+  suiteHooks.afterEach(async () => {
+    if (getOptionList()) {
+      await clickOff()
+    }
     wrapper.unmount()
     QUnit.config.testTimeout = qunitTimeout
   })
@@ -143,13 +139,11 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
     return wrapper.find('input').at(0).instance()
   }
 
-  function clickInputToOpenMenu() {
-    return new Promise(resolve => {
-      resolveOpenCloseState = resolve
-      const $input = getTextInput()
-      focusElement($input)
-      $input.click()
-    })
+  async function clickInputToOpenMenu() {
+    const $input = getTextInput()
+    focusElement($input)
+    $input.click()
+    await waitFor(getOptionList)
   }
 
   function keyDownOnInput(keyCode) {
@@ -161,8 +155,8 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
   }
 
   function getOptionList() {
-    const controlledContentId = wrapper.find('input').instance().getAttribute('aria-controls')
-    return document.getElementById(controlledContentId)
+    const controlledContentId = getTextInput().getAttribute('aria-controls')
+    return controlledContentId ? document.getElementById(controlledContentId) : null
   }
 
   function getOptions() {
@@ -179,11 +173,9 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
     return getOptions().find($el => $el.textContent.trim() === optionLabel)
   }
 
-  function clickOption(optionLabel) {
-    return new Promise(resolve => {
-      resolveOpenCloseState = resolve
-      getOption(optionLabel).click()
-    })
+  async function clickOption(optionLabel) {
+    getOption(optionLabel).click()
+    await menuClosed()
   }
 
   function arrowDownTo(optionLabel) {
@@ -217,11 +209,9 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
     getOption(optionLabel).dispatchEvent(event)
   }
 
-  function clickOff() {
-    return new Promise(resolve => {
-      resolveOpenCloseState = resolve
-      blurElement(getTextInput())
-    })
+  async function clickOff() {
+    blurElement(getTextInput())
+    await menuClosed()
   }
 
   function setInputText(value) {
@@ -243,6 +233,32 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
   async function mountAndClick() {
     await mountComponent()
     await clickInputToOpenMenu()
+  }
+
+  async function menuClosed() {
+    if (getOptionList()) {
+      await waitFor(() => !getOptionList())
+    }
+  }
+
+  async function waitFor(conditionFn, timeout = 1000) {
+    return new Promise((resolve, reject) => {
+      let timeoutId
+
+      const intervalId = setInterval(() => {
+        const result = conditionFn()
+        if (result) {
+          clearInterval(intervalId)
+          clearTimeout(timeoutId)
+          resolve(result)
+        }
+      }, 10)
+
+      timeoutId = setTimeout(() => {
+        clearInterval(intervalId)
+        reject(new Error('Timeout waiting for condition'))
+      }, timeout)
+    })
   }
 
   test('renders a text input', async () => {
@@ -285,6 +301,11 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
   })
 
   QUnit.module('when the input is dismissed by clicking elsewhere', () => {
+    async function clickOffAndWaitForValue(value) {
+      await clickOff()
+      await waitFor(() => getTextInput().value === value)
+    }
+
     test('does not call the onSelect prop', async () => {
       await mountAndClick()
       await clickOff()
@@ -309,7 +330,7 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
       props.grades.robin.selected = true
       await mountAndClick()
       setInputText('')
-      await clickOff()
+      await clickOffAndWaitForValue(labelForGrader('robin'))
       equal(getTextInput().value, labelForGrader('robin'))
     })
 
@@ -324,21 +345,28 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
       }
       await mountAndClick()
       setInputText('')
-      await clickOff()
+      await clickOffAndWaitForValue(customLabel('11'))
       equal(getTextInput().value, customLabel('11'))
     })
 
     test('resets the input to the "no selection" option when no grade is selected', async () => {
       await mountAndClick()
       setInputText('')
-      await clickOff()
+      await clickOffAndWaitForValue('–')
+      equal(getTextInput().value, '–')
+    })
+
+    test('resets the input to the "no selection" option when some text has been entered', async () => {
+      await mountAndClick()
+      setInputText('5')
+      await clickOffAndWaitForValue('–')
       equal(getTextInput().value, '–')
     })
 
     test('restores the full list of options for subsequent selection', async () => {
       await mountAndClick()
       setInputText('7.9')
-      await clickOff()
+      await clickOffAndWaitForValue('–')
       await clickInputToOpenMenu()
       deepEqual(getOptionLabels(), ['frizz', 'robin', 'feeny'].map(labelForGrader))
     })
@@ -552,7 +580,7 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
       await mountAndClick()
     })
 
-    test('prevents adding custom options to the options list', async () => {
+    test('prevents adding custom options to the options list', () => {
       setInputText('5')
       notOk(getOptionLabels().includes(customLabel('5')))
     })
@@ -896,7 +924,7 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
       props.grades = grades
     })
 
-    test('includes only grader options when one of the grades is selected', async () => {
+    test('includes only grader options when one of the grades is selected', () => {
       props.grades.frizz.selected = true
       wrapper.setProps({grades: props.grades})
       deepEqual(getOptionLabels(), ['frizz', 'robin', 'feeny'].map(labelForGrader))

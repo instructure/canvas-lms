@@ -41,7 +41,7 @@ describe 'Stuff related to how we load stuff from CDN and use brandable_css' do
           'bundles/common' => false,
           'plugins/analytics/analytics' => false, # to test that it works with plugins
           'jst/tinymce/EquationEditorView' => false, # to test that it works with handlebars-loaded css
-          'jst/tinymce/InsertUpdateImageView' => true
+          'jst/AssignmentGroupWeightsDialog' => true
         }
         sample_bundles.each do |bundle_name, includes_no_variables|
           fingerprints = BrandableCSS.variants.map do |variant|
@@ -52,14 +52,13 @@ describe 'Stuff related to how we load stuff from CDN and use brandable_css' do
           end
 
           expect(fingerprints.length).to eq(8), 'We have 8 variants'
-          msg = 'make sure the conbined results match the result of all_fingerprints_for'
+          msg = 'make sure the combined results match the result of all_fingerprints_for'
           expect(fingerprints).to eq(BrandableCSS.all_fingerprints_for(bundle_name).values), msg
+          next unless includes_no_variables
 
-          if includes_no_variables
-            msg = "all variants should outupt the same css if a bundle doesn't pull in the variables file"
-            unique_fingerprints = fingerprints.map{ |f| f[:combinedChecksum] }.uniq
-            expect(unique_fingerprints.length).to eq(1), msg
-          end
+          msg = "all variants should output the same css if a bundle doesn't pull in the variables file"
+          unique_fingerprints = fingerprints.map{ |f| f[:combinedChecksum] }.uniq
+          expect(unique_fingerprints.length).to eq(1), msg
         end
       end
     end

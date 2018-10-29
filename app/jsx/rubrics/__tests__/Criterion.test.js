@@ -41,13 +41,13 @@ _.toPairs(rubrics).forEach(([key, rubric]) => {
         const component = (mods) => shallow(<Criterion {...{ ...props, ...mods }} />)
 
         it('renders the root component as expected', () => {
-          expect(component().debug()).toMatchSnapshot()
+          expect(component()).toMatchSnapshot()
         })
 
         subComponents.forEach((name) => {
           it(`renders the ${name} sub-component(s) as expected`, () => {
             component().find(name)
-              .forEach((el) => expect(el.shallow().debug()).toMatchSnapshot())
+              .forEach((el) => expect(el.shallow()).toMatchSnapshot())
           })
         })
       }

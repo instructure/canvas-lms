@@ -77,7 +77,7 @@
   }
   .ui-state-error, .ui-state-highlight {
     border-radius: 4px !important;
-    padding: 10px 10px 10px 35px;
+    padding: direction-sides(10px 10px 10px 35px);
     position: relative;
     a {
       text-decoration: underline;

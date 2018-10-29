@@ -21,8 +21,13 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 require 'nokogiri'
 
 describe DiscussionTopic::MaterializedView do
-  def map_to_ids_and_replies(list)
-    list.map { |l| l = l.slice('id', 'replies'); l['replies'] = map_to_ids_and_replies(l['replies'] || []); l }
+  def recursively_slice_with_replies(list, slice_targets)
+    slice_targets.append('replies') unless slice_targets.include? 'replies'
+    list.map do |l|
+      l = l.slice(*slice_targets)
+      l['replies'] = recursively_slice_with_replies(l['replies'] || [], slice_targets)
+      l
+    end
   end
 
   before :once do
@@ -97,21 +102,21 @@ describe DiscussionTopic::MaterializedView do
     expect(html.at_css('video')['src']).to eq "https://placeholder.invalid/courses/#{@course.id}/media_download?entryId=0_abcde&media_type=video&redirect=1"
 
     # the deleted entry will be marked deleted and have no summary
-    simple_json = map_to_ids_and_replies(json)
+    simple_json = recursively_slice_with_replies(json, ['id'])
     expect(simple_json).to eq [
       {
-      'id' => @root1.id.to_s,
-      'replies' => [
-        { 'id' => @reply1.id.to_s, 'replies' => [ { 'id' => @reply_reply2.id.to_s, 'replies' => [] } ], },
-        { 'id' => @reply2.id.to_s, 'replies' => [ { 'id' => @reply_reply1.id.to_s, 'replies' => [] } ], },
-    ],
-    },
-    {
-      'id' => @root2.id.to_s,
-      'replies' => [
-        { 'id' => @reply3.id.to_s, 'replies' => [], },
-    ],
-    },
+        'id' => @root1.id.to_s,
+        'replies' => [
+          { 'id' => @reply1.id.to_s, 'replies' => [ { 'id' => @reply_reply2.id.to_s, 'replies' => [] } ], },
+          { 'id' => @reply2.id.to_s, 'replies' => [ { 'id' => @reply_reply1.id.to_s, 'replies' => [] } ], },
+        ],
+      },
+      {
+        'id' => @root2.id.to_s,
+        'replies' => [
+          { 'id' => @reply3.id.to_s, 'replies' => [], },
+        ],
+      },
     ]
   end
 
@@ -127,5 +132,98 @@ describe DiscussionTopic::MaterializedView do
     entry_json = JSON.parse(structure).last
     html = Nokogiri::HTML::DocumentFragment.parse(entry_json['message'])
     expect(html.at_css('video track')['src']).to eq "https://placeholder.invalid/media_objects/#{obj.id}/media_tracks/#{track.id}.json"
+  end
+
+  context "sharding" do
+    require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
+    specs_require_sharding
+
+    it "users local ids when accessed from the same shard" do
+      @view.update_materialized_view_without_send_later
+      structure, participant_ids, entry_ids = @topic.materialized_view
+      expect(participant_ids.sort).to eq [@student.local_id, @teacher.local_id].sort
+      expect(entry_ids.sort).to eq @topic.discussion_entries.map(&:local_id).sort
+      json = JSON.parse(structure)
+      simple_json = recursively_slice_with_replies(json, ['id', 'user_id'])
+      expect(simple_json).to eq [
+        {
+          'id' => @root1.local_id.to_s,
+          'user_id' => @student.local_id.to_s,
+          'replies' => [
+            {
+              'id' => @reply1.local_id.to_s,
+              'replies' => [{
+                'id' => @reply_reply2.local_id.to_s,
+                'user_id' => @student.local_id.to_s,
+                'replies' => []
+              }]
+            },
+            {
+              'id' => @reply2.local_id.to_s,
+              'user_id' => @teacher.local_id.to_s,
+              'replies' => [{
+                'id' => @reply_reply1.local_id.to_s,
+                'user_id' => @student.local_id.to_s,
+                'replies' => []
+              }]
+            },
+          ],
+        },
+        {
+          'id' => @root2.local_id.to_s,
+          'user_id' => @student.local_id.to_s,
+          'replies' => [{
+            'id' => @reply3.local_id.to_s,
+            'user_id' => @student.local_id.to_s,
+            'replies' => []
+          }],
+        },
+      ]
+    end
+
+    it "users global ids when accessed from a different shard" do
+      @view.update_materialized_view_without_send_later
+      @shard1.activate!
+      structure, participant_ids, entry_ids = @topic.materialized_view
+      expect(participant_ids.sort).to eq [@student.global_id, @teacher.global_id].sort
+      expect(entry_ids.sort).to eq @topic.discussion_entries.map(&:global_id).sort
+      json = JSON.parse(structure)
+      simple_json = recursively_slice_with_replies(json, ['id', 'user_id'])
+      expect(simple_json).to eq [
+        {
+          'id' => @root1.global_id.to_s,
+          'user_id' => @student.global_id.to_s,
+          'replies' => [
+            {
+              'id' => @reply1.global_id.to_s,
+              'replies' => [{
+                'id' => @reply_reply2.global_id.to_s,
+                'user_id' => @student.global_id.to_s,
+                'replies' => []
+              }]
+            },
+            {
+              'id' => @reply2.global_id.to_s,
+              'user_id' => @teacher.global_id.to_s,
+              'replies' => [{
+                'id' => @reply_reply1.global_id.to_s,
+                'user_id' => @student.global_id.to_s,
+                'replies' => []
+              }]
+            },
+          ],
+        },
+        {
+          'id' => @root2.global_id.to_s,
+          'user_id' => @student.global_id.to_s,
+          'replies' => [{
+            'id' => @reply3.global_id.to_s,
+            'user_id' => @student.global_id.to_s,
+            'replies' => []
+          }],
+        },
+      ]
+      Shard.default.activate!
+    end
   end
 end

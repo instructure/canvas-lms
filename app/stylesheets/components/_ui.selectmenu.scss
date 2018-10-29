@@ -25,8 +25,8 @@
 .ui-selectmenu-menu  ul { padding:0; margin:0; list-style:none; position: relative; overflow: auto; overflow-y: auto ; overflow-x: hidden; }
 .ui-selectmenu-open { display: block; }
 .ui-selectmenu-menu-popup { margin-top: -1px; }
-.ui-selectmenu-menu li { padding:0; margin:0; display: block; border-top: 1px dotted transparent; border-bottom: 1px dotted transparent; border-right-width: 0 !important; border-left-width: 0 !important; font-weight: normal !important; }
-.ui-selectmenu-menu li a,.ui-selectmenu-status { line-height: 1.4em; display: block; padding: .405em 2.1em .405em 1em; outline:none; text-decoration:none; }
+.ui-selectmenu-menu li { padding:0; margin:0; display: block; border-top: 1px dotted transparent; border-bottom: 1px dotted transparent; border-#{direction(right)}-width: 0 !important; border-#{direction(left)}-width: 0 !important; font-weight: normal !important; }
+.ui-selectmenu-menu li a,.ui-selectmenu-status { line-height: 1.4em; display: block; padding: direction-sides(.405em 2.1em .405em 1em); outline:none; text-decoration:none; }
 .ui-selectmenu-menu li.ui-state-disabled a, .ui-state-disabled { cursor: default; }
 .ui-selectmenu-menu li.ui-selectmenu-hasIcon a,
 .ui-selectmenu-hasIcon .ui-selectmenu-status { padding-#{direction(left)}: 20px; position: relative; margin-#{direction(left)}: 5px; }

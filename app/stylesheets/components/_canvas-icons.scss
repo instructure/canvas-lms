@@ -133,6 +133,16 @@ a[class^=icon-] {
     font-weight: normal !important;
     font-style: normal !important;
   }
+
+  // flip all the arrows around in RTL
+  @if $direction == 'rtl' {
+    &[class*=-right],
+    &[class*=-left] {
+      &:before {
+        transform: scaleX(-1);
+      }
+    }
+  }
 }
 
 i[class*=icon-], i[class^=icon-] {

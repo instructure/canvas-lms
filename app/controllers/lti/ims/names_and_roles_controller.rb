@@ -17,14 +17,11 @@
 
 module Lti::Ims
   class NamesAndRolesController < ApplicationController
+    include Concerns::AdvantageServices
 
     skip_before_action :load_user
-    before_action(
-      :require_context,
-      :verify_nrps_v2_allowed
-    )
 
-    MIME_TYPE = 'application/vnd.ims.lis.v2.membershipcontainer+json'.freeze
+    MIME_TYPE = 'application/vnd.ims.lti-nrps.v2.membershipcontainer+json'.freeze
 
     def course_index
       render_memberships
@@ -38,29 +35,31 @@ module Lti::Ims
       polymorphic_url([context, :names_and_roles])
     end
 
+    def tool_permissions_granted?
+      access_token&.claim('scopes')&.split(' ')&.include?(TokenScopes::LTI_NRPS_V2_SCOPE)
+    end
+
+    def context
+      get_context
+      @context
+    end
+
     private
 
     def render_memberships
       page = find_memberships_page
-      render json: Lti::Ims::NamesAndRolesSerializer.new(page).as_json, content_type: MIME_TYPE
+      render json: NamesAndRolesSerializer.new(page).as_json, content_type: MIME_TYPE
+    rescue AdvantageErrors::AdvantageClientError => e # otherwise it's a system error, so we want normal error trapping and rendering to kick in
+      handled_error(e)
+      render_error e.api_message, e.status_code
     end
 
     def find_memberships_page
-      {url: request.url}.reverse_merge(new_finder.find)
+      {url: request.url}.reverse_merge(new_provider.find)
     end
 
-    def new_finder
-      Helpers.const_get("#{context.class}MembershipsFinder").new(context, self)
+    def new_provider
+      Providers.const_get("#{context.class}MembershipsProvider").new(context, self, tool)
     end
-
-    def verify_nrps_v2_allowed
-      # TODO: Add 'real' 1.3 security checks. See same hack in Lti::Ims::Concerns::GradebookServices.
-      render_unauthorized_action if Rails.env.production?
-
-      # TODO: This will become one of the 'real' security checks once NRPS invocations can be associated with a Tool
-      # render_unauthorized_action unless tool && tool.names_and_roles_service_enabled?
-      true
-    end
-
   end
 end

@@ -440,7 +440,7 @@ describe "Roles API", type: :request do
     describe "json response" do
       it "should return the expected json format" do
         json = api_call_with_settings
-        expect(json.keys.sort).to eq ["account", "base_role_type", "id", "label",
+        expect(json.keys.sort).to eq ["account", "base_role_type", "created_at", "id", "label",
                                       "last_updated_at", "permissions", "role", "workflow_state"]
         expect(json["account"]["id"]).to eq @account.id
         expect(json["id"]).to eq @role.id

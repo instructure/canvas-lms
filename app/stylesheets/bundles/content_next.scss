@@ -276,8 +276,8 @@ input.move-module-label-spacer {
 }
 
 .ui-dialog-titlebar.ui-widget-header.ui-corner-all.ui-helper-clearfix {
-  padding-right: 40px;
-  padding-left: 40px;
+  padding-#{direction(right)}: 40px;
+  padding-#{direction(left)}: 40px;
 }
 
 .no-requirements {

@@ -225,6 +225,7 @@ class ProfileController < ApplicationController
     @context = @user.profile
     @active_tab = 'notifications'
 
+
     # Get the list of Notification models (that are treated like categories) that make up the full list of Categories.
     full_category_list = Notification.dashboard_categories(@user)
     categories = full_category_list.map do |category|
@@ -242,6 +243,7 @@ class ProfileController < ApplicationController
       :policies => NotificationPolicy.setup_with_default_policies(@user, full_category_list).map { |p| notification_policy_json(p, @user, session).tap { |json| json[:communication_channel_id] = p.communication_channel_id } },
       :categories => categories,
       :update_url => communication_update_profile_path,
+      :show_observed_names => @user.observer_enrollments.any? || @user.as_observer_observation_links.any? ? @user.send_observed_names_in_notifications? : nil
       },
       :READ_PRIVACY_INFO => @user.preferences[:read_notification_privacy_info],
       :ACCOUNT_PRIVACY_NOTICE => @domain_root_account.settings[:external_notification_warning]

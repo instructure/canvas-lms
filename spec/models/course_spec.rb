@@ -2632,7 +2632,7 @@ describe Course, 'grade_publishing' do
       end
 
       it 'should kick off the actual grade send' do
-        expect(@course).to receive(:send_later_if_production).with(:send_final_grades_to_endpoint, @user, nil).and_return(nil)
+        expect(@course).to receive(:send_later_if_production_enqueue_args).with(:send_final_grades_to_endpoint, anything, @user, nil).and_return(nil)
         allow(@plugin).to receive(:enabled?).and_return(true)
         @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
         @course.publish_final_grades(@user)
@@ -2640,7 +2640,7 @@ describe Course, 'grade_publishing' do
 
       it 'should kick off the actual grade send for a specific user' do
         make_student_enrollments
-        expect(@course).to receive(:send_later_if_production).with(:send_final_grades_to_endpoint, @user, @student_enrollments.first.user_id).and_return(nil)
+        expect(@course).to receive(:send_later_if_production_enqueue_args).with(:send_final_grades_to_endpoint, anything, @user, @student_enrollments.first.user_id).and_return(nil)
         allow(@plugin).to receive(:enabled?).and_return(true)
         @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
         @course.publish_final_grades(@user, @student_enrollments.first.user_id)
@@ -2648,7 +2648,7 @@ describe Course, 'grade_publishing' do
       end
 
       it 'should kick off the timeout when a success timeout is defined and waiting is configured' do
-        expect(@course).to receive(:send_later_if_production).with(:send_final_grades_to_endpoint, @user, nil).and_return(nil)
+        expect(@course).to receive(:send_later_if_production_enqueue_args).with(:send_final_grades_to_endpoint, anything, @user, nil).and_return(nil)
         current_time = Time.now.utc
         allow(Time).to receive(:now).and_return(current_time)
         allow(current_time).to receive(:utc).and_return(current_time)
@@ -2663,7 +2663,7 @@ describe Course, 'grade_publishing' do
       end
 
       it 'should not kick off the timeout when a success timeout is defined and waiting is not configured' do
-        expect(@course).to receive(:send_later_if_production).with(:send_final_grades_to_endpoint, @user, nil).and_return(nil)
+        expect(@course).to receive(:send_later_if_production_enqueue_args).with(:send_final_grades_to_endpoint, anything, @user, nil).and_return(nil)
         current_time = Time.now.utc
         allow(Time).to receive(:now).and_return(current_time)
         allow(current_time).to receive(:utc).and_return(current_time)
@@ -2678,7 +2678,7 @@ describe Course, 'grade_publishing' do
       end
 
       it 'should not kick off the timeout when a success timeout is not defined and waiting is not configured' do
-        expect(@course).to receive(:send_later_if_production).with(:send_final_grades_to_endpoint, @user, nil).and_return(nil)
+        expect(@course).to receive(:send_later_if_production_enqueue_args).with(:send_final_grades_to_endpoint, anything, @user, nil).and_return(nil)
         current_time = Time.now.utc
         allow(Time).to receive(:now).and_return(current_time)
         allow(current_time).to receive(:utc).and_return(current_time)
@@ -2693,7 +2693,7 @@ describe Course, 'grade_publishing' do
       end
 
       it 'should not kick off the timeout when a success timeout is not defined and waiting is configured' do
-        expect(@course).to receive(:send_later_if_production).with(:send_final_grades_to_endpoint, @user, nil).and_return(nil)
+        expect(@course).to receive(:send_later_if_production_enqueue_args).with(:send_final_grades_to_endpoint, anything, @user, nil).and_return(nil)
         current_time = Time.now.utc
         allow(Time).to receive(:now).and_return(current_time)
         allow(current_time).to receive(:utc).and_return(current_time)

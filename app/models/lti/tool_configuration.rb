@@ -41,6 +41,7 @@ module Lti
         false
       )
       tool.developer_key = developer_key
+      tool.custom_fields_string = tool.custom_fields_string + "\n#{custom_fields}"
       tool
     end
 

@@ -1,0 +1,81 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FileBrowser renders 1`] = `
+<div
+  className="file-browser__container"
+>
+  <Text
+    as="span"
+    letterSpacing="normal"
+    size="medium"
+  >
+    Available folders
+  </Text>
+  <div
+    className="file-browser__tree"
+  >
+    <TreeBrowser
+      collectionIcon={[Function]}
+      collectionIconExpanded={[Function]}
+      collections={
+        Object {
+          "0": Object {
+            "collections": Array [],
+          },
+        }
+      }
+      defaultExpanded={Array []}
+      itemIcon={[Function]}
+      items={Object {}}
+      onCollectionClick={[Function]}
+      onCollectionToggle={[Function]}
+      onItemClick={[Function]}
+      rootId={0}
+      selectionType="single"
+      showRootCollection={false}
+      size="medium"
+      treeLabel="Folder tree"
+      variant="folderTree"
+    />
+    <Spinner
+      as="div"
+      className="file-browser__loading"
+      size="small"
+      title="Loading folders"
+      variant="default"
+    />
+  </div>
+  <div
+    className="image-upload__form"
+  >
+    <input
+      accept="image/*"
+      className="hidden"
+      onChange={[Function]}
+      type="file"
+    />
+    <Button
+      as="button"
+      buttonRef={[Function]}
+      cursor="pointer"
+      disabled={true}
+      fluidWidth={false}
+      icon={[Function]}
+      id="image-upload__upload"
+      margin="0"
+      onClick={[Function]}
+      size="medium"
+      type="button"
+      variant="ghost"
+    >
+      Upload File
+       
+      <ScreenReaderContent
+        as="span"
+      >
+        Upload not available for this folder
+      </ScreenReaderContent>
+    </Button>
+  </div>
+</div>
+`;

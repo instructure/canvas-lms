@@ -103,7 +103,6 @@ describe IncomingMail::MessageHandler do
         it "silently fails on no message notification id" do
           message = double("original message without notification id", original_message_attributes.merge(:notification_id => nil))
           allow(Message).to receive(:where).with(id: original_message_id).and_return(double(first: message))
-          expect(Rails.cache).to receive(:fetch).never
           expect(Mailer).to receive(:create_message).never
           expect(message.context).to receive(:reply_from).never
 
@@ -113,7 +112,6 @@ describe IncomingMail::MessageHandler do
         it "silently fails on invalid secure id" do
           allow(Message).to receive(:where).with(id: original_message_id).and_return(double(first: original_message))
           allow(Canvas::Security).to receive(:verify_hmac_sha1).and_return(false)
-          expect(Rails.cache).to receive(:fetch).never
           expect(Mailer).to receive(:create_message).never
           expect(original_message.context).to receive(:reply_from).never
 
@@ -123,7 +121,6 @@ describe IncomingMail::MessageHandler do
         it "silently fails if the original message is missing" do
           expect(Message).to receive(:where).with(id: original_message_id).and_return(double(first: nil))
           expect_any_instance_of(Message).to receive(:deliver).never
-          expect(Rails.cache).to receive(:fetch).never
 
           subject.handle(outgoing_from_address, body, html_body, incoming_message, "#{secure_id}-#{original_message_id}")
         end
@@ -131,7 +128,6 @@ describe IncomingMail::MessageHandler do
         it "silently fails if the address tag is invalid" do
           expect(Message).to receive(:where).never
           expect_any_instance_of(Message).to receive(:deliver).never
-          expect(Rails.cache).to receive(:fetch).never
 
           subject.handle(outgoing_from_address, body, html_body, incoming_message, "#{secure_id}-not-an-id")
         end
@@ -140,7 +136,6 @@ describe IncomingMail::MessageHandler do
           allow(Message).to receive(:where).with(id: original_message_id).and_return(double(first: original_message))
           expect_any_instance_of(Message).to receive(:deliver).never
           expect(Account.site_admin).to receive(:feature_enabled?).with(:notification_service).and_return(false)
-          expect(Rails.cache).to receive(:fetch).never
           expect(original_message.context).to receive(:reply_from).never
           message = double("incoming message with bad from",
                            incoming_message_attributes.merge(:from => ['not_lucy@example.com'],
@@ -154,14 +149,12 @@ describe IncomingMail::MessageHandler do
           message = double("original message without user", original_message_attributes.merge(:user => nil))
           allow(Message).to receive(:where).with(id: original_message_id).and_return(double(first: message))
           expect_any_instance_of(Message).to receive(:deliver)
-          expect(Rails.cache).to receive(:fetch).never
           subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
         end
 
         it "bounces the message on invalid context" do
           message = double("original message with invalid context", original_message_attributes.merge({context: double("context")}))
           allow(Message).to receive(:where).with(id: original_message_id).and_return(double(first: message))
-          expect(Rails.cache).to receive(:fetch).never
           expect_any_instance_of(Message).to receive(:save)
           expect_any_instance_of(Message).to receive(:deliver)
 
@@ -171,7 +164,6 @@ describe IncomingMail::MessageHandler do
         it "saves and delivers the message with proper input" do
           message = double("original message with invalid context", original_message_attributes.merge({context: double("context")}))
           allow(Message).to receive(:where).with(id: original_message_id).and_return(double(first: message))
-          expect(Rails.cache).to receive(:fetch).never
           expect_any_instance_of(Message).to receive(:save)
           expect_any_instance_of(Message).to receive(:deliver)
 
@@ -181,7 +173,6 @@ describe IncomingMail::MessageHandler do
         it "does not send a message if the incoming message has no from" do
           invalid_incoming_message = double("invalid incoming message", incoming_message_attributes.merge(from: nil, reply_to: nil))
           allow(Message).to receive(:where).with(id: original_message_id).and_return(double(first: original_message))
-          expect(Rails.cache).to receive(:fetch).never
           expect_any_instance_of(Message).to receive(:deliver).never
 
           subject.handle(outgoing_from_address, body, html_body, invalid_incoming_message, tag)
@@ -212,7 +203,6 @@ describe IncomingMail::MessageHandler do
             }
             expected_bounce_message = Message.new(message_attributes)
             expect(Message).to receive(:new).with(message_attributes).and_return(expected_bounce_message)
-            expect(Rails.cache).to receive(:fetch).never
             expect(expected_bounce_message).to receive(:deliver)
 
             subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)

@@ -1084,6 +1084,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: :assignments_api) do
       get "courses/:course_id/assignments/gradeable_students", controller: :submissions_api, action: :multiple_gradeable_students, as: "multiple_assignments_gradeable_students"
       get 'courses/:course_id/assignments', action: :index, as: 'course_assignments'
+      get 'courses/:course_id/assignment_groups/:assignment_group_id/assignments', action: :index, as: 'course_assignment_group_assignments'
       get 'users/:user_id/courses/:course_id/assignments', action: :user_index, as: 'user_course_assignments'
       get 'courses/:course_id/assignments/:id', action: :show, as: 'course_assignment'
       post 'courses/:course_id/assignments', action: :create
@@ -1230,6 +1231,8 @@ CanvasRails::Application.routes.draw do
         delete "#{context}s/:#{context}_id/external_tools/:external_tool_id", action: :destroy, as: "#{context}_external_tools_delete"
         post "#{context}s/:#{context}_id/developer_keys/:developer_key_id/create_tool", action: :create_tool_from_tool_config
         post "#{context}s/:#{context}_id/developer_keys/:developer_key_id/create_tool", action: :create_tool_from_tool_config
+        delete "#{context}s/:#{context}_id/developer_keys/:developer_key_id/delete_tool", action: :delete_tool_from_tool_config
+        delete "#{context}s/:#{context}_id/developer_keys/:developer_key_id/delete_tool", action: :delete_tool_from_tool_config
       end
 
       get "groups/:group_id/external_tools", action: :index, as: "group_external_tools"
@@ -1267,6 +1270,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: :sis_imports_api) do
       post 'accounts/:account_id/sis_imports', action: :create
       put 'accounts/:account_id/sis_imports/abort_all_pending', action: :abort_all_pending
+      get 'accounts/:account_id/sis_imports/importing', action: :importing
       get 'accounts/:account_id/sis_imports/:id', action: :show
       get 'accounts/:account_id/sis_imports', action: :index, as: "account_sis_imports"
       put 'accounts/:account_id/sis_imports/:id/abort', action: :abort

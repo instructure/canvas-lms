@@ -49,6 +49,7 @@ module Lti
       allow(shard_mock).to receive(:settings).and_return({encription_key: 'abc'})
       allow(m).to receive(:shard).and_return(shard_mock)
       allow(m).to receive(:opaque_identifier_for).and_return("6cd2e0d65bd5aef3b5ee56a64bdcd595e447bc8f")
+      allow(m).to receive(:use_1_3?).and_return(false)
       m
     end
     let(:controller) do
@@ -142,6 +143,44 @@ module Lti
       expanded = variable_expander.expand_variables!({some_name: 'my variable is buried in here ${tests_expan} can you find it?'})
       expect(expanded.count).to eq 1
       expect(expanded[:some_name]).to eq "my variable is buried in here ${tests_expan} can you find it?"
+    end
+
+    it 'echoes registered variable if blacklisted' do
+      VariableExpander.register_expansion('test_expan', ['a'], -> { @context })
+      VariableExpander.register_expansion('variable1', ['a'], -> { 1 })
+      variable_expander.variable_blacklist = ['test_expan']
+      expanded1 = variable_expander.expand_variables!({some_name: '$test_expan'})
+      expanded2 = variable_expander.expand_variables!({some_name: '$variable1'})
+      expect(expanded1.count).to eq 1
+      expect(expanded1[:some_name]).to eq '$test_expan'
+      expect(expanded2.count).to eq 1
+      expect(expanded2[:some_name]).to eq 1
+    end
+
+    it 'echoes substring variable if blacklisted' do
+      allow(account).to receive(:id).and_return(42)
+      VariableExpander.register_expansion('test_expan', ['a'], -> { @context.id })
+      VariableExpander.register_expansion('variable1', ['a'], -> { 1 })
+      variable_expander.variable_blacklist = ['test_expan']
+      expanded1 = variable_expander.expand_variables!({some_name: 'my variable is buried in here ${test_expan} can you find it?'})
+      expanded2 = variable_expander.expand_variables!({some_name: 'my variable is buried in here ${variable1} can you find it?'})
+      expect(expanded1.count).to eq 1
+      expect(expanded1[:some_name]).to eq 'my variable is buried in here $test_expan can you find it?'
+      expect(expanded2.count).to eq 1
+      expect(expanded2[:some_name]).to eq 'my variable is buried in here 1 can you find it?'
+    end
+
+    it 'echoes multiple substring variables if blacklisted' do
+      allow(account).to receive(:id).and_return(42)
+      VariableExpander.register_expansion('test_expan', ['a'], -> { @context.id })
+      VariableExpander.register_expansion('variable1', ['a'], -> { 1 })
+      VariableExpander.register_expansion('other_variable', ['a'], -> { 2 })
+      variable_expander.variable_blacklist = ['test_expan','variable1']
+      expanded = variable_expander.expand_variables!(
+        {some_name: 'my variables ${variable1} is buried ${other_variable} in here ${test_expan} can you find them?'}
+      )
+      expect(expanded.count).to eq 1
+      expect(expanded[:some_name]).to eq 'my variables $variable1 is buried 2 in here $test_expan can you find them?'
     end
 
     describe '#self.expansion_keys' do
@@ -609,7 +648,7 @@ module Lti
       end
 
       context 'context is a group' do
-        let(:variable_expander) { VariableExpander.new(root_account, group, controller, current_user: user) }
+        let(:variable_expander) { VariableExpander.new(root_account, group, controller, current_user: user, tool: tool) }
 
         it 'has substitution for $ToolProxyBinding.memberships.url when context is a group' do
           exp_hash = { test: '$ToolProxyBinding.memberships.url' }
@@ -730,7 +769,7 @@ module Lti
       end
 
       context 'context is a course' do
-        let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: user) }
+        let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: user, tool: tool) }
 
         it 'has substitution for $ToolProxyBinding.memberships.url when context is a course' do
           exp_hash = { test: '$ToolProxyBinding.memberships.url' }
@@ -807,7 +846,18 @@ module Lti
 
         it 'has substitution for $com.Instructure.membership.roles' do
           allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
-          allow(substitution_helper).to receive(:current_canvas_roles_lis_v2).and_return(
+          allow(substitution_helper).to receive(:current_canvas_roles_lis_v2).with('lis2').and_return(
+            'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student'
+          )
+          exp_hash = {test: '$com.Instructure.membership.roles'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student'
+        end
+
+        it 'has substitution for foo' do
+          allow(tool).to receive(:use_1_3?).and_return(true)
+          allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
+          allow(substitution_helper).to receive(:current_canvas_roles_lis_v2).with('lti1_3').and_return(
             'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student'
           )
           exp_hash = {test: '$com.Instructure.membership.roles'}
@@ -1023,7 +1073,7 @@ module Lti
       end
 
       context 'context is a course with an assignment' do
-        let(:variable_expander) { VariableExpander.new(root_account, course, controller, collaboration: collaboration) }
+        let(:variable_expander) { VariableExpander.new(root_account, course, controller, tool: tool, collaboration: collaboration) }
 
         it 'has substitution for $Canvas.api.collaborationMembers.url' do
           allow(collaboration).to receive(:id).and_return(1)
@@ -1035,7 +1085,7 @@ module Lti
       end
 
       context 'context is a course with an assignment' do
-        let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: user, assignment: assignment) }
+        let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: user, tool: tool, assignment: assignment) }
 
         it 'has substitution for $Canvas.assignment.id' do
           allow(assignment).to receive(:id).and_return(2015)
@@ -1190,6 +1240,13 @@ module Lti
           expect(exp_hash[:test]).to eq 'Uncle'
         end
 
+        it 'has substitution for $com.instructure.Person.name_sortable' do
+          user.sortable_name = 'Jake, Uncle'
+          exp_hash = {test: '$com.instructure.Person.name_sortable'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq 'Jake, Uncle'
+        end
+
         it 'has substitution for $Person.email.primary' do
           allow(substitution_helper).to receive(:email).and_return('someone@somewhere')
           allow(SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
@@ -1273,6 +1330,15 @@ module Lti
 
         it 'has substitution for $Membership.role' do
           allow(substitution_helper).to receive(:all_roles).with('lis2').and_return('Admin,User')
+          allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
+          exp_hash = {test: '$Membership.role'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq 'Admin,User'
+        end
+
+        it 'has substitution for $Membership.role in LTI 1.3 mode' do
+          allow(tool).to receive(:use_1_3?).and_return(true)
+          allow(substitution_helper).to receive(:all_roles).with('lti1_3').and_return('Admin,User')
           allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
           exp_hash = {test: '$Membership.role'}
           variable_expander.expand_variables!(exp_hash)

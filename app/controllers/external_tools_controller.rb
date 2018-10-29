@@ -923,6 +923,7 @@ class ExternalToolsController < ApplicationController
   end
 
   # @API Create Tool from ToolConfiguration
+  # @internal
   # Creates context_external_tool from attached tool_configuration of
   # the provided developer_key if not already present in context.
   # DeveloperKey must have a ToolConfiguration to create tool or 404 will be raised.
@@ -945,6 +946,26 @@ class ExternalToolsController < ApplicationController
       invalidate_nav_tabs_cache(cet)
     end
     render json: external_tool_json(cet, @context, @current_user, session)
+  end
+
+  # @API Delete Tool from ToolConfiguration
+  # @internal
+  #
+  # Deletes the tool given the context and the developer_key_id.
+  #
+  # @argument account_id [String]
+  #    if account
+  #
+  # @argument course_id [String]
+  #    if course
+  #
+  # @argument developer_key_id [String]
+  #
+  # @returns ContextExternalTool
+  def delete_tool_from_tool_config
+    cet = @context.context_external_tools.active.where(developer_key: developer_key).take
+    raise ActiveRecord::RecordNotFound if cet.nil?
+    delete_tool(cet)
   end
 
   # @API Edit an external tool
@@ -991,20 +1012,7 @@ class ExternalToolsController < ApplicationController
   #        -H "Authorization: Bearer <token>"
   def destroy
     @tool = @context.context_external_tools.active.find(params[:id] || params[:external_tool_id])
-    if authorized_action(@tool, @current_user, :delete)
-      respond_to do |format|
-        if @tool.destroy
-          if api_request?
-            invalidate_nav_tabs_cache(@tool)
-            format.json { render :json => external_tool_json(@tool, @context, @current_user, session) }
-          else
-            format.json { render :json => @tool.as_json(:methods => [:readable_state, :custom_fields_string], :include_root => false) }
-          end
-        else
-          format.json { render :json => @tool.errors, :status => :bad_request }
-        end
-      end
-    end
+    delete_tool(@tool)
   end
 
   def jwt_token
@@ -1220,6 +1228,23 @@ class ExternalToolsController < ApplicationController
 
   def developer_key
     @_developer_key = DeveloperKey.nondeleted.find(params[:developer_key_id])
+  end
+
+  def delete_tool(tool)
+    if authorized_action(tool, @current_user, :delete)
+      respond_to do |format|
+        if tool.destroy
+          if api_request?
+            invalidate_nav_tabs_cache(tool)
+            format.json { render :json => external_tool_json(tool, @context, @current_user, session) }
+          else
+            format.json { render :json => tool.as_json(:methods => [:readable_state, :custom_fields_string], :include_root => false) }
+          end
+        else
+          format.json { render :json => tool.errors, :status => :bad_request }
+        end
+      end
+    end
   end
 
   def placement_from_params

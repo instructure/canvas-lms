@@ -142,10 +142,10 @@ module WikiAndTinyCommon
   def add_canvas_image(el, folder, filename)
     dialog = activate_editor_embed_image(el)
     fj('a[href="#tabUploaded"]:visible').click
-    folder_el = fj(".treeLabel:contains(#{folder.inspect})")
-    folder_el.click unless folder_el['class'].split.include?('expanded')
-    expect(f('.treeFile', dialog)).to be_displayed
-    file_el = f(".treeFile[title=\"#{filename}\"]", dialog)
+    folder_el = fj(".file-browser__tree button:contains('#{folder}')")
+    folder_el.click unless folder_el['aria-expanded'] == 'true'
+    expect(fj(".file-browser__tree li[title='#{filename}'] button", dialog)).to be_displayed
+    file_el = fj(".file-browser__tree li[title='#{filename}'] button", dialog)
     expect(file_el).not_to be_nil
     file_el.click
     wait_for_ajaximations

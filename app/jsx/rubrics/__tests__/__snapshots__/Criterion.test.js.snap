@@ -3,645 +3,2228 @@
 exports[`Criterion can open and close the long description dialog 1`] = `"<div><p> a wild paragraph appears </p></div>"`;
 
 exports[`Free-form Rubric with a custom criterion by default renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
-"<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} defaultFocusElement={{...}} constrain=\\"window\\">
+<Modal
+  constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
+  insertAt="bottom"
+  label="Criterion Long Description"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
+  onDismiss={[Function]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
+  open={false}
+  shouldCloseOnDocumentClick={true}
+  shouldReturnFocus={true}
+  size="medium"
+  transition="fade"
+>
   <ModalHeader>
-    <CloseButton placement=\\"end\\" offset=\\"medium\\" variant=\\"icon\\" onClick={[Function]} buttonRef={[Function: buttonRef]} size=\\"small\\" margin=\\"0\\">
+    <CloseButton
+      buttonRef={[Function]}
+      margin="0"
+      offset="medium"
+      onClick={[Function]}
+      placement="end"
+      size="small"
+      variant="icon"
+    >
       Close
     </CloseButton>
-    <Heading border=\\"none\\" color=\\"inherit\\" level=\\"h2\\" ellipsis={false}>
+    <Heading
+      border="none"
+      color="inherit"
+      ellipsis={false}
+      level="h2"
+    >
       Criterion Long Description
     </Heading>
   </ModalHeader>
-  <ModalBody padding=\\"medium\\" as=\\"div\\">
-    <Text lineHeight=\\"double\\" as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\">
-      <div dangerouslySetInnerHTML={{...}} />
+  <ModalBody
+    as="div"
+    padding="medium"
+  >
+    <Text
+      as="span"
+      letterSpacing="normal"
+      lineHeight="double"
+      size="medium"
+    >
+      <div
+        dangerouslySetInnerHTML={
+          Object {
+            "__html": "",
+          }
+        }
+      />
     </Text>
   </ModalBody>
-</Modal>"
+</Modal>
 `;
 
 exports[`Free-form Rubric with a custom criterion by default renders the root component as expected 1`] = `
-"<tr className=\\"rubric-criterion\\">
-  <th scope=\\"row\\" className=\\"description-header\\">
-    <div className=\\"description react-rubric-cell\\">
-      <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
+<tr
+  className="rubric-criterion"
+>
+  <th
+    className="description-header"
+    scope="row"
+  >
+    <div
+      className="description react-rubric-cell"
+    >
+      <Text
+        as="span"
+        letterSpacing="normal"
+        size="small"
+        weight="normal"
+      >
         Description of criterion
       </Text>
     </div>
-    <div className=\\"long-description\\">
-      <LongDescriptionDialog close={[Function]} longDescription=\\"\\" open={false} />
+    <div
+      className="long-description"
+    >
+      <LongDescriptionDialog
+        close={[Function]}
+        longDescription=""
+        open={false}
+      />
     </div>
   </th>
-  <td className=\\"ratings\\">
-    <Comments assessing={false} assessment={{...}} footer={{...}} savedComments={{...}} setSaveLater={[Function: setSaveLater]} setComments={[Function: setComments]} />
+  <td
+    className="ratings"
+  >
+    <Comments
+      assessing={false}
+      assessment={
+        Object {
+          "comments": "",
+          "comments_enabled": true,
+          "criterion_id": "_1384",
+          "description": "No Marks",
+          "id": "blank_2",
+          "learning_outcome_id": null,
+          "points": Object {
+            "text": null,
+            "valid": true,
+            "value": 0,
+          },
+        }
+      }
+      footer={null}
+      savedComments={Array []}
+      setComments={[Function]}
+      setSaveLater={[Function]}
+    />
   </td>
-  <td className=\\"criterion_points\\">
-    <Points allowExtraCredit={true} assessing={false} assessment={{...}} onPointChange={{...}} pointsPossible={8} />
+  <td
+    className="criterion_points"
+  >
+    <Points
+      allowExtraCredit={true}
+      assessing={false}
+      assessment={
+        Object {
+          "comments": "",
+          "comments_enabled": true,
+          "criterion_id": "_1384",
+          "description": "No Marks",
+          "id": "blank_2",
+          "learning_outcome_id": null,
+          "points": Object {
+            "text": null,
+            "valid": true,
+            "value": 0,
+          },
+        }
+      }
+      key="points"
+      onPointChange={null}
+      pointsPossible={8}
+    />
   </td>
-</tr>"
+</tr>
 `;
 
 exports[`Free-form Rubric with a custom criterion when assessing renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
-"<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} defaultFocusElement={{...}} constrain=\\"window\\">
+<Modal
+  constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
+  insertAt="bottom"
+  label="Criterion Long Description"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
+  onDismiss={[Function]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
+  open={false}
+  shouldCloseOnDocumentClick={true}
+  shouldReturnFocus={true}
+  size="medium"
+  transition="fade"
+>
   <ModalHeader>
-    <CloseButton placement=\\"end\\" offset=\\"medium\\" variant=\\"icon\\" onClick={[Function]} buttonRef={[Function: buttonRef]} size=\\"small\\" margin=\\"0\\">
+    <CloseButton
+      buttonRef={[Function]}
+      margin="0"
+      offset="medium"
+      onClick={[Function]}
+      placement="end"
+      size="small"
+      variant="icon"
+    >
       Close
     </CloseButton>
-    <Heading border=\\"none\\" color=\\"inherit\\" level=\\"h2\\" ellipsis={false}>
+    <Heading
+      border="none"
+      color="inherit"
+      ellipsis={false}
+      level="h2"
+    >
       Criterion Long Description
     </Heading>
   </ModalHeader>
-  <ModalBody padding=\\"medium\\" as=\\"div\\">
-    <Text lineHeight=\\"double\\" as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\">
-      <div dangerouslySetInnerHTML={{...}} />
+  <ModalBody
+    as="div"
+    padding="medium"
+  >
+    <Text
+      as="span"
+      letterSpacing="normal"
+      lineHeight="double"
+      size="medium"
+    >
+      <div
+        dangerouslySetInnerHTML={
+          Object {
+            "__html": "",
+          }
+        }
+      />
     </Text>
   </ModalBody>
-</Modal>"
+</Modal>
 `;
 
 exports[`Free-form Rubric with a custom criterion when assessing renders the root component as expected 1`] = `
-"<tr className=\\"rubric-criterion\\">
-  <th scope=\\"row\\" className=\\"description-header\\">
-    <div className=\\"description react-rubric-cell\\">
-      <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
+<tr
+  className="rubric-criterion"
+>
+  <th
+    className="description-header"
+    scope="row"
+  >
+    <div
+      className="description react-rubric-cell"
+    >
+      <Text
+        as="span"
+        letterSpacing="normal"
+        size="small"
+        weight="normal"
+      >
         Description of criterion
       </Text>
     </div>
-    <div className=\\"long-description\\">
-      <LongDescriptionDialog close={[Function]} longDescription=\\"\\" open={false} />
+    <div
+      className="long-description"
+    >
+      <LongDescriptionDialog
+        close={[Function]}
+        longDescription=""
+        open={false}
+      />
     </div>
   </th>
-  <td className=\\"ratings\\">
-    <Comments assessing={true} assessment={{...}} footer={{...}} savedComments={{...}} setSaveLater={[Function: setSaveLater]} setComments={[Function: setComments]} />
+  <td
+    className="ratings"
+  >
+    <Comments
+      assessing={true}
+      assessment={
+        Object {
+          "comments": "",
+          "comments_enabled": true,
+          "criterion_id": "_1384",
+          "description": "No Marks",
+          "id": "blank_2",
+          "learning_outcome_id": null,
+          "points": Object {
+            "text": null,
+            "valid": true,
+            "value": 0,
+          },
+        }
+      }
+      footer={null}
+      savedComments={Array []}
+      setComments={[Function]}
+      setSaveLater={[Function]}
+    />
   </td>
-  <td className=\\"criterion_points\\">
-    <Points allowExtraCredit={true} assessing={true} assessment={{...}} onPointChange={[Function: updatePoints]} pointsPossible={8} />
+  <td
+    className="criterion_points"
+  >
+    <Points
+      allowExtraCredit={true}
+      assessing={true}
+      assessment={
+        Object {
+          "comments": "",
+          "comments_enabled": true,
+          "criterion_id": "_1384",
+          "description": "No Marks",
+          "id": "blank_2",
+          "learning_outcome_id": null,
+          "points": Object {
+            "text": null,
+            "valid": true,
+            "value": 0,
+          },
+        }
+      }
+      key="points"
+      onPointChange={[Function]}
+      pointsPossible={8}
+    />
   </td>
-</tr>"
+</tr>
 `;
 
 exports[`Free-form Rubric with a custom criterion without an assessment renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
-"<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} defaultFocusElement={{...}} constrain=\\"window\\">
+<Modal
+  constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
+  insertAt="bottom"
+  label="Criterion Long Description"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
+  onDismiss={[Function]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
+  open={false}
+  shouldCloseOnDocumentClick={true}
+  shouldReturnFocus={true}
+  size="medium"
+  transition="fade"
+>
   <ModalHeader>
-    <CloseButton placement=\\"end\\" offset=\\"medium\\" variant=\\"icon\\" onClick={[Function]} buttonRef={[Function: buttonRef]} size=\\"small\\" margin=\\"0\\">
+    <CloseButton
+      buttonRef={[Function]}
+      margin="0"
+      offset="medium"
+      onClick={[Function]}
+      placement="end"
+      size="small"
+      variant="icon"
+    >
       Close
     </CloseButton>
-    <Heading border=\\"none\\" color=\\"inherit\\" level=\\"h2\\" ellipsis={false}>
+    <Heading
+      border="none"
+      color="inherit"
+      ellipsis={false}
+      level="h2"
+    >
       Criterion Long Description
     </Heading>
   </ModalHeader>
-  <ModalBody padding=\\"medium\\" as=\\"div\\">
-    <Text lineHeight=\\"double\\" as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\">
-      <div dangerouslySetInnerHTML={{...}} />
+  <ModalBody
+    as="div"
+    padding="medium"
+  >
+    <Text
+      as="span"
+      letterSpacing="normal"
+      lineHeight="double"
+      size="medium"
+    >
+      <div
+        dangerouslySetInnerHTML={
+          Object {
+            "__html": "",
+          }
+        }
+      />
     </Text>
   </ModalBody>
-</Modal>"
+</Modal>
 `;
 
 exports[`Free-form Rubric with a custom criterion without an assessment renders the root component as expected 1`] = `
-"<tr className=\\"rubric-criterion\\">
-  <th scope=\\"row\\" className=\\"description-header\\">
-    <div className=\\"description react-rubric-cell\\">
-      <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
+<tr
+  className="rubric-criterion"
+>
+  <th
+    className="description-header"
+    scope="row"
+  >
+    <div
+      className="description react-rubric-cell"
+    >
+      <Text
+        as="span"
+        letterSpacing="normal"
+        size="small"
+        weight="normal"
+      >
         Description of criterion
       </Text>
     </div>
-    <div className=\\"long-description\\">
-      <LongDescriptionDialog close={[Function]} longDescription=\\"\\" open={false} />
+    <div
+      className="long-description"
+    >
+      <LongDescriptionDialog
+        close={[Function]}
+        longDescription=""
+        open={false}
+      />
     </div>
   </th>
-  <td className=\\"ratings\\">
-    <Comments assessing={false} assessment={{...}} footer={{...}} savedComments={{...}} setSaveLater={[Function: setSaveLater]} setComments={[Function: setComments]} />
+  <td
+    className="ratings"
+  >
+    <Comments
+      assessing={false}
+      assessment={null}
+      footer={null}
+      savedComments={Array []}
+      setComments={[Function]}
+      setSaveLater={[Function]}
+    />
   </td>
-  <td className=\\"criterion_points\\">
-    <Points allowExtraCredit={true} assessing={false} assessment={{...}} onPointChange={{...}} pointsPossible={8} />
+  <td
+    className="criterion_points"
+  >
+    <Points
+      allowExtraCredit={true}
+      assessing={false}
+      assessment={null}
+      key="points"
+      onPointChange={null}
+      pointsPossible={8}
+    />
   </td>
-</tr>"
+</tr>
 `;
 
 exports[`Free-form Rubric with a outcome criterion by default renders the LongDescription sub-component(s) as expected 1`] = `
-"<Button fluidWidth={true} variant=\\"link\\" onClick={[Function: onClick]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" margin=\\"0\\" buttonRef={[Function: buttonRef]} cursor=\\"pointer\\">
-  <Text size=\\"x-small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+<Button
+  as="button"
+  buttonRef={[Function]}
+  cursor="pointer"
+  fluidWidth={true}
+  margin="0"
+  onClick={[Function]}
+  size="medium"
+  type="button"
+  variant="link"
+>
+  <Text
+    as="span"
+    letterSpacing="normal"
+    size="x-small"
+  >
     view longer description
   </Text>
-</Button>"
+</Button>
 `;
 
 exports[`Free-form Rubric with a outcome criterion by default renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
-"<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} defaultFocusElement={{...}} constrain=\\"window\\">
+<Modal
+  constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
+  insertAt="bottom"
+  label="Criterion Long Description"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
+  onDismiss={[Function]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
+  open={false}
+  shouldCloseOnDocumentClick={true}
+  shouldReturnFocus={true}
+  size="medium"
+  transition="fade"
+>
   <ModalHeader>
-    <CloseButton placement=\\"end\\" offset=\\"medium\\" variant=\\"icon\\" onClick={[Function]} buttonRef={[Function: buttonRef]} size=\\"small\\" margin=\\"0\\">
+    <CloseButton
+      buttonRef={[Function]}
+      margin="0"
+      offset="medium"
+      onClick={[Function]}
+      placement="end"
+      size="small"
+      variant="icon"
+    >
       Close
     </CloseButton>
-    <Heading border=\\"none\\" color=\\"inherit\\" level=\\"h2\\" ellipsis={false}>
+    <Heading
+      border="none"
+      color="inherit"
+      ellipsis={false}
+      level="h2"
+    >
       Criterion Long Description
     </Heading>
   </ModalHeader>
-  <ModalBody padding=\\"medium\\" as=\\"div\\">
-    <Text lineHeight=\\"double\\" as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\">
-      <div dangerouslySetInnerHTML={{...}} />
+  <ModalBody
+    as="div"
+    padding="medium"
+  >
+    <Text
+      as="span"
+      letterSpacing="normal"
+      lineHeight="double"
+      size="medium"
+    >
+      <div
+        dangerouslySetInnerHTML={
+          Object {
+            "__html": "sa Sivert.",
+          }
+        }
+      />
     </Text>
   </ModalBody>
-</Modal>"
+</Modal>
 `;
 
 exports[`Free-form Rubric with a outcome criterion by default renders the OutcomeIcon sub-component(s) as expected 1`] = `
-"<span>
+<span>
   <IconOutcomes />
    
-  <ScreenReaderContent as=\\"span\\">
+  <ScreenReaderContent
+    as="span"
+  >
     This criterion is linked to a Learning Outcome
   </ScreenReaderContent>
-</span>"
+</span>
 `;
 
 exports[`Free-form Rubric with a outcome criterion by default renders the Threshold sub-component(s) as expected 1`] = `
-"<Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
+<Text
+  as="span"
+  letterSpacing="normal"
+  size="x-small"
+  weight="normal"
+>
   threshold: 3
-</Text>"
+</Text>
 `;
 
 exports[`Free-form Rubric with a outcome criterion by default renders the root component as expected 1`] = `
-"<tr className=\\"rubric-criterion\\">
-  <th scope=\\"row\\" className=\\"description-header\\">
-    <div className=\\"description react-rubric-cell\\">
+<tr
+  className="rubric-criterion"
+>
+  <th
+    className="description-header"
+    scope="row"
+  >
+    <div
+      className="description react-rubric-cell"
+    >
       <OutcomeIcon />
-      <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
+      <Text
+        as="span"
+        letterSpacing="normal"
+        size="small"
+        weight="normal"
+      >
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
       </Text>
     </div>
-    <div className=\\"long-description\\">
-      <LongDescription showLongDescription={[Function]} />
-      <LongDescriptionDialog close={[Function]} longDescription=\\"sa Sivert.\\" open={false} />
+    <div
+      className="long-description"
+    >
+      <LongDescription
+        showLongDescription={[Function]}
+      />
+      <LongDescriptionDialog
+        close={[Function]}
+        longDescription="sa Sivert."
+        open={false}
+      />
     </div>
-    <Threshold threshold={3} />
+    <Threshold
+      threshold={3}
+    />
   </th>
-  <td className=\\"ratings\\">
-    <Comments assessing={false} assessment={{...}} footer={{...}} savedComments={{...}} setSaveLater={[Function: setSaveLater]} setComments={[Function: setComments]} />
+  <td
+    className="ratings"
+  >
+    <Comments
+      assessing={false}
+      assessment={
+        Object {
+          "above_threshold": false,
+          "comments": "I award you no points, and may God have mercy on your soul.",
+          "comments_enabled": true,
+          "comments_html": "I award you <b>no</b> points, and may God have mercy on your soul.",
+          "criterion_id": "7_391",
+          "description": "No details",
+          "learning_outcome_id": "612",
+          "points": Object {
+            "text": null,
+            "valid": true,
+            "value": 0,
+          },
+        }
+      }
+      footer={null}
+      savedComments={Array []}
+      setComments={[Function]}
+      setSaveLater={[Function]}
+    />
   </td>
-  <td className=\\"criterion_points\\">
-    <Points allowExtraCredit={false} assessing={false} assessment={{...}} onPointChange={{...}} pointsPossible={3} />
+  <td
+    className="criterion_points"
+  >
+    <Points
+      allowExtraCredit={false}
+      assessing={false}
+      assessment={
+        Object {
+          "above_threshold": false,
+          "comments": "I award you no points, and may God have mercy on your soul.",
+          "comments_enabled": true,
+          "comments_html": "I award you <b>no</b> points, and may God have mercy on your soul.",
+          "criterion_id": "7_391",
+          "description": "No details",
+          "learning_outcome_id": "612",
+          "points": Object {
+            "text": null,
+            "valid": true,
+            "value": 0,
+          },
+        }
+      }
+      key="points"
+      onPointChange={null}
+      pointsPossible={3}
+    />
   </td>
-</tr>"
+</tr>
 `;
 
 exports[`Free-form Rubric with a outcome criterion when assessing renders the LongDescription sub-component(s) as expected 1`] = `
-"<Button fluidWidth={true} variant=\\"link\\" onClick={[Function: onClick]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" margin=\\"0\\" buttonRef={[Function: buttonRef]} cursor=\\"pointer\\">
-  <Text size=\\"x-small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+<Button
+  as="button"
+  buttonRef={[Function]}
+  cursor="pointer"
+  fluidWidth={true}
+  margin="0"
+  onClick={[Function]}
+  size="medium"
+  type="button"
+  variant="link"
+>
+  <Text
+    as="span"
+    letterSpacing="normal"
+    size="x-small"
+  >
     view longer description
   </Text>
-</Button>"
+</Button>
 `;
 
 exports[`Free-form Rubric with a outcome criterion when assessing renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
-"<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} defaultFocusElement={{...}} constrain=\\"window\\">
+<Modal
+  constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
+  insertAt="bottom"
+  label="Criterion Long Description"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
+  onDismiss={[Function]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
+  open={false}
+  shouldCloseOnDocumentClick={true}
+  shouldReturnFocus={true}
+  size="medium"
+  transition="fade"
+>
   <ModalHeader>
-    <CloseButton placement=\\"end\\" offset=\\"medium\\" variant=\\"icon\\" onClick={[Function]} buttonRef={[Function: buttonRef]} size=\\"small\\" margin=\\"0\\">
+    <CloseButton
+      buttonRef={[Function]}
+      margin="0"
+      offset="medium"
+      onClick={[Function]}
+      placement="end"
+      size="small"
+      variant="icon"
+    >
       Close
     </CloseButton>
-    <Heading border=\\"none\\" color=\\"inherit\\" level=\\"h2\\" ellipsis={false}>
+    <Heading
+      border="none"
+      color="inherit"
+      ellipsis={false}
+      level="h2"
+    >
       Criterion Long Description
     </Heading>
   </ModalHeader>
-  <ModalBody padding=\\"medium\\" as=\\"div\\">
-    <Text lineHeight=\\"double\\" as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\">
-      <div dangerouslySetInnerHTML={{...}} />
+  <ModalBody
+    as="div"
+    padding="medium"
+  >
+    <Text
+      as="span"
+      letterSpacing="normal"
+      lineHeight="double"
+      size="medium"
+    >
+      <div
+        dangerouslySetInnerHTML={
+          Object {
+            "__html": "sa Sivert.",
+          }
+        }
+      />
     </Text>
   </ModalBody>
-</Modal>"
+</Modal>
 `;
 
 exports[`Free-form Rubric with a outcome criterion when assessing renders the OutcomeIcon sub-component(s) as expected 1`] = `
-"<span>
+<span>
   <IconOutcomes />
    
-  <ScreenReaderContent as=\\"span\\">
+  <ScreenReaderContent
+    as="span"
+  >
     This criterion is linked to a Learning Outcome
   </ScreenReaderContent>
-</span>"
+</span>
 `;
 
 exports[`Free-form Rubric with a outcome criterion when assessing renders the Threshold sub-component(s) as expected 1`] = `
-"<Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
+<Text
+  as="span"
+  letterSpacing="normal"
+  size="x-small"
+  weight="normal"
+>
   threshold: 3
-</Text>"
+</Text>
 `;
 
 exports[`Free-form Rubric with a outcome criterion when assessing renders the root component as expected 1`] = `
-"<tr className=\\"rubric-criterion\\">
-  <th scope=\\"row\\" className=\\"description-header\\">
-    <div className=\\"description react-rubric-cell\\">
+<tr
+  className="rubric-criterion"
+>
+  <th
+    className="description-header"
+    scope="row"
+  >
+    <div
+      className="description react-rubric-cell"
+    >
       <OutcomeIcon />
-      <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
+      <Text
+        as="span"
+        letterSpacing="normal"
+        size="small"
+        weight="normal"
+      >
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
       </Text>
     </div>
-    <div className=\\"long-description\\">
-      <LongDescription showLongDescription={[Function]} />
-      <LongDescriptionDialog close={[Function]} longDescription=\\"sa Sivert.\\" open={false} />
+    <div
+      className="long-description"
+    >
+      <LongDescription
+        showLongDescription={[Function]}
+      />
+      <LongDescriptionDialog
+        close={[Function]}
+        longDescription="sa Sivert."
+        open={false}
+      />
     </div>
-    <Threshold threshold={3} />
+    <Threshold
+      threshold={3}
+    />
   </th>
-  <td className=\\"ratings\\">
-    <Comments assessing={true} assessment={{...}} footer={{...}} savedComments={{...}} setSaveLater={[Function: setSaveLater]} setComments={[Function: setComments]} />
+  <td
+    className="ratings"
+  >
+    <Comments
+      assessing={true}
+      assessment={
+        Object {
+          "above_threshold": false,
+          "comments": "I award you no points, and may God have mercy on your soul.",
+          "comments_enabled": true,
+          "comments_html": "I award you <b>no</b> points, and may God have mercy on your soul.",
+          "criterion_id": "7_391",
+          "description": "No details",
+          "learning_outcome_id": "612",
+          "points": Object {
+            "text": null,
+            "valid": true,
+            "value": 0,
+          },
+        }
+      }
+      footer={null}
+      savedComments={Array []}
+      setComments={[Function]}
+      setSaveLater={[Function]}
+    />
   </td>
-  <td className=\\"criterion_points\\">
-    <Points allowExtraCredit={false} assessing={true} assessment={{...}} onPointChange={[Function: updatePoints]} pointsPossible={3} />
+  <td
+    className="criterion_points"
+  >
+    <Points
+      allowExtraCredit={false}
+      assessing={true}
+      assessment={
+        Object {
+          "above_threshold": false,
+          "comments": "I award you no points, and may God have mercy on your soul.",
+          "comments_enabled": true,
+          "comments_html": "I award you <b>no</b> points, and may God have mercy on your soul.",
+          "criterion_id": "7_391",
+          "description": "No details",
+          "learning_outcome_id": "612",
+          "points": Object {
+            "text": null,
+            "valid": true,
+            "value": 0,
+          },
+        }
+      }
+      key="points"
+      onPointChange={[Function]}
+      pointsPossible={3}
+    />
   </td>
-</tr>"
+</tr>
 `;
 
 exports[`Free-form Rubric with a outcome criterion without an assessment renders the LongDescription sub-component(s) as expected 1`] = `
-"<Button fluidWidth={true} variant=\\"link\\" onClick={[Function: onClick]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" margin=\\"0\\" buttonRef={[Function: buttonRef]} cursor=\\"pointer\\">
-  <Text size=\\"x-small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+<Button
+  as="button"
+  buttonRef={[Function]}
+  cursor="pointer"
+  fluidWidth={true}
+  margin="0"
+  onClick={[Function]}
+  size="medium"
+  type="button"
+  variant="link"
+>
+  <Text
+    as="span"
+    letterSpacing="normal"
+    size="x-small"
+  >
     view longer description
   </Text>
-</Button>"
+</Button>
 `;
 
 exports[`Free-form Rubric with a outcome criterion without an assessment renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
-"<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} defaultFocusElement={{...}} constrain=\\"window\\">
+<Modal
+  constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
+  insertAt="bottom"
+  label="Criterion Long Description"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
+  onDismiss={[Function]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
+  open={false}
+  shouldCloseOnDocumentClick={true}
+  shouldReturnFocus={true}
+  size="medium"
+  transition="fade"
+>
   <ModalHeader>
-    <CloseButton placement=\\"end\\" offset=\\"medium\\" variant=\\"icon\\" onClick={[Function]} buttonRef={[Function: buttonRef]} size=\\"small\\" margin=\\"0\\">
+    <CloseButton
+      buttonRef={[Function]}
+      margin="0"
+      offset="medium"
+      onClick={[Function]}
+      placement="end"
+      size="small"
+      variant="icon"
+    >
       Close
     </CloseButton>
-    <Heading border=\\"none\\" color=\\"inherit\\" level=\\"h2\\" ellipsis={false}>
+    <Heading
+      border="none"
+      color="inherit"
+      ellipsis={false}
+      level="h2"
+    >
       Criterion Long Description
     </Heading>
   </ModalHeader>
-  <ModalBody padding=\\"medium\\" as=\\"div\\">
-    <Text lineHeight=\\"double\\" as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\">
-      <div dangerouslySetInnerHTML={{...}} />
+  <ModalBody
+    as="div"
+    padding="medium"
+  >
+    <Text
+      as="span"
+      letterSpacing="normal"
+      lineHeight="double"
+      size="medium"
+    >
+      <div
+        dangerouslySetInnerHTML={
+          Object {
+            "__html": "sa Sivert.",
+          }
+        }
+      />
     </Text>
   </ModalBody>
-</Modal>"
+</Modal>
 `;
 
 exports[`Free-form Rubric with a outcome criterion without an assessment renders the OutcomeIcon sub-component(s) as expected 1`] = `
-"<span>
+<span>
   <IconOutcomes />
    
-  <ScreenReaderContent as=\\"span\\">
+  <ScreenReaderContent
+    as="span"
+  >
     This criterion is linked to a Learning Outcome
   </ScreenReaderContent>
-</span>"
+</span>
 `;
 
 exports[`Free-form Rubric with a outcome criterion without an assessment renders the Threshold sub-component(s) as expected 1`] = `
-"<Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
+<Text
+  as="span"
+  letterSpacing="normal"
+  size="x-small"
+  weight="normal"
+>
   threshold: 3
-</Text>"
+</Text>
 `;
 
 exports[`Free-form Rubric with a outcome criterion without an assessment renders the root component as expected 1`] = `
-"<tr className=\\"rubric-criterion\\">
-  <th scope=\\"row\\" className=\\"description-header\\">
-    <div className=\\"description react-rubric-cell\\">
+<tr
+  className="rubric-criterion"
+>
+  <th
+    className="description-header"
+    scope="row"
+  >
+    <div
+      className="description react-rubric-cell"
+    >
       <OutcomeIcon />
-      <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
+      <Text
+        as="span"
+        letterSpacing="normal"
+        size="small"
+        weight="normal"
+      >
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
       </Text>
     </div>
-    <div className=\\"long-description\\">
-      <LongDescription showLongDescription={[Function]} />
-      <LongDescriptionDialog close={[Function]} longDescription=\\"sa Sivert.\\" open={false} />
+    <div
+      className="long-description"
+    >
+      <LongDescription
+        showLongDescription={[Function]}
+      />
+      <LongDescriptionDialog
+        close={[Function]}
+        longDescription="sa Sivert."
+        open={false}
+      />
     </div>
-    <Threshold threshold={3} />
+    <Threshold
+      threshold={3}
+    />
   </th>
-  <td className=\\"ratings\\">
-    <Comments assessing={false} assessment={{...}} footer={{...}} savedComments={{...}} setSaveLater={[Function: setSaveLater]} setComments={[Function: setComments]} />
+  <td
+    className="ratings"
+  >
+    <Comments
+      assessing={false}
+      assessment={null}
+      footer={null}
+      savedComments={Array []}
+      setComments={[Function]}
+      setSaveLater={[Function]}
+    />
   </td>
-  <td className=\\"criterion_points\\">
-    <Points allowExtraCredit={false} assessing={false} assessment={{...}} onPointChange={{...}} pointsPossible={3} />
+  <td
+    className="criterion_points"
+  >
+    <Points
+      allowExtraCredit={false}
+      assessing={false}
+      assessment={null}
+      key="points"
+      onPointChange={null}
+      pointsPossible={3}
+    />
   </td>
-</tr>"
+</tr>
 `;
 
 exports[`Point Rubric with a custom criterion by default renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
-"<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} defaultFocusElement={{...}} constrain=\\"window\\">
+<Modal
+  constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
+  insertAt="bottom"
+  label="Criterion Long Description"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
+  onDismiss={[Function]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
+  open={false}
+  shouldCloseOnDocumentClick={true}
+  shouldReturnFocus={true}
+  size="medium"
+  transition="fade"
+>
   <ModalHeader>
-    <CloseButton placement=\\"end\\" offset=\\"medium\\" variant=\\"icon\\" onClick={[Function]} buttonRef={[Function: buttonRef]} size=\\"small\\" margin=\\"0\\">
+    <CloseButton
+      buttonRef={[Function]}
+      margin="0"
+      offset="medium"
+      onClick={[Function]}
+      placement="end"
+      size="small"
+      variant="icon"
+    >
       Close
     </CloseButton>
-    <Heading border=\\"none\\" color=\\"inherit\\" level=\\"h2\\" ellipsis={false}>
+    <Heading
+      border="none"
+      color="inherit"
+      ellipsis={false}
+      level="h2"
+    >
       Criterion Long Description
     </Heading>
   </ModalHeader>
-  <ModalBody padding=\\"medium\\" as=\\"div\\">
-    <Text lineHeight=\\"double\\" as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\">
-      <div dangerouslySetInnerHTML={{...}} />
+  <ModalBody
+    as="div"
+    padding="medium"
+  >
+    <Text
+      as="span"
+      letterSpacing="normal"
+      lineHeight="double"
+      size="medium"
+    >
+      <div
+        dangerouslySetInnerHTML={
+          Object {
+            "__html": "",
+          }
+        }
+      />
     </Text>
   </ModalBody>
-</Modal>"
+</Modal>
 `;
 
 exports[`Point Rubric with a custom criterion by default renders the root component as expected 1`] = `
-"<tr className=\\"rubric-criterion\\">
-  <th scope=\\"row\\" className=\\"description-header\\">
-    <div className=\\"description react-rubric-cell\\">
-      <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
+<tr
+  className="rubric-criterion"
+>
+  <th
+    className="description-header"
+    scope="row"
+  >
+    <div
+      className="description react-rubric-cell"
+    >
+      <Text
+        as="span"
+        letterSpacing="normal"
+        size="small"
+        weight="normal"
+      >
         Description of criterion
       </Text>
     </div>
-    <div className=\\"long-description\\">
-      <LongDescriptionDialog close={[Function]} longDescription=\\"\\" open={false} />
+    <div
+      className="long-description"
+    >
+      <LongDescriptionDialog
+        close={[Function]}
+        longDescription=""
+        open={false}
+      />
     </div>
-    <div className=\\"assessment-comments\\">
-      <Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
+    <div
+      className="assessment-comments"
+    >
+      <Text
+        as="span"
+        letterSpacing="normal"
+        size="x-small"
+        weight="normal"
+      >
         Instructor Comments
       </Text>
-      <CommentText assessment={{...}} weight=\\"light\\" placeholder=\\"\\" />
+      <CommentText
+        assessment={
+          Object {
+            "comments": "i'd like to say some things",
+            "comments_enabled": true,
+            "criterion_id": "_1384",
+            "description": "bleh",
+            "id": "7_4778",
+            "learning_outcome_id": null,
+            "points": Object {
+              "text": null,
+              "valid": true,
+              "value": 3.2,
+            },
+          }
+        }
+        key="comment"
+        placeholder=""
+        weight="light"
+      />
     </div>
   </th>
-  <td className=\\"ratings\\">
-    <Ratings assessing={false} customRatings={{...}} footer={{...}} tiers={{...}} onPointChange={[Function: onPointChange]} points={3.2} pointsPossible={8} defaultMasteryThreshold={8} isSummary={false} useRange={false} hidePoints={false} />
+  <td
+    className="ratings"
+  >
+    <Ratings
+      assessing={false}
+      customRatings={Array []}
+      defaultMasteryThreshold={8}
+      footer={null}
+      hidePoints={false}
+      isSummary={false}
+      onPointChange={[Function]}
+      points={3.2}
+      pointsPossible={8}
+      tiers={
+        Array [
+          Object {
+            "criterion_id": "_1384",
+            "description": "Full Marks",
+            "id": "blank",
+            "long_description": "",
+            "points": 8,
+          },
+          Object {
+            "criterion_id": "_1384",
+            "description": "bleh",
+            "id": "7_4778",
+            "long_description": "blah",
+            "points": 3,
+          },
+          Object {
+            "criterion_id": "_1384",
+            "description": "No Marks",
+            "id": "blank_2",
+            "long_description": "",
+            "points": 0,
+          },
+        ]
+      }
+      useRange={false}
+    />
   </td>
-  <td className=\\"criterion_points\\">
-    <Points allowExtraCredit={true} assessing={false} assessment={{...}} onPointChange={{...}} pointsPossible={8} />
+  <td
+    className="criterion_points"
+  >
+    <Points
+      allowExtraCredit={true}
+      assessing={false}
+      assessment={
+        Object {
+          "comments": "i'd like to say some things",
+          "comments_enabled": true,
+          "criterion_id": "_1384",
+          "description": "bleh",
+          "id": "7_4778",
+          "learning_outcome_id": null,
+          "points": Object {
+            "text": null,
+            "valid": true,
+            "value": 3.2,
+          },
+        }
+      }
+      key="points"
+      onPointChange={null}
+      pointsPossible={8}
+    />
   </td>
-</tr>"
+</tr>
 `;
 
 exports[`Point Rubric with a custom criterion when assessing renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
-"<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} defaultFocusElement={{...}} constrain=\\"window\\">
+<Modal
+  constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
+  insertAt="bottom"
+  label="Criterion Long Description"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
+  onDismiss={[Function]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
+  open={false}
+  shouldCloseOnDocumentClick={true}
+  shouldReturnFocus={true}
+  size="medium"
+  transition="fade"
+>
   <ModalHeader>
-    <CloseButton placement=\\"end\\" offset=\\"medium\\" variant=\\"icon\\" onClick={[Function]} buttonRef={[Function: buttonRef]} size=\\"small\\" margin=\\"0\\">
+    <CloseButton
+      buttonRef={[Function]}
+      margin="0"
+      offset="medium"
+      onClick={[Function]}
+      placement="end"
+      size="small"
+      variant="icon"
+    >
       Close
     </CloseButton>
-    <Heading border=\\"none\\" color=\\"inherit\\" level=\\"h2\\" ellipsis={false}>
+    <Heading
+      border="none"
+      color="inherit"
+      ellipsis={false}
+      level="h2"
+    >
       Criterion Long Description
     </Heading>
   </ModalHeader>
-  <ModalBody padding=\\"medium\\" as=\\"div\\">
-    <Text lineHeight=\\"double\\" as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\">
-      <div dangerouslySetInnerHTML={{...}} />
+  <ModalBody
+    as="div"
+    padding="medium"
+  >
+    <Text
+      as="span"
+      letterSpacing="normal"
+      lineHeight="double"
+      size="medium"
+    >
+      <div
+        dangerouslySetInnerHTML={
+          Object {
+            "__html": "",
+          }
+        }
+      />
     </Text>
   </ModalBody>
-</Modal>"
+</Modal>
 `;
 
 exports[`Point Rubric with a custom criterion when assessing renders the root component as expected 1`] = `
-"<tr className=\\"rubric-criterion\\">
-  <th scope=\\"row\\" className=\\"description-header\\">
-    <div className=\\"description react-rubric-cell\\">
-      <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
+<tr
+  className="rubric-criterion"
+>
+  <th
+    className="description-header"
+    scope="row"
+  >
+    <div
+      className="description react-rubric-cell"
+    >
+      <Text
+        as="span"
+        letterSpacing="normal"
+        size="small"
+        weight="normal"
+      >
         Description of criterion
       </Text>
     </div>
-    <div className=\\"long-description\\">
-      <LongDescriptionDialog close={[Function]} longDescription=\\"\\" open={false} />
+    <div
+      className="long-description"
+    >
+      <LongDescriptionDialog
+        close={[Function]}
+        longDescription=""
+        open={false}
+      />
     </div>
   </th>
-  <td className=\\"ratings\\">
-    <Ratings assessing={true} customRatings={{...}} footer={{...}} tiers={{...}} onPointChange={[Function: updatePoints]} points={3.2} pointsPossible={8} defaultMasteryThreshold={8} isSummary={false} useRange={false} hidePoints={false} />
+  <td
+    className="ratings"
+  >
+    <Ratings
+      assessing={true}
+      customRatings={Array []}
+      defaultMasteryThreshold={8}
+      footer={null}
+      hidePoints={false}
+      isSummary={false}
+      onPointChange={[Function]}
+      points={3.2}
+      pointsPossible={8}
+      tiers={
+        Array [
+          Object {
+            "criterion_id": "_1384",
+            "description": "Full Marks",
+            "id": "blank",
+            "long_description": "",
+            "points": 8,
+          },
+          Object {
+            "criterion_id": "_1384",
+            "description": "bleh",
+            "id": "7_4778",
+            "long_description": "blah",
+            "points": 3,
+          },
+          Object {
+            "criterion_id": "_1384",
+            "description": "No Marks",
+            "id": "blank_2",
+            "long_description": "",
+            "points": 0,
+          },
+        ]
+      }
+      useRange={false}
+    />
   </td>
-  <td className=\\"criterion_points\\">
-    <Points allowExtraCredit={true} assessing={true} assessment={{...}} onPointChange={[Function: updatePoints]} pointsPossible={8} />
-    <CommentButton comments=\\"i\\\\'d like to say some things\\" description=\\"Description of criterion\\" finalize={[Function: finalize]} initialize={[Function: initialize]} open={false} setComments={[Function: updateComments]} />
+  <td
+    className="criterion_points"
+  >
+    <Points
+      allowExtraCredit={true}
+      assessing={true}
+      assessment={
+        Object {
+          "comments": "i'd like to say some things",
+          "comments_enabled": true,
+          "criterion_id": "_1384",
+          "description": "bleh",
+          "id": "7_4778",
+          "learning_outcome_id": null,
+          "points": Object {
+            "text": null,
+            "valid": true,
+            "value": 3.2,
+          },
+        }
+      }
+      key="points"
+      onPointChange={[Function]}
+      pointsPossible={8}
+    />
+    <CommentButton
+      comments="i'd like to say some things"
+      description="Description of criterion"
+      finalize={[Function]}
+      initialize={[Function]}
+      open={false}
+      setComments={[Function]}
+    />
   </td>
-</tr>"
+</tr>
 `;
 
 exports[`Point Rubric with a custom criterion without an assessment renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
-"<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} defaultFocusElement={{...}} constrain=\\"window\\">
+<Modal
+  constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
+  insertAt="bottom"
+  label="Criterion Long Description"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
+  onDismiss={[Function]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
+  open={false}
+  shouldCloseOnDocumentClick={true}
+  shouldReturnFocus={true}
+  size="medium"
+  transition="fade"
+>
   <ModalHeader>
-    <CloseButton placement=\\"end\\" offset=\\"medium\\" variant=\\"icon\\" onClick={[Function]} buttonRef={[Function: buttonRef]} size=\\"small\\" margin=\\"0\\">
+    <CloseButton
+      buttonRef={[Function]}
+      margin="0"
+      offset="medium"
+      onClick={[Function]}
+      placement="end"
+      size="small"
+      variant="icon"
+    >
       Close
     </CloseButton>
-    <Heading border=\\"none\\" color=\\"inherit\\" level=\\"h2\\" ellipsis={false}>
+    <Heading
+      border="none"
+      color="inherit"
+      ellipsis={false}
+      level="h2"
+    >
       Criterion Long Description
     </Heading>
   </ModalHeader>
-  <ModalBody padding=\\"medium\\" as=\\"div\\">
-    <Text lineHeight=\\"double\\" as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\">
-      <div dangerouslySetInnerHTML={{...}} />
+  <ModalBody
+    as="div"
+    padding="medium"
+  >
+    <Text
+      as="span"
+      letterSpacing="normal"
+      lineHeight="double"
+      size="medium"
+    >
+      <div
+        dangerouslySetInnerHTML={
+          Object {
+            "__html": "",
+          }
+        }
+      />
     </Text>
   </ModalBody>
-</Modal>"
+</Modal>
 `;
 
 exports[`Point Rubric with a custom criterion without an assessment renders the root component as expected 1`] = `
-"<tr className=\\"rubric-criterion\\">
-  <th scope=\\"row\\" className=\\"description-header\\">
-    <div className=\\"description react-rubric-cell\\">
-      <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
+<tr
+  className="rubric-criterion"
+>
+  <th
+    className="description-header"
+    scope="row"
+  >
+    <div
+      className="description react-rubric-cell"
+    >
+      <Text
+        as="span"
+        letterSpacing="normal"
+        size="small"
+        weight="normal"
+      >
         Description of criterion
       </Text>
     </div>
-    <div className=\\"long-description\\">
-      <LongDescriptionDialog close={[Function]} longDescription=\\"\\" open={false} />
+    <div
+      className="long-description"
+    >
+      <LongDescriptionDialog
+        close={[Function]}
+        longDescription=""
+        open={false}
+      />
     </div>
   </th>
-  <td className=\\"ratings\\">
-    <Ratings assessing={false} customRatings={{...}} footer={{...}} tiers={{...}} onPointChange={[Function: onPointChange]} points={[undefined]} pointsPossible={8} defaultMasteryThreshold={8} isSummary={false} useRange={false} hidePoints={false} />
+  <td
+    className="ratings"
+  >
+    <Ratings
+      assessing={false}
+      customRatings={Array []}
+      defaultMasteryThreshold={8}
+      footer={null}
+      hidePoints={false}
+      isSummary={false}
+      onPointChange={[Function]}
+      pointsPossible={8}
+      tiers={
+        Array [
+          Object {
+            "criterion_id": "_1384",
+            "description": "Full Marks",
+            "id": "blank",
+            "long_description": "",
+            "points": 8,
+          },
+          Object {
+            "criterion_id": "_1384",
+            "description": "bleh",
+            "id": "7_4778",
+            "long_description": "blah",
+            "points": 3,
+          },
+          Object {
+            "criterion_id": "_1384",
+            "description": "No Marks",
+            "id": "blank_2",
+            "long_description": "",
+            "points": 0,
+          },
+        ]
+      }
+      useRange={false}
+    />
   </td>
-  <td className=\\"criterion_points\\">
-    <Points allowExtraCredit={true} assessing={false} assessment={{...}} onPointChange={{...}} pointsPossible={8} />
+  <td
+    className="criterion_points"
+  >
+    <Points
+      allowExtraCredit={true}
+      assessing={false}
+      assessment={null}
+      key="points"
+      onPointChange={null}
+      pointsPossible={8}
+    />
   </td>
-</tr>"
+</tr>
 `;
 
 exports[`Point Rubric with a outcome criterion by default renders the LongDescription sub-component(s) as expected 1`] = `
-"<Button fluidWidth={true} variant=\\"link\\" onClick={[Function: onClick]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" margin=\\"0\\" buttonRef={[Function: buttonRef]} cursor=\\"pointer\\">
-  <Text size=\\"x-small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+<Button
+  as="button"
+  buttonRef={[Function]}
+  cursor="pointer"
+  fluidWidth={true}
+  margin="0"
+  onClick={[Function]}
+  size="medium"
+  type="button"
+  variant="link"
+>
+  <Text
+    as="span"
+    letterSpacing="normal"
+    size="x-small"
+  >
     view longer description
   </Text>
-</Button>"
+</Button>
 `;
 
 exports[`Point Rubric with a outcome criterion by default renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
-"<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} defaultFocusElement={{...}} constrain=\\"window\\">
+<Modal
+  constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
+  insertAt="bottom"
+  label="Criterion Long Description"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
+  onDismiss={[Function]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
+  open={false}
+  shouldCloseOnDocumentClick={true}
+  shouldReturnFocus={true}
+  size="medium"
+  transition="fade"
+>
   <ModalHeader>
-    <CloseButton placement=\\"end\\" offset=\\"medium\\" variant=\\"icon\\" onClick={[Function]} buttonRef={[Function: buttonRef]} size=\\"small\\" margin=\\"0\\">
+    <CloseButton
+      buttonRef={[Function]}
+      margin="0"
+      offset="medium"
+      onClick={[Function]}
+      placement="end"
+      size="small"
+      variant="icon"
+    >
       Close
     </CloseButton>
-    <Heading border=\\"none\\" color=\\"inherit\\" level=\\"h2\\" ellipsis={false}>
+    <Heading
+      border="none"
+      color="inherit"
+      ellipsis={false}
+      level="h2"
+    >
       Criterion Long Description
     </Heading>
   </ModalHeader>
-  <ModalBody padding=\\"medium\\" as=\\"div\\">
-    <Text lineHeight=\\"double\\" as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\">
-      <div dangerouslySetInnerHTML={{...}} />
+  <ModalBody
+    as="div"
+    padding="medium"
+  >
+    <Text
+      as="span"
+      letterSpacing="normal"
+      lineHeight="double"
+      size="medium"
+    >
+      <div
+        dangerouslySetInnerHTML={
+          Object {
+            "__html": "sa Sivert.",
+          }
+        }
+      />
     </Text>
   </ModalBody>
-</Modal>"
+</Modal>
 `;
 
 exports[`Point Rubric with a outcome criterion by default renders the OutcomeIcon sub-component(s) as expected 1`] = `
-"<span>
+<span>
   <IconOutcomes />
    
-  <ScreenReaderContent as=\\"span\\">
+  <ScreenReaderContent
+    as="span"
+  >
     This criterion is linked to a Learning Outcome
   </ScreenReaderContent>
-</span>"
+</span>
 `;
 
 exports[`Point Rubric with a outcome criterion by default renders the Threshold sub-component(s) as expected 1`] = `
-"<Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
+<Text
+  as="span"
+  letterSpacing="normal"
+  size="x-small"
+  weight="normal"
+>
   threshold: 3
-</Text>"
+</Text>
 `;
 
 exports[`Point Rubric with a outcome criterion by default renders the root component as expected 1`] = `
-"<tr className=\\"rubric-criterion\\">
-  <th scope=\\"row\\" className=\\"description-header\\">
-    <div className=\\"description react-rubric-cell\\">
+<tr
+  className="rubric-criterion"
+>
+  <th
+    className="description-header"
+    scope="row"
+  >
+    <div
+      className="description react-rubric-cell"
+    >
       <OutcomeIcon />
-      <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
+      <Text
+        as="span"
+        letterSpacing="normal"
+        size="small"
+        weight="normal"
+      >
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
       </Text>
     </div>
-    <div className=\\"long-description\\">
-      <LongDescription showLongDescription={[Function]} />
-      <LongDescriptionDialog close={[Function]} longDescription=\\"sa Sivert.\\" open={false} />
+    <div
+      className="long-description"
+    >
+      <LongDescription
+        showLongDescription={[Function]}
+      />
+      <LongDescriptionDialog
+        close={[Function]}
+        longDescription="sa Sivert."
+        open={false}
+      />
     </div>
-    <Threshold threshold={3} />
-    <div className=\\"assessment-comments\\">
-      <Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
+    <Threshold
+      threshold={3}
+    />
+    <div
+      className="assessment-comments"
+    >
+      <Text
+        as="span"
+        letterSpacing="normal"
+        size="x-small"
+        weight="normal"
+      >
         Instructor Comments
       </Text>
-      <CommentText assessment={{...}} weight=\\"light\\" placeholder=\\"\\" />
+      <CommentText
+        assessment={
+          Object {
+            "above_threshold": false,
+            "comments": "here too",
+            "comments_enabled": true,
+            "criterion_id": "7_391",
+            "description": "Naturligvis hadde han ogsaa længe forstaat hvorfor Inger hadde.",
+            "id": "7_6639",
+            "learning_outcome_id": "612",
+            "points": Object {
+              "text": null,
+              "valid": true,
+              "value": 3,
+            },
+          }
+        }
+        key="comment"
+        placeholder=""
+        weight="light"
+      />
     </div>
   </th>
-  <td className=\\"ratings\\">
-    <Ratings assessing={false} customRatings={{...}} footer={{...}} tiers={{...}} onPointChange={[Function: onPointChange]} points={3} pointsPossible={3} defaultMasteryThreshold={3} isSummary={false} useRange={false} hidePoints={false} />
+  <td
+    className="ratings"
+  >
+    <Ratings
+      assessing={false}
+      customRatings={Array []}
+      defaultMasteryThreshold={3}
+      footer={null}
+      hidePoints={false}
+      isSummary={false}
+      onPointChange={[Function]}
+      points={3}
+      pointsPossible={3}
+      tiers={
+        Array [
+          Object {
+            "criterion_id": "7_391",
+            "description": "Naturligvis hadde han ogsaa længe forstaat hvorfor Inger hadde ordet om.",
+            "id": "7_6639",
+            "long_description": "",
+            "points": 3,
+          },
+          Object {
+            "criterion_id": "7_391",
+            "description": "De levet tæt hos hverandre som Dyr i Skogen, de sov og spiste, det lidde saa.",
+            "id": "7_194",
+            "long_description": "",
+            "points": 2,
+          },
+          Object {
+            "criterion_id": "7_391",
+            "description": "Et graat og rødt Uldtørklæde med Frynser var pragtfuldt paa hendes mørke Haar.",
+            "id": "7_8479",
+            "long_description": "",
+            "points": 1,
+          },
+        ]
+      }
+      useRange={false}
+    />
   </td>
-  <td className=\\"criterion_points\\">
-    <Points allowExtraCredit={false} assessing={false} assessment={{...}} onPointChange={{...}} pointsPossible={3} />
+  <td
+    className="criterion_points"
+  >
+    <Points
+      allowExtraCredit={false}
+      assessing={false}
+      assessment={
+        Object {
+          "above_threshold": false,
+          "comments": "here too",
+          "comments_enabled": true,
+          "criterion_id": "7_391",
+          "description": "Naturligvis hadde han ogsaa længe forstaat hvorfor Inger hadde.",
+          "id": "7_6639",
+          "learning_outcome_id": "612",
+          "points": Object {
+            "text": null,
+            "valid": true,
+            "value": 3,
+          },
+        }
+      }
+      key="points"
+      onPointChange={null}
+      pointsPossible={3}
+    />
   </td>
-</tr>"
+</tr>
 `;
 
 exports[`Point Rubric with a outcome criterion when assessing renders the LongDescription sub-component(s) as expected 1`] = `
-"<Button fluidWidth={true} variant=\\"link\\" onClick={[Function: onClick]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" margin=\\"0\\" buttonRef={[Function: buttonRef]} cursor=\\"pointer\\">
-  <Text size=\\"x-small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+<Button
+  as="button"
+  buttonRef={[Function]}
+  cursor="pointer"
+  fluidWidth={true}
+  margin="0"
+  onClick={[Function]}
+  size="medium"
+  type="button"
+  variant="link"
+>
+  <Text
+    as="span"
+    letterSpacing="normal"
+    size="x-small"
+  >
     view longer description
   </Text>
-</Button>"
+</Button>
 `;
 
 exports[`Point Rubric with a outcome criterion when assessing renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
-"<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} defaultFocusElement={{...}} constrain=\\"window\\">
+<Modal
+  constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
+  insertAt="bottom"
+  label="Criterion Long Description"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
+  onDismiss={[Function]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
+  open={false}
+  shouldCloseOnDocumentClick={true}
+  shouldReturnFocus={true}
+  size="medium"
+  transition="fade"
+>
   <ModalHeader>
-    <CloseButton placement=\\"end\\" offset=\\"medium\\" variant=\\"icon\\" onClick={[Function]} buttonRef={[Function: buttonRef]} size=\\"small\\" margin=\\"0\\">
+    <CloseButton
+      buttonRef={[Function]}
+      margin="0"
+      offset="medium"
+      onClick={[Function]}
+      placement="end"
+      size="small"
+      variant="icon"
+    >
       Close
     </CloseButton>
-    <Heading border=\\"none\\" color=\\"inherit\\" level=\\"h2\\" ellipsis={false}>
+    <Heading
+      border="none"
+      color="inherit"
+      ellipsis={false}
+      level="h2"
+    >
       Criterion Long Description
     </Heading>
   </ModalHeader>
-  <ModalBody padding=\\"medium\\" as=\\"div\\">
-    <Text lineHeight=\\"double\\" as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\">
-      <div dangerouslySetInnerHTML={{...}} />
+  <ModalBody
+    as="div"
+    padding="medium"
+  >
+    <Text
+      as="span"
+      letterSpacing="normal"
+      lineHeight="double"
+      size="medium"
+    >
+      <div
+        dangerouslySetInnerHTML={
+          Object {
+            "__html": "sa Sivert.",
+          }
+        }
+      />
     </Text>
   </ModalBody>
-</Modal>"
+</Modal>
 `;
 
 exports[`Point Rubric with a outcome criterion when assessing renders the OutcomeIcon sub-component(s) as expected 1`] = `
-"<span>
+<span>
   <IconOutcomes />
    
-  <ScreenReaderContent as=\\"span\\">
+  <ScreenReaderContent
+    as="span"
+  >
     This criterion is linked to a Learning Outcome
   </ScreenReaderContent>
-</span>"
+</span>
 `;
 
 exports[`Point Rubric with a outcome criterion when assessing renders the Threshold sub-component(s) as expected 1`] = `
-"<Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
+<Text
+  as="span"
+  letterSpacing="normal"
+  size="x-small"
+  weight="normal"
+>
   threshold: 3
-</Text>"
+</Text>
 `;
 
 exports[`Point Rubric with a outcome criterion when assessing renders the root component as expected 1`] = `
-"<tr className=\\"rubric-criterion\\">
-  <th scope=\\"row\\" className=\\"description-header\\">
-    <div className=\\"description react-rubric-cell\\">
+<tr
+  className="rubric-criterion"
+>
+  <th
+    className="description-header"
+    scope="row"
+  >
+    <div
+      className="description react-rubric-cell"
+    >
       <OutcomeIcon />
-      <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
+      <Text
+        as="span"
+        letterSpacing="normal"
+        size="small"
+        weight="normal"
+      >
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
       </Text>
     </div>
-    <div className=\\"long-description\\">
-      <LongDescription showLongDescription={[Function]} />
-      <LongDescriptionDialog close={[Function]} longDescription=\\"sa Sivert.\\" open={false} />
+    <div
+      className="long-description"
+    >
+      <LongDescription
+        showLongDescription={[Function]}
+      />
+      <LongDescriptionDialog
+        close={[Function]}
+        longDescription="sa Sivert."
+        open={false}
+      />
     </div>
-    <Threshold threshold={3} />
+    <Threshold
+      threshold={3}
+    />
   </th>
-  <td className=\\"ratings\\">
-    <Ratings assessing={true} customRatings={{...}} footer={{...}} tiers={{...}} onPointChange={[Function: updatePoints]} points={3} pointsPossible={3} defaultMasteryThreshold={3} isSummary={false} useRange={false} hidePoints={false} />
+  <td
+    className="ratings"
+  >
+    <Ratings
+      assessing={true}
+      customRatings={Array []}
+      defaultMasteryThreshold={3}
+      footer={null}
+      hidePoints={false}
+      isSummary={false}
+      onPointChange={[Function]}
+      points={3}
+      pointsPossible={3}
+      tiers={
+        Array [
+          Object {
+            "criterion_id": "7_391",
+            "description": "Naturligvis hadde han ogsaa længe forstaat hvorfor Inger hadde ordet om.",
+            "id": "7_6639",
+            "long_description": "",
+            "points": 3,
+          },
+          Object {
+            "criterion_id": "7_391",
+            "description": "De levet tæt hos hverandre som Dyr i Skogen, de sov og spiste, det lidde saa.",
+            "id": "7_194",
+            "long_description": "",
+            "points": 2,
+          },
+          Object {
+            "criterion_id": "7_391",
+            "description": "Et graat og rødt Uldtørklæde med Frynser var pragtfuldt paa hendes mørke Haar.",
+            "id": "7_8479",
+            "long_description": "",
+            "points": 1,
+          },
+        ]
+      }
+      useRange={false}
+    />
   </td>
-  <td className=\\"criterion_points\\">
-    <Points allowExtraCredit={false} assessing={true} assessment={{...}} onPointChange={[Function: updatePoints]} pointsPossible={3} />
-    <CommentButton comments=\\"here too\\" description=\\"Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.\\" finalize={[Function: finalize]} initialize={[Function: initialize]} open={false} setComments={[Function: updateComments]} />
+  <td
+    className="criterion_points"
+  >
+    <Points
+      allowExtraCredit={false}
+      assessing={true}
+      assessment={
+        Object {
+          "above_threshold": false,
+          "comments": "here too",
+          "comments_enabled": true,
+          "criterion_id": "7_391",
+          "description": "Naturligvis hadde han ogsaa længe forstaat hvorfor Inger hadde.",
+          "id": "7_6639",
+          "learning_outcome_id": "612",
+          "points": Object {
+            "text": null,
+            "valid": true,
+            "value": 3,
+          },
+        }
+      }
+      key="points"
+      onPointChange={[Function]}
+      pointsPossible={3}
+    />
+    <CommentButton
+      comments="here too"
+      description="Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag."
+      finalize={[Function]}
+      initialize={[Function]}
+      open={false}
+      setComments={[Function]}
+    />
   </td>
-</tr>"
+</tr>
 `;
 
 exports[`Point Rubric with a outcome criterion without an assessment renders the LongDescription sub-component(s) as expected 1`] = `
-"<Button fluidWidth={true} variant=\\"link\\" onClick={[Function: onClick]} as=\\"button\\" type=\\"button\\" size=\\"medium\\" margin=\\"0\\" buttonRef={[Function: buttonRef]} cursor=\\"pointer\\">
-  <Text size=\\"x-small\\" as=\\"span\\" letterSpacing=\\"normal\\">
+<Button
+  as="button"
+  buttonRef={[Function]}
+  cursor="pointer"
+  fluidWidth={true}
+  margin="0"
+  onClick={[Function]}
+  size="medium"
+  type="button"
+  variant="link"
+>
+  <Text
+    as="span"
+    letterSpacing="normal"
+    size="x-small"
+  >
     view longer description
   </Text>
-</Button>"
+</Button>
 `;
 
 exports[`Point Rubric with a outcome criterion without an assessment renders the LongDescriptionDialog sub-component(s) as expected 1`] = `
-"<Modal open={false} onDismiss={[Function]} size=\\"medium\\" label=\\"Criterion Long Description\\" shouldCloseOnDocumentClick={true} transition=\\"fade\\" onOpen={[Function: onOpen]} onClose={[Function: onClose]} onEnter={[Function: onEnter]} onEntering={[Function: onEntering]} onEntered={[Function: onEntered]} onExit={[Function: onExit]} onExiting={[Function: onExiting]} onExited={[Function: onExited]} mountNode={{...}} insertAt=\\"bottom\\" liveRegion={{...}} contentRef={[Function: contentRef]} shouldReturnFocus={true} defaultFocusElement={{...}} constrain=\\"window\\">
+<Modal
+  constrain="window"
+  contentRef={[Function]}
+  defaultFocusElement={null}
+  insertAt="bottom"
+  label="Criterion Long Description"
+  liveRegion={null}
+  mountNode={null}
+  onClose={[Function]}
+  onDismiss={[Function]}
+  onEnter={[Function]}
+  onEntered={[Function]}
+  onEntering={[Function]}
+  onExit={[Function]}
+  onExited={[Function]}
+  onExiting={[Function]}
+  onOpen={[Function]}
+  open={false}
+  shouldCloseOnDocumentClick={true}
+  shouldReturnFocus={true}
+  size="medium"
+  transition="fade"
+>
   <ModalHeader>
-    <CloseButton placement=\\"end\\" offset=\\"medium\\" variant=\\"icon\\" onClick={[Function]} buttonRef={[Function: buttonRef]} size=\\"small\\" margin=\\"0\\">
+    <CloseButton
+      buttonRef={[Function]}
+      margin="0"
+      offset="medium"
+      onClick={[Function]}
+      placement="end"
+      size="small"
+      variant="icon"
+    >
       Close
     </CloseButton>
-    <Heading border=\\"none\\" color=\\"inherit\\" level=\\"h2\\" ellipsis={false}>
+    <Heading
+      border="none"
+      color="inherit"
+      ellipsis={false}
+      level="h2"
+    >
       Criterion Long Description
     </Heading>
   </ModalHeader>
-  <ModalBody padding=\\"medium\\" as=\\"div\\">
-    <Text lineHeight=\\"double\\" as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\">
-      <div dangerouslySetInnerHTML={{...}} />
+  <ModalBody
+    as="div"
+    padding="medium"
+  >
+    <Text
+      as="span"
+      letterSpacing="normal"
+      lineHeight="double"
+      size="medium"
+    >
+      <div
+        dangerouslySetInnerHTML={
+          Object {
+            "__html": "sa Sivert.",
+          }
+        }
+      />
     </Text>
   </ModalBody>
-</Modal>"
+</Modal>
 `;
 
 exports[`Point Rubric with a outcome criterion without an assessment renders the OutcomeIcon sub-component(s) as expected 1`] = `
-"<span>
+<span>
   <IconOutcomes />
    
-  <ScreenReaderContent as=\\"span\\">
+  <ScreenReaderContent
+    as="span"
+  >
     This criterion is linked to a Learning Outcome
   </ScreenReaderContent>
-</span>"
+</span>
 `;
 
 exports[`Point Rubric with a outcome criterion without an assessment renders the Threshold sub-component(s) as expected 1`] = `
-"<Text size=\\"x-small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
+<Text
+  as="span"
+  letterSpacing="normal"
+  size="x-small"
+  weight="normal"
+>
   threshold: 3
-</Text>"
+</Text>
 `;
 
 exports[`Point Rubric with a outcome criterion without an assessment renders the root component as expected 1`] = `
-"<tr className=\\"rubric-criterion\\">
-  <th scope=\\"row\\" className=\\"description-header\\">
-    <div className=\\"description react-rubric-cell\\">
+<tr
+  className="rubric-criterion"
+>
+  <th
+    className="description-header"
+    scope="row"
+  >
+    <div
+      className="description react-rubric-cell"
+    >
       <OutcomeIcon />
-      <Text size=\\"small\\" weight=\\"normal\\" as=\\"span\\" letterSpacing=\\"normal\\">
+      <Text
+        as="span"
+        letterSpacing="normal"
+        size="small"
+        weight="normal"
+      >
         Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.
       </Text>
     </div>
-    <div className=\\"long-description\\">
-      <LongDescription showLongDescription={[Function]} />
-      <LongDescriptionDialog close={[Function]} longDescription=\\"sa Sivert.\\" open={false} />
+    <div
+      className="long-description"
+    >
+      <LongDescription
+        showLongDescription={[Function]}
+      />
+      <LongDescriptionDialog
+        close={[Function]}
+        longDescription="sa Sivert."
+        open={false}
+      />
     </div>
-    <Threshold threshold={3} />
+    <Threshold
+      threshold={3}
+    />
   </th>
-  <td className=\\"ratings\\">
-    <Ratings assessing={false} customRatings={{...}} footer={{...}} tiers={{...}} onPointChange={[Function: onPointChange]} points={[undefined]} pointsPossible={3} defaultMasteryThreshold={3} isSummary={false} useRange={false} hidePoints={false} />
+  <td
+    className="ratings"
+  >
+    <Ratings
+      assessing={false}
+      customRatings={Array []}
+      defaultMasteryThreshold={3}
+      footer={null}
+      hidePoints={false}
+      isSummary={false}
+      onPointChange={[Function]}
+      pointsPossible={3}
+      tiers={
+        Array [
+          Object {
+            "criterion_id": "7_391",
+            "description": "Naturligvis hadde han ogsaa længe forstaat hvorfor Inger hadde ordet om.",
+            "id": "7_6639",
+            "long_description": "",
+            "points": 3,
+          },
+          Object {
+            "criterion_id": "7_391",
+            "description": "De levet tæt hos hverandre som Dyr i Skogen, de sov og spiste, det lidde saa.",
+            "id": "7_194",
+            "long_description": "",
+            "points": 2,
+          },
+          Object {
+            "criterion_id": "7_391",
+            "description": "Et graat og rødt Uldtørklæde med Frynser var pragtfuldt paa hendes mørke Haar.",
+            "id": "7_8479",
+            "long_description": "",
+            "points": 1,
+          },
+        ]
+      }
+      useRange={false}
+    />
   </td>
-  <td className=\\"criterion_points\\">
-    <Points allowExtraCredit={false} assessing={false} assessment={{...}} onPointChange={{...}} pointsPossible={3} />
+  <td
+    className="criterion_points"
+  >
+    <Points
+      allowExtraCredit={false}
+      assessing={false}
+      assessment={null}
+      key="points"
+      onPointChange={null}
+      pointsPossible={3}
+    />
   </td>
-</tr>"
+</tr>
 `;

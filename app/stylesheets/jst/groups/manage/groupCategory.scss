@@ -42,8 +42,8 @@
 }
 
 .progressbar {
-  margin-left: auto;
-  margin-right: auto;
+  margin-#{direction(left)}: auto;
+  margin-#{direction(right)}: auto;
   width: 60%;
 }
 

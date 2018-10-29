@@ -37,7 +37,7 @@ const defaultProps = (props = {}) => (
 
 it('renders the ProficiencyRating component', () => {
   const wrapper = shallow(<ProficiencyRating {...defaultProps()}/>)
-  expect(wrapper.debug()).toMatchSnapshot()
+  expect(wrapper).toMatchSnapshot()
 })
 
 it('mastery checkbox is checked if mastery', () => {

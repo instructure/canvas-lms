@@ -92,6 +92,7 @@ describe Api::V1::User do
           'sortable_name' => 'User',
           'sis_import_id' => nil,
           'id' => @user.id,
+          'created_at' => @user.created_at.iso8601,
           'short_name' => 'User',
           'sis_user_id' => 'xyz',
           'integration_id' => nil,
@@ -112,6 +113,7 @@ describe Api::V1::User do
         'name' => 'User',
         'sortable_name' => 'User',
         'id' => student.id,
+        'created_at' => student.created_at.iso8601,
         'short_name' => 'User',
         'sis_user_id' => 'xyz',
         'integration_id' => nil,
@@ -133,6 +135,7 @@ describe Api::V1::User do
         'name' => 'User',
         'sortable_name' => 'User',
         'id' => student.id,
+        'created_at' => student.created_at.iso8601,
         'short_name' => 'User',
         'sis_user_id' => 'xyz',
         'integration_id' => nil,
@@ -143,6 +146,7 @@ describe Api::V1::User do
         'name' => 'User',
         'sortable_name' => 'User',
         'id' => student.id,
+        'created_at' => student.created_at.iso8601,
         'short_name' => 'User'
       })
 
@@ -164,6 +168,7 @@ describe Api::V1::User do
         'name' => 'User',
         'sortable_name' => 'User',
         'id' => student.id,
+        'created_at' => student.created_at.iso8601,
         'short_name' => 'User',
         'sis_user_id' => 'xyz',
         'integration_id' => nil,
@@ -174,6 +179,7 @@ describe Api::V1::User do
         'name' => 'User',
         'sortable_name' => 'User',
         'id' => student.id,
+        'created_at' => student.created_at.iso8601,
         'short_name' => 'User'
       })
 
@@ -192,6 +198,7 @@ describe Api::V1::User do
           'sortable_name' => 'User',
           'sis_import_id' => sis_batch.id,
           'id' => @user.id,
+          'created_at' => @user.created_at.iso8601,
           'short_name' => 'User',
           'sis_user_id' => 'xyz',
           'integration_id' => nil,
@@ -212,6 +219,7 @@ describe Api::V1::User do
           'name' => 'User',
           'sortable_name' => 'User',
           'id' => @user.id,
+          'created_at' => @user.created_at.iso8601,
           'short_name' => 'User',
           'login_id' => 'abc',
           'sis_user_id' => 'a',
@@ -231,6 +239,7 @@ describe Api::V1::User do
           'name' => 'User',
           'sortable_name' => 'User',
           'id' => @user.id,
+          'created_at' => @user.created_at.iso8601,
           'short_name' => 'User',
           'integration_id' => nil,
           'sis_import_id' => nil,
@@ -332,6 +341,7 @@ describe Api::V1::User do
         "name"=>"Student",
         "sortable_name"=>"Student",
         "id"=>@student.id,
+        'created_at' => @student.created_at.iso8601,
         "short_name"=>"Student",
         "sis_user_id"=>"sis-user-id",
         "integration_id" => nil,
@@ -521,6 +531,7 @@ describe "Users API", type: :request do
          'sortable_name' => @other_user.sortable_name,
          'sis_import_id' => nil,
          'id' => @other_user.id,
+        'created_at' => @other_user.created_at.iso8601,
          'short_name' => @other_user.short_name,
          'sis_user_id' => @other_user.pseudonym.sis_user_id,
          'integration_id' => nil,
@@ -539,6 +550,7 @@ describe "Users API", type: :request do
          'name' => @other_user.name,
          'sortable_name' => @other_user.sortable_name,
          'id' => @other_user.id,
+        'created_at' => @other_user.created_at.iso8601,
          'short_name' => @other_user.short_name,
          'locale' => nil,
          'permissions' => {'can_update_name' => true, 'can_update_avatar' => false}
@@ -602,6 +614,7 @@ describe "Users API", type: :request do
           'sortable_name' => user.sortable_name,
           'sis_import_id' => nil,
           'id' => user.id,
+          'created_at' => user.created_at.iso8601,
           'short_name' => user.short_name,
           'sis_user_id' => user.pseudonym.sis_user_id,
           'integration_id' => nil,
@@ -677,7 +690,6 @@ describe "Users API", type: :request do
       p.save!
 
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param }, { include: ['last_login'], search_term: u.id.to_s })
-
       expect(json.count).to eq 1
       expect(json.first['last_login']).to eq p.current_login_at.iso8601
 
@@ -686,6 +698,19 @@ describe "Users API", type: :request do
         { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param },
         { include: ['last_login'], sort: "last_login", order: 'desc'})
       expect(json.first['last_login']).to eq p.current_login_at.iso8601
+    end
+
+    it "does return a next header on the last page" do
+      @account = Account.default
+      u = User.create!(name: 'test user')
+      p = u.pseudonyms.create!(account: @account, unique_id: 'user')
+
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param }, { search_term: u.id.to_s, per_page: '1', page: '1' })
+      expect(json.length).to eq 1
+      expect(response.headers['Link']).to include("rel=\"next\"")
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param }, { search_term: u.id.to_s, per_page: '1', page: '2' })
+      expect(json).to be_empty
+      expect(response.headers['Link']).to_not include("rel=\"next\"")
     end
   end
 
@@ -770,6 +795,7 @@ describe "Users API", type: :request do
 
           expect(json).to eq({
             "id"            => user.id,
+            "created_at"    => user.created_at.iso8601,
             "integration_id"=> nil,
             "name"          => "",
             "sortable_name" => "",
@@ -823,6 +849,7 @@ describe "Users API", type: :request do
           "short_name"       => "Test",
           "sortable_name"    => "User, T.",
           "id"               => user.id,
+          "created_at"       => user.created_at.iso8601,
           "sis_user_id"      => "12345",
           "sis_import_id"    => user.pseudonym.sis_batch_id,
           "login_id"         => "test@example.com",
@@ -1258,6 +1285,7 @@ describe "Users API", type: :request do
           'sis_user_id' => 'sis-user-id',
           'sis_import_id' => nil,
           'id' => user.id,
+          'created_at' => user.created_at.iso8601,
           'short_name' => 'Tobias',
           'integration_id' => nil,
           'login_id' => 'student@example.com',

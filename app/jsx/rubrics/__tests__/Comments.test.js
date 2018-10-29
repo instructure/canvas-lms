@@ -40,7 +40,7 @@ describe('The Comments component', () => {
   const rating = (mods) => component(mods).find('CommentText').shallow()
 
   it('renders the root component as expected when assessing', () => {
-    expect(component().debug()).toMatchSnapshot()
+    expect(component()).toMatchSnapshot()
   })
 
   it('directly renders comments_html', () => {
@@ -49,7 +49,7 @@ describe('The Comments component', () => {
   })
 
   it('renders a placeholder when no assessment provided', () => {
-    expect(rating({ assessing: false, assessment: null }).debug()).toMatchSnapshot()
+    expect(rating({ assessing: false, assessment: null })).toMatchSnapshot()
   })
 
   it('shows no selector when no comments are presented', () => {
@@ -89,6 +89,6 @@ describe('The Comments component', () => {
   it('renders a footer after the comment when provided', () => {
     const el = component({ assessing: false, footer: <div>this is a footer</div> })
 
-    expect(el.shallow().debug()).toMatchSnapshot()
+    expect(el.shallow()).toMatchSnapshot()
   })
 })

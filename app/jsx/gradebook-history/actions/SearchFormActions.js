@@ -17,7 +17,7 @@
  */
 
 import AssignmentApi from '../../gradebook-history/api/AssignmentApi';
-import HistoryActions from '../../gradebook-history/actions/HistoryActions';
+import * as HistoryActions from '../../gradebook-history/actions/HistoryActions';
 import HistoryApi from '../../gradebook-history/api/HistoryApi';
 import UserApi from '../../gradebook-history/api/UserApi';
 import environment from '../../gradebook-history/environment';

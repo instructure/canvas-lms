@@ -17,14 +17,12 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
+import { bool, func, shape, string } from 'prop-types'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
 import I18n from 'i18n!modules'
 import PostGradesDialog from '../../gradezilla/SISGradePassback/PostGradesDialog'
 import classnames from 'classnames'
-
-const { bool, func, shape, string } = PropTypes
 
 // The PostGradesApp mounts a single "Sync Grades" button, which pops up
 // the PostGradesDialog when clicked.

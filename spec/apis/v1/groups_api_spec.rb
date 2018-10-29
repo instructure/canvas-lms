@@ -41,7 +41,8 @@ describe "Groups API", type: :request do
       'storage_quota_mb' => group.storage_quota_mb,
       'leader' => group.leader,
       'has_submission' => group.submission?,
-      'concluded' => group.context.concluded? || group.context.deleted?
+      'concluded' => group.context.concluded? || group.context.deleted?,
+      'created_at' => group.created_at.iso8601
     }
     if opts[:include_users]
       json['users'] = users_json(group.users, opts)
@@ -89,6 +90,7 @@ describe "Groups API", type: :request do
   def user_json(user, opts)
     hash = {
       'id' => user.id,
+      'created_at' => user.created_at.iso8601,
       'name' => user.name,
       'sortable_name' => user.sortable_name,
       'short_name' => user.short_name
@@ -103,6 +105,7 @@ describe "Groups API", type: :request do
       'user_id' => membership.user_id,
       'workflow_state' => membership.workflow_state,
       'moderator' => membership.moderator,
+      'created_at' => membership.created_at.iso8601
     }
     json['sis_import_id'] = membership.sis_batch_id if membership.group.context_type == 'Account' && is_admin
     json['sis_group_id'] = membership.group.sis_source_id if membership.group.context_type == 'Account' && is_admin

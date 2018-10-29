@@ -1,5 +1,5 @@
 <% define_content :link do %>
-  <%= polymorphic_url([asset.assignment.context, asset.assignment, :submission], id: asset.user) %>
+  <%= course_assignment_submission_url(asset.assignment.context, asset.assignment, asset.user_id) %>
 <% end %>
 
 <% define_content :subject do %>
@@ -12,7 +12,11 @@
   </a>
 <% end %>
 
-<p><%= t :body, "The grade on your assignment, %{assignment_title} has been changed.", :assignment_title => asset.assignment.title %></p>
+<% if send_student_names(asset, user) %>
+  <p><%= t "The grade on assignment %{assignment_title} has been changed for %{name}.", :assignment_title => asset.assignment.title, name: asset.user.name %></p>
+<% else %>
+  <p><%= t :body, "The grade on your assignment %{assignment_title} has been changed.", :assignment_title => asset.assignment.title %></p>
+<% end %>
 
 <p><%= t :regraded_date, "re-graded: %{date}", :date => (datetime_string(force_zone(asset.graded_at)) rescue t(:no_date_set, "No Date Set")) %></p>
 

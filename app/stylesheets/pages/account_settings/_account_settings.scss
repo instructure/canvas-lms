@@ -62,7 +62,7 @@
 
 #account_notification_icon {
   option {
-    padding: 3px 0 3px 25px;
+    padding: direction-sides(3px 0 3px 25px);
     background: url(/images/warning.png) no-repeat 5px center;
     &.calendar {
       background-image: url(/images/calendar_icon.png);

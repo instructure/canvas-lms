@@ -38,7 +38,7 @@ body.files {
 }
 
 .ic-app-nav-toggle-and-crumbs.ic-app-nav-toggle-and-crumbs--files {
-  margin-left: 0; margin-right: 0;
+  margin-#{direction(left)}: 0; margin-#{direction(right)}: 0;
 }
 
 // hides the course menu hamburger in the personal files breadcrumb
@@ -83,7 +83,7 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
     margin-bottom: 0;
     flex: 0 0 $ic-sp*31;
     &.ef-search-form--showing-buttons {
-      flex: 0 0 $ic-sp*19;
+      flex: 0 0 $ic-sp*21;
     }
   }
 }
@@ -350,8 +350,8 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
 }
 
 .ef-edit-name-form__button {
-  padding-left: $ic-sp/2;
-  padding-right: $ic-sp/2;
+  padding-#{direction(left)}: $ic-sp/2;
+  padding-#{direction(right)}: $ic-sp/2;
 }
 
 .ef-footer {
@@ -404,7 +404,7 @@ body:not(.with-left-side) .ic-app-nav-toggle-and-crumbs--files {
 .DragFeedback {
   position: absolute;
   top: 0;
-  left: 0;
+  #{direction(left)}: 0;
   z-index: 100;
 
   > * {

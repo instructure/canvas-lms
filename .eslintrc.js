@@ -39,13 +39,40 @@ module.exports = {
     "class-methods-use-this": [0],
     "comma-dangle": [2, "only-multiline"],
     "func-names": [0],
+    'guard-for-in': 'off',
     "max-len": [1, {"code": 140}],
     "no-continue": [0],
+    "react/destructuring-assignment": [0],
     "react/no-typos": [0],
     "no-cond-assign": ["warn", "except-parens"],
     "no-else-return": [0],
     "no-nested-ternary": "off",
+    'no-param-reassign': 'off',
     "no-plusplus": [0],
+    'no-prototype-builtins': 'off',
+    "no-restricted-syntax": [
+      "warn",
+      // note: in the default airbnb styleguide this is enabled but we do this
+      // all the time and we don't have to worry about somone garbage to
+      // Object.prototype (or if someone did, a ton of other code would break too)
+      // so we're turning it off
+      // {
+      //   "selector": "ForInStatement",
+      //   "message": "for..in loops iterate over the entire prototype chain, which is virtually never what you want. Use Object.{keys,values,entries}, and iterate over the resulting array."
+      // },
+      {
+        "selector": "ForOfStatement",
+        "message": "iterators/generators require regenerator-runtime ... unless you know for sure you're dealing with an array, in which case they are fine. so `for (const el of Array.from($('someSelector')))` and `for (const key of ['foo', 'bar'])` are both ok but `for (const el of $('someSelector'))` is not."
+      },
+      {
+        "selector": "LabeledStatement",
+        "message": "Labels are a form of GOTO; using them makes code confusing and hard to maintain and understand."
+      },
+      {
+        "selector": "WithStatement",
+        "message": "`with` is disallowed in strict mode because it makes code impossible to predict and optimize."
+      }
+    ],
     "no-return-assign": "off",
     "no-underscore-dangle": [0],
     "no-unused-vars": [2, { "argsIgnorePattern": "^_"}],
@@ -82,6 +109,7 @@ module.exports = {
         "import/no-commonjs": "error",
         "import/no-extraneous-dependencies": "off", // allows 'i18n!webzip_exports' and 'compiled/foo/bar'
         "import/no-nodejs-modules": "error",
+        'import/order': 'off', // because it thinks 'jsx/whatever' and 'compiled/baz' should go in their groups. we don't want to encourage people to do that just so they move them back together once  those everything is in same dir
         "import/no-unresolved": "off",
         "import/no-webpack-loader-syntax": "off"
       },

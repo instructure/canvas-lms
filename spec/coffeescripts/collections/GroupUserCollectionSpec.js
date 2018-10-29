@@ -21,7 +21,7 @@ import UnassignedGroupUserCollection from 'compiled/collections/UnassignedGroupU
 import GroupCategory from 'compiled/models/GroupCategory'
 import GroupUser from 'compiled/models/GroupUser'
 import Group from 'compiled/models/Group'
-import {Collection} from 'Backbone'
+import Backbone from 'Backbone'
 
 let source = null
 let target = null
@@ -32,7 +32,7 @@ QUnit.module('GroupUserCollection', {
   setup() {
     group = new Group({id: 1})
     const category = new GroupCategory()
-    category._groups = new Collection([group])
+    category._groups = new Backbone.Collection([group])
     users = [
       new GroupUser({
         id: 1,

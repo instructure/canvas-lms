@@ -7877,6 +7877,7 @@ en-AU:
   enable_the_creation_of_blueprint_courses_79f91c30: "Enable the creation of Blueprint Courses"
   enable_the_creation_of_master_courses_8205b155: "Enable the creation of Master Courses"
   enable_the_plagiarism_detection_platform_7c3b6195: "Enable the plagiarism detection platform"
+  enable_toolname_b06257b7: "Enable %{toolName}"
   enabled_and_locked_49ff3de4: "Enabled and Locked"
   enabled_ba7cab66: Enabled
   enabled_by_default_e530d6ed: "Enabled by Default"

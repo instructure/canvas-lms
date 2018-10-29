@@ -80,7 +80,7 @@
   display: block;
   position: absolute;
   top: 0;
-  left: 0;
+  #{direction(left)}: 0;
   animation-name: rotate;
   animation-duration: 2.25s;
   animation-iteration-count: infinite;

@@ -5,6 +5,9 @@
   "add_to_do_7def3c37": {
     "message": "Bæta við Verkefni"
   },
+  "address_3159962f": {
+    "message": "Aðsetur:"
+  },
   "all_day_fb42c4fc": {
     "message": "Allan dag"
   },
@@ -56,6 +59,9 @@
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Upphaf verkefnasögu þinnar"
   },
+  "calendar_a8563bb2": {
+    "message": "Dagatal:"
+  },
   "calendar_event_89aadc1c": {
     "message": "Dagatalsviðburður"
   },
@@ -92,11 +98,17 @@
   "date_is_required_8660ec22": {
     "message": "Dagsetningar er krafist"
   },
+  "date_time_d9fbf2d7": {
+    "message": "Dagsetning og tími:"
+  },
   "delete_a6efa79d": {
     "message": "Eyða"
   },
   "details_98a31b68": {
     "message": "Upplýsingar"
+  },
+  "details_a6f427c3": {
+    "message": "Upplýsingar:"
   },
   "discussion_6719c51d": {
     "message": "Umræða"
@@ -193,6 +205,9 @@
   },
   "loading_planner_items_947a813d": {
     "message": "Hleður skipulögðum atriðum"
+  },
+  "location_3b6ff307": {
+    "message": "Staðsetning:"
   },
   "looks_like_there_isn_t_anything_here_d9bcef49": {
     "message": "Lítur út fyrir að vera autt"
@@ -301,6 +316,12 @@
   },
   "startdate_to_enddate_d245175b": {
     "message": "{ startDate } til { endDate }"
+  },
+  "startdatetime_enddatetime_20abc10e": {
+    "message": "{ startDateTime } - { endDateTime }"
+  },
+  "startdatetime_endtime_49741bbe": {
+    "message": "{ startDateTime } - { endTime }"
   },
   "starttime_to_endtime_d7cc249d": {
     "message": "{ startTime } til { endTime }"

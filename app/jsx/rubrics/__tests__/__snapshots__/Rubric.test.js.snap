@@ -1,52 +1,347 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`the Rubric component hides the score total when needed 1`] = `
-"<div className=\\"react-rubric\\" style={{...}}>
-  <Table caption=\\"Point Rubric\\" hover={false} size=\\"medium\\">
+<div
+  className="react-rubric"
+  style={
+    Object {
+      "minWidth": "37.5rem",
+    }
+  }
+>
+  <Table
+    caption="Point Rubric"
+    hover={false}
+    size="medium"
+  >
     <thead>
       <tr>
-        <th scope=\\"col\\" className={[undefined]}>
+        <th
+          className="rubric-criteria"
+          scope="col"
+        >
           Criteria
         </th>
-        <th scope=\\"col\\" className=\\"ratings\\">
+        <th
+          className="ratings"
+          scope="col"
+        >
           Ratings
         </th>
-        <th scope=\\"col\\">
+        <th
+          className="rubric-points"
+          scope="col"
+        >
           Pts
         </th>
       </tr>
     </thead>
-    <tbody className=\\"criterions\\">
-      <Criterion allowExtraCredit={false} assessment={{...}} criterion={{...}} customRatings={{...}} freeForm={false} isSummary={false} onAssessmentChange={{...}} savedComments={{...}} hidePoints={false} hasPointsColumn={true} />
-      <Criterion allowExtraCredit={false} assessment={{...}} criterion={{...}} customRatings={{...}} freeForm={false} isSummary={false} onAssessmentChange={{...}} savedComments={{...}} hidePoints={false} hasPointsColumn={true} />
+    <tbody
+      className="criterions"
+    >
+      <Criterion
+        allowExtraCredit={false}
+        assessment={
+          Object {
+            "comments": "i'd like to say some things",
+            "comments_enabled": true,
+            "criterion_id": "_1384",
+            "description": "bleh",
+            "id": "7_4778",
+            "learning_outcome_id": null,
+            "points": Object {
+              "text": null,
+              "valid": true,
+              "value": 3.2,
+            },
+          }
+        }
+        criterion={
+          Object {
+            "criterion_use_range": false,
+            "description": "Description of criterion",
+            "id": "_1384",
+            "long_description": "",
+            "points": 8,
+            "ratings": Array [
+              Object {
+                "criterion_id": "_1384",
+                "description": "Full Marks",
+                "id": "blank",
+                "long_description": "",
+                "points": 8,
+              },
+              Object {
+                "criterion_id": "_1384",
+                "description": "bleh",
+                "id": "7_4778",
+                "long_description": "blah",
+                "points": 3,
+              },
+              Object {
+                "criterion_id": "_1384",
+                "description": "No Marks",
+                "id": "blank_2",
+                "long_description": "",
+                "points": 0,
+              },
+            ],
+          }
+        }
+        customRatings={Array []}
+        freeForm={false}
+        hasPointsColumn={true}
+        hidePoints={false}
+        isSummary={false}
+        key="_1384"
+        onAssessmentChange={null}
+        savedComments={Array []}
+      />
+      <Criterion
+        allowExtraCredit={false}
+        assessment={
+          Object {
+            "above_threshold": false,
+            "comments": "here too",
+            "comments_enabled": true,
+            "criterion_id": "7_391",
+            "description": "Naturligvis hadde han ogsaa længe forstaat hvorfor Inger hadde.",
+            "id": "7_6639",
+            "learning_outcome_id": "612",
+            "points": Object {
+              "text": null,
+              "valid": true,
+              "value": 3,
+            },
+          }
+        }
+        criterion={
+          Object {
+            "criterion_use_range": false,
+            "description": "Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.",
+            "id": "7_391",
+            "ignore_for_scoring": false,
+            "learning_outcome_id": "612",
+            "long_description": "sa Sivert.",
+            "mastery_points": 3,
+            "points": 3,
+            "ratings": Array [
+              Object {
+                "criterion_id": "7_391",
+                "description": "Naturligvis hadde han ogsaa længe forstaat hvorfor Inger hadde ordet om.",
+                "id": "7_6639",
+                "long_description": "",
+                "points": 3,
+              },
+              Object {
+                "criterion_id": "7_391",
+                "description": "De levet tæt hos hverandre som Dyr i Skogen, de sov og spiste, det lidde saa.",
+                "id": "7_194",
+                "long_description": "",
+                "points": 2,
+              },
+              Object {
+                "criterion_id": "7_391",
+                "description": "Et graat og rødt Uldtørklæde med Frynser var pragtfuldt paa hendes mørke Haar.",
+                "id": "7_8479",
+                "long_description": "",
+                "points": 1,
+              },
+            ],
+          }
+        }
+        customRatings={Array []}
+        freeForm={false}
+        hasPointsColumn={true}
+        hidePoints={false}
+        isSummary={false}
+        key="7_391"
+        onAssessmentChange={null}
+        savedComments={Array []}
+      />
     </tbody>
   </Table>
-</div>"
+</div>
 `;
 
 exports[`the Rubric component renders as expected 1`] = `
-"<div className=\\"react-rubric\\" style={{...}}>
-  <Table caption=\\"Point Rubric\\" hover={false} size=\\"medium\\">
+<div
+  className="react-rubric"
+  style={
+    Object {
+      "minWidth": "37.5rem",
+    }
+  }
+>
+  <Table
+    caption="Point Rubric"
+    hover={false}
+    size="medium"
+  >
     <thead>
       <tr>
-        <th scope=\\"col\\" className={[undefined]}>
+        <th
+          className="rubric-criteria"
+          scope="col"
+        >
           Criteria
         </th>
-        <th scope=\\"col\\" className=\\"ratings\\">
+        <th
+          className="ratings"
+          scope="col"
+        >
           Ratings
         </th>
-        <th scope=\\"col\\">
+        <th
+          className="rubric-points"
+          scope="col"
+        >
           Pts
         </th>
       </tr>
     </thead>
-    <tbody className=\\"criterions\\">
-      <Criterion allowExtraCredit={false} assessment={{...}} criterion={{...}} customRatings={{...}} freeForm={false} isSummary={false} onAssessmentChange={{...}} savedComments={{...}} hidePoints={false} hasPointsColumn={true} />
-      <Criterion allowExtraCredit={false} assessment={{...}} criterion={{...}} customRatings={{...}} freeForm={false} isSummary={false} onAssessmentChange={{...}} savedComments={{...}} hidePoints={false} hasPointsColumn={true} />
+    <tbody
+      className="criterions"
+    >
+      <Criterion
+        allowExtraCredit={false}
+        assessment={
+          Object {
+            "comments": "i'd like to say some things",
+            "comments_enabled": true,
+            "criterion_id": "_1384",
+            "description": "bleh",
+            "id": "7_4778",
+            "learning_outcome_id": null,
+            "points": Object {
+              "text": null,
+              "valid": true,
+              "value": 3.2,
+            },
+          }
+        }
+        criterion={
+          Object {
+            "criterion_use_range": false,
+            "description": "Description of criterion",
+            "id": "_1384",
+            "long_description": "",
+            "points": 8,
+            "ratings": Array [
+              Object {
+                "criterion_id": "_1384",
+                "description": "Full Marks",
+                "id": "blank",
+                "long_description": "",
+                "points": 8,
+              },
+              Object {
+                "criterion_id": "_1384",
+                "description": "bleh",
+                "id": "7_4778",
+                "long_description": "blah",
+                "points": 3,
+              },
+              Object {
+                "criterion_id": "_1384",
+                "description": "No Marks",
+                "id": "blank_2",
+                "long_description": "",
+                "points": 0,
+              },
+            ],
+          }
+        }
+        customRatings={Array []}
+        freeForm={false}
+        hasPointsColumn={true}
+        hidePoints={false}
+        isSummary={false}
+        key="_1384"
+        onAssessmentChange={null}
+        savedComments={Array []}
+      />
+      <Criterion
+        allowExtraCredit={false}
+        assessment={
+          Object {
+            "above_threshold": false,
+            "comments": "here too",
+            "comments_enabled": true,
+            "criterion_id": "7_391",
+            "description": "Naturligvis hadde han ogsaa længe forstaat hvorfor Inger hadde.",
+            "id": "7_6639",
+            "learning_outcome_id": "612",
+            "points": Object {
+              "text": null,
+              "valid": true,
+              "value": 3,
+            },
+          }
+        }
+        criterion={
+          Object {
+            "criterion_use_range": false,
+            "description": "Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.",
+            "id": "7_391",
+            "ignore_for_scoring": false,
+            "learning_outcome_id": "612",
+            "long_description": "sa Sivert.",
+            "mastery_points": 3,
+            "points": 3,
+            "ratings": Array [
+              Object {
+                "criterion_id": "7_391",
+                "description": "Naturligvis hadde han ogsaa længe forstaat hvorfor Inger hadde ordet om.",
+                "id": "7_6639",
+                "long_description": "",
+                "points": 3,
+              },
+              Object {
+                "criterion_id": "7_391",
+                "description": "De levet tæt hos hverandre som Dyr i Skogen, de sov og spiste, det lidde saa.",
+                "id": "7_194",
+                "long_description": "",
+                "points": 2,
+              },
+              Object {
+                "criterion_id": "7_391",
+                "description": "Et graat og rødt Uldtørklæde med Frynser var pragtfuldt paa hendes mørke Haar.",
+                "id": "7_8479",
+                "long_description": "",
+                "points": 1,
+              },
+            ],
+          }
+        }
+        customRatings={Array []}
+        freeForm={false}
+        hasPointsColumn={true}
+        hidePoints={false}
+        isSummary={false}
+        key="7_391"
+        onAssessmentChange={null}
+        savedComments={Array []}
+      />
       <tr>
-        <td colSpan=\\"3\\">
-          <Flex justifyItems=\\"end\\" as=\\"span\\" direction=\\"row\\" alignItems=\\"center\\" inline={false} visualDebug={false} wrapItems={false}>
-            <FlexItem data-selenium=\\"rubric_total\\" as=\\"span\\" grow={false} shrink={false}>
+        <td
+          colSpan="3"
+        >
+          <Flex
+            alignItems="center"
+            as="span"
+            direction="row"
+            inline={false}
+            justifyItems="end"
+            visualDebug={false}
+            wrapItems={false}
+          >
+            <FlexItem
+              as="span"
+              data-selenium="rubric_total"
+              grow={false}
+              shrink={false}
+            >
               Total Points: 6
             </FlexItem>
           </Flex>
@@ -54,32 +349,158 @@ exports[`the Rubric component renders as expected 1`] = `
       </tr>
     </tbody>
   </Table>
-</div>"
+</div>
 `;
 
 exports[`the Rubric component renders properly with no assessment 1`] = `
-"<div className=\\"react-rubric\\" style={{...}}>
-  <Table caption=\\"Point Rubric\\" hover={false} size=\\"medium\\">
+<div
+  className="react-rubric"
+  style={
+    Object {
+      "minWidth": "37.5rem",
+    }
+  }
+>
+  <Table
+    caption="Point Rubric"
+    hover={false}
+    size="medium"
+  >
     <thead>
       <tr>
-        <th scope=\\"col\\" className={[undefined]}>
+        <th
+          className="rubric-criteria"
+          scope="col"
+        >
           Criteria
         </th>
-        <th scope=\\"col\\" className=\\"ratings\\">
+        <th
+          className="ratings"
+          scope="col"
+        >
           Ratings
         </th>
-        <th scope=\\"col\\">
+        <th
+          className="rubric-points"
+          scope="col"
+        >
           Pts
         </th>
       </tr>
     </thead>
-    <tbody className=\\"criterions\\">
-      <Criterion allowExtraCredit={false} assessment={{...}} criterion={{...}} customRatings={{...}} freeForm={false} isSummary={false} onAssessmentChange={{...}} savedComments={{...}} hidePoints={false} hasPointsColumn={true} />
-      <Criterion allowExtraCredit={false} assessment={{...}} criterion={{...}} customRatings={{...}} freeForm={false} isSummary={false} onAssessmentChange={{...}} savedComments={{...}} hidePoints={false} hasPointsColumn={true} />
+    <tbody
+      className="criterions"
+    >
+      <Criterion
+        allowExtraCredit={false}
+        assessment={null}
+        criterion={
+          Object {
+            "criterion_use_range": false,
+            "description": "Description of criterion",
+            "id": "_1384",
+            "long_description": "",
+            "points": 8,
+            "ratings": Array [
+              Object {
+                "criterion_id": "_1384",
+                "description": "Full Marks",
+                "id": "blank",
+                "long_description": "",
+                "points": 8,
+              },
+              Object {
+                "criterion_id": "_1384",
+                "description": "bleh",
+                "id": "7_4778",
+                "long_description": "blah",
+                "points": 3,
+              },
+              Object {
+                "criterion_id": "_1384",
+                "description": "No Marks",
+                "id": "blank_2",
+                "long_description": "",
+                "points": 0,
+              },
+            ],
+          }
+        }
+        customRatings={Array []}
+        freeForm={false}
+        hasPointsColumn={true}
+        hidePoints={false}
+        isSummary={false}
+        key="_1384"
+        onAssessmentChange={null}
+        savedComments={Array []}
+      />
+      <Criterion
+        allowExtraCredit={false}
+        assessment={null}
+        criterion={
+          Object {
+            "criterion_use_range": false,
+            "description": "Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.",
+            "id": "7_391",
+            "ignore_for_scoring": false,
+            "learning_outcome_id": "612",
+            "long_description": "sa Sivert.",
+            "mastery_points": 3,
+            "points": 3,
+            "ratings": Array [
+              Object {
+                "criterion_id": "7_391",
+                "description": "Naturligvis hadde han ogsaa længe forstaat hvorfor Inger hadde ordet om.",
+                "id": "7_6639",
+                "long_description": "",
+                "points": 3,
+              },
+              Object {
+                "criterion_id": "7_391",
+                "description": "De levet tæt hos hverandre som Dyr i Skogen, de sov og spiste, det lidde saa.",
+                "id": "7_194",
+                "long_description": "",
+                "points": 2,
+              },
+              Object {
+                "criterion_id": "7_391",
+                "description": "Et graat og rødt Uldtørklæde med Frynser var pragtfuldt paa hendes mørke Haar.",
+                "id": "7_8479",
+                "long_description": "",
+                "points": 1,
+              },
+            ],
+          }
+        }
+        customRatings={Array []}
+        freeForm={false}
+        hasPointsColumn={true}
+        hidePoints={false}
+        isSummary={false}
+        key="7_391"
+        onAssessmentChange={null}
+        savedComments={Array []}
+      />
       <tr>
-        <td colSpan=\\"3\\">
-          <Flex justifyItems=\\"end\\" as=\\"span\\" direction=\\"row\\" alignItems=\\"center\\" inline={false} visualDebug={false} wrapItems={false}>
-            <FlexItem data-selenium=\\"rubric_total\\" as=\\"span\\" grow={false} shrink={false}>
+        <td
+          colSpan="3"
+        >
+          <Flex
+            alignItems="center"
+            as="span"
+            direction="row"
+            inline={false}
+            justifyItems="end"
+            visualDebug={false}
+            wrapItems={false}
+          >
+            <FlexItem
+              as="span"
+              data-selenium="rubric_total"
+              grow={false}
+              shrink={false}
+            >
               Total Points: 11
             </FlexItem>
           </Flex>
@@ -87,32 +508,186 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
       </tr>
     </tbody>
   </Table>
-</div>"
+</div>
 `;
 
 exports[`the Rubric component updates the total score when an individual criterion point assessment changes 1`] = `
-"<div className=\\"react-rubric\\" style={{...}}>
-  <Table caption=\\"Point Rubric\\" hover={false} size=\\"medium\\">
+<div
+  className="react-rubric"
+  style={
+    Object {
+      "minWidth": "37.5rem",
+    }
+  }
+>
+  <Table
+    caption="Point Rubric"
+    hover={false}
+    size="medium"
+  >
     <thead>
       <tr>
-        <th scope=\\"col\\" className={[undefined]}>
+        <th
+          className="rubric-criteria"
+          scope="col"
+        >
           Criteria
         </th>
-        <th scope=\\"col\\" className=\\"ratings\\">
+        <th
+          className="ratings"
+          scope="col"
+        >
           Ratings
         </th>
-        <th scope=\\"col\\">
+        <th
+          className="rubric-points"
+          scope="col"
+        >
           Pts
         </th>
       </tr>
     </thead>
-    <tbody className=\\"criterions\\">
-      <Criterion allowExtraCredit={false} assessment={{...}} criterion={{...}} customRatings={{...}} freeForm={false} isSummary={false} onAssessmentChange={[Function]} savedComments={{...}} hidePoints={false} hasPointsColumn={true} />
-      <Criterion allowExtraCredit={false} assessment={{...}} criterion={{...}} customRatings={{...}} freeForm={false} isSummary={false} onAssessmentChange={[Function]} savedComments={{...}} hidePoints={false} hasPointsColumn={true} />
+    <tbody
+      className="criterions"
+    >
+      <Criterion
+        allowExtraCredit={false}
+        assessment={
+          Object {
+            "comments": "i'd like to say some things",
+            "comments_enabled": true,
+            "criterion_id": "_1384",
+            "description": "bleh",
+            "id": "7_4778",
+            "learning_outcome_id": null,
+            "points": Object {
+              "valid": true,
+              "value": 2,
+            },
+          }
+        }
+        criterion={
+          Object {
+            "criterion_use_range": false,
+            "description": "Description of criterion",
+            "id": "_1384",
+            "long_description": "",
+            "points": 8,
+            "ratings": Array [
+              Object {
+                "criterion_id": "_1384",
+                "description": "Full Marks",
+                "id": "blank",
+                "long_description": "",
+                "points": 8,
+              },
+              Object {
+                "criterion_id": "_1384",
+                "description": "bleh",
+                "id": "7_4778",
+                "long_description": "blah",
+                "points": 3,
+              },
+              Object {
+                "criterion_id": "_1384",
+                "description": "No Marks",
+                "id": "blank_2",
+                "long_description": "",
+                "points": 0,
+              },
+            ],
+          }
+        }
+        customRatings={Array []}
+        freeForm={false}
+        hasPointsColumn={true}
+        hidePoints={false}
+        isSummary={false}
+        key="_1384"
+        onAssessmentChange={[Function]}
+        savedComments={Array []}
+      />
+      <Criterion
+        allowExtraCredit={false}
+        assessment={
+          Object {
+            "above_threshold": false,
+            "comments": "here too",
+            "comments_enabled": true,
+            "criterion_id": "7_391",
+            "description": "Naturligvis hadde han ogsaa længe forstaat hvorfor Inger hadde.",
+            "id": "7_6639",
+            "learning_outcome_id": "612",
+            "points": Object {
+              "text": null,
+              "valid": true,
+              "value": 3,
+            },
+          }
+        }
+        criterion={
+          Object {
+            "criterion_use_range": false,
+            "description": "Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag.",
+            "id": "7_391",
+            "ignore_for_scoring": false,
+            "learning_outcome_id": "612",
+            "long_description": "sa Sivert.",
+            "mastery_points": 3,
+            "points": 3,
+            "ratings": Array [
+              Object {
+                "criterion_id": "7_391",
+                "description": "Naturligvis hadde han ogsaa længe forstaat hvorfor Inger hadde ordet om.",
+                "id": "7_6639",
+                "long_description": "",
+                "points": 3,
+              },
+              Object {
+                "criterion_id": "7_391",
+                "description": "De levet tæt hos hverandre som Dyr i Skogen, de sov og spiste, det lidde saa.",
+                "id": "7_194",
+                "long_description": "",
+                "points": 2,
+              },
+              Object {
+                "criterion_id": "7_391",
+                "description": "Et graat og rødt Uldtørklæde med Frynser var pragtfuldt paa hendes mørke Haar.",
+                "id": "7_8479",
+                "long_description": "",
+                "points": 1,
+              },
+            ],
+          }
+        }
+        customRatings={Array []}
+        freeForm={false}
+        hasPointsColumn={true}
+        hidePoints={false}
+        isSummary={false}
+        key="7_391"
+        onAssessmentChange={[Function]}
+        savedComments={Array []}
+      />
       <tr>
-        <td colSpan=\\"3\\">
-          <Flex justifyItems=\\"end\\" as=\\"span\\" direction=\\"row\\" alignItems=\\"center\\" inline={false} visualDebug={false} wrapItems={false}>
-            <FlexItem data-selenium=\\"rubric_total\\" as=\\"span\\" grow={false} shrink={false}>
+        <td
+          colSpan="3"
+        >
+          <Flex
+            alignItems="center"
+            as="span"
+            direction="row"
+            inline={false}
+            justifyItems="end"
+            visualDebug={false}
+            wrapItems={false}
+          >
+            <FlexItem
+              as="span"
+              data-selenium="rubric_total"
+              grow={false}
+              shrink={false}
+            >
               Total Points: 5 out of 11
             </FlexItem>
           </Flex>
@@ -120,5 +695,5 @@ exports[`the Rubric component updates the total score when an individual criteri
       </tr>
     </tbody>
   </Table>
-</div>"
+</div>
 `;

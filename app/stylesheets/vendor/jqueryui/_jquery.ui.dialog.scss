@@ -11,7 +11,7 @@
 .ui-dialog { position: absolute; padding: .2em; width: 300px; overflow: hidden; }
 
 .ui-dialog .ui-dialog-title {
-  float: direction(left); margin: 0 16px 0 0;
+  float: direction(left); margin: direction-sides(0 16px 0 0);
   @include fontSize(18px);
   font-weight: normal;
 }
@@ -20,7 +20,7 @@
   #{direction(right)}: .3em;
   top: 50%;
   width: 19px;
-  margin: -10px 0 0 0;
+  margin: direction-sides(-10px 0 0 0);
   padding: 1px;
   height: 18px;
   padding: 0;
@@ -33,7 +33,7 @@
 .ui-dialog .ui-dialog-titlebar-close span { display: block; margin: 1px; }
 .ui-dialog .ui-dialog-titlebar-close:hover, .ui-dialog .ui-dialog-titlebar-close:focus { padding: 0; }
 .ui-dialog .ui-dialog-content { position: relative; border: 0; padding: .5em 1em; background: none; overflow: auto; zoom: 1; }
-.ui-dialog .ui-dialog-buttonpane { text-align: direction(left); border-width: 1px 0 0 0; background-image: none; margin: .5em 0 0 0; padding: direction-sides(.3em 1em .5em .4em); }
+.ui-dialog .ui-dialog-buttonpane { text-align: direction(left); border-width: direction-sides(1px 0 0 0); background-image: none; margin: direction-sides(.5em 0 0 0); padding: direction-sides(.3em 1em .5em .4em); }
 .ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset { float: direction(right); }
 .ui-dialog .ui-dialog-buttonpane button { margin: direction-sides(.5em .4em .5em 0); cursor: pointer; }
 .ui-dialog .ui-resizable-se { width: 14px; height: 14px; #{direction(right)}: 3px; bottom: 3px; }
@@ -97,8 +97,8 @@
 
 .ui-datepicker .ui-datepicker-header,
 .ui-dialog .ui-dialog-titlebar {
-  border-top: 0; border-left: 0; border-right: 0;
-  border-bottom-left-radius: 0; border-bottom-right-radius: 0;
+  border-top: 0; border-#{direction(left)}: 0; border-#{direction(right)}: 0;
+  border-bottom-#{direction(left)}-radius: 0; border-bottom-#{direction(right)}-radius: 0;
   font-weight: bold;
   @include fontSize(14px);
 }

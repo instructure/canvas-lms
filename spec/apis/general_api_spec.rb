@@ -85,6 +85,7 @@ describe "API", type: :request do
   describe "json post format" do
     before :once do
       course_with_teacher(:user => user_with_pseudonym, :active_all => true)
+      enable_default_developer_key!
       @token = @user.access_tokens.create!(:purpose => "specs")
     end
 

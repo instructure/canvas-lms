@@ -44,8 +44,6 @@ describe "ApplicationController Token Scoping", type: :request do
 
     before(:once) do
       course_with_teacher(user: user_with_pseudonym, active_all: true)
-      Account.site_admin.enable_feature!(:developer_key_management_and_scoping)
-      Account.default.enable_feature!(:developer_key_management_and_scoping)
     end
 
     before { enable_developer_key_account_binding!(developer_key) }

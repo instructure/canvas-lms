@@ -96,7 +96,7 @@ body {
     @include bg-image("footer-logo", "png", no-repeat, left, top, transparent, 114px, 10px);
     display: inline-block;
     height: 10px;
-    margin: 0 20px 0 0;
+    margin: direction-sides(0 20px 0 0);
     width: 114px;
   }
 }

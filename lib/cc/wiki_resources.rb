@@ -40,8 +40,10 @@ module CC
           meta_fields[:workflow_state] = page.workflow_state
           meta_fields[:front_page] = page.is_front_page?
           meta_fields[:module_locked] = page.locked_by_module_item?(@user, deep_check_if_needed: true).present?
-          meta_fields[:assignment_identifier] =
-            page.for_assignment? ? create_key(page.assignment) : nil
+          if page.for_assignment?
+            meta_fields[:assignment_identifier] = create_key(page.assignment)
+            meta_fields[:only_visible_to_overrides] = page.assignment.only_visible_to_overrides
+          end
           meta_fields[:todo_date] = page.todo_date
 
           File.open(path, 'w') do |file|

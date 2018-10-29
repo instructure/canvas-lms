@@ -82,7 +82,7 @@ export class Opportunities extends Component {
   }
 
   getFocusable () {
-    return this.newTabRef;
+    return this.closeButtonRef;
   }
 
   handleKeyDown = (event) => {

@@ -379,7 +379,9 @@ window.rubricAssessment = {
   },
 
   populateNewRubricSummary: function(container, assessment, rubricAssociation, editData) {
+    const el = container.get(0)
     if (ENV.nonScoringRubrics && ENV.rubric) {
+      ReactDOM.unmountComponentAtNode(el)
       if(assessment) {
         const filled = rubricAssessment.fillAssessment(ENV.rubric, assessment || {})
         ReactDOM.render(<Rubric
@@ -389,9 +391,9 @@ window.rubricAssessment = {
           rubricAssociation={rubricAssociation}
           isSummary={true}>
           {null}
-        </Rubric>, container.get(0))
+        </Rubric>, el)
       } else {
-        container.get(0).innerHTML = ''
+        el.innerHTML = ''
       }
     } else {
       rubricAssessment.populateRubricSummary(

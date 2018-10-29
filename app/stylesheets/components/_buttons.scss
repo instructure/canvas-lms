@@ -222,8 +222,8 @@ listen to the "click" and "keyclick" events and add `tabindex="0"` and `role="bu
 .Button--block {
   display: block;
   width: 100%;
-  padding-left: 0;
-  padding-right: 0;
+  padding-#{direction(left)}: 0;
+  padding-#{direction(right)}: 0;
   box-sizing: border-box;
 }
 

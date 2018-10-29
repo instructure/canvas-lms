@@ -5,6 +5,9 @@
   "add_to_do_7def3c37": {
     "message": "To-do lijst toevoegen"
   },
+  "address_3159962f": {
+    "message": "Adres:"
+  },
   "all_day_fb42c4fc": {
     "message": "De hele dag"
   },
@@ -56,6 +59,9 @@
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Begin van je To-do-historie"
   },
+  "calendar_a8563bb2": {
+    "message": "Kalender:"
+  },
   "calendar_event_89aadc1c": {
     "message": "Gebeurtenis op kalender"
   },
@@ -92,11 +98,17 @@
   "date_is_required_8660ec22": {
     "message": "Datum is verplicht"
   },
+  "date_time_d9fbf2d7": {
+    "message": "Datum en tijd:"
+  },
   "delete_a6efa79d": {
     "message": "Verwijderen"
   },
   "details_98a31b68": {
     "message": "Details"
+  },
+  "details_a6f427c3": {
+    "message": "Details..."
   },
   "discussion_6719c51d": {
     "message": "Discussie"
@@ -193,6 +205,9 @@
   },
   "loading_planner_items_947a813d": {
     "message": "Planner items laden"
+  },
+  "location_3b6ff307": {
+    "message": "Locatie:"
   },
   "looks_like_there_isn_t_anything_here_d9bcef49": {
     "message": "Het lijkt erop dat er hier niets is"
@@ -301,6 +316,12 @@
   },
   "startdate_to_enddate_d245175b": {
     "message": "{ startDate } tot { endDate }"
+  },
+  "startdatetime_enddatetime_20abc10e": {
+    "message": "{ startDateTime } - { endDateTime }"
+  },
+  "startdatetime_endtime_49741bbe": {
+    "message": "{ startDateTime } - { endTime }"
   },
   "starttime_to_endtime_d7cc249d": {
     "message": "{ startTime } tot { endTime }"

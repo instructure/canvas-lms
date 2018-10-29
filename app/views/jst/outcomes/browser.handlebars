@@ -7,25 +7,21 @@
     </button>
 
     {{#if canManageOutcomes}}
-    <button class="add_outcome_link ui-button ui-widget ui-state-default ui-corner-all">
+    <button class="add_outcome_link ui-button ui-widget ui-state-default ui-corner-all" aria-label="{{#t}}Add a New Outcome{{/t}}">
       <i class="icon-plus"></i>
       <span class="ui-button-text" aria-hidden="true">{{#t}}Outcome{{/t}}</span>
-      <span class="screenreader-only">{{#t}}Add a New Outcome{{/t}}</span>
     </button>
-    <button class="add_outcome_group ui-button ui-widget ui-state-default ui-corner-all">
+    <button class="add_outcome_group ui-button ui-widget ui-state-default ui-corner-all" aria-label="{{#t}}Add a New Outcome Group{{/t}}">
       <i class="icon-plus"></i>
       <span class="ui-button-text" aria-hidden="true">{{#t}}Group{{/t}}</span>
-      <span class="screenreader-only">{{#t}}Add a New Outcome Group{{/t}}</span>
     </button>
-    <button class="import_outcomes ui-button ui-widget ui-state-default ui-corner-all">
+    <button class="import_outcomes ui-button ui-widget ui-state-default ui-corner-all" aria-label="{{#t}}Import a set of Outcomes{{/t}}">
       <i class="icon-upload"></i>
       <span class="ui-button-text" aria-hidden="true">{{#t}}Import{{/t}}</span>
-      <span class="screenreader-only">{{#t}}Import a set of Outcomes{{/t}}</span>
     </button>
-    <button class="find_outcome ui-button ui-widget ui-state-default ui-corner-all">
+    <button class="find_outcome ui-button ui-widget ui-state-default ui-corner-all" aria-label="{{#t}}Find an Outcome{{/t}}">
       <i class="icon-search"></i>
       <span class="ui-button-text" aria-hidden="true">{{#t}}Find{{/t}}</span>
-      <span class="screenreader-only">{{#t}}Find an Outcome{{/t}}</span>
     </button>
     {{/if}}
     {{#if canManageRubrics }}

@@ -338,8 +338,8 @@ select.un-bootrstrapify {
   // when you want your non-modal .form-actions footer to not have any whitespace around it
   &.flush {
     margin-bottom: -1em;
-    margin-left: -1em;
-    margin-right: -1em;
+    margin-#{direction(left)}: -1em;
+    margin-#{direction(right)}: -1em;
   }
 }
 
@@ -463,7 +463,7 @@ abbr.initialism {
 
 // Blockquotes
 blockquote {
-  padding: 0 0 0 15px;
+  padding: direction-sides(0 0 0 15px);
   margin: 0 0 20px;
   border-#{direction(left)}: 5px solid $ic-border-color;
   p {
@@ -575,21 +575,21 @@ $popoverArrowDistanceFromCorner: $popoverArrowOuterWidth;
     height:0;
     content: "";
     top: -$popoverArrowOuterWidth * 2;
-    left: $popoverArrowDistanceFromCorner;
+    #{direction(left)}: $popoverArrowDistanceFromCorner;
   }
   &:after {
     border-bottom-color: $popoverTitleBackground;
     border-width: $popoverArrowWidth;
     top: -$popoverArrowWidth * 2;
-    left: $popoverArrowDistanceFromCorner + 1;
+    #{direction(left)}: $popoverArrowDistanceFromCorner + 1;
   }
   &.right:before {
-    left: auto;
-    right: $popoverArrowDistanceFromCorner;
+    #{direction(left)}: auto;
+    #{direction(right)}: $popoverArrowDistanceFromCorner;
   }
   &.right:after {
-    left: auto;
-    right: $popoverArrowDistanceFromCorner + 1;
+    #{direction(left)}: auto;
+    #{direction(right)}: $popoverArrowDistanceFromCorner + 1;
   }
   &.bottom:before {
     border-color: $popoverArrowOuterColor transparent transparent transparent;
@@ -602,14 +602,14 @@ $popoverArrowDistanceFromCorner: $popoverArrowOuterWidth;
     bottom: -$popoverArrowWidth * 2;
   }
   &.center:before {
-    left: 50%;
-    margin-left: -$popoverArrowOuterWidth;
-    right: auto;
+    #{direction(left)}: 50%;
+    margin-#{direction(left)}: -$popoverArrowOuterWidth;
+    #{direction(right)}: auto;
   }
   &.center:after {
-    left: 50%;
-    margin-left: -$popoverArrowWidth;
-    right: auto;
+    #{direction(left)}: 50%;
+    margin-#{direction(left)}: -$popoverArrowWidth;
+    #{direction(right)}: auto;
   }
   &.middle:before {
     top: 50%;
@@ -625,26 +625,26 @@ $popoverArrowDistanceFromCorner: $popoverArrowOuterWidth;
     top: 50%;
     margin-top: -$popoverArrowOuterWidth;
     bottom: auto;
-    left: -$popoverArrowOuterWidth * 2;
-    right: auto;
+    #{direction(left)}: -$popoverArrowOuterWidth * 2;
+    #{direction(right)}: auto;
     border-color: transparent $popoverArrowOuterColor transparent transparent;
   }
   &.horizontal:after {
     top: 50%;
     margin-top: -$popoverArrowWidth;
     bottom: auto;
-    left: -$popoverArrowWidth * 2;
-    right: auto;
+    #{direction(left)}: -$popoverArrowWidth * 2;
+    #{direction(right)}: auto;
     border-color: transparent $popoverArrowColor transparent transparent;
   }
   &.right.horizontal:before {
-    left: auto;
-    right: -$popoverArrowOuterWidth * 2;
+    #{direction(left)}: auto;
+    #{direction(right)}: -$popoverArrowOuterWidth * 2;
     border-color: transparent transparent transparent $popoverArrowOuterColor;
   }
   &.right.horizontal:after {
-    left: auto;
-    right: -$popoverArrowWidth * 2;
+    #{direction(left)}: auto;
+    #{direction(right)}: -$popoverArrowWidth * 2;
     border-color: transparent transparent transparent $popoverArrowColor;
   }
   &.bottom.horizontal:before {

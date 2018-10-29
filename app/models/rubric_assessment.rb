@@ -43,7 +43,10 @@ class RubricAssessment < ActiveRecord::Base
 
   def track_outcomes
     outcome_ids = (self.data || []).map{|r| r[:learning_outcome_id] }.compact.uniq
-    send_later_if_production(:update_outcomes_for_assessment, outcome_ids) unless outcome_ids.empty?
+    peer_review = self.assessment_type == "peer_review"
+    provisional_grade = self.artifact_type == "ModeratedGrading::ProvisionalGrade"
+    update_outcomes = outcome_ids.present? && !peer_review && !provisional_grade
+    send_later_if_production(:update_outcomes_for_assessment, outcome_ids) if update_outcomes
   end
 
   def update_outcomes_for_assessment(outcome_ids=[])

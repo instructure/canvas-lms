@@ -55,7 +55,7 @@
     }
 
     .slick-header-column:nth-child(even) {
-      border-right-style:dashed;
+      border-#{direction(right)}-style:dashed;
     }
 
     .slick-cell {
@@ -74,7 +74,7 @@
   }
 
   .slick-cell {
-    border-right-style:dashed;
+    border-#{direction(right)}-style:dashed;
   }
 
   .slick-cell.editable, .slick-cell.active {
@@ -83,7 +83,7 @@
   }
 
   .slick-cell:nth-child(odd) {
-    border-right-style:solid;
+    border-#{direction(right)}-style:solid;
   }
 
   .slick-header-column {
@@ -93,7 +93,7 @@
 
   .left-highlight {
     background-color: lighten($ic-color-danger, 50);
-    border-left-color: $ic-color-danger;
+    border-#{direction(left)}-color: $ic-color-danger;
     border-top-color: $ic-color-danger;
     border-bottom-color: $ic-color-danger;
     color:$ic-color-danger;
@@ -102,8 +102,8 @@
 
   .right-highlight {
     background-color: lighten($ic-color-danger, 50);
-    border-right-style: solid;
-    border-right-color: $ic-color-danger;
+    border-#{direction(right)}-style: solid;
+    border-#{direction(right)}-color: $ic-color-danger;
     border-top-color: $ic-color-danger;
     border-bottom-color: $ic-color-danger;
     color:$ic-color-danger;

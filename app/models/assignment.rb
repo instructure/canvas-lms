@@ -114,7 +114,7 @@ class Assignment < ActiveRecord::Base
   validate :discussion_group_ok?
   validate :positive_points_possible?
   validate :moderation_setting_ok?
-  validate :assignment_name_length_ok?
+  validate :assignment_name_length_ok?, :unless => :deleted?
   validates :lti_context_id, presence: true, uniqueness: true
   validates :grader_count, numericality: true
 
@@ -182,7 +182,8 @@ class Assignment < ActiveRecord::Base
 
   # The relevant associations that are copied are:
   #
-  # learning_outcome_alignments, rubric_association, wiki_page
+  # learning_outcome_alignments, rubric_association, wiki_page,
+  # assignment_configuration_tool_lookups
   #
   # In the case of wiki_page, a new wiki_page will be created.  The underlying
   # rubric association, however, will simply point to the original rubric
@@ -203,6 +204,7 @@ class Assignment < ActiveRecord::Base
     default_opts = {
       :duplicate_wiki_page => true,
       :duplicate_discussion_topic => true,
+      :duplicate_plagiarism_tool_association => true,
       :copy_title => nil,
       :user => nil
     }
@@ -240,6 +242,12 @@ class Assignment < ActiveRecord::Base
     end
 
     result.discussion_topic&.assignment = result
+
+    if self.assignment_configuration_tool_lookups.present? && opts_with_default[:duplicate_plagiarism_tool_association]
+      result.assignment_configuration_tool_lookups = [
+        self.assignment_configuration_tool_lookups.first.dup
+      ]
+    end
 
     # Learning outcome alignments seem to get copied magically, possibly
     # through the rubric

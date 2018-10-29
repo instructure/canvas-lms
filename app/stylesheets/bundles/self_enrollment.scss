@@ -43,7 +43,7 @@ body.embedded {
     text-align: direction(right);
     .footer-info {
       //position: absolute;
-      //left: 1em;
+      //#{direction(left)}: 1em;
       //top: 1.5em;
     }
     .ic-Self-enrollment-footer {

@@ -41,8 +41,8 @@
   border-top: 1px solid $ic-border-color;
 }
 .ic-Login__sso-list {
-  padding: $ic-sp 0 0 0;
-  margin: $ic-sp*2 0 0 0;
+  padding: direction-sides($ic-sp 0 0 0);
+  margin: direction-sides($ic-sp*2 0 0 0);
   border-top: 1px solid var(--ic-brand-Login-footer-link-color);
 }
 .ic-Login__sso-list__item {

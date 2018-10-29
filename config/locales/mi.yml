@@ -7811,6 +7811,7 @@ mi:
   enable_the_creation_of_blueprint_courses_79f91c30: "Whakahohea te hanga o ngā Akoranga Mape"
   enable_the_creation_of_master_courses_8205b155: "Whakahohea te hanganga o ngā Akoranga Ariki"
   enable_the_plagiarism_detection_platform_7c3b6195: "Whakahohe te tūāpapa rapunga tinihanga"
+  enable_toolname_b06257b7: "Whakahohea %{toolName}"
   enabled_and_locked_49ff3de4: "Kua whakahohea me te Rakaina"
   enabled_ba7cab66: "Kua whakahohea"
   enabled_by_default_e530d6ed: "Kua whakahohea e te taunoa"

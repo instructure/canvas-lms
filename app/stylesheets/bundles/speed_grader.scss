@@ -218,8 +218,8 @@ $icon-size: 1.4rem;
   position: absolute;
   top: $gradebook_header_height + 0.0625em;
   bottom: 0;
-  left: 0;
-  right: 0;
+  #{direction(left)}: 0;
+  #{direction(right)}: 0;
   min-width: 960px;
   &.with_moderation_tabs {
     top: $gradebook_header_height * 2;
@@ -790,6 +790,8 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
         overflow: hidden;
       }
       .display_name {
+        display: block;
+        margin-#{direction(right)}: 28px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -813,7 +815,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
     height: 19px;
     margin-#{direction(left)}: 8px;
     padding-#{direction(left)}: 29px;
-    background: url("/images/arrow_left.png") no-repeat center left;
+    background: url("/images/arrow_#{direction(left)}.png") no-repeat center direction(left);
     overflow: hidden;
     white-space: nowrap;
     color: $ic-font-color-dark;
@@ -943,7 +945,7 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 }
 
 #grading-box-selected-grader {
-  margin-left: 10px;
+  margin-#{direction(left)}: 10px;
   font-style: italic;
 }
 

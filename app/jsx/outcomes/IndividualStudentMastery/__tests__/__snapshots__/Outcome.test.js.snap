@@ -1,39 +1,805 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`renders correctly expanded 1`] = `
-"<ToggleGroup summary={{...}} toggleLabel=\\"Toggle alignment details for My outcome\\" expanded={true} onToggle={[Function]} border={false} size=\\"medium\\" icon={[Function: IconArrowOpenEnd]} iconExpanded={[Function: IconArrowOpenDown]} defaultExpanded={false} transition={true} as=\\"span\\" elementRef={[Function: elementRef]}>
-  <List variant=\\"unstyled\\" delimiter=\\"dashed\\" as=\\"ul\\" margin=\\"none\\" size=\\"medium\\">
-    <ListItem>
-      <AssignmentResult result={{...}} outcome={{...}} outcomeProficiency={{...}} />
+<ToggleGroup
+  as="span"
+  border={false}
+  defaultExpanded={false}
+  elementRef={[Function]}
+  expanded={true}
+  icon={[Function]}
+  iconExpanded={[Function]}
+  onToggle={[Function]}
+  size="medium"
+  summary={
+    <Flex
+      alignItems="center"
+      as="span"
+      data-selenium="outcome"
+      direction="row"
+      inline={false}
+      justifyItems="space-between"
+      visualDebug={false}
+      wrapItems={false}
+    >
+      <FlexItem
+        as="span"
+        grow={false}
+        shrink={true}
+      >
+        <Flex
+          alignItems="center"
+          as="span"
+          direction="column"
+          inline={false}
+          justifyItems="start"
+          visualDebug={false}
+          wrapItems={false}
+        >
+          <FlexItem
+            as="span"
+            grow={false}
+            shrink={false}
+          >
+            <Text
+              as="span"
+              letterSpacing="normal"
+              size="medium"
+            >
+              <Flex
+                alignItems="center"
+                as="span"
+                direction="row"
+                inline={false}
+                justifyItems="start"
+                visualDebug={false}
+                wrapItems={false}
+              >
+                <FlexItem
+                  as="span"
+                  grow={false}
+                  shrink={false}
+                >
+                  <OutcomePopover
+                    outcome={
+                      Object {
+                        "assignments": Array [
+                          Object {
+                            "assignment_id": 1,
+                            "learning_outcome_id": 1,
+                            "submission_types": "online_quiz",
+                            "title": "My assignment",
+                            "url": "www.example.com",
+                          },
+                        ],
+                        "calculation_method": "highest",
+                        "expansionId": 100,
+                        "id": 1,
+                        "mastered": false,
+                        "mastery_points": 3,
+                        "points_possible": 5,
+                        "ratings": Array [
+                          Object {
+                            "description": "My first rating",
+                          },
+                          Object {
+                            "description": "My second rating",
+                          },
+                        ],
+                        "results": Array [
+                          Object {
+                            "assignment": Object {
+                              "html_url": "http://foo",
+                              "id": "assignment_1",
+                              "name": "My assignment",
+                              "score": 0,
+                              "submission_types": "online_quiz",
+                            },
+                            "id": 1,
+                            "percent": 0.1,
+                            "score": 1,
+                          },
+                        ],
+                        "title": "My outcome",
+                      }
+                    }
+                    outcomeProficiency={null}
+                  />
+                </FlexItem>
+                <FlexItem
+                  as="span"
+                  grow={false}
+                  padding="0 x-small"
+                  shrink={true}
+                >
+                  <TruncateText
+                    debounce={0}
+                    ellipsis="…"
+                    ignore={
+                      Array [
+                        " ",
+                        ".",
+                        ",",
+                      ]
+                    }
+                    maxLines={1}
+                    onUpdate={[Function]}
+                    position="end"
+                    truncate="character"
+                  >
+                    My outcome
+                  </TruncateText>
+                </FlexItem>
+              </Flex>
+            </Text>
+          </FlexItem>
+          <FlexItem
+            as="span"
+            grow={false}
+            shrink={false}
+          >
+            <Text
+              as="span"
+              letterSpacing="normal"
+              size="small"
+            >
+              1 alignment
+            </Text>
+          </FlexItem>
+        </Flex>
+      </FlexItem>
+      <FlexItem
+        as="span"
+        grow={false}
+        shrink={false}
+      >
+        <Pill
+          text="Not mastered"
+          variant="default"
+        />
+      </FlexItem>
+    </Flex>
+  }
+  toggleLabel="Toggle alignment details for My outcome"
+  transition={true}
+>
+  <List
+    as="ul"
+    delimiter="dashed"
+    margin="none"
+    size="medium"
+    variant="unstyled"
+  >
+    <ListItem
+      key="1"
+    >
+      <AssignmentResult
+        outcome={
+          Object {
+            "assignments": Array [
+              Object {
+                "assignment_id": 1,
+                "learning_outcome_id": 1,
+                "submission_types": "online_quiz",
+                "title": "My assignment",
+                "url": "www.example.com",
+              },
+            ],
+            "calculation_method": "highest",
+            "expansionId": 100,
+            "id": 1,
+            "mastered": false,
+            "mastery_points": 3,
+            "points_possible": 5,
+            "ratings": Array [
+              Object {
+                "description": "My first rating",
+              },
+              Object {
+                "description": "My second rating",
+              },
+            ],
+            "results": Array [
+              Object {
+                "assignment": Object {
+                  "html_url": "http://foo",
+                  "id": "assignment_1",
+                  "name": "My assignment",
+                  "score": 0,
+                  "submission_types": "online_quiz",
+                },
+                "id": 1,
+                "percent": 0.1,
+                "score": 1,
+              },
+            ],
+            "title": "My outcome",
+          }
+        }
+        outcomeProficiency={null}
+        result={
+          Object {
+            "assignment": Object {
+              "html_url": "http://foo",
+              "id": "assignment_1",
+              "name": "My assignment",
+              "score": 0,
+              "submission_types": "online_quiz",
+            },
+            "id": 1,
+            "percent": 0.1,
+            "score": 1,
+          }
+        }
+      />
     </ListItem>
   </List>
-</ToggleGroup>"
+</ToggleGroup>
 `;
 
 exports[`renders correctly expanded with no results 1`] = `
-"<ToggleGroup summary={{...}} toggleLabel=\\"Toggle alignment details for My outcome\\" expanded={true} onToggle={[Function]} border={false} size=\\"medium\\" icon={[Function: IconArrowOpenEnd]} iconExpanded={[Function: IconArrowOpenDown]} defaultExpanded={false} transition={true} as=\\"span\\" elementRef={[Function: elementRef]}>
-  <List variant=\\"unstyled\\" delimiter=\\"dashed\\" as=\\"ul\\" margin=\\"none\\" size=\\"medium\\">
-    <UnassessedAssignment assignment={{...}} />
+<ToggleGroup
+  as="span"
+  border={false}
+  defaultExpanded={false}
+  elementRef={[Function]}
+  expanded={true}
+  icon={[Function]}
+  iconExpanded={[Function]}
+  onToggle={[Function]}
+  size="medium"
+  summary={
+    <Flex
+      alignItems="center"
+      as="span"
+      data-selenium="outcome"
+      direction="row"
+      inline={false}
+      justifyItems="space-between"
+      visualDebug={false}
+      wrapItems={false}
+    >
+      <FlexItem
+        as="span"
+        grow={false}
+        shrink={true}
+      >
+        <Flex
+          alignItems="center"
+          as="span"
+          direction="column"
+          inline={false}
+          justifyItems="start"
+          visualDebug={false}
+          wrapItems={false}
+        >
+          <FlexItem
+            as="span"
+            grow={false}
+            shrink={false}
+          >
+            <Text
+              as="span"
+              letterSpacing="normal"
+              size="medium"
+            >
+              <Flex
+                alignItems="center"
+                as="span"
+                direction="row"
+                inline={false}
+                justifyItems="start"
+                visualDebug={false}
+                wrapItems={false}
+              >
+                <FlexItem
+                  as="span"
+                  grow={false}
+                  shrink={false}
+                >
+                  <OutcomePopover
+                    outcome={
+                      Object {
+                        "assignments": Array [
+                          Object {
+                            "assignment_id": 1,
+                            "learning_outcome_id": 1,
+                            "submission_types": "online_quiz",
+                            "title": "My assignment",
+                            "url": "www.example.com",
+                          },
+                        ],
+                        "calculation_method": "highest",
+                        "expansionId": 100,
+                        "id": 1,
+                        "mastered": false,
+                        "mastery_points": 3,
+                        "points_possible": 5,
+                        "ratings": Array [
+                          Object {
+                            "description": "My first rating",
+                          },
+                          Object {
+                            "description": "My second rating",
+                          },
+                        ],
+                        "results": Array [],
+                        "title": "My outcome",
+                      }
+                    }
+                    outcomeProficiency={null}
+                  />
+                </FlexItem>
+                <FlexItem
+                  as="span"
+                  grow={false}
+                  padding="0 x-small"
+                  shrink={true}
+                >
+                  <TruncateText
+                    debounce={0}
+                    ellipsis="…"
+                    ignore={
+                      Array [
+                        " ",
+                        ".",
+                        ",",
+                      ]
+                    }
+                    maxLines={1}
+                    onUpdate={[Function]}
+                    position="end"
+                    truncate="character"
+                  >
+                    My outcome
+                  </TruncateText>
+                </FlexItem>
+              </Flex>
+            </Text>
+          </FlexItem>
+          <FlexItem
+            as="span"
+            grow={false}
+            shrink={false}
+          >
+            <Text
+              as="span"
+              letterSpacing="normal"
+              size="small"
+            >
+              1 alignment
+            </Text>
+          </FlexItem>
+        </Flex>
+      </FlexItem>
+      <FlexItem
+        as="span"
+        grow={false}
+        shrink={false}
+      >
+        <Pill
+          text="Not mastered"
+          variant="default"
+        />
+      </FlexItem>
+    </Flex>
+  }
+  toggleLabel="Toggle alignment details for My outcome"
+  transition={true}
+>
+  <List
+    as="ul"
+    delimiter="dashed"
+    margin="none"
+    size="medium"
+    variant="unstyled"
+  >
+    <UnassessedAssignment
+      assignment={
+        Object {
+          "assignment_id": 1,
+          "learning_outcome_id": 1,
+          "submission_types": "online_quiz",
+          "title": "My assignment",
+          "url": "www.example.com",
+        }
+      }
+    />
   </List>
-</ToggleGroup>"
+</ToggleGroup>
 `;
 
 exports[`renders correctly expanded with no results or assignments 1`] = `
-"<ToggleGroup summary={{...}} toggleLabel=\\"Toggle alignment details for My outcome\\" expanded={true} onToggle={[Function]} border={false} size=\\"medium\\" icon={[Function: IconArrowOpenEnd]} iconExpanded={[Function: IconArrowOpenDown]} defaultExpanded={false} transition={true} as=\\"span\\" elementRef={[Function: elementRef]}>
-  <View as=\\"div\\" padding=\\"small\\" display=\\"auto\\">
-    <Text as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\">
+<ToggleGroup
+  as="span"
+  border={false}
+  defaultExpanded={false}
+  elementRef={[Function]}
+  expanded={true}
+  icon={[Function]}
+  iconExpanded={[Function]}
+  onToggle={[Function]}
+  size="medium"
+  summary={
+    <Flex
+      alignItems="center"
+      as="span"
+      data-selenium="outcome"
+      direction="row"
+      inline={false}
+      justifyItems="space-between"
+      visualDebug={false}
+      wrapItems={false}
+    >
+      <FlexItem
+        as="span"
+        grow={false}
+        shrink={true}
+      >
+        <Flex
+          alignItems="center"
+          as="span"
+          direction="column"
+          inline={false}
+          justifyItems="start"
+          visualDebug={false}
+          wrapItems={false}
+        >
+          <FlexItem
+            as="span"
+            grow={false}
+            shrink={false}
+          >
+            <Text
+              as="span"
+              letterSpacing="normal"
+              size="medium"
+            >
+              <Flex
+                alignItems="center"
+                as="span"
+                direction="row"
+                inline={false}
+                justifyItems="start"
+                visualDebug={false}
+                wrapItems={false}
+              >
+                <FlexItem
+                  as="span"
+                  grow={false}
+                  shrink={false}
+                >
+                  <OutcomePopover
+                    outcome={
+                      Object {
+                        "assignments": Array [],
+                        "calculation_method": "highest",
+                        "expansionId": 100,
+                        "id": 1,
+                        "mastered": false,
+                        "mastery_points": 3,
+                        "points_possible": 5,
+                        "ratings": Array [
+                          Object {
+                            "description": "My first rating",
+                          },
+                          Object {
+                            "description": "My second rating",
+                          },
+                        ],
+                        "results": Array [],
+                        "title": "My outcome",
+                      }
+                    }
+                    outcomeProficiency={null}
+                  />
+                </FlexItem>
+                <FlexItem
+                  as="span"
+                  grow={false}
+                  padding="0 x-small"
+                  shrink={true}
+                >
+                  <TruncateText
+                    debounce={0}
+                    ellipsis="…"
+                    ignore={
+                      Array [
+                        " ",
+                        ".",
+                        ",",
+                      ]
+                    }
+                    maxLines={1}
+                    onUpdate={[Function]}
+                    position="end"
+                    truncate="character"
+                  >
+                    My outcome
+                  </TruncateText>
+                </FlexItem>
+              </Flex>
+            </Text>
+          </FlexItem>
+          <FlexItem
+            as="span"
+            grow={false}
+            shrink={false}
+          >
+            <Text
+              as="span"
+              letterSpacing="normal"
+              size="small"
+            >
+              No alignments
+            </Text>
+          </FlexItem>
+        </Flex>
+      </FlexItem>
+      <FlexItem
+        as="span"
+        grow={false}
+        shrink={false}
+      >
+        <Pill
+          text="Not mastered"
+          variant="default"
+        />
+      </FlexItem>
+    </Flex>
+  }
+  toggleLabel="Toggle alignment details for My outcome"
+  transition={true}
+>
+  <View
+    as="div"
+    display="auto"
+    padding="small"
+  >
+    <Text
+      as="span"
+      letterSpacing="normal"
+      size="medium"
+    >
       No alignments are available for this outcome.
     </Text>
   </View>
-</ToggleGroup>"
+</ToggleGroup>
 `;
 
 exports[`renders the Outcome component 1`] = `
-"<ToggleGroup summary={{...}} toggleLabel=\\"Toggle alignment details for My outcome\\" expanded={false} onToggle={[Function]} border={false} size=\\"medium\\" icon={[Function: IconArrowOpenEnd]} iconExpanded={[Function: IconArrowOpenDown]} defaultExpanded={false} transition={true} as=\\"span\\" elementRef={[Function: elementRef]}>
-  <List variant=\\"unstyled\\" delimiter=\\"dashed\\" as=\\"ul\\" margin=\\"none\\" size=\\"medium\\">
-    <ListItem>
-      <AssignmentResult result={{...}} outcome={{...}} outcomeProficiency={{...}} />
+<ToggleGroup
+  as="span"
+  border={false}
+  defaultExpanded={false}
+  elementRef={[Function]}
+  expanded={false}
+  icon={[Function]}
+  iconExpanded={[Function]}
+  onToggle={[Function]}
+  size="medium"
+  summary={
+    <Flex
+      alignItems="center"
+      as="span"
+      data-selenium="outcome"
+      direction="row"
+      inline={false}
+      justifyItems="space-between"
+      visualDebug={false}
+      wrapItems={false}
+    >
+      <FlexItem
+        as="span"
+        grow={false}
+        shrink={true}
+      >
+        <Flex
+          alignItems="center"
+          as="span"
+          direction="column"
+          inline={false}
+          justifyItems="start"
+          visualDebug={false}
+          wrapItems={false}
+        >
+          <FlexItem
+            as="span"
+            grow={false}
+            shrink={false}
+          >
+            <Text
+              as="span"
+              letterSpacing="normal"
+              size="medium"
+            >
+              <Flex
+                alignItems="center"
+                as="span"
+                direction="row"
+                inline={false}
+                justifyItems="start"
+                visualDebug={false}
+                wrapItems={false}
+              >
+                <FlexItem
+                  as="span"
+                  grow={false}
+                  shrink={false}
+                >
+                  <OutcomePopover
+                    outcome={
+                      Object {
+                        "assignments": Array [
+                          Object {
+                            "assignment_id": 1,
+                            "learning_outcome_id": 1,
+                            "submission_types": "online_quiz",
+                            "title": "My assignment",
+                            "url": "www.example.com",
+                          },
+                        ],
+                        "calculation_method": "highest",
+                        "expansionId": 100,
+                        "id": 1,
+                        "mastered": false,
+                        "mastery_points": 3,
+                        "points_possible": 5,
+                        "ratings": Array [
+                          Object {
+                            "description": "My first rating",
+                          },
+                          Object {
+                            "description": "My second rating",
+                          },
+                        ],
+                        "results": Array [
+                          Object {
+                            "assignment": Object {
+                              "html_url": "http://foo",
+                              "id": "assignment_1",
+                              "name": "My assignment",
+                              "score": 0,
+                              "submission_types": "online_quiz",
+                            },
+                            "id": 1,
+                            "percent": 0.1,
+                            "score": 1,
+                          },
+                        ],
+                        "title": "My outcome",
+                      }
+                    }
+                    outcomeProficiency={null}
+                  />
+                </FlexItem>
+                <FlexItem
+                  as="span"
+                  grow={false}
+                  padding="0 x-small"
+                  shrink={true}
+                >
+                  <TruncateText
+                    debounce={0}
+                    ellipsis="…"
+                    ignore={
+                      Array [
+                        " ",
+                        ".",
+                        ",",
+                      ]
+                    }
+                    maxLines={1}
+                    onUpdate={[Function]}
+                    position="end"
+                    truncate="character"
+                  >
+                    My outcome
+                  </TruncateText>
+                </FlexItem>
+              </Flex>
+            </Text>
+          </FlexItem>
+          <FlexItem
+            as="span"
+            grow={false}
+            shrink={false}
+          >
+            <Text
+              as="span"
+              letterSpacing="normal"
+              size="small"
+            >
+              1 alignment
+            </Text>
+          </FlexItem>
+        </Flex>
+      </FlexItem>
+      <FlexItem
+        as="span"
+        grow={false}
+        shrink={false}
+      >
+        <Pill
+          text="Not mastered"
+          variant="default"
+        />
+      </FlexItem>
+    </Flex>
+  }
+  toggleLabel="Toggle alignment details for My outcome"
+  transition={true}
+>
+  <List
+    as="ul"
+    delimiter="dashed"
+    margin="none"
+    size="medium"
+    variant="unstyled"
+  >
+    <ListItem
+      key="1"
+    >
+      <AssignmentResult
+        outcome={
+          Object {
+            "assignments": Array [
+              Object {
+                "assignment_id": 1,
+                "learning_outcome_id": 1,
+                "submission_types": "online_quiz",
+                "title": "My assignment",
+                "url": "www.example.com",
+              },
+            ],
+            "calculation_method": "highest",
+            "expansionId": 100,
+            "id": 1,
+            "mastered": false,
+            "mastery_points": 3,
+            "points_possible": 5,
+            "ratings": Array [
+              Object {
+                "description": "My first rating",
+              },
+              Object {
+                "description": "My second rating",
+              },
+            ],
+            "results": Array [
+              Object {
+                "assignment": Object {
+                  "html_url": "http://foo",
+                  "id": "assignment_1",
+                  "name": "My assignment",
+                  "score": 0,
+                  "submission_types": "online_quiz",
+                },
+                "id": 1,
+                "percent": 0.1,
+                "score": 1,
+              },
+            ],
+            "title": "My outcome",
+          }
+        }
+        outcomeProficiency={null}
+        result={
+          Object {
+            "assignment": Object {
+              "html_url": "http://foo",
+              "id": "assignment_1",
+              "name": "My assignment",
+              "score": 0,
+              "submission_types": "online_quiz",
+            },
+            "id": 1,
+            "percent": 0.1,
+            "score": 1,
+          }
+        }
+      />
     </ListItem>
   </List>
-</ToggleGroup>"
+</ToggleGroup>
 `;

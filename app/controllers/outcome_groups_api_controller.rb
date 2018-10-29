@@ -432,10 +432,10 @@ class OutcomeGroupsApiController < ApplicationController
   #   The points corresponding to a rating level for the embedded rubric criterion.
   #
   # @argument calculation_method [String, "decaying_average"|"n_mastery"|"latest"|"highest"]
-  #   The new calculation method.  Defaults to "highest"
+  #   The new calculation method.  Defaults to "decaying_average"
   #
   # @argument calculation_int [Integer]
-  #   The new calculation int.  Only applies if the calculation_method is "decaying_average" or "n_mastery"
+  #   The new calculation int.  Only applies if the calculation_method is "decaying_average" or "n_mastery". Defaults to 65
   #
   # @returns OutcomeLink
   #
@@ -455,7 +455,7 @@ class OutcomeGroupsApiController < ApplicationController
   #        -F 'vendor_guid=customid9000' \
   #        -F 'mastery_points=3' \
   #        -F 'calculation_method=decaying_average' \
-  #        -F 'calculation_int=75' \
+  #        -F 'calculation_int=65' \
   #        -F 'ratings[][description]=Exceeds Expectations' \
   #        -F 'ratings[][points]=5' \
   #        -F 'ratings[][description]=Meets Expectations' \

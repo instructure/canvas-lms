@@ -16,8 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Editors, Grid } from 'vendor/slickgrid';
+import slickgrid from 'vendor/slickgrid';
 import GridSupport from 'jsx/gradezilla/default_gradebook/GradebookGrid/GridSupport';
+
+const { Editors, Grid } = slickgrid
 
 function createColumns () {
   return [1, 2, 3, 4].map(id => (

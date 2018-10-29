@@ -102,7 +102,7 @@
       <% end %>
       <tr>
         <td class="form-label"><%= f.blabel :name, :course_name, :en => "Name" %></td>
-        <td class="nobr">
+        <td>
           <% if can_rename_course %>
             <%= f.text_field :name, :class => "course_form", :maxlength => '255', :style => "width: 150px;" %>
           <% else %>
@@ -112,7 +112,7 @@
       </tr>
       <tr>
         <td class="form-label nobr"><%= f.blabel :course_code, :en => "Course Code" %></td>
-        <td class="nobr">
+        <td>
           <% if can_rename_course %>
             <%= f.text_field :course_code, :maxlength => '255', :style => "width: 100px;" %>
           <% else %>
@@ -157,7 +157,7 @@
       <% if @context.sis_source_id && can_do(@context, @current_user, :read_sis) || can_do(@context.root_account, @current_user, :manage_sis) %>
         </tr><tr>
           <td class="form-label"><%= f.blabel :sis_source_id, :en => "SIS ID" %></td>
-          <td>
+          <td style="word-wrap: break-word;">
             <% if can_manage && can_do(@context.root_account, @current_user, :manage_sis) %>
               <%= f.text_field :sis_source_id, :style => "width: 202px;", :title => t('sis_source_id', "SIS ID"), :value => @context.sis_source_id %>
             <% else %>
@@ -589,12 +589,6 @@
       'Warning: For improved accessibility in reordering Course Navigation elements, please use the Move To Dialog option found in the menu.') %>
     </div>
 
-    <% keyboard_navigation([
-         {:key => t('keycodes.next_navigation_link', 'Up'), :description => t('keycode_descriptions.next_navigation_link', 'Select next navigation link')},
-         {:key => t('keycodes.previous_navigation_link', 'Down'), :description => t('keycode_descriptions.previous_navigation_link', 'Select previous navigation link')},
-         {:key => t('keycodes.toggle_navigation_dragging', 'Space'), :description => t('keycode_descriptions.toggle_navigation_dragging', 'Select link to begin dragging, or drop previously selected link')}
-     ]) %>
-
     <%= form_tag context_url(@context, :context_update_nav_url), {:id => "nav_form", :title => t('titles.edit_navigation', "Edit Course Navigation") } do %>
       <input type="hidden" name="tabs_json" id="tabs_json" value="[]" />
       <% tabs = sortable_tabs %>
@@ -610,7 +604,6 @@
         <% tabs.select {|t| !t[:hidden] }.each do |tab|  %>
           <li aria-label="<%= tab[:label] %>" class="navitem <%= 'enabled' if tab[:id] != Course::TAB_HOME %> <%= tab[:label].downcase %>"
               id="nav_edit_tab_id_<%= tab[:id] %>"
-              tabindex="0"
           >
             <%= tab[:label] %>
             <div class="admin-links">
@@ -648,7 +641,6 @@
           <li aria-label="<%= tab[:label] %>"
               class="navitem enabled"
               id="nav_edit_tab_id_<%= tab[:id] %>"
-              tabindex="0"
           >
             <%= tab[:label] %>
             <div class="admin-links">

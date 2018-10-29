@@ -20,7 +20,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe Oauth2ProviderController do
   describe 'GET auth' do
-    let_once(:key) { DeveloperKey.create! :redirect_uri => 'https://example.com' }
+    let_once(:key) do
+      d = DeveloperKey.create! :redirect_uri => 'https://example.com'
+      enable_developer_key_account_binding!(d)
+      d
+    end
 
     it 'renders a 401 when there is no client_id' do
       get :auth
@@ -37,10 +41,6 @@ describe Oauth2ProviderController do
 
     context 'with invalid scopes' do
       let(:dev_key) { DeveloperKey.create! redirect_uri: 'https://example.com', require_scopes: true, scopes: [] }
-
-      before do
-        allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_and_scoping).and_return(true)
-      end
 
       it 'renders 400' do
         get :auth, params: {
@@ -172,127 +172,119 @@ describe Oauth2ProviderController do
         expect(response.location).to match(/https:\/\/example.com/)
       end
 
-      context 'when new developer key FF is enabled' do
-        before do
-          allow(Account.site_admin).to receive(:feature_allowed?).and_return(false)
-          allow(Account.default).to receive(:feature_enabled?).and_return(false)
-          allow(Account.default).to receive(:feature_enabled?).with(:developer_key_management_and_scoping).and_return(true)
+      shared_examples_for 'the authorization endpoint' do
+        let(:account_developer_key) { raise 'set in examples' }
+        let(:account) { account_developer_key.account || Account.site_admin }
+
+        it 'should redirect with "unauthorized_client" if binding does not exist for the account' do
+          get :auth, params: { client_id: account_developer_key.id, redirect_uri: 'https://example.com', response_type: 'code' }
+          redirect_query_params = Rack::Utils.parse_query(URI.parse(response.location).query)
+          expect(redirect_query_params['error']).to eq 'unauthorized_client'
         end
 
-        shared_examples_for 'the authorization endpoint' do
-          let(:account_developer_key) { raise 'set in examples' }
-          let(:account) { account_developer_key.account || Account.site_admin }
+        it 'should redirect with "unauthorized_client" if binding for the account is set to "allow"' do
+          binding = account_developer_key.developer_key_account_bindings.find_or_create_by(account: account)
+          binding.update!(workflow_state: 'allow')
+          get :auth, params: { client_id: account_developer_key.id, redirect_uri: 'https://example.com', response_type: 'code' }
+          redirect_query_params = Rack::Utils.parse_query(URI.parse(response.location).query)
+          expect(redirect_query_params['error']).to eq 'unauthorized_client'
+        end
 
-          it 'should redirect with "unauthorized_client" if binding does not exist for the account' do
-            get :auth, params: { client_id: account_developer_key.id, redirect_uri: 'https://example.com', response_type: 'code' }
-            redirect_query_params = Rack::Utils.parse_query(URI.parse(response.location).query)
+        it 'should redirect with "unauthorized_client" if binding for the account is set to "off"' do
+          binding = account_developer_key.developer_key_account_bindings.find_or_create_by(account: account)
+          binding.update!(workflow_state: 'off')
+          get :auth, params: { client_id: account_developer_key.id, redirect_uri: 'https://example.com', response_type: 'code' }
+          redirect_query_params = Rack::Utils.parse_query(URI.parse(response.location).query)
+          expect(redirect_query_params['error']).to eq 'unauthorized_client'
+        end
+
+        it 'should redirect to confirmation page when the binding for the account is set to "on"' do
+          binding = account_developer_key.developer_key_account_bindings.find_or_create_by(account: account)
+          binding.update!(workflow_state: 'on')
+          get :auth, params: { client_id: account_developer_key.id, redirect_uri: 'https://example.com', response_type: 'code' }
+          expect(response.location).to eq 'http://test.host/login/oauth2/confirm'
+        end
+      end
+
+      context 'when key is a site admin key' do
+        let(:root_account) { Account.default }
+        let(:developer_key) { DeveloperKey.create!(redirect_uri: 'https://example.com') }
+        let(:root_account_binding) { developer_key.developer_key_account_bindings.find_by(account: root_account) }
+        let(:sa_account_binding) { developer_key.developer_key_account_bindings.find_by(account: Account.site_admin) }
+        let(:redirect_query_params) { Rack::Utils.parse_query(URI.parse(response.location).query) }
+
+        it_behaves_like 'the authorization endpoint' do
+          let(:account_developer_key) { developer_key }
+        end
+
+        context 'when root account binding exists' do
+          before do
+            developer_key.developer_key_account_bindings.create!(account: root_account)
+          end
+
+          it 'should redirect with "unauthorized_client" if binding for SA is "off" and root account binding is "on"' do
+            root_account_binding.update!(workflow_state: 'on')
+            sa_account_binding.update!(workflow_state: 'off')
+            get :auth, params: { client_id: developer_key.id, redirect_uri: 'https://example.com', response_type: 'code' }
             expect(redirect_query_params['error']).to eq 'unauthorized_client'
           end
 
-          it 'should redirect with "unauthorized_client" if binding for the account is set to "allow"' do
-            binding = account_developer_key.developer_key_account_bindings.find_or_create_by(account: account)
-            binding.update!(workflow_state: 'allow')
-            get :auth, params: { client_id: account_developer_key.id, redirect_uri: 'https://example.com', response_type: 'code' }
-            redirect_query_params = Rack::Utils.parse_query(URI.parse(response.location).query)
+          it 'should redirect with "unauthorized_client" if binding for SA is "allow" and binding for root account is "allow"' do
+            root_account_binding.update!(workflow_state: 'allow')
+            sa_account_binding.update!(workflow_state: 'allow')
+            get :auth, params: { client_id: developer_key.id, redirect_uri: 'https://example.com', response_type: 'code' }
             expect(redirect_query_params['error']).to eq 'unauthorized_client'
           end
 
-          it 'should redirect with "unauthorized_client" if binding for the account is set to "off"' do
-            binding = account_developer_key.developer_key_account_bindings.find_or_create_by(account: account)
-            binding.update!(workflow_state: 'off')
-            get :auth, params: { client_id: account_developer_key.id, redirect_uri: 'https://example.com', response_type: 'code' }
-            redirect_query_params = Rack::Utils.parse_query(URI.parse(response.location).query)
+          it 'should redirect with "unauthorized_client" if binding for SA is "allow" and binding for root account is "off"' do
+            root_account_binding.update!(workflow_state: 'off')
+            sa_account_binding.update!(workflow_state: 'allow')
+            get :auth, params: { client_id: developer_key.id, redirect_uri: 'https://example.com', response_type: 'code' }
             expect(redirect_query_params['error']).to eq 'unauthorized_client'
           end
 
-          it 'should redirect to confirmation page when the binding for the account is set to "on"' do
-            binding = account_developer_key.developer_key_account_bindings.find_or_create_by(account: account)
-            binding.update!(workflow_state: 'on')
-            get :auth, params: { client_id: account_developer_key.id, redirect_uri: 'https://example.com', response_type: 'code' }
+          it 'should redirect with "unauthorized_client" if binding for SA is "off" and binding for root account is "off"' do
+            root_account_binding.update!(workflow_state: 'off')
+            sa_account_binding.update!(workflow_state: 'off')
+            get :auth, params: { client_id: developer_key.id, redirect_uri: 'https://example.com', response_type: 'code' }
+            expect(redirect_query_params['error']).to eq 'unauthorized_client'
+          end
+
+          it 'should redirect to confirmation page if binding for SA is "allow" and binding for root account is "on"' do
+            root_account_binding.update!(workflow_state: 'on')
+            sa_account_binding.update!(workflow_state: 'allow')
+            get :auth, params: { client_id: developer_key.id, redirect_uri: 'https://example.com', response_type: 'code' }
+            expect(response.location).to eq 'http://test.host/login/oauth2/confirm'
+          end
+
+          it 'should redirect to confirmation page if binding for SA is "on" and binding for root account is "off"' do
+            root_account_binding.update!(workflow_state: 'off')
+            sa_account_binding.update!(workflow_state: 'on')
+            get :auth, params: { client_id: developer_key.id, redirect_uri: 'https://example.com', response_type: 'code' }
+            expect(response.location).to eq 'http://test.host/login/oauth2/confirm'
+          end
+
+          it 'should redirect to confirmation page if binding for SA is "on" and binding for root account is "allow"' do
+            root_account_binding.update!(workflow_state: 'allow')
+            sa_account_binding.update!(workflow_state: 'on')
+            get :auth, params: { client_id: developer_key.id, redirect_uri: 'https://example.com', response_type: 'code' }
+            expect(response.location).to eq 'http://test.host/login/oauth2/confirm'
+          end
+
+          it 'should redirect to confirmation page if binding for SA is "on" and binding for root account is "on"' do
+            root_account_binding.update!(workflow_state: 'on')
+            sa_account_binding.update!(workflow_state: 'on')
+            get :auth, params: { client_id: developer_key.id, redirect_uri: 'https://example.com', response_type: 'code' }
             expect(response.location).to eq 'http://test.host/login/oauth2/confirm'
           end
         end
+      end
 
-        context 'when key is a site admin key' do
-          let(:root_account) { Account.default }
-          let(:developer_key) { DeveloperKey.create!(redirect_uri: 'https://example.com') }
-          let(:root_account_binding) { developer_key.developer_key_account_bindings.find_by(account: root_account) }
-          let(:sa_account_binding) { developer_key.developer_key_account_bindings.find_by(account: Account.site_admin) }
-          let(:redirect_query_params) { Rack::Utils.parse_query(URI.parse(response.location).query) }
+      context 'when key is a root account key' do
+        let(:root_account) { Account.default }
 
-          it_behaves_like 'the authorization endpoint' do
-            let(:account_developer_key) { developer_key }
-          end
-
-          context 'when root account binding exists' do
-            before do
-              developer_key.developer_key_account_bindings.create!(account: root_account)
-            end
-
-            it 'should redirect with "unauthorized_client" if binding for SA is "off" and root account binding is "on"' do
-              root_account_binding.update!(workflow_state: 'on')
-              sa_account_binding.update!(workflow_state: 'off')
-              get :auth, params: { client_id: developer_key.id, redirect_uri: 'https://example.com', response_type: 'code' }
-              expect(redirect_query_params['error']).to eq 'unauthorized_client'
-            end
-
-            it 'should redirect with "unauthorized_client" if binding for SA is "allow" and binding for root account is "allow"' do
-              root_account_binding.update!(workflow_state: 'allow')
-              sa_account_binding.update!(workflow_state: 'allow')
-              get :auth, params: { client_id: developer_key.id, redirect_uri: 'https://example.com', response_type: 'code' }
-              expect(redirect_query_params['error']).to eq 'unauthorized_client'
-            end
-
-            it 'should redirect with "unauthorized_client" if binding for SA is "allow" and binding for root account is "off"' do
-              root_account_binding.update!(workflow_state: 'off')
-              sa_account_binding.update!(workflow_state: 'allow')
-              get :auth, params: { client_id: developer_key.id, redirect_uri: 'https://example.com', response_type: 'code' }
-              expect(redirect_query_params['error']).to eq 'unauthorized_client'
-            end
-
-            it 'should redirect with "unauthorized_client" if binding for SA is "off" and binding for root account is "off"' do
-              root_account_binding.update!(workflow_state: 'off')
-              sa_account_binding.update!(workflow_state: 'off')
-              get :auth, params: { client_id: developer_key.id, redirect_uri: 'https://example.com', response_type: 'code' }
-              expect(redirect_query_params['error']).to eq 'unauthorized_client'
-            end
-
-            it 'should redirect to confirmation page if binding for SA is "allow" and binding for root account is "on"' do
-              root_account_binding.update!(workflow_state: 'on')
-              sa_account_binding.update!(workflow_state: 'allow')
-              get :auth, params: { client_id: developer_key.id, redirect_uri: 'https://example.com', response_type: 'code' }
-              expect(response.location).to eq 'http://test.host/login/oauth2/confirm'
-            end
-
-            it 'should redirect to confirmation page if binding for SA is "on" and binding for root account is "off"' do
-              root_account_binding.update!(workflow_state: 'off')
-              sa_account_binding.update!(workflow_state: 'on')
-              get :auth, params: { client_id: developer_key.id, redirect_uri: 'https://example.com', response_type: 'code' }
-              expect(response.location).to eq 'http://test.host/login/oauth2/confirm'
-            end
-
-            it 'should redirect to confirmation page if binding for SA is "on" and binding for root account is "allow"' do
-              root_account_binding.update!(workflow_state: 'allow')
-              sa_account_binding.update!(workflow_state: 'on')
-              get :auth, params: { client_id: developer_key.id, redirect_uri: 'https://example.com', response_type: 'code' }
-              expect(response.location).to eq 'http://test.host/login/oauth2/confirm'
-            end
-
-            it 'should redirect to confirmation page if binding for SA is "on" and binding for root account is "on"' do
-              root_account_binding.update!(workflow_state: 'on')
-              sa_account_binding.update!(workflow_state: 'on')
-              get :auth, params: { client_id: developer_key.id, redirect_uri: 'https://example.com', response_type: 'code' }
-              expect(response.location).to eq 'http://test.host/login/oauth2/confirm'
-            end
-          end
-        end
-
-        context 'when key is a root account key' do
-          let(:root_account) { Account.default }
-
-          it_behaves_like 'the authorization endpoint' do
-            let(:account_developer_key) { DeveloperKey.create!(redirect_uri: 'https://example.com', account: root_account) }
-          end
+        it_behaves_like 'the authorization endpoint' do
+          let(:account_developer_key) { DeveloperKey.create!(redirect_uri: 'https://example.com', account: root_account) }
         end
       end
     end
@@ -301,7 +293,7 @@ describe Oauth2ProviderController do
   describe 'POST token' do
     subject { response }
 
-    let_once(:key) { DeveloperKey.create! scopes: %w(testscope) }
+    let_once(:key) { DeveloperKey.create! scopes: [TokenScopes::USER_INFO_SCOPE[:scope]] }
     let_once(:other_key) { DeveloperKey.create! }
     let_once(:inactive_key) { DeveloperKey.create! workflow_state: 'inactive' }
     let_once(:user) { User.create! }
@@ -523,7 +515,7 @@ describe Oauth2ProviderController do
         {
           client_assertion_type: 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer',
           client_assertion: jws,
-          scope: 'testscope'
+          scope: TokenScopes::USER_INFO_SCOPE[:scope]
         }
       end
 

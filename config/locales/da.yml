@@ -7843,6 +7843,7 @@ da:
   enable_the_creation_of_blueprint_courses_79f91c30: "Aktivér oprettelsen af ​​Blueprint-fag"
   enable_the_creation_of_master_courses_8205b155: "Aktivér oprettelsen af ​​masterkursus"
   enable_the_plagiarism_detection_platform_7c3b6195: "Aktiver afsløringsplatformen for plagiat"
+  enable_toolname_b06257b7: "Aktivér %{toolName}"
   enabled_and_locked_49ff3de4: "Aktiveret og låst"
   enabled_ba7cab66: Aktiveret
   enabled_by_default_e530d6ed: "Aktiveret som standard"

@@ -28,20 +28,6 @@ $preview-footer-height: 140px;
 $preview-header-height: 9vh;
 $preview-html-background: whitesmoke;
 
-.ReactModal__Overlay.ReactModal__Overlay--ef-file-preview {
-  background: rgba(black, 0.9);
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-}
-
-.ReactModal__Content.ReactModal__Content--ef-file-preview {
-  height: 100%;
-  display: flex;
-}
-
 /// __File Preview Layout
 ////////////////////////////////
 // Since this was a slightly complex layout I've separated this into
@@ -127,7 +113,7 @@ $preview-html-background: whitesmoke;
 
 .ef-file-preview-button {
   transition: all 0.2s;
-  color: darken($preview-font-color, 45);
+  color: darken($preview-font-color, 45) !important; // To override InstUI styles
   cursor: pointer;
   padding: 0 12px;
   @include fontSize($ic-font-size--small);
@@ -136,8 +122,9 @@ $preview-html-background: whitesmoke;
   box-sizing: border-box;
   text-align: center;
   align-items: center;
-  background: $preview-bg;
+  background: transparent !important;
   white-space: nowrap;
+  place-items: center !important; // To override InstUI style since it misaligns the buttons
   @include breakpoint(desktop) { padding: 0 24px; }
   &:hover, &:focus { color: $ic-color-light; text-decoration: none;}
   [class^=icon-] { margin-#{direction(right)}: 3px; }
@@ -153,12 +140,12 @@ $preview-html-background: whitesmoke;
   }
 
   &.ef-file-preview-button--active {
-    color: $preview-font-color;
+    color: $preview-font-color !important; // To override InstUI styles
     background: transparent;
     background: $preview-info-bg;
     border-bottom-color: transparent;
-    border-left: 1px solid $preview-border-color;
-    border-right: 1px solid $preview-border-color;
+    border-#{direction(left)}: 1px solid $preview-border-color;
+    border-#{direction(right)}: 1px solid $preview-border-color;
   }
 }
 

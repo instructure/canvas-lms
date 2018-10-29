@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# @API Rubrics
 class RubricsController < ApplicationController
   before_action :require_context
   before_action { |c| c.active_tab = "rubrics" }
@@ -50,7 +51,16 @@ class RubricsController < ApplicationController
   end
 
   # @API Create a single rubric
+  #
   # Returns the rubric with the given id.
+  #
+  # Unfortuantely this endpoint does not return a standard Rubric object,
+  # instead it returns a hash that looks like
+  #   { 'rubric': Rubric, 'rubric_association': RubricAssociation }
+  #
+  # This may eventually be deprecated in favor of a more standardized return
+  # value, but that is not currently planned.
+  #
   # @argument id [Integer]
   #   The id of the rubric
   # @argument rubric_association_id [Integer]
@@ -66,8 +76,6 @@ class RubricsController < ApplicationController
   # @argument rubric_association[purpose] [String]
   # @argument rubric[criteria] [Hash]
   #   An indexed Hash of RubricCriteria objects where the keys are integer ids and the values are the RubricCriteria objects
-  # @returns Rubric
-
   def create
     update
   end
@@ -81,7 +89,16 @@ class RubricsController < ApplicationController
 
 
   # @API Update a single rubric
+  #
   # Returns the rubric with the given id.
+  #
+  # Unfortuantely this endpoint does not return a standard Rubric object,
+  # instead it returns a hash that looks like
+  #   { 'rubric': Rubric, 'rubric_association': RubricAssociation }
+  #
+  # This may eventually be deprecated in favor of a more standardized return
+  # value, but that is not currently planned.
+  #
   # @argument id [Integer]
   #   The id of the rubric
   # @argument rubric_association_id [Integer]
@@ -99,8 +116,6 @@ class RubricsController < ApplicationController
   # @argument rubric_association[purpose] [String]
   # @argument rubric[criteria] [Hash]
   #   An indexed Hash of RubricCriteria objects where the keys are integer ids and the values are the RubricCriteria objects
-  # @returns Rubric
-
   def update
     association_params = params[:rubric_association] ?
       params[:rubric_association].permit(:use_for_grading, :title, :purpose, :url, :hide_score_total, :hide_points, :hide_outcome_results, :bookmarked) : {}

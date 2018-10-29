@@ -25,8 +25,8 @@
   height: 0;
   vertical-align: top;
   border-top:   4px solid $black;
-  border-right: 4px solid transparent;
-  border-left:  4px solid transparent;
+  border-#{direction(right)}: 4px solid transparent;
+  border-#{direction(left)}:  4px solid transparent;
   content: "";
 }
 
@@ -52,7 +52,7 @@
   background-color: $dropdownBackground;
   border: 1px solid #ccc; // Fallback for IE7-8
   border: 1px solid $dropdownBorder;
-  *border-right-width: 2px;
+  *border-#{direction(right)}-width: 2px;
   *border-bottom-width: 2px;
   border-radius: 6px;
   @include box-shadow(0 5px 10px rgba(0,0,0,.2));
@@ -166,7 +166,7 @@
   height: 0;
   border-color: transparent;
   border-style: solid;
-  border-width: 5px 0 5px 5px;
+  border-width: direction-sides(5px 0 5px 5px);
   border-#{direction(left)}-color: darken($dropdownBackground, 20%);
   margin-top: 5px;
   margin-#{direction(right)}: -10px;

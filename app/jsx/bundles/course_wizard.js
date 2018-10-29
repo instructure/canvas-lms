@@ -28,11 +28,8 @@ import CourseWizard from '../course_wizard/CourseWizard'
 
 const $wizard_box = $('#wizard_box')
 
-$('.wizard_popup_link').click((event) => {
-  ReactDOM.render(
-    <CourseWizard overlayClassName="CourseWizard__modalOverlay" showWizard />,
-    $wizard_box[0]
-  )
+$('.wizard_popup_link').click(event => {
+  ReactDOM.render(<CourseWizard showWizard />, $wizard_box[0])
 })
 
 // We are currently not allowing the wizard to popup automatically,

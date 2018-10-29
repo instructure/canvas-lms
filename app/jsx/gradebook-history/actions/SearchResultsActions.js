@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import HistoryActions from '../../gradebook-history/actions/HistoryActions';
+import * as HistoryActions from '../../gradebook-history/actions/HistoryActions';
 import HistoryApi from '../../gradebook-history/api/HistoryApi';
 
-function getHistoryNextPage (url) {
+export function getHistoryNextPage (url) {
   return function (dispatch) {
     dispatch(HistoryActions.fetchHistoryNextPageStart());
 
@@ -32,7 +32,3 @@ function getHistoryNextPage (url) {
       });
   };
 }
-
-export default {
-  getHistoryNextPage
-};

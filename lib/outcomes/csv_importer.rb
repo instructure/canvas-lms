@@ -61,6 +61,8 @@ module Outcomes
         raise DataFormatError, I18n.t("Invalid CSV File")
       rescue ParseError => e
         raise DataFormatError, e.message
+      rescue ActiveRecord::StatementInvalid => e
+        raise DataFormatError, I18n.t("Database error (%{err})", err: e.message)
       end
       status = {
         errors: file_errors,

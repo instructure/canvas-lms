@@ -49,7 +49,7 @@ thead th {
 }
 
 .table-bordered:first-of-type {
-  border-radius: 4px 4px 0 0;
+  border-radius: direction-corners(4px 4px 0 0);
   thead {
     tr:first-child th:first-child {
       border-top-#{direction(left)}-radius: 4px !important;
@@ -65,7 +65,7 @@ thead th {
 
 .table-bordered:last-of-type {
   border-bottom: 1px solid #ddd;
-  border-radius: 0 0 4px 4px;
+  border-radius: direction-corners(0 0 4px 4px);
   tbody {
     tr:last-child th {
       border-bottom-#{direction(left)}-radius: 4px !important;
@@ -104,13 +104,13 @@ thead th {
 
 .notification-prefs-table {
   .ui-button {
-    margin-left: 0;
-    margin-right: 0;
+    margin-#{direction(left)}: 0;
+    margin-#{direction(right)}: 0;
     padding: 2px; // fixes FF padding issues
   }
   .ui-buttonset {
-    margin-left: 0;
-    margin-right: 0;
+    margin-#{direction(left)}: 0;
+    margin-#{direction(right)}: 0;
   }
   .grouping > td:first-child {
     min-width: 205px;

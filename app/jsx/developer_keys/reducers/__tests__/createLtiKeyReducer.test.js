@@ -29,7 +29,10 @@ function freshState() {
     toolConfiguration: {},
     toolConfigurationUrl: '',
     enabledScopes: [],
-    disabledPlacements: []
+    disabledPlacements: [],
+    updateCustomizationsPending: false,
+    updateCustomizationsSuccessful: false,
+    updateCustomizationsError: null,
   }
 }
 
@@ -40,6 +43,9 @@ it('sets the defaults', () => {
   expect(defaults.toolConfiguration).toEqual({})
   expect(defaults.disabledPlacements).toEqual([])
   expect(defaults.enabledScopes).toEqual([])
+  expect(defaults.updateCustomizationsPending).toEqual(false)
+  expect(defaults.updateCustomizationsSuccessful).toEqual(false)
+  expect(defaults.updateCustomizationsError).toBeNull()
 })
 
 it('handles "LTI_KEYS_SET_LTI_KEY"', () => {
@@ -52,6 +58,9 @@ it('handles "LTI_KEYS_SET_LTI_KEY"', () => {
   expect(newState.toolConfiguration).toEqual({})
   expect(newState.disabledPlacements).toEqual([])
   expect(newState.enabledScopes).toEqual([])
+  expect(newState.updateCustomizationsPending).toEqual(false)
+  expect(newState.updateCustomizationsSuccessful).toEqual(false)
+  expect(newState.updateCustomizationsError).toBeNull()
 })
 
 it('handles "LTI_KEYS_SET_CUSTOMIZING"', () => {
@@ -64,6 +73,9 @@ it('handles "LTI_KEYS_SET_CUSTOMIZING"', () => {
   expect(newState.toolConfiguration).toEqual({})
   expect(newState.disabledPlacements).toEqual([])
   expect(newState.enabledScopes).toEqual([])
+  expect(newState.updateCustomizationsPending).toEqual(false)
+  expect(newState.updateCustomizationsSuccessful).toEqual(false)
+  expect(newState.updateCustomizationsError).toBeNull()
 })
 
 it('handles "LTI_KEYS_SET_ENABLED_SCOPES"', () => {
@@ -76,6 +88,9 @@ it('handles "LTI_KEYS_SET_ENABLED_SCOPES"', () => {
   expect(newState.toolConfiguration).toEqual({})
   expect(newState.disabledPlacements).toEqual([])
   expect(newState.enabledScopes).toEqual(['cool scope'])
+  expect(newState.updateCustomizationsPending).toEqual(false)
+  expect(newState.updateCustomizationsSuccessful).toEqual(false)
+  expect(newState.updateCustomizationsError).toBeNull()
 })
 
 it('handles "LTI_KEYS_SET_DISABLED_PLACEMENTS"', () => {
@@ -88,6 +103,9 @@ it('handles "LTI_KEYS_SET_DISABLED_PLACEMENTS"', () => {
   expect(newState.toolConfiguration).toEqual({})
   expect(newState.disabledPlacements).toEqual(['account_navigation'])
   expect(newState.enabledScopes).toEqual([])
+  expect(newState.updateCustomizationsPending).toEqual(false)
+  expect(newState.updateCustomizationsSuccessful).toEqual(false)
+  expect(newState.updateCustomizationsError).toBeNull()
 })
 
 it('handles "SET_LTI_TOOL_CONFIGURATION"', () => {
@@ -133,4 +151,64 @@ it('handles "SAVE_LTI_TOOL_CONFIGURATION_SUCCESSFUL"', () => {
   expect(newState.saveToolConfigurationPending).toEqual(false)
   expect(newState.saveToolConfigurationError).toBeNull()
   expect(newState.saveToolConfigurationSuccessful).toEqual(true)
+})
+
+it('handles "LTI_KEYS_UPDATE_CUSTOMIZATIONS_START"', () => {
+  const state = freshState()
+  const action = actions.ltiKeysUpdateCustomizationsStart()
+  const newState = reducer(state, action)
+
+  expect(newState.isLtiKey).toEqual(false)
+  expect(newState.customizing).toEqual(false)
+  expect(newState.toolConfiguration).toEqual({})
+  expect(newState.disabledPlacements).toEqual([])
+  expect(newState.enabledScopes).toEqual([])
+  expect(newState.updateCustomizationsPending).toEqual(true)
+  expect(newState.updateCustomizationsSuccessful).toEqual(false)
+  expect(newState.updateCustomizationsError).toBeNull()
+})
+
+it('handles "LTI_KEYS_UPDATE_CUSTOMIZATIONS_FAILED"', () => {
+  const state = freshState()
+  const action = actions.ltiKeysUpdateCustomizationsFailed('Error message')
+  const newState = reducer(state, action)
+
+  expect(newState.isLtiKey).toEqual(false)
+  expect(newState.customizing).toEqual(false)
+  expect(newState.toolConfiguration).toEqual({})
+  expect(newState.disabledPlacements).toEqual([])
+  expect(newState.enabledScopes).toEqual([])
+  expect(newState.updateCustomizationsPending).toEqual(false)
+  expect(newState.updateCustomizationsSuccessful).toEqual(false)
+  expect(newState.updateCustomizationsError).toEqual('Error message')
+})
+
+it('handles "LTI_KEYS_UPDATE_CUSTOMIZATIONS_SUCCESSFUL"', () => {
+  const state = freshState()
+  const action = actions.ltiKeysUpdateCustomizationsSuccessful()
+  const newState = reducer(state, action)
+
+  expect(newState.isLtiKey).toEqual(false)
+  expect(newState.customizing).toEqual(false)
+  expect(newState.toolConfiguration).toEqual({})
+  expect(newState.disabledPlacements).toEqual([])
+  expect(newState.enabledScopes).toEqual([])
+  expect(newState.updateCustomizationsPending).toEqual(false)
+  expect(newState.updateCustomizationsSuccessful).toEqual(true)
+  expect(newState.updateCustomizationsError).toBeNull()
+})
+
+it('handles "RESET_LTI_STATE"', () => {
+  const state = freshState()
+  const action = actions.resetLtiState()
+  const newState = reducer(state, action)
+
+  expect(newState.isLtiKey).toEqual(false)
+  expect(newState.customizing).toEqual(false)
+  expect(newState.toolConfiguration).toEqual({})
+  expect(newState.disabledPlacements).toEqual([])
+  expect(newState.enabledScopes).toEqual([])
+  expect(newState.updateCustomizationsPending).toEqual(false)
+  expect(newState.updateCustomizationsSuccessful).toEqual(false)
+  expect(newState.updateCustomizationsError).toBeNull()
 })

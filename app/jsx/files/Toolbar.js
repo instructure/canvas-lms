@@ -107,6 +107,7 @@ export default class Toolbar extends React.Component {
   openUsageRightsDialog() {
     const contents = (
       <UsageRightsDialog
+        isOpen
         closeModal={this.props.modalOptions.closeModal}
         itemsToManage={this.props.selectedItems}
         userCanRestrictFilesForContext={this.props.userCanRestrictFilesForContext}
@@ -343,7 +344,7 @@ export default class Toolbar extends React.Component {
             <a
               ref="previewLink"
               href="#"
-              onClick={!selectedItemIsFolder && preventDefault(() => this.openPreview())}
+              onClick={!selectedItemIsFolder ? preventDefault(() => this.openPreview()) : (() => {})}
               className={viewBtnClasses}
               title={label}
               role="button"

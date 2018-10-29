@@ -136,12 +136,6 @@ export const dismissOpportunity = (id, plannerOverride) => {
       saveNewPlannerOverride(apiOverride);
     promise = promise.then(response => {
       dispatch(dismissedOpportunity(response.data));
-
-      // TODO: When splitting into dismissed not dismissed tabs this needs to change
-      if(!getState().loading.allOpportunitiesLoaded && !getState().loading.loadingOpportunities && getState().opportunities.items.filter((opp) => {
-        return opp.planner_override && !opp.planner_override.dismissed;
-      }).length < 10)
-        dispatch(getNextOpportunities());
     })
     .catch((error) => {
       alert(formatMessage('An error occurred attempting to dismiss the opportunity.'), true);

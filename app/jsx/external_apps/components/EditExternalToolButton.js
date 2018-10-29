@@ -31,7 +31,8 @@ import Lti2Edit from '../../external_apps/components/Lti2Edit'
 export default class EditExternalToolButton extends React.Component {
   static propTypes = {
     tool: PropTypes.object.isRequired,
-    canAddEdit: PropTypes.bool.isRequired
+    canAddEdit: PropTypes.bool.isRequired,
+    returnFocus: PropTypes.func.isRequired
   }
 
   state = {
@@ -63,6 +64,7 @@ export default class EditExternalToolButton extends React.Component {
 
   closeModal = () => {
     this.setState({modalIsOpen: false})
+    this.props.returnFocus()
   }
 
   saveChanges = (configurationType, data) => {

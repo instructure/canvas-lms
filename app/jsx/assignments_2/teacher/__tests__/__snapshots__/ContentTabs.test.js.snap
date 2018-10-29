@@ -1,0 +1,63 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders 1`] = `
+<TabList
+  defaultSelectedIndex={0}
+  focus={false}
+  variant="minimal"
+>
+  <TabPanel
+    id={null}
+    labelledBy={null}
+    padding="small"
+    selected={false}
+    tabRef={[Function]}
+    title="Details"
+    variant="simple"
+  >
+    <Details
+      assignment={
+        Object {
+          "description": "<p>some assignment description</p>",
+          "dueAt": "due",
+          "name": "title",
+          "pointsPossible": 42,
+        }
+      }
+    />
+  </TabPanel>
+  <TabPanel
+    id={null}
+    labelledBy={null}
+    padding="small"
+    selected={false}
+    tabRef={[Function]}
+    title="Students"
+    variant="simple"
+  >
+    Students
+  </TabPanel>
+  <TabPanel
+    id={null}
+    labelledBy={null}
+    padding="small"
+    selected={false}
+    tabRef={[Function]}
+    title="Rubric"
+    variant="simple"
+  >
+    Rubric
+  </TabPanel>
+  <TabPanel
+    id={null}
+    labelledBy={null}
+    padding="small"
+    selected={false}
+    tabRef={[Function]}
+    title="Settings"
+    variant="simple"
+  >
+    Settings
+  </TabPanel>
+</TabList>
+`;

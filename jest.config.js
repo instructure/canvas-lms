@@ -11,6 +11,9 @@ module.exports = {
     'public/javascripts/vendor'
   ],
   reporters: [ "default", "jest-junit" ],
+  snapshotSerializers: [
+    'enzyme-to-json/serializer'
+  ],
   setupFiles: [
     'jest-localstorage-mock',
     'jest-canvas-mock',

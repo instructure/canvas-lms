@@ -3,6 +3,17 @@
     <span><i class='{{icon}}' /> {{title}}</span>
   {{/each}}
 </div>
+{{#if showObservedNames.available}}
+  <div class="user-preference">
+    <label class="checkbox" for="show-name-observers">
+      {{checkbox showObservedNames.name
+        id="show-name-observers"
+        class="user-pref-check"
+        checked=showObservedNames.on}}
+      {{showObservedNames.label}}
+    </label>
+  </div>
+{{/if}}
 
 {{#each eventGroups}}
   <table cellspacing="0"

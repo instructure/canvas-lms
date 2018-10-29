@@ -55,7 +55,8 @@ module GoogleDrive
     def download(document_id, extensions)
       response = client_execute!(
         :api_method => drive.files.get,
-        :parameters => { :fileId => normalize_document_id(document_id) }
+        :parameters => { :fileId => normalize_document_id(document_id) },
+        :retries => 9
       )
 
       file = response.data.to_hash
@@ -147,7 +148,8 @@ module GoogleDrive
         result = client_execute(
           :api_method => drive.permissions.insert,
           :body_object => new_permission,
-          :parameters => { :fileId => normalize_document_id(document_id) }
+          :parameters => { :fileId => normalize_document_id(document_id),
+          :retries => 9 }
         )
         if result.error?
           raise ConnectionException, result.error_message

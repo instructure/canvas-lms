@@ -200,6 +200,19 @@ describe UserObservationLink do
       end
       expect(parent.enrollments.shard(parent).first.course).to eq course
     end
+
+    it "creates enrollments for trusted accounts" do
+      @shard2.activate do
+        @other_account = Account.create!
+        @parent = user_with_pseudonym(account: @other_account, active_all: true)
+        UserObservationLink.create_or_restore(observer: @parent, student: student, root_account: @other_account)
+      end
+      pseudonym(@parent, :account => Account.default)
+      allow_any_instantiation_of(Account.default).to receive(:trusted_account_ids).and_return([@other_account.id])
+      course_factory(active_all: true)
+      student_in_course(course: @course, user: student, active_all: true)
+      expect(@parent.enrollments.shard(@parent).first.course).to eq @course
+    end
   end
 
   context "root account restrictions" do

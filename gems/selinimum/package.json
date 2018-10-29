@@ -3,6 +3,6 @@
   "private": true,
   "version": "1.0.0",
   "dependencies": {
-    "sass-graph": "^2.0.1"
+    "sass-graph": "^3"
   }
 }

@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require "fileutils"
-require "chromedriver/helper"
+require 'chromedriver-helper'
 require_relative "common_helper_methods/custom_alert_actions"
 
 # WebDriver uses port 7054 (the "locking port") as a mutex to ensure
@@ -324,6 +324,12 @@ module SeleniumDriverSetup
       Chromedriver.set_version "2.38"
       chrome_options = Selenium::WebDriver::Chrome::Options.new
       chrome_options.add_argument('--disable-impl-side-painting')
+
+      # put `auto_open_devtools: true` in your selenium.yml if you want to have
+      # the chrome dev tools open by default by selenium
+      if CONFIG[:auto_open_devtools]
+        chrome_options.add_argument('--auto-open-devtools-for-tabs')
+      end
 
       Selenium::WebDriver.for :chrome, options: chrome_options
     end

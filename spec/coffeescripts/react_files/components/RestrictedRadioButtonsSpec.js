@@ -35,27 +35,26 @@ QUnit.module('RestrictedRadioButtons', {
     )
   },
   teardown() {
-    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.RestrictedRadioButtons).parentNode)
     $('#fixtures').empty()
   }
 })
 
 test('renders a publish input field', function() {
-  ok(this.RestrictedRadioButtons.refs.publishInput, 'should have a publish input field')
+  ok(this.RestrictedRadioButtons.publishInput, 'should have a publish input field')
 })
 
 test('renders an unpublish input field', function() {
-  ok(this.RestrictedRadioButtons.refs.unpublishInput, 'should have an unpublish input field')
+  ok(this.RestrictedRadioButtons.unpublishInput, 'should have an unpublish input field')
 })
 
 test('renders a permissions input field', function() {
-  Simulate.change(this.RestrictedRadioButtons.refs.permissionsInput)
-  ok(this.RestrictedRadioButtons.refs.permissionsInput, 'should have an permissions input field')
+  Simulate.change(this.RestrictedRadioButtons.permissionsInput)
+  ok(this.RestrictedRadioButtons.permissionsInput, 'should have an permissions input field')
 })
 
 test('renders a calendar option input field', function() {
-  Simulate.change(this.RestrictedRadioButtons.refs.permissionsInput)
-  ok(this.RestrictedRadioButtons.refs.dateRange, 'should have a dateRange input field')
+  Simulate.change(this.RestrictedRadioButtons.permissionsInput)
+  ok(this.RestrictedRadioButtons.dateRange, 'should have a dateRange input field')
 })
 
 QUnit.module('RestrictedRadioButtons Multiple Selected Items', {
@@ -79,29 +78,20 @@ QUnit.module('RestrictedRadioButtons Multiple Selected Items', {
     )
   },
   teardown() {
-    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.RestrictedRadioButtons).parentNode)
     $('#fixtures').empty()
   }
 })
 
 test('defaults to having nothing selected when non common items are selected', function() {
-  equal(this.RestrictedRadioButtons.refs.publishInput.checked, false, 'not selected')
-  equal(this.RestrictedRadioButtons.refs.unpublishInput.checked, false, 'not selected')
-  equal(
-    this.RestrictedRadioButtons.refs.permissionsInput.checked,
-    false,
-    'not selected'
-  )
+  equal(this.RestrictedRadioButtons.publishInput.checked, false, 'not selected')
+  equal(this.RestrictedRadioButtons.unpublishInput.checked, false, 'not selected')
+  equal(this.RestrictedRadioButtons.permissionsInput.checked, false, 'not selected')
 })
 
 test('selecting the restricted access option default checks the hiddenInput option', function() {
-  this.RestrictedRadioButtons.refs.permissionsInput.checked = true
-  Simulate.change(this.RestrictedRadioButtons.refs.permissionsInput)
-  equal(
-    this.RestrictedRadioButtons.refs.link_only.checked,
-    true,
-    'default checks hiddenInput'
-  )
+  this.RestrictedRadioButtons.permissionsInput.checked = true
+  Simulate.change(this.RestrictedRadioButtons.permissionsInput)
+  equal(this.RestrictedRadioButtons.link_only.checked, true, 'default checks hiddenInput')
 })
 
 QUnit.module('RestrictedRadioButtons#extractFormValues', {
@@ -116,14 +106,13 @@ QUnit.module('RestrictedRadioButtons#extractFormValues', {
     )
   },
   teardown() {
-    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.restrictedRadioButtons).parentNode)
     $('#fixtures').empty()
   }
 })
 
 test('returns the correct object to publish an item', function() {
-  this.restrictedRadioButtons.refs.publishInput.checked = true
-  Simulate.change(this.restrictedRadioButtons.refs.publishInput)
+  this.restrictedRadioButtons.publishInput.checked = true
+  Simulate.change(this.restrictedRadioButtons.publishInput)
   const expectedObject = {
     hidden: false,
     unlock_at: '',
@@ -138,8 +127,8 @@ test('returns the correct object to publish an item', function() {
 })
 
 test('returns the correct object to unpublish an item', function() {
-  this.restrictedRadioButtons.refs.unpublishInput.checked = true
-  Simulate.change(this.restrictedRadioButtons.refs.unpublishInput)
+  this.restrictedRadioButtons.unpublishInput.checked = true
+  Simulate.change(this.restrictedRadioButtons.unpublishInput)
   const expectedObject = {
     hidden: false,
     unlock_at: '',
@@ -154,8 +143,8 @@ test('returns the correct object to unpublish an item', function() {
 })
 
 test('returns the correct object to hide an item', function() {
-  this.restrictedRadioButtons.refs.permissionsInput.checked = true
-  Simulate.change(this.restrictedRadioButtons.refs.permissionsInput)
+  this.restrictedRadioButtons.permissionsInput.checked = true
+  Simulate.change(this.restrictedRadioButtons.permissionsInput)
   const expectedObject = {
     hidden: true,
     unlock_at: '',
@@ -170,11 +159,11 @@ test('returns the correct object to hide an item', function() {
 })
 
 test('returns the correct object to restrict an item based on dates', function() {
-  Simulate.change(this.restrictedRadioButtons.refs.permissionsInput)
-  Simulate.change(this.restrictedRadioButtons.refs.dateRange)
-  this.restrictedRadioButtons.refs.dateRange.checked = true
-  $(this.restrictedRadioButtons.refs.unlock_at).data('unfudged-date', 'something else')
-  $(this.restrictedRadioButtons.refs.lock_at).data('unfudged-date', 'something')
+  Simulate.change(this.restrictedRadioButtons.permissionsInput)
+  Simulate.change(this.restrictedRadioButtons.dateRange)
+  this.restrictedRadioButtons.dateRange.checked = true
+  $(this.restrictedRadioButtons.unlock_at).data('unfudged-date', 'something else')
+  $(this.restrictedRadioButtons.lock_at).data('unfudged-date', 'something')
   const expectedObject = {
     hidden: false,
     unlock_at: 'something else',
@@ -213,19 +202,18 @@ QUnit.module('RestrictedRadioButtons Multiple Items', {
     )
   },
   teardown() {
-    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.restrictedRadioButtons).parentNode)
     $('#fixtures').empty()
   }
 })
 
 test('commonly selected items will open the same defaulted options', function() {
   equal(
-    this.restrictedRadioButtons.refs.permissionsInput.checked,
+    this.restrictedRadioButtons.permissionsInput.checked,
     true,
     'permissionsInput is checked for all of the selected items'
   )
   equal(
-    this.restrictedRadioButtons.refs.link_only.checked,
+    this.restrictedRadioButtons.link_only.checked,
     true,
     'link_only is checked for all of the selected items'
   )

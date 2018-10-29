@@ -16,13 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import htmlEscape from "escape-html";
 import clickCallback from "./clickCallback";
+import formatMessage from "../../../format-message";
 
 tinymce.create("tinymce.plugins.InstructureRecord", {
   init: function(ed) {
     ed.addCommand("instructureRecord", clickCallback.bind(this, ed, document));
     ed.addButton("instructure_record", {
-      title: "Record/Upload Media",
+      title: htmlEscape(
+        formatMessage({
+          default: "Record/Upload Media",
+          description: "Title for RCE button to insert or record media"
+        })
+      ),
       cmd: "instructureRecord",
       icon: "video icon-video"
     });

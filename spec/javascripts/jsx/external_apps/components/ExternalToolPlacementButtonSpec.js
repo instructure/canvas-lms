@@ -26,7 +26,9 @@ test('normally renders with a menuitem role', () => {
   const wrapper = shallow(<ExternalToolPlacementButton tool={{
     app_type: 'ContextExternalTool',
     name: 'A Tool',
-  }} />)
+  }}
+  returnFocus={()=>{}}
+  />)
   equal(wrapper.find('a').props().role, 'menuitem');
 })
 
@@ -34,6 +36,8 @@ test('renders as a button when specified', () => {
   const wrapper = shallow(<ExternalToolPlacementButton type="button" tool={{
     app_type: 'ContextExternalTool',
     name: 'A Tool',
-  }} />)
+  }}
+  returnFocus={()=>{}}
+  />)
   equal(wrapper.find('a').props().role, 'button');
 })

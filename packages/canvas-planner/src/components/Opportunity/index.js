@@ -40,7 +40,7 @@ export class Opportunity extends Component {
     opportunityTitle: string.isRequired,
     timeZone: string.isRequired,
     url: string.isRequired,
-    dismiss: func.isRequired,
+    dismiss: func,
     plannerOverride: object,
     registerAnimatable: func,
     deregisterAnimatable: func,

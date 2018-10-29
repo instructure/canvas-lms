@@ -84,7 +84,7 @@ ul.user_list li.user {
     width: 0;
     height: 0;
     padding: 0;
-    margin: (-8px) 0 0 -8px;
+    margin: direction-sides((-8px) 0 0 -8px);
     border-bottom: 10px solid transparent;
     border-#{direction(left)}: 10px solid #06A9EE;
     display: block;
@@ -220,7 +220,7 @@ ul.user_list div.enrollment_type.pending {
     padding: direction-sides(4px 0 4px 25px);
     border: solid $section_tabs_border_bottom_color;
     border-width: 0 1px 1px;
-    &:hover, &:focus {
+    &:hover {
       background-color: $section_tabs_hover_background_color;
       z-index: 0;
       position: static;
@@ -238,7 +238,7 @@ ul.user_list div.enrollment_type.pending {
 #nav_disabled_list {
   border-top: 0;
   li.disabled {
-    padding: 4px 0 4px 0px;
+    padding: direction-sides(4px 0 4px 0px);
     border-bottom: 1px solid $section_tabs_border_top_color;
   }
   li.navitem {
@@ -301,6 +301,16 @@ ul.user_list div.enrollment_type.pending {
 }
 
 #course_form table.coursesettings {
+  table-layout: fixed;
+  width: 100%;
+  td:nth-of-type(1) {
+    width: 20%;
+  }
+  td:nth-of-type(2) {
+    width: 80%;
+  }
+
+
   input[type=checkbox] + label {
     vertical-align: baseline;
   }

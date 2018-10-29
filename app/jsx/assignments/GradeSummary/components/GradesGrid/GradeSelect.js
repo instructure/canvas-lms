@@ -182,9 +182,9 @@ export default class GradeSelect extends Component {
       selectedOption == null ||
       selectedOption.value === NO_SELECTION
     ) {
-      if (_event.type === 'blur') {
+      setTimeout(() => {
         this.$input.value = this.state.selectedOption.label
-      }
+      })
       return
     }
 

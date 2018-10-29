@@ -58,8 +58,8 @@
 .CourseImagePicker__Overlay {
   position: fixed;
   top: 0;
-  left: 0;
-  right: 0;
+  #{direction(left)}: 0;
+  #{direction(right)}: 0;
   bottom: 0;
   pointer-events: none;
   z-index: 10;
@@ -71,8 +71,8 @@
 
 .DraggingOverlay {
   top: $ic-sp;
-  left: $ic-sp;
-  right: $ic-sp;
+  #{direction(left)}: $ic-sp;
+  #{direction(right)}: $ic-sp;
   bottom: $ic-sp;
   border: 4px dashed var(--ic-brand-primary);
 }

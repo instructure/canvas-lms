@@ -81,11 +81,13 @@ it('renders page icon for pages', () => {
   expect(wrapper.find('IconDocument').exists()).toBe(true);
 });
 
-it('renders peer review icon for peer reviews', () => {
+it('renders peer review icon and title for peer reviews', () => {
   const wrapper = shallow(
     <ToDoItem {...getDefaultProps({ type: 'Peer Review' })} />
   );
   expect(wrapper.find('IconPeerReview').exists()).toBe(true);
+  const title = wrapper.find('.ToDoSidebarItem__Title');
+  expect(title.html()).toMatch(/Peer Review for/);
 });
 
 it('renders note icon for planner_notes', () => {

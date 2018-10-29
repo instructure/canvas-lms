@@ -7845,6 +7845,7 @@ zh-Hant:
   enable_the_creation_of_blueprint_courses_79f91c30: 容許創建計劃課程
   enable_the_creation_of_master_courses_8205b155: 啟用設立主課程
   enable_the_plagiarism_detection_platform_7c3b6195: 啟用抄襲檢測平台
+  enable_toolname_b06257b7: "啟用%{toolName}"
   enabled_and_locked_49ff3de4: 啟用並鎖定
   enabled_ba7cab66: 啟用
   enabled_by_default_e530d6ed: 默認啟用

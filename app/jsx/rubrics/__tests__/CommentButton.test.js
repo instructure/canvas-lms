@@ -33,8 +33,8 @@ describe('The CommentButton component', () => {
   const component = (mods) => shallow(<CommentButton {...{ ...props, ...mods }} />)
 
   it('renders the root component as expected', () => {
-    expect(component().debug()).toMatchSnapshot()
-    expect(component().find('CommentDialog').shallow().debug()).toMatchSnapshot()
+    expect(component()).toMatchSnapshot()
+    expect(component().find('CommentDialog').shallow()).toMatchSnapshot()
   })
 
   it('opens the dialog when the outer button is clicked', () => {

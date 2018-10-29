@@ -18,10 +18,12 @@
 require_relative '../../helpers/gradezilla_common'
 require_relative '../pages/gradezilla_page'
 require_relative '../setup/gradebook_setup'
+require_relative '../../../feature_flag_helper'
 
 describe "Gradezilla - post grades to SIS" do
   include GradezillaCommon
   include GradebookSetup
+  include FeatureFlagHelper
   include_context "in-process server selenium tests"
 
   before(:once) do
@@ -62,7 +64,7 @@ describe "Gradezilla - post grades to SIS" do
     end
 
     it "should be visible when enabled on course with sis_source_id" do
-      Account.default.set_feature_flag!('post_grades', 'on')
+      mock_feature_flag(:post_grades, true)
       @course.sis_source_id = 'xyz'
       @course.save
 
@@ -74,7 +76,7 @@ describe "Gradezilla - post grades to SIS" do
 
     it 'does not show assignment errors when clicking the post grades button if all ' \
       'assignments have due dates for each section', priority: '1', test_id: 3036003 do
-      Account.default.set_feature_flag!('post_grades', 'on')
+      mock_feature_flag(:post_grades, true)
 
       @course.update!(sis_source_id: 'xyz')
       @course.course_sections.each do |section|

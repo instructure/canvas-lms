@@ -26,11 +26,11 @@
 }
 
 .alert {
-  padding-left: 40px;
-  padding-right: 40px;
+  padding-#{direction(left)}: 40px;
+  padding-#{direction(right)}: 40px;
   margin: 1px 2px 2px;
   width: auto;
-  padding: 20px 20px 6px 6px;
+  padding: direction-sides(20px 20px 6px 6px);
   background-color: transparent; // added to override the alert creation form block that was throwing a golden background under admin alerts
   .alert-label {
     color: black;

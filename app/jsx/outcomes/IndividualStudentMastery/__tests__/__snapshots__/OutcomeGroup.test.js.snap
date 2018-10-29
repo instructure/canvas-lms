@@ -1,25 +1,221 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`renders correctly expanded 1`] = `
-"<View as=\\"div\\" className=\\"outcomeGroup\\" display=\\"auto\\">
-  <ToggleGroup summary={{...}} toggleLabel=\\"Toggle outcomes for My group\\" expanded={true} onToggle={[Function]} size=\\"medium\\" icon={[Function: IconArrowOpenEnd]} iconExpanded={[Function: IconArrowOpenDown]} defaultExpanded={false} transition={true} as=\\"span\\" elementRef={[Function: elementRef]} border={true}>
-    <List variant=\\"unstyled\\" delimiter=\\"solid\\" as=\\"ul\\" margin=\\"none\\" size=\\"medium\\">
-      <ListItem margin=\\"0\\">
-        <Outcome outcome={{...}} expanded={false} onExpansionChange={[Function: onExpansionChange]} outcomeProficiency={{...}} />
+<View
+  as="div"
+  className="outcomeGroup"
+  display="auto"
+>
+  <ToggleGroup
+    as="span"
+    border={true}
+    defaultExpanded={false}
+    elementRef={[Function]}
+    expanded={true}
+    icon={[Function]}
+    iconExpanded={[Function]}
+    onToggle={[Function]}
+    size="medium"
+    summary={
+      <Flex
+        alignItems="center"
+        as="span"
+        direction="row"
+        inline={false}
+        justifyItems="space-between"
+        visualDebug={false}
+        wrapItems={false}
+      >
+        <FlexItem
+          as="span"
+          grow={false}
+          padding="0 x-small 0 0"
+          shrink={false}
+        >
+          <Text
+            as="span"
+            letterSpacing="normal"
+            size="large"
+            weight="bold"
+          >
+            My group
+          </Text>
+        </FlexItem>
+        <FlexItem
+          as="span"
+          grow={false}
+          shrink={false}
+        >
+          <Pill
+            text="0 of 1 Mastered"
+            variant="default"
+          />
+        </FlexItem>
+      </Flex>
+    }
+    toggleLabel="Toggle outcomes for My group"
+    transition={true}
+  >
+    <List
+      as="ul"
+      delimiter="solid"
+      margin="none"
+      size="medium"
+      variant="unstyled"
+    >
+      <ListItem
+        key="1"
+        margin="0"
+      >
+        <Outcome
+          expanded={false}
+          onExpansionChange={[Function]}
+          outcome={
+            Object {
+              "calculation_method": "highest",
+              "expansionId": 100,
+              "id": 1,
+              "mastered": false,
+              "mastery_points": 3,
+              "points_possible": 5,
+              "ratings": Array [
+                Object {
+                  "description": "My first rating",
+                },
+                Object {
+                  "description": "My second rating",
+                },
+              ],
+              "results": Array [
+                Object {
+                  "assignment": Object {
+                    "html_url": "http://foo",
+                    "id": 1,
+                    "name": "My assignment",
+                    "submission_types": "online_quiz",
+                  },
+                  "id": 1,
+                  "percent": 0.1,
+                  "score": 1,
+                },
+              ],
+              "title": "My outcome",
+            }
+          }
+          outcomeProficiency={null}
+        />
       </ListItem>
     </List>
   </ToggleGroup>
-</View>"
+</View>
 `;
 
 exports[`renders the OutcomeGroup component 1`] = `
-"<View as=\\"div\\" className=\\"outcomeGroup\\" display=\\"auto\\">
-  <ToggleGroup summary={{...}} toggleLabel=\\"Toggle outcomes for My group\\" expanded={false} onToggle={[Function]} size=\\"medium\\" icon={[Function: IconArrowOpenEnd]} iconExpanded={[Function: IconArrowOpenDown]} defaultExpanded={false} transition={true} as=\\"span\\" elementRef={[Function: elementRef]} border={true}>
-    <List variant=\\"unstyled\\" delimiter=\\"solid\\" as=\\"ul\\" margin=\\"none\\" size=\\"medium\\">
-      <ListItem margin=\\"0\\">
-        <Outcome outcome={{...}} expanded={false} onExpansionChange={[Function: onExpansionChange]} outcomeProficiency={{...}} />
+<View
+  as="div"
+  className="outcomeGroup"
+  display="auto"
+>
+  <ToggleGroup
+    as="span"
+    border={true}
+    defaultExpanded={false}
+    elementRef={[Function]}
+    expanded={false}
+    icon={[Function]}
+    iconExpanded={[Function]}
+    onToggle={[Function]}
+    size="medium"
+    summary={
+      <Flex
+        alignItems="center"
+        as="span"
+        direction="row"
+        inline={false}
+        justifyItems="space-between"
+        visualDebug={false}
+        wrapItems={false}
+      >
+        <FlexItem
+          as="span"
+          grow={false}
+          padding="0 x-small 0 0"
+          shrink={false}
+        >
+          <Text
+            as="span"
+            letterSpacing="normal"
+            size="large"
+            weight="bold"
+          >
+            My group
+          </Text>
+        </FlexItem>
+        <FlexItem
+          as="span"
+          grow={false}
+          shrink={false}
+        >
+          <Pill
+            text="0 of 1 Mastered"
+            variant="default"
+          />
+        </FlexItem>
+      </Flex>
+    }
+    toggleLabel="Toggle outcomes for My group"
+    transition={true}
+  >
+    <List
+      as="ul"
+      delimiter="solid"
+      margin="none"
+      size="medium"
+      variant="unstyled"
+    >
+      <ListItem
+        key="1"
+        margin="0"
+      >
+        <Outcome
+          expanded={false}
+          onExpansionChange={[Function]}
+          outcome={
+            Object {
+              "calculation_method": "highest",
+              "expansionId": 100,
+              "id": 1,
+              "mastered": false,
+              "mastery_points": 3,
+              "points_possible": 5,
+              "ratings": Array [
+                Object {
+                  "description": "My first rating",
+                },
+                Object {
+                  "description": "My second rating",
+                },
+              ],
+              "results": Array [
+                Object {
+                  "assignment": Object {
+                    "html_url": "http://foo",
+                    "id": 1,
+                    "name": "My assignment",
+                    "submission_types": "online_quiz",
+                  },
+                  "id": 1,
+                  "percent": 0.1,
+                  "score": 1,
+                },
+              ],
+              "title": "My outcome",
+            }
+          }
+          outcomeProficiency={null}
+        />
       </ListItem>
     </List>
   </ToggleGroup>
-</View>"
+</View>
 `;

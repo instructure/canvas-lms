@@ -499,49 +499,49 @@ describe "student planner" do
   context "with new activity button" do
     before :once do
       @old, @older, @oldest = new_activities_in_the_past
-      graded_discussion_in_the_future
+      @future_discussion = graded_discussion_in_the_future
     end
 
     before :each do
       user_session(@student1)
     end
 
-    it "scrolls to the next immediate new activity", priority: "1", test_id: 3468774 do
-      skip('fragile, will be fixed in ADMIN-1449')
+    it "scrolls to the next new activity", priority: "1", test_id: 3468774 do
       go_to_list_view
+      wait_for_spinner
+      expect(items_displayed.count).to eq 1
+      expect(scroll_height).to eq 0
+
       new_activity_button.click
       wait_for_spinner
-      expect(first_item_on_page).to contain_link(@old.title.to_s)
+      expect(items_displayed.count).to eq 4
+      expect{scroll_height}.to become_between 600, 620  # 609
+
       new_activity_button.click
-      expect(first_item_on_page).to contain_link(@older.title.to_s)
-      new_activity_button.click
-      expect(first_item_on_page).to contain_link(@oldest.title.to_s)
+      expect{scroll_height}.to become_between 450, 470  # 457
     end
 
-    it "shows new activity if there are activity above the current scroll position", priority: "1", test_id: 3468775 do
-      skip('fragile, will be fixed in ADMIN-1449')
-      past_discussion = graded_discussion_in_the_past
-      graded_discussion_in_the_future
+    it "shows any new activity above the current scroll position", priority: "1", test_id: 3468775 do
       go_to_list_view
+      wait_for_spinner
+
+      expect(planner_header_container).to contain_jqcss(new_activity_button_selector)
       new_activity_button.click
       wait_for_spinner
-      expect(planner_app_div).to contain_link(past_discussion.title.to_s)
-      expect(planner_app_div).not_to contain_css("button:contains('New Activity')")
+      scroll_page_to_top
+      expect(planner_header_container).not_to contain_jqcss(new_activity_button_selector)
       scroll_page_to_bottom
-      expect(planner_app_div).to contain_css("button:contains('New Activity')")
+      expect(planner_header_container).to contain_jqcss(new_activity_button_selector)
     end
-  end
 
-  it "completes and collapses an item", priority: "1", test_id: 3263155 do
-    skip("often times out in jenkins. Ticket ADMIN-618 exists to fix this.")
-    @course.assignments.create!(name: 'assignment 1',
-                                due_at: Time.zone.now + 2.days)
-    go_to_list_view
-    f('label[for*=Checkbox]').click
-    wait_for_ajaximations # wait for the resulting api call to complete
-    refresh_page
-    wait_for_planner_load
-    expect(planner_app_div).to contain_jqcss('span:contains("Show 1 completed item")')
+    it "collapses an item when marked as complete", priority: "1", test_id: 3263155 do
+      go_to_list_view
+      wait_for_spinner
+
+      planner_item_status_checkbox('Discussion', @future_discussion.title).click
+      refresh_page
+      expect(planner_app_div).to contain_jqcss('span:contains("Show 1 completed item")')
+    end
   end
 
   context "teacher in a course" do

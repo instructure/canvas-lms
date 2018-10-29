@@ -40,7 +40,7 @@ describe('default proficiency', () => {
 
   it('renders the ProficiencyRating component', () => {
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
-    expect(wrapper.debug()).toMatchSnapshot()
+    expect(wrapper).toMatchSnapshot()
   })
 
   it('renders loading at startup', () => {

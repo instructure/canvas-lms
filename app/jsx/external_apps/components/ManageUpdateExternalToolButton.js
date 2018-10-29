@@ -25,7 +25,8 @@ import store from '../../external_apps/lib/ExternalAppsStore'
 
 export default class ManageUpdateExternalToolButton extends React.Component {
   static propTypes = {
-    tool: PropTypes.object.isRequired
+    tool: PropTypes.object.isRequired,
+    returnFocus: PropTypes.func.isRequired,
   }
 
   openReregModal = e => {
@@ -51,7 +52,7 @@ export default class ManageUpdateExternalToolButton extends React.Component {
         >
           {I18n.t('Manage Update')}
         </a>
-        <Lti2ReregistrationUpdateModal ref="reregModal" tool={this.props.tool} />
+        <Lti2ReregistrationUpdateModal ref="reregModal" tool={this.props.tool} returnFocus={this.props.returnFocus} />
       </li>
     )
   }

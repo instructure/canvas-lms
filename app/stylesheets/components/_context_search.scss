@@ -46,7 +46,7 @@
     a.toggle {
       display: none;
       float: direction(left);
-      margin: 0 14px 0 6px;
+      margin: direction-sides(0 14px 0 6px);
       i {
         width: 16px;
         height: 16px;
@@ -163,7 +163,7 @@
     li.expanded, li.active.expanded {
       padding-#{direction(left)}: 11px;
       .avatar-box {
-        margin: 0 14px 0 0;
+        margin: direction-sides(0 14px 0 0);
       }
     }
   }

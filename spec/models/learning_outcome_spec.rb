@@ -461,8 +461,8 @@ describe LearningOutcome do
         'n_mastery'
       ]
       invalid_values = {
-        decaying_average: [0, 100, 1000, nil],
-        n_mastery: [0, 10, nil]
+        decaying_average: [0, 100, 1000],
+        n_mastery: [0, 10]
       }.with_indifferent_access
 
       calc_method.each do |method|
@@ -489,9 +489,9 @@ describe LearningOutcome do
 
     context "should set calculation_int to default if the calculation_method is changed and calculation_int isn't set" do
       method_to_int = {
-        # "decaying_average" => { default: 75, testval: 4, altmeth: 'n_mastery' },
-        # "n_mastery" => { default: 5, testval: nil, altmeth: 'highest' },
-        "highest" => { default: nil, testval: nil, altmeth: 'latest' },
+        "decaying_average" => { default: 65, testval: nil, altmeth: 'latest' },
+        "n_mastery" => { default: 5, testval: nil, altmeth: 'highest' },
+        "highest" => { default: nil, testval: 4, altmeth: 'n_mastery' },
         "latest" => { default: nil, testval: 72, altmeth: 'decaying_average' },
       }
 
@@ -821,9 +821,10 @@ describe LearningOutcome do
         expect(@outcome.points_possible).to be 5
       end
 
-      it "should default calculation_method to highest" do
+      it "should default calculation_method to decaying_average" do
         @outcome = LearningOutcome.create!(:title => 'outcome')
-        expect(@outcome.calculation_method).to eql('highest')
+        expect(@outcome.calculation_method).to eql('decaying_average')
+        expect(@outcome.calculation_int).to be 65
       end
 
       it "should default calculation_int to nil for highest" do
@@ -846,7 +847,7 @@ describe LearningOutcome do
 
       # This is to prevent changing behavior of existing outcomes made before we added the
       # ability to set a calculation_method
-      it "should set calculation_method to highest if the record is pre-existing and nil" do
+      it "should set calculation_method to decaying_average if the record is pre-existing and nil" do
         @outcome = LearningOutcome.create!(:title => 'outcome')
         @outcome.update_column(:calculation_method, nil)
         @outcome.reload
@@ -855,7 +856,7 @@ describe LearningOutcome do
         @outcome.save!
         @outcome.reload
         expect(@outcome.description).to eq("foo bar baz qux")
-        expect(@outcome.calculation_method).to eq('highest')
+        expect(@outcome.calculation_method).to eq('decaying_average')
       end
     end
   end

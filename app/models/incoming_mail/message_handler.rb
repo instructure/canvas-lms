@@ -20,36 +20,38 @@ module IncomingMail
   class MessageHandler
     def handle(outgoing_from_address, body, html_body, incoming_message, tag)
       secure_id, original_message_id = parse_tag(tag)
-      raise IncomingMail::Errors::SilentIgnore unless original_message_id
+      return unless original_message_id
 
       original_message = Message.where(id: original_message_id).first
       # This prevents us from rebouncing users that have auto-replies setup -- only bounce something
       # that was sent out because of a notification.
-      raise IncomingMail::Errors::SilentIgnore unless original_message && original_message.notification_id
-      raise IncomingMail::Errors::SilentIgnore unless valid_secure_id?(original_message_id, secure_id)
+      return unless original_message && original_message.notification_id
+      return unless valid_secure_id?(original_message_id, secure_id)
 
       from_channel = nil
       original_message.shard.activate do
-        context = original_message.context
-        user = original_message.user
-        raise IncomingMail::Errors::UnknownAddress unless valid_user_and_context?(context, user)
-        from_channel = sent_from_channel(user, incoming_message)
-        raise IncomingMail::Errors::UnknownSender unless from_channel
-        Rails.cache.fetch(['incoming_mail_reply_from', context, incoming_message.message_id].cache_key, expires_in: 7.days) do
-          context.reply_from({
-                               :purpose => 'general',
-                               :user => user,
-                               :subject => utf8ify(incoming_message.subject, incoming_message.header[:subject].try(:charset)),
-                               :html => html_body,
-                               :text => body
-                             })
-          true
+        begin
+          context = original_message.context
+          user = original_message.user
+          raise IncomingMail::Errors::UnknownAddress unless valid_user_and_context?(context, user)
+          from_channel = sent_from_channel(user, incoming_message)
+          raise IncomingMail::Errors::UnknownSender unless from_channel
+          Rails.cache.fetch(['incoming_mail_reply_from', context, incoming_message.message_id].cache_key, expires_in: 7.days) do
+            context.reply_from({
+                                 :purpose => 'general',
+                                 :user => user,
+                                 :subject => utf8ify(incoming_message.subject, incoming_message.header[:subject].try(:charset)),
+                                 :html => html_body,
+                                 :text => body
+                               })
+            true
+          end
+        rescue IncomingMail::Errors::ReplyFrom => error
+          bounce_message(original_message, incoming_message, error, outgoing_from_address, from_channel)
+        rescue => e
+          Canvas::Errors.capture_exception("IncomingMailProcessor", e)
         end
       end
-    rescue IncomingMail::Errors::ReplyFrom => error
-      bounce_message(original_message, incoming_message, error, outgoing_from_address, from_channel)
-    rescue IncomingMail::Errors::SilentIgnore
-      #do nothing
     end
 
     private

@@ -109,8 +109,8 @@ input::-webkit-input-placeholder {
 
 .enrollment_link {
   bottom: 10px;
-  left: 0;
-  right: 0;
+  #{direction(left)}: 0;
+  #{direction(right)}: 0;
   text-align: center;
 }
 

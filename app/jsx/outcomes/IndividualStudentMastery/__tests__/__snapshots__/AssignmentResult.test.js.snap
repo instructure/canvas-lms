@@ -1,36 +1,125 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`renders the AlignmentResult component 1`] = `
-"<Flex padding=\\"small\\" direction=\\"column\\" alignItems=\\"stretch\\" as=\\"span\\" justifyItems=\\"start\\" inline={false} visualDebug={false} wrapItems={false}>
-  <FlexItem as=\\"span\\" grow={false} shrink={false}>
-    <Link href=\\"http://foo\\" variant=\\"default\\" as=\\"button\\" linkRef={[Function: linkRef]} ellipsis={false} iconPlacement=\\"start\\">
-      <Flex alignItems=\\"center\\" as=\\"span\\" direction=\\"row\\" justifyItems=\\"start\\" inline={false} visualDebug={false} wrapItems={false}>
-        <FlexItem as=\\"span\\" grow={false} shrink={false}>
-          <Text size=\\"medium\\" as=\\"span\\" letterSpacing=\\"normal\\">
+<Flex
+  alignItems="stretch"
+  as="span"
+  direction="column"
+  inline={false}
+  justifyItems="start"
+  padding="small"
+  visualDebug={false}
+  wrapItems={false}
+>
+  <FlexItem
+    as="span"
+    grow={false}
+    shrink={false}
+  >
+    <Link
+      as="button"
+      ellipsis={false}
+      href="http://foo"
+      iconPlacement="start"
+      linkRef={[Function]}
+      variant="default"
+    >
+      <Flex
+        alignItems="center"
+        as="span"
+        direction="row"
+        inline={false}
+        justifyItems="start"
+        visualDebug={false}
+        wrapItems={false}
+      >
+        <FlexItem
+          as="span"
+          grow={false}
+          shrink={false}
+        >
+          <Text
+            as="span"
+            letterSpacing="normal"
+            size="medium"
+          >
             <IconQuiz />
           </Text>
         </FlexItem>
-        <FlexItem padding=\\"0 x-small\\" as=\\"span\\" grow={false} shrink={false}>
-          <Text weight=\\"bold\\" as=\\"span\\" size=\\"medium\\" letterSpacing=\\"normal\\">
+        <FlexItem
+          as="span"
+          grow={false}
+          padding="0 x-small"
+          shrink={false}
+        >
+          <Text
+            as="span"
+            letterSpacing="normal"
+            size="medium"
+            weight="bold"
+          >
             My assignment
           </Text>
         </FlexItem>
       </Flex>
     </Link>
   </FlexItem>
-  <FlexItem padding=\\"x-small 0\\" as=\\"span\\" grow={false} shrink={false}>
-    <View padding=\\"x-small 0 0 0\\" display=\\"auto\\">
-      <Text size=\\"small\\" fontStyle=\\"italic\\" weight=\\"bold\\" as=\\"span\\" letterSpacing=\\"normal\\">
+  <FlexItem
+    as="span"
+    grow={false}
+    padding="x-small 0"
+    shrink={false}
+  >
+    <View
+      display="auto"
+      padding="x-small 0 0 0"
+    >
+      <Text
+        as="span"
+        fontStyle="italic"
+        letterSpacing="normal"
+        size="small"
+        weight="bold"
+      >
         Your score: 1
       </Text>
     </View>
   </FlexItem>
-  <FlexItem borderWidth=\\"small\\" as=\\"span\\" grow={false} shrink={false}>
-    <div className=\\"react-rubric\\">
-      <div className=\\"ratings\\">
-        <Ratings tiers={{...}} points={1} hidePoints={false} useRange={false} customRatings={[undefined]} defaultMasteryThreshold={3} pointsPossible={5} assessing={false} isSummary={false} footer={{...}} onPointChange={[Function: onPointChange]} />
+  <FlexItem
+    as="span"
+    borderWidth="small"
+    grow={false}
+    shrink={false}
+  >
+    <div
+      className="react-rubric"
+    >
+      <div
+        className="ratings"
+      >
+        <Ratings
+          assessing={false}
+          defaultMasteryThreshold={3}
+          footer={null}
+          hidePoints={false}
+          isSummary={false}
+          onPointChange={[Function]}
+          points={1}
+          pointsPossible={5}
+          tiers={
+            Array [
+              Object {
+                "description": "My first rating",
+              },
+              Object {
+                "description": "My second rating",
+              },
+            ]
+          }
+          useRange={false}
+        />
       </div>
     </div>
   </FlexItem>
-</Flex>"
+</Flex>
 `;

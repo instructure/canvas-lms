@@ -22,11 +22,13 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import Modal, {ModalBody, ModalFooter} from '../../shared/components/InstuiModal'
-import store from '../../external_apps/lib/ExternalAppsStore'
+import store from '../lib/ExternalAppsStore'
 
 export default class DeleteExternalToolButton extends React.Component {
   static propTypes = {
-    tool: PropTypes.object.isRequired
+    tool: PropTypes.shape({name: PropTypes.string}).isRequired,
+    returnFocus: PropTypes.func.isRequired,
+    canAddEdit: PropTypes.bool.isRequired
   }
 
   state = {
@@ -49,6 +51,7 @@ export default class DeleteExternalToolButton extends React.Component {
       this.setState({modalIsOpen: false}, cb)
     } else {
       this.setState({modalIsOpen: false})
+      this.props.returnFocus()
     }
   }
 
@@ -58,6 +61,7 @@ export default class DeleteExternalToolButton extends React.Component {
     this.closeModal(() => {
       store.delete(this.props.tool)
       this.isDeleting = false
+      this.props.returnFocus({passFocusUp: true})
     })
   }
 
@@ -68,8 +72,8 @@ export default class DeleteExternalToolButton extends React.Component {
           <a
             href="#"
             tabIndex="-1"
-            ref="btnTriggerDelete"
             role="button"
+            ref="btnTriggerDelete"
             aria-label={I18n.t('Delete %{toolName} App', {toolName: this.props.tool.name})}
             className="icon-trash"
             onClick={this.openModal}

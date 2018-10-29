@@ -480,56 +480,97 @@ test('rounds points_possible', function() {
   equal(data.points_possible, 1.23)
 })
 
-test('sets seconds of due_at to 59 if year has changed', function() {
-  const view = this.editView({due_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))})
+test('sets seconds of due_at to 59 if the new minute value is 59', function() {
+  const view = this.editView({due_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:58:23'))})
   const override = view.assignment.attributes.assignment_overrides.models[0]
-  override.attributes.due_at = $.unfudgeDateForProfileTimezone(new Date('2001-08-28T11:59:23'))
-  strictEqual(view.getFormData().due_at, '2001-08-28T11:59:59.000Z')
+  override.attributes.due_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
+  strictEqual(view.getFormData().due_at, '2000-08-28T11:59:59.000Z')
 })
 
-test('sets seconds of due_at to 59 if month has changed', function() {
+test('sets seconds of due_at to 00 if the new minute value is not 59', function() {
   const view = this.editView({due_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))})
   const override = view.assignment.attributes.assignment_overrides.models[0]
-  override.attributes.due_at = $.unfudgeDateForProfileTimezone(new Date('2000-09-28T11:59:23'))
-  strictEqual(view.getFormData().due_at, '2000-09-28T11:59:59.000Z')
+  override.attributes.due_at = $.unfudgeDateForProfileTimezone(new Date('2000-09-28T11:58:23'))
+  strictEqual(view.getFormData().due_at, '2000-09-28T11:58:00.000Z')
 })
 
-test('sets seconds of due_at to 59 if day has changed', function() {
-  const view = this.editView({due_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))})
+// The UI doesn't allow editing the seconds value and always returns 00. If
+// the seconds value was set to something different prior to the update, keep
+// that value.
+test('keeps original due_at seconds if only the seconds value has changed', function() {
+  const view = this.editView({due_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:23'))})
   const override = view.assignment.attributes.assignment_overrides.models[0]
-  override.attributes.due_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:23'))
-  strictEqual(view.getFormData().due_at, '2000-08-29T11:59:59.000Z')
+  override.attributes.due_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:59'))
+  strictEqual(view.getFormData().due_at, '2000-08-29T11:59:23.000Z')
 })
 
-test('sets seconds of due_at to 59 if hour has changed', function() {
-  const view = this.editView({due_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))})
-  const override = view.assignment.attributes.assignment_overrides.models[0]
-  override.attributes.due_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-28T10:59:23'))
-  strictEqual(view.getFormData().due_at, '2000-08-28T10:59:59.000Z')
-})
-
-test('sets seconds of due_at to 59 if minute has changed', function() {
-  const view = this.editView({due_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))})
-  const override = view.assignment.attributes.assignment_overrides.models[0]
-  override.attributes.due_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:58:23'))
-  strictEqual(view.getFormData().due_at, '2000-08-28T11:58:59.000Z')
-})
-
-test('keeps original due_at seconds if the date has not changed', function () {
+test('keeps original due_at seconds if the date has not changed', function() {
   const view = this.editView({due_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))})
   const override = view.assignment.attributes.assignment_overrides.models[0]
   override.attributes.due_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
   strictEqual(view.getFormData().due_at, '2000-08-28T11:59:23.000Z')
 })
 
-// Seems counterintuitive, but the UI doesn't allow updating the seconds
-// value, but the form will always return a seconds value of 00. In the case
-// that the due_at had seconds set to non-00, we should ignore that.
-test('keeps the original due_at seconds even if the seconds value has changed', function() {
-  const view = this.editView({due_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))})
+test('sets seconds of unlock_at to 59 if the new minute value is 59', function() {
+  const view = this.editView({unlock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:58:23'))})
   const override = view.assignment.attributes.assignment_overrides.models[0]
-  override.attributes.due_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:32'))
-  strictEqual(view.getFormData().due_at, '2000-08-28T11:59:23.000Z')
+  override.attributes.unlock_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
+  strictEqual(view.getFormData().unlock_at, '2000-08-28T11:59:59.000Z')
+})
+
+test('sets seconds of unlock_at to 00 if the new minute value is not 59', function() {
+  const view = this.editView({unlock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))})
+  const override = view.assignment.attributes.assignment_overrides.models[0]
+  override.attributes.unlock_at = $.unfudgeDateForProfileTimezone(new Date('2000-09-28T11:58:23'))
+  strictEqual(view.getFormData().unlock_at, '2000-09-28T11:58:00.000Z')
+})
+
+// The UI doesn't allow editing the seconds value and always returns 00. If
+// the seconds value was set to something different prior to the update, keep
+// that value.
+test('keeps original unlock_at seconds if only the seconds value has changed', function() {
+  const view = this.editView({unlock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:23'))})
+  const override = view.assignment.attributes.assignment_overrides.models[0]
+  override.attributes.unlock_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:59'))
+  strictEqual(view.getFormData().unlock_at, '2000-08-29T11:59:23.000Z')
+})
+
+test('keeps original unlock_at seconds if the date has not changed', function() {
+  const view = this.editView({unlock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))})
+  const override = view.assignment.attributes.assignment_overrides.models[0]
+  override.attributes.unlock_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
+  strictEqual(view.getFormData().unlock_at, '2000-08-28T11:59:23.000Z')
+})
+
+test('sets seconds of lock_at to 59 if the new minute value is 59', function() {
+  const view = this.editView({lock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:58:23'))})
+  const override = view.assignment.attributes.assignment_overrides.models[0]
+  override.attributes.lock_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
+  strictEqual(view.getFormData().lock_at, '2000-08-28T11:59:59.000Z')
+})
+
+test('sets seconds of lock_at to 00 if the new minute value is not 59', function() {
+  const view = this.editView({lock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))})
+  const override = view.assignment.attributes.assignment_overrides.models[0]
+  override.attributes.lock_at = $.unfudgeDateForProfileTimezone(new Date('2000-09-28T11:58:23'))
+  strictEqual(view.getFormData().lock_at, '2000-09-28T11:58:00.000Z')
+})
+
+// The UI doesn't allow editing the seconds value and always returns 00. If
+// the seconds value was set to something different prior to the update, keep
+// that value.
+test('keeps original lock_at seconds if only the seconds value has changed', function() {
+  const view = this.editView({lock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:23'))})
+  const override = view.assignment.attributes.assignment_overrides.models[0]
+  override.attributes.lock_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-29T11:59:59'))
+  strictEqual(view.getFormData().lock_at, '2000-08-29T11:59:23.000Z')
+})
+
+test('keeps original lock_at seconds if the date has not changed', function() {
+  const view = this.editView({lock_at: $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))})
+  const override = view.assignment.attributes.assignment_overrides.models[0]
+  override.attributes.lock_at = $.unfudgeDateForProfileTimezone(new Date('2000-08-28T11:59:23'))
+  strictEqual(view.getFormData().lock_at, '2000-08-28T11:59:23.000Z')
 })
 
 QUnit.module('EditView: handleGroupCategoryChange', {

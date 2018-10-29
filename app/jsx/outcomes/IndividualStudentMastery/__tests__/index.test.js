@@ -36,7 +36,7 @@ const props = {
 
 it('renders the component', () => {
   const wrapper = shallow(<IndividualStudentMastery {...props}/>)
-  expect(wrapper.debug()).toMatchSnapshot()
+  expect(wrapper).toMatchSnapshot()
 })
 
 it('attempts to load when mounted', () => {

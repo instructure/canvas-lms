@@ -37,6 +37,19 @@ describe Types::AssignmentGroupType do
       @group_type = GraphQLTypeTester.new(@group, current_user: @student)
     end
 
+    context "top-level permissions" do
+      it "needs read permission" do
+        some_person = user_factory(active_all: true)
+        expect(@group_type.resolve("_id", current_user: some_person)).to be_nil
+
+        expect(
+          CanvasSchema.execute(<<~GQL, context: {current_user: some_person}).dig("data", "ag")
+            query { ag: assignmentGroup(id: "#{@group.id}") { id } }
+          GQL
+        ).to be_nil
+      end
+    end
+
     it "returns information about the group" do
       expect(@group_type.resolve("_id")).to eq @group.id.to_s
       expect(@group_type.resolve("name")).to eq @group.name

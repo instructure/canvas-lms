@@ -227,7 +227,7 @@ $ic-token-padding: 3px 15px;
       padding: 0 11px;
     }
     span {
-      padding: 0 15px 0 4px;
+      padding: direction-sides(0 15px 0 4px);
     }
   }
 

@@ -44,8 +44,8 @@ $headerBorderColor: rgb(199, 205, 209);
     content: "";
     position: absolute;
     top: -0.25rem;
-    left: -0.25rem; /* stylelint-disable-line property-blacklist */
-    right: -0.25rem; /* stylelint-disable-line property-blacklist */
+    #{direction(left)}: -0.25rem;
+    #{direction(right)}: -0.25rem;
     bottom: -0.25rem;
     border: 1px solid var(--ic-link-color);
     border-radius: $borderRadiusLarge;
@@ -141,7 +141,7 @@ $headerBorderColor: rgb(199, 205, 209);
 
 .GradesGrid__FinalGradeCell {
   max-width: $finalGradeColumnWidth;
-  padding: 0 0 0 $ic-sp;
+  padding: direction-sides(0 0 0 $ic-sp);
   text-align: center;
 }
 

@@ -50,7 +50,8 @@ module Importers
           end
 
           if bank
-            if bank.grants_right?(migration.user, :read)
+            if bank.grants_right?(migration.user, :read) || (bank_context.is_a?(Account) && context.account_chain_ids.include?(bank_context.id))
+              # if it's account-level they'd still be able to see it in the list to link to a new question group even though they can't directly view it... weird
               item.assessment_question_bank_id = bank.id
             else
               migration.add_warning(t('#quizzes.quiz_group.errors.no_permissions', "User didn't have permission to reference question bank in quiz group %{group_name}", :group_name => item.name))

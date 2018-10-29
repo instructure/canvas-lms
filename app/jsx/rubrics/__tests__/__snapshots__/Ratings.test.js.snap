@@ -1,111 +1,385 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`The Ratings component only renders the single selected Rating with a footer in summary mode 1`] = `
-"<div className=\\"rating-tier selected\\" onClick={{...}} onKeyPress={[Function: onKeyPress]} role={{...}} style={{...}} tabIndex={{...}}>
-  <div className=\\"rating-description\\">
-    <Text size=\\"small\\" lineHeight=\\"condensed\\" weight=\\"bold\\" as=\\"span\\" letterSpacing=\\"normal\\">
+<div
+  className="rating-tier selected"
+  onClick={null}
+  onKeyPress={[Function]}
+  role={null}
+  style={
+    Object {
+      "width": "100%",
+    }
+  }
+  tabIndex={null}
+>
+  <div
+    className="rating-description"
+  >
+    <Text
+      as="span"
+      letterSpacing="normal"
+      lineHeight="condensed"
+      size="small"
+      weight="bold"
+    >
       Meh
     </Text>
   </div>
-  <Text size=\\"small\\" lineHeight=\\"condensed\\" as=\\"span\\" letterSpacing=\\"normal\\">
+  <Text
+    as="span"
+    letterSpacing="normal"
+    lineHeight="condensed"
+    size="small"
+  >
     More Verbosity
   </Text>
-  <div className=\\"rating-footer\\">
+  <div
+    className="rating-footer"
+  >
     <div>
       ow my foot
     </div>
   </div>
-  <div className=\\"shader nearMasteryShader\\" style={{...}} aria-label={{...}}>
-    <div className=\\"triangle\\" style={{...}} />
+  <div
+    aria-label={null}
+    className="shader nearMasteryShader"
+    style={
+      Object {
+        "backgroundColor": null,
+      }
+    }
+  >
+    <div
+      className="triangle"
+      style={
+        Object {
+          "borderBottomColor": null,
+        }
+      }
+    />
   </div>
-</div>"
+</div>
 `;
 
 exports[`The Ratings component renders a default rating if none of the ratings are selected 1`] = `
-"<div className=\\"rating-tier\\" onClick={{...}} onKeyPress={[Function: onKeyPress]} role={{...}} style={{...}} tabIndex={{...}}>
-  <div className=\\"rating-description\\">
-    <Text size=\\"small\\" lineHeight=\\"condensed\\" weight=\\"bold\\" as=\\"span\\" letterSpacing=\\"normal\\">
+<div
+  className="rating-tier"
+  onClick={null}
+  onKeyPress={[Function]}
+  role={null}
+  style={
+    Object {
+      "width": undefined,
+    }
+  }
+  tabIndex={null}
+>
+  <div
+    className="rating-description"
+  >
+    <Text
+      as="span"
+      letterSpacing="normal"
+      lineHeight="condensed"
+      size="small"
+      weight="bold"
+    >
       No details
     </Text>
   </div>
-  <Text size=\\"small\\" lineHeight=\\"condensed\\" as=\\"span\\" letterSpacing=\\"normal\\" />
-  <div className=\\"rating-footer\\">
+  <Text
+    as="span"
+    letterSpacing="normal"
+    lineHeight="condensed"
+    size="small"
+  />
+  <div
+    className="rating-footer"
+  >
     <div>
       ow my foot
     </div>
   </div>
-  <div className=\\"shader\\" style={{...}} aria-label={{...}}>
-    <div className=\\"triangle\\" style={{...}} />
+  <div
+    aria-label={null}
+    className="shader"
+    style={
+      Object {
+        "backgroundColor": undefined,
+      }
+    }
+  >
+    <div
+      className="triangle"
+      style={
+        Object {
+          "borderBottomColor": undefined,
+        }
+      }
+    />
   </div>
-</div>"
+</div>
 `;
 
 exports[`The Ratings component renders the Rating sub-components as expected when range rating enabled 1`] = `
-"<div className=\\"rating-tier\\" onClick={{...}} onKeyPress={[Function: onKeyPress]} role={{...}} style={{...}} tabIndex={{...}}>
-  <div className=\\"rating-points\\">
-    <Text size=\\"small\\" weight=\\"bold\\" as=\\"span\\" letterSpacing=\\"normal\\">
+<div
+  className="rating-tier"
+  onClick={null}
+  onKeyPress={[Function]}
+  role={null}
+  style={
+    Object {
+      "width": "33.333333333333336%",
+    }
+  }
+  tabIndex={null}
+>
+  <div
+    className="rating-points"
+  >
+    <Text
+      as="span"
+      letterSpacing="normal"
+      size="small"
+      weight="bold"
+    >
       10 to &gt;5 pts
     </Text>
   </div>
-  <div className=\\"rating-description\\">
-    <Text size=\\"small\\" lineHeight=\\"condensed\\" weight=\\"bold\\" as=\\"span\\" letterSpacing=\\"normal\\">
+  <div
+    className="rating-description"
+  >
+    <Text
+      as="span"
+      letterSpacing="normal"
+      lineHeight="condensed"
+      size="small"
+      weight="bold"
+    >
       Superb
     </Text>
   </div>
-  <Text size=\\"small\\" lineHeight=\\"condensed\\" as=\\"span\\" letterSpacing=\\"normal\\" />
-  <div className=\\"rating-footer\\" />
-  <div className=\\"shader\\" style={{...}} aria-label={{...}}>
-    <div className=\\"triangle\\" style={{...}} />
+  <Text
+    as="span"
+    letterSpacing="normal"
+    lineHeight="condensed"
+    size="small"
+  />
+  <div
+    className="rating-footer"
+  />
+  <div
+    aria-label={null}
+    className="shader"
+    style={
+      Object {
+        "backgroundColor": "transparent",
+      }
+    }
+  >
+    <div
+      className="triangle"
+      style={
+        Object {
+          "borderBottomColor": "transparent",
+        }
+      }
+    />
   </div>
-</div>"
+</div>
 `;
 
 exports[`The Ratings component renders the Rating sub-components as expected when range rating enabled 2`] = `
-"<div className=\\"rating-tier selected\\" onClick={{...}} onKeyPress={[Function: onKeyPress]} role={{...}} style={{...}} tabIndex={{...}}>
-  <div className=\\"rating-points\\">
-    <Text size=\\"small\\" weight=\\"bold\\" as=\\"span\\" letterSpacing=\\"normal\\">
+<div
+  className="rating-tier selected"
+  onClick={null}
+  onKeyPress={[Function]}
+  role={null}
+  style={
+    Object {
+      "width": "33.333333333333336%",
+    }
+  }
+  tabIndex={null}
+>
+  <div
+    className="rating-points"
+  >
+    <Text
+      as="span"
+      letterSpacing="normal"
+      size="small"
+      weight="bold"
+    >
       5 to &gt;1 pts
     </Text>
   </div>
-  <div className=\\"rating-description\\">
-    <Text size=\\"small\\" lineHeight=\\"condensed\\" weight=\\"bold\\" as=\\"span\\" letterSpacing=\\"normal\\">
+  <div
+    className="rating-description"
+  >
+    <Text
+      as="span"
+      letterSpacing="normal"
+      lineHeight="condensed"
+      size="small"
+      weight="bold"
+    >
       Meh
     </Text>
   </div>
-  <Text size=\\"small\\" lineHeight=\\"condensed\\" as=\\"span\\" letterSpacing=\\"normal\\">
+  <Text
+    as="span"
+    letterSpacing="normal"
+    lineHeight="condensed"
+    size="small"
+  >
     More Verbosity
   </Text>
-  <div className=\\"rating-footer\\" />
-  <div className=\\"shader nearMasteryShader\\" style={{...}} aria-label=\\"This rating is selected\\">
-    <div className=\\"triangle\\" style={{...}} />
+  <div
+    className="rating-footer"
+  />
+  <div
+    aria-label="This rating is selected"
+    className="shader nearMasteryShader"
+    style={
+      Object {
+        "backgroundColor": null,
+      }
+    }
+  >
+    <div
+      className="triangle"
+      style={
+        Object {
+          "borderBottomColor": null,
+        }
+      }
+    />
   </div>
-</div>"
+</div>
 `;
 
 exports[`The Ratings component renders the Rating sub-components as expected when range rating enabled 3`] = `
-"<div className=\\"rating-tier\\" onClick={{...}} onKeyPress={[Function: onKeyPress]} role={{...}} style={{...}} tabIndex={{...}}>
-  <div className=\\"rating-points\\">
-    <Text size=\\"small\\" weight=\\"bold\\" as=\\"span\\" letterSpacing=\\"normal\\">
+<div
+  className="rating-tier"
+  onClick={null}
+  onKeyPress={[Function]}
+  role={null}
+  style={
+    Object {
+      "width": "33.333333333333336%",
+    }
+  }
+  tabIndex={null}
+>
+  <div
+    className="rating-points"
+  >
+    <Text
+      as="span"
+      letterSpacing="normal"
+      size="small"
+      weight="bold"
+    >
       1 to &gt;0 pts
     </Text>
   </div>
-  <div className=\\"rating-description\\">
-    <Text size=\\"small\\" lineHeight=\\"condensed\\" weight=\\"bold\\" as=\\"span\\" letterSpacing=\\"normal\\">
+  <div
+    className="rating-description"
+  >
+    <Text
+      as="span"
+      letterSpacing="normal"
+      lineHeight="condensed"
+      size="small"
+      weight="bold"
+    >
       Subpar
     </Text>
   </div>
-  <Text size=\\"small\\" lineHeight=\\"condensed\\" as=\\"span\\" letterSpacing=\\"normal\\" />
-  <div className=\\"rating-footer\\" />
-  <div className=\\"shader\\" style={{...}} aria-label={{...}}>
-    <div className=\\"triangle\\" style={{...}} />
+  <Text
+    as="span"
+    letterSpacing="normal"
+    lineHeight="condensed"
+    size="small"
+  />
+  <div
+    className="rating-footer"
+  />
+  <div
+    aria-label={null}
+    className="shader"
+    style={
+      Object {
+        "backgroundColor": "transparent",
+      }
+    }
+  >
+    <div
+      className="triangle"
+      style={
+        Object {
+          "borderBottomColor": "transparent",
+        }
+      }
+    />
   </div>
-</div>"
+</div>
 `;
 
 exports[`The Ratings component renders the root component as expected 1`] = `
-"<div className=\\"rating-tier-list\\">
-  <Rating assessing={false} classes=\\"rating-tier\\" endOfRangePoints={{...}} footer={{...}} onClick={[Function: onClick]} shaderClass={{...}} tierColor=\\"transparent\\" hidePoints={false} isSummary={false} selected={false} width=\\"33.333333333333336%\\" description=\\"Superb\\" points={10} />
-  <Rating assessing={false} classes=\\"rating-tier selected\\" endOfRangePoints={{...}} footer={{...}} onClick={[Function: onClick]} shaderClass=\\"nearMasteryShader\\" tierColor={{...}} hidePoints={false} isSummary={false} selected={true} width=\\"33.333333333333336%\\" description=\\"Meh\\" long_description=\\"More Verbosity\\" points={5} />
-  <Rating assessing={false} classes=\\"rating-tier\\" endOfRangePoints={{...}} footer={{...}} onClick={[Function: onClick]} shaderClass={{...}} tierColor=\\"transparent\\" hidePoints={false} isSummary={false} selected={false} width=\\"33.333333333333336%\\" description=\\"Subpar\\" points={1} />
-</div>"
+<div
+  className="rating-tier-list"
+>
+  <Rating
+    assessing={false}
+    classes="rating-tier"
+    description="Superb"
+    endOfRangePoints={null}
+    footer={null}
+    hidePoints={false}
+    isSummary={false}
+    key="0"
+    onClick={[Function]}
+    points={10}
+    selected={false}
+    shaderClass={null}
+    tierColor="transparent"
+    width="33.333333333333336%"
+  />
+  <Rating
+    assessing={false}
+    classes="rating-tier selected"
+    description="Meh"
+    endOfRangePoints={null}
+    footer={null}
+    hidePoints={false}
+    isSummary={false}
+    key="1"
+    long_description="More Verbosity"
+    onClick={[Function]}
+    points={5}
+    selected={true}
+    shaderClass="nearMasteryShader"
+    tierColor={null}
+    width="33.333333333333336%"
+  />
+  <Rating
+    assessing={false}
+    classes="rating-tier"
+    description="Subpar"
+    endOfRangePoints={null}
+    footer={null}
+    hidePoints={false}
+    isSummary={false}
+    key="2"
+    onClick={[Function]}
+    points={1}
+    selected={false}
+    shaderClass={null}
+    tierColor="transparent"
+    width="33.333333333333336%"
+  />
+</div>
 `;

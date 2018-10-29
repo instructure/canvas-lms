@@ -122,12 +122,12 @@ a {
     }
     textarea.edit_section {
       width: 95%;
-      margin-left: auto;
-      margin-right: auto;
+      margin-#{direction(left)}: auto;
+      margin-#{direction(right)}: auto;
     }
     table.mceLayout {
-      margin-left: auto;
-      margin-right: auto;
+      margin-#{direction(left)}: auto;
+      margin-#{direction(right)}: auto;
     }
   }
 }
@@ -309,7 +309,7 @@ ul.submission_list.instTree li.submission.leaf {
       color: #4b7092;
       display: block;
       @include fontSize(14px);
-      padding: 5px 0 5px 25px;
+      padding: direction-sides(5px 0 5px 25px);
       border-bottom: 1px solid lighten(#C6C6C6, 4%);
       &:hover, &:focus {
         background-color: darken(#e4e7e9, 2%);
@@ -328,7 +328,7 @@ ul.submission_list.instTree li.submission.leaf {
       background-color: $bodyBackground;
       margin-#{direction(right)}: -1px;
       position: relative;
-      padding: 7px 0 7px 23px;
+      padding: direction-sides(7px 0 7px 23px);
       // color: #2C4C5E
 
     }

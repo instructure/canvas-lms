@@ -26,8 +26,8 @@
 
 .public-license-image-link {
   float:direction(left);
-  margin-right: 5px;
-  margin-left: 5px;
+  margin-#{direction(right)}: 5px;
+  margin-#{direction(left)}: 5px;
   margin-bottom: 5px;
 }
 

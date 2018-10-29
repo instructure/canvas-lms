@@ -61,6 +61,10 @@ module PlannerPageObject
     "span:contains('Reminder:')"
   end
 
+  def new_activity_button_selector
+    "button:contains('New Activity')"
+  end
+
   #------------------------- Elements --------------------------
 
   def peer_review_item(course_name)
@@ -69,6 +73,10 @@ module PlannerPageObject
 
   def planner_app_div
     f('.PlannerApp')
+  end
+
+  def planner_header_container
+    f("#dashboard_header_container")
   end
 
   def select_dashboard_view_menuitem
@@ -84,7 +92,7 @@ module PlannerPageObject
   end
 
   def items_displayed
-    ff('li', planner_app_div)
+    ff('li .planner-item', planner_app_div)
   end
 
   def title_input(title = nil)
@@ -190,6 +198,10 @@ module PlannerPageObject
 
   def list_view_planner_items
     ff('div.planner-item')
+  end
+
+  def planner_item_status_checkbox(object_type, object_name)
+    fj("div label:contains('#{object_type} #{object_name} is not marked as done.')")
   end
 
   #----------------------- Actions & Methods -------------------------
@@ -334,7 +346,7 @@ module PlannerPageObject
     @modal = todo_sidebar_modal(@student_to_do.title)
   end
 
-  def graded_discussion_in_the_past(due = Time.zone.now - 2.days, title = 'Graded discussion')
+  def graded_discussion_in_the_past(due = Time.zone.now - 2.days, title = 'Graded discussion past')
     assignment = @course.assignments.create!(name: 'assignment 1',
                                              due_at: due)
     discussion = @course.discussion_topics.create!(user: @teacher,
@@ -349,7 +361,7 @@ module PlannerPageObject
     assignment = @course.assignments.create!(name: 'assignment 2',
                                              due_at: Time.zone.now + 2.days)
     discussion = @course.discussion_topics.create!(user: @teacher,
-                                                   title: 'Graded discussion 2',
+                                                   title: 'Graded discussion future',
                                                    message: 'Discussion topic message',
                                                    assignment: assignment)
     discussion.discussion_entries.create!(user: @teacher,
@@ -371,9 +383,11 @@ module PlannerPageObject
 
   def wait_for_spinner
     begin
-      fj("title:contains('Loading')", planner_app_div) # the loading spinner appears
+      fj("[id*=Spinner]", planner_app_div) # the loading spinner appears
     rescue Selenium::WebDriver::Error::NoSuchElementError
       # ignore - sometimes spinner is too quick
+    rescue SpecTimeLimit::Error
+      # ignore - sometimes spinner doesn't appear in Chrome
     end
     expect(planner_app_div).not_to contain_jqcss("title:contains('Loading')")
   end
@@ -399,5 +413,9 @@ module PlannerPageObject
   def click_dashboard_settings
     expect(dashboard_options_menu_container).to be_displayed # Ensure the page is loaded and the element is visible
     dashboard_options_menu_container.click
+  end
+  
+  def scroll_height
+    driver.execute_script("return window.pageYOffset")
   end
 end

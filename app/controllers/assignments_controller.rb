@@ -64,7 +64,6 @@ class AssignmentsController < ApplicationController
         HAS_ASSIGNMENTS: @context.active_assignments.count > 0,
         QUIZ_LTI_ENABLED: quiz_lti_tool_enabled?,
         DUE_DATE_REQUIRED_FOR_ACCOUNT: due_date_required_for_account,
-        ARC_RECORDING_FEATURE_ENABLED: @context.root_account.feature_enabled?(:integrate_arc_rce),
       }
       js_env(hash)
 
@@ -140,13 +139,17 @@ class AssignmentsController < ApplicationController
         @external_tools = []
       end
 
+      permissions = {
+        context: @context.rights_status(@current_user, session, :read_as_admin, :manage_assignments),
+        assignment: @assignment.rights_status(@current_user, session, :update, :submit),
+      }
       js_env({
         :ROOT_OUTCOME_GROUP => outcome_group_json(@context.root_outcome_group, @current_user, session),
         :COURSE_ID => @context.id,
         :ASSIGNMENT_ID => @assignment.id,
         :EXTERNAL_TOOLS => external_tools_json(@external_tools, @context, @current_user, session),
         :EULA_URL => tool_eula_url,
-        ARC_RECORDING_FEATURE_ENABLED: @context.root_account.feature_enabled?(:integrate_arc_rce),
+        PERMISSIONS: permissions,
       })
       set_master_course_js_env_data(@assignment, @context)
       conditional_release_js_env(@assignment, includes: :rule)
@@ -502,7 +505,6 @@ class AssignmentsController < ApplicationController
           }
         end,
         VALID_DATE_RANGE: CourseDateRange.new(@context),
-        ARC_RECORDING_FEATURE_ENABLED: @context.root_account.feature_enabled?(:integrate_arc_rce),
       }
 
       add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
@@ -644,9 +646,9 @@ class AssignmentsController < ApplicationController
   end
 
   def pledge_text
-    (@assignment.turnitin_enabled? && @context.turnitin_pledge) ||
-    (@assignment.vericite_enabled? && @context.vericite_pledge) ||
-    @assignment.course.account.closest_turnitin_pledge
+    pledge = @context.turnitin_pledge if @context.turnitin_pledge.present? && @assignment.turnitin_enabled?
+    pledge ||= @context.vericite_pledge if @context.vericite_pledge.present? && @assignment.vericite_enabled?
+    pledge || @assignment.course.account.closest_turnitin_pledge
   end
 
   def quiz_lti_tool_enabled?

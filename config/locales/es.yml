@@ -7861,6 +7861,7 @@ es:
   enable_the_creation_of_blueprint_courses_79f91c30: "Habilitar la creación de Cursos plantilla "
   enable_the_creation_of_master_courses_8205b155: "Habilitar la creación de cursos principales"
   enable_the_plagiarism_detection_platform_7c3b6195: "Activar la plataforma de detección de plagio"
+  enable_toolname_b06257b7: "Habilitar %{toolName}"
   enabled_and_locked_49ff3de4: "Activado y bloqueado"
   enabled_ba7cab66: Activado
   enabled_by_default_e530d6ed: "Activado por configuración predeterminada"

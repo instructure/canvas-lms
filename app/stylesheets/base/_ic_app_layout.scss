@@ -49,8 +49,8 @@ body:not(.ic-no-flex-layout):not(.embedded) .ic-app-main-content {
   padding: $ic-sp*2;
 
   body.is-inside-submission-frame & {
-    padding-left: $ic-sp;
-    padding-right: $ic-sp;
+    padding-#{direction(left)}: $ic-sp;
+    padding-#{direction(right)}: $ic-sp;
   }
 
   body.no-headers & {

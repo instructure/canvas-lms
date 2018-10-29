@@ -16,10 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
 import Role from 'compiled/models/Role'
 import Account from 'compiled/models/Account'
-import BASE_ROLE_TYPES from 'compiled/util/BaseRoleTypes'
 import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('RoleModel', {

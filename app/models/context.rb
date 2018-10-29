@@ -82,27 +82,33 @@ module Context
     end
   end
 
-  def sorted_rubrics(user, context)
-    associations = RubricAssociation.bookmarked.for_context_codes(context.asset_string).include_rubric
+  def self.sorted_rubrics(user, context)
+    associations = RubricAssociation.bookmarked.for_context_codes(context.asset_string).preload(:rubric => :context)
     Canvas::ICU.collate_by(associations.to_a.uniq(&:rubric_id).select{|r| r.rubric }) { |r| r.rubric.title || CanvasSort::Last }
   end
 
   def rubric_contexts(user)
-    context_codes = [self.asset_string]
-    context_codes.concat(([user] + user.management_contexts).uniq.map(&:asset_string)) if user
-    context = self
-    while context && context.respond_to?(:account) || context.respond_to?(:parent_account)
-      context = context.respond_to?(:account) ? context.account : context.parent_account
-      context_codes << context.asset_string if context
+    associations = []
+    course_ids = [self.id]
+    course_ids = (course_ids + user.participating_instructor_course_ids.map{|id| Shard.relative_id_for(id, user.shard, Shard.current)}).uniq if user
+    Shard.partition_by_shard(course_ids) do |sharded_course_ids|
+      context_codes = sharded_course_ids.map{|id| "course_#{id}"}
+      if Shard.current == self.shard
+        context = self
+        while context && context.respond_to?(:account) || context.respond_to?(:parent_account)
+          context = context.respond_to?(:account) ? context.account : context.parent_account
+          context_codes << context.asset_string if context
+        end
+      end
+      associations += RubricAssociation.bookmarked.for_context_codes(context_codes).include_rubric.preload(:context).to_a
     end
-    associations = RubricAssociation.bookmarked.for_context_codes(context_codes).include_rubric
-    associations = associations.to_a.select(&:rubric).uniq{|a| [a.rubric_id, a.context_code] }
-    contexts = associations.group_by(&:context_code).map do |code, code_associations|
-      context_name = code_associations.first.context_name
+
+    associations = associations.select(&:rubric).uniq{|a| [a.rubric_id, a.context.asset_string] }
+    contexts = associations.group_by{|a| a.context.asset_string}.map do |code, code_associations|
       {
         :rubrics => code_associations.length,
         :context_code => code,
-        :name => context_name
+        :name => code_associations.first.context_name
       }
     end
     Canvas::ICU.collate_by(contexts) { |r| r[:name] }

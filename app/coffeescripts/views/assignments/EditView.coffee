@@ -389,35 +389,36 @@ define [
       keyboardShortcutsView.render().$el.insertBefore($(".rte_switch_views_link:first"))
 
     # -- Data for Submitting --
-    _dueAtHasChanged: (dueAt) =>
-      originalDueAt = new Date(@model.dueAt())
-      newDueAt = new Date(dueAt)
+    _datesDifferIgnoringSeconds: (newDate, originalDate) =>
+      newWithoutSeconds = new Date(newDate)
+      originalWithoutSeconds = new Date(originalDate)
 
       # Since a user can't edit the seconds field in the UI and the form also
       # thinks that the seconds is always set to 00, we compare by everything
       # except seconds.
-      originalDueAt.setSeconds(0)
-      newDueAt.setSeconds(0)
-      originalDueAt.getTime() != newDueAt.getTime()
+      originalWithoutSeconds.setSeconds(0)
+      newWithoutSeconds.setSeconds(0)
+      originalWithoutSeconds.getTime() != newWithoutSeconds.getTime()
 
-    _getDueAt: (defaultDates) ->
-      # The UI doesn't allow settings seconds to 59, but when a new assignment
-      # is created, the seconds are set to 59. Thus, to avoid issues where
-      # the date is edited after creation, we set seconds to 59 behind the
-      # scenes here. However, to ensure that we don't fudge with specifically
-      # set seconds value through the assignments api, if the date is not
-      # changed in the UI form, we keep the previous seconds value.
-      date = defaultDates?.get('due_at')
-      return null unless date
+    _adjustDateValue: (newDate, originalDate) ->
+      # If the minutes value of the due date is 59, set the seconds to 59 so
+      # the assignment ends up due one second before the following hour.
+      # Otherwise, set it to 0 seconds.
+      #
+      # If the user has not changed the due date, don't touch the seconds value
+      # (so that we don't clobber a due date set by the API).
+      # debugger
+      return null unless newDate
 
-      due_at = new Date(date)
+      adjustedDate = new Date(newDate)
+      originalDate = new Date(originalDate)
 
-      if @_dueAtHasChanged(date)
-        due_at.setSeconds(59)
+      if @_datesDifferIgnoringSeconds(adjustedDate, originalDate)
+        adjustedDate.setSeconds(if adjustedDate.getMinutes() == 59 then 59 else 0)
       else
-        due_at.setSeconds(new Date(@model.dueAt()).getSeconds())
+        adjustedDate.setSeconds(originalDate.getSeconds())
 
-      due_at.toISOString()
+      adjustedDate.toISOString()
 
     getFormData: =>
       data = super
@@ -429,10 +430,17 @@ define [
       # should update the date fields.. pretty hacky.
       unless data.post_to_sis
         data.post_to_sis = false
+
       defaultDates = @dueDateOverrideView.getDefaultDueDate()
-      data.lock_at = defaultDates?.get('lock_at') or null
-      data.unlock_at = defaultDates?.get('unlock_at') or null
-      data.due_at = @_getDueAt(defaultDates)
+      if defaultDates?
+        data.due_at = @_adjustDateValue(defaultDates.get('due_at'), @model.dueAt())
+        data.lock_at = @_adjustDateValue(defaultDates.get('lock_at'), @model.lockAt())
+        data.unlock_at = @_adjustDateValue(defaultDates.get('unlock_at'), @model.unlockAt())
+      else
+        data.due_at = null
+        data.lock_at = null
+        data.unlock_at = null
+
       data.only_visible_to_overrides = !@dueDateOverrideView.overridesContainDefault()
       data.assignment_overrides = @dueDateOverrideView.getOverrides()
       data.published = true if @shouldPublish

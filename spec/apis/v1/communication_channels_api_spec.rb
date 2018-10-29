@@ -38,6 +38,7 @@ describe 'CommunicationChannels API', type: :request do
         cc = @someone.communication_channel
         expect(json).to eql [{
           'id'       => cc.id,
+          'created_at' => cc.created_at.iso8601,
           'address'  => cc.path,
           'type'     => cc.path_type,
           'position' => cc.position,
@@ -51,6 +52,7 @@ describe 'CommunicationChannels API', type: :request do
         cc = @someone.communication_channel
         expect(json).to eql [{
           'id'       => cc.id,
+          'created_at' => cc.created_at.iso8601,
           'address'  => cc.path,
           'type'     => cc.path_type,
           'position' => cc.position,
@@ -107,6 +109,7 @@ describe 'CommunicationChannels API', type: :request do
 
       expect(json).to eq({
         'id' => @channel.id,
+        'created_at' => @channel.created_at.iso8601,
         'address' => 'new+api@example.com',
         'type' => 'email',
         'workflow_state' => 'active',
@@ -147,6 +150,7 @@ describe 'CommunicationChannels API', type: :request do
 
         expect(json).to eq({
           'id' => @channel.id,
+          'created_at' => @channel.created_at.iso8601,
           'address' => 'new+api@example.com',
           'type' => 'email',
           'workflow_state' => 'unconfirmed',
@@ -162,6 +166,7 @@ describe 'CommunicationChannels API', type: :request do
 
         expect(json).to eq({
           'id' => @channel.id,
+          'created_at' => @channel.created_at.iso8601,
           'address' => 'new+api@example.com',
           'type' => 'email',
           'workflow_state' => 'active',
@@ -257,7 +262,8 @@ describe 'CommunicationChannels API', type: :request do
           'id' => channel.id,
           'workflow_state' => 'retired',
           'user_id' => someone.id,
-          'type' => 'email'
+          'type' => 'email',
+          'created_at' => channel.created_at.iso8601
         })
       end
     end
@@ -274,7 +280,8 @@ describe 'CommunicationChannels API', type: :request do
           'id' => channel.id,
           'workflow_state' => 'retired',
           'user_id' => someone.id,
-          'type' => 'email'
+          'type' => 'email',
+          'created_at' => channel.created_at.iso8601
         })
       end
 

@@ -159,7 +159,7 @@ $discussion-dark-text: $ic-color-dark;
 }
 
 .reply-textarea {
-  border-radius: 5px 5px 0 0;
+  border-radius: direction-corners(5px 5px 0 0);
   box-sizing: border-box;
   min-height: 155px;
   width: 100%;
@@ -324,7 +324,7 @@ $discussion-dark-text: $ic-color-dark;
     .discussion-entry-reply-area {
       padding: 0 0.8em;
       border-top: 1px solid #d4d5d7;
-      border-radius: 0 0 3px 3px;
+      border-radius: direction-corners(0 0 3px 3px);
 
       &.reply-box-container {
         padding: 15px 0.8em;
@@ -467,8 +467,8 @@ $discussion-dark-text: $ic-color-dark;
 
   .entry-content {
     padding: $ic-sp;
-    border-left: 1px solid $ic-border-light;
-    border-right: 1px solid $ic-border-light;
+    border-#{direction(left)}: 1px solid $ic-border-light;
+    border-#{direction(right)}: 1px solid $ic-border-light;
   }
 }
 
@@ -545,6 +545,7 @@ $discussion-dark-text: $ic-color-dark;
 }
 
 .message_wrapper {
+  word-break: break-word;
   padding-top: 2px;
   padding-bottom: 2px;
 }
@@ -666,7 +667,7 @@ $discussion-dark-text: $ic-color-dark;
   }
   .sticky {
     position: fixed;
-    top: 0; left: 0; right: 0;
+    top: 0; #{direction(left)}: 0; #{direction(right)}: 0;
     z-index: 15; // increase for discussions sticky toolbar
     border-color: $ic-border-light;
     background: $lightBackground;

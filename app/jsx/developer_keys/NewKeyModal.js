@@ -58,6 +58,20 @@ export default class DeveloperKeyModal extends React.Component {
     return this.newForm && this.newForm.testClusterOnly
   }
 
+  saveCustomizations = () => {
+    const customFields = new FormData(this.submissionForm).get('custom_fields')
+    const { store, actions, createLtiKeyState, createOrEditDeveloperKeyState } = this.props
+
+    store.dispatch(actions.ltiKeysUpdateCustomizations(
+      createLtiKeyState.enabledScopes,
+      createLtiKeyState.disabledPlacements,
+      createOrEditDeveloperKeyState.developerKey.id,
+      createLtiKeyState.toolConfiguration,
+      customFields
+    ))
+    this.closeModal()
+  }
+
   submitForm = () => {
     const method = this.developerKey() ? 'put' : 'post'
     const formData = new FormData(this.submissionForm)
@@ -92,7 +106,8 @@ export default class DeveloperKeyModal extends React.Component {
         name: formData.get("developer_key[name]"),
         email: formData.get("developer_key[email]"),
         notes: formData.get("developer_key[notes]"),
-        test_cluster_only: this.testClusterOnly
+        test_cluster_only: this.testClusterOnly,
+        access_token_count: 0
       },
       settings: JSON.parse(formData.get("tool_configuration")),
       settings_url: formData.get("tool_configuration_url"),
@@ -119,7 +134,7 @@ export default class DeveloperKeyModal extends React.Component {
       return(
         <LtiKeyFooter
           onCancelClick={this.closeModal}
-          onSaveClick={this.submitForm}
+          onSaveClick={this.saveCustomizations}
           onAdvanceToCustomization={this.saveLtiToolConfiguration}
           customizing={this.props.createLtiKeyState.customizing}
           ltiKeysSetCustomizing={this.props.actions.ltiKeysSetCustomizing}

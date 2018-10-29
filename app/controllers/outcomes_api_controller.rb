@@ -89,7 +89,7 @@
 #         },
 #         "calculation_int": {
 #           "description": "this defines the variable value used by the calculation_method. included only if calculation_method uses it",
-#           "example": 75,
+#           "example": 65,
 #           "type": "integer"
 #         },
 #         "ratings": {
@@ -155,9 +155,11 @@
 #
 class OutcomesApiController < ApplicationController
   include Api::V1::Outcome
+  include Outcomes::Enrollments
 
   before_action :require_user
   before_action :get_outcome, except: :outcome_alignments
+  before_action :require_context, only: :outcome_alignments
 
   # @API Show an outcome
   #
@@ -227,7 +229,7 @@ class OutcomesApiController < ApplicationController
   #        -F 'vendor_guid=customid9001' \
   #        -F 'mastery_points=3' \
   #        -F 'calculation_method=decaying_average' \
-  #        -F 'calculation_int=75' \
+  #        -F 'calculation_int=65' \
   #        -F 'ratings[][description]=Exceeds Expectations' \
   #        -F 'ratings[][points]=5' \
   #        -F 'ratings[][description]=Meets Expectations' \
@@ -283,7 +285,8 @@ class OutcomesApiController < ApplicationController
     else
       course = Course.find(params[:course_id])
       can_manage = course.grants_any_right?(@current_user, session, :manage_grades, :view_all_grades)
-      student_id = can_manage ? params[:student_id].to_i : @current_user.id
+      student_id = params[:student_id].to_i
+      verify_readable_grade_enrollments([student_id]) unless can_manage
       alignments = ActiveRecord::Base.connection.exec_query(ContentTag.active.for_context(course).learning_outcome_alignments.
         select("content_tags.learning_outcome_id, content_tags.title, content_tags.content_id as assignment_id, assignments.submission_types").
         joins("INNER JOIN #{Assignment.quoted_table_name} assignments ON assignments.id = content_tags.content_id AND content_tags.content_type = 'Assignment' AND assignments.workflow_state <> 'deleted'").

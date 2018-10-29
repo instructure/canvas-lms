@@ -46,7 +46,7 @@ class AnnouncementNewEdit
     end
 
     def submit_announcement_form
-      submit_form('.form-actions')
+      wait_for_new_page_load { submit_form('.form-actions') }
     end
 
     # Note: This *appends* to the existing content in the text area
@@ -78,7 +78,6 @@ class AnnouncementNewEdit
       replace_content(f('input[name=title]'), title)
       type_in_tiny('textarea[name=message]', text)
       submit_announcement_form
-      wait_for_ajax_requests
     end
 
     def edit_group_announcement(group, announcement, message)
@@ -88,7 +87,6 @@ class AnnouncementNewEdit
       # Note that add_message *appends* to existing
       add_message(message)
       submit_announcement_form
-      wait_for_ajax_requests
     end
   end
 end

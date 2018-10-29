@@ -79,6 +79,14 @@ class Score < ActiveRecord::Base
     score_to_grade(unposted_final_score)
   end
 
+  def effective_final_score
+    override_score || final_score
+  end
+
+  def effective_final_grade
+    score_to_grade(effective_final_score)
+  end
+
   def scorable
     # if you're calling this method, you might want to preload objects to avoid N+1
     grading_period || assignment_group || enrollment.course

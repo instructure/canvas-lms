@@ -64,7 +64,7 @@ function emitTemplate (path, name, result, dependencies) {
 module.exports = function (source) {
   this.cacheable()
   const name = resourceName(this.resourcePath)
-  const dependencies = ['ember', 'coffeescripts/ember/shared/helpers/common.coffee']
+  const dependencies = ['ember', 'coffeescripts/ember/shared/helpers/common']
 
   const result = compileHandlebars({path: this.resourcePath, source: source, ember: true})
 

@@ -36,9 +36,9 @@ gem 'encrypted_cookie_store-instructure', '1.2.8', require: 'encrypted_cookie_st
 gem 'active_model_serializers',   '0.9.0alpha1',
   github: 'rails-api/active_model_serializers', ref: '61882e1e4127facfe92e49057aec71edbe981829'
 gem 'authlogic', '4.0.1'
-  gem 'scrypt', '3.0.5'
+  gem 'scrypt', '3.0.6'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
-gem 'switchman', '1.12.10'
+gem 'switchman', '1.12.13'
   gem 'open4', '1.3.4', require: false
 gem 'folio-pagination', '0.0.12', require: 'folio/rails'
   # for folio, see the folio README
@@ -98,7 +98,7 @@ gem 'mime-types', '1.25.1', require: 'mime/types'
 gem 'mini_magick', '4.8.0'
 gem 'multi_json', '1.13.1'
 gem 'netaddr', '1.5.1', require: false
-gem 'nokogiri', '1.8.2', require: false
+gem 'nokogiri', '1.8.5', require: false
 gem 'oauth', '0.5.4', require: false
 gem 'parallel', '1.12.1', require: false
   gem 'ruby-progressbar', '1.9.0', require: false # used to show progress of S3Uploader

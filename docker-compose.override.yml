@@ -19,9 +19,11 @@ services:
       - locales:/usr/src/app/config/locales/generated
       - log:/usr/src/app/log
       - node_modules:/usr/src/app/node_modules
+      - pacts:/usr/src/app/pacts
       - quizzes_dist:/usr/src/app/client_apps/canvas_quizzes/dist
       - quizzes_node_modules:/usr/src/app/client_apps/canvas_quizzes/node_modules
       - quizzes_tmp:/usr/src/app/client_apps/canvas_quizzes/tmp
+      - reports:/usr/src/app/reports
       - selinimum_node_modules:/usr/src/app/gems/selinimum/node_modules
       - styleguide:/usr/src/app/app/views/info
       - tmp:/usr/src/app/tmp
@@ -61,9 +63,11 @@ volumes:
   log: {}
   node_modules: {}
   pg_data: {}
+  pacts: {}
   quizzes_dist: {}
   quizzes_node_modules: {}
   quizzes_tmp: {}
+  reports: {}
   selinimum_node_modules: {}
   styleguide: {}
   tmp: {}

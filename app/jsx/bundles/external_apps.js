@@ -42,4 +42,3 @@ $('#account_settings_tabs, #course_details_tabs').on('tabscreate tabsactivate', 
   const tabId = $(selectedTab).find('a').attr('id')
   renderReactApps(tabId)
 })
-

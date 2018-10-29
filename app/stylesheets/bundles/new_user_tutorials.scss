@@ -25,25 +25,25 @@
 
   @include breakpoint(tablet) {
     width: 21rem;
-    padding-left: $ic-sp*2;
-    padding-right: $ic-sp*2;
+    padding-#{direction(left)}: $ic-sp*2;
+    padding-#{direction(right)}: $ic-sp*2;
   }
 }
 
 .NewUserTutorialTray__Subheading {
-  margin: ($ic-sp / 2) 0 ($ic-sp * 1.5) 0;
+  margin: direction-sides(($ic-sp / 2) 0 ($ic-sp * 1.5) 0);
 }
 
 .NewUserTutorialTray__ButtonContainer {
   position: absolute;
-  right: $ic-sp * 2;
+  #{direction(right)}: $ic-sp * 2;
   top: $ic-sp + 2;
 }
 
 .NewUserTutorialTray__EndTutorialContainer {
   position: absolute;
   bottom: $ic-sp;
-  right: $ic-sp;
+  #{direction(right)}: $ic-sp;
 }
 
 @keyframes trayImage {

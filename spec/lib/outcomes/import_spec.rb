@@ -221,7 +221,7 @@ RSpec.describe Outcomes::Import do
 
   describe '#import_outcome' do
     let_once(:existing_outcome) do
-      outcome_model(context: context, vendor_guid: outcome_vendor_guid, display_name: '')
+      outcome_model(context: context, vendor_guid: outcome_vendor_guid, display_name: '', calculation_method: 'highest')
     end
 
     context 'with magic vendor_guid' do
@@ -250,6 +250,15 @@ RSpec.describe Outcomes::Import do
           description: 'changed!'
         )
         expect(existing_outcome.reload.description).to eq 'changed!'
+      end
+
+      it 'defaults to decaying_average if no calculation_method is given' do
+        expect(existing_outcome.reload.calculation_method).to eq 'highest'
+        importer.import_outcome(
+          **outcome_attributes,
+          calculation_method: nil
+        )
+        expect(existing_outcome.reload.calculation_method).to eq 'decaying_average'
       end
 
       context 'importing outcome into visible context' do

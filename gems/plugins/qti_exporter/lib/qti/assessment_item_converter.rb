@@ -222,6 +222,10 @@ class AssessmentItemConverter
     end
   end
 
+  def get_or_generate_answer_id(response_identifier)
+    (@flavor == Qti::Flavors::CANVAS && response_identifier.to_s.sub(/response_/i, "").presence&.to_i) || unique_local_id
+  end
+
   def unique_local_id
     @@ids ||= {}
     id = rand(100_000)

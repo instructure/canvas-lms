@@ -148,8 +148,8 @@ Simply add the **.ui-tabs-minimal** class to the parent tab element.
   &.ui-tabs-minimal {
     .ui-tabs-panel {
       border-width: 0;
-      padding-left: 0;
-      padding-right: 0;
+      padding-#{direction(left)}: 0;
+      padding-#{direction(right)}: 0;
       padding-bottom: 0;
     }
   }

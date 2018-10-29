@@ -52,6 +52,7 @@ class GraphQLController < ApplicationController
   end
 
   def graphiql
+    @page_title = "GraphiQL"
     render :graphiql, layout: 'bare'
   end
 end

@@ -24,13 +24,13 @@ module Api::V1::DeveloperKey
   ).freeze
   INHERITED_DEVELOPER_KEY_JSON_ATTRS = %w[name created_at icon_url workflow_state].freeze
 
-  def developer_keys_json(keys, user, session, context, show_bindings=false, inherited: false)
-    keys.map { |k| developer_key_json(k, user, session, context, show_bindings, inherited: inherited) }
+  def developer_keys_json(keys, user, session, context, inherited: false)
+    keys.map { |k| developer_key_json(k, user, session, context, inherited: inherited) }
   end
 
-  def developer_key_json(key, user, session, context, show_bindings=false, inherited: false)
+  def developer_key_json(key, user, session, context, inherited: false)
     context ||= Account.site_admin
-    account_binding = key.account_binding_for(context) if show_bindings.present?
+    account_binding = key.account_binding_for(context)
     keys_to_show = if inherited
       INHERITED_DEVELOPER_KEY_JSON_ATTRS
     else
@@ -50,7 +50,7 @@ module Api::V1::DeveloperKey
         hash['vendor_code'] = key.vendor_code
       end
 
-      if account_binding.present? && show_bindings
+      if account_binding.present?
         hash['developer_key_account_binding'] = DeveloperKeyAccountBindingSerializer.new(account_binding, context)
       end
 

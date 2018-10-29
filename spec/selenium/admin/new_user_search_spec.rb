@@ -17,6 +17,7 @@
 
 require_relative '../common'
 require_relative 'pages/new_user_search_page'
+require_relative 'pages/new_course_search_page'
 require_relative 'pages/new_user_edit_modal_page.rb'
 require_relative 'pages/edit_existing_user_modal_page.rb'
 require_relative 'pages/masquerade_page.rb'
@@ -25,6 +26,7 @@ require_relative '../conversations/conversations_new_message_modal_page.rb'
 describe "new account user search" do
   include_context "in-process server selenium tests"
   include NewUserSearchPage
+  include NewCourseSearchPage
   include NewUserEditModalPage
   include MasqueradePage
   include ConversationsNewMessageModalPage
@@ -37,10 +39,6 @@ describe "new account user search" do
 
   before do
     user_session(@user)
-  end
-
-  def get_rows
-    ff('[data-automation="users list"] tr')
   end
 
   def wait_for_loading_to_disappear
@@ -114,14 +112,14 @@ describe "new account user search" do
 
     it "should show the create users button user has permission on the root_account" do
       visit_subaccount(@sub_account)
-      expect(results_body).to contain_jqcss(add_user_button_jqcss)
+      expect(results_body).to contain_jqcss(add_people_button_jqcss)
     end
 
     it "should not show the create users button for non-root accounts" do
       account_admin_user(account: @sub_account, active_all: true)
       user_session(@admin)
       visit_subaccount(@sub_account)
-      expect(results_body).not_to contain_jqcss(add_user_button_jqcss)
+      expect(results_body).not_to contain_jqcss(add_people_button_jqcss)
     end
 
     it "should paginate" do
@@ -131,18 +129,18 @@ describe "new account user search" do
       end
       visit_users(@account)
 
-      expect(get_rows.count).to eq 15
-      expect(get_rows.first).to include_text("Admin")
-      expect(get_rows[1]).to include_text("UserA, Test")
+      expect(results_rows.count).to eq 15
+      expect(results_rows.first).to include_text("Admin")
+      expect(results_rows[1]).to include_text("UserA, Test")
       expect(all_results_users).to_not include_text("UserO, Test")
       expect(results_body).not_to contain_jqcss(page_previous_jqcss)
 
       click_page_number_button("2")
       wait_for_ajaximations
 
-      expect(get_rows.count).to eq 12
-      expect(get_rows.first).to include_text("UserO, Test")
-      expect(get_rows.last).to include_text("UserZ, Test")
+      expect(results_rows.count).to eq 12
+      expect(results_rows.first).to include_text("UserO, Test")
+      expect(results_rows.last).to include_text("UserZ, Test")
       expect(all_results_users).not_to include_text("UserA, Test")
     end
 
@@ -171,7 +169,7 @@ describe "new account user search" do
       email = 'someemail@example.com'
       visit_users(@account)
 
-      click_add_user
+      click_add_people
       expect(modal_object).to be_displayed
 
       set_value(full_name_input, name)
@@ -186,11 +184,11 @@ describe "new account user search" do
 
       # should refresh the users list
       expect(all_results_users).to include_text(new_pseudonym.user.sortable_name)
-      expect(get_rows.count).to eq 2 # the first user is the admin
+      expect(results_rows.count).to eq 2 # the first user is the admin
       expect(user_row(name)).to include_text(email)
 
       # should clear out the inputs
-      click_add_user
+      click_add_people
       expect(full_name_input.attribute('value')).to eq('')
     end
 
@@ -199,7 +197,7 @@ describe "new account user search" do
       email = 'someemail@example.com'
       visit_users(@account)
 
-      click_add_user
+      click_add_people
 
       set_value(full_name_input, name)
       set_value(email_input, email)

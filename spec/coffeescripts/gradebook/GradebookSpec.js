@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import GradeCalculatorSpecHelper from 'spec/jsx/gradebook/GradeCalculatorSpecHelper'
+import {createCourseGradesWithGradingPeriods as createExampleGrades} from 'spec/jsx/gradebook/GradeCalculatorSpecHelper'
 import Gradebook from 'compiled/gradebook/Gradebook'
 import DataLoader from 'jsx/gradebook/DataLoader'
 import _ from 'underscore'
@@ -42,8 +42,6 @@ const exampleGradebookOptions = {
   },
   sections: []
 }
-
-const createExampleGrades = GradeCalculatorSpecHelper.createCourseGradesWithGradingPeriods
 
 QUnit.module('Gradebook')
 

@@ -21,7 +21,7 @@
 ul.item_list {
   list-style-type: none;
   padding: 0;
-  margin: 5px 0 20px 20px;
+  margin: direction-sides(5px 0 20px 20px);
   max-height: 150px;
   overflow: auto;
   li {

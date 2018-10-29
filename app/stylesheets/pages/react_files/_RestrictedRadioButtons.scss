@@ -18,15 +18,15 @@
 
 .RestrictedRadioButtons__publish_icon {
   color: $ic-color-success;
-  padding: 0px 10px 0px 5px;
+  padding: direction-sides(0px 10px 0px 5px);
 }
 
 .RestrictedRadioButtons__unpublish_icon {
   color: gray;
-  padding: 0px 10px 0px 5px;
+  padding: direction-sides(0px 10px 0px 5px);
 }
 
 .RestrictedRadioButtons__icon-cloud-lock {
   color: $ic-color-alert;
-  padding: 0px 10px 0px 5px;
+  padding: direction-sides(0px 10px 0px 5px);
 }

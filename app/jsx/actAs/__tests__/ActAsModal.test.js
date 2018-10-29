@@ -49,7 +49,7 @@ const props = {
 describe('ActAsModal',  () => {
   it('renders with panda svgs, user avatar, table, and proceed button present', () => {
     const wrapper = shallow(<ActAsModal {...props} />)
-    // expect(wrapper).toMatchSnapshot() // Coming soon.... (need to get enzyme upgraded to 3.x first)
+    expect(wrapper).toMatchSnapshot()
 
     const mask = wrapper.find(ActAsMask)
     const panda = wrapper.find(ActAsPanda)

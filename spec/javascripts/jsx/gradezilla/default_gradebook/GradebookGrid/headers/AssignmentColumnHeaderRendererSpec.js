@@ -18,8 +18,7 @@
 
 import ReactDOM from 'react-dom';
 import { createGradebook, setFixtureHtml } from '../../GradebookSpecHelper';
-import AssignmentColumnHeaderRenderer
-from 'jsx/gradezilla/default_gradebook/GradebookGrid/headers/AssignmentColumnHeaderRenderer'
+import AssignmentColumnHeaderRenderer from 'jsx/gradezilla/default_gradebook/GradebookGrid/headers/AssignmentColumnHeaderRenderer'
 
 QUnit.module('AssignmentColumnHeaderRenderer', function (suiteHooks) {
   let $container;
@@ -434,6 +433,15 @@ QUnit.module('AssignmentColumnHeaderRenderer', function (suiteHooks) {
       gradebook.setStudentsLoaded(true);
       gradebook.setSubmissionsLoaded(true);
       render();
+      strictEqual(component.props.sortBySetting.disabled, true);
+    });
+
+    test('sets the "Sort by" disabled setting to true when anonymize_students is true', function () {
+      gradebook.setAssignmentsLoaded(true);
+      gradebook.setStudentsLoaded(true);
+      gradebook.setSubmissionsLoaded(true);
+      assignment.anonymize_students = true
+      render()
       strictEqual(component.props.sortBySetting.disabled, true);
     });
 

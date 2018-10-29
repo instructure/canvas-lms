@@ -47,8 +47,8 @@ $assign-border-color: #ccc;
   border: 1px dashed $assign-border-color; // color matching legacy code
   border-top: 0;
   border-radius: 0;
-  border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 5px;
+  border-bottom-#{direction(left)}-radius: 5px;
+  border-bottom-#{direction(right)}-radius: 5px;
   width: 100%;
 }
 .Date__label{
@@ -61,8 +61,8 @@ $assign-border-color: #ccc;
 .Container__DueDateRow {
   border: 1px solid $assign-border-color; // matching color to legacy code
   border-radius: 5px;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
+  border-bottom-#{direction(left)}-radius: 0;
+  border-bottom-#{direction(right)}-radius: 0;
   border-bottom: none;
 }
 

@@ -58,11 +58,12 @@ module Lti
       config = tool_configuration[:config]
       {
         app_type: config.class.name,
-        app_id: config.id,
+        app_id: config.developer_key.id,
         name: config[:settings]['title'],
         description: config[:settings]['description'],
         installed_locally: tool_configuration[:enabled],
         enabled: tool_configuration[:enabled],
+        installed_in_current_course: tool_configuration[:installed_in_current_course],
         tool_configuration: nil,
         context: 'Account',
         context_id: config.developer_key.account_id,

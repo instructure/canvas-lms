@@ -24,18 +24,18 @@
 
   border-radius: 0.6em;
   li:first-child {
-    border-top-right-radius: 0.6em;
-    border-top-left-radius: 0.6em;
+    border-top-#{direction(right)}-radius: 0.6em;
+    border-top-#{direction(left)}-radius: 0.6em;
   }
   li:last-child  {
-    border-bottom-right-radius: 0.6em;
-    border-bottom-left-radius: 0.6em;
+    border-bottom-#{direction(right)}-radius: 0.6em;
+    border-bottom-#{direction(left)}-radius: 0.6em;
   }
 
   &.ui-listview-no-rounded-bottom {
     &, li:last-child {
-      border-bottom-right-radius: 0;
-      border-bottom-left-radius: 0;
+      border-bottom-#{direction(right)}-radius: 0;
+      border-bottom-#{direction(left)}-radius: 0;
     }
   }
 
@@ -56,7 +56,7 @@
       display: block;
       position: relative;
       height: 100%;
-      padding: .7em 15px .7em 44px;
+      padding: direction-sides(.7em 15px .7em 44px);
       text-overflow: ellipsis; overflow: hidden; white-space: nowrap;
       font-size: 1em; /*this is to override the .file, .pdf, .doc etc 10px size*/
       background-position: 15px center; /*overrides background-position left of attachment_links*/

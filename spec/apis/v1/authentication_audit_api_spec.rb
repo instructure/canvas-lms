@@ -156,6 +156,7 @@ describe "AuthenticationAudit API", type: :request do
         it "should be formatted as an array of Pseudonym objects" do
           expect(@json).to eq [{
             "id" => @pseudonym.id,
+            "created_at" => @pseudonym.created_at.iso8601,
             "account_id" => @account.id,
             "user_id" => @user.id,
             "unique_id" => @pseudonym.unique_id,
@@ -195,6 +196,7 @@ describe "AuthenticationAudit API", type: :request do
         it "should be formatted as an array of User objects" do
           expect(@json).to eq [{
             "id" => @user.id,
+            "created_at" => @user.created_at.iso8601,
             "name" => @user.name,
             "sortable_name" => @user.sortable_name,
             "short_name" => @user.short_name,

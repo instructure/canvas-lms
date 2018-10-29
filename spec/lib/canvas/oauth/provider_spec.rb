@@ -180,8 +180,8 @@ module Canvas::Oauth
     end
 
     describe '#valid_scopes?' do
-      let(:developer_key) { DeveloperKey.create! scopes: %w(testscope) }
-      let(:scopes) { %w(testscope) }
+      let(:developer_key) { DeveloperKey.create! scopes: [TokenScopes::USER_INFO_SCOPE[:scope]] }
+      let(:scopes) { [TokenScopes::USER_INFO_SCOPE[:scope]] }
       let(:provider) { Provider.new(developer_key.id, 'some_uri', scopes)}
 
       it 'returns true if scopes requested are included on key' do
@@ -189,7 +189,7 @@ module Canvas::Oauth
       end
 
       context 'with invalid scopes' do
-        let(:scopes) { %w(testscope otherscope) }
+        let(:scopes) { [TokenScopes::USER_INFO_SCOPE[:scope], 'otherscope'] }
 
         it 'returns false' do
           expect(provider.valid_scopes?).to eq(false)

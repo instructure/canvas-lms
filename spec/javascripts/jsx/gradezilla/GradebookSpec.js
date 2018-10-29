@@ -39,7 +39,7 @@ import LatePolicyApplicator from 'jsx/grading/LatePolicyApplicator';
 import SubmissionStateMap from 'jsx/gradezilla/SubmissionStateMap';
 import studentRowHeaderConstants from 'jsx/gradezilla/default_gradebook/constants/studentRowHeaderConstants';
 import { darken, statusColors, defaultColors } from 'jsx/gradezilla/default_gradebook/constants/colors';
-import { createGradebook } from '../gradezilla/default_gradebook/GradebookSpecHelper';
+import { createGradebook, stubDataLoader } from './default_gradebook/GradebookSpecHelper';
 import { createCourseGradesWithGradingPeriods as createGrades } from '../gradebook/GradeCalculatorSpecHelper';
 
 const $fixtures = document.getElementById('fixtures');
@@ -162,55 +162,6 @@ test('custom columns remain empty when teacher notes are not provided', function
   deepEqual(gradebook.gradebookContent.customColumns, []);
 });
 
-QUnit.module('Gradebook - when grid-required data is loaded', {
-  setup () {
-    $fixtures.innerHTML = `
-      <div id="search-filter-container">
-        <input type="text" />
-      </div>
-    `;
-  },
-
-  teardown () {
-    $fixtures.innerHTML = '';
-  }
-});
-
-test('renders the StatusesModal', function () {
-  const loaderPromises = {
-    gotAssignmentGroups: $.Deferred(),
-    gotContextModules: $.Deferred(),
-    gotCustomColumns: $.Deferred(),
-    gotStudentIds: $.Deferred(),
-    gotStudents: $.Deferred(),
-    gotSubmissions: $.Deferred(),
-    gotCustomColumnData: $.Deferred()
-  };
-  sandbox.stub(DataLoader, 'loadGradebookData').returns(loaderPromises);
-  sandbox.stub(Gradebook.prototype, 'renderActionMenu');
-  const gradebook = createGradebook();
-  [
-    'renderViewOptionsMenu',
-    'initGrid',
-    'renderGradebookMenus',
-    'arrangeColumnsBy',
-    'renderGradebookSettingsModal',
-    'renderSettingsButton',
-    'renderAnonymousSpeedGraderAlert',
-    'updatePostGradesFeatureButton',
-    'initPostGradesStore',
-  ].forEach(fn => sandbox.stub(gradebook, fn));
-  const renderStatusesModalStub = sandbox.stub(gradebook, 'renderStatusesModal');
-  gradebook.gridReady.reject();
-  gradebook.initialize();
-  loaderPromises.gotContextModules.resolve([])
-  loaderPromises.gotCustomColumns.resolve([]);
-  loaderPromises.gotAssignmentGroups.resolve([]);
-  loaderPromises.gotStudentIds.resolve({ user_ids: [] });
-
-  ok(renderStatusesModalStub.calledOnce);
-});
-
 QUnit.module('Gradebook#gotCustomColumnDataChunk', {
   setup () {
     this.gradebook = createGradebook();
@@ -304,16 +255,7 @@ test('updates partial .filterColumnsBy settings with the default values', functi
 
 QUnit.module('Gradebook#initialize', {
   setup () {
-    this.loaderPromises = {
-      gotAssignmentGroups: $.Deferred(),
-      gotContextModules: $.Deferred(),
-      gotCustomColumns: $.Deferred(),
-      gotStudentIds: $.Deferred(),
-      gotStudents: $.Deferred(),
-      gotSubmissions: $.Deferred(),
-      gotCustomColumnData: $.Deferred()
-    };
-    sandbox.stub(DataLoader, 'loadGradebookData').returns(this.loaderPromises);
+    stubDataLoader()
     $fixtures.innerHTML = `
       <div id="search-filter-container">
         <input type="text" />
@@ -332,58 +274,6 @@ QUnit.module('Gradebook#initialize', {
   }
 });
 
-test('sets the students as not loaded', function () {
-  const gradebook = this.createInitializedGradebook();
-  strictEqual(gradebook.contentLoadStates.studentsLoaded, false);
-});
-
-test('sets the submissions as not loaded', function () {
-  const gradebook = this.createInitializedGradebook();
-  strictEqual(gradebook.contentLoadStates.submissionsLoaded, false);
-});
-
-test('calls DataLoader.loadGradebookData', function () {
-  this.createInitializedGradebook();
-  strictEqual(DataLoader.loadGradebookData.callCount, 1);
-});
-
-test('includes the course id when calling DataLoader.loadGradebookData', function () {
-  this.createInitializedGradebook();
-  const [options] = DataLoader.loadGradebookData.lastCall.args;
-  equal(options.courseId, '1');
-});
-
-test('includes the per page api request setting when calling DataLoader.loadGradebookData', function () {
-  this.createInitializedGradebook({ api_max_per_page: 50 });
-  const [options] = DataLoader.loadGradebookData.lastCall.args;
-  equal(options.perPage, 50);
-});
-
-test('loads assignment groups', function () {
-  this.createInitializedGradebook({ assignment_groups_url: '/assignment-groups' });
-  const [options] = DataLoader.loadGradebookData.lastCall.args;
-  equal(options.assignmentGroupsURL, '/assignment-groups');
-});
-
-test('loads context modules', function () {
-  this.createInitializedGradebook({ context_modules_url: '/context-modules' });
-  const [options] = DataLoader.loadGradebookData.lastCall.args;
-  equal(options.contextModulesURL, '/context-modules');
-});
-
-test('requests data for hidden custom columns', function () {
-  this.createInitializedGradebook({ custom_column_data_url: '/custom-column-data' });
-  const [options] = DataLoader.loadGradebookData.lastCall.args;
-  strictEqual(options.customColumnDataParams.include_hidden, true);
-});
-
-test('stores student ids when loaded', function () {
-  const gradebook = this.createInitializedGradebook();
-  const studentIds = ['1101', '1102', '1103'];
-  this.loaderPromises.gotStudentIds.resolve({ user_ids: studentIds });
-  equal(gradebook.courseContent.students.listStudentIds(), studentIds);
-});
-
 test('stores the late policy with camelized keys, if one exists', function () {
   const gradebook = this.createInitializedGradebook({ late_policy: { late_submission_interval: 'hour' } });
   deepEqual(gradebook.courseContent.latePolicy, { lateSubmissionInterval: 'hour' });
@@ -394,436 +284,10 @@ test('stores the late policy as undefined if the late_policy option is null', fu
   strictEqual(gradebook.courseContent.latePolicy, undefined);
 });
 
-test('builds rows when student ids are loaded', function () {
-  const gradebook = this.createInitializedGradebook();
-  const studentIds = ['1101', '1102', '1103'];
-  this.loaderPromises.gotStudentIds.resolve({ user_ids: studentIds });
-  deepEqual(gradebook.gridData.rows.map(row => row.id), studentIds);
-});
-
-test('stores context modules when loaded', function () {
-  const contextModules = [{ id: '2601' }, { id: '2602' }];
-  const gradebook = this.createInitializedGradebook({ context_modules_url: '/context-modules' });
-  sandbox.stub(gradebook, 'renderViewOptionsMenu');
-  this.loaderPromises.gotContextModules.resolve(contextModules);
-  equal(gradebook.listContextModules(), contextModules);
-});
-
-test('sets context modules as loaded', function () {
-  const contextModules = [{ id: '2601' }, { id: '2602' }];
-  const gradebook = this.createInitializedGradebook({ context_modules_url: '/context-modules' });
-  sandbox.stub(gradebook, 'renderViewOptionsMenu');
-  this.loaderPromises.gotContextModules.resolve(contextModules);
-  strictEqual(gradebook.contentLoadStates.contextModulesLoaded, true);
-});
-
-test('re-renders the view options menu after storing the loaded context modules', function () {
-  const contextModules = [{ id: '2601' }, { id: '2602' }];
-  const gradebook = this.createInitializedGradebook({ context_modules_url: '/context-modules' });
-  sandbox.stub(gradebook, 'renderViewOptionsMenu').callsFake(() => {
-    equal(gradebook.listContextModules(), contextModules);
-  });
-  this.loaderPromises.gotContextModules.resolve(contextModules);
-});
-
-test('updates students load state when loaded', function () {
-  const gradebook = this.createInitializedGradebook();
-  this.loaderPromises.gotStudents.resolve();
-  strictEqual(gradebook.contentLoadStates.studentsLoaded, true);
-});
-
-test('re-renders the column headers when students are loaded', function () {
-  const gradebook = this.createInitializedGradebook();
-  sandbox.stub(gradebook, 'updateColumnHeaders');
-  this.loaderPromises.gotStudents.resolve();
-  strictEqual(gradebook.updateColumnHeaders.callCount, 1);
-});
-
-test('re-renders the column headers after updating students load state', function () {
-  const gradebook = this.createInitializedGradebook();
-  sandbox.stub(gradebook, 'updateColumnHeaders').callsFake(() => {
-    strictEqual(gradebook.contentLoadStates.studentsLoaded, true, 'students load state was already updated');
-  });
-  this.loaderPromises.gotStudents.resolve();
-});
-
-test('re-renders the filters when students are loaded', function () {
-  const gradebook = this.createInitializedGradebook();
-  sandbox.stub(gradebook, 'renderFilters');
-  this.loaderPromises.gotStudents.resolve();
-  strictEqual(gradebook.renderFilters.callCount, 1);
-});
-
-test('re-renders the filters after updating students load state', function () {
-  const gradebook = this.createInitializedGradebook();
-  sandbox.stub(gradebook, 'renderFilters').callsFake(() => {
-    strictEqual(gradebook.contentLoadStates.studentsLoaded, true, 'students load state was already updated');
-  });
-  this.loaderPromises.gotStudents.resolve();
-});
-
-test('updates submissions load state when loaded', function () {
-  const gradebook = this.createInitializedGradebook();
-  this.loaderPromises.gotSubmissions.resolve();
-  strictEqual(gradebook.contentLoadStates.submissionsLoaded, true);
-});
-
-test('re-renders the column headers when submissions are loaded', function () {
-  const gradebook = this.createInitializedGradebook();
-  sandbox.stub(gradebook, 'updateColumnHeaders');
-  this.loaderPromises.gotSubmissions.resolve();
-  strictEqual(gradebook.updateColumnHeaders.callCount, 1);
-});
-
-test('re-renders the column headers after updating submissions load state', function () {
-  const gradebook = this.createInitializedGradebook();
-  sandbox.stub(gradebook, 'updateColumnHeaders').callsFake(() => {
-    strictEqual(gradebook.contentLoadStates.submissionsLoaded, true, 'submissions load state was already updated');
-  });
-  this.loaderPromises.gotSubmissions.resolve();
-});
-
-test('re-renders the filters when submissions are loaded', function () {
-  const gradebook = this.createInitializedGradebook();
-  sandbox.stub(gradebook, 'renderFilters');
-  this.loaderPromises.gotSubmissions.resolve();
-  strictEqual(gradebook.renderFilters.callCount, 1);
-});
-
-test('re-renders the filters after updating submissions load state', function () {
-  const gradebook = this.createInitializedGradebook();
-  sandbox.stub(gradebook, 'renderFilters').callsFake(() => {
-    strictEqual(gradebook.contentLoadStates.submissionsLoaded, true, 'submissions load state was already updated');
-  });
-  this.loaderPromises.gotSubmissions.resolve();
-});
-
 test('sets assignmentGroupsLoaded to false', function () {
   const gradebook = this.createInitializedGradebook()
   strictEqual(gradebook.contentLoadStates.assignmentGroupsLoaded, false)
 })
-
-QUnit.module('Gradebook#reloadStudentData', {
-  setup () {
-    this.gradingPeriodSet = {
-      id: '1501',
-      grading_periods: [
-        { id: '701', weight: 50 },
-        { id: '702', weight: 50 }
-      ],
-      weighted: true
-    }
-    this.loaderPromises = {
-      gotGradingPeriodAssignments: $.Deferred(),
-      gotStudentIds: $.Deferred(),
-      gotStudents: $.Deferred(),
-      gotSubmissions: $.Deferred(),
-    };
-    sandbox.stub(DataLoader, 'loadGradebookData').returns(this.loaderPromises);
-    $fixtures.innerHTML = `
-      <div id="search-filter-container">
-        <input type="text" />
-      </div>
-    `;
-  },
-
-  teardown () {
-    $fixtures.innerHTML = '';
-  }
-});
-
-test('sets the students as not loaded', function () {
-  const gradebook = createGradebook();
-  gradebook.setStudentsLoaded(true);
-  gradebook.reloadStudentData();
-  strictEqual(gradebook.contentLoadStates.studentsLoaded, false);
-});
-
-test('sets the submissions as not loaded', function () {
-  const gradebook = createGradebook();
-  gradebook.setSubmissionsLoaded(true);
-  gradebook.reloadStudentData();
-  strictEqual(gradebook.contentLoadStates.submissionsLoaded, false);
-});
-
-test('re-renders the filters', function () {
-  const gradebook = createGradebook();
-  sandbox.stub(gradebook, 'renderFilters');
-  gradebook.reloadStudentData();
-  strictEqual(gradebook.renderFilters.callCount, 1);
-});
-
-test('re-renders the filters after students load status is updated', function () {
-  const gradebook = createGradebook();
-  sandbox.stub(gradebook, 'renderFilters').callsFake(() => {
-    strictEqual(gradebook.contentLoadStates.studentsLoaded, false);
-  });
-  gradebook.reloadStudentData();
-});
-
-test('re-renders the filters after submissions load status is updated', function () {
-  const gradebook = createGradebook();
-  sandbox.stub(gradebook, 'renderFilters').callsFake(() => {
-    strictEqual(gradebook.contentLoadStates.submissionsLoaded, false);
-  });
-  gradebook.reloadStudentData();
-});
-
-test('calls DataLoader.loadGradebookData', function () {
-  const gradebook = createGradebook();
-  gradebook.reloadStudentData();
-  strictEqual(DataLoader.loadGradebookData.callCount, 1);
-});
-
-test('includes the course id when calling DataLoader.loadGradebookData', function () {
-  const gradebook = createGradebook();
-  gradebook.reloadStudentData();
-  const [options] = DataLoader.loadGradebookData.lastCall.args;
-  equal(options.courseId, '1');
-});
-
-test('includes the per page api request setting when calling DataLoader.loadGradebookData', function () {
-  const gradebook = createGradebook({ api_max_per_page: 50 });
-  gradebook.reloadStudentData();
-  const [options] = DataLoader.loadGradebookData.lastCall.args;
-  equal(options.perPage, 50);
-});
-
-test('includes the students url when calling DataLoader.loadGradebookData', function () {
-  const gradebook = createGradebook({ students_stateless_url: '/students-url' });
-  gradebook.reloadStudentData();
-  const [options] = DataLoader.loadGradebookData.lastCall.args;
-  equal(options.studentsURL, '/students-url');
-});
-
-test('includes the students page callback when calling DataLoader.loadGradebookData', function () {
-  const gradebook = createGradebook();
-  gradebook.reloadStudentData();
-  const [options] = DataLoader.loadGradebookData.lastCall.args;
-  strictEqual(options.studentsPageCb, gradebook.gotChunkOfStudents);
-});
-
-test('includes students params when calling DataLoader.loadGradebookData', function () {
-  const exampleStudentsParams = { example: true };
-  const gradebook = createGradebook();
-  sandbox.stub(gradebook, 'studentsParams').returns(exampleStudentsParams);
-  gradebook.reloadStudentData();
-  const [options] = DataLoader.loadGradebookData.lastCall.args;
-  equal(options.studentsParams, exampleStudentsParams);
-});
-
-test('includes the loaded student ids when calling DataLoader.loadGradebookData', function () {
-  const studentIds = ['1101', '1102', '1103'];
-  const gradebook = createGradebook();
-  gradebook.courseContent.students.setStudentIds(studentIds);
-  gradebook.reloadStudentData();
-  const [options] = DataLoader.loadGradebookData.lastCall.args;
-  deepEqual(options.loadedStudentIds, studentIds);
-});
-
-test('includes the submissions url when calling DataLoader.loadGradebookData', function () {
-  const gradebook = createGradebook({ submissions_url: '/submissions-url' });
-  gradebook.reloadStudentData();
-  const [options] = DataLoader.loadGradebookData.lastCall.args;
-  equal(options.submissionsURL, '/submissions-url');
-});
-
-test('includes the submissions chunk callback when calling DataLoader.loadGradebookData', function () {
-  const gradebook = createGradebook();
-  gradebook.reloadStudentData();
-  const [options] = DataLoader.loadGradebookData.lastCall.args;
-  strictEqual(options.submissionsChunkCb, gradebook.gotSubmissionsChunk);
-});
-
-test('includes the submissions chunk size when calling DataLoader.loadGradebookData', function () {
-  const gradebook = createGradebook({ chunk_size: 10 });
-  gradebook.reloadStudentData();
-  const [options] = DataLoader.loadGradebookData.lastCall.args;
-  equal(options.submissionsChunkSize, 10);
-});
-
-test('includes the stored custom columns when calling DataLoader.loadGradebookData', function () {
-  const gradebook = createGradebook({ chunk_size: 10 });
-  gradebook.gotCustomColumns([{ id: '2401' }, { id: '2402' }]);
-  gradebook.reloadStudentData();
-  const [options] = DataLoader.loadGradebookData.lastCall.args;
-  deepEqual(options.customColumnIds, ['2401', '2402']);
-});
-
-test('includes the custom column data url when calling DataLoader.loadGradebookData', function () {
-  const gradebook = createGradebook({ custom_column_data_url: '/custom-column-data' });
-  gradebook.reloadStudentData();
-  const [options] = DataLoader.loadGradebookData.lastCall.args;
-  equal(options.customColumnDataURL, '/custom-column-data');
-});
-
-test('includes the custom column data page callback when calling DataLoader.loadGradebookData', function () {
-  const gradebook = createGradebook();
-  gradebook.reloadStudentData();
-  const [options] = DataLoader.loadGradebookData.lastCall.args;
-  strictEqual(options.customColumnDataPageCb, gradebook.gotCustomColumnDataChunk);
-});
-
-test('includes the getGradingPeriodAssignments param when calling DataLoader.loadGradebookData', function () {
-  const gradebook = createGradebook();
-  gradebook.reloadStudentData();
-  const [options] = DataLoader.loadGradebookData.lastCall.args;
-  strictEqual(options.getGradingPeriodAssignments, false);
-});
-
-test('optionally sets getGradingPeriodAssignments to true', function () {
-  const gradebook = createGradebook();
-  const optionOverrides = { getGradingPeriodAssignments: true }
-  gradebook.reloadStudentData(optionOverrides);
-  const [options] = DataLoader.loadGradebookData.lastCall.args;
-  strictEqual(options.getGradingPeriodAssignments, true);
-});
-
-test('requests data for hidden custom columns', function () {
-  const gradebook = createGradebook({ custom_column_data_url: '/custom-column-data' });
-  gradebook.reloadStudentData();
-  const [options] = DataLoader.loadGradebookData.lastCall.args;
-  strictEqual(options.customColumnDataParams.include_hidden, true);
-});
-
-test('calls gotGradingPeriodAssignments after grading period assignments are loaded', function () {
-  const gradebook = createGradebook({ grading_period_set: this.gradingPeriodSet })
-  sandbox.stub(gradebook, 'gotGradingPeriodAssignments')
-  gradebook.reloadStudentData({ getGradingPeriodAssignments: true })
-  this.loaderPromises.gotGradingPeriodAssignments.resolve({ grading_period_assignments: {} })
-  strictEqual(gradebook.gotGradingPeriodAssignments.callCount, 1)
-})
-
-test('calls updateColumns after grading period assignments are loaded', function () {
-  const gradebook = createGradebook({ grading_period_set: this.gradingPeriodSet })
-  sandbox.stub(gradebook, 'updateColumns')
-  gradebook.reloadStudentData({ getGradingPeriodAssignments: true })
-  this.loaderPromises.gotGradingPeriodAssignments.resolve({ grading_period_assignments: {} })
-  strictEqual(gradebook.updateColumns.callCount, 1)
-})
-
-test('calls the afterColumnsUpdated function (if it is supplied) when grading period assignments are loaded', function () {
-  const gradebook = createGradebook({ grading_period_set: this.gradingPeriodSet })
-  const afterColumnsUpdated = sinon.stub()
-  gradebook.reloadStudentData({ getGradingPeriodAssignments: true }, afterColumnsUpdated)
-  this.loaderPromises.gotGradingPeriodAssignments.resolve({ grading_period_assignments: {} })
-  strictEqual(afterColumnsUpdated.callCount, 1)
-})
-
-test('calls the afterColumnsUpdated function after columns are updated', function () {
-  const gradebook = createGradebook({ grading_period_set: this.gradingPeriodSet })
-  sandbox.stub(gradebook, 'updateColumns')
-  const afterColumnsUpdated = sinon.stub()
-  gradebook.reloadStudentData(true, afterColumnsUpdated)
-  this.loaderPromises.gotGradingPeriodAssignments.resolve({ grading_period_assignments: {} })
-  sinon.assert.callOrder(gradebook.updateColumns, afterColumnsUpdated);
-})
-
-test('calls the passed function after grading period assignments are loaded', function () {
-  const gradebook = createGradebook({ grading_period_set: this.gradingPeriodSet })
-  const afterHeaderRewrite = sinon.stub()
-  gradebook.reloadStudentData(true, afterHeaderRewrite)
-  this.loaderPromises.gotGradingPeriodAssignments.resolve({ grading_period_assignments: {} })
-  strictEqual(afterHeaderRewrite.callCount, 1)
-})
-
-test('stores student ids when loaded', function () {
-  const gradebook = createGradebook();
-  gradebook.reloadStudentData();
-  const studentIds = ['1101', '1102', '1103'];
-  this.loaderPromises.gotStudentIds.resolve({ user_ids: studentIds });
-  equal(gradebook.courseContent.students.listStudentIds(), studentIds);
-});
-
-test('builds rows when student ids are loaded', function () {
-  const gradebook = createGradebook();
-  gradebook.reloadStudentData();
-  const studentIds = ['1101', '1102', '1103'];
-  this.loaderPromises.gotStudentIds.resolve({ user_ids: studentIds });
-  deepEqual(gradebook.gridData.rows.map(row => row.id), studentIds);
-});
-
-test('updates students load state when loaded', function () {
-  const gradebook = createGradebook();
-  gradebook.reloadStudentData();
-  this.loaderPromises.gotStudents.resolve();
-  strictEqual(gradebook.contentLoadStates.studentsLoaded, true);
-});
-
-test('re-renders the column headers when students are loaded', function () {
-  const gradebook = createGradebook();
-  gradebook.reloadStudentData();
-  sandbox.stub(gradebook, 'updateColumnHeaders');
-  this.loaderPromises.gotStudents.resolve();
-  strictEqual(gradebook.updateColumnHeaders.callCount, 1);
-});
-
-test('re-renders the column headers after updating students load state', function () {
-  const gradebook = createGradebook();
-  gradebook.reloadStudentData();
-  sandbox.stub(gradebook, 'updateColumnHeaders').callsFake(() => {
-    strictEqual(gradebook.contentLoadStates.studentsLoaded, true, 'students load state was already updated');
-  });
-  this.loaderPromises.gotStudents.resolve();
-});
-
-test('re-renders the filters when students are loaded', function () {
-  const gradebook = createGradebook();
-  gradebook.reloadStudentData();
-  sandbox.stub(gradebook, 'renderFilters');
-  this.loaderPromises.gotStudents.resolve();
-  strictEqual(gradebook.renderFilters.callCount, 1);
-});
-
-test('re-renders the filters after updating students load state', function () {
-  const gradebook = createGradebook();
-  gradebook.reloadStudentData();
-  sandbox.stub(gradebook, 'renderFilters').callsFake(() => {
-    strictEqual(gradebook.contentLoadStates.studentsLoaded, true, 'students load state was already updated');
-  });
-  this.loaderPromises.gotStudents.resolve();
-});
-
-test('updates submissions load state when loaded', function () {
-  const gradebook = createGradebook();
-  gradebook.reloadStudentData();
-  this.loaderPromises.gotSubmissions.resolve();
-  strictEqual(gradebook.contentLoadStates.submissionsLoaded, true);
-});
-
-test('re-renders the column headers when submissions are loaded', function () {
-  const gradebook = createGradebook();
-  gradebook.reloadStudentData();
-  sandbox.stub(gradebook, 'updateColumnHeaders');
-  this.loaderPromises.gotSubmissions.resolve();
-  strictEqual(gradebook.updateColumnHeaders.callCount, 1);
-});
-
-test('re-renders the column headers after updating submissions load state', function () {
-  const gradebook = createGradebook();
-  gradebook.reloadStudentData();
-  sandbox.stub(gradebook, 'updateColumnHeaders').callsFake(() => {
-    strictEqual(gradebook.contentLoadStates.submissionsLoaded, true, 'submissions load state was already updated');
-  });
-  this.loaderPromises.gotSubmissions.resolve();
-});
-
-test('re-renders the filters when submissions are loaded', function () {
-  const gradebook = createGradebook();
-  gradebook.reloadStudentData();
-  sandbox.stub(gradebook, 'renderFilters');
-  this.loaderPromises.gotSubmissions.resolve();
-  strictEqual(gradebook.renderFilters.callCount, 1);
-});
-
-test('re-renders the filters after updating submissions load state', function () {
-  const gradebook = createGradebook();
-  gradebook.reloadStudentData();
-  sandbox.stub(gradebook, 'renderFilters').callsFake(() => {
-    strictEqual(gradebook.contentLoadStates.submissionsLoaded, true, 'submissions load state was already updated');
-  });
-  this.loaderPromises.gotSubmissions.resolve();
-});
 
 QUnit.module('Gradebook#gotChunkOfStudents', {
   setup () {
@@ -5412,19 +4876,7 @@ QUnit.module('Gradebook Grading Schemes', (suiteHooks) => {
   }
 
   suiteHooks.beforeEach(() => {
-    sinon.stub(DataLoader, 'loadGradebookData').returns({
-      gotAssignmentGroups: $.Deferred(),
-      gotContextModules: $.Deferred(),
-      gotCustomColumns: $.Deferred(),
-      gotStudentIds: $.Deferred(),
-      gotStudents: $.Deferred(),
-      gotSubmissions: $.Deferred(),
-      gotCustomColumnData: $.Deferred()
-    });
-  });
-
-  suiteHooks.afterEach(() => {
-    DataLoader.loadGradebookData.restore();
+    stubDataLoader()
   });
 
   QUnit.module('#getDefaultGradingScheme', () => {
@@ -9268,10 +8720,13 @@ QUnit.module('Gradebook#setAssignmentGroupsLoaded', (hooks) => {
 })
 
 QUnit.module('Gradebook#handleAssignmentMutingChange', (hooks) => {
+  let columnId
   let gradebook
+  const sortByStudentNameSettings = { columnId: 'student', settingKey: 'sortable_name', direction: 'ascending' }
 
   hooks.beforeEach(() => {
     gradebook = createGradebook()
+    columnId = gradebook.getAssignmentColumnId('2301')
   })
 
   test('resets grading', () => {
@@ -9279,5 +8734,38 @@ QUnit.module('Gradebook#handleAssignmentMutingChange', (hooks) => {
     gradebook.handleAssignmentMutingChange({ id: '2301' })
     strictEqual(gradebook.resetGrading.callCount, 1)
     gradebook.resetGrading.restore()
+  })
+
+  test('when sorted by an anonymous assignment, gradebook changes sort', () => {
+    gradebook.setSortRowsBySetting(columnId, 'grade', 'ascending')
+    gradebook.handleAssignmentMutingChange({ id: '2301', anonymize_students: true })
+    deepEqual(gradebook.getSortRowsBySetting(), sortByStudentNameSettings)
+  })
+
+  test('when sorted by assignment group of an anonymous assignment, gradebook changes sort', () => {
+    const groupId = '7'
+    gradebook.setSortRowsBySetting(gradebook.getAssignmentGroupColumnId(groupId), 'grade', 'ascending')
+    gradebook.handleAssignmentMutingChange({ id: '2301', anonymize_students: true, assignment_group_id: groupId })
+    deepEqual(gradebook.getSortRowsBySetting(), sortByStudentNameSettings)
+  })
+
+  test('when sorted by total grade, gradebook changes sort', () => {
+    gradebook.setSortRowsBySetting('total_grade', 'grade', 'ascending')
+    gradebook.handleAssignmentMutingChange({ id: '2301', anonymize_students: true })
+    deepEqual(gradebook.getSortRowsBySetting(), sortByStudentNameSettings)
+  })
+
+  test('when assignment is not anonymous, gradebook does not change sort', () => {
+    gradebook.setSortRowsBySetting(columnId, 'grade', 'ascending')
+    const sortSettings = gradebook.getSortRowsBySetting()
+    gradebook.handleAssignmentMutingChange({ id: '2301', anonymize_students: false })
+    deepEqual(gradebook.getSortRowsBySetting(), sortSettings)
+  })
+
+  test('when gradebook is sorted by an unrelated column, gradebook does not change sort', () => {
+    gradebook.setSortRowsBySetting(gradebook.getAssignmentColumnId('2222'), 'grade', 'ascending')
+    const sortSettings = gradebook.getSortRowsBySetting()
+    gradebook.handleAssignmentMutingChange({ id: '2301', anonymize_students: true })
+    deepEqual(gradebook.getSortRowsBySetting(), sortSettings)
   })
 })

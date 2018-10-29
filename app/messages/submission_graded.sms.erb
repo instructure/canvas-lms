@@ -1,4 +1,8 @@
+<% if send_student_names(asset, user) %>
+<%= t "%{assignment}, %{context} has been graded for %{name}.", :assignment => asset.assignment.title, :context => asset.assignment.context.name, name: asset.user.name %>
+<% else %>
 <%= t :sms_body, "%{assignment}, %{context} has been graded.", :assignment => asset.assignment.title, :context => asset.assignment.context.name %>
+<% end %>
 
 <%= t :graded_date, "graded: %{date}", :date => (datetime_string(force_zone(asset.graded_at)) rescue t(:no_date_set, "No Date Set")) %>
 <% if asset.score && user.try(:send_scores_in_emails?, asset.assignment.context.root_account) %>

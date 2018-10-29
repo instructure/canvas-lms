@@ -398,6 +398,13 @@ describe RoleOverride do
         expect(Account.site_admin.grants_right?(@site_admin, :manage_site_settings)).to be_truthy
       end
 
+      it "should grant permissions on root accounts to custom site admins" do
+        custom_role = custom_account_role("somerole", :account => Account.site_admin)
+        Account.site_admin.role_overrides.create!(role: custom_role, enabled: true, permission: :manage_site_settings)
+        custom_site_admin = account_admin_user(account: Account.site_admin, role: custom_role)
+        expect(Account.default.grants_right?(@site_admin, :manage_site_settings)).to be_truthy
+      end
+
       it "should not grant root only permissions to sub account admins" do
         expect(Account.default.grants_right?(@root_admin, :become_user)).to be_truthy
         expect(@sub_account.grants_right?(@sub_admin, :become_user)).to be_falsey

@@ -211,5 +211,30 @@ describe Quizzes::QuizQuestionsController do
       expect(linked_question.question_data['correct_comments_html']).to be_blank
       expect(linked_question.question_data['correct_comments']).to be_blank
     end
+
+    it "should leave assessment question verifiers" do
+      @attachment = attachment_with_context(@course)
+      bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
+      aq = bank.assessment_questions.create!(:question_data => {
+        :question_type => 'essay_question',
+        :question_text => "File ref:<img src=\"/courses/#{@course.id}/files/#{@attachment.id}/download\">"})
+
+      translated_text = aq.reload.question_data['question_text']
+      expect(translated_text).to match %r{/assessment_questions/\d+/files/\d+}
+      expect(translated_text).to match /verifier=/
+
+      # add the first question directly onto the quiz, so it shouldn't get "randomly" selected from the group
+      linked_question = @quiz.quiz_questions.build(:question_data => aq.question_data)
+      linked_question.assessment_question_id = aq.id
+      linked_question.save!
+
+      user_session(@teacher)
+      put 'update', params: {:course_id => @course.id, :quiz_id => @quiz, :id => linked_question.id,
+        :question => {:question_text => translated_text}}
+      expect(response).to be_successful
+
+      linked_question.reload
+      expect(linked_question.question_data['question_text']).to eq translated_text # leave alone
+    end
   end
 end

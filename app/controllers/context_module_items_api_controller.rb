@@ -238,6 +238,7 @@ class ContextModuleItemsApiController < ApplicationController
   before_action :disable_escape_html_entities, :only => [:index, :show]
   after_action :enable_escape_html_entities, :only => [:index, :show]
   include Api::V1::ContextModule
+  include PlannerApiHelper
 
   # @API List module items
   #

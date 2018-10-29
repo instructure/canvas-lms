@@ -130,7 +130,7 @@ class AssociateInteraction < AssessmentItemConverter
       @question[:answers] << answer
       answer_map[ci['responseIdentifier']] = answer
       extract_answer!(answer, ci.at_css('prompt'))
-      answer[:id] = unique_local_id
+      answer[:id] = get_or_generate_answer_id(ci['responseIdentifier'])
     end
 
     # connect to match

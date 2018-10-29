@@ -187,7 +187,7 @@ class UserMerge
         move_observees(target_user, user_merge_data)
       end
 
-      Enrollment.send_later(:recompute_final_scores, target_user.id)
+      Enrollment.send_later(:recompute_due_dates_and_scores, target_user.id)
       target_user.update_account_associations
     end
 

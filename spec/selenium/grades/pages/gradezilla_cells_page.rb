@@ -132,6 +132,28 @@ class Gradezilla
         driver.action.send_keys(key).perform
         wait_for_animations
       end
+
+      # ---------- Grade Override Cells ---------------
+      def grade_override_selector(student)
+        # TODO: locator for override, similar to total_grade_selector
+      end
+
+      def grade_override_input(student)
+        # TODO: f("#{gade_override_selector(student)} input[type='text']")
+      end
+
+      def get_override_grade(student)
+        f(grade_override_selector(student)).text
+      end
+
+      def edit_override(student, grade)
+        grade_override_selector.click
+
+        override_input = grade_override_input(student)
+        set_value(override_input, grade)
+
+        override_input.send_keys(:return)
+      end
     end
   end
 end

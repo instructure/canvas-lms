@@ -105,8 +105,8 @@
     padding: 0;
   }
   .btn {
-    padding-left: 8px;
-    padding-right: 8px;
+    padding-#{direction(left)}: 8px;
+    padding-#{direction(right)}: 8px;
   }
   .module-published-button {
     color: #33802a;
@@ -222,32 +222,32 @@
   /*
   .editable .item-group-condensed {
     .ig-title {
-      right: 600px;
-      left: 30px;
+      #{direction(right)}: 600px;
+      #{direction(left)}: 30px;
       &.indent-1 {
-        left: 42px;
+        #{direction(left)}: 42px;
       }
       &.indent-2 {
-        left: 54px;
+        #{direction(left)}: 54px;
       }
       &.indent-3 {
-        left: 66px;
+        #{direction(left)}: 66px;
       }
       &.indent-4 {
-        left: 78px;
+        #{direction(left)}: 78px;
       }
     }
     .ig-details {
-      right: 140px;
+      #{direction(right)}: 140px;
       width: 400px;
     }
     .ig-publish-btn {
       position: absolute;
-      right: 76px;
+      #{direction(right)}: 76px;
     }
     .add-item-button {
-      padding-left: 7px;
-      padding-right: 7px;
+      padding-#{direction(left)}: 7px;
+      padding-#{direction(right)}: 7px;
     }
   }
   */

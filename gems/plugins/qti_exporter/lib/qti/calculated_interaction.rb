@@ -83,7 +83,8 @@ class CalculatedInteraction < AssessmentItemConverter
 
   def get_answer_sets
     @doc.css('calculated var_sets var_set').each do |vs|
-      set = {:variables=>[], :id=>unique_local_id, :weight=>100}
+      set = {:variables=>[], :weight=>100}
+      set[:id] = vs['ident'].presence || unique_local_id
       @question[:answers] << set
       set[:answer] = vs.at_css('answer').text.to_f if vs.at_css('answer')
 

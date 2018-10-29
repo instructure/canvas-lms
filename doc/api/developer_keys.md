@@ -1,6 +1,6 @@
 Developer Keys
 ==============
-<h3 class="beta">BETA: This API resource is not finalized, and there could be breaking changes before its final release.</h3>
+
 Developer keys are OAuth2 client ID and secret pairs stored in Canvas that allow third-party applications to request access to Canvas API endpoints via the [OAuth2 flow](https://canvas.instructure.com/doc/api/file.oauth.html). Access is granted after a user authorizes an app and Canvas creates an API access token that’s returned in the final request of the OAuth2 flow.
 
 Developer keys created in a root account, by root account administrators or Instructure employees, are only functional for the account they are created in and its sub-accounts. Developer keys created globally, by an Instructure employee, are functional in any Canvas account where they are enabled.

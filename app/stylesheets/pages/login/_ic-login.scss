@@ -98,7 +98,7 @@ body.ic-Login-Body { // apply the background to the body element so that you don
 .ic-Login__body {
   background: var(--ic-brand-Login-Content-inner-body-bgd);
   border: 2px solid var(--ic-brand-Login-Content-inner-body-border);
-  padding: $ic-sp*1.5 $ic-sp*1.5 $ic-sp $ic-sp*1.5;
+  padding: direction-sides($ic-sp*1.5 $ic-sp*1.5 $ic-sp $ic-sp*1.5);
   margin-top: $ic-sp;
 }
 // these have !important because Canvas specificity on labels and
@@ -193,8 +193,8 @@ body.ic-Login-Body { // apply the background to the body element so that you don
       content: "";
       position: absolute;
       top: -0.375rem;
-      left: -0.375rem;
-      right: -0.375rem;
+      #{direction(left)}: -0.375rem;
+      #{direction(right)}: -0.375rem;
       bottom: -0.375rem;
       border: 1px solid var(--ic-brand-Login-Content-password-text-color);
       border-radius: 0.375rem;
@@ -212,8 +212,8 @@ body.ic-Login-Body { // apply the background to the body element so that you don
       content: "";
       position: absolute;
       top: 0;
-      left: 0;
-      right: 0;
+      #{direction(left)}: 0;
+      #{direction(right)}: 0;
       bottom: 0;
       border-radius: 0.175rem;
     }
@@ -230,7 +230,7 @@ body.ic-Login-Body { // apply the background to the body element so that you don
 .ic-Login__forgot-text {
   color: var(--ic-brand-Login-Content-password-text-color);
   @include fontSize($ic-font-size--small);
-  padding: 0 0 $ic-sp*2 0;
+  padding: direction-sides(0 0 $ic-sp*2 0);
   margin: 0;
   line-height: $ic-sp*2;
 }
@@ -338,12 +338,12 @@ body.ic-Login-Body #footer.ic-Login-footer {
     }
     h2, .h2 {
       height: 41px;
-      margin: 0 0 -5px 0;
-      padding: 0 0 0 60px;
+      margin: direction-sides(0 0 -5px 0);
+      padding: direction-sides(0 0 0 60px);
       color: #000;
     }
     p {
-      padding: 0 0 0 60px;
+      padding: direction-sides(0 0 0 60px);
       margin: 0;
       font-size: 1.25em;
       font-weight: normal;
@@ -379,8 +379,8 @@ body.body--login-confirmation {
 
 .ic-Login-confirmation__header {
   background: $ic-Login-confirmation-bgd;
-  border-top-left-radius: $baseBorderRadius;
-  border-top-right-radius: $baseBorderRadius;
+  border-top-#{direction(left)}-radius: $baseBorderRadius;
+  border-top-#{direction(right)}-radius: $baseBorderRadius;
   padding: $ic-sp*1.5;
 }
 
@@ -391,8 +391,8 @@ body.body--login-confirmation {
 .ic-Login-confirmation__content {
   padding: $ic-sp*2;
   background: $ic-color-light;
-  border-bottom-left-radius: $baseBorderRadius;
-  border-bottom-right-radius: $baseBorderRadius;
+  border-bottom-#{direction(left)}-radius: $baseBorderRadius;
+  border-bottom-#{direction(right)}-radius: $baseBorderRadius;
 
   .terms_of_service_link {
     position: relative;

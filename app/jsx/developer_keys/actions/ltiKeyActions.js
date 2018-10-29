@@ -15,8 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import axios from 'axios'
+
 import $ from 'jquery'
+import axios from 'axios'
 import developerKeysActions from './developerKeysActions'
 
 const actions = {}
@@ -103,6 +104,7 @@ actions.saveLtiToolConfiguration = ({
     .then(response => {
       dispatch(actions.saveLtiToolConfigurationSuccessful())
       dispatch(actions.setLtiToolConfiguration(response.data.tool_configuration.settings))
+      dispatch(actions.ltiKeysSetCustomizing(true))
 
       const newDevKey = {
         ...developer_key,
@@ -113,6 +115,48 @@ actions.saveLtiToolConfiguration = ({
     })
     .catch(error => {
       dispatch(actions.saveLtiToolConfigurationFailed(error))
+      $.flashError(error.message)
+    })
+}
+
+actions.LTI_KEYS_UPDATE_CUSTOMIZATIONS_START = 'LTI_KEYS_UPDATE_CUSTOMIZATIONS_START'
+actions.ltiKeysUpdateCustomizationsStart = () => ({
+  type: actions.LTI_KEYS_UPDATE_CUSTOMIZATIONS_START
+})
+
+actions.LTI_KEYS_UPDATE_CUSTOMIZATIONS_FAILED = 'LTI_KEYS_UPDATE_CUSTOMIZATIONS_FAILED'
+actions.ltiKeysUpdateCustomizationsFailed = payload => ({
+  type: actions.LTI_KEYS_UPDATE_CUSTOMIZATIONS_FAILED,
+  payload
+})
+
+actions.LTI_KEYS_UPDATE_CUSTOMIZATIONS_SUCCESSFUL = 'LTI_KEYS_UPDATE_CUSTOMIZATIONS_SUCCESSFUL'
+actions.ltiKeysUpdateCustomizationsSuccessful = payload => ({
+  type: actions.LTI_KEYS_UPDATE_CUSTOMIZATIONS_SUCCESSFUL,
+  payload
+})
+
+actions.LTI_KEYS_UPDATE_CUSTOMIZATIONS = 'LTI_KEYS_UPDATE_CUSTOMIZATIONS'
+actions.ltiKeysUpdateCustomizations = (scopes, disabled_placements, developerKeyId, toolConfiguration, customFields) => dispatch => {
+  dispatch(actions.ltiKeysUpdateCustomizationsStart())
+  const url = `/api/lti/developer_keys/${developerKeyId}/tool_configuration`
+
+  axios
+    .put(url, {
+      developer_key: {
+        scopes
+      },
+      tool_configuration: {
+        custom_fields: customFields,
+        disabled_placements,
+        settings: toolConfiguration
+      }
+    })
+    .then(() => {
+      actions.ltiKeysUpdateCustomizationsSuccessful()
+    })
+    .catch(error => {
+      dispatch(actions.ltiKeysUpdateCustomizationsFailed(error))
       $.flashError(error.message)
     })
 }

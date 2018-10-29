@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-//// 
+////
 // Note: We share this file with other Instructure projects so we can
 // maintain a consistent look feel with our styleguides.
 // If you edit something in there please throw a reference in #ui so we
@@ -41,10 +41,10 @@
 .Sg-Main .code-rendered {
   border: 1px solid $sg-example-border;
   border-bottom: none;
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
-  margin: 15px 0 0; 
-  padding: 50px 10px 10px; 
+  border-top-#{direction(left)}-radius: 5px;
+  border-top-#{direction(right)}-radius: 5px;
+  margin: 15px 0 0;
+  padding: 50px 10px 10px;
   position: relative;
   &:after {
     content: 'Example';
@@ -58,7 +58,7 @@
     display: inline-block;
     font-family: $sg-font;
     @include fontSize($ic-font-size--xsmall);
-  }  
+  }
 }
 .Sg-Main .codeBlock,
 .Sg-Main .highlight {
@@ -68,7 +68,7 @@
   color: $sg-example-tag-color;
   @include fontSize(15px);
   line-height: 1.6em;
-  overflow-x: auto;  
+  overflow-x: auto;
   position: relative;
   width: auto;
   &:after {
@@ -84,7 +84,7 @@
     display: inline-block;
     font-family: $sg-font;
     @include fontSize($ic-font-size--xsmall);
-  }  
+  }
   &.jsExample:after {
     content: 'JS';
   }

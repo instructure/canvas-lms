@@ -250,10 +250,6 @@ describe 'dashcards' do
         expect(f('.ic-DashboardCard__header_hero')).to have_attribute("style", rgb)
       end
 
-      it 'should initially focus the nickname input' do
-        check_element_has_focus(f('#NicknameInput'))
-      end
-
       it 'should customize dashcard color', priority: "1", test_id: 239991 do
         hex = random_hex_color
         expect(f('.ColorPicker__Container')).to be_displayed

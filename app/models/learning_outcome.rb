@@ -47,6 +47,7 @@ class LearningOutcome < ActiveRecord::Base
 
   validates :description, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
   validates :short_description, length: { maximum: maximum_string_length }
+  validates :vendor_guid, length: { maximum: maximum_string_length, allow_nil: true }
   validates :display_name, length: { maximum: maximum_string_length, allow_nil: true, allow_blank: true }
   validates :calculation_method, inclusion: { in: CALCULATION_METHODS.keys,
     message: -> { t(
@@ -125,27 +126,27 @@ class LearningOutcome < ActiveRecord::Base
 
   def infer_default_calculation_method
     # If we are a new record, or are not changing our calculation_method (such as on a pre-existing
-    # record or an import), then assume the default of highest
+    # record or an import), then assume the default of decaying average
     if new_record? || !calculation_method_changed?
       self.calculation_method ||= default_calculation_method
+      self.calculation_int ||= default_calculation_int
     end
   end
 
   def adjust_calculation_int
-    # If we are setting calculation_method to latest or highest,
-    # set calculation_int nil unless it is a new record (meaning it was set explicitly)
-    if %w[highest latest].include?(calculation_method) && calculation_method_changed?
-      self.calculation_int = nil unless new_record?
+    # If we are changing calculation_method, set default calculation_int
+    if calculation_method_changed? && (!calculation_int_changed? || %w[highest latest].include?(calculation_method))
+      self.calculation_int = default_calculation_int unless new_record?
     end
   end
 
   def default_calculation_method
-    "highest"
+    "decaying_average"
   end
 
   def default_calculation_int(method=self.calculation_method)
     case method
-    when 'decaying_average' then 75
+    when 'decaying_average' then 65
     when 'n_mastery' then 5
     else nil
     end

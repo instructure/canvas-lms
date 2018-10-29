@@ -98,15 +98,15 @@
 
 // Give the line between buttons some depth
 .btn-group > .btn + .dropdown-toggle {
-  padding-left: 8px;
-  padding-right: 8px;
+  padding-#{direction(left)}: 8px;
+  padding-#{direction(right)}: 8px;
   @include box-shadow(inset 1px 0 0 rgba(255,255,255,.125), inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05));
   *padding-top: 5px;
   *padding-bottom: 5px;
 }
 .btn-group > .btn-mini + .dropdown-toggle {
-  padding-left: 5px;
-  padding-right: 5px;
+  padding-#{direction(left)}: 5px;
+  padding-#{direction(right)}: 5px;
   *padding-top: 2px;
   *padding-bottom: 2px;
 }
@@ -115,8 +115,8 @@
   *padding-bottom: 4px;
 }
 .btn-group > .btn-large + .dropdown-toggle {
-  padding-left: 12px;
-  padding-right: 12px;
+  padding-#{direction(left)}: 12px;
+  padding-#{direction(right)}: 12px;
   *padding-top: 7px;
   *padding-bottom: 7px;
 }
@@ -168,8 +168,8 @@
   margin-top: 6px;
 }
 .btn-large .caret {
-  border-left-width:  5px;
-  border-right-width: 5px;
+  border-#{direction(left)}-width:  5px;
+  border-#{direction(right)}-width: 5px;
   border-top-width:   5px;
 }
 // Upside down carets for .dropup

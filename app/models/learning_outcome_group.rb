@@ -28,6 +28,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
   belongs_to :context, polymorphic: [:account, :course]
 
   before_save :infer_defaults
+  validates :vendor_guid, length: { maximum: maximum_string_length, allow_nil: true }
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
   validates_presence_of :title, :workflow_state

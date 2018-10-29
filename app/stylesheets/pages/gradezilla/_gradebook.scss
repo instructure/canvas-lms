@@ -213,8 +213,8 @@ $gradebook_cell_padding_top: 8px;
     @if $direction == 'rtl' {
       .ui-widget &.ui-sortable-helper {
         /* because in rtl we set the "right" property, but during drag jqueryUI uses the "left" property */
-        right: auto;
-        border-right: 1px solid $grid-border-color;
+        #{direction(right)}: auto;
+        border-#{direction(right)}: 1px solid $grid-border-color;
       }
     }
   }
@@ -337,8 +337,8 @@ $gradebook_cell_padding_top: 8px;
     }
 
     .slick-cell.primary-column {
-      border-left: 1px solid $active-border-color;
-      border-right: 1px solid $active-border-color;
+      border-#{direction(left)}: 1px solid $active-border-color;
+      border-#{direction(right)}: 1px solid $active-border-color;
       height: $row-height - 2px; // subtract top and bottom border
     }
   }
@@ -380,8 +380,8 @@ $gradebook_cell_padding_top: 8px;
     #{direction(left)}: 15px;
     content: "";
     border-top-color: transparent;
-    border-left-color: transparent;
-    border-right-color: transparent;
+    border-#{direction(left)}-color: transparent;
+    border-#{direction(right)}-color: transparent;
     border-bottom: 5px solid #444444;
     top: -10px;
   }

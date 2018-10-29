@@ -177,6 +177,11 @@ module Types
         AssignmentOverrideApplicator.overrides_for_assignment_and_user(assignment, current_user)
     end
 
+    field :group_set, GroupSetType, null: true
+    def group_set
+      load_association(:group_category)
+    end
+
     field :submissions_connection, SubmissionType.connection_type, null: true do
       description "submissions for this assignment"
       argument :filter, SubmissionFilterInputType, required: false

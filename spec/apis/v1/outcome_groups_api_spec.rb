@@ -1244,8 +1244,8 @@ describe "Outcome Groups API", type: :request do
           { :points => 0, :description => "Does Not Meet Expectations" }
         ]
       })
-      expect(@outcome.calculation_method).to eq("highest")
-      expect(@outcome.calculation_int).to be_nil
+      expect(@outcome.calculation_method).to eq("decaying_average")
+      expect(@outcome.calculation_int).to be 65
     end
 
     it "should link the new outcome into the group" do

@@ -181,19 +181,19 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
     it 'should insert image using embed image widget', priority: "2", test_id: 397971 do
       wiki_page_tools_file_tree_setup
-      fj('.mce-ico.mce-i-image').click
+      f('.mce-ico.mce-i-image').click
       wait_for_ajaximations
-      widget = fj('.ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-draggable.ui-dialog-buttons')
+      widget = f('.ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-draggable.ui-dialog-buttons')
       widget.find_element(:link_text, 'Canvas').click
       wait_for_ajaximations
-      widget.find_element(:link_text, 'Course files').click
+      fj("button:contains('Course files')").click
       wait_for_ajaximations
-      widget.find_element(:link_text, 'email.png').click
-      fj('.btn-primary.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only').click
+      fj("button:contains('email.png')").click
+      f('.btn-primary.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only').click
       wait_for_ajaximations
-      fj('.btn.btn-primary.submit').click
-      wait_for_ajaximations
-      main = fj('#main')
+      f('.btn.btn-primary.submit').click
+      wait_for_new_page_load
+      main = f('#main')
       expect(main.find_element(:tag_name, 'img')).to have_attribute('height', '16')
       expect(main.find_element(:tag_name, 'img')).to have_attribute('width', '16')
       expect(main.find_element(:tag_name, 'img')).to have_attribute('alt', 'email.png')
@@ -366,6 +366,9 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
       f('#new_page_link').click
       expect(f('#new_page_name')).to be_displayed
+      in_frame wiki_page_body_ifr_id do
+        wait_for_dom_ready
+      end
       f('#new_page_name').send_keys(title)
       submit_form("#new_page_drop_down")
 

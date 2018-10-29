@@ -10,7 +10,7 @@
 
 // Fluid layouts (left aligned, with sidebar, min- & max-width content)
 .container-fluid {
-  padding-right: $gridGutterWidth;
-  padding-left: $gridGutterWidth;
+  padding-#{direction(right)}: $gridGutterWidth;
+  padding-#{direction(left)}: $gridGutterWidth;
   @include clearfix();
 }

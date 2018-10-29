@@ -6839,6 +6839,7 @@ cy:
   enable_reregistration_for_lti_2_b2a10444: "Galluogi ailgofrestru ar gyfer LTI 2 "
   enable_student_context_card_links_eba2f2c5: "Galluogi dolenni ar gyfer cardiau cyd-destun myfyrwyr"
   enable_the_creation_of_blueprint_courses_79f91c30: "Galluogi’r broses o greu Cyrsiau Glasbrint"
+  enable_toolname_b06257b7: "Galluogi %{toolName}"
   enabled_and_locked_49ff3de4: "Wedi galluogi a chloi"
   enabled_ba7cab66: "Wedi galluogi"
   enabled_by_default_e530d6ed: "Wedi galluogi yn ddiofyn"

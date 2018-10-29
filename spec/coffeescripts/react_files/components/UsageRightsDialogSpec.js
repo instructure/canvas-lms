@@ -36,102 +36,97 @@ test('clicking cancelXButton closes modal', () => {
   const usage_rights = {use_justification: 'choose'}
   let modalClosed = false
   const props = {
+    isOpen: true,
     closeModal: () => (modalClosed = true),
     itemsToManage: [new File({thumbnail_url: 'blah', usage_rights})]
   }
   const uRD = TestUtils.renderIntoDocument(<UsageRightsDialog {...props} />)
-  TestUtils.Simulate.click(uRD.refs.cancelXButton)
+  TestUtils.Simulate.click(uRD.cancelXButton)
   ok(modalClosed)
-  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(uRD).parentNode)
 })
 
 test('clicking canel closes the modal', () => {
   const usage_rights = {use_justification: 'choose'}
   let modalClosed = false
   const props = {
+    isOpen: true,
     closeModal: () => (modalClosed = true),
     itemsToManage: [new File({thumbnail_url: 'blah', usage_rights})]
   }
   const uRD = TestUtils.renderIntoDocument(<UsageRightsDialog {...props} />)
-  TestUtils.Simulate.click(uRD.refs.cancelButton)
+  TestUtils.Simulate.click(uRD.cancelButton)
   ok(modalClosed)
-  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(uRD).parentNode)
 })
 
 test('render the file name with multiple items', () => {
   const usage_rights = {use_justification: 'choose'}
   const props = {
-    closeModal: () => (modalClosed = true),
+    isOpen: true,
+    closeModal: () => {},
     itemsToManage: [
       new File({thumbnail_url: 'blah', usage_rights}),
       new File({thumbnail_url: 'blah', usage_rights})
     ]
   }
   const uRD = TestUtils.renderIntoDocument(<UsageRightsDialog {...props} />)
-  equal(uRD.refs.fileName.innerHTML, '2 items selected', 'has correct message')
-  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(uRD).parentNode)
+  equal(uRD.fileName.innerText.trim(), '2 items selected', 'has correct message')
 })
 
 test('render the file name with one item', () => {
   const usage_rights = {use_justification: 'choose'}
   const file = new File({thumbnail_url: 'blah', usage_rights})
   file.displayName = () => 'cats'
-  const props = {closeModal() {}, itemsToManage: [file]}
+  const props = {isOpen: true, closeModal() {}, itemsToManage: [file]}
   const uRD = TestUtils.renderIntoDocument(<UsageRightsDialog {...props} />)
-  equal(uRD.refs.fileName.innerHTML, 'cats', 'has correct message')
-  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(uRD).parentNode)
+  equal(uRD.fileName.innerText.trim(), 'cats', 'has correct message')
 })
 
 test('render different right message', () => {
   const usage_rights = {use_justification: 'own_copyright'}
   const usage_rights2 = {use_justification: 'used_by_permission'}
-  const file = new File({thumbnail_url: 'blah', usage_rights})
+  const file = new File({thumbnail_url: 'blah', cid: '1', usage_rights})
   file.displayName = () => 'cats'
-  const file2 = new File({thumbnail_url: 'blah', usage_rights})
+  const file2 = new File({thumbnail_url: 'blah', cid: '2', usage_rights})
   file.displayName = () => 'cats2'
   const props = {
+    isOpen: true,
     closeModal() {},
     itemsToManage: [file, file2]
   }
   const uRD = TestUtils.renderIntoDocument(<UsageRightsDialog {...props} />)
   equal(
-    uRD.refs.differentRightsMessage.innerText,
+    uRD.differentRightsMessage.innerText,
     'Items selected have different usage rights.',
     'displays correct message'
   )
-  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(uRD).parentNode)
 })
 
 test('do not render different rights message when they are the same', () => {
   const usage_rights = {use_justification: 'own_copyright', legal_copyright: ''}
-  const file = new File({thumbnail_url: 'blah', usage_rights})
+  const file = new File({thumbnail_url: 'blah', cid: '3', usage_rights})
   file.displayName = () => 'cats'
-  const file2 = new File({thumbnail_url: 'blah', usage_rights})
+  const file2 = new File({thumbnail_url: 'blah', cid: '4', usage_rights})
   file2.displayName = () => 'cats'
   const props = {
+    isOpen: true,
     closeModal() {},
     itemsToManage: [file, file2]
   }
   const uRD = TestUtils.renderIntoDocument(<UsageRightsDialog {...props} />)
-  ok(!uRD.refs.differentRightsMessage, 'does not show the message')
-  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(uRD).parentNode)
+  ok(!uRD.differentRightsMessage, 'does not show the message')
 })
 
 test('render folder message for one folder', () => {
   const usage_rights = {use_justification: 'choose'}
-  const folder = new Folder({usage_rights})
+  const folder = new Folder({cid: 1, usage_rights})
   folder.displayName = () => 'some folder'
   const props = {
+    isOpen: true,
     closeModal() {},
     itemsToManage: [folder]
   }
   const uRD = TestUtils.renderIntoDocument(<UsageRightsDialog {...props} />)
-  equal(
-    uRD.refs.folderBulletList.innerText,
-    'some folder',
-    'shows display name'
-  )
-  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(uRD).parentNode)
+  equal(uRD.folderBulletList.innerText.trim(), 'some folder', 'shows display name')
 })
 
 test('render folder tooltip for multiple folders', () => {
@@ -139,17 +134,17 @@ test('render folder tooltip for multiple folders', () => {
   const folder = new Folder({usage_rights})
   folder.displayName = () => 'hello'
   const props = {
+    isOpen: true,
     closeModal() {},
     itemsToManage: [folder, folder, folder, folder]
   }
   const uRD = TestUtils.renderIntoDocument(<UsageRightsDialog {...props} />)
   equal(
-    uRD.refs.folderTooltip.getAttribute('data-html-tooltip-title'),
+    uRD.folderTooltip.getAttribute('data-html-tooltip-title'),
     'hello<br />hello',
     'sets title for multple folders'
   )
-  ok(uRD.refs.folderTooltip.innerText.match('and 2 more\u2026'), 'sets count text')
-  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(uRD).parentNode)
+  ok(uRD.folderTooltip.innerText.match('and 2 more\u2026'), 'sets count text')
 })
 
 QUnit.module('UploadProgress: Submitting')
@@ -159,11 +154,15 @@ test('validate they selected usage right', () => {
   const file = new File({thumbnail_url: 'blah', usage_rights})
   file.displayName = () => 'hello'
   const props = {
+    isOpen: true,
     closeModal() {},
     itemsToManage: [file]
   }
   const uRD = TestUtils.renderIntoDocument(<UsageRightsDialog {...props} />)
-  uRD.refs.usageSelection.getValues = () => ({use_justification: 'choose'})
+  equal(
+    uRD.usageSelection.props.use_justification,
+    'choose',
+    'default use_justification is "choose"'
+  )
   equal(uRD.submit(), false, 'returns false')
-  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(uRD).parentNode)
 })

@@ -22,7 +22,6 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   self.table_name = 'quiz_submissions'
 
   include Workflow
-  include PlannerHelper
 
   attr_readonly :quiz_id, :user_id
   attr_accessor :grader_id
@@ -73,7 +72,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   def update_planner_override
     return unless self.saved_change_to_workflow_state?
     return unless self.workflow_state == "complete"
-    complete_planner_override_for_quiz_submission(self)
+    PlannerHelper.complete_planner_override_for_quiz_submission(self)
   end
 
   serialize :quiz_data

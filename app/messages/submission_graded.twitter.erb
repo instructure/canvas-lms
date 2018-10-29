@@ -1,7 +1,11 @@
 <% define_content :link do -%>
   <%= polymorphic_url([asset.assignment.context, asset.assignment]) %>
 <% end -%>
-<%= t :tweet, "Canvas Alert - Graded: %{assignment}, %{context}", :assignment => asset.assignment.title, :context => asset.assignment.context.name %>
+<% if send_student_names(asset, user) %>
+  <%= t "Canvas Alert - Graded: %{assignment}, %{context} for %{name}", :assignment => asset.assignment.title, :context => asset.assignment.context.name, name: user.asset.name %>
+<% else %>
+  <%= t :tweet, "Canvas Alert - Graded: %{assignment}, %{context}", :assignment => asset.assignment.title, :context => asset.assignment.context.name %>
+<% end %>
 
 <%= datetime_string(force_zone(asset.graded_at)) rescue t(:no_date_set, "No Date Set") %>
 

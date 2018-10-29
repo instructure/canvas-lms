@@ -648,12 +648,6 @@ END
       state: 'hidden',
       beta: true
     },
-    'developer_key_management_and_scoping' => {
-      display_name: -> { I18n.t('Developer key management and scoping')},
-      description: -> { I18n.t('If enabled, developer key management options and token scoping will be used.') },
-      applies_to: 'RootAccount',
-      state: 'allowed'
-    },
     'non_scoring_rubrics' => {
       display_name: -> { I18n.t('Non-scoring Rubrics')},
       description: -> { I18n.t('If enabled, the option will be presented to have non-scoring rubrics.') },
@@ -666,6 +660,37 @@ END
       applies_to: 'RootAccount',
       development: true,
       state: 'allowed'
+    },
+    'assignments_2' => {
+      display_name: -> { I18n.t('Assignments 2') },
+      description: -> { I18n.t('Allow switching to the new assignments page') },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      development: true,
+      beta: true
+    },
+    'restrict_students_from_annotating' => {
+      display_name: -> { I18n.t('Restrict Students from Annotating') },
+      description: -> {
+        I18n.t <<~DESCRIPTION
+          Prevents students from leaving annotations in assignments. Does not apply to peer-reviewed assignments.
+        DESCRIPTION
+      },
+      applies_to: 'Course',
+      state: 'allowed',
+      development: true
+    },
+    'final_grade_override' => {
+      display_name: -> { I18n.t('Final Grade Override') },
+      description: -> {
+        I18n.t <<~DESCRIPTION
+          Enable ability to alter the final grade for the entire course without changing scores for assignments.
+        DESCRIPTION
+      },
+      applies_to: 'Course',
+      state: 'allowed',
+      development: true,
+      beta: true
     }
   )
 

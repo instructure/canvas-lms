@@ -61,7 +61,7 @@
 
   .ig-details__item {
     strong {
-      margin-right: 5px;
+      margin-#{direction(right)}: 5px;
     }
 
     span:last-child {
@@ -80,7 +80,7 @@
   }
 
   .type_icon {
-    margin-left: 5px;
+    margin-#{direction(left)}: 5px;
 
     i {
       color: $ic-color-light;

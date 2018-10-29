@@ -224,7 +224,7 @@ const mediaCommentActions = {
     }
   },
 
-  show (id, mediaType = 'video') {
+  show (id, mediaType = 'video', openingElement = null) {
     // if a media comment is still open, close it.
     $('.play_media_comment').find('.ui-dialog-titlebar-close').click()
 
@@ -257,8 +257,17 @@ const mediaCommentActions = {
         close: () => {
           const $mediaPlayer = $this.data('mediaelementplayer')
           if ($mediaPlayer) $mediaPlayer.pause()
+
+          if (openingElement) {
+            openingElement.focus()
+          }
         },
-        open: ev => $(ev.currentTarget).parent().find('.ui-dialog-titlebar-close').focus()
+        open: event => {
+          $(event.currentTarget).closest('.ui-dialog')
+            .attr('role', 'dialog')
+            .attr('aria-label', I18n.t('Play Media Comment'))
+          $(event.currentTarget).parent().find('.ui-dialog-titlebar-close').focus()
+        }
       })
 
       // Populate dialog box with a video

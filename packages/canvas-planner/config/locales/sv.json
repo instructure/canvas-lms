@@ -5,6 +5,9 @@
   "add_to_do_7def3c37": {
     "message": "Lägg till Att göra"
   },
+  "address_3159962f": {
+    "message": "Adress:"
+  },
   "all_day_fb42c4fc": {
     "message": "Hela dagen"
   },
@@ -56,6 +59,9 @@
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Början av din Att göra-historik"
   },
+  "calendar_a8563bb2": {
+    "message": "Kalender:"
+  },
   "calendar_event_89aadc1c": {
     "message": "Kalenderhändelse"
   },
@@ -92,11 +98,17 @@
   "date_is_required_8660ec22": {
     "message": "Datum krävs"
   },
+  "date_time_d9fbf2d7": {
+    "message": "Datum och tid:"
+  },
   "delete_a6efa79d": {
     "message": "Ta bort"
   },
   "details_98a31b68": {
     "message": "Detaljer"
+  },
+  "details_a6f427c3": {
+    "message": "Detaljer:"
   },
   "discussion_6719c51d": {
     "message": "Diskussion"
@@ -193,6 +205,9 @@
   },
   "loading_planner_items_947a813d": {
     "message": "Läser in Planner-objekt"
+  },
+  "location_3b6ff307": {
+    "message": "Plats:"
   },
   "looks_like_there_isn_t_anything_here_d9bcef49": {
     "message": "Det verkar inte finnas något här"
@@ -301,6 +316,12 @@
   },
   "startdate_to_enddate_d245175b": {
     "message": "{ startDate } till { endDate }"
+  },
+  "startdatetime_enddatetime_20abc10e": {
+    "message": "{ startDateTime } - { endDateTime }"
+  },
+  "startdatetime_endtime_49741bbe": {
+    "message": "{ startDateTime } - { endTime }"
   },
   "starttime_to_endtime_d7cc249d": {
     "message": "{ startTime } till { endTime }"

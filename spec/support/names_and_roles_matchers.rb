@@ -63,22 +63,91 @@ module Lti::Ims::NamesAndRolesMatchers
     membership.group.leader_id == membership.user.id
   end
 
-  RSpec::Matchers.define :be_lti_course_membership do |*expected|
-    match do |actual|
-      @expected = {
-        'status' => 'Active',
-        'context_id' => expected_lti_id(expected.first.context),
-        'context_label' => expected.first.context.course_code,
-        'context_title' => expected.first.context.name,
-        'name' => expected.first.user.name,
-        'picture' => expected.first.user.avatar_image_url,
-        'given_name' => expected.first.user.first_name,
-        'family_name' => expected.first.user.last_name,
-        'email' => expected.first.user.email,
-        'user_id' => expected_lti_id(expected.first.user),
-        'roles' => match_array(expected_course_lti_roles(*expected))
-      }.compact
+  def expected_base_membership_context(context)
+    {
+      'id' => expected_lti_id(context),
+      'title' => context.name
+    }.compact
+  end
 
+  def expected_group_membership_context(context)
+    expected_base_membership_context(context)
+  end
+
+  def expected_course_membership_context(context)
+    expected_base_membership_context(context).merge!({'label' => context.course_code}).compact
+  end
+
+  def expected_sourced_id(user)
+    return user.sourced_id if user.respond_to?(:sourced_id)
+    SisPseudonym.for(user, Account.default, type: :trusted, require_sis: false)&.sis_user_id
+  end
+
+  # Special defaulting as compared to #expected_sourced_id b/c that field is effectively NRPS-only and has special
+  # logic in NamesAndRolesSerializer to just suppress the field if it's either disallowed or blank. But here, for
+  # login ID, we're verifying existing extension rendering behaviors which rely on `$Canvas.user.loginId` expansion
+  # which is guarded by a rule that requires a SIS Pseudonym. So even though the expansion might be _allowed_, if the
+  # expanded field is blank, you'll get the custom param echoed back. (This way we get symmetry between NRPS and
+  # LTI launches for this particular field.)
+  def expected_login_id_extension(user)
+    SisPseudonym.for(user, Account.default, type: :trusted, require_sis: false)&.unique_id.presence || '$Canvas.user.loginId'
+  end
+
+  def expected_base_membership(user, opts)
+    {
+      'status' => 'Active',
+      'name' => (user.name if %w(public name_only).include?(privacy(opts))),
+      'picture' => (user.avatar_url if privacy(opts) == 'public'),
+      'given_name' => (user.first_name if %w(public name_only).include?(privacy(opts))),
+      'family_name' => (user.last_name if %w(public name_only).include?(privacy(opts))),
+      'email' => (user.email if %w(public email_only).include?(privacy(opts))),
+      'lis_person_sourcedid' => (expected_sourced_id(user) if %w(public name_only).include?(privacy(opts))),
+      'user_id' => expected_lti_id(Lti::Ims::Providers::MembershipsProvider.unwrap(user))
+    }.compact
+  end
+
+  def expected_message_array(user, opts)
+    [
+      {
+        'https://purl.imsglobal.org/spec/lti/claim/message_type' => 'LtiResourceLinkRequest',
+        'locale' => (user.locale || I18n.default_locale.to_s),
+        'https://purl.imsglobal.org/spec/lti/claim/custom' => {},
+        'https://www.instructure.com/canvas_user_id' => user.id,
+        'https://www.instructure.com/canvas_user_login_id' => (expected_login_id_extension(user) if privacy(opts) == 'public')
+      }.merge!(opts[:message_matcher].presence || {}).compact
+    ]
+  end
+
+  def expected_context_membership(user, roles_matcher, opts)
+    expected_base_membership(user, opts).
+      merge!('roles' => roles_matcher.call).
+      merge('message' => opts[:message_matcher] ? match_array(expected_message_array(user, opts)) : nil).
+      compact
+  end
+
+  def expected_course_membership(opts)
+    expected_context_membership(
+      opts[:expected].first.user,
+      -> { match_array(expected_course_lti_roles(*opts[:expected])) },
+      opts
+    )
+  end
+
+  def expected_group_membership(opts)
+    expected_context_membership(
+      opts[:expected].user,
+      -> { match_array(expected_group_lti_roles(opts[:expected])) },
+      opts
+    )
+  end
+
+  def privacy(opts)
+    opts[:privacy_level].presence || 'public'
+  end
+
+  RSpec::Matchers.define :be_lti_course_membership_context do |expected|
+    match do |actual|
+      @expected = expected_course_membership_context(expected)
       values_match? @expected, actual
     end
 
@@ -88,19 +157,49 @@ module Lti::Ims::NamesAndRolesMatchers
     attr_reader :actual, :expected
   end
 
-  RSpec::Matchers.define :be_lti_group_membership do |expected|
+  RSpec::Matchers.define :be_lti_group_membership_context do |expected|
+    match do |actual|
+      @expected = expected_group_membership_context(expected)
+      values_match? @expected, actual
+    end
+
+    diffable
+
+    # Make sure a failure diffs the two JSON structs (w/o this will compare 'actual' JSON to 'expected' AR model)
+    attr_reader :actual, :expected
+  end
+
+  RSpec::Matchers.define :be_lti_course_membership do |opts|
+    match do |actual|
+      @expected = expected_course_membership(opts)
+      values_match? @expected, actual
+    end
+
+    diffable
+
+    # Make sure a failure diffs the two JSON structs (w/o this will compare 'actual' JSON to 'expected' AR model)
+    attr_reader :actual, :expected
+  end
+
+  RSpec::Matchers.define :be_lti_group_membership do |opts|
+    match do |actual|
+      @expected = expected_group_membership(opts)
+      values_match? @expected, actual
+    end
+
+    diffable
+
+    # Make sure a failure diffs the two JSON structs (w/o this will compare 'actual' JSON to 'expected' AR model)
+    attr_reader :actual, :expected
+  end
+
+  RSpec::Matchers.define :be_lti_advantage_error_response_body do |expected_type, expected_message|
     match do |actual|
       @expected = {
-        'status' => 'Active',
-        'context_id' => expected_lti_id(expected.context),
-        'context_title' => expected.context.name,
-        'name' => expected.user.name,
-        'picture' => expected.user.avatar_image_url,
-        'given_name' => expected.user.first_name,
-        'family_name' => expected.user.last_name,
-        'email' => expected.user.email,
-        'user_id' => expected_lti_id(expected.user),
-        'roles' => match_array(expected_group_lti_roles(expected))
+        'errors' => {
+          'type' => expected_type,
+          'message' => expected_message
+        }
       }.compact
 
       values_match? @expected, actual
@@ -108,7 +207,7 @@ module Lti::Ims::NamesAndRolesMatchers
 
     diffable
 
-    # Make sure a failure diffs the two JSON structs (w/o this will compare 'actual' JSON to 'expected' AR model)
+    # Make sure a failure diffs the two JSON structs
     attr_reader :actual, :expected
   end
 end

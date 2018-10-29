@@ -197,7 +197,7 @@ import YouTubeApi from './youtube_api'
         var $editor = $box.data('editor');
         var $target = $(event.target);
         event.preventDefault();
-        RceCommandShim.send($editor, 'insert_code', buttonToImg($target));
+        send($editor, 'insert_code', buttonToImg($target));
         $box.dialog('close');
       });
       // http://img.youtube.com/vi/BOegH4uYe-c/3.jpg

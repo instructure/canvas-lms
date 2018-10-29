@@ -24,7 +24,7 @@
 
 .scopes-list {
   .developer-key-scope {
-    margin-right: -29px;
+    margin-#{direction(right)}: -29px;
   }
 }
 
@@ -53,7 +53,7 @@
     &.icon_react {
       min-width: 120px;
       a {
-        margin-right: 5px;
+        margin-#{direction(right)}: 5px;
         margin-bottom: 3px;
       }
     }
@@ -131,7 +131,7 @@
   height: 36px;
   width: 36px;
   display: block;
-  float: left;
+  float: direction(left);
   border: 1px solid #C7CDD1;
-  margin-right: .25rem;
+  margin-#{direction(right)}: .25rem;
 }

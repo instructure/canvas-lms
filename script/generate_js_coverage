@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 ###
 # This script does the work of combining various coverage JS code coverage files
 # together to produce one common html (and json) coverage report for the entire
@@ -17,6 +19,5 @@ fi
 
 echo '========== Merging all coverage reports =========='
 ./node_modules/.bin/istanbul-merge --out .nyc_output/total-coverage.json "{coverage-karma,coverage-jest,packages/*/coverage}/**/coverage*.json"
-
 echo '============= Generating HTML Report ============='
 ./node_modules/.bin/nyc report --reporter=html --report-dir coverage-js

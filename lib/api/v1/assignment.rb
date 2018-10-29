@@ -265,7 +265,7 @@ module Api::V1::Assignment
       if assignment.rubric
         rubric = assignment.rubric
         hash['rubric'] = rubric.data.map do |row|
-          row_hash = row.slice(:id, :points, :description, :long_description)
+          row_hash = row.slice(:id, :points, :description, :long_description, :ignore_for_scoring)
           row_hash["criterion_use_range"] = row[:criterion_use_range] || false
           row_hash["ratings"] = row[:ratings].map do |c|
             rating_hash = c.slice(:id, :points, :description, :long_description)
