@@ -126,27 +126,13 @@ export function labelFor(auditEvent) {
 }
 
 export function snippetFor({eventType, payload}) {
-  if (!(eventType in trailTypeByEventType)) {
-    return null
-  }
-
-  if (eventType === 'submission_comment_created') {
+  if (eventType === 'submission_comment_created' || eventType === 'submission_comment_updated') {
     return payload.comment
   }
 
-  /*
-   * TODO: GRADE-1670
-   * Everything below is only a placeholder so that the related part of the UI
-   * can be displayed with _some_ content, for QA/PR purposes. This will be
-   * replaced with logic to retrieve content for any audit events which should
-   * be displayed with supplemental text as context for the event.
-   */
-  if (Math.random() >= 0.5) {
-    return Math.random() >= 0.5 ? 'Example content here' : null
+  if (eventType === 'docviewer_comment_created' || eventType === 'docviewer_comment_updated') {
+    return payload.annotation_body.content
   }
 
-  return [
-    'I am the very model of a modern Major-General,',
-    "I've information vegetable, animal, and mineral"
-  ].join(' ')
+  return null
 }

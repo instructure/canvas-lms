@@ -399,5 +399,27 @@ describe('AuditTrailHelpers', () => {
       const event = buildEventOfType('unknown')
       expect(AuditTrailHelpers.snippetFor(event)).toBeNull()
     })
+
+    it('returns the comment for "submission_comment_created" events', () => {
+      const event = buildEventOfType('submission_comment_created', {payload: {comment: 'Good job!'}})
+      expect(AuditTrailHelpers.snippetFor(event)).toEqual('Good job!')
+      })
+
+    it('returns the comment for "submission_comment_updated" events', () => {
+      const event = buildEventOfType('submission_comment_updated', {payload: {comment: 'Good job!'}})
+      expect(AuditTrailHelpers.snippetFor(event)).toEqual('Good job!')
+    })
+
+    it('returns the comment for "docviewer_comment_created" events', () => {
+      const payload = {annotation_body: {content: 'Good job!'}}
+      const event = buildEventOfType('docviewer_comment_created', {payload})
+      expect(AuditTrailHelpers.snippetFor(event)).toEqual('Good job!')
+    })
+
+    it('returns the comment for "docviewer_comment_updated" events', () => {
+      const payload = {annotation_body: {content: 'Good job!'}}
+      const event = buildEventOfType('docviewer_comment_updated', {payload})
+      expect(AuditTrailHelpers.snippetFor(event)).toEqual('Good job!')
+    })
   })
 })
