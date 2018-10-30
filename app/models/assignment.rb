@@ -215,8 +215,9 @@ class Assignment < ActiveRecord::Base
     result.attachments.clear
     result.ignores.clear
     result.moderated_grading_selections.clear
+    result.grades_published_at = nil
     [:migration_id, :lti_context_id, :turnitin_id,
-      :discussion_topic, :integration_id, :integration_data].each do |attr|
+     :discussion_topic, :integration_id, :integration_data].each do |attr|
       result.send(:"#{attr}=", nil)
     end
     result.peer_review_count = 0

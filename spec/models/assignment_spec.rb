@@ -989,6 +989,14 @@ describe Assignment do
       expect(new_assignment3.title).to eq "Wiki Assignment Copy 3"
     end
 
+    it "does not duplicate grades_published_at" do
+      assignment = @course.assignments.create!(title: "whee", points_possible: 10)
+      assignment.grades_published_at = Time.zone.now
+      assignment.save!
+      new_assignment = assignment.reload.duplicate
+      expect(new_assignment.grades_published_at).to be_nil
+    end
+
     it "should not explode duplicating a mismatched rubric association" do
       assmt = @course.assignments.create!(:title => "assmt", :points_possible => 3)
       rubric = @course.rubrics.new(:title => "rubric")
