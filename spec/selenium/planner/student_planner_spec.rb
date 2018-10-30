@@ -532,7 +532,6 @@ describe "student planner" do
     end
 
     it "scrolls to the next new activity", priority: "1", test_id: 3468774 do
-      skip("I don't think it's waiting for the animation on the second click. see ADMIN-1569")
       go_to_list_view
       wait_for_spinner
       expect(items_displayed.count).to eq 1
@@ -546,8 +545,6 @@ describe "student planner" do
       new_activity_button.click
       wait_for_animations
       expect{scroll_height}.to become_between 450, 470  # 457
-
-      expect(true).to be_falsey
     end
 
     it "shows any new activity above the current scroll position", priority: "1", test_id: 3468775 do
