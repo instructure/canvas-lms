@@ -38,6 +38,7 @@ define [
 
     events:
       'click .all_users_checkbox': 'toggleAllUsers'
+      'click .remove_observers_checkbox': 'toggleRemoveObservers'
       'change #web_conference_long_running': 'changeLongRunning'
       'change #web_conference_conference_type': 'renderConferenceFormUserSettings'
 
@@ -119,6 +120,7 @@ define [
           {name: type.name, type: type.type, selected: (conferenceData.conference_type == type.type)}
         )
         inviteAll: invite_all
+        removeObservers: false
 
     updateConferenceUserSettingDetailsForConference: (conferenceData) ->
       # make handlebars comparisons easy
@@ -189,7 +191,15 @@ define [
       )
 
     toggleAllUsers: ->
+      $('.all_observers_checkbox').attr("checked", false);
       if(@$('.all_users_checkbox').is(':checked'))
+        $("#members_list").hide()
+      else
+        $("#members_list").slideDown()
+
+    toggleRemoveObservers: ->
+      $('.all_users_checkbox').attr("checked", false);
+      if(@$('.remove_observers_checkbox').is(':checked'))
         $("#members_list").hide()
       else
         $("#members_list").slideDown()

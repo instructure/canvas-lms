@@ -46,6 +46,15 @@ describe ConversationsController, type: :request do
     u
   end
 
+  def observer_in_course(options = {})
+    section = options.delete(:section)
+    u = User.create(options)
+    enrollment = @course.enroll_user(u, 'ObserverEnrollment', :section => section)
+    enrollment.workflow_state = 'active'
+    enrollment.save
+    u
+  end
+
   context "conversations" do
     it "should return the conversation list" do
       @c1 = conversation(@bob, :workflow_state => 'read')

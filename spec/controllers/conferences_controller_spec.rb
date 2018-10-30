@@ -111,6 +111,15 @@ describe ConferencesController do
       expect(response).to be_successful
     end
 
+    it "should create a conference with observers removed" do
+      user_session(@teacher)
+      enrollment = observer_in_course(active_all: true, user: user_with_pseudonym(active_all: true))
+      post 'create', params: {:observers => { :remove => "1" }, :course_id => @course.id, :web_conference => {:title => "My Conference", :conference_type => 'Wimba'}}, :format => 'json'
+      expect(response).to be_successful
+      conference = WebConference.last
+      expect(conference.invitees).not_to include(enrollment.user)
+    end
+
     context 'with concluded students in context' do
       context "with a course context" do
         it 'should not invite students with a concluded enrollment' do
