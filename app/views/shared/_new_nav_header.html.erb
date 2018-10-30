@@ -117,6 +117,7 @@
         <% if @current_user %>
         <hr class="sm-divider" />
           <ul class="ic-app-header__menu-list">
+            <% if SettingsService.get_settings(object: 'school', id: 1)['helpcenter_on'] %>
             <li class="menu-item ic-app-header__menu-list-item">
               <a id="global_nav_pendo_helpcenter_link" href="#helpcenter" class="ic-app-header__menu-list-link">
                 <div class="menu-item-icon-container" style="-webkit-filter: invert(100%)" aria-hidden="true">
@@ -125,6 +126,16 @@
                 <div class="menu-item__text"><%= t('Help') %></div>
               </a>
             </li>
+            <% else %>
+            <li class="menu-item ic-app-header__menu-list-item">
+              <a id="global_nav_pendo_helpcenter_link" href="#feedback" class="ic-app-header__menu-list-link">
+                <div class="menu-item-icon-container" style="-webkit-filter: invert(100%)" aria-hidden="true">
+                    <%= svg_icon :sm_feedback %>
+                </div>
+                <div class="menu-item__text"><%= t('Feedback') %></div>
+              </a>
+            </li>
+            <% end %>
           </ul>
         <%end%>
       </div>
