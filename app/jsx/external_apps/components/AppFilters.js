@@ -25,16 +25,16 @@ import 'compiled/jquery.rails_flash_notifications'
 export default class AppFilters extends React.Component {
   state = store.getState()
 
-  onChange = () => {
-    this.setState(store.getState())
-  }
-
   componentDidMount() {
     store.addChangeListener(this.onChange)
   }
 
   componentWillUnmount() {
     store.removeChangeListener(this.onChange)
+  }
+
+  onChange = () => {
+    this.setState(store.getState())
   }
 
   handleFilterClick = (filter, e) => {
@@ -52,6 +52,10 @@ export default class AppFilters extends React.Component {
   announceFilterResults = () => {
     const apps = store.filteredApps()
     $.screenReaderFlashMessageExclusive(I18n.t('%{count} apps found', {count: apps.length}))
+  }
+
+  focus () {
+    this.filterText.focus()
   }
 
   render() {
