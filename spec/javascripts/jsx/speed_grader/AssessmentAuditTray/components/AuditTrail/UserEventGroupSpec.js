@@ -38,6 +38,7 @@ QUnit.module('AssessmentAuditTray UserEventGroup', suiteHooks => {
     ]
 
     props = {
+      userId: '1101',
       userName: 'Adam Jones'
     }
   })

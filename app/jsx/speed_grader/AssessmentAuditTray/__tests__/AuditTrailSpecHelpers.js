@@ -16,17 +16,39 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable import/prefer-default-export */
-export function buildEvent(attr = {}) {
+export function buildEvent(attr = {}, payload = {}) {
   return {
     assignmentId: '2301',
     canvadocId: null,
     eventType: 'unknown',
     id: '4901',
-    payload: {},
     submissionId: null,
     userId: '1101',
     ...attr,
-    createdAt: attr.createdAt ? new Date(attr.createdAt) : new Date()
+    createdAt: attr.createdAt ? new Date(attr.createdAt) : new Date(),
+    payload
   }
+}
+
+export function buildAssignmentCreatedEvent(attr = {}, payload = {}) {
+  const fullPayload = {
+    anonymous_grading: true,
+    anonymous_instructor_annotations: true,
+    final_grader_id: '1102',
+    grader_comments_visible_to_graders: true,
+    grader_count: 2,
+    grader_names_visible_to_final_grader: true,
+    graders_anonymous_to_graders: false,
+    moderated_grading: true,
+    muted: true,
+    omit_from_final_grade: false,
+    points_possible: 10,
+    ...payload
+  }
+
+  return buildEvent({...attr, eventType: 'assignment_created'}, fullPayload)
+}
+
+export function buildAssignmentUpdatedEvent(attr = {}, payload = {}) {
+  return buildEvent({...attr, eventType: 'assignment_updated'}, payload)
 }

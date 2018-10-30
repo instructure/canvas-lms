@@ -50,13 +50,13 @@ QUnit.module('AssessmentAuditTray AuditEvent', suiteHooks => {
   })
 
   QUnit.module('"Non-anonymous" notification', () => {
-    // TODO: Implement as a part of GRADE-1667
+    // TODO: Implement as a part of GRADE-1668
     QUnit.skip('does not display a notification for anonymous events', () => {
       props.anonymous = true
       mountComponent()
     })
 
-    // TODO: Implement as a part of GRADE-1667
+    // TODO: Implement as a part of GRADE-1668
     QUnit.skip('displays a notification for non-anonymous events', () => {
       props.anonymous = false
       mountComponent()
@@ -65,12 +65,10 @@ QUnit.module('AssessmentAuditTray AuditEvent', suiteHooks => {
 
   QUnit.module('snippet', () => {
     test('is displayed for audit events with snippets', () => {
-      props.auditEvent = buildEvent({
-        eventType: 'submission_comment_created',
-        payload: {
-          comment: 'Good job.'
-        }
-      })
+      props.auditEvent = buildEvent(
+        {eventType: 'submission_comment_created'},
+        {comment: 'Good job.'}
+      )
       mountComponent()
       const $snippet = $container.querySelector('p')
       equal($snippet.textContent, 'Good job.')
