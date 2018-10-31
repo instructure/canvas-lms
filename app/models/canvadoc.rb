@@ -88,6 +88,8 @@ class Canvadoc < ActiveRecord::Base
       application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
       application/vnd.openxmlformats-officedocument.presentationml.presentation
       application/vnd.openxmlformats-officedocument.wordprocessingml.document
+      application/vnd.oasis.opendocument.graphics
+      application/vnd.oasis.opendocument.formula
     ].to_json)
   end
 
@@ -101,6 +103,8 @@ class Canvadoc < ActiveRecord::Base
       application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
       application/vnd.openxmlformats-officedocument.presentationml.presentation
       application/vnd.openxmlformats-officedocument.wordprocessingml.document
+      application/vnd.oasis.opendocument.graphics
+      application/vnd.oasis.opendocument.formula
       image/bmp
       image/jpeg
       image/jpg
