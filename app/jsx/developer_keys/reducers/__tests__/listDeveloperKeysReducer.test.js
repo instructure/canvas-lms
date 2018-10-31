@@ -176,9 +176,9 @@ it('listDeveloperKeysReplaceBindingState in inherited list', () => {
 it('responds to listDeveloperKeysDelete', () => {
   const state = {
     list: [
-      {id: 44, name: 'dd'},
-      {id: 55, name: 'ee'},
-      {id: 66, name: 'ff'},
+      {id: '44', name: 'dd'},
+      {id: '55', name: 'ee'},
+      {id: '66', name: 'ff'},
     ]
   };
 
@@ -188,8 +188,8 @@ it('responds to listDeveloperKeysDelete', () => {
 
   expect(newState.list).toEqual(
     [
-      {id: 44, name: 'dd'},
-      {id: 66, name: 'ff'}
+      {id: '44', name: 'dd'},
+      {id: '66', name: 'ff'}
     ]
   )
 });

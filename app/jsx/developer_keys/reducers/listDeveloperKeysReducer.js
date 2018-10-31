@@ -97,7 +97,7 @@ const developerKeysHandlers = {
   },
   [ACTION_NAMES.LIST_DEVELOPER_KEYS_DELETE]: (state, action) => ({
     ...state,
-    list: state.list.filter(developerKey => action.payload.id !== developerKey.id)
+    list: state.list.filter(developerKey => action.payload.id.toString() !== developerKey.id.toString())
   }),
   [ACTION_NAMES.LIST_DEVELOPER_KEYS_PREPEND]: (state, action) => {
     const list = state.list.slice()
