@@ -111,6 +111,11 @@ Rails.configuration.after_initialize do
     with_each_shard_by_database(Assignment, :zero_overdue_participation)
   end
 
+  # shortly after zeroing overdue, send the email warnings for the next day
+  Delayed::Periodic.cron 'Assignment.zero_overdue_participation', '12 14 * * *', :priority => Delayed::LOW_PRIORITY do
+    with_each_shard_by_database(Assignment, :send_assignment_warnings)
+  end
+
   Delayed::Periodic.cron 'Alerts::DelayedAlertSender.process', '30 11 * * *', :priority => Delayed::LOW_PRIORITY do
     with_each_shard_by_database(Alerts::DelayedAlertSender, :process)
   end

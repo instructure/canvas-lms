@@ -22,6 +22,8 @@ require 'canvas/draft_state_validations'
 require 'bigdecimal'
 require_dependency 'turnitin'
 
+require 'bz_grading'
+
 class Assignment < ActiveRecord::Base
   include Workflow
   include TextHelper
@@ -131,6 +133,54 @@ class Assignment < ActiveRecord::Base
         end
       end
     end
+  end
+
+  def self.send_assignment_warnings
+    bzg = BZGrading.new
+    result = []
+    Course.active.each do |course|
+      course.assignments.active.due_between_with_overrides(DateTime.now, DateTime.now + 2.days).each do |assignment|
+        course.students.active.each do |student|
+          ar = assignment.overridden_for(student)
+          next if ar.nil?
+          next if ar.due_at.nil?
+          next if ar.due_at - DateTime.now < 0 # due in the past
+          next if ar.due_at - DateTime.now > 2.days # no need to nag yet
+          next if assignment.submission_for_student(student).workflow_state != "unsubmitted" # already submitted, no need to nag
+          group = assignment.assignment_group
+          if !group.nil?
+            next if group.name == "1:1s" # the coach will do this and we can't tell on canvas if it has been done
+            next if group.name == "To Do" # these are just reminders for the event list, no need to email nag (again, can't tell if the are already done)
+            if group.name == "Module Engagement"
+              # also remind modules if not done already
+              disp_name = assignment.name["Course Participation - ".length .. -1]
+              mod = course.context_modules.active.where(:name => disp_name).first
+
+              next if bzg.get_module_completion_status(mod, student) == "completed"
+            end
+          end
+
+          when = (ar.due_at - DateTime.now < 1.days) ? "today" : "tomorrow"
+
+          Message.create!(
+            :to => student.email,
+            :from => "no-reply@bebraven.org",
+            :subject => "A Braven Assignment is due soon",
+            :body => "#{assignment.name} is due #{when} for Braven, please log into https://portal.bebraven.org/ and finish it to ensure you get full on-time credit.",
+            :delay_for => 0,
+            :context => assignment
+          )
+
+
+          result << "#{course.id} assignment #{assignment.name} due for #{student.name} at #{ar.due_at}"
+        end
+      end
+    end
+
+    result.each do |r|
+      puts r # for logging review and testing
+    end
+    nil
   end
 
   ALLOWED_GRADING_TYPES = %w(
