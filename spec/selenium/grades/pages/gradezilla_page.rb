@@ -216,6 +216,10 @@ class Gradezilla
       f('#new_gradebook_upload')
     end
 
+    def loading_spinner
+      f('#spinner')
+    end
+
     # actions
     def visit(course)
       Account.default.enable_feature!(:new_gradebook)
@@ -340,6 +344,16 @@ class Gradezilla
 
     def header_selector_by_col_index(n)
       f(".container_0 .slick-header-column:nth-child(#{n})")
+    end
+
+    def wait_for_spinner
+      begin
+        spinner = loading_spinner
+        keep_trying_until(3) { (spinner.displayed? == false) }
+      rescue Selenium::WebDriver::Error::TimeOutError
+        # ignore - sometimes spinner doesn't appear in Chrome
+      end
+      wait_for_ajaximations
     end
 
     # Semantic Methods for Gradebook Menus
