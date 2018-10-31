@@ -155,6 +155,7 @@ class BzController < ApplicationController
 
     result = {}
     result["answers"] = {}
+    # FIXME: add result["schema"] here with info about the requested fields.
 
     if enrollment
       enrollment.course_section.students.each do |student|
