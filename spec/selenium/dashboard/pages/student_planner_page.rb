@@ -87,6 +87,14 @@ module PlannerPageObject
     fj('span[role="menuitemradio"]:contains("List View")')
   end
 
+  def select_recent_activity_menuitem
+    fj('span[role="menuitemradio"]:contains("Recent Activity")')
+  end
+
+  def todo_sidebar_container
+    f('.Sidebar__TodoListContainer')
+  end
+
   def todo_info_holder
     f(".planner-grouping ol")
   end
@@ -164,8 +172,16 @@ module PlannerPageObject
     f("#DashboardCard_Container")
   end
 
+  def dashboard_card
+    f('.ic-DashboardCard')
+  end
+
   def dashboard_card_header_content
     f(".ic-DashboardCard__header_content")
+  end
+
+  def dashboard_card_actions_container
+    f(".ic-DashboardCard__action-container", dashboard_card)
   end
 
   def todosidebar_item_list
@@ -204,6 +220,26 @@ module PlannerPageObject
     fj("div label:contains('#{object_type} #{object_name} is not marked as done.')")
   end
 
+  def course_page_recent_activity
+    f('ul.recent_activity')
+  end
+
+  def recent_activity_show_more_link
+    fj(".stream-announcement a:contains('Show More')")
+  end
+
+  def recent_activity_close_announcement(title)
+    f("a[title='Ignore #{title}']")
+  end
+
+  def recent_activity_dashboard_activity
+    f('#dashboard-activity')
+  end
+
+  def course_recent_activity_main_content
+    f('#course_home_content')
+  end
+
   #----------------------- Actions & Methods -------------------------
 
   def mark_peer_review_as_complete(course)
@@ -224,6 +260,10 @@ module PlannerPageObject
 
   def dismiss_todo_item(todo_title)
     dismiss_todo_item_button(todo_title).click
+  end
+
+  def dismiss_announcement
+    f(".ToDoSidebarItem__Close button").click
   end
 
   def expand_planner_item_open_arrow
@@ -322,6 +362,11 @@ module PlannerPageObject
     wait_for_dashboard_load
   end
 
+  def go_to_recent_activity_view
+    dashboard_options_menu_container.click
+    select_recent_activity_menuitem.click
+  end
+
   # should pass the type of object as a string
   def validate_link_to_url(object, url_type)
     navigate_to_course_object(object)
@@ -381,9 +426,18 @@ module PlannerPageObject
     f('.ic-dashboard-app')
   end
 
+  def wait_for_todo_load
+    begin
+      f("[id*=Spinner]", todo_sidebar_container)
+    rescue Selenium::WebDriver::Error::NoSuchElementError
+    rescue SpecTimeLimit::Error
+    end
+    expect(todo_sidebar_container).not_to contain_jqcss("title:contains('To Do Items Loading')")
+  end
+
   def wait_for_spinner
     begin
-      fj("[id*=Spinner]", planner_app_div) # the loading spinner appears
+      f("[id*=Spinner]", planner_app_div) # the loading spinner appears
     rescue Selenium::WebDriver::Error::NoSuchElementError
       # ignore - sometimes spinner is too quick
     rescue SpecTimeLimit::Error
@@ -414,7 +468,7 @@ module PlannerPageObject
     expect(dashboard_options_menu_container).to be_displayed # Ensure the page is loaded and the element is visible
     dashboard_options_menu_container.click
   end
-  
+
   def scroll_height
     driver.execute_script("return window.pageYOffset")
   end

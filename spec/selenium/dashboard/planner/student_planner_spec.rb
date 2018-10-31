@@ -15,10 +15,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common'
-require_relative 'pages/student_planner_page'
-require_relative '../admin/pages/student_context_tray_page'
-require_relative '../assignments/page_objects/assignment_page'
+require_relative '../../common'
+require_relative '../pages/student_planner_page'
+require_relative '../../admin/pages/student_context_tray_page'
+require_relative '../../assignments/page_objects/assignment_page'
 
 describe "student planner" do
   include_context "in-process server selenium tests"

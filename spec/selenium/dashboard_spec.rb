@@ -46,69 +46,6 @@ describe "dashboard" do
       })
     end
 
-    def test_hiding(url)
-      create_announcement
-      items = @user.stream_item_instances
-      expect(items.size).to eq 1
-      expect(items.first.hidden).to eq false
-
-      get url
-      if url =='/'
-        f('#DashboardOptionsMenu_Container button').click
-        fj('span[role="menuitemradio"]:contains("Recent Activity")').click
-      end
-      click_recent_activity_header
-      item_selector = '#announcement-details tbody tr'
-      expect(ff(item_selector).size).to eq 1
-      f('#announcement-details .ignore-item').click
-      expect(f("#content")).not_to contain_css(item_selector)
-
-      # should still be gone on reload
-      get url
-      if url =='/'
-        f('#DashboardOptionsMenu_Container button').click
-        fj('span[role="menuitemradio"]:contains("Recent Activity")').click
-      end
-      expect(f("#content")).not_to contain_css(item_selector)
-
-      expect(@user.recent_stream_items.size).to eq 0
-      expect(items.first.reload.hidden).to eq true
-    end
-
-    it_should_behave_like 'load events list'
-
-    it "should allow hiding a stream item on the dashboard", priority: "1", test_id: 215577 do
-      test_hiding("/")
-    end
-
-    it "should allow hiding a stream item on the course page", priority: "1", test_id: 215578 do
-      test_hiding("/courses/#{@course.to_param}")
-    end
-
-    it "should not show stream items for deleted objects", priority: "1", test_id: 215579 do
-      enable_cache do
-        announcement = create_announcement
-        item_selector = '#announcement-details tbody tr'
-        Timecop.freeze(5.minutes.ago) do
-          items = @user.stream_item_instances
-          expect(items.size).to eq 1
-          expect(items.first.hidden).to eq false
-
-          get "/"
-          f('#DashboardOptionsMenu_Container button').click
-          fj('span[role="menuitemradio"]:contains("Recent Activity")').click
-
-          click_recent_activity_header
-          expect(ff(item_selector).size).to eq 1
-        end
-
-        announcement.destroy
-
-        get "/"
-        expect(f('.no_recent_messages')).to include_text('No Recent Messages')
-      end
-    end
-
     it "should not show announcement stream items without permissions" do
       @course.account.role_overrides.create!(:role => student_role,
                                              :permission => 'read_announcements',

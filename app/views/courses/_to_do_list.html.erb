@@ -32,7 +32,7 @@ cache(safe_cache_key([@current_user, contexts, show_legacy_todo_list, 'to_do_lis
 %>
 
 <% if !show_legacy_todo_list && @domain_root_account&.feature_enabled?(:student_planner) %>
-    <div class="todo-list"></div>
+    <div class="todo-list Sidebar__TodoListContainer"></div>
 <% else %>
   <% if presenter.any_assignments? %>
     <h2 class="todo-list-header" tabindex="-1"><%= t('headings.to_do', %{To Do}) %></h2>
