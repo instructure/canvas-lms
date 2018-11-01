@@ -906,12 +906,14 @@ const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : 
     updateDisplayComments: function() {
       this.checkShowDetails();
       $(".question_holder > .question > .question_comment").each(function() {
-        var val = $.trim($(this).find(".question_comment_text").html());
-        $(this).css('display', '').toggleClass('empty', !val);
+        const plain = $.trim($(this).find(".question_comment_text").html());
+        const rich = $.trim($(this).find(".question_comment_html").html());
+        $(this).css('display', '').toggleClass('empty', !plain && !rich);
       });
       $(".question_holder .answer_comment_holder").each(function() {
-        var val = $.trim($(this).find(".answer_comment").html());
-        $(this).css('display', '').toggleClass('empty', !val);
+        const plain = $.trim($(this).find(".answer_comment").html());
+        const rich = $.trim($(this).find(".answer_comment_html").html());
+        $(this).css('display', '').toggleClass('empty', !plain && !rich);
       });
       $("#questions .group_top:not(#group_top_new)").each(function(){
         var pickCount = $(this).find(".pick_count").text() || 0;
