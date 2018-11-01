@@ -37,9 +37,9 @@ QUnit.module('AssessmentAuditTray AuditTrail', suiteHooks => {
       buildEvent({id: '4904', userId: '1104'})
     ]
     const users = [
-      { id: '1101', name: 'A sedulous pupil', role: 'student' },
-      { id: '1102', name: 'A quizzical administrator', role: 'administrator' },
-      { id: '1103', name: 'A querulous final-grader', role: 'final_grader' }
+      {id: '1101', name: 'A sedulous pupil', role: 'student'},
+      {id: '1102', name: 'A quizzical administrator', role: 'administrator'},
+      {id: '1103', name: 'A querulous final-grader', role: 'final_grader'}
     ]
 
     props = {
@@ -88,6 +88,6 @@ QUnit.module('AssessmentAuditTray AuditTrail', suiteHooks => {
     mountComponent()
 
     const names = getHeaderContents()
-    ok(names[names.length-1].includes('Unknown User'))
+    ok(names[names.length - 1].includes('Unknown User'))
   })
 })

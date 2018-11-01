@@ -208,7 +208,9 @@ export default function buildAuditTrail(auditData) {
   }
 
   const usersById = {}
-  users.forEach(user => { usersById[user.id] = user })
+  users.forEach(user => {
+    usersById[user.id] = user
+  })
 
   // sort in ascending order (earliest event to most recent)
   const sortedEvents = [...auditEvents].sort((a, b) => a.createdAt - b.createdAt)

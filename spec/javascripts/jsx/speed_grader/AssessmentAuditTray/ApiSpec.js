@@ -59,7 +59,7 @@ QUnit.module('AssessmentAuditTray Api', suiteHooks => {
         }
       ]
 
-      users = [{ id: '1101', name: 'The Greatest Grader', role: 'grader' }]
+      users = [{id: '1101', name: 'The Greatest Grader', role: 'grader'}]
     })
 
     async function loadAssessmentAuditTrail() {

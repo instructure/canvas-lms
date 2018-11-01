@@ -17,7 +17,6 @@
  */
 
 import React, {PureComponent} from 'react'
-import {string} from 'prop-types'
 import ApplyTheme from '@instructure/ui-themeable/lib/components/ApplyTheme'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import ToggleDetails from '@instructure/ui-toggle-details/lib/components/ToggleGroup'
@@ -36,7 +35,7 @@ const themeOverride = {
 
 export default class UserEventGroup extends PureComponent {
   static propTypes = {
-    userEventGroup: propTypes.userEventGroup.isRequired,
+    userEventGroup: propTypes.userEventGroup.isRequired
   }
 
   render() {
@@ -55,7 +54,7 @@ export default class UserEventGroup extends PureComponent {
                 <Text weight="bold">{userName}</Text> ({roleLabel})
               </Text>
             }
-            toggleLabel={I18n.t('Assessment audit events for %{userName}', { userName })}
+            toggleLabel={I18n.t('Assessment audit events for %{userName}', {userName})}
           >
             <div>
               {dateEventGroups.map(dateEventGroup => (

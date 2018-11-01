@@ -127,7 +127,11 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         auditEvents: [buildEvent()],
         users: []
       })
-      expect(auditTrail.userEventGroups['1101'].user).toEqual({id: '1101', name: 'Unknown User', role: 'unknown'})
+      expect(auditTrail.userEventGroups['1101'].user).toEqual({
+        id: '1101',
+        name: 'Unknown User',
+        role: 'unknown'
+      })
     })
 
     describe('when the user has only one event', () => {

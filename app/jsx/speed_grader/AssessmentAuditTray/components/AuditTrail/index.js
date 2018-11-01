@@ -18,7 +18,6 @@
 
 import React, {PureComponent} from 'react'
 import View from '@instructure/ui-layout/lib/components/View'
-import I18n from 'i18n!speed_grader'
 
 import UserEventGroup from './UserEventGroup'
 import * as propTypes from './propTypes'
@@ -34,10 +33,7 @@ export default class AuditTrail extends PureComponent {
     return (
       <View as="div" id="assessment-audit-trail">
         {Object.values(userEventGroups).map(group => (
-          <UserEventGroup
-            key={group.user.id}
-            userEventGroup={group}
-          />
+          <UserEventGroup key={group.user.id} userEventGroup={group} />
         ))}
       </View>
     )

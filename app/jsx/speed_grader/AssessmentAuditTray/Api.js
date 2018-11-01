@@ -40,7 +40,7 @@ export default class Api {
         role: user.role
       }))
 
-      return { auditEvents, users }
+      return {auditEvents, users}
     })
   }
 }
