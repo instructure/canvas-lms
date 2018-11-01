@@ -60,14 +60,14 @@
           <h2 class="assignmentDetails__Title"><%= @assignment.title %></h2>
         </a>
         <p class="assignmentDetails__Info">
-          <span tabindex="0"><%= translated_due_date(@assignment) %></span>
+          <span><%= translated_due_date(@assignment) %></span>
           - <a id="context_title" href="<%= context_url(@context, :context_url) %>"><%= @context.short_name %></a>
         </p>
       </div>
     </div>
     <div class="subheadContent subheadContent--flex-end">
       <div class="statsMetric">
-        <div class="statsMetric__Item" tabindex="0">
+        <div class="statsMetric__Item">
           <div class="statsMetric__Item-value" id="x_of_x_graded"></div>
           <div class="statsMetric__Item-label"><%= t("Graded") %></div>
         </div>
@@ -75,7 +75,7 @@
           <div class="statsMetric__Item-value" id='average_score'>0.0</div>
           <div class="statsMetric__Item-label"><%= t("Average") %></div>
         </div>
-        <div class="statsMetric__Item" tabindex="0">
+        <div class="statsMetric__Item">
           <div class="statsMetric__Item-value" id="x_of_x_students_frd"></div>
           <div class="statsMetric__Item-label" id="gradee"></div>
         </div>
