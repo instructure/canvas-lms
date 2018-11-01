@@ -28,10 +28,31 @@ class Message < ActiveRecord::Base
   include Messages::PeerReviewsHelper
   include Messages::SendStudentNamesHelper
 
+  include CanvasPartman::Concerns::Partitioned
+  self.partitioning_strategy = :by_date
+  self.partitioning_interval = :weeks
+
   extend TextHelper
 
   MAX_TWITTER_MESSAGE_LENGTH = 140
 
+  class Queued
+    # use this to queue messages for delivery so we find them using the created_at in the scope
+    # instead of using id alone when reconstituting the AR object
+    attr_accessor :id, :created_at
+    def initialize(id, created_at)
+      @id, @created_at = id, created_at
+    end
+
+    delegate :deliver, :dispatch_at, :to => :message
+    def message
+      @message ||= Message.where(:id => @id, :created_at => @created_at).first
+    end
+  end
+
+  def for_queue
+    Queued.new(self.id, self.created_at)
+  end
 
   # Associations
   belongs_to :communication_channel
@@ -51,6 +72,7 @@ class Message < ActiveRecord::Base
   before_save :move_messages_for_deleted_users
 
   # Validations
+  validate :prevent_updates
   validates :body, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
   validates :html_body, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
   validates :transmission_errors, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
@@ -60,6 +82,13 @@ class Message < ActiveRecord::Base
   validates :subject, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
   validates :from_name, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
   validates :reply_to_name, length: {maximum: maximum_string_length}, allow_nil: true, allow_blank: true
+
+  def prevent_updates
+    unless self.new_record?
+      # e.g. Message.where(:id => self.id, :created_at => self.created_at).update_all(...)
+      self.errors.add(:base, "Regular saving on messages is disabled - use save_using_update_all")
+    end
+  end
 
   # Stream policy
   on_create_send_to_streams do
@@ -140,6 +169,21 @@ class Message < ActiveRecord::Base
     end
   end
 
+  # turns out we can override this method inside the workflow gem to get a custom save for workflow transitions
+  def persist_workflow_state(new_state)
+    self.workflow_state = new_state
+    self.save_using_update_all
+  end
+
+  def save_using_update_all
+    self.shard.activate do
+      self.updated_at = Time.now.utc
+      updates = Hash[self.changes_to_save.map{|k, v| [k, v.last]}]
+      self.class.where(:id => self.id, :created_at => self.created_at).update_all(updates)
+      self.clear_changes_information
+    end
+  end
+
   # Named scopes
   scope :for, lambda { |context| where(:context_type => context.class.base_class.to_s, :context_id => context) }
 
@@ -170,6 +214,8 @@ class Message < ActiveRecord::Base
   scope :staged, -> { where("messages.workflow_state='staged' AND messages.dispatch_at>?", Time.now.utc) }
 
   scope :in_state, lambda { |state| where(:workflow_state => Array(state).map(&:to_s)) }
+
+  scope :at_timestamp, lambda { |timestamp| where("created_at >= ? AND created_at < ?", Time.at(timestamp.to_i), Time.at(timestamp.to_i + 1)) }
 
   #Public: Helper methods for grabbing a user via the "from" field and using it to
   #populate the avatar, name, and email in the conversation email notification
@@ -569,7 +615,7 @@ class Message < ActiveRecord::Base
     else
       targets.each do |target|
         Services::NotificationService.process(
-          global_id,
+          notification_service_id,
           notification_message,
           path_type,
           target
@@ -685,6 +731,18 @@ class Message < ActiveRecord::Base
       end
 
       current_context
+    end
+  end
+
+  def notification_service_id
+    "#{self.global_id}+#{self.created_at.to_i}"
+  end
+
+  def self.parse_notification_service_id(service_id)
+    if service_id.to_s.include?("+")
+      service_id.split("+")
+    else
+      [service_id, nil]
     end
   end
 

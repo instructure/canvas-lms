@@ -2393,7 +2393,7 @@ describe ConversationsController, type: :request do
     end
 
     it 'returns an error when the user_id is not provided' do
-      @c1.all_messages.first()
+      message = @c1.all_messages.first()
 
       raw_api_call(:put, "/api/v1/conversations/restore",
               { :controller => "conversations", :action => "restore_message", :format => "json",
@@ -2403,7 +2403,7 @@ describe ConversationsController, type: :request do
     end
 
     it 'returns an error when the conversation_id is not provided' do
-      @c1.all_messages.first()
+      message = @c1.all_messages.first()
 
       raw_api_call(:put, "/api/v1/conversations/restore",
               { :controller => "conversations", :action => "restore_message", :format => "json",

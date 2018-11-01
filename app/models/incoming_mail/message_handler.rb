@@ -19,10 +19,10 @@
 module IncomingMail
   class MessageHandler
     def handle(outgoing_from_address, body, html_body, incoming_message, tag)
-      secure_id, original_message_id = parse_tag(tag)
+      secure_id, original_message_id, timestamp = parse_tag(tag)
       return unless original_message_id
 
-      original_message = Message.where(id: original_message_id).first
+      original_message = get_original_message(original_message_id, timestamp)
       # This prevents us from rebouncing users that have auto-replies setup -- only bounce something
       # that was sent out because of a notification.
       return unless original_message && original_message.notification_id
@@ -151,8 +151,16 @@ module IncomingMail
     end
 
     def parse_tag(tag)
-      match = tag.match /^(\h+)-([0-9~]+)$/
-      return match[1], match[2] if match
+      match = tag.match /^(\h+)-([0-9~]+)(?:-([0-9]+))?$/
+      return match[1], match[2], match[3] if match
+    end
+
+    def get_original_message(original_message_id, timestamp)
+      if timestamp
+        Message.where(id: original_message_id).at_timestamp(timestamp).first
+      else
+        Message.where(id: original_message_id).first
+      end
     end
   end
 end

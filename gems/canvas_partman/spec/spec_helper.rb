@@ -32,6 +32,7 @@ require 'support/schema_helper'
 require 'fixtures/zoo'
 require 'fixtures/animal'
 require 'fixtures/trail'
+require 'fixtures/week_event'
 
 require 'byebug'
 
@@ -39,6 +40,7 @@ RSpec.configure do |config|
   Zoo = CanvasPartmanTest::Zoo
   Animal = CanvasPartmanTest::Animal
   Trail = CanvasPartmanTest::Trail
+  WeekEvent = CanvasPartmanTest::WeekEvent
 
   config.run_all_when_everything_filtered = true
   config.filter_run :focus
@@ -59,11 +61,11 @@ RSpec.configure do |config|
   end
 
   config.before :all do
-    [ Zoo, Animal, Trail ].each(&:create_schema)
+    [ Zoo, Animal, Trail, WeekEvent ].each(&:create_schema)
   end
 
   config.after :all do
-    [ Animal, Trail, Zoo ].each(&:drop_schema)
+    [ Animal, Trail, Zoo, WeekEvent ].each(&:drop_schema)
   end
 
   config.after :each do

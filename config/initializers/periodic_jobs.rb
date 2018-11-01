@@ -127,10 +127,6 @@ Rails.configuration.after_initialize do
     with_each_shard_by_database(Ignore, :cleanup)
   end
 
-  Delayed::Periodic.cron 'MessageScrubber.scrub_all', '0 0 * * *' do
-    with_each_shard_by_database(MessageScrubber, :scrub)
-  end
-
   Delayed::Periodic.cron 'DelayedMessageScrubber.scrub_all', '0 1 * * *' do
     with_each_shard_by_database(DelayedMessageScrubber, :scrub)
   end
@@ -163,6 +159,10 @@ Rails.configuration.after_initialize do
 
   Delayed::Periodic.cron 'Version::Partitioner.process', '0 0 * * *' do
     with_each_shard_by_database(Version::Partitioner, :process)
+  end
+
+  Delayed::Periodic.cron 'Messages::Partitioner.process', '0 0 * * *' do
+    with_each_shard_by_database(Messages::Partitioner, :process)
   end
 
   if AuthenticationProvider::SAML.enabled?
