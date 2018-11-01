@@ -80,7 +80,9 @@ module Importers
 
     def self.import_course_part_from_migration(hash, context, migration, item=nil)
       hash = hash.with_indifferent_access
-      item = CoursePart.new(:course_id => context.id)
+      item ||= CoursePart.where(:course_id => context.id, :id => hash[:id]).first if hash[:id]
+      item ||= CoursePart.where(:course_id => context.id, :migration_id => hash[:migration_id]).first if hash[:migration_id]
+      item ||= CoursePart.new(:course_id => context.id)
       item.migration_id = hash[:migration_id]
       migration.add_imported_item(item)
 
