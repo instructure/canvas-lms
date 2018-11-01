@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import renderAssignmentsApp from '../assignments_2'
+import renderAssignmentsApp from '../assignments_2/teacherIndex'
 
 const elt = document.querySelector('#assignments_2')
 renderAssignmentsApp(ENV, elt)

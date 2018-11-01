@@ -16,26 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import { EnvShape } from './shapes'
-import TeacherView from '../teacher/TeacherView'
-import StudentView from '../student/StudentView'
+import renderAssignmentsApp from '../assignments_2/studentIndex'
 
-AssignmentView.propTypes = {
-  env: EnvShape.isRequired,
-}
-
-export default function AssignmentView (props) {
-  const viewProps = {
-    assignmentLid: props.env.ASSIGNMENT_ID.toString(),
-  }
-
-  let UserView
-  if (props.env.PERMISSIONS.context.read_as_admin) {
-    UserView = TeacherView
-  } else {
-    UserView = StudentView
-  }
-
-  return <UserView {...viewProps} />
-}
+const elt = document.querySelector('#assignments_2')
+renderAssignmentsApp(ENV, elt)

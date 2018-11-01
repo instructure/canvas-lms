@@ -23,7 +23,7 @@ import ReactDOM from 'react-dom'
 import ApolloClient from 'apollo-boost'
 import { ApolloProvider } from 'react-apollo'
 
-import AssignmentView from './shared/AssignmentView'
+import StudentView from './student/StudentView'
 
 const apolloClient = new ApolloClient({
   uri: '/api/graphql',
@@ -41,7 +41,7 @@ const apolloClient = new ApolloClient({
 export default function renderAssignmentsApp (env, elt) {
   ReactDOM.render(
     <ApolloProvider client={apolloClient}>
-      <AssignmentView env={env} />
+      <StudentView assignmentLid={ENV.ASSIGNMENT_ID.toString()}/>
     </ApolloProvider>, elt
   )
 }

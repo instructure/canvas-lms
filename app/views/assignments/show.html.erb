@@ -17,7 +17,11 @@
 %>
 
 <% if @context.account.feature_enabled?(:assignments_2) && value_to_boolean(params[:assignments_2]) %>
-  <% js_bundle :assignments_2_show %>
+  <% if can_do(@context, @current_user, :read_as_admin) %>
+    <% js_bundle :assignments_2_show_teacher %>
+  <% else %>
+    <% js_bundle :assignments_2_show_student %>
+  <% end %>
   <div id="assignments_2"></div>
 <% else %>
 
