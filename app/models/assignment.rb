@@ -495,7 +495,8 @@ class Assignment < ActiveRecord::Base
               :delete_empty_abandoned_children,
               :update_cached_due_dates,
               :apply_late_policy,
-              :touch_submissions_if_muted_changed
+              :touch_submissions_if_muted_changed,
+              :update_line_items
 
   with_options if: -> { auditable? && @updating_user.present? } do
     after_create :create_assignment_created_audit_event!
@@ -997,6 +998,46 @@ class Assignment < ActiveRecord::Base
       end
     end
   end
+
+  def update_line_items
+    # TODO: Edits to existing Assignment<->Tool associations are (mostly) ignored
+    #
+    # A few key points as a result:
+    #
+    # - Adding a 1.3 Tool to an Assignment which did not _ever_ have one previously _is_ supported and will result
+    # in LineItem+ResourceLink creation. But otherwise any attempt to add/edit/delete the Tool binding will have no
+    # impact on associated LineItems and ResourceLinks, even if it means those associations are now stale.
+    #
+    # - Associated LineItems and ResourceLinks are never deleted b/c this could possibly result in grade loss (cascaded
+    # delete from ResourceLink->LineItem->Result)
+    #
+    # - So in the case where a Tool association is abandoned or re-pointed to a different Tool, the Assignment's
+    # previously created LineItems and ResourceLinks will still exist and will be anomalous. I.e. they will be bound to
+    # a different tool than the Assignment.
+    #
+    # - Until this is resolved, clients trying to resolve an Assignment via ResourceLink->LineItem->Assignment chains
+    # have to remember to also check that the Assignment's ContentTag is still associated with the same
+    # ContextExternalTool as the ResourceLink. Also check Assignment.external_tool?.
+    #
+    # - Edits to assignment title and points_possible always propagate to the primary associated LineItem, even if the
+    # currently bound Tool doesn't support LTI 1.3 or if the LineItem's ResourceLink doesn't agree with Assignment's
+    # ContentTag on the currently bound tool. Presumably you always want correct data in the LineItem, regardless of
+    # which Tool it's bound to.
+    if lti_1_3_external_tool_tag? && line_items.empty?
+      rl = Lti::ResourceLink.create!(resource_link_id: lti_context_id, context_external_tool: external_tool_tag.content)
+      line_items.create!(label: title, score_maximum: points_possible, resource_link: rl)
+    elsif saved_change_to_title? || saved_change_to_points_possible?
+      line_items.
+        find(&:assignment_line_item?)&.
+        update!(label: title, score_maximum: points_possible)
+    end
+  end
+  protected :update_line_items
+
+  def lti_1_3_external_tool_tag?
+    external_tool? && external_tool_tag&.content_type == "ContextExternalTool" && external_tool_tag&.content&.use_1_3?
+  end
+  private :lti_1_3_external_tool_tag?
 
   # call this to perform notifications on an Assignment that is not being saved
   # (useful when a batch of overrides associated with a new assignment have been saved)

@@ -20,10 +20,15 @@ require_relative '../../spec_helper'
 
 RSpec.describe Lti::ResourceLink, type: :model do
   context 'when validating' do
-    let(:resource_link) { Lti::ResourceLink.create! }
+    let(:tool) { external_tool_model }
+    let(:resource_link) { Lti::ResourceLink.create!(context_external_tool: tool) }
 
     it 'sets the "resource_link_id" if it is not specified' do
       expect(resource_link.resource_link_id).not_to be_blank
+    end
+
+    it 'sets the "context_external_tool"' do
+      expect(resource_link.context_external_tool).to eq tool
     end
   end
 end

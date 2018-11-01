@@ -111,7 +111,11 @@ module Lti::Ims::Providers
     def assignment
       @_assignment ||= begin
         return nil unless rlid?
-        Assignment.active.for_course(course.id).where(lti_context_id: rlid).take
+        Assignment.active.for_course(course.id).
+          joins(line_items: :resource_link).
+          where(lti_resource_links: { resource_link_id: rlid, context_external_tool_id: tool.id }).
+          distinct.
+          take
       end
     end
 
@@ -121,7 +125,14 @@ module Lti::Ims::Providers
 
     def validate_tool_for_assignment!
       raise Lti::Ims::AdvantageErrors::InvalidResourceLinkIdFilter unless assignment?
-      # TODO: all of this might need to change once the LTI 1.3 tool<->resourcelink<->assignment binding mechanism is finalized
+
+      unless assignment.external_tool?
+        raise Lti::Ims::AdvantageErrors::InvalidResourceLinkIdFilter.new(
+          "Assignment (id: #{assignment.id}, rlid: #{rlid}) is not configured for submissions via external tool",
+          api_message: 'Requested assignment not configured for external tool launches'
+        )
+      end
+
       tool_tag = assignment.external_tool_tag
       if tool_tag.blank?
         raise Lti::Ims::AdvantageErrors::InvalidResourceLinkIdFilter.new(

@@ -16,14 +16,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Factories
-  def resource_link_model(overrides: {})
-    params = {
-      resource_link_id: overrides[:resource_link_id],
-      context_external_tool: overrides.fetch(:with_context_external_tool) do |_|
-        external_tool_model(context: overrides[:context], opts: overrides.fetch(:context_external_tool, {}))
-      end
-    }
-    Lti::ResourceLink.create!(params)
+class AddNotNullConstraintToLtiResourceLinks < ActiveRecord::Migration[5.1]
+  tag :predeploy
+
+  def change
+    change_column_null :lti_resource_links, :context_external_tool_id, false
   end
 end

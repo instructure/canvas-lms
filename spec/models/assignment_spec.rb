@@ -7208,6 +7208,149 @@ describe Assignment do
         expect(event.payload).to include('graders_anonymous_to_graders' => [false, true])
       end
     end
+
+    describe '#update_line_items' do
+      let(:use_1_3) { true }
+      let(:tool) do
+        course.context_external_tools.create!(
+          consumer_key: 'key',
+          shared_secret: 'secret',
+          name: 'test tool',
+          url: 'http://www.tool.com/launch',
+          settings: { use_1_3: use_1_3 },
+          workflow_state: 'public'
+        )
+      end
+      let(:assignment) do
+        @course.assignments.create!(submission_types: 'external_tool',
+                                    external_tool_tag_attributes: { content: tool },
+                                    **assignment_valid_attributes)
+      end
+
+      shared_examples 'line item and resource link existence check' do
+        it 'has a line item and a resource link referencing the currently bound tool' do
+          expect(assignment.line_items.length).to eq 1
+          expect(assignment.line_items.first.label).to eq assignment.title
+          expect(assignment.line_items.first.score_maximum).to eq assignment.points_possible
+          expect(assignment.line_items.first.resource_link).not_to be_nil
+          expect(assignment.line_items.first.resource_link.resource_link_id).to eq assignment.lti_context_id
+          expect(assignment.line_items.first.resource_link.context_external_tool).to eq tool
+          expect(assignment.external_tool_tag.content).to eq tool
+          expect(assignment.line_items.first.resource_link.line_items.first).to eq assignment.line_items.first
+        end
+      end
+
+      shared_examples 'assignment to line item attribute sync check' do
+        it 'synchronizes assignment title and points_possible changes to the primary line item' do
+          # create a secondary line item (i.e. one that should not be synchronized)
+          previous_title = assignment.title
+          previous_points_possible = assignment.points_possible
+          first_line_item = assignment.line_items.first
+          line_item_two = assignment.line_items.create!(
+            label: previous_title,
+            score_maximum: previous_points_possible,
+            resource_link: first_line_item.resource_link
+          )
+          line_item_two.update_attributes!(created_at: first_line_item.created_at + 1.minute)
+          assignment.title += " edit"
+          assignment.points_possible += 10
+          assignment.save!
+          assignment.reload
+          expect(assignment.line_items.length).to eq 2
+          expect(assignment.line_items.find(&:assignment_line_item?).label).to eq assignment.title
+          expect(assignment.line_items.find(&:assignment_line_item?).score_maximum).to eq assignment.points_possible
+          expect(assignment.line_items.find { |li| !li.assignment_line_item? }.label).to eq previous_title
+          expect(assignment.line_items.find { |li| !li.assignment_line_item? }.score_maximum).to eq previous_points_possible
+        end
+      end
+
+      context 'given an assignment bound to a LTI 1.3 tool' do
+
+        it_behaves_like 'line item and resource link existence check'
+        it_behaves_like 'assignment to line item attribute sync check'
+
+        context 'and the tool binding is changed' do
+          let(:different_tool_use_1_3) { true }
+          let!(:different_tool) do
+            course.context_external_tools.create!(
+              consumer_key: 'key2',
+              shared_secret: 'secret2',
+              name: 'test tool 2',
+              url: 'http://www.tool2.com/launch',
+              settings: { use_1_3: different_tool_use_1_3 },
+              workflow_state: 'public'
+            )
+          end
+
+          before(:each) do
+            assignment.update!(external_tool_tag_attributes: { content: different_tool })
+            assignment.reload
+          end
+
+          shared_examples 'unchanged line item and resource link check' do
+            it 'does not change nor add to the line item nor resource link' do
+              expect(assignment.line_items.length).to eq 1
+              expect(assignment.line_items.first.resource_link.context_external_tool).to eq tool
+              # some sanity checks to make sure the update did what we thought it did
+              expect(different_tool.id).not_to eq tool.id
+              expect(assignment.external_tool_tag.content.id).to eq different_tool.id
+            end
+          end
+
+          # rubocop:disable RSpec/NestedGroups
+          context 'to a different LTI 1.3 tool' do
+            it_behaves_like 'unchanged line item and resource link check'
+            it_behaves_like 'assignment to line item attribute sync check'
+          end
+
+          context 'to a different non-LTI 1.3 tool' do
+            let(:different_tool_use_1_3) { false }
+
+            it_behaves_like 'unchanged line item and resource link check'
+            it_behaves_like 'assignment to line item attribute sync check'
+          end
+          # rubocop:enable RSpec/NestedGroups
+        end
+
+        context 'and the tool binding is abandoned' do
+          it 'does not delete the line item nor resource link' do
+            assignment.update!(submission_types: 'none')
+            assignment.reload
+            expect(assignment.line_items.length).to eq 1
+            expect(assignment.line_items.first.resource_link.context_external_tool).to eq tool
+          end
+
+          it_behaves_like 'assignment to line item attribute sync check'
+        end
+      end
+
+      context 'given an assignment bound to a non-LTI 1.3 tool' do
+        let(:use_1_3) { false }
+
+        it 'does not create line items and resource links' do
+          expect(assignment.line_items).to be_empty
+        end
+      end
+
+      context 'given an assignment not yet bound to a LTI 1.3 tool' do
+        let(:assignment) do
+          @course.assignments.create!(submission_types: 'external_tool',
+                                      **assignment_valid_attributes)
+        end
+
+        it 'initially has no line items nor resource links' do
+          expect(assignment.line_items).to be_empty
+        end
+
+        context 'but when a LTI 1.3 tool is subsequently added' do
+          before do
+            assignment.update!(external_tool_tag_attributes: { content: tool })
+          end
+
+          it_behaves_like 'line item and resource link existence check'
+        end
+      end
+    end
   end
 
   def setup_assignment_with_group
