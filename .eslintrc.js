@@ -61,10 +61,6 @@ module.exports = {
       //   "message": "for..in loops iterate over the entire prototype chain, which is virtually never what you want. Use Object.{keys,values,entries}, and iterate over the resulting array."
       // },
       {
-        "selector": "ForOfStatement",
-        "message": "iterators/generators require regenerator-runtime ... unless you know for sure you're dealing with an array, in which case they are fine. so `for (const el of Array.from($('someSelector')))` and `for (const key of ['foo', 'bar'])` are both ok but `for (const el of $('someSelector'))` is not."
-      },
-      {
         "selector": "LabeledStatement",
         "message": "Labels are a form of GOTO; using them makes code confusing and hard to maintain and understand."
       },
