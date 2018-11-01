@@ -47,9 +47,9 @@ export default class DateEventGroup extends PureComponent {
         </Text>
 
         <List variant="unstyled">
-          {auditEvents.map(({anonymous, auditEvent}) => (
+          {auditEvents.map(({auditEvent, studentAnonymity}) => (
             <ListItem key={auditEvent.id} margin="small none none none">
-              <AuditEvent anonymous={anonymous} auditEvent={auditEvent} />
+              <AuditEvent auditEvent={auditEvent} studentAnonymity={studentAnonymity} />
             </ListItem>
           ))}
         </List>

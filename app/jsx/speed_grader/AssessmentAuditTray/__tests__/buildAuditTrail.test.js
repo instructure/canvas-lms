@@ -19,6 +19,8 @@
 import timezone from 'timezone_core'
 import newYork from 'timezone/America/New_York'
 
+import {auditEventStudentAnonymityStates} from '../AuditTrailHelpers'
+
 import buildAuditTrail from '../buildAuditTrail'
 import {
   buildAssignmentCreatedEvent,
@@ -70,9 +72,13 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
     auditEvents.push(buildAssignmentUpdatedEvent({createdAt, id}, payload))
   }
 
-  function getAuditEvents() {
+  function getUserEventGroup(userId) {
     auditTrail = auditTrail || buildAuditTrail({auditEvents, users})
-    const {dateEventGroups} = auditTrail.userEventGroups['1101']
+    return auditTrail.userEventGroups[userId]
+  }
+
+  function getAuditEvents() {
+    const {dateEventGroups} = getUserEventGroup('1101')
     return dateEventGroups.reduce(
       (allEvents, dateEventGroup) => allEvents.concat(dateEventGroup.auditEvents),
       []
@@ -95,6 +101,10 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
 
       return eventWasCreatedAt(eventDatum, createdAt)
     })
+  }
+
+  function getAuditEvent(eventId) {
+    return getAuditEvents().find(({auditEvent}) => auditEvent.id === eventId)
   }
 
   describe('events by user id', () => {
@@ -513,6 +523,16 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           expect(auditEventDatum.auditEvent.id).toEqual('4901.grader_to_grader_anonymity_updated')
         })
 
+        it('copies .studentAnonymity from the "assignment_created" audit event datum', () => {
+          buildCreateEvent({moderated_grading: true})
+          const [createEventDatum] = filterAuditEvents('assignment_created')
+          const [auditEventDatum] = filterAuditEvents(
+            'grader_to_grader_anonymity_updated',
+            '2018-09-01T12:00:00Z'
+          )
+          expect(auditEventDatum.studentAnonymity).toEqual(createEventDatum.studentAnonymity)
+        })
+
         it('copies the remaining attributes from the "assignment_created" audit event', () => {
           buildCreateEvent({moderated_grading: true})
           const [createEventDatum] = filterAuditEvents('assignment_created')
@@ -567,6 +587,16 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           expect(auditEventDatum.auditEvent.id).toEqual(
             '4901.grader_to_final_grader_anonymity_updated'
           )
+        })
+
+        it('copies .studentAnonymity from the "assignment_created" audit event datum', () => {
+          buildCreateEvent({moderated_grading: true})
+          const [createEventDatum] = filterAuditEvents('assignment_created')
+          const [auditEventDatum] = filterAuditEvents(
+            'grader_to_final_grader_anonymity_updated',
+            '2018-09-01T12:00:00Z'
+          )
+          expect(auditEventDatum.studentAnonymity).toEqual(createEventDatum.studentAnonymity)
         })
 
         it('copies the remaining attributes from the "assignment_created" audit event', () => {
@@ -625,6 +655,16 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           )
         })
 
+        it('copies .studentAnonymity from the "assignment_created" audit event datum', () => {
+          buildCreateEvent({moderated_grading: true})
+          const [createEventDatum] = filterAuditEvents('assignment_created')
+          const [auditEventDatum] = filterAuditEvents(
+            'grader_to_grader_comment_visibility_updated',
+            '2018-09-01T12:00:00Z'
+          )
+          expect(auditEventDatum.studentAnonymity).toEqual(createEventDatum.studentAnonymity)
+        })
+
         it('copies the remaining attributes from the "assignment_created" audit event', () => {
           buildCreateEvent({moderated_grading: true})
           const [createEventDatum] = filterAuditEvents('assignment_created')
@@ -661,6 +701,16 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
             '2018-09-01T12:00:00Z'
           )
           expect(auditEventDatum.auditEvent.id).toEqual('4901.grader_count_updated')
+        })
+
+        it('copies .studentAnonymity from the "assignment_created" audit event datum', () => {
+          buildCreateEvent({moderated_grading: true})
+          const [createEventDatum] = filterAuditEvents('assignment_created')
+          const [auditEventDatum] = filterAuditEvents(
+            'grader_count_updated',
+            '2018-09-01T12:00:00Z'
+          )
+          expect(auditEventDatum.studentAnonymity).toEqual(createEventDatum.studentAnonymity)
         })
 
         it('copies the remaining attributes from the "assignment_created" audit event', () => {
@@ -724,6 +774,15 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           expect(auditEventDatum.auditEvent.id).toEqual('4901.grader_to_grader_anonymity_updated')
         })
 
+        it('copies .studentAnonymity from the "assignment_created" audit event datum', () => {
+          const [createEventDatum] = filterAuditEvents('assignment_created')
+          const [auditEventDatum] = filterAuditEvents(
+            'grader_to_grader_anonymity_updated',
+            '2018-09-01T12:00:00Z'
+          )
+          expect(auditEventDatum.studentAnonymity).toEqual(createEventDatum.studentAnonymity)
+        })
+
         it('copies the remaining attributes from the "assignment_created" audit event', () => {
           const [createEventDatum] = filterAuditEvents('assignment_created')
           const [auditEventDatum] = filterAuditEvents(
@@ -763,6 +822,15 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
             '2018-09-02T12:00:00Z'
           )
           expect(auditEventDatum.auditEvent.id).toEqual('4902.grader_to_grader_anonymity_updated')
+        })
+
+        it('copies .studentAnonymity from the "assignment_updated" audit event datum', () => {
+          const [updateEventDatum] = filterAuditEvents('assignment_updated')
+          const [auditEventDatum] = filterAuditEvents(
+            'grader_to_grader_anonymity_updated',
+            '2018-09-02T12:00:00Z'
+          )
+          expect(auditEventDatum.studentAnonymity).toEqual(updateEventDatum.studentAnonymity)
         })
 
         it('copies the remaining attributes from the "assignment_updated" audit event', () => {
@@ -810,6 +878,15 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           )
         })
 
+        it('copies .studentAnonymity from the "assignment_created" audit event datum', () => {
+          const [createEventDatum] = filterAuditEvents('assignment_created')
+          const [auditEventDatum] = filterAuditEvents(
+            'grader_to_final_grader_anonymity_updated',
+            '2018-09-01T12:00:00Z'
+          )
+          expect(auditEventDatum.studentAnonymity).toEqual(createEventDatum.studentAnonymity)
+        })
+
         it('copies the remaining attributes from the "assignment_created" audit event', () => {
           const [createEventDatum] = filterAuditEvents('assignment_created')
           const [auditEventDatum] = filterAuditEvents(
@@ -853,6 +930,15 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           expect(auditEventDatum.auditEvent.id).toEqual(
             '4902.grader_to_final_grader_anonymity_updated'
           )
+        })
+
+        it('copies .studentAnonymity from the "assignment_updated" audit event datum', () => {
+          const [updateEventDatum] = filterAuditEvents('assignment_updated')
+          const [auditEventDatum] = filterAuditEvents(
+            'grader_to_final_grader_anonymity_updated',
+            '2018-09-02T12:00:00Z'
+          )
+          expect(auditEventDatum.studentAnonymity).toEqual(updateEventDatum.studentAnonymity)
         })
 
         it('copies the remaining attributes from the "assignment_updated" audit event', () => {
@@ -900,6 +986,15 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           )
         })
 
+        it('copies .studentAnonymity from the "assignment_created" audit event datum', () => {
+          const [createEventDatum] = filterAuditEvents('assignment_created')
+          const [auditEventDatum] = filterAuditEvents(
+            'grader_to_grader_comment_visibility_updated',
+            '2018-09-01T12:00:00Z'
+          )
+          expect(auditEventDatum.studentAnonymity).toEqual(createEventDatum.studentAnonymity)
+        })
+
         it('copies the remaining attributes from the "assignment_created" audit event', () => {
           const [createEventDatum] = filterAuditEvents('assignment_created')
           const [auditEventDatum] = filterAuditEvents(
@@ -943,6 +1038,15 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           expect(auditEventDatum.auditEvent.id).toEqual(
             '4902.grader_to_grader_comment_visibility_updated'
           )
+        })
+
+        it('copies .studentAnonymity from the "assignment_updated" audit event datum', () => {
+          const [updateEventDatum] = filterAuditEvents('assignment_updated')
+          const [auditEventDatum] = filterAuditEvents(
+            'grader_to_grader_comment_visibility_updated',
+            '2018-09-02T12:00:00Z'
+          )
+          expect(auditEventDatum.studentAnonymity).toEqual(updateEventDatum.studentAnonymity)
         })
 
         it('copies the remaining attributes from the "assignment_updated" audit event', () => {
@@ -990,6 +1094,15 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
             '2018-09-02T12:00:00Z'
           )
           expect(auditEventDatum.auditEvent.id).toEqual('4902.grader_count_updated')
+        })
+
+        it('copies .studentAnonymity from the "assignment_updated" audit event datum', () => {
+          const [updateEventDatum] = filterAuditEvents('assignment_updated')
+          const [auditEventDatum] = filterAuditEvents(
+            'grader_count_updated',
+            '2018-09-02T12:00:00Z'
+          )
+          expect(auditEventDatum.studentAnonymity).toEqual(updateEventDatum.studentAnonymity)
         })
 
         it('copies the remaining attributes from the "assignment_updated" audit event', () => {
@@ -1080,6 +1193,15 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           expect(auditEventDatum.auditEvent.id).toEqual('4902.grader_to_grader_anonymity_updated')
         })
 
+        it('copies .studentAnonymity from the "assignment_updated" audit event datum', () => {
+          const [updateEventDatum] = filterAuditEvents('assignment_updated')
+          const [auditEventDatum] = filterAuditEvents(
+            'grader_to_grader_anonymity_updated',
+            '2018-09-02T12:00:00Z'
+          )
+          expect(auditEventDatum.studentAnonymity).toEqual(updateEventDatum.studentAnonymity)
+        })
+
         it('copies the remaining attributes from the "assignment_updated" audit event', () => {
           const [updateEventDatum] = filterAuditEvents('assignment_updated')
           const [auditEventDatum] = filterAuditEvents(
@@ -1123,6 +1245,15 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           expect(auditEventDatum.auditEvent.id).toEqual(
             '4902.grader_to_final_grader_anonymity_updated'
           )
+        })
+
+        it('copies .studentAnonymity from the "assignment_updated" audit event datum', () => {
+          const [updateEventDatum] = filterAuditEvents('assignment_updated')
+          const [auditEventDatum] = filterAuditEvents(
+            'grader_to_final_grader_anonymity_updated',
+            '2018-09-02T12:00:00Z'
+          )
+          expect(auditEventDatum.studentAnonymity).toEqual(updateEventDatum.studentAnonymity)
         })
 
         it('copies the remaining attributes from the "assignment_updated" audit event', () => {
@@ -1212,6 +1343,12 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           expect(auditEventDatum.auditEvent.id).toEqual('4901.assignment_unmuted')
         })
 
+        it('copies .studentAnonymity from the "assignment_created" audit event datum', () => {
+          const [createEventDatum] = filterAuditEvents('assignment_created')
+          const [auditEventDatum] = filterAuditEvents('assignment_unmuted', '2018-09-01T12:00:00Z')
+          expect(auditEventDatum.studentAnonymity).toEqual(createEventDatum.studentAnonymity)
+        })
+
         it('copies the remaining attributes from the "assignment_created" audit event', () => {
           const [createEventDatum] = filterAuditEvents('assignment_created')
           const [auditEventDatum] = filterAuditEvents('assignment_unmuted', '2018-09-01T12:00:00Z')
@@ -1235,6 +1372,12 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('derives a unique id from the "assignment_updated" event', () => {
           const [auditEventDatum] = filterAuditEvents('assignment_muted', '2018-09-02T12:00:00Z')
           expect(auditEventDatum.auditEvent.id).toEqual('4902.assignment_muted')
+        })
+
+        it('copies .studentAnonymity from the "assignment_updated" audit event datum', () => {
+          const [updateEventDatum] = filterAuditEvents('assignment_updated')
+          const [auditEventDatum] = filterAuditEvents('assignment_muted', '2018-09-02T12:00:00Z')
+          expect(auditEventDatum.studentAnonymity).toEqual(updateEventDatum.studentAnonymity)
         })
 
         it('copies the remaining attributes from the "assignment_updated" audit event', () => {
@@ -1287,6 +1430,12 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
           expect(auditEventDatum.auditEvent.id).toEqual('4901.assignment_muted')
         })
 
+        it('copies .studentAnonymity from the "assignment_created" audit event datum', () => {
+          const [createEventDatum] = filterAuditEvents('assignment_created')
+          const [auditEventDatum] = filterAuditEvents('assignment_muted', '2018-09-01T12:00:00Z')
+          expect(auditEventDatum.studentAnonymity).toEqual(createEventDatum.studentAnonymity)
+        })
+
         it('copies the remaining attributes from the "assignment_created" audit event', () => {
           const [createEventDatum] = filterAuditEvents('assignment_created')
           const [auditEventDatum] = filterAuditEvents('assignment_muted', '2018-09-01T12:00:00Z')
@@ -1310,6 +1459,12 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         it('derives a unique id from the "assignment_updated" event', () => {
           const [auditEventDatum] = filterAuditEvents('assignment_unmuted', '2018-09-02T12:00:00Z')
           expect(auditEventDatum.auditEvent.id).toEqual('4902.assignment_unmuted')
+        })
+
+        it('copies .studentAnonymity from the "assignment_updated" audit event datum', () => {
+          const [updateEventDatum] = filterAuditEvents('assignment_updated')
+          const [auditEventDatum] = filterAuditEvents('assignment_unmuted', '2018-09-02T12:00:00Z')
+          expect(auditEventDatum.studentAnonymity).toEqual(updateEventDatum.studentAnonymity)
         })
 
         it('copies the remaining attributes from the "assignment_updated" audit event', () => {
@@ -1346,6 +1501,127 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         const auditEventData = filterAuditEvents('assignment_muted')
         expect(auditEventData).toHaveLength(0)
       })
+    })
+  })
+
+  describe('per-event anonymity tracking', () => {
+    const {NA, OFF, ON, TURNED_OFF, TURNED_ON} = auditEventStudentAnonymityStates
+
+    describe('when student anonymity is initially disabled and subsequently enabled', () => {
+      beforeEach(() => {
+        buildCreateEvent({anonymous_grading: false})
+        buildUpdateEvent('4902', '2018-09-02T12:00:00Z', {points_possible: [10, 15]})
+        buildUpdateEvent('4903', '2018-09-03T12:00:00Z', {anonymous_grading: [false, true]})
+        buildUpdateEvent('4904', '2018-09-04T12:00:00Z', {points_possible: [15, 10]})
+      })
+
+      it('sets .studentAnonymity to OFF on the initial event', () => {
+        expect(getAuditEvent('4901').studentAnonymity).toBe(OFF)
+      })
+
+      it('sets .studentAnonymity to OFF on subsequent events which have not enabled student anonymity', () => {
+        expect(getAuditEvent('4902').studentAnonymity).toBe(OFF)
+      })
+
+      it('sets .studentAnonymity to ON on the subsequent update which enables student anonymity', () => {
+        expect(getAuditEvent('4903').studentAnonymity).toBe(ON)
+      })
+
+      it('sets .studentAnonymity to TURNED_ON on the extracted event which enables student anonymity', () => {
+        expect(getAuditEvent('4903.student_anonymity_updated').studentAnonymity).toBe(TURNED_ON)
+      })
+
+      it('sets .studentAnonymity to ON on subsequent events which have not re-disabled student anonymity', () => {
+        expect(getAuditEvent('4904').studentAnonymity).toBe(ON)
+      })
+    })
+
+    describe('when student anonymity is initially enabled and subsequently disabled', () => {
+      beforeEach(() => {
+        buildCreateEvent({anonymous_grading: true})
+        buildUpdateEvent('4902', '2018-09-02T12:00:00Z', {points_possible: [10, 15]})
+        buildUpdateEvent('4903', '2018-09-03T12:00:00Z', {anonymous_grading: [true, false]})
+        buildUpdateEvent('4904', '2018-09-04T12:00:00Z', {points_possible: [15, 10]})
+      })
+
+      it('sets .studentAnonymity to ON on the initial event', () => {
+        expect(getAuditEvent('4901').studentAnonymity).toBe(ON)
+      })
+
+      it('sets .studentAnonymity to ON on subsequent events which have not disabled student anonymity', () => {
+        expect(getAuditEvent('4902').studentAnonymity).toBe(ON)
+      })
+
+      it('sets .studentAnonymity to OFF on the subsequent event which disables student anonymity', () => {
+        expect(getAuditEvent('4903').studentAnonymity).toBe(OFF)
+      })
+
+      it('sets .studentAnonymity to TURNED_OFF on the extracted event which enables student anonymity', () => {
+        expect(getAuditEvent('4903.student_anonymity_updated').studentAnonymity).toBe(TURNED_OFF)
+      })
+
+      it('sets .studentAnonymity to OFF on subsequent events which have not re-enabled student anonymity', () => {
+        expect(getAuditEvent('4904').studentAnonymity).toBe(OFF)
+      })
+    })
+
+    describe('when student anonymity is never enabled', () => {
+      beforeEach(() => {
+        buildCreateEvent({})
+        buildUpdateEvent('4902', '2018-09-02T12:00:00Z', {points_possible: [10, 15]})
+      })
+
+      it('sets .studentAnonymity to N/A on the initial event', () => {
+        expect(getAuditEvent('4901').studentAnonymity).toBe(NA)
+      })
+
+      it('sets .studentAnonymity to N/A on subsequent events', () => {
+        expect(getAuditEvent('4902').studentAnonymity).toBe(NA)
+      })
+    })
+  })
+
+  describe('per-user anonymity tracking', () => {
+    beforeEach(() => {
+      buildCreateEvent({anonymous_grading: true})
+      buildUpdateEvent('4902', '2018-09-02T12:00:00Z', {points_possible: [10, 15]})
+    })
+
+    function gradeStudent(id, createdAt, userId, payload) {
+      auditEvents.push(
+        buildEvent({createdAt, eventType: 'provisional_grade_created', id, userId}, payload)
+      )
+    }
+
+    it('sets .anonymousOnly to true when student anonymity was never disabled', () => {
+      expect(getUserEventGroup('1101').anonymousOnly).toBe(true)
+    })
+
+    it('sets .anonymousOnly to false when the given user disabled student anonymity', () => {
+      buildUpdateEvent('4903', '2018-09-03T12:00:00Z', {anonymous_grading: [true, false]})
+      buildUpdateEvent('4904', '2018-09-04T12:00:00Z', {anonymous_grading: [false, true]})
+      expect(getUserEventGroup('1101').anonymousOnly).toBe(false)
+    })
+
+    it('sets .anonymousOnly to false when the given user acted while student anonymity was disabled', () => {
+      buildUpdateEvent('4903', '2018-09-03T12:00:00Z', {anonymous_grading: [true, false]})
+      gradeStudent('4904', '2018-09-03T12:01:00Z', '1103', {grade: 'F', score: 0})
+      buildUpdateEvent('4905', '2018-09-04T12:00:00Z', {anonymous_grading: [false, true]})
+      expect(getUserEventGroup('1103').anonymousOnly).toBe(false)
+    })
+
+    it('sets .anonymousOnly to true when the given user acted only before student anonymity was disabled', () => {
+      gradeStudent('4903', '2018-09-03T11:59:00Z', '1103', {grade: 'F', score: 0})
+      buildUpdateEvent('4904', '2018-09-03T12:00:00Z', {anonymous_grading: [true, false]})
+      buildUpdateEvent('4905', '2018-09-04T12:00:00Z', {anonymous_grading: [false, true]})
+      expect(getUserEventGroup('1103').anonymousOnly).toBe(true)
+    })
+
+    it('sets .anonymousOnly to true when the given user acted only after student anonymity was re-enabled', () => {
+      buildUpdateEvent('4903', '2018-09-03T12:00:00Z', {anonymous_grading: [true, false]})
+      buildUpdateEvent('4904', '2018-09-04T12:00:00Z', {anonymous_grading: [false, true]})
+      gradeStudent('4905', '2018-09-04T12:01:00Z', '1103', {grade: 'F', score: 0})
+      expect(getUserEventGroup('1103').anonymousOnly).toBe(true)
     })
   })
 })

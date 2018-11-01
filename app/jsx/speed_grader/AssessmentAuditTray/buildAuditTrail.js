@@ -19,6 +19,14 @@
 import timezone from 'timezone_core'
 import I18n from 'i18n!speed_grader'
 
+import {auditEventStudentAnonymityStates} from './AuditTrailHelpers'
+
+const {NA, OFF, ON, TURNED_OFF, TURNED_ON} = auditEventStudentAnonymityStates
+
+function buildUnknownUser(userId) {
+  return {id: userId, name: I18n.t('Unknown User'), role: 'unknown'}
+}
+
 function getDateKey(date) {
   return timezone.format(date, '%F')
 }
@@ -50,16 +58,21 @@ function trackFeaturesOverall(auditEvents) {
 }
 
 function extractEvent(eventDatum, eventType, payload) {
-  const {anonymous, auditEvent} = eventDatum
+  const {auditEvent, studentAnonymity} = eventDatum
+
+  let specificAnonymity = studentAnonymity
+  if (eventType === 'student_anonymity_updated') {
+    specificAnonymity = studentAnonymity === ON ? TURNED_ON : TURNED_OFF
+  }
 
   return {
-    anonymous,
     auditEvent: {
       ...auditEvent,
       eventType,
       id: `${auditEvent.id}.${eventType}`,
       payload
-    }
+    },
+    studentAnonymity: specificAnonymity
   }
 }
 
@@ -160,6 +173,19 @@ function extractEvents(eventDatum, featureTracking) {
   return eventData
 }
 
+function getCurrentAnonymity({eventType, payload}, currentlyAnonymous) {
+  if (eventType === 'assignment_created') {
+    return payload.anonymous_grading
+  }
+
+  if (eventType === 'assignment_updated' && 'anonymous_grading' in payload) {
+    // [1] is the value after the change
+    return payload.anonymous_grading[1]
+  }
+
+  return currentlyAnonymous
+}
+
 /*
  * Audit trail data is structured as follows:
  * {
@@ -178,6 +204,9 @@ function extractEvents(eventDatum, featureTracking) {
  *   enabled at any time within the audit trail.
  * - `mutingWasUsed` indicate whether or not the assignment was muted at any
  *   time within the audit trail.
+ *
+ * - Within the user event map, `anonymousOnly` indicates whether or not the
+ *   user performed actions only when student anonymity was enabled.
  *
  * A `DateEventGroup` is an object containing audit event data from a specific
  * date. It is structured as follows:
@@ -217,38 +246,44 @@ export default function buildAuditTrail(auditData) {
   const userEventGroups = {}
 
   const featureTracking = trackFeaturesOverall(sortedEvents)
+  let currentlyAnonymous = false
 
   sortedEvents.forEach(auditEvent => {
-    const {userId} = auditEvent
-    // We hope we won't ever get events keyed to a user that doesn't exist, but
-    // better safe than sorry
-    const user = usersById[userId] || {id: userId, name: I18n.t('Unknown User'), role: 'unknown'}
+    const {createdAt, userId} = auditEvent
+    // In the event we do not have user info loaded for this user id, for
+    // whatever reason, the user still needs to be represented in the UI.
+    // Use an "Unknown User" as a fallback.
+    const user = usersById[userId] || buildUnknownUser(userId)
 
-    userEventGroups[userId] = userEventGroups[userId] || {dateEventGroups: [], user}
-    const {dateEventGroups} = userEventGroups[userId]
+    currentlyAnonymous = getCurrentAnonymity(auditEvent, currentlyAnonymous)
 
-    const dateKey = getDateKey(auditEvent.createdAt)
-
-    const lastDateGroup = dateEventGroups[dateEventGroups.length - 1]
-    const eventDatum = {
-      /*
-       * TODO: GRADE-1668
-       * This `anonymous` value is only a placeholder so that the related part
-       * of the UI can be displayed, for QA/PR purposes.  This will be replaced
-       * with logic for specifying whether or not anonymity was enabled when
-       * this event occurred.
-       */
-      anonymous: Math.random() >= 0.5,
-      auditEvent
+    userEventGroups[userId] = userEventGroups[userId] || {
+      anonymousOnly: currentlyAnonymous,
+      dateEventGroups: [],
+      user
     }
+    userEventGroups[userId].anonymousOnly =
+      userEventGroups[userId].anonymousOnly && currentlyAnonymous
+
+    const {dateEventGroups} = userEventGroups[userId]
+    const lastDateGroup = dateEventGroups[dateEventGroups.length - 1]
+
+    const eventDatum = {auditEvent}
+    if (featureTracking.anonymousGradingWasUsed) {
+      eventDatum.studentAnonymity = currentlyAnonymous ? ON : OFF
+    } else {
+      eventDatum.studentAnonymity = NA
+    }
+
     const eventData = extractEvents(eventDatum, featureTracking)
 
+    const dateKey = getDateKey(createdAt)
     if (lastDateGroup && lastDateGroup.startDateKey === dateKey) {
       lastDateGroup.auditEvents.push(...eventData)
     } else {
       dateEventGroups.push({
         auditEvents: eventData,
-        startDate: auditEvent.createdAt,
+        startDate: createdAt,
         startDateKey: dateKey
       })
     }

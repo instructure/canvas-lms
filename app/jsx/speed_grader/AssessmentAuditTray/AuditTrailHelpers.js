@@ -26,6 +26,14 @@ import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
 import IconUnmuted from '@instructure/ui-icons/lib/Line/IconUnmuted'
 import I18n from 'i18n!speed_grader'
 
+export const auditEventStudentAnonymityStates = Object.freeze({
+  NA: 'N/A',
+  OFF: 'OFF',
+  ON: 'ON',
+  TURNED_OFF: 'TURNED_OFF',
+  TURNED_ON: 'TURNED_ON'
+})
+
 const defaultIcon = IconQuestion
 const iconsByEventTrailType = {
   anonymity: IconStandards,

@@ -18,8 +18,14 @@
 
 import React, {PureComponent} from 'react'
 import ApplyTheme from '@instructure/ui-themeable/lib/components/ApplyTheme'
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
+import IconWarning from '@instructure/ui-icons/lib/Line/IconWarning'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import ToggleDetails from '@instructure/ui-toggle-details/lib/components/ToggleGroup'
+import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
+import TruncateText from '@instructure/ui-elements/lib/components/TruncateText'
 import View from '@instructure/ui-layout/lib/components/View'
 import I18n from 'i18n!speed_grader'
 
@@ -39,9 +45,10 @@ export default class UserEventGroup extends PureComponent {
   }
 
   render() {
-    const {dateEventGroups, user} = this.props.userEventGroup
+    const {anonymousOnly, dateEventGroups, user} = this.props.userEventGroup
     const userName = user.name || I18n.t('Unknown User')
     const roleLabel = roleLabelFor(user)
+    const message = !anonymousOnly && I18n.t('This user performed actions while anonymous was off')
 
     return (
       <View as="div">
@@ -50,9 +57,31 @@ export default class UserEventGroup extends PureComponent {
             border={false}
             id={`user-event-group-${user.id}`}
             summary={
-              <Text as="h3">
-                <Text weight="bold">{userName}</Text> ({roleLabel})
-              </Text>
+              <Flex as="div" direction="row">
+                <FlexItem grow size="0" padding="none xx-small none none">
+                  <Text as="h3">
+                    <TruncateText maxLines={1}>
+                      <Text weight="bold">{userName}</Text> ({roleLabel})
+                    </TruncateText>
+                  </Text>
+                </FlexItem>
+
+                {!anonymousOnly && (
+                  <FlexItem>
+                    <Tooltip
+                      on={['click', 'focus', 'hover']}
+                      placement="start"
+                      size="medium"
+                      tip={message}
+                      variant="inverse"
+                    >
+                      <Button icon={<IconWarning color="error" />} size="medium" variant="icon">
+                        <ScreenReaderContent>{I18n.t('Toggle tooltip')}</ScreenReaderContent>
+                      </Button>
+                    </Tooltip>
+                  </FlexItem>
+                )}
+              </Flex>
             }
             toggleLabel={I18n.t('Assessment audit events for %{userName}', {userName})}
           >

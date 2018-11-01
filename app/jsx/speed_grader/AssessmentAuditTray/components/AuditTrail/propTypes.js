@@ -16,19 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {arrayOf, bool, instanceOf, shape, string} from 'prop-types'
+import {arrayOf, bool, instanceOf, oneOf, shape, string} from 'prop-types'
+
+import {auditEventStudentAnonymityStates} from '../../AuditTrailHelpers'
 
 export const auditEvent = shape({
   eventType: string.isRequired
 })
 
-export const auditEventInfo = shape({
-  anonymous: bool.isRequired,
-  auditEvent: auditEvent.isRequired
-})
+export const auditEventInfo = {
+  auditEvent: auditEvent.isRequired,
+  studentAnonymity: oneOf(Object.values(auditEventStudentAnonymityStates)).isRequired
+}
 
 export const dateEventGroup = shape({
-  auditEvents: arrayOf(auditEventInfo).isRequired,
+  auditEvents: arrayOf(shape(auditEventInfo)).isRequired,
   startDate: instanceOf(Date).isRequired,
   startDateKey: string.isRequired
 })
@@ -40,6 +42,7 @@ export const user = shape({
 })
 
 export const userEventGroup = shape({
+  anonymousOnly: bool.isRequired,
   dateEventGroups: arrayOf(dateEventGroup).isRequired,
   user: user.isRequired
 })
