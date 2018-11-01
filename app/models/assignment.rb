@@ -160,13 +160,13 @@ class Assignment < ActiveRecord::Base
             end
           end
 
-          when = (ar.due_at - DateTime.now < 1.days) ? "today" : "tomorrow"
+          when_due = (ar.due_at - DateTime.now < 1.days) ? "today" : "tomorrow"
 
           Message.create!(
             :to => student.email,
             :from => "no-reply@bebraven.org",
             :subject => "A Braven Assignment is due soon",
-            :body => "#{assignment.name} is due #{when} for Braven, please log into https://portal.bebraven.org/ and finish it to ensure you get full on-time credit.",
+            :body => "#{assignment.name} is due #{when_due} for Braven, please log into https://portal.bebraven.org/ and finish it to ensure you get full on-time credit.",
             :delay_for => 0,
             :context => assignment
           )
