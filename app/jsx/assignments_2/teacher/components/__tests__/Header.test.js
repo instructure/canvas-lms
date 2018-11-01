@@ -17,21 +17,14 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
-import {CoreTeacherView} from '../TeacherView'
+import {render} from 'react-testing-library'
+import {mockAssignment} from '../../test-utils'
+import Header from '../Header'
 
-it('renders normally', () => {
-  const wrapper = shallow(
-    <CoreTeacherView
-      data={{
-        assignment: {
-          name: 'What is the Answer?',
-          dueAt: 'The Future',
-          pointsPossible: 42,
-          description: 'an assignment'
-        }
-      }}
-    />
-  )
-  expect(wrapper).toMatchSnapshot()
+it('renders basic assignment information', () => {
+  const assignment = mockAssignment()
+  const {container, getByTestId} = render(<Header assignment={mockAssignment()} />)
+  expect(container).toHaveTextContent(assignment.name)
+  expect(container).toHaveTextContent(assignment.pointsPossible.toString())
+  expect(getByTestId('teacher-toolbox')).toBeInTheDocument()
 })

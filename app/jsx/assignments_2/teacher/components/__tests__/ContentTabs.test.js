@@ -17,15 +17,10 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import {render} from 'react-testing-library'
+import {mockAssignment} from '../../test-utils'
 import ContentTabs from '../ContentTabs'
 
 it('renders', () => {
-  const assignment = {
-    name: 'title',
-    pointsPossible: 42,
-    dueAt: 'due',
-    description: '<p>some assignment description</p>'
-  }
-  expect(shallow(<ContentTabs assignment={assignment} />)).toMatchSnapshot()
+  render(<ContentTabs assignment={mockAssignment()} />)
 })

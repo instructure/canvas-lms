@@ -16,17 +16,5 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {shallow} from 'enzyme'
-import AssignmentHeader from '../AssignmentHeader'
-
-it('renders normally', () => {
-  const assignment = {
-    name: 'an assignment',
-    pointsPossible: 42,
-    dueAt: 'some time',
-    description: 'an assignment'
-  }
-  const wrapper = shallow(<AssignmentHeader assignment={assignment} />)
-  expect(wrapper).toMatchSnapshot()
-})
+import 'jest-dom/extend-expect'
+import 'react-testing-library/cleanup-after-each'

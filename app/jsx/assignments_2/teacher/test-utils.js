@@ -16,22 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {shallow} from 'enzyme'
-import apiUserContent from 'compiled/str/apiUserContent'
-import Details from '../Details'
-
-jest.mock('compiled/str/apiUserContent')
-apiUserContent.convert = jest.fn(arg => `converted ${arg}`)
-
-it('renders and converts', () => {
-  const assignment = {
-    name: 'title',
-    pointsPossible: 42,
-    dueAt: 'due',
-    description: '<p>some assignment description</p>'
+// because our version of jsdom doesn't support elt.closest('a') yet. Should soon.
+export function closest(el, selector) {
+  while (el && !el.matches(selector)) {
+    el = el.parentElement
   }
-  const wrapper = shallow(<Details assignment={assignment} />)
-  // snapshot also tests that the content was converted
-  expect(wrapper).toMatchSnapshot()
-})
+  return el
+}
+
+export function mockCourse(overrides) {
+  return {
+    lid: 'course-lid',
+    ...overrides
+  }
+}
+
+export function mockAssignment(overrides) {
+  return {
+    name: 'assignment name',
+    description: 'assignment description',
+    lid: 'assignment-lid',
+    dueAt: 'due-at',
+    pointsPossible: 5,
+    state: 'published',
+    course: mockCourse(),
+    ...overrides
+  }
+}

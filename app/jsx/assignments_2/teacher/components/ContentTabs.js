@@ -18,7 +18,7 @@
 
 import React from 'react'
 import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
-import {AssignmentShape} from '../shared/shapes'
+import {AssignmentShape} from '../shapes'
 import Details from './Details'
 
 ContentTabs.propTypes = {

@@ -37,6 +37,7 @@ module.exports = {
     'jest-canvas-mock',
     '<rootDir>/jest/jest-setup.js'
   ],
+  setupTestFrameworkScriptFile: '<rootDir>/jest/jest-setup-framework.js',
   testMatch: [
     '**/__tests__/**/?(*.)(spec|test).js'
   ],

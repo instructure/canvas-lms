@@ -17,24 +17,16 @@
  */
 
 import React from 'react'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {render} from 'react-testing-library'
+import {mockAssignment} from '../../test-utils'
+import apiUserContent from 'compiled/str/apiUserContent'
+import Details from '../Details'
 
-import {AssignmentShape} from './shapes'
+jest.mock('compiled/str/apiUserContent')
+apiUserContent.convert = jest.fn(arg => `converted ${arg}`)
 
-AssignmentHeader.propTypes = {
-  assignment: AssignmentShape.isRequired
-}
-
-export default function AssignmentHeader(props) {
-  return (
-    <div>
-      <h1>{props.assignment.name}</h1>
-      <div>
-        <Text>Points Possible: {props.assignment.pointsPossible}</Text>
-      </div>
-      <div>
-        <Text>Due: {props.assignment.dueAt}</Text>
-      </div>
-    </div>
-  )
-}
+it('renders and converts', () => {
+  const assignment = mockAssignment()
+  const {getByText} = render(<Details assignment={assignment} />)
+  getByText(`converted ${assignment.description}`)
+})

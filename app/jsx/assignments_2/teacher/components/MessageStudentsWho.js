@@ -16,33 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-
 import React from 'react'
-import ReactDOM from 'react-dom'
-import ApolloClient from 'apollo-boost'
-import {ApolloProvider} from 'react-apollo'
 
-import TeacherView from './teacher/components/TeacherView'
+import I18n from 'i18n!assignments_2'
 
-const apolloClient = new ApolloClient({
-  uri: '/api/graphql',
-  request: operation => {
-    operation.setContext({
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest',
-        'GraphQL-Metrics': true,
-        'X-CSRF-Token': $.cookie('_csrf_token')
-      }
-    })
-  }
-})
+import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
+import Modal, {
+  ModalHeader,
+  ModalBody
+  // ModalFooter
+} from '@instructure/ui-overlays/lib/components/Modal'
 
-export default function renderAssignmentsApp(env, elt) {
-  ReactDOM.render(
-    <ApolloProvider client={apolloClient}>
-      <TeacherView assignmentLid={ENV.ASSIGNMENT_ID.toString()} />
-    </ApolloProvider>,
-    elt
+export default function MessageStudentsWho(props) {
+  return (
+    <Modal label={I18n.t('Message Students Who')} {...props}>
+      <ModalHeader>
+        <CloseButton placement="end" variant="icon" onClick={props.onDismiss}>
+          {I18n.t('Close')}
+        </CloseButton>
+      </ModalHeader>
+      <ModalBody>
+        <div data-testid="message-students-who">Message Students Who</div>
+      </ModalBody>
+    </Modal>
   )
 }

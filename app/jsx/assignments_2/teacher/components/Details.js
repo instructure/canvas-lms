@@ -18,7 +18,7 @@
 
 import React from 'react'
 import apiUserContent from 'compiled/str/apiUserContent'
-import {AssignmentShape} from '../shared/shapes'
+import {AssignmentShape} from '../shapes'
 
 Details.propTypes = {
   assignment: AssignmentShape.isRequired
@@ -31,6 +31,5 @@ export default function Details(props) {
   const convertedHtml = apiUserContent.convert(description)
 
   // html is sanitized on the server side
-  // eslint-disable-next-line react/no-danger
   return <div dangerouslySetInnerHTML={{__html: convertedHtml}} />
 }
