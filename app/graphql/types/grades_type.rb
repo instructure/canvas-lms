@@ -23,15 +23,28 @@ module Types
     description "Contains grade information for a course or grading period"
 
     field :current_score, Float, <<~DESC, null: true
-      The current score includes all graded assignments
+      The current score includes all graded assignments, excluding muted submissions.
+    DESC
+    field :unposted_current_score, Float, <<~DESC, null: true
+      The current score includes all graded assignments, including muted submissions.
     DESC
     field :current_grade, String, null: true
+    field :unposted_current_grade, String, null: true
 
     field :final_score, Float, <<~DESC, null: true
-      The final score includes all assignments
-      (ungraded assignments are counted as 0 points)
+      The final score includes all assignments, excluding muted submissions
+      (ungraded assignments are counted as 0 points).
+    DESC
+    field :unposted_final_score, Float, <<~DESC, null: true
+      The final score includes all assignments, including muted submissions
+      (ungraded assignments are counted as 0 points).
     DESC
     field :final_grade, String, null: true
+    field :unposted_final_grade, String, null: true
+
+    field :override_score, Float, <<~DESC, null: true
+      The override score. Supersedes the computed final score if set.
+    DESC
 
     field :grading_period, GradingPeriodType, null: true
     def grading_period
