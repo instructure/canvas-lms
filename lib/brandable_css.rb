@@ -133,6 +133,7 @@ module BrandableCSS
         migration = migrations.find { |m| m.name == MIGRATION_NAME + pre_or_post.camelize }
         # they can't have the same id, so we just add 1 to the postdeploy one
         expected_version = (pre_or_post == 'predeploy') ? migration_version : (migration_version + 1)
+        raise BrandConfigWithOutCompileAssets if expected_version == 92630630174579589147
         raise DefaultMD5NotUpToDateError unless migration && migration.version == expected_version
       end
     end
@@ -317,6 +318,19 @@ module BrandableCSS
       variants.each_with_object({}) do |variant, object|
         object[variant] = cache_for(bundle_path, variant)
       end
+    end
+  end
+
+  class BrandConfigWithOutCompileAssets < RuntimeError
+    def initialize
+      super <<-END
+
+It looks like you are running a migration before running `rake canvas:compile_assets`
+compile_assets needs to complete before running db:migrate if brand_configs have not run
+
+run `rake canvas:compile_assets` and then try migrations again.
+
+      END
     end
   end
 
