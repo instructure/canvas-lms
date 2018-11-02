@@ -21,6 +21,7 @@ import bg from "../locales/bg.json";
 import cs from "../locales/cs.json";
 import cy from "../locales/cy.json";
 import da from "../locales/da.json";
+import da_K12 from "../locales/da-x-k12.json"
 import de from "../locales/de.json";
 import el from "../locales/el.json";
 import en_AU from "../locales/en_AU.json";
@@ -42,6 +43,7 @@ import ja from "../locales/ja.json";
 import ko from "../locales/ko.json";
 import mi from "../locales/mi.json";
 import nb from "../locales/nb.json";
+import nb_K12 from "../locales/nb-x-k12.json"
 import nl from "../locales/nl.json";
 import nn from "../locales/nn.json";
 import pl from "../locales/pl.json";
@@ -52,6 +54,7 @@ import ru from "../locales/ru.json";
 import sq from "../locales/sq.json";
 import sr from "../locales/sr.json";
 import sv from "../locales/sv.json";
+import sv_K12 from "../locales/sv-x-k12.json"
 import tr from "../locales/tr.json";
 import uk from "../locales/uk_UA.json";
 import vi from "../locales/vi.json";
@@ -64,6 +67,7 @@ export default {
   cs,
   cy,
   da,
+  "da-x-k12": da_K12,
   de,
   "en-AU": en_AU,
   "en-GB": en_GB,
@@ -85,6 +89,7 @@ export default {
   ko,
   mi,
   nb,
+  "nb-x-k12": nb_K12,
   nl,
   nn,
   pl,
@@ -94,6 +99,7 @@ export default {
   ru,
   sq,
   sr,
+  "sv-x-k12": sv_K12,
   sv,
   tr,
   uk,
