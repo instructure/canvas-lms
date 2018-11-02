@@ -6,6 +6,55 @@ The Change Log Archive page displays previous API changes in the <a href="file.c
 
 <h2>Prior Updates</h2>
 
+<h2>2018-09-15</h2>
+
+<h3>Additions</h3>
+<table class="changelog">
+<tr>
+<th>API Calls</th>
+<th>Function</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="custom_gradebook_columns.html">Custom Gradebook Columns API</a></td>
+<td>Bulk Update Column Data</td>
+<td>Sets the content of custom columns
+</td>
+</tr>
+<tr>
+<td><a href="file.tools_variable_substitutions.html">LTI Variable Substitutions</a></td>
+<td>com.instructure.Assignment.anonymous_grading<br><br>
+    com.Instructure.membership.roles</td>
+<td>Returns true if the assignment has anonymous grading enabled<br><br>
+    Returns true if the assignment has anonymous grading enabled</td>
+</tr>
+<tr>
+<td><a href="sis_imports.html">SIS Imports API</a></td>
+<td>SIS Import Object</td>
+<td>CSV_attachments parameter: Returns an array of CSV files for processing</td>
+</tr>
+</table>
+<p></p>
+<table class="changelog">
+<tr>
+<th>API Responses</th>
+<th>Function</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="accounts.html">Accounts API</a></td>
+<td>Get Help Links Endpoint</td>
+<td>Returns the help links for that account</td>
+</tr>
+<tr>
+<td><a href="blueprint_courses.html">Blueprint Courses API</a></td>
+<td>BlueprintSubscription Object<br><br>
+    List Blueprint Subscriptions Endpoint</td>
+<td>Returns the ID of the blueprint course and blueprint template the associated course is subscribed to<br><br>
+  Returns a list of blueprint subscriptions for the given course (currently a course may have no more than one)</td>
+</tr>
+</table>
+
 <h2>2018-08-04</h2>
 
 <h3>Changes</h3>

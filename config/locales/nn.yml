@@ -6019,7 +6019,7 @@ nn:
       available_from: "Tilgjengeleg frå"
       buttons: 
         save_and_publish: "Lagre og publiser"
-      delay_posting: "Utsett oppføring"
+      delay_posting: "Utsett utsending"
       enable_podcast_feed: "Aktiver podkaststraum"
       include_replies_in_podcast_feed: "Inkluder studentsvar i podkaststraumen"
       only_graders_can_like: "Berre dei som set karakterar kan like"

@@ -7,6 +7,82 @@ The API Change Log includes adjustments to the Canvas API documentation as part 
 <li>This page documents API changes for the last four releases. For prior releases, view the <a href="file.changelog_archive.html">API Change Log archive page</a>.</li>
 </ul>
 
+<h2>2018-11-17</h2>
+
+<h3>Changes</h3>
+<table class="changelog">
+<tr>
+<th>API Calls</th>
+<th>Function</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="roles.html">Roles API</a></td>
+<td>Create a New Role Endpoint</td>
+<td>Permissions parameter: Updated account- and course-level roles to match roles in the Canvas Permissions page
+</tr>
+</table>
+<p></p>
+<table class="changelog">
+<tr>
+<th>API Responses</th>
+<th>Function</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="assignments.html">Assignments API</a></td>
+<td>List Assignments Endpoint</td>
+<td>Clarified that the paginated list of assignments is returned for the current course or assignment group
+</tr>
+<tr>
+<td><a href="rubrics.html">Rubrics API</a></td>
+<td>Create a Single Rubric Endpoint</td>
+<td>Clarified the rubric return value</td>
+</tr>
+</table>
+
+<h3>Additions</h3>
+<table class="changelog">
+<tr>
+<th>API Calls</th>
+<th>Function</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="file.tools_variable_substitutions.html">LTI Variable Substitutions</a></td>
+<td>com.instructure.Person.name_sortable</td>
+<td>Added variable that returns the sortable name of the launching user.
+<br><br>Availability: when launched by a logged in user
+</tr>
+</table>
+<p></p>
+<table class="changelog">
+<tr>
+<th>API Responses</th>
+<th>Function</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="sis_imports.html">SIS Imports API</a></td>
+<td>Get the Current Importing SIS Import Endpoint</td>
+<td>Added endpoint to return the SIS imports that are currently processing for an account
+</table>
+
+<h3>Removals</h3>
+<table class="changelog">
+<tr>
+<th>API Calls</th>
+<th>Function</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="planner.html">Planner API</td>
+<td></td>
+<td>Removed the beta warning banner from the API documentation</td>
+</tr>
+</table>
+
+
 <h2>2018-10-27</h2>
 
 <h3>Changes</h3>
@@ -30,6 +106,25 @@ The API Change Log includes adjustments to the Canvas API documentation as part 
 <td><a href="quiz_submissions.html">Quiz Submissions API</a></td>
 <td>Update Student Question Scores and Comment Endpoint</td>
 <td>All parameters: Added quiz_submissions to parameter name</td>
+</tr>
+</table>
+
+<h3>Additions</h3>
+<table class="changelog">
+<tr>
+<th>API Responses</th>
+<th>Function</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="plagiarism_detection_platform_assignments.html">Plagiarism Detection Platform Assignments API</a></td>
+<td>LtiAssignment Object</td>
+<td>Added LTI Course ID and Course ID return parameters
+</tr>
+<tr>
+<td><a href="plagiarism_detection_submissions.html">Plagiarism Detection Submissions API</a></td>
+<td>Submission Object</td>
+<td>Added LTI Course ID and Course ID return parameters</td>
 </tr>
 </table>
 
@@ -111,7 +206,7 @@ The API Change Log includes adjustments to the Canvas API documentation as part 
 <tr>
 <td><a href="courses.html">Courses API</a></td>
 <td>Course Object</td>
-<td>Created_at parameter: Returns the date the course was created
+<td>Added created_at parameter, which returns the date the course was created
 </td>
 </tr>
 </table>
@@ -128,54 +223,5 @@ The API Change Log includes adjustments to the Canvas API documentation as part 
 <td>Uploading via URL</td>
 <td>Explains file management system transition and identifies deprecated behavior
 </td>
-</tr>
-</table>
-
-<h2>2018-09-15</h2>
-
-<h3>Additions</h3>
-<table class="changelog">
-<tr>
-<th>API Calls</th>
-<th>Function</th>
-<th></th>
-</tr>
-<tr>
-<td><a href="custom_gradebook_columns.html">Custom Gradebook Columns API</a></td>
-<td>Bulk Update Column Data</td>
-<td>Sets the content of custom columns
-</td>
-</tr>
-<tr>
-<td><a href="file.tools_variable_substitutions.html">LTI Variable Substitutions</a></td>
-<td>com.instructure.Assignment.anonymous_grading<br><br>
-    com.Instructure.membership.roles</td>
-<td>Returns true if the assignment has anonymous grading enabled<br><br>
-    Returns true if the assignment has anonymous grading enabled</td>
-</tr>
-<tr>
-<td><a href="sis_imports.html">SIS Imports API</a></td>
-<td>SIS Import Object</td>
-<td>CSV_attachments parameter: Returns an array of CSV files for processing</td>
-</tr>
-</table>
-<p></p>
-<table class="changelog">
-<tr>
-<th>API Responses</th>
-<th>Function</th>
-<th></th>
-</tr>
-<tr>
-<td><a href="accounts.html">Accounts API</a></td>
-<td>Get Help Links Endpoint</td>
-<td>Returns the help links for that account</td>
-</tr>
-<tr>
-<td><a href="blueprint_courses.html">Blueprint Courses API</a></td>
-<td>BlueprintSubscription Object<br><br>
-    List Blueprint Subscriptions Endpoint</td>
-<td>Returns the ID of the blueprint course and blueprint template the associated course is subscribed to<br><br>
-  Returns a list of blueprint subscriptions for the given course (currently a course may have no more than one)</td>
 </tr>
 </table>
