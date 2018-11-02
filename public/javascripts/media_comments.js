@@ -342,7 +342,8 @@ import 'jqueryui/tabs'
           partnerData: $.mediaComment.partnerData(),
           partner_data: $.mediaComment.partnerData(),
           entryName:temporaryName,
-          soundcodec: 'Speex'
+          soundcodec: 'Speex',
+          autoPreview: '0'
         };
 
         var params = {
