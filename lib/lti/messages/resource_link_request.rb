@@ -36,7 +36,7 @@ module Lti::Messages
       add_extension('outcome_result_total_score_accepted', true)
       add_extension('outcome_submission_submitted_at_accepted', true)
       add_extension('outcomes_tool_placement_url', lti_turnitin_outcomes_placement_url)
-      add_assignment_substitutions!
+      add_assignment_substitutions!(assignment)
       generate_post_payload
     end
 
@@ -44,20 +44,40 @@ module Lti::Messages
       lti_assignment = Lti::LtiAssignmentCreator.new(assignment).convert
       add_extension('content_return_types', lti_assignment.return_types.join(','))
       add_extension('content_file_extensions', assignment.allowed_extensions&.join(','))
-      add_assignment_substitutions!
+      add_assignment_substitutions!(assignment)
       generate_post_payload
     end
 
     private
 
     def add_resource_link_request_claims!
-      @message.resource_link.id = Lti::Asset.opaque_identifier_for(@context)
+      @message.resource_link.id = @opts[:resource_link_id] || context_resource_link_id
     end
 
-    def add_assignment_substitutions!
+    def context_resource_link_id
+      Lti::Asset.opaque_identifier_for(@context)
+    end
+
+    def assignment_resource_link_id(assignment)
+      launch_error = Lti::Ims::AdvantageErrors::InvalidLaunchError
+      unless assignment.external_tool?
+        raise launch_error.new(nil, api_message: 'Assignment not configured for external tool launches')
+      end
+      unless assignment.external_tool_tag&.content == @tool
+        raise launch_error.new(nil, api_message: 'Assignment not configured for launches with specified tool')
+      end
+      resource_link = assignment.line_items.find(&:assignment_line_item?)&.resource_link
+      unless resource_link&.context_external_tool == @tool
+        raise launch_error.new(nil, api_message: 'Mismatched assignment vs resource link tool configurations')
+      end
+      resource_link.resource_link_id
+    end
+
+    def add_assignment_substitutions!(assignment)
       add_extension('canvas_assignment_id', '$Canvas.assignment.id') if @tool.public?
       add_extension('canvas_assignment_title', '$Canvas.assignment.title')
       add_extension('canvas_assignment_points_possible', '$Canvas.assignment.pointsPossible')
+      @opts[:resource_link_id] = assignment_resource_link_id(assignment)
     end
   end
 end

@@ -29,6 +29,7 @@ module Lti::Messages
       @expander = expander
       @return_url = return_url
       @message = LtiAdvantage::Messages::JwtMessage.new
+      @used = false
     end
 
     def self.generate_id_token(body)
@@ -36,6 +37,9 @@ module Lti::Messages
     end
 
     def generate_post_payload_message
+      raise 'Class can only be used once.' if @used
+      @used = true
+
       add_security_claims! if include_claims?(:security)
       add_public_claims! if @tool.public? && include_claims?(:public)
       add_mentorship_claims! if @tool.public? && include_claims?(:mentorship)

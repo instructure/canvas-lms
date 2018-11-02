@@ -47,9 +47,6 @@ describe Lti::LtiAdvantageAdapter do
       opts: opts
     )
   end
-  let(:login_message) { adapter.generate_post_payload }
-  let(:verifier) { Canvas::Security.decode_jwt(login_message['lti_message_hint'])['verifier'] }
-  let(:params) { JSON.parse(fetch_and_delete_launch(course, verifier)) }
   let(:tool) do
     tool = course.context_external_tools.new(
       name: 'bob',
@@ -63,8 +60,16 @@ describe Lti::LtiAdvantageAdapter do
     tool.save!
     tool
   end
-
-  let_once(:assignment) { assignment_model(course: course) }
+  let(:login_message) { adapter.generate_post_payload }
+  let(:verifier) { Canvas::Security.decode_jwt(login_message['lti_message_hint'])['verifier'] }
+  let(:params) { JSON.parse(fetch_and_delete_launch(course, verifier)) }
+  let(:assignment) do
+    assignment_model(
+      course: course,
+      submission_types: 'external_tool',
+      external_tool_tag_attributes: { content: tool }
+    )
+  end
   let_once(:course) do
     course_with_student
     @course

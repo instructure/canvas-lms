@@ -23,7 +23,6 @@ describe Lti::Messages::JwtMessage do
   let(:return_url) { 'http://www.platform.com/return_url' }
   let(:user) { @student }
   let(:opts) { { resource_type: 'course_navigation' } }
-
   let(:expander) do
     Lti::VariableExpander.new(
       course.root_account,
@@ -35,33 +34,18 @@ describe Lti::Messages::JwtMessage do
       }
     )
   end
-
-  let(:jwt_message) do
-    Lti::Messages::JwtMessage.new(
-      tool: tool,
-      context: course,
-      user: user,
-      expander: expander,
-      return_url: return_url,
-      opts: opts
-    )
-  end
-
   let(:decoded_jwt) do
     jws = Lti::Messages::JwtMessage.generate_id_token(jwt_message.generate_post_payload)
     JSON::JWT.decode(jws[:id_token], pub_key)
   end
-
   let(:pub_key) do
     jwk = JSON::JWK.new(Lti::KeyStorage.retrieve_keys['jwk-present.json'])
     jwk.to_key.public_key
   end
-
   let_once(:course) do
     course_with_student
     @course
   end
-
   let_once(:assignment) { assignment_model(course: course) }
   let_once(:tool) do
     tool = course.context_external_tools.new(
@@ -86,6 +70,17 @@ describe Lti::Messages::JwtMessage do
     tool
   end
   let_once(:developer_key) { DeveloperKey.create! }
+
+  def jwt_message
+    Lti::Messages::JwtMessage.new(
+      tool: tool,
+      context: course,
+      user: user,
+      expander: expander,
+      return_url: return_url,
+      opts: opts
+    )
+  end
 
   describe 'signing' do
     it 'signs the id token with the current canvas private key' do
@@ -847,7 +842,7 @@ describe Lti::Messages::JwtMessage do
         observer.update!(lti_context_id: SecureRandom.uuid)
         observer_enrollment = course.enroll_user(observer, 'ObserverEnrollment')
         observer_enrollment.update_attribute(:associated_user_id, user.id)
-        allow(jwt_message).to receive(:current_observee_list).and_return([observer.lti_context_id])
+        allow_any_instance_of(Lti::Messages::JwtMessage).to receive(:current_observee_list).and_return([observer.lti_context_id])
 
         expect(decoded_jwt['https://purl.imsglobal.org/spec/lti/claim/role_scope_mentor']).to match_array [
           observer.lti_context_id

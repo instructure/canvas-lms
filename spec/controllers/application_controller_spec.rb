@@ -604,6 +604,9 @@ RSpec.describe ApplicationController do
             tool.developer_key = developer_key
             tool.use_1_3 = true
             tool.save!
+
+            assignment = assignment_model(submission_types: 'external_tool', external_tool_tag: content_tag)
+            content_tag.update_attributes!(context: assignment)
           end
 
           shared_examples_for 'a placement that caches the launch' do
@@ -643,6 +646,7 @@ RSpec.describe ApplicationController do
 
             it_behaves_like 'a placement that caches the launch'
           end
+          # rubocop:enable RSpec/NestedGroups
         end
 
         it 'creates a basic lti launch request when tool is not configured to use LTI 1.3' do
