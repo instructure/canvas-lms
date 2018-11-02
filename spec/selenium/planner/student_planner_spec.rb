@@ -84,27 +84,22 @@ describe "student planner" do
   end
 
   context "responsive layout" do
-    before :each do
-      resize_screen_to_default
-    end
-    after :each do
-      resize_screen_to_default
-    end
-
     it "changes layout on browser resize" do
+      resize_screen_to_normal
       go_to_list_view
 
-      expect(f('.large.ic-Dashboard-header__layout')).to be
-      expect(f('.large.PlannerApp')).to be
+      expect(f('.large.ic-Dashboard-header__layout')).to be_present
+      expect(f('.large.PlannerApp')).to be_present
 
       dimension = driver.manage.window.size
       driver.manage.window.resize_to(800, dimension.height)
-      expect(f('.medium.ic-Dashboard-header__layout')).to be
-      expect(f('.medium.PlannerApp')).to be
+      expect(f('.medium.ic-Dashboard-header__layout')).to be_present
+      expect(f('.medium.PlannerApp')).to be_present
 
       driver.manage.window.resize_to(500, dimension.height)
-      expect(f('.small.ic-Dashboard-header__layout')).to be
-      expect(f('.small.PlannerApp')).to be
+      expect(f('.small.ic-Dashboard-header__layout')).to be_present
+      expect(f('.small.PlannerApp')).to be_present
+      resize_screen_to_normal
     end
   end
 
@@ -383,19 +378,12 @@ describe "student planner" do
       element = ff('input', modal)[1]
       element.click
       fj("button:contains('15')").click
-
-      title_element = title_input
-      title_element.send_keys('the title')
-
-      time_element = time_input
-      time_element.click
-      time_input.clear
-      time_element.send_keys('9:00 am')
-      time_element.send_keys(:tab)
+      title_input.send_keys('the title')
+      time_input.click
+      fj("li[role=option]:contains('9:00 AM')").click
 
       todo_save_button.click
-      # Gergich will complain, but there's no format_time_for_view format that returns what we need
-      expect(PlannerNote.last.todo_date.strftime("%l:%M %p")).to eq(" 9:00 AM")
+      expect(ff('.planner-item').last).to include_text 'DUE: 9:00 AM'
     end
 
     it "updates the sidebar when clicking on mutiple to-do items", priority: "1", test_id: 3426619 do
