@@ -2,113 +2,154 @@ module.exports = {
   env: {
     es6: true,
     amd: true,
-    browser: true,
-    "jest/globals": true
+    browser: true
   },
   extends: [
-    "airbnb",
-    "prettier",
-    "prettier/react",
-    "plugin:jest/recommended",
-    "plugin:jsx-a11y/recommended"
+    'airbnb',
+    'prettier/react',
+    'plugin:jest/recommended',
+    'plugin:prettier/recommended',
+    'plugin:eslint-comments/recommended',
+    'plugin:promise/recommended'
   ],
   parserOptions: {
-    ecmaVersion: 7,
+    ecmaVersion: 2018,
     ecmaFeatures: {
-      experimentalObjectRestSpread: true,
       jsx: true
     },
-    sourceType: "module"
+    sourceType: 'module'
   },
-  parser: "babel-eslint",
+  parser: 'babel-eslint',
 
   globals: {
     ENV: true,
     INST: true,
+    tinyMCE: true,
+    tinymce: true
   },
-  plugins: [
-    "promise",
-    "import",
-    "notice",
-    "jest",
-    "prettier"
-  ],
-  // 0 - off, 1 - warning, 2 - error
+  plugins: ['promise', 'import', 'notice', 'jest', 'prettier', 'jsx-a11y', 'lodash', 'react'],
   rules: {
-    "camelcase": [0], // because we have a ton of `const $user_name = $('#user_name')`
-    "class-methods-use-this": [0],
-    "comma-dangle": [2, "only-multiline"],
-    "func-names": [0],
+    // These deal with prettier and will eventually be removed
+    'prettier/prettier': 'off',
+    'no-cond-assign': ['error', 'except-parens'],
+
+    // These come from our extended configurations, but we don't care about them
+    camelcase: 'off', // because we have a ton of `const $user_name = $('#user_name')`
+    'class-methods-use-this': 'off',
+    'consistent-return': 'off',
+    'default-case': 'off',
+    eqeqeq: 'warn', // great goal! but since we do it 1061 times, downgrade AirBnB's 'error' to 'warn' :(
+    'func-names': 'off',
+    'global-require': 'off', // every time we did this, we meant to
     'guard-for-in': 'off',
-    "max-len": [1, {"code": 140}],
-    "no-continue": [0],
-    "react/destructuring-assignment": [0],
-    "react/no-typos": [0],
-    "no-cond-assign": ["warn", "except-parens"],
-    "no-else-return": [0],
-    "no-nested-ternary": "off",
+    'no-continue': 'off',
+    'no-else-return': 'off',
+    'no-multi-assign': 'off',
+    'no-nested-ternary': 'off',
+    'no-new': 'off', // because we do `new SomeView()` all the time in Backbone just for the sideffects
     'no-param-reassign': 'off',
-    "no-plusplus": [0],
+    'no-plusplus': 'off',
     'no-prototype-builtins': 'off',
-    "no-restricted-syntax": [
-      "warn",
-      // note: in the default airbnb styleguide this is enabled but we do this
-      // all the time and we don't have to worry about somone garbage to
-      // Object.prototype (or if someone did, a ton of other code would break too)
-      // so we're turning it off
-      // {
-      //   "selector": "ForInStatement",
-      //   "message": "for..in loops iterate over the entire prototype chain, which is virtually never what you want. Use Object.{keys,values,entries}, and iterate over the resulting array."
-      // },
+    'no-return-assign': 'off',
+    'no-shadow': 'warn', // AirBnB says 'error', we downgrade to just 'warn'
+    'no-underscore-dangle': 'off',
+    'no-use-before-define': 'off',
+    'no-useless-escape': 'off',
+    'one-var': 'off',
+    'prefer-destructuring': 'off',
+    'prefer-rest-params': 'off',
+    'eslint-comments/disable-enable-pair': ['error', {allowWholeFile: true}], // We are okay with turning rules off for the entirety of a file (though use it sparingly)
+    'import/prefer-default-export': 'off',
+    'jsx-a11y/label-has-for': 'off',
+    'jsx-a11y/anchor-is-valid': ['error', {components: []}], // InstUI has special behavior around this
+    'promise/always-return': 'off',
+    'promise/catch-or-return': 'warn', // The recommendation is to error on this, but we downgrade it to a warning
+    'promise/avoid-new': 'off',
+    'promise/no-nesting': 'off',
+    'react/destructuring-assignment': 'off',
+    'react/no-typos': 'off',
+    'react/sort-comp': 'off',
+    'react/require-default-props': 'off',
+    'react/default-props-match-prop-types': ['error', {allowRequiredDefaults: true}], // add the `allowRequiredDefaults: true` option to allow specifying something as a required prop (so you get propType error messages), but in case it's not present at runtime, I'll use `[]` as the default (so it is resilient)".
+    'react/forbid-foreign-prop-types': 'off', // You can refer to proptypes within proptypes, but you shouldn't use proptypes in actual app code of the component
+    'react/no-danger': 'off', // dangerouslySetInnerHTML is already pretty explicit on making you aware of its danger
+    'react/no-render-return-value': 'warn', // In future versions of react this will fail
+    'no-restricted-syntax': [
+      // This is here because we are turning off 2 items from what AirBnB cares about.
+      'error',
       {
-        "selector": "LabeledStatement",
-        "message": "Labels are a form of GOTO; using them makes code confusing and hard to maintain and understand."
+        selector: 'LabeledStatement',
+        message:
+          'Labels are a form of GOTO; using them makes code confusing and hard to maintain and understand.'
       },
       {
-        "selector": "WithStatement",
-        "message": "`with` is disallowed in strict mode because it makes code impossible to predict and optimize."
+        selector: 'WithStatement',
+        message:
+          '`with` is disallowed in strict mode because it makes code impossible to predict and optimize.'
       }
     ],
-    "no-return-assign": "off",
-    "no-underscore-dangle": [0],
-    "no-unused-vars": [2, { "argsIgnorePattern": "^_"}],
-    "no-use-before-define": "off",
-    "one-var": ["error", { initialized: "never" }], // allow `let foo, bar` but not `let foo=1, bar=2`
-    "object-curly-spacing": [0],
-    "prefer-destructuring": "off",
-    "padded-blocks": [0], // so we can have space between the define([... and the callback
-    "semi": [0],
-    "import/named": [2],
-    "import/no-extraneous-dependencies": ["error", {"devDependencies": true}],
-    "import/no-commonjs": "off",
-    "jest/prefer-to-be-null": "error",
-    "jest/prefer-to-be-undefined": "error",
-    "react/jsx-filename-extension": [2, { "extensions": [".js"] }],
-    "import/extensions": [1, { "js": "never", "jsx": "never", "json": "always" }],
-    'notice/notice': ['error', {
-      templateFile: 'config/copyright-template.js',
-      // purposely lenient so we don't automatically put our copyright notice on
-      // top of something already copyrighted by someone else.
-      mustMatch: 'Copyright '
-    }],
-    "promise/avoid-new": [0],
+
+    // These are discouraged, but allowed
+    'no-console': 'warn',
+    'jest/no-large-snapshots': 'warn',
+
+    // These are things we care about
+    'react/jsx-filename-extension': ['error', {extensions: ['.js']}],
+    'no-unused-vars': ['error', {argsIgnorePattern: '^_'}],
+    'eslint-comments/no-unused-disable': 'error',
+    'import/extensions': ['error', 'ignorePackages', {js: 'never'}],
+    'import/no-commonjs': 'off', // This is overridden where it counts
+    'import/no-extraneous-dependencies': ['error', {devDependencies: true}],
+    'lodash/callback-binding': 'error',
+    'lodash/collection-method-value': 'error',
+    'lodash/collection-return': 'error',
+    'lodash/no-extra-args': 'error',
+    'lodash/no-unbound-this': 'error',
+    'notice/notice': [
+      'error',
+      {
+        templateFile: 'config/copyright-template.js',
+        // purposely lenient so we don't automatically put our copyright notice on
+        // top of something already copyrighted by someone else.
+        mustMatch: 'Copyright '
+      }
+    ]
+  },
+  settings: {
+    react: {
+      version: '16'
+    }
   },
   overrides: [
+    {
+      files: require('./jest.config').testMatch,
+      plugins: ['jest'],
+      env: {
+        'jest/globals': true
+      },
+      rules: {
+        'jest/prefer-to-be-null': 'error',
+        'jest/prefer-to-be-undefined': 'error',
+        'jest/prefer-to-contain': 'error',
+        'jest/no-test-return-statement': 'error',
+        'jest/no-large-snapshots': 'warn'
+      }
+    },
     {
       files: ['app/**/*', 'spec/**/*', 'public/**/*'],
       rules: {
         // Turn off the "absolute-first" rule. Until we get rid of the `compiled/` and `jsx/`
         // stuff and use real realitive paths it will tell you to do the wrong thing
-        "import/first": ["error", {"absolute-first": false}],
+        'import/first': ['error', {'absolute-first': false}],
 
-        "import/no-amd": "error",
-        "import/no-commonjs": "error",
-        "import/no-extraneous-dependencies": "off", // allows 'i18n!webzip_exports' and 'compiled/foo/bar'
-        "import/no-nodejs-modules": "error",
+        'import/no-amd': 'error',
+        'import/no-commonjs': 'warn',
+        'import/no-extraneous-dependencies': 'off', // allows 'i18n!webzip_exports' and 'compiled/foo/bar'
+        'import/no-nodejs-modules': 'error',
         'import/order': 'off', // because it thinks 'jsx/whatever' and 'compiled/baz' should go in their groups. we don't want to encourage people to do that just so they move them back together once  those everything is in same dir
-        "import/no-unresolved": "off",
-        "import/no-webpack-loader-syntax": "off"
-      },
+        'import/no-unresolved': 'off',
+        'import/no-webpack-loader-syntax': 'off'
+      }
     },
     {
       // If you are starting a new project or section of greenfield code,
@@ -120,7 +161,6 @@ module.exports = {
         'app/jsx/account_course_user_search/**/*.js',
         'app/jsx/discussions/**/*.js',
         'app/jsx/announcements/**/*.js',
-        'app/jsx/announcements/**/*.js',
         'app/jsx/assignments_2/**/*.js'
       ],
       rules: {
@@ -129,4 +169,3 @@ module.exports = {
     }
   ]
 }
-
