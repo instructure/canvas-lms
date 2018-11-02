@@ -92,6 +92,10 @@ class Score < ActiveRecord::Base
     grading_period || assignment_group || enrollment.course
   end
 
+  def overridden?
+    override_score.present?
+  end
+
   def self.params_for_course
     { course_score: true }
   end

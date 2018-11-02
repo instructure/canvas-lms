@@ -86,7 +86,7 @@ describe 'Final Grade Override' do
     end
 
     it 'displays overriden grade for student grades', priority: '1', test_id: 3682131 do
-      skip('Unskip in GRADE-1587')
+      skip('Unskip in GRADE-1688')
       # TODO: displays on Student grades page
       user_session(@students.first)
       StudentGradesPage.visit_as_student(@course)

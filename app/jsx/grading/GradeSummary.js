@@ -35,7 +35,7 @@ import round from 'compiled/util/round'
 import numberHelper from '../shared/helpers/numberHelper'
 import CourseGradeCalculator from '../gradebook/CourseGradeCalculator'
 import {scopeToUser} from '../gradebook/EffectiveDueDates'
-import {scoreToGrade} from '../gradebook/GradingSchemeHelper'
+import {gradeToScoreLowerBound, scoreToGrade} from '../gradebook/GradingSchemeHelper'
 import GradeFormatHelper from '../gradebook/shared/helpers/GradeFormatHelper'
 import StatusPill from '../grading/StatusPill'
 import SelectMenuGroup from '../grade_summary/SelectMenuGroup'
@@ -344,6 +344,7 @@ function finalGradePointsPossibleText (groupWeightingScheme, scoreWithPointsPoss
 }
 
 function calculateTotals (calculatedGrades, currentOrFinal, groupWeightingScheme) {
+  const gradeChanged = $('.grade.changed').length > 0
   const showTotalGradeAsPoints = ENV.show_total_grade_as_points
 
   const subtotals = calculateSubtotals(subtotalByGradingPeriod(), calculatedGrades, currentOrFinal)
@@ -362,7 +363,10 @@ function calculateTotals (calculatedGrades, currentOrFinal, groupWeightingScheme
   let finalGrade
   let teaserText
 
-  if (showTotalGradeAsPoints && groupWeightingScheme !== 'percent') {
+  if (!gradeChanged && ENV.grading_scheme && ENV.effective_final_grade) {
+    finalGrade = formatPercentGrade(gradeToScoreLowerBound(ENV.effective_final_grade, ENV.grading_scheme))
+    teaserText = scoreAsPoints
+  } else if (showTotalGradeAsPoints && groupWeightingScheme !== 'percent') {
     finalGrade = scoreAsPoints
     teaserText = scoreAsPercent
   } else {
@@ -381,7 +385,7 @@ function calculateTotals (calculatedGrades, currentOrFinal, groupWeightingScheme
     $finalGradeRow.find('.score_teaser').hide()
   }
 
-  if ($('.grade.changed').length > 0) {
+  if (gradeChanged) {
       // User changed their points for an assignment => let's let them know their updated points
     const msg = I18n.t('Based on What-If scores, the new total is now %{grade}', {grade: finalGrade})
     $.screenReaderFlashMessageExclusive(msg)
@@ -389,8 +393,8 @@ function calculateTotals (calculatedGrades, currentOrFinal, groupWeightingScheme
 
   if (ENV.grading_scheme) {
     $('.final_letter_grade .grade').text(
-        scoreToGrade(calculatePercentGrade(finalScore, finalPossible), ENV.grading_scheme)
-      )
+      ENV.effective_final_grade || scoreToGrade(calculatePercentGrade(finalScore, finalPossible), ENV.grading_scheme)
+    )
   }
 
   $('.revert_all_scores').showIf($('#grades_summary .revert_score_link').length > 0)
