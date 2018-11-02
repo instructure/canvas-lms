@@ -13,7 +13,15 @@
                 <span class="turnitin_score_container">{{> turnitinScore}}</span>
               {{/with}}
             {{/if}}
-            <a href="{{url}}" class="{{mimeClass content-type}}" title="{{filename}}">{{display_name}}</a>
+            {{#ifEqual workflow_state "pending_upload"}}
+              <a href="{{url}}" class="{{mimeClass content-type}}" title="{{filename}}">{{display_name}}</a><i class='icon-upload' title="Uploading" style="padding-left: 5px;"></i>
+            {{else}}
+              {{#ifEqual workflow_state "errored" }}
+                <a href="{{url}}" class="{{mimeClass content-type}}" title="{{filename}}">{{display_name}}</a><i class='icon-warning' title="Upload Failed" style="padding-left: 5px;"></i>
+              {{else}}
+                <a href="{{url}}" class="{{mimeClass content-type}}" title="{{filename}}">{{display_name}}</a>
+              {{/ifEqual}}
+            {{/ifEqual}}
           </div>
         {{/each}}
       </div>
