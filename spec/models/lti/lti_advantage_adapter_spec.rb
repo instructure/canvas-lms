@@ -26,15 +26,13 @@ describe Lti::LtiAdvantageAdapter do
   let(:return_url) { 'http://www.platform.com/return_url' }
   let(:user) { @student }
   let(:opts) { { resource_type: 'course_navigation', domain: 'test.com' } }
+  let(:expander_opts) { { current_user: user, tool: tool } }
   let(:expander) do
     Lti::VariableExpander.new(
       course.root_account,
       course,
       nil,
-      {
-        current_user: user,
-        tool: tool
-      }
+      expander_opts
     )
   end
   let(:adapter) do
@@ -104,17 +102,13 @@ describe Lti::LtiAdvantageAdapter do
     let(:lti_turnitin_outcomes_placement_url) { 'https://www.turnitin.com' }
     let(:params) { JSON.parse(fetch_and_delete_launch(course, verifier)) }
     let(:verifier) do
-      jws = adapter.generate_post_payload_for_assignment(
-        assignment,
-        outcome_service_url,
-        legacy_outcome_service_url,
-        lti_turnitin_outcomes_placement_url
-      )['lti_message_hint']
+      jws = adapter.generate_post_payload_for_homework_submission(assignment)['lti_message_hint']
       Canvas::Security.decode_jwt(jws)['verifier']
     end
+    let(:expander_opts) { super().merge(assignment: assignment) }
 
     it 'adds assignment specific claims' do
-      expect(params['https://www.instructure.com/lis_outcome_service_url']).to eq outcome_service_url
+      expect(params['https://www.instructure.com/canvas_assignment_title']).to eq assignment.title
     end
   end
 

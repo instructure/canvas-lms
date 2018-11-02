@@ -27,15 +27,7 @@ module Lti::Messages
       super
     end
 
-    def generate_post_payload_for_assignment(assignment, outcome_service_url, legacy_outcome_service_url, lti_turnitin_outcomes_placement_url)
-      lti_assignment = Lti::LtiAssignmentCreator.new(assignment).convert
-      add_extension('lis_result_sourcedid', lti_assignment.source_id)
-      add_extension('lis_outcome_service_url', outcome_service_url)
-      add_extension('ims_lis_basic_outcome_url', legacy_outcome_service_url)
-      add_extension('outcome_data_values_accepted', lti_assignment.return_types.join(','))
-      add_extension('outcome_result_total_score_accepted', true)
-      add_extension('outcome_submission_submitted_at_accepted', true)
-      add_extension('outcomes_tool_placement_url', lti_turnitin_outcomes_placement_url)
+    def generate_post_payload_for_assignment(assignment, _outcome_service_url, _legacy_outcome_service_url, _lti_turnitin_outcomes_placement_url)
       add_assignment_substitutions!(assignment)
       generate_post_payload
     end

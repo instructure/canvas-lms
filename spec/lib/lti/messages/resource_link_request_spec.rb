@@ -89,7 +89,7 @@ describe Lti::Messages::ResourceLinkRequest do
 
     it 'does not add public claims if the tool is not public' do
       tool.update!(workflow_state: 'private')
-      expect(jws['picture']).to be_nil
+      expect(jws).not_to include 'picture'
     end
 
     it 'adds include email claims if the tool is include email' do
@@ -100,7 +100,7 @@ describe Lti::Messages::ResourceLinkRequest do
     it 'does not add include email claims if the tool is not include email' do
       user.update!(email: 'banana@test.com')
       tool.update!(workflow_state: 'private')
-      expect(jws['email']).to be_nil
+      expect(jws).not_to include 'email'
     end
 
     it 'adds include name claims if the tool is include name' do
@@ -110,7 +110,7 @@ describe Lti::Messages::ResourceLinkRequest do
 
     it 'does not add include name claims if the tool is not include name' do
       tool.update!(workflow_state: 'private')
-      expect(jws['name']).to be_nil
+      expect(jws).not_to include 'name'
     end
 
     it 'adds private claims' do
@@ -193,6 +193,26 @@ describe Lti::Messages::ResourceLinkRequest do
     it_behaves_like 'disabled rlid claim group check'
   end
 
+  shared_examples 'assignment common extensions check' do
+    it 'adds the canvas_assignment_id if the tool is public' do
+      tool.update!(workflow_state: 'public')
+      expect(jws['https://www.instructure.com/canvas_assignment_id']).to eq assignment.id
+    end
+
+    it 'does not add the canvas_assignment_id if the tool is not public' do
+      tool.update!(workflow_state: 'private')
+      expect(jws).not_to include 'https://www.instructure.com/canvas_assignment_id'
+    end
+
+    it 'adds the canvas_assignment_title' do
+      expect(jws['https://www.instructure.com/canvas_assignment_title']).to eq assignment.title
+    end
+
+    it 'adds the canvas_assignment_points_possible' do
+      expect(jws['https://www.instructure.com/canvas_assignment_points_possible']).to eq assignment.points_possible
+    end
+  end
+
   describe '#generate_post_payload_for_assignment' do
     let(:outcome_service_url) { 'https://www.outcome-service-url.com' }
     let(:legacy_outcome_service_url) { 'https://www.legacy-outcome-service-url.com' }
@@ -207,52 +227,36 @@ describe Lti::Messages::ResourceLinkRequest do
       )
     end
 
-    it 'adds the lis_result_sourcedid' do
-      expect(jws['https://www.instructure.com/lis_result_sourcedid']).to eq lti_assignment.source_id
+    # Bunch of negative tests for claims that were previously added but then support was intentionally removed from the impl
+    it 'does not add lis_result_sourcedid' do
+      expect(jws).not_to include 'https://www.instructure.com/lis_result_sourcedid'
     end
 
-    it 'adds the lis_outcome_service_url' do
-      expect(jws['https://www.instructure.com/lis_outcome_service_url']).to eq outcome_service_url
+    it 'does not add lis_outcome_service_url' do
+      expect(jws).not_to include 'https://www.instructure.com/lis_outcome_service_url'
     end
 
-    it 'adds the ims_lis_basic_outcome_url' do
-      expect(jws['https://www.instructure.com/ims_lis_basic_outcome_url']).to eq legacy_outcome_service_url
+    it 'does not add ims_lis_basic_outcome_url' do
+      expect(jws).not_to include 'https://www.instructure.com/ims_lis_basic_outcome_url'
     end
 
-    it 'adds the outcome_data_values_accepted' do
-      expect(jws['https://www.instructure.com/outcome_data_values_accepted']).to eq lti_assignment.return_types.join(',')
+    it 'does not add outcome_data_values_accepted' do
+      expect(jws).not_to include 'https://www.instructure.com/outcome_data_values_accepted'
     end
 
-    it 'adds the outcome_result_total_score_accepted' do
-      expect(jws['https://www.instructure.com/outcome_result_total_score_accepted']).to eq true
+    it 'does not add outcome_result_total_score_accepted' do
+      expect(jws).not_to include 'https://www.instructure.com/outcome_result_total_score_accepted'
     end
 
-    it 'adds the outcome_submission_submitted_at_accepted' do
-      expect(jws['https://www.instructure.com/outcome_submission_submitted_at_accepted']).to eq true
+    it 'does not add outcome_submission_submitted_at_accepted' do
+      expect(jws).not_to include 'https://www.instructure.com/outcome_submission_submitted_at_accepted'
     end
 
-    it 'adds the outcomes_tool_placement_url' do
-      expect(jws['https://www.instructure.com/outcomes_tool_placement_url']).to eq lti_turnitin_outcomes_placement_url
+    it 'does not add outcomes_tool_placement_url' do
+      expect(jws).not_to include 'https://www.instructure.com/outcomes_tool_placement_url'
     end
 
-    it 'adds the canvas_assignment_id if the tool is public' do
-      tool.update!(workflow_state: 'public')
-      expect(jws['https://www.instructure.com/canvas_assignment_id']).to eq assignment.id
-    end
-
-    it 'does not add the canvas_assignment_id if the tool is not public' do
-      tool.update!(workflow_state: 'private')
-      expect(jws['https://www.instructure.com/canvas_assignment_id']).to be_nil
-    end
-
-    it 'adds the canvas_assignment_title' do
-      expect(jws['https://www.instructure.com/canvas_assignment_title']).to eq assignment.title
-    end
-
-    it 'adds the canvas_assignment_points_possible' do
-      expect(jws['https://www.instructure.com/canvas_assignment_points_possible']).to eq assignment.points_possible
-    end
-
+    it_behaves_like 'assignment common extensions check'
     it_behaves_like 'assignment resource link id check'
   end
 
@@ -263,24 +267,11 @@ describe Lti::Messages::ResourceLinkRequest do
       expect(jws['https://www.instructure.com/content_return_types']).to eq lti_assignment.return_types.join(',')
     end
 
-    it 'adds the content_file_extensions if the tool is public' do
-      tool.update!(workflow_state: 'public')
+    it 'adds the content_file_extensions' do
       expect(jws['https://www.instructure.com/content_file_extensions']).to eq assignment.allowed_extensions&.join(',')
     end
 
-    it 'does not add the canvas_assignment_id if the tool is not public' do
-      tool.update!(workflow_state: 'private')
-      expect(jws['https://www.instructure.com/canvas_assignment_id']).to be_nil
-    end
-
-    it 'adds the canvas_assignment_title' do
-      expect(jws['https://www.instructure.com/canvas_assignment_title']).to eq assignment.title
-    end
-
-    it 'adds the canvas_assignment_points_possible' do
-      expect(jws['https://www.instructure.com/canvas_assignment_points_possible']).to eq assignment.points_possible
-    end
-
+    it_behaves_like 'assignment common extensions check'
     it_behaves_like 'assignment resource link id check'
   end
 
