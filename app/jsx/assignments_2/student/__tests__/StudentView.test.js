@@ -15,12 +15,27 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 import React from 'react'
-import {shallow} from 'enzyme'
+import ReactDOM from 'react-dom'
+import $ from 'jquery'
+
 import StudentView from '../StudentView'
 
+beforeAll(() => {
+  const found = document.getElementById('fixtures')
+  if (!found) {
+    const fixtures = document.createElement('div')
+    fixtures.setAttribute('id', 'fixtures')
+    document.body.appendChild(fixtures)
+  }
+})
+
+afterEach(() => {
+  ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
+})
+
 it('renders normally', () => {
-  const wrapper = shallow(<StudentView />)
-  expect(wrapper).toMatchSnapshot()
+  ReactDOM.render(<StudentView />, document.getElementById('fixtures'))
+  const element = $('[data-test-id="assignments-2-student-view"]')
+  expect(element).toHaveLength(1)
 })
