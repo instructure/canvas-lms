@@ -76,19 +76,19 @@ module ConversationsCommon
   end
 
   def message_course
-    fj('.message_course.bootstrap-select')
+    f('.message_course.bootstrap-select')
   end
 
   def message_recipients_input
-    fj('.compose_form #compose-message-recipients')
+    f('.compose_form #compose-message-recipients')
   end
 
   def message_subject_input
-    fj('#compose-message-subject')
+    f('#compose-message-subject')
   end
 
   def message_body_input
-    fj('.conversation_body')
+    f('.conversation_body')
   end
 
   def bootstrap_select_value(element)
@@ -146,9 +146,9 @@ module ConversationsCommon
 
   def select_message_course(new_course, is_group = false)
     new_course = new_course.name if new_course.respond_to? :name
-    fj('.dropdown-toggle', message_course).click
+    f('.dropdown-toggle', message_course).click
+    wait_for_ajaximations
     if is_group
-      wait_for_ajaximations
       fj("a:contains('Groups')", message_course).click
     end
     fj("a:contains('#{new_course}')", message_course).click
@@ -189,9 +189,10 @@ module ConversationsCommon
   end
 
   def compose(options={})
-    fj('#compose-btn').click
+    f('#compose-btn').click
     wait_for_ajaximations
     select_message_course(options[:course]) if options[:course]
+
     (options[:to] || []).each {|recipient| add_message_recipient recipient}
     write_message_subject(options[:subject]) if options[:subject]
     write_message_body(options[:body]) if options[:body]
