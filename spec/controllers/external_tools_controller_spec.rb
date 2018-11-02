@@ -113,11 +113,23 @@ describe ExternalToolsController do
         tool
       end
 
-      it 'creates a resource link request when tool is configured to use LTI 1.3' do
+      let(:verifier) { "e5e774d015f42370dcca2893025467b414d39009dfe9a55250279cca16f5f3c2704f9c56fef4cea32825a8f72282fa139298cf846e0110238900567923f9d057" }
+      let(:redis_key) { "#{@course.class.name}:#{Lti::RedisMessageClient::LTI_1_3_PREFIX}#{verifier}" }
+      let(:cached_launch) { JSON::JWT.decode(JSON.parse(Canvas.redis.get(redis_key))['id_token'], :skip_verification) }
+
+      before do
+        allow(SecureRandom).to receive(:hex).and_return(verifier)
         user_session(@teacher)
         get :show, params: {:course_id => @course.id, id: tool.id}
+      end
+
+      it 'creates a resource link request when tool is configured to use LTI 1.3' do
         jwt = JSON::JWT.decode(assigns[:lti_launch].params[:id_token], :skip_verification)
         expect(jwt["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
+      end
+
+      it 'caches the the LTI 1.3 launch' do
+        expect(cached_launch["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
       end
     end
 
@@ -1435,7 +1447,7 @@ describe ExternalToolsController do
 
       json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
       verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
-      redis_key = "#{@course.class.name}:#{ExternalToolsController::REDIS_PREFIX}#{verifier}"
+      redis_key = "#{@course.class.name}:#{Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX}#{verifier}"
       launch_settings = JSON.parse(Canvas.redis.get(redis_key))
       tool_settings = launch_settings['tool_settings']
 
@@ -1455,7 +1467,7 @@ describe ExternalToolsController do
 
       json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
       verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
-      redis_key = "#{@course.class.name}:#{ExternalToolsController::REDIS_PREFIX}#{verifier}"
+      redis_key = "#{@course.class.name}:#{Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX}#{verifier}"
       launch_settings = JSON.parse(Canvas.redis.get(redis_key))
 
       expect(launch_settings['launch_url']).to eq 'http://www.example.com/basic_lti'
@@ -1478,7 +1490,7 @@ describe ExternalToolsController do
 
       json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
       verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
-      redis_key = "#{@course.class.name}:#{ExternalToolsController::REDIS_PREFIX}#{verifier}"
+      redis_key = "#{@course.class.name}:#{Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX}#{verifier}"
       launch_settings = JSON.parse(Canvas.redis.get(redis_key))
       tool_settings = launch_settings['tool_settings']
 
@@ -1511,7 +1523,7 @@ describe ExternalToolsController do
 
       json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
       verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
-      redis_key = "#{@course.class.name}:#{ExternalToolsController::REDIS_PREFIX}#{verifier}"
+      redis_key = "#{@course.class.name}:#{Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX}#{verifier}"
       launch_settings = JSON.parse(Canvas.redis.get(redis_key))
       tool_settings = launch_settings['tool_settings']
 
@@ -1557,7 +1569,7 @@ describe ExternalToolsController do
 
       json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
       verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
-      redis_key = "#{@course.class.name}:#{ExternalToolsController::REDIS_PREFIX}#{verifier}"
+      redis_key = "#{@course.class.name}:#{Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX}#{verifier}"
       launch_settings = JSON.parse(Canvas.redis.get(redis_key))
 
       expect(launch_settings['tool_settings']['resource_link_id']). to eq opaque_id(@tg)
@@ -1585,7 +1597,7 @@ describe ExternalToolsController do
 
       json = JSON.parse(response.body.sub(/^while\(1\)\;/, ''))
       verifier = CGI.parse(URI.parse(json['url']).query)['verifier'].first
-      redis_key = "#{@course.class.name}:#{ExternalToolsController::REDIS_PREFIX}#{verifier}"
+      redis_key = "#{@course.class.name}:#{Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX}#{verifier}"
       launch_settings = JSON.parse(Canvas.redis.get(redis_key))
       expect(launch_settings.dig('tool_settings', 'custom_standard')).to eq @tg.id.to_s
     end

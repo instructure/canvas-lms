@@ -17,6 +17,8 @@
 
 module Lti
   class LtiAdvantageAdapter
+    include Lti::RedisMessageClient
+
     delegate :generate_post_payload_for_assignment, to: :resource_link_request
     delegate :generate_post_payload_for_homework_submission, to: :resource_link_request
 
@@ -41,6 +43,10 @@ module Lti
 
     def launch_url
       resource_type ? @tool.extension_setting(resource_type, :url) : @tool.url
+    end
+
+    def cache_payload
+      cache_launch(generate_post_payload, @context)
     end
 
     private

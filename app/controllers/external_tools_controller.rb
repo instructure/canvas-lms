@@ -30,8 +30,8 @@ class ExternalToolsController < ApplicationController
   before_action :get_context, :only => [:retrieve, :show, :resource_selection]
   skip_before_action :verify_authenticity_token, only: :resource_selection
   include Api::V1::ExternalTools
+  include Lti::RedisMessageClient
 
-  REDIS_PREFIX = 'external_tool:sessionless_launch:'.freeze
   WHITELISTED_QUERY_PARAMS = [
     :platform
   ].freeze
@@ -242,9 +242,11 @@ class ExternalToolsController < ApplicationController
 
   def sessionless_launch
     if Canvas.redis_enabled?
-      redis_key = "#{@context.class.name}:#{REDIS_PREFIX}#{params[:verifier]}"
-      launch_settings = Canvas.redis.get(redis_key)
-      Canvas.redis.del(redis_key)
+      launch_settings = fetch_and_delete_launch(
+        @context,
+        params[:verifier],
+        prefix: Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX
+      )
     end
     unless launch_settings
       render :plain => t(:cannot_locate_launch_request, 'Cannot locate launch request, please try again.'), :status => :not_found
@@ -503,11 +505,11 @@ class ExternalToolsController < ApplicationController
         opts: opts
       )
     else
-       Lti::LtiOutboundAdapter.new(tool, @current_user, @context).prepare_tool_launch(
-         @return_url,
-         expander,
-         opts
-       )
+      Lti::LtiOutboundAdapter.new(tool, @current_user, @context).prepare_tool_launch(
+        @return_url,
+        expander,
+        opts
+      )
     end
 
     lti_launch.params = if selection_type == 'homework_submission' && assignment
@@ -516,6 +518,7 @@ class ExternalToolsController < ApplicationController
                           adapter.generate_post_payload
                         end
 
+    adapter.cache_payload if adapter.respond_to?(:cache_payload)
     lti_launch.resource_url = opts[:launch_url] || adapter.launch_url
     lti_launch.link_text = selection_type ? tool.label_for(selection_type.to_sym, I18n.locale) : tool.default_label
     lti_launch.analytics_id = tool.tool_id
@@ -1157,8 +1160,7 @@ class ExternalToolsController < ApplicationController
                                        end
 
     # store the launch settings and return to the user
-    verifier = SecureRandom.hex(64)
-    Canvas.redis.setex("#{@context.class.name}:#{REDIS_PREFIX}#{verifier}", 5.minutes, launch_settings.to_json)
+    verifier = cache_launch(launch_settings, @context, prefix: Lti::RedisMessageClient::SESSIONLESS_LAUNCH_PREFIX)
 
     uri = if @context.is_a?(Account)
             URI(account_external_tools_sessionless_launch_url(@context))

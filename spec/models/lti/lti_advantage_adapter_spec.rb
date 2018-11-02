@@ -72,6 +72,15 @@ describe Lti::LtiAdvantageAdapter do
     end
   end
 
+  describe "#cache_payload" do
+    it "caches the payload" do
+      verifier = adapter.cache_payload
+      redis_key = "#{course.class.name}:#{Lti::RedisMessageClient::LTI_1_3_PREFIX}#{verifier}"
+      jwt = JSON::JWT.decode(JSON.parse(Canvas.redis.get(redis_key))['id_token'], :skip_verification)
+      expect(jwt["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
+    end
+  end
+
   describe '#generate_post_payload_for_assignment' do
     let(:outcome_service_url) { 'https://www.outcome_service_url.com' }
     let(:legacy_outcome_service_url) { 'https://www.legacy_url.com' }

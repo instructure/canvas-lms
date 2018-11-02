@@ -606,21 +606,39 @@ RSpec.describe ApplicationController do
             tool.save!
           end
 
+          shared_examples_for 'a placement that caches the launch' do
+            let(:verifier) { "e5e774d015f42370dcca2893025467b414d39009dfe9a55250279cca16f5f3c2704f9c56fef4cea32825a8f72282fa139298cf846e0110238900567923f9d057" }
+            let(:redis_key) { "#{course.class.name}:#{Lti::RedisMessageClient::LTI_1_3_PREFIX}#{verifier}" }
+            let(:cached_launch) { JSON::JWT.decode(JSON.parse(Canvas.redis.get(redis_key))['id_token'], :skip_verification) }
+
+            before { allow(SecureRandom).to receive(:hex).and_return(verifier) }
+
+            it 'caches the LTI 1.3 launch' do
+              controller.send(:content_tag_redirect, course, content_tag, nil)
+              expect(cached_launch["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
+            end
+          end
+
           context 'assignments' do
             it 'creates a resource link request when tool is configured to use LTI 1.3' do
               controller.send(:content_tag_redirect, course, content_tag, nil)
               jwt = JSON::JWT.decode(assigns[:lti_launch].params[:id_token], :skip_verification)
               expect(jwt["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
             end
+
+            it_behaves_like 'a placement that caches the launch'
           end
 
           context 'module items' do
+            before { content_tag.update!(context: course.account) }
+
             it 'creates a resource link request when tool is configured to use LTI 1.3' do
-              content_tag.update!(context: course.account)
               controller.send(:content_tag_redirect, course, content_tag, nil)
               jwt = JSON::JWT.decode(assigns[:lti_launch].params[:id_token], :skip_verification)
               expect(jwt["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
             end
+
+            it_behaves_like 'a placement that caches the launch'
           end
         end
 

@@ -1618,6 +1618,7 @@ class ApplicationController < ActionController::Base
           @lti_launch.params = adapter.generate_post_payload
         end
 
+        adapter.cache_payload if adapter.respond_to?(:cache_payload)
         @lti_launch.resource_url = @resource_url
         @lti_launch.link_text = @resource_title
         @lti_launch.analytics_id = @tool.tool_id

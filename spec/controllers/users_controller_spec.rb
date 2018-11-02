@@ -82,19 +82,28 @@ describe UsersController do
     context 'using LTI 1.3 when specified' do
       include_context 'lti_1_3_spec_helper'
 
+      let(:verifier) { "e5e774d015f42370dcca2893025467b414d39009dfe9a55250279cca16f5f3c2704f9c56fef4cea32825a8f72282fa139298cf846e0110238900567923f9d057" }
+      let(:redis_key) { "#{assigns[:domain_root_account].class_name}:#{Lti::RedisMessageClient::LTI_1_3_PREFIX}#{verifier}" }
+      let(:cached_launch) { JSON::JWT.decode(JSON.parse(Canvas.redis.get(redis_key))['id_token'], :skip_verification) }
+
       subject do
-        get :external_tool, params: {id:tool.id, user_id:user.id}
         JSON::JWT.decode(assigns[:lti_launch].params[:id_token], :skip_verification)
       end
 
       before do
+        allow(SecureRandom).to receive(:hex).and_return(verifier)
         tool.use_1_3 = true
         tool.developer_key = DeveloperKey.create!
         tool.save!
+        get :external_tool, params: {id:tool.id, user_id:user.id}
       end
 
       it 'does LTI 1.3 launch' do
         expect(subject["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
+      end
+
+      it 'caches the LTI 1.3 launch' do
+        expect(cached_launch["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
       end
     end
   end
