@@ -51,7 +51,7 @@ QUnit.module('AssessmentAuditTray UserEventGroup', suiteHooks => {
 
   function buildAuditTrailAndMountComponent() {
     const auditTrail = buildAuditTrail({auditEvents, users})
-    props = {userEventGroup: auditTrail.userEventGroups[1101]}
+    props = {userEventGroup: auditTrail.userEventGroups[0]}
     ReactDOM.render(<UserEventGroup {...props} />, $container)
   }
 

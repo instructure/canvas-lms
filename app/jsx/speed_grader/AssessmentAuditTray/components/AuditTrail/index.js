@@ -32,7 +32,7 @@ export default class AuditTrail extends PureComponent {
 
     return (
       <View as="div" id="assessment-audit-trail">
-        {Object.values(userEventGroups).map(group => (
+        {userEventGroups.map(group => (
           <UserEventGroup key={group.user.id} userEventGroup={group} />
         ))}
       </View>

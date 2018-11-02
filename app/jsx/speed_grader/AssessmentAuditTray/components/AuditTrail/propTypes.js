@@ -48,5 +48,5 @@ export const userEventGroup = shape({
 })
 
 export const auditTrail = shape({
-  userEventGroups: shape({}).isRequired
+  userEventGroups: arrayOf(userEventGroup).isRequired
 })

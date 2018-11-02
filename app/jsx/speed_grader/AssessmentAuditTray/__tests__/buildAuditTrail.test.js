@@ -74,7 +74,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
 
   function getUserEventGroup(userId) {
     auditTrail = auditTrail || buildAuditTrail({auditEvents, users})
-    return auditTrail.userEventGroups[userId]
+    return auditTrail.userEventGroups.find(group => group.user.id === userId)
   }
 
   function getAuditEvents() {
@@ -107,6 +107,131 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
     return getAuditEvents().find(({auditEvent}) => auditEvent.id === eventId)
   }
 
+  describe('user event groups', () => {
+    let availableUsers
+
+    beforeEach(() => {
+      availableUsers = {
+        1101: {id: '1101', name: 'Adam Jones'},
+        1102: {id: '1102', name: 'Betty Ford'},
+        1103: {id: '1103', name: 'Charlie Xi'},
+        1104: {id: '1104', name: 'Dana Young'},
+        1105: {id: '1105', name: 'Ed Valiant'},
+        1106: {id: '1106', name: 'Fay Aldrin'},
+        1107: {id: '1107'}
+      }
+
+      users = []
+    })
+
+    function addEventWithUser(userId, day, role) {
+      const event = buildEvent({
+        createdAt: `2018-09-0${day}T12:00:00Z`,
+        id: `490${auditEvents.length + 1}`,
+        userId
+      })
+      users.push({...availableUsers[userId], role})
+      auditEvents.push(event)
+    }
+
+    function getUserIds() {
+      return buildAuditTrail({auditEvents, users}).userEventGroups.map(group => group.user.id)
+    }
+
+    describe('students', () => {
+      beforeEach(() => {
+        addEventWithUser('1101', 1, 'grader')
+        addEventWithUser('1102', 6, 'student')
+        addEventWithUser('1103', 4, 'unknown')
+        addEventWithUser('1104', 3, 'student')
+        addEventWithUser('1105', 2, 'admin')
+        addEventWithUser('1106', 5, 'student')
+        addEventWithUser('1107', 7, 'final_grader')
+      })
+
+      it('are positioned before all other users', () => {
+        const userIds = getUserIds().slice(0, 3)
+        expect(userIds.sort()).toEqual(['1102', '1104', '1106'])
+      })
+
+      it('are ordered by date of their first event', () => {
+        expect(getUserIds().slice(0, 3)).toEqual(['1104', '1106', '1102'])
+      })
+    })
+
+    describe('graders', () => {
+      beforeEach(() => {
+        addEventWithUser('1101', 1, 'admin')
+        addEventWithUser('1102', 6, 'grader')
+        addEventWithUser('1103', 4, 'unknown')
+        addEventWithUser('1104', 3, 'grader')
+        addEventWithUser('1105', 2, 'student')
+        addEventWithUser('1106', 5, 'grader')
+        addEventWithUser('1107', 7, 'final_grader')
+      })
+
+      it('are positioned after students', () => {
+        const userIds = getUserIds().slice(1, 4)
+        expect(userIds.sort()).toEqual(['1102', '1104', '1106'])
+      })
+
+      it('are ordered by date of their first event', () => {
+        expect(getUserIds().slice(1, 4)).toEqual(['1104', '1106', '1102'])
+      })
+    })
+
+    it('positions final grader after graders', () => {
+      addEventWithUser('1101', 2, 'unknown')
+      addEventWithUser('1102', 3, 'admin')
+      addEventWithUser('1104', 4, 'student')
+      addEventWithUser('1105', 1, 'final_grader')
+      addEventWithUser('1103', 5, 'grader')
+      expect(getUserIds()[2]).toEqual('1105')
+    })
+
+    describe('admins', () => {
+      beforeEach(() => {
+        addEventWithUser('1101', 1, 'grader')
+        addEventWithUser('1102', 6, 'admin')
+        addEventWithUser('1103', 4, 'unknown')
+        addEventWithUser('1104', 3, 'admin')
+        addEventWithUser('1105', 2, 'student')
+        addEventWithUser('1106', 5, 'admin')
+        addEventWithUser('1107', 7, 'final_grader')
+      })
+
+      it('are positioned after final grader', () => {
+        const userIds = getUserIds().slice(3, 6)
+        expect(userIds.sort()).toEqual(['1102', '1104', '1106'])
+      })
+
+      it('orders admins by date of their first event', () => {
+        expect(getUserIds().slice(3, 6)).toEqual(['1104', '1106', '1102'])
+      })
+    })
+
+    describe('unknown users', () => {
+      beforeEach(() => {
+        addEventWithUser('1101', 1, 'grader')
+        addEventWithUser('1102', 6, null)
+        addEventWithUser('1103', 4, 'admin')
+        addEventWithUser('1104', 3, null)
+        addEventWithUser('1105', 2, 'student')
+        addEventWithUser('1106', 5, 'unknown')
+        addEventWithUser('1107', 7, 'final_grader')
+      })
+
+      it('are positioned after all other users', () => {
+        const userIds = getUserIds().slice(4)
+        expect(userIds.sort()).toEqual(['1102', '1104', '1106'])
+      })
+
+      it('orders unknown users by date of their first event', () => {
+        expect(getUserIds().slice(4)).toEqual(['1104', '1106', '1102'])
+      })
+    })
+  })
+
   describe('events by user id', () => {
     function buildUnknownEvent(id, createdAt, data = {}) {
       return buildEvent({id, createdAt, ...data})
@@ -121,7 +246,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         auditEvents: [buildUnknownEvent('4901', '2018-09-01T12:00:00Z')],
         users: [firstUser]
       })
-      expect(auditTrail.userEventGroups['1109']).toBeUndefined()
+      expect(getUserEventGroup('1109')).toBeUndefined()
     })
 
     it('sets .user with the related user data when the specified user is known', () => {
@@ -129,7 +254,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         auditEvents: [buildEvent()],
         users: [secondUser]
       })
-      expect(auditTrail.userEventGroups['1101'].user).toEqual(secondUser)
+      expect(getUserEventGroup('1101').user).toEqual(secondUser)
     })
 
     it('sets .user with "unknown user" data when the specified user is not known', () => {
@@ -137,7 +262,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         auditEvents: [buildEvent()],
         users: []
       })
-      expect(auditTrail.userEventGroups['1101'].user).toEqual({
+      expect(getUserEventGroup('1101').user).toEqual({
         id: '1101',
         name: 'Unknown User',
         role: 'unknown'
@@ -153,12 +278,12 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       })
 
       it('includes one group of events when the user has only one event', () => {
-        const userEventGroup = auditTrail.userEventGroups['1101']
+        const userEventGroup = getUserEventGroup('1101')
         expect(userEventGroup.dateEventGroups).toHaveLength(1)
       })
 
       it('assigns the event date to the date event group', () => {
-        const {dateEventGroups} = auditTrail.userEventGroups['1101']
+        const {dateEventGroups} = getUserEventGroup('1101')
         expect(dateEventGroups[0].startDate).toEqual(new Date('2018-09-01T12:00:00Z'))
       })
     })
@@ -176,17 +301,17 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       })
 
       it('includes one group of events', () => {
-        const {dateEventGroups} = auditTrail.userEventGroups['1101']
+        const {dateEventGroups} = getUserEventGroup('1101')
         expect(dateEventGroups).toHaveLength(1)
       })
 
       it('includes all events in the same group', () => {
-        const {dateEventGroups} = auditTrail.userEventGroups['1101']
+        const {dateEventGroups} = getUserEventGroup('1101')
         expect(dateEventGroups[0].auditEvents).toHaveLength(3)
       })
 
       it('orders events within the date event group by ascending date', () => {
-        const {dateEventGroups} = auditTrail.userEventGroups['1101']
+        const {dateEventGroups} = getUserEventGroup('1101')
         const eventIds = getDateGroupEventIds(dateEventGroups[0])
         expect(eventIds).toEqual(['4901', '4902', '4903'])
       })
@@ -205,7 +330,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
 
       function getDateEventGroups() {
         auditTrail = buildAuditTrail({auditEvents, users})
-        return auditTrail.userEventGroups['1101'].dateEventGroups
+        return getUserEventGroup('1101').dateEventGroups
       }
 
       it('includes a date event group for each distinct date', () => {

@@ -22,6 +22,12 @@ import I18n from 'i18n!speed_grader'
 import {auditEventStudentAnonymityStates} from './AuditTrailHelpers'
 
 const {NA, OFF, ON, TURNED_OFF, TURNED_ON} = auditEventStudentAnonymityStates
+const roleOrder = ['student', 'grader', 'final_grader', 'admin']
+
+function getRolePosition(user) {
+  const index = roleOrder.indexOf(user.role)
+  return index >= 0 ? index : roleOrder.length
+}
 
 function buildUnknownUser(userId) {
   return {id: userId, name: I18n.t('Unknown User'), role: 'unknown'}
@@ -243,7 +249,7 @@ export default function buildAuditTrail(auditData) {
 
   // sort in ascending order (earliest event to most recent)
   const sortedEvents = [...auditEvents].sort((a, b) => a.createdAt - b.createdAt)
-  const userEventGroups = {}
+  const userEventGroupsByUserId = {}
 
   const featureTracking = trackFeaturesOverall(sortedEvents)
   let currentlyAnonymous = false
@@ -257,15 +263,15 @@ export default function buildAuditTrail(auditData) {
 
     currentlyAnonymous = getCurrentAnonymity(auditEvent, currentlyAnonymous)
 
-    userEventGroups[userId] = userEventGroups[userId] || {
+    userEventGroupsByUserId[userId] = userEventGroupsByUserId[userId] || {
       anonymousOnly: currentlyAnonymous,
       dateEventGroups: [],
       user
     }
-    userEventGroups[userId].anonymousOnly =
-      userEventGroups[userId].anonymousOnly && currentlyAnonymous
+    userEventGroupsByUserId[userId].anonymousOnly =
+      userEventGroupsByUserId[userId].anonymousOnly && currentlyAnonymous
 
-    const {dateEventGroups} = userEventGroups[userId]
+    const {dateEventGroups} = userEventGroupsByUserId[userId]
     const lastDateGroup = dateEventGroups[dateEventGroups.length - 1]
 
     const eventDatum = {auditEvent}
@@ -287,6 +293,17 @@ export default function buildAuditTrail(auditData) {
         startDateKey: dateKey
       })
     }
+  })
+
+  const userEventGroups = Object.values(userEventGroupsByUserId).sort((groupA, groupB) => {
+    const rolePositionA = getRolePosition(groupA.user)
+    const rolePositionB = getRolePosition(groupB.user)
+    if (rolePositionA === rolePositionB) {
+      const [{auditEvent: auditEventA}] = groupA.dateEventGroups[0].auditEvents
+      const [{auditEvent: auditEventB}] = groupB.dateEventGroups[0].auditEvents
+      return auditEventA.createdAt - auditEventB.createdAt
+    }
+    return rolePositionA - rolePositionB
   })
 
   return {
