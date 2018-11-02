@@ -17,11 +17,11 @@
  */
 
 import React from 'react'
-import { bool, shape, string } from 'prop-types'
-import { graphql } from 'react-apollo'
+import {bool, shape, string} from 'prop-types'
+import {graphql} from 'react-apollo'
 import gql from 'graphql-tag'
 
-import { AssignmentShape } from '../shared/shapes'
+import {AssignmentShape} from '../shared/shapes'
 import AssignmentHeader from '../shared/AssignmentHeader'
 import ContentTabs from './ContentTabs'
 
@@ -30,56 +30,63 @@ export class CoreTeacherView extends React.Component {
     data: shape({
       assignment: AssignmentShape,
       loading: bool,
-      error: string,
-    }).isRequired,
+      error: string
+    }).isRequired
   }
 
-  renderError (error) {
+  renderError(error) {
     return <div>Error: {error}</div>
   }
 
-  renderLoading () {
+  renderLoading() {
     return <div>Loading...</div>
   }
 
-  render () {
-    const {data: {assignment, loading, error}} = this.props
+  render() {
+    const {
+      data: {assignment, loading, error}
+    } = this.props
     if (error) return this.renderError(error)
     else if (loading) return this.renderLoading()
 
-    return <div>
-      Assignments 2 Teacher View
-      <AssignmentHeader assignment={assignment} />
-      <ContentTabs assignment={assignment} />
-    </div>
+    return (
+      <div>
+        Assignments 2 Teacher View
+        <AssignmentHeader assignment={assignment} />
+        <ContentTabs assignment={assignment} />
+      </div>
+    )
   }
 }
 
 const TeacherQuery = gql`
-query GetAssignment($assignmentLid: ID!) {
-  assignment: legacyNode(type: Assignment, _id: $assignmentLid) {
-    ... on Assignment {
-      lid: _id
-      gid: id
-      name
-      description
-      dueAt
-      pointsPossible
+  query GetAssignment($assignmentLid: ID!) {
+    assignment: legacyNode(type: Assignment, _id: $assignmentLid) {
+      ... on Assignment {
+        lid: _id
+        gid: id
+        name
+        description
+        dueAt
+        pointsPossible
+      }
     }
   }
-}
 `
 
 const TeacherView = graphql(TeacherQuery, {
   options: ({assignmentLid}) => ({
     variables: {
-      assignmentLid,
+      assignmentLid
     }
   })
 })(CoreTeacherView)
 
-TeacherView.propTypes = Object.assign({
-  assignmentLid: string.isRequired,
-}, TeacherView.propTypes)
+TeacherView.propTypes = Object.assign(
+  {
+    assignmentLid: string.isRequired
+  },
+  TeacherView.propTypes
+)
 
 export default TeacherView

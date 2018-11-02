@@ -18,6 +18,6 @@
 
 import React from 'react'
 
-export default function StudentView (_props) {
+export default function StudentView(_props) {
   return <div>Assignments 2 Student View</div>
 }

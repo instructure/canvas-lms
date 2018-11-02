@@ -123,7 +123,9 @@ module.exports = {
         'app/jsx/permissions/**/*.js',
         'app/jsx/account_course_user_search/**/*.js',
         'app/jsx/discussions/**/*.js',
-        'app/jsx/announcements/**/*.js'
+        'app/jsx/announcements/**/*.js',
+        'app/jsx/announcements/**/*.js',
+        'app/jsx/assignments_2/**/*.js'
       ],
       rules: {
         'prettier/prettier': 'error'

@@ -25,7 +25,7 @@ it('renders', () => {
     name: 'title',
     pointsPossible: 42,
     dueAt: 'due',
-    description: '<p>some assignment description</p>',
+    description: '<p>some assignment description</p>'
   }
   expect(shallow(<ContentTabs assignment={assignment} />)).toMatchSnapshot()
 })

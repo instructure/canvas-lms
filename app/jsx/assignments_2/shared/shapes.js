@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { bool, number, shape, string } from 'prop-types'
+import {bool, number, shape, string} from 'prop-types'
 
 // This ENV shape is for the controller's current show action. We'll have
 // something different when assignments are being created, which is a different
@@ -32,14 +32,14 @@ export const EnvShape = shape({
     }).isRequired,
     assignment: shape({
       update: bool.isRequired,
-      submit: bool.isRequired,
-    }).isRequired,
-  }).isRequired,
+      submit: bool.isRequired
+    }).isRequired
+  }).isRequired
 })
 
 export const AssignmentShape = shape({
   name: string.isRequired,
   pointsPossible: number.isRequired,
   dueAt: string.isRequired, // temporary
-  description: string.isRequired,
+  description: string.isRequired
 })

@@ -19,16 +19,22 @@
 import React from 'react'
 import Text from '@instructure/ui-elements/lib/components/Text'
 
-import { AssignmentShape } from './shapes'
+import {AssignmentShape} from './shapes'
 
 AssignmentHeader.propTypes = {
-  assignment: AssignmentShape.isRequired,
+  assignment: AssignmentShape.isRequired
 }
 
-export default function AssignmentHeader (props) {
-  return <div>
-    <h1>{props.assignment.name}</h1>
-    <div><Text>Points Possible: {props.assignment.pointsPossible}</Text></div>
-    <div><Text>Due: {props.assignment.dueAt}</Text></div>
-  </div>
+export default function AssignmentHeader(props) {
+  return (
+    <div>
+      <h1>{props.assignment.name}</h1>
+      <div>
+        <Text>Points Possible: {props.assignment.pointsPossible}</Text>
+      </div>
+      <div>
+        <Text>Due: {props.assignment.dueAt}</Text>
+      </div>
+    </div>
+  )
 }

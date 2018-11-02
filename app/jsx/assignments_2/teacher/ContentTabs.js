@@ -25,20 +25,16 @@ ContentTabs.propTypes = {
   assignment: AssignmentShape.isRequired
 }
 
-export default function ContentTabs (props) {
+export default function ContentTabs(props) {
   const {assignment} = props
-  return <TabList defaultSelectedIndex={0} variant="minimal">
-    <TabPanel title="Details">
-      <Details assignment={assignment} />
-    </TabPanel>
-    <TabPanel title="Students">
-      Students
-    </TabPanel>
-    <TabPanel title="Rubric">
-      Rubric
-    </TabPanel>
-    <TabPanel title="Settings">
-      Settings
-    </TabPanel>
-  </TabList>
+  return (
+    <TabList defaultSelectedIndex={0} variant="minimal">
+      <TabPanel title="Details">
+        <Details assignment={assignment} />
+      </TabPanel>
+      <TabPanel title="Students">Students</TabPanel>
+      <TabPanel title="Rubric">Rubric</TabPanel>
+      <TabPanel title="Settings">Settings</TabPanel>
+    </TabList>
+  )
 }

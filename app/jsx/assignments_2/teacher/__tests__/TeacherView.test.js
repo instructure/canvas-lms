@@ -17,15 +17,21 @@
  */
 
 import React from 'react'
-import { shallow } from 'enzyme'
-import { CoreTeacherView } from '../TeacherView'
+import {shallow} from 'enzyme'
+import {CoreTeacherView} from '../TeacherView'
 
 it('renders normally', () => {
-  const wrapper = shallow(<CoreTeacherView data={{assignment: {
-    name: 'What is the Answer?',
-    dueAt: 'The Future',
-    pointsPossible: 42,
-    description: 'an assignment',
-  }}} />)
+  const wrapper = shallow(
+    <CoreTeacherView
+      data={{
+        assignment: {
+          name: 'What is the Answer?',
+          dueAt: 'The Future',
+          pointsPossible: 42,
+          description: 'an assignment'
+        }
+      }}
+    />
+  )
   expect(wrapper).toMatchSnapshot()
 })

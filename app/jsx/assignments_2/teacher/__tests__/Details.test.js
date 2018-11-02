@@ -29,7 +29,7 @@ it('renders and converts', () => {
     name: 'title',
     pointsPossible: 42,
     dueAt: 'due',
-    description: '<p>some assignment description</p>',
+    description: '<p>some assignment description</p>'
   }
   const wrapper = shallow(<Details assignment={assignment} />)
   // snapshot also tests that the content was converted

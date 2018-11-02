@@ -21,7 +21,7 @@ import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import ApolloClient from 'apollo-boost'
-import { ApolloProvider } from 'react-apollo'
+import {ApolloProvider} from 'react-apollo'
 
 import StudentView from './student/StudentView'
 
@@ -38,10 +38,11 @@ const apolloClient = new ApolloClient({
   }
 })
 
-export default function renderAssignmentsApp (env, elt) {
+export default function renderAssignmentsApp(env, elt) {
   ReactDOM.render(
     <ApolloProvider client={apolloClient}>
-      <StudentView assignmentLid={ENV.ASSIGNMENT_ID.toString()}/>
-    </ApolloProvider>, elt
+      <StudentView assignmentLid={ENV.ASSIGNMENT_ID.toString()} />
+    </ApolloProvider>,
+    elt
   )
 }

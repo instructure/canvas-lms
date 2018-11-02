@@ -24,9 +24,11 @@ Details.propTypes = {
   assignment: AssignmentShape.isRequired
 }
 
-export default function Details (props) {
-  const {assignment: {description}} = props
-  const convertedHtml = apiUserContent.convert(description);
+export default function Details(props) {
+  const {
+    assignment: {description}
+  } = props
+  const convertedHtml = apiUserContent.convert(description)
 
   // html is sanitized on the server side
   // eslint-disable-next-line react/no-danger
