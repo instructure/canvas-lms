@@ -686,6 +686,7 @@ QUnit.module('SpeedGrader#handleGradeSubmit', {
     sandbox.spy($.fn, 'append');
     this.originalWindowJSONData = window.jsonData;
     setupFixtures(`
+      <div id="iframe_holder"></div>
       <div id="multiple_submissions"></div>
       <a class="update_submission_grade_url" href="my_url.com" title="POST"></a>
     `);
@@ -1120,6 +1121,8 @@ QUnit.module('handleSubmissionSelectionChange', (hooks) => {
     submissions = `/submissions/{{submissionId}}`;
     params = `?download={{attachmentId}}`;
     setupFixtures(`
+      <div id="iframe_holder"></div>
+      <div id="react_pill_container"></div>
       <div id='grade_container'>
         <input type='text' id='grading-box-extended' />
       </div>
@@ -2435,6 +2438,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
 
         setupFixtures(`
           <div id="combo_box_container"></div>
+          <div id="react_pill_container"></div>
           <div class="comment" id="comment_fixture" style="display: none;">
             <button class="submit_comment_button"/></button>
           </div>
@@ -2665,6 +2669,10 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
           show_help_menu_item: false,
           RUBRIC_ASSESSMENT: {}
         })
+
+        setupFixtures(`
+          <div id="react_pill_container"></div>
+        `);
 
         SpeedGrader.setup()
         window.jsonData = windowJsonData
@@ -3151,6 +3159,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         submissions = `/anonymous_submissions/{{anonymousId}}`;
         params = `?download={{attachmentId}}`;
         setupFixtures(`
+          <div id="react_pill_container"></div>
           <div id="full_width_container"></div>
           <div id="submission_file_hidden">
             <a
