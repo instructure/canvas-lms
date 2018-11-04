@@ -28,13 +28,16 @@ class UserMergeData < ActiveRecord::Base
   end
 
   def add_more_data(objects, user: nil, workflow_state: nil)
-    objects.each do |o|
-      user ||= o.user_id
-      r = self.user_merge_data_records.new(context: o, previous_user_id: user)
-      r.previous_workflow_state = o.workflow_state if o.class.columns_hash.key?('workflow_state')
-      r.previous_workflow_state = o.file_state if o.class == Attachment
-      r.previous_workflow_state = workflow_state if workflow_state
-      r.save!
+    # to get relative ids in previous_user_id, we need to be on the records shard
+    self.shard.activate do
+      objects.each do |o|
+        user ||= o.user_id
+        r = self.user_merge_data_records.new(context: o, previous_user_id: user)
+        r.previous_workflow_state = o.workflow_state if o.class.columns_hash.key?('workflow_state')
+        r.previous_workflow_state = o.file_state if o.class == Attachment
+        r.previous_workflow_state = workflow_state if workflow_state
+        r.save!
+      end
     end
   end
 

@@ -104,16 +104,24 @@ class SplitUsers
           records = merge_data.user_merge_data_records
           old_user = User.find(merge_data.from_user_id)
           old_user = restore_old_user(old_user, records)
+          records = check_and_update_local_ids(old_user, records) if merge_data.from_user_id > Shard::IDS_PER_SHARD
           move_records_to_old_user(user, old_user, records)
           # update account associations for each split out user
           users = [old_user, user]
-          User.update_account_associations(users, all_shards: !(old_user.shard == user.shard))
+          User.update_account_associations(users, all_shards: (old_user.shard != user.shard))
           merge_data.destroy
           update_grades(users, records)
           User.where(id: users).touch_all
           users
         end
       end
+    end
+
+    def check_and_update_local_ids(old_user, records)
+      if records.where("previous_user_id<?", Shard::IDS_PER_SHARD).where(previous_user_id: old_user.local_id).exists?
+        records.where(previous_user_id: old_user.local_id).update_all(previous_user_id: old_user.global_id)
+      end
+      records.reload
     end
 
     # source_user is the destination user of the user merge
@@ -123,23 +131,23 @@ class SplitUsers
       move_user_observers(source_user, user, records.where(context_type: ['UserObserver', 'UserObservationLink'], previous_user_id: user))
       move_attachments(source_user, user, records.where(context_type: 'Attachment'))
       enrollment_ids = records.where(context_type: 'Enrollment', previous_user_id: user).pluck(:context_id)
-      enrollments = Enrollment.where(id: enrollment_ids).where.not(user_id: user)
-      enrollments_to_update = enrollments.reject do |e|
-        # skip conflicting enrollments
-        Enrollment.where(user_id: user,
-                         course_section_id: e.course_section_id,
-                         type: e.type,
-                         role_id: e.role_id).where.not(id: e).shard(e.shard).exists?
+      Shard.partition_by_shard(enrollment_ids) do |enrollments|
+        enrollments = Enrollment.where(id: enrollments).where.not(user: user)
+        enrollments_to_update = enrollments.reject do |e|
+          # skip conflicting enrollments
+          Enrollment.where(user_id: user,
+                           course_section_id: e.course_section_id,
+                           type: e.type,
+                           role_id: e.role_id).where.not(id: e).shard(e.shard).exists?
+        end
+        Enrollment.where(id: enrollments_to_update).update_all(user_id: user.id, updated_at: Time.now.utc)
+        courses = enrollments_to_update.map(&:course_id)
+        transfer_enrollment_data(source_user, user, Course.where(id: courses))
       end
-      Shard.partition_by_shard(enrollments_to_update) do |shard_enrolls|
-        Enrollment.where(id: shard_enrolls).update_all(user_id: user.id, updated_at: Time.now.utc)
-      end
-      courses = enrollments_to_update.map(&:course_id)
-      transfer_enrollment_data(source_user, user, Course.where(id: courses))
       handle_submissions(source_user, user, records)
       account_users_ids = records.where(context_type: 'AccountUser').pluck(:context_id)
       AccountUser.where(id: account_users_ids).update_all(user_id: user.id)
-      restore_worklow_states_from_records(records)
+      restore_workflow_states_from_records(records)
     end
 
     # source_user is the destination user of the user merge
@@ -250,7 +258,7 @@ class SplitUsers
       end
     end
 
-    def restore_worklow_states_from_records(records)
+    def restore_workflow_states_from_records(records)
       records.each do |r|
         c = r.context
         next unless c && c.class.columns_hash.key?('workflow_state')
