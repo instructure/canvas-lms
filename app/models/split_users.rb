@@ -110,7 +110,6 @@ class SplitUsers
           users = [old_user, user]
           User.update_account_associations(users, all_shards: (old_user.shard != user.shard))
           merge_data.destroy
-          update_grades(users, records)
           User.where(id: users).touch_all
           users
         end
@@ -186,16 +185,6 @@ class SplitUsers
       Attachment.migrate_attachments(source_user, user, attachments)
     end
 
-    def update_grades(users, records)
-      users.each do |user|
-        e_ids = records.where(previous_user_id: user, context_type: 'Enrollment').pluck(:context_id)
-        user.enrollments.where(id: e_ids).joins(:course).
-          where.not(courses: {workflow_state: 'deleted'}).
-          select(&:student?).uniq { |e| [e.user_id, e.course_id] }.
-          each { |e| Enrollment.recompute_final_score_in_singleton(e.user_id, e.course_id) }
-      end
-    end
-
     def restore_old_user(user, records)
       pseudonyms_ids = records.where(context_type: 'Pseudonym').pluck(:context_id)
       pseudonyms = Pseudonym.where(id: pseudonyms_ids)
@@ -253,6 +242,8 @@ class SplitUsers
               model.where(id: other_ids).update_all(user_id: source_user.id)
               model.where(id: ids).update_all(user_id: user.id)
             end
+            Enrollment.send_later(:recompute_due_dates_and_scores, source_user.id)
+            Enrollment.send_later(:recompute_due_dates_and_scores, user.id)
           end
         end
       end
