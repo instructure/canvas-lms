@@ -590,6 +590,10 @@ class SisImportsApiController < ApplicationController
   #
   # Abort a SIS import that has not completed.
   #
+  # Aborting a sis batch that is running can take some time for every process to
+  # see the abort event. Subsequent sis batches begin to process 10 minutes
+  # after the abort to allow each process to clean up properly.
+  #
   # @example_request
   #   curl https://<canvas>/api/v1/accounts/<account_id>/sis_imports/<sis_import_id>/abort \
   #     -H 'Authorization: Bearer <token>'
