@@ -100,6 +100,16 @@ export default class DeveloperKeyModal extends React.Component {
 
   saveLtiToolConfiguration = () => {
     const formData = new FormData(this.submissionForm)
+    let settings
+    try {
+      settings = JSON.parse(formData.get("tool_configuration"))
+    } catch(e) {
+      if (e instanceof SyntaxError) {
+        $.flashError(I18n.t('Json is not valid. Please submit properly formatted json.'))
+        return
+      }
+    }
+
     this.props.store.dispatch(this.props.actions.saveLtiToolConfiguration({
       account_id: this.props.ctx.params.contextId,
       developer_key: {
@@ -109,7 +119,7 @@ export default class DeveloperKeyModal extends React.Component {
         test_cluster_only: this.testClusterOnly,
         access_token_count: 0
       },
-      settings: JSON.parse(formData.get("tool_configuration")),
+      settings,
       settings_url: formData.get("tool_configuration_url"),
     }))
   }

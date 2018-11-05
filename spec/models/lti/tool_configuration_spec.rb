@@ -346,5 +346,28 @@ module Lti
         end
       end
     end
+
+    describe '#create_tool_and_key!' do
+      let_once(:account) { Account.create! }
+      let(:params) do
+        {
+          settings: settings
+        }
+      end
+
+      it 'creates a dev key' do
+        expect { described_class.create_tool_and_key! account, params }.to change(DeveloperKey, :count).by(1)
+      end
+
+      context 'when tool_config creation fails' do
+        let(:settings) { { tool: 'foo' } }
+
+        it 'does not create dev key' do
+          expect(DeveloperKey.where(account: account).count).to eq 0
+          expect { described_class.create_tool_and_key! account, params }.to raise_error ActiveRecord::RecordInvalid
+          expect(DeveloperKey.where(account: account).count).to eq 0
+        end
+      end
+    end
   end
 end

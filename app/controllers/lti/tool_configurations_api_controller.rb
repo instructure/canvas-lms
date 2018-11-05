@@ -79,13 +79,7 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   #
   # @returns ToolConfiguration
   def create
-    tool_config = Lti::ToolConfiguration.create!(
-      developer_key: DeveloperKey.create!(account: account),
-      settings: tool_configuration_params[:settings],
-      settings_url: tool_configuration_params[:settings_url],
-      disabled_placements: tool_configuration_params[:disabled_placements],
-      custom_fields: tool_configuration_params[:custom_fields]
-    )
+    tool_config = Lti::ToolConfiguration.create_tool_and_key!(account, tool_configuration_params)
     update_developer_key!(tool_config)
     render json: Lti::ToolConfigurationSerializer.new(tool_config)
   end
