@@ -70,6 +70,13 @@ describe Types::AssignmentType do
     ).to eq "http://test.host/courses/#{assignment.context_id}/assignments/#{assignment.id}"
   end
 
+  it "uses api_user_content for the description" do
+    assignment.update_attributes description: %|Hi <img src="/courses/#{course.id}/files/12/download"<h1>Content</h1>|
+    expect(
+      assignment_type.resolve("description", request: ActionDispatch::TestRequest.create)
+    ).to include "http://test.host/courses/#{course.id}/files/12/download"
+  end
+
   describe "submissionsConnection" do
     let_once(:other_student) { student_in_course(course: course, active_all: true).user }
 

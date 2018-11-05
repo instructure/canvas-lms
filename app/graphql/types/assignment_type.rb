@@ -73,7 +73,6 @@ module Types
     field :position, Int,
       "determines the order this assignment is displayed in in its assignment group",
       null: true
-    field :description, String, null: true
 
     field :points_possible, Float, "the assignment is out of this many points",
       null: true
@@ -124,6 +123,32 @@ module Types
         id: assignment.id,
         host: context[:request].host_with_port
       )
+    end
+
+    class AttachmentPreloader < GraphQL::Batch::Loader
+      def initialize(context)
+        @context = context
+      end
+
+      def perform(htmls)
+        as = Api.api_bulk_load_user_content_attachments(htmls, @context)
+        htmls.each { |html| fulfill(html, as) }
+      end
+    end
+
+    field :description, String, null: true
+    def description
+      return nil if assignment.description.blank?
+      load_association(:context).then do |course|
+        AttachmentPreloader.for(course).load(assignment.description).then do |preloaded_attachments|
+          GraphQLHelpers::UserContent.process(assignment.description,
+                                              request: context[:request],
+                                              context: assignment.context,
+                                              user: current_user,
+                                              in_app: context[:in_app],
+                                              preloaded_attachments: preloaded_attachments)
+        end
+      end
     end
 
     field :needs_grading_count, Int, null: true
