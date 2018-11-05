@@ -115,7 +115,9 @@ export default class AssessmentAuditTray extends Component {
             <Fragment>
               <View as="div" margin="small">
                 <AssessmentSummary
+                  anonymityDate={this.state.auditTrail.anonymityDate}
                   assignment={this.state.assignment}
+                  overallAnonymity={this.state.auditTrail.overallAnonymity}
                   submission={this.state.submission}
                 />
               </View>

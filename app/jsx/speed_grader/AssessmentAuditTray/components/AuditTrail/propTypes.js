@@ -18,7 +18,7 @@
 
 import {arrayOf, bool, instanceOf, oneOf, shape, string} from 'prop-types'
 
-import {auditEventStudentAnonymityStates} from '../../AuditTrailHelpers'
+import {auditEventStudentAnonymityStates, overallAnonymityStates} from '../../AuditTrailHelpers'
 
 export const auditEvent = shape({
   eventType: string.isRequired
@@ -47,6 +47,11 @@ export const userEventGroup = shape({
   user: user.isRequired
 })
 
+export const anonymityDate = instanceOf(Date)
+export const overallAnonymity = oneOf(Object.values(overallAnonymityStates))
+
 export const auditTrail = shape({
+  anonymityDate,
+  overallAnonymity: overallAnonymity.isRequired,
   userEventGroups: arrayOf(userEventGroup).isRequired
 })

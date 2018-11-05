@@ -34,6 +34,12 @@ export const auditEventStudentAnonymityStates = Object.freeze({
   TURNED_ON: 'TURNED_ON'
 })
 
+export const overallAnonymityStates = Object.freeze({
+  FULL: 'FULL',
+  NA: 'N/A',
+  PARTIAL: 'PARTIAL'
+})
+
 const defaultIcon = IconQuestion
 const iconsByEventTrailType = {
   anonymity: IconStandards,
@@ -166,6 +172,13 @@ const trailTypeByEventType = {
   submission_updated: 'updated'
 }
 
+const roleLabels = {
+  admin: I18n.t('Administrator'),
+  final_grader: I18n.t('Final Grader'),
+  grader: I18n.t('Grader'),
+  student: I18n.t('Student')
+}
+
 function trailTypeFor(auditEvent) {
   return trailTypeByEventType[auditEvent.eventType] || defaultTrailType
 }
@@ -194,12 +207,6 @@ export function snippetFor({eventType, payload}) {
   return null
 }
 
-const roleLabels = {
-  admin: I18n.t('Administrator'),
-  final_grader: I18n.t('Final Grader'),
-  grader: I18n.t('Grader'),
-  student: I18n.t('Student')
-}
 export function roleLabelFor(user) {
   return roleLabels[user.role] || I18n.t('Unknown Role')
 }

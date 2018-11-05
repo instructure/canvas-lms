@@ -21,19 +21,51 @@ import {number, shape, string} from 'prop-types'
 import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
+import Pill from '@instructure/ui-elements/lib/components/Pill'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import I18n from 'i18n!speed_grader'
 
 import FriendlyDatetime from '../../../shared/FriendlyDatetime'
+import {overallAnonymityStates} from '../AuditTrailHelpers'
+import * as propTypes from './AuditTrail/propTypes'
+
+function getOverallAnonymityLabel(overallAnonymity) {
+  switch (overallAnonymity) {
+    case overallAnonymityStates.FULL: {
+      return I18n.t('Anonymous On')
+    }
+    case overallAnonymityStates.PARTIAL: {
+      return I18n.t('Partially Anonymous')
+    }
+    default: {
+      return I18n.t('Anonymous Off')
+    }
+  }
+}
 
 export default function AssessmentSummary(props) {
+  const {anonymityDate, assignment, overallAnonymity, submission} = props
+
   const numberOptions = {precision: 2, strip_insignificant_zeros: true}
   let score = '–'
-  if (props.submission.score != null) {
-    score = I18n.n(props.submission.score, numberOptions)
+  if (submission.score != null) {
+    score = I18n.n(submission.score, numberOptions)
   }
-  const pointsPossible = I18n.n(props.assignment.pointsPossible, numberOptions)
+  const pointsPossible = I18n.n(assignment.pointsPossible, numberOptions)
   const scoreText = I18n.t('%{score}/%{pointsPossible}', {pointsPossible, score})
+
+  const overallAnonymityLabel = getOverallAnonymityLabel(overallAnonymity)
+  const overallAnonymityLabelColor =
+    overallAnonymity === overallAnonymityStates.FULL ? 'primary' : 'danger'
+
+  let overallAnonymityDescription
+  if (anonymityDate == null) {
+    overallAnonymityDescription = I18n.t('Anonymous was never turned on')
+  } else {
+    overallAnonymityDescription = (
+      <FriendlyDatetime dateTime={anonymityDate} prefix={I18n.t('As of')} showTime />
+    )
+  }
 
   return (
     <Flex
@@ -71,8 +103,26 @@ export default function AssessmentSummary(props) {
       <FlexItem>
         <Text as="div">{I18n.t('Posted to student')}</Text>
 
-        <Text fontStyle="italic" size="small" weight="bold">
+        <Text as="div" fontStyle="italic" size="small" weight="bold">
           <FriendlyDatetime dateTime={props.assignment.gradesPublishedAt} showTime />
+        </Text>
+
+        <Pill
+          as="div"
+          id="audit-tray-overall-anonymity-label"
+          margin="x-small"
+          text={overallAnonymityLabel}
+          variant={overallAnonymityLabelColor}
+        />
+
+        <Text
+          as="div"
+          id="audit-tray-overall-anonymity-description"
+          fontStyle="italic"
+          size="small"
+          weight="bold"
+        >
+          {overallAnonymityDescription}
         </Text>
       </FlexItem>
     </Flex>
@@ -80,11 +130,17 @@ export default function AssessmentSummary(props) {
 }
 
 AssessmentSummary.propTypes = {
+  anonymityDate: propTypes.anonymityDate,
   assignment: shape({
     gradesPublishedAt: string,
     pointsPossible: number
   }).isRequired,
+  overallAnonymity: propTypes.overallAnonymity.isRequired,
   submission: shape({
     score: number
   }).isRequired
+}
+
+AssessmentSummary.defaultProps = {
+  anonymityDate: null
 }

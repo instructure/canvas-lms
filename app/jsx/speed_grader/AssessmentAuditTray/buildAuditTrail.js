@@ -19,9 +19,10 @@
 import timezone from 'timezone_core'
 import I18n from 'i18n!speed_grader'
 
-import {auditEventStudentAnonymityStates} from './AuditTrailHelpers'
+import {auditEventStudentAnonymityStates, overallAnonymityStates} from './AuditTrailHelpers'
 
-const {NA, OFF, ON, TURNED_OFF, TURNED_ON} = auditEventStudentAnonymityStates
+const {OFF, ON, TURNED_OFF, TURNED_ON} = auditEventStudentAnonymityStates
+const {FULL, PARTIAL} = overallAnonymityStates
 const roleOrder = ['student', 'grader', 'final_grader', 'admin']
 
 function getRolePosition(user) {
@@ -192,6 +193,70 @@ function getCurrentAnonymity({eventType, payload}, currentlyAnonymous) {
   return currentlyAnonymous
 }
 
+function laterDate(dateA, dateB) {
+  return dateA == null || dateB - dateA > 0 ? dateB : dateA
+}
+
+function buildAnonymityTracker() {
+  // Track how many times each feature was enabled
+  const anonymityTurnedOnCounts = {
+    graderToFinalGrader: 0,
+    graderToGrader: 0,
+    student: 0
+  }
+
+  let anonymityDate = null
+
+  function update(eventData) {
+    eventData.forEach(({auditEvent: {createdAt, eventType, payload}}) => {
+      if (eventType === 'grader_to_final_grader_anonymity_updated') {
+        if (!payload.grader_names_visible_to_final_grader) {
+          anonymityTurnedOnCounts.graderToFinalGrader++
+          anonymityDate = laterDate(anonymityDate, createdAt)
+        }
+      } else if (eventType === 'grader_to_grader_anonymity_updated') {
+        if (payload.graders_anonymous_to_graders) {
+          anonymityTurnedOnCounts.graderToGrader++
+          anonymityDate = laterDate(anonymityDate, createdAt)
+        }
+      } else if (eventType === 'student_anonymity_updated') {
+        if (payload.anonymous_grading) {
+          anonymityTurnedOnCounts.student++
+          anonymityDate = laterDate(anonymityDate, createdAt)
+        }
+      }
+    })
+  }
+
+  function getAnonymityDate() {
+    return anonymityDate
+  }
+
+  function getOverallAnonymity() {
+    const maxEnableCount = Math.max(...Object.values(anonymityTurnedOnCounts))
+    if (maxEnableCount > 1) {
+      // When a feature was enabled more than once,
+      // this means it was temporarily disabled.
+      return PARTIAL
+    }
+
+    if (maxEnableCount === 1) {
+      // When a feature was enabled only once,
+      // this means it was used without interruption.
+      return FULL
+    }
+
+    // When no feature was used, anonymity does not apply.
+    return overallAnonymityStates.NA
+  }
+
+  return {
+    getAnonymityDate,
+    getOverallAnonymity,
+    update
+  }
+}
+
 /*
  * Audit trail data is structured as follows:
  * {
@@ -252,6 +317,8 @@ export default function buildAuditTrail(auditData) {
   const userEventGroupsByUserId = {}
 
   const featureTracking = trackFeaturesOverall(sortedEvents)
+  const anonymityTracker = buildAnonymityTracker()
+
   let currentlyAnonymous = false
 
   sortedEvents.forEach(auditEvent => {
@@ -278,10 +345,11 @@ export default function buildAuditTrail(auditData) {
     if (featureTracking.anonymousGradingWasUsed) {
       eventDatum.studentAnonymity = currentlyAnonymous ? ON : OFF
     } else {
-      eventDatum.studentAnonymity = NA
+      eventDatum.studentAnonymity = auditEventStudentAnonymityStates.NA
     }
 
     const eventData = extractEvents(eventDatum, featureTracking)
+    anonymityTracker.update(eventData)
 
     const dateKey = getDateKey(createdAt)
     if (lastDateGroup && lastDateGroup.startDateKey === dateKey) {
@@ -298,18 +366,20 @@ export default function buildAuditTrail(auditData) {
   const userEventGroups = Object.values(userEventGroupsByUserId).sort((groupA, groupB) => {
     const rolePositionA = getRolePosition(groupA.user)
     const rolePositionB = getRolePosition(groupB.user)
+
     if (rolePositionA === rolePositionB) {
       const [{auditEvent: auditEventA}] = groupA.dateEventGroups[0].auditEvents
       const [{auditEvent: auditEventB}] = groupB.dateEventGroups[0].auditEvents
       return auditEventA.createdAt - auditEventB.createdAt
     }
+
     return rolePositionA - rolePositionB
   })
 
   return {
-    anonymousGradingWasUsed: featureTracking.anonymousGradingWasUsed,
-    moderatedGradingWasUsed: featureTracking.moderatedGradingWasUsed,
-    mutingWasUsed: featureTracking.mutingWasUsed,
+    ...featureTracking,
+    anonymityDate: anonymityTracker.getAnonymityDate(),
+    overallAnonymity: anonymityTracker.getOverallAnonymity(),
     userEventGroups
   }
 }

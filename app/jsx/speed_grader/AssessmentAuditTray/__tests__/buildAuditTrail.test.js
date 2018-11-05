@@ -19,7 +19,7 @@
 import timezone from 'timezone_core'
 import newYork from 'timezone/America/New_York'
 
-import {auditEventStudentAnonymityStates} from '../AuditTrailHelpers'
+import {auditEventStudentAnonymityStates, overallAnonymityStates} from '../AuditTrailHelpers'
 
 import buildAuditTrail from '../buildAuditTrail'
 import {
@@ -1747,6 +1747,300 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       buildUpdateEvent('4904', '2018-09-04T12:00:00Z', {anonymous_grading: [false, true]})
       gradeStudent('4905', '2018-09-04T12:01:00Z', '1103', {grade: 'F', score: 0})
       expect(getUserEventGroup('1103').anonymousOnly).toBe(true)
+    })
+  })
+
+  describe('overall anonymity tracking', () => {
+    const {FULL, NA, PARTIAL} = overallAnonymityStates
+
+    function gradeStudent(id, createdAt, userId, payload) {
+      auditEvents.push(
+        buildEvent({createdAt, eventType: 'provisional_grade_created', id, userId}, payload)
+      )
+    }
+
+    function getOverallAnonymity() {
+      return buildAuditTrail({auditEvents, users}).overallAnonymity
+    }
+
+    function getAnonymityDate() {
+      return buildAuditTrail({auditEvents, users}).anonymityDate
+    }
+
+    describe('when only student anonymity was enabled', () => {
+      beforeEach(() => {
+        buildCreateEvent({muted: true})
+        buildUpdateEvent('4902', '2018-09-02T12:00:00Z', {anonymous_grading: [false, true]})
+        buildUpdateEvent('4903', '2018-09-03T12:00:00Z', {points_possible: [10, 15]})
+        gradeStudent('4910', '2018-09-10T11:59:00Z', '1103', {grade: 'F', score: 0})
+        buildUpdateEvent('4951', '2018-09-30T12:10:00Z', {muted: [true, false]})
+      })
+
+      describe('when anonymity was not interrupted', () => {
+        it('is fully anonymous', () => {
+          expect(getOverallAnonymity()).toEqual(FULL)
+        })
+
+        it('uses the last "anonymity enabled" date for the anonymity date', () => {
+          expect(getAnonymityDate()).toEqual(new Date('2018-09-02T12:00:00Z'))
+        })
+      })
+
+      describe('when anonymity was temporarily disabled', () => {
+        beforeEach(() => {
+          buildUpdateEvent('4917', '2018-09-17T12:00:00Z', {anonymous_grading: [true, false]})
+          buildUpdateEvent('4918', '2018-09-17T12:01:00Z', {anonymous_grading: [false, true]})
+        })
+
+        it('is partially anonymous', () => {
+          expect(getOverallAnonymity()).toEqual(PARTIAL)
+        })
+
+        it('uses the later "anonymity re-enabled" date for the anonymity date', () => {
+          expect(getAnonymityDate()).toEqual(new Date('2018-09-17T12:01:00Z'))
+        })
+      })
+
+      describe('when anonymity was disabled at the end of the audit trail', () => {
+        it('is fully anonymous when anonymity was not interrupted', () => {
+          buildUpdateEvent('4930', '2018-09-30T12:00:00Z', {anonymous_grading: [true, false]})
+          expect(getOverallAnonymity()).toEqual(FULL)
+        })
+
+        it('is partially anonymous when anonymity was temporarily disabled', () => {
+          buildUpdateEvent('4917', '2018-09-17T12:00:00Z', {anonymous_grading: [true, false]})
+          buildUpdateEvent('4918', '2018-09-17T12:01:00Z', {anonymous_grading: [false, true]})
+          buildUpdateEvent('4930', '2018-09-30T12:00:00Z', {anonymous_grading: [true, false]})
+          expect(getOverallAnonymity()).toEqual(PARTIAL)
+        })
+      })
+    })
+
+    describe('when only grader-to-grader anonymity was enabled', () => {
+      beforeEach(() => {
+        buildCreateEvent({muted: true})
+        buildUpdateEvent('4902', '2018-09-02T12:00:00Z', {
+          graders_anonymous_to_graders: [false, true]
+        })
+        buildUpdateEvent('4903', '2018-09-03T12:00:00Z', {points_possible: [10, 15]})
+        gradeStudent('4910', '2018-09-10T11:59:00Z', '1103', {grade: 'F', score: 0})
+        buildUpdateEvent('4951', '2018-09-30T12:10:00Z', {muted: [true, false]})
+      })
+
+      describe('when anonymity was not interrupted', () => {
+        it('is fully anonymous', () => {
+          expect(getOverallAnonymity()).toEqual(FULL)
+        })
+
+        it('uses the last "anonymity enabled" date for the anonymity date', () => {
+          expect(getAnonymityDate()).toEqual(new Date('2018-09-02T12:00:00Z'))
+        })
+      })
+
+      describe('when anonymity was temporarily disabled', () => {
+        beforeEach(() => {
+          buildUpdateEvent('4917', '2018-09-17T12:00:00Z', {
+            graders_anonymous_to_graders: [true, false]
+          })
+          buildUpdateEvent('4918', '2018-09-17T12:01:00Z', {
+            graders_anonymous_to_graders: [false, true]
+          })
+        })
+
+        it('is partially anonymous', () => {
+          expect(getOverallAnonymity()).toEqual(PARTIAL)
+        })
+
+        it('uses the later "anonymity re-enabled" date for the anonymity date', () => {
+          expect(getAnonymityDate()).toEqual(new Date('2018-09-17T12:01:00Z'))
+        })
+      })
+
+      describe('when anonymity was disabled at the end of the audit trail', () => {
+        it('is fully anonymous when anonymity was not interrupted', () => {
+          buildUpdateEvent('4930', '2018-09-30T12:00:00Z', {
+            graders_anonymous_to_graders: [true, false]
+          })
+          expect(getOverallAnonymity()).toEqual(FULL)
+        })
+
+        it('is partially anonymous when anonymity was temporarily disabled', () => {
+          buildUpdateEvent('4917', '2018-09-17T12:00:00Z', {
+            graders_anonymous_to_graders: [true, false]
+          })
+          buildUpdateEvent('4918', '2018-09-17T12:01:00Z', {
+            graders_anonymous_to_graders: [false, true]
+          })
+          buildUpdateEvent('4930', '2018-09-30T12:00:00Z', {
+            graders_anonymous_to_graders: [true, false]
+          })
+          expect(getOverallAnonymity()).toEqual(PARTIAL)
+        })
+      })
+    })
+
+    describe('when only grader-to-final-grader anonymity was enabled', () => {
+      beforeEach(() => {
+        buildCreateEvent({muted: true})
+        buildUpdateEvent('4902', '2018-09-02T12:00:00Z', {
+          grader_names_visible_to_final_grader: [true, false]
+        })
+        buildUpdateEvent('4903', '2018-09-03T12:00:00Z', {points_possible: [10, 15]})
+        gradeStudent('4910', '2018-09-10T11:59:00Z', '1103', {grade: 'F', score: 0})
+        buildUpdateEvent('4951', '2018-09-30T12:10:00Z', {muted: [true, false]})
+      })
+
+      describe('when anonymity was not interrupted', () => {
+        it('is fully anonymous', () => {
+          expect(getOverallAnonymity()).toEqual(FULL)
+        })
+
+        it('uses the last "anonymity enabled" date for the anonymity date', () => {
+          expect(getAnonymityDate()).toEqual(new Date('2018-09-02T12:00:00Z'))
+        })
+      })
+
+      describe('when anonymity was temporarily disabled', () => {
+        beforeEach(() => {
+          buildUpdateEvent('4917', '2018-09-17T12:00:00Z', {
+            grader_names_visible_to_final_grader: [false, true]
+          })
+          buildUpdateEvent('4918', '2018-09-17T12:01:00Z', {
+            grader_names_visible_to_final_grader: [true, false]
+          })
+        })
+
+        it('is partially anonymous', () => {
+          expect(getOverallAnonymity()).toEqual(PARTIAL)
+        })
+
+        it('uses the later "anonymity re-enabled" date for the anonymity date', () => {
+          expect(getAnonymityDate()).toEqual(new Date('2018-09-17T12:01:00Z'))
+        })
+      })
+
+      describe('when anonymity was disabled at the end of the audit trail', () => {
+        it('is fully anonymous when anonymity was not interrupted', () => {
+          buildUpdateEvent('4930', '2018-09-30T12:00:00Z', {
+            grader_names_visible_to_final_grader: [false, true]
+          })
+          expect(getOverallAnonymity()).toEqual(FULL)
+        })
+
+        it('is partially anonymous when anonymity was temporarily disabled', () => {
+          buildUpdateEvent('4917', '2018-09-17T12:00:00Z', {
+            grader_names_visible_to_final_grader: [false, true]
+          })
+          buildUpdateEvent('4918', '2018-09-17T12:01:00Z', {
+            grader_names_visible_to_final_grader: [true, false]
+          })
+          buildUpdateEvent('4930', '2018-09-30T12:00:00Z', {
+            grader_names_visible_to_final_grader: [false, true]
+          })
+          expect(getOverallAnonymity()).toEqual(PARTIAL)
+        })
+      })
+    })
+
+    describe('when all forms of anonymity are enabled', () => {
+      beforeEach(() => {
+        buildCreateEvent({muted: true})
+        buildUpdateEvent('4902', '2018-09-02T12:00:00Z', {
+          anonymous_grading: [false, true],
+          graders_anonymous_to_graders: [false, true]
+        })
+        buildUpdateEvent('4903', '2018-09-02T12:10:00Z', {
+          grader_names_visible_to_final_grader: [true, false]
+        })
+        buildUpdateEvent('4905', '2018-09-03T12:00:00Z', {points_possible: [10, 15]})
+        gradeStudent('4910', '2018-09-10T11:59:00Z', '1103', {grade: 'F', score: 0})
+        buildUpdateEvent('4930', '2018-09-30T12:00:00Z', {
+          anonymous_grading: [true, false],
+          grader_names_visible_to_final_grader: [false, true],
+          graders_anonymous_to_graders: [true, false]
+        })
+        buildUpdateEvent('4951', '2018-09-30T12:10:00Z', {muted: [true, false]})
+      })
+
+      describe('when anonymity was not interrupted', () => {
+        it('is fully anonymous', () => {
+          expect(getOverallAnonymity()).toEqual(FULL)
+        })
+
+        it('uses the last "anonymity enabled" date for the anonymity date', () => {
+          expect(getAnonymityDate()).toEqual(new Date('2018-09-02T12:10:00Z'))
+        })
+      })
+
+      describe('when student anonymity was temporarily disabled', () => {
+        beforeEach(() => {
+          buildUpdateEvent('4917', '2018-09-17T12:00:00Z', {anonymous_grading: [true, false]})
+          buildUpdateEvent('4918', '2018-09-17T12:01:00Z', {anonymous_grading: [false, true]})
+        })
+
+        it('is partially anonymous', () => {
+          expect(getOverallAnonymity()).toEqual(PARTIAL)
+        })
+
+        it('uses the later "anonymity re-enabled" date for the anonymity date', () => {
+          expect(getAnonymityDate()).toEqual(new Date('2018-09-17T12:01:00Z'))
+        })
+      })
+
+      describe('when grader-to-grader anonymity was temporarily disabled', () => {
+        beforeEach(() => {
+          buildUpdateEvent('4917', '2018-09-17T12:00:00Z', {
+            graders_anonymous_to_graders: [true, false]
+          })
+          buildUpdateEvent('4918', '2018-09-17T12:01:00Z', {
+            graders_anonymous_to_graders: [false, true]
+          })
+        })
+
+        it('is partially anonymous', () => {
+          expect(getOverallAnonymity()).toEqual(PARTIAL)
+        })
+
+        it('uses the later "anonymity re-enabled" date for the anonymity date', () => {
+          expect(getAnonymityDate()).toEqual(new Date('2018-09-17T12:01:00Z'))
+        })
+      })
+
+      describe('when grader-to-final-grader anonymity was temporarily disabled', () => {
+        beforeEach(() => {
+          buildUpdateEvent('4917', '2018-09-17T12:00:00Z', {
+            grader_names_visible_to_final_grader: [false, true]
+          })
+          buildUpdateEvent('4918', '2018-09-17T12:01:00Z', {
+            grader_names_visible_to_final_grader: [true, false]
+          })
+        })
+
+        it('is partially anonymous', () => {
+          expect(getOverallAnonymity()).toEqual(PARTIAL)
+        })
+
+        it('uses the later "anonymity re-enabled" date for the anonymity date', () => {
+          expect(getAnonymityDate()).toEqual(new Date('2018-09-17T12:01:00Z'))
+        })
+      })
+    })
+
+    describe('when anonymity was never applied', () => {
+      beforeEach(() => {
+        buildCreateEvent({muted: true})
+        buildUpdateEvent('4903', '2018-09-03T12:00:00Z', {points_possible: [10, 15]})
+        gradeStudent('4910', '2018-09-10T11:59:00Z', '1103', {grade: 'F', score: 0})
+        buildUpdateEvent('4951', '2018-09-30T12:10:00Z', {muted: [true, false]})
+      })
+
+      it('is N/A', () => {
+        expect(getOverallAnonymity()).toEqual(NA)
+      })
+
+      it('has no anonymity date', () => {
+        expect(getAnonymityDate()).toBeNull()
+      })
     })
   })
 })
