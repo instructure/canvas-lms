@@ -118,7 +118,7 @@ describe Types::CourseType do
       section1.destroy
       expect(
         course_type.resolve("sectionsConnection { edges { node { _id } } }")
-      ).to eq course.course_sections.active.map(&:to_param)
+      ).to match_array course.course_sections.active.map(&:to_param)
     end
   end
 
