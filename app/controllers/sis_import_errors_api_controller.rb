@@ -39,6 +39,11 @@
 #           "example": "No short_name given for course C001",
 #           "type": "string"
 #         },
+#         "row_info": {
+#           "description": "The contents of the line that had the error.",
+#           "example": "account_1, Sub account 1,, active ",
+#           "type": "string"
+#         },
 #         "row": {
 #           "description": "The line number where the error occurred. Some Importers do not yet support this. This is a 1 based index starting with the header row.",
 #           "example": "34",
