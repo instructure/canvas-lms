@@ -57,6 +57,8 @@ const submissionNew2Excused = {
 
 const submissionIgnored = {assignment_id: -2, grade: '25', original_grade: '25', type: 'assignment'}
 
+const customColumn1 = {id: 1, title: 'Notes', read_only: false}
+
 const createAssignmentResponse1 = {id: 3}
 const createAssignmentResponse2 = {id: 4}
 
@@ -874,6 +876,44 @@ test('handles multiple students changing multiple new and existing assignments',
   requests[2].respond(200, {}, JSON.stringify(progressCompleted))
 
   ok(goToGradebookStub.called)
+})
+
+test('calls uploadCustomColumnData if custom_columns is non-empty', () => {
+  sinon.stub(ProcessGradebookUpload, 'uploadCustomColumnData')
+
+  const student1 = {
+    previous_id: 1,
+    submissions: [submissionOld1Change, submissionNew1Excused, submissionNew2Change]
+  }
+  const gradebook = {
+    students: [student1],
+    assignments: [oldAssignment1, oldAssignment2, newAssignment1, newAssignment2],
+    custom_columns: [customColumn1]
+  }
+  ProcessGradebookUpload.upload(gradebook)
+
+  equal(ProcessGradebookUpload.uploadCustomColumnData.callCount, 1)
+
+  ProcessGradebookUpload.uploadCustomColumnData.restore()
+})
+
+test('does not call uploadCustomColumnData if custom_columns is empty', () => {
+  sinon.stub(ProcessGradebookUpload, 'uploadCustomColumnData')
+
+  const student1 = {
+    previous_id: 1,
+    submissions: [submissionOld1Change, submissionNew1Excused, submissionNew2Change]
+  }
+  const gradebook = {
+    students: [student1],
+    assignments: [oldAssignment1, oldAssignment2, newAssignment1, newAssignment2],
+    custom_columns: []
+  }
+  ProcessGradebookUpload.upload(gradebook)
+
+  equal(ProcessGradebookUpload.uploadCustomColumnData.callCount, 0)
+
+  ProcessGradebookUpload.uploadCustomColumnData.restore()
 })
 
 QUnit.module('ProcessGradebookUpload.parseCustomColumnData')
