@@ -67,6 +67,9 @@ class SisImportErrorsApiController < ApplicationController
   # Returns the list of SIS import errors for an account or a SIS import. Import
   # errors are only stored for 30 days.
   #
+  # @argument failure [Optional, Boolean]
+  #   If set, only shows errors on a sis import that would cause a failure.
+  #
   # Example:
   #   curl 'https://<canvas>/api/v1/accounts/<account_id>/sis_imports/<id>/sis_import_errors' \
   #     -H "Authorization: Bearer <token>"
@@ -83,6 +86,7 @@ class SisImportErrorsApiController < ApplicationController
         batch = @account.sis_batches.find(params[:id])
         scope = scope.where(sis_batch_id: batch)
       end
+      scope = scope.failed if value_to_boolean(params[:failure])
 
       url = api_v1_sis_batch_import_errors_url if params[:id]
       url ||= api_v1_account_sis_import_errors_url
