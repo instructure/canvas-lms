@@ -123,9 +123,17 @@ describe ExternalToolsController do
         get :show, params: {:course_id => @course.id, id: tool.id}
       end
 
-      it 'creates a resource link request when tool is configured to use LTI 1.3' do
-        jwt = JSON::JWT.decode(assigns[:lti_launch].params[:id_token], :skip_verification)
-        expect(jwt["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
+      it 'creates a login message' do
+        expect(assigns[:lti_launch].params.keys).to match_array [
+          "iss",
+          "login_hint",
+          "target_link_uri",
+          "lti_message_hint"
+        ]
+      end
+
+      it 'sets the "login_hint" to the current user lti id' do
+        expect(assigns[:lti_launch].params['login_hint']).to eq Lti::Asset.opaque_identifier_for(@teacher)
       end
 
       it 'caches the the LTI 1.3 launch' do

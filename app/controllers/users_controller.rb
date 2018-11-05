@@ -1285,7 +1285,6 @@ class UsersController < ApplicationController
       Lti::LtiOutboundAdapter.new(@tool, @current_user, @domain_root_account).prepare_tool_launch(@return_url, variable_expander,  opts)
     end
 
-    adapter.cache_payload if adapter.respond_to?(:cache_payload)
     @lti_launch.params = adapter.generate_post_payload
 
     @lti_launch.resource_url = @tool.user_navigation(:url)

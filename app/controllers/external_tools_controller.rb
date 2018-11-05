@@ -517,8 +517,6 @@ class ExternalToolsController < ApplicationController
                         else
                           adapter.generate_post_payload
                         end
-
-    adapter.cache_payload if adapter.respond_to?(:cache_payload)
     lti_launch.resource_url = opts[:launch_url] || adapter.launch_url
     lti_launch.link_text = selection_type ? tool.label_for(selection_type.to_sym, I18n.locale) : tool.default_label
     lti_launch.analytics_id = tool.tool_id

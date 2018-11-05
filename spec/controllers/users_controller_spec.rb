@@ -86,10 +86,6 @@ describe UsersController do
       let(:redis_key) { "#{assigns[:domain_root_account].class_name}:#{Lti::RedisMessageClient::LTI_1_3_PREFIX}#{verifier}" }
       let(:cached_launch) { JSON::JWT.decode(JSON.parse(Canvas.redis.get(redis_key))['id_token'], :skip_verification) }
 
-      subject do
-        JSON::JWT.decode(assigns[:lti_launch].params[:id_token], :skip_verification)
-      end
-
       before do
         allow(SecureRandom).to receive(:hex).and_return(verifier)
         tool.use_1_3 = true
@@ -98,8 +94,17 @@ describe UsersController do
         get :external_tool, params: {id:tool.id, user_id:user.id}
       end
 
-      it 'does LTI 1.3 launch' do
-        expect(subject["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
+      it 'creates a login message' do
+        expect(assigns[:lti_launch].params.keys).to match_array [
+          "iss",
+          "login_hint",
+          "target_link_uri",
+          "lti_message_hint"
+        ]
+      end
+
+      it 'sets the "login_hint" to the current user lti id' do
+        expect(assigns[:lti_launch].params['login_hint']).to eq Lti::Asset.opaque_identifier_for(user)
       end
 
       it 'caches the LTI 1.3 launch' do

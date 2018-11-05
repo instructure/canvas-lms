@@ -611,32 +611,35 @@ RSpec.describe ApplicationController do
             let(:redis_key) { "#{course.class.name}:#{Lti::RedisMessageClient::LTI_1_3_PREFIX}#{verifier}" }
             let(:cached_launch) { JSON::JWT.decode(JSON.parse(Canvas.redis.get(redis_key))['id_token'], :skip_verification) }
 
-            before { allow(SecureRandom).to receive(:hex).and_return(verifier) }
+            before do
+              allow(SecureRandom).to receive(:hex).and_return(verifier)
+              controller.send(:content_tag_redirect, course, content_tag, nil)
+            end
 
             it 'caches the LTI 1.3 launch' do
-              controller.send(:content_tag_redirect, course, content_tag, nil)
               expect(cached_launch["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
+            end
+
+            it 'creates a login message' do
+              expect(assigns[:lti_launch].params.keys).to match_array [
+                "iss",
+                "login_hint",
+                "target_link_uri",
+                "lti_message_hint"
+              ]
+            end
+
+            it 'sets the "login_hint" to the current user lti id' do
+              expect(assigns[:lti_launch].params['login_hint']).to eq Lti::Asset.opaque_identifier_for(user)
             end
           end
 
           context 'assignments' do
-            it 'creates a resource link request when tool is configured to use LTI 1.3' do
-              controller.send(:content_tag_redirect, course, content_tag, nil)
-              jwt = JSON::JWT.decode(assigns[:lti_launch].params[:id_token], :skip_verification)
-              expect(jwt["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
-            end
-
             it_behaves_like 'a placement that caches the launch'
           end
 
           context 'module items' do
             before { content_tag.update!(context: course.account) }
-
-            it 'creates a resource link request when tool is configured to use LTI 1.3' do
-              controller.send(:content_tag_redirect, course, content_tag, nil)
-              jwt = JSON::JWT.decode(assigns[:lti_launch].params[:id_token], :skip_verification)
-              expect(jwt["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
-            end
 
             it_behaves_like 'a placement that caches the launch'
           end

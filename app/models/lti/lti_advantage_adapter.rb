@@ -15,12 +15,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require 'lti_advantage'
+
 module Lti
   class LtiAdvantageAdapter
     include Lti::RedisMessageClient
-
-    delegate :generate_post_payload_for_assignment, to: :resource_link_request
-    delegate :generate_post_payload_for_homework_submission, to: :resource_link_request
 
     def initialize(tool:, user:, context:, return_url:, expander:, opts:)
       @tool = tool
@@ -31,7 +30,25 @@ module Lti
       @opts = opts
     end
 
+    def generate_post_payload_for_assignment(*args)
+      login_request(resource_link_request.generate_post_payload_for_assignment(*args))
+    end
+
+    def generate_post_payload_for_homework_submission(*args)
+      login_request(resource_link_request.generate_post_payload_for_homework_submission(*args))
+    end
+
     def generate_post_payload
+      login_request(generate_lti_params)
+    end
+
+    def launch_url
+      resource_type ? @tool.extension_setting(resource_type, :url) : @tool.url
+    end
+
+    private
+
+    def generate_lti_params
       message_type = @tool.extension_setting(resource_type, :message_type)
 
       if message_type == 'DeepLinkingRequest'
@@ -41,15 +58,19 @@ module Lti
       end
     end
 
-    def launch_url
-      resource_type ? @tool.extension_setting(resource_type, :url) : @tool.url
+    def login_request(lti_params)
+      verifier = cache_payload(lti_params)
+      LtiAdvantage::Messages::LoginRequest.new(
+        iss: Canvas::Security.config['lti_iss'],
+        login_hint: Lti::Asset.opaque_identifier_for(@user),
+        target_link_uri: 'a new endpoint',
+        lti_message_hint: verifier
+      ).as_json
     end
 
-    def cache_payload
-      cache_launch(generate_post_payload, @context)
+    def cache_payload(lti_params)
+      cache_launch(lti_params, @context)
     end
-
-    private
 
     def resource_link_request
       @_resource_link_request ||= begin
