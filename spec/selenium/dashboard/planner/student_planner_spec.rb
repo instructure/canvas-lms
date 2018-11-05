@@ -261,7 +261,7 @@ describe "student planner" do
       refresh_page
 
       # verifies that the new To Do is showing up
-      todo_item =todo_info_holder
+      todo_item = todo_info_holder
       expect(todo_item).to include_text("To Do")
       expect(todo_item).to include_text("Title Text")
       expect(f('body')).not_to contain_css(todo_sidebar_modal_selector)
@@ -271,7 +271,7 @@ describe "student planner" do
       @student1.planner_notes.create!(todo_date: 2.days.from_now, title: "Title Text")
       go_to_list_view
       # Opens the To Do edit sidebar
-      todo_item =todo_info_holder
+      todo_item = todo_info_holder
       expect(todo_item).to include_text("To Do")
       expect(todo_item).to include_text("Title Text")
       click_item_button("Title Text")
@@ -282,7 +282,7 @@ describe "student planner" do
       todo_save_button.click
 
       # verifies that the edited To Do is showing up
-      todo_item =todo_info_holder
+      todo_item = todo_info_holder
       expect(todo_item).to include_text("To Do")
       expect(todo_item).to include_text("New Text")
       expect(todo_item).not_to include_text("Title Text")
@@ -302,7 +302,7 @@ describe "student planner" do
       expect(f('input[type=checkbox]:checked')).to be_displayed
 
       # Opens the To Do edit sidebar
-      todo_item =todo_info_holder
+      todo_item = todo_info_holder
       expect(todo_item).to include_text("To Do")
       expect(todo_item).to include_text("Title Text")
       click_item_button('Title Text')
@@ -325,7 +325,7 @@ describe "student planner" do
       @student1.planner_notes.create!(todo_date: 2.days.from_now, title: "Title Text")
       go_to_list_view
       expect(f('body')).not_to contain_jqcss("h2:contains('No Due Dates Assigned')")
-      todo_item =todo_info_holder
+      todo_item = todo_info_holder
       expect(todo_item).to include_text("To Do")
       expect(todo_item).to include_text("Title Text")
       click_item_button('Title Text')
@@ -341,11 +341,11 @@ describe "student planner" do
 
     it "groups the to-do item with other course items", priority: "1", test_id: 3482560 do
       @assignment = @course.assignments.create({
-                                                 name: 'Assignment 1',
-                                                 due_at: Time.zone.now + 1.day,
-                                                 submission_types: 'online_text_entry'
-                                               })
-      @student1.planner_notes.create!(todo_date: Time.zone.now + 1.day, title: "Title Text", course_id: @course.id)
+        name: 'Assignment 1',
+        due_at: Time.zone.now + 1.day,
+        submission_types: 'online_text_entry'
+      })
+      @student1.planner_notes.create!(todo_date: 1.day.from_now, title: "Title Text", course_id: @course.id)
       go_to_list_view
       course_group = f('ol', planner_app_div)
       group_items = ff('li', course_group)
@@ -418,19 +418,14 @@ describe "student planner" do
     end
 
     it "ensures time zones with offsets higher than UTC update the planner items" do
-      planner_note = @student1.planner_notes.create!(todo_date: (Time.zone.now + 1.day),
-                                                     title: "Title Text")
+      planner_note = @student1.planner_notes.create!(todo_date: 1.day.from_now, title: "A Planner Note")
+      @student1.update!(time_zone: 'Minsk')
       go_to_list_view
-      # Opens the To Do edit sidebar
       click_item_button(planner_note.title)
-      @modal = todo_sidebar_modal(planner_note.title)
-      expect(ff('input', @modal)[1][:value]).to eq format_date_for_view(planner_note.todo_date, :long)
-      @student1.time_zone = 'Minsk'
-      @student1.save!
-      refresh_page
-      click_item_button(planner_note.title)
-      @modal = todo_sidebar_modal(planner_note.title)
-      expect(ff('input', @modal)[1][:value]).to eq format_date_for_view(planner_note.todo_date, :long)
+      modal = todo_sidebar_modal(planner_note.title)
+      expected_todo_date = ff('input', modal)[1][:value]
+      actual_todo_date = format_date_for_view(planner_note.todo_date.in_time_zone(@student1.time_zone), :long)
+      expect(expected_todo_date).to eq actual_todo_date
     end
   end
 
