@@ -26,11 +26,11 @@ export function indicatorRegion(
 }
 
 export function clearIndicators() {
-  document
-    .querySelectorAll(".a11y-checker-selection-indicator")
-    .forEach(existingElem => {
-      existingElem.parentNode.removeChild(existingElem)
-    })
+  Array.from(
+    document.querySelectorAll(".a11y-checker-selection-indicator")
+  ).forEach(existingElem => {
+    existingElem.parentNode.removeChild(existingElem)
+  })
 }
 
 export default function indicate(editor, elem, margin = MARGIN) {
