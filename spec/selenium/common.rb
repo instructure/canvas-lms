@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require "nokogiri"
 require "selenium-webdriver"
 require "socket"
 require "timeout"
@@ -197,6 +198,12 @@ shared_context "in-process server selenium tests" do
 
   # logs everything that showed up in the browser console during selenium tests
   after(:each) do |example|
+    if example.exception
+      html = f('body').attribute('outerHTML')
+      document = Nokogiri::HTML(html)
+      example.metadata[:page_html] = document.to_html
+    end
+
     browser_logs = driver.manage.logs.get(:browser)
 
     if browser_logs.present?

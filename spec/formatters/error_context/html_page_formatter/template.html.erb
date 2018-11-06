@@ -36,6 +36,13 @@
       <h2>Screenshot</h2>
       <img style="border:1px solid #000" src="./<%= summary.screenshot_name %>" />
     <% end %>
+
+    <% if summary.page_html %>
+      <h2>HTML</h2>
+      <code>
+        <pre><%= summary.page_html %></pre>
+      </code>
+    <% end %>
   </body>
 </html>
 
