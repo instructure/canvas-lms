@@ -76,7 +76,7 @@ describe Lti::Messages::ResourceLinkRequest do
   end
 
   describe '#initialize' do
-    let(:jws) { JSON::JWT.decode(jwt_message.generate_post_payload[:id_token], :skip_verification) }
+    let(:jws) { jwt_message.generate_post_payload }
 
     it 'adds public claims if the tool is public' do
       tool.update!(workflow_state: 'public')
@@ -138,14 +138,11 @@ describe Lti::Messages::ResourceLinkRequest do
     let(:lti_turnitin_outcomes_placement_url) { 'https://www.lti-turnitin-outcomes-placement-url.com' }
 
     let(:jws) do
-      JSON::JWT.decode(
-        jwt_message.generate_post_payload_for_assignment(
-          assignment,
-          outcome_service_url,
-          legacy_outcome_service_url,
-          lti_turnitin_outcomes_placement_url
-        )[:id_token],
-        :skip_verification
+      jwt_message.generate_post_payload_for_assignment(
+        assignment,
+        outcome_service_url,
+        legacy_outcome_service_url,
+        lti_turnitin_outcomes_placement_url
       )
     end
 
@@ -198,11 +195,8 @@ describe Lti::Messages::ResourceLinkRequest do
 
   describe '#generate_post_payload_for_homework_submission' do
     let(:jws) do
-      JSON::JWT.decode(
-        jwt_message.generate_post_payload_for_homework_submission(
-          assignment
-        )[:id_token],
-        :skip_verification
+      jwt_message.generate_post_payload_for_homework_submission(
+        assignment
       )
     end
 

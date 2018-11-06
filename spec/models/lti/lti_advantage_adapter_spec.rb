@@ -25,7 +25,7 @@ describe Lti::LtiAdvantageAdapter do
   let!(:lti_user_id) { Lti::Asset.opaque_identifier_for(@student) }
   let(:return_url) { 'http://www.platform.com/return_url' }
   let(:user) { @student }
-  let(:opts) { { resource_type: 'course_navigation' } }
+  let(:opts) { { resource_type: 'course_navigation', domain: 'test.com' } }
   let(:expander) do
     Lti::VariableExpander.new(
       course.root_account,
@@ -48,8 +48,8 @@ describe Lti::LtiAdvantageAdapter do
     )
   end
   let(:login_message) { adapter.generate_post_payload }
-  let(:verifier) { login_message['lti_message_hint'] }
-  let(:params) { JSON::JWT.decode(JSON.parse(fetch_and_delete_launch(course, verifier))['id_token'], :skip_verification) }
+  let(:verifier) { Canvas::Security.decode_jwt(login_message['lti_message_hint'])['verifier'] }
+  let(:params) { JSON.parse(fetch_and_delete_launch(course, verifier)) }
   let(:tool) do
     tool = course.context_external_tools.new(
       name: 'bob',
@@ -87,20 +87,25 @@ describe Lti::LtiAdvantageAdapter do
     it 'sets the "login_hint" to the current user LTI ID' do
       expect(login_message['login_hint']).to eq lti_user_id
     end
+
+    it 'sets the domain in the message hint' do
+      expect(Canvas::Security.decode_jwt(login_message['lti_message_hint'])['canvas_domain']).to eq 'test.com'
+    end
   end
 
   describe '#generate_post_payload_for_assignment' do
     let(:outcome_service_url) { 'https://www.outcome_service_url.com' }
     let(:legacy_outcome_service_url) { 'https://www.legacy_url.com' }
     let(:lti_turnitin_outcomes_placement_url) { 'https://www.turnitin.com' }
-    let(:params) { JSON::JWT.decode(JSON.parse(fetch_and_delete_launch(course, verifier))['id_token'], :skip_verification) }
+    let(:params) { JSON.parse(fetch_and_delete_launch(course, verifier)) }
     let(:verifier) do
-      adapter.generate_post_payload_for_assignment(
+      jws = adapter.generate_post_payload_for_assignment(
         assignment,
         outcome_service_url,
         legacy_outcome_service_url,
         lti_turnitin_outcomes_placement_url
       )['lti_message_hint']
+      Canvas::Security.decode_jwt(jws)['verifier']
     end
 
     it 'adds assignment specific claims' do
@@ -109,8 +114,11 @@ describe Lti::LtiAdvantageAdapter do
   end
 
   describe '#generate_post_payload_for_homework_submission' do
-    let(:verifier) { adapter.generate_post_payload_for_homework_submission(assignment)['lti_message_hint'] }
-    let(:params) { JSON::JWT.decode(JSON.parse(fetch_and_delete_launch(course, verifier))['id_token'], :skip_verification) }
+    let(:verifier) do
+      jws = adapter.generate_post_payload_for_homework_submission(assignment)['lti_message_hint']
+      Canvas::Security.decode_jwt(jws)['verifier']
+    end
+    let(:params) { JSON.parse(fetch_and_delete_launch(course, verifier)) }
 
     it 'adds hoemwork specific claims' do
       expect(params['https://www.instructure.com/content_file_extensions']).to eq assignment.allowed_extensions&.join(',')

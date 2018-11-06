@@ -488,7 +488,8 @@ class ExternalToolsController < ApplicationController
 
     default_opts = {
         resource_type: selection_type,
-        selected_html: params[:selection]
+        selected_html: params[:selection],
+        domain: @domain_root_account&.domain
     }
     opts = default_opts.merge(opts)
 

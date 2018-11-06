@@ -19,6 +19,8 @@ require 'lti_advantage'
 
 module Lti
   class LtiAdvantageAdapter
+    MESSAGE_HINT_LIFESPAN = 5.minutes
+
     include Lti::RedisMessageClient
 
     def initialize(tool:, user:, context:, return_url:, expander:, opts:)
@@ -59,17 +61,24 @@ module Lti
     end
 
     def login_request(lti_params)
-      verifier = cache_payload(lti_params)
+      message_hint = cache_payload(lti_params)
       LtiAdvantage::Messages::LoginRequest.new(
         iss: Canvas::Security.config['lti_iss'],
         login_hint: Lti::Asset.opaque_identifier_for(@user),
         target_link_uri: 'a new endpoint',
-        lti_message_hint: verifier
+        lti_message_hint: message_hint
       ).as_json
     end
 
     def cache_payload(lti_params)
-      cache_launch(lti_params, @context)
+      verifier = cache_launch(lti_params, @context)
+      Canvas::Security.create_jwt(
+        {
+          verifier: verifier,
+          canvas_domain: @opts[:domain]
+        },
+        (Time.zone.now + MESSAGE_HINT_LIFESPAN)
+      )
     end
 
     def resource_link_request

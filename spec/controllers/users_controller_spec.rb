@@ -84,7 +84,7 @@ describe UsersController do
 
       let(:verifier) { "e5e774d015f42370dcca2893025467b414d39009dfe9a55250279cca16f5f3c2704f9c56fef4cea32825a8f72282fa139298cf846e0110238900567923f9d057" }
       let(:redis_key) { "#{assigns[:domain_root_account].class_name}:#{Lti::RedisMessageClient::LTI_1_3_PREFIX}#{verifier}" }
-      let(:cached_launch) { JSON::JWT.decode(JSON.parse(Canvas.redis.get(redis_key))['id_token'], :skip_verification) }
+      let(:cached_launch) { JSON.parse(Canvas.redis.get(redis_key))}
 
       before do
         allow(SecureRandom).to receive(:hex).and_return(verifier)

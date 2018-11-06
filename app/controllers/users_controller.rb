@@ -1266,7 +1266,8 @@ class UsersController < ApplicationController
     @lti_launch = @tool.settings['post_only'] ? Lti::Launch.new(post_only: true) : Lti::Launch.new
     opts = {
         resource_type: @resource_type,
-        link_code: @opaque_id
+        link_code: @opaque_id,
+        domain: @domain_root_account&.domain
     }
     variable_expander = Lti::VariableExpander.new(@domain_root_account, @context, self,{
                                                                         current_user: @current_user,

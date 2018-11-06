@@ -48,7 +48,7 @@ describe Lti::Messages::JwtMessage do
   end
 
   let(:decoded_jwt) do
-    jws = jwt_message.generate_post_payload
+    jws = Lti::Messages::JwtMessage.generate_id_token(jwt_message.generate_post_payload)
     JSON::JWT.decode(jws[:id_token], pub_key)
   end
 
@@ -89,7 +89,7 @@ describe Lti::Messages::JwtMessage do
 
   describe 'signing' do
     it 'signs the id token with the current canvas private key' do
-      jws = jwt_message.generate_post_payload
+      jws = Lti::Messages::JwtMessage.generate_id_token(jwt_message.generate_post_payload)
 
       expect do
         JSON::JWT.decode(jws[:id_token], pub_key)
@@ -126,7 +126,7 @@ describe Lti::Messages::JwtMessage do
 
     it 'sets the "nonce" claim to a unique ID' do
       first_nonce = decoded_jwt['nonce']
-      jws = jwt_message.generate_post_payload
+      jws = Lti::Messages::JwtMessage.generate_id_token(jwt_message.generate_post_payload)
       second_nonce = JSON::JWT.decode(jws[:id_token], pub_key)['nonce']
 
       expect(first_nonce).not_to eq second_nonce
@@ -374,7 +374,7 @@ describe Lti::Messages::JwtMessage do
       end
 
       let(:decoded_jwt) do
-        jws = account_jwt_message.generate_post_payload
+        jws = Lti::Messages::JwtMessage.generate_id_token(account_jwt_message.generate_post_payload)
         JSON::JWT.decode(jws[:id_token], pub_key)
       end
 
@@ -428,12 +428,12 @@ describe Lti::Messages::JwtMessage do
     end
 
     it 'adds placement-specific custom parameters' do
-      jwt_message.generate_post_payload
+      Lti::Messages::JwtMessage.generate_id_token(jwt_message.generate_post_payload)
       expect(message_custom['no_expansion']).to eq 'foo'
     end
 
     it 'expands variable expansions' do
-      jwt_message.generate_post_payload
+      Lti::Messages::JwtMessage.generate_id_token(jwt_message.generate_post_payload)
       expect(message_custom['has_expansion']).to eq user.id
     end
 
@@ -692,7 +692,7 @@ describe Lti::Messages::JwtMessage do
       end
 
       let(:account_jwt) do
-        jws = account_jwt_message.generate_post_payload
+        jws = Lti::Messages::JwtMessage.generate_id_token(account_jwt_message.generate_post_payload)
         JSON::JWT.decode(jws[:id_token], pub_key)
       end
     end

@@ -61,6 +61,10 @@ module LtiAdvantage::Messages
                   :zoneinfo,
                   :id
 
+    def self.create_jws(body, private_key, alg = :RS256)
+      JSON::JWT.new(body).sign(private_key, alg).to_s
+    end
+
     def context
       @context ||= TYPED_ATTRIBUTES[:context].new
     end
@@ -102,7 +106,7 @@ module LtiAdvantage::Messages
     end
 
     def to_jws(private_key, alg = :RS256)
-      JSON::JWT.new(self.to_h).sign(private_key, alg).to_s
+      self.class.create_jws(self.to_h, private_key, alg)
     end
   end
 end

@@ -31,6 +31,10 @@ module Lti::Messages
       @message = LtiAdvantage::Messages::JwtMessage.new
     end
 
+    def self.generate_id_token(body)
+      { id_token: LtiAdvantage::Messages::JwtMessage.create_jws(body, Lti::KeyStorage.present_key) }
+    end
+
     def generate_post_payload_message
       add_security_claims! if include_claims?(:security)
       add_public_claims! if @tool.public? && include_claims?(:public)
@@ -51,7 +55,7 @@ module Lti::Messages
     end
 
     def generate_post_payload
-      { id_token: generate_post_payload_message.to_jws(Lti::KeyStorage.present_key) }
+      generate_post_payload_message.to_h
     end
 
     private

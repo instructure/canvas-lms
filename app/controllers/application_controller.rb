@@ -1577,7 +1577,8 @@ class ApplicationController < ActionController::Base
         opts = {
             launch_url: @resource_url,
             link_code: @opaque_id,
-            overrides: {'resource_link_title' => @resource_title}
+            overrides: {'resource_link_title' => @resource_title},
+            domain: @domain_root_account&.domain
         }
         variable_expander = Lti::VariableExpander.new(@domain_root_account, @context, self,{
                                                         current_user: @current_user,
