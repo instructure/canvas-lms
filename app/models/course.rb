@@ -344,7 +344,12 @@ class Course < ActiveRecord::Base
       tags = self.context_module_tags.active.joins(:context_module).where(:context_modules => {:workflow_state => 'active'})
     end
 
-    DifferentiableAssignment.scope_filter(tags, user, self, is_teacher: user_is_teacher)
+    scope = DifferentiableAssignment.scope_filter(tags, user, self, is_teacher: user_is_teacher)
+    unless user_is_teacher
+      scope = scope.where("content_tags.content_type <> ? OR content_tags.content_id IN (?)", "DiscussionTopic",
+        self.discussion_topics.published.visible_to_student_sections(user).select(:id))
+    end
+    scope
   end
 
   def sequential_module_item_ids
