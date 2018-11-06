@@ -378,7 +378,7 @@ class SisBatch < ActiveRecord::Base
     @has_errors = self.sis_batch_errors.exists?
     import_finished = !(@has_errors && self.sis_batch_errors.failed.exists?) if import_finished
     finalize_workflow_state(import_finished)
-    write_errors_to_file
+    self.send_later_if_production_enqueue_args(:write_errors_to_file, {max_attempts: 5}) if @has_errors
     populate_old_warnings_and_errors
     statistics
     self.progress = 100 if import_finished
@@ -658,6 +658,7 @@ class SisBatch < ActiveRecord::Base
       Rack::Test::UploadedFile.new(file, 'csv', true),
       "sis_errors_attachment_#{id}.csv"
     )
+    self.save! if Rails.env.production?
   end
 
   def temp_error_file_path
