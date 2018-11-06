@@ -52,20 +52,13 @@ module MathMan
     end
 
     def with_plugin_settings
-      dynamic_settings = Canvas::DynamicSettings.for_prefix('math-man')
       plugin_settings = Canvas::Plugin.find(:mathman).settings
       settings = {
-        base_url: dynamic_settings[:base_url],
+        base_url: ENV['MATHMAN_BASE_URL'],
         use_for_mml: plugin_settings[:use_for_mml],
         use_for_svg: plugin_settings[:use_for_svg]
       }
       yield settings
-    rescue Canvas::DynamicSettings::NoFallbackError
-      if Rails.env.production?
-        raise
-      else
-        yield({})
-      end
     end
   end
 end
