@@ -40,7 +40,8 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       notes: "Some cool notes",
       test_cluster_only: true,
       scopes: ['https://purl.imsglobal.org/spec/lti-ags/scope/lineitem'],
-      require_scopes: true
+      require_scopes: true,
+      redirect_uris: "http://www.test.com\r\nhttp://www.anothertest.com"
     }
   end
   let(:new_url) { 'https://www.new-url.com/test' }
@@ -239,6 +240,10 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
 
     it 'sets the developer key require_scopes' do
       expect(subject.require_scopes).to eq dev_key_params[:require_scopes]
+    end
+
+    it 'sets the developer key redirect_uris' do
+      expect(subject.redirect_uris).to eq dev_key_params[:redirect_uris].split
     end
 
     context 'when scopes are invalid' do

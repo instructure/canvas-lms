@@ -115,16 +115,16 @@ test('does not include legacy redirect uri if lti key', () => {
   notOk(formFieldOfTypeAndName(developerKey, 'input', 'redirect_uri', true))
 })
 
-test('does not include redirect uris if lti key', () => {
-  notOk(formFieldOfTypeAndName(developerKey, 'textarea', 'redirect_uris', true))
-})
-
 test('does not include vendor code if lti key', () => {
   notOk(formFieldOfTypeAndName(developerKey, 'input', 'vendor_code', true))
 })
 
 test('does not include icon URL if lti key', () => {
   notOk(formFieldOfTypeAndName(developerKey, 'input', 'icon_url', true))
+})
+
+test('populates the redirect uris if lti key', () => {
+  ok(formFieldOfTypeAndName(developerKey, 'textarea', 'redirect_uris', true))
 })
 
 test('populates the key name when lti key', () => {

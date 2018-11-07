@@ -116,6 +116,7 @@ export default class DeveloperKeyModal extends React.Component {
         name: formData.get("developer_key[name]"),
         email: formData.get("developer_key[email]"),
         notes: formData.get("developer_key[notes]"),
+        redirect_uris: formData.get("developer_key[redirect_uris]"),
         test_cluster_only: this.testClusterOnly,
         access_token_count: 0
       },

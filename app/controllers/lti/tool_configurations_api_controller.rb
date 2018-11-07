@@ -181,6 +181,6 @@ class Lti::ToolConfigurationsApiController < ApplicationController
 
   def developer_key_params
     return {} unless params.key? :developer_key
-    params.require(:developer_key).permit(:name, :email, :notes, :test_cluster_only, :require_scopes, scopes: [])
+    params.require(:developer_key).permit(:name, :email, :notes, :redirect_uris, :test_cluster_only, :require_scopes, scopes: [])
   end
 end
