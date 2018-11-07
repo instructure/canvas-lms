@@ -658,6 +658,14 @@ END
       development: true,
       beta: true
     },
+    'javascript_csp' => {
+      display_name: -> { I18n.t('Content Security Policy')},
+      description: -> { I18n.t('Enable the Security tab on the settings page to adjust CSP settings')},
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      development: true,
+      beta: true
+    },
     'restrict_students_from_annotating' => {
       display_name: -> { I18n.t('Restrict Students from Annotating') },
       description: -> {
