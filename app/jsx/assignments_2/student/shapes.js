@@ -16,17 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import StudentHeader from './components/StudentHeader'
-import AssignmentToggleDetails from '../shared/AssignmentToggleDetails'
-import StudentContentTabs from './StudentContentTabs'
+import {number, oneOf, shape, string} from 'prop-types'
 
-export default function StudentView(_props) {
-  return (
-    <div data-test-id="assignments-2-student-view">
-      <StudentHeader />
-      <AssignmentToggleDetails description="Testing this description with some dummy data" />
-      <StudentContentTabs />
-    </div>
-  )
-}
+export const CourseShape = shape({
+  lid: string.isRequired
+})
+
+export const AssignmentShape = shape({
+  name: string.isRequired,
+  pointsPossible: number.isRequired,
+  dueAt: string.isRequired, // temporary
+  description: string.isRequired,
+  state: oneOf(['published', 'unpublished']).isRequired,
+  course: CourseShape.isRequired
+})
