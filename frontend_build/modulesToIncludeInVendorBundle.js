@@ -59,7 +59,7 @@ module.exports = [
   'compiled/str/i18nLolcalize',
   'instructure',
 
-   // 'jsx/shared/rce/RichContentEditor'
+  // 'jsx/shared/rce/RichContentEditor'
   'lodash',
   '@instructure/ui-layout/lib/components/Grid',
 
@@ -82,6 +82,5 @@ module.exports = [
   '@instructure/ui-pagination/lib/components',
   '@instructure/ui-tabs/lib/components',
   '@instructure/ui-themeable/lib/components/ApplyTheme',
-  '@instructure/ui-icons/lib/Solid/IconSettings',
-
+  '@instructure/ui-icons/lib/Solid/IconSettings'
 ]
