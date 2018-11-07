@@ -2919,13 +2919,6 @@ describe User do
     end
   end
 
-  describe "after_create" do
-    it "sets the new_user_tutorial_on_off feature flag to true" do
-      u = User.create!
-      expect(u.feature_enabled?(:new_user_tutorial_on_off)).to be true
-    end
-  end
-
   describe "#authenticate_one_time_password" do
     let(:user) { User.create! }
     let(:otp) { user.one_time_passwords.create! }
