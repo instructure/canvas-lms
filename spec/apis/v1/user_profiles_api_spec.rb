@@ -98,7 +98,8 @@ describe "User Profile API", type: :request do
       'title' => nil,
       'bio' => nil,
       'time_zone' => 'Etc/UTC',
-      'locale' => nil
+      'locale' => nil,
+      'effective_locale' => 'en'
     })
   end
 
@@ -122,7 +123,8 @@ describe "User Profile API", type: :request do
       'title' => nil,
       'bio' => nil,
       'time_zone' => 'Etc/UTC',
-      'locale' => 'es'
+      'locale' => 'es',
+      'effective_locale' => 'es'
     })
   end
 
@@ -144,7 +146,8 @@ describe "User Profile API", type: :request do
       'title' => nil,
       'bio' => nil,
       'time_zone' => 'Etc/UTC',
-      'locale' => nil
+      'locale' => nil,
+      'effective_locale' => 'en'
     })
   end
 

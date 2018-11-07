@@ -1246,7 +1246,7 @@ class UsersController < ApplicationController
   def api_show
     @user = api_find(User, params[:id])
     if @user.grants_right?(@current_user, session, :api_show_user)
-      render :json => user_json(@user, @current_user, session, %w{locale avatar_url permissions email}, @domain_root_account)
+      render :json => user_json(@user, @current_user, session, %w{locale avatar_url permissions email effective_locale}, @domain_root_account)
     else
       render_unauthorized_action
     end

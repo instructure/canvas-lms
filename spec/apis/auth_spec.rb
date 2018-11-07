@@ -143,7 +143,7 @@ describe "API Authentication", type: :request do
           expect(response.header[content_type_key]).to eq 'application/json; charset=utf-8'
           json = JSON.parse(response.body)
           token = json['access_token']
-          expect(json['user']).to eq({ 'id' => @user.id, 'global_id' => @user.global_id.to_s, 'name' => 'test1@example.com' })
+          expect(json['user']).to eq({ 'id' => @user.id, 'global_id' => @user.global_id.to_s, 'name' => 'test1@example.com', 'effective_locale' => 'en' })
           reset!
 
           # try an api call
@@ -357,7 +357,7 @@ describe "API Authentication", type: :request do
             expect(response.header[content_type_key]).to eq 'application/json; charset=utf-8'
             json = JSON.parse(response.body)
             @token = json['access_token']
-            expect(json['user']).to eq({ 'id' => @user.id, 'global_id' => @user.global_id.to_s, 'name' => 'test1@example.com' })
+            expect(json['user']).to eq({ 'id' => @user.id, 'global_id' => @user.global_id.to_s, 'name' => 'test1@example.com', 'effective_locale' => 'en' })
             reset!
           end
 
@@ -825,6 +825,7 @@ describe "API Authentication", type: :request do
         'integration_id' => nil,
         'time_zone' => 'Etc/UTC',
         'locale' => nil,
+        'effective_locale' => 'en',
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" }
       })
 
@@ -847,6 +848,7 @@ describe "API Authentication", type: :request do
           'integration_id' => nil,
           'time_zone' => 'Etc/UTC',
           'locale' => nil,
+          'effective_locale' => 'en',
           'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" }
       })
 
@@ -867,6 +869,7 @@ describe "API Authentication", type: :request do
           'integration_id' => nil,
           'time_zone' => 'Etc/UTC',
           'locale' => nil,
+          'effective_locale' => 'en',
           'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" }
       })
     end
@@ -893,6 +896,7 @@ describe "API Authentication", type: :request do
         'primary_email' => "blah@example.com",
         'time_zone' => 'Etc/UTC',
         'locale' => nil,
+        'effective_locale' => 'en',
         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
       })
     end
@@ -920,6 +924,7 @@ describe "API Authentication", type: :request do
           'primary_email' => "blah@example.com",
           'time_zone' => 'Etc/UTC',
           'locale' => nil,
+          'effective_locale' => 'en',
           'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
       })
     end
