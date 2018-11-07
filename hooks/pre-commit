@@ -1,0 +1,5 @@
+#!/bin/sh
+
+(yarn run --silent lint:staged) ||
+echo 'Trying to run lint:staged inside Docker, if you want things quicker yarn install locally.' && (docker-compose run --rm --no-deps web yarn run lint:staged) ||
+echo 'You should run `yarn` locally or check to make sure docker is running.'
