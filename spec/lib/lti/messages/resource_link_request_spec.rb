@@ -24,11 +24,24 @@ describe Lti::Messages::ResourceLinkRequest do
   let(:return_url) { 'http://www.platform.com/return_url' }
   let(:opts) { { resource_type: 'course_navigation' } }
   let(:lti_assignment) { Lti::LtiAssignmentCreator.new(assignment).convert }
+  let(:controller) do
+    controller = double('controller')
+    allow(controller).to receive(:request).and_return(request)
+    controller
+  end
+  # All this setup just so we can stub out controller.*_url methods
+  let(:request) do
+    request = double('request')
+    allow(request).to receive(:url).and_return('https://localhost')
+    allow(request).to receive(:host).and_return('/my/url')
+    allow(request).to receive(:scheme).and_return('https')
+    request
+  end
   let(:expander) do
     Lti::VariableExpander.new(
       course.root_account,
       course,
-      nil,
+      controller,
       {
         current_user: user,
         tool: tool,
@@ -48,6 +61,7 @@ describe Lti::Messages::ResourceLinkRequest do
     course_with_student
     @course
   end
+  # rubocop:disable RSpec/ScatteredLet
   let(:tool) do
     tool = course.context_external_tools.new(
       name: 'bob',
@@ -66,10 +80,25 @@ describe Lti::Messages::ResourceLinkRequest do
       }
     }
     tool.use_1_3 = true
-    tool.developer_key = DeveloperKey.create!
+    tool.developer_key = developer_key
     tool.save!
     tool
   end
+  let(:developer_key) do
+    DeveloperKey.create!(
+      name: 'Developer Key With Scopes',
+      account: course.root_account,
+      scopes: developer_key_scopes,
+      require_scopes: true
+    )
+  end
+  let(:developer_key_scopes) { [] }
+
+  before(:each) do
+    course.root_account.enable_feature!(:lti_1_3)
+    course.root_account.save!
+  end
+  # rubocop:enable RSpec/ScatteredLet
 
   shared_examples 'disabled rlid claim group check' do
     let(:opts) { super().merge({claim_group_blacklist: [:rlid]}) }
@@ -145,6 +174,47 @@ describe Lti::Messages::ResourceLinkRequest do
 
     it 'sets the assignment as resource link id' do
       expect_assignment_resource_link_id(jws)
+    end
+
+    context 'when assignment and grade service enabled' do
+      let(:developer_key_scopes) do
+        [
+          'https://purl.imsglobal.org/spec/lti-ags/scope/lineitem',
+          'https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly',
+          'https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly',
+          'https://purl.imsglobal.org/spec/lti-ags/scope/score'
+        ]
+      end
+
+      before(:each) do
+        allow(controller).to receive(:lti_line_item_index_url).and_return('lti_line_item_index_url')
+        allow(controller).to receive(:lti_line_item_show_url).with(
+          {
+            course_id: course.id,
+            id: expected_assignment_line_item.id
+          }
+        ).and_return('lti_line_item_show_url')
+      end
+
+      it 'sets the AGS scopes' do
+        expect_assignment_and_grade_scope(jws)
+      end
+
+      it 'sets the AGS line items url' do
+        expect_assignment_and_grade_line_items_url(jws)
+      end
+
+      it 'sets the AGS line item url' do
+        expect_assignment_and_grade_line_item_url(jws)
+      end
+
+      it 'can still be used to output a course launch after an assignment launch' do
+        expect_assignment_resource_link_id(jws)
+        expect_course_resource_link_id(course_jws)
+        expect_assignment_and_grade_scope(course_jws)
+        expect_assignment_and_grade_line_items_url(course_jws)
+        expect_assignment_and_grade_line_item_url_absent(course_jws)
+      end
     end
 
     context 'when assignment not configured for external tool lauch' do
@@ -286,12 +356,34 @@ describe Lti::Messages::ResourceLinkRequest do
     )
   end
 
-  def expect_assignment_resource_link_id(jws)
-    rlid = assignment.line_items.first.resource_link.resource_link_id
-    expect(jws.dig('https://purl.imsglobal.org/spec/lti/claim/resource_link', 'id')).to eq rlid
+  def expected_assignment_line_item
+    assignment.line_items.find(&:assignment_line_item?)
   end
 
-  def expect_course_resource_link_id(jws)
-    expect(jws.dig('https://purl.imsglobal.org/spec/lti/claim/resource_link', 'id')).to eq course.lti_context_id
+  # these take `claims` as a method arg b/c we sometimes need to test two different jws structs in the same example where
+  # it is not practical to define one or both with `let`
+  def expect_assignment_resource_link_id(claims)
+    rlid = expected_assignment_line_item.resource_link.resource_link_id
+    expect(claims.dig('https://purl.imsglobal.org/spec/lti/claim/resource_link', 'id')).to eq rlid
+  end
+
+  def expect_course_resource_link_id(claims)
+    expect(claims.dig('https://purl.imsglobal.org/spec/lti/claim/resource_link', 'id')).to eq course.lti_context_id
+  end
+
+  def expect_assignment_and_grade_scope(claims)
+    expect(claims.dig('https://purl.imsglobal.org/spec/lti-ags/claim/endpoint', 'scope')).to eq developer_key_scopes
+  end
+
+  def expect_assignment_and_grade_line_item_url(claims)
+    expect(claims.dig('https://purl.imsglobal.org/spec/lti-ags/claim/endpoint', 'lineitem')).to eq 'lti_line_item_show_url'
+  end
+
+  def expect_assignment_and_grade_line_item_url_absent(claims)
+    expect(claims['https://purl.imsglobal.org/spec/lti-ags/claim/endpoint']).not_to include 'lineitem'
+  end
+
+  def expect_assignment_and_grade_line_items_url(claims)
+    expect(claims.dig('https://purl.imsglobal.org/spec/lti-ags/claim/endpoint', 'lineitems')).to eq 'lti_line_item_index_url'
   end
 end

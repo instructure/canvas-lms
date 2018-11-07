@@ -26,6 +26,7 @@ module LtiAdvantage::Messages
       launch_presentation: LtiAdvantage::Claims::LaunchPresentation,
       lis: LtiAdvantage::Claims::Lis,
       names_and_roles_service: LtiAdvantage::Claims::NamesAndRolesService,
+      assignment_and_grade_service: LtiAdvantage::Claims::AssignmentAndGradeService,
       tool_platform: LtiAdvantage::Claims::Platform,
       roles: Array,
       role_scope_mentor: Array
@@ -79,6 +80,10 @@ module LtiAdvantage::Messages
 
     def names_and_roles_service
       @names_and_roles_service ||= TYPED_ATTRIBUTES[:names_and_roles_service].new
+    end
+
+    def assignment_and_grade_service
+      @assignment_and_grade_service ||= TYPED_ATTRIBUTES[:assignment_and_grade_service].new
     end
 
     def lis

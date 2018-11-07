@@ -51,6 +51,11 @@ module LtiAdvantage::Messages
         message.names_and_roles_service.context_memberships_url = 'http://some.meaningless.url.com'
         expect(message.names_and_roles_service.context_memberships_url).to eq 'http://some.meaningless.url.com'
       end
+
+      it 'initializes "assignment_and_grade_service" when it is referenced' do
+        message.assignment_and_grade_service.lineitems = 'http://some.meaningless.url.com'
+        expect(message.assignment_and_grade_service.lineitems).to eq 'http://some.meaningless.url.com'
+      end
     end
 
     describe 'validations' do
@@ -159,6 +164,14 @@ module LtiAdvantage::Messages
         message.validate
         expect(message.errors.messages[:names_and_roles_service]).to match_array [
           'names_and_roles_service must be an instance of LtiAdvantage::Claims::NamesAndRolesService'
+        ]
+      end
+
+      it 'verifies that "assignment_and_grade_service" is an AssignmentAndGradeService' do
+        message.assignment_and_grade_service = 'foo'
+        message.validate
+        expect(message.errors.messages[:assignment_and_grade_service]).to match_array [
+          'assignment_and_grade_service must be an instance of LtiAdvantage::Claims::AssignmentAndGradeService'
         ]
       end
     end

@@ -20,6 +20,7 @@ module LtiAdvantage::Serializers
     IMS_CLAIM_PREFIX = 'https://purl.imsglobal.org/spec/lti/claim/'.freeze
     DL_CLAIM_PREFIX = 'https://purl.imsglobal.org/spec/lti-dl/claim/'.freeze
     NRPS_CLAIM_URL = 'https://purl.imsglobal.org/spec/lti-nrps/claim/namesroleservice'.freeze
+    AGS_CLAIM_URL = 'https://purl.imsglobal.org/spec/lti-ags/claim/endpoint'.freeze
 
     STANDARD_IMS_CLAIMS = %w(
       context
@@ -42,6 +43,7 @@ module LtiAdvantage::Serializers
     ).freeze
 
     NAMES_AND_ROLES_SERVICE_CLAIM = 'names_and_roles_service'.freeze
+    ASSIGNMENT_AND_GRADE_SERVICE_CLAIM = 'assignment_and_grade_service'.freeze
 
     def initialize(object)
       @object = object
@@ -67,6 +69,8 @@ module LtiAdvantage::Serializers
           "#{DL_CLAIM_PREFIX}#{key}"
         elsif NAMES_AND_ROLES_SERVICE_CLAIM == key
           NRPS_CLAIM_URL
+        elsif ASSIGNMENT_AND_GRADE_SERVICE_CLAIM == key
+          AGS_CLAIM_URL
         else
           key
         end
