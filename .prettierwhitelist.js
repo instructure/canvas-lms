@@ -11,6 +11,7 @@ const PRETTIER_WHITELIST = module.exports =  [
   'app/jsx/*.js',
   'frontend_build/**/*.js',
   'script/**/*.js',
+  'app/jsx/account_settings/**/*.js',
   appAndSpecDirsFor('account_course_user_search'),
   appAndSpecDirsFor('announcements'),
   appAndSpecDirsFor('assignments_2'),
