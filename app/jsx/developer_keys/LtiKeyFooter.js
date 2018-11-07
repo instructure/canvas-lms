@@ -44,7 +44,7 @@ export default class LtiKeyFooter extends React.Component {
     const buttonText = customizing ? I18n.t('Save Customizations') : I18n.t('Save and Customize')
 
     return (
-      <Button onClick={clickHandler} variant="primary">
+      <Button onClick={clickHandler} variant="primary" disabled={this.props.disable}>
         {buttonText}
       </Button>
     )
@@ -67,5 +67,6 @@ LtiKeyFooter.propTypes = {
   onCancelClick: PropTypes.func.isRequired,
   onSaveClick: PropTypes.func.isRequired,
   onAdvanceToCustomization: PropTypes.func.isRequired,
-  customizing: PropTypes.bool.isRequired
+  customizing: PropTypes.bool.isRequired,
+  disable: PropTypes.bool
 }

@@ -181,8 +181,8 @@ actions.editDeveloperKey = payload => dispatch => {
 }
 
 actions.DEVELOPER_KEYS_MODAL_OPEN = 'DEVELOPER_KEYS_MODAL_OPEN'
-actions.developerKeysModalOpen = () => {
-  window.location.hash = "key_modal_opened"
+actions.developerKeysModalOpen = (type = 'api') => {
+  window.location.hash = `${type}_key_modal_opened`
   return {type: actions.DEVELOPER_KEYS_MODAL_OPEN}
 }
 

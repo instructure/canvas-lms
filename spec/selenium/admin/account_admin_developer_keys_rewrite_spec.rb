@@ -400,7 +400,7 @@ describe 'Developer Keys' do
       end
 
       it "opens the developer key modal when open modal anchor is present" do
-        get "/accounts/#{Account.default.id}/developer_keys#key_modal_opened"
+        get "/accounts/#{Account.default.id}/developer_keys#api_key_modal_opened"
         expect(find_button("Save Key")).to be_present
       end
 

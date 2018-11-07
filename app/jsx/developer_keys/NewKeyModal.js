@@ -129,12 +129,12 @@ export default class DeveloperKeyModal extends React.Component {
     return this.props.createLtiKeyState.isLtiKey
   }
 
+  get isSaving() {
+    return this.props.createOrEditDeveloperKeyState.developerKeyCreateOrEditPending || this.props.createLtiKeyState.saveToolConfigurationPending
+  }
+
   modalBody() {
-    const isSavingDeveloperKey = this.props.createOrEditDeveloperKeyState.developerKeyCreateOrEditPending
-    const isSavingLtiToolConfig = this.props.createLtiKeyState.saveToolConfigurationPending
-    if (
-      isSavingDeveloperKey || isSavingLtiToolConfig
-    ) {
+    if (this.isSaving) {
       return this.spinner()
     }
     return this.developerKeyForm()
@@ -142,19 +142,22 @@ export default class DeveloperKeyModal extends React.Component {
 
   modalFooter() {
     if (this.isLtiKey) {
+      const { createLtiKeyState, store, actions } = this.props
       return(
         <LtiKeyFooter
           onCancelClick={this.closeModal}
           onSaveClick={this.saveCustomizations}
           onAdvanceToCustomization={this.saveLtiToolConfiguration}
-          customizing={this.props.createLtiKeyState.customizing}
-          ltiKeysSetCustomizing={this.props.actions.ltiKeysSetCustomizing}
-          dispatch={this.props.store.dispatch}
+          customizing={createLtiKeyState.customizing}
+          disable={this.isSaving}
+          ltiKeysSetCustomizing={actions.ltiKeysSetCustomizing}
+          dispatch={store.dispatch}
         />
       )
     }
     return(
       <NewKeyFooter
+        disable={this.isSaving}
         onCancelClick={this.closeModal}
         onSaveClick={this.submitForm}
       />
