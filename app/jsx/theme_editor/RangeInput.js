@@ -66,7 +66,7 @@ export default class RangeInput extends Component {
   }
 
   render() {
-    var {labelText, formatValue, onChange, value, ...props} = this.props
+    const {labelText, formatValue, onChange, value, ...props} = this.props
 
     return (
       <label className="RangeInput">

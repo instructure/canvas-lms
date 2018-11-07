@@ -47,7 +47,12 @@ const TABS = [
   }
 ]
 
-const OVERRIDE_FILE_KEYS = ['js_overrides', 'css_overrides', 'mobile_js_overrides', 'mobile_css_overrides'];
+const OVERRIDE_FILE_KEYS = [
+  'js_overrides',
+  'css_overrides',
+  'mobile_js_overrides',
+  'mobile_css_overrides'
+]
 
 function findVarDef(variableSchema, variableName) {
   for (let i = 0; i < variableSchema.length; i++) {
@@ -99,9 +104,9 @@ export default class ThemeEditor extends React.Component {
       themeStore: {
         properties: {...this.originalThemeProperties},
         files: OVERRIDE_FILE_KEYS.map(key => ({
-            customFileUpload: true,
-            variable_name: key,
-            value: this.originalThemeOverrides[key]
+          customFileUpload: true,
+          variable_name: key,
+          value: this.originalThemeOverrides[key]
         }))
       },
       changedValues: {},
@@ -175,13 +180,12 @@ export default class ThemeEditor extends React.Component {
       if (opts.customFileUpload) {
         fileStorageObject.customFileUpload = true
       }
-      const index = files.findIndex(x => x.variable_name === key);
+      const index = files.findIndex(x => x.variable_name === key)
       if (index !== -1) {
-        files[index] = fileStorageObject;
+        files[index] = fileStorageObject
       } else {
-        files.push(fileStorageObject);
+        files.push(fileStorageObject)
       }
-
     } else {
       properties = {
         ...properties,
@@ -287,11 +291,15 @@ export default class ThemeEditor extends React.Component {
       if (!f.customFileUpload || (f.customFileUpload && f.value != null)) {
         processedData.append(keyName, f.value)
       }
-    });
+    })
     // We need to make sure that these are present with the upload
     OVERRIDE_FILE_KEYS.forEach(name => {
-      if (!processedData.has(name) || processedData.get(name) === 'undefined' || processedData.get(name) === 'null') {
-        processedData.append(name, this.props.brandConfig[name] || '');
+      if (
+        !processedData.has(name) ||
+        processedData.get(name) === 'undefined' ||
+        processedData.get(name) === 'null'
+      ) {
+        processedData.append(name, this.props.brandConfig[name] || '')
       }
     })
     return processedData

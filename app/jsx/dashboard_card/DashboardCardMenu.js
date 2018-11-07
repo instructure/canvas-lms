@@ -157,12 +157,12 @@ export default class DashboardCardMenu extends React.Component {
           <CloseButton
             buttonRef={c => (this._closeButton = c)}
             placement="end"
-            onClick={() => this.setState({show:false})}
+            onClick={() => this.setState({show: false})}
           >
             {I18n.t('Close')}
           </CloseButton>
           <div style={menuStyles}>
-            {(
+            {
               <div>
                 <TabList
                   ref={c => (this._tabList = c)}
@@ -182,7 +182,7 @@ export default class DashboardCardMenu extends React.Component {
                   </TabPanel>
                 </TabList>
               </div>
-            )}
+            }
           </div>
         </PopoverContent>
       </Popover>

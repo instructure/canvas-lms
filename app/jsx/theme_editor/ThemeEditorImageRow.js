@@ -45,17 +45,20 @@ export default class ThemeEditorImageRow extends Component {
 
   // valid input: null, '', or an HTMLInputElement
   setValue = inputElementOrNewValue => {
-    var chosenValue = inputElementOrNewValue
+    let chosenValue = inputElementOrNewValue
 
     if (!inputElementOrNewValue) {
-      //if it's null or ''
+      // if it's null or ''
       // if they hit the "Undo" or "Use Default" button,
       // we want to also clear out the value of the <input type=file>
       // but we don't want to mess with its value otherwise
       this.fileInput.value = ''
       if (isSet(this.props.userInput.val)) {
         // In this case, they clicked 'Use Default' so we need to make sure we really do go with the default
-        this.props.handleThemeStateChange(this.props.varDef.variable_name, null, {resetValue: true, useDefault: true})
+        this.props.handleThemeStateChange(this.props.varDef.variable_name, null, {
+          resetValue: true,
+          useDefault: true
+        })
       } else {
         this.props.handleThemeStateChange(this.props.varDef.variable_name, null, {resetValue: true})
       }
@@ -70,8 +73,8 @@ export default class ThemeEditorImageRow extends Component {
   }
 
   render() {
-    var inputName = 'brand_config[variables][' + this.props.varDef.variable_name + ']'
-    var imgSrc = this.props.userInput.val || this.props.placeholder
+    const inputName = `brand_config[variables][${this.props.varDef.variable_name}]`
+    const imgSrc = this.props.userInput.val || this.props.placeholder
 
     return (
       <section className="Theme__editor-accordion_element Theme__editor-upload">
@@ -85,10 +88,9 @@ export default class ThemeEditorImageRow extends Component {
             </div>
 
             <div
-              className={
-                'Theme__editor_preview-img-container Theme__editor_preview-img-container--' +
+              className={`Theme__editor_preview-img-container Theme__editor_preview-img-container--${
                 this.props.varDef.variable_name
-              }
+              }`}
             >
               {/* ^ this utility class is to control the background color that shows behind the images you can customize in theme editor - see theme_editor.scss */}
               <div className="Theme__editor_preview-img">

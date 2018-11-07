@@ -27,7 +27,7 @@ let activeEditorNodes = null
 let initPromise = null
 
 const initializedTest = (description, fn) => {
-  test(description, (assert) => {
+  test(description, assert => {
     const done = assert.async()
     initPromise.then(() => {
       fn()
@@ -38,18 +38,19 @@ const initializedTest = (description, fn) => {
 
 QUnit.module('EditorAccessibility', {
   setup() {
-    initPromise = new Promise((resolve) => {
+    initPromise = new Promise(resolve => {
       textarea = $("<textarea id='a42' data-rich_text='true'></textarea>")
       fixtures.append(textarea)
-      tinymce.init({
-        selector: '#fixtures textarea#a42',
-      }).then(() => {
-        resolve();
-      })
+      tinymce
+        .init({
+          selector: '#fixtures textarea#a42'
+        })
+        .then(() => {
+          resolve()
+        })
       acc = new EditorAccessibility(tinymce.activeEditor)
       activeEditorNodes = tinymce.activeEditor.getContainer().children
-
-    });
+    })
   },
   teardown() {
     textarea.remove()
@@ -60,10 +61,9 @@ QUnit.module('EditorAccessibility', {
   }
 })
 
-initializedTest('initialization', () => equal(acc.$el.length, 1));
+initializedTest('initialization', () => equal(acc.$el.length, 1))
 
 initializedTest('cacheElements grabs the relevant tinymce iframe', () => {
-
   acc._cacheElements()
   ok(acc.$iframe.length, 1)
 })

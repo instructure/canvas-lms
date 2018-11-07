@@ -34,6 +34,6 @@ const getDroppableDashboardCardBox = (backend = ReactDnDHTML5Backend) =>
       connectDropTarget: connect.dropTarget()
     }))
   )(DashboardCardBox)
-  /* eslint-enable new-cap */
+/* eslint-enable new-cap */
 
 export default getDroppableDashboardCardBox

@@ -21,7 +21,7 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
 import customTypes from './PropTypes'
-import Modal, { ModalBody, ModalFooter } from 'jsx/shared/components/InstuiModal'
+import Modal, {ModalBody, ModalFooter} from 'jsx/shared/components/InstuiModal'
 
 export default class SaveThemeButton extends Component {
   static propTypes = {
@@ -121,7 +121,8 @@ export default class SaveThemeButton extends Component {
               onClick={() => this.setState({modalIsOpen: false})}
             >
               {I18n.t('Cancel')}
-            </button>&nbsp;
+            </button>
+            &nbsp;
             <button
               type="button"
               onClick={this.save}

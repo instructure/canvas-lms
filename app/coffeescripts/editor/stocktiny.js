@@ -28,6 +28,6 @@ import 'tinymce/plugins/lists/plugin'
 import 'tinymce/plugins/wordcount/plugin'
 
 // prevent tiny from loading any CSS assets
-tinymce.DOM.loadCSS = function () {}
+tinymce.DOM.loadCSS = function() {}
 
 export default tinymce

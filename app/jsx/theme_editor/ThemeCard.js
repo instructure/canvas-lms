@@ -22,15 +22,11 @@ import {string, func, bool} from 'prop-types'
 import SVGWrapper from '../shared/SVGWrapper'
 import ReactCSSTransitionGroup from 'react-transition-group/CSSTransitionGroup'
 
-export default function ThemeCard (props) {
+export default function ThemeCard(props) {
   const getVar = props.getVariable
   return (
     <div className={`ic-ThemeCard ${props.isActiveBrandConfig && 'ic-ThemeCard--is-active-theme'}`}>
-      <div
-        className="ic-ThemeCard-thumbnail"
-        aria-hidden="true"
-        onClick={props.open}
-      >
+      <div className="ic-ThemeCard-thumbnail" aria-hidden="true" onClick={props.open}>
         <div className="ic-ThemeCard-thumbnail__primary-content">
           <div className="ic-ThemeCard-fake-text" />
           <div
@@ -39,7 +35,7 @@ export default function ThemeCard (props) {
           >
             <div
               className="ic-ThemeCard-fake-progressbar__inner"
-              style={{ backgroundColor: getVar('ic-brand-primary') }}
+              style={{backgroundColor: getVar('ic-brand-primary')}}
             />
           </div>
           <div className="ic-ThemeCard-fake-radio">
@@ -54,7 +50,7 @@ export default function ThemeCard (props) {
           <div className="ic-ThemeCard-fake-checkbox">
             <div
               className="ic-ThemeCard-fake-checkbox__inner"
-              style={{ backgroundColor: getVar('ic-brand-primary') }}
+              style={{backgroundColor: getVar('ic-brand-primary')}}
             >
               <i className="icon-check" />
             </div>
@@ -63,109 +59,93 @@ export default function ThemeCard (props) {
         <div className="ic-ThemeCard-thumbnail__secondary-content">
           <div
             className="ic-ThemeCard-fake-button"
-            style={{ backgroundColor: getVar('ic-brand-button--primary-bgd') }}
+            style={{backgroundColor: getVar('ic-brand-button--primary-bgd')}}
           />
           <div
             className="ic-ThemeCard-fake-button"
-            style={{ backgroundColor: getVar('ic-brand-button--secondary-bgd') }}
+            style={{backgroundColor: getVar('ic-brand-button--secondary-bgd')}}
           />
         </div>
         <div
           className="ic-ThemeCard-thumbnail__nav"
-          style={{ backgroundColor: getVar('ic-brand-global-nav-bgd') }}
+          style={{backgroundColor: getVar('ic-brand-global-nav-bgd')}}
         >
           <div className="ic-ThemeCard-thumbnail__icon">
             <SVGWrapper
               url="/images/svg-icons/svg_icon_courses_new_styles.svg"
-              fillColor={ getVar('ic-brand-global-nav-ic-icon-svg-fill') }
+              fillColor={getVar('ic-brand-global-nav-ic-icon-svg-fill')}
             />
             <div
               className="ic-ThemeCard-thumbnail__icon-text"
-              style={{ backgroundColor: getVar('ic-brand-global-nav-menu-item__text-color') }}
+              style={{backgroundColor: getVar('ic-brand-global-nav-menu-item__text-color')}}
             />
           </div>
           <div className="ic-ThemeCard-thumbnail__icon">
             <SVGWrapper
               url="/images/svg-icons/svg_icon_calendar_new_styles.svg"
-              fillColor={ getVar('ic-brand-global-nav-ic-icon-svg-fill') }
+              fillColor={getVar('ic-brand-global-nav-ic-icon-svg-fill')}
             />
             <div
               className="ic-ThemeCard-thumbnail__icon-text"
-              style={{ backgroundColor: getVar('ic-brand-global-nav-menu-item__text-color') }}
+              style={{backgroundColor: getVar('ic-brand-global-nav-menu-item__text-color')}}
             />
           </div>
           <div className="ic-ThemeCard-thumbnail__icon">
             <SVGWrapper
               url="/images/svg-icons/svg_icon_inbox.svg"
-              fillColor={ getVar('ic-brand-global-nav-ic-icon-svg-fill') }
+              fillColor={getVar('ic-brand-global-nav-ic-icon-svg-fill')}
             />
             <div
               className="ic-ThemeCard-thumbnail__icon-text"
-              style={{ backgroundColor: getVar('ic-brand-global-nav-menu-item__text-color') }}
+              style={{backgroundColor: getVar('ic-brand-global-nav-menu-item__text-color')}}
             />
           </div>
         </div>
-        { !props.isBeingDeleted &&
+        {!props.isBeingDeleted && (
           <div className="ic-ThemeCard-overlay">
             <div className="ic-ThemeCard-overlay__content">
-              <div className="Button Button--primary">
-                {I18n.t('Open in Theme Editor')}
-              </div>
+              <div className="Button Button--primary">{I18n.t('Open in Theme Editor')}</div>
             </div>
           </div>
-        }
+        )}
       </div>
       <div className="ic-ThemeCard-main">
         <div className="ic-ThemeCard-main__name">
-          <button
-            type="button"
-            className="ic-ThemeCard-name-button"
-            onClick={props.open}
-          >
+          <button type="button" className="ic-ThemeCard-name-button" onClick={props.open}>
             <span className="screenreader-only">
-              { props.isActiveBrandConfig ? I18n.t('This is your current theme') : null }
+              {props.isActiveBrandConfig ? I18n.t('This is your current theme') : null}
               {I18n.t('Edit this theme in Theme Editor')}
             </span>
             {props.name}
           </button>
         </div>
         <div className="ic-ThemeCard-main__actions">
-          { props.isDeletable &&
+          {props.isDeletable && (
             <button className="Button Button--icon-action" onClick={props.startDeleting}>
               <span className="screenreader-only">{I18n.t('Delete theme')}</span>
               <i className="icon-trash" />
             </button>
-          }
+          )}
         </div>
       </div>
       <ReactCSSTransitionGroup transitionName="ic-ThemeCard-overlay-transition">
-      { props.isBeingDeleted &&
-        <div className="ic-ThemeCard-overlay">
-          <div className="ic-ThemeCard-overlay__content">
-            <h4 className="ic-ThemeCard-overlay__heading">
-              {I18n.t('Delete this theme?')}
-            </h4>
-            <div className="ic-ThemeCard-overlay__actions">
-              <button
-                type="button"
-                className="Button"
-                onClick={props.cancelDeleting}
-              >
-                {I18n.t('Cancel')}
-              </button>
-              <button
-                type="button"
-                className="Button Button--danger"
-                onClick={props.onDelete}
-              >
-                {I18n.t('Delete')}
-              </button>
+        {props.isBeingDeleted && (
+          <div className="ic-ThemeCard-overlay">
+            <div className="ic-ThemeCard-overlay__content">
+              <h4 className="ic-ThemeCard-overlay__heading">{I18n.t('Delete this theme?')}</h4>
+              <div className="ic-ThemeCard-overlay__actions">
+                <button type="button" className="Button" onClick={props.cancelDeleting}>
+                  {I18n.t('Cancel')}
+                </button>
+                <button type="button" className="Button Button--danger" onClick={props.onDelete}>
+                  {I18n.t('Delete')}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      }
+        )}
       </ReactCSSTransitionGroup>
-      { props.isActiveBrandConfig &&
+      {props.isActiveBrandConfig && (
         <div
           className="ic-ThemeCard-status ic-ThemeCard-status--is-active-theme"
           aria-hidden="true"
@@ -179,14 +159,16 @@ export default function ThemeCard (props) {
                 type="button"
                 className="Button Button--icon-action-rev"
                 data-tooltip='{"tooltipClass":"popover popover-padded", "position":"right"}'
-                title={I18n.t('Multiple are marked "Current theme" because the same values have been saved under multiple names—i.e., they\'re each the same as what\'s currently applied')}
+                title={I18n.t(
+                  'Multiple are marked "Current theme" because the same values have been saved under multiple names—i.e., they\'re each the same as what\'s currently applied'
+                )}
               >
                 <i className="icon-question" aria-hidden="true" />
               </button>
             )}
           </span>
         </div>
-      }
+      )}
     </div>
   )
 }

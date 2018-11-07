@@ -157,14 +157,20 @@ module.exports = {
       // to start ensuring conforms to prettier, add it to this array to opt-in
       // now to conform to prettier.
       files: [
-        'frontend_build/**/*.js',
         './*.js',
-        'script/**/*.js',
-        'app/jsx/permissions/**/*.js',
+        'app/jsx/*.js',
         'app/jsx/account_course_user_search/**/*.js',
-        'app/jsx/discussions/**/*.js',
         'app/jsx/announcements/**/*.js',
-        'app/jsx/assignments_2/**/*.js'
+        'app/jsx/assignments_2/**/*.js',
+        'app/jsx/dashboard_card/**/*.js',
+        'app/jsx/discussions/**/*.js',
+        'app/jsx/editor/**/*.js',
+        'app/jsx/help_dialog/**/*.js',
+        'app/jsx/login/**/*.js',
+        'app/jsx/permissions/**/*.js',
+        'app/jsx/theme_editor/**/*.js',
+        'frontend_build/**/*.js',
+        'script/**/*.js'
       ],
       rules: {
         'prettier/prettier': 'error'

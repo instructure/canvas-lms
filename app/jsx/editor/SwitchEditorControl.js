@@ -34,9 +34,13 @@ class SwitchEditorControl extends React.Component {
     e.preventDefault()
     RichContentEditor.callOnRCE(this.props.textarea, 'toggle')
     if (this.state.mode == 'rce') {
-      this.setState({mode: 'html'}, () => { this.switchLink.focus() })
+      this.setState({mode: 'html'}, () => {
+        this.switchLink.focus()
+      })
     } else {
-      this.setState({mode: 'rce'}, () => { this.switchLink.focus() })
+      this.setState({mode: 'rce'}, () => {
+        this.switchLink.focus()
+      })
     }
   }
 
@@ -63,7 +67,12 @@ class SwitchEditorControl extends React.Component {
   render() {
     return (
       <div style={{float: 'right'}}>
-        <a ref={c => (this.switchLink = c)} href="#" className={this.linkClass()} onClick={this.toggle}>
+        <a
+          ref={c => (this.switchLink = c)}
+          href="#"
+          className={this.linkClass()}
+          onClick={this.toggle}
+        >
           {this.switchLinkText()}
         </a>
       </div>

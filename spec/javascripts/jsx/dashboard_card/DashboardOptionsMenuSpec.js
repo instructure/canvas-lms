@@ -20,55 +20,37 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import { shallow, mount } from 'enzyme'
+import {shallow, mount} from 'enzyme'
 import DashboardOptionsMenu from 'jsx/dashboard_card/DashboardOptionsMenu'
-import moxios from 'moxios';
+import moxios from 'moxios'
 import sinon from 'sinon'
 
 const container = document.getElementById('fixtures')
 
-const FakeDashboard = function (props) {
+const FakeDashboard = function(props) {
   return (
     <div>
       <DashboardOptionsMenu
-        ref={(c) => { props.menuRef(c) }}
+        ref={c => {
+          props.menuRef(c)
+        }}
         view={props.view}
         planner_enabled={props.planner_enabled}
         onDashboardChange={props.onDashboardChange}
       />
-      {
-        props.planner_enabled && (
-          <div>
-            <div
-              id="dashboard-planner"
-              style={{ display: 'block' }}
-            />
-            <div
-              id="dashboard-planner-header"
-              style={{ display: 'block' }}
-            />
-          </div>
-        )
-      }
-      <div
-        id="dashboard-activity"
-        style={{ display: 'block' }}
-      />
-      <div
-        id="DashboardCard_Container"
-        style={{ display: 'none' }}
-      >
+      {props.planner_enabled && (
+        <div>
+          <div id="dashboard-planner" style={{display: 'block'}} />
+          <div id="dashboard-planner-header" style={{display: 'block'}} />
+        </div>
+      )}
+      <div id="dashboard-activity" style={{display: 'block'}} />
+      <div id="DashboardCard_Container" style={{display: 'none'}}>
         <div className="ic-DashboardCard__header">
           <div className="ic-DashboardCard__header_image">
-            <div
-              className="ic-DashboardCard__header_hero"
-              style={{opacity: 0.6}}
-            />
+            <div className="ic-DashboardCard__header_hero" style={{opacity: 0.6}} />
           </div>
-          <div
-            className="ic-DashboardCard__header-button-bg"
-            style={{opacity: 0}}
-          />
+          <div className="ic-DashboardCard__header-button-bg" style={{opacity: 0}} />
         </div>
       </div>
     </div>
@@ -79,105 +61,122 @@ FakeDashboard.propTypes = {
   menuRef: PropTypes.func.isRequired,
   view: PropTypes.string,
   planner_enabled: PropTypes.bool,
-  onDashboardChange: PropTypes.func,
+  onDashboardChange: PropTypes.func
 }
 
 FakeDashboard.defaultProps = {
   view: 'cards',
   planner_enabled: false,
-  onDashboardChange: () => {},
+  onDashboardChange: () => {}
 }
 
 QUnit.module('Dashboard Options Menu', {
-  afterEach () {
+  afterEach() {
     ReactDOM.unmountComponentAtNode(container)
   }
 })
 
-test('it renders', function () {
+test('it renders', function() {
   const dashboardMenu = TestUtils.renderIntoDocument(
     <DashboardOptionsMenu onDashboardChange={() => {}} />
   )
   ok(dashboardMenu)
 })
 
-test('it should call onDashboardChange when new view is selected', function () {
+test('it should call onDashboardChange when new view is selected', function() {
   const onDashboardChangeSpy = sinon.spy()
 
   const wrapper = shallow(
-    <DashboardOptionsMenu
-      view="planner"
-      onDashboardChange={onDashboardChangeSpy}
-    />)
+    <DashboardOptionsMenu view="planner" onDashboardChange={onDashboardChangeSpy} />
+  )
 
   wrapper.instance().handleViewOptionSelect(null, ['cards'])
   equal(onDashboardChangeSpy.callCount, 1)
   ok(onDashboardChangeSpy.calledWith('cards'))
 })
 
-test('it should not call onDashboardChange when correct view is already set', function () {
+test('it should not call onDashboardChange when correct view is already set', function() {
   const onDashboardChangeSpy = sinon.spy()
 
-  const wrapper = mount(<DashboardOptionsMenu view="activity" onDashboardChange={onDashboardChangeSpy} />)
+  const wrapper = mount(
+    <DashboardOptionsMenu view="activity" onDashboardChange={onDashboardChangeSpy} />
+  )
   wrapper.find('button').simulate('click')
 
   const menuItems = Array.from(document.querySelectorAll('[role="menuitemradio"]'))
-  const recentActivity = menuItems.filter(menuItem => menuItem.textContent.trim() === 'Recent Activity')[0]
+  const recentActivity = menuItems.filter(
+    menuItem => menuItem.textContent.trim() === 'Recent Activity'
+  )[0]
   recentActivity.click()
 
   equal(onDashboardChangeSpy.callCount, 0)
   wrapper.unmount()
 })
 
-test('it should include a List View menu item when Student Planner is enabled', function () {
-  const wrapper = mount(
-    <DashboardOptionsMenu
-      planner_enabled
-      onDashboardChange={() => {}}
-    />
-  )
+test('it should include a List View menu item when Student Planner is enabled', function() {
+  const wrapper = mount(<DashboardOptionsMenu planner_enabled onDashboardChange={() => {}} />)
   wrapper.find('button').simulate('click')
   const menuItems = Array.from(document.querySelectorAll('[role="menuitemradio"]'))
   ok(menuItems.some(menuItem => menuItem.textContent.trim() === 'List View'))
   wrapper.unmount()
-});
+})
 
-test('it should display toggle color overlay option if card view is set', function () {
+test('it should display toggle color overlay option if card view is set', function() {
   const wrapper = mount(<DashboardOptionsMenu onDashboardChange={() => {}} />)
   wrapper.find('button').simulate('click')
 
   const menuItems = Array.from(document.querySelectorAll('[role="menuitemradio"]'))
-  const colorToggle = menuItems.filter(menuItem => menuItem.textContent.trim() === 'Color Overlay')[0]
+  const colorToggle = menuItems.filter(
+    menuItem => menuItem.textContent.trim() === 'Color Overlay'
+  )[0]
 
   ok(colorToggle)
   wrapper.unmount()
 })
 
-test('it should not display toggle color overlay option if recent activity view is set', function () {
+test('it should not display toggle color overlay option if recent activity view is set', function() {
   const wrapper = mount(<DashboardOptionsMenu view="activity" onDashboardChange={() => {}} />)
   wrapper.find('button').simulate('click')
 
   const menuItems = Array.from(document.querySelectorAll('[role="menuitemradio"]'))
-  const colorToggle = menuItems.filter(menuItem => menuItem.textContent.trim() === 'Color Overlay')[0]
+  const colorToggle = menuItems.filter(
+    menuItem => menuItem.textContent.trim() === 'Color Overlay'
+  )[0]
 
   notOk(colorToggle)
   wrapper.unmount()
 })
 
-test('it should toggle color overlays', function () {
+test('it should toggle color overlays', function() {
   sandbox.stub(DashboardOptionsMenu.prototype, 'postToggleColorOverlays')
   let dashboardMenu = null
   ReactDOM.render(
     <FakeDashboard
-      menuRef={(c) => { dashboardMenu = c }}
-      dashboard_view='cards'
-    />, container)
+      menuRef={c => {
+        dashboardMenu = c
+      }}
+      dashboard_view="cards"
+    />,
+    container
+  )
 
   dashboardMenu.handleColorOverlayOptionSelect(false)
-  strictEqual(document.getElementsByClassName('ic-DashboardCard__header_hero')[0].style.opacity, '0')
-  strictEqual(document.getElementsByClassName('ic-DashboardCard__header-button-bg')[0].style.opacity, '1')
+  strictEqual(
+    document.getElementsByClassName('ic-DashboardCard__header_hero')[0].style.opacity,
+    '0'
+  )
+  strictEqual(
+    document.getElementsByClassName('ic-DashboardCard__header-button-bg')[0].style.opacity,
+    '1'
+  )
 
   dashboardMenu.handleColorOverlayOptionSelect(true)
-  strictEqual(document.getElementsByClassName('ic-DashboardCard__header_hero')[0].style.opacity, '0.6')
-  strictEqual(document.getElementsByClassName('ic-DashboardCard__header-button-bg')[0].style.opacity, '0')
-});
+  strictEqual(
+    document.getElementsByClassName('ic-DashboardCard__header_hero')[0].style.opacity,
+    '0.6'
+  )
+  strictEqual(
+    document.getElementsByClassName('ic-DashboardCard__header-button-bg')[0].style.opacity,
+    '0'
+  )
+})

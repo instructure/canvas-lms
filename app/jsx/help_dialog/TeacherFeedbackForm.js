@@ -123,7 +123,8 @@ class TeacherFeedbackForm extends React.Component {
           <div className="ic-HelpDialog__form-actions">
             <button type="button" className="Button" onClick={this.handleCancelClick}>
               {I18n.t('Cancel')}
-            </button>&nbsp;
+            </button>
+            &nbsp;
             <button
               type="submit"
               disabled={!this.state.coursesLoaded}

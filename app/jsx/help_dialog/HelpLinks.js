@@ -28,37 +28,45 @@ export default function HelpLinks({links, hasLoaded, onClick}) {
   return (
     <List variant="unstyled" margin="small 0" itemSpacing="small">
       {hasLoaded ? (
-        links.map((link, index) => (
-          <ListItem key={`link-${index}`}>
-            <Link
-              href={link.url}
-              target="_blank"
-              rel="noopener"
-              onClick={event => {
-                if (link.url === '#create_ticket' || link.url === '#teacher_feedback') {
-                  event.preventDefault()
-                  onClick(link.url)
-                }
-              }}
-            >
-              {link.text}
-            </Link>
-            {link.subtext && (
-              <Text as="div" size="small" weight="light">{link.subtext}</Text>
-            )}
-          </ListItem>
-        )).concat(
-          // if the current user is an admin, show the settings link to
-          // customize this menu
-          window.ENV.current_user_roles && window.ENV.current_user_roles.includes('root_admin') && ([
-            <ListItem key="hr"><hr role="presentation"/></ListItem>,
-            <ListItem key="customize">
-              <Link href="/accounts/self/settings#custom_help_link_settings" >
-                {I18n.t('Customize this menu')}
+        links
+          .map((link, index) => (
+            <ListItem key={`link-${index}`}>
+              <Link
+                href={link.url}
+                target="_blank"
+                rel="noopener"
+                onClick={event => {
+                  if (link.url === '#create_ticket' || link.url === '#teacher_feedback') {
+                    event.preventDefault()
+                    onClick(link.url)
+                  }
+                }}
+              >
+                {link.text}
               </Link>
+              {link.subtext && (
+                <Text as="div" size="small" weight="light">
+                  {link.subtext}
+                </Text>
+              )}
             </ListItem>
-          ])
-        ).filter(Boolean)
+          ))
+          .concat(
+            // if the current user is an admin, show the settings link to
+            // customize this menu
+            window.ENV.current_user_roles &&
+              window.ENV.current_user_roles.includes('root_admin') && [
+                <ListItem key="hr">
+                  <hr role="presentation" />
+                </ListItem>,
+                <ListItem key="customize">
+                  <Link href="/accounts/self/settings#custom_help_link_settings">
+                    {I18n.t('Customize this menu')}
+                  </Link>
+                </ListItem>
+              ]
+          )
+          .filter(Boolean)
       ) : (
         <ListItem>
           <Spinner size="small" title={I18n.t('Loading')} />
@@ -69,11 +77,13 @@ export default function HelpLinks({links, hasLoaded, onClick}) {
 }
 
 HelpLinks.propTypes = {
-  links: arrayOf(shape({
-    url: string.isRequired,
-    text: string.isRequired,
-    subtext: string
-  })).isRequired,
+  links: arrayOf(
+    shape({
+      url: string.isRequired,
+      text: string.isRequired,
+      subtext: string
+    })
+  ).isRequired,
   hasLoaded: bool,
   onClick: func
 }
