@@ -622,6 +622,12 @@ END
         is_provisioned
       end
     },
+    'quizzes_next_submission_history' => {
+      display_name: -> { I18n.t('Quizzes.Next submission history') },
+      description: -> { I18n.t('If enabled, submission history for Quizzes.Next quizzes is dealt with separately.') },
+      applies_to: 'RootAccount',
+      state: 'on'
+    },
     'import_to_quizzes_next' =>
     {
       display_name: -> { I18n.t('Quizzes.Next Importing') },

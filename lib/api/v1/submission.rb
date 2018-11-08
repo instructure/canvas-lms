@@ -38,6 +38,8 @@ module Api::V1::Submission
             quiz_submission_attempt_json(ver.model, assignment, current_user, session, context, params)
           end
         end
+      elsif quizzes_next_submission?(submission)
+        hash['submission_history'] = quizzes_next_submission_history(submission)
       else
         histories = submission.submission_history
         if includes.include?("group")
@@ -375,5 +377,18 @@ module Api::V1::Submission
       assignment_id: assignment.id,
       anchor: anchor.to_json
     )
+  end
+
+  def quizzes_next_submission?(submission)
+    assignment = submission.assignment
+    assignment.quiz_lti? && assignment.root_account.feature_enabled?(:quizzes_next_submission_history)
+  end
+
+  def quizzes_next_submission_history(submission)
+    quiz_lti_submission = BasicLTI::QuizzesNextVersionedSubmission.new(
+      submission.assignment,
+      submission.user
+    )
+    quiz_lti_submission.grade_history
   end
 end
