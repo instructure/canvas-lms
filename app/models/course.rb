@@ -291,7 +291,7 @@ class Course < ActiveRecord::Base
 
   def update_account_associations_if_changed
     if (self.saved_change_to_root_account_id? || self.saved_change_to_account_id?) && !self.class.skip_updating_account_associations?
-      send_now_or_later_if_production(new_record? ? :now : :later, :update_account_associations)
+      send_now_or_later_if_production(saved_change_to_id? ? :now : :later, :update_account_associations)
     end
   end
 
