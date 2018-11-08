@@ -702,6 +702,28 @@ describe PlannerController do
              ['wiki_page', @other_page.id]]
           )
         end
+
+        it "should still work with context code if the student is from another shard" do
+          @shard1.activate do
+            @cs_student = user_factory(:active_all => true, :account => Account.create!)
+            @original_course.enroll_user(@cs_student, 'StudentEnrollment', :enrollment_state => 'active')
+            planner_note_model(course: @original_course, user: @cs_student)
+          end
+          group_category(context: @original_course)
+          @group = @group_category.groups.create!(context: @original_course)
+          @group.add_user(@cs_student, 'accepted')
+          @group_assignment = @original_course.assignments.create!(group_category: @group_category, due_at: 1.day.from_now)
+          @original_topic = @original_course.discussion_topics.create! todo_date: 1.day.from_now, title: 'fuh'
+          @original_page = @original_course.wiki_pages.create! todo_date: 1.day.from_now, title: 'duh'
+
+          user_session(@cs_student)
+
+          get :index, params: {context_codes: [@original_course.asset_string, @group.asset_string, @cs_student.asset_string]}
+          json = json_parse(response.body)
+          expect(json.map{|h| h["plannable_id"]}).to match_array([
+            @planner_note.id, @group_assignment.id, @original_topic.id, @original_page.id
+          ])
+        end
       end
 
       context "pagination" do
