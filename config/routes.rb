@@ -2179,6 +2179,11 @@ CanvasRails::Application.routes.draw do
       get 'assignments/:assignment_id', action: :show
     end
 
+    scope(controller: 'lti/ims/authentication') do
+      post 'authorize_redirect', action: :authorize_redirect
+      get 'authorize', action: :authorize, as: :lti_1_3_authorization
+    end
+
     %w(course account).each do |context|
       prefix = "#{context}s/:#{context}_id"
       post "#{prefix}/authorize", controller: 'lti/ims/authorization', action: :authorize, as: "#{context}_lti_oauth2_authorize"
