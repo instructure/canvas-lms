@@ -25,7 +25,9 @@ module Factories
       if opts[:active_all]
         u = User.create!
         u.register!
-        u.enable_feature!(:new_user_tutorial_on_off) if opts[:new_user]
+        if u.feature_enabled?(:new_user_tutorial_on_off) && !opts[:new_user]
+          u.disable_feature!(:new_user_tutorial_on_off)
+        end
         e = @course.enroll_teacher(u)
         e.workflow_state = 'active'
         e.save!

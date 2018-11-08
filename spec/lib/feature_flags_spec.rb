@@ -59,8 +59,8 @@ describe FeatureFlags do
   end
 
   describe "lookup_feature_flag" do
-    it "should raise an error if the feature isn't defined" do
-      expect { t_root_account.lookup_feature_flag('blah') }.to raise_error("no such feature - blah")
+    it "should return nil if the feature isn't defined" do
+      expect(t_root_account.lookup_feature_flag('blah')).to be_nil
     end
 
     it "should return nil if the feature doesn't apply" do

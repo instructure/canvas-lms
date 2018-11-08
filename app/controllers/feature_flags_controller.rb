@@ -200,9 +200,7 @@ class FeatureFlagsController < ApplicationController
   def show
     if authorized_action(@context, @current_user, :read)
       return render json: { message: "missing feature parameter" }, status: :bad_request unless params[:feature].present?
-      feature = params[:feature]
-      raise ActiveRecord::RecordNotFound unless Feature.definitions.has_key?(feature.to_s)
-      flag = @context.lookup_feature_flag(feature, Account.site_admin.grants_right?(@current_user, session, :read))
+      flag = @context.lookup_feature_flag(params[:feature], Account.site_admin.grants_right?(@current_user, session, :read))
       raise ActiveRecord::RecordNotFound unless flag
       render json: feature_flag_json(flag, @context, @current_user, session)
     end

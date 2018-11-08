@@ -758,7 +758,7 @@ class User < ActiveRecord::Base
   end
 
   def set_default_feature_flags
-    self.enable_feature!(:new_user_tutorial_on_off) unless Rails.env.test?
+    self.enable_feature!(:new_user_tutorial_on_off)
   end
 
   def sortable_name
