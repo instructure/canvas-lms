@@ -28,7 +28,8 @@ if (!process.env.JS_BUILD_NO_UGLIFY) {
       parallel: true,
       uglifyOptions: {
         compress: {
-          sequences: false // prevents it from combining a bunch of statments with ","s so it is easier to set breakpoints
+          sequences: false, // prevents it from combining a bunch of statments with ","s so it is easier to set breakpoints
+          reduce_funcs: false // works around this bug: https://github.com/facebook/react/issues/13987#issuecomment-437100945
         },
         ecma: 5,
         output: {
