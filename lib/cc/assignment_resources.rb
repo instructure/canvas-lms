@@ -164,6 +164,10 @@ module CC
       node.due_at CCHelper::ims_datetime(assignment.due_at, nil)
       node.lock_at CCHelper::ims_datetime(assignment.lock_at, nil)
       node.unlock_at CCHelper::ims_datetime(assignment.unlock_at, nil)
+      max_attempts = SettingsService.get_settings(object: 'assignment', id: assignment.migration_id)['max_attempts'].to_i || false
+      if max_attempts
+        node.max_attempts max_attempts
+      end
       if manifest && manifest.try(:user).present?
         node.module_locked assignment.locked_by_module_item?(manifest.user, deep_check_if_needed: true).present?
       end
