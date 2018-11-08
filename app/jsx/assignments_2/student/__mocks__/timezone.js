@@ -15,29 +15,14 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React from 'react'
-import ReactDOM from 'react-dom'
-import $ from 'jquery'
 
-import StudentView from '../StudentView'
-
-beforeAll(() => {
-  const found = document.getElementById('fixtures')
-  if (!found) {
-    const fixtures = document.createElement('div')
-    fixtures.setAttribute('id', 'fixtures')
-    document.body.appendChild(fixtures)
+const funcs = {
+  parse() {
+    return 1
+  },
+  format() {
+    return '12/28/2018 23:59:00'
   }
-})
+}
 
-afterEach(() => {
-  ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
-})
-
-jest.mock('timezone')
-
-it('renders normally', () => {
-  ReactDOM.render(<StudentView />, document.getElementById('fixtures'))
-  const element = $('[data-test-id="assignments-2-student-view"]')
-  expect(element).toHaveLength(1)
-})
+export default funcs

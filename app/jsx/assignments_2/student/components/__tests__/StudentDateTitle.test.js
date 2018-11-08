@@ -19,7 +19,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
 
-import StudentView from '../StudentView'
+import StudentDateTitle from '../StudentDateTitle'
 
 beforeAll(() => {
   const found = document.getElementById('fixtures')
@@ -33,11 +33,23 @@ beforeAll(() => {
 afterEach(() => {
   ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
 })
-
 jest.mock('timezone')
 
-it('renders normally', () => {
-  ReactDOM.render(<StudentView />, document.getElementById('fixtures'))
-  const element = $('[data-test-id="assignments-2-student-view"]')
-  expect(element).toHaveLength(1)
+it('renders title correctly', () => {
+  ReactDOM.render(
+    <StudentDateTitle title="Egypt Economy Research" dueDate={new Date('12/28/2018 23:59:00')} />,
+    document.getElementById('fixtures')
+  )
+  const title = $('[data-test-id="title"]')
+  expect(title.text()).toEqual('Egypt Economy Research')
+})
+
+it('renders date correctly', () => {
+  ReactDOM.render(
+    <StudentDateTitle title="Egypt Economy Research" dueDate={new Date('12/28/2018 23:59:00')} />,
+    document.getElementById('fixtures')
+  )
+  const title = $('[data-test-id="due-date-display"]')
+  // Reason why this is showing up twice is once for screenreader content and again for regular content
+  expect(title.text()).toEqual('Due: 12/28/2018 23:59:00Due: 12/28/2018 23:59:002018-12-28')
 })

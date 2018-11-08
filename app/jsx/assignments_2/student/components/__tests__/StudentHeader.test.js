@@ -19,7 +19,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
 
-import StudentView from '../StudentView'
+import StudentHeader from '../StudentHeader'
 
 beforeAll(() => {
   const found = document.getElementById('fixtures')
@@ -37,7 +37,7 @@ afterEach(() => {
 jest.mock('timezone')
 
 it('renders normally', () => {
-  ReactDOM.render(<StudentView />, document.getElementById('fixtures'))
-  const element = $('[data-test-id="assignments-2-student-view"]')
+  ReactDOM.render(<StudentHeader />, document.getElementById('fixtures'))
+  const element = $('[data-test-id="assignments-2-student-header"]')
   expect(element).toHaveLength(1)
 })

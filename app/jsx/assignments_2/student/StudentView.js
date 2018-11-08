@@ -17,13 +17,12 @@
  */
 
 import React from 'react'
-import PointsDisplay from './components/PointsDisplay'
+import StudentHeader from './components/StudentHeader'
 
 export default function StudentView(_props) {
   return (
     <div data-test-id="assignments-2-student-view">
-      <div>Assignments 2 Student View</div>
-      <PointsDisplay receivedPoints={null} possiblePoints={32} />
+      <StudentHeader />
     </div>
   )
 }
