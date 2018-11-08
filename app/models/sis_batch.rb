@@ -640,7 +640,6 @@ class SisBatch < ActiveRecord::Base
   end
 
   def write_errors_to_file
-    return unless @has_errors
     file = temp_error_file_path
     CSV.open(file, "w") do |csv|
       csv << %w(sis_import_id file message row)
