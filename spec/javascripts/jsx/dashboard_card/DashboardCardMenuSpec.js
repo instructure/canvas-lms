@@ -21,7 +21,7 @@ import {mount} from 'enzyme'
 import DashboardCardMenu from 'jsx/dashboard_card/DashboardCardMenu'
 
 const defaultProps = () => ({
-  trigger: <button>menu</button>,
+  trigger: <button type="button">menu</button>,
   assetString: 'course_1',
   afterUpdateColor: () => {},
   currentColor: '#8a8a8a',

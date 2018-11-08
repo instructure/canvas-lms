@@ -54,7 +54,7 @@ if (ENV.use_high_contrast) {
 
   // Set CSS transitions to 0ms in Selenium and JS tests
   let transitionOverride = {}
-  if (process.env.NODE_ENV == 'test' || window.INST.environment === 'test') {
+  if (process.env.NODE_ENV === 'test' || window.INST.environment === 'test') {
     transitionOverride = {
       transitions: {
         duration: '0ms'

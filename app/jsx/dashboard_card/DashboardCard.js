@@ -262,6 +262,7 @@ export default class DashboardCard extends Component {
           {...reorderingProps}
           trigger={
             <button
+              type="button"
               className="Button Button--icon-action-rev ic-DashboardCard__header-button"
               ref={c => {
                 this.settingsToggle = c

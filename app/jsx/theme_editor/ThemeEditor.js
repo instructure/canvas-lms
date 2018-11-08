@@ -26,8 +26,6 @@ import Progress from 'compiled/models/Progress'
 import customTypes from './PropTypes'
 import submitHtmlForm from './submitHtmlForm'
 import SaveThemeButton from './SaveThemeButton'
-import ThemeEditorAccordion from './ThemeEditorAccordion'
-import ThemeEditorFileUpload from './ThemeEditorFileUpload'
 import ThemeEditorModal from './ThemeEditorModal'
 import ThemeEditorSidebar from './ThemeEditorSidebar'
 
@@ -252,7 +250,7 @@ export default class ThemeEditor extends React.Component {
   handleCancelClicked = () => {
     if (this.somethingHasChanged() || !this.displayedMatchesSaved()) {
       const msg = I18n.t(
-        'You are about to lose any unsaved changes.\n\n' + 'Would you still like to proceed?'
+        'You are about to lose any unsaved changes.\n\nWould you still like to proceed?'
       )
       if (!window.confirm(msg)) return
     }
@@ -545,7 +543,6 @@ export default class ThemeEditor extends React.Component {
               ) : null}
               <iframe
                 id="previewIframe"
-                ref="previewIframe"
                 src={`/accounts/${this.props.accountID}/theme-preview/?editing_brand_config=1`}
                 title={I18n.t('Preview')}
                 aria-hidden={this.somethingHasChanged()}

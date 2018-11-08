@@ -27,13 +27,11 @@ const cardTarget = {
 }
 
 const getDroppableDashboardCardBox = (backend = ReactDnDHTML5Backend) =>
-  /* eslint-disable new-cap */
   compose(
     DragDropContext(backend),
     DropTarget(ItemTypes.CARD, cardTarget, connect => ({
       connectDropTarget: connect.dropTarget()
     }))
   )(DashboardCardBox)
-/* eslint-enable new-cap */
 
 export default getDroppableDashboardCardBox

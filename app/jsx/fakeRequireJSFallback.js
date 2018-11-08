@@ -43,16 +43,7 @@ if (!('require' in window)) {
     // load these asynchronously so they are not downloaded unless asked for
     i18nObj: () => import('i18nObj'),
     underscore: () => import('underscore'),
-    'jsx/course_wizard/ListItems': () =>
-      new Promise(resolve => {
-        require.ensure(
-          [],
-          require => {
-            resolve(require('./course_wizard/ListItems'))
-          },
-          'course_wizardListItemsAsyncChunk'
-        )
-      })
+    'jsx/course_wizard/ListItems': () => import('./course_wizard/ListItems')
   }
 
   const getModule = module => {

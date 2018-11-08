@@ -121,7 +121,11 @@ export default function ThemeCard(props) {
         </div>
         <div className="ic-ThemeCard-main__actions">
           {props.isDeletable && (
-            <button className="Button Button--icon-action" onClick={props.startDeleting}>
+            <button
+              type="button"
+              className="Button Button--icon-action"
+              onClick={props.startDeleting}
+            >
               <span className="screenreader-only">{I18n.t('Delete theme')}</span>
               <i className="icon-trash" />
             </button>
@@ -182,5 +186,6 @@ ThemeCard.propTypes = {
   startDeleting: func.isRequired,
   cancelDeleting: func.isRequired,
   onDelete: func.isRequired,
+  open: func.isRequired,
   getVariable: func.isRequired
 }

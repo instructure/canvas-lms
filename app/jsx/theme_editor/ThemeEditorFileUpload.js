@@ -107,6 +107,7 @@ export default class ThemeEditorFileUpload extends Component {
       <a
         href={this.props.currentValue}
         target="_blank"
+        rel="noopener noreferrer"
         className="ThemeEditorFileUpload__view-file"
       >
         {I18n.t('View File')}

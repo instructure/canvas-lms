@@ -54,7 +54,6 @@ const cardTarget = {
   }
 }
 
-/* eslint-disable new-cap */
 export default compose(
   DropTarget(ItemTypes.CARD, cardTarget, connect => ({
     connectDropTarget: connect.dropTarget()
@@ -64,4 +63,3 @@ export default compose(
     isDragging: monitor.isDragging()
   }))
 )(DashboardCard)
-/* eslint-enable new-cap */

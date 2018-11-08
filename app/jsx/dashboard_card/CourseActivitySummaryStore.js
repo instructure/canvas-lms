@@ -19,8 +19,6 @@
 import _ from 'underscore'
 import createStore from '../shared/helpers/createStore'
 import $ from 'jquery'
-import DefaultUrlMixin from 'compiled/backbone-ext/DefaultUrlMixin'
-import 'compiled/fn/parseLinkHeader'
 
 const CourseActivitySummaryStore = createStore({streams: {}})
 

@@ -99,7 +99,7 @@ export default class DashboardCardBox extends React.Component {
     const Component = DraggableDashboardCard
     const cards = this.state.courseCards.map((card, index) => {
       const position =
-        card.position != null ? card.position : this.getOriginalIndex.bind(this, card.assetString)
+        card.position != null ? card.position : () => this.getOriginalIndex(card.assetString)
       return (
         <Component
           key={card.id}
@@ -112,7 +112,7 @@ export default class DashboardCardBox extends React.Component {
           term={card.term}
           assetString={card.assetString}
           backgroundColor={this.colorForCard(card.assetString)}
-          handleColorChange={this.handleColorChange.bind(this, card.assetString)}
+          handleColorChange={newColor => this.handleColorChange(card.assetString, newColor)}
           image={card.image}
           hideColorOverlays={this.props.hideColorOverlays}
           position={position}
