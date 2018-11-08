@@ -1106,7 +1106,11 @@ class FilesController < ApplicationController
 
 
   # @API Delete file
-  # Remove the specified file
+  # Remove the specified file. Unlike most other DELETE endpoints, using this
+  # endpoint will result in comprehensive, irretrievable destruction of the file.
+  # It should be used with the `replace` parameter set to true in cases where the
+  # file preview also needs to be destroyed (such as to remove files that violate
+  # privacy laws).
   #
   # @argument replace [boolean]
   #   This action is irreversible.
