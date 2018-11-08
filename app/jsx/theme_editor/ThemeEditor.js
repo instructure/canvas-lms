@@ -279,6 +279,8 @@ export default class ThemeEditor extends React.Component {
     Object.keys(properties).forEach(k => {
       const defaultVal = this.getSchemaDefault(k)
       if (properties[k] !== defaultVal && properties[k] && properties[k][0] !== '$') {
+        // xsslint safeString.identifier k properties[k]
+        // xsslint safeString.property k
         processedData.append(`brand_config[variables][${k}]`, properties[k])
       }
     })
@@ -287,6 +289,8 @@ export default class ThemeEditor extends React.Component {
         ? f.variable_name
         : `brand_config[variables][${f.variable_name}]`
       if (!f.customFileUpload || (f.customFileUpload && f.value != null)) {
+        // xsslint safeString.identifier keyName
+        // xsslint safeString.property value
         processedData.append(keyName, f.value)
       }
     })
@@ -297,6 +301,8 @@ export default class ThemeEditor extends React.Component {
         processedData.get(name) === 'undefined' ||
         processedData.get(name) === 'null'
       ) {
+        // xsslint safeString.identifier name
+        // xsslint safeString.property name
         processedData.append(name, this.props.brandConfig[name] || '')
       }
     })

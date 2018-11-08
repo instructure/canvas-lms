@@ -119,6 +119,7 @@ class DashboardHeader extends React.Component {
     $dashboardActivity.show().disableWhileLoading(
       Promise.all([promiseToGetCode, promiseToGetHtml])
         .then(([DashboardView, axiosResponse]) => {
+          // xsslint safeString.property data
           $dashboardActivity.html(axiosResponse.data)
           new DashboardView()
         })

@@ -39,12 +39,14 @@ function getEnrollmentLabel (student) {
   return null;
 }
 
+// xsslint safeString.property enrollmentLabel secondaryInfo studentId courseId url displayName
 function render (options) {
   let enrollmentStatus = '';
   let secondaryInfo = '';
 
   if (options.enrollmentLabel) {
     const title = I18n.t('This user is currently not able to access the course');
+    // xsslint safeString.identifier title
     enrollmentStatus = `&nbsp;<span title="${title}" class="label">${options.enrollmentLabel}</span>`;
   }
 
@@ -52,6 +54,7 @@ function render (options) {
     secondaryInfo = `<div class="secondary-info">${options.secondaryInfo}</div>`;
   }
 
+  // xsslint safeString.identifier enrollmentStatus secondaryInfo
   return `
     <div class="student-name">
       <a

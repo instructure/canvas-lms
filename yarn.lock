@@ -18711,10 +18711,9 @@ xregexp@4.0.0:
   resolved "https://registry.yarnpkg.com/xregexp/-/xregexp-4.0.0.tgz#e698189de49dd2a18cc5687b05e17c8e43943020"
   integrity sha512-PHyM+sQouu7xspQQwELlGwwd05mXUFqwFYfqPO0cC7x4fxyHnnuetmQr6CjJiafIDoH4MogHb9dOoJzR/Y4rFg==
 
-xsslint@0.1.4:
+"xsslint@https://github.com/claydiffrient/xsslint.git#master":
   version "0.1.4"
-  resolved "https://registry.yarnpkg.com/xsslint/-/xsslint-0.1.4.tgz#1d4c5742d2f6076ae81ecced6c935375a8525114"
-  integrity sha1-HUxXQtL2B2roHsztbJNTdahSURQ=
+  resolved "https://github.com/claydiffrient/xsslint.git#f2a8ac8f2e7807da38ac99a0b8a6394c1e0769ee"
   dependencies:
     babel-traverse "^6.0.0"
     babylon "^6.0.0"

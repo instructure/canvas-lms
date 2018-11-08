@@ -104,8 +104,8 @@ const allPaths = [
     transform: source => CoffeeScript.compile(source, {})
   },
   {
-    paths: ['app/jsx'].concat(glob.sync('gems/plugins/*/app/jsx')),
-    glob: '*.jsx'
+    paths: ['app/jsx', 'app/coffeescripts'].concat(glob.sync('gems/plugins/*/app/jsx')),
+    glob: '*.js'
   },
   {
     paths: ['public/javascripts'].concat(glob.sync('gems/plugins/*/public/javascripts')),
@@ -114,7 +114,7 @@ const allPaths = [
   }
 ]
 
-allPaths.forEach(({paths, glob, defaultIgnores = [], transform}) => {
+allPaths.forEach(({paths, glob, defaultIgnores = ['**/__tests__/**/*.js'], transform}) => {
   paths.forEach(path => {
     process.chdir(path)
     const ignores = defaultIgnores.concat(
@@ -137,10 +137,9 @@ allPaths.forEach(({paths, glob, defaultIgnores = [], transform}) => {
       let source = fs.readFileSync(file).toString()
       if (transform) source = transform(source)
       source = babylon.parse(source, {
-        plugins: ['jsx', 'classProperties', 'objectRestSpread'],
+        plugins: ['jsx', 'classProperties', 'objectRestSpread', 'dynamicImport'],
         sourceType: 'module'
       })
-
       const warnings = XSSLint.run({source})
       warningCount += warnings.length
       warnings.forEach(({line, method}) => {

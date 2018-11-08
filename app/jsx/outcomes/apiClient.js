@@ -20,6 +20,7 @@ import axios from 'axios'
 
 export function createImport (contextRoot, file) {
   const data = new FormData()
+  // xsslint safeString.identifier file
   data.append('attachment', file)
   const url = `/api/v1${contextRoot}/outcome_imports?import_type=instructure_csv`
   return axios.post(url, data)

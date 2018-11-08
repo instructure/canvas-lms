@@ -201,7 +201,7 @@
     "webpack-cleanup-plugin": "^0.5",
     "webpack-manifest-plugin": "^2",
     "wsrun": "^2.2.0",
-    "xsslint": "0.1.4",
+    "xsslint": "https://github.com/claydiffrient/xsslint.git#master",
     "yaml-loader": "^0.5"
   },
   "jest-junit": {
