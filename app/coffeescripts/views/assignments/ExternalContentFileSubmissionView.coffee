@@ -74,7 +74,7 @@ define [
         eula_agreement_timestamp: @assignmentSubmission.get('eula_agreement_timestamp')
 
       if ENV.SUBMIT_ASSIGNMENT.GROUP_ID_FOR_USER?
-        preflightUrl = "/api/v1/groups/" + ENV.SUBMIT_ASSIGNMENT.GROUP_ID_FOR_USER + "/files"
+        preflightUrl = "/api/v1/groups/" + ENV.SUBMIT_ASSIGNMENT.GROUP_ID_FOR_USER + "/files?assignment_id=#{ENV.SUBMIT_ASSIGNMENT.ID}"
       else
         preflightUrl = "/api/v1/courses/" + ENV.COURSE_ID + "/assignments/" + ENV.SUBMIT_ASSIGNMENT.ID + "/submissions/" + ENV.current_user_id + "/files"
 
