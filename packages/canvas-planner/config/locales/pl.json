@@ -278,6 +278,9 @@
   "peer_review_74f26a13": {
     "message": "Recenzja drugiego uczestnika"
   },
+  "peer_review_for_itemtitle_358cb413": {
+    "message": "Recenzja { itemTitle } innego uczestnika"
+  },
   "points_bceb5005": {
     "message": "punkty"
   },
