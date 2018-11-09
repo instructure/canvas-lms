@@ -28,6 +28,7 @@ describe "Group Categories API", type: :request do
       'self_signup' => category.self_signup,
       'context_type' => category.context_type,
       "#{category.context_type.downcase}_id" => category.context_id,
+      'created_at' => category.created_at.iso8601,
       'group_limit' => category.group_limit,
       'groups_count' => category.groups.size,
       'unassigned_users_count' => category.unassigned_users.count(:all),
