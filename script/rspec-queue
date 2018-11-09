@@ -69,6 +69,7 @@ class CanvasSpecRunner < TestQueue::Runner::RSpec
       # :'( but we can retry
       exit ::RSpec.configuration.failure_exit_code
     else
+      puts "Error statuses: #{error_statuses.join(',')}"
       # this shouldn't happen, crap is broken
       exit 1
     end
