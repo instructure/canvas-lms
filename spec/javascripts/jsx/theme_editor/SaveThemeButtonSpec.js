@@ -75,6 +75,7 @@ test('save', function(assert) {
       jQuery.ajaxJSON.calledWithMatch(props.accountID, 'POST'),
       'makes a post request with the correct account id'
     )
+    ReactDOM.unmountComponentAtNode(elem)
     done()
   })
 })
@@ -92,6 +93,7 @@ test('modal visibility', function() {
 
   modal = wrapper.find('CanvasInstUIModal')
   ok(modal.props().open, 'modal is open')
+  wrapper.unmount()
 })
 
 test('disabling button', () => {
@@ -103,6 +105,7 @@ test('disabling button', () => {
       .prop('disabled'),
     'not disabled by default'
   )
+  wrapper.unmount()
 })
 
 test('disabling button: disabled if userNeedsToPreviewFirst', () => {
@@ -113,6 +116,7 @@ test('disabling button: disabled if userNeedsToPreviewFirst', () => {
       .first()
       .prop('disabled')
   )
+  wrapper.unmount()
 })
 
 test('disabling button: disabled if there are no unsaved changes', () => {
@@ -128,6 +132,7 @@ test('disabling button: disabled if there are no unsaved changes', () => {
       .first()
       .prop('disabled')
   )
+  wrapper.unmount()
 })
 
 test('disabling button: disabled if everything is default', () => {
@@ -138,4 +143,5 @@ test('disabling button: disabled if everything is default', () => {
       .first()
       .prop('disabled')
   )
+  wrapper.unmount()
 })
