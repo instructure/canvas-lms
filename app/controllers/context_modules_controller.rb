@@ -83,16 +83,14 @@ class ContextModulesController < ApplicationController
            manage_files: @context.grants_right?(@current_user, session, :manage_files)
         }
 
-      if master_courses?
-        is_master_course = MasterCourses::MasterTemplate.is_master_course?(@context)
-        is_child_course = MasterCourses::ChildSubscription.is_child_course?(@context)
-        if is_master_course || is_child_course
-          js_env(:MASTER_COURSE_SETTINGS => {
-            :IS_MASTER_COURSE => is_master_course,
-            :IS_CHILD_COURSE => is_child_course,
-            :MASTER_COURSE_DATA_URL => context_url(@context, :context_context_modules_master_course_info_url)
-          })
-        end
+      is_master_course = MasterCourses::MasterTemplate.is_master_course?(@context)
+      is_child_course = MasterCourses::ChildSubscription.is_child_course?(@context)
+      if is_master_course || is_child_course
+        js_env(:MASTER_COURSE_SETTINGS => {
+          :IS_MASTER_COURSE => is_master_course,
+          :IS_CHILD_COURSE => is_child_course,
+          :MASTER_COURSE_DATA_URL => context_url(@context, :context_context_modules_master_course_info_url)
+        })
       end
 
       conditional_release_js_env(includes: :active_rules)
@@ -316,7 +314,6 @@ class ContextModulesController < ApplicationController
   end
 
   def content_tag_master_course_data
-    return not_found unless master_courses?
     if authorized_action(@context, @current_user, :read_as_admin)
       info = {}
       is_child_course = MasterCourses::ChildSubscription.is_child_course?(@context)

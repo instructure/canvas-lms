@@ -51,7 +51,6 @@ export default function CoursesToolbar({
   isLoading,
   errors,
   draftFilters,
-  show_blueprint_courses_checkbox,
   toggleSRMessage
 }) {
   const groupedTerms = groupBy(terms.data, termGroup)
@@ -141,15 +140,13 @@ export default function CoursesToolbar({
                       label={I18n.t('Hide courses without students')}
                     />
                   </GridCol>
-                  {show_blueprint_courses_checkbox && (
-                    <GridCol>
-                      <Checkbox
-                        checked={draftFilters.blueprint}
-                        onChange={e => onUpdateFilters({blueprint: e.target.checked ? true : null})}
-                        label={I18n.t('Show only blueprint courses')}
-                      />
-                    </GridCol>
-                  )}
+                  <GridCol>
+                    <Checkbox
+                      checked={draftFilters.blueprint}
+                      onChange={e => onUpdateFilters({blueprint: e.target.checked ? true : null})}
+                      label={I18n.t('Show only blueprint courses')}
+                    />
+                  </GridCol>
                 </GridRow>
               </Grid>
             </GridCol>
@@ -173,7 +170,6 @@ export default function CoursesToolbar({
 CoursesToolbar.propTypes = {
   toggleSRMessage: func.isRequired,
   can_create_courses: bool,
-  show_blueprint_courses_checkbox: bool,
   onUpdateFilters: func.isRequired,
   onApplyFilters: func.isRequired,
   isLoading: bool.isRequired,
@@ -192,7 +188,6 @@ CoursesToolbar.propTypes = {
 CoursesToolbar.defaultProps = {
   can_create_courses:
     window.ENV && window.ENV.PERMISSIONS && window.ENV.PERMISSIONS.can_create_courses,
-  show_blueprint_courses_checkbox: window.ENV && window.ENV['master_courses?'],
   terms: {
     data: [],
     loading: false

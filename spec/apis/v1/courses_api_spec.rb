@@ -27,11 +27,6 @@ class TestCourseApi
   def course_url(course, opts = {}); return "course_url(Course.find(#{course.id}), :host => #{HostUrl.context_host(@course1)})"; end
 
   def api_user_content(syllabus, course); return "api_user_content(#{syllabus}, #{course.id})"; end
-
-  attr_accessor :master_courses
-  def master_courses?
-    master_courses
-  end
 end
 
 describe Api::V1::Course do
@@ -318,10 +313,6 @@ describe Api::V1::Course do
     end
 
     context "master course stuff" do
-      before do
-        @test_api.master_courses = true
-      end
-
       let(:json) { @test_api.course_json(@course1, @me, {}, [], []) }
 
       it "should return blueprint status" do

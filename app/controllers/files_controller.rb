@@ -1133,7 +1133,7 @@ class FilesController < ApplicationController
       end
     end
     if can_do(@attachment, @current_user, :delete)
-      return render_unauthorized_action if master_courses? && editing_restricted?(@attachment)
+      return render_unauthorized_action if editing_restricted?(@attachment)
       @attachment.destroy
       respond_to do |format|
         format.html {

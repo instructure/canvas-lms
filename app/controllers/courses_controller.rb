@@ -1262,19 +1262,17 @@ class CoursesController < ApplicationController
 
       set_tutorial_js_env
 
-      if @context.root_account.feature_enabled?(:master_courses)
-        master_template = @context.master_course_templates.for_full_course.first
-        restrictions_by_object_type = master_template&.default_restrictions_by_type_for_api || {}
-        message =!MasterCourses::MasterTemplate.is_master_course?(@context) && why_cant_i_enable_master_course(@context)
-        message ||= ''
-        js_env({
-          IS_MASTER_COURSE: MasterCourses::MasterTemplate.is_master_course?(@context),
-          DISABLED_BLUEPRINT_MESSAGE: message,
-          BLUEPRINT_RESTRICTIONS: master_template&.default_restrictions || { :content => true },
-          USE_BLUEPRINT_RESTRICTIONS_BY_OBJECT_TYPE: master_template&.use_default_restrictions_by_type || false,
-          BLUEPRINT_RESTRICTIONS_BY_OBJECT_TYPE: restrictions_by_object_type
-        })
-      end
+      master_template = @context.master_course_templates.for_full_course.first
+      restrictions_by_object_type = master_template&.default_restrictions_by_type_for_api || {}
+      message = !MasterCourses::MasterTemplate.is_master_course?(@context) && why_cant_i_enable_master_course(@context)
+      message ||= ''
+      js_env({
+        IS_MASTER_COURSE: MasterCourses::MasterTemplate.is_master_course?(@context),
+        DISABLED_BLUEPRINT_MESSAGE: message,
+        BLUEPRINT_RESTRICTIONS: master_template&.default_restrictions || { :content => true },
+        USE_BLUEPRINT_RESTRICTIONS_BY_OBJECT_TYPE: master_template&.use_default_restrictions_by_type || false,
+        BLUEPRINT_RESTRICTIONS_BY_OBJECT_TYPE: restrictions_by_object_type
+      })
 
       @course_settings_sub_navigation_tools = ContextExternalTool.all_tools_for(@context,
         :type => :course_settings_sub_navigation,

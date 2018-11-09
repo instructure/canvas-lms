@@ -561,13 +561,6 @@ END
       root_opt_in: true,
       touch_context: true
     },
-    'master_courses' =>
-    {
-      display_name: -> { I18n.t('Blueprint Courses') }, # this won't be confusing at all
-      description: -> { I18n.t('Enable the creation of Blueprint Courses') },
-      applies_to: 'RootAccount',
-      state: 'on'
-    },
     'student_context_cards' =>
     {
       display_name: -> { I18n.t('Student Context Card') },

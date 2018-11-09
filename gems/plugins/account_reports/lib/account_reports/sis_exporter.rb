@@ -229,12 +229,11 @@ module AccountReports
     end
 
     def courses
-      include_blueprints = root_account.feature_enabled?(:master_courses)
       if @sis_format
         # headers are not translated on sis_export to maintain import compatibility
         headers = ['course_id', 'integration_id', 'short_name', 'long_name',
-                   'account_id', 'term_id', 'status', 'start_date', 'end_date', 'course_format']
-        headers << 'blueprint_course_id' if include_blueprints
+                   'account_id', 'term_id', 'status', 'start_date', 'end_date', 'course_format',
+                   'blueprint_course_id']
       else
         headers = []
         headers << I18n.t('#account_reports.report_header_canvas_course_id', 'canvas_course_id')
@@ -250,7 +249,7 @@ module AccountReports
         headers << I18n.t('#account_reports.report_header_start__date', 'start_date')
         headers << I18n.t('#account_reports.report_header_end__date', 'end_date')
         headers << I18n.t('#account_reports.report_header_course_format', 'course_format')
-        headers << I18n.t('blueprint_course_id') if include_blueprints
+        headers << I18n.t('blueprint_course_id')
         headers << I18n.t('created_by_sis')
       end
 
@@ -277,16 +276,14 @@ module AccountReports
         courses.find_in_batches do |batch|
 
           blueprint_map = {}
-          if include_blueprints
-            root_account.shard.activate do
-              sub_data = Hash[MasterCourses::ChildSubscription.active.where(:child_course_id => batch).pluck(:child_course_id, :master_template_id)]
-              template_data = Hash[MasterCourses::MasterTemplate.active.for_full_course.where(:id => sub_data.values).pluck(:id, :course_id)] if sub_data.present?
-              course_sis_data = Hash[Course.where(:id => template_data.values).where.not(:sis_source_id => nil).pluck(:id, :sis_source_id)] if template_data.present?
-              if course_sis_data.present?
-                sub_data.each do |child_course_id, template_id|
-                  sis_id = course_sis_data[template_data[template_id]]
-                  blueprint_map[child_course_id] = sis_id if sis_id
-                end
+          root_account.shard.activate do
+            sub_data = Hash[MasterCourses::ChildSubscription.active.where(:child_course_id => batch).pluck(:child_course_id, :master_template_id)]
+            template_data = Hash[MasterCourses::MasterTemplate.active.for_full_course.where(:id => sub_data.values).pluck(:id, :course_id)] if sub_data.present?
+            course_sis_data = Hash[Course.where(:id => template_data.values).where.not(:sis_source_id => nil).pluck(:id, :sis_source_id)] if template_data.present?
+            if course_sis_data.present?
+              sub_data.each do |child_course_id, template_id|
+                sis_id = course_sis_data[template_data[template_id]]
+                blueprint_map[child_course_id] = sis_id if sis_id
               end
             end
           end
@@ -320,7 +317,7 @@ module AccountReports
               row << nil
             end
             row << c.course_format
-            row << blueprint_map[c.id] if include_blueprints
+            row << blueprint_map[c.id]
             row << c.sis_batch_id? unless @sis_format
             csv << row
           end

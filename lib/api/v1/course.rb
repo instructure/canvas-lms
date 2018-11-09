@@ -151,7 +151,6 @@ module Api::V1::Course
   end
 
   def apply_master_course_settings(hash, course, user)
-    return unless respond_to?(:master_courses?) && master_courses?
     is_mc = MasterCourses::MasterTemplate.is_master_course?(course)
     hash['blueprint'] = is_mc
 

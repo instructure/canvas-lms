@@ -28,7 +28,7 @@ module Api::V1::Attachment
   end
 
   def attachments_json(files, user, url_options = {}, options = {})
-    if options[:can_view_hidden_files] && options[:context] && master_courses?
+    if options[:can_view_hidden_files] && options[:context]
       options[:master_course_status] = setup_master_course_restrictions(files, options[:context])
     end
     files.map do |f|

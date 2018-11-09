@@ -21,8 +21,6 @@ describe "master courses - child courses - assignment locking" do
   include_context "in-process server selenium tests"
 
   before :once do
-    Account.default.enable_feature!(:master_courses)
-
     due_date = format_date_for_view(Time.zone.now - 1.month)
     @copy_from = course_factory(:active_all => true)
     @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)

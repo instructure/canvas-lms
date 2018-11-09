@@ -120,7 +120,6 @@
           <% end %>
         </td>
       </tr>
-      <% if @context.root_account.feature_enabled?(:master_courses) %>
       <tr>
         <td class="form-label nobr"><%= f.blabel :blueprint_course, :en => "Blueprint Course" %></td>
         <td class="nobr">
@@ -140,7 +139,6 @@
           <% end %>
         </td>
       </tr>
-      <% end %>
       <tr>
         <td><%= f.blabel :time_zone, :en => "Time Zone" %></td>
         <td>

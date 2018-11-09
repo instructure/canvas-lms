@@ -238,7 +238,6 @@
 #  }
 #
 class MasterCourses::MasterTemplatesController < ApplicationController
-  before_action :require_master_courses
   before_action :get_course
   before_action :get_template, :except => [:import_details, :imports_index, :imports_show, :subscriptions_index]
   before_action :get_subscription, :only => [:import_details, :imports_index, :imports_show]
@@ -630,10 +629,6 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   end
 
   protected
-  def require_master_courses
-    render_unauthorized_action unless master_courses?
-  end
-
   def require_account_level_manage_rights
     !!authorized_action(@course.account, @current_user, :manage_master_courses)
   end

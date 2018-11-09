@@ -271,13 +271,8 @@ class ApplicationController < ActionController::Base
   end
   helper_method :grading_periods?
 
-  def master_courses?
-    @domain_root_account && @domain_root_account.feature_enabled?(:master_courses)
-  end
-  helper_method :master_courses?
-
   def setup_master_course_restrictions(objects, course, user_can_edit: false)
-    return unless master_courses? && course.is_a?(Course) && (user_can_edit || course.grants_right?(@current_user, session, :read_as_admin))
+    return unless course.is_a?(Course) && (user_can_edit || course.grants_right?(@current_user, session, :read_as_admin))
 
     if MasterCourses::MasterTemplate.is_master_course?(course)
       MasterCourses::Restrictor.preload_default_template_restrictions(objects, course)
@@ -303,7 +298,7 @@ class ApplicationController < ActionController::Base
   helper_method :set_master_course_js_env_data
 
   def load_blueprint_courses_ui
-    return unless @context && @context.is_a?(Course) && master_courses? && @context.grants_right?(@current_user, :manage)
+    return unless @context && @context.is_a?(Course) && @context.grants_right?(@current_user, :manage)
 
     is_child = MasterCourses::ChildSubscription.is_child_course?(@context)
     is_master = MasterCourses::MasterTemplate.is_master_course?(@context)
@@ -336,7 +331,7 @@ class ApplicationController < ActionController::Base
   helper_method :load_blueprint_courses_ui
 
   def editing_restricted?(content, edit_type=:any)
-    return false unless master_courses? && content.respond_to?(:editing_restricted?)
+    return false unless content.respond_to?(:editing_restricted?)
     content.editing_restricted?(edit_type)
   end
   helper_method :editing_restricted?
@@ -2378,7 +2373,6 @@ class ApplicationController < ActionController::Base
     js_env({
       ROOT_ACCOUNT_NAME: @account.root_account.name, # used in AddPeopleApp modal
       ACCOUNT_ID: @account.id,
-      'master_courses?' => master_courses?,
       ROOT_ACCOUNT_ID: @account.root_account.id,
       customized_login_handle_name: @account.root_account.customized_login_handle_name,
       delegated_authentication: @account.root_account.delegated_authentication?,
