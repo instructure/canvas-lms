@@ -75,7 +75,9 @@ module Lti
       Canvas::Security.create_jwt(
         {
           verifier: verifier,
-          canvas_domain: @opts[:domain]
+          canvas_domain: @opts[:domain],
+          context_type: @context.class,
+          context_id: @context.global_id
         },
         (Time.zone.now + MESSAGE_HINT_LIFESPAN)
       )

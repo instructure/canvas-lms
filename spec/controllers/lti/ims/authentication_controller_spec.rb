@@ -16,13 +16,17 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../../lti_1_3_spec_helper')
 
 describe Lti::Ims::AuthenticationController do
+  include Lti::RedisMessageClient
+
   let(:developer_key) { DeveloperKey.create!(redirect_uris: ['https://redirect.tool.com']) }
   let(:user) { user_model }
   let(:redirect_domain) { 'redirect.instructure.com' }
   let(:verifier) { SecureRandom.hex 64 }
   let(:client_id) { developer_key.global_id }
+  let(:context) { account_model }
   let(:login_hint) { Lti::Asset.opaque_identifier_for(user) }
   let(:nonce) { SecureRandom.uuid }
   let(:prompt) { 'none' }
@@ -35,7 +39,9 @@ describe Lti::Ims::AuthenticationController do
     Canvas::Security.create_jwt(
       {
         verifier: verifier,
-        canvas_domain: redirect_domain
+        canvas_domain: redirect_domain,
+        context_id: context.global_id,
+        context_type: context.class.to_s
       },
       1.year.from_now
     )
@@ -134,6 +140,41 @@ describe Lti::Ims::AuthenticationController do
 
       it 'has a descriptive error message' do
         expect(JSON.parse(subject.body)['message']).to eq expected_message
+      end
+    end
+
+    context 'when there is a cached LTI 1.3 launch' do
+      include_context 'lti_1_3_spec_helper'
+
+      subject do
+        get :authorize, params: params
+        JSON::JWT.decode(assigns.dig(:id_token_or_errors, :id_token), :skip_verification)
+      end
+
+      let(:account) { context }
+      let(:lti_launch) do
+        {
+          "aud" => developer_key.global_id,
+          "https://purl.imsglobal.org/spec/lti/claim/deployment_id" => "265:37750cbd4487fb044c4faf195c195b5fb9ed9636",
+          "iss" => "https://canvas.instructure.com",
+          "nonce" => "a854dc79-be3b-476a-b0db-2963a7f4158c",
+          "sub" => "535fa085f22b4655f48cd5a36a9215f64c062838",
+          "picture" => "http://canvas.instructure.com/images/messages/avatar-50.png",
+          "email" => "wdransfield@instructure.com",
+          "name" => "wdransfield@instructure.com",
+          "given_name" => "wdransfield@instructure.com",
+        }
+      end
+      let(:verifier) { cache_launch(lti_launch, context) }
+
+      before { developer_key.update!(redirect_uris: ['https://redirect.tool.com']) }
+
+      it 'correctly sets the nonce of the launch' do
+        expect(subject['nonce']).to eq nonce
+      end
+
+      it 'generates an id token' do
+        expect(subject.except('nonce')).to eq lti_launch.except('nonce')
       end
     end
 

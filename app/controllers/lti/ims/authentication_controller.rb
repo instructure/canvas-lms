@@ -18,6 +18,8 @@
 module Lti
   module Ims
     class AuthenticationController < ApplicationController
+      include Lti::RedisMessageClient
+
       skip_before_action :load_user, only: :authorize_redirect
       skip_before_action :verify_authenticity_token, only: :authorize_redirect
 
@@ -33,7 +35,7 @@ module Lti
           layout: 'borderless_lti',
           locals: {
             redirect_uri: redirect_uri,
-            params: authorization_response_params
+            parameters: id_token_or_errors
           }
         )
       end
@@ -48,17 +50,32 @@ module Lti
         decoded_jwt['canvas_domain']
       end
 
+      def context
+        @context ||= begin
+          model = decoded_jwt['context_type'].constantize
+          model.find(decoded_jwt['context_id'])
+        end
+      end
+
+      def cached_launch_with_nonce
+        @cached_launch_with_nonce ||= begin
+          JSON.parse(
+            fetch_and_delete_launch(
+              context,
+              verifier
+            )
+          ).merge({nonce: oidc_params[:nonce]})
+        end
+      end
+
+      def id_token_or_errors
+        @id_token_or_errors ||= Lti::Messages::JwtMessage.generate_id_token(cached_launch_with_nonce)
+      end
+
       def authorize_redirect_url
         url = URI.parse(lti_1_3_authorization_url(params: oidc_params))
         url.host = canvas_domain
         url.to_s
-      end
-
-      def authorization_response_params
-        # TODO if errors exist populate with error params as outlined in
-        #      section 3.1.2.6 (Authentication Error Response). Otherwise
-        #      populate with ID TOken.
-        {}
       end
 
       def redirect_uri
