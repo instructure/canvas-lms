@@ -46,7 +46,6 @@ describe "course settings/blueprint" do
   include_context "blueprint course settings context"
 
   before :once do
-    Account.default.enable_feature! :master_courses
     account_admin_user
     course_factory :active_all => true
   end

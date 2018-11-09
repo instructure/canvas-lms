@@ -478,7 +478,8 @@ describe UsersController, type: :request do
         'apply_assignment_group_weights' => false,
         'restrict_enrollments_to_course_dates' => false,
         'time_zone' => 'America/Denver',
-        'uuid' => @course.uuid
+        'uuid' => @course.uuid,
+        'blueprint' => false
       },
 
       'user' => {
@@ -603,7 +604,8 @@ describe UsersController, type: :request do
         'apply_assignment_group_weights' => false,
         'restrict_enrollments_to_course_dates' => false,
         'time_zone' => 'America/Denver',
-        'uuid' => @course.uuid
+        'uuid' => @course.uuid,
+        'blueprint' => false
       },
 
       'user' => {

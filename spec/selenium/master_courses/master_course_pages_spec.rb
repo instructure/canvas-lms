@@ -21,8 +21,6 @@ describe "master courses - pages locking" do
   include_context "in-process server selenium tests"
 
   before :once do
-    Account.default.enable_feature!(:master_courses)
-
     @course = course_factory(:active_all => true)
     @template = MasterCourses::MasterTemplate.set_as_master_course(@course)
     @page = @course.wiki_pages.create!(title: 'Page1')

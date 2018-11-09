@@ -789,7 +789,8 @@ describe CoursesController, type: :request do
           'id' => new_course.id,
           'created_at' => new_course.created_at.as_json,
           'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{new_course.uuid}.ics" },
-          'uuid' => new_course.uuid
+          'uuid' => new_course.uuid,
+          'blueprint' => false
         )
         course_response.delete 'term_id' #not included in the response
         expect(json).to eql course_response
@@ -843,7 +844,8 @@ describe CoursesController, type: :request do
           'id' => new_course.id,
           'created_at' => new_course.created_at.as_json,
           'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{new_course.uuid}.ics" },
-          'uuid' => new_course.uuid
+          'uuid' => new_course.uuid,
+          'blueprint' => false
         )
         expect(json).to eql course_response
       end
@@ -3243,7 +3245,8 @@ describe CoursesController, type: :request do
         'enrollment_term_id' => @course.enrollment_term_id,
         'restrict_enrollments_to_course_dates' => false,
         'time_zone' => 'America/Los_Angeles',
-        'uuid' => @course1.uuid
+        'uuid' => @course1.uuid,
+        'blueprint' => false
       })
     end
 

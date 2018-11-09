@@ -25,7 +25,6 @@ describe "master courses - add and remove course associations" do
 
   before :once do
     # create the master course
-    Account.default.enable_feature!(:master_courses)
     @master = course_factory(active_all: true)
     @template = MasterCourses::MasterTemplate.set_as_master_course(@master)
 

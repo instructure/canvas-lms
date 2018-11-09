@@ -566,8 +566,7 @@ END
       display_name: -> { I18n.t('Blueprint Courses') }, # this won't be confusing at all
       description: -> { I18n.t('Enable the creation of Blueprint Courses') },
       applies_to: 'RootAccount',
-      state: 'allowed',
-      beta: false,
+      state: 'on'
     },
     'student_context_cards' =>
     {

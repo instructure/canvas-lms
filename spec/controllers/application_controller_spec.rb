@@ -1257,7 +1257,6 @@ describe CoursesController do
 
   describe "set_master_course_js_env_data" do
     before :each do
-      Account.default.enable_feature!(:master_courses)
       controller.instance_variable_set(:@domain_root_account, Account.default)
       account_admin_user(:active_all => true)
       controller.instance_variable_set(:@current_user, @user)

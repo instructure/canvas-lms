@@ -96,7 +96,6 @@ describe "master courses - locked items" do
     @unlocked_button_css = ".lock-icon.btn-unlocked"
     @locked_button_css = ".lock-icon.lock-icon-locked"
 
-    Account.default.enable_feature!(:master_courses)
     @master = course_factory(active_all: true)
     @master_teacher = @teacher
     @template = MasterCourses::MasterTemplate.set_as_master_course(@master)

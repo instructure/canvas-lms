@@ -1784,7 +1784,6 @@ describe CoursesController do
 
     describe 'master courses' do
       before :once do
-        Account.default.enable_feature! :master_courses
         account_admin_user
         course_factory
       end
