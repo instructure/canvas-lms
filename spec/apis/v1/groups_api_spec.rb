@@ -76,7 +76,8 @@ describe "Groups API", type: :request do
       "#{group_category.context_type.underscore}_id" => group_category.context_id,
       "protected" => group_category.protected?,
       "allows_multiple_memberships" => group_category.allows_multiple_memberships?,
-      "is_member" => group_category.is_member?(user)
+      "is_member" => group_category.is_member?(user),
+      "created_at" => group_category.created_at.iso8601
     }
     json['sis_group_category_id'] = group_category.sis_source_id if group_category.context.grants_any_right?(user, :read_sis, :manage_sis)
     json['sis_import_id'] = group_category.sis_batch_id if group_category.context.grants_right?(user, :manage_sis)
