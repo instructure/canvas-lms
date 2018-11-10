@@ -105,7 +105,7 @@ export default class AssessmentAuditTray extends Component {
             </FlexItem>
 
             <FlexItem margin="0 0 0 small">
-              <Heading as="h1" level="h3">
+              <Heading as="h2" level="h3">
                 {I18n.t('Assessment audit')}
               </Heading>
             </FlexItem>
