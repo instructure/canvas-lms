@@ -30,7 +30,7 @@ module Multipart
       if size.nil?
         # slurp up all remaining contents, even if that's just "" when eof at
         # beginning
-        @streams.each { |stream| outbuf.concat(stream.read) }
+        @streams.each { |stream| outbuf.concat(stream.read.force_encoding("utf-8")) }
         return outbuf
       elsif size.zero?
         # return "" (which is already in outbuf) even if eof at beginning
@@ -44,6 +44,7 @@ module Multipart
           while remaining > 0 && stream.read(remaining, readbuf)
             read_any = true
             remaining -= readbuf.length
+            readbuf.force_encoding("utf-8")
             outbuf.concat(readbuf)
           end
         end
