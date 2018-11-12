@@ -111,7 +111,7 @@ describe 'Audit Trail' do
     expect(Speedgrader.audit_entries).to include_text("Assignment unmuted")
   end
 
-  it 'shows entry for editing anonymous grading', priority: "1", test_id: 3513995 do
+  it 'shows entry for editing anonymous grading', priority: "1", test_id: 3691670 do
     # make some edits to the assignment, verify in audit trail
     @assignment.updating_user = @teacher3
     @assignment.update!(anonymous_grading: true)
@@ -126,7 +126,7 @@ describe 'Audit Trail' do
     expect(Speedgrader.audit_entries).to include_text("Anonymous turned on")
   end
 
-  it 'shows entry for editing graders anon to graders', priority: "1", test_id: 3513995 do
+  it 'shows entry for editing graders anon to graders', priority: "1", test_id: 3691670 do
     # make some edits to the assignment, verify in audit trail
     @assignment.updating_user = @teacher3
     @assignment.update!(graders_anonymous_to_graders: true)
@@ -140,7 +140,7 @@ describe 'Audit Trail' do
     expect(Speedgrader.audit_entries).to include_text("Graders anonymous to graders turned on")
   end
 
-  it 'shows entry for editing grader names visible to final grader', priority: "1", test_id: 3513995 do
+  it 'shows entry for editing grader names visible to final grader', priority: "1", test_id: 3691670 do
     # make some edits to the assignment, verify in audit trail
     @assignment.updating_user = @teacher3
     @assignment.update!(grader_names_visible_to_final_grader: false)
@@ -154,7 +154,7 @@ describe 'Audit Trail' do
     expect(Speedgrader.audit_entries).to include_text("Grader names visible to final grader turned off")
   end
 
-  it 'shows entry for editing grader comments visible', priority: "1", test_id: 3513995 do
+  it 'shows entry for editing grader comments visible', priority: "1", test_id: 3691670 do
     # make some edits to the assignment, verify in audit trail
     @assignment.updating_user = @teacher3
     @assignment.update!(grader_comments_visible_to_graders: false)
@@ -168,7 +168,7 @@ describe 'Audit Trail' do
     expect(Speedgrader.audit_entries).to include_text("Grader comments visible to graders turned off")
   end
 
-  it 'shows entry for editing grader count', priority: "1", test_id: 3513995 do
+  it 'shows entry for editing grader count', priority: "1", test_id: 3691670 do
     # make some edits to the assignment, verify in audit trail
     @assignment.updating_user = @teacher3
     @assignment.update!(grader_count: 3)
