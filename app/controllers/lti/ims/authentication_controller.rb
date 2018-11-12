@@ -20,6 +20,20 @@ module Lti
     class AuthenticationController < ApplicationController
       include Lti::RedisMessageClient
 
+      REQUIRED_PARAMS = %w[
+        client_id
+        login_hint
+        lti_message_hint
+        nonce
+        prompt
+        redirect_uri
+        response_mode
+        response_type
+        scope
+      ].freeze
+      OPTIONAL_PARAMS = ['state'].freeze
+      SCOPE = 'openid'.freeze
+
       skip_before_action :load_user, only: :authorize_redirect
       skip_before_action :verify_authenticity_token, only: :authorize_redirect
 
@@ -30,17 +44,51 @@ module Lti
       end
 
       def authorize
+        validate_oidc_params!
+        validate_current_user!
+        validate_client_id!
+
         render(
           'lti/ims/authentication/authorize.html.erb',
           layout: 'borderless_lti',
           locals: {
             redirect_uri: redirect_uri,
-            parameters: id_token_or_errors
+            parameters: @oidc_error || id_token
           }
         )
       end
 
       private
+
+      def validate_client_id!
+        binding_context = context.respond_to?(:account) ? context.account : context
+
+        unless developer_key.usable? && developer_key.account_binding_for(binding_context).workflow_state == 'on'
+          set_oidc_error!('unauthorized_client', 'Client not authorized in requested context')
+        end
+      end
+
+      def validate_current_user!
+        if Lti::Asset.opaque_identifier_for(@current_user) != oidc_params[:login_hint]
+          set_oidc_error!('login_required', 'The user is not logged in')
+        end
+      end
+
+      def validate_oidc_params!
+        missing_params = REQUIRED_PARAMS - oidc_params.keys
+        if missing_params.present?
+          set_oidc_error!('invalid_request_object', "The following parameters are missing: #{missing_params.join(',')}")
+        end
+        set_oidc_error!('invalid_request_object', "The 'scope' must be '#{SCOPE}'") if oidc_params[:scope] != SCOPE
+      end
+
+      def set_oidc_error!(error, error_description)
+        @oidc_error = {
+          error: error,
+          error_description: error_description,
+          state: oidc_params[:state]
+        }
+      end
 
       def verifier
         decoded_jwt['verifier']
@@ -68,8 +116,12 @@ module Lti
         end
       end
 
-      def id_token_or_errors
-        @id_token_or_errors ||= Lti::Messages::JwtMessage.generate_id_token(cached_launch_with_nonce)
+      def id_token
+        @id_token ||= begin
+          Lti::Messages::JwtMessage.generate_id_token(cached_launch_with_nonce).merge({
+            state: oidc_params[:state]
+          })
+        end
       end
 
       def authorize_redirect_url
@@ -78,13 +130,14 @@ module Lti
         url.to_s
       end
 
+      def developer_key
+        @developer_key ||= DeveloperKey.find_cached(oidc_params[:client_id].to_i)
+      end
+
       def redirect_uri
         @redirect_uri ||= begin
-          developer_key = DeveloperKey.find_cached(oidc_params[:client_id].to_i)
           requested_redirect_base = oidc_params[:redirect_uri].split('?').first
 
-          # TODO Verify account binding is on for context (need context first)
-          reject! 'Invalid client_id' and return unless developer_key.usable?
           unless developer_key.redirect_uris.include? requested_redirect_base
             reject! 'Invalid redirect_uri' and return
           end
@@ -94,18 +147,7 @@ module Lti
       end
 
       def oidc_params
-        params.permit(
-          :client_id,
-          :login_hint,
-          :lti_message_hint,
-          :nonce,
-          :prompt,
-          :redirect_uri,
-          :response_mode,
-          :response_type,
-          :scope,
-          :state
-        )
+        params.permit(*(OPTIONAL_PARAMS + REQUIRED_PARAMS))
       end
 
       def decoded_jwt

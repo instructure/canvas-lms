@@ -21,7 +21,14 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../lti_1_3_spec_helper
 describe Lti::Ims::AuthenticationController do
   include Lti::RedisMessageClient
 
-  let(:developer_key) { DeveloperKey.create!(redirect_uris: ['https://redirect.tool.com']) }
+  let(:developer_key) {
+    key = DeveloperKey.create!(
+      redirect_uris: ['https://redirect.tool.com'],
+      account: context
+    )
+    enable_developer_key_account_binding!(key)
+    key
+  }
   let(:user) { user_model }
   let(:redirect_domain) { 'redirect.instructure.com' }
   let(:verifier) { SecureRandom.hex 64 }
@@ -60,6 +67,8 @@ describe Lti::Ims::AuthenticationController do
       'lti_message_hint' => lti_message_hint
     }
   end
+
+  before { user_session(user) }
 
   describe 'authorize_redirect' do
     before { post :authorize_redirect, params: params }
@@ -133,13 +142,31 @@ describe Lti::Ims::AuthenticationController do
     subject { get :authorize, params: params }
 
     shared_examples_for 'redirect_uri errors' do
-      let(:expected_message) { raise 'set in example' }
       let(:expected_status) { 400 }
 
       it { is_expected.to have_http_status(expected_status) }
+    end
+
+    shared_examples_for 'non redirect_uri errors' do
+      let(:expected_message) { raise 'set in example' }
+      let(:expected_error) { raise 'set in example' }
+      let(:error_object) do
+        subject
+        assigns[:oidc_error]
+      end
+
+      it { is_expected.to be_success }
 
       it 'has a descriptive error message' do
-        expect(JSON.parse(subject.body)['message']).to eq expected_message
+        expect(error_object[:error_description]).to eq expected_message
+      end
+
+      it 'sends the state' do
+        expect(error_object[:state]).to eq state
+      end
+
+      it 'has the correct error code' do
+        expect(error_object[:error]).to eq expected_error
       end
     end
 
@@ -148,7 +175,7 @@ describe Lti::Ims::AuthenticationController do
 
       subject do
         get :authorize, params: params
-        JSON::JWT.decode(assigns.dig(:id_token_or_errors, :id_token), :skip_verification)
+        JSON::JWT.decode(assigns.dig(:id_token, :id_token), :skip_verification)
       end
 
       let(:account) { context }
@@ -167,7 +194,10 @@ describe Lti::Ims::AuthenticationController do
       end
       let(:verifier) { cache_launch(lti_launch, context) }
 
-      before { developer_key.update!(redirect_uris: ['https://redirect.tool.com']) }
+      before do
+        developer_key.update!(redirect_uris: ['https://redirect.tool.com'])
+        enable_developer_key_account_binding!(developer_key)
+      end
 
       it 'correctly sets the nonce of the launch' do
         expect(subject['nonce']).to eq nonce
@@ -176,13 +206,59 @@ describe Lti::Ims::AuthenticationController do
       it 'generates an id token' do
         expect(subject.except('nonce')).to eq lti_launch.except('nonce')
       end
+
+      it 'sends the state' do
+        subject
+        expect(assigns.dig(:id_token, :state)).to eq state
+      end
     end
 
-    context 'when the devloper key is not active' do
-      before { developer_key.update!(workflow_state: 'inactive') }
+    context 'when there are non redirect_uri errors' do
+      context 'when there are missing oidc params' do
+        let(:params) do
+          {
+            'client_id' => client_id.to_s,
+            'login_hint' => login_hint,
+            'redirect_uri' => redirect_uri,
+            'response_mode' => response_mode,
+            'response_type' => response_type,
+            'scope' => scope,
+            'state' => state,
+            'lti_message_hint' => lti_message_hint
+          }
+        end
 
-      it_behaves_like 'redirect_uri errors' do
-        let(:expected_message) { 'Invalid client_id' }
+        it_behaves_like 'non redirect_uri errors' do
+          let(:expected_message) { "The following parameters are missing: nonce,prompt" }
+          let(:expected_error) { "invalid_request_object" }
+        end
+      end
+
+      context 'when the scope is invalid' do
+        let(:scope) { 'banana' }
+
+        it_behaves_like 'non redirect_uri errors' do
+          let(:expected_message) { "The 'scope' must be 'openid'" }
+          let(:expected_error) { "invalid_request_object" }
+        end
+      end
+
+      context 'when the current user is not in the login_hint' do
+        let(:login_hint) { 'not_the_correct_lti_id' }
+
+        it_behaves_like 'non redirect_uri errors' do
+          let(:expected_message) { "The user is not logged in" }
+          let(:expected_error) { "login_required" }
+        end
+      end
+
+      context 'when the devloper key is not active' do
+        before { developer_key.update!(workflow_state: 'inactive') }
+
+        it_behaves_like 'non redirect_uri errors' do
+          let(:expected_message) { "Client not authorized in requested context" }
+          let(:expected_error) { "unauthorized_client" }
+        end
       end
     end
 
