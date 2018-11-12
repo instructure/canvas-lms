@@ -19,7 +19,6 @@
 import React from 'react'
 import {number, shape, string} from 'prop-types'
 import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import Pill from '@instructure/ui-elements/lib/components/Pill'
 import Text from '@instructure/ui-elements/lib/components/Text'
@@ -78,7 +77,7 @@ export default function AssessmentSummary(props) {
       padding="small"
       textAlign="center"
     >
-      <FlexItem>
+      <FlexItem id="audit-tray-final-grade">
         <Text aria-labelledby="audit-tray-final-grade-label" weight="bold">
           <Text as="div" size="x-large">
             {scoreText}
@@ -90,23 +89,23 @@ export default function AssessmentSummary(props) {
             </Text>
           </PresentationContent>
 
-          <Text aria-labelledby="audit-tray-posted-date-label" fontStyle="italic" size="small">
-            <ScreenReaderContent>{I18n.t('Posted to student')}</ScreenReaderContent>
-
-            <FriendlyDatetime dateTime={props.assignment.gradesPublishedAt} showTime />
+          <Text fontStyle="italic" size="small">
+            <FriendlyDatetime dateTime={props.finalGradeDate} showTime />
           </Text>
         </Text>
       </FlexItem>
 
       <FlexItem as="div" borderWidth="none none small" margin="small none" padding="none" />
 
-      <FlexItem>
+      <FlexItem id="audit-tray-grades-posted">
         <Text as="div">{I18n.t('Posted to student')}</Text>
 
         <Text as="div" fontStyle="italic" size="small" weight="bold">
           <FriendlyDatetime dateTime={props.assignment.gradesPublishedAt} showTime />
         </Text>
+      </FlexItem>
 
+      <FlexItem>
         <Pill
           as="div"
           id="audit-tray-overall-anonymity-label"
@@ -135,6 +134,7 @@ AssessmentSummary.propTypes = {
     gradesPublishedAt: string,
     pointsPossible: number
   }).isRequired,
+  finalGradeDate: propTypes.finalGradeDate.isRequired,
   overallAnonymity: propTypes.overallAnonymity.isRequired,
   submission: shape({
     score: number

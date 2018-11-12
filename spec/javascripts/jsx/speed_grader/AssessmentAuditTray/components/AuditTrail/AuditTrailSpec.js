@@ -34,7 +34,11 @@ QUnit.module('AssessmentAuditTray AuditTrail', suiteHooks => {
       buildEvent({id: '4901', userId: '1103'}),
       buildEvent({id: '4902', userId: '1101'}),
       buildEvent({id: '4903', userId: '1102'}),
-      buildEvent({id: '4904', userId: '1104'})
+      buildEvent({id: '4904', userId: '1104'}),
+      buildEvent(
+        {id: '4905', eventType: 'submission_updated', userId: '1101'},
+        {grade: [null, 'A']}
+      )
     ]
     const users = [
       {id: '1101', name: 'A sedulous pupil', role: 'student'},

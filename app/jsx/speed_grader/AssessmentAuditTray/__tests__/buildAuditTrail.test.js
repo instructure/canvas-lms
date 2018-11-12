@@ -107,6 +107,81 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
     return getAuditEvents().find(({auditEvent}) => auditEvent.id === eventId)
   }
 
+  describe('.finalGradeDate', () => {
+    describe('when the assignment is moderated', () => {
+      beforeEach(() => {
+        auditEvents = [
+          buildAssignmentCreatedEvent(
+            {id: '4901', createdAt: '2018-09-01T12:00:00Z'},
+            {moderated_grading: true}
+          ),
+          buildEvent({
+            createdAt: '2018-09-17T12:00:00Z',
+            eventType: 'provisional_grade_selected',
+            id: '4911',
+            userId: '1101'
+          })
+        ]
+      })
+
+      it('is the date of the "provisional_grade_selected" event', () => {
+        auditTrail = buildAuditTrail({auditEvents, users})
+        expect(auditTrail.finalGradeDate).toEqual(new Date('2018-09-17T12:00:00Z'))
+      })
+
+      it('is the latest selection date when the selected grade changed', () => {
+        auditEvents.push(
+          buildEvent({
+            createdAt: '2018-09-17T12:01:00Z',
+            eventType: 'provisional_grade_selected',
+            id: '4912'
+          }),
+          buildEvent({
+            createdAt: '2018-09-17T12:08:00Z',
+            eventType: 'provisional_grade_selected',
+            id: '4913'
+          })
+        )
+        auditTrail = buildAuditTrail({auditEvents, users})
+        expect(auditTrail.finalGradeDate).toEqual(new Date('2018-09-17T12:08:00Z'))
+      })
+    })
+
+    describe('when the assignment is not moderated', () => {
+      beforeEach(() => {
+        auditEvents = [
+          buildAssignmentCreatedEvent(
+            {id: '4901', createdAt: '2018-09-01T12:00:00Z'},
+            {moderated_grading: false}
+          )
+        ]
+      })
+
+      function gradeStudent(id, createdAt, gradeBefore, gradeAfter) {
+        auditEvents.push(
+          buildEvent(
+            {createdAt, eventType: 'submission_updated', id},
+            {grade: [gradeBefore, gradeAfter]}
+          )
+        )
+      }
+
+      it('is the date of the "submission_updated" event where the grade was changed', () => {
+        gradeStudent('4912', '2018-09-17T12:00:00Z')
+        auditTrail = buildAuditTrail({auditEvents, users})
+        expect(auditTrail.finalGradeDate).toEqual(new Date('2018-09-17T12:00:00Z'))
+      })
+
+      it('is the latest grade change date when the grade changed multiple times', () => {
+        gradeStudent('4912', '2018-09-17T12:00:00Z')
+        gradeStudent('4913', '2018-09-17T12:01:00Z')
+        gradeStudent('4914', '2018-09-18T13:04:00Z')
+        auditTrail = buildAuditTrail({auditEvents, users})
+        expect(auditTrail.finalGradeDate).toEqual(new Date('2018-09-18T13:04:00Z'))
+      })
+    })
+  })
+
   describe('user event groups', () => {
     let availableUsers
 

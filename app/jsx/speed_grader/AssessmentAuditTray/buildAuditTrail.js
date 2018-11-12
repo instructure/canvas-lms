@@ -193,6 +193,17 @@ function getCurrentAnonymity({eventType, payload}, currentlyAnonymous) {
   return currentlyAnonymous
 }
 
+function changesFinalGrade({eventType}) {
+  /*
+   * Selecting a provisional grade for a moderated assignment is considered the
+   * "final grade date" of the audit for the related student. For a
+   * non-moderated assignment, the date of the last grade change on the
+   * submission is used. At this time, every "submission_updated" event is a
+   * grade change event.
+   */
+  return eventType === 'provisional_grade_selected' || eventType === 'submission_updated'
+}
+
 function laterDate(dateA, dateB) {
   return dateA == null || dateB - dateA > 0 ? dateB : dateA
 }
@@ -320,6 +331,7 @@ export default function buildAuditTrail(auditData) {
   const anonymityTracker = buildAnonymityTracker()
 
   let currentlyAnonymous = false
+  let finalGradeDate = null
 
   sortedEvents.forEach(auditEvent => {
     const {createdAt, userId} = auditEvent
@@ -346,6 +358,10 @@ export default function buildAuditTrail(auditData) {
       eventDatum.studentAnonymity = currentlyAnonymous ? ON : OFF
     } else {
       eventDatum.studentAnonymity = auditEventStudentAnonymityStates.NA
+    }
+
+    if (changesFinalGrade(auditEvent)) {
+      finalGradeDate = createdAt
     }
 
     const eventData = extractEvents(eventDatum, featureTracking)
@@ -379,6 +395,7 @@ export default function buildAuditTrail(auditData) {
   return {
     ...featureTracking,
     anonymityDate: anonymityTracker.getAnonymityDate(),
+    finalGradeDate,
     overallAnonymity: anonymityTracker.getOverallAnonymity(),
     userEventGroups
   }

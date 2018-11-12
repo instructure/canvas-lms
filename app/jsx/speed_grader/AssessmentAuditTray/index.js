@@ -71,6 +71,7 @@ export default class AssessmentAuditTray extends Component {
 
     const {assignment, courseId, submission} = context
 
+    /* eslint-disable promise/catch-or-return */
     this.props.api
       .loadAssessmentAuditTrail(courseId, assignment.id, submission.id)
       .then(auditData => {
@@ -81,6 +82,7 @@ export default class AssessmentAuditTray extends Component {
           })
         }
       })
+    /* eslint-enable promise/catch-or-return */
   }
 
   render() {
@@ -117,6 +119,7 @@ export default class AssessmentAuditTray extends Component {
                 <AssessmentSummary
                   anonymityDate={this.state.auditTrail.anonymityDate}
                   assignment={this.state.assignment}
+                  finalGradeDate={this.state.auditTrail.finalGradeDate}
                   overallAnonymity={this.state.auditTrail.overallAnonymity}
                   submission={this.state.submission}
                 />

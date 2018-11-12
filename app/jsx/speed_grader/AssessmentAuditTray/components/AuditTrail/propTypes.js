@@ -48,10 +48,12 @@ export const userEventGroup = shape({
 })
 
 export const anonymityDate = instanceOf(Date)
+export const finalGradeDate = instanceOf(Date)
 export const overallAnonymity = oneOf(Object.values(overallAnonymityStates))
 
 export const auditTrail = shape({
   anonymityDate,
+  finalGradeDate: finalGradeDate.isRequired,
   overallAnonymity: overallAnonymity.isRequired,
   userEventGroups: arrayOf(userEventGroup).isRequired
 })
