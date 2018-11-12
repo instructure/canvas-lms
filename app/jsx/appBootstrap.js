@@ -66,3 +66,27 @@ if (ENV.use_high_contrast) {
     overrides: {...transitionOverride, ...brandvars}
   })
 }
+
+if (process.env.NODE_ENV === 'test' || window.INST.environment === 'test') {
+  // This is for the `wait_for_ajax_requests` method in selenium
+  window.__CANVAS_IN_FLIGHT_XHR_REQUESTS__ = 0
+  const send = XMLHttpRequest.prototype.send
+  XMLHttpRequest.prototype.send = function() {
+    window.__CANVAS_IN_FLIGHT_XHR_REQUESTS__++
+    // 'loadend' gets fired after both successful and errored requests
+    this.addEventListener('loadend', () => {
+      window.__CANVAS_IN_FLIGHT_XHR_REQUESTS__--
+      window.dispatchEvent(new CustomEvent('canvasXHRComplete'))
+    })
+    return send.apply(this, arguments)
+  }
+
+  // and this so it also tracks `fetch` requests
+  const fetch = window.fetch
+  window.fetch = function() {
+    window.__CANVAS_IN_FLIGHT_XHR_REQUESTS__++
+    const promise = fetch.apply(this, arguments)
+    promise.finally(() => window.__CANVAS_IN_FLIGHT_XHR_REQUESTS__--)
+    return promise
+  }
+}
