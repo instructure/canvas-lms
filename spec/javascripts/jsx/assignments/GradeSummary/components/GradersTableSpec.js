@@ -116,6 +116,10 @@ QUnit.module('GradeSummary GradersTable', suiteHooks => {
     return rows.at(0)
   }
 
+  function getAcceptGradesColumnHeader() {
+    return wrapper.find('div').findWhere(element => element.text() === 'Accept Grades')
+  }
+
   test('includes a row for each grader', () => {
     mountComponent()
     strictEqual(wrapper.find('.grader-label').length, 4)
@@ -136,27 +140,23 @@ QUnit.module('GradeSummary GradersTable', suiteHooks => {
     })
 
     test('is not displayed when grades have not started loading', () => {
-      const columnHeaders = wrapper.find('Heading')
-      strictEqual(columnHeaders.filterWhere(header => header.text() === 'Accept Grades').length, 0)
+      notOk(getAcceptGradesColumnHeader().exists())
     })
 
     test('is not displayed when grades have started loading', () => {
       store.dispatch(StudentActions.setLoadStudentsStatus(StudentActions.STARTED))
-      const columnHeaders = wrapper.find('Heading')
-      strictEqual(columnHeaders.filterWhere(header => header.text() === 'Accept Grades').length, 0)
+      notOk(getAcceptGradesColumnHeader().exists())
     })
 
     test('is not displayed when not all provisional grades have loaded', () => {
       store.dispatch(StudentActions.setLoadStudentsStatus(StudentActions.STARTED))
       store.dispatch(GradeActions.addProvisionalGrades(provisionalGrades))
-      const columnHeaders = wrapper.find('Heading')
-      strictEqual(columnHeaders.filterWhere(header => header.text() === 'Accept Grades').length, 0)
+      notOk(getAcceptGradesColumnHeader().exists())
     })
 
     test('is displayed when grades have finished loading and at least one grader can be bulk-selected', () => {
       mountAndFinishLoading()
-      const columnHeaders = wrapper.find('Heading')
-      strictEqual(columnHeaders.filterWhere(header => header.text() === 'Accept Grades').length, 1)
+      ok(getAcceptGradesColumnHeader().exists())
     })
 
     test('is not displayed when grades have finished loading and no graders can be bulk-selected', () => {
@@ -164,8 +164,7 @@ QUnit.module('GradeSummary GradersTable', suiteHooks => {
         grade.studentId = '1111' // eslint-disable-line no-param-reassign
       })
       mountAndFinishLoading()
-      const columnHeaders = wrapper.find('Heading')
-      strictEqual(columnHeaders.filterWhere(header => header.text() === 'Accept Grades').length, 0)
+      notOk(getAcceptGradesColumnHeader().exists())
     })
 
     test('is displayed when grades have finished loading and all students have a selected grade', () => {
@@ -173,8 +172,7 @@ QUnit.module('GradeSummary GradersTable', suiteHooks => {
         grade.selected = true // eslint-disable-line no-param-reassign
       })
       mountAndFinishLoading()
-      const columnHeaders = wrapper.find('Heading')
-      strictEqual(columnHeaders.filterWhere(header => header.text() === 'Accept Grades').length, 1)
+      ok(getAcceptGradesColumnHeader().exists())
     })
   })
 

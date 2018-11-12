@@ -59,12 +59,12 @@ function GradersTable(props) {
       <Grid rowSpacing="small">
         <GridRow>
           <GridCol>
-            <Heading level="h4">{I18n.t('Grader')}</Heading>
+            <Text weight="bold">{I18n.t('Grader')}</Text>
           </GridCol>
 
           {showAcceptGradesColumn && (
             <GridCol>
-              <Heading level="h4">{I18n.t('Accept Grades')}</Heading>
+              <Text weight="bold">{I18n.t('Accept Grades')}</Text>
             </GridCol>
           )}
         </GridRow>
