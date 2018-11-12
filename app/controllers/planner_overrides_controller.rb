@@ -140,10 +140,10 @@ class PlannerOverridesController < ApplicationController
   #
   # Create a planner override for the current user
   #
-  # @argument plannable_type [String, "announcement"|"assignment"|"discussion_topic"|"quiz"|"wiki_page"|"planner_note"]
+  # @argument plannable_type [Required, String, "announcement"|"assignment"|"discussion_topic"|"quiz"|"wiki_page"|"planner_note"]
   #   Type of the item that you are overriding in the planner
   #
-  # @argument plannable_id [Integer]
+  # @argument plannable_id [Required, Integer]
   #   ID of the item that you are overriding in the planner
   #
   # @argument marked_complete [Boolean]

@@ -60,7 +60,6 @@ class PlannerController < ApplicationController
   #   {
   #     "context_type": "Course",
   #     "course_id": 1,
-  #     "visible_in_planner": true, // Whether or not it is displayed on the student planner
   #     "planner_override": { ... planner override object ... }, // Associated PlannerOverride object if user has toggled visibility for the object on the planner
   #     "submissions": false, // The statuses of the user's submissions for this object
   #     "plannable_id": "123",
@@ -71,7 +70,6 @@ class PlannerController < ApplicationController
   #   {
   #     "context_type": "Course",
   #     "course_id": 1,
-  #     "visible_in_planner": true,
   #     "planner_override": {
   #         "id": 3,
   #         "plannable_type": "Assignment",
@@ -98,7 +96,6 @@ class PlannerController < ApplicationController
   #     "html_url": "http://canvas.instructure.com/courses/1/assignments/1#submit"
   #   },
   #   {
-  #     "visible_in_planner": true,
   #     "planner_override": null,
   #     "submissions": false, // false if no associated assignment exists for the plannable item
   #     "plannable_id": "789",
