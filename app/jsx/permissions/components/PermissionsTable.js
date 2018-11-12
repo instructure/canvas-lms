@@ -105,7 +105,7 @@ export default class PermissionsTable extends Component {
   renderTopHeader() {
     return (
       <tr className="ic-permissions__top-header">
-        <th className="ic-permissions__corner-stone">
+        <th scope="col" className="ic-permissions__corner-stone">
           <span className="ic-permission-corner-text">
             <Text weight="bold" size="small">
               {I18n.t('Permissions')}
