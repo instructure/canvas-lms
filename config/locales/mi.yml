@@ -5599,7 +5599,7 @@ mi:
     other: "%{count} Ngā karere"
   count_minutes_a6eeeacb: 
     one: "1 meneti"
-    other: "{%{count} meneti"
+    other: "%{count} meneti"
     zero: "iti iho i te 1 meneti"
   count_of_max_maximum_characters_fcb6ddf8: "%{count} o te %{max} te roanga o ngā pūāhua"
   count_options_190d6373: 
