@@ -22,7 +22,7 @@ import {arrayOf, func} from 'prop-types'
 import {connect} from 'react-redux'
 import $ from 'jquery'
 // For screenreaderFlashMessageExclusive  Maybe there's a better way
-import 'compiled/jquery.rails_flash_notifications' // eslint-disable-line
+import 'compiled/jquery.rails_flash_notifications'
 
 import Link from '@instructure/ui-elements/lib/components/Link'
 import Text from '@instructure/ui-elements/lib/components/Text'
