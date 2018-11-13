@@ -16,10 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+@import 'base/environment';
+
 .wrap-calendar-event-titles .fc-day-grid-event .fc-content {
   white-space: normal;
 }
 
 .fc-rtl .fc-toolbar {
   flex-direction: row-reverse;
+}
+
+.skip-to-calendar {
+  @include accessibility-prompt;
 }

@@ -149,6 +149,14 @@ export default function sidebar(contexts, selectedContexts, dataSource) {
   const $skipLink = $('.skip-to-calendar')
   const $colorPickerBtn = $('.ContextList__MoreBtn')
 
+  $skipLink.focus(() => {
+    $skipLink.removeClass("screenreader-only")
+  });
+
+  $skipLink.focusout(() => {
+    $skipLink.addClass("screenreader-only")
+  });
+
   setupCalendarFeedsWithSpecialAccessibilityConsiderationsForNVDA()
 
   $holder.html(contextListTemplate({contexts}))
