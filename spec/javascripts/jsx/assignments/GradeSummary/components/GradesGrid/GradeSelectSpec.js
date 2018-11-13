@@ -51,7 +51,7 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
 
   suiteHooks.beforeEach(() => {
     qunitTimeout = QUnit.config.testTimeout
-    QUnit.config.testTimeout = 500 // prevent accidental unresolved async
+    QUnit.config.testTimeout = 1000 // prevent accidental unresolved async
 
     $container = document.createElement('div')
     document.body.appendChild($container)
@@ -241,7 +241,7 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
     }
   }
 
-  async function waitFor(conditionFn, timeout = 1000) {
+  async function waitFor(conditionFn, timeout = 200) {
     return new Promise((resolve, reject) => {
       let timeoutId
 
