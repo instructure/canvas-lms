@@ -553,5 +553,26 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
         expect(f("#wiki_page_show p").text).to eq(text)
       end
     end
+
+    it "should add and remove links using RCS sidebar", ignore_js_errors: true do
+      title = "test_page"
+      unpublished = false
+      edit_roles = "public"
+
+      create_wiki_page(title, unpublished, edit_roles)
+
+      get "/courses/#{@course.id}/pages/front-page/edit"
+      wait_for_tiny(f("form.edit-form .edit-content"))
+
+      fj('button:contains("Pages")').click
+      f('#rcs-LinkToNewPage-btn-link').click
+      expect(f('#new-page-name-input')).to be_displayed
+      f('#new-page-name-input').send_keys(title)
+      f('#rcs-LinkToNewPage-submit').click
+
+      in_frame wiki_page_body_ifr_id do
+        expect(f('#tinymce p a').attribute('href')).to include title
+      end
+    end
   end
 end
