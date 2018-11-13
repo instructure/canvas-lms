@@ -163,7 +163,6 @@ export default class PermissionsTable extends Component {
             </button>
             */}
             <View margin="small">
-              {/* eslint-disable-next-line */}
               <Link
                 as="button"
                 onClick={() => this.props.setAndOpenPermissionTray(perm)}
