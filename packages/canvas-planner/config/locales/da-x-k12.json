@@ -1,0 +1,284 @@
+{
+  "add_to_do_7def3c37": {
+    "message": "Tilføj til opgaveliste"
+  },
+  "all_day_fb42c4fc": {
+    "message": "Hele dagen"
+  },
+  "all_items_loaded_aa256183": {
+    "message": "Alle elementer er indlæst"
+  },
+  "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
+    "message": "Der opstod en fejl under forsøg på at afvise muligheden."
+  },
+  "announcement_fb4cb645": {
+    "message": "Besked"
+  },
+  "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
+    "message": "Er du sikker på, du vil slette dette planlægningselement?"
+  },
+  "assignment_976578a8": {
+    "message": "Opgave"
+  },
+  "assignmenttype_title_6612d008": {
+    "message": "{ assignmentType } { title }."
+  },
+  "assignmenttype_title_at_datetime_478f0709": {
+    "message": "{ assignmentType } { title }, kl. { datetime }."
+  },
+  "assignmenttype_title_due_datetime_a112d8ff": {
+    "message": "{ assignmentType } { title }, forfalder { datetime }."
+  },
+  "assignmenttype_title_is_marked_as_done_a8dc46ef": {
+    "message": "{ assignmentType }{ title } er markeret som færdig."
+  },
+  "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
+    "message": "{ assignmentType }{ title } er ikke markeret som færdigt."
+  },
+  "beginning_of_your_to_do_history_61ef2dce": {
+    "message": "Begyndelsen af ​​din Opgaveliste-historik"
+  },
+  "calendar_event_89aadc1c": {
+    "message": "Kalenderbegivenhed"
+  },
+  "canvas_planner_98ed106": {
+    "message": "Canvas-planlægger"
+  },
+  "close_d634289d": {
+    "message": "Luk"
+  },
+  "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
+    "message": "{ count, plural,\n    one {Vis # afsluttet fag}\n  other {Vis # afsluttede fag}\n}"
+  },
+  "course_8a63b4a3": {
+    "message": "Fag"
+  },
+  "course_to_do_bcbbab54": {
+    "message": "{ course } OPGAVELISTE"
+  },
+  "date_at_time_dbdb1b99": {
+    "message": "{ date } kl. { time }"
+  },
+  "date_ee500367": {
+    "message": "Dato"
+  },
+  "date_is_not_a_valid_date_4ef9f8ba": {
+    "message": "#{ date } er ikke en gyldig dato"
+  },
+  "date_is_required_8660ec22": {
+    "message": "Dato er påkrævet"
+  },
+  "delete_a6efa79d": {
+    "message": "Slet"
+  },
+  "details_98a31b68": {
+    "message": "Nærmere oplysninger"
+  },
+  "discussion_6719c51d": {
+    "message": "Diskussion"
+  },
+  "dismiss_itemtitle_a9fae1b3": {
+    "message": "Afvis { itemTitle }"
+  },
+  "dismiss_opportunityname_5995176f": {
+    "message": "Afvis { opportunityName }"
+  },
+  "due_5d7267be": {
+    "message": "Forfalder:"
+  },
+  "edit_title_72e5a21e": {
+    "message": "Rediger { title }"
+  },
+  "error_loading_grades_e0b38f4d": {
+    "message": "Fejl under indlæsning vurderinger"
+  },
+  "error_loading_more_items_3f109d9f": {
+    "message": "Fejl ved indlæsning af flere elementer"
+  },
+  "error_loading_past_items_2881dbb1": {
+    "message": "Fejl ved indlæsning af forrige elementer"
+  },
+  "excused_cf8792eb": {
+    "message": "Undskyldt"
+  },
+  "failed_to_delete_to_do_64edff49": {
+    "message": "Kunne ikke slette opgave"
+  },
+  "failed_to_get_new_activity_17e7ec7c": {
+    "message": "Kunne ikke hente ny aktivitet"
+  },
+  "failed_to_load_opportunities_52ab6404": {
+    "message": "Kunne ikke indlæse muligheder"
+  },
+  "failed_to_save_to_do_ddc7503b": {
+    "message": "Kunne ikke gemme opgave"
+  },
+  "feedback_6dcc1991": {
+    "message": "Feedback"
+  },
+  "graded_25cd3fcd": {
+    "message": "Bedømt"
+  },
+  "grades_are_loading_c899652d": {
+    "message": "Vurderinger indlæses"
+  },
+  "grades_loaded_5056277c": {
+    "message": "Vurderinger indlæst"
+  },
+  "items_completed_items_plural_1_item_other_items_717d579f": {
+    "message": "{ items } færdigt / færdige { items, plural,\n     =1 {element}\n  other {elementer}\n}"
+  },
+  "late_2be42b88": {
+    "message": "Sen"
+  },
+  "load_more_a36f9cf9": {
+    "message": "Indlæs mere"
+  },
+  "load_prior_dates_f2b0f6f0": {
+    "message": "Indlæs tidligere datoer"
+  },
+  "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
+    "message": "Indlæst { count, plural,\n     =0 {# elementer}\n    one {# element}\n  other {# elementer}\n}"
+  },
+  "loading_25990131": {
+    "message": "Indlæser ..."
+  },
+  "loading_725811ca": {
+    "message": "indlæser"
+  },
+  "loading_grades_c842c887": {
+    "message": "Vurderinger indlæses"
+  },
+  "loading_past_items_ca499e75": {
+    "message": "Indlæser forrige elementer"
+  },
+  "loading_planner_items_947a813d": {
+    "message": "Indlæser planlægningselementer"
+  },
+  "looks_like_there_isn_t_anything_here_d9bcef49": {
+    "message": "Det ser ud som om, der ikke er noget her"
+  },
+  "missing_1a256b3b": {
+    "message": "Mangler"
+  },
+  "missing_items_for_title_516511f8": {
+    "message": "Manglende elementer for { title }"
+  },
+  "my_grades_98834476": {
+    "message": "Mine vurderinger"
+  },
+  "new_activity_8b84847d": {
+    "message": "Ny aktivitet"
+  },
+  "new_activity_for_title_14c9c3af": {
+    "message": "Ny aktivitet for { title }"
+  },
+  "next_month_749b1778": {
+    "message": "Næste måned"
+  },
+  "no_due_dates_assigned_e8f5bac8": {
+    "message": "Ingen afleveringsdatoer tildelt"
+  },
+  "no_grade_3b4d7f3e": {
+    "message": "Ingen vurderinger"
+  },
+  "nothing_new_needs_attention_3ac548d4": {
+    "message": "Intet nyt har brug for opmærksomhed."
+  },
+  "nothing_planned_yet_8675ffe9": {
+    "message": "Intet planlagt endnu"
+  },
+  "numpoints_points_8621a43b": {
+    "message": "{ numPoints } point"
+  },
+  "only_most_recent_grading_period_shown_f1ad6458": {
+    "message": "*Kun seneste vurderingsperiode vist."
+  },
+  "optional_add_course_ef0d70fc": {
+    "message": "Valgfrit: Tilføj fag"
+  },
+  "page_50c4823d": {
+    "message": "Side"
+  },
+  "points_bceb5005": {
+    "message": "point"
+  },
+  "points_points_63e59cce": {
+    "message": "{ points } point"
+  },
+  "previous_month_bb1e3c84": {
+    "message": "Forrige måned"
+  },
+  "pts_699bd9aa": {
+    "message": "point"
+  },
+  "quiz_e0dcce8f": {
+    "message": "Quiz"
+  },
+  "replies_4a8577c8": {
+    "message": "Svar"
+  },
+  "save_11a80ec3": {
+    "message": "Gem"
+  },
+  "show_my_grades_ebd08684": {
+    "message": "Vis mine vurderinger"
+  },
+  "startdate_to_enddate_d245175b": {
+    "message": "{ startDate } til { endDate }"
+  },
+  "submitted_318fad53": {
+    "message": "Afleveret"
+  },
+  "success_to_do_created_e34ed395": {
+    "message": "Succes: Opgaveliste oprettet"
+  },
+  "task_16b0ef38": {
+    "message": "Opgave"
+  },
+  "the_date_and_time_this_to_do_is_due_74c823d4": {
+    "message": "Dato og klokkeslæt hvor denne opgave forfalder"
+  },
+  "time_2b5aac58": {
+    "message": "Tidspunkt"
+  },
+  "title_ee03d132": {
+    "message": "Titel"
+  },
+  "title_is_required_6ddcab69": {
+    "message": "titel er påkrævet"
+  },
+  "to_do_1d554f36": {
+    "message": "Opgaveliste"
+  },
+  "to_do_items_loading_d1cdfcd5": {
+    "message": "Elementer i opgaveliste indlæses"
+  },
+  "today_76e10f9c": {
+    "message": "I dag"
+  },
+  "today_at_date_8ac30d6": {
+    "message": "I dag kl. { date }"
+  },
+  "tomorrow_9a6c9a00": {
+    "message": "I morgen"
+  },
+  "tomorrow_at_date_b53f2cf1": {
+    "message": "I morgen kl. { date }"
+  },
+  "unable_to_mark_as_complete_8141856d": {
+    "message": "Kan ikke markeres som færdig."
+  },
+  "yesterday_at_date_1aa6d18e": {
+    "message": "I går kl. { date }"
+  },
+  "yesterday_c6bd6abf": {
+    "message": "I går"
+  },
+  "you_must_provide_a_date_and_time_a86839d2": {
+    "message": "Du skal angive en dato og klokkeslæt."
+  },
+  "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
+    "message": "Du har rullet tilbage til din allerførste opgave på Opgavelisten!"
+  }
+}
