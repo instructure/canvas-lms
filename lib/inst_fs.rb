@@ -39,7 +39,7 @@ module InstFS
     end
 
     def authenticated_url(attachment, options={})
-      query_params = { token: access_jwt(access_path(attachment, attachment.display_name), options) }
+      query_params = { token: access_jwt(access_path(attachment, attachment.filename), options) }
       query_params[:download] = 1 if options[:download]
       access_url(attachment, query_params)
     end
@@ -153,7 +153,7 @@ module InstFS
     end
 
     def access_url(attachment, query_params)
-      service_url(access_path(attachment, attachment.display_name), query_params)
+      service_url(access_path(attachment, attachment.filename), query_params)
     end
 
     def thumbnail_url(attachment, query_params)

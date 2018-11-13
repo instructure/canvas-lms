@@ -41,8 +41,7 @@ describe InstFS do
       before :each do
         @attachment = attachment_with_context(user_model)
         @attachment.instfs_uuid = 1
-        @attachment.filename = "test+with+spaces.txt"
-        @attachment.display_name = "test with spaces.txt"
+        @attachment.filename = "test.txt"
       end
 
       it "constructs url properly" do
@@ -84,12 +83,6 @@ describe InstFS do
           user = user_model
           claims = claims_for(user: user)
           expect(claims[:user_id]).to eql(user.global_id.to_s)
-        end
-
-        it "sets file name to display_name" do
-          user = user_model
-          claims = claims_for(user: user)
-          expect(claims[:resource]).to include(@attachment.display_name)
         end
 
         it "includes distinct global acting_as_user_id claim in the token if acting_as provided" do
