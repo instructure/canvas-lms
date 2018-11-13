@@ -250,6 +250,7 @@ export default class TopicView extends Backbone.View {
       const isGroup = context === "group"
       modelData.showBoxReplyLink = isGroup ? (ENV.DISCUSSION.PERMISSIONS.CAN_MANAGE_OWN): true;
       modelData.root = true
+      modelData.title = ENV.DISCUSSION.TOPIC.TITLE
       modelData.isForMainDiscussion = true
       const html = replyTemplate(modelData)
       this.$('#discussion_topic').append(html)
