@@ -19,6 +19,7 @@
 import React from 'react'
 import {bool, shape, string} from 'prop-types'
 import {graphql} from 'react-apollo'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 
 import {TEACHER_QUERY, TeacherAssignmentShape} from '../assignmentData'
 import Header from './Header'
@@ -77,6 +78,9 @@ export class CoreTeacherView extends React.Component {
     return (
       <TeacherViewContext.Provider value={this.contextValue}>
         <div>
+          <ScreenReaderContent>
+            <h1>{assignment.name}</h1>
+          </ScreenReaderContent>
           <Header
             assignment={assignment}
             onUnsubmittedClick={this.handleUnsubmittedClick}
