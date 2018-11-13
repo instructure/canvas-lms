@@ -163,4 +163,4 @@ gem 'utf8_cleaner', path: 'gems/utf8_cleaner'
 gem 'workflow', path: 'gems/workflow'
 
 # StrongMind
-gem 'canvas_shim', '0.1.5'
+gem 'canvas_shim', '0.1.6'
