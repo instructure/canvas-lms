@@ -50,20 +50,11 @@ class WikiPage < ActiveRecord::Base
       WikiPage.where(:clone_of_id => id).each do |page|
         # Look for links to other pages / assignments in the Content Library and update those
         # be links to the associated pages / assignment in the local course.
-        tag = ContentTag.where(:content_id => page.id, :content_type => 'WikiPage').first
-        if tag 
-          local_course_id = tag.context_id
-          page.body = replace_content_library_links_with_local_links(body, local_course_id)
-
-          # Syncing titles changes the page URL which has a
-          # major risk of breaking links in the courses. I
-          # am thus going to leave that manual - adr
-          page.title = title
-          page.is_content_library_sync = true
-          page.save
-        else
-          Rails.logger.warn("### when duplicating wiki_page: #{self.title} from Content Library to linked local courses, no tag found for: #{page.inspect}. This can happen if there are failed migrations or if the course was deleted. Skipping!")
-        end
+        local_course_id = page.course.id
+        page.body = replace_content_library_links_with_local_links(body, local_course_id)
+        page.title = title
+        page.is_content_library_sync = true
+        page.save
       end
     end
   end
