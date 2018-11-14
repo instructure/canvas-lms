@@ -283,6 +283,20 @@ describe Score do
       end
     end
 
+    describe "#effective_final_score_lower_bound" do
+      it "returns the lowest possible score in the matching grading scheme, if grading schemes enabled" do
+        score.update!(override_score: 89)
+        allow(score.course).to receive(:grading_standard_enabled?).and_return(true)
+        expect(score.effective_final_score_lower_bound).to eq 87
+      end
+
+      it "returns the effective final score if grading schemes are not enabled" do
+        score.update!(override_score: 89)
+        allow(score.course).to receive(:grading_standard_enabled?).and_return(false)
+        expect(score.effective_final_score_lower_bound).to eq 89
+      end
+    end
+
     describe "#effective_final_grade" do
       it "returns a grade commensurate with the override score when one is present" do
         score.update!(override_score: 88)

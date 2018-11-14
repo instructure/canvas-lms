@@ -1064,6 +1064,16 @@ class Enrollment < ActiveRecord::Base
     cached_score_or_grade(:final, :score, :posted, id_opts)
   end
 
+  def effective_current_score(id_opts=nil)
+    score = find_score(id_opts)
+
+    if score&.overridden? && course.feature_enabled?(:final_grades_override)
+      score.effective_final_score_lower_bound
+    else
+      computed_current_score(id_opts)
+    end
+  end
+
   def unposted_current_grade(id_opts=nil)
     cached_score_or_grade(:current, :grade, :unposted, id_opts)
   end

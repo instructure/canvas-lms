@@ -124,6 +124,17 @@ class GradingStandard < ActiveRecord::Base
     ordered_scheme.max_by {|_, lower_bound| score >= lower_bound * 100 ? lower_bound : -lower_bound }[0]
   end
 
+  def lower_bound(score)
+    best_index = 0
+    grading_standard_data = data.reverse
+
+    grading_standard_data.each_with_index do |grade_bracket, index|
+      best_index = index if score >= grade_bracket[1] * 100
+    end
+
+    grading_standard_data[best_index][1] * 100
+  end
+
   def data=(new_val)
     self.version = VERSION
     # round values to the nearest 0.01 (0.0001 since e.g. 78 is stored as .78)
