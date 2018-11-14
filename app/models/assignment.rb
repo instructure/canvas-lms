@@ -168,6 +168,7 @@ class Assignment < ActiveRecord::Base
             :subject => "A Braven Assignment is due soon",
             :body => "#{assignment.name} is due #{when_due} for Braven, please log into https://portal.bebraven.org/ and finish it to ensure you get full on-time credit.",
             :delay_for => 0,
+            :user => student,
             :context => assignment
           )
 
