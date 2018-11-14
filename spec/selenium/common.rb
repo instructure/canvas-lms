@@ -220,7 +220,6 @@ shared_context "in-process server selenium tests" do
         "Failed to load http://example.com/",
         "Uncaught Error: cannot call methods on timeoutTooltip prior to initialization; attempted to call method 'close'",
         "Failed to load resource",
-        "Request failed with status code 503",
         "Deprecated use of magic jQueryUI widget markup detected",
         "Uncaught SG: Did not receive drive#about kind when fetching import",
         "Failed prop type",
