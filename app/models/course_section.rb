@@ -232,6 +232,7 @@ class CourseSection < ActiveRecord::Base
     old_course.course_sections.reset
     course.course_sections.reset
     assignment_overrides.active.destroy_all
+    discussion_topic_section_visibilities.active.destroy_all
 
     enrollment_data = self.all_enrollments.pluck(:id, :user_id)
     enrollment_ids = enrollment_data.map(&:first)

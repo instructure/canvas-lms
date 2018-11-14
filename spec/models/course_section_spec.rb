@@ -257,6 +257,21 @@ describe CourseSection, "moving to new course" do
     expect(u.favorites.where(:context_type => "Course", :context_id => course2).exists?).to eq true
   end
 
+  it "removes discussion visibilites on crosslist" do
+    course = course_factory({ :course_name => "Course 1", :active_all => true })
+    section = course.course_sections.create!
+    course.save!
+    announcement1 = Announcement.create!(:title => "some topic", :message => "blah",
+      :context => course, :is_section_specific => true, :course_sections => [section])
+    visibility = announcement1.reload.discussion_topic_section_visibilities.first
+
+    course2 = course_factory
+    section.crosslist_to_course(course2)
+
+    expect(visibility.reload).to be_deleted
+    expect(section.reload).to be_valid
+  end
+
   describe '#delete_enrollments_if_deleted' do
     let(:account) { Account.create!(name: '1') }
     let(:course) { account.courses.create! }

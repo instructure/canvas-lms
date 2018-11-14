@@ -48,7 +48,7 @@ class DiscussionTopicSectionVisibility < ActiveRecord::Base
   end
 
   def course_and_topic_share_context
-    return true if self.discussion_topic.context_id == self.course_section.course_id
+    return true if self.deleted? || self.discussion_topic.context_id == self.course_section.course_id
     self.errors.add(:course_section_id,
       t("Section does not belong to course for this discussion topic"))
   end
