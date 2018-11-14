@@ -335,6 +335,9 @@
   }
 
   .read-state {
+    border: 0;
+    border-width: 0px;
+    -webkit-appearance: none;
     box-sizing: border-box;
     display: inline-block;
     margin: 3px;
