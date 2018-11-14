@@ -1634,6 +1634,36 @@ describe AssignmentsApiController, type: :request do
         expect(new_assignment.tool_settings_tool).to eq message_handler
       end
 
+      context 'when a tool association already exists' do
+        let(:assignment) do
+          a = assignment_model(course: @course)
+          a.tool_settings_tool = message_handler
+          a.save!
+          a
+        end
+        let(:update_response) do
+          put "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}", params: {
+            assignment: { name: 'banana' }
+          }
+        end
+        let(:lookups) { assignment.assignment_configuration_tool_lookups }
+
+        before do
+          allow_any_instance_of(AssignmentConfigurationToolLookup).to(
+            receive(:create_subscription).and_return(SecureRandom.uuid)
+          )
+          user_session(@user)
+        end
+
+        context 'when switching to unsupported submission type' do
+          it 'destroys tool associations' do
+            expect do
+              update_response
+            end.to change(lookups, :count).from(1).to(0)
+          end
+        end
+      end
+
       context 'sets the configuration LTI 2 tool' do
         shared_examples_for 'sets the tools_settings_tool' do
           let(:submission_types) { raise 'Override in spec' }
