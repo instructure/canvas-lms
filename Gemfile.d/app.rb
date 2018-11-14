@@ -20,8 +20,9 @@ if CANVAS_RAILS5_1
 else
   gem 'rails', '5.2.1'
 end
+    gem 'loofah', '2.2.3'
 
-gem 'rack', '2.0.4'
+gem 'rack', '2.0.6'
 
 # oauth2-1.4.0 caused issues with google oauth login flow, which needs to be
 # investigated as part of a future gem bump.

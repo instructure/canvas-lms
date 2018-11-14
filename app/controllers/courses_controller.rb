@@ -1077,7 +1077,7 @@ class CoursesController < ApplicationController
   def todo_items
     get_context
     if authorized_action(@context, @current_user, :read)
-      bookmark = Plannable::Bookmarker.new(Assignment, false, :due_at, :id)
+      bookmark = Plannable::Bookmarker.new(Assignment, false, [:due_at, :created_at], :id)
 
       grading_scope = @current_user.assignments_needing_grading(:contexts => [@context], scope_only: true).
         reorder(:due_at, :id).preload(:external_tool_tag, :rubric_association, :rubric, :discussion_topic, :quiz).eager_load(:duplicate_of)
@@ -1103,7 +1103,7 @@ class CoursesController < ApplicationController
       ]
 
       if Array(params[:include]).include? 'ungraded_quizzes'
-        quizzes_bookmark = Plannable::Bookmarker.new(Quizzes::Quiz, false, :due_at, :id)
+        quizzes_bookmark = Plannable::Bookmarker.new(Quizzes::Quiz, false, [:due_at, :created_at], :id)
         quizzes_scope = @current_user.
           ungraded_quizzes(
             :contexts => [@context],
