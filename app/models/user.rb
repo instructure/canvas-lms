@@ -916,6 +916,7 @@ class User < ActiveRecord::Base
         pseudonym_scope = self.pseudonyms.active.shard(self)
         account_users = self.account_users.active.shard(self)
         has_other_root_accounts = false
+        group_memberships_scope = self.group_memberships.active.shard(self)
       else
         # make sure to do things on the root account's shard. but note,
         # root_account.enrollments won't include the student view user's
@@ -930,9 +931,11 @@ class User < ActiveRecord::Base
         account_users = root_account.account_users.where(user_id: self).to_a +
           self.account_users.shard(root_account).where(:account_id => root_account.all_accounts).to_a
         has_other_root_accounts = self.associated_accounts.shard(self).where('accounts.id <> ?', root_account).exists?
+        group_memberships_scope = self.group_memberships.active.shard(root_account.shard).joins(:group).where(:groups => {:root_account_id => root_account})
       end
 
       self.delete_enrollments(enrollment_scope, updating_user: updating_user)
+      group_memberships_scope.destroy_all
       user_observer_scope.destroy_all
       user_observee_scope.destroy_all
       pseudonym_scope.each(&:destroy)
