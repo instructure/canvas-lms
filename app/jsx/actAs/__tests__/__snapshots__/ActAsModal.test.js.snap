@@ -76,6 +76,7 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
                 inline={true}
                 margin="medium 0 x-small 0"
                 name="foo"
+                onImageLoaded={[Function]}
                 size="small"
                 src="testImageUrl"
                 variant="circle"

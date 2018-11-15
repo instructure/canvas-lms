@@ -63,6 +63,7 @@ exports[`renders the item to update if provided 1`] = `
         value="2017-04-25T08:49:00.000Z"
       />
       <Select
+        allowCustom={false}
         allowEmpty={true}
         closeOnSelect={true}
         constrain="scroll-parent"
@@ -215,6 +216,7 @@ exports[`updates state when new note is passed in 1`] = `
         value="2017-04-28T11:00:00.000Z"
       />
       <Select
+        allowCustom={false}
         allowEmpty={true}
         closeOnSelect={true}
         constrain="scroll-parent"
@@ -373,6 +375,7 @@ exports[`updates state when new note is passed in 2`] = `
         value="2017-04-28T11:00:00.000Z"
       />
       <Select
+        allowCustom={false}
         allowEmpty={true}
         closeOnSelect={true}
         constrain="scroll-parent"

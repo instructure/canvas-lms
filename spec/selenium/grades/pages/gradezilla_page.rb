@@ -52,7 +52,7 @@ class Gradezilla
     # ---------------------NEW-----------------------
     # assignment header column elements
     def assignment_header_menu_element(id)
-      f(".slick-header-column[id*='assignment_#{id}'] .Gradebook__ColumnHeaderAction [id*='Menu']")
+      f(".slick-header-column.assignment_#{id} .Gradebook__ColumnHeaderAction")
     end
 
     def assignment_header_menu_item_element(item_name)
@@ -81,7 +81,7 @@ class Gradezilla
     end
 
     def student_header_menu_main_element(menu)
-      fj("[role=menu][aria-labelledby*=Menu] button:contains('#{menu}')")
+      fj("[role=menu] button:contains('#{menu}')")
     end
 
     def student_header_submenu_item_element(sub_menu_item)
@@ -201,7 +201,7 @@ class Gradezilla
     end
 
     def expanded_popover_menu_selector
-      '[role="menu"][aria-labelledby*="Menu"]'
+      '[role="menu"]'
     end
 
     def expanded_popover_menu

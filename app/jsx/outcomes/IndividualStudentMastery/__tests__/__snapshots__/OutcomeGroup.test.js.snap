@@ -18,7 +18,6 @@ exports[`renders correctly expanded 1`] = `
     size="medium"
     summary={
       <Flex
-        alignItems="center"
         as="span"
         direction="row"
         inline={false}
@@ -128,7 +127,6 @@ exports[`renders the OutcomeGroup component 1`] = `
     size="medium"
     summary={
       <Flex
-        alignItems="center"
         as="span"
         direction="row"
         inline={false}

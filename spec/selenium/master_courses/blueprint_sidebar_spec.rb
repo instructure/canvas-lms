@@ -55,8 +55,7 @@ shared_context "blueprint sidebar context" do
   end
 
   def notification_message_text_box
-    f('.bcs__history-notification__add-message')
-      .find_element(:xpath, "//label/span/span/span/textarea")
+    f('.bcs__history-notification__message textarea')
   end
 
   def character_count

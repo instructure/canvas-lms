@@ -298,7 +298,7 @@ describe "student planner" do
       go_to_list_view
 
       # complete it
-      f('label[for*=Checkbox]').click
+      f('.planner-item label').click
       expect(f('input[type=checkbox]:checked')).to be_displayed
 
       # Opens the To Do edit sidebar
