@@ -246,7 +246,8 @@ module CC
               :omit_from_final_grade, :intra_group_peer_reviews, :only_visible_to_overrides, :post_to_sis,
               :moderated_grading, :grader_count, :grader_comments_visible_to_graders,
               :anonymous_grading, :graders_anonymous_to_graders, :grader_names_visible_to_final_grader,
-              :anonymous_instructor_annotations
+              :anonymous_instructor_annotations,
+              :allowed_attempts
       ]
       atts.each do |att|
         node.tag!(att, assignment.send(att)) if assignment.send(att) == false || !assignment.send(att).blank?

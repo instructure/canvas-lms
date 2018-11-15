@@ -5805,4 +5805,28 @@ describe Submission do
       }.from(nil).to(true)
     end
   end
+
+  describe 'extra_attempts validations' do
+    it { is_expected.to validate_numericality_of(:extra_attempts).is_greater_than_or_equal_to(0).allow_nil }
+
+    describe '#extra_attempts_can_only_be_set_on_online_uploads' do
+      it 'does not allowe extra_attempts to be set for non online upload submission types' do
+        submission = @assignment.submissions.first
+
+        %w[online_upload online_url online_text_entry].each do |submission_type|
+          submission.assignment.submission_types = submission_type
+          submission.assignment.save!
+          submission.extra_attempts = 10
+          expect(submission).to be_valid
+        end
+
+        %w[discussion_entry online_quiz].each do |submission_type|
+          submission.assignment.submission_types = submission_type
+          submission.assignment.save!
+          submission.extra_attempts = 10
+          expect(submission).to_not be_valid
+        end
+      end
+    end
+  end
 end

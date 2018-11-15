@@ -6953,6 +6953,34 @@ describe Assignment do
     end
   end
 
+  describe 'allowed_attempts validation' do
+    before(:once) do
+      assignment_model(course: @course)
+    end
+
+    it { is_expected.to validate_numericality_of(:allowed_attempts).allow_nil }
+
+    it 'should allow -1' do
+      @assignment.allowed_attempts = -1
+      expect(@assignment).to be_valid
+    end
+
+    it 'should disallow 0' do
+      @assignment.allowed_attempts = 0
+      expect(@assignment).to_not be_valid
+    end
+
+    it 'should disallow values less than -1' do
+      @assignment.allowed_attempts = -2
+      expect(@assignment).to_not be_valid
+    end
+
+    it 'should allow values greater than 0' do
+      @assignment.allowed_attempts = 2
+      expect(@assignment).to be_valid
+    end
+  end
+
   describe "after create callbacks" do
     subject(:event) { AnonymousOrModerationEvent.where(assignment: assignment).last }
 

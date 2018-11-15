@@ -569,6 +569,11 @@
 #           "description": "Boolean indicating if the assignment is moderated.",
 #           "example": true,
 #           "type": "boolean"
+#         },
+#         "allowed_attempts": {
+#           "description": "The number of submission attempts a student can make for this assignment. -1 is considered unlimited.",
+#           "example": 2,
+#           "type": "integer"
 #         }
 #       }
 #     }
@@ -945,6 +950,9 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[moderated_grading] [Boolean]
   #   Whether this assignment is moderated.
   #
+  # @argument assignment[allowed_attempts] [Integer]
+  #   The number of submission attempts allowed for this assignment. Set to -1 for unlimited attempts.
+  #
   # @returns Assignment
   def create
     @assignment = @context.assignments.build
@@ -1100,6 +1108,10 @@ class AssignmentsApiController < ApplicationController
   #
   # @argument assignment[moderated_grading] [Boolean]
   #   Whether this assignment is moderated.
+  #
+  # @argument assignment[allowed_attempts] [Integer]
+  #   The number of submission attempts allowed for this assignment. Set to -1 or null for
+  #   unlimited attempts.
   #
   # @returns Assignment
   def update

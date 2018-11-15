@@ -115,8 +115,10 @@ class Submission < ActiveRecord::Base
   validates_as_url :url
   validates :points_deducted, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
   validates :seconds_late_override, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+  validates :extra_attempts, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
   validates :late_policy_status, inclusion: ['none', 'missing', 'late'], allow_nil: true
   validate :ensure_grader_can_grade
+  validate :extra_attempts_can_only_be_set_on_online_uploads
 
   scope :active, -> { where("submissions.workflow_state <> 'deleted'") }
   scope :for_enrollments, -> (enrollments) { where(user_id: enrollments.select(:user_id)) }
@@ -1511,6 +1513,16 @@ class Submission < ActiveRecord::Base
     return true if autograded? && grants_right?(nil, :autograde)
     return true if grants_right?(grader, :grade)
 
+    false
+  end
+
+  def extra_attempts_can_only_be_set_on_online_uploads
+    return true unless changes.key?("extra_attempts") && assignment
+    allowed_submission_types = %w[online_upload online_url online_text_entry]
+    return true if (assignment.submission_types.split(",") & allowed_submission_types).any?
+
+    error_msg = 'extra_attempts can only be set on submissions for an assignment with a type of online_upload, online_url, or online_text_entry'
+    errors.add(:extra_attempts, error_msg)
     false
   end
 

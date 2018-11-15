@@ -83,6 +83,30 @@ describe "Api::V1::Assignment" do
       expect(json['planner_override']).to be_nil
     end
 
+    describe "the allowed_attempts attribute" do
+      it "returns -1 if set to nil" do
+        assignment.update_attribute(:allowed_attempts, nil)
+        json = api.assignment_json(assignment, user, session, {override_dates: false})
+        expect(json["allowed_attempts"]).to eq(-1)
+      end
+
+      it "returns -1 if set to -1" do
+        assignment.update_attribute(:allowed_attempts, -1)
+        json = api.assignment_json(assignment, user, session, {override_dates: false})
+        expect(json["allowed_attempts"]).to eq(-1)
+      end
+
+      it "returns any other values as set in the databse" do
+        assignment.update_attribute(:allowed_attempts, 1)
+        json = api.assignment_json(assignment, user, session, {override_dates: false})
+        expect(json["allowed_attempts"]).to eq(1)
+
+        assignment.update_attribute(:allowed_attempts, 2)
+        json = api.assignment_json(assignment, user, session, {override_dates: false})
+        expect(json["allowed_attempts"]).to eq(2)
+      end
+    end
+
     context "for an assignment" do
       it "provides a submissions download URL" do
         json = api.assignment_json(assignment, user, session)

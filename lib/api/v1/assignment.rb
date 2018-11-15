@@ -60,6 +60,7 @@ module Api::V1::Assignment
       omit_from_final_grade
       anonymous_instructor_annotations
       anonymous_grading
+      allowed_attempts
     )
   }.freeze
 
@@ -141,6 +142,7 @@ module Api::V1::Assignment
     hash['has_submitted_submissions'] = assignment.has_submitted_submissions?
     hash['due_date_required'] = assignment.due_date_required?
     hash['max_name_length'] = assignment.max_name_length
+    hash['allowed_attempts'] = -1 if assignment.allowed_attempts.nil?
 
     unless opts[:exclude_response_fields].include?('in_closed_grading_period')
       hash['in_closed_grading_period'] = assignment.in_closed_grading_period?
@@ -423,6 +425,7 @@ module Api::V1::Assignment
     integration_id
     omit_from_final_grade
     anonymous_instructor_annotations
+    allowed_attempts
   ).freeze
 
   API_ALLOWED_TURNITIN_SETTINGS = %w(

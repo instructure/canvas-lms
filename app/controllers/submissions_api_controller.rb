@@ -174,6 +174,11 @@
 #               "pending_review"
 #             ]
 #           }
+#         },
+#         "extra_attempts": {
+#           "description": "Extra submission attempts allowed for the given user and assignment.",
+#           "example": 10,
+#           "type": "number"
 #         }
 #       }
 #     }

@@ -117,6 +117,7 @@ class Assignment < ActiveRecord::Base
   validate :assignment_name_length_ok?, :unless => :deleted?
   validates :lti_context_id, presence: true, uniqueness: true
   validates :grader_count, numericality: true
+  validates :allowed_attempts, numericality: { greater_than: 0 }, unless: proc { |a| a.allowed_attempts == -1 }, allow_nil: true
 
   with_options unless: :moderated_grading? do
     validates :graders_anonymous_to_graders, absence: true

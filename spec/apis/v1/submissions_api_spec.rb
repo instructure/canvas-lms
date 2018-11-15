@@ -937,7 +937,8 @@ describe 'Submissions API', type: :request do
         "missing"=>false,
         "late_policy_status"=>nil,
         "seconds_late"=>0,
-        "points_deducted"=>nil
+        "points_deducted"=>nil,
+        "extra_attempts"=>nil
     })
 
     # can't access other students' submissions
@@ -1086,6 +1087,7 @@ describe 'Submissions API', type: :request do
         "cached_due_date" => nil,
         "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student1.id}?preview=1&version=3",
         "grade_matches_current_submission"=>true,
+        "extra_attempts" => nil,
         "attachments" =>
          [
            { "content-type" => "application/loser",
@@ -1136,7 +1138,8 @@ describe 'Submissions API', type: :request do
            "missing"=>false,
            "late_policy_status"=>nil,
            "seconds_late"=>0,
-           "points_deducted"=>nil},
+           "points_deducted"=>nil,
+           "extra_attempts"=>nil},
           {"id"=>sub1.id,
            "grade"=>nil,
            "entered_grade"=>nil,
@@ -1167,7 +1170,8 @@ describe 'Submissions API', type: :request do
            "missing"=>false,
            "late_policy_status"=>nil,
            "seconds_late"=>0,
-           "points_deducted"=>nil},
+           "points_deducted"=>nil,
+           "extra_attempts"=>nil},
           {"id"=>sub1.id,
            "grade"=>"A-",
            "entered_grade"=>"A-",
@@ -1222,7 +1226,8 @@ describe 'Submissions API', type: :request do
            "missing"=>false,
            "late_policy_status"=>nil,
            "seconds_late"=>0,
-           "points_deducted"=>nil}],
+           "points_deducted"=>nil,
+           "extra_attempts"=>nil}],
         "attempt"=>3,
         "url"=>nil,
         "submission_type"=>"online_text_entry",
@@ -1274,6 +1279,7 @@ describe 'Submissions API', type: :request do
         "preview_url" => "http://www.example.com/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student2.id}?preview=1&version=1",
         "grade_matches_current_submission"=>true,
         "submitted_at"=>"1970-01-01T04:00:00Z",
+        "extra_attempts" => nil,
         "submission_history"=>
          [{"id"=>sub2.id,
            "grade"=>"F",
@@ -1325,7 +1331,8 @@ describe 'Submissions API', type: :request do
            "missing"=>false,
            "late_policy_status"=>nil,
            "seconds_late"=>0,
-           "points_deducted"=>nil}],
+           "points_deducted"=>nil,
+           "extra_attempts"=>nil}],
         "attempt"=>1,
         "url"=>"http://www.instructure.com",
         "submission_type"=>"online_url",

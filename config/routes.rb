@@ -1093,6 +1093,10 @@ CanvasRails::Application.routes.draw do
       delete 'courses/:course_id/assignments/:id', action: :destroy, controller: :assignments
     end
 
+    scope(controller: 'assignment_extensions') do
+      post "courses/:course_id/assignments/:assignment_id/extensions", action: :create, as: "course_assignment_extensions_create"
+    end
+
     scope(controller: :peer_reviews_api) do
       get 'courses/:course_id/assignments/:assignment_id/peer_reviews', action: :index
       get 'sections/:section_id/assignments/:assignment_id/peer_reviews', action: :index
