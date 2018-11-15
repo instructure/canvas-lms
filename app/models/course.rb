@@ -2843,6 +2843,8 @@ class Course < ActiveRecord::Base
     end
   end
 
+  include Csp::CourseHelper
+
   # unfortunately we decided to pluralize this in the API after the fact...
   # so now we pluralize it everywhere except the actual settings hash and
   # course import/export :(

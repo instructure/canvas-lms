@@ -40,7 +40,7 @@ class ContextExternalTool < ActiveRecord::Base
   attr_accessor :config_type, :config_url, :config_xml
 
   before_save :infer_defaults, :validate_vendor_help_link
-  after_save :touch_context, :check_global_navigation_cache
+  after_save :touch_context, :check_global_navigation_cache, :clear_tool_domain_cache
   validate :check_for_xml_error
 
   workflow do
@@ -753,6 +753,12 @@ class ContextExternalTool < ActiveRecord::Base
       %w{members admins}.each do |visibility|
         Rails.cache.delete("external_tools/global_navigation/#{self.context.asset_string}/#{visibility}")
       end
+    end
+  end
+
+  def clear_tool_domain_cache
+    if self.saved_change_to_domain? || self.saved_change_to_url?
+      self.context.clear_tool_domain_cache
     end
   end
 

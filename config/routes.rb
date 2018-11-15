@@ -2122,6 +2122,15 @@ CanvasRails::Application.routes.draw do
       post 'planner_notes', action: :create
       delete 'planner_notes/:id', action: :destroy
     end
+
+    scope(:controller => :csp_settings) do
+      %w(course account).each do |context|
+        get "#{context.pluralize}/:#{context}_id/csp_settings", :action => :get_csp_settings
+        put "#{context.pluralize}/:#{context}_id/csp_settings", :action => :set_csp_setting
+      end
+      post "accounts/:account_id/csp_settings/domains", :action => :add_domain
+      delete "accounts/:account_id/csp_settings/domains", :action => :remove_domain
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented or

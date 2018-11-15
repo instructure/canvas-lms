@@ -162,6 +162,7 @@ class Account < ActiveRecord::Base
   end
 
   include ::Account::Settings
+  include ::Csp::AccountHelper
 
   # these settings either are or could be easily added to
   # the account settings page
