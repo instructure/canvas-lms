@@ -54,8 +54,13 @@ CanvasRails::Application.routes.draw do
   # Send them back to Braven Champions if they go to the wrong domain
   get '/connect' => 'bz#champion_connect_redirect'
 
+  # Also a BZ addition: for managing the magic field schema
+  resources :magic_field_schema
+
   # IMPORTANT: there are more custom routes below, search for 'bz'
   # end
+
+
   resources :epub_exports, only: [:index]
 
   get 'inbox' => 'context#inbox'

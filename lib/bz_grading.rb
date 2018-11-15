@@ -57,6 +57,46 @@ class BZGrading
 
   end
 
+  def get_module_completion_status(mod, user)
+    if mod.unlock_at && mod.unlock_at > DateTime.now
+      # unlock in the future
+      return 'locked'
+    else
+      # unlocked now, we started or complete? need to check relevant magic field
+      page = mod.content_tags.active.first
+      return 'locked' if page.nil?
+
+      page = WikiPage.find(page.content_id)
+
+      data = RetainedData.where(:user_id => user.id, :name => "module_position_#{page.id}")
+      data = data.any? ? data.first : nil
+      if data.nil?
+        return '' # no progress
+      else
+        doc = Nokogiri::HTML(page.body)
+        final_position = 0
+
+        # pull in sandwiched modules
+        doc.css('[data-replace-with-page]').each do |o|
+          p = o.attr('data-replace-with-page')
+
+          all_pages = mod.course.wiki_pages.active
+          page = all_pages.where(:title => p)
+          if page.any?
+            o.inner_html = page.first.body
+          end
+        end
+
+        doc.css('.bz-box .bz-toggle-all-next').each do |o|
+          final_position += 1
+        end
+
+        #  give it some wiggle room with >= instead of == for edits where we remove something
+        return data.value.to_i >= final_position.to_i ? 'completed' : "started"
+      end
+    end
+  end
+
   def find_module_item_id(course_id, wiki_page_name)
     pages = WikiPage.where(:title => wiki_page_name)
     tag = nil
