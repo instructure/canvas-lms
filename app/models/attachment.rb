@@ -865,8 +865,16 @@ class Attachment < ActiveRecord::Base
   # passed block; this is a helper function for #open
   # (you should call #open instead of this)
   private def streaming_download(dest=nil, &block)
+    retries ||= 0
     CanvasHttp.get(public_url) do |response|
       response.read_body(dest, &block)
+    end
+  rescue Net::ReadTimeout => e
+    if (retries += 1) < Setting.get(:streaming_download_retries, '5').to_i
+      Canvas::Errors.capture_exception(:attachment, e)
+      retry
+    else
+      raise e
     end
   end
 
