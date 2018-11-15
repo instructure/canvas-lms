@@ -138,7 +138,7 @@ const Rubric = (props) => {
           {criteria}
           { showTotalPoints && (
             <tr>
-              <td colSpan="3">
+              <td colSpan={isSummary ? "2" : "3"}>
                 <Flex justifyItems="end">
                   <FlexItem data-selenium="rubric_total">
                     {hideScoreTotal || noScore ? null : total}
