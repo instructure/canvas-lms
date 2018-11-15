@@ -55,15 +55,15 @@ describe 'Final Grade Override' do
     MainSettings::Controls.click_update_button
   end
 
-  it 'display override column in Gradezilla', priority: '1', test_id: 3682130 do
-    skip('Unskip in GRADE-80')
+  it 'display override column in new gradebook', priority: '1', test_id: 3682130 do
+    skip('Unskip in GRADE-1686')
     # TODO: verify new column on NG
     expect(f(".slick-header-column[title='Override']")).to be_displayed
   end
 
-  it 'display override area in SRGB', priority: '1', test_id: 3682130 do
+  it 'display override area in individual gradebook', priority: '1', test_id: 3682130 do
     skip('Unskip in GRADE-81')
-    # TODO: verify new area in SRGB
+    # TODO: verify new area in individual gradebook
   end
 
   context 'with overriden grade' do
@@ -73,7 +73,7 @@ describe 'Final Grade Override' do
     end
 
     it 'saves overriden grade in Gradezilla', priority: '1', test_id: 3682131 do
-      skip('Unskip in GRADE-80')
+      skip('Unskip in GRADE-1686')
       Gradezilla.visit(@course)
       # TODO: displays on NG
       expect(Gradezilla::Cells.get_override_grade(@students.first)).to equal 5

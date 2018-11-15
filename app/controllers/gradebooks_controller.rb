@@ -813,11 +813,12 @@ class GradebooksController < ApplicationController
     {
       GRADEBOOK_OPTIONS: {
         colors: gradebook_settings.fetch(:colors, {}),
+        final_grades_override_enabled: @context.feature_enabled?(:final_grades_override),
         graded_late_submissions_exist: graded_late_submissions_exist,
-        grading_schemes: GradingStandard.for(@context).as_json(include_root: false),
         gradezilla: true,
-        new_gradebook_development_enabled: new_gradebook_development_enabled?,
-        late_policy: @context.late_policy.as_json(include_root: false)
+        grading_schemes: GradingStandard.for(@context).as_json(include_root: false),
+        late_policy: @context.late_policy.as_json(include_root: false),
+        new_gradebook_development_enabled: new_gradebook_development_enabled?
       }
     }
   end

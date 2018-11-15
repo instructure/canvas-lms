@@ -173,15 +173,16 @@ define [
       filterRowsBy
       selectedPrimaryInfo
       selectedSecondaryInfo
-      sortRowsBy:
-        columnId: sortRowsByColumnId # the column controlling the sort
-        settingKey: sortRowsBySettingKey # the key describing the sort criteria
-        direction: sortRowsByDirection # the direction of the sort
       selectedViewOptionsFilters: settings.selected_view_options_filters || []
       showEnrollments:
         concluded: false
         inactive: false
-      showUnpublishedDisplayed: false
+      showUnpublishedAssignments: true
+      showFinalGradeOverrides: false
+      sortRowsBy:
+        columnId: sortRowsByColumnId # the column controlling the sort
+        settingKey: sortRowsBySettingKey # the key describing the sort criteria
+        direction: sortRowsByDirection # the direction of the sort
       submissionTray:
         open: false
         studentId: null
@@ -197,6 +198,7 @@ define [
     {
       assignmentsLoaded: false
       contextModulesLoaded: false
+      overridesColumnUpdating: false
       studentsLoaded: false
       submissionsLoaded: false
       teacherNotesColumnUpdating: false
@@ -321,6 +323,7 @@ define [
       if @options.settings.show_inactive_enrollments == 'true'
         @toggleEnrollmentFilter('inactive', true)
       @initShowUnpublishedAssignments(@options.settings.show_unpublished_assignments)
+      @initShowOverrides(@options.settings.show_final_grade_overrides)
       @initSubmissionStateMap()
       @gradebookColumnSizeSettings = @options.gradebook_column_size_settings
       @setColumnOrder(Object.assign(
@@ -872,7 +875,7 @@ define [
         (submissionType isnt 'attendance' or @show_attendance)
 
     filterAssignmentByPublishedStatus: (assignment) =>
-      assignment.published or @showUnpublishedAssignments
+      assignment.published or @gridDisplaySettings.showUnpublishedAssignments
 
     filterAssignmentByAssignmentGroup: (assignment) =>
       return true unless @isFilteringColumnsByAssignmentGroup()
@@ -1277,6 +1280,12 @@ define [
       onSelect: onSelect
       selected: showingNotes
 
+    getOverridesViewOptionsMenuProps: ->
+      disabled: @contentLoadStates.overridesColumnUpdating || @gridReady.state() != 'resolved'
+      label: if @options.grading_period_set then I18n.t('Grading Period Overrides') else I18n.t('Overrides')
+      onSelect: @toggleOverrides
+      selected: @gridDisplaySettings.showFinalGradeOverrides
+
     getColumnSortSettingsViewOptionsMenuProps: ->
       storedSortOrder = @getColumnOrder()
       criterion = if @isDefaultSortOrder(storedSortOrder.sortType)
@@ -1320,9 +1329,11 @@ define [
 
     getViewOptionsMenuProps: ->
       teacherNotes: @getTeacherNotesViewOptionsMenuProps()
+      overrides: @getOverridesViewOptionsMenuProps()
+      finalGradesOverrideEnabled: @options.final_grades_override_enabled
       columnSortSettings: @getColumnSortSettingsViewOptionsMenuProps()
       filterSettings: @getFilterSettingsViewOptionsMenuProps()
-      showUnpublishedAssignments: @showUnpublishedAssignments
+      showUnpublishedAssignments: @gridDisplaySettings.showUnpublishedAssignments
       onSelectShowUnpublishedAssignments: @toggleUnpublishedAssignments
       onSelectShowStatusesModal: =>
         @statusesModal.open()
@@ -1764,7 +1775,8 @@ define [
       selectedViewOptionsFilters = @listSelectedViewOptionsFilters(),
       showConcludedEnrollments = @getEnrollmentFilters().concluded,
       showInactiveEnrollments = @getEnrollmentFilters().inactive,
-      showUnpublishedAssignments = @showUnpublishedAssignments,
+      showUnpublishedAssignments = @gridDisplaySettings.showUnpublishedAssignments,
+      showFinalGradeOverrides = @gridDisplaySettings.showFinalGradeOverrides,
       studentColumnDisplayAs = @getSelectedPrimaryInfo(),
       studentColumnSecondaryInfo = @getSelectedSecondaryInfo(),
       sortRowsBy = @getSortRowsBySetting(),
@@ -1779,6 +1791,7 @@ define [
           show_concluded_enrollments: showConcludedEnrollments
           show_inactive_enrollments: showInactiveEnrollments
           show_unpublished_assignments: showUnpublishedAssignments
+          show_final_grade_overrides: showFinalGradeOverrides
           student_column_display_as: studentColumnDisplayAs
           student_column_secondary_info: studentColumnSecondaryInfo
           filter_rows_by: ConvertCase.underscore(@gridDisplaySettings.filterRowsBy)
@@ -2346,18 +2359,34 @@ define [
 
     ## Gradebook Application State Methods
 
-    initShowUnpublishedAssignments: (show_unpublished_assignments = 'true') =>
-      @showUnpublishedAssignments = show_unpublished_assignments == 'true'
+    initShowUnpublishedAssignments: (showUnpublishedAssignments = 'true') =>
+      @gridDisplaySettings.showUnpublishedAssignments = showUnpublishedAssignments == 'true'
 
     toggleUnpublishedAssignments: =>
-      @showUnpublishedAssignments = !@showUnpublishedAssignments
+      @gridDisplaySettings.showUnpublishedAssignments = !@gridDisplaySettings.showUnpublishedAssignments
       @updateColumnsAndRenderViewOptionsMenu()
 
       @saveSettings(
-        { @showUnpublishedAssignments },
+        { showUnpublishedAssignments: @gridDisplaySettings.showUnpublishedAssignments },
         () =>, # on success, do nothing since the render happened earlier
         () => # on failure, undo
-          @showUnpublishedAssignments = !@showUnpublishedAssignments
+          @gridDisplaySettings.showUnpublishedAssignments = !@gridDisplaySettings.showUnpublishedAssignments
+          @updateColumnsAndRenderViewOptionsMenu()
+      )
+
+    initShowOverrides: (showFinalGradeOverrides = 'false') =>
+      @gridDisplaySettings.showFinalGradeOverrides =
+        @options.final_grades_override_enabled && showFinalGradeOverrides == 'true'
+
+    toggleOverrides: =>
+      @gridDisplaySettings.showFinalGradeOverrides = !@gridDisplaySettings.showFinalGradeOverrides
+      @updateColumnsAndRenderViewOptionsMenu()
+
+      @saveSettings(
+        { showFinalGradeOverrides: @gridDisplaySettings.showFinalGradeOverrides },
+        () =>, # on success, do nothing since the render happened earlier
+        () => # on failure, undo
+          @gridDisplaySettings.showFinalGradeOverrides = !@gridDisplaySettings.showFinalGradeOverrides
           @updateColumnsAndRenderViewOptionsMenu()
       )
 
@@ -2404,6 +2433,9 @@ define [
 
     setTeacherNotesColumnUpdating: (updating) =>
       @contentLoadStates.teacherNotesColumnUpdating = updating
+
+    setOverridesColumnUpdating: (updating) =>
+      @contentLoadStates.overridesColumnUpdating = updating
 
     ## Grid Display Settings Access Methods
 
