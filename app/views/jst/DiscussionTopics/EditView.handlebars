@@ -112,8 +112,8 @@
   <fieldset>
 
     {{#ifAny isTopic contextIsCourse canModerate showAssignment}}
+    <legend class="control-label">{{#t "options"}}Options{{/t}}</legend>
     <div class="control-group">
-      <div class="control-label">{{#t "options"}}Options{{/t}}</div>
       <div class="controls">
         {{#if isTopic}}
           <div><label class="checkbox short-label" for="threaded">
