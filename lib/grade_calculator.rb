@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require "bigdecimal"
+
 class GradeCalculator
   attr_accessor :assignments, :groups
 
@@ -733,7 +735,7 @@ class GradeCalculator
           assignment: a,
           submission: s,
           score: s&.score,
-          total: a.points_possible || 0,
+          total: BigDecimal(a.points_possible || 0, 15),
           excused: s&.excused?,
         }
       end
@@ -765,7 +767,7 @@ class GradeCalculator
         score:     score,
         possible:  possible,
         weight:    group.group_weight,
-        grade:     ((score.to_f / possible * 100).round(2) if possible > 0),
+        grade:     ((score.to_f / possible * 100).round(2).to_f if possible > 0),
         dropped:   dropped_submissions
       }.tap { |group_grade_info|
         Rails.logger.debug "GRADES: calculated #{group_grade_info.inspect}"
@@ -948,9 +950,9 @@ class GradeCalculator
       if possible > 0
         final_grade = (total.to_f / possible) * 100
         {
-          grade: final_grade.round(2),
+          grade: final_grade.round(2).to_f,
           total: total.to_f,
-          possible: possible,
+          possible: possible.to_f,
           dropped: dropped
         }
       else
