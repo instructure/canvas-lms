@@ -49,6 +49,7 @@ exports[`The Comments component renders a placeholder when no assessment provide
 
 exports[`The Comments component renders the root component as expected when assessing 1`] = `
 <FreeFormComments
+  allowSaving={true}
   comments="I award you no points, and may God have mercy on your soul."
   saveLater={false}
   savedComments={
