@@ -1837,6 +1837,10 @@ CanvasRails::Application.routes.draw do
       get "support_helpers/turnitin/refresh_lti_attachment", action: :lti_attachment
     end
 
+    scope(controller: 'support_helpers/plagiarism_platform') do
+      get "support_helpers/plagiarism_platform/add_service", action: :add_service
+    end
+
     scope(controller: 'support_helpers/crocodoc') do
       get "support_helpers/crocodoc/shard", action: :shard
       get "support_helpers/crocodoc/submission", action: :submission
