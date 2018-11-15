@@ -73,7 +73,6 @@ module Lti::Ims
   class ScoresController < ApplicationController
     include Concerns::GradebookServices
 
-    skip_before_action :load_user
     before_action(
       :verify_line_item_in_context,
       :verify_user_in_context,
@@ -141,6 +140,10 @@ module Lti::Ims
 
     REQUIRED_PARAMS = %i[userId activityProgress gradingProgress timestamp].freeze
     OPTIONAL_PARAMS = %i[scoreGiven scoreMaximum comment].freeze
+
+    def scopes_matcher
+      self.class.all_of(TokenScopes::LTI_AGS_SCORE_SCOPE)
+    end
 
     def scores_params
       @_scores_params ||= begin

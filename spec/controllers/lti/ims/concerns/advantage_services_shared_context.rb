@@ -27,19 +27,19 @@ shared_context 'advantage services context' do
     dk.developer_key_account_bindings.first.update! workflow_state: DeveloperKeyAccountBinding::ON_STATE
     dk
   end
-
   let(:access_token_scopes) do
     %w(https://purl.imsglobal.org/spec/lti-ags/scope/lineitem
        https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly
        https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly).join(' ')
   end
   let(:access_token_signing_key) { Canvas::Security.encryption_key }
+  let(:test_request_host) { 'test.host' }
   let(:access_token_jwt_hash) do
     timestamp = Time.zone.now.to_i
     {
       iss: 'https://canvas.instructure.com',
       sub: developer_key.global_id,
-      aud: 'http://test.host/login/oauth2/token',
+      aud: "http://#{test_request_host}/login/oauth2/token",
       iat: timestamp,
       exp: (timestamp + 1.hour.to_i),
       nbf: (timestamp - 30),
@@ -51,7 +51,6 @@ shared_context 'advantage services context' do
     return nil if access_token_jwt_hash.blank?
     JSON::JWT.new(access_token_jwt_hash).sign(access_token_signing_key, :HS256).to_s
   end
-
   let(:tool_context) { root_account }
   let!(:tool) do
     ContextExternalTool.create!(
@@ -65,7 +64,6 @@ shared_context 'advantage services context' do
       workflow_state: 'public'
     )
   end
-
   let(:course_account) do
     root_account
   end

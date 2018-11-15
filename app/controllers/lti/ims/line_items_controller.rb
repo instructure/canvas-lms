@@ -62,10 +62,16 @@ module Lti
     class LineItemsController < ApplicationController
       include Concerns::GradebookServices
 
-      skip_before_action :load_user
-
       before_action :verify_line_item_in_context, only: %i(show update destroy)
       before_action :verify_valid_resource_link, only: :create
+
+      ACTION_SCOPE_MATCHERS = {
+        create: all_of(TokenScopes::LTI_AGS_LINE_ITEM_SCOPE),
+        update: all_of(TokenScopes::LTI_AGS_LINE_ITEM_SCOPE),
+        destroy: all_of(TokenScopes::LTI_AGS_LINE_ITEM_SCOPE),
+        show: any_of(TokenScopes::LTI_AGS_LINE_ITEM_SCOPE, TokenScopes::LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE),
+        index: any_of(TokenScopes::LTI_AGS_LINE_ITEM_SCOPE, TokenScopes::LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE)
+      }.with_indifferent_access.freeze
 
       MIME_TYPE = 'application/vnd.ims.lis.v2.lineitem+json'.freeze
       CONTAINER_MIME_TYPE = 'application/vnd.ims.lis.v2.lineitemcontainer+json'.freeze
@@ -145,7 +151,7 @@ module Lti
       # @argument tag [String]
       #   If specified only Line Items with this tag will be included.
       #
-      # @argument resouce_id [String]
+      # @argument resource_id [String]
       #   If specified only Line Items with this resource_id will be included.
       #
       # @argument lti_link_id [String]
@@ -171,7 +177,7 @@ module Lti
       #
       # @returns LineItem
       def destroy
-        return render_unauthorized_action if line_item.assignment_line_item? && line_item.resource_link.present?
+        head :unauthorized and return if line_item.assignment_line_item? && line_item.resource_link.present?
         line_item.destroy!
         head :no_content
       end
@@ -214,7 +220,7 @@ module Lti
       end
 
       def resource_link
-        # TODO: Create an Lti::ResourceLink when a 1.3 tool is associated with an assignment
+        # TODO: Constrain query by current tool
         @_resource_link ||= ResourceLink.find_by(resource_link_id: params[:ltiLinkId])
       end
 
@@ -237,7 +243,11 @@ module Lti
         return unless params[:ltiLinkId]
         raise ActiveRecord::RecordNotFound if resource_link.blank?
         head :precondition_failed if resource_link.line_items.blank?
-        # TODO: check that the Lti::ResouceLink is owned by the tool
+        # TODO: additional checks similar to MembershipProvider#validate_tool_for_assignment!
+      end
+
+      def scopes_matcher
+        ACTION_SCOPE_MATCHERS.fetch(action_name, self.class.none)
       end
     end
   end

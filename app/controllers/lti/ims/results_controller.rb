@@ -64,12 +64,7 @@ module Lti::Ims
   class ResultsController < ApplicationController
     include Concerns::GradebookServices
 
-    skip_before_action :load_user
-    before_action(
-      :verify_tool_in_context,
-      :verify_tool_permissions,
-      :verify_line_item_in_context
-    )
+    before_action :verify_line_item_in_context
     before_action :verify_result_in_line_item, only: %i[show]
 
     MIME_TYPE = 'application/vnd.ims.lis.v2.resultcontainer+json'.freeze
@@ -103,6 +98,13 @@ module Lti::Ims
       render json: Lti::Ims::ResultsSerializer.new(result, line_item_url).as_json, content_type: MIME_TYPE
     end
 
+    def scopes_matcher
+      # Spec seems to strongly imply this scope is sufficient. I.e. even tho a Result belongs to a LineItem,
+      # doesn't look like we're compelled to require at least one of LTI_AGS_LINE_ITEM_SCOPE and
+      # LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE
+      self.class.all_of(TokenScopes::LTI_AGS_RESULT_READ_ONLY_SCOPE)
+    end
+
     private
 
     def verify_result_in_line_item
@@ -119,10 +121,6 @@ module Lti::Ims
 
     def result
       @_result = Lti::Result.find(params[:id])
-    end
-
-    def pagination_args
-      params[:limit] ? { per_page: params[:limit] } : {}
     end
 
     def results_collection(results)
