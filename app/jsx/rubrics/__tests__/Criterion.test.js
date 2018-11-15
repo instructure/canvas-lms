@@ -120,6 +120,17 @@ describe('Criterion', () => {
     expect(comments({ isSummary: true })).toHaveLength(0)
   })
 
+  it('does not have a threshold when mastery_points is null / there is no outcome', () => {
+    const nullified = { ...rubrics.points.criteria[1], mastery_points: null }
+    const el = shallow(
+      <Criterion
+        criterion={nullified}
+      />
+    )
+
+    expect(el.find('Threshold')).toHaveLength(0)
+  })
+
   it('does not have a points column when hasPointsColumn is false', () => {
     const el = shallow(
       <Criterion

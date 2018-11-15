@@ -246,7 +246,7 @@ export default class Criterion extends React.Component {
               />
           </div>
           {
-            !hidePoints && threshold !== undefined ? <Threshold threshold={threshold} /> : null
+            !(hidePoints || _.isNil(threshold)) ? <Threshold threshold={threshold} /> : null
           }
           {
             (freeForm || assessing || isSummary || noComments) ? null : (
