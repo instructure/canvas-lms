@@ -2904,7 +2904,7 @@ class Course < ActiveRecord::Base
   def reset_content
     Course.transaction do
       new_course = Course.new
-      self.attributes.delete_if{|k,v| [:id, :created_at, :updated_at, :syllabus_body, :wiki_id, :default_view, :tab_configuration, :lti_context_id, :workflow_state].include?(k.to_sym) }.each do |key, val|
+      self.attributes.delete_if{|k,v| [:id, :created_at, :updated_at, :syllabus_body, :wiki_id, :default_view, :tab_configuration, :lti_context_id, :workflow_state, :latest_outcome_import_id].include?(k.to_sym) }.each do |key, val|
         new_course.write_attribute(key, val)
       end
       new_course.workflow_state = (self.admins.any? ? 'claimed' : 'created')
