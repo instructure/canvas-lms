@@ -19,11 +19,12 @@
 import $ from 'jquery'
 import gql from 'graphql-tag'
 import {ApolloClient} from 'apollo-client'
-import {InMemoryCache} from 'apollo-cache-inmemory'
+import {InMemoryCache, IntrospectionFragmentMatcher} from 'apollo-cache-inmemory'
 import {HttpLink} from 'apollo-link-http'
 import {onError} from 'apollo-link-error'
 import {ApolloLink} from 'apollo-link'
 import {ApolloProvider, Query} from 'react-apollo'
+import introspectionQueryResultData from './fragmentTypes.json'
 
 const client = new ApolloClient({
   link: ApolloLink.from([
@@ -53,7 +54,10 @@ const client = new ApolloClient({
   ]),
   cache: new InMemoryCache({
     addTypename: true,
-    dataIdFromObject: object => object.id || null
+    dataIdFromObject: object => object.id || null,
+    fragmentMatcher: new IntrospectionFragmentMatcher({
+      introspectionQueryResultData
+    })
   })
 })
 

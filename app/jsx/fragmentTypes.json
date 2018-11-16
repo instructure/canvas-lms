@@ -1,0 +1,156 @@
+{
+  "__schema": {
+    "types": [
+      {
+        "kind": "INTERFACE",
+        "name": "Node",
+        "possibleTypes": [
+          {
+            "name": "Assignment"
+          },
+          {
+            "name": "AssignmentGroup"
+          },
+          {
+            "name": "AssignmentOverride"
+          },
+          {
+            "name": "Course"
+          },
+          {
+            "name": "Discussion"
+          },
+          {
+            "name": "Enrollment"
+          },
+          {
+            "name": "GradingPeriod"
+          },
+          {
+            "name": "Group"
+          },
+          {
+            "name": "GroupSet"
+          },
+          {
+            "name": "Module"
+          },
+          {
+            "name": "Page"
+          },
+          {
+            "name": "Quiz"
+          },
+          {
+            "name": "Section"
+          },
+          {
+            "name": "Submission"
+          },
+          {
+            "name": "User"
+          }
+        ]
+      },
+      {
+        "kind": "INTERFACE",
+        "name": "Timestamped",
+        "possibleTypes": [
+          {
+            "name": "Assignment"
+          },
+          {
+            "name": "AssignmentGroup"
+          },
+          {
+            "name": "AssignmentOverride"
+          },
+          {
+            "name": "Course"
+          },
+          {
+            "name": "Discussion"
+          },
+          {
+            "name": "Enrollment"
+          },
+          {
+            "name": "GradingPeriod"
+          },
+          {
+            "name": "Group"
+          },
+          {
+            "name": "GroupMembership"
+          },
+          {
+            "name": "Module"
+          },
+          {
+            "name": "Page"
+          },
+          {
+            "name": "Quiz"
+          },
+          {
+            "name": "Section"
+          },
+          {
+            "name": "Submission"
+          },
+          {
+            "name": "User"
+          }
+        ]
+      },
+      {
+        "kind": "INTERFACE",
+        "name": "AssignmentsConnectionInterface",
+        "possibleTypes": [
+          {
+            "name": "AssignmentGroup"
+          },
+          {
+            "name": "Course"
+          }
+        ]
+      },
+      {
+        "kind": "UNION",
+        "name": "Lockable",
+        "possibleTypes": [
+          {
+            "name": "Assignment"
+          },
+          {
+            "name": "Discussion"
+          },
+          {
+            "name": "Quiz"
+          },
+          {
+            "name": "Page"
+          },
+          {
+            "name": "Module"
+          }
+        ]
+      },
+      {
+        "kind": "UNION",
+        "name": "AssignmentOverrideSet",
+        "possibleTypes": [
+          {
+            "name": "Section"
+          },
+          {
+            "name": "Group"
+          },
+          {
+            "name": "AdhocStudents"
+          }
+        ]
+      }
+    ]
+  }
+}
