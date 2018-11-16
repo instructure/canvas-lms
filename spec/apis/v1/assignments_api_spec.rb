@@ -1634,6 +1634,20 @@ describe AssignmentsApiController, type: :request do
         expect(new_assignment.tool_settings_tool).to eq message_handler
       end
 
+      context 'when no tool association exists' do
+        let(:assignment) { assignment_model(course: @course) }
+        let(:update_response) do
+          put "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}", params: {
+            assignment: { name: 'banana' }
+          }
+        end
+
+        it 'does not attempt to clear tool associations' do
+          expect(assignment).not_to receive(:clear_tool_settings_tools)
+          update_response
+        end
+      end
+
       context 'when a tool association already exists' do
         let(:assignment) do
           a = assignment_model(course: @course)

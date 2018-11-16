@@ -903,7 +903,7 @@ module Api::V1::Assignment
     if plagiarism_capable?(assignment_params)
       tool = assignment_configuration_tool(assignment_params)
       assignment.tool_settings_tool = tool
-    else
+    elsif assignment.persisted? && assignment.assignment_configuration_tool_lookups.present?
       # Destroy subscriptions and tool associations
       assignment.send_later_if_production(:clear_tool_settings_tools)
     end
