@@ -289,6 +289,12 @@ class Submission < ActiveRecord::Base
   after_save :update_participation
   after_save -> { PipelineService.publish self }
 
+  after_save :send_unit_grades_to_pipeline
+
+  def send_unit_grades_to_pipeline
+    PipelineService.publish(PipelineService::Nouns::UnitGrades.new(self))
+  end
+
   def autograded?
     # AutoGrader == (quiz_id * -1)
     !!(self.grader_id && self.grader_id < 0)
