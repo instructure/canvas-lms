@@ -165,6 +165,24 @@ describe('Criterion', () => {
     expect(onAssessmentChange.args[0][0].comments).toEqual('up')
   })
 
+  it('can save empty comments', () => {
+    const onAssessmentChange = sinon.spy()
+    const newComments = { ...assessments.points.data[1], partialComments: '' }
+    const comments = shallow(
+      <Criterion
+        assessment={newComments}
+        criterion={rubrics.points.criteria[1]}
+        onAssessmentChange={onAssessmentChange}
+        freeForm={false}
+      />
+    )
+
+    const button = comments.find('CommentButton')
+    button.prop('finalize')(true)
+
+    expect(onAssessmentChange.args[0][0].comments).toEqual('')
+  })
+
   it('saves prior comments from the dialog if unchanged', () => {
     const onAssessmentChange = sinon.spy()
     const comments = shallow(
