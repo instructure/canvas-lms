@@ -19,7 +19,7 @@
 import axios from 'axios';
 import { camelize, underscore } from 'convert_case';
 
-const DEFAULT_LATE_POLICY_DATA = Object.freeze({
+export const DEFAULT_LATE_POLICY_DATA = Object.freeze({
   lateSubmissionDeductionEnabled: false,
   lateSubmissionDeduction: 0,
   lateSubmissionInterval: 'day',
@@ -35,7 +35,7 @@ function camelizeLatePolicyResponseData (latePolicyResponseData) {
   return { latePolicy: camelizedData };
 }
 
-function fetchLatePolicy (courseId) {
+export function fetchLatePolicy (courseId) {
   const url = `/api/v1/courses/${courseId}/late_policy`;
   return axios.get(url)
     .then(response => (
@@ -52,7 +52,7 @@ function fetchLatePolicy (courseId) {
     });
 }
 
-function createLatePolicy (courseId, latePolicyData) {
+export function createLatePolicy (courseId, latePolicyData) {
   const url = `/api/v1/courses/${courseId}/late_policy`;
   const data = { late_policy: underscore(latePolicyData) };
   return axios.post(url, data).then(response => (
@@ -60,7 +60,7 @@ function createLatePolicy (courseId, latePolicyData) {
   ));
 }
 
-function updateLatePolicy (courseId, latePolicyData) {
+export function updateLatePolicy (courseId, latePolicyData) {
   const url = `/api/v1/courses/${courseId}/late_policy`;
   const data = { late_policy: underscore(latePolicyData) };
   return axios.patch(url, data);

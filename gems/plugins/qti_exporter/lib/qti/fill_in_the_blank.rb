@@ -86,8 +86,8 @@ class FillInTheBlank < AssessmentItemConverter
       ci.search('simpleChoice').each do |choice|
         answer = {}
         answer[:weight] = @type == 'multiple_dropdowns_question' ? 0 : 100
-        answer[:id] = unique_local_id
         answer[:migration_id] = choice['identifier']
+        answer[:id] = get_or_generate_answer_id(answer[:migration_id])
         answer[:text] = choice.text.strip
         answer[:blank_id] = blank_id
         @question[:answers] << answer

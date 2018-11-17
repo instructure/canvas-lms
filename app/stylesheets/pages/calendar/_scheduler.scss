@@ -254,7 +254,7 @@
 
 .ag_contexts_done {
   float: direction(right);
-  margin: 5px 5px 0 0;
+  margin: direction-sides(5px 5px 0 0);
 }
 
 .delete-block-link {
@@ -341,8 +341,8 @@
       overflow: hidden;
       white-space: nowrap;
       float: direction(left);
-      margin: 1px 2px 1px 4px;
-      padding: 0 14px 0 11px;
+      margin: direction-sides(1px 2px 1px 4px);
+      padding: direction-sides(0 14px 0 11px);
       color: #000;
       background-color: #dee7fa;
       border: 1px solid #a5bcf0;

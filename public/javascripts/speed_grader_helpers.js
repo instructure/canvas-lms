@@ -177,6 +177,14 @@ export function setupAnonymizableAuthorId (isAnonymous) {
       return $.replaceTags($('#assignment_submission_resubmit_to_turnitin_url').attr('href'), { user_id: submission[anonymizableUserId] })
     },
 
+    plagiarismResubmitButton(hasOriginalityScore, buttonContainer) {
+      if (hasOriginalityScore) {
+        buttonContainer.hide()
+      } else {
+        buttonContainer.show()
+      }
+    },
+
     reloadPage() {
       window.location.reload();
     },

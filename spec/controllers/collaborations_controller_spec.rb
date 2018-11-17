@@ -135,6 +135,7 @@ describe CollaborationsController do
       before(:each) do
         pseudonym(@student)
         @student.save!
+        enable_default_developer_key!
         token = @student.access_tokens.create!(purpose: 'test').full_token
         @request.headers['Authorization'] = "Bearer #{token}"
       end

@@ -76,19 +76,19 @@ const defaultProps = (props = {}) => (
 
 it('renders the Outcome component', () => {
   const wrapper = shallow(<Outcome {...defaultProps()}/>)
-  expect(wrapper.debug()).toMatchSnapshot()
+  expect(wrapper).toMatchSnapshot()
 })
 
 it('renders correctly expanded', () => {
   const wrapper = shallow(<Outcome {...defaultProps()} expanded />)
-  expect(wrapper.debug()).toMatchSnapshot()
+  expect(wrapper).toMatchSnapshot()
 })
 
 it('renders correctly expanded with no results', () => {
   const props = defaultProps()
   props.outcome.results = []
   const wrapper = shallow(<Outcome {...props} expanded />)
-  expect(wrapper.debug()).toMatchSnapshot()
+  expect(wrapper).toMatchSnapshot()
 })
 
 it('renders correctly expanded with no results or assignments', () => {
@@ -96,7 +96,7 @@ it('renders correctly expanded with no results or assignments', () => {
   props.outcome.results = []
   props.outcome.assignments = []
   const wrapper = shallow(<Outcome {...props} expanded />)
-  expect(wrapper.debug()).toMatchSnapshot()
+  expect(wrapper).toMatchSnapshot()
 })
 
 describe('header', () => {

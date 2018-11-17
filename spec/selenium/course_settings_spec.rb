@@ -44,8 +44,7 @@ describe "course settings" do
       fj('.grading_standard_select:visible a').click
       fj('button.select_grading_standard_link:visible').click
       f('.done_button').click
-      submit_form('#course_form')
-      wait_for_ajaximations
+      wait_for_new_page_load(submit_form('#course_form'))
 
       @course.reload
       expect(@course.grading_standard).to eq(@standard)

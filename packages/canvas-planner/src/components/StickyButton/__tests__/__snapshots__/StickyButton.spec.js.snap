@@ -7,6 +7,7 @@ exports[`adds aria-hidden when specified 1`] = `
     aria-disabled={null}
     aria-hidden="true"
     className=""
+    id="sb"
     onClick={[Function]}
     style={
       Object {
@@ -29,6 +30,7 @@ exports[`renders 1`] = `
     aria-disabled={null}
     aria-hidden={null}
     className=""
+    id="sb"
     onClick={[Function]}
     style={
       Object {

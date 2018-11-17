@@ -5,6 +5,9 @@
   "add_to_do_7def3c37": {
     "message": "Добавить в задачи"
   },
+  "address_3159962f": {
+    "message": "Адрес:"
+  },
   "all_day_fb42c4fc": {
     "message": "Весь день"
   },
@@ -56,6 +59,9 @@
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Начало вашей истории задач"
   },
+  "calendar_a8563bb2": {
+    "message": "Календарь:"
+  },
   "calendar_event_89aadc1c": {
     "message": "Событие календаря"
   },
@@ -92,11 +98,17 @@
   "date_is_required_8660ec22": {
     "message": "Необходимо указать дату"
   },
+  "date_time_d9fbf2d7": {
+    "message": "Дата и время:"
+  },
   "delete_a6efa79d": {
     "message": "Удалить"
   },
   "details_98a31b68": {
     "message": "Подробные сведения"
+  },
+  "details_a6f427c3": {
+    "message": "Сведения:"
   },
   "discussion_6719c51d": {
     "message": "Обсуждение"
@@ -193,6 +205,9 @@
   },
   "loading_planner_items_947a813d": {
     "message": "Загрузка событий планировщика"
+  },
+  "location_3b6ff307": {
+    "message": "Местоположение:"
   },
   "looks_like_there_isn_t_anything_here_d9bcef49": {
     "message": "Похоже, здесь ничего нет"
@@ -301,6 +316,12 @@
   },
   "startdate_to_enddate_d245175b": {
     "message": "с { startDate } до { endDate }"
+  },
+  "startdatetime_enddatetime_20abc10e": {
+    "message": "{ startDateTime } - { endDateTime }"
+  },
+  "startdatetime_endtime_49741bbe": {
+    "message": "{ startDateTime } - { endTime }"
   },
   "starttime_to_endtime_d7cc249d": {
     "message": "с { startTime } до { endTime }"

@@ -138,7 +138,7 @@
 .ic-flash-info, .ic-flash-success, .ic-flash-warning, .ic-flash-error {
   position: relative;
   box-sizing: border-box;
-  padding: $ic-sp/2 40px $ic-sp/2 $ic-sp*4;
+  padding: direction-sides($ic-sp/2 40px $ic-sp/2 $ic-sp*4);
   margin: 0 auto;
   width: 475px;
   min-height: 20px;

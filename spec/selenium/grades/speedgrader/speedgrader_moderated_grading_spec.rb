@@ -53,9 +53,8 @@ describe "speed grader" do
       wait_for_ajaximations
       f('.criterion_points input').send_keys(score.to_s)
       f('.criterion_points input').send_keys(:tab)
-      sleep 0.5
       wait_for_ajaximations
-      scroll_into_view('.save_rubric_button')
+      scroll_to(f('.save_rubric_button'))
       save_rubric_button = f('#rubric_full .save_rubric_button')
       save_rubric_button.click
       wait_for_ajaximations

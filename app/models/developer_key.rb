@@ -144,6 +144,7 @@ class DeveloperKey < ActiveRecord::Base
         end
         return @special_keys[default_key_name] = key if key
         key = DeveloperKey.create!(:name => default_key_name)
+        key.developer_key_account_bindings.update_all(workflow_state: 'on')
         Setting.set("#{default_key_name}_developer_key_id", key.id)
         return @special_keys[default_key_name] = key
       end
@@ -248,7 +249,6 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   def invalidate_access_tokens_if_scopes_removed!
-    return unless developer_key_management_and_scoping_on?
     return unless saved_change_to_scopes?
     return if (scopes_before_last_save - scopes).blank?
     send_later_if_production(:invalidate_access_tokens!)
@@ -259,19 +259,7 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   def binding_on_in_account?(target_account)
-    if target_account.site_admin?
-      return true unless Setting.get(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES, nil).present?
-    else
-      return true unless target_account.root_account.feature_enabled?(:developer_key_management_and_scoping)
-    end
-
     account_binding_for(target_account)&.workflow_state == DeveloperKeyAccountBinding::ON_STATE
-  end
-
-  def developer_key_management_and_scoping_on?
-    owner_account.root_account.feature_enabled?(:developer_key_management_and_scoping) || (
-      owner_account.site_admin? && Setting.get(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES, nil).present?
-    )
   end
 
   def create_default_account_binding
@@ -279,7 +267,6 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   def validate_scopes!
-    return true unless developer_key_management_and_scoping_on?
     return true if self.scopes.empty?
     invalid_scopes = self.scopes - TokenScopes.all_scopes
     return true if invalid_scopes.empty?

@@ -18,7 +18,6 @@
 
 class DiscussionTopicParticipant < ActiveRecord::Base
   include Workflow
-  include PlannerHelper
 
   belongs_to :discussion_topic
   belongs_to :user
@@ -46,7 +45,7 @@ class DiscussionTopicParticipant < ActiveRecord::Base
     if id_before_last_save.nil? ||
       (unread_entry_count_before_last_save == 0 && unread_entry_count > 0) ||
       (unread_entry_count_before_last_save > 0 && unread_entry_count == 0)
-      clear_planner_cache(user)
+      PlannerHelper.clear_planner_cache(user)
     end
   end
 end

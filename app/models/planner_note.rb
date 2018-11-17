@@ -19,7 +19,6 @@
 class PlannerNote < ActiveRecord::Base
   include Canvas::SoftDeletable
   include Plannable
-  include PlannerHelper
 
   belongs_to :user
   belongs_to :course

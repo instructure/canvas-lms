@@ -120,8 +120,8 @@
     }
   }
   .undo-main-margins {
-    margin-left: -1em;
-    margin-right: -1em;
+    margin-#{direction(left)}: -1em;
+    margin-#{direction(right)}: -1em;
     margin-bottom: -1em;
   }
   .student-assignment-overview {
@@ -130,7 +130,7 @@
     border-top: 1px solid $ic-border-light;
     border-bottom: 1px solid $ic-border-light;
     padding: $ic-sp 0;
-    margin: 0 0 ($ic-sp * 1.5) 0;
+    margin: direction-sides(0 0 ($ic-sp * 1.5) 0);
     li {
       display: inline-block;
     }

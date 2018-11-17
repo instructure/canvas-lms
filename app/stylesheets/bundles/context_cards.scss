@@ -24,8 +24,8 @@
   padding: $ic-sp*3 $ic-sp*1.5 $ic-sp;
 
   @include breakpoint(tablet) {
-    padding-left: $ic-sp*2;
-    padding-right: $ic-sp*2;
+    padding-#{direction(left)}: $ic-sp*2;
+    padding-#{direction(right)}: $ic-sp*2;
   }
 
   // Bump the content up a bit if there's an avatar image

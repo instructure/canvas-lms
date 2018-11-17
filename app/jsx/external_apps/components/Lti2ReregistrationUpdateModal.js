@@ -29,7 +29,8 @@ export default class Lti2ReregistrationUpdateModal extends React.Component {
   static propTypes = {
     tool: PropTypes.object.isRequired,
     closeHandler: PropTypes.func,
-    canAddEdit: PropTypes.bool.isRequired
+    canAddEdit: PropTypes.bool.isRequired,
+    returnFocus: PropTypes.func.isRequired
   }
 
   state = {
@@ -47,6 +48,7 @@ export default class Lti2ReregistrationUpdateModal extends React.Component {
     } else {
       this.setState({modalIsOpen: false})
     }
+    this.props.returnFocus()
   }
 
   acceptUpdate = e => {

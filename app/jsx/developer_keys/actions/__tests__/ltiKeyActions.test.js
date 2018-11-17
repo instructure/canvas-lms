@@ -22,17 +22,17 @@ import axios from 'axios'
 
 const dispatch = jest.fn()
 
-beforeAll(() => {
-  axios.post = jest.fn().mockResolvedValue({
-    data: {tool_configuration: {settings: {test: 'config'}, developer_key_id: '1'}}
-  })
-})
-
-afterAll(() => {
-  axios.post.mockRestore()
-})
-
 describe('saveLtiToolConfiguration', () => {
+  beforeAll(() => {
+    axios.post = jest.fn().mockResolvedValue({
+      data: {tool_configuration: {settings: {test: 'config'}, developer_key_id: '1'}}
+    })
+  })
+
+  afterAll(() => {
+    axios.post.mockRestore()
+  })
+
   const save = (includeUrl = false) => {
     actions.saveLtiToolConfiguration({
       account_id: '1',
@@ -62,5 +62,45 @@ describe('saveLtiToolConfiguration', () => {
         developerKeysActions.listDeveloperKeysPrepend({name: 'test', id: '1'})
       )
     })
+  })
+})
+
+describe('ltiKeysUpdateCustomizations', () => {
+  beforeAll(() => { axios.put = jest.fn().mockResolvedValue({}) })
+
+  afterAll(() => { axios.put.mockRestore() })
+
+  const scopes = ['https://www.test.com/scope']
+  const disabledPlacements = ['account_navigation', 'course_navigaiton']
+  const developerKeyId = 123
+  const toolConfiguration = {}
+  const customFields = "foo=bar\r\nkey=value"
+
+  const update = (dispatch) => {
+    actions.ltiKeysUpdateCustomizations(
+      scopes,
+      disabledPlacements,
+      developerKeyId,
+      toolConfiguration,
+      customFields
+    )(dispatch)
+  }
+
+  it('makes a request to the tool config update endpoint', () => {
+    update(jest.fn())
+
+    expect(axios.put).toHaveBeenCalledWith(
+      `/api/lti/developer_keys/${developerKeyId}/tool_configuration`,
+      {
+        developer_key: {
+          scopes
+        },
+        tool_configuration: {
+          disabled_placements: disabledPlacements,
+          settings: toolConfiguration,
+          custom_fields: customFields
+        }
+      }
+    )
   })
 })

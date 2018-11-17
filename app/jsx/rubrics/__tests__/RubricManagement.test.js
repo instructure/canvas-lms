@@ -26,7 +26,7 @@ const defaultProps = (props = {}) => (
 
 it('renders the RubricManagement component', () => {
   const wrapper = shallow(<RubricManagement {...defaultProps()}/>)
-  expect(wrapper.debug()).toMatchSnapshot()
+  expect(wrapper).toMatchSnapshot()
 })
 
 it('passes accountId to the ProficiencyTable component', () => {

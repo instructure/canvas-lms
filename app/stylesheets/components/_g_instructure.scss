@@ -80,7 +80,7 @@
   li:not(.ic-flash-info, .ic-flash-success, .ic-flash-warning, .ic-flash-error) {
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
     border-bottom-color: rgba(0, 0, 0, 0.5);
-    padding: 4px 40px 4px 8px;
+    padding: direction-sides(4px 40px 4px 8px);
     min-height: 20px;
     vertical-align: middle;
     text-align: center;
@@ -175,8 +175,8 @@
     padding: 0px 10px;
     border-bottom: 1px solid #aaa;
     font-size: 1.2em;
-    border-top-right-radius: 4px;
-    border-top-left-radius: 4px;
+    border-top-#{direction(right)}-radius: 4px;
+    border-top-#{direction(left)}-radius: 4px;
   }
   .body {
     width: auto;
@@ -250,7 +250,7 @@
   table.courses {
     width: 100%;
     td {
-      padding: 5px 5px 10px 10px;
+      padding: direction-sides(5px 5px 10px 10px);
       background-color: #eee;
       color: #888;
       .name {
@@ -299,7 +299,7 @@
         height: 100%;
         width: $ic-sp;
         background: linear-gradient(
-          to right, rgba(255, 255, 255, 0) 0%,
+          to direction(right), rgba(255, 255, 255, 0) 0%,
           rgba(255, 255, 255, 1) 80%);
       }
     }
@@ -310,7 +310,7 @@
       &:after {
         width: $ic-sp * 2.5;
         background: linear-gradient(
-          to right, rgba(255, 255, 255, 0) 0%,
+          to direction(right), rgba(255, 255, 255, 0) 0%,
           rgba(255, 255, 255, 1) 50%);
       }
     }
@@ -386,7 +386,7 @@ table.summary {
   table.subtable {
     th, td {
       border-top: 0;
-      padding: 1px 5px 1px 0;
+      padding: direction-sides(1px 5px 1px 0);
       font-size: 0.8em;
     }
   }
@@ -418,12 +418,12 @@ table.formtable td {
   }
   .details {
     font-size: 0.8em;
-    margin: 0 0 0 10px;
+    margin: direction-sides(0 0 0 10px);
   }
   .info {
     clear: direction(left);
     font-size: 0.8em;
-    margin: 0 0 5px 10px;
+    margin: direction-sides(0 0 5px 10px);
     .links {
       color: #eee;
       a {
@@ -500,7 +500,7 @@ body .disabled_link {
 .error_box {
   position: absolute;
   top: -1000px;
-  left: -100px;
+  #{direction(left)}: -100px;
   z-index: 11;
   max-width: 200px;
   min-width: 100px;
@@ -516,7 +516,7 @@ body .disabled_link {
   .error_bottom {
     position: absolute;
     bottom: 0;
-    left: 4px;
+    #{direction(left)}: 4px;
   }
 }
 
@@ -629,7 +629,7 @@ $wizard-bg-color: $ic-color-dark;
     }
     .wizard_options_list {
       list-style-type: none;
-      margin: 0 10px 0 0;
+      margin: direction-sides(0 10px 0 0);
       padding-#{direction(left)}: 5px;
       li {
         line-height: 1.8em;
@@ -828,7 +828,7 @@ $wizard-bg-color: $ic-color-dark;
             display: flex;
             width: 100%;
             align-items: center;
-            padding: 8px ($ic-sp * 3) 8px ($ic-sp * 3);
+            padding: direction-sides(8px ($ic-sp * 3) 8px ($ic-sp * 3));
             color: $ic-color-light;
             text-decoration: none;
             background: url("/images/wizard-todo-unchecked.svg") no-repeat $ic-sp 50%;
@@ -1100,7 +1100,7 @@ $wizard-bg-color: $ic-color-dark;
       }
     }
     &.content {
-      padding: 5px 5px 1px 50px;
+      padding: direction-sides(5px 5px 1px 50px);
       color: #444;
       .links {
         text-align: direction(right);
@@ -1144,7 +1144,7 @@ $wizard-bg-color: $ic-color-dark;
           }
           &.stats {
             vertical-align: top;
-            padding: 5px 0 5px 10px;
+            padding: direction-sides(5px 0 5px 10px);
             border-bottom: 1px solid #eee;
             .answer {
               .text {
@@ -1181,9 +1181,6 @@ $wizard-bg-color: $ic-color-dark;
     &.base_links {
       font-size: 1.5em;
       text-align: center;
-    }
-    &.subcontent {
-      /* :border-left 1px solid #ddd */
     }
   }
   &.pinned_notification {
@@ -1271,7 +1268,7 @@ $wizard-bg-color: $ic-color-dark;
 .communication_message.conversation {
   .submission {
     ul {
-      margin: 0 10px 10px 0;
+      margin: direction-sides(0 10px 10px 0);
       padding: 0;
     }
     li {
@@ -1292,7 +1289,7 @@ $wizard-bg-color: $ic-color-dark;
 }
 
 .communication_sub_message {
-  margin: 0 2.5em 2px 0em;
+  margin: direction-sides(0 2.5em 2px 0em);
   padding: 0;
   width: auto;
   color: #000;
@@ -1339,7 +1336,7 @@ $wizard-bg-color: $ic-color-dark;
       }
     }
     &.content {
-      padding: 1px 5px 1px 30px;
+      padding: direction-sides(1px 5px 1px 30px);
       color: #444;
       .less_important {
         color: #888;
@@ -1372,7 +1369,7 @@ $wizard-bg-color: $ic-color-dark;
     }
     &.behavior_content {
       color: #999;
-      padding: 2px 5px 2px 30px;
+      padding: direction-sides(2px 5px 2px 30px);
       a {
         color: #888;
       }
@@ -1527,7 +1524,7 @@ html > body .new_activity_message form textarea {
     padding: 2px 5px;
   }
   .content {
-    padding: 5px 20px 5px 10px;
+    padding: direction-sides(5px 20px 5px 10px);
     max-height: 50px;
     overflow: auto;
     ul {
@@ -1557,7 +1554,7 @@ html > body .new_activity_message form textarea {
         img {
           visibility: hidden;
         }
-        background: url(/images/pass.png) no-repeat left top;
+        background: url(/images/pass.png) no-repeat direction(left) top;
         &:hover {
           img {
             visibility: visible;
@@ -1633,8 +1630,8 @@ body > #ui-datepicker-div {
 body.padless-content .ic-Layout-contentMain,
 .ic-Layout-contentMain.padless {
   #sequence_footer {
-    margin-left: 10px;
-    margin-right: 10px;
+    margin-#{direction(left)}: 10px;
+    margin-#{direction(right)}: 10px;
     padding-top: 0;
   }
 }

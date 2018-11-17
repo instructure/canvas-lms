@@ -24,7 +24,6 @@ class Submission < ActiveRecord::Base
   include CustomValidations
   include SendToStream
   include Workflow
-  include PlannerHelper
 
   GRADE_STATUS_MESSAGES_MAP = {
     success: {
@@ -365,10 +364,10 @@ class Submission < ActiveRecord::Base
     if self.submission_type == "online_quiz" && self.workflow_state == "graded"
       # unless it's an auto-graded quiz
       return unless self.workflow_state_before_last_save == "unsubmitted"
-      complete_planner_override_for_submission(self)
+      PlannerHelper.complete_planner_override_for_submission(self)
     else
       return unless self.workflow_state == "submitted"
-      complete_planner_override_for_submission(self)
+      PlannerHelper.complete_planner_override_for_submission(self)
     end
   end
 
@@ -2415,7 +2414,7 @@ class Submission < ActiveRecord::Base
     return true if new_state == self.read_state(current_user)
 
     StreamItem.update_read_state_for_asset(self, new_state, current_user.id)
-    clear_planner_cache(current_user)
+    PlannerHelper.clear_planner_cache(current_user)
 
     ContentParticipation.create_or_update({
       :content => self,

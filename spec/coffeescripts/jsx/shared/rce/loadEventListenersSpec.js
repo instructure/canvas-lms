@@ -18,7 +18,7 @@
 
 import EquationEditorView from 'compiled/views/tinymce/EquationEditorView'
 import Links from 'tinymce_plugins/instructure_links/links'
-import InsertUpdateImageView from 'compiled/views/tinymce/InsertUpdateImageView'
+import InsertUpdateImageView from 'coffeescripts/views/tinymce/InsertUpdateImageView'
 import loadEventListeners from 'jsx/shared/rce/loadEventListeners'
 import 'jquery'
 import 'jqueryui/tabs'

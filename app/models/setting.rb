@@ -34,7 +34,7 @@ class Setting < ActiveRecord::Base
         check = Proc.new do
           object = Setting.where(name: name).take
           if !object && set_if_nx
-            Setting.create!(name: name, value: default&.to_s)
+            object = Setting.create!(name: name, value: default&.to_s)
           end
           object&.value
         end

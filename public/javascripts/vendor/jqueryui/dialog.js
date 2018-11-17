@@ -1,6 +1,6 @@
 import $ from 'jquery'
 import h from '../../str/htmlEscape'
-import returnValOfUnpatchedDialog from 'jqueryui/dialog-unpatched'
+import 'jqueryui/dialog-unpatched'
 
   // have UI dialogs default to modal:true
   $.ui.dialog.prototype.options.modal = true
@@ -41,5 +41,3 @@ import returnValOfUnpatchedDialog from 'jqueryui/dialog-unpatched'
       return setOption.call(this, key, value);
     }
   });
-
-  export default returnValOfUnpatchedDialog;

@@ -261,7 +261,7 @@ $cell_height: 33px;
 
 .slick-cell {
   // we're adding this further in
-  // border-right: none
+  // border-#{direction(right)}: none
 }
 
 .slick-cell.editable {
@@ -287,8 +287,8 @@ $cell_height: 33px;
     #{direction(left)}: 15px;
     content: "";
     border-top-color: transparent;
-    border-left-color: transparent;
-    border-right-color: transparent;
+    border-#{direction(left)}-color: transparent;
+    border-#{direction(right)}-color: transparent;
     border-bottom: 5px solid #444444;
     top: -10px;
   }
@@ -541,7 +541,7 @@ $gradebook_cell_padding_top: 8px;
     //changeme
     margin-top: -10px;
     .divider {
-      padding: 0 1px 0 2px;
+      padding: direction-sides(0 1px 0 2px);
     }
     .outof, .grade {
       width: 200px;

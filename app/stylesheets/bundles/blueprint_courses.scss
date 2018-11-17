@@ -70,8 +70,8 @@
 
   &.bcs__history-item__change-log-row {
     border-top: none;
-    border-left: none;
-    border-right: none;
+    border-#{direction(left)}: none;
+    border-#{direction(right)}: none;
     padding: 0.8em 0;
 
     &.bcs__history-item__change-log-row__heading {
@@ -102,13 +102,13 @@
   }
 
   &:first-of-type {
-    border-top-right-radius: 3px;
-    border-top-left-radius: 3px;
+    border-top-#{direction(right)}-radius: 3px;
+    border-top-#{direction(left)}-radius: 3px;
   }
 
   &:last-of-type {
-    border-bottom-right-radius: 3px;
-    border-bottom-left-radius: 3px;
+    border-bottom-#{direction(right)}-radius: 3px;
+    border-bottom-#{direction(left)}-radius: 3px;
   }
 
   &.bcs__history-item__change__expanded {
@@ -175,8 +175,8 @@
 }
 
 .bcs__sync-btn-text {
-  margin-left: 7px;
-  margin-right: 7px;
+  margin-#{direction(left)}: 7px;
+  margin-#{direction(right)}: 7px;
 }
 
 .bcs__row {
@@ -184,8 +184,8 @@
   border-top: 1px solid $ic-border-color;
 
   & > button:first-child {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
+    padding-#{direction(left)}: 0 !important;
+    padding-#{direction(right)}: 0 !important;
   }
 
   &.bcs__row__associations {
@@ -203,7 +203,7 @@
   background: $electric;
   position: relative;
   text-align: center;
-  padding: 1.2em 1.75em 1.2em 0;
+  padding: direction-sides(1.2em 1.75em 1.2em 0);
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .2);
 }
 
@@ -231,8 +231,8 @@
   position: absolute;
   z-index: 10;
   top: 0;
-  left: 0;
-  right: 0;
+  #{direction(left)}: 0;
+  #{direction(right)}: 0;
   bottom: 0;
   background: rgba(255,255,255,.85);
   text-align: center;
@@ -277,8 +277,8 @@
   position: absolute;
   z-index: 10;
   top: 28px;
-  left: 1px;
-  right: 1px;
+  #{direction(left)}: 1px;
+  #{direction(right)}: 1px;
   bottom: 1px;
   background: rgba(255,255,255,.65);
   text-align: center;
@@ -296,8 +296,8 @@
   .btps-table__header-wrapper {
     position: absolute;
     top: 0;
-    left: 0;
-    right: 0;
+    #{direction(left)}: 0;
+    #{direction(right)}: 0;
 
     .bca-table__head {
       background: $ic-color-medium-light;

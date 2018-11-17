@@ -1416,6 +1416,8 @@ class UsersController < ApplicationController
   #
   # @argument enable_sis_reactivation [Boolean]
   #   When true, will first try to re-activate a deleted user with matching sis_user_id if possible.
+  #   This is commonly done with user[skip_registration] and communication_channel[skip_confirmation]
+  #   so that the default communication_channel is also restored.
   #
   # @argument destination [URL]
   #
@@ -2491,12 +2493,13 @@ class UsersController < ApplicationController
         @user = @pseudonym.user
         @user.workflow_state = 'registered'
         @user.update_account_associations
-        if params[:user][:skip_registration] && params[:communication_channel][:skip_confirmation]
+        if params[:user]&.dig(:skip_registration) && params[:communication_channel]&.dig(:skip_confirmation)
           cc = CommunicationChannel.where(user_id: @user.id, path_type: :email).order(updated_at: :desc).first
-          return if cc.nil?
-          cc.pseudonym = @pseudonym
-          cc.workflow_state = 'active'
-          cc.save!
+          if cc
+            cc.pseudonym = @pseudonym
+            cc.workflow_state = 'active'
+            cc.save!
+          end
         end
       end
     end

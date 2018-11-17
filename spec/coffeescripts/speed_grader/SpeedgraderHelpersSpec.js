@@ -539,3 +539,24 @@ QUnit.module('SpeedgraderHelpers.setupAnonymizableAuthorId', () => {
     strictEqual(setupAnonymizableAuthorId(false), 'author_id')
   })
 })
+
+QUnit.module('SpeedgraderHelpers.plagiarismResubmitButton', () => {
+  test('hides the container if score is present', () => {
+    const containerStub = {
+      hide: sinon.spy()
+    }
+
+    SpeedgraderHelpers.plagiarismResubmitButton(true, containerStub)
+    ok(containerStub.hide.called)
+  })
+
+  test('showes the container if score is absent', () => {
+    const containerStub = {
+      show: sinon.spy()
+    }
+
+    SpeedgraderHelpers.plagiarismResubmitButton(false, containerStub)
+    ok(containerStub.show.called)
+  })
+})
+

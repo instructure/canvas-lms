@@ -39,11 +39,6 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
     }
   end
 
-  before do
-    Setting.set(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES, 'true')
-    root_account.enable_feature!(:developer_key_management_and_scoping)
-  end
-
   shared_examples 'the developer key account binding create endpoint' do
     let(:authorized_admin) { raise 'set in example' }
     let(:unauthorized_admin) { raise 'set in example' }
@@ -61,14 +56,6 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
       user_session(authorized_admin)
       post :create_or_update, params: params
       expect(response).to be_successful
-    end
-
-    it 'renders unauthorized if the flag is not enabled in the root account' do
-      allow_any_instance_of(Account).to receive(:feature_enabled?)
-      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_and_scoping).and_return(false)
-      user_session(authorized_admin)
-      post :create_or_update, params: params
-      expect(response).to be_unauthorized
     end
 
     it 'creates the binding' do
@@ -108,14 +95,6 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
       expect(response).to be_unauthorized
     end
 
-    it 'renders unauthorized if the flag is not enabled in the root account' do
-      allow_any_instance_of(Account).to receive(:feature_enabled?)
-      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_and_scoping).and_return(false)
-      user_session(unauthorized_admin)
-      post :create_or_update, params: params, format: :json
-      expect(response).to be_unauthorized
-    end
-
     it 'allows updating the workflow_state' do
       user_session(authorized_admin)
       post :create_or_update, params: params
@@ -139,14 +118,6 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
     let(:expected_binding_index) { DeveloperKeyAccountBinding.where(account_id: account.account_chain_ids.concat([Account.site_admin.id])) }
 
     it 'renders unauthorized if the user does not have "manage_developer_keys"' do
-      user_session(unauthorized_admin)
-      get :index, params: params, format: :json
-      expect(response).to be_unauthorized
-    end
-
-    it 'renders unauthorized if the flag is not enabled in the root account' do
-      allow_any_instance_of(Account).to receive(:feature_enabled?)
-      allow_any_instance_of(Account).to receive(:feature_enabled?).with(:developer_key_management_and_scoping).and_return(false)
       user_session(unauthorized_admin)
       get :index, params: params, format: :json
       expect(response).to be_unauthorized
@@ -214,23 +185,6 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
         post :create_or_update, params: site_admin_params
         expect(response).to be_successful
       end
-
-      it 'fails when there is no setting and the account is site admin and developer key has no bindings' do
-        Setting.remove(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES)
-        site_admin_key = DeveloperKey.create!
-        site_admin_key.developer_key_account_bindings.destroy_all
-        site_admin_params = {
-          account_id: 'site_admin',
-          developer_key_id: site_admin_key.global_id,
-          developer_key_account_binding: {
-            workflow_state: 'on'
-          }
-        }
-
-        user_session(account_admin_user(account: Account.site_admin))
-        post :create_or_update, params: site_admin_params
-        expect(response).to be_unauthorized
-      end
     end
 
     describe "GET #index" do
@@ -286,9 +240,6 @@ RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
     end
 
     describe "POST #create_or_edit" do
-      before do
-        Account.default.enable_feature!(:developer_key_management_and_scoping)
-      end
       let(:binding_to_edit) do
         DeveloperKeyAccountBinding.create!(
           account: sub_account,

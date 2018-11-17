@@ -18,7 +18,7 @@
 
 import Color from 'tinycolor2';
 
-const defaultColors = {
+export const defaultColors = {
   salmon: '#FFE8E5',
   orange: '#FEF0E5',
   yellow: '#FEF7E5',
@@ -39,19 +39,13 @@ const defaultStatusColors = {
   resubmitted: defaultColors.green
 };
 
-function statusColors (userColors = {}) {
+export function statusColors (userColors = {}) {
   return {
     ...defaultStatusColors,
     ...userColors
   };
 }
 
-function darken (color, percent) {
+export function darken (color, percent) {
   return Color(color).darken(percent);
 }
-
-export default {
-  defaultColors,
-  statusColors,
-  darken
-};

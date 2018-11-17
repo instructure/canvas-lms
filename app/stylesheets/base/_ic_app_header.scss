@@ -380,8 +380,8 @@ body.primary-nav-expanded {
     color: var(--ic-brand-global-nav-menu-item__text-color);
     white-space: normal;
     word-wrap: break-word;
-    padding-left: 0.25rem;
-    padding-right: 0.25rem;
+    padding-#{direction(left)}: 0.25rem;
+    padding-#{direction(right)}: 0.25rem;
 
     &::after {
       display: none;
@@ -405,7 +405,7 @@ body.primary-nav-expanded {
   border: 0;
   padding: 0.01em 0 0;
   min-width: 0;
-  margin: 0 0 $spacing-width/2 0;
+  margin: direction-sides(0 0 $spacing-width/2 0);
 }
 
 .ic-HelpDialog__form-actions {

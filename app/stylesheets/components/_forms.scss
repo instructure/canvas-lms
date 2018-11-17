@@ -117,8 +117,8 @@ input + .hint-text {
     border-top: 1px solid $ic-border-light;
     text-align: direction(right);
     position: absolute;
-    left: 0px;
-    right: 0px;
+    #{direction(left)}: 0px;
+    #{direction(right)}: 0px;
     bottom: 0px;
   }
 
@@ -127,8 +127,8 @@ input + .hint-text {
     // default scroll area, this gives us our own scrollable content area
     // while still allowing us to use the height option in $.fn.dialog
     position: absolute;
-    left: 0;
-    right: 0;
+    #{direction(left)}: 0;
+    #{direction(right)}: 0;
     top: 0;
     bottom: 51px;
     overflow: auto;

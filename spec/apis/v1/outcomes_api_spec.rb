@@ -215,7 +215,8 @@ describe "Outcomes API", type: :request do
           "id" => @outcome.id,
           "context_id" => @account.id,
           "context_type" => "Account",
-          "calculation_method" => "highest",
+          "calculation_int" => 65,
+          "calculation_method" => "decaying_average",
           "title" => @outcome.title,
           "display_name" => nil,
           "url" => api_v1_outcome_path(:id => @outcome.id),
@@ -261,7 +262,8 @@ describe "Outcomes API", type: :request do
           "description" => @outcome.description,
           "points_possible" => 5,
           "mastery_points" => 3,
-          "calculation_method" => "highest",
+          "calculation_int" => 65,
+          "calculation_method" => "decaying_average",
           "assessed" => false,
           "ratings" => [
             { "points" => 5, "description" => "Exceeds Expectations" },
@@ -411,7 +413,8 @@ describe "Outcomes API", type: :request do
           "id" => @outcome.id,
           "context_id" => @account.id,
           "context_type" => "Account",
-          "calculation_method" => "highest",
+          "calculation_int" => 65,
+          "calculation_method" => "decaying_average",
           "vendor_guid" => "vendorguid9000",
           "title" => "New Title",
           "display_name" => nil,
@@ -536,7 +539,7 @@ describe "Outcomes API", type: :request do
           end
         end
 
-        it "should set a default calculation_method of 'highest' if the record is being re-saved (previously created)" do
+        it "should set a default calculation_method of 'decaying_average' if the record is being re-saved (previously created)" do
           # The order here is intentional.  We don't want to trigger any callbacks on LearningOutcome
           # because it will take away our nil calculation_method.  The nil is required in order to
           # simulate pre-existing learning outcome records that have nil calculation_methods
@@ -553,7 +556,7 @@ describe "Outcomes API", type: :request do
                      :calculation_method => nil })
 
           @outcome.reload
-          expect(@outcome.calculation_method).to eq('highest')
+          expect(@outcome.calculation_method).to eq('decaying_average')
         end
 
         it "should return a sensible error message for an incorrect calculation_method" do

@@ -16,10 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Backbone from 'Backbone'
 import Role from 'compiled/models/Role'
 import RolesCollection from 'compiled/collections/RolesCollection'
-import 'compiled/util/BaseRoleTypes'
 
 QUnit.module('RolesCollection', {
   setup() {

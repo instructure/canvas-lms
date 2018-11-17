@@ -25,9 +25,6 @@ describe 'Developer Keys' do
     before(:each) do
       admin_logged_in
       Setting.set(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES, 'true')
-      Account.default.enable_feature!(:developer_key_management_and_scoping)
-      Account.site_admin.allow_feature!(:developer_key_management_and_scoping)
-      Account.default.enable_feature!(:developer_key_management_and_scoping)
     end
 
     let(:root_developer_key) do

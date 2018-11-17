@@ -25,6 +25,7 @@ Rails.application.config.after_initialize do
       else
         ::WillPaginate::Collection.create(current_page, limit_value) do |col|
           col.replace super
+          col.next_page = nil if total_entries.nil? && col.respond_to?(:length) && col.length < col.per_page # don't return a next page if there's nothing to get next
           col.total_entries ||= total_entries
         end
       end

@@ -88,12 +88,6 @@ QUnit.module('GradeSummary Layout', suiteHooks => {
     strictEqual(StudentActions.loadStudents.callCount, 1)
   })
 
-  test('does not load students when there are not graders', () => {
-    storeEnv.graders = []
-    mountComponent()
-    strictEqual(StudentActions.loadStudents.callCount, 0)
-  })
-
   QUnit.module('when students have not yet loaded', () => {
     test('displays a spinner', () => {
       mountComponent()

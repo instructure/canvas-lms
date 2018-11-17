@@ -891,7 +891,7 @@ To edit blueprint lock settings on an individual quiz, or on the Quizzes index p
     {
       title: I18n.t('Rubrics'),
       description: I18n.t(`Disabling this permission will override (if enabled) the Rubrics - add / edit / delete ​permission, preventing user from creating or editing rubrics from an
-individual assignment. However, if Learning Outcomes - add / edit / delete​ is enabled, user can still add rubrics via Outcomes – Manage Rubrics.`)
+individual assignment. However, if Learning Outcomes - add / edit / delete​ is enabled, user can still add rubrics via user can still add rubrics via Outcomes (Manage Rubrics button).`)
     }
   ],
   [
@@ -954,7 +954,7 @@ To edit blueprint lock settings on an individual quiz, or on the Quizzes index p
     {
       title: I18n.t('Rubrics'),
       description: I18n.t(`Disabling this permission will override (if enabled) the Rubrics - add / edit / delete ​permission, preventing user from creating or editing rubrics from an
-individual assignment. However, if Learning Outcomes - add / edit / delete​ is enabled, user can still add rubrics via Outcomes – Manage Rubrics.`)
+individual assignment. However, if Learning Outcomes - add / edit / delete​ is enabled, user can still add rubrics via Outcomes (Manage Rubrics button).`)
     },
   ]
 )
@@ -1879,9 +1879,10 @@ Allows user to access the Learning Mastery Gradebook (if enabled).`)
     {
       title: I18n.t('Quizzes'),
       description: I18n.t(
-        `To moderate a quiz, Assignments and Quizzes - add / edit / delete​ must also be enabled.`
+        `To moderate a quiz, Assignments and Quizzes - add / edit / delete​ must also be enabled.
+        To view the user SIS ID column in the Quiz Item Analysis CSV file, SIS Data - read must also be enabled.`
       )
-    }
+    },
   ],
   [
     {
@@ -1943,13 +1944,14 @@ Allows user to access the Learning Mastery Gradebook (if enabled).`)
     {
       title: I18n.t('Quizzes'),
       description: I18n.t(
-        `To moderate a quiz, Assignments and Quizzes - add / edit / delete must also be enabled.`
+        `To moderate a quiz, Assignments and Quizzes - add / edit / delete must also be enabled.
+        To view the user SIS ID column in the Quiz Item Analysis CSV file, SIS Data - read must also be enabled.`
       )
     },
     {
       title: I18n.t('Settings'),
       description: I18n.t(`Course Grading Schemes can be enabled/disabled in Course Settings.`)
-    }
+    },
   ]
 )
 
@@ -2508,11 +2510,15 @@ const sisDataReadPermissions = generateActionTemplates(
     },
     {
       title: I18n.t('People (Account)'),
-      description: I18n.t('Allows a user to view the SIS ID in a user’s login details.')
+      description: I18n.t('Allows user to view the SIS ID in a user’s login details.')
     },
     {
       title: I18n.t('People (Course)'),
-      description: I18n.t('Allows a user to view user SIS IDs in a course People page.')
+      description: I18n.t('Allows user to view user SIS IDs in a course People page.')
+    },
+    {
+      title: I18n.t('Quizzes'),
+      description: I18n.t('Allows user to view the user SIS ID column in the Quiz Item Analysis CSV file.')
     }
   ],
   [
@@ -2547,6 +2553,10 @@ To add users via SIS ID, Users - add / remove students from courses ​and/or Us
     {
       title: I18n.t('People'),
       description: I18n.t('Allows user to view user SIS IDs.')
+    },
+    {
+      title: I18n.t('Quizzes'),
+      description: I18n.t('Allows user to view the user SIS ID column in the Quiz Item Analysis CSV file.')
     }
   ],
   [

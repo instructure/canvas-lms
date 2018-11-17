@@ -49,7 +49,11 @@ module CC::Importer::Canvas
       wiki[:assignment] = nil
       wiki[:todo_date] = meta['todo_date']
       if asg_id = meta['assignment_identifier']
-        wiki[:assignment] = { migration_id: asg_id }
+        wiki[:assignment] = {
+          migration_id: asg_id,
+          assignment_overrides: [],
+          only_visible_to_overrides: meta['only_visible_to_overrides'] == 'true'
+        }
       end
       wiki
     end

@@ -5,7 +5,7 @@
 <% define_content :subject do %>
   <%= t('assignment_due_date_changed', 'Assignment Due Date Changed: %{assignment_name}, %{course_name}', :assignment_name => asset.title, :course_name => asset.context.name) %>
 <% end %>
-      
+
 <%= t('assignment_due_date_changed_sentence', 'The due date for the assignment, %{assignment_name}, for the course, %{course_name}, has changed to:', :assignment_name => asset.title, :course_name => asset.context.name) %>
 
 <% if asset.due_at %>

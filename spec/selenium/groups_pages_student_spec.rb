@@ -150,7 +150,7 @@ describe "groups" do
         AnnouncementNewEdit.visit_new(@testgroup.first)
         AnnouncementNewEdit.add_message("New Announcement")
         AnnouncementNewEdit.add_title("New Title")
-        expect_new_page_load {AnnouncementNewEdit.submit_announcement_form}
+        AnnouncementNewEdit.submit_announcement_form
         expect(driver.current_url).to include(AnnouncementNewEdit.
                                               individual_announcement_url(Announcement.last))
       end

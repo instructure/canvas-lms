@@ -32,13 +32,13 @@
   background-color: $ic-color-light;
 
   &:first-of-type {
-    border-top-left-radius: $borderRadius;
-    border-top-right-radius: $borderRadius;
+    border-top-#{direction(left)}-radius: $borderRadius;
+    border-top-#{direction(right)}-radius: $borderRadius;
   }
 
   &:last-of-type {
-    border-bottom-left-radius: $borderRadius;
-    border-bottom-right-radius: $borderRadius;
+    border-bottom-#{direction(left)}-radius: $borderRadius;
+    border-bottom-#{direction(right)}-radius: $borderRadius;
     border-bottom: 1px solid $ic-border-light;
   }
 
@@ -92,8 +92,8 @@
 }
 
 .ic-Sortable-sort-controls__button {
-  padding-left: 2px;
-  padding-right: 2px;
+  padding-#{direction(left)}: 2px;
+  padding-#{direction(right)}: 2px;
 }
 
 .ic-Sortable-item__Add-link-fieldset {

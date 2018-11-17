@@ -1867,6 +1867,17 @@ describe Enrollment do
       expect(group).to have_common_section
     end
 
+    it "should ungroup the user when the enrollment is rejected" do
+      user1 = user_model
+      # set up a group without a group category and put both users in it
+      group = @course.groups.create
+      gm = group.add_user(user1)
+      section1 = @course.course_sections.create
+      enrollment = section1.enroll_user(user1, 'StudentEnrollment')
+      enrollment.reject!
+      expect(gm.reload).to be_deleted
+    end
+
     it "should ungroup the user when a changed enrollment causes conflict" do
       # set up course with two users in one section
       user1 = user_model

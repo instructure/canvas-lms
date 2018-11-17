@@ -236,15 +236,15 @@ i[class*=icon-].icon-messageRecipient--cancel {
 
   &:before {
     border-bottom: 10px solid $ic-border-light;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
+    border-#{direction(left)}: 10px solid transparent;
+    border-#{direction(right)}: 10px solid transparent;
     top: 26px;
   }
 
   &:after {
     border-bottom: 10px solid #fff;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
+    border-#{direction(left)}: 10px solid transparent;
+    border-#{direction(right)}: 10px solid transparent;
     top: 27px;
   }
 }

@@ -18,6 +18,13 @@
 
 /* customizations to mediaelementplayer css */
 
+/*
+  Because this file is not proccessed by our brandable_css sass pipeline,
+  it cannot use our sass-direction helpers. So we have to handle RTL manually
+  by putting direction-specific styles in [dir="ltr"] or [dir="rtl"] blocks.
+*/
+/* stylelint-disable property-blacklist, declaration-property-value-blacklist */
+
 /* good menu widths */
 .mejs-sourcechooser-selector {
   width: 160px;
@@ -29,6 +36,9 @@
 .mejs-captions-selector {
   width: 105px;
 }
+[dir="ltr"]  .mejs-captions-selector { text-align: left }
+[dir="rtl"]  .mejs-captions-selector { text-align: right }
+
 .mejs-captions-selector label {
   width: 70px !important;
 }
@@ -36,16 +46,28 @@
 /* Subtitile upload link */
 .mejs-captions-selector .upload-track {
   color: white;
-  margin: 3px 0 5px 5px;
-  float: direction(left);
+  margin-top: 3px;
+  margin-bottom: 5px;
+}
+[dir="ltr"] .mejs-captions-selector .upload-track {
+  margin-right: 0px;
+  margin-left: 5px;
+  float: left;
+}
+[dir="rtl"] .mejs-captions-selector .upload-track {
+  margin-left: 0px;
+  margin-right: 5px;
+  float: right;
 }
 
 /* "x" button to remove a subtitle */
 .mejs-captions-selector a[data-remove] {
   position: absolute;
-  top: 0; right: 0;
+  top: 0;
   color: white;
 }
+[dir="ltr"] .mejs-captions-selector a[data-remove] { right: 0 }
+[dir="rtl"] .mejs-captions-selector a[data-remove] { left: 0 }
 
 
 /* style menu items without a radio button */
@@ -73,9 +95,14 @@
   height: 1px;
 }
 .mejs-button [role="menu"] ul li label {
-  margin-left: 5px;
   cursor: pointer;
 }
+[dir="ltr"] .mejs-button [role="menu"] ul li label { margin-left: 5px }
+[dir="rtl"] .mejs-button [role="menu"] ul li label { margin-right: 5px }
+
+
 .mejs-button [role="menu"] label.mejs-selected {
   color: #21f8f8 !important;
 }
+
+/* stylelint-enable property-blacklist, declaration-property-value-blacklist */

@@ -92,7 +92,7 @@
         margin: 0; padding: 0;
         padding-#{direction(left)}: 10px;
         &:after {
-          content: "   →   ";
+          content: "   #{direction-ltr("→", "←")}   ";
         }
         &:last-child:after {
           content: "";

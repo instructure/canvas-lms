@@ -89,6 +89,7 @@ class StickyButton extends Component {
 
   render () {
     const {
+      id,
       children,
       disabled,
       hidden,
@@ -108,6 +109,7 @@ class StickyButton extends Component {
     return (
       <span>
         <button
+          id={id}
           type="button"
           onClick={this.handleClick}
           className={classnames(classes, styles.newActivityButton)}

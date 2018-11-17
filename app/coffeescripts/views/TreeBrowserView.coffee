@@ -71,7 +71,7 @@ define [
 
     afterRender: ->
       @$tree = @$el.children('.tree')
-      for rootModel in @rootModelsFinder.find()
+      for rootModel in @rootModelsFinder.find() when rootModel
         new TreeView({
           model: rootModel,
           onlyShowSubtrees: @onlyShowSubtrees

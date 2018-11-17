@@ -587,6 +587,31 @@ is:
         message_date_to: "Til dagsetningar"
         search: "Leita að fólki eftir auðkenni eða nafni"
         search_people: "Leita í fólki"
+    adtalem: 
+      attendance_extract: 
+        parameters: 
+          custom_reports: 
+            start: 
+              parameters: 
+                header: "Virknidagur:"
+      no_submissions: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "Endar á:"
+            start: 
+              parameters: 
+                header: "Byrjar á:"
+      submissions_detail: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "Endar á:"
+            start: 
+              parameters: 
+                header: "Byrjar á:"
     argo: 
       user_access: 
         parameters: 
@@ -1676,7 +1701,10 @@ is:
   allow_rtl_users_to_see_rtl_interface_3c4f8b86: "Leyfa RTL notendum að sjá RTL viðmót"
   allow_students_to_download_course_content_and_view_810e66ec: "Heimila nemendum að hlaða niður námskeiðsefni og skoða án nettengingar"
   allow_students_to_see_who_has_signed_up_for_time_s_497f4a46: "Heimila nemendum að sjá skráningar í tímaraufar."
+  allow_students_to_see_who_has_signed_up_for_time_s_7eb1d0ef: "Leyfa nemendum að sjá hver hefur skráð sig fyrir tímalotum sem eru enn tiltækar."
   allow_students_to_see_who_was_signed_up_for_time_s_160ba252: "Heimila nemendum að sjá hverjir voru skráðir í tímaraufar"
+  allow_students_to_see_who_was_signed_up_for_time_s_37f5cb01: "Leyfa nemendum að sjá hver var skráður fyrir tímalotum sem eru enn tiltækar"
+  allow_switching_to_the_new_assignments_page_9ac0ad93: "Leyfa skiptingu í nýju úthlutarsíðuna"
   allow_the_ability_to_send_notifications_through_ou_13cc8537: "Heimila að senda tilkynningar gegnum sendingaröð okkar"
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "Veittu þessu verkfæri aðgang að IMS Names og Role provisioning Service"
   allow_users_to_comment_45b8f753: "Leyfa notendum að gera athugasemdir"
@@ -1934,7 +1962,10 @@ is:
       Gerir notanda kleift að skoða nýjar tilkynningar hnappinn á heimasíðu.
       Gerir notanda kleift að bæta við tilkynningum á tilkynningasíðunni.
   allows_user_to_view_the_people_link_in_course_navi_58b38f5d: "Gerir notanda kleift að skoða fólk-hlekkinn í yfirliti námskeiðs."
+  allows_user_to_view_the_sis_id_in_a_user_s_login_d_71e0922b: "Leyfa notanda að skoða SIS-auðkenni í innskráningarupplýsingum notanda."
+  allows_user_to_view_the_user_sis_id_column_in_the__265cb234: "Leyfir notanda að skoða SIS-auðkennisdálk í skyndiprófs greiningar CSV skrá."
   allows_user_to_view_user_sis_ids_68a9d218: "Gerir notanda kleift að skoða SIS-auðkenni notanda."
+  allows_user_to_view_user_sis_ids_in_a_course_peopl_fc145ade: "Leyfir notanda að skoða SIS-auðkenni í fólk síðu námskeiðs."
   allows_users_to_edit_conferences_2d3c960c: "Gerir notendum kleift að breyta ráðstefnum."
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Gera notendum með alþjóðleg símanúmer kleift að fá textaboð frá Canvas."
   alumno_88c80e37: Alumno
@@ -2257,6 +2288,7 @@ is:
   ask_your_instructor_a_question_a61ca5e9: "Spurðu kennarann þinn"
   assess_and_survey_your_students_ce8172a9: "Meta og kanna nemendur"
   assessment_audit_d4a76709: Matsyfirferð
+  assessment_audit_events_for_username_eb2144ad: "Matsyfirferðaratburðir fyrir %{userName}"
   assessment_audit_tray_5dd11721: Matsyfirferðarbakki
   assessment_by_name_7b879a2c: "Mat eftir %{name}"
   assessment_id_9a1476be: "auðkenni mats"
@@ -2324,7 +2356,9 @@ is:
   assignment_assignment_submission_paper_view_8a4c9776: "Innsending verkefnis %{assignment} pappírssýn"
   assignment_assignment_submission_plain_text_view_b217d372: "Innsending verkefnis %{assignment} einfaldur textahamur"
   assignment_comments_e43ed898: "Athugasemdir með verkefni"
+  assignment_context_has_been_graded_for_name_af51759a: "%{assignment}, %{context} var gefin einkunn fyrir %{name}."
   assignment_created_assignment_name_course_name_324a5639: "Verkefni stofnað - %{assignment_name}, %{course_name}"
+  assignment_created_b3ee04d7: "Verkefni var búið til"
   assignment_d8387b78: verkefni
   assignment_details_collapsed_55b67150: "upplýsingar um verkefni felldar"
   assignment_details_dialog: 
@@ -2373,6 +2407,7 @@ is:
   assignment_groups_bc9cc3c9: Verkefnahópar
   assignment_groups_weight_2f1a5a7c: "Vægi verkefnahópa"
   assignment_has_a_locked_date_due_date_cannot_be_se_2e2e3389: "Verkefni er með fastri dagsetningu Skiladagur getur ekki verið utan við fastar dagsetningar"
+  assignment_has_been_graded_for_name_4384f9b: "%{assignment} %{name} var gefin einkunn fyrir."
   assignment_id_96baa1b7: "auðkenni verkefnis"
   assignment_id_b040cee0: "Auðkenni verkefnis"
   assignment_menu_91fe3716: "Valmynd verkefnis"
@@ -2403,6 +2438,7 @@ is:
   assignment_title_82b4422e: "Titill verkefnis:"
   assignment_title_8a707dd2: "titill verkefnis"
   assignment_title_e3192978: "Verkefni: %{title}"
+  assignment_updated_c7482598: "Verkefni uppfært"
   assignment_url_37c849c6: "vefslóð verkefnis"
   assignment_view_1206a60b: "Skoða verkefni"
   assignment_was_deleted_8320d26d: "Verkefni var eytt"
@@ -2899,6 +2935,7 @@ is:
         originality_report_visible_after_grading: "Að lokinni einkunnagjöf fyrir verkefnið"
         originality_report_visible_immediately: Tafarlaust
   assignments_1e02582c: Verkefni
+  assignments_2_e88d7a26: "Verkefni 2"
   assignments_and_gradebook_37e43d4f: "Verkefni og einkunnabók"
   assignments_and_quizzes_add_edit_delete_5bac17ed: "Verkefni og próf - bæta við / breyta / eyða"
   assignments_and_quizzes_view_answer_matrix_e7a65578: "Verkefni og próf - skoða svargrind"
@@ -3088,6 +3125,7 @@ is:
   available_8606e40c: Tiltækt
   available_after_unlock_at_b5682224: "Tiltækt eftir %{unlock_at}"
   available_after_unlock_at_until_lock_at_499e8092: "Tiltækt eftir %{unlock_at} til %{lock_at}"
+  available_folders_694d0436: "Tiltækar möppur"
   available_from_587ce92f: "Tiltækt frá"
   available_from_date_43b5e11d: "Tiltækt frá degi"
   available_from_date_must_precede_available_until_c9f9e533: "\"Tiltækt frá\" dagur verður að vera á undan \"Tiltækt til\""
@@ -3811,6 +3849,8 @@ is:
         stream_name_required: "Nefna þarf Kinesis-streymið."
   canvas_account_id_97b0471f: canvas_account_id
   canvas_alert_change_assignment_name_course_name_2fc63d9c: "Canvas-tilkynning - Breyta: %{assignment_name}, %{course_name}"
+  canvas_alert_grade_change_date_for_name_56f680ed: "Canvas viðvörun - breyting á einkunn: %{date} fyrir %{name}"
+  canvas_alert_graded_assignment_context_for_name_459fdf31: "Canvas viðvörun - einkunn: %{assignment}, %{context} fyrir %{name}"
   canvas_alert_invited_course_as_role_type_9ed79ce3: "Canvas-tilkynning - Boðið: %{course} sem %{role_type}"
   canvas_alert_invited_course_as_role_type_ea825937: "Canvas-tilkynning - Boðið: námskeið sem  %{role_type}"
   canvas_attribute_eaa7e31a: Canvas-eiginleiki
@@ -5259,6 +5299,7 @@ is:
       topic: "Óþekkt efni"
       wiki_page: "Óþekkt wiki-síða"
   course_files_62deb8f8: Námskeiðsskrár
+  course_files_a31f97fc: Námskeiðsskrár
   course_files_add_edit_delete_24678a2f: "Skrár námskeiðs - bæta við / breyta / eyða"
   course_found_f5a40cd3: "Námskeið fannst"
   course_found_not_deleted_a20f72f0: "Námskeið fannst (ekki eytt)"
@@ -5441,6 +5482,7 @@ is:
   course_view_change_logs_d62d5d9d: "Námskeið - skoða breytingakladda"
   course_view_usage_reports_bbc9271d: "Námskeið - skoða notkunarskýrslur"
   course_visibility_options_ca8ab3a8: "Sýnileikakostir námskeiðs"
+  course_wizard_31c87552: Námskeiðsleiðbeiningarforrit
   courses: 
     confirm_action: 
       buttons: 
@@ -6069,6 +6111,7 @@ is:
   data_exports: "útflutningur gagna"
   data_point_over_time_8d0a54cc: "%{data_point} Yfir tíma"
   data_set_identifier_data_set_id_c228b5df: "Auðkenni gagnasetts: %{data_set_id}"
+  database_error_err_6393d244: "Gagnagrunnsvilla (%{err})"
   date: 
     abbr_day_names: 
       - Sun
@@ -6459,6 +6502,8 @@ is:
   disabling_post_to_sis_is_not_available_for_non_pub_ee031373: "Ekki er hægt að óvirkja birtingu í SIS fyrir námskeið sem hafa ekki verið birt"
   disabling_sync_to_name_failed_e7521ebb: "Aðgerðin „óvirkja samstillingu“ við %{name} mistókst"
   disabling_this_permission_will_override_if_enabled_8d9c42f5: "Ef þetta leyfi er afvirkjað mun það hnekkja (ef virkjað) matsviðmið - bæta við / breyta / eyða leyfinu, sem kemur í veg fyrir að notandi geti búið til eða breytt matsviðmiðum frá einstöku verkefni. Engu að síður, ef lærdómsniðurstöður - bæta við / breyta / eyða er virkjað getur notandi enn bætt við matsviðmiði í gegnum niðurstöður - stjórna matsviðmiðum."
+  disabling_this_permission_will_override_if_enabled_955dfb03: "Ef þetta leyfi er afvirkjað mun það hnekkja (ef virkjað) matsviðmið - bæta við / breyta / eyða leyfinu, sem kemur í veg fyrir að notandi geti búið til eða breytt matsviðmiðum frá einstöku verkefni. Engu að síður, ef lærdómsniðurstöður - bæta við / breyta / eyða er virkjað getur notandi enn bætt við matsviðmiði í gegnum niðurstöður (stjórna matsviðmiðum )."
+  disabling_this_permission_will_override_if_enabled_9c4fa650: "Ef þetta leyfi er afvirkjað mun það hnekkja (ef virkjað) matsviðmið - bæta við / breyta / eyða leyfinu, sem kemur í veg fyrir að notandi geti búið til eða breytt matsviðmiðum frá einstöku verkefni. Engu að síður, ef lærdómsniðurstöður - bæta við / breyta / eyða er virkjað getur notandi enn bætt við matsviðmiði í gegnum niðurstöður (stjórna matsviðmiðum )."
   disallow_comments_6d04b47a: "Banna athugasemdir"
   disallow_replies_for_title_ca3806b2: "Banna svör við %{title}"
   disccussions_515a3a99: Umræður
@@ -6775,6 +6820,27 @@ is:
   divide_into_equal_time_slots_in_minutes_234312fa: "Skipta í jöfn tímahólf (í mínútum"
   do_not_count_this_assignment_towards_the_final_gra_4dd92e00: "Ekki reikna þetta verkefni með í lokaeinunn"
   do_nothing_9672b478: "Gera ekkert"
+  docviewer_area_created_37502a31: "Docviewer svæði búið til"
+  docviewer_area_deleted_6e56d3ba: "Docviewer svæði eytt"
+  docviewer_area_updated_43f60b7e: "Docviewer svæði uppfært"
+  docviewer_comment_created_1dc99da5: "Docviewer athugasemd búin til"
+  docviewer_comment_deleted_44cf642e: "Docviewer athugasemd eytt"
+  docviewer_comment_updated_696fbcea: "Docviewer athugasemd uppfærð"
+  docviewer_free_draw_created_727f26aa: "Docviewer fríhendisteikning búin til"
+  docviewer_free_draw_deleted_2b79df21: "Docviewer fríhendisteikning eytt"
+  docviewer_free_draw_updated_6d907e5: "Docviewer fríhendisteikning uppfærð"
+  docviewer_free_text_created_1b9c8cf9: "Docviewer frjáls texti búinn til"
+  docviewer_free_text_deleted_429a7572: "Docviewer frjálsum texta eytt"
+  docviewer_free_text_updated_6f3aadb6: "Docviewer frjáls texti uppfærður"
+  docviewer_highlight_created_337a5ced: "Docviewer auðkenning búin til"
+  docviewer_highlight_deleted_6a7ca566: "Docviewer auðkenningu eytt"
+  docviewer_highlight_updated_47dc7da2: "Docviewer auðkenning uppfærð"
+  docviewer_point_created_ade65993: "Docviewer punktur búinn til"
+  docviewer_point_deleted_f4e0a018: "Docviewer punkti eytt"
+  docviewer_point_updated_d94078dc: "Docviewer punktur uppfærður"
+  docviewer_strikeout_created_84cccd3b: "Docviewer yfirstrikun búin til"
+  docviewer_strikeout_deleted_ddca34b0: "Docviewer yfirstrikun eytt"
+  docviewer_strikeout_updated_f06aec74: "Docviewer yfirstrikun uppfærð"
   does_not_meet_expectations_b0736d20: "Uppfyllir ekki væntingar"
   domain_3b54c511: Lén
   domain_is_required_1d4c8b25: "Þarf lén"
@@ -7030,6 +7096,7 @@ is:
   embedded_images_598ff8da: embedded_images
   empty_stub_for_testing_only_37aad38: "Auður stubbur (bara fyrir prófun)"
   enable_6f5d1328: Heimila
+  enable_ability_to_alter_the_final_grade_for_the_en_e120f72d: "Virkja getu til að breyta lokaeinkunn fyrir allt námskeiðið án þess að breyta einkunnum fyrir verkefni."
   enable_and_lock_e6099cc2: "Heimila og læsa"
   enable_anonymous_grading_of_assignments_e18f75be: "Virkja nafnlausa einkunnagjöf verkefna."
   enable_anonymous_marking_of_assignments_only_relev_792a2a17: "Virkja nafnlausa einkunnagjöf verkefna.Á aðeins við ef nafnlausi stjórnunarfáninn er virkjaður."
@@ -7047,6 +7114,7 @@ is:
   enable_the_creation_of_blueprint_courses_79f91c30: "Heimila stofnun grunnsniðsnámskeiða"
   enable_the_plagiarism_detection_platform_7c3b6195: "Heimila ritstuldargreiningu"
   enable_toolname_b06257b7: "Heimila %{toolName}"
+  enable_toolname_dc64c25a: "Heimila %{toolName}"
   enabled_and_locked_49ff3de4: "Heimilað og læst"
   enabled_ba7cab66: Heimilað
   enabled_by_default_e530d6ed: "Sjálfvalið heimilað"
@@ -7672,6 +7740,7 @@ is:
   file_not_available_1869c733: "Skrá er ekki tiltæk"
   file_not_found_9eec054c: "Skrá fannst ekki"
   file_preview_eedb43f2: "Forskoðun skrár"
+  file_preview_overlay_87f7e5f: "Forskoðun skráar yfirlögn"
   file_previews: 
     lock_explanation: 
       messages: 
@@ -7690,7 +7759,9 @@ is:
     restricted_status: "Tiltækt frá %{from_date} til %{until_date}"
     unpublished_status: Óbirt
   file_storage_32477f6: Skráargeymsla
+  file_upload_failed_af22dd91: "Upphleðsla skrár mistókst"
   file_upload_submission_740711f: "Upphleðsla á skilaskrá"
+  file_uploading_56c9c0c8: "Skrá er að hlaðast upp"
   filename_has_been_published_with_the_following_usa_fbd8b39f: "%{filename} hefur verið birt með þessum notkunarréttindum: %{usage_right}"
   filename_is_hidden_available_with_a_link_click_to__3e328e8f: "%{fileName} er falin en tiltæk með tengli - Smelltu til að breyta"
   filename_is_locked_click_to_modify_bf711763: "%{fileName} er læst - Smelltu til að breyta"
@@ -7749,6 +7820,7 @@ is:
   final_grade_finalgrade_138d9e07: "Lokaeinkunn: %{finalGrade}"
   final_grade_finalgrade_408580bb: "Lokaeinkunn: *%{finalGrade}*"
   final_grade_info_2aa35d25: "Upplýsingar um lokaeinkunn"
+  final_grade_override_be8a21cd: "Hnekking lokaeinkunnar"
   final_grader_can_view_other_grader_names_67736530: "Loka matsaðili getur skoðað nöfn annarra matsaðila"
   final_letter_grade_80dccec1: Lokabókstafseinkunn
   final_score_26bcfc20: Lokaeinkunn
@@ -7789,6 +7861,7 @@ is:
   folder_705fd2d7: Mappa
   folder_browsing_tree_1f00a3ae: Möpputré
   folder_icon_29017021: Möpputákn
+  folder_tree_fbab0726: Möpputré
   folders: 
     event_updated: "Viðburður var uppfærður."
     folder_created: "Mappa var búin til."
@@ -7802,6 +7875,7 @@ is:
   for_best_results_crop_image_to_262px_wide_by_146px_af81a540: "Best er að hafa myndina 262 pixla á breidd og 146 á hæð. JPG, PNG eða GIF eru samþykktar skráategundir."
   for_course_level_users_deleting_a_course_is_part_o_932f7a98: "Fyrir notendur á námskeiðsstigi er það að eyða námskeiði hluti af staða námskeiðs - stjórna leyfum. Engu að síður gildir fyrir notendur á reikningsstigi að það að eyða námskeiði krefst þessa leyfis og námskeið - bæta við / breyta / eyða. "
   for_each_late_62aecf41: "Fyrir hvert seint"
+  for_name_d5684bfd: "Fyrir %{name}"
   forgot_password_f0c3fbac: "Gleymt aðgangsorð?"
   forgot_password_url_3f9c04b: "Vefslóð fyrir gleymt aðgangsorð"
   form_background_fb654518: "Bakgrunnur eyðublaðs"
@@ -8270,10 +8344,13 @@ is:
   grades_for_this_assignment_are_now_visible_to_stud_623efda0: "Nemendur geta nú séð einkunnir fyrir þetta verkefni."
   grades_moderate_317fce84: "Einkunnir - stjórna"
   grades_posted_c274d9f8: "Einkunnir birtar"
+  grades_posted_c5d8dcce: "Einkunnir birtar"
   grades_posting_bc7cfc1a: "Einkunnir í birtingu"
   grades_saved_5954b0bb: "Einkunnir vistaðar."
+  grades_select_final_grade_for_moderation_ae8585d1: "Einkunnir - velja lokaeinkunn fyrir stjórnun"
   grades_select_final_grade_for_moderation_c66284f4: "Einkunnir - velja lokaeinkunn fyrir stjórnun"
   grades_view_all_grades_8bf9f8d3: "Einkunnir - sjá allar einkunnir"
+  grades_view_audit_trail_cc4c1fcc: "Einkunnir - sjá yfirferðaslóð"
   grades_view_audit_trail_db7364b1: "Einkunnir - sjá yfirferðaslóð"
   grades_view_change_logs_6bc1b959: "Einkunnir - skoða breytingakladda"
   grades_visible_to_students_1584fa83: "Einkunnir sýnilegar nemendum"
@@ -8418,6 +8495,7 @@ is:
   group_category_id_7001cf89: group_category_id
   group_category_locked: "Hópaflokki verður ekki breytt því nemendur hafa þegar skilað fyrir þetta verkefni"
   group_details_e51122f1: "Upplýsingar um hóp"
+  group_files_82e5dcdb: Hópskrár
   group_group_name_is_for_a_different_section_4d84d256: "Hópurinn %{group_name} er fyrir annan hluta"
   group_group_name_is_full_297880d6: "Hópurinn %{group_name} er fullur"
   group_group_name_is_joined_by_invitation_only_4ac2a9e5: "Aðeins er hægt að ganga í hópinn %{group_name} með boði"
@@ -8831,6 +8909,7 @@ is:
   how_is_the_grade_determined_bb75bf53: "Hvernig er einkunn fundin út?"
   how_is_this_affecting_you_b3b6a639: "Hvaða áhrif hefur þetta á þig?"
   how_many_minutes_ecca5ee7: "Hve margar mínútur?"
+  html5_media_recorder_in_rce_bb59b78f: "HTML5 margmiðlunarupptaka í RCE"
   html_editor_fb2ab713: "HTML ritill"
   hungary_36_cd3e515b: "Úngverjaland (+36)"
   i_agree_to_the_34aa16ce: "Ég samþykki"
@@ -9281,6 +9360,8 @@ is:
   last_user_access_title: "Síðasti aðgangur notanda"
   late_2be42b88: Seint
   late_8bd684b6: seint
+  late_anonymous_assignment_user_name_has_submitted__f1ec191d: "Nafnlausu verkefni skilað of seint: %{user_name} skilaði of seint fyrir %{assignment_title}"
+  late_assignment_user_name_has_submitted_late_for_a_ce1a2d41: "Verkefni skilað of seint: %{user_name} skilaði of seint fyrir %{assignment_title}"
   late_bd436902: SEINT
   late_penalty_78099d18: "Viðurlög vegna skila sem ekki berast í tæka tíð:"
   late_penalty_817fff4e: "Viðurlög vegna of seinna skila:"
@@ -9468,6 +9549,7 @@ is:
   link_only_995966e: "Aðeins tengill"
   link_selection_1486c5d0: "Val á tengli"
   link_title_189888b7: "Titill tengils"
+  link_to_lti_tools_608df3b0: "Tengja við Iti verkfæri."
   link_to_url_52dd935c: "Tengill á vefslóð"
   link_url_a213671c: "Vefslóð tengils"
   link_url_cf96376: "Vefslóð tengils"
@@ -9500,6 +9582,7 @@ is:
   loading_6ac402e1: "hleð inn..."
   loading_725811ca: sæki
   loading_announcements_b927a86c: "Sæki tilkynningar"
+  loading_assessment_audit_trail_5cf4c10: "Hleð matsyfirferðarslóð"
   loading_assignments_352ec769: "Hleð niður verkefnum"
   loading_associations_9da66c4e: "Sæki tengingar"
   loading_associations_complete_b93a9c6e: "Búið að sækja tengingar"
@@ -9517,6 +9600,7 @@ is:
   loading_courses_started_6e6d742c: "Byrjað að sækja námskeið"
   loading_data_ecd89ba: "Sæki gögn..."
   loading_discussions_8ed5fcd7: "Hleð umræðu"
+  loading_folders_d8b5869e: "Hleð möppum"
   loading_graders_f6a76142: "Sækir matsaðila"
   loading_last_attended_date_5a42463: "Hleð inn upplýsingum um dagsetningu síðustu mætingar"
   loading_more_grade_history_results_b235de5: "Hleð fleiri niðurstöðum um einkunnaferil."
@@ -11222,10 +11306,10 @@ is:
         tweet: "Canvas-tilkynning - Athugasemd: %{author} fyrir %{assignment}, %{user}, %{context}."
     submission_grade_changed: 
       email: 
-        body: "Einkunn fyrir verkefnið þitt, %{assignment_title} hefur verið breytt."
+        body: "Einkunninni fyrir verkefni þitt %{assignment_title} var breytt."
         excused: "Þetta verkefni er undanskilið"
         html: 
-          body: "Einkunn fyrir verkefnið þitt, %{assignment_title} hefur verið breytt."
+          body: "Einkunninni fyrir verkefni þitt %{assignment_title} var breytt."
           excused: "Þetta verkefni er undanskilið"
           link_message: "Hér geturðu skoðað verkefni"
           no_date_set: "Engin dagsetning ákveðin"
@@ -11242,7 +11326,7 @@ is:
         score_pending: "einkunn bíður eftir mati kennara"
         subject: "Einkunn breytt: %{assignment}, %{context}"
       sms: 
-        body_sms: "Einkunnin þín fyrir %{title}, %{context} hefur breyst."
+        body_sms: "Einkunn þinni fyrir %{title} í %{context} var að breytast."
         more_info: "Nánari upplýsingar á %{url}"
         no_date_set: "Engin dagsetning ákveðin"
         not_applicable: "Á ekki við"
@@ -11264,11 +11348,11 @@ is:
         tweet: "Canvas-tilkynning - Breytt einkunn: %{date}"
     submission_graded: 
       email: 
-        body: "Verkefnið þitt %{assignment} hefur verið metið til einkunnar."
+        body: "Verkefni þitt %{assignment} er komið með einkunn."
         excused: "Þetta verkefni er undanskilið"
         graded_date: "metið: %{date}"
         html: 
-          body: "Verkefnið þitt %{assignment} hefur verið metið til einkunnar."
+          body: "Verkefni þitt %{assignment} er komið með einkunn."
           excused: "Þetta verkefni er undanskilið"
           graded_date: "metið: %{date}"
           link_message: "Hér geturðu skoðað verkefni"
@@ -11520,6 +11604,7 @@ is:
   modules_c4325335: Einingar
   modules_tutorial_tray_d58ac3cb: "Leiðbeiningar með einingum"
   month_s_5c17590e: Mánuður(ir)
+  monthandday_starting_at_time_769b12c8: "%{monthAndDay} byrjar í %{time}"
   moodle_dropdown_many_warning_title: "Það eru %{count} fjölfellispurningar í spurningabankanum sem gætu hafa verið fluttar rangt inn"
   moodle_dropdown_warning_title: "Fjölfellispurningar hafa mögulega verið fluttar rangt inn"
   moodle_formula_many_warning_title: "Það eru %{count} formúluspurningar í spurningabankanum þar sem þarf að búa aftur til möguleg svör"
@@ -11638,6 +11723,7 @@ is:
   muted_3ff94739: Óvirkt
   muting_assignment_a9aeb5c7: "Felur verkefni..."
   my_dashboard_b724020: "Skjáborðið mitt"
+  my_files_2f621040: "Mínar skrár"
   my_settings_2ff35329: "Minar stillingar"
   my_themes_b72217b8: "Þemun mín"
   n_554bc493: "n"
@@ -12269,6 +12355,7 @@ is:
   other_1c6d9c79: Annað
   other_carrier_45531207: "Annar flytjandi"
   other_ddacb37d: annað
+  other_incorrect_match_options_c1418af5: "Aðrir rangir flokkunarmöguleikar:"
   other_timezones_42530564: "Önnur tímabelti"
   out_of_formattedoutof_e08e90d5: "af %{formattedOutOf}"
   out_of_n_assignment_points_possible_3b026ea9: "af %{n_assignment.points_possible}"
@@ -12591,6 +12678,8 @@ is:
   planner_note_cc2fc176: "Minnismiði skipuleggjara"
   planner_override_13b23f6e: "Hnekking skipuleggjara"
   play_1a47eaa7: Spila
+  play_media_comment_8614d30f: "Spila miðilsathugasemd"
+  play_media_comment_fad7a166: "Spila miðilsathugasemd"
   please_add_a_due_date_1d433d2: "Bættu við skiladegi"
   please_add_at_least_one_non_blank_answer_213c2c8e: "Bættu við að minnsta kosti einu svari sem er ekki autt"
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Bættu við að minnsta kosti einu svari fyrir hverja breytu sem er ekki autt"
@@ -13094,6 +13183,7 @@ is:
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "Ýttu á kommulykilinn eða Shift + ? til að sjá lista yfir flýtilykla"
   press_the_esc_key_to_close_this_modal_14d10601: "Ýttu á Escape til að loka"
   prev_month_34bd934c: "Fyrri mánuður"
+  prevents_students_from_leaving_annotations_in_assi_cb188d2: "Kemur í veg fyrir að nemendur geti skilið eftir athugasemdir í verkefnum. Á ekki við um ritrýnd verkefni."
   preview_53003fd2: Forskoðun
   preview_a3f8f854: FORSKOÐA
   preview_your_changes_373557d8: "Forskoða breytingar"
@@ -13409,6 +13499,10 @@ is:
   provides_users_with_a_to_do_list_dashboard_option_9334f9fa: "Gefa notendum kost á skipuleggjara á skjáborði."
   provision_a_catalog_account_8cea67f6: "Ráðstafa Catalog reikning"
   provision_a_quiz_next_service_c7c6bd87: "Útvegun Quiz.Next-þjónustu"
+  provisional_grade_created_13f5c392: "Bráðabirgða einkunn búin til"
+  provisional_grade_deleted_4af33a19: "Bráðabirgða einkunn eytt"
+  provisional_grade_selected_416db903: "Bráðabirgða einkunn valin"
+  provisional_grade_updated_6753e2dd: "Bráðabirgða einkunn uppfærð"
   provisioned_catalog_account_26339afd: "Ráðstafaður Catalog-reikningur"
   provisioning_only_7c0e5911: "Eingöngu til ráðstöfunar"
   provisioning_title: Ráðstafar
@@ -14880,6 +14974,7 @@ is:
   restored_course_association_course_c9e16045: "Endurheimtar námskeiðstengingar %{course}"
   restrict_students_from_accessing_courses_after_end_7dd66bce: "Meina nemendum aðgang að námskeiðum eftir lokadag"
   restrict_students_from_accessing_courses_before_st_f7c22c00: "Meina nemendum aðgang að námskeiðum fyrir upphafsdag"
+  restrict_students_from_annotating_6c28ab9b: "Takmarka athugasemdir nemenda"
   restricted_access_d3e99a39: "Takmarkaður aðgangur"
   resubmit_to_the_associated_tool_for_plagiarism_ana_8d84d913: "Skila aftur í viðeigandi verkfæri svo hægt sé að greina ritstuld."
   resubmit_to_tool_name_1cf02a31: "Skila aftur í %{tool_name}"
@@ -15065,8 +15160,11 @@ is:
     unknown_user: "Óþekktur notandi"
   rubric_association: 
     no_details: "Engar upplýsingar"
+  rubric_created_64980593: "Matsviðmið búið til"
   rubric_criterion_range_12499bf1: "Fyrirsagna viðmiðasvið"
+  rubric_deleted_3d9efc18: "Matsviðmiði eytt"
   rubric_fc39da76: Matsviðmið
+  rubric_updated_103e24dc: "Matsviðmið uppfært"
   rubrics: 
     index: 
       account_rubrics: "Matsviðmið reiknings"
@@ -15117,7 +15215,9 @@ is:
   sample_data_e4fd01ff: Sýnisgögn
   saudi_arabia_966_d01ed717: "Sádi Arabía (+966)"
   save_11a80ec3: Vista
+  save_and_customize_19eb7a7b: "Vista og sérsníða"
   save_changes_698abe77: "Vista breytingar"
+  save_customizations_dde779d8: "Vista sérsnið"
   save_grading_period_daaaddea: "Vista einkunnatímabil"
   save_grading_period_set_e029fa88: "Vista stillingar einkunnatímabils"
   save_key_b4dede06: "Vista lykil"
@@ -15406,6 +15506,7 @@ is:
   see_rubric_results_62a6447d: "Sjá niðurstöður matsviðmiðs"
   see_scoring_details_f7fd1f3b: "Sjá upplýsingar um skor"
   see_some_lti_tools_that_work_great_with_canvas_16ef75a0: "*Sjá nokkur LTI tól* sem svínvirka með Canvas."
+  see_some_lti_tools_that_work_great_with_canvas_53e92091: "Sjá LTI verkfæri sem virka vel með Canvas."
   see_turnitin_results_cd9d4a6c: "Sjá niðurstöður Turnitin"
   select_1e849959: "[ Velja]"
   select_a_grading_period_5ea50f1: "Velja einkunnatímabil..."
@@ -16211,6 +16312,7 @@ is:
   show_key_1fbf0c64: "Sýna lykil"
   show_links_to_unpublished_content_30c0450d: "Sýna tengla á óbirt efni"
   show_more_af9cbc16: "Sýna meira"
+  show_name_of_observed_students_in_notifications_a56dd9e4: "Sýna nafn nemenda sem fylgst er með í tilkynningum."
   show_navigation_menu_34e7f441: "Sýna leiðarstýringarvalmynd"
   show_one_question_at_a_time_271e346d: "Sýna eina spurningu í einu"
   show_only_blueprint_courses_9fb37b41: "Sýna aðeins grunnsnið námskeiða"
@@ -16330,6 +16432,7 @@ is:
   something_is_broken_but_i_can_work_around_it_for_n_7fcedb9d: "Eitthvað er í ólagi en ég get samt unnið í kringum það"
   something_went_wrong_accessing_your_webcam_6643b87e: "Eitthvað misfórst við aðgang að vefmyndavélinni."
   something_went_wrong_creating_course_please_try_ag_5198931d: "Eitthvað fór úrskeiðis við að búa til námskeiðið. Vinsamlegast reynið aftur."
+  something_went_wrong_d238c551: "Eitthvað mistókst"
   something_went_wrong_please_try_refreshing_the_pag_4e14a67: "Eitthvað fór úrskeiðis. Reyndu að endurglæða síðuna. Ef vandamálið er viðvarandi kunna að vera of margar skrár á „%{assignmentTitle}“ til að hægt sé að hlaða SpeedGrader."
   something_went_wrong_re_activating_the_user_please_82c3e7a: "Eitthvað fór úrskeiðis við endurvirkjun notandans. Reyndu aftur síðar."
   something_went_wrong_updating_the_user_s_role_plea_5de95400: "Eitthvað fór úrskeiðis við uppfærslu hlutverks notandans. Reyndu aftur síðar."
@@ -16573,6 +16676,9 @@ is:
   submission_added_title_50ebdc85: "skilum bætt við: %{title}"
   submission_comment: 
     unknown_author: Einhver
+  submission_comment_created_f9375ca2: "Innsendingarathugasemd búin til"
+  submission_comment_deleted_a031a529: "Innsendingarathugasemd eytt"
+  submission_comment_updated_8d917ded: "Innsendingarathugasemd uppfærð"
   submission_comments_4fa03a17: "Athugasemdir við skil"
   submission_date_a7920dac: skiladagur
   submission_detail: 
@@ -16600,6 +16706,7 @@ is:
   submission_score_b7a291e8: skilaeinkunn
   submission_status_3079e730: "Staða á skilum"
   submission_tray_429ac3df: Skilabakki
+  submission_updated_8897f3b7: "Innsending uppfærð"
   submissions: 
     assignment_submit_success: "Verkefni var lagt fram."
     assignment_submitted: "Verkefni lagt fram."
@@ -16707,6 +16814,7 @@ is:
   submitting_types_7c5a7096: "Skila: %{types}"
   subscribe_failed_2eb62de0: "Áskrift tókst ekki"
   subscribe_to_title_c7d6bbd2: "Áskrifast að  %{title}"
+  success_file_uploaded_8174e93f: "Árangur: Skrá var hlaðið upp"
   success_grades_for_this_assignment_are_now_visible_e6dafd1e: "Árangur! Nemendur geta nú séð einkunnir fyrir þetta verkefni."
   success_grades_were_published_to_the_grade_book_da3b4fba: "Einkunnir voru birtar í einkunnabók."
   successfully_created_a_set_38374719: "Stofnað var sett"
@@ -16941,6 +17049,8 @@ is:
   the_global_context_9c3a8062: "Hin stærri mynd"
   the_grade_for_this_assignment_will_not_sync_to_the_3bb4f6f5: "Einkunn fyrir þetta verkefni samstillist ekki við nemendaupplýsingakerfi."
   the_grade_for_this_assignment_will_sync_to_the_stu_5d32cedb: "Einkunn fyrir þetta verkefni samstillist við nemendaupplýsingakerfi."
+  the_grade_for_title_in_context_for_name_just_chang_caef1c12: "Einkunn fyrir %{title} í %{context} fyrir %{name} var að breytast."
+  the_grade_on_assignment_assignment_title_has_been__f2487efc: "Einkunninni fyrir verkefni %{assignment_title} var breytt fyrir %{name}."
   the_grading_period_cannot_be_found_646a8a24: "Einkunnatímabilið finnst ekki"
   the_grading_period_set_was_deleted_cce5d8f6: "Einkunnatímabili var eytt"
   the_grading_period_set_was_updated_successfully_d8dd5d0f: "Einkunnatímabilið var uppfært."
@@ -17555,7 +17665,13 @@ is:
   to_manage_sis_data_sis_data_manage_must_also_be_en_cc52f042: "Til að stjórna SIS-gögnum, þarf SIS gögn - stjórna einnig að vera virkt."
   to_manage_sis_data_sis_data_manage_must_be_enabled_23f57d2: "Til að stjórna SIS-gögnum, þarf SIS gögn - stjórna að vera virkt. Ef SIS-gögn - stjórna er virkt og SIS gögn - lesa er óvirkt, hnekkir leyfi reiknings leyfi námskeiðs. Ef SIS gögn - stjórna er óvirkt og SIS gögn - lesa er virkt, geta notendur aðeins skoðað SIS-auðkenni námskeiðs, notanda og undirreiknings.  Til að koma í veg fyrir að notendur skoði einhver SIS-auðkenni á námskeiðsstigi þarf að afvirkja bæði SIS gögn - stjórna og SIS gögn - lesa."
   to_minscore_43e5452e: "til %{minScore}%"
+  to_moderate_a_quiz_assignments_and_quizzes_add_edi_2c7f4c18: |-
+      Til að ritstýra prófi, þarf líka að virkja verkefni og próf - bæta við / breyta / eyða.
+      Til að skoða SIS-auðkennisdálk í skyndiprófs greiningar CSV skránni, SIS gögn - lesa þarf líka að vera virkt.
   to_moderate_a_quiz_assignments_and_quizzes_add_edi_9747d5fb: "Til að ritstýra prófi, þarf líka að virkja verkefni og próf - bæta við / breyta / eyða."
+  to_moderate_a_quiz_assignments_and_quizzes_add_edi_bd8aada1: |-
+      Til að ritstýra prófi, þarf líka að virkja verkefni og próf - bæta við / breyta / eyða.
+      Til að skoða SIS-auðkennisdálk í skyndiprófs greiningar CSV skránni, SIS gögn - lesa þarf líka að vera virkt.
   to_moderate_a_quiz_assignments_and_quizzes_add_edi_ebdecaf8: "Til að ritstýra prófi, þarf líka að virkja verkefni og próf - bæta við / breyta / eyða."
   to_moderate_a_quiz_grades_edit_must_also_be_enable_72ca6ca1: "Til að ritstýra prófi þarf einkunnir - stjórna að vera virkjað."
   to_moderate_grades_grades_select_final_grade_for_m_8c605763: "Til að stjórna einkunnum, þarf að virkja einkunnir - velja lokaeinkunn."
@@ -17774,11 +17890,13 @@ is:
   unknown_answers_9688a2bc: "Óþekkt svör"
   unknown_compression_method_b6a850b5: "óþekkt þjöppunaraðferð"
   unknown_content_type_ae6d08e8: "Óþekkt efnistegund"
+  unknown_event_7a0bcda3: "Óþekktur atburður"
   unknown_manage_discussion_action_encountered_92a8dfc0: "Óþekkt umræðustjórnaraðgerð fundin "
   unknown_question_bank: "Óþekktur spurningabanki"
   unknown_quiz: "Óþekkt próf"
   unknown_status_status_35331e1d: "Óþekkt staða, %{status}"
   unknown_status_status_message_3a4ed4d5: "Óþekkt staða, %{status}: %{message}"
+  unknown_user_1113fcaa: "Óþekktur notandi"
   unknown_user_url_82196ba7: "Óþekkt notandaslóð"
   unlock_at_bb930b34: "Aflæsa við"
   unlock_at_time_a0bbfb9: "Aflæsa við: %{time}"
@@ -17873,9 +17991,11 @@ is:
     drop_to_upload: "Slepptu atriðum sem á að hlaða upp"
   upload_failed_a5dc91ec: "Upphleðsla mistókst"
   upload_failed_quota_exceeded_ff3af659: "Upphleðsla tókst ekki, fer yfir mörk"
+  upload_file_fd2361b8: "Hlaða upp skrá"
   upload_files_submitted_with_assignments_to_a_speci_5b4d2df8: "Hlaða upp skiluðum skrám með verkefnum í sérstaka möppu fyrir skil sem aðeins er hægt að lesa"
   upload_gradebook_386a46c8: "Hlaða upp einkunnabók"
   upload_media_ce31135a: "Hlaða upp miðli"
+  upload_not_available_for_this_folder_8f8623c6: "Upphleðsla ekki tiltæk fyrir þessa möppu"
   upload_successful_ca47465f: "Upphleðsla tókst"
   upload_your_outcomes_bceeadbe: "Hlaða upp þínum niðurstöðum!"
   uploaded_over_time_d59abb68: "Uppflutt efni með tímanum"
@@ -18326,6 +18446,7 @@ is:
       Kerfisstjórar undirreikninga geta ekki séð SIS-upplýsingar nema þeir hafi líka hlutverk leiðbeinanda í námskeiði. Kerfisstjórar undirreikninga geta ekki séð SIS-upplýsingar án tengingu við námskeið, þar sem hlutverk leiðbeinanda hefur leyfi til að lesa SIS-gögn á reikningsstigi.
   users_can_access_the_manage_question_banks_link_on_e411d01: "Notendur geta fengið aðgang að stjórna spurningabönkum á prófatriðaskrásíðunni þegar efni námskeiðs - skoða og verkefni og próf - bæta við / breyta / eyða eru virk."
   users_d1b60cb0: Notendur
+  users_generate_observer_pairing_codes_for_students_2c25d52a: "Notendur - búa til áhorfenda pörunarkóða fyrir nemendur"
   users_generate_observer_pairing_codes_for_students_6975caad: "Notendur - búa til áhorfenda pörunarkóða fyrir nemendur"
   users_manage_log_in_details_b944568b: "Notendur - stjórna innskráningarupplýsingum"
   users_manage_login_details_9462b30f: "Notendur - stjórna innskráningarupplýsingum"

@@ -65,7 +65,7 @@
   border-radius: 3px;
   .student-group-header {
     @include clearfix;
-    padding: 16px 16px 16px 10px;
+    padding: direction-sides(16px 16px 16px 10px);
   }
   .icon-mini-arrow-right, .icon-mini-arrow-down {
     float: direction(left);
@@ -92,7 +92,7 @@
     float: direction(left);
     display: inline-flex;
     h3 {
-      margin: 0 7px 0 5px;
+      margin: direction-sides(0 7px 0 5px);
       font-weight: bold;
       @include fontSize($ic-font-size--small);
       float: direction(left);
@@ -129,7 +129,7 @@
     text-align: direction(right);
   }
   .student-group-body {
-    padding: 16px 16px 16px 36px;
+    padding: direction-sides(16px 16px 16px 36px);
     &:last-child {
       border-bottom: 0;
     }
@@ -164,11 +164,11 @@
 #group_categories_tabs {
   margin: 0 -1em -1em;
   > .collectionViewItems {
-    padding: 10px 130px 0 1em;
+    padding: direction-sides(10px 130px 0 1em);
   }
   > .roster-tab {
-    padding-left: 1em;
-    padding-right: 1em;
+    padding-#{direction(left)}: 1em;
+    padding-#{direction(right)}: 1em;
   }
 }
 
@@ -181,7 +181,7 @@
 }
 // group switcher within left sub-nav
 .al-trigger--within-left-menu {
-  margin: 0 0 $ic-sp $ic-sp/2;
+  margin: direction-sides(0 0 $ic-sp $ic-sp/2);
 
   &.ui-menu-item {
     max-width: 200px; //override the kyle menu width for this instance

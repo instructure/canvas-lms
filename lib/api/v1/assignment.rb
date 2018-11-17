@@ -265,7 +265,7 @@ module Api::V1::Assignment
       if assignment.rubric
         rubric = assignment.rubric
         hash['rubric'] = rubric.data.map do |row|
-          row_hash = row.slice(:id, :points, :description, :long_description)
+          row_hash = row.slice(:id, :points, :description, :long_description, :ignore_for_scoring)
           row_hash["criterion_use_range"] = row[:criterion_use_range] || false
           row_hash["ratings"] = row[:ratings].map do |c|
             rating_hash = c.slice(:id, :points, :description, :long_description)
@@ -903,6 +903,9 @@ module Api::V1::Assignment
     if plagiarism_capable?(assignment_params)
       tool = assignment_configuration_tool(assignment_params)
       assignment.tool_settings_tool = tool
+    elsif assignment.persisted? && assignment.assignment_configuration_tool_lookups.present?
+      # Destroy subscriptions and tool associations
+      assignment.send_later_if_production(:clear_tool_settings_tools)
     end
   end
 

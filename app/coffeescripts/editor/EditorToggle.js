@@ -159,7 +159,10 @@ class EditorToggle {
   // method to get the content for the editor
   // @api private
   getContent () {
-    return $.trim(this.el.html())
+    // remove MathML additions
+    const content = $('<div></div>').append($(this.el.html()))
+    content.find('.hidden-readable').remove()
+    return $.trim(content.html())
   }
 
   // #

@@ -51,7 +51,7 @@ const defaultProps = (props = {}) => (
 
 it('renders the AlignmentResult component', () => {
   const wrapper = shallow(<AssignmentResult {...defaultProps()}/>)
-  expect(wrapper.debug()).toMatchSnapshot()
+  expect(wrapper).toMatchSnapshot()
 })
 
 it('includes the assignment name', () => {

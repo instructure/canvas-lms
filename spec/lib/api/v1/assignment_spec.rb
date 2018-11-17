@@ -151,6 +151,31 @@ describe "Api::V1::Assignment" do
       json = api.assignment_json(assignment, user, session, params)
       expect(json).not_to have_key "needs_grading_count"
     end
+
+
+    context 'rubrics' do
+      before do
+        rubric_model({
+          context: assignment.course,
+          title: "test rubric",
+          data: [{
+            description: "Some criterion",
+            points: 10,
+            id: 'crit1',
+            ignore_for_scoring: true,
+            ratings: [
+              {description: "Good", points: 10, id: 'rat1', criterion_id: 'crit1'}
+            ]
+          }]
+        })
+        @rubric.associate_with(assignment, assignment.course, purpose: 'grading')
+      end
+
+      it "includes ignore_for_scoring when it is on the rubric" do
+        json = api.assignment_json(assignment, user, session)
+        expect(json['rubric'][0]['ignore_for_scoring']).to eq true
+      end
+    end
   end
 
   describe "*_settings_hash methods" do

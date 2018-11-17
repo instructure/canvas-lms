@@ -22,14 +22,14 @@
   label.label_with_checkbox {
     margin-bottom: 10px;
     input[type="checkbox"] {
-      margin: 0 5px 0 0;
+      margin: direction-sides(0 5px 0 0);
     }
   }
   .date_start_end_row {
     @include clearfix;
     th, td {
       vertical-align: top;
-      padding: 0 5px 0 0;
+      padding: direction-sides(0 5px 0 0);
       &:first-child {
         padding-#{direction(left)}: 0px;
       }

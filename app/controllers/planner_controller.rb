@@ -22,7 +22,6 @@
 
 class PlannerController < ApplicationController
   include Api::V1::PlannerItem
-  include PlannerHelper
 
   before_action :require_user
   before_action :require_planner_enabled
@@ -33,7 +32,6 @@ class PlannerController < ApplicationController
               :include_concluded
 
   # @API List planner items
-  # @beta
   #
   # Retrieve the paginated list of objects to be shown on the planner for the
   # current user with the associated planner override to override an item's

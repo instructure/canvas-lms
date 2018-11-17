@@ -51,5 +51,18 @@ if (ENV.use_high_contrast) {
   canvasHighContrastTheme.use()
 } else {
   const brandvars = window.CANVAS_ACTIVE_BRAND_VARIABLES || {}
-  canvasBaseTheme.use({ overrides: brandvars })
+
+  // Set CSS transitions to 0ms in Selenium and JS tests
+  let transitionOverride = {}
+  if (process.env.NODE_ENV == 'test' || window.INST.environment === 'test') {
+    transitionOverride =  {
+      transitions: {
+        duration: '0ms'
+      }
+    }
+  }
+
+  canvasBaseTheme.use({
+    overrides: {...transitionOverride, ...brandvars}
+  })
 }

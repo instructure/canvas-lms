@@ -36,8 +36,8 @@
     color: var(--ic-brand-font-color-dark);
     font-weight: bold;
     border-top: none;
-    border-left: none;
-    border-right: none;
+    border-#{direction(left)}: none;
+    border-#{direction(right)}: none;
     border-radius: 0;
     border-bottom: 1px solid #C7CDD1;
     background-color: white;

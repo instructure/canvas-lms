@@ -16,9 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+@import "base/environment";
+
 .insertUpdateImage {
   .insertUpdateImageTabpane {
-    height: 200px;
+    min-height: 265px;
     overflow: auto;
   }
   .checkbox.inline { white-space: nowrap; }
@@ -30,4 +32,25 @@
     margin-top: 20px;
     -webkit-margin-collapse: separate;
   }
+  fieldset {
+    min-width: 50%;
+  }
+}
+
+.image-upload__form {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.file-browser__tree {
+  height: 175px;
+  overflow: auto;
+  border: solid 1px $ic-border-color;
+  border-radius: $ic-border-radius;
+  margin: .5rem auto;
+}
+
+.file-browser__container {
+  padding: .25rem;
 }

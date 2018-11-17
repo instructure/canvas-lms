@@ -38,8 +38,7 @@ describe "gradebook - concluded courses and enrollments" do
       get course_gradebook_path(@course)
       f('#gradebook_settings').click
       expect do
-        f('label[for="show_inactive_enrollments"]').click
-        wait_for_ajax_requests
+        wait_for_new_page_load(f('label[for="show_inactive_enrollments"]').click)
       end
         .to change { gradebook_settings_for_course.call(@teacher, @course)}
         .from(nil)

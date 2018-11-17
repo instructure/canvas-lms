@@ -154,12 +154,12 @@ For admin dropdowns that appear in main content areas, such as item groups, plea
     }
 
     &:first-of-type a {
-      border-top-left-radius: 0;
-      border-top-right-radius: 0;
+      border-top-#{direction(left)}-radius: 0;
+      border-top-#{direction(right)}-radius: 0;
     }
     &:last-child a {
-      border-bottom-left-radius: 0;
-      border-bottom-right-radius: 0;
+      border-bottom-#{direction(left)}-radius: 0;
+      border-bottom-#{direction(right)}-radius: 0;
     }
 
     &.ui-menu-item--helper-text {
@@ -195,8 +195,8 @@ For admin dropdowns that appear in main content areas, such as item groups, plea
 .al-trigger:hover { text-decoration: none; }
 
 .al-trigger {
-  padding-left: 8px;
-  padding-right: 8px;
+  padding-#{direction(left)}: 8px;
+  padding-#{direction(right)}: 8px;
   cursor: pointer;
   white-space: nowrap;
   text-decoration: none;

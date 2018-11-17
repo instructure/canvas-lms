@@ -42,15 +42,39 @@ export class DynamicUiManager {
     this.animatableRegistry = new AnimatableRegistry();
     this.animationCollection = new AnimationCollection(this, opts.actionsToAnimations);
     this.animationPlan = {};
-    this.stickyOffset = 0;
-    this.additionalOffset = 0;
+    this.plannerHeaderId = '';
+    this.newActivityButtonId = '';
   }
 
-  setStickyOffset (offset) {
-    this.stickyOffset = offset;
+
+  setOffsetElementIds (plannerHeaderId, newActivityButtonId) {
+    this.plannerHeaderId = plannerHeaderId;
+    this.newActivityButtonId = newActivityButtonId;
   }
 
-  getStickyOffset () { return this.stickyOffset; }
+  getStickyOffset () {
+    let offset = 0;
+    if (this.plannerHeaderId) {
+      const elem = this.getDocument().getElementById(this.plannerHeaderId)
+      if (elem) {
+        const rect = elem.getBoundingClientRect();
+        offset = rect.bottom;
+      }
+    }
+    return offset;
+  }
+
+  getAdditionalOffset () {
+    let offset = 0;
+    if (this.newActivityButtonId) {
+      const elem = this.getDocument().getElementById(this.newActivityButtonId);
+      if (elem) {
+        const rect = elem.getBoundingClientRect();
+        offset = rect.height;
+      }
+    }
+    return offset;
+  }
 
   setStore (store) {
     this.store = store;
@@ -61,7 +85,7 @@ export class DynamicUiManager {
   }
 
   totalOffset () {
-    return this.stickyOffset + this.additionalOffset;
+    return this.getStickyOffset() + this.getAdditionalOffset()
   }
 
   focusFallback (type) {
@@ -108,9 +132,7 @@ export class DynamicUiManager {
     if (this.plannerActive()) this.animationCollection.uiWillUpdate();
   }
 
-  triggerUpdates = (additionalOffset) => {
-    if (additionalOffset != null) this.additionalOffset = additionalOffset;
-
+  triggerUpdates = () => {
     if (this.plannerActive()) this.animationCollection.uiDidUpdate();
 
     const animationPlan = this.animationPlan;
@@ -135,7 +157,7 @@ export class DynamicUiManager {
     // bouncing of the button visibility that happens as we scroll to new
     // activity because showing and hiding the button changes the document
     // height, which changes the scroll position.
-    let naiThreshold = this.stickyOffset;
+    let naiThreshold = this.getStickyOffset();
     if (!this.store.getState().ui.naiAboveScreen) {
       naiThreshold = 0;
     }
@@ -188,7 +210,9 @@ export class DynamicUiManager {
   }
 
   handleDismissedOpportunity = (action) => {
-    const doomedComponentId = action.payload.plannable_id;
+    // for graded discussions and quizzes, the assignment_id is different
+    // and is what is registered
+    const doomedComponentId = action.payload.assignment_id || action.payload.plannable_id;
     this.planDeletedComponent('opportunity', doomedComponentId);
   }
 

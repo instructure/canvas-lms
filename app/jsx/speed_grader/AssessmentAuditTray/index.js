@@ -16,24 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Component} from 'react'
-import {func} from 'prop-types'
+import React, {Component, Fragment} from 'react'
+import {func, instanceOf} from 'prop-types'
 import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
+import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import Tray from '@instructure/ui-overlays/lib/components/Tray'
 import View from '@instructure/ui-layout/lib/components/View'
 import I18n from 'i18n!speed_grader'
 
 import AssessmentSummary from './components/AssessmentSummary'
+import AuditTrail from './components/AuditTrail'
+import Api from './Api'
+import buildAuditTrail from './buildAuditTrail'
 
 export default class AssessmentAuditTray extends Component {
   static propTypes = {
+    api: instanceOf(Api),
     onEntered: func,
     onExited: func
   }
 
   static defaultProps = {
+    api: new Api(),
     onEntered() {},
     onExited() {}
   }
@@ -45,6 +51,8 @@ export default class AssessmentAuditTray extends Component {
     this.show = this.show.bind(this)
 
     this.state = {
+      auditEventsLoaded: false,
+      auditTrail: buildAuditTrail([]),
       open: false
     }
   }
@@ -56,8 +64,23 @@ export default class AssessmentAuditTray extends Component {
   show(context) {
     this.setState({
       ...context,
+      auditEventsLoaded: false,
+      auditTrail: buildAuditTrail([]),
       open: true
     })
+
+    const {assignment, courseId, submission} = context
+
+    this.props.api
+      .loadAssessmentAuditTrail(courseId, assignment.id, submission.id)
+      .then(auditEvents => {
+        if (this.state.open && this.state.submission.id === submission.id) {
+          this.setState({
+            auditEventsLoaded: true,
+            auditTrail: buildAuditTrail(auditEvents)
+          })
+        }
+      })
   }
 
   render() {
@@ -88,12 +111,22 @@ export default class AssessmentAuditTray extends Component {
             </FlexItem>
           </Flex>
 
-          <View as="div" margin="small">
-            <AssessmentSummary
-              assignment={this.state.assignment}
-              submission={this.state.submission}
-            />
-          </View>
+          {this.state.auditEventsLoaded ? (
+            <Fragment>
+              <View as="div" margin="small">
+                <AssessmentSummary
+                  assignment={this.state.assignment}
+                  submission={this.state.submission}
+                />
+              </View>
+
+              <View as="div" margin="small">
+                <AuditTrail auditTrail={this.state.auditTrail} />
+              </View>
+            </Fragment>
+          ) : (
+            <Spinner title={I18n.t('Loading assessment audit trail')} />
+          )}
         </View>
       </Tray>
     )

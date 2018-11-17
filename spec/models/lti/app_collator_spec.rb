@@ -280,7 +280,8 @@ module Lti
       let(:collection) do
         [{
           enabled: enabled,
-          config: tool_config
+          config: tool_config,
+          installed_in_current_course: false
         }]
       end
       let(:enabled) { true }
@@ -289,6 +290,10 @@ module Lti
 
       it 'returns an enabled tool' do
         expect(subject.first[:enabled]).to be true
+      end
+
+      it 'is not installed in a course' do
+        expect(subject.first[:installed_in_current_course]).to eq false
       end
 
       context 'with disabled tool' do

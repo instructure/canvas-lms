@@ -111,24 +111,19 @@ QUnit.module('GradeSummary GradersTable', suiteHooks => {
   function getGraderRow(graderId) {
     const {graderName} = storeEnv.graders.find(grader => grader.graderId === graderId)
     const rows = wrapper
-      .find('tbody tr')
-      .filterWhere(row => row.find('th').text() === graderName)
+      .find('View Grid GridRow')
+      .filterWhere(row => row.find('label').length > 0 && row.find('label').text() === graderName)
     return rows.at(0)
   }
 
-  test('renders a table', () => {
-    mountComponent()
-    strictEqual(wrapper.find('table').length, 1)
-  })
-
   test('includes a row for each grader', () => {
     mountComponent()
-    strictEqual(wrapper.find('tbody tr th').length, 4)
+    strictEqual(wrapper.find('.grader-label').length, 4)
   })
 
   test('displays grader names in the row headers', () => {
     mountComponent()
-    const rowHeaders = wrapper.find('tbody tr th')
+    const rowHeaders = wrapper.find('.grader-label')
     deepEqual(
       rowHeaders.map(header => header.text()),
       storeEnv.graders.map(grader => grader.graderName)
@@ -141,26 +136,26 @@ QUnit.module('GradeSummary GradersTable', suiteHooks => {
     })
 
     test('is not displayed when grades have not started loading', () => {
-      const columnHeaders = wrapper.find('thead tr th')
+      const columnHeaders = wrapper.find('Heading')
       strictEqual(columnHeaders.filterWhere(header => header.text() === 'Accept Grades').length, 0)
     })
 
     test('is not displayed when grades have started loading', () => {
       store.dispatch(StudentActions.setLoadStudentsStatus(StudentActions.STARTED))
-      const columnHeaders = wrapper.find('thead tr th')
+      const columnHeaders = wrapper.find('Heading')
       strictEqual(columnHeaders.filterWhere(header => header.text() === 'Accept Grades').length, 0)
     })
 
     test('is not displayed when not all provisional grades have loaded', () => {
       store.dispatch(StudentActions.setLoadStudentsStatus(StudentActions.STARTED))
       store.dispatch(GradeActions.addProvisionalGrades(provisionalGrades))
-      const columnHeaders = wrapper.find('thead tr th')
+      const columnHeaders = wrapper.find('Heading')
       strictEqual(columnHeaders.filterWhere(header => header.text() === 'Accept Grades').length, 0)
     })
 
     test('is displayed when grades have finished loading and at least one grader can be bulk-selected', () => {
       mountAndFinishLoading()
-      const columnHeaders = wrapper.find('thead tr th')
+      const columnHeaders = wrapper.find('Heading')
       strictEqual(columnHeaders.filterWhere(header => header.text() === 'Accept Grades').length, 1)
     })
 
@@ -169,7 +164,7 @@ QUnit.module('GradeSummary GradersTable', suiteHooks => {
         grade.studentId = '1111' // eslint-disable-line no-param-reassign
       })
       mountAndFinishLoading()
-      const columnHeaders = wrapper.find('thead tr th')
+      const columnHeaders = wrapper.find('Heading')
       strictEqual(columnHeaders.filterWhere(header => header.text() === 'Accept Grades').length, 0)
     })
 
@@ -178,7 +173,7 @@ QUnit.module('GradeSummary GradersTable', suiteHooks => {
         grade.selected = true // eslint-disable-line no-param-reassign
       })
       mountAndFinishLoading()
-      const columnHeaders = wrapper.find('thead tr th')
+      const columnHeaders = wrapper.find('Heading')
       strictEqual(columnHeaders.filterWhere(header => header.text() === 'Accept Grades').length, 1)
     })
   })

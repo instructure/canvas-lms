@@ -332,7 +332,7 @@
               <div>
                 <% if question_type.entry_type == 'textarea' %>
                   <%= t('Your Answer:') %>
-                  <div class="user_content quiz_response_text"><%= hash_get(user_answer, :text).html_safe %></div>
+                  <div class="user_content quiz_response_text"><%= user_content(hash_get(user_answer, :text)) %></div>
                 <% else %>
                   <% matched_answer = hash_get(question, :answers, []).find{|a| hash_get(a, :text) == hash_get(user_answer, :text) || hash_get(a, :id) == hash_get(user_answer, :answer_id) } %>
                   <% hash_get(question, :answers, []).each do |a|
@@ -388,7 +388,7 @@
         <% if question && hash_get(question, :question_type) == 'matching_question' && !assessing && ((@quiz && display_correct_answers) || (!user_answer && !assessment_results)) && !@quiz.try(:survey?) %>
           <% other_matches = (hash_get(question, :matches) || hash_get(question, :answers, [])).select{|a| !hash_get(question, :answers, []).map{|an| hash_get(an, :match_id) }.include?(hash_get(a, :match_id)) } %>
           <% if !other_matches.empty? %>
-            Other Incorrect Match Options:
+            <%= t('Other Incorrect Match Options:') %>
             <ul class="matching_answer_incorrect_matches_list">
             <% other_matches.each do |match| %>
               <li><%= hash_get(match, :right) || hash_get(match, :text) %></li>
@@ -414,17 +414,17 @@
       <div title="<%= t('titles.question_correct_comment', "Students will see this comment if they get the question correct") %>" class="question_comment question_correct_comment" <%= hidden(true) unless question && comment_get(question, :correct_comments).present? %>>
         <div class="comment_top"></div>
         <div class="question_comment_text correct_comments" <%= hidden(true) if hash_get(question, :correct_comments_html).present? %>><%= hash_get(question, :correct_comments) %></div>
-        <div class="question_comment_html correct_comments_html"><%= sanitize hash_get(question, :correct_comments_html) %></div>
+        <div class="question_comment_html correct_comments_html"><%= user_content sanitize(hash_get(question, :correct_comments_html)) %></div>
       </div>
       <div title="<%= t('titles.question_incorrect_comment', "Students will see this comment if they get the question wrong") %>" class="question_comment question_incorrect_comment" <%= hidden(true) unless question && comment_get(question, :incorrect_comments).present? %>>
         <div class="comment_top"></div>
         <div class="question_comment_text incorrect_comments" <%= hidden(true) if hash_get(question, :incorrect_comments_html).present? %>><%= hash_get(question, :incorrect_comments) %></div>
-        <div class="question_comment_html incorrect_comments_html"><%= sanitize hash_get(question, :incorrect_comments_html) %></div>
+        <div class="question_comment_html incorrect_comments_html"><%= user_content sanitize(hash_get(question, :incorrect_comments_html)) %></div>
       </div>
       <div title="<%= t('titles.question_neutral_comment', "Students will see this comment once they've answered the question") %>" class="question_comment question_neutral_comment" <%= hidden(true) unless question && comment_get(question, :neutral_comments).present? %>>
         <div class="comment_top"></div>
         <div class="question_comment_text neutral_comments" <%= hidden(true) if hash_get(question, :neutral_comments_html).present? %>><%= hash_get(question, :neutral_comments) %></div>
-        <div class="question_comment_html neutral_comments_html"><%= sanitize hash_get(question, :neutral_comments_html) %></div>
+        <div class="question_comment_html neutral_comments_html"><%= user_content sanitize(hash_get(question, :neutral_comments_html)) %></div>
       </div>
     <% end %>
     <% if question_bank_id %>

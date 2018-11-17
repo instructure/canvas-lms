@@ -17,7 +17,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe GradebooksController do
   before :once do
@@ -2109,6 +2109,28 @@ describe GradebooksController do
       allow(@controller).to receive(:can_do).and_return(true)
 
       expect(@controller.post_grades_feature?).to eq(true)
+    end
+  end
+
+  describe "#grading_rubrics" do
+    context "sharding" do
+      specs_require_sharding
+
+      it "should fetch rubrics from a cross-shard course" do
+        user_session(@teacher)
+        @shard1.activate do
+          a = Account.create!
+          @cs_course = Course.create!(:name => 'cs_course', :account => a)
+          @rubric = Rubric.create!(context: @cs_course, title: 'testing')
+          RubricAssociation.create!(context: @cs_course, rubric: @rubric, purpose: :bookmark, association_object: @cs_course)
+          @cs_course.enroll_user(@teacher, "TeacherEnrollment", :enrollment_state => "active")
+        end
+
+        get "grading_rubrics", params: {:course_id => @course, :context_code => @cs_course.asset_string}
+        json = json_parse(response.body)
+        expect(json.first["rubric_association"]["rubric_id"]).to eq @rubric.global_id.to_s
+        expect(json.first["rubric_association"]["context_code"]).to eq @cs_course.global_asset_string
+      end
     end
   end
 end

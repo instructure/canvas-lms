@@ -50,7 +50,7 @@ describe TokenScopes do
     end
 
     describe "generated_scopes" do
-      let!(:generated_scopes) {TokenScopes.all_scopes.reject {|s| s == TokenScopes::USER_INFO_SCOPE[:scope] || TokenScopes::LTI_SCOPES.values.include?(s) }}
+      let!(:generated_scopes) {TokenScopes.all_scopes.reject {|s| s == TokenScopes::USER_INFO_SCOPE[:scope] || TokenScopes::LTI_SCOPES.keys.include?(s) }}
 
       it "formats the scopes with url:http_verb|api_path" do
         generated_scopes.each do |scope|

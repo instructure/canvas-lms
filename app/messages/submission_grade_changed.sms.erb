@@ -1,4 +1,8 @@
-<%= t :body_sms, "Your grade for %{title}, %{context} just changed.", :title => asset.assignment.title, :context => asset.assignment.context.name %>
+<% if send_student_names(asset, user) %>
+<%= t "The grade for %{title} in %{context} for %{name} just changed.", :title => asset.assignment.title, :context => asset.assignment.context.name, name: asset.user.name %>
+<% else %>
+  <%= t :body_sms, "Your grade for %{title} in %{context} just changed.", :title => asset.assignment.title, :context => asset.assignment.context.name %>
+<% end %>
 
 <%= t :regraded_date, "re-graded: %{date}", :date => (datetime_string(force_zone(asset.graded_at)) rescue t(:no_date_set, "No Date Set")) %>
 <% if asset.score && user.try(:send_scores_in_emails?, asset.assignment.context.root_account) %>

@@ -252,6 +252,27 @@ describe AssignmentsApiController, type: :request do
                           assignment8)
     end
 
+    it "returns assignments by assignment group" do
+      group1 = @course.assignment_groups.create!(:name => 'group1')
+      group2 = @course.assignment_groups.create!(:name => 'group2')
+      @course.assignments.create!(:title => 'assignment1',
+                                  :assignment_group => group2)
+      @course.assignments.create!(:title => 'assignment2',
+                                  :assignment_group => group2)
+      @course.assignments.create!(:title => 'assignment3',
+                                  :assignment_group => group1)
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/assignment_groups/#{group2.id}/assignments",
+                      {
+                        controller: 'assignments_api',
+                        action: 'index',
+                        format: 'json',
+                        course_id: @course.to_param,
+                        assignment_group_id: group2.to_param
+                      })
+      expect(json.map { |a| a['name'] }).to match_array(['assignment1', 'assignment2'])
+    end
+
     it "should search for assignments by title" do
       2.times {|i| @course.assignments.create!(:title => "First_#{i}") }
       ids = @course.assignments.map(&:id)
@@ -1611,6 +1632,50 @@ describe AssignmentsApiController, type: :request do
         })
         new_assignment = Assignment.find(JSON.parse(response.body)['id'])
         expect(new_assignment.tool_settings_tool).to eq message_handler
+      end
+
+      context 'when no tool association exists' do
+        let(:assignment) { assignment_model(course: @course) }
+        let(:update_response) do
+          put "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}", params: {
+            assignment: { name: 'banana' }
+          }
+        end
+
+        it 'does not attempt to clear tool associations' do
+          expect(assignment).not_to receive(:clear_tool_settings_tools)
+          update_response
+        end
+      end
+
+      context 'when a tool association already exists' do
+        let(:assignment) do
+          a = assignment_model(course: @course)
+          a.tool_settings_tool = message_handler
+          a.save!
+          a
+        end
+        let(:update_response) do
+          put "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}", params: {
+            assignment: { name: 'banana' }
+          }
+        end
+        let(:lookups) { assignment.assignment_configuration_tool_lookups }
+
+        before do
+          allow_any_instance_of(AssignmentConfigurationToolLookup).to(
+            receive(:create_subscription).and_return(SecureRandom.uuid)
+          )
+          user_session(@user)
+        end
+
+        context 'when switching to unsupported submission type' do
+          it 'destroys tool associations' do
+            expect do
+              update_response
+            end.to change(lookups, :count).from(1).to(0)
+          end
+        end
       end
 
       context 'sets the configuration LTI 2 tool' do

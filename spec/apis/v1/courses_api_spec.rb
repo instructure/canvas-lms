@@ -404,7 +404,7 @@ describe Api::V1::Course do
 end
 
 describe CoursesController, type: :request do
-  let(:user_api_fields) { %w(id name sortable_name short_name) }
+  let(:user_api_fields) {%w(id name sortable_name short_name created_at)}
 
   before :once do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym(:name => 'UWP'))
@@ -2575,6 +2575,7 @@ describe CoursesController, type: :request do
         expect(json).to eq [
           {
             'id' => @ta.id,
+            'created_at' => @ta.created_at.iso8601,
             'name' => 'TAPerson',
             'sortable_name' => 'TAPerson',
             'short_name' => 'TAPerson',

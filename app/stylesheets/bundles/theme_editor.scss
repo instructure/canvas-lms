@@ -151,7 +151,7 @@ $te-footer-height: 72px;
 
 .Theme__header-theme-name {
   @include fontSize(16px);
-  margin: 0 0 0 $ic-sp*1.5;
+  margin: direction-sides(0 0 0 $ic-sp*1.5);
 }
 
 .Theme__editor-shared-themes {
@@ -200,7 +200,7 @@ $te-footer-height: 72px;
       border-bottom-color: $te-content-bgd;
       position: absolute;
       bottom: -1px;
-      left: 0; right: 0;
+      #{direction(left)}: 0; #{direction(right)}: 0;
       margin: 0 auto;
     }
 
@@ -309,8 +309,8 @@ $te-footer-height: 72px;
 }
 @mixin animate-hover {
   transition: padding 0.2s;
-  padding-left: 5px;
-  padding-right: 5px;
+  padding-#{direction(left)}: 5px;
+  padding-#{direction(right)}: 5px;
 }
 .Theme__editor-accordion.ui-accordion {
   .ui-accordion-header {
@@ -461,7 +461,7 @@ $te-footer-height: 72px;
   .Theme__editor-color-block_input-text {
     width: 75px;
     height: $te-input-height;
-    margin: 0 $ic-sp 0 0;
+    margin: direction-sides(0 $ic-sp 0 0);
     padding: 0 $ic-sp/2;
     color: $ic-font-color-dark;
     border: 1px solid $ic-color-neutral;

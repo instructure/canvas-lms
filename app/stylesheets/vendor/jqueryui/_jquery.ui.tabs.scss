@@ -16,7 +16,7 @@
     padding: 0;
     border-radius: 0;
     background: transparent;
-    border-width: 0 0 1px 0;
+    border-width: direction-sides(0 0 1px 0);
     box-shadow: none; //override .ui-widget-header
     li {
       list-style: none;
@@ -48,7 +48,7 @@
   .ui-tabs-nav li a, &.ui-tabs-collapsible .ui-tabs-nav li.ui-tabs-active a { cursor: pointer; } /* first selector in group seems obsolete, but required to overcome bug in Opera applying cursor: text overall if defined elsewhere... */
   .ui-tabs-panel { display: block; padding: 1em 1.4em;
     background-color: $bgColorContent;
-    border-width: 0 1px 1px 1px;
+    border-width: direction-sides(0 1px 1px 1px);
     border-radius: 0;
 
   }

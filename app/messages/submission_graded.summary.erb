@@ -6,6 +6,9 @@
   <%= t :subject, "Assignment Graded: %{assignment}, %{context}", :assignment => asset.assignment.title, :context => asset.assignment.context.name %>
 <% end %>
 
+<% if send_student_names(asset, user) %>
+  <%= t "For %{name}", name: asset.user.name %>
+<% end %>
 <%= t :graded_date, "graded: %{date}", :date => (datetime_string(force_zone(asset.graded_at)) rescue t(:no_date_set, "No Date Set")) %>
 <% if asset.score && user.try(:send_scores_in_emails?, asset.assignment.context.root_account) %>
   <%= t :score, "score:  %{score} out of %{total}", :score => asset.score, :total => (asset.assignment.points_possible || t(:not_applicable, "N/A")) %>

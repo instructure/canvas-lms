@@ -152,6 +152,7 @@ class ApplicationController < ActionController::Base
           show_feedback_link: show_feedback_link?,
           enable_profiles: (@domain_root_account && @domain_root_account.settings[:enable_profiles] != false)
         },
+        ARC_RECORDING_FEATURE_ENABLED: (@domain_root_account && @domain_root_account.feature_enabled?(:integrate_arc_rce)),
       }
       @js_env[:current_user] = @current_user ? Rails.cache.fetch(['user_display_json', @current_user].cache_key, :expires_in => 1.hour) { user_display_json(@current_user, :profile, [:avatar_is_fallback]) } : {}
       @js_env[:page_view_update_url] = page_view_path(@page_view.id, page_view_token: @page_view.token) if @page_view

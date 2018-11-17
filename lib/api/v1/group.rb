@@ -22,12 +22,12 @@ module Api::V1::Group
   include Api::V1::Tab
 
   API_GROUP_JSON_OPTS = {
-    :only => %w(id name description is_public join_level group_category_id max_membership),
+    :only => %w(id name description is_public join_level group_category_id max_membership created_at),
     :methods => %w(members_count storage_quota_mb),
   }
 
   API_GROUP_MEMBERSHIP_JSON_OPTS = {
-    :only => %w(id group_id user_id workflow_state moderator).freeze
+    :only => %w(id group_id user_id workflow_state moderator created_at).freeze
   }.freeze
 
   # permission keys need to be symbols

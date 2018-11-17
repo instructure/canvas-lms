@@ -50,8 +50,8 @@
   background: $ic-color-light;
   position: relative;
   z-index: 1;
-  padding-left: $ic-sp;
-  padding-right: $ic-sp;
+  padding-#{direction(left)}: $ic-sp;
+  padding-#{direction(right)}: $ic-sp;
 }
 .ic-ThemeCard-add-template-menu {
   .ui-menu-item a {

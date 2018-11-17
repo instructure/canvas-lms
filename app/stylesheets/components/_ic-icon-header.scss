@@ -58,5 +58,5 @@ The Icon-Text Combo is a tiny component for when you want to use an icon with a 
 .ic-icon-text-combo__text {
   flex: 1;
   line-height: 1.2;
-  padding: 0; margin: 0 0 0 $ic-sp;
+  padding: direction-sides(0; margin: 0 0 0 $ic-sp);
 }

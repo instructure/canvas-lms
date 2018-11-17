@@ -41,7 +41,7 @@ a {
   height: 122px;
   padding-top: 12px;
   h1, .h1 {
-    padding: 50px 0 0 0px;
+    padding: direction-sides(50px 0 0 0px);
     a {
       display: block;
       width: 175px;
@@ -55,7 +55,7 @@ a {
     position: absolute;
     #{direction(right)}: 73px;
     top: 55px;
-    padding: 0 22px 0 0;
+    padding: direction-sides(0 22px 0 0);
     border: 5px solid transparent;
     font-size: 1.1em;
     background: transparent url(/images/registration/down-arrow.png) right center no-repeat;

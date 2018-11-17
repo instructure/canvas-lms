@@ -158,8 +158,8 @@
 
     .ic-item-row__master-course-lock {
       &:focus { @include ic-focus-variant; }
-      margin-left: 2px;
-      margin-right: 2px;
+      margin-#{direction(left)}: 2px;
+      margin-#{direction(right)}: 2px;
     }
   }
 }

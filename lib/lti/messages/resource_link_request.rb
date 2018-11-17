@@ -22,8 +22,8 @@ module Lti::Messages
       @message = LtiAdvantage::Messages::ResourceLinkRequest.new
     end
 
-    def generate_post_payload
-      add_resource_link_request_claims!
+    def generate_post_payload_message
+      add_resource_link_request_claims! if include_claims?(:rlid)
       super
     end
 

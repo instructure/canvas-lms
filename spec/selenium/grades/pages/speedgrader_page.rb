@@ -274,11 +274,11 @@ class Speedgrader
     end
 
     def audit_link
-      # TODO in GRADE-1075 locator for audit link
+      fj("button:contains(\"Assessment audit\")")
     end
 
     def audit_entries
-      # TODO in GRADE-1075 locator all of the audit entries
+      f("#assessment-audit-trail")
     end
 
     # action
@@ -410,8 +410,14 @@ class Speedgrader
       wait.until { grade_input.attribute('value') != "" }
     end
 
-    def click_audit_link
+    def open_assessment_audit
       audit_link.click
+      wait_for_ajaximations
+    end
+
+    def expand_assessment_audit_user_events(user)
+      f("#user-event-group-#{user.id} button").click
+      wait_for_animations
     end
 
     def expand_right_pane

@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders normally 1`] = `
+<div>
+  Assignments 2 Teacher View
+  <AssignmentHeader
+    assignment={
+      Object {
+        "description": "an assignment",
+        "dueAt": "The Future",
+        "name": "What is the Answer?",
+        "pointsPossible": 42,
+      }
+    }
+  />
+  <ContentTabs
+    assignment={
+      Object {
+        "description": "an assignment",
+        "dueAt": "The Future",
+        "name": "What is the Answer?",
+        "pointsPossible": 42,
+      }
+    }
+  />
+</div>
+`;

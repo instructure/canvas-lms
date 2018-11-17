@@ -34,9 +34,9 @@
   }
   // Account for brand name
   .navbar .brand {
-    padding-left: 10px;
-    padding-right: 10px;
-    margin: 0 0 0 -5px;
+    padding-#{direction(left)}: 10px;
+    padding-#{direction(right)}: 10px;
+    margin: direction-sides(0 0 0 -5px);
   }
 
   // COLLAPSIBLE NAVBAR
@@ -162,8 +162,8 @@
   // STATIC NAVBAR
   // -------------
   .navbar-static .navbar-inner {
-    padding-left:  10px;
-    padding-right: 10px;
+    padding-#{direction(left)}:  10px;
+    padding-#{direction(right)}: 10px;
   }
 
 

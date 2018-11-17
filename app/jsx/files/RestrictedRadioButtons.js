@@ -120,8 +120,8 @@ class RestrictedRadioButtons extends React.Component {
 
   componentDidMount() {
     return $([
-      ReactDOM.findDOMNode(this.refs.unlock_at),
-      ReactDOM.findDOMNode(this.refs.lock_at)
+      this.unlock_at,
+      this.lock_at
     ]).datetime_field()
   }
 
@@ -129,11 +129,11 @@ class RestrictedRadioButtons extends React.Component {
     hidden: this.state.selectedOption === 'link_only',
     unlock_at:
       (this.state.selectedOption === 'date_range' &&
-        $(ReactDOM.findDOMNode(this.refs.unlock_at)).data('unfudged-date')) ||
+        $(this.unlock_at).data('unfudged-date')) ||
       '',
     lock_at:
       (this.state.selectedOption === 'date_range' &&
-        $(ReactDOM.findDOMNode(this.refs.lock_at)).data('unfudged-date')) ||
+        $(this.lock_at).data('unfudged-date')) ||
       '',
     locked: this.state.selectedOption === 'unpublished'
   })
@@ -160,12 +160,12 @@ class RestrictedRadioButtons extends React.Component {
       <div className="radio" key={index}>
         <label>
           <input
-            ref={option.ref}
+            ref={e => this[option.ref] = e}
             type="radio"
             name="permissions"
             checked={this.isPermissionChecked(option)}
             onChange={option.onChange.bind(this)}
-          />
+            />
           <i className={option.iconClasses} aria-hidden />
           {option.text}
         </label>
@@ -183,7 +183,7 @@ class RestrictedRadioButtons extends React.Component {
           <div className="radio" key={index}>
             <label>
               <input
-                ref={option.ref}
+                ref={e => (this[option.ref] = e)}
                 type="radio"
                 name="restrict_options"
                 checked={this.state.selectedOption === option.selectedOptionKey}
@@ -212,7 +212,7 @@ class RestrictedRadioButtons extends React.Component {
         </label>
         <div className="dateSelectInputContainer controls">
           <input
-            ref="unlock_at"
+            ref={e => (this.unlock_at = e)}
             defaultValue={this.state.unlock_at ? $.datetimeString(this.state.unlock_at) : ''}
             className="form-control dateSelectInput"
             type="text"
@@ -226,7 +226,7 @@ class RestrictedRadioButtons extends React.Component {
           <div className="dateSelectInputContainer controls">
             <input
               id="lockDate"
-              ref="lock_at"
+              ref={e => (this.lock_at = e)}
               defaultValue={this.state.lock_at ? $.datetimeString(this.state.lock_at) : ''}
               className="form-control dateSelectInput"
               type="text"
@@ -238,7 +238,7 @@ class RestrictedRadioButtons extends React.Component {
     )
   }
 
-  renderRestrictedRadioButtons = options => (
+  renderRestrictedRadioButtons = () => (
     <div>
       {this.renderPermissionOptions()}
       {this.renderRestrictedAccessOptions()}

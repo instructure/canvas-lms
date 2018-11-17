@@ -181,8 +181,8 @@ $dashboardIconSize: 28px;
 
 .recent_activity .image-block-image {
   width: $dashboardIconSize;
-  margin-right: 10px;
-  margin-left: 10px;
+  margin-#{direction(right)}: 10px;
+  margin-#{direction(left)}: 10px;
 }
 
 .recent_activity .image-block-image i {

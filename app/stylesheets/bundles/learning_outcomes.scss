@@ -65,7 +65,7 @@
     overflow-y: hidden;
     padding-bottom: 15px;
     border: none;
-    border-radius: 0px 0px 0px 5px;
+    border-radius: direction-corners(0px 0px 0px 5px);
     .wrapper {
       width: 201px;
     }
@@ -303,8 +303,8 @@ table.criterion .insert {
   height: 0;
   padding: 0;
   margin: 0 11px;
-  border-right: 5px solid transparent;
-  border-left: 5px solid transparent;
+  border-#{direction(right)}: 5px solid transparent;
+  border-#{direction(left)}: 5px solid transparent;
   border-top-width: 5px;
   border-top-style: solid;
   display: block;

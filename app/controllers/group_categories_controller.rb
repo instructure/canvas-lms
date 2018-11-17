@@ -525,6 +525,7 @@ class GroupCategoriesController < ApplicationController
       GroupCategory.transaction do
         group_category = GroupCategory.active.find(params[:id])
         new_group_category = group_category.dup
+        new_group_category.sis_source_id = nil
         new_group_category.name = params[:name]
         begin
           DueDateCacher.with_executing_user(@current_user) do

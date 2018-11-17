@@ -5,6 +5,9 @@
   "add_to_do_7def3c37": {
     "message": "Adicionar A Fazer"
   },
+  "address_3159962f": {
+    "message": "Morada:"
+  },
   "all_day_fb42c4fc": {
     "message": "Dia todo"
   },
@@ -56,6 +59,9 @@
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Início do seu histórico de tarefas"
   },
+  "calendar_a8563bb2": {
+    "message": "Calendário:"
+  },
   "calendar_event_89aadc1c": {
     "message": "Evento do calendário"
   },
@@ -92,11 +98,17 @@
   "date_is_required_8660ec22": {
     "message": "Data requerida"
   },
+  "date_time_d9fbf2d7": {
+    "message": "Data e Hora:"
+  },
   "delete_a6efa79d": {
     "message": "Eliminar"
   },
   "details_98a31b68": {
     "message": "Detalhes"
+  },
+  "details_a6f427c3": {
+    "message": "Detalhes:"
   },
   "discussion_6719c51d": {
     "message": "Discussão"
@@ -193,6 +205,9 @@
   },
   "loading_planner_items_947a813d": {
     "message": "A carregar itens do planeador"
+  },
+  "location_3b6ff307": {
+    "message": "Local:"
   },
   "looks_like_there_isn_t_anything_here_d9bcef49": {
     "message": "Parece que não há nada aqui"
@@ -301,6 +316,12 @@
   },
   "startdate_to_enddate_d245175b": {
     "message": "{ startDate } a { endDate }"
+  },
+  "startdatetime_enddatetime_20abc10e": {
+    "message": "{ startDateTime } - { endDateTime }"
+  },
+  "startdatetime_endtime_49741bbe": {
+    "message": "{ startDateTime } - { endTime }"
   },
   "starttime_to_endtime_d7cc249d": {
     "message": "{ startTime } a { endTime }"

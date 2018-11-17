@@ -26,7 +26,7 @@ import 'jquery.instructure_misc_plugins' // ifExists, showIf
 import 'jquery.loadingImg'
 import 'vendor/jquery.scrollTo'
 import 'jqueryui/datepicker'
-import * as mathml from 'mathml'
+import {isMathJaxLoaded, reloadElement, loadMathJax, isMathMLOnPage} from 'mathml'
 
 let specialDatesAreHidden = false
 
@@ -313,11 +313,11 @@ const bindToEditSyllabus = function () {
       $course_syllabus.loadingImage('remove').html(data.course.syllabus_body)
       $course_syllabus.data('syllabus_body', data.course.syllabus_body)
       $course_syllabus_details.hide()
-      if (mathml.isMathMLOnPage()) {
-        if (mathml.isMathJaxLoaded()) {
-          mathml.reloadElement('content')
+      if (isMathMLOnPage()) {
+        if (isMathJaxLoaded()) {
+          reloadElement('content')
         } else {
-          mathml.loadMathJax('MML_HTMLorMML.js')
+          loadMathJax('MML_HTMLorMML.js')
         }
       }
     },

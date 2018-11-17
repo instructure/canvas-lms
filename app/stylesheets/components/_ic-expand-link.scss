@@ -179,7 +179,7 @@ $ic-Expand-link-size: $ic-sp*4;
   .ic-Expand-link__layout {
     position: relative;
     display: flex;
-    padding: 0 $ic-Expand-link-size 0 0;
+    padding: direction-sides(0 $ic-Expand-link-size 0 0);
     min-height: $ic-Expand-link-size;
   }
 
@@ -226,7 +226,7 @@ $ic-Expand-link-size: $ic-sp*4;
       }
     }
 
-    .ic-Expand-link__layout { padding: 0 0 0 $ic-Expand-link-size; }
+    .ic-Expand-link__layout { padding: direction-sides(0 0 0 $ic-Expand-link-size); }
     .ic-Expand-link__icon { #{direction(right)}: auto; #{direction(left)}: 0; }
 
     &.ic-Expand-link--active {

@@ -67,7 +67,7 @@ $ic-DashboardCard-icon-color: $ic-icon-link-color;
   width: $ic-DashboardCard-width;
   display: inline-block;
   vertical-align: top;
-  margin: 0 $ic-sp*3 $ic-sp*3 0;
+  margin: direction-sides(0 $ic-sp*3 $ic-sp*3 0);
   .no-touch & {
     &:hover { box-shadow: 0 4px 10px rgba(black, 0.35); }
   }

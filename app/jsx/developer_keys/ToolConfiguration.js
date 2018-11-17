@@ -64,6 +64,6 @@ ToolConfiguration.propTypes = {
     toolConfiguration: PropTypes.object.isRequired,
     toolConfigurationUrl: PropTypes.string.isRequired,
     enabledScopes: PropTypes.arrayOf(PropTypes.string).isRequired,
-    disabledPlacements: PropTypes.arrayOf(PropTypes.string).isRequired
+    disabledPlacements: PropTypes.arrayOf(PropTypes.string).isRequired,
   }).isRequired
 }

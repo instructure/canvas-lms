@@ -17,76 +17,81 @@
  */
 
 import React from 'react'
-import { mount } from 'enzyme'
+import ReactDOM from 'react-dom'
+
 import CustomColumnHeader from 'jsx/gradezilla/default_gradebook/GradebookGrid/headers/CustomColumnHeader'
 
-function mountComponent (props, mountOptions = {}) {
-  return mount(<CustomColumnHeader {...props} />, mountOptions);
-}
+QUnit.module('CustomColumnHeader', suiteHooks => {
+  let $container
+  let component
+  let props
 
-QUnit.module('CustomColumnHeader');
+  suiteHooks.beforeEach(() => {
+    $container = document.body.appendChild(document.createElement('div'))
 
-test('displays the given title', function () {
-  const wrapper = mount(<CustomColumnHeader title="Notes" />);
-  equal(wrapper.text(), 'Notes');
-});
+    props = {
+      title: 'Notes'
+    }
+  })
 
-QUnit.module('CustomColumnHeader#handleKeyDown', {
-  setup () {
-    this.wrapper = mountComponent({ title: 'Notes' }, { attachTo: document.querySelector('#fixtures') });
-  },
+  suiteHooks.afterEach(() => {
+    ReactDOM.unmountComponentAtNode($container)
+    $container.remove()
+  })
 
-  handleKeyDown (which, shiftKey = false) {
-    return this.wrapper.instance().handleKeyDown({ which, shiftKey, preventDefault: this.preventDefault });
-  },
-
-  teardown () {
-    this.wrapper.unmount();
+  function mountComponent() {
+    component = ReactDOM.render(<CustomColumnHeader {...props} />, $container)
   }
-});
 
-test('does not handle Tab', function () {
-  // This ensures no issues calling .handleKeyDown for Tab on an instance of
-  // this component.
-  const returnValue = this.handleKeyDown(9, false); // Tab
-  equal(typeof returnValue, 'undefined');
-});
+  test('displays the title of the custom column', () => {
+    mountComponent()
+    ok($container.textContent.includes('Notes'))
+  })
 
-test('does not handle Shift+Tab', function () {
-  // This ensures no issues calling .handleKeyDown for Shift+Tab on an instance
-  // of this component.
-  const returnValue = this.handleKeyDown(9, true); // Shift+Tab
-  equal(typeof returnValue, 'undefined');
-});
+  QUnit.module('#handleKeyDown()', hooks => {
+    hooks.beforeEach(() => {
+      mountComponent()
+    })
 
-test('does not handle Enter', function () {
-  // This ensures no issues calling .handleKeyDown for Enter on an instance of
-  // this component.
-  const returnValue = this.handleKeyDown(13); // Enter
-  equal(typeof returnValue, 'undefined');
-});
+    function handleKeyDown(which, shiftKey = false) {
+      return component.handleKeyDown({which, shiftKey})
+    }
 
-QUnit.module('CustomColumnHeader: focus', {
-  setup () {
-    this.wrapper = mountComponent({ title: 'Notes' }, { attachTo: document.querySelector('#fixtures') });
-    this.activeElement = document.activeElement;
-  },
+    test('does not handle Tab', () => {
+      // This allows Grid Support Navigation to handle navigation.
+      const returnValue = handleKeyDown(9, false) // Tab
+      equal(typeof returnValue, 'undefined')
+    })
 
-  teardown () {
-    this.wrapper.unmount();
-  }
-});
+    test('does not handle Shift+Tab', () => {
+      // This allows Grid Support Navigation to handle navigation.
+      const returnValue = handleKeyDown(9, true) // Shift+Tab
+      equal(typeof returnValue, 'undefined')
+    })
 
-test('#focusAtStart has no effect', function () {
-  // This ensures no issues calling .focusAtStart on an instance of this
-  // component.
-  this.wrapper.instance().focusAtStart();
-  equal(document.activeElement, this.activeElement);
-});
+    test('does not handle Enter', () => {
+      // This allows Grid Support Navigation to handle navigation.
+      const returnValue = handleKeyDown(13) // Enter
+      equal(typeof returnValue, 'undefined')
+    })
+  })
 
-test('#focusAtEnd has no effect', function () {
-  // This ensures no issues calling .focusAtEnd on an instance of this
-  // component.
-  this.wrapper.instance().focusAtEnd();
-  equal(document.activeElement, this.activeElement);
-});
+  QUnit.module('focus', hooks => {
+    let activeElement
+
+    hooks.beforeEach(() => {
+      mountComponent()
+      activeElement = document.activeElement
+    })
+
+    test('#focusAtStart() does not change focus', () => {
+      component.focusAtStart()
+      strictEqual(document.activeElement, activeElement)
+    })
+
+    test('#focusAtEnd() does not change focus', () => {
+      component.focusAtEnd()
+      strictEqual(document.activeElement, activeElement)
+    })
+  })
+})

@@ -19,9 +19,9 @@
 import I18n from 'i18n!external_tools'
 import React from 'react'
 import PropTypes from 'prop-types'
-import Header from '../../external_apps/components/Header'
-import ExternalToolsTable from '../../external_apps/components/ExternalToolsTable'
-import AddExternalToolButton from '../../external_apps/components/AddExternalToolButton'
+import Header from './Header'
+import ExternalToolsTable from './ExternalToolsTable'
+import AddExternalToolButton from './AddExternalToolButton'
 import page from 'page'
 
 export default class Configurations extends React.Component {
@@ -30,6 +30,14 @@ export default class Configurations extends React.Component {
   }
 
   canAddEdit = () => this.props.env.PERMISSIONS && this.props.env.PERMISSIONS.create_tool_manually
+
+  focusHeader = () => {
+    this.headerRef.focus()
+  }
+
+  setHeaderRef = (node) => {
+    this.headerRef = node
+  }
 
   render() {
     const appCenterLink = function() {
@@ -46,11 +54,11 @@ export default class Configurations extends React.Component {
 
     return (
       <div className="Configurations">
-        <Header>
+        <Header ref={this.setHeaderRef}>
           {this.canAddEdit() && <AddExternalToolButton />}
           {appCenterLink()}
         </Header>
-        <ExternalToolsTable canAddEdit={this.canAddEdit()} />
+        <ExternalToolsTable canAddEdit={this.canAddEdit()} setFocusAbove={this.focusHeader} />
       </div>
     )
   }

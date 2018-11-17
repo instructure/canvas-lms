@@ -31,6 +31,7 @@ export default {
   displayName: 'ManageUsageRightsModal',
 
   propTypes: {
+    isOpen: PropTypes.bool,
     closeModal: PropTypes.func,
     itemsToManage: PropTypes.arrayOf(customPropTypes.filesystemObject).isRequired
   },
@@ -47,13 +48,11 @@ export default {
   use_justification: null,
 
   submit() {
-    const values = this.refs.usageSelection.getValues()
+    const values = this.usageSelection.getValues()
 
     // They didn't choose a copyright
     if (values.use_justification === 'choose') {
-      $(ReactDOM.findDOMNode(this.refs.usageSelection.refs.usageRightSelection)).errorBox(
-        I18n.t('You must specify a usage right.')
-      )
+      $(this.usageSelection.usageRightSelection).errorBox(I18n.t('You must specify a usage right.'))
       return false
     }
 
@@ -67,7 +66,7 @@ export default {
       if (success) {
         updateModelsUsageRights(data, this.props.itemsToManage)
         $.flashMessage(I18n.t('Usage rights have been set.'))
-        this.setRestrictedAccess(this.refs.restrictedSelection.extractFormValues())
+        this.setRestrictedAccess(this.restrictedSelection.extractFormValues())
       } else {
         $.flashError(I18n.t('There was an error setting usage rights.'))
       }

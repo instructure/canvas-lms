@@ -20,13 +20,16 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 
 import AssessmentAuditTray from 'jsx/speed_grader/AssessmentAuditTray'
+import Api from 'jsx/speed_grader/AssessmentAuditTray/Api'
 
 QUnit.module('AssessmentAuditTray', suiteHooks => {
   let $container
+  let api
   let context
   let onEntered
   let onExited
   let props
+  let resolveAuditTrail
   let tray
 
   suiteHooks.beforeEach(() => {
@@ -34,6 +37,12 @@ QUnit.module('AssessmentAuditTray', suiteHooks => {
     props = {}
     onEntered = promiseProp('onEntered')
     onExited = promiseProp('onExited')
+
+    api = new Api()
+    const promise = new Promise(resolve => {
+      resolveAuditTrail = resolve
+    })
+    sinon.stub(api, 'loadAssessmentAuditTrail').returns(promise)
 
     context = {
       assignment: {
@@ -65,6 +74,7 @@ QUnit.module('AssessmentAuditTray', suiteHooks => {
   function renderTray() {
     ReactDOM.render(
       <AssessmentAuditTray
+        api={api}
         ref={ref => {
           tray = ref
         }}
@@ -78,6 +88,14 @@ QUnit.module('AssessmentAuditTray', suiteHooks => {
     return document.querySelector('[role="dialog"][aria-label="Assessment audit tray"]')
   }
 
+  function getAssessmentSummaryContainer() {
+    return getTrayContainer().querySelector('section')
+  }
+
+  function getAssessmentAuditTrailContainer() {
+    return getTrayContainer().querySelector('#assessment-audit-trail')
+  }
+
   function getCloseButton() {
     const $tray = getTrayContainer()
     return [...$tray.querySelectorAll('button')].find($button => $button.textContent === 'Close')
@@ -88,6 +106,86 @@ QUnit.module('AssessmentAuditTray', suiteHooks => {
       tray.show(context)
       await onEntered
       ok(getTrayContainer())
+    })
+
+    test('loads the assessment audit trail', async () => {
+      tray.show(context)
+      await onEntered
+      strictEqual(api.loadAssessmentAuditTrail.callCount, 1)
+    })
+
+    QUnit.module('when requesting the assessment audit trail', contextHooks => {
+      contextHooks.beforeEach(async () => {
+        tray.show(context)
+        await onEntered
+      })
+
+      test('includes the given course id', () => {
+        const [courseId] = api.loadAssessmentAuditTrail.lastCall.args
+        strictEqual(courseId, '1201')
+      })
+
+      test('includes the given assignment id', () => {
+        const [, assignmentId] = api.loadAssessmentAuditTrail.lastCall.args
+        strictEqual(assignmentId, '2301')
+      })
+
+      test('includes the given submission id', () => {
+        const [, , submissionId] = api.loadAssessmentAuditTrail.lastCall.args
+        strictEqual(submissionId, '2501')
+      })
+    })
+
+    QUnit.module('when the assessment audit trail is loading', contextHooks => {
+      contextHooks.beforeEach(async () => {
+        tray.show(context)
+        await onEntered
+      })
+
+      test('does not show the assessment summary', () => {
+        notOk(getAssessmentSummaryContainer())
+      })
+
+      test('does not show the assessment audit trail', () => {
+        notOk(getAssessmentAuditTrailContainer())
+      })
+
+      test('displays a loading message', () => {
+        ok(getTrayContainer().textContent.includes('Loading assessment audit trail'))
+      })
+    })
+
+    QUnit.module('when the assessment audit trail loads', contextHooks => {
+      contextHooks.beforeEach(async () => {
+        tray.show(context)
+        await onEntered
+        resolveAuditTrail([
+          {
+            assignmentId: '2301',
+            canvadocId: null,
+            createdAt: new Date('2018-08-28T16:46:44Z'),
+            eventType: 'grades_posted',
+            id: '4901',
+            payload: {
+              grades_published_at: [null, '2018-08-28T16:46:43Z']
+            },
+            submissionId: '2501',
+            userId: '1101'
+          }
+        ])
+      })
+
+      test('shows the assessment summary', () => {
+        ok(getAssessmentSummaryContainer())
+      })
+
+      test('shows the assessment audit trail', () => {
+        ok(getAssessmentAuditTrailContainer())
+      })
+
+      test('does not display a loading message', () => {
+        notOk(getTrayContainer().textContent.includes('Loading assessment audit trail'))
+      })
     })
   })
 

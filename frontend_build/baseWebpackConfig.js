@@ -168,6 +168,8 @@ module.exports = {
         ],
         exclude: [
           path.resolve(__dirname, '../public/javascripts/translations'),
+          path.resolve(__dirname, '../public/javascripts/react-dnd-test-backend'),
+          path.resolve(__dirname, '../public/javascripts/lodash.underscore'),
           /bower\//,
         ],
         loaders: happify('babel', [

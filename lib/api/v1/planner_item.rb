@@ -27,7 +27,7 @@ module Api::V1::PlannerItem
   include Api::V1::CalendarEvent
   include Api::V1::PlannerNote
   include Api::V1::AssessmentRequest
-  include PlannerHelper
+  include PlannerApiHelper
 
   API_PLANNABLE_FIELDS = [:id, :title, :course_id, :location_name, :todo_date, :details, :url, :unread_count,
                           :read_state, :created_at, :updated_at].freeze
@@ -40,7 +40,7 @@ module Api::V1::PlannerItem
     context_data(item, use_effective_code: true).merge({
       :plannable_id => item.id,
       :planner_override => planner_override_json(item.planner_override_for(user), user, session, item.class_name),
-      :plannable_type => PLANNABLE_TYPES.key(item.class_name),
+      :plannable_type => PlannerHelper::PLANNABLE_TYPES.key(item.class_name),
       :new_activity => new_activity(item, user, opts)
     }).merge(submission_statuses_for(user, item, opts)).tap do |hash|
       if item.is_a?(::CalendarEvent)
@@ -56,14 +56,14 @@ module Api::V1::PlannerItem
         hash[:plannable_date] = item[:user_due_date] || item.due_at
         quiz = item.is_a?(Quizzes::Quiz) ? item : item.quiz
         hash[:plannable_id] = quiz.id
-        hash[:plannable_type] = PLANNABLE_TYPES.key(quiz.class_name)
+        hash[:plannable_type] = PlannerHelper::PLANNABLE_TYPES.key(quiz.class_name)
         hash[:plannable] = plannable_json(quiz.attributes, extra_fields: GRADABLE_FIELDS)
         hash[:html_url] = named_context_url(quiz.context, :context_quiz_url, quiz.id)
         hash[:planner_override] ||= planner_override_json(quiz.planner_override_for(user), user, session)
       elsif item.is_a?(WikiPage) || (item.respond_to?(:wiki_page?) && item.wiki_page?)
         item = item.wiki_page if item.respond_to?(:wiki_page?) && item.wiki_page?
         hash[:plannable_date] = item.todo_date || item.created_at
-        hash[:plannable_type] = PLANNABLE_TYPES.key(item.class_name)
+        hash[:plannable_type] = PlannerHelper::PLANNABLE_TYPES.key(item.class_name)
         hash[:plannable] = plannable_json(item.attributes)
         hash[:html_url] = named_context_url(item.context, :context_wiki_page_url, item.url)
         hash[:planner_override] ||= planner_override_json(item.planner_override_for(user), user, session)
@@ -80,12 +80,12 @@ module Api::V1::PlannerItem
         unread_attributes = {unread_count: unread_count, read_state: read_state}
         hash[:plannable_id] = topic.id
         hash[:plannable_date] = item[:user_due_date] || topic.todo_date || topic.posted_at || topic.created_at
-        hash[:plannable_type] = PLANNABLE_TYPES.key(topic.class_name)
+        hash[:plannable_type] = PlannerHelper::PLANNABLE_TYPES.key(topic.class_name)
         hash[:plannable] = plannable_json(unread_attributes.merge(item.attributes).merge(topic.attributes), extra_fields: GRADABLE_FIELDS)
         hash[:html_url] = discussion_topic_html_url(topic, user, hash[:submissions])
         hash[:planner_override] ||= planner_override_json(topic.planner_override_for(user), user, session, topic.class_name)
       elsif item.is_a?(AssessmentRequest)
-        hash[:plannable_type] = PLANNABLE_TYPES.key(item.class_name)
+        hash[:plannable_type] = PlannerHelper::PLANNABLE_TYPES.key(item.class_name)
         hash[:plannable_date] = item.asset.assignment.peer_reviews_due_at || item.assessor_asset.cached_due_date
         title_date = {title: item.asset&.assignment&.title, todo_date: hash[:plannable_date]}
         hash[:plannable] = plannable_json(title_date.merge(item.attributes), extra_fields: ASSESSMENT_REQUEST_FIELDS)

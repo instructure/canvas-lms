@@ -19,12 +19,12 @@
 import 'jquery.instructure_date_and_time'
 import parseLinkHeader from '../../shared/parseLinkHeader';
 
-const FETCH_HISTORY_START = 'FETCH_HISTORY_START';
-const FETCH_HISTORY_SUCCESS = 'FETCH_HISTORY_SUCCESS';
-const FETCH_HISTORY_FAILURE = 'FETCH_HISTORY_FAILURE';
-const FETCH_HISTORY_NEXT_PAGE_START = 'FETCH_HISTORY_NEXT_PAGE_START';
-const FETCH_HISTORY_NEXT_PAGE_SUCCESS = 'FETCH_HISTORY_NEXT_PAGE_SUCCESS';
-const FETCH_HISTORY_NEXT_PAGE_FAILURE = 'FETCH_HISTORY_NEXT_PAGE_FAILURE';
+export const FETCH_HISTORY_START = 'FETCH_HISTORY_START';
+export const FETCH_HISTORY_SUCCESS = 'FETCH_HISTORY_SUCCESS';
+export const FETCH_HISTORY_FAILURE = 'FETCH_HISTORY_FAILURE';
+export const FETCH_HISTORY_NEXT_PAGE_START = 'FETCH_HISTORY_NEXT_PAGE_START';
+export const FETCH_HISTORY_NEXT_PAGE_SUCCESS = 'FETCH_HISTORY_NEXT_PAGE_SUCCESS';
+export const FETCH_HISTORY_NEXT_PAGE_FAILURE = 'FETCH_HISTORY_NEXT_PAGE_FAILURE';
 
 function indexById (collection = []) {
   return collection.reduce((acc, item) => {
@@ -78,13 +78,13 @@ function formatHistoryItems (data) {
   });
 }
 
-function fetchHistoryStart () {
+export function fetchHistoryStart () {
   return {
     type: FETCH_HISTORY_START
   };
 }
 
-function fetchHistorySuccess ({ events, linked: { assignments, users }}, { link }) {
+export function fetchHistorySuccess ({ events, linked: { assignments, users }}, { link }) {
   return {
     type: FETCH_HISTORY_SUCCESS,
     payload: {
@@ -94,19 +94,19 @@ function fetchHistorySuccess ({ events, linked: { assignments, users }}, { link 
   };
 }
 
-function fetchHistoryFailure () {
+export function fetchHistoryFailure () {
   return {
     type: FETCH_HISTORY_FAILURE
   };
 }
 
-function fetchHistoryNextPageStart () {
+export function fetchHistoryNextPageStart () {
   return {
     type: FETCH_HISTORY_NEXT_PAGE_START
   };
 }
 
-function fetchHistoryNextPageSuccess ({ events, linked: { assignments, users }}, { link }) {
+export function fetchHistoryNextPageSuccess ({ events, linked: { assignments, users }}, { link }) {
   return {
     type: FETCH_HISTORY_NEXT_PAGE_SUCCESS,
     payload: {
@@ -116,23 +116,8 @@ function fetchHistoryNextPageSuccess ({ events, linked: { assignments, users }},
   };
 }
 
-function fetchHistoryNextPageFailure () {
+export function fetchHistoryNextPageFailure () {
   return {
     type: FETCH_HISTORY_NEXT_PAGE_FAILURE
   };
 }
-
-export default {
-  FETCH_HISTORY_START,
-  FETCH_HISTORY_SUCCESS,
-  FETCH_HISTORY_FAILURE,
-  FETCH_HISTORY_NEXT_PAGE_START,
-  FETCH_HISTORY_NEXT_PAGE_SUCCESS,
-  FETCH_HISTORY_NEXT_PAGE_FAILURE,
-  fetchHistoryStart,
-  fetchHistorySuccess,
-  fetchHistoryFailure,
-  fetchHistoryNextPageStart,
-  fetchHistoryNextPageSuccess,
-  fetchHistoryNextPageFailure,
-};

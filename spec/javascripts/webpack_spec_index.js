@@ -94,7 +94,7 @@ if (process.env.JSPEC_PATH) {
 } else {
   if (!process.env.JSPEC_GROUP || (process.env.JSPEC_GROUP === 'coffee')) {
     // run specs for ember screenreader gradebook
-    requireAll(require.context('../../app/coffeescripts', !!'includeSubdirectories', /\.spec.coffee$/))
+    requireAll(require.context('../../app/coffeescripts', !!'includeSubdirectories', /\.spec.js$/))
 
     requireAll(require.context('../coffeescripts', !!'includeSubdirectories', /Spec.js$/))
     requireAll(require.context('../coffeescripts', !!'includeSubdirectories', /Spec.coffee$/))

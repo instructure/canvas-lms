@@ -67,7 +67,7 @@ define [
     validateFormData: (data) ->
       errors = {}
 
-      for integerField in @integerFields
+      for integerField in @integerFields when typeof data[integerField] isnt 'undefined'
         unless data[integerField].match(@constructor.INTEGER_REGEX)
           errors[integerField] = [
             type: 'integer_required'

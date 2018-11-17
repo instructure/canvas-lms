@@ -16,10 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../../helpers/gradebook_common'
+require_relative '../../../feature_flag_helper'
 
 describe "gradebook - post grades to SIS" do
   include GradebookCommon
   include_context "in-process server selenium tests"
+  include FeatureFlagHelper
 
   before(:once) do
     gradebook_data_setup
@@ -45,7 +47,7 @@ describe "gradebook - post grades to SIS" do
   end
 
   it "should be visible when enabled on course with sis_source_id" do
-    Account.default.set_feature_flag!('post_grades', 'on')
+    mock_feature_flag(:post_grades, true)
     @course.sis_source_id = 'xyz'
     @course.save
     get "/courses/#{@course.id}/gradebook"
@@ -53,7 +55,7 @@ describe "gradebook - post grades to SIS" do
   end
 
   it "should not be displayed if viewing outcome gradebook", priority: "1", test_id: 244959 do
-    Account.default.set_feature_flag!('post_grades', 'on')
+    mock_feature_flag(:post_grades, true)
     Account.default.set_feature_flag!('outcome_gradebook', 'on')
     @course.sis_source_id = 'xyz'
     @course.save
@@ -64,12 +66,11 @@ describe "gradebook - post grades to SIS" do
     expect(f('.post-grades-placeholder')).not_to be_displayed
 
     f('a[data-id=assignment]').click
-
     expect(f('.post-grades-placeholder')).to be_displayed
   end
 
   it "should display post grades button when powerschool is configured", priority: "1", test_id: 164219 do
-    Account.default.set_feature_flag!('post_grades', 'on')
+    mock_feature_flag(:post_grades, true)
     @course.sis_source_id = 'xyz'
     @course.save
     get "/courses/#{@course.id}/gradebook"
@@ -80,7 +81,7 @@ describe "gradebook - post grades to SIS" do
 
   it 'does not show assignment errors when clicking the post grades button if all ' \
     'assignments have due dates for each section', priority: '1', test_id: 3036003 do
-    @course.root_account.enable_feature!(:post_grades)
+    mock_feature_flag(:post_grades, true)
     @course.update!(sis_source_id: 'xyz')
     @course.course_sections.each do |section|
       @attendance_assignment.assignment_overrides.create! do |override|
@@ -240,7 +241,7 @@ describe "gradebook - post grades to SIS" do
         create_post_grades_tool(name: "test tool #{i}")
       end
 
-      Account.default.set_feature_flag!('post_grades', 'on')
+      mock_feature_flag(:post_grades, true)
       @course.sis_source_id = 'xyz'
       @course.save
       @assignment.post_to_sis = true
@@ -252,7 +253,7 @@ describe "gradebook - post grades to SIS" do
     end
 
     it "should show powerschool option in exports dropdown" do
-      Account.default.set_feature_flag!('post_grades', 'on')
+      mock_feature_flag(:post_grades, true)
       @course.sis_source_id = 'xyz'
       @course.save
       @assignment.post_to_sis = true

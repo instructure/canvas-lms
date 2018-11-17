@@ -428,6 +428,23 @@ describe SplitUsers do
         expect(@user2.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort).to eq user2_ccs
       end
 
+      it 'should handle enrollments across shards' do
+        user1 = user_with_pseudonym(username: 'user1@example.com', active_all: 1)
+        e = course1.enroll_user(user1)
+        @shard1.activate do
+          account = Account.create!
+          @user2 = user_with_pseudonym(username: 'user2@example.com', active_all: 1, account: account)
+          @p2 = @pseudonym
+          @shard1_course = account.courses.create!
+          @e = @shard1_course.enroll_user(@user2)
+          UserMerge.from(user1).into(@user2)
+        end
+        SplitUsers.split_db_users(@user2)
+
+        expect(e.reload.user).to eq user1
+        expect(@e.reload.user).to eq @user2
+      end
+
       it "should work with cross-shard submissions" do
         @shard1.activate do
           course_with_teacher(:account => account_model)

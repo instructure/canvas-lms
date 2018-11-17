@@ -85,7 +85,7 @@ module AuthenticationMethods
   end
 
   def validate_scopes
-    if @access_token && @domain_root_account.feature_enabled?(:developer_key_management_and_scoping)
+    if @access_token
       developer_key = @access_token.developer_key
       request_method = request.method.casecmp('HEAD') == 0 ? 'GET' : request.method.upcase
 

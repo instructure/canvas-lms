@@ -545,7 +545,7 @@ RSpec.describe ApplicationController do
       end
 
       context 'lti version' do
-        let(:user) { User.new }
+        let_once(:user) { user_model }
 
         before do
           allow(controller).to receive(:named_context_url).and_return('wrong_url')
@@ -564,7 +564,11 @@ RSpec.describe ApplicationController do
         end
 
         describe 'LTI 1.3' do
-          let_once(:developer_key) { DeveloperKey.create! }
+          let_once(:developer_key) do
+            d = DeveloperKey.create!
+            enable_developer_key_account_binding! d
+            d
+          end
           include_context 'lti_1_3_spec_helper'
 
           before do
@@ -1250,57 +1254,48 @@ describe CoursesController do
   end
 
   context 'validate_scopes' do
-    let(:account_with_feature_enabled) do
-      account = double()
-      allow(account).to receive(:feature_enabled?).with(:developer_key_management_and_scoping).and_return(true)
-      account
+    let(:account) { double() }
+
+    before do
+      controller.instance_variable_set(:@domain_root_account, account)
     end
 
-    let(:account_with_feature_disabled) do
-      account = double()
-      allow(account).to receive(:feature_enabled?).with(:developer_key_management_and_scoping).and_return(false)
-      account
+    it 'does not affect session based api requests' do
+      allow(controller).to receive(:request).and_return(double({
+        params: {}
+      }))
+      expect(controller.send(:validate_scopes)).to be_nil
     end
 
-    context 'developer_key_management_and_scoping feature enabled' do
-      before do
-        controller.instance_variable_set(:@domain_root_account, account_with_feature_enabled)
-      end
+    it 'does not affect api requests that use an access token with an unscoped developer key' do
+      user = user_model
+      developer_key = DeveloperKey.create!
+      token = AccessToken.create!(user: user, developer_key: developer_key)
+      controller.instance_variable_set(:@access_token, token)
+      allow(controller).to receive(:request).and_return(double({
+        params: {},
+        method: 'GET'
+      }))
+      expect(controller.send(:validate_scopes)).to be_nil
+    end
 
-      it 'does not affect session based api requests' do
-        allow(controller).to receive(:request).and_return(double({
-          params: {}
-        }))
-        expect(controller.send(:validate_scopes)).to be_nil
-      end
+    it 'raises AccessTokenScopeError if scopes do not match' do
+      user = user_model
+      developer_key = DeveloperKey.create!(require_scopes: true)
+      token = AccessToken.create!(user: user, developer_key: developer_key)
+      controller.instance_variable_set(:@access_token, token)
+      allow(controller).to receive(:request).and_return(double({
+        params: {},
+        method: 'GET'
+      }))
+      expect { controller.send(:validate_scopes) }.to raise_error(AuthenticationMethods::AccessTokenScopeError)
+    end
 
-      it 'does not affect api requests that use an access token with an unscoped developer key' do
-        user = user_model
-        developer_key = DeveloperKey.create!
-        token = AccessToken.create!(user: user, developer_key: developer_key)
-        controller.instance_variable_set(:@access_token, token)
-        allow(controller).to receive(:request).and_return(double({
-          params: {},
-          method: 'GET'
-        }))
-        expect(controller.send(:validate_scopes)).to be_nil
-      end
-
-      it 'raises AccessTokenScopeError if scopes do not match' do
-        user = user_model
-        developer_key = DeveloperKey.create!(require_scopes: true)
-        token = AccessToken.create!(user: user, developer_key: developer_key)
-        controller.instance_variable_set(:@access_token, token)
-        allow(controller).to receive(:request).and_return(double({
-          params: {},
-          method: 'GET'
-        }))
-        expect { controller.send(:validate_scopes) }.to raise_error(AuthenticationMethods::AccessTokenScopeError)
-      end
+    context 'with valid scopes on dev key' do
+      let(:developer_key) { DeveloperKey.create!(require_scopes: true, scopes: ['url:GET|/api/v1/accounts']) }
 
       it 'allows adequately scoped requests through' do
         user = user_model
-        developer_key = DeveloperKey.create!(require_scopes: true)
         token = AccessToken.create!(user: user, developer_key: developer_key, scopes: ['url:GET|/api/v1/accounts'])
         controller.instance_variable_set(:@access_token, token)
         allow(controller).to receive(:request).and_return(double({
@@ -1313,7 +1308,6 @@ describe CoursesController do
 
       it 'allows HEAD requests' do
         user = user_model
-        developer_key = DeveloperKey.create!(require_scopes: true)
         token = AccessToken.create!(user: user, developer_key: developer_key, scopes: ['url:GET|/api/v1/accounts'])
         controller.instance_variable_set(:@access_token, token)
         allow(controller).to receive(:request).and_return(double({
@@ -1326,7 +1320,6 @@ describe CoursesController do
 
       it 'strips includes for adequately scoped requests' do
         user = user_model
-        developer_key = DeveloperKey.create!(require_scopes: true)
         token = AccessToken.create!(user: user, developer_key: developer_key, scopes: ['url:GET|/api/v1/accounts'])
         controller.instance_variable_set(:@access_token, token)
         allow(controller).to receive(:request).and_return(double({
@@ -1337,21 +1330,6 @@ describe CoursesController do
         expect(params).to receive(:delete).with(:include)
         expect(params).to receive(:delete).with(:includes)
         allow(controller).to receive(:params).and_return(params)
-        controller.send(:validate_scopes)
-      end
-    end
-
-    context 'developer_key_management_and_scoping feature disabled' do
-      before do
-        controller.instance_variable_set(:@domain_root_account, account_with_feature_disabled)
-      end
-
-      after do
-        controller.instance_variable_set(:@domain_root_account, nil)
-      end
-
-      it "does nothing" do
-        expect(controller).not_to receive(:api_request?)
         controller.send(:validate_scopes)
       end
     end

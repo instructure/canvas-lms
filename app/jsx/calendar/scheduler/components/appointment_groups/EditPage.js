@@ -329,7 +329,7 @@ import TimeBlockSelector from './TimeBlockSelector'
                   />
                 </div>
                 <Checkbox
-                  label={I18n.t('Allow students to see who was signed up for time slots')}
+                  label={I18n.t('Allow students to see who was signed up for time slots that are still available')}
                   checked={this.state.formValues.allowStudentsToView}
                   name="allowStudentsToView"
                   onChange={this.handleCheckboxChange}

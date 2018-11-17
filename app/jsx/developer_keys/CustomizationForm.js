@@ -51,7 +51,9 @@ export default class CustomizationForm extends React.Component {
     }
 
     // Intersection of requested scopes and valid scopes
-    return toolConfiguration.scopes.filter(scope => validScopeNames.includes(scope)).map(s => validScopes[s])
+    return toolConfiguration.scopes
+      .filter(scope => validScopeNames.includes(scope))
+      .map(s => validScopes[s])
   }
 
   get placements() {
@@ -62,9 +64,9 @@ export default class CustomizationForm extends React.Component {
     }
 
     // Get Canvas specific extensions from the tool config
-    const extension = toolConfiguration.extensions.find(ext => (
-      ext.platform === 'canvas.instructure.com'
-    ))
+    const extension = toolConfiguration.extensions.find(
+      ext => ext.platform === 'canvas.instructure.com'
+    )
 
     if (!(extension && extension.settings)) {
       return []
@@ -75,13 +77,13 @@ export default class CustomizationForm extends React.Component {
   }
 
   componentDidMount() {
-    const { dispatch, setEnabledScopes } = this.props
-    const initialScopes = this.scopes.map((s) => this.invertedScopes[s])
+    const {dispatch, setEnabledScopes} = this.props
+    const initialScopes = this.scopes.map(s => this.invertedScopes[s])
 
     dispatch(setEnabledScopes(initialScopes))
   }
 
-  handleScopeChange = (e) => {
+  handleScopeChange = e => {
     const {dispatch, setEnabledScopes} = this.props
     const value = this.invertedScopes[e.target.value]
     const newEnabledScopes = this.props.enabledScopes.slice()
@@ -89,8 +91,8 @@ export default class CustomizationForm extends React.Component {
     dispatch(setEnabledScopes(this.toggleArrayItem(newEnabledScopes, value)))
   }
 
-  handlePlacementChange = (e) => {
-    const { dispatch, setDisabledPlacements, validPlacements } = this.props
+  handlePlacementChange = e => {
+    const {dispatch, setDisabledPlacements, validPlacements} = this.props
     const value = e.target.value
     const newDisabledPlacements = this.props.disabledPlacements.slice()
 
@@ -118,7 +120,7 @@ export default class CustomizationForm extends React.Component {
         name={I18n.t('Services')}
         options={scopes}
         onOptionToggle={this.handleScopeChange}
-        selectedOptions={this.props.enabledScopes.map((s) => (this.props.validScopes[s]))}
+        selectedOptions={this.props.enabledScopes.map(s => this.props.validScopes[s])}
         type="scope"
       />
     )
@@ -147,6 +149,7 @@ export default class CustomizationForm extends React.Component {
         maxHeight="20rem"
         width="50%"
         messages={[{text: I18n.t('One per line. Format: name=value'), type: 'hint'}]}
+        name="custom_fields"
       />
     )
   }

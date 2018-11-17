@@ -18,38 +18,38 @@
 
 import GRADEBOOK_TRANSLATIONS from 'compiled/gradebook/GradebookTranslations'
 
-  const MULTIPLIER = 1.5;
+const MULTIPLIER = 1.5
 
-  const isNegativePoints = function(score) {
-    return score < 0;
-  };
+function isNegativePoints (score) {
+  return score < 0
+}
 
-  const isUnusuallyHigh = function(score, pointsPossible) {
-    if (pointsPossible === 0 || pointsPossible == null) { return false; }
-    const outlierBoundary = pointsPossible * MULTIPLIER;
-    return score >= outlierBoundary;
-  };
+export function isUnusuallyHigh(score, pointsPossible) {
+  if (pointsPossible === 0 || pointsPossible == null) {
+    return false
+  }
+  const outlierBoundary = pointsPossible * MULTIPLIER
+  return score >= outlierBoundary
+}
 
-  class OutlierScoreHelper {
-    constructor(score, pointsPossible) {
-      this.score = score;
-      this.pointsPossible = pointsPossible;
+export default class OutlierScoreHelper {
+  constructor(score, pointsPossible) {
+    this.score = score
+    this.pointsPossible = pointsPossible
+  }
+
+  hasWarning() {
+    // mutually exclusive
+    return isNegativePoints(this.score) || isUnusuallyHigh(this.score, this.pointsPossible)
+  }
+
+  warningMessage() {
+    if (isNegativePoints(this.score)) {
+      return GRADEBOOK_TRANSLATIONS.submission_negative_points_warning
+    } else if (isUnusuallyHigh(this.score, this.pointsPossible)) {
+      return GRADEBOOK_TRANSLATIONS.submission_too_many_points_warning
+    } else {
+      return null
     }
-
-    hasWarning() {
-      // mutually exclusive
-      return isNegativePoints(this.score) || isUnusuallyHigh(this.score, this.pointsPossible);
-    }
-
-    warningMessage() {
-      if (isNegativePoints(this.score)) {
-        return GRADEBOOK_TRANSLATIONS.submission_negative_points_warning;
-      } else if (isUnusuallyHigh(this.score, this.pointsPossible)) {
-        return GRADEBOOK_TRANSLATIONS.submission_too_many_points_warning;
-      } else {
-        return null;
-      }
-    }
-  };
-
-export { OutlierScoreHelper as default, isUnusuallyHigh }
+  }
+}

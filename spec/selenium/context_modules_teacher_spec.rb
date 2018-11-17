@@ -808,10 +808,6 @@ describe "context modules" do
         f('html').send_keys("j")
       end
 
-      def send_keys(*keys)
-        driver.switch_to.active_element.send_keys(*keys)
-      end
-
       let(:context_modules) { ff('.context_module .collapse_module_link') }
       let(:context_module_items) { ff('.context_module_item a.title') }
 

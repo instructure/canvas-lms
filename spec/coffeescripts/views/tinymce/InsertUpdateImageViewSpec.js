@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import InsertUpdateImageView from 'compiled/views/tinymce/InsertUpdateImageView'
+import InsertUpdateImageView from 'coffeescripts/views/tinymce/InsertUpdateImageView'
 import * as RceCommandShim from 'jsx/shared/rce/RceCommandShim'
 
 let fakeEditor

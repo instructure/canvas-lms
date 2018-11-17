@@ -21,8 +21,8 @@
 
 .theme-preview__page-header { margin-top: 0; }
 .ic-app-nav-toggle-and-crumbs--theme-preview {
-  margin-left: 0;
-  margin-right: 0;
+  margin-#{direction(left)}: 0;
+  margin-#{direction(right)}: 0;
 }
 
 .ic-login--theme-preview {

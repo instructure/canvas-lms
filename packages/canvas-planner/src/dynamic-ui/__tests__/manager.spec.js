@@ -24,6 +24,9 @@ import {
   startLoadingGradesSaga, gotGradesSuccess} from '../../actions/loading-actions';
 import { initialize as alertInitialize } from '../../utilities/alertUtils';
 
+const plannerHeaderId = 'headerid';
+const newActivityId = 'newactivityid';
+
 class MockAnimator {
   animationOrder = []
   isAboveScreen = jest.fn()
@@ -38,7 +41,24 @@ class MockAnimator {
 }
 
 class MockDocument {
-  activeElement = {some: 'element'}
+  activeElement = {some: 'element'};
+  getElementById = function (id) {
+    if (id === plannerHeaderId) {
+      return {
+        getBoundingClientRect: function () {
+          return {top: 0, bottom: 42};
+        }
+      }
+    } else if (id === newActivityId) {
+      return {
+        getBoundingClientRect: function () {
+          return {top: 0, bottom: 11}
+        }
+      }
+    } else {
+      return null;
+    }
+  }
 }
 
 class MockStore {
@@ -80,7 +100,8 @@ function createManagerWithMocks (opts = {}) {
   const manager = new Manager(opts);
   const store = new MockStore();
   manager.setStore(store);
-  manager.setStickyOffset(42);
+  manager.setOffsetElementIds(plannerHeaderId, newActivityId);
+
   return {
     manager,
     animator: opts.animator,

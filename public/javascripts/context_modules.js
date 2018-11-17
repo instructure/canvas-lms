@@ -22,7 +22,7 @@ import PublishCloud from 'jsx/shared/PublishCloud'
 import ModuleDuplicationSpinner from 'jsx/modules/components/ModuleDuplicationSpinner'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import * as MoveItem from 'jsx/move_item'
+import {reorderElements, renderTray} from 'jsx/move_item'
 import PublishableModuleItem from 'compiled/models/PublishableModuleItem'
 import PublishIconView from 'compiled/views/PublishIconView'
 import LockIconView from 'compiled/views/LockIconView'
@@ -1275,13 +1275,13 @@ function scrollTo ($thing, time = 500) {
           $container[0].appendChild(item)
 
           const order = data.context_module.content_tags.map(item => item.content_tag.id)
-          MoveItem.reorderElements(order, $container[0], id => `#context_module_item_${id}`)
+          reorderElements(order, $container[0], id => `#context_module_item_${id}`)
           $container.sortable('enable').sortable('refresh')
         },
         focusOnExit: () => currentItem.querySelector('.al-trigger'),
       }
 
-      MoveItem.renderTray(moveTrayProps, document.getElementById('not_right_side'))
+      renderTray(moveTrayProps, document.getElementById('not_right_side'))
     })
 
     $('.move_module_link').on('click keyclick', function (event) {

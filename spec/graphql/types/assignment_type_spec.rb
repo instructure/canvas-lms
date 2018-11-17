@@ -43,9 +43,20 @@ describe Types::AssignmentType do
     expect(assignment_type.resolve("muted")).to eq assignment.muted?
   end
 
-  it "requires read permission" do
-    assignment.unpublish
-    expect(assignment_type.resolve("_id")).to be_nil
+  context "top-level permissions" do
+    it "requires read permission" do
+      assignment.unpublish
+
+      # node / legacy node
+      expect(assignment_type.resolve("_id")).to be_nil
+
+      # assignment
+      expect(
+        CanvasSchema.execute(<<~GQL, context: {current_user: student}).dig("data", "assignment")
+          query { assignment(id: "#{assignment.id.to_s}") { id } }
+        GQL
+      ).to be_nil
+    end
   end
 
   it "returns needsGradingCount" do

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { Grid } from 'vendor/slickgrid';
+import slickgrid from 'vendor/slickgrid';
 import 'jqueryui/sortable';
 import CellEditorFactory from './editors/CellEditorFactory'
 import CellFormatterFactory from './formatters/CellFormatterFactory'
@@ -53,7 +53,7 @@ export default class GradebookGrid {
       this.gridData.columns.definitions[columnId]
     ));
 
-    this.grid = new Grid(this.options.$container, this.gridData.rows, columns, options);
+    this.grid = new slickgrid.Grid(this.options.$container, this.gridData.rows, columns, options);
 
     const gridSupportOptions = {
       activeBorderColor: this.options.activeBorderColor,

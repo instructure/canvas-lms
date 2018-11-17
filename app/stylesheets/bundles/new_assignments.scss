@@ -158,8 +158,8 @@
 }
 
 .sortable-handle {
-  margin: 0 0px 0 -30px;
-  padding: 0 0px 0 30px;
+  margin: direction-sides(0 0px 0 -30px);
+  padding: direction-sides(0 0px 0 30px);
   a {
     padding: 20px 0px 10px;
   }
@@ -188,8 +188,8 @@
 .draggable-dropzone {
   height: 40px;
   background-color: lighten($ic-color-dark, 15%);
-  border-right: 1px dashed $ic-border-dark;
-  border-left: 1px dashed $ic-border-dark;
+  border-#{direction(right)}: 1px dashed $ic-border-dark;
+  border-#{direction(left)}: 1px dashed $ic-border-dark;
 }
 
 .ag-header-controls .tooltip_link {

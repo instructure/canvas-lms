@@ -346,7 +346,6 @@ import './rubric_assessment' /*global rubricAssessment*/
       }).change();
       $(".media_comment_link").click(function(event) {
         event.preventDefault();
-        $("#add_comment_form").hide();
         $("#media_media_recording").show();
         var $recording = $("#media_media_recording").find(".media_recording");
         $recording.mediaComment('create', 'any', function(id, type) {
@@ -369,7 +368,7 @@ import './rubric_assessment' /*global rubricAssessment*/
           event.preventDefault();
           var comment_id = $(this).parents(".comment_media").getTemplateData({textValues: ['media_comment_id']}).media_comment_id;
           if(comment_id) {
-            $(this).parents(".comment_media").find(".media_comment_content").mediaComment('show', comment_id, 'video');
+            $(this).parents(".comment_media").find(".media_comment_content").mediaComment('show', comment_id, 'video', this);
           }
         })
 

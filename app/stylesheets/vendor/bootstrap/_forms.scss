@@ -456,7 +456,7 @@ This is the standard form actions button bar at the bottom of every content form
   .uneditable-input {
     position: relative; // placed here by default so that on :focus we can place the input above the .add-on for full border and box-shadow goodness
     margin-bottom: 0; // prevent bottom margin from screwing up alignment in stacked forms
-    *margin-left: 0;
+    *margin-#{direction(left)}: 0;
     vertical-align: top;
     border-radius: direction-corners(0 $inputBorderRadius $inputBorderRadius 0);
     // Make input on top when focused so blue border and shadow always show
@@ -504,9 +504,9 @@ This is the standard form actions button bar at the bottom of every content form
   input,
   select,
   .uneditable-input {
-    border-radius: $inputBorderRadius 0 0 $inputBorderRadius;
+    border-radius: direction-corners($inputBorderRadius 0 0 $inputBorderRadius);
     + .btn-group .btn {
-      border-radius: 0 $inputBorderRadius $inputBorderRadius 0;
+      border-radius: direction-corners(0 $inputBorderRadius $inputBorderRadius 0);
     }
   }
   .add-on,
@@ -527,21 +527,21 @@ This is the standard form actions button bar at the bottom of every content form
   .uneditable-input {
     border-radius: 0;
     + .btn-group .btn {
-      border-radius: 0 $inputBorderRadius $inputBorderRadius 0;
+      border-radius: direction-corners(0 $inputBorderRadius $inputBorderRadius 0);
     }
   }
   .add-on:#{direction-if(rtl, last, first)}-child,
   .btn:#{direction-if(rtl, last, first)}-child {
-    margin-right: -1px;
+    margin-#{direction(right)}: -1px;
     border-radius: $inputBorderRadius 0 0 $inputBorderRadius;
   }
   .add-on:#{direction-if(rtl, first, last)}-child,
   .btn:#{direction-if(rtl, first, last)}-child {
-    margin-left: -1px;
+    margin-#{direction(left)}: -1px;
     border-radius: 0 $inputBorderRadius $inputBorderRadius 0;
   }
   .btn-group:#{direction-if(rtl, last, first)}-child {
-    margin-left: 0;
+    margin-#{direction(left)}: 0;
   }
 }
 
@@ -552,10 +552,10 @@ This is the standard form actions button bar at the bottom of every content form
 // -----------
 
 input.search-query {
-  padding-right: 14px;
-  padding-right: 4px \9;
-  padding-left: 14px;
-  padding-left: 4px \9; /* IE7-8 doesn't have border-radius, so don't indent the padding */
+  padding-#{direction(right)}: 14px;
+  padding-#{direction(right)}: 4px \9;
+  padding-#{direction(left)}: 14px;
+  padding-#{direction(left)}: 4px \9; /* IE7-8 doesn't have border-radius, so don't indent the padding */
   margin-bottom: 0; // Remove the default margin on all inputs
 }
 

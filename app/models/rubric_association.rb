@@ -133,8 +133,10 @@ class RubricAssociation < ActiveRecord::Base
   end
 
   def context_name
-    @cached_context_name ||= Rails.cache.fetch(['short_name_lookup', self.context_code].cache_key) do
-      self.context.short_name rescue ""
+    @cached_context_name ||= self.shard.activate do
+      Rails.cache.fetch(['short_name_lookup', self.context_code].cache_key) do
+        self.context.short_name rescue ""
+      end
     end
   end
 

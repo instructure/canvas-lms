@@ -17,8 +17,6 @@
 #
 
 module UserLearningObjectScopes
-  include PlannerHelper
-
   ULOS_DEFAULT_LIMIT = 15
 
   # This is a helper method for converting a method call's regular parameters
@@ -374,7 +372,7 @@ module UserLearningObjectScopes
     include_locked: false
   )
     params = _params_hash(binding)
-    Rails.cache.fetch(['assignment_submission_statuses', self, get_planner_cache_id(self), params].cache_key, :expires_in => 120.minutes) do
+    Rails.cache.fetch(['assignment_submission_statuses', self, PlannerHelper.get_planner_cache_id(self), params].cache_key, :expires_in => 120.minutes) do
       {
         submitted: Set.new(submitted_assignments(**params).pluck(:id)),
         excused: Set.new(Submission.active.with_assignment.where(excused: true, user_id: self).pluck(:assignment_id)),

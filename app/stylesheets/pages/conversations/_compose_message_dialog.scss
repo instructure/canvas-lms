@@ -264,7 +264,7 @@ $subtleBorderColor: #e5e5e5;
     .message-header-label {
       display: table-cell;
       box-sizing: border-box;
-      padding: 10px 15px 10px 5px;
+      padding: direction-sides(10px 15px 10px 5px);
       text-align: direction(right);
       width: 1px;
       white-space: nowrap;

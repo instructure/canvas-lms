@@ -27,7 +27,9 @@ import {mount} from 'enzyme'
 const {Simulate} = TestUtils
 const wrapper = document.getElementById('fixtures')
 Modal.setAppElement(wrapper)
-const createElement = data => <DeleteExternalToolButton tool={data.tool} canAddEdit={data.canAddEdit} />
+const createElement = data => (
+  <DeleteExternalToolButton tool={data.tool} canAddEdit={data.canAddEdit} returnFocus={data.returnFocus} />
+)
 const renderComponent = data => ReactDOM.render(createElement(data), wrapper)
 const getDOMNodes = function(data) {
   const component = renderComponent(data)
@@ -67,13 +69,13 @@ QUnit.module('ExternalApps.DeleteExternalToolButton', {
 
 test('does not render when the canAddEdit permission is false', () => {
   const tool = {name: 'test tool'}
-  const component = renderComponent({tool, canAddEdit: false})
+  const component = renderComponent({tool, canAddEdit: false, returnFocus: () => {}})
   const node = ReactDOM.findDOMNode(component)
   notOk(node)
 })
 
 test('open and close modal', function() {
-  const data = {tool: this.tools[1], canAddEdit: true}
+  const data = {tool: this.tools[1], canAddEdit: true, returnFocus: () => {}}
   const [component, btnTriggerDelete] = Array.from(getDOMNodes(data))
   Simulate.click(btnTriggerDelete)
   ok(component.state.modalIsOpen, 'modal is open')
@@ -83,7 +85,7 @@ test('open and close modal', function() {
 
 test('deletes a tool', function() {
   sinon.spy(store, 'delete')
-  const wrapper = mount(<DeleteExternalToolButton tool={this.tools[0]} canAddEdit />)
+  const wrapper = mount(<DeleteExternalToolButton tool={this.tools[0]} canAddEdit returnFocus={() => {}}/>)
   wrapper.instance().deleteTool({preventDefault: () => {}})
   ok(store.delete.called)
   store.delete.restore()

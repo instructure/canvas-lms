@@ -88,7 +88,7 @@ class ContextExternalTool < ActiveRecord::Base
       settings['content_migration'].key?('import_start_url')
   end
 
-  def names_and_roles_service_enabled?
+  def lti_1_3_enabled?
     use_1_3? && context.root_account.feature_enabled?(:lti_1_3)
   end
 

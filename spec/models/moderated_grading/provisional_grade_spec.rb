@@ -383,6 +383,25 @@ describe ModeratedGrading::ProvisionalGrade do
       expect(real_assmt.data).to eq prov_assmt.data
     end
 
+    it "posts learning outcome results" do
+      @course = course
+      outcome_with_rubric
+      association = @rubric.associate_with(assignment, course, :purpose => 'grading', :use_for_grading => true)
+
+      sub = assignment.submit_homework(student, :submission_type => 'online_text_entry', :body => 'hallo')
+      pg = sub.find_or_create_provisional_grade!(scorer, score: 1)
+
+      expect do
+        association.assess(:user => student, :assessor => scorer, :artifact => pg,
+          :assessment => { :assessment_type => 'grading',
+            :"criterion_#{@rubric.criteria_object.first.id}" => { :points => 3, :comments => "good 4 u" } })
+      end.to change { LearningOutcomeResult.count }.by(0)
+
+
+      expect do
+        pg.send :publish_rubric_assessments!
+      end.to change { LearningOutcomeResult.count }.by(1)
+    end
   end
 
   describe "publish!" do

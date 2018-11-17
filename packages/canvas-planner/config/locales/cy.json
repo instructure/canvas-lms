@@ -5,6 +5,9 @@
   "add_to_do_7def3c37": {
     "message": "Ychwanegu Tasg i’w Gwneud"
   },
+  "address_3159962f": {
+    "message": "Cyfeiriad:"
+  },
   "all_day_fb42c4fc": {
     "message": "Drwy’r Dydd"
   },
@@ -56,6 +59,9 @@
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Dechrau’r Hanes Tasgau i’w Gwneud"
   },
+  "calendar_a8563bb2": {
+    "message": "Calendr:"
+  },
   "calendar_event_89aadc1c": {
     "message": "Digwyddiad Calendr"
   },
@@ -92,11 +98,17 @@
   "date_is_required_8660ec22": {
     "message": "Mae’n rhaid rhoi dyddiad"
   },
+  "date_time_d9fbf2d7": {
+    "message": "Dyddiad ac Amser:"
+  },
   "delete_a6efa79d": {
     "message": "Dileu"
   },
   "details_98a31b68": {
     "message": "Manylion"
+  },
+  "details_a6f427c3": {
+    "message": "Manylion:"
   },
   "discussion_6719c51d": {
     "message": "Trafodaeth"
@@ -193,6 +205,9 @@
   },
   "loading_planner_items_947a813d": {
     "message": "Wrthi’n llwytho eitemau’r trefnydd"
+  },
+  "location_3b6ff307": {
+    "message": "Lleoliad:"
   },
   "looks_like_there_isn_t_anything_here_d9bcef49": {
     "message": "Does dim byd yma yn ôl pob golwg"
@@ -301,6 +316,12 @@
   },
   "startdate_to_enddate_d245175b": {
     "message": "{ startDate } i { endDate }"
+  },
+  "startdatetime_enddatetime_20abc10e": {
+    "message": "{ startDateTime } - { endDateTime }"
+  },
+  "startdatetime_endtime_49741bbe": {
+    "message": "{ startDateTime } - { endTime }"
   },
   "starttime_to_endtime_d7cc249d": {
     "message": "{ startTime } i { endTime }"

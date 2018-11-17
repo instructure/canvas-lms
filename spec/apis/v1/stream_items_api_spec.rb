@@ -461,7 +461,7 @@ describe UsersController, type: :request do
       },
 
       'user' => {
-        "name"=>"User", "sortable_name"=>"User", "id"=>@sub.user_id, "short_name"=>"User"
+        "name"=>"User", "sortable_name"=>"User", "id"=>@sub.user_id, "short_name"=>"User", "created_at"=>@user.created_at.iso8601
       },
 
       'context_type' => 'Course',
@@ -586,7 +586,7 @@ describe UsersController, type: :request do
       },
 
       'user' => {
-        "name"=>"User", "sortable_name"=>"User", "id"=>@sub.user_id, "short_name"=>"User"
+        "name"=>"User", "sortable_name"=>"User", "id"=>@sub.user_id, "short_name"=>"User", "created_at"=>@user.created_at.iso8601
       },
 
       'context_type' => 'Course',

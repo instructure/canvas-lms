@@ -110,7 +110,7 @@
     }
     width: 11px;
     height: 11px;
-    margin: 5px 11px 0 15px;
+    margin: direction-sides(5px 11px 0 15px);
     float: direction(left);
     border: 1px solid;
   }

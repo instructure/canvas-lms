@@ -5,6 +5,9 @@
   "add_to_do_7def3c37": {
     "message": "إضافة قائمة مهام"
   },
+  "address_3159962f": {
+    "message": "العنوان:"
+  },
   "all_day_fb42c4fc": {
     "message": "طوال اليوم"
   },
@@ -56,6 +59,9 @@
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "بداية سجل قائمة المهام الخاصة بك"
   },
+  "calendar_a8563bb2": {
+    "message": "التقويم:"
+  },
   "calendar_event_89aadc1c": {
     "message": "حدث التقويم"
   },
@@ -92,11 +98,17 @@
   "date_is_required_8660ec22": {
     "message": "التاريخ مطلوب"
   },
+  "date_time_d9fbf2d7": {
+    "message": "التاريخ والوقت:"
+  },
   "delete_a6efa79d": {
     "message": "حذف"
   },
   "details_98a31b68": {
     "message": "التفاصيل"
+  },
+  "details_a6f427c3": {
+    "message": "التفاصيل:"
   },
   "discussion_6719c51d": {
     "message": "النقاش"
@@ -193,6 +205,9 @@
   },
   "loading_planner_items_947a813d": {
     "message": "جارٍ تحميل عناصر المخطِط"
+  },
+  "location_3b6ff307": {
+    "message": "الموقع:"
   },
   "looks_like_there_isn_t_anything_here_d9bcef49": {
     "message": "يبدو أنه لا يوجد أي شيء هنا"
@@ -301,6 +316,12 @@
   },
   "startdate_to_enddate_d245175b": {
     "message": "{ startDate } إلى { endDate }"
+  },
+  "startdatetime_enddatetime_20abc10e": {
+    "message": "{ startDateTime } - { endDateTime }"
+  },
+  "startdatetime_endtime_49741bbe": {
+    "message": "{ startDateTime } - { endTime }"
   },
   "starttime_to_endtime_d7cc249d": {
     "message": "{ startTime } إلى { endTime }"

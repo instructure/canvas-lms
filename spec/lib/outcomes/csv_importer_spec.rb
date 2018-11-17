@@ -169,7 +169,7 @@ describe Outcomes::CsvImporter do
       methods = LearningOutcome::CALCULATION_METHODS.keys.sort
       expect(by_method.keys.sort).to eq(methods)
 
-      expect(by_method['decaying_average'][0].calculation_int).to eq(40)
+      expect(by_method['decaying_average'].map(&:calculation_int)).to include(40)
       expect(by_method['n_mastery'][0].calculation_int).to eq(3)
     end
 
@@ -424,6 +424,18 @@ describe Outcomes::CsvImporter do
         ],
         [
           [2, "Calculation method calculation_method must be one of the following: #{methods}"],
+        ]
+      )
+    end
+
+    it 'raises a line error when vendor_guid is too long' do
+      expect_import_error(
+        [
+          headers,
+          outcome_row(vendor_guid: 'long-' * 200),
+        ],
+        [
+          [2, "Vendor guid is too long (maximum is 255 characters)"],
         ]
       )
     end

@@ -51,8 +51,8 @@ $revision-button-color: $ic-color-dark;
   position: fixed;
   z-index: 1000;
   top: 0px;
-  left: 0px;
-  right: 0px;
+  #{direction(left)}: 0px;
+  #{direction(right)}: 0px;
   margin-#{direction(left)}: 1px;
   background: white;
   height: 33px;
@@ -126,7 +126,7 @@ $revision-button-color: $ic-color-dark;
       height: 103px;
       animation: page-changed-header-bar 1.15s;
       .page-changed-alert {
-        margin: (-1px) 0 0 0;
+        margin: direction-sides((-1px) 0 0 0);
         border-bottom: $pages-border;
         box-shadow: $shadow;
         height: 39px;
@@ -317,18 +317,18 @@ $revision-button-color: $ic-color-dark;
   }
   .header-bar {
     .publish-button {
-      margin: 0 12px 0 0;
+      margin: direction-sides(0 12px 0 0);
     }
     .front-page.label {
-      margin: 6px 12px 6px 0;
+      margin: direction-sides(6px 12px 6px 0);
     }
     .published, .unpublished {
       display: inline-block;
-      margin: 6px 8px 6px 5px;
+      margin: direction-sides(6px 8px 6px 5px);
     }
   }
   .locked-alert ul {
-    margin: 4px 0 6px 25px;
+    margin: direction-sides(4px 0 6px 25px);
   }
   .show-content {
     word-wrap: break-word;

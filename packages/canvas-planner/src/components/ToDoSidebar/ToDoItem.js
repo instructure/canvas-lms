@@ -91,8 +91,15 @@ export default class ToDoItem extends React.Component {
     return toDisplay;
   }
 
+  itemTitle () {
+    if (this.props.item.type === 'Peer Review') {
+      return formatMessage('Peer Review for {itemTitle}', {itemTitle: this.props.item.title});
+    } 
+    return this.props.item.title;
+  }
+
   render () {
-    const title = <Text size="small" lineHeight="fit">{this.props.item.title}</Text>;
+    const title = <Text size="small" lineHeight="fit">{this.itemTitle()}</Text>;
     const titleComponent = this.props.item.html_url ? (
       <Link linkRef={(elt) => {this.linkRef = elt;}} href={this.props.item.html_url}>{title}</Link>
     ) : (

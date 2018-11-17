@@ -93,6 +93,7 @@ module Lti
       before(:each) do
         course_with_teacher
         @course.offer!
+        enable_default_developer_key!
       end
 
       describe "#course_index" do
@@ -211,6 +212,7 @@ module Lti
 
     context 'course with multiple enrollments' do
       before(:each) do
+        enable_default_developer_key!
         course_with_teacher
         @course.enroll_user(@teacher, 'TeacherEnrollment', enrollment_state: 'active')
         @ta = user_model
@@ -261,6 +263,7 @@ module Lti
 
     context 'user not in course group' do
       before(:each) do
+        enable_default_developer_key!
         course_with_teacher
         @course.offer!
         user_model
@@ -320,6 +323,7 @@ module Lti
 
         context 'with access token' do
           before(:each) do
+            enable_default_developer_key!
             pseudonym(@student)
             @student.save!
             token = @student.access_tokens.create!(purpose: 'test').full_token
@@ -398,6 +402,7 @@ module Lti
 
     context 'group with multiple students' do
       before(:each) do
+        enable_default_developer_key!
         course_with_teacher
         @course.offer!
         @student1 = user_model

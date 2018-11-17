@@ -19,13 +19,12 @@ require_relative '../../common'
 require_relative '../pages/moderate_page'
 require_relative '../pages/speedgrader_page'
 
-GRADES = [["10", "8"].freeze, ["9", "7"].freeze, ["5", "3"].freeze].freeze
-
 describe 'Moderation Page' do
   include_context 'in-process server selenium tests'
 
-  before(:once) do
+  GRADES = [["10", "8"], ["9", "7"], ["5", "3"]]
 
+  before(:once) do
     @moderated_course = course_factory(course_name: "Moderated Course")
     # create and enroll 4 teachers in course
     @teachers = create_users_in_course(@moderated_course, 4, return_type: :record, name_prefix: "Boss", enrollment_type: 'TeacherEnrollment')
@@ -94,6 +93,7 @@ describe 'Moderation Page' do
   end
 
   it 'navigates to an anonymous student submission in speedgrader', priority: "1", test_id: 3638364 do
+    skip('Skipping this until GRADE-1691 is resolved')
     @assignment.update!(anonymous_grading: true)
     ModeratePage.visit(@moderated_course.id, @assignment.id)
     ModeratePage.click_student_link("Student 1")

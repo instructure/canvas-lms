@@ -35,10 +35,12 @@ module Importers
       mig_id = qq_hash['quiz_question_migration_id'] || qq_hash['migration_id']
 
       if id = qq_ids[mig_id]
-        Quizzes::QuizQuestion.where(id: id).update_all(quiz_group_id: quiz_group&.id,
+        data = {quiz_group_id: quiz_group&.id,
           assessment_question_id: hash['assessment_question_id'], question_data: hash,
           created_at: Time.now.utc, updated_at: Time.now.utc, migration_id: mig_id,
-          position: position)
+          position: position}
+        data.delete(:assessment_question_id) if hash['assessment_question_id'].nil? && migration.for_master_course_import? # don't undo an existing association
+        Quizzes::QuizQuestion.where(id: id).update_all(data)
       else
         args = [quiz && quiz.id, quiz_group && quiz_group.id, hash['assessment_question_id'],
             hash.to_yaml, Time.now.utc, Time.now.utc, mig_id, position]

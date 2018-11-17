@@ -396,7 +396,7 @@ export class PlannerItem extends Component {
     if (!this.props.associated_item) {
       return formatMessage('{course} TO DO', { course: this.props.courseName || '' });
     } else {
-      return `${this.props.courseName || ''} ${this.props.associated_item}`;
+      return `${this.props.courseName || ''} ${this.assignmentType()}`;
     }
   }
 

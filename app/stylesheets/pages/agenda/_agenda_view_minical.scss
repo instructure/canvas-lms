@@ -108,7 +108,7 @@ $mini-cal-highlight-border: #fa0;
   }
 
   .fc-basic-view td.fc-day-number {
-    padding: 3px 2px 2px 0;
+    padding: direction-sides(3px 2px 2px 0);
   }
 
   .event {
@@ -117,9 +117,9 @@ $mini-cal-highlight-border: #fa0;
     &::after {
       position: absolute;
       top: 1px;
-      left: 1px;
+      #{direction(left)}: 1px;
       height: 1.2em;
-      right: 1px;
+      #{direction(right)}: 1px;
       border: 1px solid $ic-color-dark;
       content: " ";
     }

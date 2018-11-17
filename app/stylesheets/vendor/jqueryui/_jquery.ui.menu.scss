@@ -102,8 +102,8 @@ $kyle-menu-border-radius: $baseBorderRadius;
   // have to use first-of-type instead of :first-child because the carat that gets inserted becomes
   // :first-child but the carat is not an <li>, so this gets the first <li> which is what we want.
   // doesn't work in ie8- but that's ok because neither does the border radius we are trying to fix.
-  li:first-of-type a { border-top-left-radius: $kyle-menu-border-radius; border-top-right-radius:$kyle-menu-border-radius; }
-  li:last-child a { border-bottom-left-radius: $kyle-menu-border-radius; border-bottom-right-radius:$kyle-menu-border-radius; }
+  li:first-of-type a { border-top-#{direction(left)}-radius: $kyle-menu-border-radius; border-top-#{direction(right)}-radius:$kyle-menu-border-radius; }
+  li:last-child a { border-bottom-#{direction(left)}-radius: $kyle-menu-border-radius; border-bottom-#{direction(right)}-radius:$kyle-menu-border-radius; }
   .ui-state-focus {
     font-weight: bold !important;
     border: none;

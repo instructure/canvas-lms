@@ -99,7 +99,7 @@ function getProps (column, gradebook, options) {
 
     sortBySetting: {
       direction: sortRowsBySetting.direction,
-      disabled: !gradeSortDataLoaded,
+      disabled: !gradeSortDataLoaded || assignment.anonymize_students,
       isSortColumn: sortRowsBySetting.columnId === columnId,
       onSortByGradeAscending: () => {
         gradebook.setSortRowsBySetting(columnId, 'grade', 'ascending');

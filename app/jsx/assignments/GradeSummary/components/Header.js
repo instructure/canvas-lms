@@ -18,7 +18,7 @@
 
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
-import {arrayOf, bool, func, oneOf, shape, string} from 'prop-types'
+import {arrayOf, func, oneOf, shape, string} from 'prop-types'
 import Alert from '@instructure/ui-alerts/lib/components/Alert'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
@@ -49,7 +49,6 @@ class Header extends Component {
     ).isRequired,
     publishGrades: func.isRequired,
     publishGradesStatus: oneOf(enumeratedStatuses(AssignmentActions)),
-    showNoGradersMessage: bool.isRequired,
     unmuteAssignment: func.isRequired,
     unmuteAssignmentStatus: oneOf(enumeratedStatuses(AssignmentActions))
   }
@@ -94,42 +93,40 @@ class Header extends Component {
           </Alert>
         )}
 
-        {this.props.showNoGradersMessage && (
-          <Alert margin="0 0 medium 0" variant="warning">
-            {I18n.t(
-              'Moderation is unable to occur at this time due to grades not being submitted.'
-            )}
-          </Alert>
-        )}
-
         <Heading level="h1" margin="0 0 x-small 0">
           {I18n.t('Grade Summary')}
         </Heading>
 
         <Text size="x-large">{this.props.assignment.title}</Text>
 
-        {this.props.graders.length > 0 && (
-          <Flex as="div" margin="large 0 0 0">
-            <FlexItem as="div" grow>
+        <Flex as="div" margin="large 0 0 0">
+          {this.props.graders.length > 0 && (
+            <FlexItem as="div" flex="1" grow>
               <GradersTable />
             </FlexItem>
+          )}
 
-            <FlexItem align="end" as="div" justifyItems="end">
-              <PostButton
-                gradesPublished={this.props.assignment.gradesPublished}
-                margin="0 x-small 0 0"
-                onClick={this.handlePublishClick}
-                publishGradesStatus={this.props.publishGradesStatus}
-              />
+          <FlexItem align="end" as="div" flex="2" grow>
+            <Flex as="div" justifyItems="end">
+              <FlexItem>
+                <PostButton
+                  gradesPublished={this.props.assignment.gradesPublished}
+                  margin="0 x-small 0 0"
+                  onClick={this.handlePublishClick}
+                  publishGradesStatus={this.props.publishGradesStatus}
+                />
+              </FlexItem>
 
-              <DisplayToStudentsButton
-                assignment={this.props.assignment}
-                onClick={this.handleUnmuteClick}
-                unmuteAssignmentStatus={this.props.unmuteAssignmentStatus}
-              />
-            </FlexItem>
-          </Flex>
-        )}
+              <FlexItem>
+                <DisplayToStudentsButton
+                  assignment={this.props.assignment}
+                  onClick={this.handleUnmuteClick}
+                  unmuteAssignmentStatus={this.props.unmuteAssignmentStatus}
+                />
+              </FlexItem>
+            </Flex>
+          </FlexItem>
+        </Flex>
       </header>
     )
   }
@@ -142,7 +139,6 @@ function mapStateToProps(state) {
     assignment,
     graders: state.context.graders,
     publishGradesStatus,
-    showNoGradersMessage: !assignment.gradesPublished && state.context.graders.length === 0,
     unmuteAssignmentStatus
   }
 }

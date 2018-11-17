@@ -37,18 +37,18 @@
 .bcs__object-tab {
   padding: .6em;
   border-top: 1px solid $ic-border-color;
-  border-left: 1px solid $ic-border-color;
-  border-right: 1px solid $ic-border-color;
+  border-#{direction(left)}: 1px solid $ic-border-color;
+  border-#{direction(right)}: 1px solid $ic-border-color;
 
     &:first-of-type {
-      border-top-right-radius: 3px;
-      border-top-left-radius: 3px;
+      border-top-#{direction(right)}-radius: 3px;
+      border-top-#{direction(left)}-radius: 3px;
     }
 
     &:last-of-type {
       border-bottom: 1px solid $ic-border-color;
-      border-bottom-right-radius: 3px;
-      border-bottom-left-radius: 3px;
+      border-bottom-#{direction(right)}-radius: 3px;
+      border-bottom-#{direction(left)}-radius: 3px;
     }
 
     .bcs_tab-icon {

@@ -86,17 +86,6 @@ QUnit.module('GradeSummary Header', suiteHooks => {
     notOk(wrapper.text().includes('they have already been posted'))
   })
 
-  test('includes a "no graders" message when there are no graders', () => {
-    storeEnv.graders = []
-    mountComponent()
-    ok(wrapper.text().includes('Moderation is unable to occur'))
-  })
-
-  test('excludes the "no graders" message when there are graders', () => {
-    mountComponent()
-    notOk(wrapper.text().includes('Moderation is unable to occur'))
-  })
-
   QUnit.module('Graders Table', () => {
     test('is not displayed when there are no graders', () => {
       storeEnv.graders = []
@@ -123,13 +112,8 @@ QUnit.module('GradeSummary Header', suiteHooks => {
       window.confirm.restore()
     })
 
-    test('is not displayed when there are no graders', () => {
+    test('is always displayed', () => {
       storeEnv.graders = []
-      mountComponent()
-      strictEqual(wrapper.find('PostButton').length, 0)
-    })
-
-    test('is displayed when there are graders', () => {
       mountComponent()
       strictEqual(wrapper.find('PostButton').length, 1)
     })
@@ -181,13 +165,8 @@ QUnit.module('GradeSummary Header', suiteHooks => {
       window.confirm.restore()
     })
 
-    test('is not displayed when there are no graders', () => {
+    test('is always displayed', () => {
       storeEnv.graders = []
-      mountComponent()
-      strictEqual(wrapper.find('DisplayToStudentsButton').length, 0)
-    })
-
-    test('is displayed when there are graders', () => {
       mountComponent()
       strictEqual(wrapper.find('DisplayToStudentsButton').length, 1)
     })

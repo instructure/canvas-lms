@@ -23,7 +23,8 @@ $menu-item-keyboard-shortcut-color: $ic-font-color-dark;
 
 [dir=rtl] {
   .mce-container, .mce-container *, .mce-widget, .mce-widget *, .mce-reset {
-    text-align: right;
+
+    text-align: right; /* stylelint-disable-line declaration-property-value-blacklist */
   }
 }
 
@@ -65,7 +66,7 @@ $menu-item-keyboard-shortcut-color: $ic-font-color-dark;
       color: $menu-item-text-hover-focus-color;
     }
     .mce-caret {
-      border-left-color: $menu-item-text-hover-focus-color
+      border-#{direction(left)}-color: $menu-item-text-hover-focus-color
     }
   }
 }

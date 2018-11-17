@@ -1,0 +1,16 @@
+#!/bin/bash 
+
+generic_consumer_version='0.15'
+sha=$(git rev-parse --short HEAD)
+version="$generic_consumer_version+$sha"
+
+echo Publishing version: $version
+
+set -e
+
+RAILS_ENV=test \
+  bundle exec pact-broker publish pacts/generic_consumer-canvas_lms_api.json \
+  -u $PACT_BROKER_PUBLIC_USERNAME \
+  -p $PACT_BROKER_PUBLIC_PASSWORD \
+  -b https://pact-broker.instructure.com \
+  -a $version

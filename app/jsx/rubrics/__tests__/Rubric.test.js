@@ -31,8 +31,7 @@ describe('the Rubric component', () => {
         rubricAssociation={assessments.points.rubric_association}
       />
     )
-    expect(modal.debug()).toMatchSnapshot()
-    expect(modal.find('.react-rubric').prop('style')).toEqual({ minWidth: '52.5rem' })
+    expect(modal).toMatchSnapshot()
   })
 
   it('renders properly with no assessment', () => {
@@ -42,7 +41,7 @@ describe('the Rubric component', () => {
         rubricAssociation={assessments.points.rubric_association}
       />
     )
-    expect(modal.debug()).toMatchSnapshot()
+    expect(modal).toMatchSnapshot()
   })
 
   const setCloned = (object, path, value) => _.setWith(_.clone(object), path, value, _.clone)
@@ -54,7 +53,7 @@ describe('the Rubric component', () => {
         rubricAssessment={hidden}
         rubricAssociation={hidden.rubric_association}
       />)
-    expect(modal.debug()).toMatchSnapshot()
+    expect(modal).toMatchSnapshot()
   })
 
   it('updates the total score when an individual criterion point assessment changes', () => {
@@ -81,7 +80,7 @@ describe('the Rubric component', () => {
       }]
     ])
 
-    expect(renderAssessing(onAssessmentChange.args[0][0]).debug()).toMatchSnapshot()
+    expect(renderAssessing(onAssessmentChange.args[0][0])).toMatchSnapshot()
   })
 
   describe('points column', () => {

@@ -204,14 +204,14 @@ define [
       errors
 
     _getDueAt: (dueAt) ->
-      # The UI doesn't allow settings seconds to 59, but when a new assignment
-      # is created, the seconds are set to 59. Thus, to avoid issues where
-      # the date is edited after creation, we set seconds to 59 behind the
-      # scenes here. However, to ensure that we don't fudge with specifically
-      # set seconds value through the assignments api, if the date is not
-      # changed in the UI form, we keep the previous seconds value.
+      # If the minutes value of the date is 59, set the seconds to 59 so
+      # the date ends up being one second before the following hour. Otherwise,
+      # set it to 0 seconds.
+      #
+      # If the user has not changed the date, don't touch the seconds value
+      # (so that we don't clobber a date set by the API).
       if @_dueAtHasChanged(dueAt.toISOString())
-        dueAt.setSeconds(59)
+        dueAt.setSeconds(if dueAt.getMinutes() == 59 then 59 else 0)
       else
         dueAt.setSeconds(new Date(@model.dueAt()).getSeconds())
 

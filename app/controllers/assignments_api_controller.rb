@@ -138,6 +138,10 @@
 #         "ratings": {
 #           "type": "array",
 #           "items": { "$ref": "RubricRating" }
+#         },
+#         "ignore_for_scoring": {
+#           "type": "boolean",
+#           "example": true
 #         }
 #       }
 #     }
@@ -576,7 +580,7 @@ class AssignmentsApiController < ApplicationController
   include Api::V1::AssignmentOverride
 
   # @API List assignments
-  # Returns the paginated list of assignments for the current context.
+  # Returns the paginated list of assignments for the current course or assignment group.
   # @argument include[] [String, "submission"|"assignment_visibility"|"all_dates"|"overrides"|"observed_users"]
   #   Associations to include with the assignment. The "assignment_visibility" option
   #   requires that the Differentiated Assignments course feature be turned on. If
@@ -673,7 +677,13 @@ class AssignmentsApiController < ApplicationController
       end
       scope = scope.reorder(Arel.sql("#{Assignment.best_unicode_collation_key('assignments.title')}, assignment_groups.position, assignments.position, assignments.id")) if params[:order_by] == 'name'
 
-      assignments = Api.paginate(scope, self, api_v1_course_assignments_url(@context))
+      assignments = if params[:assignment_group_id].present?
+        assignment_group_id = params[:assignment_group_id]
+        scope = scope.where(assignment_group_id: assignment_group_id)
+        Api.paginate(scope, self, api_v1_course_assignment_group_assignments_url(@context, assignment_group_id))
+      else
+        Api.paginate(scope, self, api_v1_course_assignments_url(@context))
+      end
 
       if params[:assignment_ids] && assignments.length != params[:assignment_ids].length
         invalid_ids = params[:assignment_ids] - assignments.map(&:id).map(&:to_s)

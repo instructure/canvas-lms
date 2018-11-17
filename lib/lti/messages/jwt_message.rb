@@ -31,23 +31,33 @@ module Lti::Messages
       @message = LtiAdvantage::Messages::JwtMessage.new
     end
 
-    def generate_post_payload
-      add_security_claims!
-      add_public_claims! if @tool.public?
-      add_include_email_claims! if @tool.include_email?
-      add_include_name_claims! if @tool.include_name?
-      add_resource_claims!
-      add_private_claims!
+    def generate_post_payload_message
+      add_security_claims! if include_claims?(:security)
+      add_public_claims! if @tool.public? && include_claims?(:public)
+      add_mentorship_claims! if @tool.public? && include_claims?(:mentorship)
+      add_include_email_claims! if @tool.include_email? && include_claims?(:email)
+      add_include_name_claims! if @tool.include_name? && include_claims?(:name)
+      add_resource_claims! if include_claims?(:resource)
+      add_context_claims! if include_claims?(:context)
+      add_tool_platform_claims! if include_claims?(:tool_platform)
+      add_launch_presentation_claims! if include_claims?(:launch_presentation)
+      add_i18n_claims! if include_claims?(:i18n)
+      add_roles_claims! if include_claims?(:roles)
+      add_custom_params_claims! if include_claims?(:custom_params)
       add_names_and_roles_service_claims! if include_names_and_roles_service_claims?
 
       @expander.expand_variables!(@message.extensions)
-      { id_token: @message.to_jws(Lti::KeyStorage.present_key) }
+      @message
+    end
+
+    def generate_post_payload
+      { id_token: generate_post_payload_message.to_jws(Lti::KeyStorage.present_key) }
     end
 
     private
 
     def add_security_claims!
-      @message.aud = @tool.developer_key.global_id
+      @message.aud = @tool.developer_key.global_id.to_s
       @message.deployment_id = @tool.deployment_id
       @message.exp = Setting.get('lti.oauth2.access_token.exp', 1.hour).to_i.seconds.from_now.to_i
       @message.iat = Time.zone.now.to_i
@@ -56,25 +66,42 @@ module Lti::Messages
       @message.sub = Lti::Asset.opaque_identifier_for(@user)
     end
 
-    def add_private_claims!
-      @message.locale = I18n.locale || I18n.default_locale.to_s
-      @message.roles = expand_variable('$com.Instructure.membership.roles').split ','
+    def add_context_claims!
       @message.context.id = Lti::Asset.opaque_identifier_for(@context)
       @message.context.label = @context.course_code if @context.respond_to?(:course_code)
       @message.context.title = @context.name
       @message.context.type = [Lti::SubstitutionsHelper::LIS_V2_ROLE_MAP[@context.class] || @context.class.to_s]
+    end
+
+    def add_tool_platform_claims!
       @message.tool_platform.guid = @context.root_account.lti_guid
       @message.tool_platform.name = @context.root_account.name
       @message.tool_platform.version = 'cloud'
       @message.tool_platform.product_family_code = 'canvas'
+    end
+
+    def add_launch_presentation_claims!
       @message.launch_presentation.document_target = 'iframe'
       @message.launch_presentation.height = @tool.extension_setting(@opts[:resource_type], :selection_height)
       @message.launch_presentation.width = @tool.extension_setting(@opts[:resource_type], :selection_width)
       @message.launch_presentation.return_url = @return_url
       @message.launch_presentation.locale = I18n.locale || I18n.default_locale.to_s
-      @message.custom = custom_parameters
+    end
+
+    def add_i18n_claims!
+      # Repeated as @message.launch_presentation.locale above. Separated b/c often want one or the other but not both,
+      # e.g. NRPS v2 only wants this one and none of the launch_presention fields.
+      @message.locale = I18n.locale || I18n.default_locale.to_s
+    end
+
+    def add_roles_claims!
+      @message.roles = expand_variable('$com.Instructure.membership.roles').split ','
       add_extension('roles', '$Canvas.xuser.allRoles')
       add_extension('canvas_enrollment_state', '$Canvas.enrollment.enrollmentState')
+    end
+
+    def add_custom_params_claims!
+      @message.custom = custom_parameters
     end
 
     def add_include_name_claims!
@@ -91,7 +118,6 @@ module Lti::Messages
 
     def add_public_claims!
       @message.picture = @user.avatar_url
-      @message.role_scope_mentor = current_observee_list if current_observee_list.present?
       add_extension('canvas_user_id', '$Canvas.user.id')
       add_extension('canvas_user_login_id', '$Canvas.user.loginId')
       add_extension('canvas_api_domain', '$Canvas.api.domain')
@@ -104,6 +130,10 @@ module Lti::Messages
         add_extension('canvas_account_id', '$Canvas.account.id')
         add_extension('canvas_account_sis_id', '$Canvas.account.sisSourceId')
       end
+    end
+
+    def add_mentorship_claims!
+      @message.role_scope_mentor = current_observee_list if current_observee_list.present?
     end
 
     def add_resource_claims!
@@ -131,13 +161,16 @@ module Lti::Messages
     end
 
     def include_names_and_roles_service_claims?
-      (@context.is_a?(Course) || @context.is_a?(Group)) && @tool.names_and_roles_service_enabled?
+      include_claims?(:names_and_roles_service) &&
+        (@context.is_a?(Course) || @context.is_a?(Group)) &&
+        @tool.lti_1_3_enabled? &&
+        @tool.developer_key&.scopes&.include?(TokenScopes::LTI_NRPS_V2_SCOPE)
     end
 
     def add_names_and_roles_service_claims!
       @message.names_and_roles_service.context_memberships_url =
         @expander.controller.polymorphic_url([@context, :names_and_roles])
-      @message.names_and_roles_service.service_version = '2.0'
+      @message.names_and_roles_service.service_versions = ['2.0']
     end
 
     def expand_variable(variable)
@@ -163,9 +196,18 @@ module Lti::Messages
       @expander.expand_variables!(custom_params_hash)
     end
 
+    def include_claims?(claim_group)
+      Lti::AppUtil.allowed?(claim_group, @opts[:claim_group_whitelist], @opts[:claim_group_blacklist])
+    end
+
+    def include_extension?(extension_name)
+      Lti::AppUtil.allowed?(extension_name, @opts[:extension_whitelist], @opts[:extension_blacklist])
+    end
+
     protected
 
     def add_extension(key, value)
+      return unless include_extension?(key.to_sym)
       @message.extensions["#{JwtMessage::EXTENSION_PREFIX}#{key}"] = value
     end
   end

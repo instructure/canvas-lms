@@ -187,8 +187,8 @@
 
 // Centered container element
 @mixin container-fixed() {
-  margin-right: auto;
-  margin-left: auto;
+  margin-#{direction(right)}: auto;
+  margin-#{direction(left)}: auto;
   @include clearfix();
 }
 

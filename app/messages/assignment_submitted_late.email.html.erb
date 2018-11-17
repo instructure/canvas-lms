@@ -1,9 +1,34 @@
+<%
+  assignment = asset.assignment
+  anonymize_students = assignment.anonymize_students?
+  user_name = anonymize_students ? 'A student' : asset.user.name
+  link = ''
+  subject = ''
+
+  if anonymize_students
+    subject = t(
+      'Late anonymous assignment: %{user_name} has submitted late for %{assignment_title}',
+      user_name: user_name,
+      assignment_title: assignment.title
+    )
+    link = speed_grader_course_gradebook_url(assignment.context, assignment_id: assignment.id) +
+      "\#{\"anonymous_id\":\"#{asset.anonymous_id}\"}"
+  else
+    subject = t(
+      'Late assignment: %{user_name} has submitted late for %{assignment_title}',
+      user_name: user_name,
+      assignment_title: assignment.title
+    )
+    link = course_assignment_submission_url(assignment.context, assignment, asset.user_id)
+  end
+%>
+
 <% define_content :link do %>
-  <%= course_assignment_submission_url(asset.assignment.context, asset.assignment, asset.user_id) %>
+  <%= link.html_safe %>
 <% end %>
 
 <% define_content :subject do %>
-  <%= t('user_submitted', 'Late Assignment: %{user_name}, %{assignment_name}', :user_name => asset.user.name, :assignment_name => asset.assignment.title) %>
+  <%= subject %>
 <% end %>
 
 <% define_content :footer_link do %>
@@ -12,7 +37,12 @@
   </a>
 <% end %>
 
-<p><%= t('user_resubmitted_sentence', '%{user_name} has just turned in a late submission for %{assignment_name} in the course %{course_name}',
-         :user_name => asset.user.name,
-         :assignment_name => asset.assignment.title,
-         :course_name => asset.assignment.context.name) %></p>
+<p>
+  <%= t(
+    'user_resubmitted_sentence',
+    '%{user_name} has just turned in a late submission for %{assignment_name} in the course %{course_name}',
+    user_name: user_name,
+    assignment_name: assignment.title,
+    course_name: assignment.context.name
+  ) %>
+</p>

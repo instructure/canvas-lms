@@ -63,6 +63,12 @@ module GraphQLNodeLoader
       end
     when "Group"
       Loaders::IDLoader.for(Group).load(id).then(check_read_permission)
+    when "GroupSet"
+      Loaders::IDLoader.for(GroupCategory).load(id).then do |category|
+        Loaders::AssociationLoader.for(GroupCategory, :context)
+          .load(category)
+          .then(check_read_permission)
+      end
     when "GradingPeriod"
       Loaders::IDLoader.for(GradingPeriod).load(id).then(check_read_permission)
     when "Module"

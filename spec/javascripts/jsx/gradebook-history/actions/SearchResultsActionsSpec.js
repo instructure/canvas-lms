@@ -18,9 +18,9 @@
 
 import Fixtures from '../../gradebook-history/Fixtures';
 import GradebookHistoryStore from 'jsx/gradebook-history/store/GradebookHistoryStore';
-import HistoryActions from 'jsx/gradebook-history/actions/HistoryActions';
+import * as HistoryActions from 'jsx/gradebook-history/actions/HistoryActions';
 import HistoryApi from 'jsx/gradebook-history/api/HistoryApi';
-import SearchResultsActions from 'jsx/gradebook-history/actions/SearchResultsActions';
+import * as SearchResultsActions from 'jsx/gradebook-history/actions/SearchResultsActions';
 
 QUnit.module('SearchResultsActionsSpec getHistoryNextPage', {
   setup () {

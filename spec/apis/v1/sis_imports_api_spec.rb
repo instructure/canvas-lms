@@ -209,6 +209,20 @@ describe SisImportsApiController, type: :request do
     api_call(:get, "/api/v1/progress/#{json['id']}", params, {}, {}, expected_status: 200)
   end
 
+  it 'should show current running sis import' do
+    batch = @account.sis_batches.create!
+    json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports/importing",
+                    {controller: 'sis_imports_api', action: 'importing', format: 'json',
+                     account_id: @account.id.to_s})
+    expect(json["sis_imports"]).to eq []
+    batch.workflow_state = 'importing'
+    batch.save!
+    json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports/importing",
+                    {controller: 'sis_imports_api', action: 'importing', format: 'json',
+                     account_id: @account.id.to_s})
+    expect(json["sis_imports"].first['id']).to eq batch.id
+  end
+
   it 'should abort batch on abort' do
     batch = @account.sis_batches.create
     api_call(:put, "/api/v1/accounts/#{@account.id}/sis_imports/#{batch.id}/abort",

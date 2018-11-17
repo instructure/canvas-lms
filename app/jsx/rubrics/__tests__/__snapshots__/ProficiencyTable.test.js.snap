@@ -1,7 +1,19 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`default proficiency renders the ProficiencyRating component 1`] = `
-"<div style={{...}}>
-  <Spinner title=\\"Loading\\" size=\\"large\\" margin=\\"0 0 0 medium\\" as=\\"div\\" variant=\\"default\\" />
-</div>"
+<div
+  style={
+    Object {
+      "textAlign": "center",
+    }
+  }
+>
+  <Spinner
+    as="div"
+    margin="0 0 0 medium"
+    size="large"
+    title="Loading"
+    variant="default"
+  />
+</div>
 `;

@@ -1785,9 +1785,12 @@ EG = {
     var turnitinEnabled = submission.turnitin_data && (typeof submission.turnitin_data.provider === 'undefined');
     var vericiteEnabled = submission.turnitin_data && submission.turnitin_data.provider === 'vericite';
 
-    if (submission.has_originality_score) {
-      $('#plagiarism_platform_info_container').hide();
-    } else {
+    SpeedgraderHelpers.plagiarismResubmitButton(
+      submission.has_originality_score,
+      $('#plagiarism_platform_info_container')
+    )
+
+    if (!submission.has_originality_score) {
       const resubmitUrl = SpeedgraderHelpers.plagiarismResubmitUrl(submission, anonymizableUserId)
       $('#plagiarism_resubmit_button').on('click', (e) => { SpeedgraderHelpers.plagiarismResubmitHandler(e, resubmitUrl, anonymizableUserId) })
     }
@@ -2890,7 +2893,9 @@ EG = {
     });
     $right_side.delegate(".play_comment_link", 'click', function() {
       if($(this).data('media_comment_id')) {
-        $(this).parents(".comment").find(".media_comment_content").show().mediaComment('show', $(this).data('media_comment_id'), $(this).data('media_comment_type'));
+        $(this).parents(".comment").find(".media_comment_content")
+          .show()
+          .mediaComment('show', $(this).data('media_comment_id'), $(this).data('media_comment_type'), this)
       }
       return false; // so that it doesn't hit the $("a.instructure_inline_media_comment").live('click' event handler
     });

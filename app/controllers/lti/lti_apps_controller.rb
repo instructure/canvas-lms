@@ -62,6 +62,7 @@ module Lti
         config = {}
         config[:config] = tool
         config[:enabled] = dev_key_ids_of_installed_tools.include?(tool.developer_key_id)
+        config[:installed_in_current_course] = context_types_of_installed_tools.include?('Course')
         memo << config
       end
 
@@ -71,7 +72,20 @@ module Lti
     end
 
     def dev_key_ids_of_installed_tools
-      @installed_tools ||= ContextExternalTool.where(developer_key: dev_keys).pluck(:developer_key_id)
+      @installed_tools ||= active_tools_keys_and_contexts.map(&:first)
+    end
+
+    def context_types_of_installed_tools
+      @context_types_of_installed_tools ||= active_tools_keys_and_contexts.map(&:second)
+    end
+
+    def active_tools_keys_and_contexts
+      @active_tools ||= begin
+        ContextExternalTool.
+          active.
+          where(developer_key: dev_keys, context_id: [@context.id] + @context.account_chain_ids).
+          pluck(:developer_key_id, :context_type)
+      end
     end
 
     def tool_configs

@@ -22,7 +22,7 @@ module Api::V1::User
   include AvatarHelper
 
   API_USER_JSON_OPTS = {
-    :only => %w(id name).freeze,
+    :only => %w(id name created_at).freeze,
     :methods => %w(sortable_name short_name).freeze
   }.freeze
 
@@ -32,7 +32,9 @@ module Api::V1::User
 
     # pseudonyms for SisPseudonym
     # pseudonyms account for Pseudonym#works_for_account?
-    ActiveRecord::Associations::Preloader.new.preload(users, pseudonyms: :account) if opts.fetch(:accounts, true) && user_json_is_admin?
+    ActiveRecord::Associations::Preloader.new.preload(users, pseudonyms: :account) if opts.fetch(:accounts, true) &&
+      (opts.fetch(:pseudonyms, false) || user_json_is_admin?)
+    
     if preload_email && (no_email_users = users.reject(&:email_cached?)).present?
       # communication_channels for User#email if it is not cached
       ActiveRecord::Associations::Preloader.new.preload(no_email_users, :communication_channels)
@@ -46,7 +48,8 @@ module Api::V1::User
     includes ||= []
     excludes ||= []
     api_json(user, current_user, session, API_USER_JSON_OPTS).tap do |json|
-      enrollment_json_opts = { current_grading_period_scores: includes.include?('current_grading_period_scores') }
+      json[:created_at] = json[:created_at]&.iso8601
+      enrollment_json_opts = {current_grading_period_scores: includes.include?('current_grading_period_scores')}
       if includes.include?('sis_user_id') || (!excludes.include?('pseudonym') && user_json_is_admin?(context, current_user))
         include_root_account = @domain_root_account.trust_exists?
         sis_context = enrollment || @domain_root_account
@@ -261,14 +264,14 @@ module Api::V1::User
       json[:user] = user_json(enrollment.user, user, session, user_includes, @context, nil, []) if includes.include?(:user)
       if includes.include?('locked')
         lockedbysis = enrollment.defined_by_sis?
-        lockedbysis &&= !enrollment.course.account.grants_right?(@current_user, session, :manage_account_settings)
+        lockedbysis &&= !enrollment.course.account.grants_any_right?(@current_user, session, :manage_account_settings, :manage_sis)
         json[:locked] = lockedbysis
       end
       if includes.include?('observed_users') && enrollment.observer? && enrollment.associated_user && !enrollment.associated_user.deleted?
         json[:observed_user] = user_json(enrollment.associated_user, user, session, user_includes, @context, enrollment.associated_user.not_ended_enrollments.all_student.shard(enrollment).where(:course_id => enrollment.course_id))
       end
       if includes.include?('can_be_removed')
-        json[:can_be_removed] = (!enrollment.defined_by_sis? || context.grants_right?(@current_user, session, :manage_account_settings)) &&
+        json[:can_be_removed] = (!enrollment.defined_by_sis? || context.grants_any_right?(@current_user, session, :manage_account_settings, :manage_sis)) &&
                                   enrollment.can_be_deleted_by(@current_user, @context, session)
       end
     end

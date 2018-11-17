@@ -1,12 +1,35 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`renders the RubricManagement component 1`] = `
-"<TabList defaultSelectedIndex={0} variant=\\"simple\\" focus={false}>
-  <TabPanel title=\\"Account Rubrics\\" id={{...}} variant=\\"simple\\" labelledBy={{...}} selected={false} padding=\\"small\\" tabRef={[Function: tabRef]}>
+<TabList
+  defaultSelectedIndex={0}
+  focus={false}
+  variant="simple"
+>
+  <TabPanel
+    id={null}
+    labelledBy={null}
+    padding="small"
+    selected={false}
+    tabRef={[Function]}
+    title="Account Rubrics"
+    variant="simple"
+  >
     <RubricPanel />
   </TabPanel>
-  <TabPanel title=\\"Learning Mastery\\" id={{...}} variant=\\"simple\\" labelledBy={{...}} selected={false} padding=\\"small\\" tabRef={[Function: tabRef]}>
-    <ProficiencyTable focusTab={[Function]} accountId=\\"1\\" />
+  <TabPanel
+    id={null}
+    labelledBy={null}
+    padding="small"
+    selected={false}
+    tabRef={[Function]}
+    title="Learning Mastery"
+    variant="simple"
+  >
+    <ProficiencyTable
+      accountId="1"
+      focusTab={[Function]}
+    />
   </TabPanel>
-</TabList>"
+</TabList>
 `;

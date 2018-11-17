@@ -369,15 +369,17 @@ class Enrollment < ActiveRecord::Base
 
   def other_section_enrollment_exists?
     # If other active sessions that the user is enrolled in exist.
-    self.course.student_enrollments.active.for_user(self.user).where.not(id: self.id).exists?
+    self.course.student_enrollments.where.not(:workflow_state => ['deleted', 'rejected']).for_user(self.user).where.not(id: self.id).exists?
   end
 
   def audit_groups_for_deleted_enrollments
     # did the student cease to be enrolled in a non-deleted state in a section?
     had_section = self.course_section_id_was.present?
-    was_active = (self.workflow_state_was != 'deleted')
+    deleted_states = ['deleted', 'rejected']
+    was_active = !deleted_states.include?(self.workflow_state_was)
+    is_deleted = deleted_states.include?(self.workflow_state)
     return unless had_section && was_active &&
-                  (self.course_section_id_changed? || self.workflow_state == 'deleted')
+                  (self.course_section_id_changed? || is_deleted)
 
     # what section the user is abandoning, and the section they're moving to
     # (if it's in the same course and the enrollment's not deleted)
@@ -389,7 +391,7 @@ class Enrollment < ActiveRecord::Base
 
       # check group deletion criteria if either enrollment is not a deletion
       # or it may be a deletion/unenrollment from a section but not from the course as a whole (still enrolled in another section)
-      if self.workflow_state != 'deleted' || other_section_enrollment_exists?
+      if !is_deleted || other_section_enrollment_exists?
         # don't bother unless the group's category has section restrictions
         next unless group.group_category && group.group_category.restricted_self_signup?
 
@@ -416,7 +418,7 @@ class Enrollment < ActiveRecord::Base
   protected :audit_groups_for_deleted_enrollments
 
   def observers
-    student? ? user.linked_observers.active.linked_through_root_accounts(self.root_account_id) : []
+    student? ? user.linked_observers.active.linked_through_root_account(self.root_account) : []
   end
 
   def create_linked_enrollments
@@ -1032,6 +1034,12 @@ class Enrollment < ActiveRecord::Base
       course_id,
       opts
     )
+  end
+
+  def self.recompute_due_dates_and_scores(user_id)
+    Course.where(:id => StudentEnrollment.where(user_id: user_id).distinct.pluck(:course_id)).each do |course|
+      DueDateCacher.recompute_users_for_course([user_id], course, nil, update_grades: true)
+    end
   end
 
   def self.recompute_final_scores(user_id)

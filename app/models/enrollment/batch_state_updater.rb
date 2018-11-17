@@ -44,7 +44,7 @@ class Enrollment::BatchStateUpdater
     Enrollment.transaction do
       # cache some data before the destroy that is needed after the destroy
       invited_user_ids = Enrollment.where(id: batch, workflow_state: 'invited').distinct.pluck(:user_id)
-      students = Enrollment.of_student_type.where(id: batch).preload(user: :linked_observers).to_a
+      students = Enrollment.of_student_type.where(id: batch).preload({user: :linked_observers}, :root_account).to_a
       students.each{|e| e.workflow_state = 'deleted'; e.readonly!}
       user_course_tuples = Enrollment.where(id: batch).active.select(%i(user_id course_id)).distinct.to_a
       user_ids = Enrollment.where(id: batch).order(:user_id).distinct.pluck(:user_id)
@@ -192,7 +192,7 @@ class Enrollment::BatchStateUpdater
     raise ArgumentError, 'Cannot call with more than 1000 enrollments' if batch.count > 1_000
     Enrollment.transaction do
       EnrollmentState.send_later_if_production(:force_recalculation, batch)
-      students = Enrollment.of_student_type.where(id: batch).preload(user: :linked_observers).to_a
+      students = Enrollment.of_student_type.where(id: batch).preload({user: :linked_observers}, :root_account).to_a
       user_ids = Enrollment.where(id: batch).distinct.pluck(:user_id)
       courses = Course.where(id: Enrollment.where(id: batch).select(:course_id).distinct).to_a
       root_account = courses.first.root_account

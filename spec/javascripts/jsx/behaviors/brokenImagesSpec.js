@@ -16,7 +16,6 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 import $ from 'jquery'
 import { attachErrorHandler, getImagesAndAttach } from 'compiled/behaviors/broken-images'
-import {setTimeout} from 'timers'
 
 let server
 QUnit.module('Broken Images Behavior', {
@@ -28,46 +27,37 @@ QUnit.module('Broken Images Behavior', {
   }
 })
 
-test('on error handler attaches the proper class to images when they are broken and not locked', assert => {
-  const done = assert.async()
+test('on error handler attaches the proper class to images when they are broken and not locked', () => {
+  server = sinon.fakeServer.create()
+  server.respondWith('GET', '/broken_image.jpg', [404, {}, 'Not Found'])
   const $imgElement = $('#borked')
   attachErrorHandler($imgElement)
   $imgElement.triggerHandler('error')
-  setTimeout(() => {
-    ok($imgElement.hasClass('broken-image'))
-    done()
-  }, 100)
+  server.respond()
+  ok($imgElement.hasClass('broken-image'))
+  server.restore()
 })
 
-test('on error handler changes src when the image is locked', assert => {
-  const done = assert.async()
+test('on error handler changes src when the image is locked', () => {
   server = sinon.fakeServer.create()
   server.respondWith('GET', '/broken_image.jpg', [403, {}, 'Forbidden'])
   const $imgElement = $('#borked')
   attachErrorHandler($imgElement)
   $imgElement.triggerHandler('error')
-
-  setTimeout(() => {
-    server.respond()
-    equal($imgElement.attr('src'), '/images/svg-icons/icon_lock.svg')
-    server.restore()
-    done()
-  }, 100)
+  server.respond()
+  equal($imgElement.attr('src'), '/images/svg-icons/icon_lock.svg')
+  server.restore()
 })
 
-test('on error handler sets appropriate alt text indicating the image is locked', assert => {
-  const done = assert.async()
+test('on error handler sets appropriate alt text indicating the image is locked', () => {
   server = sinon.fakeServer.create()
   server.respondWith('GET', '/broken_image.jpg', [403, {}, 'Forbidden'])
   const $imgElement = $('#borked')
   attachErrorHandler($imgElement)
   $imgElement.triggerHandler('error')
-  setTimeout(() => {
-    server.respond()
-    equal($imgElement.attr('alt'), 'Locked image')
-    server.restore()
-    done()
-  }, 100)
+  server.respond()
+  equal($imgElement.attr('alt'), 'Locked image')
+  server.restore()
 })
 
 QUnit.module('getImagesAndAttach', {

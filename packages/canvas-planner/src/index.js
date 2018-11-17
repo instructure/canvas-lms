@@ -72,6 +72,9 @@ const defaultOptions = {
 
 const defaultEnv = {};
 
+const plannerHeaderId = "dashboard_header_container";
+const plannerNewActivityButtonId = "new_activity_button"
+
 function mergeDefaultOptions (options) {
   const newOpts = {...defaultOptions, ...options};
   newOpts.env = {...defaultEnv, ...options.env};
@@ -156,13 +159,9 @@ export function initializePlanner (options) {
   initializeContent(options);
   initializeDateTimeFormatters(options.dateTimeFormatters);
 
-  const stickyElement = document.getElementById('dashboard_header_container');
-  if (stickyElement) {
-    const stickyElementRect = stickyElement.getBoundingClientRect();
-    options.stickyOffset = stickyElementRect.bottom - stickyElementRect.top + 24;
-    dynamicUiManager.setStickyOffset(options.stickyOffset);
-  }
-
+  options.plannerNewActivityButtonId = plannerNewActivityButtonId;
+  dynamicUiManager.setOffsetElementIds(plannerHeaderId, plannerNewActivityButtonId);
+    
   if (options.externalFallbackFocusable) {
     dynamicUiManager.registerAnimatable(
       'item', externalFocusableWrapper(options.externalFallbackFocusable), -1, [specialFallbackFocusId('item')]
@@ -191,7 +190,6 @@ function render (element) {
       <Provider store={store}>
         <PlannerApp
           appRef={app => dynamicUiManager.setApp(app)}
-          stickyOffset={initializedOptions.stickyOffset}
           changeDashboardView={initializedOptions.changeDashboardView}
           plannerActive={plannerActive}
           currentUser={store.getState().currentUser}
@@ -213,6 +211,7 @@ function renderHeader (element, auxElement) {
       <Provider store={store}>
         <PlannerHeader
           stickyZIndex={initializedOptions.stickyZIndex}
+          stickyButtonId={initializedOptions.plannerNewActivityButtonId}
           timeZone={initializedOptions.env.TIMEZONE}
           locale={initializedOptions.env.MOMENT_LOCALE}
           ariaHideElement={ariaHideElement}

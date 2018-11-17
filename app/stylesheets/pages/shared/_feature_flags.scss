@@ -26,7 +26,7 @@ $left-offset:  16px;
 
 #tab-features .alert {
   margin-bottom: 20px;
-  padding: 8px 35px 8px 14px;
+  padding: direction-sides(8px 35px 8px 14px);
 }
 
 .feature-flags {
@@ -41,7 +41,7 @@ $left-offset:  16px;
 .feature-flag {
   border-bottom: 1px solid $border-light;
   line-height: 30px;
-  padding: 6px 6px 6px $left-offset;
+  padding: direction-sides(6px 6px 6px $left-offset);
 
   &:last-child {
     border-bottom: none;

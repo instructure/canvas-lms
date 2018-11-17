@@ -294,7 +294,10 @@ module Importers
        :automatic_peer_reviews, :anonymous_peer_reviews,
        :grade_group_students_individually, :allowed_extensions,
        :position, :peer_review_count,
-       :omit_from_final_grade, :intra_group_peer_reviews, :post_to_sis
+       :omit_from_final_grade, :intra_group_peer_reviews, :post_to_sis,
+       :moderated_grading, :grader_count, :grader_comments_visible_to_graders,
+       :anonymous_grading, :graders_anonymous_to_graders, :grader_names_visible_to_final_grader,
+       :anonymous_instructor_annotations
       ].each do |prop|
         item.send("#{prop}=", hash[prop]) unless hash[prop].nil?
       end

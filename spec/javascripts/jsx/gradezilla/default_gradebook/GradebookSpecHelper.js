@@ -16,6 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import $ from 'jquery';
+
+import DataLoader from 'jsx/gradezilla/DataLoader';
 import Gradebook from 'compiled/gradezilla/Gradebook';
 
 export function createGradebook (options = {}) {
@@ -91,6 +94,20 @@ export function setFixtureHtml ($fixture) {
     </div>
   `;
   /* eslint-enable no-param-reassign */
+}
+
+export function stubDataLoader() {
+  const dataLoaderPromises = {
+    gotAssignmentGroups: $.Deferred(),
+    gotContextModules: $.Deferred(),
+    gotCustomColumnData: $.Deferred(),
+    gotCustomColumns: $.Deferred(),
+    gotStudentIds: $.Deferred(),
+    gotStudents: $.Deferred(),
+    gotSubmissions: $.Deferred()
+  };
+
+  sandbox.stub(DataLoader, 'loadGradebookData').returns(dataLoaderPromises);
 }
 
 export default {

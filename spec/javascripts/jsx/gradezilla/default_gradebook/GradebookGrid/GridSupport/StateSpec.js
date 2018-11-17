@@ -17,9 +17,10 @@
  */
 
 import 'jquery.keycodes'; // used by some SlickGrid editors
-import { Editors, GlobalEditorLock, Grid } from 'vendor/slickgrid';
+import slickgrid from 'vendor/slickgrid';
 import GridSupport from 'jsx/gradezilla/default_gradebook/GradebookGrid/GridSupport';
 
+const { Editors, GlobalEditorLock, Grid } = slickgrid
 const $fixtures = document.getElementById('fixtures');
 
 function createColumns () {

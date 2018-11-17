@@ -23,11 +23,6 @@
 //============================
 $ic-wizard-color-dark-neutral: $ic-color-dark;
 
-.ReactModal__Overlay.CourseWizard__modalOverlay {
-  transition: none;
-  background: transparent;
-}
-
 .ic-wizard-box {
   transition: all 1s $ic-transition;
   width: 100%;
@@ -44,7 +39,7 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   opacity: 0;
   @include breakpoint(desktop) { flex-direction: row; }
 
-  .ReactModal__Overlay.ReactModal__Overlay--after-open & {
+  &.ic-wizard-box--is-open {
     transform: translate3d(0,0,0);
     opacity: 1;
   }
@@ -122,7 +117,7 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   display: flex;
   align-items: center;
   user-select: none;
-  padding: 0 $ic-sp 0 $ic-sp*4;
+  padding: direction-sides(0 $ic-sp 0 $ic-sp*4);
   border-#{direction(left)}: 4px solid transparent;
   background: url("/images/wizard-todo-unchecked.svg") no-repeat $ic-sp 50%;
   background-size: 18px 18px;
@@ -277,7 +272,7 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   opacity: 0;
   transform: translate3d(0,50%,0);
   background: rgba($ic-color-light, 0.9);
-  padding: $ic-sp*4 $ic-sp*2 $ic-sp*2 $ic-sp*2;
+  padding: direction-sides($ic-sp*4 $ic-sp*2 $ic-sp*2 $ic-sp*2);
   box-shadow: 0 1px 4px 1px rgba(black, 0.3);
   text-align: center;
 
@@ -292,7 +287,7 @@ $ic-wizard-color-dark-neutral: $ic-color-dark;
   @include breakpoint(mini-tablet) {
     border-radius: $baseBorderRadius;
   }
-  @include breakpoint(desktop) { padding: $ic-sp*7 $ic-sp*2 $ic-sp*2 $ic-sp*2; }
+  @include breakpoint(desktop) { padding: direction-sides($ic-sp*7 $ic-sp*2 $ic-sp*2 $ic-sp*2); }
 
 }
 
