@@ -57,7 +57,7 @@ export default class DiscussionToolbarView extends View {
 
   initialize() {
     super.initialize(...arguments)
-    return this.model.on('change', this.clearInputs)
+    return this.model.on('change', () => this.clearInputs())
   }
 
   afterRender() {
