@@ -1512,13 +1512,25 @@ QUnit.module('Gradebook Column Order', (suiteHooks) => {
   });
 
   QUnit.module('#freezeTotalGradeColumn', (hooks) => {
+    let server
+    let options
+
     hooks.beforeEach(() => {
-      gradebook = createGradebook();
+      server = sinon.fakeServer.create({ respondImmediately: true })
+      options = { gradebook_column_order_settings_url: 'gradebook_column_order_setting_url' }
+      server.respondWith('POST', options.gradebook_column_order_settings_url, [
+        200, { 'Content-Type': 'application/json' }, '{}'
+      ])
+      gradebook = createGradebook(options);
       gradebook.setColumnOrder({ freezeTotalGrade: false });
       sinon.stub(gradebook, 'saveColumnOrder');
       sinon.stub(gradebook, 'updateGrid');
       sinon.stub(gradebook, 'updateColumnHeaders');
-    });
+    })
+
+    hooks.afterEach(() => {
+      server.restore()
+    })
 
     test('sets the total grade column as frozen', () => {
       gradebook.freezeTotalGradeColumn();
@@ -3435,6 +3447,15 @@ test('optionally sorts by grade in descending order', function () {
 QUnit.module('Gradebook#sortGridRows', {
   setup () {
     this.gradebook = createGradebook();
+    this.server = sinon.fakeServer.create({ respondImmediately: true });
+    const options = { settings_update_url: '/course/1/gradebook_settings' };
+    this.server.respondWith('POST', options.settings_update_url, [
+      200, { 'Content-Type': 'application/json' }, '{}'
+    ]);
+  },
+
+  teardown () {
+    this.server.restore()
   }
 });
 
@@ -4321,12 +4342,12 @@ QUnit.module('Gradebook#gotSubmissionsChunk', function (hooks) {
   });
 });
 
-QUnit.module('Gradebook Assignment Student Visibility', function (hooks) {
+QUnit.module('Gradebook Assignment Student Visibility', function (moduleHooks) {
   let gradebook;
   let allStudents;
   let assignments;
 
-  hooks.beforeEach(function () {
+  moduleHooks.beforeEach(function () {
     gradebook = createGradebook();
 
     allStudents = [{
@@ -4355,7 +4376,17 @@ QUnit.module('Gradebook Assignment Student Visibility', function (hooks) {
     ]);
   });
 
-  QUnit.module('#studentsThatCanSeeAssignment', function () {
+  QUnit.module('#studentsThatCanSeeAssignment', function (hooks) {
+    let saveSettingsStub
+
+    hooks.beforeEach(() => {
+      saveSettingsStub = sinon.stub(gradebook, 'saveSettings')
+    })
+
+    hooks.afterEach(() => {
+      saveSettingsStub.restore()
+    })
+
     test('returns all students when the assignment is visible to everyone', function () {
       gradebook.gotChunkOfStudents(allStudents);
       const students = gradebook.studentsThatCanSeeAssignment('2301');
@@ -4385,27 +4416,42 @@ QUnit.module('Gradebook Assignment Student Visibility', function (hooks) {
   });
 });
 
-QUnit.module('Gradebook#setSortRowsBySetting');
+QUnit.module('Gradebook#setSortRowsBySetting', (hooks) => {
+  let server
+  let options
+  let gradebook
 
-test('sets the "sort rows by" setting', function () {
-  const gradebook = createGradebook();
-  gradebook.setSortRowsBySetting('assignment_201', 'grade', 'descending');
-  const sortRowsBySetting = gradebook.getSortRowsBySetting();
-  equal(sortRowsBySetting.columnId, 'assignment_201');
-  equal(sortRowsBySetting.settingKey, 'grade');
-  equal(sortRowsBySetting.direction, 'descending');
-});
+  hooks.beforeEach(() => {
+    server = sinon.fakeServer.create({ respondImmediately: true })
+    options = { settings_update_url: '/course/1/gradebook_settings' }
+    server.respondWith('POST', options.settings_update_url, [
+      200, { 'Content-Type': 'application/json' }, '{}'
+    ])
+    gradebook = createGradebook(options);
+  })
 
-test('sorts the grid rows after updating the setting', function () {
-  const gradebook = createGradebook();
-  sandbox.stub(gradebook, 'sortGridRows').callsFake(() => {
+  hooks.afterEach(() => {
+    server.restore()
+  })
+
+  test('sets the "sort rows by" setting', function () {
+    gradebook.setSortRowsBySetting('assignment_201', 'grade', 'descending');
     const sortRowsBySetting = gradebook.getSortRowsBySetting();
-    equal(sortRowsBySetting.columnId, 'assignment_201', 'sortRowsBySetting.columnId was set beforehand');
-    equal(sortRowsBySetting.settingKey, 'grade', 'sortRowsBySetting.settingKey was set beforehand');
-    equal(sortRowsBySetting.direction, 'descending', 'sortRowsBySetting.direction was set beforehand');
+    equal(sortRowsBySetting.columnId, 'assignment_201');
+    equal(sortRowsBySetting.settingKey, 'grade');
+    equal(sortRowsBySetting.direction, 'descending');
   });
-  gradebook.setSortRowsBySetting('assignment_201', 'grade', 'descending');
-});
+
+  test('sorts the grid rows after updating the setting', function () {
+    sandbox.stub(gradebook, 'sortGridRows').callsFake(() => {
+      const sortRowsBySetting = gradebook.getSortRowsBySetting();
+      equal(sortRowsBySetting.columnId, 'assignment_201', 'sortRowsBySetting.columnId was set beforehand');
+      equal(sortRowsBySetting.settingKey, 'grade', 'sortRowsBySetting.settingKey was set beforehand');
+      equal(sortRowsBySetting.direction, 'descending', 'sortRowsBySetting.direction was set beforehand');
+    });
+    gradebook.setSortRowsBySetting('assignment_201', 'grade', 'descending');
+  });
+})
 
 QUnit.module('Gradebook#sortRowsWithFunction', {
   setup () {
@@ -4699,10 +4745,17 @@ test('reloads student data after saving settings', function () {
 });
 
 QUnit.module('Gradebook "Enter Grades as" Setting', function (suiteHooks) {
-  let gradebook;
+  let server
+  let options
+  let gradebook
 
-  suiteHooks.beforeEach(function () {
-    gradebook = createGradebook();
+  suiteHooks.beforeEach(() => {
+    options = { settings_update_url: '/course/1/gradebook_settings' }
+    server = sinon.fakeServer.create({ respondImmediately: true })
+    server.respondWith('POST', options.settings_update_url, [
+      200, { 'Content-Type': 'application/json' }, '{}'
+    ])
+    gradebook = createGradebook(options);
     gradebook.setAssignments({
       2301: { id: '2301', grading_type: 'points', name: 'Math Assignment', published: true },
       2302: { id: '2302', grading_type: 'points', name: 'English Assignment', published: false }
@@ -4716,6 +4769,10 @@ QUnit.module('Gradebook "Enter Grades as" Setting', function (suiteHooks) {
       }
     };
   });
+
+  suiteHooks.afterEach(() => {
+    server.restore()
+  })
 
   QUnit.module('#getEnterGradesAsSetting', function () {
     test('returns the setting when stored', function () {
@@ -5358,11 +5415,20 @@ test('sets the raw grade on submission', function () {
   equal(this.submission.rawGrade, '123.45');
 });
 
-QUnit.module('Gradebook#arrangeColumnsBy', {
-  setup () {
-    this.gradebook = createGradebook();
-    this.gradebook.makeColumnSortFn = () => () => 1;
-    this.gradebook.gradebookGrid.grid = {
+QUnit.module('Gradebook#arrangeColumnsBy', (hooks) => {
+  let server
+  let options
+  let gradebook
+
+  hooks.beforeEach(() => {
+    server = sinon.fakeServer.create({ respondImmediately: true })
+    options = { gradebook_column_order_settings_url: '/grade_column_order_settings_url' }
+    server.respondWith('POST', options.gradebook_column_order_settings_url, [
+      200, { 'Content-Type': 'application/json' }, '{}'
+    ])
+    gradebook = createGradebook(options);
+    gradebook.makeColumnSortFn = () => () => 1;
+    gradebook.gradebookGrid.grid = {
       getColumns () { return []; },
       getOptions () {
         return {
@@ -5373,16 +5439,20 @@ QUnit.module('Gradebook#arrangeColumnsBy', {
       setColumns () {},
       setNumberOfColumnsToFreeze () {}
     }
-  }
-});
+  })
 
-test('renders the view options menu', function () {
-  sandbox.stub(this.gradebook, 'renderViewOptionsMenu');
-  sandbox.stub(this.gradebook, 'updateColumnHeaders');
+  hooks.afterEach(() => {
+    server.restore()
+  })
 
-  this.gradebook.arrangeColumnsBy({ sortBy: 'due_date', direction: 'ascending' }, false);
+  test('renders the view options menu', function () {
+    sandbox.stub(gradebook, 'renderViewOptionsMenu');
+    sandbox.stub(gradebook, 'updateColumnHeaders');
 
-  strictEqual(this.gradebook.renderViewOptionsMenu.callCount, 1);
+    gradebook.arrangeColumnsBy({ sortBy: 'due_date', direction: 'ascending' }, false);
+
+    strictEqual(gradebook.renderViewOptionsMenu.callCount, 1);
+  });
 });
 
 QUnit.module('Gradebook#updateCurrentGradingPeriod', {
@@ -8614,10 +8684,21 @@ QUnit.module('Gradebook#hideAnonymousSpeedGraderAlert', (hooks) => {
 });
 
 QUnit.module('#setVisibleGridColumns', (hooks) => {
-  let gradebook;
+  let server
+  let options
+  let gradebook
 
   hooks.beforeEach(() => {
-    gradebook = createGradebook()
+    server = sinon.fakeServer.create({ respondImmediately: true })
+    options = { gradebook_column_order_settings_url: '/grade_column_order_settings_url' }
+    server.respondWith('POST', options.gradebook_column_order_settings_url, [
+      200, { 'Content-Type': 'application/json' }, '{}'
+    ])
+    gradebook = createGradebook(options);
+  })
+
+  hooks.afterEach(() => {
+    server.restore()
   })
 
   test('adds total_grade to frozen columns if it is not included and total grade should be frozen', function () {
@@ -8702,10 +8783,21 @@ QUnit.module('Gradebook#gotAllAssignmentGroups', (hooks) => {
 })
 
 QUnit.module('Gradebook#setAssignmentGroupsLoaded', (hooks) => {
+  let server
+  let options
   let gradebook
 
   hooks.beforeEach(() => {
-    gradebook = createGradebook()
+    server = sinon.fakeServer.create({ respondImmediately: true })
+    options = { settings_update_url: '/course/1/gradebook_settings' }
+    server.respondWith('POST', options.settings_update_url, [
+      200, { 'Content-Type': 'application/json' }, '{}'
+    ])
+    gradebook = createGradebook(options);
+  })
+
+  hooks.afterEach(() => {
+    server.restore()
   })
 
   test('sets contentLoadStates.assignmentGroupsLoaded to true when passed true', () => {
@@ -8721,12 +8813,23 @@ QUnit.module('Gradebook#setAssignmentGroupsLoaded', (hooks) => {
 
 QUnit.module('Gradebook#handleAssignmentMutingChange', (hooks) => {
   let columnId
+  let server
+  let options
   let gradebook
   const sortByStudentNameSettings = { columnId: 'student', settingKey: 'sortable_name', direction: 'ascending' }
 
   hooks.beforeEach(() => {
-    gradebook = createGradebook()
+    server = sinon.fakeServer.create({ respondImmediately: true })
+    options = { settings_update_url: '/course/1/gradebook_settings' }
+    server.respondWith('POST', options.settings_update_url, [
+      200, { 'Content-Type': 'application/json' }, '{}'
+    ])
+    gradebook = createGradebook(options);
     columnId = gradebook.getAssignmentColumnId('2301')
+  })
+
+  hooks.afterEach(() => {
+    server.restore()
   })
 
   test('resets grading', () => {
