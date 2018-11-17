@@ -206,17 +206,19 @@ class OutcomeImportsApiController < ApplicationController
   def body_file
     file_obj = request.body
 
-    def file_obj.set_file_attributes(filename, content_type)
-      @original_filename = filename
-      @content_type = content_type
-    end
+    file_obj.instance_exec do
+      def set_file_attributes(filename, content_type)
+        @original_filename = filename
+        @content_type = content_type
+      end
 
-    def file_obj.content_type
-      @content_type
-    end
+      def content_type
+        @content_type
+      end
 
-    def file_obj.original_filename
-      @original_filename
+      def original_filename
+        @original_filename
+      end
     end
 
     if params[:extension]
