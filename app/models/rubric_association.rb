@@ -227,8 +227,8 @@ class RubricAssociation < ActiveRecord::Base
     # Update/create the association -- this is what ties the rubric to an entity
     update_if_existing = params.delete(:update_if_existing)
     if params[:hide_points] == '1'
-      params.delete(:use_for_grading)
-      params.delete(:hide_score_total)
+      params[:use_for_grading] = '0'
+      params[:hide_score_total] = '0'
     end
     association ||= rubric.associate_with(
       association_object,

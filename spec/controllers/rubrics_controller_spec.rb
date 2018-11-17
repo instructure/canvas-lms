@@ -377,7 +377,7 @@ describe RubricsController do
       put 'update', params: update_params
       @rubric_association.reload
       expect(@rubric_association.hide_points).to eq true
-      expect(@rubric_association.hide_score_total).to eq nil
+      expect(@rubric_association.hide_score_total).to eq false
       expect(@rubric_association.hide_outcome_results).to eq true
     end
 
