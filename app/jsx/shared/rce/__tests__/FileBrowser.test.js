@@ -91,8 +91,8 @@ describe('FileBrowser', () => {
     const wrapper = mount(<FileBrowser { ...getProps() } />)
     const collections = {
       0: {collections: [1]},
-      1: {id: 1, name: 'folder 1', collections: [4], items: []},
-      4: {id: 4, name: 'folder 4', collections: [], items: []},
+      1: {id: 1, name: 'folder 1', collections: [4], items: [], context: '/courses/1'},
+      4: {id: 4, name: 'folder 4', collections: [], items: [], context: '/users/1'},
     }
     wrapper.instance().setState({collections})
     wrapper.update()
@@ -185,10 +185,10 @@ describe('FileBrowser', () => {
       const wrapper = mount(<FileBrowser { ...getProps() } />)
       const collections = {
         0: {collections: [1, 3]},
-        1: {id: 1, collections: [4, 5]},
-        3: {id: 3, collections: [], items: []},
-        4: {id: 4, collections: [], items: []},
-        5: {id: 5, collections: [], items: []}
+        1: {id: 1, collections: [4, 5], context: '/courses/1'},
+        3: {id: 3, collections: [], items: [], context: '/courses/1'},
+        4: {id: 4, collections: [], items: [], context: '/courses/1'},
+        5: {id: 5, collections: [], items: [], context: '/users/1'}
       }
       wrapper.instance().setState({collections})
       wrapper.update()
@@ -209,10 +209,10 @@ describe('FileBrowser', () => {
       const wrapper = mount(<FileBrowser { ...getProps() } />)
       const collections = {
         0: {collections: [1, 3]},
-        1: {id: 1, collections: [4, 5]},
-        3: {id: 3, collections: [], items: []},
-        4: {id: 4, collections: [], items: []},
-        5: {id: 5, collections: [], items: []}
+        1: {id: 1, collections: [4, 5], context: '/courses/1'},
+        3: {id: 3, collections: [], items: [], context: '/courses/1'},
+        4: {id: 4, collections: [], items: [], context: '/courses/1'},
+        5: {id: 5, collections: [], items: [], context: '/users/1'}
       }
       wrapper.instance().setState({collections, openFolders: [1]})
       wrapper.update()
@@ -242,8 +242,8 @@ describe('FileBrowser', () => {
       const wrapper = mount(<FileBrowser { ...getProps() } />)
       const collections = {
         0: {collections: [1]},
-        1: {id: 1, name: 'folder 1', collections: [4], items: []},
-        4: {id: 4, name: 'folder 4', collections: [], items: []},
+        1: {id: 1, name: 'folder 1', collections: [4], items: [], context: '/courses/1'},
+        4: {id: 4, name: 'folder 4', collections: [], items: [], context: '/users/1'},
       }
       wrapper.instance().setState({collections})
       wrapper.update()
@@ -289,8 +289,8 @@ describe('FileBrowser', () => {
       const wrapper = mount(<FileBrowser { ...getProps() } />)
       const collections = {
         0: {collections: [1, 3]},
-        1: {id: 1, collections: [4]},
-        4: {id: 4, collections: [], items: []},
+        1: {id: 1, collections: [4], context: 'courses/1'},
+        4: {id: 4, collections: [], items: [], context: 'users/1'},
       }
       wrapper.instance().setState({collections})
       wrapper.update()
@@ -326,8 +326,8 @@ describe('FileBrowser', () => {
       const wrapper = mount(<FileBrowser { ...getProps() } />)
       const collections = {
         0: {collections: [1]},
-        1: {id: 1, name: 'folder 1', collections: [4], items: []},
-        4: {id: 4, name: 'folder 4', collections: [], items: [], descriptor: 'Locked', locked: true},
+        1: {id: 1, name: 'folder 1', collections: [4], items: [], context: '/courses/1'},
+        4: {id: 4, name: 'folder 4', collections: [], items: [], descriptor: 'Locked', locked: true, context: '/users/1'},
       }
       wrapper.instance().setState({collections})
       wrapper.update()
@@ -361,9 +361,9 @@ describe('FileBrowser', () => {
       const wrapper = mount(<FileBrowser { ...getProps() } />)
       const collections = {
         0: {collections: [1]},
-        1: {id: 1, name: 'folder 1', collections: [4], items: []},
-        4: {id: 4, name: 'folder 4', collections: [5], items: [1]},
-        5: {id: 5, name: 'folder 5', collections: [], items: []}
+        1: {id: 1, name: 'folder 1', collections: [4], items: [], context: '/courses/1'},
+        4: {id: 4, name: 'folder 4', collections: [5], items: [1], context: '/courses/1'},
+        5: {id: 5, name: 'folder 5', collections: [], items: [], context: '/users/1'}
       }
       const items = {1: {id: 1, name: 'old name 1'}}
       wrapper.instance().setState({collections, items})
@@ -422,7 +422,7 @@ describe('FileBrowser', () => {
       const wrapper = mount(<FileBrowser { ...getProps() } />)
       const collections = {
         0: {collections: [1]},
-        1: {id: 1, name: 'folder 1', collections: [], items: []},
+        1: {id: 1, name: 'folder 1', collections: [], items: [], context: '/courses/1'},
       }
       wrapper.instance().setState({collections})
       wrapper.update()
@@ -455,7 +455,7 @@ describe('FileBrowser', () => {
       const wrapper = mount(<FileBrowser { ...getProps() } />)
       const collections = {
         0: {collections: [1]},
-        1: {id: 1, name: 'folder 1', collections: [], items: []},
+        1: {id: 1, name: 'folder 1', collections: [], items: [], context: '/courses/1'},
       }
       wrapper.instance().setState({collections})
       wrapper.update()
@@ -474,9 +474,9 @@ describe('FileBrowser', () => {
       const wrapper = mount(<FileBrowser { ...getProps() } />)
       const collections = {
         0: {collections: [1]},
-        1: {id: 1, name: 'folder 1', collections: [4,5], items: [], canUpload: true, locked: false},
-        4: {id: 4, name: 'folder 4', collections: [], items: [], canUpload: false, locked: false},
-        5: {id: 5, name: 'folder 5', collections: [], items: [], canUpload: true, locked: true}
+        1: {id: 1, name: 'folder 1', collections: [4,5], items: [], canUpload: true, locked: false, context: '/courses/1'},
+        4: {id: 4, name: 'folder 4', collections: [], items: [], canUpload: false, locked: false, context: '/courses/1'},
+        5: {id: 5, name: 'folder 5', collections: [], items: [], canUpload: true, locked: true, context: '/users/1'}
       }
       wrapper.instance().setState({collections})
       wrapper.update()
@@ -493,7 +493,7 @@ describe('FileBrowser', () => {
       const wrapper = mount(<FileBrowser { ...getProps() } />)
       const collections = {
         0: {collections: [1]},
-        1: {id: 1, name: 'folder 1', collections: [], items: [], canUpload: true, locked: false}
+        1: {id: 1, name: 'folder 1', collections: [], items: [], canUpload: true, locked: false, context: '/courses/1'}
       }
       const spy = sinon.spy(wrapper.instance(), 'submitFile')
       wrapper.instance().setState({collections})
@@ -513,7 +513,7 @@ describe('FileBrowser', () => {
       const wrapper = mount(<FileBrowser { ...getProps() } />)
       const collections = {
         0: {collections: [1]},
-        1: {id: 1, name: 'folder 1', collections: [], items: [], canUpload: true, locked: false}
+        1: {id: 1, name: 'folder 1', collections: [], items: [], canUpload: true, locked: false, context: '/courses/1'}
       }
       wrapper.instance().setState({collections})
       wrapper.update()
@@ -533,7 +533,7 @@ describe('FileBrowser', () => {
       const wrapper = mount(<FileBrowser { ...getProps() } />)
       const collections = {
         0: {collections: [1]},
-        1: {id: 1, name: 'folder 1', collections: [], items: [], canUpload: true, locked: false}
+        1: {id: 1, name: 'folder 1', collections: [], items: [], canUpload: true, locked: false, context: '/courses/1'}
       }
       wrapper.instance().setState({collections})
       wrapper.update()
@@ -578,7 +578,7 @@ describe('FileBrowser', () => {
       const wrapper = mount(<FileBrowser { ...getProps() } />)
       const collections = {
         0: {collections: [1]},
-        1: {id: 1, name: 'folder 1', collections: [], items: [], canUpload: true, locked: false}
+        1: {id: 1, name: 'folder 1', collections: [], items: [], canUpload: true, locked: false, context: '/courses/1'}
       }
       const spy = sinon.spy(wrapper.instance(), 'setFailureMessage')
       moxios.stubRequest('/api/v1/folders/1/files', {
