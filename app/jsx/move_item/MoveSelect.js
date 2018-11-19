@@ -179,8 +179,8 @@ export default class MoveSelect extends React.Component {
       I18n.t('Place') :
       I18n.t('Place "%{title}"', { title: this.props.items[0].title })
     return (
-      <Text paragraphMargin="medium 0" weight="bold">{title}</Text>
-    );
+      <Text weight='bold'>{title}</Text>
+    )
   }
 
   render () {
@@ -188,7 +188,7 @@ export default class MoveSelect extends React.Component {
     return (
       <div className="move-select">
         {this.props.moveOptions.groupsLabel &&
-          <Text paragraphMargin="medium 0" weight="bold">{this.props.moveOptions.groupsLabel}</Text>}
+          <Text weight='bold'>{this.props.moveOptions.groupsLabel}</Text>}
         {groups
           ? this.renderSelectGroup()
           : this.renderSelectPosition(siblings)}
