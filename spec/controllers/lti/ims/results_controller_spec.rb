@@ -17,28 +17,33 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/concerns/advantage_services_shared_context')
+require File.expand_path(File.dirname(__FILE__) + '/concerns/advantage_services_shared_examples')
 require_dependency "lti/ims/results_controller"
 
 describe Lti::Ims::ResultsController do
   include_context 'advantage services context'
 
-  let_once(:course) { course_factory(active_course: true) }
-  let_once(:assignment) { assignment_model context: course}
-  let_once(:result) { lti_result_model assignment: assignment }
+  let(:assignment) { assignment_model context: course}
+  let(:context) { course }
+  let(:unknown_context_id) { (Course.maximum(:id) || 0) + 1 }
+  let(:result) { lti_result_model assignment: assignment }
   let(:json) { JSON.parse(response.body) }
   let(:params_overrides) do
     {
-      course_id: course.id,
+      course_id: context_id,
       line_item_id: result.lti_line_item_id
     }
   end
+  let(:scope_to_remove) { 'https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly' }
 
-  describe '#index' do
+  describe '#index action' do
     let(:action) { :index }
 
-    before_once do
+    before do
       8.times { lti_result_model line_item: result.line_item, assignment: assignment }
     end
+
+    it_behaves_like 'advantage services'
 
     it 'returns a collection of results' do
       send_request
@@ -118,6 +123,8 @@ describe Lti::Ims::ResultsController do
   describe '#show' do
     let(:params_overrides) { super().merge(id: result.id) }
     let(:action) { :show }
+
+    it_behaves_like 'advantage services'
 
     it 'returns the result' do
       send_request

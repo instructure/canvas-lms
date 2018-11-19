@@ -133,7 +133,7 @@ module Lti::Ims
     #   The url to the result that was created.
     def create
       update_or_create_result
-      render json: { resultUrl: result_url }
+      render json: { resultUrl: result_url }, content_type: MIME_TYPE
     end
 
     private

@@ -74,6 +74,9 @@ shared_context 'advantage services context' do
   let(:action) { raise 'Override in spec'}
   let(:params_overrides) { {} }
   let(:json) { JSON.parse(response.body).with_indifferent_access }
+  let(:scope_to_remove) { raise 'Override in spec' }
+  let(:http_success_status) { :ok }
+  let(:expected_mime_type) { described_class::MIME_TYPE }
 
   def apply_headers
     request.headers['Authorization'] = "Bearer #{access_token_jwt}" if access_token_jwt
@@ -90,6 +93,14 @@ shared_context 'advantage services context' do
 
   def expect_empty_response
     raise 'Abstract Method'
+  end
+
+  def remove_access_token_scope(default_scopes, to_remove)
+    scopes_to_remove = [to_remove].flatten
+    default_scopes.
+      split(' ').
+      reject { |s| scopes_to_remove.include? s }.
+      join(' ')
   end
 
   def enable_1_3(enableable)

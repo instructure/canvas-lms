@@ -17,15 +17,17 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/concerns/advantage_services_shared_context')
+require File.expand_path(File.dirname(__FILE__) + '/concerns/advantage_services_shared_examples')
 require_dependency "lti/ims/scores_controller"
 
 module Lti::Ims
   RSpec.describe ScoresController do
     include_context 'advantage services context'
 
-    let_once(:line_item) { line_item_model with_resource_link: true }
-    let_once(:user) { student_in_course(course: course, active_all: true).user }
-    let(:course) { line_item.assignment.course }
+    let(:context) { course }
+    let(:unknown_context_id) { (Course.maximum(:id) || 0) + 1 }
+    let(:line_item) { line_item_model with_resource_link: true, course: course }
+    let(:user) { student_in_course(course: course, active_all: true).user }
     let(:line_item_id) { line_item.id }
     let(:result) { lti_result_model line_item: line_item, user: user, scoreGiven: nil, scoreMaximum: nil }
     let(:submission) { nil }
@@ -33,7 +35,7 @@ module Lti::Ims
     let(:access_token_scopes) { 'https://purl.imsglobal.org/spec/lti-ags/scope/score' }
     let(:params_overrides) do
       {
-        course_id: course.id,
+        course_id: context_id,
         line_item_id: line_item_id,
         userId: user.id,
         activityProgress: 'Completed',
@@ -42,8 +44,11 @@ module Lti::Ims
       }
     end
     let(:action) { :create }
+    let(:scope_to_remove) { 'https://purl.imsglobal.org/spec/lti-ags/scope/score' }
 
     describe '#create' do
+      it_behaves_like 'advantage services'
+
       context 'with valid params' do
         it 'returns a valid resultUrl in the body' do
           send_request

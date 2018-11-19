@@ -80,7 +80,7 @@ module Lti::Ims
     #
     # @returns Result
     def index
-      render(json: [], content_type: MIME_TYPE) && return if user.present? && !context.user_is_student?(user)
+      render(json: [], content_type: MIME_TYPE) and return if user.present? && !context.user_is_student?(user)
 
       results = Lti::Result.where(line_item: line_item)
       results = results.where(user: user) if params.key?(:user_id)
@@ -95,8 +95,11 @@ module Lti::Ims
     #
     # @returns Result
     def show
-      render json: Lti::Ims::ResultsSerializer.new(result, line_item_url).as_json, content_type: MIME_TYPE
+      render json: Lti::Ims::ResultsSerializer.new(result, results_url).as_json, content_type: MIME_TYPE
     end
+
+
+    private
 
     def scopes_matcher
       # Spec seems to strongly imply this scope is sufficient. I.e. even tho a Result belongs to a LineItem,
@@ -104,8 +107,6 @@ module Lti::Ims
       # LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE
       self.class.all_of(TokenScopes::LTI_AGS_RESULT_READ_ONLY_SCOPE)
     end
-
-    private
 
     def verify_result_in_line_item
       raise ActiveRecord::RecordNotFound unless result.line_item == line_item
@@ -125,7 +126,7 @@ module Lti::Ims
 
     def results_collection(results)
       results.map do |result|
-        Lti::Ims::ResultsSerializer.new(result, line_item_url).as_json
+        Lti::Ims::ResultsSerializer.new(result, results_url).as_json
       end
     end
   end

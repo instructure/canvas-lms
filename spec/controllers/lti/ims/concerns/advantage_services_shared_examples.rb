@@ -21,7 +21,7 @@ require_dependency "lti/ims/concerns/advantage_services"
 
 shared_examples 'mime_type check' do
   it 'does not return ims mime_type' do
-    expect(response.headers['Content-Type']).not_to include described_class::MIME_TYPE
+    expect(response.headers['Content-Type']).not_to include expected_mime_type
   end
 end
 
@@ -58,7 +58,7 @@ shared_examples_for "advantage services" do
       end
 
       it 'returns 200 and finds the tool associated with the access token\'s developer key, ignoring other the other developer key and its tool' do
-        expect(response).to have_http_status :ok
+        expect(response).to have_http_status http_success_status
         expect(controller.tool).to eq tool
       end
 
@@ -97,19 +97,11 @@ shared_examples_for "advantage services" do
     end
 
     it 'returns correct mime_type' do
-      expect(response.headers['Content-Type']).to include described_class::MIME_TYPE
+      expect(response.headers['Content-Type']).to include expected_mime_type
     end
 
     it 'returns 200 success' do
-      expect(response).to have_http_status :ok
-    end
-
-    it 'returns request url in payload' do
-      expect(json[:id]).to eq request.url
-    end
-
-    it 'returns an empty response' do
-      expect_empty_response
+      expect(response).to have_http_status http_success_status
     end
 
     context 'with unknown context' do
@@ -162,7 +154,7 @@ shared_examples_for "advantage services" do
 
     context 'with no access token scope grant' do
       let(:access_token_scopes) do
-        remove_access_token_scope(super())
+        remove_access_token_scope(super(), scope_to_remove)
       end
 
       it_behaves_like 'mime_type check'
@@ -325,7 +317,7 @@ shared_examples_for "advantage services" do
       # the simple happy-path case.... by default :course and :developer_key are attached directly to the same Account,
       # which has no subaccounts
       it 'returns 200 and finds the correct tool' do
-        expect(response).to have_http_status :ok
+        expect(response).to have_http_status http_success_status
         expect(controller.tool).to eq tool
       end
     end
@@ -357,7 +349,7 @@ shared_examples_for "advantage services" do
       end
 
       it 'returns 200 and walks up account chain to find the correct tool' do
-        expect(response).to have_http_status :ok
+        expect(response).to have_http_status http_success_status
         expect(controller.tool).to eq tool
       end
     end
@@ -389,7 +381,7 @@ shared_examples_for "advantage services" do
       end
 
       it 'returns 200 and walks up account chain to find the correct tool' do
-        expect(response).to have_http_status :ok
+        expect(response).to have_http_status http_success_status
         expect(controller.tool).to eq tool
       end
     end
@@ -421,7 +413,7 @@ shared_examples_for "advantage services" do
       end
 
       it 'returns 200 and finds the tool in the same sub-sub-account as the course' do
-        expect(response).to have_http_status :ok
+        expect(response).to have_http_status http_success_status
         expect(controller.tool).to eq tool
       end
     end
@@ -514,7 +506,7 @@ shared_examples_for "advantage services" do
       end
 
       it 'returns 200 and finds the tool attached directly to the course, ignoring the account-level tool' do
-        expect(response).to have_http_status :ok
+        expect(response).to have_http_status http_success_status
         expect(controller.tool).to eq tool
       end
     end
@@ -523,6 +515,4 @@ shared_examples_for "advantage services" do
     it_behaves_like 'extra developer key and account tool check'
     it_behaves_like 'extra developer key and course tool check'
   end
-
-
 end

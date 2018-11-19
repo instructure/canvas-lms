@@ -17,6 +17,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/concerns/advantage_services_shared_context')
+require File.expand_path(File.dirname(__FILE__) + '/concerns/advantage_services_shared_examples')
 require_dependency "lti/ims/line_items_controller"
 
 module Lti
@@ -24,7 +25,8 @@ module Lti
     RSpec.describe LineItemsController do
       include_context 'advantage services context'
 
-      let(:course) { course_model }
+      let(:context) { course }
+      let(:unknown_context_id) { (Course.maximum(:id) || 0) + 1 }
       let(:resource_link) { resource_link_model(overrides: {resource_link_id: assignment.lti_context_id}) }
       let(:assignment) { assignment_model(course: course) }
       let(:parsed_response_body) { JSON.parse(response.body) }
@@ -32,7 +34,7 @@ module Lti
       let(:tag) { 'some_tag' }
       let(:resource_id) { 'orig-123' }
       let(:score_max) { 50 }
-      let(:course_id) { course.id }
+      let(:scope_to_remove) { 'https://purl.imsglobal.org/spec/lti-ags/scope/lineitem' }
 
       describe '#create' do
         let(:params_overrides) do
@@ -42,10 +44,13 @@ module Lti
             resourceId: resource_id,
             tag: tag,
             ltiLinkId: assignment.lti_context_id,
-            course_id: course_id
+            course_id: context_id
           }
         end
         let(:action) { :create }
+        let(:http_success_status) { :created }
+
+        it_behaves_like 'advantage services'
 
         before do
           resource_link.line_items.create!(
@@ -193,10 +198,12 @@ module Lti
         let(:params_overrides) do
           {
             id: line_item_id,
-            course_id: course_id
+            course_id: context_id
           }
         end
         let(:action) { :update }
+
+        it_behaves_like 'advantage services'
 
         context do
           let(:new_score_maximum) { 88.2 }
@@ -317,10 +324,18 @@ module Lti
         let(:params_overrides) do
           {
             id: line_item_id,
-            course_id: course_id
+            course_id: context_id
           }
         end
         let(:action) { :show }
+        let(:scope_to_remove) do
+          [
+            'https://purl.imsglobal.org/spec/lti-ags/scope/lineitem',
+            'https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly'
+          ]
+        end
+
+        it_behaves_like 'advantage services'
 
         it 'correctly formats the requested line item' do
           send_request
@@ -335,7 +350,7 @@ module Lti
         end
 
         context do
-          let(:course_id) { course_model.id }
+          let(:context_id) { course_model.id }
 
           it 'responds with 404 if the line item is not found in the course' do
             send_request
@@ -353,7 +368,7 @@ module Lti
         end
 
         context do
-          let(:course_id) { Course.last.id + 1 }
+          let(:context_id) { Course.last.id + 1 }
 
           it 'responds with 404 if the course does not exist' do
             send_request
@@ -370,7 +385,7 @@ module Lti
       describe '#index' do
         let(:params_overrides) do
           {
-            course_id: course_id
+            course_id: context_id
           }
         end
         let(:action) { :index }
@@ -403,9 +418,18 @@ module Lti
         let(:line_item_list) do
           parsed_response_body.map { |li| LineItem.find(li['id'].split('/').last) }
         end
+        let(:scope_to_remove) do
+          [
+            'https://purl.imsglobal.org/spec/lti-ags/scope/lineitem',
+            'https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly'
+          ]
+        end
+        let(:expected_mime_type) { described_class::CONTAINER_MIME_TYPE }
+
+        it_behaves_like 'advantage services'
 
         context do
-          let(:course_id) { Course.last.id + 1 }
+          let(:context_id) { Course.last.id + 1 }
 
           it 'responds with 404 if context does not exist' do
             send_request
@@ -487,7 +511,7 @@ module Lti
         let(:line_item_id) { line_item.id }
         let(:params_overrides) do
           {
-            course_id: course_id,
+            course_id: context_id,
             id: line_item_id
           }
         end
