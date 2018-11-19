@@ -40,6 +40,7 @@ class DeveloperKey < ActiveRecord::Base
   before_create :set_visible
   before_save :nullify_empty_icon_url
   before_save :protect_default_key
+  before_save :set_require_scopes
   after_save :clear_cache
   after_update :invalidate_access_tokens_if_scopes_removed!
   after_create :create_default_account_binding
@@ -264,6 +265,11 @@ class DeveloperKey < ActiveRecord::Base
 
   def create_default_account_binding
     owner_account.developer_key_account_bindings.create!(developer_key: self)
+  end
+
+  def set_require_scopes
+    # Prevent RSA keys from having API access
+    self.require_scopes = true if public_jwk.present?
   end
 
   def validate_scopes!

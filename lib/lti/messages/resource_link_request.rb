@@ -96,7 +96,6 @@ module Lti::Messages
       include_claims?(:assignment_and_grade_service) &&
         (@context.is_a?(Course) || @context.is_a?(Group)) &&
         @tool.lti_1_3_enabled? &&
-        @tool.developer_key&.scopes&.present? &&
         (@tool.developer_key.scopes & TokenScopes::LTI_AGS_SCOPES).present?
     end
 
