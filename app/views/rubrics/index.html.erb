@@ -66,7 +66,7 @@
       </span>
       <span class="details">
         <%= t({:one => "1 criterion", :other => "%{count} criteria"}, :count => rubric.criteria.length) %><br/>
-        <%= t('points_possible', {:one => "1 point possible", :other => "%{count} points possible"}, :count => round_if_whole(rubric.points_possible)) %>
+        <%= t('points_possible', {:one => "1 point possible", :other => "%{count} points possible"}, :count => round_if_whole(rubric.points_possible)) unless rubric.points_possible.nil? %>
       </span>
     </li>
   <% end %>

@@ -23,7 +23,7 @@
 // config issues.
 
 class clientAppPlugin {
-  apply (compiler) {
+  apply(compiler) {
     compiler.plugin('normal-module-factory', nmf => {
       nmf.plugin('before-resolve', (result, callback) => {
         let request = result.request
@@ -55,7 +55,10 @@ class clientAppPlugin {
         // Since webpack knows where to find all the dependencies, we can just load
         //  the core canvas jquery plugin directly.
         if (/jquery\/instructure_date_and_time/.test(request)) {
-          request = request.replace(/jquery\/instructure_date_and_time/, 'jquery.instructure_date_and_time')
+          request = request.replace(
+            /jquery\/instructure_date_and_time/,
+            'jquery.instructure_date_and_time'
+          )
         }
 
         let newRequest = request
@@ -66,7 +69,7 @@ class clientAppPlugin {
           // this reaches into it's respective
           // "main" file for the app (client_apps/canvas_quizzes/apps/statistics/js/main)
           // to compile from source (canvas).
-          newRequest = request + '/js/main'
+          newRequest = `${request}/js/main`
         } else if (/^canvas\/vendor\//.test(request)) {
           // client apps would prefix canvas vendor files with "canvas" and map them across.
           // webpack knows where to look for vendor files, so we can ditch the prefix

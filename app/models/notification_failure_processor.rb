@@ -26,7 +26,11 @@ class NotificationFailureProcessor
   POLL_PARAMS = %i(idle_timeout wait_time_seconds visibility_timeout).freeze
   DEFAULT_CONFIG = {
     notification_failure_queue_name: 'notification-service-failures',
-    idle_timeout: 10
+    # stop the loop if no message received for 10s
+    idle_timeout: 10,
+    # stop the loop (and wait for it to process the job again) if we've been running
+    # for this long
+    iteration_high_water: 300
   }.freeze
 
   def self.config
@@ -47,6 +51,11 @@ class NotificationFailureProcessor
 
   def process
     return nil unless self.class.enabled?
+    start_time = Time.now
+    notification_failure_queue.before_request do |_stats|
+      throw :stop_polling if Time.now - start_time > config[:iteration_high_water]
+    end
+
     notification_failure_queue.poll(config.slice(*POLL_PARAMS)) do |failure_summary_json|
       summary = parse_failure_summary(failure_summary_json)
       process_failure_summary(summary) if summary

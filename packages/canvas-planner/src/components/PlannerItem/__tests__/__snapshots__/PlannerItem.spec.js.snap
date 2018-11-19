@@ -268,6 +268,7 @@ exports[`prefers to render feedback if it and the location are available 1`] = `
         <Avatar
           inline={true}
           name="Dr. David Bowman"
+          onImageLoaded={[Function]}
           size="small"
           src="/avatar/is/here/"
           variant="circle"
@@ -2826,6 +2827,7 @@ exports[`renders Note correctly with everything 1`] = `
     <Avatar
       inline={true}
       name="Jane"
+      onImageLoaded={[Function]}
       size="small"
       src="/picture/is/here"
       variant="circle"
@@ -2987,6 +2989,7 @@ exports[`renders Note correctly without Course 1`] = `
     <Avatar
       inline={true}
       name="Jane"
+      onImageLoaded={[Function]}
       size="small"
       src="/picture/is/here"
       variant="circle"
@@ -4586,6 +4589,7 @@ exports[`renders feedback anonymously according to the assignment settings 1`] =
         <Avatar
           inline={true}
           name="?"
+          onImageLoaded={[Function]}
           size="small"
           variant="circle"
         />
@@ -4730,6 +4734,7 @@ exports[`renders feedback if available 1`] = `
         <Avatar
           inline={true}
           name="Boyd Crowder"
+          onImageLoaded={[Function]}
           size="small"
           src="/avatar/is/here/"
           variant="circle"
@@ -4875,6 +4880,7 @@ exports[`renders media feedback if available 1`] = `
         <Avatar
           inline={true}
           name="Howard Stern"
+          onImageLoaded={[Function]}
           size="small"
           src="/avatar/is/here/"
           variant="circle"
@@ -5219,6 +5225,7 @@ exports[`renders user-created Todo correctly 1`] = `
     <Avatar
       inline={true}
       name="Jane"
+      onImageLoaded={[Function]}
       size="small"
       src="/picture/is/here"
       variant="circle"

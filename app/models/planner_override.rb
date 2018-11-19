@@ -69,7 +69,7 @@ class PlannerOverride < ActiveRecord::Base
   end
 
   def associated_assignment_id
-    return self.plannable.id if self.plannable_type == 'Assignment'
+    return self.plannable_id if self.plannable_type == 'Assignment'
     self.plannable.assignment_id if self.plannable.respond_to? :assignment_id
   end
 

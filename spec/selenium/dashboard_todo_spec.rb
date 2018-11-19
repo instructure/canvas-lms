@@ -37,7 +37,7 @@ describe "dashboard" do
       expect(ff("#planner-todosidebar-item-list>li")).to have_size(7)
       fj(".Sidebar__TodoListContainer button:contains('Show All')").click
       wait_for_ajaximations
-      expect(ff("#dashboard-planner-header button")).to have_size(3)
+      expect(ff("#dashboard-planner-header button")).to have_size(4)
     end
 
     it "should display assignments to do in to do list for a student", priority: "1", test_id: 216406 do

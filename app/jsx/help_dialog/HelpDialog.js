@@ -24,7 +24,7 @@ import HelpLinks from './HelpLinks'
 
 class HelpDialog extends React.Component {
   static propTypes = {
-    links: PropTypes.array,
+    links: HelpLinks.propTypes.links,
     hasLoaded: PropTypes.bool,
     onFormSubmit: PropTypes.func
   }

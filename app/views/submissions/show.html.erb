@@ -276,11 +276,18 @@
             <% end %>
             <% submission_comments.each do |comment| %>
               <% if can_do(comment, @current_user, :read) %>
+                <%
+                  author_name = comment_author_name_for(comment)
+                  created_at = datetime_string(comment.created_at)
+                %>
               <div class="comment <%= 'draft' if comment.draft? %>" id="submission_comment_<%= comment.id %>" style="margin-bottom: 10px;">
                 <div class="comment" style="color: #444;">
                   <% if comment.media_comment_id %>
                     <div class="comment_media">
-                      <%= t('media_comment_link', "This is a media comment, *click here to view*.", :wrapper => '<br/><a href="#" class="play_comment_link media-comment">\1</a>.') %>
+                      <%= t(
+                        "This is a media comment, *click here to view*.",
+                        wrapper: "<br/><a data-author='#{author_name}' data-created_at='#{created_at}' href='#' class='play_comment_link media-comment'>\1</a>.")
+                      %>
                       <span class="media_comment_id" style="display: none;"><%= comment.media_comment_id %></span>
                       <div class="media_comment_content">
                       </div>
@@ -298,9 +305,9 @@
                 </div>
                 <div style="text-align: <%= direction('right') %>; font-size: 0.8em; color: #888;">
                   <span class="author_name">
-                    <%= comment_author_name_for(comment) %>
+                    <%= author_name %>
                   </span>,
-                  <span class="posted_at"><%= datetime_string(comment.created_at) %></span>
+                  <span class="posted_at"><%= created_at %></span>
                 </div>
               </div>
               <% end %>

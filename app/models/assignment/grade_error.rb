@@ -20,6 +20,9 @@ class Assignment
   class GradeError < StandardError
     attr_accessor :status_code, :error_code
 
+    PROVISIONAL_GRADE_INVALID_SCORE = "PROVISIONAL_GRADE_INVALID_SCORE".freeze
+    PROVISIONAL_GRADE_MODIFY_SELECTED = "PROVISIONAL_GRADE_MODIFY_SELECTED".freeze
+
     # The following parameters are all optional, and allow for different behavior
     # depending on the type of error.
     #

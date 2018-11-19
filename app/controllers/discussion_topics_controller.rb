@@ -666,6 +666,7 @@ class DiscussionTopicsController < ApplicationController
               :APP_URL => named_context_url(@context, :context_discussion_topic_url, @topic),
               :TOPIC => {
                 :ID => @topic.id,
+                :TITLE => @topic.title,
                 :IS_SUBSCRIBED => @topic.subscribed?(@current_user),
                 :IS_PUBLISHED  => @topic.published?,
                 :CAN_UNPUBLISH => @topic.can_unpublish?,

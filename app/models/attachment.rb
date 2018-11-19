@@ -1834,10 +1834,6 @@ class Attachment < ActiveRecord::Base
     canvadoc.try(:available?)
   end
 
-  def view_inline_ping_url
-    "/#{context_url_prefix}/files/#{self.id}/inline_view"
-  end
-
   def canvadoc_url(user, opts={})
     return unless canvadocable?
     "/api/v1/canvadoc_session?#{preview_params(user, 'canvadoc', opts)}"

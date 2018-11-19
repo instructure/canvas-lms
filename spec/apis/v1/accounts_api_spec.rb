@@ -1086,7 +1086,6 @@ describe "Accounts API", type: :request do
     context "blueprint courses" do
       before :once do
         @a = Account.create!
-        @a.enable_feature! :master_courses
         @mc = course_model :name => 'MasterCourse', :account => @a
         @cc = course_model :name => 'ChildCourse', :account => @a
         @oc = course_model :name => 'OtherCourse', :account => @a

@@ -7,4 +7,5 @@
 
   color: var(--color);
   background: var(--background);
+  white-space: nowrap;
 }

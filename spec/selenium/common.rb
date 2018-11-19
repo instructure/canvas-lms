@@ -16,6 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require "nokogiri"
 require "selenium-webdriver"
 require "socket"
 require "timeout"
@@ -197,6 +198,12 @@ shared_context "in-process server selenium tests" do
 
   # logs everything that showed up in the browser console during selenium tests
   after(:each) do |example|
+    if example.exception
+      html = f('body').attribute('outerHTML')
+      document = Nokogiri::HTML(html)
+      example.metadata[:page_html] = document.to_html
+    end
+
     browser_logs = driver.manage.logs.get(:browser)
 
     if browser_logs.present?
@@ -213,14 +220,14 @@ shared_context "in-process server selenium tests" do
         "Failed to load http://example.com/",
         "Uncaught Error: cannot call methods on timeoutTooltip prior to initialization; attempted to call method 'close'",
         "Failed to load resource",
-        "Request failed with status code 503",
         "Deprecated use of magic jQueryUI widget markup detected",
         "Uncaught SG: Did not receive drive#about kind when fetching import",
         "Failed prop type",
         "isMounted is deprecated. Instead, make sure to clean up subscriptions and pending requests in componentWillUnmount to prevent memory leaks",
         "https://www.gstatic.com/_/apps-viewer/_/js/k=apps-viewer.standalone.en_US",
         "In webpack, loading timezones on-demand is not",
-        "Uncaught RangeError: Maximum call stack size exceeded"
+        "Uncaught RangeError: Maximum call stack size exceeded",
+        "Warning: React does not recognize the `%s` prop on a DOM element."
       ].freeze
 
       javascript_errors = browser_logs.select do |e|

@@ -8,7 +8,7 @@ exports[`renders an empty div 1`] = `
 
 exports[`renders an indicator 1`] = `
 <div
-  className="undefined"
+  className=""
 >
   <Animatable(NewActivityIndicator)
     title="blah"

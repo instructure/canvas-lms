@@ -989,6 +989,14 @@ describe Assignment do
       expect(new_assignment3.title).to eq "Wiki Assignment Copy 3"
     end
 
+    it "does not duplicate grades_published_at" do
+      assignment = @course.assignments.create!(title: "whee", points_possible: 10)
+      assignment.grades_published_at = Time.zone.now
+      assignment.save!
+      new_assignment = assignment.reload.duplicate
+      expect(new_assignment.grades_published_at).to be_nil
+    end
+
     it "should not explode duplicating a mismatched rubric association" do
       assmt = @course.assignments.create!(:title => "assmt", :points_possible => 3)
       rubric = @course.rubrics.new(:title => "rubric")
@@ -1553,6 +1561,60 @@ describe Assignment do
       end
     end
 
+    context "moderated assignment" do
+      let_once(:assignment) do
+        @course.assignments.create!(moderated_grading: true, grader_count: 1, final_grader: @teacher)
+      end
+      let_once(:student) { course_with_user("StudentEnrollment", course: @course, active_all: true, name: "Stu").user }
+      let_once(:ta) { course_with_user("TaEnrollment", course: @course, active_all: true, name: "Ta").user }
+      let(:pg) { @result.first.provisional_grades.find_by!(scorer: ta) }
+
+      before(:each) do
+        @result = assignment.grade_student(student, grade: "10", grader: ta, provisional: true)
+      end
+
+      it "allows for grades to be deleted" do
+        expect{
+          assignment.grade_student(student, grade: "", grader: ta, provisional: true)
+        }.to change{
+          pg.reload.grade
+        }.from("10").to(nil)
+      end
+
+      it "keeps the provisional grader's slot after grade deletion" do
+        assignment.grade_student(student, grade: "10", grader: ta, provisional: true)
+        expect{
+          assignment.grade_student(student, grade: "", grader: ta, provisional: true)
+        }.not_to change{
+          assignment.provisional_moderation_graders.first.slot_taken
+        }
+      end
+
+      it "does not allow grade to be deleted if grade was selected" do
+        selection = assignment.moderated_grading_selections.where(student_id: student.id).first
+        selection.provisional_grade = pg
+        selection.save!
+
+        expect{
+          assignment.grade_student(student, grade: "", grader: ta, provisional: true)
+        }.to raise_error(Assignment::GradeError) do |error|
+          expect(error.error_code).to eq Assignment::GradeError::PROVISIONAL_GRADE_MODIFY_SELECTED
+        end
+      end
+
+      it "does not allow grade to be changed if grade was selected" do
+        selection = assignment.moderated_grading_selections.where(student_id: student.id).first
+        selection.provisional_grade = pg
+        selection.save!
+
+        expect{
+          assignment.grade_student(student, grade: "23", grader: ta, provisional: true)
+        }.to raise_error(Assignment::GradeError) do |error|
+          expect(error.error_code).to eq Assignment::GradeError::PROVISIONAL_GRADE_MODIFY_SELECTED
+        end
+      end
+    end
+
     context 'with an excused assignment' do
       before :once do
         @result = @assignment.grade_student(@user, grader: @teacher, excuse: true)
@@ -1634,7 +1696,7 @@ describe Assignment do
       it 'raises an error if an invalid score is passed for a provisional grade' do
         expect { @assignment.grade_student(@student, grader: @first_teacher, provisional: true, grade: 'bad') }.
           to raise_error(Assignment::GradeError) do |error|
-            expect(error.error_code).to eq 'PROVISIONAL_GRADE_INVALID_SCORE'
+            expect(error.error_code).to eq Assignment::GradeError::PROVISIONAL_GRADE_INVALID_SCORE
           end
       end
 
@@ -3625,11 +3687,11 @@ describe Assignment do
       @assignment.updated_at = Time.at(1220443500) # 3 Sep 2008 12:05pm (UTC)
       res = @assignment.to_ics(in_own_calendar: false)
       expect(res).not_to be_nil
-      expect(res.start.icalendar_tzid).to eq 'UTC'
-      expect(res.start.strftime('%Y-%m-%dT%H:%M:%S')).to eq Time.zone.parse("Sep 3 2008 11:55am").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
-      expect(res.end.icalendar_tzid).to eq 'UTC'
-      expect(res.end.strftime('%Y-%m-%dT%H:%M:%S')).to eq Time.zone.parse("Sep 3 2008 11:55am").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
-      expect(res.dtstamp.icalendar_tzid).to eq 'UTC'
+      expect(res.dtstart.tz_utc).to eq true
+      expect(res.dtstart.strftime('%Y-%m-%dT%H:%M:%S')).to eq Time.zone.parse("Sep 3 2008 11:55am").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
+      expect(res.dtend.tz_utc).to eq true
+      expect(res.dtend.strftime('%Y-%m-%dT%H:%M:%S')).to eq Time.zone.parse("Sep 3 2008 11:55am").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
+      expect(res.dtstamp.tz_utc).to eq true
       expect(res.dtstamp.strftime('%Y-%m-%dT%H:%M:%S')).to eq Time.zone.parse("Sep 3 2008 12:05pm").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
     end
 
@@ -3640,11 +3702,11 @@ describe Assignment do
       @assignment.updated_at = Time.at(1220472300) # 3 Sep 2008 12:05pm (AKDT)
       res = @assignment.to_ics(in_own_calendar: false)
       expect(res).not_to be_nil
-      expect(res.start.icalendar_tzid).to eq 'UTC'
-      expect(res.start.strftime('%Y-%m-%dT%H:%M:%S')).to eq Time.zone.parse("Sep 3 2008 11:55am").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
-      expect(res.end.icalendar_tzid).to eq 'UTC'
-      expect(res.end.strftime('%Y-%m-%dT%H:%M:%S')).to eq Time.zone.parse("Sep 3 2008 11:55am").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
-      expect(res.dtstamp.icalendar_tzid).to eq 'UTC'
+      expect(res.dtstart.tz_utc).to eq true
+      expect(res.dtstart.strftime('%Y-%m-%dT%H:%M:%S')).to eq Time.zone.parse("Sep 3 2008 11:55am").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
+      expect(res.dtend.tz_utc).to eq true
+      expect(res.dtend.strftime('%Y-%m-%dT%H:%M:%S')).to eq Time.zone.parse("Sep 3 2008 11:55am").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
+      expect(res.dtstamp.tz_utc).to eq true
       expect(res.dtstamp.strftime('%Y-%m-%dT%H:%M:%S')).to eq Time.zone.parse("Sep 3 2008 12:05pm").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
     end
 
@@ -7144,6 +7206,149 @@ describe Assignment do
       it 'creates an AnonymousOrModerationEvent with assignment changes when graders_anonymous_to_graders is changed' do
         assignment.update!(graders_anonymous_to_graders: true)
         expect(event.payload).to include('graders_anonymous_to_graders' => [false, true])
+      end
+    end
+
+    describe '#update_line_items' do
+      let(:use_1_3) { true }
+      let(:tool) do
+        course.context_external_tools.create!(
+          consumer_key: 'key',
+          shared_secret: 'secret',
+          name: 'test tool',
+          url: 'http://www.tool.com/launch',
+          settings: { use_1_3: use_1_3 },
+          workflow_state: 'public'
+        )
+      end
+      let(:assignment) do
+        @course.assignments.create!(submission_types: 'external_tool',
+                                    external_tool_tag_attributes: { content: tool },
+                                    **assignment_valid_attributes)
+      end
+
+      shared_examples 'line item and resource link existence check' do
+        it 'has a line item and a resource link referencing the currently bound tool' do
+          expect(assignment.line_items.length).to eq 1
+          expect(assignment.line_items.first.label).to eq assignment.title
+          expect(assignment.line_items.first.score_maximum).to eq assignment.points_possible
+          expect(assignment.line_items.first.resource_link).not_to be_nil
+          expect(assignment.line_items.first.resource_link.resource_link_id).to eq assignment.lti_context_id
+          expect(assignment.line_items.first.resource_link.context_external_tool).to eq tool
+          expect(assignment.external_tool_tag.content).to eq tool
+          expect(assignment.line_items.first.resource_link.line_items.first).to eq assignment.line_items.first
+        end
+      end
+
+      shared_examples 'assignment to line item attribute sync check' do
+        it 'synchronizes assignment title and points_possible changes to the primary line item' do
+          # create a secondary line item (i.e. one that should not be synchronized)
+          previous_title = assignment.title
+          previous_points_possible = assignment.points_possible
+          first_line_item = assignment.line_items.first
+          line_item_two = assignment.line_items.create!(
+            label: previous_title,
+            score_maximum: previous_points_possible,
+            resource_link: first_line_item.resource_link
+          )
+          line_item_two.update_attributes!(created_at: first_line_item.created_at + 1.minute)
+          assignment.title += " edit"
+          assignment.points_possible += 10
+          assignment.save!
+          assignment.reload
+          expect(assignment.line_items.length).to eq 2
+          expect(assignment.line_items.find(&:assignment_line_item?).label).to eq assignment.title
+          expect(assignment.line_items.find(&:assignment_line_item?).score_maximum).to eq assignment.points_possible
+          expect(assignment.line_items.find { |li| !li.assignment_line_item? }.label).to eq previous_title
+          expect(assignment.line_items.find { |li| !li.assignment_line_item? }.score_maximum).to eq previous_points_possible
+        end
+      end
+
+      context 'given an assignment bound to a LTI 1.3 tool' do
+
+        it_behaves_like 'line item and resource link existence check'
+        it_behaves_like 'assignment to line item attribute sync check'
+
+        context 'and the tool binding is changed' do
+          let(:different_tool_use_1_3) { true }
+          let!(:different_tool) do
+            course.context_external_tools.create!(
+              consumer_key: 'key2',
+              shared_secret: 'secret2',
+              name: 'test tool 2',
+              url: 'http://www.tool2.com/launch',
+              settings: { use_1_3: different_tool_use_1_3 },
+              workflow_state: 'public'
+            )
+          end
+
+          before(:each) do
+            assignment.update!(external_tool_tag_attributes: { content: different_tool })
+            assignment.reload
+          end
+
+          shared_examples 'unchanged line item and resource link check' do
+            it 'does not change nor add to the line item nor resource link' do
+              expect(assignment.line_items.length).to eq 1
+              expect(assignment.line_items.first.resource_link.context_external_tool).to eq tool
+              # some sanity checks to make sure the update did what we thought it did
+              expect(different_tool.id).not_to eq tool.id
+              expect(assignment.external_tool_tag.content.id).to eq different_tool.id
+            end
+          end
+
+          # rubocop:disable RSpec/NestedGroups
+          context 'to a different LTI 1.3 tool' do
+            it_behaves_like 'unchanged line item and resource link check'
+            it_behaves_like 'assignment to line item attribute sync check'
+          end
+
+          context 'to a different non-LTI 1.3 tool' do
+            let(:different_tool_use_1_3) { false }
+
+            it_behaves_like 'unchanged line item and resource link check'
+            it_behaves_like 'assignment to line item attribute sync check'
+          end
+          # rubocop:enable RSpec/NestedGroups
+        end
+
+        context 'and the tool binding is abandoned' do
+          it 'does not delete the line item nor resource link' do
+            assignment.update!(submission_types: 'none')
+            assignment.reload
+            expect(assignment.line_items.length).to eq 1
+            expect(assignment.line_items.first.resource_link.context_external_tool).to eq tool
+          end
+
+          it_behaves_like 'assignment to line item attribute sync check'
+        end
+      end
+
+      context 'given an assignment bound to a non-LTI 1.3 tool' do
+        let(:use_1_3) { false }
+
+        it 'does not create line items and resource links' do
+          expect(assignment.line_items).to be_empty
+        end
+      end
+
+      context 'given an assignment not yet bound to a LTI 1.3 tool' do
+        let(:assignment) do
+          @course.assignments.create!(submission_types: 'external_tool',
+                                      **assignment_valid_attributes)
+        end
+
+        it 'initially has no line items nor resource links' do
+          expect(assignment.line_items).to be_empty
+        end
+
+        context 'but when a LTI 1.3 tool is subsequently added' do
+          before do
+            assignment.update!(external_tool_tag_attributes: { content: tool })
+          end
+
+          it_behaves_like 'line item and resource link existence check'
+        end
       end
     end
   end

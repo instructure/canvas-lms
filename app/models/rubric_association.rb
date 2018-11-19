@@ -321,7 +321,8 @@ class RubricAssociation < ActiveRecord::Base
         if !rating[:description] || rating[:description].empty?
           rating[:description] = cached_description
         end
-        if rating[:comments] && !rating[:comments].empty? && data[:save_comment] == '1'
+        save_comment = data[:save_comment] == '1' && params[:assessment_type] != 'peer_review'
+        if rating[:comments] && !rating[:comments].empty? && save_comment
           self.summary_data ||= {}
           self.summary_data[:saved_comments] ||= {}
           self.summary_data[:saved_comments][criterion.id.to_s] ||= []

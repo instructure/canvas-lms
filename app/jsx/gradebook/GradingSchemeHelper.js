@@ -18,9 +18,13 @@
 
 import round from 'compiled/util/round'
 
-export function gradeToScore(grade, gradingScheme) {
+function indexOfGrade(grade, gradingScheme) {
   const cleanGrade = `${grade}`.trim().toLowerCase()
-  const index = gradingScheme.findIndex(entry => entry[0].toLowerCase() === cleanGrade)
+  return gradingScheme.findIndex(entry => entry[0].toLowerCase() === cleanGrade)
+}
+
+export function gradeToScoreUpperBound(grade, gradingScheme) {
+  const index = indexOfGrade(grade, gradingScheme)
 
   if (index === -1) {
     // if the given grade is not in the scheme, return null
@@ -43,6 +47,19 @@ export function gradeToScore(grade, gradingScheme) {
   }
 
   return round(nextHigherSchemeValue * 100 - percentageOffset, 2)
+}
+
+export function gradeToScoreLowerBound(grade, gradingScheme) {
+  const index = indexOfGrade(grade, gradingScheme)
+
+  if (index === -1) {
+    // if the given grade is not in the scheme, return null
+    return null
+  }
+
+  const matchingSchemeValue = gradingScheme[index][1]
+
+  return round(matchingSchemeValue * 100, 2)
 }
 
 export function scoreToGrade(score, gradingScheme) {

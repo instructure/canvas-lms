@@ -64,6 +64,7 @@ class ObserverAlert < ActiveRecord::Base
       for_enrollments(Enrollment.all_active_or_pending).
       missing.
       merge(Assignment.submittable).
+      merge(Assignment.published).
       where('cached_due_date > ?', 1.day.ago).
       where("observer_alerts.id IS NULL")
 

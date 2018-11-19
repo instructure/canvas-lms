@@ -48,6 +48,7 @@ test('els config', function() {
     static initClass() {
       this.prototype.els = {'.foo': '$bar'}
     }
+
     template() {
       return "<div class='foo'>foo</div>"
     }
@@ -103,6 +104,7 @@ test('child views', function() {
       this.optionProperty(this, 'fart')
       this.child('childView', '#child')
     }
+
     template() {
       return "<div id='child'></div>"
     }
@@ -149,12 +151,14 @@ test('data-bind', function() {
         '#title': '$title'
       }
     }
+
     template({name, title}) {
       return `\
 <i id='name' data-bind='name'>${name}</i>
 <i id='title' data-bind='title'>${title}</i>\
 `
     }
+
     format(attr, value) {
       if (attr === 'title') {
         return 'formatted'
@@ -235,6 +239,7 @@ test('View.mixin', 3, function() {
       this.prototype.events = {'click .baz': 'baz'}
       this.mixin(mixin1, mixin2)
     }
+
     baz() {
       ok(true, 'called prototype method baz')
     }
@@ -302,6 +307,7 @@ test('View.mixin with compound mixins', function() {
     static initClass() {
       this.mixin(mixin2, mixin3)
     }
+
     afterRender() {
       return super.afterRender(...arguments) && afterRenderFoo()
     }
@@ -327,6 +333,7 @@ test('View.mixin with compound mixins', function() {
     static initClass() {
       this.mixin(mixin6, mixin5)
     }
+
     afterRender() {
       return super.afterRender(...arguments) && afterRenderBar()
     }

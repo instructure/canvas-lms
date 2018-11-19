@@ -79,8 +79,8 @@ module Lti::Ims::Concerns
       before_action(
         :verify_environment,
         :verify_access_token,
-        :verify_developer_key,
         :verify_context,
+        :verify_developer_key,
         :verify_tool,
         :verify_tool_permissions,
         :verify_tool_features,
@@ -105,12 +105,19 @@ module Lti::Ims::Concerns
         end
       end
 
-      def verify_developer_key
-        render_error("Unknown or inactive Developer Key", :unauthorized) unless developer_key&.active?
-      end
-
       def verify_context
         render_error("Context not found", :not_found) if context.blank?
+      end
+
+      def verify_developer_key
+        unless developer_key&.active?
+          render_error("Unknown or inactive Developer Key", :unauthorized)
+          return
+        end
+        unless context&.account.present? && developer_key.binding_on_in_account?(context.account)
+          render_error("Invalid Developer Key", :unauthorized)
+          return
+        end
       end
 
       def verify_tool

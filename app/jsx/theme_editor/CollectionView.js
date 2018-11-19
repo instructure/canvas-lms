@@ -45,7 +45,6 @@ export default class CollectionView extends React.Component {
   }
 
   state = {
-    newThemeModalIsOpen: false,
     brandConfigBeingDeleted: null
   }
 
@@ -157,7 +156,9 @@ export default class CollectionView extends React.Component {
         showMultipleCurrentThemesMessage={
           isActiveBrandConfig && this.multipleThemesReflectActiveOne()
         }
-        getVariable={this.brandVariableValue.bind(this, sharedConfig.brand_config)}
+        getVariable={variableName =>
+          this.brandVariableValue(sharedConfig.brand_config, variableName)
+        }
         open={onClick}
         isDeletable={this.isDeletable(sharedConfig)}
         isBeingDeleted={this.state.brandConfigBeingDeleted === sharedConfig}

@@ -1230,22 +1230,19 @@ class ApplicationController < ActionController::Base
     # or it's not an update to an already-existing page_view.  We check to make sure
     # it's not an update because if the page_view already existed, we don't want to
     # double-count it as multiple views when it's really just a single view.
-    if @accessed_asset && (@accessed_asset[:level] == 'participate' || !@page_view_update)
-      @access = AssetUserAccess.where(user_id: user.id, asset_code: @accessed_asset[:code]).first_or_initialize
-      @accessed_asset[:level] ||= 'view'
-      @access.log @context, @accessed_asset
+    return unless @accessed_asset && (@accessed_asset[:level] == 'participate' || !@page_view_update)
+    @access = AssetUserAccess.log(user, @context, @accessed_asset) if @context
 
-      if @page_view.nil? && page_views_enabled? && %w{participate submit}.include?(@accessed_asset[:level])
-        generate_page_view(user)
-      end
-
-      if @page_view
-        @page_view.participated = %w{participate submit}.include?(@accessed_asset[:level])
-        @page_view.asset_user_access = @access
-      end
-
-      @page_view_update = true
+    if @page_view.nil? && page_views_enabled? && %w{participate submit}.include?(@accessed_asset[:level])
+      generate_page_view(user)
     end
+
+    if @page_view
+      @page_view.participated = %w{participate submit}.include?(@accessed_asset[:level])
+      @page_view.asset_user_access = @access
+    end
+
+    @page_view_update = true
   end
 
   def log_gets
@@ -1581,6 +1578,7 @@ class ApplicationController < ActionController::Base
             launch_url: @resource_url,
             link_code: @opaque_id,
             overrides: {'resource_link_title' => @resource_title},
+            domain: @domain_root_account&.domain
         }
         variable_expander = Lti::VariableExpander.new(@domain_root_account, @context, self,{
                                                         current_user: @current_user,
@@ -2338,6 +2336,7 @@ class ApplicationController < ActionController::Base
 
     ctx[:hostname] = request.host
     ctx[:user_agent] = request.headers['User-Agent']
+    ctx[:client_ip] = request.remote_ip
     ctx[:producer] = 'canvas'
 
     StringifyIds.recursively_stringify_ids(ctx)

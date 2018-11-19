@@ -67,7 +67,7 @@ test("hits the group url", () => {
 
   const spy = sandbox.spy(axios, 'post')
   view.uploadFileFromUrl({}, model)
-  ok(spy.calledWith('/api/v1/groups/2/files'))
+  ok(spy.calledWith('/api/v1/groups/2/files?assignment_id=24'))
 })
 
 test("sends the eula agreement timestamp to the submission endpoint", () => {

@@ -155,10 +155,7 @@ module DashboardHelper
       presenter.to_h
     end
 
-    if @domain_root_account.feature_enabled?(:dashcard_reordering)
-      mapped = mapped.sort_by {|h| h[:position] || ::CanvasSort::Last}
-    end
-    mapped
+    mapped.sort_by {|h| h[:position] || ::CanvasSort::Last}
   end
 
 end

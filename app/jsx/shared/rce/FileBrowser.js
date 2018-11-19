@@ -190,10 +190,11 @@ class FileBrowser extends React.Component {
 
   formatFileInfo (apiFile, opts = {}) {
     const { collections } = this.state
+    const context = collections[apiFile.folder_id].context
     const file = {
       id: apiFile.id,
       name: apiFile.display_name,
-      src: `${collections[apiFile.folder_id].context}/files/${apiFile.id}/preview`,
+      src: `${context}/files/${apiFile.id}/preview${context.includes('user') ? `?verifier=${apiFile.uuid}` : ''}`,
       alt: apiFile.display_name,
       ...opts
     }

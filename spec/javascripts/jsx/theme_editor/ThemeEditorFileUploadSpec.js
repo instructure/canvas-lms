@@ -87,7 +87,7 @@ test('hasUserInput', () => {
 })
 
 test('handleFileChanged', function() {
-  var expected = {}
+  const expected = {}
   sandbox.stub(window.URL, 'createObjectURL').returns(expected)
   const component = ReactDOM.render(<ThemeEditorFileUpload {...props} />, elem)
   sandbox.spy(component, 'setState')

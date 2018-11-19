@@ -79,15 +79,9 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   #
   # @returns ToolConfiguration
   def create
-    tool_config = Lti::ToolConfiguration.create!(
-      developer_key: DeveloperKey.create!(account: account),
-      settings: tool_configuration_params[:settings],
-      settings_url: tool_configuration_params[:settings_url],
-      disabled_placements: tool_configuration_params[:disabled_placements],
-      custom_fields: tool_configuration_params[:custom_fields]
-    )
+    tool_config = Lti::ToolConfiguration.create_tool_and_key!(account, tool_configuration_params)
     update_developer_key!(tool_config)
-    render json: tool_config
+    render json: Lti::ToolConfigurationSerializer.new(tool_config)
   end
 
   # @API Update Tool configuration
@@ -135,7 +129,7 @@ class Lti::ToolConfigurationsApiController < ApplicationController
     )
     update_developer_key!(tool_config)
 
-    render json: tool_config
+    render json: Lti::ToolConfigurationSerializer.new(tool_config)
   end
 
   # @API Show Tool configuration
@@ -143,7 +137,7 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   #
   # @returns ToolConfiguration
   def show
-    render json: developer_key.tool_configuration
+    render json: Lti::ToolConfigurationSerializer.new(developer_key.tool_configuration)
   end
 
   # @API Show Tool configuration
@@ -187,6 +181,6 @@ class Lti::ToolConfigurationsApiController < ApplicationController
 
   def developer_key_params
     return {} unless params.key? :developer_key
-    params.require(:developer_key).permit(:name, :email, :notes, :test_cluster_only, :require_scopes, scopes: [])
+    params.require(:developer_key).permit(:name, :email, :notes, :redirect_uris, :test_cluster_only, :require_scopes, scopes: [])
   end
 end

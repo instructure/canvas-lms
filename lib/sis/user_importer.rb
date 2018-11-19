@@ -124,7 +124,7 @@ module SIS
           if pseudo
             if pseudo.sis_user_id && pseudo.sis_user_id != user_row.user_id
               message = I18n.t("An existing Canvas user with the SIS ID %{user_id} has already claimed %{other_user_id}'s user_id requested login information, skipping", user_id: pseudo.sis_user_id, other_user_id: user_row.user_id)
-              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row)
+              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row_info)
               next
             end
             if pseudo_by_login && (pseudo != pseudo_by_login && status_is_active ||
@@ -132,7 +132,7 @@ module SIS
               id_message = pseudo_by_login.sis_user_id ? 'SIS ID' : 'Canvas ID'
               user_id = pseudo_by_login.sis_user_id || pseudo_by_login.user_id
               message = I18n.t("An existing Canvas user with the %{user_id} has already claimed %{other_user_id}'s user_id requested login information, skipping", user_id: "#{id_message} #{user_id.to_s}", other_user_id: user_row.user_id)
-              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row)
+              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row_info)
               next
             end
 
@@ -164,7 +164,7 @@ module SIS
           if !status_is_active && !user.new_record?
             if user.id == @batch&.user_id
               message = "Can't remove yourself user_id '#{user_row.user_id}'"
-              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row)
+              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row_info)
               next
             end
 
@@ -187,7 +187,7 @@ module SIS
             end
             unless (pseudo.authentication_provider = @authentication_providers[user_row.authentication_provider_id])
               message = "unrecognized authentication provider #{user_row.authentication_provider_id} for #{user_row.user_id}, skipping"
-              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row)
+              @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row_info)
               next
             end
           else
@@ -200,7 +200,7 @@ module SIS
             id_message = pseudo_by_integration.sis_user_id ? 'SIS ID' : 'Canvas ID'
             user_id = pseudo_by_integration.sis_user_id || pseudo_by_integration.user_id
             message = I18n.t("An existing Canvas user with the %{user_id} has already claimed %{other_user_id}'s requested integration_id, skipping", user_id: "#{id_message} #{user_id.to_s}", other_user_id: user_row.user_id)
-            @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row)
+            @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row_info)
             next
           end
           pseudo.integration_id = user_row.integration_id if user_row.integration_id.present?
@@ -251,14 +251,14 @@ module SIS
               end
             end
           rescue ImportError
-            @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row)
+            @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row_info)
             next
           rescue => e
             # something broke
             error = Canvas::Errors.capture_exception(:sis_import, e)
             er = error[:error_report]
             message = generate_user_warning("Something broke with this user. Contact Support with ErrorReport id: #{er}", user_row.user_id, user_row.login_id)
-            @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, backtrace: e.backtrace, row_info: user_row)
+            @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, backtrace: e.backtrace, row_info: user_row.row_info)
             next
           end
 
@@ -333,7 +333,7 @@ module SIS
             end
           elsif user_row.email.present? && EmailAddressValidator.valid?(user_row.email) == false
             message = "The email address associated with user '#{user_row.user_id}' is invalid (email: '#{user_row.email}')"
-            @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row)
+            @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row_info)
             next
           end
 

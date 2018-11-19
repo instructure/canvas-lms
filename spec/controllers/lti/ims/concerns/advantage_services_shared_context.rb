@@ -22,7 +22,11 @@ shared_context 'advantage services context' do
   let_once(:root_account) do
     enable_1_3(Account.default)
   end
-  let_once(:developer_key) { DeveloperKey.create!(account: root_account) }
+  let_once(:developer_key) do
+    dk = DeveloperKey.create!(account: root_account)
+    dk.developer_key_account_bindings.first.update! workflow_state: DeveloperKeyAccountBinding::ON_STATE
+    dk
+  end
 
   let(:access_token_scopes) do
     %w(https://purl.imsglobal.org/spec/lti-ags/scope/lineitem

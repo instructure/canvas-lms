@@ -18,7 +18,7 @@
 
 require 'aws-sdk-s3'
 require 'aws-sdk-sqs'
-require File.expand_path('../configurable_timeout', __FILE__)
+require_relative 'configurable_timeout'
 
 module IncomingMailProcessor
   class SqsMailbox
@@ -46,8 +46,17 @@ module IncomingMailProcessor
     end
 
     def each_message(opts={})
+      start_time = Time.now
+      iteration_high_water = config[:iteration_high_water] || 300
+      @incoming_mail_queue.before_request do |_stats|
+        throw :stop_polling if Time.now - start_time > iteration_high_water
+      end
+
+      poll_params = config.slice(*POLL_PARAMS)
+      poll_params[:idle_timeout] ||= 10
+
       # stride and offset opts are ignored. queues safely handle simultaneous readers inherently
-      @incoming_mail_queue.poll(config.slice(*POLL_PARAMS)) do |msg|
+      @incoming_mail_queue.poll(poll_params) do |msg|
         # We don't really have a message id. The message object is how we refer to a message, so return that
         yield msg, raw_contents(msg)
       end # Messages are deleted as the block exits normally

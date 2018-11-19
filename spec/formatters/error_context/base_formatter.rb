@@ -174,6 +174,10 @@ module ErrorContext
       Rails.logger.captured_messages
     end
 
+    def page_html
+      example.metadata[:page_html] || 'Page HTML was not captured.'
+    end
+
     def capture_screenshot?
       selenium? && !SeleniumDriverSetup.saucelabs_test_run?
     end

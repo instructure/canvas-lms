@@ -25,6 +25,7 @@ import Heading from '@instructure/ui-elements/lib/components/Heading';
 import Text from '@instructure/ui-elements/lib/components/Text';
 import View from '@instructure/ui-layout/lib/components/View';
 import { string } from 'prop-types';
+import { sizeShape } from '../plannerPropTypes';
 import styles from './styles.css';
 import theme from './theme.js';
 import { getShortDate } from '../../utilities/dateUtils';
@@ -36,7 +37,11 @@ export class EmptyDays extends Component {
     day: string.isRequired,
     endday: string.isRequired,
     timeZone: string.isRequired,
+    responsiveSize: sizeShape,
   };
+  static defualtProps = {
+    responsiveSize: 'large',
+  }
 
   renderDate (start, end) {
     let dateString;
@@ -58,20 +63,21 @@ export class EmptyDays extends Component {
     const end = moment.tz(this.props.endday, this.props.timeZone).endOf('day');
     const includesToday = (now.isSame(start, 'day') || now.isAfter(start, 'day')) &&
                           (now.isSame(end, 'day')   || now.isBefore(end, 'day'));
+    const clazz = classnames(styles.root, styles[this.props.responsiveSize], 'planner-empty-days', {'planner-today': includesToday});
 
     return (
-      <div className={classnames(styles.root, 'planner-empty-days', {'planner-today': includesToday})} >
+      <div className={clazz} >
           <Heading border={'bottom'}>
             {this.renderDate(start, end)}
           </Heading>
-          <View as="div" padding="small 0 0 0">
+          <div className={styles.nothingPlannedContent}>
             <GroupedDates role="img" aria-hidden="true" />
             <div className={styles.nothingPlannedContainer}>
               <div className={styles.nothingPlanned}>
                 <Text size="large">{formatMessage('Nothing Planned Yet')}</Text>
               </div>
             </div>
-          </View>
+          </div>
       </div>
     );
   }

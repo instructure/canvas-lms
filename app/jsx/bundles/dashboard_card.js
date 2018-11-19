@@ -18,7 +18,6 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import DashboardCardBox from '../dashboard_card/DashboardCardBox'
 import getDroppableDashboardCardBox from '../dashboard_card/getDroppableDashboardCardBox'
 import axios from 'axios'
 
@@ -26,17 +25,17 @@ let promiseToGetDashboardCards
 
 const sessionStorageKey = `dashcards_for_user_${ENV && ENV.current_user_id}`
 
-export default function loadCardDashboard () {
-  const Box = ENV.DASHBOARD_REORDERING_ENABLED ? getDroppableDashboardCardBox() : DashboardCardBox
+export default function loadCardDashboard() {
+  const Box = getDroppableDashboardCardBox()
   const dashboardContainer = document.getElementById('DashboardCard_Container')
 
   function render(dashboardCards) {
     ReactDOM.render(
       <Box
         courseCards={dashboardCards}
-        reorderingEnabled={ENV.DASHBOARD_REORDERING_ENABLED}
         hideColorOverlays={ENV.PREFERENCES.hide_dashcard_color_overlays}
-      />, dashboardContainer
+      />,
+      dashboardContainer
     )
   }
 
@@ -47,7 +46,7 @@ export default function loadCardDashboard () {
 
   if (!promiseToGetDashboardCards) {
     promiseToGetDashboardCards = axios.get('/dashboard/dashboard_cards').then(({data}) => data)
-    promiseToGetDashboardCards.then((dashboardCards) =>
+    promiseToGetDashboardCards.then(dashboardCards =>
       sessionStorage.setItem(sessionStorageKey, JSON.stringify(dashboardCards))
     )
   }

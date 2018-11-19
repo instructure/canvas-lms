@@ -23,8 +23,6 @@ describe "master courses - child courses - wiki page locking" do
   include_context "blueprint courses files context"
 
   before :once do
-    Account.default.enable_feature!(:master_courses)
-
     @copy_from = course_factory(:active_all => true)
     @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
     @original_page = @copy_from.wiki_pages.create!(:title => "blah", :body => "bloo")

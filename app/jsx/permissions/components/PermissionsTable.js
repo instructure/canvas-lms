@@ -22,7 +22,7 @@ import {arrayOf, func} from 'prop-types'
 import {connect} from 'react-redux'
 import $ from 'jquery'
 // For screenreaderFlashMessageExclusive  Maybe there's a better way
-import 'compiled/jquery.rails_flash_notifications' // eslint-disable-line
+import 'compiled/jquery.rails_flash_notifications'
 
 import Link from '@instructure/ui-elements/lib/components/Link'
 import Text from '@instructure/ui-elements/lib/components/Text'
@@ -105,7 +105,7 @@ export default class PermissionsTable extends Component {
   renderTopHeader() {
     return (
       <tr className="ic-permissions__top-header">
-        <th className="ic-permissions__corner-stone">
+        <th scope="col" className="ic-permissions__corner-stone">
           <span className="ic-permission-corner-text">
             <Text weight="bold" size="small">
               {I18n.t('Permissions')}
@@ -163,7 +163,6 @@ export default class PermissionsTable extends Component {
             </button>
             */}
             <View margin="small">
-              {/* eslint-disable-next-line */}
               <Link
                 as="button"
                 onClick={() => this.props.setAndOpenPermissionTray(perm)}

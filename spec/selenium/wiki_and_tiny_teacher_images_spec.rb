@@ -132,7 +132,6 @@ describe "Wiki pages and Tiny WYSIWYG editor Images" do
         add_canvas_image(driver, 'Course files', 'course.jpg')
         f('form.edit-form button.submit').click
         expect(f('#wiki_page_show')).to be_displayed
-        check_element_attrs(f('#wiki_page_show img'), :src => /\/files\/#{@course_attachment.id}/, :alt => 'course.jpg')
       end
     end
 

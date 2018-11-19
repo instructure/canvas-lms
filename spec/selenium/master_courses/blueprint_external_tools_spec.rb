@@ -21,8 +21,6 @@ describe "master courses - child courses - external tool locking" do
   include_context "in-process server selenium tests"
 
   before :once do
-    Account.default.enable_feature!(:master_courses)
-
     @copy_from = course_factory(active_all: true)
     @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
     attributes = {name: "new tool", consumer_key: "key",

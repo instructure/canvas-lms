@@ -18,21 +18,33 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import timezone from 'timezone'
+import newYork from 'timezone/America/New_York'
 
 import AssessmentSummary from 'jsx/speed_grader/AssessmentAuditTray/components/AssessmentSummary'
+import {overallAnonymityStates} from 'jsx/speed_grader/AssessmentAuditTray/AuditTrailHelpers'
+
+const {FULL, NA, PARTIAL} = overallAnonymityStates
 
 QUnit.module('AssessmentSummary', suiteHooks => {
   let $container
   let props
+  let timezoneSnapshot
 
   suiteHooks.beforeEach(() => {
     $container = document.body.appendChild(document.createElement('div'))
 
+    timezoneSnapshot = timezone.snapshot()
+    timezone.changeZone(newYork, 'America/New_York')
+
     props = {
+      anonymityDate: new Date('2015-04-04T19:00:00.000Z'),
       assignment: {
-        gradesPublishedAt: '2015-05-04T12:00:00.000Z',
+        gradesPublishedAt: '2015-05-04T16:00:00.000Z',
         pointsPossible: 10
       },
+      finalGradeDate: new Date('2015-04-18T17:00:00.000Z'),
+      overallAnonymity: FULL,
       submission: {
         score: 9.5
       }
@@ -42,6 +54,7 @@ QUnit.module('AssessmentSummary', suiteHooks => {
   suiteHooks.afterEach(() => {
     ReactDOM.unmountComponentAtNode($container)
     $container.remove()
+    timezone.restore(timezoneSnapshot)
   })
 
   function renderComponent() {
@@ -83,19 +96,110 @@ QUnit.module('AssessmentSummary', suiteHooks => {
       renderComponent()
       ok($container.textContent.includes('–/10'))
     })
+
+    test('displays the "final grade" date from the audit trail', () => {
+      renderComponent()
+      const $time = $container.querySelector('#audit-tray-final-grade time')
+      equal($time.getAttribute('datetime'), '2015-04-18T17:00:00.000Z')
+    })
+
+    test('includes the time on the visible date', () => {
+      renderComponent()
+      const $time = $container.querySelector('#audit-tray-final-grade time')
+      ok($time.textContent.includes('1pm'))
+    })
   })
 
   QUnit.module('"Posted to student"', () => {
     test('displays the "grades published" date from the assignment', () => {
       renderComponent()
-      const $time = $container.querySelector('time')
+      const $time = $container.querySelector('#audit-tray-grades-posted time')
       equal($time.getAttribute('datetime'), props.assignment.gradesPublishedAt)
     })
 
     test('includes the time on the visible date', () => {
       renderComponent()
-      const $time = $container.querySelector('time')
+      const $time = $container.querySelector('#audit-tray-grades-posted time')
       ok($time.textContent.includes('12pm'))
+    })
+  })
+
+  QUnit.module('"Overall Anonymity"', () => {
+    let $description
+    let $label
+
+    function getOverallAnonymityLabel() {
+      return $container.querySelector('#audit-tray-overall-anonymity-label')
+    }
+
+    function getOverallAnonymityDescription() {
+      return $container.querySelector('#audit-tray-overall-anonymity-description')
+    }
+
+    function renderAndQuery() {
+      renderComponent()
+      $label = getOverallAnonymityLabel()
+      $description = getOverallAnonymityDescription()
+    }
+
+    QUnit.module('when anonymity was used without interruption', contextHooks => {
+      contextHooks.beforeEach(() => {
+        props.overallAnonymity = FULL
+        renderAndQuery()
+      })
+
+      test('labels the indicator with "Anonymous On"', () => {
+        equal($label.textContent, 'Anonymous On')
+      })
+
+      test('displays the anonymity date', () => {
+        const $time = $description.querySelector('time')
+        equal($time.getAttribute('datetime'), '2015-04-04T19:00:00.000Z')
+      })
+
+      test('includes the time on the visible date', () => {
+        const $time = $description.querySelector('time')
+        ok($time.textContent.includes('3pm'))
+      })
+    })
+
+    QUnit.module('when anonymity was applied multiple times', contextHooks => {
+      contextHooks.beforeEach(() => {
+        props.overallAnonymity = PARTIAL
+        renderAndQuery()
+      })
+
+      test('labels the indicator with "Partially Anonymous"', () => {
+        // TODO: Swap the assertion here for GRADE-1820
+        // equal($label.textContent, 'Partially Anonymous')
+        ok($label.textContent.includes('Partially'))
+      })
+
+      test('displays the anonymity date', () => {
+        const $time = $description.querySelector('time')
+        equal($time.getAttribute('datetime'), '2015-04-04T19:00:00.000Z')
+      })
+
+      test('includes the time on the visible date', () => {
+        const $time = $description.querySelector('time')
+        ok($time.textContent.includes('3pm'))
+      })
+    })
+
+    QUnit.module('when anonymity was not used', contextHooks => {
+      contextHooks.beforeEach(() => {
+        props.anonymityDate = null
+        props.overallAnonymity = NA
+        renderAndQuery()
+      })
+
+      test('labels the indicator with "Anonymous Off"', () => {
+        equal($label.textContent, 'Anonymous Off')
+      })
+
+      test('includes the time on the visible date', () => {
+        equal($description.textContent, 'Anonymous was never turned on')
+      })
     })
   })
 })

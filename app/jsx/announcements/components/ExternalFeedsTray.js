@@ -95,7 +95,7 @@ export default class ExternalFeedsTray extends Component {
         textAlign="start"
         className="announcements-tray__add-rss-root"
       >
-        <Text size="medium" as="h2" weight="bold">
+        <Text size="medium" as="h3" weight="bold">
           {I18n.t('Feeds')}
         </Text>
         <div className="announcements-tray-row">

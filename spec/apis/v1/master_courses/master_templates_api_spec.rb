@@ -20,7 +20,6 @@ require_relative '../../api_spec_helper'
 
 describe MasterCourses::MasterTemplatesController, type: :request do
   def setup_template
-    Account.default.enable_feature!(:master_courses)
     course_factory
     @template = MasterCourses::MasterTemplate.set_as_master_course(@course)
     account_admin_user(:active_all => true)
@@ -33,11 +32,6 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       setup_template
       @url = "/api/v1/courses/#{@course.id}/blueprint_templates/default"
       @params = @base_params.merge(:action => 'show')
-    end
-
-    it "should require the feature flag" do
-      Account.default.disable_feature!(:master_courses)
-      api_call(:get, @url, @params, {}, {}, {:expected_status => 401})
     end
 
     it "should require authorization" do

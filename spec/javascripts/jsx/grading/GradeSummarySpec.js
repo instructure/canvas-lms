@@ -92,6 +92,11 @@ function setPageHtmlFixture() {
       <div id="student-grades-right-content">
         <div class="student_assignment final_grade">
           <span class="grade"></span>
+          <span class="final_letter_grade">
+          (
+            <span id="final_letter_grade_text" class="grade"></span>
+          )
+          </span>
           <span class="score_teaser"></span>
         </div>
         <div id="student-grades-whatif" class="show_guess_grades" style="display: none;">
@@ -309,38 +314,76 @@ test('sets "formattedValue" to formatted grade', function() {
   equal(score.formattedValue, 'C+ (78.5)')
 })
 
-QUnit.module('GradeSummary.calculateTotals', {
-  setup() {
+QUnit.module('GradeSummary.calculateTotals', (suiteHooks) => {
+  suiteHooks.beforeEach(() => {
     commonSetup()
     ENV.assignment_groups = createAssignmentGroups()
     sandbox.stub($, 'screenReaderFlashMessageExclusive')
     setPageHtmlFixture()
-  },
+  })
 
-  teardown() {
+  suiteHooks.afterEach(() => {
     commonTeardown()
-  }
+  })
+
+  test('displays a screenreader-only alert when grades have been changed', function() {
+    $fixtures.find('.assignment_score .grade').addClass('changed')
+    GradeSummary.calculateTotals(createExampleGrades(), 'current', 'percent')
+    equal($.screenReaderFlashMessageExclusive.callCount, 1)
+    const messageText = $.screenReaderFlashMessageExclusive.getCall(0).args[0]
+    ok(messageText.includes('the new total is now'), 'flash message mentions new total')
+  })
+
+  test('does not display a screenreader-only alert when grades have not been changed', function() {
+    GradeSummary.calculateTotals(createExampleGrades(), 'current', 'percent')
+    equal($.screenReaderFlashMessageExclusive.callCount, 0)
+  })
+
+  test('localizes displayed grade', function() {
+    sandbox.stub(I18n, 'n').returns('1,234')
+    GradeSummary.calculateTotals(createExampleGrades(), 'current', 'percent')
+    const $teaser = $fixtures.find('.student_assignment.final_grade .score_teaser')
+    ok($teaser.text().includes('1,234'), 'includes internationalized score')
+  })
+
+  QUnit.module('final grade override', (contextHooks) => {
+    contextHooks.beforeEach(() => {
+      exampleGrades = createExampleGrades()
+      ENV.grading_scheme = [['A', 0.90], ['B', 0.80], ['C', 0.70], ['D', 0.60], ['F', 0]]
+    })
+
+    test('sets the final letter grade to the effective final grade, if present', () => {
+      ENV.effective_final_grade = 'D-'
+      GradeSummary.calculateTotals(exampleGrades, 'current', 'percent')
+      const $grade = $fixtures.find('.final_letter_grade .grade')
+      strictEqual($grade.text(), 'D-')
+    })
+
+    test('sets the final letter grade to the calculated final grade, if not present', () => {
+      GradeSummary.calculateTotals(exampleGrades, 'current', 'percent')
+      const $grade = $fixtures.find('.final_letter_grade .grade')
+      strictEqual($grade.text(), 'F')
+    })
+
+    test('sets the percent grade to the corresponding value of the effective grade, if present', () => {
+      ENV.effective_final_grade = 'C'
+      GradeSummary.calculateTotals(exampleGrades, 'current', 'percent')
+      const $grade = $fixtures.find('.student_assignment.final_grade .grade').first()
+      strictEqual($grade.text(), '70%')
+    })
+
+    test('changed What-If scores take precedence over the effective grade', () => {
+      ENV.effective_final_grade = 'C'
+      exampleGrades.current = {score: 3, possible: 10 }
+      const changedGrade = '<span class="grade changed">3</span>'
+      $fixtures.find('.score_holder .tooltip').html(changedGrade)
+      GradeSummary.calculateTotals(exampleGrades, 'current', 'percent')
+      const $grade = $fixtures.find('.student_assignment.final_grade .grade').first()
+      strictEqual($grade.text(), '30%')
+    })
+  })
 })
 
-test('displays a screenreader-only alert when grades have been changed', function() {
-  $fixtures.find('.assignment_score .grade').addClass('changed')
-  GradeSummary.calculateTotals(createExampleGrades(), 'current', 'percent')
-  equal($.screenReaderFlashMessageExclusive.callCount, 1)
-  const messageText = $.screenReaderFlashMessageExclusive.getCall(0).args[0]
-  ok(messageText.includes('the new total is now'), 'flash message mentions new total')
-})
-
-test('does not display a screenreader-only alert when grades have not been changed', function() {
-  GradeSummary.calculateTotals(createExampleGrades(), 'current', 'percent')
-  equal($.screenReaderFlashMessageExclusive.callCount, 0)
-})
-
-test('localizes displayed grade', function() {
-  sandbox.stub(I18n, 'n').returns('1,234')
-  GradeSummary.calculateTotals(createExampleGrades(), 'current', 'percent')
-  const $teaser = $fixtures.find('.student_assignment.final_grade .score_teaser')
-  ok($teaser.text().includes('1,234'), 'includes internationalized score')
-})
 
 QUnit.module('GradeSummary.calculateSubtotalsByGradingPeriod', {
   setup() {

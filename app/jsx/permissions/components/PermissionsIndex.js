@@ -21,6 +21,8 @@ import React, {Component} from 'react'
 import {func, arrayOf} from 'prop-types'
 import {connect} from 'react-redux'
 import {debounce} from 'lodash'
+import $ from 'jquery'
+import 'compiled/jquery.rails_flash_notifications'
 
 import AccessibleContent from '@instructure/ui-a11y/lib/components/AccessibleContent'
 import Button from '@instructure/ui-buttons/lib/components/Button'
@@ -60,6 +62,19 @@ export default class PermissionsIndex extends Component {
   }
 
   onRoleFilterChange = (_, value) => {
+    if (value.length > this.props.selectedRoles.length) {
+      const addedValue = value.filter(option => {
+        const addedElement = this.props.selectedRoles.findIndex(i => i.label === option.label)
+        return addedElement < 0
+      })
+      $.screenReaderFlashMessage(I18n.t('%{value} Added', {value: addedValue[0].label}))
+    } else if (value.length < this.props.selectedRoles.length) {
+      const removedValue = this.props.selectedRoles.filter(option => {
+        const removedElement = value.findIndex(i => i.label === option.label)
+        return removedElement < 0
+      })
+      $.screenReaderFlashMessage(I18n.t('%{value} Removed', {value: removedValue[0].label}))
+    }
     const valueCopy = value.filter(option => option.value !== ALL_ROLES_VALUE)
     this.props.filterRoles({
       selectedRoles: valueCopy,

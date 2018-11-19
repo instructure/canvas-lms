@@ -142,6 +142,7 @@ module Api::V1
     def enrollment_hash(enrollment)
       enrollment_hash = default_enrollment_attributes(enrollment)
       enrollment_hash[:associated_user_id] = enrollment.associated_user_id if enrollment.assigned_observer?
+      enrollment_hash.merge!(grading_period_info) if include_grading_period_info? && enrollment.student?
       enrollment_hash.merge!(total_scores(enrollment)) if include_total_scores? && enrollment.student?
       enrollment_hash
     end
@@ -177,13 +178,18 @@ module Api::V1
       scores
     end
 
+    def grading_period_info
+      {
+        current_grading_period_id: current_grading_period&.id,
+        current_grading_period_title: current_grading_period&.title,
+        has_grading_periods: @course.grading_periods?,
+        multiple_grading_periods_enabled: @course.grading_periods? # for backwards compatibility
+      }
+    end
+
     def current_grading_period_scores(student_enrollment)
       scores = {
-        has_grading_periods: @course.grading_periods?,
-        multiple_grading_periods_enabled: @course.grading_periods?, # for backwards compatibility
         totals_for_all_grading_periods_option: @course.display_totals_for_all_grading_periods?,
-        current_grading_period_title: current_grading_period&.title,
-        current_grading_period_id: current_grading_period&.id,
         current_period_computed_current_score: grading_period_score(student_enrollment, :current),
         current_period_computed_final_score: grading_period_score(student_enrollment, :final),
         current_period_computed_current_grade: grading_period_grade(student_enrollment, :current),
@@ -232,6 +238,12 @@ module Api::V1
       return @include_current_grading_period_scores unless @include_current_grading_period_scores.nil?
       @include_current_grading_period_scores =
         include_total_scores? && @includes.include?(:current_grading_period_scores)
+    end
+
+    def include_grading_period_info?
+      return @include_grading_period_info unless @include_grading_period_info.nil?
+      @include_grading_period_info =
+        @includes.include?(:current_grading_period_scores) && @includes.include?(:total_scores)
     end
   end
 end

@@ -139,7 +139,7 @@ define [
 
       opts.classes += ' no_grade_yet ' unless opts.submission.grade && opts.submission.workflow_state != 'pending_review'
       innerContents = null if opts.submission.workflow_state == 'pending_review' && !isNaN(innerContents)
-      innerContents ?= if submission_type then SubmissionCell.submissionIcon(submission_type) else '-'
+      innerContents ?= if submission_type then SubmissionCell.submissionIcon(submission_type, opts.submission.attachments) else '-'
 
       if turnitin = extractDataTurnitin(opts.submission)
         specialClasses.push('turnitin')
@@ -183,8 +183,14 @@ define [
       classes.push(submission.submission_type) if submission.submission_type
       classes
 
-    @submissionIcon: (submission_type) ->
+    @submissionIcon: (submission_type, attachments) ->
       klass = SubmissionCell.iconFromSubmissionType(submission_type)
+      if attachments?
+        workflow_state = attachments[0].workflow_state
+        if workflow_state == "pending_upload"
+          klass = "upload"
+        else if workflow_state == "errored"
+          klass = "warning"
       "<i class='icon-#{htmlEscape klass}' ></i>"
 
     @iconFromSubmissionType: (submission_type) ->

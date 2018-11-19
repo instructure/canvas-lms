@@ -144,8 +144,8 @@ module WikiAndTinyCommon
     fj('a[href="#tabUploaded"]:visible').click
     folder_el = fj(".file-browser__tree button:contains('#{folder}')")
     folder_el.click unless folder_el['aria-expanded'] == 'true'
-    expect(fj(".file-browser__tree li[title='#{filename}'] button", dialog)).to be_displayed
-    file_el = fj(".file-browser__tree li[title='#{filename}'] button", dialog)
+    expect(fj(".file-browser__tree li:contains('#{filename}') button", dialog)).to be_displayed
+    file_el = fj(".file-browser__tree li:contains('#{filename}') button", dialog)
     expect(file_el).not_to be_nil
     file_el.click
     wait_for_ajaximations

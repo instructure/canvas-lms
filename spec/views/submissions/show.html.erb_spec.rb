@@ -427,4 +427,38 @@ describe "/submissions/show" do
       end
     end
   end
+
+  describe "media comments" do
+    let_once(:assignment) { @course.assignments.create! }
+    let_once(:student) { course_with_user("StudentEnrollment", course: @course, name: "Stu", active_all: true).user }
+    let_once(:sub) { assignment.submit_homework(student, body: "i did a thing") }
+    let_once(:teacher) { course_with_user("TeacherEnrollment", course: @course, name: "Tom", active_all: true).user }
+
+    before(:once) do
+      @comment = sub.add_comment(author: teacher, comment: "comment", media_comment_id: 1, media_comment_type: "video")
+    end
+
+    before(:each) do
+      assign(:assignment, assignment)
+      assign(:context, @course)
+      assign(:current_user, teacher)
+      assign(:submission, sub)
+    end
+
+    it "passes comment author for the thumbnail" do
+      render "submissions/show"
+      html = Nokogiri::HTML.fragment(response.body)
+      anchor = html.at_css("div#submission_comment_#{@comment.id} div.comment_media a")
+      author = anchor.attributes.fetch("data-author").value
+      expect(author).to eq "Tom"
+    end
+
+    it "passes comment creation time for the thumbnail" do
+      render "submissions/show"
+      html = Nokogiri::HTML.fragment(response.body)
+      anchor = html.at_css("div#submission_comment_#{@comment.id} div.comment_media a")
+      created_at = anchor.attributes.fetch("data-created_at").value
+      expect(created_at).to eq datetime_string(@comment.created_at)
+    end
+  end
 end

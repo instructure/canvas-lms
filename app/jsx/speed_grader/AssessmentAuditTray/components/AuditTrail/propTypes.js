@@ -16,27 +16,44 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {arrayOf, bool, instanceOf, shape, string} from 'prop-types'
+import {arrayOf, bool, instanceOf, oneOf, shape, string} from 'prop-types'
+
+import {auditEventStudentAnonymityStates, overallAnonymityStates} from '../../AuditTrailHelpers'
 
 export const auditEvent = shape({
   eventType: string.isRequired
 })
 
-export const auditEventInfo = shape({
-  anonymous: bool.isRequired,
-  auditEvent: auditEvent.isRequired
-})
+export const auditEventInfo = {
+  auditEvent: auditEvent.isRequired,
+  studentAnonymity: oneOf(Object.values(auditEventStudentAnonymityStates)).isRequired
+}
 
 export const dateEventGroup = shape({
-  auditEvents: arrayOf(auditEventInfo).isRequired,
+  auditEvents: arrayOf(shape(auditEventInfo)).isRequired,
   startDate: instanceOf(Date).isRequired,
   startDateKey: string.isRequired
 })
 
-export const userEventGroup = shape({
-  dateEventGroups: arrayOf(dateEventGroup).isRequired
+export const user = shape({
+  id: string.isRequired,
+  name: string.isRequired,
+  role: string.isRequired
 })
 
+export const userEventGroup = shape({
+  anonymousOnly: bool.isRequired,
+  dateEventGroups: arrayOf(dateEventGroup).isRequired,
+  user: user.isRequired
+})
+
+export const anonymityDate = instanceOf(Date)
+export const finalGradeDate = instanceOf(Date)
+export const overallAnonymity = oneOf(Object.values(overallAnonymityStates))
+
 export const auditTrail = shape({
-  userEventGroups: shape({}).isRequired
+  anonymityDate,
+  finalGradeDate: finalGradeDate.isRequired,
+  overallAnonymity: overallAnonymity.isRequired,
+  userEventGroups: arrayOf(userEventGroup).isRequired
 })

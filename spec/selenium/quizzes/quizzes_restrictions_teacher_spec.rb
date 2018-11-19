@@ -59,8 +59,7 @@ describe 'quiz restrictions as a teacher' do
       wait_for_ajaximations
 
       # now try and save it and validate the validation text
-      f('button.save_quiz_button.btn.btn-primary').click
-      wait_for_ajaximations
+      wait_for_new_page_load{ f('button.save_quiz_button.btn.btn-primary').click }
       expect(ffj('.error_text')[1]).to include_text('You must enter an access code')
     end
 
@@ -72,8 +71,7 @@ describe 'quiz restrictions as a teacher' do
       f('#quiz_access_code').send_keys('guybrush')
 
       # save and verify that the show page comes up
-      f('button.save_quiz_button.btn.btn-primary').click
-      wait_for_ajaximations
+      wait_for_new_page_load{ f('button.save_quiz_button.btn.btn-primary').click }
       expect(f('.unpublished_quiz_warning')).to include_text('This quiz is unpublished')
     end
 
@@ -113,8 +111,7 @@ describe 'quiz restrictions as a teacher' do
       wait_for_ajaximations
 
       # now try and save it and validate the validation text
-      f('button.save_quiz_button.btn.btn-primary').click
-      wait_for_ajaximations
+      wait_for_new_page_load{ f('button.save_quiz_button.btn.btn-primary').click }
       expect(ffj('.error_text')[1]).to include_text('You must enter a valid IP Address')
     end
 
@@ -127,8 +124,7 @@ describe 'quiz restrictions as a teacher' do
 
       # save and verify that the page changes (passes validation)
       expect(f('#quiz_title')).to be
-      f('button.save_quiz_button.btn.btn-primary').click
-      wait_for_ajaximations
+      wait_for_new_page_load{ f('button.save_quiz_button.btn.btn-primary').click }
       expect(f('.unpublished_quiz_warning')).to include_text('This quiz is unpublished')
     end
 
@@ -141,8 +137,7 @@ describe 'quiz restrictions as a teacher' do
 
       # save and verify that the page changes (passes validation)
       expect(f('#quiz_title')).to be
-      f('button.save_quiz_button.btn.btn-primary').click
-      wait_for_ajaximations
+      wait_for_new_page_load{ f('button.save_quiz_button.btn.btn-primary').click }
       expect(f('.unpublished_quiz_warning')).to include_text('This quiz is unpublished')
     end
 
@@ -155,8 +150,7 @@ describe 'quiz restrictions as a teacher' do
 
       # save and verify that the page changes (passes validation)
       expect(f('#quiz_title')).to be
-      f('button.save_quiz_button.btn.btn-primary').click
-      wait_for_ajaximations
+      wait_for_new_page_load{ f('button.save_quiz_button.btn.btn-primary').click }
       expect(f('.unpublished_quiz_warning')).to include_text('This quiz is unpublished')
     end
 
@@ -167,8 +161,7 @@ describe 'quiz restrictions as a teacher' do
       wait_for_ajaximations
       f('#quiz_ip_filter').send_keys('7')
 
-      f('button.save_quiz_button.btn.btn-primary').click
-      wait_for_ajaximations
+      wait_for_new_page_load{ f('button.save_quiz_button.btn.btn-primary').click }
       expect(ffj('.error_text')[1]).to include_text('IP filter is not valid')
     end
 

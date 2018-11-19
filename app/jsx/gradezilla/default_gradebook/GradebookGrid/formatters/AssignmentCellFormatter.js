@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+// xsslint safeString.method I18n.t
+
 import I18n from 'i18n!gradebook'
 import htmlEscape from 'str/htmlEscape';
 import { extractDataTurnitin } from 'compiled/gradezilla/Turnitin';
@@ -64,6 +66,7 @@ function renderStartContainer(options) {
     content +=
       '<div class="Grid__AssignmentRowCell__InvalidGrade"><i class="icon-warning"></i></div>'
   }
+  // xsslint safeString.identifier content
   return `<div class="Grid__AssignmentRowCell__StartContainer">${content}</div>`
 }
 
@@ -85,9 +88,12 @@ function renderTemplate(grade, options = {}) {
 
   if (options.turnitinState) {
     classNames.push('turnitin');
+    // xsslint safeString.property turnitinState
     content += `<span class="gradebook-cell-turnitin ${options.turnitinState}-score" />`;
   }
 
+  // xsslint safeString.identifier content
+  // xsslint safeString.function renderStartContainer
   return `<div class="${htmlEscape(classNames.join(' '))}">
     ${renderStartContainer(options)}
     <div class="Grid__AssignmentRowCell__Content">

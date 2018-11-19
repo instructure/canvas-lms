@@ -450,16 +450,6 @@ END
       root_opt_in: true,
       beta: true
     },
-    'dashcard_reordering' =>
-    {
-      display_name: -> { I18n.t('Allow Reorder Dashboard Cards') },
-      description: -> { I18n.t('Allow dashboard cards to be reordered for each user.') },
-      applies_to: 'RootAccount',
-      state: 'hidden',
-      beta: true,
-      development: true,
-      root_opt_in: false
-    },
     'responsive_layout' =>
     {
       display_name: -> { I18n.t('Responsive Layout') },
@@ -576,8 +566,7 @@ END
       display_name: -> { I18n.t('Blueprint Courses') }, # this won't be confusing at all
       description: -> { I18n.t('Enable the creation of Blueprint Courses') },
       applies_to: 'RootAccount',
-      state: 'allowed',
-      beta: false,
+      state: 'on'
     },
     'student_context_cards' =>
     {
@@ -664,6 +653,14 @@ END
     'assignments_2' => {
       display_name: -> { I18n.t('Assignments 2') },
       description: -> { I18n.t('Allow switching to the new assignments page') },
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      development: true,
+      beta: true
+    },
+    'javascript_csp' => {
+      display_name: -> { I18n.t('Content Security Policy')},
+      description: -> { I18n.t('Enable the Security tab on the settings page to adjust CSP settings')},
       applies_to: 'RootAccount',
       state: 'hidden',
       development: true,

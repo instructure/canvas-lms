@@ -52,7 +52,7 @@ export default class AssessmentAuditTray extends Component {
 
     this.state = {
       auditEventsLoaded: false,
-      auditTrail: buildAuditTrail([]),
+      auditTrail: buildAuditTrail({}),
       open: false
     }
   }
@@ -65,22 +65,24 @@ export default class AssessmentAuditTray extends Component {
     this.setState({
       ...context,
       auditEventsLoaded: false,
-      auditTrail: buildAuditTrail([]),
+      auditTrail: buildAuditTrail({}),
       open: true
     })
 
     const {assignment, courseId, submission} = context
 
+    /* eslint-disable promise/catch-or-return */
     this.props.api
       .loadAssessmentAuditTrail(courseId, assignment.id, submission.id)
-      .then(auditEvents => {
+      .then(auditData => {
         if (this.state.open && this.state.submission.id === submission.id) {
           this.setState({
             auditEventsLoaded: true,
-            auditTrail: buildAuditTrail(auditEvents)
+            auditTrail: buildAuditTrail(auditData)
           })
         }
       })
+    /* eslint-enable promise/catch-or-return */
   }
 
   render() {
@@ -105,7 +107,7 @@ export default class AssessmentAuditTray extends Component {
             </FlexItem>
 
             <FlexItem margin="0 0 0 small">
-              <Heading as="h1" level="h3">
+              <Heading as="h2" level="h3">
                 {I18n.t('Assessment audit')}
               </Heading>
             </FlexItem>
@@ -115,7 +117,10 @@ export default class AssessmentAuditTray extends Component {
             <Fragment>
               <View as="div" margin="small">
                 <AssessmentSummary
+                  anonymityDate={this.state.auditTrail.anonymityDate}
                   assignment={this.state.assignment}
+                  finalGradeDate={this.state.auditTrail.finalGradeDate}
+                  overallAnonymity={this.state.auditTrail.overallAnonymity}
                   submission={this.state.submission}
                 />
               </View>

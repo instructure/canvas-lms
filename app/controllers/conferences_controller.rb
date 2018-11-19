@@ -378,8 +378,9 @@ class ConferencesController < ApplicationController
 
   def get_new_members
     members = [@current_user]
-
-    if params[:user] && params[:user][:all] != '1'
+    if params[:observers] && params[:observers][:remove] == '1'
+      ids = @context.user_ids - @context.observers.pluck(:id)
+    elsif params[:user] && params[:user][:all] != '1'
       ids = []
       params[:user].each do |id, val|
         ids << id.to_i if val == '1'

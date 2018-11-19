@@ -1,0 +1,284 @@
+{
+  "add_to_do_7def3c37": {
+    "message": "Lägg till att göra"
+  },
+  "all_day_fb42c4fc": {
+    "message": "Hela dagen"
+  },
+  "all_items_loaded_aa256183": {
+    "message": "Alla poster laddade"
+  },
+  "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
+    "message": "Ett fel inträffade när du försökte avvisa möjligheten."
+  },
+  "announcement_fb4cb645": {
+    "message": "Meddelande"
+  },
+  "are_you_sure_you_want_to_delete_this_planner_item_b71e330c": {
+    "message": "Är du säker på att du vill radera det här planeringspost?"
+  },
+  "assignment_976578a8": {
+    "message": "Uppgift"
+  },
+  "assignmenttype_title_6612d008": {
+    "message": "{ assignmentType } { title }."
+  },
+  "assignmenttype_title_at_datetime_478f0709": {
+    "message": "{ assignmentType } { title }, på { datetime }."
+  },
+  "assignmenttype_title_due_datetime_a112d8ff": {
+    "message": "{ assignmentType } { title }, som ska vara klar { datetime }."
+  },
+  "assignmenttype_title_is_marked_as_done_a8dc46ef": {
+    "message": "{ assignmentType } { title } är markerad som klar."
+  },
+  "assignmenttype_title_is_not_marked_as_done_ba80ba66": {
+    "message": "{ assignmentType } { title } är inte markerad som klar."
+  },
+  "beginning_of_your_to_do_history_61ef2dce": {
+    "message": "Början av din Att-göra-historik"
+  },
+  "calendar_event_89aadc1c": {
+    "message": "Kalenderhändelse"
+  },
+  "canvas_planner_98ed106": {
+    "message": "Canvas-lanering"
+  },
+  "close_d634289d": {
+    "message": "Stäng"
+  },
+  "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
+    "message": "{ count, plural,\n    one {Visa # fullgjord post}\n  other {Visa # fullgjorda poster}\n}"
+  },
+  "course_8a63b4a3": {
+    "message": "Kurs"
+  },
+  "course_to_do_bcbbab54": {
+    "message": "{ course } ATT GÖRA"
+  },
+  "date_at_time_dbdb1b99": {
+    "message": "{ date } kl { time }"
+  },
+  "date_ee500367": {
+    "message": "Datum"
+  },
+  "date_is_not_a_valid_date_4ef9f8ba": {
+    "message": "#{ date } är inte ett giltigt datum."
+  },
+  "date_is_required_8660ec22": {
+    "message": "Datum krävs"
+  },
+  "delete_a6efa79d": {
+    "message": "Radera"
+  },
+  "details_98a31b68": {
+    "message": "Detaljer"
+  },
+  "discussion_6719c51d": {
+    "message": "Diskussion"
+  },
+  "dismiss_itemtitle_a9fae1b3": {
+    "message": "Avfärda { itemTitle }"
+  },
+  "dismiss_opportunityname_5995176f": {
+    "message": "Avfärda { opportunityName }"
+  },
+  "due_5d7267be": {
+    "message": "Färdiggjord:"
+  },
+  "edit_title_72e5a21e": {
+    "message": "Ändra { title }"
+  },
+  "error_loading_grades_e0b38f4d": {
+    "message": "Fel när bedömningar skulle laddas"
+  },
+  "error_loading_more_items_3f109d9f": {
+    "message": "Det gick inte att läsa in fler poster"
+  },
+  "error_loading_past_items_2881dbb1": {
+    "message": "Det gick inte att läsa in tidigare poster"
+  },
+  "excused_cf8792eb": {
+    "message": "Slipper göras"
+  },
+  "failed_to_delete_to_do_64edff49": {
+    "message": "Misslyckades att ta bort: att göra"
+  },
+  "failed_to_get_new_activity_17e7ec7c": {
+    "message": "Misslyckades att få ny aktivitet"
+  },
+  "failed_to_load_opportunities_52ab6404": {
+    "message": "Kunde inte ladda upp möjligheter"
+  },
+  "failed_to_save_to_do_ddc7503b": {
+    "message": "Misslyckades att spara: att göra"
+  },
+  "feedback_6dcc1991": {
+    "message": "Återkoppling"
+  },
+  "graded_25cd3fcd": {
+    "message": "Bedömd"
+  },
+  "grades_are_loading_c899652d": {
+    "message": "Bedömningar laddas"
+  },
+  "grades_loaded_5056277c": {
+    "message": "Bedömningar laddade"
+  },
+  "items_completed_items_plural_1_item_other_items_717d579f": {
+    "message": "{ items } fullgjord(a) { items, plural,\n     =1 {post}\n  other {poster}\n}"
+  },
+  "late_2be42b88": {
+    "message": "Sen"
+  },
+  "load_more_a36f9cf9": {
+    "message": "Ladda fler"
+  },
+  "load_prior_dates_f2b0f6f0": {
+    "message": "Laddar tidigare datum"
+  },
+  "loaded_count_plural_0_items_one_item_other_items_e58533e9": {
+    "message": "Laddade { count, plural,\n     =0 {# poster}\n    one {# post}\n  other {# poster}\n}"
+  },
+  "loading_25990131": {
+    "message": "Laddar..."
+  },
+  "loading_725811ca": {
+    "message": "laddar"
+  },
+  "loading_grades_c842c887": {
+    "message": "Laddar bedömningar"
+  },
+  "loading_past_items_ca499e75": {
+    "message": "Laddar tidigare poster"
+  },
+  "loading_planner_items_947a813d": {
+    "message": "Laddar planerade poster"
+  },
+  "looks_like_there_isn_t_anything_here_d9bcef49": {
+    "message": "Det verkar som att det inte finns något här"
+  },
+  "missing_1a256b3b": {
+    "message": "Saknas"
+  },
+  "missing_items_for_title_516511f8": {
+    "message": "Poster saknas för { title }"
+  },
+  "my_grades_98834476": {
+    "message": "Mina bedömningar"
+  },
+  "new_activity_8b84847d": {
+    "message": "Ny aktivitet"
+  },
+  "new_activity_for_title_14c9c3af": {
+    "message": "Ny aktivitet för { title }"
+  },
+  "next_month_749b1778": {
+    "message": "Nästa månad"
+  },
+  "no_due_dates_assigned_e8f5bac8": {
+    "message": "Inga slutdatum tilldelade"
+  },
+  "no_grade_3b4d7f3e": {
+    "message": "Ingen bedömning"
+  },
+  "nothing_new_needs_attention_3ac548d4": {
+    "message": "Ingenting är i behov av uppmärksamhet"
+  },
+  "nothing_planned_yet_8675ffe9": {
+    "message": "Ingenting planerat än."
+  },
+  "numpoints_points_8621a43b": {
+    "message": "{ numPoints } poäng"
+  },
+  "only_most_recent_grading_period_shown_f1ad6458": {
+    "message": "*Endast den senaste bedömningsperioden visas."
+  },
+  "optional_add_course_ef0d70fc": {
+    "message": "Valfritt: Lägg till kurs"
+  },
+  "page_50c4823d": {
+    "message": "Sida"
+  },
+  "points_bceb5005": {
+    "message": "poäng"
+  },
+  "points_points_63e59cce": {
+    "message": "{ points } poäng"
+  },
+  "previous_month_bb1e3c84": {
+    "message": "Föregående månad"
+  },
+  "pts_699bd9aa": {
+    "message": "poäng"
+  },
+  "quiz_e0dcce8f": {
+    "message": "Quiz"
+  },
+  "replies_4a8577c8": {
+    "message": "Svar"
+  },
+  "save_11a80ec3": {
+    "message": "Spara"
+  },
+  "show_my_grades_ebd08684": {
+    "message": "Visa mina bedömningar"
+  },
+  "startdate_to_enddate_d245175b": {
+    "message": "{ startDate } till { endDate }"
+  },
+  "submitted_318fad53": {
+    "message": "Inlämnad"
+  },
+  "success_to_do_created_e34ed395": {
+    "message": "Framgång: Att göra skapad"
+  },
+  "task_16b0ef38": {
+    "message": "Uppgift"
+  },
+  "the_date_and_time_this_to_do_is_due_74c823d4": {
+    "message": "Datum och klockslag denna Att göra ska vara klar"
+  },
+  "time_2b5aac58": {
+    "message": "Tid"
+  },
+  "title_ee03d132": {
+    "message": "Titel"
+  },
+  "title_is_required_6ddcab69": {
+    "message": "rubrik krävs"
+  },
+  "to_do_1d554f36": {
+    "message": "Att göra"
+  },
+  "to_do_items_loading_d1cdfcd5": {
+    "message": "Att-göra-poster laddar"
+  },
+  "today_76e10f9c": {
+    "message": "Idag"
+  },
+  "today_at_date_8ac30d6": {
+    "message": "Idag vid { date }"
+  },
+  "tomorrow_9a6c9a00": {
+    "message": "Imorgon"
+  },
+  "tomorrow_at_date_b53f2cf1": {
+    "message": "Imorgon vid { date }"
+  },
+  "unable_to_mark_as_complete_8141856d": {
+    "message": "Kunde inte markera som fullgjord."
+  },
+  "yesterday_at_date_1aa6d18e": {
+    "message": "Igår vid { date }"
+  },
+  "yesterday_c6bd6abf": {
+    "message": "Igår"
+  },
+  "you_must_provide_a_date_and_time_a86839d2": {
+    "message": "Du måste ange ett datum och ett klockslag."
+  },
+  "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
+    "message": "Du har skrollat tillbaka till din allra första To-Do!"
+  }
+}

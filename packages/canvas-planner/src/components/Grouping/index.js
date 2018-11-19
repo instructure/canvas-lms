@@ -202,6 +202,7 @@ export class Grouping extends Component {
               labelColor: this.props.color
             }}
             date={theDay}
+            responsiveSize={this.props.responsiveSize}
           />
         </li>
       );

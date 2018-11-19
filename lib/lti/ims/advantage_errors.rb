@@ -39,6 +39,12 @@ module Lti::Ims
       end
     end
 
+    class InvalidLaunchError < AdvantageClientError
+      def initialize(msg=nil, opts={})
+        super(msg, { api_message: 'Invalid LTI launch attempt', status_code: :bad_request }.merge(opts))
+      end
+    end
+
     class AdvantageSecurityError < AdvantageClientError
       def initialize(msg=nil, opts={})
         super(msg, { api_message:'Service invocation refused', status_code: :unauthorized }.merge(opts))

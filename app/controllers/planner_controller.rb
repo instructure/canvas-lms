@@ -23,7 +23,7 @@
 class PlannerController < ApplicationController
   include Api::V1::PlannerItem
 
-  before_action :require_user
+  before_action :require_user, unless: :public_access?
   before_action :require_planner_enabled
   before_action :set_date_range
   before_action :set_params, only: [:index]
@@ -60,7 +60,6 @@ class PlannerController < ApplicationController
   #   {
   #     "context_type": "Course",
   #     "course_id": 1,
-  #     "visible_in_planner": true, // Whether or not it is displayed on the student planner
   #     "planner_override": { ... planner override object ... }, // Associated PlannerOverride object if user has toggled visibility for the object on the planner
   #     "submissions": false, // The statuses of the user's submissions for this object
   #     "plannable_id": "123",
@@ -71,7 +70,6 @@ class PlannerController < ApplicationController
   #   {
   #     "context_type": "Course",
   #     "course_id": 1,
-  #     "visible_in_planner": true,
   #     "planner_override": {
   #         "id": 3,
   #         "plannable_type": "Assignment",
@@ -98,7 +96,6 @@ class PlannerController < ApplicationController
   #     "html_url": "http://canvas.instructure.com/courses/1/assignments/1#submit"
   #   },
   #   {
-  #     "visible_in_planner": true,
   #     "planner_override": null,
   #     "submissions": false, // false if no associated assignment exists for the plannable item
   #     "plannable_id": "789",
@@ -145,6 +142,11 @@ class PlannerController < ApplicationController
   end
 
   private
+
+  def public_access?
+    # this is for things that are visible on courses with a public syllabus
+    params[:filter] == 'all_ungraded_todo_items'
+  end
 
   def collection_for_filter(filter)
     case filter
@@ -233,8 +235,8 @@ class PlannerController < ApplicationController
   end
 
   def unread_assignment_collection
-    assign_scope = Assignment.active.where(:context_type => "Course", :context_id => @course_ids)
-    disc_assign_ids = DiscussionTopic.active.where(context_type: 'Course', context_id: @course_ids).
+    assign_scope = Assignment.active.where(:context_type => "Course", :context_id => @local_course_ids)
+    disc_assign_ids = DiscussionTopic.active.where(context_type: 'Course', context_id: @local_course_ids).
       where.not(assignment_id: nil).unread_for(@current_user).pluck(:assignment_id)
     scope = assign_scope.where("assignments.muted IS NULL OR NOT assignments.muted").
       # we can assume content participations because they're automatically created when comments
@@ -249,11 +251,12 @@ class PlannerController < ApplicationController
   end
 
   def planner_note_collection
-    user_only_query = @user_ids.present? ? "course_id IS NULL OR " : nil
     user = @user_ids.presence || @current_user
+    shard = @user_ids.present? ? Shard.shard_for(@user_ids.first) : @current_user.shard # TODO fix to span multiple shards if needed
+    course_ids = @course_ids.map{|id| Shard.relative_id_for(id, @current_user.shard, shard)}
+    course_ids += [nil] if @user_ids.present?
     item_collection('planner_notes',
-                    PlannerNote.active.where(user: user, todo_date: @start_date...@end_date).
-                      where("#{user_only_query}course_id IN (?)", @course_ids),
+                    shard.activate { PlannerNote.active.where(user: user, todo_date: @start_date...@end_date, course_id: course_ids) },
                     PlannerNote, [:todo_date, :created_at], :id)
   end
 
@@ -308,25 +311,34 @@ class PlannerController < ApplicationController
     @per_page = params[:per_page] || 50
     @page = params[:page] || 'first'
     @include_concluded = includes.include? 'concluded'
-    if params[:context_codes]
-      @contexts = Context.from_context_codes(Array(params[:context_codes])).select{ |c| c.grants_right?(@current_user, :read) }
-      @course_ids = @contexts.select{ |c| c.is_a? Course }.map(&:id)
-      @group_ids = @contexts.select{ |c| c.is_a? Group }.map(&:id)
+    if params[:context_codes].present?
+      @contexts = Context.from_context_codes(Array(params[:context_codes]))
+      perms = public_access? ? [:read, :read_syllabus] : [:read]
+      render_json_unauthorized and return false unless @contexts.all? { |c| c.grants_any_right?(@current_user, *perms) }
+      (@current_user&.shard || Shard.current).activate do
+        @course_ids = @contexts.select{ |c| c.is_a? Course }.map(&:id)
+        @group_ids = @contexts.select{ |c| c.is_a? Group }.map(&:id)
+      end
       @user_ids = @contexts.select{ |c| c.is_a? User }.map(&:id)
     else
       @course_ids = @current_user.course_ids_for_todo_lists(:student, default_opts.slice(:course_ids, :include_concluded))
       @group_ids = @current_user.group_ids_for_todo_lists(default_opts.slice(:group_ids))
       @user_ids = [@current_user.id]
     end
+
+    # get ids relative to the current shard, not the user's
+    @local_course_ids = @current_user ? @course_ids.map{|id| Shard.relative_id_for(id, @current_user.shard, Shard.current)} : @course_ids
+    @local_group_ids = @current_user ? @group_ids.map{|id| Shard.relative_id_for(id, @current_user.shard, Shard.current)} : @group_ids
+
     @context_codes = @course_ids.map{|id| "course_#{id}"} || []
     @context_codes += @group_ids.map{|id| "group_#{id}"}
     @context_codes += @user_ids.map{|id| "user_#{id}"}
   end
 
   def contexts_cache_key
-    [Context.last_updated_at(Course, @course_ids),
+    [Context.last_updated_at(Course, @local_course_ids),
      Context.last_updated_at(User, @user_ids),
-     Context.last_updated_at(Group, @group_ids)].compact.max || Time.zone.today
+     Context.last_updated_at(Group, @local_group_ids)].compact.max || Time.zone.today
   end
 
   def default_opts

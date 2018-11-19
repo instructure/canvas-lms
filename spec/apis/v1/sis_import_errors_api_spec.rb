@@ -39,11 +39,11 @@ describe SisImportsApiController, type: :request do
                     {controller: 'sis_import_errors_api', action: 'index',
                      format: 'json', account_id: @account.id.to_s, id: @batch.id.to_s})
     expect(json["sis_import_errors"]).to eq [{"sis_import_id" => @batch.id, "file" => "users.csv",
-                                              "message" => "some error message 2", "row" => 2},
+                                              "message" => "some error message 2", "row_info"=>nil, "row" => 2},
                                              {"sis_import_id" => @batch.id, "file" => "users.csv",
-                                              "message" => "some error message 1", "row" => 1},
+                                              "message" => "some error message 1", "row_info"=>nil, "row" => 1},
                                              {"sis_import_id" => @batch.id, "file" => "users.csv",
-                                              "message" => "some error message 0", "row" => 0}]
+                                              "message" => "some error message 0", "row_info"=>nil, "row" => 0}]
   end
 
   it 'should show errors for a root_account' do
@@ -58,14 +58,14 @@ describe SisImportsApiController, type: :request do
                     {controller: 'sis_import_errors_api', action: 'index',
                      format: 'json', account_id: @account.id.to_s})
     expect(json["sis_import_errors"]).to eq [{"sis_import_id" => batch.id, "file" => "courses.csv",
-                                              "message" => "some error message 1", "row" => 1},
+                                              "message" => "some error message 1", "row_info"=>nil, "row" => 1},
                                              {"sis_import_id" => batch.id, "file" => "courses.csv",
-                                              "message" => "some error message 0", "row" => 0},
+                                              "message" => "some error message 0", "row_info"=>nil, "row" => 0},
                                              {"sis_import_id" => @batch.id, "file" => "users.csv",
-                                              "message" => "some error message 2", "row" => 2},
+                                              "message" => "some error message 2", "row_info"=>nil, "row" => 2},
                                              {"sis_import_id" => @batch.id, "file" => "users.csv",
-                                              "message" => "some error message 1", "row" => 1},
+                                              "message" => "some error message 1", "row_info"=>nil, "row" => 1},
                                              {"sis_import_id" => @batch.id, "file" => "users.csv",
-                                              "message" => "some error message 0", "row" => 0}]
+                                              "message" => "some error message 0", "row_info"=>nil, "row" => 0}]
   end
 end

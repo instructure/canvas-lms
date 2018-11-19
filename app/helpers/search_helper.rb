@@ -108,7 +108,7 @@ module SearchHelper
         add_courses.call [context], :current
         visibility = context.enrollment_visibility_level_for(@current_user, context.section_visibilities_for(@current_user), true)
         sections = case visibility
-        when :sections, :limited
+        when :sections, :sections_limited, :limited
           context.sections_visible_to(@current_user)
         when :full
           context.course_sections

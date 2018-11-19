@@ -51,13 +51,10 @@ describe "Gradezilla - uploads" do
       "Student Name,ID,Section,GPA Scale Assignment",
       "User,#{@student.id},,B-")
     Gradezilla.grades_uploaded_data.send_keys(fullpath)
-    Gradezilla.grades_new_upload.submit
+    wait_for_new_page_load{ Gradezilla.grades_new_upload.submit }
     run_jobs
-    wait_for_ajaximations
-    expect(f("#spinner")).not_to be_displayed
-    submit_form('#gradebook_grid_form')
-    accept_alert
-    wait_for_ajaximations
+    Gradezilla.wait_for_spinner
+    wait_for_new_page_load(true){ submit_form('#gradebook_grid_form') }
     run_jobs
     expect(assignment.submissions.last.grade).to eq "B-"
   end
@@ -70,11 +67,11 @@ describe "Gradezilla - uploads" do
           "Student Name,ID,Section,Assignment 1",
           "User,#{@student.id},,10")
     Gradezilla.grades_uploaded_data.send_keys(fullpath)
-    Gradezilla.grades_new_upload.submit
-    wait_for_ajaximations
+    wait_for_new_page_load{ Gradezilla.grades_new_upload.submit }
     run_jobs
+    Gradezilla.wait_for_spinner
 
-  expect(f('#gradebook_importer_resolution_section')).not_to be_displayed
+    expect(f('#gradebook_importer_resolution_section')).not_to be_displayed
   end
 
   it "should show only changed assignment", priority: "1", test_id: 209972 do
@@ -87,9 +84,9 @@ describe "Gradezilla - uploads" do
           "Student Name,ID,Section,Assignment 1,Assignment 2",
           "User,#{@student.id},,10,9")
     Gradezilla.grades_uploaded_data.send_keys(fullpath)
-    Gradezilla.grades_new_upload.submit
-    wait_for_ajaximations
+    wait_for_new_page_load{ Gradezilla.grades_new_upload.submit }
     run_jobs
+    Gradezilla.wait_for_spinner
 
     expect(f('#gradebook_importer_resolution_section')).not_to be_displayed
     expect(f('#no_changes_detected')).not_to be_displayed
@@ -103,11 +100,10 @@ describe "Gradezilla - uploads" do
       "Student Name,ID,Section,New Assignment",
       "User,#{@student.id},,0")
     Gradezilla.grades_uploaded_data.send_keys(fullpath)
-    Gradezilla.grades_new_upload.submit
-    wait_for_ajaximations
+    wait_for_new_page_load{ Gradezilla.grades_new_upload.submit }
     run_jobs
+    Gradezilla.wait_for_spinner
 
-    expect(f("#spinner")).not_to be_displayed
     expect(f('#gradebook_importer_resolution_section')).to be_displayed
 
     expect(ff('.assignment_section #assignment_resolution_template').length).to eq 1
@@ -123,9 +119,7 @@ describe "Gradezilla - uploads" do
     expect(f('#assignments_without_changes_alert')).not_to be_displayed
 
     assignment_count = @course.assignments.count
-    submit_form('#gradebook_grid_form')
-    accept_alert
-    wait_for_ajaximations
+    wait_for_new_page_load(true) { submit_form('#gradebook_grid_form') }
     run_jobs
     expect(@course.assignments.count).to eql (assignment_count + 1)
     assignment = @course.assignments.order(:created_at).last
@@ -142,9 +136,9 @@ describe "Gradezilla - uploads" do
           "Student Name,ID,Section,Assignment 2,Assignment 1",
           "User,#{@student.id},,,10")
     Gradezilla.grades_uploaded_data.send_keys(fullpath)
-    Gradezilla.grades_new_upload.submit
-    wait_for_ajaximations
+    wait_for_new_page_load{ Gradezilla.grades_new_upload.submit }
     run_jobs
+    Gradezilla.wait_for_spinner
 
     expect(f('#gradebook_importer_resolution_section')).to be_displayed
 
@@ -160,8 +154,7 @@ describe "Gradezilla - uploads" do
     expect(ff('.slick-header-column.assignment').length).to eq 1
 
     assignment_count = @course.assignments.count
-    submit_form('#gradebook_grid_form')
-    wait_for_ajaximations
+    wait_for_new_page_load{ submit_form('#gradebook_grid_form') }
     run_jobs
     expect(@course.assignments.count).to eql (assignment_count + 1)
     assignment = @course.assignments.order(:created_at).last
@@ -178,11 +171,10 @@ describe "Gradezilla - uploads" do
           "Student Name,ID,Section,Assignment 2",
           "User,#{@student.id},,10")
     Gradezilla.grades_uploaded_data.send_keys(fullpath)
-    Gradezilla.grades_new_upload.submit
-    wait_for_ajaximations
+    wait_for_new_page_load{ Gradezilla.grades_new_upload.submit }
     run_jobs
+    Gradezilla.wait_for_spinner
 
-    expect(f("#spinner")).not_to be_displayed
     expect(f('#gradebook_importer_resolution_section')).to be_displayed
 
     expect(ff('.assignment_section #assignment_resolution_template').length).to eq 1
@@ -205,11 +197,10 @@ describe "Gradezilla - uploads" do
           "Student Name,ID,Section,Assignment 1,Assignment 3",
           "User,#{@student.id},,10,9")
     Gradezilla.grades_uploaded_data.send_keys(fullpath)
-    Gradezilla.grades_new_upload.submit
-    wait_for_ajaximations
+    wait_for_new_page_load{ Gradezilla.grades_new_upload.submit }
     run_jobs
+    Gradezilla.wait_for_spinner
 
-    expect(f("#spinner")).not_to be_displayed
     expect(f('#gradebook_importer_resolution_section')).to be_displayed
 
     expect(ff('.assignment_section #assignment_resolution_template').length).to eq 1
@@ -219,7 +210,6 @@ describe "Gradezilla - uploads" do
 
     submit_form('#gradebook_importer_resolution_section')
 
-    expect(f("#spinner")).not_to be_displayed
     expect(f('#no_changes_detected')).not_to be_displayed
 
     expect(ff('.slick-header-column.assignment').length).to eq 1
@@ -234,11 +224,10 @@ describe "Gradezilla - uploads" do
           "Student Name,ID,Section,Assignment 1",
           "Student,,,10")
     Gradezilla.grades_uploaded_data.send_keys(fullpath)
-    Gradezilla.grades_new_upload.submit
-    wait_for_ajaximations
+    wait_for_new_page_load{ Gradezilla.grades_new_upload.submit }
     run_jobs
+    Gradezilla.wait_for_spinner
 
-    expect(f("#spinner")).not_to be_displayed
     expect(f('#gradebook_importer_resolution_section')).to be_displayed
 
     expect(ff('.student_section #student_resolution_template').length).to eq 1
@@ -261,11 +250,10 @@ describe "Gradezilla - uploads" do
           "Student Name,ID,Section,Assignment 1,Assignment 2",
           "Student,,,10,9")
     Gradezilla.grades_uploaded_data.send_keys(fullpath)
-    Gradezilla.grades_new_upload.submit
-    wait_for_ajaximations
+    wait_for_new_page_load{ Gradezilla.grades_new_upload.submit }
     run_jobs
+    Gradezilla.wait_for_spinner
 
-    expect(f("#spinner")).not_to be_displayed
     expect(f('#gradebook_importer_resolution_section')).to be_displayed
 
     expect(ff('.student_section #student_resolution_template').length).to eq 1
@@ -290,9 +278,9 @@ describe "Gradezilla - uploads" do
           "User,#{@student.id},,9")
 
     Gradezilla.grades_uploaded_data.send_keys(fullpath)
-    Gradezilla.grades_new_upload.submit
-    wait_for_ajaximations
+    wait_for_new_page_load{ Gradezilla.grades_new_upload.submit }
     run_jobs
+    Gradezilla.wait_for_spinner
 
     assert_assignment_is_highlighted
   end
@@ -306,9 +294,9 @@ describe "Gradezilla - uploads" do
           "User,#{@student.id},,")
 
     Gradezilla.grades_uploaded_data.send_keys(fullpath)
-    Gradezilla.grades_new_upload.submit
-    wait_for_ajaximations
+    wait_for_new_page_load{ Gradezilla.grades_new_upload.submit }
     run_jobs
+    Gradezilla.wait_for_spinner
 
     assert_assignment_is_highlighted
   end
@@ -322,9 +310,9 @@ describe "Gradezilla - uploads" do
           "User,#{@student.id},,100")
 
     Gradezilla.grades_uploaded_data.send_keys(fullpath)
-    Gradezilla.grades_new_upload.submit
-    wait_for_ajaximations
+    wait_for_new_page_load{ Gradezilla.grades_new_upload.submit }
     run_jobs
+    Gradezilla.wait_for_spinner
 
     assert_assignment_is_not_highlighted
   end
@@ -338,10 +326,9 @@ describe "Gradezilla - uploads" do
           "User,#{@student.id},,EX")
 
     Gradezilla.grades_uploaded_data.send_keys(fullpath)
-    Gradezilla.grades_new_upload.submit
-    wait_for_ajaximations
+    wait_for_new_page_load{ Gradezilla.grades_new_upload.submit }
     run_jobs
-    expect(f("#spinner")).not_to be_displayed
+    Gradezilla.wait_for_spinner
 
     assert_assignment_is_not_highlighted
   end

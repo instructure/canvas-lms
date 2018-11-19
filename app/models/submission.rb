@@ -1878,8 +1878,10 @@ class Submission < ActiveRecord::Base
   def last_teacher_comment
     if association(:submission_comments).loaded?
       submission_comments.reverse.detect{ |com| !com.draft && com.author_id != user_id }
+    elsif association(:visible_submission_comments).loaded?
+      visible_submission_comments.reverse.detect{ |com| com.author_id != user_id }
     else
-      submission_comments.published.where.not(:author_id => user_id).order(:created_at => :desc).first
+      submission_comments.published.where.not(:author_id => user_id).reorder(:created_at => :desc).first
     end
   end
 
@@ -2593,10 +2595,16 @@ class Submission < ActiveRecord::Base
   end
 
   def update_provisional_grade(pg, scorer, attrs = {})
+    # Adding a comment calls update_provisional_grade, but will not have the
+    # grade or score keys included.
+    if (attrs.key?(:grade) || attrs.key?(:score)) && pg.selection.present?
+      raise Assignment::GradeError, error_code: Assignment::GradeError::PROVISIONAL_GRADE_MODIFY_SELECTED
+    end
+
     pg.scorer = pg.current_user = scorer
     pg.final = !!attrs[:final]
-    pg.grade = attrs[:grade] unless attrs[:grade].nil?
-    pg.score = attrs[:score] unless attrs[:score].nil?
+    pg.grade = attrs[:grade] if attrs.key?(:grade)
+    pg.score = attrs[:score] if attrs.key?(:score)
     pg.source_provisional_grade = attrs[:source_provisional_grade] if attrs.key?(:source_provisional_grade)
     pg.graded_anonymously = attrs[:graded_anonymously] unless attrs[:graded_anonymously].nil?
     pg.force_save = !!attrs[:force_save]

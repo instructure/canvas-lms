@@ -291,7 +291,7 @@ class Course < ActiveRecord::Base
 
   def update_account_associations_if_changed
     if (self.saved_change_to_root_account_id? || self.saved_change_to_account_id?) && !self.class.skip_updating_account_associations?
-      send_now_or_later_if_production(new_record? ? :now : :later, :update_account_associations)
+      send_now_or_later_if_production(saved_change_to_id? ? :now : :later, :update_account_associations)
     end
   end
 
@@ -344,7 +344,12 @@ class Course < ActiveRecord::Base
       tags = self.context_module_tags.active.joins(:context_module).where(:context_modules => {:workflow_state => 'active'})
     end
 
-    DifferentiableAssignment.scope_filter(tags, user, self, is_teacher: user_is_teacher)
+    scope = DifferentiableAssignment.scope_filter(tags, user, self, is_teacher: user_is_teacher)
+    unless user_is_teacher
+      scope = scope.where("content_tags.content_type <> ? OR content_tags.content_id IN (?)", "DiscussionTopic",
+        self.discussion_topics.published.visible_to_student_sections(user).select(:id))
+    end
+    scope
   end
 
   def sequential_module_item_ids
@@ -2376,7 +2381,7 @@ class Course < ActiveRecord::Base
     case visibility_level
     when :full, :limited
       scope
-    when :sections
+    when :sections, :sections_limited
       scope.where("enrollments.course_section_id IN (?) OR (enrollments.limit_privileges_to_course_section=? AND enrollments.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'))",
                   visibilities.map{|s| s[:course_section_id]}, false)
     when :restricted
@@ -2422,6 +2427,8 @@ class Course < ActiveRecord::Base
     when :sections then scope.where(enrollments: { course_section_id: visibilities.map {|s| s[:course_section_id] } })
     when :restricted then scope.where(enrollments: { user_id: (visibilities.map { |s| s[:associated_user_id] }.compact + [user]) })
     when :limited then scope.where(enrollments: { type: ['StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'StudentViewEnrollment'] })
+    when :sections_limited then scope.where(enrollments: { course_section_id: visibilities.map {|s| s[:course_section_id] } }).
+      where(enrollments: { type: ['StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'StudentViewEnrollment'] })
     else scope.none
     end
   end
@@ -2479,7 +2486,11 @@ class Course < ActiveRecord::Base
     if granted_permissions.empty?
       :restricted # e.g. observer, can only see admins in the course
     elsif visibilities.present? && visibility_limited_to_course_sections?(user, visibilities)
-      :sections
+      if granted_permissions.eql? [:read_roster]
+        :sections_limited
+      else
+        :sections
+      end
     elsif granted_permissions.eql? [:read_roster]
       :limited
     else

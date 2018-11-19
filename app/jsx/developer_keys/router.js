@@ -30,11 +30,15 @@ let state = store.getState()
  */
 // ctx is context
 function renderShowDeveloperKeys(ctx) {
-  if (ctx.hash === 'key_modal_opened') {
-    store.dispatch(actions.developerKeysModalOpen())
+  if (ctx.hash === 'api_key_modal_opened') {
+    store.dispatch(actions.developerKeysModalOpen('api'))
+  } else if (ctx.hash === 'lti_key_modal_opened') {
+    store.dispatch(actions.developerKeysModalOpen('lti'))
+    store.dispatch(actions.ltiKeysSetLtiKey(true))
   } else {
     store.dispatch(actions.developerKeysModalClose())
     store.dispatch(actions.editDeveloperKey())
+    store.dispatch(actions.ltiKeysSetLtiKey(false))
   }
 
   if (!state.listDeveloperKeys.listDeveloperKeysSuccessful) {

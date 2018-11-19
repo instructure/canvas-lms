@@ -33,10 +33,14 @@ class SwitchEditorControl extends React.Component {
   toggle = e => {
     e.preventDefault()
     RichContentEditor.callOnRCE(this.props.textarea, 'toggle')
-    if (this.state.mode == 'rce') {
-      this.setState({mode: 'html'}, () => { this.switchLink.focus() })
+    if (this.state.mode === 'rce') {
+      this.setState({mode: 'html'}, () => {
+        this.switchLink.focus()
+      })
     } else {
-      this.setState({mode: 'rce'}, () => { this.switchLink.focus() })
+      this.setState({mode: 'rce'}, () => {
+        this.switchLink.focus()
+      })
     }
   }
 
@@ -45,7 +49,7 @@ class SwitchEditorControl extends React.Component {
   //
 
   switchLinkText = () => {
-    if (this.state.mode == 'rce') {
+    if (this.state.mode === 'rce') {
       return I18n.t('switch_editor_html', 'HTML Editor')
     } else {
       return I18n.t('switch_editor_rich_text', 'Rich Content Editor')
@@ -53,17 +57,22 @@ class SwitchEditorControl extends React.Component {
   }
 
   linkClass = () => {
-    if (this.state.mode == 'rce') {
-      return 'switch-views__link__html'
+    if (this.state.mode === 'rce') {
+      return 'switch-views__link switch-views__link__html'
     } else {
-      return 'switch-views__link__rce'
+      return 'switch-views__link switch-views__link__rce'
     }
   }
 
   render() {
     return (
       <div style={{float: 'right'}}>
-        <a ref={c => (this.switchLink = c)} href="#" className={this.linkClass()} onClick={this.toggle}>
+        <a
+          ref={c => (this.switchLink = c)}
+          href="#"
+          className={this.linkClass()}
+          onClick={this.toggle}
+        >
           {this.switchLinkText()}
         </a>
       </div>

@@ -22,8 +22,8 @@ import timezone from 'timezone'
 export default class Api {
   loadAssessmentAuditTrail(courseId, assignmentId, submissionId) {
     const url = `/courses/${courseId}/assignments/${assignmentId}/submissions/${submissionId}/audit_events`
-    return axios.get(url).then(response =>
-      response.data.audit_events.map(auditEvent => ({
+    return axios.get(url).then(response => {
+      const auditEvents = response.data.audit_events.map(auditEvent => ({
         assignmentId: auditEvent.assignment_id,
         canvadocId: auditEvent.canvadoc_id,
         createdAt: timezone.parse(auditEvent.created_at),
@@ -33,6 +33,14 @@ export default class Api {
         submissionId: auditEvent.submission_id,
         userId: auditEvent.user_id
       }))
-    )
+
+      const users = response.data.users.map(user => ({
+        id: user.id,
+        name: user.name,
+        role: user.role
+      }))
+
+      return {auditEvents, users}
+    })
   }
 }

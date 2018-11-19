@@ -25,36 +25,34 @@ import {client, ApolloProvider, Query, gql} from '../canvas-apollo'
 
 const SCC_QUERY = gql`
   query StudentContextCard($courseId: ID!, $studentId: ID!) {
-    course: legacyNode(type: Course, _id: $courseId) {
-      ... on Course {
-        _id
-        name
-        permissions {
-          become_user: becomeUser
-          manage_grades: manageGrades
-          send_messages: sendMessages
-          view_all_grades: viewAllGrades
-          view_analytics: viewAnalytics
-        }
-        submissionsConnection(
-          first: 10
-          orderBy: [{field: gradedAt, direction: descending}]
-          studentIds: [$studentId]
-        ) {
-          edges {
-            submission: node {
-              id
-              score
-              grade
-              excused
-              user {
-                _id
-              }
-              assignment {
-                name
-                html_url: htmlUrl
-                points_possible: pointsPossible
-              }
+    course(id: $courseId) {
+      _id
+      name
+      permissions {
+        become_user: becomeUser
+        manage_grades: manageGrades
+        send_messages: sendMessages
+        view_all_grades: viewAllGrades
+        view_analytics: viewAnalytics
+      }
+      submissionsConnection(
+        first: 10
+        orderBy: [{field: gradedAt, direction: descending}]
+        studentIds: [$studentId]
+      ) {
+        edges {
+          submission: node {
+            id
+            score
+            grade
+            excused
+            user {
+              _id
+            }
+            assignment {
+              name
+              html_url: htmlUrl
+              points_possible: pointsPossible
             }
           }
         }

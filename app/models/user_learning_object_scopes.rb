@@ -63,7 +63,7 @@ module UserLearningObjectScopes
     shard.activate do
       course_ids_result = Shackles.activate(:slave) do
         if include_concluded
-          participated_course_ids
+          all_course_ids
         else
           case participation_type
           when :student
@@ -359,37 +359,6 @@ module UserLearningObjectScopes
         visible_to_user(self).
         for_courses_and_groups(shard_course_ids, shard_group_ids).
         todo_date_between(due_after, due_before)
-    end
-  end
-
-  def submission_statuses(
-    limit: ULOS_DEFAULT_LIMIT,
-    due_after: 2.weeks.ago,
-    due_before: 2.weeks.from_now, # not used but helps with signature matching
-    cache_timeout: 120.minutes,
-    scope_only: false,
-    include_concluded: false,
-    include_locked: false
-  )
-    params = _params_hash(binding)
-    Rails.cache.fetch(['assignment_submission_statuses', self, PlannerHelper.get_planner_cache_id(self), params].cache_key, :expires_in => 120.minutes) do
-      {
-        submitted: Set.new(submitted_assignments(**params).pluck(:id)),
-        excused: Set.new(Submission.active.with_assignment.where(excused: true, user_id: self).pluck(:assignment_id)),
-        graded: Set.new(Submission.active.with_assignment.where(user_id: self).
-          where("submissions.excused = true OR (submissions.score IS NOT NULL AND submissions.workflow_state = 'graded')").
-          pluck(:assignment_id)),
-        late: Set.new(Submission.active.with_assignment.late.where(user_id: self).pluck(:assignment_id)),
-        missing: Set.new(Submission.active.with_assignment.missing.where(user_id: self).pluck(:assignment_id)),
-        needs_grading: Set.new(Submission.active.with_assignment.needs_grading.where(user_id: self).pluck(:assignment_id)),
-        # distinguishes between assignment being graded and having feedback comments, but cannot discern
-        # new feedback and new grades if there is already feedback. that's OK for now, since the "New" was
-        # removed from the "New Grades" and "New Feedback" pills in the UI to simply indicate if there
-        # is _any_ feedback or grade.
-        has_feedback: Set.new((self.recent_feedback(start_at: due_after).
-          select { |feedback| feedback[:submission_comments_count].to_i > 0 }).pluck(:assignment_id)),
-        new_activity: Set.new(Submission.active.with_assignment.unread_for(self).pluck(:assignment_id))
-      }.with_indifferent_access
     end
   end
 end

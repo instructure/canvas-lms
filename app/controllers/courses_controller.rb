@@ -409,8 +409,18 @@ class CoursesController < ApplicationController
   #     'current_period_unposted_final_grade' (see Enrollment documentation for
   #     more information on these fields). In addition, when this argument is
   #     passed, the course will have a 'has_grading_periods' attribute
-  #     on it. This argument is ignored if the course is configured to hide final
-  #     grades or if the total_scores argument is not included.
+  #     on it. This argument is ignored if the total_scores argument is not
+  #     included. If the course is configured to hide final grades, the
+  #     following fields are not returned:
+  #     'totals_for_all_grading_periods_option',
+  #     'current_period_computed_current_score',
+  #     'current_period_computed_final_score',
+  #     'current_period_computed_current_grade',
+  #     'current_period_computed_final_grade',
+  #     'current_period_unposted_current_score',
+  #     'current_period_unposted_final_score',
+  #     'current_period_unposted_current_grade', and
+  #     'current_period_unposted_final_grade'
   #   - "term": Optional information to include with each Course. When
   #     term is given, the information for the enrollment term for each course
   #     is returned.

@@ -278,6 +278,9 @@
   "peer_review_74f26a13": {
     "message": "ピア レビュー"
   },
+  "peer_review_for_itemtitle_358cb413": {
+    "message": "{ itemTitle }のピア評価"
+  },
   "points_bceb5005": {
     "message": "ポイント"
   },

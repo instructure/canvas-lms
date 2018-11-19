@@ -278,6 +278,9 @@
   "peer_review_74f26a13": {
     "message": "Рассмотрение коллегами"
   },
+  "peer_review_for_itemtitle_358cb413": {
+    "message": "Рассмотрение коллегами для { itemTitle }"
+  },
   "points_bceb5005": {
     "message": "баллы"
   },

@@ -16,26 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
-import DashboardCard from './DashboardCard'
 import DraggableDashboardCard from './DraggableDashboardCard'
 import DashboardCardBackgroundStore from './DashboardCardBackgroundStore'
 import MovementUtils from './MovementUtils'
 
 export default class DashboardCardBox extends React.Component {
-
   static propTypes = {
-    courseCards: PropTypes.array,
-    reorderingEnabled: PropTypes.bool,
+    courseCards: PropTypes.arrayOf(PropTypes.object),
     hideColorOverlays: PropTypes.bool,
     connectDropTarget: PropTypes.func
   }
 
   static defaultProps = {
     courseCards: [],
-    hideColorOverlays: false
+    hideColorOverlays: false,
+    connectDropTarget: el => el
   }
 
   componentWillMount() {
@@ -49,16 +46,16 @@ export default class DashboardCardBox extends React.Component {
     DashboardCardBackgroundStore.setDefaultColors(this.allCourseAssetStrings())
   }
 
-  componentWillUnmount() {
-    DashboardCardBackgroundStore.removeChangeListener(this.colorsUpdated)
-  }
-
   componentWillReceiveProps(newProps) {
     DashboardCardBackgroundStore.setDefaultColors(this.allCourseAssetStrings())
 
     this.setState({
       courseCards: newProps.courseCards
     })
+  }
+
+  componentWillUnmount() {
+    DashboardCardBackgroundStore.removeChangeListener(this.colorsUpdated)
   }
 
   colorsUpdated = () => {
@@ -99,10 +96,10 @@ export default class DashboardCardBox extends React.Component {
   }
 
   render() {
-    const Component = this.props.reorderingEnabled ? DraggableDashboardCard : DashboardCard
+    const Component = DraggableDashboardCard
     const cards = this.state.courseCards.map((card, index) => {
       const position =
-        card.position != null ? card.position : this.getOriginalIndex.bind(this, card.assetString)
+        card.position != null ? card.position : () => this.getOriginalIndex(card.assetString)
       return (
         <Component
           key={card.id}
@@ -115,9 +112,8 @@ export default class DashboardCardBox extends React.Component {
           term={card.term}
           assetString={card.assetString}
           backgroundColor={this.colorForCard(card.assetString)}
-          handleColorChange={this.handleColorChange.bind(this, card.assetString)}
+          handleColorChange={newColor => this.handleColorChange(card.assetString, newColor)}
           image={card.image}
-          reorderingEnabled={this.props.reorderingEnabled}
           hideColorOverlays={this.props.hideColorOverlays}
           position={position}
           currentIndex={index}
@@ -129,12 +125,7 @@ export default class DashboardCardBox extends React.Component {
 
     const dashboardCardBox = <div className="ic-DashboardCard__box">{cards}</div>
 
-    if (this.props.reorderingEnabled) {
-      const {connectDropTarget} = this.props
-      return connectDropTarget(dashboardCardBox)
-    }
-
-    return dashboardCardBox
+    const {connectDropTarget} = this.props
+    return connectDropTarget(dashboardCardBox)
   }
 }
-

@@ -50,9 +50,8 @@ Feature.register(
       DESCRIPTION
     },
     applies_to: 'Account',
-    state: 'hidden',
+    state: 'allowed',
     root_opt_in: true,
-    beta: true,
-    development: true
+    beta: true
   }
 )

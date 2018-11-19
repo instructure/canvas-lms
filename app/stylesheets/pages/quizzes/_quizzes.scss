@@ -1399,12 +1399,6 @@ ul#quiz_versions {
   .delete_answer_link {
     display: none !important;
   }
-  .question_correct_comment {
-    display: none;
-  }
-  .question_incorrect_comment {
-    display: none;
-  }
 }
 
 .calculated_question {
@@ -1833,6 +1827,27 @@ ul#quiz_versions {
     font-size: 0.9em;
     margin: 16px 0 8px;
     padding: 5px 10px;
+  }
+}
+
+.question_comments {
+  display: flex;
+  flex-wrap: wrap;
+
+  .comments_header {
+    font-weight: bold;
+  }
+
+  .quiz_comment {
+    font-size: 0.9em;
+  }
+
+  .correct_comments_header {
+    color: $ic-color-success;
+  }
+
+  .incorrect_comments_header {
+    color: $ic-color-danger;
   }
 }
 

@@ -46,7 +46,7 @@ export const opportunityShape = {
   nextUrl: PropTypes.string,
 };
 
-export const sizeShape = PropTypes.oneOf(['medium', 'large']);
+export const sizeShape = PropTypes.oneOf(['small', 'medium', 'large']);
 
 export const statusShape = PropTypes.oneOfType([
   PropTypes.bool,

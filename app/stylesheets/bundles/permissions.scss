@@ -172,6 +172,10 @@ $darkRowBg: #f9f9f9;
     background-color: inherit;
   }
 
+  .ic-permissions__left-header__col-wrapper button {
+    text-align: direction(left);
+  }
+
   .ic-permissions__top-header__col-wrapper-th {
     box-shadow: 3px 4px 5px 0 #e8e8e8, inset 0 1px 0 0 #ddd;
     position: sticky;

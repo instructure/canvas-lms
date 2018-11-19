@@ -344,8 +344,8 @@
                   } else {
                       minHeight = 0;
                   }
-                  menu.css({'max-height' : menuHeight + 'px', 'overflow' : 'visible', 'min-height' : minHeight + 'px'});
-                  menuInner.css({'max-height' : (menuHeight - menuPadding) + 'px', 'overflow-y' : 'visible'});
+                  menu.css({'max-height' : menuHeight + 'px', 'overflow' : 'auto', 'min-height' : minHeight + 'px'});
+                  menuInner.css({'max-height' : (menuHeight - menuPadding) + 'px', 'overflow-y' : 'auto'});
           }
               getSize();
               $(window).resize(getSize);

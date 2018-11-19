@@ -304,7 +304,7 @@ window.rubricAssessment = {
         </Rubric>, container.get(0))
       }
 
-      setCurrentAssessment(rubricAssessment.fillAssessment(ENV.rubric, assessment || {}))
+      setCurrentAssessment(rubricAssessment.fillAssessment(ENV.rubric, assessment || {}, ENV.RUBRIC_ASSESSMENT))
       const header = container.find('th').first()
       header.attr('tabindex', -1).focus()
     } else {
@@ -383,7 +383,7 @@ window.rubricAssessment = {
     if (ENV.nonScoringRubrics && ENV.rubric) {
       ReactDOM.unmountComponentAtNode(el)
       if(assessment) {
-        const filled = rubricAssessment.fillAssessment(ENV.rubric, assessment || {})
+        const filled = rubricAssessment.fillAssessment(ENV.rubric, assessment || {}, ENV.RUBRIC_ASSESSMENT)
         ReactDOM.render(<Rubric
           customRatings={ENV.outcome_proficiency ? ENV.outcome_proficiency.ratings : []}
           rubric={ENV.rubric}

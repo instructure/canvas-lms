@@ -23,6 +23,7 @@ import FlickrStore from './stores/FlickrStore'
 import FlickrImage from './FlickrImage'
 import SVGWrapper from './SVGWrapper'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
+import Text from '@instructure/ui-elements/lib/components/Text'
 
 export default class FlickrSearch extends React.Component {
   state = FlickrStore.getState()
@@ -68,12 +69,16 @@ export default class FlickrSearch extends React.Component {
 
   render() {
     const photos = this.state.searchResults.photos
+    const safetyMessage = I18n.t(`Flickr displays SafeSearch images within the Creative Commons Public Domain.
+              However, safe search results are not guaranteed, as some images may not include a
+              specified safety level by their owners.`)
 
     return (
       <div>
         <div className="FlickrSearch__logo">
           <SVGWrapper url="/images/flickr_logo.svg" />
         </div>
+        <Text color="secondary">{safetyMessage}</Text>
         <div className="ic-Input-group">
           <div
             className="ic-Input-group__add-on"

@@ -18,7 +18,7 @@
 
 import Big from 'big.js'
 import round from 'compiled/util/round'
-import {gradeToScore, scoreToGrade} from '../../gradebook/GradingSchemeHelper'
+import {gradeToScoreUpperBound, scoreToGrade} from '../../gradebook/GradingSchemeHelper'
 import numberHelper from '../../shared/helpers/numberHelper'
 
 const MAX_PRECISION = 15 // the maximum precision of a score persisted to the database
@@ -50,7 +50,7 @@ function parseAsGradingScheme(value, options) {
     return null
   }
 
-  const percentage = gradeToScore(value, options.gradingScheme)
+  const percentage = gradeToScoreUpperBound(value, options.gradingScheme)
   if (percentage == null) {
     return null
   }

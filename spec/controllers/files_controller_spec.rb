@@ -262,6 +262,13 @@ describe FilesController do
       end
     end
 
+    it "authenticates via course if given an assignment id" do
+      user_session(@teacher)
+      assignment = @course.assignments.create!(name: "an assignment")
+      get 'show', params: {assignment_id: assignment.id, id: @file.id}, format: :json
+      expect(response).to be_ok
+    end
+
     describe "with verifiers" do
       it "should allow public access with legacy verifier" do
         allow_any_instance_of(Attachment).to receive(:canvadoc_url).and_return "stubby"

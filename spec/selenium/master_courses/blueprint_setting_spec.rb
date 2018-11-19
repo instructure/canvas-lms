@@ -22,7 +22,6 @@ describe "master courses - settings" do
 
   before :once do
     @account = Account.default
-    @account.enable_feature!(:master_courses)
     @test_course = course_factory(active_all: true)
     @template = MasterCourses::MasterTemplate.set_as_master_course(@test_course)
   end

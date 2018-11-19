@@ -255,7 +255,7 @@ module AngelPropExpected
           :answers=>[],
           :correct_comments=>"",
           :question_name=>"offline item?",
-          :incorrect_comments=>"",
+          :incorrect_comments=>"asdf",
           :migration_id=>nil,
           :points_possible=>1,
           :question_type=>"file_upload_question",

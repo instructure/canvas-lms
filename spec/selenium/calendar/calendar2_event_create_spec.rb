@@ -292,7 +292,7 @@ describe "calendar2" do
         # click to edit
         f(".fc-event-container a.group_user_#{@student1.id}").click
         # detial popup is displayed
-        expect(f('.event-details .event-details-header h3')).to include_text(@to_do.title)
+        expect(f('.event-details .event-details-header h2')).to include_text(@to_do.title)
         # click edit button
         f("button.event_button.edit_event_link").click
         expect(f('#planner_note_context')).to be_displayed

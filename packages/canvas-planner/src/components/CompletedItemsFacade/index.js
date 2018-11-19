@@ -24,7 +24,7 @@ import Pill from '@instructure/ui-elements/lib/components/Pill';
 import BadgeList from '../BadgeList';
 import NotificationBadge, { MissingIndicator, NewActivityIndicator} from '../NotificationBadge';
 import { func, number, string, arrayOf, shape, oneOf } from 'prop-types';
-import { badgeShape } from '../plannerPropTypes';
+import { badgeShape, sizeShape } from '../plannerPropTypes';
 import {animatable} from '../../dynamic-ui';
 
 import styles from './styles.css';
@@ -43,12 +43,14 @@ export class CompletedItemsFacade extends Component {
     deregisterAnimatable: func,
     notificationBadge: oneOf(['none', 'newActivity', 'missing']),
     date: momentObj,  // the scroll-to-today animation requires a date on each component in the planner
+    responsiveSize: sizeShape,
   };
   static defaultProps = {
     badges: [],
     registerAnimatable: () => {},
     deregisterAnimatable: () => {},
     notificationBadge: 'none',
+    responsiveSize: 'large',
   };
 
   componentDidMount () {
@@ -87,13 +89,13 @@ export class CompletedItemsFacade extends Component {
   }
 
   renderNotificationBadge () {
-    if (this.props.notificationBadge === 'none') return null;
+    if (this.props.notificationBadge === 'none') return <NotificationBadge responsiveSize={this.props.responsiveSize} />;
 
     const isNewItem = this.props.notificationBadge === 'newActivity';
     const IndicatorComponent = isNewItem ? NewActivityIndicator : MissingIndicator;
     const badgeMessage = formatMessage('{items} completed {items, plural,=1 {item} other {items}}', {items: this.props.itemCount});
     return (
-      <NotificationBadge>
+      <NotificationBadge responsiveSize={this.props.responsiveSize}>
       <div className={styles.activityIndicator}>
         <IndicatorComponent
         title={badgeMessage}
@@ -111,7 +113,10 @@ export class CompletedItemsFacade extends Component {
       iconMargin: this.theme.gutterWidth,
     } : null;
     return (
-      <div className={classnames(styles.root, 'planner-completed-items')} ref={elt => this.rootDiv = elt}>
+      <div
+        className={classnames(styles.root, styles[this.props.responsiveSize], 'planner-completed-items')}
+        ref={elt => this.rootDiv = elt}
+      >
         {this.renderNotificationBadge()}
         <div className={styles.contentPrimary}>
           <ToggleDetails

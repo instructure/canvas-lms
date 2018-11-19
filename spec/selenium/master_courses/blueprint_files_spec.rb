@@ -25,8 +25,6 @@ describe "blueprint courses - file locking" do
   context "In the associated course" do
 
     before :once do
-      Account.default.enable_feature!(:master_courses)
-
       @copy_from = course_factory(:active_all => true)
       @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
       @filename = 'file.txt'
@@ -108,8 +106,6 @@ describe "blueprint courses - file locking" do
   context "in the blueprint course" do
 
     before :once do
-      Account.default.enable_feature!(:master_courses)
-
       @copy_from = course_factory(:active_all => true)
       @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
       @filename = 'file.txt'

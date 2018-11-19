@@ -233,7 +233,7 @@ module SIS
           run_parallel_importer(parallel_importer)
         end
         parallel_importer.fail
-        fail_with_error!(e)
+        fail_with_error!(e, filename: parallel_importer.attachment.display_name)
       ensure
         file&.close
         unless @run_immediately
@@ -243,7 +243,7 @@ module SIS
         end
       end
 
-      def fail_with_error!(e)
+      def fail_with_error!(e, filename: nil)
         return @batch if @batch.workflow_state == 'aborted'
         message = "Importing CSV for account: "\
             "#{@root_account.id} (#{@root_account.name}) sis_batch_id: #{@batch.id}: #{e}"
@@ -255,7 +255,7 @@ module SIS
         error_message = I18n.t("Error while importing CSV. Please contact support. "\
                                  "(Error report %{number})", number: err_id.to_s)
         @batch.shard.activate do
-          SisBatch.add_error(nil, error_message, sis_batch: @batch, failure: true, backtrace: e.try(:backtrace))
+          SisBatch.add_error(filename, error_message, sis_batch: @batch, failure: true, backtrace: e.try(:backtrace))
           @batch.workflow_state = :failed_with_messages
           @batch.finish(false)
           @batch.save!

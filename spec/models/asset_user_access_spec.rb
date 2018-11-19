@@ -36,15 +36,14 @@ describe AssetUserAccess do
   it "should update existing records that have changed display names" do
     @assignment.title = 'My changed Assignment'
     @assignment.save!
-    @asset = AssetUserAccess.find(@asset.id)
-    @asset.log @course, { :level => 'view' }
-    expect(@asset.display_name).to eq 'My changed Assignment'
+    AssetUserAccess.log @user, @course, { level: 'view', code: @assignment.asset_string }
+    expect(@asset.reload.display_name).to eq 'My changed Assignment'
   end
 
   it "should work for assessment questions" do
     question = assessment_question_model(bank: AssessmentQuestionBank.create!(context: @course))
-    @asset.log question, { :level => 'view' }
-    expect(@asset.context).to eq @course
+    asset = AssetUserAccess.log @user, question, { level: 'view', code: @assignment.asset_string }
+    expect(asset.context).to eq @course
   end
 
   describe "for_user" do

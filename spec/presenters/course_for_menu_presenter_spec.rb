@@ -71,10 +71,9 @@ describe CourseForMenuPresenter do
       expect(h[:shortName]).to eq 'nickname'
     end
 
-    context 'with Dashcard Reordering feature enabled' do
+    context 'Dashcard Reordering' do
       before(:each) do
         @account = Account.default
-        @account.enable_feature! :dashcard_reordering
       end
 
       it 'returns a position if one is set' do

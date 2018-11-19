@@ -1,0 +1,239 @@
+{
+  "alternative_text_a834dcad": {
+    "message": "Alternativ tekst:"
+  },
+  "announcement_list_da155734": {
+    "message": "Meddelelsesliste"
+  },
+  "announcements_a4b8ed4a": {
+    "message": "Beskeder"
+  },
+  "assignments_1e02582c": {
+    "message": "Opgaver"
+  },
+  "background_color_press_down_to_select_ef99fdac": {
+    "message": "Baggrundsfarve, tryk ned for at vælge"
+  },
+  "c_2001_acme_inc_283f7f80": {
+    "message": "(c) 2001 Acme Inc."
+  },
+  "cancel_file_upload_9903e7b9": {
+    "message": "Annuller fil-upload"
+  },
+  "cancel_image_upload_2c771950": {
+    "message": "Annuller upload af billede"
+  },
+  "cc_attribution_f6de631f": {
+    "message": "CC navngivelse"
+  },
+  "cc_attribution_no_derivatives_b006744f": {
+    "message": "CC navngivelse ingen afledninger"
+  },
+  "cc_attribution_non_commercial_39e0d30d": {
+    "message": "CC navngivelse ikke-kommerciel"
+  },
+  "cc_attribution_non_commercial_no_derivatives_9fe74c00": {
+    "message": "CC navngivelse ikke-kommerciel ingen afledninger"
+  },
+  "cc_attribution_non_commercial_share_alike_c7edb1e5": {
+    "message": "CC navngivelse ikke-kommerciel del ligeligt"
+  },
+  "cc_attribution_share_alike_669e7f16": {
+    "message": "CC tillæg navngivelse del ligeligt"
+  },
+  "check_if_the_image_is_decorative_283649b7": {
+    "message": "Kontroller, om billedet er dekorativt"
+  },
+  "choose_usage_rights_33683854": {
+    "message": "Vælg brugsrettigheder ..."
+  },
+  "click_any_file_to_insert_a_download_link_for_that__a708fa4c": {
+    "message": "Klik på en vilkårlig fil for at indsætte et download-link til den pågældende fil."
+  },
+  "click_any_image_to_embed_the_image_in_the_page_2cdd1136": {
+    "message": "Klik på et vilkårligt billede for at integrere billedet i siden."
+  },
+  "click_any_page_to_insert_a_link_to_that_page_ac920c02": {
+    "message": "Klik på en vilkårlig side for at indsætte et link til den pågældende side."
+  },
+  "click_to_embed_image_33107dd8": {
+    "message": "Klik for at integrere billede"
+  },
+  "click_to_embed_imagename_c41ea8df": {
+    "message": "Klik for at integrere { imageName }"
+  },
+  "click_to_insert_a_link_into_the_editor_c19613aa": {
+    "message": "Klik for at indsætte et link i editoren."
+  },
+  "click_to_insert_a_link_to_this_item_39794098": {
+    "message": "Klik for at indsætte et link i dette element."
+  },
+  "close_flickr_form_b32e600a": {
+    "message": "Luk Flickr-formular"
+  },
+  "collaborations_5c56c15f": {
+    "message": "Samarbejde"
+  },
+  "copyright_holder_66ee111": {
+    "message": "Rettighedshaver:"
+  },
+  "course_navigation_dd035109": {
+    "message": "Fagnavigation"
+  },
+  "creative_commons_license_725584ae": {
+    "message": "Creative Commons licens:"
+  },
+  "decorative_image_fde98579": {
+    "message": "Dekorativt billede"
+  },
+  "discussions_a5f96392": {
+    "message": "Diskussioner"
+  },
+  "discussions_index_6c36ced": {
+    "message": "Diskussionsoversigt"
+  },
+  "embed_image_1080badc": {
+    "message": "Integrer billede"
+  },
+  "enter_search_terms_e397b1f0": {
+    "message": "indtast søgetermer"
+  },
+  "enter_the_alternative_text_for_this_image_88047c47": {
+    "message": "Indtast den alternative tekst til dette billede"
+  },
+  "file_upload_form_4aaad554": {
+    "message": "Upload-formular til filer"
+  },
+  "files_c300e900": {
+    "message": "Filer"
+  },
+  "files_index_af7c662b": {
+    "message": "Filoversigt"
+  },
+  "folder_705fd2d7": {
+    "message": "mappe"
+  },
+  "font_size_press_down_to_select_6c25dc2d": {
+    "message": "Skriftstørrelse, tryk ned for at vælge"
+  },
+  "formatting_press_down_to_select_df728c30": {
+    "message": "Formatering, tryk ned for at vælge"
+  },
+  "grades_a61eba0a": {
+    "message": "Vurderinger"
+  },
+  "group_navigation_99f191a": {
+    "message": "Gruppenavigation"
+  },
+  "i_have_obtained_permission_to_use_this_file_6386f087": {
+    "message": "Jeg har opnået tilladelse til at bruge denne fil."
+  },
+  "i_hold_the_copyright_71ee91b1": {
+    "message": "Jeg er rettighedshaveren"
+  },
+  "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
+    "message": "Hvis du ikke vælger brugsrettigheder nu, vil denne fil ikke blive offentliggjort, når den uploades."
+  },
+  "image_upload_form_7b74079a": {
+    "message": "Uploadformular for billeder"
+  },
+  "images_7ce26570": {
+    "message": "Billeder"
+  },
+  "insert_equella_links_49a8dacd": {
+    "message": "Indsæt Equella-links"
+  },
+  "insert_link_6dc23cae": {
+    "message": "Indsæt link"
+  },
+  "insert_math_equation_57c6e767": {
+    "message": "Indsæt matematikregnestykke"
+  },
+  "link_7262adec": {
+    "message": "Link"
+  },
+  "link_to_a_new_page_6c4ad034": {
+    "message": "Link til en ny side"
+  },
+  "link_to_other_content_in_the_course_879163b5": {
+    "message": "Link til andet indhold i faget."
+  },
+  "link_to_other_content_in_the_group_3fe25379": {
+    "message": "Link til andet indhold i gruppen."
+  },
+  "link_to_url_52dd935c": {
+    "message": "Link til URL"
+  },
+  "links_14b70841": {
+    "message": "Links"
+  },
+  "load_more_results_460f49a9": {
+    "message": "Indlæs flere resultater"
+  },
+  "loading_25990131": {
+    "message": "Indlæser ..."
+  },
+  "loading_failed_b3524381": {
+    "message": "Indlæsning mislykkedes ..."
+  },
+  "modules_c4325335": {
+    "message": "Forløb"
+  },
+  "no_results_940393cf": {
+    "message": "Ingen resultater."
+  },
+  "pages_e5414c2c": {
+    "message": "Sider"
+  },
+  "people_b4ebb13c": {
+    "message": "Deltagere"
+  },
+  "quizzes_7e598f57": {
+    "message": "Quizzer"
+  },
+  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
+    "message": "Område med RTF. Tryk på ALT+F8 for hjælp"
+  },
+  "search_280d00bd": {
+    "message": "Søg"
+  },
+  "search_flickr_6884b518": {
+    "message": "Søg Flickr"
+  },
+  "select_a_file_53ba40ac": {
+    "message": "Vælg en fil"
+  },
+  "select_a_folder_to_upload_your_file_into_b82d12b": {
+    "message": "Vælg en mappe at uploade din fil til"
+  },
+  "text_color_press_down_to_select_8f5ad9b5": {
+    "message": "Tekstfarve, tryk ned for at vælge"
+  },
+  "the_material_is_in_the_public_domain_279c39a3": {
+    "message": "Materialer er på det offentlige domæne"
+  },
+  "the_material_is_licensed_under_creative_commons_3242cb5e": {
+    "message": "Materialet licenseres under Creative Commons"
+  },
+  "the_material_is_subject_to_fair_use_exception_41bc6a4b": {
+    "message": "Materialet er underlagt undtagelsen om rimelig brug"
+  },
+  "upload_8b403d05": {
+    "message": "Upload"
+  },
+  "upload_a_new_file_96e6d4ff": {
+    "message": "Upload en ny fil"
+  },
+  "upload_a_new_image_890df275": {
+    "message": "Upload et nyt billede"
+  },
+  "usage_right_ff96f3e2": {
+    "message": "Brugsrettigheder:"
+  },
+  "what_would_you_like_to_call_the_new_page_d7e4488a": {
+    "message": "Hvad kunne du tænke dig at kalde den nye side?"
+  },
+  "wiki_home_9cd54d0": {
+    "message": "Wiki startside"
+  }
+}

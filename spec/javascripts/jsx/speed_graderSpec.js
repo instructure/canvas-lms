@@ -22,6 +22,7 @@ import ReactDOM from 'react-dom';
 import SpeedGrader from 'speed_grader';
 import SpeedGraderHelpers from 'speed_grader_helpers';
 
+import _ from 'underscore';
 import JQuerySelectorCache from 'jsx/shared/helpers/JQuerySelectorCache';
 import fakeENV from 'helpers/fakeENV';
 import natcompare from 'compiled/util/natcompare';
@@ -61,6 +62,19 @@ function teardownFixtures() {
 
 QUnit.module('SpeedGrader#showDiscussion', {
   setup () {
+    const commentBlankHtml = `
+      <div id="comments">
+      </div>
+      <div id="comment_blank">
+        <a class="play_comment_link"></a>
+        <div class="comment">
+          <div class="comment_flex">
+            <span class="comment"></span>
+          </div>
+        </div>
+      </div>
+    `;
+
     fakeENV.setup({
       assignment_id: '17',
       course_id: '29',
@@ -68,7 +82,7 @@ QUnit.module('SpeedGrader#showDiscussion', {
       help_url: 'example.com/support',
       show_help_menu_item: false
     })
-    setupFixtures();
+    setupFixtures(commentBlankHtml);
     sandbox.stub($, 'ajaxJSON');
     sandbox.spy($.fn, 'append');
     this.originalWindowJSONData = window.jsonData;
@@ -93,12 +107,14 @@ QUnit.module('SpeedGrader#showDiscussion', {
           attachment_ids: '',
           author_id: 1000,
           author_name: 'An Author',
-          comment: 'test',
+          comment: 'a comment!',
           context_id: 1,
           context_type: 'Course',
           created_at: '2016-07-12T23:47:34Z',
           hidden: false,
           id: 11,
+          media_comment_id: 3,
+          media_comment_type: 'video',
           posted_at: 'Jul 12 at 5:47pm',
           submission_id: 1,
           teacher_only_comment: false,
@@ -140,7 +156,7 @@ test('showDiscussion should show group comments for group assignments', () => {
   window.jsonData.GROUP_GRADING_MODE = true;
   SpeedGrader.EG.currentStudent.submission.submission_comments[0].group_comment_id = 'hippo';
   SpeedGrader.EG.showDiscussion();
-  sinon.assert.calledTwice($.fn.append);
+  strictEqual(document.querySelector('.comment').innerText, 'a comment!')
 });
 
 test('showDiscussion should show private comments for non group assignments', () => {
@@ -149,6 +165,18 @@ test('showDiscussion should show private comments for non group assignments', ()
   SpeedGrader.EG.showDiscussion();
   sinon.assert.calledTwice($.fn.append);
 });
+
+test('thumbnails of media comments have screenreader text', () => {
+  const originalKalturaSettings = INST.kalturaSettings
+  INST.kalturaSettings = { resource_domain: "example.com", partner_id: "asdf" }
+  sinon.stub(_, 'defer').callsFake((func, elem, size, keepOriginalText) => {
+    func(elem, size, keepOriginalText)
+  })
+  SpeedGrader.EG.showDiscussion()
+  const screenreaderText = document.querySelector(".play_comment_link .screenreader-only").innerText
+  strictEqual(screenreaderText, "Play media comment by An Author from Jul 12, 2016 at 11:47pm.")
+  INST.kalturaSettings = originalKalturaSettings
+})
 
 QUnit.module('SpeedGrader#refreshSubmissionsToView', {
   setup () {
@@ -658,6 +686,7 @@ QUnit.module('SpeedGrader#handleGradeSubmit', {
     sandbox.spy($.fn, 'append');
     this.originalWindowJSONData = window.jsonData;
     setupFixtures(`
+      <div id="iframe_holder"></div>
       <div id="multiple_submissions"></div>
       <a class="update_submission_grade_url" href="my_url.com" title="POST"></a>
     `);
@@ -1092,6 +1121,8 @@ QUnit.module('handleSubmissionSelectionChange', (hooks) => {
     submissions = `/submissions/{{submissionId}}`;
     params = `?download={{attachmentId}}`;
     setupFixtures(`
+      <div id="iframe_holder"></div>
+      <div id="react_pill_container"></div>
       <div id='grade_container'>
         <input type='text' id='grading-box-extended' />
       </div>
@@ -1345,6 +1376,10 @@ QUnit.module('SpeedGrader#formatGradeForSubmission', {
   teardown () {
     fakeENV.teardown();
   }
+});
+
+test('returns empty string if input is empty string', () => {
+  strictEqual(SpeedGrader.EG.formatGradeForSubmission(''), '');
 });
 
 test('should call numberHelper#parse if grading type is points', () => {
@@ -2403,6 +2438,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
 
         setupFixtures(`
           <div id="combo_box_container"></div>
+          <div id="react_pill_container"></div>
           <div class="comment" id="comment_fixture" style="display: none;">
             <button class="submit_comment_button"/></button>
           </div>
@@ -2633,6 +2669,10 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
           show_help_menu_item: false,
           RUBRIC_ASSESSMENT: {}
         })
+
+        setupFixtures(`
+          <div id="react_pill_container"></div>
+        `);
 
         SpeedGrader.setup()
         window.jsonData = windowJsonData
@@ -3119,6 +3159,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         submissions = `/anonymous_submissions/{{anonymousId}}`;
         params = `?download={{attachmentId}}`;
         setupFixtures(`
+          <div id="react_pill_container"></div>
           <div id="full_width_container"></div>
           <div id="submission_file_hidden">
             <a
@@ -3149,6 +3190,15 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         SpeedGrader.EG.handleSubmissionSelectionChange()
         const {classList} = document.getElementById('full_width_container')
         strictEqual(classList.contains('with_enrollment_notice'), true)
+      })
+
+      test('removes existing event listeners for resubmit button', () => {
+        const spy = sinon.spy($.prototype, "off")
+        SpeedGrader.EG.currentStudent = alphaStudent
+        window.jsonData.context.enrollments[0].workflow_state = 'inactive'
+        SpeedGrader.EG.currentStudent.submission.has_originality_score = true
+        SpeedGrader.EG.handleSubmissionSelectionChange()
+        ok(spy.called)
       })
 
       test('isStudentConcluded is called with anonymous id', () => {
@@ -3850,6 +3900,12 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
 
       const [errorMessage] = $.flashError.firstCall.args
       strictEqual(errorMessage, 'An error occurred updating this assignment.')
+    })
+
+    test('warns the user that a selected grade cannot be altered', () => {
+      SpeedGrader.EG.handleGradingError({errors: {error_code: 'PROVISIONAL_GRADE_MODIFY_SELECTED'}})
+      const [errorMessage] = $.flashError.firstCall.args
+      strictEqual(errorMessage, 'The grade you entered has been selected and can no longer be changed.')
     })
   })
 

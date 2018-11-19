@@ -35,9 +35,10 @@ module SIS
         count = SIS::UserImporter.new(@root_account, importer_opts).process(messages) do |importer|
           csv_rows(csv, index, count) do |row|
             begin
-              importer.add_user(create_user(row, csv))
+              u = create_user(row, csv)
+              importer.add_user(u)
             rescue ImportError => e
-              messages << SisBatch.build_error(csv, e.to_s, sis_batch: @batch, row: row['lineno'], row_info: row)
+              messages << SisBatch.build_error(csv, e.to_s, sis_batch: @batch, row: row['lineno'], row_info: u.row_info)
             end
           end
         end

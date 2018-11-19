@@ -18,7 +18,7 @@
 import React, { Component } from 'react';
 import classnames from 'classnames';
 import themeable from '@instructure/ui-themeable/lib';
-import { func, bool } from 'prop-types';
+import { func, bool, string } from 'prop-types';
 
 import Heading from '@instructure/ui-elements/lib/components/Heading';
 import Link from '@instructure/ui-elements/lib/components/Link';
@@ -37,6 +37,10 @@ class PlannerEmptyState extends Component {
     changeDashboardView: func.isRequired,
     onAddToDo: func.isRequired,
     isCompletelyEmpty: bool,
+    responsiveSize: string,
+  }
+  static defaultProps = {
+    responsiveSize: 'large',
   }
 
   handleDashboardCardLinkClick = () => {
@@ -57,7 +61,7 @@ class PlannerEmptyState extends Component {
 
   renderNothingAtAll () {
     return (
-      <div className={classnames(styles.root, 'planner-empty-state')}>
+      <div className={classnames(styles.root, 'planner-empty-state', styles[this.props.responsiveSize])}>
         <DesertSvg className={classnames(styles.desert, 'desert')} aria-hidden="true" />
         <div className={styles.title}>
           <Heading>{formatMessage("No Due Dates Assigned")}</Heading>
@@ -73,7 +77,7 @@ class PlannerEmptyState extends Component {
 
   renderNothingLeft () {
     return (
-      <div className={classnames(styles.root, 'planner-empty-state')}>
+      <div className={classnames(styles.root, 'planner-empty-state', styles[this.props.responsiveSize])}>
         <BalloonsSvg className={classnames(styles.balloons, 'balloons')} aria-hidden="true" />
         <div className={styles.title}>
           <Heading>{formatMessage("Nothing More To Do")}</Heading>

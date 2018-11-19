@@ -17,7 +17,7 @@
 %>
 
 <%
-  event_list ||= nil
+  event_list ||= []
   title ||= t('titles.events', "Events")
   display_count ||= 3
   display_count += 1 if event_list.length == display_count + 1

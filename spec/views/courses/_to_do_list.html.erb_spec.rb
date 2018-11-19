@@ -27,7 +27,7 @@ describe "courses/_to_do_list.html.erb" do
         course_with_student(active_all: true)
         view_context
         render partial: "courses/to_do_list", locals: {contexts: nil}
-        expect(response).to include '<div class="todo-list">'
+        expect(response).to include '<div class="todo-list Sidebar__TodoListContainer">'
       end
     end
   end

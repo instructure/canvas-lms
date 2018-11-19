@@ -18,7 +18,6 @@
 
 import React, {PureComponent} from 'react'
 import View from '@instructure/ui-layout/lib/components/View'
-import I18n from 'i18n!speed_grader'
 
 import UserEventGroup from './UserEventGroup'
 import * as propTypes from './propTypes'
@@ -30,27 +29,11 @@ export default class AuditTrail extends PureComponent {
 
   render() {
     const {userEventGroups} = this.props.auditTrail
-    const userEventGroupData = []
-
-    Object.keys(userEventGroups).forEach(userId => {
-      userEventGroupData.push({
-        userEventGroup: userEventGroups[userId],
-        userId,
-        // A user could be unknown in the event we do not have user info loaded
-        // for this user id. Display "Unknown User" as a fallback.
-        userName: I18n.t('Unknown User')
-      })
-    })
 
     return (
       <View as="div" id="assessment-audit-trail">
-        {userEventGroupData.map(datum => (
-          <UserEventGroup
-            key={datum.userId}
-            userEventGroup={datum.userEventGroup}
-            userId={datum.userId}
-            userName={datum.userName}
-          />
+        {userEventGroups.map(group => (
+          <UserEventGroup key={group.user.id} userEventGroup={group} />
         ))}
       </View>
     )

@@ -316,21 +316,6 @@ describe('api actions', () => {
       });
     });
 
-    it('does set default time of 11:59 pm for planner date at midnight', () => {
-      const TZ = "Atlantic/Azores";
-      const plannerItem = simpleItem({date: moment.tz(TZ).startOf('day').toISOString()});
-      Actions.savePlannerItem(plannerItem)(() => {}, () => {return {timeZone: TZ};});
-      return moxiosWait((request) => {
-        expect(request.config.method).toBe('post');
-        expect(request.url).toBe('/api/v1/planner_notes');
-        expect(JSON.parse(request.config.data).transformedToApi).toBeTruthy();
-        const result = moment(JSON.parse(request.config.data).date).tz(TZ);
-        expect(result.hours()).toEqual(23);
-        expect(result.minutes()).toEqual(59);
-        expect(result.seconds()).toEqual(59);
-      });
-    });
-
     it('does a put if the planner item exists (has id)', () => {
       const plannerItem = simpleItem({id: '42'});
       Actions.savePlannerItem(plannerItem, )(() => {}, () => {return {timeZone: 'America/Halifax'};});

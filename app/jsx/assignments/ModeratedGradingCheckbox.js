@@ -39,6 +39,12 @@ export default function ModeratedGradingCheckbox(props) {
   }
 
   const isDisabled = props.gradedSubmissionsExist || props.isGroupAssignment || props.isPeerReviewAssignment
+  let disabledLabel
+  if (isDisabled) {
+    disabledLabel = <div className="ModeratedGrading__CheckboxDescription" style={{fontSize: '0.9em'}}>
+      {tooltipMessage()}
+    </div>
+  }
   const body = (
     <label className="ModeratedGrading__CheckboxLabel" htmlFor="assignment_moderated_grading">
       <input type="hidden" name="moderated_grading" value={props.checked} />
@@ -55,7 +61,7 @@ export default function ModeratedGradingCheckbox(props) {
       />
 
       <strong className="ModeratedGrading__CheckboxLabelText">{I18n.t('Moderated Grading')}</strong>
-
+      {disabledLabel}
       <div className="ModeratedGrading__CheckboxDescription">
         {I18n.t('Allow moderator to review multiple independent grades for selected submissions')}
       </div>

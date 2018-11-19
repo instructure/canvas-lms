@@ -294,10 +294,45 @@ class SubmissionsController < SubmissionsBaseController
       submission_id: params[:submission_id]
     )
 
+    submission = Submission.find(params[:submission_id])
+
     respond_to do |format|
-      format.json { render json: { audit_events: audit_events.as_json(include_root: false) }, status: :ok }
+      format.json do
+        render json: {
+          audit_events: audit_events.as_json(include_root: false),
+          users: audit_event_user_data(audit_events: audit_events, submission: submission)
+        }, status: :ok
+      end
     end
   end
+
+  def audit_event_user_data(audit_events:, submission:)
+    auditing_users = User.find(audit_events.pluck(:user_id))
+
+    auditing_users.map do |user|
+      {
+        id: user.id,
+        name: user.name,
+        role: auditing_user_role(user: user, submission: submission)
+      }
+    end
+  end
+  private :audit_event_user_data
+
+  def auditing_user_role(user:, submission:)
+    assignment = submission.assignment
+
+    if submission.user == user
+      "student"
+    elsif assignment.moderated_grading? && assignment.final_grader == user
+      "final_grader"
+    elsif assignment.course.account_membership_allows(user)
+      "admin"
+    else
+      "grader"
+    end
+  end
+  private :auditing_user_role
 
   def lookup_existing_attachments
     if params[:submission][:file_ids].is_a?(Array)

@@ -34,6 +34,7 @@ test('@mixin', function() {
     static initClass() {
       this.mixin(mixable)
     }
+
     initialize() {
       initSpy.apply(this, arguments)
       super.initialize(...arguments)

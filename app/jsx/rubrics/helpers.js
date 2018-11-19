@@ -35,10 +35,12 @@ const fillCriteria = (criterion) => {
   }
 }
 
-export const fillAssessment = (rubric, partialAssessment) => {
+export const fillAssessment = (rubric, partialAssessment, assessmentDefaults) => {
   const prior = _.keyBy(_.cloneDeep(partialAssessment.data), (c) => c.criterion_id)
+
   return {
     score: 0,
+    ...assessmentDefaults,
     ...partialAssessment,
     data: rubric.criteria.map((c) =>
       _.has(prior, c.id) ? fillCriteria(prior[c.id]) : defaultCriteria(c.id)

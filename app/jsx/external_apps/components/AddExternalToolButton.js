@@ -227,7 +227,7 @@ export default class AddExternalToolButton extends React.Component {
           open={this.state.modalIsOpen}
           onDismiss={this.closeModal}
           label={I18n.t('Add App')}
-          size={this.state.isLti2 ? 'auto' : 'large'}
+          size="large"
         >
           <ModalBody>
             {this.renderForm()}

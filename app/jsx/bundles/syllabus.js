@@ -37,9 +37,7 @@ if (ENV.current_user_id) {
   collections.push(new SyllabusAppointmentGroupsCollection([ENV.context_asset_string], 'manageable'))
 }
 
-// also only show planner items to logged in users because non-logged in users don't have access
-// to these yet.
-if (ENV.STUDENT_PLANNER_ENABLED && ENV.current_user_id) {
+if (ENV.STUDENT_PLANNER_ENABLED) {
   collections.push(new SyllabusPlannerCollection([ENV.context_asset_string]))
 }
 
