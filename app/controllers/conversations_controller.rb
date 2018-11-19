@@ -328,6 +328,9 @@ class ConversationsController < ApplicationController
   # @argument body [Required, String]
   #   The message to be sent
   #
+  # @argument force_new [Boolean]
+  #   Forces a new message to be created, even if there is an existing private conversation.
+  #
   # @argument group_conversation [Boolean]
   #   Defaults to false. If true, this will be a group conversation (i.e. all
   #   recipients may see all messages and replies). If false, individual private
@@ -395,7 +398,7 @@ class ConversationsController < ApplicationController
 
     group_conversation     = value_to_boolean(params[:group_conversation])
     batch_private_messages = !group_conversation && @recipients.size > 1
-    batch_group_messages   = group_conversation && value_to_boolean(params[:bulk_message])
+    batch_group_messages   = (group_conversation && value_to_boolean(params[:bulk_message])) || value_to_boolean(params[:force_new])
     message                = build_message
 
     if !batch_group_messages && @recipients.size > Conversation.max_group_conversation_size
