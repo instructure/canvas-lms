@@ -328,6 +328,9 @@ class ConversationsController < ApplicationController
   # @argument body [Required, String]
   #   The message to be sent
   #
+  # @argument force_new [Boolean]
+  #   Forces a new message to be created, even if there is an existing private conversation.
+  #
   # @argument group_conversation [Boolean]
   #   Defaults to false. If true, this will be a group conversation (i.e. all
   #   recipients may see all messages and replies). If false, individual private
@@ -403,7 +406,7 @@ class ConversationsController < ApplicationController
     end
 
     shard.activate do
-      if batch_private_messages || batch_group_messages
+      if batch_private_messages || batch_group_messages || value_to_boolean(params[:force_new])
         mode = params[:mode] == 'async' ? :async : :sync
         batch = ConversationBatch.generate(message, @recipients, mode,
           subject: params[:subject], context_type: context_type,
