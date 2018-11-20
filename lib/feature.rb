@@ -676,7 +676,7 @@ END
       state: 'allowed',
       development: true
     },
-    'final_grade_override' => {
+    'final_grades_override' => {
       display_name: -> { I18n.t('Final Grade Override') },
       description: -> {
         I18n.t <<~DESCRIPTION
@@ -684,7 +684,7 @@ END
         DESCRIPTION
       },
       applies_to: 'Course',
-      state: 'allowed',
+      state: 'hidden',
       development: true,
       beta: true
     }
