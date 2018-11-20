@@ -227,7 +227,7 @@ describe GradebooksController do
     context "final grade override" do
       before(:once) do
         @course.update!(grading_standard_enabled: true)
-        @course.enable_feature!(:final_grade_override)
+        @course.enable_feature!(:final_grades_override)
         @course.assignments.create!(title: "an assignment")
         @student_enrollment.scores.find_by(course_score: true).update!(override_score: 99)
       end
@@ -239,7 +239,7 @@ describe GradebooksController do
       end
 
       it "does not include the effective final grade in the ENV if the feature is disabled" do
-        @course.disable_feature!(:final_grade_override)
+        @course.disable_feature!(:final_grades_override)
         user_session(@teacher)
         get :grade_summary, params: { course_id: @course.id, id: @student.id }
         expect(assigns[:js_env].key?(:effective_final_grade)).to be false
