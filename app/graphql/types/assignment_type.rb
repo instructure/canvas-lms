@@ -187,6 +187,13 @@ module Types
       load_association(:assignment_group)
     end
 
+    field :modules, [ModuleType], null: true
+    def modules
+      load_association(:context_module_tags).then do
+        assignment.context_module_tags.map(&:context_module).sort_by(&:position)
+      end
+    end
+
     field :only_visible_to_overrides, Boolean,
       "specifies that this assignment is only assigned to students for whom an
        `AssignmentOverride` applies.",

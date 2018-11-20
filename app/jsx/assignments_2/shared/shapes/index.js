@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {bool, number, oneOf, shape, string} from 'prop-types'
+import {bool, number, oneOf, shape, string, arrayOf} from 'prop-types'
 
 // This ENV shape is for the controller's current show action. We'll have
 // something different when assignments are being created, which is a different
@@ -41,11 +41,23 @@ export const CourseShape = shape({
   lid: string.isRequired
 })
 
+export const ModuleShape = shape({
+  lid: string.isRequired,
+  name: string.isRequired
+})
+
+export const AssignmentGroupShape = shape({
+  lid: string.isRequired,
+  name: string.isRequired
+})
+
 export const AssignmentShape = shape({
   name: string.isRequired,
   pointsPossible: number.isRequired,
   dueAt: string.isRequired, // temporary
   description: string.isRequired,
   state: oneOf(['published', 'unpublished']).isRequired,
-  course: CourseShape.isRequired
+  course: CourseShape.isRequired,
+  modules: arrayOf(ModuleShape).isRequired,
+  assignmentGroup: AssignmentGroupShape.isRequired
 })

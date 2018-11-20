@@ -40,6 +40,8 @@ export function mockAssignment(overrides) {
     pointsPossible: 5,
     state: 'published',
     course: mockCourse(),
+    modules: [{lid: '1', name: 'module 1'}, {lid: '2', name: 'module 2'}],
+    assignmentGroup: {lid: '1', name: 'assignment group'},
     ...overrides
   }
 }

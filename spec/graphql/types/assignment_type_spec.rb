@@ -125,6 +125,14 @@ describe Types::AssignmentType do
     expect(assignment_type.resolve("assignmentGroup { _id }")).to eq assignment.assignment_group.to_param
   end
 
+  it "has modules" do
+    module1 = assignment.course.context_modules.create!(name: 'Module 1')
+    module2 = assignment.course.context_modules.create!(name: 'Module 2')
+    assignment.context_module_tags.create!(context_module: module1, context: assignment.course, tag_type: 'context_module')
+    assignment.context_module_tags.create!(context_module: module2, context: assignment.course, tag_type: 'context_module')
+    expect(assignment_type.resolve("modules { _id }").sort).to eq [module1.id.to_s, module2.id.to_s]
+  end
+
   it "only returns valid submission types" do
     assignment.update_attribute :submission_types, "none,foodfight"
     expect(assignment_type.resolve("submissionTypes")).to eq ["none"]

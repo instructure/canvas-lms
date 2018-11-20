@@ -97,6 +97,16 @@ const TeacherQuery = gql`
       pointsPossible
       state
 
+      assignmentGroup {
+        lid: _id
+        name
+      }
+
+      modules {
+        lid: _id
+        name
+      }
+
       course {
         lid: _id
       }

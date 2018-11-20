@@ -33,6 +33,7 @@ type Assignment implements Node & Timestamped {
   id: ID!
   lockAt: DateTime
   lockInfo: LockInfo
+  modules: [Module!]
   muted: Boolean!
   name: String
   needsGradingCount: Int
