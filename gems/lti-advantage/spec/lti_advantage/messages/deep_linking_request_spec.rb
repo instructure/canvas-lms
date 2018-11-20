@@ -20,10 +20,10 @@ require 'lti_advantage'
 require File.expand_path(File.dirname(__FILE__) + '/typed_attribute_examples')
 
 module LtiAdvantage::Messages
-  RSpec.describe ResourceLinkRequest do
-    let(:message) { ResourceLinkRequest.new }
+  RSpec.describe DeepLinkingRequest do
+    let(:message) { DeepLinkingRequest.new }
     let(:valid_message) do
-      ResourceLinkRequest.new(
+      DeepLinkingRequest.new(
         aud: ['129aeb8c-a267-4551-bb5f-e6fc308fcecf'],
         azp: '163440e5-1c75-4c28-a07c-43e8a9cd3110',
         sub: '7da708b6-b6cf-483b-b899-11831c685b6f',
@@ -32,14 +32,17 @@ module LtiAdvantage::Messages
         exp: 1529681634,
         iss: 'https://platform.example.edu',
         nonce: '5a234202-6f0e-413d-8793-809db7a95930',
-        resource_link: LtiAdvantage::Claims::ResourceLink.new(id: 1),
+        deep_linking_settings: LtiAdvantage::Models::DeepLinkingSetting.new(
+          accept_types: ['link'],
+          accept_presentation_document_targets: ['iframe']
+        ),
         roles: ['foo']
       )
     end
 
     describe 'initializer' do
-      it 'defaults "message_type" to "LtiResourceLinkRequest' do
-        expect(message.message_type).to eq 'LtiResourceLinkRequest'
+      it 'defaults "message_type" to "LtiDeepLinkingRequest' do
+        expect(message.message_type).to eq 'LtiDeepLinkingRequest'
       end
 
       it 'defaults "version" to "1.3.0' do
@@ -53,9 +56,9 @@ module LtiAdvantage::Messages
         expect(message.context.id).to eq 23
       end
 
-      it 'initializes "resource_link" when it is referenced' do
-        message.resource_link.id = 23
-        expect(message.resource_link.id).to eq 23
+      it 'initializes "deep_linking_settings" when it is referenced' do
+        message.deep_linking_settings.title = 'Title'
+        expect(message.deep_linking_settings.title).to eq 'Title'
       end
 
       it 'initalizes "launch_presentation" when it is referenced' do
@@ -67,22 +70,20 @@ module LtiAdvantage::Messages
         message.tool_platform.name = 'foo'
         expect(message.tool_platform.name).to eq 'foo'
       end
-
-      it 'initializes "names_and_roles_service" when it is referenced' do
-        message.names_and_roles_service.context_memberships_url = 'http://some.meaningless.url.com'
-        expect(message.names_and_roles_service.context_memberships_url).to eq 'http://some.meaningless.url.com'
-      end
-
-      it 'initializes "assignment_and_grade_service" when it is referenced' do
-        message.assignment_and_grade_service.lineitems = 'http://some.meaningless.url.com'
-        expect(message.assignment_and_grade_service.lineitems).to eq 'http://some.meaningless.url.com'
-      end
     end
 
     describe 'validations' do
       include_context 'typed_attribute_examples'
 
       it_behaves_like 'validations for a JWT LTI message'
+
+      it 'verifies that "deep_linking_settings" is an DeepLinkingSetting' do
+        message.deep_linking_settings = 'foo'
+        message.validate
+        expect(message.errors.messages[:deep_linking_settings]).to match_array [
+          'deep_linking_settings must be an instance of LtiAdvantage::Models::DeepLinkingSetting'
+        ]
+      end
 
       it 'is not valid if required claims are missing' do
         expect(message).to be_invalid
@@ -93,7 +94,7 @@ module LtiAdvantage::Messages
       end
 
       it 'validates sub claims' do
-        message = ResourceLinkRequest.new(
+        message = DeepLinkingRequest.new(
           aud: ['129aeb8c-a267-4551-bb5f-e6fc308fcecf'],
           azp: '163440e5-1c75-4c28-a07c-43e8a9cd3110',
           sub: '7da708b6-b6cf-483b-b899-11831c685b6f',
@@ -102,40 +103,18 @@ module LtiAdvantage::Messages
           exp: 1529681634,
           iss: 'https://platform.example.edu',
           nonce: '5a234202-6f0e-413d-8793-809db7a95930',
-          resource_link: LtiAdvantage::Claims::ResourceLink.new(id: 1),
+          deep_linking_settings: LtiAdvantage::Models::DeepLinkingSetting.new(
+            accept_types: ['link'],
+            accept_presentation_document_targets: ['iframe']
+          ),
           roles: ['foo'],
           context: LtiAdvantage::Claims::Context.new
         )
         message.validate
         expect(message.errors.messages[:context].first.messages).to eq(
-          {:id => ["can't be blank"]}
+          { id: ["can't be blank"] }
         )
       end
-
-      it 'verifies that "resource_link" is an Platform' do
-        message.resource_link = 'foo'
-        message.validate
-        expect(message.errors.messages[:resource_link]).to match_array [
-          'resource_link must be an instance of LtiAdvantage::Claims::ResourceLink'
-        ]
-      end
-
-      it 'verifies that "names_and_roles_service" is a NamesAndRolesService' do
-        message.names_and_roles_service = 'foo'
-        message.validate
-        expect(message.errors.messages[:names_and_roles_service]).to match_array [
-          'names_and_roles_service must be an instance of LtiAdvantage::Claims::NamesAndRolesService'
-        ]
-      end
-
-      it 'verifies that "assignment_and_grade_service" is an AssignmentAndGradeService' do
-        message.assignment_and_grade_service = 'foo'
-        message.validate
-        expect(message.errors.messages[:assignment_and_grade_service]).to match_array [
-          'assignment_and_grade_service must be an instance of LtiAdvantage::Claims::AssignmentAndGradeService'
-        ]
-      end
     end
-
   end
 end
