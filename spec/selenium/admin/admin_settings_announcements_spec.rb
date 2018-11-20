@@ -50,7 +50,7 @@ describe "settings tabs" do
 
       # close the "user account" Tray that opened so we could read the displayed username
       f('body').click
-      expect(f('body')).not_to contain_css('[aria-label="Global navigation tray"]')
+      expect(f('body')).not_to contain_css('[aria-label="Profile tray"]')
 
       expect(f("#tab-announcements .notification_subject").text).to eq subject
       expect(f("#tab-announcements .notification_message").text).to eq "this is a message"
