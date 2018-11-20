@@ -21,6 +21,13 @@ namespace :strongmind do
     CanvasShimAssetUploader.new.upload!
   end
 
+  desc "Re-enqueue orphaned jobs after deploy"
+  task :enqueue_jobs, [:worker_id] => :environment do |task, args|
+    worker_id = args[:worker_id]
+    puts "RE-ENQUEUE JOBS !!!!!! #{worker_id}"
+    Delayed::Job.where("locked_by ilike ?", "#{worker_id}%").update(run_at: Time.now, locked_by: nil, locked_at: nil)
+  end
+
   desc "Reset EULA accepted"
   task :reset_eula_accepted => :environment do
     User.find_each do |user|
