@@ -22,6 +22,7 @@ import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import AssignmentGroupModuleNav from './AssignmentGroupModuleNav'
 import StudentDateTitle from './StudentDateTitle'
 import PointsDisplay from './PointsDisplay'
+import StepContainer from './StepContainer'
 
 function StudentHeader() {
   return (
@@ -30,7 +31,7 @@ function StudentHeader() {
         module={{name: 'Egypt Economy Research Module: Week 1', link: 'www.google.com'}}
         assignmentGroup={{name: 'Research Assignments', link: 'www.yahoo.com'}}
       />
-      <Flex>
+      <Flex margin="0 0 xx-large 0">
         <FlexItem grow>
           <StudentDateTitle
             title="Egypt Economy Research"
@@ -41,6 +42,7 @@ function StudentHeader() {
           <PointsDisplay receivedPoints={null} possiblePoints={32} />
         </FlexItem>
       </Flex>
+      <StepContainer />
     </div>
   )
 }
