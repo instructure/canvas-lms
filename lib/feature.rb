@@ -122,8 +122,7 @@ class Feature
       description: -> { I18n.t('Use HTML5 Recorder in Content Editor instead of Flash') },
       applies_to: 'RootAccount',
       state: 'allowed',
-      root_opt_in: true,
-      development: true
+      root_opt_in: true
     },
     'google_docs_domain_restriction' =>
     {
