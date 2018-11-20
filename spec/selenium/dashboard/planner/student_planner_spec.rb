@@ -484,7 +484,7 @@ describe "student planner" do
       quiz.generate_quiz_data
       quiz.due_at = Time.zone.now + 2.days
       quiz.save!
-      Array.new(12){|n| n}.each do |i|
+      Array.new(18){|n| n}.each do |i|
         @course.wiki_pages.create!(title: "Page#{i}", todo_date: Time.zone.now + (i-4).days)
         @course.assignments.create!(name: "assignment#{i}",
                                     due_at: Time.zone.now.advance(days:(i-4)))
