@@ -1868,71 +1868,96 @@ test('returns false when group_weighting_scheme is not "percent" and gradingPeri
   equal(this.gradebook.weightedGrades(), false);
 });
 
-QUnit.module('Gradebook#switchTotalDisplay', {
-  setup () {
-    this.gradebook = createGradebook({
-      show_total_grade_as_points: true,
-      setting_update_url: 'http://settingUpdateUrl'
-    });
-    this.gradebook.gradebookGrid.gridSupport = {
-      columns: {
-        updateColumnHeaders: sinon.stub()
+QUnit.module('Gradebook', () => {
+  let gradebook
+
+  QUnit.module('#switchTotalDisplay()', hooks => {
+    hooks.beforeEach(() => {
+      // Stub this here so the AJAX calls in Dataloader don't get stubbed too
+      sandbox.stub($, 'ajaxJSON')
+
+      createAndStubGradebook()
+    })
+
+    hooks.afterEach(() => {
+      UserSettings.contextRemove('warned_about_totals_display')
+      gradebook.destroy()
+    })
+
+    function createAndStubGradebook() {
+      gradebook = createGradebook({
+        show_total_grade_as_points: true,
+        setting_update_url: 'http://settingUpdateUrl'
+      })
+
+      gradebook.gradebookGrid.gridSupport = {
+        columns: {
+          updateColumnHeaders: sinon.stub()
+        }
       }
+
+      sandbox.stub(gradebook.gradebookGrid, 'invalidate')
     }
 
-    sandbox.stub(this.gradebook.gradebookGrid, 'invalidate');
-    // Stub this here so the AJAX calls in Dataloader don't get stubbed too
-    sandbox.stub($, 'ajaxJSON');
-  },
+    test('sets the warned_about_totals_display setting when called with true', () => {
+      notOk(UserSettings.contextGet('warned_about_totals_display'))
+      gradebook.switchTotalDisplay({dontWarnAgain: true})
+      strictEqual(UserSettings.contextGet('warned_about_totals_display'), true)
+    })
 
-  teardown () {
-    UserSettings.contextRemove('warned_about_totals_display');
-  }
-});
+    test('disables "Show Total Grade as Points" when previously enabled', () => {
+      gradebook.switchTotalDisplay({dontWarnAgain: false})
+      strictEqual(gradebook.options.show_total_grade_as_points, false)
+    })
 
-test('sets the warned_about_totals_display setting when called with true', function () {
-  notOk(UserSettings.contextGet('warned_about_totals_display'));
+    test('enables "Show Total Grade as Points" when previously disabled', () => {
+      gradebook.switchTotalDisplay({dontWarnAgain: false})
+      gradebook.switchTotalDisplay({dontWarnAgain: false})
+      strictEqual(gradebook.options.show_total_grade_as_points, true)
+    })
 
-  this.gradebook.switchTotalDisplay({ dontWarnAgain: true });
+    test('updates the total display preferences for the current user', () => {
+      gradebook.switchTotalDisplay({dontWarnAgain: false})
 
-  ok(UserSettings.contextGet('warned_about_totals_display'));
-});
+      strictEqual($.ajaxJSON.callCount, 1)
+      equal($.ajaxJSON.getCall(0).args[0], 'http://settingUpdateUrl')
+      equal($.ajaxJSON.getCall(0).args[1], 'PUT')
+      strictEqual($.ajaxJSON.getCall(0).args[2].show_total_grade_as_points, false)
+    })
 
-test('flips the show_total_grade_as_points property', function () {
-  this.gradebook.switchTotalDisplay({ dontWarnAgain: false });
+    test('invalidates the grid so it re-renders it', () => {
+      gradebook.switchTotalDisplay({dontWarnAgain: false})
+      strictEqual(gradebook.gradebookGrid.invalidate.callCount, 1)
+    })
 
-  equal(this.gradebook.options.show_total_grade_as_points, false);
+    test('updates column headers', () => {
+      gradebook.switchTotalDisplay({dontWarnAgain: false})
+      strictEqual(gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount, 1)
+    })
 
-  this.gradebook.switchTotalDisplay({ dontWarnAgain: false });
+    QUnit.module('when the "total grade override" column is used', () => {
+      test('includes both "total grade" column ids when updating column headers', () => {
+        gradebook.setShowFinalGradeOverrides(true)
+        gradebook.switchTotalDisplay({dontWarnAgain: false})
+        const [
+          columnIds
+        ] = gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.lastCall.args
+        deepEqual(columnIds, ['total_grade', 'total_grade_override'])
+      })
+    })
 
-  equal(this.gradebook.options.show_total_grade_as_points, true);
-});
-
-test('updates the total display preferences for the current user', function () {
-  this.gradebook.switchTotalDisplay({ dontWarnAgain: false });
-
-  equal($.ajaxJSON.callCount, 1);
-  equal($.ajaxJSON.getCall(0).args[0], 'http://settingUpdateUrl');
-  equal($.ajaxJSON.getCall(0).args[1], 'PUT');
-  equal($.ajaxJSON.getCall(0).args[2].show_total_grade_as_points, false);
-});
-
-test('invalidates the grid so it re-renders it', function () {
-  this.gradebook.switchTotalDisplay({ dontWarnAgain: false });
-
-  equal(this.gradebook.gradebookGrid.invalidate.callCount, 1);
-});
-
-test('updates the total grade column header', function () {
-  this.gradebook.switchTotalDisplay({ dontWarnAgain: false });
-  strictEqual(this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount, 1);
-});
-
-test('includes the "student" column id when updating column headers', function () {
-  this.gradebook.switchTotalDisplay({ dontWarnAgain: false });
-  const [columnIds] = this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.lastCall.args;
-  deepEqual(columnIds, ['total_grade']);
-});
+    QUnit.module('when the "total grade override" column is not used', () => {
+      test('includes only the "total grade" column id when updating column headers', () => {
+        gradebook.setShowFinalGradeOverrides(false)
+        gradebook.switchTotalDisplay({dontWarnAgain: false})
+        const [
+          columnIds
+        ] = gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.lastCall.args
+        deepEqual(columnIds, ['total_grade'])
+      })
+    })
+  })
+})
 
 QUnit.module('Gradebook#togglePointsOrPercentTotals', {
   setup () {
@@ -8903,38 +8928,154 @@ QUnit.module('Gradebook#hideAnonymousSpeedGraderAlert', (hooks) => {
   });
 });
 
-QUnit.module('#setVisibleGridColumns', (hooks) => {
-  let server
-  let options
+QUnit.module('Gradebook', () => {
   let gradebook
+  let server
 
-  hooks.beforeEach(() => {
-    server = sinon.fakeServer.create({ respondImmediately: true })
-    options = { gradebook_column_order_settings_url: '/grade_column_order_settings_url' }
-    server.respondWith('POST', options.gradebook_column_order_settings_url, [
-      200, { 'Content-Type': 'application/json' }, '{}'
-    ])
-    gradebook = createGradebook(options);
-  })
+  QUnit.module('#setVisibleGridColumns()', hooks => {
+    hooks.beforeEach(() => {
+      server = sinon.fakeServer.create({respondImmediately: true})
+      const options = {gradebook_column_order_settings_url: '/grade_column_order_settings_url'}
+      server.respondWith('POST', options.gradebook_column_order_settings_url, [
+        200,
+        {'Content-Type': 'application/json'},
+        '{}'
+      ])
 
-  hooks.afterEach(() => {
-    server.restore()
-  })
+      $fixtures.innerHTML = `
+        <div id="application">
+          <div id="wrapper">
+            <div id="StudentTray__Container"></div>
+            <span data-component="GridColor"></span>
+            <div id="gradebook_grid"></div>
+          </div>
+        </div>
+      `
+    })
 
-  test('adds total_grade to frozen columns if it is not included and total grade should be frozen', function () {
-    gradebook.gradebookColumnOrderSettings.freezeTotalGrade = true
-    deepEqual(gradebook.gridData.columns.frozen, [])
+    hooks.afterEach(() => {
+      $fixtures.innerHTML = ''
+      server.restore()
+    })
 
-    gradebook.setVisibleGridColumns()
-    deepEqual(gradebook.gridData.columns.frozen, ['total_grade'])
-  })
+    function createAndInitGradebook(options) {
+      gradebook = createGradebook(options)
+      gradebook.gotAllAssignmentGroups([
+        {
+          assignments: [
+            {
+              assignment_group_id: '2201',
+              id: '2301',
+              name: 'Math Assignment',
+              points_possible: 10,
+              published: true
+            },
+            {
+              assignment_group_id: '2201',
+              id: '2302',
+              name: 'English Assignment',
+              points_possible: 10,
+              published: false
+            }
+          ],
+          group_weight: 40,
+          id: '2201',
+          name: 'Assignments'
+        }
+      ])
 
-  test('does not add total_grade to frozen columns if it is already included', function () {
-    gradebook.freezeTotalGradeColumn()
-    deepEqual(gradebook.gridData.columns.frozen, ['total_grade'])
+      const students = [
+        {
+          id: '1101',
+          name: 'Adam Jones',
+          enrollments: [{type: 'StudentEnrollment', grades: {html_url: 'http://example.url/'}}]
+        },
+        {
+          id: '1102',
+          name: 'Betty Ford',
+          enrollments: [{type: 'StudentEnrollment', grades: {html_url: 'http://example.url/'}}]
+        },
+        {
+          id: '1199',
+          name: 'Test Student',
+          enrollments: [{type: 'StudentViewEnrollment', grades: {html_url: 'http://example.url/'}}]
+        }
+      ]
+      gradebook.courseContent.students.setStudentIds(['1101', '1102', '1199'])
+      gradebook.buildRows()
+      gradebook.gotChunkOfStudents(students)
+      gradebook.initGrid()
+    }
 
-    gradebook.setVisibleGridColumns()
-    deepEqual(gradebook.gridData.columns.frozen, ['total_grade'])
+    function countColumn(columnSection, columnId) {
+      return columnSection.filter(id => id === columnId).length
+    }
+
+    QUnit.module('when the "Total Grade" column will be frozen', contextHooks => {
+      contextHooks.beforeEach(() => {
+        createAndInitGradebook()
+      })
+
+      test('adds total_grade to frozen columns when not yet included', () => {
+        gradebook.gradebookColumnOrderSettings.freezeTotalGrade = true
+        strictEqual(countColumn(gradebook.gridData.columns.frozen, 'total_grade'), 0)
+
+        gradebook.setVisibleGridColumns()
+        strictEqual(countColumn(gradebook.gridData.columns.frozen, 'total_grade'), 1)
+      })
+
+      test('does not add total_grade to scrollable columns', () => {
+        gradebook.gradebookColumnOrderSettings.freezeTotalGrade = true
+        gradebook.setVisibleGridColumns()
+        strictEqual(countColumn(gradebook.gridData.columns.scrollable, 'total_grade'), 0)
+      })
+
+      test('does not add total_grade to frozen columns when already included', () => {
+        gradebook.freezeTotalGradeColumn()
+        strictEqual(
+          countColumn(gradebook.gridData.columns.frozen, 'total_grade'),
+          1,
+          'column is frozen before setting visible grid columns'
+        )
+
+        gradebook.setVisibleGridColumns()
+        strictEqual(countColumn(gradebook.gridData.columns.frozen, 'total_grade'), 1)
+      })
+    })
+
+    QUnit.module('when the "Total Grade Override" column is used', contextHooks => {
+      contextHooks.beforeEach(() => {
+        createAndInitGradebook({final_grade_override_enabled: true})
+        gradebook.setShowFinalGradeOverrides(true)
+      })
+
+      test('adds total_grade_override to scrollable columns', () => {
+        gradebook.setVisibleGridColumns()
+        strictEqual(countColumn(gradebook.gridData.columns.scrollable, 'total_grade_override'), 1)
+      })
+
+      test('does not add total_grade_override to frozen columns', () => {
+        gradebook.setVisibleGridColumns()
+        strictEqual(countColumn(gradebook.gridData.columns.frozen, 'total_grade_override'), 0)
+      })
+    })
+
+    QUnit.module('when the "Total Grade Override" column is not used', contextHooks => {
+      contextHooks.beforeEach(() => {
+        createAndInitGradebook({final_grade_override_enabled: true})
+        gradebook.setShowFinalGradeOverrides(false)
+      })
+
+      test('does not add total_grade_override to scrollable columns', () => {
+        gradebook.setVisibleGridColumns()
+        strictEqual(countColumn(gradebook.gridData.columns.scrollable, 'total_grade_override'), 0)
+      })
+
+      test('does not add total_grade_override to frozen columns', () => {
+        gradebook.setVisibleGridColumns()
+        strictEqual(countColumn(gradebook.gridData.columns.frozen, 'total_grade_override'), 0)
+      })
+    })
   })
 })
 

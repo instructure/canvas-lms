@@ -246,6 +246,9 @@ define [
       total:
         min: 95
         max: 400
+      total_grade_override:
+        min: 95
+        max: 400
 
     hasSections: $.Deferred()
 
@@ -835,6 +838,8 @@ define [
 
     wrapColumnSortFn: (wrappedFn, direction = 'ascending') ->
       (a, b) ->
+        return -1 if b.type is 'total_grade_override'
+        return  1 if a.type is 'total_grade_override'
         return -1 if b.type is 'total_grade'
         return  1 if a.type is 'total_grade'
         return -1 if b.type is 'assignment_group' and a.type isnt 'assignment_group'
@@ -901,7 +906,8 @@ define [
         anonymousColumnIds = [
           @getAssignmentColumnId(assignment.id),
           @getAssignmentGroupColumnId(assignment.assignment_group_id),
-          'total_grade'
+          'total_grade',
+          'total_grade_override'
         ]
 
         if @getSortRowsBySetting().columnId in anonymousColumnIds
@@ -1446,7 +1452,10 @@ define [
       @options.show_total_grade_as_points = not @options.show_total_grade_as_points
       $.ajaxJSON @options.setting_update_url, "PUT", show_total_grade_as_points: @options.show_total_grade_as_points
       @gradebookGrid.invalidate()
-      @gradebookGrid.gridSupport.columns.updateColumnHeaders(['total_grade'])
+      if @gridDisplaySettings.showFinalGradeOverrides
+        @gradebookGrid.gridSupport.columns.updateColumnHeaders(['total_grade', 'total_grade_override'])
+      else
+        @gradebookGrid.gridSupport.columns.updateColumnHeaders(['total_grade'])
 
     togglePointsOrPercentTotals: (cb) =>
       if UserSettings.contextGet('warned_about_totals_display')
@@ -1483,10 +1492,14 @@ define [
       unless @hideAggregateColumns()
         for assignmentGroupId of @assignmentGroups
           scrollableColumns.push(@gridData.columns.definitions[@getAssignmentGroupColumnId(assignmentGroupId)])
+
         if @getColumnOrder().freezeTotalGrade
           parentColumnIds.push('total_grade') unless parentColumnIds.includes('total_grade')
         else
           scrollableColumns.push(@gridData.columns.definitions['total_grade'])
+
+        if @gridDisplaySettings.showFinalGradeOverrides
+          scrollableColumns.push(@gridData.columns.definitions['total_grade_override'])
 
       if @gradebookColumnOrderSettings?.sortType
         scrollableColumns.sort @makeColumnSortFn(@getColumnOrder())
@@ -1614,6 +1627,26 @@ define [
         type: 'total_grade'
       }
 
+    buildTotalGradeOverrideColumn: ->
+      label = I18n.t 'Override'
+
+      if @gradebookColumnSizeSettings && @gradebookColumnSizeSettings['total_grade_override']
+        totalWidth = parseInt(@gradebookColumnSizeSettings['total_grade_override'])
+      else
+        totalWidth = testWidth(label, columnWidths.total_grade_override.min, columnWidths.total_grade_override.max)
+
+      {
+        id: 'total_grade_override'
+        field: 'total_grade_override'
+        toolTip: label
+        minWidth: columnWidths.total_grade_override.min
+        maxWidth: columnWidths.total_grade_override.max
+        width: totalWidth
+        cssClass: 'total-cell total_grade_override'
+        headerCssClass: 'total_grade_override'
+        type: 'total_grade_override'
+      }
+
     initGrid: =>
       @updateFilteredContentInfo()
 
@@ -1631,6 +1664,9 @@ define [
 
       totalGradeColumn = @buildTotalGradeColumn()
       @gridData.columns.definitions[totalGradeColumn.id] = totalGradeColumn
+
+      totalGradeOverrideColumn = @buildTotalGradeOverrideColumn()
+      @gridData.columns.definitions[totalGradeOverrideColumn.id] = totalGradeOverrideColumn
 
       @renderGridColor()
       @createGrid()
@@ -2375,11 +2411,13 @@ define [
       )
 
     initShowOverrides: (showFinalGradeOverrides = 'false') =>
-      @gridDisplaySettings.showFinalGradeOverrides =
-        @options.final_grade_override_enabled && showFinalGradeOverrides == 'true'
+      @setShowFinalGradeOverrides(@options.final_grade_override_enabled && showFinalGradeOverrides == 'true')
+
+    setShowFinalGradeOverrides: (show) =>
+      @gridDisplaySettings.showFinalGradeOverrides = show
 
     toggleOverrides: =>
-      @gridDisplaySettings.showFinalGradeOverrides = !@gridDisplaySettings.showFinalGradeOverrides
+      @setShowFinalGradeOverrides(!@gridDisplaySettings.showFinalGradeOverrides)
       @updateColumnsAndRenderViewOptionsMenu()
 
       @saveSettings(

@@ -68,7 +68,7 @@ function render (options) {
   let letterGrade = '';
 
   if (!options.hideTooltip) {
-    let tooltipContent = '-';
+    let tooltipContent = '–';
 
     if (options.warning) {
       tooltipContent = `<div class="total-column-tooltip">${options.warning.warningText}</div>`;
@@ -89,7 +89,7 @@ function render (options) {
   if (options.showPointsNotPercent) {
     grade = options.score;
   } else {
-    grade = options.possible ? options.percentage : '-';
+    grade = options.possible ? options.percentage : '–';
   }
 
   if (options.letterGrade) {
