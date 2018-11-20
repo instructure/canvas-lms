@@ -6137,7 +6137,7 @@ nn:
       topic_subscribed_tooltip: "Du abonnerer og vil bli varsla om nye kommentarar"
       topic_time_locked: "Emnet er låst til %{time}."
       topic_unsubscribe: Abonnerer
-      unlock_topic: "Open for kommentarar"
+      unlock_topic: "Opne for kommentarar"
       unread: "Ikkje lest"
     sub_entry: 
       authors_name: "Forfattaren sitt namn"
@@ -11889,7 +11889,7 @@ nn:
   only_teachers_can_see_this_course_until_it_is_publ_6fac97a7: "Berre faglærarar kan sjå dette emnet før det er publisert"
   open_color_picker_f117df0a: "Opne fargeveljar"
   open_event_menu_e9a21e39: "Opne hendingsmenyen"
-  open_for_comments_f8f7641e: "Open for kommentarar"
+  open_for_comments_f8f7641e: "Opne for kommentarar"
   open_in_theme_editor_156028e2: "Opne i temaredigeringsprogrammet"
   open_message_d7b12975: "Opne melding"
   open_name_color_picker_a2646a33: "Opne %{name} fargeveljar"
