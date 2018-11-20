@@ -23,7 +23,9 @@ module Canvas
       end
 
       def fetch(key, **_)
-        @data[key]
+        # use .to_s, to act like consul where booleans aren't
+        # first class data types
+        @data[key]&.to_s
       end
       alias [] fetch
 

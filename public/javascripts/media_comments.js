@@ -495,10 +495,17 @@ import 'jqueryui/tabs'
            (currentBrowser.name === 'Chrome' && Number(currentBrowser.version) >= 68) ||
            (currentBrowser.name === 'Firefox' && Number(currentBrowser.version) >= 61)
          ) {
-           setTimeout(() => {
-             const renderCanvasMediaRecorder = require('jsx/media_recorder/renderRecorder')
-             renderCanvasMediaRecorder('record_media_tab', jsUploader.doUploadByFile)
-           }, 700)
+           import('jsx/media_recorder/renderRecorder').then((renderCanvasMediaRecorder) => {
+             let tryToRenderInterval
+             const renderFunc = () => {
+               const e = document.getElementById('record_media_tab')
+               if (e) {
+                 renderCanvasMediaRecorder(e, jsUploader.doUploadByFile)
+                 clearInterval(tryToRenderInterval)
+               }
+             }
+             tryToRenderInterval = setInterval(renderFunc, 10)
+           })
         }
       }
     }

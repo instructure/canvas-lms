@@ -122,8 +122,7 @@ class Feature
       description: -> { I18n.t('Use HTML5 Recorder in Content Editor instead of Flash') },
       applies_to: 'RootAccount',
       state: 'allowed',
-      root_opt_in: true,
-      development: true
+      root_opt_in: true
     },
     'google_docs_domain_restriction' =>
     {
@@ -677,7 +676,7 @@ END
       state: 'allowed',
       development: true
     },
-    'final_grade_override' => {
+    'final_grades_override' => {
       display_name: -> { I18n.t('Final Grade Override') },
       description: -> {
         I18n.t <<~DESCRIPTION
@@ -685,7 +684,7 @@ END
         DESCRIPTION
       },
       applies_to: 'Course',
-      state: 'allowed',
+      state: 'hidden',
       development: true,
       beta: true
     }

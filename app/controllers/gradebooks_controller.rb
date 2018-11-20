@@ -130,7 +130,7 @@ class GradebooksController < ApplicationController
       outcome_proficiency: outcome_proficiency
     }
 
-    if @context.feature_enabled?(:final_grade_override)
+    if @context.feature_enabled?(:final_grades_override)
       total_score = if grading_periods? && !view_all_grading_periods?
         student_enrollment.find_score(grading_period_id: @current_grading_period_id)
       else
