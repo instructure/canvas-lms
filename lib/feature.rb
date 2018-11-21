@@ -234,10 +234,7 @@ END
     'anonymous_instructor_annotations' =>
     {
       display_name: -> { I18n.t('Anonymous Instructor Annotations') },
-      description:  -> { I18n.t(<<~END) },
-        Anonymous Instructor Annotations is a setting on assignments allowing
-        instructors to leave annotations that are anonymous to students.
-      END
+      description:  -> { I18n.t('Anonymize all instructor comments and annotations within DocViewer') },
       applies_to: 'Course',
       state: 'allowed',
       root_opt_in: false,
