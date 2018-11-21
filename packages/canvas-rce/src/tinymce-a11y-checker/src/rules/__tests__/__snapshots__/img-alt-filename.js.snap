@@ -9,6 +9,8 @@ Array [
 ]
 `;
 
+exports[`linkText returns the proper why message 1`] = `"Learn more about using filenames as alt text"`;
+
 exports[`message returns the proper message 1`] = `"Image filenames should not be used as the alt attribute describing the image content."`;
 
 exports[`why returns the proper why message 1`] = `"Screen readers cannot determine what is displayed in an image without alternative text, and filenames are often meaningless strings of numbers and letters that do not describe the context or meaning."`;

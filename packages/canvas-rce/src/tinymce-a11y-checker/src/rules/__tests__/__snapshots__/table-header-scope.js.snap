@@ -31,6 +31,8 @@ Array [
 ]
 `;
 
+exports[`linkText returns the proper linkText message 1`] = `"Learn more about using scope attributes with tables"`;
+
 exports[`message returns the proper message 1`] = `"Tables headers should specify scope."`;
 
 exports[`why returns the proper message 1`] = `"Screen readers cannot interpret tables without the proper structure. Table headers provide direction and content scope."`;

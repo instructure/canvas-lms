@@ -3,6 +3,7 @@ import formatMessage from "../format-message"
 const VALID_SCOPES = ["row", "col", "rowgroup", "colgroup"]
 
 export default {
+  id: "table-header-scope",
   test: elem => {
     if (elem.tagName !== "TH") {
       return true
@@ -46,5 +47,7 @@ export default {
       "Screen readers cannot interpret tables without the proper structure. Table headers provide direction and content scope."
     ),
 
-  link: "https://www.w3.org/TR/WCAG20-TECHS/H63.html"
+  link: "https://www.w3.org/TR/WCAG20-TECHS/H63.html",
+  linkText: () =>
+    formatMessage("Learn more about using scope attributes with tables")
 }

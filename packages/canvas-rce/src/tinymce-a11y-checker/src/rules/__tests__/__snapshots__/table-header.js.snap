@@ -33,6 +33,8 @@ Array [
 ]
 `;
 
+exports[`linkText returns the proper linkText message 1`] = `"Learn more about table headers"`;
+
 exports[`message returns the proper message 1`] = `"Tables should include at least one header."`;
 
 exports[`update header option === both adds a header row and a header column 1`] = `

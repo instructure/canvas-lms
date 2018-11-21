@@ -1,6 +1,7 @@
 import formatMessage from "../format-message"
 
 export default {
+  id: "img-alt",
   test: elem => {
     if (elem.tagName !== "IMG") {
       return true
@@ -54,5 +55,6 @@ export default {
       "Screen readers cannot determine what is displayed in an image without alternative text, which describes the content and meaning of the image."
     ),
 
-  link: "https://www.w3.org/TR/WCAG20-TECHS/H37.html"
+  link: "https://www.w3.org/TR/WCAG20-TECHS/H37.html",
+  linkText: () => formatMessage("Learn more about using alt text for images")
 }

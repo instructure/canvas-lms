@@ -4,7 +4,7 @@ const MAX_ALT_LENGTH = 120
 
 export default {
   "max-alt-length": MAX_ALT_LENGTH,
-
+  id: "img-alt-length",
   test: elem => {
     if (elem.tagName !== "IMG") {
       return true

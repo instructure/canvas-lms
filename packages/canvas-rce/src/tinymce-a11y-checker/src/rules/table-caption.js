@@ -2,6 +2,7 @@ import formatMessage from "../format-message"
 import { prepend } from "../utils/dom"
 
 export default {
+  id: "table-caption",
   test: elem => {
     if (elem.tagName !== "TABLE") {
       return true
@@ -43,5 +44,6 @@ export default {
       "Screen readers cannot interpret tables without the proper structure. Table captions describe the context and general understanding of the table."
     ),
 
-  link: "https://www.w3.org/TR/WCAG20-TECHS/H39.html"
+  link: "https://www.w3.org/TR/WCAG20-TECHS/H39.html",
+  linkText: () => formatMessage("Learn more about using captions with tables")
 }

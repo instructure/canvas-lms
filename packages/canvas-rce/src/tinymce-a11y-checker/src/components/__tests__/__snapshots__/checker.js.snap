@@ -175,7 +175,9 @@ exports[`render matches snapshot with errors 1`] = `
                         size="medium"
                       >
                         <p>
-                          Why Text 
+                          Why Text
+                        </p>
+                        <p>
                           <Link
                             as="button"
                             ellipsis={false}
@@ -185,7 +187,7 @@ exports[`render matches snapshot with errors 1`] = `
                             target="_blank"
                             variant="default"
                           >
-                            Learn more
+                            Link for learning more
                           </Link>
                         </p>
                       </Text>

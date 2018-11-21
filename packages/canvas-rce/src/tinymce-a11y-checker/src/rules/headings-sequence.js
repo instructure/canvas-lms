@@ -107,6 +107,7 @@ const getValidHeadings = elem => {
 }
 
 export default {
+  id: "headings-sequence",
   test: elem => {
     const testTags = {
       H2: true,
@@ -167,5 +168,6 @@ export default {
       "Sighted users browse web pages quickly, looking for large or bolded headings. Screen reader users rely on headers for contextual understanding. Headers should use the proper structure."
     ),
 
-  link: "https://www.w3.org/TR/WCAG20-TECHS/G141.html"
+  link: "https://www.w3.org/TR/WCAG20-TECHS/G141.html",
+  linkText: () => formatMessage("Learn more about organizing page headings")
 }

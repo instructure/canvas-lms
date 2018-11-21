@@ -4,6 +4,7 @@ import { filename } from "../utils/strings"
 import axios from "axios"
 
 export default {
+  id: "img-alt-filename",
   test: elem => {
     if (elem.tagName !== "IMG") {
       return true
@@ -59,5 +60,6 @@ export default {
       "Screen readers cannot determine what is displayed in an image without alternative text, and filenames are often meaningless strings of numbers and letters that do not describe the context or meaning."
     ),
 
-  link: "https://www.w3.org/TR/WCAG20-TECHS/F30.html"
+  link: "https://www.w3.org/TR/WCAG20-TECHS/F30.html",
+  linkText: () => formatMessage("Learn more about using filenames as alt text")
 }
