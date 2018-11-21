@@ -18,7 +18,7 @@
 
 import React from 'react'
 import apiUserContent from 'compiled/str/apiUserContent'
-import {AssignmentShape} from '../shapes'
+import {AssignmentShape} from '../../shared/shapes'
 
 Details.propTypes = {
   assignment: AssignmentShape.isRequired

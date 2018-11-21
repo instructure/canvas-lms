@@ -25,7 +25,7 @@ import Text from '@instructure/ui-elements/lib/components/Text'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import View from '@instructure/ui-layout/lib/components/View'
 
-import {AssignmentShape} from './shapes'
+import {AssignmentShape} from '../shared/shapes'
 
 StudentContentTabs.propTypes = {
   assignment: AssignmentShape

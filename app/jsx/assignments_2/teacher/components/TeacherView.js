@@ -21,7 +21,7 @@ import {bool, shape, string} from 'prop-types'
 import {graphql} from 'react-apollo'
 import gql from 'graphql-tag'
 
-import {AssignmentShape} from '../shapes'
+import {AssignmentShape} from '../../shared/shapes'
 import Header from './Header'
 import ContentTabs from './ContentTabs'
 import MessageStudentsWho from './MessageStudentsWho'

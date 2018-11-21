@@ -24,22 +24,42 @@ import StudentDateTitle from './StudentDateTitle'
 import PointsDisplay from './PointsDisplay'
 import StepContainer from './StepContainer'
 
-function StudentHeader() {
+import {AssignmentShape} from '../../shared/shapes'
+
+StudentHeader.propTypes = {
+  assignment: AssignmentShape
+}
+
+function StudentHeader(props) {
+  let assignmentGroup = null
+  if (props.assignment.assignmentGroup.name) {
+    assignmentGroup = {
+      name: props.assignment.assignmentGroup.name,
+      link: `${window.location.origin}/${ENV.context_asset_string.split('_')[0]}s/${
+        ENV.context_asset_string.split('_')[1]
+      }/assignments`
+    }
+  }
   return (
     <div data-test-id="assignments-2-student-header">
       <AssignmentGroupModuleNav
-        module={{name: 'Egypt Economy Research Module: Week 1', link: 'www.google.com'}}
-        assignmentGroup={{name: 'Research Assignments', link: 'www.yahoo.com'}}
+        module={{
+          name: 'Egypt Economy Research Module: Week 1',
+          link: `${window.location.origin}/${ENV.context_asset_string.split('_')[0]}s/${
+            ENV.context_asset_string.split('_')[1]
+          }/modules`
+        }}
+        assignmentGroup={assignmentGroup}
       />
       <Flex margin="0 0 xx-large 0">
         <FlexItem grow>
           <StudentDateTitle
-            title="Egypt Economy Research"
-            dueDate={new Date('12/28/2018 23:59:00')}
+            title={props.assignment.name}
+            dueDate={new Date(props.assignment.dueAt)}
           />
         </FlexItem>
         <FlexItem grow>
-          <PointsDisplay receivedPoints={null} possiblePoints={32} />
+          <PointsDisplay receivedPoints={null} possiblePoints={props.assignment.pointsPossible} />
         </FlexItem>
       </Flex>
       <StepContainer />

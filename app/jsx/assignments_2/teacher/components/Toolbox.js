@@ -29,7 +29,7 @@ import Text from '@instructure/ui-elements/lib/components/Text'
 import IconEmail from '@instructure/ui-icons/lib/Line/IconEmail'
 import IconSpeedGrader from '@instructure/ui-icons/lib/Line/IconSpeedGrader'
 
-import {AssignmentShape} from '../shapes'
+import {AssignmentShape} from '../../shared/shapes'
 
 export default class Toolbox extends React.Component {
   static propTypes = {
