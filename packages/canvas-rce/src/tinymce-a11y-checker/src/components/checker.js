@@ -372,12 +372,12 @@ export default class Checker extends React.Component {
                                 {formatMessage("Close")}
                               </CloseButton>
                               <Text>
+                                <p>{rule.why()}</p>
                                 <p>
-                                  {rule.why() + " "}
                                   {rule.link &&
                                     rule.link.length && (
                                       <Link href={rule.link} target="_blank">
-                                        {formatMessage("Learn more")}
+                                        {rule.linkText()}
                                       </Link>
                                     )}
                                 </p>

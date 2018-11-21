@@ -14,6 +14,7 @@ const IS_HEADING = {
 export default {
   "max-heading-length": MAX_HEADING_LENGTH,
 
+  id: "paragraphs-for-headings",
   test: elem => {
     if (!IS_HEADING[elem.tagName]) {
       return true

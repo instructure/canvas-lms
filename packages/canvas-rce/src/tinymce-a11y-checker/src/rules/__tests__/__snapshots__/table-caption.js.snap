@@ -15,6 +15,8 @@ Array [
 ]
 `;
 
+exports[`linkText returns the proper linkText message 1`] = `"Learn more about using captions with tables"`;
+
 exports[`message returns the proper message 1`] = `"Tables should include a caption describing the contents of the table."`;
 
 exports[`why returns the proper why message 1`] = `"Screen readers cannot interpret tables without the proper structure. Table captions describe the context and general understanding of the table."`;

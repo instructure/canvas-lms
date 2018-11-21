@@ -4,6 +4,7 @@ import smallTextContrast from "./small-text-contrast"
 import { onlyContainsLink, hasTextNode } from "../utils/dom"
 
 export default {
+  id: "large-text-contrast",
   test: (elem, config = {}) => {
     const disabled = config.disableContrastCheck == true
     const noText = !hasTextNode(elem)
@@ -34,5 +35,6 @@ export default {
       "Text is difficult to read without sufficient contrast between the text and the background, especially for those with low vision."
     ),
 
-  link: "https://www.w3.org/TR/WCAG20-TECHS/G17.html"
+  link: "https://www.w3.org/TR/WCAG20-TECHS/G17.html",
+  linkText: () => formatMessage("Learn more about color contrast")
 }

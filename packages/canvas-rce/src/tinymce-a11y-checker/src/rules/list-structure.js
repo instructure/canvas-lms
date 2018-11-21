@@ -65,6 +65,7 @@ const splitParagraphsByBreak = paragraph => {
 }
 
 export default {
+  id: "list-structure",
   test: function(elem) {
     const isList = isTextList(elem)
     const isFirst = elem.previousElementSibling
@@ -147,5 +148,6 @@ export default {
       "When markup is used that visually formats items as a list but does not indicate the list relationship, users may have difficulty in navigating the information."
     ),
 
-  link: "https://www.w3.org/TR/2016/NOTE-WCAG20-TECHS-20161007/H48"
+  link: "https://www.w3.org/TR/2016/NOTE-WCAG20-TECHS-20161007/H48",
+  linkText: () => formatMessage("Learn more about using lists")
 }

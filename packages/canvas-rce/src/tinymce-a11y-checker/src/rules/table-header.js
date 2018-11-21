@@ -4,6 +4,7 @@ import { changeTag } from "../utils/dom"
 const _forEach = Array.prototype.forEach
 
 export default {
+  id: "table-header",
   test: elem => {
     if (elem.tagName !== "TABLE") {
       return true
@@ -67,5 +68,6 @@ export default {
       "Screen readers cannot interpret tables without the proper structure. Table headers provide direction and overview of the content."
     ),
 
-  link: "https://www.w3.org/TR/WCAG20-TECHS/H43.html"
+  link: "https://www.w3.org/TR/WCAG20-TECHS/H43.html",
+  linkText: () => formatMessage("Learn more about table headers")
 }

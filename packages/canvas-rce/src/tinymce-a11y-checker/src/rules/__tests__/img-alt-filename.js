@@ -169,3 +169,9 @@ describe("why", () => {
     expect(rule.why()).toMatchSnapshot()
   })
 })
+
+describe("linkText", () => {
+  test("returns the proper why message", () => {
+    expect(rule.linkText()).toMatchSnapshot()
+  })
+})

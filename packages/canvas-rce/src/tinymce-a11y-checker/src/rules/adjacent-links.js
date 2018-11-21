@@ -63,6 +63,7 @@ const descendantImageWithRedundantAltText = (left, right) => {
 }
 
 export default {
+  id: "adjacent-links",
   test: function(elem) {
     if (elem.tagName != "A") {
       return true
@@ -114,5 +115,6 @@ export default {
       "Keyboards navigate to links using the Tab key. Two adjacent links that direct to the same destination can be confusing to keyboard users."
     ),
 
-  link: "https://www.w3.org/TR/WCAG20-TECHS/H2.html"
+  link: "https://www.w3.org/TR/WCAG20-TECHS/H2.html",
+  linkText: () => formatMessage("Learn more about adjacent links")
 }
