@@ -294,6 +294,13 @@ describe RubricAssociation do
                                              assessment: assessment_params)
       expect(assessment.hide_points).to be true
     end
+
+    it "updates the rating description and id if not present in passed params" do
+      assessment = rubric_association.assess(user: student, assessor: first_teacher, artifact: submission,
+                                             assessment: assessment_params)
+      expect(assessment.data[0][:id]).to eq 'blank'
+      expect(assessment.data[0][:description]).to eq 'Full Marks'
+    end
   end
 
   describe '#generate' do

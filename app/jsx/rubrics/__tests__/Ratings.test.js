@@ -29,11 +29,12 @@ describe('The Ratings component', () => {
     assessing: false,
     footer: null,
     tiers: [
-      { description: 'Superb', points: 10 },
-      { description: 'Meh', long_description: 'More Verbosity', points: 5 },
-      { description: 'Subpar', points: 1 }
+      { id: '1', description: 'Superb', points: 10 },
+      { id: '2', description: 'Meh', long_description: 'More Verbosity', points: 5 },
+      { id: '3', description: 'Subpar', points: 1 }
     ],
     defaultMasteryThreshold: 10,
+    assessmentRatingId: '2',
     points: 5,
     pointsPossible: 10,
     isSummary: false,
@@ -51,21 +52,22 @@ describe('The Ratings component', () => {
       .forEach((el) => expect(el.shallow()).toMatchSnapshot())
   })
 
-  it('properly selects ratings when two tiers have the same point value', () => {
+  it('properly select the first matching rating when two tiers have the same point value and no ID is passed', () => {
     const tiers = [
       { description: 'Superb', points: 10 },
       { description: 'Meh', points: 5 },
       { description: 'Meh 2, The Sequel', points: 5 },
       { description: 'Subpar', points: 1 }
     ]
-    const selected = component({ tiers }).find('Rating').map((el) =>
+    const assessmentRatingId = null
+    const selected = component({ tiers, assessmentRatingId }).find('Rating').map((el) =>
       el.prop('selected'))
-    expect(selected).toEqual([false, true, true, false])
+    expect(selected).toEqual([false, true, false, false])
   })
 
-  it('highlights the right rating', () => {
-    const ratings = (points, useRange = false) =>
-      component({ points, useRange }).find('Rating').map((el) => el.shallow().hasClass('selected'))
+  it('highlights the right rating when no assessmentRatingId present', () => {
+    const ratings = (points, useRange = false, assessmentRatingId = null) =>
+      component({ points, useRange, assessmentRatingId }).find('Rating').map((el) => el.shallow().hasClass('selected'))
 
     expect(ratings(10)).toEqual([true, false, false])
     expect(ratings(8)).toEqual([false, false, false])
@@ -84,22 +86,22 @@ describe('The Ratings component', () => {
     const el = component({ onPointChange })
 
     el.find('Rating').first().prop('onClick').call()
-    expect(onPointChange.args[0]).toEqual([10])
+    expect(onPointChange.args[0]).toEqual([{id: '1', "description": "Superb", "points": 10}])
     expect(flashMock).toHaveBeenCalledTimes(1)
     flashMock.mockRestore()
   })
 
   it('uses the right default mastery level colors', () => {
-    const mastery = (points) =>
-      component({ points }).find('Rating').map((el) => el.prop('tierColor'))
-    expect(mastery(10)).toEqual([null, 'transparent', 'transparent'])
-    expect(mastery(5)).toEqual(['transparent', null, 'transparent'])
-    expect(mastery(1)).toEqual(['transparent', 'transparent', null])
-    const shaderClasses = (points) =>
-      component({ points }).find('Rating').map((el) => el.prop('shaderClass'))
-    expect(shaderClasses(10)).toEqual(['meetsMasteryShader', null, null])
-    expect(shaderClasses(5)).toEqual([null, 'nearMasteryShader', null])
-    expect(shaderClasses(1)).toEqual([null, null, 'wellBelowMasteryShader'])
+    const mastery = (points, assessmentRatingId) =>
+      component({ points, assessmentRatingId }).find('Rating').map((el) => el.prop('tierColor'))
+    expect(mastery(10, '1')).toEqual([null, 'transparent', 'transparent'])
+    expect(mastery(5, '2')).toEqual(['transparent', null, 'transparent'])
+    expect(mastery(1 , '3')).toEqual(['transparent', 'transparent', null])
+    const shaderClasses = (points, assessmentRatingId) =>
+      component({ points, assessmentRatingId }).find('Rating').map((el) => el.prop('shaderClass'))
+    expect(shaderClasses(10, '1')).toEqual(['meetsMasteryShader', null, null])
+    expect(shaderClasses(5, '2')).toEqual([null, 'nearMasteryShader', null])
+    expect(shaderClasses(1, '3')).toEqual([null, null, 'wellBelowMasteryShader'])
   })
 
   it('uses the right custom rating colors', () => {
@@ -108,12 +110,12 @@ describe('The Ratings component', () => {
       {points: 5, color: "65499D"},
       {points: 1, color: "F8971C"}
     ]
-    const ratings = (points, useRange = false) =>
-      component({points, useRange, customRatings}).find('Rating').map((el) => el.prop('tierColor'))
-    expect(ratings(10)).toEqual(['#09BCD3', 'transparent', 'transparent'])
-    expect(ratings(5)).toEqual(['transparent', '#65499D', 'transparent'])
-    expect(ratings(1)).toEqual(['transparent', 'transparent', '#F8971C'])
-    expect(ratings(0, true)).toEqual(['transparent', 'transparent', '#F8971C'])
+    const ratings = (points, assessmentRatingId, useRange = false) =>
+      component({points, assessmentRatingId, useRange, customRatings}).find('Rating').map((el) => el.prop('tierColor'))
+    expect(ratings(10, '1')).toEqual(['#09BCD3', 'transparent', 'transparent'])
+    expect(ratings(5, '2')).toEqual(['transparent', '#65499D', 'transparent'])
+    expect(ratings(1, '3')).toEqual(['transparent', 'transparent', '#F8971C'])
+    expect(ratings(0, '3', true)).toEqual(['transparent', 'transparent', '#F8971C'])
   })
 
   describe('custom ratings', () => {
@@ -123,22 +125,22 @@ describe('The Ratings component', () => {
       {points: 10, color: "101010"},
       {points: 1, color: "111111"}
     ]
-    const ratings = (points, pointsPossible = 10) =>
-      component({ points, pointsPossible, customRatings, useRange: true }).find('Rating').map((el) => el.prop('tierColor'))
+    const ratings = (points, assessmentRatingId, pointsPossible = 10) =>
+      component({ points, assessmentRatingId, pointsPossible, customRatings, useRange: true }).find('Rating').map((el) => el.prop('tierColor'))
 
     it('scales points to custom ratings', () => {
-      expect(ratings(10)).toEqual(['#100100', 'transparent', 'transparent'])
-      expect(ratings(6)).toEqual(['#606060', 'transparent', 'transparent'])
-      expect(ratings(5)).toEqual(['transparent', '#101010', 'transparent'])
-      expect(ratings(4.4)).toEqual(['transparent', '#101010', 'transparent'])
-      expect(ratings(1)).toEqual(['transparent', 'transparent', '#101010'])
-      expect(ratings(0.1)).toEqual(['transparent', 'transparent', '#111111'])
-      expect(ratings(0)).toEqual(['transparent', 'transparent', '#111111'])
+      expect(ratings(10, '1')).toEqual(['#100100', 'transparent', 'transparent'])
+      expect(ratings(6, '1')).toEqual(['#606060', 'transparent', 'transparent'])
+      expect(ratings(5, '2')).toEqual(['transparent', '#101010', 'transparent'])
+      expect(ratings(4.4, '2')).toEqual(['transparent', '#101010', 'transparent'])
+      expect(ratings(1, '3')).toEqual(['transparent', 'transparent', '#101010'])
+      expect(ratings(0.1, '3')).toEqual(['transparent', 'transparent', '#111111'])
+      expect(ratings(0, '3')).toEqual(['transparent', 'transparent', '#111111'])
     })
 
     it('does not scale points if pointsPossible is 0', () => {
-      expect(ratings(10, 0)).toEqual(['#101010', 'transparent', 'transparent'])
-      expect(ratings(4, 0)).toEqual(['transparent', '#111111', 'transparent'])
+      expect(ratings(10, '1', 0)).toEqual(['#101010', 'transparent', 'transparent'])
+      expect(ratings(4, '2', 0)).toEqual(['transparent', '#111111', 'transparent'])
     })
   })
 
@@ -178,7 +180,7 @@ describe('The Ratings component', () => {
   })
 
   it('renders a default rating if none of the ratings are selected', () => {
-    const el = component({ points: 6, isSummary: true, footer: <div>ow my foot</div> })
+    const el = component({ points: 6, assessmentRatingId: null, isSummary: true, footer: <div>ow my foot</div> })
     const ratings = el.find('Rating')
 
     expect(ratings).toHaveLength(1)

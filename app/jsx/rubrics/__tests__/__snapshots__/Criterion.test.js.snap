@@ -1166,6 +1166,7 @@ exports[`Point Rubric with a custom criterion by default renders the root compon
       onPointChange={[Function]}
       points={3.2}
       pointsPossible={8}
+      selectedRatingId="7_4778"
       tiers={
         Array [
           Object {
@@ -1333,6 +1334,7 @@ exports[`Point Rubric with a custom criterion when assessing renders the root co
       onPointChange={[Function]}
       points={3.2}
       pointsPossible={8}
+      selectedRatingId="7_4778"
       tiers={
         Array [
           Object {
@@ -1745,6 +1747,7 @@ exports[`Point Rubric with a outcome criterion by default renders the root compo
       onPointChange={[Function]}
       points={3}
       pointsPossible={3}
+      selectedRatingId="7_6639"
       tiers={
         Array [
           Object {
@@ -1965,6 +1968,7 @@ exports[`Point Rubric with a outcome criterion when assessing renders the root c
       onPointChange={[Function]}
       points={3}
       pointsPossible={3}
+      selectedRatingId="7_6639"
       tiers={
         Array [
           Object {
