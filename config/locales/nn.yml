@@ -11153,7 +11153,7 @@ nn:
   model_is_already_located_in_newgroup_e5cea361: "%{model} er allereie plassert i %{newGroup}"
   moderate_assignment_ccb00173: "Moderer %{assignment}"
   moderate_assignment_name_cf59e0a7: "Moderer %{assignment_name}"
-  moderate_d0c85e92: Moderer
+  moderate_d0c85e92: Moderat
   moderate_grades_4f43f85d: "Moderer karakterar"
   moderated_grading_cannot_be_enabled_for_group_assi_7e947ab7: "Moderert karaktersetjing kan ikkje aktiverast for gruppeoppgåver"
   moderated_grading_cannot_be_enabled_for_peer_revie_6b7eedc1: "Moderert karaktersetjing kan ikkje aktiverast for fagfellevurderte oppgåver"
