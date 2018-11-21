@@ -1,10 +1,107 @@
 API Change Log Archive
 ================
 
-The Change Log Archive page displays previous API changes in the <a href="file.changelog.html">API Change Log</a> older than the last four releases.
+The Change Log Archive page displays previous API changes in the <a href="file.changelog.html">API Change Log</a> older than the last four releases. The release date indicates the date that the API code was made available in the production environment.
 <p>
 
 <h2>Prior Updates</h2>
+
+<h2>2018-10-06</h2>
+
+<h3>Changes</h3>
+<table class="changelog">
+<tr>
+<th>API Calls</th>
+<th>Function</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="accounts.html">Accounts API</a></td>
+<td>Permissions Endpoint</td>
+<td>Added links to Course and Group permissions</td>
+</tr>
+<tr>
+<td><a href="courses.html">Courses API</a></td>
+<td>Permissions Endpoint</td>
+<td>Added links to Account and Group permissions</td>
+</tr>
+</table>
+<p></p>
+<table class="changelog">
+<tr>
+<th>Basics</th>
+<th>File</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="file.file_uploads.html">Uploading Files</td>
+<td>Uploading via URL</td>
+<td>Explains file management system transition and clarifies newer file upload process
+</td>
+</tr>
+</table>
+<p></p>
+<table class="changelog">
+<tr>
+<th>OAuth2</th>
+<th>Endpoint</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="file.oauth_endpoints.html">OAuth2 Endpoints</td>
+<td>Get login/oauth2/auth</td>
+<td>Below parameters table, clarified info on scopes for oath2 endpoint
+</td>
+</tr>
+</table>
+
+<h3>Additions</h3>
+<table class="changelog">
+<tr>
+<th>API Calls</th>
+<th>Function</th>
+<th></th>
+<tr>
+<td><a href="file.assignment_external_tools.html">Assignment External Tools</a></td>
+<td></td>
+<td>Added content page</td>
+</tr>
+<tr>
+<td><a href="groups.html">Groups API</a></td>
+<td>Permissions Endpoint</td>
+<td>Added endpoint
+</td>
+</tr>
+</table>
+<p></p>
+<table class="changelog">
+<tr>
+<th>API Responses</th>
+<th>Function</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="courses.html">Courses API</a></td>
+<td>Course Object</td>
+<td>Added created_at parameter, which returns the date the course was created
+</td>
+</tr>
+</table>
+
+<h3>Removals</h3>
+<table class="changelog">
+<tr>
+<th>Basics</th>
+<th>File</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="file.file_uploads.html">Uploading Files</td>
+<td>Uploading via URL</td>
+<td>Explains file management system transition and identifies deprecated behavior
+</td>
+</tr>
+</table>
 
 <h2>2018-09-15</h2>
 
