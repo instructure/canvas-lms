@@ -39,7 +39,7 @@ const Message = ({message, variant}) => {
       >
         <GridCol width="auto" textAlign="start">
           <Text color={color}>
-            <Icon title={message} style={{display: 'block'}} />
+            <Icon style={{display: 'block'}} />
           </Text>
         </GridCol>
         <GridCol>
