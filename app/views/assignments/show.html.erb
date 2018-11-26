@@ -151,6 +151,16 @@
           </li>
         <% end %>
       <% end %>
+      <% if @assignment.allowed_attempts&.> 0 %>
+        <li>
+          <span class='title'><%= t :attempts, 'Attempts' %></span>
+          <span class='value'><%= @current_user_submission&.attempt || 0 %></span>
+        </li>
+        <li>
+          <span class='title'><%= t :allowed_attempts, 'Allowed Attempts' %></span>
+          <span class='value'><%= @assignment.allowed_attempts + (@current_user_submission&.extra_attempts || 0) %></span>
+        </li>
+      <% end %>
       <%= render :partial => "shared/available_dates", :locals => {:association => @assignment} %>
       <div class="clear"></div>
     </ul>
@@ -189,6 +199,14 @@
             <div class="control-label"><%= t :submission_types, 'File Types' %></div>
             <div class="controls">
               <span class="value"><%= @assignment.allowed_extensions.to_sentence %></span>
+            </div>
+          </div>
+        <% end -%>
+        <% if @assignment.allowed_attempts&.> 0 %>
+          <div class="control-group">
+            <div class="control-label"><%= t :allowed_attempts, 'Allowed Attempts' %></div>
+            <div class="controls">
+              <span class="value"><%= @assignment.allowed_attempts %></span>
             </div>
           </div>
         <% end -%>

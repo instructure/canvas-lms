@@ -5853,4 +5853,110 @@ describe Submission do
       end
     end
   end
+
+  describe '#ensure_attempts_are_in_range' do
+    let(:submission) { @assignment.submissions.first }
+
+    context 'the assignment is of a type that is restricted by attempts' do
+      before do
+        @assignment.allowed_attempts = 10
+        @assignment.submission_types = 'online_upload'
+        @assignment.save!
+      end
+
+      context 'attempts_left <= 0' do
+        before do
+          submission.attempt = 10
+          submission.save!
+        end
+
+        context 'the submitted_at changed' do
+          it 'is invalid' do
+            submission.submitted_at = Time.zone.now
+            expect(submission).to_not be_valid
+          end
+        end
+
+        context 'the submitted_at did not change' do
+          it 'is valid' do
+            expect(submission).to be_valid
+          end
+        end
+      end
+    end
+
+    context 'the assignment is of a type that is not restricted by attempts' do
+      before do
+        @assignment.allowed_attempts = 10
+        @assignment.submission_types = 'online_discussion'
+        @assignment.save!
+        submission.attempt = 10
+        submission.save!
+      end
+
+      it 'is valid' do
+        expect(submission).to be_valid
+      end
+    end
+  end
+
+  describe '#attempts_left' do
+    let(:submission) { @assignment.submissions.first }
+
+    context 'allowed_attempts is set to a number > 0 on the assignment' do
+      before do
+        @assignment.allowed_attempts = 10
+        @assignment.submission_types = 'online_upload'
+        @assignment.save!
+      end
+
+      context 'the submission has extra_attempts set to a value > 0' do
+        it 'returns assignment.allowed_attempts + submission.extra_attempts - submission.attempt' do
+          submission.extra_attempts = 12
+          submission.attempt = 6
+          submission.save!
+          expect(submission.attempts_left).to eq(10 + 12 - 6)
+        end
+
+        it 'correctly recalculates when allowed_attempts and extra_attempts change' do
+          submission.extra_attempts = 12
+          submission.attempt = 22
+          submission.save!
+          expect(submission.attempts_left).to eq(0)
+          @assignment.allowed_attempts = 11
+          @assignment.save!
+          expect(submission.attempts_left).to eq(1)
+          submission.extra_attempts = 13
+          submission.save!
+          expect(submission.attempts_left).to eq(2)
+        end
+
+        it 'will never return negative values' do
+          submission.attempt = 1000
+          submission.save!
+          expect(submission.attempts_left).to eq(0)
+        end
+      end
+
+      context 'the submission has extra_attempts set to nil' do
+        it 'returns allowed_attempts from the assignment' do
+          submission.extra_attempts = nil
+          submission.attempt = 6
+          submission.save!
+          expect(submission.attempts_left).to eq(10 - 6)
+        end
+      end
+    end
+
+    context 'allowed_attempts is set to nil or -1 on the assignment' do
+      it 'returns nil' do
+        @assignment.allowed_attempts = nil
+        @assignment.save!
+        expect(submission.attempts_left).to be_nil
+        @assignment.allowed_attempts = -1
+        @assignment.save!
+        expect(submission.attempts_left).to be_nil
+      end
+    end
+  end
 end

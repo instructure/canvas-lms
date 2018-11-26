@@ -58,6 +58,8 @@ class Submission < ActiveRecord::Base
     }.freeze
   }.freeze
 
+  SUBMISSION_TYPES_GOVERNED_BY_ALLOWED_ATTEMPTS = %w[online_upload online_url online_text_entry].freeze
+
   attr_readonly :assignment_id
   attr_accessor :visible_to_user,
                 :skip_grade_calc,
@@ -119,6 +121,7 @@ class Submission < ActiveRecord::Base
   validates :late_policy_status, inclusion: ['none', 'missing', 'late'], allow_nil: true
   validate :ensure_grader_can_grade
   validate :extra_attempts_can_only_be_set_on_online_uploads
+  validate :ensure_attempts_are_in_range
 
   scope :active, -> { where("submissions.workflow_state <> 'deleted'") }
   scope :for_enrollments, -> (enrollments) { where(user_id: enrollments.select(:user_id)) }
@@ -1518,11 +1521,23 @@ class Submission < ActiveRecord::Base
 
   def extra_attempts_can_only_be_set_on_online_uploads
     return true unless changes.key?("extra_attempts") && assignment
-    allowed_submission_types = %w[online_upload online_url online_text_entry]
-    return true if (assignment.submission_types.split(",") & allowed_submission_types).any?
+    return true if (assignment.submission_types.split(",") & SUBMISSION_TYPES_GOVERNED_BY_ALLOWED_ATTEMPTS).any?
 
-    error_msg = 'extra_attempts can only be set on submissions for an assignment with a type of online_upload, online_url, or online_text_entry'
+    error_msg = 'can only be set on submissions for an assignment with a type of online_upload, online_url, or online_text_entry'
     errors.add(:extra_attempts, error_msg)
+    false
+  end
+
+  def attempts_left
+    return nil if self.assignment.allowed_attempts.nil? || self.assignment.allowed_attempts < 0
+    [0, self.assignment.allowed_attempts + (self.extra_attempts || 0) - (self.attempt || 0)].max
+  end
+
+  def ensure_attempts_are_in_range
+    return true unless changes.key?("submitted_at") && assignment
+    return true unless (assignment.submission_types.split(",") & SUBMISSION_TYPES_GOVERNED_BY_ALLOWED_ATTEMPTS).any?
+    return true if attempts_left.nil? || attempts_left > 0
+    errors.add(:attempt, 'you have reached the maximum number of allowed attempts for this assignment')
     false
   end
 
