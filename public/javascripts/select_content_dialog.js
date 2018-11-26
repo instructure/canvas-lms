@@ -26,6 +26,7 @@ import _ from 'underscore'
 import htmlEscape from 'str/htmlEscape'
 import { uploadFile } from 'jsx/shared/upload_file'
 import iframeAllowances from 'jsx/external_apps/lib/iframeAllowances'
+import SelectContent from './lti/select_content'
 import './jquery.instructure_date_and_time' /* datetime_field */
 import './jquery.ajaxJSON'
 import './jquery.instructure_forms' /* formSubmit, ajaxJSONFiles, getFormData, errorBox */
@@ -462,7 +463,10 @@ import './jquery.templateData'
               var tool = data[idx];
               var $tool = $tool_template.clone(true);
               var placement = tool.placements.assignment_selection || tool.placements.link_selection;
-              $tool.toggleClass('resource_selection', ('resource_selection' in tool.placements || placement.message_type == "ContentItemSelectionRequest"));
+              $tool.toggleClass(
+                'resource_selection',
+                SelectContent.isContentMessage(placement.message_type, tool.placements)
+              );
               $tool.fillTemplateData({
                 data: tool,
                 dataValues: ['definition_type', 'definition_id', 'domain', 'name', 'placements', 'description']
