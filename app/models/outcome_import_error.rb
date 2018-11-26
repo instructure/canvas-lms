@@ -21,4 +21,8 @@ class OutcomeImportError < ApplicationRecord
 
   validates :outcome_import_id, presence: true
   validates :message, presence: true
+
+  def message=(value)
+    super(value.present? ? value[0..254] : value)
+  end
 end
