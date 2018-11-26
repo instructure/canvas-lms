@@ -6,6 +6,9 @@ type AdhocStudents {
 type Assignment implements Node & Timestamped {
   # legacy canvas id
   _id: ID!
+
+  # permitted uploaded file extensions (e.g. ['doc', 'xls', 'txt'])
+  allowedExtensions: [String!]
   assignmentGroup: AssignmentGroup
   assignmentOverrides(
     # Returns the elements in the list that come after the specified cursor.

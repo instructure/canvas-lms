@@ -85,6 +85,10 @@ module Types
 
     field :lock_info, LockInfoType, null: true
 
+    field :allowed_extensions, [String],
+      "permitted uploaded file extensions (e.g. ['doc', 'xls', 'txt'])",
+      null: true
+
     def lock_info
       Loaders::AssociationLoader.for(
         Assignment,

@@ -28,7 +28,8 @@ describe Types::AssignmentType do
   let(:assignment) do
     course.assignments.create(title: "some assignment",
                               submission_types: ["online_text_entry"],
-                              workflow_state: "published")
+                              workflow_state: "published",
+                              allowed_extensions: ["doc", "xlt", "foo"])
   end
 
   let(:assignment_type) { GraphQLTypeTester.new(assignment, current_user: student) }
@@ -41,6 +42,7 @@ describe Types::AssignmentType do
     expect(assignment_type.resolve("onlyVisibleToOverrides")).to eq assignment.only_visible_to_overrides
     expect(assignment_type.resolve("assignmentGroup { _id }")).to eq assignment.assignment_group.id.to_s
     expect(assignment_type.resolve("muted")).to eq assignment.muted?
+    expect(assignment_type.resolve("allowedExtensions")).to eq assignment.allowed_extensions
   end
 
   context "top-level permissions" do
