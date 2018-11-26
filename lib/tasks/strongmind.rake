@@ -28,6 +28,11 @@ namespace :strongmind do
     Delayed::Job.where("locked_by ilike ?", "#{worker_id}%").update(run_at: Time.now, locked_by: nil, locked_at: nil)
   end
 
+  desc "Re-enqueue orphaned jobs after deploy on ECS"
+  task :enqueue_jobs_ecs => :environment do |task, args|
+    Delayed::Job.where.not(locked_by: nil).update(run_at: Time.now, locked_by: nil, locked_at: nil)
+  end
+
   desc "Reset EULA accepted"
   task :reset_eula_accepted => :environment do
     User.find_each do |user|
