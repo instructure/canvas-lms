@@ -1660,6 +1660,11 @@ class CoursesController < ApplicationController
   #   - "course_image": Optional course image data for when there is a course image
   #     and the course image feature flag has been enabled
   #
+  # @argument teacher_limit [Integer]
+  #   The maximum number of teacher enrollments to show.
+  #   If the course contains more teachers than this, instead of giving the teacher
+  #   enrollments, the count of teachers will be given under a _teacher_count_ key.
+  #
   # @returns Course
   def show
     if api_request?
