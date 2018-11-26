@@ -30,7 +30,7 @@ namespace :strongmind do
 
   desc "Re-enqueue orphaned jobs after deploy on ECS"
   task :enqueue_jobs_ecs => :environment do |task, args|
-    Delayed::Job.where.not(locked_by: nil).update(run_at: Time.now, locked_by: nil, locked_at: nil)
+    Delayed::Job.where.not(locked_by: nil, locked_at: nil).update(run_at: Time.now, locked_by: nil, locked_at: nil)
   end
 
   desc "Reset EULA accepted"
