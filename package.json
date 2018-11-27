@@ -232,7 +232,7 @@
     "build:js:watch": "yarn run webpack",
     "build:packages": "yarn workspace-run build:canvas",
     "lint:browser-code": "es-check es5 ./public/dist/**/*.js",
-    "lint:staged": "if [ -f node_modules/.bin/lint-staged ]; then lint-staged || true; else false; fi",
+    "lint:staged": "lint-staged",
     "postinstall": "yarn build:packages && ./script/install_hooks",
     "webpack": "gulp rev 1> /dev/null & webpack --progress --color --watch",
     "webpack-development": "gulp rev 1> /dev/null & webpack --color && yarn lint:browser-code",
