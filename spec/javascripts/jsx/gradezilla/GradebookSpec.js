@@ -2339,14 +2339,14 @@ QUnit.module('Gradebook#getViewOptionsMenuProps', () => {
     consoleSpy.restore()
   })
 
-  test('finalGradesOverrideEnabled is false', () => {
-    const {finalGradesOverrideEnabled} = createGradebook().getViewOptionsMenuProps()
-    strictEqual(finalGradesOverrideEnabled, false)
+  test('finalGradeOverrideEnabled is false', () => {
+    const {finalGradeOverrideEnabled} = createGradebook().getViewOptionsMenuProps()
+    strictEqual(finalGradeOverrideEnabled, false)
   })
 
-  test('finalGradesOverrideEnabled is set via final_grades_override_enabled', () => {
-    const {finalGradesOverrideEnabled} = createGradebook({final_grades_override_enabled: true}).getViewOptionsMenuProps()
-    strictEqual(finalGradesOverrideEnabled, true)
+  test('finalGradeOverrideEnabled is set via final_grade_override_enabled', () => {
+    const {finalGradeOverrideEnabled} = createGradebook({final_grade_override_enabled: true}).getViewOptionsMenuProps()
+    strictEqual(finalGradeOverrideEnabled, true)
   })
 
   test('showUnpublishedAssignments is true', () => {
@@ -5285,11 +5285,11 @@ QUnit.module('Gradebook#initShowOverrides', () => {
     gradebook.destroy()
   })
 
-  QUnit.module('given final_grades_override_enabled is false', (hooks) => {
+  QUnit.module('given final_grade_override_enabled is false', (hooks) => {
     let gradebook
 
     hooks.beforeEach(() => {
-      gradebook = createGradebook({final_grades_override_enabled: false})
+      gradebook = createGradebook({final_grade_override_enabled: false})
     })
 
     hooks.afterEach(() => {
@@ -5318,11 +5318,11 @@ QUnit.module('Gradebook#initShowOverrides', () => {
     })
   })
 
-  QUnit.module('given final_grades_override_enabled is true', (hooks) => {
+  QUnit.module('given final_grade_override_enabled is true', (hooks) => {
     let gradebook
 
     hooks.beforeEach(() => {
-      gradebook = createGradebook({final_grades_override_enabled: true})
+      gradebook = createGradebook({final_grade_override_enabled: true})
     })
 
     hooks.afterEach(() => {
@@ -5475,7 +5475,7 @@ QUnit.module('Gradebook#toggleOverrides', () => {
   });
 
   test('calls saveSettings with showFinalGradeOverrides', function () {
-    const gradebookProps = {settings: {show_final_grade_overrides: 'true'}, final_grades_override_enabled: true}
+    const gradebookProps = {settings: {show_final_grade_overrides: 'true'}, final_grade_override_enabled: true}
     const gradebook = createGradebook(gradebookProps);
     sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu');
     const saveSettingsStub = sandbox.stub(gradebook, 'saveSettings');

@@ -46,7 +46,7 @@ function defaultProps ({ props, filterSettings } = {}) {
     onSelectShowStatusesModal () {},
     onSelectShowUnpublishedAssignments () {},
     showUnpublishedAssignments: false,
-    finalGradesOverrideEnabled: false,
+    finalGradeOverrideEnabled: false,
     teacherNotes: {
       disabled: false,
       onSelect () {},
@@ -171,11 +171,11 @@ QUnit.module('ViewOptionsMenu - Overrides', (moduleHooks) => {
     strictEqual(menuItem, undefined)
   })
 
-  QUnit.module('given finalGradesOverrideEnabled is true', (hooks) => {
+  QUnit.module('when "Final Grade Override" is enabled', hooks => {
     hooks.beforeEach(() => {
       props = {
         ...defaultProps(),
-        finalGradesOverrideEnabled: true
+        finalGradeOverrideEnabled: true
       }
     })
 

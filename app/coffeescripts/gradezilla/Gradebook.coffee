@@ -1330,7 +1330,7 @@ define [
     getViewOptionsMenuProps: ->
       teacherNotes: @getTeacherNotesViewOptionsMenuProps()
       overrides: @getOverridesViewOptionsMenuProps()
-      finalGradesOverrideEnabled: @options.final_grades_override_enabled
+      finalGradeOverrideEnabled: @options.final_grade_override_enabled
       columnSortSettings: @getColumnSortSettingsViewOptionsMenuProps()
       filterSettings: @getFilterSettingsViewOptionsMenuProps()
       showUnpublishedAssignments: @gridDisplaySettings.showUnpublishedAssignments
@@ -2376,7 +2376,7 @@ define [
 
     initShowOverrides: (showFinalGradeOverrides = 'false') =>
       @gridDisplaySettings.showFinalGradeOverrides =
-        @options.final_grades_override_enabled && showFinalGradeOverrides == 'true'
+        @options.final_grade_override_enabled && showFinalGradeOverrides == 'true'
 
     toggleOverrides: =>
       @gridDisplaySettings.showFinalGradeOverrides = !@gridDisplaySettings.showFinalGradeOverrides

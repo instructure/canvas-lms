@@ -810,15 +810,15 @@ describe GradebooksController do
         expect(gradebook_options).not_to have_key :colors
       end
 
-      it "includes final_grades_override_enabled if New Gradebook is enabled" do
+      it "includes final_grade_override_enabled if New Gradebook is enabled" do
         @course.enable_feature!(:new_gradebook)
         get :show, params: {course_id: @course.id}
-        expect(gradebook_options).to have_key :final_grades_override_enabled
+        expect(gradebook_options).to have_key :final_grade_override_enabled
       end
 
-      it "does not include final_grades_override_enabled if New Gradebook is disabled" do
+      it "does not include final_grade_override_enabled if New Gradebook is disabled" do
         get :show, params: {course_id: @course.id}
-        expect(gradebook_options).not_to have_key :final_grades_override_enabled
+        expect(gradebook_options).not_to have_key :final_grade_override_enabled
       end
 
       it "includes late_policy if New Gradebook is enabled" do

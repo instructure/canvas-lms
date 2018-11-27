@@ -813,7 +813,7 @@ class GradebooksController < ApplicationController
     {
       GRADEBOOK_OPTIONS: {
         colors: gradebook_settings.fetch(:colors, {}),
-        final_grades_override_enabled: @context.feature_enabled?(:final_grades_override),
+        final_grade_override_enabled: @context.feature_enabled?(:final_grades_override),
         graded_late_submissions_exist: graded_late_submissions_exist,
         gradezilla: true,
         grading_schemes: GradingStandard.for(@context).as_json(include_root: false),
