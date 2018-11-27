@@ -1115,7 +1115,7 @@ class User < ActiveRecord::Base
     end
     can :reset_mfa
 
-    given { |user| user && (user.as_observer_observation_links.where(user_id: self.id).exists? || self.check_courses_right?(user, :read, user.observer_enrollments)) }
+    given { |user| user && user.as_observer_observation_links.where(user_id: self.id).exists? }
     can :read and can :read_as_parent
   end
 

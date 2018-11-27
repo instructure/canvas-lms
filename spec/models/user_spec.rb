@@ -2515,60 +2515,6 @@ describe User do
     end
   end
 
-  describe ":read_as_parent" do
-    before :once do
-      @student = course_with_student(active_all: true).user
-    end
-
-    context "as manually enrolled observer" do
-      before :once do
-        course_with_observer(course: @course, active_enrollment: true, associated_user_id: @student.id)
-      end
-
-      it "is granted" do
-        expect(@student.grants_right?(@observer, :read_as_parent)).to eq true
-      end
-    end
-
-    context "as super observer" do
-      before :once do
-        @observer = user_model
-        UserObservationLink.create(student: @student, observer: @observer)
-      end
-
-      it "is granted" do
-        expect(@student.grants_right?(@observer, :read_as_parent)).to eq true
-      end
-    end
-  end
-
-  describe ":read" do
-    before :once do
-      @student = course_with_student(active_all: true).user
-    end
-
-    context "as manually enrolled observer" do
-      before :once do
-        course_with_observer(course: @course, active_enrollment: true, associated_user_id: @student.id)
-      end
-
-      it "is granted" do
-        expect(@student.grants_right?(@observer, :read)).to eq true
-      end
-    end
-
-    context "as super observer" do
-      before :once do
-        @observer = user_model
-        UserObservationLink.create(student: @student, observer: @observer)
-      end
-
-      it "is granted" do
-        expect(@student.grants_right?(@observer, :read)).to eq true
-      end
-    end
-  end
-
   describe "check_accounts_right?" do
     describe "sharding" do
       specs_require_sharding
