@@ -73,6 +73,30 @@ describe GradeSummaryAssignmentPresenter do
     end
   end
 
+  describe '#upload_status' do
+    it 'returns attachment workflow_state when workflow_state is pending_upload' do
+      expect(presenter.upload_status).to eq('pending_upload')
+    end
+
+    it 'returns attachment workflow_state when workflow_state is errored' do
+      @attachment.workflow_state = 'errored'
+      @attachment.save!
+      expect(presenter.upload_status).to eq('errored')
+    end
+
+    it 'returns the proper attachment when there are muliptle attachments in different states' do
+      attachment_1 = attachment_model(context: @student)
+      attachment_1.workflow_state = 'success'
+      attachment_1.save!
+      attachment_2 = attachment_model(context: @student)
+      attachment_2.workflow_state = 'errored'
+      attachment_2.save!
+      attachment_3 = attachment_model(context: @student)
+      @assignment.submit_homework @student, attachments: [attachment_1, attachment_2, attachment_3]
+      expect(presenter.upload_status).to eq('errored')
+    end
+  end
+
   describe '#originality_report' do
     it 'returns true when an originality report exists' do
       OriginalityReport.create(originality_score: 0.8,

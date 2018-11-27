@@ -71,6 +71,9 @@
             } %>
           </a>
         </div>
+        <% js_bundle 'progress_pill' %>
+        <span class="assignment_presenter_for_submission" style="display: none;"><%= attachment.workflow_state %></span>
+        <span class="react_pill_container"></span>
       <% end %>
     <% elsif @current_user_submission.submission_type == "online_quiz" %>
       <a href="<%= context_url(@assignment.context, :context_quiz_url, @assignment.quiz.id) %>" target="_new">

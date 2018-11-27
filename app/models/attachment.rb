@@ -381,6 +381,7 @@ class Attachment < ActiveRecord::Base
     text/plain
     text/html
     application/rtf
+    text/rtf
     text/richtext
     application/vnd.wordperfect
     application/vnd.ms-powerpoint
