@@ -540,6 +540,9 @@ type GradingPeriodConnection {
   # A list of edges.
   edges: [GradingPeriodEdge]
 
+  # A list of nodes.
+  nodes: [GradingPeriod]
+
   # Information to aid in pagination.
   pageInfo: PageInfo!
 }
@@ -618,6 +621,9 @@ type GroupMembership implements Timestamped {
 type GroupMembershipConnection {
   # A list of edges.
   edges: [GroupMembershipEdge]
+
+  # A list of nodes.
+  nodes: [GroupMembership]
 
   # Information to aid in pagination.
   pageInfo: PageInfo!
@@ -824,6 +830,9 @@ type Section implements Node & Timestamped {
 type SectionConnection {
   # A list of edges.
   edges: [SectionEdge]
+
+  # A list of nodes.
+  nodes: [Section]
 
   # Information to aid in pagination.
   pageInfo: PageInfo!
