@@ -18,34 +18,30 @@
 
 import React from 'react'
 import {bool} from 'prop-types'
-
-import apiUserContent from 'compiled/str/apiUserContent'
-import {TeacherAssignmentShape} from '../assignmentData'
-import Overrides from './Overrides/Overrides'
+import I18n from 'i18n!assignments_2'
+import {OverrideShape} from '../../assignmentData'
+import ToggleGroup from '@instructure/ui-toggle-details/lib/components/ToggleGroup'
 import View from '@instructure/ui-layout/lib/components/View'
+import OverrideSummary from './OverrideSummary'
 
-Details.propTypes = {
-  assignment: TeacherAssignmentShape.isRequired,
+Override.propTypes = {
+  override: OverrideShape,
   readOnly: bool
 }
-Details.defaultProps = {
+Override.defaultProps = {
   readOnly: true
 }
 
-export default function Details(props) {
-  const {
-    assignment: {description}
-  } = props
-  const convertedHtml = apiUserContent.convert(description)
-
-  // html is sanitized on the server side
-  // TODO: when readOnly=false, render the rce
+export default function Override(props) {
   return (
-    <View as="div" margin="0">
-      <View as="div" margin="small 0">
-        <div dangerouslySetInnerHTML={{__html: convertedHtml}} />
-      </View>
-      <Overrides assignment={props.assignment} readOnly={props.readOnly} />
+    <View as="div" margin="0 0 small 0">
+      <ToggleGroup
+        toggleLabel={I18n.t('Expand')}
+        summary={<OverrideSummary override={props.override} />}
+        background="default"
+      >
+        <div style={{padding: '.5rem'}}>OverrideDetail goes here</div>
+      </ToggleGroup>
     </View>
   )
 }

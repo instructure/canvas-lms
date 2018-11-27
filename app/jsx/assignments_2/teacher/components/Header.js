@@ -25,9 +25,12 @@ import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import Text from '@instructure/ui-elements/lib/components/Text'
 
 import {TeacherAssignmentShape} from '../assignmentData'
+import TeacherViewContext from './TeacherViewContext'
 import Toolbox from './Toolbox'
 
 export default class Header extends React.Component {
+  static contextType = TeacherViewContext
+
   static propTypes = {
     assignment: TeacherAssignmentShape.isRequired,
     onUnsubmittedClick: func,
