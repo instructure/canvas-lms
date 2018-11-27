@@ -34,7 +34,8 @@ module LtiAdvantage::Messages
         nonce: '5a234202-6f0e-413d-8793-809db7a95930',
         deep_linking_settings: LtiAdvantage::Models::DeepLinkingSetting.new(
           accept_types: ['link'],
-          accept_presentation_document_targets: ['iframe']
+          accept_presentation_document_targets: ['iframe'],
+          deep_link_return_url: 'http://test.com/return_url'
         ),
         roles: ['foo']
       )

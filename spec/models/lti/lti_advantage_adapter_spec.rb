@@ -74,6 +74,23 @@ describe Lti::LtiAdvantageAdapter do
   end
 
   describe '#generate_post_payload' do
+    context 'when the message type is "LtiDeepLinkingRequest"' do
+      let(:opts) { { resource_type: 'editor_button', domain: 'test.com' } }
+
+      before do
+        tool.editor_button = {
+          enabled: true,
+          message_type: 'LtiDeepLinkingRequest',
+          icon_url: 'http://test.com/icon'
+        }
+        tool.save!
+      end
+
+      it 'caches a deep linking request' do
+        expect(params["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq 'LtiDeepLinkingRequest'
+      end
+    end
+
     it "generates a resource link request if the tool's resource type setting is 'ResourceLinkRequest'" do
       expect(params["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
     end

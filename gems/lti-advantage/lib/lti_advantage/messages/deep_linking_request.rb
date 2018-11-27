@@ -18,6 +18,8 @@
 module LtiAdvantage::Messages
   # Class represeting an LTI 1.3 LtiDeepLinkingRequest.
   class DeepLinkingRequest < JwtMessage
+    MESSAGE_TYPE = "LtiDeepLinkingRequest"
+
     # Required claims for this message type
     REQUIRED_CLAIMS = superclass::REQUIRED_CLAIMS + %i[
       deep_linking_settings
@@ -38,7 +40,7 @@ module LtiAdvantage::Messages
     # @param [Hash] attributes for message initialization.
     # @return [DeepLinkingRequest]
     def initialize(params = {})
-      self.message_type = "LtiDeepLinkingRequest"
+      self.message_type = MESSAGE_TYPE
       self.version = "1.3.0"
       super
     end

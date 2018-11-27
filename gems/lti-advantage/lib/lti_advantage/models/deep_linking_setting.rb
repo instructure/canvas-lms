@@ -25,6 +25,7 @@ module LtiAdvantage::Models
     REQUIRED_ATTRIBUTES = %i[
       accept_types
       accept_presentation_document_targets
+      deep_link_return_url
     ].freeze
 
     TYPED_ATTRIBUTES = {

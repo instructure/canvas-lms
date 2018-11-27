@@ -1,6 +1,8 @@
 module LtiAdvantage::Messages
   # Class represeting an LTI 1.3 LtiResourceLinkRequest.
   class ResourceLinkRequest < JwtMessage
+    MESSAGE_TYPE = "LtiResourceLinkRequest"
+
     # Required claims for this message type
     REQUIRED_CLAIMS = superclass::REQUIRED_CLAIMS + %i[
       resource_link
@@ -21,7 +23,7 @@ module LtiAdvantage::Messages
     # @param [Hash] attributes for message initialization.
     # @return [LtiResourceLinkRequest]
     def initialize(params = {})
-      self.message_type = "LtiResourceLinkRequest"
+      self.message_type = MESSAGE_TYPE
       self.version = "1.3.0"
       super
     end

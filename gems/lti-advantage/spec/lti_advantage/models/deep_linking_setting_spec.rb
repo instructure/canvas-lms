@@ -35,7 +35,8 @@ module LtiAdvantage::Models
         expect(
           DeepLinkingSetting.new(
             accept_types: ['foo'],
-            accept_presentation_document_targets: ['bar']
+            accept_presentation_document_targets: ['bar'],
+            deep_link_return_url: 'http://test.com/return'
           )
         ).to be_valid
       end
