@@ -21,8 +21,10 @@ module Lti::Ims::Concerns
     include AdvantageServices
 
     included do
+      before_action :verify_line_item_tool_connection, only: %i[show update destroy]
+
       def line_item
-        @_line_item ||= Lti::LineItem.find(params.fetch(:line_item_id, params[:id]))
+        @_line_item ||= Lti::LineItem.where(id: params.fetch(:line_item_id, params[:id])).eager_load(:resource_link).take!
       end
 
       def context
@@ -41,6 +43,10 @@ module Lti::Ims::Concerns
       def verify_user_in_context
         return if context.user_is_student? user
         render_error('User not found in course or is not a student', :unprocessable_entity)
+      end
+
+      def verify_line_item_tool_connection
+        render_error('Tool does not have permission to view line_item') unless line_item.resource_link.context_external_tool_id == tool.id
       end
 
       def verify_line_item_in_context

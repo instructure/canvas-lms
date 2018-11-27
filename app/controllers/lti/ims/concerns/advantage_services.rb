@@ -98,7 +98,6 @@ module Lti::Ims::Concerns
       skip_before_action :load_user
 
       before_action(
-        :verify_environment,
         :verify_access_token,
         :verify_context,
         :verify_developer_key,
@@ -106,11 +105,6 @@ module Lti::Ims::Concerns
         :verify_tool_permissions,
         :verify_tool_features,
       )
-
-      def verify_environment
-        # TODO: Take out when 1.3/Advantage fully baked.
-        render_unauthorized_action if Rails.env.production?
-      end
 
       def verify_access_token
         if access_token.blank?

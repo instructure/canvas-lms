@@ -23,10 +23,21 @@ require_dependency "lti/ims/results_controller"
 describe Lti::Ims::ResultsController do
   include_context 'advantage services context'
 
-  let(:assignment) { assignment_model context: course}
+  let(:assignment) do
+    opts = {course: course}
+    if tool.present?
+      opts[:submission_types] = 'external_tool'
+      opts[:external_tool_tag_attributes] = {
+        url: tool.url,
+        content_type: 'context_external_tool',
+        content_id: tool.id
+      }
+    end
+    assignment_model(opts)
+  end
   let(:context) { course }
   let(:unknown_context_id) { (Course.maximum(:id) || 0) + 1 }
-  let(:result) { lti_result_model assignment: assignment }
+  let(:result) { lti_result_model assignment: assignment, line_item: assignment.line_items.first }
   let(:json) { JSON.parse(response.body) }
   let(:params_overrides) do
     {
@@ -40,14 +51,14 @@ describe Lti::Ims::ResultsController do
     let(:action) { :index }
 
     before do
-      8.times { lti_result_model line_item: result.line_item, assignment: assignment }
+      3.times { lti_result_model line_item: result.line_item, assignment: assignment }
     end
 
     it_behaves_like 'advantage services'
 
     it 'returns a collection of results' do
       send_request
-      expect(json.size).to eq 9
+      expect(json.size).to eq 4
     end
 
     it 'formats the results correctly' do
@@ -138,7 +149,7 @@ describe Lti::Ims::ResultsController do
     end
 
     context 'when result requested not in line_item' do
-      let(:params_overrides) { super().merge(id: result.id, line_item_id: line_item_model(assignment: assignment).id) }
+      let(:params_overrides) { super().merge(id: result.id, line_item_id: line_item_model(assignment: assignment, with_resource_link: true).id) }
 
       it 'returns a 404' do
         send_request

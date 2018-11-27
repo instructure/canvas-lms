@@ -27,14 +27,58 @@ module Lti
 
       let(:context) { course }
       let(:unknown_context_id) { (Course.maximum(:id) || 0) + 1 }
-      let(:resource_link) { resource_link_model(overrides: {resource_link_id: assignment.lti_context_id}) }
-      let(:assignment) { assignment_model(course: course) }
+      let(:resource_link) do
+        if tool.present? && tool.use_1_3?
+          resource_link_model(overrides: {resource_link_id: assignment.lti_context_id})
+        else
+          resource_link_model
+        end
+      end
+      let(:assignment) do
+        opts = {course: course}
+        if tool.present?
+          opts[:submission_types] = 'external_tool'
+          opts[:external_tool_tag_attributes] = {
+            url: tool.url,
+            content_type: 'context_external_tool',
+            content_id: tool.id
+          }
+        end
+        assignment_model(opts)
+      end
       let(:parsed_response_body) { JSON.parse(response.body) }
       let(:label) { 'Originality Score' }
       let(:tag) { 'some_tag' }
       let(:resource_id) { 'orig-123' }
       let(:score_max) { 50 }
       let(:scope_to_remove) { 'https://purl.imsglobal.org/spec/lti-ags/scope/lineitem' }
+
+      shared_examples 'assignment with wrong tool' do
+        let(:other_tool) do
+          ContextExternalTool.create!(
+            context: tool_context,
+            consumer_key: 'key',
+            shared_secret: 'secret',
+            name: 'wrong tool',
+            url: 'http://www.wrong_tool.com/launch',
+            developer_key: DeveloperKey.create!,
+            settings: { use_1_3: true },
+            workflow_state: 'public'
+          )
+        end
+        let(:line_item) do
+          line_item_model(
+            course: course,
+            with_resource_link: true,
+            tool: other_tool
+          )
+        end
+
+        it 'returns a precondition_failed' do
+          send_request
+          expect(response).to have_http_status :precondition_failed
+        end
+      end
 
       describe '#create' do
         let(:params_overrides) do
@@ -161,27 +205,37 @@ module Lti
             end.to change {Assignment.count}.by(1)
           end
 
+          it 'does not create a resource_link record' do
+            expect do
+              send_request
+            end.to change {Lti::ResourceLink.count}.by(0)
+          end
+
           context 'when a new assignment is created' do
+            let(:item) { Lti::LineItem.find(parsed_response_body['id'].split('/').last) }
+
             before do
               send_request
-              body = parsed_response_body
-              @item = Lti::LineItem.find(body['id'].split('/').last)
             end
 
             it 'sets the score maximum on the new assignment' do
-              expect(@item.assignment.points_possible).to eq score_max
+              expect(item.assignment.points_possible).to eq score_max
             end
 
             it 'sets the submission type on the new assignment' do
-              expect(@item.assignment.submission_types).to eq 'none'
+              expect(item.assignment.submission_types).to eq 'none'
+            end
+
+            it 'does not attach a resource_link' do
+              expect(item.resource_link).to be_blank
             end
 
             it 'sets the name for the assignment' do
-              expect(@item.assignment.name).to eq label
+              expect(item.assignment.name).to eq label
             end
 
             it 'sets the context of the new assignment' do
-              expect(@item.assignment.context).to eq course
+              expect(item.assignment.context).to eq course
             end
           end
         end
@@ -204,6 +258,7 @@ module Lti
         let(:action) { :update }
 
         it_behaves_like 'advantage services'
+        it_behaves_like 'assignment with wrong tool'
 
         context do
           let(:new_score_maximum) { 88.2 }
@@ -244,16 +299,18 @@ module Lti
         context do
           let(:new_label) { 'a new label!' }
           let(:params_overrides) { super().merge(label: new_label) }
+          let(:line_item) { assignment.line_items.first }
+
           it 'updates the assignment name if ResourceLink is absent' do
+            skip('Pending a review of how we will handle the decoupled approach')
             line_item.update_attributes!(resource_link: nil)
             send_request
             expect(line_item.reload.assignment.name).to eq new_label
           end
 
           it 'updates the assignment name if default line item' do
-            new_label = 'a new label!'
             send_request
-            expect(line_item.reload.assignment.name).to eq new_label
+            expect(line_item.reload.assignment.name).to eq 'a new label!'
           end
         end
 
@@ -336,6 +393,7 @@ module Lti
         end
 
         it_behaves_like 'advantage services'
+        it_behaves_like 'assignment with wrong tool'
 
         it 'correctly formats the requested line item' do
           send_request
@@ -359,7 +417,7 @@ module Lti
         end
 
         context do
-          let(:line_item) {  line_item_model }
+          let(:line_item_id) {  Lti::LineItem.maximum(:id) + 1 }
 
           it 'responds with 404 if the line item does not exist' do
             send_request
@@ -393,9 +451,7 @@ module Lti
         # diverse pool of line items when testing the queries in
         # the specs that follow.
         let!(:line_item) do
-          line_item_model(
-            assignment: assignment
-          )
+          assignment.line_items.first
         end
         let!(:line_item_with_tag) do
           line_item_model(
@@ -470,12 +526,20 @@ module Lti
         end
 
         context do
-          let(:params_overrides) { super().merge(lti_link_id: resource_link.resource_link_id) }
+          let(:line_item_new_lti_link) do
+            line_item_model(
+              course: course,
+              with_resource_link: true,
+              tool: tool
+            )
+          end
+          let(:params_overrides) { super().merge(lti_link_id: line_item_new_lti_link.resource_link.resource_link_id) }
 
           it 'correctly queries by lti_link_id' do
             send_request
             expect(line_item_list).to match_array([
-              line_item_with_lti_link_id
+              line_item_new_lti_link.assignment.line_items.first,
+              line_item_new_lti_link
             ])
           end
         end
@@ -518,6 +582,8 @@ module Lti
         let(:action) { :destroy }
 
         shared_examples 'the line item destroy endpoint' do
+          it_behaves_like 'assignment with wrong tool'
+
           it 'deletes the correct line item' do
             send_request
             expect(Lti::LineItem.find_by(id: line_item_id)).to be_nil
@@ -531,12 +597,11 @@ module Lti
 
         context 'when using the coupled model' do
           let(:coupled_line_item) do
-            line_item_model(
-              assignment: assignment,
-              resource_link: resource_link,
+            assignment.line_items.first.update!(
               tag: tag,
               resource_id: resource_id
             )
+            assignment.line_items.first
           end
 
           let!(:second_line_item) do
@@ -548,13 +613,13 @@ module Lti
             )
           end
           let(:line_item) do
-            coupled_line_item
+            second_line_item
           end
 
           it_behaves_like 'the line item destroy endpoint'
 
           context do
-            let(:line_item) { second_line_item }
+            let(:line_item) { coupled_line_item }
 
             it 'does not allow destroying default line items' do
               send_request
@@ -563,10 +628,10 @@ module Lti
           end
         end
 
-        context 'when using the uncoupled model' do
+        xcontext 'when using the uncoupled model' do
           let(:line_item) do
             line_item_model(
-              assignment: assignment,
+              course: course,
               tag: tag,
               resource_id: resource_id
             )

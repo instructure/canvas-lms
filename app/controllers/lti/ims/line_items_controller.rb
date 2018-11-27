@@ -101,8 +101,10 @@ module Lti
       #
       # @returns LineItem
       def create
-        new_line_item = LineItem.create!(
-          line_item_params.merge({assignment_id: assignment_id, resource_link: resource_link})
+        new_line_item = LineItem.create_line_item!(
+          assignment,
+          context,
+          line_item_params.merge(resource_link: resource_link)
         )
 
         render json: LineItemsSerializer.new(new_line_item, line_item_id(new_line_item)),
@@ -163,7 +165,7 @@ module Lti
       # @returns LineItem
       def index
         line_items = Api.paginate(
-          Lti::LineItem.where(index_query),
+          Lti::LineItem.where(index_query).eager_load(:resource_link),
           self,
           lti_line_item_index_url(course_id: context.id),
           pagination_args
@@ -192,19 +194,8 @@ module Lti
         end
       end
 
-      def assignment_id
-        @_assignment_id ||= begin
-          if params[:ltiLinkId].present?
-            resource_link.line_items&.first&.assignment_id
-          else
-            Assignment.create!(
-              context: context,
-              name: line_item_params[:label],
-              points_possible: line_item_params[:score_maximum],
-              submission_types: 'none'
-            ).id
-          end
-        end
+      def assignment
+        @_assignment ||= resource_link.line_items&.first&.assignment if params[:ltiLinkId].present?
       end
 
       def line_item_id(line_item)
@@ -220,19 +211,32 @@ module Lti
       end
 
       def resource_link
-        # TODO: Constrain query by current tool
-        @_resource_link ||= ResourceLink.find_by(resource_link_id: params[:ltiLinkId])
+        @_resource_link ||= ResourceLink.find_by(
+          resource_link_id: params[:ltiLinkId],
+          context_external_tool: tool
+        )
       end
 
       def index_query
-        assignments = Assignment.where(context: context)
-        # TODO: only show line items that belong to the current tool.
-        {
-          assignment: assignments,
-          tag: params[:tag],
-          resource_id: params[:resource_id],
-          lti_resource_link_id: Lti::ResourceLink.find_by(resource_link_id: params[:lti_link_id])
-        }.compact
+        rlid = params[:lti_link_id]
+        # Eventually becomes a set of predicates in a paginated LineItem query. Limits the latter to only those
+        # Assignments belonging to the requested context _and_ having a LineItem bound to a ResourceLink
+        # associated with the current tool. Client can further narrow that last condition by specifying
+        # a particular ResourceLink UUID (`lti_link_id`). (`tag` and `resource_id` query params also treated
+        # as LineItem filters.)
+        assignments = Assignment.
+          active.
+          joins(line_items: :resource_link).
+          where(
+            context: context,
+            lti_resource_links: { context_external_tool_id: tool.id }.merge!(rlid.present? ? { resource_link_id: rlid } : {})
+          ).
+          distinct
+
+        { assignment: assignments }.
+          merge!(params[:tag].present? ? { tag: params[:tag] } : {}).
+          merge!(params[:resource_id].present? ? { resource_id: params[:resource_id] } : {}).
+          compact
       end
 
       def line_item_collection(line_items)
@@ -242,8 +246,13 @@ module Lti
       def verify_valid_resource_link
         return unless params[:ltiLinkId]
         raise ActiveRecord::RecordNotFound if resource_link.blank?
-        head :precondition_failed if resource_link.line_items.blank?
-        # TODO: additional checks similar to MembershipProvider#validate_tool_for_assignment!
+        head :precondition_failed if check_for_bad_resource_link
+      end
+
+      def check_for_bad_resource_link
+        resource_link.line_items.blank? ||
+        assignment&.context != context ||
+        !assignment&.active?
       end
 
       def scopes_matcher

@@ -25,8 +25,24 @@ module Lti::Ims
     include_context 'advantage services context'
 
     let(:context) { course }
+    let(:assignment) do
+      opts = {course: course}
+      if tool.present? && tool.use_1_3?
+        opts[:submission_types] = 'external_tool'
+        opts[:external_tool_tag_attributes] = {
+          url: tool.url,
+          content_type: 'context_external_tool',
+          content_id: tool.id
+        }
+      end
+      assignment_model(opts)
+    end
     let(:unknown_context_id) { (Course.maximum(:id) || 0) + 1 }
-    let(:line_item) { line_item_model with_resource_link: true, course: course }
+    let(:line_item) do
+      assignment.external_tool? && tool.use_1_3? ?
+        assignment.line_items.first :
+        line_item_model(course: course)
+    end
     let(:user) { student_in_course(course: course, active_all: true).user }
     let(:line_item_id) { line_item.id }
     let(:result) { lti_result_model line_item: line_item, user: user, scoreGiven: nil, scoreMaximum: nil }
@@ -103,7 +119,7 @@ module Lti::Ims
 
         context 'when line_item is not an assignment' do
           let(:line_item_no_submission) do
-            line_item_model assignment: line_item.assignment, resource_link: line_item.resource_link
+            line_item_model assignment: line_item.assignment, resource_link: line_item.resource_link, tool: tool
           end
           let(:line_item_id) { line_item_no_submission.id }
 
