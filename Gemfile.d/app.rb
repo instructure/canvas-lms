@@ -16,9 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 if CANVAS_RAILS5_1
-  gem 'rails', '5.1.6'
+  gem 'rails', '5.1.6.1'
 else
-  gem 'rails', '5.2.1'
+  gem 'rails', '5.2.1.1'
 end
     gem 'loofah', '2.2.3'
 
