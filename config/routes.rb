@@ -1839,6 +1839,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: 'support_helpers/plagiarism_platform') do
       get "support_helpers/plagiarism_platform/add_service", action: :add_service
+      get "support_helpers/plagiarism_platform/resubmit_for_assignment/:assignment_id", action: :resubmit_for_assignment
     end
 
     scope(controller: 'support_helpers/crocodoc') do

@@ -20,6 +20,35 @@ require File.expand_path(File.dirname(__FILE__) + '/../../lti2_spec_helper.rb')
 describe SupportHelpers::PlagiarismPlatformController do
   include_context 'lti2_spec_helper'
 
+  let(:user) { site_admin_user }
+
+  describe '#resubmit_for_assignment' do
+    let_once(:assignment) { assignment_model }
+    let_once(:submission) { submission_model(assignment: assignment) }
+
+    let(:params) { {assignment_id: assignment.id} }
+
+    before do
+      user_session(user)
+    end
+
+    it 'triggers a plagiarism_resubmit event for all submissions' do
+      expect(Canvas::LiveEvents).to receive(:plagiarism_resubmit).with(submission)
+      get :resubmit_for_assignment, params: params
+    end
+
+    context 'when user is not site admin' do
+      subject { response }
+
+      let(:user) { user_model }
+
+      it 'redirects to login page' do
+        get :resubmit_for_assignment, params: params
+        expect(subject).to be_redirect
+      end
+    end
+  end
+
   describe '#add_service' do
     subject do
       updated_tool_services
@@ -28,7 +57,6 @@ describe SupportHelpers::PlagiarismPlatformController do
     let(:product_code) { product_family.product_code }
     let(:service_actions) { ['GET', 'pOsT'] }
     let(:service_name) { 'vnd.Canvas.webhooksSubscription' }
-    let(:user) { site_admin_user }
     let(:updated_tool_services) do
       Lti::ToolProxy.all.map { |tp| tp.raw_data.dig('security_contract', 'tool_service') }
     end

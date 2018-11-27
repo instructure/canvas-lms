@@ -55,6 +55,24 @@ module SupportHelpers
       )
     end
 
+    # @API Resubmit All Submissions to Tool
+    # @internal
+    # Resends a 'plagiarism_resubmit' webhook for each submission
+    # in the specified assignment
+    #
+    # Example Request:
+    # http://canvas.docker/api/v1/support_helpers/plagiarism_platform/
+    #   resubmit_for_assignment/85
+    #
+    # @argument assignment_id [Integer]
+    #   The assignment ID
+    def resubmit_for_assignment
+      run_fixer(
+        SupportHelpers::AssignmentResubmission,
+        Assignment.find(params[:assignment_id])
+      )
+    end
+
     private
 
     def product_code
