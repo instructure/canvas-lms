@@ -135,10 +135,11 @@ class Enrollment::BatchStateUpdater
 
   def self.touch_all_graders_if_needed(students)
     courses_to_touch_admins = students.map(&:course_id).uniq
-    Enrollment.connection.after_transaction_commit do
-      User.where(id: Enrollment.where(course_id: courses_to_touch_admins,
-                                      type: ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment']).
-        active.select(:user_id)).touch_all
+    admin_ids = Enrollment.where(course_id: courses_to_touch_admins,
+      type: ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment']).
+      active.distinct.pluck(:user_id).sort
+    admin_ids.each_slice(1000) do |sliced_admin_ids|
+      User.where(id: sliced_admin_ids).touch_all
     end
   end
 
