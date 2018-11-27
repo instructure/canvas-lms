@@ -1263,7 +1263,7 @@ es:
         megabytes_tooltip: megabytes
         update_button: Actualizar
       report_last_run_never: Nunca
-      report_running: "El informe se está corriendo.*Recibirá un correo electrónico cuando esté listo.*"
+      report_running: "El informe se está procesando.*Recibirá un correo electrónico cuando esté listo.*"
       select: 
         mfa: 
           disabled: Desactivado
