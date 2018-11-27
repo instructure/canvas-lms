@@ -911,7 +911,11 @@ class Message < ActiveRecord::Base
   end
 
   def name_helper
-    @name_helper ||= Messages::NameHelper.new(context, notification_name)
+    @name_helper ||= Messages::NameHelper.new(
+      asset: context,
+      message_recipient: self.user,
+      notification_name: notification_name
+    )
   end
 
   def apply_course_nickname_to_asset(asset, user)

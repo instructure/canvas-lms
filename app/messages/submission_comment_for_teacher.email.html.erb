@@ -1,9 +1,40 @@
+<%
+  submission = asset.submission
+  assignment = submission.assignment
+  comment_author = ""
+  link = ""
+  submission_submittor = ""
+
+  if assignment.anonymize_students?
+    link = speed_grader_course_gradebook_url(assignment.context, assignment_id: assignment.id)
+    link += "##{{"anonymous_id": submission.anonymous_id}.to_json}"
+    submission_submittor = t("Student (%{id})", id: submission.anonymous_id)
+    user_submission = Submission.find_by(user: asset.author, assignment: assignment)
+    comment_author = if user_submission.present?
+      t("Student (%{id})", id: user_submission.anonymous_id)
+    else
+      t("Someone")
+    end
+  else
+    comment_author = asset.author_name
+    link = course_assignment_submission_url(assignment.context, assignment, submission.user_id)
+    submission_submittor = submission.user.short_name
+  end
+%>
+
 <% define_content :link do %>
-  <%= polymorphic_url([asset.submission.assignment.context, asset.submission.assignment, :submission], id: asset.submission.user) %>
+  <%= link.html_safe %>
 <% end %>
 
 <% define_content :subject do %>
-  <%= t :subject, "Submission Comment: %{user}, %{assignment}, %{context}", :user => asset.submission.user.name, :assignment => asset.submission.assignment.title, :context => asset.submission.assignment.context.name %>
+  <%=
+    t(
+      "Submission Comment: %{submission_submittor}, %{assignment}, %{context}",
+      submission_submittor: submission_submittor,
+      assignment: assignment.title,
+      context: assignment.context.name
+    )
+  %>
 <% end %>
 
 <% define_content :footer_link do %>
@@ -12,48 +43,56 @@
   </a>
 <% end %>
 
-<p><%= t :body, "%{author} just made a new comment on the submission for %{user} for %{assignment}",
-         :author => (asset.author_name || t(:someone, "Someone")),
-         :user => asset.submission.user.short_name,
-         :assignment => asset.submission.assignment.title %></p>
+<p>
+  <%=
+    t(
+      "%{author} just made a new comment on the submission for %{submission_submittor} for %{assignment}",
+      author: comment_author,
+      submission_submittor: submission_submittor,
+      assignment: assignment.title
+    )
+  %>
+</p>
 
 <%= format_message(asset.comment).first %>
 
-<% if avatar_enabled? %> 
-  <table border="0" style="border-collapse: collapse">
-    <tr height="30px">
-      <td></td>
-    </tr>
-    <tr >
-      <td align="left" width="50" style="width: 50px"><img style="border-radius: 50px; height: 50px; width: 50px;" height="50" width="50" src="<%=author_avatar_url%>" alt="<%=author_short_name%>"> </td>
-      <td width="10"></td>
-      <td>
-        <table border="0" style="font-size: 14px; color: #444444; background-color: #ffffff; font-family: 'Open Sans', 'Lucida Grande', 'Segoe UI', Arial, Verdana, 'Lucida Sans Unicode', Tahoma, 'Sans Serif';" valign="top" align="left">
-          <tr>
-            <td valign="bottom" align="left">
-              <b><%= author_short_name%></b>
-            </td>
-          </tr>
-          <tr>
-            <td valign="top" align="left">
-              <a href="mailto:<%= author_email_address %>">
-                <%= author_email_address%>
-              </a>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-<% else %>
-  <p height="30px"></p>
-  <p>
-    <b><%= author_short_name%></b>
-    <br/>
-    <a href="mailto:<%= author_email_address %>">
-      <%= author_email_address%>
-    </a>
-  </p>
+<% unless assignment.anonymize_students? %>
+  <% if avatar_enabled? %>
+    <table border="0" style="border-collapse: collapse">
+      <tr height="30px">
+        <td></td>
+      </tr>
+      <tr >
+        <td align="left" width="50" style="width: 50px"><img style="border-radius: 50px; height: 50px; width: 50px;" height="50" width="50" src="<%=author_avatar_url%>" alt="<%=author_short_name%>"> </td>
+        <td width="10"></td>
+        <td>
+          <table border="0" style="font-size: 14px; color: #444444; background-color: #ffffff; font-family: 'Open Sans', 'Lucida Grande', 'Segoe UI', Arial, Verdana, 'Lucida Sans Unicode', Tahoma, 'Sans Serif';" valign="top" align="left">
+            <tr>
+              <td valign="bottom" align="left">
+                <b><%= author_short_name%></b>
+              </td>
+            </tr>
+            <tr>
+              <td valign="top" align="left">
+                <a href="mailto:<%= author_email_address %>">
+                  <%= author_email_address%>
+                </a>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  <% else %>
+    <p height="30px"></p>
+    <p>
+      <b><%= author_short_name%></b>
+      <br/>
+      <a href="mailto:<%= author_email_address %>">
+        <%= author_email_address%>
+      </a>
+    </p>
+  <% end %>
 <% end %>
 
 <% if asset.media_comment? %>
