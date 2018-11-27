@@ -18,6 +18,8 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+
+import {mockAssignment} from '../../shared/__tests__/utils'
 import StudentContentTabs from '../StudentContentTabs'
 import $ from 'jquery'
 
@@ -35,14 +37,8 @@ afterEach(() => {
 })
 
 it('renders normally', () => {
-  const assignment = {
-    name: 'an assignment',
-    pointsPossible: 42,
-    dueAt: 'some time',
-    description: 'an assignment'
-  }
   ReactDOM.render(
-    <StudentContentTabs assignment={assignment} />,
+    <StudentContentTabs assignment={mockAssignment()} />,
     document.getElementById('fixtures')
   )
   const element = $('[data-test-id="assignment-2-student-content-tabs-test-text"]')

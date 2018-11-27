@@ -16,13 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const funcs = {
-  parse() {
-    return 1
-  },
-  format() {
-    return '12/28/2018 23:59:00'
+export function mockAssignment(overrides = {}) {
+  return {
+    lid: '7',
+    gid: 'QXNzaWdubWVudC03',
+    name: 'Assignment',
+    description: '<p>description</p>',
+    dueAt: '2018-07-11T18:59:59-06:00',
+    pointsPossible: 10,
+    lockAt: null,
+    unlockAt: null,
+    state: 'published',
+    course: {
+      lid: '1',
+      __typename: 'Course'
+    },
+    modules: [],
+    assignmentGroup: {
+      name: 'Assignments',
+      lid: '1',
+      __typename: 'AssignmentGroup'
+    },
+    lockInfo: {
+      isLocked: true,
+      __typename: 'LockInfo'
+    },
+    __typename: 'Assignment',
+    ...overrides
   }
 }
-
-export default funcs

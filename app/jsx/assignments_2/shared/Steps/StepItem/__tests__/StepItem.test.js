@@ -58,6 +58,15 @@ it('should render in-progress status', async () => {
   expect(component.hasClass('in-progress')).toBeTruthy()
 })
 
+it('should render unavailable status', async () => {
+  ReactDOM.render(
+    <StepItem status="unavailable" label="Test label" />,
+    document.getElementById('fixtures')
+  )
+  const component = $('.step-item-step')
+  expect(component.hasClass('unavailable')).toBeTruthy()
+})
+
 it('should render label correctly', async () => {
   ReactDOM.render(
     <StepItem status="complete" label={status => `progress 2 ${status}`} />,

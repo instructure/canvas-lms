@@ -19,6 +19,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
 
+import {mockAssignment} from '../../../shared/__tests__/utils'
 import StudentDateTitle from '../StudentDateTitle'
 
 beforeAll(() => {
@@ -33,23 +34,20 @@ beforeAll(() => {
 afterEach(() => {
   ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
 })
-jest.mock('timezone')
 
 it('renders title correctly', () => {
-  ReactDOM.render(
-    <StudentDateTitle title="Egypt Economy Research" dueDate={new Date('12/28/2018 23:59:00')} />,
-    document.getElementById('fixtures')
-  )
+  const assignment = mockAssignment({name: 'Egypt Economy Research'})
+  ReactDOM.render(<StudentDateTitle assignment={assignment} />, document.getElementById('fixtures'))
   const title = $('[data-test-id="title"]')
   expect(title.text()).toEqual('Egypt Economy Research')
 })
 
 it('renders date correctly', () => {
-  ReactDOM.render(
-    <StudentDateTitle title="Egypt Economy Research" dueDate={new Date('12/28/2018 23:59:00')} />,
-    document.getElementById('fixtures')
-  )
+  const assignment = mockAssignment({dueAt: '2016-07-11T18:00:00-01:00'})
+  ReactDOM.render(<StudentDateTitle assignment={assignment} />, document.getElementById('fixtures'))
   const title = $('[data-test-id="due-date-display"]')
+
   // Reason why this is showing up twice is once for screenreader content and again for regular content
-  expect(title.text()).toEqual('Due: 12/28/2018 23:59:00Due: 12/28/2018 23:59:002018-12-28')
+  // Also, notice that it handles timezone differences here, with the `-01:00` offset
+  expect(title.text()).toEqual('Due: Mon Jul 11, 2016 7:00pmDue: Mon Jul 11, 2016 7:00pm2016-7-11')
 })

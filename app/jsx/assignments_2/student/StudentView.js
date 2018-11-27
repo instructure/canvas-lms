@@ -17,13 +17,15 @@
  */
 
 import React from 'react'
-import StudentHeader from './components/StudentHeader'
-import AssignmentToggleDetails from '../shared/AssignmentToggleDetails'
-import StudentContentTabs from './StudentContentTabs'
+import StudentContainer from './components/StudentContainer'
 import {string} from 'prop-types'
 import {Query} from 'react-apollo'
 import gql from 'graphql-tag'
 
+// Fields I'm not sure if we are using:
+//   - state
+//   - course
+//   - various lids
 export const STUDENT_VIEW_QUERY = gql`
   query GetAssignment($assignmentLid: ID!) {
     assignment: legacyNode(type: Assignment, _id: $assignmentLid) {
@@ -34,8 +36,22 @@ export const STUDENT_VIEW_QUERY = gql`
         description
         dueAt
         pointsPossible
+        lockAt
+        unlockAt
+        state
+        course {
+          lid: _id
+        }
+        modules {
+          name
+          lid: _id
+        }
         assignmentGroup {
           name
+          lid: _id
+        }
+        lockInfo {
+          isLocked
         }
       }
     }
@@ -48,13 +64,7 @@ const StudentView = props => (
       // TODO HANDLE ERROR AND LOADING
       if (loading) return null
       if (error) return `Error!: ${error}`
-      return (
-        <div data-test-id="assignments-2-student-view">
-          <StudentHeader assignment={data.assignment} />
-          <AssignmentToggleDetails description={data.assignment.description} />
-          <StudentContentTabs />
-        </div>
-      )
+      return <StudentContainer assignment={data.assignment} />
     }}
   </Query>
 )

@@ -18,26 +18,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
-import {mockAssignment} from '../../shared/__tests__/utils'
-import {MockedProvider} from 'react-apollo/test-utils'
-import StudentView, {STUDENT_VIEW_QUERY} from '../StudentView'
-import wait from 'waait'
 
-const mocks = [
-  {
-    request: {
-      query: STUDENT_VIEW_QUERY,
-      variables: {
-        assignmentLid: '7'
-      }
-    },
-    result: {
-      data: {
-        assignment: mockAssignment()
-      }
-    }
-  }
-]
+import {mockAssignment} from '../../../shared/__tests__/utils'
+import StepContainer from '../StepContainer'
 
 beforeAll(() => {
   const found = document.getElementById('fixtures')
@@ -46,26 +29,28 @@ beforeAll(() => {
     fixtures.setAttribute('id', 'fixtures')
     document.body.appendChild(fixtures)
   }
-  global.ENV = {}
-  global.ENV.context_asset_string = 'course_1'
-})
-
-afterAll(() => {
-  global.ENV = null
 })
 
 afterEach(() => {
   ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
 })
 
-it('renders normally', async () => {
-  ReactDOM.render(
-    <MockedProvider mocks={mocks} removeTypename addTypename>
-      <StudentView assignmentLid="7" />
-    </MockedProvider>,
-    document.getElementById('fixtures')
-  )
-  await wait(0) // wait for response
-  const element = $('[data-test-id="assignments-2-student-view"]')
-  expect(element).toHaveLength(1)
+it('will render the availaible step container if assignment is not locked', () => {
+  const assignment = mockAssignment({lockInfo: {isLocked: false}})
+  ReactDOM.render(<StepContainer assignment={assignment} />, document.getElementById('fixtures'))
+
+  const expectedElement = $('.in-progress')
+  const unexpectedElement = $('.unavailable')
+  expect(expectedElement).toHaveLength(1)
+  expect(unexpectedElement).toHaveLength(0)
+})
+
+it('will render the unavailaible step container if assignment is locked', () => {
+  const assignment = mockAssignment({lockInfo: {isLocked: true}})
+  ReactDOM.render(<StepContainer assignment={assignment} />, document.getElementById('fixtures'))
+
+  const expectedElement = $('.unavailable')
+  const unexpectedElement = $('.in-progress')
+  expect(expectedElement).toHaveLength(1)
+  expect(unexpectedElement).toHaveLength(0)
 })

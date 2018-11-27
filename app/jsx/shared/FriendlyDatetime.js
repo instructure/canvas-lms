@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18nObj'
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import tz from 'timezone'

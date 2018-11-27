@@ -53,16 +53,13 @@ function StudentHeader(props) {
       />
       <Flex margin="0 0 xx-large 0">
         <FlexItem grow>
-          <StudentDateTitle
-            title={props.assignment.name}
-            dueDate={new Date(props.assignment.dueAt)}
-          />
+          <StudentDateTitle assignment={props.assignment} />
         </FlexItem>
         <FlexItem grow>
           <PointsDisplay receivedPoints={null} possiblePoints={props.assignment.pointsPossible} />
         </FlexItem>
       </Flex>
-      <StepContainer />
+      <StepContainer assignment={props.assignment} />
     </div>
   )
 }

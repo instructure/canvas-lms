@@ -37,6 +37,10 @@ export const EnvShape = shape({
   }).isRequired
 })
 
+export const LockInfoShape = shape({
+  isLocked: bool.isRequired
+})
+
 export const CourseShape = shape({
   lid: string.isRequired
 })
@@ -54,10 +58,13 @@ export const AssignmentGroupShape = shape({
 export const AssignmentShape = shape({
   name: string.isRequired,
   pointsPossible: number.isRequired,
-  dueAt: string.isRequired, // temporary
+  dueAt: string.isRequired,
+  lockAt: string.isRequired,
+  unlockAt: string.isRequired,
   description: string.isRequired,
   state: oneOf(['published', 'unpublished']).isRequired,
   course: CourseShape.isRequired,
   modules: arrayOf(ModuleShape).isRequired,
-  assignmentGroup: AssignmentGroupShape.isRequired
+  assignmentGroup: AssignmentGroupShape.isRequired,
+  lockInfo: LockInfoShape.isRequired
 })

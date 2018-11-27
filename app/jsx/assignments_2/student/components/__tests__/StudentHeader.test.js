@@ -19,18 +19,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
 
+import {mockAssignment} from '../../../shared/__tests__/utils'
 import StudentHeader from '../StudentHeader'
-
-const mockAssignment = {
-  lid: '40',
-  gid: 'QXNzaWdubWVudC00MA==',
-  name: 'is this still workin',
-  description: '<p>sadflkajsdfklajsdfasdf</p>',
-  dueAt: '2018-07-11T18:59:59-06:00',
-  pointsPossible: 0,
-  assignmentGroup: {name: 'Assignments', __typename: 'AssignmentGroup'},
-  __typename: 'Assignment'
-}
 
 beforeAll(() => {
   const found = document.getElementById('fixtures')
@@ -43,16 +33,17 @@ beforeAll(() => {
   global.ENV.context_asset_string = 'course_1'
 })
 
-afterEach(() => {
+afterAll(() => {
   global.ENV = null
+})
+
+afterEach(() => {
   ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
 })
 
-jest.mock('timezone')
-
 it('renders normally', () => {
   ReactDOM.render(
-    <StudentHeader assignment={mockAssignment} />,
+    <StudentHeader assignment={mockAssignment()} />,
     document.getElementById('fixtures')
   )
   const element = $('[data-test-id="assignments-2-student-header"]')

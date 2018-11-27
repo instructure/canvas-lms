@@ -55,6 +55,17 @@
     background: #00AC18;
   }
 }
+.unavailable {
+  .step-item-label {
+    font-weight: 700;
+  }
+  .step-item-pin {
+    border-color:#e52209;
+    border-style: solid;
+    border-width: 2px;
+    background: #ffffff;
+  }
+}
 
 .in-progress {
   .step-item-label {

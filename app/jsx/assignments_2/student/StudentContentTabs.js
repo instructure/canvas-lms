@@ -33,67 +33,69 @@ StudentContentTabs.propTypes = {
 
 function StudentContentTabs(props) {
   return (
-    <TabList defaultSelectedIndex={0} variant="minimal">
-      <TabPanel
-        title={
+    <div data-test-id="assignment-2-student-content-tabs">
+      <TabList defaultSelectedIndex={0} variant="minimal">
+        <TabPanel
+          title={
+            <Flex as="header" alignItems="center" justifyItems="center" direction="column">
+              <FlexItem>
+                <IconUpload size="small" />
+                <View margin="small">
+                  <Text>Upload</Text>
+                </View>
+              </FlexItem>
+            </Flex>
+          }
+        >
           <Flex as="header" alignItems="center" justifyItems="center" direction="column">
             <FlexItem>
-              <IconUpload size="small" />
-              <View margin="small">
-                <Text>Upload</Text>
-              </View>
+              <Text data-test-id="assignment-2-student-content-tabs-test-text">
+                `TODO: Input Upload Content Here...`
+              </Text>
             </FlexItem>
           </Flex>
-        }
-      >
-        <Flex as="header" alignItems="center" justifyItems="center" direction="column">
-          <FlexItem>
-            <Text data-test-id="assignment-2-student-content-tabs-test-text">
-              `TODO: Input Upload Content Here...`
-            </Text>
-          </FlexItem>
-        </Flex>
-      </TabPanel>
-      <TabPanel
-        title={
+        </TabPanel>
+        <TabPanel
+          title={
+            <Flex as="header" alignItems="center" justifyItems="center" direction="column">
+              <FlexItem>
+                <IconComment size="small" />
+                <View margin="small">
+                  <Text>Comments</Text>
+                </View>
+              </FlexItem>
+            </Flex>
+          }
+        >
           <Flex as="header" alignItems="center" justifyItems="center" direction="column">
             <FlexItem>
-              <IconComment size="small" />
-              <View margin="small">
-                <Text>Comments</Text>
-              </View>
+              <Text>
+                {`TODO: Input Comments Content Here... ${props.assignment &&
+                  props.assignment.description}`}
+              </Text>
             </FlexItem>
           </Flex>
-        }
-      >
-        <Flex as="header" alignItems="center" justifyItems="center" direction="column">
-          <FlexItem>
-            <Text>
-              {`TODO: Input Comments Content Here... ${props.assignment &&
-                props.assignment.description}`}
-            </Text>
-          </FlexItem>
-        </Flex>
-      </TabPanel>
-      <TabPanel
-        title={
+        </TabPanel>
+        <TabPanel
+          title={
+            <Flex as="header" alignItems="center" justifyItems="center" direction="column">
+              <FlexItem>
+                <IconRubric size="small" />
+                <View margin="small">
+                  <Text>Rubric</Text>
+                </View>
+              </FlexItem>
+            </Flex>
+          }
+        >
           <Flex as="header" alignItems="center" justifyItems="center" direction="column">
             <FlexItem>
-              <IconRubric size="small" />
-              <View margin="small">
-                <Text>Rubric</Text>
-              </View>
+              <Text>`TODO: Input Rubric Content Here...`</Text>
             </FlexItem>
           </Flex>
-        }
-      >
-        <Flex as="header" alignItems="center" justifyItems="center" direction="column">
-          <FlexItem>
-            <Text>`TODO: Input Rubric Content Here...`</Text>
-          </FlexItem>
-        </Flex>
-      </TabPanel>
-    </TabList>
+        </TabPanel>
+      </TabList>
+    </div>
   )
 }
 

@@ -22,11 +22,11 @@ import React from 'react'
 import Steps from '../../shared/Steps'
 import StepItem from '../../shared/Steps/StepItem'
 
-function StepContainer() {
+function availableStepContainer() {
   return (
     <div className="steps-container">
       <Steps>
-        <StepItem label={I18n.t('Avaible: ')} status="complete" />
+        <StepItem label={I18n.t('Avaible')} status="complete" />
         <StepItem
           status="in-progress"
           label={status =>
@@ -46,6 +46,30 @@ function StepContainer() {
       </Steps>
     </div>
   )
+}
+
+function unavailableStepContainer() {
+  return (
+    <div className="steps-container">
+      <Steps>
+        <StepItem label={I18n.t('Unavailable')} status="unavailable" />
+        <StepItem label={I18n.t('Upload')} />
+        <StepItem label={I18n.t('Submit')} />
+        <StepItem label={I18n.t('Not Graded')} />
+      </Steps>
+    </div>
+  )
+}
+
+function StepContainer(props) {
+  const {assignment} = props
+
+  // TODO render the step-container based on the actual assignment data.
+  if (assignment.lockInfo.isLocked) {
+    return unavailableStepContainer()
+  } else {
+    return availableStepContainer()
+  }
 }
 
 export default React.memo(StepContainer)
