@@ -112,12 +112,18 @@ describe "Outcome Reports" do
   end
 
   def verify(row, values, row_index: nil)
-    user, assignment, outcome, outcome_result, course, section, submission, quiz, question, quiz_submission, pseudonym =
+    user, assignment, outcome, outcome_result, course, section, submission, quiz, question, quiz_outcome_result, quiz_submission, pseudonym =
       values.values_at(:user, :assignment, :outcome, :outcome_result, :course, :section, :submission, :quiz, :question,
-      :quiz_submission, :pseudonym)
-    rating = if quiz.nil? && outcome.present? && outcome_result&.score&.present?
+      :quiz_outcome_result, :quiz_submission, :pseudonym)
+    result = quiz.nil? ? outcome_result : quiz_outcome_result
+    rating = if outcome.present? && result&.score&.present?
                outcome.rubric_criterion&.[](:ratings)&.select do |r|
-                 r[:points].present? && r[:points] <= outcome_result.score
+                 score = if quiz.nil?
+                           result.score
+                         else
+                           result.percent * outcome.points_possible
+                 end
+                 r[:points].present? && r[:points] <= score
                end&.first
     end
     rating ||= {}
@@ -418,7 +424,8 @@ describe "Outcome Reports" do
           outcome: @quiz_outcome,
           course: @course1,
           assignment: @quiz.assignment,
-          section: @section
+          section: @section,
+          quiz_outcome_result: @quiz_outcome_result
         }
         verify_all(
           report, [
@@ -443,9 +450,9 @@ describe "Outcome Reports" do
         )
       end
 
-      it 'should not include ratings for quiz questions' do
+      it 'should include ratings for quiz questions' do
         expect(report[0]['assessment type']).to eq 'quiz'
-        expect(report[0]['learning outcome rating']).to be_nil
+        expect(report[0]['learning outcome rating']).to eq 'Does Not Meet Expectations'
       end
     end
   end

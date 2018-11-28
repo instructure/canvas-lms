@@ -208,6 +208,9 @@ module AccountReports
           COALESCE(qr.attempt, r.attempt)             AS "attempt",
           r.hide_points                               AS "learning outcome points hidden",
           COALESCE(qr.score, r.score)                 AS "outcome score",
+          CASE WHEN r.association_type IN ('Quiz', 'Quizzes::Quiz') THEN r.percent
+               ELSE NULL
+          END                                         AS "total percent outcome score",
           c.name                                      AS "course name",
           c.id                                        AS "course id",
           c.sis_source_id                             AS "course sis id",
@@ -323,8 +326,14 @@ module AccountReports
       row['learning outcome mastery score'] = outcome_data[:mastery_points]
 
       score = row['outcome score']
-      if score.present? && row['assessment type'] != 'quiz'
+      if score.present?
         ratings = outcome_data[:ratings]&.sort_by { |r| r[:points] }&.reverse || []
+        total_percent = row['total percent outcome score']
+        if total_percent
+          points_possible = outcome_data[:points_possible]
+          points_possible = outcome_data[:mastery_points] if points_possible.zero?
+          score = points_possible * total_percent
+        end
         rating = ratings.detect { |r| r[:points] <= score } || {}
         row['learning outcome rating'] = rating[:description]
 
