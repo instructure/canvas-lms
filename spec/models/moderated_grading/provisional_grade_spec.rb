@@ -480,6 +480,17 @@ describe ModeratedGrading::ProvisionalGrade do
       expect(GradeCalculator).not_to receive(:recompute_final_score)
       pg.publish!(skip_grade_calc: true)
     end
+
+    it 'does not create a duplicate submission comment created event when a provisional grade is published' do
+      assignment.update!(moderated_grading: true, final_grader: scorer, grader_count: 1)
+      provisional_grade = submission.find_or_create_provisional_grade!(scorer)
+      submission.add_comment(comment: 'provisional comment', provisional: true, author: scorer)
+
+      expect { provisional_grade.publish!(skip_grade_calc: true) }.not_to change {
+        AnonymousOrModerationEvent.where(assignment: assignment, submission: submission).
+          submission_comment_created.count
+      }
+    end
   end
 
   describe "copy_to_final_mark!" do

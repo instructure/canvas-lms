@@ -4504,18 +4504,15 @@ describe Submission do
       let(:assignment) { course.assignments.create!(title: 'ok', anonymous_grading: true) }
       let(:student) { course.enroll_student(User.create!, enrollment_state: 'active').user }
       let(:teacher) { course.enroll_teacher(User.create!, enrollment_state: 'active').user }
-      let(:submission) { assignment.submission_for_student(student) }
-
+      let(:submission) { assignment.submissions.find_by!(user: student) }
       let(:comment_params) { {comment: 'my great submission', author: student} }
-
-      let(:audit_events) do
-        AnonymousOrModerationEvent.where(assignment: assignment, submission: submission).reload
-      end
-      let(:last_event) { audit_events.last }
+      let(:last_event) { AnonymousOrModerationEvent.where(assignment: assignment, submission: submission).last }
 
       context 'for an auditable assignment' do
         it 'creates an event when a non-draft comment is published' do
-          expect { submission.add_comment(comment_params) }.to change(audit_events, :count).by(1)
+          expect { submission.add_comment(comment_params) }.to change {
+            AnonymousOrModerationEvent.where(assignment: assignment, submission: submission).count
+          }.by(1)
         end
 
         it 'sets "submission_comment_created" as the event type' do
@@ -4529,8 +4526,10 @@ describe Submission do
         end
 
         it 'does not create events for draft comments' do
-          draft_params = comment_params.merge({draft_comment: true})
-          expect { submission.add_comment(draft_params) }.not_to change(audit_events, :count)
+          draft_params = comment_params.merge(draft_comment: true)
+          expect { submission.add_comment(draft_params) }.not_to change {
+            AnonymousOrModerationEvent.where(assignment: assignment, submission: submission).count
+          }
         end
 
         describe 'auditable attributes' do
@@ -4545,17 +4544,17 @@ describe Submission do
           end
 
           it 'captures the value of the "media_comment_id" attribute' do
-            submission.add_comment(comment_params.merge({media_comment_id: 12}))
+            submission.add_comment(comment_params.merge(media_comment_id: 12))
             expect(last_event.payload['media_comment_id']).to eq '12'
           end
 
           it 'captures the value of the "media_comment_type" attribute' do
-            submission.add_comment(comment_params.merge({media_comment_type: 'audio'}))
+            submission.add_comment(comment_params.merge(media_comment_type: 'audio'))
             expect(last_event.payload['media_comment_type']).to eq 'audio'
           end
 
           it 'captures the value of the "group_comment_id" attribute' do
-            submission.add_comment(comment_params.merge({group_comment_id: 12}))
+            submission.add_comment(comment_params.merge(group_comment_id: 12))
             expect(last_event.payload['group_comment_id']).to eq '12'
           end
 
@@ -4565,7 +4564,7 @@ describe Submission do
               assessor: student,
               assessor_asset: submission
             )
-            submission.add_comment(comment_params.merge({assessment_request: assessment_request}))
+            submission.add_comment(comment_params.merge(assessment_request: assessment_request))
             expect(last_event.payload['assessment_request_id']).to eq assessment_request.id
           end
 
@@ -4575,7 +4574,7 @@ describe Submission do
               uploaded_data: StringIO.new('hello!'),
               context: course
             )
-            submission.add_comment(comment_params.merge({attachments: [attachment]}))
+            submission.add_comment(comment_params.merge(attachments: [attachment]))
             expect(last_event.payload['attachment_ids']).to eq attachment.id.to_s
           end
 
@@ -4589,7 +4588,7 @@ describe Submission do
             assignment.update!(moderated_grading: true, final_grader: teacher, grader_count: 1)
             provisional_grade = submission.find_or_create_provisional_grade!(teacher)
 
-            provisional_comment_params = comment_params.merge({ provisional: true, author: teacher })
+            provisional_comment_params = comment_params.merge(provisional: true, author: teacher)
             submission.add_comment(provisional_comment_params)
             expect(last_event.payload['provisional_grade_id']).to eq provisional_grade.id
           end
@@ -4599,7 +4598,9 @@ describe Submission do
       it 'does not create audit events when the assignment is not auditable' do
         assignment1 = course.assignments.create!(title: 'ok', anonymous_grading: false)
         submission1 = assignment1.submission_for_student(student)
-        expect { submission1.add_comment(comment_params) }.not_to change(audit_events, :count)
+        expect { submission1.add_comment(comment_params) }.not_to change {
+          AnonymousOrModerationEvent.where(assignment: assignment, submission: submission).count
+        }
       end
     end
   end
@@ -5665,7 +5666,7 @@ describe Submission do
     end
 
     context 'with lti_result' do
-      let(:lti_result) { lti_result_model({ assignment: @assignment }) }
+      let(:lti_result) { lti_result_model(assignment: @assignment) }
       let(:submission) { lti_result.submission }
 
       it 'does nothing if score has not changed' do
@@ -5784,6 +5785,24 @@ describe Submission do
 
       @assignment.grade_student(@threshold.student, score: 10, grader: @teacher)
     end
+  end
 
+  describe "#grade_posting_in_progress" do
+    subject { submission.grade_posting_in_progress }
+
+    it { is_expected.to be nil }
+
+    it "reports its value" do
+      submission.grade_posting_in_progress = true
+      expect(submission.grade_posting_in_progress).to be true
+    end
+  end
+
+  describe "#grade_posting_in_progress=" do
+    it "can set a value" do
+      expect { submission.grade_posting_in_progress = true }.to change {
+        submission.grade_posting_in_progress
+      }.from(nil).to(true)
+    end
   end
 end
