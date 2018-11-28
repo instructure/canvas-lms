@@ -529,17 +529,11 @@ module QuizzesCommon
   end
 
   def edit_quiz
-    expect_new_page_load do
-      wait_for_ajaximations
-      f('.quiz-edit-button').click
-    end
+    expect_new_page_load { f('.quiz-edit-button').click }
   end
 
   def cancel_quiz_edit
-    expect_new_page_load do
-      fj('#cancel_button', 'div#quiz_edit_actions').click
-      wait_for_ajaximations
-    end
+    expect_new_page_load { fj('#cancel_button', 'div#quiz_edit_actions').click }
   end
 
   def edit_first_multiple_choice_answer(text)

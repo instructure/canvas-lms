@@ -66,13 +66,7 @@ describe "quizzes question creation with attempts" do
       f('#quiz_time_limit').click
       expect(alert_present?).to be_falsey
       expect(fj('#quiz_allowed_attempts')).to have_attribute('value', attempts) # fj to avoid selenium caching
-
-      expect_new_page_load do
-        f('.save_quiz_button').click
-        wait_for_ajaximations
-        expect(f('.header-bar-right')).to be_truthy
-      end
-
+      expect_new_page_load { f('.save_quiz_button').click }
       expect(Quizzes::Quiz.last.allowed_attempts).to eq attempts.to_i
     end
   end
