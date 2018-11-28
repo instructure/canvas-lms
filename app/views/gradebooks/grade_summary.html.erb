@@ -175,11 +175,21 @@
             <%
               mid = 0
               disp_name = assignment.name["Course Participation - ".length .. -1]
-              tag = @context.context_modules.active.where(:name => disp_name).first.content_tags.first
+              mod = @context.context_modules.active.where(:name => disp_name).first
+              tag = mod.content_tags.first
               #tag = ContentTag.where(:content_id => page.id, :context_id => @context.id, :context_type => 'Course', :content_type => 'WikiPage').first
               mid = tag.id unless tag.nil?
+
+              bzg = BZGrading.new
             %>
-            <a href="/bz/grade_details?user_id=<%= @presenter.student_id %>&module_item_id=<%= mid %>"><%= assignment.title %></a>
+
+            <%
+              if bzg.get_module_completion_status(mod, User.find(@presenter.student_id)) == 'completed'
+            %>
+               <a href="/bz/grade_details?user_id=<%= @presenter.student_id %>&module_item_id=<%= mid %>"><%= assignment.title %></a>
+            <% else %>
+               <a href="/courses/<%= @context.id %>/modules/items/<%= mid %>"><%= assignment.title %></a>
+            <% end %>
           <% else %>
             <a href="<%= context_url(@context, :context_assignment_submission_url, assignment, @presenter.student_id) %>"><%= assignment.title %></a>
           <% end %>
