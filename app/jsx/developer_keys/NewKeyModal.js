@@ -91,7 +91,9 @@ export default class DeveloperKeyModal extends React.Component {
       formData.append('developer_key[require_scopes]', true)
     }
 
-    formData.append('developer_key[test_cluster_only]', this.testClusterOnly)
+    if (this.testClusterOnly !== undefined) {
+      formData.append('developer_key[test_cluster_only]', this.testClusterOnly)
+    }
 
     this.props.store.dispatch(
       this.props.actions.createOrEditDeveloperKey(formData, this.developerKeyUrl(), method)
