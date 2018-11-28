@@ -243,6 +243,35 @@ test('it adds each selected scope to the form data', () => {
   wrapper.unmount()
 })
 
+test('it removes testClusterOnly from the form data if it is undefined', () => {
+  const createOrEditSpy = sinon.spy()
+  const dispatchSpy = sinon.spy()
+  const fakeActions = { createOrEditDeveloperKey: createOrEditSpy }
+  const fakeStore = { dispatch: dispatchSpy }
+  const developerKey2 = Object.assign({}, developerKey, { require_scopes: true, scopes: ['test'] })
+  delete developerKey2.test_cluster_only
+  const editDeveloperKeyState2 = Object.assign({}, editDeveloperKeyState, { developerKey: developerKey2 })
+  const wrapper = mount(
+    <DeveloperKeyModal
+      createLtiKeyState={createLtiKeyState}
+      availableScopes={{}}
+      availableScopesPending={false}
+      closeModal={() => {}}
+      createOrEditDeveloperKeyState={editDeveloperKeyState2}
+      listDeveloperKeyScopesState={listDeveloperKeyScopesState}
+      actions={fakeActions}
+      store={fakeStore}
+      mountNode={modalMountNode}
+      selectedScopes={selectedScopes}
+    />
+  )
+  wrapper.instance().submitForm()
+  const [[sentFormData]] = createOrEditSpy.args
+  notOk(sentFormData.has('test_cluster_only'))
+
+  wrapper.unmount()
+})
+
 test('flashes an error if no scopes are selected', () => {
   const flashStub = sinon.stub($, 'flashError')
   const createOrEditSpy = sinon.spy()
