@@ -1139,7 +1139,7 @@ class ConversationsController < ApplicationController
     known = @current_user.address_book.known_users(users, context: context, conversation_id: params[:from_conversation_id])
     contexts.each{ |context| known.concat(@current_user.address_book.known_in_context(context)) }
     @recipients = known.uniq(&:id)
-    @recipients.reject!{|u| u.id == @current_user.id} unless @recipients == [@current_user]
+    @recipients.reject!{|u| u.id == @current_user.id} unless @recipients == [@current_user] && params[:recipients].count == 1
   end
 
   def infer_tags
