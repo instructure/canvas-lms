@@ -43,19 +43,28 @@ module Turnitin
         submission,
         asset_string
       )
-    rescue StandardError
+    rescue Errors::ScoreStillPendingError
       if attempt_number == self.class.max_attempts
-        @assignment.attachments.create!(
-          uploaded_data: StringIO.new(I18n.t('An error occurred while attempting to contact Turnitin.')),
-          display_name: 'Failed turnitin submission',
-          filename: 'failed_turnitin.txt',
-          user: @user
+        create_error_attachment
+        raise
+      else
+        turnitin_processor = Turnitin::OutcomeResponseProcessor.new(@tool, @assignment, @user, @outcomes_response_json)
+        turnitin_processor.send_later_enqueue_args(
+          :process,
+          {
+            max_attempts: Turnitin::OutcomeResponseProcessor.max_attempts,
+            priority: Delayed::LOW_PRIORITY,
+            attempts: attempt_number,
+            run_at: Time.now.utc + (attempt_number ** 4) + 5
+          }
         )
       end
+    rescue StandardError
+      if attempt_number == self.class.max_attempts
+        create_error_attachment
+      end
       raise
-
     end
-    handle_asynchronously :process, max_attempts: max_attempts, priority: Delayed::LOW_PRIORITY
 
     def resubmit(submission, asset_string)
       self.send_later_enqueue_args(
@@ -94,6 +103,15 @@ module Turnitin
     end
 
     private
+
+    def create_error_attachment
+      @assignment.attachments.create!(
+        uploaded_data: StringIO.new(I18n.t('An error occurred while attempting to contact Turnitin.')),
+        display_name: 'Failed turnitin submission',
+        filename: 'failed_turnitin.txt',
+        user: @user
+      )
+    end
 
     def stash_turnitin_client
       old_turnit_client = @_turnitin_client

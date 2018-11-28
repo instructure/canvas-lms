@@ -41,7 +41,10 @@ module Turnitin
     def self.save_attachment(turnitin_client, user, attachment)
       Dir.mktmpdir do |dirname|
         turnitin_client.original_submission do |response|
-          filename = response.headers['content-disposition'].match(/filename=(\"?)(.+)\1/)[2]
+          content_disposition = response.headers['content-disposition']
+          fail Errors::ScoreStillPendingError if content_disposition.nil?
+
+          filename = content_disposition.match(/filename=(\"?)(.+)\1/)[2]
           filename.tr!('/','-')
           path = File.join(dirname, filename)
           File.open(path, 'wb') do |f|

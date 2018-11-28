@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require 'active_support/dependencies'
 require_dependency "turnitin/outcome_response_processor"
 require File.expand_path(File.dirname(__FILE__) + '/turnitin_spec_helper')
 require 'turnitin_api'
@@ -40,28 +41,28 @@ module Turnitin
       end
 
       it 'creates an attachment' do
-        subject.process_without_send_later
+        subject.process
         attachment = lti_assignment.attachments.first
         expect(lti_assignment.attachments.count).to eq 1
         expect(attachment.display_name).to eq filename
       end
 
       it 'sets the turnitin status to pending' do
-        subject.process_without_send_later
+        subject.process
         submission = lti_assignment.submissions.first
         attachment = lti_assignment.attachments.first
         expect(submission.turnitin_data[attachment.asset_string][:status]).to eq 'pending'
       end
 
       it 'sets the submission submitted_at if not nil' do
-        subject.process_without_send_later
+        subject.process
         submission = lti_assignment.submissions.first
         expect(submission.submitted_at).to eq tii_response['meta']['date_uploaded']
       end
 
       it 'does not set the submission submitted_at if nil' do
         tii_response['meta']['date_uploaded'] = nil
-        subject.process_without_send_later
+        subject.process
         submission = lti_assignment.submissions.first
         expect(submission.submitted_at).not_to be_nil
       end
@@ -72,16 +73,48 @@ module Turnitin
         it 'does not create an error attachment' do
           allow_any_instance_of(subject.class).to receive(:attempt_number).and_return(subject.class.max_attempts-1)
           expect_any_instance_of(TurnitinApi::OutcomesResponseTransformer).to receive(:original_submission).and_raise(Faraday::TimeoutError, 'Net::ReadTimeout')
-          expect { subject.process_without_send_later }.to raise_error(Faraday::TimeoutError)
+          expect { subject.process }.to raise_error(Faraday::TimeoutError)
           expect(lti_assignment.attachments.count).to eq 0
+        end
+
+        it 'creates a new job' do
+          time = Time.now.utc
+          attempt_number = subject.class.max_attempts-1
+          original_submission_response = double('original_submission_mock')
+          allow(original_submission_response).to receive(:headers).and_return({})
+          expect_any_instance_of(TurnitinApi::OutcomesResponseTransformer).to receive(:original_submission).and_yield(original_submission_response)
+          allow_any_instance_of(subject.class).to receive(:attempt_number).and_return(attempt_number)
+          expect_any_instance_of(subject.class).to receive(:send_later_enqueue_args).with(
+            :process,
+            {
+              max_attempts: subject.class.max_attempts,
+              priority: Delayed::LOW_PRIORITY,
+              attempts: attempt_number,
+              run_at: time + (attempt_number ** 4) + 5
+            }
+          )
+          Timecop.freeze(time) do
+            subject.process
+          end
         end
       end
 
       context 'when it is the last attempt' do
+        it 'creates an attachment for "Errors::ScoreStillPendingError"' do
+          allow(subject.class).to receive(:max_attempts).and_return(1)
+          original_submission_response = double('original_submission_mock')
+          allow(original_submission_response).to receive(:headers).and_return({})
+          expect_any_instance_of(TurnitinApi::OutcomesResponseTransformer).to receive(:original_submission).and_yield(original_submission_response)
+          expect { subject.process }.to raise_error(Errors::ScoreStillPendingError)
+          attachment = lti_assignment.attachments.first
+          expect(lti_assignment.attachments.count).to eq 1
+          expect(attachment.display_name).to eq "Failed turnitin submission"
+        end
+
         it 'creates an attachment for "Faraday::TimeoutError"' do
           allow(subject.class).to receive(:max_attempts).and_return(1)
           expect_any_instance_of(TurnitinApi::OutcomesResponseTransformer).to receive(:original_submission).and_raise(Faraday::TimeoutError, 'Net::ReadTimeout')
-          expect { subject.process_without_send_later }.to raise_error(Faraday::TimeoutError)
+          expect { subject.process }.to raise_error(Faraday::TimeoutError)
           attachment = lti_assignment.attachments.first
           expect(lti_assignment.attachments.count).to eq 1
           expect(attachment.display_name).to eq "Failed turnitin submission"
@@ -90,7 +123,7 @@ module Turnitin
         it 'creates an attachment for "Errno::ETIMEDOUT"' do
           allow(subject.class).to receive(:max_attempts).and_return(1)
           expect_any_instance_of(TurnitinApi::OutcomesResponseTransformer).to receive(:original_submission).and_raise(Errno::ETIMEDOUT, 'Connection timed out - connect(2) for "api.turnitin.com" port 443')
-          expect { subject.process_without_send_later }.to raise_error(Errno::ETIMEDOUT)
+          expect { subject.process }.to raise_error(Errno::ETIMEDOUT)
           attachment = lti_assignment.attachments.first
           expect(lti_assignment.attachments.count).to eq 1
           expect(attachment.display_name).to eq "Failed turnitin submission"
@@ -99,7 +132,7 @@ module Turnitin
         it 'creates an attachment for "Faraday::ConnectionFailed"' do
           allow(subject.class).to receive(:max_attempts).and_return(1)
           expect_any_instance_of(TurnitinApi::OutcomesResponseTransformer).to receive(:original_submission).and_raise(Faraday::ConnectionFailed, 'Connection reset by peer')
-          expect { subject.process_without_send_later }.to raise_error(Faraday::ConnectionFailed)
+          expect { subject.process }.to raise_error(Faraday::ConnectionFailed)
           attachment = lti_assignment.attachments.first
           expect(lti_assignment.attachments.count).to eq 1
           expect(attachment.display_name).to eq "Failed turnitin submission"
