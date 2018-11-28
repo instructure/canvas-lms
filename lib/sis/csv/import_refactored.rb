@@ -212,7 +212,7 @@ module SIS
 
       def run_parallel_importer(id, csv: nil)
         parallel_importer = id.is_a?(ParallelImporter) ? id : ParallelImporter.find(id)
-        if @batch.workflow_state == 'aborted'
+        if should_stop_import?
           parallel_importer.abort
           return
         end
@@ -238,7 +238,7 @@ module SIS
         file&.close
         unless @run_immediately
           if is_last_parallel_importer_of_type?(parallel_importer)
-            queue_next_importer_set unless %w{aborted failed failed_with_messages}.include?(@batch.workflow_state)
+            queue_next_importer_set unless should_stop_import?
           end
         end
       end
@@ -262,7 +262,9 @@ module SIS
         end
       end
 
-      private
+      def should_stop_import?
+        %w{aborted failed failed_with_messages}.include?(@batch.workflow_state)
+      end
 
       def run_all_importers
         IMPORTERS.each do |importer_type|
@@ -271,7 +273,7 @@ module SIS
           importers.each do |pi|
             run_parallel_importer(pi, csv: @csvs[importer_type].detect{|csv| csv[:attachment] == pi.attachment})
             @batch.data[:completed_importers] << importer_type
-            return false if %w{aborted failed failed_with_messages}.include?(@batch.workflow_state)
+            return false if should_stop_import?
           end
         end
         @parallel_importers.each do |type, importers|
