@@ -37,7 +37,13 @@ export default class CustomizationTable extends React.Component {
     return !this.props.selectedOptions.includes(option)
   }
 
+  optionIsDeepLinking(option) {
+    return this.props.messageTypeFor(option) === 'LtiDeepLinkingRequest'
+  }
+
   render() {
+    const {type} = this.props
+
     return (
       <Table
         margin="0 0 medium 0"
@@ -57,8 +63,9 @@ export default class CustomizationTable extends React.Component {
               name={option}
               label={option}
               onChange={this.props.onOptionToggle}
-              type={this.props.type}
+              type={type}
               checked={this.optionIsChecked(option)}
+              deepLinking={type === 'placement' && this.optionIsDeepLinking(option)}
               key={`customization:${option}`}
             />
           ))}
@@ -73,5 +80,10 @@ CustomizationTable.propTypes = {
   type: PropTypes.string.isRequired,
   options: PropTypes.arrayOf(PropTypes.string),
   selectedOptions: PropTypes.arrayOf(PropTypes.string),
-  onOptionToggle: PropTypes.func.isRequired
+  onOptionToggle: PropTypes.func.isRequired,
+  messageTypeFor: PropTypes.func
+}
+
+CustomizationTable.defaultProps = {
+  messageTypeFor: () => ('')
 }

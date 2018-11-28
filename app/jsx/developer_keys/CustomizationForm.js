@@ -56,17 +56,26 @@ export default class CustomizationForm extends React.Component {
       .map(s => validScopes[s])
   }
 
-  get placements() {
-    const {toolConfiguration, validPlacements} = this.props
+  get canvasExtension() {
+    const {toolConfiguration} = this.props
 
     if (!toolConfiguration.extensions) {
-      return []
+      return null
     }
 
     // Get Canvas specific extensions from the tool config
-    const extension = toolConfiguration.extensions.find(
+    return toolConfiguration.extensions.find(
       ext => ext.platform === 'canvas.instructure.com'
     )
+  }
+
+  get placements() {
+    const {validPlacements} = this.props
+    const extension = this.canvasExtension
+
+    if (!extension) {
+      return []
+    }
 
     if (!(extension && extension.settings)) {
       return []
@@ -97,6 +106,16 @@ export default class CustomizationForm extends React.Component {
     const newDisabledPlacements = this.props.disabledPlacements.slice()
 
     dispatch(setDisabledPlacements(this.toggleArrayItem(newDisabledPlacements, value)))
+  }
+
+  messageTypeFor = (placement) => {
+    const extension = this.canvasExtension
+
+    if (!(extension && extension.settings[placement])) {
+      return null
+    }
+
+    return extension.settings[placement].message_type
   }
 
   toggleArrayItem(array, value) {
@@ -138,6 +157,7 @@ export default class CustomizationForm extends React.Component {
         onOptionToggle={this.handlePlacementChange}
         selectedOptions={this.props.disabledPlacements}
         type="placement"
+        messageTypeFor={this.messageTypeFor}
       />
     )
   }
