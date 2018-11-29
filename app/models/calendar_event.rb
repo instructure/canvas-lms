@@ -208,6 +208,19 @@ class CalendarEvent < ActiveRecord::Base
   end
   protected :default_values
 
+  def root_account
+    if context.respond_to?(:root_account)
+      context.root_account # course, section, group
+    else
+      case context
+      when User
+        context.account
+      when AppointmentGroup
+        context.context&.root_account
+      end
+    end
+  end
+
   def populate_appointment_group_defaults
     self.effective_context_code = context.appointment_group_contexts.map(&:context_code).join(",")
     if new_record?
