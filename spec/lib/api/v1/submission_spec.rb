@@ -438,6 +438,65 @@ describe Api::V1::Submission do
         expect(json.fetch(:attachments).first.fetch(:preview_url)).to include("submission_id%22:#{submission.id}")
       end
     end
+
+    describe "Quizzes.Next" do
+      before do
+        allow(assignment).to receive(:quiz_lti?).and_return(true)
+        url_grades.each do |h|
+          grade = "#{TextHelper.round_if_whole(h[:grade] * 100)}%"
+          grade, score = assignment.compute_grade_and_score(grade, nil)
+          submission.grade = grade
+          submission.score = score
+          submission.submission_type = 'basic_lti_launch'
+          submission.workflow_state = 'submitted'
+          submission.submitted_at = Time.zone.now
+          submission.url = h[:url]
+          submission.grader_id = -1
+          submission.with_versioning(:explicit => true) { submission.save! }
+        end
+      end
+
+      let(:field) { 'submission_history' }
+
+      let(:submission) { assignment.submissions.build(user: user) }
+
+      let(:json) do
+        fake_controller.submission_json(submission, assignment, user, session, context, [field], params)
+      end
+
+      let(:urls) do
+        %w(
+          https://abcdef.com/uuurrrlll00
+          https://abcdef.com/uuurrrlll01
+          https://abcdef.com/uuurrrlll02
+          https://abcdef.com/uuurrrlll03
+        )
+      end
+
+      let(:url_grades) do
+        [
+          # url 0 group
+          { url: urls[0], grade: 0.11 },
+          { url: urls[0], grade: 0.12 },
+          # url 1 group
+          { url: urls[1], grade: 0.22 },
+          { url: urls[1], grade: 0.23 },
+          { url: urls[1], grade: 0.24 },
+          # url 2 group
+          { url: urls[2], grade: 0.33 },
+          # url 3 group
+          { url: urls[3], grade: 0.44 },
+          { url: urls[3], grade: 0.45 },
+          { url: urls[3], grade: 0.46 },
+          { url: urls[3], grade: 0.47 },
+          { url: urls[3], grade: 0.48 }
+        ]
+      end
+
+      it "outputs submission histories only for distinct urls" do
+        expect(json.fetch(field).count).to be 4
+      end
+    end
   end
 
   describe '#submission_zip' do

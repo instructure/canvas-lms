@@ -44,13 +44,17 @@ module BasicLTI
     end
 
     def self.process_request(tool, xml)
-      res = LtiResponse.new(xml)
+      res = (quizzes_next_tool?(tool) ? BasicLTI::QuizzesNextLtiResponse : LtiResponse).new(xml)
 
       unless res.handle_request(tool)
         res.code_major = 'unsupported'
         res.description = 'Request could not be handled. ¯\_(ツ)_/¯'
       end
-      return res
+      res
+    end
+
+    def self.quizzes_next_tool?(tool)
+      tool.tool_id == 'Quizzes 2' && tool.context.root_account.feature_enabled?(:quizzes_next_submission_history)
     end
 
     def self.process_legacy_request(tool, params)

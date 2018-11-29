@@ -203,7 +203,10 @@ module SpeedGrader
           url_opts[:enrollment_type] = canvadocs_user_role(@course, @current_user)
         end
 
-        if json['submission_history'] && (@assignment.quiz.nil? || too_many)
+        if quizzes_next_submission?
+          quiz_lti_submission = BasicLTI::QuizzesNextVersionedSubmission.new(@assignment, sub.user)
+          json['submission_history'] = quiz_lti_submission.grade_history.map { |submission| { submission: submission } }
+        elsif json['submission_history'] && (@assignment.quiz.nil? || too_many)
           json['submission_history'] = json['submission_history'].map do |version|
             # to avoid a call to the DB in Submission#missing?
             version.assignment = sub.assignment
@@ -295,6 +298,10 @@ module SpeedGrader
       StringifyIds.recursively_stringify_ids(res)
     ensure
       Attachment.skip_thumbnails = nil
+    end
+
+    def quizzes_next_submission?
+      @assignment.quiz_lti? && @assignment.root_account.feature_enabled?(:quizzes_next_submission_history)
     end
 
     def preloaded_provisional_grades
