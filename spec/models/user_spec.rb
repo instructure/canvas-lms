@@ -1110,29 +1110,16 @@ describe User do
         expect(@student.count_messageable_users_in_course(@course)).to eql 2
       end
 
-      it "should return concluded enrollments in the group if they are still members" do
+      it "users with concluded enrollments should not be messageable" do
         @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
-        @this_section_user_enrollment.conclude
-
-        expect(search_messageable_users(@this_section_user, :context => "group_#{@group.id}").map(&:id)).to eql [@this_section_user.id]
-        expect(@this_section_user.count_messageable_users_in_group(@group)).to eql 1
         expect(search_messageable_users(@student, :context => "group_#{@group.id}").map(&:id)).to eql [@this_section_user.id]
         expect(@student.count_messageable_users_in_group(@group)).to eql 1
-      end
-
-      it "should return concluded enrollments in the group and section if they are still members" do
-        enrollment = @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
-        # we currently force limit_privileges_to_course_section to be false for students; override it in the db
-        Enrollment.where(:id => enrollment).update_all(:limit_privileges_to_course_section => true)
-
-        @group.users << @other_section_user
         @this_section_user_enrollment.conclude
 
-        expect(search_messageable_users(@this_section_user, :context => "group_#{@group.id}").map(&:id).sort).to eql [@this_section_user.id, @other_section_user.id]
-        expect(@this_section_user.count_messageable_users_in_group(@group)).to eql 2
-        # student can only see people in his section
-        expect(search_messageable_users(@student, :context => "group_#{@group.id}").map(&:id)).to eql [@this_section_user.id]
-        expect(@student.count_messageable_users_in_group(@group)).to eql 1
+        expect(search_messageable_users(@this_section_user, :context => "group_#{@group.id}").map(&:id)).to eql []
+        expect(@this_section_user.count_messageable_users_in_group(@group)).to eql 0
+        expect(search_messageable_users(@student, :context => "group_#{@group.id}").map(&:id)).to eql []
+        expect(@student.count_messageable_users_in_group(@group)).to eql 0
       end
     end
 
