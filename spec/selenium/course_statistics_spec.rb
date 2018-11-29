@@ -49,4 +49,18 @@ describe "course statistics" do
     expect(links[1]['href'].end_with?("/courses/#{@course.id}/users/#{@student3.id}")).to eq true
     expect(links[2]['href'].end_with?("/courses/#{@course.id}/users/#{@student1.id}")).to eq true
   end
+
+  it "should show a deduped count" do
+    section2 = @course.course_sections.create!
+    student_in_course(:active_all => true, :user => @student1, :section => section2, :allow_multiple_enrollments => true)
+    invited_student = user_factory(:active_all => true)
+    student_in_course(:user => invited_student)
+    student_in_course(:user => invited_student, :section => section2, :allow_multiple_enrollments => true)
+
+    get "/courses/#{@course.id}/statistics"
+    wait_for_ajaximations
+    text = f("#tab-totals").text
+    expect(text).to include("Active Students 3")
+    expect(text).to include("Unaccepted Students 1")
+  end
 end
