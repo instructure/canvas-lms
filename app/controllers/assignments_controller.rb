@@ -25,6 +25,7 @@ class AssignmentsController < ApplicationController
   include Api::V1::ModerationGrader
   include Api::V1::Outcome
   include Api::V1::ExternalTools
+  include Api::V1::ContextModule
 
   include KalturaHelper
   include SyllabusHelper
@@ -139,6 +140,13 @@ class AssignmentsController < ApplicationController
         @external_tools = []
       end
 
+
+      assignment_prereqs = {}
+
+      if @locked && !@locked[:can_view]
+        assignment_prereqs = context_module_sequence_items_by_asset_id(@assignment.id, "Assignment")
+      end
+
       permissions = {
         context: @context.rights_status(@current_user, session, :read_as_admin, :manage_assignments),
         assignment: @assignment.rights_status(@current_user, session, :update, :submit),
@@ -150,6 +158,7 @@ class AssignmentsController < ApplicationController
         :EXTERNAL_TOOLS => external_tools_json(@external_tools, @context, @current_user, session),
         :EULA_URL => tool_eula_url,
         PERMISSIONS: permissions,
+        PREREQS: assignment_prereqs
       })
       set_master_course_js_env_data(@assignment, @context)
       conditional_release_js_env(@assignment, includes: :rule)

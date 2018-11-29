@@ -27,9 +27,12 @@ import AssignmentToggleDetails from '../../shared/AssignmentToggleDetails'
 import StudentContentTabs from '../StudentContentTabs'
 import AvailabilityDates from '../../shared/AvailabilityDates'
 import lockedSVG from '../../../../../public/images/assignments_2/Locked.svg'
+import StudentPrereqContainer from './StudentPrereqContainer'
 
 function renderContentBaseOnAvailability(assignment) {
-  if (assignment.lockInfo.isLocked) {
+  if (ENV && ENV.PREREQS && ENV.PREREQS.items && ENV.PREREQS.items.length === 0) {
+    return <StudentPrereqContainer />
+  } else if (assignment.lockInfo.isLocked) {
     return (
       <Flex textAlign="center" justifyItems="center" margin="0 0 large" direction="column">
         <FlexItem>
