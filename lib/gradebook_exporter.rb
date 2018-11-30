@@ -183,7 +183,7 @@ class GradebookExporter
         row << (column.read_only? ? read_only : nil)
       end
 
-      row.concat(assignments.map{ |a| I18n.n(a.points_possible) })
+      row.concat(assignments.map{ |a| format_numbers(a.points_possible) })
 
       if should_show_totals
         row.concat([read_only] * group_filler_length)
@@ -226,7 +226,7 @@ class GradebookExporter
               elsif a.grading_type == "gpa_scale" && submission.try(:score)
                 a.score_to_grade(submission.score)
               else
-                I18n.n(submission.try(:score))
+                format_numbers(submission.try(:score))
               end
             else
               "N/A"
@@ -272,7 +272,9 @@ class GradebookExporter
   end
 
   def format_numbers(number)
-    I18n.n(number)
+    # Always pass a precision value so that I18n.n doesn't try to add thousands
+    # separators. 2 is the maximum number of digits we display in the front end.
+    I18n.n(number, precision: 2)
   end
 
   def show_group_totals(student_enrollment, grade, groups)

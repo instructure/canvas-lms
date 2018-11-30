@@ -172,6 +172,44 @@ describe GradebookImporter do
       end
     end
 
+    context "when dealing with a file containing comma field separators" do
+      let(:rows) do
+        [
+          'Student,ID,Section,Assignment 1,Assignment 2,Final Score',
+          'Points Possible,,,1000,50000,',
+          'C. Iulius Caesar,1,,123.43,"45,678.12",99%',
+          'Cn. Pompeius Magnus,2,,"123,32","45.678,23",99%',
+        ]
+      end
+
+      let(:importer) { importer_with_rows(rows) }
+      let(:students) { importer.upload.gradebook.fetch('students') }
+
+      context "with values that use a period as a decimal separator" do
+        let(:grades) { students.first.fetch('submissions').map { |submission| submission.fetch('grade') } }
+
+        it "normalizes values with no thousands separator" do
+          expect(grades.first).to eq "123.43"
+        end
+
+        it "normalizes values using a comma as the thousands separator" do
+          expect(grades.second).to eq "45678.12"
+        end
+      end
+
+      context "with values that use a comma as the decimal separator" do
+        let(:grades) { students.second.fetch('submissions').map { |submission| submission.fetch('grade') } }
+
+        it "normalizes values with no thousands separator" do
+          expect(grades.first).to eq "123.32"
+        end
+
+        it "normalizes values using a period as the thousands separator" do
+          expect(grades.second).to eq "45678.23"
+        end
+      end
+    end
+
     it "creates a GradebookUpload" do
       new_gradebook_importer
       expect(GradebookUpload.where(course_id: @course, user_id: @user)).not_to be_empty
@@ -533,6 +571,18 @@ describe GradebookImporter do
     importer_with_rows(
         "Student,ID,Section,Assignment 1",
         ",#{@student.id},,10"
+    )
+    expect(@gi.assignments).to eq []
+  end
+
+  it "checks for score changes at a precision of 2 decimal places" do
+    course_with_student
+    course_with_teacher(course: @course)
+    @assignment1 = @course.assignments.create!(name: 'Assignment 1', points_possible: 10)
+    @assignment1.grade_student(@student, grade: 10.987, grader: @teacher)
+    importer_with_rows(
+      "Student,ID,Section,Assignment 1",
+      ",#{@student.id},,10.99"
     )
     expect(@gi.assignments).to eq []
   end
