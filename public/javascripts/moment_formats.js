@@ -17,8 +17,33 @@
  */
 
 import _ from 'underscore'
-import I18n from 'i18nObj'
+import I18n from 'i18n!instructure'
 import moment from 'moment'
+
+function eventTimes(dateFormats, timeFormats) {
+  const formats = []
+  dateFormats.forEach(df => {
+    timeFormats.forEach(tf => {
+      formats.push(() => I18n.t('#time.event', {
+        date: I18n.lookup(`date.formats.${df}`),
+        time: I18n.lookup(`time.formats.${tf}`)
+      }))
+    })
+  })
+  return formats
+}
+
+function dateFormat(key) {
+  return () => I18n.lookup(`date.formats.${key}`)
+}
+
+function timeFormat(key) {
+  return () => I18n.lookup(`time.formats.${key}`)
+}
+
+function joinFormats(separator, ...formats) {
+  return () => formats.map(key => I18n.lookup(key)).join(separator)
+}
 
 export default {
 
@@ -76,34 +101,32 @@ export default {
     // examples are from en_US. order is significant since if an input matches
     // multiple formats, the format earlier in the list will be preferred
   orderedFormats: [
-    'time.formats.default',             // %a, %d %b %Y %H:%M:%S %z
-    'date.formats.full_with_weekday',   // %a %b %-d, %Y %-l:%M%P
-    'date.formats.full',                // %b %-d, %Y %-l:%M%P
-    'date.formats.date_at_time',        // %b %-d at %l:%M%P
-    'date.formats.long_with_weekday',   // %A, %B %-d
-    'date.formats.medium_with_weekday', // %a %b %-d, %Y
-    'date.formats.short_with_weekday',  // %a, %b %-d
-    'time.formats.long',                // %B %d, %Y %H:%M
-    'date.formats.long',                // %B %-d, %Y
-    'date.formats.medium+_+time.formats.tiny',
-    'date.formats.medium+_+time.formats.tiny_on_the_hour',
-    'date.formats.medium',              // %b %-d, %Y
-    'time.formats.short',               // %d %b %H:%M
-    'date.formats.short+_+time.formats.tiny',
-    'date.formats.short+_+time.formats.tiny_on_the_hour',
-    'date.formats.short',               // %b %-d
-    'date.formats.default',             // %Y-%m-%d
-    'time.formats.tiny',                // %l:%M%P
-    'time.formats.tiny_on_the_hour',    // %l%P
-    'date.formats.weekday',             // %A
-    'date.formats.short_weekday'        // %a
+    timeFormat('default'),             // %a, %d %b %Y %H:%M:%S %z
+    dateFormat('full_with_weekday'),   // %a %b %-d, %Y %-l:%M%P
+    dateFormat('full'),                // %b %-d, %Y %-l:%M%P
+    dateFormat('date_at_time'),        // %b %-d at %l:%M%P
+    dateFormat('long_with_weekday'),   // %A, %B %-d
+    dateFormat('medium_with_weekday'), // %a %b %-d, %Y
+    dateFormat('short_with_weekday'),  // %a, %b %-d
+    timeFormat('long'),                // %B %d, %Y %H:%M
+    dateFormat('long'),                // %B %-d, %Y
+    ...eventTimes(['medium', 'short'], ['tiny', 'tiny_on_the_hour']),
+    joinFormats(' ', 'date.formats.medium', 'time.formats.tiny'),
+    joinFormats(' ', 'date.formats.medium', 'time.formats.tiny_on_the_hour'),
+    dateFormat('medium'),              // %b %-d, %Y
+    timeFormat('short'),               // %d %b %H:%M
+    joinFormats(' ', 'date.formats.short', 'time.formats.tiny'),
+    joinFormats(' ', 'date.formats.short', 'time.formats.tiny_on_the_hour'),
+    dateFormat('short'),               // %b %-d
+    dateFormat('default'),             // %Y-%m-%d
+    timeFormat('tiny'),                // %l:%M%P
+    timeFormat('tiny_on_the_hour'),    // %l%P
+    dateFormat('weekday'),             // %A
+    dateFormat('short_weekday')        // %a
   ],
 
   formatsForLocale () {
-    return _.compact(_.map(this.orderedFormats, key => key.split('+')
-      .map(format => format !== '_' ? I18n.lookup(format) : ' ')
-      .reduce((a, b) => a + b)
-    ))
+    return _.compact(this.orderedFormats.map(fn => fn()))
   },
 
   i18nToMomentFormat (fullString) {
