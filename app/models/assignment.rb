@@ -270,6 +270,8 @@ class Assignment < ActiveRecord::Base
       result.workflow_state = 'unpublished'
     end
 
+    result.post_to_sis = false
+
     result
   end
 

@@ -6011,6 +6011,12 @@ describe Assignment do
       allow(AssignmentUtil).to receive(:sis_integration_settings_enabled?).and_return(true)
     end
 
+    it "can duplicate" do
+      create_section_override_for_assignment(@assignment)
+      assignment_duplicate = @assignment.duplicate
+      expect(assignment_duplicate.save).to eq(true)
+    end
+
     context "checking if overrides are valid" do
       it "is valid if a new override has a due date" do
         override = assignment_override_model(assignment: @assignment, due_at: 2.days.from_now)
