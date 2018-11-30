@@ -93,7 +93,7 @@
     "react-tokeninput": "^2.5.0",
     "react-transition-group": "^1",
     "redux": "^4.0.1",
-    "redux-actions": "0.11.0",
+    "redux-actions": "^2.6.4",
     "redux-thunk": "2.1.0",
     "spin.js": "2.3.2",
     "swfobject": "^2.2.1",
