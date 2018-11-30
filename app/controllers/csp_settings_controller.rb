@@ -83,8 +83,11 @@ class CspSettingsController < ApplicationController
   #
   # @argument domain [Required, String]
   def add_domain
-    @context.add_domain!(@domain)
-    render :json => {:current_account_whitelist => @context.csp_domains.active.pluck(:domain).sort}
+    if @context.add_domain!(@domain)
+      render :json => {:current_account_whitelist => @context.csp_domains.active.pluck(:domain).sort}
+    else
+      render :json => {:message => "invalid domain"}, :status => :bad_request
+    end
   end
 
   # @API Remove a domain from account whitelist

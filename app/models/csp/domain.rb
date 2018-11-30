@@ -23,10 +23,21 @@ class Csp::Domain < ActiveRecord::Base
   validates_presence_of :account_id, :domain
   validates_length_of :domain, :maximum => maximum_string_length
 
+  validate :validate_domain
+
   include Canvas::SoftDeletable
 
   before_save :downcase_domain
   after_save :invalidate_domain_list_cache
+
+  def validate_domain
+    begin
+      URI.parse(self.domain)
+    rescue
+      self.errors.add(:domain, "Invalid domain")
+      return false
+    end
+  end
 
   def downcase_domain
     self.domain = self.domain.downcase

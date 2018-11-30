@@ -646,7 +646,12 @@ module ApplicationHelper
       brand_config = if session.key?(:brand_config_md5)
         BrandConfig.where(md5: session[:brand_config_md5]).first
       else
-        brand_config_for_account(opts)
+        account = brand_config_account(opts)
+        if opts[:ignore_parents]
+          account.brand_config if account.branding_allowed?
+        else
+          account.try(:effective_brand_config)
+        end
       end
       # If the account does not have a brandConfig, or they explicitly chose to start from a blank
       # slate in the theme editor, do one last check to see if we should actually use the k12 theme
@@ -663,32 +668,29 @@ module ApplicationHelper
     "#{Canvas::Cdn.config.host}/#{path}"
   end
 
-  def brand_config_for_account(opts={})
-    account = Context.get_account(@context || @course)
+  def brand_config_account(opts={})
+    return @brand_account if @brand_account
+    @brand_account = Context.get_account(@context || @course)
 
     # for finding which values to show in the theme editor
-    if opts[:ignore_parents]
-      return account.brand_config if account.branding_allowed?
-      return
-    end
+    return @brand_account if opts[:ignore_parents]
 
-    if !account
+    if !@brand_account
       if @current_user.present?
         # If we're not viewing a `context` with an account, like if we're on the dashboard or my
         # user profile, show the branding for the lowest account where all my enrollments are. eg:
         # if I'm at saltlakeschooldistrict.instructure.com, but I'm only enrolled in classes at
         # Highland High, show Highland's branding even on the dashboard.
-        account = @current_user.common_account_chain(@domain_root_account).last
+        @brand_account = @current_user.common_account_chain(@domain_root_account).last
       end
       # If we're not logged in, or we have no enrollments anywhere in domain_root_account,
       # and we're on the dashboard at eg: saltlakeschooldistrict.instructure.com, just
       # show its branding
-      account ||= @domain_root_account
+      @brand_account ||= @domain_root_account
     end
-
-    account.try(:effective_brand_config)
+    @brand_account
   end
-  private :brand_config_for_account
+  private :brand_config_account
 
   def include_account_js(options = {})
     return if params[:global_includes] == '0' || !@domain_root_account
@@ -856,6 +858,8 @@ module ApplicationHelper
   end
 
   def include_custom_meta_tags
+    add_csp_meta_tags
+
     output = []
     if @meta_tags.present?
       output = @meta_tags.map{ |meta_attrs| tag("meta", meta_attrs) }
@@ -867,6 +871,29 @@ module ApplicationHelper
     output << tag("link", rel: 'manifest', href: manifest_url) if manifest_url.present?
 
     output.join("\n").html_safe.presence
+  end
+
+  def add_csp_meta_tags
+    csp_context =
+      if @context.is_a?(Course)
+        @context
+      elsif @context.is_a?(Group) && @context.context.is_a?(Course)
+        @context.context
+      elsif @course.is_a?(Course)
+        @course
+      else
+        brand_config_account
+      end
+    return unless csp_context &&
+      csp_context.root_account.feature_enabled?(:javascript_csp) &&
+      csp_context.csp_enabled?
+
+    domains = %w{'self' 'unsafe-eval' 'unsafe-inline'} + csp_context.csp_whitelisted_domains
+    @meta_tags ||= []
+    @meta_tags << {
+      "http-equiv" => "Content-Security-Policy",
+      "content" => "script-src #{domains.join(" ")}"
+    }
   end
 
   # Returns true if the current_path starts with the given value

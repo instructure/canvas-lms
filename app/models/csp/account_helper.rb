@@ -73,7 +73,8 @@ module Csp::AccountHelper
       if retry_count > 0 && (record = self.csp_domains.where(:domain => domain).take)
         record.undestroy if record.deleted?
       else
-        self.csp_domains.create!(:domain => domain)
+        record = self.csp_domains.create(:domain => domain)
+        record.valid? && record
       end
     end
   end

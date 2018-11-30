@@ -167,6 +167,11 @@ describe "CSP Settings API", type: :request do
       expect(@sub.reload.csp_domains.active.pluck(:domain)).to eq [domain]
       expect(json["current_account_whitelist"]).to eq [domain]
     end
+
+    it "should try to parse the domain" do
+      json = add_domain(@sub, "domain; default-src badexample.com", 400)
+      expect(@sub.reload.csp_domains.active.pluck(:domain)).to be_empty
+    end
   end
 
   describe "DELETE remove_domain" do
