@@ -57,7 +57,6 @@ describe "speed grader - rubrics" do
     fj("span:contains('Amazing'):visible").click
     f('svg[name="IconFeedback"]').find_element(:xpath, '../../parent::button').click
     f("textarea[data-selenium='criterion_comments_text']").send_keys('special rubric comment')
-    ffj("button:contains('Update Comment')", nil).second.click
     wait_for_ajaximations
     expect(f("span[data-selenium='rubric_total']")).to include_text('8')
     wait_for_ajaximations
@@ -107,7 +106,6 @@ describe "speed grader - rubrics" do
     Speedgrader.expand_right_pane
     Speedgrader.comment_button_for_row("no outcome row").click
     Speedgrader.additional_comment_textarea.send_keys(to_comment)
-    Speedgrader.update_comment_button.click
     wait_for_ajaximations
     Speedgrader.enter_rubric_points('1')
     button = Speedgrader.save_rubric_button
