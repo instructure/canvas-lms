@@ -89,7 +89,7 @@
     "react-immutable-proptypes": "^2.1.0",
     "react-lazy-load": "^3.0.13",
     "react-modal": "^3",
-    "react-redux": "^4.4.9",
+    "react-redux": "^5.1.1",
     "react-tokeninput": "^2.5.0",
     "react-transition-group": "^1",
     "redux": "^4.0.1",
