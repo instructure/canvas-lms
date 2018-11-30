@@ -1394,6 +1394,18 @@ class Assignment < ActiveRecord::Base
     ])
   end
 
+  def touch_on_unlock_if_necessary
+    if self.unlock_at && Time.zone.now < self.unlock_at && (Time.zone.now + 1.hour) > self.unlock_at
+      Shackles.activate(:master) do
+        # Because of assignemnt overrides, an assignment can have the same global id but
+        # a different unlock_at time, so include that in the singleton key so that different
+        # unlock_at times are properly handled.
+        singleton = "touch_on_unlock_assignment_#{self.global_id}_#{self.unlock_at}"
+        send_later_enqueue_args(:touch, { :run_at => self.unlock_at, :singleton => singleton })
+      end
+    end
+  end
+
   def low_level_locked_for?(user, opts={})
     return false if opts[:check_policies] && context.grants_right?(user, :read_as_admin)
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
@@ -1416,6 +1428,7 @@ class Assignment < ActiveRecord::Base
           break
         end
       end
+      assignment_for_user.touch_on_unlock_if_necessary
       locked
     end
   end
