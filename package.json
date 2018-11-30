@@ -94,7 +94,7 @@
     "react-transition-group": "^1",
     "redux": "^4.0.1",
     "redux-actions": "^2.6.4",
-    "redux-thunk": "2.1.0",
+    "redux-thunk": "^2.3.0",
     "spin.js": "2.3.2",
     "swfobject": "^2.2.1",
     "tablesorter": "^2.28.5",
