@@ -167,7 +167,7 @@ describe "AuthenticationProviders API", type: :request do
       json = call_create({}, 422)
       expect(json['errors'].first).to eq({
         'field' => 'auth_type',
-        'message' => "invalid auth_type, must be one of #{AuthenticationProvider::VALID_AUTH_TYPES.join(',')}",
+        'message' => "invalid auth_type, must be one of #{AuthenticationProvider.valid_auth_types.join(',')}",
         'error_code' => 'inclusion'
       })
     end
