@@ -216,7 +216,7 @@ Rails.configuration.after_initialize do
     with_each_shard_by_database(ObserverAlert, :create_assignment_missing_alerts)
   end
 
-  Delayed::Periodic.cron 'LTI::KeyStorage.rotateKeys', '0 0 1 * *', priority: Delayed::LOW_PRIORITY do
+  Delayed::Periodic.cron 'Lti::KeyStorage.rotate_keys', '0 0 1 * *', priority: Delayed::LOW_PRIORITY do
     LTI::KeyStorage.rotateKeys
   end
 
