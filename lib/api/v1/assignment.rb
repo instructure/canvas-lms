@@ -602,6 +602,13 @@ module Api::V1::Assignment
     false
   end
 
+  def assignment_mute_status_valid?(assignment, assignment_params)
+    return true unless assignment_params.include?("muted") && assignment.moderated_grading?
+
+    # A moderated assignment may not be unmuted until grades have been published
+    assignment.grades_published? || value_to_boolean(assignment_params["muted"])
+  end
+
   def update_from_params(assignment, assignment_params, user, context = assignment.context)
     update_params = assignment_params.permit(allowed_assignment_input_fields)
 
@@ -899,6 +906,7 @@ module Api::V1::Assignment
     return false unless assignment_group_id_valid?(assignment, assignment_params)
     return false unless assignment_dates_valid?(assignment, assignment_params)
     return false unless submission_types_valid?(assignment, assignment_params)
+    return false unless assignment_mute_status_valid?(assignment, assignment_params)
     true
   end
 
