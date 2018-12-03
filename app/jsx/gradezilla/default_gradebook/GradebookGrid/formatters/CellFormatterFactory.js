@@ -21,21 +21,23 @@ import AssignmentGroupCellFormatter from './AssignmentGroupCellFormatter'
 import CustomColumnCellFormatter from './CustomColumnCellFormatter'
 import StudentCellFormatter from './StudentCellFormatter'
 import TotalGradeCellFormatter from './TotalGradeCellFormatter'
+import TotalGradeOverrideCellFormatter from './TotalGradeOverrideCellFormatter'
 
 class CellFormatterFactory {
-  constructor (gradebook) {
+  constructor(gradebook) {
     this.formatters = {
       assignment: new AssignmentCellFormatter(gradebook),
       assignment_group: new AssignmentGroupCellFormatter(),
       custom_column: new CustomColumnCellFormatter(),
       student: new StudentCellFormatter(gradebook),
-      total_grade: new TotalGradeCellFormatter(gradebook)
-    };
+      total_grade: new TotalGradeCellFormatter(gradebook),
+      total_grade_override: new TotalGradeOverrideCellFormatter(gradebook)
+    }
   }
 
-  getFormatter (column) {
-    return (this.formatters[column.type] || {}).render;
+  getFormatter(column) {
+    return (this.formatters[column.type] || {}).render
   }
 }
 
-export default CellFormatterFactory;
+export default CellFormatterFactory

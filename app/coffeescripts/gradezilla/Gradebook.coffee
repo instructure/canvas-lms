@@ -220,6 +220,11 @@ define [
       latePolicy: ConvertCase.camelize(options.late_policy) if options.late_policy
     }
 
+  getInitialStudentContent = () ->
+    {
+      finalGradeOverrides: {}
+    }
+
   getInitialGradebookContent = (options) ->
     {
       customColumns: if options.teacher_notes then [options.teacher_notes] else []
@@ -289,6 +294,7 @@ define [
 
     setInitialState: =>
       @courseContent = getInitialCourseContent(@options)
+      @studentContent = getInitialStudentContent()
       @gradebookContent = getInitialGradebookContent(@options)
       @gridDisplaySettings = getInitialGridDisplaySettings(@options.settings, @options.colors)
       @contentLoadStates = getInitialContentLoadStates()
@@ -382,6 +388,8 @@ define [
       @setSubmissionsLoaded(false)
 
       dataLoader = DataLoader.loadGradebookData(
+        gradebook: @
+
         courseId: @options.context_id
         perPage: @options.api_max_per_page
         assignmentGroupsURL: @options.assignment_groups_url
@@ -390,6 +398,7 @@ define [
           include: @fieldsToIncludeWithAssignments
         contextModulesURL: @options.context_modules_url
         customColumnsURL: @options.custom_columns_url
+        getFinalGradeOverrides: @options.final_grade_override_enabled
         getGradingPeriodAssignments: @gradingPeriodSet?
 
         sectionsURL: @options.sections_url
@@ -472,6 +481,7 @@ define [
       @renderFilters()
 
       dataLoaderOptions =
+        gradebook: @
         courseId: @options.context_id
         perPage: @options.api_max_per_page
         studentsURL: @options.students_stateless_url
@@ -673,7 +683,7 @@ define [
     updateStudentRow: (student) =>
       index = @gridData.rows.findIndex (row) => row.id == student.id
       if index != -1
-        @gridData.rows[index] = student
+        @gridData.rows[index] = @buildRow(student)
         @gradebookGrid.invalidateRow(index)
 
     gotAllStudents: =>
@@ -928,10 +938,14 @@ define [
 
       for student in @courseContent.students.listStudents()
         if @rowFilter(student)
-          @gridData.rows.push(student)
+          @gridData.rows.push(@buildRow(student))
           @calculateStudentGrade(student) # TODO: this may not be necessary
 
       @gradebookGrid.invalidate()
+
+    buildRow: (student) =>
+      # because student is current mutable, we need to retain the reference
+      student
 
     gotSubmissionsChunk: (student_submissions) =>
       changedStudentIds = []
@@ -1637,13 +1651,11 @@ define [
 
       {
         id: 'total_grade_override'
-        field: 'total_grade_override'
-        toolTip: label
         minWidth: columnWidths.total_grade_override.min
         maxWidth: columnWidths.total_grade_override.max
         width: totalWidth
-        cssClass: 'total-cell total_grade_override'
-        headerCssClass: 'total_grade_override'
+        cssClass: 'total-grade-override'
+        headerCssClass: 'total-grade-override'
         type: 'total_grade_override'
       }
 
@@ -2077,7 +2089,7 @@ define [
     invalidateRowsForStudentIds: (studentIds) =>
       rowIndices = @listRowIndicesForStudentIds(studentIds)
       for rowIndex in rowIndices
-        @gradebookGrid.invalidateRow(rowIndex)
+        @gradebookGrid.invalidateRow(rowIndex) if rowIndex?
 
       @gradebookGrid.render()
 
@@ -2679,6 +2691,17 @@ define [
           @courseContent.modulesById[contextModule.id] = contextModule
 
       contextModules
+
+    getFinalGradeOverrides: (studentId) =>
+      @studentContent.finalGradeOverrides[studentId]
+
+    setFinalGradeOverrides: (finalGradeOverrides) =>
+      @studentContent.finalGradeOverrides = finalGradeOverrides
+
+    updateFinalGradeOverrides: (finalGradeOverrides) =>
+      @setFinalGradeOverrides(finalGradeOverrides)
+      studentIds = Object.keys(@studentContent.finalGradeOverrides)
+      @invalidateRowsForStudentIds(studentIds)
 
     onLatePolicyUpdate: (latePolicy) =>
       @setLatePolicy(latePolicy)

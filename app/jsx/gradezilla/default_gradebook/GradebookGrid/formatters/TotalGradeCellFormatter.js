@@ -60,7 +60,7 @@ function buildNoPointsPossibleWarning () {
   };
 }
 
-// xsslint safeString.property score possbile warningText icon letterGrade
+// xsslint safeString.property score possible warningText icon letterGrade
 function render (options) {
   let tooltip = '';
   let warningIcon = '';
@@ -139,7 +139,7 @@ export default class TotalGradeCellFormatter {
     }
 
     let percentage = getGradePercentage(grade.score, grade.possible);
-    percentage = isFinite(percentage) ? percentage : 0;
+    percentage = Number.isFinite(percentage) ? percentage : 0;
 
     let possible = round(grade.possible, round.DEFAULT);
     possible = possible ? I18n.n(possible) : possible;

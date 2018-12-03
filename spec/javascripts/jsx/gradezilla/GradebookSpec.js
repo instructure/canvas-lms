@@ -24,7 +24,6 @@ import PropTypes from 'prop-types';
 import moxios from 'moxios';
 import qs from 'qs';
 import fakeENV from 'helpers/fakeENV';
-import Gradebook from 'compiled/gradezilla/Gradebook';
 import UserSettings from 'compiled/userSettings';
 import natcompare from 'compiled/util/natcompare';
 import round from 'compiled/util/round';
@@ -5003,6 +5002,58 @@ QUnit.module('Gradebook Grading Schemes', (suiteHooks) => {
     });
   });
 });
+
+QUnit.module('Gradebook', () => {
+  let gradebook
+
+  QUnit.module('#updateFinalGradeOverrides()', hooks => {
+    let finalGradeOverrides
+
+    hooks.beforeEach(() => {
+      gradebook = createGradebook()
+      sinon.stub(gradebook, 'invalidateRowsForStudentIds')
+      finalGradeOverrides = {
+        1101: {
+          courseGrade: {
+            percentage: 88.1
+          }
+        },
+        1102: {
+          courseGrade: {
+            percentage: 91.1
+          }
+        }
+      }
+    })
+
+    test('stores the given final grade overrides in the Gradebook', () => {
+      gradebook.updateFinalGradeOverrides(finalGradeOverrides)
+      deepEqual(gradebook.getFinalGradeOverrides('1101'), finalGradeOverrides[1101])
+    })
+
+    test('invalidates grid rows', () => {
+      gradebook.updateFinalGradeOverrides(finalGradeOverrides)
+      strictEqual(gradebook.invalidateRowsForStudentIds.callCount, 1)
+    })
+
+    test('invalidates grid rows after storing final grade overrides', () => {
+      gradebook.invalidateRowsForStudentIds.callsFake(() => {
+        deepEqual(
+          gradebook.getFinalGradeOverrides('1101'),
+          finalGradeOverrides[1101],
+          'final grade overrides have already been updated by this time'
+        )
+      })
+      gradebook.updateFinalGradeOverrides(finalGradeOverrides)
+    })
+
+    test('invalidates rows for related students', () => {
+      gradebook.updateFinalGradeOverrides(finalGradeOverrides)
+      const [studentIds] = gradebook.invalidateRowsForStudentIds.lastCall.args
+      deepEqual(studentIds, ['1101', '1102'])
+    })
+  })
+})
 
 QUnit.module('Gradebook#saveSettings', {
   setup () {
