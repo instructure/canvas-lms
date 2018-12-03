@@ -19,13 +19,14 @@
 import {
   mergeNewItemsIntoDays, mergeNewItemsIntoDaysHash, mergeDaysIntoDaysHash, mergeDaysHashes,
   itemsToDaysHash, daysToDaysHash, itemsToDays, daysToItems, mergeItems, purgeDuplicateDays,
-  mergeDays, daysHashToDays, groupAndSortDayItems, deleteItemFromDays,
+  mergeDays, daysHashToDays, groupAndSortDayItems, deleteItemFromDays, orderItemsByTimeAndTitle,
 } from '../daysUtils';
+import moment from 'moment-timezone';
 
 function mockItem (date = '2017-12-18', opts = {}) {
   return {
-    date: date,
-    dateBucketMoment: date,
+    date: moment(date),
+    dateBucketMoment: moment(date),
     title: 'aaa',
     ...opts,
   };
@@ -281,7 +282,7 @@ describe('groupAndSortDayItems', () => {
     ]);
   });
 
-  it('sorts items by time, allDay events first', () => {
+  it('sort items by group, then allDay events, then by time', () => {
     const items = [
       mockItem('2017-12-05T11:00:00Z', {uniqueId: '1'}),
       mockItem('2017-12-05T12:00:00Z', {uniqueId: '2', context: {type: 'Course', id: '1', title: 'Math'}}),
@@ -305,6 +306,49 @@ describe('groupAndSortDayItems', () => {
     const result = groupAndSortDayItems(items);
     expect(result).toMatchObject([
       {uniqueId: '3'}, {uniqueId: '4'}, {uniqueId: '2'}, {uniqueId: '1'}
+    ]);
+  });
+});
+
+describe('orderItemsByTimeAndTitle', () => {
+  it('sorts items by time then allDay events if on same day', () => {
+    const items = [
+      mockItem('2017-12-05T11:00:00Z', {uniqueId: '1'}),
+      mockItem('2017-12-05T12:00:00Z', {uniqueId: '2'}),
+      mockItem('2017-12-05T12:30:00Z', {uniqueId: '1.5', allDay: true}),
+      mockItem('2017-12-05T11:00:00Z', {uniqueId: '3'}),
+      mockItem('2017-12-05T11:00:00Z', {uniqueId: '4'}),
+    ];
+    const result = items.sort(orderItemsByTimeAndTitle);
+    expect(result).toMatchObject([
+      {uniqueId: '1.5'}, {uniqueId: '1'}, {uniqueId: '3'}, {uniqueId: '4'}, {uniqueId: '2'}
+    ]);
+  });
+
+  it('group allDay events by day close together', () => {
+    const items = [
+      mockItem('2018-12-05T00:00:00Z', {uniqueId: '1', allDay: true}),
+      mockItem('2018-12-06T01:00:00Z', {uniqueId: '2'}),
+      mockItem('2018-12-06T00:00:00Z', {uniqueId: '3', allDay: true}),
+      mockItem('2018-12-07T00:00:00Z', {uniqueId: '4', allDay: true}),
+    ];
+    const result = items.sort(orderItemsByTimeAndTitle);
+    expect(result).toMatchObject([
+      {uniqueId: '1'}, {uniqueId: '3'}, {uniqueId: '2'}, {uniqueId: '4'}
+    ]);
+  });
+
+  it('group allDay events by day', () => {
+    const items = [
+      mockItem('2017-12-05T11:00:00Z', {uniqueId: '1'}),
+      mockItem('2017-12-05T12:00:00Z', {uniqueId: '2'}),
+      mockItem('2017-12-05T12:30:00Z', {uniqueId: '1.5', allDay: true}),
+      mockItem('2017-12-05T11:00:00Z', {uniqueId: '3'}),
+      mockItem('2017-12-04T11:00:00Z', {uniqueId: '4'}),
+    ];
+    const result = items.sort(orderItemsByTimeAndTitle);
+    expect(result).toMatchObject([
+      {uniqueId: '4'}, {uniqueId: '1.5'}, {uniqueId: '1'}, {uniqueId: '3'}, {uniqueId: '2'}
     ]);
   });
 });
