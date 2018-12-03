@@ -14,23 +14,13 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
-module Lti::Ims
-  class LineItemsSerializer
-    def initialize(line_item, line_item_url)
-      @line_item = line_item
-      @line_item_url = line_item_url
-    end
+class AddToolIdToLineItem < ActiveRecord::Migration[5.1]
+  tag :predeploy
 
-    def as_json
-      {
-        id: @line_item_url,
-        scoreMaximum: @line_item.score_maximum,
-        label: @line_item.label,
-        resourceId: @line_item.resource_id,
-        tag: @line_item.tag,
-        resourceLinkId: @line_item.resource_link&.resource_link_id
-      }.compact
-    end
+  def change
+    add_column :lti_line_items, :client_id, :integer, limit: 8, null: false
+    add_index :lti_line_items, :client_id
   end
 end

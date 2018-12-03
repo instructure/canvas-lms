@@ -7245,6 +7245,7 @@ describe Assignment do
 
     describe '#update_line_items' do
       let(:use_1_3) { true }
+      let(:dev_key) { DeveloperKey.create! }
       let(:tool) do
         course.context_external_tools.create!(
           consumer_key: 'key',
@@ -7252,7 +7253,8 @@ describe Assignment do
           name: 'test tool',
           url: 'http://www.tool.com/launch',
           settings: { use_1_3: use_1_3 },
-          workflow_state: 'public'
+          workflow_state: 'public',
+          developer_key: dev_key
         )
       end
       let(:assignment) do

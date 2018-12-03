@@ -498,6 +498,7 @@ RSpec.describe ApplicationController do
     context 'ContextExternalTool' do
 
       let(:course){ course_model }
+      let_once(:dev_key) { DeveloperKey.create! }
 
       let(:tool) do
         tool = course.context_external_tools.new(
@@ -505,7 +506,8 @@ RSpec.describe ApplicationController do
           consumer_key: "bob",
           shared_secret: "bob",
           tool_id: 'some_tool',
-          privacy_level: 'public'
+          privacy_level: 'public',
+          developer_key: dev_key
         )
         tool.url = "http://www.example.com/basic_lti"
         tool.resource_selection = {
