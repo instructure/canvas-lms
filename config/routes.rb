@@ -223,6 +223,7 @@ CanvasRails::Application.routes.draw do
       collection do
         get :change_gradebook_version
         get :blank_submission
+        get :final_grade_overrides
         get :speed_grader
         post :speed_grader_settings
         get :history

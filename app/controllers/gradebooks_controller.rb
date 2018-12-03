@@ -764,6 +764,13 @@ class GradebooksController < ApplicationController
     end
   end
 
+  def final_grade_overrides
+    return unless authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
+
+    final_grade_overrides = ::Gradebook::FinalGradeOverrides.new(@context, @current_user)
+    render json: { final_grade_overrides: final_grade_overrides.to_h }
+  end
+
   def user_ids
     return unless authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
 

@@ -1157,6 +1157,44 @@ describe GradebooksController do
     end
   end
 
+  describe "GET 'final_grade_overrides'" do
+    it "returns unauthorized when there is no current user" do
+      get :final_grade_overrides, params: {course_id: @course.id}, format: :json
+      assert_status(401)
+    end
+
+    it "returns unauthorized when the user is not authorized to manage grades" do
+      user_session(@student)
+      get :final_grade_overrides, params: {course_id: @course.id}, format: :json
+      assert_status(401)
+    end
+
+    it "grants authorization to teachers in active courses" do
+      user_session(@teacher)
+      get :final_grade_overrides, params: {course_id: @course.id}, format: :json
+      expect(response).to be_ok
+    end
+
+    it "grants authorization to teachers in concluded courses" do
+      @course.complete!
+      user_session(@teacher)
+      get :final_grade_overrides, params: {course_id: @course.id}, format: :json
+      expect(response).to be_ok
+    end
+
+    it "returns the map of final grade overrides" do
+      assignment = assignment_model(course: @course, points_possible: 10)
+      assignment.grade_student(@student, grade: '85%', grader: @teacher)
+      enrollment = @student.enrollments.find_by!(course: @course)
+      enrollment.scores.find_by!(course_score: true).update!(override_score: 89.2)
+
+      user_session(@teacher)
+      get :final_grade_overrides, params: {course_id: @course.id}, format: :json
+      final_grade_overrides = json_parse(response.body)["final_grade_overrides"]
+      expect(final_grade_overrides).to have_key(@student.id.to_s)
+    end
+  end
+
   describe "GET 'user_ids'" do
     it "returns unauthorized if there is no current user" do
       get :user_ids, params: {course_id: @course.id}, format: :json
