@@ -125,6 +125,7 @@ describe('Criterion', () => {
     const el = shallow(
       <Criterion
         criterion={nullified}
+        freeForm={false}
       />
     )
 
