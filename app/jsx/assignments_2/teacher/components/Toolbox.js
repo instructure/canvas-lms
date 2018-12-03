@@ -29,11 +29,11 @@ import Text from '@instructure/ui-elements/lib/components/Text'
 import IconEmail from '@instructure/ui-icons/lib/Line/IconEmail'
 import IconSpeedGrader from '@instructure/ui-icons/lib/Line/IconSpeedGrader'
 
-import {AssignmentShape} from '../../shared/shapes'
+import {TeacherAssignmentShape} from '../assignmentData'
 
 export default class Toolbox extends React.Component {
   static propTypes = {
-    assignment: AssignmentShape.isRequired,
+    assignment: TeacherAssignmentShape.isRequired,
     onUnsubmittedClick: func,
     onPublishChange: func
   }

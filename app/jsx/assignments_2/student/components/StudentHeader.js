@@ -24,10 +24,10 @@ import StudentDateTitle from './StudentDateTitle'
 import PointsDisplay from './PointsDisplay'
 import StepContainer from './StepContainer'
 
-import {AssignmentShape} from '../../shared/shapes'
+import {StudentAssignmentShape} from '../assignmentData'
 
 StudentHeader.propTypes = {
-  assignment: AssignmentShape
+  assignment: StudentAssignmentShape
 }
 
 function StudentHeader(props) {

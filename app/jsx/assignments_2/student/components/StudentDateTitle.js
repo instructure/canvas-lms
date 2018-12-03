@@ -22,7 +22,7 @@ import React from 'react'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
 import Text from '@instructure/ui-elements/lib/components/Text'
 
-import {AssignmentShape} from '../../shared/shapes'
+import {StudentAssignmentShape} from '../assignmentData'
 import FriendlyDatetime from '../../../shared/FriendlyDatetime'
 import AvailabilityDates from '../../shared/AvailabilityDates'
 
@@ -52,7 +52,7 @@ function StudentDateTitle(props) {
 }
 
 StudentDateTitle.propTypes = {
-  assignment: AssignmentShape
+  assignment: StudentAssignmentShape
 }
 
 export default React.memo(StudentDateTitle)

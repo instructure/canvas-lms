@@ -19,9 +19,8 @@
 import React from 'react'
 import {bool, shape, string} from 'prop-types'
 import {graphql} from 'react-apollo'
-import gql from 'graphql-tag'
 
-import {AssignmentShape} from '../../shared/shapes'
+import {TEACHER_QUERY, TeacherAssignmentShape} from '../assignmentData'
 import Header from './Header'
 import ContentTabs from './ContentTabs'
 import MessageStudentsWho from './MessageStudentsWho'
@@ -29,7 +28,7 @@ import MessageStudentsWho from './MessageStudentsWho'
 export class CoreTeacherView extends React.Component {
   static propTypes = {
     data: shape({
-      assignment: AssignmentShape,
+      assignment: TeacherAssignmentShape,
       loading: bool,
       error: string
     }).isRequired
@@ -86,35 +85,7 @@ export class CoreTeacherView extends React.Component {
   }
 }
 
-const TeacherQuery = gql`
-  query GetAssignment($assignmentLid: ID!) {
-    assignment(id: $assignmentLid) {
-      lid: _id
-      gid: id
-      name
-      description
-      dueAt
-      pointsPossible
-      state
-
-      assignmentGroup {
-        lid: _id
-        name
-      }
-
-      modules {
-        lid: _id
-        name
-      }
-
-      course {
-        lid: _id
-      }
-    }
-  }
-`
-
-const TeacherView = graphql(TeacherQuery, {
+const TeacherView = graphql(TEACHER_QUERY, {
   options: ({assignmentLid}) => ({
     variables: {
       assignmentLid

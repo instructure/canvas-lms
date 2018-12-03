@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
+import gql from 'graphql-tag'
 import {bool, number, oneOf, shape, string, arrayOf} from 'prop-types'
 
 // This ENV shape is for the controller's current show action. We'll have
@@ -37,9 +37,33 @@ export const EnvShape = shape({
   }).isRequired
 })
 
-export const LockInfoShape = shape({
-  isLocked: bool.isRequired
-})
+export const TEACHER_QUERY = gql`
+  query GetAssignment($assignmentLid: ID!) {
+    assignment(id: $assignmentLid) {
+      lid: _id
+      gid: id
+      name
+      description
+      dueAt
+      pointsPossible
+      state
+
+      assignmentGroup {
+        lid: _id
+        name
+      }
+
+      modules {
+        lid: _id
+        name
+      }
+
+      course {
+        lid: _id
+      }
+    }
+  }
+`
 
 export const CourseShape = shape({
   lid: string.isRequired
@@ -55,16 +79,15 @@ export const AssignmentGroupShape = shape({
   name: string.isRequired
 })
 
-export const AssignmentShape = shape({
+export const TeacherAssignmentShape = shape({
+  lid: string.isRequired,
+  gid: string.isRequired,
   name: string.isRequired,
-  pointsPossible: number.isRequired,
-  dueAt: string.isRequired,
-  lockAt: string.isRequired,
-  unlockAt: string.isRequired,
   description: string.isRequired,
+  dueAt: string.isRequired,
+  pointsPossible: number.isRequired,
   state: oneOf(['published', 'unpublished']).isRequired,
-  course: CourseShape.isRequired,
-  modules: arrayOf(ModuleShape).isRequired,
   assignmentGroup: AssignmentGroupShape.isRequired,
-  lockInfo: LockInfoShape.isRequired
+  modules: arrayOf(ModuleShape).isRequired,
+  course: CourseShape.isRequired
 })

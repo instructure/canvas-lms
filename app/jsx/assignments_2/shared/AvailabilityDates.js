@@ -19,7 +19,6 @@ import I18n from 'i18n!assignments_2'
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import {AssignmentShape} from './shapes'
 import FriendlyDatetime from '../../shared/FriendlyDatetime'
 
 function AvailabilityDates(props) {
@@ -63,7 +62,10 @@ function AvailabilityDates(props) {
 }
 
 AvailabilityDates.propTypes = {
-  assignment: AssignmentShape,
+  assignment: PropTypes.shape({
+    lockAt: PropTypes.string,
+    unlockAt: PropTypes.string
+  }).isRequired,
   formatStyle: PropTypes.oneOf(['short', 'long'])
 }
 

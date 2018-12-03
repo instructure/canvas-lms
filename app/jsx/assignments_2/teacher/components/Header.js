@@ -24,12 +24,12 @@ import I18n from 'i18n!assignments_2'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import Text from '@instructure/ui-elements/lib/components/Text'
 
-import {AssignmentShape} from '../../shared/shapes'
+import {TeacherAssignmentShape} from '../assignmentData'
 import Toolbox from './Toolbox'
 
 export default class Header extends React.Component {
   static propTypes = {
-    assignment: AssignmentShape.isRequired,
+    assignment: TeacherAssignmentShape.isRequired,
     onUnsubmittedClick: func,
     onPublishChange: func
   }

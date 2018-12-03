@@ -19,7 +19,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
 
-import {mockAssignment} from '../../../shared/__tests__/utils'
+import {mockAssignment} from '../../test-utils'
 import StudentContainer from '../StudentContainer'
 
 beforeAll(() => {

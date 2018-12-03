@@ -18,11 +18,11 @@
 
 import React from 'react'
 import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
-import {AssignmentShape} from '../../shared/shapes'
+import {TeacherAssignmentShape} from '../assignmentData'
 import Details from './Details'
 
 ContentTabs.propTypes = {
-  assignment: AssignmentShape.isRequired
+  assignment: TeacherAssignmentShape.isRequired
 }
 
 export default function ContentTabs(props) {

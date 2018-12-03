@@ -21,7 +21,7 @@ import React from 'react'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import Text from '@instructure/ui-elements/lib/components/Text'
 
-import {AssignmentShape} from '../../shared/shapes'
+import {StudentAssignmentShape} from '../assignmentData'
 import StudentHeader from './StudentHeader'
 import AssignmentToggleDetails from '../../shared/AssignmentToggleDetails'
 import StudentContentTabs from '../StudentContentTabs'
@@ -69,7 +69,7 @@ function StudentContainer(props) {
 }
 
 StudentContainer.propTypes = {
-  assignment: AssignmentShape
+  assignment: StudentAssignmentShape
 }
 
 export default React.memo(StudentContainer)

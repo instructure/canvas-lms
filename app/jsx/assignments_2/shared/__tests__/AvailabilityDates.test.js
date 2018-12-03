@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import AvailabilityDates from '../AvailabilityDates'
-import {mockAssignment} from './utils'
+import {mockAssignment} from '../../student/test-utils'
 import $ from 'jquery'
 
 beforeAll(() => {

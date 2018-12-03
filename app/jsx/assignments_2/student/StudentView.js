@@ -20,43 +20,7 @@ import React from 'react'
 import StudentContainer from './components/StudentContainer'
 import {string} from 'prop-types'
 import {Query} from 'react-apollo'
-import gql from 'graphql-tag'
-
-// Fields I'm not sure if we are using:
-//   - state
-//   - course
-//   - various lids
-export const STUDENT_VIEW_QUERY = gql`
-  query GetAssignment($assignmentLid: ID!) {
-    assignment: legacyNode(type: Assignment, _id: $assignmentLid) {
-      ... on Assignment {
-        lid: _id
-        gid: id
-        name
-        description
-        dueAt
-        pointsPossible
-        lockAt
-        unlockAt
-        state
-        course {
-          lid: _id
-        }
-        modules {
-          name
-          lid: _id
-        }
-        assignmentGroup {
-          name
-          lid: _id
-        }
-        lockInfo {
-          isLocked
-        }
-      }
-    }
-  }
-`
+import {STUDENT_VIEW_QUERY} from './assignmentData'
 
 const StudentView = props => (
   <Query query={STUDENT_VIEW_QUERY} variables={{assignmentLid: props.assignmentLid}}>

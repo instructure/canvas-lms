@@ -25,10 +25,10 @@ import Text from '@instructure/ui-elements/lib/components/Text'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import View from '@instructure/ui-layout/lib/components/View'
 
-import {AssignmentShape} from '../shared/shapes'
+import {StudentAssignmentShape} from './assignmentData'
 
 StudentContentTabs.propTypes = {
-  assignment: AssignmentShape
+  assignment: StudentAssignmentShape
 }
 
 function StudentContentTabs(props) {

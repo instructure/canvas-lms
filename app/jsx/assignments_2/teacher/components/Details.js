@@ -18,10 +18,10 @@
 
 import React from 'react'
 import apiUserContent from 'compiled/str/apiUserContent'
-import {AssignmentShape} from '../../shared/shapes'
+import {TeacherAssignmentShape} from '../assignmentData'
 
 Details.propTypes = {
-  assignment: AssignmentShape.isRequired
+  assignment: TeacherAssignmentShape.isRequired
 }
 
 export default function Details(props) {

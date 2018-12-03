@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import {mockAssignment} from '../../shared/__tests__/utils'
+import {mockAssignment} from '../test-utils'
 import StudentContentTabs from '../StudentContentTabs'
 import $ from 'jquery'
 

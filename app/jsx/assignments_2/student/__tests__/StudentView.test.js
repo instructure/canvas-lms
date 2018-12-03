@@ -18,9 +18,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
-import {mockAssignment} from '../../shared/__tests__/utils'
+import {mockAssignment} from '../test-utils'
 import {MockedProvider} from 'react-apollo/test-utils'
-import StudentView, {STUDENT_VIEW_QUERY} from '../StudentView'
+import StudentView from '../StudentView'
+import {STUDENT_VIEW_QUERY} from '../assignmentData'
 import wait from 'waait'
 
 const mocks = [
