@@ -2612,7 +2612,7 @@ describe CoursesController, type: :request do
         @course1.root_account.settings[:enable_profiles] = true
         @course1.root_account.save!
 
-        json = api_call(:get, api_url, api_route, :search_term => "TAPerson", :include => ['email', 'bio'])
+        json = api_call(:get, api_url, api_route, :search_term => "TAPerson", :include => ['bio'])
 
         expect(json).to eq [
           {
