@@ -17,24 +17,24 @@
 #
 
 module Types
-  GradingPeriodType = GraphQL::ObjectType.define do
-    name "GradingPeriod"
+  class GradingPeriodType < ApplicationObjectType
+    graphql_name "GradingPeriod"
 
     implements GraphQL::Types::Relay::Node
-    interfaces [Interfaces::TimestampInterface]
+    implements Interfaces::TimestampInterface
 
     global_id_field :id
-    field :_id, !types.ID, "legacy canvas id", property: :id
+    field :_id, ID, "legacy canvas id", method: :id, null: false
 
-    field :title, types.String
+    field :title, String, null: true
 
-    field :startDate, DateTimeType, property: :start_date
-    field :endDate, DateTimeType, property: :end_date
-    field :closeDate, DateTimeType, <<-DOC, property: :close_date
+    field :start_date, DateTimeType, null: true
+    field :end_date, DateTimeType, null: true
+    field :close_date, DateTimeType, <<-DOC, null: true
     assignments can only be graded before the grading period closes
     DOC
 
-    field :weight, types.Float, <<-DOC
+    field :weight, Float, <<-DOC, null: true
     used to calculate how much the assignments in this grading period
     contribute to the overall grade
     DOC
