@@ -38,6 +38,15 @@ describe SIS::CSV::ImportRefactored do
     expect(importer.errors.first.last).to eq "Invalid UTF-8"
   end
 
+  it "should work with valid UTF-8 when split across bytes" do
+    allow(Attachment).to receive(:read_file_chunk_size).and_return(1) # force it to split
+    importer = process_csv_data(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 1ö1,,,active"
+    )
+    expect(importer.errors).to be_empty
+  end
+
   it "should error files with invalid CSV headers " do
     importer = process_csv_data(
       "xlist_course_id,\"section_id,status"

@@ -40,7 +40,7 @@ module IncomingMail
             context.reply_from({
                                  :purpose => 'general',
                                  :user => user,
-                                 :subject => utf8ify(incoming_message.subject, incoming_message.header[:subject].try(:charset)),
+                                 :subject => IncomingMailProcessor::IncomingMessageProcessor.utf8ify(incoming_message.subject, incoming_message.header[:subject].try(:charset)),
                                  :html => html_body,
                                  :text => body
                                })
@@ -148,14 +148,6 @@ module IncomingMail
     def sent_from_channel(user, incoming_message)
       from_addresses = ((incoming_message.from || []) + (incoming_message.reply_to || [])).uniq
       user && from_addresses.lazy.map {|addr| user.communication_channels.active.email.by_path(addr).first}.first
-    end
-
-    # MOVE!
-    def utf8ify(string, encoding)
-      encoding ||= 'UTF-8'
-      encoding = encoding.upcase
-      # change encoding; if it throws an exception (i.e. unrecognized encoding), just strip invalid UTF-8
-      Iconv.conv('UTF-8//TRANSLIT//IGNORE', encoding, string) rescue TextHelper.strip_invalid_utf8(string)
     end
 
     def parse_tag(tag)
