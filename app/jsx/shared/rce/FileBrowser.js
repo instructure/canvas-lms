@@ -95,6 +95,7 @@ class FileBrowser extends React.Component {
   }
 
   getContextFolders() {
+    if (!ENV.context_asset_string) return
     const contextInfo = this.getContextInfo(ENV.context_asset_string)
     if (contextInfo && contextInfo.type && contextInfo.id) {
       this.getRootFolderData(contextInfo.type, contextInfo.id, {name: contextInfo.name})

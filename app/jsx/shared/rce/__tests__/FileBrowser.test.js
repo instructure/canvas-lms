@@ -156,6 +156,12 @@ describe('FileBrowser', () => {
     })
   })
 
+  it('should not error when there is no context asset string', () => {
+    delete window.ENV.context_asset_string
+    const wrapper = shallow(<FileBrowser { ...getProps() } />)
+    expect(wrapper.find('TreeBrowser').exists()).toBeTruthy()
+  })
+
   describe('on folder click', () => {
     it("gets sub-folders and files for folder's sub-folders on folder expand", (done) => {
       const subFolders1 = [courseFolder({id: 6, name: 'sub folder 1', parent_folder_id: 4})]
