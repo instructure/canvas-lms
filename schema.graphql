@@ -1,6 +1,6 @@
 # A list of students that an `AssignmentOverride` applies to
 type AdhocStudents {
-  students: [User]
+  students: [User!]
 }
 
 type Assignment implements Node & Timestamped {
