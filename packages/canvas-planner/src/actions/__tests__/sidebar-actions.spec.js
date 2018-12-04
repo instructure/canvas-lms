@@ -21,7 +21,7 @@ import moxios from 'moxios';
 import moment from 'moment-timezone';
 import MockDate from 'mockdate';
 
-import {moxiosRespond} from '../../test-utils';
+import {moxiosRespond} from 'jest-moxios-utils';
 import {findNextLink, transformApiToInternalItem} from '../../utilities/apiUtils';
 
 jest.mock('../../utilities/apiUtils');
