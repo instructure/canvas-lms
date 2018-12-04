@@ -56,7 +56,15 @@ function StudentHeader(props) {
           <StudentDateTitle assignment={props.assignment} />
         </FlexItem>
         <FlexItem grow>
-          <PointsDisplay receivedPoints={null} possiblePoints={props.assignment.pointsPossible} />
+          <PointsDisplay
+            displayAs={props.assignment.gradingType}
+            receivedGrade={
+              props.assignment.submissionsConnection &&
+              props.assignment.submissionsConnection.nodes[0] &&
+              props.assignment.submissionsConnection.nodes[0].grade
+            }
+            possiblePoints={props.assignment.pointsPossible}
+          />
         </FlexItem>
       </Flex>
       <StepContainer assignment={props.assignment} />

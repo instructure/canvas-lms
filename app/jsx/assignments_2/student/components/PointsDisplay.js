@@ -25,14 +25,14 @@ import Text from '@instructure/ui-elements/lib/components/Text'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 
-function renderPoints(receivedPoints, possiblePoints) {
+function renderPoints(receivedGrade, possiblePoints) {
   let screenReaderPoints, displayPoints
-  if (receivedPoints === null || receivedPoints === undefined) {
+  if (receivedGrade === null || receivedGrade === undefined) {
     screenReaderPoints = I18n.t('Ungraded')
     displayPoints = '-'
   } else {
-    screenReaderPoints = receivedPoints
-    displayPoints = receivedPoints
+    screenReaderPoints = receivedGrade
+    displayPoints = receivedGrade
   }
 
   return (
@@ -55,12 +55,61 @@ function renderPoints(receivedPoints, possiblePoints) {
   )
 }
 
+function renderPercent(receivedGrade) {
+  let screenReaderPoints, displayPoints
+  const convertedRecievedPoints = receivedGrade ? Number(receivedGrade.slice(0, -1)) : null // NOTE: percentage grade comes as a x% format
+  if (convertedRecievedPoints === null || convertedRecievedPoints === undefined) {
+    screenReaderPoints = I18n.t('Ungraded')
+    displayPoints = '-'
+  } else {
+    screenReaderPoints = receivedGrade
+    displayPoints = convertedRecievedPoints
+  }
+
+  return (
+    <div>
+      <ScreenReaderContent>{`${screenReaderPoints} ${I18n.t('percent')}`}</ScreenReaderContent>
+
+      <Flex aria-hidden="true" direction="column" textAlign="end">
+        <FlexItem>
+          <Text size="x-large" data-test-id="points-display">
+            {`${displayPoints}%`}
+          </Text>
+        </FlexItem>
+      </Flex>
+    </div>
+  )
+}
+
+function renderPointsPossible(possiblePoints) {
+  return (
+    <div>
+      <Flex direction="row" alignItems="end" justifyItems="end" textAlign="end">
+        <FlexItem padding="0 x-small">
+          <Text size="large" margin="small" data-test-id="points-possible-display">
+            {I18n.t('%{possiblePoints} Points Possible', {possiblePoints})}
+          </Text>
+        </FlexItem>
+      </Flex>
+    </div>
+  )
+}
+
 function PointsDisplay(props) {
-  const {displayAs, receivedPoints, possiblePoints} = props
+  const {displayAs, receivedGrade, possiblePoints} = props
 
   switch (displayAs) {
     case 'points':
-      return renderPoints(receivedPoints, possiblePoints)
+      return renderPoints(receivedGrade, possiblePoints)
+    case 'percent':
+      return renderPercent(receivedGrade)
+    // NOTE: this is in another ticket where we handle these cases
+    case 'pass_fail':
+    case 'gpa_scale':
+    case 'letter_grade':
+      return renderPointsPossible(possiblePoints)
+    case 'not_graded':
+      return <div />
     default:
       throw new Error(`Invalid displayAs option "${displayAs}"`)
   }
@@ -71,7 +120,7 @@ function PointsDisplay(props) {
 //      Would be helpful if the other types are actually passing in different data (A, C+, etc).
 PointsDisplay.propTypes = {
   displayAs: PropTypes.string.isRequired,
-  receivedPoints: PropTypes.number,
+  receivedGrade: PropTypes.oneOf([PropTypes.number, PropTypes.string]),
   possiblePoints: PropTypes.number.isRequired
 }
 

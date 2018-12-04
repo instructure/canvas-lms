@@ -50,7 +50,7 @@ it('throws an error if displayAs prop is not valid', () => {
   global.console.error.mockRestore()
 })
 
-it('renders points correctly when no receivedPoints are set', () => {
+it('renders points correctly when no receivedGrade are set', () => {
   ReactDOM.render(
     <PointsDisplay displayAs="points" possiblePoints={32} />,
     document.getElementById('fixtures')
@@ -59,18 +59,18 @@ it('renders points correctly when no receivedPoints are set', () => {
   expect(textElement.text()).toEqual('-/32')
 })
 
-it('renders points correctly when receivedPoints is set', () => {
+it('renders points correctly when receivedGrade is set', () => {
   ReactDOM.render(
-    <PointsDisplay displayAs="points" receivedPoints={4} possiblePoints={5} />,
+    <PointsDisplay displayAs="points" receivedGrade={4} possiblePoints={5} />,
     document.getElementById('fixtures')
   )
   const textElement = $('[data-test-id="points-display"]')
   expect(textElement.text()).toEqual('4/5')
 })
 
-it('renders correctly when receivedPoints is 0', () => {
+it('renders correctly when receivedGrade is 0', () => {
   ReactDOM.render(
-    <PointsDisplay receivedPoints={0} possiblePoints={5} />,
+    <PointsDisplay receivedGrade={0} possiblePoints={5} />,
     document.getElementById('fixtures')
   )
   const textElement = $('[data-test-id="points-display"]')
@@ -79,9 +79,54 @@ it('renders correctly when receivedPoints is 0', () => {
 
 it('defaults to using points if displayAs is not explictly set', () => {
   ReactDOM.render(
-    <PointsDisplay receivedPoints={4} possiblePoints={5} />,
+    <PointsDisplay receivedGrade={4} possiblePoints={5} />,
     document.getElementById('fixtures')
   )
   const textElement = $('[data-test-id="points-display"]')
   expect(textElement.text()).toEqual('4/5')
+})
+
+it('renders correctly when displayType is percent', () => {
+  ReactDOM.render(
+    <PointsDisplay receivedGrade="15%" possiblePoints={5} displayAs="percent" />,
+    document.getElementById('fixtures')
+  )
+  const textElement = $('[data-test-id="points-display"]')
+  expect(textElement.text()).toEqual('15%')
+})
+
+it('renders percent correctly when no receivedGrade are set', () => {
+  ReactDOM.render(
+    <PointsDisplay possiblePoints={5} displayAs="percent" />,
+    document.getElementById('fixtures')
+  )
+  const textElement = $('[data-test-id="points-display"]')
+  expect(textElement.text()).toEqual('-%')
+})
+
+it('renders points possible when displayAs is grading scheme', () => {
+  ReactDOM.render(
+    <PointsDisplay receivedGrade={4} possiblePoints={5} displayAs="pass_fail" />,
+    document.getElementById('fixtures')
+  )
+  const textElement = $('[data-test-id="points-possible-display"]')
+  expect(textElement.text()).toEqual('5 Points Possible')
+})
+
+it('renders Points Possible when displayAs is pass fail', () => {
+  ReactDOM.render(
+    <PointsDisplay receivedGrade={4} possiblePoints={5} displayAs="gpa_scale" />,
+    document.getElementById('fixtures')
+  )
+  const textElement = $('[data-test-id="points-possible-display"]')
+  expect(textElement.text()).toEqual('5 Points Possible')
+})
+
+it('renders Points Possible when displayAs is letter grade', () => {
+  ReactDOM.render(
+    <PointsDisplay receivedGrade={4} possiblePoints={5} displayAs="letter_grade" />,
+    document.getElementById('fixtures')
+  )
+  const textElement = $('[data-test-id="points-possible-display"]')
+  expect(textElement.text()).toEqual('5 Points Possible')
 })
