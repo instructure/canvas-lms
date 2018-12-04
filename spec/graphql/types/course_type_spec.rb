@@ -99,11 +99,10 @@ describe Types::CourseType do
       end
 
       it "can still return assignments for all grading periods" do
-        expect(
-          course_type.resolve(<<~GQL, current_user: @student)
-            assignmentsConnection(filter: {gradingPeriodId: null}) { edges { node { _id } } }
-          GQL
-        ).to match course.assignments.published.map(&:to_param)
+        result = course_type.resolve(<<~GQL, current_user: @student)
+          assignmentsConnection(filter: {gradingPeriodId: null}) { edges { node { _id } } }
+        GQL
+        expect(result.sort).to match course.assignments.published.map(&:to_param).sort
       end
     end
   end
@@ -136,7 +135,6 @@ describe Types::CourseType do
       ).to match_array course.modules_visible_to(@student).map(&:to_param)
     end
   end
-
 
   context "submissionsConnection" do
     before(:once) do

@@ -200,7 +200,6 @@ module Types
     field :permissions, CoursePermissionsType,
       "returns permission information for the current user in this course",
       null: true
-
     def permissions
       Loaders::CoursePermissionsLoader.for(
         course,
@@ -209,4 +208,3 @@ module Types
     end
   end
 end
-

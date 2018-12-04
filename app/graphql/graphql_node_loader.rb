@@ -77,6 +77,14 @@ module GraphQLNodeLoader
           .load(mod)
           .then(check_read_permission)
       end
+    when "ModuleItem"
+      Loaders::IDLoader.for(ContentTag).load(id).then do |ct|
+        Loaders::AssociationLoader.for(ContentTag, :context_module).load(ct).then do |ct|
+          next nil unless ct.context_module.grants_right?(ctx[:current_user], :read)
+          next nil unless ct.visible_to_user?(ctx[:current_user]) # Checks context and content
+          ct
+        end
+      end
     when "Page"
       Loaders::IDLoader.for(WikiPage).load(id).then do |page|
         # This association preload loads the requisite dependencies for
@@ -86,6 +94,8 @@ module GraphQLNodeLoader
           .load(page)
           .then(check_read_permission)
       end
+    when "File"
+      Loaders::IDLoader.for(Attachment).load(id).then(check_read_permission)
     when "AssignmentGroup"
       Loaders::IDLoader.for(AssignmentGroup).load(id).then(check_read_permission)
     when "Discussion"

@@ -22,6 +22,7 @@ module Types
 
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
+    implements Interfaces::ModuleItemInterface
 
     alias :assignment :object
 
@@ -198,13 +199,6 @@ module Types
     field :assignment_group, AssignmentGroupType, null: true
     def assignment_group
       load_association(:assignment_group)
-    end
-
-    field :modules, [ModuleType], null: true
-    def modules
-      load_association(:context_module_tags).then do
-        assignment.context_module_tags.map(&:context_module).sort_by(&:position)
-      end
     end
 
     field :only_visible_to_overrides, Boolean,

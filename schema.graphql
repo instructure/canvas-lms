@@ -5,7 +5,7 @@ type AdhocStudents {
   students: [User!]
 }
 
-type Assignment implements Node & Timestamped {
+type Assignment implements ModuleItemInterface & Node & Timestamped {
   """
   legacy canvas id
   """
@@ -698,13 +698,14 @@ an ISO8601 formatted time string
 """
 scalar DateTime
 
-type Discussion implements Node & Timestamped {
+type Discussion implements ModuleItemInterface & Node & Timestamped {
   """
   legacy canvas id
   """
   _id: ID!
   createdAt: DateTime
   id: ID!
+  modules: [Module!]
   updatedAt: DateTime
 }
 
@@ -749,6 +750,40 @@ enum EnrollmentWorkflowState {
   inactive
   invited
   rejected
+}
+
+type ExternalTool implements ModuleItemInterface & Timestamped {
+  """
+  legacy canvas id
+  """
+  _id: ID!
+  createdAt: DateTime
+  modules: [Module!]
+  updatedAt: DateTime
+}
+
+type ExternalUrl implements ModuleItemInterface & Timestamped {
+  """
+  legacy canvas id
+  """
+  _id: ID!
+  createdAt: DateTime
+  modules: [Module!]
+  title: String
+  updatedAt: DateTime
+  url: String
+}
+
+type File implements ModuleItemInterface & Node & Timestamped {
+  """
+  legacy canvas id
+  """
+  _id: ID!
+  createdAt: DateTime
+  displayName: String
+  id: ID!
+  modules: [Module!]
+  updatedAt: DateTime
 }
 
 """
@@ -1078,6 +1113,7 @@ type Module implements Node & Timestamped {
   _id: ID!
   createdAt: DateTime
   id: ID!
+  moduleItems: [ModuleItem!]
   name: String
   unlockAt: DateTime
   updatedAt: DateTime
@@ -1118,6 +1154,39 @@ type ModuleEdge {
   node: Module
 }
 
+type ModuleExternalTool implements ModuleItemInterface & Timestamped {
+  """
+  legacy canvas id
+  """
+  _id: ID!
+  createdAt: DateTime
+  modules: [Module!]
+  updatedAt: DateTime
+  url: String
+}
+
+type ModuleItem implements Node & Timestamped {
+  """
+  legacy canvas id
+  """
+  _id: ID!
+  content: ModuleItemInterface
+  createdAt: DateTime
+  id: ID!
+  module: Module
+  next: ModuleItem
+  previous: ModuleItem
+  updatedAt: DateTime
+  url: URL
+}
+
+"""
+An item that can be in context modules
+"""
+interface ModuleItemInterface {
+  modules: [Module!]
+}
+
 type Mutation {
   createGroupInSet(input: CreateGroupInSetInput!): CreateGroupInSetPayload
 
@@ -1145,10 +1214,12 @@ enum NodeType {
   Course
   Discussion
   Enrollment
+  File
   GradingPeriod
   Group
   GroupSet
   Module
+  ModuleItem
   Page
   Section
   User
@@ -1159,13 +1230,14 @@ enum OrderDirection {
   descending
 }
 
-type Page implements Node & Timestamped {
+type Page implements ModuleItemInterface & Node & Timestamped {
   """
   legacy canvas id
   """
   _id: ID!
   createdAt: DateTime
   id: ID!
+  modules: [Module!]
   title: String
   updatedAt: DateTime
 }
@@ -1242,6 +1314,16 @@ type Query {
   legacyNode(_id: ID!, type: NodeType!): Node
 
   """
+  ModuleItem
+  """
+  moduleItem(
+    """
+    a graphql or legacy id
+    """
+    id: ID!
+  ): ModuleItem
+
+  """
   Fetches an object given its ID.
   """
   node(
@@ -1252,13 +1334,14 @@ type Query {
   ): Node
 }
 
-type Quiz implements Node & Timestamped {
+type Quiz implements ModuleItemInterface & Node & Timestamped {
   """
   legacy canvas id
   """
   _id: ID!
   createdAt: DateTime
   id: ID!
+  modules: [Module!]
   updatedAt: DateTime
 }
 

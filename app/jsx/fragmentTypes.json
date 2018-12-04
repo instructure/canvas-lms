@@ -24,6 +24,9 @@
             "name": "Enrollment"
           },
           {
+            "name": "File"
+          },
+          {
             "name": "GradingPeriod"
           },
           {
@@ -34,6 +37,9 @@
           },
           {
             "name": "Module"
+          },
+          {
+            "name": "ModuleItem"
           },
           {
             "name": "Page"
@@ -75,6 +81,15 @@
             "name": "Enrollment"
           },
           {
+            "name": "ExternalTool"
+          },
+          {
+            "name": "ExternalUrl"
+          },
+          {
+            "name": "File"
+          },
+          {
             "name": "GradingPeriod"
           },
           {
@@ -85,6 +100,12 @@
           },
           {
             "name": "Module"
+          },
+          {
+            "name": "ModuleExternalTool"
+          },
+          {
+            "name": "ModuleItem"
           },
           {
             "name": "Page"
@@ -112,6 +133,36 @@
           },
           {
             "name": "Course"
+          }
+        ]
+      },
+      {
+        "kind": "INTERFACE",
+        "name": "ModuleItemInterface",
+        "possibleTypes": [
+          {
+            "name": "Assignment"
+          },
+          {
+            "name": "Discussion"
+          },
+          {
+            "name": "ExternalTool"
+          },
+          {
+            "name": "ExternalUrl"
+          },
+          {
+            "name": "File"
+          },
+          {
+            "name": "ModuleExternalTool"
+          },
+          {
+            "name": "Page"
+          },
+          {
+            "name": "Quiz"
           }
         ]
       },

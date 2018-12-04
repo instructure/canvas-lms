@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2017 - present Instructure, Inc.
+# Copyright (C) 2019 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,14 +17,24 @@
 #
 
 module Types
-  class DiscussionType < ApplicationObjectType
-    graphql_name "Discussion"
+  # This is a little funky. External tools can either be backed by a `ContextExternalTool`
+  # in the database, or directly by data in a `ContentTag`. Because there could
+  # be conflicting legacy id for these, we are seperating them into two concrete
+  # types in graphql. ModuleExternalToolType is the one backed by `ContentTag`,
+  # and `ExternalToolType` is backed by `ContextExternalTool`.
+  class ModuleExternalToolType < ApplicationObjectType
+    graphql_name "ModuleExternalTool"
 
-    implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
     implements Interfaces::ModuleItemInterface
 
-    global_id_field :id
     field :_id, ID, "legacy canvas id", null: false, method: :id
+    field :url, String, null: true
+
+    def modules
+      Loaders::AssociationLoader.for(ContentTag, :context_module).load(object).then do |ct|
+        [ct.context_module]
+      end
+    end
   end
 end

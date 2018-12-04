@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2017 - present Instructure, Inc.
+# Copyright (C) 2019 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,14 +17,22 @@
 #
 
 module Types
-  class DiscussionType < ApplicationObjectType
-    graphql_name "Discussion"
+  class ExternalUrlType < ApplicationObjectType
+    graphql_name "ExternalUrl"
 
-    implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
     implements Interfaces::ModuleItemInterface
 
-    global_id_field :id
     field :_id, ID, "legacy canvas id", null: false, method: :id
+    field :title, String, null: true
+    field :url, String, null: true
+
+    # Override the default module item interface implementation. External URLs
+    # do not have a separate content table in the database.
+    def modules
+      Loaders::AssociationLoader.for(ContentTag, :context_module).load(object).then do |ct|
+        [ct.context_module]
+      end
+    end
   end
 end

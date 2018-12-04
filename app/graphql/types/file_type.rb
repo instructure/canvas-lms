@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2018 - present Instructure, Inc.
+# Copyright (C) 2019 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,41 +16,16 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class ModuleItemsVisibleLoader < GraphQL::Batch::Loader
-  def initialize(user)
-    @user = user
-  end
-
-  def perform(context_modules)
-    Shackles.activate(:slave) do
-      context_modules.each do |context_module|
-        content_tags = context_module.content_tags_visible_to(@user)
-        fulfill(context_module, content_tags)
-      end
-    end
-  end
-end
-
-
 module Types
-  class ModuleType < ApplicationObjectType
-    graphql_name "Module"
+  class FileType < ApplicationObjectType
+    graphql_name "File"
 
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
-
-    alias context_module object
+    implements Interfaces::ModuleItemInterface
 
     global_id_field :id
     field :_id, ID, "legacy canvas id", null: false, method: :id
-
-    field :name, String, null: true
-
-    field :unlock_at, DateTimeType, null: true
-
-    field :module_items, [Types::ModuleItemType], null: true
-    def module_items
-      ModuleItemsVisibleLoader.for(current_user).load(context_module)
-    end
+    field :display_name, String, null: true
   end
 end

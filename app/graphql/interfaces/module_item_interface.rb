@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2017 - present Instructure, Inc.
+# Copyright (C) 2019 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,17 +14,16 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
+module Interfaces::ModuleItemInterface
+  include GraphQL::Schema::Interface
+  description "An item that can be in context modules"
 
-module Types
-  class DiscussionType < ApplicationObjectType
-    graphql_name "Discussion"
-
-    implements GraphQL::Types::Relay::Node
-    implements Interfaces::TimestampInterface
-    implements Interfaces::ModuleItemInterface
-
-    global_id_field :id
-    field :_id, ID, "legacy canvas id", null: false, method: :id
+  field :modules, [Types::ModuleType], null: true
+  def modules
+    Loaders::IDLoader.for(ContentTag).load_many(@object.context_module_tag_ids).then do |cts|
+      Loaders::AssociationLoader.for(ContentTag, :context_module).load_many(cts).then do |res|
+        res.map(&:context_module).sort_by(&:position)
+      end
+    end
   end
 end
