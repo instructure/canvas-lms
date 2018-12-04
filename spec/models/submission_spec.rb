@@ -4765,6 +4765,23 @@ describe Submission do
       expect(comments).to match_array([@student_comment])
     end
 
+    context "peer review assignments" do
+      before(:once) do
+        assignment = @course.assignments.create!(name: "peer review assignment", peer_reviews: true)
+        @submission = assignment.submissions.find_by(user: @student)
+        @student2 = course_with_user("StudentEnrollment", course: @course, name: "Student2", active_all: true).user
+        student2_sub = assignment.submissions.find_by(user: @student2)
+        AssessmentRequest.create!(assessor: @student2, assessor_asset: student2_sub, asset: @submission, user: @student)
+        @submission.add_comment(author: @teacher, comment: "This teacher's comment should not appear")
+        @peer_review_comment = @submission.add_comment(author: @student2, comment: "A peer review's comment")
+      end
+
+      it "returns submission comments created by the peer reviewer" do
+        comments = @submission.visible_submission_comments_for(@student2)
+        expect(comments).to match_array([@peer_review_comment])
+      end
+    end
+
     context "when assignment is graded as a group" do
       before(:once) do
         student2 = course_with_user("StudentEnrollment", course: @course, name: "Student2", active_all: true).user
