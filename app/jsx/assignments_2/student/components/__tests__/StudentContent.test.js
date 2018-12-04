@@ -20,7 +20,7 @@ import ReactDOM from 'react-dom'
 import $ from 'jquery'
 
 import {mockAssignment} from '../../test-utils'
-import StudentContainer from '../StudentContainer'
+import StudentContent from '../StudentContent'
 
 beforeAll(() => {
   const found = document.getElementById('fixtures')
@@ -42,21 +42,21 @@ afterEach(() => {
 
 it('renders the student header if the assignment is unlocked', () => {
   const assignment = mockAssignment({lockInfo: {isLocked: false}})
-  ReactDOM.render(<StudentContainer assignment={assignment} />, document.getElementById('fixtures'))
+  ReactDOM.render(<StudentContent assignment={assignment} />, document.getElementById('fixtures'))
   const element = $('[data-test-id="assignments-2-student-header"]')
   expect(element).toHaveLength(1)
 })
 
 it('renders the student header if the assignment is locked', () => {
   const assignment = mockAssignment({lockInfo: {isLocked: true}})
-  ReactDOM.render(<StudentContainer assignment={assignment} />, document.getElementById('fixtures'))
+  ReactDOM.render(<StudentContent assignment={assignment} />, document.getElementById('fixtures'))
   const element = $('[data-test-id="assignments-2-student-header"]')
   expect(element).toHaveLength(1)
 })
 
 it('renders the assignment details and student content tab if the assignment is unlocked', () => {
   const assignment = mockAssignment({lockInfo: {isLocked: false}})
-  ReactDOM.render(<StudentContainer assignment={assignment} />, document.getElementById('fixtures'))
+  ReactDOM.render(<StudentContent assignment={assignment} />, document.getElementById('fixtures'))
 
   const contentTabs = $('[data-test-id="assignment-2-student-content-tabs"]')
   const toggleDetails = $('.a2-toggle-details-container')
@@ -68,7 +68,7 @@ it('renders the assignment details and student content tab if the assignment is 
 
 it('renders the availability dates if the assignment is locked', () => {
   const assignment = mockAssignment({lockInfo: {isLocked: true}})
-  ReactDOM.render(<StudentContainer assignment={assignment} />, document.getElementById('fixtures'))
+  ReactDOM.render(<StudentContent assignment={assignment} />, document.getElementById('fixtures'))
 
   const contentTabs = $('[data-test-id="assignment-2-student-content-tabs"]')
   const toggleDetails = $('.a2-toggle-details-container')

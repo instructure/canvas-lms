@@ -26,7 +26,7 @@ import {StudentAssignmentShape} from '../assignmentData'
 import FriendlyDatetime from '../../../shared/FriendlyDatetime'
 import AvailabilityDates from '../../shared/AvailabilityDates'
 
-function StudentDateTitle(props) {
+function DateTitle(props) {
   const {assignment} = props
 
   return (
@@ -53,8 +53,8 @@ function StudentDateTitle(props) {
   )
 }
 
-StudentDateTitle.propTypes = {
+DateTitle.propTypes = {
   assignment: StudentAssignmentShape
 }
 
-export default React.memo(StudentDateTitle)
+export default React.memo(DateTitle)

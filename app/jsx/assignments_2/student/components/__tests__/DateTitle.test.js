@@ -20,7 +20,7 @@ import ReactDOM from 'react-dom'
 import $ from 'jquery'
 
 import {mockAssignment} from '../../test-utils'
-import StudentDateTitle from '../StudentDateTitle'
+import DateTitle from '../DateTitle'
 
 beforeAll(() => {
   const found = document.getElementById('fixtures')
@@ -37,14 +37,14 @@ afterEach(() => {
 
 it('renders title correctly', () => {
   const assignment = mockAssignment({name: 'Egypt Economy Research'})
-  ReactDOM.render(<StudentDateTitle assignment={assignment} />, document.getElementById('fixtures'))
+  ReactDOM.render(<DateTitle assignment={assignment} />, document.getElementById('fixtures'))
   const title = $('[data-test-id="title"]')
   expect(title.text()).toEqual('Egypt Economy Research')
 })
 
 it('renders date correctly', () => {
   const assignment = mockAssignment({dueAt: '2016-07-11T18:00:00-01:00'})
-  ReactDOM.render(<StudentDateTitle assignment={assignment} />, document.getElementById('fixtures'))
+  ReactDOM.render(<DateTitle assignment={assignment} />, document.getElementById('fixtures'))
   const title = $('[data-test-id="due-date-display"]')
 
   // Reason why this is showing up twice is once for screenreader content and again for regular content
@@ -54,7 +54,7 @@ it('renders date correctly', () => {
 
 it('does not render a date if there is no dueAt set', () => {
   const assignment = mockAssignment({dueAt: null})
-  ReactDOM.render(<StudentDateTitle assignment={assignment} />, document.getElementById('fixtures'))
+  ReactDOM.render(<DateTitle assignment={assignment} />, document.getElementById('fixtures'))
   const title = $('[data-test-id="due-date-display"]')
   expect(title).toHaveLength(0)
 })

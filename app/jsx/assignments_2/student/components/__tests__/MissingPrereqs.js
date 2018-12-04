@@ -15,13 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 import React from 'react'
 import ReactDOM from 'react-dom'
-
-import {mockAssignment} from '../test-utils'
-import StudentContentTabs from '../StudentContentTabs'
 import $ from 'jquery'
+
+import MissingPrereqs from '../MissingPrereqs'
 
 beforeAll(() => {
   const found = document.getElementById('fixtures')
@@ -38,9 +36,9 @@ afterEach(() => {
 
 it('renders normally', () => {
   ReactDOM.render(
-    <StudentContentTabs assignment={mockAssignment()} />,
+    <MissingPrereqs preReqTitle="TEST" preReqLink="TEST" />,
     document.getElementById('fixtures')
   )
-  const element = $('[data-test-id="assignment-2-student-content-tabs-test-text"]')
+  const element = $('[data-test-id="assignments-2-pre-req-title"]')
   expect(element).toHaveLength(1)
 })

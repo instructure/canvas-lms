@@ -25,13 +25,13 @@ import Text from '@instructure/ui-elements/lib/components/Text'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import View from '@instructure/ui-layout/lib/components/View'
 
-import {StudentAssignmentShape} from './assignmentData'
+import {StudentAssignmentShape} from '../assignmentData'
 
-StudentContentTabs.propTypes = {
+ContentTabs.propTypes = {
   assignment: StudentAssignmentShape
 }
 
-function StudentContentTabs(props) {
+function ContentTabs(props) {
   return (
     <div data-test-id="assignment-2-student-content-tabs">
       <TabList defaultSelectedIndex={0} variant="minimal">
@@ -99,4 +99,4 @@ function StudentContentTabs(props) {
   )
 }
 
-export default React.memo(StudentContentTabs)
+export default React.memo(ContentTabs)

@@ -15,40 +15,37 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-import I18n from 'i18n!assignments_2_prereqs'
-
+import I18n from 'i18n!assignments_2'
 import React from 'react'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Button from '@instructure/ui-buttons/lib/components/Button'
+
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
+import Text from '@instructure/ui-elements/lib/components/Text'
 
-import {string} from 'prop-types'
+import AvailabilityDates from '../../shared/AvailabilityDates'
+import lockedSVG from '../../../../../public/images/assignments_2/Locked.svg'
+import {StudentAssignmentShape} from '../assignmentData'
 
-function StudentPrereq(props) {
+function LockedAssignment(props) {
+  const {assignment} = props
   return (
-    <Flex margin="small" direction="column" alignItems="center" justifyContent="center">
+    <Flex textAlign="center" justifyItems="center" margin="0 0 large" direction="column">
       <FlexItem>
-        <Heading size="large" data-test-id="assignments-2-pre-req-title" margin="small">
-          {I18n.t('Prerequisite Completion Period')}
-        </Heading>
+        <img alt={I18n.t('Assignment Locked')} src={lockedSVG} />
       </FlexItem>
       <FlexItem>
-        <Text size="medium">{props.preReqTitle}</Text>
+        <Text size="x-large">{I18n.t('Availability Dates')}</Text>
       </FlexItem>
       <FlexItem>
-        <Button variant="primary" margin="small" href={props.preReqLink}>
-          {I18n.t('Go to Prerequisite')}
-        </Button>
+        <Text size="large">
+          <AvailabilityDates assignment={assignment} formatStyle="short" />
+        </Text>
       </FlexItem>
     </Flex>
   )
 }
 
-StudentPrereq.propTypes = {
-  preReqTitle: string.isRequired,
-  preReqLink: string.isRequired
+LockedAssignment.propTypes = {
+  assignment: StudentAssignmentShape
 }
 
-export default React.memo(StudentPrereq)
+export default React.memo(LockedAssignment)

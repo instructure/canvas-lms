@@ -15,61 +15,44 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import I18n from 'i18n!assignments_2'
 import React from 'react'
 
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import Text from '@instructure/ui-elements/lib/components/Text'
-
 import {StudentAssignmentShape} from '../assignmentData'
-import StudentHeader from './StudentHeader'
+import Header from './Header'
 import AssignmentToggleDetails from '../../shared/AssignmentToggleDetails'
-import StudentContentTabs from '../StudentContentTabs'
-import AvailabilityDates from '../../shared/AvailabilityDates'
-import lockedSVG from '../../../../../public/images/assignments_2/Locked.svg'
-import StudentPrereqContainer from './StudentPrereqContainer'
+import ContentTabs from './ContentTabs'
+import MissingPrereqs from './MissingPrereqs'
+import LockedAssignment from './LockedAssignment'
 
 function renderContentBaseOnAvailability(assignment) {
-  if (ENV && ENV.PREREQS && ENV.PREREQS.items && ENV.PREREQS.items.length === 0) {
-    return <StudentPrereqContainer />
+  // TODO get this from graphql instead of ENV
+  if (ENV && ENV.PREREQS && ENV.PREREQS.items && ENV.PREREQS.items.length !== 0) {
+    const preReqItem = ENV.PREREQS.items[0] && ENV.PREREQS.items[0].prev
+    return <MissingPrereqs preReqTitle={preReqItem.title} preReqLink={preReqItem.html_url} />
   } else if (assignment.lockInfo.isLocked) {
-    return (
-      <Flex textAlign="center" justifyItems="center" margin="0 0 large" direction="column">
-        <FlexItem>
-          <img alt={I18n.t('Assignment Locked')} src={lockedSVG} />
-        </FlexItem>
-        <FlexItem>
-          <Text size="x-large">{I18n.t('Availability Dates')}</Text>
-        </FlexItem>
-        <FlexItem>
-          <Text size="large">
-            <AvailabilityDates assignment={assignment} formatStyle="short" />
-          </Text>
-        </FlexItem>
-      </Flex>
-    )
+    return <LockedAssignment assignment={assignment} />
   } else {
     return (
       <React.Fragment>
         <AssignmentToggleDetails description={assignment.description} />
-        <StudentContentTabs />
+        <ContentTabs />
       </React.Fragment>
     )
   }
 }
 
-function StudentContainer(props) {
+function StudentContent(props) {
   const {assignment} = props
   return (
     <div data-test-id="assignments-2-student-view">
-      <StudentHeader assignment={assignment} />
+      <Header assignment={assignment} />
       {renderContentBaseOnAvailability(assignment)}
     </div>
   )
 }
 
-StudentContainer.propTypes = {
+StudentContent.propTypes = {
   assignment: StudentAssignmentShape
 }
 
-export default React.memo(StudentContainer)
+export default React.memo(StudentContent)

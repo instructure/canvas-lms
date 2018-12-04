@@ -17,32 +17,45 @@
  */
 import I18n from 'i18n!assignments_2'
 import React from 'react'
+import {string} from 'prop-types'
 
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
+import Heading from '@instructure/ui-elements/lib/components/Heading'
+import Text from '@instructure/ui-elements/lib/components/Text'
+import Button from '@instructure/ui-buttons/lib/components/Button'
 
 import locked1SVG from '../../../../../public/images/assignments_2/Locked1.svg'
-import StudentPrereq from './StudentPrereq'
 
-// NOTE: We can easily move this dependency to Graphql one day
-function StudentConditionalPrereq() {
-  if (ENV && ENV.PREREQS && ENV.PREREQS.items && ENV.PREREQS.items.length === 0) {
-    return
-  }
-  const preReqItem = ENV.PREREQS.items[0] && ENV.PREREQS.items[0].prev
-  return <StudentPrereq preReqTitle={preReqItem.title} preReqLink={preReqItem.html_url} />
-}
-
-function StudentPrereqContainer() {
+function MissingPrereqs(props) {
   return (
     <Flex textAlign="center" justifyItems="center" margin="0 0 large" direction="column">
       <FlexItem>
         <img alt={I18n.t('Assignment Locked with Prerequisite')} src={locked1SVG} />
       </FlexItem>
-      {StudentConditionalPrereq()}
+      <FlexItem>
+        <Flex margin="small" direction="column" alignItems="center" justifyContent="center">
+          <FlexItem>
+            <Heading size="large" data-test-id="assignments-2-pre-req-title" margin="small">
+              {I18n.t('Prerequisite Completion Period')}
+            </Heading>
+          </FlexItem>
+          <FlexItem>
+            <Text size="medium">{props.preReqTitle}</Text>
+          </FlexItem>
+          <FlexItem>
+            <Button variant="primary" margin="small" href={props.preReqLink}>
+              {I18n.t('Go to Prerequisite')}
+            </Button>
+          </FlexItem>
+        </Flex>
+      </FlexItem>
     </Flex>
   )
 }
 
-StudentPrereqContainer.propTypes = {}
+MissingPrereqs.propTypes = {
+  preReqTitle: string.isRequired,
+  preReqLink: string.isRequired
+}
 
-export default React.memo(StudentPrereqContainer)
+export default React.memo(MissingPrereqs)

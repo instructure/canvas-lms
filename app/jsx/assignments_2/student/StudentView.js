@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import StudentContainer from './components/StudentContainer'
+import StudentContent from './components/StudentContent'
 import {string} from 'prop-types'
 import {Query} from 'react-apollo'
 import {STUDENT_VIEW_QUERY} from './assignmentData'
@@ -28,7 +28,7 @@ const StudentView = props => (
       // TODO HANDLE ERROR AND LOADING
       if (loading) return null
       if (error) return `Error!: ${error}`
-      return <StudentContainer assignment={data.assignment} />
+      return <StudentContent assignment={data.assignment} />
     }}
   </Query>
 )

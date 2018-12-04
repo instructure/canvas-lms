@@ -20,17 +20,17 @@ import React from 'react'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 
 import AssignmentGroupModuleNav from './AssignmentGroupModuleNav'
-import StudentDateTitle from './StudentDateTitle'
+import DateTitle from './DateTitle'
 import PointsDisplay from './PointsDisplay'
 import StepContainer from './StepContainer'
 
 import {StudentAssignmentShape} from '../assignmentData'
 
-StudentHeader.propTypes = {
+Header.propTypes = {
   assignment: StudentAssignmentShape
 }
 
-function StudentHeader(props) {
+function Header(props) {
   let assignmentGroup = null
   if (props.assignment.assignmentGroup.name) {
     assignmentGroup = {
@@ -53,7 +53,7 @@ function StudentHeader(props) {
       />
       <Flex margin="0 0 xx-large 0">
         <FlexItem grow>
-          <StudentDateTitle assignment={props.assignment} />
+          <DateTitle assignment={props.assignment} />
         </FlexItem>
         <FlexItem grow>
           <PointsDisplay
@@ -72,4 +72,4 @@ function StudentHeader(props) {
   )
 }
 
-export default React.memo(StudentHeader)
+export default React.memo(Header)

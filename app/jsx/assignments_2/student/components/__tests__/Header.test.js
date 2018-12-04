@@ -20,7 +20,7 @@ import ReactDOM from 'react-dom'
 import $ from 'jquery'
 
 import {mockAssignment} from '../../test-utils'
-import StudentHeader from '../StudentHeader'
+import Header from '../Header'
 
 beforeAll(() => {
   const found = document.getElementById('fixtures')
@@ -42,10 +42,7 @@ afterEach(() => {
 })
 
 it('renders normally', () => {
-  ReactDOM.render(
-    <StudentHeader assignment={mockAssignment()} />,
-    document.getElementById('fixtures')
-  )
+  ReactDOM.render(<Header assignment={mockAssignment()} />, document.getElementById('fixtures'))
   const element = $('[data-test-id="assignments-2-student-header"]')
   expect(element).toHaveLength(1)
 })
