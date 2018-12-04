@@ -34,14 +34,16 @@ function StudentDateTitle(props) {
       <Heading level="h1" as="h1" data-test-id="title" margin="0 0 x-small">
         {assignment.name}
       </Heading>
-      <Text size="large" data-test-id="due-date-display">
-        <FriendlyDatetime
-          data-test-id="due-date"
-          prefix={I18n.t('Due:')}
-          format={I18n.t('#date.formats.full_with_weekday')}
-          dateTime={assignment.dueAt}
-        />
-      </Text>
+      {assignment.dueAt && (
+        <Text size="large" data-test-id="due-date-display">
+          <FriendlyDatetime
+            data-test-id="due-date"
+            prefix={I18n.t('Due:')}
+            format={I18n.t('#date.formats.full_with_weekday')}
+            dateTime={assignment.dueAt}
+          />
+        </Text>
+      )}
       <div>
         <Text size="small">
           <AvailabilityDates assignment={assignment} formatStyle="long" />

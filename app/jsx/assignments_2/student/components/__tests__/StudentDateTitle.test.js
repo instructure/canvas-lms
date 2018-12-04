@@ -51,3 +51,10 @@ it('renders date correctly', () => {
   // Also, notice that it handles timezone differences here, with the `-01:00` offset
   expect(title.text()).toEqual('Due: Mon Jul 11, 2016 7:00pmDue: Mon Jul 11, 2016 7:00pm2016-7-11')
 })
+
+it('does not render a date if there is no dueAt set', () => {
+  const assignment = mockAssignment({dueAt: null})
+  ReactDOM.render(<StudentDateTitle assignment={assignment} />, document.getElementById('fixtures'))
+  const title = $('[data-test-id="due-date-display"]')
+  expect(title).toHaveLength(0)
+})

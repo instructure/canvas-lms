@@ -44,11 +44,11 @@ export const STUDENT_VIEW_QUERY = gql`
 
 export const StudentAssignmentShape = shape({
   description: string.isRequired,
-  dueAt: string.isRequired,
-  lockAt: string.isRequired,
+  dueAt: string,
+  lockAt: string,
   name: string.isRequired,
   pointsPossible: number.isRequired,
-  unlockAt: string.isRequired,
+  unlockAt: string,
   assignmentGroup: shape({
     name: string.isRequired
   }).isRequired,
