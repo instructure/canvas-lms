@@ -17,28 +17,27 @@
 #
 
 module Types
-  GroupMembershipType = GraphQL::ObjectType.define do
-    name "GroupMembership"
-
-    interfaces [Interfaces::TimestampInterface]
-
-    field :_id, !types.ID, "legacy canvas id", property: :id
-
-    field :state, !GroupMembershipStateType, property: :workflow_state
-
-    field :user, UserType, resolve: ->(gm, _, _) {
-      Loaders::AssociationLoader.for(GroupMembership, :user).load(gm).then {
-        gm.user
-      }
-    }
-  end
-
-  GroupMembershipStateType = GraphQL::EnumType.define do
-    name "GroupMembershipState"
+  class GroupMembershipStateType < BaseEnum
+    graphql_name "GroupMembershipState"
     value "accepted"
     value "invited"
     value "requested"
     value "rejected"
     value "deleted"
+  end
+
+  class GroupMembershipType < ApplicationObjectType
+    graphql_name "GroupMembership"
+
+    implements Interfaces::TimestampInterface
+
+    field :_id, ID, "legacy canvas id", method: :id, null: false
+
+    field :state, GroupMembershipStateType, method: :workflow_state, null: false
+
+    field :user, UserType, null: true
+    def user
+      load_association(:user)
+    end
   end
 end
