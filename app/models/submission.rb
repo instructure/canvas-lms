@@ -2095,7 +2095,9 @@ class Submission < ActiveRecord::Base
     visible_users = users_with_visible_submission_comments(current_user)
 
     all_submission_comments.select do |submission_comment|
-      if assignment.muted? && user == current_user
+      if assignment.peer_reviews && !submission_comment.grants_right?(current_user, :read)
+        false
+      elsif assignment.muted? && user == current_user
         submission_comment.author == user
       elsif assignment.grades_published? && grader == submission_comment.author
         submission_comment.provisional_grade_id.nil?
