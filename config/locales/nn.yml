@@ -550,7 +550,7 @@ nn:
         Anonymous: Anonym
         Assignment: Oppgåve
         Course: Emne
-        Grader: Karaktersetjing
+        Grader: Karaktersetjar
         Student: Student
         To: Til
         date: Dato
@@ -17234,7 +17234,7 @@ nn:
       Last opp emnefiler, pensum, litteraturlister eller andre dokument.
       Lås mapper så dei er skjult for studentane. Legg til filer i modular,
       oppgåver, diskusjonar eller emnesider.
-  upload_data_dc4fa4cb: "Lat opp data"
+  upload_data_dc4fa4cb: "Last opp data"
   upload_drop_zone: 
     drop_to_upload: "Slepp element for opplasting"
   upload_failed_quota_exceeded_ff3af659: "Opplastinga mislukkast, lagringskvote er overskriden"
