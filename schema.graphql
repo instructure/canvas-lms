@@ -162,7 +162,7 @@ type AssignmentGroupRules {
 
   # The lowest N assignments are not included in grade calculations
   dropLowest: Int
-  neverDrop: [Assignment]
+  neverDrop: [Assignment!]
 }
 
 # States that Assignment Group can be in

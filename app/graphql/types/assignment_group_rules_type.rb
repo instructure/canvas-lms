@@ -16,23 +16,24 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Types
-  AssignmentGroupRulesType = ::GraphQL::ObjectType.define do
-    name "AssignmentGroupRules"
+  class AssignmentGroupRulesType < ApplicationObjectType
+    graphql_name "AssignmentGroupRules"
 
-    field :dropLowest, types.Int do
-       hash_key :drop_lowest
-       description "The lowest N assignments are not included in grade calculations"
-    end
+    alias rules object
 
-    field :dropHighest, types.Int do
-      hash_key :drop_highest
-      description "The highest N assignments are not included in grade calculations"
-    end
+    field :drop_lowest, Integer,
+      "The lowest N assignments are not included in grade calculations",
+      null: true
 
-    field :neverDrop, types[AssignmentType], resolve: -> (r, _, _) {
-      if r[:never_drop].present?
-        Loaders::IDLoader.for(Assignment).load_many(r[:never_drop])
+    field :drop_highest, Integer,
+      "The highest N assignments are not included in grade calculations",
+      null: true
+
+    field :never_drop, [AssignmentType], null: true
+    def never_drop
+      if rules[:never_drop].present?
+        Loaders::IDLoader.for(Assignment).load_many(rules[:never_drop])
       end
-    }
+    end
   end
 end
