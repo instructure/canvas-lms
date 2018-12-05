@@ -43,6 +43,104 @@
 #       }
 #     }
 #
+# @model SisImportStatistic
+#     {
+#       "id": "SisImportStatistic",
+#       "description": "",
+#       "properties": {
+#         "created": {
+#           "description": "This is the number of items that were created.",
+#           "example": 18,
+#           "type": "integer"
+#         },
+#         "concluded": {
+#           "description": "This is the number of items that marked as completed. This only applies to courses and enrollments.",
+#           "example": 3,
+#           "type": "integer"
+#         },
+#         "deactivated": {
+#           "description": "This is the number of Enrollments that were marked as 'inactive'. This only applies to enrollments.",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "restored": {
+#           "description": "This is the number of items that were set to an active state from a completed, inactive, or deleted state.",
+#           "example": 2,
+#           "type": "integer"
+#         },
+#         "deleted": {
+#           "description": "This is the number of items that were deleted.",
+#           "example": 40,
+#           "type": "integer"
+#         }
+#       }
+#     }
+#
+# @model SisImportStatistics
+#     {
+#       "id": "SisImportStatistics",
+#       "description": "",
+#       "properties": {
+#         "total_state_changes": {
+#           "description": "This is the total number of items that were changed in the sis import. There are a few caveats that can cause this number to not add up to the individual counts. There are some state changes that happen that have no impact to the object. An example would be changing a course from 'created' to 'claimed'. Both of these would be considered an active course, but would increment this counter. In this example the course would not increment the created or restored counters for course statistic.",
+#           "example": 382,
+#           "type": "integer"
+#         },
+#         "Account": {
+#           "description": "This contains that statistics for accounts.",
+#           "$ref": "SisImportStatistic"
+#         },
+#         "EnrollmentTerm": {
+#           "description": "This contains that statistics for terms.",
+#           "$ref": "SisImportStatistic"
+#         },
+#         "CommunicationChannel": {
+#           "description": "This contains that statistics for communication channels. This is an indirect effect from creating or deleting a user.",
+#           "$ref": "SisImportStatistic"
+#         },
+#         "AbstractCourse": {
+#           "description": "This contains that statistics for abstract courses.",
+#           "$ref": "SisImportStatistic"
+#         },
+#         "Course": {
+#           "description": "This contains that statistics for courses.",
+#           "$ref": "SisImportStatistic"
+#         },
+#         "CourseSection": {
+#           "description": "This contains that statistics for course sections.",
+#           "$ref": "SisImportStatistic"
+#         },
+#         "Enrollment": {
+#           "description": "This contains that statistics for enrollments.",
+#           "$ref": "SisImportStatistic"
+#         },
+#         "GroupCategory": {
+#           "description": "This contains that statistics for group categories.",
+#           "$ref": "SisImportStatistic"
+#         },
+#         "Group": {
+#           "description": "This contains that statistics for groups.",
+#           "$ref": "SisImportStatistic"
+#         },
+#         "GroupMembership": {
+#           "description": "This contains that statistics for group memberships. This can be a direct impact from the import or indirect from an enrollment being deleted.",
+#           "$ref": "SisImportStatistic"
+#         },
+#         "Pseudonym": {
+#           "description": "This contains that statistics for pseudonyms. Pseudonyms are logins for users, and are the object that ties an enrollment to a user. This would be impacted from the user importer. ",
+#           "$ref": "SisImportStatistic"
+#         },
+#         "UserObserver": {
+#           "description": "This contains that statistics for user observers.",
+#           "$ref": "SisImportStatistic"
+#         },
+#         "AccountUser": {
+#           "description": "This contains that statistics for account users.",
+#           "$ref": "SisImportStatistic"
+#         }
+#       }
+#     }
+#
 # @model SisImportCounts
 #     {
 #       "id": "SisImportCounts",
@@ -144,7 +242,7 @@
 #           "type": "datetime"
 #         },
 #         "workflow_state": {
-#           "description": "The current state of the SIS import.\n - 'created': The SIS import has been created.\n - 'importing': The SIS import is currently processing.\n - 'cleanup_batch': The SIS import is currently cleaning up courses, sections, and enrollments not included in the batch for batch_mode imports.\n - 'imported': The SIS import has completed successfully.\n - 'imported_with_messages': The SIS import completed with errors or warnings.\n - 'aborted': The SIS import was aborted.\n - 'failed_with_messages': The SIS import failed with errors.\n - 'failed': The SIS import failed.",
+#           "description": "The current state of the SIS import.\n - 'initializing': The SIS import is being created, if this gets stuck in initializing, it will not import and will continue on to next import.\n - 'created': The SIS import has been created.\n - 'importing': The SIS import is currently processing.\n - 'cleanup_batch': The SIS import is currently cleaning up courses, sections, and enrollments not included in the batch for batch_mode imports.\n - 'imported': The SIS import has completed successfully.\n - 'imported_with_messages': The SIS import completed with errors or warnings.\n - 'aborted': The SIS import was aborted.\n - 'failed_with_messages': The SIS import failed with errors.\n - 'failed': The SIS import failed.\n - 'restoring': The SIS import is restoring states of imported items.\n - 'partially_restored': The SIS import is restored some of the states of imported items. This is generally due to passing a param like undelete only.\n - 'restored': The SIS import is restored all of the states of imported items.",
 #           "example": "imported",
 #           "type": "string",
 #           "allowableValues": {
@@ -167,6 +265,10 @@
 #         "data": {
 #           "description": "data",
 #           "$ref": "SisImportData"
+#         },
+#         "statistics": {
+#           "description": "statistics",
+#           "$ref": "SisImportStatistics"
 #         },
 #         "progress": {
 #           "description": "The progress of the SIS import. The progress will reset when using batch_mode and have a different progress for the cleanup stage",
