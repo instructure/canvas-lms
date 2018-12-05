@@ -280,7 +280,14 @@ describe Submission do
       override.save!
 
       submission = @assignment.submissions.find_by!(user: @user)
-      expect(submission.cached_due_date).to eq override.reload.due_at.change(sec: 0)
+      expect(submission.cached_due_date).to eq override.reload.due_at.change(usec: 0)
+    end
+
+    it "should not truncate seconds off of cached due dates" do
+      time = DateTime.parse("2018-12-24 23:59:59")
+      @assignment.update_attribute(:due_at, time)
+      submission = @assignment.submissions.find_by!(user: @user)
+      expect(submission.cached_due_date.to_i).to eq time.to_i
     end
 
     context 'due date changes after student submits' do
