@@ -51,5 +51,20 @@ describe "RCS sidebar tests" do
         expect(wiki_body_anchor.attribute('href')).to include title
       end
     end
+
+    it "should click on sidebar wiki page to create link in body" do
+      title = "wiki-page-1"
+      unpublished = false
+      edit_roles = "public"
+
+      create_wiki_page(title, unpublished, edit_roles)
+      visit_front_page(@course)
+      click_pages_accordion
+      click_sidebar_link(title)
+
+      in_frame wiki_page_body_ifr_id do
+        expect(wiki_body_anchor.attribute('href')).to include title
+      end
+    end
   end
 end

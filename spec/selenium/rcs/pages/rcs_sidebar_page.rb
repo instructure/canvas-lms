@@ -40,6 +40,10 @@ module RCSSidebarPage
     f('#tinymce p a')
   end
 
+  def sidebar_link(title)
+    fj("li:contains('#{title}')")
+  end
+
   # ---------------------- Actions ----------------------
 
   def click_pages_accordion
@@ -52,5 +56,9 @@ module RCSSidebarPage
 
   def click_new_page_submit
     new_page_submit_button.click
+  end
+
+  def click_sidebar_link(title)
+    sidebar_link(title).click
   end
 end
