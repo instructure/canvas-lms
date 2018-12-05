@@ -71,6 +71,30 @@ describe "/submissions/show" do
       expect(checkbox.attr('checked').value).to eq 'checked'
       expect(checkbox.attr('style').value).to include('display:none')
     end
+
+    it "peer reviewers are allowed to make group comments" do
+      @assignment.update!(grade_group_students_individually: false, peer_reviews: true)
+      peer = @course.enroll_student(User.create, enrollment_state: "active").user
+      peer_submission = @assignment.submissions.find_by(user: peer)
+      AssessmentRequest.create!(assessor: peer, assessor_asset: peer_submission, asset: @submission, user: @user)
+      view_context(@course, peer)
+      assign(:assignment, @assignment)
+      assign(:submission, @submission)
+      render "submissions/show"
+      html = Nokogiri::HTML.fragment(response.body)
+      expect(html.css("#submission_group_comment").attr("checked").value).to eq "checked"
+    end
+
+    it "students that are not peer reviewers are not allowed to make group comments" do
+      @assignment.update!(grade_group_students_individually: false, peer_reviews: true)
+      student2 = @course.enroll_student(User.create, enrollment_state: "active").user
+      view_context(@course, student2)
+      assign(:assignment, @assignment)
+      assign(:submission, @submission)
+      render "submissions/show"
+      html = Nokogiri::HTML.fragment(response.body)
+      expect(html.css("#submission_group_comment")).to be_empty
+    end
   end
 
   context 'when assignment has deducted points' do
