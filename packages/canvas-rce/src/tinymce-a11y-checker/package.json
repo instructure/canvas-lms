@@ -47,7 +47,7 @@
     "quiz-presets": "^5",
     "react": "^16",
     "react-dom": "^16",
-    "start-server-and-test": "^1.5.0",
+    "start-server-and-test": "^1.7.11",
     "webpack": "^4",
     "webpack-cli": "^3.0.8",
     "webpack-dev-server": "^3"
