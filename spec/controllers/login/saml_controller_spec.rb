@@ -353,6 +353,7 @@ describe Login::SamlController do
 
       @aac2 = @account.authentication_providers.build(auth_type: 'saml')
       @aac2.idp_entity_id = "https://example.com/idp1"
+      @aac2.log_in_url = "https://example.com/idp1/sso"
       @aac2.log_out_url = "https://example.com/idp1/slo"
       @aac2.save!
 
@@ -369,6 +370,13 @@ describe Login::SamlController do
           saml_attributes: {},
           used_key: nil
       }
+    end
+
+    it "sends the AuthnRequest by entity id" do
+      controller.request.env['canvas.domain_root_account'] = @account
+      get :new, params: { entityID: 'https://example.com/idp1' }
+      expect(response).to be_redirect
+      expect(response.location).to match(%r{^https://example.com/idp1/sso\?SAMLRequest=})
     end
 
     it "should saml_consume login with multiple authorization configs" do
