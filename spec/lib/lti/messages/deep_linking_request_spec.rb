@@ -46,6 +46,10 @@ describe Lti::Messages::DeepLinkingRequest do
       expect(subject['accept_multiple']).to eq false
     end
 
+    it 'sets the "deep_link_return_url"' do
+      expect(subject['deep_link_return_url']).to eq deep_linking_return_url
+    end
+
     context 'when resource type is "editor_button"' do
       it 'sets the correct "accept_types"' do
         expect(subject['accept_types']).to match_array %w(

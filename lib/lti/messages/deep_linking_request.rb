@@ -33,6 +33,8 @@ module Lti::Messages
       'editor_button' => false
     }.freeze
 
+    MODAL_PLACEMENTS = ['editor_button'].freeze
+
     def initialize(tool:, context:, user:, expander:, return_url:, opts: {})
       super
       @message = LtiAdvantage::Messages::DeepLinkingRequest.new
@@ -47,7 +49,7 @@ module Lti::Messages
     private
 
     def add_deep_linking_request_claims!
-      @message.deep_linking_settings.deep_link_return_url = 'Set this once we know how we will handle responses'
+      @message.deep_linking_settings.deep_link_return_url = return_url
       @message.deep_linking_settings.accept_types = ACCEPT_TYPES[placement]
       @message.deep_linking_settings.accept_presentation_document_targets = DOCUMENT_TARGETS[placement]
       @message.deep_linking_settings.accept_media_types = MEDIA_TYPES[placement].join(',')
@@ -57,6 +59,13 @@ module Lti::Messages
 
     def placement
       @opts[:resource_type]
+    end
+
+    def return_url
+      @expander.controller.polymorphic_url(
+        [@context, :deep_linking_response],
+        { modal: MODAL_PLACEMENTS.include?(placement) }
+      )
     end
   end
 end

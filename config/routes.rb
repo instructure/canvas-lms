@@ -2205,6 +2205,8 @@ CanvasRails::Application.routes.draw do
 
     %w(course account).each do |context|
       prefix = "#{context}s/:#{context}_id"
+
+      post "#{prefix}/deep_linking_response", controller: 'lti/ims/deep_linking', action: :deep_linking_response, as: "#{context}_deep_linking_response"
       post "#{prefix}/authorize", controller: 'lti/ims/authorization', action: :authorize, as: "#{context}_lti_oauth2_authorize"
       get  "#{prefix}/tool_consumer_profile(/:tool_consumer_profile_id)", controller: 'lti/ims/tool_consumer_profile',
            action: 'show', as: "#{context}_tool_consumer_profile"

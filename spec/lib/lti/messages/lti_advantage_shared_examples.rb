@@ -23,9 +23,11 @@ RSpec.shared_context 'lti_advantage_shared_examples' do
   let(:return_url) { 'http://www.platform.com/return_url' }
   let(:opts) { { resource_type: 'course_navigation' } }
   let(:lti_assignment) { Lti::LtiAssignmentCreator.new(assignment).convert }
+  let(:deep_linking_return_url) { 'http://www.test.cop/success' }
   let(:controller) do
     controller = double('controller')
     allow(controller).to receive(:request).and_return(request)
+    allow(controller).to receive(:polymorphic_url).and_return(deep_linking_return_url)
     controller
   end
   # All this setup just so we can stub out controller.*_url methods

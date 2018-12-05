@@ -197,7 +197,7 @@ shared_examples_for "advantage services" do
 
       it 'returns 401 unauthorized and complains about an invalid aud field' do
         expect(response).to have_http_status :unauthorized
-        expect(json).to be_lti_advantage_error_response_body('unauthorized', 'Invalid access token field/s: the \'aud\' must be the LTI Authorization endpoint')
+        expect(json).to be_lti_advantage_error_response_body('unauthorized', 'Invalid access token field/s: the \'aud\' is invalid')
       end
     end
 
