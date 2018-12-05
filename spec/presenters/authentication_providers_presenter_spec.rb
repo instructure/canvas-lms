@@ -145,6 +145,12 @@ describe AuthenticationProvidersPresenter do
 
   describe "#sso_options" do
     it "always has cas and ldap" do
+      AuthenticationProvider.valid_auth_types.each do |auth_type|
+        klass = AuthenticationProvider.find_sti_class(auth_type)
+        next if klass == AuthenticationProvider::SAML
+        allow(klass).to receive(:enabled?).and_return(true)
+      end
+
       allow(AuthenticationProvider::SAML).to receive(:enabled?).and_return(false)
       presenter = described_class.new(stubbed_account)
       options = presenter.sso_options
@@ -153,7 +159,11 @@ describe AuthenticationProvidersPresenter do
     end
 
     it "includes saml if saml enabled" do
-      allow(AuthenticationProvider::SAML).to receive(:enabled?).and_return(true)
+      AuthenticationProvider.valid_auth_types.each do |auth_type|
+        klass = AuthenticationProvider.find_sti_class(auth_type)
+        allow(klass).to receive(:enabled?).and_return(true)
+      end
+
       presenter = described_class.new(stubbed_account)
       expect(presenter.sso_options).to include({name: 'SAML', value: 'saml'})
     end
