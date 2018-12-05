@@ -1,0 +1,29 @@
+<%
+  # Copyright (C) 2015 - present Instructure, Inc.
+  #
+  # This file is part of Canvas.
+  #
+  # Canvas is free software: you can redistribute it and/or modify it under
+  # the terms of the GNU Affero General Public License as published by the Free
+  # Software Foundation, version 3 of the License.
+  #
+  # Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+  # WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+  # A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+  # details.
+  #
+  # You should have received a copy of the GNU Affero General Public License along
+  # with this program. If not, see <http://www.gnu.org/licenses/>.
+%>
+
+<p><%= mt(<<-TEXT, wrap: { '*' => '<pre>\1</pre>' })
+Provide the URL to your SAML IdP Discovery Service that conforms to the
+*urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol* protocol.
+Additional SAML providers must also be configured to follow the response
+from the discovery service.
+       TEXT
+%></p>
+<div class="ic-Form-control">
+  <%= f.label :discovery_service_url, t('Discovery Service URL'), class: 'ic-Label', for: "discovery_service_url_#{presenter.id_suffix(aac)}" %>
+  <%= f.text_field :discovery_service_url, class: 'ic-Input', id: "discovery_service_url_#{presenter.id_suffix(aac)}" %>
+</div>
