@@ -85,10 +85,6 @@ module Types
 
     field :lock_info, LockInfoType, null: true
 
-    field :allowed_extensions, [String],
-      "permitted uploaded file extensions (e.g. ['doc', 'xls', 'txt'])",
-      null: true
-
     def lock_info
       Loaders::AssociationLoader.for(
         Assignment,
@@ -96,7 +92,7 @@ module Types
       ).load(assignment).then {
         assignment.low_level_locked_for?(current_user,
                                          check_policies: true,
-                                         context: assignment.context)
+                                         context: assignment.context) || {}
       }
     end
 
@@ -108,6 +104,10 @@ module Types
       return nil if assignment.allowed_attempts.nil? || assignment.allowed_attempts <= 0
       assignment.allowed_attempts
     end
+
+    field :allowed_extensions, [String],
+      "permitted uploaded file extensions (e.g. ['doc', 'xls', 'txt'])",
+      null: true
 
     field :muted, Boolean, method: :muted?, null: false
 
