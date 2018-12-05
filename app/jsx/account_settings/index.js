@@ -16,16 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Component} from 'react'
-import ReactDOM from 'react-dom'
+import React from 'react'
+import {render} from 'react-dom'
+import {Provider} from 'react-redux'
+import {ConnectedSecurityPanel} from './components/SecurityPanel'
+import {configStore, defaultState} from './store'
 
-// eslint-disable-next-line react/prefer-stateless-function
-class SecurityPanel extends Component {
-  render() {
-    return <div>This is a placeholder</div>
-  }
-}
+export function start(element, props = {}, state = defaultState) {
+  const store = configStore(state)
 
-export function start(element) {
-  ReactDOM.render(<SecurityPanel />, element)
+  render(
+    <Provider store={store}>
+      <ConnectedSecurityPanel {...props} />
+    </Provider>,
+    element
+  )
 }

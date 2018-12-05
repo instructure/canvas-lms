@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`setCspEnabledAction creates a SET_CSP_ENABLED action when passed a boolean value 1`] = `
+Object {
+  "payload": true,
+  "type": "SET_CSP_ENABLED",
+}
+`;
+
+exports[`setCspEnabledAction creates a SET_CSP_ENABLED_OPTIMISTIC action when optimistic option is given 1`] = `
+Object {
+  "payload": true,
+  "type": "SET_CSP_ENABLED_OPTIMISTIC",
+}
+`;
+
+exports[`setCspEnabledAction creates an error action if passed a non-boolean value 1`] = `
+Object {
+  "error": true,
+  "payload": [Error: Can only set to Boolean values],
+  "type": "SET_CSP_ENABLED",
+}
+`;

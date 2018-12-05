@@ -120,9 +120,13 @@ import './vendor/jquery.scrollTo'
     $("#account_settings_tabs").tabs({
       beforeActivate: (event, ui) => {
         if (ui.newTab.context.id === 'tab-security-link') {
-          import('jsx/account_settings/SecurityPanel')
+          import('jsx/account_settings')
             .then(({start}) => {
-              start(document.getElementById('tab-security'));
+              const splitContext = window.ENV.context_asset_string.split('_')
+              start(document.getElementById('tab-security'), {
+                context: splitContext[0],
+                contextId: splitContext[1]
+              });
           }).catch(() => {
             // We really should never get here... but if we do... do something.
             const $message = $('<div />').text('Security Tab failed to load')
