@@ -346,31 +346,25 @@ module AccountReports
         headers << I18n.t('created_by_sis')
       end
       sections = root_account.course_sections.
-        select("course_sections.*, nxc.sis_source_id AS non_x_course_sis_id,
-                rc.sis_source_id AS course_sis_id, nxc.id AS non_x_course_id,
-                ra.id AS r_account_id, ra.sis_source_id AS r_account_sis_id,
-                nxc.account_id AS nx_account_id, nxa.sis_source_id AS nx_account_sis_id").
+        select("course_sections.*,
+                rc.sis_source_id AS course_sis_id,
+                ra.id AS r_account_id, ra.sis_source_id AS r_account_sis_id").
         joins("INNER JOIN #{Course.quoted_table_name} AS rc ON course_sections.course_id = rc.id
-               INNER JOIN #{Account.quoted_table_name} AS ra ON rc.account_id = ra.id
-               LEFT OUTER JOIN #{Course.quoted_table_name} AS nxc ON course_sections.nonxlist_course_id = nxc.id
-               LEFT OUTER JOIN #{Account.quoted_table_name} AS nxa ON nxc.account_id = nxa.id")
+               INNER JOIN #{Account.quoted_table_name} AS ra ON rc.account_id = ra.id")
 
       if @include_deleted
         sections.where!("course_sections.workflow_state<>'deleted'
                            OR
                            (course_sections.sis_source_id IS NOT NULL
-                            AND (nxc.sis_source_id IS NOT NULL
-                                 OR rc.sis_source_id IS NOT NULL))")
+                            AND rc.sis_source_id IS NOT NULL)")
       else
         sections.where!("course_sections.workflow_state<>'deleted'
-                           AND (nxc.workflow_state<>'deleted'
-                                OR rc.workflow_state<>'deleted')")
+                           AND rc.workflow_state<>'deleted'")
       end
 
       if @sis_format
         sections = sections.where("course_sections.sis_source_id IS NOT NULL
-                                     AND (nxc.sis_source_id IS NOT NULL
-                                     OR rc.sis_source_id IS NOT NULL)")
+                                     AND rc.sis_source_id IS NOT NULL")
       end
 
       sections = sections.where.not(course_sections: {sis_batch_id: nil}) if @created_by_sis
@@ -382,13 +376,8 @@ module AccountReports
           row = []
           row << s.id unless @sis_format
           row << s.sis_source_id
-          if s.nonxlist_course_id.nil?
-            row << s.course_id unless @sis_format
-            row << s.course_sis_id
-          else
-            row << s.non_x_course_id unless @sis_format
-            row << s.non_x_course_sis_id
-          end
+          row << s.course_id unless @sis_format
+          row << s.course_sis_id
           row << s.integration_id
           row << s.name
           row << s.workflow_state
@@ -400,13 +389,8 @@ module AccountReports
             row << nil
           end
           unless @sis_format
-            if s.nonxlist_course_id == nil
-              row << s.r_account_id
-              row << s.r_account_sis_id
-            else
-              row << s.nx_account_id
-              row << s.nx_account_sis_id
-            end
+            row << s.r_account_id
+            row << s.r_account_sis_id
             row << s.sis_batch_id?
           end
           csv << row
