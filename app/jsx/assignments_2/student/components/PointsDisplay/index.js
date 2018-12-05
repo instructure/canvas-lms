@@ -23,63 +23,12 @@ import React from 'react'
 
 import Text from '@instructure/ui-elements/lib/components/Text'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 
-function renderPoints(receivedGrade, possiblePoints) {
-  let screenReaderPoints, displayPoints
-  if (receivedGrade === null || receivedGrade === undefined) {
-    screenReaderPoints = I18n.t('Ungraded')
-    displayPoints = '-'
-  } else {
-    screenReaderPoints = receivedGrade
-    displayPoints = receivedGrade
-  }
-
-  return (
-    <div>
-      <ScreenReaderContent>
-        {`${screenReaderPoints} ${I18n.t('out of')} ${possiblePoints} ${I18n.t('points')}`}
-      </ScreenReaderContent>
-
-      <Flex aria-hidden="true" direction="column" textAlign="end">
-        <FlexItem>
-          <Text size="x-large" data-test-id="points-display">
-            {displayPoints}/{possiblePoints}
-          </Text>
-        </FlexItem>
-        <FlexItem>
-          <Text>{I18n.t('Points')}</Text>
-        </FlexItem>
-      </Flex>
-    </div>
-  )
-}
-
-function renderPercent(receivedGrade) {
-  let screenReaderPoints, displayPoints
-  const convertedRecievedPoints = receivedGrade ? Number(receivedGrade.slice(0, -1)) : null // NOTE: percentage grade comes as a x% format
-  if (convertedRecievedPoints === null || convertedRecievedPoints === undefined) {
-    screenReaderPoints = I18n.t('Ungraded')
-    displayPoints = '-'
-  } else {
-    screenReaderPoints = receivedGrade
-    displayPoints = convertedRecievedPoints
-  }
-
-  return (
-    <div>
-      <ScreenReaderContent>{`${screenReaderPoints} ${I18n.t('percent')}`}</ScreenReaderContent>
-
-      <Flex aria-hidden="true" direction="column" textAlign="end">
-        <FlexItem>
-          <Text size="x-large" data-test-id="points-display">
-            {`${displayPoints}%`}
-          </Text>
-        </FlexItem>
-      </Flex>
-    </div>
-  )
-}
+import PointsDisplayPoints from './PointsDisplayPoints'
+import PointsDisplayPercent from './PointsDisplayPercent'
+import PointsDisplayComplete from './PointsDisplayComplete'
+import PointsDisplayLetter from './PointsDisplayLetter'
+import PointsDisplayGradingScheme from './PointsDisplayGradingScheme'
 
 function renderPointsPossible(possiblePoints) {
   return (
@@ -100,13 +49,16 @@ function PointsDisplay(props) {
 
   switch (displayAs) {
     case 'points':
-      return renderPoints(receivedGrade, possiblePoints)
+      return <PointsDisplayPoints receivedGrade={receivedGrade} possiblePoints={possiblePoints} />
     case 'percent':
-      return renderPercent(receivedGrade)
-    // NOTE: this is in another ticket where we handle these cases
+      return <PointsDisplayPercent receivedGrade={receivedGrade} />
     case 'pass_fail':
+      return <PointsDisplayComplete receivedGrade={receivedGrade} />
     case 'gpa_scale':
+      return <PointsDisplayGradingScheme receivedGrade={receivedGrade} />
     case 'letter_grade':
+      return <PointsDisplayLetter receivedGrade={receivedGrade} />
+    case 'points_possible':
       return renderPointsPossible(possiblePoints)
     case 'not_graded':
       return <div />

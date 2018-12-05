@@ -29,12 +29,12 @@ function renderContentBaseOnAvailability(assignment) {
   if (ENV && ENV.PREREQS && ENV.PREREQS.items && ENV.PREREQS.items.length !== 0) {
     const preReqItem = ENV.PREREQS.items[0] && ENV.PREREQS.items[0].prev
     return <MissingPrereqs preReqTitle={preReqItem.title} preReqLink={preReqItem.html_url} />
-  } else if (assignment.lockInfo.isLocked) {
+  } else if (assignment && assignment.lockInfo.isLocked) {
     return <LockedAssignment assignment={assignment} />
   } else {
     return (
       <React.Fragment>
-        <AssignmentToggleDetails description={assignment.description} />
+        <AssignmentToggleDetails description={assignment && assignment.description} />
         <ContentTabs />
       </React.Fragment>
     )

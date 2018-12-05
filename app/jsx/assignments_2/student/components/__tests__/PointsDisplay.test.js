@@ -91,40 +91,85 @@ it('renders correctly when displayType is percent', () => {
     <PointsDisplay receivedGrade="15%" possiblePoints={5} displayAs="percent" />,
     document.getElementById('fixtures')
   )
-  const textElement = $('[data-test-id="points-display"]')
+  const textElement = $('[data-test-id="percent-display"]')
   expect(textElement.text()).toEqual('15%')
 })
 
-it('renders percent correctly when no receivedGrade are set', () => {
+it('renders percent correctly when no grade is set', () => {
   ReactDOM.render(
     <PointsDisplay possiblePoints={5} displayAs="percent" />,
     document.getElementById('fixtures')
   )
-  const textElement = $('[data-test-id="points-display"]')
+  const textElement = $('[data-test-id="percent-display"]')
   expect(textElement.text()).toEqual('-%')
 })
 
-it('renders points possible when displayAs is grading scheme', () => {
+it('renders grading scheme correcty with grade', () => {
   ReactDOM.render(
-    <PointsDisplay receivedGrade={4} possiblePoints={5} displayAs="pass_fail" />,
+    <PointsDisplay receivedGrade="Absolutely Amazing" possiblePoints={5} displayAs="gpa_scale" />,
     document.getElementById('fixtures')
   )
-  const textElement = $('[data-test-id="points-possible-display"]')
-  expect(textElement.text()).toEqual('5 Points Possible')
+  const textElement = $('[data-test-id="grade-display"]')
+  expect(textElement.text()).toEqual('Absolutely Amazing')
 })
 
-it('renders Points Possible when displayAs is pass fail', () => {
+it('renders grading scheme correcty with no grade', () => {
   ReactDOM.render(
-    <PointsDisplay receivedGrade={4} possiblePoints={5} displayAs="gpa_scale" />,
+    <PointsDisplay possiblePoints={5} displayAs="gpa_scale" />,
     document.getElementById('fixtures')
   )
-  const textElement = $('[data-test-id="points-possible-display"]')
-  expect(textElement.text()).toEqual('5 Points Possible')
+  const textElement = $('[data-test-id="grade-display"]')
+  expect(textElement.text()).toEqual('-')
 })
 
-it('renders Points Possible when displayAs is letter grade', () => {
+it('renders pass fail correcty with grade', () => {
   ReactDOM.render(
-    <PointsDisplay receivedGrade={4} possiblePoints={5} displayAs="letter_grade" />,
+    <PointsDisplay receivedGrade="complete" possiblePoints={5} displayAs="pass_fail" />,
+    document.getElementById('fixtures')
+  )
+  const textElement = $('[data-test-id="grade-display"]')
+  expect(textElement.text()).toEqual('Complete')
+})
+
+it('renders pass fail correcty with incomplete grade', () => {
+  ReactDOM.render(
+    <PointsDisplay receivedGrade="incomplete" possiblePoints={100} displayAs="pass_fail" />,
+    document.getElementById('fixtures')
+  )
+  const textElement = $('[data-test-id="grade-display"]')
+  expect(textElement.text()).toEqual('Incomplete')
+})
+
+it('renders pass fail correcty with no grade', () => {
+  ReactDOM.render(
+    <PointsDisplay possiblePoints={5} displayAs="pass_fail" />,
+    document.getElementById('fixtures')
+  )
+  const textElement = $('[data-test-id="grade-display"]')
+  expect(textElement.text()).toEqual('Ungraded')
+})
+
+it('renders letter grade correctly with grade', () => {
+  ReactDOM.render(
+    <PointsDisplay receivedGrade="A" possiblePoints={5} displayAs="letter_grade" />,
+    document.getElementById('fixtures')
+  )
+  const textElement = $('[data-test-id="grade-display"]')
+  expect(textElement.text()).toEqual('A')
+})
+
+it('renders letter grade correctly with no grade', () => {
+  ReactDOM.render(
+    <PointsDisplay possiblePoints={5} displayAs="letter_grade" />,
+    document.getElementById('fixtures')
+  )
+  const textElement = $('[data-test-id="grade-display"]')
+  expect(textElement.text()).toEqual('-')
+})
+
+it('renders Points Possible when displayAs is points possible', () => {
+  ReactDOM.render(
+    <PointsDisplay receivedGrade={4} possiblePoints={5} displayAs="points_possible" />,
     document.getElementById('fixtures')
   )
   const textElement = $('[data-test-id="points-possible-display"]')
