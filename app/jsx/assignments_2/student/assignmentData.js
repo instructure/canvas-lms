@@ -37,6 +37,11 @@ export const STUDENT_VIEW_QUERY = gql`
         modules {
           name
         }
+        submissionsConnection(last: 1) {
+          nodes {
+            grade
+          }
+        }
       }
     }
   }
@@ -55,5 +60,12 @@ export const StudentAssignmentShape = shape({
   lockInfo: shape({
     isLocked: bool.isRequired
   }).isRequired,
-  modules: arrayOf(shape({name: string.isRequired})).isRequired
+  modules: arrayOf(shape({name: string.isRequired})).isRequired,
+  submissionsConnection: shape({
+    nodes: arrayOf(
+      shape({
+        grade: string
+      })
+    ).isRequired
+  }).isRequired
 })

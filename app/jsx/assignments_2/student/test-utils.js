@@ -41,6 +41,10 @@ export function mockAssignment(overrides = {}) {
       isLocked: true,
       __typename: 'LockInfo'
     },
+    submissionsConnection: {
+      nodes: [],
+      __typename: 'SubmissionConnection'
+    },
     __typename: 'Assignment',
     ...overrides
   }
