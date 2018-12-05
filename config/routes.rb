@@ -729,7 +729,7 @@ CanvasRails::Application.routes.draw do
   post 'login/cas' => 'login/cas#destroy', as: :cas_logout
   post 'login/cas/:id' => 'login/cas#destroy'
 
-  get 'login/saml' => 'login/saml#new'
+  get 'login/saml' => 'login/saml#new', as: :saml_login_base
   get 'login/saml/logout' => 'login/saml#destroy'
   # deprecated alias
   get 'saml_logout' => 'login/saml#destroy'
@@ -738,6 +738,9 @@ CanvasRails::Application.routes.draw do
   post 'login/saml' => 'login/saml#create'
   # deprecated alias; no longer advertised
   post 'saml_consume' => 'login/saml#create'
+
+  get 'login/saml_idp_discovery' => 'login/saml_idp_discovery#new'
+  get 'login/saml_idp_discovery/:id' => 'login/saml_idp_discovery#new', as: :saml_idp_discovery_login
 
   # the callback URL for all OAuth1.0a based SSO
   get 'login/oauth/callback' => 'login/oauth#create', as: :oauth_login_callback
