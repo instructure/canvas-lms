@@ -20,29 +20,25 @@ module Lti::Ims::Concerns
     extend ActiveSupport::Concern
 
     def validate_jwt
-      render_error(deep_linking_jwt.errors.first) and return unless deep_linking_jwt.valid?
+      render_error(deep_linking_jwt.errors) and return unless deep_linking_jwt.valid?
     end
 
     def deep_linking_jwt
       @deep_linking_jwt ||= DeepLinkingJwt.new(params[:JWT], @context)
     end
 
-    def render_error(message)
-      render json: { error: message }, status: :bad_request
+    def render_error(errors)
+      render json: errors, status: :bad_request
     end
 
     class DeepLinkingJwt
-      attr_reader :errors
+      include ActiveModel::Validations
+
+      validate :verified_jwt
 
       def initialize(raw_jwt_str, context)
         @raw_jwt_str = raw_jwt_str
         @context = context
-        @errors = []
-      end
-
-      def valid?
-        verified_jwt
-        @errors.length == 0
       end
 
       def [](key)
@@ -54,27 +50,27 @@ module Lti::Ims::Concerns
       def verified_jwt
         @verified_jwt ||= begin
           jwt_hash = JSON::JWT.decode(@raw_jwt_str, public_key)
-          @errors.concat(standard_claim_errors(jwt_hash))
-          @errors.concat(developer_key_errors)
+          standard_claim_errors(jwt_hash)
+          developer_key_errors
           return if @errors.present?
           jwt_hash
         rescue JSON::JWT::InvalidFormat
-          @errors << 'JWT format is invalid'
+          errors.add(:jwt, 'JWT format is invalid')
         rescue JSON::JWS::UnexpectedAlgorithm
-          @errors << 'JWT has unexpected alg'
+          errors.add(:jwt, 'JWT has unexpected alg')
         rescue JSON::JWS::VerificationFailed
-          @errors << 'JWT verification failure'
+          errors.add(:jwt, 'JWT verification failure')
         rescue JSON::JWT::Exception
-          @errors << 'JWT exception'
+          errors.add(:jwt, 'JWT exception')
         rescue ActiveRecord::RecordNotFound
-          @errors << 'Client not found'
+          errors.add(:jwt, 'Client not found')
         end
       end
 
       def standard_claim_errors(jwt_hash)
         hash = jwt_hash.dup
 
-        # The nonce nnd jti share the same purpose here
+        # The nonce and jti share the same purpose here
         hash['jti'] = hash['nonce']
 
         # Temporarily make the client ID the sub
@@ -86,15 +82,15 @@ module Lti::Ims::Concerns
           require_iss: true
         )
         validator.validate
-        validator.errors&.to_h&.values&.map(&:to_s) || []
+        validator.errors.to_h.each do |k, v|
+          errors.add(k, v.to_s)
+        end
       end
 
       def developer_key_errors
-        response = []
         account = @context.respond_to?(:account) ? @context.account : @context
-        response << 'Developer key inactive in context' unless developer_key.binding_on_in_account?(account)
-        response << 'Developer key inactive' unless developer_key.workflow_state == 'active'
-        response
+        errors.add(:developer_key, 'Developer key inactive in context') unless developer_key.binding_on_in_account?(account)
+        errors.add(:developer_key, 'Developer key inactive') unless developer_key.workflow_state == 'active'
       end
 
       def developer_key

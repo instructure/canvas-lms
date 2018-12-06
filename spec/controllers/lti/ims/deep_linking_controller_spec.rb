@@ -48,7 +48,7 @@ module Lti
 
           it 'responds with an error' do
             subject
-            expect(json_parse['error']).to eq response_message
+            expect(json_parse['errors'].to_s).to include response_message
           end
         end
 
