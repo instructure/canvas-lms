@@ -20,8 +20,11 @@ module Lti::Ims::Concerns
     extend ActiveSupport::Concern
 
     def validate_jwt
-      deep_linking_jwt = DeepLinkingJwt.new(params[:JWT], @context)
       render_error(deep_linking_jwt.errors.first) and return unless deep_linking_jwt.valid?
+    end
+
+    def deep_linking_jwt
+      @deep_linking_jwt ||= DeepLinkingJwt.new(params[:JWT], @context)
     end
 
     def render_error(message)

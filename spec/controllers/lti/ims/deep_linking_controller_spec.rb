@@ -30,6 +30,17 @@ module Lti
 
         it { is_expected.to be_ok }
 
+        it 'sets the JS ENV' do
+          expect(controller).to receive(:js_env).with(
+            content_items: content_items,
+            message: message,
+            log: '',
+            error_message: error_message,
+            error_log: ''
+          )
+          subject
+        end
+
         shared_examples_for 'errors' do
           let(:response_message) { raise 'set in examples' }
 
