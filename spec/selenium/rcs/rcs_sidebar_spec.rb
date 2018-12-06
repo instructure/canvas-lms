@@ -66,5 +66,18 @@ describe "RCS sidebar tests" do
         expect(wiki_body_anchor.attribute('href')).to include title
       end
     end
+
+    it "should click on sidebar assignment page to create link in body" do
+      title = "Assignment-Title"
+      @assignment = @course.assignments.create!(:name => title)
+
+      visit_front_page(@course)
+      click_assignments_accordion
+      click_sidebar_link(title)
+
+      in_frame wiki_page_body_ifr_id do
+        expect(wiki_body_anchor.attribute('href')).to include "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      end
+    end
   end
 end
