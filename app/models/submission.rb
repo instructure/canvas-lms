@@ -466,7 +466,7 @@ class Submission < ActiveRecord::Base
         user &&
         self.assessment_requests.map(&:assessor_id).include?(user.id)
     end
-    can :read and can :comment
+    can :read and can :comment and can :make_group_comment
 
     given { |user, session|
       can_view_plagiarism_report('turnitin', user, session)
@@ -2079,11 +2079,16 @@ class Submission < ActiveRecord::Base
   end
 
   def visible_submission_comments_for(current_user)
-    return all_submission_comments.for_groups if assignment.grade_as_group?
+    if assignment.grade_as_group?
+      return all_submission_comments.for_groups.select { |comment| comment.grants_right?(current_user, :read) }
+    end
+
     visible_users = users_with_visible_submission_comments(current_user)
 
     all_submission_comments.select do |submission_comment|
-      if assignment.muted? && user == current_user
+      if assignment.peer_reviews && !submission_comment.grants_right?(current_user, :read)
+        false
+      elsif assignment.muted? && user == current_user
         submission_comment.author == user
       elsif assignment.grades_published? && grader == submission_comment.author
         submission_comment.provisional_grade_id.nil?

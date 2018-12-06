@@ -211,6 +211,46 @@ describe Submission do
           end
         end
       end
+
+      describe "make_group_comment" do
+        let_once(:course) { Course.create! }
+        let_once(:student) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
+        let_once(:student2) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
+        let_once(:teacher) { course.enroll_user(User.create!, "TeacherEnrollment", enrollment_state: "active").user }
+
+        before(:once) do
+          all_groups = @course.group_categories.create!(name: "all groups")
+          all_groups.groups.create!(context: @course, name: "group 1").add_user(student)
+          all_groups.groups.create!(context: @course, name: "group 2").add_user(student2)
+
+          @group_assignment = course.assignments.create!(
+            grade_group_students_individually: false,
+            group_category: all_groups,
+            name: "group assignment"
+          )
+          @submission = @group_assignment.submissions.find_by(user: student)
+        end
+
+        it "allows a student to make a group comment for their own submission" do
+          expect(@submission.grants_right?(student, :make_group_comment)).to be true
+        end
+
+        it "allows a teacher to make a group comment" do
+          expect(@submission.grants_right?(teacher, :make_group_comment)).to be true
+        end
+
+        it "allows a peer reviewer to make a group comment for their assigned submission" do
+          @group_assignment.update!(peer_reviews: true)
+          peer_submission = @group_assignment.submissions.find_by(user: student2)
+          AssessmentRequest.create!(assessor: student2, assessor_asset: peer_submission, asset: @submission, user: student)
+          expect(@submission.grants_right?(student2, :make_group_comment)).to be true
+        end
+
+        it "does not allow a student not peer reviewing to make a group comment" do
+          @group_assignment.update!(peer_reviews: true)
+          expect(@submission.grants_right?(student2, :make_group_comment)).to be false
+        end
+      end
     end
   end
 
@@ -4765,10 +4805,28 @@ describe Submission do
       expect(comments).to match_array([@student_comment])
     end
 
+    context "peer review assignments" do
+      before(:once) do
+        assignment = @course.assignments.create!(name: "peer review assignment", peer_reviews: true)
+        @submission = assignment.submissions.find_by(user: @student)
+        @student2 = course_with_user("StudentEnrollment", course: @course, name: "Student2", active_all: true).user
+        student2_sub = assignment.submissions.find_by(user: @student2)
+        AssessmentRequest.create!(assessor: @student2, assessor_asset: student2_sub, asset: @submission, user: @student)
+        @submission.add_comment(author: @teacher, comment: "This teacher's comment should not appear")
+        @peer_review_comment = @submission.add_comment(author: @student2, comment: "A peer review's comment")
+      end
+
+      it "returns submission comments created by the peer reviewer" do
+        comments = @submission.visible_submission_comments_for(@student2)
+        expect(comments).to match_array([@peer_review_comment])
+      end
+    end
+
     context "when assignment is graded as a group" do
+      let_once(:all_groups) { @course.group_categories.create!(name: "all groups") }
+
       before(:once) do
         student2 = course_with_user("StudentEnrollment", course: @course, name: "Student2", active_all: true).user
-        all_groups = @course.group_categories.create!(name: "all groups")
         group1 = all_groups.groups.create!(context: @course)
         group1.add_user(@student)
         group1.add_user(student2)
@@ -4786,6 +4844,48 @@ describe Submission do
         comments = @submission.visible_submission_comments_for(@teacher)
         expect(comments).to match_array([@student_comment, @student2_comment])
       end
+
+      context "has peer reviews" do
+        before(:once) do
+          @student = @course.enroll_student(User.create!, enrollment_state: "active").user
+          @student2 = @course.enroll_student(User.create!, enrollment_state: "active").user
+          all_groups.groups.create!(context: @course).add_user(@student)
+          all_groups.groups.create!(context: @course).add_user(@student2)
+          assignment = @course.assignments.create!(
+            grade_group_students_individually: false,
+            group_category: all_groups,
+            name: "group assignment",
+            peer_reviews: true
+          )
+          @submission = assignment.submissions.find_by(user: @student)
+          student2_sub = assignment.submissions.find_by(user: @student2)
+          AssessmentRequest.create!(
+            assessor: @student2,
+            assessor_asset: student2_sub,
+            asset: @submission,
+            user: @student
+          )
+          @peer_review_comment = @submission.add_comment(author: @student2, comment: "Student2", group_comment_id: "ab")
+          @student_comment = @submission.add_comment(author: @student, comment: "Student", group_comment_id: "ac")
+          @teacher_comment = @submission.add_comment(author: @teacher, comment: "Teacher", group_comment_id: "ad")
+        end
+
+        it "peer reviewers can see only their own comments" do
+          comments = @submission.visible_submission_comments_for(@student2)
+          expect(comments).to match_array([@peer_review_comment])
+        end
+
+        it "students see all comments" do
+          comments = @submission.visible_submission_comments_for(@student)
+          expect(comments).to match_array([@peer_review_comment, @student_comment, @teacher_comment])
+        end
+
+        it "teachers see all comments" do
+          comments = @submission.visible_submission_comments_for(@teacher)
+          expect(comments).to match_array([@peer_review_comment, @student_comment, @teacher_comment])
+        end
+      end
+
     end
 
     context "for a moderated assignment" do

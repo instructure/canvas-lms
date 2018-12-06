@@ -550,7 +550,7 @@ nn:
         Anonymous: Anonym
         Assignment: Oppgåve
         Course: Emne
-        Grader: Karaktersetjing
+        Grader: Karaktersetjar
         Student: Student
         To: Til
         date: Dato
@@ -17043,7 +17043,7 @@ nn:
   to_do_1d554f36: Gjeremål
   to_do_5526f10a: "Gjeremål: "
   to_do_items_loading_d1cdfcd5: "Lastar innhald i gjeremålslista"
-  to_do_list_dashboard_d741f64e: "Dashbord for gjeremål"
+  to_do_list_dashboard_d741f64e: "Dashbord med gjeremålsliste"
   to_link_the_course_observer_name_to_a_student_star_f993c826: "Om du vil lenke emneobservatøren *%{name}* til ein student, kan du skrive og finne studenten sitt namn nedanfor og deretter klikke på Oppdater."
   to_minscore_43e5452e: "to %{minScore}%"
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: "For å førehandvise endringar i temaredigeringsprogrammet, må du *slå av høgkontrast-UI*."
@@ -17234,7 +17234,7 @@ nn:
       Last opp emnefiler, pensum, litteraturlister eller andre dokument.
       Lås mapper så dei er skjult for studentane. Legg til filer i modular,
       oppgåver, diskusjonar eller emnesider.
-  upload_data_dc4fa4cb: "Lat opp data"
+  upload_data_dc4fa4cb: "Last opp data"
   upload_drop_zone: 
     drop_to_upload: "Slepp element for opplasting"
   upload_failed_quota_exceeded_ff3af659: "Opplastinga mislukkast, lagringskvote er overskriden"
