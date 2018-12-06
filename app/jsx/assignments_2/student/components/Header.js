@@ -18,6 +18,8 @@
 
 import React from 'react'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
+import Heading from '@instructure/ui-elements/lib/components/Heading'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 
 import AssignmentGroupModuleNav from './AssignmentGroupModuleNav'
 import DateTitle from './DateTitle'
@@ -42,6 +44,13 @@ function Header(props) {
   }
   return (
     <div data-test-id="assignments-2-student-header">
+      <Heading level="h1">
+        {/* We hide this because in the designs, what visually looks like should
+            be the h1 appears after the group/module links, but we need the
+            h1 to actually come before them for a11y */}
+        <ScreenReaderContent> {props.assignment.name} </ScreenReaderContent>
+      </Heading>
+
       <AssignmentGroupModuleNav
         module={{
           name: 'Egypt Economy Research Module: Week 1',

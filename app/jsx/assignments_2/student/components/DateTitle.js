@@ -31,7 +31,7 @@ function DateTitle(props) {
 
   return (
     <React.Fragment>
-      <Heading level="h1" as="h1" data-test-id="title" margin="0 0 x-small">
+      <Heading level="h1" as="h2" data-test-id="title" margin="0 0 x-small">
         {assignment.name}
       </Heading>
       {assignment.dueAt && (
