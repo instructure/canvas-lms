@@ -100,6 +100,15 @@ module Types
       }
     end
 
+    field :allowed_attempts, Int,
+      "The number of submission attempts a student can make for this assignment. null implies unlimited.",
+      null: true
+
+    def allowed_attempts
+      return nil if assignment.allowed_attempts.nil? || assignment.allowed_attempts <= 0
+      assignment.allowed_attempts
+    end
+
     field :muted, Boolean, method: :muted?, null: false
 
     field :state, AssignmentStateType, method: :workflow_state, null: false

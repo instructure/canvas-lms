@@ -7,6 +7,9 @@ type Assignment implements Node & Timestamped {
   # legacy canvas id
   _id: ID!
 
+  # The number of submission attempts a student can make for this assignment. null implies unlimited.
+  allowedAttempts: Int
+
   # permitted uploaded file extensions (e.g. ['doc', 'xls', 'txt'])
   allowedExtensions: [String!]
   assignmentGroup: AssignmentGroup
