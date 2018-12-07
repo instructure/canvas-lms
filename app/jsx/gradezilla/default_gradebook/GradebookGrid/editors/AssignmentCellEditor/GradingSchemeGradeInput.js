@@ -224,7 +224,12 @@ export default class GradingSchemeInput extends Component {
             onSelect={this.handleSelect}
             placement="bottom"
             trigger={
-              <Button buttonRef={this.bindButton} disabled={this.props.disabled} size="small" variant="icon">
+              <Button
+                buttonRef={this.bindButton}
+                disabled={this.props.disabled}
+                size="small"
+                variant="icon"
+              >
                 <IconArrowOpenDownLine title={I18n.t('Open Grading Scheme menu')} />
               </Button>
             }

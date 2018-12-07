@@ -107,10 +107,7 @@ export default class AssignmentRowCell extends Component {
     const submissionFinishedUpdating =
       prevProps.submissionIsUpdating && !this.props.submissionIsUpdating
 
-    if (
-      submissionFinishedUpdating &&
-      this.trayButton !== document.activeElement
-    ) {
+    if (submissionFinishedUpdating && this.trayButton !== document.activeElement) {
       // the cell was reactivated while the grade was updating
       // set the focus on the input by default
       this.gradeInput.focus()

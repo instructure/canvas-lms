@@ -19,7 +19,7 @@
 import {createGradebook} from '../../GradebookSpecHelper'
 import TotalGradeOverrideCellFormatter from 'jsx/gradezilla/default_gradebook/GradebookGrid/formatters/TotalGradeOverrideCellFormatter'
 
-QUnit.module('TotalGradeOverrideCellFormatter', hooks => {
+QUnit.module('GradebookGrid TotalGradeOverrideCellFormatter', hooks => {
   let $fixture
   let finalGradeOverrides
   let formatter

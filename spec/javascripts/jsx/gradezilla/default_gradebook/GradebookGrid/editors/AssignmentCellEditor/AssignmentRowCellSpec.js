@@ -16,30 +16,29 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { mount } from 'enzyme';
-import AssignmentRowCell
-from 'jsx/gradezilla/default_gradebook/GradebookGrid/editors/AssignmentCellEditor/AssignmentRowCell'
+import React from 'react'
+import {mount} from 'enzyme'
+import AssignmentRowCell from 'jsx/gradezilla/default_gradebook/GradebookGrid/editors/AssignmentCellEditor/AssignmentRowCell'
 
-QUnit.module('AssignmentRowCell', (suiteHooks) => {
-  let $container;
-  let props;
-  let wrapper;
+QUnit.module('GradebookGrid AssignmentRowCell', suiteHooks => {
+  let $container
+  let props
+  let wrapper
 
-  function mountComponent () {
-    return mount(<AssignmentRowCell {...props} />, { attachTo: $container });
+  function mountComponent() {
+    return mount(<AssignmentRowCell {...props} />, {attachTo: $container})
   }
 
-  function simulateKeyDown (keyCode, shiftKey = false) {
-    const event = new Event('keydown');
+  function simulateKeyDown(keyCode, shiftKey = false) {
+    const event = new Event('keydown')
     event.which = keyCode
-    event.shiftKey = shiftKey;
-    return wrapper.instance().handleKeyDown(event);
+    event.shiftKey = shiftKey
+    return wrapper.instance().handleKeyDown(event)
   }
 
   suiteHooks.beforeEach(() => {
-    $container = document.createElement('div');
-    document.body.appendChild($container);
+    $container = document.createElement('div')
+    document.body.appendChild($container)
 
     props = {
       assignment: {
@@ -58,9 +57,11 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
           }
         },
         grid: {},
-        item: { // student row object
+        item: {
+          // student row object
           id: '1101',
-          assignment_2301: { // submission
+          assignment_2301: {
+            // submission
             user_id: '1101'
           }
         }
@@ -79,15 +80,15 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
         userId: '1101'
       },
       submissionIsUpdating: false
-    };
-  });
+    }
+  })
 
   suiteHooks.afterEach(() => {
-    wrapper.unmount();
-    $container.remove();
-  });
+    wrapper.unmount()
+    $container.remove()
+  })
 
-  QUnit.module('#render', () => {
+  QUnit.module('#render()', () => {
     test('assigns a reference to its child SubmissionCell container', () => {
       wrapper = mountComponent()
       const $el = wrapper.getDOMNode()
@@ -288,10 +289,10 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
         wrapper = mountComponent()
         strictEqual(wrapper.find('.Grid__AssignmentRowCell').hasClass('passFail'), true)
       })
-    });
-  });
+    })
+  })
 
-  QUnit.module('#handleKeyDown', () => {
+  QUnit.module('#handleKeyDown()', () => {
     QUnit.module('with a GradeInput', hooks => {
       hooks.beforeEach(() => {
         props.assignment.gradingType = 'points'
@@ -374,9 +375,9 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
         })
       })
     })
-  });
+  })
 
-  QUnit.module('#focus', () => {
+  QUnit.module('#focus()', () => {
     test('sets focus on the text input, if one exists, for a GradeInput', () => {
       props.assignment.gradingType = 'points'
       wrapper = mountComponent()
@@ -394,7 +395,7 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
     })
   })
 
-  QUnit.module('#isValueChanged', () => {
+  QUnit.module('#isValueChanged()', () => {
     test('delegates to the "hasGradeChanged" method for a GradeInput', () => {
       props.assignment.gradingType = 'points'
       wrapper = mountComponent()
@@ -408,20 +409,35 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
       props.submissionIsUpdating = true
       wrapper = mountComponent()
       wrapper.setProps({submissionIsUpdating: false})
-      strictEqual(document.activeElement, wrapper.find('input').at(0).getDOMNode())
+      strictEqual(
+        document.activeElement,
+        wrapper
+          .find('input')
+          .at(0)
+          .getDOMNode()
+      )
     })
 
     test('does not set focus on the grade input when the submission has not finished updating', () => {
       props.submissionIsUpdating = true
       wrapper = mountComponent()
       wrapper.setProps({submissionIsUpdating: true})
-      notStrictEqual(document.activeElement, wrapper.find('input').at(0).getDOMNode())
+      notStrictEqual(
+        document.activeElement,
+        wrapper
+          .find('input')
+          .at(0)
+          .getDOMNode()
+      )
     })
 
     test('does not set focus on the grade input when the tray button has focus', () => {
       props.submissionIsUpdating = true
       wrapper = mountComponent()
-      const button = wrapper.find('button').at(0).getDOMNode()
+      const button = wrapper
+        .find('button')
+        .at(0)
+        .getDOMNode()
       button.focus()
       wrapper.setProps({submissionIsUpdating: false})
       strictEqual(document.activeElement, button)
@@ -444,17 +460,17 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
     })
 
     test('calls onToggleSubmissionTrayOpen when clicked', () => {
-      props.onToggleSubmissionTrayOpen = sinon.stub();
-      wrapper = mountComponent();
+      props.onToggleSubmissionTrayOpen = sinon.stub()
+      wrapper = mountComponent()
       wrapper.find(buttonSelector).simulate('click')
-      strictEqual(props.onToggleSubmissionTrayOpen.callCount, 1);
-    });
+      strictEqual(props.onToggleSubmissionTrayOpen.callCount, 1)
+    })
 
     test('calls onToggleSubmissionTrayOpen with the student id and assignment id', () => {
-      props.onToggleSubmissionTrayOpen = sinon.stub();
-      wrapper = mountComponent();
+      props.onToggleSubmissionTrayOpen = sinon.stub()
+      wrapper = mountComponent()
       wrapper.find(buttonSelector).simulate('click')
-      deepEqual(props.onToggleSubmissionTrayOpen.getCall(0).args, ['1101', '2301']);
-    });
-  });
-});
+      deepEqual(props.onToggleSubmissionTrayOpen.getCall(0).args, ['1101', '2301'])
+    })
+  })
+})

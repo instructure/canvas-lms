@@ -19,17 +19,17 @@
 // xsslint safeString.method I18n.t
 
 import I18n from 'i18n!gradebook'
-import htmlEscape from 'str/htmlEscape';
-import { extractDataTurnitin } from 'compiled/gradezilla/Turnitin';
-import GradeFormatHelper from '../../../../gradebook/shared/helpers/GradeFormatHelper';
+import htmlEscape from 'str/htmlEscape'
+import {extractDataTurnitin} from 'compiled/gradezilla/Turnitin'
+import GradeFormatHelper from '../../../../gradebook/shared/helpers/GradeFormatHelper'
 import {classNamesForAssignmentCell} from './CellStyles'
 
-function getTurnitinState (submission) {
-  const turnitin = extractDataTurnitin(submission);
+function getTurnitinState(submission) {
+  const turnitin = extractDataTurnitin(submission)
   if (turnitin) {
-    return htmlEscape(turnitin.state);
+    return htmlEscape(turnitin.state)
   }
-  return null;
+  return null
 }
 
 function needsGrading(submission, pendingGradeInfo) {
@@ -38,26 +38,27 @@ function needsGrading(submission, pendingGradeInfo) {
   }
 
   if (submission.excused || !submission.submission_type) {
-    return false;
+    return false
   }
 
-  return submission.workflow_state === 'pending_review' || (
+  return (
+    submission.workflow_state === 'pending_review' ||
     // the submission exists and/or has been graded
-    ['submitted', 'graded'].includes(submission.workflow_state) &&
-    // the score has been cleared, or the submission has been resubmitted
-    (submission.score == null || submission.grade_matches_current_submission === false)
-  );
+    (['submitted', 'graded'].includes(submission.workflow_state) &&
+      // the score has been cleared, or the submission has been resubmitted
+      (submission.score == null || submission.grade_matches_current_submission === false))
+  )
 }
 
-function formatGrade (submissionData, assignment, options) {
+function formatGrade(submissionData, assignment, options) {
   const formatOptions = {
     formatType: options.getEnterGradesAsSetting(assignment.id),
     gradingScheme: options.getGradingSchemeData(assignment.id),
     pointsPossible: assignment.points_possible,
     version: 'final'
-  };
+  }
 
-  return GradeFormatHelper.formatSubmissionGrade(submissionData, formatOptions);
+  return GradeFormatHelper.formatSubmissionGrade(submissionData, formatOptions)
 }
 
 function renderStartContainer(options) {
@@ -75,21 +76,21 @@ function renderTemplate(grade, options = {}) {
   let content = grade
 
   if (options.classNames) {
-    classNames = [...classNames, ...options.classNames];
+    classNames = [...classNames, ...options.classNames]
   }
 
   if (options.dimmed) {
-    classNames.push('grayed-out');
+    classNames.push('grayed-out')
   }
 
   if (options.disabled) {
-    classNames.push('cannot_edit');
+    classNames.push('cannot_edit')
   }
 
   if (options.turnitinState) {
-    classNames.push('turnitin');
+    classNames.push('turnitin')
     // xsslint safeString.property turnitinState
-    content += `<span class="gradebook-cell-turnitin ${options.turnitinState}-score" />`;
+    content += `<span class="gradebook-cell-turnitin ${options.turnitinState}-score" />`
   }
 
   // xsslint safeString.identifier content
@@ -104,51 +105,51 @@ function renderTemplate(grade, options = {}) {
 }
 
 export default class AssignmentCellFormatter {
-  constructor (gradebook) {
+  constructor(gradebook) {
     this.options = {
-      getAssignment (assignmentId) {
-        return gradebook.getAssignment(assignmentId);
+      getAssignment(assignmentId) {
+        return gradebook.getAssignment(assignmentId)
       },
-      getEnterGradesAsSetting (assignmentId) {
-        return gradebook.getEnterGradesAsSetting(assignmentId);
+      getEnterGradesAsSetting(assignmentId) {
+        return gradebook.getEnterGradesAsSetting(assignmentId)
       },
-      getGradingSchemeData (assignmentId) {
-        return gradebook.getAssignmentGradingScheme(assignmentId).data;
+      getGradingSchemeData(assignmentId) {
+        return gradebook.getAssignmentGradingScheme(assignmentId).data
       },
       getPendingGradeInfo(submission) {
         return gradebook.getPendingGradeInfo(submission)
       },
-      getStudent (studentId) {
-        return gradebook.student(studentId);
+      getStudent(studentId) {
+        return gradebook.student(studentId)
       },
-      getSubmissionState (submission) {
-        return gradebook.submissionStateMap.getSubmissionState(submission);
+      getSubmissionState(submission) {
+        return gradebook.submissionStateMap.getSubmissionState(submission)
       }
-    };
+    }
   }
 
   render = (row, cell, submission /* value */, _columnDef, student /* dataContext */) => {
-    let submissionState;
+    let submissionState
     if (submission) {
-      submissionState = this.options.getSubmissionState(submission);
+      submissionState = this.options.getSubmissionState(submission)
     }
 
     if (!student.loaded || !student.initialized || !submissionState) {
-      return renderTemplate('');
+      return renderTemplate('')
     }
 
     if (submissionState.hideGrade) {
-      return renderTemplate('', { dimmed: true });
+      return renderTemplate('', {dimmed: true})
     }
 
-    const assignment = this.options.getAssignment(submission.assignment_id);
+    const assignment = this.options.getAssignment(submission.assignment_id)
 
     const assignmentData = {
       id: assignment.id,
       muted: assignment.muted,
       pointsPossible: assignment.points_possible,
       submissionTypes: assignment.submission_types
-    };
+    }
 
     const submissionData = {
       dropped: submission.drop,
@@ -158,7 +159,7 @@ export default class AssignmentCellFormatter {
       missing: submission.missing,
       resubmitted: submission.grade_matches_current_submission === false,
       score: submission.score
-    };
+    }
 
     const pendingGradeInfo = this.options.getPendingGradeInfo({
       assignmentId: assignment.id,
@@ -176,7 +177,7 @@ export default class AssignmentCellFormatter {
       hidden: submissionState.hideGrade,
       invalid: !!pendingGradeInfo && !pendingGradeInfo.valid,
       turnitinState: getTurnitinState(submission)
-    };
+    }
 
     if (needsGrading(submission, pendingGradeInfo)) {
       const text = `<span class="screenreader-only">${I18n.t('Needs Grading')}</span>`
@@ -206,5 +207,5 @@ export default class AssignmentCellFormatter {
     }
 
     return renderTemplate(htmlEscape(grade), options)
-  };
+  }
 }

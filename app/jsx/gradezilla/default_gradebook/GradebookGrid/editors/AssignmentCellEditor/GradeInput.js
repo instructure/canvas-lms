@@ -32,7 +32,7 @@ const CLASSNAME_FOR_ENTER_GRADES_AS = {
 }
 
 function inputComponentFor(enterGradesAs) {
-  switch(enterGradesAs) {
+  switch (enterGradesAs) {
     case 'gradingScheme': {
       return GradingSchemeGradeInput
     }

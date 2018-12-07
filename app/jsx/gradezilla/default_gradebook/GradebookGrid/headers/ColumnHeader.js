@@ -16,32 +16,31 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { func } from 'prop-types';
+import React from 'react'
+import {func} from 'prop-types'
 
 export default class ColumnHeader extends React.Component {
   static propTypes = {
     addGradebookElement: func,
     removeGradebookElement: func,
     onHeaderKeyDown: func
-  };
+  }
 
   static defaultProps = {
-    addGradebookElement () {},
-    removeGradebookElement () {},
-    onHeaderKeyDown () {}
-  };
+    addGradebookElement() {},
+    removeGradebookElement() {},
+    onHeaderKeyDown() {}
+  }
 
-  constructor (props) {
-    super(props);
+  constructor(props) {
+    super(props)
 
     this.handleBlur = this.handleBlur.bind(this)
     this.handleFocus = this.handleFocus.bind(this)
-    this.handleKeyDown = this.handleKeyDown.bind(this);
+    this.handleKeyDown = this.handleKeyDown.bind(this)
 
     this.state = {
-      hasFocus: false,
+      hasFocus: false, // eslint-disable-line react/no-unused-state
       menuShown: false,
       skipFocusOnClose: false
     }
@@ -50,77 +49,79 @@ export default class ColumnHeader extends React.Component {
   bindFlyoutMenu = (ref, name) => {
     if (ref) {
       this[name] = ref
-      this.props.addGradebookElement(ref);
-      ref.addEventListener('keydown', this.handleMenuKeyDown);
+      this.props.addGradebookElement(ref)
+      ref.addEventListener('keydown', this.handleMenuKeyDown)
     } else if (this[name]) {
-      this.props.removeGradebookElement(this[name]);
+      this.props.removeGradebookElement(this[name])
     }
   }
 
-  bindSortByMenuContent = (ref) => {
-    this.bindFlyoutMenu(ref, 'sortByMenuContent');
-  };
+  bindSortByMenuContent = ref => {
+    this.bindFlyoutMenu(ref, 'sortByMenuContent')
+  }
 
-  bindOptionsMenuContent = (ref) => {
-    this.bindFlyoutMenu(ref, 'optionsMenuContent');
-  };
+  bindOptionsMenuContent = ref => {
+    this.bindFlyoutMenu(ref, 'optionsMenuContent')
+  }
 
   focusAtStart = () => {
     if (this.optionsMenuTrigger) {
-      this.optionsMenuTrigger.focus();
+      this.optionsMenuTrigger.focus()
     }
-  };
+  }
 
   focusAtEnd = () => {
     if (this.optionsMenuTrigger) {
-      this.optionsMenuTrigger.focus();
+      this.optionsMenuTrigger.focus()
     }
-  };
+  }
 
   handleBlur() {
-    this.setState({hasFocus: false})
+    this.setState({hasFocus: false}) // eslint-disable-line react/no-unused-state
   }
 
   handleFocus() {
-    this.setState({hasFocus: true})
+    this.setState({hasFocus: true}) // eslint-disable-line react/no-unused-state
   }
 
-  onToggle = (menuShown) => {
-    const newState = { menuShown };
-    let callback;
+  onToggle = menuShown => {
+    const newState = {menuShown}
+    let callback
 
     if (this.state.menuShown && !menuShown) {
       if (this.state.skipFocusOnClose) {
-        newState.skipMenuOnClose = false;
+        newState.skipMenuOnClose = false
       } else {
-        callback = this.focusAtEnd;
+        callback = this.focusAtEnd
       }
     }
 
     if (!this.state.menuShown && menuShown) {
-      newState.skipFocusOnClose = false;
+      newState.skipFocusOnClose = false
     }
 
-    this.setState(newState, callback);
-  };
+    this.setState(newState, callback)
+  }
 
-  handleMenuKeyDown = (event) => {
-    if (event.which === 9) { // Tab
-      this.setState({ menuShown: false, skipFocusOnClose: true });
-      this.props.onHeaderKeyDown(event);
-      return false;
+  handleMenuKeyDown = event => {
+    if (event.which === 9) {
+      // Tab
+      this.setState({menuShown: false, skipFocusOnClose: true})
+      this.props.onHeaderKeyDown(event)
+      return false
     }
-    return true;
-  };
+    return true
+  }
 
-  handleKeyDown (event) {
+  handleKeyDown(event) {
     if (document.activeElement === this.optionsMenuTrigger) {
-      if (event.which === 13) { // Enter
-        this.optionsMenuTrigger.click();
-        return false; // prevent Grid behavior
+      if (event.which === 13) {
+        // Enter
+        this.optionsMenuTrigger.click()
+        return false // prevent Grid behavior
       }
     }
 
-    return undefined;
+    return undefined
   }
 }
