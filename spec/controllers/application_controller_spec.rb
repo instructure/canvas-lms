@@ -27,7 +27,8 @@ RSpec.describe ApplicationController do
       headers: {},
       format: double(:html? => true),
       user_agent: nil,
-      remote_ip: '0.0.0.0'
+      remote_ip: '0.0.0.0',
+      base_url: 'https://canvas.test'
     )
     allow(controller).to receive(:request).and_return(request_double)
   end
@@ -161,6 +162,10 @@ RSpec.describe ApplicationController do
         "midi *",
         "encrypted-media *"
       ]
+    end
+
+    it 'sets DEEP_LINKING_POST_MESSAGE_ORIGIN' do
+      expect(@controller.js_env[:DEEP_LINKING_POST_MESSAGE_ORIGIN]).to eq @controller.request.base_url
     end
 
     context "sharding" do

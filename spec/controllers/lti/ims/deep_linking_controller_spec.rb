@@ -34,9 +34,9 @@ module Lti
           expect(controller).to receive(:js_env).with(
             content_items: content_items,
             message: message,
-            log: '',
+            log: log,
             error_message: error_message,
-            error_log: ''
+            error_log: error_log
           )
           subject
         end
