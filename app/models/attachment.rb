@@ -1520,7 +1520,10 @@ class Attachment < ActiveRecord::Base
 
   def restore
     self.file_state = 'available'
-    self.save
+    if self.save
+      self.handle_duplicates(:rename)
+    end
+    true
   end
 
   def deleted?
