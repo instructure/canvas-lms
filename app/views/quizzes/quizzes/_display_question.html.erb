@@ -345,8 +345,8 @@
                     matched_answer = a if hash_get(a, :numerical_answer_type) == 'exact_answer' && val <= (hash_get(a, :exact) + hash_get(a, :margin, 0)) && val >= (hash_get(a, :exact) - hash_get(a, :margin, 0))
                     matched_answer = a if hash_get(a, :numerical_answer_type) == 'range_answer' && val <= hash_get(a, :end) && val >= hash_get(a, :start)
                     if hash_get(a, :numerical_answer_type) == 'precision_answer'
-                      submission = BigDecimal.new(val, 16).split
-                      expected = BigDecimal.new(a[:approximate].to_s, 16).split
+                      submission = BigDecimal(val, 16).split
+                      expected = BigDecimal(a[:approximate].to_s, 16).split
                       precision = a[:precision].to_i
                       matched_answer = a if submission[0] == expected[0] && submission[1][0, precision] == expected[1][0, precision] && submission[3] == expected[3]
                     end

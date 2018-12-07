@@ -42,9 +42,9 @@ module Quizzes::QuizQuestion::AnswerSerializers
       #
       # @return [BigDecimal]
       def to_decimal(value)
-        BigDecimal.new(value.to_s)
+        BigDecimal(value.to_s)
       rescue ArgumentError
-        BigDecimal.new('0.0')
+        BigDecimal('0.0')
       end
 
       def to_boolean(flag)

@@ -1244,7 +1244,7 @@ class Assignment < ActiveRecord::Base
       result = passed ? "complete" : "incomplete"
     when "letter_grade", "gpa_scale"
       if self.points_possible.to_f > 0.0
-        score = BigDecimal.new(score.to_s.presence || '0.0') / BigDecimal.new(points_possible.to_s)
+        score = BigDecimal(score.to_s.presence || '0.0') / BigDecimal(points_possible.to_s)
         result = grading_standard_or_default.score_to_grade((score * 100).to_f)
       elsif given_grade
         # the score for a zero-point letter_grade assignment could be considered

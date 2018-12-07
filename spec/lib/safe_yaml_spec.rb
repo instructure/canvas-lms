@@ -193,7 +193,7 @@ YAML
   end
 
   it "should be able to dump and load BigDecimals" do
-    hash = {blah: BigDecimal.new("1.2")}
+    hash = {blah: BigDecimal("1.2")}
     expect(YAML.load(YAML.dump(hash))).to eq hash
   end
 
