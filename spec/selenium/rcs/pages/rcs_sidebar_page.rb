@@ -28,6 +28,10 @@ module RCSSidebarPage
     fj('button:contains("Assignments")')
   end
 
+  def quizzes_accordion_button
+    fj('button:contains("Quizzes")')
+  end
+
   def new_page_link
     f('#rcs-LinkToNewPage-btn-link')
   end
@@ -56,6 +60,10 @@ module RCSSidebarPage
 
   def click_assignments_accordion
     assignments_accordion_button.click
+  end
+
+  def click_quizzes_accordion
+    quizzes_accordion_button.click
   end
 
   def click_new_page_link

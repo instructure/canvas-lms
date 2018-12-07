@@ -79,5 +79,18 @@ describe "RCS sidebar tests" do
         expect(wiki_body_anchor.attribute('href')).to include "/courses/#{@course.id}/assignments/#{@assignment.id}"
       end
     end
+
+    it "should click on sidebar quizzes page to create link in body" do
+      title = "Quiz-Title"
+      @quiz = @course.quizzes.create!(:workflow_state => "available", :title => title)
+
+      visit_front_page(@course)
+      click_quizzes_accordion
+      click_sidebar_link(title)
+
+      in_frame wiki_page_body_ifr_id do
+        expect(wiki_body_anchor.attribute('href')).to include "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+      end
+    end
   end
 end
