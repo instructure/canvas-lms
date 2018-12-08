@@ -54,6 +54,10 @@ define [
   RCEKeyboardShortcuts, ConditionalRelease, deparam, SisValidationHelper,
   SimilarityDetectionTools, ModeratedGradingFormFieldGroup, AssignmentExternalTools) ->
 
+  ###
+  xsslint safeString.identifier srOnly
+  ###
+
   RichContentEditor.preloadRemoteModule()
 
   class EditView extends ValidatedFormView
@@ -188,8 +192,13 @@ define [
 
     checkboxAccessibleAdvisory: (box) ->
       label = box.parent()
-      advisory = label.find('span.screenreader-only.accessible_label')
-      advisory = $('<span class="screenreader-only accessible_label"></span>').appendTo(label) unless advisory.length
+      srOnly = if box == @$peerReviewsBox || box == @$groupCategoryBox || box == @$anonymousGradingBox
+        ""
+      else
+        "screenreader-only"
+
+      advisory = label.find('div.accessible_label')
+      advisory = $("<div class='#{srOnly} accessible_label' style='font-size: 0.9em'></div>").appendTo(label) unless advisory.length
       advisory
 
     setImplicitCheckboxValue: (box, value) ->

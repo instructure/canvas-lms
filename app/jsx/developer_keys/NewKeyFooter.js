@@ -27,7 +27,7 @@ const NewKeyFooter = props => {
   return (
     <ModalFooter>
       <Button onClick={props.onCancelClick}>{I18n.t('Cancel')}</Button>&nbsp;
-      <Button onClick={props.onSaveClick} variant="primary">
+      <Button onClick={props.onSaveClick} variant="primary" disabled={props.disable}>
         {I18n.t('Save Key')}
       </Button>
     </ModalFooter>
@@ -36,7 +36,8 @@ const NewKeyFooter = props => {
 
 NewKeyFooter.propTypes = {
   onCancelClick: PropTypes.func.isRequired,
-  onSaveClick: PropTypes.func.isRequired
+  onSaveClick: PropTypes.func.isRequired,
+  disable: PropTypes.bool
 }
 
 export default NewKeyFooter

@@ -59,7 +59,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
   # adds a new link to an outcome to this group. does nothing if a link already
   # exists (an outcome can be linked into a context multiple times by multiple
   # groups, but only once per group).
-  def add_outcome(outcome)
+  def add_outcome(outcome, skip_touch: false)
     # no-op if the outcome is already linked under this group
     outcome_link = child_outcome_links.active.where(content_id: outcome).first
     return outcome_link if outcome_link
@@ -67,8 +67,10 @@ class LearningOutcomeGroup < ActiveRecord::Base
     # create new link and in this group
     touch_parent_group
     child_outcome_links.create(
-      :content => outcome,
-      :context => self.context || self)
+      content: outcome,
+      context: self.context || self,
+      skip_touch: skip_touch
+    )
   end
 
   # copies an existing outcome group, form this context or another, into this
@@ -86,20 +88,24 @@ class LearningOutcomeGroup < ActiveRecord::Base
       copy.description = original.description
       copy.vendor_guid = original.vendor_guid
       copy.context = self.context
+      copy.skip_parent_group_touch = true
       copy.save!
 
       # copy the group contents
+      copy_opts = opts.reverse_merge(skip_touch: true)
       original.child_outcome_groups.active.each do |group|
         next if opts[:only] && opts[:only][group.asset_string] != "1"
-        copy.add_outcome_group(group, opts)
+        copy.add_outcome_group(group, copy_opts)
       end
 
       original.child_outcome_links.active.each do |link|
         next if opts[:only] && opts[:only][link.asset_string] != "1"
-        copy.add_outcome(link.content)
+        copy.add_outcome(link.content, skip_touch: true)
       end
 
+      self.context&.touch unless opts[:skip_touch]
       touch_parent_group
+
       # done
       copy
     end

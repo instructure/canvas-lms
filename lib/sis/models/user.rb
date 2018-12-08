@@ -51,6 +51,14 @@ module SIS
          password.to_s, ssha_password.to_s, integration_id.to_s, short_name,
          full_name, sortable_name, authentication_provider_id]
       end
+
+      def row_info
+        [user_id: user_id, login_id: login_id, status: status,
+         first_name: first_name, last_name: last_name, email: email,
+         integration_id: integration_id, short_name: short_name,
+         full_name: full_name, sortable_name: sortable_name,
+         authentication_provider_id: authentication_provider_id].to_s
+      end
     end
   end
 end

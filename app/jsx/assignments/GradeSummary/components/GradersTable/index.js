@@ -53,18 +53,18 @@ function GradersTable(props) {
   return (
     <View as="div" padding="0 small">
       <ScreenReaderContent>
-        <Heading>{I18n.t('Grader Details Table')}</Heading>
+        <Heading>{I18n.t('Grader Details')}</Heading>
       </ScreenReaderContent>
 
       <Grid rowSpacing="small">
         <GridRow>
           <GridCol>
-            <Heading level="h4">{I18n.t('Grader')}</Heading>
+            <Text weight="bold">{I18n.t('Grader')}</Text>
           </GridCol>
 
           {showAcceptGradesColumn && (
             <GridCol>
-              <Heading level="h4">{I18n.t('Accept Grades')}</Heading>
+              <Text weight="bold">{I18n.t('Accept Grades')}</Text>
             </GridCol>
           )}
         </GridRow>

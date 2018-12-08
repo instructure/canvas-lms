@@ -23,10 +23,47 @@ module Api
   module V1
 
     describe CourseJson do
+      let(:course) { ::Course.create! }
+      let(:course_json) { CourseJson.new(course, nil, includes, []) }
       let(:includes) { [] }
-      let(:course) { double(:course) }
       let(:user) { double(:user) }
-      let(:course_json) { CourseJson.new( course, nil, includes, [] ) }
+
+      describe "#to_hash" do
+        let(:student) { course_with_user("StudentEnrollment", course: course, name: "Student", active_all: true).user }
+
+        before(:each) do
+          grading_period_group = course.grading_period_groups.create!
+          grading_period_group.grading_periods.create!(
+            title: "gp1",
+            start_date: 1.day.ago,
+            end_date: 2.days.from_now,
+            close_date: 3.days.from_now
+          )
+        end
+
+        it "contains information for the grading period even when final grades are hidden" do
+          course.update!(hide_final_grades: true)
+          includes = [:current_grading_period_scores, :total_scores]
+          enrollments = Api::V1::CourseJson.to_hash(course, student, includes, course.enrollments).fetch("enrollments")
+          expect(enrollments.first.keys).to include(
+            :current_grading_period_id,
+            :current_grading_period_title,
+            :has_grading_periods,
+            :multiple_grading_periods_enabled
+          )
+        end
+
+        it "does not contain information for the period when total scores and period scores are not included" do
+          includes = []
+          enrollments = Api::V1::CourseJson.to_hash(course, student, includes, course.enrollments).fetch("enrollments")
+          expect(enrollments.first.keys).not_to include(
+            :current_grading_period_id,
+            :current_grading_period_title,
+            :has_grading_periods,
+            :multiple_grading_periods_enabled
+          )
+        end
+      end
 
       describe '#include_description' do
         let(:predicate){ course_json.include_description }

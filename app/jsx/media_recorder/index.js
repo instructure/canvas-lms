@@ -29,12 +29,13 @@ const translations = {
   ARIA_VIDEO_LABEL: I18n.t('Video Player'),
   ARIA_VOLUME: I18n.t('Current Volume Level'),
   ARIA_RECORDING: I18n.t('Recording'),
-  DEFAULT_ERROR: I18n.t('Something went wrong accessing your webcam.'),
+  DEFAULT_ERROR: I18n.t('Something went wrong accessing your mic or webcam.'),
   DEVICE_AUDIO: I18n.t('Mic'),
   DEVICE_VIDEO: I18n.t('Webcam'),
   FILE_PLACEHOLDER: I18n.t('Untitled'),
   FINISH: I18n.t('Finish'),
-  NOT_ALLOWED_ERROR: I18n.t('Please allow Arc to access your webcam.'),
+  NO_WEBCAM: I18n.t('No Video'),
+  NOT_ALLOWED_ERROR: I18n.t('Please allow Canvas to access your webcam.'),
   NOT_READABLE_ERROR: I18n.t('Your webcam may already be in use.'),
   PLAYBACK_PAUSE: I18n.t('Pause'),
   PLAYBACK_PLAY: I18n.t('Play'),
@@ -49,6 +50,7 @@ export default class CanvasMediaRecorder extends React.Component {
   static propTypes = {
     onSaveFile: func
   }
+
   static defaultProps = {
     onSaveFile: () => {}
   }
@@ -58,6 +60,15 @@ export default class CanvasMediaRecorder extends React.Component {
   }
 
   render() {
-    return <div>{canUseMediaCapture() ? <MediaCapture translations={translations} onCompleted={this.saveFile} /> : null}</div>
+    return (
+      <div>
+        {canUseMediaCapture() && (
+          <MediaCapture
+            translations={translations}
+            onCompleted={this.saveFile}
+          />
+        )}
+      </div>
+    )
   }
 }

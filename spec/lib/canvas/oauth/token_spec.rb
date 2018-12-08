@@ -174,7 +174,8 @@ module Canvas::Oauth
         expect(json['user']).to eq({
           'id' => user.id,
           'name' => user.name,
-          'global_id' => user.global_id.to_s
+          'global_id' => user.global_id.to_s,
+          'effective_locale' => 'en'
         })
       end
 

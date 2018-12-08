@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-  /**
-   * Used for drag and drop stuff
-   */
-  const TYPES = {
-    CARD: 'card'
-  };
+/**
+ * Used for drag and drop stuff
+ */
+const TYPES = {
+  CARD: 'card'
+}
 
 export default TYPES

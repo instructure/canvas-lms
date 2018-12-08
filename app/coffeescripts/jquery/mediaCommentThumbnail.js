@@ -46,7 +46,18 @@ function createMediaCommentThumbnail (elem, size, keepOriginalText) {
     ((idAttr = $link.attr('id')) && idAttr.match(/^media_comment_/) && idAttr.substring(14)) ||
     $.trim($link.parent().find('.media_comment_id:first').text())
 
-  const altText = $link.data('alt')
+  const authorName = $link.data('author');
+  const createdAt = $link.data('created_at');
+  let altText;
+
+  if (authorName && createdAt) {
+    altText = I18n.t(
+      'Play media comment by %{name} from %{createdAt}.',
+      { name: authorName, createdAt: createdAt }
+    )
+  } else {
+    altText = I18n.t('Play media comment.');
+  }
 
   if (id) {
     const domain = `https://${INST.kalturaSettings.resource_domain}`
@@ -62,7 +73,6 @@ function createMediaCommentThumbnail (elem, size, keepOriginalText) {
       >
         <span class='media_comment_thumbnail_play_button'>
           <span class='screenreader-only'>
-            ${htmlEscape(I18n.t('click_to_view', 'Click to view'))}
             ${htmlEscape(altText)}
           </span>
         </span>

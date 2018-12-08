@@ -412,7 +412,12 @@ class Speedgrader
 
     def open_assessment_audit
       audit_link.click
+      audit_tray_label # wait for tray
       wait_for_ajaximations
+    end
+
+    def audit_tray_label
+      f('span[aria-labelledby="audit-tray-final-grade-label"]')
     end
 
     def expand_assessment_audit_user_events(user)

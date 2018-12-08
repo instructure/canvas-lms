@@ -54,7 +54,10 @@ export default class ComboBox {
     this.$menu = $('select', this.$el)
 
     // populate and instantiate the selectmenu
-    this.$menu.append(..._.map(this.items, this._buildOption))
+    const itemList = _.map(this.items, this._buildOption)
+    // We can't use a spread here because xsslint doesn't like it.
+    // xsslint safeString.identifier itemList
+    this.$menu.append.apply(this.$menu, itemList) // eslint-disable-line prefer-spread
 
     // set initial selection
     if (opts.selected != null) {

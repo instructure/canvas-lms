@@ -466,7 +466,7 @@ class Submission < ActiveRecord::Base
         user &&
         self.assessment_requests.map(&:assessor_id).include?(user.id)
     end
-    can :read and can :comment
+    can :read and can :comment and can :make_group_comment
 
     given { |user, session|
       can_view_plagiarism_report('turnitin', user, session)
@@ -1878,8 +1878,10 @@ class Submission < ActiveRecord::Base
   def last_teacher_comment
     if association(:submission_comments).loaded?
       submission_comments.reverse.detect{ |com| !com.draft && com.author_id != user_id }
+    elsif association(:visible_submission_comments).loaded?
+      visible_submission_comments.reverse.detect{ |com| com.author_id != user_id }
     else
-      submission_comments.published.where.not(:author_id => user_id).order(:created_at => :desc).first
+      submission_comments.published.where.not(:author_id => user_id).reorder(:created_at => :desc).first
     end
   end
 
@@ -2077,11 +2079,16 @@ class Submission < ActiveRecord::Base
   end
 
   def visible_submission_comments_for(current_user)
-    return all_submission_comments.for_groups if assignment.grade_as_group?
+    if assignment.grade_as_group?
+      return all_submission_comments.for_groups.select { |comment| comment.grants_right?(current_user, :read) }
+    end
+
     visible_users = users_with_visible_submission_comments(current_user)
 
     all_submission_comments.select do |submission_comment|
-      if assignment.muted? && user == current_user
+      if assignment.peer_reviews && !submission_comment.grants_right?(current_user, :read)
+        false
+      elsif assignment.muted? && user == current_user
         submission_comment.author == user
       elsif assignment.grades_published? && grader == submission_comment.author
         submission_comment.provisional_grade_id.nil?
@@ -2593,10 +2600,16 @@ class Submission < ActiveRecord::Base
   end
 
   def update_provisional_grade(pg, scorer, attrs = {})
+    # Adding a comment calls update_provisional_grade, but will not have the
+    # grade or score keys included.
+    if (attrs.key?(:grade) || attrs.key?(:score)) && pg.selection.present?
+      raise Assignment::GradeError, error_code: Assignment::GradeError::PROVISIONAL_GRADE_MODIFY_SELECTED
+    end
+
     pg.scorer = pg.current_user = scorer
     pg.final = !!attrs[:final]
-    pg.grade = attrs[:grade] unless attrs[:grade].nil?
-    pg.score = attrs[:score] unless attrs[:score].nil?
+    pg.grade = attrs[:grade] if attrs.key?(:grade)
+    pg.score = attrs[:score] if attrs.key?(:score)
     pg.source_provisional_grade = attrs[:source_provisional_grade] if attrs.key?(:source_provisional_grade)
     pg.graded_anonymously = attrs[:graded_anonymously] unless attrs[:graded_anonymously].nil?
     pg.force_save = !!attrs[:force_save]

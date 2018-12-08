@@ -770,10 +770,11 @@ describe SubmissionsController do
   end
 
   describe "GET audit_events" do
-    before(:once) do
+    let(:first_student) { course_with_user("StudentEnrollment", course: @course, name: "First", active_all: true).user }
+
+    before(:each) do
       @course = Course.create!
       @course.account.enable_service(:avatars)
-      first_student = course_with_user("StudentEnrollment", course: @course, name: "First", active_all: true).user
       second_student = course_with_user("StudentEnrollment", course: @course, name: "Second", active_all: true).user
       @teacher = course_with_user("TeacherEnrollment", course: @course, name: "Teacher", active_all: true).user
       @assignment = @course.assignments.create!(name: "anonymous", anonymous_grading: true, updating_user: @teacher)
@@ -837,6 +838,59 @@ describe SubmissionsController do
         event.fetch("id")
       end
       expect(audit_event_ids).to eql audit_event_ids.sort
+    end
+
+    describe "user names and roles" do
+      let(:admin) { site_admin_user }
+      let(:final_grader) { @teacher }
+      let(:other_grader) { User.create!(name: "Nobody") }
+
+      let(:returned_users) { json_parse(response.body).fetch("users") }
+
+      before(:each) do
+        @course.enroll_teacher(other_grader, enrollment_state: "active")
+        @assignment.update!(moderated_grading: true, grader_count: 2, final_grader: final_grader)
+
+        @submission.submission_comments.create!(author: admin, comment: "I am an administrator :)")
+        @submission.submission_comments.create!(
+          author: other_grader,
+          comment: "I am nobody. Who are you? Are you nobody too?"
+        )
+      end
+
+      it "returns all users who have generated events for a submission" do
+        extraneous_grader = User.create!
+        @assignment.create_moderation_grader(extraneous_grader, occupy_slot: true)
+
+        get :audit_events, params: params, format: :json
+        user_ids = returned_users.pluck("id")
+        expect(user_ids).to match_array([first_student.id, admin.id, other_grader.id, final_grader.id])
+      end
+
+      it "returns the name associated with a user" do
+        get :audit_events, params: params, format: :json
+        expect(returned_users).to include(hash_including({"id" => other_grader.id, "name" => "Nobody" }))
+      end
+
+      it "returns a role of 'final_grader' if a user is the final grader" do
+        get :audit_events, params: params, format: :json
+        expect(returned_users).to include(hash_including({"id" => final_grader.id, "role" => "final_grader" }))
+      end
+
+      it "returns a role of 'admin' if a user is an administrator" do
+        get :audit_events, params: params, format: :json
+        expect(returned_users).to include(hash_including({"id" => admin.id, "role" => "admin" }))
+      end
+
+      it "returns a role of 'grader' if a user is a grader" do
+        get :audit_events, params: params, format: :json
+        expect(returned_users).to include(hash_including({"id" => other_grader.id, "role" => "grader" }))
+      end
+
+      it "returns a role of 'student' if a user is a student" do
+        get :audit_events, params: params, format: :json
+        expect(returned_users).to include(hash_including({"id" => first_student.id, "role" => "student" }))
+      end
     end
   end
 

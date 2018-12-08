@@ -517,7 +517,7 @@ import 'compiled/behaviors/quiz_selectmenu'
         var $this = $(this);
         if ($this.hasClass('numerical_question_input')) {
           var val = parseFloat($this.val().replace(/,/g, ''));
-          $this.val(isNaN(val) ? "" : val.toFixed(4));
+          $this.val(isNaN(val) ? "" : val.toFixed(4).replace(/\.?0+(e.*)?$/,"$1"));
         }
         if ($this.hasClass('precision_question_input')) {
           var val = parseFloat($this.val().replace(/,/g, ''));

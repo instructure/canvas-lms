@@ -91,6 +91,13 @@ describe 'LTI Advantage Errors' do
     it_behaves_like 'error check'
   end
 
+  describe Lti::Ims::AdvantageErrors::InvalidLaunchError do
+    let(:default_api_message) { 'Invalid LTI launch attempt' }
+    let(:default_status_code) { :bad_request }
+
+    it_behaves_like 'error check'
+  end
+
   describe Lti::Ims::AdvantageErrors::AdvantageSecurityError do
     let(:default_api_message) { 'Service invocation refused' }
     let(:default_status_code) { :unauthorized }

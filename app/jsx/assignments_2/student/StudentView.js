@@ -17,7 +17,16 @@
  */
 
 import React from 'react'
+import StudentHeader from './components/StudentHeader'
+import AssignmentToggleDetails from '../shared/AssignmentToggleDetails'
+import StudentContentTabs from './StudentContentTabs'
 
-export default function StudentView (_props) {
-  return <div>Assignments 2 Student View</div>
+export default function StudentView(_props) {
+  return (
+    <div data-test-id="assignments-2-student-view">
+      <StudentHeader />
+      <AssignmentToggleDetails description="Testing this description with some dummy data" />
+      <StudentContentTabs />
+    </div>
+  )
 }

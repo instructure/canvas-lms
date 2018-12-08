@@ -19,7 +19,6 @@
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
-import htmlEscape from 'str/htmlEscape'
 import I18n from 'i18n!help_dialog'
 import 'jquery.instructure_forms'
 import 'compiled/jquery.rails_flash_notifications'
@@ -123,7 +122,8 @@ class TeacherFeedbackForm extends React.Component {
           <div className="ic-HelpDialog__form-actions">
             <button type="button" className="Button" onClick={this.handleCancelClick}>
               {I18n.t('Cancel')}
-            </button>&nbsp;
+            </button>
+            &nbsp;
             <button
               type="submit"
               disabled={!this.state.coursesLoaded}

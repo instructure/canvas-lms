@@ -490,6 +490,27 @@ describe GradeCalculator do
       expect(computed_scores.dig(:current, :grade)).to eq 93.83
     end
 
+    it "calculates the grade without floating point calculation errors due to points possible" do
+      @course.update!(group_weighting_scheme: 'points')
+      @assignment_group = @course.assignment_groups.create!(name: "Assignments")
+
+      @assignments = Array.new(2) do |i|
+        @course.assignments.create!(
+          assignment_group: @assignment_group,
+          points_possible: 100,
+          title: "Assignment #{i + 1}"
+        )
+      end
+
+      @assignments[0].grade_student(@user, grade: 88.56, grader: @teacher)
+      @assignments[1].grade_student(@user, grade: 69.71, grader: @teacher)
+      calc = GradeCalculator.new([@user.id], @course.id)
+      computed_scores = calc.compute_scores.first
+      # floating point calculation: 88.56 + 69.71 / 2 = 79.13499999999999 => 79.13%
+      # correct calcuation: 88.56 + 69.71 / 2 = 79.135 => 79.14%
+      expect(computed_scores.dig(:current, :grade)).to equal 79.14
+    end
+
     it "should compute a weighted grade when specified" do
       two_groups_two_assignments(50, 10, 50, 40)
       expect(@user.enrollments.first.computed_current_score).to eql(nil)

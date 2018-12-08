@@ -85,7 +85,7 @@ exports[`renders spinner while loading 1`] = `
   <View
     as="div"
     display="auto"
-    padding="small"
+    padding="medium small small small"
     textAlign="center"
   >
     <Spinner

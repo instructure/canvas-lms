@@ -41,6 +41,7 @@ exports[`the Rubric component hides the score total when needed 1`] = `
     >
       <Criterion
         allowExtraCredit={false}
+        allowSavedComments={true}
         assessment={
           Object {
             "comments": "i'd like to say some things",
@@ -99,6 +100,7 @@ exports[`the Rubric component hides the score total when needed 1`] = `
       />
       <Criterion
         allowExtraCredit={false}
+        allowSavedComments={true}
         assessment={
           Object {
             "above_threshold": false,
@@ -205,6 +207,7 @@ exports[`the Rubric component renders as expected 1`] = `
     >
       <Criterion
         allowExtraCredit={false}
+        allowSavedComments={true}
         assessment={
           Object {
             "comments": "i'd like to say some things",
@@ -263,6 +266,7 @@ exports[`the Rubric component renders as expected 1`] = `
       />
       <Criterion
         allowExtraCredit={false}
+        allowSavedComments={true}
         assessment={
           Object {
             "above_threshold": false,
@@ -328,7 +332,6 @@ exports[`the Rubric component renders as expected 1`] = `
           colSpan="3"
         >
           <Flex
-            alignItems="center"
             as="span"
             direction="row"
             inline={false}
@@ -393,6 +396,7 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
     >
       <Criterion
         allowExtraCredit={false}
+        allowSavedComments={true}
         assessment={null}
         criterion={
           Object {
@@ -437,6 +441,7 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
       />
       <Criterion
         allowExtraCredit={false}
+        allowSavedComments={true}
         assessment={null}
         criterion={
           Object {
@@ -487,7 +492,6 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
           colSpan="3"
         >
           <Flex
-            alignItems="center"
             as="span"
             direction="row"
             inline={false}
@@ -552,6 +556,7 @@ exports[`the Rubric component updates the total score when an individual criteri
     >
       <Criterion
         allowExtraCredit={false}
+        allowSavedComments={true}
         assessment={
           Object {
             "comments": "i'd like to say some things",
@@ -609,6 +614,7 @@ exports[`the Rubric component updates the total score when an individual criteri
       />
       <Criterion
         allowExtraCredit={false}
+        allowSavedComments={true}
         assessment={
           Object {
             "above_threshold": false,
@@ -674,7 +680,6 @@ exports[`the Rubric component updates the total score when an individual criteri
           colSpan="3"
         >
           <Flex
-            alignItems="center"
             as="span"
             direction="row"
             inline={false}

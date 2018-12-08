@@ -49,6 +49,8 @@ const Rubric = (props) => {
     isSummary,
     flexWidth
   } = props
+
+  const peerReview = _.get(rubricAssessment, 'assessment_type') === 'peer_review'
   const assessing = onAssessmentChange !== null
   const priorData = _.get(rubricAssessment, 'data', [])
   const byCriteria = _.keyBy(priorData, (ra) => ra.criterion_id)
@@ -86,6 +88,7 @@ const Rubric = (props) => {
     return (
       <Criterion
         allowExtraCredit={allowExtraCredit}
+        allowSavedComments={!peerReview}
         key={criterion.id}
         assessment={assessment}
         criterion={criterion}
@@ -135,7 +138,7 @@ const Rubric = (props) => {
           {criteria}
           { showTotalPoints && (
             <tr>
-              <td colSpan="3">
+              <td colSpan={isSummary ? "2" : "3"}>
                 <Flex justifyItems="end">
                   <FlexItem data-selenium="rubric_total">
                     {hideScoreTotal || noScore ? null : total}

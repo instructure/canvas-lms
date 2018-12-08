@@ -38,10 +38,11 @@ QUnit.module('AssessmentAuditTray DateEventGroup', suiteHooks => {
       buildEvent({id: '4902', userId: '1101', createdAt: '2018-09-01T16:45:00Z'}),
       buildEvent({id: '4903', userId: '1101', createdAt: '2018-09-01T16:56:00Z'})
     ]
-    const auditTrail = buildAuditTrail(auditEvents)
+    const users = [{id: '1101', name: 'A stupefying student', role: 'student'}]
+    const auditTrail = buildAuditTrail({auditEvents, users})
 
     props = {
-      dateEventGroup: auditTrail.userEventGroups[1101].dateEventGroups[0]
+      dateEventGroup: auditTrail.userEventGroups[0].dateEventGroups[0]
     }
 
     timezoneSnapshot = timezone.snapshot()

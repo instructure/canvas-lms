@@ -69,6 +69,9 @@ class CanvasSpecRunner < TestQueue::Runner::RSpec
       # :'( but we can retry
       exit ::RSpec.configuration.failure_exit_code
     else
+      puts "Error statuses: "
+      p error_statuses
+      p @completed.map{|c| [c.pid, c.status.exitstatus]}
       # this shouldn't happen, crap is broken
       exit 1
     end

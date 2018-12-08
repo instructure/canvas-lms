@@ -16,8 +16,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% if @context.account.feature_enabled?(:assignments_2) && value_to_boolean(params[:assignments_2]) %>
-  <% js_bundle :assignments_2_show %>
+
+<% if @context.root_account.feature_enabled?(:assignments_2) && value_to_boolean(params[:assignments_2]) %>
+  <% if can_do(@context, @current_user, :read_as_admin) %>
+    <% js_bundle :assignments_2_show_teacher %>
+  <% else %>
+    <% js_bundle :assignments_2_show_student %>
+  <% end %>
   <div id="assignments_2"></div>
 <% else %>
 
@@ -53,7 +58,7 @@
         </h1>
       </div>
       <div class='assignment-buttons'>
-        <% if @context.account.feature_enabled?(:assignments_2) %>
+        <% if @context.root_account.feature_enabled?(:assignments_2) %>
           <a id="toggle_assignments_2" class="btn" href="<%= course_assignment_path(@context, @assignment)%>?assignments_2=true"><%= t("Assignments 2") %></a>
         <% end %>
         <button
@@ -101,7 +106,7 @@
         </h1>
       </div>
       <div class='assignment-buttons'>
-        <% if @context.account.feature_enabled?(:assignments_2) %>
+        <% if @context.root_account.feature_enabled?(:assignments_2) %>
           <a id="toggle_assignments_2" class="btn" href="<%= course_assignment_path(@context, @assignment)%>?assignments_2=true"><%= t("Assignments 2") %></a>
         <% end %>
         <%= render "shared/mark_as_done" %>

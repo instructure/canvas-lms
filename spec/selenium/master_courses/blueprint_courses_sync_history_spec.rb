@@ -49,7 +49,6 @@ describe "sync history modal" do
   include BlueprintCourseCommon
 
   before :once do
-    Account.default.enable_feature!(:master_courses)
     @master = course_factory(active_all: true)
     @master_teacher = @teacher
     @template = MasterCourses::MasterTemplate.set_as_master_course(@master)

@@ -17,23 +17,22 @@
  */
 
 import React from 'react'
+import {number, string} from 'prop-types'
 import classnames from 'classnames'
 
 export default function ProgressBar(props) {
-  const barClasses = classnames({
-    'progress-bar__bar': true,
-    'almost-done': props.progress === 100
-  })
-
-  const containerClasses = classnames({
-    'progress-bar__bar-container': true,
-    'almost-done': props.progress === 100
-  })
-
   return (
-    <div className={containerClasses}>
+    <div
+      className={classnames({
+        'progress-bar__bar-container': true,
+        'almost-done': props.progress === 100
+      })}
+    >
       <div
-        className={barClasses}
+        className={classnames({
+          'progress-bar__bar': true,
+          'almost-done': props.progress === 100
+        })}
         role="progressbar"
         aria-valuenow={props.progress}
         aria-valuemin="0"
@@ -45,4 +44,9 @@ export default function ProgressBar(props) {
       />
     </div>
   )
+}
+
+ProgressBar.propTypes = {
+  'aria-label': string,
+  progress: number.isRequired
 }

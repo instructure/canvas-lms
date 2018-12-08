@@ -332,17 +332,21 @@ module Api::V1::AssignmentOverride
 
   def update_assignment_override(override, override_data, updating_user: nil)
     DueDateCacher.with_executing_user(updating_user) do
+      override_changed = false
       override.transaction do
         update_assignment_override_without_save(override, override_data)
-        override.save!
+        override_changed = override.changed? || override.changed_student_ids.present?
+        override.save! if override_changed
       end
-      if override.set_type == 'ADHOC' && override.changed_student_ids.present?
-        override.assignment.run_if_overrides_changed_later!(
-          student_ids: override.changed_student_ids.to_a,
-          updating_user: updating_user
-        )
-      else
-        override.assignment.run_if_overrides_changed_later!(updating_user: updating_user)
+      if override_changed
+        if override.set_type == 'ADHOC' && override.changed_student_ids.present?
+          override.assignment.run_if_overrides_changed_later!(
+            student_ids: override.changed_student_ids.to_a,
+            updating_user: updating_user
+          )
+        else
+          override.assignment.run_if_overrides_changed_later!(updating_user: updating_user)
+        end
       end
     end
 

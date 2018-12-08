@@ -56,7 +56,7 @@ exports[`new activity button does not show when there is no new activity 1`] = `
   </Button>
   <Popover
     alignArrow={false}
-    constrain="none"
+    constrain="window"
     contentRef={[Function]}
     defaultFocusElement={null}
     defaultShow={false}
@@ -350,7 +350,7 @@ exports[`new activity button shows when there is new activity 1`] = `
   </Button>
   <Popover
     alignArrow={false}
-    constrain="none"
+    constrain="window"
     contentRef={[Function]}
     defaultFocusElement={null}
     defaultShow={false}
@@ -644,7 +644,7 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
   </Button>
   <Popover
     alignArrow={false}
-    constrain="none"
+    constrain="window"
     contentRef={[Function]}
     defaultFocusElement={null}
     defaultShow={false}

@@ -18,12 +18,16 @@
 
 # See Google Drive API documentation here:
 # https://developers.google.com/drive/v2/web/about-sdk
+
+require 'google/api_client/errors'
+
 module GoogleDrive
   class Connection
-    def initialize(refresh_token, access_token, timeout = nil)
+    def initialize(refresh_token, access_token, timeout = nil, retries: 3)
       @refresh_token = refresh_token
       @access_token = access_token
       @timeout = timeout
+      @retries = retries
     end
 
     def retrieve_access_token
@@ -41,13 +45,11 @@ module GoogleDrive
     end
 
     def client_execute(options)
-      options[:retries] = 9
-      with_timeout_protection { api_client.execute(options) }
+      with_timeout_protection { with_retries { api_client.execute(options) } }
     end
 
     def client_execute!(options)
-      options[:retries] = 9
-      with_timeout_protection { api_client.execute!(options) }
+      with_timeout_protection { with_retries { api_client.execute!(options) } }
     end
 
     def force_token_update
@@ -180,6 +182,19 @@ module GoogleDrive
     end
 
     private
+
+    # Retry on 4xx and 5xx status codes
+    def with_retries
+      attempts ||= 0
+      yield
+    rescue Google::APIClient::ClientError, Google::APIClient::ServerError
+      if (attempts += 1) <= @retries
+        sleep attempts ** 2
+        retry
+      end
+
+      raise
+    end
 
     def list(extensions)
       client_params = {

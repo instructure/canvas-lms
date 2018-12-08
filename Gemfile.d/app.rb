@@ -82,7 +82,7 @@ end
 gem 'i18nliner', '0.1.0'
   gem 'ruby2ruby', '2.4.1', require: false
   gem 'ruby_parser', '3.11.0', require: false
-gem 'icalendar', '1.5.4', require: false
+gem 'icalendar', '2.5.1', require: false
 gem 'ims-lti', '2.2.3', require: 'ims'
 gem 'json_schemer', '0.1.7'
 gem 'simple_oauth', '0.3.1', require: false

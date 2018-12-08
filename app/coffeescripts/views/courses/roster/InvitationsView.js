@@ -27,14 +27,14 @@ export default class InvitationsView extends DialogBaseView {
   dialogOptions() {
     return {
       id: 'enrollment_dialog',
-      title: I18n.t('re_send_invitation', 'Re-Send Invitation'),
+      title: I18n.t('re_send_invitation', 'Resend Invitation'),
       buttons: [
         {
           text: I18n.t('cancel', 'Cancel'),
           click: this.cancel
         },
         {
-          text: I18n.t('re_send_invitation', 'Re-Send Invitation'),
+          text: I18n.t('re_send_invitation', 'Resend Invitation'),
           class: 'btn-primary',
           click: this.resend.bind(this)
         }

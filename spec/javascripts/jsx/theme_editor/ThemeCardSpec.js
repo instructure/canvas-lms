@@ -18,12 +18,12 @@
 
 import React from 'react'
 import ThemeCard from 'jsx/theme_editor/ThemeCard'
-import { shallow } from 'enzyme'
+import {shallow} from 'enzyme'
 
 let props
 
 QUnit.module('ThemeCard Component', {
-  setup () {
+  setup() {
     props = {
       name: 'Theme Name',
       isActiveBrandConfig: false,
@@ -53,8 +53,14 @@ test('Renders preview of colors', () => {
   ok(getVar.calledWith('ic-brand-button--primary-bgd'), 'prview ic-brand-button--primary-bgd')
   ok(getVar.calledWith('ic-brand-button--secondary-bgd'), 'prview ic-brand-button--secondary-bgd')
   ok(getVar.calledWith('ic-brand-global-nav-bgd'), 'prview ic-brand-global-nav-bgd')
-  ok(getVar.calledWith('ic-brand-global-nav-ic-icon-svg-fill'), 'prview ic-brand-global-nav-ic-icon-svg-fill')
-  ok(getVar.calledWith('ic-brand-global-nav-menu-item__text-color'), 'prview ic-brand-nav-menu-item__text-color')
+  ok(
+    getVar.calledWith('ic-brand-global-nav-ic-icon-svg-fill'),
+    'prview ic-brand-global-nav-ic-icon-svg-fill'
+  )
+  ok(
+    getVar.calledWith('ic-brand-global-nav-menu-item__text-color'),
+    'prview ic-brand-nav-menu-item__text-color'
+  )
 })
 
 test('Indicates if it is the current theme', () => {

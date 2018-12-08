@@ -29,12 +29,12 @@ import PropTypes from 'prop-types'
 
 export default class DeveloperKeyModalTrigger extends React.Component {
   showCreateDeveloperKey = () => {
-    this.props.store.dispatch(this.props.actions.developerKeysModalOpen())
+    this.props.store.dispatch(this.props.actions.developerKeysModalOpen('api'))
   }
 
   showCreateLtiKey = () => {
     this.props.store.dispatch(this.props.actions.ltiKeysSetLtiKey(true))
-    this.props.store.dispatch(this.props.actions.developerKeysModalOpen())
+    this.props.store.dispatch(this.props.actions.developerKeysModalOpen('lti'))
   }
 
   isLti13Enabled = ENV.LTI_1_3_ENABLED

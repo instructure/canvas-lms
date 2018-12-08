@@ -44,11 +44,15 @@ define [
       quiz.set('loadingOverrides', false)
 
     _chooseLatest: (dates, type) ->
+      if _.any(dates, (d) -> _.isNull(d[type]) || _.isUndefined(d[type]))
+        return null
       sortedDates = @_sortedDatesOfType(dates, type)
       if _.any(sortedDates)
         _.last(sortedDates)
 
     _chooseEarliest: (dates, type) ->
+      if _.any(dates, (d) -> _.isNull(d[type]) || _.isUndefined(d[type]))
+        return null
       sortedDates = @_sortedDatesOfType(dates, type)
       if _.any(sortedDates)
         _.first(sortedDates)

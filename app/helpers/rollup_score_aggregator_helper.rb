@@ -17,19 +17,24 @@
 
 module RollupScoreAggregatorHelper
   def aggregate_score
-    scores = score_sets.pluck(:score)
-    agg_score = (scores.sum.to_f / scores.size).round(2)
+    scores = present_scores
+    agg_score = scores.empty? ? nil : (scores.sum.to_f / scores.size).round(2)
     {score: agg_score, results: score_sets.pluck(:result)}
   end
 
   def median_aggregate_score
-    scores = score_sets.pluck(:score)
+    scores = present_scores
     sorted = scores.sort
-    median = (sorted[(sorted.size - 1)/2] + sorted[sorted.size/2]) / 2.0
+    median = scores.empty? ? nil : (sorted[(sorted.size - 1)/2] + sorted[sorted.size/2]) / 2.0
     {score: median, results: score_sets.pluck(:result)}
   end
 
   private
+
+  def present_scores
+    score_sets.pluck(:score).reject(&:nil?)
+  end
+
   def latest_result
     latest_result = @outcome_results.max_by{|result| result_time(result) }
     @submitted_at = latest_result.submitted_at || latest_result.assessed_at

@@ -1823,6 +1823,7 @@ EG = {
 
     if (!submission.has_originality_score) {
       const resubmitUrl = SpeedgraderHelpers.plagiarismResubmitUrl(submission, anonymizableUserId)
+      $('#plagiarism_resubmit_button').off('click')
       $('#plagiarism_resubmit_button').on('click', (e) => { SpeedgraderHelpers.plagiarismResubmitHandler(e, resubmitUrl, anonymizableUserId) })
     }
 
@@ -2594,7 +2595,10 @@ EG = {
 
         if (commentElement) {
           $comments.append($(commentElement).show());
-          $comments.find('.play_comment_link').mediaCommentThumbnail('normal');
+          const $commentLink = $comments.find('.play_comment_link').last();
+          $commentLink.data('author', comment.author_name);
+          $commentLink.data('created_at', comment.posted_at);
+          $commentLink.mediaCommentThumbnail('normal');
         }
       });
     }
@@ -2891,6 +2895,10 @@ EG = {
   },
 
   formatGradeForSubmission: function (grade) {
+    if (grade === '') {
+      return grade;
+    }
+
     var formattedGrade = grade;
 
     if (EG.shouldParseGrade()) {
@@ -3056,6 +3064,8 @@ EG = {
     let errorMessage
     if (errorCode === 'MAX_GRADERS_REACHED') {
       errorMessage = I18n.t('The maximum number of graders has been reached for this assignment.');
+    } else if (errorCode === 'PROVISIONAL_GRADE_MODIFY_SELECTED') {
+      errorMessage = I18n.t('The grade you entered has been selected and can no longer be changed.');
     } else {
       errorMessage = I18n.t('An error occurred updating this assignment.');
     }

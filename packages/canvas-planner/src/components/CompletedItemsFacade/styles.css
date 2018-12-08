@@ -37,3 +37,17 @@
 .activityIndicator + .contentPrimary {
   margin-inline-start: calc(var(--gutterWidth) - var(--buttonPadding) - var(--activityIndicatorWidth));
 }
+
+.small {
+  padding-left: 0;
+  padding-right: 0;
+
+  .contentPrimary {
+    margin-inline-start: 10px;
+    flex-basis: auto;
+  }
+
+  .contentSecondary {
+    display: none;
+  }
+}

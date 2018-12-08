@@ -237,6 +237,10 @@ class DeveloperKey < ActiveRecord::Base
     account || Account.site_admin
   end
 
+  def binding_on_in_account?(target_account)
+    account_binding_for(target_account)&.workflow_state == DeveloperKeyAccountBinding::ON_STATE
+  end
+
   private
 
   def validate_public_jwk
@@ -256,10 +260,6 @@ class DeveloperKey < ActiveRecord::Base
 
   def invalidate_access_tokens!
     access_tokens.destroy_all
-  end
-
-  def binding_on_in_account?(target_account)
-    account_binding_for(target_account)&.workflow_state == DeveloperKeyAccountBinding::ON_STATE
   end
 
   def create_default_account_binding

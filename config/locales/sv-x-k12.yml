@@ -1432,7 +1432,7 @@ sv-x-k12:
   addressbook_performance_tap_98ddf67: "AddressBook Prestanda steg"
   adds_analytics_link_on_the_user_settings_menu_3a048816: "Lägger till analyslänk på menyn för användarinställningar."
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: "Lägg till analys på en elevs kontextkort."
-  admin_4d3ba42f: Administratör
+  admin_4d3ba42f: Admin
   admin_csv_f8d1b3eb: "Administratör CVS"
   admin_navigation_menu_77b801a2: "Administratörs navigeringsmeny"
   admin_tools_grade_change_logs_d804833f: "Administratörsverktyg (ändringsloggar för bedömningar)"
@@ -1550,7 +1550,7 @@ sv-x-k12:
   allow_bulk_grade_export_to_sis_e11a6e66: "Tillåt export av bedömning i Bulk till SIS"
   allow_comments_a1f45d8: "Tillåt kommentarer"
   allow_course_content_to_be_downloaded_and_viewed_o_48a0d252: "Tillåt kursinnehåll att visas och laddas ner offline."
-  allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: "Tillåt kursbilder att tilldelas till en kurs och användas i kontrollpanelens kort."
+  allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: "Tillåt kursbilder att tilldelas till en kurs och användas i översiktens kort."
   allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "Låt översiktskort registreras för varje användare."
   allow_importing_of_qti_and_common_cartridge_into_q_81b657cd: "Tillåt importering av QTI och  Common Cartridge i Quizzes.Next."
   allow_in_mastery_paths_5332c786: "Tillåt i måluppfyllelseväg"
@@ -1559,7 +1559,7 @@ sv-x-k12:
   allow_moderator_to_review_multiple_independent_gra_c59d64f6: "Tillåt moderator att granska flera obroende bedömningar för valda inlämningar."
   allow_multiple_attempts_e67a0a37: "Tillåt flera försök"
   allow_opt_out_of_inbox: "Tillåt användare att välja om de vill ut ur konversations-inkorgen. Det kommer leda till att alla konversationsmeddelanden och aviseringar skickas som ASAP-aviseringar till användarens primära e-post, dölj Konversations-inkorgens märke för olästa meddelanden, och dölj Konversations-inkorgens aviseringspreferenser."
-  allow_outcome_extra_credit_57c1e84e: "Tillåt resultat extra kredit"
+  allow_outcome_extra_credit_57c1e84e: "Tillåt extra poäng på lärandemål"
   allow_passive_acceptance_of_terms_of_service_63ef5994: "Tillåt passivt godkännande av användarvillkoren"
   allow_reorder_dashboard_cards_78215947: "Tillåt registrering av översiktskort"
   allow_replies_for_title_cfe7af6c: "Tillåt svar för %{title}"
@@ -1956,7 +1956,7 @@ sv-x-k12:
   anonymize_all_annotations_made_by_instructors_on_s_4f2b70a5: "Anonymisera alla annoteringar gjorda av lärare på inlämningar för denna uppgift i SpeedGrader"
   anonymous_e1b8ad27: Anonym
   anonymous_grading_cannot_be_enabled_for_group_assi_faa33494: "Anonym bedömning kan inte aktiveras för gruppuppgifter"
-  anonymous_grading_ccb5045c: "Anonymt bedömning"
+  anonymous_grading_ccb5045c: "Anonym bedömning"
   anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Anonym bedömning döljer elevnamnet i SpeedGrader™"
   anonymous_instructor_annotations_2b6c822: "Anonyma lärarannoteringar"
   anonymous_mode_on_2dd9b94a: "Anonymt läge På"
@@ -5613,7 +5613,7 @@ sv-x-k12:
   create_as_many_discussion_topics_as_needed_as_assi_45ec1df: |-
       Skapa så många diskussionsämnen som behövs, som uppgifter
       för bedömning eller som ett forum för att dela idéer och information.
-  create_assessments_with_quizzes_next_and_migrate_e_eaaee5e6: "Skapa bedömningar med Quizzes. Härnäst och migrera befintliga Canvas Quizzes."
+  create_assessments_with_quizzes_next_and_migrate_e_eaaee5e6: "Skapa bedömningar med Quizzes.Next och migrera befintliga Canvas Quizzes."
   create_assignment_68532ceb: "Skapa uppgift"
   create_assignments_on_the_assignments_page_organiz_90c78fdc: |-
       Skapa uppgifter på sidan Uppgifter. Organisera uppgifter
@@ -7310,7 +7310,7 @@ sv-x-k12:
   failed_to_update_permission_33c493f: "Kunde inte uppdatera registrering"
   failed_to_update_role_name_8c7b0119: "Kunde inte uppdatera rollnamn"
   fair_38e62237: Rättvis
-  fair_score_554e2558: "Rättvist resultat"
+  fair_score_554e2558: "Mediokert resultat"
   fair_use_bee47d77: "Rättvis användning"
   fall_grading_period_current_score_d48c7f78: "Nuvarande resultat under höstens bedömningsperiod"
   fall_grading_period_final_score_56d96a8f: "Slutlig resultat för höstens bedömningsperiod"
@@ -7344,7 +7344,7 @@ sv-x-k12:
     k12: "K-12 särskilda funktioner"
     learning_mastery_gradebook: "Bedömningsöversikt för måluppfyllelse"
     lor: "LOR externa verktyg"
-    post_grades: "Posta bedömningar till SIS"
+    post_grades: "Skicka bedömningar till SIS"
     quiz_log_auditing: "Granskning av quizlogg"
     student_outcome_gradebook: "Bedömningsöversikt för elevs måluppfyllelse"
   features_2581da: Funktioner
@@ -7516,7 +7516,7 @@ sv-x-k12:
   full_name_14c958f7: "Fullständigt namn:"
   full_name_23fdfb6d: "Fullständigt namn"
   full_name_is_required_8efbdc84: "Fullständigt namn krävs"
-  future_5416ea92: Framtid
+  future_5416ea92: Framtida
   future_terms_7fba2ae6: "Framtida termer"
   general_locked_objects_6a9adafb: "Allmänt låsta objekt"
   generate_activity_for_user_2b0af749: "Generera aktivitet för %{user}"
@@ -8816,7 +8816,7 @@ sv-x-k12:
         all: Alla
         current: Nuvarande
         failed: Misslyckad
-        future: Framtid
+        future: Framtida
         id: ID
         strand: Fiber
         tag: Tagg
@@ -12570,7 +12570,7 @@ sv-x-k12:
   polls_d8096fb7: Omröstningar
   pollsubmissions_ce0ef4d: PollSubmissions
   poor_1150a0f8: dålig
-  poor_score_715306e2: "Dålig resultat"
+  poor_score_715306e2: "Dåligt resultat"
   port_75f69d1: Port
   position_f9c9b93c: Placering
   position_select_c2dd3980: Position-val
@@ -12580,7 +12580,7 @@ sv-x-k12:
   possible_score_5e0a328e: "Möjlig: %{score}"
   post_1e445890: Inlägg
   post_grades_description: |-
-      Lämna bedömningar tillåter lärare att posta bedömningar tillbaka till aktiverade SIS system: Powerschool, Aspire (SIS2000), JMC, och andra SIF-aktiverade SIS som accepterar SIF egenskaper GradingCategory,
+      Skicka bedömningar tillåter lärare att skicka bedömningar tillbaka till aktiverade SIS system: Powerschool, Aspire (SIS2000), JMC, och andra SIF-aktiverade SIS som accepterar SIF egenskaper GradingCategory,
       GradingAssignment, GradingAssignmentScore.
   post_to_961f8937: "Posta till"
   posted_on_e1010e1e: "Postade den:"
@@ -16492,7 +16492,7 @@ sv-x-k12:
   this_criterion_is_linked_to_a_learning_outcome_c8aa57bf: "Det här kriteriet är länkat till ett lärandemål"
   this_element_is_a_more_accessible_alternative_to_d_e17b4e51: "Det här elementet är ett mer tillgängligt alternativ för dra och släpp omorganisering. Tryck på Enter eller Blankstegs-tangenten för att flytta den här frågan."
   this_email_address_is_unconfirmed_f0fc8c6e: "E-postadressen är inte bekräftad"
-  this_enables_users_to_generate_and_download_course_4c69c531: "Detta låter användare generera och ladda ner kurs ePub."
+  this_enables_users_to_generate_and_download_course_4c69c531: "Detta låter användare generera och ladda ned kurs som ePub."
   this_environment_is_currently_being_updated_with_a_235f1875: "Denna miljö uppdateras för närvarande med en kopia av senaste produktionsdata. Kontrollera igen senare."
   this_feature_can_t_be_disabled_because_there_is_at_a015b943: "Den här funktionen kan inte inaktiveras eftersom det finns minst ett underkonto eller en kurs med den här funktionen aktiverad."
   this_feature_can_t_be_enabled_while_autodetection__a3552fb4: "Denna funktion kan inte aktiveras medan automatisk detektering av fältseparerare är aktiverad."

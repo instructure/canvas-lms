@@ -60,6 +60,7 @@ function buildNoPointsPossibleWarning () {
   };
 }
 
+// xsslint safeString.property score possbile warningText icon letterGrade
 function render (options) {
   let tooltip = '';
   let warningIcon = '';
@@ -77,6 +78,7 @@ function render (options) {
       tooltipContent = options.percentage;
     }
 
+    // xsslint safeString.identifier tooltipContent
     tooltip = `<div class="gradebook-tooltip">${tooltipContent}</div>`;
   }
 
@@ -94,6 +96,7 @@ function render (options) {
     letterGrade = `<span class="letter-grade-points">${options.letterGrade}</span>`;
   }
 
+  // xsslint safeString.identifier tooltip warningIcon grade letterGrade
   return `
     <div class="gradebook-cell">
       ${tooltip}

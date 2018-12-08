@@ -225,4 +225,13 @@ describe BrandConfig do
     CreateK12Theme.new.up
     expect(BrandConfig.k12_config).to be_present
   end
+
+  it "expects md5 to be correct" do
+    current_calculated_md5 = BrandableCSS.migration_version
+    expect(current_calculated_md5 == (92630630174579589147 || 75072935522965904110132)).to be true
+    # if this spec fails, you have probably made a change to app/stylesheets/brandable_variables.json
+    # you will need to update the migration that runs brand_configs and update these md5s that are
+    # with and without running `rake canvas:compile_assets`
+    # Also update the other use of 92630630174579589147 in lib/brandable_css.rb
+  end
 end

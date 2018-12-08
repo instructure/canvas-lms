@@ -19,8 +19,10 @@
 import React from 'react';
 import I18n from 'i18n!dashboard';
 import axios from 'axios';
-import { bool, func, string, object } from 'prop-types';
+import classnames from 'classnames';
+import { bool, func, string, object, oneOf } from 'prop-types';
 import { initializePlanner, loadPlannerDashboard, renderToDoSidebar } from 'canvas-planner';
+import responsiviser from 'canvas-planner/lib/components/responsiviser'
 import { showFlashAlert, showFlashError } from '../shared/FlashAlert'
 import apiUserContent from 'compiled/str/apiUserContent'
 import DashboardOptionsMenu from '../dashboard_card/DashboardOptionsMenu';
@@ -36,20 +38,22 @@ const [show, hide] = ['block', 'none'].map(displayVal => id => {
  * This component renders the header and the to do sidebar for the user
  * dashboard and loads the current dashboard.
  */
-export default class DashboardHeader extends React.Component {
+class DashboardHeader extends React.Component {
   static propTypes = {
     dashboard_view: string,
     planner_enabled: bool.isRequired,
     screenReaderFlashMessage: func,
     env: object, // eslint-disable-line react/forbid-prop-types
-    showTodoList: func
+    showTodoList: func,
+    responsiveSize: oneOf(['small', 'medium', 'large'])
   }
 
   static defaultProps = {
     dashboard_view: 'cards',
     screenReaderFlashMessage: () => {},
     env: {},
-    showTodoList
+    showTodoList,
+    responsiveSize: 'large',
   }
 
   constructor (...args) {
@@ -115,6 +119,7 @@ export default class DashboardHeader extends React.Component {
     $dashboardActivity.show().disableWhileLoading(
       Promise.all([promiseToGetCode, promiseToGetHtml])
         .then(([DashboardView, axiosResponse]) => {
+          // xsslint safeString.property data
           $dashboardActivity.html(axiosResponse.data)
           new DashboardView()
         })
@@ -180,7 +185,7 @@ export default class DashboardHeader extends React.Component {
 
   render () {
     return (
-      <div className="ic-Dashboard-header__layout">
+      <div className={classnames(this.props.responsiveSize, "ic-Dashboard-header__layout")}>
         <h1 className="ic-Dashboard-header__title">{I18n.t('Dashboard')}</h1>
         <div className="ic-Dashboard-header__actions">
           {this.props.planner_enabled && (
@@ -206,6 +211,9 @@ export default class DashboardHeader extends React.Component {
     );
   }
 }
+
+export {DashboardHeader}
+export default responsiviser()(DashboardHeader)
 
 // extract this out to a property so tests can override it and not have to mock
 // out the timers in every single test.

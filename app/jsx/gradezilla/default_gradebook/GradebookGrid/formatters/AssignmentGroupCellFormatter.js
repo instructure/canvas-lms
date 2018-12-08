@@ -28,6 +28,8 @@ function getGradePercentage (score, pointsPossible) {
 function render (options) {
   const percentage = options.possible ? options.percentage : '-';
 
+  // xsslint safeString.property score possible
+  // xsslint safeString.identifier percentage
   return `
     <div class="gradebook-cell">
       <div class="gradebook-tooltip">${options.score} / ${options.possible}</div>

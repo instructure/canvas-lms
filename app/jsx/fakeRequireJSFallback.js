@@ -43,33 +43,34 @@ if (!('require' in window)) {
     // load these asynchronously so they are not downloaded unless asked for
     i18nObj: () => import('i18nObj'),
     underscore: () => import('underscore'),
-    'jsx/course_wizard/ListItems': () => new Promise(resolve => {
-      require.ensure([], require => {
-        resolve(require('./course_wizard/ListItems'))
-      }, 'course_wizardListItemsAsyncChunk')
-    })
+    'jsx/course_wizard/ListItems': () => import('./course_wizard/ListItems')
   }
 
-  const getModule = (module) => {
+  const getModule = module => {
     if (module in thingsWeStillAllowThemToRequire) {
       return thingsWeStillAllowThemToRequire[module]()
-    } else if (/^(https?:)?\/\//.test(module)) { // starts with 'http://', 'https://' or '//'
+    } else if (/^(https?:)?\/\//.test(module)) {
+      // starts with 'http://', 'https://' or '//'
       return jQuery.getScript(module)
     } else {
-      throw new Error(`Cannot load ${module}, use your own RequireJS or something else to load this script`)
+      throw new Error(
+        `Cannot load ${module}, use your own RequireJS or something else to load this script`
+      )
     }
   }
 
-  window.require = function fakeRequire (deps, callback) {
+  window.require = function fakeRequire(deps, callback) {
     console.warn(
       '`require`-ing internal Canvas modules comes with no warranty, ' +
-      'things can change in any release and you are responsible for making sure your custom ' +
-      'JavaScript that uses it continues to work.'
+        'things can change in any release and you are responsible for making sure your custom ' +
+        'JavaScript that uses it continues to work.'
     )
     if (deps.includes('jquery')) {
-      console.error("You don't need to `require(['jquery...`, just use the global `$` variable directly.")
+      console.error(
+        "You don't need to `require(['jquery...`, just use the global `$` variable directly."
+      )
     }
-    Promise.all(deps.map(getModule)).then((modules) => {
+    Promise.all(deps.map(getModule)).then(modules => {
       if (callback) callback(...modules)
     })
   }

@@ -18,7 +18,9 @@
 
 class Lti::ResourceLink < ApplicationRecord
   validates :resource_link_id, presence: true
+  validates :context_external_tool, presence: true
 
+  belongs_to :context_external_tool
   has_many :line_items,
             inverse_of: :resource_link,
             class_name: 'Lti::LineItem',

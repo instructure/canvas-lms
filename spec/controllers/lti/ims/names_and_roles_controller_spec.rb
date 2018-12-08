@@ -600,6 +600,20 @@ describe Lti::Ims::NamesAndRolesController do
         let(:rlid_param) { rlid_param_1 }
         let!(:student_enrollment_1) { student_enrollment } # no need to create an extra enrollment
 
+        context 'for an assignment unbound from its previous tool' do
+          before do
+            assignment_with_rlid_1.update!(submission_types: 'none')
+            # mime_type check needs the request to have already been sent
+            send_request
+          end
+
+          it_behaves_like 'mime_type check'
+
+          it 'returns a 400 bad_request and descriptive error message' do
+            expect(json).to be_lti_advantage_error_response_body('bad_request', 'Requested assignment not configured for external tool launches')
+          end
+        end
+
         context 'for an assignment assigned to everyone' do
 
           it 'returns all course members' do

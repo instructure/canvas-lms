@@ -156,7 +156,7 @@ module SIS
           unless pseudo
             err = "User not found for enrollment "
             err << "(User ID: #{enrollment_info.user_id}, Course ID: #{enrollment_info.course_id}, Section ID: #{enrollment_info.section_id})"
-            @messages << SisBatch.build_error(enrollment_info.csv, err, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info)
+            @messages << SisBatch.build_error(enrollment_info.csv, err, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info)
             next
           end
 
@@ -164,7 +164,7 @@ module SIS
           if root_account != @root_account
             unless SisPseudonym.for(user, @root_account, type: :implicit, require_sis: false)
               err = "User #{enrollment_info.root_account_id}:#{enrollment_info.user_id} does not have a usable login for this account"
-              @messages << SisBatch.build_error(enrollment_info.csv, err, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info)
+              @messages << SisBatch.build_error(enrollment_info.csv, err, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info)
               next
             end
           end
@@ -174,7 +174,7 @@ module SIS
           if @course.nil? && @section.nil?
             message = "Neither course nor section existed for user enrollment "
             message << "(Course ID: #{enrollment_info.course_id}, Section ID: #{enrollment_info.section_id}, User ID: #{enrollment_info.user_id})"
-            @messages << SisBatch.build_error(enrollment_info.csv, message, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info)
+            @messages << SisBatch.build_error(enrollment_info.csv, message, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info)
 
             next
           end
@@ -182,13 +182,13 @@ module SIS
           if enrollment_info.section_id.present? && !@section
             @course = nil
             message = "An enrollment referenced a non-existent section #{enrollment_info.section_id}"
-            @messages << SisBatch.build_error(enrollment_info.csv, message, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info)
+            @messages << SisBatch.build_error(enrollment_info.csv, message, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info)
             next
           end
           if enrollment_info.course_id.present? && !@course
             @section = nil
             message = "An enrollment referenced a non-existent course #{enrollment_info.course_id}"
-            @messages << SisBatch.build_error(enrollment_info.csv, message, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info)
+            @messages << SisBatch.build_error(enrollment_info.csv, message, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info)
             next
           end
 
@@ -203,7 +203,7 @@ module SIS
             message = "An enrollment listed a section (#{enrollment_info.section_id}) "
             message << "and a course (#{enrollment_info.course_id}) that are unrelated "
             message << "for user (#{enrollment_info.user_id})"
-            @messages << SisBatch.build_error(enrollment_info.csv, message, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info)
+            @messages << SisBatch.build_error(enrollment_info.csv, message, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info)
             next
           end
 
@@ -242,7 +242,7 @@ module SIS
                  end
           unless type
             message = "Improper role \"#{enrollment_info.role}\" for an enrollment"
-            @messages << SisBatch.build_error(enrollment_info.csv, message, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info)
+            @messages << SisBatch.build_error(enrollment_info.csv, message, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info)
             next
           end
 
@@ -254,7 +254,7 @@ module SIS
               associated_user_id = a_pseudo.user_id
             else
               message = "An enrollment referenced a non-existent associated user #{enrollment_info.associated_user_id}"
-              @messages << SisBatch.build_error(enrollment_info.csv, message, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info)
+              @messages << SisBatch.build_error(enrollment_info.csv, message, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info)
               next
             end
           end
@@ -284,7 +284,7 @@ module SIS
             else
               enrollment.workflow_state = 'deleted'
               message = "Attempted enrolling of deleted user #{enrollment_info.user_id} in course #{enrollment_info.course_id}"
-              @messages << SisBatch.build_error(enrollment_info.csv, message, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info)
+              @messages << SisBatch.build_error(enrollment_info.csv, message, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info)
             end
           elsif enrollment_info.status =~ /\Adeleted/i
             # we support creating deleted enrollments, but we want to preserve
@@ -343,7 +343,7 @@ module SIS
               msg += "(" + "course: #{enrollment_info.course_id}, section: #{enrollment_info.section_id}, "
               msg += "user: #{enrollment_info.user_id}, role: #{enrollment_info.role}, error: " +
                 msg += enrollment.errors.full_messages.join(",") + ")"
-              @messages << SisBatch.build_error(enrollment_info.csv, msg, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info)
+              @messages << SisBatch.build_error(enrollment_info.csv, msg, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info)
               next
             rescue ActiveRecord::RecordNotUnique
               if @retry == true
@@ -351,7 +351,7 @@ module SIS
                 msg += "(course: #{enrollment_info.course_id}, section: #{enrollment_info.section_id}, "
                 msg += "user: #{enrollment_info.user_id}, role: #{enrollment_info.role}, error: " +
                   msg += enrollment.errors.full_messages.join(",") + ")"
-                @messages << SisBatch.build_error(enrollment_info.csv, msg, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info)
+                @messages << SisBatch.build_error(enrollment_info.csv, msg, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info)
                 @retry = false
               else
                 @enrollment_batch.unshift(enrollment_info)

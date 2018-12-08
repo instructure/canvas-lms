@@ -29,7 +29,7 @@ special attention to the `RichContentEditor.js` and `serviceRCELoader.js`.
 This project makes use of modern JavaScript APIs like Promise, Object.assign,
 Array.prototype.includes, etc. which are present in modern
 browsers but may not be present in old browsers like IE 11. In order to not
-send unnesicarily large and duplicated code bundles to the browser, consumers
+send unnecessarily large and duplicated code bundles to the browser, consumers
 are expected to have already globally polyfilled those APIs.
 Canvas already does this but if you need suggestions for how to this in your
 own app, you can just put this in your html above the script that includes

@@ -38,7 +38,6 @@ describe "blueprint courses quizzes" do
 
   context "in the blueprint course" do
     before :once do
-      Account.default.enable_feature!(:master_courses)
       @master = course_factory(active_all: true)
       @master_teacher = @teacher
       @template = MasterCourses::MasterTemplate.set_as_master_course(@master)
@@ -75,8 +74,6 @@ describe "blueprint courses quizzes" do
 
   context "in the associated course" do
     before :once do
-      Account.default.enable_feature!(:master_courses)
-
       due_date = format_date_for_view(Time.zone.now - 1.month)
       @copy_from = course_factory(:active_all => true)
       @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
@@ -213,8 +210,6 @@ describe "blueprint courses quizzes" do
 
   context "question groups in associated course" do
     before :once do
-      Account.default.enable_feature!(:master_courses)
-
       due_date = format_date_for_view(Time.zone.now - 1.month)
       @copy_from = course_factory(:active_all => true)
       @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)

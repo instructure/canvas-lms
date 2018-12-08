@@ -30,6 +30,7 @@ module Api::V1::SisImportError
       sis_import_id: error.sis_batch_id,
       file: error.file,
       message: error.message,
+      row_info: error.row_info,
       row: error.row
     }
   end

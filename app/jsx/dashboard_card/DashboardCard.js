@@ -17,7 +17,7 @@
  */
 
 import _ from 'underscore'
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!dashcards'
 import DashboardCardAction from './DashboardCardAction'
@@ -25,7 +25,6 @@ import CourseActivitySummaryStore from './CourseActivitySummaryStore'
 import DashboardCardMenu from './DashboardCardMenu'
 
 export default class DashboardCard extends Component {
-
   // ===============
   //     CONFIG
   // ===============
@@ -43,7 +42,6 @@ export default class DashboardCard extends Component {
     image: PropTypes.string,
     handleColorChange: PropTypes.func,
     hideColorOverlays: PropTypes.bool,
-    reorderingEnabled: PropTypes.bool,
     isDragging: PropTypes.bool,
     connectDragSource: PropTypes.func,
     connectDropTarget: PropTypes.func,
@@ -59,20 +57,19 @@ export default class DashboardCard extends Component {
     hideColorOverlays: false,
     handleColorChange: () => {},
     image: '',
-    reorderingEnabled: false,
     isDragging: false,
-    connectDragSource: () => {},
-    connectDropTarget: () => {},
+    connectDragSource: c => c,
+    connectDropTarget: c => c,
     moveCard: () => {},
     totalCards: 0,
     position: 0
   }
 
-  constructor (props) {
+  constructor(props) {
     super()
 
     this.state = _.extend(
-      { nicknameInfo: this.nicknameInfo(props.shortName, props.originalName, props.id) },
+      {nicknameInfo: this.nicknameInfo(props.shortName, props.originalName, props.id)},
       CourseActivitySummaryStore.getStateForCourse(props.id)
     )
   }
@@ -81,12 +78,12 @@ export default class DashboardCard extends Component {
   //    LIFECYCLE
   // ===============
 
-  componentDidMount () {
+  componentDidMount() {
     CourseActivitySummaryStore.addChangeListener(this.handleStoreChange)
     this.parentNode = this.cardDiv
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     CourseActivitySummaryStore.removeChangeListener(this.handleStoreChange)
   }
 
@@ -94,48 +91,54 @@ export default class DashboardCard extends Component {
   //    ACTIONS
   // ===============
 
-  settingsClick = (e) => {
-    if (e) { e.preventDefault(); }
-    this.toggleEditing();
+  settingsClick = e => {
+    if (e) {
+      e.preventDefault()
+    }
+    this.toggleEditing()
   }
 
-  getCardPosition () {
+  getCardPosition() {
     return typeof this.props.position === 'function' ? this.props.position() : this.props.position
   }
 
-  handleNicknameChange = (nickname) => {
-    this.setState({ nicknameInfo: this.nicknameInfo(nickname, this.props.originalName, this.props.id) })
+  handleNicknameChange = nickname => {
+    this.setState({
+      nicknameInfo: this.nicknameInfo(nickname, this.props.originalName, this.props.id)
+    })
   }
 
   handleStoreChange = () => {
-    this.setState(
-      CourseActivitySummaryStore.getStateForCourse(this.props.id)
-    );
+    this.setState(CourseActivitySummaryStore.getStateForCourse(this.props.id))
   }
 
   toggleEditing = () => {
-    const currentState = !!this.state.editing;
-    this.setState({editing: !currentState});
+    const currentState = !!this.state.editing
+    this.setState({editing: !currentState})
   }
 
-  headerClick = (e) => {
-    if (e) { e.preventDefault(); }
-    window.location = this.props.href;
+  headerClick = e => {
+    if (e) {
+      e.preventDefault()
+    }
+    window.location = this.props.href
   }
 
   doneEditing = () => {
     this.setState({editing: false})
-    this.settingsToggle.focus();
+    this.settingsToggle.focus()
   }
 
-  handleColorChange = (color) => {
-    const hexColor = `#${color}`;
+  handleColorChange = color => {
+    const hexColor = `#${color}`
     this.props.handleColorChange(hexColor)
   }
 
   handleMove = (assetString, atIndex) => {
     if (typeof this.props.moveCard === 'function') {
-      this.props.moveCard(assetString, atIndex, () => { this.settingsToggle.focus() })
+      this.props.moveCard(assetString, atIndex, () => {
+        this.settingsToggle.focus()
+      })
     }
   }
 
@@ -143,7 +146,7 @@ export default class DashboardCard extends Component {
   //    HELPERS
   // ===============
 
-  nicknameInfo (nickname, originalName, courseId) {
+  nicknameInfo(nickname, originalName, courseId) {
     return {
       nickname,
       originalName,
@@ -152,28 +155,30 @@ export default class DashboardCard extends Component {
     }
   }
 
-  unreadCount (icon, stream) {
+  unreadCount(icon, stream) {
     const activityType = {
       'icon-announcement': 'Announcement',
       'icon-assignment': 'Message',
       'icon-discussion': 'DiscussionTopic'
-    }[icon];
+    }[icon]
 
-    const itemStream = stream || [];
-    const streamItem = _.find(itemStream, item => (
-      // only return 'Message' type if category is 'Due Date' (for assignments)
-      item.type === activityType &&
+    const itemStream = stream || []
+    const streamItem = _.find(
+      itemStream,
+      item =>
+        // only return 'Message' type if category is 'Due Date' (for assignments)
+        item.type === activityType &&
         (activityType !== 'Message' || item.notification_category === I18n.t('Due Date'))
-    ));
+    )
 
     // TODO: unread count is always 0 for assignments (see CNVS-21227)
-    return (streamItem) ? streamItem.unread_count : 0;
+    return streamItem ? streamItem.unread_count : 0
   }
 
-  calculateMenuOptions () {
+  calculateMenuOptions() {
     const position = this.getCardPosition()
-    const isFirstCard = position === 0;
-    const isLastCard = position === this.props.totalCards - 1;
+    const isFirstCard = position === 0
+    const isLastCard = position === this.props.totalCards - 1
     return {
       canMoveLeft: !isFirstCard,
       canMoveRight: !isLastCard,
@@ -186,10 +191,10 @@ export default class DashboardCard extends Component {
   //    RENDERING
   // ===============
 
-  linksForCard () {
-    return this.props.links.map((link) => {
+  linksForCard() {
+    return this.props.links.map(link => {
       if (!link.hidden) {
-        const screenReaderLabel = `${link.label} - ${this.state.nicknameInfo.nickname}`;
+        const screenReaderLabel = `${link.label} - ${this.state.nicknameInfo.nickname}`
         return (
           <DashboardCardAction
             unreadCount={this.unreadCount(link.icon, this.state.stream)}
@@ -199,25 +204,18 @@ export default class DashboardCard extends Component {
             screenReaderLabel={screenReaderLabel}
             key={link.path}
           />
-        );
+        )
       }
-      return null;
-    });
+      return null
+    })
   }
 
-  renderHeaderHero () {
-    const {
-      image,
-      backgroundColor,
-      hideColorOverlays
-    } = this.props;
+  renderHeaderHero() {
+    const {image, backgroundColor, hideColorOverlays} = this.props
 
     if (image) {
       return (
-        <div
-          className="ic-DashboardCard__header_image"
-          style={{backgroundImage: `url(${image})`}}
-        >
+        <div className="ic-DashboardCard__header_image" style={{backgroundImage: `url(${image})`}}>
           <div
             className="ic-DashboardCard__header_hero"
             style={{backgroundColor, opacity: hideColorOverlays ? 0 : 0.6}}
@@ -225,7 +223,7 @@ export default class DashboardCard extends Component {
             aria-hidden="true"
           />
         </div>
-      );
+      )
     }
 
     return (
@@ -235,17 +233,13 @@ export default class DashboardCard extends Component {
         onClick={this.headerClick}
         aria-hidden="true"
       />
-    );
+    )
   }
 
-  renderHeaderButton () {
-    const {
-      backgroundColor,
-      hideColorOverlays
-    } = this.props;
+  renderHeaderButton() {
+    const {backgroundColor, hideColorOverlays} = this.props
 
-    const reorderingProps = this.props.reorderingEnabled && {
-      reorderingEnabled: this.props.reorderingEnabled,
+    const reorderingProps = {
       handleMove: this.handleMove,
       currentPosition: this.getCardPosition(),
       lastPosition: this.props.totalCards - 1,
@@ -268,15 +262,17 @@ export default class DashboardCard extends Component {
           {...reorderingProps}
           trigger={
             <button
+              type="button"
               className="Button Button--icon-action-rev ic-DashboardCard__header-button"
-              ref={(c) => { this.settingsToggle = c }}
+              ref={c => {
+                this.settingsToggle = c
+              }}
             >
               <i className="icon-more" aria-hidden="true" />
               <span className="screenreader-only">
-                { this.props.reorderingEnabled
-                  ? I18n.t('Choose a color or course nickname or move course card for %{course}', { course: nickname })
-                  : I18n.t('Choose a color or course nickname for %{course}', { course: nickname })
-                }
+                {I18n.t('Choose a color or course nickname or move course card for %{course}', {
+                  course: nickname
+                })}
               </span>
             </button>
           }
@@ -285,26 +281,31 @@ export default class DashboardCard extends Component {
     )
   }
 
-  render () {
+  render() {
     const dashboardCard = (
       <div
         className="ic-DashboardCard"
-        ref={(c) => { this.cardDiv = c }}
-        style={{ opacity: (this.props.reorderingEnabled && this.props.isDragging) ? 0 : 1 }}
+        ref={c => {
+          this.cardDiv = c
+        }}
+        style={{opacity: this.props.isDragging ? 0 : 1}}
         aria-label={this.props.originalName}
       >
         <div className="ic-DashboardCard__header">
           <span className="screenreader-only">
-            {
-              this.props.image ?
-                I18n.t('Course image for %{course}', {course: this.state.nicknameInfo.nickname})
-                : I18n.t('Course card color region for %{course}', {course: this.state.nicknameInfo.nickname})
-            }
+            {this.props.image
+              ? I18n.t('Course image for %{course}', {course: this.state.nicknameInfo.nickname})
+              : I18n.t('Course card color region for %{course}', {
+                  course: this.state.nicknameInfo.nickname
+                })}
           </span>
           {this.renderHeaderHero()}
           <a href={this.props.href} className="ic-DashboardCard__link">
             <div className="ic-DashboardCard__header_content">
-              <h2 className="ic-DashboardCard__header-title ellipsis" title={this.props.originalName}>
+              <h2
+                className="ic-DashboardCard__header-title ellipsis"
+                title={this.props.originalName}
+              >
                 <span style={{color: this.props.backgroundColor}}>
                   {this.state.nicknameInfo.nickname}
                 </span>
@@ -315,30 +316,23 @@ export default class DashboardCard extends Component {
               >
                 {this.props.courseCode}
               </div>
-              <div
-                className="ic-DashboardCard__header-term ellipsis"
-                title={this.props.term}
-              >
-                {(this.props.term) ? this.props.term : null}
+              <div className="ic-DashboardCard__header-term ellipsis" title={this.props.term}>
+                {this.props.term ? this.props.term : null}
               </div>
             </div>
           </a>
-          { this.renderHeaderButton() }
+          {this.renderHeaderButton()}
         </div>
         <nav
           className="ic-DashboardCard__action-container"
           aria-label={I18n.t('Actions for %{course}', {course: this.state.nicknameInfo.nickname})}
         >
-          { this.linksForCard() }
+          {this.linksForCard()}
         </nav>
       </div>
-    );
+    )
 
-    if (this.props.reorderingEnabled) {
-      const { connectDragSource, connectDropTarget } = this.props;
-      return connectDragSource(connectDropTarget(dashboardCard));
-    }
-
-    return dashboardCard;
+    const {connectDragSource, connectDropTarget} = this.props
+    return connectDragSource(connectDropTarget(dashboardCard))
   }
 }

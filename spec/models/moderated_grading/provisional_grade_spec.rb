@@ -22,7 +22,7 @@ describe ModeratedGrading::ProvisionalGrade do
 
   let(:account) { Account.default }
   let(:course) { account.courses.create! }
-  let(:assignment) { course.assignments.create!(submission_types: 'online_text_entry', anonymous_grading: true) }
+  let(:assignment) { course.assignments.create!(submission_types: 'online_text_entry', moderated_grading: true, grader_count: 2) }
   let(:submission) { assignment.submissions.find_by!(user: student) }
   let(:scorer) { user_factory(active_user: true).tap {|u| course.enroll_teacher(u, enrollment_state: 'active') } }
   let(:student) { user_factory(active_user: true).tap {|u| course.enroll_student(u, enrollment_state: 'active') } }
@@ -292,11 +292,6 @@ describe ModeratedGrading::ProvisionalGrade do
 
   describe 'unique constraint' do
     it "disallows multiple provisional grades from the same user" do
-      mgs = ModeratedGrading::Selection.new
-      mgs.student = submission.user
-      mgs.assignment = assignment
-      mgs.save!
-
       pg1 = submission.provisional_grades.build(score: 75)
       pg1.scorer = scorer
       pg1.save!
@@ -306,11 +301,6 @@ describe ModeratedGrading::ProvisionalGrade do
     end
 
     it "disallows multiple final provisional grades" do
-      mgs = ModeratedGrading::Selection.new
-      mgs.student = submission.user
-      mgs.assignment = assignment
-      mgs.save!
-
       pg1 = submission.provisional_grades.build(score: 75, final: false)
       pg1.scorer = scorer
       pg1.save!

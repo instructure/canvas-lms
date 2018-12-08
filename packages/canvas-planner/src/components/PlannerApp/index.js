@@ -207,6 +207,7 @@ export class PlannerApp extends Component {
         changeDashboardView={this.props.changeDashboardView}
         isCompletelyEmpty={this.props.isCompletelyEmpty}
         onAddToDo={this.onAddToDo}
+        responsiveSize={this.props.responsiveSize}
       />
     );
   }
@@ -268,6 +269,7 @@ export class PlannerApp extends Component {
         key={workingDayKey}
         updateTodo={this.props.updateTodo}
         currentUser={this.props.currentUser}
+        responsiveSize={this.props.responsiveSize}
       />
     );
     workingDay.add(1, 'days');  // step to the next day

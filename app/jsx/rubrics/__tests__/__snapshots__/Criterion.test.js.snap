@@ -103,6 +103,7 @@ exports[`Free-form Rubric with a custom criterion by default renders the root co
     className="ratings"
   >
     <Comments
+      allowSaving={true}
       assessing={false}
       assessment={
         Object {
@@ -255,6 +256,7 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the roo
     className="ratings"
   >
     <Comments
+      allowSaving={true}
       assessing={true}
       assessment={
         Object {
@@ -407,6 +409,7 @@ exports[`Free-form Rubric with a custom criterion without an assessment renders 
     className="ratings"
   >
     <Comments
+      allowSaving={true}
       assessing={false}
       assessment={null}
       footer={null}
@@ -583,6 +586,7 @@ exports[`Free-form Rubric with a outcome criterion by default renders the root c
     className="ratings"
   >
     <Comments
+      allowSaving={true}
       assessing={false}
       assessment={
         Object {
@@ -789,6 +793,7 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the ro
     className="ratings"
   >
     <Comments
+      allowSaving={true}
       assessing={true}
       assessment={
         Object {
@@ -995,6 +1000,7 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
     className="ratings"
   >
     <Comments
+      allowSaving={true}
       assessing={false}
       assessment={null}
       footer={null}

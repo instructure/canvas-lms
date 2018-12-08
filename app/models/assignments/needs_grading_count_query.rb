@@ -60,7 +60,7 @@ module Assignments
             case visibility_level
             when :full, :limited
               manual_count
-            when :sections
+            when :sections, :sections_limited
               section_filtered_submissions.distinct.count(:id)
             else
               0
@@ -72,7 +72,7 @@ module Assignments
 
     def needs_moderated_grading_count
       level = visibility_level
-      return 0 unless [:full, :limited, :sections].include?(level)
+      return 0 unless [:full, :limited, :sections, :sections_limited].include?(level)
 
       # ignore submissions this user has graded
       graded_sub_ids = assignment.submissions.joins(:provisional_grades).

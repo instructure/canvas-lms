@@ -26,7 +26,6 @@ describe "Blueprint association settings" do
   include BlueprintCourseCommon
 
   before :once do
-    Account.default.enable_feature!(:master_courses)
     account_admin_user(active_all: true)
 
     @master = course_factory(active_all: true)

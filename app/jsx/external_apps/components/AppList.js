@@ -37,6 +37,9 @@ export default class AppList extends React.Component {
   componentDidMount() {
     store.addChangeListener(this.onChange)
     store.fetch()
+    if (this.props.alreadyRendered) {
+      this.appFilters.focus()
+    }
   }
 
   componentWillUnmount() {
@@ -70,9 +73,11 @@ export default class AppList extends React.Component {
     } else {
       return store
         .filteredApps()
-        .map((app, index) => <AppTile key={index} app={app} pathname={this.props.pathname} />)
+        .map((app) => <AppTile key={app.app_id} app={app} pathname={this.props.pathname} />)
     }
   }
+
+  setAppFiltersRef = (node) => this.appFilters = node
 
   render() {
     return (
@@ -86,7 +91,9 @@ export default class AppList extends React.Component {
             {I18n.t('View App Configurations')}
           </a>
         </Header>
-        <AppFilters />
+        <AppFilters
+          ref={this.setAppFiltersRef}
+        />
         <div className="app_center">
           <div className="app_list">
             <div className="collectionViewItems clearfix">{this.apps()}</div>

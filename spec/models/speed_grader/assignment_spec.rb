@@ -473,7 +473,7 @@ describe SpeedGrader::Assignment do
     assignment.submit_homework @student, :submission_type => :online_upload, :attachments => [attachment]
     json = SpeedGrader::Assignment.new(assignment, @teacher).json
     attachment_json = json['submissions'][0]['submission_history'][0]['submission']['versioned_attachments'][0]['attachment']
-    expect(attachment_json['view_inline_ping_url']).to match %r{/users/#{@student.id}/files/#{attachment.id}/inline_view\z}
+    expect(attachment_json['view_inline_ping_url']).to match %r{/assignments/#{assignment.id}/files/#{attachment.id}/inline_view\z}
   end
 
   it "includes lti launch url in submission history" do
@@ -739,6 +739,120 @@ describe SpeedGrader::Assignment do
         json = SpeedGrader::Assignment.new(@assignment, @teacher).json
         submission_id = json.fetch(:submissions).first.fetch(:submission_history).first.fetch(:submission).fetch(:id)
         expect(submission_id).to eq @quiz_submission.submission_id.to_s
+      end
+    end
+  end
+
+  context "quizzes.next" do
+    before do
+      assignment_model(submission_types: 'external_tool', course: @course)
+
+      tool = @course.context_external_tools.create!(
+        name: 'Quizzes.Next',
+        consumer_key: 'test_key',
+        shared_secret: 'test_secret',
+        tool_id: 'Quizzes 2',
+        url: 'http://example.com/launch'
+      )
+      @assignment.external_tool_tag_attributes = { content: tool }
+    end
+
+    it "works for quizzes without submissions" do
+      expect(BasicLTI::QuizzesNextVersionedSubmission).
+        to receive(:new).and_call_original
+      json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+
+      expect(json[:submissions]).to be_all do |ss|
+        ss.key?('submission_history') && ss['submission_history'].empty?
+      end
+    end
+
+    context "with quiz_submissions" do
+      before do
+        i = 1
+        url_grades.each do |h|
+          grade = "#{TextHelper.round_if_whole(h[:grade] * 100)}%"
+          grade, score = @assignment.compute_grade_and_score(grade, nil)
+          submission.grade = grade
+          submission.score = score
+          submission.submission_type = 'basic_lti_launch'
+          submission.workflow_state = 'submitted'
+          submission.submitted_at = i.hours.ago
+          submission.url = h[:url]
+          submission.grader_id = -1
+          submission.with_versioning(:explicit => true) { submission.save! }
+          i += 1
+        end
+      end
+      let(:submission) { Submission.find_or_initialize_by(assignment: @assignment, user: @student) }
+
+      let(:urls) do
+        %w(
+          https://abcdef.com/uuurrrlll00
+          https://abcdef.com/uuurrrlll01
+          https://abcdef.com/uuurrrlll02
+          https://abcdef.com/uuurrrlll03
+        )
+      end
+
+      let(:url_grades) do
+        [
+          # url 0 group
+          { url: urls[0], grade: 0.11 },
+          { url: urls[0], grade: 0.12 },
+          # url 1 group
+          { url: urls[1], grade: 0.22 },
+          { url: urls[1], grade: 0.23 },
+          { url: urls[1], grade: 0.24 },
+          # url 2 group
+          { url: urls[2], grade: 0.33 },
+          # url 3 group
+          { url: urls[3], grade: 0.44 },
+          { url: urls[3], grade: 0.45 },
+          { url: urls[3], grade: 0.46 },
+          { url: urls[3], grade: 0.47 },
+          { url: urls[3], grade: 0.48 }
+        ]
+      end
+
+      it "returns submission json correctly" do
+        json = SpeedGrader::Assignment.new(@assignment, @student).json
+        json_submission = json.fetch(:submissions).first.fetch(:submission_history)
+
+        expect(json_submission.count).to be 4
+        json_submission1 = json_submission.first.fetch('submission')
+        expect(json_submission1['score']).to eq(@assignment.points_possible*0.12)
+        expect(json_submission1['url']).to eq(urls[0])
+        json_submission2 = json_submission.second.fetch('submission')
+        expect(json_submission2['score']).to eq(@assignment.points_possible*0.24)
+        expect(json_submission2['url']).to eq(urls[1])
+        json_submission3 = json_submission.third.fetch('submission')
+        expect(json_submission3['score']).to eq(@assignment.points_possible*0.33)
+        expect(json_submission3['url']).to eq(urls[2])
+        json_submission4 = json_submission.last.fetch('submission')
+        expect(json_submission4['score']).to eq(@assignment.points_possible*0.48)
+        expect(json_submission4['url']).to eq(urls[3])
+      end
+
+      context "when quizzes_next_submission_history FF is turned off" do
+        before do
+          allow(@assignment.root_account).
+            to receive(:feature_enabled?).
+            with(:quizzes_next_submission_history).and_return(false)
+        end
+
+        it "doesn't use BasicLTI::QuizzesNextVersionedSubmission object" do
+          expect(BasicLTI::QuizzesNextVersionedSubmission).not_to receive(:new)
+          json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+          submission_history = json.fetch(:submissions).first.fetch(:submission_history)
+          expect(submission_history.count).to be url_grades.count
+          expect(submission_history.map{|x| x.values.first['score']}).to eq(
+            url_grades.map{|x| @assignment.points_possible*x[:grade]}.reverse
+          )
+          expect(submission_history.map{|x| x.values.first['external_tool_url']}).to eq(
+            url_grades.map{|x| x[:url]}.reverse
+          )
+        end
       end
     end
   end

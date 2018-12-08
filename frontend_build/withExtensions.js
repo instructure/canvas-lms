@@ -21,17 +21,17 @@
 // a chain of calls to apply the extensions.  This is a replacement for any
 // place in the app the original file is required.
 
-function extractFileName (remainingRequest) {
+function extractFileName(remainingRequest) {
   const loaderedPieces = remainingRequest.split('!')
   const unloaderedRequest = loaderedPieces[loaderedPieces.length - 1]
   return unloaderedRequest.replace(/^.*\/app\/coffeescripts\//, '')
 }
 
-module.exports = function (source) {
+module.exports = function(source) {
   throw 'Should not ever make it to the actual extensions loader because the pitching function does the work'
 }
 
-module.exports.pitch = function (remainingRequest, precedingRequest, data) {
+module.exports.pitch = function(remainingRequest, precedingRequest, data) {
   this.cacheable()
 
   const fileName = extractFileName(remainingRequest)
@@ -48,7 +48,7 @@ module.exports.pitch = function (remainingRequest, precedingRequest, data) {
   let pluginChain = 'orig'
 
   let i = pluginArgs.length - 1
-  while (i >= 0){
+  while (i >= 0) {
     const pluginCall = pluginArgs[i]
     pluginChain = `${pluginCall}(${pluginChain})`
     i--

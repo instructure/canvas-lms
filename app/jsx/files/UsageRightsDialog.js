@@ -57,7 +57,7 @@ UsageRightsDialog.renderFolderList = function(folders) {
         <span>{I18n.t('Usage rights will be set for all of the files contained in:')}</span>
         <ul ref={e => (this.folderBulletList = e)} className="UsageRightsDialog__folderBulletList">
           {foldersToShow.map(item => (
-            <li>{item.displayName()}</li>
+            <li key={item.cid}>{item.displayName()}</li>
           ))}
         </ul>
       </div>
@@ -71,9 +71,11 @@ UsageRightsDialog.renderFolderTooltip = function(folders) {
   const toolTipFolders = folders.slice(MAX_FOLDERS_TO_SHOW)
 
   if (toolTipFolders.length) {
-    const displayNames = toolTipFolders.map(item => htmlEscape(item.displayName()).toString())
+    const renderItems = toolTipFolders.map(item => (
+      {cid: item.cid, displayName: htmlEscape(item.displayName()).toString()}
+    ))
     // Doing it this way so commas, don't show up when rendering the list out in the tooltip.
-    const renderedNames = displayNames.join('<br />')
+    const renderedNames = renderItems.map(item => item.displayName).join('<br />')
 
     return (
       <span
@@ -87,8 +89,8 @@ UsageRightsDialog.renderFolderTooltip = function(folders) {
         {I18n.t('and %{count} more…', {count: toolTipFolders.length})}
         <span className="screenreader-only">
           <ul>
-            {displayNames.map((item, i) => (
-              <li ref={e => (this[`displayNameTooltip${i}-screenreader`] = e)}> {item}</li>
+            {renderItems.map((item, i) => (
+              <li key={item.cid} ref={e => (this[`displayNameTooltip${i}-screenreader`] = e)}> {item.displayName}</li>
             ))}
           </ul>
         </span>

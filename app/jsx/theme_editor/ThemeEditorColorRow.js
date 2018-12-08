@@ -106,34 +106,25 @@ export default class ThemeEditorColorRow extends Component {
     this.forceUpdate()
   }
 
-  textColorInput = () => {
-    const inputClasses = classnames({
-      'Theme__editor-color-block_input-text': true,
-      'Theme__editor-color-block_input': true,
-      'Theme__editor-color-block_input--has-error': this.props.userInput.invalid
-    })
-
-    const colorVal =
-      this.props.userInput.val != null ? this.props.userInput.val : this.props.currentValue
-
-    // 2nd input handles display, input events, and validation
-    const hexValue = this.hexVal(colorVal)
-    return (
-      <span>
-        <input
-          ref={c => (this.textInput = c)}
-          type="text"
-          id={`brand_config[variables][${this.props.varDef.variable_name}]`}
-          className={inputClasses}
-          placeholder={this.props.placeholder}
-          value={this.props.themeState[this.props.varDef.variable_name]}
-          aria-invalid={this.showWarning()}
-          onChange={event => this.inputChange(event.target.value)}
-          onBlur={this.updateIfMounted}
-        />
-      </span>
-    )
-  }
+  textColorInput = () => (
+    <span>
+      <input
+        ref={c => (this.textInput = c)}
+        type="text"
+        id={`brand_config[variables][${this.props.varDef.variable_name}]`}
+        className={classnames({
+          'Theme__editor-color-block_input-text': true,
+          'Theme__editor-color-block_input': true,
+          'Theme__editor-color-block_input--has-error': this.props.userInput.invalid
+        })}
+        placeholder={this.props.placeholder}
+        value={this.props.themeState[this.props.varDef.variable_name]}
+        aria-invalid={this.showWarning()}
+        onChange={event => this.inputChange(event.target.value)}
+        onBlur={this.updateIfMounted}
+      />
+    </span>
+  )
 
   render() {
     const colorInputValue = this.props.placeholder !== 'none' ? this.props.placeholder : null
@@ -158,7 +149,6 @@ export default class ThemeEditorColorRow extends Component {
               <input
                 className="Theme__editor-color-block_input-sample Theme__editor-color-block_input"
                 type="color"
-                ref="colorpicker"
                 value={colorInputValue}
                 role="presentation-only"
                 onChange={event => this.inputChange(event.target.value)}

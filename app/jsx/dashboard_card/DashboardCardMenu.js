@@ -41,7 +41,6 @@ export default class DashboardCardMenu extends React.Component {
     }).isRequired,
     trigger: PropTypes.node.isRequired,
     assetString: PropTypes.string.isRequired,
-    reorderingEnabled: PropTypes.bool,
     popoverContentRef: PropTypes.func,
     handleShow: PropTypes.func,
     handleMove: PropTypes.func,
@@ -56,7 +55,6 @@ export default class DashboardCardMenu extends React.Component {
   }
 
   static defaultProps = {
-    reorderingEnabled: false,
     popoverContentRef: () => {},
     handleShow: () => {},
     handleMove: () => {},
@@ -92,7 +90,6 @@ export default class DashboardCardMenu extends React.Component {
       afterUpdateColor,
       currentColor,
       nicknameInfo,
-      reorderingEnabled,
       handleMove,
       handleShow,
       popoverContentRef,
@@ -125,7 +122,7 @@ export default class DashboardCardMenu extends React.Component {
       </div>
     )
 
-    const movementMenu = reorderingEnabled ? (
+    const movementMenu = (
       <DashboardCardMovementMenu
         ref={c => (this._movementMenu = c)}
         cardTitle={nicknameInfo.nickname}
@@ -136,12 +133,12 @@ export default class DashboardCardMenu extends React.Component {
         handleMove={handleMove}
         onMenuSelect={this.handleMovementMenuSelect}
       />
-    ) : null
+    )
 
     const menuStyles = {
       width: 190,
-      height: reorderingEnabled ? 310 : 262,
-      paddingTop: reorderingEnabled ? 0 : 6
+      height: 310,
+      paddingTop: 0
     }
 
     return (
@@ -151,9 +148,7 @@ export default class DashboardCardMenu extends React.Component {
         onToggle={this.handleMenuToggle}
         shouldContainFocus
         shouldReturnFocus
-        defaultFocusElement={() =>
-          reorderingEnabled ? this._colorTab : document.getElementById('NicknameInput')
-        }
+        defaultFocusElement={() => this._colorTab}
         onShow={handleShow}
         contentRef={popoverContentRef}
       >
@@ -162,12 +157,12 @@ export default class DashboardCardMenu extends React.Component {
           <CloseButton
             buttonRef={c => (this._closeButton = c)}
             placement="end"
-            onClick={() => this.setState({show:false})}
+            onClick={() => this.setState({show: false})}
           >
             {I18n.t('Close')}
           </CloseButton>
           <div style={menuStyles}>
-            {reorderingEnabled ? (
+            {
               <div>
                 <TabList
                   ref={c => (this._tabList = c)}
@@ -187,9 +182,7 @@ export default class DashboardCardMenu extends React.Component {
                   </TabPanel>
                 </TabList>
               </div>
-            ) : (
-              <div className="DashboardCardMenu">{colorPicker}</div>
-            )}
+            }
           </div>
         </PopoverContent>
       </Popover>

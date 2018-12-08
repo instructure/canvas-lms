@@ -168,7 +168,7 @@ class PlannerNotesController < ApplicationController
     render json: {errors: e.message.as_json}, status: :bad_request
   end
 
-  # @API Show a PlannerNote
+  # @API Show a planner note
   #
   # Retrieve a planner note for the current user
   #
@@ -178,7 +178,7 @@ class PlannerNotesController < ApplicationController
     render json: planner_note_json(note, @current_user, session)
   end
 
-  # @API Update a PlannerNote
+  # @API Update a planner note
   #
   # Update a planner note for the current user
   # @argument title [Optional, String]

@@ -19,7 +19,7 @@
 import * as GradingSchemeHelper from 'jsx/gradebook/GradingSchemeHelper'
 
 QUnit.module('GradingSchemeHelper', () => {
-  QUnit.module('.gradeToScore()', hooks => {
+  QUnit.module('.gradeToScoreUpperBound()', hooks => {
     let gradingScheme
 
     hooks.beforeEach(() => {
@@ -27,60 +27,106 @@ QUnit.module('GradingSchemeHelper', () => {
     })
 
     test('returns 100 when the grade is the first scheme key', () => {
-      strictEqual(GradingSchemeHelper.gradeToScore('A', gradingScheme), 100)
+      strictEqual(GradingSchemeHelper.gradeToScoreUpperBound('A', gradingScheme), 100)
     })
 
     test('returns 1% below the next highest scheme value', () => {
-      strictEqual(GradingSchemeHelper.gradeToScore('B', gradingScheme), 89)
+      strictEqual(GradingSchemeHelper.gradeToScoreUpperBound('B', gradingScheme), 89)
     })
 
     test('returns 0.1% below the next highest scheme value when higher by 1%', () => {
       gradingScheme[1][1] = 0.89
-      strictEqual(GradingSchemeHelper.gradeToScore('B', gradingScheme), 89.9)
+      strictEqual(GradingSchemeHelper.gradeToScoreUpperBound('B', gradingScheme), 89.9)
     })
 
     test('returns 0.1% below the next highest scheme value when higher by less than 1%', () => {
       gradingScheme[1][1] = 0.895
-      strictEqual(GradingSchemeHelper.gradeToScore('B', gradingScheme), 89.9)
+      strictEqual(GradingSchemeHelper.gradeToScoreUpperBound('B', gradingScheme), 89.9)
     })
 
     test('rounds the returned score to two decimal places', () => {
       // grading scheme values support only two places of precision on percentages
       gradingScheme[0][1] = 0.8888888888
       gradingScheme[1][1] = 0.85
-      strictEqual(GradingSchemeHelper.gradeToScore('B', gradingScheme), 87.89)
+      strictEqual(GradingSchemeHelper.gradeToScoreUpperBound('B', gradingScheme), 87.89)
     })
 
     test('matches the first scheme key without case sensitivity', () => {
-      strictEqual(GradingSchemeHelper.gradeToScore('a', gradingScheme), 100)
+      strictEqual(GradingSchemeHelper.gradeToScoreUpperBound('a', gradingScheme), 100)
     })
 
     test('matches other scheme keys without case sensitivity', () => {
-      strictEqual(GradingSchemeHelper.gradeToScore('c', gradingScheme), 79)
+      strictEqual(GradingSchemeHelper.gradeToScoreUpperBound('c', gradingScheme), 79)
     })
 
     test('matches numerical scheme keys', () => {
       gradingScheme = [['4.0', 0.9], ['3.5', 0.8], ['3.0', 0.7], ['2.5', 0.6], ['2.0', 0.5]]
-      strictEqual(GradingSchemeHelper.gradeToScore('2.5', gradingScheme), 69)
+      strictEqual(GradingSchemeHelper.gradeToScoreUpperBound('2.5', gradingScheme), 69)
     })
 
     test('matches scheme keys with arbitrary text', () => {
       gradingScheme = [['4x', 0.9], ['-*', 0.8], ['å +', 0.7], ['+4', 0.6], ['!^', 0.5]]
-      strictEqual(GradingSchemeHelper.gradeToScore('å +', gradingScheme), 79)
+      strictEqual(GradingSchemeHelper.gradeToScoreUpperBound('å +', gradingScheme), 79)
     })
 
     test('matches scheme keys with surrounding whitespace', () => {
       gradingScheme = [['4x', 0.9], ['-*', 0.8], ['å +', 0.7], ['+4', 0.6], ['!^', 0.5]]
-      strictEqual(GradingSchemeHelper.gradeToScore('   !^   ', gradingScheme), 59)
+      strictEqual(GradingSchemeHelper.gradeToScoreUpperBound('   !^   ', gradingScheme), 59)
     })
 
     test('matches emoji scheme keys', () => {
       gradingScheme = [['😂', 0.9], ['🙂', 0.8], ['😐', 0.7], ['😢', 0.6], ['💩', 0]]
-      strictEqual(GradingSchemeHelper.gradeToScore('😐', gradingScheme), 79)
+      strictEqual(GradingSchemeHelper.gradeToScoreUpperBound('😐', gradingScheme), 79)
     })
 
     test('returns null when the grade does not match a scheme key', () => {
-      strictEqual(GradingSchemeHelper.gradeToScore('B+', gradingScheme), null)
+      strictEqual(GradingSchemeHelper.gradeToScoreUpperBound('B+', gradingScheme), null)
+    })
+  })
+
+  QUnit.module('.gradeToScoreLowerBound()', hooks => {
+    let gradingScheme
+
+    hooks.beforeEach(() => {
+      gradingScheme = [['A', 0.9], ['B', 0.8], ['C', 0.7], ['D', 0.6], ['F', 0.5]]
+    })
+
+    test('returns the lower bound of a grade', () => {
+      strictEqual(GradingSchemeHelper.gradeToScoreLowerBound('B', gradingScheme), 80)
+    })
+
+    test('rounds the returned score to two decimal places', () => {
+      // grading scheme values support only two places of precision on percentages
+      gradingScheme[1][1] = 0.8588888
+      strictEqual(GradingSchemeHelper.gradeToScoreLowerBound('B', gradingScheme), 85.89)
+    })
+
+    test('matches the first scheme key without case sensitivity', () => {
+      strictEqual(GradingSchemeHelper.gradeToScoreLowerBound('c', gradingScheme), 70)
+    })
+
+    test('matches numerical scheme keys', () => {
+      gradingScheme = [['4.0', 0.9], ['3.5', 0.8], ['3.0', 0.7], ['2.5', 0.6], ['2.0', 0.5]]
+      strictEqual(GradingSchemeHelper.gradeToScoreLowerBound('2.5', gradingScheme), 60)
+    })
+
+    test('matches scheme keys with arbitrary text', () => {
+      gradingScheme = [['4x', 0.9], ['-*', 0.8], ['å +', 0.7], ['+4', 0.6], ['!^', 0.5]]
+      strictEqual(GradingSchemeHelper.gradeToScoreLowerBound('å +', gradingScheme), 70)
+    })
+
+    test('matches scheme keys with surrounding whitespace', () => {
+      gradingScheme = [['4x', 0.9], ['-*', 0.8], ['å +', 0.7], ['+4', 0.6], ['!^', 0.5]]
+      strictEqual(GradingSchemeHelper.gradeToScoreLowerBound('   !^   ', gradingScheme), 50)
+    })
+
+    test('matches emoji scheme keys', () => {
+      gradingScheme = [['😂', 0.9], ['🙂', 0.8], ['😐', 0.7], ['😢', 0.6], ['💩', 0]]
+      strictEqual(GradingSchemeHelper.gradeToScoreLowerBound('😐', gradingScheme), 70)
+    })
+
+    test('returns null when the grade does not match a scheme key', () => {
+      strictEqual(GradingSchemeHelper.gradeToScoreLowerBound('B+', gradingScheme), null)
     })
   })
 

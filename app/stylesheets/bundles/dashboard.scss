@@ -25,10 +25,19 @@
 .ic-Dashboard-header__layout {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   border-bottom: 1px solid $ic-border-light;
   background: rgba($ic-color-light, 0.95);
   box-sizing: border-box;
   height: $ic-breadcrumbs-height;
+  &.small {
+    padding-bottom: .5rem;
+
+    .ic-Dashboard-header__actions {
+      display: flex;
+      flex-wrap: wrap;
+    }
+  }
 }
 
 .ic-Dashboard-Activity { padding: $ic-sp; }

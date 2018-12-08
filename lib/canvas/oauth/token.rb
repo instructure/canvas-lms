@@ -117,7 +117,8 @@ module Canvas::Oauth
         'user' => {
           'id' => user.id,
           'name' => user.name,
-          'global_id' => user.global_id.to_s
+          'global_id' => user.global_id.to_s,
+          'effective_locale' => I18n.locale&.to_s
         }
       }
 

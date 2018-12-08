@@ -291,7 +291,7 @@ describe "quizzes" do
         expect(error_displayed?).to be_falsey
         driver.execute_script('$(".numerical_question_input").change()')
         wait_for_ajaximations
-        expect(input).to have_attribute(:value, "1.0000")
+        expect(input).to have_attribute(:value, "1")
       end
       user_session(@user)
     end

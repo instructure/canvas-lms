@@ -43,6 +43,7 @@ exports[`PlannerApp always renders today and tomorrow when only items are in the
     day="2017-04-26"
     endday="2017-04-28"
     key="2017-04-26"
+    responsiveSize="large"
     timeZone="Asia/Tokyo"
   />
   <Animatable(Day)
@@ -133,6 +134,7 @@ exports[`PlannerApp empty day calculation always renders yesterday, today and to
     day="2017-04-26"
     endday="2017-04-28"
     key="2017-04-26"
+    responsiveSize="large"
     timeZone="Asia/Tokyo"
   />
   <Animatable(Day)
@@ -264,6 +266,7 @@ exports[`PlannerApp empty day calculation merges 3 consecutive empty days in the
     day="2017-04-26"
     endday="2017-04-28"
     key="2017-04-26"
+    responsiveSize="large"
     timeZone="Asia/Tokyo"
   />
   <Animatable(Day)
@@ -604,6 +607,7 @@ exports[`PlannerApp renders empty component with no assignments 1`] = `
     changeDashboardView={[Function]}
     isCompletelyEmpty={false}
     onAddToDo={[Function]}
+    responsiveSize="large"
   />
 </div>
 `;

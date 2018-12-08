@@ -550,7 +550,7 @@ nn:
         Anonymous: Anonym
         Assignment: Oppgåve
         Course: Emne
-        Grader: Karaktersetjing
+        Grader: Karaktersetjar
         Student: Student
         To: Til
         date: Dato
@@ -6137,7 +6137,7 @@ nn:
       topic_subscribed_tooltip: "Du abonnerer og vil bli varsla om nye kommentarar"
       topic_time_locked: "Emnet er låst til %{time}."
       topic_unsubscribe: Abonnerer
-      unlock_topic: "Open for kommentarar"
+      unlock_topic: "Opne for kommentarar"
       unread: "Ikkje lest"
     sub_entry: 
       authors_name: "Forfattaren sitt namn"
@@ -11153,7 +11153,7 @@ nn:
   model_is_already_located_in_newgroup_e5cea361: "%{model} er allereie plassert i %{newGroup}"
   moderate_assignment_ccb00173: "Moderer %{assignment}"
   moderate_assignment_name_cf59e0a7: "Moderer %{assignment_name}"
-  moderate_d0c85e92: Moderer
+  moderate_d0c85e92: Moderat
   moderate_grades_4f43f85d: "Moderer karakterar"
   moderated_grading_cannot_be_enabled_for_group_assi_7e947ab7: "Moderert karaktersetjing kan ikkje aktiverast for gruppeoppgåver"
   moderated_grading_cannot_be_enabled_for_peer_revie_6b7eedc1: "Moderert karaktersetjing kan ikkje aktiverast for fagfellevurderte oppgåver"
@@ -11889,7 +11889,7 @@ nn:
   only_teachers_can_see_this_course_until_it_is_publ_6fac97a7: "Berre faglærarar kan sjå dette emnet før det er publisert"
   open_color_picker_f117df0a: "Opne fargeveljar"
   open_event_menu_e9a21e39: "Opne hendingsmenyen"
-  open_for_comments_f8f7641e: "Open for kommentarar"
+  open_for_comments_f8f7641e: "Opne for kommentarar"
   open_in_theme_editor_156028e2: "Opne i temaredigeringsprogrammet"
   open_message_d7b12975: "Opne melding"
   open_name_color_picker_a2646a33: "Opne %{name} fargeveljar"
@@ -17043,7 +17043,7 @@ nn:
   to_do_1d554f36: Gjeremål
   to_do_5526f10a: "Gjeremål: "
   to_do_items_loading_d1cdfcd5: "Lastar innhald i gjeremålslista"
-  to_do_list_dashboard_d741f64e: "Dashbord for gjeremål"
+  to_do_list_dashboard_d741f64e: "Dashbord med gjeremålsliste"
   to_link_the_course_observer_name_to_a_student_star_f993c826: "Om du vil lenke emneobservatøren *%{name}* til ein student, kan du skrive og finne studenten sitt namn nedanfor og deretter klikke på Oppdater."
   to_minscore_43e5452e: "to %{minScore}%"
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: "For å førehandvise endringar i temaredigeringsprogrammet, må du *slå av høgkontrast-UI*."
@@ -17234,7 +17234,7 @@ nn:
       Last opp emnefiler, pensum, litteraturlister eller andre dokument.
       Lås mapper så dei er skjult for studentane. Legg til filer i modular,
       oppgåver, diskusjonar eller emnesider.
-  upload_data_dc4fa4cb: "Lat opp data"
+  upload_data_dc4fa4cb: "Last opp data"
   upload_drop_zone: 
     drop_to_upload: "Slepp element for opplasting"
   upload_failed_quota_exceeded_ff3af659: "Opplastinga mislukkast, lagringskvote er overskriden"

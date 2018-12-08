@@ -26,6 +26,7 @@ module LtiAdvantage::Messages
       launch_presentation: LtiAdvantage::Claims::LaunchPresentation,
       lis: LtiAdvantage::Claims::Lis,
       names_and_roles_service: LtiAdvantage::Claims::NamesAndRolesService,
+      assignment_and_grade_service: LtiAdvantage::Claims::AssignmentAndGradeService,
       tool_platform: LtiAdvantage::Claims::Platform,
       roles: Array,
       role_scope_mentor: Array
@@ -61,6 +62,10 @@ module LtiAdvantage::Messages
                   :zoneinfo,
                   :id
 
+    def self.create_jws(body, private_key, alg = :RS256)
+      JSON::JWT.new(body).sign(private_key, alg).to_s
+    end
+
     def context
       @context ||= TYPED_ATTRIBUTES[:context].new
     end
@@ -75,6 +80,10 @@ module LtiAdvantage::Messages
 
     def names_and_roles_service
       @names_and_roles_service ||= TYPED_ATTRIBUTES[:names_and_roles_service].new
+    end
+
+    def assignment_and_grade_service
+      @assignment_and_grade_service ||= TYPED_ATTRIBUTES[:assignment_and_grade_service].new
     end
 
     def lis
@@ -102,7 +111,7 @@ module LtiAdvantage::Messages
     end
 
     def to_jws(private_key, alg = :RS256)
-      JSON::JWT.new(self.to_h).sign(private_key, alg).to_s
+      self.class.create_jws(self.to_h, private_key, alg)
     end
   end
 end

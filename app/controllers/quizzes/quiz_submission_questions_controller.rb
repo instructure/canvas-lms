@@ -145,7 +145,10 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
     quiz_questions = @quiz.quiz_questions.where(id: answers.keys)
 
     record = quiz_questions.reduce({}) do |hsh, quiz_question|
+      question_data = @quiz_submission.quiz_data.find { |qd| qd[:id] == quiz_question.id }
+
       serializer = serializer_for quiz_question
+      serializer.override_question_data(question_data) if question_data.present?
       serialization_rc = serializer.serialize(answers[quiz_question.id])
 
       unless serialization_rc.valid?

@@ -19,6 +19,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!help_dialog'
+import $ from 'jquery'
 import 'jquery.instructure_forms'
 import 'compiled/jquery.rails_flash_notifications'
 
@@ -40,7 +41,7 @@ class CreateTicketForm extends React.Component {
       formErrors: false,
       disableWhileLoading: true,
       required: ['error[subject]', 'error[comments]', 'error[user_perceived_severity]'],
-      success: data => {
+      success: _data => {
         $.flashMessage(I18n.t('Ticket successfully submitted.'))
         this.props.onSubmit()
       },
@@ -154,7 +155,8 @@ class CreateTicketForm extends React.Component {
           <div className="ic-HelpDialog__form-actions">
             <button type="button" className="Button" onClick={this.handleCancelClick}>
               {I18n.t('Cancel')}
-            </button>&nbsp;
+            </button>
+            &nbsp;
             <button type="submit" className="Button Button--primary">
               {I18n.t('Submit Ticket')}
             </button>

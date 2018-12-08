@@ -108,8 +108,7 @@ describe "assignment groups" do
         send_keys(format_date_for_view(other_section_due, :medium))
 
       # `return_to` is not set, so no redirect happens
-      submit_form('#edit_assignment_form')
-      wait_for_ajax_requests
+      wait_for_new_page_load{ submit_form('#edit_assignment_form') }
 
       overrides = assign.reload.assignment_overrides
       expect(overrides.count).to eq 3
@@ -162,8 +161,7 @@ describe "assignment groups" do
       first_lock_at_element.clear
       last_due_at_element.
         send_keys(format_date_for_view(due_date, :medium))
-      submit_form('#edit_assignment_form')
-      wait_for_ajaximations
+      wait_for_new_page_load{ submit_form('#edit_assignment_form') }
       overrides = assign.reload.assignment_overrides
       section_override = overrides.detect{ |o| o.set_id == section1.id }
       expect(section_override.due_at.to_date)

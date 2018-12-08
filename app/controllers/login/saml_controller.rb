@@ -171,7 +171,7 @@ class Login::SamlController < ApplicationController
         session[:login_aac] = aac.id
 
         if relay_state.present? && (uri = URI.parse(relay_state) rescue nil)
-          if uri.absolute?
+          if uri.host
             # allow relay_state's to other (trusted) domains, by tacking on a session token
             target_account = Account.find_by_domain(uri.host)
             if target_account &&
@@ -184,8 +184,8 @@ class Login::SamlController < ApplicationController
               uri.query.concat("session_token=#{token}")
               session[:return_to] = uri.to_s
             end
-          else
-            # otherwise, relative URIs are okay
+          elsif uri.path[0] == '/'
+            # otherwise, absolute paths on the same domain are okay
             session[:return_to] = relay_state
           end
         end

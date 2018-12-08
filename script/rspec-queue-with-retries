@@ -2,6 +2,7 @@
 
 set -e
 
+export TEST_QUEUE_VERBOSE=0
 export TEST_QUEUE_REPLACE_STATS=1
 export TEST_QUEUE_NUM_LAZY_LOADERS=4
 export ERROR_CONTEXT_BASE_PATH="`pwd`/log/spec_failures/Initial"

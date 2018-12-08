@@ -39,6 +39,11 @@
 #           "example": "No short_name given for course C001",
 #           "type": "string"
 #         },
+#         "row_info": {
+#           "description": "The contents of the line that had the error.",
+#           "example": "account_1, Sub account 1,, active ",
+#           "type": "string"
+#         },
 #         "row": {
 #           "description": "The line number where the error occurred. Some Importers do not yet support this. This is a 1 based index starting with the header row.",
 #           "example": "34",
@@ -62,6 +67,9 @@ class SisImportErrorsApiController < ApplicationController
   # Returns the list of SIS import errors for an account or a SIS import. Import
   # errors are only stored for 30 days.
   #
+  # @argument failure [Optional, Boolean]
+  #   If set, only shows errors on a sis import that would cause a failure.
+  #
   # Example:
   #   curl 'https://<canvas>/api/v1/accounts/<account_id>/sis_imports/<id>/sis_import_errors' \
   #     -H "Authorization: Bearer <token>"
@@ -78,6 +86,7 @@ class SisImportErrorsApiController < ApplicationController
         batch = @account.sis_batches.find(params[:id])
         scope = scope.where(sis_batch_id: batch)
       end
+      scope = scope.failed if value_to_boolean(params[:failure])
 
       url = api_v1_sis_batch_import_errors_url if params[:id]
       url ||= api_v1_account_sis_import_errors_url

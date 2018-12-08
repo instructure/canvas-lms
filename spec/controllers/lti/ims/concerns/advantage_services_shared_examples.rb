@@ -256,6 +256,21 @@ shared_examples_for "advantage services" do
       end
     end
 
+    context 'with unbound developer key' do
+      let(:before_send_request) do
+        -> {
+          developer_key.developer_key_account_bindings.first.update! workflow_state: DeveloperKeyAccountBinding::OFF_STATE
+        }
+      end
+
+      it_behaves_like 'mime_type check'
+
+      it 'returns 401 unauthorized and complains about missing developer key' do
+        expect(response).to have_http_status :unauthorized
+        expect(json).to be_lti_advantage_error_response_body('unauthorized', 'Invalid Developer Key')
+      end
+    end
+
     context 'with deleted tool' do
       let(:before_send_request) { -> { tool.destroy! } }
 

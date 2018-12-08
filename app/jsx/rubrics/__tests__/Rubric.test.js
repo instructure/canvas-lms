@@ -56,6 +56,19 @@ describe('the Rubric component', () => {
     expect(modal).toMatchSnapshot()
   })
 
+  it('forbids comment saving on peer assessments', () => {
+    const peer = setCloned(assessments.freeForm, 'assessment_type', 'peer_review')
+    const el = shallow(
+      <Rubric
+        rubric={rubric}
+        rubricAssessment={peer}
+        rubricAssociation={peer.rubric_association}
+      />
+    )
+    const allow = (c) => c.prop('allowSavedComments')
+    expect(el.find('Criterion').map(allow)).toEqual([false, false])
+  })
+
   it('updates the total score when an individual criterion point assessment changes', () => {
     const onAssessmentChange = sinon.spy()
     const renderAssessing = (assessment) =>

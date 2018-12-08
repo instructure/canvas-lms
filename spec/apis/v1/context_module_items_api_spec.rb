@@ -837,6 +837,34 @@ describe "Module Items API", type: :request do
         expect(json['modules'].map {|mod| mod['id']}.sort).to eq [@module1.id, @module2.id].sort
       end
 
+      context "section specific discussions" do
+        before :each do
+          @topic_section = @course.course_sections.create!
+          @topic.is_section_specific = true
+          @topic.course_sections = [@topic_section]
+          @topic.save!
+        end
+
+        it "should skip discussions invisible by section assignment" do
+          other_section = @course.course_sections.create!
+          @course.enroll_student(user_factory(:active_all => true), :section => other_section, :enrollment_state => "active")
+
+          json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=ModuleItem&asset_id=#{@quiz_tag.id}",
+            :controller => "context_module_items_api", :action => "item_sequence", :format => "json",
+            :course_id => @course.to_param, :asset_type => 'ModuleItem', :asset_id => @quiz_tag.to_param)
+          expect(json["items"].first["next"]["id"]).to eq @external_url_tag.id
+        end
+
+        it "should still show visible section-specific discussions" do
+          @course.enroll_student(user_factory(:active_all => true), :section => @topic_section, :enrollment_state => "active")
+
+          json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=ModuleItem&asset_id=#{@quiz_tag.id}",
+            :controller => "context_module_items_api", :action => "item_sequence", :format => "json",
+            :course_id => @course.to_param, :asset_type => 'ModuleItem', :asset_id => @quiz_tag.to_param)
+          expect(json["items"].first["next"]["id"]).to eq @topic_tag.id
+        end
+      end
+
       it "should find a (non-deleted) wiki page by url" do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=Page&asset_id=#{@wiki_page.url}",
                         :controller => "context_module_items_api", :action => "item_sequence", :format => "json",

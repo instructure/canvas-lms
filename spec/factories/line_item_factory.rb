@@ -27,7 +27,7 @@ module Factories
         ),
       resource_link: overrides.fetch(
         :resource_link,
-        overrides[:with_resource_link] ? resource_link_model : nil
+        overrides[:with_resource_link] ? resource_link_model(overrides: overrides) : nil
       )
     }.merge(overrides.except(:assignment, :course, :resource_link, :with_resource_link))
     Lti::LineItem.create!(params)

@@ -19,11 +19,7 @@ exports[`renders the component 1`] = `
       April 23 to April 26
     </Text>
   </Heading>
-  <View
-    as="div"
-    display="auto"
-    padding="small 0 0 0"
-  >
+  <div>
     <GroupedDates
       aria-hidden="true"
       role="img"
@@ -42,7 +38,7 @@ exports[`renders the component 1`] = `
         </Text>
       </div>
     </div>
-  </View>
+  </div>
 </div>
 `;
 
@@ -65,11 +61,7 @@ exports[`renders the today className when surrounds Today 1`] = `
       April 22 to April 26
     </Text>
   </Heading>
-  <View
-    as="div"
-    display="auto"
-    padding="small 0 0 0"
-  >
+  <div>
     <GroupedDates
       aria-hidden="true"
       role="img"
@@ -88,6 +80,6 @@ exports[`renders the today className when surrounds Today 1`] = `
         </Text>
       </div>
     </div>
-  </View>
+  </div>
 </div>
 `;

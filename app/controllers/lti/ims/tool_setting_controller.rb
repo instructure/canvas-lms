@@ -37,6 +37,7 @@ module Lti
 
       skip_before_action :load_user
       before_action :authenticate_api_call
+      skip_before_action :verify_authenticity_token
 
       SERVICE_DEFINITIONS = [
         {

@@ -66,7 +66,7 @@ export default class RangeInput extends Component {
   }
 
   render() {
-    var {labelText, formatValue, onChange, value, ...props} = this.props
+    const {labelText, formatValue, onChange, value, ...props} = this.props
 
     return (
       <label className="RangeInput">
@@ -76,7 +76,6 @@ export default class RangeInput extends Component {
             className="RangeInput__input"
             ref={c => (this.rangeInput = c)}
             type="range"
-            role="slider"
             aria-valuenow={this.props.defaultValue}
             aria-valuemin={this.props.min}
             aria-valuemax={this.props.max}

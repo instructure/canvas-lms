@@ -1107,6 +1107,19 @@ equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_
       expect(q2.question_data['answers'].first['comments_html']).to eq text
     end
 
+    it "should copy neutral feedback for file upload questions" do
+      q = @copy_from.quizzes.create!(:title => "q")
+      data = {"question_type" => "file_upload_question", 'name' => 'test question', "neutral_comments_html" => "<i>comment</i>", "neutral_comments" => "comment"}
+      qq = q.quiz_questions.create!(:question_data => data)
+
+      run_course_copy
+
+      q2 = @copy_to.quizzes.first
+      qq2 = q2.quiz_questions.first
+      expect(qq2.question_data['neutral_comments_html']).to eq data['neutral_comments_html']
+      expect(qq2.question_data['neutral_comments']).to eq data['neutral_comments']
+    end
+
     describe "assignment overrides" do
       before :once do
         @quiz_plain = @copy_from.quizzes.create!(title: 'my quiz')

@@ -31,7 +31,7 @@ import 'jquery.ajaxJSON'
   const ProcessGradebookUpload = {
     upload (gradebook) {
       if (gradebook != null && (_.isArray(gradebook.assignments) || _.isArray(gradebook.custom_columns)) && _.isArray(gradebook.students)) {
-        if (gradebook.custom_columns) {
+        if (gradebook.custom_columns && gradebook.custom_columns.length > 0) {
           this.uploadCustomColumnData(gradebook);
         }
 

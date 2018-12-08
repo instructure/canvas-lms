@@ -22,6 +22,8 @@ const glob = require('glob')
 const ManifestPlugin = require('webpack-manifest-plugin')
 const path = require('path')
 const webpack = require('webpack')
+const WebpackCleanupPlugin = require('webpack-cleanup-plugin')
+const HappyPack = require('happypack')
 const bundleEntries = require('./bundles')
 const BundleExtensionsPlugin = require('./BundleExtensionsPlugin')
 const ClientAppsPlugin = require('./clientAppPlugin')
@@ -30,38 +32,39 @@ const I18nPlugin = require('./i18nPlugin')
 const SelinimumManifestPlugin = require('./SelinimumManifestPlugin')
 const WebpackHooks = require('./webpackHooks')
 const webpackPublicPath = require('./webpackPublicPath')
-const WebpackCleanupPlugin = require('webpack-cleanup-plugin')
-const HappyPack = require('happypack')
 const momentLocaleBundles = require('./momentBundles')
 require('babel-polyfill')
 
 const root = path.resolve(__dirname, '..')
-const USE_BABEL_CACHE = process.env.NODE_ENV !== 'production' && process.env.DISABLE_HAPPYPACK === '1'
+const USE_BABEL_CACHE =
+  process.env.NODE_ENV !== 'production' && process.env.DISABLE_HAPPYPACK === '1'
 
 const happypackPlugins = []
 const getHappyThreadPool = (() => {
   let pool
-  return () => pool || (pool = new HappyPack.ThreadPool({ size: 4 }))
+  return () => pool || (pool = new HappyPack.ThreadPool({size: 4}))
 })()
 
-function happify (id, loaders) {
+function happify(id, loaders) {
   if (process.env.DISABLE_HAPPYPACK !== '1') {
-    happypackPlugins.push(new HappyPack({
-      id,
-      loaders,
-      threadPool: getHappyThreadPool(),
-      tempDir: (process.env.HAPPYPACK_TEMPDIR || 'node_modules/.happypack_tmp/'),
+    happypackPlugins.push(
+      new HappyPack({
+        id,
+        loaders,
+        threadPool: getHappyThreadPool(),
+        tempDir: process.env.HAPPYPACK_TEMPDIR || 'node_modules/.happypack_tmp/',
 
-      // by default, we use the cache everywhere exept prod. but you can
-      // set HAPPYPACK_CACHE environment variable to override
-      cache: (typeof process.env.HAPPYPACK_CACHE === 'undefined' ?
-        process.env.NODE_ENV !== 'production' :
-        process.env.HAPPYPACK_CACHE === '1'
-      ),
-      cacheContext: {
-        env: process.env.NODE_ENV
-      }
-    }))
+        // by default, we use the cache everywhere exept prod. but you can
+        // set HAPPYPACK_CACHE environment variable to override
+        cache:
+          typeof process.env.HAPPYPACK_CACHE === 'undefined'
+            ? process.env.NODE_ENV !== 'production'
+            : process.env.HAPPYPACK_CACHE === '1',
+        cacheContext: {
+          env: process.env.NODE_ENV
+        }
+      })
+    )
     return [`happypack/loader?id=${id}`]
   }
   return loaders
@@ -73,14 +76,23 @@ module.exports = {
 
   // In production, and when not using JS_BUILD_NO_UGLIFY, generate separate sourcemap files.
   // In development, generate `eval` sourcemaps.
-  devtool: process.env.NODE_ENV === 'production' ?
-    (process.env.JS_BUILD_NO_UGLIFY ? undefined : 'source-map')
-    : ((process.env.COVERAGE || process.env.SENTRY_DSN) ? 'source-map' : 'eval'),
+  devtool:
+    process.env.NODE_ENV === 'production'
+      ? process.env.JS_BUILD_NO_UGLIFY
+        ? undefined
+        : 'source-map'
+      : process.env.COVERAGE || process.env.SENTRY_DSN
+        ? 'source-map'
+        : 'eval',
 
-  entry: Object.assign({
-    vendor: require('./modulesToIncludeInVendorBundle'),
-    appBootstrap: 'jsx/appBootstrap'
-  }, bundleEntries, momentLocaleBundles),
+  entry: Object.assign(
+    {
+      vendor: require('./modulesToIncludeInVendorBundle'),
+      appBootstrap: 'jsx/appBootstrap'
+    },
+    bundleEntries,
+    momentLocaleBundles
+  ),
 
   output: {
     // NOTE: hashSalt was added when HashedModuleIdsPlugin was installed, since
@@ -119,8 +131,14 @@ module.exports = {
       // stuff for canvas_quzzes client_apps
       'canvas_quizzes/apps': path.resolve(__dirname, '../client_apps/canvas_quizzes/apps'),
       qtip$: path.resolve(__dirname, '../client_apps/canvas_quizzes/vendor/js/jquery.qtip.js'),
-      old_version_of_react_used_by_canvas_quizzes_client_apps$: path.resolve(__dirname, '../client_apps/canvas_quizzes/vendor/js/old_version_of_react_used_by_canvas_quizzes_client_apps.js'),
-      'old_version_of_react-router_used_by_canvas_quizzes_client_apps$': path.resolve(__dirname, '../client_apps/canvas_quizzes/vendor/js/old_version_of_react-router_used_by_canvas_quizzes_client_apps.js')
+      old_version_of_react_used_by_canvas_quizzes_client_apps$: path.resolve(
+        __dirname,
+        '../client_apps/canvas_quizzes/vendor/js/old_version_of_react_used_by_canvas_quizzes_client_apps.js'
+      ),
+      'old_version_of_react-router_used_by_canvas_quizzes_client_apps$': path.resolve(
+        __dirname,
+        '../client_apps/canvas_quizzes/vendor/js/old_version_of_react-router_used_by_canvas_quizzes_client_apps.js'
+      )
     },
 
     modules: [
@@ -146,10 +164,7 @@ module.exports = {
       // to get tinymce to work. see: https://github.com/tinymce/tinymce/issues/2836
       {
         test: require.resolve('tinymce/tinymce'),
-        loaders: [
-          'imports-loader?this=>window',
-          'exports-loader?window.tinymce'
-        ]
+        loaders: ['imports-loader?this=>window', 'exports-loader?window.tinymce']
       },
       {
         test: /tinymce\/(themes|plugins)\//,
@@ -170,11 +185,9 @@ module.exports = {
           path.resolve(__dirname, '../public/javascripts/translations'),
           path.resolve(__dirname, '../public/javascripts/react-dnd-test-backend'),
           path.resolve(__dirname, '../public/javascripts/lodash.underscore'),
-          /bower\//,
+          /bower\//
         ],
-        loaders: happify('babel', [
-          `babel-loader?cacheDirectory=${USE_BABEL_CACHE}`
-        ])
+        loaders: happify('babel', [`babel-loader?cacheDirectory=${USE_BABEL_CACHE}`])
       },
       {
         test: /\.js$/,
@@ -189,9 +202,7 @@ module.exports = {
           /app\/coffeescripts\//,
           /gems\/plugins\/.*\/spec_canvas\/coffeescripts\//
         ],
-        loaders: happify('coffee', [
-          'coffee-loader'
-        ])
+        loaders: happify('coffee', ['coffee-loader'])
       },
       {
         test: /\.handlebars$/,
@@ -199,9 +210,7 @@ module.exports = {
           path.resolve(__dirname, '../app/views/jst'),
           /gems\/plugins\/.*\/app\/views\/jst\//
         ],
-        loaders: happify('handlebars-i18n', [
-          'i18nLinerHandlebars'
-        ])
+        loaders: happify('handlebars-i18n', ['i18nLinerHandlebars'])
       },
       {
         test: /\.hbs$/,
@@ -209,7 +218,7 @@ module.exports = {
           /app\/coffeescripts\/ember\/screenreader_gradebook\/templates\//,
           /app\/coffeescripts\/ember\/shared\/templates\//
         ],
-        loaders: happify('handlebars-ember', [path.join(root, 'frontend_build/emberHandlebars')]),
+        loaders: happify('handlebars-ember', [path.join(root, 'frontend_build/emberHandlebars')])
       },
       {
         test: /\.json$/,
@@ -228,9 +237,8 @@ module.exports = {
   },
 
   plugins: [
-
     // return a non-zero exit code if there are any warnings so we don't continue compiling assets if webpack fails
-    function () {
+    function() {
       this.plugin('done', ({compilation}) => {
         if (compilation.warnings && compilation.warnings.length) {
           console.error(compilation.warnings)
@@ -276,38 +284,41 @@ module.exports = {
       hashDigestLength: 10
     })
   ]
-  .concat(process.env.SELINIMUM_RUN || process.env.SELINIMUM_CAPTURE ? [
+    .concat(
+      process.env.SELINIMUM_RUN || process.env.SELINIMUM_CAPTURE
+        ? [new SelinimumManifestPlugin()]
+        : []
+    )
+    .concat(happypackPlugins)
+    .concat(
+      process.env.NODE_ENV === 'test'
+        ? []
+        : [
+            // don't include any of the moment locales in the common bundle (otherwise it is huge!)
+            // we load them explicitly onto the page in include_js_bundles from rails.
+            new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
 
-    new SelinimumManifestPlugin()
+            // outputs a json file so Rails knows which hash fingerprints to add to each script url
+            new ManifestPlugin({fileName: 'webpack-manifest.json'}),
 
-  ] : [])
-  .concat(happypackPlugins)
-  .concat(process.env.NODE_ENV === 'test' ? [] : [
+            // these multiple commonsChunks make it so anything in the vendor bundle,
+            // or in the common bundle, won't get loaded any of our other app bundles.
+            new webpack.optimize.CommonsChunkPlugin({
+              name: 'vendor',
+              // children: true,
 
-    // don't include any of the moment locales in the common bundle (otherwise it is huge!)
-    // we load them explicitly onto the page in include_js_bundles from rails.
-    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-
-    // outputs a json file so Rails knows which hash fingerprints to add to each script url
-    new ManifestPlugin({fileName: 'webpack-manifest.json'}),
-
-    // these multiple commonsChunks make it so anything in the vendor bundle,
-    // or in the common bundle, won't get loaded any of our other app bundles.
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'vendor',
-      // children: true,
-
-      // ensures that no other module goes into the vendor chunk
-      minChunks: Infinity
-    }),
-    // gets moment locale setup before any app code runs
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'appBootstrap',
-      children: true
-    }),
-    new webpack.optimize.CommonsChunkPlugin({
-      name: bundleEntries.common,
-      children: true
-    }),
-  ])
+              // ensures that no other module goes into the vendor chunk
+              minChunks: Infinity
+            }),
+            // gets moment locale setup before any app code runs
+            new webpack.optimize.CommonsChunkPlugin({
+              name: 'appBootstrap',
+              children: true
+            }),
+            new webpack.optimize.CommonsChunkPlugin({
+              name: bundleEntries.common,
+              children: true
+            })
+          ]
+    )
 }

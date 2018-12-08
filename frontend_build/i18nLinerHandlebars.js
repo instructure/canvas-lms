@@ -36,7 +36,7 @@ require('i18nliner-canvas/js/scoped_hbs_pre_processor')
 // By requiring it here the code here will use that monkeypatched behavior.
 require('i18nliner-canvas/js/main')
 
-const compileHandlebars = (data) => {
+const compileHandlebars = data => {
   const path = data.path
   const source = data.source
   try {
@@ -65,7 +65,7 @@ const emitTemplate = (path, name, result, dependencies, cssRegistration, partial
       Handlebars = Handlebars.default
       var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
       var name = '${name}';
-      templates[name] = template(${result['template']});
+      templates[name] = template(${result.template});
       ${partialRegistration};
       ${cssRegistration};
       return templates[name];
@@ -73,38 +73,35 @@ const emitTemplate = (path, name, result, dependencies, cssRegistration, partial
   `
 }
 
-const resourceName = (path) => {
-  return path
+const resourceName = path =>
+  path
     .replace(/^.+\/app\/views\/jst\/(?:plugins\/[^\/]*\/)?/, '')
     .replace(/\.handlebars$/, '')
     .replace(/_/g, '-')
-}
 
 // given an object, returns a new object with just the 'combinedChecksum' property of each item
-const getCombinedChecksums = (obj) => {
-  return Object.keys(obj).reduce((accumulator, key) => {
+const getCombinedChecksums = obj =>
+  Object.keys(obj).reduce((accumulator, key) => {
     accumulator[key] = pick(obj[key], 'combinedChecksum')
     return accumulator
   }, {})
-}
 
-const buildCssReference = (name) => {
-  const bundle = 'jst/' + name
-  const cached = allFingerprintsFor(bundle + '.scss')
+const buildCssReference = name => {
+  const bundle = `jst/${name}`
+  const cached = allFingerprintsFor(`${bundle}.scss`)
   const firstVariant = Object.keys(cached)[0]
   if (!firstVariant) {
     // no matching css file, just return a blank string
     return ''
   }
 
-  const options = cached[firstVariant].includesNoVariables ?
-    // there is no branding / high contrast specific variables in this file,
-    // all users will use the same file.
-    JSON.stringify(pick(cached[firstVariant], 'combinedChecksum', 'includesNoVariables'))
-  :
-    // Spit out all the combinedChecksums into the compiled js file and use brandableCss.getCssVariant()
-    // at runtime to determine which css variant to load, based on the user & account's settings
-    JSON.stringify(getCombinedChecksums(cached)) + '[brandableCss.getCssVariant()]'
+  const options = cached[firstVariant].includesNoVariables
+    ? // there is no branding / high contrast specific variables in this file,
+      // all users will use the same file.
+      JSON.stringify(pick(cached[firstVariant], 'combinedChecksum', 'includesNoVariables'))
+    : // Spit out all the combinedChecksums into the compiled js file and use brandableCss.getCssVariant()
+      // at runtime to determine which css variant to load, based on the user & account's settings
+      `${JSON.stringify(getCombinedChecksums(cached))}[brandableCss.getCssVariant()]`
 
   return `
     var brandableCss = arguments[1];
@@ -113,10 +110,10 @@ const buildCssReference = (name) => {
 }
 
 const partialRegexp = /\{\{>\s?\[?(.+?)\]?( .*?)?}}/g
-const findReferencedPartials = (source) => {
-  let partials = []
+const findReferencedPartials = source => {
+  const partials = []
   let match
-  while (match = partialRegexp.exec(source)){
+  while ((match = partialRegexp.exec(source))) {
     partials.push(match[1].trim())
   }
 
@@ -129,7 +126,10 @@ const emitPartialRegistration = (path, resourceName) => {
   const baseName = path.split('/').pop()
   if (baseName.startsWith('_')) {
     const partialName = baseName.replace(/^_/, '')
-    const partialPath = path.replace(baseName, partialName).replace(/.*\/\jst\//, '').replace(/\.handlebars/, '')
+    const partialPath = path
+      .replace(baseName, partialName)
+      .replace(/.*\/\jst\//, '')
+      .replace(/\.handlebars/, '')
     return `
       Handlebars.registerPartial('${partialPath}', templates['${resourceName}']);
     `
@@ -137,17 +137,17 @@ const emitPartialRegistration = (path, resourceName) => {
   return ''
 }
 
-const buildPartialRequirements = (partialPaths) => {
+const buildPartialRequirements = partialPaths => {
   const requirements = partialPaths.map(partial => {
     const partialParts = partial.split('/')
-    partialParts[partialParts.length - 1] = '_' + partialParts[partialParts.length - 1]
+    partialParts[partialParts.length - 1] = `_${partialParts[partialParts.length - 1]}`
     const requirePath = partialParts.join('/')
-    return 'jst/' + requirePath
+    return `jst/${requirePath}`
   })
   return requirements
 }
 
-module.exports = function i18nLinerHandlebarsLoader (source) {
+module.exports = function i18nLinerHandlebarsLoader(source) {
   this.cacheable()
   const name = resourceName(this.resourcePath)
   const dependencies = ['handlebars/runtime']
@@ -171,12 +171,19 @@ module.exports = function i18nLinerHandlebarsLoader (source) {
   }
 
   if (result.translationCount > 0) {
-    dependencies.push('i18n!' + result.scope)
+    dependencies.push(`i18n!${result.scope}`)
   }
 
   // make sure the template has access to all our handlebars helpers
   dependencies.push('coffeescripts/handlebars_helpers.coffee')
 
-  const compiledTemplate = emitTemplate(this.resourcePath, name, result, dependencies, cssRegistration, partialRegistration)
+  const compiledTemplate = emitTemplate(
+    this.resourcePath,
+    name,
+    result,
+    dependencies,
+    cssRegistration,
+    partialRegistration
+  )
   return compiledTemplate
 }

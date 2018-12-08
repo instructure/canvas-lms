@@ -28,13 +28,23 @@
     <div style="overflow: auto; max-height: 300px;"><%= recent_spec_runs %></div>
 
     <% if summary.screen_capture_name %>
-      <h2>Screen Capture</h2>
-      <a href="./<%= summary.screen_capture_name %>">here</a>
+      <h2>Video Capture</h2>
+        <video width="100%" controls>
+          <source src="./<%= summary.screen_capture_name %>" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
     <% end %>
 
     <% if summary.screenshot_name %>
       <h2>Screenshot</h2>
       <img style="border:1px solid #000" src="./<%= summary.screenshot_name %>" />
+    <% end %>
+
+    <% if summary.page_html %>
+      <h2>HTML</h2>
+      <code>
+        <pre><%= summary.page_html %></pre>
+      </code>
     <% end %>
   </body>
 </html>

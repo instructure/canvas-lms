@@ -1163,8 +1163,8 @@ describe CalendarEventsApiController, type: :request do
                         :controller => 'courses', :action => 'show', :format => 'json', :id => @course.id.to_s)
         get json['calendar']['ics']
         expect(response).to be_successful
-        cal = Icalendar.parse(response.body.dup)[0]
-        cal.events[0].x_alt_desc
+        cal = Icalendar::Calendar.parse(response.body.dup)[0]
+        cal.events[0].x_alt_desc.first
       end
     end
 
@@ -1173,9 +1173,9 @@ describe CalendarEventsApiController, type: :request do
       assignment_model(description: "secret stuff here")
       get "/feeds/calendars/#{@course.feed_code}.ics"
       expect(response).to be_successful
-      cal = Icalendar.parse(response.body.dup)[0]
+      cal = Icalendar::Calendar.parse(response.body.dup)[0]
       expect(cal.events[0].description).to eq nil
-      expect(cal.events[0].x_alt_desc).to eq nil
+      expect(cal.events[0].x_alt_desc).to be_blank
     end
 
     it 'works when event descriptions contain paths to user attachments' do
@@ -2262,7 +2262,7 @@ describe CalendarEventsApiController, type: :request do
     it "should include the appointment details in the teachers export" do
       get "/feeds/calendars/#{@teacher.feed_code}.ics"
       expect(response).to be_successful
-      cal = Icalendar.parse(response.body.dup)[0]
+      cal = Icalendar::Calendar.parse(response.body.dup)[0]
       appointment_text = "Unnamed Course\n" + "\n" + "Participants: \n" + "User\n" + "\n"
       expect(cal.events[1].description).to eq appointment_text
       expect(cal.events[2].description).to eq appointment_text
@@ -2271,7 +2271,7 @@ describe CalendarEventsApiController, type: :request do
     it "should not expose details of other students appts to a student" do
       get "/feeds/calendars/#{@user.feed_code}.ics"
       expect(response).to be_successful
-      cal = Icalendar.parse(response.body.dup)[0]
+      cal = Icalendar::Calendar.parse(response.body.dup)[0]
       expect(cal.events[1].description).to eq nil
     end
 

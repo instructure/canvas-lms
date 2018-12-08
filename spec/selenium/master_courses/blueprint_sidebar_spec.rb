@@ -55,8 +55,7 @@ shared_context "blueprint sidebar context" do
   end
 
   def notification_message_text_box
-    f('.bcs__history-notification__add-message')
-      .find_element(:xpath, "//label/span/span/span/textarea")
+    f('.bcs__history-notification__message textarea')
   end
 
   def character_count
@@ -86,7 +85,6 @@ describe "master courses sidebar" do
 
 
   before :once do
-    Account.default.enable_feature!(:master_courses)
     @master = course_factory(active_all: true)
     @master_teacher = @teacher
     @template = MasterCourses::MasterTemplate.set_as_master_course(@master)

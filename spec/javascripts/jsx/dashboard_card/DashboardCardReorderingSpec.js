@@ -16,98 +16,87 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import ReactDOM from 'react-dom';
-import TestUtils from 'react-dom/test-utils';
-import { DragDropContext } from 'react-dnd';
-import ReactDndTestBackend from 'react-dnd-test-backend';
-import DraggableDashboardCard from 'jsx/dashboard_card/DraggableDashboardCard';
-import getDroppableDashboardCardBox from 'jsx/dashboard_card/getDroppableDashboardCardBox';
-import DashboardCardBox from 'jsx/dashboard_card/DashboardCardBox';
-import DashboardCard from 'jsx/dashboard_card/DashboardCard';
-import DashboardCardMovementMenu from 'jsx/dashboard_card/DashboardCardMovementMenu';
-import fakeENV from 'helpers/fakeENV';
+import React from 'react'
+import TestUtils from 'react-dom/test-utils'
+import ReactDndTestBackend from 'react-dnd-test-backend'
+import DraggableDashboardCard from 'jsx/dashboard_card/DraggableDashboardCard'
+import getDroppableDashboardCardBox from 'jsx/dashboard_card/getDroppableDashboardCardBox'
+import fakeENV from 'helpers/fakeENV'
 
-  let cards;
-  let fakeServer;
+let cards
+let fakeServer
 
-  QUnit.module('DashboardCard Reordering', {
-    setup () {
-      fakeENV.setup({
-        DASHBOARD_REORDERING_ENABLED: true
-      });
-
-      cards = [{
+QUnit.module('DashboardCard Reordering', {
+  setup() {
+    cards = [
+      {
         id: 1,
         assetString: 'course_1',
         position: 0,
         originalName: 'Intro to Dashcards 1',
         shortName: 'Dash 101'
-      }, {
+      },
+      {
         id: 2,
         assetString: 'course_2',
         position: 1,
         originalName: 'Intermediate Dashcarding',
         shortName: 'Dash 201'
-      }, {
+      },
+      {
         id: 3,
         assetString: 'course_3',
         originalName: 'Advanced Dashcards',
         shortName: 'Dash 301'
-      }];
+      }
+    ]
 
-      fakeServer = sinon.fakeServer.create();
-    },
-    teardown () {
-      fakeENV.teardown();
-      cards = null;
-      fakeServer.restore();
-    }
-  });
+    fakeServer = sinon.fakeServer.create()
+  },
+  teardown() {
+    fakeENV.teardown()
+    cards = null
+    fakeServer.restore()
+  }
+})
 
-  test('it renders', () => {
-    const Box = getDroppableDashboardCardBox()
-    const root = TestUtils.renderIntoDocument(
-      <Box reorderingEnabled courseCards={cards} />
-    );
-    ok(root);
-  });
+test('it renders', () => {
+  const Box = getDroppableDashboardCardBox()
+  const root = TestUtils.renderIntoDocument(<Box courseCards={cards} />)
+  ok(root)
+})
 
-  test('cards have opacity of 0 while moving', () => {
-    const Card = DraggableDashboardCard.DecoratedComponent;
-    const card = TestUtils.renderIntoDocument(
-      <Card
-        {...cards[0]}
-        connectDragSource={el => el}
-        connectDropTarget={el => el}
-        isDragging
-        reorderingEnabled
-      />
-    );
-    const div = TestUtils.findRenderedDOMComponentWithClass(card, 'ic-DashboardCard')
-    equal(div.style.opacity, 0);
-  });
+test('cards have opacity of 0 while moving', () => {
+  const Card = DraggableDashboardCard.DecoratedComponent
+  const card = TestUtils.renderIntoDocument(
+    <Card {...cards[0]} connectDragSource={el => el} connectDropTarget={el => el} isDragging />
+  )
+  const div = TestUtils.findRenderedDOMComponentWithClass(card, 'ic-DashboardCard')
+  equal(div.style.opacity, 0)
+})
 
-  test('moving a card adjusts the position property', () => {
-    const Box = getDroppableDashboardCardBox(ReactDndTestBackend);
-    const root = TestUtils.renderIntoDocument(
-      <Box
-        reorderingEnabled
-        courseCards={cards}
-        connectDropTarget={el => el}
-      />
-    );
+test('moving a card adjusts the position property', () => {
+  const Box = getDroppableDashboardCardBox(ReactDndTestBackend)
+  const root = TestUtils.renderIntoDocument(
+    <Box courseCards={cards} connectDropTarget={el => el} />
+  )
 
-    const backend = root.getManager().getBackend();
-    const renderedCardComponents = TestUtils.scryRenderedComponentsWithType(root, DraggableDashboardCard);
-    const sourceHandlerId = renderedCardComponents[0].getDecoratedComponentInstance().getHandlerId();
-    const targetHandlerId = renderedCardComponents[1].getHandlerId();
+  const backend = root.getManager().getBackend()
+  const renderedCardComponents = TestUtils.scryRenderedComponentsWithType(
+    root,
+    DraggableDashboardCard
+  )
+  const sourceHandlerId = renderedCardComponents[0].getDecoratedComponentInstance().getHandlerId()
+  const targetHandlerId = renderedCardComponents[1].getHandlerId()
 
-    backend.simulateBeginDrag([sourceHandlerId]);
-    backend.simulateHover([targetHandlerId]);
-    backend.simulateDrop();
+  backend.simulateBeginDrag([sourceHandlerId])
+  backend.simulateHover([targetHandlerId])
+  backend.simulateDrop()
 
-    const renderedAfterDragNDrop = TestUtils.scryRenderedDOMComponentsWithClass(root, 'ic-DashboardCard');
-    equal(renderedAfterDragNDrop[0].getAttribute('aria-label'), 'Intermediate Dashcarding');
-    equal(renderedAfterDragNDrop[1].getAttribute('aria-label'), 'Intro to Dashcards 1');
-  });
+  const renderedAfterDragNDrop = TestUtils.scryRenderedDOMComponentsWithClass(
+    root,
+    'ic-DashboardCard'
+  )
+  equal(renderedAfterDragNDrop[0].getAttribute('aria-label'), 'Intermediate Dashcarding')
+  equal(renderedAfterDragNDrop[1].getAttribute('aria-label'), 'Intro to Dashcards 1')
+})

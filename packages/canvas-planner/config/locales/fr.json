@@ -278,6 +278,9 @@
   "peer_review_74f26a13": {
     "message": "Révision par les pairs"
   },
+  "peer_review_for_itemtitle_358cb413": {
+    "message": "Correction par un pair pour { itemTitle }"
+  },
   "points_bceb5005": {
     "message": "points"
   },

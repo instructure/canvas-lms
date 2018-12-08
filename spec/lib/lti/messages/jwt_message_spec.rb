@@ -23,7 +23,6 @@ describe Lti::Messages::JwtMessage do
   let(:return_url) { 'http://www.platform.com/return_url' }
   let(:user) { @student }
   let(:opts) { { resource_type: 'course_navigation' } }
-
   let(:expander) do
     Lti::VariableExpander.new(
       course.root_account,
@@ -35,33 +34,18 @@ describe Lti::Messages::JwtMessage do
       }
     )
   end
-
-  let(:jwt_message) do
-    Lti::Messages::JwtMessage.new(
-      tool: tool,
-      context: course,
-      user: user,
-      expander: expander,
-      return_url: return_url,
-      opts: opts
-    )
-  end
-
   let(:decoded_jwt) do
-    jws = jwt_message.generate_post_payload
+    jws = Lti::Messages::JwtMessage.generate_id_token(jwt_message.generate_post_payload)
     JSON::JWT.decode(jws[:id_token], pub_key)
   end
-
   let(:pub_key) do
     jwk = JSON::JWK.new(Lti::KeyStorage.retrieve_keys['jwk-present.json'])
     jwk.to_key.public_key
   end
-
   let_once(:course) do
     course_with_student
     @course
   end
-
   let_once(:assignment) { assignment_model(course: course) }
   let_once(:tool) do
     tool = course.context_external_tools.new(
@@ -87,9 +71,20 @@ describe Lti::Messages::JwtMessage do
   end
   let_once(:developer_key) { DeveloperKey.create! }
 
+  def jwt_message
+    Lti::Messages::JwtMessage.new(
+      tool: tool,
+      context: course,
+      user: user,
+      expander: expander,
+      return_url: return_url,
+      opts: opts
+    )
+  end
+
   describe 'signing' do
     it 'signs the id token with the current canvas private key' do
-      jws = jwt_message.generate_post_payload
+      jws = Lti::Messages::JwtMessage.generate_id_token(jwt_message.generate_post_payload)
 
       expect do
         JSON::JWT.decode(jws[:id_token], pub_key)
@@ -126,7 +121,7 @@ describe Lti::Messages::JwtMessage do
 
     it 'sets the "nonce" claim to a unique ID' do
       first_nonce = decoded_jwt['nonce']
-      jws = jwt_message.generate_post_payload
+      jws = Lti::Messages::JwtMessage.generate_id_token(jwt_message.generate_post_payload)
       second_nonce = JSON::JWT.decode(jws[:id_token], pub_key)['nonce']
 
       expect(first_nonce).not_to eq second_nonce
@@ -277,52 +272,54 @@ describe Lti::Messages::JwtMessage do
     end
   end
 
-  describe 'names and roles' do
-    shared_examples 'names and roles claim check' do
-      it 'sets the NRPS url' do
-        expect(message_names_and_roles_service['context_memberships_url']).to eq 'polymorphic_url'
-      end
-
-      it 'sets the NRPS version' do
-        expect(message_names_and_roles_service['service_versions']).to eq ['2.0']
-      end
+  shared_context 'lti advantage service claims context' do
+    let_once(:ags_scopes) do
+      [
+        'https://purl.imsglobal.org/spec/lti-ags/scope/lineitem',
+        'https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly',
+        'https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly',
+        'https://purl.imsglobal.org/spec/lti-ags/scope/score'
+      ]
     end
-
-    let(:nrps_tool) do
+    let_once(:nrps_scopes) { ['https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly'] }
+    let(:lti_advantage_tool) do
       tool = course.context_external_tools.new(
         name: 'bob',
         consumer_key: 'key',
         shared_secret: 'secret',
         url: 'http://www.example.com/basic_lti',
-        developer_key: nrps_developer_key
+        developer_key: lti_advantage_developer_key
       )
       tool.use_1_3 = true
       tool.save!
       tool
     end
-    let(:ags_scopes) { ['https://purl.imsglobal.org/spec/lti-ags/scope/lineitem', 'https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly'] }
-    let(:nrps_scopes) { ['https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly'] }
-    let(:nrps_developer_key_scopes) { ags_scopes + nrps_scopes }
-    let(:nrps_developer_key) do
+    let(:lti_advantage_developer_key_scopes) { raise 'Set in example' }
+    let(:lti_advantage_developer_key) do
       DeveloperKey.create!(
         name: 'Developer Key With Scopes',
         account: course.root_account,
-        scopes: nrps_developer_key_scopes,
+        scopes: lti_advantage_developer_key_scopes,
         require_scopes: true
       )
     end
+    let(:lti_context) { course }
     let(:jwt_message) do
       Lti::Messages::JwtMessage.new(
-        tool: nrps_tool,
-        context: course,
+        tool: lti_advantage_tool,
+        context: lti_context,
         user: user,
         expander: expander,
         return_url: return_url,
         opts: opts
       )
     end
-    let(:message_names_and_roles_service) { decoded_jwt['https://purl.imsglobal.org/spec/lti-nrps/claim/namesroleservice'] }
-
+    let(:controller) do
+      controller = double('controller')
+      allow(controller).to receive(:polymorphic_url).and_return('polymorphic_url')
+      allow(controller).to receive(:request).and_return(request)
+      controller
+    end
     # All this setup just so we can stub out controller.polymorphic_url
     let(:request) do
       request = double('request')
@@ -331,90 +328,87 @@ describe Lti::Messages::JwtMessage do
       allow(request).to receive(:scheme).and_return('https')
       request
     end
-
-    let(:controller) do
-      controller = double('controller')
-      allow(controller).to receive(:polymorphic_url).and_return('polymorphic_url')
-      allow(controller).to receive(:request).and_return(request)
-      controller
-    end
-
     # override b/c all the rest of the tests fail if a Controller is injected into the 'top-level' expander def
     let(:expander) do
       Lti::VariableExpander.new(
         course.root_account,
-        course,
+        lti_context,
         controller,
         {
           current_user: user,
-          tool: nrps_tool
+          tool: lti_advantage_tool
         }
       )
     end
+    let(:lti_advantage_service_claim) { raise 'Set in example' }
 
     before(:each) do
       course.root_account.enable_feature!(:lti_1_3)
       course.root_account.save!
     end
+  end
+
+  shared_context 'with lti advantage group context' do
+    let_once(:group_record) { group(context: course) } # _record suffix to avoid conflict with group() factory mtd
+    let(:lti_context) { group_record }
+  end
+
+  shared_context 'with lti advantage account context' do
+    let(:lti_context) { course.root_account }
+  end
+
+  shared_examples 'absent lti advantage service claim check' do
+    it 'does not set the lti advantage service claim' do
+      expect(lti_advantage_service_claim).to be_nil
+    end
+  end
+
+  shared_examples 'lti advantage service claim group disabled check' do
+    let(:opts) { super().merge({claim_group_blacklist: [lti_advantage_service_claim_group]}) }
+
+    it_behaves_like 'absent lti advantage service claim check'
+  end
+
+  shared_examples 'lti advantage scopes missing from developer key' do
+    let(:lti_advantage_developer_key_scopes) { [ TokenScopes::USER_INFO_SCOPE[:scope] ] }
+
+    it_behaves_like 'absent lti advantage service claim check'
+  end
+
+  describe 'names and roles' do
+    include_context 'lti advantage service claims context'
+    let(:lti_advantage_developer_key_scopes) { nrps_scopes }
+    let(:lti_advantage_service_claim) { decoded_jwt['https://purl.imsglobal.org/spec/lti-nrps/claim/namesroleservice'] }
+    let(:lti_advantage_service_claim_group) { :names_and_roles_service }
+
+    shared_examples 'names and roles claim check' do
+      it 'sets the NRPS url' do
+        expect(lti_advantage_service_claim['context_memberships_url']).to eq 'polymorphic_url'
+      end
+
+      it 'sets the NRPS version' do
+        expect(lti_advantage_service_claim['service_versions']).to eq ['2.0']
+      end
+    end
 
     context 'when context is a course' do
       it_behaves_like 'names and roles claim check'
+      it_behaves_like 'lti advantage service claim group disabled check'
+      it_behaves_like 'lti advantage scopes missing from developer key'
     end
 
     context 'when context is an account' do
-      let(:account_jwt_message) do
-        Lti::Messages::JwtMessage.new(
-          tool: nrps_tool,
-          context: course.root_account,
-          user: user,
-          expander: expander,
-          return_url: return_url,
-          opts: opts
-        )
-      end
-
-      let(:decoded_jwt) do
-        jws = account_jwt_message.generate_post_payload
-        JSON::JWT.decode(jws[:id_token], pub_key)
-      end
-
-      it 'does not set the NRPS claim' do
-        expect(message_names_and_roles_service).to be_nil
-      end
+      include_context 'with lti advantage account context'
+      it_behaves_like 'absent lti advantage service claim check'
+      it_behaves_like 'lti advantage service claim group disabled check'
+      it_behaves_like 'lti advantage scopes missing from developer key'
     end
 
     context 'when context is a group' do
-
-      let_once(:group_record) { group(context: course) } # _record suffix to avoid conflict with group() factory mtd
-
-      let(:jwt_message) do
-        Lti::Messages::JwtMessage.new(
-          tool: nrps_tool,
-          context: group_record,
-          user: user,
-          expander: expander,
-          return_url: return_url,
-          opts: opts
-        )
-      end
-
+      include_context 'with lti advantage group context'
       it_behaves_like 'names and roles claim check'
-    end
-
-    context 'when names and roles claim group disabled' do
-      let(:opts) { super().merge({claim_group_blacklist: [:names_and_roles_service]}) }
-
-      it 'does not set the NRPS claim' do
-        expect(message_names_and_roles_service).to be_nil
-      end
-    end
-
-    context 'when names and roles scope missing from developer key' do
-      let(:nrps_developer_key_scopes) { ags_scopes }
-
-      it 'does not set the NRPS claim' do
-        expect(message_names_and_roles_service).to be_nil
-      end
+      it_behaves_like 'lti advantage service claim group disabled check'
+      it_behaves_like 'lti advantage scopes missing from developer key'
     end
   end
 
@@ -428,12 +422,12 @@ describe Lti::Messages::JwtMessage do
     end
 
     it 'adds placement-specific custom parameters' do
-      jwt_message.generate_post_payload
+      Lti::Messages::JwtMessage.generate_id_token(jwt_message.generate_post_payload)
       expect(message_custom['no_expansion']).to eq 'foo'
     end
 
     it 'expands variable expansions' do
-      jwt_message.generate_post_payload
+      Lti::Messages::JwtMessage.generate_id_token(jwt_message.generate_post_payload)
       expect(message_custom['has_expansion']).to eq user.id
     end
 
@@ -692,7 +686,7 @@ describe Lti::Messages::JwtMessage do
       end
 
       let(:account_jwt) do
-        jws = account_jwt_message.generate_post_payload
+        jws = Lti::Messages::JwtMessage.generate_id_token(account_jwt_message.generate_post_payload)
         JSON::JWT.decode(jws[:id_token], pub_key)
       end
     end
@@ -847,7 +841,7 @@ describe Lti::Messages::JwtMessage do
         observer.update!(lti_context_id: SecureRandom.uuid)
         observer_enrollment = course.enroll_user(observer, 'ObserverEnrollment')
         observer_enrollment.update_attribute(:associated_user_id, user.id)
-        allow(jwt_message).to receive(:current_observee_list).and_return([observer.lti_context_id])
+        allow_any_instance_of(Lti::Messages::JwtMessage).to receive(:current_observee_list).and_return([observer.lti_context_id])
 
         expect(decoded_jwt['https://purl.imsglobal.org/spec/lti/claim/role_scope_mentor']).to match_array [
           observer.lti_context_id

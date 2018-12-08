@@ -34,6 +34,7 @@ class TokenScopes
     LTI_AGS_SCORE_SCOPE => I18n.t("Create/Edit Line Item Scores"),
     LTI_NRPS_V2_SCOPE => I18n.t("Read Context Membership")
   }.freeze
+  LTI_AGS_SCOPES = [ LTI_AGS_LINE_ITEM_SCOPE, LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE, LTI_AGS_RESULT_READ_ONLY_SCOPE, LTI_AGS_SCORE_SCOPE ].freeze
 
   def self.named_scopes
     return @_named_scopes if @_named_scopes

@@ -484,4 +484,44 @@ describe BasicLTI::BasicOutcomes do
       end
     end
   end
+
+  describe "#process_request" do
+    context "when assignment is a Quizzes.Next quiz" do
+      let(:tool) do
+        @course.context_external_tools.create(
+          name: "a",
+          url: "http://google.com",
+          consumer_key: '12345',
+          shared_secret: 'secret',
+          tool_id: 'Quizzes 2'
+        )
+      end
+
+      it "uses BasicLTI::QuizzesNextLtiResponse object" do
+        expect(BasicLTI::QuizzesNextLtiResponse).to receive(:new).and_call_original
+        BasicLTI::BasicOutcomes.process_request(tool, xml)
+      end
+
+      context "when quizzes_next_submission_history is off" do
+        before do
+          allow(tool.context.root_account).to receive(:feature_enabled?).
+            with(:quizzes_next_submission_history).and_return(false)
+        end
+
+        it "uses BasicLTI::BasicOutcomes::LtiResponse object" do
+          expect(BasicLTI::BasicOutcomes::LtiResponse).to receive(:new).and_call_original
+          expect(BasicLTI::QuizzesNextLtiResponse).not_to receive(:new)
+          BasicLTI::BasicOutcomes.process_request(tool, xml)
+        end
+      end
+    end
+
+    context "when assignment is not a Quizzes.Next quiz" do
+      it "uses BasicLTI::BasicOutcomes::LtiResponse object" do
+        expect(BasicLTI::BasicOutcomes::LtiResponse).to receive(:new).and_call_original
+        expect(BasicLTI::QuizzesNextLtiResponse).not_to receive(:new)
+        BasicLTI::BasicOutcomes.process_request(tool, xml)
+      end
+    end
+  end
 end

@@ -18,6 +18,7 @@
 import I18n from 'i18n!media_comments'
 import $ from 'jquery'
 import 'jqueryui/dialog'
+import ReactDOM from 'react-dom'
 
 /*
  * manages uploader modal dialog
@@ -75,6 +76,7 @@ export default class DialogManager {
 
   setCloseOption(opts) {
     return this.dialog.dialog('option', 'close', () => {
+      ReactDOM.unmountComponentAtNode(document.getElementById('record_media_tab'))
       $('#audio_record')
         .before("<div id='audio_record'/>")
         .remove()

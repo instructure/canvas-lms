@@ -1791,7 +1791,7 @@ sv:
   allow_bulk_grade_export_to_sis_e11a6e66: "Tillåt export av omdömen i Bulk till SIS"
   allow_comments_a1f45d8: "Tillåt kommentarer"
   allow_course_content_to_be_downloaded_and_viewed_o_48a0d252: "Tillåt kursinnehåll att visas och laddas ner offline."
-  allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: "Tillåt kursbilder att tilldelas till en kurs och användas i kontrollpanelens kort."
+  allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: "Tillåt kursbilder att tilldelas till en kurs och användas i översiktens kort."
   allow_course_images_to_be_assigned_to_a_course_and_adb906f4: "Tillåt kursbilder att tilldelas till en kurs och användas i kontrollpanelerna."
   allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "Låt översiktskort registreras för varje användare."
   allow_importing_of_qti_and_common_cartridge_into_q_81b657cd: "Tillåt import av QTI och Common Cartridge till Quizzes.Next."
@@ -1801,7 +1801,7 @@ sv:
   allow_moderator_to_review_multiple_independent_gra_c59d64f6: "Tillåt att en moderator granskar flera oberoende omdömen för utvalda inlämningar."
   allow_multiple_attempts_e67a0a37: "Tillåt flera försök"
   allow_opt_out_of_inbox: "Tillåt användare att välja om de vill ut ur konversations-inkorgen. Det kommer leda till att alla konversationsmeddelanden och aviseringar skickas som ASAP-aviseringar till användarens primära e-post, dölj Konversations-inkorgens märke för olästa meddelanden, och dölj Konversations-inkorgens aviseringspreferenser. "
-  allow_outcome_extra_credit_57c1e84e: "Tillåt extra kredit för lärandemål"
+  allow_outcome_extra_credit_57c1e84e: "Tillåt extra poäng på lärandemål"
   allow_passive_acceptance_of_terms_of_service_63ef5994: "Tillåt passivt godkännande av användarvillkoren"
   allow_reorder_dashboard_cards_78215947: "Tillåt registrering av översiktskort"
   allow_replies_for_title_cfe7af6c: "Tillåt svar för %{title}"
@@ -2239,8 +2239,8 @@ sv:
   anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Anonym bedömning döljer studentnamnet i SpeedGrader™"
   anonymous_instructor_annotations_2b6c822: "Anonyma instruktörs annoteringar"
   anonymous_instructor_annotations_is_a_setting_on_a_f7a2e36a: |-
-      Anonyma instruktörsanteckningar är en inställning för uppgifter som gör
-      det möjligt för instruktörer att lämna kommentarer som är anonyma för studenter.
+      Anonyma lärarannoteringar är en inställning för uppgifter som gör
+      det möjligt för lärare att lämna kommentarer som är anonyma för studenter.
   anonymous_marking_92a4d623: "Anonym märkning"
   anonymous_mode_on_2dd9b94a: "Anonymt läge på"
   anonymous_mode_on_feb53729: "Anonymt läge på:"
@@ -6602,7 +6602,7 @@ sv:
   create_as_many_discussion_topics_as_needed_as_assi_f1221307: |-
       Skapa så många diskussionsämnen som behövs, som tilldelning
       för betygsättning eller som ett forum för gemensamma idéer och information.
-  create_assessments_with_quizzes_next_and_migrate_e_eaaee5e6: "Skapa bedömningar med Quizzes. Härnäst och migrera befintliga Canvas Quizzes."
+  create_assessments_with_quizzes_next_and_migrate_e_eaaee5e6: "Skapa bedömningar med Quizzes.Next och migrera befintliga Canvas Quizzes."
   create_assignment_68532ceb: "Skapa uppgift"
   create_assignments_on_the_assignments_page_organiz_8838b18a: |-
       Skapa uppgifter på uppgiftssidan. Organisera uppgifter
@@ -8636,7 +8636,7 @@ sv:
   failed_to_update_role_name_8c7b0119: "Det gick inte att uppdatera rollens namn"
   failed_to_validate_cas_ticket_error_31aa4c63: "Det gick inte att skapa en CAS-biljett: %{error}"
   fair_38e62237: Rättvis
-  fair_score_554e2558: "Rättvis poäng"
+  fair_score_554e2558: "Mediokert poäng"
   fair_use_bee47d77: "Rättvis användning"
   fall_grading_period_current_score_d48c7f78: "Nuvarande poäng under höstens omdömesperiod"
   fall_grading_period_final_score_56d96a8f: "Slutlig poäng för höstens omdömesperiod"
@@ -8685,7 +8685,7 @@ sv:
     lor: "LOR externa verktyg"
     multiple_grading_periods: "Flera betygsperioder"
     new_quiz_statistics: "Ny sida för Quizstatistik"
-    post_grades: "Posta omdöme till SIS"
+    post_grades: "Skicka omdöme till SIS"
     quiz_log_auditing: "Granskning av quizlogg"
     student_groups: "Ny elevgruppsida"
     student_outcome_gradebook: "Studentöverblick för Måluppfyllelse"
@@ -8928,7 +8928,7 @@ sv:
   full_name_23fdfb6d: "Fullständigt namn"
   full_name_83cf5453: "Fullständigt namn"
   full_name_is_required_8efbdc84: "Fullständigt namn krävs"
-  future_5416ea92: Framtid
+  future_5416ea92: Framtida
   future_terms_7fba2ae6: "Framtida termer"
   gathering_files_933551d9: "Samlar filer..."
   general_locked_objects_6a9adafb: "Allmänt låsta föremål"
@@ -10851,7 +10851,7 @@ sv:
         all: Alla
         current: Nuvarande
         failed: Misslyckad
-        future: Framtid
+        future: Framtida
         id: ID
         strand: Fiber
         tag: Tagg
@@ -15271,7 +15271,7 @@ sv:
   polls_d8096fb7: Enkätundersökningar
   pollsubmissions_ce0ef4d: PollSubmissions
   poor_1150a0f8: dålig
-  poor_score_715306e2: "Dålig poäng"
+  poor_score_715306e2: "Dåligt poäng"
   port_75f69d1: Port
   position_f9c9b93c: Position
   position_select_c2dd3980: Position-val
@@ -19982,7 +19982,7 @@ sv:
   this_email_address_is_unconfirmed_f0fc8c6e: "E-postadressen är inte bekräftad"
   this_enables_a_course_setting_to_allow_students_to_fc47219: "Detta aktiverar en kursinställning så att studenter kan exportera kurserna som en webbzipmapp offline."
   this_enables_an_updated_navigation_new_dashboard_a_8bd4cae: "Det här aktiverar en uppdaterad navigering, ny översikt och ett enklare och mer modernt utseende och känsla."
-  this_enables_users_to_generate_and_download_course_4c69c531: "Detta låter användare generera och ladda ner kurs ePub."
+  this_enables_users_to_generate_and_download_course_4c69c531: "Detta låter användare generera och ladda ned kurs som ePub."
   this_environment_is_currently_being_updated_with_a_235f1875: "Miljön uppdateras för tillfället med en kopia av senaste produktionsdata. Återkom vid ett senare tillfälle."
   this_feature_can_t_be_disabled_because_there_is_at_a015b943: "Den här funktionen kan inte inaktiveras eftersom det finns minst ett underkonto eller en kurs med den här funktionen aktiverad."
   this_feature_can_t_be_enabled_while_autodetection__a3552fb4: "Den här funktionen kan inte aktiveras när autodetektering av fältseparatorer är aktiverad"

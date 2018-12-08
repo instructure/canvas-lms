@@ -341,6 +341,44 @@ describe RubricAssessment do
       expect(assessment.artifact.score).to eql(nil)
     end
 
+    describe "when saving comments is requested" do
+      it "saves comments normally" do
+        criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
+        @association.assess({
+          :user => @student,
+          :assessor => @student,
+          :artifact => @assignment.find_or_create_submission(@student),
+          :assessment => {
+            :assessment_type => 'grading',
+            criterion_id => {
+              :points => "3",
+              :comments => "Some comment",
+              :save_comment => '1'
+            }
+          }
+        })
+        expect(@association.summary_data[:saved_comments]["crit1"]).to eq(["Some comment"])
+      end
+
+      it "does not save comments for peer assessments" do
+        criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
+        @association.assess({
+          :user => @student,
+          :assessor => @student,
+          :artifact => @assignment.find_or_create_submission(@student),
+          :assessment => {
+            :assessment_type => 'peer_review',
+            criterion_id => {
+              :points => "3",
+              :comments => "Some obscene comment",
+              :save_comment => '1'
+            }
+          }
+        })
+        expect(@association.summary_data).to be_nil
+      end
+    end
+
     describe "for assignment requiring anonymous peer reviews" do
       before(:once) do
         @assignment.update_attribute(:anonymous_peer_reviews, true)

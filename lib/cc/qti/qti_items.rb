@@ -129,7 +129,7 @@ module CC
             presentation_options(pres_node, question)
           end # presentation
 
-          unless ['text_only_question', 'file_upload_question'].include?(question['question_type'])
+          if question['question_type'] != 'text_only_question'
             item_node.resprocessing do |res_node|
               res_node.outcomes do |out_node|
                 out_node.decvar(
@@ -256,7 +256,7 @@ module CC
 
       def calculated_response_str(node, question)
         node.response_str(
-                :ident => question["answers"].first["id"],
+                :ident => 'response1',
                 :rcardinality => 'Single'
         ) do |r_node|
           r_node.render_fib(:fibtype=>'Decimal') {|n| n.response_label(:ident=>'answer1')}
@@ -338,7 +338,7 @@ module CC
         node.respcondition(:continue=>'No') do |res_node|
           res_node.conditionvar do |c_node|
             question['answers'].each do |answer|
-              c_node.varequal answer['text'], :respident => answer['id']
+              c_node.varequal answer['text'], :respident => 'response1'
             end
           end #c_node
           res_node.setvar '100', :action => 'Set', :varname => 'SCORE'
@@ -354,13 +354,13 @@ module CC
                 # exact answer
                 c_node.or do |or_node|
                   exact = answer['exact'].to_f
-                  or_node.varequal exact, :respident=>answer['id']
+                  or_node.varequal exact, :respident => 'response1'
                   unless answer['margin'].blank?
                     or_node.and do |and_node|
                       exact = BigDecimal.new(answer['exact'].to_s)
                       margin = BigDecimal.new(answer['margin'].to_s)
-                      and_node.vargte((exact - margin).to_f, :respident=>answer['id'])
-                      and_node.varlte((exact + margin).to_f, :respident=>answer['id'])
+                      and_node.vargte((exact - margin).to_f, :respident => 'response1')
+                      and_node.varlte((exact + margin).to_f, :respident => 'response1')
                     end
                   end
                 end
@@ -368,7 +368,7 @@ module CC
                 # this might be one of the worst hacks i've ever done
                 c_node.or do |or_node|
                   approx = answer['approximate'].to_d
-                  or_node.varequal approx, :respident=>answer['id']
+                  or_node.varequal approx, :respident=> 'response1'
 
                   precision = answer['precision'].to_i
                   if precision > 0
@@ -380,15 +380,15 @@ module CC
                     ceil = "#{prefix.to_d + range}E#{exp}".to_d # 1.3405E+01
 
                     or_node.and do |and_node|
-                      and_node.vargt(floor, :respident=>answer['id'])
-                      and_node.varlte(ceil, :respident=>answer['id'])
+                      and_node.vargt(floor, :respident => 'response1')
+                      and_node.varlte(ceil, :respident => 'response1')
                     end
                   end
                 end
               else
                 # answer in range
-                c_node.vargte(answer['start'], :respident=>answer['id'])
-                c_node.varlte(answer['end'], :respident=>answer['id'])
+                c_node.vargte(answer['start'], :respident => 'response1')
+                c_node.varlte(answer['end'], :respident => 'response1')
               end
             end #c_node
 

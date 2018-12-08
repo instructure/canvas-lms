@@ -553,6 +553,7 @@ describe "Users API", type: :request do
         'created_at' => @other_user.created_at.iso8601,
          'short_name' => @other_user.short_name,
          'locale' => nil,
+         'effective_locale' => 'en',
          'permissions' => {'can_update_name' => true, 'can_update_avatar' => false}
       })
     end

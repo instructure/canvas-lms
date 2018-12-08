@@ -76,3 +76,14 @@ it("Renders the 'Save' button if not customizing", () => {
       .text()
   ).toEqual('Save Customizations')
 })
+
+it("Disables the save button if disable is true", () => {
+  wrapper = mount(<LtiKeyFooter {...newProps()} disable />)
+  expect(
+    wrapper
+      .find('Button')
+      .at(1)
+      .props()
+      .disabled
+  ).toEqual(true)
+})

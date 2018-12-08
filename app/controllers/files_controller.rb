@@ -142,6 +142,8 @@ class FilesController < ApplicationController
     :api_create, :api_create_success, :api_create_success_cors, :show_thumbnail
   ]
 
+  before_action :open_limited_cors, only: [:show]
+
   prepend_around_action :load_pseudonym_from_policy, only: :create
   skip_before_action :verify_authenticity_token, only: :api_create
   before_action :verify_api_id, only: [
@@ -457,7 +459,10 @@ class FilesController < ApplicationController
     end
     params[:include] = Array(params[:include])
     if authorized_action(@attachment,@current_user,:read)
-      render :json => attachment_json(@attachment, @current_user, {}, { include: params[:include], omit_verifier_in_app: !value_to_boolean(params[:use_verifiers]) })
+      json = attachment_json(@attachment, @current_user, {}, { include: params[:include], omit_verifier_in_app: !value_to_boolean(params[:use_verifiers]) })
+
+      json.merge!(doc_preview_json(@attachment, @current_user))
+      render :json => json
     end
   end
 
@@ -497,14 +502,9 @@ class FilesController < ApplicationController
       return
     end
 
-
-    verifier_checker = Attachments::Verification.new(@attachment)
-    if (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :read, session)) ||
-        @attachment.attachment_associations.where(:context_type => 'Submission').
-          any? { |aa| aa.context && aa.context.grants_right?(@current_user, session, :read) } ||
-        authorized_action(@attachment, @current_user, :read)
-
+    if read_allowed(@attachment, @current_user, session, params)
       @attachment.ensure_media_object
+      verifier_checker = Attachments::Verification.new(@attachment)
 
       if params[:download]
         if (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download, session)) ||
@@ -1198,6 +1198,26 @@ class FilesController < ApplicationController
     headers['Access-Control-Allow-Methods'] = 'POST, PUT, DELETE, GET, OPTIONS'
     headers['Access-Control-Request-Method'] = '*'
     headers['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept, Authorization, Accept-Encoding'
+  end
+
+  def open_limited_cors
+    headers['Access-Control-Allow-Origin'] = '*'
+    headers['Access-Control-Allow-Methods'] = 'GET, HEAD'
+  end
+
+  def read_allowed(attachment, user, session, params)
+    if params[:verifier]
+      verifier_checker = Attachments::Verification.new(attachment)
+      return true if verifier_checker.valid_verifier_for_permission?(params[:verifier], :read, session)
+    end
+
+    submissions = attachment.attachment_associations.where(context_type: "Submission").preload(:context).map(&:context).compact
+    return true if submissions.any? { |submission| submission.grants_right?(user, session, :read) }
+
+    course = Assignment.find(params[:assignment_id]).course unless params[:assignment_id].nil?
+    return true if course&.grants_right?(user, session, :read)
+
+    authorized_action(attachment, user, :read)
   end
 
   def strong_attachment_params

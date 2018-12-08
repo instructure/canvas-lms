@@ -41,7 +41,7 @@ class CourseForMenuPresenter
       enrollmentType: course.primary_enrollment_type,
       id: course.id,
       image: course.feature_enabled?(:course_card_images) ? course.image : nil,
-      position: @context&.feature_enabled?(:dashcard_reordering) ? @user.dashboard_positions[course.asset_string] : nil,
+      position: @user.dashboard_positions[course.asset_string] || nil,
     }.tap do |hash|
       if @opts[:tabs]
         tabs = course.tabs_available(@user, {

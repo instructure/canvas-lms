@@ -116,6 +116,24 @@ export default class CoursesListRow extends React.Component {
     this.setState({teachersToShow: this.uniqueTeachers()})
   }
 
+  allowAddingEnrollments() {
+    return this.props.can_create_enrollments && this.props.workflow_state !== 'completed'
+  }
+
+  renderAddEnrollments() {
+    if (this.allowAddingEnrollments()) {
+      const {name} = this.props
+      const addUsersTip = I18n.t('Add Users to %{name}', {name})
+      return (
+        <Tooltip tip={addUsersTip}>
+          <Button variant="icon" size="small" onClick={this.openAddUsersToCourseDialog}>
+            <IconPlusLine title={addUsersTip} />
+          </Button>
+        </Tooltip>
+      )
+    }
+  }
+
   render() {
     const {
       id,
@@ -127,15 +145,13 @@ export default class CoursesListRow extends React.Component {
       subaccount_name,
       showSISIds,
       term,
-      blueprint,
-      can_create_enrollments
+      blueprint
     } = this.props
     const {teachersToShow, newlyEnrolledStudents} = this.state
     const url = `/courses/${id}`
     const isPublished = workflow_state !== 'unpublished'
 
     const blueprintTip = I18n.t('This is a blueprint course')
-    const addUsersTip = I18n.t('Add Users to %{name}', {name})
     const statsTip = I18n.t('Statistics for %{name}', {name})
     const settingsTip = I18n.t('Settings for %{name}', {name})
 
@@ -186,13 +202,7 @@ export default class CoursesListRow extends React.Component {
         <td>{subaccount_name}</td>
         <td>{I18n.n(total_students + newlyEnrolledStudents)}</td>
         <td style={{whiteSpace: 'nowrap'}}>
-          {can_create_enrollments && (
-            <Tooltip tip={addUsersTip}>
-              <Button variant="icon" size="small" onClick={this.openAddUsersToCourseDialog}>
-                <IconPlusLine title={addUsersTip} />
-              </Button>
-            </Tooltip>
-          )}
+          {this.renderAddEnrollments()}
           <Tooltip tip={statsTip}>
             <Button variant="icon" size="small" href={`${url}/statistics`}>
               <IconStatsLine title={statsTip} />

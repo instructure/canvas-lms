@@ -20,9 +20,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import CanvasMediaRecorder from './index'
 
-export default function renderCanvasMediaRecorder(domElementId, onSaveFile) {
-  const recorderElement = document.getElementById(domElementId)
-  if (recorderElement) {
-    ReactDOM.render(<CanvasMediaRecorder onSaveFile={onSaveFile} />, recorderElement)
-  }
+// We have this simple code in a seperate file so that we can take advantage
+// of code splitting
+export default function renderCanvasMediaRecorder(element, onSaveFile) {
+  ReactDOM.render(<CanvasMediaRecorder onSaveFile={onSaveFile} />, element)
 }

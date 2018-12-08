@@ -41,8 +41,8 @@ class Gradezilla
         fj("input[value=#{type}]")
       end
 
-      def late_by_input_xpath
-        "//input[contains(@id, 'NumberInput')]"
+      def late_by_input
+        fj(".NumberInput__Container-LeftIndent :input")
       end
 
       def late_by_hours
@@ -136,12 +136,12 @@ class Gradezilla
       end
 
       def fetch_late_by_value
-        fxpath(late_by_input_xpath)['value']
+        late_by_input['value']
       end
 
       def edit_late_by_input(value)
-        fxpath(late_by_input_xpath).click
-        set_value(fxpath(late_by_input_xpath), value)
+        late_by_input.click
+        set_value(late_by_input, value)
         # shifting focus from input = saving the changes
         driver.action.send_keys(:tab).perform
         wait_for_ajax_requests

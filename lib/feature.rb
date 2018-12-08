@@ -122,8 +122,7 @@ class Feature
       description: -> { I18n.t('Use HTML5 Recorder in Content Editor instead of Flash') },
       applies_to: 'RootAccount',
       state: 'allowed',
-      root_opt_in: true,
-      development: true
+      root_opt_in: true
     },
     'google_docs_domain_restriction' =>
     {
@@ -450,16 +449,6 @@ END
       root_opt_in: true,
       beta: true
     },
-    'dashcard_reordering' =>
-    {
-      display_name: -> { I18n.t('Allow Reorder Dashboard Cards') },
-      description: -> { I18n.t('Allow dashboard cards to be reordered for each user.') },
-      applies_to: 'RootAccount',
-      state: 'hidden',
-      beta: true,
-      development: true,
-      root_opt_in: false
-    },
     'responsive_layout' =>
     {
       display_name: -> { I18n.t('Responsive Layout') },
@@ -576,8 +565,7 @@ END
       display_name: -> { I18n.t('Blueprint Courses') }, # this won't be confusing at all
       description: -> { I18n.t('Enable the creation of Blueprint Courses') },
       applies_to: 'RootAccount',
-      state: 'allowed',
-      beta: false,
+      state: 'on'
     },
     'student_context_cards' =>
     {
@@ -634,6 +622,12 @@ END
         is_provisioned
       end
     },
+    'quizzes_next_submission_history' => {
+      display_name: -> { I18n.t('Quizzes.Next submission history') },
+      description: -> { I18n.t('If enabled, submission history for Quizzes.Next quizzes is dealt with separately.') },
+      applies_to: 'RootAccount',
+      state: 'on'
+    },
     'import_to_quizzes_next' =>
     {
       display_name: -> { I18n.t('Quizzes.Next Importing') },
@@ -669,6 +663,14 @@ END
       development: true,
       beta: true
     },
+    'javascript_csp' => {
+      display_name: -> { I18n.t('Content Security Policy')},
+      description: -> { I18n.t('Enable the Security tab on the settings page to adjust CSP settings')},
+      applies_to: 'RootAccount',
+      state: 'hidden',
+      development: true,
+      beta: true
+    },
     'restrict_students_from_annotating' => {
       display_name: -> { I18n.t('Restrict Students from Annotating') },
       description: -> {
@@ -680,7 +682,7 @@ END
       state: 'allowed',
       development: true
     },
-    'final_grade_override' => {
+    'final_grades_override' => {
       display_name: -> { I18n.t('Final Grade Override') },
       description: -> {
         I18n.t <<~DESCRIPTION
@@ -688,7 +690,7 @@ END
         DESCRIPTION
       },
       applies_to: 'Course',
-      state: 'allowed',
+      state: 'hidden',
       development: true,
       beta: true
     }

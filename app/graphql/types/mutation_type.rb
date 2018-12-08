@@ -16,25 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Types
-  MutationType = GraphQL::ObjectType.define do
-    name "Mutation"
+class Types::MutationType < Types::ApplicationObjectType
+  graphql_name "Mutation"
 
-    field :createAssignment, AssignmentType do
-      argument :assignment, !AssignmentInput
-
-      resolve -> (_, args, ctx) do
-        CanvasSchema.object_from_id(args[:assignment][:courseId], ctx).then do |course|
-          # NOTE: i guess i have to type check here since i'm using global ids?
-          if course && course.is_a?(Course)
-            assignment = course.assignments.new name: args[:assignment][:name]
-            if assignment.grants_right? ctx[:current_user], ctx[:session], :create
-              assignment.save!
-            end
-          end
-          assignment
-        end
-      end
-    end
-  end
+  field :create_group_in_set, mutation: Mutations::CreateGroupInSet
+  field :set_override_score, <<~DESC, mutation: Mutations::SetOverrideScore
+    Sets the overridden final score for the associated enrollment, optionally limited to a specific
+    grading period. This will supersede the computed final score/grade if present.
+  DESC
 end

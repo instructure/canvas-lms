@@ -64,11 +64,128 @@ describe 'Audit Trail' do
 
   before :each do
     user_session(@teacher3)
+  end
 
+  it 'shows entry for submission comments', priority: "1", test_id: 3513995 do
+    complete_moderation!
+
+    user_session(@auditor)
+    Speedgrader.visit(@course.id, @assignment.id)
+    Speedgrader.open_assessment_audit
+    Speedgrader.expand_assessment_audit_user_events(@teacher1)
+    expect(Speedgrader.audit_entries).to include_text("Just a comment by teacher1")
+  end
+
+  it 'shows entry for submission comments deleted', priority: "1", test_id: 3513995 do
+    Speedgrader.visit(@course.id, @assignment.id)
+    Speedgrader.delete_comment[0].click
+    accept_alert
+    wait_for_ajaximations
+    complete_moderation!
+
+    user_session(@auditor)
+    Speedgrader.visit(@course.id, @assignment.id)
+    Speedgrader.open_assessment_audit
+    Speedgrader.expand_assessment_audit_user_events(@teacher3)
+    expect(Speedgrader.audit_entries).to include_text("Submission comment deleted")
+  end
+
+  it 'shows entry for grades posted', priority: "1", test_id: 3513995 do
+    complete_moderation!
+
+    user_session(@auditor)
+    Speedgrader.visit(@course.id, @assignment.id)
+    Speedgrader.open_assessment_audit
+    Speedgrader.expand_assessment_audit_user_events(@teacher3)
+    expect(Speedgrader.audit_entries).to include_text("Grades posted")
+  end
+
+  it 'show entry for grades displayed to students', priority: "1", test_id: 3513995 do
+    complete_moderation!
+
+    user_session(@auditor)
+    Speedgrader.visit(@course.id, @assignment.id)
+    Speedgrader.open_assessment_audit
+    Speedgrader.expand_assessment_audit_user_events(@teacher3)
+    # verify there is an entry for when unmuted
+    expect(Speedgrader.audit_entries).to include_text("Assignment unmuted")
+  end
+
+  it 'shows entry for editing anonymous grading', priority: "1", test_id: 3691670 do
+    # make some edits to the assignment, verify in audit trail
+    @assignment.updating_user = @teacher3
+    @assignment.update!(anonymous_grading: true)
+    @assignment.update!(anonymous_grading: false)
+    complete_moderation!
+
+    user_session(@auditor)
+    Speedgrader.visit(@course.id, @assignment.id)
+    Speedgrader.open_assessment_audit
+    Speedgrader.expand_assessment_audit_user_events(@teacher3)
+    # (final grader, comment visibility, # of graders, muted on/off, anonymous on/off, etc.)
+    expect(Speedgrader.audit_entries).to include_text("Anonymous turned on")
+  end
+
+  it 'shows entry for editing graders anon to graders', priority: "1", test_id: 3691670 do
+    # make some edits to the assignment, verify in audit trail
+    @assignment.updating_user = @teacher3
+    @assignment.update!(graders_anonymous_to_graders: true)
+    complete_moderation!
+
+    user_session(@auditor)
+    Speedgrader.visit(@course.id, @assignment.id)
+    Speedgrader.open_assessment_audit
+    Speedgrader.expand_assessment_audit_user_events(@teacher3)
+    # (final grader, comment visibility, # of graders, muted on/off, anonymous on/off, etc.)
+    expect(Speedgrader.audit_entries).to include_text("Graders anonymous to graders turned on")
+  end
+
+  it 'shows entry for editing grader names visible to final grader', priority: "1", test_id: 3691670 do
+    # make some edits to the assignment, verify in audit trail
+    @assignment.updating_user = @teacher3
+    @assignment.update!(grader_names_visible_to_final_grader: false)
+    complete_moderation!
+
+    user_session(@auditor)
+    Speedgrader.visit(@course.id, @assignment.id)
+    Speedgrader.open_assessment_audit
+    Speedgrader.expand_assessment_audit_user_events(@teacher3)
+    # (final grader, comment visibility, # of graders, muted on/off, anonymous on/off, etc.)
+    expect(Speedgrader.audit_entries).to include_text("Grader names visible to final grader turned off")
+  end
+
+  it 'shows entry for editing grader comments visible', priority: "1", test_id: 3691670 do
+    # make some edits to the assignment, verify in audit trail
+    @assignment.updating_user = @teacher3
+    @assignment.update!(grader_comments_visible_to_graders: false)
+    complete_moderation!
+
+    user_session(@auditor)
+    Speedgrader.visit(@course.id, @assignment.id)
+    Speedgrader.open_assessment_audit
+    Speedgrader.expand_assessment_audit_user_events(@teacher3)
+    # (final grader, comment visibility, # of graders, muted on/off, anonymous on/off, etc.)
+    expect(Speedgrader.audit_entries).to include_text("Grader comments visible to graders turned off")
+  end
+
+  it 'shows entry for editing grader count', priority: "1", test_id: 3691670 do
+    # make some edits to the assignment, verify in audit trail
+    @assignment.updating_user = @teacher3
+    @assignment.update!(grader_count: 3)
+    complete_moderation!
+
+    user_session(@auditor)
+    Speedgrader.visit(@course.id, @assignment.id)
+    Speedgrader.open_assessment_audit
+    Speedgrader.expand_assessment_audit_user_events(@teacher3)
+    # (final grader, comment visibility, # of graders, muted on/off, anonymous on/off, etc.)
+    expect(Speedgrader.audit_entries).to include_text("Grader count set to 3")
+  end
+
+  def complete_moderation!
     ModeratePage.visit(@course.id, @assignment.id)
     ModeratePage.select_provisional_grade_for_student_by_position(@student1, 1)
     ModeratePage.select_provisional_grade_for_student_by_position(@student2, 2)
-
     # post the grades
     ModeratePage.click_post_grades_button
     driver.switch_to.alert.accept
@@ -81,91 +198,5 @@ describe 'Audit Trail' do
     wait_for_ajaximations
     # wait for element to exist, means page has loaded
     ModeratePage.grades_visible_to_students_button
-
-    # change sesison to auditor
-    user_session(@auditor)
-    Speedgrader.visit(@course.id, @assignment.id)
-  end
-
-  it 'shows entry for submission comments', priority: "1", test_id: 3513995 do
-    skip('Unskip with GRADE-1670')
-    Speedgrader.open_assessment_audit
-    # verify that the submission comments created above show in audit trail
-    expect(Speedgrader.audit_entries).to include_text("Just a comment by teacher1")
-  end
-
-  it 'shows entry for submission comments deleted', priority: "1", test_id: 3513995 do
-    skip('Unskip with GRADE-1672')
-    Speedgrader.delete_comment[0].click
-    accept_alert
-    wait_for_ajaximations
-    Speedgrader.open_assessment_audit
-    Speedgrader.expand_assessment_audit_user_events(@teacher1)
-    # delete a comment, verify there is an entry
-    expect(Speedgrader.audit_entries).to include_text("Submission comment deleted")
-  end
-
-  it 'shows entry for grades posted', priority: "1", test_id: 3513995 do
-    skip('Unskip with GRADE-1672')
-    Speedgrader.open_assessment_audit
-    # verify there is an entry for when the grades were posted
-    expect(Speedgrader.audit_entries).to include_text("Grades posted")
-  end
-
-  it 'show entry for grades displayed to students', priority: "1", test_id: 3513995 do
-    skip('Unskip with GRADE-1667')
-    Speedgrader.open_assessment_audit
-    # verify there is an entry for when unmuted
-    expect(Speedgrader.audit_entries).to include_text("Assignment unmuted")
-  end
-
-  it 'shows entry for editing anonymous grading', priority: "1", test_id: 3513995 do
-    skip('Unskip with GRADE-1667')
-    # make some edits to the assignment, verify in audit trail
-    @assignment.update!(anonymous_grading: true)
-    Speedgrader.visit(@course.id, @assignment.id)
-    Speedgrader.open_assessment_audit
-    # (final grader, comment visibility, # of graders, muted on/off, anonymous on/off, etc.)
-    expect(Speedgrader.audit_entries).to include_text("Anonymous turned on")
-  end
-
-  it 'shows entry for editing graders anon to graders', priority: "1", test_id: 3513995 do
-    skip('Unskip with GRADE-1667')
-    # make some edits to the assignment, verify in audit trail
-    @assignment.update!(graders_anonymous_to_graders: true)
-    Speedgrader.visit(@course.id, @assignment.id)
-    Speedgrader.open_assessment_audit
-    # (final grader, comment visibility, # of graders, muted on/off, anonymous on/off, etc.)
-    expect(Speedgrader.audit_entries).to include_text("Graders anonymous to graders turned on")
-  end
-
-  it 'shows entry for editing grader names visible to final grader', priority: "1", test_id: 3513995 do
-    skip('Unskip with GRADE-1667')
-    # make some edits to the assignment, verify in audit trail
-    @assignment.update!(grader_names_visible_to_final_grader: false)
-    Speedgrader.visit(@course.id, @assignment.id)
-    Speedgrader.open_assessment_audit
-    # (final grader, comment visibility, # of graders, muted on/off, anonymous on/off, etc.)
-    expect(Speedgrader.audit_entries).to include_text("Grader names visible to final grader turned off")
-  end
-
-  it 'shows entry for editing grader comments visible', priority: "1", test_id: 3513995 do
-    skip('Unskip with GRADE-1667')
-    # make some edits to the assignment, verify in audit trail
-    @assignment.update!(grader_comments_visible_to_graders: false)
-    Speedgrader.visit(@course.id, @assignment.id)
-    Speedgrader.open_assessment_audit
-    # (final grader, comment visibility, # of graders, muted on/off, anonymous on/off, etc.)
-    expect(Speedgrader.audit_entries).to include_text("Grader comments visisble to graders turned off")
-  end
-
-  it 'shows entry for editing grader count', priority: "1", test_id: 3513995 do
-    skip('Unskip with GRADE-1667')
-    # make some edits to the assignment, verify in audit trail
-    @assignment.update!(grader_count: 3)
-    Speedgrader.visit(@course.id, @assignment.id)
-    Speedgrader.open_assessment_audit
-    # (final grader, comment visibility, # of graders, muted on/off, anonymous on/off, etc.)
-    expect(Speedgrader.audit_entries).to include_text("Grader count updated to 3")
   end
 end

@@ -224,6 +224,54 @@ describe GradebooksController do
       expect(assigns[:js_env][:students]).to match_array [@student].as_json(include_root: false)
     end
 
+    context "final grade override" do
+      before(:once) do
+        @course.update!(grading_standard_enabled: true)
+        @course.enable_feature!(:final_grades_override)
+        @course.assignments.create!(title: "an assignment")
+        @student_enrollment.scores.find_by(course_score: true).update!(override_score: 99)
+      end
+
+      it "includes the effective final grade in the ENV" do
+        user_session(@teacher)
+        get :grade_summary, params: { course_id: @course.id, id: @student.id }
+        expect(assigns[:js_env][:effective_final_grade]).to eq "A"
+      end
+
+      it "does not include the effective final grade in the ENV if the feature is disabled" do
+        @course.disable_feature!(:final_grades_override)
+        user_session(@teacher)
+        get :grade_summary, params: { course_id: @course.id, id: @student.id }
+        expect(assigns[:js_env].key?(:effective_final_grade)).to be false
+      end
+
+      it "does not include the effective final grade in the ENV if there is no override score" do
+        @student_enrollment.scores.find_by(course_score: true).update!(override_score: nil)
+        user_session(@teacher)
+        get :grade_summary, params: { course_id: @course.id, id: @student.id }
+        expect(assigns[:js_env].key?(:effective_final_grade)).to be false
+      end
+
+      it "takes the effective final grade for the grading period, if present" do
+        grading_period_group = @course.grading_period_groups.create!
+        grading_period = grading_period_group.grading_periods.create!(
+          title: "a grading period",
+          start_date: 1.day.ago,
+          end_date: 1.day.from_now
+        )
+        @student_enrollment.scores.find_by(grading_period: grading_period).update!(override_score: 84)
+        user_session(@teacher)
+        get :grade_summary, params: { course_id: @course.id, id: @student.id }
+        expect(assigns[:js_env][:effective_final_grade]).to eq "B"
+      end
+
+      it "takes the effective final grade for the course score, if viewing all grading periods" do
+        user_session(@teacher)
+        get :grade_summary, params: { course_id: @course.id, id: @student.id, grading_period_id: 0 }
+        expect(assigns[:js_env][:effective_final_grade]).to eq "A"
+      end
+    end
+
     it "includes muted assignments" do
       user_session(@student)
       assignment = @course.assignments.create!(title: "Example Assignment")

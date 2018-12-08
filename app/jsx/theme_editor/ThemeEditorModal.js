@@ -23,69 +23,73 @@ import Modal, {ModalHeader, ModalBody} from '@instructure/ui-overlays/lib/compon
 import Heading from '@instructure/ui-elements/lib/components/Heading'
 import ProgressBar from '../shared/ProgressBar'
 
-export default class ThemeEditorModal extends React.Component {
-  static propTypes = {
-    showProgressModal: PropTypes.bool,
-    showSubAccountProgress: PropTypes.bool,
-    progress: PropTypes.number,
-    activeSubAccountProgresses: PropTypes.array
-  }
+const messageToName = message =>
+  message.includes('Syncing for') ? message.replace('Syncing for ', '') : I18n.t('Unknown Account')
 
-  modalOpen = () => this.props.showProgressModal || this.props.showSubAccountProgress
-
-  subAccountProgressBar = progress => (
+function SubAccountProgressBar({message, completion}) {
+  return (
     <li className="Theme-editor-progress-list-item">
       <div className="Theme-editor-progress-list-item__title">
         {I18n.t('%{account_name}', {
-          account_name: this.messageToName(progress.message)
+          account_name: messageToName(message)
         })}
       </div>
       <div className="Theme-editor-progress-list-item__bar">
         <ProgressBar
-          progress={progress.completion}
+          progress={completion}
           title={I18n.t('Progress for %{account_name}', {
-            account_name: this.messageToName(progress.message)
+            account_name: messageToName(message)
           })}
         />
       </div>
     </li>
   )
+}
+SubAccountProgressBar.propTypes = {
+  message: PropTypes.string,
+  completion: ProgressBar.propTypes.completion
+}
 
-  messageToName = message =>
-    message.includes('Syncing for')
-      ? message.replace('Syncing for ', '')
-      : I18n.t('Unknown Account')
+export default function ThemeEditorModal(props) {
+  const modalIsOpen = props.showProgressModal || props.showSubAccountProgress
 
-  render() {
-    return (
-      <Modal open={this.modalOpen()} size={this.props.showProgressModal ? 'small' : 'medium'}>
-        <ModalHeader>
-          <Heading>
-            {this.props.showProgressModal
-              ? I18n.t('Generating preview...')
-              : I18n.t('Applying new styles to subaccounts')}{' '}
-          </Heading>
-        </ModalHeader>
-        <ModalBody>
-          {this.props.showProgressModal ? (
-            <ProgressBar
-              progress={this.props.progress}
-              title={I18n.t('%{percent} complete', {
-                percent: I18n.toPercentage(this.props.progress, {
-                  precision: 0
-                })
-              })}
-            />
-          ) : (
-            <div>
-              <p>{I18n.t('Changes will still apply if you leave this page.')}</p>
-              <ul className="unstyled_list">
-                {this.props.activeSubAccountProgresses.map(this.subAccountProgressBar)}
-              </ul>
-            </div>
-          )}
-        </ModalBody>
-      </Modal>
-    )
-  }
+  return (
+    <Modal open={modalIsOpen} size={props.showProgressModal ? 'small' : 'medium'}>
+      <ModalHeader>
+        <Heading>
+          {props.showProgressModal
+            ? I18n.t('Generating preview...')
+            : I18n.t('Applying new styles to subaccounts')}{' '}
+        </Heading>
+      </ModalHeader>
+      <ModalBody>
+        {props.showProgressModal ? (
+          <ProgressBar
+            progress={props.progress}
+            title={I18n.t('%{percent} complete', {
+              percent: I18n.toPercentage(props.progress, {
+                precision: 0
+              })
+            })}
+          />
+        ) : (
+          <div>
+            <p>{I18n.t('Changes will still apply if you leave this page.')}</p>
+            <ul className="unstyled_list">
+              {props.activeSubAccountProgresses.map(progressData => (
+                <SubAccountProgressBar {...progressData} />
+              ))}
+            </ul>
+          </div>
+        )}
+      </ModalBody>
+    </Modal>
+  )
+}
+
+ThemeEditorModal.propTypes = {
+  showProgressModal: PropTypes.bool,
+  showSubAccountProgress: PropTypes.bool,
+  progress: PropTypes.number,
+  activeSubAccountProgresses: PropTypes.arrayOf(PropTypes.shape(SubAccountProgressBar.propTypes))
 }

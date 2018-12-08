@@ -43,17 +43,15 @@ export default class ThemeEditorFileUpload extends Component {
     selectedFileName: ''
   }
 
-  hasSomethingToReset = () => {
-    return this.props.userInput.val || this.props.userInput.val === '' || this.props.currentValue
-  }
+  hasSomethingToReset = () =>
+    this.props.userInput.val || this.props.userInput.val === '' || this.props.currentValue
 
-  hasUserInput = () => {
+  hasUserInput = () =>
     // null means the userInput has been reverted so ignore it
-    return this.props.userInput.val !== null && this.props.userInput.val !== undefined
-  }
+    this.props.userInput.val !== null && this.props.userInput.val !== undefined
 
   handleFileChanged = event => {
-    var file = event.target.files[0]
+    const file = event.target.files[0]
     this.setState({selectedFileName: file.name})
     this.props.handleThemeStateChange(this.props.name, file, {customFileUpload: true})
     this.props.onChange(window.URL.createObjectURL(file))
@@ -109,6 +107,7 @@ export default class ThemeEditorFileUpload extends Component {
       <a
         href={this.props.currentValue}
         target="_blank"
+        rel="noopener noreferrer"
         className="ThemeEditorFileUpload__view-file"
       >
         {I18n.t('View File')}
@@ -145,9 +144,7 @@ export default class ThemeEditorFileUpload extends Component {
               onChange={this.handleFileChanged}
               ref={c => (this.fileInput = c)}
             />
-            <div
-              className="ThemeEditorFileUpload__fake-input uneditable-input ic-Input"
-            >
+            <div className="ThemeEditorFileUpload__fake-input uneditable-input ic-Input">
               {this.displayValue()}
             </div>
             <div className="Button" aria-hidden="true">

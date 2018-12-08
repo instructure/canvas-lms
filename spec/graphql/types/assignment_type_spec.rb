@@ -64,6 +64,11 @@ describe Types::AssignmentType do
     expect(assignment_type.resolve("needsGradingCount", current_user: teacher)).to eq 1
   end
 
+  it "can return a url for the assignment" do
+    expect(
+      assignment_type.resolve("htmlUrl", request: ActionDispatch::TestRequest.create)
+    ).to eq "http://test.host/courses/#{assignment.context_id}/assignments/#{assignment.id}"
+  end
 
   describe "submissionsConnection" do
     let_once(:other_student) { student_in_course(course: course, active_all: true).user }

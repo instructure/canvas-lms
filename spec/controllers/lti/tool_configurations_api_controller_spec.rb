@@ -17,36 +17,22 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../lti_1_3_spec_helper')
 
 RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
+  include_context 'lti_1_3_spec_helper'
+
   subject { response }
-  let_once(:account) { Account.default }
   let_once(:sub_account) { account_model(root_account: account) }
   let_once(:admin) { account_admin_user(account: account) }
   let_once(:student) do
     student_in_course
     @student
   end
-  let(:developer_key) { DeveloperKey.create!(account: account) }
   let(:config_from_response) do
     Lti::ToolConfiguration.find(json_parse.dig('tool_configuration', 'id'))
   end
-  let(:tool_configuration) do
-    Lti::ToolConfiguration.create!(
-      developer_key: developer_key,
-      settings: settings
-    )
-  end
-  let(:public_jwk) do
-    {
-      "kty" => "RSA",
-      "e" => "AQAB",
-      "n" => "2YGluUtCi62Ww_TWB38OE6wTaN...",
-      "kid" => "2018-09-18T21:55:18Z",
-      "alg" => "RS256",
-      "use" => "sig"
-    }
-  end
+  let_once(:account) { Account.default }
   let(:dev_key_params) do
     {
       name: "Test Dev Key",
@@ -54,43 +40,11 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       notes: "Some cool notes",
       test_cluster_only: true,
       scopes: ['https://purl.imsglobal.org/spec/lti-ags/scope/lineitem'],
-      require_scopes: true
-    }
-  end
-  let(:settings) do
-    {
-      'title' => 'LTI 1.3 Tool',
-      'description' => '1.3 Tool',
-      'launch_url' => launch_url,
-      'custom_fields' => {'has_expansion' => '$Canvas.user.id', 'no_expansion' => 'foo'},
-      'public_jwk' => public_jwk,
-      'extensions' =>  [
-        {
-          'platform' => 'canvas.instructure.com',
-          'privacy_level' => 'public',
-          'tool_id' => 'LTI 1.3 Test Tool',
-          'domain' => 'http://lti13testtool.docker',
-          'settings' =>  {
-            'icon_url' => 'https://static.thenounproject.com/png/131630-200.png',
-            'selection_height' => 500,
-            'selection_width' => 500,
-            'text' => 'LTI 1.3 Test Tool Extension text',
-            'course_navigation' =>  {
-              'message_type' => 'LtiResourceLinkRequest',
-              'canvas_icon_class' => 'icon-lti',
-              'icon_url' => 'https://static.thenounproject.com/png/131630-211.png',
-              'text' => 'LTI 1.3 Test Tool Course Navigation',
-              'url' =>
-              'http://lti13testtool.docker/launch?placement=course_navigation',
-              'enabled' => true
-            }
-          }
-        }
-      ]
+      require_scopes: true,
+      redirect_uris: "http://www.test.com\r\nhttp://www.anothertest.com"
     }
   end
   let(:new_url) { 'https://www.new-url.com/test' }
-  let(:launch_url) { 'http://lti13testtool.docker/blti_launch' }
   let(:dev_key_id) { developer_key.id }
   let(:valid_parameters) do
     {
@@ -258,7 +212,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
   shared_examples_for 'an endpoint that accepts developer key parameters' do
     subject do
       make_request
-      DeveloperKey.find(json_parse.dig('tool_configuration', 'developer_key_id'))
+      DeveloperKey.find(json_parse.dig('developer_key', 'id'))
     end
 
     let(:make_request) { raise 'set in example' }
@@ -286,6 +240,10 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
 
     it 'sets the developer key require_scopes' do
       expect(subject.require_scopes).to eq dev_key_params[:require_scopes]
+    end
+
+    it 'sets the developer key redirect_uris' do
+      expect(subject.redirect_uris).to eq dev_key_params[:redirect_uris].split
     end
 
     context 'when scopes are invalid' do

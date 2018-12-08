@@ -281,6 +281,28 @@ describe Outcomes::ResultAnalytics do
       allow_any_instance_of(ActiveRecord::Associations::Preloader).to receive(:preload)
     end
 
+    context 'with n_mastery outcome and results below mastery' do
+      let(:n_mastery) { create_outcome(method: 'n_mastery', calc_int: 5) }
+      let(:results) do
+        [
+          outcome_from_score(0.0, {outcome: n_mastery}),
+          outcome_from_score(0.0, {outcome: n_mastery, user: MockUser[20, 'b']})
+        ]
+      end
+
+      it 'returns average aggregate score of nil' do
+        fake_context = MockUser.new(42, 'fake')
+        aggregate_result = ra.aggregate_outcome_results_rollup(results, fake_context)
+        expect(aggregate_result.scores.map(&:score)).to eq [nil]
+      end
+
+      it 'returns median aggregate score of nil' do
+        fake_context = MockUser.new(42, 'fake')
+        aggregate_result = ra.aggregate_outcome_results_rollup(results, fake_context, 'median')
+        expect(aggregate_result.scores.map(&:score)).to eq [nil]
+      end
+    end
+
     context 'with results' do
       let(:results) do
         [

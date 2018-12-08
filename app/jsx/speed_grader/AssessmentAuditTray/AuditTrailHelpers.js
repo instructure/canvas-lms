@@ -21,12 +21,28 @@ import IconEdit from '@instructure/ui-icons/lib/Line/IconEdit'
 import IconGradebook from '@instructure/ui-icons/lib/Line/IconGradebook'
 import IconMuted from '@instructure/ui-icons/lib/Line/IconMuted'
 import IconQuestion from '@instructure/ui-icons/lib/Line/IconQuestion'
+import IconStandards from '@instructure/ui-icons/lib/Line/IconStandards'
 import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
 import IconUnmuted from '@instructure/ui-icons/lib/Line/IconUnmuted'
 import I18n from 'i18n!speed_grader'
 
+export const auditEventStudentAnonymityStates = Object.freeze({
+  NA: 'N/A',
+  OFF: 'OFF',
+  ON: 'ON',
+  TURNED_OFF: 'TURNED_OFF',
+  TURNED_ON: 'TURNED_ON'
+})
+
+export const overallAnonymityStates = Object.freeze({
+  FULL: 'FULL',
+  NA: 'N/A',
+  PARTIAL: 'PARTIAL'
+})
+
 const defaultIcon = IconQuestion
 const iconsByEventTrailType = {
+  anonymity: IconStandards,
   created: IconAdd,
   deleted: IconTrash,
   gradebook: IconGradebook,
@@ -38,6 +54,8 @@ const iconsByEventTrailType = {
 const defaultLabel = I18n.t('Unknown event')
 const labelByEventType = {
   assignment_created: I18n.t('Assignment created'),
+  assignment_muted: I18n.t('Assignment muted'),
+  assignment_unmuted: I18n.t('Assignment unmuted'),
   assignment_updated: I18n.t('Assignment updated'),
   docviewer_area_created: I18n.t('Docviewer area created'),
   docviewer_area_deleted: I18n.t('Docviewer area deleted'),
@@ -60,6 +78,32 @@ const labelByEventType = {
   docviewer_strikeout_created: I18n.t('Docviewer strikeout created'),
   docviewer_strikeout_deleted: I18n.t('Docviewer strikeout deleted'),
   docviewer_strikeout_updated: I18n.t('Docviewer strikeout updated'),
+
+  grader_count_updated(auditEvent) {
+    return I18n.t('Grader count set to %{count}', {count: I18n.n(auditEvent.payload.grader_count)})
+  },
+
+  grader_to_final_grader_anonymity_updated({payload}) {
+    if (payload.grader_names_visible_to_final_grader) {
+      return I18n.t('Grader names visible to final grader turned on')
+    }
+    return I18n.t('Grader names visible to final grader turned off')
+  },
+
+  grader_to_grader_anonymity_updated({payload}) {
+    if (payload.graders_anonymous_to_graders) {
+      return I18n.t('Graders anonymous to graders turned on')
+    }
+    return I18n.t('Graders anonymous to graders turned off')
+  },
+
+  grader_to_grader_comment_visibility_updated({payload}) {
+    if (payload.grader_comments_visible_to_graders) {
+      return I18n.t('Grader comments visible to graders turned on')
+    }
+    return I18n.t('Grader comments visible to graders turned off')
+  },
+
   grades_posted: I18n.t('Grades posted'),
   provisional_grade_created: I18n.t('Provisional grade created'),
   provisional_grade_selected: I18n.t('Provisional grade selected'),
@@ -68,6 +112,14 @@ const labelByEventType = {
   rubric_created: I18n.t('Rubric created'),
   rubric_deleted: I18n.t('Rubric deleted'),
   rubric_updated: I18n.t('Rubric updated'),
+
+  student_anonymity_updated({payload}) {
+    if (payload.anonymous_grading) {
+      return I18n.t('Anonymous turned on')
+    }
+    return I18n.t('Anonymous turned off')
+  },
+
   submission_comment_created: I18n.t('Submission comment created'),
   submission_comment_deleted: I18n.t('Submission comment deleted'),
   submission_comment_updated: I18n.t('Submission comment updated'),
@@ -77,6 +129,8 @@ const labelByEventType = {
 const defaultTrailType = 'unknown'
 const trailTypeByEventType = {
   assignment_created: 'created',
+  assignment_muted: 'muted',
+  assignment_unmuted: 'unmuted',
   assignment_updated: 'updated',
   docviewer_area_created: 'created',
   docviewer_area_deleted: 'deleted',
@@ -99,6 +153,10 @@ const trailTypeByEventType = {
   docviewer_strikeout_created: 'created',
   docviewer_strikeout_deleted: 'deleted',
   docviewer_strikeout_updated: 'updated',
+  grader_count_updated: 'updated',
+  grader_to_final_grader_anonymity_updated: 'anonymity',
+  grader_to_grader_anonymity_updated: 'anonymity',
+  grader_to_grader_comment_visibility_updated: 'anonymity',
   grades_posted: 'gradebook',
   provisional_grade_created: 'created',
   provisional_grade_selected: 'updated',
@@ -107,10 +165,18 @@ const trailTypeByEventType = {
   rubric_created: 'created',
   rubric_deleted: 'deleted',
   rubric_updated: 'updated',
+  student_anonymity_updated: 'anonymity',
   submission_comment_created: 'created',
   submission_comment_deleted: 'deleted',
   submission_comment_updated: 'updated',
   submission_updated: 'updated'
+}
+
+const roleLabels = {
+  admin: I18n.t('Administrator'),
+  final_grader: I18n.t('Final Grader'),
+  grader: I18n.t('Grader'),
+  student: I18n.t('Student')
 }
 
 function trailTypeFor(auditEvent) {
@@ -122,31 +188,25 @@ export function iconFor(auditEvent) {
 }
 
 export function labelFor(auditEvent) {
-  return labelByEventType[auditEvent.eventType] || defaultLabel
+  const label = labelByEventType[auditEvent.eventType]
+  if (typeof label === 'function') {
+    return label(auditEvent)
+  }
+  return label || defaultLabel
 }
 
 export function snippetFor({eventType, payload}) {
-  if (!(eventType in trailTypeByEventType)) {
-    return null
-  }
-
-  if (eventType === 'submission_comment_created') {
+  if (eventType === 'submission_comment_created' || eventType === 'submission_comment_updated') {
     return payload.comment
   }
 
-  /*
-   * TODO: GRADE-1670
-   * Everything below is only a placeholder so that the related part of the UI
-   * can be displayed with _some_ content, for QA/PR purposes. This will be
-   * replaced with logic to retrieve content for any audit events which should
-   * be displayed with supplemental text as context for the event.
-   */
-  if (Math.random() >= 0.5) {
-    return Math.random() >= 0.5 ? 'Example content here' : null
+  if (eventType === 'docviewer_comment_created' || eventType === 'docviewer_comment_updated') {
+    return payload.annotation_body.content
   }
 
-  return [
-    'I am the very model of a modern Major-General,',
-    "I've information vegetable, animal, and mineral"
-  ].join(' ')
+  return null
+}
+
+export function roleLabelFor(user) {
+  return roleLabels[user.role] || I18n.t('Unknown Role')
 }

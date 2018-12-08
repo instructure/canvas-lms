@@ -32,7 +32,14 @@ const truncate = (comment) =>
   comment.length > 100 ? [comment.slice(0, 99), ellipsis()] : [comment]
 
 const FreeFormComments = (props) => {
-  const { savedComments, comments, saveLater, setComments, setSaveLater } = props
+  const {
+    allowSaving,
+    savedComments,
+    comments,
+    saveLater,
+    setComments,
+    setSaveLater
+  } = props
   const first = <option key="first" value="first">{I18n.t('[ Select ]')}</option>
 
   const options = savedComments.map((comment, ix) => (
@@ -55,6 +62,19 @@ const FreeFormComments = (props) => {
     <br key="br" />
   ]
 
+  const saveBox = () => {
+    if (allowSaving) {
+      return (
+        <Checkbox
+          checked={saveLater}
+          label={I18n.t('Save this comment for reuse')}
+          size="small"
+          onChange={(event) => setSaveLater(event.target.checked)}
+        />
+      )
+    }
+  }
+
   return (
     <div className="edit-freeform-comments">
       {options.length > 0 ? selector : null}
@@ -67,16 +87,12 @@ const FreeFormComments = (props) => {
         value={comments}
       />
       <br />
-      <Checkbox
-        checked={saveLater}
-        label={I18n.t('Save this comment for reuse')}
-        size="small"
-        onChange={(event) => setSaveLater(event.target.checked)}
-      />
+      {saveBox()}
     </div>
   )
 }
 FreeFormComments.propTypes = {
+  allowSaving: PropTypes.bool.isRequired,
   savedComments: PropTypes.arrayOf(PropTypes.string).isRequired,
   comments: PropTypes.string,
   saveLater: PropTypes.bool,
@@ -137,6 +153,7 @@ const Comments = (props) => {
   }
 }
 Comments.propTypes = {
+  allowSaving: PropTypes.bool,
   assessing: PropTypes.bool.isRequired,
   assessment: PropTypes.shape(assessmentShape),
   footer: PropTypes.node,
@@ -145,6 +162,7 @@ Comments.propTypes = {
   setSaveLater: PropTypes.func.isRequired
 }
 Comments.defaultProps = {
+  allowSaving: true,
   footer: null
 }
 

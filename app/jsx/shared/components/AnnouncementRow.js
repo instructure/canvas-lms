@@ -106,8 +106,8 @@ export default function AnnouncementRow({
           )}
           <ScreenReaderContent>
             {announcement.locked
-              ? I18n.t('Allow replies for %{title}', {title: announcement.title})
-              : I18n.t('Disallow replies for %{title}', {title: announcement.title})}
+              ? I18n.t('Allow comments for %{title}', {title: announcement.title})
+              : I18n.t('Disallow comments for %{title}', {title: announcement.title})}
           </ScreenReaderContent>
         </MenuItem>
       )
