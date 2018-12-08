@@ -307,11 +307,12 @@ class CourseLinkValidator
 
   # ping the url and make sure we get a 200
   def reachable_url?(url)
+    @unavailable_photo_redirect_pattern ||= Regexp.new(Setting.get('unavailable_photo_redirect_pattern', 'yimg\.com/.+/photo_unavailable.png$'))
     redirect_proc = lambda do |response|
       # flickr does a redirect to this file when a photo is deleted/not found;
       # treat this as a broken image instead of following the redirect
       url = response['Location']
-      raise RuntimeError("photo unavailable") if url =~ /yimg\.com\/.+\/photo_unavailable.png$/
+      raise RuntimeError("photo unavailable") if url =~ @unavailable_photo_redirect_pattern
     end
 
     begin
