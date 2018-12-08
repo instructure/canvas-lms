@@ -184,8 +184,6 @@ define [
       yes
 
     allowsSideComments: ->
-      isGroup = ENV.context_asset_string.split('_')[0] == "group"
-      return no if isGroup && !ENV.DISCUSSION.PERMISSIONS.CAN_MANAGE_OWN
       return no if @get 'deleted'
       return no unless ENV.DISCUSSION.PERMISSIONS.CAN_REPLY
       return no if ENV.DISCUSSION.THREADED
