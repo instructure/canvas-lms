@@ -91,6 +91,11 @@ describe Announcement do
       expect(@announcement.visible_for?(@student1)).to be_truthy
     end
 
+    it "should be visible to section-limited students in specific section" do
+      @student1.enrollments.where(course_section_id: @section).update_all(limit_privileges_to_course_section: true)
+      expect(@announcement.visible_for?(@student1)).to be_truthy
+    end
+
     it "should not be visible to students not in specific section" do
       expect(@announcement.visible_for?(@student2)).to be_falsey
     end
