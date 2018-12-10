@@ -33,15 +33,6 @@ Header.propTypes = {
 }
 
 function Header(props) {
-  let assignmentGroup = null
-  if (props.assignment.assignmentGroup.name) {
-    assignmentGroup = {
-      name: props.assignment.assignmentGroup.name,
-      link: `${window.location.origin}/${ENV.context_asset_string.split('_')[0]}s/${
-        ENV.context_asset_string.split('_')[1]
-      }/assignments`
-    }
-  }
   return (
     <div data-test-id="assignments-2-student-header">
       <Heading level="h1">
@@ -51,15 +42,7 @@ function Header(props) {
         <ScreenReaderContent> {props.assignment.name} </ScreenReaderContent>
       </Heading>
 
-      <AssignmentGroupModuleNav
-        module={{
-          name: 'Egypt Economy Research Module: Week 1',
-          link: `${window.location.origin}/${ENV.context_asset_string.split('_')[0]}s/${
-            ENV.context_asset_string.split('_')[1]
-          }/modules`
-        }}
-        assignmentGroup={assignmentGroup}
-      />
+      <AssignmentGroupModuleNav assignment={props.assignment} />
       <Flex margin="0 0 xx-large 0">
         <FlexItem grow>
           <DateTitle assignment={props.assignment} />

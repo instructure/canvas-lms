@@ -29,11 +29,6 @@ beforeAll(() => {
     fixtures.setAttribute('id', 'fixtures')
     document.body.appendChild(fixtures)
   }
-  global.ENV = {context_asset_string: 'course_1'}
-})
-
-afterAll(() => {
-  global.ENV = null
 })
 
 afterEach(() => {
