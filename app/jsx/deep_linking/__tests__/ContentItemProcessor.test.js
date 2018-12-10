@@ -18,6 +18,35 @@
 
 import $ from 'jquery'
 import ContentItemProcessor from '../ContentItemProcessor'
+import {send} from 'jsx/shared/rce/RceCommandShim'
+
+jest.mock('jsx/shared/rce/RceCommandShim', () => ({
+  send: jest.fn()
+}))
+
+describe('processContentItemsForEditor', () => {
+  const linkContentItem = {
+    type: 'link',
+    url: 'http://www.test.com',
+    title: 'link title',
+    text: 'link text'
+  }
+  const invalidContentItem = { type: 'banana' }
+  const contentItems = [linkContentItem, invalidContentItem]
+  const editor = { id: 'editor_id' }
+
+  beforeEach(() => {
+    send.mockClear()
+    const processor = new ContentItemProcessor(contentItems, {}, {})
+    processor.processContentItemsForEditor(editor)
+  })
+
+  it('creates content for the valid content item', () => {
+    expect(send.mock.calls[0][2]).toEqual(
+      '<a href="http://www.test.com" title="link title">link text</a>'
+    )
+  })
+})
 
 const oldEnv = window.ENV
 const env = {

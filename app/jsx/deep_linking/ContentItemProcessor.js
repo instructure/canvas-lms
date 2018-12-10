@@ -17,6 +17,8 @@
  */
 
 import $ from 'jquery'
+import {send} from 'jsx/shared/rce/RceCommandShim'
+import LinkContentItem from './models/LinkContentItem'
 
 export function processContentItemsForEditor(event, editor) {
   const {content_items, msg, log, errormsg, errorlog} = event.data
@@ -46,8 +48,19 @@ export default class ContentItemProcessor {
     return ENV && ENV.DEEP_LINKING_LOGGING
   }
 
+  get typeMap() {
+    return {
+      'link': LinkContentItem
+    }
+  }
+
   processContentItemsForEditor(editor) {
-    // TODO: Add the content items to the editor
+    this.contentItems.forEach(contentItem => {
+      if (Object.keys(this.typeMap).includes(contentItem.type)) {
+        const contentItemModel = new this.typeMap[contentItem.type](contentItem)
+        send($(`#${editor.id}`), 'insert_code', contentItemModel.toHtmlString());
+      }
+    })
   }
 
   showMessages() {
