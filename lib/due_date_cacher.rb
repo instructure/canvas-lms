@@ -189,14 +189,15 @@ class DueDateCacher
         submission_scope = Submission.active.where(assignment_id: assignment_id)
 
         if @user_ids.blank? && assigned_student_ids.blank? && enrollment_counts.prior_student_ids.blank?
-          submission_scope.in_batches.update_all(workflow_state: :deleted)
+          submission_scope.in_batches.update_all(workflow_state: :deleted, updated_at: Time.zone.now)
         else
           # Delete the users we KNOW we need to delete in batches (it makes the database happier this way)
           deletable_student_ids =
             enrollment_counts.accepted_student_ids - assigned_student_ids - enrollment_counts.prior_student_ids
           deletable_student_ids.each_slice(1000) do |deletable_student_ids_chunk|
             # using this approach instead of using .in_batches because we want to limit the IDs in the IN clause to 1k
-            submission_scope.where(user_id: deletable_student_ids_chunk).update_all(workflow_state: :deleted)
+            submission_scope.where(user_id: deletable_student_ids_chunk).
+              update_all(workflow_state: :deleted, updated_at: Time.zone.now)
           end
         end
       end
@@ -207,7 +208,7 @@ class DueDateCacher
         @assignment_ids.each_slice(10) do |assignment_ids_slice|
           Submission.active.
             where(assignment_id: assignment_ids_slice, user_id: student_slice).
-            update_all(workflow_state: :deleted)
+            update_all(workflow_state: :deleted, updated_at: Time.zone.now)
         end
       end
 
