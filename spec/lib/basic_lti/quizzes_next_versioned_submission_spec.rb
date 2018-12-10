@@ -186,5 +186,48 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
         )
       end
     end
+
+    context "when nil url is present" do
+      context "when a submission has only a nil version" do
+        let(:url_grades) do
+          [
+            { url: nil, grade: 0.33 }
+          ]
+        end
+
+        it "outputs nothing" do
+          expect(
+            subject.grade_history.map do |submission|
+              [submission[:url], submission[:score], submission[:grade]]
+            end
+          ).to eq([])
+        end
+      end
+
+      context "when nils are mixed in history" do
+        let(:url_grades) do
+          [
+            { url: 'https://abcdef.com/uuurrrlll00?p1=9&p2=11', grade: 0.11 },
+            { url: 'https://abcdef.com/uuurrrlll01?p1=10&p2=12', grade: 0.22 },
+            { url: nil, grade: 0.33 },
+            { url: 'https://abcdef.com/uuurrrlll03?p1=12&p2=14', grade: 0.44 },
+            { url: nil, grade: 0.55 },
+          ]
+        end
+
+        it "outputs only versions with an actual url" do
+          expect(
+            subject.grade_history.map do |submission|
+              [submission[:url], submission[:score], submission[:grade]]
+            end
+          ).to eq(
+            url_grades.map do |x|
+              next if x[:url].blank?
+              [x[:url], assignment.points_possible * x[:grade], (assignment.points_possible * x[:grade]).to_s]
+            end.compact
+          )
+        end
+      end
+    end
   end
 end
