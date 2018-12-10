@@ -106,5 +106,18 @@ describe "RCS sidebar tests" do
         expect(wiki_body_anchor.attribute('href')).to include "/courses/#{@course.id}/discussion_topics/#{@announcement.id}"
       end
     end
+
+    it "should click on sidebar discussions page to create link in body" do
+      title = "Discussion-Title"
+      @discussion = @course.discussion_topics.create!(:title => title)
+
+      visit_front_page(@course)
+      click_discussions_accordion
+      click_sidebar_link(title)
+
+      in_frame wiki_page_body_ifr_id do
+        expect(wiki_body_anchor.attribute('href')).to include "/courses/#{@course.id}/discussion_topics/#{@discussion.id}"
+      end
+    end
   end
 end
