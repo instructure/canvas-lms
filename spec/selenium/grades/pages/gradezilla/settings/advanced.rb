@@ -15,17 +15,17 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
+require_relative '../../../../common'
+require_relative '../settings'
 
-module MainSettings
-  class Advanced
-    class << self
-      include SeleniumDependencies
+module Gradezilla
+  module Settings
+    module Advanced
+      extend SeleniumDependencies
 
-      def grade_override_checkbox
-        # TODO: add locator for checkbox
+      def self.select_grade_override_checkbox
+        fj('label:contains("Allow final grade override")').click
       end
-
     end
   end
 end

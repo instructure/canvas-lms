@@ -17,8 +17,7 @@
 
 require_relative '../../common'
 require_relative '../pages/gradezilla_page'
-require_relative '../pages/gradezilla_advanced_options_page'
-require_relative '../pages/gradezilla_main_settings'
+require_relative '../pages/gradezilla/settings/advanced'
 require_relative '../pages/gradezilla_cells_page'
 require_relative '../pages/srgb_page'
 require_relative '../pages/student_grades_page'
@@ -27,7 +26,6 @@ describe 'Final Grade Override' do
   include_context 'in-process server selenium tests'
 
   before(:once) do
-    skip('Unskip in GRADE-1867')
     course_with_teacher(course_name: "Grade Override", active_course: true,active_enrollment: true,name: "Teacher Boss1",active_user: true)
     @students = create_users_in_course(@course, 5, return_type: :record, name_prefix: "Purple")
     Account.default.enable_feature!(:final_grades_override)
@@ -50,14 +48,12 @@ describe 'Final Grade Override' do
     user_session(@teacher)
     Gradezilla.visit(@course)
     Gradezilla.settings_cog_select
-    #select option for override
-    MainSettings::Advanced.grade_override_checkbox.click
-    MainSettings::Controls.click_update_button
+    Gradezilla::Settings.click_advanced_tab
+    Gradezilla::Settings::Advanced.select_grade_override_checkbox
+    Gradezilla::Settings.click_update_button
   end
 
   it 'display override column in new gradebook', priority: '1', test_id: 3682130 do
-    skip('Unskip in GRADE-1867')
-    # TODO: verify new column on NG
     expect(f(".slick-header-column[title='Override']")).to be_displayed
   end
 

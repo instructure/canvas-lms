@@ -77,7 +77,7 @@ export function createGradebook(options = {}) {
 }
 
 export function setFixtureHtml($fixture) {
-  $fixture.innerHTML = `
+  return $fixture.innerHTML = `
     <div id="application">
       <div id="wrapper">
         <div data-component="GridColor"></div>
@@ -112,5 +112,5 @@ export function stubDataLoader() {
     gotSubmissions: $.Deferred()
   }
 
-  window.sandbox.stub(DataLoader, 'loadGradebookData').returns(dataLoaderPromises)
+  return window.sandbox.stub(DataLoader, 'loadGradebookData').returns(dataLoaderPromises)
 }

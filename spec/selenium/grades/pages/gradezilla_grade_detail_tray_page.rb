@@ -16,7 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../../common'
-class Gradezilla
+
+module Gradezilla
   class GradeDetailTray
     class << self
       include SeleniumDependencies

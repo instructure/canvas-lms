@@ -65,10 +65,3 @@ export function updateLatePolicy (courseId, latePolicyData) {
   const data = { late_policy: underscore(latePolicyData) };
   return axios.patch(url, data);
 }
-
-export default {
-  DEFAULT_LATE_POLICY_DATA,
-  fetchLatePolicy,
-  createLatePolicy,
-  updateLatePolicy
-};

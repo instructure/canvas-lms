@@ -15,64 +15,62 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../common'
-module MainSettings
-  class LatePolicies
-    class << self
-      include SeleniumDependencies
+require_relative '../../../../common'
+require_relative '../settings'
 
-      def late_policy_tab
-        # f('#late_policy_tab')
-      end
+module Gradezilla
+  module Settings
+    module LatePolicies
+      extend SeleniumDependencies
 
-      def missing_policy_checkbox
+      def self.missing_policy_checkbox
         fj('label:contains("Automatically apply grade for missing submissions")')
       end
 
-      def missing_policy_percent_input
+      def self.missing_policy_percent_input
         f('#missing-submission-grade')
       end
 
-      def late_policy_checkbox
+      def self.late_policy_checkbox
         fj('label:contains("Automatically apply deduction to late submissions")')
       end
 
-      def late_policy_deduction_input
+      def self.late_policy_deduction_input
         f('#late-submission-deduction')
       end
 
-      def late_policy_increment_combobox(increment)
+      def self.late_policy_increment_combobox(increment)
         click_option(f('#late-submission-interval'), increment)
       end
 
-      def lowest_grade_percent_input
+      def self.lowest_grade_percent_input
         f('#late-submission-minimum-percent')
       end
 
-      def select_late_policy_tab
+      def self.select_late_policy_tab
         late_policy_tab.click
       end
 
-      def create_missing_policy(percent_per_assignment)
+      def self.create_missing_policy(percent_per_assignment)
         unless missing_policy_checkbox.attribute('checked')
           missing_policy_checkbox.click
         end
         set_value(missing_policy_percent_input, percent_per_assignment)
       end
 
-      def disable_missing_policy
+      def self.disable_missing_policy
         if missing_policy_checkbox.attribute('checked')
           missing_policy_checkbox.click
         end
       end
 
-      def disable_late_policy
+      def self.disable_late_policy
         if late_policy_checkbox.attribute('checked')
           late_policy_checkbox.click
         end
       end
 
-      def create_late_policy(percentage, time_increment, lowest_percentage = nil)
+      def self.create_late_policy(percentage, time_increment, lowest_percentage = nil)
         late_policy_checkbox.click
         set_value(late_policy_deduction_input, percentage)
         late_policy_increment_combobox(time_increment)

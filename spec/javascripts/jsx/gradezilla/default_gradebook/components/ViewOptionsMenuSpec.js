@@ -170,56 +170,6 @@ QUnit.module('ViewOptionsMenu - Overrides', (moduleHooks) => {
     const menuItem = getMenuItem(wrapper.instance().menuContent, 'Overrides')
     strictEqual(menuItem, undefined)
   })
-
-  QUnit.module('when "Final Grade Override" is enabled', hooks => {
-    hooks.beforeEach(() => {
-      props = {
-        ...defaultProps(),
-        finalGradeOverrideEnabled: true
-      }
-    })
-
-    test('is not disabled', () => {
-      wrapper = mountAndOpenOptions(props)
-      const menuItem = getMenuItem(wrapper.instance().menuContent, 'Overrides')
-      strictEqual(menuItem.getAttribute('aria-disabled'), null)
-    })
-
-    test('can be optionally disabled', () => {
-      props.overrides.disabled = true
-      wrapper = mountAndOpenOptions(props)
-      const menuItem = getMenuItem(wrapper.instance().menuContent, 'Overrides')
-      strictEqual(menuItem.getAttribute('aria-disabled'), props.overrides.disabled.toString())
-    })
-
-    test('triggers the onSelect when the "Overrides" option is clicked', () => {
-      sandbox.stub(props.overrides, 'onSelect')
-      wrapper = mountAndOpenOptions(props)
-      getMenuItem(wrapper.instance().menuContent, 'Overrides').click()
-      equal(props.overrides.onSelect.callCount, 1)
-    })
-
-    test('is optionally not selected', () => {
-      wrapper = mountAndOpenOptions(props)
-      const menuItem = getMenuItem(wrapper.instance().menuContent, 'Overrides')
-      strictEqual(menuItem.getAttribute('aria-checked'), props.overrides.selected.toString())
-    })
-
-    test('is optionally selected', () => {
-      props.overrides.selected = true
-      wrapper = mountAndOpenOptions(props)
-      const menuItem = getMenuItem(wrapper.instance().menuContent, 'Overrides')
-      strictEqual(menuItem.getAttribute('aria-checked'), props.overrides.selected.toString())
-    })
-
-    test('can be given a different label', () => {
-      const someLabel = 'Grading Periods Label'
-      props.overrides.label = someLabel
-      wrapper = mountAndOpenOptions(props)
-      const menuItem = getMenuItem(wrapper.instance().menuContent, someLabel)
-      strictEqual(menuItem.textContent, someLabel)
-    })
-  })
 })
 
 QUnit.module('ViewOptionsMenu - Filters', {

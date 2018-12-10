@@ -231,7 +231,9 @@ export function showFlashAlert ({ message, err, type = err ? 'error' : 'info', s
 
 export function destroyContainer () {
   const container = document.getElementById(messageHolderId)
+  const liveRegion = document.getElementById(screenreaderMessageHolderId)
   if (container) container.remove()
+  if (liveRegion) liveRegion.remove()
 }
 
 export function showFlashError (message = I18n.t('An error occurred making a network request')) {

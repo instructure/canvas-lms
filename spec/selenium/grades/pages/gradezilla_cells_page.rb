@@ -17,7 +17,7 @@
 
 require_relative '../../common'
 
-class Gradezilla
+module Gradezilla
   class Cells
     class << self
       include SeleniumDependencies

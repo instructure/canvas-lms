@@ -39,6 +39,7 @@ import SubmissionStateMap from 'jsx/gradezilla/SubmissionStateMap';
 import studentRowHeaderConstants from 'jsx/gradezilla/default_gradebook/constants/studentRowHeaderConstants';
 import { darken, statusColors, defaultColors } from 'jsx/gradezilla/default_gradebook/constants/colors';
 import ViewOptionsMenu from 'jsx/gradezilla/default_gradebook/components/ViewOptionsMenu';
+import GradebookSettingsModal from 'jsx/gradezilla/default_gradebook/components/GradebookSettingsModal';
 
 import { createGradebook, stubDataLoader } from 'jsx/gradezilla/default_gradebook/__tests__/GradebookSpecHelper';
 import { createCourseGradesWithGradingPeriods as createGrades } from '../gradebook/GradeCalculatorSpecHelper';
@@ -254,40 +255,51 @@ test('updates partial .filterColumnsBy settings with the default values', functi
   strictEqual(gradebook.getFilterColumnsBySetting('gradingPeriodId'), null);
 });
 
-QUnit.module('Gradebook#initialize', {
-  setup () {
-    stubDataLoader()
-    $fixtures.innerHTML = `
-      <div id="search-filter-container">
-        <input type="text" />
-      </div>
-    `;
-  },
+QUnit.module('Gradebook#initialize', () => {
+  QUnit.module('with dataloader stubs',  (moduleHooks) => {
+    moduleHooks.beforeEach(() => {
+      stubDataLoader()
+      $fixtures.innerHTML = `
+        <div id="search-filter-container">
+          <input type="text" />
+        </div>
+      `
+    })
 
-  createInitializedGradebook (options) {
-    const gradebook = createGradebook(options);
-    gradebook.initialize();
-    return gradebook;
-  },
+    moduleHooks.afterEach(() => {
+      $fixtures.innerHTML = ''
+    })
 
-  teardown () {
-    $fixtures.innerHTML = '';
-  }
-});
+    function createInitializedGradebook (options) {
+      const gradebook = createGradebook(options)
+      gradebook.initialize()
+      return gradebook
+    }
 
-test('stores the late policy with camelized keys, if one exists', function () {
-  const gradebook = this.createInitializedGradebook({ late_policy: { late_submission_interval: 'hour' } });
-  deepEqual(gradebook.courseContent.latePolicy, { lateSubmissionInterval: 'hour' });
-});
+    test('stores the late policy with camelized keys, if one exists', () => {
+      const gradebook = createInitializedGradebook({ late_policy: { late_submission_interval: 'hour' } })
+      deepEqual(gradebook.courseContent.latePolicy, { lateSubmissionInterval: 'hour' })
+    })
 
-test('stores the late policy as undefined if the late_policy option is null', function () {
-  const gradebook = this.createInitializedGradebook({ late_policy: null });
-  strictEqual(gradebook.courseContent.latePolicy, undefined);
-});
+    test('stores the late policy as undefined if the late_policy option is null', () => {
+      const gradebook = createInitializedGradebook({ late_policy: null })
+      strictEqual(gradebook.courseContent.latePolicy, undefined)
+    })
 
-test('sets assignmentGroupsLoaded to false', function () {
-  const gradebook = this.createInitializedGradebook()
-  strictEqual(gradebook.contentLoadStates.assignmentGroupsLoaded, false)
+    test('sets assignmentGroupsLoaded to false', function () {
+      const gradebook = createInitializedGradebook()
+      strictEqual(gradebook.contentLoadStates.assignmentGroupsLoaded, false)
+    })
+  })
+
+  test('calls DataLoader.loadGradebookData with getFinalGradeOverrides', () => {
+    const gradebook = createGradebook()
+    const loadGradebookDataStub = stubDataLoader()
+    gradebook.initialize()
+    const {firstCall: {args: [{getFinalGradeOverrides}]}} = loadGradebookDataStub
+    strictEqual(getFinalGradeOverrides, false)
+    loadGradebookDataStub.restore()
+  })
 })
 
 QUnit.module('Gradebook#gotChunkOfStudents', {
@@ -2361,16 +2373,6 @@ QUnit.module('Gradebook#getViewOptionsMenuProps', () => {
     PropTypes.checkPropTypes(ViewOptionsMenu.propTypes, props, 'prop', 'ViewOptionsMenu')
     strictEqual(consoleSpy.called, false)
     consoleSpy.restore()
-  })
-
-  test('finalGradeOverrideEnabled is false', () => {
-    const {finalGradeOverrideEnabled} = createGradebook().getViewOptionsMenuProps()
-    strictEqual(finalGradeOverrideEnabled, false)
-  })
-
-  test('finalGradeOverrideEnabled is set via final_grade_override_enabled', () => {
-    const {finalGradeOverrideEnabled} = createGradebook({final_grade_override_enabled: true}).getViewOptionsMenuProps()
-    strictEqual(finalGradeOverrideEnabled, true)
   })
 
   test('showUnpublishedAssignments is true', () => {
@@ -5242,6 +5244,30 @@ QUnit.module('Gradebook#updateColumnsAndRenderViewOptionsMenu', function (hooks)
   });
 });
 
+QUnit.module('Gradebook#updateColumnsAndRenderGradebookSettingsModal', (moduleHooks) => {
+  let gradebook
+
+  moduleHooks.beforeEach(() => {
+    gradebook = createGradebook()
+    sinon.stub(gradebook, 'updateColumns')
+    sinon.stub(gradebook, 'renderGradebookSettingsModal')
+  })
+
+  moduleHooks.afterEach(() => {
+    gradebook.destroy()
+  })
+
+  test('calls updateColumns', () => {
+    gradebook.updateColumnsAndRenderGradebookSettingsModal()
+    strictEqual(gradebook.updateColumns.callCount, 1)
+  })
+
+  test('calls renderGradebookSettingsModal', () => {
+    gradebook.updateColumnsAndRenderGradebookSettingsModal()
+    strictEqual(gradebook.renderGradebookSettingsModal.callCount, 1)
+  })
+})
+
 QUnit.module('Gradebook React Header Component References', {
   setup () {
     this.gradebook = createGradebook();
@@ -5468,8 +5494,8 @@ QUnit.module('Gradebook#toggleUnpublishedAssignments', () => {
 QUnit.module('Gradebook#toggleOverrides', () => {
   test('toggles showFinalGradeOverrides to true when currently false', function () {
     const gradebook = createGradebook();
-    gradebook.gridDisplaySettings.showFinalGradeOverrides = false;
-    sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu');
+    gradebook.setShowFinalGradeOverrides(false);
+    sandbox.stub(gradebook, 'updateColumnsAndRenderGradebookSettingsModal');
     sandbox.stub(gradebook, 'saveSettings');
     gradebook.toggleOverrides();
 
@@ -5478,8 +5504,8 @@ QUnit.module('Gradebook#toggleOverrides', () => {
 
   test('toggles showFinalGradeOverrides to false when currently true', function () {
     const gradebook = createGradebook();
-    gradebook.gridDisplaySettings.showFinalGradeOverrides = true;
-    sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu');
+    gradebook.setShowFinalGradeOverrides(true);
+    sandbox.stub(gradebook, 'updateColumnsAndRenderGradebookSettingsModal');
     sandbox.stub(gradebook, 'saveSettings');
     gradebook.toggleOverrides();
 
@@ -5488,8 +5514,8 @@ QUnit.module('Gradebook#toggleOverrides', () => {
 
   test('calls showFinalGradeOverrides after toggling', function () {
     const gradebook = createGradebook();
-    gradebook.gridDisplaySettings.showFinalGradeOverrides = true;
-    const stubFn = sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu').callsFake(function () {
+    gradebook.setShowFinalGradeOverrides(true);
+    const stubFn = sandbox.stub(gradebook, 'updateColumnsAndRenderGradebookSettingsModal').callsFake(function () {
       strictEqual(gradebook.gridDisplaySettings.showFinalGradeOverrides, false);
     });
     sandbox.stub(gradebook, 'saveSettings');
@@ -5501,7 +5527,7 @@ QUnit.module('Gradebook#toggleOverrides', () => {
   test('calls saveSettings with showFinalGradeOverrides', function () {
     const gradebookProps = {settings: {show_final_grade_overrides: 'true'}, final_grade_override_enabled: true}
     const gradebook = createGradebook(gradebookProps);
-    sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu');
+    sandbox.stub(gradebook, 'updateColumnsAndRenderGradebookSettingsModal');
     const saveSettingsStub = sandbox.stub(gradebook, 'saveSettings');
     gradebook.toggleOverrides();
 
@@ -5517,8 +5543,8 @@ QUnit.module('Gradebook#toggleOverrides', () => {
     ]);
 
     const gradebook = createGradebook({ options });
-    gradebook.gridDisplaySettings.showFinalGradeOverrides = true;
-    sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu');
+    gradebook.setShowFinalGradeOverrides(true);
+    sandbox.stub(gradebook, 'updateColumnsAndRenderGradebookSettingsModal');
     const saveSettingsStub = sinon.spy(gradebook, 'saveSettings');
     gradebook.toggleOverrides();
 
@@ -5534,8 +5560,9 @@ QUnit.module('Gradebook#toggleOverrides', () => {
     ]);
 
     const gradebook = createGradebook({ options });
-    gradebook.gridDisplaySettings.showFinalGradeOverrides = true;
-    const stubFn = sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu');
+    gradebook.setShowFinalGradeOverrides(true);
+    sandbox.stub(gradebook, 'renderGradebookSettingsModal')
+    const stubFn = sandbox.stub(gradebook, 'updateColumns');
     stubFn.onFirstCall().callsFake(function () {
       strictEqual(gradebook.gridDisplaySettings.showFinalGradeOverrides, false);
     });
@@ -6122,59 +6149,110 @@ QUnit.module('Gradebook', () => {
     })
   })
 
-  QUnit.module('Gradebook#getOverridesViewOptionsMenuProps', () => {
-    test('includes exactly what ViewOptionsMenu overrides props require', () => {
-      const props = createGradebook().getOverridesViewOptionsMenuProps()
-      const {propTypes: {overrides}} = ViewOptionsMenu
+  QUnit.module('Gradebook#getFinalGradeOverridesSettingsModalProps', () => {
+    test('includes the exact properties that GradebookSettingsModal overrides props require', () => {
+      const props = createGradebook().getFinalGradeOverridesSettingsModalProps()
+      const {propTypes: {overrides}} = GradebookSettingsModal
       const consoleSpy = sinon.spy(console, 'error')
-      PropTypes.checkPropTypes({overrides}, props, 'prop', 'ViewOptionsMenu')
+      PropTypes.checkPropTypes({overrides}, props, 'prop', 'GradebookSettingsModal')
       strictEqual(consoleSpy.called, false)
       consoleSpy.restore()
     })
 
-    test('disabled defaults to true', function () {
-      const gradebook = createGradebook()
-      const props = gradebook.getOverridesViewOptionsMenuProps()
-      strictEqual(props.disabled, true)
-    })
-
-    test('disabled is false when the grid is ready', function () {
+    test('`disabled` defaults to true', () => {
       const gradebook = createGradebook()
       sinon.stub(gradebook.gridReady, 'state').returns('resolved')
-      const props = gradebook.getOverridesViewOptionsMenuProps()
-      strictEqual(props.disabled, false)
+      const {disabled} = gradebook.getFinalGradeOverridesSettingsModalProps()
+      strictEqual(disabled, true)
     })
 
-    test('disabled is true if the overrides column is updating', function () {
-      const gradebook = createGradebook()
+    test('`disabled` is false when final grades override is enabled and checked', () => {
+      const final_grade_override_enabled = true
+      const gradebook = createGradebook({final_grade_override_enabled})
       sinon.stub(gradebook.gridReady, 'state').returns('resolved')
-      gradebook.setOverridesColumnUpdating(true)
-      const props = gradebook.getOverridesViewOptionsMenuProps()
-      strictEqual(props.disabled, true)
+      const {disabled} = gradebook.getFinalGradeOverridesSettingsModalProps()
+      strictEqual(disabled, !final_grade_override_enabled)
     })
 
-    test('disabled is false if the overrides column is not updating', function () {
-      const gradebook = createGradebook()
+    test('`disabled` is true when overrides column is updating', () => {
+      const gradebook = createGradebook({final_grade_override_enabled: true})
       sinon.stub(gradebook.gridReady, 'state').returns('resolved')
-      gradebook.setOverridesColumnUpdating(false)
-      const props = gradebook.getOverridesViewOptionsMenuProps()
-      strictEqual(props.disabled, false)
+      const overridesColumnUpdating = true
+      gradebook.setOverridesColumnUpdating(overridesColumnUpdating)
+      const {disabled} = gradebook.getFinalGradeOverridesSettingsModalProps()
+      strictEqual(disabled, overridesColumnUpdating)
     })
 
-    test('onSelect calls toggleOverrides', function () {
-      const gradebook = createGradebook({ showFinalGradeOverrides: true })
+    test('`onChange` calls `toggleOverrides`', () => {
+      const gradebook = createGradebook({final_grade_override_enabled: true})
+      sinon.stub(gradebook.gridReady, 'state').returns('resolved')
       sinon.stub(gradebook, 'toggleOverrides')
-      const props = gradebook.getOverridesViewOptionsMenuProps()
-      props.onSelect()
+      const props = gradebook.getFinalGradeOverridesSettingsModalProps()
+      props.onChange()
       strictEqual(gradebook.toggleOverrides.callCount, 1)
-      gradebook.toggleOverrides.restore()
     })
 
-    test('selected reports showFinalGradeOverrides', function () {
-      const show_final_grade_overrides = false
+    test('`defaultChecked` defaults to false', () => {
+      const gradebook = createGradebook()
+      sinon.stub(gradebook.gridReady, 'state').returns('resolved')
+      const {defaultChecked} = gradebook.getFinalGradeOverridesSettingsModalProps()
+      strictEqual(defaultChecked, false)
+    })
+
+    test('`defaultChecked` is false when final grades override is enabled', () => {
+      const final_grade_override_enabled = true
+      const gradebook = createGradebook({final_grade_override_enabled})
+      sinon.stub(gradebook.gridReady, 'state').returns('resolved')
+      const {defaultChecked} = gradebook.getFinalGradeOverridesSettingsModalProps()
+      strictEqual(defaultChecked, !final_grade_override_enabled)
+    })
+
+    test('`defaultChecked` is false when show final override setting is enabled', () => {
+      const show_final_grade_overrides = 'true'
       const gradebook = createGradebook({settings: {show_final_grade_overrides}})
-      const props = gradebook.getOverridesViewOptionsMenuProps()
-      equal(props.selected, show_final_grade_overrides)
+      sinon.stub(gradebook.gridReady, 'state').returns('resolved')
+      const {defaultChecked} = gradebook.getFinalGradeOverridesSettingsModalProps()
+      strictEqual(defaultChecked, !show_final_grade_overrides)
+    })
+
+    test('`defaultChecked` is true when show final grades is enabled and the setting to show final grades is enabled', () => {
+      const gradebook = createGradebook({
+        final_grade_override_enabled: true,
+        settings: {show_final_grade_overrides: 'true'}
+      })
+      sinon.stub(gradebook.gridReady, 'state').returns('resolved')
+      const {defaultChecked} = gradebook.getFinalGradeOverridesSettingsModalProps()
+      strictEqual(defaultChecked, true)
+    })
+
+    test('`defaultChecked` is false when final grades is disabled and the setting to show final grades is enabled', () => {
+      const gradebook = createGradebook({
+        final_grade_override_enabled: false,
+        settings: {show_final_grade_overrides: 'true'}
+      })
+      sinon.stub(gradebook.gridReady, 'state').returns('resolved')
+      const {defaultChecked} = gradebook.getFinalGradeOverridesSettingsModalProps()
+      strictEqual(defaultChecked, false)
+    })
+
+    test('`defaultChecked` is false when final grades is enabled and the setting to show final grades is disabled', () => {
+      const gradebook = createGradebook({
+        final_grade_override_enabled: true,
+        settings: {show_final_grade_overrides: 'false'}
+      })
+      sinon.stub(gradebook.gridReady, 'state').returns('resolved')
+      const {defaultChecked} = gradebook.getFinalGradeOverridesSettingsModalProps()
+      strictEqual(defaultChecked, false)
+    })
+
+    test('`defaultChecked` is false when final grades is disabled and the setting to show final grades is disabled', () => {
+      const gradebook = createGradebook({
+        final_grade_override_enabled: false,
+        settings: {show_final_grade_overrides: 'false'}
+      })
+      sinon.stub(gradebook.gridReady, 'state').returns('resolved')
+      const {defaultChecked} = gradebook.getFinalGradeOverridesSettingsModalProps()
+      strictEqual(defaultChecked, false)
     })
   })
 })
@@ -8816,7 +8894,17 @@ QUnit.module('#renderGradebookSettingsModal', (hooks) => {
     gradebook.renderGradebookSettingsModal();
     strictEqual(gradebookSettingsModalProps().locale, 'de');
   });
-});
+
+  test('passes override props', () => {
+    gradebook = createGradebook().renderGradebookSettingsModal()
+    const expectedProps = {
+      defaultChecked: false,
+      disabled: true,
+      onChange: {}
+    }
+    propEqual(gradebookSettingsModalProps().overrides, expectedProps)
+  })
+})
 
 QUnit.module('Gradebook#renderAnonymousSpeedGraderAlert', (hooks) => {
   let gradebook;
