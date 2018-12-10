@@ -87,6 +87,7 @@ describe "CSP Settings API", type: :request do
         expect(json["enabled"]).to eq true
         expect(json["inherited"]).to eq true
         expect(json["effective_whitelist"]).to match_array(["example1.com", "example2.com"])
+        expect(json["tools_whitelist"]).to eq(["example2.com"])
         expect(json["current_account_whitelist"]).to eq []
       end
 

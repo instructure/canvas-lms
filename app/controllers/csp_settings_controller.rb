@@ -34,6 +34,7 @@ class CspSettingsController < ApplicationController
   # @response_field inherited Whether the current CSP settings are inherited from a parent account.
   # @response_field effective_whitelist If enabled, lists the currently whitelisted domains
   #   (includes domains automatically whitelisted through external tools).
+  # @response_field tools_whitelist (Account-only) Lists the automatically whitelisted domains from external tools
   # @response_field current_account_whitelist (Account-only) Lists the current list of domains
   #   explicitly whitelisted by this account. (Note: this list will not take effect unless
   #   CSP is explicitly enabled on this account)
@@ -121,7 +122,10 @@ class CspSettingsController < ApplicationController
       :inherited => @context.csp_inherited?,
     }
     json[:effective_whitelist] = @context.csp_whitelisted_domains if @context.csp_enabled?
-    json[:current_account_whitelist] = @context.csp_domains.active.pluck(:domain).sort if @context.is_a?(Account)
+    if @context.is_a?(Account)
+      json[:tools_whitelist] = @context.cached_tool_domains
+      json[:current_account_whitelist] = @context.csp_domains.active.pluck(:domain).sort
+    end
     json
   end
 end
