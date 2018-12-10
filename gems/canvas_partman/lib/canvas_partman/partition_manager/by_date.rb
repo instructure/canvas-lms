@@ -27,6 +27,7 @@ module CanvasPartman
             create_partition(min)
             min += 1.send(base_class.partitioning_interval)
           end
+          create_partition(min)
         end
 
         ensure_partitions(advance_partitions)
