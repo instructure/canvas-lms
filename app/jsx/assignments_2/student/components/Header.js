@@ -20,6 +20,7 @@ import React from 'react'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import I18n from 'i18n!assignments_2_student_header'
 
 import AssignmentGroupModuleNav from './AssignmentGroupModuleNav'
 import DateTitle from './DateTitle'
@@ -28,40 +29,85 @@ import StepContainer from './StepContainer'
 
 import {StudentAssignmentShape} from '../assignmentData'
 
-Header.propTypes = {
-  assignment: StudentAssignmentShape
-}
+const THRESHHOLD = 250
+class Header extends React.Component {
+  static propTypes = {
+    assignment: StudentAssignmentShape
+  }
 
-function Header(props) {
-  return (
-    <div data-test-id="assignments-2-student-header">
-      <Heading level="h1">
-        {/* We hide this because in the designs, what visually looks like should
-            be the h1 appears after the group/module links, but we need the
-            h1 to actually come before them for a11y */}
-        <ScreenReaderContent> {props.assignment.name} </ScreenReaderContent>
-      </Heading>
+  state = {
+    isSticky: false,
+    scrollOffset: 0
+  }
 
-      <AssignmentGroupModuleNav assignment={props.assignment} />
-      <Flex margin="0 0 xx-large 0">
-        <FlexItem grow>
-          <DateTitle assignment={props.assignment} />
-        </FlexItem>
-        <FlexItem grow>
-          <PointsDisplay
-            displayAs={props.assignment.gradingType}
-            receivedGrade={
-              props.assignment.submissionsConnection &&
-              props.assignment.submissionsConnection.nodes[0] &&
-              props.assignment.submissionsConnection.nodes[0].grade
+  componentDidMount() {
+    window.onscroll = () => {
+      if (window.pageYOffset < THRESHHOLD) {
+        this.setState({isSticky: false, scrollOffset: window.pageYOffset})
+      } else {
+        this.setState({isSticky: true, scrollOffset: window.pageYOffset})
+      }
+    }
+  }
+
+  calculateHeaderWidth = () => Math.round(100 - this.state.scrollOffset / 3)
+
+  render() {
+    return (
+      <div
+        data-test-id="assignments-2-student-header"
+        className={
+          this.state.isSticky
+            ? 'assignment-student-header-sticky'
+            : 'assignment-student-header-normal'
+        }
+      >
+        <Heading level="h1">
+          {/* We hide this because in the designs, what visually looks like should
+              be the h1 appears after the group/module links, but we need the
+              h1 to actually come before them for a11y */}
+          <ScreenReaderContent> {this.props.assignment.name} </ScreenReaderContent>
+        </Heading>
+
+        {!this.state.isSticky && <AssignmentGroupModuleNav assignment={this.props.assignment} />}
+        <Flex margin={this.state.isSticky ? '0' : '0 0 xx-large 0'}>
+          <FlexItem grow>
+            <DateTitle assignment={this.props.assignment} />
+          </FlexItem>
+          <FlexItem grow>
+            <PointsDisplay
+              displayAs={this.props.assignment.gradingType}
+              receivedGrade={
+                this.props.assignment.submissionsConnection &&
+                this.props.assignment.submissionsConnection.nodes[0] &&
+                this.props.assignment.submissionsConnection.nodes[0].grade
+              }
+              possiblePoints={this.props.assignment.pointsPossible}
+            />
+          </FlexItem>
+        </Flex>
+        <div className="assignment-pizza-header-outer">
+          <div
+            className="assignment-pizza-header-inner"
+            data-test-id={
+              this.state.isSticky
+                ? 'assignment-student-header-sticky'
+                : 'assignment-student-header-normal'
             }
-            possiblePoints={props.assignment.pointsPossible}
-          />
-        </FlexItem>
-      </Flex>
-      <StepContainer assignment={props.assignment} />
-    </div>
-  )
+            style={{
+              width: `${this.calculateHeaderWidth()}%`
+            }}
+          >
+            <StepContainer
+              assignment={this.props.assignment}
+              isCollapsed={this.state.isSticky}
+              collapsedLabel={I18n.t('Submitted')}
+            />
+          </div>
+        </div>
+      </div>
+    )
+  }
 }
 
-export default React.memo(Header)
+export default Header

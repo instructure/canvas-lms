@@ -16,6 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+ .steps-main {
+  transition: width .2s ease-in-out, height .2s ease-in-out, transform .38s ease-in-out, position .2s ease-in-out, top .2s ease-in-out, right .2s ease-in-out;
+ }
+
+ .steps-main-status-label {
+   position: absolute;
+   #{direction(right)}: 140px;
+   top: 4px;
+ }
+
+ .steps-container-collapsed {
+    position: absolute;
+    #{direction(right)}: 8px;
+    width: 120px;
+
+    .step-item-label {
+      visibility: hidden;
+    }
+
+    .progressionContainer {
+      visibility: hidden;
+    }
+ }
+
 .steps {
   list-style-type: none;
   margin: 0;
