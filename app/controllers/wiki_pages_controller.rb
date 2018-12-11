@@ -159,14 +159,11 @@ class WikiPagesController < ApplicationController
   end
 
   def wiki_pages_js_env(context)
-    return @wiki_pages_env if defined? @wiki_pages_env
-    @wiki_pages_env = Rails.cache.fetch(['wiki_pages_env', context].cache_key, expires_in: 120.minutes) do
-      {
-        :wiki_page_menu_tools => external_tools_display_hashes(:wiki_page_menu),
-        :DISPLAY_SHOW_ALL_LINK => tab_enabled?(context.class::TAB_PAGES, {no_render: true}),
-        :STUDENT_PLANNER_ENABLED => context.root_account.feature_enabled?(:student_planner)
-      }
-    end
+    @wiki_pages_env ||= {
+      :wiki_page_menu_tools => external_tools_display_hashes(:wiki_page_menu),
+      :DISPLAY_SHOW_ALL_LINK => tab_enabled?(context.class::TAB_PAGES, {no_render: true}),
+      :STUDENT_PLANNER_ENABLED => context.root_account.feature_enabled?(:student_planner)
+    }
     js_env(@wiki_pages_env)
     @wiki_pages_env
   end
