@@ -62,3 +62,66 @@ export function getCspEnabled(context, contextId) {
       dispatch(setCspEnabledAction(response.data.enabled))
     })
 }
+
+export const ADD_DOMAIN = 'ADD_DOMAIN'
+export const ADD_DOMAIN_BULK = 'ADD_DOMAIN_BULK'
+export const ADD_DOMAIN_OPTIMISTIC = 'ADD_DOMAIN_OPTIMISTIC'
+
+export function addDomainAction(domain, opts = {}) {
+  const type = opts.optimistic ? ADD_DOMAIN_OPTIMISTIC : ADD_DOMAIN
+  if (typeof domain !== 'string') {
+    return {
+      type,
+      payload: new Error('Can only set to String values'),
+      error: true
+    }
+  }
+  return {
+    type,
+    payload: domain
+  }
+}
+
+export function addDomainBulkAction(domains) {
+  if (!Array.isArray(domains)) {
+    return {
+      type: ADD_DOMAIN_BULK,
+      payload: new Error('Can only set to an array of strings'),
+      error: true
+    }
+  }
+  return {
+    type: ADD_DOMAIN_BULK,
+    payload: domains
+  }
+}
+
+export function addDomain(context, contextId, domain) {
+  context = pluralize(context)
+  return (dispatch, getState, {axios}) => {
+    dispatch(addDomainAction(domain, {optimistic: true}))
+    return axios
+      .post(`/api/v1/${context}/${contextId}/csp_settings/domains`, {
+        domain
+      })
+      .then(() => {
+        // This isn't really necessary but since the whitelist is unique,
+        // it doesn't hurt.
+        dispatch(addDomainAction(domain))
+      })
+  }
+}
+
+export function getCurrentWhitelist(context, contextId) {
+  context = pluralize(context)
+  return (dispatch, getState, {axios}) => {
+    const {enabled} = getState()
+    return axios.get(`/api/v1/${context}/${contextId}/csp_settings`).then(response => {
+      dispatch(
+        addDomainBulkAction(
+          response.data[enabled ? 'effective_whitelist' : 'current_account_whitelist']
+        )
+      )
+    })
+  }
+}

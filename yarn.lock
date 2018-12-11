@@ -9835,6 +9835,11 @@ is-utf8@^0.2.0, is-utf8@^0.2.1:
   resolved "https://registry.yarnpkg.com/is-utf8/-/is-utf8-0.2.1.tgz#4b0da1442104d1b336340e80797e865cf39f7d72"
   integrity sha1-Sw2hRCEE0bM2NA6AeX6GXPOffXI=
 
+is-valid-domain@^0.0.6:
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/is-valid-domain/-/is-valid-domain-0.0.6.tgz#97f8ec909cffd21f795667029587d73354fd6412"
+  integrity sha512-XXiNRcLcNKeb0LB3PzB39gJa8QiA+6nnc4NX9zNvFQcaITWU+64hfVqaVppbSd3tSVlJttW6sINkX3xLKPax7A==
+
 is-whitespace-character@^1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/is-whitespace-character/-/is-whitespace-character-1.0.2.tgz#ede53b4c6f6fb3874533751ec9280d01928d03ed"

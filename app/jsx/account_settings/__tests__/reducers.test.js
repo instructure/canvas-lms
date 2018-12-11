@@ -16,8 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {cspEnabled} from '../reducers'
-import {SET_CSP_ENABLED, SET_CSP_ENABLED_OPTIMISTIC} from '../actions'
+import {cspEnabled, whitelistedDomains} from '../reducers'
+import {
+  SET_CSP_ENABLED,
+  SET_CSP_ENABLED_OPTIMISTIC,
+  ADD_DOMAIN,
+  ADD_DOMAIN_OPTIMISTIC,
+  ADD_DOMAIN_BULK
+} from '../actions'
 
 describe('cspEnabled', () => {
   const testMatrix = [
@@ -30,4 +36,38 @@ describe('cspEnabled', () => {
       expect(cspEnabled(initialState, action)).toEqual(expectedState)
     }
   )
+})
+
+describe('whitelistedDomains', () => {
+  const testMatrix = [
+    [{type: ADD_DOMAIN, payload: 'instructure.com'}, [], ['instructure.com']],
+    [{type: ADD_DOMAIN_OPTIMISTIC, payload: 'instructure.com'}, [], ['instructure.com']],
+    [
+      {type: ADD_DOMAIN_BULK, payload: ['instructure.com', 'bridgelms.com']},
+      ['canvaslms.com'],
+      ['canvaslms.com', 'instructure.com', 'bridgelms.com']
+    ]
+  ]
+  it.each(testMatrix)(
+    'with %p action and %p payload the whitelistedDomains state becomes %p',
+    (action, initialState, expectedState) => {
+      expect(whitelistedDomains(initialState, action)).toEqual(expectedState)
+    }
+  )
+
+  it('does not allow duplicate domains with ADD_DOMAIN actions', () => {
+    const action = {type: ADD_DOMAIN, payload: 'instructure.com'}
+    const initialState = ['instructure.com', 'canvaslms.com']
+    expect(whitelistedDomains(initialState, action)).toEqual(['instructure.com', 'canvaslms.com'])
+  })
+
+  it('does not allow duplicates domains with ADD_DOMAIN_BULK actions', () => {
+    const action = {type: ADD_DOMAIN_BULK, payload: ['instructure.com', 'bridgelms.com']}
+    const initialState = ['instructure.com', 'canvaslms.com']
+    expect(whitelistedDomains(initialState, action)).toEqual([
+      'instructure.com',
+      'canvaslms.com',
+      'bridgelms.com'
+    ])
+  })
 })

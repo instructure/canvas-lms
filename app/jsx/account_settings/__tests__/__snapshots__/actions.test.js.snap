@@ -1,5 +1,45 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`addDomainAction creates an ADD_DOMAIN action when passed a boolean value 1`] = `
+Object {
+  "payload": "instructure.com",
+  "type": "ADD_DOMAIN",
+}
+`;
+
+exports[`addDomainAction creates an ADD_DOMAIN_OPTIMISTIC action when optimistic option is given 1`] = `
+Object {
+  "payload": "instructure.com",
+  "type": "ADD_DOMAIN_OPTIMISTIC",
+}
+`;
+
+exports[`addDomainAction creates an error action if passed a non-string value 1`] = `
+Object {
+  "error": true,
+  "payload": [Error: Can only set to String values],
+  "type": "ADD_DOMAIN",
+}
+`;
+
+exports[`addDomainBulkAction creates a ADD_DOMAIN action when passed an value 1`] = `
+Object {
+  "payload": Array [
+    "instructure.com",
+    "canvaslms.com",
+  ],
+  "type": "ADD_DOMAIN_BULK",
+}
+`;
+
+exports[`addDomainBulkAction creates an error action if passed a non-Array value 1`] = `
+Object {
+  "error": true,
+  "payload": [Error: Can only set to an array of strings],
+  "type": "ADD_DOMAIN_BULK",
+}
+`;
+
 exports[`setCspEnabledAction creates a SET_CSP_ENABLED action when passed a boolean value 1`] = `
 Object {
   "payload": true,

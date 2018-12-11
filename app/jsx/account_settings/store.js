@@ -22,7 +22,8 @@ import rootReducer from './reducers'
 import axios from 'axios'
 
 export const defaultState = {
-  cspEnabled: false
+  cspEnabled: false,
+  whitelistedDomains: []
 }
 
 export function configStore(initialState, options = {}) {

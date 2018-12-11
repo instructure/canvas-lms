@@ -24,8 +24,10 @@ import Heading from '@instructure/ui-elements/lib/components/Heading'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import View from '@instructure/ui-layout/lib/components/View'
 import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
+import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
 
-import {getCspEnabled, setCspEnabled} from '../actions'
+import {getCspEnabled, setCspEnabled, getCurrentWhitelist} from '../actions'
+import {ConnectedWhitelist} from './Whitelist'
 
 export class SecurityPanel extends Component {
   static propTypes = {
@@ -33,7 +35,8 @@ export class SecurityPanel extends Component {
     contextId: string.isRequired,
     cspEnabled: bool.isRequired,
     getCspEnabled: func.isRequired,
-    setCspEnabled: func.isRequired
+    setCspEnabled: func.isRequired,
+    getCurrentWhitelist: func.isRequired
   }
 
   handleCspToggleChange = e => {
@@ -42,6 +45,7 @@ export class SecurityPanel extends Component {
 
   componentDidMount() {
     this.props.getCspEnabled(this.props.context, this.props.contextId)
+    this.props.getCurrentWhitelist(this.props.context, this.props.contextId)
   }
 
   render() {
@@ -60,12 +64,23 @@ export class SecurityPanel extends Component {
             )}
           </Text>
         </View>
-        <Checkbox
-          variant="toggle"
-          label={I18n.t('Enable Content Security Policy')}
-          onChange={this.handleCspToggleChange}
-          checked={this.props.cspEnabled}
-        />
+        <Grid>
+          <GridRow>
+            <GridCol>
+              <Checkbox
+                variant="toggle"
+                label={I18n.t('Enable Content Security Policy')}
+                onChange={this.handleCspToggleChange}
+                checked={this.props.cspEnabled}
+              />
+            </GridCol>
+          </GridRow>
+          <GridRow>
+            <GridCol>
+              <ConnectedWhitelist context={this.props.context} contextId={this.props.contextId} />
+            </GridCol>
+          </GridRow>
+        </Grid>
       </div>
     )
   }
@@ -80,7 +95,8 @@ function mapStateToProps(state, ownProps) {
 
 const mapDispatchToProps = {
   getCspEnabled,
-  setCspEnabled
+  setCspEnabled,
+  getCurrentWhitelist
 }
 
 export const ConnectedSecurityPanel = connect(

@@ -17,7 +17,13 @@
  */
 
 import {combineReducers} from 'redux'
-import {SET_CSP_ENABLED, SET_CSP_ENABLED_OPTIMISTIC} from './actions'
+import {
+  SET_CSP_ENABLED,
+  SET_CSP_ENABLED_OPTIMISTIC,
+  ADD_DOMAIN,
+  ADD_DOMAIN_OPTIMISTIC,
+  ADD_DOMAIN_BULK
+} from './actions'
 
 export function cspEnabled(state = false, action) {
   switch (action.type) {
@@ -29,6 +35,24 @@ export function cspEnabled(state = false, action) {
   }
 }
 
+export function whitelistedDomains(state = [], action) {
+  switch (action.type) {
+    case ADD_DOMAIN:
+    case ADD_DOMAIN_OPTIMISTIC: {
+      const domains = new Set(state)
+      domains.add(action.payload)
+      return Array.from(domains)
+    }
+    case ADD_DOMAIN_BULK: {
+      const domains = new Set(state.concat(action.payload))
+      return Array.from(domains)
+    }
+    default:
+      return state
+  }
+}
+
 export default combineReducers({
-  cspEnabled
+  cspEnabled,
+  whitelistedDomains
 })
