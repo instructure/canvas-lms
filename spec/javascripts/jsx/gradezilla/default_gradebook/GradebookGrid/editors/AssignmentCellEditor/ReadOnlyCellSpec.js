@@ -73,7 +73,7 @@ QUnit.module('GradebookGrid ReadOnlyCell', suiteHooks => {
 
   QUnit.module('#render()', () => {
     function getRenderedGrade() {
-      return wrapper.find('.Grid__AssignmentRowCell__Content').text()
+      return wrapper.find('.Grid__GradeCell__Content').text()
     }
 
     test('sets focus on the tray button', () => {
@@ -173,14 +173,14 @@ QUnit.module('GradebookGrid ReadOnlyCell', suiteHooks => {
     test('calls onToggleSubmissionTrayOpen when clicked', () => {
       props.onToggleSubmissionTrayOpen = sinon.stub()
       wrapper = mountComponent()
-      wrapper.find('.Grid__AssignmentRowCell__Options button').simulate('click')
+      wrapper.find('.Grid__GradeCell__Options button').simulate('click')
       strictEqual(props.onToggleSubmissionTrayOpen.callCount, 1)
     })
 
     test('calls onToggleSubmissionTrayOpen with the student id and assignment id', () => {
       props.onToggleSubmissionTrayOpen = sinon.stub()
       wrapper = mountComponent()
-      wrapper.find('.Grid__AssignmentRowCell__Options button').simulate('click')
+      wrapper.find('.Grid__GradeCell__Options button').simulate('click')
       deepEqual(props.onToggleSubmissionTrayOpen.getCall(0).args, ['1101', '2301'])
     })
   })

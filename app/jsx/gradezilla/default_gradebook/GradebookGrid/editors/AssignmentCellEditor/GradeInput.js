@@ -25,10 +25,10 @@ import GradingSchemeGradeInput from './GradingSchemeGradeInput'
 import TextGradeInput from './TextGradeInput'
 
 const CLASSNAME_FOR_ENTER_GRADES_AS = {
-  gradingScheme: 'Grid__AssignmentRowCell__GradingSchemeInput',
-  passFail: 'Grid__AssignmentRowCell__CompleteIncompleteInput',
-  percent: 'Grid__AssignmentRowCell__PercentInput',
-  points: 'Grid__AssignmentRowCell__PointsInput'
+  gradingScheme: 'Grid__GradeCell__GradingSchemeInput',
+  passFail: 'Grid__GradeCell__CompleteIncompleteInput',
+  percent: 'Grid__GradeCell__PercentInput',
+  points: 'Grid__GradeCell__PointsInput'
 }
 
 function inputComponentFor(enterGradesAs) {

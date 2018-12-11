@@ -124,7 +124,7 @@ QUnit.module('GradebookGrid GradeInput using GradingSchemeGradeInput', suiteHook
   test('adds the GradingSchemeInput-suffix class to the container', () => {
     mountComponent()
     const classList = wrapper.getDOMNode().classList
-    strictEqual(classList.contains('Grid__AssignmentRowCell__GradingSchemeInput'), true)
+    strictEqual(classList.contains('Grid__GradeCell__GradingSchemeInput'), true)
   })
 
   test('renders a text input', () => {

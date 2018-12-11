@@ -77,7 +77,7 @@ QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
   }
 
   function getRenderedGrade() {
-    return $fixture.querySelector('.Grid__AssignmentRowCell__Content .Grade')
+    return $fixture.querySelector('.Grid__GradeCell__Content .Grade')
   }
 
   function excuseSubmission() {
@@ -293,7 +293,7 @@ QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
     })
 
     test('does not display an invalid grade indicator when no grade is pending', () => {
-      strictEqual(renderCell().querySelectorAll('.Grid__AssignmentRowCell__InvalidGrade').length, 0)
+      strictEqual(renderCell().querySelectorAll('.Grid__GradeCell__InvalidGrade').length, 0)
     })
 
     QUnit.module('when a grade is pending', contextHooks => {
@@ -347,7 +347,7 @@ QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
         }
         gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
         strictEqual(
-          renderCell().querySelectorAll('.Grid__AssignmentRowCell__InvalidGrade').length,
+          renderCell().querySelectorAll('.Grid__GradeCell__InvalidGrade').length,
           1
         )
       })
@@ -362,7 +362,7 @@ QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
         }
         gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
         strictEqual(
-          renderCell().querySelectorAll('.Grid__AssignmentRowCell__InvalidGrade').length,
+          renderCell().querySelectorAll('.Grid__GradeCell__InvalidGrade').length,
           0
         )
       })

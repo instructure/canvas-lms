@@ -26,7 +26,7 @@ import I18n from 'i18n!gradebook'
 
 function InvalidGradeIndicator(props) {
   return (
-    <div className="Grid__AssignmentRowCell__InvalidGrade">
+    <div className="Grid__GradeCell__InvalidGrade">
       <Tooltip
         placement="bottom"
         size="medium"

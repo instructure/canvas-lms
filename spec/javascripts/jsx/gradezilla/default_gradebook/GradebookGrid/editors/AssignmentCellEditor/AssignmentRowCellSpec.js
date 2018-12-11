@@ -122,40 +122,40 @@ QUnit.module('GradebookGrid AssignmentRowCell', suiteHooks => {
 
       test('renders end text', () => {
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell__EndText').length, 1)
+        strictEqual(wrapper.find('.Grid__GradeCell__EndText').length, 1)
       })
 
       test('renders points possible in the end text', () => {
         wrapper = mountComponent()
-        equal(wrapper.find('.Grid__AssignmentRowCell__EndText').text(), '/10')
+        equal(wrapper.find('.Grid__GradeCell__EndText').text(), '/10')
       })
 
       test('renders nothing in the end text when the assignment has no points possible', () => {
         props.assignment.pointsPossible = 0
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell__EndText').text(), '')
+        strictEqual(wrapper.find('.Grid__GradeCell__EndText').text(), '')
       })
 
       test('renders an InvalidGradeIndicator when the pending grade is invalid', () => {
         props.pendingGradeInfo = {excused: false, grade: null, valid: false}
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell__InvalidGrade').length, 1)
+        strictEqual(wrapper.find('.Grid__GradeCell__InvalidGrade').length, 1)
       })
 
       test('does not render an InvalidGradeIndicator when the pending grade is valid', () => {
         props.pendingGradeInfo = {excused: false, grade: null, valid: true}
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell__InvalidGrade').length, 0)
+        strictEqual(wrapper.find('.Grid__GradeCell__InvalidGrade').length, 0)
       })
 
       test('does not render an InvalidGradeIndicator when no pending grade is present', () => {
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell__InvalidGrade').length, 0)
+        strictEqual(wrapper.find('.Grid__GradeCell__InvalidGrade').length, 0)
       })
 
-      test('renders the AssignmentRowCell div with the "points" class', () => {
+      test('renders the GradeCell div with the "points" class', () => {
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell').hasClass('points'), true)
+        strictEqual(wrapper.find('.Grid__GradeCell').hasClass('points'), true)
       })
     })
 
@@ -183,34 +183,34 @@ QUnit.module('GradebookGrid AssignmentRowCell', suiteHooks => {
 
       test('renders end text', () => {
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell__EndText').length, 1)
+        strictEqual(wrapper.find('.Grid__GradeCell__EndText').length, 1)
       })
 
       test('renders nothing in the end text', () => {
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell__EndText').text(), '')
+        strictEqual(wrapper.find('.Grid__GradeCell__EndText').text(), '')
       })
 
       test('renders an InvalidGradeIndicator when the pending grade is invalid', () => {
         props.pendingGradeInfo = {excused: false, grade: null, valid: false}
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell__InvalidGrade').length, 1)
+        strictEqual(wrapper.find('.Grid__GradeCell__InvalidGrade').length, 1)
       })
 
       test('does not render an InvalidGradeIndicator when the pending grade is valid', () => {
         props.pendingGradeInfo = {excused: false, grade: null, valid: true}
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell__InvalidGrade').length, 0)
+        strictEqual(wrapper.find('.Grid__GradeCell__InvalidGrade').length, 0)
       })
 
       test('does not render an InvalidGradeIndicator when no pending grade is present', () => {
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell__InvalidGrade').length, 0)
+        strictEqual(wrapper.find('.Grid__GradeCell__InvalidGrade').length, 0)
       })
 
-      test('renders the AssignmentRowCell div with the "percent" class', () => {
+      test('renders the GradeCell div with the "percent" class', () => {
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell').hasClass('percent'), true)
+        strictEqual(wrapper.find('.Grid__GradeCell').hasClass('percent'), true)
       })
     })
 
@@ -238,29 +238,29 @@ QUnit.module('GradebookGrid AssignmentRowCell', suiteHooks => {
 
       test('does not render end text', () => {
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell__EndText').length, 0)
+        strictEqual(wrapper.find('.Grid__GradeCell__EndText').length, 0)
       })
 
       test('renders an InvalidGradeIndicator when the pending grade is invalid', () => {
         props.pendingGradeInfo = {excused: false, grade: null, valid: false}
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell__InvalidGrade').length, 1)
+        strictEqual(wrapper.find('.Grid__GradeCell__InvalidGrade').length, 1)
       })
 
       test('does not render an InvalidGradeIndicator when the pending grade is valid', () => {
         props.pendingGradeInfo = {excused: false, grade: null, valid: true}
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell__InvalidGrade').length, 0)
+        strictEqual(wrapper.find('.Grid__GradeCell__InvalidGrade').length, 0)
       })
 
       test('does not render an InvalidGradeIndicator when no pending grade is present', () => {
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell__InvalidGrade').length, 0)
+        strictEqual(wrapper.find('.Grid__GradeCell__InvalidGrade').length, 0)
       })
 
-      test('renders the AssignmentRowCell div with the "gradingScheme" class', () => {
+      test('renders the GradeCell div with the "gradingScheme" class', () => {
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell').hasClass('gradingScheme'), true)
+        strictEqual(wrapper.find('.Grid__GradeCell').hasClass('gradingScheme'), true)
       })
     })
 
@@ -282,12 +282,12 @@ QUnit.module('GradebookGrid AssignmentRowCell', suiteHooks => {
 
       test('does not render end text', () => {
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell__EndText').length, 0)
+        strictEqual(wrapper.find('.Grid__GradeCell__EndText').length, 0)
       })
 
-      test('renders the AssignmentRowCell div with the "passFail" class', () => {
+      test('renders the GradeCell div with the "passFail" class', () => {
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell').hasClass('passFail'), true)
+        strictEqual(wrapper.find('.Grid__GradeCell').hasClass('passFail'), true)
       })
     })
   })
@@ -445,7 +445,7 @@ QUnit.module('GradebookGrid AssignmentRowCell', suiteHooks => {
   })
 
   QUnit.module('"Toggle Tray" Button', () => {
-    const buttonSelector = '.Grid__AssignmentRowCell__Options button'
+    const buttonSelector = '.Grid__GradeCell__Options button'
 
     test('is rendered when the assignment grading type is "points"', () => {
       props.assignment.gradingType = 'points'

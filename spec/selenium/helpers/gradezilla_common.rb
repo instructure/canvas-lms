@@ -60,7 +60,7 @@ module GradezillaCommon
   def open_comment_dialog(x=0, y=0)
     cell = f("#gradebook_grid .container_1 .slick-row:nth-child(#{y+1}) .slick-cell:nth-child(#{x+1})")
     cell.click
-    fj('.Grid__AssignmentRowCell__Options button:visible', cell).click
+    fj('.Grid__GradeCell__Options button:visible', cell).click
     f('#ShowSubmissionDetailsAction').click
     # the dialog fetches the comments async after it displays and then innerHTMLs the whole
     # thing again once it has fetched them from the server, completely replacing it

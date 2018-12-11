@@ -216,7 +216,7 @@ export default class GradingSchemeInput extends Component {
           value={this.state.value}
         />
 
-        <div className="Grid__AssignmentRowCell__GradingSchemeMenu">
+        <div className="Grid__GradeCell__GradingSchemeMenu">
           <Menu
             contentRef={this.props.menuContentRef}
             onDismiss={this.props.onMenuDismiss}

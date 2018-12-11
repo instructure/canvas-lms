@@ -104,19 +104,19 @@ QUnit.module('GradebookGrid GradeInput using CompleteIncompleteGradeInput', suit
   }
 
   function getTextValue() {
-    const text = wrapper.find('.Grid__AssignmentRowCell__CompleteIncompleteValue').at(0)
+    const text = wrapper.find('.Grid__GradeCell__CompleteIncompleteValue').at(0)
     return text.getDOMNode().textContent
   }
 
   test('adds the CompleteIncompleteInput-suffix class to the container', () => {
     mountComponent()
     const classList = wrapper.getDOMNode().classList
-    strictEqual(classList.contains('Grid__AssignmentRowCell__CompleteIncompleteInput'), true)
+    strictEqual(classList.contains('Grid__GradeCell__CompleteIncompleteInput'), true)
   })
 
   test('renders a text container', () => {
     mountComponent()
-    const container = wrapper.find('.Grid__AssignmentRowCell__CompleteIncompleteValue')
+    const container = wrapper.find('.Grid__GradeCell__CompleteIncompleteValue')
     strictEqual(container.length, 1)
   })
 

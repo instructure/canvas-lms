@@ -65,14 +65,14 @@ function renderStartContainer(options) {
   let content = ''
   if (options.invalid) {
     content +=
-      '<div class="Grid__AssignmentRowCell__InvalidGrade"><i class="icon-warning"></i></div>'
+      '<div class="Grid__GradeCell__InvalidGrade"><i class="icon-warning"></i></div>'
   }
   // xsslint safeString.identifier content
-  return `<div class="Grid__AssignmentRowCell__StartContainer">${content}</div>`
+  return `<div class="Grid__GradeCell__StartContainer">${content}</div>`
 }
 
 function renderTemplate(grade, options = {}) {
-  let classNames = ['Grid__AssignmentRowCell', 'gradebook-cell']
+  let classNames = ['Grid__GradeCell', 'gradebook-cell']
   let content = grade
 
   if (options.classNames) {
@@ -97,10 +97,10 @@ function renderTemplate(grade, options = {}) {
   // xsslint safeString.function renderStartContainer
   return `<div class="${htmlEscape(classNames.join(' '))}">
     ${renderStartContainer(options)}
-    <div class="Grid__AssignmentRowCell__Content">
+    <div class="Grid__GradeCell__Content">
       <span class="Grade">${content}</span>
     </div>
-    <div class="Grid__AssignmentRowCell__EndContainer"></div>
+    <div class="Grid__GradeCell__EndContainer"></div>
   </div>`
 }
 

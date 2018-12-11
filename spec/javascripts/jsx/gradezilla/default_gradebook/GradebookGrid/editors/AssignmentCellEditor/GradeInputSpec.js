@@ -89,7 +89,7 @@ QUnit.module('GradebookGrid GradeInput', suiteHooks => {
   QUnit.module('when the "enter grades as" setting is "passFail"', contextHooks => {
     const getInputValue = () =>
       wrapper
-        .find('.Grid__AssignmentRowCell__CompleteIncompleteValue')
+        .find('.Grid__GradeCell__CompleteIncompleteValue')
         .at(0)
         .getDOMNode().textContent
 
@@ -101,7 +101,7 @@ QUnit.module('GradebookGrid GradeInput', suiteHooks => {
 
     test('renders a button trigger for the menu', () => {
       mountComponent()
-      const button = wrapper.find('.Grid__AssignmentRowCell__CompleteIncompleteMenu button')
+      const button = wrapper.find('.Grid__GradeCell__CompleteIncompleteMenu button')
       strictEqual(button.length, 1)
     })
 
@@ -143,7 +143,7 @@ QUnit.module('GradebookGrid GradeInput', suiteHooks => {
     test('adds the PointsInput-suffix class to the container', () => {
       mountComponent()
       const {classList} = wrapper.getDOMNode()
-      strictEqual(classList.contains('Grid__AssignmentRowCell__PointsInput'), true)
+      strictEqual(classList.contains('Grid__GradeCell__PointsInput'), true)
     })
 
     test('renders a text input', () => {
@@ -200,7 +200,7 @@ QUnit.module('GradebookGrid GradeInput', suiteHooks => {
     test('adds the PercentInput-suffix class to the container', () => {
       mountComponent()
       const {classList} = wrapper.getDOMNode()
-      strictEqual(classList.contains('Grid__AssignmentRowCell__PercentInput'), true)
+      strictEqual(classList.contains('Grid__GradeCell__PercentInput'), true)
     })
 
     test('renders a text input', () => {

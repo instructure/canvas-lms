@@ -145,11 +145,11 @@ export default class CompleteIncompleteGradeInput extends Component {
 
     return (
       <div className="HorizontalFlex">
-        <span className="Grid__AssignmentRowCell__CompleteIncompleteValue">
+        <span className="Grid__GradeCell__CompleteIncompleteValue">
           {componentForGrade(grade)}
         </span>
 
-        <div className="Grid__AssignmentRowCell__CompleteIncompleteMenu">
+        <div className="Grid__GradeCell__CompleteIncompleteMenu">
           <Menu
             menuRef={this.props.menuContentRef}
             onDismiss={this.props.onMenuDismiss}
