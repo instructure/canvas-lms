@@ -20,12 +20,13 @@ import React, {Component} from 'react'
 import {bool, func, instanceOf, number, oneOf, shape, string} from 'prop-types'
 import ApplyTheme from '@instructure/ui-themeable/lib/components/ApplyTheme'
 import Button from '@instructure/ui-buttons/lib/components/Button'
+import IconExpandStart from '@instructure/ui-icons/lib/Line/IconExpandStart'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import TextInput from '@instructure/ui-forms/lib/components/TextInput'
-import IconExpandStart from '@instructure/ui-icons/lib/Line/IconExpandStart'
 import I18n from 'i18n!gradebook'
-import InvalidGradeIndicator from './InvalidGradeIndicator'
-import GradeInput from './GradeInput'
+
+import GradeInput from '../GradeInput'
+import InvalidGradeIndicator from '../InvalidGradeIndicator'
 
 const themeOverrides = {
   [Button.theme]: {
