@@ -19,6 +19,8 @@
 import React from 'react'
 import I18n from 'i18n!assignments_2'
 import {OverrideShape} from '../../assignmentData'
+import OverrideAttempts from './OverrideAttempts'
+import OverrideAssignTo from './OverrideAssignTo'
 import OverrideSubmissionTypes from './OverrideSubmissionTypes'
 import TeacherViewContext from '../TeacherViewContext'
 import AvailabilityDates from '../../../shared/AvailabilityDates'
@@ -49,7 +51,7 @@ export default class OverrideSummary extends React.Component {
   renderSubmissionTypesAndDueDate(override) {
     return (
       <Text>
-        <OverrideSubmissionTypes variant="simple" override={override} />
+        <OverrideSubmissionTypes variant="summary" override={override} />
         <Text> | </Text>
         <FriendlyDatetime
           prefix={I18n.t('Due: ')}
@@ -74,6 +76,7 @@ export default class OverrideSummary extends React.Component {
     if (override) {
       return (
         <Responsive
+          match="media"
           query={{
             largerScreen: {minWidth: '36rem'}
           }}
@@ -84,9 +87,11 @@ export default class OverrideSummary extends React.Component {
             const leftColumn = (
               <View display="block" margin={largerScreen ? '0' : '0 0 small'}>
                 <View display="block" margin="0 0 xxx-small">
-                  <Text weight="bold">{this.renderTitle(override)}</Text>
+                  <OverrideAssignTo override={override} variant="summary" />
                 </View>
-                <View display="block">{this.renderAttemptsAllowed(override)}</View>
+                <View display="block">
+                  <OverrideAttempts override={override} variant="summary" />
+                </View>
               </View>
             )
 
@@ -100,7 +105,7 @@ export default class OverrideSummary extends React.Component {
             )
 
             return (
-              <View as="div">
+              <View as="div" data-testid="OverrideSummary">
                 {largerScreen ? (
                   <Flex justifyItems="space-between">
                     <FlexItem grow shrink>

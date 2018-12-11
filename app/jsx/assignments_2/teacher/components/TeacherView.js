@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {string} from 'prop-types'
+import {string, bool} from 'prop-types'
 import I18n from 'i18n!assignments_2'
 
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
@@ -32,7 +32,13 @@ import TeacherViewContext, {TeacherViewContextDefaults} from './TeacherViewConte
 
 export default class TeacherView extends React.Component {
   static propTypes = {
-    assignmentLid: string
+    assignmentLid: string,
+    readOnly: bool
+  }
+
+  // for now, put "#edit" in the URL and it will turn off readOnly
+  static defaultProps = {
+    readOnly: window.location.hash.indexOf('edit') < 0
   }
 
   constructor(props) {
@@ -179,7 +185,7 @@ export default class TeacherView extends React.Component {
             onPublishChange={this.handlePublishChange}
             onDelete={this.handleDeleteButtonPressed}
           />
-          <ContentTabs assignment={assignment} />
+          <ContentTabs assignment={assignment} readOnly={this.props.readOnly} />
           <MessageStudentsWho
             open={this.state.messageStudentsWhoOpen}
             onDismiss={this.handleDismissMessageStudentsWho}

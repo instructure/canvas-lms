@@ -63,6 +63,7 @@ export const TEACHER_QUERY = gql`
       }
       submissionTypes
       allowedExtensions
+      allowedAttempts
       course {
         lid: _id
       }
@@ -80,6 +81,23 @@ export const TEACHER_QUERY = gql`
           dueAt
           lockAt
           unlockAt
+          set {
+            __typename
+            ... on Section {
+              lid: _id
+              name
+            }
+            ... on Group {
+              lid: _id
+              name
+            }
+            ... on AdhocStudents {
+              students {
+                lid: _id
+                name
+              }
+            }
+          }
         }
       }
       submissions: submissionsConnection(
@@ -154,7 +172,7 @@ export const OverrideShape = shape({
   set: shape({
     lid: string,
     name: string,
-    __typename: oneOf(['Section', 'Group'])
+    __typename: oneOf(['Section', 'Group', 'AdhocStudents'])
   })
 })
 

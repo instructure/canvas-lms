@@ -18,7 +18,9 @@
 
 import React from 'react'
 import {bool} from 'prop-types'
+
 import View from '@instructure/ui-layout/lib/components/View'
+
 import {TeacherAssignmentShape} from '../../assignmentData'
 import Override from './Override'
 import EveryoneElse from './EveryoneElse'
@@ -59,7 +61,8 @@ function renderOverrides(assignment, readOnly) {
         override={{
           ...override,
           submissionTypes: assignment.submissionTypes,
-          allowedExtensions: assignment.allowedExtensions
+          allowedExtensions: assignment.allowedExtensions,
+          allowedAttempts: assignment.allowedAttempts
         }}
         readOnly={readOnly}
       />

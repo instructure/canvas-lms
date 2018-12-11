@@ -22,6 +22,8 @@ import {bool} from 'prop-types'
 import apiUserContent from 'compiled/str/apiUserContent'
 import {TeacherAssignmentShape} from '../assignmentData'
 import Overrides from './Overrides/Overrides'
+import AddOverride from './Overrides/AddOverride'
+
 import View from '@instructure/ui-layout/lib/components/View'
 
 Details.propTypes = {
@@ -43,6 +45,10 @@ export default function Details(props) {
         <div dangerouslySetInnerHTML={{__html: convertedHtml}} />
       </View>
       <Overrides assignment={props.assignment} readOnly={props.readOnly} />
+      {props.readOnly ? null : <AddOverride onAddOverride={addOverride} />}
     </View>
   )
 }
+
+// TODO: the real deal
+function addOverride() {}

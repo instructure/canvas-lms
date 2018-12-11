@@ -17,26 +17,25 @@
  */
 
 import React from 'react'
-import I18n from 'i18n!assignments_2'
-import tz from 'timezone'
-import {render} from 'react-testing-library'
+import {render, fireEvent, waitForElement} from 'react-testing-library'
 import {mockOverride} from '../../../test-utils'
 import Override from '../Override'
 
 it('renders an override', () => {
   const override = mockOverride()
+  const {getByTestId} = render(<Override override={override} />)
+  expect(getByTestId('OverrideSummary')).toBeInTheDocument()
+})
 
-  const {getByText} = render(<Override override={override} />)
+it('displays OverrideDetail on expanding toggle group', async () => {
+  const override = mockOverride()
+  const {getByText, getByTestId} = render(<Override override={override} />)
 
-  // this is really testing the OverrideSummary, but short of shallow rendering
-  // to see that's what's happening, I'm at a loss as to what to do
-  expect(getByText('Section A')).toBeInTheDocument()
-
-  const due = `Due: ${tz.format(override.dueAt, I18n.t('#date.formats.full'))}`
-  expect(getByText(due, {exact: false})).toBeInTheDocument()
-
-  const unlock = `${tz.format(override.unlockAt, I18n.t('#date.formats.short'))}`
-  const lock = `to ${tz.format(override.lockAt, I18n.t('#date.formats.full'))}`
-  expect(getByText(unlock)).toBeInTheDocument()
-  expect(getByText(lock)).toBeInTheDocument()
+  const expandButton = getByText('Expand')
+  fireEvent.click(expandButton)
+  // the detail is now rendered
+  const detail = await waitForElement(() => getByTestId('OverrideDetail'))
+  expect(detail).toBeInTheDocument()
+  // and the summary's still there
+  expect(getByTestId('OverrideSummary')).toBeInTheDocument()
 })

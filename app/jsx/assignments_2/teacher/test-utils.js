@@ -63,8 +63,8 @@ export function mockAssignment(overrides) {
     lid: 'assignment-lid',
     name: 'assignment name',
     pointsPossible: 5,
-    dueAt: '2018-11-27T13:00-05:00',
-    lockAt: '2018-11-27T13:00-05:00',
+    dueAt: '2018-11-28T13:00-05:00',
+    lockAt: '2018-11-29T13:00-05:00',
     unlockAt: '2018-11-27T13:00-05:00',
     description: 'assignment description',
     state: 'published',
@@ -77,6 +77,7 @@ export function mockAssignment(overrides) {
     },
     submissionTypes: ['online_text_entry'],
     allowedExtensions: [],
+    allowedAttempts: null,
     assignmentOverrides: {
       nodes: []
     },
@@ -87,7 +88,7 @@ export function mockAssignment(overrides) {
   }
 }
 
-export function mockOverride(overrides) {
+export function mockOverride(overrides = {}) {
   return {
     gid: '1',
     lid: '1',
@@ -96,6 +97,12 @@ export function mockOverride(overrides) {
     allDay: true,
     lockAt: '2018-12-29T23:59:00-05:00',
     unlockAt: '2018-12-23T00:00:00-05:00',
+    allowedAttempts: null,
+    set: {
+      __typename: 'Section',
+      lid: '10',
+      name: 'Section A'
+    },
     ...overrides
   }
 }
@@ -131,3 +138,12 @@ export function mockUser(overrides) {
 
 // values need to match the defaults for TeacherViewContext
 export const mockTeacherContext = () => ({...TeacherViewContextDefaults})
+
+// because jsdom doesn't define matchMedia
+window.matchMedia =
+  window.matchMedia ||
+  (() => ({
+    matches: false,
+    addListener: () => {},
+    removeListener: () => {}
+  }))

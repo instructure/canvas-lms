@@ -584,6 +584,20 @@
     classnames "^2"
     prop-types "^15"
 
+"@instructure/ui-form-field@^5":
+  version "5.40.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-form-field/-/ui-form-field-5.40.0.tgz#66ff11239aa924145469c596043c77722530ad61"
+  integrity sha512-/bivQ5lgk/cfMNUcDxKBVRaaCKFwqWxcQC118xBUTyvrPrEKEYESCY15BDc7L5IxRXTRFMu3lJ0PNPJAZkqJsw==
+  dependencies:
+    "@instructure/ui-a11y" "^5"
+    "@instructure/ui-icons" "^5"
+    "@instructure/ui-layout" "^5"
+    "@instructure/ui-themeable" "^5"
+    "@instructure/ui-utils" "^5"
+    "@instructure/uid" "^5"
+    classnames "^2"
+    prop-types "^15"
+
 "@instructure/ui-form-field@^5.38.0":
   version "5.38.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-form-field/-/ui-form-field-5.38.0.tgz#6c08912933c61da673f7e155fec5ac8bd59919a8"
@@ -941,6 +955,11 @@
     moment-timezone "^0.5"
     numeral "^2"
     prop-types "^15"
+
+"@instructure/uid@^5":
+  version "5.40.0"
+  resolved "https://registry.yarnpkg.com/@instructure/uid/-/uid-5.40.0.tgz#b510a96c4071c593fe666c262261d97fbab9b3b4"
+  integrity sha512-/B6jsjbW/ZsMduFUk96GC5AER14qIATtDOAl4BV6looypJOTP6/CGUqFXjOn0yP1lsNYUHkDG6f3+tRnns6W+A==
 
 "@lerna/package@3.0.0-beta.17":
   version "3.0.0-beta.17"
