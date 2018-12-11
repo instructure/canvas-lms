@@ -178,8 +178,9 @@ class PermissionsIndex
 
     def edit_role(role, new_name)
       open_edit_role_tray(role)
-      set_value(f('input[name="edit_name_box"]'), new_name)
-      driver.action.send_keys(:tab).perform
+      replace_content(f('input[name="edit_name_box"]'), new_name, tab_out: true)
+      # click header since :tab does not tab out of input
+      edit_tray_header.click
       wait_for_ajaximations
     end
 
