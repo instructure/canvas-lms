@@ -52,9 +52,8 @@ module Lti
 
     def generate_lti_params
       message_type = @tool.extension_setting(resource_type, :message_type)
-
-      if message_type == 'DeepLinkingRequest'
-        # Use the DeepLinkingRequest message model to generate params.
+      if message_type == LtiAdvantage::Messages::DeepLinkingRequest::MESSAGE_TYPE
+        deep_linking_request.generate_post_payload
       else
         resource_link_request.generate_post_payload
       end
@@ -80,6 +79,17 @@ module Lti
           context_id: @context.global_id
         },
         (Time.zone.now + MESSAGE_HINT_LIFESPAN)
+      )
+    end
+
+    def deep_linking_request
+      Lti::Messages::DeepLinkingRequest.new(
+        tool: @tool,
+        context: @context,
+        user: @user,
+        expander: @expander,
+        return_url: @return_url,
+        opts: @opts
       )
     end
 

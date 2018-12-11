@@ -27,11 +27,6 @@ class TestCourseApi
   def course_url(course, opts = {}); return "course_url(Course.find(#{course.id}), :host => #{HostUrl.context_host(@course1)})"; end
 
   def api_user_content(syllabus, course); return "api_user_content(#{syllabus}, #{course.id})"; end
-
-  attr_accessor :master_courses
-  def master_courses?
-    master_courses
-  end
 end
 
 describe Api::V1::Course do
@@ -318,10 +313,6 @@ describe Api::V1::Course do
     end
 
     context "master course stuff" do
-      before do
-        @test_api.master_courses = true
-      end
-
       let(:json) { @test_api.course_json(@course1, @me, {}, [], []) }
 
       it "should return blueprint status" do
@@ -1872,6 +1863,51 @@ describe CoursesController, type: :request do
       course2['enrollments'].first
     end
 
+    context "with override scores" do
+      before(:once) do
+        @course2.enable_feature!(:final_grades_override)
+        student_enrollment = @course2.all_student_enrollments.first
+        student_enrollment.scores.create!(
+          course_score: true,
+          current_score: 60,
+          final_score: 77,
+          override_score: 89
+        )
+      end
+
+      it "returns the override score instead of the current score" do
+        @course2.update!(grading_standard_enabled: false)
+        json_response = courses_api_index_call
+        expect(enrollment(json_response).fetch("computed_current_score")).to be 89.0
+      end
+
+      it "returns the lower bound of override score instead of the current score" do
+        json_response = courses_api_index_call
+        expect(enrollment(json_response).fetch("computed_current_score")).to be 87.0
+      end
+
+      it "returns the override grade instead of the current grade" do
+        json_response = courses_api_index_call
+        expect(enrollment(json_response).fetch("computed_current_grade")).to eq "B+"
+      end
+
+      it "returns the lower bound of override score instead of the current final score" do
+        json_response = courses_api_index_call
+        expect(enrollment(json_response).fetch("computed_final_score")).to be 87.0
+      end
+
+      it "returns the override score instead of the current final score" do
+        @course2.update!(grading_standard_enabled: false)
+        json_response = courses_api_index_call
+        expect(enrollment(json_response).fetch("computed_final_score")).to be 89.0
+      end
+
+      it "returns the override grade instead of the current final grade" do
+        json_response = courses_api_index_call
+        expect(enrollment(json_response).fetch("computed_final_grade")).to eq "B+"
+      end
+    end
+
     context "include total scores" do
       before(:once) do
         student_enrollment = @course2.all_student_enrollments.first
@@ -2612,7 +2648,7 @@ describe CoursesController, type: :request do
         @course1.root_account.settings[:enable_profiles] = true
         @course1.root_account.save!
 
-        json = api_call(:get, api_url, api_route, :search_term => "TAPerson", :include => ['email', 'bio'])
+        json = api_call(:get, api_url, api_route, :search_term => "TAPerson", :include => ['bio'])
 
         expect(json).to eq [
           {

@@ -745,6 +745,41 @@ describe UsersController do
 
         expect(response).to_not be_ok
       end
+
+      it "returns the requested grading period override score, if present and feature is enabled" do
+        test_course.enable_feature!(:final_grades_override)
+        user_session(student)
+        student_enrollment.scores.find_by!(grading_period: grading_period).update!(override_score: 89.2)
+        get "grades_for_student", params: { grading_period_id: grading_period.id, enrollment_id: student_enrollment.id }
+        expect(json_parse(response.body).fetch("grade")).to eq 89.2
+      end
+
+      it "returns the course override score for all grading periods, if present and feature is enabled" do
+        test_course.enable_feature!(:final_grades_override)
+        user_session(student)
+        student_enrollment.scores.find_by!(course_score: true).update!(override_score: 91.2)
+        get "grades_for_student", params: { enrollment_id: student_enrollment.id }
+        expect(json_parse(response.body).fetch("grade")).to eq 91.2
+      end
+
+      it "does not return an override score, if present and feature is not enabled" do
+        user_session(student)
+        student_enrollment.scores.find_by!(grading_period: grading_period).update(override_score: 89.2)
+        get "grades_for_student", params: { grading_period_id: grading_period.id, enrollment_id: student_enrollment.id }
+        expect(json_parse(response.body).fetch("grade")).to eq 40.0
+      end
+    end
+
+    context "as a teacher" do
+      let(:teacher) { course_with_user("TeacherEnrollment", course: test_course, active_all: true).user }
+
+      it "shows the computed score, even if override scores exist and feature is enabled" do
+        test_course.enable_feature!(:final_grades_override)
+        user_session(teacher)
+        student_enrollment.scores.find_by!(course_score: true).update!(override_score: 89.2)
+        get "grades_for_student", params: { grading_period_id: grading_period.id, enrollment_id: student_enrollment.id }
+        expect(json_parse(response.body).fetch("grade")).to eq 40.0
+      end
     end
 
     context "with unposted assignments" do
@@ -831,8 +866,11 @@ describe UsersController do
     context "as an observer" do
       let(:observer) { user_with_pseudonym(active_all: true) }
 
-      it "returns the grade and the total for a student, filtered by grading period" do
+      before(:each) do
         student.linked_observers << observer
+      end
+
+      it "returns the grade and the total for a student, filtered by grading period" do
         user_session(observer)
         get('grades_for_student', params: {enrollment_id: student_enrollment.id,
           grading_period_id: grading_period.id})
@@ -854,7 +892,6 @@ describe UsersController do
 
       it "does not filter the grades by a grading period if " \
       "'All Grading Periods' is selected" do
-        student.linked_observers << observer
         all_grading_periods_id = 0
         user_session(observer)
         get('grades_for_student', params: {grading_period_id: all_grading_periods_id,
@@ -866,16 +903,93 @@ describe UsersController do
       end
 
       it "returns unauthorized if the student is not an observee of the observer" do
+        observer.observer_enrollments.find_by!(associated_user: student).destroy
         user_session(observer)
         get('grades_for_student', params: {enrollment_id: student_enrollment.id,
           grading_period_id: grading_period.id})
 
         expect(response).to_not be_ok
       end
+
+      it "returns the requested grading period override score, if present and feature is enabled" do
+        test_course.enable_feature!(:final_grades_override)
+        user_session(observer)
+        student_enrollment.scores.find_by!(grading_period: grading_period).update!(override_score: 89.2)
+        get "grades_for_student", params: { grading_period_id: grading_period.id, enrollment_id: student_enrollment.id }
+        expect(json_parse(response.body).fetch("grade")).to eq 89.2
+      end
+
+      it "returns the course override score for all grading periods, if present and feature is enabled" do
+        test_course.enable_feature!(:final_grades_override)
+        user_session(observer)
+        student_enrollment.scores.find_by!(course_score: true).update!(override_score: 91.2)
+        get "grades_for_student", params: { enrollment_id: student_enrollment.id }
+        expect(json_parse(response.body).fetch("grade")).to eq 91.2
+      end
+
+      it "does not return an override score, if present and feature is not enabled" do
+        user_session(observer)
+        student_enrollment.scores.find_by!(grading_period: grading_period).update(override_score: 89.2)
+        get "grades_for_student", params: { grading_period_id: grading_period.id, enrollment_id: student_enrollment.id }
+        expect(json_parse(response.body).fetch("grade")).to eq 40.0
+      end
     end
   end
 
   describe "GET 'grades'" do
+    context "as an observer" do
+      let_once(:course) { Course.create!(workflow_state: "available") }
+      let_once(:student1) { course_with_user("StudentEnrollment", course: course, active_all: true).user }
+      let_once(:student2) { course_with_user("StudentEnrollment", course: course, active_all: true).user }
+      let_once(:observer) do
+        user = user_with_pseudonym(active_all: true)
+        student1.linked_observers << user
+        student2.linked_observers << user
+        user
+      end
+      let(:enrollment) { course.enrollments.find_by(user: student1) }
+
+      it "returns the course override score, if present and feature is enabled" do
+        course.enable_feature!(:final_grades_override)
+        user_session(observer)
+        enrollment.scores.create!(course_score: true, current_score: 73.0, override_score: 89.2)
+        get "grades"
+        expect(assigns[:grades][:observed_enrollments][course.id][student1.id]).to eq 89.2
+      end
+
+      it "does not return the course override score, if present and feature is not enabled" do
+        user_session(observer)
+        enrollment.scores.create!(course_score: true, current_score: 73.0, override_score: 89.2)
+        get "grades"
+        expect(assigns[:grades][:observed_enrollments][course.id][student1.id]).to eq 73.0
+      end
+    end
+
+    context "as a student" do
+      let_once(:course) { Course.create!(workflow_state: "available") }
+      let_once(:second_course) { Course.create!(workflow_state: "available") }
+      let_once(:student) do
+        user = course_with_user("StudentEnrollment", course: course, active_all: true).user
+        course_with_user("StudentEnrollment", course: second_course, user: user, active_all: true).user
+      end
+      let(:enrollment) { course.enrollments.find_by(user: student) }
+
+      it "returns the course override score, if present and feature is enabled" do
+        course.enable_feature!(:final_grades_override)
+        user_session(student)
+        enrollment.scores.create!(course_score: true, current_score: 73.0, override_score: 89.2)
+        get "grades"
+        expect(assigns[:grades][:student_enrollments][course.id]).to eq 89.2
+      end
+
+      it "does not return the course override score, if present and feature is not enabled" do
+        user_session(student)
+        enrollment.scores.create!(course_score: true, current_score: 73.0, override_score: 89.2)
+        get "grades"
+        expect(assigns[:grades][:student_enrollments][course.id]).to eq 73.0
+      end
+    end
+
     context "grading periods" do
       let(:test_course) { course_factory(active_all: true) }
       let(:student1) { user_factory(active_all: true) }
@@ -912,6 +1026,8 @@ describe UsersController do
         end
 
         context "with grading periods" do
+          let(:enrollment) { test_course.enrollments.find_by(user: student1) }
+
           it "returns the grading periods" do
             user_session(observer)
             get 'grades'
@@ -941,6 +1057,21 @@ describe UsersController do
             grade = assigns[:grades][:observed_enrollments][test_course.id][student1.id]
             # 5/10 on assignment in grading period + 10/10 on assignment outside of grading period -> 15/20 -> 75%
             expect(grade).to eq(75.0)
+          end
+
+          it "returns the requested grading period override score, if present and feature is enabled" do
+            test_course.enable_feature!(:final_grades_override)
+            user_session(observer)
+            enrollment.scores.create!(grading_period: grading_period, current_score: 73.0, override_score: 89.2)
+            get "grades"
+            expect(assigns[:grades][:observed_enrollments][test_course.id][student1.id]).to eq 89.2
+          end
+
+          it "does not return an override score, if present and feature is not enabled" do
+            user_session(observer)
+            enrollment.scores.create!(grading_period: grading_period, current_score: 73.0, override_score: 89.2)
+            get "grades"
+            expect(assigns[:grades][:observed_enrollments][test_course.id][student1.id]).to eq 73.0
           end
 
           context "selected_period_id" do
@@ -991,6 +1122,23 @@ describe UsersController do
 
             grading_periods = assigns[:grading_periods][test_course.id][:periods]
             expect(grading_periods).to include grading_period
+          end
+
+          it "returns the requested grading period override score, if present and feature is enabled" do
+            test_course.enable_feature!(:final_grades_override)
+            user_session(test_student)
+            enrollment = test_course.enrollments.find_by(user: test_student)
+            enrollment.scores.create!(grading_period: grading_period, current_score: 73.0, override_score: 89.2)
+            get "grades"
+            expect(assigns[:grades][:student_enrollments][test_course.id]).to eq 89.2
+          end
+
+          it "does not return an override score, if present and feature is not enabled" do
+            user_session(test_student)
+            enrollment = test_course.enrollments.find_by(user: test_student)
+            enrollment.scores.create!(grading_period: grading_period, current_score: 73.0, override_score: 89.2)
+            get "grades"
+            expect(assigns[:grades][:student_enrollments][test_course.id]).to eq 73.0
           end
 
           context "selected_period_id" do

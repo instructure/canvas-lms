@@ -187,6 +187,7 @@ describe ContentMigration do
       @assignment.omit_from_final_grade = true
       @assignment.only_visible_to_overrides = true
       @assignment.post_to_sis = true
+      @assignment.allowed_attempts = 10
 
       @assignment.save!
 
@@ -196,7 +197,7 @@ describe ContentMigration do
       attrs = [:turnitin_enabled, :vericite_enabled, :turnitin_settings, :peer_reviews,
           :automatic_peer_reviews, :anonymous_peer_reviews,
           :grade_group_students_individually, :allowed_extensions,
-          :position, :peer_review_count, :omit_from_final_grade, :post_to_sis]
+          :position, :peer_review_count, :omit_from_final_grade, :post_to_sis, :allowed_attempts]
 
       run_course_copy
 
@@ -210,6 +211,38 @@ describe ContentMigration do
       end
       expect(new_assignment.muted).to be_falsey
       expect(new_assignment.only_visible_to_overrides).to be_falsey
+    end
+
+    describe "allowed_attempts copying" do
+      it "copies nil over properly" do
+        assignment_model(course: @copy_from, points_possible: 40, submission_types: 'file_upload', grading_type: 'points')
+        @assignment.allowed_attempts = nil
+        @assignment.save!
+
+        run_course_copy
+        new_assignment = @copy_to.assignments.where(migration_id: mig_id(@assignment)).last
+        expect(new_assignment.allowed_attempts).to be_nil
+      end
+
+      it "copies -1 over properly" do
+        assignment_model(course: @copy_from, points_possible: 40, submission_types: 'file_upload', grading_type: 'points')
+        @assignment.allowed_attempts = -1
+        @assignment.save!
+
+        run_course_copy
+        new_assignment = @copy_to.assignments.where(migration_id: mig_id(@assignment)).last
+        expect(new_assignment.allowed_attempts).to eq(-1)
+      end
+
+      it "copies values > 0 over properly" do
+        assignment_model(course: @copy_from, points_possible: 40, submission_types: 'file_upload', grading_type: 'points')
+        @assignment.allowed_attempts = 3
+        @assignment.save!
+
+        run_course_copy
+        new_assignment = @copy_to.assignments.where(migration_id: mig_id(@assignment)).last
+        expect(new_assignment.allowed_attempts).to eq(3)
+      end
     end
 
     it "should copy other feature-dependent assignment attributes" do

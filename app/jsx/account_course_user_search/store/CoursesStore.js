@@ -29,6 +29,7 @@ export default createStore({
     const params = {
       ...originalParams,
       include: ['total_students', 'teachers', 'subaccount', 'term'],
+      teacher_limit: 25,
       per_page: COURSES_TO_FETCH_PER_PAGE,
       no_avatar_fallback: '1'
     }

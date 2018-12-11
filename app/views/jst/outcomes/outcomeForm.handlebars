@@ -20,18 +20,11 @@
 
   <textarea cols="40" name="description" id=description rows="20" style="display: none; width: 100%; height: 150px;">{{description}}</textarea>
 
-  <div id="outcome_criterion_dialog" style="display: none;">
-    {{#t "criterion_dialog"}}Learning outcomes can be included in assignment rubrics as an easy way
-    to assess mastery of outcomes aligned to specific assignments.  When you define
-    a learning outcome, you should also define a criterion that can be used
-    when building assignment rubrics.  Define as many rubric columns as you
-    need, and specify a point threshold that will be used to define mastery
-    of this outcome.{{/t}}
-  </div>
-
   <label>
-    {{#t "criterion"}}Criterion ratings{{/t}}:
-    <a class="outcome_information_link" title="{{#t "criterion_info_link"}}Click to learn about criterion ratings{{/t}}" tabindex=0 href="#"><i class="icon-question"></i></a>
+    <div style="display: flex">
+      <div style="margin-top: 0.65rem">{{#t "criterion"}}Criterion ratings{{/t}}:</div>
+      <div id="react-info-link" />
+    </div>
   </label>
   <table class="criterion">
     <tbody>

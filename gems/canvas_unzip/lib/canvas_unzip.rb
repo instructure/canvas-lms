@@ -136,7 +136,7 @@ class CanvasUnzip
         raise UnknownArchiveType, "invalid tar"
       end
     else
-      raise UnknownArchiveType, "unknown mime type #{mime_type}"
+      raise UnknownArchiveType, "unknown mime type #{mime_type} for archive #{File.basename(archive_filename)}"
     end
   end
 

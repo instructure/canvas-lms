@@ -29,13 +29,12 @@ module Utf8Cleaner
   # report to the db.
   def self.strip_invalid_utf8(string)
     return string if string.nil?
-    # add four spaces to the end of the string, because iconv with the //IGNORE
-    # option will still fail on incomplete byte sequences at the end of the input
-    # we force_encoding on the returned string because Iconv.conv returns binary.
-    string = Iconv.conv('UTF-8//IGNORE', 'UTF-8', string + '    ')[0...-4]
-    if string.respond_to?(:force_encoding)
-      string.force_encoding(Encoding::UTF_8)
+    unless string.encoding == Encoding::UTF_8
+      new_string = string.force_encoding(Encoding::UTF_8)
+      string = new_string if new_string.valid_encoding?
     end
+
+    string = string.encode("UTF-8", :undef => :replace, :invalid => :replace, :replace => '')
     # Strip ASCII backspace and delete characters
     string.tr("\b\x7F", '')
   end

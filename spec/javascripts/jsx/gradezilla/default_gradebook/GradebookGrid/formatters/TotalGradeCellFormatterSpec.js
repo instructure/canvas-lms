@@ -92,14 +92,14 @@ QUnit.module('TotalGradeCellFormatter', function (hooks) {
     equal(renderCell().querySelector('.gradebook-tooltip').innerText.trim(), '94.67%')
   })
 
-  test('renders a dash "-" in the tooltip when the grade has zero points possible', function () {
+  test('renders "–" (en dash) in the tooltip when the grade has zero points possible', function () {
     grade.possible = 0;
-    equal(renderCell().querySelector('.gradebook-tooltip').innerText, '-');
+    equal(renderCell().querySelector('.gradebook-tooltip').innerText, '–');
   });
 
-  test('renders a dash "-" in the tooltip when the grade has undefined points possible', function () {
+  test('renders "–" (en dash) in the tooltip when the grade has undefined points possible', function () {
     grade.possible = null;
-    equal(renderCell().querySelector('.gradebook-tooltip').innerText, '-');
+    equal(renderCell().querySelector('.gradebook-tooltip').innerText, '–');
   });
 
   QUnit.module('#render with a percent grade', {
@@ -117,14 +117,14 @@ QUnit.module('TotalGradeCellFormatter', function (hooks) {
     equal(renderCell().querySelector('.percentage').innerText.trim(), '82.35%');
   });
 
-  test('renders a dash "-" when the grade has zero points possible', function () {
+  test('renders "–" (en dash) when the grade has zero points possible', function () {
     grade.possible = 0;
-    equal(renderCell().querySelector('.percentage').innerText, '-');
+    equal(renderCell().querySelector('.percentage').innerText, '–');
   });
 
-  test('renders a dash "-" when the grade has undefined points possible', function () {
+  test('renders "–" (en dash) when the grade has undefined points possible', function () {
     grade.possible = null;
-    equal(renderCell().querySelector('.percentage').innerText, '-');
+    equal(renderCell().querySelector('.percentage').innerText, '–');
   });
 
   test('renders the score and points possible in the tooltip', function () {

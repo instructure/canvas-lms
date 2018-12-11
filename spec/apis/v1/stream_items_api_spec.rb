@@ -421,6 +421,7 @@ describe UsersController, type: :request do
       'seconds_late' => 0,
       'url' => nil,
       'user_id' => @sub.user_id,
+      'extra_attempts' => nil,
 
       'submission_comments' => [
         {
@@ -547,6 +548,7 @@ describe UsersController, type: :request do
       'seconds_late' => 0,
       'url' => nil,
       'user_id' => @sub.user_id,
+      'extra_attempts' => nil,
 
       'submission_comments' => [
         {

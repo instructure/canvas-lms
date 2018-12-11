@@ -406,17 +406,63 @@ class SisBatch < ActiveRecord::Base
     stats[:total_state_changes] = roll_back_data.count
     SisBatchRollBackData::RESTORE_ORDER.each do |type|
       stats[type.to_sym] = {}
-      deleted_state = case type
-                      when CommunicationChannel
-                        'retired'
-                      else
-                        'deleted'
-                      end
-      stats[type.to_sym][:created] = roll_back_data.where(context_type: type).where(previous_workflow_state: 'non-existent').count
-      stats[type.to_sym][:deleted] = roll_back_data.where(context_type: type).where(updated_workflow_state: deleted_state).count
+      stats[type.to_sym][:created] = roll_back_data.where(context_type: type).
+        where(previous_workflow_state: ['non-existent', 'creation_pending'],
+              updated_workflow_state: stat_active_state(type)).count
+
+      stats[type.to_sym][:restored] = roll_back_data.where(context_type: type).
+        where(previous_workflow_state: stat_restored_from(type),
+              updated_workflow_state: stat_active_state(type)).count
+      if ['Course', 'Enrollment'].include? type
+        stats[type.to_sym][:concluded] = roll_back_data.
+          where(context_type: type, updated_workflow_state: 'completed').count
+      end
+
+      if type == 'Enrollment'
+        stats[type.to_sym][:deactivated] = roll_back_data.
+          where(context_type: type, updated_workflow_state: 'inactive').count
+      end
+
+      stats[type.to_sym][:deleted] = roll_back_data.where(context_type: type).
+        where(updated_workflow_state: stat_deleted_state(type)).count
     end
     self.data ||= {}
     self.data[:statistics] = stats
+  end
+
+  def stat_active_state(type)
+    case type
+    when GroupMembership
+      'accepted'
+    when Group
+      'available'
+    when Course
+      ['claimed', 'created', 'available']
+    else
+      'active'
+    end
+  end
+
+  def stat_deleted_state(type)
+    case type
+    when CommunicationChannel
+      'retired'
+    else
+      'deleted'
+    end
+  end
+
+  def stat_restored_from(type)
+    case type
+    when CommunicationChannel
+      ['retired', 'unconfirmed']
+    when Course
+      ['completed', 'deleted']
+    when Enrollment
+      ['inactive', 'completed', 'rejected', 'deleted']
+    else
+      'deleted'
+    end
   end
 
   def batch_mode_terms

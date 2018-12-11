@@ -370,9 +370,8 @@ describe "submissions" do
         wait_for_animations
 
         # traverse the tree
-        f('#uploaded_files > ul > li.folder > .sign').click
-        expect(f('#uploaded_files > ul > li.folder .file .name')).to be_displayed
-        f('#uploaded_files > ul > li.folder .file .name').click
+        f('li[aria-label="My files"] button').click
+        f('li[aria-label="html-editing-test.html"] button').click
 
         expect_new_page_load { f('#submit_file_button').click }
 
@@ -400,9 +399,9 @@ describe "submissions" do
         wait_for_animations
 
         # traverse the tree
-        f('#uploaded_files > ul > li.folder > .sign').click
-        expect(f('#uploaded_files > ul > li.folder .file .name')).to be_displayed
-        f('#uploaded_files > ul > li.folder .file .name').click
+        f('li[aria-label="My files"] button').click
+        f('li[aria-label="'+FILENAME+'"] button').click
+
         f('#submit_file_button').click
 
         # Make sure the flash message is being displayed

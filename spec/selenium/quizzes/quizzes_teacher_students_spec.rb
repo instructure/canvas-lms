@@ -67,8 +67,7 @@ describe 'quizzes students' do
         enter_student_view
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
-        f('#take_quiz_link').click
-        wait_for_ajaximations
+        wait_for_new_page_load { f('#take_quiz_link').click }
 
         q = @quiz.stored_questions[0]
 

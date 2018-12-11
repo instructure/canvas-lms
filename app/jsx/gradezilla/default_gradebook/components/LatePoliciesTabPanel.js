@@ -28,8 +28,11 @@ import Text from '@instructure/ui-elements/lib/components/Text';
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
 import Checkbox from '@instructure/ui-forms/lib/components/Checkbox';
 import Select from '@instructure/ui-core/lib/components/Select';
-import Round from 'compiled/util/round';
+import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid';
+
 import NumberHelper from '../../../shared/helpers/numberHelper';
+
+import Round from 'compiled/util/round';
 import I18n from 'i18n!gradebook';
 
 function isNumeric (input) {
@@ -218,7 +221,6 @@ class LatePoliciesTabPanel extends React.Component {
     }
 
     const { data, validationErrors } = this.props.latePolicy;
-    const numberInputWidth = "5.5rem";
     return (
       <div id="LatePoliciesTabPanel__Container">
         <View as="div" margin="small">
@@ -235,36 +237,35 @@ class LatePoliciesTabPanel extends React.Component {
           messages={this.missingPolicyMessages(validationErrors)}
         >
           <View as="div" margin="small small small large">
-            <div style={{ marginLeft: '0.25rem'}}>
-              <PresentationContent>
-                <View as="div" margin="0 0 x-small 0">
-                  <label htmlFor="missing-submission-grade">
-                    <Text size="small" weight="bold">{I18n.t('Missing submission grade')}</Text>
-                  </label>
-                </View>
-              </PresentationContent>
+            <div className="NumberInput__Container">
 
-              <div className="NumberInput__Container">
-                <NumberInput
-                  id="missing-submission-grade"
-                  locale={this.props.locale}
-                  inputRef={(m) => { this.missingSubmissionDeductionInput = m; }}
-                  label={<ScreenReaderContent>{I18n.t('Missing submission grade percent')}</ScreenReaderContent>}
-                  disabled={!this.getLatePolicyAttribute('missingSubmissionDeductionEnabled')}
-                  defaultValue={markMissingSubmissionsDefaultValue(data.missingSubmissionDeduction)}
-                  onChange={(_e, val)  => this.validateAndChangeNumber('missingSubmissionDeduction', val)}
-                  min="0"
-                  max="100"
-                  inline
-                  width={numberInputWidth}
-                />
+              <Grid vAlign="bottom" colSpacing="small">
+                <GridRow>
+                  <GridCol width="auto">
 
-                <PresentationContent>
-                  <View as="div" margin="0 small">
-                    <Text>{I18n.t('%')}</Text>
-                  </View>
-                </PresentationContent>
-              </div>
+                    <NumberInput
+                      id="missing-submission-grade"
+                      locale={this.props.locale}
+                      inputRef={(m) => { this.missingSubmissionDeductionInput = m; }}
+                      label={I18n.t('Percent to deduct for missing submission')}
+                      disabled={!this.getLatePolicyAttribute('missingSubmissionDeductionEnabled')}
+                      defaultValue={markMissingSubmissionsDefaultValue(data.missingSubmissionDeduction)}
+                      onChange={(_e, val)  => this.validateAndChangeNumber('missingSubmissionDeduction', val)}
+                      min="0"
+                      max="100"
+                    />
+
+                  </GridCol>
+                  <GridCol width="auto">
+
+                    <View margin="0 0 x-small" display="block">
+                      <Text weight="bold">{I18n.t('%')}</Text>
+                    </View>
+
+                  </GridCol>
+                </GridRow>
+              </Grid>
+
             </div>
           </View>
         </FormFieldGroup>
@@ -295,96 +296,77 @@ class LatePoliciesTabPanel extends React.Component {
           messages={this.latePolicyMessages(validationErrors)}
         >
           <View as="div" margin="small small small large">
-            <div style={{ marginLeft: '0.25rem' }}>
-              <View display="inline-block" as="div" margin="0 small 0 0">
-                <PresentationContent>
-                  <View as="div" margin="0 0 x-small 0">
-                    <label htmlFor="late-submission-deduction">
-                      <Text size="small" weight="bold">{I18n.t('Deduct')}</Text>
-                    </label>
-                  </View>
-                </PresentationContent>
+            <div style={{display: 'flex', alignItems: 'center'}}>
 
-                <div style={{display: 'flex', alignItems: 'center'}}>
-                  <NumberInput
-                    id="late-submission-deduction"
-                    locale={this.props.locale}
-                    inputRef={(l) => { this.lateSubmissionDeductionInput = l; }}
-                    label={<ScreenReaderContent>{I18n.t('Late submission deduction percent')}</ScreenReaderContent>}
-                    defaultValue={data.lateSubmissionDeduction.toString()}
-                    disabled={!this.getLatePolicyAttribute('lateSubmissionDeductionEnabled')}
-                    onChange={(_e, val) => this.validateAndChangeNumber('lateSubmissionDeduction', val)}
-                    min="0"
-                    max="100"
-                    inline
-                    width={numberInputWidth}
-                  />
-                  <PresentationContent>
-                    <View as="div" margin="0 small">
-                      <Text>{I18n.t('%')}</Text>
+              <Grid vAlign="bottom" colSpacing="small">
+                <GridRow>
+                  <GridCol width="auto">
+
+                    <NumberInput
+                      id="late-submission-deduction"
+                      locale={this.props.locale}
+                      inputRef={(l) => { this.lateSubmissionDeductionInput = l; }}
+                      label={I18n.t('Late submission deduction percent')}
+                      defaultValue={data.lateSubmissionDeduction.toString()}
+                      disabled={!this.getLatePolicyAttribute('lateSubmissionDeductionEnabled')}
+                      onChange={(_e, val) => this.validateAndChangeNumber('lateSubmissionDeduction', val)}
+                      min="0"
+                      max="100"
+                    />
+
+                  </GridCol>
+                  <GridCol width="auto">
+
+                    <View margin="0 0 x-small" display="block">
+                      <Text weight="bold">{I18n.t('%')}</Text>
                     </View>
-                  </PresentationContent>
-                </div>
-              </View>
 
-              <View display="inline-block" as="div" margin="0 0 0 small">
-                <PresentationContent>
-                  <View as="div" margin="0 0 x-small 0">
-                    <label htmlFor="late-submission-interval">
-                      <Text size="small" weight="bold">{I18n.t('For each late')}</Text>
-                    </label>
-                  </View>
-                </PresentationContent>
+                  </GridCol>
+                  <GridCol width="auto">
 
-                <Select
-                  id="late-submission-interval"
-                  disabled={!this.getLatePolicyAttribute('lateSubmissionDeductionEnabled')}
-                  label={<ScreenReaderContent>{I18n.t('Late submission deduction interval')}</ScreenReaderContent>}
-                  inline
-                  width="6rem"
-                  defaultValue={data.lateSubmissionInterval}
-                  onChange={this.changeLateSubmissionInterval}
-                >
-                  <option value="day">{I18n.t('Day')}</option>
-                  <option value="hour" >{I18n.t('Hour')}</option>
-                </Select>
-              </View>
+                    <Select
+                      id="late-submission-interval"
+                      disabled={!this.getLatePolicyAttribute('lateSubmissionDeductionEnabled')}
+                      label={I18n.t('Late submission deduction interval')}
+                      defaultValue={data.lateSubmissionInterval}
+                      onChange={this.changeLateSubmissionInterval}
+                    >
+                      <option value="day">{I18n.t('Day')}</option>
+                      <option value="hour" >{I18n.t('Hour')}</option>
+                    </Select>
+
+                  </GridCol>
+                </GridRow>
+                <GridRow>
+                  <GridCol width="auto">
+
+                    <NumberInput
+                      id="late-submission-minimum-percent"
+                      locale={this.props.locale}
+                      inputRef={(l) => { this.lateSubmissionMinimumPercentInput = l; }}
+                      label={I18n.t('Lowest possible grade percent')}
+                      defaultValue={data.lateSubmissionMinimumPercent.toString()}
+                      disabled={!this.getLatePolicyAttribute('lateSubmissionDeductionEnabled')}
+                      onChange={(_e, val) => this.validateAndChangeNumber('lateSubmissionMinimumPercent', val)}
+                      min="0"
+                      max="100"
+                      inline
+                    />
+
+                  </GridCol>
+                  <GridCol width="auto">
+
+                    <View margin="0 0 x-small" display="block">
+                      <Text weight="bold">{I18n.t('%')}</Text>
+                    </View>
+
+                  </GridCol>
+                </GridRow>
+              </Grid>
+
             </div>
           </View>
 
-          <View as="div" margin="small small small large">
-            <div style={{ marginLeft: '0.25rem' }}>
-              <PresentationContent>
-                <View as="div" margin="0 0 x-small 0">
-                  <label htmlFor="late-submission-minimum-percent">
-                    <Text size="small" weight="bold">{I18n.t('Lowest possible grade')}</Text>
-                  </label>
-                </View>
-              </PresentationContent>
-
-              <div style={{display: 'flex', alignItems: 'center'}}>
-                <NumberInput
-                  id="late-submission-minimum-percent"
-                  locale={this.props.locale}
-                  inputRef={(l) => { this.lateSubmissionMinimumPercentInput = l; }}
-                  label={<ScreenReaderContent>{I18n.t('Lowest possible grade percent')}</ScreenReaderContent>}
-                  defaultValue={data.lateSubmissionMinimumPercent.toString()}
-                  disabled={!this.getLatePolicyAttribute('lateSubmissionDeductionEnabled')}
-                  onChange={(_e, val) => this.validateAndChangeNumber('lateSubmissionMinimumPercent', val)}
-                  min="0"
-                  max="100"
-                  inline
-                  width={numberInputWidth}
-                />
-
-                <PresentationContent>
-                  <View as="div" margin="0 small">
-                    <Text>{I18n.t('%')}</Text>
-                  </View>
-                </PresentationContent>
-              </div>
-            </div>
-          </View>
         </FormFieldGroup>
       </div>
     );

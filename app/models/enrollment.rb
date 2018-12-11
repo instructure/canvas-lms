@@ -660,8 +660,7 @@ class Enrollment < ActiveRecord::Base
 
   def accept(force = false)
     return false unless force || invited?
-    ids = self.user.dashboard_messages.where(:context_id => self, :context_type => 'Enrollment').pluck(:id) if self.user
-    Message.where(:id => ids).delete_all if ids.present?
+    self.user.dashboard_messages.where(:context_id => self, :context_type => 'Enrollment').delete_all if self.user
     update_attribute(:workflow_state, 'active')
     if self.type == 'StudentEnrollment'
       Enrollment.recompute_final_score_in_singleton(self.user_id, self.course_id)
@@ -1062,6 +1061,58 @@ class Enrollment < ActiveRecord::Base
 
   def computed_final_score(id_opts=nil)
     cached_score_or_grade(:final, :score, :posted, id_opts)
+  end
+
+  def effective_current_grade(id_opts=nil)
+    score = find_score(id_opts)
+
+    if score&.overridden? && course.feature_enabled?(:final_grades_override)
+      score.effective_final_grade
+    else
+      computed_current_grade(id_opts)
+    end
+  end
+
+  def effective_current_score(id_opts=nil)
+    score = find_score(id_opts)
+
+    if score&.overridden? && course.feature_enabled?(:final_grades_override)
+      score.effective_final_score_lower_bound
+    else
+      computed_current_score(id_opts)
+    end
+  end
+
+  def effective_final_grade(id_opts=nil)
+    score = find_score(id_opts)
+
+    if score&.overridden? && course.feature_enabled?(:final_grades_override)
+      score.effective_final_grade
+    else
+      computed_final_grade(id_opts)
+    end
+  end
+
+  def effective_final_score(id_opts=nil)
+    score = find_score(id_opts)
+
+    if score&.overridden? && course.feature_enabled?(:final_grades_override)
+      score.effective_final_score_lower_bound
+    else
+      computed_final_score(id_opts)
+    end
+  end
+
+  def override_grade(id_opts=nil)
+    return nil unless course.feature_enabled?(:final_grades_override) && course.grading_standard_enabled?
+    score = find_score(id_opts)
+    score.effective_final_grade if score&.override_score
+  end
+
+  def override_score(id_opts=nil)
+    return nil unless course.feature_enabled?(:final_grades_override)
+    score = find_score(id_opts)
+    score&.override_score
   end
 
   def unposted_current_grade(id_opts=nil)

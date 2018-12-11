@@ -95,13 +95,24 @@ const SCC_QUERY = gql`
   }
 `
 
+// for admins who can view the roster but not the course list
+function placeholderCourse(courseId) {
+  return {
+    _id: courseId,
+    permissions: {},
+    submissionsConnection: {
+      edges: []
+    }
+  }
+}
+
 export default props => {
   return (
     <ApolloProvider client={client}>
       <Query query={SCC_QUERY} variables={{courseId: props.courseId, studentId: props.studentId}}>
         {({data, loading}) => {
           const {course, user} = data
-          return <StudentContextTray data={{loading, course, user}} {...props} />
+          return <StudentContextTray data={{loading, course: course || placeholderCourse(props.courseId), user}} {...props} />
         }}
       </Query>
     </ApolloProvider>

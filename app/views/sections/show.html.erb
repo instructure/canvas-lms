@@ -142,6 +142,14 @@ h3 .tally {
     </tr>
   <% end %>
   <tr>
+    <td></td>
+    <td>
+      <div style="font-size: 0.8em;">
+        <%= t "Changing section dates may override course and term availability settings and placement in the Courses page and Dashboard. Please confirm term and course dates before modifying section dates." %>
+      </div>
+    </td>
+  </tr>
+  <tr>
     <td>
       <%= f.blabel :start_at, en: "Starts" %>
       <label class="screenreader-only" id="section_starts_at_label">
@@ -178,11 +186,12 @@ h3 .tally {
     </td>
   </tr>
   <tr>
-    <td colspan="2">
-      <%= f.check_box :restrict_enrollments_to_section_dates %>
-      <%= f.label :restrict_enrollments_to_section_dates, t('access_limit', "Users can only participate in the course between these dates") %>
-      <div style="font-size: 0.8em; padding-<%= direction('left') %>: 25px;">
-        <%= t('override_settings', 'This will override any term or course date settings.') %>
+    <td></td>
+    <td>
+      <%= f.check_box :restrict_enrollments_to_section_dates, 'aria-describedby' => 'restrict-enrollments-description' %>
+      <%= f.label :restrict_enrollments_to_section_dates, t("Students can only participate in the course between these dates") %>
+      <div style="font-size: 0.8em;" id="restrict-enrollments-description">
+        <%= t "When selected, the course section is in a read-only state outside these dates." %>
       </div>
     </td>
   </tr>

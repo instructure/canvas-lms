@@ -137,7 +137,7 @@ class FoldersController < ApplicationController
       can_view_hidden_files = can_view_hidden_files?(folder.context, @current_user, session)
       opts = {:can_view_hidden_files => can_view_hidden_files, :context => folder.context}
       if can_view_hidden_files && folder.context.is_a?(Course) &&
-          master_courses? && MasterCourses::ChildSubscription.is_child_course?(folder.context)
+          MasterCourses::ChildSubscription.is_child_course?(folder.context)
         opts[:master_course_restricted_folder_ids] = MasterCourses::FolderHelper.locked_folder_ids_for_course(folder.context)
       end
 
@@ -487,7 +487,7 @@ class FoldersController < ApplicationController
     if authorized_action(@folder, @current_user, :delete)
       if @folder.root_folder?
         render :json => {:message => t('no_deleting_root', "Can't delete the root folder")}, :status => 400
-      elsif @folder.context.is_a?(Course) && master_courses? &&
+      elsif @folder.context.is_a?(Course) &&
           MasterCourses::ChildSubscription.is_child_course?(@folder.context) &&
           MasterCourses::FolderHelper.locked_folder_ids_for_course(@folder.context).include?(@folder.id)
         render :json => {:message => "Can't delete folder containing files locked by Blueprint Course"}, :status => 400

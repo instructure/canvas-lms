@@ -43,6 +43,10 @@ function newProps() {
               url: 'https://lti-tool-provider-example.herokuapp.com/messages/blti',
               text: 'LTI 1.3 Test Tool (Course Nav)',
               message_type: 'LtiResourceLinkRequest'
+            },
+            no_message_type: {
+              url: 'https://lti-tool-provider-example.herokuapp.com/messages/blti',
+              text: 'LTI 1.3 Test Tool (Course Nav)'
             }
           },
           privacy_level: 'public'
@@ -178,4 +182,19 @@ it('adds a placement from "disabledPlacements" when it is toggled on', () => {
   wrapper.instance().handlePlacementChange(event)
 
   expect(props.setDisabledPlacements).toHaveBeenCalledWith(['account_navigation'])
+})
+
+it('correctly retrieves the placement message type', () => {
+  wrapper = mount(<CustomizationForm {...newProps()} />)
+  expect(wrapper.instance().messageTypeFor('file_menu')).toEqual('LtiResourceLinkRequest')
+})
+
+it('returns null if the placement does not exist', () => {
+  wrapper = mount(<CustomizationForm {...newProps()} />)
+  expect(wrapper.instance().messageTypeFor('banana')).toBeFalsy()
+})
+
+it('returns null if the placement have a message type', () => {
+  wrapper = mount(<CustomizationForm {...newProps()} />)
+  expect(wrapper.instance().messageTypeFor('no_message_type')).toBeFalsy()
 })

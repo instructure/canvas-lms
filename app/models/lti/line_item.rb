@@ -38,6 +38,18 @@ class Lti::LineItem < ApplicationRecord
     resource_link.line_items.order(:created_at).first.id == self.id
   end
 
+  def self.create_line_item!(assignment, context, params)
+    self.transaction do
+      a = assignment.presence || Assignment.create!(
+        context: context,
+        name: params[:label],
+        points_possible: params[:score_maximum],
+        submission_types: 'none'
+      )
+      self.create!({assignment: a}.merge(params))
+    end
+  end
+
   private
 
   def lti_link_id_has_one_assignment

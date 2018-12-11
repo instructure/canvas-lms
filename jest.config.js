@@ -20,7 +20,9 @@ module.exports = {
   moduleNameMapper: {
     '^i18n!(.*$)': '<rootDir>/jest/i18nTransformer.js',
     '^compiled/(.*)$': '<rootDir>/app/coffeescripts/$1',
-    '^jsx/(.*)$': '<rootDir>/app/jsx/$1'
+    '^jsx/(.*)$': '<rootDir>/app/jsx/$1',
+    "^timezone$": "<rootDir>/public/javascripts/timezone_core.js",
+    "\\.svg$": "<rootDir>/jest/imageMock.js"
   },
   roots: ['app/jsx'],
   moduleDirectories: [
@@ -47,5 +49,5 @@ module.exports = {
   transform: {
     '^i18n': '<rootDir>/jest/i18nTransformer.js',
     '^.+\\.jsx?$': 'babel-jest'
-  }
+  },
 }

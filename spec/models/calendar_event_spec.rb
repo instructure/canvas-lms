@@ -527,8 +527,10 @@ describe CalendarEvent do
 
       it "should notify admins and observers when a user reserves", priority: "1", test_id: 193144 do
         reservation = @appointment.reserve_for(@student1, @student1)
-        expect(reservation.messages_sent).to be_include("Appointment Reserved By User")
-        expect(reservation.messages_sent["Appointment Reserved By User"].map(&:user_id).sort.uniq).to eql (@course.instructors.map(&:id) + [@observer.id]).sort
+        messages = reservation.messages_sent["Appointment Reserved By User"]
+        expect(messages).to be_present
+        expect(messages.first.root_account_id).to eq Account.default.id
+        expect(messages.map(&:user_id).sort.uniq).to eql (@course.instructors.map(&:id) + [@observer.id]).sort
       end
 
       it "should notify admins and observers when a user reserves a group appointment" do

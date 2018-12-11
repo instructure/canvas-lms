@@ -33,6 +33,7 @@ export const tierShape = {
 export const ratingShape = {
   tiers: PropTypes.arrayOf(PropTypes.shape(tierShape)).isRequired,
   points: PropTypes.number,
+  selectedRatingId: PropTypes.string,
   defaultMasteryThreshold: PropTypes.number,
   useRange: PropTypes.bool.isRequired
 }

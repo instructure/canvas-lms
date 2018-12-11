@@ -18,18 +18,29 @@
 
 module Factories
   def line_item_model(overrides = {})
+    assignment_opts = {
+      course: overrides[:course] || course_factory(active_course: true),
+      submission_types: overrides[:tool] ? 'external_tool' : nil,
+      external_tool_tag_attributes: overrides[:tool] ?
+        {
+          url: overrides[:tool].url,
+          content_type: 'context_external_tool',
+          content_id: overrides[:tool].id
+        } :
+        nil
+    }.compact
+    assignment = overrides[:assignment] || assignment_model(assignment_opts)
     params = {
       score_maximum: 10,
       label: 'Test Line Item',
-      assignment: overrides[:assignment] ||
-        assignment_model(
-          course: overrides[:course] || course_factory(active_course: true)
-        ),
+      assignment: assignment,
       resource_link: overrides.fetch(
         :resource_link,
-        overrides[:with_resource_link] ? resource_link_model(overrides: overrides) : nil
+        overrides[:with_resource_link] ?
+          resource_link_model(overrides: overrides.merge(resource_link_id:  assignment.lti_context_id)) :
+          nil
       )
-    }.merge(overrides.except(:assignment, :course, :resource_link, :with_resource_link))
+    }.merge(overrides.except(:assignment, :course, :resource_link, :with_resource_link, :tool))
     Lti::LineItem.create!(params)
   end
 end

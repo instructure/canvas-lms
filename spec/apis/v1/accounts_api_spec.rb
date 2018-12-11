@@ -681,6 +681,22 @@ describe "Accounts API", type: :request do
       expect(json[0].has_key?('term')).to be_truthy
     end
 
+    it "should return a teacher count if too many teachers are found" do
+      @c1 = course_with_teacher(:account => @a1, :course_name => 'c1').course
+      @c2 = course_with_teacher(:account => @a1, :course_name => 'c2').course
+      @c2.enroll_teacher(user_factory)
+
+      @a1.account_users.create!(user: @user)
+      json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?include[]=teachers&teacher_limit=1",
+        { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param,
+          :format => 'json', :include => ['teachers'], :teacher_limit => "1" })
+      c1_hash = json.detect{|h| h['id'] == @c1.id}
+      expect(c1_hash['teachers']).to be_present
+      c2_hash = json.detect{|h| h['id'] == @c2.id}
+      expect(c2_hash.has_key?('teachers')).to eq false
+      expect(c2_hash['teacher_count']).to eq 2
+    end
+
     describe 'sort' do
       before :once do
         @me = @user

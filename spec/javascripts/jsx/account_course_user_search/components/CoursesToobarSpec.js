@@ -95,21 +95,12 @@ QUnit.module('CoursesToolbar', () => {
   })
 
   QUnit.module('blueprint_courses checkbox', () => {
-    test('does not show "blueprint courses checkbox" unless feature is enabled', () => {
-      let wrapper = shallow(<CoursesToolbar {...props} />)
-      notOk(wrapper.find('Checkbox[label="Show only blueprint courses"]').exists())
-
-      wrapper = shallow(<CoursesToolbar {...props} show_blueprint_courses_checkbox />)
-      ok(wrapper.find('Checkbox[label="Show only blueprint courses"]').exists())
-    })
-
     test('clicking it causes "onUpdateFilters" to be called', () => {
       const onUpdateFilters = sinon.stub()
       const checkbox = shallow(
         <CoursesToolbar
           {...props}
           onUpdateFilters={onUpdateFilters}
-          show_blueprint_courses_checkbox
         />
       ).find('Checkbox[label="Show only blueprint courses"]')
 

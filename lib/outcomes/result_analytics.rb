@@ -129,6 +129,33 @@ module Outcomes
       rollups + missing_users.map { |u| Rollup.new(u, []) }
     end
 
+    # Public: Gets rating percents for outcomes based on rollup
+    #
+    # Returns a hash of outcome id to array of rating percents
+    def rating_percents(rollups)
+      counts = {}
+      rollups.each do |rollup|
+        rollup.scores.each do |score|
+          next unless score.score
+          outcome = score.outcome
+          next unless outcome
+          ratings = outcome.rubric_criterion[:ratings]
+          next unless ratings
+          counts[outcome.id] = Array.new(ratings.length, 0) unless counts[outcome.id]
+          idx = ratings.find_index { |rating| rating[:points] <= score.score }
+          counts[outcome.id][idx] = counts[outcome.id][idx] + 1 if idx
+        end
+      end
+      counts.each {|k, v| counts[k] = to_percents(v)}
+      counts
+    end
+
+    def to_percents(count_arr)
+      total = count_arr.sum
+      return count_arr if total.zero?
+      count_arr.map {|v| (100.0 * v / total).round}
+    end
+
     class << self
       include ResultAnalytics
     end

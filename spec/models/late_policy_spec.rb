@@ -77,32 +77,32 @@ describe LatePolicy do
   describe 'rounding' do
     it 'only keeps 2 digits after the decimal for late_submission_minimum_percent' do
       policy = LatePolicy.new(late_submission_minimum_percent: 25.223)
-      expect(policy.late_submission_minimum_percent).to eql BigDecimal.new('25.22')
+      expect(policy.late_submission_minimum_percent).to eql BigDecimal('25.22')
     end
 
     it 'rounds late_submission_minimum_percent' do
       policy = LatePolicy.new(late_submission_minimum_percent: 25.225)
-      expect(policy.late_submission_minimum_percent).to eql BigDecimal.new('25.23')
+      expect(policy.late_submission_minimum_percent).to eql BigDecimal('25.23')
     end
 
     it 'only keeps 2 digits after the decimal for missing_submission_deduction' do
       policy = LatePolicy.new(missing_submission_deduction: 25.223)
-      expect(policy.missing_submission_deduction).to eql BigDecimal.new('25.22')
+      expect(policy.missing_submission_deduction).to eql BigDecimal('25.22')
     end
 
     it 'rounds missing_submission_deduction' do
       policy = LatePolicy.new(missing_submission_deduction: 25.225)
-      expect(policy.missing_submission_deduction).to eql BigDecimal.new('25.23')
+      expect(policy.missing_submission_deduction).to eql BigDecimal('25.23')
     end
 
     it 'only keeps 2 digits after the decimal for late_submission_deduction' do
       policy = LatePolicy.new(late_submission_deduction: 25.223)
-      expect(policy.late_submission_deduction).to eql BigDecimal.new('25.22')
+      expect(policy.late_submission_deduction).to eql BigDecimal('25.22')
     end
 
     it 'rounds late_submission_deduction' do
       policy = LatePolicy.new(late_submission_deduction: 25.225)
-      expect(policy.late_submission_deduction).to eql BigDecimal.new('25.23')
+      expect(policy.late_submission_deduction).to eql BigDecimal('25.23')
     end
   end
 

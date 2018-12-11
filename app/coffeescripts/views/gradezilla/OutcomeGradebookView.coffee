@@ -304,7 +304,7 @@ define [
       sortParams = "#{sortParams}&sort_outcome_id=#{sortOutcomeId}" if sortOutcomeId
       sortParams = "#{sortParams}&sort_order=desc" if !@sortOrderAsc
       sectionParam = if Grid.section and Grid.section != "0" then "&section_id=#{Grid.section}" else ""
-      "/api/v1/courses/#{course}/outcome_rollups?per_page=20&include[]=outcomes&include[]=users&include[]=outcome_paths#{excluding}&page=#{page}#{sortParams}#{sectionParam}"
+      "/api/v1/courses/#{course}/outcome_rollups?rating_percents=true&per_page=20&include[]=outcomes&include[]=users&include[]=outcome_paths#{excluding}&page=#{page}#{sortParams}#{sectionParam}"
 
     _loadOutcomes: (page = 1) =>
       exclude = if @$('#no_results_students').prop('checked') then 'missing_user_rollups' else ''

@@ -147,7 +147,7 @@ test('selectChangeLog does not dispatch LOAD_CHANGE_START if changeId is null', 
   actions.selectChangeLog(null)(dispatchSpy, getState)
 
   equal(dispatchSpy.callCount, 1)
-  deepEqual(dispatchSpy.firstCall.args, [{ type: 'SELECT_CHANGE_LOG' }])
+  deepEqual(dispatchSpy.firstCall.args, [{ payload: null, type: 'SELECT_CHANGE_LOG' }])
 })
 
 test('loadHistory dispatches LOAD_HISTORY_START', () => {

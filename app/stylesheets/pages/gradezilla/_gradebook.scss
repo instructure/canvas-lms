@@ -289,35 +289,19 @@ $gradebook_cell_padding_top: 8px;
 }
 
 .odd .slick-cell {
-  background-color: #f5f6f7;
+  background-color: $ic-bg-light-neutral;
 
   &.minimized {
-    background-color: darken(#f5f6f7, 4%);
+    background-color: darken($ic-bg-light-neutral, 4%);
   }
 }
 
 .even .slick-cell {
-  background-color: #fcfcfc;
+  background-color: #ffffff;
 
   &.minimized {
-    background-color: darken(#fcfcfc, 4%);
+    background-color: darken(#ffffff, 4%);
   }
-}
-
-.odd .meta-cell {
-  background-color: #eff3f4;
-}
-
-.even .meta-cell {
-  background-color: #e6eaec;
-}
-
-.odd .total-cell {
-  background-color: #e0e6e8;
-}
-
-.even .total-cell {
-  background-color: #d7dee1;
 }
 
 // overrides of jqueryUI theme
@@ -534,6 +518,11 @@ $gradebook_cell_padding_top: 8px;
       text-overflow: ellipsis;
       width: 100%;
     }
+  }
+
+  &.total-grade-override {
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   &.active {
@@ -771,6 +760,35 @@ $gradebook_checkbox_size: 16px;
     display: none;
   }
 }
+
+/* Total Grade Override Cell START */
+
+.slick-cell.total-grade-override {
+  .gradebook-cell {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    justify-content: center;
+    padding: 0;
+
+    .flex-space,
+    .percentage-grade,
+    .scheme-grade {
+      flex: 1 1;
+    }
+
+    .percentage-grade {
+      margin: 0 0.25em;
+    }
+
+    .scheme-grade {
+      text-align: start;
+    }
+  }
+}
+
+/* Total Grade Override Cell END */
 
 // STUFF FOR HEADER
 #gradebook-toolbar {

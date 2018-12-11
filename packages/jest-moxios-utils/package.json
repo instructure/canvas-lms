@@ -1,0 +1,17 @@
+{
+  "name": "jest-moxios-utils",
+  "version": "1.0.0",
+  "main": "index.js",
+  "description": "Utilities useful in testing using moxios within jest",
+  "scripts": {
+    "test": "jest",
+    "test:coverage": "jest --coverage"
+  },
+  "dependencies": {
+    "moxios": "^0.4"
+  },
+  "devDependencies": {
+    "axios": "^0.18.0",
+    "jest": "^23.6.0"
+  }
+}

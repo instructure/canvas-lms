@@ -62,6 +62,15 @@
 }
 .submission-details-header__info {
   margin-top: $ic-sp / 3;
+  display: flex;
+
+  .submission-details-header__attempts_info {
+    margin: 0px 0px 0px 40px;
+
+    > span {
+      margin: 0px 20px 0px 0px;
+    }
+  }
 }
 .submission-details-header__time {
   margin-#{direction(right)}: $ic-sp / 4;

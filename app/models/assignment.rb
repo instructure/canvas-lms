@@ -117,6 +117,7 @@ class Assignment < ActiveRecord::Base
   validate :assignment_name_length_ok?, :unless => :deleted?
   validates :lti_context_id, presence: true, uniqueness: true
   validates :grader_count, numericality: true
+  validates :allowed_attempts, numericality: { greater_than: 0 }, unless: proc { |a| a.allowed_attempts == -1 }, allow_nil: true
 
   with_options unless: :moderated_grading? do
     validates :graders_anonymous_to_graders, absence: true
@@ -269,6 +270,8 @@ class Assignment < ActiveRecord::Base
     else
       result.workflow_state = 'unpublished'
     end
+
+    result.post_to_sis = false
 
     result
   end
@@ -1241,7 +1244,7 @@ class Assignment < ActiveRecord::Base
       result = passed ? "complete" : "incomplete"
     when "letter_grade", "gpa_scale"
       if self.points_possible.to_f > 0.0
-        score = BigDecimal.new(score.to_s.presence || '0.0') / BigDecimal.new(points_possible.to_s)
+        score = BigDecimal(score.to_s.presence || '0.0') / BigDecimal(points_possible.to_s)
         result = grading_standard_or_default.score_to_grade((score * 100).to_f)
       elsif given_grade
         # the score for a zero-point letter_grade assignment could be considered
@@ -1394,6 +1397,18 @@ class Assignment < ActiveRecord::Base
     ])
   end
 
+  def touch_on_unlock_if_necessary
+    if self.unlock_at && Time.zone.now < self.unlock_at && (Time.zone.now + 1.hour) > self.unlock_at
+      Shackles.activate(:master) do
+        # Because of assignemnt overrides, an assignment can have the same global id but
+        # a different unlock_at time, so include that in the singleton key so that different
+        # unlock_at times are properly handled.
+        singleton = "touch_on_unlock_assignment_#{self.global_id}_#{self.unlock_at}"
+        send_later_enqueue_args(:touch, { :run_at => self.unlock_at, :singleton => singleton })
+      end
+    end
+  end
+
   def low_level_locked_for?(user, opts={})
     return false if opts[:check_policies] && context.grants_right?(user, :read_as_admin)
     Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
@@ -1416,6 +1431,7 @@ class Assignment < ActiveRecord::Base
           break
         end
       end
+      assignment_for_user.touch_on_unlock_if_necessary
       locked
     end
   end

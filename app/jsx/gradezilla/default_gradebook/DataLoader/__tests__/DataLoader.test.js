@@ -20,6 +20,7 @@ import sinon from 'sinon'
 
 import FakeServer, {paramsFromRequest, pathFromRequest} from '../../../../__tests__/FakeServer'
 import DataLoader from '../../../DataLoader'
+import * as FinalGradeOverrideApi from '../../apis/FinalGradeOverrideApi'
 
 describe('Gradebook DataLoader', () => {
   const exampleData = {
@@ -27,6 +28,15 @@ describe('Gradebook DataLoader', () => {
     contextModules: [{id: '2601'}, {id: '2602 '}, {id: '2603'}],
     customColumnData: [{id: '2801'}, {id: '2802'}, {id: '2803'}],
     customColumns: [{id: '2401'}, {id: '2402'}, {id: '2403'}],
+
+    finalGradeOverrides: {
+      1101: {
+        courseGrade: {
+          percentage: 91.23
+        }
+      }
+    },
+
     gradingPeriodAssignments: {1401: ['2301']},
     studentIds: ['1101', '1102', '1103'],
     students: [{id: '1101'}, {id: '1102'}, {id: '1103'}],
@@ -45,6 +55,7 @@ describe('Gradebook DataLoader', () => {
   }
 
   let dataLoader
+  let gradebook
   let server
 
   beforeEach(() => {
@@ -99,9 +110,18 @@ describe('Gradebook DataLoader', () => {
     server
       .for(urls.customColumnData('2403'))
       .respond([{status: 200, body: exampleData.customColumnData.slice(3, 4)}])
+
+    sinon
+      .stub(FinalGradeOverrideApi, 'getFinalGradeOverrides')
+      .returns(Promise.resolve({finalGradeOverrides: exampleData.finalGradeOverrides}))
+
+    gradebook = {
+      updateFinalGradeOverrides: sinon.stub()
+    }
   })
 
   afterEach(() => {
+    FinalGradeOverrideApi.getFinalGradeOverrides.restore()
     server.teardown()
   })
 
@@ -116,6 +136,8 @@ describe('Gradebook DataLoader', () => {
         customColumnDataParams: {},
         customColumnDataURL: urls.customColumnData(':id'),
         customColumnsURL: urls.customColumns,
+        getFinalGradeOverrides: false,
+        gradebook,
         perPage: 2,
         studentsPageCb() {},
         studentsParams: {enrollment_state: ['active']},
@@ -330,6 +352,35 @@ describe('Gradebook DataLoader', () => {
           exampleData.submissions.slice(0, 1),
           exampleData.submissions.slice(1, 3)
         ])
+      })
+    })
+
+    describe('loading final grade overrides', () => {
+      it('optionally requests final grade overrides', async () => {
+        await loadGradebookData({getFinalGradeOverrides: true})
+        expect(FinalGradeOverrideApi.getFinalGradeOverrides.callCount).toEqual(1)
+      })
+
+      it('optionally does not request final grade overrides', async () => {
+        await loadGradebookData({getFinalGradeOverrides: false})
+        expect(FinalGradeOverrideApi.getFinalGradeOverrides.callCount).toEqual(0)
+      })
+
+      it('uses the given course id when loading final grade overrides', async () => {
+        await loadGradebookData({getFinalGradeOverrides: true})
+        const [courseId] = FinalGradeOverrideApi.getFinalGradeOverrides.lastCall.args
+        expect(courseId).toEqual('1201')
+      })
+
+      it('updates Gradebook when the final grade overrides have loaded', async () => {
+        await loadGradebookData({getFinalGradeOverrides: true})
+        expect(gradebook.updateFinalGradeOverrides.callCount).toEqual(1)
+      })
+
+      it('updates Gradebook with the loaded final grade overrides', async () => {
+        await loadGradebookData({getFinalGradeOverrides: true})
+        const [finalGradeOverrides] = gradebook.updateFinalGradeOverrides.lastCall.args
+        expect(finalGradeOverrides).toEqual(exampleData.finalGradeOverrides)
       })
     })
 

@@ -261,8 +261,6 @@ module Lti::Ims
     # rubocop:enable Metrics/LineLength
     include Concerns::AdvantageServices
 
-    skip_before_action :load_user
-
     MIME_TYPE = 'application/vnd.ims.lti-nrps.v2.membershipcontainer+json'.freeze
 
     # @API List Course Memberships
@@ -313,8 +311,8 @@ module Lti::Ims
       polymorphic_url([context, :names_and_roles])
     end
 
-    def tool_permissions_granted?
-      access_token&.claim('scopes')&.split(' ')&.include?(TokenScopes::LTI_NRPS_V2_SCOPE)
+    def scopes_matcher
+      self.class.all_of(TokenScopes::LTI_NRPS_V2_SCOPE)
     end
 
     def context

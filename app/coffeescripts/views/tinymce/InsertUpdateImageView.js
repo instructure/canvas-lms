@@ -75,7 +75,10 @@ export default class InsertUpdateImageView extends DialogBaseView {
       case 'tabUploaded':
         loadTab(done => {
           ReactDOM.render(
-            <FileBrowser type="image/*" selectFile={this.setSelectedImage} />,
+            <FileBrowser allowUpload={true}
+                         contentTypes={["image/*"]}
+                         selectFile={this.setSelectedImage}
+                         useContextAssets={true} />,
             this.$el[0].querySelector('#tabUploaded'),
             done
           )

@@ -863,8 +863,7 @@ class CoursesController < ApplicationController
   #   'StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'ObserverEnrollment',
   #   or 'DesignerEnrollment'.
   #
-  # @argument include[] [String, "email"|"enrollments"|"locked"|"avatar_url"|"test_student"|"bio"|"custom_links"|"current_grading_period_scores"]
-  #   - "email": Optional user email.
+  # @argument include[] [String, "enrollments"|"locked"|"avatar_url"|"test_student"|"bio"|"custom_links"|"current_grading_period_scores"]
   #   - "enrollments":
   #   Optionally include with each Course the user's current and invited
   #   enrollments. If the user is enrolled as a student, and the account has
@@ -937,7 +936,7 @@ class CoursesController < ApplicationController
         end
 
         users = Api.paginate(users, self, api_v1_course_users_url)
-        includes = Array(params[:include]).concat(['sis_user_id'])
+        includes = Array(params[:include]).concat(['sis_user_id', 'email'])
 
         # user_json_preloads loads both active/accepted and deleted
         # group_memberships when passed "group_memberships: true." In a
@@ -1262,19 +1261,17 @@ class CoursesController < ApplicationController
 
       set_tutorial_js_env
 
-      if @context.root_account.feature_enabled?(:master_courses)
-        master_template = @context.master_course_templates.for_full_course.first
-        restrictions_by_object_type = master_template&.default_restrictions_by_type_for_api || {}
-        message =!MasterCourses::MasterTemplate.is_master_course?(@context) && why_cant_i_enable_master_course(@context)
-        message ||= ''
-        js_env({
-          IS_MASTER_COURSE: MasterCourses::MasterTemplate.is_master_course?(@context),
-          DISABLED_BLUEPRINT_MESSAGE: message,
-          BLUEPRINT_RESTRICTIONS: master_template&.default_restrictions || { :content => true },
-          USE_BLUEPRINT_RESTRICTIONS_BY_OBJECT_TYPE: master_template&.use_default_restrictions_by_type || false,
-          BLUEPRINT_RESTRICTIONS_BY_OBJECT_TYPE: restrictions_by_object_type
-        })
-      end
+      master_template = @context.master_course_templates.for_full_course.first
+      restrictions_by_object_type = master_template&.default_restrictions_by_type_for_api || {}
+      message = !MasterCourses::MasterTemplate.is_master_course?(@context) && why_cant_i_enable_master_course(@context)
+      message ||= ''
+      js_env({
+        IS_MASTER_COURSE: MasterCourses::MasterTemplate.is_master_course?(@context),
+        DISABLED_BLUEPRINT_MESSAGE: message,
+        BLUEPRINT_RESTRICTIONS: master_template&.default_restrictions || { :content => true },
+        USE_BLUEPRINT_RESTRICTIONS_BY_OBJECT_TYPE: master_template&.use_default_restrictions_by_type || false,
+        BLUEPRINT_RESTRICTIONS_BY_OBJECT_TYPE: restrictions_by_object_type
+      })
 
       @course_settings_sub_navigation_tools = ContextExternalTool.all_tools_for(@context,
         :type => :course_settings_sub_navigation,
@@ -1661,6 +1658,11 @@ class CoursesController < ApplicationController
   #   - "observed_users": include observed users in the enrollments
   #   - "course_image": Optional course image data for when there is a course image
   #     and the course image feature flag has been enabled
+  #
+  # @argument teacher_limit [Integer]
+  #   The maximum number of teacher enrollments to show.
+  #   If the course contains more teachers than this, instead of giving the teacher
+  #   enrollments, the count of teachers will be given under a _teacher_count_ key.
   #
   # @returns Course
   def show
@@ -2950,7 +2952,7 @@ class CoursesController < ApplicationController
     enrollments_by_course = Api.paginate(enrollments_by_course, self, paginate_url) if api_request?
     courses = enrollments_by_course.map(&:first).map(&:course)
     preloads = %i/account root_account/
-    preloads << :teachers if includes.include?('teachers')
+    preload_teachers(courses) if includes.include?('teachers')
     preloads << :grading_standard if includes.include?('total_scores')
     preloads << :account if includes.include?('subaccount') || includes.include?('account')
     if includes.include?('current_grading_period_scores')

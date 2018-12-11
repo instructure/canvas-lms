@@ -41,6 +41,8 @@ if ENV["VERBOSE"] != "1"
   STDERR.reopen "/dev/null"
 end
 
+ENV['RCE_API_PORT'] ||= '3000'
+
 class DockerComposer
   class << self
     # :cry: not the same as canvas docker-compose ... yet

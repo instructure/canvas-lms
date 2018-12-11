@@ -16,9 +16,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 if CANVAS_RAILS5_1
-  gem 'rails', '5.1.6'
+  gem 'rails', '5.1.6.1'
 else
-  gem 'rails', '5.2.1'
+  gem 'rails', '5.2.1.1'
 end
     gem 'loofah', '2.2.3'
 
@@ -62,10 +62,10 @@ gem 'bcrypt', '3.1.11'
 gem 'canvas_connect', '0.3.11'
   gem 'adobe_connect', '1.0.6', require: false
 gem 'canvas_webex', '0.17'
-gem 'inst-jobs', '0.15.3'
+gem 'inst-jobs', '0.15.5'
   gem 'rufus-scheduler', '3.4.2', require: false
     gem 'et-orbi', '1.0.8', require: false
-gem 'switchman-inst-jobs', '1.2.1'
+gem 'switchman-inst-jobs', '1.2.2'
 gem 'inst-jobs-autoscaling', '1.0.5'
   gem 'aws-sdk-autoscaling', '1.5.0', require: false
 # ffi 1.9.2x seem to have issues on RHEL & CentOS causing segfaults

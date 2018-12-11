@@ -25,8 +25,10 @@ QUnit.module('Moment formats', {
     I18nStubber.setLocale('test')
     I18nStubber.stub('test', {
       'date.formats.medium': '%b %-d, %Y',
+      'date.formats.short': '%b %-d',
       'time.formats.tiny': '%l:%M%P',
-      'time.formats.tiny_on_the_hour': '%l%P'
+      'time.formats.tiny_on_the_hour': '%l%P',
+      'time.event': '%{date} event %{time}'
     })
   },
   teardown () {
@@ -36,6 +38,14 @@ QUnit.module('Moment formats', {
 
 test('formatsForLocale include formats matching datepicker', () => {
   const formats = moment_formats.formatsForLocale()
-  ok(formats.indexOf('%b %-d, %Y %l:%M%P') !== -1)
-  ok(formats.indexOf('%b %-d, %Y %l%P') !== -1)
+  ok(formats.includes('%b %-d, %Y %l:%M%P'))
+  ok(formats.includes('%b %-d, %Y %l%P'))
+})
+
+test('formatsForLocale includes all event formats', () => {
+  const formats = moment_formats.formatsForLocale()
+  ok(formats.includes('%b %-d, %Y event %l:%M%P'))
+  ok(formats.includes('%b %-d event %l:%M%P'))
+  ok(formats.includes('%b %-d, %Y event %l%P'))
+  ok(formats.includes('%b %-d, %Y event %l%P'))
 })

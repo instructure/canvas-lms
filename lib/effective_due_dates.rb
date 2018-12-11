@@ -216,7 +216,8 @@ class EffectiveDueDates
               os.user_id AS student_id,
               o.assignment_id,
               o.id AS override_id,
-              date_trunc('minute', o.due_at) AS due_at,
+              date_trunc('minute', o.due_at) AS trunc_due_at,
+              o.due_at,
               o.set_type AS override_type,
               o.due_at_overridden,
               1 AS priority
@@ -235,7 +236,8 @@ class EffectiveDueDates
               gm.user_id AS student_id,
               o.assignment_id,
               o.id AS override_id,
-              date_trunc('minute', o.due_at) AS due_at,
+              date_trunc('minute', o.due_at) AS trunc_due_at,
+              o.due_at,
               o.set_type AS override_type,
               o.due_at_overridden,
               1 AS priority
@@ -256,7 +258,8 @@ class EffectiveDueDates
               e.user_id AS student_id,
               o.assignment_id,
               o.id AS override_id,
-              date_trunc('minute', o.due_at) AS due_at,
+              date_trunc('minute', o.due_at) AS trunc_due_at,
+              o.due_at,
               o.set_type AS override_type,
               o.due_at_overridden,
               1 AS priority
@@ -279,7 +282,8 @@ class EffectiveDueDates
               e.user_id AS student_id,
               a.id as assignment_id,
               NULL::integer AS override_id,
-              date_trunc('minute', a.due_at) AS due_at,
+              date_trunc('minute', a.due_at) AS trunc_due_at,
+              a.due_at,
               'Everyone Else'::varchar AS override_type,
               FALSE AS due_at_overridden,
               2 AS priority
@@ -385,7 +389,7 @@ class EffectiveDueDates
           FROM calculated_overrides overrides
           -- match the effective due date with its grading period
           LEFT OUTER JOIN applied_grading_periods periods ON
-              periods.start_date < overrides.due_at AND overrides.due_at <= periods.end_date
+              periods.start_date < overrides.trunc_due_at AND overrides.trunc_due_at <= periods.end_date
         SQL
       end
     end

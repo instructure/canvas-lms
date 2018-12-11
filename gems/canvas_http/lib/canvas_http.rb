@@ -60,9 +60,12 @@ module CanvasHttp
   # the body having been read yet -- this allows for streaming the response
   # rather than reading it all into memory.
   #
+  # redirect_spy allows you to see redirects as they happen. it accepts one
+  # parameter, which is the redirect response.
+  #
   # Eventually it may be expanded to optionally do cert verification as well.
   def self.request(request_class, url_str, other_headers = {}, redirect_limit: 3, form_data: nil, multipart: false,
-    streaming: false, body: nil, content_type: nil)
+    streaming: false, body: nil, content_type: nil, redirect_spy: nil)
     last_scheme = nil
     last_host = nil
 
@@ -80,6 +83,7 @@ module CanvasHttp
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
       http.request(request) do |response|
         if response.is_a?(Net::HTTPRedirection) && !response.is_a?(Net::HTTPNotModified)
+          redirect_spy.call(response) if redirect_spy.is_a?(Proc)
           last_host = uri.host
           last_scheme = uri.scheme
           url_str = response['Location']

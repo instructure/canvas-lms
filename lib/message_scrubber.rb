@@ -96,7 +96,7 @@ class MessageScrubber
   #
   # Returns class object.
   def klass
-    Message
+    raise "regular MessageScrubber is deprecated in favor of dropping partitions"
   end
 
   # Internal: The name of the Canvas setting this class' limit is stored in.

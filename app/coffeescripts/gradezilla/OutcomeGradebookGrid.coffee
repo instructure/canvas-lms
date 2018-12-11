@@ -351,8 +351,3 @@ define [
         results = Grid.View.getColumnResults(grid.getData(), column)
         ratings = column.outcome.ratings || []
         ratings.result_count = results.length
-        points = _.pluck ratings, 'points'
-        counts = _.countBy results, (result) ->
-          _.find points, (x) -> result && x <= result.score
-        _.each ratings, (rating) ->
-          rating.percent = Math.round((counts[rating.points] || 0) / results.length * 100)

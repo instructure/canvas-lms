@@ -29,10 +29,10 @@
       </tr><tr>
         <td><%= blabel :attachment, :uploaded_data, :en => "File", id: 'attachmentLabel' %></td>
         <td>
-          <a href="#" class="add_another_file_link">
+          <button class="Button Button--link add_another_file_link">
             <i class="icon-add" aria-hidden="true"></i>
             <%= t 'links.add_another_file', "Add Another File" %>
-          </a>
+          </button>
           <div id="submission_attachment_blank" class="submission_attachment" style="display: none;">
             <input aria-labelledby="attachmentLabel" type="file" name="attachments[-1][uploaded_data]" class="input-file"/>
             <a href="#" class="remove_attachment_link no-hover" style="display: none;"><i class="icon-end" aria-hidden="true"></i><span class="screenreader-only"><%= t('remove empty attachment')%></span></a>
@@ -48,13 +48,8 @@
       <tr>
         <td></td>
         <td style="font-size: 0.8em;">
-        <a href="#" class="toggle_uploaded_files_link"><%= t 'links.find_file', "Click here to find a file you've already uploaded" %></a><br/>
-        <div id="uploaded_files" style="display: none;">
-          <% folders = @current_user.folders.active %>
-          <% content = (render :partial => "files/nested_content", :object => (folders.select{|f| !f.parent_folder_id}), :locals => {:folders => folders}) %>
-          <%= t(:no_files, "No Files") if @current_user.attachments.active.empty? || !content || content.strip.empty? %>
-          <%= content %>
-        </div>
+          <button class="Button Button--link toggle_uploaded_files_link"><%= t 'links.find_file', "Click here to find a file you've already uploaded" %></button><br/>
+          <div id="uploaded_files" style="display: none;" />
         </td>
       </tr>
       <% end %>

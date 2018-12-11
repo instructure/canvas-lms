@@ -98,13 +98,18 @@ class Feature
   VALID_STATES = %w(on allowed hidden hidden_in_prod).freeze
   VALID_APPLIES_TO = %w(Course Account RootAccount User).freeze
 
+  DISABLED_FEATURE = Feature.new.freeze
+
   def self.register(feature_hash)
     @features ||= {}
     feature_hash.each do |feature_name, attrs|
       validate_attrs(attrs)
-      next if attrs[:development] && production_environment?
       feature = feature_name.to_s
-      @features[feature] = Feature.new({feature: feature}.merge(attrs))
+      if attrs[:development] && production_environment?
+        @features[feature] = DISABLED_FEATURE
+      else
+        @features[feature] = Feature.new({feature: feature}.merge(attrs))
+      end
     end
   end
 
@@ -229,10 +234,7 @@ END
     'anonymous_instructor_annotations' =>
     {
       display_name: -> { I18n.t('Anonymous Instructor Annotations') },
-      description:  -> { I18n.t(<<~END) },
-        Anonymous Instructor Annotations is a setting on assignments allowing
-        instructors to leave annotations that are anonymous to students.
-      END
+      description:  -> { I18n.t('Anonymize all instructor comments and annotations within DocViewer') },
       applies_to: 'Course',
       state: 'allowed',
       root_opt_in: false,
@@ -559,13 +561,6 @@ END
       development: false,
       root_opt_in: true,
       touch_context: true
-    },
-    'master_courses' =>
-    {
-      display_name: -> { I18n.t('Blueprint Courses') }, # this won't be confusing at all
-      description: -> { I18n.t('Enable the creation of Blueprint Courses') },
-      applies_to: 'RootAccount',
-      state: 'on'
     },
     'student_context_cards' =>
     {

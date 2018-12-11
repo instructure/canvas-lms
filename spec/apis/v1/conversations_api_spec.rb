@@ -617,6 +617,19 @@ describe ConversationsController, type: :request do
         expect(json3.first["id"]).to_not eq conv1.id # should make a new one
       end
 
+      it "should create a new conversation if force_new parameter is provided" do
+        json = api_call(:post, "/api/v1/conversations",
+          { :controller => 'conversations', :action => 'create', :format => 'json' },
+          { :recipients => [@bob.id], :body => "test", :subject => "subject_1", :force_new => "true" })
+        conv1 = Conversation.find(json.first["id"])
+
+        json2 = api_call(:post, "/api/v1/conversations",
+          { :controller => 'conversations', :action => 'create', :format => 'json' },
+          { :recipients => [@bob.id], :body => "test", :subject => "subject_2", :force_new => "true" })
+        conv2 = Conversation.find(json2.first["id"])
+        expect(conv2.id).to_not eq conv1.id # should make a new one
+      end
+
       it "should not break trying to pull cached conversations for re-use" do
         course1 = @course
         course_with_student(:course => course1, :user => @billy, :active_all => true)
@@ -2380,7 +2393,7 @@ describe ConversationsController, type: :request do
     end
 
     it 'returns an error when the user_id is not provided' do
-      @c1.all_messages.first()
+      message = @c1.all_messages.first()
 
       raw_api_call(:put, "/api/v1/conversations/restore",
               { :controller => "conversations", :action => "restore_message", :format => "json",
@@ -2390,7 +2403,7 @@ describe ConversationsController, type: :request do
     end
 
     it 'returns an error when the conversation_id is not provided' do
-      @c1.all_messages.first()
+      message = @c1.all_messages.first()
 
       raw_api_call(:put, "/api/v1/conversations/restore",
               { :controller => "conversations", :action => "restore_message", :format => "json",

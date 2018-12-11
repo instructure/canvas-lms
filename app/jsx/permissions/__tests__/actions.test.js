@@ -22,7 +22,7 @@ import actions from '../actions'
 
 import {COURSE, ACCOUNT} from '../propTypes'
 import {PERMISSIONS, ROLES} from './examples'
-import {moxiosWait} from '../test-utils'
+import {moxiosWait} from 'jest-moxios-utils'
 
 // This is needed for $.screenReaderFlashMessageExclusive to work.
 // TODO: This is terrible, make it unterrible

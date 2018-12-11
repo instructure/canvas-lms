@@ -26,6 +26,7 @@ import outcomeTemplate from 'jst/outcomes/outcome'
 import outcomeFormTemplate from 'jst/outcomes/outcomeForm'
 import criterionTemplate from 'jst/outcomes/_criterion'
 import confirmOutcomeEditModal, {showConfirmOutcomeEdit} from 'jsx/outcomes/ConfirmOutcomeEditModal'
+import { addCriterionInfoButton } from 'jsx/outcomes/CriterionInfo'
 import 'jqueryui/dialog'
 
 // For outcomes in the main content view.
@@ -36,7 +37,6 @@ export default class OutcomeView extends OutcomeContentBase {
 
     this.prototype.events = _.extend(
       {
-        'click .outcome_information_link': 'showRatingDialog',
         'click .edit_rating': 'editRating',
         'click .delete_rating_link': 'deleteRating',
         'click .save_rating_link': 'saveRating',
@@ -76,7 +76,6 @@ export default class OutcomeView extends OutcomeContentBase {
     this.deleteRating = this.deleteRating.bind(this)
     this.insertRating = this.insertRating.bind(this)
     this.updateCalcMethod = this.updateCalcMethod.bind(this)
-    this.showRatingDialog = this.showRatingDialog.bind(this)
     this.setQuizMastery = setQuizMastery
     this.useForScoring = useForScoring
     super(...arguments)
@@ -255,20 +254,6 @@ export default class OutcomeView extends OutcomeContentBase {
     })
   }
 
-  showRatingDialog(e) {
-    e.preventDefault()
-    $('#outcome_criterion_dialog')
-      .dialog({
-        autoOpen: false,
-        title: I18n.t('outcome_criterion', 'Learning Outcome Criterion'),
-        width: 400,
-        close() {
-          $(e.target).focus()
-        }
-      })
-      .dialog('open')
-  }
-
   screenreaderTitleFocus() {
     return this.$('.screenreader-outcome-title').focus()
   }
@@ -283,6 +268,9 @@ export default class OutcomeView extends OutcomeContentBase {
         this.$el.html(
           outcomeFormTemplate(_.extend(data, {calculationMethods: this.model.calculationMethods()}))
         )
+
+        addCriterionInfoButton(this.$el.find("#react-info-link")[0])
+
         this.readyForm()
         break
       case 'loading':

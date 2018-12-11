@@ -336,7 +336,7 @@ module SIS
       def process_file(base, file, att)
         csv = {base: base, file: file, fullpath: File.join(base, file), attachment: att}
         if File.file?(csv[:fullpath]) && File.extname(csv[:fullpath]).downcase == '.csv'
-          unless valid_utf8?(csv[:fullpath])
+          unless Attachment.valid_utf8?(File.open(csv[:fullpath]))
             SisBatch.add_error(csv, I18n.t("Invalid UTF-8"), sis_batch: @batch, failure: true)
             return
           end
@@ -367,38 +367,6 @@ module SIS
         elsif !File.directory?(csv[:fullpath]) && (csv[:fullpath] !~ IGNORE_FILES)
           SisBatch.add_error(csv, I18n.t("Skipping unknown file type"), sis_batch: @batch)
         end
-      end
-
-      def valid_utf8?(path)
-        # validate UTF-8
-        Iconv.open('UTF-8', 'UTF-8') do |iconv|
-          File.open(path) do |file|
-            chunk = file.read(4096)
-            error_count = 0
-
-            while chunk
-              begin
-                iconv.iconv(chunk)
-              rescue Iconv::Failure
-                error_count += 1
-                if !file.eof? && error_count <= 4
-                  # we may have split a utf-8 character in the chunk - try to resolve it, but only to a point
-                  chunk << file.read(1)
-                  next
-                else
-                  raise
-                end
-              end
-
-              error_count = 0
-              chunk = file.read(4096)
-            end
-            iconv.iconv(nil)
-          end
-        end
-        true
-      rescue Iconv::Failure
-        false
       end
 
       def create_filtered_csv(csv, headers)

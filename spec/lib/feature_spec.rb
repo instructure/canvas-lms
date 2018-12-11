@@ -206,7 +206,7 @@ describe "Feature.register" do
       allow(Rails.env).to receive(:test?).and_return(false)
       allow(Rails.env).to receive(:production?).and_return(true)
       Feature.register({dev_feature: t_dev_feature_hash})
-      expect(Feature.definitions['dev_feature']).to be_nil
+      expect(Feature.definitions['dev_feature']).to eq Feature::DISABLED_FEATURE
     end
   end
 

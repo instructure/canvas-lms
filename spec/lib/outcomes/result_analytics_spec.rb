@@ -58,7 +58,7 @@ describe Outcomes::ResultAnalytics do
     # outcomes that predate the newer calculation methods
     id = args[:id] || 80
     method = args[:method] || "highest"
-    criterion = args[:criterion] || {mastery_points: 3.0}
+    criterion = args[:criterion] || LearningOutcome.default_rubric_criterion
     MockOutcome[id, method, args[:calc_int], criterion]
   end
 
@@ -372,6 +372,24 @@ describe Outcomes::ResultAnalytics do
         {score: 10.0, percent: 0.7, possible: 1.0, association_id: 1})
       aggregate_result = ra.aggregate_outcome_results_rollup([q_results].flatten, fake_context)
       expect(aggregate_result.scores.map(&:score)).to eq [2.1]
+    end
+  end
+
+  describe '#rating_percents' do
+    before do
+      allow_any_instance_of(ActiveRecord::Associations::Preloader).to receive(:preload)
+    end
+
+    it 'computes percents' do
+      results = [
+        outcome_from_score(4.0, {}),
+        outcome_from_score(5.0, {user: MockUser[20, 'b']}),
+        outcome_from_score(3.0, {user: MockUser[20, 'b']})
+      ]
+      users = [MockUser[10, 'a'], MockUser[30, 'c']]
+      rollups = ra.outcome_results_rollups(results, users)
+      percents = ra.rating_percents(rollups)
+      expect(percents).to eq({ 80 => [50, 50, 0] })
     end
   end
 

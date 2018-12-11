@@ -646,7 +646,12 @@ module ApplicationHelper
       brand_config = if session.key?(:brand_config_md5)
         BrandConfig.where(md5: session[:brand_config_md5]).first
       else
-        brand_config_for_account(opts)
+        account = brand_config_account(opts)
+        if opts[:ignore_parents]
+          account.brand_config if account.branding_allowed?
+        else
+          account.try(:effective_brand_config)
+        end
       end
       # If the account does not have a brandConfig, or they explicitly chose to start from a blank
       # slate in the theme editor, do one last check to see if we should actually use the k12 theme
@@ -663,32 +668,29 @@ module ApplicationHelper
     "#{Canvas::Cdn.config.host}/#{path}"
   end
 
-  def brand_config_for_account(opts={})
-    account = Context.get_account(@context || @course)
+  def brand_config_account(opts={})
+    return @brand_account if @brand_account
+    @brand_account = Context.get_account(@context || @course)
 
     # for finding which values to show in the theme editor
-    if opts[:ignore_parents]
-      return account.brand_config if account.branding_allowed?
-      return
-    end
+    return @brand_account if opts[:ignore_parents]
 
-    if !account
+    if !@brand_account
       if @current_user.present?
         # If we're not viewing a `context` with an account, like if we're on the dashboard or my
         # user profile, show the branding for the lowest account where all my enrollments are. eg:
         # if I'm at saltlakeschooldistrict.instructure.com, but I'm only enrolled in classes at
         # Highland High, show Highland's branding even on the dashboard.
-        account = @current_user.common_account_chain(@domain_root_account).last
+        @brand_account = @current_user.common_account_chain(@domain_root_account).last
       end
       # If we're not logged in, or we have no enrollments anywhere in domain_root_account,
       # and we're on the dashboard at eg: saltlakeschooldistrict.instructure.com, just
       # show its branding
-      account ||= @domain_root_account
+      @brand_account ||= @domain_root_account
     end
-
-    account.try(:effective_brand_config)
+    @brand_account
   end
-  private :brand_config_for_account
+  private :brand_config_account
 
   def include_account_js(options = {})
     return if params[:global_includes] == '0' || !@domain_root_account
@@ -856,6 +858,8 @@ module ApplicationHelper
   end
 
   def include_custom_meta_tags
+    add_csp_meta_tags
+
     output = []
     if @meta_tags.present?
       output = @meta_tags.map{ |meta_attrs| tag("meta", meta_attrs) }
@@ -867,6 +871,29 @@ module ApplicationHelper
     output << tag("link", rel: 'manifest', href: manifest_url) if manifest_url.present?
 
     output.join("\n").html_safe.presence
+  end
+
+  def add_csp_meta_tags
+    csp_context =
+      if @context.is_a?(Course)
+        @context
+      elsif @context.is_a?(Group) && @context.context.is_a?(Course)
+        @context.context
+      elsif @course.is_a?(Course)
+        @course
+      else
+        brand_config_account
+      end
+    return unless csp_context &&
+      csp_context.root_account.feature_enabled?(:javascript_csp) &&
+      csp_context.csp_enabled?
+
+    domains = %w{'self' 'unsafe-eval' 'unsafe-inline'} + csp_context.csp_whitelisted_domains
+    @meta_tags ||= []
+    @meta_tags << {
+      "http-equiv" => "Content-Security-Policy",
+      "content" => "script-src #{domains.join(" ")}"
+    }
   end
 
   # Returns true if the current_path starts with the given value
@@ -962,6 +989,85 @@ module ApplicationHelper
     else
       nil
     end
+  end
+
+  MAX_SEQUENCES=10
+  def context_module_sequence_items_by_asset_id(asset_id, asset_type)
+    # assemble a sequence of content tags in the course
+    # (break ties on module position by module id)
+    tag_ids = @context.sequential_module_item_ids & Shackles.activate(:slave) { @context.module_items_visible_to(@current_user).reorder(nil).pluck(:id) }
+
+    # find content tags to include
+    tag_indices = []
+    if asset_type == 'ContentTag'
+      tag_ids.each_with_index { |tag_id, ix| tag_indices << ix if tag_id == asset_id.to_i }
+    else
+      # map wiki page url to id
+      if asset_type == 'WikiPage'
+        page = @context.wiki_pages.not_deleted.where(url: asset_id).first
+        asset_id = page.id if page
+      else
+        asset_id = asset_id.to_i
+      end
+
+      # find the associated assignment id, if applicable
+      if asset_type == 'Quizzes::Quiz'
+        asset = @context.quizzes.where(id: asset_id.to_i).first
+        associated_assignment_id = asset.assignment_id if asset
+      end
+
+      if asset_type == 'DiscussionTopic'
+        asset = @context.send(asset_type.tableize).where(id: asset_id.to_i).first
+        associated_assignment_id = asset.assignment_id if asset
+      end
+
+      # find up to MAX_SEQUENCES tags containing the object (or its associated assignment)
+      matching_tag_ids = @context.context_module_tags.where(:id => tag_ids).
+        where(:content_type => asset_type, :content_id => asset_id).pluck(:id)
+      if associated_assignment_id
+        matching_tag_ids += @context.context_module_tags.where(:id => tag_ids).
+          where(:content_type => 'Assignment', :content_id => associated_assignment_id).pluck(:id)
+      end
+
+      if matching_tag_ids.any?
+        tag_ids.each_with_index { |tag_id, ix| tag_indices << ix if matching_tag_ids.include?(tag_id) }
+      end
+    end
+
+    tag_indices.sort!
+    if tag_indices.length > MAX_SEQUENCES
+      tag_indices = tag_indices[0, MAX_SEQUENCES]
+    end
+
+    # render the result
+    result = { :items => [] }
+
+    needed_tag_ids = []
+    tag_indices.each do |ix|
+      needed_tag_ids << tag_ids[ix]
+      needed_tag_ids << tag_ids[ix - 1] if ix > 0
+      needed_tag_ids << tag_ids[ix + 1] if ix < tag_ids.size - 1
+    end
+
+    needed_tags = ContentTag.where(:id => needed_tag_ids.uniq).preload(:context_module).index_by(&:id)
+    tag_indices.each do |ix|
+      hash = { :current => module_item_json(needed_tags[tag_ids[ix]], @current_user, session), :prev => nil, :next => nil }
+      if ix > 0
+        hash[:prev] = module_item_json(needed_tags[tag_ids[ix - 1]], @current_user, session)
+      end
+      if ix < tag_ids.size - 1
+        hash[:next] = module_item_json(needed_tags[tag_ids[ix + 1]], @current_user, session)
+      end
+      if cyoe_enabled?(@context)
+        is_student = @context.grants_right?(@current_user, session, :participate_as_student)
+        opts = { context: @context, user: @current_user, session: session, is_student: is_student }
+        hash[:mastery_path] = conditional_release_rule_for_module_item(needed_tags[tag_ids[ix]], opts)
+      end
+      result[:items] << hash
+    end
+    modules = needed_tags.values.map(&:context_module).uniq
+    result[:modules] = modules.map { |mod| module_json(mod, @current_user, session) }
+    result
   end
 
   def file_access_oauth_host

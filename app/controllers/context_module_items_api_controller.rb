@@ -630,7 +630,6 @@ class ContextModuleItemsApiController < ApplicationController
     raise ActiveRecord::RecordNotFound unless @item && @item.visible_to_user?(user)
   end
 
-  MAX_SEQUENCES = 10
   # @API Get module item sequence
   #
   # Given an asset in a course, find the ModuleItem it belongs to, the previous and next Module Items
@@ -656,82 +655,7 @@ class ContextModuleItemsApiController < ApplicationController
       return render :json => { :message => 'invalid asset_type'}, :status => :bad_request unless asset_type
       asset_id = params[:asset_id]
       return render :json => { :message => 'missing asset_id' }, :status => :bad_request unless asset_id
-
-      # assemble a sequence of content tags in the course
-      # (break ties on module position by module id)
-      tag_ids = @context.sequential_module_item_ids & Shackles.activate(:slave) { @context.module_items_visible_to(@current_user).reorder(nil).pluck(:id) }
-
-      # find content tags to include
-      tag_indices = []
-      if asset_type == 'ContentTag'
-        tag_ids.each_with_index { |tag_id, ix| tag_indices << ix if tag_id == asset_id.to_i }
-      else
-        # map wiki page url to id
-        if asset_type == 'WikiPage'
-          page = @context.wiki_pages.not_deleted.where(url: asset_id).first
-          asset_id = page.id if page
-        else
-          asset_id = asset_id.to_i
-        end
-
-        # find the associated assignment id, if applicable
-        if asset_type == 'Quizzes::Quiz'
-          asset = @context.quizzes.where(id: asset_id.to_i).first
-          associated_assignment_id = asset.assignment_id if asset
-        end
-
-        if asset_type == 'DiscussionTopic'
-          asset = @context.send(asset_type.tableize).where(id: asset_id.to_i).first
-          associated_assignment_id = asset.assignment_id if asset
-        end
-
-        # find up to MAX_SEQUENCES tags containing the object (or its associated assignment)
-        matching_tag_ids = @context.context_module_tags.where(:id => tag_ids).
-          where(:content_type => asset_type, :content_id => asset_id).pluck(:id)
-        if associated_assignment_id
-          matching_tag_ids += @context.context_module_tags.where(:id => tag_ids).
-            where(:content_type => 'Assignment', :content_id => associated_assignment_id).pluck(:id)
-        end
-
-        if matching_tag_ids.any?
-          tag_ids.each_with_index { |tag_id, ix| tag_indices << ix if matching_tag_ids.include?(tag_id) }
-        end
-      end
-
-      tag_indices.sort!
-      if tag_indices.length > MAX_SEQUENCES
-        tag_indices = tag_indices[0, MAX_SEQUENCES]
-      end
-
-      # render the result
-      result = { :items => [] }
-
-      needed_tag_ids = []
-      tag_indices.each do |ix|
-        needed_tag_ids << tag_ids[ix]
-        needed_tag_ids << tag_ids[ix - 1] if ix > 0
-        needed_tag_ids << tag_ids[ix + 1] if ix < tag_ids.size - 1
-      end
-
-      needed_tags = ContentTag.where(:id => needed_tag_ids.uniq).preload(:context_module).index_by(&:id)
-      tag_indices.each do |ix|
-        hash = { :current => module_item_json(needed_tags[tag_ids[ix]], @current_user, session), :prev => nil, :next => nil }
-        if ix > 0
-          hash[:prev] = module_item_json(needed_tags[tag_ids[ix - 1]], @current_user, session)
-        end
-        if ix < tag_ids.size - 1
-          hash[:next] = module_item_json(needed_tags[tag_ids[ix + 1]], @current_user, session)
-        end
-        if cyoe_enabled?(@context)
-          is_student = @context.grants_right?(@current_user, session, :participate_as_student)
-          opts = { context: @context, user: @current_user, session: session, is_student: is_student }
-          hash[:mastery_path] = conditional_release_rule_for_module_item(needed_tags[tag_ids[ix]], opts)
-        end
-        result[:items] << hash
-      end
-      modules = needed_tags.values.map(&:context_module).uniq
-      result[:modules] = modules.map { |mod| module_json(mod, @current_user, session) }
-
+      result = context_module_sequence_items_by_asset_id(asset_id, asset_type)
       render :json => result
     end
   end

@@ -110,6 +110,40 @@ describe DeveloperKey do
           url:GET|/api/v1/audit/grade_change/courses/:course_id/assignments/:assignment_id/graders/:grader_id)
       end
 
+      describe 'before_save' do
+        subject do
+          key.save!
+          key.require_scopes
+        end
+
+        context 'when a public jwk is set' do
+          let(:key) do
+            developer_key_not_saved.generate_rsa_keypair!
+            developer_key_not_saved
+          end
+
+          it { is_expected.to eq true }
+        end
+
+        context 'when a public jwk is not set' do
+          let(:key) { developer_key_not_saved }
+
+          it { is_expected.to eq false }
+        end
+
+        context 'when a key requires scopes but has no public jwk' do
+          let(:key) do
+            developer_key_not_saved.update!(
+              require_scopes: true,
+              public_jwk: nil
+            )
+            developer_key_not_saved
+          end
+
+          it { is_expected.to eq true }
+        end
+      end
+
       describe 'after_update' do
         let(:user) { user_model }
         let(:developer_key_with_scopes) { DeveloperKey.create!(scopes: valid_scopes) }
@@ -158,16 +192,6 @@ describe DeveloperKey do
             scopes: valid_scopes
           )
         end.not_to raise_exception
-      end
-
-      it 'does not set "require_scopes" to true if scopes are present and require_scopes is false' do
-        key = DeveloperKey.create!(scopes: valid_scopes, require_scopes: false)
-        expect(key.require_scopes).to eq false
-      end
-
-      it 'does not set "require_scopes" to false if scopes are blank and require_scopes is true' do
-        key = DeveloperKey.create!(require_scopes: true)
-        expect(key.require_scopes).to eq true
       end
     end
 

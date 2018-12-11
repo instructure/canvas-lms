@@ -810,6 +810,17 @@ describe GradebooksController do
         expect(gradebook_options).not_to have_key :colors
       end
 
+      it "includes final_grade_override_enabled if New Gradebook is enabled" do
+        @course.enable_feature!(:new_gradebook)
+        get :show, params: {course_id: @course.id}
+        expect(gradebook_options).to have_key :final_grade_override_enabled
+      end
+
+      it "does not include final_grade_override_enabled if New Gradebook is disabled" do
+        get :show, params: {course_id: @course.id}
+        expect(gradebook_options).not_to have_key :final_grade_override_enabled
+      end
+
       it "includes late_policy if New Gradebook is enabled" do
         @course.enable_feature!(:new_gradebook)
         get :show, params: { course_id: @course.id }
@@ -950,7 +961,7 @@ describe GradebooksController do
           expect(Enrollment).to receive(:recompute_final_score).never
           get 'show', params: {:course_id => @course.id, :init => 1, :assignments => 1}, :format => 'csv'
         end
-        it "should get all the expected datas even with multibytes characters", :focus => true do
+        it "should get all the expected datas even with multibytes characters" do
           @course.assignments.create(:title => "Déjà vu")
           exporter = GradebookExporter.new(
             @course,
@@ -1143,6 +1154,44 @@ describe GradebooksController do
         periods = assigns[:js_env][:GRADEBOOK_OPTIONS][:grading_period_set][:grading_periods]
         expect(periods).to all include(:id, :start_date, :end_date, :close_date, :is_closed, :is_last)
       end
+    end
+  end
+
+  describe "GET 'final_grade_overrides'" do
+    it "returns unauthorized when there is no current user" do
+      get :final_grade_overrides, params: {course_id: @course.id}, format: :json
+      assert_status(401)
+    end
+
+    it "returns unauthorized when the user is not authorized to manage grades" do
+      user_session(@student)
+      get :final_grade_overrides, params: {course_id: @course.id}, format: :json
+      assert_status(401)
+    end
+
+    it "grants authorization to teachers in active courses" do
+      user_session(@teacher)
+      get :final_grade_overrides, params: {course_id: @course.id}, format: :json
+      expect(response).to be_ok
+    end
+
+    it "grants authorization to teachers in concluded courses" do
+      @course.complete!
+      user_session(@teacher)
+      get :final_grade_overrides, params: {course_id: @course.id}, format: :json
+      expect(response).to be_ok
+    end
+
+    it "returns the map of final grade overrides" do
+      assignment = assignment_model(course: @course, points_possible: 10)
+      assignment.grade_student(@student, grade: '85%', grader: @teacher)
+      enrollment = @student.enrollments.find_by!(course: @course)
+      enrollment.scores.find_by!(course_score: true).update!(override_score: 89.2)
+
+      user_session(@teacher)
+      get :final_grade_overrides, params: {course_id: @course.id}, format: :json
+      final_grade_overrides = json_parse(response.body)["final_grade_overrides"]
+      expect(final_grade_overrides).to have_key(@student.id.to_s)
     end
   end
 

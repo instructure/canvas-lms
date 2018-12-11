@@ -28,7 +28,8 @@ describe Types::AssignmentType do
   let(:assignment) do
     course.assignments.create(title: "some assignment",
                               submission_types: ["online_text_entry"],
-                              workflow_state: "published")
+                              workflow_state: "published",
+                              allowed_extensions: ["doc", "xlt", "foo"])
   end
 
   let(:assignment_type) { GraphQLTypeTester.new(assignment, current_user: student) }
@@ -41,6 +42,7 @@ describe Types::AssignmentType do
     expect(assignment_type.resolve("onlyVisibleToOverrides")).to eq assignment.only_visible_to_overrides
     expect(assignment_type.resolve("assignmentGroup { _id }")).to eq assignment.assignment_group.id.to_s
     expect(assignment_type.resolve("muted")).to eq assignment.muted?
+    expect(assignment_type.resolve("allowedExtensions")).to eq assignment.allowed_extensions
   end
 
   context "top-level permissions" do
@@ -68,6 +70,13 @@ describe Types::AssignmentType do
     expect(
       assignment_type.resolve("htmlUrl", request: ActionDispatch::TestRequest.create)
     ).to eq "http://test.host/courses/#{assignment.context_id}/assignments/#{assignment.id}"
+  end
+
+  it "uses api_user_content for the description" do
+    assignment.update_attributes description: %|Hi <img src="/courses/#{course.id}/files/12/download"<h1>Content</h1>|
+    expect(
+      assignment_type.resolve("description", request: ActionDispatch::TestRequest.create)
+    ).to include "http://test.host/courses/#{course.id}/files/12/download"
   end
 
   describe "submissionsConnection" do
@@ -116,6 +125,14 @@ describe Types::AssignmentType do
 
   it "has an assignmentGroup" do
     expect(assignment_type.resolve("assignmentGroup { _id }")).to eq assignment.assignment_group.to_param
+  end
+
+  it "has modules" do
+    module1 = assignment.course.context_modules.create!(name: 'Module 1')
+    module2 = assignment.course.context_modules.create!(name: 'Module 2')
+    assignment.context_module_tags.create!(context_module: module1, context: assignment.course, tag_type: 'context_module')
+    assignment.context_module_tags.create!(context_module: module2, context: assignment.course, tag_type: 'context_module')
+    expect(assignment_type.resolve("modules { _id }").sort).to eq [module1.id.to_s, module2.id.to_s]
   end
 
   it "only returns valid submission types" do

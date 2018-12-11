@@ -223,6 +223,7 @@ CanvasRails::Application.routes.draw do
       collection do
         get :change_gradebook_version
         get :blank_submission
+        get :final_grade_overrides
         get :speed_grader
         post :speed_grader_settings
         get :history
@@ -476,6 +477,11 @@ CanvasRails::Application.routes.draw do
   get 'external_content/success/:service/:id' => 'external_content#success', as: :external_content_update
   get 'external_content/retrieve/oembed' => 'external_content#oembed_retrieve', as: :external_content_oembed_retrieve
   get 'external_content/cancel/:service' => 'external_content#cancel', as: :external_content_cancel
+
+  %w(account course).each do |context|
+    prefix = "#{context}s/:#{context}_id"
+    post "#{prefix}/deep_linking_response", controller: 'lti/ims/deep_linking', action: :deep_linking_response, as: "#{context}_deep_linking_response"
+  end
 
   %w(account course group user).each do |context|
     match "#{context.pluralize}/:#{context}_id/external_content/success/:service" => 'external_content#success', as: "#{context}_external_content_success", via: [:get, :post]
@@ -1091,6 +1097,10 @@ CanvasRails::Application.routes.draw do
       put 'courses/:course_id/assignments/:id', action: :update
       post 'courses/:course_id/assignments/:assignment_id/duplicate', action: :duplicate
       delete 'courses/:course_id/assignments/:id', action: :destroy, controller: :assignments
+    end
+
+    scope(controller: 'assignment_extensions') do
+      post "courses/:course_id/assignments/:assignment_id/extensions", action: :create, as: "course_assignment_extensions_create"
     end
 
     scope(controller: :peer_reviews_api) do
@@ -1837,6 +1847,11 @@ CanvasRails::Application.routes.draw do
       get "support_helpers/turnitin/refresh_lti_attachment", action: :lti_attachment
     end
 
+    scope(controller: 'support_helpers/plagiarism_platform') do
+      get "support_helpers/plagiarism_platform/add_service", action: :add_service
+      get "support_helpers/plagiarism_platform/resubmit_for_assignment/:assignment_id", action: :resubmit_for_assignment
+    end
+
     scope(controller: 'support_helpers/crocodoc') do
       get "support_helpers/crocodoc/shard", action: :shard
       get "support_helpers/crocodoc/submission", action: :submission
@@ -2117,6 +2132,15 @@ CanvasRails::Application.routes.draw do
       post 'planner_notes', action: :create
       delete 'planner_notes/:id', action: :destroy
     end
+
+    scope(:controller => :csp_settings) do
+      %w(course account).each do |context|
+        get "#{context.pluralize}/:#{context}_id/csp_settings", :action => :get_csp_settings
+        put "#{context.pluralize}/:#{context}_id/csp_settings", :action => :set_csp_setting
+      end
+      post "accounts/:account_id/csp_settings/domains", :action => :add_domain
+      delete "accounts/:account_id/csp_settings/domains", :action => :remove_domain
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented or
@@ -2186,6 +2210,7 @@ CanvasRails::Application.routes.draw do
 
     %w(course account).each do |context|
       prefix = "#{context}s/:#{context}_id"
+
       post "#{prefix}/authorize", controller: 'lti/ims/authorization', action: :authorize, as: "#{context}_lti_oauth2_authorize"
       get  "#{prefix}/tool_consumer_profile(/:tool_consumer_profile_id)", controller: 'lti/ims/tool_consumer_profile',
            action: 'show', as: "#{context}_tool_consumer_profile"

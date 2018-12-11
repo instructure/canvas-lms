@@ -216,4 +216,29 @@ module WikiAndTinyCommon
     el = f(selector)
     driver.action.key_down(:shift).click(el).key_up(:shift).perform
   end
+
+  def visit_front_page(course)
+    get "/courses/#{course.id}/pages/front-page/edit"
+  end
+
+  def edit_wiki_css
+    f("form.edit-form .edit-content")
+  end
+
+  def wysiwyg_state_setup(course, text = "1\n2\n3", val: false, html: false)
+    visit_front_page(course)
+    wait_for_tiny(edit_wiki_css)
+
+    if val == true
+      add_text_to_tiny(text)
+      validate_link(text)
+    else
+      if html
+        add_html_to_tiny(text)
+      else
+        add_text_to_tiny_no_val(text)
+      end
+      select_all_wiki
+    end
+  end
 end

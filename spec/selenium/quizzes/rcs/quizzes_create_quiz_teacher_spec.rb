@@ -98,19 +98,13 @@ describe 'creating a quiz' do
       @account.save!
 
       get "/courses/#{@course.id}/quizzes"
-      expect_new_page_load do
-        f('.new-quiz-link').click
-        wait_for_ajaximations
-      end
+      expect_new_page_load { f('.new-quiz-link').click }
       expect(is_checked('#quiz_post_to_sis')).to be_truthy
     end
 
     it "should not default to post grades if account setting is not enabled" do
       get "/courses/#{@course.id}/quizzes"
-      expect_new_page_load do
-        f('.new-quiz-link').click
-        wait_for_ajaximations
-      end
+      expect_new_page_load { f('.new-quiz-link').click }
       expect(is_checked('#quiz_post_to_sis')).to be_falsey
     end
   end

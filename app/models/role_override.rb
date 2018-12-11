@@ -176,8 +176,7 @@ class RoleOverride < ActiveRecord::Base
        :account_only => true,
        :true_for => [
          'AccountAdmin'
-       ],
-       :account_allows => lambda {|a| a.root_account.feature_allowed?(:master_courses)}
+       ]
      },
      :manage_role_overrides => {
        :label => lambda { t('permissions.manage_role_overrides', "Manage permissions") },

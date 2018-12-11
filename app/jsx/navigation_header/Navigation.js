@@ -290,10 +290,27 @@ export default class Navigation extends React.Component {
     }
   }
 
+  getTrayLabel() {
+    switch (this.state.type) {
+      case "courses":
+        return I18n.t("Courses tray");
+      case "groups":
+        return I18n.t("Groups tray");
+      case "accounts":
+        return I18n.t("Admin tray");
+      case "profile":
+        return I18n.t("Profile tray");
+      case "help":
+        return I18n.t("%{title} tray", { title: window.ENV.help_link_name });
+      default:
+        return I18n.t("Global navigation tray");
+    }
+  }
+
   render() {
     return (
       <Tray
-        label={I18n.t('Global navigation tray')}
+        label={this.getTrayLabel()}
         size="small"
         open={this.state.isTrayOpen}
         onDismiss={this.closeTray}

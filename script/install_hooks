@@ -1,0 +1,27 @@
+#!/bin/sh
+set -e
+
+if [ -n "$1" ]; then
+  PREPEND_PATH=$1
+fi
+
+if [ ! -d $PREPEND_PATH".git" ]; then
+  exit 0
+fi
+
+GLOB_PATTERN=$PREPEND_PATH"hooks/*"
+
+for hook in $GLOB_PATTERN; do
+  hook_name=${hook##*/}
+  git_path="$PREPEND_PATH"".git/hooks/""$hook_name"
+  # make sure file exists
+  touch "$git_path"
+  # make sure it has a shebang prepending if necessary
+  grep -qF -- "#!" "$git_path" || (echo "#!/bin/sh" | cat - $git_path > "$git_path""-temp" && mv "$git_path""-temp" $git_path)
+  # make sure it is executable
+  chmod +x "$git_path"
+  # # put in line to call this hook
+  grep -qF -- "./hooks/$hook_name" "$git_path" || echo "./hooks/$hook_name" >> "$git_path"
+done
+
+exit 0

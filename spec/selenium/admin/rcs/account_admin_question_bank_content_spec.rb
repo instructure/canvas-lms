@@ -110,17 +110,17 @@ describe "account admin question bank" do
     verify_added_question(name, question_text, multiple_choice_value)
   end
 
-  it "should add bank and multiple choice question" do
+  it "should add bank and multiple choice question", ignore_js_errors: true do
     question_bank2 = create_question_bank('question bank 2')
     get "/accounts/#{Account.default.id}/question_banks/#{question_bank2.id}"
     add_multiple_choice_question
   end
 
-  it "should add a multiple choice question" do
+  it "should add a multiple choice question", ignore_js_errors: true do
     add_multiple_choice_question
   end
 
-  it "should edit a multiple choice question" do
+  it "should edit a multiple choice question", ignore_js_errors: true do
     new_name = "question 2"
     new_question_text = "what is the answer to #{new_name}?"
     hover_and_click("#question_#{@question.id} .edit_question_link")

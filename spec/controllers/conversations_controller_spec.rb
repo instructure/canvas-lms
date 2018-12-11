@@ -558,7 +558,8 @@ describe ConversationsController do
     end
 
     it "should correctly infer context tags" do
-      @group = @course.groups.create!
+      a = Account.default
+      @group = a.groups.create!
       @conversation.participants.each{ |user| @group.users << user }
       2.times{ @group.users << User.create }
 

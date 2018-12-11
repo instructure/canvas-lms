@@ -452,7 +452,7 @@ module Api
   end
 
 
-  def api_bulk_load_user_content_attachments(htmls, context = nil)
+  def self.api_bulk_load_user_content_attachments(htmls, context = nil)
 
     regex = context ? %r{/#{context.class.name.tableize}/#{context.id}/files/(\d+)} : %r{/files/(\d+)}
 
@@ -474,6 +474,10 @@ module Api
 
       attachments.preload(:context).index_by(&:id)
     end
+  end
+
+  def api_bulk_load_user_content_attachments(htmls, context = nil)
+    Api.api_bulk_load_user_content_attachments(htmls, context)
   end
 
   PLACEHOLDER_PROTOCOL = 'https'

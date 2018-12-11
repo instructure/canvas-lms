@@ -18,8 +18,9 @@
 
 module Factories
   def resource_link_model(overrides: {})
+    return Lti::ResourceLink.find_by!(resource_link_id: overrides[:resource_link_id]) if overrides.key?(:resource_link_id)
+
     params = {
-      resource_link_id: overrides[:resource_link_id],
       context_external_tool: overrides.fetch(:with_context_external_tool) do |_|
         external_tool_model(context: overrides[:context], opts: overrides.fetch(:context_external_tool, {}))
       end

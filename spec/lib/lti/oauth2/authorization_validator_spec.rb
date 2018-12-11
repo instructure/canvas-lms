@@ -143,7 +143,7 @@ module Lti
         it "raises Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt if the 'aud' is not the authorization endpoint" do
           raw_jwt['aud'] = 'http://google.com/invalid'
           expect { auth_validator.jwt }.to raise_error Lti::Oauth2::AuthorizationValidator::InvalidAuthJwt,
-                                                       "the 'aud' must be the LTI Authorization endpoint"
+                                                       "the 'aud' is invalid"
         end
 
         it "raises Lti::Oauth2::AuthorizationValidator::SecretNotFound if no ToolProxy or developer key" do

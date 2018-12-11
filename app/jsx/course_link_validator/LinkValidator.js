@@ -44,7 +44,7 @@ class LinkValidator extends React.Component {
           setTimeout(() => {
             this.getResults()
           }, 10000)
-        } else if (data.workflow_state === 'completed') {
+        } else if (data.workflow_state === 'completed' && data.results.version == 2) {
           this.setState({
             buttonMessage: I18n.t('Restart Link Validation'),
             buttonDisabled: false,

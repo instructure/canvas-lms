@@ -117,7 +117,20 @@ import './vendor/jquery.scrollTo'
     globalAnnouncements.augmentView()
     globalAnnouncements.bindDomEvents()
 
-    $("#account_settings_tabs").tabs().show();
+    $("#account_settings_tabs").tabs({
+      beforeActivate: (event, ui) => {
+        if (ui.newTab.context.id === 'tab-security-link') {
+          import('jsx/account_settings/SecurityPanel')
+            .then(({start}) => {
+              start(document.getElementById('tab-security'));
+          }).catch(() => {
+            // We really should never get here... but if we do... do something.
+            const $message = $('<div />').text('Security Tab failed to load')
+            $('tab-security').append($message)
+          })
+        }
+      }
+    }).show();
     $(".add_ip_filter_link").click(function(event) {
       event.preventDefault();
       var $filter = $(".ip_filter.blank:first").clone(true).removeClass('blank');

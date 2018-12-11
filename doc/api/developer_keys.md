@@ -1,7 +1,7 @@
 Developer Keys
 ==============
 
-Developer keys are OAuth2 client ID and secret pairs stored in Canvas that allow third-party applications to request access to Canvas API endpoints via the [OAuth2 flow](https://canvas.instructure.com/doc/api/file.oauth.html). Access is granted after a user authorizes an app and Canvas creates an API access token that’s returned in the final request of the OAuth2 flow.
+Developer keys are OAuth2 client ID and secret pairs stored in Canvas that allow third-party applications to request access to Canvas API endpoints via the [OAuth2 flow](file.oauth.html). Access is granted after a user authorizes an app and Canvas creates an API access token that’s returned in the final request of the OAuth2 flow.
 
 Developer keys created in a root account, by root account administrators or Instructure employees, are only functional for the account they are created in and its sub-accounts. Developer keys created globally, by an Instructure employee, are functional in any Canvas account where they are enabled.
 
@@ -24,7 +24,7 @@ For example, the corresponding scope for the `GET /api/v1/courses/:course_id/rub
 url:GET|/api/v1/courses/:course_id/rubrics
 ```
 ### How do developer key scopes function?
-When requesting an access token, third-party applications should specify a `scope` parameter (See [here](/doc/api/file.oauth_endpoints.html#get-login-oauth2-auth)). The requested scopes must be a subset of the scopes set for the developer key.
+When requesting an access token, third-party applications should specify a `scope` parameter (see the [oauth endpoints documentation](file.oauth_endpoints.html#get-login-oauth2-auth)). The requested scopes must be a subset of the scopes set for the developer key.
 
 When a client makes any API request, Canvas will verify the requested endpoint's scope has been granted by the account administrator to the developer key of the request's access token.
 
@@ -38,10 +38,8 @@ For global developer keys, an Instructure employee may grant or revoke scopes.
 *Note:* If a scope is removed from a developer key, all access tokens derived from that key will be invalidated. In this case, clients should request a new access token.
 
 ### Where can I see what scopes are available?
-A complete list of available scopes can be found [here](/doc/api/file.api_token_scopes.html).
+View the complete list of [token scopes](api_token_scopes.html).
 Scopes may also be found beneath their corresponding endpoints in the "resources" documentation pages.
-
-
 
 ## Developer Key Management
 Developer key management features allow root account administrators to turn global developer keys "on" and "off" for only their account.
@@ -60,20 +58,20 @@ Please include:
 
 
 ### How do management features function?
-When a client uses the [OAuth2 Auth endpoint](/doc/api/file.oauth_endpoints.html#get-login-oauth2-auth) as part of the flow to retrieve an access token canvas will check the developer key associated with the `client_id`. If the developer key is not enabled in the requested account, Canvas will respond with `unauthorized_client`.
+When a client uses the [OAuth2 Auth endpoint](file.oauth_endpoints.html#get-login-oauth2-auth) as part of the flow to retrieve an access token canvas will check the developer key associated with the `client_id`. If the developer key is not enabled in the requested account, Canvas will respond with `unauthorized_client`.
 
 When a client makes any API request, Canvas will check the developer key associated with the access token used in the request. If the developer key is not enabled for the requested account, Canvas will respond with `401 Unauthorized`.
 
 ## Other Considerations
 ### Maximum number of scopes
-When clients request an access token they may specify what scopes the token needs (See [here](/doc/api/file.oauth_endpoints.html#get-login-oauth2-auth)). Because the client sends the scopes they require in a GET request, the maximum number of scopes one access token can specify is limited by the maximum HTTP header size Canvas allows (8000 chars).
+When clients request an access token they may specify what scopes the token needs (see the [oauth endpoints documentation](file.oauth_endpoints.html#get-login-oauth2-auth)). Because the client sends the scopes they require in a GET request, the maximum number of scopes one access token can specify is limited by the maximum HTTP header size Canvas allows (8000 chars).
 
-On average, an access token may use up to 110 scopes. This number will vary depending on the actual length of the scopes used and any other headers sent in the [request](/doc/api/file.oauth_endpoints.html#get-login-oauth2-auth) along with the scopes.
+On average, an access token may use up to 110 scopes. This number will vary depending on the actual length of the scopes used and any other headers sent in the [login oauth2 request](file.oauth_endpoints.html#get-login-oauth2-auth) along with the scopes.
 
 If the number of scopes required by the client exceeds this limitation, a second access token with the remaining scopes should be requested.
 
 ### Canvas API Includes
-Several Canvas APIs allow specifying an `include` parameter. This parameter allows nesting resources in JSON responses. For example, a request to the [assignment index endpoint](/doc/api/assignments.html#method.assignments_api.index) could be made to include the submission objects for each assignment.
+Several Canvas APIs allow specifying an `include` parameter. This parameter allows nesting resources in JSON responses. For example, a request to the [assignment index endpoint](assignments.html#method.assignments_api.index) could be made to include the submission objects for each assignment.
 
 Responses to requests made with a scoped access token do not support this functionality. When a request is made with a scoped token Canvas will ignore `include` and `includes` parameters.
 

@@ -26,6 +26,7 @@ describe("accessibleEditor", () => {
     elementMap = {};
     shortcuts = {};
     editor = {
+      id: 'description',
       editorContainer: {
         id: 42
       },
@@ -47,6 +48,9 @@ describe("accessibleEditor", () => {
               focus: () => {
                 elementMap[selector].gotFocused = true;
               },
+              getAttribute: attr => {
+                return elementMap[selector].attrMap[attr];
+              },
               setAttribute: (attr, value) => {
                 elementMap[selector].attrMap[attr] = value;
               },
@@ -58,6 +62,13 @@ describe("accessibleEditor", () => {
                 return elementMap[selector];
               }
             };
+            if (selector === accEd.selectors.editorIframe) {
+              elementMap[selector].contentWindow = {
+                document: {
+                  body: editor.element.querySelector("iframe-body")
+                }
+              }
+            }
           }
           return elementMap[selector];
         }
@@ -68,6 +79,13 @@ describe("accessibleEditor", () => {
       getElementById: id => {
         if (id === 42) {
           return editor.element;
+        }
+      },
+      querySelector: sel => {
+        if (sel === 'label[for="description"]') {
+          return {
+            textContent: "This is a label"
+          }
         }
       }
     };
@@ -80,6 +98,12 @@ describe("accessibleEditor", () => {
     let bgColorLabel =
       elementMap[accEd.selectors.bgColorBtn].attrMap["aria-label"];
     assert.equal(bgColorLabel, "Background Color, press down to select");
+  });
+
+  it("adds textarea label as aria-label to rce body", () => {
+    accEd.addLabels();
+    let bodyLabel = elementMap[accEd.selectors.editorIframe].contentWindow.document.body.getAttribute("aria-label");
+    assert.equal(bodyLabel, "This is a label");
   });
 
   it("puts a better title on the iframe", () => {

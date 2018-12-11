@@ -67,6 +67,13 @@ class ViewOptionsMenu extends React.Component {
       onSelect: func.isRequired,
       selected: bool.isRequired
     }).isRequired,
+    overrides: shape({
+      disabled: bool.isRequired,
+      label: string.isRequired,
+      onSelect: func.isRequired,
+      selected: bool.isRequired
+    }),
+    finalGradeOverrideEnabled: bool.isRequired,
     onSelectShowStatusesModal: func.isRequired,
     showUnpublishedAssignments: bool.isRequired,
     onSelectShowUnpublishedAssignments: func.isRequired
@@ -233,6 +240,16 @@ class ViewOptionsMenu extends React.Component {
           >
             {I18n.t('Unpublished Assignments')}
           </MenuItem>
+
+          {this.props.finalGradeOverrideEnabled &&
+            <MenuItem
+              disabled={this.props.overrides.disabled}
+              onSelect={this.props.overrides.onSelect}
+              selected={this.props.overrides.selected}
+            >
+              <span data-menu-item-id="show-overrides-column">{this.props.overrides.label}</span>
+            </MenuItem>
+          }
         </MenuItemGroup>
       </Menu>
     );

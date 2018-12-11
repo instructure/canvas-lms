@@ -20,14 +20,15 @@ import React from 'react'
 import {mount} from 'enzyme'
 import CustomizationOption from '../CustomizationOption'
 
-function newProps(checked = false) {
+function newProps(checked = false, deepLinking = false) {
   return {
     label: 'Manage Line Items',
     name: 'manage_line_items',
     type: 'scope',
     onChange: jest.fn(),
     checked,
-    toggleStyle: {width: '25%'}
+    toggleStyle: {width: '25%'},
+    deepLinking
   }
 }
 
@@ -65,4 +66,14 @@ it("calls 'onChange' when changed", () => {
     .instance()
     .handleChange()
   expect(props.onChange).toHaveBeenCalled()
+})
+
+it("renders a deep linking tooltip if deepLinking is true", () => {
+  wrapper = mount(<CustomizationOption {...newProps(true, true)} />)
+  expect(wrapper.exists('Tooltip')).toBeTruthy()
+})
+
+it("does not render a deep linking tooltip if deepLinking is false", () => {
+  wrapper = mount(<CustomizationOption {...newProps()} />)
+  expect(wrapper.exists('Tooltip')).toBeFalsy()
 })

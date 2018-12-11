@@ -478,32 +478,6 @@ describe "student planner" do
     end
   end
 
-  context "History" do
-    before :once do
-      quiz = quiz_model(course: @course)
-      quiz.generate_quiz_data
-      quiz.due_at = Time.zone.now + 2.days
-      quiz.save!
-      Array.new(12){|n| n}.each do |i|
-        @course.wiki_pages.create!(title: "Page#{i}", todo_date: Time.zone.now + (i-4).days)
-        @course.assignments.create!(name: "assignment#{i}",
-                                    due_at: Time.zone.now.advance(days:(i-4)))
-        @course.discussion_topics.create!(user: @teacher, title: "topic#{i}",
-                                          message: "somebody topic message ##{i}",
-                                          todo_date: Time.zone.now + (i-4).days)
-      end
-    end
-
-    it "loads future items at the bottom of the page", priority: "1", test_id: 3263149 do
-      go_to_list_view
-      current_items = items_displayed.count
-      load_more_button.click
-      wait_for_spinner
-
-      expect(items_displayed.count).to be > current_items
-    end
-  end
-
   context "with new activity button" do
     before :once do
       @old, @older, @oldest = new_activities_in_the_past

@@ -214,7 +214,7 @@ QUnit.module('Gradebook Grid Column Filtering', function (suiteHooks) {
 
   QUnit.module('with unpublished assignments', function (hooks) {
     function setShowUnpublishedAssignments (show) {
-      gradebook.showUnpublishedAssignments = show;
+      gradebook.gridDisplaySettings.showUnpublishedAssignments = show;
     }
 
     hooks.beforeEach(function () {

@@ -89,6 +89,24 @@ describe CanvasPartman::PartitionManager do
     end
   end
 
+  context "by_date + weeks" do
+    subject { CanvasPartman::PartitionManager.create(WeekEvent) }
+
+    describe '#create_partition' do
+      it 'creates partitions suffixed by year and week number' do
+        expect {
+          subject.create_partition(Time.new(2018, 12, 24))
+          subject.create_partition(Time.new(2018, 12, 31)) # beginning of next year's first week
+          subject.create_partition(Time.new(2021, 1, 1)) # part of last year's 53rd week
+        }.not_to raise_error
+
+        expect(SchemaHelper.table_exists?('partman_week_events_2018_52')).to be true
+        expect(SchemaHelper.table_exists?('partman_week_events_2019_01')).to be true
+        expect(SchemaHelper.table_exists?('partman_week_events_2020_53')).to be true
+      end
+    end
+  end
+
   context :by_id do
     subject { CanvasPartman::PartitionManager.create(Trail) }
 

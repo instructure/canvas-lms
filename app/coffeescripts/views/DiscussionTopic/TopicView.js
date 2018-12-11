@@ -120,7 +120,6 @@ export default class TopicView extends Backbone.View {
     }
 
     const [context, context_id] = ENV.context_asset_string.split('_')
-
     if (context === 'course') {
       const elementToRenderInto = this.$AssignmentExternalTools.get(0)
       if (elementToRenderInto) {
@@ -246,9 +245,7 @@ export default class TopicView extends Backbone.View {
     // erb renders most of this
     if (ENV.DISCUSSION.PERMISSIONS.CAN_REPLY) {
       const modelData = this.model.toJSON()
-      const [context] = ENV.context_asset_string.split('_')
-      const isGroup = context === "group"
-      modelData.showBoxReplyLink = isGroup ? (ENV.DISCUSSION.PERMISSIONS.CAN_MANAGE_OWN): true;
+      modelData.showBoxReplyLink = true
       modelData.root = true
       modelData.title = ENV.DISCUSSION.TOPIC.TITLE
       modelData.isForMainDiscussion = true

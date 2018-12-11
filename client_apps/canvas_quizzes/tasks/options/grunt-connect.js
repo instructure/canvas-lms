@@ -88,7 +88,7 @@ module.exports = {
   tests: {
     options: {
       keepalive: false,
-      port: 9443,
+      port: 9219,
       hostname: '*'
     }
   },

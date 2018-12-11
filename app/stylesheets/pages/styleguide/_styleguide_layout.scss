@@ -84,6 +84,10 @@ body.Sg-only {
   width: 100%;
   z-index: 999;
 }
+.Sg-header__Alert {
+  background: darken($ic-color-dark, 5%);
+  padding: 16px;
+}
 .Sg-header__Navigation {
   @include sg-header-logo;
   @extend %sg-flex;
@@ -137,7 +141,7 @@ body.Sg-only {
 }
 .Sg-Main {
   /// Account for fixed header
-  padding-top: 85px;
+  padding-top: 121px;
 }
 // Hologram class
 .Sg-Content,

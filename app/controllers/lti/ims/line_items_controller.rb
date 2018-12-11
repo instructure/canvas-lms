@@ -62,10 +62,16 @@ module Lti
     class LineItemsController < ApplicationController
       include Concerns::GradebookServices
 
-      skip_before_action :load_user
-
       before_action :verify_line_item_in_context, only: %i(show update destroy)
       before_action :verify_valid_resource_link, only: :create
+
+      ACTION_SCOPE_MATCHERS = {
+        create: all_of(TokenScopes::LTI_AGS_LINE_ITEM_SCOPE),
+        update: all_of(TokenScopes::LTI_AGS_LINE_ITEM_SCOPE),
+        destroy: all_of(TokenScopes::LTI_AGS_LINE_ITEM_SCOPE),
+        show: any_of(TokenScopes::LTI_AGS_LINE_ITEM_SCOPE, TokenScopes::LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE),
+        index: any_of(TokenScopes::LTI_AGS_LINE_ITEM_SCOPE, TokenScopes::LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE)
+      }.with_indifferent_access.freeze
 
       MIME_TYPE = 'application/vnd.ims.lis.v2.lineitem+json'.freeze
       CONTAINER_MIME_TYPE = 'application/vnd.ims.lis.v2.lineitemcontainer+json'.freeze
@@ -95,8 +101,10 @@ module Lti
       #
       # @returns LineItem
       def create
-        new_line_item = LineItem.create!(
-          line_item_params.merge({assignment_id: assignment_id, resource_link: resource_link})
+        new_line_item = LineItem.create_line_item!(
+          assignment,
+          context,
+          line_item_params.merge(resource_link: resource_link)
         )
 
         render json: LineItemsSerializer.new(new_line_item, line_item_id(new_line_item)),
@@ -145,7 +153,7 @@ module Lti
       # @argument tag [String]
       #   If specified only Line Items with this tag will be included.
       #
-      # @argument resouce_id [String]
+      # @argument resource_id [String]
       #   If specified only Line Items with this resource_id will be included.
       #
       # @argument lti_link_id [String]
@@ -157,7 +165,7 @@ module Lti
       # @returns LineItem
       def index
         line_items = Api.paginate(
-          Lti::LineItem.where(index_query),
+          Lti::LineItem.where(index_query).eager_load(:resource_link),
           self,
           lti_line_item_index_url(course_id: context.id),
           pagination_args
@@ -171,7 +179,7 @@ module Lti
       #
       # @returns LineItem
       def destroy
-        return render_unauthorized_action if line_item.assignment_line_item? && line_item.resource_link.present?
+        head :unauthorized and return if line_item.assignment_line_item? && line_item.resource_link.present?
         line_item.destroy!
         head :no_content
       end
@@ -186,19 +194,8 @@ module Lti
         end
       end
 
-      def assignment_id
-        @_assignment_id ||= begin
-          if params[:ltiLinkId].present?
-            resource_link.line_items&.first&.assignment_id
-          else
-            Assignment.create!(
-              context: context,
-              name: line_item_params[:label],
-              points_possible: line_item_params[:score_maximum],
-              submission_types: 'none'
-            ).id
-          end
-        end
+      def assignment
+        @_assignment ||= resource_link.line_items&.first&.assignment if params[:ltiLinkId].present?
       end
 
       def line_item_id(line_item)
@@ -214,19 +211,32 @@ module Lti
       end
 
       def resource_link
-        # TODO: Create an Lti::ResourceLink when a 1.3 tool is associated with an assignment
-        @_resource_link ||= ResourceLink.find_by(resource_link_id: params[:ltiLinkId])
+        @_resource_link ||= ResourceLink.find_by(
+          resource_link_id: params[:ltiLinkId],
+          context_external_tool: tool
+        )
       end
 
       def index_query
-        assignments = Assignment.where(context: context)
-        # TODO: only show line items that belong to the current tool.
-        {
-          assignment: assignments,
-          tag: params[:tag],
-          resource_id: params[:resource_id],
-          lti_resource_link_id: Lti::ResourceLink.find_by(resource_link_id: params[:lti_link_id])
-        }.compact
+        rlid = params[:lti_link_id]
+        # Eventually becomes a set of predicates in a paginated LineItem query. Limits the latter to only those
+        # Assignments belonging to the requested context _and_ having a LineItem bound to a ResourceLink
+        # associated with the current tool. Client can further narrow that last condition by specifying
+        # a particular ResourceLink UUID (`lti_link_id`). (`tag` and `resource_id` query params also treated
+        # as LineItem filters.)
+        assignments = Assignment.
+          active.
+          joins(line_items: :resource_link).
+          where(
+            context: context,
+            lti_resource_links: { context_external_tool_id: tool.id }.merge!(rlid.present? ? { resource_link_id: rlid } : {})
+          ).
+          distinct
+
+        { assignment: assignments }.
+          merge!(params[:tag].present? ? { tag: params[:tag] } : {}).
+          merge!(params[:resource_id].present? ? { resource_id: params[:resource_id] } : {}).
+          compact
       end
 
       def line_item_collection(line_items)
@@ -236,8 +246,17 @@ module Lti
       def verify_valid_resource_link
         return unless params[:ltiLinkId]
         raise ActiveRecord::RecordNotFound if resource_link.blank?
-        head :precondition_failed if resource_link.line_items.blank?
-        # TODO: check that the Lti::ResouceLink is owned by the tool
+        head :precondition_failed if check_for_bad_resource_link
+      end
+
+      def check_for_bad_resource_link
+        resource_link.line_items.blank? ||
+        assignment&.context != context ||
+        !assignment&.active?
+      end
+
+      def scopes_matcher
+        ACTION_SCOPE_MATCHERS.fetch(action_name, self.class.none)
       end
     end
   end

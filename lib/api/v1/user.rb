@@ -34,7 +34,7 @@ module Api::V1::User
     # pseudonyms account for Pseudonym#works_for_account?
     ActiveRecord::Associations::Preloader.new.preload(users, pseudonyms: :account) if opts.fetch(:accounts, true) &&
       (opts.fetch(:pseudonyms, false) || user_json_is_admin?)
-    
+
     if preload_email && (no_email_users = users.reject(&:email_cached?)).present?
       # communication_channels for User#email if it is not cached
       ActiveRecord::Associations::Preloader.new.preload(no_email_users, :communication_channels)
@@ -290,17 +290,27 @@ module Api::V1::User
       period = grading_period(enrollment.course, opts)
       score_opts = period ? { grading_period_id: period.id } : Score.params_for_course
 
-      grades[:current_score] = enrollment.computed_current_score(score_opts)
-      grades[:current_grade] = enrollment.computed_current_grade(score_opts)
-      grades[:final_score]   = enrollment.computed_final_score(score_opts)
-      grades[:final_grade]   = enrollment.computed_final_grade(score_opts)
       grades[:grading_period_id] = period&.id if opts[:current_grading_period_scores]
 
       if course.grants_any_right?(user, :manage_grades, :view_all_grades)
+        override_grade = enrollment.override_grade(score_opts)
+        override_score = enrollment.override_score(score_opts)
+
+        grades[:current_grade] = enrollment.computed_current_grade(score_opts)
+        grades[:current_score] = enrollment.computed_current_score(score_opts)
+        grades[:final_grade]   = enrollment.computed_final_grade(score_opts)
+        grades[:final_score]   = enrollment.computed_final_score(score_opts)
+        grades[:override_grade] = override_grade if override_grade.present?
+        grades[:override_score] = override_score if override_score.present?
         grades[:unposted_current_score] = enrollment.unposted_current_score(score_opts)
         grades[:unposted_current_grade] = enrollment.unposted_current_grade(score_opts)
         grades[:unposted_final_score]   = enrollment.unposted_final_score(score_opts)
         grades[:unposted_final_grade]   = enrollment.unposted_final_grade(score_opts)
+      else
+        grades[:current_grade] = enrollment.effective_current_grade(score_opts)
+        grades[:current_score] = enrollment.effective_current_score(score_opts)
+        grades[:final_grade]   = enrollment.effective_final_grade(score_opts)
+        grades[:final_score]   = enrollment.effective_final_score(score_opts)
       end
     end
     grades

@@ -23,7 +23,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     'saml'.freeze
   end
 
-  def self.enabled?
+  def self.enabled?(_account = nil)
     @enabled
   end
 
@@ -62,7 +62,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
   end
 
   def self.supports_debugging?
-    true
+    debugging_enabled?
   end
 
   def self.debugging_sections

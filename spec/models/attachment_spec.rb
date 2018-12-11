@@ -1141,7 +1141,7 @@ describe Attachment do
 
     it "should sanitize filename with iconv" do
       a = attachment_with_context(@course, :display_name => "糟糕.pdf")
-      sanitized_filename = Iconv.conv("ASCII//TRANSLIT//IGNORE", "UTF-8", a.display_name)
+      sanitized_filename = a.display_name.encode("UTF-8")
       allow(a).to receive(:authenticated_s3_url)
       expect(a).to receive(:authenticated_s3_url).with(include(:response_content_disposition => %(attachment; filename="#{sanitized_filename}"; filename*=UTF-8''%E7%B3%9F%E7%B3%95.pdf)))
       a.public_download_url
@@ -1291,6 +1291,12 @@ describe Attachment do
       allow(@attachment).to receive(:open).and_raise(IOError)
       @attachment.infer_encoding
       expect(@attachment.encoding).to eq nil
+
+      # work across split bytes
+      allow(Attachment).to receive(:read_file_chunk_size).and_return(1)
+      attachment_model(:uploaded_data => stub_png_data('blank.txt', "\xc2\xa9 2011"))
+      @attachment.infer_encoding
+      expect(@attachment.encoding).to eq 'UTF-8'
     end
   end
 

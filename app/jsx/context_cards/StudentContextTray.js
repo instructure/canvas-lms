@@ -206,7 +206,7 @@ export default class StudentContextTray extends React.Component {
                 <div>
                   <header className="StudentContextTray-Header">
                     <Avatar user={user}
-                      canMasquerade={course.permissions.become_user}
+                      canMasquerade={course.permissions && course.permissions.become_user}
                       courseId={this.props.courseId}
                     />
 

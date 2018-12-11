@@ -101,7 +101,7 @@ module FeatureFlags
   def lookup_feature_flag(feature, override_hidden = false)
     feature = feature.to_s
     feature_def = Feature.definitions[feature]
-    return nil unless feature_def
+    raise "no such feature - #{feature}" unless feature_def
     return nil unless feature_def.applies_to_object(self)
 
     return nil if feature_def.visible_on.is_a?(Proc) && !feature_def.visible_on.call(self)
