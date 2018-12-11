@@ -1357,6 +1357,8 @@ CanvasRails::Application.routes.draw do
 
       post 'users/self/pandata_events_token', controller: 'users', action: 'pandata_events_token'
 
+      get 'dashboard/dashboard_cards', controller: 'users', action: 'dashboard_cards', as: :dashboard_dashboard_cards
+
       scope(controller: :user_observees) do
         get    'users/:user_id/observees', action: :index, as: 'user_observees'
         post   'users/:user_id/observees', action: :create
