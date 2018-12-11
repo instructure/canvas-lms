@@ -119,5 +119,18 @@ describe "RCS sidebar tests" do
         expect(wiki_body_anchor.attribute('href')).to include "/courses/#{@course.id}/discussion_topics/#{@discussion.id}"
       end
     end
+
+    it "should click on sidebar modules page to create link in body" do
+      title = "Module-Title"
+      @module = @course.context_modules.create!(:name => title)
+
+      visit_front_page(@course)
+      click_modules_accordion
+      click_sidebar_link(title)
+
+      in_frame wiki_page_body_ifr_id do
+        expect(wiki_body_anchor.attribute('href')).to include "/courses/#{@course.id}/modules/#{@module.id}"
+      end
+    end
   end
 end

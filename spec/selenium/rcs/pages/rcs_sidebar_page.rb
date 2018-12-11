@@ -40,6 +40,10 @@ module RCSSidebarPage
     fj('button:contains("Discussions")')
   end
 
+  def modules_accordion_button
+    fj('button:contains("Modules")')
+  end
+
   def new_page_link
     f('#rcs-LinkToNewPage-btn-link')
   end
@@ -80,6 +84,10 @@ module RCSSidebarPage
 
   def click_discussions_accordion
     discussions_accordion_button.click
+  end
+
+  def click_modules_accordion
+    modules_accordion_button.click
   end
 
   def click_new_page_link
