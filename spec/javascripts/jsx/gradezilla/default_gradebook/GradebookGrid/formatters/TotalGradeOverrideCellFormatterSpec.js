@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createGradebook} from '../../GradebookSpecHelper'
+import {createGradebook} from 'jsx/gradezilla/default_gradebook/__tests__/GradebookSpecHelper'
 import TotalGradeOverrideCellFormatter from 'jsx/gradezilla/default_gradebook/GradebookGrid/formatters/TotalGradeOverrideCellFormatter'
 
 QUnit.module('GradebookGrid TotalGradeOverrideCellFormatter', hooks => {

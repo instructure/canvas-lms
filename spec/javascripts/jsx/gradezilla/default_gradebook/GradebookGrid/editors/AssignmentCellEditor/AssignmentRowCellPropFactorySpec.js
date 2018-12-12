@@ -17,7 +17,7 @@
  */
 
 import AssignmentRowCellPropFactory from 'jsx/gradezilla/default_gradebook/GradebookGrid/editors/AssignmentCellEditor/AssignmentRowCellPropFactory'
-import {createGradebook} from '../../../GradebookSpecHelper'
+import {createGradebook} from 'jsx/gradezilla/default_gradebook/__tests__/GradebookSpecHelper'
 
 QUnit.module('GradebookGrid AssignmentRowCellPropFactory', () => {
   let gradebook

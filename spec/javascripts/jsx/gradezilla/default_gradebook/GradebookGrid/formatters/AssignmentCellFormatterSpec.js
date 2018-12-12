@@ -17,7 +17,7 @@
  */
 
 import AssignmentCellFormatter from 'jsx/gradezilla/default_gradebook/GradebookGrid/formatters/AssignmentCellFormatter'
-import {createGradebook, setFixtureHtml} from '../../GradebookSpecHelper'
+import {createGradebook, setFixtureHtml} from 'jsx/gradezilla/default_gradebook/__tests__/GradebookSpecHelper'
 
 QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
   let $fixture

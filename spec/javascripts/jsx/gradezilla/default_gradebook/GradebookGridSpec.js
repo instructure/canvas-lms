@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { createGradebook } from '../../gradezilla/default_gradebook/GradebookSpecHelper';
+import { createGradebook } from 'jsx/gradezilla/default_gradebook/__tests__/GradebookSpecHelper';
 import GradebookGrid from 'jsx/gradezilla/default_gradebook/GradebookGrid';
 
 QUnit.module('GradebookGrid', (suiteHooks) => {

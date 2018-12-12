@@ -40,7 +40,7 @@ import studentRowHeaderConstants from 'jsx/gradezilla/default_gradebook/constant
 import { darken, statusColors, defaultColors } from 'jsx/gradezilla/default_gradebook/constants/colors';
 import ViewOptionsMenu from 'jsx/gradezilla/default_gradebook/components/ViewOptionsMenu';
 
-import { createGradebook, stubDataLoader } from './default_gradebook/GradebookSpecHelper';
+import { createGradebook, stubDataLoader } from 'jsx/gradezilla/default_gradebook/__tests__/GradebookSpecHelper';
 import { createCourseGradesWithGradingPeriods as createGrades } from '../gradebook/GradeCalculatorSpecHelper';
 
 const $fixtures = document.getElementById('fixtures');

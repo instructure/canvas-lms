@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!gradebook'
 import ReactDOM from 'react-dom'
-import {createGradebook, setFixtureHtml} from '../../GradebookSpecHelper'
+import {createGradebook, setFixtureHtml} from 'jsx/gradezilla/default_gradebook/__tests__/GradebookSpecHelper'
 import CustomColumnHeaderRenderer from 'jsx/gradezilla/default_gradebook/GradebookGrid/headers/CustomColumnHeaderRenderer'
 
 QUnit.module('GradebookGrid CustomColumnHeaderRenderer', suiteHooks => {
