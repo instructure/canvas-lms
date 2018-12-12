@@ -459,8 +459,13 @@ class CommunicationChannel < ActiveRecord::Base
     scope = CommunicationChannel.active.by_path(self.path).of_type(self.path_type)
     merge_candidates = {}
     Shard.with_each_shard(shards) do
-      scope = scope.shard(Shard.current)
-      scope.where("user_id<>?", self.user_id).preload(:user).map(&:user).select do |u|
+      scope = scope.shard(Shard.current).where("user_id<>?", self.user_id)
+
+      limit = Setting.get("merge_candidate_search_limit", "100").to_i
+      ccs = scope.preload(:user).limit(limit + 1).to_a
+      return [] if ccs.count > limit # just bail if things are getting out of hand
+
+      ccs.map(&:user).select do |u|
         result = merge_candidates.fetch(u.global_id) do
           merge_candidates[u.global_id] = (u.all_active_pseudonyms.length != 0)
         end

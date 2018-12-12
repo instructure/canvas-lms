@@ -269,11 +269,16 @@ module SIS
             # find all CCs for this user, and active conflicting CCs for all users
             # unless we're deleting this user, then only find CCs for this user
             if status_is_active
-              ccs = CommunicationChannel.where("workflow_state='active' OR user_id=?", user)
+              cc_scope = CommunicationChannel.where("workflow_state='active' OR user_id=?", user)
             else
-              ccs = user.communication_channels
+              cc_scope = user.communication_channels
             end
-            ccs = ccs.email.by_path(user_row.email).to_a
+            cc_scope = cc_scope.email.by_path(user_row.email)
+            limit = Setting.get("merge_candidate_search_limit", "100").to_i
+            ccs = cc_scope.limit(limit + 1).to_a
+            if ccs.count > limit
+              ccs = cc_scope.where(:user_id => user).to_a # don't bother with merge candidates anymore
+            end
 
             # sis_cc could be set from the previous user, if we're not on a transaction boundary,
             # and the previous user had an sis communication channel, and this user doesn't have one
