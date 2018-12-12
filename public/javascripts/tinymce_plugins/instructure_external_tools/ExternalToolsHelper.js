@@ -151,13 +151,14 @@ export default {
       contentItemDialog.dialog('destroy').remove()
     },
 
-    createDeepLinkingListener: (editor) => {
+    createDeepLinkingListener: (editor, dialogId) => {
       return event => {
         // Only accept messages from the same origin
         if (event.origin === ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN) {
           processContentItemsForEditor(
             event,
-            editor
+            editor,
+            dialogId
           )
         }
       }

@@ -173,7 +173,8 @@ import Links from 'tinymce_plugins/instructure_links/links'
 
       // Handle deep linking responses
       deepLinkingListener = deepLinkingListener || ExternalToolsHelper.createDeepLinkingListener(
-        $dialog.data('editor') || ed
+        $dialog.data('editor') || ed,
+        'external_tool_button_dialog'
       )
       window.removeEventListener("message", deepLinkingListener)
       window.addEventListener("message", deepLinkingListener, false)

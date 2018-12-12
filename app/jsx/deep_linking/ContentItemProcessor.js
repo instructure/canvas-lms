@@ -19,8 +19,9 @@
 import $ from 'jquery'
 import {send} from 'jsx/shared/rce/RceCommandShim'
 import LinkContentItem from './models/LinkContentItem'
+import I18n from 'i18n!external_content.success'
 
-export function processContentItemsForEditor(event, editor) {
+export function processContentItemsForEditor(event, editor, dialogId) {
   const {content_items, msg, log, errormsg, errorlog} = event.data
   new ContentItemProcessor(
     content_items,
@@ -32,7 +33,17 @@ export function processContentItemsForEditor(event, editor) {
       log,
       errorlog
     }
-  ).processContentItemsForEditor(editor)
+  )
+    .processContentItemsForEditor(editor)
+    .finally(() => {
+      // Remove "unsaved changes" warnings and close modal
+      const dialog = $(`#${dialogId}`)
+      dialog.off()
+      dialog.dialog('close')
+    })
+    .catch(() => {
+      $.flashError(I18n.t('Error retrieving content'))
+    })
 }
 
 export default class ContentItemProcessor {
@@ -50,15 +61,15 @@ export default class ContentItemProcessor {
 
   get typeMap() {
     return {
-      'link': LinkContentItem
+      link: LinkContentItem
     }
   }
 
-  processContentItemsForEditor(editor) {
+  async processContentItemsForEditor(editor) {
     this.contentItems.forEach(contentItem => {
       if (Object.keys(this.typeMap).includes(contentItem.type)) {
         const contentItemModel = new this.typeMap[contentItem.type](contentItem)
-        send($(`#${editor.id}`), 'insert_code', contentItemModel.toHtmlString());
+        send($(`#${editor.id}`), 'insert_code', contentItemModel.toHtmlString())
       }
     })
   }

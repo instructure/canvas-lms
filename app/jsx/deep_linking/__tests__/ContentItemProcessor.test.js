@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import ContentItemProcessor from '../ContentItemProcessor'
+import ContentItemProcessor, {processContentItemsForEditor} from '../ContentItemProcessor'
 import {send} from 'jsx/shared/rce/RceCommandShim'
 
 jest.mock('jsx/shared/rce/RceCommandShim', () => ({
