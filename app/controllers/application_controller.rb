@@ -332,6 +332,27 @@ class ApplicationController < ActionController::Base
   end
   helper_method :load_blueprint_courses_ui
 
+  def load_content_notices
+    if @context && @context.respond_to?(:content_notices)
+      notices = @context.content_notices(@current_user)
+      if notices.any?
+        js_env :CONTENT_NOTICES => notices.map { |notice|
+          {
+            tag: notice.tag,
+            variant: notice.variant || 'info',
+            text: notice.text.is_a?(Proc) ? notice.text.call : notice.text,
+            link_text: notice.link_text.is_a?(Proc) ? notice.link_text.call : notice.link_text,
+            link_target: notice.link_target.is_a?(Proc) ? notice.link_target.call(@context) : notice.link_target
+          }
+        }
+        js_bundle :content_notices
+        return true
+      end
+    end
+    false
+  end
+  helper_method :load_content_notices
+
   def editing_restricted?(content, edit_type=:any)
     return false unless content.respond_to?(:editing_restricted?)
     content.editing_restricted?(edit_type)
