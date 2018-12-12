@@ -72,7 +72,7 @@ class PermissionsIndex
     end
 
     def permission_tray_button(permission_name, role_id)
-      ff("##{permission_name}_#{role_id}").last
+      f("[data-ui-testable='Portal'] ##{permission_name}_#{role_id}")
     end
 
     def permission_menu_item(item_name)
@@ -158,8 +158,8 @@ class PermissionsIndex
     end
 
     def disable_tray_permission(permission_name, role_id)
-      permission_tray_button(permission_name, role_id).click()
-      ff('[role="menuitemradio"]')[2].click()
+      permission_tray_button(permission_name, role_id).click
+      permission_menu_item('disable').click
       wait_for_ajaximations
     end
 
@@ -170,9 +170,9 @@ class PermissionsIndex
     end
 
     def add_role(name)
-      add_role_button.click()
+      add_role_button.click
       set_value(add_role_input, name)
-      add_role_submit_button.click()
+      add_role_submit_button.click
       wait_for_ajaximations
     end
 
