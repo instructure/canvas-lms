@@ -98,4 +98,12 @@ export default class GradebookGrid {
       this.grid.setColumns(columnIds.map(columnId => this.gridData.columns.definitions[columnId]))
     }
   }
+
+  updateRowCell(studentId, columnId) {
+    if (this.grid) {
+      const columnIndex = this.columns.getIndexOfColumn(columnId)
+      const rowIndex = this.gridData.rows.findIndex(row => row.id === studentId)
+      this.grid.updateCell(rowIndex, columnIndex)
+    }
+  }
 }

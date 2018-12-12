@@ -78,4 +78,9 @@ export default class Columns {
       events.onColumnsResized.trigger(event, columns)
     })
   }
+
+  getIndexOfColumn(columnId) {
+    const {frozen, scrollable} = this.gradebookGrid.gridData.columns
+    return [...frozen, ...scrollable].indexOf(columnId)
+  }
 }

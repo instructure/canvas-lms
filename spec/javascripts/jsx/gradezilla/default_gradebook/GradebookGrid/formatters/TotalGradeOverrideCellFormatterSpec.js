@@ -53,7 +53,7 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellFormatter', hooks => {
   })
 
   function renderCell() {
-    gradebook.setFinalGradeOverrides(finalGradeOverrides)
+    gradebook.finalGradeOverrides._datastore.setGrades(finalGradeOverrides)
     $fixture.innerHTML = formatter.render(
       0, // row
       0, // cell
@@ -100,7 +100,7 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellFormatter', hooks => {
 
     test('renders "–" (en dash) when the student has no course grade overrides', () => {
       delete finalGradeOverrides[1101].courseGrade
-      gradebook.setFinalGradeOverrides({})
+      gradebook.finalGradeOverrides._datastore.setGrades({})
       equal(getPercentageGrade(), '–')
     })
   })
