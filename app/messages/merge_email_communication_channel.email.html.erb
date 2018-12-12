@@ -1,5 +1,5 @@
 <%
-  current_host = (HostUrl.context_host(asset.merge_candidates.first.pseudonym.account) rescue nil) || HostUrl.default_host
+  current_host = (HostUrl.context_host(asset.merge_candidates(true).first.pseudonym.account) rescue nil) || HostUrl.default_host
   new_host     = (HostUrl.context_host((asset.pseudonym || asset.user.pseudonym).account) rescue nil) || HostUrl.default_host
 %>
 
