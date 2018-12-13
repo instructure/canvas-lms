@@ -18,9 +18,9 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import GradeInput from 'jsx/gradezilla/default_gradebook/GradebookGrid/editors/GradeInput'
+import AssignmentGradeInput from 'jsx/gradezilla/default_gradebook/GradebookGrid/editors/AssignmentGradeInput'
 
-QUnit.module('GradebookGrid GradeInput using CompleteIncompleteGradeInput', suiteHooks => {
+QUnit.module('GradebookGrid AssignmentGradeInput using CompleteIncompleteGradeInput', suiteHooks => {
   let $container
   let props
   let $menuContent
@@ -67,7 +67,7 @@ QUnit.module('GradebookGrid GradeInput using CompleteIncompleteGradeInput', suit
   })
 
   function mountComponent() {
-    wrapper = mount(<GradeInput {...props} />, {attachTo: $container})
+    wrapper = mount(<AssignmentGradeInput {...props} />, {attachTo: $container})
   }
 
   function clickToOpen() {

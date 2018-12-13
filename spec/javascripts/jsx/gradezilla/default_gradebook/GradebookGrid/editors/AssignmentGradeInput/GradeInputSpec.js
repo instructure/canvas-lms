@@ -18,10 +18,10 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import GradeInput from 'jsx/gradezilla/default_gradebook/GradebookGrid/editors/GradeInput'
+import AssignmentGradeInput from 'jsx/gradezilla/default_gradebook/GradebookGrid/editors/AssignmentGradeInput'
 
 /* eslint-disable qunit/no-identical-names */
-QUnit.module('GradebookGrid GradeInput', suiteHooks => {
+QUnit.module('GradebookGrid AssignmentGradeInput', suiteHooks => {
   let $container
   let props
   let wrapper
@@ -55,7 +55,7 @@ QUnit.module('GradebookGrid GradeInput', suiteHooks => {
   })
 
   function mountComponent() {
-    wrapper = mount(<GradeInput {...props} />, {attachTo: $container})
+    wrapper = mount(<AssignmentGradeInput {...props} />, {attachTo: $container})
   }
 
   function getTextInputValue() {

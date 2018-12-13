@@ -46,7 +46,7 @@ function inputComponentFor(enterGradesAs) {
   }
 }
 
-export default class GradeInput extends Component {
+export default class AssignmentGradeInput extends Component {
   static propTypes = {
     assignment: shape({
       pointsPossible: number

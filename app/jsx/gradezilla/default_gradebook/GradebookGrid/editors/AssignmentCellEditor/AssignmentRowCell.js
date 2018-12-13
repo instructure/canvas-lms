@@ -25,7 +25,7 @@ import Text from '@instructure/ui-elements/lib/components/Text'
 import TextInput from '@instructure/ui-forms/lib/components/TextInput'
 import I18n from 'i18n!gradebook'
 
-import GradeInput from '../GradeInput'
+import AssignmentGradeInput from '../AssignmentGradeInput'
 import InvalidGradeIndicator from '../InvalidGradeIndicator'
 
 const themeOverrides = {
@@ -186,7 +186,7 @@ export default class AssignmentRowCell extends Component {
           </div>
 
           <div className="Grid__GradeCell__Content" ref={this.bindContainerRef}>
-            <GradeInput
+            <AssignmentGradeInput
               assignment={this.props.assignment}
               enterGradesAs={this.props.enterGradesAs}
               disabled={this.props.submissionIsUpdating}

@@ -103,21 +103,21 @@ QUnit.module('GradebookGrid AssignmentRowCell', suiteHooks => {
         props.enterGradesAs = 'points'
       })
 
-      test('renders a GradeInput', () => {
+      test('renders a AssignmentGradeInput', () => {
         wrapper = mountComponent()
-        strictEqual(wrapper.find('GradeInput').length, 1)
+        strictEqual(wrapper.find('AssignmentGradeInput').length, 1)
       })
 
       test('sets focus on the grade input', () => {
         wrapper = mountComponent()
-        const node = wrapper.find('GradeInput input').at(0)
+        const node = wrapper.find('AssignmentGradeInput input').at(0)
         strictEqual(node.getDOMNode(), document.activeElement)
       })
 
-      test('disables the GradeInput when the submission is updating', () => {
+      test('disables the AssignmentGradeInput when the submission is updating', () => {
         props.submissionIsUpdating = true
         wrapper = mountComponent()
-        strictEqual(wrapper.find('GradeInput').prop('disabled'), true)
+        strictEqual(wrapper.find('AssignmentGradeInput').prop('disabled'), true)
       })
 
       test('renders end text', () => {
@@ -164,21 +164,21 @@ QUnit.module('GradebookGrid AssignmentRowCell', suiteHooks => {
         props.enterGradesAs = 'percent'
       })
 
-      test('renders a GradeInput', () => {
+      test('renders a AssignmentGradeInput', () => {
         wrapper = mountComponent()
-        strictEqual(wrapper.find('GradeInput').length, 1)
+        strictEqual(wrapper.find('AssignmentGradeInput').length, 1)
       })
 
       test('sets focus on the grade input', () => {
         wrapper = mountComponent()
-        const node = wrapper.find('GradeInput input').at(0)
+        const node = wrapper.find('AssignmentGradeInput input').at(0)
         strictEqual(node.getDOMNode(), document.activeElement)
       })
 
-      test('disables the GradeInput when the submission is updating', () => {
+      test('disables the AssignmentGradeInput when the submission is updating', () => {
         props.submissionIsUpdating = true
         wrapper = mountComponent()
-        strictEqual(wrapper.find('GradeInput').prop('disabled'), true)
+        strictEqual(wrapper.find('AssignmentGradeInput').prop('disabled'), true)
       })
 
       test('renders end text', () => {
@@ -219,21 +219,21 @@ QUnit.module('GradebookGrid AssignmentRowCell', suiteHooks => {
         props.enterGradesAs = 'gradingScheme'
       })
 
-      test('renders a GradeInput', () => {
+      test('renders a AssignmentGradeInput', () => {
         wrapper = mountComponent()
-        strictEqual(wrapper.find('GradeInput').length, 1)
+        strictEqual(wrapper.find('AssignmentGradeInput').length, 1)
       })
 
       test('sets focus on the grade input', () => {
         wrapper = mountComponent()
-        const node = wrapper.find('GradeInput input').at(0)
+        const node = wrapper.find('AssignmentGradeInput input').at(0)
         strictEqual(node.getDOMNode(), document.activeElement)
       })
 
-      test('disables the GradeInput when the submission is updating', () => {
+      test('disables the AssignmentGradeInput when the submission is updating', () => {
         props.submissionIsUpdating = true
         wrapper = mountComponent()
-        strictEqual(wrapper.find('GradeInput').prop('disabled'), true)
+        strictEqual(wrapper.find('AssignmentGradeInput').prop('disabled'), true)
       })
 
       test('does not render end text', () => {
@@ -269,14 +269,14 @@ QUnit.module('GradebookGrid AssignmentRowCell', suiteHooks => {
         props.enterGradesAs = 'passFail'
       })
 
-      test('renders a GradeInput', () => {
+      test('renders a AssignmentGradeInput', () => {
         wrapper = mountComponent()
-        strictEqual(wrapper.find('GradeInput').length, 1)
+        strictEqual(wrapper.find('AssignmentGradeInput').length, 1)
       })
 
       test('sets focus on the button', () => {
         wrapper = mountComponent()
-        const node = wrapper.find('GradeInput button').at(0)
+        const node = wrapper.find('AssignmentGradeInput button').at(0)
         strictEqual(node.getDOMNode(), document.activeElement)
       })
 
@@ -293,7 +293,7 @@ QUnit.module('GradebookGrid AssignmentRowCell', suiteHooks => {
   })
 
   QUnit.module('#handleKeyDown()', () => {
-    QUnit.module('with a GradeInput', hooks => {
+    QUnit.module('with a AssignmentGradeInput', hooks => {
       hooks.beforeEach(() => {
         props.assignment.gradingType = 'points'
       })
@@ -315,7 +315,7 @@ QUnit.module('GradebookGrid AssignmentRowCell', suiteHooks => {
       test('skips SlickGrid default behavior when the input handles the event', () => {
         wrapper = mountComponent()
         wrapper.instance().gradeInput.focus()
-        sinon.stub(wrapper.find('GradeInput').instance(), 'handleKeyDown').returns(false)
+        sinon.stub(wrapper.find('AssignmentGradeInput').instance(), 'handleKeyDown').returns(false)
         const continueHandling = simulateKeyDown(9) // tab within the grade input
         strictEqual(continueHandling, false)
       })
@@ -378,28 +378,28 @@ QUnit.module('GradebookGrid AssignmentRowCell', suiteHooks => {
   })
 
   QUnit.module('#focus()', () => {
-    test('sets focus on the text input, if one exists, for a GradeInput', () => {
+    test('sets focus on the text input, if one exists, for a AssignmentGradeInput', () => {
       props.assignment.gradingType = 'points'
       wrapper = mountComponent()
       wrapper.instance().focus()
-      const input = wrapper.find('GradeInput input')
+      const input = wrapper.find('AssignmentGradeInput input')
       strictEqual(input.at(0).getDOMNode(), document.activeElement)
     })
 
-    test('sets focus on the button for a GradeInput if no text input exists', () => {
+    test('sets focus on the button for a AssignmentGradeInput if no text input exists', () => {
       props.enterGradesAs = 'passFail'
       wrapper = mountComponent()
       wrapper.instance().focus()
-      const button = wrapper.find('GradeInput button')
+      const button = wrapper.find('AssignmentGradeInput button')
       strictEqual(button.at(0).getDOMNode(), document.activeElement)
     })
   })
 
   QUnit.module('#isValueChanged()', () => {
-    test('delegates to the "hasGradeChanged" method for a GradeInput', () => {
+    test('delegates to the "hasGradeChanged" method for a AssignmentGradeInput', () => {
       props.assignment.gradingType = 'points'
       wrapper = mountComponent()
-      sinon.stub(wrapper.find('GradeInput').instance(), 'hasGradeChanged').returns(true)
+      sinon.stub(wrapper.find('AssignmentGradeInput').instance(), 'hasGradeChanged').returns(true)
       strictEqual(wrapper.instance().isValueChanged(), true)
     })
   })
