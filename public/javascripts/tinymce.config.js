@@ -60,18 +60,37 @@ export default class EditorConfig {
    * @return {Hash}
    */
   defaultConfig () {
+    var plugins = 'paste,table,textcolor,directionality,lists';
+    var isStaff = ENV['current_user_roles'].indexOf('teacher') != -1 || ENV['current_user_roles'].indexOf('admin') != -1;
+    if (isStaff) {
+      plugins = 'autolink,media,paste,table,textcolor,link,directionality,lists';
+    }
+    if (isStaff) {
+      var external_plugins = {
+        instructure_image: '/javascripts/tinymce_plugins/instructure_image/plugin.js',
+        instructure_links: '/javascripts/tinymce_plugins/instructure_links/plugin.js',
+        instructure_embed: '/javascripts/tinymce_plugins/instructure_embed/plugin.js',
+        instructure_equation: '/javascripts/tinymce_plugins/instructure_equation/plugin.js',
+        instructure_equella: '/javascripts/tinymce_plugins/instructure_equella/plugin.js',
+        instructure_external_tools: '/javascripts/tinymce_plugins/instructure_external_tools/plugin.js',
+        instructure_record: '/javascripts/tinymce_plugins/instructure_record/plugin.js'
+      }
+    } else {
+      var external_plugins = {
+        instructure_equation: '/javascripts/tinymce_plugins/instructure_equation/plugin.js',
+        instructure_equella: '/javascripts/tinymce_plugins/instructure_equella/plugin.js',
+        instructure_external_tools: '/javascripts/tinymce_plugins/instructure_external_tools/plugin.js',
+        instructure_record: '/javascripts/tinymce_plugins/instructure_record/plugin.js'
+      }
+    }
+
     return {
       selector: `#${this.idAttribute}`,
       toolbar: this.toolbar(),
       theme: 'modern',
       skin: false,
-      plugins: 'paste,table,textcolor,directionality,lists',
-      external_plugins: {
-        instructure_equation: '/javascripts/tinymce_plugins/instructure_equation/plugin.js',
-        instructure_equella: '/javascripts/tinymce_plugins/instructure_equella/plugin.js',
-        instructure_external_tools: '/javascripts/tinymce_plugins/instructure_external_tools/plugin.js',
-        instructure_record: '/javascripts/tinymce_plugins/instructure_record/plugin.js'
-      },
+      plugins: plugins,
+      external_plugins: external_plugins,
       language_load: false,
       convert_urls: false,
       // we add the menubar for a11y purposes but then
