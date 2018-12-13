@@ -35,3 +35,8 @@ formatMessage.setup({
 });
 
 document.documentElement.setAttribute('dir', 'ltr');
+
+// set up mocks for native APIs
+if (!('MutationObserver' in window)) {
+  Object.defineProperty(window, 'MutationObserver', { value: require('mutation-observer') });
+}

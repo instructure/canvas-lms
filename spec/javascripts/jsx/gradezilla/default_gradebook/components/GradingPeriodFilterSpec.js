@@ -43,7 +43,7 @@ QUnit.module('GradingPeriod Filter - subclass functionality', {
 });
 
 test('renders a screenreader-friendly label', function () {
-  strictEqual(this.wrapper.find('ScreenReaderContent').at(1).text(), 'Grading Period Filter');
+  strictEqual(this.wrapper.find('ScreenReaderContent').text(), 'Grading Period Filter');
 });
 
 test('the options are displayed in the same order as they were sent in', function () {

@@ -130,7 +130,7 @@ export default class PermissionsIndex extends Component {
                   label={<ScreenReaderContent>{I18n.t('Search Permissions')}</ScreenReaderContent>}
                   placeholder={I18n.t('Search Permissions')}
                   icon={() => (
-                    <span disabled="true">
+                    <span disabled>
                       <IconSearchLine focusable={false} />
                     </span>
                   )}

@@ -242,7 +242,7 @@ test('disables the add new set button after it is clicked', function () {
     const component = collection.refs.addSetFormButton;
     const button = findRenderedDOMComponentWithTag(component, 'button');
     Simulate.click(button);
-    equal(button.getAttribute('aria-disabled'), 'true');
+    strictEqual(button.getAttribute('disabled'), '');
   });
 });
 

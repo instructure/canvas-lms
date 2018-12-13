@@ -43,7 +43,7 @@ QUnit.module('Module Filter - subclass functionality', {
 });
 
 test('renders a screenreader-friendly label', function () {
-  strictEqual(this.wrapper.find('ScreenReaderContent').at(1).text(), 'Module Filter');
+  strictEqual(this.wrapper.find('ScreenReaderContent').text(), 'Module Filter');
 });
 
 test('the options are displayed in the same order as they were sent in', function () {

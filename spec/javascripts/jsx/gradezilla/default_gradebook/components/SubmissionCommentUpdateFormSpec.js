@@ -36,6 +36,14 @@ QUnit.module('SubmissionCommentUpdateForm', function (hooks) {
     return wrapper.find('button').at(1);
   }
 
+  function cancelButtonComponent () {
+    return wrapper.find('Button').at(0);
+  }
+
+  function submitButtonComponent () {
+    return wrapper.find('Button').at(1);
+  }
+
   hooks.beforeEach(function () {
     props = {
       cancelCommenting () {},
@@ -92,74 +100,74 @@ QUnit.module('SubmissionCommentUpdateForm', function (hooks) {
 
   test('"Submit" button is disabled if the current comment is the same as the comment prop passed in', function () {
     wrapper = mountComponent();
-    strictEqual(submitButton().prop('aria-disabled'), 'true');
+    strictEqual(submitButtonComponent().prop('disabled'), true);
   });
 
   test('"Cancel" button is enabled if the current comment is the same as the comment prop passed in', function () {
     wrapper = mountComponent();
-    strictEqual(cancelButton().prop('aria-disabled'), null);
+    strictEqual(cancelButtonComponent().prop('disabled'), false);
   });
 
   test('"Submit" button is disabled if the current comment after trimming is the same as the comment prop passed', function () {
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: '    A comment    ' } });
-    strictEqual(submitButton().prop('aria-disabled'), 'true');
+    strictEqual(submitButtonComponent().prop('disabled'), true);
   });
 
   test('"Cancel" button is enabled if the current comment after trimming is the same as the comment prop passed', function () {
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: '    A comment    ' } });
-    strictEqual(cancelButton().prop('aria-disabled'), null);
+    strictEqual(cancelButtonComponent().prop('disabled'), false);
   });
 
   test('"Submit" button is disabled if the all the content in the comment is removed', function () {
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: '' } });
-    strictEqual(submitButton().prop('aria-disabled'), 'true');
+    strictEqual(submitButtonComponent().prop('disabled'), true);
   });
 
   test('"Cancel" button is enabled if the all the content in the comment is removed', function () {
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: '' } });
-    strictEqual(cancelButton().prop('aria-disabled'), null);
+    strictEqual(cancelButtonComponent().prop('disabled'), false);
   });
 
   test('"Submit" button is disabled if the all the content in the comment is removed except for spaces', function () {
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: '     ' } });
-    strictEqual(submitButton().prop('aria-disabled'), 'true');
+    strictEqual(submitButtonComponent().prop('disabled'), true);
   });
 
   test('"Cancel" button is enabled if the all the content in the comment is removed except for spaces', function () {
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: '     ' } });
-    strictEqual(cancelButton().prop('aria-disabled'), null);
+    strictEqual(cancelButtonComponent().prop('disabled'), false);
   });
 
   test('"Submit" button is disabled while processing', function () {
     props.processing = true;
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: 'A changed comment' } });
-    strictEqual(submitButton().prop('aria-disabled'), 'true');
+    strictEqual(submitButtonComponent().prop('disabled'), true);
   });
 
   test('"Cancel" button is disabled while processing', function () {
     props.processing = true;
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: 'A changed comment' } });
-    strictEqual(cancelButton().prop('aria-disabled'), 'true');
+    strictEqual(cancelButtonComponent().prop('disabled'), true);
   });
 
   test('"Submit" button is enabled if the comment is changed and is not empty', function () {
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: 'A changed comment' } });
-    strictEqual(submitButton().prop('aria-disabled'), null);
+    strictEqual(submitButtonComponent().prop('disabled'), false);
   });
 
   test('"Cancel" button is enabled if the comment is changed and is not empty', function () {
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: 'A changed comment' } });
-    strictEqual(cancelButton().prop('aria-disabled'), null);
+    strictEqual(cancelButtonComponent().prop('disabled'), false);
   });
 
   test('"Submit" button has the text "Submit"', function () {

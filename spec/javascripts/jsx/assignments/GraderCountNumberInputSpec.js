@@ -29,7 +29,7 @@ QUnit.module('GraderCountNumberInput', hooks => {
   }
 
   function numberInput() {
-    return numberInputContainer().find('input[name="grader_count"]')
+    return numberInputContainer().find('.ModeratedGrading__GraderCountInputContainer input')
   }
 
   function mountComponent() {

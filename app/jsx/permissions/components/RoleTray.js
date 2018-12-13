@@ -438,7 +438,6 @@ export default class RoleTray extends Component {
         <TextInput
           label={I18n.t('Role Name')}
           name="edit_name_box"
-          defaultValue={this.props.label}
           value={this.state.editRoleLabelInput}
           messages={this.state.editRoleLabelErrorMessages}
           onBlur={this.updateRole}
@@ -447,10 +446,10 @@ export default class RoleTray extends Component {
       </Container>
 
       {/*
-        * this is not currently possible due to limitations in the api. once we
-        * update the API we should be able to uncomment this, update our apiClient,
-        * and have everything just work :fingers-crossed:
-        */}
+       * this is not currently possible due to limitations in the api. once we
+       * update the API we should be able to uncomment this, update our apiClient,
+       * and have everything just work :fingers-crossed:
+       */}
       {false && this.renderBaseRoleSelector()}
     </div>
   )
@@ -517,7 +516,7 @@ function mapStateToProps(state, ownProps) {
   }, [])
 
   const allRoleLabels = state.roles.reduce((obj, r) => {
-    obj[r.label] = true  // eslint-disable-line
+    obj[r.label] = true
     return obj
   }, {})
 

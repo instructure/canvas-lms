@@ -113,7 +113,8 @@ describe('expand and contract', () => {
     })
   })
 
-  it('contracts child outcomes when a group is contracted', (done) => {
+  // OUT-2927: Skipped because it is regularly timing out on jenkins, but not locally
+  it.skip('contracts child outcomes when a group is contracted', (done) => {
     const wrapper = mount(<IndividualStudentMastery {...props} />)
     setTimeout(() => {
       wrapper.setState({ expandedGroups: Set.of(1), expandedOutcomes: Set.of(100) }, () => {

@@ -54,7 +54,7 @@ class AssignmentCreateEditPage
     end
 
     def grader_count_input
-      f("input[name='grader_count']")
+      f(".ModeratedGrading__GraderCountInputContainer input")
     end
 
     def moderate_checkbox

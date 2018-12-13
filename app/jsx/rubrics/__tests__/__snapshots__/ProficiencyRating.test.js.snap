@@ -133,6 +133,7 @@ exports[`renders the ProficiencyRating component 1`] = `
       shouldCloseOnDocumentClick={true}
       shouldCloseOnEscape={true}
       shouldContainFocus={false}
+      shouldFocusContentOnTriggerBlur={false}
       shouldRenderOffscreen={false}
       shouldReturnFocus={true}
       show={false}

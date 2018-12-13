@@ -140,12 +140,16 @@ QUnit.module('SubmissionTray', function (hooks) {
     return document.querySelector('#SubmissionTray__RadioInputGroup');
   }
 
+  function assertElementDisabled($elt, disabled, message) {
+    strictEqual($elt.getAttribute('disabled'), disabled ? '' : null, message)
+  }
+
   QUnit.module('Student Carousel', function () {
     function assertStudentButtonsDisabled(disabled) {
       ['Previous student', 'Next student'].forEach(label => {
         const $button = carouselButton(label)
         const message = `'${label}' button is ${disabled ? '' : 'not '} disabled`
-        strictEqual($button.getAttribute('aria-disabled'), disabled ? 'true' : null, message)
+        assertElementDisabled($button, disabled, message)
       })
     }
 
@@ -185,7 +189,7 @@ QUnit.module('SubmissionTray', function (hooks) {
       ['Previous assignment', 'Next assignment'].forEach(label => {
         const $button = carouselButton(label)
         const message = `'${label}' button is ${disabled ? '' : 'not '} disabled`
-        strictEqual($button.getAttribute('aria-disabled'), disabled ? 'true' : null, message)
+        assertElementDisabled($button, disabled, message)
       })
     }
 
@@ -351,7 +355,7 @@ QUnit.module('SubmissionTray', function (hooks) {
     mountComponent({ gradingDisabled: false });
     const $inputs = content.querySelectorAll('[name="SubmissionTrayRadioInput"]');
     $inputs.forEach($input => {
-      strictEqual($input.getAttribute('aria-disabled'), null);
+      assertElementDisabled($input, false)
     })
   });
 
@@ -359,7 +363,7 @@ QUnit.module('SubmissionTray', function (hooks) {
     mountComponent({ gradingDisabled: true });
     const $inputs = content.querySelectorAll('[name="SubmissionTrayRadioInput"]');
     $inputs.forEach($input => {
-      strictEqual($input.getAttribute('aria-disabled'), 'true');
+      assertElementDisabled($input, true)
     })
   });
 
@@ -510,13 +514,13 @@ QUnit.module('SubmissionTray', function (hooks) {
     test('is disabled when grading is disabled', function () {
       mountComponent({ gradingDisabled: true });
       const $input = content.querySelector('#grade-detail-tray--grade-input')
-      strictEqual($input.getAttribute('aria-disabled'), 'true');
+      assertElementDisabled($input, true)
     });
 
     test('is not disabled when grading is not disabled', function () {
       mountComponent({ gradingDisabled: false });
       const $input = content.querySelector('#grade-detail-tray--grade-input')
-      strictEqual($input.getAttribute('aria-disabled'), null);
+      assertElementDisabled($input, false)
     });
 
     test('receives the "onGradeSubmission" callback given to the Tray', function () {
@@ -540,7 +544,7 @@ QUnit.module('SubmissionTray', function (hooks) {
     test('receives the "submissionUpdating" given to the Tray', function () {
       mountComponent({ submissionUpdating: true });
       const $input = content.querySelector('#grade-detail-tray--grade-input')
-      strictEqual($input.getAttribute('aria-disabled'), 'true');
+      assertElementDisabled($input, true)
     });
 
     test('receives the "enterGradesAs" given to the Tray', function () {

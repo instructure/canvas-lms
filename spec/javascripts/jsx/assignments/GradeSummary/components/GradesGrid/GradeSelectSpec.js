@@ -521,14 +521,12 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
 
     test('enables the input when grade selection was successful', () => {
       wrapper.setProps({selectProvisionalGradeStatus: SUCCESS})
-      const input = wrapper.find('input[type="text"]')
-      strictEqual(input.prop('aria-disabled'), null)
+      strictEqual(wrapper.find('Select').prop('editable'), true)
     })
 
     test('enables the input when grade selection has failed', () => {
       wrapper.setProps({selectProvisionalGradeStatus: FAILURE})
-      const input = wrapper.find('input[type="text"]')
-      strictEqual(input.prop('aria-disabled'), null)
+      strictEqual(wrapper.find('Select').prop('editable'), true)
     })
   })
 

@@ -71,7 +71,7 @@ class AssignmentConfigurationTools extends React.Component {
       url: toolsUrl,
       data,
       success: $.proxy(function(data) {
-        let prevToolLaunch;
+        let prevToolLaunch
         if (this.props.selectedTool && this.props.selectedToolType) {
           for (let i = 0; i < data.length; i++) {
             if (
@@ -83,6 +83,7 @@ class AssignmentConfigurationTools extends React.Component {
             }
           }
         }
+        const currentToolType = this.state.toolType
         this.setState({
           tools: data,
           toolType: this.props.selectedToolType || '',
@@ -90,12 +91,12 @@ class AssignmentConfigurationTools extends React.Component {
         })
       }, self),
       error(xhr) {
-        $.flashError(I18n.t('Error retrieving similarity detection tools'));
+        $.flashError(I18n.t('Error retrieving similarity detection tools'))
       }
     })
   }
 
-  getDefinitionsUrl = () => `/api/v1/courses/${this.props.courseId}/lti_apps/launch_definitions`;
+  getDefinitionsUrl = () => `/api/v1/courses/${this.props.courseId}/lti_apps/launch_definitions`
 
   getLaunch = tool => {
     const url = tool.placements.similarity_detection.url
@@ -161,40 +162,40 @@ class AssignmentConfigurationTools extends React.Component {
   }
 
   renderOptions = () => (
-      <select
-        id="similarity_detection_tool"
-        name="similarityDetectionTool"
-        onChange={this.handleSelectionChange}
-        ref={(c) => { this.similarityDetectionTool = c; }}
-        value={this.state.selectedToolValue}
-      >
-        <option title="Plagiarism Review Tool" data-launch="about:blank" data-type="none">
-          None
+    <select
+      id="similarity_detection_tool"
+      name="similarityDetectionTool"
+      onChange={this.handleSelectionChange}
+      ref={c => {
+        this.similarityDetectionTool = c
+      }}
+      value={this.state.selectedToolValue}
+    >
+      <option title="Plagiarism Review Tool" data-launch="about:blank" data-type="none">
+        None
+      </option>
+      {this.state.tools.map(tool => (
+        <option
+          title="Plagiarism Review Tool"
+          key={`${tool.definition_type}_${tool.definition_id}`}
+          value={`${tool.definition_type}_${tool.definition_id}`}
+          data-launch={this.getLaunch(tool)}
+          data-type={tool.definition_type}
+        >
+          {tool.name}
         </option>
-        {
-          this.state.tools.map(tool => (
-            <option
-              title="Plagiarism Review Tool"
-              key={`${tool.definition_type}_${tool.definition_id}`}
-              value={`${tool.definition_type}_${tool.definition_id}`}
-              data-launch={this.getLaunch(tool)}
-              data-type={tool.definition_type}
-            >
-              {tool.name}
-            </option>
-          ))
-        }
-      </select>
-    );
+      ))}
+    </select>
+  )
 
   renderToolType = () => (
-      <input
-        type="hidden"
-        id="configuration-tool-type"
-        name="configuration_tool_type"
-        value={this.state.toolType}
-      />
-    );
+    <input
+      type="hidden"
+      id="configuration-tool-type"
+      name="configuration_tool_type"
+      value={this.state.toolType}
+    />
+  )
 
   renderConfigTool = () => {
     const beforeAlertStyles = `before_external_content_info_alert ${

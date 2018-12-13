@@ -24,10 +24,6 @@ QUnit.module('SelectMenuGroup', function (suiteHooks) {
   let props;
   let wrapper;
 
-  function mountComponent () {
-    return mount(<SelectMenuGroup {...props} />);
-  }
-
   suiteHooks.beforeEach(function () {
     const assignmentSortOptions = [
       ['Assignment Group', 'assignment_group'],
@@ -172,23 +168,22 @@ QUnit.module('SelectMenuGroup', function (suiteHooks) {
 
   test('disables the submit button if no select menu options have changed', function () {
     wrapper = mount(<SelectMenuGroup {...props} />);
-    const submitButton = wrapper.find('#apply_select_menus').last().instance();
-    strictEqual(submitButton.getAttribute('aria-disabled'), 'true');
+    const submitButton = wrapper.find('Button[id="apply_select_menus"]')
+    strictEqual(submitButton.prop('disabled'), true);
   });
 
   test('enables the submit button if a select menu options is changed', function () {
     wrapper = mount(<SelectMenuGroup {...props} />);
     wrapper.find('#student_select_menu').last().simulate('change', { target: { value: '7' } });
-    const submitButton = wrapper.find('#apply_select_menus').last().instance();
-    strictEqual(submitButton.getAttribute('aria-disabled'), null);
+    const submitButton = wrapper.find('Button[id="apply_select_menus"]')
+    strictEqual(submitButton.prop('disabled'), false);
   });
 
   test('disables the submit button after it is clicked', function () {
     wrapper = mount(<SelectMenuGroup {...props} />)
     wrapper.find('#student_select_menu').last().simulate('change', { target: { value: '7' } });
-    const submitButton = wrapper.find('#apply_select_menus').last();
-    submitButton.simulate('click');
-    strictEqual(submitButton.instance().getAttribute('aria-disabled'), 'true');
+    wrapper.find('Button[id="apply_select_menus"]').find('button').simulate('click');
+    strictEqual(wrapper.find('Button[id="apply_select_menus"]').prop('disabled'), true);
   });
 
   test('calls saveAssignmentOrder when the button is clicked, if assignment order has changed', function () {

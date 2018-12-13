@@ -36,6 +36,14 @@ QUnit.module('SubmissionCommentCreateForm', function (hooks) {
     return wrapper.find('button').at(1);
   }
 
+  function cancelButtonComponent () {
+    return wrapper.find('Button').at(0);
+  }
+
+  function submitButtonComponent () {
+    return wrapper.find('Button').at(1);
+  }
+
   hooks.beforeEach(function () {
     props = {
       cancelCommenting () {},
@@ -86,13 +94,13 @@ QUnit.module('SubmissionCommentCreateForm', function (hooks) {
   test('"Submit" button is not disabled', function () {
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: 'some message' } });
-    strictEqual(submitButton().prop('aria-disabled'), null);
+    strictEqual(submitButtonComponent().prop('disabled'), false);
   });
 
   test('"Cancel" button is not disabled', function () {
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: 'some message' } });
-    strictEqual(cancelButton().prop('aria-disabled'), null);
+    strictEqual(cancelButtonComponent().prop('disabled'), false);
   });
 
   test('"Submit" button has the text "Submit"', function () {
@@ -146,7 +154,7 @@ QUnit.module('SubmissionCommentCreateForm', function (hooks) {
     props.processing = true;
     wrapper = mountComponent();
     wrapper.find('textarea').simulate('change', { target: { value: 'some message' } });
-    strictEqual(submitButton().prop('aria-disabled'), 'true');
+    strictEqual(submitButtonComponent().prop('disabled'), true);
   });
 
   test('"Submit" button label reads "Submit Comment"', function () {

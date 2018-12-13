@@ -23,7 +23,7 @@ module Gradezilla
 
     def self.tab(label:)
       # only works if not currently active
-      ff('[data-ui-testable="TabList"] > [role="presentation"]').find do |el|
+      ff('[data-uid="Tab"][role="presentation"]').find do |el|
         el.text == label
       end
     end

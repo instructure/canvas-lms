@@ -53,8 +53,7 @@ describe 'New Gradebook' do
 
     it 'score cell disabled in grade detail tray', priority: '1', test_id: 3500571 do
       Gradezilla::Cells.open_tray(@student1, @anonymous_assignment)
-
-      expect(Gradezilla::GradeDetailTray.grade_input).to have_attribute('aria-disabled', 'true')
+      expect(Gradezilla::GradeDetailTray.grade_input).to have_attribute('disabled', 'true')
     end
 
     it 'existing assignment is muted when anonymous-grading is enabled', priority: '1', test_id: 3500572 do

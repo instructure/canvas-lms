@@ -46,7 +46,7 @@ function numberInputContainer () {
 }
 
 function numberInput () {
-  return numberInputContainer().find('input')
+  return numberInputContainer().find(NumberInput)
 }
 
 function numberInputDescription () {
@@ -230,14 +230,14 @@ QUnit.module('SubmissionTrayRadioInput', function (hooks) {
 
       test('calls updateSubmission if the parsed value (2 decimals) differs from the current value', function () {
         wrapper = mountComponent({ value: 'late', checked: true, updateSubmission })
-        const input = numberInput()
+        const input = numberInput().find('input')
         input.simulate('blur', { target: { value: '2' } })
         strictEqual(updateSubmission.callCount, 1)
       })
 
       test('calls updateSubmission with latePolicyStatus set to "late"', function () {
         wrapper = mountComponent({ value: 'late', checked: true, updateSubmission })
-        const input = numberInput()
+        const input = numberInput().find('input')
         input.simulate('blur', { target: { value: '2' } })
         strictEqual(updateSubmission.getCall(0).args[0].latePolicyStatus, 'late')
       })
@@ -249,7 +249,7 @@ QUnit.module('SubmissionTrayRadioInput', function (hooks) {
           value: 'late'
         })
 
-        const input = numberInput()
+        const input = numberInput().find('input')
         input.simulate('blur', { target: { value: '2' } })
         const expectedSeconds = 2 * 3600
         strictEqual(updateSubmission.getCall(0).args[0].secondsLateOverride, expectedSeconds)
@@ -257,7 +257,7 @@ QUnit.module('SubmissionTrayRadioInput', function (hooks) {
 
       test('interval is day: calls updateSubmission with the input converted to seconds', function () {
         wrapper = mountComponent({ value: 'late', checked: true, updateSubmission })
-        const input = numberInput()
+        const input = numberInput().find('input')
         input.simulate('blur', { target: { value: '2' } })
         const expectedSeconds = 2 * 86400
         strictEqual(updateSubmission.getCall(0).args[0].secondsLateOverride, expectedSeconds)
@@ -265,7 +265,7 @@ QUnit.module('SubmissionTrayRadioInput', function (hooks) {
 
       test('truncates the remainder if one exists', function () {
         wrapper = mountComponent({ value: 'late', checked: true, updateSubmission })
-        const input = numberInput()
+        const input = numberInput().find('input')
         input.simulate('blur', { target: { value: '2.3737' } })
         const expectedSeconds = Math.trunc(2.3737 * 86400)
         strictEqual(updateSubmission.getCall(0).args[0].secondsLateOverride, expectedSeconds)

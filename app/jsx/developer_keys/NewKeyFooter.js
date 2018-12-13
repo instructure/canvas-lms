@@ -40,4 +40,6 @@ NewKeyFooter.propTypes = {
   disable: PropTypes.bool
 }
 
+NewKeyFooter.displayName = "NewKeyFooter"
+
 export default NewKeyFooter

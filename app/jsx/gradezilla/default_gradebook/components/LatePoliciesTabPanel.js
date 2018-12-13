@@ -220,13 +220,14 @@ class LatePoliciesTabPanel extends React.Component {
       );
     }
 
-    const { data, validationErrors } = this.props.latePolicy;
+    const { validationErrors } = this.props.latePolicy;
+    const data = {...this.props.latePolicy.data, ...this.props.latePolicy.changes}
     return (
       <div id="LatePoliciesTabPanel__Container">
         <View as="div" margin="small">
           <Checkbox
             label={I18n.t('Automatically apply grade for missing submissions')}
-            defaultChecked={data.missingSubmissionDeductionEnabled}
+            checked={data.missingSubmissionDeductionEnabled}
             onChange={this.changeMissingSubmissionDeductionEnabled}
             ref={(c) => { this.missingSubmissionCheckbox = c; }}
           />
@@ -249,7 +250,7 @@ class LatePoliciesTabPanel extends React.Component {
                       inputRef={(m) => { this.missingSubmissionDeductionInput = m; }}
                       label={I18n.t('Grade percentage for missing submissions')}
                       disabled={!this.getLatePolicyAttribute('missingSubmissionDeductionEnabled')}
-                      defaultValue={markMissingSubmissionsDefaultValue(data.missingSubmissionDeduction)}
+                      value={markMissingSubmissionsDefaultValue(data.missingSubmissionDeduction)}
                       onChange={(_e, val)  => this.validateAndChangeNumber('missingSubmissionDeduction', val)}
                       min="0"
                       max="100"
@@ -307,7 +308,7 @@ class LatePoliciesTabPanel extends React.Component {
                       locale={this.props.locale}
                       inputRef={(l) => { this.lateSubmissionDeductionInput = l; }}
                       label={I18n.t('Late submission deduction percent')}
-                      defaultValue={data.lateSubmissionDeduction.toString()}
+                      value={data.lateSubmissionDeduction.toString()}
                       disabled={!this.getLatePolicyAttribute('lateSubmissionDeductionEnabled')}
                       onChange={(_e, val) => this.validateAndChangeNumber('lateSubmissionDeduction', val)}
                       min="0"
@@ -328,7 +329,7 @@ class LatePoliciesTabPanel extends React.Component {
                       id="late-submission-interval"
                       disabled={!this.getLatePolicyAttribute('lateSubmissionDeductionEnabled')}
                       label={I18n.t('Late submission deduction interval')}
-                      defaultValue={data.lateSubmissionInterval}
+                      value={data.lateSubmissionInterval}
                       onChange={this.changeLateSubmissionInterval}
                     >
                       <option value="day">{I18n.t('Day')}</option>
@@ -345,7 +346,7 @@ class LatePoliciesTabPanel extends React.Component {
                       locale={this.props.locale}
                       inputRef={(l) => { this.lateSubmissionMinimumPercentInput = l; }}
                       label={I18n.t('Lowest possible grade percent')}
-                      defaultValue={data.lateSubmissionMinimumPercent.toString()}
+                      value={data.lateSubmissionMinimumPercent.toString()}
                       disabled={!this.getLatePolicyAttribute('lateSubmissionDeductionEnabled')}
                       onChange={(_e, val) => this.validateAndChangeNumber('lateSubmissionMinimumPercent', val)}
                       min="0"

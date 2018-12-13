@@ -18,13 +18,11 @@
 
 import { equal, ok } from "assert";
 import sinon from "sinon";
-import jsdom from "mocha-jsdom";
 import indicate from "../../src/common/indicate";
 
 describe("indicate function", () => {
   let clock, region, margin, indicator;
 
-  jsdom();
 
   beforeEach(() => {
     clock = sinon.useFakeTimers();

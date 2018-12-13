@@ -72,7 +72,7 @@ class PermissionsIndex
     end
 
     def permission_tray_button(permission_name, role_id)
-      f("[data-ui-testable='Portal'] ##{permission_name}_#{role_id}")
+      f("##{permission_name}_#{role_id}")
     end
 
     def permission_menu_item(item_name)

@@ -68,7 +68,7 @@ QUnit.module('ModeratedGradingFormFieldGroup', hooks => {
 
   test('includes a grader count input in the moderated grading content', () => {
     mountComponent()
-    const graderCountInput = content().find('input[name="grader_count"]')
+    const graderCountInput = content().find('.ModeratedGrading__GraderCountInputContainer input')
     strictEqual(graderCountInput.length, 1)
   })
 

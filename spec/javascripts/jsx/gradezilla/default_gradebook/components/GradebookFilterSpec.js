@@ -54,7 +54,7 @@ test('disables the underlying select component if specified by props', function 
 });
 
 test('renders a screenreader-friendly label', function () {
-  strictEqual(this.wrapper.find('ScreenReaderContent').at(1).text(), 'Item Filter');
+  strictEqual(this.wrapper.find('ScreenReaderContent').text(), 'Item Filter');
 });
 
 test('the Select component has three options', function () {

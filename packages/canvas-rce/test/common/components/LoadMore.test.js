@@ -22,7 +22,6 @@ import ReactDOM from "react-dom";
 import LoadMore, { styles } from "../../../src/common/components/LoadMore";
 import sd from "skin-deep";
 import sinon from "sinon";
-import jsdom from "mocha-jsdom";
 import { css } from "aphrodite";
 
 describe("LoadMore", () => {
@@ -30,7 +29,6 @@ describe("LoadMore", () => {
 
   describe.skip("focus handling", () => {
     let elem, props;
-    jsdom();
 
     function renderChildren(items) {
       return (
