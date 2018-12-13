@@ -1904,6 +1904,8 @@ class Attachment < ActiveRecord::Base
        self.context.respond_to?(:feature_enabled?) &&
        self.context.feature_enabled?(:usage_rights_required)
       self.locked = self.usage_rights.nil?
+    else
+      self.locked = false
     end
   end
 
