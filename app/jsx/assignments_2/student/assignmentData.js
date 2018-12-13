@@ -54,6 +54,7 @@ export const STUDENT_VIEW_QUERY = gql`
         name
         pointsPossible
         unlockAt
+        gradingType
         assignmentGroup {
           name
         }
@@ -89,6 +90,7 @@ export const StudentAssignmentShape = shape({
   name: string.isRequired,
   pointsPossible: number.isRequired,
   unlockAt: string,
+  gradingType: string,
   assignmentGroup: shape({
     name: string.isRequired
   }).isRequired,
