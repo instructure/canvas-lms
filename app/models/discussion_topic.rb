@@ -96,6 +96,7 @@ class DiscussionTopic < ActiveRecord::Base
   after_save :touch_context
   after_save :schedule_delayed_transitions
   after_save :update_materialized_view_if_changed
+  after_save :recalculate_progressions_if_sections_changed
   after_update :clear_streams_if_not_published
   after_create :create_participant
   after_create :create_materialized_view
@@ -193,6 +194,17 @@ class DiscussionTopic < ActiveRecord::Base
   def update_materialized_view_if_changed
     if self.saved_change_to_sort_by_rating?
       update_materialized_view
+    end
+  end
+
+  attr_writer :sections_changed
+  def recalculate_progressions_if_sections_changed
+    # either changed sections or undid section specificness
+    return unless self.is_section_specific? ? @sections_changed : self.is_section_specific_before_last_save
+    self.class.connection.after_transaction_commit do
+      if self.context_module_tags.preload(:context_module).exists?
+        self.context_module_tags.map(&:context_module).uniq.each(&:invalidate_progressions)
+      end
     end
   end
 
