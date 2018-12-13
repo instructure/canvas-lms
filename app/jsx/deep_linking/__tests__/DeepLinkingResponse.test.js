@@ -28,7 +28,8 @@ const env = {
   log: 'log',
   error_message: 'error message',
   error_log: "error log",
-  DEEP_LINKING_POST_MESSAGE_ORIGIN: '*'
+  DEEP_LINKING_POST_MESSAGE_ORIGIN: '*',
+  lti_endpoint: 'https://www.test.com/retrieve'
 }
 let oldEnv = {}
 
@@ -84,5 +85,9 @@ describe('post message', () => {
 
   it('sends the correct error log', () => {
     expect(messageData().errorlog).toEqual(env.error_log)
+  })
+
+  it('sends the correct ltiEndpiont', () => {
+    expect(messageData().ltiEndpoint).toEqual('https://www.test.com/retrieve')
   })
 })

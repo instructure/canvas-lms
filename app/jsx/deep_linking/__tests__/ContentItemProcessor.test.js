@@ -31,9 +31,15 @@ describe('processContentItemsForEditor', () => {
     title: 'link title',
     text: 'link text'
   }
-  const invalidContentItem = { type: 'banana' }
-  const contentItems = [linkContentItem, invalidContentItem]
-  const editor = { id: 'editor_id' }
+  const resourceLinkContentItem = {
+    type: 'ltiResourceLink',
+    url: 'http://www.test.com',
+    title: 'link title',
+    text: 'link text'
+  }
+  const invalidContentItem = {type: 'banana'}
+  const contentItems = [linkContentItem, invalidContentItem, resourceLinkContentItem]
+  const editor = {id: 'editor_id'}
 
   beforeEach(() => {
     send.mockClear()
@@ -41,9 +47,15 @@ describe('processContentItemsForEditor', () => {
     processor.processContentItemsForEditor(editor)
   })
 
-  it('creates content for the valid content item', () => {
+  it('creates content for a link content item', () => {
     expect(send.mock.calls[0][2]).toEqual(
       '<a href="http://www.test.com" title="link title">link text</a>'
+    )
+  })
+
+  it('creates content for an LTI ResourceLink content itme', () => {
+    expect(send.mock.calls[1][2]).toEqual(
+      '<a href="undefined?display=borderless&amp;url=http%3A%2F%2Fwww.test.com" title="link title">link text</a>'
     )
   })
 })

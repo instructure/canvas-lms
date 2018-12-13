@@ -19,10 +19,11 @@
 import $ from 'jquery'
 import {send} from 'jsx/shared/rce/RceCommandShim'
 import LinkContentItem from './models/LinkContentItem'
+import ResourceLinkContentItem from './models/ResourceLinkContentItem'
 import I18n from 'i18n!external_content.success'
 
 export function processContentItemsForEditor(event, editor, dialogId) {
-  const {content_items, msg, log, errormsg, errorlog} = event.data
+  const {content_items, msg, log, errormsg, errorlog, ltiEndpoint} = event.data
   new ContentItemProcessor(
     content_items,
     {
@@ -32,7 +33,8 @@ export function processContentItemsForEditor(event, editor, dialogId) {
     {
       log,
       errorlog
-    }
+    },
+    ltiEndpoint
   )
     .processContentItemsForEditor(editor)
     .finally(() => {
@@ -47,10 +49,11 @@ export function processContentItemsForEditor(event, editor, dialogId) {
 }
 
 export default class ContentItemProcessor {
-  constructor(contentItems, messages, logs) {
+  constructor(contentItems, messages, logs, ltiEndpoint) {
     this.contentItems = contentItems
     this.messages = messages
     this.logs = logs
+    this.ltiEndpoint = ltiEndpoint
     this.showMessages()
     this.showLogs()
   }
@@ -61,14 +64,18 @@ export default class ContentItemProcessor {
 
   get typeMap() {
     return {
-      link: LinkContentItem
+      link: LinkContentItem,
+      ltiResourceLink: ResourceLinkContentItem
     }
   }
 
   async processContentItemsForEditor(editor) {
     this.contentItems.forEach(contentItem => {
       if (Object.keys(this.typeMap).includes(contentItem.type)) {
-        const contentItemModel = new this.typeMap[contentItem.type](contentItem)
+        const contentItemModel = new this.typeMap[contentItem.type](
+          contentItem,
+          this.ltiEndpoint
+        )
         send($(`#${editor.id}`), 'insert_code', contentItemModel.toHtmlString())
       }
     })

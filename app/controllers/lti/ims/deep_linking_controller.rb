@@ -34,7 +34,8 @@ module Lti
           message: messaging_value('msg'),
           log: messaging_value('log'),
           error_message: messaging_value('errormsg'),
-          error_log: messaging_value('errorlog')
+          error_log: messaging_value('errorlog'),
+          lti_endpoint: polymorphic_url([:retrieve, @context, :external_tools])
         }.compact)
 
         render layout: 'bare'

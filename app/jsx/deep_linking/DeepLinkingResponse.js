@@ -34,7 +34,8 @@ export class RetrievingContent extends React.Component {
       msg: ENV.message,
       log: ENV.log,
       errormsg: ENV.error_message,
-      errorlog: ENV.error_log
+      errorlog: ENV.error_log,
+      ltiEndpoint: ENV.lti_endpoint
     }, ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN)
   }
 

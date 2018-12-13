@@ -36,7 +36,11 @@ module Lti
             message: message,
             log: log,
             error_message: error_message,
-            error_log: error_log
+            error_log: error_log,
+            lti_endpoint: Rails.application.routes.url_helpers.polymorphic_url(
+              [:retrieve, account, :external_tools],
+              host: 'test.host'
+            )
           )
           subject
         end
