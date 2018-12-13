@@ -21,26 +21,32 @@ import SelectContent from '../select_content'
 describe('isContentMessage',() => {
   it('returns true if placements includes "resource_selection"', () => {
     expect(
-      SelectContent.isContentMessage('', {resource_selection: {}})
+      SelectContent.isContentMessage({message_type: ''}, {resource_selection: {}})
     ).toBeTruthy()
   })
 
   it('returns true if message type includes "ContentItemSelectionRequest"', () => {
     expect(
-      SelectContent.isContentMessage('ContentItemSelectionRequest')
+      SelectContent.isContentMessage({message_type: 'ContentItemSelectionRequest'})
     ).toBeTruthy()
   })
 
   it('returns true if message type includes "LtiDeepLinkingRequest"', () => {
     expect(
-      SelectContent.isContentMessage('LtiDeepLinkingRequest')
+      SelectContent.isContentMessage({message_type: 'LtiDeepLinkingRequest'})
     ).toBeTruthy()
   })
 
   it('returns false if no content placements or message types are present', () => {
     expect(
-      SelectContent.isContentMessage('ResourceLinkRequest', {assignment_selection: {}})
+      SelectContent.isContentMessage({message_type: 'ResourceLinkRequest'}, {assignment_selection: {}})
     ).toBeTruthy()
+  })
+
+  it('returns false if placement is undefined', () => {
+    expect(
+      SelectContent.isContentMessage(undefined)
+    ).toBeFalsy()
   })
 })
 
