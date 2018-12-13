@@ -132,5 +132,16 @@ describe "RCS sidebar tests" do
         expect(wiki_body_anchor.attribute('href')).to include "/courses/#{@course.id}/modules/#{@module.id}"
       end
     end
+
+    it "should click on sidebar course navigation page to create link in body", ignore_js_errors: true do
+      title = "Files"
+      visit_front_page(@course)
+      click_navigation_accordion
+      click_sidebar_link(title)
+
+      in_frame wiki_page_body_ifr_id do
+        expect(wiki_body_anchor.attribute('href')).to include "/courses/#{@course.id}/files"
+      end
+    end
   end
 end

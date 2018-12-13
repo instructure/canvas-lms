@@ -44,6 +44,10 @@ module RCSSidebarPage
     fj('button:contains("Modules")')
   end
 
+  def navigation_accordion_button
+    fj('button:contains("Course Navigation")')
+  end
+
   def new_page_link
     f('#rcs-LinkToNewPage-btn-link')
   end
@@ -61,7 +65,7 @@ module RCSSidebarPage
   end
 
   def sidebar_link(title)
-    fj("li:contains('#{title}')")
+    fj("aside li:contains('#{title}')")
   end
 
   # ---------------------- Actions ----------------------
@@ -88,6 +92,10 @@ module RCSSidebarPage
 
   def click_modules_accordion
     modules_accordion_button.click
+  end
+
+  def click_navigation_accordion
+    navigation_accordion_button.click
   end
 
   def click_new_page_link
