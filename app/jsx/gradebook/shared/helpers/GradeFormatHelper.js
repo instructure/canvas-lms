@@ -231,7 +231,9 @@ const GradeFormatHelper = {
       default:
         return formatPointsGrade(score);
     }
-  }
+  },
+
+  UNGRADED
 };
 
 export default GradeFormatHelper

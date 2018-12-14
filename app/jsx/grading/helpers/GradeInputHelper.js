@@ -17,11 +17,21 @@
  */
 
 import Big from 'big.js'
-import round from 'compiled/util/round'
-import {gradeToScoreUpperBound, scoreToGrade} from '../../gradebook/GradingSchemeHelper'
+import {
+  gradeToScoreLowerBound,
+  gradeToScoreUpperBound,
+  indexOfGrade,
+  scoreToGrade
+} from '../../gradebook/GradingSchemeHelper'
 import numberHelper from '../../shared/helpers/numberHelper'
 
 const MAX_PRECISION = 15 // the maximum precision of a score persisted to the database
+const PERCENTAGES = /[%％﹪٪]/
+
+export const GradingSchemeBounds = Object.freeze({
+  LOWER: 'LOWER',
+  UPPER: 'UPPER'
+})
 
 function toNumber(bigValue) {
   return parseFloat(bigValue.round(MAX_PRECISION).toString(), 10)
@@ -50,7 +60,8 @@ function parseAsGradingScheme(value, options) {
     return null
   }
 
-  const percentage = gradeToScoreUpperBound(value, options.gradingScheme)
+  const gradeToScore = options.useLowerBound ? gradeToScoreLowerBound : gradeToScoreUpperBound
+  const percentage = gradeToScore(value, options.gradingScheme)
   if (percentage == null) {
     return null
   }
@@ -64,7 +75,7 @@ function parseAsGradingScheme(value, options) {
 }
 
 function parseAsPercent(value, options) {
-  const percentage = numberHelper.parse(value.replace(/[%％﹪٪]/, ''))
+  const percentage = numberHelper.parse(value.replace(PERCENTAGES, ''))
   if (isNaN(percentage)) {
     return null
   }
@@ -175,6 +186,44 @@ function parseForPassFail(value, options) {
 
 export function isExcused(grade) {
   return `${grade}`.trim().toLowerCase() === 'ex'
+}
+
+export function parseEntryValue(value, gradingScheme) {
+  const trimmedValue = value != null ? `${value}`.trim() : ''
+
+  const result = {
+    enteredValue: trimmedValue,
+    isCleared: trimmedValue === '',
+    isExcused: isExcused(trimmedValue),
+    isPercentage: false,
+    isPoints: false,
+    isSchemeKey: gradingScheme ? false : null,
+    value: null
+  }
+
+  if (PERCENTAGES.test(trimmedValue)) {
+    const percentage = numberHelper.parse(trimmedValue.replace(PERCENTAGES, ''))
+    if (!Number.isNaN(percentage)) {
+      result.isPercentage = true
+      result.value = toNumber(new Big(percentage))
+    }
+  } else {
+    const points = numberHelper.parse(trimmedValue)
+    if (!Number.isNaN(points)) {
+      result.isPoints = true
+      result.value = points
+    }
+  }
+
+  if (gradingScheme) {
+    const keyIndex = indexOfGrade(trimmedValue, gradingScheme.data)
+    if (keyIndex !== -1) {
+      result.isSchemeKey = true
+      result.value = gradingScheme.data[keyIndex][0]
+    }
+  }
+
+  return result
 }
 
 export function parseTextValue(value, options) {
