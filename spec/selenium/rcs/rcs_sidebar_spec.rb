@@ -143,5 +143,12 @@ describe "RCS sidebar tests" do
         expect(wiki_body_anchor.attribute('href')).to include "/courses/#{@course.id}/files"
       end
     end
+
+    it "should click on sidebar files tab", ignore_js_errors: true do
+      wiki_page_tools_file_tree_setup(true, true)
+
+      click_files_tab
+      expect(upload_new_file).to be_displayed
+    end
   end
 end

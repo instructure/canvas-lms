@@ -68,6 +68,14 @@ module RCSSidebarPage
     fj("aside li:contains('#{title}')")
   end
 
+  def files_tab
+    fj('[role="presentation"]:contains("Files")')
+  end
+
+  def upload_new_file
+    fj('button:contains("Upload a new file")')
+  end
+
   # ---------------------- Actions ----------------------
 
   def click_pages_accordion
@@ -108,5 +116,9 @@ module RCSSidebarPage
 
   def click_sidebar_link(title)
     sidebar_link(title).click
+  end
+
+  def click_files_tab
+    files_tab.click
   end
 end
