@@ -98,6 +98,19 @@ The API Change Log includes adjustments to the Canvas API documentation as part 
 </table>
 
 <h3>Removals</h3>
+<table class="changelog"
+<tr>
+<th>API Calls</th>
+<th>Function</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="courses.html">Courses API</a></td>
+<td>List Users in Course Endpoint</td>
+<td>Include parameter: Removed email as an optional parameter</td>
+</tr>
+</table>
+<p></p>
 <table class="changelog">
 <tr>
 <th>Content</th>
@@ -137,14 +150,26 @@ Workflow_state parameter: added initializing, failed, restoring, partially_resto
 <th></th>
 </tr>
 <tr>
-<td><a href="courses.html">Courses API</a></td>
-<td>List Your Courses Endpoint</td>
-<td>Include parameter: Added graded period parameters to be returned even if total grades are hidden in the course</td>
-</tr>
-<tr>
 <td><a href="sis_import_errors.html">SIS Import Errors API</a></td>
 <td>SISImportError Object</td>
 <td>Added row_info parameter, which displays the contents of the line that had the error</td>
+</tr>
+<tr>
+<td><a href="users.html">Users API</a></td>
+<td>List the Activity Stream Endpoint</td>
+<td>Added only_active_courses parameter</td>
+</tr>
+</table>
+<p></p>
+<table class="changelog">
+<tr>
+<th>API Responses</th>
+<th>Function</th>
+<th></th>
+<tr>
+<td><a href="courses.html">Courses API</a></td>
+<td>List Your Courses Endpoint</td>
+<td>Include parameter: Added graded period parameters to be returned even if total grades are hidden in the course</td>
 </tr>
 </table>
 <p></p>
@@ -161,7 +186,7 @@ Workflow_state parameter: added initializing, failed, restoring, partially_resto
 <tr>
 <td><a href="roles.html">Roles API</a></td>
 <td>Create a New Role Endpoint</td>
-<td>Permissions parameter: Updated account- and course-level roles to match roles in the Canvas Permissions page
+<td>Permissions parameter: Updated account- and course-level role names to match roles in the Canvas Permissions page
 </tr>
 </table>
 <p></p>
