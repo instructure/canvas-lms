@@ -55,6 +55,7 @@ define [
   'jsx/gradezilla/default_gradebook/GradebookGrid'
   'jsx/gradezilla/default_gradebook/constants/studentRowHeaderConstants'
   'jsx/gradezilla/default_gradebook/GradebookGrid/editors/AssignmentCellEditor/AssignmentRowCellPropFactory'
+  'jsx/gradezilla/default_gradebook/GradebookGrid/editors/TotalGradeOverrideCellEditor/TotalGradeOverrideCellPropFactory'
   'jsx/gradezilla/default_gradebook/components/GradebookMenu'
   'jsx/gradezilla/default_gradebook/components/ViewOptionsMenu'
   'jsx/gradezilla/default_gradebook/components/ActionMenu'
@@ -102,7 +103,8 @@ define [
   CourseGradeCalculator, EffectiveDueDates, GradeFormatHelper, UserSettings, Spinner, AssignmentMuter,
   GradeDisplayWarningDialog, PostGradesFrameDialog, NumberCompare, natcompare, ConvertCase, htmlEscape,
   EnterGradesAsSetting, SetDefaultGradeDialogManager, CurveGradesDialogManager, GradebookApi, SubmissionCommentApi,
-  FinalGradeOverrides, GradebookGrid, studentRowHeaderConstants, AssignmentRowCellPropFactory, GradebookMenu, ViewOptionsMenu, ActionMenu,
+  FinalGradeOverrides, GradebookGrid, studentRowHeaderConstants, AssignmentRowCellPropFactory, TotalGradeOverrideCellPropFactory,
+  GradebookMenu, ViewOptionsMenu, ActionMenu,
   AssignmentGroupFilter, GradingPeriodFilter, ModuleFilter, SectionFilter, GridColor, StatusesModal, SubmissionTray,
   GradebookSettingsModal, AnonymousSpeedGraderAlert, { statusColors }, StudentDatastore, PostGradesStore, PostGradesApp,
   SubmissionStateMap, DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager, GradebookKeyboardNav,
@@ -204,7 +206,14 @@ define [
     }
 
   getInitialCourseContent = (options) ->
+    courseGradingScheme = null
     defaultGradingScheme = null
+
+    if options.grading_standard
+      courseGradingScheme = {
+        data: options.grading_standard
+      }
+
     if options.default_grading_standard
       defaultGradingScheme = {
         data: options.default_grading_standard
@@ -212,6 +221,7 @@ define [
 
     {
       contextModules: []
+      courseGradingScheme
       defaultGradingScheme
       gradingSchemes: options.grading_schemes.map(ConvertCase.camelize)
       gradingPeriodAssignments: {}
@@ -1647,10 +1657,12 @@ define [
 
       {
         cssClass: 'total-grade-override'
+        getGridSupport: => @gradebookGrid.gridSupport
         headerCssClass: 'total-grade-override'
         id: 'total_grade_override'
         maxWidth: columnWidths.total_grade_override.max
         minWidth: columnWidths.total_grade_override.min
+        propFactory: new TotalGradeOverrideCellPropFactory(@)
         toolTip: label
         type: 'total_grade_override'
         width: totalWidth
@@ -1799,7 +1811,8 @@ define [
     # The current cell editor has been changed and is valid
     onCellChange: (event, obj) =>
       { item, column } = obj
-      if col_id = column.field.match /^custom_col_(\d+)/
+      if column.type == 'custom_column'
+        col_id = column.field.match /^custom_col_(\d+)/
         url = @options.custom_column_datum_url
           .replace(/:id/, col_id[1])
           .replace(/:user_id/, item.id)
@@ -2455,14 +2468,17 @@ define [
       @contentLoadStates.submissionsLoaded = loaded
 
     isGradeEditable: (studentId, assignmentId) =>
-      student = @student(studentId)
-      return false if !student || student.isConcluded
+      return false unless @isStudentGradeable(studentId)
       submissionState = @submissionStateMap.getSubmissionState(assignment_id: assignmentId, user_id: studentId)
       submissionState? && !submissionState.locked
 
     isGradeVisible: (studentId, assignmentId) =>
       submissionState = @submissionStateMap.getSubmissionState(assignment_id: assignmentId, user_id: studentId)
       submissionState? && !submissionState.hideGrade
+
+    isStudentGradeable: (studentId) =>
+      student = @student(studentId)
+      not (!student || student.isConcluded)
 
     addPendingGradeInfo: (submission, gradeInfo) =>
       { userId, assignmentId } = submission
@@ -2646,6 +2662,9 @@ define [
       )
 
     ## Course Settings Access Methods
+
+    getCourseGradingScheme: ->
+      @courseContent.courseGradingScheme
 
     getDefaultGradingScheme: ->
       @courseContent.defaultGradingScheme

@@ -19,13 +19,13 @@
 import {createGradebook} from 'jsx/gradezilla/default_gradebook/__tests__/GradebookSpecHelper'
 import TotalGradeOverrideCellFormatter from 'jsx/gradezilla/default_gradebook/GradebookGrid/formatters/TotalGradeOverrideCellFormatter'
 
-QUnit.module('GradebookGrid TotalGradeOverrideCellFormatter', hooks => {
+/* eslint-disable qunit/no-identical-names */
+QUnit.module('GradebookGrid TotalGradeOverrideCellFormatter', suiteHooks => {
   let $fixture
   let finalGradeOverrides
-  let formatter
   let gradebook
 
-  hooks.beforeEach(() => {
+  suiteHooks.beforeEach(() => {
     $fixture = document.body.appendChild(document.createElement('div'))
 
     gradebook = createGradebook({
@@ -45,15 +45,15 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellFormatter', hooks => {
     }
     sinon.stub(gradebook, 'isFilteringColumnsByGradingPeriod').returns(false)
     sinon.stub(gradebook, 'getGradingPeriodToShow').returns('1501')
-    formatter = new TotalGradeOverrideCellFormatter(gradebook)
   })
 
-  hooks.afterEach(() => {
+  suiteHooks.afterEach(() => {
     $fixture.remove()
   })
 
   function renderCell() {
     gradebook.finalGradeOverrides._datastore.setGrades(finalGradeOverrides)
+    const formatter = new TotalGradeOverrideCellFormatter(gradebook)
     $fixture.innerHTML = formatter.render(
       0, // row
       0, // cell
@@ -64,44 +64,53 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellFormatter', hooks => {
     return $fixture
   }
 
-  function getPercentageGrade() {
-    const $percentageGrade = renderCell().querySelector('.percentage-grade')
+  function getGrade() {
+    const $percentageGrade = renderCell().querySelector('.Grade')
     return $percentageGrade && $percentageGrade.innerText.trim()
   }
 
-  function getSchemeGrade() {
-    const $schemeGrade = renderCell().querySelector('.scheme-grade')
-    return $schemeGrade && $schemeGrade.innerText.trim()
-  }
-
   QUnit.module('when displaying course grade overrides', () => {
-    test('renders the percentage of the grade', () => {
-      equal(getPercentageGrade(), '90%')
+    QUnit.module('when using a grading scheme', () => {
+      test('displays the scheme grade', () => {
+        equal(getGrade(), 'A')
+      })
+
+      test('renders "–" (en dash) when the student has no grade overrides', () => {
+        finalGradeOverrides = {}
+        equal(getGrade(), '–')
+      })
+
+      test('renders "–" (en dash) when the student has no course grade overrides', () => {
+        delete finalGradeOverrides[1101].courseGrade
+        gradebook.finalGradeOverrides._datastore.setGrades({})
+        equal(getGrade(), '–')
+      })
     })
 
-    test('rounds the percentage to two decimal places', () => {
-      finalGradeOverrides[1101].courseGrade.percentage = 92.345
-      equal(getPercentageGrade(), '92.35%')
-    })
+    QUnit.module('when not using a grading scheme', hooks => {
+      hooks.beforeEach(() => {
+        sinon.stub(gradebook, 'getCourseGradingScheme').returns(null)
+      })
 
-    test('includes the scheme grade when using a grading scheme', () => {
-      equal(getSchemeGrade(), 'A')
-    })
+      test('renders the percentage of the grade', () => {
+        equal(getGrade(), '90%')
+      })
 
-    test('excludes the scheme grade when not using a grading scheme', () => {
-      gradebook.options.grading_standard = null
-      strictEqual(getSchemeGrade(), null)
-    })
+      test('rounds the percentage to two decimal places', () => {
+        finalGradeOverrides[1101].courseGrade.percentage = 92.345
+        equal(getGrade(), '92.35%')
+      })
 
-    test('renders "–" (en dash) when the student has no grade overrides', () => {
-      finalGradeOverrides = {}
-      equal(getPercentageGrade(), '–')
-    })
+      test('renders "–" (en dash) when the student has no grade overrides', () => {
+        finalGradeOverrides = {}
+        equal(getGrade(), '–')
+      })
 
-    test('renders "–" (en dash) when the student has no course grade overrides', () => {
-      delete finalGradeOverrides[1101].courseGrade
-      gradebook.finalGradeOverrides._datastore.setGrades({})
-      equal(getPercentageGrade(), '–')
+      test('renders "–" (en dash) when the student has no course grade overrides', () => {
+        delete finalGradeOverrides[1101].courseGrade
+        gradebook.finalGradeOverrides._datastore.setGrades({})
+        equal(getGrade(), '–')
+      })
     })
   })
 
@@ -110,37 +119,56 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellFormatter', hooks => {
       gradebook.isFilteringColumnsByGradingPeriod.returns(true)
     })
 
-    test('renders the percentage of the grade', () => {
-      equal(getPercentageGrade(), '80%')
+    QUnit.module('when using a grading scheme', () => {
+      test('displays the scheme grade', () => {
+        equal(getGrade(), 'B')
+      })
+
+      test('renders "–" (en dash) when the student has no grade overrides', () => {
+        finalGradeOverrides = {}
+        equal(getGrade(), '–')
+      })
+
+      test('renders "–" (en dash) when the student has no grading period grade overrides', () => {
+        delete finalGradeOverrides[1101].gradingPeriodGrades
+        equal(getGrade(), '–')
+      })
+
+      test('renders "–" (en dash) when the student has no grade override for the selected grading period', () => {
+        gradebook.getGradingPeriodToShow.returns('1502')
+        equal(getGrade(), '–')
+      })
     })
 
-    test('rounds the percentage to two decimal places', () => {
-      finalGradeOverrides[1101].gradingPeriodGrades[1501].percentage = 82.345
-      equal(getPercentageGrade(), '82.35%')
-    })
+    QUnit.module('when not using a grading scheme', hooks => {
+      hooks.beforeEach(() => {
+        sinon.stub(gradebook, 'getCourseGradingScheme').returns(null)
+      })
 
-    test('includes the scheme grade when using a grading scheme', () => {
-      equal(getSchemeGrade(), 'B')
-    })
+      test('renders the percentage of the grade', () => {
+        equal(getGrade(), '80%')
+      })
 
-    test('excludes the scheme grade when not using a grading scheme', () => {
-      gradebook.options.grading_standard = null
-      strictEqual(getSchemeGrade(), null)
-    })
+      test('rounds the percentage to two decimal places', () => {
+        finalGradeOverrides[1101].gradingPeriodGrades[1501].percentage = 82.345
+        equal(getGrade(), '82.35%')
+      })
 
-    test('renders "–" (en dash) when the student has no grade overrides', () => {
-      finalGradeOverrides = {}
-      equal(getPercentageGrade(), '–')
-    })
+      test('renders "–" (en dash) when the student has no grade overrides', () => {
+        finalGradeOverrides = {}
+        equal(getGrade(), '–')
+      })
 
-    test('renders "–" (en dash) when the student has no grading period grade overrides', () => {
-      delete finalGradeOverrides[1101].gradingPeriodGrades
-      equal(getPercentageGrade(), '–')
-    })
+      test('renders "–" (en dash) when the student has no grading period grade overrides', () => {
+        delete finalGradeOverrides[1101].gradingPeriodGrades
+        equal(getGrade(), '–')
+      })
 
-    test('renders "–" (en dash) when the student has no grade override for the selected grading period', () => {
-      gradebook.getGradingPeriodToShow.returns('1502')
-      equal(getPercentageGrade(), '–')
+      test('renders "–" (en dash) when the student has no grade override for the selected grading period', () => {
+        gradebook.getGradingPeriodToShow.returns('1502')
+        equal(getGrade(), '–')
+      })
     })
   })
 })
+/* eslint-enable qunit/no-identical-names */

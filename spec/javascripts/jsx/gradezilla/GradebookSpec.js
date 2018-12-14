@@ -5141,6 +5141,7 @@ QUnit.module('Gradebook Grading Schemes', suiteHooks => {
     gradebook = createGradebook({
       default_grading_standard: defaultGradingScheme,
       grading_schemes: [gradingScheme],
+      grading_standard: gradingScheme.data,
       ...options
     })
     gradebook.initialize()
@@ -5164,6 +5165,18 @@ QUnit.module('Gradebook Grading Schemes', suiteHooks => {
 
   suiteHooks.beforeEach(() => {
     stubDataLoader()
+  })
+
+  QUnit.module('#getCourseGradingScheme', () => {
+    test('returns the course grading scheme when present', () => {
+      createInitializedGradebook()
+      deepEqual(gradebook.getCourseGradingScheme().data, gradingScheme.data)
+    })
+
+    test('returns null when course is not using a grading scheme', () => {
+      createInitializedGradebook({grading_standard: undefined})
+      strictEqual(gradebook.getCourseGradingScheme(), null)
+    })
   })
 
   QUnit.module('#getDefaultGradingScheme', () => {
@@ -8492,6 +8505,27 @@ QUnit.module('Gradebook', () => {
       gradebook.isGradeVisible('1101', '2301')
       const submission = gradebook.submissionStateMap.getSubmissionState.lastCall.args[0]
       strictEqual(submission.user_id, '1101')
+    })
+  })
+
+  QUnit.module('#isStudentGradeable()', hooks => {
+    hooks.beforeEach(() => {
+      gradebook = createGradebook()
+      gradebook.students = {1101: {id: '1101', isConcluded: false}}
+    })
+
+    test('returns true when the student enrollment is active', () => {
+      strictEqual(gradebook.isStudentGradeable('1101'), true)
+    })
+
+    test('returns false when the student enrollment is concluded', () => {
+      gradebook.students[1101].isConcluded = true
+      strictEqual(gradebook.isStudentGradeable('1101'), false)
+    })
+
+    test('returns false when the student is not loaded', () => {
+      delete gradebook.students[1101]
+      strictEqual(gradebook.isStudentGradeable('1101'), false)
     })
   })
 

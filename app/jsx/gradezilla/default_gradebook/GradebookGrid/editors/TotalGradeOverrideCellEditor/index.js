@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 - present Instructure, Inc.
+ * Copyright (C) 2018 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,16 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import AssignmentCellEditor from './AssignmentCellEditor'
-import TotalGradeOverrideCellEditor from './TotalGradeOverrideCellEditor'
+import React from 'react'
 
-const editorsByColumnType = {
-  assignment: AssignmentCellEditor,
-  total_grade_override: TotalGradeOverrideCellEditor
-}
+import ReactCellEditor from '../ReactCellEditor'
+import EditableCell from './EditableCell'
+import ReadOnlyCell from './ReadOnlyCell'
 
-export default class CellEditorFactory {
-  getEditor(column) {
-    return editorsByColumnType[column.type]
+export default class TotalGradeOverrideCellEditor extends ReactCellEditor {
+  createElement(props) {
+    if (props.studentIsGradeable) {
+      return <EditableCell {...props} />
+    }
+    return <ReadOnlyCell {...props} />
   }
 }

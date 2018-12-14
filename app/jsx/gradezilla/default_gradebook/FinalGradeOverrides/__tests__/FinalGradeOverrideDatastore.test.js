@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import GradeOverrideInfo from '../../../../grading/GradeEntry/GradeOverrideInfo'
 import FinalGradeOverrideDatastore from '../FinalGradeOverrideDatastore'
 
 describe('Gradebook FinalGradeOverrideDatastore', () => {
@@ -25,7 +26,7 @@ describe('Gradebook FinalGradeOverrideDatastore', () => {
     datastore = new FinalGradeOverrideDatastore()
   })
 
-  describe('.getGrades()', () => {
+  describe('#getGrade()', () => {
     let grades
 
     beforeEach(() => {
@@ -80,6 +81,214 @@ describe('Gradebook FinalGradeOverrideDatastore', () => {
 
     it('returns null for grading period grade when the given user has no overrides', () => {
       expect(datastore.getGrade('1103', '1501')).toBe(null)
+    })
+  })
+
+  describe('#updateGrade()', () => {
+    let grades
+
+    beforeEach(() => {
+      grades = {
+        1101: {
+          courseGrade: {
+            percentage: 90.12
+          }
+        },
+
+        1102: {
+          gradingPeriodGrades: {
+            1501: {
+              percentage: 81.23
+            }
+          }
+        }
+      }
+
+      datastore.setGrades(grades)
+    })
+
+    it('updates the course grade when given a null grading period id', () => {
+      datastore.updateGrade('1101', null, {percentage: 91})
+      expect(datastore.getGrade('1101', null)).toEqual({percentage: 91})
+    })
+
+    it('adds the course grade when the given user has no course grade override', () => {
+      datastore.updateGrade('1102', null, {percentage: 91})
+      expect(datastore.getGrade('1102', null)).toEqual({percentage: 91})
+    })
+
+    it('updates the grading period grade when given a grading period id', () => {
+      datastore.updateGrade('1102', '1501', {percentage: 82})
+      expect(datastore.getGrade('1102', '1501')).toEqual({percentage: 82})
+    })
+
+    it('adds the grading period grade when the given user has no override for the given grading period', () => {
+      datastore.updateGrade('1102', '1502', {percentage: 82})
+      expect(datastore.getGrade('1102', '1502')).toEqual({percentage: 82})
+    })
+
+    it('adds the grading period grade when the given user has no grading period overrides', () => {
+      datastore.updateGrade('1101', '1501', {percentage: 82})
+      expect(datastore.getGrade('1101', '1501')).toEqual({percentage: 82})
+    })
+
+    it('adds the course grade when the given user has no overrides', () => {
+      datastore.updateGrade('1103', null, {percentage: 91})
+      expect(datastore.getGrade('1103', null)).toEqual({percentage: 91})
+    })
+
+    it('adds the grading period grade when the given user has no overrides', () => {
+      datastore.updateGrade('1103', '1501', {percentage: 82})
+      expect(datastore.getGrade('1103', '1501')).toEqual({percentage: 82})
+    })
+  })
+
+  describe('#addPendingGradeInfo()', () => {
+    describe('when adding course grade override info', () => {
+      it('adds the info when the given user has no pending course grade override', () => {
+        const gradeInfo = new GradeOverrideInfo()
+        datastore.addPendingGradeInfo('1101', null, gradeInfo)
+        expect(datastore.getPendingGradeInfo('1101', null)).toBe(gradeInfo)
+      })
+
+      it('replaces the existing pending course grade override for the given user', () => {
+        const previousGradeInfo = new GradeOverrideInfo()
+        const nextGradeInfo = new GradeOverrideInfo()
+        datastore.addPendingGradeInfo('1101', null, previousGradeInfo)
+        datastore.addPendingGradeInfo('1101', null, nextGradeInfo)
+        expect(datastore.getPendingGradeInfo('1101', null)).toBe(nextGradeInfo)
+      })
+
+      it('does not replace pending course grade overrides for other users', () => {
+        const otherUserInfo = new GradeOverrideInfo()
+        const gradeInfo = new GradeOverrideInfo()
+        datastore.addPendingGradeInfo('1102', null, otherUserInfo)
+        datastore.addPendingGradeInfo('1101', null, gradeInfo)
+        expect(datastore.getPendingGradeInfo('1102', null)).toBe(otherUserInfo)
+      })
+
+      it('does not replace pending grading period overrides for the same user', () => {
+        const gradingPeriodInfo = new GradeOverrideInfo()
+        const gradeInfo = new GradeOverrideInfo()
+        datastore.addPendingGradeInfo('1101', '1501', gradingPeriodInfo)
+        datastore.addPendingGradeInfo('1101', null, gradeInfo)
+        expect(datastore.getPendingGradeInfo('1101', '1501')).toBe(gradingPeriodInfo)
+      })
+    })
+
+    describe('when adding grading period override info', () => {
+      it('adds the info when the given user has no pending grading period override', () => {
+        const gradeInfo = new GradeOverrideInfo()
+        datastore.addPendingGradeInfo('1101', '1501', gradeInfo)
+        expect(datastore.getPendingGradeInfo('1101', '1501')).toBe(gradeInfo)
+      })
+
+      it('replaces the existing pending grading period override for the given user', () => {
+        const previousGradeInfo = new GradeOverrideInfo()
+        const nextGradeInfo = new GradeOverrideInfo()
+        datastore.addPendingGradeInfo('1101', '1501', previousGradeInfo)
+        datastore.addPendingGradeInfo('1101', '1501', nextGradeInfo)
+        expect(datastore.getPendingGradeInfo('1101', '1501')).toBe(nextGradeInfo)
+      })
+
+      it('does not replace pending grading period overrides for other users', () => {
+        const otherUserInfo = new GradeOverrideInfo()
+        const gradeInfo = new GradeOverrideInfo()
+        datastore.addPendingGradeInfo('1102', '1501', otherUserInfo)
+        datastore.addPendingGradeInfo('1101', '1501', gradeInfo)
+        expect(datastore.getPendingGradeInfo('1102', '1501')).toBe(otherUserInfo)
+      })
+
+      it('does not replace pending grading period overrides for other grading periods', () => {
+        const otherPeriodInfo = new GradeOverrideInfo()
+        const gradeInfo = new GradeOverrideInfo()
+        datastore.addPendingGradeInfo('1101', '1501', otherPeriodInfo)
+        datastore.addPendingGradeInfo('1101', '1502', gradeInfo)
+        expect(datastore.getPendingGradeInfo('1101', '1501')).toBe(otherPeriodInfo)
+      })
+
+      it('does not replace a pending course grade override for the same user', () => {
+        const courseGradeInfo = new GradeOverrideInfo()
+        const gradeInfo = new GradeOverrideInfo()
+        datastore.addPendingGradeInfo('1101', null, courseGradeInfo)
+        datastore.addPendingGradeInfo('1101', '1501', gradeInfo)
+        expect(datastore.getPendingGradeInfo('1101', null)).toBe(courseGradeInfo)
+      })
+    })
+  })
+
+  describe('#removePendingGradeInfo()', () => {
+    describe('when removing course grade override info', () => {
+      it('removes the pending course grade override for the given user', () => {
+        const gradeInfo = new GradeOverrideInfo()
+        datastore.addPendingGradeInfo('1101', null, gradeInfo)
+        datastore.removePendingGradeInfo('1101', null)
+        expect(datastore.getPendingGradeInfo('1101', null)).toBe(null)
+      })
+
+      it('has no effect when the given user has no pending course grade override', () => {
+        datastore.removePendingGradeInfo('1101', null)
+        expect(datastore.getPendingGradeInfo('1101', null)).toBe(null)
+      })
+
+      it('does not remove pending course grade overrides for other users', () => {
+        const otherUserInfo = new GradeOverrideInfo()
+        const gradeInfo = new GradeOverrideInfo()
+        datastore.addPendingGradeInfo('1102', null, otherUserInfo)
+        datastore.addPendingGradeInfo('1101', null, gradeInfo)
+        datastore.removePendingGradeInfo('1101', null)
+        expect(datastore.getPendingGradeInfo('1102', null)).toBe(otherUserInfo)
+      })
+
+      it('does not remove pending grading period overrides for the same user', () => {
+        const gradingPeriodInfo = new GradeOverrideInfo()
+        const gradeInfo = new GradeOverrideInfo()
+        datastore.addPendingGradeInfo('1101', '1501', gradingPeriodInfo)
+        datastore.addPendingGradeInfo('1101', null, gradeInfo)
+        datastore.removePendingGradeInfo('1101', null)
+        expect(datastore.getPendingGradeInfo('1101', '1501')).toBe(gradingPeriodInfo)
+      })
+    })
+
+    describe('when removing grading period override info', () => {
+      it('removes the existing pending grading period override for the given user', () => {
+        const gradeInfo = new GradeOverrideInfo()
+        datastore.addPendingGradeInfo('1101', '1501', gradeInfo)
+        datastore.removePendingGradeInfo('1101', '1501')
+        expect(datastore.getPendingGradeInfo('1101', '1501')).toBe(null)
+      })
+
+      it('has no effect when the given user has no pending grading period override', () => {
+        datastore.removePendingGradeInfo('1101', '1501')
+        expect(datastore.getPendingGradeInfo('1101', '1501')).toBe(null)
+      })
+
+      it('does not remove pending grading period overrides for other users', () => {
+        const otherUserInfo = new GradeOverrideInfo()
+        const gradeInfo = new GradeOverrideInfo()
+        datastore.addPendingGradeInfo('1102', '1501', otherUserInfo)
+        datastore.addPendingGradeInfo('1101', '1501', gradeInfo)
+        datastore.removePendingGradeInfo('1101', '1501')
+        expect(datastore.getPendingGradeInfo('1102', '1501')).toBe(otherUserInfo)
+      })
+
+      it('does not remove pending grading period overrides for other grading periods', () => {
+        const otherPeriodInfo = new GradeOverrideInfo()
+        const gradeInfo = new GradeOverrideInfo()
+        datastore.addPendingGradeInfo('1101', '1501', otherPeriodInfo)
+        datastore.addPendingGradeInfo('1101', '1502', gradeInfo)
+        datastore.removePendingGradeInfo('1101', '1502')
+        expect(datastore.getPendingGradeInfo('1101', '1501')).toBe(otherPeriodInfo)
+      })
+
+      it('does not remove a pending course grade override for the same user', () => {
+        const courseGradeInfo = new GradeOverrideInfo()
+        const gradeInfo = new GradeOverrideInfo()
+        datastore.addPendingGradeInfo('1101', null, courseGradeInfo)
+        datastore.addPendingGradeInfo('1101', '1501', gradeInfo)
+        datastore.removePendingGradeInfo('1101', '1501')
+        expect(datastore.getPendingGradeInfo('1101', null)).toBe(courseGradeInfo)
+      })
     })
   })
 })

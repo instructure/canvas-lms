@@ -135,11 +135,11 @@ module Gradezilla
 
       # ---------- Grade Override Cells ---------------
       def grade_override_selector(student)
-        # TODO: locator for override, similar to total_grade_selector
+        ".slick-row.student_#{student.id} .slick-cell.total-grade-override"
       end
 
       def grade_override_input(student)
-        # TODO: f("#{gade_override_selector(student)} input[type='text']")
+        f("#{grade_override_selector(student)} input[type='text']")
       end
 
       def get_override_grade(student)
@@ -147,7 +147,7 @@ module Gradezilla
       end
 
       def edit_override(student, grade)
-        grade_override_selector.click
+        f(grade_override_selector(student)).click
 
         override_input = grade_override_input(student)
         set_value(override_input, grade)

@@ -50,7 +50,7 @@ module Gradezilla
 
     def self.click_update_button
       update_button.click
-      wait_for_animations
+      wait_for_ajaximations
     end
   end
 end

@@ -41,7 +41,7 @@ describe 'Final Grade Override' do
     )
 
     @students.each do |student|
-      @assignment.grade_student(student, grade: 9.2, grader: @teacher)
+      @assignment.grade_student(student, grade: 8.9, grader: @teacher)
     end
   end
 
@@ -75,40 +75,38 @@ describe 'Final Grade Override' do
   end
 
   context "Gradezilla" do
-    before(:each) do
+    it 'display override column in new gradebook', priority: '1', test_id: 3682130 do
       user_session(@teacher)
       Gradezilla.visit(@course)
       Gradezilla.settings_cog_select
       Gradezilla::Settings.click_advanced_tab
       Gradezilla::Settings::Advanced.select_grade_override_checkbox
       Gradezilla::Settings.click_update_button
-    end
-
-    it 'display override column in new gradebook', priority: '1', test_id: 3682130 do
       expect(f(".slick-header-column[title='Override']")).to be_displayed
     end
 
-    context 'with overridden grade' do
+    context 'with an overridden grade' do
       before(:each) do
-        skip('Unskip in GRADE-1688')
-        # TODO: override grade
-        Gradezilla::Cells.edit_override(@students.first, 5)
+        @teacher.preferences.deep_merge!({
+          gradebook_settings: { @course.id => { 'show_final_grade_overrides' => 'true' } }
+        })
+        @teacher.save
+
+        user_session(@teacher)
+        Gradezilla.visit(@course)
+        Gradezilla::Cells.edit_override(@students.first, 90.0)
       end
 
       it 'saves overridden grade in Gradezilla', priority: '1', test_id: 3682131 do
-        skip('Unskip in GRADE-1688')
         Gradezilla.visit(@course)
-        # TODO: displays on NG
-        expect(Gradezilla::Cells.get_override_grade(@students.first)).to equal 5
+        expect(Gradezilla::Cells.get_override_grade(@students.first)).to eql "A-"
       end
 
       it 'displays overridden grade for student grades', priority: '1', test_id: 3682131 do
-        skip('Unskip in GRADE-1688')
-        # TODO: displays on Student grades page
+        skip('GRADE-1931')
         user_session(@students.first)
         StudentGradesPage.visit_as_student(@course)
-
-        expect(StudentGradesPage.fetch_assignment_score(@assignment)).to equal 5
+        expect(StudentGradesPage.final_grade.text).to eql "90%"
       end
     end
   end
