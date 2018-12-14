@@ -285,6 +285,23 @@ CanvasRails::Application.routes.draw do
         get 'vericite/:asset_string' => 'submissions#vericite_report', as: :vericite_report
         get 'audit_events' => 'submissions#audit_events', as: :audit_events
       end
+
+      get 'anonymous_submissions/:anonymous_id/originality_report/:asset_string',
+        to: 'anonymous_submissions#originality_report',
+        as: :anonymous_submission_originality_report
+      post 'anonymous_submissions/:anonymous_id/turnitin/resubmit',
+        to: 'anonymous_submissions#resubmit_to_turnitin',
+        as: :anonymous_submission_resubmit_to_turnitin
+      get 'anonymous_submissions/:anonymous_id/turnitin/:asset_string',
+        to: 'anonymous_submissions#turnitin_report',
+        as: :anonymous_submission_turnitin_report
+      post 'anonymous_submissions/:anonymous_id/vericite/resubmit',
+        to: 'anonymous_submissions#resubmit_to_vericite',
+        as: :anonymous_submission_resubmit_to_vericite
+      get 'anonymous_submissions/:anonymous_id/vericite/:asset_string',
+        to: 'anonymous_submissions#vericite_report',
+        as: :anonymous_submission_vericite_report
+
       get :rubric
       resource :rubric_association, path: :rubric do
         resources :rubric_assessments, path: :assessments

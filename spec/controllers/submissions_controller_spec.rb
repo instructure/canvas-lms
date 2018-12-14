@@ -704,9 +704,14 @@ describe SubmissionsController do
       expect(response).to redirect_to originality_report.originality_report_url
     end
 
-    it 'returns 400 if submission_id is not integer' do
-      get 'originality_report', params: {:course_id => assignment.context_id, :assignment_id => assignment.id, :submission_id => '{ user_id }', :asset_string => attachment.asset_string}
-      expect(response.response_code).to eq 400
+    it 'returns bad_request if submission_id is not an integer' do
+      get 'originality_report', params: {
+        course_id: assignment.context_id,
+        assignment_id: assignment.id,
+        submission_id: '{ user_id }',
+        asset_string: attachment.asset_string
+      }
+      expect(response).to have_http_status(:bad_request)
     end
 
     it "returns unauthorized for users who can't read submission" do
@@ -716,18 +721,23 @@ describe SubmissionsController do
       expect(response.status).to eq 401
     end
 
-    it 'gives error if no url is present for the OriginalityReport' do
+    it 'shows an error if no URL is present for the OriginalityReport' do
       originality_report.update_attribute(:originality_report_url, nil)
-      get 'originality_report', params: {course_id: assignment.context_id, assignment_id: assignment.id, submission_id: test_student.id, asset_string: attachment.asset_string}
-      expect(flash[:notice]).to be_present
+      get 'originality_report', params: {
+        course_id: assignment.context_id,
+        assignment_id: assignment.id,
+        submission_id: test_student.id,
+        asset_string: attachment.asset_string
+      }
+      expect(flash[:error]).to be_present
     end
   end
 
   describe 'POST resubmit_to_turnitin' do
-    it 'returns 400 if assignment_id is not integer' do
+    it 'returns bad_request if assignment_id is not integer' do
       assignment = assignment_model
       post 'resubmit_to_turnitin', params: {course_id: assignment.context_id, assignment_id: 'assignment-id', submission_id: test_student.id}
-      expect(response.response_code).to eq 400
+      expect(response).to have_http_status(:bad_request)
     end
 
     it "emits a 'plagiarism_resubmit' live event if originality report exists" do
@@ -742,17 +752,6 @@ describe SubmissionsController do
     end
   end
 
-  it "redirects to speed grader when an anonymous submission id is used" do
-    params = {
-      course_id: assignment.context_id,
-      assignment_id: assignment.id,
-      submission_id: assignment.submission_for_student(test_student).anonymous_id,
-      anonymous: true
-    }
-    post 'resubmit_to_turnitin', params: params
-    expect(response).to be_redirect
-  end
-
   describe 'POST resubmit_to_vericite' do
     it "emits a 'plagiarism_resubmit' live event" do
       expect(Canvas::LiveEvents).to receive(:plagiarism_resubmit)
@@ -762,10 +761,15 @@ describe SubmissionsController do
  end
 
   describe 'GET turnitin_report' do
-    it 'returns 400 if submission_id is not integer' do
+    it 'returns bad_request if submission_id is not an integer' do
       assignment = assignment_model
-      get 'turnitin_report', params: {:course_id => assignment.context_id, :assignment_id => assignment.id, :submission_id => '{ user_id }', :asset_string => '123'}
-      expect(response.response_code).to eq 400
+      get 'turnitin_report', params: {
+        course_id: assignment.context_id,
+        assignment_id: assignment.id,
+        submission_id: '{ user_id }',
+        asset_string: '123'
+      }
+      expect(response).to have_http_status(:bad_request)
     end
   end
 
