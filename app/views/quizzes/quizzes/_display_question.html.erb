@@ -66,11 +66,17 @@
       <% if user_answer %>
         <div class="user_points" <%= hidden(true) if (assessing || assessment_results) && question_type && question_type.entry_type == "none" %>>
           <% if editable %>
-            <input class="question_input"
-              name="question_score_<%= hash_get(question, :id) %>" placeholder="--"
+            <input class="question_input_hidden" type="hidden"
+              name="question_score_<%= hash_get(question, :id) %>"
               value="<%= point_value_for_input(user_answer, question).is_a?(Float) &&
                 !point_value_for_input(user_answer, question).nan? &&
-                n(round_if_whole(point_value_for_input(user_answer, question).round(2))) || ''
+                round_if_whole(point_value_for_input(user_answer, question).round(2)) || ''
+              %>" />
+            <input class="question_input"
+              placeholder="--"
+              value="<%= point_value_for_input(user_answer, question).is_a?(Float) &&
+                !point_value_for_input(user_answer, question).nan? &&
+                render_score(point_value_for_input(user_answer, question)) || ''
               %>"
               autocomplete='off'/>
           <% else %>
@@ -86,17 +92,17 @@
             <% end %>
           <% end %>
           <% question[:points_possible] = 0 if question_type.answer_type == 'none' %>
-          <%= t(:points_possible, "%{points_possible} pts", :points_possible => raw("<span class=\"points question_points\"> / #{round_if_whole(hash_get(question, :points_possible, "0"))}</span>")) %>
+          <%= t(:points_possible, "%{points_possible} pts", :points_possible => raw("<span class=\"points question_points\"> / #{render_score(hash_get(question, :points_possible, "0"))}</span>")) %>
           <% if hash_get(user_answer, :score_before_regrade) %>
             <span class=user-regrade-points>
               <%= t('regraded_score', 'Regraded Score:') %>
               <%= render_score hash_get(user_answer, :points) %>
-              <%= t(:points_possible, "%{points_possible} pts", :points_possible => raw("<span class=\"points question_points\"> / #{round_if_whole(hash_get(question, :points_possible, "0"))}</span>")) %>
+              <%= t(:points_possible, "%{points_possible} pts", :points_possible => raw("<span class=\"points question_points\"> / #{render_score(hash_get(question, :points_possible, "0"))}</span>")) %>
             </span>
           <% end %>
         </div>
       <% else %>
-        <%= t(:points_possible, "%{points_possible} pts", :points_possible => raw("<span class=\"points question_points\">#{round_if_whole(hash_get(question, :points_possible, "0"))}</span>")) %>
+        <%= t(:points_possible, "%{points_possible} pts", :points_possible => raw("<span class=\"points question_points\">#{render_score(hash_get(question, :points_possible, "0"))}</span>")) %>
       <% end %>
     </span>
     </div>

@@ -141,8 +141,8 @@
 <% if editable %>
   <div class="update_scores_fudge">
     <label for="fudge_points_entry"><%= before_label(:fudge_points, "Fudge Points") %></label>
-    <input type="hidden" name="fudge_points" value="<%= @submission.fudge_points || 0 %>">
-    <input id="fudge_points_entry" type="number" step="any" name="fudge_points" value="<%= (!@submission.fudge_points || @submission.fudge_points == 0 ? '' : @submission.fudge_points) %>" placeholder="--" autocomplete='off' />
+    <input id="fudge_points_input" type="hidden" name="fudge_points" value="<%= @submission.fudge_points || 0 %>">
+    <input id="fudge_points_entry" type="text" value="<%= (!@submission.fudge_points || @submission.fudge_points == 0 ? '' : render_score(@submission.fudge_points)) %>" placeholder="--" autocomplete='off' />
     <%
       fudge_text = begin
         if @submission.quiz_points_possible == @quiz.points_possible || !@submission.quiz_points_possible || !@quiz.points_possible
@@ -155,7 +155,7 @@
             this box.
             TEXT
             :user => @submission.user.name,
-            :difference => @quiz.points_possible - @submission.quiz_points_possible)
+            :difference => render_score(@quiz.points_possible - @submission.quiz_points_possible))
         else
           t('labels.fudge_points_changed_points_quiz', <<-TEXT,
             Since %{user} took this quiz, the number of points possible
@@ -164,7 +164,7 @@
             this box.
             TEXT
             :user => @submission.user.name,
-            :difference => @quiz.points_possible - @submission.quiz_points_possible)
+            :difference => render_score(@quiz.points_possible - @submission.quiz_points_possible))
         end
       end
     %>
