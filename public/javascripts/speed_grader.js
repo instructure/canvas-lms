@@ -1664,18 +1664,14 @@ EG = {
         $assignment_submission_turnitin_report_url,
         $assignment_submission_originality_report_url
       )
-      let reportUrl
-      let tooltip
-
-      if (!isAnonymous) {
-        reportUrl = $.replaceTags(
-          urlContainer.attr('href'),
-          { user_id: submission.user_id, asset_string: assetString }
-        )
-        tooltip = I18n.t('Similarity Score - See detailed report')
-      } else {
-        tooltip = anonymousAssignmentDetailedReportTooltip
-      }
+      const reportUrl = $.replaceTags(
+        urlContainer.attr('href'),
+        {
+          [anonymizableUserId]: submission[anonymizableUserId],
+          asset_string: assetString
+        }
+      )
+      const tooltip = I18n.t('Similarity Score - See detailed report')
 
       $turnitinScoreContainer.html(turnitinScoreTemplate({
         state: (turnitinAsset.state || 'no') + '_score',
@@ -1824,7 +1820,7 @@ EG = {
     if (!submission.has_originality_score) {
       const resubmitUrl = SpeedgraderHelpers.plagiarismResubmitUrl(submission, anonymizableUserId)
       $('#plagiarism_resubmit_button').off('click')
-      $('#plagiarism_resubmit_button').on('click', (e) => { SpeedgraderHelpers.plagiarismResubmitHandler(e, resubmitUrl, anonymizableUserId) })
+      $('#plagiarism_resubmit_button').on('click', (e) => { SpeedgraderHelpers.plagiarismResubmitHandler(e, resubmitUrl) })
     }
 
     if(vericiteEnabled){

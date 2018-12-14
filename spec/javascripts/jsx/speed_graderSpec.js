@@ -4930,7 +4930,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
           <span class='turnitin_info_container'></span>
         </div>
         <a id='assignment_submission_originality_report_url' href='#'></a>
-        <a id='assignment_submission_turnitin_report_url' href='#'></a>
+        <a id='assignment_submission_turnitin_report_url' href='#{{ user_id }}/{{ asset_string }}'></a>
         <a id='assignment_submission_vericite_report_url' href='#'></a>
       `)
 
@@ -4944,11 +4944,13 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       })
 
       submission = {
+        anonymous_id: 'abcde',
         grading_period_id: 8,
         id: '1',
         user_id: '1',
         submission_type: 'online_text_entry',
         submission_history: [{
+          anonymous_id: 'abcde',
           grading_period_id: 8,
           id: '1',
           user_id: '1',
@@ -4997,6 +4999,21 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         strictEqual(document.querySelector(gradeSimilaritySelector).tagName, 'A')
       })
 
+      test('includes the user ID and asset ID in the link for Turnitin submissions', () => {
+        submission.submission_history[0].turnitin_data = turnitinData
+        submission.submission_history[0].has_originality_score = true
+
+        window.jsonData = testJsonData
+        SpeedGrader.EG.jsonReady()
+        SpeedGrader.EG.currentStudent = {
+          ...student,
+          submission
+        }
+        SpeedGrader.EG.handleSubmissionSelectionChange()
+
+        ok(document.querySelector(gradeSimilaritySelector).href.includes('#1/submission_1'))
+      })
+
       test('links to a detailed report for VeriCite submissions', () => {
         submission.submission_history[0].turnitin_data = vericiteData
         submission.submission_history[0].has_originality_score = true
@@ -5015,10 +5032,13 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
 
     QUnit.module('when anonymous grading is active', hooks => {
       hooks.beforeEach(() => {
+        const reportURL = document.querySelector('#assignment_submission_turnitin_report_url')
+        reportURL.href = reportURL.href.replace('user_id', 'anonymous_id')
+
         testJsonData.anonymize_students = true
       })
 
-      test('does not link to a report for Turnitin submissions', () => {
+      test('links to a report for Turnitin submissions', () => {
         submission.submission_history[0].turnitin_data = turnitinData
         submission.submission_history[0].has_originality_score = true
 
@@ -5030,7 +5050,23 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         }
         SpeedGrader.EG.handleSubmissionSelectionChange()
 
-        strictEqual(document.querySelector(gradeSimilaritySelector).tagName, 'SPAN')
+        strictEqual(document.querySelector(gradeSimilaritySelector).tagName, 'A')
+      })
+
+      test('includes the anonymous submission ID and asset ID in the link for Turnitin submissions', () => {
+        submission.submission_history[0].turnitin_data = turnitinData
+        submission.submission_history[0].has_originality_score = true
+
+        window.jsonData = testJsonData
+        SpeedGrader.EG.jsonReady()
+        SpeedGrader.EG.currentStudent = {
+          ...student,
+          submission
+        }
+        SpeedGrader.EG.handleSubmissionSelectionChange()
+
+        const destinationURL = new URL(document.querySelector(gradeSimilaritySelector).href)
+        strictEqual(destinationURL.hash, '#abcde/submission_1')
       })
 
       test('does not link to a report for VeriCite submissions', () => {
