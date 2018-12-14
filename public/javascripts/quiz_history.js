@@ -17,6 +17,8 @@
  */
 
 import $ from 'jquery'
+import I18n from 'i18n!quizzes'
+import numberHelper from 'jsx/shared/helpers/numberHelper'
 import './jquery.instructure_misc_plugins' /* fragmentChange */
 import './jquery.templateData'
 import './vendor/jquery.scrollTo'
@@ -106,7 +108,9 @@ import 'compiled/behaviors/quiz_selectmenu'
           if (!ENV.GRADE_BY_QUESTION) {
             $question.addClass('modified_but_not_saved');
           }
-          $question.find(".user_points :text").val(question.points).end()
+          $question
+            .find("#question_input_hidden").val(question.points).end()
+            .find(".user_points :text").val(I18n.n(question.points)).end()
             .find(".question_neutral_comment .question_comment_text textarea").val(question.comments);
         }
         if(parentWindow.hasProperty('lastQuestionTouched') && !ENV.GRADE_BY_QUESTION) {
@@ -156,7 +160,7 @@ import 'compiled/behaviors/quiz_selectmenu'
         if (!ENV.GRADE_BY_QUESTION) {
           $question.addClass('modified_but_not_saved');
         }
-        data.points = parseFloat($question.find(".user_points :text").val(), 10);
+        data.points = numberHelper.parse($question.find(".user_points :text").val());
         data.comments = $question.find(".question_neutral_comment .question_comment_text textarea").val() || "";
         scoringSnapshot.update(question_id, data);
       }
@@ -184,14 +188,14 @@ import 'compiled/behaviors/quiz_selectmenu'
       var $total = $("#after_fudge_points_total");
       var total = 0;
       $(".display_question .user_points:visible").each(function() {
-        var points = parseFloat($(this).find("input.question_input").val(), 10) || 0;
+        var points = numberHelper.parse($(this).find("input.question_input").val()) || 0;
         points = Math.round(points * 100.0) / 100.0;
         total = total + points;
       });
-      var fudge = (parseFloat($("#fudge_points_entry").val(), 10) || 0);
+      var fudge = (numberHelper.parse($("#fudge_points_entry").val()) || 0);
       fudge = Math.round(fudge * 100.0) / 100.0;
       total = total + fudge;
-      $total.text(total || "0");
+      $total.text(I18n.n(total) || "0");
     },
 
     questions: function(){
@@ -295,8 +299,8 @@ import 'compiled/behaviors/quiz_selectmenu'
     updateStatusFor: function($scoreInput){
       try{
         var questionId = $scoreInput.attr('name').split('_')[2];
-        var scoreValue = $scoreInput.val();
-        $('#quiz_nav_' + questionId).toggleClass('complete', (!isNaN(parseFloat(scoreValue))));
+        var scoreValue = numberHelper.parse($scoreInput.val());
+        $('#quiz_nav_' + questionId).toggleClass('complete', (!isNaN(scoreValue)));
       } catch(err) {
         // do nothing; if there's no status to update, continue with other execution
       }
@@ -413,12 +417,14 @@ import 'compiled/behaviors/quiz_selectmenu'
       var questionId = $question.attr('id');
       gradingForm.updateSnapshotFor($question);
       if($(this).hasClass('question_input')){
+        $question.find('.question_input_hidden').val(numberHelper.parse($(this).val()) || '')
         quizNavBar.updateStatusFor($(this));
       }
     });
 
     $("#fudge_points_entry").change(function() {
-      var points = parseFloat($(this).val(), 10);
+      var points = numberHelper.parse($(this).val());
+      $("#fudge_points_input").val(points || '');
       gradingForm.addFudgePoints(points);
     });
 
