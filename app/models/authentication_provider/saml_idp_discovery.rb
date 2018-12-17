@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2016 - present Instructure, Inc.
+# Copyright (C) 2015 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,32 +14,26 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
-class Version::Partitioner
-  cattr_accessor :logger
+class AuthenticationProvider::SamlIdpDiscovery < AuthenticationProvider::Delegated
+  class << self
+    def enabled?(_account = nil)
+      AuthenticationProvider::SAML.enabled?
+    end
 
-  def self.precreate_tables
-    Setting.get('versions_precreate_tables', 2).to_i
-  end
+    def recognized_params
+      [ :discovery_service_url ].freeze
+    end
 
-  def self.process
-    Shackles.activate(:deploy) do
-      Version.transaction do
-        log '*' * 80
-        log '-' * 80
+    def display_name
+      'SAML IdP Discovery Service'
+    end
 
-        partman = CanvasPartman::PartitionManager.create(Version)
-
-        partman.ensure_partitions(precreate_tables)
-
-        log 'Done. Bye!'
-        log '*' * 80
-        ActiveRecord::Base.connection_pool.current_pool.disconnect! unless Rails.env.test?
-      end
+    def sti_name
+      'saml_idp_discovery'
     end
   end
 
-  def self.log(*args)
-    logger.info(*args) if logger
-  end
+  alias_attribute :discovery_service_url, :log_in_url
 end

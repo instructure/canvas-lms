@@ -87,7 +87,8 @@ class DueDateCacher
     opts = {
       assignments: [assignment.id],
       inst_jobs_opts: {
-        strand: "cached_due_date:calculator:Course:Assignments:#{assignment.context.global_id}"
+        strand: "cached_due_date:calculator:Course:Assignments:#{assignment.context.global_id}",
+        max_attempts: 10
       },
       update_grades: update_grades,
       original_caller: current_caller,
@@ -100,6 +101,7 @@ class DueDateCacher
   def self.recompute_course(course, assignments: nil, inst_jobs_opts: {}, run_immediately: false, update_grades: false, original_caller: caller(1..1).first, executing_user: nil)
     Rails.logger.debug "DDC.recompute_course(#{course.inspect}, #{assignments.inspect}, #{inst_jobs_opts.inspect}) - #{original_caller}"
     course = Course.find(course) unless course.is_a?(Course)
+    inst_jobs_opts[:max_attempts] ||= 10
     inst_jobs_opts[:singleton] ||= "cached_due_date:calculator:Course:#{course.global_id}" if assignments.nil? && !inst_jobs_opts[:strand]
 
     assignments_to_recompute = assignments || Assignment.active.where(context: course).pluck(:id)
@@ -117,6 +119,7 @@ class DueDateCacher
   def self.recompute_users_for_course(user_ids, course, assignments = nil, inst_jobs_opts = {})
     user_ids = Array(user_ids)
     course = Course.find(course) unless course.is_a?(Course)
+    inst_jobs_opts[:max_attempts] ||= 10
     if assignments.nil?
       inst_jobs_opts[:singleton] ||= "cached_due_date:calculator:Users:#{course.global_id}:#{Digest::MD5.hexdigest(user_ids.sort.join(':'))}"
     end
@@ -189,14 +192,15 @@ class DueDateCacher
         submission_scope = Submission.active.where(assignment_id: assignment_id)
 
         if @user_ids.blank? && assigned_student_ids.blank? && enrollment_counts.prior_student_ids.blank?
-          submission_scope.in_batches.update_all(workflow_state: :deleted)
+          submission_scope.in_batches.update_all(workflow_state: :deleted, updated_at: Time.zone.now)
         else
           # Delete the users we KNOW we need to delete in batches (it makes the database happier this way)
           deletable_student_ids =
             enrollment_counts.accepted_student_ids - assigned_student_ids - enrollment_counts.prior_student_ids
           deletable_student_ids.each_slice(1000) do |deletable_student_ids_chunk|
             # using this approach instead of using .in_batches because we want to limit the IDs in the IN clause to 1k
-            submission_scope.where(user_id: deletable_student_ids_chunk).update_all(workflow_state: :deleted)
+            submission_scope.where(user_id: deletable_student_ids_chunk).
+              update_all(workflow_state: :deleted, updated_at: Time.zone.now)
           end
         end
       end
@@ -207,7 +211,7 @@ class DueDateCacher
         @assignment_ids.each_slice(10) do |assignment_ids_slice|
           Submission.active.
             where(assignment_id: assignment_ids_slice, user_id: student_slice).
-            update_all(workflow_state: :deleted)
+            update_all(workflow_state: :deleted, updated_at: Time.zone.now)
         end
       end
 

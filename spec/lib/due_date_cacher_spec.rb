@@ -44,7 +44,11 @@ describe DueDateCacher do
     it "queues a delayed job in an assignment-specific singleton in production" do
       expect(DueDateCacher).to receive(:new).and_return(@instance)
       expect(@instance).to receive(:send_later_if_production_enqueue_args).
-        with(:recompute, strand: "cached_due_date:calculator:Course:Assignments:#{@assignment.context.global_id}")
+        with(
+          :recompute,
+          strand: "cached_due_date:calculator:Course:Assignments:#{@assignment.context.global_id}",
+          max_attempts: 10
+        )
       DueDateCacher.recompute(@assignment)
     end
 
@@ -125,13 +129,13 @@ describe DueDateCacher do
     it "queues a delayed job in a singleton in production if assignments.nil" do
       expect(DueDateCacher).to receive(:new).and_return(@instance)
       expect(@instance).to receive(:send_later_if_production_enqueue_args).
-        with(:recompute, singleton: "cached_due_date:calculator:Course:#{@course.global_id}")
+        with(:recompute, singleton: "cached_due_date:calculator:Course:#{@course.global_id}", max_attempts: 10)
       DueDateCacher.recompute_course(@course)
     end
 
     it "queues a delayed job without a singleton if assignments is passed" do
       expect(DueDateCacher).to receive(:new).and_return(@instance)
-      expect(@instance).to receive(:send_later_if_production_enqueue_args).with(:recompute, {})
+      expect(@instance).to receive(:send_later_if_production_enqueue_args).with(:recompute, { max_attempts: 10 })
       DueDateCacher.recompute_course(@course, assignments: @assignments)
     end
 
@@ -152,7 +156,7 @@ describe DueDateCacher do
         with(@course, match_array(@assignments.map(&:id).sort), hash_including(update_grades: false)).
         and_return(@instance)
       expect(@instance).to receive(:send_later_if_production_enqueue_args).
-        with(:recompute, singleton: "cached_due_date:calculator:Course:#{@course.global_id}")
+        with(:recompute, singleton: "cached_due_date:calculator:Course:#{@course.global_id}", max_attempts: 10)
       DueDateCacher.recompute_course(@course.id)
     end
 
@@ -236,14 +240,18 @@ describe DueDateCacher do
     it "queues a delayed job in a singleton if given no assignments and no singleton option" do
       expect(DueDateCacher).to receive(:new).and_return(instance)
       expect(instance).to receive(:send_later_if_production_enqueue_args).
-        with(:recompute, singleton: "cached_due_date:calculator:Users:#{@course.global_id}:#{Digest::MD5.hexdigest(student_1.id.to_s)}")
+        with(
+          :recompute,
+          singleton: "cached_due_date:calculator:Users:#{@course.global_id}:#{Digest::MD5.hexdigest(student_1.id.to_s)}",
+          max_attempts: 10
+        )
       DueDateCacher.recompute_users_for_course(student_1.id, @course)
     end
 
     it "queues a delayed job in a singleton if given no assignments and a singleton option" do
       expect(DueDateCacher).to receive(:new).and_return(instance)
       expect(instance).to receive(:send_later_if_production_enqueue_args).
-        with(:recompute, singleton: "what:up:dog")
+        with(:recompute, singleton: "what:up:dog", max_attempts: 10)
       DueDateCacher.recompute_users_for_course(student_1.id, @course, nil, singleton: "what:up:dog")
     end
 
@@ -413,6 +421,14 @@ describe DueDateCacher do
           }.from(1).to(0)
         end
 
+        it "updates the timestamp when deleting submissions for enrollments that are deleted" do
+          @course.student_enrollments.update_all(workflow_state: 'deleted')
+
+          expect { cacher.recompute }.to change {
+            Submission.where(assignment_id: @assignment.id).first.updated_at
+          }
+        end
+
         it "should create submissions for enrollments that are overridden" do
           assignment_override_model(assignment: @assignment, set: @course.default_section)
           @override.override_due_at(@assignment.due_at + 1.day)
@@ -469,6 +485,14 @@ describe DueDateCacher do
         expect { @assignment.save! }.to change {
           Submission.active.count
         }.from(1).to(0)
+      end
+
+      it "updates the timestamp when deleting submissions for enrollments that are no longer assigned" do
+        @assignment.only_visible_to_overrides = true
+
+        expect { @assignment.save! }.to change {
+          Submission.first.updated_at
+        }
       end
 
       it "does not delete submissions for concluded enrollments" do

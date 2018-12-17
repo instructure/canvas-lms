@@ -2381,8 +2381,8 @@ sv:
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Är du säker på att du vill radera det här omdömesschemat?"
   are_you_sure_you_want_to_delete_this_page_2185844: "Är du säker på att du vill ta bort denna sidan?"
   are_you_sure_you_want_to_delete_this_recording_a4aab14b: "Är du säker på att du vill ta bort den här inspelningen?"
-  are_you_sure_you_want_to_delete_this_rubric_any_co_29d7ac76: "Är du säker på att du vill radera den här matrisen? Varje kurs som för tillfället är kopplad till denna rubrik har fortfarande tillgång till den, men inga nya kurser kommer att kunna använda den."
-  are_you_sure_you_want_to_delete_this_rubric_this_a_d4ff43c7: "Är du säker på att du vill radera den här matrisen? Den här åtgärden tar bort denna rubrikförening från alla uppgifter i den aktuella kursen, och tar bort eventuella befintliga bedömningar."
+  are_you_sure_you_want_to_delete_this_rubric_any_co_29d7ac76: "Är du säker på att du vill radera den här matrisen? Varje kurs som för tillfället är kopplad till denna matris har fortfarande tillgång till den, men inga nya kurser kommer att kunna använda den."
+  are_you_sure_you_want_to_delete_this_rubric_this_a_d4ff43c7: "Är du säker på att du vill radera den här matrisen? Den här åtgärden tar bort denna matrisförening från alla uppgifter i den aktuella kursen, och tar bort eventuella befintliga bedömningar."
   are_you_sure_you_want_to_delete_this_to_do_item_497016ea: "Är du säker på att du vill radera det här To Do föremålet?"
   are_you_sure_you_want_to_delete_this_track_f5a16357: "Är du säker på att du vill ta bort det här spåret?"
   are_you_sure_you_want_to_delete_your_copy_of_these_f04442ed: 
@@ -7162,7 +7162,7 @@ sv:
       Fastställer synlighet och hantering av fliken Resultat i kontonavigering.
       Gör att användare kan skapa, importera, redigera och ta bort resultat och resultatgrupper på konto- och kursnivå.
   determines_visibility_and_management_of_rubrics_ta_88a65a22: |-
-      Fastställer synlighet och hantering av fliken Rubriker i kontonavigering.
+      Fastställer synlighet och hantering av fliken Matriser i kontonavigering.
       Gör att användare kan hantera matriser.
   determines_visibility_and_management_of_sis_import_a91ed255: "Anger synlighet och hantering av fliken SIS-import i kontonavigering."
   determines_visibility_and_management_of_the_questi_fbf70ba9: "Anger synlighet och hantering av länken Frågebanker i kontonavigering."
@@ -7251,8 +7251,8 @@ sv:
   disabling_post_to_sis_is_not_available_for_non_pub_ee031373: "Inaktivering av Post till SIS är inte tillgängligt för icke publicerade kurser"
   disabling_sync_to_name_failed_e7521ebb: "Avaktivering av synkronisering för %{name} misslyckades"
   disabling_this_permission_will_override_if_enabled_8d9c42f5: "Om den här behörigheten inaktiveras åsidosätts (om aktiverad) Rubriker – lägg till/redigera/ta bort behörigheter, och förhindrar användare från att skapa eller redigera matriser från en enskild uppgift. Men även om Måluppfyllelser – lägg till/redigera/ta bort är aktiverad, kan användare ändå lägga till matriser via Resultat – hantera matriser."
-  disabling_this_permission_will_override_if_enabled_955dfb03: "Om den här behörigheten inaktiveras åsidosätts (om aktiverad) Rubriker – lägg till/redigera/ta bort behörigheter, och förhindrar användare från att skapa eller redigera matriser från en enskild uppgift. Men, om Lärandemål – lägg till/redigera/ta bort är aktiverad, kan användaren fortfarande lägga till matriser via Lärandemål (knappen Hantera matriser)."
-  disabling_this_permission_will_override_if_enabled_9c4fa650: "Om den här behörigheten inaktiveras åsidosätts (om aktiverad) Rubriker – lägg till/redigera/ta bort behörigheter, och förhindrar användare från att skapa eller redigera matriser från en enskild uppgift. Men, om Lärandemål – lägg till/redigera/ta bort är aktiverad, kan användaren fortfarande lägga till matriser via Lärandemål (knappen Hantera matriser)."
+  disabling_this_permission_will_override_if_enabled_955dfb03: "Om den här behörigheten inaktiveras åsidosätts (om aktiverad) Matriser – lägg till/redigera/ta bort behörigheter, och förhindrar användare från att skapa eller redigera matriser från en enskild uppgift. Men, om Lärandemål – lägg till/redigera/ta bort är aktiverad, kan användaren fortfarande lägga till matriser via Lärandemål (knappen Hantera matriser)."
+  disabling_this_permission_will_override_if_enabled_9c4fa650: "Om den här behörigheten inaktiveras åsidosätts (om aktiverad) Matriser – lägg till/redigera/ta bort behörigheter, och förhindrar användare från att skapa eller redigera matriser från en enskild uppgift. Men, om Lärandemål – lägg till/redigera/ta bort är aktiverad, kan användaren fortfarande lägga till matriser via Lärandemål (knappen Hantera matriser)."
   disallow_comments_6d04b47a: "Tillåt inte kommentarer"
   disallow_replies_for_title_ca3806b2: "Tillåt inte svar för %{title}"
   disccussions_515a3a99: Diskussioner
@@ -13591,7 +13591,7 @@ sv:
   moodle_formula_warning_title: "Möjliga svar måste om genereras för Formulärs-frågor"
   more_cf9cc661: Mer
   more_courses_5ebbe998: "Fler kurser"
-  more_importantly_canvas_allows_you_to_add_outcomes_78822cf: "Viktigare, Canvas tillåter dig att lägga till resultat i dina omdömesrubriker så att du kan utvärdera bemästring när du bedömer uppgifter. När du har satt upp resultat klickar du på hantera-rubriker för att börja använda dina resultat för bedömning."
+  more_importantly_canvas_allows_you_to_add_outcomes_78822cf: "Viktigare, Canvas tillåter dig att lägga till resultat i dina omdömesmatriser så att du kan utvärdera bemästring när du bedömer uppgifter. När du har satt upp resultat klickar du på hantera-matriser för att börja använda dina resultat för bedömning."
   more_info_at_course_name_56dc8c10: "Mer information på %{course_name}"
   more_information_3dfb76b5: "Mer information"
   more_people_options_730e9686: "Fler människor alternativ"
@@ -17636,7 +17636,7 @@ sv:
   rubric_association: 
     no_details: "Inga detaljer"
   rubric_created_64980593: "Matris skapades"
-  rubric_criterion_range_12499bf1: "Rubrik kriterie-område"
+  rubric_criterion_range_12499bf1: "Matris kriterie-område"
   rubric_deleted_3d9efc18: "Matris togs bort"
   rubric_fc39da76: Matris
   rubric_updated_103e24dc: "Matris uppdaterades"
@@ -18068,7 +18068,7 @@ sv:
   select_one_of_the_options_c8b0c6e4: "Välj ett av alternativen:"
   select_prerequisite_module_57894963: "Välj förkunskapsmodul"
   select_prerequite_module_e9042bb0: "Välj nödvändig modul"
-  select_rubric_2aa2ffa2: "Välj rubrik"
+  select_rubric_2aa2ffa2: "Välj matris"
   select_student_name_caaff244: "Välj student %{name}"
   select_studentname_e7b7908d: "Välj %{studentName}"
   select_students_for_review_6e004a12: "Välj studenter att bedöma"
@@ -19153,7 +19153,7 @@ sv:
   space_ec476863: Blanksteg
   spain_34_d5286826: "Spanien (+34)"
   spain_817a5961: Spanien
-  specify_max_and_min_points_to_clarify_boundaries_o_1c4d732a: "Ange max och min poäng för att klargöra gränserna för en rubrik-kriterie-gradering."
+  specify_max_and_min_points_to_clarify_boundaries_o_1c4d732a: "Ange max och min poäng för att klargöra gränserna för en matris-kriterie-gradering."
   specify_the_transparency_of_the_watermark_backgrou_f4d5cc1d: "Välj transparensen för bakgrundsbildens vattenmärke"
   speech_recognition_c1c0b7f7: Taligenkänning
   speed_grader: 
@@ -20087,7 +20087,7 @@ sv:
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Det här låter dig verifiera Canvas för att posta omdömen på SIS"
   this_will_apply_these_changes_to_your_entire_accou_22b86cde: "Detta kommer ändra hela sitt konto. Vill du fortsätta?"
   this_will_apply_this_theme_to_your_entire_account__4cfabbe5: "Det här kommer att tillämpa temat på hela ditt konto. Vill du fortsätta?"
-  this_will_update_all_rubrics_using_this_outcome_th_6954ca45: "Detta kommer att uppdatera alla rubriker med hjälp av detta resultat som ännu inte har utvärderats"
+  this_will_update_all_rubrics_using_this_outcome_th_6954ca45: "Detta kommer att uppdatera alla matriser med hjälp av detta resultat som ännu inte har utvärderats"
   threshold_pts_45f0e5d8: "tröskel: %{pts}"
   ticket_successfully_submitted_f6254460: "Biljetten skickades in."
   ticketing_system_52205bff: Biljettsystem
@@ -20486,7 +20486,7 @@ sv:
   to_share_a_discussion_to_commons_discussions_view__df0fd6ac: "Om du vill dela en diskussion till Commons måste även Diskussioner – visa vara aktiverad."
   to_view_a_course_outcomes_page_as_read_only_course_5bb7241f: |-
       Om du vill visa en kursresultatsida som skrivskyddad måste Kursinnehåll – visa vara aktiverad.
-      Om du vill importera måluppfyllelser från resultatsidan måste Rubriker – lägg till/redigera/ta bort vara aktiverad.
+      Om du vill importera måluppfyllelser från resultatsidan måste Matriser – lägg till/redigera/ta bort vara aktiverad.
       Användare kan komma åt och skapa (men inte redigera) enskilda uppgiftsmatriser via Uppgifter om Kursinnehåll – visa och Uppgifter och quiz – lägg till/redigera/ta bort är aktiverade.
   to_view_a_user_s_login_details_users_view_list_and_6d42118b: "Om du vill se en användares inloggningsuppgifter måste även både Användare – visa lista och Ändra inloggningsuppgifter för användare vara aktiverade."
   to_view_account_level_groups_groups_add_edit_delet_bf12e984: "Om du vill se grupper på kontonivå måste även Grupper – lägg till/redigera/ta bort vara aktiverad."

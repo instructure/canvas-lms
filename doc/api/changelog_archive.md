@@ -6,6 +6,51 @@ The Change Log Archive page displays previous API changes in the <a href="file.c
 
 <h2>Prior Updates</h2>
 
+<h2>2018-10-27</h2>
+
+<h3>Changes</h3>
+<table class="changelog">
+<tr>
+<th>API Calls</th>
+<th>Function</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="conversations.html">Conversations API</a></td>
+<td>Create a Conversation Endpoint</td>
+<td>Recipients parameter: Added clarification when the course/group has over 100 enrollments, bulk_message and group_conversation must be set to true</td>
+</tr>
+<tr>
+<td><a href="quiz_extensions.html">Quiz Extensions API</a></td>
+<td>Set Extensions for Student Quiz Submissions Endpoint</td>
+<td>All parameters: Added quiz_extensions to parameter name</td>
+</tr>
+<tr>
+<td><a href="quiz_submissions.html">Quiz Submissions API</a></td>
+<td>Update Student Question Scores and Comment Endpoint</td>
+<td>All parameters: Added quiz_submissions to parameter name</td>
+</tr>
+</table>
+
+<h3>Additions</h3>
+<table class="changelog">
+<tr>
+<th>API Responses</th>
+<th>Function</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="plagiarism_detection_platform_assignments.html">Plagiarism Detection Platform Assignments API</a></td>
+<td>LtiAssignment Object</td>
+<td>Added LTI Course ID and Course ID return parameters
+</tr>
+<tr>
+<td><a href="plagiarism_detection_submissions.html">Plagiarism Detection Submissions API</a></td>
+<td>Submission Object</td>
+<td>Added LTI Course ID and Course ID return parameters</td>
+</tr>
+</table>
+
 <h2>2018-10-06</h2>
 
 <h3>Changes</h3>
@@ -35,8 +80,8 @@ The Change Log Archive page displays previous API changes in the <a href="file.c
 </tr>
 <tr>
 <td><a href="file.file_uploads.html">Uploading Files</td>
-<td>Uploading via URL</td>
-<td>Explains file management system transition and clarifies newer file upload process
+<td>Uploading via POST</td>
+<td>Step 3: Explains file management system transition and clarifies newer file upload process
 </td>
 </tr>
 </table>
@@ -91,14 +136,14 @@ The Change Log Archive page displays previous API changes in the <a href="file.c
 <h3>Removals</h3>
 <table class="changelog">
 <tr>
-<th>Basics</th>
+<th>API</th>
 <th>File</th>
 <th></th>
 </tr>
 <tr>
 <td><a href="file.file_uploads.html">Uploading Files</td>
-<td>Uploading via URL</td>
-<td>Explains file management system transition and identifies deprecated behavior
+<td>Uploading via POST</td>
+<td>Step 3: Identifies deprecated behavior in replacing GET calls with the deprecated POST request, to be removed 2019-04-21
 </td>
 </tr>
 </table>
