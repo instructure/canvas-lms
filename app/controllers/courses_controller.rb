@@ -2453,7 +2453,6 @@ class CoursesController < ApplicationController
       end
       blueprint_keys = [:blueprint_restrictions, :use_blueprint_restrictions_by_object_type, :blueprint_restrictions_by_object_type]
       if blueprint_keys.any?{|k| params[:course].has_key?(k)} && MasterCourses::MasterTemplate.is_master_course?(@course)
-        return unless authorized_action(@course.account, @current_user, :manage_master_courses)
         template = MasterCourses::MasterTemplate.full_template_for(@course)
 
         if params[:course].has_key?(:use_blueprint_restrictions_by_object_type)
@@ -2474,8 +2473,9 @@ class CoursesController < ApplicationController
           template.default_restrictions_by_type = parsed_restrictions_by_type
         end
 
-        if template.changed? && !template.save
-          @course.errors.add(:master_course_restrictions, t("Invalid restrictions"))
+        if template.changed?
+          return unless authorized_action(@course.account, @current_user, :manage_master_courses)
+          @course.errors.add(:master_course_restrictions, t("Invalid restrictions")) unless template.save
         end
       end
 
