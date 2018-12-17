@@ -106,7 +106,16 @@ class Oauth2ProviderController < ApplicationController
     end
 
     raise Canvas::Oauth::RequestError, :unsupported_grant_type unless granter.supported_type?
-    render :json => granter.token
+
+    token = granter.token
+    # make sure locales are set up
+    if token.is_a?(Canvas::Oauth::Token)
+      @current_user = token.user
+      assign_localizer
+      I18n.set_locale_with_localizer
+    end
+
+    render :json => token
   end
 
   def destroy
