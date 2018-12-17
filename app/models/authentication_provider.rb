@@ -43,7 +43,7 @@ class AuthenticationProvider < ActiveRecord::Base
     case type_name
     when 'cas', 'ldap', 'saml'
       const_get(type_name.upcase)
-    when 'clever', 'facebook', 'google', 'microsoft', 'twitter'
+    when 'clever', 'facebook', 'google', 'microsoft', 'saml_idp_discovery', 'twitter'
       const_get(type_name.classify)
     when 'canvas'
       Canvas
@@ -66,7 +66,7 @@ class AuthenticationProvider < ActiveRecord::Base
     false
   end
 
-  def self.enabled?
+  def self.enabled?(_account = nil)
     true
   end
 
@@ -97,10 +97,13 @@ class AuthenticationProvider < ActiveRecord::Base
   has_many :pseudonyms, foreign_key: :authentication_provider_id, inverse_of: :authentication_provider
   acts_as_list scope: { account: self, workflow_state: [nil, 'active'] }
 
-  VALID_AUTH_TYPES = %w[canvas cas clever facebook github google ldap linkedin microsoft openid_connect saml twitter].freeze
+  def self.valid_auth_types
+    %w[canvas cas clever facebook github google ldap linkedin microsoft openid_connect saml saml_idp_discovery twitter].freeze
+  end
+
   validates :auth_type,
-            inclusion: { in: VALID_AUTH_TYPES,
-                         message: "invalid auth_type, must be one of #{VALID_AUTH_TYPES.join(',')}" }
+            inclusion: { in: ->(_) { valid_auth_types },
+                         message: -> { "invalid auth_type, must be one of #{valid_auth_types.join(',')}" } }
   validates :account_id, presence: true
   validate :validate_federated_attributes
 
@@ -108,7 +111,7 @@ class AuthenticationProvider < ActiveRecord::Base
   # type
   module FindWithType
     def find(*args)
-      if VALID_AUTH_TYPES.include?(args.first)
+      if AuthenticationProvider.valid_auth_types.include?(args.first)
         where(auth_type: args.first).first!
       else
         super

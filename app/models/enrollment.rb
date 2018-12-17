@@ -1028,7 +1028,7 @@ class Enrollment < ActiveRecord::Base
       :recompute_final_score,
       {
         singleton: "Enrollment.recompute_final_score:#{user_id}:#{course_id}:#{opts[:grading_period_id]}",
-        run_at: 2.seconds.from_now # why is this needed?
+        max_attempts: 10
       },
       user_id,
       course_id,

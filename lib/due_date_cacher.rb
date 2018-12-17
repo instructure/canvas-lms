@@ -87,7 +87,8 @@ class DueDateCacher
     opts = {
       assignments: [assignment.id],
       inst_jobs_opts: {
-        strand: "cached_due_date:calculator:Course:Assignments:#{assignment.context.global_id}"
+        strand: "cached_due_date:calculator:Course:Assignments:#{assignment.context.global_id}",
+        max_attempts: 10
       },
       update_grades: update_grades,
       original_caller: current_caller,
@@ -100,6 +101,7 @@ class DueDateCacher
   def self.recompute_course(course, assignments: nil, inst_jobs_opts: {}, run_immediately: false, update_grades: false, original_caller: caller(1..1).first, executing_user: nil)
     Rails.logger.debug "DDC.recompute_course(#{course.inspect}, #{assignments.inspect}, #{inst_jobs_opts.inspect}) - #{original_caller}"
     course = Course.find(course) unless course.is_a?(Course)
+    inst_jobs_opts[:max_attempts] ||= 10
     inst_jobs_opts[:singleton] ||= "cached_due_date:calculator:Course:#{course.global_id}" if assignments.nil? && !inst_jobs_opts[:strand]
 
     assignments_to_recompute = assignments || Assignment.active.where(context: course).pluck(:id)
@@ -117,6 +119,7 @@ class DueDateCacher
   def self.recompute_users_for_course(user_ids, course, assignments = nil, inst_jobs_opts = {})
     user_ids = Array(user_ids)
     course = Course.find(course) unless course.is_a?(Course)
+    inst_jobs_opts[:max_attempts] ||= 10
     if assignments.nil?
       inst_jobs_opts[:singleton] ||= "cached_due_date:calculator:Users:#{course.global_id}:#{Digest::MD5.hexdigest(user_ids.sort.join(':'))}"
     end
