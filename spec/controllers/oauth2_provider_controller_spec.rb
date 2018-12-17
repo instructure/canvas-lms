@@ -296,7 +296,7 @@ describe Oauth2ProviderController do
     let_once(:key) { DeveloperKey.create! scopes: [TokenScopes::USER_INFO_SCOPE[:scope]] }
     let_once(:other_key) { DeveloperKey.create! }
     let_once(:inactive_key) { DeveloperKey.create! workflow_state: 'inactive' }
-    let_once(:user) { User.create! }
+    let_once(:user) { User.create!(locale: 'zh-Hant') }
     let(:old_token) { user.access_tokens.create!(developer_key: key) }
     let(:client_id) { key.id }
     let(:client_secret) { key.api_key }
@@ -437,6 +437,7 @@ describe Oauth2ProviderController do
         expect(response).to be_successful
         json = JSON.parse(response.body)
         expect(json.keys.sort).to match_array ['access_token', 'refresh_token', 'user', 'expires_in', 'token_type']
+        expect(json.dig('user', 'effective_locale')).to eq 'zh-Hant'
       end
 
       it 'deletes existing tokens for the same key when replace_tokens=1' do
