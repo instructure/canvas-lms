@@ -59,9 +59,10 @@ import 'jqueryui/tabs'
     return ENV.context_asset_string || ('user_' + ENV.current_user_id);
   }
 
-  function addEntry(entry){
-    var contextCode = $.mediaComment.contextCode(),
-        mediaType = { 2: 'image', 5: 'audio' }[entry.mediaType] || 'video';
+  function addEntry(entry, isAudioFile){
+    const contextCode = $.mediaComment.contextCode();
+
+    const mediaType = { 2: 'image', 5: 'audio' }[entry.mediaType] || isAudioFile ? 'audio' : 'video';
 
     if (contextCode) {
       $.ajaxJSON("/media_objects", "POST", {
