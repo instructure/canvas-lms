@@ -25,6 +25,7 @@ export function mockAssignment(overrides = {}) {
     pointsPossible: 10,
     unlockAt: null,
     gradingType: 'points',
+    allowedAttempts: null,
     assignmentGroup: {
       name: 'Assignments',
       __typename: 'AssignmentGroup'

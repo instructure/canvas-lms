@@ -27,6 +27,7 @@ import SubmissionStatusPill from './SubmissionStatusPill'
 import DateTitle from './DateTitle'
 import PointsDisplay from './PointsDisplay'
 import StepContainer from './StepContainer'
+import Attempt from './Attempt'
 
 import {StudentAssignmentShape} from '../assignmentData'
 
@@ -71,7 +72,7 @@ class Header extends React.Component {
         </Heading>
 
         {!this.state.isSticky && <AssignmentGroupModuleNav assignment={this.props.assignment} />}
-        <Flex margin={this.state.isSticky ? '0' : '0 0 xx-large 0'}>
+        <Flex margin={this.state.isSticky ? '0' : '0 0 medium 0'}>
           <FlexItem grow>
             <DateTitle assignment={this.props.assignment} />
           </FlexItem>
@@ -96,6 +97,7 @@ class Header extends React.Component {
             </FlexItem>
           </FlexItem>
         </Flex>
+        <Attempt assignment={this.props.assignment} />
         <div className="assignment-pizza-header-outer">
           <div
             className="assignment-pizza-header-inner"

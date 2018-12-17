@@ -32,7 +32,7 @@ function AssignmentGroupModuleNav(props) {
   } = props
 
   return (
-    <Flex margin="0 0 xx-large 0" direction="column">
+    <Flex margin="0 0 large 0" direction="column">
       {modules.slice(0, MAX_DISPLAYED_MODULES).map(module => (
         <FlexItem key={module.id}>
           <Link data-test-id="module-link" href={env.moduleUrl} theme={{color: '#000000'}}>
