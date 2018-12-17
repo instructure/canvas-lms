@@ -73,9 +73,13 @@ export const STUDENT_VIEW_QUERY = gql`
           id
           name
         }
-        submissionsConnection(last: 1) {
+        submissionsConnection(
+          last: 1
+          filter: {states: [unsubmitted, graded, pending_review, submitted]}
+        ) {
           nodes {
             grade
+            submissionStatus
           }
         }
       }

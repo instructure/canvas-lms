@@ -23,6 +23,7 @@ import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReade
 import I18n from 'i18n!assignments_2_student_header'
 
 import AssignmentGroupModuleNav from './AssignmentGroupModuleNav'
+import SubmissionStatusPill from './SubmissionStatusPill'
 import DateTitle from './DateTitle'
 import PointsDisplay from './PointsDisplay'
 import StepContainer from './StepContainer'
@@ -84,6 +85,15 @@ class Header extends React.Component {
               }
               possiblePoints={this.props.assignment.pointsPossible}
             />
+            <FlexItem as="div" align="end" textAlign="end">
+              <SubmissionStatusPill
+                submissionStatus={
+                  this.props.assignment.submissionsConnection &&
+                  this.props.assignment.submissionsConnection.nodes[0] &&
+                  this.props.assignment.submissionsConnection.nodes[0].submissionStatus
+                }
+              />
+            </FlexItem>
           </FlexItem>
         </Flex>
         <div className="assignment-pizza-header-outer">
