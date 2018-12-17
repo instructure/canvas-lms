@@ -77,5 +77,19 @@ export function mockOverride(overrides) {
   }
 }
 
+export function mockSubmission(submissions) {
+  return {
+    id: '1',
+    lid: '1',
+    assetId: '2',
+    assetType: 'Submission',
+    state: 'assigned',
+    assessorId: '3',
+    assessorAssetId: '33',
+    assessorAssetType: 'Submission',
+    ...submissions
+  }
+}
+
 // values need to match the defaults for TeacherViewContext
 export const mockTeacherContext = () => ({...TeacherViewContextDefaults})
