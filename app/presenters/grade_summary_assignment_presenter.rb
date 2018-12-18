@@ -120,7 +120,7 @@ class GradeSummaryAssignmentPresenter
     assignment.special_class ? ("hard_coded " + assignment.special_class) : "editable"
   end
 
-  def show_submission_details_link?
+  def show_submission_details?
     is_assignment? && !!submission&.can_view_details?(@current_user)
   end
 

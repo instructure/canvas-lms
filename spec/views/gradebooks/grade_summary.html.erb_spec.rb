@@ -135,4 +135,123 @@ describe "/gradebooks/grade_summary" do
       expect(response).to have_tag("a[href='#{@submission_details_url}']")
     end
   end
+
+  describe "plagiarism info" do
+    let(:course) { Course.create! }
+    let(:student) { course.enroll_student(User.create!, active_all: true).user }
+    let(:teacher) { course.enroll_teacher(User.create!, active_all: true).user }
+
+    let(:assignment) do
+      course.assignments.create!(
+        title: 'hi',
+        submission_types: 'online_text_entry',
+        anonymous_grading: true
+      )
+    end
+
+    before(:each) do
+      assignment.submit_homework(student, submission_type: 'online_text_entry', body: 'hello')
+      assign(:context, course)
+    end
+
+    context "for an anonymous assignment viewed by a teacher" do
+      let(:presenter) { GradeSummaryPresenter.new(course, teacher, student.id) }
+
+      before(:each) do
+        assign(:presenter, presenter)
+        assign(:current_user, teacher)
+      end
+
+      context "when the assignment uses Turnitin" do
+        before(:each) do
+          allow(presenter).to receive(:turnitin_enabled?).and_return(true)
+        end
+
+        it "does not show plagiarism info when students are anonymized" do
+          render "gradebooks/grade_summary"
+          expect(response).not_to have_tag("a[@title='Similarity score -- more information']")
+        end
+
+        it "shows plagiarism info when students are not anonymized" do
+          assignment.unmute!
+
+          render "gradebooks/grade_summary"
+          expect(response).to have_tag("a[@title='Similarity score -- more information']")
+        end
+      end
+
+      context "when the submission has an associated originality report" do
+        before(:each) do
+          assignment.submission_for_student(student).originality_reports.create!(
+            workflow_state: 'scored',
+            originality_score: 88
+          )
+        end
+
+        it "does not show plagiarism info when students are anonymized" do
+          render "gradebooks/grade_summary"
+          expect(response).not_to have_tag("a[@title='Originality Report']")
+        end
+
+        it "shows plagiarism info when students are not anonymized" do
+          assignment.unmute!
+
+          render "gradebooks/grade_summary"
+          expect(response).to have_tag("a[@title='Originality Report']")
+        end
+      end
+
+      context "when the assignment uses Vericite" do
+        before(:each) do
+          allow(presenter).to receive(:vericite_enabled?).and_return(true)
+        end
+
+        it "does not show plagiarism info when students are anonymized" do
+          render "gradebooks/grade_summary"
+          expect(response).not_to have_tag("a[@title='VeriCite similarity score -- more information']")
+        end
+
+        it "shows plagiarism info when students are not anonymized" do
+          assignment.unmute!
+
+          render "gradebooks/grade_summary"
+          expect(response).to have_tag("a[@title='VeriCite similarity score -- more information']")
+        end
+      end
+    end
+
+    context "for an anonymized assignment viewed by a site administrator" do
+      let(:site_admin) { site_admin_user }
+      let(:presenter) { GradeSummaryPresenter.new(course, site_admin, student.id) }
+
+      before(:each) do
+        assign(:presenter, presenter)
+        assign(:current_user, site_admin)
+      end
+
+      it "always shows plagiarism info when the assignment uses Turnitin" do
+        allow(presenter).to receive(:turnitin_enabled?).and_return(true)
+
+        render "gradebooks/grade_summary"
+        expect(response).to have_tag("a[@title='Similarity score -- more information']")
+      end
+
+      it "always shows plagiarism info when the submission has an originality report" do
+        assignment.submission_for_student(student).originality_reports.create!(
+          workflow_state: 'scored',
+          originality_score: 88
+        )
+
+        render "gradebooks/grade_summary"
+        expect(response).to have_tag("a[@title='Originality Report']")
+      end
+
+      it "always shows plagiarism info when the assignment uses Vericite" do
+        allow(presenter).to receive(:vericite_enabled?).and_return(true)
+
+        render "gradebooks/grade_summary"
+        expect(response).to have_tag("a[@title='VeriCite similarity score -- more information']")
+      end
+    end
+  end
 end
