@@ -463,7 +463,7 @@ class SubmissionsApiController < ApplicationController
     if params[:grouped].present?
       scope = (@section || @context).all_student_enrollments.
         preload(:root_account, :sis_pseudonym, :user => :pseudonyms).
-        where(:user_id => student_ids)
+        where(:user_id => student_ids).order(:user_id)
       student_enrollments = Api.paginate(scope, self, polymorphic_url([:api_v1, @section || @context, :student_submissions]))
 
       submissions_scope = Submission.active.where(user_id: student_enrollments.map(&:user_id), assignment_id: assignments)
