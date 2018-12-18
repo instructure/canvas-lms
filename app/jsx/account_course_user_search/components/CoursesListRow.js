@@ -39,7 +39,8 @@ export default class CoursesListRow extends React.Component {
     name: string.isRequired,
     workflow_state: string.isRequired,
     total_students: number.isRequired,
-    teachers: arrayOf(shape(UserLink.propTypes)).isRequired,
+    teachers: arrayOf(shape(UserLink.propTypes)),
+    teacher_count: number,
     sis_course_id: string,
     subaccount_name: string.isRequired,
     term: shape({name: string.isRequired}).isRequired,
@@ -143,6 +144,7 @@ export default class CoursesListRow extends React.Component {
       sis_course_id,
       total_students,
       teachers,
+      teacher_count,
       subaccount_name,
       showSISIds,
       term,
@@ -196,11 +198,12 @@ export default class CoursesListRow extends React.Component {
               />
             </div>
           ))}
-          {teachers.length > 2 && teachersToShow.length === 2 && (
+          {teachers && teachers.length > 2 && teachersToShow.length === 2 && (
             <Button variant="link" size="small" onClick={this.showMoreTeachers}>
               {I18n.t('Show More')}
             </Button>
           )}
+          {!teachers && teacher_count && I18n.t('%{teacher_count} teachers', {teacher_count})}
         </td>
         <td>{subaccount_name}</td>
         <td>{I18n.n(total_students + newlyEnrolledStudents)}</td>
