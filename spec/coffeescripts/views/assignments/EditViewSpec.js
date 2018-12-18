@@ -703,6 +703,14 @@ QUnit.module('#handleAnonymousGradingChange', (hooks) => {
     const groupCategoryCheckbox = document.getElementById('has_group_category')
     strictEqual(groupCategoryCheckbox.disabled, true)
   })
+
+  test('leaves the group category box disabled if the assignment has submissions', () => {
+    disableCheckbox('has_group_category')
+    view.model.set('has_submitted_submissions', true)
+    view.handleAnonymousGradingChange()
+    const groupCategoryCheckbox = document.getElementById('has_group_category')
+    strictEqual(groupCategoryCheckbox.disabled, true)
+  })
 })
 
 QUnit.module('#togglePeerReviewsAndGroupCategoryEnabled', (hooks) => {

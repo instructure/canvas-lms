@@ -241,7 +241,7 @@ define [
       else if @assignment.anonymousGrading() || @assignment.gradersAnonymousToGraders()
         @disableCheckbox(@$groupCategoryBox, I18n.t('Group assignments cannot be enabled for anonymously graded assignments'))
       else if !@assignment.moderatedGrading()
-        @enableCheckbox(@$groupCategoryBox)
+        @enableCheckbox(@$groupCategoryBox) if @model.canGroup()
 
     togglePeerReviewsAndGroupCategoryEnabled: =>
       if @assignment.moderatedGrading()
@@ -249,7 +249,7 @@ define [
         @disableCheckbox(@$groupCategoryBox, I18n.t("Group assignments cannot be enabled for moderated assignments"))
       else
         @enableCheckbox(@$peerReviewsBox)
-        @enableCheckbox(@$groupCategoryBox)
+        @enableCheckbox(@$groupCategoryBox) if @model.canGroup()
       @renderModeratedGradingFormFieldGroup()
 
     setDefaultsIfNew: =>
