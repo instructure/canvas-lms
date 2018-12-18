@@ -245,6 +245,51 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
     }
   }.observes('showConcludedEnrollments'),
 
+  finalGradeOverrideEnabled: (() => ENV.GRADEBOOK_OPTIONS.final_grade_override_enabled).property(),
+
+  showFinalGradeOverride: function() {
+    if (!ENV.GRADEBOOK_OPTIONS.settings || !this.get('finalGradeOverrideEnabled')) {
+      return false
+    }
+    return ENV.GRADEBOOK_OPTIONS.settings.show_final_grade_overrides === 'true'
+  }.property().volatile(),
+
+  updateShowFinalGradeOverride: function() {
+    ajax.request({
+      dataType: 'json',
+      type: 'put',
+      url: ENV.GRADEBOOK_OPTIONS.settings_update_url,
+      data: {
+        gradebook_settings: {
+          show_final_grade_overrides: this.get('showFinalGradeOverride')
+        }
+      }
+    })
+  }.observes('showFinalGradeOverride'),
+
+  selectedStudentFinalGradeOverrides: function() {
+    const records = this.get('final_grade_overrides')
+    const student = this.get('selectedStudent')
+    const gradingPeriodId = this.get('selectedGradingPeriod.id')
+
+    if (!student || !records || !records.get('isLoaded')) {
+      return
+    }
+
+    const overrides = records.get('content').finalGradeOverrides
+    const overridesForStudent = overrides[student.id]
+
+    if (!overridesForStudent) {
+      return
+    }
+
+    if (gradingPeriodId === "0" || gradingPeriodId == null) {
+      return overridesForStudent.courseGrade
+    }
+
+    return overridesForStudent.gradingPeriodGrades[gradingPeriodId]
+  }.property('selectedStudent', 'selectedGradingPeriod'),
+
   selectedAssignmentPointsPossible: function() {
     return I18n.n(this.get('selectedAssignment.points_possible'))
   }.property('selectedAssignment'),
@@ -418,7 +463,6 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
     const weightingScheme = this.get('weightingScheme')
     const gradingPeriodSet = this.getGradingPeriodSet()
     const effectiveDueDates = this.get('effectiveDueDates.content')
-
     const hasGradingPeriods = gradingPeriodSet && effectiveDueDates
 
     return CourseGradeCalculator.calculate(

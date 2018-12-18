@@ -15,10 +15,10 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import {Route, ArrayProxy, set} from 'ember'
+import {ArrayProxy, ObjectProxy, Route} from 'ember'
 import _ from 'underscore'
-import ajax from 'ic-ajax'
 import fetchAllPages from '../../shared/xhr/fetch_all_pages'
+import {getFinalGradeOverrides} from 'jsx/gradezilla/default_gradebook/FinalGradeOverrides/FinalGradeOverrideApi'
 
 const ScreenreaderGradebookRoute = Route.extend({
   model() {
@@ -28,6 +28,16 @@ const ScreenreaderGradebookRoute = Route.extend({
       submissions: ArrayProxy.create({content: []}),
       custom_columns: fetchAllPages(ENV.GRADEBOOK_OPTIONS.custom_columns_url),
       sections: fetchAllPages(ENV.GRADEBOOK_OPTIONS.sections_url)
+    }
+
+    if (ENV.GRADEBOOK_OPTIONS.final_grade_override_enabled) {
+      const records = ObjectProxy.create({content: {}, isLoaded: false})
+
+      records.set('promise', getFinalGradeOverrides(ENV.GRADEBOOK_OPTIONS.context_id).then(data => {
+        records.set('isLoaded', true)
+        records.set('content', data)
+      }))
+      model.final_grade_overrides = records
     }
 
     if (!ENV.GRADEBOOK_OPTIONS.outcome_gradebook_enabled) {

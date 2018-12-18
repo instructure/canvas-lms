@@ -60,6 +60,14 @@ class SRGB
       f('#student_information .total-grade')
     end
 
+    def final_grade_override
+      f("#final-grade-override")
+    end
+
+    def final_grade_override_grade
+      f("#final-grade-override-grade")
+    end
+
     def assignment_muted_checkbox
       f('#assignment_muted_check')
     end
@@ -111,6 +119,10 @@ class SRGB
 
     def show_notes_option
       f('#show_notes')
+    end
+
+    def show_final_grade_override_option
+      f('#show_final_grade_override')
     end
 
     def all_content

@@ -19,7 +19,7 @@
 import _ from 'underscore'
 import ajax from 'ic-ajax'
 import startApp from '../start_app'
-import Ember from 'ember'
+import Ember, {ObjectProxy} from 'ember'
 import fixtures from '../shared_ajax_fixtures'
 import {createCourseGradesWithGradingPeriods} from 'spec/jsx/gradebook/GradeCalculatorSpecHelper'
 import SRGBController from '../../controllers/screenreader_gradebook_controller'
@@ -1057,6 +1057,130 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
     test('is PUT when the notes column exists', () => {
       Ember.run(() => srgb.set('shouldCreateNotes', false))
       equal(srgb.get('notesVerb'), 'PUT')
+    })
+  })
+
+  QUnit.module('finalGradeOverrideEnabled', hooks => {
+    hooks.beforeEach(() => {
+      initializeApp()
+    })
+
+    test('returns true when final_grade_override_enabled is true', () => {
+      window.ENV.GRADEBOOK_OPTIONS.final_grade_override_enabled = true
+      strictEqual(srgb.get('finalGradeOverrideEnabled'), true)
+    })
+
+    test('returns false when final_grade_override_enabled is false', () => {
+      window.ENV.GRADEBOOK_OPTIONS.final_grade_override_enabled = false
+      strictEqual(srgb.get('finalGradeOverrideEnabled'), false)
+    })
+  })
+
+  QUnit.module('showFinalGradeOverride', hooks => {
+    hooks.beforeEach(() => {
+      window.ENV.GRADEBOOK_OPTIONS.settings = {}
+      initializeApp()
+      srgb.set('finalGradeOverrideEnabled', true)
+    })
+
+    test('returns true when show_final_grade_overrides is true', () => {
+      window.ENV.GRADEBOOK_OPTIONS.settings.show_final_grade_overrides = 'true'
+      strictEqual(srgb.get('showFinalGradeOverride'), true)
+    })
+
+    test('returns false when finalGradeOverrideEnabled is false', () => {
+      srgb.set('finalGradeOverrideEnabled', false)
+      window.ENV.GRADEBOOK_OPTIONS.settings.show_final_grade_overrides = 'true'
+      strictEqual(srgb.get('showFinalGradeOverride'), false)
+    })
+
+    test('returns false when show_final_grade_overrides is false', () => {
+      window.ENV.GRADEBOOK_OPTIONS.settings.show_final_grade_overrides = 'false'
+      strictEqual(srgb.get('showFinalGradeOverride'), false)
+    })
+  })
+
+  QUnit.module('updateShowFinalGradeOverride', hooks => {
+    hooks.beforeEach(() => {
+      window.ENV.GRADEBOOK_OPTIONS.settings = {}
+      window.ENV.GRADEBOOK_OPTIONS.settings.show_final_grade_overrides = 'true'
+      window.ENV.GRADEBOOK_OPTIONS.settings_update_url = 'gradebook_settings'
+      ajax.defineFixture(window.ENV.GRADEBOOK_OPTIONS.settings.settings_update_url, {
+        response: [],
+        textStatus: 'success'
+      })
+      initializeApp()
+    })
+
+    test('changing showFinalGradeOverride calls updateShowFinalGradeOverride', () => {
+      const updateShowFinalGradeOverrideStub = sinon.stub(srgb, 'updateShowFinalGradeOverride')
+      srgb.set('showFinalGradeOverride', false)
+      strictEqual(updateShowFinalGradeOverrideStub.callCount, 1)
+      updateShowFinalGradeOverrideStub.restore()
+    })
+
+    test('updateShowFinalGradeOverride uses the gradebook settings endpoint', () => {
+      const ajaxRequestSpy = sinon.spy(ajax, 'request')
+      srgb.set('showFinalGradeOverride', false)
+      strictEqual(ajaxRequestSpy.firstCall.args[0].url, 'gradebook_settings')
+      ajaxRequestSpy.restore()
+    })
+
+    test('updateShowFinalGradeOverride passes the updated setting state', () => {
+      const ajaxRequestSpy = sinon.spy(ajax, 'request')
+      srgb.set('showFinalGradeOverride', false)
+      deepEqual(ajaxRequestSpy.firstCall.args[0].data.gradebook_settings, {show_final_grade_overrides: false})
+      ajaxRequestSpy.restore()
+    })
+  })
+
+  QUnit.module('selectedStudentFinalGradeOverrides', hooks => {
+    let student
+
+    hooks.beforeEach(() => {
+      initializeApp()
+
+      // These observe the selectedGradingPeriod, so tests setting that
+      // property will trigger these unless stubbed out.
+      sinon.stub(srgb, 'fetchStudentSubmissions')
+      sinon.stub(srgb, 'fetchAssignmentGroups')
+      sinon.stub(srgb, 'calculateStudentGrade')
+      student = srgb.get('students.firstObject')
+
+      srgb.set('selectedStudent', student)
+      srgb.set('final_grade_overrides', ObjectProxy.create({
+        content: {
+          finalGradeOverrides: {
+            [student.id]: {
+              courseGrade: {
+                percentage: 67.1
+              },
+              gradingPeriodGrades: {
+                1: {
+                  percentage: 93.2
+                }
+              }
+            }
+          }
+        },
+        isLoaded: true
+      }))
+    })
+
+    test('returns the overrides for the given grading period', () => {
+      const selectedGradingPeriod = {id: '1'}
+      srgb.set('selectedGradingPeriod', selectedGradingPeriod)
+      deepEqual(srgb.get('selectedStudentFinalGradeOverrides'), {percentage: 93.2})
+    })
+
+    test('returns the overrides for the course', () => {
+      const selectedGradingPeriod = {id: '0'}
+      srgb.set('selectedGradingPeriod', selectedGradingPeriod)
+      deepEqual(srgb.get('selectedStudentFinalGradeOverrides'), {percentage: 67.1})
+    })
+
+    test('returns the overrides for the course if there are no grading periods', () => {
+      deepEqual(srgb.get('selectedStudentFinalGradeOverrides'), {percentage: 67.1})
     })
   })
 
