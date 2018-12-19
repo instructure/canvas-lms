@@ -889,26 +889,20 @@ class FilesController < ApplicationController
     if params[:progress_id]
       progress = Progress.find(params[:progress_id])
 
-      # If the upload is for an Assignment, submit it
+      # If the attachment is for an Assignment's upload_via_url, submit it
       if progress.tag == 'upload_via_url' && progress.context.is_a?(Assignment)
-        assignment = progress.context
-        homework_service = Services::SubmitHomeworkService.new(@attachment, assignment)
-        begin
-          homework_service.submit(progress.created_at, params[:eula_agreement_timestamp])
-          homework_service.deliver_email
+        homework_service = Services::SubmitHomeworkService.new(@attachment, progress)
 
-          progress.complete unless progress.failed?
+        begin
+          homework_service.submit(params[:eula_agreement_timestamp])
+          homework_service.success!
         rescue => error
           error_id = Canvas::Errors.capture_exception(self.class.name, error)[:error_report]
-          progress.message = "Unexpected error, ID: #{error_id || 'unknown'}"
-          progress.save
-          progress.fail
+          message = "Unexpected error, ID: #{error_id || 'unknown'}"
           logger.error "Error submitting a file: #{error} - #{error.backtrace}"
-          homework_service.failure_email
+          homework_service.failed!(message)
         end
-      end
-
-      if progress.running?
+      elsif progress.running?
         progress.set_results('id' => @attachment.id)
         progress.complete!
       end

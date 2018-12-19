@@ -314,10 +314,9 @@ shared_examples_for "file uploads api" do
   end
 
   def run_download_job
-    expect(Delayed::Job.list_jobs(:tag, 10, 0, 'Services::SubmitHomeworkService::SubmitWorker#perform').length).to be > 0
+    expect(Delayed::Job.where("tag like '#{Services::SubmitHomeworkService}::%'").count).to be > 0
     run_jobs
   end
-
 end
 
 shared_examples_for "file uploads api with folders" do

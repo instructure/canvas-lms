@@ -20,10 +20,12 @@ require_dependency 'services/submit_homework_service'
 
 module Services
   describe SubmitHomeworkService do
-    subject { described_class.new(attachment, assignment) }
+    subject { described_class.new(attachment, progress) }
 
+    let(:submission) { submission_model }
+    let(:assignment) { submission.assignment }
+    let(:progress) { Progress.create!(context: assignment, user: user, tag: 'test') }
     let(:user) { user_factory }
-    let(:assignment) { assignment_model }
     let(:attachment) do
       attachment_model(
         context: assignment,
@@ -31,7 +33,6 @@ module Services
         filename: 'Some File'
       )
     end
-    let(:submitted_at) { Time.zone.now }
     let(:failure_email) do
       OpenStruct.new(
         from_name: 'notifications@instructure.com',
@@ -71,16 +72,19 @@ module Services
     end
 
     describe '.submit_job' do
-      let(:service) { described_class.new(attachment, assignment)}
-      let(:progress) { Progress.create(context: assignment, tag: 'test') }
-      let!(:worker) { described_class.submit_job(progress, attachment, eula_agreement_timestamp, executor) }
+      let(:service) { described_class.new(attachment, progress) }
+      let(:worker) do
+        described_class.submit_job(attachment, progress, eula_agreement_timestamp, executor)
+      end
 
-      before { allow(described_class).to receive(:new).and_return(service) }
+      before do
+        allow(worker).to receive(:homework_service).and_return(service)
+        allow(worker).to receive(:attachment).and_return(attachment)
+      end
 
       it 'should clone and submit the url' do
-        allow(worker).to receive(:attachment).and_return(attachment)
         expect(attachment).to receive(:clone_url).with(url, dup_handling, check_quota, opts)
-        expect(service).to receive(:submit).with(progress.created_at, eula_agreement_timestamp)
+        expect(service).to receive(:submit).with(eula_agreement_timestamp)
         worker.perform
 
         expect(progress.reload.workflow_state).to eq 'completed'
@@ -92,7 +96,13 @@ module Services
         it 'marks progress as failed' do
           latest_progress = progress.reload
           expect(latest_progress.workflow_state).to eq 'failed'
-          expect(latest_progress.message).to match(/Unexpected error/)
+          expect(latest_progress.message).to eq 'error'
+        end
+
+        it 'creates an AttachmentUploadStatus' do
+          failure = AttachmentUploadStatus.find_by(attachment: attachment)
+          expect(failure.error).to eq 'error'
+          expect(AttachmentUploadStatus.upload_status(attachment)).to eq 'failed'
         end
 
         it 'sends a failure email' do
@@ -113,19 +123,24 @@ module Services
     end
 
     describe '#submit' do
-      let(:submission) { subject.submit(submitted_at, eula_agreement_timestamp) }
+      let(:submitted) { subject.submit(eula_agreement_timestamp) }
       let(:recent_assignment) { assignment.reload }
 
       it 'should set submitted_at to the Progress#created_at' do
-        expect(submission.submitted_at).to eq submitted_at
+        expect(submitted.submitted_at).to eq progress.created_at
       end
 
       it 'should set attachments for the submission' do
-        expect(submission.attachments).to eq [attachment]
+        expect(submitted.attachments).to eq [attachment]
       end
 
       it 'should set assignment for the submission' do
-        expect(submission.assignment).to eq assignment
+        expect(submitted.assignment).to eq recent_assignment
+      end
+
+      it 'is a successful upload' do
+        submitted
+        expect(AttachmentUploadStatus.upload_status(attachment)).to eq 'success'
       end
     end
 
