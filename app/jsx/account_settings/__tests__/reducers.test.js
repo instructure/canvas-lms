@@ -40,12 +40,16 @@ describe('cspEnabled', () => {
 
 describe('whitelistedDomains', () => {
   const testMatrix = [
-    [{type: ADD_DOMAIN, payload: 'instructure.com'}, [], ['instructure.com']],
-    [{type: ADD_DOMAIN_OPTIMISTIC, payload: 'instructure.com'}, [], ['instructure.com']],
+    [{type: ADD_DOMAIN, payload: {account: 'instructure.com'}}, [], {account: ['instructure.com']}],
     [
-      {type: ADD_DOMAIN_BULK, payload: ['instructure.com', 'bridgelms.com']},
-      ['canvaslms.com'],
-      ['canvaslms.com', 'instructure.com', 'bridgelms.com']
+      {type: ADD_DOMAIN_OPTIMISTIC, payload: {account: 'instructure.com'}},
+      [],
+      {account: ['instructure.com']}
+    ],
+    [
+      {type: ADD_DOMAIN_BULK, payload: {account: ['instructure.com'], tools: ['bridgelms.com']}},
+      {account: ['canvaslms.com', 'eduappcenter.com']},
+      {account: ['canvaslms.com', 'eduappcenter.com', 'instructure.com'], tools: ['bridgelms.com']}
     ]
   ]
   it.each(testMatrix)(
@@ -56,18 +60,18 @@ describe('whitelistedDomains', () => {
   )
 
   it('does not allow duplicate domains with ADD_DOMAIN actions', () => {
-    const action = {type: ADD_DOMAIN, payload: 'instructure.com'}
-    const initialState = ['instructure.com', 'canvaslms.com']
-    expect(whitelistedDomains(initialState, action)).toEqual(['instructure.com', 'canvaslms.com'])
+    const action = {type: ADD_DOMAIN, payload: {account: 'instructure.com'}}
+    const initialState = {account: ['instructure.com', 'canvaslms.com']}
+    expect(whitelistedDomains(initialState, action)).toEqual({
+      account: ['instructure.com', 'canvaslms.com']
+    })
   })
 
   it('does not allow duplicates domains with ADD_DOMAIN_BULK actions', () => {
-    const action = {type: ADD_DOMAIN_BULK, payload: ['instructure.com', 'bridgelms.com']}
-    const initialState = ['instructure.com', 'canvaslms.com']
-    expect(whitelistedDomains(initialState, action)).toEqual([
-      'instructure.com',
-      'canvaslms.com',
-      'bridgelms.com'
-    ])
+    const action = {type: ADD_DOMAIN_BULK, payload: {account: ['instructure.com', 'bridgelms.com']}}
+    const initialState = {account: ['instructure.com', 'canvaslms.com']}
+    expect(whitelistedDomains(initialState, action)).toEqual({
+      account: ['instructure.com', 'canvaslms.com', 'bridgelms.com']
+    })
   })
 })

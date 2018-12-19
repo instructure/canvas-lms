@@ -66,8 +66,9 @@ export function getCspEnabled(context, contextId) {
 export const ADD_DOMAIN = 'ADD_DOMAIN'
 export const ADD_DOMAIN_BULK = 'ADD_DOMAIN_BULK'
 export const ADD_DOMAIN_OPTIMISTIC = 'ADD_DOMAIN_OPTIMISTIC'
+const DOMAIN_MAP_KEYS = ['account', 'tools', 'effective']
 
-export function addDomainAction(domain, opts = {}) {
+export function addDomainAction(domain, domainType, opts = {}) {
   const type = opts.optimistic ? ADD_DOMAIN_OPTIMISTIC : ADD_DOMAIN
   if (typeof domain !== 'string') {
     return {
@@ -76,30 +77,37 @@ export function addDomainAction(domain, opts = {}) {
       error: true
     }
   }
+  if (!DOMAIN_MAP_KEYS.includes(domainType)) {
+    return {
+      type,
+      payload: new Error('domainType is invalid'),
+      error: true
+    }
+  }
   return {
     type,
-    payload: domain
+    payload: {[domainType]: domain}
   }
 }
 
-export function addDomainBulkAction(domains) {
-  if (!Array.isArray(domains)) {
+export function addDomainBulkAction(domainsMap) {
+  if (Object.keys(domainsMap).some(d => !DOMAIN_MAP_KEYS.includes(d))) {
     return {
       type: ADD_DOMAIN_BULK,
-      payload: new Error('Can only set to an array of strings'),
+      payload: new Error('Invalid domain type key provided in domainsMap'),
       error: true
     }
   }
   return {
     type: ADD_DOMAIN_BULK,
-    payload: domains
+    payload: domainsMap
   }
 }
 
 export function addDomain(context, contextId, domain) {
   context = pluralize(context)
   return (dispatch, getState, {axios}) => {
-    dispatch(addDomainAction(domain, {optimistic: true}))
+    dispatch(addDomainAction(domain, 'account', {optimistic: true}))
     return axios
       .post(`/api/v1/${context}/${contextId}/csp_settings/domains`, {
         domain
@@ -107,21 +115,20 @@ export function addDomain(context, contextId, domain) {
       .then(() => {
         // This isn't really necessary but since the whitelist is unique,
         // it doesn't hurt.
-        dispatch(addDomainAction(domain))
+        dispatch(addDomainAction(domain, 'account'))
       })
   }
 }
 
 export function getCurrentWhitelist(context, contextId) {
   context = pluralize(context)
-  return (dispatch, getState, {axios}) => {
-    const {enabled} = getState()
-    return axios.get(`/api/v1/${context}/${contextId}/csp_settings`).then(response => {
-      dispatch(
-        addDomainBulkAction(
-          response.data[enabled ? 'effective_whitelist' : 'current_account_whitelist']
-        )
-      )
+  return (dispatch, getState, {axios}) =>
+    axios.get(`/api/v1/${context}/${contextId}/csp_settings`).then(response => {
+      const addDomainMap = {
+        effective: response.data.effective_whitelist || [],
+        account: response.data.current_account_whitelist || [],
+        tools: response.data.tools_whitelist || []
+      }
+      dispatch(addDomainBulkAction(addDomainMap))
     })
-  }
 }

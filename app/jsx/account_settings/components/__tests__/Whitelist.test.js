@@ -37,6 +37,19 @@ describe('ConnectedWhitelist', () => {
     expect(domainCellEntry).toBeInTheDocument()
   })
 
+  it('renders the tools whitelist when present', () => {
+    const {getByText} = renderWithRedux(<ConnectedWhitelist context="account" contextId="1" />, {
+      initialState: {
+        whitelistedDomains: {
+          account: ['instructure.com'],
+          tools: ['eduappcenter.com']
+        }
+      }
+    })
+
+    const toolDomain = getByText('eduappcenter.com')
+    expect(toolDomain).toBeInTheDocument()
+  })
   it('shows an error message when an invalid domain is entered', () => {
     const {getByLabelText, getByText, container} = renderWithRedux(
       <ConnectedWhitelist context="account" contextId="1" />

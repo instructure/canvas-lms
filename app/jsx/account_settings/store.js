@@ -23,7 +23,11 @@ import axios from 'axios'
 
 export const defaultState = {
   cspEnabled: false,
-  whitelistedDomains: []
+  whitelistedDomains: {
+    account: [],
+    effective: [],
+    tools: []
+  }
 }
 
 export function configStore(initialState, options = {}) {

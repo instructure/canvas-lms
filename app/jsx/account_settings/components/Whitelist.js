@@ -19,13 +19,14 @@
 import React, {Component} from 'react'
 import I18n from 'i18n!security_panel'
 import {connect} from 'react-redux'
-import {arrayOf, func, oneOf, string} from 'prop-types'
+import {arrayOf, func, oneOf, shape, string} from 'prop-types'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
 import TextInput from '@instructure/ui-forms/lib/components/TextInput'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import IconPlus from '@instructure/ui-icons/lib/Solid/IconPlus'
 import Table from '@instructure/ui-elements/lib/components/Table'
+import View from '@instructure/ui-layout/lib/components/View'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import isValidDomain from 'is-valid-domain'
 
@@ -38,7 +39,11 @@ export class Whitelist extends Component {
     addDomain: func.isRequired,
     context: oneOf(['course', 'account']).isRequired,
     contextId: string.isRequired,
-    whitelistedDomains: arrayOf(string).isRequired
+    whitelistedDomains: shape({
+      account: arrayOf(string),
+      effective: arrayOf(string),
+      tools: arrayOf(string)
+    }).isRequired
   }
 
   state = {
@@ -77,7 +82,7 @@ export class Whitelist extends Component {
       <div>
         <Heading margin="small 0" level="h4" as="h3" border="bottom">
           {I18n.t('Whitelist (%{count}/%{max})', {
-            count: this.props.whitelistedDomains.length,
+            count: this.props.whitelistedDomains.account.length,
             max: 100
           })}
         </Heading>
@@ -116,7 +121,7 @@ export class Whitelist extends Component {
             </tr>
           </thead>
           <tbody>
-            {this.props.whitelistedDomains.map(domain => (
+            {this.props.whitelistedDomains.account.map(domain => (
               <tr key={domain}>
                 <td>{domain}</td>
                 <td />
@@ -124,6 +129,37 @@ export class Whitelist extends Component {
             ))}
           </tbody>
         </Table>
+        {this.props.whitelistedDomains.tools.length > 0 && (
+          <View as="div" margin="large 0">
+            <Heading level="h4" as="h3">
+              {I18n.t('Whitelisted Tool Domains')}
+            </Heading>
+            <p>
+              {I18n.t(
+                `These domains have automatically been added to your whitelist.
+              If you wish to remove them, you should remove the associated tool.`
+              )}
+            </p>
+            <Table
+              caption={
+                <ScreenReaderContent>{I18n.t('Whitelisted Tool Domains')}</ScreenReaderContent>
+              }
+            >
+              <thead>
+                <tr>
+                  <th scope="col">Domain Name</th>
+                </tr>
+              </thead>
+              <tbody>
+                {this.props.whitelistedDomains.tools.map(domain => (
+                  <tr key={domain}>
+                    <td>{domain}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </View>
+        )}
       </div>
     )
   }

@@ -35,17 +35,26 @@ export function cspEnabled(state = false, action) {
   }
 }
 
-export function whitelistedDomains(state = [], action) {
+export function whitelistedDomains(state = {account: [], effective: [], tools: []}, action) {
   switch (action.type) {
     case ADD_DOMAIN:
     case ADD_DOMAIN_OPTIMISTIC: {
-      const domains = new Set(state)
-      domains.add(action.payload)
-      return Array.from(domains)
+      const newState = {...state}
+      Object.keys(action.payload).forEach(domainType => {
+        const uniqueDomains = new Set(state[domainType])
+        uniqueDomains.add(action.payload[domainType])
+        newState[domainType] = Array.from(uniqueDomains)
+      })
+      return newState
     }
     case ADD_DOMAIN_BULK: {
-      const domains = new Set(state.concat(action.payload))
-      return Array.from(domains)
+      const newState = {...state}
+      Object.keys(action.payload).forEach(domainType => {
+        const uniqueDomains = new Set(state[domainType])
+        action.payload[domainType].forEach(x => uniqueDomains.add(x))
+        newState[domainType] = Array.from(uniqueDomains)
+      })
+      return newState
     }
     default:
       return state

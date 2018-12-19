@@ -109,14 +109,20 @@ describe('getCspEnabled', () => {
 })
 
 describe('addDomainAction', () => {
-  it('creates an ADD_DOMAIN action when passed a boolean value', () => {
-    expect(Actions.addDomainAction('instructure.com')).toMatchSnapshot()
+  it('creates an ADD_DOMAIN action when passed string value', () => {
+    expect(Actions.addDomainAction('instructure.com', 'account')).toMatchSnapshot()
   })
   it('creates an error action if passed a non-string value', () => {
-    expect(Actions.addDomainAction(true)).toMatchSnapshot()
+    expect(Actions.addDomainAction(true, 'account')).toMatchSnapshot()
   })
+  it('creates an error action if given an invalid domainType', () => {
+    expect(Actions.addDomainAction('instructure', 'subaccount')).toMatchSnapshot()
+  })
+
   it('creates an ADD_DOMAIN_OPTIMISTIC action when optimistic option is given', () => {
-    expect(Actions.addDomainAction('instructure.com', {optimistic: true})).toMatchSnapshot()
+    expect(
+      Actions.addDomainAction('instructure.com', 'account', {optimistic: true})
+    ).toMatchSnapshot()
   })
 })
 
@@ -134,27 +140,36 @@ describe('addDomain', () => {
     }
     thunk(fakeDispatch, null, {axios: fakeAxios})
     expect(fakeDispatch).toHaveBeenNthCalledWith(1, {
-      payload: 'instructure.com',
+      payload: {account: 'instructure.com'},
       type: 'ADD_DOMAIN_OPTIMISTIC'
     })
     expect(fakeDispatch).toHaveBeenNthCalledWith(2, {
-      payload: 'instructure.com',
+      payload: {account: 'instructure.com'},
       type: 'ADD_DOMAIN'
     })
   })
 })
 
 describe('addDomainBulkAction', () => {
-  it('creates a ADD_DOMAIN action when passed an value', () => {
-    expect(Actions.addDomainBulkAction(['instructure.com', 'canvaslms.com'])).toMatchSnapshot()
+  it('creates a ADD_DOMAIN_BULK action when passed an value', () => {
+    expect(
+      Actions.addDomainBulkAction({
+        account: ['instructure.com'],
+        tools: ['google.com']
+      })
+    ).toMatchSnapshot()
   })
-  it('creates an error action if passed a non-Array value', () => {
-    expect(Actions.addDomainBulkAction('instructure.com')).toMatchSnapshot()
+  it('creates an error action if passed an invalid domainMap', () => {
+    expect(
+      Actions.addDomainBulkAction({
+        lti: ['google.com']
+      })
+    ).toMatchSnapshot()
   })
 })
 
 describe('getCurrentWhitelist', () => {
-  it('dispatches a bulk domain action using the effective_whitelist when the whitelist is enabled', () => {
+  it('dispatches a bulk domain action ', () => {
     const thunk = Actions.getCurrentWhitelist('account', 1)
     const fakeDispatch = jest.fn()
     const fakeGetState = () => ({enabled: true})
@@ -165,7 +180,8 @@ describe('getCurrentWhitelist', () => {
             data: {
               enabled: true,
               current_account_whitelist: ['instructure.com', 'canvaslms.com'],
-              effective_whitelist: ['bridgelms.com']
+              effective_whitelist: ['bridgelms.com'],
+              tools_whitelist: ['lti-tool.com']
             }
           }
           func(fakeResponse)
@@ -174,32 +190,11 @@ describe('getCurrentWhitelist', () => {
     }
     thunk(fakeDispatch, fakeGetState, {axios: fakeAxios})
     expect(fakeDispatch).toHaveBeenCalledWith({
-      payload: ['bridgelms.com'],
-      type: 'ADD_DOMAIN_BULK'
-    })
-  })
-
-  it('dispatches a bulk domain action using the current_account_whitelist when the whitelist is disabled', () => {
-    const thunk = Actions.getCurrentWhitelist('account', 1)
-    const fakeDispatch = jest.fn()
-    const fakeGetState = () => ({enabled: false})
-    const fakeAxios = {
-      get: jest.fn(() => ({
-        then(func) {
-          const fakeResponse = {
-            data: {
-              enabled: false,
-              current_account_whitelist: ['instructure.com', 'canvaslms.com'],
-              effective_whitelist: ['bridgelms.com']
-            }
-          }
-          func(fakeResponse)
-        }
-      }))
-    }
-    thunk(fakeDispatch, fakeGetState, {axios: fakeAxios})
-    expect(fakeDispatch).toHaveBeenCalledWith({
-      payload: ['instructure.com', 'canvaslms.com'],
+      payload: {
+        effective: ['bridgelms.com'],
+        account: ['instructure.com', 'canvaslms.com'],
+        tools: ['lti-tool.com']
+      },
       type: 'ADD_DOMAIN_BULK'
     })
   })
