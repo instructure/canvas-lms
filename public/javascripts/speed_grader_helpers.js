@@ -163,18 +163,20 @@ export function setupAnonymizableAuthorId (isAnonymous) {
         return "not_submitted";
       }
     },
-    plagiarismResubmitHandler: (event, resubmitUrl, anonymizableUserId = "") => {
+    plagiarismResubmitHandler: (event, resubmitUrl) => {
       event.preventDefault();
-      const params = anonymizableUserId === 'anonymous_id' ? { anonymous: true } : {}
 
       $(event.target).attr('disabled', true).text(I18n.t('turnitin.resubmitting', 'Resubmitting...'));
-      $.ajaxJSON(resubmitUrl, "POST", params, () => {
+      $.ajaxJSON(resubmitUrl, "POST", {}, () => {
         speedGraderHelpers.reloadPage();
       });
     },
 
     plagiarismResubmitUrl (submission, anonymizableUserId) {
-      return $.replaceTags($('#assignment_submission_resubmit_to_turnitin_url').attr('href'), { user_id: submission[anonymizableUserId] })
+      return $.replaceTags(
+        $('#assignment_submission_resubmit_to_turnitin_url').attr('href'),
+        { [anonymizableUserId]: submission[anonymizableUserId] }
+      )
     },
 
     plagiarismResubmitButton(hasOriginalityScore, buttonContainer) {

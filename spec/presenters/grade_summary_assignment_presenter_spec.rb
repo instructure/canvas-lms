@@ -189,7 +189,7 @@ describe GradeSummaryAssignmentPresenter do
     end
   end
 
-  describe "#show_submission_details_link?" do
+  describe "#show_submission_details?" do
     before :each do
       @submission_stub = double()
       allow(@submission_stub).to receive(:originality_reports_for_display)
@@ -199,24 +199,24 @@ describe GradeSummaryAssignmentPresenter do
       @assignment = {}
       allow(@submission_stub).to receive(:can_view_details?).and_return(true)
       presenter = GradeSummaryAssignmentPresenter.new(summary, @student, @assignment, @submission_stub)
-      expect(presenter.show_submission_details_link?).to be false
+      expect(presenter.show_submission_details?).to be false
     end
 
     it "returns false when assignment is an assignment and user cannot view details on submission" do
       allow(@submission_stub).to receive(:can_view_details?).and_return(false)
       presenter = GradeSummaryAssignmentPresenter.new(summary, @student, @assignment, @submission_stub)
-      expect(presenter.show_submission_details_link?).to be false
+      expect(presenter.show_submission_details?).to be false
     end
 
     it "returns true when assignment is an assignment and use can view details on submission" do
       allow(@submission_stub).to receive(:can_view_details?).and_return(true)
       presenter = GradeSummaryAssignmentPresenter.new(summary, @student, @assignment, @submission_stub)
-      expect(presenter.show_submission_details_link?).to be true
+      expect(presenter.show_submission_details?).to be true
     end
 
     it "returns false when submission is nil" do
       presenter = GradeSummaryAssignmentPresenter.new(summary, @student, @assignment, nil)
-      expect(presenter.show_submission_details_link?).to be false
+      expect(presenter.show_submission_details?).to be false
     end
   end
 

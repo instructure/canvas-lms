@@ -158,7 +158,7 @@
           <% if assignment_presenter.is_unread? %>
             <div class="unread-grade">&nbsp;</div>
           <% end %>
-          <% if assignment_presenter.show_submission_details_link? %>
+          <% if assignment_presenter.show_submission_details? %>
             <a href="<%= context_url(@context, :context_assignment_submission_url, assignment, @presenter.student_id) %>"><%= assignment.title %></a>
           <% else %>
             <%= assignment.title %>
@@ -328,63 +328,65 @@
             </span>
             <i class="icon-rubric"></i>
           </a>
-          <% if @presenter.turnitin_enabled? || assignment_presenter.originality_report? %>
-            <%
-              turntitin = nil
-              url = '#'
-              anchor_title = t('Similarity score -- more information')
-              alt_text = t('See Turnitin results')
-              tooltip_text = t('See Turnitin results')
+          <% if assignment_presenter.show_submission_details? %>
+            <% if @presenter.turnitin_enabled? || assignment_presenter.originality_report? %>
+              <%
+                turnitin = nil
+                url = '#'
+                anchor_title = t('Similarity score -- more information')
+                alt_text = t('See Turnitin results')
+                tooltip_text = t('See Turnitin results')
 
-              if can_do(submission, @current_user, :view_turnitin_report)
-                turnitin = assignment_presenter.turnitin
-                if assignment_presenter.is_text_entry? && !assignment_presenter.originality_report?
-                  url = context_url(@context, :context_assignment_submission_turnitin_report_url, assignment.id, @presenter.student_id, submission.asset_string)
-                elsif assignment_presenter.originality_report? && turnitin
-                  asset_string = assignment_presenter.file&.asset_string || assignment_presenter.submission&.asset_string
-                  url = polymorphic_url([@context, assignment, submission, :originality_report], asset_string: asset_string)
-                  anchor_title = t('Originality Report')
-                  alt_text = t('Originality Report')
-                  tooltip_text = t('Originality Report')
-                elsif assignment_presenter.is_online_upload? && assignment_presenter.file
-                  asset_string = assignment_presenter.file.asset_string
-                  url = context_url(@context, :context_assignment_submission_turnitin_report_url, assignment.id, @presenter.student_id, asset_string)
+                if can_do(submission, @current_user, :view_turnitin_report)
+                  turnitin = assignment_presenter.turnitin
+                  if assignment_presenter.is_text_entry? && !assignment_presenter.originality_report?
+                    url = context_url(@context, :context_assignment_submission_turnitin_report_url, assignment.id, @presenter.student_id, submission.asset_string)
+                  elsif assignment_presenter.originality_report? && turnitin
+                    asset_string = assignment_presenter.file&.asset_string || assignment_presenter.submission&.asset_string
+                    url = polymorphic_url([@context, assignment, submission, :originality_report], asset_string: asset_string)
+                    anchor_title = t('Originality Report')
+                    alt_text = t('Originality Report')
+                    tooltip_text = t('Originality Report')
+                  elsif assignment_presenter.is_online_upload? && assignment_presenter.file
+                    asset_string = assignment_presenter.file.asset_string
+                    url = context_url(@context, :context_assignment_submission_turnitin_report_url, assignment.id, @presenter.student_id, asset_string)
+                  end
                 end
-              end
-            %>
-            <% if url && url != '#' %>
-              <a class="tooltip" title="<%= anchor_title %>" href="<%= url %>" style="<%= 'visibility: hidden;' if !turnitin %>" target="_blank">
-                <%= turnitin ? image_tag("turnitin_#{turnitin && turnitin[:state]}_score.png", :alt => alt_text) : image_tag("blank.png", :alt => '') %>
-                <span class="tooltip_wrap right">
-                  <span class="tooltip_text"><%= tooltip_text %></span>
-                </span>
-              </a>
+              %>
+              <% if url && url != '#' %>
+                <a class="tooltip" title="<%= anchor_title %>" href="<%= url %>" style="<%= 'visibility: hidden;' if !turnitin %>" target="_blank">
+                  <%= turnitin ? image_tag("turnitin_#{turnitin && turnitin[:state]}_score.png", :alt => alt_text) : image_tag("blank.png", :alt => '') %>
+                  <span class="tooltip_wrap right">
+                    <span class="tooltip_text"><%= tooltip_text %></span>
+                  </span>
+                </a>
+              <% end %>
             <% end %>
-          <% end %>
-          <% if @presenter.vericite_enabled? && !assignment_presenter.originality_report? %>
-            <%
-              vericite = nil
-              url = '#'
-              if submission && submission.can_view_plagiarism_report('vericite', @current_user, session)
-                vericite = assignment_presenter.vericite
-                if assignment_presenter.is_text_entry?
-                  url = context_url(@context, :context_assignment_submission_vericite_report_url, assignment.id, @presenter.student_id, submission.asset_string)
-                elsif assignment_presenter.is_online_upload? && assignment_presenter.file
-                  asset_string = assignment_presenter.file.asset_string
-                  url = context_url(@context, :context_assignment_submission_vericite_report_url, assignment.id, @presenter.student_id, asset_string)
+            <% if @presenter.vericite_enabled? && !assignment_presenter.originality_report? %>
+              <%
+                vericite = nil
+                url = '#'
+                if submission && submission.can_view_plagiarism_report('vericite', @current_user, session)
+                  vericite = assignment_presenter.vericite
+                  if assignment_presenter.is_text_entry?
+                    url = context_url(@context, :context_assignment_submission_vericite_report_url, assignment.id, @presenter.student_id, submission.asset_string)
+                  elsif assignment_presenter.is_online_upload? && assignment_presenter.file
+                    asset_string = assignment_presenter.file.asset_string
+                    url = context_url(@context, :context_assignment_submission_vericite_report_url, assignment.id, @presenter.student_id, asset_string)
+                  end
                 end
-              end
-            %>
+              %>
 
-            <span class="turnitin_score_container" style="<%= 'visibility: hidden;' if !vericite %>">
-              <span class="vericite_score_container_caret <%= vericite && vericite[:state] %>_score"></span>
-              <a title="<%= t('titles.vericite_score', "VeriCite similarity score -- more information") %>" href="<%= url %>" target="_blank" class="tooltip not_external turnitin_similarity_score <%= vericite && vericite[:state] %>_score">
-                <%= vericite && vericite[:similarity_score] %>%
-                <span class="tooltip_wrap right">
-                  <span class="tooltip_text"><%= t(:see_vericite_results, "See VeriCite results") %></span>
-                </span>
-              </a>
-            </span>
+              <span class="turnitin_score_container" style="<%= 'visibility: hidden;' if !vericite %>">
+                <span class="vericite_score_container_caret <%= vericite && vericite[:state] %>_score"></span>
+                <a title="<%= t('titles.vericite_score', "VeriCite similarity score -- more information") %>" href="<%= url %>" target="_blank" class="tooltip not_external turnitin_similarity_score <%= vericite && vericite[:state] %>_score">
+                  <%= vericite && vericite[:similarity_score] %>%
+                  <span class="tooltip_wrap right">
+                    <span class="tooltip_text"><%= t(:see_vericite_results, "See VeriCite results") %></span>
+                  </span>
+                </a>
+              </span>
+            <% end %>
           <% end %>
         <% end %>
         </td>

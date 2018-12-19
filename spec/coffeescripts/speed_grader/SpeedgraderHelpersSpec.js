@@ -25,6 +25,7 @@ import SpeedgraderHelpers, {
   setupAnonymizableStudentId,
   setupAnonymizableAuthorId
 } from 'speed_grader_helpers'
+import $ from 'jquery'
 
 QUnit.module('SpeedGrader', {
   setup() {
@@ -62,6 +63,7 @@ test('setupAnonymizableAuthorId is available on main object', () => {
 test('populateTurnitin sets correct URL for OriginalityReports', () => {
   const submission = {
     id: '7',
+    anonymous_id: 'zxcvb',
     grade: null,
     score: null,
     submitted_at: '2016-11-29T22:29:44Z',
@@ -376,15 +378,6 @@ test('returns graded if submission excused', function() {
   equal(result, 'graded')
 })
 
-test('returns the proper submission url', () => {
-  $('#fixtures').append(
-    '<a id="assignment_submission_resubmit_to_turnitin_url" href="http://www.resubmit.com"></a>'
-  )
-  const submission = {user_id: 1}
-  const result = SpeedgraderHelpers.plagiarismResubmitUrl(submission)
-  equal(result, 'http://www.resubmit.com')
-})
-
 test("prevents the button's default action", () => {
   $('#fixtures').append('<button id="resubmit-button">Click Here</button>')
   const ajaxStub = sinon.stub()
@@ -400,24 +393,6 @@ test("prevents the button's default action", () => {
   }
   SpeedgraderHelpers.plagiarismResubmitHandler(event, 'http://www.test.com')
   ok(event.preventDefault.called)
-  $.ajaxJSON = previousAjaxJson
-})
-
-test("sets the 'anonymous' param to true if anonymizableUserId is 'anonymous_id'", () => {
-  $('#fixtures').append('<button id="resubmit-button">Click Here</button>')
-  const ajaxStub = sinon.stub()
-  ajaxStub.returns({
-    status: 200,
-    data: {}
-  })
-  const previousAjaxJson = $.ajaxJSON
-  $.ajaxJSON = ajaxStub
-  const event = {
-    preventDefault: sinon.spy(),
-    target: document.getElementById('resubmit-button')
-  }
-  SpeedgraderHelpers.plagiarismResubmitHandler(event, 'http://www.test.com', 'anonymous_id')
-  deepEqual(ajaxStub.args[0][2], {anonymous: true})
   $.ajaxJSON = previousAjaxJson
 })
 
@@ -560,3 +535,30 @@ QUnit.module('SpeedgraderHelpers.plagiarismResubmitButton', () => {
   })
 })
 
+QUnit.module('SpeedGraderHelpers.plagiarismResubmitUrl', () => {
+  test('populates the "user_id" tag in the resubmission URL when passed the key "user_id"', () => {
+    $('#fixtures').append(
+      '<a id="assignment_submission_resubmit_to_turnitin_url" href="http://www.resubmit.com/{{ user_id }}"></a>'
+    )
+
+    strictEqual(
+      SpeedgraderHelpers.plagiarismResubmitUrl({user_id: 1248}, 'user_id'),
+      'http://www.resubmit.com/1248'
+    )
+
+    $('#assignment_submission_resubmit_to_turnitin_url').remove()
+  })
+
+  test('populates the "anonymous_id" tag in the resubmission URL when passed the key "anonymous_id"', () => {
+    $('#fixtures').append(
+      '<a id="assignment_submission_resubmit_to_turnitin_url" href="http://www.resubmit.com/{{ anonymous_id }}"></a>'
+    )
+
+    strictEqual(
+      SpeedgraderHelpers.plagiarismResubmitUrl({anonymous_id: 'ohnoo'}, 'anonymous_id'),
+      'http://www.resubmit.com/ohnoo'
+    )
+
+    $('#assignment_submission_resubmit_to_turnitin_url').remove()
+  })
+})
