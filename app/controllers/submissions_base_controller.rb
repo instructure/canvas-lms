@@ -160,6 +160,26 @@ class SubmissionsBaseController < ApplicationController
     end
   end
 
+  def turnitin_report
+    plagiarism_report('turnitin')
+  end
+
+  def resubmit_to_turnitin
+    resubmit_to_plagiarism('turnitin')
+  end
+
+  def vericite_report
+    plagiarism_report('vericite')
+  end
+
+  def resubmit_to_vericite
+    resubmit_to_plagiarism('vericite')
+  end
+
+  def originality_report
+    plagiarism_report('originality_report')
+  end
+
   private
 
   def update_student_entered_score(score)
@@ -174,5 +194,72 @@ class SubmissionsBaseController < ApplicationController
     if @context.root_account.feature_enabled?(:non_scoring_rubrics)
       @context.account.resolved_outcome_proficiency&.as_json
     end
+  end
+
+  def legacy_plagiarism_report(submission, asset_string, type)
+    plag_data = type == 'vericite' ? submission.vericite_data : submission.turnitin_data
+
+    if plag_data[asset_string] && plag_data[asset_string][:report_url]
+      polymorphic_url([:retrieve, @context, :external_tools], url: plag_data[asset_string], display:'borderless')
+    elsif type == 'vericite'
+      # VeriCite URL
+      submission.vericite_report_url(asset_string, @current_user, session)
+    else
+      # Turnitin URL
+      submission.turnitin_report_url(asset_string, @current_user)
+    end
+  rescue
+    # vericite_report_url or turnitin_report_url may throw an error
+    nil
+  end
+
+  protected
+  def plagiarism_report(type)
+    return head(:bad_request) if @submission.blank?
+
+    @asset_string = params[:asset_string]
+    if authorized_action(@submission, @current_user, :read)
+      url = if type == 'originality_report'
+        @submission.originality_report_url(@asset_string, @current_user)
+      else
+        legacy_plagiarism_report(@submission, @asset_string, type)
+      end
+
+      if url
+        redirect_to url
+      else
+        flash[:error] = t('errors.no_report', "Couldn't find a report for that submission item")
+        redirect_to default_plagiarism_redirect_url
+      end
+    end
+  end
+
+  def resubmit_to_plagiarism(type)
+    return head(:bad_request) if @submission.blank?
+
+    if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
+      Canvas::LiveEvents.plagiarism_resubmit(@submission)
+
+      if type == 'vericite'
+        # VeriCite
+        @submission.resubmit_to_vericite
+        message = t("Successfully resubmitted to VeriCite.")
+      else
+        # turnitin
+        @submission.resubmit_to_turnitin
+        message = t("Successfully resubmitted to turnitin.")
+      end
+      respond_to do |format|
+        format.html do
+          flash[:notice] = message
+          redirect_to default_plagiarism_redirect_url
+        end
+        format.json { head :no_content }
+      end
+    end
+  end
+
+  def default_plagiarism_redirect_url
+    named_context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id)
   end
 end
