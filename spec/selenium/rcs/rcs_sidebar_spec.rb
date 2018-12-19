@@ -150,5 +150,19 @@ describe "RCS sidebar tests" do
       click_files_tab
       expect(upload_new_file).to be_displayed
     end
+
+    it "should click on a file in sidebar to create link in body" do
+      title = "text_file.txt"
+      @root_folder = Folder.root_folders(@course).first
+      @text_file = @root_folder.attachments.create!(:filename => title, :context => @course) { |a| a.content_type = 'text/plain' }
+
+      visit_front_page(@course)
+      click_files_tab
+      click_sidebar_link(title)
+
+      in_frame wiki_page_body_ifr_id do
+        expect(wiki_body_anchor.attribute('href')).to include "/files/#{@text_file.id}"
+      end
+    end
   end
 end
