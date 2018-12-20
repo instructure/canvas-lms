@@ -54,6 +54,12 @@ export function waitForNoElement(queryFn) {
 export function mockCourse(overrides) {
   return {
     lid: 'course-lid',
+    assignmentGroupsConnection: {
+      nodes: []
+    },
+    modulesConnection: {
+      nodes: []
+    },
     ...overrides
   }
 }

@@ -550,6 +550,20 @@
     keycode "^2.1.8"
     prop-types "^15"
 
+"@instructure/ui-editable@^5":
+  version "5.38.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-editable/-/ui-editable-5.38.0.tgz#a8cf120c5409b6e15b13cddfa0b3bfa966244a03"
+  integrity sha512-rbnNXPuI9gDc7rPnSnFfsdLjlHwGGvmPpHZMRemCGjSqmG6O1Q8DrebnF9CrOC3nvgkOnpS293sPdDRIgkH5iQ==
+  dependencies:
+    "@instructure/ui-a11y" "^5.38.0"
+    "@instructure/ui-buttons" "^5.38.0"
+    "@instructure/ui-focusable" "^5.38.0"
+    "@instructure/ui-icons" "^5.38.0"
+    "@instructure/ui-layout" "^5.38.0"
+    "@instructure/ui-utils" "^5.38.0"
+    prop-types "^15"
+    react "^0.14.9 || ^15 || ^16"
+
 "@instructure/ui-elements@^5", "@instructure/ui-elements@^5 || rc", "@instructure/ui-elements@^5.38.0":
   version "5.38.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-elements/-/ui-elements-5.38.0.tgz#2d5391303fd0c2e5c847ebf6b2601c32c4207061"
@@ -701,7 +715,7 @@
     babel-runtime "^6"
     prop-types "^15"
 
-"@instructure/ui-number-input@^5.38.0":
+"@instructure/ui-number-input@^5", "@instructure/ui-number-input@^5.38.0":
   version "5.38.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-number-input/-/ui-number-input-5.38.0.tgz#3276b596b1937cda2144260af51a0d729e7a56f0"
   integrity sha512-YQcLBPDY2PYKnpDxEHSnBSHBQKH+D1zF74tZ1T2E3Yx5STDjMJTmwkOaEyagdQcXBDZ3v/AZ/c768v5/NLJX/w==
@@ -14905,7 +14919,7 @@ react@0.14.9:
     envify "^3.0.0"
     fbjs "^0.6.1"
 
-"react@^0.14.7 || ^15 || 16", "react@^0.14.8 || ^15.0.0 || ^16", react@^16.6.0:
+"react@^0.14.7 || ^15 || 16", "react@^0.14.8 || ^15.0.0 || ^16", "react@^0.14.9 || ^15 || ^16", react@^16.6.0:
   version "16.7.0"
   resolved "https://registry.yarnpkg.com/react/-/react-16.7.0.tgz#b674ec396b0a5715873b350446f7ea0802ab6381"
   integrity sha512-StCz3QY8lxTb5cl2HJxjwLFOXPIFQp+p+hxQfc8WE0QiLfCtIlKj8/+5tjjKm8uSTlAW+fCPaavGFS06V9Ar3A==

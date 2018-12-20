@@ -66,6 +66,30 @@ export const TEACHER_QUERY = gql`
       allowedAttempts
       course {
         lid: _id
+        modulesConnection {
+          pageInfo {
+            startCursor
+            endCursor
+            hasNextPage
+            hasPreviousPage
+          }
+          nodes {
+            lid: _id
+            name
+          }
+        }
+        assignmentGroupsConnection {
+          pageInfo {
+            startCursor
+            endCursor
+            hasNextPage
+            hasPreviousPage
+          }
+          nodes {
+            lid: _id
+            name
+          }
+        }
       }
       assignmentOverrides {
         pageInfo {

@@ -32,6 +32,7 @@ import IconEmail from '@instructure/ui-icons/lib/Line/IconEmail'
 import IconSpeedGrader from '@instructure/ui-icons/lib/Line/IconSpeedGrader'
 import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
 
+import EditableNumber from './Editables/EditableNumber'
 import {TeacherAssignmentShape} from '../assignmentData'
 
 // let's use these helpers from the gradebook so we're consistent
@@ -61,6 +62,15 @@ export default class Toolbox extends React.Component {
 
   countSubmissions(fn) {
     return this.submissions().reduce((memo, submission) => memo + (fn(submission) ? 1 : 0), 0)
+  }
+
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      pointsMode: 'view',
+      pointsValue: this.props.assignment.pointsPossible
+    }
   }
 
   handlePublishChange = event => {
@@ -138,19 +148,38 @@ export default class Toolbox extends React.Component {
   }
 
   renderPoints() {
+    const sty = this.state.pointsMode === 'view' ? {marginTop: '7px'} : {}
     return (
-      <Text as="div" size="x-large" lineHeight="fit">
-        {this.props.assignment.pointsPossible}
-      </Text>
+      <div style={sty}>
+        <Flex alignItems="center">
+          <FlexItem margin="0 x-small 0 0">
+            <EditableNumber
+              mode={this.state.pointsMode}
+              inline
+              size="large"
+              value={this.state.pointsValue}
+              onChange={this.handlePointsChange}
+              onChangeMode={this.handlePointsChangeMode}
+              label={I18n.t('Edit Points')}
+              editButtonPlacement="start"
+              invalidMessage={I18n.t('Points must be >= 0')}
+              required
+            />
+          </FlexItem>
+          <FlexItem>
+            <Text size="large">{I18n.t('Points')}</Text>
+          </FlexItem>
+        </Flex>
+      </div>
     )
   }
 
-  renderPointsLabel() {
-    return (
-      <Text as="div" lineHeight="fit">
-        {I18n.t('Points')}
-      </Text>
-    )
+  handlePointsChange = value => {
+    this.setState({pointsValue: value})
+  }
+
+  handlePointsChangeMode = mode => {
+    this.setState({pointsMode: mode})
   }
 
   render() {
@@ -162,9 +191,8 @@ export default class Toolbox extends React.Component {
             {this.renderDelete()}
           </FlexItem>
           {this.renderSubmissionStats()}
-          <FlexItem padding="medium xx-small large">
+          <FlexItem padding="medium xx-small large" align="end">
             {this.renderPoints()}
-            {this.renderPointsLabel()}
           </FlexItem>
         </Flex>
       </div>

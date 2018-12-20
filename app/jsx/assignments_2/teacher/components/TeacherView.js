@@ -32,13 +32,7 @@ import TeacherViewContext, {TeacherViewContextDefaults} from './TeacherViewConte
 
 export default class TeacherView extends React.Component {
   static propTypes = {
-    assignmentLid: string,
-    readOnly: bool
-  }
-
-  // for now, put "#edit" in the URL and it will turn off readOnly
-  static defaultProps = {
-    readOnly: window.location.hash.indexOf('edit') < 0
+    assignmentLid: string
   }
 
   constructor(props) {
@@ -49,7 +43,9 @@ export default class TeacherView extends React.Component {
       confirmDelete: false,
       deletingNow: false,
       loading: true,
-      errors: []
+      errors: [],
+      // for now, put "#edit" in the URL and it will turn off readOnly
+      readOnly: window.location.hash.indexOf('edit') < 0
     }
 
     this.contextValue = {
@@ -90,11 +86,13 @@ export default class TeacherView extends React.Component {
     return errors
   }
 
+  // newAssignmentState is oneOf(['published', 'unpublished']) (but can be set to 'deleted'
+  // to soft-delete the assignmet). This is not TeacherView's React state
   handlePublishChange = async newAssignmentState => {
     const oldAssignmentState = this.state.assignment.state
 
     // be optimistic
-    this.setState(state => this.assignmentStateUpdate(state, newAssignmentState))
+    this.setState(state => this.assignmentStateUpdate(state, {state: newAssignmentState}))
     const errors = await this.setWorkflowApiCall(this.state.assignment, newAssignmentState)
     if (errors.length > 0) {
       this.setState(state => ({
@@ -184,8 +182,9 @@ export default class TeacherView extends React.Component {
             onUnsubmittedClick={this.handleUnsubmittedClick}
             onPublishChange={this.handlePublishChange}
             onDelete={this.handleDeleteButtonPressed}
+            readOnly={this.state.readOnly}
           />
-          <ContentTabs assignment={assignment} readOnly={this.props.readOnly} />
+          <ContentTabs assignment={assignment} readOnly={this.state.readOnly} />
           <MessageStudentsWho
             open={this.state.messageStudentsWhoOpen}
             onDismiss={this.handleDismissMessageStudentsWho}
