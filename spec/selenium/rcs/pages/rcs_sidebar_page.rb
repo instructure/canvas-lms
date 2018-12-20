@@ -76,6 +76,14 @@ module RCSSidebarPage
     fj('button:contains("Upload a new file")')
   end
 
+  def images_tab
+    fj('[role="presentation"]:contains("Images")')
+  end
+
+  def upload_new_image
+    fj('button:contains("Upload a new image")')
+  end
+
   # ---------------------- Actions ----------------------
 
   def click_pages_accordion
@@ -120,5 +128,9 @@ module RCSSidebarPage
 
   def click_files_tab
     files_tab.click
+  end
+
+  def click_images_tab
+    images_tab.click
   end
 end

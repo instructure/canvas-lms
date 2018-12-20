@@ -164,5 +164,12 @@ describe "RCS sidebar tests" do
         expect(wiki_body_anchor.attribute('href')).to include "/files/#{@text_file.id}"
       end
     end
+
+    it "should click on sidebar images tab" do
+      visit_front_page(@course)
+
+      click_images_tab
+      expect(upload_new_image).to be_displayed
+    end
   end
 end
