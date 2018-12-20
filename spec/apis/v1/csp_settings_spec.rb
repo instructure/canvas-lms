@@ -81,13 +81,14 @@ describe "CSP Settings API", type: :request do
       it "should get the whitelist if enabled" do
         Account.default.enable_csp!
         Account.default.add_domain!("example1.com")
-        create_tool(@sub, :domain => "example2.com")
+        tool = create_tool(@sub, :domain => "example2.com")
 
         json = get_csp_settings(@sub)
         expect(json["enabled"]).to eq true
         expect(json["inherited"]).to eq true
         expect(json["effective_whitelist"]).to match_array(["example1.com", "example2.com"])
-        expect(json["tools_whitelist"]).to eq(["example2.com"])
+        expect(json["tools_whitelist"]).to eq(
+          {"example2.com" => [{"id" => tool.id, "name" => tool.name, "account_id" => @sub.id}]})
         expect(json["current_account_whitelist"]).to eq []
       end
 
