@@ -60,6 +60,14 @@ describe "CanvasUnzip" do
       end
     end
 
+    it "should deal with empty archives" do
+      Dir.mktmpdir do |tmpdir|
+        subdir = File.join(tmpdir, 'sub_dir')
+        Dir.mkdir(subdir)
+        expect { CanvasUnzip.extract_archive(fixture_filename("empty.#{extension}"), subdir) }.not_to raise_error
+      end
+    end
+
     it "should enumerate entries" do
       indices = []
       entries = []
