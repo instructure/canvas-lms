@@ -274,15 +274,26 @@ $(document).ready(function() {
         type = "sms number", confirm_title =  I18n.t('titles.confirm_sms_number', "Confirm SMS Number") ;
       }
       var $box = $("#confirm_communication_channel");
+
       if($channel.parents(".email_channels").length > 0) {
         $box = $("#confirm_email_channel");
       }
       var data = $channel.getTemplateData({textValues: ['user_id', 'pseudonym_id', 'channel_id']});
       var path = $(this).text();
+
+      $.ajaxJSON(`/confirmations/${data.user_id}/limit_reached/${data.channel_id}`, 'GET', {}, function(data){
+        if(data.confirmation_limit_reached) {
+          $box.find(".re_send_confirmation_link").css('visibility', 'hidden');
+        } else {
+          $box.find(".re_send_confirmation_link").css('visibility', 'visible');
+        }
+      }, function(_) {});
+
       if(type == "sms number") {
         path = path.split("@")[0];
       }
       data.code = "";
+
       $box.fillTemplateData({data: {
         path: path,
         path_type: type,
@@ -294,6 +305,7 @@ $(document).ready(function() {
       url = $.replaceTags(url, "id", data.channel_id);
       url = $.replaceTags(url, "pseudonym_id", data.pseudonym_id);
       url = $.replaceTags(url, "user_id", data.user_id);
+
       $box.find(".re_send_confirmation_link").attr('href', url)
         .text( I18n.t('links.resend_confirmation', "Re-Send Confirmation") );
       $box.fillFormData(data);

@@ -277,7 +277,15 @@ class CommunicationChannel < ActiveRecord::Base
     @request_password = false
   end
 
+  def confirmation_limit_reached
+    self.confirmation_sent_count > 2
+  end
+
   def send_confirmation!(root_account)
+    if self.confirmation_limit_reached
+      return
+    end
+    self.confirmation_sent_count = self.confirmation_sent_count + 1
     @send_confirmation = true
     @root_account = root_account
     self.save!

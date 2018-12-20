@@ -414,6 +414,7 @@ class CommunicationChannelsController < ApplicationController
     end
   end
 
+
   # params[:enrollment_id] is optional
   def re_send_confirmation
     @user = User.find(params[:user_id])
@@ -433,6 +434,14 @@ class CommunicationChannelsController < ApplicationController
       @cc.send_confirmation!(@domain_root_account)
     end
     render :json => {:re_sent => true}
+  end
+
+  def confirmation_limit_reached
+    @user = User.find(params[:user_id])
+    return render_unauthorized_action unless @user.grants_any_right?(@current_user, session, :manage, :manage_user_details)
+    return render :json => {}, :status => :bad_request unless params[:id].present?
+    @cc = @user.communication_channels.find(params[:id])
+    render :json => {:confirmation_limit_reached => @cc.confirmation_limit_reached}
   end
 
   def reset_bounce_count
