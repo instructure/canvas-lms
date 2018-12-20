@@ -199,8 +199,8 @@ class SubmissionsBaseController < ApplicationController
   def legacy_plagiarism_report(submission, asset_string, type)
     plag_data = type == 'vericite' ? submission.vericite_data : submission.turnitin_data
 
-    if plag_data[asset_string] && plag_data[asset_string][:report_url]
-      polymorphic_url([:retrieve, @context, :external_tools], url: plag_data[asset_string], display:'borderless')
+    if plag_data.dig(asset_string, :report_url).present?
+      polymorphic_url([:retrieve, @context, :external_tools], url: plag_data[asset_string][:report_url], display:'borderless')
     elsif type == 'vericite'
       # VeriCite URL
       submission.vericite_report_url(asset_string, @current_user, session)
