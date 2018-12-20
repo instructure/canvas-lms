@@ -77,18 +77,6 @@ describe Api::V1::Course do
       expect(@test_api.course_json(@course1, @me, {}, [], [])).to include "apply_assignment_group_weights"
     end
 
-    it "should not show details if user is restricted from access by course dates" do
-      @student = student_in_course(:course => @course2).user
-      @course2.start_at = 3.weeks.ago
-      @course2.conclude_at = 2.weeks.ago
-      @course2.restrict_enrollments_to_course_dates = true
-      @course2.restrict_student_past_view = true
-      @course2.save!
-
-      json = @test_api.course_json(@course2, @student, {}, ['access_restricted_by_date'], @student.student_enrollments)
-      expect(json).to eq({"id" => @course2.id, "access_restricted_by_date" => true})
-    end
-
     it "should include course progress" do
       mod = @course2.context_modules.create!(:name => "some module", :require_sequential_progress => true)
       assignment = @course2.assignments.create!(:title => "some assignment")
@@ -335,6 +323,38 @@ describe Api::V1::Course do
         expect(json["blueprint"]).to eq true
         expect(json["blueprint_restrictions_by_object_type"]["assignment"]["points"]).to eq true
         expect(json["blueprint_restrictions_by_object_type"]["quiz"]["content"]).to eq true
+      end
+    end
+
+    context "students restricted from access by course dates" do
+      before(:once) do
+        @student = student_in_course(:course => @course2).user
+        @course2.start_at = 3.weeks.ago
+        @course2.conclude_at = 2.weeks.ago
+        @course2.restrict_enrollments_to_course_dates = true
+        @course2.restrict_student_past_view = true
+        @course2.save!
+      end
+
+      let(:json) do
+        @test_api.course_json(
+          @course2,
+          @calling_user,
+          {},
+          ['access_restricted_by_date'],
+          @student.student_enrollments
+        )
+      end
+
+      it "should not show details if the calling user is restricted from access by course dates" do
+        @calling_user = @student
+        expect(json).to eq({"id" => @course2.id, "access_restricted_by_date" => true})
+      end
+
+      it "should show details if calling user is an admin when the requested " \
+      "user is restricted from access by course dates" do
+        @calling_user = account_admin_user
+        expect(json).to include "enrollments"
       end
     end
   end
