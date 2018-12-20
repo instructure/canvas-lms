@@ -271,4 +271,84 @@ RSpec.describe AnonymousSubmissionsController do
       end
     end
   end
+
+  describe 'GET turnitin_report' do
+    let(:course) { Course.create! }
+    let(:student) { course.enroll_student(User.create!).user }
+    let(:teacher) { course.enroll_teacher(User.create!).user }
+    let(:assignment) do
+      course.assignments.create!(
+        anonymous_grading: true,
+        submission_types: 'online_text_entry',
+        title: 'hi'
+      )
+    end
+    let(:submission) { assignment.submit_homework(student, body: 'zzzzzzzzzz') }
+    let(:asset_string) { submission.id.to_s }
+
+    before { user_session(teacher) }
+
+    it 'returns bad_request if anonymous_id is not valid' do
+      get 'turnitin_report', params: {
+        course_id: assignment.context_id,
+        assignment_id: assignment.id,
+        anonymous_id: '{ anonymous_id }',
+        asset_string: asset_string
+      }
+      expect(response).to have_http_status(:bad_request)
+    end
+
+    context "when the submission's turnitin data contains a report URL" do
+      before(:each) do
+        submission.update!(turnitin_data: {asset_string => {report_url: 'MY_GREAT_REPORT'}})
+      end
+
+      it "redirects to the course tool retrieval URL" do
+        get 'turnitin_report', params: {
+          course_id: assignment.context_id,
+          assignment_id: assignment.id,
+          anonymous_id: submission.anonymous_id,
+          asset_string: asset_string
+        }
+        expect(response).to redirect_to(/#{retrieve_course_external_tools_url(course.id)}/)
+      end
+
+      it "includes the report URL in the redirect" do
+        get 'turnitin_report', params: {
+          course_id: assignment.context_id,
+          assignment_id: assignment.id,
+          anonymous_id: submission.anonymous_id,
+          asset_string: asset_string
+        }
+        expect(response).to redirect_to(/MY_GREAT_REPORT/)
+      end
+    end
+
+    it "redirects the user to SpeedGrader if no turnitin URL exists" do
+      get 'turnitin_report', params: {
+        course_id: assignment.context_id,
+        assignment_id: assignment.id,
+        anonymous_id: submission.anonymous_id,
+        asset_string: asset_string
+      }
+
+      speed_grader_url = speed_grader_course_gradebook_url(
+        course,
+        assignment_id: assignment.id,
+        anchor: "{\"anonymous_id\":\"#{submission.anonymous_id}\"}"
+      )
+      expect(response).to redirect_to(speed_grader_url)
+    end
+
+    it "displays a flash error if no turnitin URL exists" do
+      get 'turnitin_report', params: {
+        course_id: assignment.context_id,
+        assignment_id: assignment.id,
+        anonymous_id: submission.anonymous_id,
+        asset_string: asset_string
+      }
+
+      expect(flash[:error]).to be_present
+    end
+  end
 end
