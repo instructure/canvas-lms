@@ -71,7 +71,7 @@ describe "courses/_to_do_list.html.erb" do
                          submission_types: "online_text_entry",
                          points_possible: 15,
                          title: "GradeMe")
-        allow(Assignment).to receive(:need_grading_info).and_return(Assignment.where(id: @assignment.id))
+        allow(@teacher).to receive(:assignments_needing_grading).and_return(Assignment.where(id: @assignment.id))
         allow_any_instance_of(Assignments::NeedsGradingCountQuery).to receive(:manual_count).and_return(1000)
         @user = @teacher
         @user.course_nicknames[@course.id] = "My Awesome Course"

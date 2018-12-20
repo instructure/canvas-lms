@@ -1991,21 +1991,6 @@ class UsersController < ApplicationController
     end
   end
 
-  def assignments_needing_grading
-    @user = User.find(params[:user_id])
-    if authorized_action(@user, @current_user, :read)
-      res = @user.assignments_needing_grading
-      render :json => res
-    end
-  end
-
-  def assignments_needing_submitting
-    @user = User.find(params[:user_id])
-    if authorized_action(@user, @current_user, :read)
-      render :json => @user.assignments_needing_submitting
-    end
-  end
-
   def mark_avatar_image
     if params[:remove]
       if authorized_action(@user, @current_user, :remove_avatar)

@@ -256,7 +256,7 @@ class Submission < ActiveRecord::Base
       AND (submissions.excused = 'f' OR submissions.excused IS NULL)
       AND (submissions.workflow_state = 'pending_review'
         OR (submissions.workflow_state IN ('submitted', 'graded')
-          AND (submissions.score IS NULL OR NOT submissions.grade_matches_current_submission)
+          AND (submissions.score IS NULL OR submissions.grade_matches_current_submission =  'f')
         )
       )
     SQL

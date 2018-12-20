@@ -4209,16 +4209,6 @@ describe Assignment do
           expect(@sub2.messages_sent).to be_empty
         end
       end
-
-      it "should include re-submitted submissions in the list of submissions needing grading" do
-        expect(@assignment).to be_published
-        expect(@assignment.submissions.not_placeholder.size).to eq 1
-        expect(Assignment.need_grading_info.where(id: @assignment).first).to be_nil
-        @assignment.submit_homework(@stu1, :body => "Changed my mind!")
-        @sub1.reload
-        expect(@sub1.body).to eq "Changed my mind!"
-        expect(Assignment.need_grading_info.where(id: @assignment).first).not_to be_nil
-      end
     end
 
     context "assignment changed" do

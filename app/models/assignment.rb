@@ -2509,17 +2509,6 @@ class Assignment < ActiveRecord::Base
     chain.preload(:context)
   }
 
-  # This should only be used in the course drop down to show assignments not yet graded.
-  scope :need_grading_info, lambda {
-    chain = api_needed_fields.
-      where("EXISTS (?)",
-        Submission.active.where("assignment_id=assignments.id").
-          where(Submission.needs_grading_conditions)).
-      order("assignments.due_at")
-
-    chain.preload(:context)
-  }
-
   scope :expecting_submission, -> do
     where.not(submission_types: [nil, ''] + %w(none not_graded on_paper wiki_page))
   end

@@ -821,8 +821,6 @@ CanvasRails::Application.routes.draw do
 
     resources :pseudonyms, except: :index
     resources :question_banks, only: :index
-    get :assignments_needing_grading
-    get :assignments_needing_submitting
     get :admin_merge
     post :merge
     get :grades
