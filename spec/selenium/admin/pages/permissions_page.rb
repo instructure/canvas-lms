@@ -107,6 +107,10 @@ class PermissionsIndex
       f("#permissions-add-tray-submit-button")
     end
 
+    def edit_name_box
+      f('input[name="edit_name_box"]')
+    end
+
     def role_tray_permission_state(permission, role)
       icon = fj("##{permission}_#{role} svg:first").attribute('name')
       state = ""
@@ -165,8 +169,13 @@ class PermissionsIndex
 
     def open_edit_role_tray(role)
       role_name(role).click
-      edit_role_icon.click
-      wait_for_animations
+      f('.ic-permissions_role_tray')
+      keep_trying_until do
+        disable_implicit_wait{edit_role_icon.click}
+        disable_implicit_wait{edit_name_box.displayed?}
+      end
+      # sometimes the input loads and the value takes longer, wait for value
+      wait_for(method: nil, timeout: 1) { edit_name_box.attribute('value') == role.name }
     end
 
     def add_role(name)
@@ -178,7 +187,7 @@ class PermissionsIndex
 
     def edit_role(role, new_name)
       open_edit_role_tray(role)
-      replace_content(f('input[name="edit_name_box"]'), new_name, tab_out: true)
+      replace_content(edit_name_box, new_name, tab_out: true)
       # click header since :tab does not tab out of input
       edit_tray_header.click
       wait_for_ajaximations
