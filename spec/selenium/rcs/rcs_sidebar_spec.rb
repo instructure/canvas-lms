@@ -171,5 +171,22 @@ describe "RCS sidebar tests" do
       click_images_tab
       expect(upload_new_image).to be_displayed
     end
+
+    it "should click on an image in sidebar to display in body" do
+      title = "email.png"
+      @root_folder = Folder.root_folders(@course).first
+      @image = @root_folder.attachments.build(:context => @course)
+      path = File.expand_path(File.dirname(__FILE__) + '/../../../public/images/email.png')
+      @image.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
+      @image.save!
+
+      visit_front_page(@course)
+      click_images_tab
+      click_image_link(title)
+
+      in_frame wiki_page_body_ifr_id do
+        expect(wiki_body_image.attribute('src')).to include "/files/#{@image.id}"
+      end
+    end
   end
 end

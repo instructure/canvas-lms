@@ -64,6 +64,10 @@ module RCSSidebarPage
     f('#tinymce p a')
   end
 
+  def wiki_body_image
+    f('#tinymce p img')
+  end
+
   def sidebar_link(title)
     fj("aside li:contains('#{title}')")
   end
@@ -82,6 +86,10 @@ module RCSSidebarPage
 
   def upload_new_image
     fj('button:contains("Upload a new image")')
+  end
+
+  def image_link(title)
+    fj("aside [role='button']:contains('#{title}')")
   end
 
   # ---------------------- Actions ----------------------
@@ -132,5 +140,9 @@ module RCSSidebarPage
 
   def click_images_tab
     images_tab.click
+  end
+
+  def click_image_link(title)
+    image_link(title).click
   end
 end
