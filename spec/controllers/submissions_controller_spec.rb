@@ -761,15 +761,70 @@ describe SubmissionsController do
  end
 
   describe 'GET turnitin_report' do
+    let(:course) { Course.create! }
+    let(:student) { course.enroll_student(User.create!).user }
+    let(:teacher) { course.enroll_teacher(User.create!).user }
+    let(:assignment) { course.assignments.create!(submission_types: 'online_text_entry', title: 'hi') }
+    let(:submission) { assignment.submit_homework(student, body: 'zzzzzzzzzz') }
+    let(:asset_string) { submission.id.to_s }
+
+    before { user_session(teacher) }
+
     it 'returns bad_request if submission_id is not an integer' do
-      assignment = assignment_model
       get 'turnitin_report', params: {
         course_id: assignment.context_id,
         assignment_id: assignment.id,
         submission_id: '{ user_id }',
-        asset_string: '123'
+        asset_string: asset_string
       }
       expect(response).to have_http_status(:bad_request)
+    end
+
+    context "when the submission's turnitin data contains a report URL" do
+      before(:each) do
+        submission.update!(turnitin_data: {asset_string => {report_url: 'MY_GREAT_REPORT'}})
+      end
+
+      it "redirects to the course tool retrieval URL" do
+        get 'turnitin_report', params: {
+          course_id: assignment.context_id,
+          assignment_id: assignment.id,
+          submission_id: student.id,
+          asset_string: asset_string
+        }
+        expect(response).to redirect_to(/#{retrieve_course_external_tools_url(course.id)}/)
+      end
+
+      it "includes the report URL in the redirect" do
+        get 'turnitin_report', params: {
+          course_id: assignment.context_id,
+          assignment_id: assignment.id,
+          submission_id: student.id,
+          asset_string: asset_string
+        }
+        expect(response).to redirect_to(/MY_GREAT_REPORT/)
+      end
+    end
+
+    it "redirects the user to the submission details page if no turnitin URL exists" do
+      get 'turnitin_report', params: {
+        course_id: assignment.context_id,
+        assignment_id: assignment.id,
+        submission_id: student.id,
+        asset_string: asset_string
+      }
+      expect(response).to redirect_to course_assignment_submission_url(assignment.context_id, assignment.id, student.id)
+    end
+
+    it "displays a flash error if no turnitin URL exists" do
+      get 'turnitin_report', params: {
+        course_id: assignment.context_id,
+        assignment_id: assignment.id,
+        submission_id: student.id,
+        asset_string: asset_string
+      }
+
+      expect(flash[:error]).to be_present
     end
   end
 
