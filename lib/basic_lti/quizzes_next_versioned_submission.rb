@@ -75,7 +75,7 @@ module BasicLTI
       @_params ||= {}
     end
 
-    def save_submission!(launch_url, score, grade, grader_id)
+    def save_submission!(launch_url, grade, score, grader_id)
       submission.grade = grade
       submission.score = score
       submission.submission_type = params[:submission_type] || 'basic_lti_launch'

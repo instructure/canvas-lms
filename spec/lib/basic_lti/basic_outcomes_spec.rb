@@ -385,8 +385,39 @@ describe BasicLTI::BasicOutcomes do
       expect(submission.submission_type).to eq 'basic_lti_launch'
     end
 
-    context "submissions" do
+    context "quizzes.next submissions" do
+      let(:tool) do
+        @course.context_external_tools.create(
+          name: "a",
+          url: "http://google.com",
+          consumer_key: '12345',
+          shared_secret: 'secret',
+          tool_id: 'Quizzes 2'
+        )
+      end
 
+      let(:assignment) do
+        @course.assignments.create!(
+          {
+              title: "Quizzes.next Quiz",
+              description: "value for description",
+              due_at: Time.zone.now,
+              points_possible: "1.5",
+              submission_types: 'external_tool',
+              grading_type: "letter_grade",
+              external_tool_tag_attributes: {url: tool.url}
+          }
+        )
+      end
+
+      it "stores the score and grade for quizzes.next assignments" do
+        xml.at_css('text').replace('<ltiLaunchUrl>http://example.com/launch</ltiLaunchUrl>')
+        BasicLTI::BasicOutcomes.process_request(tool, xml)
+        expect(assignment.submissions.first.grade).to eq "A-"
+      end
+    end
+
+    context "submissions" do
       it "creates a new submissions if there isn't one" do
         xml.css('resultData').remove
         expect{BasicLTI::BasicOutcomes.process_request(tool, xml)}.
