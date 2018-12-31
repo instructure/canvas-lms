@@ -55,6 +55,23 @@ require 'atom'
 #       }
 #     }
 #
+# @model AnonymousUserDisplay
+#     {
+#       "id": "AnonymousUserDisplay",
+#       "description": "This mini-object is returned in place of UserDisplay when returning student data for anonymous assignments, and includes an anonymous ID to identify a user within the scope of a single assignment.",
+#       "properties": {
+#         "anonymous_id": {
+#           "description": "A unique short ID identifying this user within the scope of a particular assignment.",
+#           "example": "xn29Q",
+#           "type": "string"
+#         },
+#         "avatar_image_url": {
+#           "description": "A URL to retrieve a generic avatar.",
+#           "example": "https://en.gravatar.com/avatar/d8cb8c8cd40ddf0cd05241443a591868?s=80&r=g",
+#           "type": "string"
+#         }
+#       }
+#     }
 #
 # @model User
 #     {
