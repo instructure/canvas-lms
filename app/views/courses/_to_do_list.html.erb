@@ -155,11 +155,37 @@ cache(safe_cache_key([@current_user, contexts, 'to_do_list_view']), cache_opts) 
         <%= render :partial => 'shared/ignore_option_list', :locals => {presenter: assessment_request} %>
       </li>
     <% end %>
-    <% if presenter.hidden_count > 0 %>
-      <li>
-      <a href="#" class="more_link">
-        <%= t 'links.show_more', '%{count} more...', :count => presenter.hidden_count %>
-      </a>
+    <% presenter.needs_reading.each_with_index do |assignment, i| %>
+      <li class="todo" style="<%= hidden if i >= presenter.visible_limit %>">
+        <a
+          class="item"
+          href="<%= assignment.gradebook_path %>"
+          data-track-category="dashboard"
+          data-track-label="todo needs reading"
+        >
+          <div class="todo-badge-wrapper">
+            <div class="todo-badge">
+              <span aria-hidden="true"><%= assignment.needs_grading_badge %></span>
+              <span class="screenreader-only"><%= assignment.needs_grading_label %></span>
+            </div>
+          </div>
+          <div class="todo-details">
+            <b class="todo-details__title"><%= t('Read %{assignment}', assignment: assignment.title) %></b>
+            <% if presenter.show_context? %>
+              <p class="todo-details__context">
+                <%= assignment.short_context_name %>
+              </p>
+            <% end %>
+            <p>
+              <% if assignment.points_possible %>
+                <%= t({one: '1 point', other: '%{count} points'}, count: round_if_whole(assignment.points_possible)) %>
+                &bullet;
+              <% end %>
+              <%= assignment.formatted_due_date %>
+            </p>
+          </div>
+        </a>
+        <%= render :partial => 'shared/ignore_option_list', :locals => {presenter: assignment} unless assignment.type == :discussion_topics_need_reading %>
       </li>
     <% end %>
   </ul>

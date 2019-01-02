@@ -19,7 +19,7 @@ class ToDoListPresenter
   ASSIGNMENT_LIMIT = 100
   VISIBLE_LIMIT = 5
 
-  attr_reader :needs_grading, :needs_moderation, :needs_submitting, :needs_reviewing
+  attr_reader :needs_grading, :needs_moderation, :needs_submitting, :needs_reviewing, :needs_reading
 
   def initialize(view, user, contexts)
     @view = view
@@ -27,6 +27,7 @@ class ToDoListPresenter
     @contexts = contexts
 
     if user
+      @needs_reading = discussion_topics_need_reading
       @needs_grading = assignments_needing(:grading)
       @needs_moderation = assignments_needing(:moderation)
       @needs_submitting = assignments_needing(:submitting, include_ungraded: true)
@@ -37,6 +38,7 @@ class ToDoListPresenter
         AssessmentRequestPresenter.new(view, ar, user) if ar.asset.assignment.published?
       end.compact
     else
+      @needs_reading = []
       @needs_grading = []
       @needs_moderation = []
       @needs_submitting = []
@@ -54,6 +56,13 @@ class ToDoListPresenter
     end
   end
 
+  def discussion_topics_need_reading
+    ids = JSON.parse(@user.get_teacher_unread_discussion_topics)
+    Assignment.joins(:discussion_topic).where('discussion_topics.id' => ids.map(&:to_i)).map do |assignment|
+      AssignmentPresenter.new(@view, assignment, @user, :discussion_topics_need_reading)
+    end
+  end
+
   def ungraded_quizzes_needing_submitting
     @user.ungraded_quizzes_needing_submitting(contexts: @contexts, limit: ASSIGNMENT_LIMIT).map do |quiz|
       AssignmentPresenter.new(@view, quiz, @user, :submitting)
@@ -65,7 +74,8 @@ class ToDoListPresenter
       @needs_grading.present? ||
       @needs_moderation.present? ||
       @needs_submitting.present? ||
-      @needs_reviewing.present?
+      @needs_reviewing.present? ||
+      @needs_reading.present?
     )
   end
 
@@ -93,7 +103,7 @@ class ToDoListPresenter
   end
 
   class AssignmentPresenter
-    attr_reader :assignment
+    attr_reader :assignment, :type
     protected :assignment
     delegate :title, :submission_action_string, :points_possible, :due_at, :updated_at, :peer_reviews_due_at, to: :assignment
 
