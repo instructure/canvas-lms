@@ -37,8 +37,19 @@ describe('processContentItemsForEditor', () => {
     title: 'link title',
     text: 'link text'
   }
+  const imageContentItem = {
+    type: 'image',
+    url: 'http://www.test.com/image',
+    width: 100,
+    height: 200
+  }
   const invalidContentItem = {type: 'banana'}
-  const contentItems = [linkContentItem, invalidContentItem, resourceLinkContentItem]
+  const contentItems = [
+    linkContentItem,
+    invalidContentItem,
+    resourceLinkContentItem,
+    imageContentItem
+  ]
   const editor = {id: 'editor_id'}
 
   beforeEach(() => {
@@ -53,9 +64,15 @@ describe('processContentItemsForEditor', () => {
     )
   })
 
-  it('creates content for an LTI ResourceLink content itme', () => {
+  it('creates content for an LTI ResourceLink content item', () => {
     expect(send.mock.calls[1][2]).toEqual(
       '<a href="undefined?display=borderless&amp;url=http%3A%2F%2Fwww.test.com" title="link title">link text</a>'
+    )
+  })
+
+  it('creates content for an image content item', () => {
+    expect(send.mock.calls[2][2]).toEqual(
+      '<img src="http://www.test.com/image" width="100" height="200">'
     )
   })
 })

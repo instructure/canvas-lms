@@ -18,31 +18,22 @@
 
 import ContentItem from './ContentItem'
 
-// Base content item type
-export default class LinkContentItem extends ContentItem {
-  static type = 'link'
+export default class ImageContentItem extends ContentItem {
+  static type = 'image'
 
   constructor(json) {
     super(json)
-    this.type = LinkContentItem.type
+    this.type = ImageContentItem.type
   }
 
   get properties() {
-    return Object.freeze(['url', 'title', 'text', 'icon', 'thumbnail'])
+    return Object.freeze(['url', 'title', 'thumbnail', 'text', 'width', 'height'])
   }
 
   toHtmlString() {
-    return this.anchorTag(this.linkBody())
-  }
-
-  linkText() {
-    return (this.text && this.text.trim()) || (this.title && this.title.trim())
-  }
-
-  linkBody() {
     if (this.thumbnail) {
-      return this.linkThumbnail()
+      return this.anchorTag(this.linkThumbnail())
     }
-    return this.linkText()
+    return this.imageTag(this.safeUrl(), this.width, this.height)
   }
 }

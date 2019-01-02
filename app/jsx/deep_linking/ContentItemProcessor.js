@@ -20,6 +20,7 @@ import $ from 'jquery'
 import {send} from 'jsx/shared/rce/RceCommandShim'
 import LinkContentItem from './models/LinkContentItem'
 import ResourceLinkContentItem from './models/ResourceLinkContentItem'
+import ImageContentItem from './models/ImageContentItem'
 import I18n from 'i18n!external_content.success'
 
 export function processContentItemsForEditor(event, editor, dialogId) {
@@ -65,7 +66,8 @@ export default class ContentItemProcessor {
   get typeMap() {
     return {
       link: LinkContentItem,
-      ltiResourceLink: ResourceLinkContentItem
+      ltiResourceLink: ResourceLinkContentItem,
+      image: ImageContentItem
     }
   }
 

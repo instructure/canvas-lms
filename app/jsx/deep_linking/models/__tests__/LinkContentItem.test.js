@@ -63,7 +63,7 @@ describe('constructor', () => {
 describe('toHtmlString', () => {
   it('correctly creates a link with the thumbnail', () => {
     expect(linkContentItem().toHtmlString()).toEqual(
-      '<a href="https://www.test.com" title="Title"><img src="https://www.test.com/thumbnail" title="Title"></a>'
+      '<a href="https://www.test.com" title="Title"><img src="https://www.test.com/thumbnail" alt="some text"></a>'
     )
   })
 
@@ -80,7 +80,7 @@ describe('toHtmlString', () => {
     const overrides = {url: 'javascript:alert("hello world!");'}
     it('sanitizes the url', () => {
       expect(linkContentItem(overrides).toHtmlString()).toEqual(
-        '<a href="#javascript:alert(&quot;hello world!&quot;);" title="Title"><img src="https://www.test.com/thumbnail" title="Title"></a>'
+        '<a href="#javascript:alert(&quot;hello world!&quot;);" title="Title"><img src="https://www.test.com/thumbnail" alt="some text"></a>'
       )
     })
   })
