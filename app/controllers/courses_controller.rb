@@ -1214,14 +1214,16 @@ class CoursesController < ApplicationController
   #     "hide_distribution_graphs": false,
   #     "lock_all_announcements": true
   #   }
+  def api_settings
+    get_context
+    if authorized_action @context, @current_user, :read
+      render :json => course_settings_json(@context)
+    end
+  end
+
   def settings
     get_context
     if authorized_action(@context, @current_user, :read_as_admin)
-      if api_request?
-        render :json => course_settings_json(@context)
-        return
-      end
-
       load_all_contexts(:context => @context)
 
       @all_roles = Role.custom_roles_and_counts_for_course(@context, @current_user, true)
