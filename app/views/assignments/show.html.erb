@@ -73,7 +73,7 @@
           <a href="<%= edit_polymorphic_path([@context, @assignment]) %>" class='btn edit_assignment_link<%= ' disabled' unless can_do(@assignment, @current_user, :update) %>'>
             <i class='icon-edit'></i> <%= t('links.edit', 'Edit') %>
             <% unless can_do(@assignment, @current_user, :update) %>
-              <span class="screenreader-only">You are not the selected moderator for this assignment</span>
+              <span class="screenreader-only">You do not have permissions to edit this moderated assignment</span>
             <% end %>
           </a>
         <% end %>

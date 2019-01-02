@@ -117,8 +117,9 @@ describe "moderated grading assignments" do
       end
     end
 
-    context "on visiting assignment edit page as non assignment moderator" do
+    context "on visiting assignment edit page as user without Select Final Grade permission" do
       before do
+        @course.account.role_overrides.create!(permission: :select_final_grade, role: teacher_role, enabled: false)
         user_session(@teacher_three)
         AssignmentPage.visit_assignment_edit_page(@course.id, @moderated_assignment.id)
       end

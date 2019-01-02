@@ -3563,8 +3563,8 @@ describe Assignment do
       before(:each) do
         @course.enable_feature!(:moderated_grading)
 
+        @ta = ta_in_course(course: @course, active_all: true).user
         @moderator = teacher_in_course(course: @course, active_all: true).user
-        @non_moderator = teacher_in_course(course: @course, active_all: true).user
 
         @moderated_assignment = @course.assignments.create!(
           moderated_grading: true,
@@ -3577,17 +3577,23 @@ describe Assignment do
         expect(@moderated_assignment.grants_right?(@moderator, :update)).to eq(true)
       end
 
-      it "does not allow non-moderators to update a moderated assignment" do
-        expect(@moderated_assignment.grants_right?(@non_moderator, :update)).to eq(false)
+      it "allows non-moderators with Select Final Grade permission to update a moderated assignment" do
+        expect(@moderated_assignment.grants_right?(@ta, :update)).to eq(true)
       end
 
       it "allows an admin to update a moderated assignment" do
         expect(@moderated_assignment.grants_right?(@admin, :update)).to eq(true)
       end
 
-      it "allows a teacher to update a moderated assignment with no moderator selected" do
+      it "does not allow users without Select Final Grade permission to update a moderated assignment" do
+        @course.account.role_overrides.create!(permission: :select_final_grade, role: ta_role, enabled: false)
+        expect(@moderated_assignment.grants_right?(@ta, :update)).to be false
+      end
+
+      it "allows an instructor to update a moderated assignment with no moderator selected" do
+        @course.account.role_overrides.create!(permission: :select_final_grade, role: ta_role, enabled: false)
         @moderated_assignment.update!(final_grader: nil)
-        expect(@moderated_assignment.grants_right?(@non_moderator, :update)).to eq(true)
+        expect(@moderated_assignment.grants_right?(@ta, :update)).to eq(true)
       end
     end
   end
