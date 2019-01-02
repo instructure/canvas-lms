@@ -612,15 +612,15 @@ describe Oauth2ProviderController do
           end
         end
 
-        context 'with replayed jwt' do
-          it 'returns 400' do
+        context 'with same token' do
+          it 'returns 200' do
             enable_cache do
               expect(subject).to have_http_status 200
               Setting.set('oauth.allowed_timestamp_future_skew', 0.seconds)
 
               parameters = {grant_type: 'client_credentials' }.merge(client_credentials_params)
               post :token, params: parameters
-              expect(response).to have_http_status 400
+              expect(response).to have_http_status 200
             end
           end
         end

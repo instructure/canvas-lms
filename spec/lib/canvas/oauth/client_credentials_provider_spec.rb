@@ -153,6 +153,15 @@ module Canvas::Oauth
         end
       end
 
+      context 'jti check' do
+        it 'is true when when validated twice' do
+          enable_cache do
+            subject
+            expect(subject).to eq true
+          end
+        end
+      end
+
       context 'with missing assertion' do
         (Canvas::Security::JwtValidator::REQUIRED_ASSERTIONS + ['iss']).each do |assertion|
           it "is invalid when #{assertion} missing" do
