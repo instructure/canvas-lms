@@ -81,3 +81,8 @@ it('does not show add-enrollment when not allowed', () => {
       .exists()
   ).toBe(false)
 })
+
+it('shows the teacher count when needed', () => {
+  const wrapper = shallow(<CoursesListRow {...props} teacher_count={3} teachers={null} />)
+  expect(wrapper.text()).toContain('3 teachers')
+})
