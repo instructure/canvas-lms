@@ -28,31 +28,35 @@ import DateTitle from './DateTitle'
 import PointsDisplay from './PointsDisplay'
 import StepContainer from './StepContainer'
 import Attempt from './Attempt'
+import {number} from 'prop-types'
 
 import {StudentAssignmentShape} from '../assignmentData'
 
-const THRESHHOLD = 250
 class Header extends React.Component {
   static propTypes = {
-    assignment: StudentAssignmentShape
+    assignment: StudentAssignmentShape,
+    scrollThreshold: number.isRequired
   }
 
   state = {
-    isSticky: false,
-    scrollOffset: 0
+    isSticky: false
   }
 
   componentDidMount() {
-    window.onscroll = () => {
-      if (window.pageYOffset < THRESHHOLD) {
-        this.setState({isSticky: false, scrollOffset: window.pageYOffset})
-      } else {
-        this.setState({isSticky: true, scrollOffset: window.pageYOffset})
-      }
-    }
+    window.addEventListener('scroll', this.handleScroll)
   }
 
-  calculateHeaderWidth = () => Math.round(100 - this.state.scrollOffset / 3)
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this.handleScroll)
+  }
+
+  handleScroll = () => {
+    if (window.pageYOffset < this.props.scrollThreshold) {
+      this.setState({isSticky: false})
+    } else {
+      this.setState({isSticky: true})
+    }
+  }
 
   render() {
     return (
@@ -97,7 +101,7 @@ class Header extends React.Component {
             </FlexItem>
           </FlexItem>
         </Flex>
-        <Attempt assignment={this.props.assignment} />
+        {!this.state.isSticky && <Attempt assignment={this.props.assignment} />}
         <div className="assignment-pizza-header-outer">
           <div
             className="assignment-pizza-header-inner"
@@ -106,9 +110,6 @@ class Header extends React.Component {
                 ? 'assignment-student-header-sticky'
                 : 'assignment-student-header-normal'
             }
-            style={{
-              width: `${this.calculateHeaderWidth()}%`
-            }}
           >
             <StepContainer
               assignment={this.props.assignment}

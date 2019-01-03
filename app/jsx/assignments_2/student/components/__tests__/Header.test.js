@@ -37,22 +37,31 @@ afterEach(() => {
 })
 
 it('renders normally', () => {
-  ReactDOM.render(<Header assignment={mockAssignment()} />, document.getElementById('fixtures'))
+  ReactDOM.render(
+    <Header scrollThreshold={150} assignment={mockAssignment()} />,
+    document.getElementById('fixtures')
+  )
   const element = $('[data-test-id="assignments-2-student-header"]')
   expect(element).toHaveLength(1)
 })
 
 it('dispatches scroll event properly when less than threshold', () => {
-  ReactDOM.render(<Header assignment={mockAssignment()} />, document.getElementById('fixtures'))
+  ReactDOM.render(
+    <Header scrollThreshold={150} assignment={mockAssignment()} />,
+    document.getElementById('fixtures')
+  )
   const scrollEvent = new Event('scroll')
-  window.pageYOffset = 200
+  window.pageYOffset = 100
   window.dispatchEvent(scrollEvent)
   const foundClassElement = $('[data-test-id="assignment-student-header-normal"]')
   expect(foundClassElement).toHaveLength(1)
 })
 
 it('dispatches scroll event properly when greather than threshold', () => {
-  ReactDOM.render(<Header assignment={mockAssignment()} />, document.getElementById('fixtures'))
+  ReactDOM.render(
+    <Header scrollThreshold={150} assignment={mockAssignment()} />,
+    document.getElementById('fixtures')
+  )
   const scrollEvent = new Event('scroll')
   window.pageYOffset = 500
   window.dispatchEvent(scrollEvent)

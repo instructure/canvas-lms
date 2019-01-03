@@ -16,29 +16,34 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
- .steps-main {
-  transition: width .2s ease-in-out, height .2s ease-in-out, transform .38s ease-in-out, position .2s ease-in-out, top .2s ease-in-out, right .2s ease-in-out;
- }
+.steps-main {
+  width: 100%;
+  position: absolute;
+  #{direction(right)}: 0px;
+  transition: all 0.5s linear;
+}
 
- .steps-main-status-label {
-   position: absolute;
-   #{direction(right)}: 140px;
-   top: 4px;
- }
+.steps-main-status-label {
+  animation: 1.0s ease 0s normal forwards 1 fadein;
+  position: absolute;
+  #{direction(right)}: 140px;
+  top: 4px;
+}
 
- .steps-container-collapsed {
-    position: absolute;
-    #{direction(right)}: 8px;
-    width: 120px;
+.steps-container-collapsed {
+  transition: all 0.5s linear;
+  position: absolute;
+  #{direction(right)}: 8px;
+  width: 120px;
 
-    .step-item-label {
-      visibility: hidden;
-    }
+  .step-item-label {
+    visibility: hidden;
+  }
 
-    .progressionContainer {
-      visibility: hidden;
-    }
- }
+  .progressionContainer {
+    visibility: hidden;
+  }
+}
 
 .steps {
   list-style-type: none;
@@ -91,4 +96,10 @@
 
 [dir="rtl"] .completeProgression {
   transform-origin: right center;
+}
+
+@keyframes fadein {
+    0% { opacity:0; }
+    66% { opacity:0; }
+    100% { opacity:1; }
 }

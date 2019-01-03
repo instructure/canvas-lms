@@ -40,12 +40,11 @@ function renderContentBaseOnAvailability(assignment) {
   }
 }
 
-// TODO: remove the 200vh when more content is populated in this view
 function StudentContent(props) {
   const {assignment} = props
   return (
-    <div data-test-id="assignments-2-student-view" style={{height: '200vh'}}>
-      <Header assignment={assignment} />
+    <div data-test-id="assignments-2-student-view">
+      <Header scrollThreshold={150} assignment={assignment} />
       {renderContentBaseOnAvailability(assignment)}
     </div>
   )
