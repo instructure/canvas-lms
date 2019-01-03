@@ -17,6 +17,7 @@
 
 require_relative '../../common'
 require_relative '../../assignments/page_objects/assignment_page'
+require_relative '../../assignments/page_objects/assignment_create_edit_page'
 require_relative '../pages/moderate_page'
 require_relative '../pages/gradebook_page'
 require_relative '../pages/student_grades_page'
@@ -74,13 +75,13 @@ describe 'Moderated Marking' do
       Account.default.role_overrides.create!(role: Role.find_by(name: 'TaEnrollment'), permission: 'select_final_grade', enabled: false)
 
       user_session(@teacher1)
-      AssignmentPage.visit_assignment_edit_page(@moderated_course.id, @moderated_assignment.id)
+      AssignmentCreateEditPage.visit_assignment_edit_page(@moderated_course.id, @moderated_assignment.id)
     end
 
     it 'user without the permission is not displayed in final-grader dropdown', priority: '1', test_id: 3490529 do
-      AssignmentPage.select_grader_dropdown.click
+      AssignmentCreateEditPage.select_grader_dropdown.click
 
-      expect(AssignmentPage.select_grader_dropdown).not_to include_text(@ta.name)
+      expect(AssignmentCreateEditPage.select_grader_dropdown).not_to include_text(@ta.name)
     end
   end
 
