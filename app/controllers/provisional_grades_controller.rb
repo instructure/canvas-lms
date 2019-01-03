@@ -203,38 +203,6 @@ class ProvisionalGradesController < ProvisionalGradesBaseController
     render json: json
   end
 
-  # @API Copy provisional grade
-  #
-  # Given a provisional grade, copy the grade (and associated submission comments and rubric assessments)
-  # to a "final" mark which can be edited or commented upon by a moderator prior to publication of grades.
-  #
-  # Notes:
-  # * The student must be in the moderation set for the assignment.
-  # * The newly created grade will be selected.
-  # * The caller must have "Moderate Grades" rights in the course.
-  #
-  # @returns ProvisionalGrade
-  def copy_to_final_mark
-    render_unauthorized_action and return unless @assignment.permits_moderation?(@current_user)
-
-    pg = @assignment.provisional_grades.find(params[:provisional_grade_id])
-    return render :json => { :message => 'provisional grade is already final' }, :status => :bad_request if pg.final
-    selection = @assignment.moderated_grading_selections.where(student_id: pg.submission.user_id).first
-    return render :json => { :message => 'student not in moderation set' }, :status => :bad_request unless selection
-    final_mark = pg.copy_to_final_mark!(@current_user)
-    selection.provisional_grade = final_mark
-    selection.save!
-    render json: provisional_grade_json(
-      course: @context,
-      assignment: @assignment,
-      submission: pg.submission,
-      provisional_grade: final_mark,
-      current_user: @current_user,
-      avatars: service_enabled?(:avatars) && !@assignment.grade_as_group?,
-      includes: %w(submission_comments rubric_assessment crocodoc_urls)
-    ).merge(selected: true)
-  end
-
   # @API Publish provisional grades for an assignment
   #
   # Publish the selected provisional grade for all submissions to an assignment.

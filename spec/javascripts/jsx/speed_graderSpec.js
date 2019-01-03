@@ -3824,48 +3824,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
     })
   })
 
-  QUnit.module('#removeModerationBarAndShowSubmission', function(hooks) {
-    hooks.beforeEach(() => {
-      setupFixtures(`
-        <div id="full_width_container" class="with_moderation_tabs"></div>
-        <div id="moderation_bar"></div>
-        <form id="add_a_comment" style="display:none;"></form>
-      `);
-      sinon.stub(SpeedGrader.EG, 'domReady')
-      sinon.stub(SpeedGrader.EG, 'showSubmission')
-      SpeedGrader.setup()
-    })
-
-    hooks.afterEach(() => {
-      SpeedGrader.EG.showSubmission.restore()
-      SpeedGrader.EG.domReady.restore()
-      teardownFixtures()
-    })
-
-    test('removes the "with_moderation_tabs" class from the container', () => {
-      SpeedGrader.EG.removeModerationBarAndShowSubmission()
-      const containerClasses = document.getElementById('full_width_container').className
-      strictEqual(containerClasses.includes('with_moderation_tabs'), false)
-    })
-
-    test('hides the moderation bar', () => {
-      SpeedGrader.EG.removeModerationBarAndShowSubmission()
-      const moderationBar = document.getElementById('moderation_bar')
-      strictEqual(moderationBar.style.display, 'none')
-    })
-
-    test('calls showSubmission', () => {
-      SpeedGrader.EG.removeModerationBarAndShowSubmission()
-      strictEqual(SpeedGrader.EG.showSubmission.callCount, 1)
-    })
-
-    test('reveals the comment form', () => {
-      SpeedGrader.EG.removeModerationBarAndShowSubmission()
-      const addCommentForm = document.getElementById('add_a_comment')
-      strictEqual(addCommentForm.style.display, '')
-    })
-  })
-
   QUnit.module('#handleGradingError', (hooks) => {
     hooks.beforeEach(() => {
       sinon.stub($, 'flashError')
@@ -4029,7 +3987,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       EG.setupProvisionalGraderDisplayNames()
 
       submission = EG.currentStudent.submission
-      sinon.stub(EG, 'submitSelectedProvisionalGrade')
+      sinon.stub(EG, 'selectProvisionalGrade')
       sinon.stub(EG, 'setActiveProvisionalGradeFields')
       sinon.stub(EG, 'renderProvisionalGradeSelector')
     })
@@ -4037,17 +3995,17 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
     hooks.afterEach(() => {
       EG.renderProvisionalGradeSelector.restore()
       EG.setActiveProvisionalGradeFields.restore()
-      EG.submitSelectedProvisionalGrade.restore()
+      EG.selectProvisionalGrade.restore()
 
       SpeedGrader.teardown()
       window.location.hash = ''
       teardownFixtures()
     })
 
-    test('calls submitSelectedProvisionalGrade with the grade ID when selectedGrade is passed', () => {
+    test('calls selectProvisionalGrade with the grade ID when selectedGrade is passed', () => {
       EG.handleProvisionalGradeSelected({selectedGrade: submission.provisional_grades[0]})
 
-      const [selectedGradeId] = EG.submitSelectedProvisionalGrade.firstCall.args
+      const [selectedGradeId] = EG.selectProvisionalGrade.firstCall.args
       strictEqual(selectedGradeId, '1')
     })
 
@@ -4324,7 +4282,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
     })
   })
 
-  QUnit.module('#submitSelectedProvisionalGrade', (hooks) => {
+  QUnit.module('#selectProvisionalGrade', (hooks) => {
     const EG = SpeedGrader.EG
 
     hooks.beforeEach(() => {
@@ -4366,7 +4324,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
     })
 
     test('includes the value of ENV.provisional_select_url and provisionalGradeId in the URL', () => {
-      EG.submitSelectedProvisionalGrade(123)
+      EG.selectProvisionalGrade(123)
       const addSubmissionCommentAjaxJSON = $.ajaxJSON.getCalls().find(call =>
         call.args[0] === 'provisional_select_url?123'
       )
@@ -4375,12 +4333,12 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
 
     QUnit.module('when the request completes successfully', () => {
       test('calls fetchProvisionalGrades when refetchOnSuccess is true', () => {
-        EG.submitSelectedProvisionalGrade(1, true)
+        EG.selectProvisionalGrade(1, true)
         strictEqual(EG.fetchProvisionalGrades.callCount, 1)
       })
 
       test('calls renderProvisionalGradeSelector when refetchOnSuccess is false', () => {
-        EG.submitSelectedProvisionalGrade(1, false)
+        EG.selectProvisionalGrade(1, false)
         strictEqual(EG.renderProvisionalGradeSelector.callCount, 1)
       })
     })

@@ -670,7 +670,6 @@ class GradebooksController < ApplicationController
           outcome_proficiency: outcome_proficiency,
         }
         if grading_role(assignment: @assignment) == :moderator
-          env[:provisional_copy_url] = api_v1_copy_to_final_mark_path(@context.id, @assignment.id, "{{provisional_grade_id}}")
           env[:provisional_select_url] = api_v1_select_provisional_grade_path(@context.id, @assignment.id, "{{provisional_grade_id}}")
         end
 

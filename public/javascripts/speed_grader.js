@@ -112,19 +112,6 @@ let $gradebook_header
 let $grading_box_selected_grader
 let assignmentUrl
 let $rightside_inner
-let $moderation_bar
-let $moderation_tabs_div
-let $moderation_tabs
-let $moderation_tab_2nd
-let $moderation_tab_final
-let $new_mark_container
-let $new_mark_link
-let $new_mark_link_menu_item
-let $new_mark_copy_link1
-let $new_mark_copy_link2
-let $new_mark_copy_link2_menu_item
-let $new_mark_final_link
-let $new_mark_final_link_menu_item
 let $not_gradeable_message
 let $comments
 let $comment_blank
@@ -1063,32 +1050,6 @@ EG = {
   refreshGrades,
 
   domReady: function(){
-    $moderation_tabs_div.tabs({
-      activate: function(event, ui) {
-        var index = ui.newTab.data('pg-index')
-        if (index != 'final') {
-          index = parseInt(index);
-        }
-        EG.showProvisionalGrade(index);
-      }
-    });
-    $moderation_tabs.each(function(index) {
-      if (index == 2) index = "final"; // this will make it easier to identify the final mark
-
-      $(this).find('a').click(function(e) {
-        e.preventDefault();
-        EG.showProvisionalGrade(index);
-      });
-      $('<i class="icon-check selected_icon"></i>').prependTo($(this).find('.mark_title'));
-      $('<button class="Button" role="button"></button>').text(I18n.t('Select')).appendTo($(this)).on('click keyclick', function(){
-        EG.selectProvisionalGrade(index);
-      });
-    });
-    $new_mark_link.click(function(e){ e.preventDefault(); EG.newProvisionalGrade('new', 1)} );
-    $new_mark_final_link.click(function(e){ e.preventDefault(); EG.newProvisionalGrade('new', 'final')} );
-    $new_mark_copy_link1.click(function(e){ e.preventDefault(); EG.newProvisionalGrade('copy', 0)} );
-    $new_mark_copy_link2.click(function(e){ e.preventDefault(); EG.newProvisionalGrade('copy', 1)} );
-
     function makeFullWidth(){
       $full_width_container.addClass("full_width");
       $left_side.css("width",'');
@@ -1441,8 +1402,8 @@ EG = {
       this.renderProvisionalGradeSelector({showingNewStudent: true})
       this.setCurrentStudentRubricAssessments()
 
-      this.current_prov_grade_index = null;
-      this.removeModerationBarAndShowSubmission();
+      this.showSubmission();
+      this.setReadOnly(false);
 
       const selectedGrade = currentStudentProvisionalGrades().find(grade => grade.selected);
       if (selectedGrade) {
@@ -1470,132 +1431,6 @@ EG = {
     this.updateStatsInHeader();
     this.showSubmissionDetails();
     this.refreshFullRubric();
-  },
-
-  removeModerationBarAndShowSubmission() {
-    $full_width_container.removeClass("with_moderation_tabs")
-    $moderation_bar.hide()
-    this.showSubmission()
-    this.setReadOnly(false)
-  },
-
-  updateModerationTabs: function() {
-    if (!this.currentStudent.submission) return;
-    var prov_grades = this.currentStudent.submission.provisional_grades;
-
-    this.updateModerationTab($moderation_tabs.eq(0), prov_grades && prov_grades[0]);
-    this.updateModerationTab($moderation_tabs.eq(1), prov_grades && prov_grades[1]);
-    this.updateModerationTab($moderation_tab_final, this.currentStudent.submission.final_provisional_grade);
-  },
-
-  updateModerationTab: function($tab, prov_grade) {
-    var CHOSEN_GRADE_MESSAGE = I18n.t('This is the currently chosen grade for this student.');
-    var $srMessage = $('<span class="selected_sr_message screenreader-only"></span>').text(CHOSEN_GRADE_MESSAGE);
-    if (prov_grade && prov_grade.selected) {
-      $tab.addClass('selected');
-      // Remove an old message, should it be there
-      $tab.find('.selected_sr_message').remove();
-      $tab.find('.mark_title').prepend($srMessage);
-    } else {
-      $tab.removeClass('selected');
-      $tab.find('.selected_sr_message').remove();
-    }
-
-    if (prov_grade && prov_grade.provisional_grade_id) {
-      $tab.removeClass('pending');
-    } else {
-      $tab.addClass('pending');
-    }
-
-    var $mark_grade = $tab.find('.mark_grade');
-    if (prov_grade && prov_grade.score) {
-      $mark_grade.html(htmlEscape(I18n.n(prov_grade.score) + '/' + I18n.n(window.jsonData.points_possible)));
-    } else {
-      $mark_grade.empty();
-    }
-  },
-
-  showProvisionalGrade: function(idx) {
-    if (this.current_prov_grade_index != idx) {
-
-      this.current_prov_grade_index = idx;
-      var prov_grade;
-      if (idx == 'final') {
-        prov_grade = this.currentStudent.submission.final_provisional_grade;
-      } else {
-        prov_grade = this.currentStudent.submission.provisional_grades[idx];
-      }
-
-      // merge in the provisional attributes
-      $.extend(this.currentStudent.submission, prov_grade);
-
-      this.currentStudent.rubric_assessments = prov_grade.rubric_assessments;
-      this.currentStudent.provisional_crocodoc_urls = prov_grade.crocodoc_urls;
-      this.showSubmission();
-
-      // set read-only if needed
-      this.setReadOnly(prov_grade.readonly);
-    }
-  },
-
-  newProvisionalGrade: function(type, index) {
-    if (type == 'new')  {
-      var new_mark = {
-        'grade': null,
-        'score': null,
-        'graded_at': null,
-        'final': false,
-        'grade_matches_current_submission': true,
-        'scorer_id': ENV.current_user_id,
-        'rubric_assessments': []
-      };
-      if (index == 1) {
-        this.currentStudent.submission.provisional_grades.push(new_mark);
-      } else if (index == 'final') {
-        this.currentStudent.submission.final_provisional_grade = new_mark;
-      }
-      this.removeModerationBarAndShowSubmission();
-    } else if (type == 'copy') {
-      if (!this.currentStudent.submission.final_provisional_grade ||
-          confirm(I18n.t("Are you sure you want to copy to the final mark? This will overwrite the existing mark."))) {
-        var grade_to_copy = this.currentStudent.submission.provisional_grades[index];
-        $full_width_container.disableWhileLoading(
-          $.ajaxJSON($.replaceTags(ENV.provisional_copy_url, {provisional_grade_id: grade_to_copy.provisional_grade_id}), "POST",  {}, function(data) {
-            $.each(EG.currentStudent.submission.provisional_grades, function(i, pg) { pg.selected = false; });
-
-            EG.currentStudent.submission.final_provisional_grade = data;
-            EG.currentStudent.submission_state =
-              SpeedgraderHelpers.submissionState(EG.currentStudent, ENV.grading_role);
-            EG.current_prov_grade_index = null;
-            this.removeModerationBarAndShowSubmission();
-            EG.updateModerationTabs();
-            $moderation_tab_final.focus();
-          })
-        );
-      }
-    }
-  },
-
-  selectProvisionalGrade: function(index) {
-    var prov_grade, $tab;
-    if (index == 'final') {
-      prov_grade = this.currentStudent.submission.final_provisional_grade;
-      $tab = $moderation_tab_final
-    } else {
-      prov_grade = this.currentStudent.submission.provisional_grades[index];
-      $tab = $moderation_tabs.eq(index);
-    }
-    $full_width_container.disableWhileLoading(
-      $.ajaxJSON($.replaceTags(ENV.provisional_select_url, {provisional_grade_id: prov_grade.provisional_grade_id}), "PUT",  {}, function(data) {
-        $.each(EG.currentStudent.submission.provisional_grades, function(i, pg) { pg.selected = false; });
-        if (EG.currentStudent.submission.final_provisional_grade) {
-          EG.currentStudent.submission.final_provisional_grade.selected = false;
-        }
-        prov_grade.selected = true;
-        EG.updateModerationTabs();
-        $tab.focus();
-      })
-    );
   },
 
   setGradeReadOnly: function(readonly) {
@@ -2655,9 +2490,6 @@ EG = {
     }
     if (ENV.grading_role == 'moderator' || ENV.grading_role == 'provisional_grader') {
       formData['submission[provisional]'] = true;
-      if (ENV.grading_role == 'moderator' && EG.current_prov_grade_index == 'final') { // final mark
-        formData['submission[final]'] = true;
-      }
     }
 
     function formSuccess(submissions) {
@@ -2716,13 +2548,6 @@ EG = {
         prov_grade = student.submission.provisional_grades && student.submission.provisional_grades[this.current_prov_grade_index];
       }
       if (prov_grade) {
-        if (!prov_grade.provisional_grade_id) {
-          prov_grade.provisional_grade_id = submission.provisional_grade_id; // populate a new prov_grade's id
-          this.updateModerationTabs();
-          if (this.current_prov_grade_index == 1) {
-            $new_mark_copy_link2_menu_item.show(); // show the copy link now
-          }
-        }
         prov_grade.score = submission.score;
         prov_grade.grade = submission.grade;
         prov_grade.rubric_assessments = student.rubric_assessments;
@@ -2771,9 +2596,6 @@ EG = {
     }
     if (ENV.grading_role == 'moderator' || ENV.grading_role == 'provisional_grader') {
       formData['submission[provisional]'] = true;
-      if (ENV.grading_role == 'moderator' && EG.current_prov_grade_index == 'final') {
-        formData['submission[final]'] = true;
-      }
     }
 
     const submissionSuccess = submissions => {
@@ -2811,7 +2633,7 @@ EG = {
           existingGrade.score = score;
         }
 
-        EG.submitSelectedProvisionalGrade(newProvisionalGradeId, !existingGrade);
+        EG.selectProvisionalGrade(newProvisionalGradeId, !existingGrade);
         EG.setActiveProvisionalGradeFields({grade: existingGrade, label: customProvisionalGraderLabel});
       }
     };
@@ -2866,10 +2688,6 @@ EG = {
       }
     } else {
       $score.text("");
-    }
-
-    if (ENV.grading_role == 'moderator') {
-      EG.updateModerationTabs();
     }
 
     EG.updateStatsInHeader();
@@ -3069,11 +2887,7 @@ EG = {
     $.flashError(errorMessage);
   },
 
-  // (This *should* properly be called selectProvisionalGrade, but it has a
-  // different name to avoid confusion with the method on the EG object with
-  // that name. This one is only called when Anonymous Moderated Marking is
-  // on, meaning we don't need to update the moderation tab.)
-  submitSelectedProvisionalGrade (provisionalGradeId, refetchOnSuccess=false) {
+  selectProvisionalGrade (provisionalGradeId, refetchOnSuccess=false) {
     const selectGradeUrl = $.replaceTags(
       ENV.provisional_select_url,
       { provisional_grade_id: provisionalGradeId }
@@ -3173,7 +2987,7 @@ EG = {
     if (selectedGrade) {
       const selectedGradeId = selectedGrade.provisional_grade_id;
 
-      this.submitSelectedProvisionalGrade(selectedGradeId);
+      this.selectProvisionalGrade(selectedGradeId);
       this.setActiveProvisionalGradeFields({
         grade: selectedGrade,
         label: provisionalGraderDisplayNames[selectedGradeId]
@@ -3318,20 +3132,7 @@ function setupSelectors() {
   $grded_so_far = $('#x_of_x_graded')
   $iframe_holder = $('#iframe_holder')
   $left_side = $('#left_side')
-  $moderation_bar = $('#moderation_bar')
-  $moderation_tabs = $('#moderation_tabs > ul > li')
-  $moderation_tab_2nd = $moderation_tabs.eq(1)
-  $moderation_tab_final = $moderation_tabs.eq(2)
-  $moderation_tabs_div = $('#moderation_tabs')
   $multiple_submissions = $('#multiple_submissions')
-  $new_mark_container = $('#new_mark_container')
-  $new_mark_copy_link1 = $('#new_mark_copy_link1')
-  $new_mark_copy_link2 = $('#new_mark_copy_link2')
-  $new_mark_copy_link2_menu_item = $new_mark_copy_link2.parent()
-  $new_mark_final_link = $('#new_mark_final_link')
-  $new_mark_final_link_menu_item = $new_mark_final_link.parent()
-  $new_mark_link = $('#new_mark_link')
-  $new_mark_link_menu_item = $new_mark_link.parent()
   $no_annotation_warning = $('#no_annotation_warning')
   $not_gradeable_message = $('#not_gradeable_message')
   $points_deducted = $('#points-deducted')

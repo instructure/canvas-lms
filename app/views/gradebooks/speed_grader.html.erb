@@ -98,47 +98,6 @@
   <% end %>
   </div>
 </div>
-<div id="moderation_bar">
-  <div id="moderation_bar_content">
-    <div id="moderation_tabs" class="ui-tabs-minimal">
-      <ul>
-        <li data-pg-index="0"><a href="#dummy_container">
-          <span class="mark_title"><%= t('1st Reviewer') %></span>
-          <span class="mark_grade"></span>
-        </a></li>
-        <li data-pg-index="1"><a href="#dummy_container">
-          <span class="mark_title"><%= t('2nd Reviewer') %></span>
-          <span class="mark_grade"></span>
-        </a></li>
-        <li data-pg-index="final"><a href="#dummy_container">
-          <span class="mark_title"><%= t('Moderator') %></span>
-          <span class="mark_grade"></span>
-        </a></li>
-      </ul>
-      <div id="dummy_container"></div>
-    </div>
-    <div id="new_mark_container">
-      <a id="new_mark_dropdown_link" href="#dummy_container" class="al-trigger" data-popup-within="#full_width_container" tabindex="0">
-        <%= t('Add Review') %>
-        <i class="icon-mini-arrow-down"></i>
-      </a>
-      <ul id="new_mark_dropdown" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false" aria-activedescendant="new_mark_dropdown_link1">
-        <li role="presentation">
-          <a href="#" id="new_mark_link" tabindex="-1" role="menuitem"><%= t('Add 2nd Review') %></a>
-        </li>
-        <li role="presentation">
-          <a href="#" id="new_mark_final_link" tabindex="-1" role="menuitem"><%= t('Add Moderator Review (New)') %></a>
-        </li>
-        <li role="presentation">
-          <a href="#" id="new_mark_copy_link1" tabindex="-1" role="menuitem"><%= t('Add Moderator Review (Copy 1st)') %></a>
-        </li>
-        <li role="presentation">
-          <a href="#" id="new_mark_copy_link2" tabindex="-1" role="menuitem"><%= t('Add Moderator Review (Copy 2nd)') %></a>
-        </li>
-      </ul>
-    </div>
-  </div>
-</div>
 <div id="enrollment_inactive_notice" class="alert alert-info" style="display: none;">
   <span><%= t "Notice: Inactive Student" %></span>
 </div>

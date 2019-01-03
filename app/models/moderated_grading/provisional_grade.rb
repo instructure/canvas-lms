@@ -135,27 +135,6 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
     submission.skip_grade_calc = original_skip_grade_calc
   end
 
-  def copy_to_final_mark!(scorer)
-    final_mark = submission.find_or_create_provisional_grade!(
-      scorer,
-      score: self.score,
-      grade: self.grade,
-      force_save: true,
-      graded_anonymously: self.graded_anonymously,
-      final: true,
-      source_provisional_grade: self
-    )
-
-    final_mark.submission_comments.destroy_all
-    copy_submission_comments!(final_mark)
-
-    final_mark.rubric_assessments.destroy_all
-    copy_rubric_assessments!(final_mark)
-
-    final_mark.reload
-    final_mark
-  end
-
   def attachment_info(user, attachment)
     annotators = [submission.user, scorer]
     annotators << source_provisional_grade.scorer if source_provisional_grade
