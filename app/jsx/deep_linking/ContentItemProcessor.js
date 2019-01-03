@@ -22,6 +22,7 @@ import LinkContentItem from './models/LinkContentItem'
 import ResourceLinkContentItem from './models/ResourceLinkContentItem'
 import ImageContentItem from './models/ImageContentItem'
 import I18n from 'i18n!external_content.success'
+import HtmlFragmentContentItem from './models/HtmlFragmentContentItem'
 
 export function processContentItemsForEditor(event, editor, dialogId) {
   const {content_items, msg, log, errormsg, errorlog, ltiEndpoint} = event.data
@@ -67,7 +68,8 @@ export default class ContentItemProcessor {
     return {
       link: LinkContentItem,
       ltiResourceLink: ResourceLinkContentItem,
-      image: ImageContentItem
+      image: ImageContentItem,
+      html: HtmlFragmentContentItem
     }
   }
 
