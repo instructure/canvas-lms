@@ -17,29 +17,27 @@
  */
 
 import React from 'react'
-import {bool, shape, string} from 'prop-types'
-import {graphql} from 'react-apollo'
+import {string} from 'prop-types'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 
-import {TEACHER_QUERY, TeacherAssignmentShape} from '../assignmentData'
+import {queryAssignment, setWorkflow} from '../api'
 import Header from './Header'
 import ContentTabs from './ContentTabs'
 import MessageStudentsWho from './MessageStudentsWho'
 import TeacherViewContext, {TeacherViewContextDefaults} from './TeacherViewContext'
 
-export class CoreTeacherView extends React.Component {
+export default class TeacherView extends React.Component {
   static propTypes = {
-    data: shape({
-      assignment: TeacherAssignmentShape,
-      loading: bool,
-      error: string
-    }).isRequired
+    assignmentLid: string
   }
 
   constructor(props) {
     super(props)
     this.state = {
-      messageStudentsWhoOpen: false
+      messageStudentsWhoOpen: false,
+      assignment: {},
+      loading: true,
+      errors: []
     }
 
     this.contextValue = {
@@ -48,8 +46,52 @@ export class CoreTeacherView extends React.Component {
     }
   }
 
-  handlePublishChange = () => {
-    alert('publish toggle clicked')
+  componentDidMount() {
+    this.loadAssignment()
+  }
+
+  async loadAssignment() {
+    const loadingErrors = []
+    let assignment = {}
+    try {
+      const {errors, data} = await queryAssignment(this.props.assignmentLid)
+      if (errors) loadingErrors.push(...errors)
+      if (data.assignment) assignment = data.assignment
+    } catch (error) {
+      loadingErrors.push(error.message)
+    }
+    this.setState({assignment, loading: false, errors: loadingErrors})
+  }
+
+  assignmentStateUpdate(state, updates) {
+    return {assignment: {...state.assignment, ...updates}}
+  }
+
+  async setWorkflowApiCall(newAssignmentState) {
+    const errors = []
+    try {
+      const {graphqlErrors} = await setWorkflow(this.state.assignment, newAssignmentState)
+      if (graphqlErrors) errors.push(...graphqlErrors)
+    } catch (error) {
+      errors.push(error)
+    }
+    return errors
+  }
+
+  handlePublishChange = async event => {
+    const newlyChecked = event.target.checked
+    const oldAssignmentState = this.state.assignment.state
+    const newAssignmentState = newlyChecked ? 'published' : 'unpublished'
+
+    // be optimistic
+    this.setState(state => this.assignmentStateUpdate(state, {state: newAssignmentState}))
+    const errors = await this.setWorkflowApiCall(newAssignmentState)
+    if (errors.length > 0) {
+      this.setState(state => ({
+        errors,
+        ...this.assignmentStateUpdate(state, {state: oldAssignmentState})
+      }))
+    } // else setWorkflow succeeded
   }
 
   handleUnsubmittedClick = () => {
@@ -60,8 +102,8 @@ export class CoreTeacherView extends React.Component {
     this.setState({messageStudentsWhoOpen: false})
   }
 
-  renderError(error) {
-    return <pre>Error: {JSON.stringify(error, null, 2)}</pre>
+  renderErrors() {
+    return <pre>Error: {JSON.stringify(this.state.errors, null, 2)}</pre>
   }
 
   renderLoading() {
@@ -69,12 +111,9 @@ export class CoreTeacherView extends React.Component {
   }
 
   render() {
-    const {
-      data: {assignment, loading, error}
-    } = this.props
-    if (error) return this.renderError(error)
-    else if (loading) return this.renderLoading()
-
+    if (this.state.loading) return this.renderLoading()
+    if (this.state.errors.length > 0) return this.renderErrors()
+    const assignment = this.state.assignment
     return (
       <TeacherViewContext.Provider value={this.contextValue}>
         <div>
@@ -96,18 +135,3 @@ export class CoreTeacherView extends React.Component {
     )
   }
 }
-
-const TeacherView = graphql(TEACHER_QUERY, {
-  options: ({assignmentLid}) => ({
-    variables: {
-      assignmentLid
-    }
-  })
-})(CoreTeacherView)
-
-TeacherView.propTypes = {
-  assignmentLid: string.isRequired,
-  ...TeacherView.propTypes
-}
-
-export default TeacherView

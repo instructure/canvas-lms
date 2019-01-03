@@ -26,6 +26,12 @@ export function closest(el, selector) {
   return el
 }
 
+export function findInputForLabel(labelChild, container) {
+  const label = closest(labelChild, 'label')
+  const input = container.querySelector(`#${label.getAttribute('for')}`)
+  return input
+}
+
 export function mockCourse(overrides) {
   return {
     lid: 'course-lid',

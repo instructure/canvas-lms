@@ -17,28 +17,50 @@
  */
 
 import React from 'react'
-import {render, fireEvent, wait} from 'react-testing-library'
-import {mockAssignment} from '../../test-utils'
-import {CoreTeacherView} from '../TeacherView'
+import {render, fireEvent, wait, waitForElement} from 'react-testing-library'
+import {mockAssignment, findInputForLabel} from '../../test-utils'
+import TeacherView from '../TeacherView'
+import {queryAssignment, setWorkflow} from '../../api'
+
+jest.mock('../../api')
+
+async function renderTeacherView(assignment = mockAssignment()) {
+  queryAssignment.mockReturnValueOnce({data: {assignment}})
+  const result = render(<TeacherView assignmentLid={assignment.lid} />)
+  await wait() // wait a tick for the api promise to resolve
+  return result
+}
 
 it('shows the message students who dialog when the unsubmitted button is clicked', async () => {
-  const {getByText} = render(<CoreTeacherView data={{assignment: mockAssignment()}} />)
+  const {getByText} = await renderTeacherView()
   fireEvent.click(getByText(/unsubmitted/))
-  // waitForElement would be much more convenient and less redundant, but it
-  // doesn't work with the MutationObserver that Canvas installs in
-  // jest-setup.js. Figure this out later.
-  await wait(() => getByText('Message Students Who'))
-  expect(getByText('Message Students Who')).toBeInTheDocument()
+  expect(await waitForElement(() => getByText('Message Students Who'))).toBeInTheDocument()
 })
 
-it('shows the assignment', () => {
+it('shows the assignment', async () => {
   const assignment = mockAssignment()
-  const {getByText} = render(<CoreTeacherView data={{assignment}} />)
-  expect(getByText(assignment.name)).toBeInTheDocument()
-  expect(getByText(`${assignment.pointsPossible}`)).toBeInTheDocument()
-  expect(getByText('Everyone')).toBeInTheDocument()
-  expect(getByText('Due:', {exact: false})).toBeInTheDocument()
-  expect(getByText('Available', {exact: false})).toBeInTheDocument()
+  const {getByText} = await renderTeacherView(assignment)
+  expect(await waitForElement(() => getByText(assignment.name))).toBeInTheDocument()
+  expect(await waitForElement(() => getByText(`${assignment.pointsPossible}`))).toBeInTheDocument()
+  expect(await waitForElement(() => getByText('Everyone'))).toBeInTheDocument()
+  expect(await waitForElement(() => getByText('Due:', {exact: false}))).toBeInTheDocument()
+  expect(await waitForElement(() => getByText('Available', {exact: false}))).toBeInTheDocument()
+})
+
+it('unpublishes the assignment', async () => {
+  const assignment = mockAssignment()
+  const {getByText, container} = await renderTeacherView(assignment)
+  const publish = getByText('publish', {exact: false})
+  fireEvent.click(findInputForLabel(publish, container))
+  expect(setWorkflow).toHaveBeenCalledWith(assignment, 'unpublished')
+})
+
+it('publishes the assignment', async () => {
+  const assignment = mockAssignment({state: 'unpublished'})
+  const {getByText, container} = await renderTeacherView(assignment)
+  const publish = getByText('publish', {exact: false})
+  fireEvent.click(findInputForLabel(publish, container))
+  expect(setWorkflow).toHaveBeenCalledWith(assignment, 'published')
 })
 
 // tests to implement somewhere
