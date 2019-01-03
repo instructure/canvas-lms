@@ -76,9 +76,11 @@ export default class ContentItemProcessor {
   async processContentItemsForEditor(editor) {
     this.contentItems.forEach(contentItem => {
       if (Object.keys(this.typeMap).includes(contentItem.type)) {
+        const selection = editor.selection && editor.selection.getContent()
         const contentItemModel = new this.typeMap[contentItem.type](
           contentItem,
-          this.ltiEndpoint
+          this.ltiEndpoint,
+          selection
         )
         send($(`#${editor.id}`), 'insert_code', contentItemModel.toHtmlString())
       }

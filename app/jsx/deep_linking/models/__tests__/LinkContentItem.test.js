@@ -29,9 +29,9 @@ const json = {
   invalidProp: 'banana'
 }
 
-const linkContentItem = overrides => {
+const linkContentItem = (overrides, selection) => {
   const mergedJson = {...json, ...overrides}
-  return new LinkContentItem(mergedJson)
+  return new LinkContentItem(mergedJson, '', selection)
 }
 
 describe('constructor', () => {
@@ -57,6 +57,12 @@ describe('constructor', () => {
 
   it('does not set invalid props', () => {
     expect(linkContentItem().invalidProp).toBeUndefined()
+  })
+
+  describe('when there is a user selection', () => {
+    it('replaces "text" with the selection', () => {
+      expect(linkContentItem({}, 'selection').text).toEqual('selection')
+    })
   })
 })
 

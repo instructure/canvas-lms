@@ -22,9 +22,13 @@ import ContentItem from './ContentItem'
 export default class LinkContentItem extends ContentItem {
   static type = 'link'
 
-  constructor(json) {
+  constructor(json, ltiEndpoint, selection) {
     super(json)
     this.type = LinkContentItem.type
+
+    if (selection && selection !== '') {
+      this.text = selection
+    }
   }
 
   get properties() {

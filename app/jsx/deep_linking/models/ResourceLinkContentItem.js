@@ -19,8 +19,8 @@
 import LinkContentItem from './LinkContentItem'
 
 export default class ResourceLinkContentItem extends LinkContentItem {
-  constructor(json, ltiEndpoint) {
-    super(json)
+  constructor(json, ltiEndpoint, selection) {
+    super(json, ltiEndpoint, selection)
     this.url = `${ltiEndpoint}?${this.ltiEndpointParams(json.url)}`
   }
 
