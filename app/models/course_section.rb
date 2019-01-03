@@ -322,7 +322,7 @@ class CourseSection < ActiveRecord::Base
     cs = CourseSection.where(id: batch).select(:id, :workflow_state).to_a
     data = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch, contexts: cs, updated_state: 'deleted', batch_mode_delete: batch_mode)
     CourseSection.where(id: cs.map(&:id)).update_all(workflow_state: 'deleted', updated_at: Time.zone.now)
-    Enrollment.not_fake.where(course_section_id: cs.map(&:id)).active.find_in_batches do |e_batch|
+    Enrollment.where(course_section_id: cs.map(&:id)).active.find_in_batches do |e_batch|
       Shackles.activate(:master) do
         new_data = Enrollment::BatchStateUpdater.destroy_batch(e_batch, sis_batch: sis_batch, batch_mode: batch_mode)
         data.push(*new_data)
