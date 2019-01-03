@@ -199,3 +199,39 @@ describe('getCurrentWhitelist', () => {
     })
   })
 })
+
+describe('removeDomainAction', () => {
+  it('creates an REMOVE_DOMAIN action when passed a string value', () => {
+    expect(Actions.removeDomainAction('instructure.com')).toMatchSnapshot()
+  })
+  it('creates an error action if passed a non-string value', () => {
+    expect(Actions.removeDomainAction(false)).toMatchSnapshot()
+  })
+  it('creates a REMOVE_DOMAIN_OPTIMISTIC action when optimistic option is given', () => {
+    expect(Actions.setCspEnabledAction('instructure.com', {optimistic: true})).toMatchSnapshot()
+  })
+})
+
+describe('removeDomain', () => {
+  it('dispatches an optimistic action followed by the final result', () => {
+    const thunk = Actions.removeDomain('account', 1, 'instructure.com')
+    const fakeDispatch = jest.fn()
+    const fakeAxios = {
+      delete: jest.fn(() => ({
+        then(func) {
+          const fakeResponse = {}
+          func(fakeResponse)
+        }
+      }))
+    }
+    thunk(fakeDispatch, null, {axios: fakeAxios})
+    expect(fakeDispatch).toHaveBeenNthCalledWith(1, {
+      payload: 'instructure.com',
+      type: 'REMOVE_DOMAIN_OPTIMISTIC'
+    })
+    expect(fakeDispatch).toHaveBeenNthCalledWith(2, {
+      payload: 'instructure.com',
+      type: 'REMOVE_DOMAIN'
+    })
+  })
+})

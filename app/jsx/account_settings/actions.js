@@ -132,3 +132,34 @@ export function getCurrentWhitelist(context, contextId) {
       dispatch(addDomainBulkAction(addDomainMap))
     })
 }
+
+export const REMOVE_DOMAIN = 'REMOVE_DOMAIN'
+export const REMOVE_DOMAIN_OPTIMISTIC = 'REMOVE_DOMAIN_OPTIMISTIC'
+
+export function removeDomainAction(domain, opts = {}) {
+  const type = opts.optimistic ? REMOVE_DOMAIN_OPTIMISTIC : REMOVE_DOMAIN
+  if (typeof domain !== 'string') {
+    return {
+      type,
+      payload: new Error('Domain can only set to String values'),
+      error: true
+    }
+  }
+  return {
+    type,
+    payload: domain
+  }
+}
+
+export function removeDomain(context, contextId, domain) {
+  context = pluralize(context)
+  return (dispatch, getState, {axios}) => {
+    dispatch(removeDomainAction(domain, {optimistic: true}))
+    return axios
+      .delete(`/api/v1/${context}/${contextId}/csp_settings/domains?domain=${domain}`)
+      .then(() => {
+        // This isn't really necessary but doesn't hurt
+        dispatch(removeDomainAction(domain))
+      })
+  }
+}

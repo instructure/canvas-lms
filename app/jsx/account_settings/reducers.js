@@ -22,7 +22,9 @@ import {
   SET_CSP_ENABLED_OPTIMISTIC,
   ADD_DOMAIN,
   ADD_DOMAIN_OPTIMISTIC,
-  ADD_DOMAIN_BULK
+  ADD_DOMAIN_BULK,
+  REMOVE_DOMAIN,
+  REMOVE_DOMAIN_OPTIMISTIC
 } from './actions'
 
 export function cspEnabled(state = false, action) {
@@ -54,6 +56,12 @@ export function whitelistedDomains(state = {account: [], effective: [], tools: [
         action.payload[domainType].forEach(x => uniqueDomains.add(x))
         newState[domainType] = Array.from(uniqueDomains)
       })
+      return newState
+    }
+    case REMOVE_DOMAIN:
+    case REMOVE_DOMAIN_OPTIMISTIC: {
+      const newState = {...state}
+      newState.account = newState.account.filter(domain => domain !== action.payload)
       return newState
     }
     default:

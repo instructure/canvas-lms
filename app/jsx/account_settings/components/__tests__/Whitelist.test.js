@@ -23,14 +23,14 @@ import {renderWithRedux} from './utils'
 
 describe('ConnectedWhitelist', () => {
   it('renders items on the whitelist after they are added', () => {
-    const {getByLabelText, getByText, container} = renderWithRedux(
+    const {getByLabelText, getByText} = renderWithRedux(
       <ConnectedWhitelist context="account" contextId="1" />
     )
 
-    const domainInput = getByLabelText('Add Domain')
+    const domainInput = getByLabelText('Domain Name')
     fireEvent.input(domainInput, {target: {value: 'instructure.com'}})
 
-    const button = container.querySelector('button')
+    const button = getByLabelText('Add Domain')
     fireEvent.click(button)
 
     const domainCellEntry = getByText('instructure.com')
@@ -51,14 +51,14 @@ describe('ConnectedWhitelist', () => {
     expect(toolDomain).toBeInTheDocument()
   })
   it('shows an error message when an invalid domain is entered', () => {
-    const {getByLabelText, getByText, container} = renderWithRedux(
+    const {getByLabelText, getByText} = renderWithRedux(
       <ConnectedWhitelist context="account" contextId="1" />
     )
 
-    const domainInput = getByLabelText('Add Domain')
+    const domainInput = getByLabelText('Domain Name')
     fireEvent.input(domainInput, {target: {value: 'fake'}})
 
-    const button = container.querySelector('button')
+    const button = getByLabelText('Add Domain')
     fireEvent.click(button)
 
     const errorMessage = getByText('Invalid domain')
@@ -66,14 +66,14 @@ describe('ConnectedWhitelist', () => {
   })
 
   it('shows the correct count for the whitelist', () => {
-    const {getByLabelText, getByText, container} = renderWithRedux(
+    const {getByLabelText, getByText} = renderWithRedux(
       <ConnectedWhitelist context="account" contextId="1" />
     )
 
-    const domainInput = getByLabelText('Add Domain')
+    const domainInput = getByLabelText('Domain Name')
     fireEvent.input(domainInput, {target: {value: 'instructure.com'}})
 
-    const button = container.querySelector('button')
+    const button = getByLabelText('Add Domain')
     fireEvent.click(button)
 
     const countString = getByText('Whitelist (1/100)')
@@ -81,16 +81,89 @@ describe('ConnectedWhitelist', () => {
   })
 
   it('clears the input box after a successful submisssion', () => {
-    const {getByLabelText, container} = renderWithRedux(
-      <ConnectedWhitelist context="account" contextId="1" />
-    )
+    const {getByLabelText} = renderWithRedux(<ConnectedWhitelist context="account" contextId="1" />)
 
-    const domainInput = getByLabelText('Add Domain')
+    const domainInput = getByLabelText('Domain Name')
     fireEvent.input(domainInput, {target: {value: 'instructure.com'}})
 
-    const button = container.querySelector('button')
+    const button = getByLabelText('Add Domain')
     fireEvent.click(button)
 
     expect(domainInput.getAttribute('value')).toBe('')
+  })
+
+  it('removes items when clicking the delete icon', () => {
+    const {getByText, queryByText} = renderWithRedux(
+      <ConnectedWhitelist context="account" contextId="1" />,
+      {
+        initialState: {
+          whitelistedDomains: {
+            account: ['instructure.com', 'canvaslms.com']
+          }
+        }
+      }
+    )
+
+    const TEXT = 'Remove instructure.com from the whitelist'
+
+    const button = getByText(TEXT)
+    fireEvent.click(button)
+    expect(queryByText(TEXT)).toBeNull()
+  })
+
+  it('sets focus to the previous whitelist item delete icon when deleting', () => {
+    const {getByText, getByTestId} = renderWithRedux(
+      <ConnectedWhitelist context="account" contextId="1" />,
+      {
+        initialState: {
+          whitelistedDomains: {
+            account: ['instructure.com', 'canvaslms.com']
+          }
+        }
+      }
+    )
+
+    const button = getByText('Remove canvaslms.com from the whitelist')
+    fireEvent.click(button)
+    const previousButton = getByTestId('delete-button-instructure.com')
+
+    expect(previousButton).toHaveFocus()
+  })
+
+  it('sets focus to the the add domain button when removing the first positioned domain from the whitelist', () => {
+    const {getByLabelText, getByText} = renderWithRedux(
+      <ConnectedWhitelist context="account" contextId="1" />,
+      {
+        initialState: {
+          whitelistedDomains: {
+            account: ['instructure.com', 'canvaslms.com']
+          }
+        }
+      }
+    )
+
+    const deleteButton = getByText('Remove instructure.com from the whitelist')
+    fireEvent.click(deleteButton)
+    const addDomainButton = getByLabelText('Add Domain')
+    expect(addDomainButton).toHaveFocus()
+  })
+
+  it('sets focus to the add domain button when removing the last remaining domain from the whitelist', () => {
+    const {getByLabelText, getByText} = renderWithRedux(
+      <ConnectedWhitelist context="account" contextId="1" />,
+      {
+        initialState: {
+          whitelistedDomains: {
+            account: ['instructure.com']
+          }
+        }
+      }
+    )
+
+    const deleteButton = getByText('Remove instructure.com from the whitelist')
+    fireEvent.click(deleteButton)
+
+    const addDomainButton = getByLabelText('Add Domain')
+    expect(addDomainButton).toHaveFocus()
   })
 })

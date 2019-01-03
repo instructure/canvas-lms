@@ -22,7 +22,9 @@ import {
   SET_CSP_ENABLED_OPTIMISTIC,
   ADD_DOMAIN,
   ADD_DOMAIN_OPTIMISTIC,
-  ADD_DOMAIN_BULK
+  ADD_DOMAIN_BULK,
+  REMOVE_DOMAIN,
+  REMOVE_DOMAIN_OPTIMISTIC
 } from '../actions'
 
 describe('cspEnabled', () => {
@@ -72,6 +74,22 @@ describe('whitelistedDomains', () => {
     const initialState = {account: ['instructure.com', 'canvaslms.com']}
     expect(whitelistedDomains(initialState, action)).toEqual({
       account: ['instructure.com', 'canvaslms.com', 'bridgelms.com']
+    })
+  })
+
+  it('removes domains with REMOVE_DOMAIN actions', () => {
+    const action = {type: REMOVE_DOMAIN, payload: 'instructure.com'}
+    const initialState = {account: ['instructure.com', 'canvaslms.com']}
+    expect(whitelistedDomains(initialState, action)).toEqual({
+      account: ['canvaslms.com']
+    })
+  })
+
+  it('removes domains with REMOVE_DOMAIN_OPTIMISTIC actions', () => {
+    const action = {type: REMOVE_DOMAIN_OPTIMISTIC, payload: 'instructure.com'}
+    const initialState = {account: ['instructure.com', 'canvaslms.com']}
+    expect(whitelistedDomains(initialState, action)).toEqual({
+      account: ['canvaslms.com']
     })
   })
 })

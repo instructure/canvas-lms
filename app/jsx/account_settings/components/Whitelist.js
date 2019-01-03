@@ -28,15 +28,17 @@ import IconPlus from '@instructure/ui-icons/lib/Solid/IconPlus'
 import Table from '@instructure/ui-elements/lib/components/Table'
 import View from '@instructure/ui-layout/lib/components/View'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
 import isValidDomain from 'is-valid-domain'
 
-import {addDomain} from '../actions'
+import {addDomain, removeDomain} from '../actions'
 
 const PROTOCOL_REGEX = /^(?:(ht|f)tp(s?)\:\/\/)?/
 
 export class Whitelist extends Component {
   static propTypes = {
     addDomain: func.isRequired,
+    removeDomain: func.isRequired,
     context: oneOf(['course', 'account']).isRequired,
     contextId: string.isRequired,
     whitelistedDomains: shape({
@@ -50,6 +52,10 @@ export class Whitelist extends Component {
     addDomainInputValue: '',
     errors: []
   }
+
+  deleteButtons = []
+
+  addDomainBtn = null
 
   validateInput = input => {
     const domainOnly = input.replace(PROTOCOL_REGEX, '')
@@ -77,6 +83,21 @@ export class Whitelist extends Component {
     }
   }
 
+  handleRemoveDomain = domain => {
+    const deletedIndex = this.props.whitelistedDomains.account.findIndex(x => x === domain)
+    let newIndex = 0
+    if (deletedIndex > 0) {
+      newIndex = deletedIndex - 1
+    }
+    this.props.removeDomain(this.props.context, this.props.contextId, domain)
+    const newDomainToFocus = this.props.whitelistedDomains.account[newIndex]
+    if (deletedIndex <= 0) {
+      this.addDomainBtn.focus()
+    } else {
+      this.deleteButtons[newDomainToFocus].focus()
+    }
+  }
+
   render() {
     return (
       <div>
@@ -95,7 +116,7 @@ export class Whitelist extends Component {
           <Flex>
             <FlexItem grow shrink padding="0 medium 0 0">
               <TextInput
-                label={I18n.t('Add Domain')}
+                label={I18n.t('Domain Name')}
                 placeholder="http://somedomain.com"
                 value={this.state.addDomainInputValue}
                 messages={this.state.errors}
@@ -105,7 +126,13 @@ export class Whitelist extends Component {
               />
             </FlexItem>
             <FlexItem align={this.state.errors.length ? 'center' : 'end'}>
-              <Button type="submit" margin="0 x-small 0 0" icon={IconPlus}>
+              <Button
+                aria-label={I18n.t('Add Domain')}
+                ref={c => (this.addDomainBtn = c)}
+                type="submit"
+                margin="0 x-small 0 0"
+                icon={IconPlus}
+              >
                 {I18n.t('Domain')}
               </Button>
             </FlexItem>
@@ -124,12 +151,24 @@ export class Whitelist extends Component {
             {this.props.whitelistedDomains.account.map(domain => (
               <tr key={domain}>
                 <td>{domain}</td>
-                <td />
+                <td style={{textAlign: 'end'}}>
+                  <Button
+                    ref={c => (this.deleteButtons[domain] = c)}
+                    variant="icon"
+                    icon={IconTrash}
+                    onClick={() => this.handleRemoveDomain(domain)}
+                    data-testid={`delete-button-${domain}`}
+                  >
+                    <ScreenReaderContent>
+                      {I18n.t('Remove %{domain} from the whitelist', {domain})}
+                    </ScreenReaderContent>
+                  </Button>
+                </td>
               </tr>
             ))}
           </tbody>
         </Table>
-        {this.props.whitelistedDomains.tools.length > 0 && (
+        {this.props.whitelistedDomains.tools && this.props.whitelistedDomains.tools.length > 0 && (
           <View as="div" margin="large 0">
             <Heading level="h4" as="h3">
               {I18n.t('Whitelisted Tool Domains')}
@@ -170,7 +209,8 @@ function mapStateToProps(state, ownProps) {
 }
 
 const mapDispatchToProps = {
-  addDomain
+  addDomain,
+  removeDomain
 }
 
 export const ConnectedWhitelist = connect(

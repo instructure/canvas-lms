@@ -56,6 +56,29 @@ Object {
 }
 `;
 
+exports[`removeDomainAction creates a REMOVE_DOMAIN_OPTIMISTIC action when optimistic option is given 1`] = `
+Object {
+  "error": true,
+  "payload": [Error: Can only set to Boolean values],
+  "type": "SET_CSP_ENABLED_OPTIMISTIC",
+}
+`;
+
+exports[`removeDomainAction creates an REMOVE_DOMAIN action when passed a string value 1`] = `
+Object {
+  "payload": "instructure.com",
+  "type": "REMOVE_DOMAIN",
+}
+`;
+
+exports[`removeDomainAction creates an error action if passed a non-string value 1`] = `
+Object {
+  "error": true,
+  "payload": [Error: Domain can only set to String values],
+  "type": "REMOVE_DOMAIN",
+}
+`;
+
 exports[`setCspEnabledAction creates a SET_CSP_ENABLED action when passed a boolean value 1`] = `
 Object {
   "payload": true,
