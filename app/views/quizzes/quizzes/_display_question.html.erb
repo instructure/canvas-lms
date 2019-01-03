@@ -74,6 +74,7 @@
               %>" />
             <input class="question_input"
               placeholder="--"
+              data-question-id="<%= hash_get(question, :id) %>"
               value="<%= point_value_for_input(user_answer, question).is_a?(Float) &&
                 !point_value_for_input(user_answer, question).nan? &&
                 render_score(point_value_for_input(user_answer, question)) || ''
