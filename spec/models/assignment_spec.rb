@@ -27,6 +27,7 @@ describe Assignment do
     it { is_expected.to have_one(:score_statistic).dependent(:destroy) }
     it { is_expected.to have_many(:moderation_graders) }
     it { is_expected.to have_many(:moderation_grader_users) }
+    it { is_expected.to have_one(:post_policy).dependent(:destroy).inverse_of(:assignment) }
   end
 
   before :once do
@@ -228,6 +229,26 @@ describe Assignment do
         expect(DueDateCacher).to receive(:recompute).with(assignment, update_grades: true)
 
         assignment.update_cached_due_dates
+      end
+    end
+
+    describe "ensure_manual_posting_if_anonymous" do
+      it "sets a newly-created anonymous assignment to post manually" do
+        assignment = @course.assignments.create!(title: 'hi', anonymous_grading: true)
+        expect(assignment.effective_post_policy).to be_post_manually
+      end
+
+      it "sets a pre-existing assignment to post manually if anonymous grading is enabled" do
+        assignment = @course.assignments.create!(title: 'hi')
+        assignment.create_post_policy!(post_manually: false)
+
+        assignment.update!(anonymous_grading: true)
+        expect(assignment.effective_post_policy).to be_post_manually
+      end
+
+      it "does not set a post policy of a non-anonymous assignment" do
+        assignment = @course.assignments.create!(title: 'hi')
+        expect(assignment.effective_post_policy).to be_nil
       end
     end
   end
@@ -6812,6 +6833,25 @@ describe Assignment do
 
     it 'is false if the assignment is neither anonymous nor moderated' do
       expect(assignment).not_to be_auditable
+    end
+  end
+
+  describe "#effective_post_policy" do
+    let(:course) { Course.create! }
+    let(:assignment) { course.assignments.create!(title: 'hi') }
+
+    before(:each) do
+      course.post_policies.create!(post_manually: true)
+    end
+
+    it "returns the post policy for the course if the assignment has no policy attached" do
+      expect(assignment.effective_post_policy).to eq(course.default_post_policy)
+    end
+
+    it "returns the post policy for the assignment if present" do
+      assignment.create_post_policy!(post_manually: false)
+
+      expect(assignment.effective_post_policy).to eq(assignment.post_policy)
     end
   end
 

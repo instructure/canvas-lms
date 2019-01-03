@@ -97,6 +97,7 @@ class Assignment < ActiveRecord::Base
 
   has_one :external_tool_tag, :class_name => 'ContentTag', :as => :context, :inverse_of => :context, :dependent => :destroy
   has_one :score_statistic, dependent: :destroy
+  has_one :post_policy, dependent: :destroy, inverse_of: :assignment
 
   has_many :moderation_graders, inverse_of: :assignment
   has_many :moderation_grader_users, through: :moderation_graders, source: :user
@@ -499,7 +500,8 @@ class Assignment < ActiveRecord::Base
               :update_cached_due_dates,
               :apply_late_policy,
               :touch_submissions_if_muted_changed,
-              :update_line_items
+              :update_line_items,
+              :ensure_manual_posting_if_anonymous
 
   with_options if: -> { auditable? && @updating_user.present? } do
     after_create :create_assignment_created_audit_event!
@@ -3113,6 +3115,10 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+  def effective_post_policy
+    post_policy || course.default_post_policy
+  end
+
   private
 
   def anonymous_grader_identities(index_by:)
@@ -3142,6 +3148,13 @@ class Assignment < ActiveRecord::Base
     return unless moderated_grading_changed?
 
     self.muted = true if moderated_grading?
+  end
+
+  def ensure_manual_posting_if_anonymous
+    return unless saved_change_to_anonymous_grading?(from: false, to: true)
+
+    self.post_policy ||= PostPolicy.create!(course_id: course.id)
+    self.post_policy.update!(post_manually: true)
   end
 
   def due_date_ok?
