@@ -26,7 +26,7 @@ export const defaultState = {
   whitelistedDomains: {
     account: [],
     effective: [],
-    tools: []
+    tools: {}
   }
 }
 

@@ -40,9 +40,15 @@ Object {
     "account": Array [
       "instructure.com",
     ],
-    "tools": Array [
-      "google.com",
-    ],
+    "tools": Object {
+      "google.com": Array [
+        Object {
+          "account_id": "1",
+          "id": "1",
+          "name": "Cool Tool 1",
+        },
+      ],
+    },
   },
   "type": "ADD_DOMAIN_BULK",
 }

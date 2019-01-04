@@ -19,12 +19,13 @@
 import React, {Component} from 'react'
 import I18n from 'i18n!security_panel'
 import {connect} from 'react-redux'
-import {arrayOf, func, oneOf, shape, string} from 'prop-types'
+import {arrayOf, func, objectOf, oneOf, shape, string} from 'prop-types'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
 import TextInput from '@instructure/ui-forms/lib/components/TextInput'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import IconPlus from '@instructure/ui-icons/lib/Solid/IconPlus'
+import List, {ListItem} from '@instructure/ui-elements/lib/components/List'
 import Table from '@instructure/ui-elements/lib/components/Table'
 import View from '@instructure/ui-layout/lib/components/View'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
@@ -44,7 +45,7 @@ export class Whitelist extends Component {
     whitelistedDomains: shape({
       account: arrayOf(string),
       effective: arrayOf(string),
-      tools: arrayOf(string)
+      tools: objectOf(arrayOf(shape({id: string, name: string, account_id: string})))
     }).isRequired
   }
 
@@ -99,6 +100,9 @@ export class Whitelist extends Component {
   }
 
   render() {
+    const toolsWhitelistKeys = this.props.whitelistedDomains.tools
+      ? Object.keys(this.props.whitelistedDomains.tools)
+      : []
     return (
       <div>
         <Heading margin="small 0" level="h4" as="h3" border="bottom">
@@ -168,7 +172,7 @@ export class Whitelist extends Component {
             ))}
           </tbody>
         </Table>
-        {this.props.whitelistedDomains.tools && this.props.whitelistedDomains.tools.length > 0 && (
+        {toolsWhitelistKeys && toolsWhitelistKeys.length > 0 && (
           <View as="div" margin="large 0">
             <Heading level="h4" as="h3">
               {I18n.t('Whitelisted Tool Domains')}
@@ -187,12 +191,20 @@ export class Whitelist extends Component {
               <thead>
                 <tr>
                   <th scope="col">Domain Name</th>
+                  <th scope="col">Associated Tools</th>
                 </tr>
               </thead>
               <tbody>
-                {this.props.whitelistedDomains.tools.map(domain => (
+                {toolsWhitelistKeys.map(domain => (
                   <tr key={domain}>
                     <td>{domain}</td>
+                    <td>
+                      <List variant="unstyled">
+                        {this.props.whitelistedDomains.tools[domain].map(associatedTool => (
+                          <ListItem key={associatedTool.id}>{associatedTool.name}</ListItem>
+                        ))}
+                      </List>
+                    </td>
                   </tr>
                 ))}
               </tbody>

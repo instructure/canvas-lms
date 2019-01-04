@@ -42,7 +42,15 @@ describe('ConnectedWhitelist', () => {
       initialState: {
         whitelistedDomains: {
           account: ['instructure.com'],
-          tools: ['eduappcenter.com']
+          tools: {
+            'eduappcenter.com': [
+              {
+                id: '1',
+                name: 'Cool Tool 1',
+                account_id: '1'
+              }
+            ]
+          }
         }
       }
     })

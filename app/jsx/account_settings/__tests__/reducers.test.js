@@ -47,11 +47,6 @@ describe('whitelistedDomains', () => {
       {type: ADD_DOMAIN_OPTIMISTIC, payload: {account: 'instructure.com'}},
       [],
       {account: ['instructure.com']}
-    ],
-    [
-      {type: ADD_DOMAIN_BULK, payload: {account: ['instructure.com'], tools: ['bridgelms.com']}},
-      {account: ['canvaslms.com', 'eduappcenter.com']},
-      {account: ['canvaslms.com', 'eduappcenter.com', 'instructure.com'], tools: ['bridgelms.com']}
     ]
   ]
   it.each(testMatrix)(
@@ -74,6 +69,51 @@ describe('whitelistedDomains', () => {
     const initialState = {account: ['instructure.com', 'canvaslms.com']}
     expect(whitelistedDomains(initialState, action)).toEqual({
       account: ['instructure.com', 'canvaslms.com', 'bridgelms.com']
+    })
+  })
+
+  it('handles bulk adding of tools domains with ADD_DOMAIN_BULK actions', () => {
+    const action = {
+      type: ADD_DOMAIN_BULK,
+      payload: {
+        tools: {
+          'instructure.com': [
+            {
+              id: '1',
+              name: 'Cool Tool 1',
+              account_id: '1'
+            }
+          ],
+          'bridgelms.com': [
+            {
+              id: '2',
+              name: 'Cool Tool 2',
+              account_id: '1'
+            }
+          ]
+        }
+      }
+    }
+    const initialState = {account: ['instructure.com', 'canvaslms.com'], tools: {}}
+
+    expect(whitelistedDomains(initialState, action)).toEqual({
+      account: ['instructure.com', 'canvaslms.com'],
+      tools: {
+        'instructure.com': [
+          {
+            id: '1',
+            name: 'Cool Tool 1',
+            account_id: '1'
+          }
+        ],
+        'bridgelms.com': [
+          {
+            id: '2',
+            name: 'Cool Tool 2',
+            account_id: '1'
+          }
+        ]
+      }
     })
   })
 

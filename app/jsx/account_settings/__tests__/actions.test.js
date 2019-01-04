@@ -155,7 +155,15 @@ describe('addDomainBulkAction', () => {
     expect(
       Actions.addDomainBulkAction({
         account: ['instructure.com'],
-        tools: ['google.com']
+        tools: {
+          'google.com': [
+            {
+              id: '1',
+              name: 'Cool Tool 1',
+              account_id: '1'
+            }
+          ]
+        }
       })
     ).toMatchSnapshot()
   })
@@ -181,7 +189,15 @@ describe('getCurrentWhitelist', () => {
               enabled: true,
               current_account_whitelist: ['instructure.com', 'canvaslms.com'],
               effective_whitelist: ['bridgelms.com'],
-              tools_whitelist: ['lti-tool.com']
+              tools_whitelist: {
+                'lti-tool.com': [
+                  {
+                    id: '1',
+                    name: 'Cool Tool 1',
+                    account_id: '1'
+                  }
+                ]
+              }
             }
           }
           func(fakeResponse)
@@ -193,7 +209,15 @@ describe('getCurrentWhitelist', () => {
       payload: {
         effective: ['bridgelms.com'],
         account: ['instructure.com', 'canvaslms.com'],
-        tools: ['lti-tool.com']
+        tools: {
+          'lti-tool.com': [
+            {
+              id: '1',
+              name: 'Cool Tool 1',
+              account_id: '1'
+            }
+          ]
+        }
       },
       type: 'ADD_DOMAIN_BULK'
     })

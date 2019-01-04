@@ -127,7 +127,7 @@ export function getCurrentWhitelist(context, contextId) {
       const addDomainMap = {
         effective: response.data.effective_whitelist || [],
         account: response.data.current_account_whitelist || [],
-        tools: response.data.tools_whitelist || []
+        tools: response.data.tools_whitelist || {}
       }
       dispatch(addDomainBulkAction(addDomainMap))
     })
