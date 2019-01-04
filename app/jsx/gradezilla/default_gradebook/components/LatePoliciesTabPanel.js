@@ -247,7 +247,7 @@ class LatePoliciesTabPanel extends React.Component {
                       id="missing-submission-grade"
                       locale={this.props.locale}
                       inputRef={(m) => { this.missingSubmissionDeductionInput = m; }}
-                      label={I18n.t('Percent to deduct for missing submission')}
+                      label={I18n.t('Grade percentage for missing submissions')}
                       disabled={!this.getLatePolicyAttribute('missingSubmissionDeductionEnabled')}
                       defaultValue={markMissingSubmissionsDefaultValue(data.missingSubmissionDeduction)}
                       onChange={(_e, val)  => this.validateAndChangeNumber('missingSubmissionDeduction', val)}
