@@ -43,6 +43,7 @@
     "jest": "^23",
     "jest-canvas-mock": "^1.1.0",
     "moxios": "^0.4.0",
+    "mutation-observer": "^1.0.3",
     "prettier": "^1.7.3",
     "quiz-presets": "^5",
     "react": "^16",

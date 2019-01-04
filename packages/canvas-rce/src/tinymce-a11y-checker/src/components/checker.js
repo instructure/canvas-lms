@@ -23,6 +23,7 @@ import Popover, {
 } from "@instructure/ui-overlays/lib/components/Popover"
 import Text from "@instructure/ui-elements/lib/components/Text"
 import IconQuestionLine from "@instructure/ui-icons/lib/Line/IconQuestion"
+import ApplyTheme from "@instructure/ui-themeable/lib/components/ApplyTheme"
 import ColorField from "./color-field"
 import PlaceholderSVG from "./placeholder-svg"
 
@@ -374,12 +375,19 @@ export default class Checker extends React.Component {
                               <Text>
                                 <p>{rule.why()}</p>
                                 <p>
-                                  {rule.link &&
-                                    rule.link.length && (
+                                  {rule.link && rule.link.length && (
+                                    <ApplyTheme
+                                      theme={{
+                                        [Link.theme]: {
+                                          textDecoration: "underline"
+                                        }
+                                      }}
+                                    >
                                       <Link href={rule.link} target="_blank">
                                         {rule.linkText()}
                                       </Link>
-                                    )}
+                                    </ApplyTheme>
+                                  )}
                                 </p>
                               </Text>
                             </View>
@@ -430,17 +438,16 @@ export default class Checker extends React.Component {
                 </form>
               </View>
             )}
-            {this.state.errors.length === 0 &&
-              !this.state.checking && (
-                <View>
-                  <Text>
-                    <p>
-                      {formatMessage("No accessibility issues were detected.")}
-                    </p>
-                  </Text>
-                  <PlaceholderSVG />
-                </View>
-              )}
+            {this.state.errors.length === 0 && !this.state.checking && (
+              <View>
+                <Text>
+                  <p>
+                    {formatMessage("No accessibility issues were detected.")}
+                  </p>
+                </Text>
+                <PlaceholderSVG />
+              </View>
+            )}
             {this.state.checking && (
               <div>
                 <LiveMessage
