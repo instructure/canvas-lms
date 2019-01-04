@@ -116,6 +116,7 @@
       </div>
     <% end %>
     <%= render :partial => 'to_do_list', :locals => {:contexts => [@context]} %>
+    <%= render :partial => 'unread_discussion_list', :locals => {:contexts => [@context]} %>
     <%= render :partial => "group_list", :locals => {:group_list => @user_groups} %>
     <%= nbsp unless @current_user %>
   </div>

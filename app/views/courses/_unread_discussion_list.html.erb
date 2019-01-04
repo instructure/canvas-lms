@@ -1,0 +1,16 @@
+<h2 class="todo-list-header" tabindex="-1">Unread Items</h2>
+<ul class="right-side-list to-do-list">
+  <% @current_user.get_teacher_unread_discussion_topics(@context).each do |assignment| %>
+    <li class="todo" style="">
+      <%= link_to speed_grader_course_gradebook_path(@context, assignment_id: assignment.id), class: "item" do %>
+        <div class="todo-badge-wrapper">
+          <div class="todo-badge">
+          </div>
+        </div>
+        <div class="todo-details">
+          <b class="todo-details__title"><%= assignment.title %></b>
+        </div>
+      <% end %>
+    </li>
+  <% end %>
+</ul>
