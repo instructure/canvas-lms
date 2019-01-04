@@ -25,12 +25,12 @@ export function classNamesForAssignmentCell(assignment, submissionData) {
       classNames.push('dropped')
     } else if (submissionData.excused) {
       classNames.push('excused')
+    } else if (submissionData.late) {
+      classNames.push('late')
     } else if (submissionData.resubmitted) {
       classNames.push('resubmitted')
     } else if (submissionData.missing) {
       classNames.push('missing')
-    } else if (submissionData.late) {
-      classNames.push('late')
     }
   }
 

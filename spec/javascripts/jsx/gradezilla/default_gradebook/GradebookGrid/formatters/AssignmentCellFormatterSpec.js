@@ -103,6 +103,12 @@ QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
       ok(renderCell().classList.contains('resubmitted'))
     })
 
+    test('excludes the "resubmitted" style when the submission is both resubmitted and late', () => {
+      submission.grade_matches_current_submission = false
+      submission.late = true
+      notOk(renderCell().classList.contains('resubmitted'))
+    })
+
     test('includes the "missing" style when the submission is missing', () => {
       submission.missing = true
       ok(renderCell().classList.contains('missing'))
@@ -126,6 +132,12 @@ QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
       notOk(renderCell().classList.contains('missing'))
     })
 
+    test('excludes the "missing" style when the submission is both missing and late', () => {
+      submission.missing = true
+      submission.late = true
+      notOk(renderCell().classList.contains('missing'))
+    })
+
     test('includes the "late" style when the submission is late', () => {
       submission.late = true
       ok(renderCell().classList.contains('late'))
@@ -139,18 +151,6 @@ QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
 
     test('excludes the "late" style when the submission is both excused and late', () => {
       excuseSubmission()
-      submission.late = true
-      notOk(renderCell().classList.contains('late'))
-    })
-
-    test('excludes the "late" style when the submission is both resubmitted and late', () => {
-      submission.grade_matches_current_submission = false
-      submission.late = true
-      notOk(renderCell().classList.contains('late'))
-    })
-
-    test('excludes the "late" style when the submission is both missing and late', () => {
-      submission.missing = true
       submission.late = true
       notOk(renderCell().classList.contains('late'))
     })
