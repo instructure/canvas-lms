@@ -97,6 +97,7 @@ class NotificationFailureProcessor
     return @notification_failure_queue if defined?(@notification_failure_queue)
     conf = Canvas::AWS.validate_v2_config(config, 'notification_failures.yml').dup
     conf.except!(*POLL_PARAMS)
+    conf.delete(:iteration_high_water)
     conf.delete(:initial_timeout) # old, no longer supported poll param
     queue_name = conf.delete(:notification_failure_queue_name)
     sqs = Aws::SQS::Client.new(conf)
