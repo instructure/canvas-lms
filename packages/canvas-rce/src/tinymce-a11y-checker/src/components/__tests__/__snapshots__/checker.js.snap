@@ -123,6 +123,7 @@ exports[`render matches snapshot with errors 1`] = `
                   shouldCloseOnDocumentClick={true}
                   shouldCloseOnEscape={true}
                   shouldContainFocus={true}
+                  shouldFocusContentOnTriggerBlur={false}
                   shouldRenderOffscreen={false}
                   shouldReturnFocus={true}
                   show={false}
@@ -178,17 +179,28 @@ exports[`render matches snapshot with errors 1`] = `
                           Why Text
                         </p>
                         <p>
-                          <Link
-                            as="button"
-                            ellipsis={false}
-                            href="http://some-url"
-                            iconPlacement="start"
-                            linkRef={[Function]}
-                            target="_blank"
-                            variant="default"
+                          <ApplyTheme
+                            immutable={false}
+                            theme={
+                              Object {
+                                Symbol(Link): Object {
+                                  "textDecoration": "underline",
+                                },
+                              }
+                            }
                           >
-                            Link for learning more
-                          </Link>
+                            <Link
+                              as="button"
+                              ellipsis={false}
+                              href="http://some-url"
+                              iconPlacement="start"
+                              linkRef={[Function]}
+                              target="_blank"
+                              variant="default"
+                            >
+                              Link for learning more
+                            </Link>
+                          </ApplyTheme>
                         </p>
                       </Text>
                     </View>
