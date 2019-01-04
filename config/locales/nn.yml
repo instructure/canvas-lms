@@ -2729,15 +2729,15 @@ nn:
     default_login_handle_name: E-post
   authentication_provider/ldap: 
     test_bind_failed: "Tilkopling mislukkast med følgande feil:  %{error}"
-    test_bind_timeout: "Tidsavbrot under binding"
+    test_bind_timeout: "Tidsavbrot under tilkopling"
     test_connection_timeout: "Tidsavbrot under tilkopling"
     test_host_unknown: "Ukjend vert: %{host}"
     test_login_auth_exception: "Unntak ved pålogging: %{error}"
     test_login_auth_failed: "Godkjenning mislukkast"
-    test_search_failed: "Søk etter mislukkast med følgande feil: %{error}"
+    test_search_failed: "Søk mislukkast med følgande feil: %{error}"
   authentication_provider/saml: 
     debug: 
-      logout_redirect: "Førespurnad om å logge av er send til IdP"
+      logout_redirect: "Førespurnad om å logge av er sendt til IdP"
   authentication_providers: 
     account_required: "må vere LDAP-godkjend"
     debugging: 
@@ -2747,17 +2747,17 @@ nn:
     index: 
       delete_auth_confirmation: "Er du sikker? Brukarar kan ikkje logge på dersom denne blir fjerna."
       delete_auth_link: "Fjern autentisering"
-      ip_address_list_description: "Dersom du brukar ei godkjenningsteneste som krev at Canvas-tenarane må kontakte tenarane dine direkte, som LDAP, må du kontrollere at tenarane godtek tilkoplingar frå desse IP-adressene:"
-      no_auth_type_description: "Kontoen integrerer ikkje med ein identitetsleverandør akkurat no."
-      page_title: Godkjenningsinnstillingar
+      ip_address_list_description: "Dersom du brukar ei autentiseringsteneste som krev at Canvas-tenarane må kontakte tenarane dine direkte, som LDAP, må du kontrollere at tenarane godtek tilkoplingar frå desse IP-adressene:"
+      no_auth_type_description: "Kontoen integrerer ikkje med ein identitetsleverandør, IdP, akkurat no."
+      page_title: Autentiseringsinnstillingar
       profile_page_link_example: "For eksempel, her er profilsida di: [%{friendlyname}](%{url})"
       settings_description: "Dersom ein brukar skal godkjennast gjennom ein ekstern identitetsleverandør (IdP), må brukaren ha ein påloggings-ID som både er kopla til denne kontoen og som samsvarer med den unike ID-en som kjem frå IdP. Dersom du vil sjå dei gjeldande påloggingane for ein brukar, kan du gå til avsnittet \"Påloggingsinformasjon\" på brukaren si profilside. (Søk etter brukaren i fana \"Brukarar\".)"
-      settings_title: Godkjenningsinnstillingar
+      settings_title: Autentiseringsinnstillingar
       test_ldap_link: "Test LDAP-godkjenning"
     ldap_fields: 
       auth_filter_description: "Bruk *%{placeholder}* som plasshaldar for brukarnamnet som er oppgitt av brukaren. For eksempel: *(sAMAccountName=%{placeholder})*"
       identifer_format_description: "LDAP-attributtet du skal bruke for å søke etter Canvas-pålogginga. La den stå tom for brukarnamnet frå brukaren."
-      ldap_timeout_failure_help2: "Dersom Canvas har tidsavbrot for mange gongar i kommunikasjon med LDAP-tenaren, vil den blokkere for vidare pålogging til LDAP-tenaren i %{time}. Siste tidsavbrot for LDAP-tenaren var %{timestamp}."
+      ldap_timeout_failure_help2: "Dersom Canvas har for mange tidsavbrot i kommunikasjon med LDAP-tenaren, vil den blokkere for vidare pålogging til LDAP-tenaren i %{time}. Siste tidsavbrot for LDAP-tenaren var %{timestamp}."
     ldap_settings_test: 
       labels: 
         pass: Passord
@@ -2776,7 +2776,7 @@ nn:
       test_ldap_connection_label: "Testar tilkopling..."
       test_ldap_dialog_close: Lukk
       test_ldap_dialog_page_title: "Testar LDAP-konfigurasjonen"
-      test_ldap_login_form_header: "Tilbyr eit gyldig LDAP-brukarnamn/-passord for å teste pålogging:"
+      test_ldap_login_form_header: "Tilby eit gyldig LDAP-brukarnamn/-passord for å teste pålogging:"
       test_ldap_login_help_header: "LDAP-tenaren avslo legitimasjonen din"
       test_ldap_login_label: "Test brukarpålogging..."
       test_ldap_search_help_body: "Søket mislukkast eller returnerte 0 resultat. Dette kan du gjere:"
@@ -2795,7 +2795,7 @@ nn:
     password_required: "må leggast til"
     sso_settings_form: 
       change_password_url_help: "La det stå tomt for standard Canvas-funksjon"
-      discovery_url_description: "Dersom ein oppdagings-URL blir oppgitt, kjem Canvas til å sende vidare alle brukarar til URL-adressa når dei skal godkjennast. Sida hjelper brukaren med å finne ut kvar han skal gå for å logge på. Dersom URL-adressa ikkje er konfigurert, blir den første konfigurasjonen brukt for brukaren si godkjenning."
+      discovery_url_description: "Dersom ein påloggingsval-URL blir oppgitt, kjem Canvas til å sende vidare alle brukarar til URL-adressa når dei skal godkjennast. Sida hjelper brukaren med å finne ut kvar han skal gå for å logge på. Dersom URL-adressa ikkje er konfigurert, blir den første konfigurasjonen brukt for brukaren si godkjenning."
       login_handle_name_description: "Etiketten som blir brukt for unike påloggings-ID-ar. Eksempel: Pålogging, brukarnamn, student-ID osv."
       unknown_user_url_description: "URL-en for omdirigering av godkjend brukar finst ikkje i Canvas."
   authentication_with_provider_was_successful_but_no_6a194137: "Autorisering med %{provider} var vellykka, men ein unik ID for pålogging til Canvas blei ikkje tilbydd."
@@ -3391,12 +3391,12 @@ nn:
       event_title: "frist: %{event_title}"
     show: 
       calendar_feed: Kalenderstraum
-      calendar_feed_instructions: "Kopier lenka nedanfor og lim ho inn i ein kalenderapp som tek imot straum frå iCal (Google Calendar, iCal, Outlook, osv.)"
+      calendar_feed_instructions: "Kopier lenka nedanfor og lim ho inn i ein kalenderapp som tek imot datastraum frå iCal (Google Calendar, iCal, Outlook, osv.)"
       calendars: Kalendrar
       feed_dialog_title: Kalenderstraum
       feed_title: "Emnekalender i Atom-format"
       links: 
-        feed: "klikk her for å vise straum"
+        feed: "klikk her for å vise datastraum"
       page_title_header: Kalender
       skip_to_calendar: "Hopp til kalender"
       undated_items: "Utan dato"
@@ -4002,7 +4002,7 @@ nn:
       labels: 
         all_quizzes: "Alle quizar"
       select_quizzes: "Vel quizar som skal eksporterast"
-  content_exports_e5a66f6a: "Innhald i eksport"
+  content_exports_e5a66f6a: "Eksport av innhald"
   content_for_section_1_7ecfb319: "Innhald for seksjon 1"
   content_for_section_2_e7c6e2a3: "Innhald for seksjon 2"
   content_for_section_3_90c1d235: "Innhald for seksjon 3"
