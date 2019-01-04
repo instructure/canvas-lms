@@ -43,6 +43,7 @@ define [
   'jsx/assignments/AssignmentConfigurationTools'
   'jsx/assignments/ModeratedGradingFormFieldGroup'
   'jsx/assignments/AssignmentExternalTools'
+  '../../../jsx/shared/helpers/returnToHelper'
   'jqueryui/dialog'
   'jquery.toJSON'
   '../../jquery.rails_flash_notifications'
@@ -52,7 +53,8 @@ define [
   VeriCiteSettings, TurnitinSettingsDialog, preventDefault, MissingDateDialog,
   AssignmentGroupSelector, GroupCategorySelector, toggleAccessibly,
   RCEKeyboardShortcuts, ConditionalRelease, deparam, SisValidationHelper,
-  SimilarityDetectionTools, ModeratedGradingFormFieldGroup, AssignmentExternalTools) ->
+  SimilarityDetectionTools, ModeratedGradingFormFieldGroup,
+  AssignmentExternalTools, returnToHelper) ->
 
   ###
   xsslint safeString.identifier srOnly
@@ -669,7 +671,7 @@ define [
       window.location = @locationAfterSave(deparam())
 
     locationAfterSave: (params) ->
-      return params['return_to'] if params['return_to']?
+      return params['return_to'] if returnToHelper.isValid(params['return_to'])
       @model.get 'html_url'
 
     redirectAfterCancel: ->
@@ -677,7 +679,7 @@ define [
       window.location = location if location
 
     locationAfterCancel: (params) ->
-      return params['return_to'] if params['return_to']?
+      return params['return_to'] if returnToHelper.isValid(params['return_to'])
       return ENV.CANCEL_TO if ENV.CANCEL_TO?
       null
 
