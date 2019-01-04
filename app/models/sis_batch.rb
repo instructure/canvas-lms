@@ -404,7 +404,10 @@ class SisBatch < ActiveRecord::Base
   def statistics
     stats = {}
     stats[:total_state_changes] = roll_back_data.count
-    SisBatchRollBackData::RESTORE_ORDER.each do |type|
+    # add statistics with all types but only query types that were imported.
+    stats = add_zero_stats(stats)
+    types = roll_back_data.distinct.order(:context_type).pluck(:context_type)
+    types.each do |type|
       stats[type.to_sym] = {}
       stats[type.to_sym][:created] = roll_back_data.where(context_type: type).
         where(previous_workflow_state: ['non-existent', 'creation_pending'],
@@ -428,6 +431,18 @@ class SisBatch < ActiveRecord::Base
     end
     self.data ||= {}
     self.data[:statistics] = stats
+  end
+
+  def add_zero_stats(stats)
+    SisBatchRollBackData::RESTORE_ORDER.each do |type|
+      stats[type.to_sym] = {}
+      stats[type.to_sym][:created] = 0
+      stats[type.to_sym][:restored] = 0
+      stats[type.to_sym][:concluded] = 0 if ['Course', 'Enrollment'].include? type
+      stats[type.to_sym][:deactivated] = 0 if type == 'Enrollment'
+      stats[type.to_sym][:deleted] = 0
+    end
+    stats
   end
 
   def stat_active_state(type)
