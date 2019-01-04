@@ -48,8 +48,8 @@ describe Mutations::UpdateAssignment do
         }
       }
     GQL
-    context = {current_user: user_executing, request: ActionDispatch::TestRequest.create}
-    return CanvasSchema.execute(mutation_command, context: context)
+    context = {current_user: user_executing, request: ActionDispatch::TestRequest.create, session: {}}
+    CanvasSchema.execute(mutation_command, context: context)
   end
 
   it "can do basic update on name" do
