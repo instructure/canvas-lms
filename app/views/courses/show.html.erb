@@ -116,7 +116,9 @@
       </div>
     <% end %>
     <%= render :partial => 'to_do_list', :locals => {:contexts => [@context]} %>
-    <%= render :partial => 'unread_discussion_list', :locals => {:contexts => [@context]} %>
+    <% if SettingsService.get_settings(object: 'school', id: 1)['show_unread_discussions'] %>
+      <%= render :partial => 'unread_discussion_list', :locals => {:contexts => [@context]} %>
+    <% end %>
     <%= render :partial => "group_list", :locals => {:group_list => @user_groups} %>
     <%= nbsp unless @current_user %>
   </div>

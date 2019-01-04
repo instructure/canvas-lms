@@ -1,6 +1,9 @@
+<% unread_topics = @current_user.get_teacher_unread_discussion_topics(@context) %>
+
+<% if unread_topics.any? %>
 <h2 class="todo-list-header" tabindex="-1">Unread Items</h2>
 <ul class="right-side-list to-do-list">
-  <% @current_user.get_teacher_unread_discussion_topics(@context).each do |assignment| %>
+  <% unread_topics.each do |assignment| %>
     <li class="todo" style="">
       <%= link_to speed_grader_course_gradebook_path(@context, assignment_id: assignment.id), class: "item" do %>
         <div class="todo-badge-wrapper">
@@ -14,3 +17,4 @@
     </li>
   <% end %>
 </ul>
+<% end %>
