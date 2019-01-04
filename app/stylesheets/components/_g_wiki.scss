@@ -454,26 +454,22 @@ $revision-button-color: $ic-color-dark;
   .revision {
     list-style-type: none;
     overflow: hidden;
-    // height and transitions
-    height: 34px;
-    transition: height 400ms;
 
     border-#{direction(left)}: 2px solid transparent;
 
-    &.selected, &.latest {
-      height: 56px;
-      transition: height 400ms;
-    }
     .revision-content {
       padding: 7px 8px;
       @include fontSize($ic-font-size--xsmall);
 
       .revision-details {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        padding-#{direction(left)}: 3px;
+        text-align: #{direction(left)};
         font-size: 12px;
         color: #333;
+      }
+
+      .revision-actions {
+        padding-#{direction(left)}: 3px;
       }
     }
     &:not(.selected):hover {
