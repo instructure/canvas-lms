@@ -6,10 +6,6 @@
   <% unread_topics.each do |assignment| %>
     <li class="todo" style="">
       <%= link_to speed_grader_course_gradebook_path(@context, assignment_id: assignment.id), class: "item" do %>
-        <div class="todo-badge-wrapper">
-          <div class="todo-badge">
-          </div>
-        </div>
         <div class="todo-details">
           <b class="todo-details__title"><%= assignment.title %></b>
         </div>
