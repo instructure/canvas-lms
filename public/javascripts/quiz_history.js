@@ -417,7 +417,9 @@ import 'compiled/behaviors/quiz_selectmenu'
       var questionId = $question.attr('id');
       gradingForm.updateSnapshotFor($question);
       if($(this).hasClass('question_input')){
-        $question.find('.question_input_hidden').val(numberHelper.parse($(this).val()) || '')
+        const parsed = numberHelper.parse($(this).val())
+        const hiddenVal = Number.isNaN(parsed) ? '' : parsed
+        $question.find('.question_input_hidden').val(hiddenVal)
         quizNavBar.updateStatusFor($(this));
       }
     });
