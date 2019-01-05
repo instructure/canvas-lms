@@ -134,6 +134,7 @@ Rating.defaultProps = {
 const Ratings = (props) => {
   const {
     assessing,
+    selectedRatingId,
     customRatings,
     defaultMasteryThreshold,
     footer,
@@ -151,16 +152,19 @@ const Ratings = (props) => {
     return { current: tier.points, next: next ? next.points : null }
   })
 
-  const currentIndices = () => pairs.map(({ current, next }, i) => {
-    const currentMatch = points === current
-    const withinRange = points > next && points <= current
-    const zeroAndInLastRange = points === 0 && next === null
-    if (currentMatch || (useRange && (withinRange || zeroAndInLastRange))){
-      return i
-    } else {
-      return -1
-    }
-  }).filter((index) => (index >= 0))
+  const currentIndex = () => {
+      if (selectedRatingId) {
+        return _.findIndex(tiers, (tier) => tier.id === selectedRatingId && (useRange || tier.points === points))
+      }
+      else {
+        return pairs.findIndex(({ current, next }) => {
+          const currentMatch = points === current
+          const withinRange = points > next && points <= current
+          const zeroAndInLastRange = points === 0 && next === null
+          return currentMatch || (useRange && (withinRange || zeroAndInLastRange))
+        })
+      }
+  }
 
   const getRangePoints = (currentPoints, nextTier) => {
     if (nextTier) {
@@ -195,21 +199,21 @@ const Ratings = (props) => {
     }
   }
 
-  const handleClick = (tierPoints) => {
-    onPointChange(tierPoints)
+  const handleClick = (tier) => {
+    onPointChange(tier)
     $.screenReaderFlashMessage(I18n.t('Rating selected'))
   }
 
-  const selectedIndices = points !== undefined ? currentIndices() : null
+  const selectedIndex = points !== undefined ? currentIndex() : null
 
   const visible = tiers.map((tier, index) => ({
     tier,
     index,
-    selected: _.includes(selectedIndices, index),
+    selected: selectedIndex === index,
   })).filter(({ selected }) => isSummary ? selected : true)
 
   const ratings = visible.map(({ tier, index }) => {
-    const selected = _.includes(selectedIndices, index)
+    const selected = selectedIndex === index
     const classes = classNames({
       'rating-tier': true,
       'selected': selected,
@@ -222,7 +226,7 @@ const Ratings = (props) => {
         classes={classes}
         endOfRangePoints={useRange ? getRangePoints(tier.points, tiers[index + 1]) : null}
         footer={footer}
-        onClick={() => handleClick(tier.points)}
+        onClick={() => handleClick(tier)}
         shaderClass={getShaderClass(selected)}
         tierColor={getTierColor(selected)}
         hidePoints={isSummary || hidePoints}

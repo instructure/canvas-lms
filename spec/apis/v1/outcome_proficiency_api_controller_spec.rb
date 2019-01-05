@@ -116,6 +116,13 @@ describe OutcomeProficiencyApiController, type: :request do
     end
 
     context 'update proficiencies' do
+      let(:ratings) do
+        [
+          { description: '1', points: 1, mastery: true, color: '0000ff' },
+          { description: '0', points: 0, mastery: false, color: 'ff0000' },
+        ]
+      end
+
       before do
         @proficiency = @account.outcome_proficiency
         api_call(:post,
@@ -172,11 +179,19 @@ describe OutcomeProficiencyApiController, type: :request do
         include_examples 'update ratings'
       end
 
+      context 'remove top rating' do
+        let(:updated_ratings) do
+          [ { description: '0', points: 0, mastery: true, color: 'ff0000' } ]
+        end
+
+        include_examples 'update ratings'
+      end
+
       context 'empty ratings' do
         let(:updated_ratings) { [] }
 
         it 'does not delete previous ratings' do
-          expect(@proficiency.outcome_proficiency_ratings.length).to eq 1
+          expect(@proficiency.outcome_proficiency_ratings.length).to eq 2
         end
       end
     end

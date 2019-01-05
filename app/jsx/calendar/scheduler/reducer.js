@@ -33,6 +33,6 @@ import initialState from './store/initialState'
         selectedCourse: action.payload
       }
     }
-  });
+  }, initialState);
 
 export default reducer

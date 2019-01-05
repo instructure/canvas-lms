@@ -7,6 +7,123 @@ The API Change Log includes adjustments to the Canvas API documentation as part 
 <li>This page documents API changes for the last four releases. The release date indicates the date that the API code will be available in the production environment. For prior releases, view the <a href="file.changelog_archive.html">API Change Log archive page</a>.</li>
 </ul>
 
+<h2>2019-01-05</h2>
+
+<h3>Changes</h3>
+<table class="changelog">
+<tr>
+<th>API Calls</th>
+<th>Function</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="file.developer_keys.html">Developer Keys API</a></td>
+<td></td>
+<td>Verified and corrected all links in document</td>
+</tr>
+<tr>
+<td><a href="files.html">Files API</a></td>
+<td>Delete File Endpoint</td>
+<td>Clarified endpoint usage and added permanent deletion warning</td>
+</tr>
+</table>
+
+<h3>Additions</h3>
+<table class="changelog">
+<tr>
+<th>API Calls</th>
+<th>Function</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="assignments.html">Assignments API</a></td>
+  <td>Create an Assignment Endpoint<br><br>
+  Edit an Assignment Endpoint</td>
+  <td>Added assignment[allowed_attempts] parameter</td>
+</tr>
+<tr>
+<td><a href="conversations.html">Conversations API</a></td>
+  <td>Create a Conversations Endpoint</td>
+  <td>Added force_new parameter</td>
+</tr>
+<tr>
+<td><a href="courses.html">Courses API</a></td>
+  <td>Get a Single Course Endpoint</td>
+  <td>Added teacher_limit parameter</td>
+</tr>
+<tr>
+<td><a href="roles.html">Roles API</a></td>
+  <td>Create a New Role Endpoint</td>
+  <td>Permissions_enabled parameter: Added view_audit_trail in permissions list</td>
+</tr>
+</table>
+<p></p>
+<table class="changelog">
+<tr>
+<th>API Responses</th>
+<th>Function</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="assignments.html">Assignments API</a></td>
+  <td>Assignment Object</td>
+  <td>Added allowed_attempts parameter</td>
+</tr>
+<tr>
+<td><a href="enrollments.html">Enrollments API</a></td>
+  <td>Enrollment Object</td>
+  <td>Added override_grade, override_score, current_period_override_grade, and current_period_override_score parameters
+  <br><br>
+  Added override score clarifications in computed_current_score, computed_final_score, computed_final_grade, current_period_computed_current_score, current_period_computed_final_score, current_period_computed_current_grade, and current_period_computed_final_grade parameters</td>
+</tr>
+<tr>
+<td><a href="sis_imports.html">SIS Imports API</a></td>
+  <td>SIS Import Statistic Object<br><br>
+  SIS Import Statistic Objects</td>
+  <td>Added object examples</td>
+</tr>
+<tr>
+<td><a href="sis_imports.html">SIS Imports API</a></td>
+  <td>SIS Import Object</td>
+  <td>Workflow_state parameter: Added initializing and failed descriptions<br><br>
+  Added statistics parameter
+</td>
+</tr>
+<tr>
+<td><a href="submissions.html">Submissions API</a></td>
+  <td>Submission Object</td>
+  <td>Added extra_attempts parameter
+</td>
+</tr>
+</table>
+
+<h3>Removals</h3>
+<table class="changelog"
+<tr>
+<th>API Calls</th>
+<th>Function</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="courses.html">Courses API</a></td>
+<td>List Users in Course Endpoint</td>
+<td>Include parameter: Removed email as an optional parameter</td>
+</tr>
+</table>
+<p></p>
+<table class="changelog">
+<tr>
+<th>Content</th>
+<th>Function</th>
+<th></th>
+</tr>
+<tr>
+<td><a href="file.navigation_tools.html">Navigation Tools</a></td>
+  <td></td>
+  <td>Removed incorrect auto-generated links from page</td>
+</tr>
+</table>
+
 <h2>2018-12-08</h2>
 
 <h3>Changes</h3>
@@ -33,14 +150,26 @@ Workflow_state parameter: added initializing, failed, restoring, partially_resto
 <th></th>
 </tr>
 <tr>
-<td><a href="courses.html">Courses API</a></td>
-<td>List Your Courses Endpoint</td>
-<td>Include parameter: Added graded period parameters to be returned even if total grades are hidden in the course</td>
-</tr>
-<tr>
 <td><a href="sis_import_errors.html">SIS Import Errors API</a></td>
 <td>SISImportError Object</td>
 <td>Added row_info parameter, which displays the contents of the line that had the error</td>
+</tr>
+<tr>
+<td><a href="users.html">Users API</a></td>
+<td>List the Activity Stream Endpoint</td>
+<td>Added only_active_courses parameter</td>
+</tr>
+</table>
+<p></p>
+<table class="changelog">
+<tr>
+<th>API Responses</th>
+<th>Function</th>
+<th></th>
+<tr>
+<td><a href="courses.html">Courses API</a></td>
+<td>List Your Courses Endpoint</td>
+<td>Include parameter: Added graded period parameters to be returned even if total grades are hidden in the course</td>
 </tr>
 </table>
 <p></p>
@@ -57,7 +186,7 @@ Workflow_state parameter: added initializing, failed, restoring, partially_resto
 <tr>
 <td><a href="roles.html">Roles API</a></td>
 <td>Create a New Role Endpoint</td>
-<td>Permissions parameter: Updated account- and course-level roles to match roles in the Canvas Permissions page
+<td>Permissions parameter: Updated account- and course-level role names to match roles in the Canvas Permissions page
 </tr>
 </table>
 <p></p>
@@ -117,51 +246,5 @@ Workflow_state parameter: added initializing, failed, restoring, partially_resto
 <td><a href="planner.html">Planner API</td>
 <td></td>
 <td>Removed the beta warning banner from the API documentation</td>
-</tr>
-</table>
-
-
-<h2>2018-10-27</h2>
-
-<h3>Changes</h3>
-<table class="changelog">
-<tr>
-<th>API Calls</th>
-<th>Function</th>
-<th></th>
-</tr>
-<tr>
-<td><a href="conversations.html">Conversations API</a></td>
-<td>Create a Conversation Endpoint</td>
-<td>Recipients parameter: Added clarification when the course/group has over 100 enrollments, bulk_message and group_conversation must be set to true
-</tr>
-<tr>
-<td><a href="quiz_extensions.html">Quiz Extensions API</a></td>
-<td>Set Extensions for Student Quiz Submissions Endpoint</td>
-<td>All parameters: Added quiz_extensions to parameter name</td>
-</tr>
-<tr>
-<td><a href="quiz_submissions.html">Quiz Submissions API</a></td>
-<td>Update Student Question Scores and Comment Endpoint</td>
-<td>All parameters: Added quiz_submissions to parameter name</td>
-</tr>
-</table>
-
-<h3>Additions</h3>
-<table class="changelog">
-<tr>
-<th>API Responses</th>
-<th>Function</th>
-<th></th>
-</tr>
-<tr>
-<td><a href="plagiarism_detection_platform_assignments.html">Plagiarism Detection Platform Assignments API</a></td>
-<td>LtiAssignment Object</td>
-<td>Added LTI Course ID and Course ID return parameters
-</tr>
-<tr>
-<td><a href="plagiarism_detection_submissions.html">Plagiarism Detection Submissions API</a></td>
-<td>Submission Object</td>
-<td>Added LTI Course ID and Course ID return parameters</td>
 </tr>
 </table>

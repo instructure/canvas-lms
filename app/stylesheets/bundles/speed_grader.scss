@@ -509,10 +509,11 @@ $icon-size: 1.4rem;
   overflow-y: auto;
   .comment {
     .avatar {
+      flex-grow: 0;
+      flex-shrink: 0;
       height: 24px;
-      max-width: 24px;
-      flex-shrink: 5;
       margin-#{direction(right)}: 12px;
+      width: 24px;
     }
   }
 }

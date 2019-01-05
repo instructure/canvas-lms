@@ -57,7 +57,10 @@ module Api::V1::Outcome
 
         hash['points_possible'] = outcome.rubric_criterion[:points_possible]
         hash['mastery_points'] = outcome.rubric_criterion[:mastery_points]
-        hash['ratings'] = outcome.rubric_criterion[:ratings]
+        hash['ratings'] = outcome.rubric_criterion[:ratings]&.clone
+        hash['ratings']&.each_with_index do |rating, i|
+          rating[:percent] = opts[:rating_percents][i] if i < opts[:rating_percents].length
+        end if opts[:rating_percents]
         if opts[:assessed_outcomes] && outcome.context_type != "Account"
           hash['assessed'] = opts[:assessed_outcomes].include?(outcome.id)
         else

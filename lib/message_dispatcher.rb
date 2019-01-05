@@ -17,9 +17,8 @@
 #
 
 class MessageDispatcher < Delayed::PerformableMethod
-
   def self.dispatch(message)
-    Delayed::Job.enqueue(self.new(message, :deliver),
+    Delayed::Job.enqueue(self.new(message.for_queue, :deliver),
                          run_at: message.dispatch_at,
                          priority: 25,
                          max_attempts: 15)
@@ -33,7 +32,7 @@ class MessageDispatcher < Delayed::PerformableMethod
       return
     end
 
-    Delayed::Job.enqueue(self.new(self, :deliver_batch, [messages]),
+    Delayed::Job.enqueue(self.new(self, :deliver_batch, [messages.map(&:for_queue)]),
                          run_at: messages.first.dispatch_at,
                          priority: 25,
                          max_attempts: 15)
@@ -47,6 +46,11 @@ class MessageDispatcher < Delayed::PerformableMethod
   protected
 
   def self.deliver_batch(messages)
+    if messages.first.is_a?(Message::Queued)
+      times = messages.map(&:created_at).sort
+      range_for_partition = (times.first)..(times.last)
+      messages = Message.where(:id => messages.map(&:id), :created_at => range_for_partition).to_a
+    end
     messages.each do |message|
       begin
         message.deliver

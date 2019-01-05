@@ -55,11 +55,13 @@ describe IncomingMail::ReplyToAddress do
         expect(message).to receive(:context_type).and_return('Course')
         expect(message).to receive(:id).twice.and_return(1)
         expect(message).to receive(:global_id).twice.and_return(@shard1.global_id_for(42))
+        created_at = Time.now.utc
+        expect(message).to receive(:created_at).and_return(created_at)
         IncomingMail::ReplyToAddress.address_pool = %w{canvas@example.com}
 
         short_id = Shard.short_id_for(@shard1.global_id_for(42))
 
-        expect(IncomingMail::ReplyToAddress.new(message).address).to eq "canvas+#{expect_secure_id}-#{short_id}@example.com"
+        expect(IncomingMail::ReplyToAddress.new(message).address).to eq "canvas+#{expect_secure_id}-#{short_id}-#{created_at.to_i}@example.com"
       end
     end
   end

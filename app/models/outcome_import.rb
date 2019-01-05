@@ -116,10 +116,11 @@ class OutcomeImport < ApplicationRecord
 
   def run
     root_account.shard.activate do
-      job_started!
-      I18n.locale = locale if locale.present?
-      file = self.attachment.open(need_local_file: true)
       begin
+        job_started!
+        I18n.locale = locale if locale.present?
+        file = self.attachment.open(need_local_file: true)
+
         Outcomes::CsvImporter.new(self, file).run do |status|
           status[:errors].each do |row, error|
             add_error row, error

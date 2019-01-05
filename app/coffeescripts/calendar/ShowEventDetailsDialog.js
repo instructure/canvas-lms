@@ -345,6 +345,9 @@ export default class ShowEventDetailsDialog {
     this.popover = new Popover(jsEvent, eventDetailsTemplate(params))
     this.popover.el.data('showEventDetailsDialog', this)
 
+    const element = document.getElementById("event-details-trap-focus")
+    this.popover.trapFocus(element)
+
     this.popover.el.find('.view_event_link').click(preventDefault(this.openShowPage))
 
     this.popover.el.find('.edit_event_link').click(preventDefault(this.showEditDialog))

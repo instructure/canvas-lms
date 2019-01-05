@@ -120,7 +120,6 @@
           <% end %>
         </td>
       </tr>
-      <% if @context.root_account.feature_enabled?(:master_courses) %>
       <tr>
         <td class="form-label nobr"><%= f.blabel :blueprint_course, :en => "Blueprint Course" %></td>
         <td class="nobr">
@@ -140,7 +139,6 @@
           <% end %>
         </td>
       </tr>
-      <% end %>
       <tr>
         <td><%= f.blabel :time_zone, :en => "Time Zone" %></td>
         <td>
@@ -221,6 +219,13 @@
           <% end %>
         </td>
       </tr><tr>
+        <td></td>
+        <td class="tall-row">
+          <div class="aside top-hint">
+            <%= t "Changing course dates may override term availability settings and placement in the Courses page and Dashboard. Please confirm term dates before modifying course dates." %>
+          </div>
+        </td>
+      </tr><tr>
         <td class="form-label"><%= f.blabel :start_at, :en => "Starts" %></td>
         <td class="nobr">
           <% if can_manage %>
@@ -241,12 +246,11 @@
                 meaning that the previous day will be the last day this course is active.") %></p></div>">
             </i>
 
-            <%= f.check_box :restrict_enrollments_to_course_dates %>
-            <%= f.label :restrict_enrollments_to_course_dates, :en => "Users can only participate in the course between these dates" %>
+            <%= f.check_box :restrict_enrollments_to_course_dates, "aria-describedby" => 'users-can-only-participate-description' %>
+            <%= f.label :restrict_enrollments_to_course_dates, :en => "Students can only participate in the course between these dates" %>
           </div>
-
-          <div class="aside palign">
-            <%= t('course_overrides_term', %{This will override any term availability settings.}) %>
+          <div class="aside bottom-hint" id="users-can-only-participate-description">
+            <%= t "When selected, the course is in a read-only state outside these dates." %>
           </div>
           <% else %>
             <%= datetime_string(@context.conclude_at, :verbose) %>
@@ -257,9 +261,26 @@
         <td class="form-label"></td>
         <td class="nobr">
           <%= f.check_box :restrict_enrollments_to_course_dates, :disabled => true %>
-          <%= f.label :restrict_enrollments_to_course_dates, :en => "Users can only participate in the course between these dates" %>
+          <%= f.label :restrict_enrollments_to_course_dates, :en => "Students can only participate in the course between these dates" %>
         </td>
       <% end %>
+      </tr><tr>
+        <td></td>
+        <td class="tall-row">
+          <div class="nobr" role="group" aria-describedby="restrict-view-description">
+            <div>
+              <%= f.check_box :restrict_student_past_view, :disabled => !can_manage || @context.account.restrict_student_past_view[:locked] %>
+              <%= f.label :restrict_student_past_view, :en => "Restrict students from viewing this course after end date" %>
+            </div>
+            <div>
+              <%= f.check_box :restrict_student_future_view, :disabled => !can_manage || @context.account.restrict_student_future_view[:locked] %>
+              <%= f.label :restrict_student_future_view, :en => "Restrict students from viewing this course before start date" %>
+            </div>
+          </div>
+          <div class="aside bottom-hint" id="restrict-view-description">
+            <%= t "When selected, the course is inaccessible outside course dates. If the course dates are blank, these start and end dates apply to the term dates." %>
+          </div>
+        </td>
       <% if available_locales.size > 1 %>
       </tr><tr>
         <td class="form-label"><%= f.blabel :locale, :language, :en => "Language" %></td>
@@ -349,15 +370,6 @@
           <div class="public_options">
             <%= f.check_box :indexed, :disabled => !can_manage %>
             <%= f.label :indexed, :en => "Include this course in the public course index" %>
-          </div>
-          <br/>
-          <div>
-            <%= f.check_box :restrict_student_past_view, :disabled => !can_manage || @context.account.restrict_student_past_view[:locked] %>
-            <%= f.label :restrict_student_past_view, :en => "Restrict students from viewing course after end date" %>
-          </div>
-          <div>
-            <%= f.check_box :restrict_student_future_view, :disabled => !can_manage || @context.account.restrict_student_future_view[:locked] %>
-            <%= f.label :restrict_student_future_view, :en => "Restrict students from viewing course before start date" %>
           </div>
         </td>
       </tr><tr>

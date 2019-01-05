@@ -17,16 +17,24 @@
  */
 
 import React from 'react'
-import StudentHeader from './components/StudentHeader'
-import AssignmentToggleDetails from '../shared/AssignmentToggleDetails'
-import StudentContentTabs from './StudentContentTabs'
+import StudentContent from './components/StudentContent'
+import {string} from 'prop-types'
+import {Query} from 'react-apollo'
+import {STUDENT_VIEW_QUERY} from './assignmentData'
 
-export default function StudentView(_props) {
-  return (
-    <div data-test-id="assignments-2-student-view">
-      <StudentHeader />
-      <AssignmentToggleDetails description="Testing this description with some dummy data" />
-      <StudentContentTabs />
-    </div>
-  )
+const StudentView = props => (
+  <Query query={STUDENT_VIEW_QUERY} variables={{assignmentLid: props.assignmentLid}}>
+    {({loading, error, data}) => {
+      // TODO HANDLE ERROR AND LOADING
+      if (loading) return null
+      if (error) return `Error!: ${error}`
+      return <StudentContent assignment={data.assignment} />
+    }}
+  </Query>
+)
+
+StudentView.propTypes = {
+  assignmentLid: string.isRequired
 }
+
+export default React.memo(StudentView)

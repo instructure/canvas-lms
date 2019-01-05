@@ -48,6 +48,15 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
 
+  githook_installer:
+    build:
+      context: .
+      dockerfile: 'Dockerfile.githook'
+    volumes:
+      - ./.git:/tmp/.git
+      - ./hooks:/tmp/hooks
+      - ./script:/tmp/script
+
 volumes:
   api_docs: {}
   brandable_css_brands: {}

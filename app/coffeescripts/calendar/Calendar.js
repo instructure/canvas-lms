@@ -431,7 +431,7 @@ export default class Calendar {
         .find('.ui-resizable-handle')
         .remove()
     }
-    if (event.eventType.match(/assignment/) && event.isDueAtMidnight() && view.name === 'month') {
+    if (event.eventType.match(/assignment/) && event.isDueStrictlyAtMidnight() && view.name === 'month') {
       element.find('.fc-time').empty()
     }
     if (

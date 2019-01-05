@@ -68,9 +68,13 @@ class CanvasSpecRunner < TestQueue::Runner::RSpec
     elsif error_statuses == [::RSpec.configuration.failure_exit_code]
       # :'( but we can retry
       exit ::RSpec.configuration.failure_exit_code
+    elsif error_statuses.include?(nil)
+      # We're seeing this with Chromedriver crashes from test-queue, we can't do much about these for now
+      puts "Error statuses: "
+      p @completed.reduce([]){|memo, c| c.pid == 0 ? memo : memo + [c.pid, c.status.exitstatus]}
+      exit 98
     else
       puts "Error statuses: "
-      p error_statuses
       p @completed.map{|c| [c.pid, c.status.exitstatus]}
       # this shouldn't happen, crap is broken
       exit 1

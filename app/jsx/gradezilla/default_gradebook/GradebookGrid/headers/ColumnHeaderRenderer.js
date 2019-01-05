@@ -21,6 +21,7 @@ import AssignmentGroupColumnHeaderRenderer from './AssignmentGroupColumnHeaderRe
 import CustomColumnHeaderRenderer from './CustomColumnHeaderRenderer'
 import StudentColumnHeaderRenderer from './StudentColumnHeaderRenderer'
 import TotalGradeColumnHeaderRenderer from './TotalGradeColumnHeaderRenderer'
+import TotalGradeOverrideColumnHeaderRenderer from './TotalGradeOverrideColumnHeaderRenderer'
 
 export default class ColumnHeaderRenderer {
   constructor (gradebook) {
@@ -30,7 +31,8 @@ export default class ColumnHeaderRenderer {
       assignment_group: new AssignmentGroupColumnHeaderRenderer(gradebook),
       custom_column: new CustomColumnHeaderRenderer(gradebook),
       student: new StudentColumnHeaderRenderer(gradebook),
-      total_grade: new TotalGradeColumnHeaderRenderer(gradebook)
+      total_grade: new TotalGradeColumnHeaderRenderer(gradebook),
+      total_grade_override: new TotalGradeOverrideColumnHeaderRenderer(gradebook)
     };
   }
 

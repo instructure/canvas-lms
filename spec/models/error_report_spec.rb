@@ -25,7 +25,8 @@ describe ErrorReport do
       message << 255.chr
       message << "llo"
       data = { extra: { message: message } }
-      described_class.log_exception_from_canvas_errors('my error', data)
+      expect { described_class.log_exception_from_canvas_errors('my error', data) }.
+        to_not raise_error
     end
 
     it "uses an empty hash as a default for errors with no extra data" do

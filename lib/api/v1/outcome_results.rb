@@ -60,7 +60,7 @@ module Api::V1::OutcomeResults
   # Public: Serializes outcomes in a hash that can be added to the linked hash.
   #
   # Returns a Hash containing serialized outcomes.
-  def outcome_results_include_outcomes_json(outcomes)
+  def outcome_results_include_outcomes_json(outcomes, percents = {})
     alignment_asset_string_map = {}
     outcomes.each_slice(50).each do |outcomes_slice|
       ActiveRecord::Associations::Preloader.new.preload(outcomes_slice, [:context])
@@ -74,7 +74,10 @@ module Api::V1::OutcomeResults
       assessed_outcomes += LearningOutcomeResult.distinct.where(learning_outcome_id: outcome_ids).pluck(:learning_outcome_id)
     end
     outcomes.map do |o|
-      hash = outcome_json(o, @current_user, session, assessed_outcomes: assessed_outcomes)
+      hash = outcome_json(o,
+        @current_user, session,
+        assessed_outcomes: assessed_outcomes,
+        rating_percents: percents[o.id])
       hash.merge!(alignments: alignment_asset_string_map[o.id])
       hash
     end

@@ -80,7 +80,7 @@ class GradingStandard < ActiveRecord::Base
   def ordered_scheme
     # Convert to BigDecimal so we don't get weird float behavior: 0.545 * 100 (gives 54.50000000000001 with floats)
     @ordered_scheme ||= grading_scheme.to_a.
-        map { |grade_letter, percent| [grade_letter, BigDecimal.new(percent.to_s)] }.
+        map { |grade_letter, percent| [grade_letter, BigDecimal(percent.to_s)] }.
         sort_by { |_, percent| -percent }
   end
 
@@ -120,8 +120,19 @@ class GradingStandard < ActiveRecord::Base
     score = 0 if score < 0
     # assign the highest grade whose min cutoff is less than the score
     # if score is less than all scheme cutoffs, assign the lowest grade
-    score = BigDecimal.new(score.to_s) # Cast this to a BigDecimal too or comparisons get wonky
+    score = BigDecimal(score.to_s) # Cast this to a BigDecimal too or comparisons get wonky
     ordered_scheme.max_by {|_, lower_bound| score >= lower_bound * 100 ? lower_bound : -lower_bound }[0]
+  end
+
+  def lower_bound(score)
+    best_index = 0
+    grading_standard_data = data.reverse
+
+    grading_standard_data.each_with_index do |grade_bracket, index|
+      best_index = index if score >= grade_bracket[1] * 100
+    end
+
+    grading_standard_data[best_index][1] * 100
   end
 
   def data=(new_val)

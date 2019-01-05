@@ -658,7 +658,7 @@ class AccountsController < ApplicationController
     @courses = Api.paginate(@courses, self, api_v1_account_courses_url, page_opts)
 
     ActiveRecord::Associations::Preloader.new.preload(@courses, [:account, :root_account, course_account_associations: :account])
-    ActiveRecord::Associations::Preloader.new.preload(@courses, [:teachers]) if includes.include?("teachers")
+    preload_teachers(@courses) if includes.include?("teachers")
     ActiveRecord::Associations::Preloader.new.preload(@courses, [:enrollment_term]) if includes.include?("term")
 
     if includes.include?("total_students")
@@ -1105,7 +1105,7 @@ class AccountsController < ApplicationController
     associated_courses = associated_courses.for_term(@term) if @term
     @associated_courses_count = associated_courses.count
     @hide_enrollmentless_courses = params[:hide_enrollmentless_courses] == "1"
-    @only_master_courses = (params[:only_master_courses] == "1") && master_courses?
+    @only_master_courses = (params[:only_master_courses] == "1")
     @courses_sort_orders = [
       {
         key: "name_asc",
@@ -1251,13 +1251,11 @@ class AccountsController < ApplicationController
   def build_course_stats
     courses_to_fetch_users_for = @courses
 
-    if master_courses?
-      templates = MasterCourses::MasterTemplate.active.for_full_course.where(:course_id => @courses).to_a
-      if templates.any?
-        MasterCourses::MasterTemplate.preload_index_data(templates)
-        @master_template_index = templates.index_by(&:course_id)
-        courses_to_fetch_users_for = courses_to_fetch_users_for.reject{|c| @master_template_index[c.id]} # don't fetch the counts for the master/blueprint courses
-      end
+    templates = MasterCourses::MasterTemplate.active.for_full_course.where(:course_id => @courses).to_a
+    if templates.any?
+      MasterCourses::MasterTemplate.preload_index_data(templates)
+      @master_template_index = templates.index_by(&:course_id)
+      courses_to_fetch_users_for = courses_to_fetch_users_for.reject{|c| @master_template_index[c.id]} # don't fetch the counts for the master/blueprint courses
     end
 
     teachers = TeacherEnrollment.for_courses_with_user_name(courses_to_fetch_users_for).where.not(:enrollments => {:workflow_state => %w{rejected deleted}})

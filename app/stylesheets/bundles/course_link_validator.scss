@@ -21,12 +21,16 @@
 #link_validator_wrapper {
   margin: 20px 0;
   .alert {
-    max-width: 15%;
+    display: inline-block;
+    padding: 12px;
     margin-top: 20px;
   }
 
   .result {
     margin: 20px 10px;
+    h2 {
+      line-height: 80%;
+    }
   }
 
   .Button {

@@ -34,6 +34,7 @@ class Version::Partitioner
 
         log 'Done. Bye!'
         log '*' * 80
+        ActiveRecord::Base.connection_pool.current_pool.disconnect! unless Rails.env.test?
       end
     end
   end

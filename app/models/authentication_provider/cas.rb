@@ -33,7 +33,7 @@ class AuthenticationProvider::CAS < AuthenticationProvider::Delegated
   end
 
   def self.supports_debugging?
-    true
+    debugging_enabled?
   end
 
   def self.debugging_sections

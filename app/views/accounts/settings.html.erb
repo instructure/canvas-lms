@@ -74,6 +74,9 @@
     <% if can_do(@context, @current_user, :manage_feature_flags) %>
       <li><a href="#tab-features" id="tab-features-link"><%= t(:feature_options, "Feature Options") %></a></li>
     <% end %>
+    <% if @account.feature_enabled?(:javascript_csp) && can_do(@context, @current_user, :manage_account_settings) && @account.root_account? && !@account.site_admin? %>
+      <li><a href="#tab-security" id="tab-security-link"><%= t("Security") %></a></li>
+    <% end %>
   </ul>
   <% if can_do(@context, @current_user, :manage_account_settings) %>
     <div id="tab-settings">
@@ -1195,5 +1198,8 @@ acknowledge that you have read and agreed to the
   <% end %>
   <% if can_do(@context, @current_user, :manage_feature_flags) %>
     <div id="tab-features"></div>
+  <% end %>
+  <% if @account.feature_enabled?(:javascript_csp) && can_do(@context, @current_user, :manage_account_settings) && @account.root_account? && !@account.site_admin? %>
+    <div id="tab-security"></div>
   <% end %>
 </div>

@@ -764,6 +764,13 @@ class GradebooksController < ApplicationController
     end
   end
 
+  def final_grade_overrides
+    return unless authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
+
+    final_grade_overrides = ::Gradebook::FinalGradeOverrides.new(@context, @current_user)
+    render json: { final_grade_overrides: final_grade_overrides.to_h }
+  end
+
   def user_ids
     return unless authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
 
@@ -813,11 +820,12 @@ class GradebooksController < ApplicationController
     {
       GRADEBOOK_OPTIONS: {
         colors: gradebook_settings.fetch(:colors, {}),
+        final_grade_override_enabled: @context.feature_enabled?(:final_grades_override),
         graded_late_submissions_exist: graded_late_submissions_exist,
-        grading_schemes: GradingStandard.for(@context).as_json(include_root: false),
         gradezilla: true,
-        new_gradebook_development_enabled: new_gradebook_development_enabled?,
-        late_policy: @context.late_policy.as_json(include_root: false)
+        grading_schemes: GradingStandard.for(@context).as_json(include_root: false),
+        late_policy: @context.late_policy.as_json(include_root: false),
+        new_gradebook_development_enabled: new_gradebook_development_enabled?
       }
     }
   end

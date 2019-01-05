@@ -27,10 +27,10 @@ describe 'Final Grade Override' do
   include_context 'in-process server selenium tests'
 
   before(:once) do
-    skip('Unskip in GRADE-1584')
+    skip('Unskip in GRADE-1867')
     course_with_teacher(course_name: "Grade Override", active_course: true,active_enrollment: true,name: "Teacher Boss1",active_user: true)
     @students = create_users_in_course(@course, 5, return_type: :record, name_prefix: "Purple")
-    # TODO: @course.account.enable_feature!()
+    Account.default.enable_feature!(:final_grades_override)
 
     # create moderated assignment with teacher4 as final grader
     @assignment = @course.assignments.create!(
@@ -55,25 +55,26 @@ describe 'Final Grade Override' do
     MainSettings::Controls.click_update_button
   end
 
-  it 'display override column in Gradezilla', priority: '1', test_id: 3682130 do
-    skip('Unskip in GRADE-80')
+  it 'display override column in new gradebook', priority: '1', test_id: 3682130 do
+    skip('Unskip in GRADE-1867')
     # TODO: verify new column on NG
     expect(f(".slick-header-column[title='Override']")).to be_displayed
   end
 
-  it 'display override area in SRGB', priority: '1', test_id: 3682130 do
+  it 'display override area in individual gradebook', priority: '1', test_id: 3682130 do
     skip('Unskip in GRADE-81')
-    # TODO: verify new area in SRGB
+    # TODO: verify new area in individual gradebook
   end
 
   context 'with overriden grade' do
     before(:each) do
+      skip('Unskip in GRADE-1688')
       # TODO: override grade
       Gradezilla::Cells.edit_override(@students.first, 5)
     end
 
     it 'saves overriden grade in Gradezilla', priority: '1', test_id: 3682131 do
-      skip('Unskip in GRADE-80')
+      skip('Unskip in GRADE-1688')
       Gradezilla.visit(@course)
       # TODO: displays on NG
       expect(Gradezilla::Cells.get_override_grade(@students.first)).to equal 5

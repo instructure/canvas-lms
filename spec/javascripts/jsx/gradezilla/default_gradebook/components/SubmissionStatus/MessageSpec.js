@@ -28,7 +28,7 @@ QUnit.module('Message', () => {
     test('includes IconWarningLine with message', () => {
       const message = 'Some Message'
       const wrapper = shallow(<Message variant="warning" message={message} />)
-      strictEqual(wrapper.containsMatchingElement(<IconWarningLine title={message} />), true)
+      strictEqual(wrapper.containsMatchingElement(<IconWarningLine />), true)
     })
 
     test('includes a text message', () => {
@@ -42,7 +42,7 @@ QUnit.module('Message', () => {
     test('includes IconWarningLine with message', () => {
       const message = 'Some Message'
       const wrapper = shallow(<Message variant="info" message={message} />)
-      strictEqual(wrapper.containsMatchingElement(<IconInfoLine title={message} />), true)
+      strictEqual(wrapper.containsMatchingElement(<IconInfoLine />), true)
     })
 
     test('includes a text message', () => {

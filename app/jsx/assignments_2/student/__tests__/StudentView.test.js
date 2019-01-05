@@ -18,8 +18,27 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
-
+import {mockAssignment} from '../test-utils'
+import {MockedProvider} from 'react-apollo/test-utils'
 import StudentView from '../StudentView'
+import {STUDENT_VIEW_QUERY} from '../assignmentData'
+import wait from 'waait'
+
+const mocks = [
+  {
+    request: {
+      query: STUDENT_VIEW_QUERY,
+      variables: {
+        assignmentLid: '7'
+      }
+    },
+    result: {
+      data: {
+        assignment: mockAssignment()
+      }
+    }
+  }
+]
 
 beforeAll(() => {
   const found = document.getElementById('fixtures')
@@ -28,16 +47,26 @@ beforeAll(() => {
     fixtures.setAttribute('id', 'fixtures')
     document.body.appendChild(fixtures)
   }
+  global.ENV = {}
+  global.ENV.context_asset_string = 'course_1'
+})
+
+afterAll(() => {
+  global.ENV = null
 })
 
 afterEach(() => {
   ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
 })
 
-jest.mock('timezone')
-
-it('renders normally', () => {
-  ReactDOM.render(<StudentView />, document.getElementById('fixtures'))
+it('renders normally', async () => {
+  ReactDOM.render(
+    <MockedProvider mocks={mocks} removeTypename addTypename>
+      <StudentView assignmentLid="7" />
+    </MockedProvider>,
+    document.getElementById('fixtures')
+  )
+  await wait(0) // wait for response
   const element = $('[data-test-id="assignments-2-student-view"]')
   expect(element).toHaveLength(1)
 })

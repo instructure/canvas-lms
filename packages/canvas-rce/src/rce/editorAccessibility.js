@@ -67,6 +67,9 @@ export default function accessibleEditor(editor, docContext) {
       "title",
       htmlEscape(formatMessage("Rich Text Area. Press ALT+F8 for help"))
     );
+    const label = docContext.querySelector(`label[for="${editor.id}"]`);
+    if (label)
+      this.find("editorIframe").contentWindow.document.body.setAttribute("aria-label", label.textContent);
   };
 
   // Hide the menubar until ALT+F9 is pressed.

@@ -5,12 +5,23 @@
 {{!-- Navigation --}}
 
 <header class="Sg-header">
+  <div class="Sg-header__Alert">
+    <div class="ic-flash-warning">
+      <div class="ic-flash__icon" aria-hidden="true">
+        <i class="icon-warning"></i>
+      </div>
+      This page is deprecated.
+      <a target="_blank" href="https://community.canvaslms.com/community/ideas/blog/2018/11/16/instui-instructure-s-style-guide-20">
+        Learn More
+      </a>
+    </div>
+  </div>
   <nav class="Sg-header__Navigation">
       <a href="#" data-sg-category="Sg-Navigation--Style" class="Sg-header__Navigation-item ">Style</a>
       <a href="#" data-sg-category="Sg-Navigation--Scaffold" class="Sg-header__Navigation-item">Scaffold</a>
       <a href="#" data-sg-category="Sg-Navigation--Components" class="Sg-header__Navigation-item active">Components</a>
       <a href="#" data-sg-category="Sg-Navigation--Patterns" class="Sg-header__Navigation-item">Patterns</a>
-  </nav>  
+  </nav>
   <nav class="Sg-header__Subnavigation">
     <section class="Sg-Navigation--Components">
       <a class="Sg-header__Subnavigation-item" href="#accordion">Accordion</a>
@@ -22,7 +33,7 @@
       <a class="Sg-header__Subnavigation-item" href="#item_groups_condensed">Item Groups Condensed</a>
       <a class="Sg-header__Subnavigation-item" href="#modal_dialog">Modals</a>
       <a class="Sg-header__Subnavigation-item" href="#tab_navigation">Tabs</a>
-    </section>  
+    </section>
     <section class="Sg-Navigation--Scaffold isHidden">
       <a class="Sg-header__Subnavigation-item" href="#forms">Forms</a>
       <a class="Sg-header__Subnavigation-item" href="#grid">Grid</a>
@@ -38,7 +49,7 @@
       <a class="Sg-header__Subnavigation-item" href="#highlights/alerts">Alerts</a>
       <a class="Sg-header__Subnavigation-item" href="#spacing">Spacing</a>
       <a class="Sg-header__Subnavigation-item" href="#border_classes">Borders</a>
-    </section>    
+    </section>
     <section class="Sg-Navigation--Patterns isHidden">
       <a class="Sg-header__Subnavigation-item" href="#header_bar">Header Bar</a>
       <a class="Sg-header__Subnavigation-item" href="#pills">Pills</a>
@@ -46,24 +57,24 @@
       <a class="Sg-header__Subnavigation-item" href="#progress_bar">Progress Bar</a>
       <a class="Sg-header__Subnavigation-item" href="#publish_state">Publish State</a>
     </section>
-  </nav>  
+  </nav>
 </header>
 
 {{!-- Code Examples --}}
 
 <div class="Sg-Container">
-  <div class="Sg-Main">       
+  <div class="Sg-Main">
     {{#docs}}
       <section class="Sg-Section {{id}}" style="position: relative;">
-        <div class="Sg-Content">  
+        <div class="Sg-Content">
           <span id="{{id}}" class="Sg-Anchor"></span>
-          <h1>{{component}}</h1>   
-          
+          <h1>{{component}}</h1>
+
           <div class="sg-src-file-path">{{file}}</div>
           <div class="grid-row">
             <div class="col-xs-10 off-xs-1">
               <article class="Sg-Article">
-                {{{prose}}}  
+                {{{prose}}}
               </article>
             </div>
           </div>

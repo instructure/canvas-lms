@@ -49,6 +49,7 @@ RSpec.describe GradebookSettingsController, type: :controller do
           "show_inactive_enrollments" => "true", # values must be strings
           "show_concluded_enrollments" => "false",
           "show_unpublished_assignments" => "true",
+          "show_final_grade_overrides" => "false",
           "student_column_display_as" => "last_first",
           "student_column_secondary_info" => "login_id",
           "sort_rows_by_column_id" => "student",

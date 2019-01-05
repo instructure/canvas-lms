@@ -9,6 +9,7 @@ export ERROR_CONTEXT_BASE_PATH="`pwd`/log/spec_failures/Initial"
 
 max_failures=${RERUNS:=200}
 rerun_number=0
+crash_num=0
 runs_remaining=$((1+${RERUNS_RETRY:=3}))
 spec_list=${SPEC_FILES:=spec}
 
@@ -70,6 +71,12 @@ while true; do
   num_failures=${#new_spec_list[@]}
 
   [[ $last_status == 0 ]] && break
+  if [[ $last_status == 98 ]] && [[ $crash_num == 0 ]]; then
+    echo "a worker may have crashed, retrying the run once"
+    crash_num=1
+    runs_remaining=$((runs_remaining+1))
+  fi
+
   [[ $runs_remaining == 0 ]] && { echo "reruns failed $num_failures failure(s)"; break; }
   export ERROR_CONTEXT_BASE_PATH="`pwd`/log/spec_failures/Rerun $rerun_number"
 
@@ -86,17 +93,20 @@ while true; do
   fi
 
   [[ $num_failures == 0 ]] && { echo "nothing to re-run! perhaps the code is horribly broken? :("; break; }
-  [[ $last_status != 99 ]] && { echo "unexpected exit code $last_status! perhaps the code is horribly broken? :("; break; }
+  [[ $last_status == 98 ]] && [[ $crash_num > 0 ]] && { echo "a worker may have crashed during retry, exiting"; break; }
+  [[ $last_status != 99 ]] && [[ $last_status != 98 ]] && { echo "unexpected exit code $last_status! perhaps the code is horribly broken? :("; break; }
 
-  spec_list="${new_spec_list[@]}"
+  if [[ $last_status == 99 ]]; then
+    spec_list="${new_spec_list[@]}"
+    echo -e "failed, re-trying $num_failures failure(s) ($failures_towards_rerun_threshold against threshold), $runs_remaining attempt(s) left\n\n\n"
 
-  echo -e "failed, re-trying $num_failures failure(s) ($failures_towards_rerun_threshold against threshold), $runs_remaining attempt(s) left\n\n\n"
-  if [[ ! $reruns_started ]]; then
-    reruns_started=1
-    echo "[rspec-queue:reruns] STARTING"
-    unset TEST_QUEUE_REPLACE_STATS # ensure the rerun stats merge into the main ones
-    # not many files, and we want to maximize cores for actual workers on this node (since we won't relay)
-    export TEST_QUEUE_NUM_LAZY_LOADERS=1
+    if [[ ! $reruns_started ]]; then
+      reruns_started=1
+      echo "[rspec-queue:reruns] STARTING"
+      unset TEST_QUEUE_REPLACE_STATS # ensure the rerun stats merge into the main ones
+      # not many files, and we want to maximize cores for actual workers on this node (since we won't relay)
+      export TEST_QUEUE_NUM_LAZY_LOADERS=1
+    fi
   fi
 done
 

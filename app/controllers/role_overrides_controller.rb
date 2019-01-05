@@ -297,6 +297,7 @@ class RoleOverridesController < ApplicationController
   #     send_messages                    -- [STADo] Conversations - send messages to individual course members
   #     send_messages_all                -- [sTADo] Conversations - send messages to entire class
   #     view_all_grades                  -- [ TAd ] Grades - view all grades
+  #     view_audit_trail                 -- [ t   ] Grades - view audit trail
   #     view_group_pages                 -- [sTADo] Groups - view all student groups
   #     view_user_logins                 -- [ TA  ] Users - view login IDs
   #

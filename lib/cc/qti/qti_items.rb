@@ -357,8 +357,8 @@ module CC
                   or_node.varequal exact, :respident => 'response1'
                   unless answer['margin'].blank?
                     or_node.and do |and_node|
-                      exact = BigDecimal.new(answer['exact'].to_s)
-                      margin = BigDecimal.new(answer['margin'].to_s)
+                      exact = BigDecimal(answer['exact'].to_s)
+                      margin = BigDecimal(answer['margin'].to_s)
                       and_node.vargte((exact - margin).to_f, :respident => 'response1')
                       and_node.varlte((exact + margin).to_f, :respident => 'response1')
                     end

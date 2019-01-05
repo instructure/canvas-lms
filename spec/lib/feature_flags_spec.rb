@@ -35,7 +35,8 @@ describe FeatureFlags do
       'root_opt_in_feature' => Feature.new(feature: 'root_opt_in_feature', applies_to: 'Course', state: 'allowed', root_opt_in: true),
       'hidden_feature' => Feature.new(feature: 'hidden_feature', applies_to: 'Course', state: 'hidden'),
       'hidden_root_opt_in_feature' => Feature.new(feature: 'hidden_feature', applies_to: 'Course', state: 'hidden', root_opt_in: true),
-      'hidden_user_feature' => Feature.new(feature: 'hidden_user_feature', applies_to: 'User', state: 'hidden')
+      'hidden_user_feature' => Feature.new(feature: 'hidden_user_feature', applies_to: 'User', state: 'hidden'),
+      'disabled_feature' => Feature::DISABLED_FEATURE
   })
   end
 
@@ -59,8 +60,12 @@ describe FeatureFlags do
   end
 
   describe "lookup_feature_flag" do
-    it "should return nil if the feature isn't defined" do
-      expect(t_root_account.lookup_feature_flag('blah')).to be_nil
+    it "should raise an error if the feature isn't defined" do
+      expect { t_root_account.lookup_feature_flag('blah') }.to raise_error("no such feature - blah")
+    end
+
+    it "should return nil if the feature is currently disabled" do
+      expect(t_course.lookup_feature_flag('disabled_feature')).to be_nil
     end
 
     it "should return nil if the feature doesn't apply" do

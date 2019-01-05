@@ -19,11 +19,31 @@ import I18n from 'i18n!react_developer_keys'
 import PropTypes from 'prop-types'
 import React from 'react'
 
+import Button from '@instructure/ui-buttons/lib/components/Button'
 import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
 import FormFieldGroup from '@instructure/ui-forms/lib/components/FormFieldGroup'
+import IconLink from '@instructure/ui-icons/lib/Line/IconLink'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
 
 export default class CustomizationOption extends React.Component {
+  deepLinkingIcon() {
+    if (!this.props.deepLinking) {
+      return null
+    }
+
+    return(
+      <Tooltip
+        tip={I18n.t('Tool supports Deep Linking at this placement')}
+        on={['click', 'hover', 'focus']}
+      >
+        <Button variant="icon" icon={IconLink}>
+          <ScreenReaderContent>{I18n.t('toggle tooltip')}</ScreenReaderContent>
+        </Button>
+      </Tooltip>
+    )
+  }
+
   toggle() {
     return (
       <FormFieldGroup
@@ -45,7 +65,10 @@ export default class CustomizationOption extends React.Component {
   render() {
     return (
       <tr>
-        <td>{this.props.label}</td>
+        <td>
+          {this.props.label}
+          {this.deepLinkingIcon()}
+        </td>
         <td style={{width: '25%'}}>{this.toggle()}</td>
       </tr>
     )
@@ -56,5 +79,6 @@ CustomizationOption.propTypes = {
   name: PropTypes.string.isRequired,
   label: PropTypes.string.isRequired,
   onChange: PropTypes.func.isRequired,
-  checked: PropTypes.bool.isRequired
+  checked: PropTypes.bool.isRequired,
+  deepLinking: PropTypes.bool.isRequired
 }

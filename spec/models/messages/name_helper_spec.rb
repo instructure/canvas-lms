@@ -24,9 +24,14 @@ module Messages
     let(:author){ double("Author", short_name: "Author Name") }
     let(:user){ double("User", short_name: "User Name") }
     let(:asset){ double("Asset", user: user, author: author) }
+    let(:message_recipient) { double(:user) }
 
     def asset_for(notification_name, a = asset)
-      NameHelper.new(a, notification_name)
+      NameHelper.new(
+        asset: a,
+        message_recipient: message_recipient,
+        notification_name: notification_name
+      )
     end
 
     describe '#reply_to_name' do
@@ -60,9 +65,30 @@ module Messages
         expect(asset_for("Assignment Resubmitted").from_name).to eq "User Name"
       end
 
-      it 'returns Anonymous User' do
-        asset2 = double("Asset", user: user, author: author, recipient: user, can_read_author?: false)
+      it 'returns Anonymous User when the user is not allowed to read the author' do
+        assignment = double(:assignment, anonymize_students?: false)
+        submission = double(:submission, assignment: assignment)
+        asset2 = double(:asset, author: author, recipient: user, submission: submission, can_read_author?: false)
         expect(asset_for("Submission Comment", asset2).from_name).to eq "Anonymous User"
+      end
+
+      it "returns Anonymous User when the assignment is anonymous and muted" do
+        assignment = double(:assignment, anonymize_students?: true)
+        submission = double(:submission, assignment: assignment)
+        asset2 = double(:asset, author: author, recipient: user, submission: submission)
+        expect(asset_for("Submission Comment For Teacher", asset2).from_name).to eq "Anonymous User"
+      end
+
+      it "returns the author's name when the message recipient is the author" do
+        assignment = double(:assignment, anonymize_students?: true)
+        submission = double(:submission, assignment: assignment)
+        asset2 = double(:asset, author: author, submission: submission, can_read_author?: true)
+        from_name = NameHelper.new(
+          asset: asset2,
+          message_recipient: author,
+          notification_name: "Submission Comment"
+        ).from_name
+        expect(from_name).to eq "Author Name"
       end
     end
   end

@@ -21,6 +21,11 @@ module.exports = {
     '^.+\\.(js)$': 'babel-jest',
     '^.+\\.(css)$': '<rootDir>/jest-themeable-styles'
   },
+  reporters: [ "default", ["jest-junit", {
+    suiteName: 'Canvas Planner Jest Tests',
+    outputDirectory: './coverage',
+    outputName: 'canvas-planner-junit.xml'
+  }] ],
   snapshotSerializers: [
     'enzyme-to-json/serializer'
   ],

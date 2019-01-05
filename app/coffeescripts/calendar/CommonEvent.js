@@ -141,6 +141,15 @@ Object.assign(CommonEvent.prototype, {
     )
   },
 
+  isDueStrictlyAtMidnight() {
+    return (
+      this.start &&
+      (this.midnightFudged ||
+        (this.start.hours() === 23 && this.start.minutes() > 59) ||
+        (this.start.hours() === 0 && this.start.minutes() === 0))
+    )
+  },
+
   isPast() {
     return this.start && this.start < fcUtil.now()
   },

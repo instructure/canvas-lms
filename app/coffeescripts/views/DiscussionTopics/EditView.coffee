@@ -43,6 +43,7 @@ define [
   'jsx/due_dates/DueDateCalendarPicker'
   '../../util/SisValidationHelper'
   'jsx/assignments/AssignmentExternalTools'
+  '../../../jsx/shared/helpers/returnToHelper'
 ], (
     I18n,
     ValidatedFormView,
@@ -70,7 +71,8 @@ define [
     numberHelper,
     DueDateCalendarPicker,
     SisValidationHelper,
-    AssignmentExternalTools) ->
+    AssignmentExternalTools,
+    returnToHelper) ->
 
   RichContentEditor.preloadRemoteModule()
 
@@ -142,7 +144,7 @@ define [
       window.location = @locationAfterSave(deparam())
 
     locationAfterSave: (params) =>
-      if params['return_to']
+      if returnToHelper.isValid(params['return_to'])
         params['return_to']
       else
         @model.get 'html_url'
@@ -152,7 +154,7 @@ define [
       window.location = location if location
 
     locationAfterCancel: (params) =>
-      return params['return_to'] if params['return_to']?
+      return params['return_to'] if returnToHelper.isValid(params['return_to'])
       return ENV.CANCEL_TO if ENV.CANCEL_TO?
       null
 

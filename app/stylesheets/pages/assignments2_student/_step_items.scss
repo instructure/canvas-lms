@@ -1,0 +1,142 @@
+/*
+ * Copyright (C) 2018 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+@keyframes pulse {
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.step-item-step {
+  display: block;
+}
+
+.step-item-label {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25;
+}
+
+.pinLayout {
+  display: flex;
+  align-items: center;
+}
+
+.step-item-pin {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #8B969E;
+  border-radius: 100%;
+  position: relative;
+}
+
+.complete {
+  .step-item-pin {
+    font-size: 0.75rem; /* sets the icon size bc we need smaller than theme can provide */
+    background: #00AC18;
+  }
+}
+.unavailable {
+  .step-item-label {
+    font-weight: 700;
+  }
+  .step-item-pin {
+    border-color:#e52209;
+    border-style: solid;
+    border-width: 2px;
+    background: #ffffff;
+  }
+}
+
+.in-progress {
+  .step-item-label {
+    font-weight: 700;
+    color: #2D3B45;
+  }
+
+  .step-item-pin {
+    background: #FFFFFF;
+    border: 0.125rem solid #00AC18;
+
+    /* if pin is complete, it pulses - should we make this an opt-in prop? */
+    position: relative;
+
+    &::before {
+      content: "";
+      box-sizing: border-box;
+      position: absolute;
+      top: -0.5rem;
+      bottom: -0.5rem;
+      left: -0.5rem; /* stylelint-disable-line property-blacklist */
+      right: -0.5rem; /* stylelint-disable-line property-blacklist */
+      border-width: 0.125rem;
+      border-style: solid;
+      border-color: #00AC18;
+      border-radius: 100%;
+
+      /* set initial properties to animate in the pulse animation */
+      opacity: 0;
+      transform: scale(0.5);
+
+      /* animation */
+      animation-name: pulse;
+      animation-duration: 2s;
+      animation-iteration-count: infinite;
+      animation-direction: alternate;
+      animation-timing-function: ease-out;
+    }
+  }
+}
+
+
+.placement--first {
+  .pinLayout {
+    justify-content: flex-start;
+  }
+
+  .step-item-label {
+    text-align: start;
+  }
+}
+
+.placement--last {
+  .pinLayout {
+    justify-content: flex-end;
+  }
+
+  .step-item-label {
+    text-align: end;
+  }
+}
+
+.placement--interior {
+  .pinLayout {
+    justify-content: center;
+  }
+
+  .step-item-label {
+    text-align: center;
+    margin-inline-start: auto;
+    margin-inline-end: auto;
+    max-width: 50%; /* makes all text labels equal width (first and last are reduced by flex: 0.5 rule above) */
+  }
+}

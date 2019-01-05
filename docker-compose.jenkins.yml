@@ -44,5 +44,17 @@ services:
       - pg_data:/volumes/postgres_data
       - cassandra_data:/volumes/cassandra_data
 
+  canvasrceapi:
+    image: starlord.inscloudgate.net/tmcknight/canvas-rce-api-http
+    environment:
+      ECOSYSTEM_KEY: "astringthatisactually32byteslong"
+      ECOSYSTEM_SECRET: "astringthatisactually32byteslong"
+      NODE_ENV: production
+      PASSENGER_MIN_INSTANCES: 2
+      PASSENGER_MAX_POOL_SIZE: 6
+      NGINX_WORKER_CONNECTIONS: 2048
+    ports:
+      - "${RCE_API_PORT}:80"
+
 volumes:
   cassandra_data: {}

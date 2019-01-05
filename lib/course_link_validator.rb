@@ -40,7 +40,7 @@ class CourseLinkValidator
   def self.process(progress)
     validator = self.new(progress.context)
     validator.check_course(progress)
-    progress.set_results({:issues => validator.issues, :completed_at => Time.now.utc})
+    progress.set_results({:issues => validator.issues, :completed_at => Time.now.utc, :version => 2})
   rescue
     report_id = Canvas::Errors.capture_exception(:course_link_validation, $ERROR_INFO)[:error_report]
     progress.workflow_state = 'failed'
@@ -60,6 +60,16 @@ class CourseLinkValidator
   # ****************************************************************
   # this is where the magic happens
   def check_course(progress)
+    # Course card image
+    if self.course.image_url.present?
+      find_invalid_link(self.course.image_url) do |link|
+        self.issues << {:name => I18n.t("Course Card Image"), :type => :course_card_image,
+                   :content_url => "/courses/#{self.course.id}/settings",
+                   :invalid_links => [link.merge(:image => true)]}
+      end
+      progress.update_completion! 1
+    end
+
     # Syllabus
     find_invalid_links(self.course.syllabus_body) do |links|
       self.issues << {:name => I18n.t(:syllabus, "Course Syllabus"), :type => :syllabus,
@@ -103,12 +113,17 @@ class CourseLinkValidator
     progress.update_completion! 55
 
     # External URL Module items (almost forgot about these)
-    self.course.context_module_tags.not_deleted.where(:content_type => "ExternalUrl").each do |ct|
+    invalid_module_links = {}
+    self.course.context_module_tags.not_deleted.where(:content_type => "ExternalUrl").preload(:context_module).each do |ct|
       find_invalid_link(ct.url) do |invalid_link|
-        self.issues << {:name => ct.title, :type => :module_item,
-                   :content_url => "/courses/#{self.course.id}/modules"}.merge(:invalid_links => [invalid_link])
+        (invalid_module_links[ct.context_module] ||= []) << invalid_link.merge(:link_text => ct.title)
       end
     end
+    invalid_module_links.each do |mod, invalid_module_links|
+      self.issues << {:name => mod.name, :type => :module,
+                 :content_url => "/courses/#{self.course.id}/modules#module_#{mod.id}"}.merge(:invalid_links => invalid_module_links)
+    end
+
     progress.update_completion! 65
 
     # Quizzes
@@ -180,6 +195,9 @@ class CourseLinkValidator
         end
 
         find_invalid_link(url) do |invalid_link|
+          link_text = node.text.presence
+          invalid_link[:link_text] = link_text if link_text
+          invalid_link[:image] = true if node.name == 'img'
           links << invalid_link
         end
       end
@@ -252,7 +270,7 @@ class CourseLinkValidator
     when /\/courses\/\d+\/file_contents\/(.*)/
       rel_path = CGI.unescape($1)
       unless (att = Folder.find_attachment_in_context_with_path(self.course, rel_path)) && !att.deleted?
-        result = :missing_file
+        result = :missing_item
       end
     when /\/courses\/\d+\/(pages|wiki)\/([^\s"<'\?\/#]*)/
       if obj = self.course.wiki.find_page(CGI.unescape($2))
@@ -289,10 +307,20 @@ class CourseLinkValidator
 
   # ping the url and make sure we get a 200
   def reachable_url?(url)
+    @unavailable_photo_redirect_pattern ||= Regexp.new(Setting.get('unavailable_photo_redirect_pattern', 'yimg\.com/.+/photo_unavailable.png$'))
+    redirect_proc = lambda do |response|
+      # flickr does a redirect to this file when a photo is deleted/not found;
+      # treat this as a broken image instead of following the redirect
+      url = response['Location']
+      raise RuntimeError("photo unavailable") if url =~ @unavailable_photo_redirect_pattern
+    end
+
     begin
-      response = CanvasHttp.head(url, { "Accept-Encoding" => "gzip" }, redirect_limit: 9)
+      response = CanvasHttp.head(url, { "Accept-Encoding" => "gzip" }, redirect_limit: 9, redirect_spy: redirect_proc)
       if %w{404 405}.include?(response.code)
-        response = CanvasHttp.get(url, { "Accept-Encoding" => "gzip" }, redirect_limit: 9)
+        response = CanvasHttp.get(url, { "Accept-Encoding" => "gzip" }, redirect_limit: 9, redirect_spy: redirect_proc) do
+          # don't read the response body
+        end
       end
 
       case response.code

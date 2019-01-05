@@ -34,17 +34,17 @@ export default class ValidatorResults extends React.Component {
 
   getDisplayMessage = number =>
     I18n.t(
-      {one: 'Found 1 unresponsive link', other: 'Found %{count} unresponsive links'},
+      {one: 'Found 1 broken link', other: 'Found %{count} broken links'},
       {count: number}
     )
 
   render() {
-    let allResults = [],
-      alertMessage,
+    let alertMessage,
       numberofBrokenLinks = 0,
-      errorMessage = I18n.t('An error occured. Please try again.'),
-      noBrokenLinksMessage = I18n.t('No unresponsive links found'),
       showUnpublishedBox
+    const allResults = [],
+      errorMessage = I18n.t('An error occured. Please try again.'),
+      noBrokenLinksMessage = I18n.t('No broken links found')
 
     if (this.props.error) {
       alertMessage = <div className="alert alert-error">{errorMessage}</div>
@@ -75,7 +75,7 @@ export default class ValidatorResults extends React.Component {
           const new_result = _.clone(result)
           new_result.invalid_links = _.filter(
             result.invalid_links,
-            link => link.reason != 'unpublished_item'
+            link => link.reason !== 'unpublished_item'
           )
           return new_result
         })
@@ -87,7 +87,7 @@ export default class ValidatorResults extends React.Component {
         $.screenReaderFlashMessage(noBrokenLinksMessage)
       } else {
         results.forEach(result => {
-          allResults.push(<ValidatorResultsRow result={result} />)
+          allResults.push(<ValidatorResultsRow key={result.content_url} result={result} />)
           numberofBrokenLinks += result.invalid_links.length
         })
 

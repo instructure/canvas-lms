@@ -1041,6 +1041,8 @@ describe Course do
       profile.save!
       @course.save!
       @course.reload
+      @course.update!(latest_outcome_import:
+        OutcomeImport.create!(context: @course))
 
       expect(@course.course_sections).not_to be_empty
       expect(@course.students).to eq [@student]

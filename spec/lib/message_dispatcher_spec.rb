@@ -72,8 +72,8 @@ describe 'MessageDispatcher' do
       # the original job is complete, but the individual message gets re-scheduled in its own job
       expect { job.reload }.to raise_error(ActiveRecord::RecordNotFound)
 
-      expect(job2.tag).to eq 'Message#deliver'
-      expect(job2.payload_object.object).to eq @messages[1]
+      expect(job2.tag).to eq 'Message::Queued#deliver'
+      expect(job2.payload_object.object.message).to eq @messages[1]
       expect(job2.run_at.to_i).to eq @messages[1].dispatch_at.to_i
     end
   end

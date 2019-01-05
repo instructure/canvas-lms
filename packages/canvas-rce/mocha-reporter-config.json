@@ -1,0 +1,8 @@
+{
+  "reporterEnabled": "mocha-junit-reporter, spec",
+  "mochaJunitReporterReporterOptions": {
+    "mochaFile": "coverage/canvas-rce-junit.xml",
+    "testsuitesTitle": "Canvas RCE Mocha Tests",
+    "rootSuiteTitle": "Canvas RCE Mocha Tests"
+  }
+}

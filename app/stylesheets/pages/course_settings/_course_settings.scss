@@ -339,6 +339,13 @@ ul.user_list div.enrollment_type.pending {
     line-height: 100%;
     margin-bottom: 10px;
   }
+  .top-hint {
+    margin-top: 10px;
+    margin-bottom: 5px;
+  }
+  .bottom-hint {
+    margin-bottom: 15px;
+  }
   select#course_locale + span {
     white-space: nowrap;
   }

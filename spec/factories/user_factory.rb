@@ -21,9 +21,7 @@ module Factories
     email = opts.delete(:email)
     @user = factory_with_protected_attributes(User, valid_user_attributes.merge(opts))
     @user.email = email if email # set e-mail after record creation
-    if @user.feature_enabled?(:new_user_tutorial_on_off) && !opts[:new_user]
-      @user.disable_feature!(:new_user_tutorial_on_off)
-    end
+    @user.enable_feature!(:new_user_tutorial_on_off) if opts[:new_user]
     @user
   end
 
@@ -65,9 +63,7 @@ module Factories
     end
     @user.update_attribute :workflow_state, opts[:user_state] if opts[:user_state]
     @cc = communication_channel(@user, opts) if opts[:active_cc]
-    if @user.feature_enabled?(:new_user_tutorial_on_off) && !opts[:new_user]
-      @user.disable_feature!(:new_user_tutorial_on_off)
-    end
+    @user.enable_feature!(:new_user_tutorial_on_off) if opts[:new_user]
     @user
   end
 

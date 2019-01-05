@@ -468,9 +468,11 @@ class MessageableUser
       group = group_or_id.is_a?(Group) ? group_or_id : Group.where(id: group_or_id).first
       return unless group
 
+      active_users_in_group_context = group.participating_users_in_context
+
       group.shard.activate do
         if options[:admin_context] || fully_visible_group_ids.include?(group.id)
-          group_user_scope(options).where('group_memberships.group_id' => group.id)
+          group_user_scope.merge(active_users_in_group_context.except(:joins))
         elsif section_visible_group_ids.include?(group.id)
           # group.context is guaranteed to be a course from
           # section_visible_courses at this point
@@ -478,7 +480,8 @@ class MessageableUser
           scope = enrollment_scope({ common_group_column: group.id }.merge(options)).where(
             "course_section_id IN (?) AND EXISTS (?)",
             visible_section_ids_in_courses([course]),
-            GroupMembership.where(group_id: group, workflow_state: 'accepted').where("user_id=users.id"))
+            GroupMembership.where(group_id: group, workflow_state: 'accepted').where("user_id=users.id").merge(active_users_in_group_context)
+          )
           scope = scope.where(observer_restriction_clause) if student_courses.present?
           scope
         end

@@ -23,7 +23,7 @@ import initialState from './initialState'
 
 const middleware = [
   // this is so redux-logger is not included in the production webpack bundle
-  (process.env.NODE_ENV !== 'production') && require('redux-logger')(),
+  (process.env.NODE_ENV !== 'production') && require('redux-logger').logger,
 
   ReduxThunk
 ].filter(Boolean)

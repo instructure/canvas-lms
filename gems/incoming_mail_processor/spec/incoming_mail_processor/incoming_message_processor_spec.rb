@@ -155,7 +155,7 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
 
     it "should convert another charset to UTF-8" do
       IncomingMessageProcessor.new(message_handler, error_reporter).process_single(Mail.new {
-          content_type 'text/plain; charset=Shift-JIS'
+          content_type 'text/plain; charset=Shift_JIS'
           body "\x83\x40".force_encoding(Encoding::BINARY)
         }, '')
 

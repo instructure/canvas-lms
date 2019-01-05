@@ -17,17 +17,19 @@
 #
 
 module Types
-  ModuleType = GraphQL::ObjectType.define do
-    name "Module"
+  class ModuleType < ApplicationObjectType
+    graphql_name "Module"
 
     implements GraphQL::Types::Relay::Node
-    interfaces [Interfaces::TimestampInterface]
+    implements Interfaces::TimestampInterface
+
+    alias module object
 
     global_id_field :id
-    field :_id, !types.ID, "legacy canvas id", property: :id
+    field :_id, ID, "legacy canvas id", null: false, method: :id
 
-    field :name, types.String
+    field :name, String, null: true
 
-    field :unlockAt, DateTimeType, property: :unlock_at
+    field :unlock_at, DateTimeType, null: true
   end
 end

@@ -168,9 +168,11 @@ export function orderItemsByTimeAndTitle (a, b) {
   // completed items are grouped at the bottom
   if (a.originallyCompleted && !b.originallyCompleted) return 1;
   if (!a.originallyCompleted && b.originallyCompleted) return -1;
-  // all day items are grouped at the top
-  if (a.allDay && !b.allDay) return -1;
-  if (!a.allDay && b.allDay) return 1;
+  // if we the same day, then group all day items at the top for those days
+  if (a.date.isSame(b.date, 'day')) {
+    if (a.allDay && !b.allDay) return -1;
+    if (!a.allDay && b.allDay) return 1;
+  }
   // the rest are sorted by time, then title
   if (a.date.valueOf() === b.date.valueOf()) {
     return a.title.localeCompare(b.title, locale, cmpopts);

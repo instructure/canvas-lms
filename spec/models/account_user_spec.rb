@@ -158,4 +158,30 @@ describe AccountUser do
       expect(au.grants_right?(@user, :create)).to be_falsey
     end
   end
+
+  describe "valid_role?" do
+    before :once do
+      @account = Account.default
+      @user = User.create!
+      @sub1 = @account.sub_accounts.create! name: 'sub1'
+      @sub1role = custom_account_role('sub1', :account => @sub1)
+      @sub1a = @sub1.sub_accounts.create! name: 'sub1a'
+      @sub2 = @account.sub_accounts.create! name: 'sub2'
+    end
+
+    it 'accepts a custom role in the account chain' do
+      au = AccountUser.create(user: @user, account: @sub1a, role: @sub1role)
+      expect(au).to be_valid
+    end
+
+    it 'rejects a custom role outside the account chain' do
+      au = AccountUser.create(user: @user, account: @sub2, role: @sub1role)
+      expect(au).not_to be_valid
+    end
+
+    it 'allows an invalid AccountUser to be deleted' do
+      au = AccountUser.create(user: @user, account: @sub2, role: @sub1role, workflow_state: 'deleted')
+      expect(au).to be_valid
+    end
+  end
 end

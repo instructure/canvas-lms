@@ -30,7 +30,7 @@ class AccountUser < ActiveRecord::Base
   after_save :update_account_associations_if_changed
   after_destroy :update_account_associations_later
 
-  validate :valid_role?
+  validate :valid_role?, :unless => :deleted?
 
   validates_presence_of :account_id, :user_id, :role_id
 

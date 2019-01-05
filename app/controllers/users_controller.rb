@@ -203,13 +203,13 @@ class UsersController < ApplicationController
     grading_period_id = generate_grading_period_id(params[:grading_period_id])
     opts = { grading_period_id: grading_period_id } if grading_period_id
 
-    grade_data = {
-      grade: enrollment.computed_current_score(opts),
-      hide_final_grades: enrollment.course.hide_final_grades?
-    }
+    grade_data = { hide_final_grades: enrollment.course.hide_final_grades? }
 
     if enrollment.course.grants_any_right?(@current_user, session, :manage_grades, :view_all_grades)
       grade_data[:unposted_grade] = enrollment.unposted_current_score(opts)
+      grade_data[:grade] = enrollment.computed_current_score(opts)
+    else
+      grade_data[:grade] = enrollment.effective_current_score(opts)
     end
 
     render json: grade_data
@@ -2429,9 +2429,12 @@ class UsersController < ApplicationController
       grading_period_id = generate_grading_period_id(
         grading_periods.dig(course.id, :selected_period_id)
       )
-      opts = { grading_period_id: grading_period_id} if grading_period_id
-      computed_score = enrollment.computed_current_score(opts)
-      grades[:student_enrollments][course.id] = computed_score
+      opts = { grading_period_id: grading_period_id } if grading_period_id
+      grades[:student_enrollments][course.id] = if course.grants_any_right?(@user, :manage_grades, :view_all_grades)
+        enrollment.computed_current_score(opts)
+      else
+        enrollment.effective_current_score(opts)
+      end
     end
     grades
   end
@@ -2440,8 +2443,11 @@ class UsersController < ApplicationController
     grades = {}
     opts = { grading_period_id: grading_period_id } if grading_period_id
     enrollments.each do |enrollment|
-      computed_score = enrollment.computed_current_score(opts)
-      grades[enrollment.user_id] = computed_score
+      grades[enrollment.user_id] = if enrollment.course.grants_any_right?(@user, :manage_grades, :view_all_grades)
+        enrollment.computed_current_score(opts)
+      else
+        enrollment.effective_current_score(opts)
+      end
     end
     grades
   end

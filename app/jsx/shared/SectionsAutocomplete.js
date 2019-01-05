@@ -19,6 +19,7 @@ import Select from '@instructure/ui-forms/lib/components/Select'
 import View from '@instructure/ui-layout/lib/components/View'
 import AccessibleContent from '@instructure/ui-a11y/lib/components/AccessibleContent'
 import React from 'react'
+import $ from 'jquery'
 import I18n from 'i18n!sections_autocomplete'
 import PropTypes from 'prop-types'
 import propTypes from './proptypes/sectionShape'
@@ -35,19 +36,30 @@ function sortSectionName(a,b) {
   return 0;
 }
 
+function setDiff(first, second) {
+  const diff = new Set(first)
+  for (const elt of second) {
+    diff.delete(elt)
+  }
+  return [...diff]
+}
+
 export default class SectionsAutocomplete extends React.Component {
   static propTypes = {
     sections: propTypes.sectionList.isRequired,
     selectedSections: propTypes.sectionList,
     disabled: PropTypes.bool,
     disableDiscussionOptions: PropTypes.func,
-    enableDiscussionOptions: PropTypes.func
+    enableDiscussionOptions: PropTypes.func,
+    flashMessage: PropTypes.func
   }
+
   static defaultProps = {
     selectedSections: [ALL_SECTIONS_OBJ],
     disabled: false,
     disableDiscussionOptions: (() => {}),
-    enableDiscussionOptions: (() => {})
+    enableDiscussionOptions: (() => {}),
+    flashMessage: $.screenReaderFlashMessage
   }
 
   state = {
@@ -64,7 +76,22 @@ export default class SectionsAutocomplete extends React.Component {
     this.updateDiscussionOptions()
   }
 
+  announceSectionDifference(newValues) {
+    // going to assume we only add or remove one at a time. "All Sections"
+    // complicates it a bit, but this still announces the right thing
+    const addedValue = setDiff(newValues, this.state.selectedSectionsValue)[0]
+    const removedValue = setDiff(this.state.selectedSectionsValue, newValues)[0]
+    const changedValue = addedValue || removedValue
+    const changedValueName = this.state.sections.find(section => section.id === changedValue).name
+    if (addedValue) {
+      this.props.flashMessage(I18n.t('%{section} added', {section: changedValueName}))
+    } else if (removedValue) {
+      this.props.flashMessage(I18n.t('%{section} removed', {section: changedValueName}))
+    }
+  }
+
   onAutocompleteChange = (_, value) => {
+    this.announceSectionDifference(extractIds(value))
     if(!value.length) {
       this.setState({selectedSectionsValue: [], messages: [{ text: I18n.t('A section is required'), type: 'error' }]})
     } else if (this.state.selectedSectionsValue.includes(ALL_SECTIONS_OBJ.id)) {

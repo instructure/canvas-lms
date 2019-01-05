@@ -42,6 +42,7 @@ RSpec.shared_context "lti2_spec_helper", :shared_context => :metadata do
       workflow_state: 'active',
       raw_data: {
         'enabled_capability' => ['Security.splitSecret'],
+        'security_contract' => security_contract,
         'tool_profile' => {
           'lti_version' => 'LTI-2p0',
           'product_instance' => {

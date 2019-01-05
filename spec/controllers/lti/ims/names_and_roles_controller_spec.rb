@@ -29,6 +29,7 @@ describe Lti::Ims::NamesAndRolesController do
 
   let(:group_record) { group(context: course) } # _record suffix to avoid conflict with group() factory mtd
   let(:context_param_name) { raise 'Override in spec' }
+  let(:scope_to_remove) { 'https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly' }
 
   # rubocop:disable RSpec/LetSetup
   shared_context 'assignment context' do
@@ -1330,13 +1331,6 @@ describe Lti::Ims::NamesAndRolesController do
 
   def response_links
     response.headers["Link"].split(",")
-  end
-
-  def remove_access_token_scope(default_scopes)
-    default_scopes.
-      split(' ').
-      reject { |s| s == 'https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly' }.
-      join(' ')
   end
 
   def assignment_with_rlid(rlid)

@@ -60,7 +60,7 @@ function buildNoPointsPossibleWarning () {
   };
 }
 
-// xsslint safeString.property score possbile warningText icon letterGrade
+// xsslint safeString.property score possible warningText icon letterGrade
 function render (options) {
   let tooltip = '';
   let warningIcon = '';
@@ -68,7 +68,7 @@ function render (options) {
   let letterGrade = '';
 
   if (!options.hideTooltip) {
-    let tooltipContent = '-';
+    let tooltipContent = '–';
 
     if (options.warning) {
       tooltipContent = `<div class="total-column-tooltip">${options.warning.warningText}</div>`;
@@ -89,7 +89,7 @@ function render (options) {
   if (options.showPointsNotPercent) {
     grade = options.score;
   } else {
-    grade = options.possible ? options.percentage : '-';
+    grade = options.possible ? options.percentage : '–';
   }
 
   if (options.letterGrade) {
@@ -139,7 +139,7 @@ export default class TotalGradeCellFormatter {
     }
 
     let percentage = getGradePercentage(grade.score, grade.possible);
-    percentage = isFinite(percentage) ? percentage : 0;
+    percentage = Number.isFinite(percentage) ? percentage : 0;
 
     let possible = round(grade.possible, round.DEFAULT);
     possible = possible ? I18n.n(possible) : possible;

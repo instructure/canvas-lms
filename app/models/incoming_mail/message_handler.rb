@@ -19,10 +19,10 @@
 module IncomingMail
   class MessageHandler
     def handle(outgoing_from_address, body, html_body, incoming_message, tag)
-      secure_id, original_message_id = parse_tag(tag)
+      secure_id, original_message_id, timestamp = parse_tag(tag)
       return unless original_message_id
 
-      original_message = Message.where(id: original_message_id).first
+      original_message = get_original_message(original_message_id, timestamp)
       # This prevents us from rebouncing users that have auto-replies setup -- only bounce something
       # that was sent out because of a notification.
       return unless original_message && original_message.notification_id
@@ -40,7 +40,7 @@ module IncomingMail
             context.reply_from({
                                  :purpose => 'general',
                                  :user => user,
-                                 :subject => utf8ify(incoming_message.subject, incoming_message.header[:subject].try(:charset)),
+                                 :subject => IncomingMailProcessor::IncomingMessageProcessor.utf8ify(incoming_message.subject, incoming_message.header[:subject].try(:charset)),
                                  :html => html_body,
                                  :text => body
                                })
@@ -150,17 +150,17 @@ module IncomingMail
       user && from_addresses.lazy.map {|addr| user.communication_channels.active.email.by_path(addr).first}.first
     end
 
-    # MOVE!
-    def utf8ify(string, encoding)
-      encoding ||= 'UTF-8'
-      encoding = encoding.upcase
-      # change encoding; if it throws an exception (i.e. unrecognized encoding), just strip invalid UTF-8
-      Iconv.conv('UTF-8//TRANSLIT//IGNORE', encoding, string) rescue TextHelper.strip_invalid_utf8(string)
+    def parse_tag(tag)
+      match = tag.match /^(\h+)-([0-9~]+)(?:-([0-9]+))?$/
+      return match[1], match[2], match[3] if match
     end
 
-    def parse_tag(tag)
-      match = tag.match /^(\h+)-([0-9~]+)$/
-      return match[1], match[2] if match
+    def get_original_message(original_message_id, timestamp)
+      if timestamp
+        Message.where(id: original_message_id).at_timestamp(timestamp).first
+      else
+        Message.where(id: original_message_id).first
+      end
     end
   end
 end

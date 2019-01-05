@@ -192,6 +192,7 @@
       <xs:element name="omit_from_final_grade" type="xs:boolean" minOccurs="0"/>
       <xs:element name="only_visible_to_overrides" type="xs:boolean" minOccurs="0"/>
       <xs:element name="post_to_sis" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="allowed_attempts" type="optional_integer" minOccurs="0"/>
       <xs:element name="similarity_detection_tool" minOccurs="0">
         <xs:complexType>
           <xs:attribute  name="resource_type_code" type="xs:string" use="required"/>

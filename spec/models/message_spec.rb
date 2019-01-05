@@ -157,6 +157,19 @@ describe Message do
     end
   end
 
+  it "should raise an error when trying to re-save an existing message" do
+    message_model
+    @message.body = "something else"
+    expect(@message.save).to be_falsey
+  end
+
+  it "should still set new attributes defined in workflow transitions" do
+    message_model(:workflow_state => "sending", :user => user_factory)
+    @message.complete_dispatch
+    expect(@message.reload.workflow_state).to eq "sent"
+    expect(@message.sent_at).to be_present
+  end
+
   context "named scopes" do
     it "should be able to get messages in any state" do
       m1 = message_model(:workflow_state => 'bounced', :user => user_factory)
@@ -169,8 +182,7 @@ describe Message do
 
     it "should be able to search on its context" do
       user_model
-      message_model
-      @message.update_attribute(:context, @user)
+      message_model(:context => @user)
       expect(Message.for(@user)).to eq [@message]
     end
 
@@ -462,7 +474,7 @@ describe Message do
           account.settings[:outgoing_email_default_name] = "OutgoingName"
           account.save!
           expect(account.reload.settings[:outgoing_email_default_name]).to eq "OutgoingName"
-          mesage = message_model(:context => course_model)
+          message = message_model(:context => course_model)
           expect(message.from_name).to eq "OutgoingName"
         end
 

@@ -47,9 +47,13 @@ describe RubricAssociation do
       )
     end
 
-    it 'ignore use_for_grading if hide_points enabled' do
+    it 'disable use_for_grading if hide_points enabled' do
       # Create the rubric
       @rubric = @course.rubrics.create! { |r| r.user = @teacher }
+
+      ra_params = rubric_association_params_for_assignment(@assignment, use_for_grading: '1')
+      rubric_assoc = RubricAssociation.generate(@teacher, @rubric, @course, ra_params)
+      expect(rubric_assoc.use_for_grading).to be true
 
       ra_params = rubric_association_params_for_assignment(@assignment, hide_points: '1')
       rubric_assoc = RubricAssociation.generate(@teacher, @rubric, @course, ra_params)
@@ -57,14 +61,18 @@ describe RubricAssociation do
       expect(rubric_assoc.use_for_grading).to be false
     end
 
-    it 'ignore hide_score_total if hide_points enabled' do
+    it 'disable hide_score_total if hide_points enabled' do
       # Create the rubric
       @rubric = @course.rubrics.create! { |r| r.user = @teacher }
 
-      ra_params = rubric_association_params_for_assignment(@assignment, hide_points: '1', hide_score_total: '1')
+      ra_params = rubric_association_params_for_assignment(@assignment, hide_score_total: '1')
+      rubric_assoc = RubricAssociation.generate(@teacher, @rubric, @course, ra_params)
+      expect(rubric_assoc.hide_score_total).to be true
+
+      ra_params = rubric_association_params_for_assignment(@assignment, hide_points: '1')
       rubric_assoc = RubricAssociation.generate(@teacher, @rubric, @course, ra_params)
 
-      expect(rubric_assoc.hide_score_total).to be_falsey
+      expect(rubric_assoc.hide_score_total).to be false
     end
 
     context "when a peer-review assignment has been completed AFTER rubric created" do
@@ -285,6 +293,13 @@ describe RubricAssociation do
       assessment = rubric_association.assess(user: student, assessor: first_teacher, artifact: submission,
                                              assessment: assessment_params)
       expect(assessment.hide_points).to be true
+    end
+
+    it "updates the rating description and id if not present in passed params" do
+      assessment = rubric_association.assess(user: student, assessor: first_teacher, artifact: submission,
+                                             assessment: assessment_params)
+      expect(assessment.data[0][:id]).to eq 'blank'
+      expect(assessment.data[0][:description]).to eq 'Full Marks'
     end
   end
 

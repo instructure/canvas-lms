@@ -17,35 +17,39 @@
 #
 
 module Types
-  AssignmentOverrideSetUnion = GraphQL::UnionType.define do
-    name "AssignmentOverrideSet"
+  class AdhocStudentsType < ApplicationObjectType
+    graphql_name "AdhocStudents"
+
+    description "A list of students that an `AssignmentOverride` applies to"
+
+    alias override object
+
+    field :students, [UserType], null: true
+
+    def students
+      Loaders::AssociationLoader.for(AssignmentOverride,
+                                     assignment_override_students: :user)
+      .load(override)
+      .then { override.assignment_override_students.map(&:user) }
+    end
+  end
+
+  class AssignmentOverrideSetUnion < BaseUnion
+    graphql_name "AssignmentOverrideSet"
 
     description "Objects that can be assigned overridden dates"
 
-    possible_types [SectionType, GroupType, AdhocStudentsType]
+    possible_types SectionType, GroupType, AdhocStudentsType
 
-    resolve_type ->(obj, _) {
+    def self.resolve_type(obj, _)
       case obj
       when CourseSection then SectionType
       when Group then GroupType
       when AssignmentOverride then AdhocStudentsType
       end
-    }
+    end
   end
 
-  AdhocStudentsType = GraphQL::ObjectType.define do
-    name "AdhocStudents"
-
-    description "A list of students that an `AssignmentOverride` applies to"
-
-    field :students, types[UserType], resolve: ->(override, _, _) {
-      Loaders::AssociationLoader.for(AssignmentOverride,
-                                     assignment_override_students: :user)
-      .load(override)
-      .then { override.assignment_override_students.map(&:user) }
-    }
-
-  end
   class AssignmentOverrideType < ApplicationObjectType
     graphql_name "AssignmentOverride"
 

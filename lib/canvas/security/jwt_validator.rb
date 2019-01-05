@@ -52,7 +52,7 @@ module Canvas::Security
 
     def aud
       return if errors?
-      msg = "the 'aud' must be the LTI Authorization endpoint"
+      msg = "the 'aud' is invalid"
       if @jwt.aud.is_a? String
         errors.add(:base, msg) if @jwt.aud != @expected_aud
       elsif @jwt.aud.exclude? @expected_aud

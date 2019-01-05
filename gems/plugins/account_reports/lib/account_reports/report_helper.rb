@@ -337,6 +337,9 @@ module AccountReports::ReportHelper
     Shackles.activate(:master) do
       @account_report.account_report_runners.incomplete.update_all(workflow_state: 'aborted')
       @account_report.delete_account_report_rows
+      Canvas::Errors.capture_exception(:account_report, error)
+      @account_report.workflow_state = 'error'
+      @account_report.save!
       raise error
     end
   end
@@ -372,6 +375,7 @@ module AccountReports::ReportHelper
     return false if account_report.account_report_runners.incomplete.exists?
     AccountReport.transaction do
       @account_report.reload(lock: true)
+      return false if account_report.workflow_state == 'error'
       if @account_report.workflow_state == 'running'
         @account_report.workflow_state = 'compiling'
         @account_report.save!

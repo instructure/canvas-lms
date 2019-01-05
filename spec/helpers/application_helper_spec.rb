@@ -604,9 +604,9 @@ describe ApplicationHelper do
     end
   end
 
-  describe 'brand_config_for_account' do
+  describe 'brand_config_account' do
     it "handles not having @domain_root_account set" do
-      expect(helper.send(:brand_config_for_account)).to be_nil
+      expect(helper.send(:brand_config_account)).to be_nil
     end
   end
 

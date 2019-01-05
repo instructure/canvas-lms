@@ -76,12 +76,14 @@ class NotificationFailureProcessor
     is_disabled_endpoint = error_message.include? "EndpointDisabled"
     error_context = summary['error_context']
 
-    if Message.where(id: global_id).exists?
-      message = Message.find(global_id)
-
+    message_id, timestamp = Message.parse_notification_service_id(global_id)
+    scope = Message.where(:id => message_id)
+    scope = scope.at_timestamp(timestamp) if timestamp
+    message = scope.take
+    if message
       message.set_transmission_error
       message.transmission_errors = error_message if error_message
-      message.save!
+      message.save_using_update_all
 
       # clean up disabled push endpoints
       if is_disabled_endpoint
@@ -95,6 +97,7 @@ class NotificationFailureProcessor
     return @notification_failure_queue if defined?(@notification_failure_queue)
     conf = Canvas::AWS.validate_v2_config(config, 'notification_failures.yml').dup
     conf.except!(*POLL_PARAMS)
+    conf.delete(:iteration_high_water)
     conf.delete(:initial_timeout) # old, no longer supported poll param
     queue_name = conf.delete(:notification_failure_queue_name)
     sqs = Aws::SQS::Client.new(conf)

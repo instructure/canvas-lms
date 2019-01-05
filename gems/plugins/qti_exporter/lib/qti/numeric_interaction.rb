@@ -91,7 +91,7 @@ class NumericInteraction < AssessmentItemConverter
           if upper = or_node.at_css('and customOperator[class=varlte] baseValue')
             # do margin computation with BigDecimal to avoid rounding errors
             # (this is also used when _scoring_ numeric range questions)
-            margin = BigDecimal.new(upper.text) - BigDecimal.new(exact) rescue "0.0"
+            margin = BigDecimal(upper.text) - BigDecimal(exact) rescue "0.0"
             answer[:margin] = margin.to_f
           end
         end

@@ -22,6 +22,7 @@ import I18n from 'i18n!assignment_2'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import View from '@instructure/ui-layout/lib/components/View'
 import ToggleDetails from '@instructure/ui-toggle-details/lib/components/ToggleDetails'
+import apiUserContent from 'compiled/str/apiUserContent'
 
 import {string} from 'prop-types'
 
@@ -31,16 +32,23 @@ AssignmentToggleDetails.propTypes = {
 
 function AssignmentToggleDetails(props) {
   return (
-    <ToggleDetails
-      data-test-id="assignments-2-assignment-toggle-details"
-      summary={<Text weight="bold">{I18n.t('Details')}</Text>}
-    >
-      <View margin="0" padding="0">
-        <Text weight="normal" as="div" data-test-id="assignments-2-assignment-toggle-details-text">
-          {props.description}
-        </Text>
-      </View>
-    </ToggleDetails>
+    <div className="a2-toggle-details-container">
+      <ToggleDetails
+        data-test-id="assignments-2-assignment-toggle-details"
+        summary={<Text weight="bold">{I18n.t('Details')}</Text>}
+      >
+        <View margin="0" padding="0">
+          <Text
+            weight="normal"
+            as="div"
+            data-test-id="assignments-2-assignment-toggle-details-text"
+          >
+            {/* html is sanitized on the server side */}
+            <div dangerouslySetInnerHTML={{__html: apiUserContent.convert(props.description)}} />
+          </Text>
+        </View>
+      </ToggleDetails>
+    </div>
   )
 }
 

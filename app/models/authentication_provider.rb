@@ -74,6 +74,10 @@ class AuthenticationProvider < ActiveRecord::Base
     false
   end
 
+  def self.debugging_enabled?
+    ::Canvas.redis_enabled?
+  end
+
   def self.display_name
     name.try(:demodulize)
   end
@@ -305,6 +309,7 @@ class AuthenticationProvider < ActiveRecord::Base
   end
 
   def debugging?
+    return false unless self.class.debugging_enabled?
     unless instance_variable_defined?(:@debugging)
       @debugging = !!debug_get(:debugging)
     end

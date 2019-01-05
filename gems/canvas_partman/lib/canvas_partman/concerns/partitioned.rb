@@ -72,7 +72,7 @@ module CanvasPartman::Concerns
       attr_reader :partitioning_interval
 
       def partitioning_interval=(value)
-        raise ArgumentError unless [:months, :years].include?(value)
+        raise ArgumentError unless [:weeks, :months, :years].include?(value)
 
         @partitioning_interval = value
       end
@@ -170,6 +170,9 @@ module CanvasPartman::Concerns
           date = date.utc if ActiveRecord::Base.default_timezone == :utc
 
           case partitioning_interval
+          when :weeks
+            date = date.to_date
+            [ table_name, date.cwyear, ("%02d" % date.cweek) ].join('_')
           when :months
             [ table_name, date.year, date.month ].join('_')
           when :years

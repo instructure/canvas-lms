@@ -206,7 +206,7 @@ shared_context "in-process server selenium tests" do
 
     browser_logs = driver.manage.logs.get(:browser)
 
-    if browser_logs.present?
+    if !example.metadata[:ignore_js_errors] && browser_logs.present?
       msg = "browser console logs for \"#{example.description}\":\n" + browser_logs.map(&:message).join("\n\n")
       Rails.logger.info(msg)
       # puts msg

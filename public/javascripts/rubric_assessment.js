@@ -221,6 +221,7 @@ window.rubricAssessment = {
         const pre = `rubric_assessment[criterion_${criteriaAssessment.criterion_id}]`
         const section = (key) => `${pre}${key}`
         const points = criteriaAssessment.points.value
+        data[section("[rating_id]")] = criteriaAssessment.id
         data[section("[points]")] = !Number.isNaN(points) ? points : undefined
         data[section("[description]")] = criteriaAssessment.description
         data[section("[comments]")] = criteriaAssessment.comments || ''

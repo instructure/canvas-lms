@@ -36,6 +36,7 @@ class SubmissionComment < ActiveRecord::Base
   alias_attribute :body, :comment
 
   attr_writer :updating_user
+  attr_accessor :grade_posting_in_progress
 
   belongs_to :submission
   belongs_to :author, :class_name => 'User'
@@ -321,7 +322,7 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   def auditable?
-    !draft? && submission.assignment.auditable?
+    !draft? && submission.assignment.auditable? && !grade_posting_in_progress
   end
 
   protected

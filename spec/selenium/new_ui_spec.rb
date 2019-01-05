@@ -156,7 +156,7 @@ describe 'new ui' do
       expect(global_nav_courses_link).to be_displayed
       global_nav_courses_link.click
       wait_for_ajaximations
-      fj("[aria-label='Global navigation tray'] a:contains('All Courses')").click
+      fj("[aria-label='Courses tray'] a:contains('All Courses')").click
 
       # and now actually go to the "/courses" page and make sure it shows up there too as "unpublisned"
       wait_for_ajaximations

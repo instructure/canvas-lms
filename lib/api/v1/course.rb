@@ -99,7 +99,13 @@ module Api::V1::Course
       hash['total_students'] = course.student_count || course.student_enrollments.not_fake.distinct.count(:user_id) if includes.include?('total_students')
       hash['passback_status'] = post_grades_status_json(course) if includes.include?('passback_status')
       hash['is_favorite'] = course.favorite_for_user?(user) if includes.include?('favorites')
-      hash['teachers'] = course.teachers.distinct.map { |teacher| user_display_json(teacher) } if includes.include?('teachers')
+      if includes.include?('teachers')
+        if course.teacher_count
+          hash['teacher_count'] = course.teacher_count
+        else
+          hash['teachers'] = course.teachers.distinct.map { |teacher| user_display_json(teacher) }
+        end
+      end
       hash['tabs'] = tabs_available_json(course, user, session, ['external'], precalculated_permissions: precalculated_permissions) if includes.include?('tabs')
       hash['locale'] = course.locale unless course.locale.nil?
       hash['account'] = account_json(course.account, user, session, []) if includes.include?('account')
@@ -151,7 +157,6 @@ module Api::V1::Course
   end
 
   def apply_master_course_settings(hash, course, user)
-    return unless respond_to?(:master_courses?) && master_courses?
     is_mc = MasterCourses::MasterTemplate.is_master_course?(course)
     hash['blueprint'] = is_mc
 
@@ -162,6 +167,25 @@ module Api::V1::Course
       else
         hash['blueprint_restrictions'] = template.default_restrictions
       end
+    end
+  end
+
+  def preload_teachers(courses)
+    threshold = params[:teacher_limit].presence&.to_i
+    if threshold
+      teacher_counts = Course.where(:id => courses).joins(:teacher_enrollments).group("courses.id").count
+      to_preload = []
+      courses.each do |course|
+        next unless count = teacher_counts[course.id]
+        if count > threshold
+          course.teacher_count = count
+        else
+          to_preload << course
+        end
+      end
+      ActiveRecord::Associations::Preloader.new.preload(to_preload, [:teachers]) if to_preload.any?
+    else
+      ActiveRecord::Associations::Preloader.new.preload(courses, [:teachers])
     end
   end
 end

@@ -1325,7 +1325,8 @@ describe AssignmentsApiController, type: :request do
         'group_category_id' => group_category.id,
         'turnitin_enabled' => true,
         'vericite_enabled' => true,
-        'grading_type' => 'points'
+        'grading_type' => 'points',
+        'allowed_attempts' => 2
       }
     end
 
@@ -1460,6 +1461,7 @@ describe AssignmentsApiController, type: :request do
       expect(@json['due_at']).to eq @assignment.due_at.iso8601
       expect(@json['html_url']).to eq course_assignment_url(@course,@assignment)
       expect(@json['needs_grading_count']).to eq 0
+      expect(@json['allowed_attempts']).to eq 2
 
       expect(Assignment.count).to eq 1
     end
@@ -2938,7 +2940,8 @@ describe AssignmentsApiController, type: :request do
           'grading_type' => 'letter_grade',
           'due_at' => '2011-01-01T00:00:00Z',
           'position' => 1,
-          'muted' => true
+          'muted' => true,
+          'allowed_attempts' => 10
         })
         @assignment.reload
       end
@@ -3035,6 +3038,10 @@ describe AssignmentsApiController, type: :request do
       it "updates the grading standard" do
         expect(@assignment.grading_standard_id).to eq @new_grading_standard.id
         expect(@json['grading_standard_id']).to eq @new_grading_standard.id
+      end
+
+      it "updates the allowed_attempts" do
+        expect(@json['allowed_attempts']).to eq 10
       end
     end
 
@@ -4889,7 +4896,8 @@ describe AssignmentsApiController, type: :request do
          "points_deducted" => nil,
          "seconds_late" => 0,
          "preview_url" =>
-         "http://www.example.com/courses/#{@observer_course.id}/assignments/#{@assignment.id}/submissions/#{@observed_student.id}?preview=1&version=0"
+         "http://www.example.com/courses/#{@observer_course.id}/assignments/#{@assignment.id}/submissions/#{@observed_student.id}?preview=1&version=0",
+         "extra_attempts" => nil
        }]
     end
 
@@ -4927,7 +4935,8 @@ describe AssignmentsApiController, type: :request do
          "points_deducted" => nil,
          "seconds_late" => 0,
          "preview_url" =>
-         "http://www.example.com/courses/#{@observer_course.id}/assignments/#{@assignment.id}/submissions/#{@observed_student.id}?preview=1&version=0"
+         "http://www.example.com/courses/#{@observer_course.id}/assignments/#{@assignment.id}/submissions/#{@observed_student.id}?preview=1&version=0",
+         "extra_attempts" => nil
        }]
     end
   end

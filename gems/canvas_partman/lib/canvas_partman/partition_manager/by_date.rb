@@ -27,9 +27,30 @@ module CanvasPartman
             create_partition(min)
             min += 1.send(base_class.partitioning_interval)
           end
+          create_partition(min)
         end
 
         ensure_partitions(advance_partitions)
+      end
+
+      def migrate_data_to_partitions(batch_size: 1000)
+        loop do
+          id_dates = base_class.from("ONLY #{base_class.quoted_table_name}").
+            order(base_class.partitioning_field).
+            limit(batch_size).
+            pluck(:id, base_class.partitioning_field)
+          break if id_dates.empty?
+
+          id_dates.group_by{|id, date| generate_name_for_partition(date)}.each do |partition_table, part_id_dates|
+            base_class.connection.execute(<<-SQL)
+              WITH x AS (
+                DELETE FROM ONLY #{base_class.quoted_table_name}
+                WHERE id IN (#{part_id_dates.map(&:first).join(', ')})
+                RETURNING *
+              ) INSERT INTO #{base_class.connection.quote_table_name(partition_table)} SELECT * FROM x
+            SQL
+          end
+        end
       end
 
       def ensure_partitions(advance = 1)
@@ -67,6 +88,8 @@ module CanvasPartman
 
       def table_regex
         @table_regex ||= case base_class.partitioning_interval
+                         when :weeks
+                           /^#{Regexp.escape(base_class.table_name)}_(?<year>\d{4,})_(?<week>\d{2,})$/.freeze
                          when :months
                            /^#{Regexp.escape(base_class.table_name)}_(?<year>\d{4,})_(?<month>\d{1,2})$/.freeze
                          when :years
@@ -87,11 +110,20 @@ SQL
       def date_from_partition_name(name)
         match = table_regex.match(name)
         return nil unless match
-        Time.utc(*match[1..-1])
+        if base_class.partitioning_interval == :weeks
+          Time.utc(match[:year]).beginning_of_week + (match[:weeks].to_i - 1).weeks
+        else
+          Time.utc(*match[1..-1])
+        end
       end
 
       def generate_date_constraint_range(date)
         case base_class.partitioning_interval
+        when :weeks
+          [
+            0.week.from_now(date).beginning_of_week,
+            1.week.from_now(date).beginning_of_week
+          ]
         when :months
           [
             0.month.from_now(date).beginning_of_month,

@@ -54,6 +54,7 @@ QUnit.module('Gradebook Initial Data Loading', suiteHooks => {
       context_id: '1201',
       context_modules_url: '/context-modules',
       custom_column_data_url: '/custom-column-data',
+      final_grade_override_enabled: false,
       sections: [{id: '2001', name: 'Freshmen'}, {id: '2002', name: 'Sophomores'}],
       students_stateless_url: '/students-url',
       submissions_url: '/submissions-url'
@@ -88,46 +89,70 @@ QUnit.module('Gradebook Initial Data Loading', suiteHooks => {
     gradebook.initialize()
   }
 
-  QUnit.module('when Gradebook initializes', contextHooks => {
-    contextHooks.beforeEach(() => {
-      initializeGradebook()
-    })
-
+  QUnit.module('when Gradebook initializes', () => {
     test('sets the students as not loaded', () => {
+      initializeGradebook()
       strictEqual(gradebook.contentLoadStates.studentsLoaded, false)
     })
 
     test('sets the submissions as not loaded', () => {
+      initializeGradebook()
       strictEqual(gradebook.contentLoadStates.submissionsLoaded, false)
     })
 
     test('calls DataLoader.loadGradebookData()', () => {
+      initializeGradebook()
       strictEqual(DataLoader.loadGradebookData.callCount, 1)
     })
 
     test('includes the course id when calling DataLoader.loadGradebookData()', () => {
+      initializeGradebook()
       const [options] = DataLoader.loadGradebookData.lastCall.args
       equal(options.courseId, '1201')
     })
 
+    test('includes the gradebook when calling DataLoader.loadGradebookData()', () => {
+      initializeGradebook()
+      const [options] = DataLoader.loadGradebookData.lastCall.args
+      strictEqual(options.gradebook, gradebook)
+    })
+
     test('includes the per page api request setting when calling DataLoader.loadGradebookData()', () => {
+      initializeGradebook()
       const [options] = DataLoader.loadGradebookData.lastCall.args
       equal(options.perPage, 50)
     })
 
     test('requests assignment groups', () => {
+      initializeGradebook()
       const [options] = DataLoader.loadGradebookData.lastCall.args
       equal(options.assignmentGroupsURL, '/assignment-groups')
     })
 
     test('requests context modules', () => {
+      initializeGradebook()
       const [options] = DataLoader.loadGradebookData.lastCall.args
       equal(options.contextModulesURL, '/context-modules')
     })
 
     test('requests data for hidden custom columns', () => {
+      initializeGradebook()
       const [options] = DataLoader.loadGradebookData.lastCall.args
       strictEqual(options.customColumnDataParams.include_hidden, true)
+    })
+
+    test('requests final grade overrides when the feature is enabled', () => {
+      gradebookOptions.final_grade_override_enabled = true
+      initializeGradebook()
+      const [options] = DataLoader.loadGradebookData.lastCall.args
+      strictEqual(options.getFinalGradeOverrides, true)
+    })
+
+    test('does not request final grade overrides when the feature is not enabled', () => {
+      gradebookOptions.final_grade_override_enabled = false
+      initializeGradebook()
+      const [options] = DataLoader.loadGradebookData.lastCall.args
+      strictEqual(options.getFinalGradeOverrides, false)
     })
   })
 

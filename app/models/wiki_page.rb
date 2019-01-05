@@ -38,7 +38,7 @@ class WikiPage < ActiveRecord::Base
 
   include MasterCourses::Restrictor
   restrict_columns :content, [:body, :title]
-  restrict_columns :settings, [:editing_roles]
+  restrict_columns :settings, [:editing_roles, :url]
   restrict_assignment_columns
   restrict_columns :state, [:workflow_state]
 

@@ -28,7 +28,7 @@ function AssignmentGroupModuleNav(props) {
     <Flex margin="0 0 xx-large 0" direction="column">
       {props.module && (
         <FlexItem>
-          <Link data-test-id="module-link" href={props.module.link} theme={{color: '#8B969E'}}>
+          <Link data-test-id="module-link" href={props.module.link} theme={{color: '#000000'}}>
             <Text size="medium">{props.module.name}</Text>
           </Link>
         </FlexItem>
@@ -39,7 +39,7 @@ function AssignmentGroupModuleNav(props) {
           <Link
             data-test-id="assignmentgroup-link"
             href={props.assignmentGroup.link}
-            theme={{color: '#8B969E'}}
+            theme={{color: '#000000'}}
           >
             <Text size="medium">{props.assignmentGroup.name}</Text>
           </Link>

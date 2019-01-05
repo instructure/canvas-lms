@@ -315,6 +315,270 @@ describe Enrollment do
       )
     end
 
+    describe "effective_current_grade" do
+      let_once(:period) do
+        group = @course.root_account.grading_period_groups.create!
+        group.grading_periods.create!(
+          title: 'period',
+          start_date: 'Jan 1, 2015',
+          end_date: 'Jan 5, 2015'
+        )
+      end
+
+      before(:once) do
+        @enrollment = StudentEnrollment.create!(valid_enrollment_attributes)
+        @enrollment.scores.create!(course_score: true, current_score: 88.0)
+        @enrollment.scores.create!(grading_period_id: period.id, current_score: 82.0)
+        @course.enable_feature!(:final_grades_override)
+      end
+
+      before(:each) do
+        allow(@course).to receive(:grading_standard_enabled?).and_return true
+      end
+
+      it "returns the course current grade" do
+        expect(@enrollment.effective_current_grade).to eq "B+"
+      end
+
+      it "returns the grading period current grade, if given a grading period" do
+        expect(@enrollment.effective_current_grade(grading_period_id: period.id)).to eq "B-"
+      end
+
+      it "returns the override grade" do
+        @enrollment.scores.find_by(course_score: true).update!(override_score: 97.0)
+        expect(@enrollment.effective_current_grade).to eq "A"
+      end
+
+      it "does not return the override grade if the feature is not enabled" do
+        @course.disable_feature!(:final_grades_override)
+        @enrollment.scores.find_by(course_score: true).update!(override_score: 97.0)
+        expect(@enrollment.effective_current_grade).to eq "B+"
+      end
+
+      it "returns nil if a grading standard is not enabled" do
+        allow(@course).to receive(:grading_standard_enabled?).and_return false
+        expect(@enrollment.effective_final_grade).to be_nil
+      end
+    end
+
+    describe "effective_current_score" do
+      let(:period) do
+        group = @course.root_account.grading_period_groups.create!
+        group.grading_periods.create!(
+          title: 'period',
+          start_date: 'Jan 1, 2015',
+          end_date: 'Jan 5, 2015'
+        )
+      end
+
+      before(:once) do
+        @enrollment = StudentEnrollment.create!(valid_enrollment_attributes)
+        @course.enable_feature!(:final_grades_override)
+      end
+
+      it "returns the course current score" do
+        @enrollment.scores.create!(course_score: true, current_score: 88.0)
+        expect(@enrollment.effective_current_score).to eq 88.0
+      end
+
+      it "returns the grading period current score, if given a grading period" do
+        @enrollment.scores.create!(grading_period_id: period.id, current_score: 82.0)
+        expect(@enrollment.effective_current_score(grading_period_id: period.id)).to eq 82.0
+      end
+
+      it "returns the override score" do
+        @enrollment.scores.create!(current_score: 79.0, override_score: 97.0)
+        expect(@enrollment.effective_current_score).to eq 97.0
+      end
+
+      it "returns the lower bound of an override score, if a grading standard is enabled" do
+        allow(@course).to receive(:grading_standard_enabled?).and_return(true)
+        @enrollment.scores.create!(current_score: 79.0, override_score: 97.0)
+        expect(@enrollment.effective_current_score).to eq 94.0
+      end
+
+      it "does not return the override score if the feature is not enabled" do
+        @course.disable_feature!(:final_grades_override)
+        @enrollment.scores.create!(current_score: 79.0, override_score: 97.0)
+        expect(@enrollment.effective_current_score).to eq 79.0
+      end
+    end
+
+    describe "effective_final_grade" do
+      let_once(:period) do
+        group = @course.root_account.grading_period_groups.create!
+        group.grading_periods.create!(
+          title: 'period',
+          start_date: 'Jan 1, 2015',
+          end_date: 'Jan 5, 2015'
+        )
+      end
+
+      before(:once) do
+        @enrollment = StudentEnrollment.create!(valid_enrollment_attributes)
+        @enrollment.scores.create!(course_score: true, final_score: 88.0)
+        @enrollment.scores.create!(grading_period_id: period.id, final_score: 82.0)
+        @course.enable_feature!(:final_grades_override)
+      end
+
+      before(:each) do
+        allow(@course).to receive(:grading_standard_enabled?).and_return true
+      end
+
+      it "returns the course final grade" do
+        expect(@enrollment.effective_final_grade).to eq "B+"
+      end
+
+      it "returns the grading period final grade, if given a grading period" do
+        expect(@enrollment.effective_final_grade(grading_period_id: period.id)).to eq "B-"
+      end
+
+      it "returns the override grade" do
+        @enrollment.scores.find_by(course_score: true).update!(override_score: 97.0)
+        expect(@enrollment.effective_final_grade).to eq "A"
+      end
+
+      it "does not return the override grade if the feature is not enabled" do
+        @course.disable_feature!(:final_grades_override)
+        @enrollment.scores.find_by(course_score: true).update!(override_score: 97.0)
+        expect(@enrollment.effective_final_grade).to eq "B+"
+      end
+
+      it "returns nil if a grading standard is not enabled" do
+        allow(@course).to receive(:grading_standard_enabled?).and_return false
+        expect(@enrollment.effective_final_grade).to be_nil
+      end
+    end
+
+    describe "effective_final_score" do
+      let_once(:period) do
+        group = @course.root_account.grading_period_groups.create!
+        group.grading_periods.create!(
+          title: 'period',
+          start_date: 'Jan 1, 2015',
+          end_date: 'Jan 5, 2015'
+        )
+      end
+
+      before(:once) do
+        @enrollment = StudentEnrollment.create!(valid_enrollment_attributes)
+        @enrollment.scores.create!(course_score: true, final_score: 88.0)
+        @enrollment.scores.create!(grading_period_id: period.id, final_score: 82.0)
+        @course.enable_feature!(:final_grades_override)
+      end
+
+      it "returns the course final score" do
+        expect(@enrollment.effective_final_score).to be 88.0
+      end
+
+      it "returns the grading period final score, if given a grading period" do
+        expect(@enrollment.effective_final_score(grading_period_id: period.id)).to be 82.0
+      end
+
+      it "returns the override score" do
+        @enrollment.scores.find_by!(course_score: true).update!(override_score: 97.0)
+        expect(@enrollment.effective_current_score).to eq 97.0
+      end
+
+      it "returns the lower bound override score, if a grading standard is enabled" do
+        allow(@course).to receive(:grading_standard_enabled?).and_return true
+        @enrollment.scores.find_by(course_score: true).update!(override_score: 97.0)
+        expect(@enrollment.effective_final_score).to be 94.0
+      end
+
+      it "does not return the override score if the feature is not enabled" do
+        @course.disable_feature!(:final_grades_override)
+        @enrollment.scores.find_by(course_score: true).update!(override_score: 97.0)
+        expect(@enrollment.effective_final_score).to be 88.0
+      end
+    end
+
+    describe "override_grade" do
+      before(:once) do
+        @enrollment = StudentEnrollment.create!(valid_enrollment_attributes)
+        @course = @enrollment.course
+        @score = @enrollment.scores.create!(course_score: true, final_score: 19)
+        @course.enable_feature!(:final_grades_override)
+      end
+
+      before(:each) do
+        @course.enable_feature!(:final_grades_override)
+        @course.update!(grading_standard_enabled: true)
+        @score.update!(override_score: 99.0)
+      end
+
+      it "returns nil if final_grades_override is not enabled" do
+        @course.disable_feature!(:final_grades_override)
+        expect(@enrollment.override_grade).to be nil
+      end
+
+      it "returns nil if there is no override grade" do
+        @score.update!(override_score: nil)
+        expect(@enrollment.override_grade).to be nil
+      end
+
+      it "returns nil if a grading standard is not enabled" do
+        @course.update!(grading_standard_enabled: false)
+        expect(@enrollment.override_grade).to be nil
+      end
+
+      it "returns the override grade if an override score exists" do
+        expect(@enrollment.override_grade).to eq "A"
+      end
+
+      it "can return a grading period's override grade" do
+        period_group = @course.grading_period_groups.create!
+        period = period_group.grading_periods.create!(
+          close_date: 1.day.from_now,
+          end_date: 1.day.from_now,
+          start_date: 1.day.ago,
+          title: "period"
+        )
+        @enrollment.scores.find_by(grading_period: period).update!(override_score: 71.0)
+        expect(@enrollment.override_grade(grading_period_id: period.id)).to eq "C-"
+      end
+    end
+
+    describe "override_score" do
+      before(:once) do
+        @enrollment = StudentEnrollment.create!(valid_enrollment_attributes)
+        @course = @enrollment.course
+        @score = @enrollment.scores.create!(course_score: true, final_score: 19)
+        @course.enable_feature!(:final_grades_override)
+      end
+
+      before(:each) do
+        @course.enable_feature!(:final_grades_override)
+        @score.update!(override_score: 99.0)
+      end
+
+      it "returns nil if final_grades_override is not enabled" do
+        @course.disable_feature!(:final_grades_override)
+        expect(@enrollment.override_score).to be nil
+      end
+
+      it "returns nil if there is no override score" do
+        @score.update!(override_score: nil)
+        expect(@enrollment.override_score).to be nil
+      end
+
+      it "returns the override score if one exists" do
+        expect(@enrollment.override_score).to be 99.0
+      end
+
+      it "can return a grading period's override score" do
+        period_group = @course.grading_period_groups.create!
+        period = period_group.grading_periods.create!(
+          close_date: 1.day.from_now,
+          end_date: 1.day.from_now,
+          start_date: 1.day.ago,
+          title: "period"
+        )
+        @enrollment.scores.find_by(grading_period: period).update!(override_score: 71.0)
+        expect(@enrollment.override_score(grading_period_id: period.id)).to be 71.0
+      end
+    end
+
     describe 'current scores and grades' do
       before(:once) do
         @enrollment = StudentEnrollment.create!(valid_enrollment_attributes)

@@ -1206,6 +1206,29 @@ describe MasterCourses::MasterMigration do
       expect(@copy_to.wiki.reload.front_page).to be_nil
     end
 
+    it "should leave front wiki setting alone on downstream change to front page url" do
+      @copy_to = course_factory
+      @sub = @template.add_child_course!(@copy_to)
+
+      @page = @copy_from.wiki_pages.create!(:title => "first page")
+      @page.set_as_front_page!
+      @copy_from.update_attribute(:default_view, 'wiki')
+
+      run_master_migration(:copy_settings => true)
+      @page_copy = @copy_to.wiki_pages.where(:migration_id => mig_id(@page)).first
+
+      Timecop.freeze(30.seconds.from_now) do
+        @page_copy.update_attributes(:title => "other title", :url => "other-url")
+        @page_copy.set_as_front_page!
+        @page.update_attribute(:body , "beep")
+      end
+
+      run_master_migration
+
+      expect(@page_copy.reload.is_front_page?).to eq true
+      expect(@copy_to.reload.default_view).to eq 'wiki'
+    end
+
     it "should change front wiki pages unless it gets changed downstream" do
       @copy_to = course_factory
       @sub = @template.add_child_course!(@copy_to)

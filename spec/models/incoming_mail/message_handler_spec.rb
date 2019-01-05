@@ -26,8 +26,9 @@ describe IncomingMail::MessageHandler do
   let(:body) { "Hello" }
   let(:html_body) { "Hello" }
   let(:original_message_id) { Shard.short_id_for(@shard1.global_id_for(42)) }
+  let(:timestamp) { DateTime.parse("2018-10-16").to_i.to_s }
   let(:secure_id) { "123abc" }
-  let(:tag) { "#{secure_id}-#{original_message_id}" }
+  let(:tag) { "#{secure_id}-#{original_message_id}-#{timestamp}" }
   let(:shard) do
     shard = double("shard")
     allow(shard).to receive(:activate).and_yield
@@ -69,12 +70,13 @@ describe IncomingMail::MessageHandler do
 
   before do
     allow(Canvas::Security).to receive(:verify_hmac_sha1).and_return(true)
+    allow_any_instance_of(Message).to receive(:save_using_update_all).and_return(true)
   end
 
   describe "#route" do
     it "activates the message's shard" do
       enable_cache do
-        allow(Message).to receive(:where).with(id: original_message_id).and_return(double(first: original_message))
+        allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(original_message)
         expect(shard).to receive(:activate)
 
         subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
@@ -84,7 +86,7 @@ describe IncomingMail::MessageHandler do
     it "calls reply from on the message's context" do
       enable_cache do
         expect(context).to receive(:reply_from)
-        allow(Message).to receive(:where).with(id: original_message_id).and_return(double(first: original_message))
+        allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(original_message)
         subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
       end
     end
@@ -92,7 +94,7 @@ describe IncomingMail::MessageHandler do
     it "is idempotent (via caching)" do
       enable_cache do
         expect(context).to receive(:reply_from).once
-        allow(Message).to receive(:where).with(id: original_message_id).and_return(double(first: original_message))
+        allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(original_message)
         subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
         subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
       end
@@ -102,7 +104,7 @@ describe IncomingMail::MessageHandler do
       context "silent failures" do
         it "silently fails on no message notification id" do
           message = double("original message without notification id", original_message_attributes.merge(:notification_id => nil))
-          allow(Message).to receive(:where).with(id: original_message_id).and_return(double(first: message))
+          allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(message)
           expect(Mailer).to receive(:create_message).never
           expect(message.context).to receive(:reply_from).never
 
@@ -110,7 +112,7 @@ describe IncomingMail::MessageHandler do
         end
 
         it "silently fails on invalid secure id" do
-          allow(Message).to receive(:where).with(id: original_message_id).and_return(double(first: original_message))
+          allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(original_message)
           allow(Canvas::Security).to receive(:verify_hmac_sha1).and_return(false)
           expect(Mailer).to receive(:create_message).never
           expect(original_message.context).to receive(:reply_from).never
@@ -133,7 +135,7 @@ describe IncomingMail::MessageHandler do
         end
 
         it "silently fails if the message is not from one of the original recipient's email addresses" do
-          allow(Message).to receive(:where).with(id: original_message_id).and_return(double(first: original_message))
+          allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(original_message)
           expect_any_instance_of(Message).to receive(:deliver).never
           expect(Account.site_admin).to receive(:feature_enabled?).with(:notification_service).and_return(false)
           expect(original_message.context).to receive(:reply_from).never
@@ -147,14 +149,14 @@ describe IncomingMail::MessageHandler do
       context "bounced messages" do
         it "bounces if user is missing" do
           message = double("original message without user", original_message_attributes.merge(:user => nil))
-          allow(Message).to receive(:where).with(id: original_message_id).and_return(double(first: message))
+          allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(message)
           expect_any_instance_of(Message).to receive(:deliver)
           subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
         end
 
         it "bounces the message on invalid context" do
           message = double("original message with invalid context", original_message_attributes.merge({context: double("context")}))
-          allow(Message).to receive(:where).with(id: original_message_id).and_return(double(first: message))
+          allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(message)
           expect_any_instance_of(Message).to receive(:save)
           expect_any_instance_of(Message).to receive(:deliver)
 
@@ -163,7 +165,7 @@ describe IncomingMail::MessageHandler do
 
         it "saves and delivers the message with proper input" do
           message = double("original message with invalid context", original_message_attributes.merge({context: double("context")}))
-          allow(Message).to receive(:where).with(id: original_message_id).and_return(double(first: message))
+          allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(message)
           expect_any_instance_of(Message).to receive(:save)
           expect_any_instance_of(Message).to receive(:deliver)
 
@@ -172,7 +174,7 @@ describe IncomingMail::MessageHandler do
 
         it "does not send a message if the incoming message has no from" do
           invalid_incoming_message = double("invalid incoming message", incoming_message_attributes.merge(from: nil, reply_to: nil))
-          allow(Message).to receive(:where).with(id: original_message_id).and_return(double(first: original_message))
+          allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(original_message)
           expect_any_instance_of(Message).to receive(:deliver).never
 
           subject.handle(outgoing_from_address, body, html_body, invalid_incoming_message, tag)
@@ -181,7 +183,7 @@ describe IncomingMail::MessageHandler do
         context "with a generic generic_error" do
           it "constructs the message correctly" do
             message = double("original message without user", original_message_attributes.merge(:context => nil))
-            allow(Message).to receive(:where).with(id: original_message_id).and_return(double(first: message))
+            allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(message)
 
             email_subject = "Undelivered message"
             body = <<-BODY.strip_heredoc.strip
@@ -211,7 +213,7 @@ describe IncomingMail::MessageHandler do
 
         context "with a locked discussion topic generic_error" do
           it "constructs the message correctly" do
-            allow(Message).to receive(:where).with(id: original_message_id).and_return(double(first: original_message))
+            allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(original_message)
             expect(context).to receive(:reply_from).and_raise(IncomingMail::Errors::ReplyToLockedTopic.new)
 
             email_subject = "Undelivered message"
@@ -242,7 +244,7 @@ describe IncomingMail::MessageHandler do
 
         context "with a generic reply to error" do
           it "constructs the message correctly" do
-            allow(Message).to receive(:where).with(id: original_message_id).and_return(double(first: original_message))
+            allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(original_message)
             expect(context).to receive(:reply_from).and_raise(IncomingMail::Errors::UnknownAddress.new)
 
             email_subject = "Undelivered message"
@@ -273,7 +275,7 @@ describe IncomingMail::MessageHandler do
 
         context "when there is no communication channel" do
           it "bounces the message back to the incoming from address" do
-            allow(Message).to receive(:where).with(id: original_message_id).and_return(double(first: original_message))
+            allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(original_message)
 
             expect_any_instance_of(Message).to receive(:deliver).never
             expect(Mailer).to receive(:create_message)

@@ -195,6 +195,8 @@ module Importers
         item.points_possible = 0
       end
 
+      item.allowed_attempts = hash[:allowed_attempts] if hash[:allowed_attempts]
+
       if !item.new_record? && item.is_child_content? && (item.editing_restricted?(:due_dates) || item.editing_restricted?(:availability_dates))
         # is a date-restricted master course item - clear their old overrides because we're mean
         item.assignment_overrides.where.not(:set_type => AssignmentOverride::SET_TYPE_NOOP).destroy_all

@@ -74,10 +74,30 @@ module Lti::Ims::Concerns
       end
     end
 
+    # factories for array matchers typically returned by #scopes_matcher
+    class_methods do
+      def all_of(*items)
+        -> (match_in) { items.present? && (items - match_in).blank? }
+      end
+
+      def any_of(*items)
+        -> (match_in) { items.present? && (items & match_in).present? }
+      end
+
+      def any
+        -> (_) { true }
+      end
+
+      def none
+        -> (_) { false }
+      end
+    end
+
     # rubocop:disable Metrics/BlockLength
     included do
+      skip_before_action :load_user
+
       before_action(
-        :verify_environment,
         :verify_access_token,
         :verify_context,
         :verify_developer_key,
@@ -85,12 +105,6 @@ module Lti::Ims::Concerns
         :verify_tool_permissions,
         :verify_tool_features,
       )
-
-      def verify_environment
-        # TODO: Take out when 1.3/Advantage fully baked. See same hack in Lti::Ims::Concerns::GradebookServices,
-        # which we can probably change to just include this module.
-        render_unauthorized_action if Rails.env.production?
-      end
 
       def verify_access_token
         if access_token.blank?
@@ -145,8 +159,16 @@ module Lti::Ims::Concerns
 
       delegate :host, to: :request
 
+      def access_token_scopes
+        @_access_token_scopes ||= (access_token&.claim('scopes')&.split(' ').presence || [])
+      end
+
       def tool_permissions_granted?
-        raise 'Abstract Method'
+        scopes_matcher.call(access_token_scopes)
+      end
+
+      def scopes_matcher
+        raise 'Abstract method'
       end
 
       def developer_key
@@ -190,6 +212,5 @@ module Lti::Ims::Concerns
       end
     end
     # rubocop:enable Metrics/BlockLength
-    
   end
 end

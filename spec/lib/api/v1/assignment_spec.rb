@@ -43,6 +43,10 @@ class AssignmentApiHarness
   def course_quiz_quiz_submissions_url(course, quiz, _options)
     "/course/#{course.id}/quizzes/#{quiz.id}/submissions?zip=1"
   end
+
+  def strong_anything
+    ArbitraryStrongishParams::ANYTHING
+  end
 end
 
 describe "Api::V1::Assignment" do
@@ -81,6 +85,30 @@ describe "Api::V1::Assignment" do
       json = api.assignment_json(assignment, user, session, {include_planner_override: true})
       expect(json.key?('planner_override')).to be_present
       expect(json['planner_override']).to be_nil
+    end
+
+    describe "the allowed_attempts attribute" do
+      it "returns -1 if set to nil" do
+        assignment.update_attribute(:allowed_attempts, nil)
+        json = api.assignment_json(assignment, user, session, {override_dates: false})
+        expect(json["allowed_attempts"]).to eq(-1)
+      end
+
+      it "returns -1 if set to -1" do
+        assignment.update_attribute(:allowed_attempts, -1)
+        json = api.assignment_json(assignment, user, session, {override_dates: false})
+        expect(json["allowed_attempts"]).to eq(-1)
+      end
+
+      it "returns any other values as set in the databse" do
+        assignment.update_attribute(:allowed_attempts, 1)
+        json = api.assignment_json(assignment, user, session, {override_dates: false})
+        expect(json["allowed_attempts"]).to eq(1)
+
+        assignment.update_attribute(:allowed_attempts, 2)
+        json = api.assignment_json(assignment, user, session, {override_dates: false})
+        expect(json["allowed_attempts"]).to eq(2)
+      end
     end
 
     context "for an assignment" do
@@ -318,6 +346,56 @@ describe "Api::V1::Assignment" do
           assignment.allowed_extensions = ["docx"]
           expect(api).to be_assignment_editable_fields_valid(assignment, user)
         end
+      end
+    end
+  end
+
+  describe "muting and unmuting assignments" do
+    let(:course) { Course.create! }
+    let(:teacher) { course.enroll_teacher(User.create!, enrollment_state: 'active').user }
+
+    let(:mute_params) { ActionController::Parameters.new({"muted" => "true"}) }
+    let(:unmute_params) { ActionController::Parameters.new({"muted" => "false"}) }
+
+    before(:each) do
+      allow(course).to receive(:account_membership_allows).and_return(false)
+    end
+
+    context "with a moderated assignment" do
+      let(:assignment) do
+        course.assignments.create!(
+          title: 'hi',
+          moderated_grading: true,
+          grader_count: 1,
+          final_grader: teacher
+        )
+      end
+
+      it "allows the assignment to be unmuted when grades are published" do
+        assignment.update!(grades_published_at: Time.zone.now)
+        expect(api.update_api_assignment(assignment, unmute_params, teacher)).to be :ok
+      end
+
+      it "does not allow the assignment to be unmuted when grades are not published" do
+        expect(api.update_api_assignment(assignment, unmute_params, teacher)).to be false
+      end
+
+      it "allows the assignment to be muted when grades are not published" do
+        assignment.unmute!
+        expect(api.update_api_assignment(assignment, mute_params, teacher)).to be :ok
+      end
+    end
+
+    context "with a non-moderated assignment" do
+      let(:assignment) { course.assignments.create!(title: 'hi2') }
+
+      it "always allows a non-moderated assignment to be unmuted" do
+        assignment.mute!
+        expect(api.update_api_assignment(assignment, unmute_params, teacher)).to be :ok
+      end
+
+      it "always allows a non-moderated assignment to be muted" do
+        expect(api.update_api_assignment(assignment, mute_params, teacher)).to be :ok
       end
     end
   end

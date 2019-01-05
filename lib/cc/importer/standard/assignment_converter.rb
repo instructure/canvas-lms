@@ -136,7 +136,9 @@ module CC::Importer::Standard
         val = get_float_val(meta_doc, f_type)
         assignment[f_type] = val unless val.nil?
       end
-      assignment['position'] = get_int_val(meta_doc, 'position')
+      ['position', 'allowed_attempts'].each do |i_type|
+        assignment[i_type] = get_int_val(meta_doc, i_type)
+      end
       assignment['peer_review_count'] = get_int_val(meta_doc, 'peer_review_count')
       assignment["grader_count"] = get_int_val(meta_doc, "grader_count")
       if meta_doc.at_css("assignment_overrides override")

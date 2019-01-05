@@ -332,10 +332,8 @@ describe "Gradezilla" do
       Gradezilla.grading_cell.click
       driver.action.send_keys(:escape).perform
 
-      expect_new_page_load do
-        driver.action.send_keys('g').perform
-        expect(driver.current_url.end_with?(@course.assignments.first.id.to_s)).to be(true)
-      end
+      expect_new_page_load { driver.action.send_keys('g').perform }
+      expect(driver.current_url.end_with?(@course.assignments.first.id.to_s)).to be(true)
     end
   end
 

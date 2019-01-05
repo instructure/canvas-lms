@@ -34,14 +34,18 @@ class OutcomeProficiency < ApplicationRecord
 
   private
 
+  def next_ratings
+    self.outcome_proficiency_ratings.reject(&:marked_for_destruction?)
+  end
+
   def single_mastery_rating
-    if self.outcome_proficiency_ratings.reject(&:marked_for_destruction?).count(&:mastery) != 1
+    if next_ratings.count(&:mastery) != 1
       self.errors.add(:outcome_proficiency_ratings, t('Exactly one rating can have mastery'))
     end
   end
 
   def strictly_decreasing_points
-    self.outcome_proficiency_ratings.each_cons(2) do |l, r|
+    next_ratings.each_cons(2) do |l, r|
       if l.points <= r.points
         self.errors.add(:outcome_proficiency_ratings,
           t("Points should be strictly decreasing: %{l} <= %{r}", l: l.points, r: r.points))

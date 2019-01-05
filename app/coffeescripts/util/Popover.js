@@ -31,6 +31,35 @@ function using (position, feedback) {
 let idCounter = 0
 const activePopovers = []
 
+function trapFocus(element) {
+  const focusableEls = element.querySelectorAll('a[href], button, textarea, input[type="text"], input[type="radio"], input[type="checkbox"], select');
+  const firstFocusableEl = focusableEls[0];
+  const lastFocusableEl = focusableEls[focusableEls.length - 1];
+  const KEYCODE_TAB = 9;
+
+  element.addEventListener('keydown', function(e) {
+      const isTabPressed = (e.key === 'Tab' || e.keyCode === KEYCODE_TAB);
+      if (!isTabPressed) {
+          return;
+      }
+      if ( e.shiftKey ) /* shift + tab */ {
+          if (document.activeElement === firstFocusableEl) {
+              lastFocusableEl.focus();
+              e.preventDefault();
+          }
+      } else /* tab */ {
+          if (document.activeElement === lastFocusableEl) {
+              setTimeout(() => {
+                firstFocusableEl.focus();
+              })
+              e.preventDefault();
+          }
+      }
+
+  });
+}
+
+
 export default class Popover {
 
   ignoreOutsideClickSelector = '.ui-dialog'
@@ -40,6 +69,7 @@ export default class Popover {
     this.options = options
     this.trigger = $(triggerEvent.currentTarget)
     this.triggerAction = triggerEvent.type
+    this.focusTrapped = false
     this.el = $(this.content).addClass('carat-bottom').data('popover', this).keydown((event) => {
       // if the user hits the escape key, reset the focus to what it was.
       if (event.keyCode === $.ui.keyCode.ESCAPE) this.hide()
@@ -52,9 +82,9 @@ export default class Popover {
       if (index === -1) return
 
       if (event.shiftKey) {
-        if (index === 0) this.hide()
+        if (!this.focusTrapped && index === 0) this.hide()
       } else {
-        if (index === tabbables.length - 1) this.hide()
+        if (!this.focusTrapped && index === tabbables.length - 1) this.hide()
       }
     })
 
@@ -64,6 +94,11 @@ export default class Popover {
     })
 
     this.show(triggerEvent)
+  }
+
+  trapFocus (element) {
+    this.focusTrapped = true
+    trapFocus(element)
   }
 
   show (triggerEvent) {

@@ -87,6 +87,9 @@ function loadGradebookData (opts) {
   const gotCustomColumns = getCustomColumns(opts.customColumnsURL);
 
   const studentContentDataLoader = new StudentContentDataLoader({
+    courseId: opts.courseId,
+    gradebook: opts.gradebook,
+    getFinalGradeOverrides: opts.getFinalGradeOverrides,
     loadedStudentIds: opts.loadedStudentIds,
     onStudentsChunkLoaded: opts.studentsPageCb,
     onSubmissionsChunkLoaded: opts.submissionsChunkCb,

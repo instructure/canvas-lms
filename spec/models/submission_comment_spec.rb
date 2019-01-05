@@ -549,6 +549,13 @@ This text has a http://www.google.com link in it...
       comment = @submission.submission_comments.create!(valid_attributes)
       expect(comment).not_to be_auditable
     end
+
+    it "is not auditable if posting grades" do
+      @assignment.update!(anonymous_grading: true)
+      comment = @submission.submission_comments.create!(valid_attributes)
+      comment.grade_posting_in_progress = true
+      expect(comment).not_to be_auditable
+    end
   end
 
   describe "#edited_at" do

@@ -6011,6 +6011,12 @@ describe Assignment do
       allow(AssignmentUtil).to receive(:sis_integration_settings_enabled?).and_return(true)
     end
 
+    it "can duplicate" do
+      create_section_override_for_assignment(@assignment)
+      assignment_duplicate = @assignment.duplicate
+      expect(assignment_duplicate.save).to eq(true)
+    end
+
     context "checking if overrides are valid" do
       it "is valid if a new override has a due date" do
         override = assignment_override_model(assignment: @assignment, due_at: 2.days.from_now)
@@ -6944,6 +6950,34 @@ describe Assignment do
           end
         end
       end
+    end
+  end
+
+  describe 'allowed_attempts validation' do
+    before(:once) do
+      assignment_model(course: @course)
+    end
+
+    it { is_expected.to validate_numericality_of(:allowed_attempts).allow_nil }
+
+    it 'should allow -1' do
+      @assignment.allowed_attempts = -1
+      expect(@assignment).to be_valid
+    end
+
+    it 'should disallow 0' do
+      @assignment.allowed_attempts = 0
+      expect(@assignment).to_not be_valid
+    end
+
+    it 'should disallow values less than -1' do
+      @assignment.allowed_attempts = -2
+      expect(@assignment).to_not be_valid
+    end
+
+    it 'should allow values greater than 0' do
+      @assignment.allowed_attempts = 2
+      expect(@assignment).to be_valid
     end
   end
 

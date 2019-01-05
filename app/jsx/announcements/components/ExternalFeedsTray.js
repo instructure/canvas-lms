@@ -59,7 +59,7 @@ export default class ExternalFeedsTray extends Component {
   renderHeader() {
     return (
       <View margin="0 0 0 large" as="div" textAlign="start">
-        <Heading margin="small 0 0 small" level="h3" as="h2">
+        <Heading margin="small 0 0 small" level="h3" as="h3">
           {I18n.t('External feeds')}
         </Heading>
       </View>
@@ -112,6 +112,7 @@ export default class ExternalFeedsTray extends Component {
       <View display="block" textAlign="end">
         <Button
           id="external_feed"
+          aria-haspopup="dialog"
           buttonRef={link => (this.externalFeedRef = link)}
           onClick={() => this.setState({open: !this.state.open})}
           variant="link"

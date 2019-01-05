@@ -51,22 +51,18 @@ describe CommMessagesApiController, type: :request do
         end
 
         it "should use start_time and end_time parameters to limit results" do
-          m = Message.new(:user => @test_user, :body => "site admin message", :root_account_id => Account.site_admin.id)
-          m.write_attribute(:created_at, Time.zone.now - 1.day)
-          m.save!
-
-          Message.create!(:user => @test_user, :body => "account message", :root_account_id => Account.default.id)
-
           m = Message.new(:user => @test_user, :body => "account message", :root_account_id => Account.default.id)
           m.write_attribute(:created_at, Time.zone.now + 1.day)
           m.save!
+          m2 = Message.create!(:user => @test_user, :body => "account message", :root_account_id => Account.default.id)
 
           start_time = (Time.zone.now - 1.hour).iso8601
           end_time = (Time.zone.now + 1.hour).iso8601
           json = api_call(:get, "/api/v1/comm_messages?user_id=#{@test_user.id}&start_time=#{start_time}&end_time=#{end_time}", {
             :controller => 'comm_messages_api', :action => 'index', :format => 'json',
             :user_id => @test_user.to_param, :start_time => start_time, :end_time => end_time })
-
+          expect(json.length).to eq 1
+          expect(json.first["id"]).to eq m2.id
         end
 
         it "should paginate results" do

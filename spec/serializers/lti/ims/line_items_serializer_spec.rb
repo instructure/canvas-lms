@@ -19,7 +19,31 @@ require 'spec_helper'
 
 RSpec.describe Lti::Ims::LineItemsSerializer do
   let(:resource_link) { resource_link_model(overrides: {resource_link_id: assignment.lti_context_id}) }
-  let(:assignment) { assignment_model }
+  let_once(:course) { course_model }
+  let(:tool) {
+    ContextExternalTool.create!(
+      context: course,
+      consumer_key: 'key',
+      shared_secret: 'secret',
+      name: 'wrong tool',
+      url: 'http://www.wrong_tool.com/launch',
+      developer_key: DeveloperKey.create!,
+      settings: { use_1_3: true },
+      workflow_state: 'public'
+    )
+  }
+  let(:assignment) do
+    opts = {
+      course: course,
+      submission_types: 'external_tool',
+      external_tool_tag_attributes: {
+        url: tool.url,
+        content_type: 'context_external_tool',
+        content_id: tool.id
+      }
+    }
+    assignment_model(opts)
+  end
   let(:line_item_id) do
     Rails.application.routes.url_helpers.lti_line_item_edit_path(
       course_id: 1,

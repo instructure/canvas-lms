@@ -24,19 +24,32 @@ module Factories
     )
     user = line_item_user(li_result_overrides, course)
     li = lti_result_line_item(li_result_overrides, course)
-    Lti::Result.create!(line_item_params(li_result_overrides, user, li))
+    Lti::Result.create!(line_item_results_params(li_result_overrides, user, li))
   end
 
   private
 
   def lti_result_line_item(li_result_overrides, course)
+    assignment_opts = {
+      course: course,
+      points_possible: li_result_overrides.fetch(:result_maximum, 10),
+      submission_types: li_result_overrides[:tool] ? 'external_tool' : nil,
+      external_tool_tag_attributes: li_result_overrides[:tool] ?
+        {
+          url: li_result_overrides[:tool].url,
+          content_type: 'context_external_tool',
+          content_id: li_result_overrides[:tool].id
+        } :
+        nil
+    }.compact
+
     li_result_overrides[:line_item] ||
       line_item_model(
-        assignment: li_result_overrides[:assignment] ||
-          assignment_model(
-            course: course,
-            points_possible: li_result_overrides.fetch(:result_maximum, 10)
-          )
+        {
+          assignment: li_result_overrides[:assignment] || assignment_model(assignment_opts),
+          with_resource_link: li_result_overrides[:with_resource_link],
+          tool: li_result_overrides[:tool]
+        }.compact
       )
   end
 
@@ -53,7 +66,7 @@ module Factories
     submission
   end
 
-  def line_item_params(li_result_overrides, user, li)
+  def line_item_results_params(li_result_overrides, user, li)
     time = Time.zone.now
     submission = lti_result_submission(li_result_overrides, user, li)
     {

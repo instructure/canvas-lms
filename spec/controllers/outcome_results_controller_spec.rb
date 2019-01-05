@@ -258,6 +258,11 @@ describe OutcomeResultsController do
         format: "json"
     end
 
+    it 'includes rating percents' do
+      json = parse_response(get_rollups(rating_percents: true, include: ['outcomes']))
+      expect(json['linked']['outcomes'][0]['ratings'].map { |r| r['percent'] }).to eq [50, 50]
+    end
+
     context 'sorting' do
       it 'should validate sort_by parameter' do
         get_rollups(sort_by: 'garbage')

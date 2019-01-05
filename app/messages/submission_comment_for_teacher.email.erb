@@ -1,18 +1,56 @@
+<%
+  submission = asset.submission
+  assignment = submission.assignment
+  comment_author = ""
+  link = ""
+  submission_submittor = ""
+
+  if assignment.anonymize_students?
+    link = speed_grader_course_gradebook_url(assignment.context, assignment_id: assignment.id)
+    link += "##{{"anonymous_id": submission.anonymous_id}.to_json}"
+    submission_submittor = t("Student (%{id})", id: submission.anonymous_id)
+    user_submission = Submission.find_by(user: asset.author, assignment: assignment)
+    comment_author = if user_submission.present?
+      t("Student (%{id})", id: user_submission.anonymous_id)
+    else
+      t("Someone")
+    end
+  else
+    comment_author = asset.author_name
+    link = course_assignment_submission_url(assignment.context, assignment, submission.user_id)
+    submission_submittor = submission.user.short_name
+  end
+%>
+
 <% define_content :link do %>
-  <%= polymorphic_url([asset.submission.assignment.context, asset.submission.assignment, :submission], id: asset.submission.user) %>
+  <%= link %>
 <% end %>
 
 <% define_content :subject do %>
-  <%= t :subject, "Submission Comment: %{user}, %{assignment}, %{context}", :user => asset.submission.user.name, :assignment => asset.submission.assignment.title, :context => asset.submission.assignment.context.name %>
+  <%=
+    t(
+      "Submission Comment: %{submission_submittor}, %{assignment}, %{context}",
+      submission_submittor: submission_submittor,
+      assignment: assignment.title,
+      context: assignment.context.name
+    )
+  %>
 <% end %>
 
-<%= t :body, "%{author} just made a new comment on the submission for %{user} for %{assignment}", :author => (asset.author_name || t(:someone, "Someone")), :user => asset.submission.user.short_name, :assignment => asset.submission.assignment.title %>
+<%=
+  t(
+    "%{author} just made a new comment on the submission for %{submission_submittor} for %{assignment}",
+    author: comment_author,
+    submission_submittor: submission_submittor,
+    assignment: assignment.title
+  )
+%>
 
 <%= asset.comment %>
 
 <% if asset.media_comment? %>
   <%= t("This message includes media comments. To listen or reply, click this link: %{link}.", link: content(:link)) %>
-<% elsif IncomingMailProcessor::MailboxAccount.reply_to_enabled %>
+<% elsif IncomingMailProcessor::MailboxAccount.reply_to_enabled && !assignment.anonymize_students? %>
   <%= t("You can reply to this comment by responding to this message, or review the submission details using this link: %{link}.  When allowed, if you need to include an attachment, please log in to Canvas and reply to the submission", link: content(:link)) %>
 <% else %>
   <%= t("You can review the submission details using this link: %{link}.", link: content(:link)) %>

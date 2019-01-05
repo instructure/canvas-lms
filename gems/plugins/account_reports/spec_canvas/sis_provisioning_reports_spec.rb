@@ -736,11 +736,11 @@ describe "Default Account Reports" do
         parsed = read_report("provisioning_csv", {params: parameters, order: 4})
         expect(parsed.length).to eq 4
         expect(parsed).to match_array [[@section1.id.to_s, @section1.sis_source_id,
-                                        @course1.id.to_s, @course1.sis_source_id, nil,
+                                        @course2.id.to_s, @course2.sis_source_id, nil,
                                         @section1.name, "active",
-                                        @course1.start_at.iso8601,
-                                        @course1.conclude_at.iso8601, @sub_account.id.to_s,
-                                        "sub1", "true"],
+                                        @section1.start_at.iso8601,
+                                        @section1.end_at.iso8601, @account.id.to_s,
+                                        nil, "true"],
                                        [@section4.id.to_s, nil, @course2.id.to_s,
                                         @course2.sis_source_id, nil, @section4.name,
                                         "active", nil, nil, @account.id.to_s, nil,

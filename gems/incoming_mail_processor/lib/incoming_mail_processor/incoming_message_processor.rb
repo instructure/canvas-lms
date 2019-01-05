@@ -263,8 +263,11 @@ module IncomingMailProcessor
     def self.utf8ify(string, encoding)
       encoding ||= 'UTF-8'
       encoding = encoding.upcase
+      encoding = "UTF-8" if encoding == "UTF8"
+
       # change encoding; if it throws an exception (i.e. unrecognized encoding), just strip invalid UTF-8
-      Iconv.conv('UTF-8//TRANSLIT//IGNORE', encoding, string) rescue Utf8Cleaner.strip_invalid_utf8(string)
+      new_string = string.encode("UTF-8", encoding) rescue nil
+      new_string&.valid_encoding? ? new_string : Utf8Cleaner.strip_invalid_utf8(string)
     end
 
 

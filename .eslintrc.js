@@ -152,26 +152,7 @@ module.exports = {
       }
     },
     {
-      // If you are starting a new project or section of greenfield code,
-      // or if there is a folder of code that your team controls that you want
-      // to start ensuring conforms to prettier, add it to this array to opt-in
-      // now to conform to prettier.
-      files: [
-        './*.js',
-        'app/jsx/*.js',
-        'app/jsx/account_course_user_search/**/*.js',
-        'app/jsx/announcements/**/*.js',
-        'app/jsx/assignments_2/**/*.js',
-        'app/jsx/dashboard_card/**/*.js',
-        'app/jsx/discussions/**/*.js',
-        'app/jsx/editor/**/*.js',
-        'app/jsx/help_dialog/**/*.js',
-        'app/jsx/login/**/*.js',
-        'app/jsx/permissions/**/*.js',
-        'app/jsx/theme_editor/**/*.js',
-        'frontend_build/**/*.js',
-        'script/**/*.js'
-      ],
+      files: require('./.prettierwhitelist'),
       rules: {
         'prettier/prettier': 'error'
       }

@@ -1,11 +1,14 @@
 # A list of students that an `AssignmentOverride` applies to
 type AdhocStudents {
-  students: [User]
+  students: [User!]
 }
 
 type Assignment implements Node & Timestamped {
   # legacy canvas id
   _id: ID!
+
+  # permitted uploaded file extensions (e.g. ['doc', 'xls', 'txt'])
+  allowedExtensions: [String!]
   assignmentGroup: AssignmentGroup
   assignmentOverrides(
     # Returns the elements in the list that come after the specified cursor.
@@ -33,6 +36,7 @@ type Assignment implements Node & Timestamped {
   id: ID!
   lockAt: DateTime
   lockInfo: LockInfo
+  modules: [Module!]
   muted: Boolean!
   name: String
   needsGradingCount: Int
@@ -158,7 +162,7 @@ type AssignmentGroupRules {
 
   # The lowest N assignments are not included in grade calculations
   dropLowest: Int
-  neverDrop: [Assignment]
+  neverDrop: [Assignment!]
 }
 
 # States that Assignment Group can be in
@@ -540,6 +544,9 @@ type GradingPeriodConnection {
   # A list of edges.
   edges: [GradingPeriodEdge]
 
+  # A list of nodes.
+  nodes: [GradingPeriod]
+
   # Information to aid in pagination.
   pageInfo: PageInfo!
 }
@@ -618,6 +625,9 @@ type GroupMembership implements Timestamped {
 type GroupMembershipConnection {
   # A list of edges.
   edges: [GroupMembershipEdge]
+
+  # A list of nodes.
+  nodes: [GroupMembership]
 
   # Information to aid in pagination.
   pageInfo: PageInfo!
@@ -824,6 +834,9 @@ type Section implements Node & Timestamped {
 type SectionConnection {
   # A list of edges.
   edges: [SectionEdge]
+
+  # A list of nodes.
+  nodes: [Section]
 
   # Information to aid in pagination.
   pageInfo: PageInfo!

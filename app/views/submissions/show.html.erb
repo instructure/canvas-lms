@@ -165,6 +165,16 @@
               <span class="submission-missing-pill"></span>
             <% end %>
           <% end %>
+          <% if @assignment.allowed_attempts&.> 0 %>
+            <div class="submission-details-header__attempts_info">
+              <span class="bold"><%= t :attempts, 'Attempts' %></span>
+              <span><%= @submission.attempt || 0 %></span>
+            </div>
+            <div class="submission-details-header__attempts_info">
+              <span class="bold"><%= t :allowed_attempts, 'Allowed Attempts' %></span>
+              <span><%= @assignment.allowed_attempts + (@submission.extra_attempts || 0) %></span>
+            </div>
+          <% end %>
         </div>
       </div>
       <div class="ic-Action-header__Secondary ic-Action-header__Secondary--auto">
@@ -175,7 +185,7 @@
           </a>
         <% end %>
         <% if @assignment.expects_submission? && can_do(@assignment, @current_user, :submit) && @current_user == @submission.user %>
-          <a href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>#submit" class="Button Button--primary" >
+          <a href="<%= context_url(@context, :context_assignment_url, @assignment.id) %>#submit" class="Button Button--primary" <%= 'disabled' if @submission&.attempts_left == 0 %>>
             <%= @submission.has_submission? ? t('links.resubmit', "Re-submit Assignment") : t('links.submit', "Submit Assignment") %>
           </a>
         <% end %>

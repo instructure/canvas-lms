@@ -51,6 +51,7 @@ class GradebookSettingsController < ApplicationController
       :enter_grades_as,
       :show_concluded_enrollments,
       :show_inactive_enrollments,
+      :show_final_grade_overrides,
       :show_unpublished_assignments,
       :student_column_display_as,
       :student_column_secondary_info,

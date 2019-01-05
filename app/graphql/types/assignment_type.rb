@@ -73,7 +73,6 @@ module Types
     field :position, Int,
       "determines the order this assignment is displayed in in its assignment group",
       null: true
-    field :description, String, null: true
 
     field :points_possible, Float, "the assignment is out of this many points",
       null: true
@@ -85,6 +84,10 @@ module Types
     field :unlock_at, DateTimeType, null: true
 
     field :lock_info, LockInfoType, null: true
+
+    field :allowed_extensions, [String],
+      "permitted uploaded file extensions (e.g. ['doc', 'xls', 'txt'])",
+      null: true
 
     def lock_info
       Loaders::AssociationLoader.for(
@@ -126,6 +129,32 @@ module Types
       )
     end
 
+    class AttachmentPreloader < GraphQL::Batch::Loader
+      def initialize(context)
+        @context = context
+      end
+
+      def perform(htmls)
+        as = Api.api_bulk_load_user_content_attachments(htmls, @context)
+        htmls.each { |html| fulfill(html, as) }
+      end
+    end
+
+    field :description, String, null: true
+    def description
+      return nil if assignment.description.blank?
+      load_association(:context).then do |course|
+        AttachmentPreloader.for(course).load(assignment.description).then do |preloaded_attachments|
+          GraphQLHelpers::UserContent.process(assignment.description,
+                                              request: context[:request],
+                                              context: assignment.context,
+                                              user: current_user,
+                                              in_app: context[:in_app],
+                                              preloaded_attachments: preloaded_attachments)
+        end
+      end
+    end
+
     field :needs_grading_count, Int, null: true
     def needs_grading_count
       # NOTE: this query (as it exists right now) is not batch-able.
@@ -160,6 +189,13 @@ module Types
     field :assignment_group, AssignmentGroupType, null: true
     def assignment_group
       load_association(:assignment_group)
+    end
+
+    field :modules, [ModuleType], null: true
+    def modules
+      load_association(:context_module_tags).then do
+        assignment.context_module_tags.map(&:context_module).sort_by(&:position)
+      end
     end
 
     field :only_visible_to_overrides, Boolean,

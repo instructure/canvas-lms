@@ -18,7 +18,7 @@
 import * as Actions from '../loading-actions';
 import moxios from 'moxios';
 import moment from 'moment-timezone';
-import { moxiosWait, moxiosRespond} from '../../test-utils';
+import { moxiosWait, moxiosRespond } from 'jest-moxios-utils';
 import { initialize as alertInitialize } from '../../utilities/alertUtils';
 
 jest.mock('../../utilities/apiUtils', () => ({

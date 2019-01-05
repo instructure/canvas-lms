@@ -111,7 +111,7 @@ describe "admin_tools" do
         site_admin_user
         user_with_pseudonym(:user => @admin, :account => @account)
         user_session(@admin)
-        message(:user_id => @student.id, :body => 'this is my message', :account_id => @account.id)
+        message_model(:user_id => @student.id, :body => 'this is my message', :root_account_id => @account.id)
 
         load_admin_tools_page
         click_view_notifications_tab
@@ -125,7 +125,7 @@ describe "admin_tools" do
     context "as AccountAdmin" do
       context "with permissions" do
         it "should perform search" do
-          message(:user_id => @student.id)
+          message_model(:user_id => @student.id, :body => 'foo bar', :root_account_id => @account.id)
           load_admin_tools_page
           click_view_notifications_tab
           perform_user_search("#commMessagesSearchForm", @student.id)
@@ -135,7 +135,7 @@ describe "admin_tools" do
         end
 
         it "should display nothing found" do
-          message(:user_id => @student.id)
+          message_model(:user_id => @student.id, :body => 'foo bar', :root_account_id => @account.id)
           load_admin_tools_page
           click_view_notifications_tab
           perform_user_search("#commMessagesSearchForm", @student.id)
@@ -147,7 +147,7 @@ describe "admin_tools" do
         end
 
         it "should display valid search params used" do
-          message(:user_id => @student.id)
+          message_model(:user_id => @student.id, :body => 'foo bar', :root_account_id => @account.id)
           load_admin_tools_page
           click_view_notifications_tab
           # Search with no dates
