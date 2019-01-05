@@ -208,10 +208,6 @@ module Api::V1
       }
 
       if @course.grants_any_right?(@user, :manage_grades, :view_all_grades)
-        opts = { grading_period_id: current_grading_period.id }
-        override_grade = student_enrollment.override_grade(opts)
-        override_score = student_enrollment.override_score(opts)
-
         scores[:current_period_unposted_current_score] =
           grading_period_score(student_enrollment, :current, unposted: true)
         scores[:current_period_unposted_final_score] =
@@ -220,8 +216,14 @@ module Api::V1
           grading_period_grade(student_enrollment, :current, unposted: true)
         scores[:current_period_unposted_final_grade] =
           grading_period_grade(student_enrollment, :final, unposted: true)
-        scores[:current_period_override_grade] = override_grade if override_grade.present?
-        scores[:current_period_override_score] = override_score if override_score.present?
+
+        if current_grading_period
+          opts = { grading_period_id: current_grading_period.id }
+          override_grade = student_enrollment.override_grade(opts)
+          override_score = student_enrollment.override_score(opts)
+          scores[:current_period_override_grade] = override_grade if override_grade.present?
+          scores[:current_period_override_score] = override_score if override_score.present?
+        end
       end
       scores
     end
