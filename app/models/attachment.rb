@@ -1058,7 +1058,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def disposition_filename
-    ascii_filename = display_name.force_encoding("UTF-8")
+    ascii_filename = I18n.transliterate(display_name, replacement: '_')
 
     # response-content-disposition will be url encoded in the depths of
     # aws-s3, doesn't need to happen here. we'll be nice and ghetto http
