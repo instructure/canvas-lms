@@ -37,7 +37,7 @@ export default function CoursesList(props) {
       <thead>
         <tr>
           <th width="1" scope="col">
-            <ScreenReaderContent>{I18n.t('Published')}</ScreenReaderContent>
+            {I18n.t('Published')}
           </th>
           <th>
             <CoursesListHeader

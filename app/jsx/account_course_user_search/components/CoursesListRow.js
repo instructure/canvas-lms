@@ -25,6 +25,7 @@ import IconBlueprintLine from '@instructure/ui-icons/lib/Line/IconBlueprint'
 import IconPlusLine from '@instructure/ui-icons/lib/Line/IconPlus'
 import IconSettingsLine from '@instructure/ui-icons/lib/Line/IconSettings'
 import IconStatsLine from '@instructure/ui-icons/lib/Line/IconStats'
+import IconPublish from '@instructure/ui-icons/lib/Line/IconPublish'
 import axios from 'axios'
 import {uniqBy} from 'lodash'
 import $ from 'compiled/jquery.rails_flash_notifications'
@@ -159,13 +160,16 @@ export default class CoursesListRow extends React.Component {
 
     return (
       <tr>
-        <th scope="row">
-          {isPublished && (
-            <Tooltip tip={I18n.t('Published')}>
-              <span className="published-status published">
-                <i className="icon-publish" />
-              </span>
-            </Tooltip>
+        <th scope="row" style={{textAlign: 'center'}}>
+          {isPublished ? (
+            <span className="published-status published">
+              <IconPublish size="x-smll" />
+              <ScreenReaderContent>{I18n.t('yes')}</ScreenReaderContent>
+            </span>
+          ) : (
+            <span className="published-status unpublished">
+              <ScreenReaderContent>{I18n.t('no')}</ScreenReaderContent>
+            </span>
           )}
         </th>
         <td>

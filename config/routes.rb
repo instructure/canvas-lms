@@ -964,7 +964,7 @@ CanvasRails::Application.routes.draw do
       delete 'courses/:id', action: :destroy
       post 'accounts/:account_id/courses', action: :create
       get 'courses/:course_id/students', action: :students
-      get 'courses/:course_id/settings', action: :settings, as: 'course_settings'
+      get 'courses/:course_id/settings', action: :api_settings, as: 'course_settings'
       put 'courses/:course_id/settings', action: :update_settings
       get 'courses/:course_id/recent_students', action: :recent_students, as: 'course_recent_students'
       get 'courses/:course_id/users', action: :users, as: 'course_users'
@@ -1373,6 +1373,8 @@ CanvasRails::Application.routes.draw do
       post 'users/:id/split', controller: 'users', action: 'split'
 
       post 'users/self/pandata_events_token', controller: 'users', action: 'pandata_events_token'
+
+      get 'dashboard/dashboard_cards', controller: 'users', action: 'dashboard_cards', as: :dashboard_dashboard_cards
 
       scope(controller: :user_observees) do
         get    'users/:user_id/observees', action: :index, as: 'user_observees'

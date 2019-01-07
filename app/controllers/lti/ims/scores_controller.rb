@@ -87,7 +87,7 @@ module Lti::Ims
     # @internal
     #
     # Create a new Result from the score params. If this is for the first created line_item for a
-    # ltiLinkId, or it is a line item that is not attached to a ltiLinkId, then a submission
+    # resourceLinkId, or it is a line item that is not attached to a resourceLinkId, then a submission
     # record will be created for the associated assignment when gradingProgress is set to
     # FullyGraded or PendingManual.
     #

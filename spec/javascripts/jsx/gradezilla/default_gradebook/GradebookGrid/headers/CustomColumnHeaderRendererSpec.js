@@ -16,72 +16,83 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!gradebook';
-import ReactDOM from 'react-dom';
-import { createGradebook, setFixtureHtml } from '../../GradebookSpecHelper';
-import CustomColumnHeaderRenderer
-from 'jsx/gradezilla/default_gradebook/GradebookGrid/headers/CustomColumnHeaderRenderer';
+import I18n from 'i18n!gradebook'
+import ReactDOM from 'react-dom'
+import {createGradebook, setFixtureHtml} from 'jsx/gradezilla/default_gradebook/__tests__/GradebookSpecHelper'
+import CustomColumnHeaderRenderer from 'jsx/gradezilla/default_gradebook/GradebookGrid/headers/CustomColumnHeaderRenderer'
 
-QUnit.module('CustomColumnHeaderRenderer', function (suiteHooks) {
-  let $container;
-  let gradebook;
-  let column;
-  let renderer;
-  let component;
+QUnit.module('GradebookGrid CustomColumnHeaderRenderer', suiteHooks => {
+  let $container
+  let gradebook
+  let column
+  let renderer
+  let component
 
-  function render () {
-    renderer.render(column, $container, {} /* gridSupport */, { ref (ref) { component = ref } });
+  function render() {
+    renderer.render(
+      column,
+      $container,
+      {} /* gridSupport */,
+      {
+        ref(ref) {
+          component = ref
+        }
+      }
+    )
   }
 
-  suiteHooks.beforeEach(function () {
-    $container = document.createElement('div');
-    document.body.appendChild($container);
-    setFixtureHtml($container);
+  suiteHooks.beforeEach(() => {
+    $container = document.createElement('div')
+    document.body.appendChild($container)
+    setFixtureHtml($container)
 
-    gradebook = createGradebook();
+    gradebook = createGradebook()
     gradebook.gotCustomColumns([
-      { id: '2401', teacher_notes: true, title: 'Notes' },
-      { id: '2402', teacher_notes: false, title: 'Other Notes' }
-    ]);
-    column = { id: gradebook.getCustomColumnId('2401'), customColumnId: '2401' };
-    renderer = new CustomColumnHeaderRenderer(gradebook);
-  });
+      {id: '2401', teacher_notes: true, title: 'Notes'},
+      {id: '2402', teacher_notes: false, title: 'Other Notes'}
+    ])
+    column = {id: gradebook.getCustomColumnId('2401'), customColumnId: '2401'}
+    renderer = new CustomColumnHeaderRenderer(gradebook)
+  })
 
-  suiteHooks.afterEach(function() {
-    $container.remove();
-  });
+  suiteHooks.afterEach(() => {
+    $container.remove()
+  })
 
-  QUnit.module('#render', function () {
-    test('renders the CustomColumnHeader to the given container node', function () {
-      render();
-      ok($container.innerText.includes('Notes'), 'the "Notes" header is rendered');
-    });
+  QUnit.module('#render()', () => {
+    test('renders the CustomColumnHeader to the given container node', () => {
+      render()
+      ok($container.innerText.includes('Notes'), 'the "Notes" header is rendered')
+    })
 
-    test('calls the "ref" option with the component reference', function () {
-      render();
-      equal(component.constructor.name, 'CustomColumnHeader');
-    });
+    test('calls the "ref" option with the component reference', () => {
+      render()
+      equal(component.constructor.name, 'CustomColumnHeader')
+    })
 
-    test('uses translated label for teacher notes', function () {
-      sinon.stub(I18n, 't').withArgs('Notes').returns('Translated Notes');
-      render();
-      equal(component.props.title, 'Translated Notes');
-      I18n.t.restore();
-    });
+    test('uses translated label for teacher notes', () => {
+      sinon
+        .stub(I18n, 't')
+        .withArgs('Notes')
+        .returns('Translated Notes')
+      render()
+      equal(component.props.title, 'Translated Notes')
+      I18n.t.restore()
+    })
 
-    test('uses the custom column for the related "customColumnId" on the column definition', function () {
-      column = { id: 'custom_col_2402', customColumnId: '2402' };
-      render();
-      equal(component.props.title, 'Other Notes');
-    });
-  });
+    test('uses the custom column for the related "customColumnId" on the column definition', () => {
+      column = {id: 'custom_col_2402', customColumnId: '2402'}
+      render()
+      equal(component.props.title, 'Other Notes')
+    })
+  })
 
-  QUnit.module('#destroy', function () {
-    test('unmounts the component', function () {
-      render();
-      renderer.destroy({}, $container);
-      const removed = ReactDOM.unmountComponentAtNode($container);
-      strictEqual(removed, false, 'the component was already unmounted');
-    });
-  });
-});
+  QUnit.module('#destroy()', () => {
+    test('unmounts the component', () => {
+      render()
+      renderer.destroy({}, $container)
+      const removed = ReactDOM.unmountComponentAtNode($container)
+      strictEqual(removed, false, 'the component was already unmounted')
+    })
+  })
+})

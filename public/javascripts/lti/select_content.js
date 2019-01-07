@@ -19,11 +19,13 @@
 export default class {
   static contentPlacements = ['resource_selection']
 
-  static contentMessageTypes = ["ContentItemSelectionRequest", "LtiDeepLinkingRequest"]
+  static contentMessageTypes = ['ContentItemSelectionRequest', 'LtiDeepLinkingRequest']
 
-  static isContentMessage(message_type, placements = {}) {
-    return(
-      this.contentPlacements.some((p) => (Object.keys(placements).includes(p))) ||
+  static isContentMessage(placement, placements = {}) {
+    const message_type = placement && placement.message_type
+
+    return (
+      this.contentPlacements.some(p => Object.keys(placements).includes(p)) ||
       this.contentMessageTypes.includes(message_type)
     )
   }

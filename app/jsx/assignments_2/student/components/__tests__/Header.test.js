@@ -29,12 +29,7 @@ beforeAll(() => {
     fixtures.setAttribute('id', 'fixtures')
     document.body.appendChild(fixtures)
   }
-  global.ENV = {}
-  global.ENV.context_asset_string = 'course_1'
-})
-
-afterAll(() => {
-  global.ENV = null
+  window.pageYOffset = 0
 })
 
 afterEach(() => {
@@ -42,7 +37,34 @@ afterEach(() => {
 })
 
 it('renders normally', () => {
-  ReactDOM.render(<Header assignment={mockAssignment()} />, document.getElementById('fixtures'))
+  ReactDOM.render(
+    <Header scrollThreshold={150} assignment={mockAssignment()} />,
+    document.getElementById('fixtures')
+  )
   const element = $('[data-test-id="assignments-2-student-header"]')
   expect(element).toHaveLength(1)
+})
+
+it('dispatches scroll event properly when less than threshold', () => {
+  ReactDOM.render(
+    <Header scrollThreshold={150} assignment={mockAssignment()} />,
+    document.getElementById('fixtures')
+  )
+  const scrollEvent = new Event('scroll')
+  window.pageYOffset = 100
+  window.dispatchEvent(scrollEvent)
+  const foundClassElement = $('[data-test-id="assignment-student-header-normal"]')
+  expect(foundClassElement).toHaveLength(1)
+})
+
+it('dispatches scroll event properly when greather than threshold', () => {
+  ReactDOM.render(
+    <Header scrollThreshold={150} assignment={mockAssignment()} />,
+    document.getElementById('fixtures')
+  )
+  const scrollEvent = new Event('scroll')
+  window.pageYOffset = 500
+  window.dispatchEvent(scrollEvent)
+  const foundClassElement = $('[data-test-id="assignment-student-header-sticky"]')
+  expect(foundClassElement).toHaveLength(1)
 })

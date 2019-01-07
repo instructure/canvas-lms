@@ -26,7 +26,7 @@ import {ModalFooter} from '@instructure/ui-overlays/lib/components/Modal'
 const NewKeyFooter = props => {
   return (
     <ModalFooter>
-      <Button onClick={props.onCancelClick}>{I18n.t('Cancel')}</Button>&nbsp;
+      <Button onClick={props.onCancelClick} margin="0 small 0 0">{I18n.t('Cancel')}</Button>
       <Button onClick={props.onSaveClick} variant="primary" disabled={props.disable}>
         {I18n.t('Save Key')}
       </Button>

@@ -94,13 +94,21 @@ module Csp::AccountHelper
 
   ACCOUNT_TOOL_CACHE_KEY_PREFIX = "account_tool_domains".freeze
   def cached_tool_domains
-    Rails.cache.fetch([ACCOUNT_TOOL_CACHE_KEY_PREFIX, self.global_id].cache_key) do
+    @cached_tool_domains ||= Rails.cache.fetch([ACCOUNT_TOOL_CACHE_KEY_PREFIX, self.global_id].cache_key) do
       get_account_tool_domains
     end
   end
 
+  def csp_tools_grouped_by_domain
+    csp_tool_scope.to_a.group_by{|tool| (tool.domain || (Addressable::URI.parse(tool.url).normalize.host rescue nil))&.downcase }.except(nil)
+  end
+
   def get_account_tool_domains
-    Csp::Domain.domains_for_tools(ContextExternalTool.where(:context_type => "Account", :context_id => account_chain_ids).active)
+    Csp::Domain.domains_for_tools(csp_tool_scope)
+  end
+
+  def csp_tool_scope
+    ContextExternalTool.where(:context_type => "Account", :context_id => account_chain_ids).active
   end
 
   def clear_tool_domain_cache

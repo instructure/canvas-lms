@@ -481,17 +481,41 @@ describe Oauth2ProviderController do
         expect(response.body).to match(/incorrect client/)
       end
 
-      it 'should be able to regenerate access_token multiple times' do
-        post :token, params: base_params.merge(refresh_token: refresh_token)
-        expect(response).to be_successful
-        json = JSON.parse(response.body)
-        expect(json['access_token']).to_not eq old_token.full_token
+      context "multiple refreshes" do
+        before :each do
+          allow_any_instance_of(Canvas::Oauth::GrantTypes::RefreshToken).
+            to receive(:update_recently_refreshed_tokens?).and_return(false)
+        end
 
-        access_token = json['access_token']
-        post :token, params: base_params.merge(refresh_token: refresh_token)
-        expect(response).to be_successful
-        json = JSON.parse(response.body)
-        expect(json['access_token']).to_not eq access_token
+        it 'should be able to regenerate access_token multiple times (with enough time in between)' do
+          post :token, params: base_params.merge(refresh_token: refresh_token)
+          expect(response).to be_successful
+          json = JSON.parse(response.body)
+          expect(json['access_token']).to_not eq old_token.full_token
+
+          Timecop.freeze(1.minute.from_now) do
+            access_token = json['access_token']
+            post :token, params: base_params.merge(refresh_token: refresh_token)
+            expect(response).to be_successful
+            json = JSON.parse(response.body)
+            expect(json['access_token']).to_not eq access_token
+          end
+        end
+
+        it 'should not be able to regenerate access_token multiple times in short succession' do
+          post :token, params: base_params.merge(refresh_token: refresh_token)
+          expect(response).to be_successful
+          json = JSON.parse(response.body)
+          expect(json['access_token']).to_not eq old_token.full_token
+
+          Timecop.freeze(old_token.reload.updated_at + 1.second) do
+            access_token = json['access_token']
+            post :token, params: base_params.merge(refresh_token: refresh_token)
+            expect(response).to be_successful
+            json = JSON.parse(response.body)
+            expect(json['access_token']).to eq access_token # didn't change
+          end
+        end
       end
     end
 
@@ -588,15 +612,15 @@ describe Oauth2ProviderController do
           end
         end
 
-        context 'with replayed jwt' do
-          it 'returns 400' do
+        context 'with same token' do
+          it 'returns 200' do
             enable_cache do
               expect(subject).to have_http_status 200
               Setting.set('oauth.allowed_timestamp_future_skew', 0.seconds)
 
               parameters = {grant_type: 'client_credentials' }.merge(client_credentials_params)
               post :token, params: parameters
-              expect(response).to have_http_status 400
+              expect(response).to have_http_status 200
             end
           end
         end

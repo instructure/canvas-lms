@@ -15,6 +15,7 @@ exports[`The Comments component renders a footer after the comment when provided
         "comments_html": "I award you <b>no</b> points, and may God have mercy on your soul.",
         "criterion_id": "7_391",
         "description": "No details",
+        "editComments": true,
         "learning_outcome_id": "612",
         "points": Object {
           "text": null,
@@ -47,10 +48,11 @@ exports[`The Comments component renders a placeholder when no assessment provide
 </span>
 `;
 
-exports[`The Comments component renders the root component as expected when assessing 1`] = `
+exports[`The Comments component renders the root component as expected when editing 1`] = `
 <FreeFormComments
   allowSaving={true}
   comments="I award you no points, and may God have mercy on your soul."
+  large={true}
   saveLater={false}
   savedComments={
     Array [

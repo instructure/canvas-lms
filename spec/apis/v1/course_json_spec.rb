@@ -307,16 +307,21 @@ module Api
 
             before(:once) do
               grading_period_group = course.grading_period_groups.create!
-              gp1 = grading_period_group.grading_periods.create!(
+              @gp1 = grading_period_group.grading_periods.create!(
                 close_date: 2.days.from_now,
                 end_date: 2.days.from_now,
                 start_date: 1.day.ago,
                 title: "gp1"
               )
-              @gp_score = student_enrollment.scores.find_by!(grading_period: gp1)
+              @gp_score = student_enrollment.scores.find_by!(grading_period: @gp1)
               @gp_score.update!(current_score: 63, final_score: 73)
               course.update!(grading_standard_enabled: true)
               course.enable_feature!(:final_grades_override)
+            end
+
+            it "doesn't error when there is no grading period" do
+              @gp1.destroy
+              expect { json_enrollment.fetch(:current_period_computed_current_score) }.to_not raise_error
             end
 
             it "returns the grading period current grade" do

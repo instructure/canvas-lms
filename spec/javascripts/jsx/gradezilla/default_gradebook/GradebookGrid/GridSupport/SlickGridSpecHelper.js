@@ -17,37 +17,37 @@
  */
 
 export default class SlickGridSpecHelper {
-  constructor (gradebookGrid) {
-    this.grid = gradebookGrid.grid;
+  constructor(gradebookGrid) {
+    this.grid = gradebookGrid.grid
   }
 
-  getColumn (id) {
-    return this.grid.getColumns().find(column => column.id === id);
+  getColumn(id) {
+    return this.grid.getColumns().find(column => column.id === id)
   }
 
-  listColumns () {
-    return this.grid.getColumns();
+  listColumns() {
+    return this.grid.getColumns()
   }
 
-  listColumnIds () {
-    return this.grid.getColumns().map(column => column.id);
+  listColumnIds() {
+    return this.grid.getColumns().map(column => column.id)
   }
 
-  listFrozenColumnIds () {
-    return this.listColumnIds().slice(0, this.grid.getOptions().numberOfColumnsToFreeze);
+  listFrozenColumnIds() {
+    return this.listColumnIds().slice(0, this.grid.getOptions().numberOfColumnsToFreeze)
   }
 
-  listScrollableColumnIds () {
-    return this.listColumnIds().slice(this.grid.getOptions().numberOfColumnsToFreeze);
+  listScrollableColumnIds() {
+    return this.listColumnIds().slice(this.grid.getOptions().numberOfColumnsToFreeze)
   }
 
-  updateColumnOrder (columnIds) {
-    const columns = this.grid.getColumns();
-    this.grid.setColumns(columnIds.map(id => columns.find(column => column.id === id)));
-    this.grid.onColumnsReordered.notify();
+  updateColumnOrder(columnIds) {
+    const columns = this.grid.getColumns()
+    this.grid.setColumns(columnIds.map(id => columns.find(column => column.id === id)))
+    this.grid.onColumnsReordered.notify()
   }
 
-  getColumnHeaderNode (columnId) {
-    return this.grid.getColumnHeaderNode(columnId);
+  getColumnHeaderNode(columnId) {
+    return this.grid.getColumnHeaderNode(columnId)
   }
 }

@@ -87,7 +87,7 @@ module Lti
             label: label,
             resourceId: resource_id,
             tag: tag,
-            ltiLinkId: assignment.lti_context_id,
+            resourceLinkId: assignment.lti_context_id,
             course_id: context_id
           }
         end
@@ -97,6 +97,7 @@ module Lti
         it_behaves_like 'advantage services'
 
         before do
+          resource_link.context_external_tool.update!(developer_key: developer_key)
           resource_link.line_items.create!(
             score_maximum: 1,
             label: 'Canvas Created',
@@ -136,7 +137,7 @@ module Lti
               label: label,
               resourceId: resource_id,
               tag: tag,
-              ltiLinkId: item.resource_link.resource_link_id
+              resourceLinkId: item.resource_link.resource_link_id
             }.with_indifferent_access
 
             expect(parsed_response_body).to eq expected_response
@@ -169,9 +170,9 @@ module Lti
           end
 
           context do
-            let(:params_overrides) { super().merge(ltiLinkId: SecureRandom.uuid) }
+            let(:params_overrides) { super().merge(resourceLinkId: SecureRandom.uuid) }
 
-            it 'renders not found if no matching ResourceLink for the specified ltiLinkId' do
+            it 'renders not found if no matching ResourceLink for the specified resourceLinkId' do
               send_request
               expect(response).to be_not_found
             end
@@ -179,7 +180,7 @@ module Lti
         end
 
         context 'when using the uncoupled model' do
-          let(:params_overrides) { super().except(:ltiLinkId) }
+          let(:params_overrides) { super().except(:resourceLinkId) }
 
           it_behaves_like 'the line item create endpoint'
 
@@ -302,7 +303,6 @@ module Lti
           let(:line_item) { assignment.line_items.first }
 
           it 'updates the assignment name if ResourceLink is absent' do
-            skip('Pending a review of how we will handle the decoupled approach')
             line_item.update_attributes!(resource_link: nil)
             send_request
             expect(line_item.reload.assignment.name).to eq new_label
@@ -337,18 +337,18 @@ module Lti
         end
 
         context do
-          let(:new_lti_link_id) do
+          let(:new_resource_link_id) do
             a = assignment_model
             a.lti_context_id
           end
-          let(:params_overrides) { super().merge(ltiLinkId: new_lti_link_id) }
+          let(:params_overrides) { super().merge(resourceLinkId: new_resource_link_id) }
 
-          it 'responds with precondition failed message if a non-matching ltiLinkId is included' do
+          it 'responds with precondition failed message if a non-matching resourceLinkId is included' do
             send_request
             expect(response).to be_precondition_failed
           end
 
-          it 'includes an error message if a non-mataching ltiLinkId is included' do
+          it 'includes an error message if a non-mataching resourceLinkId is included' do
             send_request
             error_message = parsed_response_body.dig('errors', 'message')
             expect(error_message).to eq 'The specified LTI link ID is not associated with the line item.'
@@ -362,7 +362,7 @@ module Lti
             id: "http://test.host/api/lti/courses/#{course.id}/line_items/#{line_item.id}",
             scoreMaximum: 10.0,
             label: 'Test Line Item',
-            ltiLinkId: line_item.resource_link.resource_link_id
+            resourceLinkId: line_item.resource_link.resource_link_id
           }.with_indifferent_access
 
           expect(parsed_response_body).to eq expected_response
@@ -402,7 +402,7 @@ module Lti
             scoreMaximum: 10.0,
             label: 'Test Line Item',
             tag: tag,
-            ltiLinkId: line_item.resource_link.resource_link_id
+            resourceLinkId: line_item.resource_link.resource_link_id
           }.with_indifferent_access
           expect(parsed_response_body).to eq expected_response
         end
@@ -465,7 +465,7 @@ module Lti
             resource_id: resource_id
           )
         end
-        let!(:line_item_with_lti_link_id) do
+        let!(:line_item_with_resource_link_id) do
           line_item_model(
             assignment: assignment,
             resource_link: resource_link
@@ -499,7 +499,7 @@ module Lti
             line_item,
             line_item_with_tag,
             line_item_with_resource_id,
-            line_item_with_lti_link_id
+            line_item_with_resource_link_id
           ])
         end
 
@@ -533,9 +533,9 @@ module Lti
               tool: tool
             )
           end
-          let(:params_overrides) { super().merge(lti_link_id: line_item_new_lti_link.resource_link.resource_link_id) }
+          let(:params_overrides) { super().merge(resource_link_id: line_item_new_lti_link.resource_link.resource_link_id) }
 
-          it 'correctly queries by lti_link_id' do
+          it 'correctly queries by resource_link_id' do
             send_request
             expect(line_item_list).to match_array([
               line_item_new_lti_link.assignment.line_items.first,

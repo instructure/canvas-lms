@@ -36,7 +36,9 @@ describe Types::GroupType do
       to eq @group.group_memberships.map(&:to_param)
   end
 
-  it "requires permission" do
+  it "requires read permission" do
+    user = user_factory(active_all: true)
+    expect(group_type.resolve("_id", current_user: user)).to be_nil
   end
 
   describe Types::GroupMembershipType do

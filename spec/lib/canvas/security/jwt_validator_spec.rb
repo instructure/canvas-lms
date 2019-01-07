@@ -22,12 +22,17 @@ module Canvas::Security
   describe JwtValidator do
     subject { validator.error_message }
 
-    let(:validator) { described_class.new jwt: jwt, expected_aud: expected_aud, require_iss: require_iss }
+    let(:validator) do
+      described_class.new(
+        jwt: jwt, expected_aud: expected_aud, require_iss: require_iss, skip_jti_check: skip_jti_check
+      )
+    end
     let(:aud) { Rails.application.routes.url_helpers.oauth2_token_url }
     let(:expected_aud) { Rails.application.routes.url_helpers.oauth2_token_url }
     let(:iat) { 1.minute.ago.to_i }
     let(:exp) { 10.minutes.from_now.to_i }
     let(:require_iss) { false }
+    let(:skip_jti_check) { false }
     let(:jwt) do
       {
         'iss' => 'someiss',
@@ -68,7 +73,27 @@ module Canvas::Security
       context 'with iat too far in future' do
         let(:iat) { 6.minutes.from_now.to_i }
 
-      it { is_expected.not_to be_empty }
+        it { is_expected.not_to be_empty }
+      end
+    end
+
+    context 'jti check' do
+      it 'is false when validated twice', skip_before: true do
+        enable_cache do
+          validator.validate
+          expect(validator.validate).to eq false
+        end
+      end
+
+      context 'when skip_jti_check is on' do
+        let(:skip_jti_check) { true }
+
+        it 'is true when when validated twice', skip_before: true do
+          enable_cache do
+            validator.validate
+            expect(validator.validate).to eq true
+          end
+        end
       end
     end
 

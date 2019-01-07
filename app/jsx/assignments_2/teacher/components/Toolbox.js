@@ -25,9 +25,12 @@ import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import Link from '@instructure/ui-elements/lib/components/Link'
 import Text from '@instructure/ui-elements/lib/components/Text'
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 
 import IconEmail from '@instructure/ui-icons/lib/Line/IconEmail'
 import IconSpeedGrader from '@instructure/ui-icons/lib/Line/IconSpeedGrader'
+import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
 
 import {TeacherAssignmentShape} from '../assignmentData'
 
@@ -50,9 +53,18 @@ export default class Toolbox extends React.Component {
         label={I18n.t('Published')}
         variant="toggle"
         size="medium"
+        inline
         checked={this.props.assignment.state === 'published'}
         onChange={this.props.onPublishChange}
       />
+    )
+  }
+
+  renderDelete() {
+    return (
+      <Button margin="0 0 0 x-small" icon={<IconTrash />}>
+        <ScreenReaderContent>{I18n.t('Delete')}</ScreenReaderContent>
+      </Button>
     )
   }
 
@@ -61,7 +73,7 @@ export default class Toolbox extends React.Component {
     const courseLid = this.props.assignment.course.lid
     const speedgraderLink = `/courses/${courseLid}/gradebook/speed_grader?assignment_id=${assignmentLid}`
     return (
-      <Link href={speedgraderLink} icon={<IconSpeedGrader />} iconPlacement="end">
+      <Link href={speedgraderLink} icon={<IconSpeedGrader />} iconPlacement="end" target="_blank">
         <Text transform="uppercase" size="small" color="primary">
           {I18n.t('%{number} to grade', {number: 'X'})}
         </Text>
@@ -79,13 +91,36 @@ export default class Toolbox extends React.Component {
     )
   }
 
+  renderPoints() {
+    return (
+      <Text as="div" size="x-large" lineHeight="fit">
+        {this.props.assignment.pointsPossible}
+      </Text>
+    )
+  }
+
+  renderPointsLabel() {
+    return (
+      <Text as="div" lineHeight="fit">
+        {I18n.t('Points')}
+      </Text>
+    )
+  }
+
   render() {
     return (
       <div data-testid="teacher-toolbox">
-        <Flex direction="column" textAlign="end">
-          <FlexItem padding="0 0 medium 0">{this.renderPublished()}</FlexItem>
-          <FlexItem>{this.renderSpeedGraderLink()}</FlexItem>
-          <FlexItem>{this.renderUnsubmittedButton()}</FlexItem>
+        <Flex direction="column">
+          <FlexItem padding="xx-small xx-small small">
+            {this.renderPublished()}
+            {this.renderDelete()}
+          </FlexItem>
+          <FlexItem padding="xx-small xx-small xxx-small">{this.renderSpeedGraderLink()}</FlexItem>
+          <FlexItem padding="xxx-small xx-small">{this.renderUnsubmittedButton()}</FlexItem>
+          <FlexItem padding="medium xx-small large">
+            {this.renderPoints()}
+            {this.renderPointsLabel()}
+          </FlexItem>
         </Flex>
       </div>
     )

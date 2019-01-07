@@ -7,6 +7,10 @@ export TEST_QUEUE_REPLACE_STATS=1
 export TEST_QUEUE_NUM_LAZY_LOADERS=4
 export ERROR_CONTEXT_BASE_PATH="`pwd`/log/spec_failures/Initial"
 
+success_status=0
+webdriver_crash_status=98
+test_failure_status=99
+
 max_failures=${RERUNS:=200}
 rerun_number=0
 crash_num=0
@@ -66,37 +70,49 @@ while true; do
   failed_relevant_spec_list=($(echo "${failed_relevant_spec_list[@]}"|tr ' ' '\n'|sort -u|tr '\n' ' '))
   failures_exempt_from_rerun_threshold=$(echo "${exempt_spec_list[@]}"|tr ' ' '\n'|grep .|sort -u|wc -l)
 
-  rerun_number=$((rerun_number+1))
-  runs_remaining=$((runs_remaining-1))
-  num_failures=${#new_spec_list[@]}
+  echo "last status: $last_status"
+  [[ $last_status == $success_status ]] && break
 
-  [[ $last_status == 0 ]] && break
-  if [[ $last_status == 98 ]] && [[ $crash_num == 0 ]]; then
+  if [[ $last_status != $success_status && $last_status != $webdriver_crash_status && $last_status != $test_failure_status ]]; then
+    echo "unexpected exit code $last_status! perhaps the code is horribly broken :("
+    break
+  fi
+
+  if [[ $last_status == $webdriver_crash_status ]]; then
+    if [[ $crash_num != 0 ]]; then
+      echo "a worker may have crashed during retry, exiting"
+      break
+    fi
+
     echo "a worker may have crashed, retrying the run once"
     crash_num=1
-    runs_remaining=$((runs_remaining+1))
   fi
 
-  [[ $runs_remaining == 0 ]] && { echo "reruns failed $num_failures failure(s)"; break; }
-  export ERROR_CONTEXT_BASE_PATH="`pwd`/log/spec_failures/Rerun $rerun_number"
+  if [[ $last_status == $test_failure_status ]]; then
+    rerun_number=$((rerun_number+1))
+    runs_remaining=$((runs_remaining-1))
+    num_failures=${#new_spec_list[@]}
 
-  failures_towards_rerun_threshold=$((num_failures-failures_exempt_from_rerun_threshold))
-  if [[ failures_towards_rerun_threshold -gt $max_failures ]]; then
-    echo "too many failures (got: $num_failures, exempt from threshold: $failures_exempt_from_rerun_threshold, max: $max_failures), build not eligible for reruns" || :
-    break
-  fi
+    [[ $runs_remaining == 0 ]] && { echo "reruns failed $num_failures failure(s)"; break; }
+    export ERROR_CONTEXT_BASE_PATH="`pwd`/log/spec_failures/Rerun $rerun_number"
 
-  failed_relevant_spec_list_length=${#failed_relevant_spec_list[@]}
-  if [[ "$DONT_RERUN_RELEVANT_SPECS" == "1" && failed_relevant_spec_list_length -gt 0 ]]; then
-    echo "specs relevant to this commit failed: ${failed_relevant_spec_list[@]}, build not eligible for reruns" || :
-    break
-  fi
+    failures_towards_rerun_threshold=$((num_failures-failures_exempt_from_rerun_threshold))
+    if [[ failures_towards_rerun_threshold -gt $max_failures ]]; then
+      echo "too many failures (got: $num_failures, exempt from threshold: $failures_exempt_from_rerun_threshold, max: $max_failures), build not eligible for reruns" || :
+      break
+    fi
 
-  [[ $num_failures == 0 ]] && { echo "nothing to re-run! perhaps the code is horribly broken? :("; break; }
-  [[ $last_status == 98 ]] && [[ $crash_num > 0 ]] && { echo "a worker may have crashed during retry, exiting"; break; }
-  [[ $last_status != 99 ]] && [[ $last_status != 98 ]] && { echo "unexpected exit code $last_status! perhaps the code is horribly broken? :("; break; }
+    failed_relevant_spec_list_length=${#failed_relevant_spec_list[@]}
+    if [[ "$DONT_RERUN_RELEVANT_SPECS" == "1" && failed_relevant_spec_list_length -gt 0 ]]; then
+      echo "specs relevant to this commit failed: ${failed_relevant_spec_list[@]}, build not eligible for reruns" || :
+      break
+    fi
 
-  if [[ $last_status == 99 ]]; then
+    if [[ $num_failures == 0 ]]; then
+      echo "nothing to re-run! perhaps the code is horribly broken? :("
+      break
+    fi
+
     spec_list="${new_spec_list[@]}"
     echo -e "failed, re-trying $num_failures failure(s) ($failures_towards_rerun_threshold against threshold), $runs_remaining attempt(s) left\n\n\n"
 

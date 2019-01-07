@@ -465,7 +465,7 @@ import './jquery.templateData'
               var placement = tool.placements.assignment_selection || tool.placements.link_selection;
               $tool.toggleClass(
                 'resource_selection',
-                SelectContent.isContentMessage(placement.message_type, tool.placements)
+                SelectContent.isContentMessage(placement, tool.placements)
               );
               $tool.fillTemplateData({
                 data: tool,

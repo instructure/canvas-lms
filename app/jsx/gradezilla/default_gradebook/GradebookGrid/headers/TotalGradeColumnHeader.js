@@ -16,31 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { bool, func, shape, string } from 'prop-types';
-import IconMoreSolid from '@instructure/ui-icons/lib/Solid/IconMore';
-import Button from '@instructure/ui-buttons/lib/components/Button';
-import View from '@instructure/ui-layout/lib/components/View';
-import Grid, { GridCol, GridRow } from '@instructure/ui-layout/lib/components/Grid';
+import React from 'react'
+import {bool, func, shape, string} from 'prop-types'
+import IconMoreSolid from '@instructure/ui-icons/lib/Solid/IconMore'
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import View from '@instructure/ui-layout/lib/components/View'
+import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
 import Menu, {
   MenuItem,
   MenuItemGroup,
   MenuItemSeparator
-} from '@instructure/ui-menu/lib/components/Menu';
-import Text from '@instructure/ui-elements/lib/components/Text';
-import I18n from 'i18n!gradebook';
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
+} from '@instructure/ui-menu/lib/components/Menu'
+import Text from '@instructure/ui-elements/lib/components/Text'
+import I18n from 'i18n!gradebook'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import ColumnHeader from './ColumnHeader'
 
-function renderTrigger (ref) {
+function renderTrigger(ref) {
   return (
     <Button buttonRef={ref} margin="0" size="small" variant="icon" icon={IconMoreSolid}>
-      <ScreenReaderContent>
-        {I18n.t('Total Options')}
-      </ScreenReaderContent>
+      <ScreenReaderContent>{I18n.t('Total Options')}</ScreenReaderContent>
     </Button>
-
-  );
+  )
 }
 
 export default class TotalGradeColumnHeader extends ColumnHeader {
@@ -68,36 +65,38 @@ export default class TotalGradeColumnHeader extends ColumnHeader {
     onMenuDismiss: Menu.propTypes.onDismiss.isRequired,
     grabFocus: bool,
     ...ColumnHeader.propTypes
-  };
+  }
 
   static defaultProps = {
     grabFocus: false,
     ...ColumnHeader.defaultProps
-  };
-
-  switchGradeDisplay = () => { this.invokeAndSkipFocus(this.props.gradeDisplay) };
-
-  invokeAndSkipFocus (action) {
-    this.setState({ skipFocusOnClose: true });
-    action.onSelect(this.focusAtEnd);
   }
 
-  componentDidMount () {
+  switchGradeDisplay = () => {
+    this.invokeAndSkipFocus(this.props.gradeDisplay)
+  }
+
+  invokeAndSkipFocus(action) {
+    this.setState({skipFocusOnClose: true})
+    action.onSelect(this.focusAtEnd)
+  }
+
+  componentDidMount() {
     if (this.props.grabFocus) {
-      this.focusAtEnd();
+      this.focusAtEnd()
     }
   }
 
-  render () {
-    const { sortBySetting, gradeDisplay, position } = this.props;
-    const selectedSortSetting = sortBySetting.isSortColumn && sortBySetting.settingKey;
-    const displayAsPoints = gradeDisplay.currentDisplay === 'points';
-    const showSeparator = !gradeDisplay.hidden;
+  render() {
+    const {sortBySetting, gradeDisplay, position} = this.props
+    const selectedSortSetting = sortBySetting.isSortColumn && sortBySetting.settingKey
+    const displayAsPoints = gradeDisplay.currentDisplay === 'points'
+    const showSeparator = !gradeDisplay.hidden
     const nowrapStyle = {
       whiteSpace: 'nowrap'
-    };
-    const menuShown = this.state.menuShown;
-    const classes = `Gradebook__ColumnHeaderAction ${menuShown ? 'menuShown' : ''}`;
+    }
+    const menuShown = this.state.menuShown
+    const classes = `Gradebook__ColumnHeaderAction ${menuShown ? 'menuShown' : ''}`
 
     return (
       <div
@@ -105,7 +104,7 @@ export default class TotalGradeColumnHeader extends ColumnHeader {
         onBlur={this.handleBlur}
         onFocus={this.handleFocus}
       >
-        <div style={{ flex: 1, minWidth: '1px' }}>
+        <div style={{flex: 1, minWidth: '1px'}}>
           <Grid colSpacing="none" hAlign="space-between" vAlign="middle">
             <GridRow>
               <GridCol textAlign="center" width="auto">
@@ -114,7 +113,9 @@ export default class TotalGradeColumnHeader extends ColumnHeader {
 
               <GridCol textAlign="center">
                 <View className="Gradebook__ColumnHeaderDetail">
-                  <Text fontStyle="normal" size="x-small" weight="bold">{ I18n.t('Total') }</Text>
+                  <Text fontStyle="normal" size="x-small" weight="bold">
+                    {I18n.t('Total')}
+                  </Text>
                 </View>
               </GridCol>
 
@@ -126,12 +127,17 @@ export default class TotalGradeColumnHeader extends ColumnHeader {
                     onToggle={this.onToggle}
                     ref={this.bindOptionsMenu}
                     shouldFocusTriggerOnClose={false}
-                    trigger={renderTrigger(ref => this.optionsMenuTrigger = ref)}
+                    trigger={renderTrigger(ref => (this.optionsMenuTrigger = ref))}
                   >
                     <Menu contentRef={this.bindSortByMenuContent} label={I18n.t('Sort by')}>
-                      <MenuItemGroup label={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}>
+                      <MenuItemGroup
+                        label={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}
+                      >
                         <MenuItem
-                          selected={selectedSortSetting === 'grade' && sortBySetting.direction === 'ascending'}
+                          selected={
+                            selectedSortSetting === 'grade' &&
+                            sortBySetting.direction === 'ascending'
+                          }
                           disabled={sortBySetting.disabled}
                           onSelect={sortBySetting.onSortByGradeAscending}
                         >
@@ -139,7 +145,10 @@ export default class TotalGradeColumnHeader extends ColumnHeader {
                         </MenuItem>
 
                         <MenuItem
-                          selected={selectedSortSetting === 'grade' && sortBySetting.direction === 'descending'}
+                          selected={
+                            selectedSortSetting === 'grade' &&
+                            sortBySetting.direction === 'descending'
+                          }
                           disabled={sortBySetting.disabled}
                           onSelect={sortBySetting.onSortByGradeDescending}
                         >
@@ -148,39 +157,35 @@ export default class TotalGradeColumnHeader extends ColumnHeader {
                       </MenuItemGroup>
                     </Menu>
 
-                    {
-                      showSeparator &&
-                      <MenuItemSeparator />
-                    }
-                    {
-                      !gradeDisplay.hidden &&
+                    {showSeparator && <MenuItemSeparator />}
+                    {!gradeDisplay.hidden && (
                       <MenuItem
                         disabled={this.props.gradeDisplay.disabled}
                         onSelect={this.switchGradeDisplay}
                       >
                         <span data-menu-item-id="grade-display-switcher" style={nowrapStyle}>
-                          {displayAsPoints ? I18n.t('Display as Percentage') : I18n.t('Display as Points')}
+                          {displayAsPoints
+                            ? I18n.t('Display as Percentage')
+                            : I18n.t('Display as Points')}
                         </span>
                       </MenuItem>
-                    }
+                    )}
 
-                    {
-                      !position.isInFront &&
+                    {!position.isInFront && (
                       <MenuItem onSelect={position.onMoveToFront}>
                         <span data-menu-item-id="total-grade-move-to-front">
                           {I18n.t('Move to Front')}
                         </span>
                       </MenuItem>
-                    }
+                    )}
 
-                    {
-                      !position.isInBack &&
+                    {!position.isInBack && (
                       <MenuItem onSelect={position.onMoveToBack}>
                         <span data-menu-item-id="total-grade-move-to-back">
                           {I18n.t('Move to End')}
                         </span>
                       </MenuItem>
-                    }
+                    )}
                   </Menu>
                 </div>
               </GridCol>
@@ -188,6 +193,6 @@ export default class TotalGradeColumnHeader extends ColumnHeader {
           </Grid>
         </div>
       </div>
-    );
+    )
   }
 }

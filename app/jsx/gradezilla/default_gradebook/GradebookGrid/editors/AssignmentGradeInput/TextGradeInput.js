@@ -90,7 +90,13 @@ export default class TextGradeInput extends Component {
     this.handleTextChange = this.handleTextChange.bind(this)
 
     const {assignment, enterGradesAs, gradingScheme, pendingGradeInfo, submission} = props
-    const value = formatGrade(submission, assignment, gradingScheme, enterGradesAs, pendingGradeInfo)
+    const value = formatGrade(
+      submission,
+      assignment,
+      gradingScheme,
+      enterGradesAs,
+      pendingGradeInfo
+    )
 
     this.state = {
       gradeInfo: pendingGradeInfo || getGradeInfo(submission.excused ? 'EX' : value, this.props),

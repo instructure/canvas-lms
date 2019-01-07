@@ -25,6 +25,29 @@ describe User do
     it "should create a new instance given valid attributes" do
       expect(user_model).to be_valid
     end
+
+    context 'on update' do
+      let(:user) { user_model }
+
+      it 'fails validation if lti_id changes' do
+        user.short_name = "chewie"
+        user.lti_id = "changedToThis"
+        expect(user).to_not be_valid
+      end
+
+      it 'passes validation if lti_id is not changed' do
+        user
+        user.short_name = "chewie"
+        expect(user).to be_valid
+      end
+    end
+  end
+
+  it 'adds an lti_id on creation' do
+    user = User.new
+    expect(user.lti_id).to be_blank
+    user.save!
+    expect(user.lti_id).to_not be_blank
   end
 
   it "should get the first email from communication_channel" do

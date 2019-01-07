@@ -132,8 +132,13 @@ RSpec.shared_context 'lti_advantage_shared_examples' do
       expect(jws['locale']).to eq 'en'
     end
 
+    it 'adds lti11_legacy_user_id' do
+      expected_val = Lti::Asset.opaque_identifier_for(user)
+      expect(jws['https://purl.imsglobal.org/spec/lti/claim/lti11_legacy_user_id']).to eq expected_val
+    end
+
     it 'adds security claims' do
-      expected_sub = Lti::Asset.opaque_identifier_for(user)
+      expected_sub = user.lti_id
       expect(jws['sub']).to eq expected_sub
     end
   end

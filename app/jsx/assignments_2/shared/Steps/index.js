@@ -19,12 +19,14 @@
 import React, {Component} from 'react'
 
 import View from '@instructure/ui-layout/lib/components/View'
+import PropTypes from 'prop-types'
 
 import {omitProps} from '@instructure/ui-utils/lib/react/passthroughProps'
 import safeCloneElement from '@instructure/ui-utils/lib/react/safeCloneElement'
 
 class Steps extends Component {
   static propTypes = {
+    isCollapsed: PropTypes.boolean,
     children: props => {
       const inProgressArr = []
       for (const child in props.children) {
@@ -93,8 +95,13 @@ class Steps extends Component {
         margin={this.props.margin}
         data-test-id="assignment-2-step-index"
         as="div"
+        className={this.props.isCollapsed ? 'steps-container-collapsed steps-main' : 'steps-main'}
       >
-        <div className="progressionContainer" aria-hidden="true">
+        <div
+          data-test-id={this.props.isCollapsed ? 'steps-container-collapsed' : 'steps-main'}
+          className="progressionContainer"
+          aria-hidden="true"
+        >
           <span className="progression" />
           <span
             style={{transform: `scaleX(${progressionScale})`}}

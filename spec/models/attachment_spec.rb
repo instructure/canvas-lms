@@ -959,6 +959,14 @@ describe Attachment do
       expect(@a.display_name).to eq 'a1-1'
     end
 
+    it "rename itself after collision on restoration" do
+      @a1.destroy!
+      @a.display_name = @a1.display_name
+      @a.save!
+      @a1.restore
+      expect(@a1.reload.display_name).to eq "#{@a.display_name}-1"
+    end
+
     it "should update ContentTags when overwriting" do
       mod = @course.context_modules.create!(:name => "some module")
       tag1 = mod.add_item(:id => @a1.id, :type => 'attachment')
@@ -1139,9 +1147,9 @@ describe Attachment do
       attachment.public_download_url
     end
 
-    it "should sanitize filename with iconv" do
+    it "should transliterate filename with i18n" do
       a = attachment_with_context(@course, :display_name => "糟糕.pdf")
-      sanitized_filename = a.display_name.encode("UTF-8")
+      sanitized_filename = I18n.transliterate(a.display_name, replacement: '_')
       allow(a).to receive(:authenticated_s3_url)
       expect(a).to receive(:authenticated_s3_url).with(include(:response_content_disposition => %(attachment; filename="#{sanitized_filename}"; filename*=UTF-8''%E7%B3%9F%E7%B3%95.pdf)))
       a.public_download_url

@@ -145,6 +145,8 @@ class ApplicationController < ActionController::Base
         help_link_icon: help_link_icon,
         use_high_contrast: @current_user.try(:prefers_high_contrast?),
         LTI_LAUNCH_FRAME_ALLOWANCES: Lti::Launch.iframe_allowances(request.user_agent),
+        DEEP_LINKING_POST_MESSAGE_ORIGIN: request.base_url,
+        DEEP_LINKING_LOGGING: Setting.get('deep_linking_logging', nil),
         SETTINGS: {
           open_registration: @domain_root_account.try(:open_registration?),
           eportfolios_enabled: (@domain_root_account && @domain_root_account.settings[:enable_eportfolios] != false), # checking all user root accounts is slow
@@ -329,6 +331,27 @@ class ApplicationController < ActionController::Base
     end
   end
   helper_method :load_blueprint_courses_ui
+
+  def load_content_notices
+    if @context && @context.respond_to?(:content_notices)
+      notices = @context.content_notices(@current_user)
+      if notices.any?
+        js_env :CONTENT_NOTICES => notices.map { |notice|
+          {
+            tag: notice.tag,
+            variant: notice.variant || 'info',
+            text: notice.text.is_a?(Proc) ? notice.text.call : notice.text,
+            link_text: notice.link_text.is_a?(Proc) ? notice.link_text.call : notice.link_text,
+            link_target: notice.link_target.is_a?(Proc) ? notice.link_target.call(@context) : notice.link_target
+          }
+        }
+        js_bundle :content_notices
+        return true
+      end
+    end
+    false
+  end
+  helper_method :load_content_notices
 
   def editing_restricted?(content, edit_type=:any)
     return false unless content.respond_to?(:editing_restricted?)

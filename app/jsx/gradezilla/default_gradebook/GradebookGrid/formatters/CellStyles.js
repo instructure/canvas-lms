@@ -16,32 +16,31 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable import/prefer-default-export */
-export function classNamesForAssignmentCell (assignment, submissionData) {
-  const classNames = [];
+export function classNamesForAssignmentCell(assignment, submissionData) {
+  const classNames = []
 
   if (submissionData) {
     // Exclusive Classes (only one of these can be used at a time)
     if (submissionData.dropped) {
-      classNames.push('dropped');
+      classNames.push('dropped')
     } else if (submissionData.excused) {
-      classNames.push('excused');
+      classNames.push('excused')
     } else if (submissionData.resubmitted) {
-      classNames.push('resubmitted');
+      classNames.push('resubmitted')
     } else if (submissionData.missing) {
-      classNames.push('missing');
+      classNames.push('missing')
     } else if (submissionData.late) {
-      classNames.push('late');
+      classNames.push('late')
     }
   }
 
   if (String(assignment.submissionTypes) === 'not_graded') {
-    classNames.push('ungraded');
+    classNames.push('ungraded')
   }
 
   if (assignment.muted) {
-    classNames.push('muted');
+    classNames.push('muted')
   }
 
-  return classNames;
+  return classNames
 }

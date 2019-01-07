@@ -363,6 +363,12 @@ test('routes to return_to', function() {
   equal(view.locationAfterSave({return_to: 'http://bar'}), 'http://bar')
 })
 
+test('does not route to return_to with javascript protocol', function() {
+  const view = this.editView({html_url: 'http://foo'})
+  // eslint-disable-next-line no-script-url
+  equal(view.locationAfterSave({return_to: 'javascript:alert(1)'}), 'http://foo')
+})
+
 test('cancels to env normally', function() {
   ENV.CANCEL_TO = 'http://foo'
   const view = this.editView()
@@ -373,6 +379,13 @@ test('cancels to return_to', function() {
   ENV.CANCEL_TO = 'http://foo'
   const view = this.editView()
   equal(view.locationAfterCancel({return_to: 'http://bar'}), 'http://bar')
+})
+
+test('does not cancel to return_to with javascript protocol', function() {
+  ENV.CANCEL_TO = 'http://foo'
+  const view = this.editView()
+  // eslint-disable-next-line no-script-url
+  equal(view.locationAfterCancel({return_to: 'javascript:alert(1)'}), 'http://foo')
 })
 
 test('disables fields when inClosedGradingPeriod', function() {
@@ -699,6 +712,14 @@ QUnit.module('#handleAnonymousGradingChange', (hooks) => {
   test('leaves the group category box disabled if the assignment is moderated', () => {
     view.assignment.moderatedGrading(true)
     disableCheckbox('has_group_category')
+    view.handleAnonymousGradingChange()
+    const groupCategoryCheckbox = document.getElementById('has_group_category')
+    strictEqual(groupCategoryCheckbox.disabled, true)
+  })
+
+  test('leaves the group category box disabled if the assignment has submissions', () => {
+    disableCheckbox('has_group_category')
+    view.model.set('has_submitted_submissions', true)
     view.handleAnonymousGradingChange()
     const groupCategoryCheckbox = document.getElementById('has_group_category')
     strictEqual(groupCategoryCheckbox.disabled, true)

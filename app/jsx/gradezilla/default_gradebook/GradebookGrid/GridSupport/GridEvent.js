@@ -17,28 +17,28 @@
  */
 
 export default class GridEvent {
-  handlers = [];
+  handlers = []
 
-  subscribe (handler) {
+  subscribe(handler) {
     if (!this.handlers.includes(handler)) {
-      this.handlers.push(handler);
+      this.handlers.push(handler)
     }
   }
 
-  unsubscribe (handler) {
-    const index = this.handlers.indexOf(handler);
+  unsubscribe(handler) {
+    const index = this.handlers.indexOf(handler)
     if (index !== -1) {
-      this.handlers.splice(index, 1);
+      this.handlers.splice(index, 1)
     }
   }
 
-  trigger (event, data) {
+  trigger(event, data) {
     for (let i = 0; i < this.handlers.length; i++) {
       if (this.handlers[i](event, data) === false) {
-        return false; // prevent additional handlers from continuing
+        return false // prevent additional handlers from continuing
       }
     }
 
-    return true; // continue handling
+    return true // continue handling
   }
 }

@@ -1,5 +1,5 @@
-<%
-# Copyright (C) 2014 - present Instructure, Inc.
+#
+# Copyright (C) 2018 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,7 +14,9 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-%>
 
-<span><%= t('course_import_notice.text', 'One or more items are currently being imported. They will be shown in the course below once they are available.') %></span>
-&emsp;<%= link_to t('course_import_notice.status_link', 'Import Status'), context_url(@context, :context_content_migrations_url) %>
+module DataFixup::AddLtiIdToUsers
+  def self.run
+    User.where(lti_id: nil).find_each { |u| u.update!(lti_id: SecureRandom.uuid) }
+  end
+end

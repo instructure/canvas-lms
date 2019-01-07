@@ -570,6 +570,36 @@
 #           "example": true,
 #           "type": "boolean"
 #         },
+#         "grader_count": {
+#           "description": "The maximum number of provisional graders who may issue grades for this assignment. Only relevant for moderated assignments. Must be a positive value, and must be set to 1 if the course has fewer than two active instructors. Otherwise, the maximum value is the number of active instructors in the course minus one, or 10 if the course has more than 11 active instructors.",
+#           "example": 3,
+#           "type": "integer"
+#         },
+#         "final_grader_id": {
+#           "description": "The user ID of the grader responsible for choosing final grades for this assignment. Only relevant for moderated assignments.",
+#           "example": 3,
+#           "type": "integer"
+#         },
+#         "grader_comments_visible_to_graders": {
+#           "description": "Boolean indicating if provisional graders' comments are visible to other provisional graders. Only relevant for moderated assignments.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "graders_anonymous_to_graders": {
+#           "description": "Boolean indicating if provisional graders' identities are hidden from other provisional graders. Only relevant for moderated assignments with grader_comments_visible_to_graders set to true.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "grader_names_visible_to_final_grader": {
+#           "description": "Boolean indicating if provisional grader identities are visible to the final grader. Only relevant for moderated assignments.",
+#           "example": true,
+#           "type": "boolean"
+#         },
+#         "anonymous_grading": {
+#           "description": "Boolean indicating if the assignment is graded anonymously. If true, graders cannot see student identities.",
+#           "example": true,
+#           "type": "boolean"
+#         },
 #         "allowed_attempts": {
 #           "description": "The number of submission attempts a student can make for this assignment. -1 is considered unlimited.",
 #           "example": 2,

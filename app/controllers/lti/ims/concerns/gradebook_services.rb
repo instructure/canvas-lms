@@ -21,7 +21,7 @@ module Lti::Ims::Concerns
     include AdvantageServices
 
     included do
-      before_action :verify_line_item_tool_connection, only: %i[show update destroy]
+      before_action :verify_line_item_client_id_connection, only: %i[show update destroy]
 
       def line_item
         @_line_item ||= Lti::LineItem.where(id: params.fetch(:line_item_id, params[:id])).eager_load(:resource_link).take!
@@ -45,14 +45,14 @@ module Lti::Ims::Concerns
         render_error('User not found in course or is not a student', :unprocessable_entity)
       end
 
-      def verify_line_item_tool_connection
-        render_error('Tool does not have permission to view line_item') unless line_item.resource_link.context_external_tool_id == tool.id
+      def verify_line_item_client_id_connection
+        render_error('Tool does not have permission to view line_item') unless line_item.client_id == developer_key.global_id
       end
 
       def verify_line_item_in_context
         line_item_context_id = Assignment.where(id: line_item.assignment_id).pluck(:context_id).first
         raise ActiveRecord::RecordNotFound if line_item_context_id != params[:course_id].to_i || context.blank?
-        return if params[:ltiLinkId].blank? || line_item.resource_link.resource_link_id == params[:ltiLinkId]
+        return if params[:resourceLinkId].blank? || line_item.resource_link.resource_link_id == params[:resourceLinkId]
         render_error("The specified LTI link ID is not associated with the line item.")
       end
     end

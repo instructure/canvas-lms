@@ -84,6 +84,7 @@ class ContentParticipationCount < ActiveRecord::Base
             where(submission_conditions).
             where(<<-SQL, user).pluck(:id)
               (submission_comments.hidden IS NULL OR NOT submission_comments.hidden)
+              AND NOT submission_comments.draft
               AND submission_comments.provisional_grade_id IS NULL
               AND submission_comments.author_id <> ?
             SQL

@@ -16,23 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import GridEvent from './GridEvent';
+import GridEvent from './GridEvent'
 
 export default class Events {
   // Column Changes
-  onColumnsResized = new GridEvent();
+  onColumnsResized = new GridEvent()
 
   // State Changes
-  onActiveLocationChanged = new GridEvent();
+  onActiveLocationChanged = new GridEvent()
 
   // Keyboard Interaction
-  onKeyDown = new GridEvent();
+  onKeyDown = new GridEvent()
 
   // Keyboard Navigation
-  onNavigatePrev = new GridEvent();
-  onNavigateNext = new GridEvent();
-  onNavigateLeft = new GridEvent();
-  onNavigateRight = new GridEvent();
-  onNavigateUp = new GridEvent();
-  onNavigateDown = new GridEvent();
+  onNavigatePrev = new GridEvent()
+
+  onNavigateNext = new GridEvent()
+
+  onNavigateLeft = new GridEvent()
+
+  onNavigateRight = new GridEvent()
+
+  onNavigateUp = new GridEvent()
+
+  onNavigateDown = new GridEvent()
 }

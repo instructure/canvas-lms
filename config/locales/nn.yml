@@ -3,17 +3,22 @@
 --- 
 nn: 
   1_item_scores_5512cd03: "1 – delresultat"
+  1_item_scores_examplescores_9736236: "1: Delresultat: %{exampleScores}"
   1_user_found_76399771: "Funne 1 brukar."
   1st_reviewer_3c1d0119: "Første fagfellevurderar"
   25th_75th_ile_406a67bf: "25.-75. persentil"
   25th_75th_percentile_aa4c11f2: "25.-75. persentil"
   2_final_score_7b0fd15e: "2 – sluttresultat"
+  2_final_score_exampleresult_922edf9c: "2: Sluttresultat: %{exampleResult}"
+  2_options_available_use_arrow_keys_to_navigate_opt_c55a8e61: "2 alternativ tilgjengeleg. Bruk piltastane for å navigere mellom alternativa."
   2nd_reviewer_94fdbcd: "Andre fagfellevurderar"
   451_message: 
     description: "Du er ikkje autorisert for tilgang til denne nettstaden fordi du oppheld deg i eit land som er underlagt handelsrestriksjonar med USA."
     headings: 
       page: "Ikkje autorisert"
     title: "Ikkje autorisert"
+  4_rows_added_44e0db4d: "Lagt til 4 rader "
+  4_rows_removed_f4ae9fb1: "Fjerna 4 rader"
   558x270_png_jpg_gif_c3faa839: "558 x 270 .png, .jpg, .gif"
   558x558_png_jpg_gif_1_8x_the_standard_tile_size_so_c56cc472: "558 x 558 .png, .jpg, .gif (1,8 x standard flisstorleik, slik at den kan skalerast opp eller ned etter behov)"
   EditAppointmentGroupDetails: 
@@ -43,10 +48,12 @@ nn:
   LongTextEditor: 
     cancel: Avbryt
     save: Lagre
+  _2d4c0d31: "..."
   _at_the_bottom__4360f2b4: "-- Nedst --"
   _b4455c8b: "%"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "Utrekningsverdi blir ikkje brukt med denne utrekningsmetoden"
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "Ei fil med namnet %{itemName} finst allereie i denne mappa."
+  a_front_page_is_required_fd57b80: "Forside er obligatorisk"
   a_full_size_logo_that_appears_in_the_right_sidebar_18873685: "Ein logo i full storleik i høgre sidestolpe på Canvas-skrivebordet. Ideell storleik er 360 x 140 pikslar. Aksepterte format: .svg, .png, .jpeg, .gif"
   a_handy_key_value_dump_of_a_host_of_interesting_en_d0518dfe: "Ein praktisk nøkkel-/verdidump med ei mengd interessant informasjon for rapporteringsbrukaren"
   a_locked_item_named_name_already_exists_in_this_lo_ab03ee39: "Eit låst element med namnet \"%{name}\" finst allereie. Skriv inn eit anna namn."
@@ -81,9 +88,14 @@ nn:
         partner_id: Partnar-ID
         partner_key: Partnarnøkkel
   accept_2fdd362e: Godta
+  accept_grades_4d56a3dd: "Godta karakterar"
+  accept_grades_by_gradername_7a98b969: "Godta karakterar frå %{graderName}"
+  acceptable_use_policy_29a28124: "Akseptable bruksvilkår"
+  accepted_c9f8ab87: Godteke
   accepted_formats_hex_rgba_rgb_hsl_42a37ef7: "godkjende format: hex, rgba, rgb, hsl"
   accepted_formats_svg_png_jpg_gif_f793e4bc: "Godkjende format: svg, png, jpg, gif"
   accepted_user_role_type_course_course_2ce91589: "Godkjend: %{user}, %{role_type}, emne, %{course}"
+  accepting_40ba3b70: Godtek
   access_report_80d28095: Tilgangsrapport
   access_token_3be22221: Tilgangstoken
   access_token_count_access_token_count_dfb5463c: "Tal på tilgangs-token %{access_token_count}"
@@ -127,6 +139,8 @@ nn:
     tab_users: Brukarar
     turnitin_pledge: "Den leverte oppgåva er mitt eige, sjølvstendige arbeid"
   account_97b34646: Konto
+  account_account_b6b3746b: "Konto: %{account}"
+  account_and_subaccount_40c6430: "Konto og underkonto"
   account_authorization_config: 
     default_delegated_login_handle_name: Pålogging
     default_login_handle_name: E-post
@@ -237,10 +251,12 @@ nn:
       unknown_user_url_description: "URL-en for omdirigering av godkjend brukar finst ikkje i Canvas."
   account_course_and_user_search_22bf297a: "Konto, emne- og brukarsøk"
   account_domain_78f43049: Kontoområde
+  account_domain_lookups_f9d1147e: Kontoområdeoppslag
   account_groups_2f301732: Kontogrupper
   account_id_2c3b4f15: konto-ID
   account_id_73966078: konto_id
   account_id_f6e26867: Konto-ID
+  account_level_settings_manage_4fca6f8e: "Innstillingar på kontonivå - administrer"
   account_name_13ed649: "%{account_name}"
   account_name_7f63a13: kontonamn
   account_name_analytics_62bf60ae: "%{account.name} Analytics"
@@ -252,6 +268,7 @@ nn:
       invalid_account_notification_end_at: "Sluttidspunkt for kontovarsling kjem ikkje før starttidspunkt"
   account_notifications: 
     announcement_deleted_notice: "Kunngjering er sletta"
+  account_notifications_f3b7f01f: Kontovarsel
   account_reports: 
     default: 
       all_terms: "Alle semester"
@@ -394,6 +411,7 @@ nn:
       what_are_quiz_ip_filters: "Kva er IP-filter for quizar?"
     user: Brukar
   account_settings_fe083453: Kontoinnstillingar
+  account_settings_subaccount_navigation_3af6f7f5: "Kontoinnstillingar (underkontonavigering)"
   account_sis_id_2e4a461: konto-SIS-ID
   account_sis_id_5da8fd2d: konto-SIS-ID
   account_statistics_2b52a1c9: Kontostatistikk
@@ -848,6 +866,7 @@ nn:
       grade_export: 
         course_date_picker_parameter: 
           Optional: Valfri
+          settings: "innstillingar:"
     include_deleted_parameter: 
       account_reports: 
         default: 
@@ -914,6 +933,11 @@ nn:
         penn_harris: 
           parameters: 
             note: "Emne med skjulte oppgåver kan vise unøyaktige resultat i rapporten ."
+    proserve_all_versions_submissions_csv_parameters: 
+      account_reports: 
+        proserv: 
+          use_serialized_submission: 
+            check_box: "Bruk serielt tidsstempel for innlevering"
     proservices: 
       provisioning: 
         parameters: 
@@ -1294,8 +1318,8 @@ nn:
       batch_mode_label: "Dette er ei fullstendig batchoppdatering"
       clear_sis_stickiness_instructions: "Dersom du vel dette alternativet, kan alle felt og postar som vedkjem SIS-importen endrast i framtidige SIS-importar som ikkje er overstyrande."
       clear_sis_stickiness_label: "Fjern status for endra brukargrensesnitt"
-      import_failed_message: "Det oppstod ein feil under importering av SIS-data. Ingen postar er importerte."
-      import_failed_with_messages_message: "Ingen SIS-postar er importerte. Importen mislukkast med desse meldingane:"
+      import_failed_message: "Det oppstod ein feil under importering av SIS-data. "
+      import_failed_with_messages_message: "Importen mislukkast med desse meldingane: "
       import_log_title: "Logg importprogresjon"
       import_started_message: "Importprosessen har starta. Det kan ta ei stund dersom det er mykje som skal importerast. Du kan forlate sida og kome tilbake seinare."
       import_type_label: Importtype
@@ -1478,6 +1502,7 @@ nn:
   act_as_user_d7ef0e48: "Opptre som brukar"
   act_as_user_name_5581cdbb: "Opptre som %{user_name}"
   act_as_users_de7ee378: "Opptre som brukarar"
+  action_was_not_anonymous_b5262db1: "Handlinga er ikkje utført anonymt"
   actions_efcde10d: Handlingar
   actions_for_course_312ff446: "Alternativ for %{course}"
   actions_taken_6fb20fd0: Gjennomført
@@ -1513,6 +1538,7 @@ nn:
   add_alert_b2729c99: "Legg til varsel"
   add_an_assignment_fb73942e: "Legg til ei oppgåve"
   add_an_identity_provider_to_this_account_c2644478: "Legg til ein identitetsleverandør til kontoen:"
+  add_announcement_165c3b05: "Legg til kunngjering"
   add_another_assignment_fc5c908f: "Legg til ei ny oppgåve"
   add_app_baf540f: "Legg til app"
   add_assignment_to_name_caf173b0: "Legg til oppgåve til %{name}"
@@ -1528,6 +1554,7 @@ nn:
   add_course_calendar_events_146154a5: "Legg til kalenderhendingar for emnet"
   add_criterion_eb9587ef: "Legg til kriterium"
   add_custom_link_22059c0: "Legg til eigendefinert lenke"
+  add_discussion_653dab4c: "Legg til diskusjon"
   add_email_address_aef3b61: "Legg til e-postadresse"
   add_existing_content_7e36da66: "Legg til eksisterande innhald"
   add_external_feed_6d437a28: "Legg til ekstern straum"
@@ -1547,9 +1574,11 @@ nn:
   add_moderator_review_new_3c183cea: "Legg til gjennomgang frå sensuransvarleg (ny)"
   add_more_e1ffaa65: "Legg til meir"
   add_new_announcement_ddacd624: "Legg til ei ny kunngjering"
+  add_new_domain_e097d4a0: "Legg til nytt område"
   add_new_group_7ac49f31: "Legg til ny gruppe"
   add_new_set_of_due_dates_e8e240f: "Legg til nye forfallsdatoar"
   add_new_term_d2217c0d: "Legg til nytt semester"
+  add_people_7948b7da: "Legg til personar"
   add_people_7ee4b2ec: "Legg til personar"
   add_people_to_coursename_5ea234e1: "Legg personar til %{courseName}"
   add_quiz_ip_filter_c7b37dc5: "Legg til IP-filter for quizar"
@@ -1559,6 +1588,7 @@ nn:
   add_review_2fb1590c: "Legg til gjennomgang"
   add_role_3dc4d273: "Legg til rolle"
   add_rubric_3636d9a6: "Legg til vurderingsskjema"
+  add_scope_a5208f8b: "Legg til omfang"
   add_section_8b027a1c: "Legg til seksjon"
   add_set_of_grading_periods_5b4d6e51: "Legg til fleire periodar for karaktersetjing"
   add_students_by_searching_by_name_course_section_o_abb9e2f2: "Legg til studentar ved å søkje på namn, emneseksjon eller gruppe. Etter å ha skrive inn tekst, kan du navigere i resultatet ved å bruke ned-piltasten på  tastaturet. Vel resultat ved å trykkje Enter-tasten. "
@@ -1577,6 +1607,7 @@ nn:
   add_users_to_name_b8109bbb: "Legg brukarar til %{name}"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Legg til oppgåvene dine.  Du kan lage ei lang liste, dele dei opp i grupper eller spesifisere vekttal for kvar enkelt oppgåvegruppe."
   add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: "Legg til ID for eigendefinert felt i Zendesk for kvar av dei følgande (felt utan ID blir ikkje registrerte):"
+  adding_rss_feed_f1202567: "Legg til RSS-straum"
   additional_comments_9aed10bb: Tilleggskommentarar
   additional_occurrence_s_7b5b0173: Tilleggsførekomst(ar)
   additional_outcomes_options_6df428f1: "Fleire læringsmålalternativ"
@@ -1584,12 +1615,26 @@ nn:
   additional_sis_sync_assignment_quiz_and_discussion_d941fa5: "Fleire alternativ for SIS-synkroniserte oppgåver, quizar og diskusjonar"
   addressbook_microservice_a4940422: "Mikroservice for adressebok"
   addressbook_performance_tap_98ddf67: "Sjå yteevna til adresseboka"
+  adds_analytics_link_on_the_user_settings_menu_3a048816: "Legg til analyselenke i meny for brukarinnstillingar."
   adjust_final_grade_fa45e7e0: "Juster sluttkarakter"
   admin_4d3ba42f: Admin
   admin_csv_f8d1b3eb: "CSV-fil over administratorar"
   admin_navigation_menu_77b801a2: Admin-navigeringsmeny
+  admin_tools_grade_change_logs_d804833f: "Administrasjonsverktøy (loggar for karakterendringar)"
+  admin_tools_logging_tab_680698f3: "Administrasjonsverktøy (loggfane)"
+  admin_tools_notifications_tab_120d6cdf: "Administrasjonsverktøy (varselfane)"
+  admin_tools_restore_courses_tab_b07bbfa7: "Administrasjonsverktøy (fane for gjenoppretting av kurs)"
+  admin_tools_undelete_courses_d9bd8631: "Administrasjonsverktøy (gjer om sletting av emne)"
+  admin_tray_3b680e7b: Administrasjonsmeny
   admin_user_name_29dd115a: admin_user_name
+  admin_view_a2f4cd5c: Administrasjonsvising
+  administrator_f325c186: Administrator
   admins_3e1dce15: Administratorar
+  admins_add_remove_26811ce5: "Administratorar - legg til/fjern"
+  affects_viewing_the_publish_course_conclude_course_76d2f601: |-
+      Har innverknad på vising av knappar for publiser emne, avslutt emne og slett emnet for godt.
+      Knappen slett emnet for godt viser berre på manuelt oppretta emne.
+  afghanistan_93_ab06805: "Afghanistan (+93)"
   after_48b9d69: Etter..
   after_4c71e718: Etter
   after_date_981cd41b: "Etter %{date}"
@@ -1649,6 +1694,7 @@ nn:
       criteria_required: "Det er obligatorisk med minst ein utløysar"
       recipients_required: "Det er obligatorisk med minst ein mottakar"
       threshold_should_be_numeric: "Dette skal vere eit positivt tal"
+  alerts_add_edit_delete_d71091c6: "Varsel - legg til / rediger / slett"
   all_4321c3a1: Alle
   all_account_types_e83c1516: "Alle kontoar"
   all_accounts_3bafc860: "Alle kontoar"
@@ -2729,15 +2775,15 @@ nn:
     default_login_handle_name: E-post
   authentication_provider/ldap: 
     test_bind_failed: "Tilkopling mislukkast med følgande feil:  %{error}"
-    test_bind_timeout: "Tidsavbrot under binding"
+    test_bind_timeout: "Tidsavbrot under tilkopling"
     test_connection_timeout: "Tidsavbrot under tilkopling"
     test_host_unknown: "Ukjend vert: %{host}"
     test_login_auth_exception: "Unntak ved pålogging: %{error}"
     test_login_auth_failed: "Godkjenning mislukkast"
-    test_search_failed: "Søk etter mislukkast med følgande feil: %{error}"
+    test_search_failed: "Søk mislukkast med følgande feil: %{error}"
   authentication_provider/saml: 
     debug: 
-      logout_redirect: "Førespurnad om å logge av er send til IdP"
+      logout_redirect: "Førespurnad om å logge av er sendt til IdP"
   authentication_providers: 
     account_required: "må vere LDAP-godkjend"
     debugging: 
@@ -2747,17 +2793,17 @@ nn:
     index: 
       delete_auth_confirmation: "Er du sikker? Brukarar kan ikkje logge på dersom denne blir fjerna."
       delete_auth_link: "Fjern autentisering"
-      ip_address_list_description: "Dersom du brukar ei godkjenningsteneste som krev at Canvas-tenarane må kontakte tenarane dine direkte, som LDAP, må du kontrollere at tenarane godtek tilkoplingar frå desse IP-adressene:"
-      no_auth_type_description: "Kontoen integrerer ikkje med ein identitetsleverandør akkurat no."
-      page_title: Godkjenningsinnstillingar
+      ip_address_list_description: "Dersom du brukar ei autentiseringsteneste som krev at Canvas-tenarane må kontakte tenarane dine direkte, som LDAP, må du kontrollere at tenarane godtek tilkoplingar frå desse IP-adressene:"
+      no_auth_type_description: "Kontoen integrerer ikkje med ein identitetsleverandør, IdP, akkurat no."
+      page_title: Autentiseringsinnstillingar
       profile_page_link_example: "For eksempel, her er profilsida di: [%{friendlyname}](%{url})"
       settings_description: "Dersom ein brukar skal godkjennast gjennom ein ekstern identitetsleverandør (IdP), må brukaren ha ein påloggings-ID som både er kopla til denne kontoen og som samsvarer med den unike ID-en som kjem frå IdP. Dersom du vil sjå dei gjeldande påloggingane for ein brukar, kan du gå til avsnittet \"Påloggingsinformasjon\" på brukaren si profilside. (Søk etter brukaren i fana \"Brukarar\".)"
-      settings_title: Godkjenningsinnstillingar
+      settings_title: Autentiseringsinnstillingar
       test_ldap_link: "Test LDAP-godkjenning"
     ldap_fields: 
       auth_filter_description: "Bruk *%{placeholder}* som plasshaldar for brukarnamnet som er oppgitt av brukaren. For eksempel: *(sAMAccountName=%{placeholder})*"
       identifer_format_description: "LDAP-attributtet du skal bruke for å søke etter Canvas-pålogginga. La den stå tom for brukarnamnet frå brukaren."
-      ldap_timeout_failure_help2: "Dersom Canvas har tidsavbrot for mange gongar i kommunikasjon med LDAP-tenaren, vil den blokkere for vidare pålogging til LDAP-tenaren i %{time}. Siste tidsavbrot for LDAP-tenaren var %{timestamp}."
+      ldap_timeout_failure_help2: "Dersom Canvas har for mange tidsavbrot i kommunikasjon med LDAP-tenaren, vil den blokkere for vidare pålogging til LDAP-tenaren i %{time}. Siste tidsavbrot for LDAP-tenaren var %{timestamp}."
     ldap_settings_test: 
       labels: 
         pass: Passord
@@ -2776,7 +2822,7 @@ nn:
       test_ldap_connection_label: "Testar tilkopling..."
       test_ldap_dialog_close: Lukk
       test_ldap_dialog_page_title: "Testar LDAP-konfigurasjonen"
-      test_ldap_login_form_header: "Tilbyr eit gyldig LDAP-brukarnamn/-passord for å teste pålogging:"
+      test_ldap_login_form_header: "Tilby eit gyldig LDAP-brukarnamn/-passord for å teste pålogging:"
       test_ldap_login_help_header: "LDAP-tenaren avslo legitimasjonen din"
       test_ldap_login_label: "Test brukarpålogging..."
       test_ldap_search_help_body: "Søket mislukkast eller returnerte 0 resultat. Dette kan du gjere:"
@@ -2795,7 +2841,7 @@ nn:
     password_required: "må leggast til"
     sso_settings_form: 
       change_password_url_help: "La det stå tomt for standard Canvas-funksjon"
-      discovery_url_description: "Dersom ein oppdagings-URL blir oppgitt, kjem Canvas til å sende vidare alle brukarar til URL-adressa når dei skal godkjennast. Sida hjelper brukaren med å finne ut kvar han skal gå for å logge på. Dersom URL-adressa ikkje er konfigurert, blir den første konfigurasjonen brukt for brukaren si godkjenning."
+      discovery_url_description: "Dersom ein påloggingsval-URL blir oppgitt, kjem Canvas til å sende vidare alle brukarar til URL-adressa når dei skal godkjennast. Sida hjelper brukaren med å finne ut kvar han skal gå for å logge på. Dersom URL-adressa ikkje er konfigurert, blir den første konfigurasjonen brukt for brukaren si godkjenning."
       login_handle_name_description: "Etiketten som blir brukt for unike påloggings-ID-ar. Eksempel: Pålogging, brukarnamn, student-ID osv."
       unknown_user_url_description: "URL-en for omdirigering av godkjend brukar finst ikkje i Canvas."
   authentication_with_provider_was_successful_but_no_6a194137: "Autorisering med %{provider} var vellykka, men ein unik ID for pålogging til Canvas blei ikkje tilbydd."
@@ -3391,12 +3437,12 @@ nn:
       event_title: "frist: %{event_title}"
     show: 
       calendar_feed: Kalenderstraum
-      calendar_feed_instructions: "Kopier lenka nedanfor og lim ho inn i ein kalenderapp som tek imot straum frå iCal (Google Calendar, iCal, Outlook, osv.)"
+      calendar_feed_instructions: "Kopier lenka nedanfor og lim ho inn i ein kalenderapp som tek imot datastraum frå iCal (Google Calendar, iCal, Outlook, osv.)"
       calendars: Kalendrar
       feed_dialog_title: Kalenderstraum
       feed_title: "Emnekalender i Atom-format"
       links: 
-        feed: "klikk her for å vise straum"
+        feed: "klikk her for å vise datastraum"
       page_title_header: Kalender
       skip_to_calendar: "Hopp til kalender"
       undated_items: "Utan dato"
@@ -4002,7 +4048,7 @@ nn:
       labels: 
         all_quizzes: "Alle quizar"
       select_quizzes: "Vel quizar som skal eksporterast"
-  content_exports_e5a66f6a: "Innhald i eksport"
+  content_exports_e5a66f6a: "Eksport av innhald"
   content_for_section_1_7ecfb319: "Innhald for seksjon 1"
   content_for_section_2_e7c6e2a3: "Innhald for seksjon 2"
   content_for_section_3_90c1d235: "Innhald for seksjon 3"
@@ -16274,7 +16320,7 @@ nn:
       process_data: "Behandle data"
     errors: 
       import_failed_code: "Det oppstod ein feil under importering av SIS-data. Ingen postar er importerte.  Ta kontakt med systemansvarleg og gi dei følgande kode: \"%{code}\""
-      import_failed_messages: "Ingen SIS-postar er importerte. Importen mislukkast med desse meldingane:"
+      import_failed_messages: "Importen mislukkast med desse meldingane: "
     headers: 
       import_errors: "Feil som hindrar import"
       import_warnings: Åtvaringar

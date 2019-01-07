@@ -28,6 +28,7 @@ const defaultProps = () => ({
     {
       id: '1',
       label: 'Role 1',
+      base_role_type: 'lead',
       permissions: {
         permission_1: 'permission_1',
         permission_2: 'permission_2'
@@ -37,6 +38,7 @@ const defaultProps = () => ({
     {
       id: '2',
       label: 'Role 2',
+      base_role_type: 'lead',
       permissions: {
         permission_1: 'permission_1',
         permission_2: 'permission_2'

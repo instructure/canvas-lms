@@ -19,14 +19,14 @@
 import AssignmentCellEditor from './AssignmentCellEditor'
 
 class CellEditorFactory {
-  getEditor (column) {
+  getEditor(column) {
     switch (column.type) {
       case 'assignment':
-        return AssignmentCellEditor;
+        return AssignmentCellEditor
       default:
-        return undefined;
+        return undefined
     }
   }
 }
 
-export default CellEditorFactory;
+export default CellEditorFactory

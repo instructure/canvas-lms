@@ -18,6 +18,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
 import Select from '@instructure/ui-forms/lib/components/Select'
@@ -36,6 +37,7 @@ const FreeFormComments = (props) => {
     allowSaving,
     savedComments,
     comments,
+    large,
     saveLater,
     setComments,
     setSaveLater
@@ -63,7 +65,7 @@ const FreeFormComments = (props) => {
   ]
 
   const saveBox = () => {
-    if (allowSaving) {
+    if (allowSaving && large) {
       return (
         <Checkbox
           checked={saveLater}
@@ -75,18 +77,24 @@ const FreeFormComments = (props) => {
     }
   }
 
+  const label = I18n.t('Comments')
+  const toScreenReader = (el) => <ScreenReaderContent>{el}</ScreenReaderContent>
+
+  const commentClass = `edit-freeform-comments-${large ? "large" : "small"}`
   return (
-    <div className="edit-freeform-comments">
+    <div className={commentClass}>
       {options.length > 0 ? selector : null}
       <TextArea
-        label={I18n.t('Comments')}
+        data-selenium="criterion_comments_text"
+        label={large ? label : toScreenReader(label)}
+        placeholder={large ? undefined : label}
         maxHeight="50rem"
         onChange={(e) => setComments(e.target.value)}
         resize="vertical"
         size="small"
         value={comments}
       />
-      <br />
+      {large ? <br /> : null}
       {saveBox()}
     </div>
   )
@@ -95,6 +103,7 @@ FreeFormComments.propTypes = {
   allowSaving: PropTypes.bool.isRequired,
   savedComments: PropTypes.arrayOf(PropTypes.string).isRequired,
   comments: PropTypes.string,
+  large: PropTypes.bool.isRequired,
   saveLater: PropTypes.bool,
   setComments: PropTypes.func.isRequired,
   setSaveLater: PropTypes.func.isRequired
@@ -129,8 +138,8 @@ CommentText.defaultProps = {
 }
 
 const Comments = (props) => {
-  const { assessing, assessment, footer, ...commentProps } = props
-  if (!assessing || assessment === null) {
+  const { editing, assessment, footer, ...commentProps } = props
+  if (!editing || assessment === null) {
     return (
       <div className="rubric-freeform">
         <CommentText
@@ -154,16 +163,18 @@ const Comments = (props) => {
 }
 Comments.propTypes = {
   allowSaving: PropTypes.bool,
-  assessing: PropTypes.bool.isRequired,
+  editing: PropTypes.bool.isRequired,
   assessment: PropTypes.shape(assessmentShape),
   footer: PropTypes.node,
+  large: PropTypes.bool,
   savedComments: PropTypes.arrayOf(PropTypes.string).isRequired,
   setComments: PropTypes.func.isRequired,
   setSaveLater: PropTypes.func.isRequired
 }
 Comments.defaultProps = {
   allowSaving: true,
-  footer: null
+  footer: null,
+  large: true
 }
 
 export default Comments
