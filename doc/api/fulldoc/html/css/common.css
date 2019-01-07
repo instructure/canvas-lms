@@ -196,12 +196,12 @@ table th, table td {
   padding: 4px;
 }
 
-table.changelog {
+.changelog+table {
   border: 2px solid gray;
   width: 100%
 }
 
-table.changelog th {
+.changelog+table th {
   padding: 4px;
   border: 1px inset gray;
   border-spacing: 1px;
@@ -213,19 +213,19 @@ table.changelog th {
   background-color: #DDD;
 }
 
-table.changelog tr td:nth-child(1) {
+.changelog+table tr td:nth-child(1) {
      width:20%;
 }
 
-table.changelog tr td:nth-child(2) {
+.changelog+table tr td:nth-child(2) {
      width:30%;
 }
 
-table.changelog tr td:last-child {
+.changelog+table tr td:last-child {
      width:auto;
 }
 
-table.changelog td {
+.changelog+table td {
   padding: 10px 8px 10px 5px;
   border: 1px inset gray;
   border-spacing: 1px;
