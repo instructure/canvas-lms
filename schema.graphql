@@ -713,6 +713,12 @@ type GroupSetEdge {
   node: GroupSet
 }
 
+enum LatePolicyStatusType {
+  late
+  missing
+  none
+}
+
 type LockInfo {
   canView: Boolean
   isLocked: Boolean!
@@ -944,6 +950,7 @@ type Submission implements Node & Timestamped {
   gradedAt: DateTime
   gradingStatus: String
   id: ID!
+  latePolicyStatus: LatePolicyStatusType
   score: Float
   state: SubmissionState!
   submissionStatus: String
