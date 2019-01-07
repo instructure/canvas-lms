@@ -209,7 +209,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
 
       select_all_wiki
       f('.mce-i-indent').click
-      validate_wiki_style_attrib("padding-left", "30px", "p")
+      validate_wiki_style_attrib("padding-left", "40px", "p")
       f('.mce-i-outdent').click
       validate_wiki_style_attrib_empty("p")
     end
@@ -218,7 +218,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       wysiwyg_state_setup(text = "test")
 
       f('.mce-i-indent').click
-      validate_wiki_style_attrib("padding-left", "30px", "p")
+      validate_wiki_style_attrib("padding-left", "40px", "p")
       f('.mce-i-outdent').click
       validate_wiki_style_attrib_empty("p")
     end
