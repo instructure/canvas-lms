@@ -452,6 +452,7 @@ class DiscussionTopicsController < ApplicationController
     return unless authorized_action(@topic, @current_user, (@topic.new_record? ? :create : :update))
     return render_unauthorized_action unless @topic.visible_for?(@current_user)
 
+    @context.try(:require_assignment_group)
     can_set_group_category = @context.respond_to?(:group_categories) && @context.grants_right?(@current_user, session, :manage) # i.e. not a student
     hash =  {
       URL_ROOT: named_context_url(@context, :api_v1_context_discussion_topics_url),
