@@ -464,31 +464,29 @@ class Submission < ActiveRecord::Base
     end
     can :read_grade
 
-    given do |user|
-      self.assignment.published? &&
-        self.assignment.peer_reviews &&
-        self.assignment.context.participating_students.where(id: self.user).exists? &&
-        user &&
-        self.assessment_requests.map(&:assessor_id).include?(user.id)
-    end
+    given { |user| peer_reviewer?(user) }
     can :read and can :comment and can :make_group_comment
 
-    given { |user, session|
-      can_view_plagiarism_report('turnitin', user, session)
-    }
-
+    given { |user, session| can_view_plagiarism_report('turnitin', user, session) }
     can :view_turnitin_report
 
-    given { |user, session|
-      can_view_plagiarism_report('vericite', user, session)
-    }
+    given { |user, session| can_view_plagiarism_report('vericite', user, session) }
     can :view_vericite_report
   end
+
+  def peer_reviewer?(user)
+    self.assignment.published? &&
+      self.assignment.peer_reviews &&
+      self.assignment.context.participating_students.where(id: self.user).exists? &&
+      user &&
+      self.assessment_requests.map(&:assessor_id).include?(user.id)
+  end
+  private :peer_reviewer?
 
   def can_view_details?(user)
     return false unless grants_right?(user, :read)
     return true unless self.assignment.anonymize_students?
-    user == self.user || Account.site_admin.grants_right?(user, :update)
+    user == self.user || peer_reviewer?(user) || Account.site_admin.grants_right?(user, :update)
   end
 
   def can_view_plagiarism_report(type, user, session)

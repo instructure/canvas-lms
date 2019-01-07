@@ -5185,6 +5185,26 @@ describe Submission do
       @submission = @assignment.submit_homework(@student, submission_type: 'online_text_entry', body: 'a body')
     end
 
+    context "for peer reviewers" do
+      let(:reviewer) { @context.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
+      let(:reviewer_sub) { @assignment.submissions.find_by!(user: reviewer) }
+
+      before(:each) do
+        @assignment.update!(peer_reviews: true)
+      end
+
+      it "returns true for peer reviewer of student under view" do
+        AssessmentRequest.create!(assessor: reviewer, assessor_asset: reviewer_sub, asset: @submission, user: @student)
+        expect(@submission.can_view_details?(reviewer)). to be true
+      end
+
+      it "returns false for peer reviewer of student not under view" do
+        new_student = @context.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user
+        new_student_sub = @assignment.submissions.find_by!(user: new_student)
+        expect(new_student_sub.can_view_details?(reviewer)).to be false
+      end
+    end
+
     context 'when the assignment is muted' do
       it "returns false if user isn't present" do
         expect(@submission).not_to be_can_view_details(nil)
