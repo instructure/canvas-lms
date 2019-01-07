@@ -14,7 +14,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-require_relative '../common'
+require_relative '../../common'
 
 class ExternalFeedPage
   class << self
@@ -70,7 +70,7 @@ class ExternalFeedPage
     end
 
     def add_external_feed(url, article_length)
-      sleep 0.5 #have to wait for instUI animations
+      sleep 0.5 # have to wait for instUI animations
       add_external_feed_expander.click
       type_in_box(feed_url_textbox, url)
       display_length_option(article_length).click

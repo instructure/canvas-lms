@@ -14,15 +14,19 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+require_relative '../../common'
 
 class AnnouncementIndex
   class << self
     include SeleniumDependencies
 
     # ---------------------- Page ----------------------
-    def visit(course)
-      get("/courses/#{course.id}/announcements/")
-      wait_for_ajaximations
+
+    def visit_announcements(course_id)
+      get "/courses/#{course_id}/announcements"
+      wait_for(method: nil, timeout: 1) {
+        fj("title:contains('Loading Announcements')", announcements_main_content)
+      }
     end
 
     def visit_groups_index(group)
@@ -40,7 +44,7 @@ class AnnouncementIndex
 
     # ---------------------- Controls ----------------------
     def filter_dropdown
-      fj('select[name="filter-dropdown"]')
+      f('select[name="filter-dropdown"]')
     end
 
     def filter_item(item_name)
@@ -59,8 +63,8 @@ class AnnouncementIndex
       f('#delete_announcements')
     end
 
-    def confirm_delete_button
-      f('#confirm_delete_announcements')
+    def confirm_delete_alert
+      f('button#confirm_delete_announcements')
     end
 
     def add_announcement_button
@@ -72,10 +76,10 @@ class AnnouncementIndex
     end
 
     # ---------------------- Announcement ----------------------
-    # def announcement_titles
-    #   announcements = ff(".discussion_topic")
-    #   announcements.map! { |x| f(".discussion-title", x).text }
-    # end
+
+    def announcements_main_content
+      f('.announcements-v2__wrapper')
+    end
 
     def announcement(title)
       fj(".ic-announcement-row:contains('#{title}')")
@@ -93,11 +97,6 @@ class AnnouncementIndex
       f('input[type="checkbox"] + label', announcement(title))
     end
 
-    def announcement_sections(title)
-      # section_elements = ff('#sections', announcement(title))
-      # section_elements.map(&:text)
-    end
-
     def announcement_unread_pill(title)
       f('.ic-unread-badge__unread-count', announcement(title))
     end
@@ -106,20 +105,16 @@ class AnnouncementIndex
       announcement_unread_pill(title).text
     end
 
-    def announcement_menu(title)
+    def announcement_options_menu(title)
       f('.ic-item-row__manage-menu button', announcement(title))
     end
 
-    def delete_menu
+    def delete_announcement_option
       f('#delete-announcement-menu-option')
     end
 
     def lock_menu
       f('#lock-announcement-menu-option')
-    end
-
-    def announcement_locked_icon(title)
-      # f('.lock', announcement(title))
     end
 
     # ---------------------- Actions ----------------------
@@ -148,17 +143,17 @@ class AnnouncementIndex
     end
 
     def click_delete_menu(title)
-      announcement_menu(title).click
-      delete_menu.click
+      announcement_options_menu(title).click
+      delete_announcement_option.click
     end
 
     def click_lock_menu(title)
-      announcement_menu(title).click
+      announcement_options_menu(title).click
       lock_menu.click
     end
 
     def click_confirm_delete
-      confirm_delete_button.click
+      confirm_delete_alert.click
     end
 
     def click_on_announcement(title)
@@ -166,7 +161,7 @@ class AnnouncementIndex
     end
 
     def click_add_announcement
-       add_announcement_button.click
+      add_announcement_button.click
     end
 
     def delete_announcement_manually(title)
@@ -176,3 +171,5 @@ class AnnouncementIndex
     end
   end
 end
+
+

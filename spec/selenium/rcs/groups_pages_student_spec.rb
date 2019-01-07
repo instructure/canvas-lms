@@ -25,7 +25,7 @@ require_relative '../helpers/groups_common'
 require_relative '../helpers/groups_shared_examples'
 require_relative '../helpers/wiki_and_tiny_common'
 require_relative '../discussions/pages/discussions_index_page'
-require_relative '../announcements/announcement_index_page'
+require_relative '../announcements/pages/announcement_index_page'
 
 describe "groups" do
   include_context "in-process server selenium tests"
