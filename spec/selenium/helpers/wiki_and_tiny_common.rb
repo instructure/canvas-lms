@@ -225,6 +225,10 @@ module WikiAndTinyCommon
     get "/courses/#{course.id}/discussion_topics/new?is_announcement=true"
   end
 
+  def visit_assignment_page(course)
+    get "/courses/#{course.id}/assignments/new"
+  end
+
   def edit_wiki_css
     f("form.edit-form .edit-content")
   end
