@@ -161,7 +161,7 @@ class EditorToggle {
   // @api private
   getContent() {
     // remove MathML additions
-    const content = $('<div></div>').append($(this.el.html()))
+    const content = $('<div></div>').append(this.el.html())
     content.find('.hidden-readable').remove()
     return $.trim(content.html())
   }

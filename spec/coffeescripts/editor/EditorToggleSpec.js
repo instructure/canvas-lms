@@ -132,6 +132,12 @@ test('getContent removes MathML', () => {
   equal(et.getContent(), '<div>Math image goes here</div>')
 })
 
+test('getContent leaves plain text alone', () => {
+  containerDiv.text('this is plain text')
+  const et = new EditorToggle(containerDiv)
+  equal(et.getContent(), 'this is plain text')
+})
+
 test('edit', function() {
   const fresh = {}
   const content = 'content'
