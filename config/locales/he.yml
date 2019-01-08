@@ -7434,6 +7434,7 @@ he:
   every_665d821e: כל
   everyone_854554dd: "כל אחד"
   everyone_else_6c6dc7b6: "כל אחד אחר"
+  everyone_else_cc5f6888: "כל אחד אחר"
   ex_ba24edf6: EX
   exact_value_margin_eae7e67e: "%{exact_value} +/- %{margin}"
   example_84698b7d: דוגמה
@@ -7453,6 +7454,7 @@ he:
   excused_5877183c: נסלח!
   excused_cf8792eb: נסלח
   exit_d0c7b013: יציאה
+  expand_2f2fadbd: הרחבה
   expand_collapse_title_outcome_group_239f0a9d: "הרחבת/כווץ קבוצת תוצאות הלמידה %{title}"
   expand_collapse_title_outcome_group_student_meets__46ffef48: "הסתרה/הרחבה של %{title} השגי למידה, התלמיד השיג מומחיות ב %{mastery_count} של  %{count} תוצאות"
   expand_global_navigation_2c28d5d4: "הצגת ניווט מרכזי"
@@ -9322,6 +9324,7 @@ he:
   import_1b31507: ייבוא
   import_content_b2fd6620: "ייבוא תוכן"
   import_sis_data_428cc803: "יבוא נתוני המערכת הבית ספרית"
+  import_status_b147bd27: "סטטוס הייבוא"
   import_tutorial_tray_8b92e956: "יבוא Tutorial Tray"
   important_note_educational_institutions_have_an_ob_c9350304: "*הערה חשובה: מוסדות חינוך חייבים לאפשר נגישות גבוהה ככל שאפשר לחומרי הלימוד שלהם. אנו ממליצים לפחות יחס של 3:1 בקונטרסט הכתוביות מול צבע רקע כדי לשמור על התוכן קריא. בקלות ניתן לבחון את רמת הקונטרסט עם **WebAIM Color Contrast Checker***."
   imported_from_posttosisname_f7cc9258: "מיובא מ %{postToSISName}"
@@ -10119,6 +10122,7 @@ he:
   max_membership_bd0ddc68: max_membership
   max_users_groups_per_appointment_867c505b: "מספר מרבי של משתמשים/קבוצות לפגישה"
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: "מספר מרבי של פגישות שמשתתף יכול להיות נוכח"
+  media_af190855: מדיה
   media_comment_e494a952: "הערת מדיה"
   media_comment_submission_14e224dc: "הגשת הערת מדיה"
   media_comments: 
@@ -12187,6 +12191,7 @@ he:
   next_steps_ce0f0d0c: "הצעדים הבאים"
   nickname_1e6da3ad: "שם חיבה"
   nickname_7df95b09: "שם חיבה:"
+  no_74e9b590: לא
   no_assignment_name_adbb215b: "חסר שם משימה"
   no_associated_terms_13bacefc: "תקופות לימודים לא שויכו"
   no_broken_links_found_38d951e3: "לא נמצאו קישורים שגויים"
@@ -12226,6 +12231,7 @@ he:
   no_students_dd8de9f0: "אין תלמידים"
   no_students_have_taken_the_quiz_yet_e667644b: "תלמידים טרם בצעו את הבוחן"
   no_students_have_taken_the_survey_yet_d378cd35: "תלמידים טרם השתתפו בסקר"
+  no_submission_fb131a40: "אין הגשה"
   no_submission_for_assignment_a9cb6fe2: "אין הגשה עבור %{assignment}"
   no_tls_618add1a: "אין TLS"
   no_unassigned_terms_deb7b76b: "אין תקופות שלא שויכו"
@@ -12609,6 +12615,7 @@ he:
   on_time_percent_eebffe38: "בזמן: %{percent}"
   once_this_feature_is_enabled_you_will_not_be_able__ad338dcb: "היה ותכונה זו תשופעל, לא ניתן יהיה יותר לכבותה. יש לוודא שאכן אתם מוכנים לשפעל את תיקיית ההגשות לפני שממשיכים בתהליך."
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "ברגע ששינית תשובה יש לבחור באפשרות לפני שמעדכנים את השאלה."
+  one_or_more_items_are_currently_being_imported_the_186fe069: "פריט אחד או יותר מיובאים ברגעים אלה. הם יוצגו בקורס שבהמשך מיד כשהם זמינים"
   one_per_line_format_name_value_79647700: "אחד לשורה. הפורמט: שם=ערך"
   online_submission_type_file_uploads_24910d74: "סוג הגשה מקוונת - העלאת קבצים"
   online_submission_type_file_uploads_restrict_uploa_5ec7b263: "סוג הגשה מקוונת - העלאת קבצים - מגבלת סוגי קבצים מותרים"
@@ -17290,6 +17297,8 @@ he:
   submissions_11e96106: הגשות
   submissions_base: 
     assignment_submitted: "המשימה הוגשה."
+    errors: 
+      no_report: "לא ניתן למצוא דוח לפריט ההגשה ההוא"
     errors_update_failed: "עדכון נכשל"
   submissions_folder_9db8dadf: "תיקיית ההגשות"
   submissions_folders_must_be_created_in_user_or_gro_aba44f76: "יש צורך ליצור ספרית הגשות בהקשר של המשתמש או הקבוצה"
@@ -17479,6 +17488,7 @@ he:
   terms_4d979628: תנאים
   testing_state_effd4a82: "בודק מצב"
   text_document_eacbcdb7: "מסמך מלל"
+  text_entry_e1808b2f: "הקלדת טקסט"
   text_entry_submission_7b0ae0c5: "הגשת מלל מוקלד"
   text_entry_submission_cannot_be_empty_3d187cae: "הגשת תוכן מילולי אינה יכולה להשאר ריקה"
   text_input_d3480b8c: "קלט מילולי"
@@ -18863,6 +18873,7 @@ he:
   x_y_4a86b3ab: "%{x}/%{y}"
   xml_configuration_5ea1b942: "קופיגורצית XML"
   yellow_4cf93785: צהוב
+  yes_3593c135: כן
   yes_dde87d5: כן
   yo_e4ee15a4: Yo
   you_are_about_to_lose_any_changes_that_you_have_no_6759802f: |-
