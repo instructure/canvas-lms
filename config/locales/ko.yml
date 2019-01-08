@@ -5099,6 +5099,7 @@ ko:
     sis_id_in_use: "SIS ID \"%{sis_id}\"이(가) 이미 사용 중임"
   everyone_854554dd: 모두
   everyone_else_6c6dc7b6: "나머지 모든 사람"
+  everyone_else_cc5f6888: "다른 모든 사람"
   example_84698b7d: 예
   exceeds_expectations_5910fc3a: "기대를 초과함"
   external_apps_f5490181: "외부 앱"
@@ -6605,6 +6606,7 @@ ko:
       miscellaneous: 기타
       operators: 연산자
       relationships: 관계
+  media_af190855: 미디어
   media_comments: 
     alerts: 
       kaltura_disabled: "이 Canvas 사이트에는 Kaltura 사용 안 함"
@@ -8421,6 +8423,7 @@ ko:
   no_results_found_58717065: "결과 없음"
   no_students_have_taken_the_quiz_yet_e667644b: "어떤 학생도 이 퀴즈를 치르지 않음"
   no_students_have_taken_the_survey_yet_d378cd35: "어떤 학생도 이 설문을 치르지 않음"
+  no_submission_fb131a40: "제출물 없음"
   not_installed_37a21a76: "설치 안 됨"
   notification: 
     added_to_conversation_description: "대화에 추가됨"
@@ -11860,6 +11863,8 @@ ko:
   submissions_11e96106: 제출물
   submissions_base: 
     assignment_submitted: "과제를 제출했습니다."
+    errors: 
+      no_report: "제출 항목에 대한 보고서를 찾을 수 없음"
     errors_update_failed: "업데이트 실패"
   submit_a3cc6859: 제출
   submitted_318fad53: 제출됨
@@ -11970,6 +11975,7 @@ ko:
       timespan: "%{start_at}*부터* %{end_at}까지"
   terms_4d979628: 학기
   testing_state_effd4a82: "테스트 상태"
+  text_entry_e1808b2f: "텍스트 항목"
   that_user_account_has_been_deleted_please_contact__350e0e0: "해당 사용자 계정은 삭제되었습니다.  계정을 다시 활성화하려면 시스템 관리자에게 문의하시기 바랍니다."
   the_institution_you_logged_in_from_is_not_configur_5ceac41: "이 계정에 구성되어 있지 않은 기관에서 로그인했습니다."
   themes_89bfe9c4: 테마
