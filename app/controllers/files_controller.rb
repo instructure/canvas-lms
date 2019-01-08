@@ -1176,7 +1176,7 @@ class FilesController < ApplicationController
       attachment = Attachment.active.where(id: params[:id], uuid: params[:uuid]).first if params[:id].present?
       thumb_opts = params.slice(:size)
       url = authenticated_thumbnail_url(attachment, thumb_opts)
-      Rails.cache.write(cache_key, url, :expires_in => 30.minutes) if url
+      Rails.cache.write(cache_key, url, :expires_in => attachment.url_ttl) if url
     end
     url ||= '/images/no_pic.gif'
     redirect_to url
