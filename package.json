@@ -3,8 +3,8 @@
   "license": "AGPL-3.0",
   "version": "0.0.0",
   "engines": {
-    "node": ">=8.10.0",
-    "yarn": "^1.10.1"
+    "node": ">=10.15.0",
+    "yarn": "^1.6.0"
   },
   "private": true,
   "workspaces": {
@@ -246,7 +246,7 @@
     "test:karma:headless": "yarn run test:karma --browsers ChromeHeadlessNoSandbox",
     "test:karma:watch": "node --max-old-space-size=4096 ./node_modules/.bin/karma start",
     "test:karma:watch:headless": "yarn run test:karma:watch --browsers ChromeHeadlessNoSandbox",
-    "test:packages": "if [ \"$COVERAGE\" ]; then yarn workspace-run test:coverage; else yarn workspace-run test; fi",
+    "test:packages": "if [ \"$COVERAGE\" ]; then yarn workspace-run-serial test:coverage; else yarn workspace-run-serial test; fi",
     "build": "yarn run build:css && yarn run build:js",
     "build:watch": "concurrently \"yarn build:css:watch\" \"yarn build:js:watch\"",
     "build:css": "brandable_css",
@@ -261,6 +261,7 @@
     "webpack-development": "gulp rev 1> /dev/null & webpack --color && yarn lint:browser-code",
     "webpack-production": "NODE_ENV=production gulp rev && node --max_old_space_size=4096 $(yarn bin)/webpack --color --config webpack.production.config.js && yarn lint:browser-code",
     "workspace-run": "r() { wsrun $@ --fast-exit --exclude-missing --collect-logs --report; exit $?; } && r",
+    "workspace-run-serial": "r() { wsrun $@ --fast-exit --exclude-missing --collect-logs --report --serial; exit $?; } && r",
     "jspec": "./spec/jspec.sh",
     "jspec-watch": "./spec/jspec.sh --watch",
     "a11y-report": "./spec/jspec.sh --a11y",

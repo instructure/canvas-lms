@@ -1,6 +1,6 @@
-FROM instructure/node:8
+FROM instructure/node:10
 
-# the instructure/node:8 docker image uses yarn 0.27 still, we want to use at least 1.3.2
+# the instructure/node:10 docker image uses yarn 0.27 still, we want to use at least 1.3.2
 USER root
 ENV YARN_VERSION 1.3.2-1
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \

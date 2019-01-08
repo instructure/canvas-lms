@@ -72,7 +72,7 @@ it('renders date correctly', () => {
   // Reason why this is showing up twice is once for screenreader content and again for regular content
   // Also, notice that it handles timezone differences here, with the `-01:00` offset
   expect(queryAllByText('Due: Mon Jul 11, 2016 7:00pm')).toHaveLength(2)
-  expect(queryAllByText('2016-7-11')).toHaveLength(1)
+  expect(queryAllByText('7/11/2016')).toHaveLength(1)
 })
 
 it('does not render a date if there is no dueAt set', () => {
