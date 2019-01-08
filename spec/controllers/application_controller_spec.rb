@@ -204,6 +204,12 @@ RSpec.describe ApplicationController do
     it "should reject disallowed paths" do
       expect(controller.send(:clean_return_to, "ftp://example.com/javascript:hai")).to be_nil
     end
+
+    it "removes /download from the end of a file path" do
+      expect(controller.send(:clean_return_to, "/courses/1/files/1/download?wrap=1")).to eq "https://canvas.example.com/courses/1/files/1"
+      expect(controller.send(:clean_return_to, "/courses/1~1/files/1~1/download?wrap=1")).to eq "https://canvas.example.com/courses/1~1/files/1~1"
+      expect(controller.send(:clean_return_to, "/courses/1/pages/download?wrap=1")).to eq "https://canvas.example.com/courses/1/pages/download?wrap=1"
+    end
   end
 
   describe "#reject!" do
