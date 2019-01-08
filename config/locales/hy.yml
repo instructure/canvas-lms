@@ -6151,6 +6151,7 @@ hy:
   every_665d821e: Յուրաքանչյուր
   everyone_854554dd: Յուրաքանչյուրին
   everyone_else_6c6dc7b6: "Մնացած բոլորը"
+  everyone_else_cc5f6888: "Մնացած յուրաքանչյուրը"
   example_84698b7d: Օրինակ
   example_final_score_355aff0f: "Վերջնական գնահատականի օրինակ"
   example_final_score_a92b30b9: "Վերջնական գնահատականի օրինակ]]"
@@ -6165,6 +6166,7 @@ hy:
   excuse_this_assignment_for_the_selected_student_af04e132: "Ազատել ընտրված ունկնդիրներին այս հանձնարարության կատարումից "
   excused_5877183c: "Ներված է:"
   excused_cf8792eb: "Ներված է"
+  expand_2f2fadbd: Բացել
   expand_collapse_title_outcome_group_239f0a9d: "բացել/փակել Արդյունքների խումբը %{title}"
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Բացել %{groupName}-ի խմբի անդամների ցուցակը"
   expand_or_collapse_calendars_9854b0d0: "Բացել կամ սեղմել օրացույցերը"
@@ -7619,6 +7621,7 @@ hy:
   immediately_c128ede6: Անմիջապես
   import_1b31507: Ներմուծել
   import_content_b2fd6620: "Ներմուծել բովանդակությունը"
+  import_status_b147bd27: "Ներմուծման կարգավիճակ"
   important_note_educational_institutions_have_an_ob_c9350304: "Կարևոր նշում․ Կրթական հաստատությունները պարտավոր են իրենց բովանդակությունը ինչքան հնարավոր է հասանելի դարձնեն։ Խորհուրդ ենք տալիս նվազագույնը տեքստը ետնապատկերի գույնի հարաբերակցությունը 3:1 հետ պահպանել, որպիսզի ձեր տեքստը ընթերցանելի լինի։ Հեշտությամբ ստուգեք ձեր կոնտրաստի հարաբերակցությունը  **WebAIM Color Contrast Checker*** -ի օգնությամբ։"
   importers/assignment_importer: 
     errors: 
@@ -8189,6 +8192,7 @@ hy:
       relationships: Հարաբերություններ
   max_users_groups_per_appointment_867c505b: "Մեկ հանդիպման համար օգտատերերի/խմբերի առավելագույն թիվը"
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: "Մեկ մասնակցի կողմից հանդիպումներին մասնակցության առավելագույն  թիվը:"
+  media_af190855: Մուլտիմեդիա
   media_comments: 
     alerts: 
       kaltura_disabled: "Kaltura-ն անջատված է Canvas-ի այս կայքի համար"
@@ -10202,6 +10206,7 @@ hy:
   next_40e12421: Հաջորդը
   next_module_item_9bb8a222: "Հաջորդ Մոդուլ/Տարր"
   next_steps_ce0f0d0c: "Հերթական քայլերը"
+  no_74e9b590: Ոչ
   no_assignment_name_adbb215b: "Հանձնարարության անվանում չկա"
   no_content_has_been_added_f36bab43: "* Բովանդակություն չի ավելացվել"
   no_courses_found_12d68a74: "Որեւէ դասընթաց չի գտնվել"
@@ -10229,6 +10234,7 @@ hy:
   no_students_dd8de9f0: "Ունկնդիրներ չկան"
   no_students_have_taken_the_quiz_yet_e667644b: "Ոչ մի ունկնդիր դեռևս չի սկսել թեստը"
   no_students_have_taken_the_survey_yet_d378cd35: "Ոչ մի ունկնդիր դեռևս չի սկսել հարցումը"
+  no_submission_fb131a40: "Չկան ներկայացված աշխատանքներ"
   no_tls_618add1a: "TLS չկա"
   no_usage_rights_object_supplied_304b8d40: "Տրված չէ 'օգտագործման իրավունքներ' օբյեկտը"
   no_users_found_64a043ff: "Որեւէ օգտատեր չի գտնվել"
@@ -10543,6 +10549,7 @@ hy:
   on_paper_46d0ba36: "Թղթային տարբերակով"
   on_time_percent_eebffe38: "Ժամանակին՝ %{percent}"
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "Պատասխանը փոխելուց հետո դուք պետք է ընտրեք տարբերակ՝ նախքան հարցը թարմացնելը:"
+  one_or_more_items_are_currently_being_imported_the_186fe069: "Մեկ կամ մի քանի տարրեր ներկայումս ներմուծվում են: Հասանելի լինելուն պես դրանք անմիջապես տեսանելի կլինեն այս դասընթացում: "
   one_per_line_format_name_value_79647700: "Մեկ տողին՝ մեկը: Ֆորմատ՝ անուն=մեծություն"
   online_submission_type_file_uploads_24910d74: "Առցանց ներկայացնելու ձեւը՝ ֆայլերի բեռնում"
   online_submission_type_file_uploads_restrict_uploa_5ec7b263: "Առցանց ներկայացնելու ձեւը՝ ֆայլերի բեռնում - սահմանափակել բեռնվող ֆայլերի տեսակները"
@@ -14718,6 +14725,8 @@ hy:
   submissions_11e96106: "Ուղարկված աշխատանքներ"
   submissions_base: 
     assignment_submitted: "Հանձնարարությունն ուղարկված է:"
+    errors: 
+      no_report: "Հնարավոր չէ գտնել հաշվետվություն այդ ուղարկված  աշխատանքի համար"
     errors_update_failed: "Թարմացնել չհաջողվեց"
   submit_a3cc6859: Ուղարկել
   submit_a_feature_idea_2d4baa3d: "Ուղարկել ֆուկցիաներին առնչվող առաջարկություններ"
@@ -14864,6 +14873,7 @@ hy:
   terms_4d979628: Ժամանակահատվածներ
   testing_state_effd4a82: "Ստուգման վիճակը"
   text_document_eacbcdb7: "Տեքստային փաստաթուղթ"
+  text_entry_e1808b2f: "Տեքստի մուտքագրում"
   text_entry_submission_cannot_be_empty_3d187cae: "Տեքստային դաշտը չի կարող դատարկ լինել"
   text_input_d3480b8c: "Տեքստի մուտք"
   that_user_account_has_been_deleted_please_contact__350e0e0: "Օգտատիրոջ այդ հաշիվը ջնջվել է: Խնդրում ենք դիմել ձեր համակարգի ադմինիստրատորին կրկին ակտիվացնելու ձեր հաշիվը:"
@@ -15959,6 +15969,7 @@ hy:
   wrong_answer_comments_14963a24: "Մեկնաբանություններ սխալ պատասխանի վերաբերյալ"
   xml_configuration_5ea1b942: "XML կոնֆիգուրացիա"
   yellow_4cf93785: Դեղին
+  yes_3593c135: Այո
   yes_dde87d5: Այո
   yo_e4ee15a4: Yo
   you_are_about_to_lose_any_changes_that_you_have_no_6759802f: |-
