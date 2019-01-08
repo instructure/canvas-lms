@@ -7205,6 +7205,7 @@ nn:
   every_665d821e: Kvar
   everyone_854554dd: Alle
   everyone_else_6c6dc7b6: "Alle andre"
+  everyone_else_cc5f6888: "Alle andre"
   ex_ba24edf6: EX
   exact_value_margin_eae7e67e: "%{exact_value} +/- %{margin}"
   example_84698b7d: Eksempel
@@ -7224,6 +7225,7 @@ nn:
   excused_5877183c: "Fritak er innvilga."
   excused_cf8792eb: "Fritak er innvilga"
   exit_d0c7b013: "Gå ut og lukk"
+  expand_2f2fadbd: Vis
   expand_collapse_title_outcome_group_239f0a9d: "vis/skjul %{title} læringsmålgruppe"
   expand_collapse_title_outcome_group_student_meets__46ffef48: "Vis/skjul %{title} læringsmålgruppe. Studenten oppnår meistring ved %{mastery_count} av %{count} læringsmål"
   expand_global_navigation_2c28d5d4: "Utvid global navigasjon"
@@ -8941,6 +8943,7 @@ nn:
   import_1b31507: Importer
   import_content_b2fd6620: "Importer innhald"
   import_sis_data_428cc803: "Importer SIS-data"
+  import_status_b147bd27: Importstatus
   import_tutorial_tray_8b92e956: "Importer opplæringsmeny"
   important_note_educational_institutions_have_an_ob_c9350304: "*Viktig merknad: Utdanningsinstitusjonar har ei plikt til å gjere eige innhald så tilgjengeleg som mogleg. Instructure anbefaler minimum 3:1-forhold for tekst over bakgrunnsfarge for at teksta skal vere så god å lese som mogleg. Du kan enkelt teste kontrastforholdet med **WebAIM Color Contrast Checker***."
   imported_from_posttosisname_f7cc9258: "Importert frå %{postToSISName}"
@@ -9733,6 +9736,7 @@ nn:
   max_membership_bd0ddc68: max_membership
   max_users_groups_per_appointment_867c505b: "Talet (maks)på brukarar/grupper per avtale"
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: "Talet (maks) på avtalar ein deltakar kan delta i"
+  media_af190855: Media
   media_comment_e494a952: Mediekommentar
   media_comment_submission_14e224dc: "Innsending av mediekommentar"
   media_comments: 
@@ -11760,6 +11764,7 @@ nn:
   next_student_b62869f4: "Neste student"
   nickname_1e6da3ad: "Alias:"
   nickname_7df95b09: "Alias:"
+  no_74e9b590: nei
   no_assignment_name_adbb215b: "Ingen oppgåvenamn"
   no_assignments_with_that_name_found_1d7be1: "Finn ikkje oppgåver med det namnet"
   no_associated_terms_13bacefc: "Ingen tilknytte filer"
@@ -11808,6 +11813,7 @@ nn:
   no_students_with_that_name_found_f6004da2: "Finn ikkje studentar med det namnet"
   no_subject_58b7941c: "Utan emne"
   no_subject_970aad80: "Utan emne"
+  no_submission_fb131a40: "Inga innlevering"
   no_submission_for_assignment_a9cb6fe2: "Inga innlevering for %{assignment}"
   no_terms_eab5ee7b: "Utan semester"
   no_tls_618add1a: "Ingen TLS"
@@ -12207,6 +12213,7 @@ nn:
   on_time_percent_eebffe38: "På tid: %{percent}"
   once_this_feature_is_enabled_you_will_not_be_able__ad338dcb: "Når denne funksjonen er slått på, kan den ikkje slåast av igjen. Ver sikker på at du er klar for å aktivere innleveringsmappa før du går vidare. "
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "Når du har levert eit svar, kan du ikkje endre på det seinare. Du kan ikkje lenger sjå førre spørsmål."
+  one_or_more_items_are_currently_being_imported_the_186fe069: "Eit eller fleire element blir importerte akkurat no. Dei blir synlege i emnet nedanfor når dei er tilgjengelege."
   one_per_line_format_name_value_79647700: "Ein per linje. Format: namn=verdi"
   online_submission_type_file_uploads_24910d74: "Innlevering på nettet – filopplasting"
   online_submission_type_file_uploads_restrict_uploa_5ec7b263: "Innlevering på nettet – filopplasting – vel filtypar som kan leverast"
@@ -16740,6 +16747,8 @@ nn:
   submissions_11e96106: Innleveringar
   submissions_base: 
     assignment_submitted: "Oppgåva er levert."
+    errors: 
+      no_report: "Finn ikkje ein rapport for innleveringa"
     errors_update_failed: "Oppdatering mislukkast"
   submissions_folder_9db8dadf: Innleveringsmappe
   submissions_folders_must_be_created_in_user_or_gro_aba44f76: "innleveringsmappene må opprettast i ein brukar- eller gruppekontekst"
@@ -16952,6 +16961,7 @@ nn:
   terms_of_service_f183ff7f: "Vilkår for bruk"
   testing_state_effd4a82: "Testar status"
   text_document_eacbcdb7: Tekstdokument
+  text_entry_e1808b2f: "Tekstinnlegging i editor"
   text_entry_submission_7b0ae0c5: "Send inn teksten"
   text_entry_submission_cannot_be_empty_3d187cae: "Tekstboksen kan ikkje vere tom"
   text_input_d3480b8c: Tekstoppføring
@@ -18426,6 +18436,7 @@ nn:
   x_y_4a86b3ab: "%{x}/%{y}"
   xml_configuration_5ea1b942: XML-konfigurasjon
   yellow_4cf93785: Gul
+  yes_3593c135: ja
   yes_dde87d5: Ja
   yes_install_tool_f51b3278: "Ja, installer verktøy"
   yo_e4ee15a4: Yo
