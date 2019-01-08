@@ -21,10 +21,10 @@ describe Lti::Ims::ResultsSerializer do
   subject { described_class.new(result, url).as_json }
 
   let(:result) { lti_result_model result_score: 10, result_maximum: 10 }
-  let(:url) { 'http://test.test/results' }
+  let(:url) { 'http://test.test' }
   let(:expected) do
     {
-      id: "#{url}/#{result.id}",
+      id: "#{url}/results/#{result.id}",
       scoreOf: url,
       userId: result.user_id.to_s,
       resultScore: result.result_score,

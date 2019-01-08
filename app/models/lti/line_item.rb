@@ -51,7 +51,7 @@ class Lti::LineItem < ApplicationRecord
         submission_types: 'none'
       )
       opts = {assignment: a}.merge(params)
-      opts[:client_id] = tool.developer_key.global_id unless params[:resource_link]
+      opts[:client_id] = tool.developer_key.global_id
       self.create!(opts)
     end
   end

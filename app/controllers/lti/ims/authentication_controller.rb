@@ -126,7 +126,9 @@ module Lti
 
       def authorize_redirect_url
         url = URI.parse(lti_1_3_authorization_url(params: oidc_params))
-        url.host = canvas_domain
+        parts = canvas_domain.split(':')
+        url.host = parts.first
+        url.port = parts.last if parts.size > 1
         url.to_s
       end
 

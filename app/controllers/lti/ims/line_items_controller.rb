@@ -220,24 +220,21 @@ module Lti
 
       def index_query
         rlid = params[:resource_link_id]
-        # Eventually becomes a set of predicates in a paginated LineItem query. Limits the latter to only those
-        # Assignments belonging to the requested context _and_ having a LineItem bound to a ResourceLink
-        # associated with the current tool. Client can further narrow that last condition by specifying
-        # a particular ResourceLink UUID (`resource_link_id`). (`tag` and `resource_id` query params also treated
-        # as LineItem filters.)
         assignments = Assignment.
           active.
-          joins(line_items: :resource_link).
+          joins(rlid.present? ? { line_items: :resource_link } : :line_items).
           where(
-            context: context,
-            lti_resource_links: { context_external_tool_id: tool.id }.merge!(rlid.present? ? { resource_link_id: rlid } : {})
-          ).
-          distinct
+            {
+              context: context,
+              lti_line_items: { client_id: developer_key.global_id }
+            }.merge!(rlid.present? ? { lti_resource_links: { resource_link_id: rlid } } : {})
+          )
 
-        { assignment: assignments }.
-          merge!(params[:tag].present? ? { tag: params[:tag] } : {}).
-          merge!(params[:resource_id].present? ? { resource_id: params[:resource_id] } : {}).
-          compact
+        {
+          assignment: assignments,
+          tag: params[:tag],
+          resource_id: params[:resource_id]
+        }.compact
       end
 
       def line_item_collection(line_items)
