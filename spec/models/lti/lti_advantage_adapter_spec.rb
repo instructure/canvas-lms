@@ -124,22 +124,6 @@ describe Lti::LtiAdvantageAdapter do
       Canvas::Security.decode_jwt(jws)['verifier']
     end
     let(:expander_opts) { super().merge(assignment: assignment) }
-
-    it 'adds assignment specific claims' do
-      expect(params['https://www.instructure.com/canvas_assignment_title']).to eq assignment.title
-    end
-  end
-
-  describe '#generate_post_payload_for_homework_submission' do
-    let(:verifier) do
-      jws = adapter.generate_post_payload_for_homework_submission(assignment)['lti_message_hint']
-      Canvas::Security.decode_jwt(jws)['verifier']
-    end
-    let(:params) { JSON.parse(fetch_and_delete_launch(course, verifier)) }
-
-    it 'adds hoemwork specific claims' do
-      expect(params['https://www.instructure.com/content_file_extensions']).to eq assignment.allowed_extensions&.join(',')
-    end
   end
 
   describe '#launch_url' do

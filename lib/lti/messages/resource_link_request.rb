@@ -31,16 +31,11 @@ module Lti::Messages
 
     def generate_post_payload_for_assignment(assignment, _outcome_service_url, _legacy_outcome_service_url, _lti_turnitin_outcomes_placement_url)
       @assignment = assignment
-      add_assignment_substitutions!
       generate_post_payload
     end
 
     def generate_post_payload_for_homework_submission(assignment)
       @assignment = assignment
-      lti_assignment = Lti::LtiAssignmentCreator.new(assignment).convert
-      add_extension('content_return_types', lti_assignment.return_types.join(','))
-      add_extension('content_file_extensions', @assignment.allowed_extensions&.join(','))
-      add_assignment_substitutions!
       generate_post_payload
     end
 
@@ -84,12 +79,6 @@ module Lti::Messages
 
     def line_item_for_assignment
       @_line_item ||= @assignment&.line_items&.find(&:assignment_line_item?)
-    end
-
-    def add_assignment_substitutions!
-      add_extension('canvas_assignment_id', '$Canvas.assignment.id') if @tool.public?
-      add_extension('canvas_assignment_title', '$Canvas.assignment.title')
-      add_extension('canvas_assignment_points_possible', '$Canvas.assignment.pointsPossible')
     end
 
     def include_assignment_and_grade_service_claims?

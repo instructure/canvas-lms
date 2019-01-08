@@ -459,56 +459,24 @@ describe Lti::Messages::JwtMessage do
       end
     end
 
-    shared_examples 'sets Canvas roles extension' do
-      it 'adds the Canvas roles extension' do
-        expect(decoded_jwt['https://www.instructure.com/roles']).to eq 'urn:lti:role:ims/lis/Learner,urn:lti:sysrole:ims/lis/User'
-      end
-    end
-
-    shared_examples 'skips Canvas roles extension' do
-      it 'does not set the Canvas roles extension' do
-        expect(decoded_jwt).not_to include 'https://www.instructure.com/roles'
-      end
-    end
-
-    shared_examples 'sets Canvas enrollment state extension' do
-      it 'adds the Canvas enrollment state extension' do
-        expect(decoded_jwt['https://www.instructure.com/canvas_enrollment_state']).to eq 'inactive'
-      end
-    end
-
-    shared_examples 'skips Canvas enrollment state extension' do
-      it 'does not set the Canvas enrollment state extension' do
-        expect(decoded_jwt).not_to include 'https://www.instructure.com/canvas_enrollment_state'
-      end
-    end
-
     it_behaves_like 'sets roles claim'
-    it_behaves_like 'sets Canvas roles extension'
-    it_behaves_like 'sets Canvas enrollment state extension'
 
     context 'when roles claim group disabled' do
       let(:opts) { super().merge({claim_group_blacklist: [:roles]}) }
 
       it_behaves_like 'skips roles claim'
-      it_behaves_like 'skips Canvas roles extension'
-      it_behaves_like 'skips Canvas enrollment state extension'
     end
 
     describe 'when Canvas roles extension disabled' do
       let(:opts) { super().merge({extension_blacklist: [:roles]}) }
 
       it_behaves_like 'sets roles claim'
-      it_behaves_like 'skips Canvas roles extension'
-      it_behaves_like 'sets Canvas enrollment state extension'
     end
 
     describe 'when Canvas enrollment state extension disabled' do
       let(:opts) { super().merge({extension_blacklist: [:canvas_enrollment_state]}) }
 
       it_behaves_like 'sets roles claim'
-      it_behaves_like 'sets Canvas roles extension'
-      it_behaves_like 'skips Canvas enrollment state extension'
     end
 
   end
@@ -615,68 +583,6 @@ describe Lti::Messages::JwtMessage do
       end
     end
 
-    shared_examples 'sets canvas course id extension' do
-      it 'adds the canvas course id extension' do
-        expect(decoded_jwt['https://www.instructure.com/canvas_course_id']).to eq course.id
-      end
-    end
-
-    shared_examples 'skips canvas course id extension' do
-      it 'does not add the canvas course id extension' do
-        expect(decoded_jwt).not_to include 'https://www.instructure.com/canvas_course_id'
-      end
-    end
-
-    shared_examples 'sets canvas workflow state extension' do
-      it 'adds the canvas workflow state' do
-        expect(decoded_jwt['https://www.instructure.com/canvas_workflow_state']).to eq 'created'
-      end
-    end
-
-    shared_examples 'skips canvas workflow state extension' do
-      it 'does not add the canvas workflow state' do
-        expect(decoded_jwt).not_to include 'https://www.instructure.com/canvas_workflow_state'
-      end
-    end
-
-    shared_examples 'sets course section sourcedId extension' do
-      it 'adds the course section sourcedId' do
-        course.update!(sis_source_id: SecureRandom.uuid)
-        expect(decoded_jwt['https://www.instructure.com/lis_course_offering_sourcedid']).to eq course.sis_source_id
-      end
-    end
-
-    shared_examples 'skips course section sourcedId extension' do
-      it 'does not add the course section sourcedId' do
-        course.update!(sis_source_id: SecureRandom.uuid)
-        expect(decoded_jwt).not_to include 'https://www.instructure.com/lis_course_offering_sourcedid'
-      end
-    end
-
-    shared_examples 'sets the canvas account id extension' do
-      it 'adds the canvas account id' do
-        expect(account_jwt['https://www.instructure.com/canvas_account_id']).to eq course.root_account.id
-      end
-    end
-
-    shared_examples 'skips the canvas account id extension' do
-      it 'does not add the canvas account id' do
-        expect(account_jwt).not_to include 'https://www.instructure.com/canvas_account_id'
-      end
-    end
-
-    shared_examples 'sets the canvas account sis id' do
-      it 'adds the canvas account sis id' do
-        expect(account_jwt['https://www.instructure.com/canvas_account_sis_id']).to eq course.root_account.sis_source_id
-      end
-    end
-
-    shared_examples 'skips the canvas account sis id' do
-      it 'does not add the canvas account sis id' do
-        expect(account_jwt).not_to include 'https://www.instructure.com/canvas_account_sis_id'
-      end
-    end
-
     shared_context 'when context is an account' do
       let(:account_jwt_message) do
         Lti::Messages::JwtMessage.new(
@@ -697,34 +603,8 @@ describe Lti::Messages::JwtMessage do
 
     it_behaves_like 'sets picture'
 
-    context 'extensions' do
-      context 'when context is a course' do
-        it_behaves_like 'sets canvas course id extension'
-        it_behaves_like 'sets canvas workflow state extension'
-        it_behaves_like 'sets course section sourcedId extension'
-      end
-
-      it_behaves_like 'when context is an account' do
-        it_behaves_like 'sets the canvas account id extension'
-        it_behaves_like 'sets the canvas account sis id'
-      end
-    end
-
     shared_examples 'does not set public claims group' do
       it_behaves_like 'skips picture'
-
-      context 'extensions' do
-        context 'when context is a course' do
-          it_behaves_like 'skips canvas course id extension'
-          it_behaves_like 'skips canvas workflow state extension'
-          it_behaves_like 'skips course section sourcedId extension'
-        end
-
-        it_behaves_like 'when context is an account' do
-          it_behaves_like 'skips the canvas account id extension'
-          it_behaves_like 'skips the canvas account sis id'
-        end
-      end
     end
 
     context 'when public claim group disabled' do
@@ -743,95 +623,30 @@ describe Lti::Messages::JwtMessage do
       let(:opts) { super().merge({extension_blacklist: [:canvas_course_id]}) }
 
       it_behaves_like 'sets picture'
-
-      context 'extensions' do
-        context 'when context is a course' do
-          it_behaves_like 'skips canvas course id extension'
-          it_behaves_like 'sets canvas workflow state extension'
-          it_behaves_like 'sets course section sourcedId extension'
-        end
-
-        it_behaves_like 'when context is an account' do
-          it_behaves_like 'sets the canvas account id extension'
-          it_behaves_like 'sets the canvas account sis id'
-        end
-      end
     end
 
     context 'when canvas workflow state extension disabled' do
       let(:opts) { super().merge({extension_blacklist: [:canvas_workflow_state]}) }
 
       it_behaves_like 'sets picture'
-
-      context 'extensions' do
-        context 'when context is a course' do
-          it_behaves_like 'sets canvas course id extension'
-          it_behaves_like 'skips canvas workflow state extension'
-          it_behaves_like 'sets course section sourcedId extension'
-        end
-
-        it_behaves_like 'when context is an account' do
-          it_behaves_like 'sets the canvas account id extension'
-          it_behaves_like 'sets the canvas account sis id'
-        end
-      end
     end
 
     context 'when course section sourcedId extension disabled' do
       let(:opts) { super().merge({extension_blacklist: [:lis_course_offering_sourcedid]}) }
 
       it_behaves_like 'sets picture'
-
-      context 'extensions' do
-        context 'when context is a course' do
-          it_behaves_like 'sets canvas course id extension'
-          it_behaves_like 'sets canvas workflow state extension'
-          it_behaves_like 'skips course section sourcedId extension'
-        end
-
-        it_behaves_like 'when context is an account' do
-          it_behaves_like 'sets the canvas account id extension'
-          it_behaves_like 'sets the canvas account sis id'
-        end
-      end
     end
 
     context 'when canvas account id extension disabled' do
       let(:opts) { super().merge({extension_blacklist: [:canvas_account_id]}) }
 
       it_behaves_like 'sets picture'
-
-      context 'extensions' do
-        context 'when context is a course' do
-          it_behaves_like 'sets canvas course id extension'
-          it_behaves_like 'sets canvas workflow state extension'
-          it_behaves_like 'sets course section sourcedId extension'
-        end
-
-        it_behaves_like 'when context is an account' do
-          it_behaves_like 'skips the canvas account id extension'
-          it_behaves_like 'sets the canvas account sis id'
-        end
-      end
     end
 
     context 'when canvas account sis id extension disabled' do
       let(:opts) { super().merge({extension_blacklist: [:canvas_account_sis_id]}) }
 
       it_behaves_like 'sets picture'
-
-      context 'extensions' do
-        context 'when context is a course' do
-          it_behaves_like 'sets canvas course id extension'
-          it_behaves_like 'sets canvas workflow state extension'
-          it_behaves_like 'sets course section sourcedId extension'
-        end
-
-        it_behaves_like 'when context is an account' do
-          it_behaves_like 'sets the canvas account id extension'
-          it_behaves_like 'skips the canvas account sis id'
-        end
-      end
     end
   end
 
@@ -871,214 +686,6 @@ describe Lti::Messages::JwtMessage do
       before { tool.update!(workflow_state: 'name_only') }
 
       it_behaves_like 'skips role scope mentor'
-    end
-  end
-
-  describe 'resource claims' do
-    shared_examples 'sets selection directive extension' do |directive|
-      it 'adds selection directive' do
-        expect(decoded_jwt['https://www.instructure.com/selection_directive']).to eq directive
-      end
-    end
-
-    shared_examples 'skips selection directive extension' do
-      it 'does not add selection directive' do
-        expect(decoded_jwt).not_to include 'https://www.instructure.com/selection_directive'
-      end
-    end
-
-    shared_examples 'sets content intended use extension' do |use|
-      it 'adds content intended use' do
-        expect(decoded_jwt['https://www.instructure.com/content_intended_use']).to eq use
-      end
-    end
-
-    shared_examples 'skips content intended use extension' do
-      it 'does not add content intended use' do
-        expect(decoded_jwt).not_to include 'https://www.instructure.com/content_intended_use'
-      end
-    end
-
-    shared_examples 'sets content return types extension' do |types|
-      it 'adds content return types' do
-        expect(decoded_jwt['https://www.instructure.com/content_return_types']).to eq types
-      end
-    end
-
-    shared_examples 'skips content return types extension' do
-      it 'does not add content return types' do
-        expect(decoded_jwt).not_to include 'https://www.instructure.com/content_return_types'
-      end
-    end
-
-    shared_examples 'sets content return url extension' do
-      it 'adds content return url' do
-        expect(decoded_jwt['https://www.instructure.com/content_return_url']).to eq return_url
-      end
-    end
-
-    shared_examples 'skips content return url extension' do
-      it 'does not add content return url' do
-        expect(decoded_jwt).not_to include 'https://www.instructure.com/content_return_url'
-      end
-    end
-
-    shared_examples 'resource group 1 check' do |directive, use, types|
-      it_behaves_like 'sets selection directive extension', directive
-      it_behaves_like 'sets content intended use extension', use
-      it_behaves_like 'sets content return types extension', types
-      it_behaves_like 'sets content return url extension'
-
-      context 'when resource claim group disabled' do
-        let(:opts) { super().merge({claim_group_blacklist: [:resource]}) }
-
-        it_behaves_like 'skips selection directive extension'
-        it_behaves_like 'skips content intended use extension'
-        it_behaves_like 'skips content return types extension'
-        it_behaves_like 'skips content return url extension'
-      end
-
-      context 'when selection directive extension disabled' do
-        let(:opts) { super().merge({extension_blacklist: [:selection_directive]}) }
-
-        it_behaves_like 'skips selection directive extension'
-        it_behaves_like 'sets content intended use extension', use
-        it_behaves_like 'sets content return types extension', types
-        it_behaves_like 'sets content return url extension'
-      end
-
-      context 'when content intended use extension disabled' do
-        let(:opts) { super().merge({extension_blacklist: [:content_intended_use]}) }
-
-        it_behaves_like 'sets selection directive extension', directive
-        it_behaves_like 'skips content intended use extension'
-        it_behaves_like 'sets content return types extension', types
-        it_behaves_like 'sets content return url extension'
-      end
-
-      context 'when content return types extension disabled' do
-        let(:opts) { super().merge({extension_blacklist: [:content_return_types]}) }
-
-        it_behaves_like 'sets selection directive extension', directive
-        it_behaves_like 'sets content intended use extension', use
-        it_behaves_like 'skips content return types extension'
-        it_behaves_like 'sets content return url extension'
-      end
-
-      context 'when content return url extension disabled' do
-        let(:opts) { super().merge({extension_blacklist: [:content_return_url]}) }
-
-        it_behaves_like 'sets selection directive extension', directive
-        it_behaves_like 'sets content intended use extension', use
-        it_behaves_like 'sets content return types extension', types
-        it_behaves_like 'skips content return url extension'
-      end
-    end
-
-    context 'editor button' do
-      before { opts[:resource_type] = 'editor_button' }
-
-      it_behaves_like 'resource group 1 check', 'embed_content', 'embed', 'oembed,lti_launch_url,url,image_url,iframe'
-    end
-
-    context 'resource selection' do
-      before { opts[:resource_type] = 'resource_selection' }
-
-      it_behaves_like 'resource group 1 check', 'select_link', 'navigation', 'lti_launch_url'
-    end
-
-    context 'homework submission' do
-      before { opts[:resource_type] = 'homework_submission' }
-
-      it_behaves_like 'sets content intended use extension', 'homework'
-      it_behaves_like 'sets content return url extension'
-
-      context 'when resource claim group disabled' do
-        let(:opts) { super().merge({claim_group_blacklist: [:resource]}) }
-
-        it_behaves_like 'skips content intended use extension'
-        it_behaves_like 'skips content return url extension'
-      end
-
-      context 'when content intended use extension disabled' do
-        let(:opts) { super().merge({extension_blacklist: [:content_intended_use]}) }
-
-        it_behaves_like 'skips content intended use extension'
-        it_behaves_like 'sets content return url extension'
-      end
-
-      context 'when content return url extension disabled' do
-        let(:opts) { super().merge({extension_blacklist: [:content_return_url]}) }
-
-        it_behaves_like 'sets content intended use extension', 'homework'
-        it_behaves_like 'skips content return url extension'
-      end
-    end
-
-    context 'migration selection' do
-      shared_examples 'sets content file extensions extension' do
-        it 'adds content file extensions' do
-          expect(decoded_jwt['https://www.instructure.com/content_file_extensions']).to eq 'zip,imscc'
-        end
-      end
-
-      shared_examples 'skips content file extensions extension' do
-        it 'does not add content file extensions' do
-          expect(decoded_jwt).not_to include 'https://www.instructure.com/content_file_extensions'
-        end
-      end
-
-      before { opts[:resource_type] = 'migration_selection' }
-
-      it_behaves_like 'sets content file extensions extension'
-      it_behaves_like 'sets content intended use extension', 'content_package'
-      it_behaves_like 'sets content return types extension', 'file'
-      it_behaves_like 'sets content return url extension'
-
-      context 'when resource claim group disabled' do
-        let(:opts) { super().merge({claim_group_blacklist: [:resource]}) }
-
-        it_behaves_like 'skips content file extensions extension'
-        it_behaves_like 'skips content intended use extension'
-        it_behaves_like 'skips content return types extension'
-        it_behaves_like 'skips content return url extension'
-      end
-
-      context 'when content file extensions extension disabled' do
-        let(:opts) { super().merge({extension_blacklist: [:content_file_extensions]}) }
-
-        it_behaves_like 'skips content file extensions extension'
-        it_behaves_like 'sets content intended use extension', 'content_package'
-        it_behaves_like 'sets content return types extension', 'file'
-        it_behaves_like 'sets content return url extension'
-      end
-
-      context 'when content intended use extension disabled' do
-        let(:opts) { super().merge({extension_blacklist: [:content_intended_use]}) }
-
-        it_behaves_like 'sets content file extensions extension'
-        it_behaves_like 'skips content intended use extension'
-        it_behaves_like 'sets content return types extension', 'file'
-        it_behaves_like 'sets content return url extension'
-      end
-
-      context 'when content return types extension disabled' do
-        let(:opts) { super().merge({extension_blacklist: [:content_return_types]}) }
-
-        it_behaves_like 'sets content file extensions extension'
-        it_behaves_like 'sets content intended use extension', 'content_package'
-        it_behaves_like 'skips content return types extension'
-        it_behaves_like 'sets content return url extension'
-      end
-
-      context 'when content return url extension disabled' do
-        let(:opts) { super().merge({extension_blacklist: [:content_return_url]}) }
-
-        it_behaves_like 'sets content file extensions extension'
-        it_behaves_like 'sets content intended use extension', 'content_package'
-        it_behaves_like 'sets content return types extension', 'file'
-        it_behaves_like 'skips content return url extension'
-      end
     end
   end
 end
