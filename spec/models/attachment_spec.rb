@@ -1139,9 +1139,9 @@ describe Attachment do
       attachment.public_download_url
     end
 
-    it "should sanitize filename with iconv" do
+    it "should transliterate filename with i18n" do
       a = attachment_with_context(@course, :display_name => "糟糕.pdf")
-      sanitized_filename = a.display_name.encode("UTF-8")
+      sanitized_filename = I18n.transliterate(a.display_name, replacement: '_')
       allow(a).to receive(:authenticated_s3_url)
       expect(a).to receive(:authenticated_s3_url).with(include(:response_content_disposition => %(attachment; filename="#{sanitized_filename}"; filename*=UTF-8''%E7%B3%9F%E7%B3%95.pdf)))
       a.public_download_url

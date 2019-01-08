@@ -208,6 +208,12 @@ QUnit.module('LatePoliciesTabPanel: missing submission deduction input', {
   }
 });
 
+test('missing submission input has label describing it', function () {
+  this.wrapper = mountComponent();
+  const input = missingPenaltiesForm(this.wrapper).find('#missing-submission-grade').at(0);
+  strictEqual(input.text(), 'Grade percentage for missing submissions');
+})
+
 test('enables the missing deduction input if the missing deduction checkbox is checked', function () {
   this.wrapper = mountComponent();
   notOk(missingDeductionInput(this.wrapper).instance().getAttribute('aria-disabled'));
