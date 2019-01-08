@@ -122,6 +122,22 @@ describe Types::CourseType do
     end
   end
 
+  describe "modulesConnection" do
+    it "returns course modules" do
+      modulea = course.context_modules.create! name: "module a"
+      course.context_modules.create! name: "module b"
+      expect(
+        course_type.resolve("modulesConnection { edges {node { _id } } }")
+      ).to match_array course.context_modules.map(&:to_param)
+
+      modulea.destroy
+      expect(
+        course_type.resolve("modulesConnection { edges {node { _id } } }")
+      ).to match_array course.modules_visible_to(@student).map(&:to_param)
+    end
+  end
+
+
   context "submissionsConnection" do
     before(:once) do
       a1 = course.assignments.create! name: "one", points_possible: 10
