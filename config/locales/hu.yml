@@ -6248,6 +6248,7 @@ hu:
   every_665d821e: Minden
   everyone_854554dd: Mindenki
   everyone_else_6c6dc7b6: "Mindenki más "
+  everyone_else_cc5f6888: "Mindenki más "
   ex_ba24edf6: EX
   exact_value_margin_eae7e67e: "%{exact_value} +/- %{margin}"
   example_84698b7d: Példa
@@ -6267,6 +6268,7 @@ hu:
   excused_5877183c: Felmentve!
   excused_cf8792eb: Felmentve
   exit_d0c7b013: Kilépés
+  expand_2f2fadbd: Kinyit
   expand_list_of_group_members_for_groupname_9ce9d2f7: "A %{groupName} csoporttaglistájának kinyitása"
   expand_subdiscussion_cd226ed4: "Alfórum kinyitása"
   expanded_f4493860: Kinyitva
@@ -7365,6 +7367,7 @@ hu:
   import_1b31507: Importálás
   import_content_b2fd6620: "Tartalom importálása"
   import_sis_data_428cc803: "SIS adat importálása"
+  import_status_b147bd27: "Import állapota"
   important_note_educational_institutions_have_an_ob_c9350304: "*Fontos megjegyzés: Az oktatási intézményeknek kötelességük a tartalmaikhoz a lehető legjobb hozzáférési szintet biztosítani. Az Instructure legalább 3:1 szöveg-háttérszín arányt ajánl a megfelelő olvashatóság eléréséhez. A kontrasztarányok egyszerű teszteléséhez használható eszköz a **WebAIM Color Contrast Checker***."
   importers/assignment_importer: 
     errors: 
@@ -8018,6 +8021,7 @@ hu:
   max_membership_bd0ddc68: max_membership
   max_users_groups_per_appointment_867c505b: "Maximális felhasználók/csoportok megbeszélésenként"
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: "Megbeszélések maximális száma, amin egy résztvevő részt vehet"
+  media_af190855: Média
   media_comment_e494a952: Médiaalapú-megjegyzés
   media_comment_submission_14e224dc: Médiatartalom-beadás
   media_comments: 
@@ -9912,6 +9916,7 @@ hu:
   next_steps_ce0f0d0c: "Következő lépések"
   next_student_b62869f4: "Következő hallgató"
   nickname_1e6da3ad: Becenév
+  no_74e9b590: nem
   no_assignment_name_adbb215b: "Nincs feladatnév"
   no_assignments_with_that_name_found_1d7be1: "Ezen a néven nem található feladat"
   no_associated_terms_13bacefc: "Nincsenek társított félévek"
@@ -9948,6 +9953,7 @@ hu:
   no_students_with_that_name_found_f6004da2: "Ezen a néven nem található hallgató"
   no_subject_58b7941c: "Nincs tárgy"
   no_subject_970aad80: "Nincs tárgy"
+  no_submission_fb131a40: "Nincs beadott munka"
   no_terms_eab5ee7b: "Nincsenek félévek"
   no_tls_618add1a: "Nincs TLS"
   no_unassigned_terms_deb7b76b: "Nincs hozzárendeletlen félév"
@@ -10289,6 +10295,7 @@ hu:
   on_paper_46d0ba36: Papíron
   on_time_17ca5ad9: Időben
   on_time_percent_eebffe38: "Időben: %{percent}"
+  one_or_more_items_are_currently_being_imported_the_186fe069: "Egy vagy több elem importálás alatt áll. Ezek az elemek meg fognak jelenni a kurzusban, amint elérhetővé válnak."
   one_per_line_format_name_value_79647700: "Soronként egy. Formátum: név=érték"
   online_submission_type_file_uploads_24910d74: "Online beadás típusa - Fájlok feltöltése"
   online_submission_type_file_uploads_restrict_uploa_5ec7b263: "Online beadás típusa - Fájlok feltöltése - Fájltípusok korlátozása"
@@ -14225,6 +14232,8 @@ hu:
   submissions_11e96106: "Beadott munkák"
   submissions_base: 
     assignment_submitted: "A feladat beadva."
+    errors: 
+      no_report: "Nem található jelentés a beadott elemhez"
     errors_update_failed: "A frissítés nem sikerült"
   submissions_folders_must_be_created_in_user_or_gro_aba44f76: "a beadandók mappát felhasználói vagy csoport környezetben kell létrehozni"
   submit_a3cc6859: Küldés
@@ -14382,6 +14391,7 @@ hu:
   terms_of_service_f183ff7f: "Felhasználási feltételek"
   testing_state_effd4a82: "Állapot ellenőrzése"
   text_document_eacbcdb7: "Szöveges dokumentum"
+  text_entry_e1808b2f: "Szöveges bevitel"
   text_entry_submission_7b0ae0c5: Szövegesbejegyzés-beadás
   text_entry_submission_cannot_be_empty_3d187cae: "Szöveges beadás nem lehet üres"
   text_input_d3480b8c: "Szöveges bemenet"
@@ -15593,6 +15603,7 @@ hu:
   x_y_4a86b3ab: "%{x}/%{y}"
   xml_configuration_5ea1b942: "XML Konfiguráció"
   yellow_4cf93785: Sárga
+  yes_3593c135: igen
   yes_dde87d5: Igen
   yes_install_tool_f51b3278: "Igen, eszköz telepítése"
   yo_e4ee15a4: Yo

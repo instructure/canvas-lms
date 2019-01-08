@@ -5660,6 +5660,7 @@ el:
   every_665d821e: Κάθε
   everyone_854554dd: Όλοι/ες
   everyone_else_6c6dc7b6: "Όλοι οι Άλλοι"
+  everyone_else_cc5f6888: "Όλοι οι άλλοι"
   exact_value_margin_eae7e67e: "%{exact_value} +/- %{margin}"
   example_84698b7d: Παράδειγμα
   example_final_score_355aff0f: "Υπόδειγμα τελικής βαθμολογίας"
@@ -5676,6 +5677,7 @@ el:
   excused_5877183c: Δικαιολογημένος/η!
   excused_cf8792eb: Δικαιολογημένος/η
   exit_d0c7b013: Έξοδος
+  expand_2f2fadbd: Επέκταση
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Ανάπτυξη της λίστας μελών της ομάδας για την ομάδα %{groupName}"
   expand_subdiscussion_cd226ed4: "Ανάπτυξη Υποσυζήτησης"
   expanded_f4493860: "Έγινε Ανάπτυξη"
@@ -6634,6 +6636,7 @@ el:
   import_1b31507: Εισαγωγή
   import_content_b2fd6620: "Εισαγωγή Περιεχομένου"
   import_sis_data_428cc803: "Εισαγωγή Δεδομένων SIS"
+  import_status_b147bd27: "Εισαγωγή Κατάστασης"
   important_note_educational_institutions_have_an_ob_c9350304: "Σημαντική σημείωση: Τα εκπαιδευτικά ιδρύματα έχουν την υποχρέωση να καθιστούν το περιεχόμενό τους όσο το δυνατό πιο προσβάσιμο. Η Instructure συνιστά αναλογία κειμένου προς χρώμα φόντου τουλάχιστον 3:1, προκειμένου να είναι ευανάγνωστο το κείμενο. Ελέγξτε εύκολα την αναλογία αντίθεσης με το **WebAIM Color Contrast Checker***."
   importers/assignment_importer: 
     errors: 
@@ -7193,6 +7196,7 @@ el:
   max_dd02d615: μέγιστο
   max_users_groups_per_appointment_867c505b: "Μέγιστος αριθμός χρηστών/ομάδων ανά εργασία"
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: "Μέγιστος αριθμός εργασιών στις οποίες μπορεί να παρευρεθεί κάποιος συμμετέχων"
+  media_af190855: Δεδομένα
   media_comments: 
     alerts: 
       kaltura_disabled: "Το Kaltura είναι απενεργοποιημένο για αυτή την ιστοσελίδα Canvas"
@@ -8957,6 +8961,7 @@ el:
   next_module_item_9bb8a222: "Επόμενη Ενότητα/Επόμενο Στοιχείο"
   next_month_b55a387c: "Επόμενος μήνας"
   next_steps_ce0f0d0c: "Επόμενα Βήματα"
+  no_74e9b590: όχι
   no_assignment_name_adbb215b: "Δεν Υπάρχει Όνομα Εργασίας"
   no_content_has_been_added_f36bab43: "* Δεν έχει προστεθεί περιεχόμενο"
   no_courses_found_12d68a74: "Δεν βρέθηκαν μαθήματα"
@@ -8981,6 +8986,7 @@ el:
   no_students_dd8de9f0: "Δεν υπάρχουν Σπουδαστές"
   no_students_have_taken_the_quiz_yet_e667644b: "Κανένας μαθητής δεν έχει κάνει ακόμα το κουίζ"
   no_students_have_taken_the_survey_yet_d378cd35: "Κανένας Σπουδαστής δεν έχει απαντήσει ακόμη στη δημοσκόπηση"
+  no_submission_fb131a40: "Καμία υποβολή"
   no_tls_618add1a: "Χωρίς TLS"
   no_usage_rights_object_supplied_304b8d40: "Δεν παρέχονται «usage_rights» αντικειμένου"
   no_users_found_64a043ff: "Δεν βρέθηκαν χρήστες"
@@ -9284,6 +9290,7 @@ el:
   on_paper_46d0ba36: Χειρόγραφο/Δακτυλογραφημένο
   on_time_17ca5ad9: Εγκαίρως
   on_time_percent_eebffe38: "Στην ώρα του/τους: %{percent}"
+  one_or_more_items_are_currently_being_imported_the_186fe069: "<mrk mid=\"1780\" mtype=\"seg\">Αυτή τη στιγμή γίνεται εισαγωγή ενός ή περισσότερων στοιχείων.</mrk> <mrk mid=\"1781\" mtype=\"seg\">Θα εμφανιστούν στο μάθημα παρακάτω μόλις είναι διαθέσιμα.</mrk>"
   one_per_line_format_name_value_79647700: "Ένα ανά σειρά.Τύπος: name=value"
   online_submission_type_file_uploads_24910d74: "Online Είδος Υποβολής - Μεταφορτώσεις Αρχείων"
   online_submission_type_file_uploads_restrict_uploa_5ec7b263: "Online Είδος Υποβολής - Μεταφορτώσεις Αρχείων - Περιορισμός Τύπων Αρχείων για Μεταφόρτωση"
@@ -12952,6 +12959,8 @@ el:
   submissions_11e96106: Υποβολές
   submissions_base: 
     assignment_submitted: "Η εργασία υποβλήθηκε."
+    errors: 
+      no_report: "Δεν ήταν δυνατή η εύρεση αναφοράς για αυτό το στοιχείο υποβολής"
     errors_update_failed: "Η Ενημέρωση Απέτυχε"
   submit_a3cc6859: Υποβολή
   submit_a_feature_idea_2d4baa3d: "Υποβολή Δικής Σας Ιδέας"
@@ -13084,6 +13093,7 @@ el:
   terms_of_service_f183ff7f: "Όροι χρήσης της υπηρεσίας"
   testing_state_effd4a82: "Έλεγχος κατάστασης"
   text_document_eacbcdb7: "Έγγραφο κειμένου"
+  text_entry_e1808b2f: "Καταχώριση Κειμένου"
   text_entry_submission_cannot_be_empty_3d187cae: "Η υποβολή καταχώρισης κειμένου δεν μπορεί να είναι κενή"
   text_input_d3480b8c: "Εισαγωγή κειμένου"
   that_user_account_has_been_deleted_please_contact__350e0e0: "<mrk mid=\"3666\" mtype=\"seg\">Ο λογαριασμός αυτού του χρήστη έχει διαγραφεί.</mrk>  <mrk mid=\"3667\" mtype=\"seg\">Παρακαλώ επικοινωνήστε με τον διαχειριστή των υπολογιστικών συστημάτων σας για την επανενεργοποίηση του λογαριασμού σας.</mrk>"
@@ -14117,6 +14127,7 @@ el:
   wrong_answer_comments_14963a24: "Σχόλια λάθος απάντησης"
   xml_configuration_5ea1b942: "Ρύθμιση XML"
   yellow_4cf93785: Κίτρινο
+  yes_3593c135: ναι
   yes_dde87d5: Ναι
   yo_e4ee15a4: "Υπηρεσία Yo"
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "Έχετε συνδεθεί ως %{institution1} χρησιμοποιώντας τα διαπιστευτήριά σας από το %{institution2}"
