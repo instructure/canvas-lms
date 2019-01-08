@@ -478,6 +478,8 @@ module QuizzesHelper
           HTML
         end
       end
+
+      s['aria-label'] = I18n.t("Multiple dropdowns, read surrounding text")
     end
     doc.to_s.html_safe
   end
@@ -686,4 +688,14 @@ module QuizzesHelper
     @quiz.quiz_type == "survey" ? "" : round_if_whole(@quiz.points_possible)
   end
 
+  def label_for_question_type(question_type)
+    case question_type.question_type
+    when 'short_answer_question'
+      I18n.t('Fill in the blank answer')
+    when 'numerical_question', 'calculated_question'
+      I18n.t('Numerical answer')
+    else
+      I18n.t('Answer field')
+    end
+  end
 end
