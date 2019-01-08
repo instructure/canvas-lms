@@ -185,7 +185,7 @@
     "karma-spec-reporter": "^0.0.32",
     "karma-verbose-reporter": "^0.0.6",
     "karma-webpack": "^3",
-    "lint-staged": "^8.0.4",
+    "lint-staged": "^8.1.0",
     "merge-stream": "^1",
     "mockdate": "^2.0.2",
     "moxios": "^0.4",
