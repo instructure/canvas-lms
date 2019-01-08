@@ -205,6 +205,7 @@
     "stylelint": "^9",
     "through2": "^2",
     "uglifyjs-webpack-plugin": "^1.2",
+    "unfetch": "^4.0.1",
     "waait": "1.0.2",
     "webpack": "^3",
     "webpack-cleanup-plugin": "^0.5",
