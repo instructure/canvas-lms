@@ -2226,6 +2226,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: 'lti/ims/authentication') do
       post 'authorize_redirect', action: :authorize_redirect
+      get 'authorize_redirect', action: :authorize_redirect
       get 'authorize', action: :authorize, as: :lti_1_3_authorization
     end
 
