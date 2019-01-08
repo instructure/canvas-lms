@@ -145,11 +145,7 @@
     <span class="SubmissionDetails__Text <%='late' if @submission.late? %> <%= 'hidden' unless @submission.submitted_at %>">
       <%= t('submitted_at', 'submitted %{submit_date}', :submit_date => datetime_string(@submission.submitted_at)) %>
     </span>
-    <% if @submission.late? %>
-      <span class="submission-late-pill"></span>
-    <% elsif @submission.missing? %>
-      <span class="submission-missing-pill"></span>
-    <% end %>
+
     <% if can_do(@context, @current_user, :grade) %>
       <a class="forward" href="<%= context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => @assignment.id) + "#" + CGI::escape({:student_id => @submission.user_id }.to_json) %>" style="float: right; padding-right: 10px;"><%= t('speedgrader', 'SpeedGrader™') %></a>
     <% end %>
