@@ -102,6 +102,7 @@ export default class DeveloperKeyFormFields extends React.Component {
       createLtiKeyState={createLtiKeyState}
       setEnabledScopes={this.props.setEnabledScopes}
       setDisabledPlacements={this.props.setDisabledPlacements}
+      setPrivacyLevel={this.props.setPrivacyLevel}
       dispatch={this.props.dispatch}
     />
   }
@@ -184,6 +185,7 @@ DeveloperKeyFormFields.propTypes = {
   dispatch: PropTypes.func.isRequired,
   listDeveloperKeyScopesSet: PropTypes.func.isRequired,
   setDisabledPlacements: PropTypes.func.isRequired,
+  setPrivacyLevel: PropTypes.func.isRequired,
   setEnabledScopes: PropTypes.func.isRequired,
   createLtiKeyState: PropTypes.shape({
     isLtiKey: PropTypes.bool.isRequired,

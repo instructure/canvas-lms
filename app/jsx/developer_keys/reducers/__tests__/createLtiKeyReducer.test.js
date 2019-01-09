@@ -30,6 +30,7 @@ function freshState() {
     toolConfigurationUrl: '',
     enabledScopes: [],
     disabledPlacements: [],
+    privacyLevel: '',
     updateCustomizationsPending: false,
     updateCustomizationsSuccessful: false,
     updateCustomizationsError: null,
@@ -46,6 +47,7 @@ it('sets the defaults', () => {
   expect(defaults.updateCustomizationsPending).toEqual(false)
   expect(defaults.updateCustomizationsSuccessful).toEqual(false)
   expect(defaults.updateCustomizationsError).toBeNull()
+  expect(defaults.privacyLevel).toEqual('anonymous')
 })
 
 it('handles "LTI_KEYS_SET_LTI_KEY"', () => {
@@ -106,6 +108,22 @@ it('handles "LTI_KEYS_SET_DISABLED_PLACEMENTS"', () => {
   expect(newState.updateCustomizationsPending).toEqual(false)
   expect(newState.updateCustomizationsSuccessful).toEqual(false)
   expect(newState.updateCustomizationsError).toBeNull()
+})
+
+it('handles "LTI_KEYS_SET_PRIVACY_LEVEL"', () => {
+  const state = freshState()
+  const action = actions.ltiKeysSetPrivacyLevel('public')
+  const newState = reducer(state, action)
+
+  expect(newState.isLtiKey).toEqual(false)
+  expect(newState.customizing).toEqual(false)
+  expect(newState.toolConfiguration).toEqual({})
+  expect(newState.disabledPlacements).toEqual([])
+  expect(newState.enabledScopes).toEqual([])
+  expect(newState.updateCustomizationsPending).toEqual(false)
+  expect(newState.updateCustomizationsSuccessful).toEqual(false)
+  expect(newState.updateCustomizationsError).toBeNull()
+  expect(newState.privacyLevel).toEqual('public')
 })
 
 it('handles "SET_LTI_TOOL_CONFIGURATION"', () => {

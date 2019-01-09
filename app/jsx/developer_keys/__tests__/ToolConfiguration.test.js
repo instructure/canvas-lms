@@ -27,6 +27,7 @@ function newProps(customizing = false) {
     dispatch: jest.fn(),
     setEnabledScopes: jest.fn(),
     setDisabledPlacements: jest.fn(),
+    setPrivacyLevel: jest.fn(),
     createLtiKeyState: {
       customizing,
       toolConfiguration: {},

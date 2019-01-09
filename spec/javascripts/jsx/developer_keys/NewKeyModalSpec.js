@@ -32,7 +32,8 @@ const fakeActions = {
   createOrEditDeveloperKey: () => {},
   editDeveloperKey: () => {},
   ltiKeysSetDisabledPlacements: () => {},
-  ltiKeysSetEnabledScopes: () => {}
+  ltiKeysSetEnabledScopes: () => {},
+  ltiKeysSetPrivacyLevel: () => {}
 }
 
 const developerKey = {
