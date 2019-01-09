@@ -7390,6 +7390,7 @@ tr:
   every_665d821e: Her
   everyone_854554dd: Herkes
   everyone_else_6c6dc7b6: "Geri kalan herkes"
+  everyone_else_cc5f6888: "Geri kalan herkes"
   ex_ba24edf6: EX
   exact_value_margin_eae7e67e: "%{exact_value} +/- %{margin}"
   example_84698b7d: Örnek
@@ -7409,6 +7410,7 @@ tr:
   excused_5877183c: Mazeretli!
   excused_cf8792eb: Mazeretli
   exit_d0c7b013: Çıkış
+  expand_2f2fadbd: Genişlet
   expand_collapse_title_outcome_group_239f0a9d: "%{title} genişlet/daralt  Öğrenme Çıktı Grubu"
   expand_group_53765272: "Grubu Genişlet"
   expand_list_of_group_members_for_groupname_9ce9d2f7: "%{groupName} için grup üyeleri listesini genişlet"
@@ -9023,6 +9025,7 @@ tr:
   import_1b31507: "İçeri Aktar"
   import_content_b2fd6620: "Derse İçerik Aktar"
   import_sis_data_428cc803: "ÖBS verisini içe aktar"
+  import_status_b147bd27: "İçeri Aktarma Durumu"
   importers/assignment_importer: 
     errors: 
       import: 
@@ -9652,6 +9655,7 @@ tr:
       relationships: İlişkiler
   max_users_groups_per_appointment_867c505b: "Randevu başına maksimum kullanıcı/grup"
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: "Bir katılımcının katılabileceği en fazla randevu sayısı"
+  media_af190855: Medya
   media_comments: 
     alerts: 
       kaltura_disabled: "Bu Canvas sitesi için Kaltura etkinleştirilmemiş"
@@ -11734,6 +11738,7 @@ tr:
   next_steps_ce0f0d0c: "Sonraki Adımlar"
   nickname_1e6da3ad: "Takma İsim"
   nickname_7df95b09: "Takma İsim:"
+  no_74e9b590: hayır
   no_assignment_name_adbb215b: "Ödev Adı Yok"
   no_broken_links_found_38d951e3: "Bozuk Bağlantı Bulunamadı"
   no_content_has_been_added_f36bab43: "* Hiçbir içerik eklenmedi"
@@ -11760,6 +11765,7 @@ tr:
   no_students_dd8de9f0: "Öğrenci Yok"
   no_students_have_taken_the_quiz_yet_e667644b: "Henüz bu kısa sınavı alan öğrenci yok"
   no_students_have_taken_the_survey_yet_d378cd35: "Henüz anketi alan öğrenci yok"
+  no_submission_fb131a40: "Gönderi Yok"
   no_tls_618add1a: "TLS Yok"
   no_usage_rights_object_supplied_304b8d40: "'usage_rights' nesnesi sağlanmamış"
   no_users_found_64a043ff: "Hiç kullanıcı bulunamadı"
@@ -12129,6 +12135,7 @@ tr:
   on_time_17ca5ad9: Zamanında
   on_time_percent_eebffe38: "Zamanında: %{percent}"
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "Cevabı bir kere değiştirdiniz mi soruyu güncellemeden önce bir seçim yapmak zorunda kalacaksınız."
+  one_or_more_items_are_currently_being_imported_the_186fe069: "Şu anda bir veya daha fazla öğe içe aktarılıyor. Hazır olduklarında aşağıdaki dersin içinde görünecekler."
   one_per_line_format_name_value_79647700: "Her bir satır. Format: isim=değer"
   online_submission_type_file_uploads_24910d74: "Çevrimiçi Gönderi Türü - Dosya Yükleme"
   online_submission_type_file_uploads_restrict_uploa_5ec7b263: "Çevrimiçi Gönderi Türü - Dosya Yükleme - Dosya Yükleme Türlerini Sınırla"
@@ -16399,6 +16406,8 @@ tr:
   submissions_11e96106: Gönderiler
   submissions_base: 
     assignment_submitted: "Sınav gönderildi."
+    errors: 
+      no_report: "Bu gönderi öğesi için rapor bulunamadı"
     errors_update_failed: "Gönderim Başarısız"
   submit_a3cc6859: Gönder
   submit_assignment_5799b4e3: "Ödevi Gönder"
@@ -16543,6 +16552,7 @@ tr:
   terms_4d979628: Dönemler
   testing_state_effd4a82: "Durum test ediliyor"
   text_document_eacbcdb7: "Metin belgesi"
+  text_entry_e1808b2f: "Metin Girişi"
   that_user_account_has_been_deleted_please_contact__350e0e0: "Bu kullanıcı hesabı silindi. Lütfen sistem yöneticisi ile kullanıcı hesabınızın tekrardan aktive edilmesi için iletişime geçiniz."
   the_app_was_activated_a84e055f: "Uygulama etkinleştirildi"
   the_app_was_added_58e2836a: "Uygulama eklendi"
@@ -17586,6 +17596,7 @@ tr:
   wrong_answer_comments_14963a24: "Yanlış cevap yorumları"
   xml_configuration_5ea1b942: "XML Ayarları"
   yellow_4cf93785: Sarı
+  yes_3593c135: evet
   yes_dde87d5: Evet
   yo_e4ee15a4: Yo
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: "%{institution1} 'a %{institution2} daki bilgilerinizi kullanarak giriş yaptınız"

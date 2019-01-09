@@ -7129,7 +7129,7 @@ sv-x-k12:
       empty: "kan inte vara tom"
       equal_to: "måste vara likvärdig med %{count}"
       even: "måste vara jämn"
-      exclusion: "är reserverad"
+      exclusion: "är bokad"
       greater_than: "måste vara större än %{count}"
       greater_than_or_equal_to: "måste vara högre eller likvärdig med %{count}"
       inclusion: "är inte inkluderad i listan"
@@ -14336,9 +14336,9 @@ sv-x-k12:
   reregister_9ab95a57: Omregistrera
   reregister_toolname_3dde0bfc: "Omregistrera %{toolName}"
   reschedule_9f780bb8: Omboka
-  reserved_by_d563e7d2: "Reserverad av:"
-  reserved_by_you_cd03b62d: "Reserverad av dig"
-  reserved_f247b60b: Reserverad
+  reserved_by_d563e7d2: "Bokad av:"
+  reserved_by_you_cd03b62d: "Bokad av dig"
+  reserved_f247b60b: Bokad
   reset_95a81614: Återställ
   reset_multi_factor_authentication_2b63a558: "Återställ flerstegs-verifiering"
   reset_this_contact_method_s_bounce_count_3845ecf4: "Återställ denna kontaktmetodens avvisande antal"
@@ -17192,7 +17192,7 @@ sv-x-k12:
   unread_e9c1b19c: Oläst
   unreadcount_unread_replies_509e167f: "%{unreadCount} olästa svar"
   unregister_service_985238e9: "Oregistrerad tjänst"
-  unreserved_e86b7425: Avreserverad
+  unreserved_e86b7425: Tillgänglig
   unsafe_file_link_8a18eceb: "osäker fil-länk"
   unselected_all_courses_99a9d35c: "Ej valda alla kurser"
   unselected_course_course_89995a83: "Ej valda kurser %{course}"

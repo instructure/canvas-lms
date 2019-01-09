@@ -7396,6 +7396,7 @@ fa:
   every_665d821e: هر
   everyone_854554dd: همه
   everyone_else_6c6dc7b6: "هر کس دیگر"
+  everyone_else_cc5f6888: "هر شخص دیگر"
   ex_ba24edf6: مثال
   exact_value_margin_eae7e67e: "%{exact_value} +/- %{margin}"
   example_84698b7d: مثال
@@ -7415,6 +7416,7 @@ fa:
   excused_5877183c: "معاف شد!"
   excused_cf8792eb: "معاف شد"
   exit_d0c7b013: خروج
+  expand_2f2fadbd: "باز کردن"
   expand_collapse_title_outcome_group_239f0a9d: "باز کردن/جمع کردن گروه نتیجه %{title}"
   expand_collapse_title_outcome_group_student_meets__46ffef48: "باز کردن/ جمع کردن  گروه نتیجه %{title}، دانشجو تسلط %{mastery_count} از  %{count} نتیجه را دارد"
   expand_global_navigation_2c28d5d4: "بسط دادن پیمایش سراسری"
@@ -9259,6 +9261,7 @@ fa:
   import_1b31507: "وارد کردن"
   import_content_b2fd6620: "وارد کردن محتوا"
   import_sis_data_428cc803: "وارد کردن داده های سامانه اطلاعات دانشجو"
+  import_status_b147bd27: "وضعیت ورود"
   import_tutorial_tray_8b92e956: "ورود سینی خودآموز"
   important_note_educational_institutions_have_an_ob_c9350304: "*نکته مهم: مؤسسات آموزشی موظفند محتوای خود را تا حد امکان قابل دسترس سازند. Instructure حداقل یک نسبت رنگ متن به پس زمینه 3:1 را توصیه می کند تا متن شما قابل خواندن باشد. نسبت های تضاد را به آسانی با استفاده از **WebAIM Color Contrast Checker*** آزمایش کنید."
   imported_from_posttosisname_f7cc9258: "وارد شده از %{postToSISName}"
@@ -10060,6 +10063,7 @@ fa:
   max_membership_bd0ddc68: حداکثر_عضویت
   max_users_groups_per_appointment_867c505b: "حداکثر تعداد کاربر/گروه در هر قرار ملاقات"
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: "حداکثر تعداد قرارهای ملاقات که یک شرکت کننده می تواند حضور یابد"
+  media_af190855: رسانه
   media_comment_e494a952: "نظر رسانه ای"
   media_comment_submission_14e224dc: "ارسال نظر رسانه‌ای"
   media_comments: 
@@ -12328,6 +12332,7 @@ fa:
   next_student_b62869f4: "دانشجوی بعدی"
   nickname_1e6da3ad: "نام مستعار"
   nickname_7df95b09: "نام مستعار:"
+  no_74e9b590: خیر
   no_assignment_name_adbb215b: "نام تکلیف موجود نیست"
   no_assignments_with_that_name_found_1d7be1: "تکلیفی با آن نام یافت نشد"
   no_associated_terms_13bacefc: "نیمسال مرتبط موجود نیست"
@@ -12375,6 +12380,7 @@ fa:
   no_students_with_that_name_found_f6004da2: "دانشجوی جدیدی با این نام یافت نشد"
   no_subject_58b7941c: "عنوان موجود نیست"
   no_subject_970aad80: "عنوان موجود نیست"
+  no_submission_fb131a40: "مورد ارسالی موجود نیست"
   no_submission_for_assignment_a9cb6fe2: "مورد ارسالی برای%{assignment} وجود ندارد"
   no_terms_eab5ee7b: "نیمسال موجود نیست"
   no_tls_618add1a: "TLS موجود نیست"
@@ -12785,6 +12791,7 @@ fa:
   once_this_feature_is_enabled_you_will_not_be_able__ad338dcb: "وقتی این ویژگی فعال شود، نمی توانید آن را دوباره غیر فعال کنید.  قبل از ادامه مطمئن شوید که برای فعالسازی پوشه موردهای ارسالی آماده هستید."
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "هنگامی که یک پاسخ ارسال کنید، نمی توانید آن را تغییر دهید. نمی‌توانید پرسش قبلی را مشاهده کنید."
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "هنگامی که یک پاسخ را تغییر داده اید، باید قبل از بهنگام سازی پرسش یک گزینه را انتخاب کنید."
+  one_or_more_items_are_currently_being_imported_the_186fe069: "یک یا چند مورد به تازگی در حال وارد شدن است. به محض اینکه در دسترس قرار گیرند، در درس زیر نمایش داده خواهند شد."
   one_per_line_format_name_value_79647700: "یکی در هر خط.. قالب: نام=مقدار"
   online_submission_type_file_uploads_24910d74: "نوع مورد ارسالی آنلاین - بارگذاری های فایل"
   online_submission_type_file_uploads_restrict_uploa_5ec7b263: "نوع مورد ارسالی آنلاین - بارگذاری های فایل - محدود کردن بارگذاری انواع فایل"
@@ -17607,6 +17614,8 @@ fa:
   submissions_11e96106: "موردهای ارسالی"
   submissions_base: 
     assignment_submitted: "تکلیف ارسال شد."
+    errors: 
+      no_report: "گزارش مربوط به این مورد ارسالی یافت نشد"
     errors_update_failed: "بهنگام سازی انجام نشد"
   submissions_folder_9db8dadf: "پوشه موردهای ارسالی"
   submissions_folders_must_be_created_in_user_or_gro_aba44f76: "پوشه های موردهای ارسالی باید در زمینه کاربر یا گروه ایجاد شود"
@@ -17821,6 +17830,7 @@ fa:
   terms_of_service_f183ff7f: "شرایط استفاده از خدمات"
   testing_state_effd4a82: "وضعیت آزمایش"
   text_document_eacbcdb7: "سند متنی"
+  text_entry_e1808b2f: "ورودی متن"
   text_entry_submission_7b0ae0c5: "ارسال ورودی متن"
   text_entry_submission_cannot_be_empty_3d187cae: "مورد ارسالی ورود متن نمی تواند خالی باشد"
   text_input_d3480b8c: "ورودی متن"
@@ -19296,6 +19306,7 @@ fa:
   x_y_4a86b3ab: "%{x}/%{y}"
   xml_configuration_5ea1b942: "پیکربندی XML"
   yellow_4cf93785: زرد
+  yes_3593c135: بله
   yes_dde87d5: بله
   yes_install_tool_f51b3278: "بله، ابزار نصب شود"
   yo_e4ee15a4: Yo
