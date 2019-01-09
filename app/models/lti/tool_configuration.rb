@@ -18,6 +18,7 @@
 module Lti
   class ToolConfiguration < ActiveRecord::Base
     CANVAS_EXTENSION_LABEL = 'canvas.instructure.com'.freeze
+    DEFAULT_PRIVACY_LEVEL = 'anonymous'.freeze
 
     belongs_to :developer_key
 
@@ -42,6 +43,7 @@ module Lti
       )
       tool.developer_key = developer_key
       tool.custom_fields_string = tool.custom_fields_string + "\n#{custom_fields}"
+      tool.workflow_state = privacy_level || DEFAULT_PRIVACY_LEVEL
       tool
     end
 

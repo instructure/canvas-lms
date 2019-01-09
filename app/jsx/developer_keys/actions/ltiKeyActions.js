@@ -151,7 +151,7 @@ actions.ltiKeysUpdateCustomizations = (scopes, disabled_placements, developerKey
         custom_fields: customFields,
         disabled_placements,
         settings: toolConfiguration,
-        workflow_state: privacyLevel
+        privacy_level: privacyLevel
       }
     })
     .then(() => {
