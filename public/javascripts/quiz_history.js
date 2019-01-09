@@ -426,7 +426,9 @@ import 'compiled/behaviors/quiz_selectmenu'
 
     $("#fudge_points_entry").change(function() {
       var points = numberHelper.parse($(this).val());
-      $("#fudge_points_input").val(points || '');
+      const parsed = numberHelper.parse($(this).val())
+      const hiddenVal = Number.isNaN(parsed) ? '' : parsed
+      $("#fudge_points_input").val(hiddenVal);
       gradingForm.addFudgePoints(points);
     });
 
