@@ -408,6 +408,11 @@ describe MasterCourses::MasterMigration do
 
       q_to = @copy_to.quizzes.where(:migration_id => mig_id(q)).first
       copied_answers = Hash[q_to.quiz_questions.to_a.map{|qq| [qq.id, qq.question_data.to_hash["answers"]]}]
+      expect(copied_answers.values.flatten.all?{|a| a["id"] != 0}).to be_truthy
+      q.quiz_questions.each do |qq|
+        qq_to = q_to.quiz_questions.where(:migration_id => mig_id(qq)).first
+        expect(copied_answers[qq_to.id].map{|a| a["id"].to_i}).to eq qq.question_data["answers"].map{|a| a["id"].to_i}
+      end
 
       Quizzes::Quiz.where(:id => q).update_all(:updated_at => 1.minute.from_now) # recopy
       run_master_migration
