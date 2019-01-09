@@ -42,14 +42,18 @@ module Lti::Messages
     private
 
     def add_resource_link_request_claims!
-      @message.resource_link.id = assignment_resource_link_id || context_resource_link_id
+      resource_link = assignment_resource_link
+      assignment = line_item_for_assignment&.assignment
+      @message.resource_link.id = resource_link&.resource_link_id || context_resource_link_id
+      @message.resource_link.description = resource_link && assignment&.description
+      @message.resource_link.title = resource_link && assignment&.title
     end
 
     def context_resource_link_id
       Lti::Asset.opaque_identifier_for(@context)
     end
 
-    def assignment_resource_link_id
+    def assignment_resource_link
       return if @assignment.nil?
       launch_error = Lti::Ims::AdvantageErrors::InvalidLaunchError
       unless @assignment.external_tool?
@@ -62,7 +66,7 @@ module Lti::Messages
       unless resource_link&.context_external_tool == @tool
         raise launch_error.new(nil, api_message: 'Mismatched assignment vs resource link tool configurations')
       end
-      resource_link.resource_link_id
+      resource_link
     end
 
     def assignment_line_item_url

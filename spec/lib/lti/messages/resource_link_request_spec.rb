@@ -64,6 +64,14 @@ describe Lti::Messages::ResourceLinkRequest do
       expect_assignment_resource_link_id(jws)
     end
 
+    it 'sets the assignment description' do
+      expect(jws.dig('https://purl.imsglobal.org/spec/lti/claim/resource_link', 'description')).to eq assignment.description
+    end
+
+    it 'sets the assignment title' do
+      expect(jws.dig('https://purl.imsglobal.org/spec/lti/claim/resource_link', 'title')).to eq assignment.title
+    end
+
     context 'when assignment and grade service enabled' do
       let(:developer_key_scopes) do
         [
