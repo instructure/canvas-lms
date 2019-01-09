@@ -22,10 +22,10 @@ module LtiAdvantage::Messages
     REQUIRED_PARAMETERS = %i[
       iss
       login_hint
+      target_link_uri
     ].freeze
 
     OPTIONAL_PARAMETERS = %i[
-      target_link_uri
       lti_message_hint
     ].freeze
 

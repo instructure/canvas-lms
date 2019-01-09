@@ -72,6 +72,7 @@ module Lti::Messages
       @message.nonce = SecureRandom.uuid
       @message.sub = @user.lti_id
       @message.lti11_legacy_user_id = Lti::Asset.opaque_identifier_for(@user)
+      @message.target_link_uri = @tool.url
     end
 
     def add_context_claims!

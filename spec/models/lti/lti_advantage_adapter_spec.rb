@@ -109,6 +109,10 @@ describe Lti::LtiAdvantageAdapter do
       expect(login_message['login_hint']).to eq lti_user_id
     end
 
+    it 'sets the "target_link_uri" to the tool launch url' do
+      expect(login_message['target_link_uri']).to eq tool.url
+    end
+
     it 'sets the domain in the message hint' do
       expect(Canvas::Security.decode_jwt(login_message['lti_message_hint'])['canvas_domain']).to eq 'test.com'
     end

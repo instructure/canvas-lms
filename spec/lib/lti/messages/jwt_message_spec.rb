@@ -135,6 +135,10 @@ describe Lti::Messages::JwtMessage do
       expect(decoded_jwt['https://purl.imsglobal.org/spec/lti/claim/lti11_legacy_user_id']).to eq user.lti_context_id
     end
 
+    it 'sets the "target_link_uri" claim' do
+      expect(decoded_jwt['https://purl.imsglobal.org/spec/lti/claim/target_link_uri']).to eq tool.url
+    end
+
     context 'when security claim group disabled' do
       let(:opts) { super().merge({claim_group_blacklist: [:security]}) }
 

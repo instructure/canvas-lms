@@ -64,7 +64,7 @@ module Lti
       LtiAdvantage::Messages::LoginRequest.new(
         iss: Canvas::Security.config['lti_iss'],
         login_hint: Lti::Asset.opaque_identifier_for(@user),
-        target_link_uri: 'a new endpoint',
+        target_link_uri: launch_url,
         lti_message_hint: message_hint
       ).as_json
     end
