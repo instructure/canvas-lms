@@ -104,7 +104,7 @@ module Lti::Messages
     end
 
     def add_roles_claims!
-      @message.roles = expand_variable('$com.Instructure.membership.roles').split ','
+      @message.roles = expand_variable('$com.instructure.User.allRoles').split ','
     end
 
     def add_custom_params_claims!

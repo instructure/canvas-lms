@@ -452,7 +452,8 @@ describe Lti::Messages::JwtMessage do
     shared_examples 'sets roles claim' do
       it 'sets the roles' do
         expect(decoded_jwt['https://purl.imsglobal.org/spec/lti/claim/roles']).to match_array [
-          'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner'
+          "http://purl.imsglobal.org/vocab/lis/v2/membership#Learner",
+          "http://purl.imsglobal.org/vocab/lis/v2/system/person#User"
         ]
       end
     end
