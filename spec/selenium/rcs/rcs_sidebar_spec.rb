@@ -38,7 +38,7 @@ describe "RCS sidebar tests" do
 
       create_wiki_page(title, unpublished, edit_roles)
 
-      visit_front_page(@course)
+      visit_front_page_edit(@course)
       wait_for_tiny(edit_wiki_css)
 
       click_pages_accordion
@@ -58,7 +58,7 @@ describe "RCS sidebar tests" do
       edit_roles = "public"
 
       create_wiki_page(title, unpublished, edit_roles)
-      visit_front_page(@course)
+      visit_front_page_edit(@course)
       click_pages_accordion
       click_sidebar_link(title)
 
@@ -71,12 +71,12 @@ describe "RCS sidebar tests" do
       title = "Assignment-Title"
       @assignment = @course.assignments.create!(:name => title)
 
-      visit_front_page(@course)
+      visit_front_page_edit(@course)
       click_assignments_accordion
       click_sidebar_link(title)
 
       in_frame wiki_page_body_ifr_id do
-        expect(wiki_body_anchor.attribute('href')).to include "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(@course, @assignment)
       end
     end
 
@@ -84,12 +84,12 @@ describe "RCS sidebar tests" do
       title = "Quiz-Title"
       @quiz = @course.quizzes.create!(:workflow_state => "available", :title => title)
 
-      visit_front_page(@course)
+      visit_front_page_edit(@course)
       click_quizzes_accordion
       click_sidebar_link(title)
 
       in_frame wiki_page_body_ifr_id do
-        expect(wiki_body_anchor.attribute('href')).to include "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+        expect(wiki_body_anchor.attribute('href')).to include quiz_id_path(@course, @quiz)
       end
     end
 
@@ -98,12 +98,12 @@ describe "RCS sidebar tests" do
       message = "Announcement 1 detail"
       @announcement = @course.announcements.create!(:title => title, :message => message)
 
-      visit_front_page(@course)
+      visit_front_page_edit(@course)
       click_announcements_accordion
       click_sidebar_link(title)
 
       in_frame wiki_page_body_ifr_id do
-        expect(wiki_body_anchor.attribute('href')).to include "/courses/#{@course.id}/discussion_topics/#{@announcement.id}"
+        expect(wiki_body_anchor.attribute('href')).to include announcement_id_path(@course, @announcement)
       end
     end
 
@@ -111,12 +111,12 @@ describe "RCS sidebar tests" do
       title = "Discussion-Title"
       @discussion = @course.discussion_topics.create!(:title => title)
 
-      visit_front_page(@course)
+      visit_front_page_edit(@course)
       click_discussions_accordion
       click_sidebar_link(title)
 
       in_frame wiki_page_body_ifr_id do
-        expect(wiki_body_anchor.attribute('href')).to include "/courses/#{@course.id}/discussion_topics/#{@discussion.id}"
+        expect(wiki_body_anchor.attribute('href')).to include discussion_id_path(@course, @discussion)
       end
     end
 
@@ -124,23 +124,23 @@ describe "RCS sidebar tests" do
       title = "Module-Title"
       @module = @course.context_modules.create!(:name => title)
 
-      visit_front_page(@course)
+      visit_front_page_edit(@course)
       click_modules_accordion
       click_sidebar_link(title)
 
       in_frame wiki_page_body_ifr_id do
-        expect(wiki_body_anchor.attribute('href')).to include "/courses/#{@course.id}/modules/#{@module.id}"
+        expect(wiki_body_anchor.attribute('href')).to include module_id_path(@course, @module)
       end
     end
 
     it "should click on sidebar course navigation page to create link in body", ignore_js_errors: true do
       title = "Files"
-      visit_front_page(@course)
+      visit_front_page_edit(@course)
       click_navigation_accordion
       click_sidebar_link(title)
 
       in_frame wiki_page_body_ifr_id do
-        expect(wiki_body_anchor.attribute('href')).to include "/courses/#{@course.id}/files"
+        expect(wiki_body_anchor.attribute('href')).to include course_file_path(@course)
       end
     end
 
@@ -156,17 +156,17 @@ describe "RCS sidebar tests" do
       @root_folder = Folder.root_folders(@course).first
       @text_file = @root_folder.attachments.create!(:filename => title, :context => @course) { |a| a.content_type = 'text/plain' }
 
-      visit_front_page(@course)
+      visit_front_page_edit(@course)
       click_files_tab
       click_sidebar_link(title)
 
       in_frame wiki_page_body_ifr_id do
-        expect(wiki_body_anchor.attribute('href')).to include "/files/#{@text_file.id}"
+        expect(wiki_body_anchor.attribute('href')).to include course_file_id_path(@text_file)
       end
     end
 
     it "should click on sidebar images tab" do
-      visit_front_page(@course)
+      visit_front_page_edit(@course)
 
       click_images_tab
       expect(upload_new_image).to be_displayed
@@ -180,12 +180,12 @@ describe "RCS sidebar tests" do
       @image.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
       @image.save!
 
-      visit_front_page(@course)
+      visit_front_page_edit(@course)
       click_images_tab
       click_image_link(title)
 
       in_frame wiki_page_body_ifr_id do
-        expect(wiki_body_image.attribute('src')).to include "/files/#{@image.id}"
+        expect(wiki_body_image.attribute('src')).to include course_file_id_path(@image)
       end
     end
 
@@ -193,12 +193,12 @@ describe "RCS sidebar tests" do
       title = "Assignment-Title"
       @assignment = @course.assignments.create!(:name => title)
 
-      visit_announcement_page(@course)
+      visit_new_announcement_page(@course)
       click_assignments_accordion
       click_sidebar_link(title)
 
       in_frame wiki_page_body_ifr_id do
-        expect(wiki_body_anchor.attribute('href')).to include "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(@course, @assignment)
       end
     end
 

@@ -449,7 +449,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     end
 
     it "should not scroll to the top of the page after using an equation button" do
-      visit_front_page(@course)
+      visit_front_page_edit(@course)
       scroll_page_to_bottom
 
       f(equation_button_selector).click
@@ -481,7 +481,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     it "should not load mathjax if displaying an equation editor image and non-visible mathml" do
       text = '<p><div class="hidden-readable"><math> <mi>&pi;</mi> <mo>⁢</mo> <msup> <mi>r</mi> <mn>2</mn> </msup> </math></div></p>'
       mathmanImg = '<p><img class="equation_image" title="\infty" src="/equation_images/%255Cinfty" alt="LaTeX: \infty" data-equation-content="\infty" /></p>'
-      visit_front_page(@course)
+      visit_front_page_edit(@course)
       add_html_to_tiny(text+mathmanImg)
       f('button.btn-primary').click
       wait_for_ajaximations
@@ -492,7 +492,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     it "should display record video dialog" do
       stub_kaltura
 
-      visit_front_page(@course)
+      visit_front_page_edit(@course)
 
       f("div[aria-label='Record/Upload Media'] button").click
       expect(f('#record_media_tab')).to be_displayed
