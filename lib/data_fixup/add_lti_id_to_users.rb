@@ -17,6 +17,8 @@
 
 module DataFixup::AddLtiIdToUsers
   def self.run
-    User.where(lti_id: nil).find_each { |u| u.update!(lti_id: SecureRandom.uuid) }
+    User.find_ids_in_ranges(:batch_size => 10_000) do |min_id, max_id|
+      User.where(:id => min_id..max_id).where(lti_id: nil).each { |u| u.update!(lti_id: SecureRandom.uuid) }
+    end
   end
 end
