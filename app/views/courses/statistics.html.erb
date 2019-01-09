@@ -26,8 +26,8 @@
 <div style="padding: 0 20px;" id="stats">
 <h1><%= t 'headings.stats', 'Statistics for %{course}', :course => @context.name %></h1>
 
-<% active_students = @context.participating_students.where("enrollments.type<>'StudentViewEnrollment'").count %>
-<% inactive_students = @context.student_enrollments.select{|e| e.invited? }.length %>
+<% active_students = @context.participating_students.where("enrollments.type<>'StudentViewEnrollment'").distinct.count %>
+<% inactive_students = @context.student_enrollments.invited_by_date.distinct.count(:user_id) %>
 
 <% active_topics =  @context.discussion_topics.active.pluck(:id) %>
 <% total_topics = active_topics.length %>

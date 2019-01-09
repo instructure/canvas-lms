@@ -25,16 +25,18 @@ describe ContextModule do
   end
 
   describe "publish_items!" do
+    before :once do
+      course_module
+      @file = @course.attachments.create!(:display_name => "some file", :uploaded_data => default_uploaded_data, :locked => true)
+      @tag = @module.add_item(:id => @file.id, :type => "attachment")
+    end
+
     context "with file usage rights required" do
-      before :each do
-        course_module
+      before :once do
         @course.enable_feature! :usage_rights_required
-        @file = @course.attachments.create!(:display_name => "some file", :uploaded_data => default_uploaded_data, :locked => true)
-        @tag = @module.add_item(:id => @file.id, :type => "attachment")
       end
 
       it "should not publish Attachment module items if usage rights are missing" do
-        @file.usage_rights = nil
         @module.publish_items!
         expect(@tag.published?).to eql(false)
         expect(@file.published?).to eql(false)
@@ -44,14 +46,17 @@ describe ContextModule do
         @file.usage_rights = @course.usage_rights.create(:use_justification => 'own_copyright')
         @file.save!
 
-        # ensure models are in sync around publish_items!
-        @module.reload
-        @module.publish_items!
-        @file.reload
-        @tag.reload
+        @module.reload.publish_items!
+        expect(@tag.reload.published?).to eql(true)
+        expect(@file.reload.published?).to eql(true)
+      end
+    end
 
-        expect(@tag.published?).to eql(true)
-        expect(@file.published?).to eql(true)
+    context "without file usage rights required" do
+      it "should publish Attachment module items" do
+        @module.publish_items!
+        expect(@tag.reload.published?).to eql(true)
+        expect(@file.reload.published?).to eql(true)
       end
     end
   end
@@ -781,7 +786,7 @@ describe ContextModule do
     end
 
     describe "must_submit requirement" do
-      before :each do
+      before :once do
         course_module
         student_in_course course: @course, active_all: true
 
@@ -1143,7 +1148,7 @@ describe ContextModule do
   end
 
   context 'unpublished completion requirements' do
-    before do
+    before :once do
       course_module
       course_with_student(course: @course, user: @student, active_all: true)
 
@@ -1189,7 +1194,7 @@ describe ContextModule do
   end
 
   describe "content_tags_visible_to" do
-    before do
+    before :once do
       course_module
       @student_1 = student_in_course(course: @course, active_all: true).user
       @student_2 = student_in_course(course: @course, active_all: true).user
@@ -1307,7 +1312,7 @@ describe ContextModule do
   end
 
   describe "#relock_warning?" do
-    before :each do
+    before :once do
       course_factory(active_all: true)
     end
 

@@ -22,7 +22,7 @@ import DataLoader from 'jsx/gradezilla/DataLoader'
 import {
   createGradebook,
   setFixtureHtml
-} from '../../gradezilla/default_gradebook/GradebookSpecHelper'
+} from 'jsx/gradezilla/default_gradebook/__tests__/GradebookSpecHelper'
 import SlickGridSpecHelper from '../../gradezilla/default_gradebook/GradebookGrid/GridSupport/SlickGridSpecHelper'
 
 QUnit.module('Gradebook Grid Column Ordering', function (suiteHooks) {

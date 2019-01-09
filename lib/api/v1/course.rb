@@ -81,7 +81,7 @@ module Api::V1::Course
   #   }
   #
   def course_json(course, user, session, includes, enrollments, subject_user = user, preloaded_progressions: nil, precalculated_permissions: nil)
-    if includes.include?('access_restricted_by_date') && enrollments && enrollments.all?(&:inactive?)
+    if includes.include?('access_restricted_by_date') && enrollments&.all?(&:inactive?) && !course.grants_right?(user, :read_as_admin)
       return {'id' => course.id, 'access_restricted_by_date' => true}
     end
 

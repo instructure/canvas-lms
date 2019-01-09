@@ -2,7 +2,10 @@
   <span><a href="{{settings.source_course_html_url}}" data-tooltip title="{{escape_html settings.source_course_name}}">{{truncate settings.source_course_name 25}}</a></span>
 {{else}}
   {{#if attachment}}
-    <span><a href="{{attachment.url}}" data-tooltip title="{{attachment.filename}}">{{truncate_left  attachment.filename 25}}</a></span>
+    <span><a href="{{attachment.url}}" data-tooltip title="{{attachment.filename}}">
+      <span class="screenreader-only">{{#t}}Download {{attachment.filename}}{{/t}}</span>
+      <span aria-hidden="true">{{truncate_left  attachment.filename 25}}</span>
+    </a></span>
   {{else}}
     <span>{{#t}}file not available{{/t}}</span>
   {{/if}}

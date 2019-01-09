@@ -20,6 +20,7 @@ import $ from 'jquery'
 import htmlEscape from '../../str/htmlEscape'
 import '../../jquery.dropdownList'
 import '../../jquery.instructure_misc_helpers'
+import {processContentItemsForEditor} from '../../../../app/jsx/deep_linking/ContentItemProcessor'
 
   /**
    * A module for holding helper functions pulled out of the instructure_external_tools/plugin.
@@ -148,5 +149,18 @@ export default {
       $(window).off('beforeunload', externalToolsPlugin.beforeUnloadHandler);
       $(window).unbind("externalContentReady");
       contentItemDialog.dialog('destroy').remove()
+    },
+
+    createDeepLinkingListener: (editor, dialogId) => {
+      return event => {
+        // Only accept messages from the same origin
+        if (event.origin === ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN) {
+          processContentItemsForEditor(
+            event,
+            editor,
+            dialogId
+          )
+        }
+      }
     }
   };

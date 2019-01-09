@@ -45,21 +45,41 @@ export const TEACHER_QUERY = gql`
       name
       description
       dueAt
+      unlockAt
+      lockAt
       pointsPossible
       state
-
+      lockInfo {
+        isLocked
+      }
       assignmentGroup {
         lid: _id
         name
       }
-
       modules {
         lid: _id
         name
       }
-
+      submissionTypes
+      allowedExtensions
       course {
         lid: _id
+      }
+      assignmentOverrides {
+        pageInfo {
+          startCursor
+          endCursor
+          hasNextPage
+          hasPreviousPage
+        }
+        nodes {
+          gid: id
+          lid: _id
+          title
+          dueAt
+          lockAt
+          unlockAt
+        }
       }
     }
   }
@@ -79,15 +99,63 @@ export const AssignmentGroupShape = shape({
   name: string.isRequired
 })
 
+export const LockInfoShape = shape({
+  isLocked: bool.isRequired
+})
+
+// TODO: is this the final shape?
+//       what is required?
+export const OverrideShape = shape({
+  id: string,
+  lid: string,
+  title: string,
+  dueAt: string,
+  lockAt: string,
+  unlockAt: string,
+  submissionTypes: arrayOf(string), // currently copied from the asisgnment
+  allowedExtensions: arrayOf(string), // currently copied from the assignment
+  set: shape({
+    lid: string,
+    name: string,
+    __typename: oneOf(['Section', 'Group'])
+  })
+})
+
 export const TeacherAssignmentShape = shape({
   lid: string.isRequired,
-  gid: string.isRequired,
   name: string.isRequired,
-  description: string.isRequired,
-  dueAt: string.isRequired,
   pointsPossible: number.isRequired,
+  dueAt: string,
+  lockAt: string,
+  unlockAt: string,
+  description: string,
   state: oneOf(['published', 'unpublished']).isRequired,
   assignmentGroup: AssignmentGroupShape.isRequired,
   modules: arrayOf(ModuleShape).isRequired,
-  course: CourseShape.isRequired
+  course: CourseShape.isRequired,
+  submissionTypes: arrayOf(string).isRequired,
+  allowedExtensions: arrayOf(string).isRequired,
+  assignmentOverrides: shape({
+    nodes: arrayOf(OverrideShape)
+  }).isRequired
+})
+
+export const AssignmentShape = shape({
+  lid: string.isRequired,
+  name: string.isRequired,
+  pointsPossible: number.isRequired,
+  dueAt: string,
+  lockAt: string,
+  unlockAt: string,
+  description: string.isRequired,
+  state: oneOf(['published', 'unpublished']).isRequired,
+  assignmentGroup: AssignmentGroupShape.isRequired,
+  modules: arrayOf(ModuleShape).isRequired,
+  course: CourseShape.isRequired,
+  lockInfo: LockInfoShape.isRequired,
+  submissionTypes: arrayOf(string).isRequired,
+  allowedExtensions: arrayOf(string).isRequired,
+  assignmentOverrides: shape({
+    nodes: arrayOf(OverrideShape)
+  }).isRequired
 })

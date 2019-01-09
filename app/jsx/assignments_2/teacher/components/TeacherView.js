@@ -19,11 +19,13 @@
 import React from 'react'
 import {bool, shape, string} from 'prop-types'
 import {graphql} from 'react-apollo'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 
 import {TEACHER_QUERY, TeacherAssignmentShape} from '../assignmentData'
 import Header from './Header'
 import ContentTabs from './ContentTabs'
 import MessageStudentsWho from './MessageStudentsWho'
+import TeacherViewContext, {TeacherViewContextDefaults} from './TeacherViewContext'
 
 export class CoreTeacherView extends React.Component {
   static propTypes = {
@@ -38,6 +40,11 @@ export class CoreTeacherView extends React.Component {
     super(props)
     this.state = {
       messageStudentsWhoOpen: false
+    }
+
+    this.contextValue = {
+      locale: (window.ENV && window.ENV.MOMENT_LOCALE) || TeacherViewContextDefaults.locale,
+      timeZone: (window.ENV && window.ENV.TIMEZONE) || TeacherViewContextDefaults.timeZone
     }
   }
 
@@ -69,18 +76,23 @@ export class CoreTeacherView extends React.Component {
     else if (loading) return this.renderLoading()
 
     return (
-      <div>
-        <Header
-          assignment={assignment}
-          onUnsubmittedClick={this.handleUnsubmittedClick}
-          onPublishChange={this.handlePublishChange}
-        />
-        <ContentTabs assignment={assignment} />
-        <MessageStudentsWho
-          open={this.state.messageStudentsWhoOpen}
-          onDismiss={this.handleDismissMessageStudentsWho}
-        />
-      </div>
+      <TeacherViewContext.Provider value={this.contextValue}>
+        <div>
+          <ScreenReaderContent>
+            <h1>{assignment.name}</h1>
+          </ScreenReaderContent>
+          <Header
+            assignment={assignment}
+            onUnsubmittedClick={this.handleUnsubmittedClick}
+            onPublishChange={this.handlePublishChange}
+          />
+          <ContentTabs assignment={assignment} />
+          <MessageStudentsWho
+            open={this.state.messageStudentsWhoOpen}
+            onDismiss={this.handleDismissMessageStudentsWho}
+          />
+        </div>
+      </TeacherViewContext.Provider>
     )
   }
 }

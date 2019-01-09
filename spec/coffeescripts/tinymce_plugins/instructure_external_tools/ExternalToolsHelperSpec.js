@@ -224,3 +224,7 @@ test('populates the editor selection input', function() {
   ExternalToolsHelper.contentItemDialogOpen(button, ed, 'course_1', form)
   equal($('#selection_input').val(), ed.selection.getContent())
 })
+
+test('returns a deep linking event handler', () => {
+  ok($.isFunction(ExternalToolsHelper.createDeepLinkingListener({})))
+})

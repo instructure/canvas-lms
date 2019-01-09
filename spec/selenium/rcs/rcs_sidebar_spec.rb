@@ -66,5 +66,127 @@ describe "RCS sidebar tests" do
         expect(wiki_body_anchor.attribute('href')).to include title
       end
     end
+
+    it "should click on sidebar assignment page to create link in body" do
+      title = "Assignment-Title"
+      @assignment = @course.assignments.create!(:name => title)
+
+      visit_front_page(@course)
+      click_assignments_accordion
+      click_sidebar_link(title)
+
+      in_frame wiki_page_body_ifr_id do
+        expect(wiki_body_anchor.attribute('href')).to include "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      end
+    end
+
+    it "should click on sidebar quizzes page to create link in body" do
+      title = "Quiz-Title"
+      @quiz = @course.quizzes.create!(:workflow_state => "available", :title => title)
+
+      visit_front_page(@course)
+      click_quizzes_accordion
+      click_sidebar_link(title)
+
+      in_frame wiki_page_body_ifr_id do
+        expect(wiki_body_anchor.attribute('href')).to include "/courses/#{@course.id}/quizzes/#{@quiz.id}"
+      end
+    end
+
+    it "should click on sidebar announcements page to create link in body" do
+      title = "Announcement-Title"
+      message = "Announcement 1 detail"
+      @announcement = @course.announcements.create!(:title => title, :message => message)
+
+      visit_front_page(@course)
+      click_announcements_accordion
+      click_sidebar_link(title)
+
+      in_frame wiki_page_body_ifr_id do
+        expect(wiki_body_anchor.attribute('href')).to include "/courses/#{@course.id}/discussion_topics/#{@announcement.id}"
+      end
+    end
+
+    it "should click on sidebar discussions page to create link in body" do
+      title = "Discussion-Title"
+      @discussion = @course.discussion_topics.create!(:title => title)
+
+      visit_front_page(@course)
+      click_discussions_accordion
+      click_sidebar_link(title)
+
+      in_frame wiki_page_body_ifr_id do
+        expect(wiki_body_anchor.attribute('href')).to include "/courses/#{@course.id}/discussion_topics/#{@discussion.id}"
+      end
+    end
+
+    it "should click on sidebar modules page to create link in body" do
+      title = "Module-Title"
+      @module = @course.context_modules.create!(:name => title)
+
+      visit_front_page(@course)
+      click_modules_accordion
+      click_sidebar_link(title)
+
+      in_frame wiki_page_body_ifr_id do
+        expect(wiki_body_anchor.attribute('href')).to include "/courses/#{@course.id}/modules/#{@module.id}"
+      end
+    end
+
+    it "should click on sidebar course navigation page to create link in body", ignore_js_errors: true do
+      title = "Files"
+      visit_front_page(@course)
+      click_navigation_accordion
+      click_sidebar_link(title)
+
+      in_frame wiki_page_body_ifr_id do
+        expect(wiki_body_anchor.attribute('href')).to include "/courses/#{@course.id}/files"
+      end
+    end
+
+    it "should click on sidebar files tab", ignore_js_errors: true do
+      wiki_page_tools_file_tree_setup(true, true)
+
+      click_files_tab
+      expect(upload_new_file).to be_displayed
+    end
+
+    it "should click on a file in sidebar to create link in body" do
+      title = "text_file.txt"
+      @root_folder = Folder.root_folders(@course).first
+      @text_file = @root_folder.attachments.create!(:filename => title, :context => @course) { |a| a.content_type = 'text/plain' }
+
+      visit_front_page(@course)
+      click_files_tab
+      click_sidebar_link(title)
+
+      in_frame wiki_page_body_ifr_id do
+        expect(wiki_body_anchor.attribute('href')).to include "/files/#{@text_file.id}"
+      end
+    end
+
+    it "should click on sidebar images tab" do
+      visit_front_page(@course)
+
+      click_images_tab
+      expect(upload_new_image).to be_displayed
+    end
+
+    it "should click on an image in sidebar to display in body" do
+      title = "email.png"
+      @root_folder = Folder.root_folders(@course).first
+      @image = @root_folder.attachments.build(:context => @course)
+      path = File.expand_path(File.dirname(__FILE__) + '/../../../public/images/email.png')
+      @image.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
+      @image.save!
+
+      visit_front_page(@course)
+      click_images_tab
+      click_image_link(title)
+
+      in_frame wiki_page_body_ifr_id do
+        expect(wiki_body_image.attribute('src')).to include "/files/#{@image.id}"
+      end
+    end
   end
 end

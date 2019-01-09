@@ -497,38 +497,40 @@ describe CoursesController do
     end
 
     describe "per-assignment permissions" do
-      let(:js_permissions) { assigns[:js_env][:PERMISSIONS] }
+      let(:assignment_permissions) { assigns[:js_env][:PERMISSIONS][:by_assignment_id] }
 
       before(:each) do
-        course_with_teacher_logged_in(active_all: true)
-
-        @course.update!(default_view: 'assignments')
+        @course = Course.create!(default_view: "assignments")
+        @teacher = course_with_user("TeacherEnrollment", course: @course, active_all: true).user
+        @ta = course_with_user("TaEnrollment", course: @course, active_all: true).user
         @course.enable_feature!(:moderated_grading)
 
-        @editable_assignment = @course.assignments.create!(
+        @assignment = @course.assignments.create!(
           moderated_grading: true,
           grader_count: 2,
           final_grader: @teacher
         )
 
         ta_in_course(active_all: true)
-        @uneditable_assignment = @course.assignments.create!(
-          moderated_grading: true,
-          grader_count: 2,
-          final_grader: @ta
-        )
       end
 
-      let(:assignment_permissions) { assigns[:js_env][:PERMISSIONS][:by_assignment_id] }
-
-      it "sets the 'update' attribute for an editable assignment to true" do
+      it "sets the 'update' attribute to true when user is the final grader" do
+        user_session(@teacher)
         get 'show', params: {id: @course.id}
-        expect(assignment_permissions[@editable_assignment.id][:update]).to eq(true)
+        expect(assignment_permissions[@assignment.id][:update]).to eq(true)
       end
 
-      it "sets the 'update' attribute for an uneditable assignment to false" do
+      it "sets the 'update' attribute to true when user has the Select Final Grade permission" do
+        user_session(@ta)
         get 'show', params: {id: @course.id}
-        expect(assignment_permissions[@uneditable_assignment.id][:update]).to eq(false)
+        expect(assignment_permissions[@assignment.id][:update]).to eq(true)
+      end
+
+      it "sets the 'update' attribute to false when user does not have the Select Final Grade permission" do
+        @course.account.role_overrides.create!(permission: :select_final_grade, enabled: false, role: ta_role)
+        user_session(@ta)
+        get 'show', params: {id: @course.id}
+        expect(assignment_permissions[@assignment.id][:update]).to eq(false)
       end
     end
   end
@@ -1786,6 +1788,7 @@ describe CoursesController do
       before :once do
         account_admin_user
         course_factory
+        ta_in_course
       end
 
       before :each do
@@ -1793,7 +1796,6 @@ describe CoursesController do
       end
 
       it 'should require :manage_master_courses permission' do
-        ta_in_course
         user_session @ta
         put 'update', params: {:id => @course.id, :course => { :blueprint => '1' }}, :format => 'json'
         expect(response).to be_unauthorized
@@ -1828,6 +1830,35 @@ describe CoursesController do
         expect(response).to be_successful
         template = MasterCourses::MasterTemplate.full_template_for(@course)
         expect(template.default_restrictions).to eq({:content => false, :due_dates => true})
+      end
+
+      describe "changing restrictions" do
+        before :once do
+          @template = MasterCourses::MasterTemplate.set_as_master_course(@course)
+          @template.update_attribute(:default_restrictions, {:content => true})
+        end
+
+        it "allows an admin to change restrictions" do
+          put 'update', params: {:id => @course.id, :course => { :blueprint => '1',
+            :blueprint_restrictions => {'content' => '0', 'due_dates' => '1'}}}, :format => 'json'
+          expect(response).to be_successful
+          template = MasterCourses::MasterTemplate.full_template_for(@course)
+          expect(template.default_restrictions).to eq({:content => false, :due_dates => true})
+        end
+
+        it "forbids a non-admin from changing restrictions" do
+          user_session @ta
+          put 'update', params: {:id => @course.id, :course => { :blueprint => '1',
+            :blueprint_restrictions => {'content' => '0', 'due_dates' => '1'}}}, :format => 'json'
+          expect(response).to be_unauthorized
+        end
+
+        it "allows a non-admin to perform a no-op request" do
+          user_session @ta
+          put 'update', params: {:id => @course.id, :course => { :blueprint => '1',
+            :blueprint_restrictions => {'content' => '1'}}}, :format => 'json'
+          expect(response).to be_successful
+        end
       end
 
       it "should validate template restrictions" do

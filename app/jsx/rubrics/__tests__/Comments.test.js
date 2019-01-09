@@ -24,7 +24,7 @@ import { assessments } from './fixtures'
 
 describe('The Comments component', () => {
   const props = {
-    assessing: true,
+    editing: true,
     assessment: assessments.freeForm.data[1],
     savedComments: [
       'I award you no points',
@@ -39,17 +39,17 @@ describe('The Comments component', () => {
   const editor = (mods) => component(mods).find('FreeFormComments').shallow()
   const rating = (mods) => component(mods).find('CommentText').shallow()
 
-  it('renders the root component as expected when assessing', () => {
+  it('renders the root component as expected when editing', () => {
     expect(component()).toMatchSnapshot()
   })
 
   it('directly renders comments_html', () => {
-    const el = rating({ assessing: false }).findWhere((e) => e.children().length === 0)
+    const el = rating({ editing: false }).findWhere((e) => e.children().length === 0)
     expect(el.html()).toMatchSnapshot()
   })
 
   it('renders a placeholder when no assessment provided', () => {
-    expect(rating({ assessing: false, assessment: null })).toMatchSnapshot()
+    expect(rating({ editing: false, assessment: null })).toMatchSnapshot()
   })
 
   it('shows no selector when no comments are presented', () => {
@@ -92,7 +92,7 @@ describe('The Comments component', () => {
   })
 
   it('renders a footer after the comment when provided', () => {
-    const el = component({ assessing: false, footer: <div>this is a footer</div> })
+    const el = component({ editing: false, footer: <div>this is a footer</div> })
 
     expect(el.shallow()).toMatchSnapshot()
   })

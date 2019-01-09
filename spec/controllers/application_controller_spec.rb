@@ -27,7 +27,8 @@ RSpec.describe ApplicationController do
       headers: {},
       format: double(:html? => true),
       user_agent: nil,
-      remote_ip: '0.0.0.0'
+      remote_ip: '0.0.0.0',
+      base_url: 'https://canvas.test'
     )
     allow(controller).to receive(:request).and_return(request_double)
   end
@@ -161,6 +162,10 @@ RSpec.describe ApplicationController do
         "midi *",
         "encrypted-media *"
       ]
+    end
+
+    it 'sets DEEP_LINKING_POST_MESSAGE_ORIGIN' do
+      expect(@controller.js_env[:DEEP_LINKING_POST_MESSAGE_ORIGIN]).to eq @controller.request.base_url
     end
 
     context "sharding" do
@@ -498,6 +503,7 @@ RSpec.describe ApplicationController do
     context 'ContextExternalTool' do
 
       let(:course){ course_model }
+      let_once(:dev_key) { DeveloperKey.create! }
 
       let(:tool) do
         tool = course.context_external_tools.new(
@@ -505,7 +511,8 @@ RSpec.describe ApplicationController do
           consumer_key: "bob",
           shared_secret: "bob",
           tool_id: 'some_tool',
-          privacy_level: 'public'
+          privacy_level: 'public',
+          developer_key: dev_key
         )
         tool.url = "http://www.example.com/basic_lti"
         tool.resource_selection = {

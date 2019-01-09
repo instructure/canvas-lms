@@ -56,12 +56,12 @@
 
 // :focus style mixins
 @mixin ic-focus-base {
-  outline-width: 1px;
+  outline-width: 0.125rem;
   outline-color: transparent;
   outline-style: solid;
 }
 
-@mixin ic-focus-variant($color: var(--ic-link-color), $offset: -1px) {
+@mixin ic-focus-variant($color: var(--ic-link-color), $offset: 0) {
   outline-offset: $offset;
   outline-color: $color;
 }

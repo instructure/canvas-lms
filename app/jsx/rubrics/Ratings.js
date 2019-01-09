@@ -225,7 +225,7 @@ const Ratings = (props) => {
         assessing={assessing}
         classes={classes}
         endOfRangePoints={useRange ? getRangePoints(tier.points, tiers[index + 1]) : null}
-        footer={footer}
+        footer={isSummary ? footer : null}
         onClick={() => handleClick(tier)}
         shaderClass={getShaderClass(selected)}
         tierColor={getTierColor(selected)}
@@ -251,9 +251,18 @@ const Ratings = (props) => {
     />
   )
 
+  const fullFooter = () => isSummary || _.isNil(footer) ? null : (
+    <div className='rating-all-footer'>
+      {footer}
+    </div>
+  )
+
   return (
-    <div className={classNames("rating-tier-list", { 'react-assessing': assessing })}>
-      {ratings.length > 0 || !isSummary ? ratings : defaultRating()}
+    <div className='rating-all'>
+      <div className={classNames("rating-tier-list", { 'react-assessing': assessing })}>
+        {ratings.length > 0 || !isSummary ? ratings : defaultRating()}
+      </div>
+      {fullFooter()}
     </div>
   )
 }

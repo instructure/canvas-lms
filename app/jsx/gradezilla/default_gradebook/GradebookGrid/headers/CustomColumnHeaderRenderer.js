@@ -16,31 +16,31 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!gradebook';
-import React from 'react';
-import ReactDOM from 'react-dom';
+import I18n from 'i18n!gradebook'
+import React from 'react'
+import ReactDOM from 'react-dom'
 import CustomColumnHeader from './CustomColumnHeader'
 
-function getProps (column, gradebook, options) {
-  const customColumn = gradebook.getCustomColumn(column.customColumnId);
+function getProps(column, gradebook, options) {
+  const customColumn = gradebook.getCustomColumn(column.customColumnId)
 
   return {
     ref: options.ref,
     title: customColumn.teacher_notes ? I18n.t('Notes') : customColumn.title
-  };
+  }
 }
 
 export default class CustomColumnHeaderRenderer {
-  constructor (gradebook) {
-    this.gradebook = gradebook;
+  constructor(gradebook) {
+    this.gradebook = gradebook
   }
 
-  render (column, $container, _gridSupport, options) {
-    const props = getProps(column, this.gradebook, options);
-    ReactDOM.render(<CustomColumnHeader {...props} />, $container);
+  render(column, $container, _gridSupport, options) {
+    const props = getProps(column, this.gradebook, options)
+    ReactDOM.render(<CustomColumnHeader {...props} />, $container)
   }
 
-  destroy (_column, $container, _gridSupport) {
-    ReactDOM.unmountComponentAtNode($container);
+  destroy(_column, $container, _gridSupport) {
+    ReactDOM.unmountComponentAtNode($container)
   }
 }

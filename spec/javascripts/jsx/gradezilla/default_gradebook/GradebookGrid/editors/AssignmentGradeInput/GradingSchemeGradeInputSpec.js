@@ -20,9 +20,9 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import GradeInput from 'jsx/gradezilla/default_gradebook/GradebookGrid/editors/AssignmentCellEditor/GradeInput'
+import AssignmentGradeInput from 'jsx/gradezilla/default_gradebook/GradebookGrid/editors/AssignmentGradeInput'
 
-QUnit.module('GradeInput using GradingSchemeGradeInput', suiteHooks => {
+QUnit.module('GradebookGrid AssignmentGradeInput using GradingSchemeGradeInput', suiteHooks => {
   let $container
   let props
   let $menuContent
@@ -90,7 +90,7 @@ QUnit.module('GradeInput using GradingSchemeGradeInput', suiteHooks => {
   })
 
   function mountComponent() {
-    wrapper = mount(<GradeInput {...props} />, {attachTo: $container})
+    wrapper = mount(<AssignmentGradeInput {...props} />, {attachTo: $container})
   }
 
   function clickToOpen() {
@@ -107,7 +107,9 @@ QUnit.module('GradeInput using GradingSchemeGradeInput', suiteHooks => {
   function clickMenuItem(optionText) {
     return new Promise(resolve => {
       resolveClose = resolve
-      getRenderedOptions().find($option => $option.textContent === optionText).click()
+      getRenderedOptions()
+        .find($option => $option.textContent === optionText)
+        .click()
     })
   }
 
@@ -122,7 +124,7 @@ QUnit.module('GradeInput using GradingSchemeGradeInput', suiteHooks => {
   test('adds the GradingSchemeInput-suffix class to the container', () => {
     mountComponent()
     const classList = wrapper.getDOMNode().classList
-    strictEqual(classList.contains('Grid__AssignmentRowCell__GradingSchemeInput'), true)
+    strictEqual(classList.contains('Grid__GradeCell__GradingSchemeInput'), true)
   })
 
   test('renders a text input', () => {
@@ -141,7 +143,10 @@ QUnit.module('GradeInput using GradingSchemeGradeInput', suiteHooks => {
   test('optionally disables the menu button', () => {
     props.disabled = true
     mountComponent()
-    const button = wrapper.find('button').at(0).getDOMNode()
+    const button = wrapper
+      .find('button')
+      .at(0)
+      .getDOMNode()
     strictEqual(button.disabled, true)
   })
 
@@ -648,7 +653,13 @@ QUnit.module('GradeInput using GradingSchemeGradeInput', suiteHooks => {
     test('sets focus on the input', () => {
       mountComponent()
       wrapper.instance().focus()
-      strictEqual(document.activeElement, wrapper.find('input').at(0).getDOMNode())
+      strictEqual(
+        document.activeElement,
+        wrapper
+          .find('input')
+          .at(0)
+          .getDOMNode()
+      )
     })
 
     test('selects the content of the input', () => {
@@ -666,7 +677,13 @@ QUnit.module('GradeInput using GradingSchemeGradeInput', suiteHooks => {
         .getDOMNode()
         .focus()
       wrapper.instance().focus()
-      strictEqual(document.activeElement, wrapper.find('button').at(0).getDOMNode())
+      strictEqual(
+        document.activeElement,
+        wrapper
+          .find('button')
+          .at(0)
+          .getDOMNode()
+      )
     })
 
     test('does not change focus when the grading scheme menu is open', () => {

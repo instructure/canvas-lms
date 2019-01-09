@@ -16,166 +16,167 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import GridHelper from './GridHelper';
+import GridHelper from './GridHelper'
 
-function getItemMetadata (data, rowIndex) {
-  const classes = [];
+function getItemMetadata(data, rowIndex) {
+  const classes = []
 
   if (rowIndex === 0) {
-    classes.push('first-row');
+    classes.push('first-row')
   }
 
   if (rowIndex === data.length - 1) {
-    classes.push('last-row');
+    classes.push('last-row')
   }
 
   if (data[rowIndex].cssClass) {
-    classes.push(data[rowIndex].cssClass);
+    classes.push(data[rowIndex].cssClass)
   }
 
   return {
     cssClasses: classes.join(' ')
-  };
+  }
 }
 
 export default class State {
-  activeLocation = { region: 'unknown' };
-  previousLocation = null;
+  activeLocation = {region: 'unknown'}
 
-  constructor (grid, gridSupport) {
-    this.grid = grid;
-    this.gridSupport = gridSupport;
-    this.helper = new GridHelper(grid);
+  previousLocation = null
+
+  constructor(grid, gridSupport) {
+    this.grid = grid
+    this.gridSupport = gridSupport
+    this.helper = new GridHelper(grid)
   }
 
-  initialize () {
+  initialize() {
     this.grid.onActiveCellChanged.subscribe((_event, activeCell) => {
       if (activeCell && activeCell.row != null) {
-        this.setActiveLocationInternal('body', { row: activeCell.row, cell: activeCell.cell });
-        this.triggerActiveLocationChange();
+        this.setActiveLocationInternal('body', {row: activeCell.row, cell: activeCell.cell})
+        this.triggerActiveLocationChange()
       }
-    });
+    })
 
-    const data = this.grid.getData();
-    data.getItemMetadata = rowIndex => getItemMetadata(data, rowIndex);
+    const data = this.grid.getData()
+    data.getItemMetadata = rowIndex => getItemMetadata(data, rowIndex)
   }
 
-  getActiveLocation () {
-    return this.activeLocation;
+  getActiveLocation() {
+    return this.activeLocation
   }
 
-  setActiveLocation (region, attr = {}) {
-    this.helper.commitCurrentEdit();
-    this.setActiveLocationInternal(region, attr);
+  setActiveLocation(region, attr = {}) {
+    this.helper.commitCurrentEdit()
+    this.setActiveLocationInternal(region, attr)
 
     if (region === 'body') {
-      this.grid.gotoCell(attr.row, attr.cell, true);
-      this.triggerActiveLocationChange();
-      return;
+      this.grid.gotoCell(attr.row, attr.cell, true)
+      this.triggerActiveLocationChange()
+      return
     }
 
     if (this.grid.getActiveCell()) {
-      this.grid.resetActiveCell();
+      this.grid.resetActiveCell()
     }
 
     if (region === 'header' || region === 'beforeGrid') {
-      this.helper.getBeforeGridNode().focus();
+      this.helper.getBeforeGridNode().focus()
     } else if (region === 'afterGrid') {
-      this.helper.getAfterGridNode().focus();
+      this.helper.getAfterGridNode().focus()
     }
 
-    this.triggerActiveLocationChange();
+    this.triggerActiveLocationChange()
   }
 
-  restorePreviousLocation () {
-    const defaultRegion = 'header';
-    const defaultAttr = { cell: 0 };
+  restorePreviousLocation() {
+    const defaultRegion = 'header'
+    const defaultAttr = {cell: 0}
 
     if (!this.previousLocation) {
-      this.setActiveLocation(defaultRegion, defaultAttr);
-      return;
+      this.setActiveLocation(defaultRegion, defaultAttr)
+      return
     }
 
-    const { region } = this.previousLocation;
-    const columnIndex = this.grid.getColumnIndex(this.previousLocation.columnId);
+    const {region} = this.previousLocation
+    const columnIndex = this.grid.getColumnIndex(this.previousLocation.columnId)
 
-    let rowIndex;
+    let rowIndex
     if (region === 'body' && columnIndex != null) {
-      rowIndex = this.grid.getData().findIndex(row => row.id === this.previousLocation.rowId);
+      rowIndex = this.grid.getData().findIndex(row => row.id === this.previousLocation.rowId)
     }
 
     if (columnIndex == null || rowIndex === -1) {
-      this.setActiveLocation(defaultRegion, defaultAttr);
+      this.setActiveLocation(defaultRegion, defaultAttr)
     } else {
-      this.setActiveLocation(region, { row: rowIndex, cell: columnIndex });
+      this.setActiveLocation(region, {row: rowIndex, cell: columnIndex})
     }
   }
 
-  resetActiveLocation () {
-    this.setActiveLocation('beforeGrid');
-    this.previousLocation = null;
+  resetActiveLocation() {
+    this.setActiveLocation('beforeGrid')
+    this.previousLocation = null
   }
 
-  setActiveLocationInternal (region, attr = {}) {
-    this.activeLocation = { region, ...attr };
+  setActiveLocationInternal(region, attr = {}) {
+    this.activeLocation = {region, ...attr}
 
     if (attr.cell != null) {
-      this.activeLocation.columnId = this.grid.getColumns()[attr.cell].id;
+      this.activeLocation.columnId = this.grid.getColumns()[attr.cell].id
     }
 
     if (region === 'header' || region === 'body') {
       this.previousLocation = {
         region,
         columnId: this.activeLocation.columnId,
-        rowId: region === 'body' ? this.grid.getData()[attr.row].id : null,
-      };
+        rowId: region === 'body' ? this.grid.getData()[attr.row].id : null
+      }
     }
   }
 
-  blur () {
+  blur() {
     // deactivate, then clear all activity state
-    this.grid.getEditorLock().commitCurrentEdit();
-    this.grid.resetActiveCell();
-    this.setActiveLocationInternal('unknown');
-    this.triggerActiveLocationChange();
+    this.grid.getEditorLock().commitCurrentEdit()
+    this.grid.resetActiveCell()
+    this.setActiveLocationInternal('unknown')
+    this.triggerActiveLocationChange()
   }
 
-  getActiveNode () {
+  getActiveNode() {
     if (this.activeLocation.region === 'header') {
-      return this.getActiveColumnHeaderNode();
+      return this.getActiveColumnHeaderNode()
     }
 
     if (this.activeLocation.region === 'body') {
-      return this.grid.getActiveCellNode();
+      return this.grid.getActiveCellNode()
     }
 
-    return null;
+    return null
   }
 
-  getEditingNode () {
+  getEditingNode() {
     if (this.grid.getEditorLock().isActive()) {
-      return this.getActiveNode();
+      return this.getActiveNode()
     }
 
-    return null;
+    return null
   }
 
-  getColumnHeaderNode (cell) {
-    const $gridContainer = this.grid.getContainerNode();
-    const $headers = $gridContainer.querySelectorAll('.slick-header-column');
+  getColumnHeaderNode(cell) {
+    const $gridContainer = this.grid.getContainerNode()
+    const $headers = $gridContainer.querySelectorAll('.slick-header-column')
 
-    return $headers[cell];
+    return $headers[cell]
   }
 
-  getActiveColumnHeaderNode () {
+  getActiveColumnHeaderNode() {
     if (this.activeLocation.cell != null) {
-      return this.getColumnHeaderNode(this.activeLocation.cell);
+      return this.getColumnHeaderNode(this.activeLocation.cell)
     }
 
-    return null;
+    return null
   }
 
-  triggerActiveLocationChange () {
-    this.gridSupport.events.onActiveLocationChanged.trigger(null, this.activeLocation);
+  triggerActiveLocationChange() {
+    this.gridSupport.events.onActiveLocationChanged.trigger(null, this.activeLocation)
   }
 }

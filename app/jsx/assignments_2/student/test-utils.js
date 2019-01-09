@@ -18,29 +18,29 @@
 
 export function mockAssignment(overrides = {}) {
   return {
-    lid: '7',
-    gid: 'QXNzaWdubWVudC03',
-    name: 'Assignment',
     description: '<p>description</p>',
     dueAt: '2018-07-11T18:59:59-06:00',
-    pointsPossible: 10,
     lockAt: null,
+    name: 'Assignment',
+    pointsPossible: 10,
     unlockAt: null,
-    state: 'published',
-    course: {
-      lid: '1',
-      __typename: 'Course'
-    },
-    modules: [],
+    gradingType: 'points',
+    allowedAttempts: null,
     assignmentGroup: {
       name: 'Assignments',
-      lid: '1',
       __typename: 'AssignmentGroup'
+    },
+    env: {
+      assignmentUrl: '/test/assignment',
+      moduleUrl: '/test/module',
+      modulePrereq: null,
+      __typename: 'env'
     },
     lockInfo: {
       isLocked: true,
       __typename: 'LockInfo'
     },
+    modules: [],
     submissionsConnection: {
       nodes: [],
       __typename: 'SubmissionConnection'
