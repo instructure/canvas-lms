@@ -22,89 +22,93 @@ import numberHelper from '../../../shared/helpers/numberHelper'
 import {scoreToPercentage} from './GradeCalculationHelper'
 import {scoreToGrade} from '../../../gradebook/GradingSchemeHelper'
 
-const POINTS = 'points';
-const PERCENT = 'percent';
-const PASS_FAIL = 'pass_fail';
+const POINTS = 'points'
+const PERCENT = 'percent'
+const PASS_FAIL = 'pass_fail'
 
-const PASS_GRADES = ['complete', 'pass'];
-const FAIL_GRADES = ['incomplete', 'fail'];
+const PASS_GRADES = ['complete', 'pass']
+const FAIL_GRADES = ['incomplete', 'fail']
 
 const UNGRADED = '–'
 
-function isPassFail (grade, gradeType) {
+function isPassFail(grade, gradeType) {
   if (gradeType) {
-    return gradeType === PASS_FAIL;
+    return gradeType === PASS_FAIL
   }
 
-  return PASS_GRADES.includes(grade) || FAIL_GRADES.includes(grade);
+  return PASS_GRADES.includes(grade) || FAIL_GRADES.includes(grade)
 }
 
-function isPercent (grade, gradeType) {
+function isPercent(grade, gradeType) {
   if (gradeType) {
-    return gradeType === PERCENT;
+    return gradeType === PERCENT
   }
 
-  return /%/g.test(grade);
+  return /%/g.test(grade)
 }
 
-function isExcused (grade) {
-  return grade === 'EX';
+function isExcused(grade) {
+  return grade === 'EX'
 }
 
-function normalizeCompleteIncompleteGrade (grade) {
+function normalizeCompleteIncompleteGrade(grade) {
   if (PASS_GRADES.includes(grade)) {
-    return 'complete';
+    return 'complete'
   }
   if (FAIL_GRADES.includes(grade)) {
-    return 'incomplete';
+    return 'incomplete'
   }
-  return null;
+  return null
 }
 
-function shouldFormatGradingType (gradingType) {
-  return gradingType === POINTS || gradingType === PERCENT || gradingType === PASS_FAIL;
+function shouldFormatGradingType(gradingType) {
+  return gradingType === POINTS || gradingType === PERCENT || gradingType === PASS_FAIL
 }
 
-function shouldFormatGrade (grade, gradingType) {
+function shouldFormatGrade(grade, gradingType) {
   if (gradingType) {
-    return shouldFormatGradingType(gradingType);
+    return shouldFormatGradingType(gradingType)
   }
 
-  return typeof grade === 'number' || isPassFail(grade);
+  return typeof grade === 'number' || isPassFail(grade)
 }
 
-function excused () {
-  return I18n.t('Excused');
+function excused() {
+  return I18n.t('Excused')
 }
 
-function formatPointsGrade (score) {
-  return I18n.n(score, { precision: 2, strip_insignificant_zeros: true });
+function formatPointsGrade(score) {
+  return I18n.n(score, {precision: 2, strip_insignificant_zeros: true})
 }
 
-function formatPercentageGrade (score, options) {
+function formatPercentageGrade(score, options) {
   const percent = options.pointsPossible ? scoreToPercentage(score, options.pointsPossible) : score
-  return I18n.n(round(percent, 2), { percentage: true, precision: 2, strip_insignificant_zeros: true });
+  return I18n.n(round(percent, 2), {
+    percentage: true,
+    precision: 2,
+    strip_insignificant_zeros: true
+  })
 }
 
-function formatGradingSchemeGrade (score, grade, options) {
+function formatGradingSchemeGrade(score, grade, options) {
   if (options.pointsPossible) {
     const percent = scoreToPercentage(score, options.pointsPossible)
-    return scoreToGrade(percent, options.gradingScheme);
+    return scoreToGrade(percent, options.gradingScheme)
   } else if (grade != null) {
-    return grade;
+    return grade
   } else {
-    return scoreToGrade(score, options.gradingScheme);
+    return scoreToGrade(score, options.gradingScheme)
   }
 }
 
-function formatCompleteIncompleteGrade (score, grade, options) {
-  let passed = false;
+function formatCompleteIncompleteGrade(score, grade, options) {
+  let passed = false
   if (options.pointsPossible) {
-    passed = score > 0;
+    passed = score > 0
   } else {
-    passed = PASS_GRADES.includes(grade);
+    passed = PASS_GRADES.includes(grade)
   }
-  return passed ? I18n.t('Complete') : I18n.t('Incomplete');
+  return passed ? I18n.t('Complete') : I18n.t('Incomplete')
 }
 
 function formatGradeInfo(gradeInfo, options = {}) {
@@ -137,30 +141,30 @@ const GradeFormatHelper = {
    * @return {string} Given grade rounded to two decimal places and formatted with I18n
    * if it is a point or percent grade.
    */
-  formatGrade (grade, options = {}) {
-    let formattedGrade = grade;
+  formatGrade(grade, options = {}) {
+    let formattedGrade = grade
 
     if (grade == null || grade === '') {
-      return ('defaultValue' in options) ? options.defaultValue : grade;
+      return 'defaultValue' in options ? options.defaultValue : grade
     }
 
     if (isExcused(grade)) {
-      return excused();
+      return excused()
     }
 
-    let parsedGrade = GradeFormatHelper.parseGrade(grade, options);
+    let parsedGrade = GradeFormatHelper.parseGrade(grade, options)
 
     if (shouldFormatGrade(parsedGrade, options.gradingType)) {
       if (isPassFail(parsedGrade, options.gradingType)) {
-        parsedGrade = normalizeCompleteIncompleteGrade(parsedGrade);
-        formattedGrade = parsedGrade === 'complete' ? I18n.t('complete') : I18n.t('incomplete');
+        parsedGrade = normalizeCompleteIncompleteGrade(parsedGrade)
+        formattedGrade = parsedGrade === 'complete' ? I18n.t('complete') : I18n.t('incomplete')
       } else {
-        const roundedGrade = round(parsedGrade, options.precision || 2);
-        formattedGrade = I18n.n(roundedGrade, { percentage: isPercent(grade, options.gradingType) });
+        const roundedGrade = round(parsedGrade, options.precision || 2)
+        formattedGrade = I18n.n(roundedGrade, {percentage: isPercent(grade, options.gradingType)})
       }
     }
 
-    return formattedGrade;
+    return formattedGrade
   },
 
   /**
@@ -168,54 +172,56 @@ const GradeFormatHelper = {
    * returns delocalized point or percentage string.
    * Otherwise, returns input.
    */
-  delocalizeGrade (localizedGrade) {
-    if (localizedGrade === undefined ||
-        localizedGrade === null ||
-        typeof localizedGrade !== 'string') {
-      return localizedGrade;
+  delocalizeGrade(localizedGrade) {
+    if (
+      localizedGrade === undefined ||
+      localizedGrade === null ||
+      typeof localizedGrade !== 'string'
+    ) {
+      return localizedGrade
     }
 
-    const delocalizedGrade = numberHelper.parse(localizedGrade.replace('%', ''));
+    const delocalizedGrade = numberHelper.parse(localizedGrade.replace('%', ''))
 
     if (isNaN(delocalizedGrade)) {
-      return localizedGrade;
+      return localizedGrade
     }
 
-    return delocalizedGrade + (/%/g.test(localizedGrade) ? '%' : '');
+    return delocalizedGrade + (/%/g.test(localizedGrade) ? '%' : '')
   },
 
-  parseGrade (grade, options = {}) {
-    let parsedGrade;
+  parseGrade(grade, options = {}) {
+    let parsedGrade
 
     if (grade == null || grade === '' || typeof grade === 'number') {
-      return grade;
+      return grade
     }
 
     const gradeNoPercent = grade.replace('%', '')
-    if ( 'delocalize' in options && !options.delocalize && !isNaN(gradeNoPercent) ) {
-      parsedGrade = parseFloat(gradeNoPercent);
+    if ('delocalize' in options && !options.delocalize && !isNaN(gradeNoPercent)) {
+      parsedGrade = parseFloat(gradeNoPercent)
     } else {
-      parsedGrade = numberHelper.parse(gradeNoPercent);
+      parsedGrade = numberHelper.parse(gradeNoPercent)
     }
 
     if (isNaN(parsedGrade)) {
-      return grade;
+      return grade
     }
 
-    return parsedGrade;
+    return parsedGrade
   },
 
   excused,
   isExcused,
   formatGradeInfo,
 
-  formatSubmissionGrade (submission, options = { version: 'final' }) {
+  formatSubmissionGrade(submission, options = {version: 'final'}) {
     if (submission.excused) {
-      return excused();
+      return excused()
     }
 
-    const score = options.version === 'entered' ? submission.enteredScore : submission.score;
-    const grade = options.version === 'entered' ? submission.enteredGrade : submission.grade;
+    const score = options.version === 'entered' ? submission.enteredScore : submission.score
+    const grade = options.version === 'entered' ? submission.enteredGrade : submission.grade
 
     if (score == null) {
       return options.defaultValue != null ? options.defaultValue : UNGRADED
@@ -223,17 +229,17 @@ const GradeFormatHelper = {
 
     switch (options.formatType) {
       case 'percent':
-        return formatPercentageGrade(score, options);
+        return formatPercentageGrade(score, options)
       case 'gradingScheme':
-        return formatGradingSchemeGrade(score, grade, options);
+        return formatGradingSchemeGrade(score, grade, options)
       case 'passFail':
-        return formatCompleteIncompleteGrade(score, grade, options);
+        return formatCompleteIncompleteGrade(score, grade, options)
       default:
-        return formatPointsGrade(score);
+        return formatPointsGrade(score)
     }
   },
 
   UNGRADED
-};
+}
 
 export default GradeFormatHelper

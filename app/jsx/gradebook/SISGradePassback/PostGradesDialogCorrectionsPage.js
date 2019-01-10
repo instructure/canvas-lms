@@ -135,7 +135,8 @@ class PostGradesDialogCorrectionsPage extends React.Component {
               onClick={this.ignoreErrorsThenProceed}
             >
               {errorCount > 0 ? I18n.t('Ignore These') : I18n.t('Continue')}
-              &nbsp;<i className="icon-arrow-right" />
+              &nbsp;
+              <i className="icon-arrow-right" />
             </button>
           </div>
         </form>

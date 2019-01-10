@@ -63,7 +63,8 @@ class PostGradesDialogNeedsGradingPage extends React.Component {
               className="btn btn-primary"
               onClick={this.props.leaveNeedsGradingPage}
             >
-              {I18n.t('Continue')}&nbsp;<i className="icon-arrow-right" />
+              {I18n.t('Continue')}&nbsp;
+              <i className="icon-arrow-right" />
             </button>
           </div>
         </form>
