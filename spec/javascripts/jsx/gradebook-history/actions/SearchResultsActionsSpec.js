@@ -16,46 +16,47 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Fixtures from '../../gradebook-history/Fixtures';
-import GradebookHistoryStore from 'jsx/gradebook-history/store/GradebookHistoryStore';
-import * as HistoryActions from 'jsx/gradebook-history/actions/HistoryActions';
-import HistoryApi from 'jsx/gradebook-history/api/HistoryApi';
-import * as SearchResultsActions from 'jsx/gradebook-history/actions/SearchResultsActions';
+import Fixtures from '../../gradebook-history/Fixtures'
+import GradebookHistoryStore from 'jsx/gradebook-history/store/GradebookHistoryStore'
+import * as HistoryActions from 'jsx/gradebook-history/actions/HistoryActions'
+import HistoryApi from 'jsx/gradebook-history/api/HistoryApi'
+import * as SearchResultsActions from 'jsx/gradebook-history/actions/SearchResultsActions'
 
 QUnit.module('SearchResultsActionsSpec getHistoryNextPage', {
-  setup () {
-    this.response = Fixtures.historyResponse();
-    this.getNextPageStub = sandbox.stub(HistoryApi, 'getNextPage')
-      .returns(Promise.resolve(this.response));
+  setup() {
+    this.response = Fixtures.historyResponse()
+    this.getNextPageStub = sandbox
+      .stub(HistoryApi, 'getNextPage')
+      .returns(Promise.resolve(this.response))
 
-    this.dispatchSpy = sandbox.spy(GradebookHistoryStore, 'dispatch');
+    this.dispatchSpy = sandbox.spy(GradebookHistoryStore, 'dispatch')
   }
-});
+})
 
-test('dispatches fetchHistoryNextPageStart', function () {
-  const fetchSpy = sandbox.spy(HistoryActions, 'fetchHistoryNextPageStart');
-  const promise = this.dispatchSpy(SearchResultsActions.getHistoryNextPage('http://example.com'));
+test('dispatches fetchHistoryNextPageStart', function() {
+  const fetchSpy = sandbox.spy(HistoryActions, 'fetchHistoryNextPageStart')
+  const promise = this.dispatchSpy(SearchResultsActions.getHistoryNextPage('http://example.com'))
   return promise.then(() => {
-    strictEqual(fetchSpy.callCount, 1);
-  });
-});
+    strictEqual(fetchSpy.callCount, 1)
+  })
+})
 
-test('dispatches fetchHistoryNextPageSuccess with response data and headers on success', function () {
-  const fetchSpy = sandbox.spy(HistoryActions, 'fetchHistoryNextPageSuccess');
-  const promise = this.dispatchSpy(SearchResultsActions.getHistoryNextPage('http://example.com'));
+test('dispatches fetchHistoryNextPageSuccess with response data and headers on success', function() {
+  const fetchSpy = sandbox.spy(HistoryActions, 'fetchHistoryNextPageSuccess')
+  const promise = this.dispatchSpy(SearchResultsActions.getHistoryNextPage('http://example.com'))
   return promise.then(() => {
-    strictEqual(fetchSpy.callCount, 1);
-    deepEqual(fetchSpy.firstCall.args[0], this.response.data);
-    deepEqual(fetchSpy.firstCall.args[1], this.response.headers);
-  });
-});
+    strictEqual(fetchSpy.callCount, 1)
+    deepEqual(fetchSpy.firstCall.args[0], this.response.data)
+    deepEqual(fetchSpy.firstCall.args[1], this.response.headers)
+  })
+})
 
-test('dispatches fetchHistoryNextPageFailure on failure', function () {
-  this.getNextPageStub.returns(Promise.reject(new Error('FAIL')));
-  const fetchSpy = sandbox.spy(HistoryActions, 'fetchHistoryNextPageFailure');
-  const promise = this.dispatchSpy(SearchResultsActions.getHistoryNextPage('http://example.com'));
+test('dispatches fetchHistoryNextPageFailure on failure', function() {
+  this.getNextPageStub.returns(Promise.reject(new Error('FAIL')))
+  const fetchSpy = sandbox.spy(HistoryActions, 'fetchHistoryNextPageFailure')
+  const promise = this.dispatchSpy(SearchResultsActions.getHistoryNextPage('http://example.com'))
   return promise.then(() => {
-    strictEqual(fetchSpy.callCount, 1);
-    fetchSpy.restore();
-  });
-});
+    strictEqual(fetchSpy.callCount, 1)
+    fetchSpy.restore()
+  })
+})

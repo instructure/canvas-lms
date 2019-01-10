@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import axios from 'axios';
+import axios from 'axios'
 
-function getGradebookHistory (courseId, input) {
-  let url = `/api/v1/audit/grade_change/courses/${courseId}`;
-  url += input.assignment ? `/assignments/${input.assignment}` : '';
-  url += input.grader ? `/graders/${input.grader}` : '';
-  url += input.student ? `/students/${input.student}` : '';
+function getGradebookHistory(courseId, input) {
+  let url = `/api/v1/audit/grade_change/courses/${courseId}`
+  url += input.assignment ? `/assignments/${input.assignment}` : ''
+  url += input.grader ? `/graders/${input.grader}` : ''
+  url += input.student ? `/students/${input.student}` : ''
 
   const params = {
     params: {
@@ -30,16 +30,16 @@ function getGradebookHistory (courseId, input) {
       end_time: input.to,
       include: ['current_grade']
     }
-  };
+  }
 
-  return axios.get(url, params);
+  return axios.get(url, params)
 }
 
-function getNextPage (url) {
-  return axios.get(url);
+function getNextPage(url) {
+  return axios.get(url)
 }
 
 export default {
   getGradebookHistory,
   getNextPage
-};
+}

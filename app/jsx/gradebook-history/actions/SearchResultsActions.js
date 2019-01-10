@@ -16,19 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as HistoryActions from '../../gradebook-history/actions/HistoryActions';
-import HistoryApi from '../../gradebook-history/api/HistoryApi';
+import * as HistoryActions from '../../gradebook-history/actions/HistoryActions'
+import HistoryApi from '../../gradebook-history/api/HistoryApi'
 
-export function getHistoryNextPage (url) {
-  return function (dispatch) {
-    dispatch(HistoryActions.fetchHistoryNextPageStart());
+export function getHistoryNextPage(url) {
+  return function(dispatch) {
+    dispatch(HistoryActions.fetchHistoryNextPageStart())
 
     return HistoryApi.getNextPage(url)
-      .then((response) => {
-        dispatch(HistoryActions.fetchHistoryNextPageSuccess(response.data, response.headers));
+      .then(response => {
+        dispatch(HistoryActions.fetchHistoryNextPageSuccess(response.data, response.headers))
       })
       .catch(() => {
-        dispatch(HistoryActions.fetchHistoryNextPageFailure());
-      });
-  };
+        dispatch(HistoryActions.fetchHistoryNextPageFailure())
+      })
+  }
 }

@@ -17,37 +17,37 @@
  */
 
 import 'jquery.instructure_date_and_time'
-import parseLinkHeader from '../../shared/parseLinkHeader';
+import parseLinkHeader from '../../shared/parseLinkHeader'
 
-export const FETCH_HISTORY_START = 'FETCH_HISTORY_START';
-export const FETCH_HISTORY_SUCCESS = 'FETCH_HISTORY_SUCCESS';
-export const FETCH_HISTORY_FAILURE = 'FETCH_HISTORY_FAILURE';
-export const FETCH_HISTORY_NEXT_PAGE_START = 'FETCH_HISTORY_NEXT_PAGE_START';
-export const FETCH_HISTORY_NEXT_PAGE_SUCCESS = 'FETCH_HISTORY_NEXT_PAGE_SUCCESS';
-export const FETCH_HISTORY_NEXT_PAGE_FAILURE = 'FETCH_HISTORY_NEXT_PAGE_FAILURE';
+export const FETCH_HISTORY_START = 'FETCH_HISTORY_START'
+export const FETCH_HISTORY_SUCCESS = 'FETCH_HISTORY_SUCCESS'
+export const FETCH_HISTORY_FAILURE = 'FETCH_HISTORY_FAILURE'
+export const FETCH_HISTORY_NEXT_PAGE_START = 'FETCH_HISTORY_NEXT_PAGE_START'
+export const FETCH_HISTORY_NEXT_PAGE_SUCCESS = 'FETCH_HISTORY_NEXT_PAGE_SUCCESS'
+export const FETCH_HISTORY_NEXT_PAGE_FAILURE = 'FETCH_HISTORY_NEXT_PAGE_FAILURE'
 
-function indexById (collection = []) {
+function indexById(collection = []) {
   return collection.reduce((acc, item) => {
-    acc[item.id] = item;
-    return acc;
-  }, {});
+    acc[item.id] = item
+    return acc
+  }, {})
 }
 
-function pointsPossibleCurrent (assignments, item) {
-  const assignment = assignments[item.links.assignment];
+function pointsPossibleCurrent(assignments, item) {
+  const assignment = assignments[item.links.assignment]
   if (!assignment || assignment.points_possible == null) {
-    return '–';
+    return '–'
   }
-  return assignment.points_possible.toString();
+  return assignment.points_possible.toString()
 }
 
-function formatHistoryItems (data) {
-  const historyItems = data.events || [];
-  const users = indexById(data.users);
-  const assignments = indexById(data.assignments);
+function formatHistoryItems(data) {
+  const historyItems = data.events || []
+  const users = indexById(data.users)
+  const assignments = indexById(data.assignments)
 
   return historyItems.map(item => {
-    let assignment;
+    let assignment
 
     if (assignments[item.links.assignment]) {
       assignment = {
@@ -55,9 +55,9 @@ function formatHistoryItems (data) {
         gradingType: assignments[item.links.assignment].grading_type,
         muted: assignments[item.links.assignment].muted,
         name: assignments[item.links.assignment].name
-      };
+      }
     } else {
-      assignment = {};
+      assignment = {}
     }
 
     return {
@@ -71,53 +71,55 @@ function formatHistoryItems (data) {
       gradeCurrent: item.grade_current || '',
       id: item.id,
       pointsPossibleAfter: item.points_possible_after ? item.points_possible_after.toString() : '–',
-      pointsPossibleBefore: item.points_possible_before ? item.points_possible_before.toString() : '–',
+      pointsPossibleBefore: item.points_possible_before
+        ? item.points_possible_before.toString()
+        : '–',
       pointsPossibleCurrent: pointsPossibleCurrent(assignments, item),
-      student: users[item.links.student] ? users[item.links.student].name : '',
-    };
-  });
+      student: users[item.links.student] ? users[item.links.student].name : ''
+    }
+  })
 }
 
-export function fetchHistoryStart () {
+export function fetchHistoryStart() {
   return {
     type: FETCH_HISTORY_START
-  };
+  }
 }
 
-export function fetchHistorySuccess ({ events, linked: { assignments, users }}, { link }) {
+export function fetchHistorySuccess({events, linked: {assignments, users}}, {link}) {
   return {
     type: FETCH_HISTORY_SUCCESS,
     payload: {
-      items: formatHistoryItems({ events, assignments, users }),
+      items: formatHistoryItems({events, assignments, users}),
       link: parseLinkHeader(link).next
     }
-  };
+  }
 }
 
-export function fetchHistoryFailure () {
+export function fetchHistoryFailure() {
   return {
     type: FETCH_HISTORY_FAILURE
-  };
+  }
 }
 
-export function fetchHistoryNextPageStart () {
+export function fetchHistoryNextPageStart() {
   return {
     type: FETCH_HISTORY_NEXT_PAGE_START
-  };
+  }
 }
 
-export function fetchHistoryNextPageSuccess ({ events, linked: { assignments, users }}, { link }) {
+export function fetchHistoryNextPageSuccess({events, linked: {assignments, users}}, {link}) {
   return {
     type: FETCH_HISTORY_NEXT_PAGE_SUCCESS,
     payload: {
-      items: formatHistoryItems({ events, assignments, users }),
+      items: formatHistoryItems({events, assignments, users}),
       link: parseLinkHeader(link).next
     }
-  };
+  }
 }
 
-export function fetchHistoryNextPageFailure () {
+export function fetchHistoryNextPageFailure() {
   return {
     type: FETCH_HISTORY_NEXT_PAGE_FAILURE
-  };
+  }
 }

@@ -16,30 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import { arrayOf, func, shape, string } from 'prop-types';
-import I18n from 'i18n!gradebook_history';
-import moment from 'moment';
-import Select from '@instructure/ui-forms/lib/components/Select';
-import Button from '@instructure/ui-buttons/lib/components/Button';
-import View from '@instructure/ui-layout/lib/components/View';
-import DateInput from '@instructure/ui-forms/lib/components/DateInput';
-import FormFieldGroup from '@instructure/ui-forms/lib/components/FormFieldGroup';
-import { GridCol } from '@instructure/ui-layout/lib/components/Grid';
-import Spinner from '@instructure/ui-elements/lib/components/Spinner';
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
-import SearchFormActions from '../gradebook-history/actions/SearchFormActions';
-import { showFlashAlert } from '../shared/FlashAlert';
+import React, {Component} from 'react'
+import {connect} from 'react-redux'
+import {arrayOf, func, shape, string} from 'prop-types'
+import I18n from 'i18n!gradebook_history'
+import moment from 'moment'
+import Select from '@instructure/ui-forms/lib/components/Select'
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import View from '@instructure/ui-layout/lib/components/View'
+import DateInput from '@instructure/ui-forms/lib/components/DateInput'
+import FormFieldGroup from '@instructure/ui-forms/lib/components/FormFieldGroup'
+import {GridCol} from '@instructure/ui-layout/lib/components/Grid'
+import Spinner from '@instructure/ui-elements/lib/components/Spinner'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import SearchFormActions from '../gradebook-history/actions/SearchFormActions'
+import {showFlashAlert} from '../shared/FlashAlert'
 
 const recordShape = shape({
   fetchStatus: string.isRequired,
-  items: arrayOf(shape({
-    id: string.isRequired,
-    name: string.isRequired
-  })),
+  items: arrayOf(
+    shape({
+      id: string.isRequired,
+      name: string.isRequired
+    })
+  ),
   nextPage: string.isRequired
-});
+})
 
 class SearchFormComponent extends Component {
   static propTypes = {
@@ -50,36 +52,31 @@ class SearchFormComponent extends Component {
     getGradebookHistory: func.isRequired,
     clearSearchOptions: func.isRequired,
     getSearchOptions: func.isRequired,
-    getSearchOptionsNextPage: func.isRequired,
-  };
+    getSearchOptionsNextPage: func.isRequired
+  }
 
   state = {
     selected: {
       assignment: '',
       grader: '',
       student: '',
-      from: { value: '', conversionFailed: false },
-      to: { value: '', conversionFailed: false }
+      from: {value: '', conversionFailed: false},
+      to: {value: '', conversionFailed: false}
     },
     messages: {
       assignments: I18n.t('Type a few letters to start searching'),
       graders: I18n.t('Type a few letters to start searching'),
       students: I18n.t('Type a few letters to start searching')
     }
-  };
-
-  componentDidMount () {
-    this.props.getGradebookHistory(this.state.selected);
   }
 
-  componentWillReceiveProps ({
-    fetchHistoryStatus,
-    assignments,
-    graders,
-    students
-  }) {
+  componentDidMount() {
+    this.props.getGradebookHistory(this.state.selected)
+  }
+
+  componentWillReceiveProps({fetchHistoryStatus, assignments, graders, students}) {
     if (this.props.fetchHistoryStatus === 'started' && fetchHistoryStatus === 'failure') {
-      showFlashAlert({ message: I18n.t('Error loading gradebook history. Try again?') });
+      showFlashAlert({message: I18n.t('Error loading gradebook history. Try again?')})
     }
 
     if (assignments.fetchStatus === 'success' && assignments.items.length === 0) {
@@ -88,7 +85,7 @@ class SearchFormComponent extends Component {
           ...prevState.messages,
           assignments: I18n.t('No assignments with that name found')
         }
-      }));
+      }))
     }
     if (graders.fetchStatus === 'success' && !graders.items.length) {
       this.setState(prevState => ({
@@ -96,7 +93,7 @@ class SearchFormComponent extends Component {
           ...prevState.messages,
           graders: I18n.t('No graders with that name found')
         }
-      }));
+      }))
     }
     if (students.fetchStatus === 'success' && !students.items.length) {
       this.setState(prevState => ({
@@ -104,143 +101,160 @@ class SearchFormComponent extends Component {
           ...prevState.messages,
           students: I18n.t('No students with that name found')
         }
-      }));
+      }))
     }
     if (assignments.nextPage) {
-      this.props.getSearchOptionsNextPage('assignments', assignments.nextPage);
+      this.props.getSearchOptionsNextPage('assignments', assignments.nextPage)
     }
     if (graders.nextPage) {
-      this.props.getSearchOptionsNextPage('graders', graders.nextPage);
+      this.props.getSearchOptionsNextPage('graders', graders.nextPage)
     }
     if (students.nextPage) {
-      this.props.getSearchOptionsNextPage('students', students.nextPage);
+      this.props.getSearchOptionsNextPage('students', students.nextPage)
     }
   }
 
   setSelectedFrom = (_, from, _rawValue, rawConversionFailed) => {
-    const startOfFrom = from ? moment(from).startOf('day').toISOString() : '';
+    const startOfFrom = from
+      ? moment(from)
+          .startOf('day')
+          .toISOString()
+      : ''
     this.setState(prevState => ({
       selected: {
         ...prevState.selected,
-        from: { value: startOfFrom, conversionFailed: rawConversionFailed }
+        from: {value: startOfFrom, conversionFailed: rawConversionFailed}
       }
-    }));
+    }))
   }
 
   setSelectedTo = (_, to, _rawValue, rawConversionFailed) => {
-    const endOfTo = to ? moment(to).endOf('day').toISOString() : '';
+    const endOfTo = to
+      ? moment(to)
+          .endOf('day')
+          .toISOString()
+      : ''
     this.setState(prevState => ({
       selected: {
         ...prevState.selected,
-        to: { value: endOfTo, conversionFailed: rawConversionFailed }
+        to: {value: endOfTo, conversionFailed: rawConversionFailed}
       }
-    }));
+    }))
   }
 
   setSelectedAssignment = (event, selected) => {
-    this.props.clearSearchOptions('assignments');
+    this.props.clearSearchOptions('assignments')
     this.setState(prevState => ({
       selected: {
         ...prevState.selected,
         assignment: selected ? selected.id : ''
       }
-    }));
+    }))
   }
 
   setSelectedGrader = (event, selected) => {
-    this.props.clearSearchOptions('graders');
+    this.props.clearSearchOptions('graders')
     this.setState(prevState => ({
       selected: {
         ...prevState.selected,
         grader: selected ? selected.id : ''
       }
-    }));
+    }))
   }
 
   setSelectedStudent = (event, selected) => {
-    this.props.clearSearchOptions('students');
+    this.props.clearSearchOptions('students')
     this.setState(prevState => ({
       selected: {
         ...prevState.selected,
         student: selected ? selected.id : ''
       }
-    }));
+    }))
   }
 
-  hasToBeforeFrom () {
-    return moment(this.state.selected.from.value).diff(moment(this.state.selected.to.value), 'seconds') >= 0;
+  hasToBeforeFrom() {
+    return (
+      moment(this.state.selected.from.value).diff(
+        moment(this.state.selected.to.value),
+        'seconds'
+      ) >= 0
+    )
   }
 
-  hasDateInputErrors () {
-    return this.dateInputErrors().length > 0 ||
+  hasDateInputErrors() {
+    return (
+      this.dateInputErrors().length > 0 ||
       this.state.selected.from.conversionFailed ||
-      this.state.selected.to.conversionFailed;
+      this.state.selected.to.conversionFailed
+    )
   }
 
   dateInputErrors = () => {
     if (this.hasToBeforeFrom()) {
-      return [{
-        type: 'error',
-        text: I18n.t('\'From\' date must be before \'To\' date')
-      }];
+      return [
+        {
+          type: 'error',
+          text: I18n.t("'From' date must be before 'To' date")
+        }
+      ]
     }
 
-    return [];
+    return []
   }
 
   promptUserEntry = () => {
-    const emptyMessage = I18n.t('Type a few letters to start searching');
+    const emptyMessage = I18n.t('Type a few letters to start searching')
     this.setState({
       messages: {
         assignments: emptyMessage,
         graders: emptyMessage,
         students: emptyMessage
       }
-    });
+    })
   }
 
   handleAssignmentChange = (_event, value) => {
-    this.handleSearchEntry('assignments', value);
+    this.handleSearchEntry('assignments', value)
   }
 
   handleGraderChange = (_event, value) => {
-    this.handleSearchEntry('graders', value);
+    this.handleSearchEntry('graders', value)
   }
 
   handleStudentChange = (_event, value) => {
-    this.handleSearchEntry('students', value);
+    this.handleSearchEntry('students', value)
   }
 
   handleSearchEntry = (target, searchTerm) => {
     if (searchTerm.length <= 2) {
       if (this.props[target].items.length > 0) {
-        this.props.clearSearchOptions(target);
-        this.promptUserEntry();
+        this.props.clearSearchOptions(target)
+        this.promptUserEntry()
       }
 
-      return;
+      return
     }
 
-    this.props.getSearchOptions(target, searchTerm);
+    this.props.getSearchOptions(target, searchTerm)
   }
 
   handleSubmit = () => {
-    this.props.getGradebookHistory(this.state.selected);
+    this.props.getGradebookHistory(this.state.selected)
   }
 
-  filterNone = options => (
+  filterNone = options =>
     // empty function here as the default filter function for Select
     // does a startsWith call, and won't match `nora` -> `Elenora` for example
     options
-  )
 
-  renderAsOptions = data => (
+  renderAsOptions = data =>
     data.map(item => (
-      <option key={item.id} value={item.id}>{item.name}</option>
+      <option key={item.id} value={item.id}>
+        {item.name}
+      </option>
     ))
-  )
 
-  render () {
+  render() {
     return (
       <View as="div" margin="0 0 xx-large">
         <FormFieldGroup
@@ -265,7 +279,11 @@ class SearchFormComponent extends Component {
               emptyOption={this.state.messages.students}
               filter={this.filterNone}
               label={I18n.t('Student')}
-              loadingText={this.props.students.fetchStatus === 'started' ? I18n.t('Loading Students') : undefined}
+              loadingText={
+                this.props.students.fetchStatus === 'started'
+                  ? I18n.t('Loading Students')
+                  : undefined
+              }
               onBlur={this.promptUserEntry}
               onChange={this.setSelectedStudent}
               onInputChange={this.handleStudentChange}
@@ -279,7 +297,9 @@ class SearchFormComponent extends Component {
               emptyOption={this.state.messages.graders}
               filter={this.filterNone}
               label={I18n.t('Grader')}
-              loadingText={this.props.graders.fetchStatus === 'started' ? I18n.t('Loading Graders') : undefined}
+              loadingText={
+                this.props.graders.fetchStatus === 'started' ? I18n.t('Loading Graders') : undefined
+              }
               onBlur={this.promptUserEntry}
               onChange={this.setSelectedGrader}
               onInputChange={this.handleGraderChange}
@@ -293,7 +313,11 @@ class SearchFormComponent extends Component {
               emptyOption={this.state.messages.assignments}
               filter={this.filterNone}
               label={I18n.t('Assignment')}
-              loadingText={this.props.assignments.fetchStatus === 'started' ? I18n.t('Loading Assignments') : undefined}
+              loadingText={
+                this.props.assignments.fetchStatus === 'started'
+                  ? I18n.t('Loading Assignments')
+                  : undefined
+              }
               onBlur={this.promptUserEntry}
               onChange={this.setSelectedAssignment}
               onInputChange={this.handleAssignmentChange}
@@ -324,7 +348,7 @@ class SearchFormComponent extends Component {
           </FormFieldGroup>
 
           <GridCol width="auto">
-            <div style={{ margin: "1.85rem 0 0 0" }}>
+            <div style={{margin: '1.85rem 0 0 0'}}>
               <Button
                 onClick={this.handleSubmit}
                 type="submit"
@@ -337,48 +361,47 @@ class SearchFormComponent extends Component {
           </GridCol>
         </FormFieldGroup>
       </View>
-    );
+    )
   }
 }
 
-const mapStateToProps = state => (
-  {
-    fetchHistoryStatus: state.history.fetchHistoryStatus || '',
-    assignments: {
-      fetchStatus: state.searchForm.records.assignments.fetchStatus || '',
-      items: state.searchForm.records.assignments.items || [],
-      nextPage: state.searchForm.records.assignments.nextPage || ''
-    },
-    graders: {
-      fetchStatus: state.searchForm.records.graders.fetchStatus || '',
-      items: state.searchForm.records.graders.items || [],
-      nextPage: state.searchForm.records.graders.nextPage || ''
-    },
-    students: {
-      fetchStatus: state.searchForm.records.students.fetchStatus || '',
-      items: state.searchForm.records.students.items || [],
-      nextPage: state.searchForm.records.students.nextPage || ''
-    }
+const mapStateToProps = state => ({
+  fetchHistoryStatus: state.history.fetchHistoryStatus || '',
+  assignments: {
+    fetchStatus: state.searchForm.records.assignments.fetchStatus || '',
+    items: state.searchForm.records.assignments.items || [],
+    nextPage: state.searchForm.records.assignments.nextPage || ''
+  },
+  graders: {
+    fetchStatus: state.searchForm.records.graders.fetchStatus || '',
+    items: state.searchForm.records.graders.items || [],
+    nextPage: state.searchForm.records.graders.nextPage || ''
+  },
+  students: {
+    fetchStatus: state.searchForm.records.students.fetchStatus || '',
+    items: state.searchForm.records.students.items || [],
+    nextPage: state.searchForm.records.students.nextPage || ''
   }
-);
+})
 
-const mapDispatchToProps = dispatch => (
-  {
-    getGradebookHistory: (input) => {
-      dispatch(SearchFormActions.getGradebookHistory(input));
-    },
-    getSearchOptions: (recordType, searchTerm) => {
-      dispatch(SearchFormActions.getSearchOptions(recordType, searchTerm));
-    },
-    getSearchOptionsNextPage: (recordType, url) => {
-      dispatch(SearchFormActions.getSearchOptionsNextPage(recordType, url));
-    },
-    clearSearchOptions: (recordType) => {
-      dispatch(SearchFormActions.clearSearchOptions(recordType));
-    }
+const mapDispatchToProps = dispatch => ({
+  getGradebookHistory: input => {
+    dispatch(SearchFormActions.getGradebookHistory(input))
+  },
+  getSearchOptions: (recordType, searchTerm) => {
+    dispatch(SearchFormActions.getSearchOptions(recordType, searchTerm))
+  },
+  getSearchOptionsNextPage: (recordType, url) => {
+    dispatch(SearchFormActions.getSearchOptionsNextPage(recordType, url))
+  },
+  clearSearchOptions: recordType => {
+    dispatch(SearchFormActions.clearSearchOptions(recordType))
   }
-);
+})
 
-export default connect(mapStateToProps, mapDispatchToProps)(SearchFormComponent);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(SearchFormComponent)
 
-export { SearchFormComponent };
+export {SearchFormComponent}

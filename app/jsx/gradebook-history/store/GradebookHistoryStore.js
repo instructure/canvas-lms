@@ -16,15 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { createStore, applyMiddleware } from 'redux';
-import thunkMiddleware from 'redux-thunk';
-import gradebookHistory from '../../gradebook-history/reducers/Reducer';
+import {createStore, applyMiddleware} from 'redux'
+import thunkMiddleware from 'redux-thunk'
+import gradebookHistory from '../../gradebook-history/reducers/Reducer'
 
-const GradebookHistoryStore = createStore(
-  gradebookHistory,
-  applyMiddleware(
-    thunkMiddleware
-  )
-);
+const GradebookHistoryStore = createStore(gradebookHistory, applyMiddleware(thunkMiddleware))
 
-export default GradebookHistoryStore;
+export default GradebookHistoryStore
