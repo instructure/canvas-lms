@@ -60,6 +60,12 @@ export class Whitelist extends Component {
 
   validateInput = input => {
     const domainOnly = input.replace(PROTOCOL_REGEX, '')
+    const parts = domainOnly.split('.')
+    const isWildcard = parts[0] === '*'
+    if (isWildcard) {
+      parts.shift()
+      return isValidDomain(parts.join('.'))
+    }
     return isValidDomain(domainOnly)
   }
 
@@ -147,7 +153,7 @@ export class Whitelist extends Component {
             <tr>
               <th scope="col">Domain Name</th>
               <th scope="col">
-                <ScreenReaderContent>Actions</ScreenReaderContent>
+                <ScreenReaderContent>{I18n.t('Actions')}</ScreenReaderContent>
               </th>
             </tr>
           </thead>

@@ -37,6 +37,21 @@ describe('ConnectedWhitelist', () => {
     expect(domainCellEntry).toBeInTheDocument()
   })
 
+  it('handles adding wildcard entries to the whitelist', () => {
+    const {getByLabelText, getByText} = renderWithRedux(
+      <ConnectedWhitelist context="account" contextId="1" />
+    )
+
+    const domainInput = getByLabelText('Domain Name')
+    fireEvent.input(domainInput, {target: {value: '*.instructure.com'}})
+
+    const button = getByLabelText('Add Domain')
+    fireEvent.click(button)
+
+    const domainCellEntry = getByText('*.instructure.com')
+    expect(domainCellEntry).toBeInTheDocument()
+  })
+
   it('renders the tools whitelist when present', () => {
     const {getByText} = renderWithRedux(<ConnectedWhitelist context="account" contextId="1" />, {
       initialState: {
