@@ -16,52 +16,52 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'react';
-import ReactDOM from 'react-dom';
-import Pill from '@instructure/ui-elements/lib/components/Pill';
-import StatusPill from 'jsx/grading/StatusPill';
+import 'react'
+import ReactDOM from 'react-dom'
+import Pill from '@instructure/ui-elements/lib/components/Pill'
+import StatusPill from 'jsx/grading/StatusPill'
 
-const wrapper = document.getElementById('fixtures');
+const wrapper = document.getElementById('fixtures')
 
-function addSpan (className) {
-  const span = document.createElement('span');
-  span.className = className;
-  return wrapper.appendChild(span);
+function addSpan(className) {
+  const span = document.createElement('span')
+  span.className = className
+  return wrapper.appendChild(span)
 }
 
 QUnit.module('StatusPill', {
-  setup () {
-    wrapper.innerHTML = '';
+  setup() {
+    wrapper.innerHTML = ''
   },
-  tearDown () {
-    wrapper.innerHTML = '';
+  tearDown() {
+    wrapper.innerHTML = ''
   }
-});
+})
 
-test('renderPills mounts a <Pill /> with correct text to each .submission-missing-pill', function () {
-  const stubbedRender = sandbox.stub(ReactDOM, 'render');
-  const spans = [1, 2, 3].map(() => addSpan('submission-missing-pill'));
-  StatusPill.renderPills();
+test('renderPills mounts a <Pill /> with correct text to each .submission-missing-pill', function() {
+  const stubbedRender = sandbox.stub(ReactDOM, 'render')
+  const spans = [1, 2, 3].map(() => addSpan('submission-missing-pill'))
+  StatusPill.renderPills()
 
-  const calls = spans.map((_span, idx) => stubbedRender.getCall(idx));
-
-  calls.forEach((call, idx) => {
-    equal(call.args[0].type, Pill);
-    equal(call.args[0].props.text, 'missing');
-    equal(call.args[1], spans[idx]);
-  });
-});
-
-test('renderPills mounts a <Pill /> with correct text to each .submission-late-pill', function () {
-  const stubbedRender = sandbox.stub(ReactDOM, 'render');
-  const spans = [1, 2, 3].map(() => addSpan('submission-late-pill'));
-  StatusPill.renderPills();
-
-  const calls = spans.map((_span, idx) => stubbedRender.getCall(idx));
+  const calls = spans.map((_span, idx) => stubbedRender.getCall(idx))
 
   calls.forEach((call, idx) => {
-    equal(call.args[0].type, Pill);
-    equal(call.args[0].props.text, 'late');
-    equal(call.args[1], spans[idx]);
-  });
-});
+    equal(call.args[0].type, Pill)
+    equal(call.args[0].props.text, 'missing')
+    equal(call.args[1], spans[idx])
+  })
+})
+
+test('renderPills mounts a <Pill /> with correct text to each .submission-late-pill', function() {
+  const stubbedRender = sandbox.stub(ReactDOM, 'render')
+  const spans = [1, 2, 3].map(() => addSpan('submission-late-pill'))
+  StatusPill.renderPills()
+
+  const calls = spans.map((_span, idx) => stubbedRender.getCall(idx))
+
+  calls.forEach((call, idx) => {
+    equal(call.args[0].type, Pill)
+    equal(call.args[0].props.text, 'late')
+    equal(call.args[1], spans[idx])
+  })
+})

@@ -19,7 +19,7 @@
 import AssignmentMuter from 'coffeescripts/AssignmentMuter'
 import $ from 'jquery'
 
-QUnit.module('AssignmentMuter', (suiteHooks) => {
+QUnit.module('AssignmentMuter', suiteHooks => {
   let assignment
   let responseAssignment
 
@@ -34,7 +34,7 @@ QUnit.module('AssignmentMuter', (suiteHooks) => {
     return muter
   }
 
-  QUnit.module('#afterUpdate', (hooks) => {
+  QUnit.module('#afterUpdate', hooks => {
     hooks.beforeEach(() => {
       sinon.stub($, 'publish')
     })
@@ -89,7 +89,13 @@ QUnit.module('AssignmentMuter', (suiteHooks) => {
         const setterFn = sinon.stub()
         const muter = createAssignmentMuter(setterFn)
         muter.afterUpdate({assignment: responseAssignment})
-        ok(setterFn.calledWith(assignment, 'anonymize_students', responseAssignment.anonymize_students))
+        ok(
+          setterFn.calledWith(
+            assignment,
+            'anonymize_students',
+            responseAssignment.anonymize_students
+          )
+        )
       })
 
       test('sets muted via the setter function', () => {

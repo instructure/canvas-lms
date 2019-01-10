@@ -23,7 +23,7 @@ const listUrl = () => ENV.ENROLLMENT_TERMS_URL
 const deserializeTerms = termGroups =>
   _.flatten(
     _.map(termGroups, group =>
-      _.map(group.enrollment_terms, (term) => {
+      _.map(group.enrollment_terms, term => {
         const groupID = term.grading_period_group_id
         const newGroupID = _.isNumber(groupID) ? groupID.toString() : groupID
         return {
@@ -32,14 +32,14 @@ const deserializeTerms = termGroups =>
           startAt: term.start_at ? new Date(term.start_at) : null,
           endAt: term.end_at ? new Date(term.end_at) : null,
           createdAt: term.created_at ? new Date(term.created_at) : null,
-          gradingPeriodGroupId: newGroupID,
+          gradingPeriodGroupId: newGroupID
         }
       })
     )
   )
 
 export default {
-  list (terms) {
+  list(terms) {
     return new Promise((resolve, reject) => {
       Depaginate(listUrl())
         .then(response => resolve(deserializeTerms(response)))

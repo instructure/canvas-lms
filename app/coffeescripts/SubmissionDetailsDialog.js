@@ -16,17 +16,16 @@ import 'jquery.instructure_misc_plugins'
 import 'vendor/jquery.scrollTo'
 import 'vendor/jquery.ba-tinypubsub'
 
-
 export default class SubmissionDetailsDialog {
-  constructor (assignment, student, options) {
+  constructor(assignment, student, options) {
     this.assignment = assignment
     this.student = student
     this.options = options
-    const speedGraderUrl = this.options.speed_grader_enabled
-      ? this.buildSpeedGraderUrl()
-      : null
+    const speedGraderUrl = this.options.speed_grader_enabled ? this.buildSpeedGraderUrl() : null
 
-    this.url = this.options.change_grade_url.replace(':assignment', this.assignment.id).replace(':submission', this.student.id)
+    this.url = this.options.change_grade_url
+      .replace(':assignment', this.assignment.id)
+      .replace(':submission', this.student.id)
     const submission = this.student[`assignment_${this.assignment.id}`]
     this.submission = $.extend({}, submission, {
       label: `student_grading_${this.assignment.id}`,
@@ -58,10 +57,12 @@ export default class SubmissionDetailsDialog {
       this.$el.remove()
     })
     this.dialog
-      .delegate('select[id="submission_to_view"]', 'change', event => this.dialog.find('.submission_detail').each(function (index) {
-        $(this).showIf(index === event.currentTarget.selectedIndex)
-      }))
-      .delegate('.submission_details_grade_form', 'submit', (event) => {
+      .delegate('select[id="submission_to_view"]', 'change', event =>
+        this.dialog.find('.submission_detail').each(function(index) {
+          $(this).showIf(index === event.currentTarget.selectedIndex)
+        })
+      )
+      .delegate('.submission_details_grade_form', 'submit', event => {
         event.preventDefault()
         let formData = $(event.currentTarget).getFormData()
         const rawGrade = formData['submission[posted_grade]']
@@ -71,10 +72,13 @@ export default class SubmissionDetailsDialog {
           formData['submission[posted_grade]'] = GradeFormatHelper.delocalizeGrade(rawGrade)
         }
         $(event.currentTarget.form).disableWhileLoading(
-          $.ajaxJSON(this.url, 'PUT', formData, (data) => {
+          $.ajaxJSON(this.url, 'PUT', formData, data => {
             this.update(data)
             if (!data.excused) {
-              const outlierScoreHelper = new OutlierScoreHelper(this.submission.score, this.submission.assignment.points_possible)
+              const outlierScoreHelper = new OutlierScoreHelper(
+                this.submission.score,
+                this.submission.assignment.points_possible
+              )
               if (outlierScoreHelper.hasWarning()) {
                 $.flashWarning(outlierScoreHelper.warningMessage())
               }
@@ -84,17 +88,19 @@ export default class SubmissionDetailsDialog {
           })
         )
       })
-      .delegate('.submission_details_add_comment_form', 'submit', (event) => {
+      .delegate('.submission_details_add_comment_form', 'submit', event => {
         event.preventDefault()
         $(event.currentTarget).disableWhileLoading(
-          $.ajaxJSON(this.url, 'PUT', $(event.currentTarget).getFormData(), (data) => {
+          $.ajaxJSON(this.url, 'PUT', $(event.currentTarget).getFormData(), data => {
             this.update(data)
             setTimeout(() => this.dialog.dialog('close'), 500)
           })
         )
       })
 
-    const url = `${this.url}&include[]=submission_history&include[]=submission_comments&include[]=rubric_assessment`
+    const url = `${
+      this.url
+    }&include[]=submission_history&include[]=submission_comments&include[]=rubric_assessment`
     const deferred = $.ajaxJSON(url, 'GET', {}, this.update)
     this.dialog.find('.submission_details_comments').disableWhileLoading(deferred)
   }
@@ -113,33 +119,41 @@ export default class SubmissionDetailsDialog {
     $('.ui-dialog-titlebar-close').focus()
   }
 
-  scrollCommentsToBottom = () =>
-    this.dialog.find('.submission_details_comments').scrollTop(999999)
+  scrollCommentsToBottom = () => this.dialog.find('.submission_details_comments').scrollTop(999999)
 
-
-  update = (newData) => {
+  update = newData => {
     $.extend(this.submission, newData)
     this.submission.moreThanOneSubmission = this.submission.submission_history.length > 1
     this.submission.loading = false
-    this.submission.submission_history.forEach((submission) => {
-      submission.submission_comments && submission.submission_comments.forEach((comment) => {
-        comment.url = `${this.options.context_url}/users/${comment.author_id}`
-        const urlPrefix = `${location.protocol}//${location.host}`
-        comment.image_url = `${urlPrefix}/images/users/${comment.author_id}`
-      })
-      submission.turnitin = extractDataForTurnitin(submission, `submission_${submission.id}`, this.options.context_url)
-      submission.attachments && submission.attachments.forEach((attachment) => {
-        attachment.turnitin = extractDataForTurnitin(submission, `attachment_${attachment.id}`, this.options.context_url)
-      })
+    this.submission.submission_history.forEach(submission => {
+      submission.submission_comments &&
+        submission.submission_comments.forEach(comment => {
+          comment.url = `${this.options.context_url}/users/${comment.author_id}`
+          const urlPrefix = `${location.protocol}//${location.host}`
+          comment.image_url = `${urlPrefix}/images/users/${comment.author_id}`
+        })
+      submission.turnitin = extractDataForTurnitin(
+        submission,
+        `submission_${submission.id}`,
+        this.options.context_url
+      )
+      submission.attachments &&
+        submission.attachments.forEach(attachment => {
+          attachment.turnitin = extractDataForTurnitin(
+            submission,
+            `attachment_${attachment.id}`,
+            this.options.context_url
+          )
+        })
     })
 
     if (this.options.anonymous) {
-      this.submission.submission_comments.forEach((comment) => {
-        if(comment.author.id !== ENV.current_user_id) {
-          comment.anonymous = comment.author.anonymous = true;
-          comment.author_name = I18n.t('Student');
+      this.submission.submission_comments.forEach(comment => {
+        if (comment.author.id !== ENV.current_user_id) {
+          comment.anonymous = comment.author.anonymous = true
+          comment.author_name = I18n.t('Student')
         }
-      });
+      })
     }
 
     if (this.submission.excused) {
@@ -152,7 +166,7 @@ export default class SubmissionDetailsDialog {
     return this.scrollCommentsToBottom()
   }
 
-  static open (assignment, student, options) {
+  static open(assignment, student, options) {
     return new SubmissionDetailsDialog(assignment, student, options).open()
   }
 }

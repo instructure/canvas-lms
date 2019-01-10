@@ -117,11 +117,19 @@ test('it uses vericite type if vericite data is present', () => {
 
 test('returns undefined for score if originality_score is blank', () => {
   submissionWithReport.turnitin_data.attachment_103.similarity_score = null
-  const tii_data = Turnitin.extractDataForTurnitin(submissionWithReport, 'attachment_103', '/courses/2')
+  const tii_data = Turnitin.extractDataForTurnitin(
+    submissionWithReport,
+    'attachment_103',
+    '/courses/2'
+  )
   equal(tii_data.score, undefined)
 })
 
 test('returns the score percentage if originality_score is present', () => {
-  const tii_data = Turnitin.extractDataForTurnitin(submissionWithReport, 'attachment_103', '/courses/2')
+  const tii_data = Turnitin.extractDataForTurnitin(
+    submissionWithReport,
+    'attachment_103',
+    '/courses/2'
+  )
   equal(tii_data.score, '0.8%')
 })

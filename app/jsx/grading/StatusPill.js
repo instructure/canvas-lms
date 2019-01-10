@@ -16,28 +16,28 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import ReactDOM from 'react-dom';
-import Pill from '@instructure/ui-elements/lib/components/Pill';
-import I18n from 'i18n!gradebook';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import Pill from '@instructure/ui-elements/lib/components/Pill'
+import I18n from 'i18n!gradebook'
 
-function forEachNode (nodeList, fn) {
+function forEachNode(nodeList, fn) {
   for (let i = 0; i < nodeList.length; i += 1) {
-    fn(nodeList[i]);
+    fn(nodeList[i])
   }
 }
 
 export default {
-  renderPills () {
-    const missMountPoints = document.querySelectorAll('.submission-missing-pill');
-    const lateMountPoints = document.querySelectorAll('.submission-late-pill');
+  renderPills() {
+    const missMountPoints = document.querySelectorAll('.submission-missing-pill')
+    const lateMountPoints = document.querySelectorAll('.submission-late-pill')
 
-    forEachNode(missMountPoints, (mountPoint) => {
-      ReactDOM.render(<Pill variant="danger" text={I18n.t('missing')} />, mountPoint);
-    });
+    forEachNode(missMountPoints, mountPoint => {
+      ReactDOM.render(<Pill variant="danger" text={I18n.t('missing')} />, mountPoint)
+    })
 
-    forEachNode(lateMountPoints, (mountPoint) => {
-      ReactDOM.render(<Pill variant="danger" text={I18n.t('late')} />, mountPoint);
-    });
+    forEachNode(lateMountPoints, mountPoint => {
+      ReactDOM.render(<Pill variant="danger" text={I18n.t('late')} />, mountPoint)
+    })
   }
-};
+}
