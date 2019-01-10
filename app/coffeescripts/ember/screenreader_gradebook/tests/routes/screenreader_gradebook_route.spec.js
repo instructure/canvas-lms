@@ -37,12 +37,12 @@ QUnit.module('ScreenreaderGradebookRoute', suiteHooks => {
     contextHooks.beforeEach(() => {
       originalENV = window.ENV
       window.ENV.GRADEBOOK_OPTIONS = {
-        custom_columns_url: "custom_columns",
-        enrollments_url: "enrollments",
-        final_grade_overrides_url: "final_grade_overrides",
-        sections_url: "sections",
-        outcome_links_url: "outcome_links",
-        outcome_rollups_url: "outcome_rollups"
+        custom_columns_url: 'custom_columns',
+        enrollments_url: 'enrollments',
+        final_grade_overrides_url: 'final_grade_overrides',
+        sections_url: 'sections',
+        outcome_links_url: 'outcome_links',
+        outcome_rollups_url: 'outcome_rollups'
       }
       route = ScreenreaderGradebookRoute.create()
     })
@@ -62,9 +62,9 @@ QUnit.module('ScreenreaderGradebookRoute', suiteHooks => {
       })
 
       test('sets isLoaded to true after records are loaded', async () => {
-        const apiStub = sinon.stub(FinalGradeOverrideApi, 'getFinalGradeOverrides').returns(
-          Promise.resolve({status: 200})
-        )
+        const apiStub = sinon
+          .stub(FinalGradeOverrideApi, 'getFinalGradeOverrides')
+          .returns(Promise.resolve({status: 200}))
         const model = await route.model()
         strictEqual(model.final_grade_overrides.isLoaded, true)
         apiStub.restore()
@@ -72,16 +72,16 @@ QUnit.module('ScreenreaderGradebookRoute', suiteHooks => {
 
       test('sets content after records are loaded', async () => {
         const overrideData = {
-          "23": {
+          '23': {
             courseGrade: {
               percentage: 91.1
             },
             gradingPeriodGrades: {}
           }
         }
-        const apiStub = sinon.stub(FinalGradeOverrideApi, 'getFinalGradeOverrides').returns(
-          Promise.resolve({finalGradeOverrides: overrideData})
-        )
+        const apiStub = sinon
+          .stub(FinalGradeOverrideApi, 'getFinalGradeOverrides')
+          .returns(Promise.resolve({finalGradeOverrides: overrideData}))
         const model = await route.model()
         deepEqual(model.final_grade_overrides.content, {finalGradeOverrides: overrideData})
         apiStub.restore()

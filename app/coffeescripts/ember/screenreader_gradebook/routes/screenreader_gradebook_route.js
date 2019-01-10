@@ -33,10 +33,13 @@ const ScreenreaderGradebookRoute = Route.extend({
     if (ENV.GRADEBOOK_OPTIONS.final_grade_override_enabled) {
       const records = ObjectProxy.create({content: {}, isLoaded: false})
 
-      records.set('promise', getFinalGradeOverrides(ENV.GRADEBOOK_OPTIONS.context_id).then(data => {
-        records.set('isLoaded', true)
-        records.set('content', data)
-      }))
+      records.set(
+        'promise',
+        getFinalGradeOverrides(ENV.GRADEBOOK_OPTIONS.context_id).then(data => {
+          records.set('isLoaded', true)
+          records.set('content', data)
+        })
+      )
       model.final_grade_overrides = records
     }
 

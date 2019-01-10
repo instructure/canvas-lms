@@ -42,7 +42,7 @@ const FinalGradeOverrideComponent = Ember.Component.extend({
       return null
     }
     return GradeFormatHelper.formatGrade(percentage, {gradingType: 'percent'})
-  }.property('finalGradeOverrides'),
+  }.property('finalGradeOverrides')
 })
 
 export default FinalGradeOverrideComponent

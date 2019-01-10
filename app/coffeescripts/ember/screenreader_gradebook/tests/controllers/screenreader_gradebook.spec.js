@@ -1129,7 +1129,9 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
     test('updateShowFinalGradeOverride passes the updated setting state', () => {
       const ajaxRequestSpy = sinon.spy(ajax, 'request')
       srgb.set('showFinalGradeOverride', false)
-      deepEqual(ajaxRequestSpy.firstCall.args[0].data.gradebook_settings, {show_final_grade_overrides: false})
+      deepEqual(ajaxRequestSpy.firstCall.args[0].data.gradebook_settings, {
+        show_final_grade_overrides: false
+      })
       ajaxRequestSpy.restore()
     })
   })
@@ -1148,23 +1150,26 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
       student = srgb.get('students.firstObject')
 
       srgb.set('selectedStudent', student)
-      srgb.set('final_grade_overrides', ObjectProxy.create({
-        content: {
-          finalGradeOverrides: {
-            [student.id]: {
-              courseGrade: {
-                percentage: 67.1
-              },
-              gradingPeriodGrades: {
-                1: {
-                  percentage: 93.2
+      srgb.set(
+        'final_grade_overrides',
+        ObjectProxy.create({
+          content: {
+            finalGradeOverrides: {
+              [student.id]: {
+                courseGrade: {
+                  percentage: 67.1
+                },
+                gradingPeriodGrades: {
+                  1: {
+                    percentage: 93.2
+                  }
                 }
               }
             }
-          }
-        },
-        isLoaded: true
-      }))
+          },
+          isLoaded: true
+        })
+      )
     })
 
     test('returns the overrides for the given grading period', () => {

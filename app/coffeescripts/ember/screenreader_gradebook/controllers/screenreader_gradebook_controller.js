@@ -252,7 +252,9 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
       return false
     }
     return ENV.GRADEBOOK_OPTIONS.settings.show_final_grade_overrides === 'true'
-  }.property().volatile(),
+  }
+    .property()
+    .volatile(),
 
   updateShowFinalGradeOverride: function() {
     ajax.request({
@@ -283,7 +285,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
       return
     }
 
-    if (gradingPeriodId === "0" || gradingPeriodId == null) {
+    if (gradingPeriodId === '0' || gradingPeriodId == null) {
       return overridesForStudent.courseGrade
     }
 

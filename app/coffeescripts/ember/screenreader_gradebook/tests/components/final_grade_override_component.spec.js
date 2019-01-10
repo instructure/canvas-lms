@@ -27,7 +27,7 @@ QUnit.module('FinalGradeOverrideComponent', hooks => {
     finalGradeOverrides = {
       percentage: 92.32
     }
-    const gradingStandard = [['A', 0.90], ['B', 0.80], ['C', 0.0]]
+    const gradingStandard = [['A', 0.9], ['B', 0.8], ['C', 0.0]]
     component = App.FinalGradeOverrideComponent.create({finalGradeOverrides, gradingStandard})
   })
 
