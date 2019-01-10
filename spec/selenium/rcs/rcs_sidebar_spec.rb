@@ -211,7 +211,20 @@ describe "RCS sidebar tests" do
       click_sidebar_link(title)
 
       in_frame wiki_page_body_ifr_id do
-        expect(wiki_body_anchor.attribute('href')).to include "/courses/#{@course.id}/modules/#{@module.id}"
+        expect(wiki_body_anchor.attribute('href')).to include module_id_path(@course, @module)
+      end
+    end
+
+    it "should click on assignment in sidebar to create link to it in discussion page" do
+      title = "Assignment-Title"
+      @assignment = @course.assignments.create!(:name => title)
+
+      visit_new_discussion_page(@course)
+      click_assignments_accordion
+      click_sidebar_link(title)
+
+      in_frame wiki_page_body_ifr_id do
+        expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(@course, @assignment)
       end
     end
   end

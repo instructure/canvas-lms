@@ -229,6 +229,10 @@ module WikiAndTinyCommon
     get "/courses/#{course.id}/assignments/new"
   end
 
+  def visit_new_discussion_page(course)
+    get "/courses/#{course.id}/discussion_topics/new"
+  end
+
   def edit_wiki_css
     f("form.edit-form .edit-content")
   end
