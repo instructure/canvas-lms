@@ -149,9 +149,8 @@ class GradingPeriodSetCollection extends React.Component {
   }
 
   onSetUpdated = updatedSet => {
-    const sets = _.map(
-      this.state.sets,
-      set => (set.id === updatedSet.id ? _.extend({}, set, updatedSet) : set)
+    const sets = _.map(this.state.sets, set =>
+      set.id === updatedSet.id ? _.extend({}, set, updatedSet) : set
     )
 
     const terms = _.map(this.state.enrollmentTerms, term => {
