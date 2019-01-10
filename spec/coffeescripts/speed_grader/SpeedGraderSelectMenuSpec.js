@@ -152,8 +152,18 @@ QUnit.module('SpeedGraderSelectMenu - rendered select control', {
         ],
         anonymizableId: 'id'
       },
-      {id: '3', name: 'Student 2', className: {raw: 'graded', formatted: 'graded'}, anonymizableId: 'id'},
-      {id: '1', name: 'Student 1', className: {raw: 'not_graded', formatted: 'not graded'}, anonymizableId: 'id'}
+      {
+        id: '3',
+        name: 'Student 2',
+        className: {raw: 'graded', formatted: 'graded'},
+        anonymizableId: 'id'
+      },
+      {
+        id: '1',
+        name: 'Student 1',
+        className: {raw: 'not_graded', formatted: 'not graded'},
+        anonymizableId: 'id'
+      }
     ]
     this.selectMenu = new SpeedgraderSelectMenu(this.optionsArray)
     this.selectMenu.appendTo('#test_area')

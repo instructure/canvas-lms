@@ -123,18 +123,32 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
 
   test('positions the "Custom" radio button first', () => {
     mountComponent()
-    strictEqual(wrapper.find('input').first().prop('value'), '3')
+    strictEqual(
+      wrapper
+        .find('input')
+        .first()
+        .prop('value'),
+      '3'
+    )
   })
 
   test('prepends a "Custom" radio button if no non-readonly grade is passed', () => {
-    const provisionalGrades = [{
-      grade: '11',
-      provisional_grade_id: '1',
-      scorer_id: '1',
-      readonly: true
-    }]
+    const provisionalGrades = [
+      {
+        grade: '11',
+        provisional_grade_id: '1',
+        scorer_id: '1',
+        readonly: true
+      }
+    ]
     mountComponent({provisionalGrades})
-    strictEqual(wrapper.find('input').first().prop('value'), 'custom')
+    strictEqual(
+      wrapper
+        .find('input')
+        .first()
+        .prop('value'),
+      'custom'
+    )
   })
 
   test('selects the first grade whose "selected" field is true', () => {
@@ -143,39 +157,66 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
   })
 
   test('selects the "Custom" button if no grade is selected', () => {
-    const provisionalGrades = [{
-      grade: '11',
-      provisional_grade_id: '1',
-      scorer_id: '1',
-      readonly: true
-    }]
+    const provisionalGrades = [
+      {
+        grade: '11',
+        provisional_grade_id: '1',
+        scorer_id: '1',
+        readonly: true
+      }
+    ]
     mountComponent({provisionalGrades})
     strictEqual(wrapper.find('input[value="custom"]').is('[checked]'), true)
   })
 
   test('includes the grader name in the button label', () => {
     mountComponent()
-    strictEqual(getRadioInput({value: '1'}).text().includes('Gradius'), true)
+    strictEqual(
+      getRadioInput({value: '1'})
+        .text()
+        .includes('Gradius'),
+      true
+    )
   })
 
   test('uses a label of "Custom" for the non-readonly button', () => {
     mountComponent()
-    strictEqual(getRadioInput({value: '3'}).text().includes('Custom'), true)
+    strictEqual(
+      getRadioInput({value: '3'})
+        .text()
+        .includes('Custom'),
+      true
+    )
   })
 
   test('includes the score for a provisional grade in the button label', () => {
     mountComponent()
-    strictEqual(getRadioInput({value: '1'}).text().includes('11'), true)
+    strictEqual(
+      getRadioInput({value: '1'})
+        .text()
+        .includes('11'),
+      true
+    )
   })
 
   test('includes the points possible for points-based assignments in the button label', () => {
     mountComponent({gradingType: 'points', pointsPossible: 123})
-    strictEqual(getRadioInput({value: '1'}).text().includes('out of 123'), true)
+    strictEqual(
+      getRadioInput({value: '1'})
+        .text()
+        .includes('out of 123'),
+      true
+    )
   })
 
   test('omits the points possible for non-points-based assignments in the button label', () => {
     mountComponent({gradingType: 'percent', pointsPossible: 123})
-    strictEqual(getRadioInput({value: '1'}).text().includes('out of 123'), false)
+    strictEqual(
+      getRadioInput({value: '1'})
+        .text()
+        .includes('out of 123'),
+      false
+    )
   })
 
   test('sorts provisional grades by anonymous grader ID if present', () => {
@@ -184,27 +225,29 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
         grade: '33',
         provisional_grade_id: '1',
         readonly: true,
-        anonymous_grader_id: 'ccccc',
+        anonymous_grader_id: 'ccccc'
       },
       {
         grade: '22',
         provisional_grade_id: '2',
         readonly: true,
-        anonymous_grader_id: 'aaaaa',
+        anonymous_grader_id: 'aaaaa'
       },
       {
         grade: '11',
         provisional_grade_id: '3',
         readonly: true,
-        anonymous_grader_id: 'bbbbb',
+        anonymous_grader_id: 'bbbbb'
       }
     ]
 
     mountComponent({provisionalGrades})
-    deepEqual(
-      wrapper.find('RadioInput').map(input => input.prop('value')),
-      ['custom', '2', '3', '1']
-    )
+    deepEqual(wrapper.find('RadioInput').map(input => input.prop('value')), [
+      'custom',
+      '2',
+      '3',
+      '1'
+    ])
   })
 
   test('sorts provisional grades by scorer ID if anonymous grader ID is not present', () => {
@@ -231,10 +274,12 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
     ]
 
     mountComponent({provisionalGrades})
-    deepEqual(
-      wrapper.find('RadioInput').map(input => input.prop('value')),
-      ['custom', '3', '2', '1']
-    )
+    deepEqual(wrapper.find('RadioInput').map(input => input.prop('value')), [
+      'custom',
+      '3',
+      '2',
+      '1'
+    ])
   })
 
   test('calls formatSubmissionGrade to render a provisional grade', () => {
@@ -245,7 +290,7 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
         provisional_grade_id: '1',
         readonly: true,
         scorer_id: '300'
-      },
+      }
     ]
 
     const formatSpy = sinon.spy(GradeFormatHelper, 'formatSubmissionGrade')
@@ -265,13 +310,13 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
         provisional_grade_id: '1',
         readonly: true,
         scorer_id: '300'
-      },
+      }
     ]
 
     const formatSpy = sinon.spy(GradeFormatHelper, 'formatSubmissionGrade')
     mountComponent({provisionalGrades})
 
-    const [,options] = formatSpy.firstCall.args
+    const [, options] = formatSpy.firstCall.args
     strictEqual(options.formatType, 'points')
 
     formatSpy.restore()
