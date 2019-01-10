@@ -29,10 +29,7 @@ module Utf8Cleaner
   # report to the db.
   def self.strip_invalid_utf8(string)
     return string if string.nil?
-    unless string.encoding == Encoding::UTF_8
-      new_string = string.force_encoding(Encoding::UTF_8)
-      string = new_string if new_string.valid_encoding?
-    end
+    string = String.new(string, encoding: Encoding::UTF_8) unless string.encoding == Encoding::UTF_8
 
     string = string.encode("UTF-8", :undef => :replace, :invalid => :replace, :replace => '')
     # Strip ASCII backspace and delete characters
