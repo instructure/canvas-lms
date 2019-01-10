@@ -103,7 +103,6 @@ describe 'Final Grade Override' do
       end
 
       it 'displays overridden grade for student grades', priority: '1', test_id: 3682131 do
-        skip('GRADE-1931')
         user_session(@students.first)
         StudentGradesPage.visit_as_student(@course)
         expect(StudentGradesPage.final_grade.text).to eql "90%"

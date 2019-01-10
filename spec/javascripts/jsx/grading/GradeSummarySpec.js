@@ -92,11 +92,9 @@ function setPageHtmlFixture() {
       <div id="student-grades-right-content">
         <div class="student_assignment final_grade">
           <span class="grade"></span>
-          <span class="final_letter_grade">
           (
-            <span id="final_letter_grade_text" class="grade"></span>
+            <span id="final_letter_grade_text" class="letter_grade">–</span>
           )
-          </span>
           <span class="score_teaser"></span>
         </div>
         <div id="student-grades-whatif" class="show_guess_grades" style="display: none;">
@@ -349,37 +347,80 @@ QUnit.module('GradeSummary.calculateTotals', (suiteHooks) => {
   QUnit.module('final grade override', (contextHooks) => {
     contextHooks.beforeEach(() => {
       exampleGrades = createExampleGrades()
+      exampleGrades.current = {score: 23, possible: 100}
       ENV.grading_scheme = [['A', 0.90], ['B', 0.80], ['C', 0.70], ['D', 0.60], ['F', 0]]
     })
 
-    test('sets the final letter grade to the effective final grade, if present', () => {
-      ENV.effective_final_grade = 'D-'
+    test('sets the percent grade to the corresponding lower bound of the effective grade', () => {
+      ENV.effective_final_score = 72
       GradeSummary.calculateTotals(exampleGrades, 'current', 'percent')
-      const $grade = $fixtures.find('.final_letter_grade .grade')
-      strictEqual($grade.text(), 'D-')
-    })
-
-    test('sets the final letter grade to the calculated final grade, if not present', () => {
-      GradeSummary.calculateTotals(exampleGrades, 'current', 'percent')
-      const $grade = $fixtures.find('.final_letter_grade .grade')
-      strictEqual($grade.text(), 'F')
-    })
-
-    test('sets the percent grade to the corresponding value of the effective grade, if present', () => {
-      ENV.effective_final_grade = 'C'
-      GradeSummary.calculateTotals(exampleGrades, 'current', 'percent')
-      const $grade = $fixtures.find('.student_assignment.final_grade .grade').first()
+      const $grade = $fixtures.find('.final_grade .grade').first()
       strictEqual($grade.text(), '70%')
     })
 
+    test('sets the letter grade to the effective grade', () => {
+      ENV.effective_final_score = 72
+      GradeSummary.calculateTotals(exampleGrades, 'current', 'percent')
+      const $grade = $fixtures.find('.final_grade .letter_grade')
+      strictEqual($grade.text(), 'C')
+    })
+
+    test('sets the percent grade to the calculated percent grade, if overrides not present', () => {
+      GradeSummary.calculateTotals(exampleGrades, 'current', 'percent')
+      const $grade = $fixtures.find('.final_grade .grade').first()
+      strictEqual($grade.text(), '23%')
+    })
+
+    test('sets the letter grade to the calculated letter grade, if overrides not present', () => {
+      GradeSummary.calculateTotals(exampleGrades, 'current', 'percent')
+      const $grade = $fixtures.find('.final_grade .letter_grade')
+      strictEqual($grade.text(), 'F')
+    })
+
     test('changed What-If scores take precedence over the effective grade', () => {
-      ENV.effective_final_grade = 'C'
-      exampleGrades.current = {score: 3, possible: 10 }
+      ENV.effective_final_score = 72
+      exampleGrades.current = {score: 3, possible: 10}
       const changedGrade = '<span class="grade changed">3</span>'
       $fixtures.find('.score_holder .tooltip').html(changedGrade)
       GradeSummary.calculateTotals(exampleGrades, 'current', 'percent')
-      const $grade = $fixtures.find('.student_assignment.final_grade .grade').first()
+      const $grade = $fixtures.find('.final_grade .grade').first()
       strictEqual($grade.text(), '30%')
+    })
+
+    test('override score of 0 results in a 0%', () => {
+      ENV.effective_final_score = 0
+      GradeSummary.calculateTotals(exampleGrades, 'current', 'percent')
+      const $grade = $fixtures.find('.final_grade .grade').first()
+      strictEqual($grade.text(), '0%')
+    })
+
+    test('override score of 0 results in an F letter grade', () => {
+      ENV.effective_final_score = 0
+      GradeSummary.calculateTotals(exampleGrades, 'current', 'percent')
+      const $grade = $fixtures.find('.final_grade .letter_grade').first()
+      strictEqual($grade.text(), 'F')
+    })
+
+    // At present, ENV.grading_scheme is always present, but that may change
+    // some day if there's no longer a need to always send it back (in other
+    // parts of Canvas, it's only present when a grading scheme is enabled),
+    // so this is a defensive test.
+    test('when a grading scheme is not present, but an override is, the raw override score is shown', () => {
+      delete ENV.grading_scheme
+      ENV.effective_final_score = 72
+      GradeSummary.calculateTotals(exampleGrades, 'current', 'percent')
+      const $grade = $fixtures.find('.final_grade .grade').first()
+      strictEqual($grade.text(), '72%')
+    })
+
+    // This test is necessary because GradeSummary determines if a grading
+    // scheme is present via the presence of this span.
+    test('when the .letter_grade span is not present, the raw override score is shown', () => {
+      $('.final_grade .letter_grade').remove()
+      ENV.effective_final_score = 72
+      GradeSummary.calculateTotals(exampleGrades, 'current', 'percent')
+      const $grade = $fixtures.find('.final_grade .grade').first()
+      strictEqual($grade.text(), '72%')
     })
   })
 })
