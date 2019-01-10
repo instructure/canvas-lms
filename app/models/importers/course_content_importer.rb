@@ -183,6 +183,30 @@ module Importers
         Canvas::Migration::ExternalContent::Migrator.send_imported_content(migration, data['external_content'])
       end
 
+      adjust_dates(course, migration)
+
+      migration.progress=100
+      migration.migration_settings ||= {}
+
+      imported_asset_hash = {}
+      migration.imported_migration_items_hash.each{|k, assets| imported_asset_hash[k] = assets.values.map(&:id).join(',') if assets.present?}
+      migration.migration_settings[:imported_assets] = imported_asset_hash
+      migration.workflow_state = :imported unless post_processing?(migration)
+      migration.save
+      ActiveRecord::Base.skip_touch_context(false)
+      if course.changed?
+        course.save!
+      else
+        course.touch
+      end
+
+      DueDateCacher.recompute_course(course, update_grades: true, executing_user: migration.user)
+
+      Auditors::Course.record_copied(migration.source_course, course, migration.user, source: migration.initiated_source)
+      migration.imported_migration_items
+    end
+
+    def self.adjust_dates(course, migration)
       begin
         #Adjust dates
         if shift_options = migration.date_shift_options
@@ -196,6 +220,9 @@ module Importers
               event.unlock_at = shift_date(event.unlock_at, shift_options)
               event.peer_reviews_due_at = shift_date(event.peer_reviews_due_at, shift_options)
               event.save_without_broadcasting
+              if event.errors.any?
+                migration.add_warning(t("Couldn't adjust dates on assignment %{name} (ID %{id})", name: event.name, id: event.id.to_s))
+              end
             end
           end
 
@@ -277,25 +304,6 @@ module Importers
       rescue
         migration.add_warning(t(:due_dates_warning, "Couldn't adjust the due dates."), $!)
       end
-      migration.progress=100
-      migration.migration_settings ||= {}
-
-      imported_asset_hash = {}
-      migration.imported_migration_items_hash.each{|k, assets| imported_asset_hash[k] = assets.values.map(&:id).join(',') if assets.present?}
-      migration.migration_settings[:imported_assets] = imported_asset_hash
-      migration.workflow_state = :imported unless post_processing?(migration)
-      migration.save
-      ActiveRecord::Base.skip_touch_context(false)
-      if course.changed?
-        course.save!
-      else
-        course.touch
-      end
-
-      DueDateCacher.recompute_course(course, update_grades: true, executing_user: migration.user)
-
-      Auditors::Course.record_copied(migration.source_course, course, migration.user, source: migration.initiated_source)
-      migration.imported_migration_items
     end
 
     def self.post_processing?(migration)
