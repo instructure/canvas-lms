@@ -16,20 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import PropTypes from 'prop-types';
-import React from 'react';
-import Select from '@instructure/ui-core/lib/components/Select';
+import PropTypes from 'prop-types'
+import React from 'react'
+import Select from '@instructure/ui-core/lib/components/Select'
 
-export default function SelectMenu (props) {
-  const options = props.options.map((option) => {
-    const text = option[props.textAttribute];
-    const value = option[props.valueAttribute];
-    return(
+export default function SelectMenu(props) {
+  const options = props.options.map(option => {
+    const text = option[props.textAttribute]
+    const value = option[props.valueAttribute]
+    return (
       <option key={value} value={value}>
         {text}
       </option>
-    );
-  });
+    )
+  })
 
   return (
     <Select
@@ -43,7 +43,7 @@ export default function SelectMenu (props) {
     >
       {options}
     </Select>
-  );
+  )
 }
 
 SelectMenu.propTypes = {
@@ -55,4 +55,4 @@ SelectMenu.propTypes = {
   options: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.array, PropTypes.object])).isRequired,
   textAttribute: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   valueAttribute: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired
-};
+}

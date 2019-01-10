@@ -138,7 +138,10 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
   }
 
   function getTextInput() {
-    return wrapper.find('input').at(0).instance()
+    return wrapper
+      .find('input')
+      .at(0)
+      .instance()
   }
 
   async function clickInputToOpenMenu() {
