@@ -350,13 +350,39 @@ describe "Gradezilla" do
       check_element_has_focus Gradezilla.assignment_header_menu_trigger_element(assignment.title)
     end
 
-    %w[message-students-who curve-grades set-default-grade assignment-muter download-submissions].each do |dialog|
-      it "is placed on assignment header trigger upon #{dialog} dialog close" do
-        Gradezilla.click_assignment_header_menu_element(assignment.id,dialog)
-        Gradezilla.close_open_dialog
+    it 'is placed on assignment header trigger upon "message students who" dialog close' do
+      Gradezilla.click_assignment_header_menu_element(assignment.id, 'message students -who')
+      Gradezilla.close_open_dialog
 
-        check_element_has_focus Gradezilla.assignment_header_menu_trigger_element(assignment.title)
-      end
+      check_element_has_focus Gradezilla.assignment_header_menu_trigger_element(assignment.title)
+    end
+
+    it 'is placed on assignment header trigger upon "curve grades" dialog close' do
+      Gradezilla.click_assignment_header_menu_element(assignment.id, 'curve grades')
+      Gradezilla.close_open_dialog
+
+      check_element_has_focus Gradezilla.assignment_header_menu_trigger_element(assignment.title)
+    end
+
+    it 'is placed on assignment header trigger upon "set default grade" dialog close' do
+      Gradezilla.click_assignment_header_menu_element(assignment.id, 'set default grade')
+      Gradezilla.close_open_dialog
+
+      check_element_has_focus Gradezilla.assignment_header_menu_trigger_element(assignment.title)
+    end
+
+    it 'is placed on assignment header trigger upon "assignment muting" dialog close' do
+      Gradezilla.click_assignment_header_menu_element(assignment.id, 'assignment muter')
+      Gradezilla.close_open_dialog
+
+      check_element_has_focus Gradezilla.assignment_header_menu_trigger_element(assignment.title)
+    end
+
+    it 'is placed on assignment header trigger upon "download submissions" dialog close' do
+      Gradezilla.click_assignment_header_menu_element(assignment.id, 'download submissions')
+      Gradezilla.close_open_dialog
+
+      check_element_has_focus Gradezilla.assignment_header_menu_trigger_element(assignment.title)
     end
   end
 end

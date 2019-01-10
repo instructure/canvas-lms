@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import I18n from 'i18n!gradebook'
-import SetDefaultGradeDialog from 'compiled/gradezilla/SetDefaultGradeDialog'
+import SetDefaultGradeDialog from 'compiled/shared/SetDefaultGradeDialog'
 import 'compiled/jquery.rails_flash_notifications'
 
 class SetDefaultGradeDialogManager {

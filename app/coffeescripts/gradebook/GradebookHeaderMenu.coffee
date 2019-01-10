@@ -22,7 +22,7 @@ define [
   'message_students'
   '../AssignmentDetailsDialog'
   '../AssignmentMuter'
-  '../gradebook/SetDefaultGradeDialog'
+  '../shared/SetDefaultGradeDialog'
   '../shared/CurveGradesDialog'
   'jst/gradebook/GradebookHeaderMenu'
   'jst/re_upload_submissions_form'
@@ -138,7 +138,7 @@ define [
       settings = MessageStudentsWhoHelper.settings(assignment, students)
       messageStudents(settings)
 
-    setDefaultGrade: (opts = { assignment: @assignment, students: @gradebook.studentsThatCanSeeAssignment(@gradebook.students, @assignment), context_id: @gradebook.options.context_id, selected_section: @gradebook.sectionToShow}) =>
+    setDefaultGrade: (opts = { assignment: @assignment, students: @gradebook.studentsThatCanSeeAssignment(@gradebook.students, @assignment), context_id: @gradebook.options.context_id, selected_section: @gradebook.sectionToShow }) =>
       if isAdmin() or not opts.assignment.inClosedGradingPeriod
         new SetDefaultGradeDialog(opts).show()
       else

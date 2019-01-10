@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 define [
-  'i18n!gradezilla'
+  'i18n!gradebook'
   'jquery'
   'jst/SetDefaultGradeDialog'
   'underscore'
@@ -36,9 +36,9 @@ define [
   PAGE_SIZE = 50
 
   class SetDefaultGradeDialog
-    constructor: ({@assignment, @students, @context_id, @selected_section}) ->
+    constructor: ({@assignment, @students, @context_id, @selected_section, @onClose = ->}) ->
 
-    show: (onClose) =>
+    show: (onClose = @onClose) =>
       templateLocals =
         assignment: @assignment
         showPointsPossible: (@assignment.points_possible || @assignment.points_possible == '0') && @assignment.grading_type != "gpa_scale"
@@ -49,10 +49,10 @@ define [
       @$dialog.dialog(
         resizable: false
         width: 350
-        open: => @$dialog.find(".grading_box").focus()
-        close: => @$dialog.remove()
       ).fixDialogButtons()
-      @$dialog.on 'dialogclose', onClose
+      @$dialog.on 'dialogclose', =>
+        onClose()
+        @$dialog.remove()
 
       $form = @$dialog
       $(".ui-dialog-titlebar-close").focus()
@@ -85,7 +85,6 @@ define [
             ,
               count: submissions.length)
             submittingDfd.resolve()
-            $("#set_default_grade").focus()
             @$dialog.dialog('close')
 
       getStudents = =>

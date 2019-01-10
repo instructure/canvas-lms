@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 
-import SetDefaultGradeDialog from 'compiled/gradezilla/SetDefaultGradeDialog'
+import SetDefaultGradeDialog from 'compiled/shared/SetDefaultGradeDialog'
 import SetDefaultGradeDialogManager from 'jsx/gradezilla/shared/SetDefaultGradeDialogManager'
 
 function createAssignmentProp() {

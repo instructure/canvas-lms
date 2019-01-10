@@ -18,20 +18,21 @@
 
 import $ from 'jquery'
 import Assignment from 'compiled/models/Assignment'
-import SetDefaultGradeDialog from 'compiled/gradezilla/SetDefaultGradeDialog'
+import SetDefaultGradeDialog from 'compiled/shared/SetDefaultGradeDialog'
 import 'jst/SetDefaultGradeDialog'
 
 QUnit.module('SetDefaultGradeDialog', {
   setup() {
     this.assignment = new Assignment({
       id: 1,
-      points_possible: 10
+      points_possible: 10,
+      name: 'an Assignment'
     })
   },
   teardown() {
     $('.ui-dialog').remove()
     $('.use-css-transitions-for-show-hide').remove()
-    $('#set_default_grade_form').remove()
+    return $('#set_default_grade_form').remove()
   }
 })
 
@@ -51,14 +52,6 @@ test('#gradeIsExcused returns false if grade is not EX', function() {
   deepEqual(dialog.gradeIsExcused('F'), false)
   // this test documents that we do not consider 'excused' to return true
   deepEqual(dialog.gradeIsExcused('excused'), false)
-})
-
-test('when given callback for #show, invokes callback upon dialog close', function() {
-  const callback = sinon.stub()
-  const dialog = new SetDefaultGradeDialog({assignment: this.assignment})
-  dialog.show(callback)
-  $('button.ui-dialog-titlebar-close').click()
-  equal(callback.callCount, 1)
 })
 
 test('#show text', function() {
