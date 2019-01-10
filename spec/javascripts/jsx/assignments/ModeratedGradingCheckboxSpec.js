@@ -58,11 +58,14 @@ QUnit.module('ModeratedGradingCheckbox', hooks => {
     strictEqual(checkbox().instance().checked, true)
   })
 
-  test('enables the checkbox if no graded submissions exist, it is not a peer ' +
-  'review assignment, and it is not a group assignment', () => {
-    mountComponent()
-    strictEqual(checkbox().instance().disabled, false)
-  })
+  test(
+    'enables the checkbox if no graded submissions exist, it is not a peer ' +
+      'review assignment, and it is not a group assignment',
+    () => {
+      mountComponent()
+      strictEqual(checkbox().instance().disabled, false)
+    }
+  )
 
   test('disables the checkbox if graded submissions exist', () => {
     props.gradedSubmissionsExist = true

@@ -40,7 +40,9 @@ QUnit.module('GraderCommentVisibilityCheckbox', hooks => {
   }
 
   function formField() {
-    return wrapper.find('input[name="grader_comments_visible_to_graders"][type="hidden"]').instance()
+    return wrapper
+      .find('input[name="grader_comments_visible_to_graders"][type="hidden"]')
+      .instance()
   }
 
   test('renders a checkbox', () => {

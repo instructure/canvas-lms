@@ -22,7 +22,8 @@ import I18n from 'i18n!assignments'
 
 export default class FinalGraderSelectMenu extends React.Component {
   static propTypes = {
-    availableModerators: arrayOf(shape({name: string.isRequired, id: string.isRequired})).isRequired,
+    availableModerators: arrayOf(shape({name: string.isRequired, id: string.isRequired}))
+      .isRequired,
     finalGraderID: string
   }
 
@@ -54,9 +55,11 @@ export default class FinalGraderSelectMenu extends React.Component {
           onChange={this.handleSelectFinalGrader}
           value={this.state.selectedValue}
         >
-          {this.state.selectedValue === '' &&
-            <option key="select-grader" value="">{I18n.t('Select Grader')}</option>
-          }
+          {this.state.selectedValue === '' && (
+            <option key="select-grader" value="">
+              {I18n.t('Select Grader')}
+            </option>
+          )}
 
           {this.props.availableModerators.map(user => (
             <option key={user.id} value={user.id}>
