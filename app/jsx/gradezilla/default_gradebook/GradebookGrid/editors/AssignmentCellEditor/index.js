@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import ReactDOM from 'react-dom'
+import React from 'react';
+import ReactDOM from 'react-dom';
 import AssignmentRowCell from './AssignmentRowCell'
 import ReadOnlyCell from './ReadOnlyCell'
 
@@ -28,31 +28,31 @@ import ReadOnlyCell from './ReadOnlyCell'
  * component.
  */
 export default class AssignmentCellEditor {
-  constructor(options) {
-    this.options = options
-    this.container = options.container
-    this.handleKeyDown = this.handleKeyDown.bind(this)
-    this.renderComponent()
-    options.column.getGridSupport().events.onKeyDown.subscribe(this.handleKeyDown)
+  constructor (options) {
+    this.options = options;
+    this.container = options.container;
+    this.handleKeyDown = this.handleKeyDown.bind(this);
+    this.renderComponent();
+    options.column.getGridSupport().events.onKeyDown.subscribe(this.handleKeyDown);
   }
 
-  renderComponent() {
+  renderComponent () {
     const props = {
       ...this.options.column.propFactory.getProps(this.options),
       editorOptions: this.options,
       ref: ref => {
         this.component = ref
       }
-    }
+    };
 
     const Component = props.gradeIsEditable ? AssignmentRowCell : ReadOnlyCell
     const element = React.createElement(Component, props, null)
-    ReactDOM.render(element, this.container)
+    ReactDOM.render(element, this.container);
   }
 
-  handleKeyDown(event) {
+  handleKeyDown (event) {
     if (this.component) {
-      return this.component.handleKeyDown(event)
+      return this.component.handleKeyDown(event);
     }
   }
 
@@ -65,10 +65,10 @@ export default class AssignmentCellEditor {
    *   • DOM elements for the editor should be removed.
    *   • Transient data created for editing should be destroyed.
    */
-  destroy() {
-    this.component = null
-    this.options.column.getGridSupport().events.onKeyDown.unsubscribe(this.handleKeyDown)
-    ReactDOM.unmountComponentAtNode(this.container)
+  destroy () {
+    this.component = null;
+    this.options.column.getGridSupport().events.onKeyDown.unsubscribe(this.handleKeyDown);
+    ReactDOM.unmountComponentAtNode(this.container);
   }
 
   /*
@@ -77,22 +77,22 @@ export default class AssignmentCellEditor {
    * This is called when validation has failed. Focus will be forcibly reset to
    * the editor.
    */
-  focus() {
-    this.component.focus()
+  focus () {
+    this.component.focus();
   }
 
   /*
    * SlickGrid Editor Interface Method (required)
    */
-  isValueChanged() {
-    return !!this.component && this.component.isValueChanged()
+  isValueChanged () {
+    return !!this.component && this.component.isValueChanged();
   }
 
   /*
    * SlickGrid Editor Interface Method (required)
    */
-  serializeValue() {
-    return null
+  serializeValue () {
+    return null;
   }
 
   /*
@@ -101,7 +101,7 @@ export default class AssignmentCellEditor {
    * @param {object} item – The data object for the row.
    */
   loadValue(/* item */) {
-    this.renderComponent()
+    this.renderComponent();
   }
 
   /*

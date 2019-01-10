@@ -21,7 +21,6 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
 import View from '@instructure/ui-layout/lib/components/View'
@@ -123,22 +122,15 @@ export default class DeveloperKeyScopesList extends React.Component {
                 <Flex>
                   <FlexItem>
                     <Checkbox
-                      label={
-                        <ScreenReaderContent>
-                          {
-                            this.state.readOnlySelected ? I18n.t('Disable all read only scopes.') : I18n.t('Enable all read only scopes.')
-                          }
-                        </ScreenReaderContent>}
+                      label={<ScreenReaderContent>{I18n.t('All GET scopes')}</ScreenReaderContent>}
                       onChange={this.handleReadOnlySelected}
                       checked={this.state.readOnlySelected}
                       inline
                     />
-                    <PresentationContent>
-                      <Text size="medium" weight="bold">
-                        {I18n.t('Read only')}
-                      </Text>
-                      <DeveloperKeyScopesMethod method="get" margin="none small none small" />
-                    </PresentationContent>
+                    <Text size="medium" weight="bold">
+                      {I18n.t('Read only')}
+                    </Text>
+                    <DeveloperKeyScopesMethod method="get" margin="none small none small" />
                   </FlexItem>
                 </Flex>
               </View>

@@ -20,7 +20,7 @@ import React from 'react'
 import { render, shallow } from 'enzyme'
 import Outcome from '../Outcome'
 
-const result = (id = 1, date = new Date(), hidePoints = false) => ({
+const result = (id = 1, date = new Date()) => ({
   id,
   percent: 0.1,
   assignment: {
@@ -30,7 +30,6 @@ const result = (id = 1, date = new Date(), hidePoints = false) => ({
     submission_types: '',
     score: 0
   },
-  hide_points: hidePoints,
   submitted_or_assessed_at: date.toISOString()
 })
 
@@ -68,8 +67,7 @@ const defaultProps = (props = {}) => (
           }
         }
       ],
-      title: 'My outcome',
-      score: 1
+      title: 'My outcome'
     },
     expanded: false,
     onExpansionChange: () => {},
@@ -130,24 +128,6 @@ describe('header', () => {
     const header = wrapper.find('ToggleGroup')
     const summary = render(header.prop('summary'))
     expect(summary.text()).toMatch('1 alignment')
-  })
-
-  it('shows points if only some results have hide points enabled', () => {
-    const props = defaultProps()
-    props.outcome.results = [result(1, undefined, false), result(2, undefined, true)]
-    const wrapper = shallow(<Outcome {...props}/>)
-    const header = wrapper.find('ToggleGroup')
-    const summary = render(header.prop('summary'))
-    expect(summary.text()).toMatch('1/5')
-  })
-
-  it('does not show points if all results have hide points enabled', () => {
-    const props = defaultProps()
-    props.outcome.results = [result(1, undefined, true), result(2, undefined, true)]
-    const wrapper = shallow(<Outcome {...props}/>)
-    const header = wrapper.find('ToggleGroup')
-    const summary = render(header.prop('summary'))
-    expect(summary.text()).not.toMatch('1/5')
   })
 })
 

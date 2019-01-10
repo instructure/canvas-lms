@@ -1315,7 +1315,7 @@ textarea.ic-Input {
 
 // We removed -webkit-appearance from anything with the
 // .ic-Input class, to give us more styling control.
-// This makes the select's caret disappear.
+// This makes the select's caret disappear in IE Edge and Webkit.
 // So we add it back in with these hacks.
 
 @mixin add-arrow-for-webkit-and-ie-edge($bg-position-x) {
@@ -1327,8 +1327,8 @@ textarea.ic-Input {
   padding: direction-sides(0 $ic-sp*2 0 $ic-sp);
 }
 
-// non-Edge hack
-select.ic-Input {
+// webkit hack
+select.ic-Input:not(*:root) {
   @include add-arrow-for-webkit-and-ie-edge( calc(100% - #{$ic-sp - 4}) );
 }
 

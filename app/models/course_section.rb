@@ -251,7 +251,7 @@ class CourseSection < ActiveRecord::Base
     Assignment.suspend_due_date_caching do
       Assignment.where(context: [old_course, self.course]).touch_all
     end
-    EnrollmentState.send_later_if_production(:invalidate_states_for_course_or_section, self, invalidate_access: true)
+    EnrollmentState.send_later_if_production(:invalidate_states_for_course_or_section, self)
     User.send_later_if_production(:update_account_associations, user_ids) if old_course.account_id != course.account_id && !User.skip_updating_account_associations?
     if old_course.id != self.course_id && old_course.id != self.nonxlist_course_id
       old_course.send_later_if_production(:update_account_associations) unless Course.skip_updating_account_associations?
@@ -322,7 +322,7 @@ class CourseSection < ActiveRecord::Base
     cs = CourseSection.where(id: batch).select(:id, :workflow_state).to_a
     data = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch, contexts: cs, updated_state: 'deleted', batch_mode_delete: batch_mode)
     CourseSection.where(id: cs.map(&:id)).update_all(workflow_state: 'deleted', updated_at: Time.zone.now)
-    Enrollment.where(course_section_id: cs.map(&:id)).active.find_in_batches do |e_batch|
+    Enrollment.not_fake.where(course_section_id: cs.map(&:id)).active.find_in_batches do |e_batch|
       Shackles.activate(:master) do
         new_data = Enrollment::BatchStateUpdater.destroy_batch(e_batch, sis_batch: sis_batch, batch_mode: batch_mode)
         data.push(*new_data)

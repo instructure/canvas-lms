@@ -113,9 +113,6 @@ class CanvasUnzip
     file = File.open(archive_filename)
     mime_type = File.mime_type?(file)
 
-    # on some systems `file` fails to recognize a zip file with no entries; fall back on using the extension
-    mime_type = File.mime_type?(archive_filename) if mime_type == 'application/octet-stream'
-
     if ['application/x-gzip', 'application/gzip'].include? mime_type
       file = Zlib::GzipReader.new(file)
       mime_type = 'application/x-tar' # it may not actually be a tar though, so rescue if there's a problem

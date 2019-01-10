@@ -18,7 +18,7 @@
 class Quizzes::QuizSubmissionEventPartitioner
   cattr_accessor :logger
 
-  def self.process(in_migration=false)
+  def self.process
     Shackles.activate(:deploy) do
       Quizzes::QuizSubmissionEvent.transaction do
         log '*' * 80
@@ -32,7 +32,7 @@ class Quizzes::QuizSubmissionEventPartitioner
 
         log 'Done. Bye!'
         log '*' * 80
-        ActiveRecord::Base.connection_pool.current_pool.disconnect! unless in_migration || Rails.env.test?
+        ActiveRecord::Base.connection_pool.current_pool.disconnect! unless Rails.env.test?
       end
     end
   end

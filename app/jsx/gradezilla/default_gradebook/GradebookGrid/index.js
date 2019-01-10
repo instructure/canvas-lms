@@ -16,25 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import slickgrid from 'vendor/slickgrid'
-import 'jqueryui/sortable'
+import slickgrid from 'vendor/slickgrid';
+import 'jqueryui/sortable';
 import CellEditorFactory from './editors/CellEditorFactory'
 import CellFormatterFactory from './formatters/CellFormatterFactory'
 import ColumnHeaderRenderer from './headers/ColumnHeaderRenderer'
-import Columns from './Columns'
-import Events from './Events'
-import GridSupport from './GridSupport'
+import Columns from './Columns';
+import Events from './Events';
+import GridSupport from './GridSupport';
 
 export default class GradebookGrid {
-  constructor(options) {
-    this.gridData = options.data
-    this.options = options
+  constructor (options) {
+    this.gridData = options.data;
+    this.options = options;
 
-    this.columns = new Columns(this)
-    this.events = new Events()
+    this.columns = new Columns(this);
+    this.events = new Events();
   }
 
-  initialize() {
+  initialize () {
     const options = {
       autoEdit: true, // whether to go into edit-mode as soon as you tab to a cell
       change_grade_url: this.options.change_grade_url, // used by SubmissionCell
@@ -47,63 +47,55 @@ export default class GradebookGrid {
       numberOfColumnsToFreeze: this.gridData.columns.frozen.length,
       rowHeight: 35,
       syncColumnCellResize: true
-    }
+    };
 
-    const columns = [...this.gridData.columns.frozen, ...this.gridData.columns.scrollable].map(
-      columnId => this.gridData.columns.definitions[columnId]
-    )
+    const columns = [...this.gridData.columns.frozen, ...this.gridData.columns.scrollable].map((columnId) => (
+      this.gridData.columns.definitions[columnId]
+    ));
 
-    this.grid = new slickgrid.Grid(this.options.$container, this.gridData.rows, columns, options)
+    this.grid = new slickgrid.Grid(this.options.$container, this.gridData.rows, columns, options);
 
     const gridSupportOptions = {
       activeBorderColor: this.options.activeBorderColor,
       columnHeaderRenderer: new ColumnHeaderRenderer(this.options.gradebook),
       rows: this.gridData.rows
-    }
-    this.gridSupport = new GridSupport(this.grid, gridSupportOptions)
+    };
+    this.gridSupport = new GridSupport(this.grid, gridSupportOptions);
 
-    this.columns.initialize()
+    this.columns.initialize();
   }
 
-  destroy() {
+  destroy () {
     if (this.grid) {
-      this.gridSupport.destroy()
-      this.grid.destroy()
-      this.grid = null
-    }
-  }
-
-  invalidate() {
-    if (this.grid) {
-      this.grid.invalidate()
+      this.gridSupport.destroy();
+      this.grid.destroy();
+      this.grid = null;
     }
   }
 
-  invalidateRow(index) {
+  invalidate () {
     if (this.grid) {
-      this.grid.invalidateRow(index)
+      this.grid.invalidate();
     }
   }
 
-  render() {
+  invalidateRow (index) {
     if (this.grid) {
-      this.grid.render()
+      this.grid.invalidateRow(index);
     }
   }
 
-  updateColumns() {
+  render () {
     if (this.grid) {
-      this.grid.setNumberOfColumnsToFreeze(this.gridData.columns.frozen.length)
-      const columnIds = [...this.gridData.columns.frozen, ...this.gridData.columns.scrollable]
+      this.grid.render();
+    }
+  }
+
+  updateColumns () {
+    if (this.grid) {
+      this.grid.setNumberOfColumnsToFreeze(this.gridData.columns.frozen.length);
+      const columnIds = [...this.gridData.columns.frozen, ...this.gridData.columns.scrollable];
       this.grid.setColumns(columnIds.map(columnId => this.gridData.columns.definitions[columnId]))
-    }
-  }
-
-  updateRowCell(studentId, columnId) {
-    if (this.grid) {
-      const columnIndex = this.columns.getIndexOfColumn(columnId)
-      const rowIndex = this.gridData.rows.findIndex(row => row.id === studentId)
-      this.grid.updateCell(rowIndex, columnIndex)
     }
   }
 }

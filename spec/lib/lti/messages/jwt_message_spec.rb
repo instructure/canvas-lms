@@ -128,11 +128,7 @@ describe Lti::Messages::JwtMessage do
     end
 
     it 'sets the "sub" claim' do
-      expect(decoded_jwt['sub']).to eq user.lti_id
-    end
-
-    it 'sets the "lti11_legacy_user_id" claim' do
-      expect(decoded_jwt['https://purl.imsglobal.org/spec/lti/claim/lti11_legacy_user_id']).to eq user.lti_context_id
+      expect(decoded_jwt['sub']).to eq user.lti_context_id
     end
 
     context 'when security claim group disabled' do

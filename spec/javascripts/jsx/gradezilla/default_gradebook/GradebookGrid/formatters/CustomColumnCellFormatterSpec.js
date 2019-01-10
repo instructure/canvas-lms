@@ -18,47 +18,50 @@
 
 import CustomColumnCellFormatter from 'jsx/gradezilla/default_gradebook/GradebookGrid/formatters/CustomColumnCellFormatter'
 
-QUnit.module('GradebookGrid CustomColumnCellFormatter', hooks => {
-  let $fixture
-  let columnContent
-  let formatter
+QUnit.module('CustomColumnCellFormatter', function (hooks) {
+  let $fixture;
+  let columnContent;
+  let formatter;
 
-  hooks.beforeEach(() => {
-    $fixture = document.body.appendChild(document.createElement('div'))
+  hooks.beforeEach(function () {
+    $fixture = document.createElement('div');
+    document.body.appendChild($fixture);
 
-    formatter = new CustomColumnCellFormatter()
-  })
+    formatter = new CustomColumnCellFormatter();
+  });
 
-  hooks.afterEach(() => {
-    $fixture.remove()
-  })
+  hooks.afterEach(function () {
+    $fixture.remove();
+  });
 
-  function renderCell() {
+  function renderCell () {
     $fixture.innerHTML = formatter.render(
       0, // row
       0, // cell
       columnContent, // value
       null, // column definition
       null // dataContext
-    )
-    return $fixture
+    );
+    return $fixture;
   }
 
-  test('renders no content when given null content', () => {
-    columnContent = null
-    const $cell = renderCell()
-    strictEqual($cell.innerHTML, '')
-  })
+  QUnit.module('#render');
 
-  test('renders the content when defined', () => {
-    columnContent = 'Example Content'
-    const $cell = renderCell()
-    equal($cell.innerHTML, 'Example Content')
-  })
+  test('renders no content when given null content', function () {
+    columnContent = null;
+    const $cell = renderCell();
+    strictEqual($cell.innerHTML, '');
+  });
 
-  test('escapes html in the content', () => {
-    columnContent = '<span>Example Content</span>'
-    const $cell = renderCell()
-    equal($cell.innerHTML, '&lt;span&gt;Example Content&lt;/span&gt;')
-  })
-})
+  test('renders the content when defined', function () {
+    columnContent = 'Example Content';
+    const $cell = renderCell();
+    equal($cell.innerHTML, 'Example Content');
+  });
+
+  test('escapes html in the content', function () {
+    columnContent = '<span>Example Content</span>';
+    const $cell = renderCell();
+    equal($cell.innerHTML, '&lt;span&gt;Example Content&lt;/span&gt;');
+  });
+});

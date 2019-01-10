@@ -243,7 +243,7 @@ class DeveloperKey extends React.Component {
               {...this.props.actions}
               developerKey={this.props.developerKey}
               visible={this.props.developerKey.visible}
-              developerName={this.getToolName()}
+              toolName={this.getToolName()}
               onDelete={this.handleDelete}
               showVisibilityToggle={this.isSiteAdmin}
             />

@@ -23,17 +23,15 @@ export const defaultCriteria = (id) => ({
 })
 
 const fillCriteria = (criterion) => {
-  const { comments, points } = criterion
+  const { points } = criterion
   const hasPoints = !_.isNil(points)
-  const hasComments = !_.isNil(comments) && comments.length > 0
   return {
     ...criterion,
     points: {
       text: hasPoints ? null : '--',
       valid: hasPoints,
       value: points
-    },
-    editComments: hasComments
+    }
   }
 }
 

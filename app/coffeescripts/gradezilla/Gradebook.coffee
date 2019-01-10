@@ -51,7 +51,6 @@ define [
   'jsx/gradezilla/default_gradebook/CurveGradesDialogManager'
   'jsx/gradezilla/default_gradebook/apis/GradebookApi'
   'jsx/gradezilla/default_gradebook/apis/SubmissionCommentApi'
-  'jsx/gradezilla/default_gradebook/FinalGradeOverrides'
   'jsx/gradezilla/default_gradebook/GradebookGrid'
   'jsx/gradezilla/default_gradebook/constants/studentRowHeaderConstants'
   'jsx/gradezilla/default_gradebook/GradebookGrid/editors/AssignmentCellEditor/AssignmentRowCellPropFactory'
@@ -102,7 +101,7 @@ define [
   CourseGradeCalculator, EffectiveDueDates, GradeFormatHelper, UserSettings, Spinner, AssignmentMuter,
   GradeDisplayWarningDialog, PostGradesFrameDialog, NumberCompare, natcompare, ConvertCase, htmlEscape,
   EnterGradesAsSetting, SetDefaultGradeDialogManager, CurveGradesDialogManager, GradebookApi, SubmissionCommentApi,
-  FinalGradeOverrides, GradebookGrid, studentRowHeaderConstants, AssignmentRowCellPropFactory, GradebookMenu, ViewOptionsMenu, ActionMenu,
+  GradebookGrid, studentRowHeaderConstants, AssignmentRowCellPropFactory, GradebookMenu, ViewOptionsMenu, ActionMenu,
   AssignmentGroupFilter, GradingPeriodFilter, ModuleFilter, SectionFilter, GridColor, StatusesModal, SubmissionTray,
   GradebookSettingsModal, AnonymousSpeedGraderAlert, { statusColors }, StudentDatastore, PostGradesStore, PostGradesApp, SubmissionStateMap,
   DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager, GradebookKeyboardNav,
@@ -221,6 +220,11 @@ define [
       latePolicy: ConvertCase.camelize(options.late_policy) if options.late_policy
     }
 
+  getInitialStudentContent = () ->
+    {
+      finalGradeOverrides: {}
+    }
+
   getInitialGradebookContent = (options) ->
     {
       customColumns: if options.teacher_notes then [options.teacher_notes] else []
@@ -271,8 +275,6 @@ define [
         gradebook: @
       })
 
-      @finalGradeOverrides = new FinalGradeOverrides(@)
-
       $.subscribe 'assignment_muting_toggled',        @handleAssignmentMutingChange
       $.subscribe 'submissions_updated',              @updateSubmissionsFromExternal
 
@@ -292,6 +294,7 @@ define [
 
     setInitialState: =>
       @courseContent = getInitialCourseContent(@options)
+      @studentContent = getInitialStudentContent()
       @gradebookContent = getInitialGradebookContent(@options)
       @gridDisplaySettings = getInitialGridDisplaySettings(@options.settings, @options.colors)
       @contentLoadStates = getInitialContentLoadStates()
@@ -1647,13 +1650,13 @@ define [
         totalWidth = testWidth(label, columnWidths.total_grade_override.min, columnWidths.total_grade_override.max)
 
       {
+        id: 'total_grade_override'
+        minWidth: columnWidths.total_grade_override.min
+        maxWidth: columnWidths.total_grade_override.max
+        width: totalWidth
         cssClass: 'total-grade-override'
         headerCssClass: 'total-grade-override'
-        id: 'total_grade_override'
-        maxWidth: columnWidths.total_grade_override.max
-        minWidth: columnWidths.total_grade_override.min
         type: 'total_grade_override'
-        width: totalWidth
       }
 
     initGrid: =>
@@ -2688,6 +2691,17 @@ define [
           @courseContent.modulesById[contextModule.id] = contextModule
 
       contextModules
+
+    getFinalGradeOverrides: (studentId) =>
+      @studentContent.finalGradeOverrides[studentId]
+
+    setFinalGradeOverrides: (finalGradeOverrides) =>
+      @studentContent.finalGradeOverrides = finalGradeOverrides
+
+    updateFinalGradeOverrides: (finalGradeOverrides) =>
+      @setFinalGradeOverrides(finalGradeOverrides)
+      studentIds = Object.keys(@studentContent.finalGradeOverrides)
+      @invalidateRowsForStudentIds(studentIds)
 
     onLatePolicyUpdate: (latePolicy) =>
       @setLatePolicy(latePolicy)

@@ -1680,7 +1680,6 @@ function scrollTo ($thing, time = 500) {
             item.model.set({locked: !parsedAttrs.published});
           } else {
             item.model.set({published: parsedAttrs.published});
-            item.model.view.render();
           }
         }
       }

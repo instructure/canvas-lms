@@ -15,47 +15,33 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import I18n from 'i18n!assignments_2'
+
+import PropTypes from 'prop-types'
 import React from 'react'
 
 import Link from '@instructure/ui-elements/lib/components/Link'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 
-import {StudentAssignmentShape} from '../assignmentData'
-
-const MAX_DISPLAYED_MODULES = 2
-
 function AssignmentGroupModuleNav(props) {
-  const {
-    assignment: {assignmentGroup, modules, env}
-  } = props
-
   return (
-    <Flex margin="0 0 large 0" direction="column">
-      {modules.slice(0, MAX_DISPLAYED_MODULES).map(module => (
-        <FlexItem key={module.id}>
-          <Link data-test-id="module-link" href={env.moduleUrl} theme={{color: '#000000'}}>
-            <Text size="medium">{module.name}</Text>
-          </Link>
-        </FlexItem>
-      ))}
-      {modules.length > MAX_DISPLAYED_MODULES && (
+    <Flex margin="0 0 xx-large 0" direction="column">
+      {props.module && (
         <FlexItem>
-          <Link data-test-id="module-link" href={env.moduleUrl} theme={{color: '#000000'}}>
-            <Text size="medium">{I18n.t('More Modules')}</Text>
+          <Link data-test-id="module-link" href={props.module.link} theme={{color: '#000000'}}>
+            <Text size="medium">{props.module.name}</Text>
           </Link>
         </FlexItem>
       )}
 
-      {assignmentGroup && (
+      {props.assignmentGroup && (
         <FlexItem>
           <Link
             data-test-id="assignmentgroup-link"
-            href={env.assignmentUrl}
+            href={props.assignmentGroup.link}
             theme={{color: '#000000'}}
           >
-            <Text size="medium">{assignmentGroup.name}</Text>
+            <Text size="medium">{props.assignmentGroup.name}</Text>
           </Link>
         </FlexItem>
       )}
@@ -64,7 +50,14 @@ function AssignmentGroupModuleNav(props) {
 }
 
 AssignmentGroupModuleNav.propTypes = {
-  assignment: StudentAssignmentShape
+  module: PropTypes.shape({
+    name: PropTypes.string,
+    link: PropTypes.string
+  }),
+  assignmentGroup: PropTypes.shape({
+    name: PropTypes.string,
+    link: PropTypes.string
+  })
 }
 
 export default React.memo(AssignmentGroupModuleNav)

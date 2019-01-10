@@ -22,7 +22,7 @@ import DataLoader from 'jsx/gradezilla/DataLoader'
 import {
   createGradebook,
   setFixtureHtml
-} from 'jsx/gradezilla/default_gradebook/__tests__/GradebookSpecHelper'
+} from '../../gradezilla/default_gradebook/GradebookSpecHelper'
 import SlickGridSpecHelper from '../../gradezilla/default_gradebook/GradebookGrid/GridSupport/SlickGridSpecHelper'
 
 QUnit.module('Gradebook Grid Column Widths', (suiteHooks) => {

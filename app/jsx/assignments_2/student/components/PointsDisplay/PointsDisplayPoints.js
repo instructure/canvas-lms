@@ -44,8 +44,11 @@ function PointsDisplayPoints({receivedGrade, possiblePoints}) {
       <Flex aria-hidden="true" direction="column" textAlign="end">
         <FlexItem>
           <Text size="x-large" data-test-id="points-display">
-            {displayPoints}/{possiblePoints} {I18n.t('Points')}
+            {displayPoints}/{possiblePoints}
           </Text>
+        </FlexItem>
+        <FlexItem>
+          <Text>{I18n.t('Points')}</Text>
         </FlexItem>
       </Flex>
     </div>

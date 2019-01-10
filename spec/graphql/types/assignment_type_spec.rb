@@ -79,22 +79,6 @@ describe Types::AssignmentType do
     ).to include "http://test.host/courses/#{course.id}/files/12/download"
   end
 
-  it "returns nil when allowed_attempts is unset" do
-    expect(assignment_type.resolve("allowedAttempts")).to eq nil
-  end
-
-  it "returns nil when allowed_attempts is an invalid non-positive value" do
-    assignment.update_attributes allowed_attempts: 0
-    expect(assignment_type.resolve("allowedAttempts")).to eq nil
-    assignment.update_attributes allowed_attempts: -1
-    expect(assignment_type.resolve("allowedAttempts")).to eq nil
-  end
-
-  it "returns allowed_attempts value set on the assignment" do
-    assignment.update_attributes allowed_attempts: 7
-    expect(assignment_type.resolve("allowedAttempts")).to eq 7
-  end
-
   describe "submissionsConnection" do
     let_once(:other_student) { student_in_course(course: course, active_all: true).user }
 

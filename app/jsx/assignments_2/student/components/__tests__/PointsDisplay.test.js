@@ -56,7 +56,7 @@ it('renders points correctly when no receivedGrade are set', () => {
     document.getElementById('fixtures')
   )
   const textElement = $('[data-test-id="points-display"]')
-  expect(textElement.text()).toEqual('-/32 Points')
+  expect(textElement.text()).toEqual('-/32')
 })
 
 it('renders points correctly when receivedGrade is set', () => {
@@ -65,7 +65,7 @@ it('renders points correctly when receivedGrade is set', () => {
     document.getElementById('fixtures')
   )
   const textElement = $('[data-test-id="points-display"]')
-  expect(textElement.text()).toEqual('4/5 Points')
+  expect(textElement.text()).toEqual('4/5')
 })
 
 it('renders correctly when receivedGrade is 0', () => {
@@ -74,7 +74,7 @@ it('renders correctly when receivedGrade is 0', () => {
     document.getElementById('fixtures')
   )
   const textElement = $('[data-test-id="points-display"]')
-  expect(textElement.text()).toEqual('0/5 Points')
+  expect(textElement.text()).toEqual('0/5')
 })
 
 it('defaults to using points if displayAs is not explictly set', () => {
@@ -83,7 +83,7 @@ it('defaults to using points if displayAs is not explictly set', () => {
     document.getElementById('fixtures')
   )
   const textElement = $('[data-test-id="points-display"]')
-  expect(textElement.text()).toEqual('4/5 Points')
+  expect(textElement.text()).toEqual('4/5')
 })
 
 it('renders correctly when displayType is percent', () => {

@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createGradebook} from 'jsx/gradezilla/default_gradebook/__tests__/GradebookSpecHelper'
+import {createGradebook} from '../../GradebookSpecHelper'
 import TotalGradeOverrideCellFormatter from 'jsx/gradezilla/default_gradebook/GradebookGrid/formatters/TotalGradeOverrideCellFormatter'
 
-QUnit.module('GradebookGrid TotalGradeOverrideCellFormatter', hooks => {
+QUnit.module('TotalGradeOverrideCellFormatter', hooks => {
   let $fixture
   let finalGradeOverrides
   let formatter
@@ -53,7 +53,7 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellFormatter', hooks => {
   })
 
   function renderCell() {
-    gradebook.finalGradeOverrides._datastore.setGrades(finalGradeOverrides)
+    gradebook.setFinalGradeOverrides(finalGradeOverrides)
     $fixture.innerHTML = formatter.render(
       0, // row
       0, // cell
@@ -100,7 +100,7 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellFormatter', hooks => {
 
     test('renders "–" (en dash) when the student has no course grade overrides', () => {
       delete finalGradeOverrides[1101].courseGrade
-      gradebook.finalGradeOverrides._datastore.setGrades({})
+      gradebook.setFinalGradeOverrides({})
       equal(getPercentageGrade(), '–')
     })
   })

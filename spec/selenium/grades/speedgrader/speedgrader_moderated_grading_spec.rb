@@ -49,6 +49,7 @@ describe "speed grader" do
       wait_for_ajaximations
       f('svg[name="IconFeedback"]').find_element(:xpath, '../../parent::button').click
       f("textarea[data-selenium='criterion_comments_text']").send_keys(comment)
+      fj("button:contains('Update Comment'):visible").click
       wait_for_ajaximations
       f('.criterion_points input').send_keys(score.to_s)
       f('.criterion_points input').send_keys(:tab)

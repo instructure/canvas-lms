@@ -216,7 +216,7 @@ export default class GradingSchemeInput extends Component {
           value={this.state.value}
         />
 
-        <div className="Grid__GradeCell__GradingSchemeMenu">
+        <div className="Grid__AssignmentRowCell__GradingSchemeMenu">
           <Menu
             contentRef={this.props.menuContentRef}
             onDismiss={this.props.onMenuDismiss}
@@ -224,12 +224,7 @@ export default class GradingSchemeInput extends Component {
             onSelect={this.handleSelect}
             placement="bottom"
             trigger={
-              <Button
-                buttonRef={this.bindButton}
-                disabled={this.props.disabled}
-                size="small"
-                variant="icon"
-              >
+              <Button buttonRef={this.bindButton} disabled={this.props.disabled} size="small" variant="icon">
                 <IconArrowOpenDownLine title={I18n.t('Open Grading Scheme menu')} />
               </Button>
             }

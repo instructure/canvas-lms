@@ -51,30 +51,8 @@ module Lti
 
       let_once(:context) { course_model(workflow_state: 'available') }
       let_once(:user) { student_in_course(course: context).user }
-      let_once(:assignment) do
-        opts = {course: context}
-        opts[:submission_types] = 'external_tool'
-        opts[:external_tool_tag_attributes] = {
-          url: tool.url,
-          content_type: 'context_external_tool',
-          content_id: tool.id
-        }
-        assignment_model(opts)
-      end
-      let_once(:developer_key) { DeveloperKey.create! }
-      let_once(:tool) do
-        ContextExternalTool.create!(
-          context: context,
-          consumer_key: 'key',
-          shared_secret: 'secret',
-          name: 'test tool',
-          url: 'http://www.tool.com/launch',
-          developer_key: developer_key,
-          settings: { use_1_3: true },
-          workflow_state: 'public'
-        )
-      end
-      let_once(:line_item) { assignment.line_items.first }
+      let_once(:assignment) { assignment_model context: context }
+      let_once(:line_item) { line_item_model assignment: assignment }
       let(:parsed_response_body) { JSON.parse(response.body) }
       let(:valid_params) { {course_id: context.id, userId: user.id, line_item_id: line_item.id} }
 

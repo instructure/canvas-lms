@@ -16,11 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import GridEvent from './GridSupport/GridEvent'
+import GridEvent from './GridSupport/GridEvent';
 
 export default class Events {
   // Column Changes
-  onColumnsReordered = new GridEvent()
-
-  onColumnsResized = new GridEvent()
+  onColumnsReordered = new GridEvent();
+  onColumnsResized = new GridEvent();
 }

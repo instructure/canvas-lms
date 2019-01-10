@@ -68,8 +68,8 @@ export default class DialogManager {
   showUpdateDialog() {
     return this.dialog.dialog({
       title: I18n.t('titles.record_upload_media_comment', 'Record/Upload Media Comment'),
-      width: 650,
-      height: 550,
+      width: 560,
+      height: 475,
       modal: true
     })
   }

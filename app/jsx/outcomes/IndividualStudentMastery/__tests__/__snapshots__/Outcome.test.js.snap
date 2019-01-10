@@ -97,7 +97,6 @@ exports[`renders correctly expanded 1`] = `
                             "score": 1,
                           },
                         ],
-                        "score": 1,
                         "title": "My outcome",
                       }
                     }
@@ -151,28 +150,7 @@ exports[`renders correctly expanded 1`] = `
         grow={false}
         shrink={false}
       >
-        <span>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              letterSpacing="normal"
-              size="medium"
-            >
-              1
-              /
-              5
-            </Text>
-          </PresentationContent>
-          <ScreenReaderContent
-            as="span"
-          >
-            1 out of 5 points
-          </ScreenReaderContent>
-        </span>
         <Pill
-          margin="0 0 0 x-small"
           text="Not mastered"
           variant="default"
         />
@@ -232,7 +210,6 @@ exports[`renders correctly expanded 1`] = `
                 "score": 1,
               },
             ],
-            "score": 1,
             "title": "My outcome",
           }
         }
@@ -341,7 +318,6 @@ exports[`renders correctly expanded with no results 1`] = `
                           },
                         ],
                         "results": Array [],
-                        "score": 1,
                         "title": "My outcome",
                       }
                     }
@@ -396,7 +372,6 @@ exports[`renders correctly expanded with no results 1`] = `
         shrink={false}
       >
         <Pill
-          margin="0 0 0 x-small"
           text="Not mastered"
           variant="default"
         />
@@ -504,7 +479,6 @@ exports[`renders correctly expanded with no results or assignments 1`] = `
                           },
                         ],
                         "results": Array [],
-                        "score": 1,
                         "title": "My outcome",
                       }
                     }
@@ -559,7 +533,6 @@ exports[`renders correctly expanded with no results or assignments 1`] = `
         shrink={false}
       >
         <Pill
-          margin="0 0 0 x-small"
           text="Not mastered"
           variant="default"
         />
@@ -682,7 +655,6 @@ exports[`renders the Outcome component 1`] = `
                             "score": 1,
                           },
                         ],
-                        "score": 1,
                         "title": "My outcome",
                       }
                     }
@@ -736,28 +708,7 @@ exports[`renders the Outcome component 1`] = `
         grow={false}
         shrink={false}
       >
-        <span>
-          <PresentationContent
-            as="span"
-          >
-            <Text
-              as="span"
-              letterSpacing="normal"
-              size="medium"
-            >
-              1
-              /
-              5
-            </Text>
-          </PresentationContent>
-          <ScreenReaderContent
-            as="span"
-          >
-            1 out of 5 points
-          </ScreenReaderContent>
-        </span>
         <Pill
-          margin="0 0 0 x-small"
           text="Not mastered"
           variant="default"
         />
@@ -817,7 +768,6 @@ exports[`renders the Outcome component 1`] = `
                 "score": 1,
               },
             ],
-            "score": 1,
             "title": "My outcome",
           }
         }

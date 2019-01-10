@@ -53,7 +53,8 @@ export default class LtiKeyFooter extends React.Component {
   render() {
     return (
       <ModalFooter>
-        <Button onClick={this.onCancel} margin="0 small 0 0">{I18n.t('Cancel')}</Button>
+        <Button onClick={this.onCancel}>{I18n.t('Cancel')}</Button>
+        &nbsp;
         {this.nextOrSaveButton()}
       </ModalFooter>
     )

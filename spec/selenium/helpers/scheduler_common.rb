@@ -151,9 +151,7 @@ module SchedulerCommon
   def click_appointment_link
     f('.view_calendar_link').click
     fj('.agenda-wrapper.active:visible')
-    # wait for loading spinner, then wait for it to not be displayed
-    wait_for(method: nil, timeout: 3) { f('#refresh_calendar_link').displayed? }
-    wait_for(method: nil, timeout: 15) { !f('#refresh_calendar_link').displayed? }
+    wait_for_ajaximations
   end
 
   def click_al_option(option_selector, offset=0)

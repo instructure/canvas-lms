@@ -104,13 +104,13 @@ exports[`Free-form Rubric with a custom criterion by default renders the root co
   >
     <Comments
       allowSaving={true}
+      assessing={false}
       assessment={
         Object {
           "comments": "",
           "comments_enabled": true,
           "criterion_id": "_1384",
           "description": "No Marks",
-          "editComments": false,
           "id": "blank_2",
           "learning_outcome_id": null,
           "points": Object {
@@ -120,9 +120,7 @@ exports[`Free-form Rubric with a custom criterion by default renders the root co
           },
         }
       }
-      editing={false}
       footer={null}
-      large={true}
       savedComments={Array []}
       setComments={[Function]}
       setSaveLater={[Function]}
@@ -140,7 +138,6 @@ exports[`Free-form Rubric with a custom criterion by default renders the root co
           "comments_enabled": true,
           "criterion_id": "_1384",
           "description": "No Marks",
-          "editComments": false,
           "id": "blank_2",
           "learning_outcome_id": null,
           "points": Object {
@@ -260,13 +257,13 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the roo
   >
     <Comments
       allowSaving={true}
+      assessing={true}
       assessment={
         Object {
           "comments": "",
           "comments_enabled": true,
           "criterion_id": "_1384",
           "description": "No Marks",
-          "editComments": false,
           "id": "blank_2",
           "learning_outcome_id": null,
           "points": Object {
@@ -276,9 +273,7 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the roo
           },
         }
       }
-      editing={true}
       footer={null}
-      large={true}
       savedComments={Array []}
       setComments={[Function]}
       setSaveLater={[Function]}
@@ -296,7 +291,6 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the roo
           "comments_enabled": true,
           "criterion_id": "_1384",
           "description": "No Marks",
-          "editComments": false,
           "id": "blank_2",
           "learning_outcome_id": null,
           "points": Object {
@@ -416,10 +410,9 @@ exports[`Free-form Rubric with a custom criterion without an assessment renders 
   >
     <Comments
       allowSaving={true}
+      assessing={false}
       assessment={null}
-      editing={false}
       footer={null}
-      large={true}
       savedComments={Array []}
       setComments={[Function]}
       setSaveLater={[Function]}
@@ -594,6 +587,7 @@ exports[`Free-form Rubric with a outcome criterion by default renders the root c
   >
     <Comments
       allowSaving={true}
+      assessing={false}
       assessment={
         Object {
           "above_threshold": false,
@@ -602,7 +596,6 @@ exports[`Free-form Rubric with a outcome criterion by default renders the root c
           "comments_html": "I award you <b>no</b> points, and may God have mercy on your soul.",
           "criterion_id": "7_391",
           "description": "No details",
-          "editComments": true,
           "learning_outcome_id": "612",
           "points": Object {
             "text": null,
@@ -611,9 +604,7 @@ exports[`Free-form Rubric with a outcome criterion by default renders the root c
           },
         }
       }
-      editing={false}
       footer={null}
-      large={true}
       savedComments={Array []}
       setComments={[Function]}
       setSaveLater={[Function]}
@@ -633,7 +624,6 @@ exports[`Free-form Rubric with a outcome criterion by default renders the root c
           "comments_html": "I award you <b>no</b> points, and may God have mercy on your soul.",
           "criterion_id": "7_391",
           "description": "No details",
-          "editComments": true,
           "learning_outcome_id": "612",
           "points": Object {
             "text": null,
@@ -804,6 +794,7 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the ro
   >
     <Comments
       allowSaving={true}
+      assessing={true}
       assessment={
         Object {
           "above_threshold": false,
@@ -812,7 +803,6 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the ro
           "comments_html": "I award you <b>no</b> points, and may God have mercy on your soul.",
           "criterion_id": "7_391",
           "description": "No details",
-          "editComments": true,
           "learning_outcome_id": "612",
           "points": Object {
             "text": null,
@@ -821,9 +811,7 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the ro
           },
         }
       }
-      editing={true}
       footer={null}
-      large={true}
       savedComments={Array []}
       setComments={[Function]}
       setSaveLater={[Function]}
@@ -843,7 +831,6 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the ro
           "comments_html": "I award you <b>no</b> points, and may God have mercy on your soul.",
           "criterion_id": "7_391",
           "description": "No details",
-          "editComments": true,
           "learning_outcome_id": "612",
           "points": Object {
             "text": null,
@@ -1014,10 +1001,9 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
   >
     <Comments
       allowSaving={true}
+      assessing={false}
       assessment={null}
-      editing={false}
       footer={null}
-      large={true}
       savedComments={Array []}
       setComments={[Function]}
       setSaveLater={[Function]}
@@ -1152,7 +1138,6 @@ exports[`Point Rubric with a custom criterion by default renders the root compon
             "comments_enabled": true,
             "criterion_id": "_1384",
             "description": "bleh",
-            "editComments": true,
             "id": "7_4778",
             "learning_outcome_id": null,
             "points": Object {
@@ -1175,33 +1160,7 @@ exports[`Point Rubric with a custom criterion by default renders the root compon
       assessing={false}
       customRatings={Array []}
       defaultMasteryThreshold={8}
-      footer={
-        <Comments
-          allowSaving={true}
-          assessment={
-            Object {
-              "comments": "i'd like to say some things",
-              "comments_enabled": true,
-              "criterion_id": "_1384",
-              "description": "bleh",
-              "editComments": true,
-              "id": "7_4778",
-              "learning_outcome_id": null,
-              "points": Object {
-                "text": null,
-                "valid": true,
-                "value": 3.2,
-              },
-            }
-          }
-          editing={false}
-          footer={null}
-          large={false}
-          savedComments={Array []}
-          setComments={[Function]}
-          setSaveLater={[Function]}
-        />
-      }
+      footer={null}
       hidePoints={false}
       isSummary={false}
       onPointChange={[Function]}
@@ -1248,7 +1207,6 @@ exports[`Point Rubric with a custom criterion by default renders the root compon
           "comments_enabled": true,
           "criterion_id": "_1384",
           "description": "bleh",
-          "editComments": true,
           "id": "7_4778",
           "learning_outcome_id": null,
           "points": Object {
@@ -1370,33 +1328,7 @@ exports[`Point Rubric with a custom criterion when assessing renders the root co
       assessing={true}
       customRatings={Array []}
       defaultMasteryThreshold={8}
-      footer={
-        <Comments
-          allowSaving={true}
-          assessment={
-            Object {
-              "comments": "i'd like to say some things",
-              "comments_enabled": true,
-              "criterion_id": "_1384",
-              "description": "bleh",
-              "editComments": true,
-              "id": "7_4778",
-              "learning_outcome_id": null,
-              "points": Object {
-                "text": null,
-                "valid": true,
-                "value": 3.2,
-              },
-            }
-          }
-          editing={true}
-          footer={null}
-          large={false}
-          savedComments={Array []}
-          setComments={[Function]}
-          setSaveLater={[Function]}
-        />
-      }
+      footer={null}
       hidePoints={false}
       isSummary={false}
       onPointChange={[Function]}
@@ -1443,7 +1375,6 @@ exports[`Point Rubric with a custom criterion when assessing renders the root co
           "comments_enabled": true,
           "criterion_id": "_1384",
           "description": "bleh",
-          "editComments": true,
           "id": "7_4778",
           "learning_outcome_id": null,
           "points": Object {
@@ -1456,6 +1387,14 @@ exports[`Point Rubric with a custom criterion when assessing renders the root co
       key="points"
       onPointChange={[Function]}
       pointsPossible={8}
+    />
+    <CommentButton
+      comments="i'd like to say some things"
+      description="Description of criterion"
+      finalize={[Function]}
+      initialize={[Function]}
+      open={false}
+      setComments={[Function]}
     />
   </td>
 </tr>
@@ -1780,7 +1719,6 @@ exports[`Point Rubric with a outcome criterion by default renders the root compo
             "comments_enabled": true,
             "criterion_id": "7_391",
             "description": "Naturligvis hadde han ogsaa længe forstaat hvorfor Inger hadde.",
-            "editComments": true,
             "id": "7_6639",
             "learning_outcome_id": "612",
             "points": Object {
@@ -1803,34 +1741,7 @@ exports[`Point Rubric with a outcome criterion by default renders the root compo
       assessing={false}
       customRatings={Array []}
       defaultMasteryThreshold={3}
-      footer={
-        <Comments
-          allowSaving={true}
-          assessment={
-            Object {
-              "above_threshold": false,
-              "comments": "here too",
-              "comments_enabled": true,
-              "criterion_id": "7_391",
-              "description": "Naturligvis hadde han ogsaa længe forstaat hvorfor Inger hadde.",
-              "editComments": true,
-              "id": "7_6639",
-              "learning_outcome_id": "612",
-              "points": Object {
-                "text": null,
-                "valid": true,
-                "value": 3,
-              },
-            }
-          }
-          editing={false}
-          footer={null}
-          large={false}
-          savedComments={Array []}
-          setComments={[Function]}
-          setSaveLater={[Function]}
-        />
-      }
+      footer={null}
       hidePoints={false}
       isSummary={false}
       onPointChange={[Function]}
@@ -1878,7 +1789,6 @@ exports[`Point Rubric with a outcome criterion by default renders the root compo
           "comments_enabled": true,
           "criterion_id": "7_391",
           "description": "Naturligvis hadde han ogsaa længe forstaat hvorfor Inger hadde.",
-          "editComments": true,
           "id": "7_6639",
           "learning_outcome_id": "612",
           "points": Object {
@@ -2052,34 +1962,7 @@ exports[`Point Rubric with a outcome criterion when assessing renders the root c
       assessing={true}
       customRatings={Array []}
       defaultMasteryThreshold={3}
-      footer={
-        <Comments
-          allowSaving={true}
-          assessment={
-            Object {
-              "above_threshold": false,
-              "comments": "here too",
-              "comments_enabled": true,
-              "criterion_id": "7_391",
-              "description": "Naturligvis hadde han ogsaa længe forstaat hvorfor Inger hadde.",
-              "editComments": true,
-              "id": "7_6639",
-              "learning_outcome_id": "612",
-              "points": Object {
-                "text": null,
-                "valid": true,
-                "value": 3,
-              },
-            }
-          }
-          editing={true}
-          footer={null}
-          large={false}
-          savedComments={Array []}
-          setComments={[Function]}
-          setSaveLater={[Function]}
-        />
-      }
+      footer={null}
       hidePoints={false}
       isSummary={false}
       onPointChange={[Function]}
@@ -2127,7 +2010,6 @@ exports[`Point Rubric with a outcome criterion when assessing renders the root c
           "comments_enabled": true,
           "criterion_id": "7_391",
           "description": "Naturligvis hadde han ogsaa længe forstaat hvorfor Inger hadde.",
-          "editComments": true,
           "id": "7_6639",
           "learning_outcome_id": "612",
           "points": Object {
@@ -2140,6 +2022,14 @@ exports[`Point Rubric with a outcome criterion when assessing renders the root c
       key="points"
       onPointChange={[Function]}
       pointsPossible={3}
+    />
+    <CommentButton
+      comments="here too"
+      description="Javel, Isak hadde ogsaa lauvet kraftig og hadde nu en Mængde Lauv av bedste Slag."
+      finalize={[Function]}
+      initialize={[Function]}
+      open={false}
+      setComments={[Function]}
     />
   </td>
 </tr>

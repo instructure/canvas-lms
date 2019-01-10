@@ -44,7 +44,6 @@
     "apollo-link": "^1.2.3",
     "apollo-link-error": "^1.1.1",
     "apollo-link-http": "^1.5.5",
-    "apollo-link-state": "^0.4.2",
     "axios": "^0.18.0",
     "backbone": "1.1.1",
     "big.js": "^5.0.3",

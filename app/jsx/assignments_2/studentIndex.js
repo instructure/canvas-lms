@@ -17,11 +17,9 @@
  */
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {GetLinkStateDefaults} from './student/assignmentData'
-import {ApolloProvider, createClient} from '../canvas-apollo'
-import StudentView from './student/StudentView'
+import {ApolloProvider, client} from '../canvas-apollo'
 
-const client = createClient({defaults: GetLinkStateDefaults()})
+import StudentView from './student/StudentView'
 
 export default function renderAssignmentsApp(env, elt) {
   ReactDOM.render(

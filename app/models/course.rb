@@ -240,9 +240,9 @@ class Course < ActiveRecord::Base
 
   include ContentNotices
   define_content_notice :import_in_progress,
-    text: -> { t('One or more items are currently being imported. They will be shown in the course below once they are available.') },
-    link_text: -> { t('Import Status') },
-    link_target: ->(course) { "/courses/#{course.to_param}/content_migrations" },
+    icon_class: 'icon-import-content',
+    alert_class: 'alert-info import-in-progress-notice',
+    template: 'courses/import_in_progress_notice',
     should_show: ->(course, user) do
       course.grants_right?(user, :manage_content)
     end

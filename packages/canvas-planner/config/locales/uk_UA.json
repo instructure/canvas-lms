@@ -95,9 +95,6 @@
   "date_is_required_8660ec22": {
     "message": "Потрібно вказати дату"
   },
-  "date_time_d9fbf2d7": {
-    "message": "Дата та час:"
-  },
   "delete_a6efa79d": {
     "message": "Видалити"
   },
@@ -275,9 +272,6 @@
   "peer_review_74f26a13": {
     "message": "Експертна оцінка"
   },
-  "peer_review_for_itemtitle_358cb413": {
-    "message": "Експертна оцінка для { itemTitle }"
-  },
   "points_bceb5005": {
     "message": "бали"
   },
@@ -316,12 +310,6 @@
   },
   "startdate_to_enddate_d245175b": {
     "message": "{ startDate } до { endDate }"
-  },
-  "startdatetime_enddatetime_20abc10e": {
-    "message": "{ startDateTime } - { endDateTime }"
-  },
-  "startdatetime_endtime_49741bbe": {
-    "message": "{ startDateTime } - { endTime }"
   },
   "starttime_to_endtime_d7cc249d": {
     "message": "{ startTime } до { endTime }"

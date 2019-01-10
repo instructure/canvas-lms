@@ -19,7 +19,6 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
 
-import {mockAssignment} from '../../test-utils'
 import AssignmentGroupModuleNav from '../AssignmentGroupModuleNav'
 
 beforeAll(() => {
@@ -36,16 +35,11 @@ afterEach(() => {
 })
 
 it('renders module and assignment group links correctly', () => {
-  const assignment = mockAssignment({
-    assignmentGroup: {name: 'Test assignmentGroup'},
-    modules: [{id: 1, name: 'Test Module'}],
-    env: {
-      assignmentUrl: 'testassignmentgrouplink',
-      moduleUrl: 'testmodulelink'
-    }
-  })
   ReactDOM.render(
-    <AssignmentGroupModuleNav assignment={assignment} />,
+    <AssignmentGroupModuleNav
+      module={{name: 'Test Module', link: 'testmodulelink'}}
+      assignmentGroup={{name: 'Test assignmentGroup', link: 'testassignmentgrouplink'}}
+    />,
     document.getElementById('fixtures')
   )
   const moduleLink = $('[data-test-id="module-link"]')
@@ -55,12 +49,11 @@ it('renders module and assignment group links correctly', () => {
 })
 
 it('renders module and assignment group text correctly', () => {
-  const assignment = mockAssignment({
-    modules: [{id: 1, name: 'Test Module'}],
-    assignmentGroup: {name: 'Test assignmentGroup'}
-  })
   ReactDOM.render(
-    <AssignmentGroupModuleNav assignment={assignment} />,
+    <AssignmentGroupModuleNav
+      module={{name: 'Test Module', link: 'testmodulelink'}}
+      assignmentGroup={{name: 'Test assignmentGroup', link: 'testassignmentgrouplink'}}
+    />,
     document.getElementById('fixtures')
   )
   const moduleLink = $('[data-test-id="module-link"]')
@@ -70,12 +63,10 @@ it('renders module and assignment group text correctly', () => {
 })
 
 it('will not render module container if not present', () => {
-  const assignment = mockAssignment({
-    modules: [],
-    assignmentGroup: {name: 'Test assignmentGroup'}
-  })
   ReactDOM.render(
-    <AssignmentGroupModuleNav assignment={assignment} />,
+    <AssignmentGroupModuleNav
+      assignmentGroup={{name: 'Test assignmentGroup', link: 'testassignmentgrouplink'}}
+    />,
     document.getElementById('fixtures')
   )
   const moduleLink = $('[data-test-id="module-link"]')
@@ -85,12 +76,8 @@ it('will not render module container if not present', () => {
 })
 
 it('will not render assignment group container if not present', () => {
-  const assignment = mockAssignment({
-    modules: [{id: 1, name: 'Test Module'}],
-    assignmentGroup: null
-  })
   ReactDOM.render(
-    <AssignmentGroupModuleNav assignment={assignment} />,
+    <AssignmentGroupModuleNav module={{name: 'Test Module', link: 'testmodulelink'}} />,
     document.getElementById('fixtures')
   )
   const moduleLink = $('[data-test-id="module-link"]')
@@ -100,49 +87,12 @@ it('will not render assignment group container if not present', () => {
 })
 
 it('will render nothing if null props provided', () => {
-  const assignment = mockAssignment({modules: [], assignmentGroup: null})
   ReactDOM.render(
-    <AssignmentGroupModuleNav assignment={assignment} />,
+    <AssignmentGroupModuleNav module={null} assignmentGroup={null} />,
     document.getElementById('fixtures')
   )
   const moduleLink = $('[data-test-id="module-link"]')
   const assignmentGroupLink = $('[data-test-id="assignmentgroup-link"]')
   expect(assignmentGroupLink).toHaveLength(0)
   expect(moduleLink).toHaveLength(0)
-})
-
-it('renders multiple modules', () => {
-  const assignment = mockAssignment({
-    modules: [{id: 1, name: 'Test Module 1'}, {id: 2, name: 'Test Module 2'}],
-    assignmentGroup: null
-  })
-  ReactDOM.render(
-    <AssignmentGroupModuleNav assignment={assignment} />,
-    document.getElementById('fixtures')
-  )
-  const moduleLink = $('[data-test-id="module-link"]')
-  expect(moduleLink).toHaveLength(2)
-  expect(moduleLink.eq(0).text()).toEqual('Test Module 1')
-  expect(moduleLink.eq(1).text()).toEqual('Test Module 2')
-})
-
-it('limits the maximum number of modules rendered', () => {
-  const assignment = mockAssignment({
-    modules: [
-      {id: 1, name: 'Test Module 1'},
-      {id: 2, name: 'Test Module 2'},
-      {id: 3, name: 'Test Module 3'},
-      {id: 4, name: 'Test Module 4'}
-    ],
-    assignmentGroup: null
-  })
-  ReactDOM.render(
-    <AssignmentGroupModuleNav assignment={assignment} />,
-    document.getElementById('fixtures')
-  )
-  const moduleLink = $('[data-test-id="module-link"]')
-  expect(moduleLink).toHaveLength(3)
-  expect(moduleLink.eq(0).text()).toEqual('Test Module 1')
-  expect(moduleLink.eq(1).text()).toEqual('Test Module 2')
-  expect(moduleLink.eq(2).text()).toEqual('More Modules')
 })

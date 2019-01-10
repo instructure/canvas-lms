@@ -54,27 +54,3 @@ it('will render the unavailaible step container if assignment is locked', () => 
   expect(expectedElement).toHaveLength(1)
   expect(unexpectedElement).toHaveLength(0)
 })
-
-it('will render collapsed label if steps is collapsed', () => {
-  const label = 'TEST'
-  const assignment = mockAssignment({lockInfo: {isLocked: false}})
-  ReactDOM.render(
-    <StepContainer assignment={assignment} isCollapsed collapsedLabel={label} />,
-    document.getElementById('fixtures')
-  )
-
-  const expectedElement = $('.steps-main-status-label')
-  expect(expectedElement.text()).toBe(label)
-})
-
-it('will not render collapsed label if steps is collapsed', () => {
-  const label = 'TEST'
-  const assignment = mockAssignment({lockInfo: {isLocked: false}})
-  ReactDOM.render(
-    <StepContainer assignment={assignment} isCollapsed={false} collapsedLabel={label} />,
-    document.getElementById('fixtures')
-  )
-
-  const expectedElement = $('.steps-main-status-label')
-  expect(expectedElement.text()).toHaveLength(0)
-})

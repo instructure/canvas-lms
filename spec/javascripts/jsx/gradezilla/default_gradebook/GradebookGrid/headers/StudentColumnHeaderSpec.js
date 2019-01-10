@@ -24,7 +24,7 @@ import studentRowHeaderConstants from 'jsx/gradezilla/default_gradebook/constant
 import {blurElement, getMenuContent, getMenuItem} from './ColumnHeaderSpecHelpers'
 
 /* eslint-disable qunit/no-identical-names */
-QUnit.module('GradebookGrid StudentColumnHeader', suiteHooks => {
+QUnit.module('StudentColumnHeader', suiteHooks => {
   let $container
   let $menuContent
   let component
@@ -196,16 +196,13 @@ QUnit.module('GradebookGrid StudentColumnHeader', suiteHooks => {
         })
 
         // TODO: GRADE-____
-        QUnit.skip(
-          'does not call the .sortBySetting.onSortBySortableNameAscending callback when already selected',
-          () => {
-            props.sortBySetting.settingKey = 'sortable_name'
-            props.sortBySetting.direction = 'ascending'
-            mountAndOpenOptionsMenu()
-            getSortByOption('A–Z').click()
-            strictEqual(props.sortBySetting.onSortBySortableNameAscending.callCount, 0)
-          }
-        )
+        QUnit.skip('does not call the .sortBySetting.onSortBySortableNameAscending callback when already selected', () => {
+          props.sortBySetting.settingKey = 'sortable_name'
+          props.sortBySetting.direction = 'ascending'
+          mountAndOpenOptionsMenu()
+          getSortByOption('A–Z').click()
+          strictEqual(props.sortBySetting.onSortBySortableNameAscending.callCount, 0)
+        })
       })
     })
 
@@ -255,16 +252,13 @@ QUnit.module('GradebookGrid StudentColumnHeader', suiteHooks => {
         })
 
         // TODO: GRADE-____
-        QUnit.skip(
-          'does not call the .sortBySetting.onSortBySortableNameDescending callback when already selected',
-          () => {
-            props.sortBySetting.settingKey = 'sortable_name'
-            props.sortBySetting.direction = 'ascending'
-            mountAndOpenOptionsMenu()
-            getSortByOption('Z–A').click()
-            strictEqual(props.sortBySetting.onSortBySortableNameDescending.callCount, 0)
-          }
-        )
+        QUnit.skip('does not call the .sortBySetting.onSortBySortableNameDescending callback when already selected', () => {
+          props.sortBySetting.settingKey = 'sortable_name'
+          props.sortBySetting.direction = 'ascending'
+          mountAndOpenOptionsMenu()
+          getSortByOption('Z–A').click()
+          strictEqual(props.sortBySetting.onSortBySortableNameDescending.callCount, 0)
+        })
       })
     })
   })
@@ -464,15 +458,12 @@ QUnit.module('GradebookGrid StudentColumnHeader', suiteHooks => {
         })
 
         // TODO: GRADE-____
-        QUnit.skip(
-          'does not call the .onSelectSecondaryInfo callback when already selected',
-          () => {
-            props.selectedSecondaryInfo = 'section'
-            mountAndOpenOptionsMenu()
-            getSecondaryInfoOption('Section').click()
-            strictEqual(props.onSelectSecondaryInfo.callCount, 0)
-          }
-        )
+        QUnit.skip('does not call the .onSelectSecondaryInfo callback when already selected', () => {
+          props.selectedSecondaryInfo = 'section'
+          mountAndOpenOptionsMenu()
+          getSecondaryInfoOption('Section').click()
+          strictEqual(props.onSelectSecondaryInfo.callCount, 0)
+        })
       })
     })
 
@@ -527,15 +518,12 @@ QUnit.module('GradebookGrid StudentColumnHeader', suiteHooks => {
         })
 
         // TODO: GRADE-____
-        QUnit.skip(
-          'does not call the .onSelectSecondaryInfo callback when already selected',
-          () => {
-            props.selectedSecondaryInfo = 'sis_id'
-            mountAndOpenOptionsMenu()
-            getSecondaryInfoOption('SIS ID').click()
-            strictEqual(props.onSelectSecondaryInfo.callCount, 0)
-          }
-        )
+        QUnit.skip('does not call the .onSelectSecondaryInfo callback when already selected', () => {
+          props.selectedSecondaryInfo = 'sis_id'
+          mountAndOpenOptionsMenu()
+          getSecondaryInfoOption('SIS ID').click()
+          strictEqual(props.onSelectSecondaryInfo.callCount, 0)
+        })
       })
     })
 
@@ -583,15 +571,12 @@ QUnit.module('GradebookGrid StudentColumnHeader', suiteHooks => {
         })
 
         // TODO: GRADE-____
-        QUnit.skip(
-          'does not call the .onSelectSecondaryInfo callback when already selected',
-          () => {
-            props.selectedSecondaryInfo = 'integration_id'
-            mountAndOpenOptionsMenu()
-            getSecondaryInfoOption('Integration ID').click()
-            strictEqual(props.onSelectSecondaryInfo.callCount, 0)
-          }
-        )
+        QUnit.skip('does not call the .onSelectSecondaryInfo callback when already selected', () => {
+          props.selectedSecondaryInfo = 'integration_id'
+          mountAndOpenOptionsMenu()
+          getSecondaryInfoOption('Integration ID').click()
+          strictEqual(props.onSelectSecondaryInfo.callCount, 0)
+        })
       })
     })
 
@@ -646,15 +631,12 @@ QUnit.module('GradebookGrid StudentColumnHeader', suiteHooks => {
         })
 
         // TODO: GRADE-____
-        QUnit.skip(
-          'does not call the .onSelectSecondaryInfo callback when already selected',
-          () => {
-            props.selectedSecondaryInfo = 'login_id'
-            mountAndOpenOptionsMenu()
-            getSecondaryInfoOption('Login ID').click()
-            strictEqual(props.onSelectSecondaryInfo.callCount, 0)
-          }
-        )
+        QUnit.skip('does not call the .onSelectSecondaryInfo callback when already selected', () => {
+          props.selectedSecondaryInfo = 'login_id'
+          mountAndOpenOptionsMenu()
+          getSecondaryInfoOption('Login ID').click()
+          strictEqual(props.onSelectSecondaryInfo.callCount, 0)
+        })
       })
     })
 
@@ -702,15 +684,12 @@ QUnit.module('GradebookGrid StudentColumnHeader', suiteHooks => {
         })
 
         // TODO: GRADE-____
-        QUnit.skip(
-          'does not call the .onSelectSecondaryInfo callback when already selected',
-          () => {
-            props.selectedSecondaryInfo = 'none'
-            mountAndOpenOptionsMenu()
-            getSecondaryInfoOption('None').click()
-            strictEqual(props.onSelectSecondaryInfo.callCount, 0)
-          }
-        )
+        QUnit.skip('does not call the .onSelectSecondaryInfo callback when already selected', () => {
+          props.selectedSecondaryInfo = 'none'
+          mountAndOpenOptionsMenu()
+          getSecondaryInfoOption('None').click()
+          strictEqual(props.onSelectSecondaryInfo.callCount, 0)
+        })
       })
     })
   })
@@ -909,4 +888,3 @@ QUnit.module('GradebookGrid StudentColumnHeader', suiteHooks => {
     })
   })
 })
-/* eslint-enable qunit/no-identical-names */

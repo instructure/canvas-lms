@@ -20,13 +20,12 @@ import React, {Component} from 'react'
 import {bool, func, instanceOf, number, oneOf, shape, string} from 'prop-types'
 import ApplyTheme from '@instructure/ui-themeable/lib/components/ApplyTheme'
 import Button from '@instructure/ui-buttons/lib/components/Button'
-import IconExpandStart from '@instructure/ui-icons/lib/Line/IconExpandStart'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import TextInput from '@instructure/ui-forms/lib/components/TextInput'
+import IconExpandStart from '@instructure/ui-icons/lib/Line/IconExpandStart'
 import I18n from 'i18n!gradebook'
-
-import AssignmentGradeInput from '../AssignmentGradeInput'
-import InvalidGradeIndicator from '../InvalidGradeIndicator'
+import InvalidGradeIndicator from './InvalidGradeIndicator'
+import GradeInput from './GradeInput'
 
 const themeOverrides = {
   [Button.theme]: {
@@ -108,7 +107,10 @@ export default class AssignmentRowCell extends Component {
     const submissionFinishedUpdating =
       prevProps.submissionIsUpdating && !this.props.submissionIsUpdating
 
-    if (submissionFinishedUpdating && this.trayButton !== document.activeElement) {
+    if (
+      submissionFinishedUpdating &&
+      this.trayButton !== document.activeElement
+    ) {
       // the cell was reactivated while the grade was updating
       // set the focus on the input by default
       this.gradeInput.focus()
@@ -178,15 +180,15 @@ export default class AssignmentRowCell extends Component {
 
     return (
       <ApplyTheme theme={themeOverrides}>
-        <div className={`Grid__GradeCell ${this.props.enterGradesAs}`}>
-          <div className="Grid__GradeCell__StartContainer">
+        <div className={`Grid__AssignmentRowCell ${this.props.enterGradesAs}`}>
+          <div className="Grid__AssignmentRowCell__StartContainer">
             {gradeIsInvalid && (
               <InvalidGradeIndicator elementRef={this.bindInvalidGradeIndicatorRef} />
             )}
           </div>
 
-          <div className="Grid__GradeCell__Content" ref={this.bindContainerRef}>
-            <AssignmentGradeInput
+          <div className="Grid__AssignmentRowCell__Content" ref={this.bindContainerRef}>
+            <GradeInput
               assignment={this.props.assignment}
               enterGradesAs={this.props.enterGradesAs}
               disabled={this.props.submissionIsUpdating}
@@ -197,14 +199,14 @@ export default class AssignmentRowCell extends Component {
             />
           </div>
 
-          <div className="Grid__GradeCell__EndContainer">
+          <div className="Grid__AssignmentRowCell__EndContainer">
             {showEndText && (
-              <span className="Grid__GradeCell__EndText">
+              <span className="Grid__AssignmentRowCell__EndText">
                 {pointsPossible && <Text size="small">{pointsPossible}</Text>}
               </span>
             )}
 
-            <div className="Grid__GradeCell__Options">
+            <div className="Grid__AssignmentRowCell__Options">
               <Button
                 buttonRef={this.bindToggleTrayButtonRef}
                 onClick={this.handleToggleTrayButtonClick}

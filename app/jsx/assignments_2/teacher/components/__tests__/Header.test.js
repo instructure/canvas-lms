@@ -23,11 +23,8 @@ import Header from '../Header'
 
 it('renders basic assignment information', () => {
   const assignment = mockAssignment()
-  const {container, getByTestId} = render(<Header assignment={assignment} />)
+  const {container, getByTestId} = render(<Header assignment={mockAssignment()} />)
   expect(container).toHaveTextContent(assignment.name)
   expect(container).toHaveTextContent(assignment.pointsPossible.toString())
-  expect(container).toHaveTextContent('module 1 | module 2')
-  expect(container).toHaveTextContent('assignment group')
-  expect(container).toHaveTextContent('Assignment')
   expect(getByTestId('teacher-toolbox')).toBeInTheDocument()
 })

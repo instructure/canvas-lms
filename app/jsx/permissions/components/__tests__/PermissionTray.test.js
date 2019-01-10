@@ -27,8 +27,6 @@ function makeDefaultProps() {
     assignedRoles: ROLES.filter(r => r.id === '1'),
     label: 'Student',
     permissionName: 'add_section',
-    permission: 'the best permission',
-    tab: 'account',
     open: true,
     hideTray: () => {},
     unassignedRoles: ROLES.filter(r => r.id === '2')

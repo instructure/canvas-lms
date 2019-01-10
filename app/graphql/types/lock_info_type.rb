@@ -16,32 +16,34 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 module Types
-  class LockableUnionType < BaseUnion
-    graphql_name "Lockable"
+  LockInfoType = GraphQL::ObjectType.define do
+    name "LockInfo"
+
+    field :isLocked, types.Boolean, resolve: ->(lock, _, _) { !!lock }
+    # module, page
+    field :lockedObject, LockableUnionType, resolve: GraphQLHelpers.make_lock_resolver(:object)
+    field :module, ModuleType, resolve: GraphQLHelpers.make_lock_resolver(:module)
+    field :lockAt, DateTimeType, resolve: GraphQLHelpers.make_lock_resolver(:lock_at)
+    field :unlockAt, DateTimeType, resolve: GraphQLHelpers.make_lock_resolver(:unlock_at)
+    field :canView, types.Boolean, resolve: GraphQLHelpers.make_lock_resolver(:can_view)
+  end
+
+
+  LockableUnionType = GraphQL::UnionType.define do
+    name "Lockable"
 
     description "Types that can be locked"
 
-    possible_types AssignmentType, DiscussionType, QuizType, PageType, ModuleType
-  end
+    possible_types [AssignmentType, DiscussionType, QuizType, PageType, ModuleType]
 
-  class LockInfoType < ApplicationObjectType
-    graphql_name "LockInfo"
-
-    alias lock_info object
-
-    field :is_locked, Boolean, null: false
-    def is_locked
-      !!lock_info[:object]
-    end
-
-    field :locked_object, LockableUnionType, null: true
-    def locked_object
-      lock_info[:object]
-    end
-
-    field :module, ModuleType, null: true
-    field :lock_at, DateTimeType, null: true
-    field :unlock_at, DateTimeType, null: true
-    field :can_view, Boolean, null: true
+    resolve_type ->(obj, _) {
+      case obj
+      when Assignment then AssignmentType
+      when DiscussionTopic then DiscussionType
+      when Quizzes::Quiz then QuizType
+      when WikiPage then PageType
+      when ContextModule then ModuleType
+      end
+    }
   end
 end

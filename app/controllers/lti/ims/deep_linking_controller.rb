@@ -20,6 +20,8 @@ require 'json/jwt'
 module Lti
   module Ims
     class DeepLinkingController < ApplicationController
+      CLAIM_PREFIX = 'https://purl.imsglobal.org/spec/lti-dl/claim/'.freeze
+
       protect_from_forgery except: [:deep_linking_response], with: :exception
 
       include Concerns::DeepLinkingServices
@@ -29,14 +31,13 @@ module Lti
 
       def deep_linking_response
         # Set content items and messaging values in JS env
-        js_env({
+        js_env(
           content_items: deep_linking_jwt["#{CLAIM_PREFIX}content_items"],
-          message: messaging_value('msg'),
-          log: messaging_value('log'),
-          error_message: messaging_value('errormsg'),
-          error_log: messaging_value('errorlog'),
-          lti_endpoint: polymorphic_url([:retrieve, @context, :external_tools])
-        }.compact)
+          message: deep_linking_jwt["#{CLAIM_PREFIX}msg"],
+          log: '',
+          error_message: deep_linking_jwt["#{CLAIM_PREFIX}errormsg"],
+          error_log: ''
+        )
 
         render layout: 'bare'
       end

@@ -145,21 +145,6 @@ describe('Criterion', () => {
     expect(el.find('td')).toHaveLength(1)
   })
 
-  it('only shows comments when they exist or editComments is true', () => {
-    const withAssessment= (changes) => shallow(
-      <Criterion
-        assessment={{ ...assessments.points.data[1], ...changes }}
-        onAssessmentChange={sinon.spy()}
-        criterion={rubrics.points.criteria[1]}
-        freeForm={false}
-      />
-    ).find('Ratings').prop('footer')
-
-    expect(withAssessment({ comments: 'blah', editComments: false })).toBeDefined()
-    expect(withAssessment({ comments: '', editComments: true })).toBeDefined()
-    expect(withAssessment({ comments: '', editComments: false })).toBeNull()
-  })
-
   it('allows extra credit for outcomes when enabled', () => {
     const el = shallow(
       <Criterion
@@ -172,6 +157,60 @@ describe('Criterion', () => {
     )
 
     expect(el.find('Points').prop('allowExtraCredit')).toEqual(true)
+  })
+
+  it('saves new comments from the dialog if entered', () => {
+    const onAssessmentChange = sinon.spy()
+    const newComments = { ...assessments.points.data[1], partialComments: 'up' }
+    const comments = shallow(
+      <Criterion
+        assessment={newComments}
+        criterion={rubrics.points.criteria[1]}
+        onAssessmentChange={onAssessmentChange}
+        freeForm={false}
+      />
+    )
+
+    const button = comments.find('CommentButton')
+    button.prop('finalize')(true)
+
+    expect(onAssessmentChange.args[0][0].comments).toEqual('up')
+  })
+
+  it('can save empty comments', () => {
+    const onAssessmentChange = sinon.spy()
+    const newComments = { ...assessments.points.data[1], partialComments: '' }
+    const comments = shallow(
+      <Criterion
+        assessment={newComments}
+        criterion={rubrics.points.criteria[1]}
+        onAssessmentChange={onAssessmentChange}
+        freeForm={false}
+      />
+    )
+
+    const button = comments.find('CommentButton')
+    button.prop('finalize')(true)
+
+    expect(onAssessmentChange.args[0][0].comments).toEqual('')
+  })
+
+  it('saves prior comments from the dialog if unchanged', () => {
+    const onAssessmentChange = sinon.spy()
+    const comments = shallow(
+      <Criterion
+        assessment={assessments.points.data[1]}
+        criterion={rubrics.points.criteria[1]}
+        onAssessmentChange={onAssessmentChange}
+        freeForm={false}
+      />
+    )
+
+    const button = comments.find('CommentButton')
+    button.prop('finalize')(true)
+
+    const priorComments = assessments.points.data[1].comments
+    expect(onAssessmentChange.args[0][0].comments).toEqual(priorComments)
   })
 
   describe('the Points for a criterion', () => {

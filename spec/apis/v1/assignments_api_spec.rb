@@ -2736,6 +2736,33 @@ describe AssignmentsApiController, type: :request do
         error = json_parse(response.body)['errors']['final_grader_id'].first
         expect(error['message']).to eq 'course has no active instructors with this ID'
       end
+
+      it 'skips final_grader_id validation if the field has not changed' do
+        assignment = @course.assignments.create!(
+          final_grader: @teacher,
+          grader_count: 2,
+          moderated_grading: true,
+          name: 'Some Assignment'
+        )
+        @course.root_account.role_overrides.create!(
+          permission: 'select_final_grade',
+          role: teacher_role,
+          enabled: false
+        )
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}",
+          {
+            controller: 'assignments_api',
+            action: 'update',
+            format: 'json',
+            course_id: @course.id,
+            id: assignment.to_param
+          },
+          { assignment: { name: 'a fancy new name' } },
+        )
+        expect(response).to be_successful
+      end
     end
 
     it 'allows updating grader_count' do

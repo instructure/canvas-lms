@@ -19,16 +19,14 @@
 import CellEditorFactory from 'jsx/gradezilla/default_gradebook/GradebookGrid/editors/CellEditorFactory'
 import AssignmentCellEditor from 'jsx/gradezilla/default_gradebook/GradebookGrid/editors/AssignmentCellEditor'
 
-QUnit.module('GradebookGrid CellEditorFactory', () => {
-  QUnit.module('#getEditor()', () => {
-    test('#getEditor returns AssignmentCellEditor for columns of type "assignment"', () => {
-      const factory = new CellEditorFactory()
-      equal(factory.getEditor({type: 'assignment'}), AssignmentCellEditor)
-    })
+QUnit.module('CellEditorFactory');
 
-    test('#getEditor returns undefined for unhandled column types', () => {
-      const factory = new CellEditorFactory()
-      equal(typeof factory.getEditor({type: 'unknown'}), 'undefined')
-    })
-  })
-})
+test('#getEditor returns AssignmentCellEditor for columns of type "assignment"', function () {
+  const factory = new CellEditorFactory();
+  equal(factory.getEditor({ type: 'assignment' }), AssignmentCellEditor);
+});
+
+test('#getEditor returns undefined for unhandled column types', function () {
+  const factory = new CellEditorFactory();
+  equal(typeof factory.getEditor({ type: 'unknown' }), 'undefined');
+});

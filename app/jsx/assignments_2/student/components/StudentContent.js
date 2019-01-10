@@ -25,9 +25,10 @@ import MissingPrereqs from './MissingPrereqs'
 import LockedAssignment from './LockedAssignment'
 
 function renderContentBaseOnAvailability(assignment) {
-  if (assignment.env.modulePrereq) {
-    const prereq = assignment.env.modulePrereq
-    return <MissingPrereqs preReqTitle={prereq.title} preReqLink={prereq.link} />
+  // TODO get this from graphql instead of ENV
+  if (ENV && ENV.PREREQS && ENV.PREREQS.items && ENV.PREREQS.items.length !== 0) {
+    const preReqItem = ENV.PREREQS.items[0] && ENV.PREREQS.items[0].prev
+    return <MissingPrereqs preReqTitle={preReqItem.title} preReqLink={preReqItem.html_url} />
   } else if (assignment && assignment.lockInfo.isLocked) {
     return <LockedAssignment assignment={assignment} />
   } else {
@@ -44,7 +45,7 @@ function StudentContent(props) {
   const {assignment} = props
   return (
     <div data-test-id="assignments-2-student-view">
-      <Header scrollThreshold={150} assignment={assignment} />
+      <Header assignment={assignment} />
       {renderContentBaseOnAvailability(assignment)}
     </div>
   )

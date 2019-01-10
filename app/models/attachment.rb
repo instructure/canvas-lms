@@ -1520,10 +1520,7 @@ class Attachment < ActiveRecord::Base
 
   def restore
     self.file_state = 'available'
-    if self.save
-      self.handle_duplicates(:rename)
-    end
-    true
+    self.save
   end
 
   def deleted?
@@ -1904,8 +1901,6 @@ class Attachment < ActiveRecord::Base
        self.context.respond_to?(:feature_enabled?) &&
        self.context.feature_enabled?(:usage_rights_required)
       self.locked = self.usage_rights.nil?
-    else
-      self.locked = false
     end
   end
 

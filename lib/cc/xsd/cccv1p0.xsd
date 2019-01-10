@@ -253,7 +253,6 @@
         <xs:element name="has_group_category" type="xs:boolean" minOccurs="0"/>
         <xs:element name="group_category" type="xs:string" minOccurs="0"/>
         <xs:element name="allow_rating" type="xs:boolean" minOccurs="0"/>
-        <xs:element name="module_locked" type="xs:boolean" minOccurs="0"/>
         <xs:element name="only_graders_can_rate" type="xs:boolean" minOccurs="0"/>
         <xs:element name="sort_by_rating" type="xs:boolean" minOccurs="0"/>
         <xs:element name="todo_date" type="optional_dateTime" minOccurs="0"/>

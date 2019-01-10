@@ -20,20 +20,19 @@ import React, {Component} from 'react'
 import {bool, instanceOf, oneOf, number, shape, string} from 'prop-types'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import I18n from 'i18n!gradebook'
-
 import CompleteIncompleteGradeInput from './CompleteIncompleteGradeInput'
 import GradingSchemeGradeInput from './GradingSchemeGradeInput'
 import TextGradeInput from './TextGradeInput'
 
 const CLASSNAME_FOR_ENTER_GRADES_AS = {
-  gradingScheme: 'Grid__GradeCell__GradingSchemeInput',
-  passFail: 'Grid__GradeCell__CompleteIncompleteInput',
-  percent: 'Grid__GradeCell__PercentInput',
-  points: 'Grid__GradeCell__PointsInput'
+  gradingScheme: 'Grid__AssignmentRowCell__GradingSchemeInput',
+  passFail: 'Grid__AssignmentRowCell__CompleteIncompleteInput',
+  percent: 'Grid__AssignmentRowCell__PercentInput',
+  points: 'Grid__AssignmentRowCell__PointsInput'
 }
 
 function inputComponentFor(enterGradesAs) {
-  switch (enterGradesAs) {
+  switch(enterGradesAs) {
     case 'gradingScheme': {
       return GradingSchemeGradeInput
     }
@@ -46,7 +45,7 @@ function inputComponentFor(enterGradesAs) {
   }
 }
 
-export default class AssignmentGradeInput extends Component {
+export default class GradeInput extends Component {
   static propTypes = {
     assignment: shape({
       pointsPossible: number

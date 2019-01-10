@@ -1553,8 +1553,8 @@ class Assignment < ActiveRecord::Base
     return true unless moderated_grading?
 
     # a moderated assignment may only be edited by the assignment's moderator (assuming one has
-    # been specified) or by a user with the Select Final Grade permission.
-    final_grader_id.blank? || context.grants_right?(user, :select_final_grade)
+    # been specified) or by an account admin with 'Select Final Grader for Moderation' privileges.
+    final_grader_id.blank? || permits_moderation?(user)
   end
 
   def user_can_read_grades?(user, session=nil)

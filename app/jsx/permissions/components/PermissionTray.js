@@ -41,7 +41,6 @@ import {
 function renderPermissionDetailToggles(tab, permissionName) {
   return PERMISSION_DETAIL_SECTIONS.map(PDS => (
     <DetailsToggle
-      key={PDS.title}
       title={PDS.title}
       detailItems={
         tab === COURSE

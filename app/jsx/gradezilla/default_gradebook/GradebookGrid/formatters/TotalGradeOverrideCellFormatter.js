@@ -43,22 +43,33 @@ function render(options) {
   `
 }
 
-export default class TotalGradeOverrideCellFormatter {
+export default class TotalGradeCellFormatter {
   constructor(gradebook) {
     this.options = {
       getFinalGradeOverride(studentId) {
-        return gradebook.finalGradeOverrides.getGradeForUser(studentId)
+        const studentGradeOverrides = gradebook.getFinalGradeOverrides(studentId)
+        if (!studentGradeOverrides) {
+          return null
+        }
+
+        if (gradebook.isFilteringColumnsByGradingPeriod()) {
+          if (!studentGradeOverrides.gradingPeriodGrades) {
+            return null
+          }
+          const gradingPeriodId = gradebook.getGradingPeriodToShow()
+          return studentGradeOverrides.gradingPeriodGrades[gradingPeriodId] || null
+        }
+
+        return studentGradeOverrides.courseGrade || null
       },
 
       getCourseGradingScheme() {
         return gradebook.options.grading_standard
       }
     }
-
-    this.render = this.render.bind(this)
   }
 
-  render(_row, _cell, _value, _columnDef, student /* dataContext */) {
+  render = (row, _cell, _value, _columnDef, student /* dataContext */) => {
     const finalGradeOverride = this.options.getFinalGradeOverride(student.id)
     if (finalGradeOverride == null) {
       return render({schemeGrade: null, percentage: null})

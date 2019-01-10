@@ -169,9 +169,9 @@ describe Csp do
       enable_cache do
         expect(@sub2.csp_whitelisted_domains).to eq []
         root_tool = create_tool(@root, :domain => "example1.com")
-        expect(Account.find(@sub2.id).csp_whitelisted_domains).to eq ["example1.com"]
+        expect(@sub2.csp_whitelisted_domains).to eq ["example1.com"]
         root_tool.update_attribute(:domain, "example2.com")
-        expect(Account.find(@sub2.id).csp_whitelisted_domains).to eq ["example2.com"]
+        expect(@sub2.csp_whitelisted_domains).to eq ["example2.com"]
       end
     end
   end

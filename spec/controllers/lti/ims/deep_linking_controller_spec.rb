@@ -34,13 +34,9 @@ module Lti
           expect(controller).to receive(:js_env).with(
             content_items: content_items,
             message: message,
-            log: log,
+            log: '',
             error_message: error_message,
-            error_log: error_log,
-            lti_endpoint: Rails.application.routes.url_helpers.polymorphic_url(
-              [:retrieve, account, :external_tools],
-              host: 'test.host'
-            )
+            error_log: ''
           )
           subject
         end

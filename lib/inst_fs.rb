@@ -40,8 +40,7 @@ module InstFS
     end
 
     def authenticated_url(attachment, options={})
-
-      query_params = { token: access_jwt(access_path(attachment), options) }
+      query_params = { token: access_jwt(access_path(attachment, attachment.filename), options) }
       query_params[:download] = 1 if options[:download]
       access_url(attachment, query_params)
     end
@@ -155,7 +154,7 @@ module InstFS
     end
 
     def access_url(attachment, query_params)
-      service_url(access_path(attachment), query_params)
+      service_url(access_path(attachment, attachment.filename), query_params)
     end
 
     def thumbnail_url(attachment, query_params)
@@ -167,13 +166,10 @@ module InstFS
       service_url("/files", query_string)
     end
 
-    def access_path(attachment)
+    def access_path(attachment, custom_name)
       res = "/files/#{attachment.instfs_uuid}"
-      display_name = attachment.display_name || attachment.filename
-      if display_name
-        unencoded_characters = Addressable::URI::CharacterClasses::UNRESERVED
-        encoded_display_name = Addressable::URI.encode_component(display_name, unencoded_characters)
-        res += "/#{encoded_display_name}"
+      if custom_name
+        res += "/#{custom_name}"
       end
       res
     end

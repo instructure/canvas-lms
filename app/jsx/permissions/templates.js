@@ -2417,7 +2417,7 @@ const questionBankPermissions = generateActionTemplates(
     {
       title: I18n.t('Question Banks'),
       description: I18n.t(
-        `Allows user to view and link questions in a quiz to account-level question banks.`
+        `Allows user to view and link questions in a quiz to account-level question banks. If disabled, user will only be able to view and link to course question banks.`
       )
     }
   ],

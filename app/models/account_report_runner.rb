@@ -51,7 +51,8 @@ class AccountReportRunner < ActiveRecord::Base
   scope :incomplete, -> {where(workflow_state: %w(created running))}
 
   def delete_account_report_rows
-    cleanup = self.account_report_rows.limit(10_000)
-    until cleanup.delete_all < 10_000; end
+    self.account_report_rows.find_ids_in_batches(batch_size: 10_000) do |batch|
+      AccountReportRow.where(id: batch).delete_all
+    end
   end
 end

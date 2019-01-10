@@ -31,18 +31,6 @@ it('shows the message students who dialog when the unsubmitted button is clicked
   expect(getByText('Message Students Who')).toBeInTheDocument()
 })
 
-it('shows the assignment', () => {
-  const assignment = mockAssignment()
-  const {getByText} = render(<CoreTeacherView data={{assignment}} />)
-  expect(getByText(assignment.name)).toBeInTheDocument()
-  expect(getByText(`${assignment.pointsPossible}`)).toBeInTheDocument()
-  expect(getByText('Everyone')).toBeInTheDocument()
-  expect(getByText('Due:', {exact: false})).toBeInTheDocument()
-  expect(getByText('Available', {exact: false})).toBeInTheDocument()
-})
-
 // tests to implement somewhere
-/* eslint-disable jest/no-disabled-tests */
 it.skip('renders a loading screen when waiting on the initial query', () => {})
 it.skip('renders a problem screen on a bad graphql query', () => {})
-/* eslint-enable jest/no-disabled-tests */

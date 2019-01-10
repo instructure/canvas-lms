@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render} from 'react-testing-library'
-import {mockAssignment, mockOverride} from '../../test-utils'
+import {mockAssignment} from '../../test-utils'
 import apiUserContent from 'compiled/str/apiUserContent'
 import Details from '../Details'
 
@@ -29,34 +29,4 @@ it('renders and converts', () => {
   const assignment = mockAssignment()
   const {getByText} = render(<Details assignment={assignment} />)
   getByText(`converted ${assignment.description}`)
-  expect(getByText('Everyone')).toBeInTheDocument()
-  expect(getByText('Due:', {exact: false})).toBeInTheDocument()
-  expect(getByText('Available', {exact: false})).toBeInTheDocument()
-})
-
-it('renders an override', () => {
-  const assignment = mockAssignment({
-    assignmentOverrides: {
-      nodes: [mockOverride({title: 'Section A'})]
-    }
-  })
-  const {getByText} = render(<Details assignment={assignment} />)
-  expect(getByText('Section A')).toBeInTheDocument()
-  expect(getByText('Everyone else')).toBeInTheDocument()
-})
-
-it('renders all the overrides', () => {
-  const assignment = mockAssignment({
-    dueAt: null,
-    assignmentOverrides: {
-      nodes: [
-        mockOverride({lid: '18', title: 'Section A'}),
-        mockOverride({lid: '19', title: 'Section B'})
-      ]
-    }
-  })
-  const {getByText, queryAllByText} = render(<Details assignment={assignment} />)
-  expect(getByText('Section A')).toBeInTheDocument()
-  expect(getByText('Section B')).toBeInTheDocument()
-  expect(queryAllByText('Everyone', {exact: false})).toHaveLength(0)
 })

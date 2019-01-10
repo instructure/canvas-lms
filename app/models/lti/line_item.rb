@@ -19,11 +19,7 @@
 class Lti::LineItem < ApplicationRecord
   validates :score_maximum, :label, :assignment, presence: true
   validates :score_maximum, numericality: true
-  validates :client_id, presence: true
-  validate :resource_link_id_has_one_assignment
-  validate :client_id_is_global?
-
-  before_validation :set_client_id_if_possible
+  validate :lti_link_id_has_one_assignment
 
   belongs_to :resource_link,
              inverse_of: :line_items,
@@ -42,7 +38,7 @@ class Lti::LineItem < ApplicationRecord
     resource_link.line_items.order(:created_at).first.id == self.id
   end
 
-  def self.create_line_item!(assignment, context, tool, params)
+  def self.create_line_item!(assignment, context, params)
     self.transaction do
       a = assignment.presence || Assignment.create!(
         context: context,
@@ -50,29 +46,17 @@ class Lti::LineItem < ApplicationRecord
         points_possible: params[:score_maximum],
         submission_types: 'none'
       )
-      opts = {assignment: a}.merge(params)
-      opts[:client_id] = tool.developer_key.global_id unless params[:resource_link]
-      self.create!(opts)
+      self.create!({assignment: a}.merge(params))
     end
   end
 
   private
 
-  def resource_link_id_has_one_assignment
+  def lti_link_id_has_one_assignment
     return if resource_link.blank?
     ids = resource_link.line_items.pluck(:assignment_id)
     return if ids.size.zero?
     return if ids.uniq.size == 1 && ids.first == assignment_id
     errors.add(:assignment, 'does not match ltiLink')
-  end
-
-  def set_client_id_if_possible
-    return if client_id.present?
-    self.client_id = resource_link.context_external_tool.developer_key&.global_id unless lti_resource_link_id.blank?
-    self.client_id ||= assignment&.external_tool_tag&.content&.developer_key&.global_id
-  end
-
-  def client_id_is_global?
-    self.client_id > Shard::IDS_PER_SHARD
   end
 end

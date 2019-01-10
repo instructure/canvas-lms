@@ -217,7 +217,7 @@ Rails.configuration.after_initialize do
   end
 
   Delayed::Periodic.cron 'Lti::KeyStorage.rotate_keys', '0 0 1 * *', priority: Delayed::LOW_PRIORITY do
-    Lti::KeyStorage.rotate_keys
+    LTI::KeyStorage.rotateKeys
   end
 
   Delayed::Periodic.cron 'abandoned job cleanup', '*/10 * * * *' do

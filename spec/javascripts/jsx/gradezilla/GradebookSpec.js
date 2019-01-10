@@ -40,7 +40,7 @@ import studentRowHeaderConstants from 'jsx/gradezilla/default_gradebook/constant
 import { darken, statusColors, defaultColors } from 'jsx/gradezilla/default_gradebook/constants/colors';
 import ViewOptionsMenu from 'jsx/gradezilla/default_gradebook/components/ViewOptionsMenu';
 
-import { createGradebook, stubDataLoader } from 'jsx/gradezilla/default_gradebook/__tests__/GradebookSpecHelper';
+import { createGradebook, stubDataLoader } from './default_gradebook/GradebookSpecHelper';
 import { createCourseGradesWithGradingPeriods as createGrades } from '../gradebook/GradeCalculatorSpecHelper';
 
 const $fixtures = document.getElementById('fixtures');
@@ -5002,6 +5002,58 @@ QUnit.module('Gradebook Grading Schemes', (suiteHooks) => {
     });
   });
 });
+
+QUnit.module('Gradebook', () => {
+  let gradebook
+
+  QUnit.module('#updateFinalGradeOverrides()', hooks => {
+    let finalGradeOverrides
+
+    hooks.beforeEach(() => {
+      gradebook = createGradebook()
+      sinon.stub(gradebook, 'invalidateRowsForStudentIds')
+      finalGradeOverrides = {
+        1101: {
+          courseGrade: {
+            percentage: 88.1
+          }
+        },
+        1102: {
+          courseGrade: {
+            percentage: 91.1
+          }
+        }
+      }
+    })
+
+    test('stores the given final grade overrides in the Gradebook', () => {
+      gradebook.updateFinalGradeOverrides(finalGradeOverrides)
+      deepEqual(gradebook.getFinalGradeOverrides('1101'), finalGradeOverrides[1101])
+    })
+
+    test('invalidates grid rows', () => {
+      gradebook.updateFinalGradeOverrides(finalGradeOverrides)
+      strictEqual(gradebook.invalidateRowsForStudentIds.callCount, 1)
+    })
+
+    test('invalidates grid rows after storing final grade overrides', () => {
+      gradebook.invalidateRowsForStudentIds.callsFake(() => {
+        deepEqual(
+          gradebook.getFinalGradeOverrides('1101'),
+          finalGradeOverrides[1101],
+          'final grade overrides have already been updated by this time'
+        )
+      })
+      gradebook.updateFinalGradeOverrides(finalGradeOverrides)
+    })
+
+    test('invalidates rows for related students', () => {
+      gradebook.updateFinalGradeOverrides(finalGradeOverrides)
+      const [studentIds] = gradebook.invalidateRowsForStudentIds.lastCall.args
+      deepEqual(studentIds, ['1101', '1102'])
+    })
+  })
+})
 
 QUnit.module('Gradebook#saveSettings', {
   setup () {

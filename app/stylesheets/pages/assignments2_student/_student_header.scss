@@ -16,33 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-.assignment-pizza-header-outer {
-  width: 100%;
-  position: relative;
-  height: 120px;
-}
-
-.assignment-pizza-header-inner {
-  width: 100%;
-  position: absolute;
-  #{direction(right)}: 0;
-}
-
-.assignment-student-header-normal {
-  position: static;
-}
-
-.assignment-student-header-sticky {
-  position: sticky;
-  padding: 12px;
-  top: 0px;
-  #{direction(right)}: 0px;
-  background-color: white;
-  height: 120px;
-  z-index: 100;
-  border-bottom: 1px solid $ic-border-light;
-}
-
 .steps-container {
   margin-bottom: 3.75rem;
 }
@@ -50,3 +23,4 @@
 .a2-toggle-details-container {
   margin-bottom: 3.75rem;
 }
+

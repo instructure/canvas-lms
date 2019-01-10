@@ -465,7 +465,8 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     it "should not load mathjax if no mathml" do
       text = '<p>o mathml here</p>'
       wysiwyg_state_setup(@course, text, html: true)
-      wait_for_new_page_load{f('button.submit').click}
+      f('button.submit').click
+      wait_for_ajaximations
       mathjax_defined = driver.execute_script('return (window.MathJax !== undefined)')
       expect(mathjax_defined).to eq false
     end
@@ -473,7 +474,8 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     it "should load mathjax if mathml" do
       text = '<p><math> <mi>&pi;</mi> <mo>⁢</mo> <msup> <mi>r</mi> <mn>2</mn> </msup> </math></p>'
       wysiwyg_state_setup(@course, text, html: true)
-      wait_for_new_page_load{f('button.submit').click}
+      f('button.submit').click
+      wait_for_ajaximations
       mathjax_defined = driver.execute_script('return (window.MathJax !== undefined)')
       expect(mathjax_defined).to eq true
     end
@@ -505,14 +507,16 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     it "should save with an iframe in a list" do
       text = "<ul><li><iframe src=\"about:blank\"></iframe></li></ul>"
       wysiwyg_state_setup(@course, text, html: true)
-      wait_for_new_page_load{f('form.edit-form button.submit').click}
+      f('form.edit-form button.submit').click
+      wait_for_ajax_requests
       expect(f("#wiki_page_show")).to contain_css('ul iframe')
     end
 
     it "should save with an iframe in a table" do
       text = "<table><tr><td><iframe src=\"about:blank\"></iframe></td></tr></table>"
       wysiwyg_state_setup(@course, text, html: true)
-      wait_for_new_page_load{f('form.edit-form button.submit').click}
+      f('form.edit-form button.submit').click
+      wait_for_ajax_requests
       expect(f("#wiki_page_show")).to contain_css('table iframe')
     end
 
@@ -526,7 +530,8 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
         fj('label:contains("Change heading tag to paragraph")').click
         fj('[aria-label="Accessibility Checker"] button:contains("Apply")').click
         expect(fj('[aria-label="Accessibility Checker"] p:contains("No accessibility issues were detected.")')).to be_displayed
-        wait_for_new_page_load{f('form.edit-form button.submit').click}
+        f('form.edit-form button.submit').click
+        wait_for_ajaximations
         expect(f("#wiki_page_show")).not_to contain_css('h2')
         expect(f("#wiki_page_show p").text).to eq(text)
       end

@@ -247,7 +247,7 @@ describe "assignment groups" do
     let(:assignment_name) { "Do this" }
     let(:assignment_points) { "13" }
     let(:time) {Time.zone.local(2018,2,7,4,15)}
-    let(:current_time) {format_time_for_view(time, :medium)}
+    let(:current_time) {format_time_for_view(time)}
 
     before :each do
       @course.require_assignment_group

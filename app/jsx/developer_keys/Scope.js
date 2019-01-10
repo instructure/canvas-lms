@@ -21,7 +21,6 @@ import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import View from '@instructure/ui-layout/lib/components/View'
-import I18n from 'i18n!react_developer_keys'
 import DeveloperKeyScopesMethod from './ScopesMethod'
 
 const DeveloperKeyScope = props => {
@@ -33,7 +32,7 @@ const DeveloperKeyScope = props => {
       <Flex alignItems="start" padding="small medium small none">
         <FlexItem padding="none">
           <Checkbox
-            label={<ScreenReaderContent>{props.checked ? I18n.t('Disable scope') : I18n.t('Enable scope')}</ScreenReaderContent>}
+            label={<ScreenReaderContent>{`${props.scope.verb} ${props.scope.scope}`}</ScreenReaderContent>}
             value={props.scope.scope}
             onChange={props.onChange}
             checked={props.checked}

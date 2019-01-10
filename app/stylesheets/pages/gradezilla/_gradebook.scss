@@ -104,7 +104,7 @@ $gradebook_cell_padding_top: 8px;
     }
 
     &.assignment .gradebook-cell {
-      &:not(.Grid__GradeCell) {
+      &:not(.Grid__AssignmentRowCell) {
         padding-top: $gradebook_cell_padding_top - 2px; // subtract 2px top border
         height: $row-height - $gradebook_cell_padding_top - 3px;
       }
@@ -112,11 +112,11 @@ $gradebook_cell_padding_top: 8px;
   }
 
   &:not(.active) {
-    &.assignment .gradebook-cell:not(.Grid__GradeCell) {
+    &.assignment .gradebook-cell:not(.Grid__AssignmentRowCell) {
       padding: 1px; // maintain extra spacing from active border
     }
 
-    &.assignment .gradebook-cell:not(.Grid__GradeCell) {
+    &.assignment .gradebook-cell:not(.Grid__AssignmentRowCell) {
       padding-top: $gradebook_cell_padding_top - 1px; // subtract extra 1px top border
     }
   }
@@ -433,7 +433,7 @@ $gradebook_cell_padding_top: 8px;
 }
 
 .gradebook-cell {
-  &:not(.Grid__GradeCell) {
+  &:not(.Grid__AssignmentRowCell) {
     border: none;
     height: $cell_height - $gradebook_cell_padding_top;
     padding-top: $gradebook_cell_padding_top;
@@ -496,7 +496,7 @@ $gradebook_cell_padding_top: 8px;
 
   &.assignment {
     .gradebook-cell,
-    .Grid__GradeCell {
+    .Grid__AssignmentRowCell {
       overflow: hidden;
       text-overflow: ellipsis;
     }
@@ -538,13 +538,13 @@ $gradebook_cell_padding_top: 8px;
 /* Assignment Cell */
 
 .slick-cell.assignment {
-  .Grid__GradeCell {
+  .Grid__AssignmentRowCell {
     height: $row-height - 4px;
   }
 
   // Inactive Cell
   &:not(.active) {
-    .Grid__GradeCell {
+    .Grid__AssignmentRowCell {
       padding: 1px;
       height: $row-height - 4px;
     }
@@ -553,11 +553,11 @@ $gradebook_cell_padding_top: 8px;
   // Inactive or Active Cell
   &:not(.editable) {
     // Inner Elements
-    .Grid__GradeCell__OriginalityScore {
+    .Grid__AssignmentRowCell__OriginalityScore {
       padding-bottom: 2px; // match the icon container size from InstUI
     }
 
-    .Grid__GradeCell__InvalidGrade {
+    .Grid__AssignmentRowCell__InvalidGrade {
       i.icon-warning {
         color: $ic-color-danger;
         padding-bottom: 2px; // match the icon container size from InstUI
@@ -566,7 +566,7 @@ $gradebook_cell_padding_top: 8px;
   }
 }
 
-.Grid__GradeCell {
+.Grid__AssignmentRowCell {
   align-items: center;
   display: flex;
   flex-direction: row;
@@ -574,7 +574,7 @@ $gradebook_cell_padding_top: 8px;
   justify-content: space-between;
 }
 
-.Grid__GradeCell__OriginalityScore {
+.Grid__AssignmentRowCell__OriginalityScore {
   align-items: center;
   box-sizing: border-box;
   display: flex;
@@ -582,7 +582,7 @@ $gradebook_cell_padding_top: 8px;
   width: $cell-icon-width;
 }
 
-.Grid__GradeCell__InvalidGrade {
+.Grid__AssignmentRowCell__InvalidGrade {
   align-items: center;
   box-sizing: border-box;
   display: flex;
@@ -590,8 +590,8 @@ $gradebook_cell_padding_top: 8px;
   width: $cell-icon-width;
 }
 
-.Grid__GradeCell__StartContainer,
-.Grid__GradeCell__EndContainer {
+.Grid__AssignmentRowCell__StartContainer,
+.Grid__AssignmentRowCell__EndContainer {
   display: flex;
   flex-basis: $cell-icon-width * 2;
   flex-grow: 1;
@@ -599,11 +599,11 @@ $gradebook_cell_padding_top: 8px;
   white-space: nowrap;
 }
 
-.Grid__GradeCell__EndContainer {
+.Grid__AssignmentRowCell__EndContainer {
   justify-content: flex-end;
 }
 
-.Grid__GradeCell__Content {
+.Grid__AssignmentRowCell__Content {
   flex-basis: auto;
   flex-grow: 0;
   flex-shrink: 0;
@@ -617,29 +617,29 @@ $gradebook_cell_padding_top: 8px;
   }
 }
 
-.Grid__GradeCell {
+.Grid__AssignmentRowCell {
   &.gradingScheme,
   &.passFail {
-    .Grid__GradeCell__EndContainer {
+    .Grid__AssignmentRowCell__EndContainer {
       flex-basis: $cell-icon-width;
     }
   }
 }
 
-.Grid__GradeCell {
+.Grid__AssignmentRowCell {
   // This nesting is required to ensure higher specificity than InstUI styles
-  .Grid__GradeCell__PercentInput,
-  .Grid__GradeCell__PointsInput {
+  .Grid__AssignmentRowCell__PercentInput,
+  .Grid__AssignmentRowCell__PointsInput {
     // wide enough to fit "Excused"
     width: 78px;
   }
 
-  .Grid__GradeCell__GradingSchemeInput {
+  .Grid__AssignmentRowCell__GradingSchemeInput {
     // wide enough to fit "Excused," input padding, and the menu button
     width: 78px + $cell-icon-width;
   }
 
-  .Grid__GradeCell__CompleteIncompleteInput {
+  .Grid__AssignmentRowCell__CompleteIncompleteInput {
     // wide enough to fit "Excused" and the menu button
     width: 64px + $cell-icon-width;
   }
@@ -652,9 +652,9 @@ $gradebook_cell_padding_top: 8px;
     justify-content: center;
   }
 
-  .Grid__GradeCell__PercentInput,
-  .Grid__GradeCell__PointsInput,
-  .Grid__GradeCell__GradingSchemeInput {
+  .Grid__AssignmentRowCell__PercentInput,
+  .Grid__AssignmentRowCell__PointsInput,
+  .Grid__AssignmentRowCell__GradingSchemeInput {
     // clip any input messages
     span > span {
       margin-bottom: 0;
@@ -666,7 +666,7 @@ $gradebook_cell_padding_top: 8px;
   }
 }
 
-.Grid__GradeCell__CompleteIncompleteValue {
+.Grid__AssignmentRowCell__CompleteIncompleteValue {
   display: flex;
   flex-grow: 1;
   justify-content: center;
@@ -683,7 +683,7 @@ $gradebook_cell_padding_top: 8px;
   }
 }
 
-.Grid__GradeCell__EndText {
+.Grid__AssignmentRowCell__EndText {
   align-items: center;
   box-sizing: border-box;
   display: flex;
@@ -697,9 +697,9 @@ $gradebook_cell_padding_top: 8px;
   white-space: nowrap;
 }
 
-.Grid__GradeCell__CompleteIncompleteMenu,
-.Grid__GradeCell__GradingSchemeMenu,
-.Grid__GradeCell__Options {
+.Grid__AssignmentRowCell__CompleteIncompleteMenu,
+.Grid__AssignmentRowCell__GradingSchemeMenu,
+.Grid__AssignmentRowCell__Options {
   align-items: center;
   box-sizing: border-box;
   display: flex;
@@ -708,8 +708,8 @@ $gradebook_cell_padding_top: 8px;
   width: $cell-icon-width;
 }
 
-.Grid__GradeCell__CompleteIncompleteMenu,
-.Grid__GradeCell__GradingSchemeMenu {
+.Grid__AssignmentRowCell__CompleteIncompleteMenu,
+.Grid__AssignmentRowCell__GradingSchemeMenu {
   flex-basis: auto;
   flex-grow: 0;
   flex-shrink: 0;

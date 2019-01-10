@@ -19,7 +19,7 @@ class CreateInitialQuizSubmissionEventPartitions < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def up
-    Quizzes::QuizSubmissionEventPartitioner.process(true)
+    Quizzes::QuizSubmissionEventPartitioner.process
   end
 
   def down

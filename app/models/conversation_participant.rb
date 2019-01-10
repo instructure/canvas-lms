@@ -352,8 +352,7 @@ class ConversationParticipant < ActiveRecord::Base
       update_cached_data
       save
     end
-    # update the stream item data but leave the instances alone
-    StreamItem.send_later_if_production_enqueue_args(:generate_or_update, {:priority => 25}, self.conversation)
+    self.conversation.queue_update_stream_items
   end
 
   def update_attributes(hash)

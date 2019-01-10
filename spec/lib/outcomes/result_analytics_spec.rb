@@ -117,11 +117,6 @@ describe Outcomes::ResultAnalytics do
       results = ra.find_outcome_results(@student, users: [@student], context: @course, outcomes: [@outcome])
       expect(results.length).to eq 0
     end
-
-    it 'order results by id on matching learning outcome id and user id' do
-      results = ra.find_outcome_results(@teacher, users: [@student], context: @course, outcomes: [@outcome], include_hidden: true)
-      expect(results.first.id).to be < results.second.id
-    end
   end
 
   describe '#rollup_user_results' do

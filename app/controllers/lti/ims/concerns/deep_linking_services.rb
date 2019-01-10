@@ -19,8 +19,6 @@ module Lti::Ims::Concerns
   module DeepLinkingServices
     extend ActiveSupport::Concern
 
-    CLAIM_PREFIX = 'https://purl.imsglobal.org/spec/lti-dl/claim/'.freeze
-
     def validate_jwt
       render_error(deep_linking_jwt.errors) and return unless deep_linking_jwt.valid?
     end
@@ -31,11 +29,6 @@ module Lti::Ims::Concerns
 
     def render_error(errors)
       render json: errors, status: :bad_request
-    end
-
-    def messaging_value(type)
-      value = deep_linking_jwt["#{CLAIM_PREFIX}#{type}"]
-      value.presence
     end
 
     class DeepLinkingJwt

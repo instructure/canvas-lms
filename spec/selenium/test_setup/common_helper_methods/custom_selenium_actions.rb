@@ -441,15 +441,14 @@ module CustomSeleniumActions
 
   MODIFIER_KEY = RUBY_PLATFORM =~ /darwin/ ? :command : :control
   def replace_content(el, value, options = {})
-    # Removed the javascript select(), it was causing stale element exceptions
-    # el.clear doesn't work with textboxes that have a pattern attribute that's why we have :backspace.
+    # We don't use selenium el.clear because it doesn't work with textboxes that have a pattern attribute.
     # We are treating the chrome browser different because Selenium cannot send :command key to chrome on Mac.
     # This is a known issue and hasn't been solved yet. https://bugs.chromium.org/p/chromedriver/issues/detail?id=30
     case driver.browser
     when :firefox, :safari, :internet_explorer
       keys = [[MODIFIER_KEY, "a"], :backspace]
     when :chrome
-      el.clear
+      driver.execute_script("arguments[0].select()", el)
       keys = [:backspace]
     end
     keys << value

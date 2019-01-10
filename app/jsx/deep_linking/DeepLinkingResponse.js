@@ -24,47 +24,22 @@ import Text from '@instructure/ui-elements/lib/components/Text'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 
 export class RetrievingContent extends React.Component {
-  static messageType = 'LtiDeepLinkingResponse'
-
-  componentDidMount() {
-    const parentWindow = this.parentWindow()
-    parentWindow.postMessage({
-      messageType: RetrievingContent.messageType,
-      content_items: ENV.content_items,
-      msg: ENV.message,
-      log: ENV.log,
-      errormsg: ENV.error_message,
-      errorlog: ENV.error_log,
-      ltiEndpoint: ENV.lti_endpoint
-    }, ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN)
-  }
-
   render() {
     const message = I18n.t('Retrieving Content')
     return (
       <div>
         <Flex justifyItems="center" margin="x-large 0 large 0">
           <FlexItem>
-            <Spinner title={message} size="large" />
+            <Spinner title={message} size="large"/>
           </FlexItem>
         </Flex>
         <Flex justifyItems="center" margin="0 0 large">
           <FlexItem>
-            <Text size="x-large" fontStyle="italic">
-              {message}
-            </Text>
+            <Text size="x-large" fontStyle="italic">{message}</Text>
           </FlexItem>
         </Flex>
       </div>
     )
-  }
-
-  parentWindow() {
-    let parentWindow = window.parent
-    while (parentWindow && parentWindow.parent !== window.parent) {
-      parentWindow = parentWindow.parent
-    }
-    return parentWindow
   }
 }
 

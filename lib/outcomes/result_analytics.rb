@@ -57,7 +57,7 @@ module Outcomes
     #
     # Returns the resulting relation
     def order_results_for_rollup(relation)
-      relation.order(:user_id, :learning_outcome_id, :id)
+      relation.order(:user_id, :learning_outcome_id)
     end
 
     # Public: Generates a rollup of each outcome result for each user.

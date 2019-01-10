@@ -94,7 +94,8 @@ describe "discussions overrides" do
       wait_for_ajaximations
       expect(f('.ui-dialog')).to be_present
       expect(f('#ui-id-7').text).to include('Not all sections will be assigned this item')
-      wait_for_new_page_load{f('.ui-dialog .ui-dialog-buttonset .btn-primary').click}
+      f('.ui-dialog .ui-dialog-buttonset .btn-primary').click
+      wait_for_ajaximations
       f('.toggle_due_dates').click
       wait_for_ajaximations
       # The toggle dates does not show the due date for everyone else

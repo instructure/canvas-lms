@@ -1214,16 +1214,14 @@ class CoursesController < ApplicationController
   #     "hide_distribution_graphs": false,
   #     "lock_all_announcements": true
   #   }
-  def api_settings
-    get_context
-    if authorized_action @context, @current_user, :read
-      render :json => course_settings_json(@context)
-    end
-  end
-
   def settings
     get_context
     if authorized_action(@context, @current_user, :read_as_admin)
+      if api_request?
+        render :json => course_settings_json(@context)
+        return
+      end
+
       load_all_contexts(:context => @context)
 
       @all_roles = Role.custom_roles_and_counts_for_course(@context, @current_user, true)
@@ -2455,6 +2453,7 @@ class CoursesController < ApplicationController
       end
       blueprint_keys = [:blueprint_restrictions, :use_blueprint_restrictions_by_object_type, :blueprint_restrictions_by_object_type]
       if blueprint_keys.any?{|k| params[:course].has_key?(k)} && MasterCourses::MasterTemplate.is_master_course?(@course)
+        return unless authorized_action(@course.account, @current_user, :manage_master_courses)
         template = MasterCourses::MasterTemplate.full_template_for(@course)
 
         if params[:course].has_key?(:use_blueprint_restrictions_by_object_type)
@@ -2475,9 +2474,8 @@ class CoursesController < ApplicationController
           template.default_restrictions_by_type = parsed_restrictions_by_type
         end
 
-        if template.changed?
-          return unless authorized_action(@course.account, @current_user, :manage_master_courses)
-          @course.errors.add(:master_course_restrictions, t("Invalid restrictions")) unless template.save
+        if template.changed? && !template.save
+          @course.errors.add(:master_course_restrictions, t("Invalid restrictions"))
         end
       end
 

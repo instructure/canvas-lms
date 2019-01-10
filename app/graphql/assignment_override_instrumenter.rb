@@ -59,7 +59,7 @@ class AssignmentOverrideInstrumenter
           when GraphQL::Batch::Promise
             assignment_or_promise.then(assignment_overrider)
           else
-            raise "unexpected assignment type! #{assignment_or_promise.class}"
+            raise "unexpected assignment type!"
           end
         else
           old_resolver.call(obj, args, ctx)

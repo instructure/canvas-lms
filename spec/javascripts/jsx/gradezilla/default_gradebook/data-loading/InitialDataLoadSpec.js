@@ -17,7 +17,7 @@
  */
 
 import DataLoader from 'jsx/gradezilla/DataLoader'
-import {createGradebook, setFixtureHtml} from 'jsx/gradezilla/default_gradebook/__tests__/GradebookSpecHelper'
+import {createGradebook, setFixtureHtml} from '../GradebookSpecHelper'
 import {createExampleStudents} from './DataLoadingSpecHelpers'
 import DataLoadingWrapper from './DataLoadingWrapper'
 

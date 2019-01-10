@@ -72,7 +72,7 @@ class PermissionsIndex
     end
 
     def permission_tray_button(permission_name, role_id)
-      f("[data-ui-testable='Portal'] ##{permission_name}_#{role_id}")
+      ff("##{permission_name}_#{role_id}").last
     end
 
     def permission_menu_item(item_name)
@@ -105,10 +105,6 @@ class PermissionsIndex
 
     def add_role_submit_button
       f("#permissions-add-tray-submit-button")
-    end
-
-    def edit_name_box
-      f('input[name="edit_name_box"]')
     end
 
     def role_tray_permission_state(permission, role)
@@ -162,34 +158,28 @@ class PermissionsIndex
     end
 
     def disable_tray_permission(permission_name, role_id)
-      permission_tray_button(permission_name, role_id).click
-      permission_menu_item('disable').click
+      permission_tray_button(permission_name, role_id).click()
+      ff('[role="menuitemradio"]')[2].click()
       wait_for_ajaximations
     end
 
     def open_edit_role_tray(role)
       role_name(role).click
-      f('.ic-permissions_role_tray')
-      keep_trying_until do
-        disable_implicit_wait{edit_role_icon.click}
-        disable_implicit_wait{edit_name_box.displayed?}
-      end
-      # sometimes the input loads and the value takes longer, wait for value
-      wait_for(method: nil, timeout: 1) { edit_name_box.attribute('value') == role.name }
+      edit_role_icon.click
+      wait_for_animations
     end
 
     def add_role(name)
-      add_role_button.click
+      add_role_button.click()
       set_value(add_role_input, name)
-      add_role_submit_button.click
+      add_role_submit_button.click()
       wait_for_ajaximations
     end
 
     def edit_role(role, new_name)
       open_edit_role_tray(role)
-      replace_content(edit_name_box, new_name, tab_out: true)
-      # click header since :tab does not tab out of input
-      edit_tray_header.click
+      set_value(f('input[name="edit_name_box"]'), new_name)
+      driver.action.send_keys(:tab).perform
       wait_for_ajaximations
     end
 

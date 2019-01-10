@@ -49,8 +49,8 @@ describe "scheduler" do
         sleep 0.1
         replace_content(f('#appointment-comment'), comment)
       end
-      f('.reserve_event_link').click
-      wait_for_ajaximations
+      force_click('.reserve_event_link') # force the click because the button can move unexpectedly.
+      wait_for_ajax_requests
     end
 
     it "should let me reserve appointment groups for contexts I am in", :priority  => "1", test_id: 140195 do
@@ -63,7 +63,6 @@ describe "scheduler" do
       get "/calendar2"
       click_scheduler_link
       click_appointment_link
-
       reserve_appointment_manual(0, "my comments")
       expect(agenda_item).to include_text "Reserved"
       agenda_item.click
@@ -81,15 +80,12 @@ describe "scheduler" do
       @course.root_account.enable_feature! :better_scheduler
       create_appointment_group(:contexts => [my_course])
       get "/calendar2#view_name=week&view_start=#{(Date.today + 1.day).strftime}"
+      wait_for_ajaximations
       find_appointment_button.click
       f('[role="dialog"][aria-label="Select Course"] button[type="submit"]').click
-      wait_for_ajaximations
-      # wait for loading spinner to be gone
-      wait_for(method: nil, timeout: 2) { !f('#refresh_calendar_link').displayed? }
       scheduler_event.click
-      f('.reserve_event_link').click
-      # wait for loading spinner before wait for ajax
-      wait_for(method: nil, timeout: 2) { f('#refresh_calendar_link').displayed? }
+      wait_for_ajaximations
+      force_click('.reserve_event_link') # force the click because the button can move unexpectedly.
       wait_for_ajaximations
       find_appointment_button.click
       expect(scheduler_event).to include_text 'new appointment group'
@@ -102,17 +98,15 @@ describe "scheduler" do
       group.add_user @student
       create_appointment_group(:sub_context_codes => [gc.asset_string], :title => "Bleh Group Thing")
       get "/calendar2#view_name=week&view_start=#{(Date.today + 1.day).strftime}"
+      wait_for_ajax_requests
       find_appointment_button.click
       f('[role="dialog"][aria-label="Select Course"] button[type="submit"]').click
-      wait_for_ajaximations
-      # wait for loading spinner to be gone
-      wait_for(method: nil, timeout: 2) { !f('#refresh_calendar_link').displayed? }
       scheduler_event.click
-      f('.reserve_event_link').click
-      # wait for loading spinner before wait for ajax
-      wait_for(method: nil, timeout: 2) { f('#refresh_calendar_link').displayed? }
+      wait_for_ajaximations
+      force_click('.reserve_event_link') # force the click because the button can move unexpectedly.
       wait_for_ajaximations
       find_appointment_button.click
+      wait_for_ajaximations
       expect(scheduler_event).to include_text 'Bleh Group Thing'
     end
 

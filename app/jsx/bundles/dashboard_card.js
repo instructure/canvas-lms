@@ -45,7 +45,7 @@ export default function loadCardDashboard() {
   if (cachedCards) render(JSON.parse(cachedCards))
 
   if (!promiseToGetDashboardCards) {
-    promiseToGetDashboardCards = axios.get('/api/v1/dashboard/dashboard_cards').then(({data}) => data)
+    promiseToGetDashboardCards = axios.get('/dashboard/dashboard_cards').then(({data}) => data)
     promiseToGetDashboardCards.then(dashboardCards =>
       sessionStorage.setItem(sessionStorageKey, JSON.stringify(dashboardCards))
     )

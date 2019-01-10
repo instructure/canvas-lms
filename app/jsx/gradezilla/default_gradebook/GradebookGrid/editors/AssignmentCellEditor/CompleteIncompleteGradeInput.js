@@ -57,10 +57,10 @@ function componentForGrade(grade, options = {}) {
   }
 }
 
-function getGradeInfo(value, assignment) {
+function getGradeInfo(value, props) {
   return parseTextValue(value, {
     enterGradesAs: 'passFail',
-    pointsPossible: assignment.pointsPossible
+    pointsPossible: props.assignment.pointsPossible
   })
 }
 
@@ -87,7 +87,7 @@ export default class CompleteIncompleteGradeInput extends Component {
   static defaultProps = {
     disabled: false,
     menuContentRef: null,
-    onMenuDismiss() {},
+    onMenuDismiss () {},
     pendingGradeInfo: null
   }
 
@@ -100,7 +100,7 @@ export default class CompleteIncompleteGradeInput extends Component {
     this.handleSelect = this.handleSelect.bind(this)
     const grade = this.props.submission.excused ? 'EX' : this.props.submission.enteredGrade
     this.state = {
-      gradeInfo: this.props.pendingGradeInfo || getGradeInfo(grade, this.props.assignment)
+      gradeInfo: this.props.pendingGradeInfo || getGradeInfo(grade, this.props)
     }
   }
 
@@ -125,7 +125,7 @@ export default class CompleteIncompleteGradeInput extends Component {
   }
 
   handleSelect(event, value) {
-    this.setState({gradeInfo: getGradeInfo(value, this.props.assignment)})
+    this.setState({gradeInfo: getGradeInfo(value, this.props)})
   }
 
   hasGradeChanged() {
@@ -145,11 +145,11 @@ export default class CompleteIncompleteGradeInput extends Component {
 
     return (
       <div className="HorizontalFlex">
-        <span className="Grid__GradeCell__CompleteIncompleteValue">
+        <span className="Grid__AssignmentRowCell__CompleteIncompleteValue">
           {componentForGrade(grade)}
         </span>
 
-        <div className="Grid__GradeCell__CompleteIncompleteMenu">
+        <div className="Grid__AssignmentRowCell__CompleteIncompleteMenu">
           <Menu
             menuRef={this.props.menuContentRef}
             onDismiss={this.props.onMenuDismiss}

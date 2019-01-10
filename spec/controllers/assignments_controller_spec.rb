@@ -240,32 +240,30 @@ describe AssignmentsController do
       before(:each) do
         @course.enable_feature!(:moderated_grading)
 
-        @assignment = @course.assignments.create!(
+        @editable_assignment = @course.assignments.create!(
           moderated_grading: true,
           grader_count: 2,
           final_grader: @teacher
         )
 
-        ta_in_course(active_all: true)
-      end
-
-      it "sets the 'update' attribute to true when user is the final grader" do
         user_session(@teacher)
-        get 'index', params: {course_id: @course.id}
-        expect(assignment_permissions[@assignment.id][:update]).to eq(true)
+        ta_in_course(active_all: true)
+
+        @noneditable_assignment = @course.assignments.create!(
+          moderated_grading: true,
+          grader_count: 2,
+          final_grader: @ta
+        )
       end
 
-      it "sets the 'update' attribute to true when user has the Select Final Grade permission" do
-        user_session(@ta)
+      it "sets the 'update' attribute for an editable assignment to true" do
         get 'index', params: {course_id: @course.id}
-        expect(assignment_permissions[@assignment.id][:update]).to eq(true)
+        expect(assignment_permissions[@editable_assignment.id][:update]).to eq(true)
       end
 
-      it "sets the 'update' attribute to false when user does not have the Select Final Grade permission" do
-        @course.account.role_overrides.create!(permission: :select_final_grade, enabled: false, role: ta_role)
-        user_session(@ta)
+      it "sets the 'update' attribute for a non-editable assignment to false" do
         get 'index', params: {course_id: @course.id}
-        expect(assignment_permissions[@assignment.id][:update]).to eq(false)
+        expect(assignment_permissions[@noneditable_assignment.id][:update]).to eq(false)
       end
     end
   end

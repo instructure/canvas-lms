@@ -1568,13 +1568,13 @@ describe Course, "gradebook_to_csv" do
     rows = CSV.parse(csv, headers: true)
     expect(rows.length).to equal(2)
     expect(rows[0]["Unposted Final Score"]).to eq "(read only)"
-    expect(rows[1]["Unposted Final Score"]).to eq "50.00"
+    expect(rows[1]["Unposted Final Score"]).to eq "50.0"
     expect(rows[0]["Final Score"]).to eq "(read only)"
-    expect(rows[1]["Final Score"]).to eq "50.00"
+    expect(rows[1]["Final Score"]).to eq "50.0"
     expect(rows[0]["Unposted Current Score"]).to eq "(read only)"
-    expect(rows[1]["Unposted Current Score"]).to eq "100.00"
+    expect(rows[1]["Unposted Current Score"]).to eq "100.0"
     expect(rows[0]["Current Score"]).to eq "(read only)"
-    expect(rows[1]["Current Score"]).to eq "100.00"
+    expect(rows[1]["Current Score"]).to eq "100.0"
   end
 
   it "should order assignments and groups by position" do
@@ -1629,10 +1629,10 @@ describe Course, "gradebook_to_csv" do
       "Some Assignment Group 2 Unposted Final Score"
     ]
 
-    expect(rows[1]["Some Assignment Group 1 Current Score"]).to eq "100.00"
-    expect(rows[1]["Some Assignment Group 1 Final Score"]).to eq "50.00"
-    expect(rows[1]["Some Assignment Group 2 Current Score"]).to eq "50.00"
-    expect(rows[1]["Some Assignment Group 2 Final Score"]).to eq "25.00"
+    expect(rows[1]["Some Assignment Group 1 Current Score"]).to eq "100.0"
+    expect(rows[1]["Some Assignment Group 1 Final Score"]).to eq "50.0"
+    expect(rows[1]["Some Assignment Group 2 Current Score"]).to eq "50.0"
+    expect(rows[1]["Some Assignment Group 2 Final Score"]).to eq "25.0"
   end
 
   it "handles nil assignment due_dates if the group and position are the same" do
@@ -1751,13 +1751,13 @@ describe Course, "gradebook_to_csv" do
     expect(rows[0]["Current Grade"]).to eq "(read only)"
     expect(rows[1]["Current Grade"]).to eq "A-"
     expect(rows[0]["Unposted Final Score"]).to eq "(read only)"
-    expect(rows[1]["Unposted Final Score"]).to eq "90.00"
+    expect(rows[1]["Unposted Final Score"]).to eq "90.0"
     expect(rows[0]["Final Score"]).to eq "(read only)"
-    expect(rows[1]["Final Score"]).to eq "90.00"
+    expect(rows[1]["Final Score"]).to eq "90.0"
     expect(rows[0]["Unposted Current Score"]).to eq "(read only)"
-    expect(rows[1]["Unposted Current Score"]).to eq "90.00"
+    expect(rows[1]["Unposted Current Score"]).to eq "90.0"
     expect(rows[0]["Current Score"]).to eq "(read only)"
-    expect(rows[1]["Current Score"]).to eq "90.00"
+    expect(rows[1]["Current Score"]).to eq "90.0"
   end
 
   it "should include sis ids if enabled" do
@@ -1875,13 +1875,13 @@ describe Course, "gradebook_to_csv" do
     it "includes points for unweighted courses" do
       csv = CSV.parse(GradebookExporter.new(@course, @teacher).to_csv, headers: true)
       expect(csv[0]["Assignments Current Points"]).to eq "(read only)"
-      expect(csv[1]["Assignments Current Points"]).to eq "8.00"
+      expect(csv[1]["Assignments Current Points"]).to eq "8.0"
       expect(csv[0]["Assignments Final Points"]).to eq "(read only)"
-      expect(csv[1]["Assignments Final Points"]).to eq "8.00"
+      expect(csv[1]["Assignments Final Points"]).to eq "8.0"
       expect(csv[0]["Current Points"]).to eq "(read only)"
-      expect(csv[1]["Current Points"]).to eq "8.00"
+      expect(csv[1]["Current Points"]).to eq "8.0"
       expect(csv[0]["Final Points"]).to eq "(read only)"
-      expect(csv[1]["Final Points"]).to eq "8.00"
+      expect(csv[1]["Final Points"]).to eq "8.0"
     end
 
     it "doesn't include points for weighted courses" do
@@ -2012,11 +2012,11 @@ describe Course, "gradebook_to_csv" do
       csv = GradebookExporter.new(@course, @teacher).to_csv
       expect(csv).not_to be_nil
       rows = CSV.parse(csv)
-      expect(rows[2][4]).to eq "3.00"
+      expect(rows[2][4]).to eq "3.0"
       expect(rows[2][5]).to eq "N/A"
 
       expect(rows[3][4]).to eq "N/A"
-      expect(rows[3][5]).to eq "3.00"
+      expect(rows[3][5]).to eq "3.0"
 
       expect(rows[4][4]).to eq "N/A"
       expect(rows[4][5]).to eq "N/A"

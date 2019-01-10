@@ -78,7 +78,7 @@
                     <% if @submission.excused? %>
                       <%= t "Excused" %>
                     <% else %>
-                      <%= i18n_grade(round_if_whole(@submission.entered_grade), @submission.grading_type) %>
+                      <%= i18n_grade(round_if_whole @submission.entered_grade) %>
                     <% end %>
                   </span>
                 <% end %>
@@ -100,9 +100,9 @@
                 <th><%= I18n.t('Final grade:') %></td>
                 <td class="bold">
                   <% if can_do(@assignment, @current_user, :grade) %>
-                    <span class="published_grade"><%= i18n_grade(round_if_whole(@submission.grade), @submission.grading_type) %></span>
+                    <span class="published_grade"><%= i18n_grade(round_if_whole @submission.grade) %></span>
                   <% elsif @submission.user_can_read_grade?(@current_user, session) %>
-                    <span class="grade"><%= i18n_grade(round_if_whole(@submission.published_grade), @submission.grading_type) %></span>
+                    <span class="grade"><%= i18n_grade(round_if_whole @submission.published_grade) %></span>
                   <% end %>
 
                   <% if @assignment.grading_type == 'points' %>
