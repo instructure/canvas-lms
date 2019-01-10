@@ -277,7 +277,6 @@ $revision-button-color: $ic-color-dark;
 }
 /// pulled out of the specific table class so the new UI could take advantage of the header sorting
 .header-row {
-  text-transform: uppercase;
   a.sort-field {
     cursor: pointer;
     user-select: none;
