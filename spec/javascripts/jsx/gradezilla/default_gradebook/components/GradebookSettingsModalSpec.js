@@ -160,7 +160,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
         return fetchLatePolicy.then(() => {
           wrapper.update()
           const updateButton = document.getElementById('gradebook-settings-update-button')
-          strictEqual(updateButton.getAttribute('disabled'), '');
+          strictEqual(updateButton.getAttribute('disabled'), '')
         })
       })
 
@@ -177,7 +177,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
             changes: {lateSubmissionDeductionEnabled: true}
           })
           const updateButton = document.getElementById('gradebook-settings-update-button')
-          strictEqual(updateButton.getAttribute('disabled'), null);
+          strictEqual(updateButton.getAttribute('disabled'), null)
         })
       })
 
@@ -197,7 +197,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
             }
           })
           const updateButton = document.getElementById('gradebook-settings-update-button')
-          strictEqual(updateButton.getAttribute('disabled'), '');
+          strictEqual(updateButton.getAttribute('disabled'), '')
         })
       })
 

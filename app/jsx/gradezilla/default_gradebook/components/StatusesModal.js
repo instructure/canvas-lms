@@ -16,17 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { func, shape, string } from 'prop-types';
-import update from 'immutability-helper';
-import I18n from 'i18n!gradebook';
-import Button from '@instructure/ui-buttons/lib/components/Button';
-import Modal, { ModalBody, ModalFooter } from '../../../shared/components/InstuiModal';
-import Heading from '@instructure/ui-elements/lib/components/Heading';
-import Text from '@instructure/ui-elements/lib/components/Text';
-import { statuses } from '../../../gradezilla/default_gradebook/constants/statuses';
-import StatusColorListItem from '../../../gradezilla/default_gradebook/components/StatusColorListItem';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import {func, shape, string} from 'prop-types'
+import update from 'immutability-helper'
+import I18n from 'i18n!gradebook'
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import Modal, {ModalBody, ModalFooter} from '../../../shared/components/InstuiModal'
+import Heading from '@instructure/ui-elements/lib/components/Heading'
+import Text from '@instructure/ui-elements/lib/components/Text'
+import {statuses} from '../../../gradezilla/default_gradebook/constants/statuses'
+import StatusColorListItem from '../../../gradezilla/default_gradebook/components/StatusColorListItem'
 
 class StatusesModal extends React.Component {
   static propTypes = {
@@ -38,76 +38,74 @@ class StatusesModal extends React.Component {
       dropped: string.isRequired,
       excused: string.isRequired
     }).isRequired,
-    afterUpdateStatusColors: func.isRequired,
-  };
-
-  constructor (props) {
-    super(props);
-
-    this.colorPickerButtons = {};
-    this.colorPickerContents = {};
-    this.state = { isOpen: false, colors: props.colors };
+    afterUpdateStatusColors: func.isRequired
   }
 
-  updateStatusColors = status =>
-    (color, successFn, failureFn) => {
-      this.setState(
-        prevState => update(prevState, { colors: { $merge: { [status]: color } } }),
-        () => {
-          const successFnAndClosePopover = () => {
-            successFn();
-            this.setState({ openPopover: null });
-          };
-          this.props.afterUpdateStatusColors(this.state.colors, successFnAndClosePopover, failureFn);
+  constructor(props) {
+    super(props)
+
+    this.colorPickerButtons = {}
+    this.colorPickerContents = {}
+    this.state = {isOpen: false, colors: props.colors}
+  }
+
+  updateStatusColors = status => (color, successFn, failureFn) => {
+    this.setState(
+      prevState => update(prevState, {colors: {$merge: {[status]: color}}}),
+      () => {
+        const successFnAndClosePopover = () => {
+          successFn()
+          this.setState({openPopover: null})
         }
-      );
-    }
-
-  isPopoverShown (status) {
-    return this.state.openPopover === status;
+        this.props.afterUpdateStatusColors(this.state.colors, successFnAndClosePopover, failureFn)
+      }
+    )
   }
 
-  handleOnToggle = status =>
-    (toggle) => {
-      if (toggle) {
-        this.setState({ openPopover: status });
-      } else {
-        this.setState({ openPopover: null });
-      }
+  isPopoverShown(status) {
+    return this.state.openPopover === status
+  }
+
+  handleOnToggle = status => toggle => {
+    if (toggle) {
+      this.setState({openPopover: status})
+    } else {
+      this.setState({openPopover: null})
     }
+  }
 
-  handleColorPickerAfterClose = status =>
-    () => {
-      this.setState({ openPopover: null }, () => {
-        // eslint-disable-next-line react/no-find-dom-node
-        ReactDOM.findDOMNode(this.colorPickerButtons[status]).focus();
-      });
-    }
+  handleColorPickerAfterClose = status => () => {
+    this.setState({openPopover: null}, () => {
+      // eslint-disable-next-line react/no-find-dom-node
+      ReactDOM.findDOMNode(this.colorPickerButtons[status]).focus()
+    })
+  }
 
-  bindColorPickerButton = status =>
-    (button) => {
-      this.colorPickerButtons[status] = button;
-    }
+  bindColorPickerButton = status => button => {
+    this.colorPickerButtons[status] = button
+  }
 
-  bindColorPickerContent = status =>
-    (content) => {
-      this.colorPickerContents[status] = content;
-    }
+  bindColorPickerContent = status => content => {
+    this.colorPickerContents[status] = content
+  }
 
-
-  bindDoneButton = (button) => { this.doneButton = button; };
-  bindContentRef = (content) => { this.modalContentRef = content; };
+  bindDoneButton = button => {
+    this.doneButton = button
+  }
+  bindContentRef = content => {
+    this.modalContentRef = content
+  }
 
   open = () => {
-    this.setState({ isOpen: true });
+    this.setState({isOpen: true})
   }
 
   close = () => {
-    this.setState({ isOpen: false });
+    this.setState({isOpen: false})
   }
 
-  renderListItems () {
-    return statuses.map(status =>
+  renderListItems() {
+    return statuses.map(status => (
       <StatusColorListItem
         key={status}
         status={status}
@@ -119,17 +117,17 @@ class StatusesModal extends React.Component {
         colorPickerAfterClose={this.handleColorPickerAfterClose(status)}
         afterSetColor={this.updateStatusColors(status)}
       />
-    );
+    ))
   }
 
-  render () {
+  render() {
     const {
-      state: { isOpen },
-      props: { onClose },
+      state: {isOpen},
+      props: {onClose},
       close,
       bindDoneButton,
       bindContentRef
-    } = this;
+    } = this
 
     return (
       <Modal
@@ -142,24 +140,18 @@ class StatusesModal extends React.Component {
       >
         <ModalBody>
           <ul className="Gradebook__StatusModalList">
-            <Text>
-              {this.renderListItems()}
-            </Text>
+            <Text>{this.renderListItems()}</Text>
           </ul>
         </ModalBody>
 
         <ModalFooter>
-          <Button
-            ref={bindDoneButton}
-            variant="primary"
-            onClick={close}
-          >
+          <Button ref={bindDoneButton} variant="primary" onClick={close}>
             {I18n.t('Done')}
           </Button>
         </ModalFooter>
       </Modal>
-    );
+    )
   }
 }
 
-export default StatusesModal;
+export default StatusesModal

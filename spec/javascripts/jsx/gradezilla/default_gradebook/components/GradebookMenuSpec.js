@@ -22,7 +22,7 @@ import {mount} from 'enzyme'
 import GradebookMenu from 'jsx/gradezilla/default_gradebook/components/GradebookMenu'
 
 QUnit.module('GradebookMenu', {
-  setup () {
+  setup() {
     this.wrapper = mount(
       <GradebookMenu
         variant="DefaultGradebook"
@@ -30,37 +30,45 @@ QUnit.module('GradebookMenu', {
         courseUrl="http://someUrl/"
         navigate={() => {}}
       />
-    );
+    )
   },
 
-  teardown () {
-    this.wrapper.unmount();
+  teardown() {
+    this.wrapper.unmount()
   }
-});
+})
 
-test('Gradebook trigger button is present', function () {
-  equal(this.wrapper.find('Button').text().trim(), 'Gradebook');
-});
+test('Gradebook trigger button is present', function() {
+  equal(
+    this.wrapper
+      .find('Button')
+      .text()
+      .trim(),
+    'Gradebook'
+  )
+})
 
-test('#handleIndividualGradebookSelect calls setLocation', function () {
-  const setLocationStub = sandbox.stub(GradebookMenu.prototype, 'setLocation');
-  this.wrapper.find('button').simulate('click');
-  document.querySelector('[data-menu-item-id="individual-gradebook"]').click();
-  const url = `${this.wrapper.props().courseUrl}/gradebook/change_gradebook_version?version=individual`;
-  ok(setLocationStub.withArgs(url).calledOnce);
-});
+test('#handleIndividualGradebookSelect calls setLocation', function() {
+  const setLocationStub = sandbox.stub(GradebookMenu.prototype, 'setLocation')
+  this.wrapper.find('button').simulate('click')
+  document.querySelector('[data-menu-item-id="individual-gradebook"]').click()
+  const url = `${
+    this.wrapper.props().courseUrl
+  }/gradebook/change_gradebook_version?version=individual`
+  ok(setLocationStub.withArgs(url).calledOnce)
+})
 
-test('#handleGradebookHistorySelect calls setLocation', function () {
-  const setLocationStub = sandbox.stub(GradebookMenu.prototype, 'setLocation');
-  this.wrapper.find('button').simulate('click');
-  document.querySelector('[data-menu-item-id="gradebook-history"]').click();
-  const url = `${this.wrapper.props().courseUrl}/gradebook/history`;
-  ok(setLocationStub.withArgs(url).calledOnce);
-});
+test('#handleGradebookHistorySelect calls setLocation', function() {
+  const setLocationStub = sandbox.stub(GradebookMenu.prototype, 'setLocation')
+  this.wrapper.find('button').simulate('click')
+  document.querySelector('[data-menu-item-id="gradebook-history"]').click()
+  const url = `${this.wrapper.props().courseUrl}/gradebook/history`
+  ok(setLocationStub.withArgs(url).calledOnce)
+})
 
 QUnit.module('Variant DefaultGradebook with Learning Mastery Enabled', {
-  setup () {
-    this.navigateStub = sinon.stub();
+  setup() {
+    this.navigateStub = sinon.stub()
     this.wrapper = mount(
       <GradebookMenu
         variant="DefaultGradebook"
@@ -68,38 +76,38 @@ QUnit.module('Variant DefaultGradebook with Learning Mastery Enabled', {
         courseUrl="http://someUrl/"
         navigate={this.navigateStub}
       />
-    );
-    this.wrapper.find('button').simulate('click');
-    this.menuItems = $('[role="menu"]:contains("Learning Mastery…")')[0].children;
+    )
+    this.wrapper.find('button').simulate('click')
+    this.menuItems = $('[role="menu"]:contains("Learning Mastery…")')[0].children
   },
-  teardown () {
-    this.wrapper.unmount();
+  teardown() {
+    this.wrapper.unmount()
   }
-});
+})
 
-test('handleDefaultGradbookLearningMasterySelect calls navigate', function () {
-  document.querySelector('[data-menu-item-id="learning-mastery"]').click();
-  ok(this.navigateStub.withArgs('tab-outcome', { trigger: true }).calledOnce);
-});
+test('handleDefaultGradbookLearningMasterySelect calls navigate', function() {
+  document.querySelector('[data-menu-item-id="learning-mastery"]').click()
+  ok(this.navigateStub.withArgs('tab-outcome', {trigger: true}).calledOnce)
+})
 
-test('Learning Mastery Menu Item is first in the Menu', function () {
-  equal(this.menuItems[0].textContent.trim(), 'Learning Mastery…');
-});
+test('Learning Mastery Menu Item is first in the Menu', function() {
+  equal(this.menuItems[0].textContent.trim(), 'Learning Mastery…')
+})
 
-test('Individual Gradebook Menu Item is second in the Menu', function () {
-  equal(this.menuItems[1].textContent.trim(), 'Individual View…');
-});
+test('Individual Gradebook Menu Item is second in the Menu', function() {
+  equal(this.menuItems[1].textContent.trim(), 'Individual View…')
+})
 
-test('Menu Item Separator is third in the Menu', function () {
-  equal(this.menuItems[2].firstElementChild.getAttribute('role'), 'presentation');
-});
+test('Menu Item Separator is third in the Menu', function() {
+  equal(this.menuItems[2].firstElementChild.getAttribute('role'), 'presentation')
+})
 
-test('Gradebook History Menu Item is fourth in the Menu', function () {
-  equal(this.menuItems[3].textContent.trim(), 'Gradebook History…');
-});
+test('Gradebook History Menu Item is fourth in the Menu', function() {
+  equal(this.menuItems[3].textContent.trim(), 'Gradebook History…')
+})
 
 QUnit.module('Variant DefaultGradebook with Learning Mastery Disabled', {
-  setup () {
+  setup() {
     this.wrapper = mount(
       <GradebookMenu
         variant="DefaultGradebook"
@@ -107,30 +115,30 @@ QUnit.module('Variant DefaultGradebook with Learning Mastery Disabled', {
         courseUrl="http://someUrl/"
         navigate={() => {}}
       />
-    );
-    this.wrapper.find('button').simulate('click');
-    this.menuItems = $('[role="menu"]:contains("Individual View…")')[0].children;
+    )
+    this.wrapper.find('button').simulate('click')
+    this.menuItems = $('[role="menu"]:contains("Individual View…")')[0].children
   },
-  teardown () {
-    this.wrapper.unmount();
+  teardown() {
+    this.wrapper.unmount()
   }
-});
+})
 
-test('Individual Gradebook Menu Item is first in the Menu', function () {
-  equal(this.menuItems[0].textContent.trim(), 'Individual View…');
-});
+test('Individual Gradebook Menu Item is first in the Menu', function() {
+  equal(this.menuItems[0].textContent.trim(), 'Individual View…')
+})
 
-test('Menu Item Separator is second in the Menu', function () {
-  equal(this.menuItems[1].firstElementChild.getAttribute('role'), 'presentation');
-});
+test('Menu Item Separator is second in the Menu', function() {
+  equal(this.menuItems[1].firstElementChild.getAttribute('role'), 'presentation')
+})
 
-test('Gradebook History Menu Item is second in the Menu', function () {
-  equal(this.menuItems[2].textContent.trim(), 'Gradebook History…');
-});
+test('Gradebook History Menu Item is second in the Menu', function() {
+  equal(this.menuItems[2].textContent.trim(), 'Gradebook History…')
+})
 
 QUnit.module('Variant DefaultGradebookLearningMastery with Learning Mastery Enabled', {
-  setup () {
-    this.navigateStub = sinon.stub();
+  setup() {
+    this.navigateStub = sinon.stub()
     this.wrapper = mount(
       <GradebookMenu
         variant="DefaultGradebookLearningMastery"
@@ -138,36 +146,42 @@ QUnit.module('Variant DefaultGradebookLearningMastery with Learning Mastery Enab
         courseUrl="http://someUrl/"
         navigate={this.navigateStub}
       />
-    );
-    this.wrapper.find('button').simulate('click');
-    this.menuItems = $('[role="menu"]:contains("Gradebook…")')[0].children;
+    )
+    this.wrapper.find('button').simulate('click')
+    this.menuItems = $('[role="menu"]:contains("Gradebook…")')[0].children
   },
-  teardown () {
-    this.wrapper.unmount();
+  teardown() {
+    this.wrapper.unmount()
   }
-});
+})
 
-test('handleDefaultGradbookSelect calls navigate', function () {
-  document.querySelector('[data-menu-item-id="default-gradebook"]').click();
-  ok(this.navigateStub.withArgs('tab-assignment', { trigger: true }).calledOnce);
-});
+test('handleDefaultGradbookSelect calls navigate', function() {
+  document.querySelector('[data-menu-item-id="default-gradebook"]').click()
+  ok(this.navigateStub.withArgs('tab-assignment', {trigger: true}).calledOnce)
+})
 
-test('Learning Mastery trigger button is present', function () {
-  equal(this.wrapper.find('Button').text().trim(), 'Learning Mastery');
-});
+test('Learning Mastery trigger button is present', function() {
+  equal(
+    this.wrapper
+      .find('Button')
+      .text()
+      .trim(),
+    'Learning Mastery'
+  )
+})
 
-test('DefaultGradebook Menu Item is first in the Menu', function () {
-  equal(this.menuItems[0].textContent.trim(), 'Gradebook…');
-});
+test('DefaultGradebook Menu Item is first in the Menu', function() {
+  equal(this.menuItems[0].textContent.trim(), 'Gradebook…')
+})
 
-test('Individual Gradebook Menu Item is second in the Menu', function () {
-  equal(this.menuItems[1].textContent.trim(), 'Individual View…');
-});
+test('Individual Gradebook Menu Item is second in the Menu', function() {
+  equal(this.menuItems[1].textContent.trim(), 'Individual View…')
+})
 
-test('Menu Item Separator is third in the Menu', function () {
-  equal(this.menuItems[2].firstElementChild.getAttribute('role'), 'presentation');
-});
+test('Menu Item Separator is third in the Menu', function() {
+  equal(this.menuItems[2].firstElementChild.getAttribute('role'), 'presentation')
+})
 
-test('Gradebook History Menu Item is fourth in the Menu', function () {
-  equal(this.menuItems[3].textContent.trim(), 'Gradebook History…');
-});
+test('Gradebook History Menu Item is fourth in the Menu', function() {
+  equal(this.menuItems[3].textContent.trim(), 'Gradebook History…')
+})

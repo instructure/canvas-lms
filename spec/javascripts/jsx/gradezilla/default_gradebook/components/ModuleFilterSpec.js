@@ -16,39 +16,36 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { mount } from 'enzyme';
-import ModuleFilter from 'jsx/gradezilla/default_gradebook/components/ModuleFilter';
+import React from 'react'
+import {mount} from 'enzyme'
+import ModuleFilter from 'jsx/gradezilla/default_gradebook/components/ModuleFilter'
 
-function defaultProps () {
+function defaultProps() {
   return {
-    items: [
-      { id: '1', name: 'Module 1', position: 2 },
-      { id: '2', name: 'Module 2', position: 1 },
-    ],
+    items: [{id: '1', name: 'Module 1', position: 2}, {id: '2', name: 'Module 2', position: 1}],
     onSelect: () => {},
-    selectedItemId: '0',
+    selectedItemId: '0'
   }
 }
 
 QUnit.module('Module Filter - subclass functionality', {
-  setup () {
-    const props = defaultProps();
-    this.wrapper = mount(<ModuleFilter {...props} />);
+  setup() {
+    const props = defaultProps()
+    this.wrapper = mount(<ModuleFilter {...props} />)
   },
 
-  teardown () {
-    this.wrapper.unmount();
+  teardown() {
+    this.wrapper.unmount()
   }
-});
+})
 
-test('renders a screenreader-friendly label', function () {
-  strictEqual(this.wrapper.find('ScreenReaderContent').text(), 'Module Filter');
-});
+test('renders a screenreader-friendly label', function() {
+  strictEqual(this.wrapper.find('ScreenReaderContent').text(), 'Module Filter')
+})
 
-test('the options are displayed in the same order as they were sent in', function () {
-  const actualOptionIds = this.wrapper.find('option').map(opt => opt.text());
-  const expectedOptionIds = ['All Modules', 'Module 1', 'Module 2'];
+test('the options are displayed in the same order as they were sent in', function() {
+  const actualOptionIds = this.wrapper.find('option').map(opt => opt.text())
+  const expectedOptionIds = ['All Modules', 'Module 1', 'Module 2']
 
-  deepEqual(actualOptionIds, expectedOptionIds);
-});
+  deepEqual(actualOptionIds, expectedOptionIds)
+})
