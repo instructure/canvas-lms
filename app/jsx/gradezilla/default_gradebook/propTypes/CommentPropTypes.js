@@ -16,10 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  instanceOf,
-  string
-} from 'prop-types';
+import {instanceOf, string} from 'prop-types'
 
 const SubmissionTrayCommentPropTypes = {
   id: string.isRequired,
@@ -29,6 +26,6 @@ const SubmissionTrayCommentPropTypes = {
   createdAt: instanceOf(Date).isRequired,
   comment: string.isRequired,
   editedAt: instanceOf(Date)
-};
+}
 
-export default SubmissionTrayCommentPropTypes;
+export default SubmissionTrayCommentPropTypes

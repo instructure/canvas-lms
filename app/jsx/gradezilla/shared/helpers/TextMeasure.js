@@ -16,14 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery';
+import $ from 'jquery'
 
-export function getWidth (text) {
-  let $textMeasure = $('#text-measure');
+export function getWidth(text) {
+  let $textMeasure = $('#text-measure')
   if (!$textMeasure.length) {
-    $textMeasure = $('<span id="text-measure" style="padding: 10px; display: none;" />').appendTo('#content');
+    $textMeasure = $('<span id="text-measure" style="padding: 10px; display: none;" />').appendTo(
+      '#content'
+    )
   }
-  return $textMeasure.text(text).outerWidth();
+  return $textMeasure.text(text).outerWidth()
 }
 
 export default {

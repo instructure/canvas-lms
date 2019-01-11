@@ -31,11 +31,7 @@ QUnit.module('AssignmentMuterDialogManager', suiteHooks => {
   })
 
   function createManager() {
-    return new AssignmentMuterDialogManager(
-      assignment,
-      url,
-      submissionsLoaded
-    )
+    return new AssignmentMuterDialogManager(assignment, url, submissionsLoaded)
   }
 
   QUnit.module('#assignment', () => {

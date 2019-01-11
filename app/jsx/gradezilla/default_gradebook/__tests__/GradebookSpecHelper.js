@@ -77,7 +77,7 @@ export function createGradebook(options = {}) {
 }
 
 export function setFixtureHtml($fixture) {
-  return $fixture.innerHTML = `
+  return ($fixture.innerHTML = `
     <div id="application">
       <div id="wrapper">
         <div data-component="GridColor"></div>
@@ -98,7 +98,7 @@ export function setFixtureHtml($fixture) {
         <div id="gradebook_grid"></div>
       </div>
     </div>
-  `
+  `)
 }
 
 export function stubDataLoader() {
