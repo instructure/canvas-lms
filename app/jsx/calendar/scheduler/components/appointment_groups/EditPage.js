@@ -304,12 +304,6 @@ import TimeBlockSelector from './TimeBlockSelector'
                 layout="inline"
                 vAlign="top"
               >
-                <Checkbox
-                  checked={this.state.appointmentGroup.participant_type === 'Group'}
-                  id="group_signup_required"
-                  aria-disabled="true"
-                  label={I18n.t('Students must sign up in groups')}
-                />
                 <div className="ic-Form-control ic-Form-control--checkbox">
                   <input
                     type="checkbox"
