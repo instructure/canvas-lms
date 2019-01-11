@@ -206,7 +206,7 @@ describe "RCS sidebar tests" do
       title = "Module-Title"
       @module = @course.context_modules.create!(:name => title)
 
-      visit_assignment_page(@course)
+      visit_new_assignment_page(@course)
       click_modules_accordion
       click_sidebar_link(title)
 
@@ -234,6 +234,20 @@ describe "RCS sidebar tests" do
       @quiz = @course.quizzes.create!
 
       visit_new_quiz_page(@course, @quiz)
+      click_assignments_accordion
+      click_sidebar_link(title)
+
+      in_frame wiki_page_body_ifr_id do
+        expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(@course, @assignment)
+      end
+    end
+
+    it "should click on assignment in sidebar to create link to it in syllabus page" do
+      title = "Assignment-Title"
+      @assignment = @course.assignments.create!(:name => title)
+
+      visit_syllabus(@course)
+      click_edit_syllabus
       click_assignments_accordion
       click_sidebar_link(title)
 

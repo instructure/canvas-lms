@@ -225,7 +225,7 @@ module WikiAndTinyCommon
     get "/courses/#{course.id}/discussion_topics/new?is_announcement=true"
   end
 
-  def visit_assignment_page(course)
+  def visit_new_assignment_page(course)
     get "/courses/#{course.id}/assignments/new"
   end
 
@@ -235,6 +235,14 @@ module WikiAndTinyCommon
 
   def visit_new_quiz_page(course, quiz)
     get "/courses/#{course.id}/quizzes/#{quiz.id}/edit"
+  end
+
+  def visit_syllabus(course)
+    get "/courses/#{course.id}/assignments/syllabus"
+  end
+
+  def click_edit_syllabus
+    f('.edit_syllabus_link').click
   end
 
   def edit_wiki_css
