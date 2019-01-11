@@ -127,11 +127,6 @@ test('when zero sections are loaded and there is secondary info configured, do n
   strictEqual(gradebook.getSelectedSecondaryInfo(), 'login_id')
 })
 
-test('initializes content load state for context modules to false', function() {
-  const gradebook = createGradebook()
-  strictEqual(gradebook.contentLoadStates.contextModulesLoaded, false)
-})
-
 test('initializes a submission state map', function() {
   const gradebook = createGradebook()
   strictEqual(gradebook.submissionStateMap.constructor, SubmissionStateMap)
@@ -285,11 +280,6 @@ QUnit.module('Gradebook#initialize', () => {
     test('stores the late policy as undefined if the late_policy option is null', () => {
       const gradebook = createInitializedGradebook({late_policy: null})
       strictEqual(gradebook.courseContent.latePolicy, undefined)
-    })
-
-    test('sets assignmentGroupsLoaded to false', function() {
-      const gradebook = createInitializedGradebook()
-      strictEqual(gradebook.contentLoadStates.assignmentGroupsLoaded, false)
     })
   })
 
@@ -9272,37 +9262,6 @@ QUnit.module('Gradebook#gotAllAssignmentGroups', hooks => {
     sinon.stub(gradebook, 'setAssignmentGroupsLoaded')
     gradebook.gotAllAssignmentGroups([])
     strictEqual(gradebook.setAssignmentGroupsLoaded.getCall(0).args[0], true)
-  })
-})
-
-QUnit.module('Gradebook#setAssignmentGroupsLoaded', hooks => {
-  let server
-  let options
-  let gradebook
-
-  hooks.beforeEach(() => {
-    server = sinon.fakeServer.create({respondImmediately: true})
-    options = {settings_update_url: '/course/1/gradebook_settings'}
-    server.respondWith('POST', options.settings_update_url, [
-      200,
-      {'Content-Type': 'application/json'},
-      '{}'
-    ])
-    gradebook = createGradebook(options)
-  })
-
-  hooks.afterEach(() => {
-    server.restore()
-  })
-
-  test('sets contentLoadStates.assignmentGroupsLoaded to true when passed true', () => {
-    gradebook.setAssignmentGroupsLoaded(true)
-    strictEqual(gradebook.contentLoadStates.assignmentGroupsLoaded, true)
-  })
-
-  test('sets contentLoadStates.assignmentGroupsLoaded to false when passed false', () => {
-    gradebook.setAssignmentGroupsLoaded(false)
-    strictEqual(gradebook.contentLoadStates.assignmentGroupsLoaded, false)
   })
 })
 
