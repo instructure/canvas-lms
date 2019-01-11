@@ -20,7 +20,7 @@ import axios from 'axios'
 import {camelize} from 'convert_case'
 import I18n from 'i18n!gradebook'
 
-import {client, gql} from '../../../canvas-apollo'
+import {createClient, gql} from '../../../canvas-apollo'
 import {showFlashAlert} from '../../../shared/FlashAlert'
 
 export async function getFinalGradeOverrides(courseId) {
@@ -77,7 +77,7 @@ export async function updateFinalGradeOverride(enrollmentId, gradingPeriodId, gr
     }
   `
 
-  return client
+  return createClient()
     .mutate({mutation})
     .then(response => {
       const {overrideScore} = response.data.setOverrideScore.grades
