@@ -17,7 +17,10 @@
  */
 
 import AssignmentCellFormatter from 'jsx/gradezilla/default_gradebook/GradebookGrid/formatters/AssignmentCellFormatter'
-import {createGradebook, setFixtureHtml} from 'jsx/gradezilla/default_gradebook/__tests__/GradebookSpecHelper'
+import {
+  createGradebook,
+  setFixtureHtml
+} from 'jsx/gradezilla/default_gradebook/__tests__/GradebookSpecHelper'
 
 QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
   let $fixture
@@ -346,10 +349,7 @@ QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
           valid: false
         }
         gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
-        strictEqual(
-          renderCell().querySelectorAll('.Grid__GradeCell__InvalidGrade').length,
-          1
-        )
+        strictEqual(renderCell().querySelectorAll('.Grid__GradeCell__InvalidGrade').length, 1)
       })
 
       test('does not display an invalid grade indicator when the pending grade is valid', () => {
@@ -361,10 +361,7 @@ QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
           valid: true
         }
         gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
-        strictEqual(
-          renderCell().querySelectorAll('.Grid__GradeCell__InvalidGrade').length,
-          0
-        )
+        strictEqual(renderCell().querySelectorAll('.Grid__GradeCell__InvalidGrade').length, 0)
       })
     })
 

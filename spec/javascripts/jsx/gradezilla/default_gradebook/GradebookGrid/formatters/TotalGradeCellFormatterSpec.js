@@ -16,7 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createGradebook, setFixtureHtml} from 'jsx/gradezilla/default_gradebook/__tests__/GradebookSpecHelper'
+import {
+  createGradebook,
+  setFixtureHtml
+} from 'jsx/gradezilla/default_gradebook/__tests__/GradebookSpecHelper'
 import TotalGradeCellFormatter from 'jsx/gradezilla/default_gradebook/GradebookGrid/formatters/TotalGradeCellFormatter'
 
 QUnit.module('GradebookGrid TotalGradeCellFormatter', hooks => {

@@ -64,8 +64,7 @@ function formatGrade(submissionData, assignment, options) {
 function renderStartContainer(options) {
   let content = ''
   if (options.invalid) {
-    content +=
-      '<div class="Grid__GradeCell__InvalidGrade"><i class="icon-warning"></i></div>'
+    content += '<div class="Grid__GradeCell__InvalidGrade"><i class="icon-warning"></i></div>'
   }
   // xsslint safeString.identifier content
   return `<div class="Grid__GradeCell__StartContainer">${content}</div>`

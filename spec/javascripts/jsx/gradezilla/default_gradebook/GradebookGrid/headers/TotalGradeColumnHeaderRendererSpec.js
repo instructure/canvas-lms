@@ -17,7 +17,10 @@
  */
 
 import ReactDOM from 'react-dom'
-import {createGradebook, setFixtureHtml} from 'jsx/gradezilla/default_gradebook/__tests__/GradebookSpecHelper'
+import {
+  createGradebook,
+  setFixtureHtml
+} from 'jsx/gradezilla/default_gradebook/__tests__/GradebookSpecHelper'
 import TotalGradeColumnHeaderRenderer from 'jsx/gradezilla/default_gradebook/GradebookGrid/headers/TotalGradeColumnHeaderRenderer'
 
 /* eslint-disable qunit/no-identical-names */
