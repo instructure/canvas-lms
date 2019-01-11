@@ -618,7 +618,7 @@ class EnrollmentsApiController < ApplicationController
 
     if @context.concluded?
       # allow moving users already in the course to open sections
-      unless @section && user.enrollments.where(course_id: @context).exists? && !@section.concluded?
+      unless @section && user.enrollments.shard(@context.shard).where(course_id: @context).exists? && !@section.concluded?
         return render_create_errors([@@errors[:concluded_course]])
       end
     end
