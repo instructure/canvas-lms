@@ -233,6 +233,10 @@ module WikiAndTinyCommon
     get "/courses/#{course.id}/discussion_topics/new"
   end
 
+  def visit_new_quiz_page(course, quiz)
+    get "/courses/#{course.id}/quizzes/#{quiz.id}/edit"
+  end
+
   def edit_wiki_css
     f("form.edit-form .edit-content")
   end
