@@ -29,6 +29,8 @@ import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid
 import {getCspEnabled, setCspEnabled, getCurrentWhitelist} from '../actions'
 import {ConnectedWhitelist} from './Whitelist'
 
+import {CONFIG} from '../index'
+
 export class SecurityPanel extends Component {
   static propTypes = {
     context: oneOf(['course', 'account']).isRequired,
@@ -60,7 +62,10 @@ export class SecurityPanel extends Component {
               `This allows you to restrict custom JavaScript that runs in your instance of Canvas.
                This will be enabled by an updated Content Security Policy (CSP).
                Domains will be added to your whitelist with the ability to manually add domains.
-               There is a a 100 domain limit on the whitelist.`
+               There is a a %{max_domains} domain limit on the whitelist.`,
+              {
+                max_domains: CONFIG.max_domains
+              }
             )}
           </Text>
         </View>

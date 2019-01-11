@@ -99,7 +99,7 @@ describe('ConnectedWhitelist', () => {
     const button = getByLabelText('Add Domain')
     fireEvent.click(button)
 
-    const countString = getByText('Whitelist (1/100)')
+    const countString = getByText('Whitelist (1/50)')
     expect(countString).toBeInTheDocument()
   })
 
@@ -188,5 +188,42 @@ describe('ConnectedWhitelist', () => {
 
     const addDomainButton = getByLabelText('Add Domain')
     expect(addDomainButton).toHaveFocus()
+  })
+
+  it('disables adding additional domains when there are 50 already present', () => {
+    const exampleDomains = []
+    for (let i = 0; i < 50; i++) {
+      exampleDomains.push(`domain-${i}.com`)
+    }
+    const {getByLabelText} = renderWithRedux(
+      <ConnectedWhitelist context="account" contextId="1" />,
+      {
+        initialState: {
+          whitelistedDomains: {
+            account: exampleDomains
+          }
+        }
+      }
+    )
+
+    const addDomainButton = getByLabelText('Add Domain')
+    expect(addDomainButton).toBeDisabled()
+  })
+
+  it('shows a message indicating whitelist has been reached', () => {
+    const exampleDomains = []
+    for (let i = 0; i < 50; i++) {
+      exampleDomains.push(`domain-${i}.com`)
+    }
+    const {getByText} = renderWithRedux(<ConnectedWhitelist context="account" contextId="1" />, {
+      initialState: {
+        whitelistedDomains: {
+          account: exampleDomains
+        }
+      }
+    })
+
+    const domainMessage = getByText(/You have reached the domain limit/)
+    expect(domainMessage).toBeInTheDocument()
   })
 })

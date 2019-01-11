@@ -20,6 +20,7 @@ import React, {Component} from 'react'
 import I18n from 'i18n!security_panel'
 import {connect} from 'react-redux'
 import {arrayOf, func, objectOf, oneOf, shape, string} from 'prop-types'
+import Alert from '@instructure/ui-alerts/lib/components/Alert'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
 import TextInput from '@instructure/ui-forms/lib/components/TextInput'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
@@ -33,6 +34,7 @@ import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
 import isValidDomain from 'is-valid-domain'
 
 import {addDomain, removeDomain} from '../actions'
+import {CONFIG} from '../index'
 
 const PROTOCOL_REGEX = /^(?:(ht|f)tp(s?)\:\/\/)?/
 
@@ -106,6 +108,7 @@ export class Whitelist extends Component {
   }
 
   render() {
+    const domainLimitReached = this.props.whitelistedDomains.account.length >= CONFIG.max_domains
     const toolsWhitelistKeys = this.props.whitelistedDomains.tools
       ? Object.keys(this.props.whitelistedDomains.tools)
       : []
@@ -114,7 +117,7 @@ export class Whitelist extends Component {
         <Heading margin="small 0" level="h4" as="h3" border="bottom">
           {I18n.t('Whitelist (%{count}/%{max})', {
             count: this.props.whitelistedDomains.account.length,
-            max: 100
+            max: CONFIG.max_domains
           })}
         </Heading>
         <form
@@ -123,6 +126,14 @@ export class Whitelist extends Component {
             this.handleSubmit()
           }}
         >
+          {domainLimitReached && (
+            <Alert variant="error" margin="small">
+              {I18n.t(
+                `You have reached the domain limit, if you wish to add more to your whitelist, please remove others first.`
+              )}
+            </Alert>
+          )}
+
           <Flex>
             <FlexItem grow shrink padding="0 medium 0 0">
               <TextInput
@@ -130,6 +141,7 @@ export class Whitelist extends Component {
                 placeholder="http://somedomain.com"
                 value={this.state.addDomainInputValue}
                 messages={this.state.errors}
+                disabled={domainLimitReached}
                 onChange={e => {
                   this.setState({addDomainInputValue: e.currentTarget.value})
                 }}
@@ -142,6 +154,7 @@ export class Whitelist extends Component {
                 type="submit"
                 margin="0 x-small 0 0"
                 icon={IconPlus}
+                disabled={domainLimitReached}
               >
                 {I18n.t('Domain')}
               </Button>
