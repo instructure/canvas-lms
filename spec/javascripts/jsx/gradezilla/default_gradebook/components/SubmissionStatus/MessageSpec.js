@@ -34,7 +34,14 @@ QUnit.module('Message', () => {
     test('includes a text message', () => {
       const message = 'Some Message'
       const wrapper = shallow(<Message variant="warning" message={message} />)
-      strictEqual(wrapper.contains(<Text color="warning" size="small">{message}</Text>), true)
+      strictEqual(
+        wrapper.contains(
+          <Text color="warning" size="small">
+            {message}
+          </Text>
+        ),
+        true
+      )
     })
   })
 
@@ -48,7 +55,14 @@ QUnit.module('Message', () => {
     test('includes a text message', () => {
       const message = 'Some Message'
       const wrapper = shallow(<Message variant="info" message={message} />)
-      strictEqual(wrapper.contains(<Text color="primary" size="small">{message}</Text>), true)
+      strictEqual(
+        wrapper.contains(
+          <Text color="primary" size="small">
+            {message}
+          </Text>
+        ),
+        true
+      )
     })
   })
 })
