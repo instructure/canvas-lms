@@ -1,250 +1,170 @@
-API Change Log
-==============
+# API Change Log
 
-The API Change Log includes adjustments to the Canvas API documentation as part of each Canvas release. This change log can be updated at any time. Instructure may add, change, and deprecate API elements according to the timelines indicated in the <a href="https://www.canvaslms.com/policies/api-policy">Canvas API Policy page</a>.
+### What is the API Change Log?
+The API Change Log includes adjustments to the Canvas API documentation as part of each Canvas release. This change log can be updated at any time. Instructure may add, change, and deprecate API elements according to the timelines indicated in the [Canvas API Policy page](https://www.canvaslms.com/policies/api-policy).
 
-<ul><li>For a summary of all deprecations, view the <a href="file.breaking.html">breaking changes API page</a>.</li>
-<li>This page documents API changes for the last four releases. The release date indicates the date that the API code will be available in the production environment. For prior releases, view the <a href="file.changelog_archive.html">API Change Log archive page</a>.</li>
-</ul>
+### How do I use the API Change Log?
+- **The release date indicates the date that the API code will be available in the production environment.**
+- For a summary of all deprecations, view the [breaking changes API page](file.breaking.html).
+- This page documents API changes for the last four releases. For prior releases, view the [API Change Log archive page](file.changelog_archive.html).
 
-<h2>2019-01-05</h2>
+## 2019-01-26
 
-<h3>Changes</h3>
-<table class="changelog">
-<tr>
-<th>API Calls</th>
-<th>Function</th>
-<th></th>
-</tr>
-<tr>
-<td><a href="file.developer_keys.html">Developer Keys API</a></td>
-<td></td>
-<td>Verified and corrected all links in document</td>
-</tr>
-<tr>
-<td><a href="files.html">Files API</a></td>
-<td>Delete File Endpoint</td>
-<td>Clarified endpoint usage and added permanent deletion warning</td>
-</tr>
-</table>
+### Changes
+<div class="changelog"></div>
+| API Calls | Function |      |
+|----------------------|----------------------|--------------------------|
+| [Submissions API]  |  List Gradeable Students endpoint | Added clarification about anonymous grading |
 
-<h3>Additions</h3>
-<table class="changelog">
-<tr>
-<th>API Calls</th>
-<th>Function</th>
-<th></th>
-</tr>
-<tr>
-<td><a href="assignments.html">Assignments API</a></td>
-  <td>Create an Assignment Endpoint<br><br>
-  Edit an Assignment Endpoint</td>
-  <td>Added assignment[allowed_attempts] parameter</td>
-</tr>
-<tr>
-<td><a href="conversations.html">Conversations API</a></td>
-  <td>Create a Conversations Endpoint</td>
-  <td>Added force_new parameter</td>
-</tr>
-<tr>
-<td><a href="courses.html">Courses API</a></td>
-  <td>Get a Single Course Endpoint</td>
-  <td>Added teacher_limit parameter</td>
-</tr>
-<tr>
-<td><a href="roles.html">Roles API</a></td>
-  <td>Create a New Role Endpoint</td>
-  <td>Permissions_enabled parameter: Added view_audit_trail in permissions list</td>
-</tr>
-</table>
+[Submissions API]: submissions.html
+
+### Additions
+<div class="changelog"></div>
+| API Responses | Function |      |
+|----------------------|----------------------|--------------------------|
+| [Assignments API] | Assignment Object | Returns grader_count, ginal_grader, grader_comments_visible_to_graders, graders_anonymous_to_graders, grader_names_visible_to_final_grader, and anonymous_grading parameters |
+| [Submissions API] | Submission Object | Returns UserDisplay parameter |
+| [Users API] |      | Added AnonyousUserDisplay Object |
+
+[Assignments API]: assignments.html
+[Submissions API]: submissions.html
+[Users API]: users.html
+
+### Removals
+<div class="changelog"></div>
+| API Responses | Function |      |
+|----------------------|----------------------|--------------------------|
+| [Enrollments API] | Enrollment Object | Removed computed_current_score, computed_final_score, computed_current_grade, computed_final_grade, current_period_computed_current_score, current_period_computed_final_score, current_period_computed_current_grade, and current_period_computed_final_grade parameters |
+
+[Enrollments API]: enrollments.html
+
+## 2019-01-05
+
+### Changes
+<div class="changelog"></div>
+| API Calls            | Function             |                          |
+|----------------------|----------------------|--------------------------|
+| [Developer Keys API] |                      | Verified and corrected all links in document               |
+| [Files API]          | Delete File Endpoint | Clarified endpoint usage and added permanent deletion warning |
+
+  [Developer Keys API]: file.developer_keys.html
+  [Files API]: files.html
+
+### Additions
+<div class="changelog"></div>
+| API Calls  | Function  |           |
+|------------|-----------|-----------|
+| [Assignments API]   | Create an Assignment Endpoint<br><br>Edit an Assignment Endpoint  | Added assignment\[allowed\_attempts\] parameter |
+| [Conversations API] | Create a Conversations Endpoint | Added force\_new parameter |
+| [Courses API]       | Get a Single Course Endpoint    | Added teacher\_limit parameter                                               |
+| [Roles API]         | Create a New Role Endpoint      | Permissions\_enabled parameter: Added view\_audit\_trail in permissions list |
+
+  [Assignments API]: assignments.html
+  [Conversations API]: conversations.html
+  [Courses API]: courses.html
+  [Roles API]: roles.html
+
 <p></p>
-<table class="changelog">
-<tr>
-<th>API Responses</th>
-<th>Function</th>
-<th></th>
-</tr>
-<tr>
-<td><a href="assignments.html">Assignments API</a></td>
-  <td>Assignment Object</td>
-  <td>Added allowed_attempts parameter</td>
-</tr>
-<tr>
-<td><a href="enrollments.html">Enrollments API</a></td>
-  <td>Enrollment Object</td>
-  <td>Added override_grade, override_score, current_period_override_grade, and current_period_override_score parameters
-  <br><br>
-  Added override score clarifications in computed_current_score, computed_final_score, computed_final_grade, current_period_computed_current_score, current_period_computed_final_score, current_period_computed_current_grade, and current_period_computed_final_grade parameters</td>
-</tr>
-<tr>
-<td><a href="sis_imports.html">SIS Imports API</a></td>
-  <td>SIS Import Statistic Object<br><br>
-  SIS Import Statistic Objects</td>
-  <td>Added object examples</td>
-</tr>
-<tr>
-<td><a href="sis_imports.html">SIS Imports API</a></td>
-  <td>SIS Import Object</td>
-  <td>Workflow_state parameter: Added initializing and failed descriptions<br><br>
-  Added statistics parameter
-</td>
-</tr>
-<tr>
-<td><a href="submissions.html">Submissions API</a></td>
-  <td>Submission Object</td>
-  <td>Added extra_attempts parameter
-</td>
-</tr>
-</table>
+<div class="changelog"></div>
+| API Responses     | Function   |   |
+|-------------------|------------|---|
+| [Assignments API] | Assignment Object  | Added allowed\_attempts parameter |
+| [Enrollments API] | Enrollment Object  | Added override\_grade, override\_score, current\_period\_override\_grade, and current\_period\_override\_score parameters<br><br>Added override score clarifications in computed\_current\_score, computed\_final\_score, computed\_final\_grade, current\_period\_computed\_current\_score, current\_period\_computed\_final\_score, current\_period\_computed\_current\_grade, and current\_period\_computed\_final\_grade parameters |
+| [SIS Imports API] | SIS Import Statistic Object <br><br>SIS Import Statistic Objects | Added object examples |
+| [SIS Imports API] | SIS Import Object  | Workflow\_state parameter: Added initializing and failed descriptions <br><br>Added statistics parameter                           |
+| [Submissions API] | Submission Object  | Added extra\_attempts parameter  |
 
-<h3>Removals</h3>
-<table class="changelog"
-<tr>
-<th>API Calls</th>
-<th>Function</th>
-<th></th>
-</tr>
-<tr>
-<td><a href="courses.html">Courses API</a></td>
-<td>List Users in Course Endpoint</td>
-<td>Include parameter: Removed email as an optional parameter</td>
-</tr>
-</table>
+  [Assignments API]: assignments.html
+  [Enrollments API]: enrollments.html
+  [SIS Imports API]: sis_imports.html
+  [Submissions API]: submissions.html
+
+
+### Removals
+<div class="changelog"></div>
+| API Calls     | Function  |   |
+|---------------|-----------|---|
+| [Courses API] | List Users in Course Endpoint | Include parameter: Removed email as an optional parameter |
+
+  [Courses API]: courses.html
+
 <p></p>
-<table class="changelog">
-<tr>
-<th>Content</th>
-<th>Function</th>
-<th></th>
-</tr>
-<tr>
-<td><a href="file.navigation_tools.html">Navigation Tools</a></td>
-  <td></td>
-  <td>Removed incorrect auto-generated links from page</td>
-</tr>
-</table>
+<div class="changelog"></div>
+| Content       | Function |   |
+|---------------|----------|---|
+| [Navigation Tools] |     | Removed incorrect auto-generated links from page |
 
-<h2>2018-12-08</h2>
+  [Navigation Tools]: file.navigation_tools.html
 
-<h3>Changes</h3>
-<table class="changelog">
-<tr>
-<th>API Calls</th>
-<th>Function</th>
-<th></th>
-</tr>
-<tr>
-<td><a href="sis_imports.html">SIS Imports API</a></td>
-<td>Abort SIS Import Endpoint<br><br>
-Get SIS Import List Endpoint</td>
-<td>Added clarification that aborting a sis batch can take time and subsequent sis batches begin to process 10 minutes after the abort.<br><br>
-Workflow_state parameter: added initializing, failed, restoring, partially_restored, and restored as allowed values</td>
-</tr>
-</table>
+## 2018-12-08
 
-<h3>Additions</h3>
-<table class="changelog">
-<tr>
-<th>API Calls</th>
-<th>Function</th>
-<th></th>
-</tr>
-<tr>
-<td><a href="sis_import_errors.html">SIS Import Errors API</a></td>
-<td>SISImportError Object</td>
-<td>Added row_info parameter, which displays the contents of the line that had the error</td>
-</tr>
-<tr>
-<td><a href="users.html">Users API</a></td>
-<td>List the Activity Stream Endpoint</td>
-<td>Added only_active_courses parameter</td>
-</tr>
-</table>
+### Changes
+<div class="changelog"></div>
+| API Calls         | Function |   |
+|-------------------|----------|---|
+| [SIS Imports API] | Abort SIS Import Endpoint<br><br> Get SIS Import List Endpoint | Added clarification that aborting a sis batch can take time and subsequent sis batches begin to process 10 minutes after the abort.<br><br> Workflow\_state parameter: added initializing, failed, restoring, partially\_restored, and restored as allowed values |
+
+  [SIS Imports API]: sis_imports.html
+
+### Additions
+<div class="changelog"></div>
+| API Calls               | Function                          |   |
+|-------------------------|-----------------------------------|---|
+| [SIS Import Errors API] | SISImportError Object             | Added row\_info parameter, which displays the contents of the line that had the error |
+| [Users API]             | List the Activity Stream Endpoint | Added only\_active\_courses parameter |
+
+  [SIS Import Errors API]: sis_import_errors.html
+  [Users API]: users.html
+
 <p></p>
-<table class="changelog">
-<tr>
-<th>API Responses</th>
-<th>Function</th>
-<th></th>
-<tr>
-<td><a href="courses.html">Courses API</a></td>
-<td>List Your Courses Endpoint</td>
-<td>Include parameter: Added graded period parameters to be returned even if total grades are hidden in the course</td>
-</tr>
-</table>
+<div class="changelog"></div>
+| API Responses | Function                   |   |
+|---------------|----------------------------|---|
+| [Courses API] | List Your Courses Endpoint | Include parameter: Added graded period parameters to be returned even if total grades are hidden in the course |
+
+  [Courses API]: courses.html
 <p></p>
 
-<h2>2018-11-17</h2>
+## 2018-11-17
 
-<h3>Changes</h3>
-<table class="changelog">
-<tr>
-<th>API Calls</th>
-<th>Function</th>
-<th></th>
-</tr>
-<tr>
-<td><a href="roles.html">Roles API</a></td>
-<td>Create a New Role Endpoint</td>
-<td>Permissions parameter: Updated account- and course-level role names to match roles in the Canvas Permissions page
-</tr>
-</table>
+### Changes
+<div class="changelog"></div>
+| API Calls   | Function                   |     |
+|-------------|----------------------------|-----|
+| [Roles API] | Create a New Role Endpoint | Permissions parameter: Updated account- and course-level role names to match roles in the Canvas Permissions page |
+
+  [Roles API]: roles.html
+
 <p></p>
-<table class="changelog">
-<tr>
-<th>API Responses</th>
-<th>Function</th>
-<th></th>
-</tr>
-<tr>
-<td><a href="assignments.html">Assignments API</a></td>
-<td>List Assignments Endpoint</td>
-<td>Clarified that the paginated list of assignments is returned for the current course or assignment group
-</tr>
-<tr>
-<td><a href="rubrics.html">Rubrics API</a></td>
-<td>Create a Single Rubric Endpoint</td>
-<td>Clarified the rubric return value</td>
-</tr>
-</table>
+<div class="changelog"></div>
+| API Responses     | Function                        |   |
+|-------------------|---------------------------------|---|
+| [Assignments API] | List Assignments Endpoint       | Clarified that the paginated list of assignments is returned for the current course or assignment group |
+| [Rubrics API]     | Create a Single Rubric Endpoint | Clarified the rubric return value |
 
-<h3>Additions</h3>
-<table class="changelog">
-<tr>
-<th>API Calls</th>
-<th>Function</th>
-<th></th>
-</tr>
-<tr>
-<td><a href="file.tools_variable_substitutions.html">LTI Variable Substitutions</a></td>
-<td>com.instructure.Person.name_sortable</td>
-<td>Added variable that returns the sortable name of the launching user.
-<br><br>Availability: when launched by a logged in user
-</tr>
-</table>
+  [Assignments API]: assignments.html
+  [Rubrics API]: rubrics.html
+
+### Additions
+<div class="changelog"></div>
+| API Calls                    | Function                              |    |
+|------------------------------|---------------------------------------|----|
+| [LTI Variable Substitutions] | com.instructure.Person.name\_sortable | Added variable that returns the sortable name of the launching user. Availability is when launched by a logged in user |
+
+  [LTI Variable Substitutions]: file.tools_variable_substitutions.html
+
 <p></p>
-<table class="changelog">
-<tr>
-<th>API Responses</th>
-<th>Function</th>
-<th></th>
-</tr>
-<tr>
-<td><a href="sis_imports.html">SIS Imports API</a></td>
-<td>Get the Current Importing SIS Import Endpoint</td>
-<td>Added endpoint to return the SIS imports that are currently processing for an account
-</table>
+<div class="changelog"></div>
+| API Responses     | Function                                      |   |
+|-------------------|-----------------------------------------------|---|
+| [SIS Imports API] | Get the Current Importing SIS Import Endpoint | Added endpoint to return the SIS imports that are currently processing for an account |
 
-<h3>Removals</h3>
-<table class="changelog">
-<tr>
-<th>API Calls</th>
-<th>Function</th>
-<th></th>
-</tr>
-<tr>
-<td><a href="planner.html">Planner API</td>
-<td></td>
-<td>Removed the beta warning banner from the API documentation</td>
-</tr>
-</table>
+  [SIS Imports API]: sis_imports.html
+
+### Removals
+<div class="changelog"></div>
+| API Calls     | Function |                                                            |
+|---------------|----------|------------------------------------------------------------|
+| [Planner API] |          | Removed the beta warning banner from the API documentation |
+
+  [Planner API]: planner.html

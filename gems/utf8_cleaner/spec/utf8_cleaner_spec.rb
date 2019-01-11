@@ -39,4 +39,14 @@ describe Utf8Cleaner do
       expect(Utf8Cleaner.strip_invalid_utf8(input)).to eq(output)
     end
   end
+
+  it "can strip non-UTF-8 strings" do
+    input_string = String.new("\x7Fohai", encoding: Encoding::ASCII)
+    expect(Utf8Cleaner.strip_invalid_utf8(input_string)).to eq("ohai")
+  end
+
+  it "can strip frozen strings" do
+    input_string = "\x7Fohai".freeze
+    expect(Utf8Cleaner.strip_invalid_utf8(input_string)).to eq("ohai")
+  end
 end
