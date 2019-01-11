@@ -68,3 +68,37 @@ it('dispatches scroll event properly when greather than threshold', () => {
   const foundClassElement = $('[data-test-id="assignment-student-header-sticky"]')
   expect(foundClassElement).toHaveLength(1)
 })
+
+it('will not render LatePolicyStatusDisplay if the submission is not late', () => {
+  const assignment = mockAssignment()
+  assignment.submissionsConnection.nodes[0].latePolicyStatus = null
+  assignment.submissionsConnection.nodes[0].submissionStatus = null
+  ReactDOM.render(
+    <Header scrollThreshold={150} assignment={assignment} />,
+    document.getElementById('fixtures')
+  )
+  const foundClassElement = $('[data-test-id="late-policy-container"]')
+  expect(foundClassElement).toHaveLength(0)
+})
+
+it('will render LatePolicyStatusDisplay if the submission status is late', () => {
+  const assignment = mockAssignment()
+  assignment.submissionsConnection.nodes[0].latePolicyStatus = null
+  ReactDOM.render(
+    <Header scrollThreshold={150} assignment={assignment} />,
+    document.getElementById('fixtures')
+  )
+  const foundClassElement = $('[data-test-id="late-policy-container"]')
+  expect(foundClassElement).toHaveLength(1)
+})
+
+it('will render LatePolicyStatusDisplay if the latePolicyStatus is late status is late', () => {
+  const assignment = mockAssignment()
+  assignment.submissionsConnection.nodes[0].submissionStatus = null
+  ReactDOM.render(
+    <Header scrollThreshold={150} assignment={assignment} />,
+    document.getElementById('fixtures')
+  )
+  const foundClassElement = $('[data-test-id="late-policy-container"]')
+  expect(foundClassElement).toHaveLength(1)
+})

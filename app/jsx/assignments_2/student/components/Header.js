@@ -24,6 +24,7 @@ import I18n from 'i18n!assignments_2_student_header'
 
 import AssignmentGroupModuleNav from './AssignmentGroupModuleNav'
 import SubmissionStatusPill from './SubmissionStatusPill'
+import LatePolicyStatusDisplay from './LatePolicyStatusDisplay'
 import DateTitle from './DateTitle'
 import GradeDisplay from './GradeDisplay'
 import StepContainer from './StepContainer'
@@ -59,6 +60,7 @@ class Header extends React.Component {
   }
 
   render() {
+    const submission = this.props.assignment.submissionsConnection.nodes[0]
     return (
       <div
         data-test-id="assignments-2-student-header"
@@ -84,20 +86,47 @@ class Header extends React.Component {
             <GradeDisplay
               gradingType={this.props.assignment.gradingType}
               receivedGrade={
-                this.props.assignment.submissionsConnection &&
-                this.props.assignment.submissionsConnection.nodes[0] &&
-                this.props.assignment.submissionsConnection.nodes[0].grade
+                this.props.assignment.submissionsConnection && submission && submission.grade
               }
               pointsPossible={this.props.assignment.pointsPossible}
             />
             <FlexItem as="div" align="end" textAlign="end">
-              <SubmissionStatusPill
-                submissionStatus={
-                  this.props.assignment.submissionsConnection &&
-                  this.props.assignment.submissionsConnection.nodes[0] &&
-                  this.props.assignment.submissionsConnection.nodes[0].submissionStatus
-                }
-              />
+              <Flex direction="column">
+                {submission.gradingStatus === 'graded' &&
+                  (submission.latePolicyStatus === 'late' ||
+                    submission.submissionStatus === 'late') && (
+                    <FlexItem grow>
+                      <LatePolicyStatusDisplay
+                        gradingType={this.props.assignment.gradingType}
+                        pointsPossible={this.props.assignment.pointsPossible}
+                        originalGrade={
+                          this.props.assignment.submissionsConnection &&
+                          submission &&
+                          submission.enteredGrade
+                        }
+                        pointsDeducted={
+                          this.props.assignment.submissionsConnection &&
+                          submission &&
+                          submission.deductedPoints
+                        }
+                        grade={
+                          this.props.assignment.submissionsConnection &&
+                          submission &&
+                          submission.grade
+                        }
+                      />
+                    </FlexItem>
+                  )}
+                <FlexItem grow>
+                  <SubmissionStatusPill
+                    submissionStatus={
+                      this.props.assignment.submissionsConnection &&
+                      submission &&
+                      submission.submissionStatus
+                    }
+                  />
+                </FlexItem>
+              </Flex>
             </FlexItem>
           </FlexItem>
         </Flex>
