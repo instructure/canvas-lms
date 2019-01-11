@@ -25,7 +25,7 @@ import I18n from 'i18n!assignments_2_student_header'
 import AssignmentGroupModuleNav from './AssignmentGroupModuleNav'
 import SubmissionStatusPill from './SubmissionStatusPill'
 import DateTitle from './DateTitle'
-import PointsDisplay from './PointsDisplay'
+import GradeDisplay from './GradeDisplay'
 import StepContainer from './StepContainer'
 import Attempt from './Attempt'
 import {number} from 'prop-types'
@@ -81,14 +81,14 @@ class Header extends React.Component {
             <DateTitle assignment={this.props.assignment} />
           </FlexItem>
           <FlexItem grow>
-            <PointsDisplay
-              displayAs={this.props.assignment.gradingType}
+            <GradeDisplay
+              gradingType={this.props.assignment.gradingType}
               receivedGrade={
                 this.props.assignment.submissionsConnection &&
                 this.props.assignment.submissionsConnection.nodes[0] &&
                 this.props.assignment.submissionsConnection.nodes[0].grade
               }
-              possiblePoints={this.props.assignment.pointsPossible}
+              pointsPossible={this.props.assignment.pointsPossible}
             />
             <FlexItem as="div" align="end" textAlign="end">
               <SubmissionStatusPill

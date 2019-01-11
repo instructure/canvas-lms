@@ -25,6 +25,7 @@ import {scoreToGrade} from '../../../gradebook/GradingSchemeHelper'
 const POINTS = 'points'
 const PERCENT = 'percent'
 const PASS_FAIL = 'pass_fail'
+const POINTS_OUT_OF_FRACTION = 'points_out_of_fraction'
 
 const PASS_GRADES = ['complete', 'pass']
 const FAIL_GRADES = ['incomplete', 'fail']
@@ -49,6 +50,24 @@ function isPercent(grade, gradeType) {
 
 function isExcused(grade) {
   return grade === 'EX'
+}
+
+function formatPointsOutOf(grade, pointsPossible) {
+  if (grade == null || grade === '') {
+    return grade
+  }
+
+  if (pointsPossible == null || pointsPossible === '') {
+    return grade
+  }
+
+  const numberOptions = {precision: 2, strip_insignificant_zeros: true}
+  let score = UNGRADED
+  if (grade != null) {
+    score = I18n.n(grade, numberOptions)
+  }
+  const pointsPossibleTranslated = I18n.n(pointsPossible, numberOptions)
+  return I18n.t('%{score}/%{pointsPossibleTranslated}', {pointsPossibleTranslated, score})
 }
 
 function normalizeCompleteIncompleteGrade(grade) {
@@ -136,6 +155,9 @@ const GradeFormatHelper = {
    *    being formatted. A value of 'pass_fail' will result in internationalization.
    *    Any other value will result in the grade not being formatted.
    *  precision {number} - If present grade will be rounded to given precision. Default is two decimals.
+   *  formatType {string} - formats grade based on grading type
+   *    - points_out_of_fraction: if grading type is points and this format type is present the grade will
+   *      show its out of score. {grade}/{pointsPossible} i.e. 5/10 1/15
    *  defaultValue - If present will be the return value when the grade is undefined, null, or empty string.
    *
    * @return {string} Given grade rounded to two decimal places and formatted with I18n
@@ -162,6 +184,9 @@ const GradeFormatHelper = {
         const roundedGrade = round(parsedGrade, options.precision || 2)
         formattedGrade = I18n.n(roundedGrade, {percentage: isPercent(grade, options.gradingType)})
       }
+    }
+    if (options.gradingType === POINTS && options.formatType === POINTS_OUT_OF_FRACTION) {
+      formattedGrade = formatPointsOutOf(grade, options.pointsPossible)
     }
 
     return formattedGrade
@@ -214,6 +239,7 @@ const GradeFormatHelper = {
   excused,
   isExcused,
   formatGradeInfo,
+  formatPointsOutOf,
 
   formatSubmissionGrade(submission, options = {version: 'final'}) {
     if (submission.excused) {

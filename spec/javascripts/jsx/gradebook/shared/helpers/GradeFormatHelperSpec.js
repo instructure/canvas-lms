@@ -37,6 +37,17 @@ test('uses I18n#n to format numerical integer grades', function() {
   equal(I18n.n.callCount, 1)
 })
 
+test('uses formatPointsOutOf to format points grade type', function() {
+  equal(
+    GradeFormatHelper.formatGrade('4', {
+      gradingType: 'points',
+      pointsPossible: '7',
+      formatType: 'points_out_of_fraction'
+    }),
+    '4/7'
+  )
+})
+
 test('uses I18n#n to format numerical decimal grades', function() {
   sandbox
     .stub(I18n, 'n')
@@ -316,6 +327,40 @@ QUnit.module('GradeFormatHelper', suiteHooks => {
 
     test('returns false when given letter grades', () => {
       strictEqual(GradeFormatHelper.isExcused('A'), false)
+    })
+  })
+
+  QUnit.module('.formatPointsOutOf()', hooks => {
+    let grade
+    let pointsPossible
+
+    function formatPointsOutOf() {
+      return GradeFormatHelper.formatPointsOutOf(grade, pointsPossible)
+    }
+
+    hooks.beforeEach(() => {
+      grade = '7'
+      pointsPossible = '10'
+    })
+
+    test('returns the score and points possible as a fraction', () => {
+      strictEqual(formatPointsOutOf(), '7/10')
+    })
+
+    test('rounds the score and points possible to two decimal places', () => {
+      grade = '7.123'
+      pointsPossible = '10.456'
+      strictEqual(formatPointsOutOf(), '7.12/10.46')
+    })
+
+    test('returns null when grade is null', () => {
+      grade = null
+      strictEqual(formatPointsOutOf(), null)
+    })
+
+    test('returns grade if pointsPossible is null', () => {
+      pointsPossible = null
+      strictEqual(formatPointsOutOf(), grade)
     })
   })
 
