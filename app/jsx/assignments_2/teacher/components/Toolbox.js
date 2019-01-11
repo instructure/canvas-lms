@@ -46,6 +46,11 @@ export default class Toolbox extends React.Component {
     onPublishChange: () => {}
   }
 
+  handlePublishChange = event => {
+    const newState = event.target.checked ? 'published' : 'unpublished'
+    this.props.onPublishChange(newState)
+  }
+
   renderPublished() {
     // TODO: put the label on the left side of the toggle when checkbox supports it
     return (
@@ -54,8 +59,8 @@ export default class Toolbox extends React.Component {
         variant="toggle"
         size="medium"
         inline
-        checked={this.props.assignment.state === 'published'}
-        onChange={this.props.onPublishChange}
+        checked={this.props.assignment.get('state') === 'published'}
+        onChange={this.handlePublishChange}
       />
     )
   }
@@ -69,8 +74,8 @@ export default class Toolbox extends React.Component {
   }
 
   renderSpeedGraderLink() {
-    const assignmentLid = this.props.assignment.lid
-    const courseLid = this.props.assignment.course.lid
+    const assignmentLid = this.props.assignment.get('lid')
+    const courseLid = this.props.assignment.getIn(['course', 'lid'])
     const speedgraderLink = `/courses/${courseLid}/gradebook/speed_grader?assignment_id=${assignmentLid}`
     return (
       <Link href={speedgraderLink} icon={<IconSpeedGrader />} iconPlacement="end" target="_blank">
@@ -94,7 +99,7 @@ export default class Toolbox extends React.Component {
   renderPoints() {
     return (
       <Text as="div" size="x-large" lineHeight="fit">
-        {this.props.assignment.pointsPossible}
+        {this.props.assignment.get('pointsPossible')}
       </Text>
     )
   }

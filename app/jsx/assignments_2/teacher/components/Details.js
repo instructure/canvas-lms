@@ -33,9 +33,7 @@ Details.defaultProps = {
 }
 
 export default function Details(props) {
-  const {
-    assignment: {description}
-  } = props
+  const description = props.assignment.get('description')
   const convertedHtml = apiUserContent.convert(description)
 
   // html is sanitized on the server side

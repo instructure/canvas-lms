@@ -42,24 +42,24 @@ export default function Overrides(props) {
 }
 
 function renderEveryoneElse(assignment, readOnly) {
-  if (assignment.dueAt !== null) {
+  if (assignment.get('dueAt') !== null) {
     return <EveryoneElse assignment={assignment} readOnly={readOnly} />
   }
   return null
 }
 
 function renderOverrides(assignment, readOnly) {
-  if (assignment.assignmentOverrides.nodes.length > 0) {
-    return assignment.assignmentOverrides.nodes.map(override => (
+  const overrides = assignment.getIn(['assignmentOverrides', 'nodes'])
+  if (overrides.size > 0) {
+    return overrides.map(override => (
       // in the existing schema, submissionTypes and allowedExtensions are on the assignment.
       // eventually, they will also be part of each override
       <Override
-        key={override.lid}
-        override={{
-          ...override,
-          submissionTypes: assignment.submissionTypes,
-          allowedExtensions: assignment.allowedExtensions
-        }}
+        key={override.get('lid')}
+        override={override.merge({
+          submissionTypes: assignment.get('submissionTypes'),
+          allowedExtensions: assignment.get('allowedExtensions')
+        })}
         readOnly={readOnly}
       />
     ))

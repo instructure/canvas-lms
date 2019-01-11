@@ -59,13 +59,16 @@ export default class Header extends React.Component {
   }
 
   renderModules() {
-    if (this.props.assignment.modules.length === 0) {
+    if (this.props.assignment.get('modules').size === 0) {
       return <div />
     }
     return (
       <Text>
         <TruncateText>
-          {this.props.assignment.modules.map(module => module.name).join(' | ')}
+          {this.props.assignment
+            .get('modules')
+            .map(module => module.get('name'))
+            .join(' | ')}
         </TruncateText>
       </Text>
     )
@@ -74,7 +77,7 @@ export default class Header extends React.Component {
   renderAssignmentGroup() {
     return (
       <Text>
-        <TruncateText>{this.props.assignment.assignmentGroup.name}</TruncateText>
+        <TruncateText>{this.props.assignment.getIn(['assignmentGroup', 'name'])}</TruncateText>
       </Text>
     )
   }
@@ -92,7 +95,7 @@ export default class Header extends React.Component {
               <FlexItem padding="xx-small 0 0">{this.renderAssignmentGroup()}</FlexItem>
               <FlexItem padding="medium 0 large">
                 <Heading as="div" level="h1">
-                  {this.props.assignment.name}
+                  {this.props.assignment.get('name')}
                 </Heading>
               </FlexItem>
             </Flex>
