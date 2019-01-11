@@ -308,84 +308,6 @@ QUnit.module('Gradebook#initialize', () => {
   })
 })
 
-QUnit.module('Gradebook#gotChunkOfStudents', {
-  setup() {
-    const placeholderStudent = {id: '1101'}
-    this.gradebook = createGradebook()
-    this.gradebook.courseContent.students.addUserStudents([placeholderStudent])
-    this.gradebook.gridData.rows.push(placeholderStudent)
-    sandbox.stub(this.gradebook.gradebookGrid, 'render')
-    this.students = [
-      {
-        id: '1101',
-        name: 'Adam Jones',
-        enrollments: [{type: 'StudentEnrollment', grades: {html_url: 'http://example.url/'}}]
-      },
-      {
-        id: '1102',
-        name: 'Betty Ford',
-        enrollments: [{type: 'StudentEnrollment', grades: {html_url: 'http://example.url/'}}]
-      },
-      {
-        id: '1199',
-        name: 'Test Student',
-        enrollments: [{type: 'StudentViewEnrollment', grades: {html_url: 'http://example.url/'}}]
-      }
-    ]
-  }
-})
-
-test('updates the student map with each student', function() {
-  this.gradebook.gotChunkOfStudents(this.students)
-  ok(this.gradebook.students[1101], 'student map includes Adam Jones')
-  ok(this.gradebook.students[1102], 'student map includes Betty Ford')
-})
-
-test('replaces matching students in the student map', function() {
-  this.gradebook.gotChunkOfStudents(this.students)
-  equal(this.gradebook.students[1101].name, 'Adam Jones')
-})
-
-test('updates the test student map with each test student', function() {
-  this.gradebook.gotChunkOfStudents(this.students)
-  ok(this.gradebook.studentViewStudents[1199], 'test student map includes Test Student')
-})
-
-test('replaces matching students in the test student map', function() {
-  this.gradebook.courseContent.students.addTestStudents([{id: '1199'}])
-  this.gradebook.gotChunkOfStudents(this.students)
-  equal(this.gradebook.studentViewStudents[1199].name, 'Test Student')
-})
-
-test('updates attributes of each student', function() {
-  this.gradebook.gotChunkOfStudents(this.students)
-  strictEqual(this.gradebook.students[1101].isConcluded, false, 'isConcluded is set to false')
-  strictEqual(this.gradebook.students[1101].isInactive, false, 'isInactive is set to false')
-})
-
-test('updates the row for each student', function() {
-  this.gradebook.gotChunkOfStudents(this.students)
-  strictEqual(this.gradebook.gridData.rows[0], this.students[0])
-})
-
-test('builds rows when filtering with search', function() {
-  this.gradebook.userFilterTerm = 'searching'
-  sandbox.stub(this.gradebook, 'buildRows')
-  this.gradebook.gotChunkOfStudents(this.students)
-  strictEqual(this.gradebook.buildRows.callCount, 1)
-})
-
-test('does not build rows when not filtering with search', function() {
-  sandbox.stub(this.gradebook, 'buildRows')
-  this.gradebook.gotChunkOfStudents(this.students)
-  strictEqual(this.gradebook.buildRows.callCount, 0)
-})
-
-test('renders the grid when not filtering with search', function() {
-  this.gradebook.gotChunkOfStudents(this.students)
-  strictEqual(this.gradebook.gradebookGrid.render.callCount, 1)
-})
-
 QUnit.module('Gradebook#calculateStudentGrade', {
   createGradebook(options = {}) {
     const gradebook = createGradebook({
@@ -3221,66 +3143,6 @@ test('sends all students when calling setupGrading', function() {
   gradebook.resetGrading()
   const [students] = gradebook.setupGrading.lastCall.args
   strictEqual(students, allStudents)
-})
-
-QUnit.module('Gradebook#updateStudentAttributes', {
-  setup() {
-    this.gradebook = createGradebook()
-    this.student = {id: '1101', enrollments: [{grades: {html_url: 'http://example.url/'}}]}
-  }
-})
-
-test('sets .computed_current_score to 0', function() {
-  this.gradebook.updateStudentAttributes(this.student)
-  strictEqual(this.student.computed_current_score, 0)
-})
-
-test('sets .computed_final_score to 0', function() {
-  this.gradebook.updateStudentAttributes(this.student)
-  strictEqual(this.student.computed_final_score, 0)
-})
-
-test('sets .isConcluded to true when all enrollments are "completed"', function() {
-  this.student.enrollments[0].enrollment_state = 'completed'
-  this.student.enrollments.push({
-    enrollment_state: 'completed',
-    grades: {html_url: 'http://example.url/'}
-  })
-  this.gradebook.updateStudentAttributes(this.student)
-  strictEqual(this.student.isConcluded, true)
-})
-
-test('sets .isConcluded to false when any enrollments are not "completed"', function() {
-  this.student.enrollments.push({
-    enrollment_state: 'completed',
-    grades: {html_url: 'http://example.url/'}
-  })
-  this.gradebook.updateStudentAttributes(this.student)
-  strictEqual(this.student.isConcluded, false)
-})
-
-test('sets .isInactive to true when all enrollments are "inactive"', function() {
-  this.student.enrollments[0].enrollment_state = 'inactive'
-  this.student.enrollments.push({
-    enrollment_state: 'inactive',
-    grades: {html_url: 'http://example.url/'}
-  })
-  this.gradebook.updateStudentAttributes(this.student)
-  strictEqual(this.student.isInactive, true)
-})
-
-test('sets .isInactive to false when any enrollments are not "inactive"', function() {
-  this.student.enrollments.push({
-    enrollment_state: 'inactive',
-    grades: {html_url: 'http://example.url/'}
-  })
-  this.gradebook.updateStudentAttributes(this.student)
-  strictEqual(this.student.isInactive, false)
-})
-
-test('sets .cssClass using the id of the student', function() {
-  this.gradebook.updateStudentAttributes(this.student)
-  equal(this.student.cssClass, 'student_1101')
 })
 
 QUnit.module('Gradebook#updateStudentRow', {
@@ -8555,27 +8417,6 @@ QUnit.module('Gradebook', () => {
       gradebook.isGradeVisible('1101', '2301')
       const submission = gradebook.submissionStateMap.getSubmissionState.lastCall.args[0]
       strictEqual(submission.user_id, '1101')
-    })
-  })
-
-  QUnit.module('#isStudentGradeable()', hooks => {
-    hooks.beforeEach(() => {
-      gradebook = createGradebook()
-      gradebook.students = {1101: {id: '1101', isConcluded: false}}
-    })
-
-    test('returns true when the student enrollment is active', () => {
-      strictEqual(gradebook.isStudentGradeable('1101'), true)
-    })
-
-    test('returns false when the student enrollment is concluded', () => {
-      gradebook.students[1101].isConcluded = true
-      strictEqual(gradebook.isStudentGradeable('1101'), false)
-    })
-
-    test('returns false when the student is not loaded', () => {
-      delete gradebook.students[1101]
-      strictEqual(gradebook.isStudentGradeable('1101'), false)
     })
   })
 
