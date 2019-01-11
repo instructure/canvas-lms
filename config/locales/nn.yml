@@ -1535,6 +1535,7 @@ nn:
   add_a_new_user_c440d053: "Legg til ein ny brukar"
   add_a_reviewer_for_the_selected_students_1c7b5d6f: "Legg til ein fagfellevurderar for dei valde studentane"
   add_account_admins_99c03c9e: "Legg til kontoadministratorar"
+  add_additional_comments_ec34a62f: "Legg til tilleggskommentar"
   add_alert_b2729c99: "Legg til varsel"
   add_an_assignment_fb73942e: "Legg til ei oppgåve"
   add_an_identity_provider_to_this_account_c2644478: "Legg til ein identitetsleverandør til kontoen:"
@@ -2574,7 +2575,7 @@ nn:
         external_tool: "Eksternt verktøy"
         no_submission: "Inga innlevering"
         on_paper: "På papir"
-        online: "På internett"
+        online: "I nettlesar"
     submit_assignment: 
       additional_comments: Tilleggskommentarar
       buttons: 
@@ -4883,7 +4884,7 @@ nn:
       blended: Blanda
       not_set: "Ikkje oppgitt"
       on_campus: "På universitetsområdet"
-      online: "På internett"
+      online: "I nettlesar"
     course_not_found: "Finn ikkje emnet"
     default_grading_scheme_name: "Standard karakteroppsett"
     default_name: "Mitt emne"
