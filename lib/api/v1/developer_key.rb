@@ -48,6 +48,7 @@ module Api::V1::DeveloperKey
         hash['access_token_count'] = key.access_token_count
         hash['last_used_at'] = key.last_used_at
         hash['vendor_code'] = key.vendor_code
+        hash['is_lti_key'] = key.public_jwk.present?
       end
 
       if account_binding.present?
