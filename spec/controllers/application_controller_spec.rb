@@ -657,6 +657,23 @@ RSpec.describe ApplicationController do
             it 'sets the "login_hint" to the current user lti id' do
               expect(assigns[:lti_launch].params['login_hint']).to eq Lti::Asset.opaque_identifier_for(user)
             end
+
+            it 'does not use the oidc_login_uri as the resource_url' do
+              expect(assigns[:lti_launch].resource_url).to eq tool.url
+            end
+
+            context 'when the developer key has an oidc_login_uri' do
+              before do
+                tool.developer_key.update!(oidc_login_uri: oidc_login_uri)
+                controller.send(:content_tag_redirect, course, content_tag, nil)
+              end
+
+              let(:oidc_login_uri) { 'https://www.test.com/oidc/login' }
+
+              it 'does use the oidc_login_uri as the resource_url' do
+                expect(assigns[:lti_launch].resource_url).to eq oidc_login_uri
+              end
+            end
           end
 
           context 'assignments' do
@@ -674,6 +691,11 @@ RSpec.describe ApplicationController do
         it 'creates a basic lti launch request when tool is not configured to use LTI 1.3' do
           controller.send(:content_tag_redirect, course, content_tag, nil)
           expect(assigns[:lti_launch].params["lti_message_type"]).to eq "basic-lti-launch-request"
+        end
+
+        it 'does not use the oidc_login_uri as the resource_url' do
+          controller.send(:content_tag_redirect, course, content_tag, nil)
+          expect(assigns[:resource_url]).to eq tool.url
         end
       end
 

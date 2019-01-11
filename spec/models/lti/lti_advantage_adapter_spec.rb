@@ -144,5 +144,15 @@ describe Lti::LtiAdvantageAdapter do
     it 'returns the general launch URL if no resource url is set' do
       expect(adapter.launch_url).to eq 'http://www.example.com/basic_lti'
     end
+
+    context 'when the oidc_login_uri is set' do
+      let(:oidc_login_uri) { 'https://www.test.com/oidc/login' }
+
+      before { tool.developer_key.update!(oidc_login_uri: oidc_login_uri) }
+
+      it 'uses the oidc login uri' do
+        expect(adapter.launch_url).to eq oidc_login_uri
+      end
+    end
   end
 end

@@ -48,6 +48,8 @@ RSpec.shared_context "lti_1_3_spec_helper", shared_context: :metadata do
     }
   end
 
+  let(:oidc_login_uri) { 'https://www.test.com/oidc/login' }
+
   let(:settings) do
     {
       'title' => 'LTI 1.3 Tool',
@@ -55,6 +57,7 @@ RSpec.shared_context "lti_1_3_spec_helper", shared_context: :metadata do
       'launch_url' => launch_url,
       'custom_fields' => {'has_expansion' => '$Canvas.user.id', 'no_expansion' => 'foo'},
       'public_jwk' => public_jwk,
+      'oidc_login_uri' => oidc_login_uri,
       'extensions' =>  [
         {
           'platform' => 'canvas.instructure.com',

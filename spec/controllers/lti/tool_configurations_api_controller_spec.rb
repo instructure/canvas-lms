@@ -246,6 +246,10 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       expect(subject.redirect_uris).to eq dev_key_params[:redirect_uris].split
     end
 
+    it 'sets the developer key oidc_login_uri' do
+      expect(subject.oidc_login_uri).to eq oidc_login_uri
+    end
+
     context 'when scopes are invalid' do
       subject do
         bad_scope_request
