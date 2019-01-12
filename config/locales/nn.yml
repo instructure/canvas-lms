@@ -269,6 +269,7 @@ nn:
   account_notifications: 
     announcement_deleted_notice: "Kunngjering er sletta"
   account_notifications_f3b7f01f: Kontovarsel
+  account_proficiency_ratings_saved_292d9239: "Ferdigheitsnivå knytta til konto lagra"
   account_reports: 
     default: 
       all_terms: "Alle semester"
@@ -1582,6 +1583,7 @@ nn:
   add_people_7948b7da: "Legg til personar"
   add_people_7ee4b2ec: "Legg til personar"
   add_people_to_coursename_5ea234e1: "Legg personar til %{courseName}"
+  add_proficiency_rating_d819f6b8: "Legg til ferdigheitsnivå"
   add_quiz_ip_filter_c7b37dc5: "Legg til IP-filter for quizar"
   add_rating_89d7fbde: "Legg til vurdering"
   add_recipient_ff135ed7: "Legg til mottakar"
@@ -1608,6 +1610,7 @@ nn:
   add_users_to_name_b8109bbb: "Legg brukarar til %{name}"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Legg til oppgåvene dine.  Du kan lage ei lang liste, dele dei opp i grupper eller spesifisere vekttal for kvar enkelt oppgåvegruppe."
   add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: "Legg til ID for eigendefinert felt i Zendesk for kvar av dei følgande (felt utan ID blir ikkje registrerte):"
+  added_new_proficiency_rating_e30cab8a: "Nytt ferdigheitsnivå er lagt til"
   adding_rss_feed_f1202567: "Legg til RSS-straum"
   additional_comments_9aed10bb: Tilleggskommentarar
   additional_occurrence_s_7b5b0173: Tilleggsførekomst(ar)
@@ -1617,6 +1620,7 @@ nn:
   addressbook_microservice_a4940422: "Mikroservice for adressebok"
   addressbook_performance_tap_98ddf67: "Sjå yteevna til adresseboka"
   adds_analytics_link_on_the_user_settings_menu_3a048816: "Legg til analyselenke i meny for brukarinnstillingar."
+  adds_analytics_to_a_student_s_context_card_d4c1e3a3: "Legg til analyse til eit studentkontekstkort"
   adjust_final_grade_fa45e7e0: "Juster sluttkarakter"
   admin_4d3ba42f: Admin
   admin_csv_f8d1b3eb: "CSV-fil over administratorar"
@@ -1696,6 +1700,7 @@ nn:
       recipients_required: "Det er obligatorisk med minst ein mottakar"
       threshold_should_be_numeric: "Dette skal vere eit positivt tal"
   alerts_add_edit_delete_d71091c6: "Varsel - legg til / rediger / slett"
+  alerts_course_settings_53551794: "Varsel (Emneinnstillingar)"
   all_4321c3a1: Alle
   all_account_types_e83c1516: "Alle kontoar"
   all_accounts_3bafc860: "Alle kontoar"
@@ -1703,6 +1708,8 @@ nn:
   all_assignments_b79a4d6a: "Alle oppgåvene"
   all_changes_were_saved_f6f3ddcc: "Alle endringar er lagra"
   all_close_dates_must_be_on_or_after_the_end_date_b898d85d: "Alle lukkedatoar må vere på eller etter sluttdatoen"
+  all_comments_are_sent_to_the_whole_group_284591e7: "Alle kommentarar sendast til heile gruppa"
+  all_comments_are_sent_to_the_whole_group_778126f3: "Alle kommentarar sendast til heile gruppa."
   all_configured_apps_a14eef0a: "Alle konfigurerte appar"
   all_courses_a7dbb853: "Alle emne"
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Alle datofelt må finnast og vere korrekt formaterte"
@@ -1728,26 +1735,39 @@ nn:
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "La ein sensuransvarleg gå gjennom fleire uavhengige karaktersetjingar for utvalde innleveringar"
   allow_bb7ce9b1: Tillat
   allow_bulk_grade_export_to_sis_e11a6e66: "Tillat gruppeeksport av karakterar til SIS"
+  allow_comments_a1f45d8: "Tillat kommentarar"
+  allow_comments_for_title_7ac9e00: "Tillat kommentarar til %{title}"
   allow_course_content_to_be_downloaded_and_viewed_o_48a0d252: "Tillat at emneinnhaldet kan bli lasta ned og lest når du ikkje er på nett"
   allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: "Tillat at emnebilde blir tilordna til eit emne og brukt på dashbordkorta. "
   allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "Tillat at kvar brukar kan reorganisere dashbordkorta sine. "
+  allow_importing_of_qti_and_common_cartridge_into_q_81b657cd: "Tillat import av QTI og Common Cartridge til Quizzes.Next."
   allow_in_mastery_paths_5332c786: "Tillat i meistringsstiane"
   allow_intra_group_peer_reviews_53f1e455: "Tillat fagfellevurdering innad i gruppa"
   allow_lor_tools: "Tillat brukarar å vise og bruke eksterne verktøy som er konfigurerte for LOR."
+  allow_moderator_to_review_multiple_independent_gra_c59d64f6: "La ein sensuransvarleg gå gjennom fleire uavhengige karaktersetjingar for utvalde innleveringar"
   allow_multiple_attempts_e67a0a37: "Tillat fleire forsøk"
   allow_opt_out_of_inbox: "Tillat brukarar å trekkje seg frå samtaleinnboksen. Dette vil medføre at alle samtalemeldingar og -varsel blir sende direkte til den primære e-postadressa til brukaren, at meldingsindikatoren for ulesne meldingar blir skjult, og at varslingsinnstillingar for samtalar blir skjulte."
   allow_passive_acceptance_of_terms_of_service_63ef5994: "Tillat passivt samtykke av bruksvilkår"
   allow_reorder_dashboard_cards_78215947: "Tillat reorganisering av dashbordkorta"
   allow_students_to_download_course_content_and_view_810e66ec: "Tillat at studentane kan laste ned emneinnhaldet og lese det når dei ikkje er på nett "
   allow_students_to_see_who_has_signed_up_for_time_s_497f4a46: "Tillat studentar å sjå kven som har registrert seg for tidsluker."
+  allow_students_to_see_who_has_signed_up_for_time_s_7eb1d0ef: "Tillat studentar å sjå kven som har registrert seg for tidsluker som framleis er ledige. "
   allow_students_to_see_who_was_signed_up_for_time_s_160ba252: "Tillat studentar å sjå kven som var registrert for tidsluker."
+  allow_students_to_see_who_was_signed_up_for_time_s_37f5cb01: "Tillat studentar å sjå kven som var registrert til tidsluker som framleis er ledige"
+  allow_switching_to_the_new_assignments_page_9ac0ad93: "Tillat å byte til den nye oppgåvesida"
   allow_the_ability_to_send_notifications_through_ou_13cc8537: "Tillat å sende varsel gjennom vår dispatch-kø"
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "Tillat at verktøyet får tilgang til IMS-namn og rolletildelingsteneste. "
+  allow_users_to_comment_45b8f753: "La brukarar få kommentere"
   allowed_attempts_4e229caa: "Tillatne forsøk"
+  allows_a_user_to_access_the_act_as_user_link_on_st_7d3e3e3d: "Gir brukarar tilgang til Opptre som brukar-lenka på studentkontekstkort"
+  allows_admin_user_to_view_account_statistics_341f00d9: "Gir adminbrukarar tilgang til å sjå kontostatistikk."
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "Tillet oppretting av kunngjeringar for ein spesifikk seksjon"
+  allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Gir rollene faglærar/designar/undervisingsassistent tilgang til chatverktøyet."
+  allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Gir rollene faglærar/designar/undervisingsassistent tilgang til frammøteverktøyet."
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Gir faglærarar løyve til å markere karakterdata for masseeksport til SIS-integrasjonar."
   allows_the_duplicating_of_modules_in_canvas_2e15b444: "Tillet duplisering av modular i Canvas"
   allows_the_duplicating_of_objects_in_canvas_c86f3665: "Tillet duplisering av objekt i Canvas"
+  allows_the_duplication_of_calendar_events_7bb0d6c5: "Tillet duplisering av kalenderhendingar"
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "Tillèt planlegging av regelmessige kalenderhendingar"
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Gjer at brukarar med internasjonale telefonnummer kan ta imot tekstmeldingar frå Canvas."
   always_3a59e701: Alltid
