@@ -4615,6 +4615,57 @@ describe Submission do
             expect(last_event.payload['provisional_grade_id']).to eq provisional_grade.id
           end
         end
+
+        describe "external tool autograding" do
+          let(:external_tool) do
+            Account.default.context_external_tools.create!(
+              name: "Undertow",
+              url: "http://www.example.com",
+              consumer_key: "12345",
+              shared_secret: "secret"
+            )
+          end
+
+          it "creates an event when graded by an external tool" do
+            expect { assignment.grade_student(student, grader_id: -external_tool.id, score: 80) }.to change {
+              AnonymousOrModerationEvent.where(assignment: assignment, submission: submission).count
+            }.by(1)
+          end
+        end
+
+        describe "quiz autograding" do
+          let(:quiz) do
+            quiz = course.quizzes.create!
+            quiz.workflow_state = "available"
+            quiz.quiz_questions.create!({ question_data: test_quiz_data.first })
+            quiz.save!
+            quiz.assignment.updating_user = teacher
+            quiz.assignment.update_attribute(:anonymous_grading, true)
+            quiz
+          end
+          let(:quiz_assignment) { quiz.assignment }
+          let(:quiz_submission) do
+            qsub = Quizzes::SubmissionManager.new(quiz).find_or_create_submission(student)
+            qsub.quiz_data = test_quiz_data
+            qsub.started_at = 1.minute.ago
+            qsub.attempt = 1
+            qsub.submission_data = [{:points=>0, :text=>"7051", :question_id=>128, :correct=>false, :answer_id=>7051}]
+            qsub.score = 0
+            qsub.save!
+            qsub.finished_at = Time.now.utc
+            qsub.workflow_state = 'complete'
+            qsub.submission = quiz.assignment.find_or_create_submission(student)
+            qsub
+          end
+
+          it "creates an event when graded by a quiz" do
+            real_submission = quiz_submission.submission
+            real_submission.audit_grade_changes = true
+            expect { quiz_submission.with_versioning(true) { quiz_submission.save! } }.to change {
+              AnonymousOrModerationEvent.where(assignment: quiz_assignment, submission: real_submission).count
+            }.by(1)
+          end
+        end
       end
 
       it 'does not create audit events when the assignment is not auditable' do

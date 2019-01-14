@@ -2610,12 +2610,22 @@ class Submission < ActiveRecord::Base
     auditable_changes = saved_changes.slice(*auditable_attributes)
     return if auditable_changes.empty?
 
-    AnonymousOrModerationEvent.create!(
-      assignment: assignment,
-      submission: self,
-      user: grader,
-      event_type: 'submission_updated',
-      payload: auditable_changes
-    )
+    event =
+      {
+        assignment: assignment,
+        submission: self,
+        event_type: 'submission_updated',
+        payload: auditable_changes
+      }
+
+    if !autograded?
+      event[:user] = grader
+    elsif quiz_submission_id
+      event[:quiz_id] = -grader_id
+    else
+      event[:context_external_tool_id] = -grader_id
+    end
+
+    AnonymousOrModerationEvent.create!(event)
   end
 end
