@@ -1147,6 +1147,16 @@ describe Course do
       expect(@course.uuid).not_to eq @new_course.uuid
       expect(@course.replacement_course_id).to eq @new_course.id
     end
+
+    it "should transfer favorites with the enrollments" do
+      student_in_course(:course => @course)
+      fav = @student.favorites.create!(:context => @course)
+      
+      @course.reload
+
+      @new_course = @course.reset_content
+      expect(fav.reload.context).to eq @new_course
+    end
   end
 
   context "group_categories" do

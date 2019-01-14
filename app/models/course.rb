@@ -2908,6 +2908,7 @@ class Course < ActiveRecord::Base
   end
 
   def reset_content
+    self.shard.activate do
     Course.transaction do
       new_course = Course.new
       self.attributes.delete_if{|k,v| [:id, :created_at, :updated_at, :syllabus_body, :wiki_id, :default_view, :tab_configuration, :lti_context_id, :workflow_state, :latest_outcome_import_id].include?(k.to_sym) }.each do |key, val|
@@ -2929,8 +2930,13 @@ class Course < ActiveRecord::Base
       # we also want to bring along prior enrollments, so don't use the enrollments
       # association
       Enrollment.where(:course_id => self).update_all(:course_id => new_course.id, :updated_at => Time.now.utc)
-      User.where(id: new_course.all_enrollments.select(:user_id)).
-          update_all(updated_at: Time.now.utc)
+      user_ids = new_course.all_enrollments.pluck(:user_id)
+      Shard.partition_by_shard(user_ids) do |sharded_user_ids|
+        User.where(id: sharded_user_ids).touch_all
+        Favorite.where(:user_id => sharded_user_ids, :context_type => "Course", :context_id => self.id).
+          update_all(:context_id => new_course.id, :updated_at => Time.now.utc)
+      end
+
       self.replacement_course_id = new_course.id
       self.workflow_state = 'deleted'
       self.save!
@@ -2939,6 +2945,7 @@ class Course < ActiveRecord::Base
       end
 
       Course.find(new_course.id)
+    end
     end
   end
 
