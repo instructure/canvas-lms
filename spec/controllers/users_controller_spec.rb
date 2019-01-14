@@ -322,6 +322,38 @@ describe UsersController do
           expect(oe.associated_user).to eq @student
         end
 
+        it "should not send a confirmation email when using a pairing_code and skip_confirmation" do
+          course_with_student
+          @domain_root_account = @course.account
+          pairing_code = @student.generate_observer_pairing_code
+
+          post 'create', params: {
+            pseudonym: {
+              unique_id: 'jon@example.com',
+              password: 'password',
+              password_confirmation: 'password'
+            },
+            user: {
+              name: 'Jon',
+              terms_of_use: '1',
+              initial_enrollment_type: 'observer',
+              skip_registration: '1'
+            },
+            communication_channel: {
+              skip_confirmation: true
+            },
+            pairing_code: {
+              code: pairing_code.code
+            }
+          }, format: 'json'
+
+          expect(response).to be_successful
+          new_pseudo = Pseudonym.where(unique_id: 'jon@example.com').first
+          new_user = new_pseudo.user
+          message = Message.where(user_id: new_user.id)
+          expect(message.count).to eq 0
+        end
+
         it "should redirect users to the oauth confirmation when registering through oauth" do
           redis = double('Redis')
           allow(redis).to receive(:setex)

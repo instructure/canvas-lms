@@ -2553,7 +2553,7 @@ class UsersController < ApplicationController
         role.grants_right?(@current_user, :manage_students)
       end
 
-      if can_manage_students
+      if can_manage_students || use_pairing_code
         skip_confirmation = value_to_boolean(cc_params[:skip_confirmation])
       end
 
@@ -2681,7 +2681,7 @@ class UsersController < ApplicationController
         registration_params = params.fetch(:user, {}).merge(remote_ip: request.remote_ip, cookies: cookies)
         @user.new_registration(registration_params)
       end
-      message_sent = notify_policy.dispatch!(@user, @pseudonym, @cc) if @cc
+      message_sent = notify_policy.dispatch!(@user, @pseudonym, @cc) if @cc && !skip_confirmation
 
       data = if api_request?
         user_json(@user, @current_user, session, includes)
