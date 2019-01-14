@@ -64,8 +64,8 @@ class SRGB
       f("#final-grade-override")
     end
 
-    def final_grade_override_grade
-      f("#final-grade-override-grade")
+    def final_grade_override_input
+      f("#final-grade-override-input")
     end
 
     def assignment_muted_checkbox
@@ -190,6 +190,11 @@ class SRGB
     def enter_grade(grade)
       replace_content(main_grade_input, grade)
       tab_out_of_input(main_grade_input)
+    end
+
+    def enter_override_grade(grade)
+      replace_content(final_grade_override_input, grade)
+      tab_out_of_input(final_grade_override_input)
     end
 
     def current_grade

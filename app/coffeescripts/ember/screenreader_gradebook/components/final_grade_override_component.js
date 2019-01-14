@@ -21,28 +21,44 @@ import {scoreToGrade} from 'jsx/gradebook/GradingSchemeHelper'
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
 
 const FinalGradeOverrideComponent = Ember.Component.extend({
-  overrideGrade: function() {
-    const percentage = this.get('finalGradeOverrides.percentage')
-    const gradingStandard = this.get('gradingStandard')
+  inputValue: null,
+  internalInputValue: null,
 
-    if (percentage == null) {
-      return null
-    } else if (!gradingStandard) {
-      return GradeFormatHelper.formatGrade(percentage, {gradingType: 'percent'})
-    }
-
-    return scoreToGrade(percentage, gradingStandard)
-  }.property('finalGradeOverrides'),
-
-  overridePercent: function() {
-    const percentage = this.get('finalGradeOverrides.percentage')
+  inputDescription: function() {
+    const percentage = this.get('finalGradeOverride.percentage')
     const gradingStandard = this.get('gradingStandard')
 
     if (percentage == null || !gradingStandard) {
       return null
     }
     return GradeFormatHelper.formatGrade(percentage, {gradingType: 'percent'})
-  }.property('finalGradeOverrides')
+  }.property('finalGradeOverride', 'gradingStandard'),
+
+  finalGradeOverrideChanged: function() {
+    const percentage = this.get('finalGradeOverride.percentage')
+    const gradingStandard = this.get('gradingStandard')
+
+    if (percentage == null) {
+      this.set('internalInputValue', null)
+    } else if (!gradingStandard) {
+      this.set(
+        'internalInputValue',
+        GradeFormatHelper.formatGrade(percentage, {gradingType: 'percent'})
+      )
+    } else {
+      this.set('internalInputValue', scoreToGrade(percentage, gradingStandard))
+    }
+
+    this.set('inputValue', this.get('internalInputValue'))
+  }
+    .observes('finalGradeOverride', 'gradingStandard')
+    .on('init'),
+
+  focusOut() {
+    this.sendAction('onEditFinalGradeOverride', this.get('inputValue'))
+    // Always show a valid grade in the input on blur.
+    this.set('inputValue', this.get('internalInputValue'))
+  }
 })
 
 export default FinalGradeOverrideComponent

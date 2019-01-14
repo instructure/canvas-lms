@@ -25,6 +25,7 @@ import {createCourseGradesWithGradingPeriods} from 'spec/jsx/gradebook/GradeCalc
 import SRGBController from '../../controllers/screenreader_gradebook_controller'
 import userSettings from '../../../../userSettings'
 import CourseGradeCalculator from 'jsx/gradebook/CourseGradeCalculator'
+import * as FinalGradeOverrideApi from '../../../../../jsx/gradezilla/default_gradebook/FinalGradeOverrides/FinalGradeOverrideApi'
 import 'vendor/jquery.ba-tinypubsub'
 import AsyncHelper from '../AsyncHelper'
 
@@ -1136,8 +1137,88 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
     })
   })
 
-  QUnit.module('selectedStudentFinalGradeOverrides', hooks => {
+  QUnit.module('selectedStudentFinalGradeOverrideChanged', hooks => {
     let student
+    let student2
+
+    hooks.beforeEach(() => {
+      initializeApp()
+
+      // These observe the selectedGradingPeriod, so tests setting that
+      // property will trigger these unless stubbed out.
+      sinon.stub(srgb, 'fetchStudentSubmissions')
+      sinon.stub(srgb, 'fetchAssignmentGroups')
+      sinon.stub(srgb, 'calculateStudentGrade')
+      student = srgb.get('students.firstObject')
+      student2 = {...student, id: student.id + 100}
+
+      srgb.set('selectedStudent', student)
+      srgb.set(
+        'final_grade_overrides',
+        ObjectProxy.create({
+          content: {
+            finalGradeOverrides: {
+              [student.id]: {
+                courseGrade: {
+                  percentage: 67.1
+                },
+                gradingPeriodGrades: {
+                  1: {
+                    percentage: 93.2
+                  }
+                }
+              },
+              [student2.id]: {
+                courseGrade: {
+                  percentage: 1
+                }
+              }
+            }
+          },
+          isLoaded: true
+        })
+      )
+    })
+
+    test('sets selectedStudentFinalGradeOverride to the grading period override', () => {
+      const selectedGradingPeriod = {id: '1'}
+      srgb.set('selectedGradingPeriod', selectedGradingPeriod)
+      strictEqual(srgb.get('selectedStudentFinalGradeOverride.percentage'), 93.2)
+    })
+
+    test('sets selectedStudentFinalGradeOverride to the course override', () => {
+      const selectedGradingPeriod = {id: '0'}
+      srgb.set('selectedGradingPeriod', selectedGradingPeriod)
+      strictEqual(srgb.get('selectedStudentFinalGradeOverride.percentage'), 67.1)
+    })
+
+    test('sets selectedStudentFinalGradeOverride to the course override if no grading period', () => {
+      strictEqual(srgb.get('selectedStudentFinalGradeOverride.percentage'), 67.1)
+    })
+
+    test('changing final_grade_overrides updates selectedStudentFinalGradeOverride', () => {
+      const overrides = srgb.get('final_grade_overrides.content.finalGradeOverrides')
+      overrides[student.id].courseGrade.percentage = 91
+      srgb.set('final_grade_overrides.content', {finalGradeOverrides: overrides})
+      strictEqual(srgb.get('selectedStudentFinalGradeOverride.percentage'), 91)
+    })
+
+    test('changing selectedStudent updates selectedStudentFinalGradeOverride', () => {
+      srgb.set('selectedStudent', student2)
+      strictEqual(srgb.get('selectedStudentFinalGradeOverride.percentage'), 1)
+    })
+
+    test('changing to a student without grading period overrides does not cause an error', () => {
+      const selectedGradingPeriod = {id: '1'}
+      srgb.set('selectedGradingPeriod', selectedGradingPeriod)
+      srgb.set('selectedStudent', student2)
+      deepEqual(srgb.get('selectedStudentFinalGradeOverride'), {})
+    })
+  })
+
+  QUnit.module('onEditFinalGradeOverride', hooks => {
+    let student
+    let updateFinalGradeOverrideStub
 
     hooks.beforeEach(() => {
       initializeApp()
@@ -1170,22 +1251,94 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
           isLoaded: true
         })
       )
+
+      updateFinalGradeOverrideStub = sinon.stub(FinalGradeOverrideApi, 'updateFinalGradeOverride')
     })
 
-    test('returns the overrides for the given grading period', () => {
-      const selectedGradingPeriod = {id: '1'}
-      srgb.set('selectedGradingPeriod', selectedGradingPeriod)
-      deepEqual(srgb.get('selectedStudentFinalGradeOverrides'), {percentage: 93.2})
+    hooks.afterEach(() => {
+      updateFinalGradeOverrideStub.restore()
     })
 
-    test('returns the overrides for the course', () => {
-      const selectedGradingPeriod = {id: '0'}
-      srgb.set('selectedGradingPeriod', selectedGradingPeriod)
-      deepEqual(srgb.get('selectedStudentFinalGradeOverrides'), {percentage: 67.1})
+    test('given an invalid grade, final_grade_overrides is unchanged', () => {
+      srgb.send('onEditFinalGradeOverride', 'howdy doody')
+      const overrides = srgb.get('final_grade_overrides').content.finalGradeOverrides[student.id]
+      strictEqual(overrides.courseGrade.percentage, 67.1)
     })
 
-    test('returns the overrides for the course if there are no grading periods', () => {
-      deepEqual(srgb.get('selectedStudentFinalGradeOverrides'), {percentage: 67.1})
+    test('given an invalid grade, the overrides endpoint is not hit', () => {
+      srgb.send('onEditFinalGradeOverride', 'howdy doody')
+      strictEqual(updateFinalGradeOverrideStub.callCount, 0)
+    })
+
+    test('given an unchanged grade, the overrides endpoint is not hit', () => {
+      srgb.send('onEditFinalGradeOverride', 67.1)
+      strictEqual(updateFinalGradeOverrideStub.callCount, 0)
+    })
+
+    test('given a changed, valid grade, final_grade_overrides is updated for grading period', () => {
+      const gradingPeriod = {id: '1'}
+      srgb.set('selectedGradingPeriod', gradingPeriod)
+      srgb.send('onEditFinalGradeOverride', 91)
+      const overrides = srgb.get('final_grade_overrides').content.finalGradeOverrides[student.id]
+      const gradingPeriodOverride = overrides.gradingPeriodGrades[gradingPeriod.id]
+      strictEqual(gradingPeriodOverride.percentage, 91)
+    })
+
+    test('given a new, valid grade, final_grade_overrides is updated for the student', () => {
+      const student2 = {...student, id: student.id + 100}
+      Ember.run(() => {
+        const enrollments = {content: [{id: 1, user_id: student2.id}]}
+        srgb.set('enrollments', enrollments)
+      })
+      srgb.set('selectedStudent', student2)
+      srgb.send('onEditFinalGradeOverride', 100)
+      const overrides = srgb.get('final_grade_overrides.content.finalGradeOverrides')[student2.id]
+      strictEqual(overrides.courseGrade.percentage, 100)
+    })
+
+    test('when no override exists for a grading period, a valid grade is accepted without issue', () => {
+      srgb.set('gradingPeriods', [{id: '1'}, {id: '9001'}])
+      srgb.set('selectedGradingPeriod', {id: '9001'})
+      srgb.send('onEditFinalGradeOverride', 100)
+      strictEqual(true, true)
+    })
+
+    test('given a changed, valid grade, selectedStudentFinalGradeOverride is updated for course', () => {
+      srgb.send('onEditFinalGradeOverride', 91)
+      const overrides = srgb.get('final_grade_overrides').content.finalGradeOverrides[student.id]
+      strictEqual(overrides.courseGrade.percentage, 91)
+    })
+
+    test('given a changed, valid grade, the overrides endpoint is hit', () => {
+      srgb.send('onEditFinalGradeOverride', 91)
+      strictEqual(updateFinalGradeOverrideStub.callCount, 1)
+    })
+
+    test('given a changed, valid grade, the overrides endpoint is passed the enrollment id', () => {
+      // Setting enrollments without Ember.run has asynchronous side-effects.
+      Ember.run(() => {
+        const enrollments = {content: [{id: 1, user_id: student.id}]}
+        srgb.set('enrollments', enrollments)
+      })
+      srgb.send('onEditFinalGradeOverride', 91)
+      strictEqual(updateFinalGradeOverrideStub.firstCall.args[0], 1)
+    })
+
+    test('given a changed, valid grade, the overrides endpoint is passed the grading period id', () => {
+      const gradingPeriod = {id: '1'}
+      srgb.set('selectedGradingPeriod', gradingPeriod)
+      srgb.send('onEditFinalGradeOverride', 91)
+      strictEqual(updateFinalGradeOverrideStub.firstCall.args[1], '1')
+    })
+
+    test('given a changed, valid grade, the overrides endpoint is passed null when no grading period is selected', () => {
+      srgb.send('onEditFinalGradeOverride', 91)
+      strictEqual(updateFinalGradeOverrideStub.firstCall.args[1], null)
+    })
+
+    test('given a changed, valid grade, the overrides endpoint is passed the new override grade', () => {
+      srgb.send('onEditFinalGradeOverride', 91)
+      strictEqual(updateFinalGradeOverrideStub.firstCall.args[2].percentage, 91)
     })
   })
 

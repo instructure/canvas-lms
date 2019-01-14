@@ -20,42 +20,68 @@ import startApp from '../start_app'
 QUnit.module('FinalGradeOverrideComponent', hooks => {
   let App
   let component
-  let finalGradeOverrides
+  let finalGradeOverride
 
   hooks.beforeEach(() => {
     App = startApp()
-    finalGradeOverrides = {
+    finalGradeOverride = {
       percentage: 92.32
     }
     const gradingStandard = [['A', 0.9], ['B', 0.8], ['C', 0.0]]
-    component = App.FinalGradeOverrideComponent.create({finalGradeOverrides, gradingStandard})
+    component = App.FinalGradeOverrideComponent.create({finalGradeOverride, gradingStandard})
   })
 
-  test('overrideGrade returns the override grade', () => {
-    strictEqual(component.get('overrideGrade'), 'A')
+  test('inputValue returns the override grade', () => {
+    strictEqual(component.get('inputValue'), 'A')
   })
 
-  test('overrideGrade returns the percentage when grading schemes are not enabled', () => {
+  test('inputValue returns the percentage when grading schemes are not enabled', () => {
     component.set('gradingStandard', undefined)
-    strictEqual(component.get('overrideGrade'), '92.32%')
+    strictEqual(component.get('inputValue'), '92.32%')
   })
 
-  test('overridePercent returns a formatted percentage', () => {
-    strictEqual(component.get('overridePercent'), '92.32%')
+  test('inputDescription returns a formatted percentage', () => {
+    strictEqual(component.get('inputDescription'), '92.32%')
   })
 
-  test('overridePercent returns null when grading schemes are not enabled', () => {
+  test('inputDescription returns null when grading schemes are not enabled', () => {
     component.set('gradingStandard', undefined)
-    strictEqual(component.get('overridePercent'), null)
+    strictEqual(component.get('inputDescription'), null)
   })
 
-  test('changing the override percentage changes the overrideGrade', () => {
-    finalGradeOverrides.percentage = 86.7
-    strictEqual(component.get('overrideGrade'), 'B')
+  test('changing the override percentage changes the inputValue', () => {
+    finalGradeOverride.percentage = 86.7
+    component.set('finalGradeOverride', {...finalGradeOverride})
+    strictEqual(component.get('inputValue'), 'B')
   })
 
-  test('changing the override percentage changes the overridePercent', () => {
-    finalGradeOverrides.percentage = 86.7
-    strictEqual(component.get('overridePercent'), '86.7%')
+  test('changing the override percentage changes the inputDescription', () => {
+    finalGradeOverride.percentage = 86.7
+    strictEqual(component.get('inputDescription'), '86.7%')
+  })
+
+  test('changing the grading standard changes the inputValue', () => {
+    const gradingStandard = [['A', 0.99], ['F', 0.0]]
+    component.set('gradingStandard', gradingStandard)
+    strictEqual(component.get('inputValue'), 'F')
+  })
+
+  test('focusOut sends onEditFinalGradeOverride with the inputValue', () => {
+    const targetObject = {
+      onEditFinalGradeOverride(grade) {
+        strictEqual(grade, 92.1)
+      }
+    }
+
+    component.set('onEditFinalGradeOverride', 'onEditFinalGradeOverride')
+    component.set('targetObject', targetObject)
+    component.set('inputValue', 92.1)
+    component.focusOut()
+  })
+
+  test('focusOut sets the inputValue to the internalInputValue', () => {
+    component.set('internalInputValue', 'C')
+    component.focusOut()
+    strictEqual(component.get('inputValue'), 'C')
   })
 })

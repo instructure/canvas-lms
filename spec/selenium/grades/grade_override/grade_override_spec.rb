@@ -48,8 +48,8 @@ describe 'Final Grade Override' do
   context "Individual Gradebook" do
     before(:once) do
       @student = @students.first
-      enrollment = @course.enrollments.find_by(user: @student)
-      enrollment.scores.find_by(course_score: true).update!(override_score: 97.1)
+      @enrollment = @course.enrollments.find_by(user: @student)
+      @enrollment.scores.find_by(course_score: true).update!(override_score: 97.1)
     end
 
     before(:each) do
@@ -64,13 +64,12 @@ describe 'Final Grade Override' do
     end
 
     it 'display override grade in individual gradebook', priority: '1', test_id: 3682130 do
-      expect(SRGB.final_grade_override_grade).to have_value "A"
+      expect(SRGB.final_grade_override_input).to have_value "A"
     end
 
     it 'saves overridden grade in SRGB', priority: '1', test_id: 3682131 do
-      skip('Unskip in GRADE-1890')
-      SRGB.visit(@course.id)
-      # TODO: displays on SRGB, not sure what this will look like yet
+      SRGB.enter_override_grade('D-')
+      expect(@enrollment.scores.find_by(course_score: true).override_score).to be 61.0
     end
   end
 
