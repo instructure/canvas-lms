@@ -82,6 +82,18 @@ module Api::V1::MasterCourses
     end
   end
 
+  def changed_settings_json(course)
+    {
+      asset_id: course.id,
+      asset_type: 'settings',
+      asset_name: I18n.t('Course Settings'),
+      change_type: :updated,
+      html_url: course_settings_url(course),
+      locked: false,
+      exceptions: []
+    }
+  end
+
   def course_summary_json(course, opts={})
     can_read_sis = opts[:can_read_sis] || course.account.grants_any_right?(@current_user, :read_sis, :manage_sis)
     hash = api_json(course, @current_user, session, :only => %w{id name course_code})
