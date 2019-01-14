@@ -163,8 +163,4 @@ gem 'utf8_cleaner', path: 'gems/utf8_cleaner'
 gem 'workflow', path: 'gems/workflow'
 
 # StrongMind
-<<<<<<< HEAD
 gem 'canvas_shim', :git => 'https://github.com/StrongMind/canvas_shim.git', :tag => '0.1.31'
-=======
-gem 'canvas_shim', :git => 'https://github.com/StrongMind/canvas_shim.git', :tag => '0.1.33'
->>>>>>> parent of af3a08aaff... distribute due dates commands all respect feature flag
