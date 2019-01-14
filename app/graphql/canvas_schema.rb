@@ -68,4 +68,5 @@ class CanvasSchema < GraphQL::Schema
                 Types::ProgressType]
 
   instrument :field, AssignmentOverrideInstrumenter.new
+  instrument :field, MutationTransactionInstrumenter.new
 end
