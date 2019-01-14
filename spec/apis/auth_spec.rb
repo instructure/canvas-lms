@@ -194,16 +194,8 @@ describe "API Authentication", type: :request do
         skip("requires SAML extension") unless AuthenticationProvider::SAML.enabled?
         account_with_saml(account: Account.default)
         flow do
-          allow_any_instance_of(Onelogin::Saml::Response).to receive(:settings=)
-          allow_any_instance_of(Onelogin::Saml::Response).to receive(:logger=)
-          allow_any_instance_of(Onelogin::Saml::Response).to receive(:is_valid?).and_return(true)
-          allow_any_instance_of(Onelogin::Saml::Response).to receive(:success_status?).and_return(true)
-          allow_any_instance_of(Onelogin::Saml::Response).to receive(:name_id).and_return('test1@example.com')
-          allow_any_instance_of(Onelogin::Saml::Response).to receive(:name_qualifier).and_return(nil)
-          allow_any_instance_of(Onelogin::Saml::Response).to receive(:session_index).and_return(nil)
-          allow_any_instance_of(Onelogin::Saml::Response).to receive(:issuer).and_return("saml_entity")
-          allow_any_instance_of(Onelogin::Saml::Response).to receive(:trusted_roots).and_return([])
           response = SAML2::Response.new
+          response.issuer = SAML2::NameID.new('saml_entity')
           response.assertions << (assertion = SAML2::Assertion.new)
           assertion.subject = SAML2::Subject.new
           assertion.subject.name_id = SAML2::NameID.new('test1@example.com')

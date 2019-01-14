@@ -25,68 +25,6 @@ describe AuthenticationProvider::SAML do
     @file_that_exists = File.expand_path(__FILE__)
   end
 
-  it "should load encryption settings" do
-    ConfigFile.stub('saml', {
-                              :entity_id => 'http://www.example.com/saml2',
-                              :encryption => {
-                                  :private_key => @file_that_exists,
-                                  :certificate => @file_that_exists
-                              }
-                          })
-
-    s = @account.authentication_providers.build(:auth_type => 'saml').saml_settings
-
-    expect(s).to be_encryption_configured
-  end
-
-  it "should load the tech contact settings" do
-    ConfigFile.stub('saml', {
-                              :tech_contact_name => 'Admin Dude',
-                              :tech_contact_email => 'admindude@example.com',
-                          })
-
-    s = @account.authentication_providers.build(:auth_type => 'saml').saml_settings
-
-    expect(s.tech_contact_name).to eq 'Admin Dude'
-    expect(s.tech_contact_email).to eq 'admindude@example.com'
-  end
-
-  it "should allow additional private keys to be set" do
-    ConfigFile.stub('saml', {
-                              :entity_id => 'http://www.example.com/saml2',
-                              :encryption => {
-                                :private_key => @file_that_exists,
-                                :certificate => @file_that_exists,
-                                :additional_private_keys => [
-                                  @file_that_exists
-                                ]
-                              }
-                          })
-
-    s = @account.authentication_providers.build(:auth_type => 'saml').saml_settings
-
-    expect(s.xmlsec_additional_privatekeys).to eq [@file_that_exists]
-  end
-
-  it "should allow some additional private keys to be set when not all exist" do
-    file_that_does_not_exist = '/tmp/i_am_not_a_private_key'
-    ConfigFile.stub('saml', {
-                              :entity_id => 'http://www.example.com/saml2',
-                              :encryption => {
-                                :private_key => @file_that_exists,
-                                :certificate => @file_that_exists,
-                                :additional_private_keys => [
-                                  @file_that_exists,
-                                  file_that_does_not_exist
-                                ]
-                              }
-                          })
-
-    s = @account.authentication_providers.build(:auth_type => 'saml').saml_settings
-
-    expect(s.xmlsec_additional_privatekeys).to eq [@file_that_exists]
-  end
-
   it "should set the entity_id with the current domain" do
     allow(HostUrl).to receive(:default_host).and_return('bob.cody.instructure.com')
     @aac = @account.authentication_providers.create!(:auth_type => "saml")
