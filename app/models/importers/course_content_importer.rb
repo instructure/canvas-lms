@@ -358,20 +358,25 @@ module Importers
       settings.slice(*atts.map(&:to_s)).each do |key, val|
         course.send("#{key}=", val)
       end
-      if settings[:grading_standard_enabled]
-        course.grading_standard_enabled = true
-        if settings[:grading_standard_identifier_ref]
-          if gs = course.grading_standards.where(migration_id: settings[:grading_standard_identifier_ref]).first
-            course.grading_standard = gs
-          else
-            migration.add_warning(t(:copied_grading_standard_warning, "Couldn't find copied grading standard for the course."))
+      if settings.has_key?(:grading_standard_enabled)
+        if settings[:grading_standard_enabled]
+          course.grading_standard_enabled = true
+          if settings[:grading_standard_identifier_ref]
+            if gs = course.grading_standards.where(migration_id: settings[:grading_standard_identifier_ref]).first
+              course.grading_standard = gs
+            else
+              migration.add_warning(t(:copied_grading_standard_warning, "Couldn't find copied grading standard for the course."))
+            end
+          elsif settings[:grading_standard_id].present?
+            if gs = GradingStandard.for(course).where(id: settings[:grading_standard_id]).first
+              course.grading_standard = gs
+            else
+              migration.add_warning(t(:account_grading_standard_warning,"Couldn't find account grading standard for the course." ))
+            end
           end
-        elsif settings[:grading_standard_id].present?
-          if gs = GradingStandard.for(course).where(id: settings[:grading_standard_id]).first
-            course.grading_standard = gs
-          else
-            migration.add_warning(t(:account_grading_standard_warning,"Couldn't find account grading standard for the course." ))
-          end
+        elsif migration.for_master_course_import?
+          course.grading_standard_enabled = false
+          course.grading_standard = nil
         end
       end
       if image_url = settings[:image_url]
