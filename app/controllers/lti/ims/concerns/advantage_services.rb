@@ -155,7 +155,7 @@ module Lti::Ims::Concerns
       end
 
       def expected_access_token_audience
-        Rails.application.routes.url_helpers.oauth2_token_url host: host
+        Rails.application.routes.url_helpers.oauth2_token_url(host: host, protocol: 'https://')
       end
 
       delegate :host, to: :request

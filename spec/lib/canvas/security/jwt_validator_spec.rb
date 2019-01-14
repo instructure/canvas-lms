@@ -63,6 +63,12 @@ module Canvas::Security
       let(:exp) { 1.minute.ago.to_i }
 
       it { is_expected.not_to be_empty }
+
+      context 'with non-numeric exp' do
+        let(:exp) { 1.minute.ago.to_i.to_s }
+
+        it { is_expected.not_to be_empty }
+      end
     end
 
     context 'with bad iat' do
@@ -72,6 +78,12 @@ module Canvas::Security
 
       context 'with iat too far in future' do
         let(:iat) { 6.minutes.from_now.to_i }
+
+        it { is_expected.not_to be_empty }
+      end
+
+      context 'with non-numeric iat' do
+        let(:iat) { Time.zone.now.to_i.to_s }
 
         it { is_expected.not_to be_empty }
       end
