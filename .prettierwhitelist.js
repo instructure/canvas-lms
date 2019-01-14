@@ -20,6 +20,8 @@ const PRETTIER_WHITELIST = module.exports =  [
   'app/coffeescripts/ember/**/*.js',
   'public/javascripts/speed_grader*.js',
   'spec/javascripts/jsx/spec-support/**/*.js',
+  'public/javascripts/tinymce_plugins/instructure_external_tools/*.js',
+  'app/jsx/editor/*.js',
   appAndSpecDirsFor('account_course_user_search'),
   appAndSpecDirsFor('announcements'),
   appAndSpecDirsFor('assignments/GradeSummary'),
