@@ -44,12 +44,14 @@ export default class Toolbox extends React.Component {
   static propTypes = {
     assignment: TeacherAssignmentShape.isRequired,
     onUnsubmittedClick: func,
-    onPublishChange: func
+    onPublishChange: func,
+    onDelete: func
   }
 
   static defaultProps = {
     onUnsubmittedClick: () => {},
-    onPublishChange: () => {}
+    onPublishChange: () => {},
+    onDelete: () => {}
   }
 
   submissions() {
@@ -82,8 +84,8 @@ export default class Toolbox extends React.Component {
 
   renderDelete() {
     return (
-      <Button margin="0 0 0 x-small" icon={<IconTrash />}>
-        <ScreenReaderContent>{I18n.t('Delete')}</ScreenReaderContent>
+      <Button margin="0 0 0 x-small" icon={<IconTrash />} onClick={this.props.onDelete}>
+        <ScreenReaderContent>{I18n.t('delete assignment')}</ScreenReaderContent>
       </Button>
     )
   }

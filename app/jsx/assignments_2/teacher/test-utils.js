@@ -17,6 +17,7 @@
  */
 
 import {TeacherViewContextDefaults} from './components/TeacherViewContext'
+import {wait} from 'react-testing-library'
 
 // because our version of jsdom doesn't support elt.closest('a') yet. Should soon.
 export function closest(el, selector) {
@@ -30,6 +31,24 @@ export function findInputForLabel(labelChild, container) {
   const label = closest(labelChild, 'label')
   const input = container.querySelector(`#${label.getAttribute('for')}`)
   return input
+}
+
+export function waitForNoElement(queryFn) {
+  // use wait instead of waitForElement because waitForElement doesn't seem to
+  // trigger the callback when elements disappear
+  return wait(() => {
+    let elt = null
+    try {
+      elt = queryFn()
+    } catch (e) {
+      // if queryFn throws, assume element can't be found and succeed
+      return
+    }
+
+    // fail if the element was found
+    if (elt !== null) throw new Error(`element is still present`)
+    // otherwise success
+  })
 }
 
 export function mockCourse(overrides) {

@@ -112,6 +112,7 @@
   },
   "devDependencies": {
     "@sentry/webpack-plugin": "^1.5.2",
+    "@sheerun/mutationobserver-shim": "0.3.2",
     "@yarnpkg/lockfile": "^1.0.2",
     "axe-core": "~2.1.7",
     "babel-cli": "^6",
@@ -193,7 +194,6 @@
     "merge-stream": "^1",
     "mockdate": "^2.0.2",
     "moxios": "^0.4",
-    "mutation-observer": "^1.0.3",
     "nyc": "^13",
     "prettier": "^1",
     "qunitjs": "^1.14.0",

@@ -18,11 +18,15 @@
 
 import React from 'react'
 import {string} from 'prop-types'
+import I18n from 'i18n!assignments_2'
+
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 
 import {queryAssignment, setWorkflow} from '../api'
 import Header from './Header'
 import ContentTabs from './ContentTabs'
+
+import ConfirmDialog from './ConfirmDialog'
 import MessageStudentsWho from './MessageStudentsWho'
 import TeacherViewContext, {TeacherViewContextDefaults} from './TeacherViewContext'
 
@@ -36,6 +40,8 @@ export default class TeacherView extends React.Component {
     this.state = {
       messageStudentsWhoOpen: false,
       assignment: {},
+      confirmDelete: false,
+      deletingNow: false,
       loading: true,
       errors: []
     }
@@ -67,10 +73,10 @@ export default class TeacherView extends React.Component {
     return {assignment: {...state.assignment, ...updates}}
   }
 
-  async setWorkflowApiCall(newAssignmentState) {
+  async setWorkflowApiCall(assignment, newAssignmentState) {
     const errors = []
     try {
-      const {graphqlErrors} = await setWorkflow(this.state.assignment, newAssignmentState)
+      const {errors: graphqlErrors} = await setWorkflow(assignment, newAssignmentState)
       if (graphqlErrors) errors.push(...graphqlErrors)
     } catch (error) {
       errors.push(error)
@@ -82,8 +88,8 @@ export default class TeacherView extends React.Component {
     const oldAssignmentState = this.state.assignment.state
 
     // be optimistic
-    this.setState(state => this.assignmentStateUpdate(state, {state: newAssignmentState}))
-    const errors = await this.setWorkflowApiCall(newAssignmentState)
+    this.setState(state => this.assignmentStateUpdate(state, newAssignmentState))
+    const errors = await this.setWorkflowApiCall(this.state.assignment, newAssignmentState)
     if (errors.length > 0) {
       this.setState(state => ({
         errors,
@@ -100,12 +106,60 @@ export default class TeacherView extends React.Component {
     this.setState({messageStudentsWhoOpen: false})
   }
 
+  handleDeleteButtonPressed = () => {
+    this.setState({confirmDelete: true})
+  }
+
+  handleCancelDelete = () => {
+    this.setState({confirmDelete: false})
+  }
+
+  handleReallyDelete = async () => {
+    this.setState({deletingNow: true})
+    const errors = await this.setWorkflowApiCall(this.state.assignment, 'deleted')
+    if (errors.length === 0) {
+      this.handleDeleteSuccess()
+    } else {
+      this.handleDeleteError(errors)
+    }
+  }
+
+  handleDeleteSuccess = () => {
+    // reloading a deleted assignment has the effect of redirecting to the
+    // assignments index page with a flash message indicating the assignment
+    // has been deleted.
+    window.location.reload()
+  }
+
+  handleDeleteError = errors => {
+    this.setState({errors, confirmDelete: false, deletingNow: false})
+  }
+
   renderErrors() {
     return <pre>Error: {JSON.stringify(this.state.errors, null, 2)}</pre>
   }
 
   renderLoading() {
     return <div>Loading...</div>
+  }
+
+  renderConfirmDialog() {
+    return (
+      <ConfirmDialog
+        open={this.state.confirmDelete}
+        working={this.state.deletingNow}
+        modalLabel={I18n.t('confirm delete')}
+        heading={I18n.t('Delete')}
+        message={I18n.t('Are you sure you want to delete this assignment?')}
+        confirmLabel={I18n.t('Delete')}
+        cancelLabel={I18n.t('Cancel')}
+        closeLabel={I18n.t('close')}
+        spinnerLabel={I18n.t('deleting assignment')}
+        onClose={this.handleCancelDelete}
+        onCancel={this.handleCancelDelete}
+        onConfirm={this.handleReallyDelete}
+      />
+    )
   }
 
   render() {
@@ -115,6 +169,7 @@ export default class TeacherView extends React.Component {
     return (
       <TeacherViewContext.Provider value={this.contextValue}>
         <div>
+          {this.renderConfirmDialog()}
           <ScreenReaderContent>
             <h1>{assignment.name}</h1>
           </ScreenReaderContent>
@@ -122,6 +177,7 @@ export default class TeacherView extends React.Component {
             assignment={assignment}
             onUnsubmittedClick={this.handleUnsubmittedClick}
             onPublishChange={this.handlePublishChange}
+            onDelete={this.handleDeleteButtonPressed}
           />
           <ContentTabs assignment={assignment} />
           <MessageStudentsWho

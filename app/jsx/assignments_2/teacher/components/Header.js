@@ -38,12 +38,14 @@ export default class Header extends React.Component {
   static propTypes = {
     assignment: TeacherAssignmentShape.isRequired,
     onUnsubmittedClick: func,
-    onPublishChange: func
+    onPublishChange: func,
+    onDelete: func
   }
 
   static defaultProps = {
     onUnsubmittedClick: () => {},
-    onPublishChange: () => {}
+    onPublishChange: () => {},
+    onDelete: () => {}
   }
 
   renderIcon() {
