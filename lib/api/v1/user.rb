@@ -359,9 +359,9 @@ module Api::V1::User
 
   def group_ids(user)
     if user.group_memberships.loaded?
-      user.group_memberships.map(&:group_id)
+      user.group_memberships.reject(&:deleted?).map(&:group_id)
     else
-      user.group_memberships.pluck(:group_id)
+      user.group_memberships.active.pluck(:group_id)
     end
   end
 end
