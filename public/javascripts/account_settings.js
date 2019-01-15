@@ -125,7 +125,8 @@ import './vendor/jquery.scrollTo'
               const splitContext = window.ENV.context_asset_string.split('_')
               start(document.getElementById('tab-security'), {
                 context: splitContext[0],
-                contextId: splitContext[1]
+                contextId: splitContext[1],
+                isSubAccount: !ENV.ACCOUNT.root_account
               });
           }).catch(() => {
             // We really should never get here... but if we do... do something.

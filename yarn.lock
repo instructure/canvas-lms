@@ -2010,6 +2010,14 @@ axe-core@~2.1.7:
   resolved "https://registry.yarnpkg.com/axe-core/-/axe-core-2.1.7.tgz#4f66f2b3ee3b58ec2d3db4339dd124c5b33b79c3"
   integrity sha1-T2bys+47WOwtPbQzndEkxbM7ecM=
 
+axios-cache-adapter@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/axios-cache-adapter/-/axios-cache-adapter-2.1.1.tgz#2ca636837776f841481673e5c701302e9972aa5b"
+  integrity sha512-gYBhhhXVcalY9SjtqDlXT4E/A2n19LitoG3zkme1Y8dlWLhIPlPFmzT/e5sgqUQlwzvGkTdi6AhrvG4OjepaRg==
+  dependencies:
+    axios "^0.18.0"
+    lodash "^4.17.4"
+
 axios@^0.18.0:
   version "0.18.0"
   resolved "https://registry.yarnpkg.com/axios/-/axios-0.18.0.tgz#32d53e4851efdc0a11993b6cd000789d70c05102"

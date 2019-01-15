@@ -63,6 +63,48 @@ export function getCspEnabled(context, contextId) {
     })
 }
 
+export const SET_CSP_INHERITED = 'SET_CSP_INHERITED'
+export const SET_CSP_INHERITED_OPTIMISTIC = 'SET_CSP_INHERITED_OPTIMISTIC'
+
+export function setCspInheritedAction(value, opts = {}) {
+  const type = opts.optimistic ? SET_CSP_INHERITED_OPTIMISTIC : SET_CSP_INHERITED
+  if (typeof value !== 'boolean') {
+    return {
+      type,
+      payload: new Error('Can only set to Boolean values'),
+      error: true
+    }
+  }
+  return {
+    type,
+    payload: value
+  }
+}
+
+export function setCspInherited(context, contextId, value) {
+  context = pluralize(context)
+  return (dispatch, getState, {axios}) => {
+    dispatch(setCspInheritedAction(value, {optimistic: true}))
+    if (value) {
+      return axios
+        .put(`/api/v1/${context}/${contextId}/csp_settings`, {
+          status: 'inherited'
+        })
+        .then(response => {
+          dispatch(setCspInheritedAction(response.data.inherited))
+        })
+    }
+  }
+}
+
+export function getCspInherited(context, contextId) {
+  context = pluralize(context)
+  return (dispatch, getState, {axios}) =>
+    axios.get(`/api/v1/${context}/${contextId}/csp_settings`).then(response => {
+      dispatch(setCspInheritedAction(response.data.inherited))
+    })
+}
+
 export const ADD_DOMAIN = 'ADD_DOMAIN'
 export const ADD_DOMAIN_BULK = 'ADD_DOMAIN_BULK'
 export const ADD_DOMAIN_OPTIMISTIC = 'ADD_DOMAIN_OPTIMISTIC'

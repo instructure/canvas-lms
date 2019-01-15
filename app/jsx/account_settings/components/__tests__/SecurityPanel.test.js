@@ -31,4 +31,35 @@ describe('ConnectedSecurityPanel', () => {
     fireEvent.click(checkbox)
     expect(checkbox.checked).toBeTruthy()
   })
+
+  describe('isSubAccount prop', () => {
+    it('renders help text for sub-accounts', () => {
+      const {getByText} = renderWithRedux(
+        <ConnectedSecurityPanel context="account" contextId="1" isSubAccount />
+      )
+
+      const helpText = getByText('Sub-accounts can choose one of three options:')
+      expect(helpText).toBeInTheDocument()
+    })
+  })
+
+  it('shows a three state toggle with the correct options', () => {
+    const {getByLabelText} = renderWithRedux(
+      <ConnectedSecurityPanel context="account" contextId="1" isSubAccount />
+    )
+
+    expect(getByLabelText('Off')).toBeInTheDocument()
+    expect(getByLabelText('Inherit')).toBeInTheDocument()
+    expect(getByLabelText('On')).toBeInTheDocument()
+  })
+
+  test.each(['Off', 'Inherit', 'On'])('selecting %s updates to show it as selected', labelText => {
+    const {getByLabelText} = renderWithRedux(
+      <ConnectedSecurityPanel context="account" contextId="1" isSubAccount />
+    )
+
+    const toggleOption = getByLabelText(labelText)
+    fireEvent.click(toggleOption)
+    expect(toggleOption.checked).toBeTruthy()
+  })
 })

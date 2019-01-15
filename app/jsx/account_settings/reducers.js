@@ -24,13 +24,25 @@ import {
   ADD_DOMAIN_OPTIMISTIC,
   ADD_DOMAIN_BULK,
   REMOVE_DOMAIN,
-  REMOVE_DOMAIN_OPTIMISTIC
+  REMOVE_DOMAIN_OPTIMISTIC,
+  SET_CSP_INHERITED,
+  SET_CSP_INHERITED_OPTIMISTIC
 } from './actions'
 
 export function cspEnabled(state = false, action) {
   switch (action.type) {
     case SET_CSP_ENABLED:
     case SET_CSP_ENABLED_OPTIMISTIC:
+      return action.payload
+    default:
+      return state
+  }
+}
+
+export function cspInherited(state = false, action) {
+  switch (action.type) {
+    case SET_CSP_INHERITED:
+    case SET_CSP_INHERITED_OPTIMISTIC:
       return action.payload
     default:
       return state
@@ -77,5 +89,6 @@ export function whitelistedDomains(state = {account: [], effective: [], tools: {
 
 export default combineReducers({
   cspEnabled,
+  cspInherited,
   whitelistedDomains
 })

@@ -259,3 +259,86 @@ describe('removeDomain', () => {
     })
   })
 })
+
+describe('setCspInheritedAction', () => {
+  it('creates an SET_CSP_INHERITED action when passed a boolean value', () => {
+    expect(Actions.setCspInheritedAction(true)).toMatchSnapshot()
+  })
+  it('creates an error action if passed a non-boolean value', () => {
+    expect(Actions.setCspInheritedAction('string')).toMatchSnapshot()
+  })
+  it('creates a SET_CSP_INHERITED_OPTIMISTIC action when optimistic option is given', () => {
+    expect(Actions.setCspInheritedAction(true, {optimistic: true})).toMatchSnapshot()
+  })
+})
+
+describe('setCspInherited', () => {
+  it('dispatches a optimistic value followed by the actual result if the value is true', () => {
+    const thunk = Actions.setCspInherited('account', 1, true)
+    const fakeDispatch = jest.fn()
+    const fakeAxios = {
+      put: jest.fn(() => ({
+        then(func) {
+          const fakeResponse = {
+            data: {
+              inherited: true
+            }
+          }
+          func(fakeResponse)
+        }
+      }))
+    }
+    thunk(fakeDispatch, null, {axios: fakeAxios})
+    expect(fakeDispatch).toHaveBeenNthCalledWith(1, {
+      payload: true,
+      type: 'SET_CSP_INHERITED_OPTIMISTIC'
+    })
+    expect(fakeDispatch).toHaveBeenNthCalledWith(2, {
+      payload: true,
+      type: 'SET_CSP_INHERITED'
+    })
+  })
+
+  it('only dispatches an optimistic action if the value is false', () => {
+    const thunk = Actions.setCspInherited('account', 1, false)
+    const fakeDispatch = jest.fn()
+    const fakeAxios = {
+      put: jest.fn(() => ({
+        then(func) {
+          const fakeResponse = {
+            data: {
+              inherited: true
+            }
+          }
+          func(fakeResponse)
+        }
+      }))
+    }
+    thunk(fakeDispatch, null, {axios: fakeAxios})
+    expect(fakeDispatch).toHaveBeenNthCalledWith(1, {
+      payload: false,
+      type: 'SET_CSP_INHERITED_OPTIMISTIC'
+    })
+    expect(fakeDispatch).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('getCspInherited', () => {
+  it('dispatches a SET_CSP_INHERITED action when complete', () => {
+    const thunk = Actions.getCspInherited('account', 1)
+    const fakeDispatch = jest.fn()
+    const fakeAxios = {
+      get: jest.fn(() => ({
+        then(func) {
+          const fakeResponse = {data: {inherited: true}}
+          func(fakeResponse)
+        }
+      }))
+    }
+    thunk(fakeDispatch, null, {axios: fakeAxios})
+    expect(fakeDispatch).toHaveBeenCalledWith({
+      payload: true,
+      type: 'SET_CSP_INHERITED'
+    })
+  })
+})

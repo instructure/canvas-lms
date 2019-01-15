@@ -46,6 +46,7 @@
     "apollo-link-http": "^1.5.5",
     "apollo-link-state": "^0.4.2",
     "axios": "^0.18.0",
+    "axios-cache-adapter": "^2.1.1",
     "backbone": "1.1.1",
     "big.js": "^5.0.3",
     "brandable_css": "0.1.0",

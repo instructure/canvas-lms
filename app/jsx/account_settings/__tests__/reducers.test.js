@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {cspEnabled, whitelistedDomains} from '../reducers'
+import {cspEnabled, whitelistedDomains, cspInherited} from '../reducers'
 import {
   SET_CSP_ENABLED,
   SET_CSP_ENABLED_OPTIMISTIC,
@@ -24,7 +24,9 @@ import {
   ADD_DOMAIN_OPTIMISTIC,
   ADD_DOMAIN_BULK,
   REMOVE_DOMAIN,
-  REMOVE_DOMAIN_OPTIMISTIC
+  REMOVE_DOMAIN_OPTIMISTIC,
+  SET_CSP_INHERITED,
+  SET_CSP_INHERITED_OPTIMISTIC
 } from '../actions'
 
 describe('cspEnabled', () => {
@@ -132,4 +134,17 @@ describe('whitelistedDomains', () => {
       account: ['canvaslms.com']
     })
   })
+})
+
+describe('cspInherited', () => {
+  const testMatrix = [
+    [{type: SET_CSP_INHERITED, payload: true}, undefined, true],
+    [{type: SET_CSP_INHERITED_OPTIMISTIC, payload: false}, undefined, false]
+  ]
+  it.each(testMatrix)(
+    'with %p action and %p value the cspInherited state becomes %p',
+    (action, initialState, expectedState) => {
+      expect(cspInherited(initialState, action)).toEqual(expectedState)
+    }
+  )
 })

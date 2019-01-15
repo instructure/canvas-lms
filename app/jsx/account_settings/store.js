@@ -20,9 +20,11 @@ import {createStore, applyMiddleware} from 'redux'
 import ReduxThunk from 'redux-thunk'
 import rootReducer from './reducers'
 import axios from 'axios'
+import {setupCache} from 'axios-cache-adapter'
 
 export const defaultState = {
   cspEnabled: false,
+  cspInherited: false,
   whitelistedDomains: {
     account: [],
     effective: [],
@@ -30,9 +32,17 @@ export const defaultState = {
   }
 }
 
+const cache = setupCache({
+  maxAge: 0.5 * 60 * 1000 // Hold onto the data for 30 seconds
+})
+
+const api = axios.create({
+  adapter: cache.adapter
+})
+
 export function configStore(initialState, options = {}) {
   const middleware = [
-    ReduxThunk.withExtraArgument({axios}),
+    ReduxThunk.withExtraArgument({axios: api}),
     process.env.NODE_ENV !== 'production' &&
       !options.disableLogger &&
       require('redux-logger').logger

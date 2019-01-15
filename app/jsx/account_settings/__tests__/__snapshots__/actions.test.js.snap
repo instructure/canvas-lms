@@ -106,3 +106,25 @@ Object {
   "type": "SET_CSP_ENABLED",
 }
 `;
+
+exports[`setCspInheritedAction creates a SET_CSP_INHERITED_OPTIMISTIC action when optimistic option is given 1`] = `
+Object {
+  "payload": true,
+  "type": "SET_CSP_INHERITED_OPTIMISTIC",
+}
+`;
+
+exports[`setCspInheritedAction creates an SET_CSP_INHERITED action when passed a boolean value 1`] = `
+Object {
+  "payload": true,
+  "type": "SET_CSP_INHERITED",
+}
+`;
+
+exports[`setCspInheritedAction creates an error action if passed a non-boolean value 1`] = `
+Object {
+  "error": true,
+  "payload": [Error: Can only set to Boolean values],
+  "type": "SET_CSP_INHERITED",
+}
+`;
