@@ -139,7 +139,9 @@ module Importers
         Importers::QuizImporter.process_migration(data, migration, question_data); migration.update_import_progress(65)
       end
 
-      Importers::DiscussionTopicImporter.process_migration(data, migration); migration.update_import_progress(70)
+      Assignment.suspend_due_date_caching do
+        Importers::DiscussionTopicImporter.process_migration(data, migration); migration.update_import_progress(70)
+      end
       Importers::WikiPageImporter.process_migration(data, migration); migration.update_import_progress(75)
 
       Assignment.suspend_due_date_caching do
