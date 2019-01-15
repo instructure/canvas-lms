@@ -479,6 +479,10 @@
               <input type="checkbox" name="update_default_pages" id="update_default_pages"/>
               <label for="update_default_pages"><%= t 'wiki_editing_roles_change_existing', %{Change pages currently editable by "%{current_setting}" to "%{new_setting}".}, :current_setting => content_tag('span', @context.readable_default_wiki_editing_roles), :new_setting => content_tag('span', nbsp, :class => 'default_wiki_editing_roles_change') %></label>
             </div>
+            <% if @context.root_account.feature_enabled?(:javascript_csp) %>
+              <hr />
+              <div id="csp_options"></div>
+            <% end %>
           </div>
         </td>
       </tr>
