@@ -185,7 +185,7 @@ RSpec.describe DeveloperKeyAccountBinding, type: :model do
   describe 'find_site_admin_cached' do
     specs_require_sharding
 
-    let(:root_account_shard) { Shard.create! }
+    let(:root_account_shard) { @shard1 }
     let(:root_account) { root_account_shard.activate { account_model } }
     let(:site_admin_key) { Account.site_admin.shard.activate { DeveloperKey.create! } }
     let(:root_account_key) { root_account_shard.activate { DeveloperKey.create!(account: root_account) } }
@@ -248,7 +248,7 @@ RSpec.describe DeveloperKeyAccountBinding, type: :model do
   context 'sharding' do
     specs_require_sharding
 
-    let(:root_account_shard) { Shard.create! }
+    let(:root_account_shard) { @shard1 }
     let(:root_account) { root_account_shard.activate { account_model } }
     let(:sa_developer_key) { Account.site_admin.shard.activate { DeveloperKey.create!(name: 'SA Key') } }
     let(:root_account_binding) do
