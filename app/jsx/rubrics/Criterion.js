@@ -221,7 +221,6 @@ export default class Criterion extends React.Component {
       <CommentButton onClick={editComments} />
     ) : null
 
-    const noComments = _.isEmpty(_.get(assessment, 'comments'))
     const longDescription = criterion.long_description
     const threshold = criterion.mastery_points
 
@@ -248,14 +247,6 @@ export default class Criterion extends React.Component {
           </div>
           {
             !(hidePoints || _.isNil(threshold)) ? <Threshold threshold={threshold} /> : null
-          }
-          {
-            (freeForm || assessing || isSummary || noComments) ? null : (
-              <div className="assessment-comments">
-                <Text size="x-small" weight="normal">{I18n.t('Instructor Comments')}</Text>
-                {pointsComment()}
-              </div>
-            )
           }
         </th>
         <td className="ratings">
