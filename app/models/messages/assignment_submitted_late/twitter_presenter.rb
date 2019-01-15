@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - present Instructure, Inc.
+# Copyright (C) 2019 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,16 +16,21 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
-
-describe 'assignment_submitted_late' do
-  before :once do
-    submission_model
+module Messages::AssignmentSubmittedLate
+  class TwitterPresenter < Presenter
+    def body
+      if anonymous?
+        I18n.t(
+          "Canvas Alert - Late Anonymous Submission: %{assignment_name}",
+          assignment_name: assignment.title
+        )
+      else
+        I18n.t(
+          "Canvas Alert - Late Submission: %{user_name}, %{assignment_name}",
+          assignment_name: assignment.title,
+          user_name: submission.user.name
+        )
+      end
+    end
   end
-
-  let(:asset) { @submission }
-  let(:notification_name) { :assignment_submitted_late }
-
-  include_examples "a message"
 end
