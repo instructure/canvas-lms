@@ -50,7 +50,7 @@ group :test do
   gem 'test-queue', github: 'instructure/test-queue', ref: 'd35166408df3a5396cd809e85dcba175136a69ba', require: false
   gem 'testrailtagging', '0.3.8.4', require: false
 
-  gem 'webmock', '3.3.0', require: false
+  gem 'webmock', '3.5.1', require: false
     gem 'crack', '0.4.3', require: false
   gem 'timecop', '0.9.1'
   gem 'jira_ref_parser', '1.0.1'
