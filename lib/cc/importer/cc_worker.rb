@@ -77,7 +77,7 @@ class Canvas::Migration::Worker::CCWorker < Canvas::Migration::Worker::Base
          end
        end
 
-      CoursesService.distribute_due_dates(course: cm.context)
+      AssignmentsService.distribute_due_dates(course: cm.context)
       saved
     rescue Canvas::Migration::Error
       cm.add_error($!.message, :exception => $!)
