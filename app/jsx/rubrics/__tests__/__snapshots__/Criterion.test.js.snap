@@ -1134,39 +1134,6 @@ exports[`Point Rubric with a custom criterion by default renders the root compon
         open={false}
       />
     </div>
-    <div
-      className="assessment-comments"
-    >
-      <Text
-        as="span"
-        letterSpacing="normal"
-        size="x-small"
-        weight="normal"
-      >
-        Instructor Comments
-      </Text>
-      <CommentText
-        assessment={
-          Object {
-            "comments": "i'd like to say some things",
-            "comments_enabled": true,
-            "criterion_id": "_1384",
-            "description": "bleh",
-            "editComments": true,
-            "id": "7_4778",
-            "learning_outcome_id": null,
-            "points": Object {
-              "text": null,
-              "valid": true,
-              "value": 3.2,
-            },
-          }
-        }
-        key="comment"
-        placeholder=""
-        weight="light"
-      />
-    </div>
   </th>
   <td
     className="ratings"
@@ -1761,40 +1728,6 @@ exports[`Point Rubric with a outcome criterion by default renders the root compo
     <Threshold
       threshold={3}
     />
-    <div
-      className="assessment-comments"
-    >
-      <Text
-        as="span"
-        letterSpacing="normal"
-        size="x-small"
-        weight="normal"
-      >
-        Instructor Comments
-      </Text>
-      <CommentText
-        assessment={
-          Object {
-            "above_threshold": false,
-            "comments": "here too",
-            "comments_enabled": true,
-            "criterion_id": "7_391",
-            "description": "Naturligvis hadde han ogsaa længe forstaat hvorfor Inger hadde.",
-            "editComments": true,
-            "id": "7_6639",
-            "learning_outcome_id": "612",
-            "points": Object {
-              "text": null,
-              "valid": true,
-              "value": 3,
-            },
-          }
-        }
-        key="comment"
-        placeholder=""
-        weight="light"
-      />
-    </div>
   </th>
   <td
     className="ratings"

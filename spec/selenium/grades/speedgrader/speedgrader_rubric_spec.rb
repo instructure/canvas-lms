@@ -114,7 +114,7 @@ describe "speed grader - rubrics" do
       true
     }
     wait_for_ajaximations
-    expect(Speedgrader.rubric_comment_for_row("no outcome row").text).to eq to_comment
+    expect(Speedgrader.rubric_comment_for_row("no outcome row")).to include_text to_comment
   end
 
   it "should not convert invalid text to 0", priority: "2", test_id: 283751 do

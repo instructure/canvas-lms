@@ -44,7 +44,7 @@ describe('The Comments component', () => {
   })
 
   it('directly renders comments_html', () => {
-    const el = rating({ editing: false }).findWhere((e) => e.children().length === 0)
+    const el = rating({ editing: false }).findWhere((e) => e.children().length === 0).last()
     expect(el.html()).toMatchSnapshot()
   })
 
