@@ -1772,6 +1772,18 @@ nn:
   allows_the_duplicating_of_objects_in_canvas_c86f3665: "Tillet duplisering av objekt i Canvas"
   allows_the_duplication_of_calendar_events_7bb0d6c5: "Tillet duplisering av kalenderhendingar"
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "Tillèt planlegging av regelmessige kalenderhendingar"
+  allows_user_to_access_and_edit_the_admin_settings__b3390b66: "Gir ein brukar løyve til å endre admininnstillingar i Commons. Gir ein brukar løyve til å opprette og administrere grupper. Gi brukar løyve til å administrere delte ressursar i kontoen. "
+  allows_user_to_access_speedgrader_from_an_assignme_3b908f7: "Gir ein brukar løyve til å gå til SpeedGrader frå ei oppgåve."
+  allows_user_to_access_the_announcements_link_in_co_b0ef1a10: |-
+      Gir ein brukar løyve til å sjå kunngjeringslenka i emnenavigasjon.
+      Gir ein brukar løyve til å sjå emnekunngjeringar.
+      Gir ein brukar løyve til å sjå nylege kunngjeringar på forsida til emnet.
+  allows_user_to_access_the_blueprint_courses_sideba_cb5f6a46: "Gir ein brukar løyve til å sjå sidemenyen for Blueprint-emne. Gir ein brukar løyve til å administrere innhald i Blueprint-emne i emneinnstillingar. Gir ein brukar løyve til å fjerne eit tilknytta emne. Gir ein brukar løyve til å redigere innstillingar som låser individuelle oppgåver, sider og diskusjonar i Blueprint-emne. "
+  allows_user_to_access_the_files_tab_in_the_content_a5187929: "Gir ein brukar løyve til å sjå fanen for filer i innhaldsveljaren. "
+  allows_user_to_access_the_restore_courses_tab_in_a_3ff3086c: "Gir ein brukar løyve til å gjenopprette emne i administrasjonsverktøyet"
+  allows_user_to_access_the_student_progress_page_aca95197: "Gir ein brukar løyve til å sjå sida for studentprogresjon."
+  allows_user_to_access_the_theme_editor_26691f9a: "Gir ein brukar tilgang til temaeditoren."
+  allows_user_to_access_the_users_link_in_account_na_d77e46de: "Gir ein brukar løyve til å gå inn på menyvalet Personar i kontonavigeringsmenyen. "
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Gjer at brukarar med internasjonale telefonnummer kan ta imot tekstmeldingar frå Canvas."
   always_3a59e701: Alltid
   always_load_the_rce_and_sidebar_from_a_canvas_rich_1495e3fd: "Last alltid RCE og sidestolpe fra Canvas sin rikt innhald-teneste"
@@ -1894,8 +1906,12 @@ nn:
   anonymous_grading_ccb5045c: "Anonym karaktersetjing"
   anonymous_grading_forces_student_names_to_be_hidde_8b46d7e7: "Anonym karaktersetjing tvingar studentnamn til å vere skjulte i SpeedGrader™"
   anonymous_instructor_annotations_2b6c822: "Anomyme merknader frå faglærar"
+  anonymous_turned_off_8118a0b: "Anonymisering slått av"
+  anonymous_turned_on_fe56f997: "Anonymisering slått på"
   anonymous_user: "Anonym brukar"
   anonymous_user_d984b9ce: "Anonym brukar"
+  anonymous_was_never_turned_on_e5e8aeda: "Anonymisering vart aldri slått på"
+  anonymous_was_turned_off_300d25ec: "Anonymisering er slått av"
   anonymously_graded_59149570: "Anonymt karaktersett"
   another_assignment_name_369f8481: "Eit nytt oppgåvenamn"
   another_configuration_is_currently_selected_select_95b394e: "Ein annan konfigurasjon er vald.  Om du vel denne konfigurasjonen fjernar du den andre."
@@ -8194,6 +8210,8 @@ nn:
   graded_quiz_7fabdf1f: "Karaktersett quiz"
   graded_survey_c0f0c395: "Vurdert undersøking"
   grader_d1198a9c: Karaktersetjing
+  graders_anonymous_to_graders_turned_off_e017d355: "Anonymisert vurdering er slått av for studentar"
+  graders_anonymous_to_graders_turned_on_6ccf213f: "Anonymisert vurdering slått på for studentar"
   grades_a61eba0a: Karakterar
   grades_are_now_reverted_to_original_scores_e6deade1: "Karakterane blir no tilbakestilt til det opphavlege resultatet"
   grades_are_now_showing_what_if_scores_711a8be2: "Karakterar viser no kva-skjer-dersom-resultat"
@@ -11506,7 +11524,7 @@ nn:
   model_is_already_located_in_newgroup_e5cea361: "%{model} er allereie plassert i %{newGroup}"
   moderate_assignment_ccb00173: "Moderer %{assignment}"
   moderate_assignment_name_cf59e0a7: "Moderer %{assignment_name}"
-  moderate_d0c85e92: Moderat
+  moderate_d0c85e92: Moderer
   moderate_grades_4f43f85d: "Moderer karakterar"
   moderated_grading_cannot_be_enabled_for_group_assi_7e947ab7: "Moderert karaktersetjing kan ikkje aktiverast for gruppeoppgåver"
   moderated_grading_cannot_be_enabled_for_peer_revie_6b7eedc1: "Moderert karaktersetjing kan ikkje aktiverast for fagfellevurderte oppgåver"
