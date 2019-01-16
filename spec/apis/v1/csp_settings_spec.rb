@@ -25,7 +25,7 @@ describe "CSP Settings API", type: :request do
   before :once do
     account_admin_user(:active_all => true)
     @sub = Account.default.sub_accounts.create!
-    course_factory(:account => @sub)
+    @course = course_factory(:account => @sub)
   end
 
   context "GET get_csp_settings" do
@@ -36,7 +36,12 @@ describe "CSP Settings API", type: :request do
     end
 
     it "should require authorization" do
-      course_with_teacher(:active_all => true)
+      course_with_teacher(active_all: true, course: @course)
+      get_csp_settings(@course, 200)
+    end
+
+    it "should be unauthorized" do
+      course_with_student(active_all: true, course: @course)
       get_csp_settings(@course, 401)
     end
 

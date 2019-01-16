@@ -23,7 +23,9 @@
 # configuring whitelisted domains
 
 class CspSettingsController < ApplicationController
-  before_action :require_context, :require_user, :require_permissions
+  before_action :require_context, :require_user
+  before_action :require_read_permissions, only: [:get_csp_settings]
+  before_action :require_permissions, except: [:get_csp_settings]
   before_action :get_domain, :only => [:add_domain, :remove_domain]
 
   # @API Get current settings for account or course
@@ -103,6 +105,10 @@ class CspSettingsController < ApplicationController
   end
 
   protected
+  def require_read_permissions
+    !!authorized_action(@context, @current_user, :read_as_admin)
+  end
+
   def require_permissions
     account = @context.is_a?(Course) ? @context.account : @context
     !!authorized_action(account, @current_user, :manage_account_settings)
