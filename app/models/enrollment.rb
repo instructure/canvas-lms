@@ -79,6 +79,7 @@ class Enrollment < ActiveRecord::Base
   after_destroy :update_assignment_overrides_if_needed
 
   after_save -> { PipelineService.publish(self) }
+  after_create -> { AssignmentsService.distribute_due_dates(enrollment: self)}
 
   attr_accessor :already_enrolled, :need_touch_user, :skip_touch_user
   scope :current, -> { joins(:course).where(QueryBuilder.new(:active).conditions).readonly(false) }
