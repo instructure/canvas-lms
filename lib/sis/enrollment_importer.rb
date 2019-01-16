@@ -279,13 +279,8 @@ module SIS
           end
 
           if enrollment_info.status =~ /\Aactive/i
-            if user.workflow_state != 'deleted' && pseudo.workflow_state != 'deleted'
-              enrollment.workflow_state = 'active'
-            else
-              enrollment.workflow_state = 'deleted'
-              message = "Attempted enrolling of deleted user #{enrollment_info.user_id} in course #{enrollment_info.course_id}"
-              @messages << SisBatch.build_error(enrollment_info.csv, message, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info)
-            end
+            message = set_enrollment_workflow_state(enrollment, enrollment_info, pseudo, user)
+            @messages << SisBatch.build_error(enrollment_info.csv, message, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info) if message
           elsif enrollment_info.status =~ /\Adeleted/i
             # we support creating deleted enrollments, but we want to preserve
             # the state for roll_back_data so only set workflow_state for new
@@ -388,6 +383,30 @@ module SIS
       end
 
       private
+
+      def set_enrollment_workflow_state(enrollment, enrollment_info, pseudo, user)
+        message = nil
+        # the user is active, and the pseudonym is active
+        if user.workflow_state != 'deleted' && pseudo.workflow_state != 'deleted'
+          enrollment.workflow_state = 'active'
+          # the user is active, but the pseudonym is deleted, check for other active pseudonym
+        elsif user.workflow_state != 'deleted' && pseudo.workflow_state == 'deleted'
+          if @root_account.pseudonyms.active.where(user_id: user).where("sis_user_id != ? OR sis_user_id IS NULL", enrollment_info.user_id).exists?
+            enrollment.workflow_state = 'active'
+            message = "Enrolled a user #{enrollment_info.user_id} in course #{enrollment_info.course_id}, but referenced a deleted sis login"
+          else
+            message = invalid_active_enrollment(enrollment, enrollment_info)
+          end
+        else # the user is deleted
+          message = invalid_active_enrollment(enrollment, enrollment_info)
+        end
+        message
+      end
+
+      def invalid_active_enrollment(enrollment, enrollment_info)
+        enrollment.workflow_state = 'deleted'
+        "Attempted enrolling of deleted user #{enrollment_info.user_id} in course #{enrollment_info.course_id}"
+      end
 
       def enrollment_needs_due_date_recaching?(enrollment)
         unless %w(active inactive).include? enrollment.workflow_state_before_last_save
