@@ -33,10 +33,11 @@ define [
 
 ], (I18n, $, setDefaultGradeDialogTemplate, _) ->
 
-  PAGE_SIZE = 50
+  noop = ->
+  alertProxy = (message) -> alert(message)
 
   class SetDefaultGradeDialog
-    constructor: ({@assignment, @students, @context_id, @selected_section, @onClose = ->}) ->
+    constructor: ({@assignment, @students, @context_id, @selected_section, @onClose = noop, @page_size = 50, @alert = alertProxy}) ->
 
     show: (onClose = @onClose) =>
       templateLocals =
@@ -66,7 +67,7 @@ define [
           $form.disableWhileLoading(submittingDfd)
 
           students = getStudents()
-          pages = (students.splice 0, PAGE_SIZE while students.length)
+          pages = (students.splice 0, @page_size while students.length)
 
           postDfds = pages.map (page) =>
             studentParams = getParams(page, formData.default_grade)
@@ -78,7 +79,7 @@ define [
             responses = [responses] if postDfds.length == 1
             submissions = getSubmissions(responses)
             $.publish 'submissions_updated', [submissions]
-            alert(I18n.t 'alerts.scores_updated'
+            @alert(I18n.t 'alerts.scores_updated'
             ,
               one: '1 Student score updated'
               other: '%{count} Student scores updated'
@@ -106,10 +107,14 @@ define [
          .value()
 
       getSubmissions = (responses) =>
+        # uniq on id is required because for group assignments the api will
+        # return all submission in a group assignment leading to duplicates
         _.chain(responses)
          .map ([response, __]) ->
            [s.submission for s in response]
-         .flatten().value()
+         .flatten()
+         .uniq('id')
+         .value()
 
     gradeIsExcused: (grade) ->
       _.isString(grade) && grade.toUpperCase() == 'EX'
