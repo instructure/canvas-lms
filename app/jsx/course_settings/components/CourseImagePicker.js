@@ -63,44 +63,42 @@ export default class CourseImagePicker extends React.Component {
 
   shouldAcceptDrop = dataTransfer => {
     if (dataTransfer) {
-      return (_.indexOf(dataTransfer.types, 'Files') >= 0)
+      return _.indexOf(dataTransfer.types, 'Files') >= 0
     }
   }
 
-  render () {
+  render() {
     return (
-      <div className="CourseImagePicker"
+      <div
+        className="CourseImagePicker"
         onDrop={this.onDrop}
         onDragLeave={this.onDragLeave}
         onDragOver={this.onDragEnter}
-        onDragEnter={this.onDragEnter}>
-        { this.props.uploadingImage &&
+        onDragEnter={this.onDragEnter}
+      >
+        {this.props.uploadingImage && (
           <div className="CourseImagePicker__Overlay">
-            <Spinner title="Loading"/>
+            <Spinner title="Loading" />
           </div>
-        }
-        { this.state.draggingFile &&
+        )}
+        {this.state.draggingFile && (
           <div className="DraggingOverlay CourseImagePicker__Overlay">
             <div className="DraggingOverlay__Content">
               <div className="DraggingOverlay__Icon">
                 <i className="icon-upload" />
               </div>
-              <div className="DraggingOverlay__Instructions">
-                {I18n.t('Drop Image')}
-              </div>
+              <div className="DraggingOverlay__Instructions">{I18n.t('Drop Image')}</div>
             </div>
           </div>
-        }
+        )}
         <div className="CourseImagePicker__Content">
           <UploadArea
             courseId={this.props.courseId}
             handleFileUpload={this.props.handleFileUpload}
           />
-          <FlickrSearch selectImage={(flickrUrl) => this.props.handleFlickrUrlUpload(flickrUrl)} />
+          <FlickrSearch selectImage={flickrUrl => this.props.handleFlickrUrlUpload(flickrUrl)} />
         </div>
       </div>
     )
   }
 }
-
-

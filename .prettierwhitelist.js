@@ -16,6 +16,7 @@ const PRETTIER_WHITELIST = module.exports =  [
   'frontend_build/**/*.js',
   'script/**/*.js',
   'app/jsx/account_settings/**/*.js',
+  'app/jsx/course_settings/**/*.js',
   'app/coffeescripts/ember/**/*.js',
   'public/javascripts/speed_grader*.js',
   'spec/javascripts/jsx/spec-support/**/*.js',

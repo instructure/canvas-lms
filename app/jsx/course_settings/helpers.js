@@ -16,32 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-  const Helpers = {
-    isValidImageType (mimeType) {
-      switch (mimeType) {
-        case 'image/jpeg':
-        case 'image/gif':
-        case 'image/png':
-          return true;
-          break;
-        default:
-          return false;
-          break;
-      }
-    },
-
-    extractInfoFromEvent (event) {
-      let file = '';
-      let type = '';
-      if (event.type === 'change') {
-        file = event.target.files[0];
-        type = file.type;
-      } else {
-        type = event.dataTransfer.files[0].type;
-        file = event.dataTransfer.files[0];
-      }
-
-      return {file, type};
+const Helpers = {
+  isValidImageType(mimeType) {
+    switch (mimeType) {
+      case 'image/jpeg':
+      case 'image/gif':
+      case 'image/png':
+        return true
+        break
+      default:
+        return false
+        break
     }
-  };
+  },
+
+  extractInfoFromEvent(event) {
+    let file = ''
+    let type = ''
+    if (event.type === 'change') {
+      file = event.target.files[0]
+      type = file.type
+    } else {
+      type = event.dataTransfer.files[0].type
+      file = event.dataTransfer.files[0]
+    }
+
+    return {file, type}
+  }
+}
 export default Helpers

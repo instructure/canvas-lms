@@ -16,14 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-  const initialState = {
-    courseImage: 'abc',
-    imageUrl: '',
-    showModal: false,
-    gettingImage: false,
-    uploadingImage: false,
-    removingImage: false
-  };
+const initialState = {
+  courseImage: 'abc',
+  imageUrl: '',
+  showModal: false,
+  gettingImage: false,
+  uploadingImage: false,
+  removingImage: false
+}
 
 export default initialState
