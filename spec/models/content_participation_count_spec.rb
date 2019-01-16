@@ -141,6 +141,12 @@ describe ContentParticipationCount do
       expect(ContentParticipationCount.unread_submission_count_for(@course, @student)).to eq 0
     end
 
+    it "should be read if a graded assignment is set to ungraded for some reason" do
+      @submission = @assignment.grade_student(@student, grade: 3, grader: @teacher).first
+      @assignment.update_attribute(:submission_types, "not_graded")
+      expect(ContentParticipationCount.unread_submission_count_for(@course, @student)).to eq 0
+    end
+
     it "should be unread after submission is graded" do
       @assignment.submit_homework(@student)
       @submission = @assignment.grade_student(@student, grade: 3, grader: @teacher).first
