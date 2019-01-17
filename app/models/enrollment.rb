@@ -439,13 +439,15 @@ class Enrollment < ActiveRecord::Base
 
   def create_linked_enrollment_for(observer)
     # we don't want to create a new observer enrollment if one exists
-    enrollment = linked_enrollment_for(observer)
-    return true if enrollment && !enrollment.deleted?
-    return false unless observer.can_be_enrolled_in_course?(course)
-    enrollment ||= observer.observer_enrollments.build
-    enrollment.associated_user_id = user_id
-    enrollment.shard = shard if enrollment.new_record?
-    enrollment.update_from(self, !!@skip_broadcasts)
+    self.class.unique_constraint_retry do
+      enrollment = linked_enrollment_for(observer)
+      return true if enrollment && !enrollment.deleted?
+      return false unless observer.can_be_enrolled_in_course?(course)
+      enrollment ||= observer.observer_enrollments.build
+      enrollment.associated_user_id = user_id
+      enrollment.shard = shard if enrollment.new_record?
+      enrollment.update_from(self, !!@skip_broadcasts)
+    end
   end
 
   def linked_enrollment_for(observer)
