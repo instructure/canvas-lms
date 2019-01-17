@@ -121,7 +121,7 @@ import cx from 'classnames'
 
     leftPosition: function(){
       return this.tooltipOnRight() ?
-        (this.leftPlusElement()) :
+        (this.leftPlusElement() - 200) :
         (this.leftPlusElement() - 360)
     },
 
