@@ -119,12 +119,10 @@ import cx from 'classnames'
       return $(this.props.parentNode).position().top + 82;
     },
 
-    leftPosition: function(px){
-      if (this.tooltipOnRight()) {
-        return px ? (this.leftPlusElement() - 200) : this.leftPlusElement()
-      } else {
-        return (this.leftPlusElement() - 360)
-      }
+    leftPosition: function(){
+      return this.tooltipOnRight() ?
+        (this.leftPlusElement() - 200) :
+        (this.leftPlusElement() - 360)
     },
 
     pickerToolTipStyle: function() {
@@ -132,7 +130,7 @@ import cx from 'classnames'
         return {
           position: 'fixed',
           top: this.topPosition(),
-          left: this.leftPosition(true),
+          left: this.leftPosition(),
           zIndex: 9999
         };
       } else {
