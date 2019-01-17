@@ -2083,8 +2083,16 @@ class Course < ActiveRecord::Base
       section.default_section = true
       section.course = self
       section.root_account_id = self.root_account_id
-      Shackles.activate(:master) do
-        section.save unless new_record?
+      unless new_record?
+        Shackles.activate(:master) do
+          CourseSection.unique_constraint_retry do |retry_count|
+            if retry_count > 0
+              section = course_sections.active.where(default_section: true).first
+            else
+              section.save
+            end
+          end
+        end
       end
     end
     section
