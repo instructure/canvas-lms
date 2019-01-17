@@ -77,9 +77,11 @@ shared_context 'advantage services context' do
   let(:scope_to_remove) { raise 'Override in spec' }
   let(:http_success_status) { :ok }
   let(:expected_mime_type) { described_class::MIME_TYPE }
+  let(:content_type) { nil }
 
   def apply_headers
     request.headers['Authorization'] = "Bearer #{access_token_jwt}" if access_token_jwt
+    request.headers['Content-Type'] = content_type if content_type.present?
   end
 
   def send_http

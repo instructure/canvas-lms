@@ -93,6 +93,7 @@ module Lti
         end
         let(:action) { :create }
         let(:http_success_status) { :created }
+        let(:content_type) { 'application/vnd.ims.lis.v2.lineitem+json' }
 
         it_behaves_like 'advantage services'
 
