@@ -29,6 +29,7 @@ Mime::Type.register "application/rtf", :rtf
 Mime::Type.register "text/plaintext", :log
 Mime::Type.register 'application/vnd.api+json', :jsonapi
 Mime::Type.register 'application/vnd.ims.lis.v2.lineitem+json', :lineitem
+Mime::Type.register 'application/vnd.ims.lis.v1.score+json', :score
 Mime::Type.register 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', :docx
 Mime::Type.register 'application/vnd.openxmlformats-officedocument.presentationml.presentation', :pptx
 Mime::Type.register 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', :xlsx
@@ -40,6 +41,7 @@ MIME::Types['application/epub+zip'].each do |mime_type|
 end
 
 # Custom LTI Advantage MIME types
-ActionDispatch::Request.parameter_parsers[:lineitem] = lambda do |body|
-  JSON.parse(body)
-end
+standard_json_parser = lambda { |body| JSON.parse(body) }
+ActionDispatch::Request.parameter_parsers[:lineitem] = standard_json_parser
+ActionDispatch::Request.parameter_parsers[:score] = standard_json_parser
+

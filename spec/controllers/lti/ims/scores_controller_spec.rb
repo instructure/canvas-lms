@@ -63,6 +63,8 @@ module Lti::Ims
     let(:scope_to_remove) { 'https://purl.imsglobal.org/spec/lti-ags/scope/score' }
 
     describe '#create' do
+      let(:content_type) { 'application/vnd.ims.lis.v1.score+json' }
+
       it_behaves_like 'advantage services'
 
       context 'with valid params' do
