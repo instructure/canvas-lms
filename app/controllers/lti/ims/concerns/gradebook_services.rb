@@ -32,7 +32,7 @@ module Lti::Ims::Concerns
       end
 
       def user
-        @_user ||= User.where(lti_context_id: params[:userId]).where.not(lti_context_id: nil).
+        @_user ||= User.where(lti_id: params[:userId]).where.not(lti_id: nil).
           or(User.where(id: params.fetch(:userId, params[:user_id]))).take
       end
 

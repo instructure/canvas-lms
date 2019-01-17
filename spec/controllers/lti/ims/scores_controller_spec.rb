@@ -49,11 +49,12 @@ module Lti::Ims
     let(:submission) { nil }
     let(:json) { JSON.parse(response.body) }
     let(:access_token_scopes) { 'https://purl.imsglobal.org/spec/lti-ags/scope/score' }
+    let(:userId) { user.id }
     let(:params_overrides) do
       {
         course_id: context_id,
         line_item_id: line_item_id,
-        userId: user.id,
+        userId: userId,
         activityProgress: 'Completed',
         gradingProgress: 'FullyGraded',
         timestamp: Time.zone.now.iso8601(3)
@@ -68,6 +69,15 @@ module Lti::Ims
       it_behaves_like 'advantage services'
 
       context 'with valid params' do
+        context 'when the lti_id userId is used' do
+          let(:userId) { user.lti_id }
+
+          it 'returns a valid resultUrl in the body' do
+            send_request
+            expect(json['resultUrl']).to include 'results'
+          end
+        end
+
         it 'returns a valid resultUrl in the body' do
           send_request
           expect(json['resultUrl']).to include 'results'
