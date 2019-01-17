@@ -140,6 +140,10 @@ module Api::V1::User
       if includes.include?('lti_id')
         json[:lti_id] = user.lti_context_id
       end
+
+      if includes.include?('uuid')
+        json[:uuid] = user.uuid
+      end
     end
   end
 

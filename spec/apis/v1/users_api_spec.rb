@@ -359,6 +359,11 @@ describe Api::V1::User do
       @test_api.context = double()
       test_context(@test_api.context, nil)
     end
+
+    it 'outputs uuid in json with includes params present' do
+      expect(@test_api.user_json(@student, @admin, {}, [], @course)).not_to have_key("uuid")
+      expect(@test_api.user_json(@student, @admin, {}, ['uuid'], @course)).to have_key("uuid")
+    end
   end
 
   describe "enrollment_json" do

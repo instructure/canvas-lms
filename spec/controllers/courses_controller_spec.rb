@@ -2512,5 +2512,19 @@ describe CoursesController do
       expect(json[0]).to include({ "id" => student1.id, "group_ids" => [group1.id] })
       expect(json[1]).to include({ "id" => student2.id, "group_ids" => [group2.id] })
     end
+
+    it 'can take student uuids as inputs and output uuids in json' do
+      user_session(teacher)
+      get 'users', params: {
+        course_id: course.id,
+        user_uuids: [student1.uuid],
+        format: 'json',
+        include: ['uuid'],
+        enrollment_role: 'StudentEnrollment'
+      }
+      json = json_parse(response.body)
+      expect(json.count).to eq(1)
+      expect(json[0]).to include({ "id" => student1.id, "uuid" => student1.uuid })
+    end
   end
 end
