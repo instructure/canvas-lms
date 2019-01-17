@@ -34,6 +34,12 @@ import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
 
 import {TeacherAssignmentShape} from '../assignmentData'
 
+// let's use these helpers from the gradebook so we're consistent
+import {
+  hasSubmitted,
+  hasSubmission
+} from '../../../gradezilla/shared/helpers/messageStudentsWhoHelper'
+
 export default class Toolbox extends React.Component {
   static propTypes = {
     assignment: TeacherAssignmentShape.isRequired,
@@ -44,6 +50,15 @@ export default class Toolbox extends React.Component {
   static defaultProps = {
     onUnsubmittedClick: () => {},
     onPublishChange: () => {}
+  }
+
+  submissions() {
+    // TODO: We will need to exhaust the submissions pagination for this to work correctly
+    return this.props.assignment.submissions.nodes
+  }
+
+  countSubmissions(fn) {
+    return this.submissions().reduce((memo, submission) => memo + (fn(submission) ? 1 : 0), 0)
   }
 
   handlePublishChange = event => {
@@ -80,19 +95,43 @@ export default class Toolbox extends React.Component {
     return (
       <Link href={speedgraderLink} icon={<IconSpeedGrader />} iconPlacement="end" target="_blank">
         <Text transform="uppercase" size="small" color="primary">
-          {I18n.t('%{number} to grade', {number: 'X'})}
+          {I18n.t('%{number} to grade', {number: this.props.assignment.needsGradingCount})}
         </Text>
       </Link>
     )
   }
 
   renderUnsubmittedButton() {
+    const unsubmittedCount = this.countSubmissions(submission => !hasSubmitted(submission))
+    return this.renderMessageStudentsWhoButton(
+      I18n.t('%{number} unsubmitted', {number: unsubmittedCount})
+    )
+  }
+
+  renderMessageStudentsWhoButton(text) {
     return (
       <Link icon={<IconEmail />} iconPlacement="end" onClick={this.props.onUnsubmittedClick}>
         <Text transform="uppercase" size="small" color="primary">
-          {I18n.t('%{number} unsubmitted', {number: 'X'})}
+          {text}
         </Text>
       </Link>
+    )
+  }
+
+  renderSubmissionStats() {
+    return hasSubmission(this.props.assignment) ? (
+      [
+        <FlexItem key="unsubmitted" padding="xx-small xx-small xxx-small">
+          {this.renderSpeedGraderLink()}
+        </FlexItem>,
+        <FlexItem key="to grade" padding="xxx-small xx-small">
+          {this.renderUnsubmittedButton()}
+        </FlexItem>
+      ]
+    ) : (
+      <FlexItem padding="xx-small xx-small xxx-small">
+        {this.renderMessageStudentsWhoButton(I18n.t('Message Students Who'))}
+      </FlexItem>
     )
   }
 
@@ -120,8 +159,7 @@ export default class Toolbox extends React.Component {
             {this.renderPublished()}
             {this.renderDelete()}
           </FlexItem>
-          <FlexItem padding="xx-small xx-small xxx-small">{this.renderSpeedGraderLink()}</FlexItem>
-          <FlexItem padding="xxx-small xx-small">{this.renderUnsubmittedButton()}</FlexItem>
+          {this.renderSubmissionStats()}
           <FlexItem padding="medium xx-small large">
             {this.renderPoints()}
             {this.renderPointsLabel()}

@@ -49,15 +49,19 @@ export function mockAssignment(overrides) {
     unlockAt: '2018-11-27T13:00-05:00',
     description: 'assignment description',
     state: 'published',
+    needsGradingCount: 0,
     course: mockCourse(),
     modules: [{lid: '1', name: 'module 1'}, {lid: '2', name: 'module 2'}],
     assignmentGroup: {lid: '1', name: 'assignment group'},
     lockInfo: {
       isLocked: false
     },
-    submissionTypes: [],
+    submissionTypes: ['online_text_entry'],
     allowedExtensions: [],
     assignmentOverrides: {
+      nodes: []
+    },
+    submissions: {
       nodes: []
     },
     ...overrides
@@ -66,7 +70,7 @@ export function mockAssignment(overrides) {
 
 export function mockOverride(overrides) {
   return {
-    id: '1',
+    gid: '1',
     lid: '1',
     title: 'Section A',
     dueAt: '2018-12-25T23:59:59-05:00',
@@ -77,17 +81,32 @@ export function mockOverride(overrides) {
   }
 }
 
-export function mockSubmission(submissions) {
+export function mockSubmission(overrides) {
   return {
-    id: '1',
+    gid: '1',
     lid: '1',
+    state: 'submitted',
+    submissionStatus: 'submitted',
+    gradingStatus: 'needs_grading',
+    excused: false,
+    latePolicyStatus: null,
+    submittedAt: '2019-01-17T12:21:42Z',
+    user: mockUser(),
     assetId: '2',
     assetType: 'Submission',
-    state: 'assigned',
     assessorId: '3',
     assessorAssetId: '33',
     assessorAssetType: 'Submission',
-    ...submissions
+    ...overrides
+  }
+}
+
+export function mockUser(overrides) {
+  return {
+    lid: 'user_1',
+    gid: 'user_1',
+    name: 'User 1',
+    ...overrides
   }
 }
 
