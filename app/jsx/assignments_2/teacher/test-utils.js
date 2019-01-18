@@ -17,7 +17,6 @@
  */
 
 import {TeacherViewContextDefaults} from './components/TeacherViewContext'
-import {fromJS} from 'immutable'
 
 // because our version of jsdom doesn't support elt.closest('a') yet. Should soon.
 export function closest(el, selector) {
@@ -34,14 +33,14 @@ export function findInputForLabel(labelChild, container) {
 }
 
 export function mockCourse(overrides) {
-  return fromJS({
+  return {
     lid: 'course-lid',
     ...overrides
-  })
+  }
 }
 
 export function mockAssignment(overrides) {
-  return fromJS({
+  return {
     lid: 'assignment-lid',
     name: 'assignment name',
     pointsPossible: 5,
@@ -62,11 +61,11 @@ export function mockAssignment(overrides) {
       nodes: []
     },
     ...overrides
-  })
+  }
 }
 
 export function mockOverride(overrides) {
-  return fromJS({
+  return {
     id: '1',
     lid: '1',
     title: 'Section A',
@@ -75,7 +74,7 @@ export function mockOverride(overrides) {
     lockAt: '2018-12-29T23:59:00-05:00',
     unlockAt: '2018-12-23T00:00:00-05:00',
     ...overrides
-  })
+  }
 }
 
 // values need to match the defaults for TeacherViewContext

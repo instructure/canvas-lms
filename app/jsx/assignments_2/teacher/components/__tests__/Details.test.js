@@ -28,7 +28,7 @@ apiUserContent.convert = jest.fn(arg => `converted ${arg}`)
 it('renders and converts', () => {
   const assignment = mockAssignment()
   const {getByText} = render(<Details assignment={assignment} />)
-  getByText(`converted ${assignment.get('description')}`)
+  getByText(`converted ${assignment.description}`)
   expect(getByText('Everyone')).toBeInTheDocument()
   expect(getByText('Due:', {exact: false})).toBeInTheDocument()
   expect(getByText('Available', {exact: false})).toBeInTheDocument()

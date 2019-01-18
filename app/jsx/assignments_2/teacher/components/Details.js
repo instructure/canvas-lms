@@ -33,8 +33,7 @@ Details.defaultProps = {
 }
 
 export default function Details(props) {
-  const description = props.assignment.get('description')
-  const convertedHtml = apiUserContent.convert(description)
+  const convertedHtml = apiUserContent.convert(props.assignment.description)
 
   // html is sanitized on the server side
   // TODO: when readOnly=false, render the rce

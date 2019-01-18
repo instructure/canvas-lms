@@ -65,9 +65,8 @@ export default class OverrideSubmissionTypes extends React.Component {
   }
 
   renderSimple() {
-    if (this.props.override.get('submissionTypes')) {
-      return this.props.override
-        .get('submissionTypes')
+    if (this.props.override.submissionTypes) {
+      return this.props.override.submissionTypes
         .map(typeSelection => {
           const type = OverrideSubmissionTypes.submissionTypes.find(t => typeSelection === t.value)
           return type ? type.name : OverrideSubmissionTypes.unknownSubmissionType.name

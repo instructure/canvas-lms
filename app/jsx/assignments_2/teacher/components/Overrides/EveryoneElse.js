@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {bool} from 'prop-types'
-import {fromJS} from 'immutable'
 import I18n from 'i18n!assignments_2'
 import {TeacherAssignmentShape} from '../../assignmentData'
 import Override from './Override'
@@ -41,24 +40,22 @@ export default function EveryoneElse(props) {
 
 function OverrideFromAssignment(assignment, readOnly) {
   const title =
-    assignment.getIn(['assignmentOverrides', 'nodes']).size > 0
-      ? I18n.t('Everyone else')
-      : I18n.t('Everyone')
+    assignment.assignmentOverrides.nodes.length > 0 ? I18n.t('Everyone else') : I18n.t('Everyone')
 
-  const fauxOverride = fromJS({
-    gid: `assignment_${assignment.get('id')}`,
-    lid: `assignment_${assignment.get('_id')}`,
-    dueAt: assignment.get('dueAt'),
-    lockAt: assignment.get('lockAt'),
-    unlockAt: assignment.get('unlockAt'),
+  const fauxOverride = {
+    gid: `assignment_${assignment.id}`,
+    lid: `assignment_${assignment._id}`,
+    dueAt: assignment.dueAt,
+    lockAt: assignment.lockAt,
+    unlockAt: assignment.unlockAt,
     title,
-    submissionTypes: assignment.get('submissionTypes'),
-    allowedExtensions: assignment.get('allowedExtensions'),
+    submissionTypes: assignment.submissionTypes,
+    allowedExtensions: assignment.allowedExtensions,
     set: {
       lid: null,
       name: title
     },
     readOnly
-  })
+  }
   return <Override override={fauxOverride} readOnly={readOnly} />
 }

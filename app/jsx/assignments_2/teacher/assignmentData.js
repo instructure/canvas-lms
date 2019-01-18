@@ -16,8 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import gql from 'graphql-tag'
-import {bool, number, oneOf, shape, string} from 'prop-types'
-import {mapContains, listOf} from 'react-immutable-proptypes'
+import {bool, number, oneOf, shape, string, arrayOf} from 'prop-types'
 
 // This ENV shape is for the controller's current show action. We'll have
 // something different when assignments are being created, which is a different
@@ -97,43 +96,43 @@ export const SET_WORKFLOW = gql`
   }
 `
 
-export const CourseShape = mapContains({
+export const CourseShape = shape({
   lid: string.isRequired
 })
 
-export const ModuleShape = mapContains({
+export const ModuleShape = shape({
   lid: string.isRequired,
   name: string.isRequired
 })
 
-export const AssignmentGroupShape = mapContains({
+export const AssignmentGroupShape = shape({
   lid: string.isRequired,
   name: string.isRequired
 })
 
-export const LockInfoShape = mapContains({
+export const LockInfoShape = shape({
   isLocked: bool.isRequired
 })
 
 // TODO: is this the final shape?
 //       what is required?
-export const OverrideShape = mapContains({
+export const OverrideShape = shape({
   id: string,
   lid: string,
   title: string,
   dueAt: string,
   lockAt: string,
   unlockAt: string,
-  submissionTypes: listOf(string), // currently copied from the asisgnment
-  allowedExtensions: listOf(string), // currently copied from the assignment
-  set: mapContains({
+  submissionTypes: arrayOf(string), // currently copied from the asisgnment
+  allowedExtensions: arrayOf(string), // currently copied from the assignment
+  set: shape({
     lid: string,
     name: string,
     __typename: oneOf(['Section', 'Group'])
   })
 })
 
-export const TeacherAssignmentShape = mapContains({
+export const TeacherAssignmentShape = shape({
   lid: string.isRequired,
   name: string.isRequired,
   pointsPossible: number.isRequired,
@@ -143,16 +142,16 @@ export const TeacherAssignmentShape = mapContains({
   description: string,
   state: oneOf(['published', 'unpublished']).isRequired,
   assignmentGroup: AssignmentGroupShape.isRequired,
-  modules: listOf(ModuleShape).isRequired,
+  modules: arrayOf(ModuleShape).isRequired,
   course: CourseShape.isRequired,
-  submissionTypes: listOf(string).isRequired,
-  allowedExtensions: listOf(string).isRequired,
-  assignmentOverrides: mapContains({
-    nodes: listOf(OverrideShape)
+  submissionTypes: arrayOf(string).isRequired,
+  allowedExtensions: arrayOf(string).isRequired,
+  assignmentOverrides: shape({
+    nodes: arrayOf(OverrideShape)
   }).isRequired
 })
 
-export const AssignmentShape = mapContains({
+export const AssignmentShape = shape({
   lid: string.isRequired,
   name: string.isRequired,
   pointsPossible: number.isRequired,
@@ -162,12 +161,12 @@ export const AssignmentShape = mapContains({
   description: string.isRequired,
   state: oneOf(['published', 'unpublished']).isRequired,
   assignmentGroup: AssignmentGroupShape.isRequired,
-  modules: listOf(ModuleShape).isRequired,
+  modules: arrayOf(ModuleShape).isRequired,
   course: CourseShape.isRequired,
   lockInfo: LockInfoShape.isRequired,
-  submissionTypes: listOf(string).isRequired,
-  allowedExtensions: listOf(string).isRequired,
-  assignmentOverrides: mapContains({
-    nodes: listOf(OverrideShape)
+  submissionTypes: arrayOf(string).isRequired,
+  allowedExtensions: arrayOf(string).isRequired,
+  assignmentOverrides: shape({
+    nodes: arrayOf(OverrideShape)
   }).isRequired
 })

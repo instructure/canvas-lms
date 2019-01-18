@@ -59,7 +59,7 @@ export default class Toolbox extends React.Component {
         variant="toggle"
         size="medium"
         inline
-        checked={this.props.assignment.get('state') === 'published'}
+        checked={this.props.assignment.state === 'published'}
         onChange={this.handlePublishChange}
       />
     )
@@ -74,8 +74,8 @@ export default class Toolbox extends React.Component {
   }
 
   renderSpeedGraderLink() {
-    const assignmentLid = this.props.assignment.get('lid')
-    const courseLid = this.props.assignment.getIn(['course', 'lid'])
+    const assignmentLid = this.props.assignment.lid
+    const courseLid = this.props.assignment.course.lid
     const speedgraderLink = `/courses/${courseLid}/gradebook/speed_grader?assignment_id=${assignmentLid}`
     return (
       <Link href={speedgraderLink} icon={<IconSpeedGrader />} iconPlacement="end" target="_blank">
@@ -99,7 +99,7 @@ export default class Toolbox extends React.Component {
   renderPoints() {
     return (
       <Text as="div" size="x-large" lineHeight="fit">
-        {this.props.assignment.get('pointsPossible')}
+        {this.props.assignment.pointsPossible}
       </Text>
     )
   }

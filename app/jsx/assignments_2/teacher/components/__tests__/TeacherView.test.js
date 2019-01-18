@@ -25,8 +25,8 @@ import {queryAssignment, setWorkflow} from '../../api'
 jest.mock('../../api')
 
 async function renderTeacherView(assignment = mockAssignment()) {
-  queryAssignment.mockReturnValueOnce({data: {assignment: assignment.toJS()}})
-  const result = render(<TeacherView assignmentLid={assignment.get('lid')} />)
+  queryAssignment.mockReturnValueOnce({data: {assignment}})
+  const result = render(<TeacherView assignmentLid={assignment.lid} />)
   await wait() // wait a tick for the api promise to resolve
   return result
 }
@@ -40,10 +40,8 @@ it('shows the message students who dialog when the unsubmitted button is clicked
 it('shows the assignment', async () => {
   const assignment = mockAssignment()
   const {getByText} = await renderTeacherView(assignment)
-  expect(await waitForElement(() => getByText(assignment.get('name')))).toBeInTheDocument()
-  expect(
-    await waitForElement(() => getByText(`${assignment.get('pointsPossible')}`))
-  ).toBeInTheDocument()
+  expect(await waitForElement(() => getByText(assignment.name))).toBeInTheDocument()
+  expect(await waitForElement(() => getByText(`${assignment.pointsPossible}`))).toBeInTheDocument()
   expect(await waitForElement(() => getByText('Everyone'))).toBeInTheDocument()
   expect(await waitForElement(() => getByText('Due:', {exact: false}))).toBeInTheDocument()
   expect(await waitForElement(() => getByText('Available', {exact: false}))).toBeInTheDocument()
@@ -54,7 +52,7 @@ it('unpublishes the assignment', async () => {
   const {getByText, container} = await renderTeacherView(assignment)
   const publish = getByText('publish', {exact: false})
   fireEvent.click(findInputForLabel(publish, container))
-  expect(setWorkflow).toHaveBeenCalledWith(assignment.toJS(), 'unpublished')
+  expect(setWorkflow).toHaveBeenCalledWith(assignment, 'unpublished')
 })
 
 it('publishes the assignment', async () => {
@@ -62,7 +60,7 @@ it('publishes the assignment', async () => {
   const {getByText, container} = await renderTeacherView(assignment)
   const publish = getByText('publish', {exact: false})
   fireEvent.click(findInputForLabel(publish, container))
-  expect(setWorkflow).toHaveBeenCalledWith(assignment.toJS(), 'published')
+  expect(setWorkflow).toHaveBeenCalledWith(assignment, 'published')
 })
 
 // tests to implement somewhere

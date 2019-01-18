@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {string} from 'prop-types'
-import {fromJS, Map} from 'immutable'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 
 import {queryAssignment, setWorkflow} from '../api'
@@ -36,7 +35,7 @@ export default class TeacherView extends React.Component {
     super(props)
     this.state = {
       messageStudentsWhoOpen: false,
-      assignment: Map(),
+      assignment: {},
       loading: true,
       errors: []
     }
@@ -53,28 +52,25 @@ export default class TeacherView extends React.Component {
 
   async loadAssignment() {
     const loadingErrors = []
-    let assignment = Map()
+    let assignment = {}
     try {
       const {errors, data} = await queryAssignment(this.props.assignmentLid)
       if (errors) loadingErrors.push(...errors)
-      if (data.assignment) assignment = fromJS(data.assignment)
+      if (data.assignment) assignment = data.assignment
     } catch (error) {
       loadingErrors.push(error.message)
     }
     this.setState({assignment, loading: false, errors: loadingErrors})
   }
 
-  assignmentWorkflowUpdate(nextAssignmentWorkflow, additionalUpdates = {}) {
-    return state => ({
-      assignment: state.assignment.set('state', nextAssignmentWorkflow),
-      ...additionalUpdates
-    })
+  assignmentStateUpdate(state, updates) {
+    return {assignment: {...state.assignment, ...updates}}
   }
 
   async setWorkflowApiCall(newAssignmentState) {
     const errors = []
     try {
-      const {graphqlErrors} = await setWorkflow(this.state.assignment.toJS(), newAssignmentState)
+      const {graphqlErrors} = await setWorkflow(this.state.assignment, newAssignmentState)
       if (graphqlErrors) errors.push(...graphqlErrors)
     } catch (error) {
       errors.push(error)
@@ -82,14 +78,17 @@ export default class TeacherView extends React.Component {
     return errors
   }
 
-  handlePublishChange = async newAssignmentWorkflow => {
-    const oldAssignmentWorkflow = this.state.assignment.get('state')
+  handlePublishChange = async newAssignmentState => {
+    const oldAssignmentState = this.state.assignment.state
 
     // be optimistic
-    this.setState(this.assignmentWorkflowUpdate(newAssignmentWorkflow))
-    const errors = await this.setWorkflowApiCall(newAssignmentWorkflow)
+    this.setState(state => this.assignmentStateUpdate(state, {state: newAssignmentState}))
+    const errors = await this.setWorkflowApiCall(newAssignmentState)
     if (errors.length > 0) {
-      this.setState(this.assignmentWorkflowUpdate(oldAssignmentWorkflow, {errors}))
+      this.setState(state => ({
+        errors,
+        ...this.assignmentStateUpdate(state, {state: oldAssignmentState})
+      }))
     } // else setWorkflow succeeded
   }
 
@@ -117,7 +116,7 @@ export default class TeacherView extends React.Component {
       <TeacherViewContext.Provider value={this.contextValue}>
         <div>
           <ScreenReaderContent>
-            <h1>{assignment.get('name')}</h1>
+            <h1>{assignment.name}</h1>
           </ScreenReaderContent>
           <Header
             assignment={assignment}

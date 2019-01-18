@@ -37,11 +37,11 @@ export default class OverrideSummary extends React.Component {
   }
 
   renderTitle(override) {
-    return <Text weight="bold">{override.get('title')}</Text>
+    return <Text weight="bold">{override.title}</Text>
   }
 
   renderAttemptsAllowed(override) {
-    const allowed = override.get('allowedAttempts')
+    const allowed = override.allowedAttempts
     const attempts = Number.isInteger(allowed) ? allowed : 1
     return <Text>{I18n.t({one: '1 Attempt', other: '%{count} Attempts'}, {count: attempts})}</Text>
   }
@@ -53,7 +53,7 @@ export default class OverrideSummary extends React.Component {
         <Text> | </Text>
         <FriendlyDatetime
           prefix={I18n.t('Due: ')}
-          dateTime={override.get('dueAt')}
+          dateTime={override.dueAt}
           format={I18n.t('#date.formats.full')}
         />
       </Text>
@@ -61,11 +61,10 @@ export default class OverrideSummary extends React.Component {
   }
 
   renderAvailability(override) {
-    // AvailabilityDates is in shared, so we have to exit Immutable-land
     return (
       <Text>
         {I18n.t('Available ')}
-        <AvailabilityDates assignment={override.toJS()} formatStyle="short" />
+        <AvailabilityDates assignment={override} formatStyle="short" />
       </Text>
     )
   }

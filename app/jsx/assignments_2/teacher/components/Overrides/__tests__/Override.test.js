@@ -32,11 +32,11 @@ it('renders an override', () => {
   // to see that's what's happening, I'm at a loss as to what to do
   expect(getByText('Section A')).toBeInTheDocument()
 
-  const due = `Due: ${tz.format(override.get('dueAt'), I18n.t('#date.formats.full'))}`
+  const due = `Due: ${tz.format(override.dueAt, I18n.t('#date.formats.full'))}`
   expect(getByText(due, {exact: false})).toBeInTheDocument()
 
-  const unlock = `${tz.format(override.get('unlockAt'), I18n.t('#date.formats.short'))}`
-  const lock = `to ${tz.format(override.get('lockAt'), I18n.t('#date.formats.full'))}`
+  const unlock = `${tz.format(override.unlockAt, I18n.t('#date.formats.short'))}`
+  const lock = `to ${tz.format(override.lockAt, I18n.t('#date.formats.full'))}`
   expect(getByText(unlock)).toBeInTheDocument()
   expect(getByText(lock)).toBeInTheDocument()
 })
