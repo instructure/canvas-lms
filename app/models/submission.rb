@@ -156,44 +156,21 @@ class Submission < ActiveRecord::Base
   scope :missing, -> do
     joins(:assignment).
     where("
-      -- if excused is false or null, and...
-      excused IS NOT TRUE AND (
-        -- teacher said it's missing, 'nuff said.
-        late_policy_status = 'missing' OR
-        (
-          -- Otherwise, submission does not have a late policy applied and
-          late_policy_status is null and
-          -- submission is past due and
-          COALESCE(submitted_at, CURRENT_TIMESTAMP) >= cached_due_date +
-            CASE submission_type WHEN 'online_quiz' THEN interval '1 minute' ELSE interval '0 minutes' END and
-          -- submission is not submitted and
-          NULLIF(submission_type, '') is null and
-          -- we expect a digital submission
-          COALESCE(NULLIF(assignments.submission_types, ''), 'none') not similar to '%(none|not\_graded|on\_paper|wiki\_page|external\_tool)%'
-        )
-      )
-    ")
-  end
-
-  scope :not_missing, -> do
-    joins(:assignment).
-    where("
       -- excused submissions cannot be missing
-      excused IS TRUE OR (
-        -- teacher hasn't said it's missing and
-        late_policy_status is distinct from 'missing' and
+      excused IS NOT TRUE AND NOT (
+        -- teacher said it's missing, 'nuff said.
+        -- we're doing a double 'NOT' here to avoid 'ORs' that could slow down the query
+        late_policy_status IS DISTINCT FROM 'missing' AND NOT
         (
-          -- late policy status was overridden but the value is not 'missing', or
-          late_policy_status IS NOT NULL OR
-          -- submission is not past due or
-          cached_due_date is null or
-          COALESCE(submitted_at, CURRENT_TIMESTAMP) < cached_due_date +
-            CASE submission_type WHEN 'online_quiz' THEN interval '1 minute' ELSE interval '0 minutes' END or
-          -- submission is submitted or
-          NULLIF(submission_type, '') is not null or
-          -- we expect an offline submission
-          COALESCE(NULLIF(assignments.submission_types, ''), 'none') similar to
-            '%(none|not\_graded|on\_paper|wiki\_page|external\_tool)%'
+          cached_due_date IS NOT NULL
+          -- submission is past due and
+          AND CURRENT_TIMESTAMP >= cached_due_date +
+            CASE assignments.submission_types WHEN 'online_quiz' THEN interval '1 minute' ELSE interval '0 minutes' END
+          -- submission is not submitted and
+          AND submission_type IS NULL
+          -- we expect a digital submission
+          and assignments.submission_types NOT IN ('', 'none', 'not_graded', 'on_paper', 'wiki_page', 'external_tool')
+          AND assignments.submission_types IS NOT NULL
         )
       )
     ")
@@ -253,7 +230,7 @@ class Submission < ActiveRecord::Base
   def self.needs_grading_conditions
     conditions = <<-SQL
       submissions.submission_type IS NOT NULL
-      AND (submissions.excused = 'f' OR submissions.excused IS NULL)
+      AND submissions.excused IS NOT TRUE
       AND (submissions.workflow_state = 'pending_review'
         OR (submissions.workflow_state IN ('submitted', 'graded')
           AND (submissions.score IS NULL OR submissions.grade_matches_current_submission =  'f')

@@ -1190,7 +1190,7 @@ describe Submission do
   end
 
   it "should add http:// to the body for long urls, too" do
-    s = submission_spec_model
+    s = submission_spec_model(submit_homework: true)
     expect(s.url).to eq 'http://www.instructure.com'
 
     long_url = ("a"*300 + ".com")
@@ -1214,7 +1214,7 @@ describe Submission do
   end
 
   it "should have an interesting state machine" do
-    submission_spec_model
+    submission_spec_model(submit_homework: true)
     expect(@submission.state).to eql(:submitted)
     @submission.grade_it
     expect(@submission.state).to eql(:graded)
@@ -1328,7 +1328,7 @@ describe Submission do
   end
 
   it "should log graded submission change when assignment muted" do
-    submission_spec_model
+    submission_spec_model(submit_homework: true)
     @submission.grade_it!
 
     expect(Auditors::GradeChange).to receive(:record)
@@ -1337,7 +1337,7 @@ describe Submission do
 
   it "should log graded submission change when assignment unmuted" do
     @assignment.mute!
-    submission_spec_model
+    submission_spec_model(submit_homework: true)
     @submission.grade_it!
 
     expect(Auditors::GradeChange).to receive(:record)
@@ -1434,7 +1434,7 @@ describe Submission do
         @assignment.workflow_state = "published"
         @assignment.update_attributes(:due_at => Time.now + 1000)
 
-        submission_spec_model(:user => @student)
+        submission_spec_model(user: @student, submit_homework: true)
         expect(@submission.messages_sent.keys).to eq ['Assignment Submitted']
       end
 
@@ -1442,7 +1442,7 @@ describe Submission do
         @assignment.workflow_state = "published"
         @assignment.update_attributes(:due_at => Time.now - 1000)
 
-        submission_spec_model(:user => @student)
+        submission_spec_model(user: @student, submit_homework: true)
         expect(@submission.messages_sent.keys).to eq ['Assignment Submitted Late']
       end
 
@@ -1479,10 +1479,10 @@ describe Submission do
     context "Submission Graded" do
       before :once do
         Notification.create(:name => 'Submission Graded', :category => 'TestImmediately')
+        submission_spec_model(submit_homework: true)
       end
 
       it "should create a message when the assignment has been graded and published" do
-        submission_spec_model
         @cc = @user.communication_channels.create(:path => "somewhere")
         @submission.reload
         expect(@submission.assignment).to eql(@assignment)
@@ -1492,7 +1492,6 @@ describe Submission do
       end
 
       it "should not create a message for a soft-concluded student" do
-        submission_spec_model
         @course.start_at = 2.weeks.ago
         @course.conclude_at = 1.weeks.ago
         @course.restrict_enrollments_to_course_dates = true
@@ -1507,14 +1506,12 @@ describe Submission do
       end
 
       it "notifies observers" do
-        submission_spec_model
         course_with_observer(course: @course, associated_user_id: @user.id, active_all: true, active_cc: true)
         @submission.grade_it!
         expect(@observer.email_channel.messages.length).to eq 1
       end
 
       it "should not create a message when a muted assignment has been graded and published" do
-        submission_spec_model
         @cc = @user.communication_channels.create(:path => "somewhere")
         @assignment.mute!
         @submission.reload
@@ -1525,7 +1522,6 @@ describe Submission do
       end
 
       it "should not create a message when this is a quiz submission" do
-        submission_spec_model
         @cc = @user.communication_channels.create(:path => "somewhere")
         @quiz = Quizzes::Quiz.create!(:context => @course)
         @submission.quiz_submission = @quiz.generate_submission(@user)
@@ -1538,7 +1534,6 @@ describe Submission do
       end
 
       it "should create a hidden stream_item_instance when muted, graded, and published" do
-        submission_spec_model
         @cc = @user.communication_channels.create :path => "somewhere"
         @assignment.mute!
         expect {
@@ -1548,7 +1543,6 @@ describe Submission do
       end
 
       it "should hide any existing stream_item_instances when muted" do
-        submission_spec_model
         @cc = @user.communication_channels.create :path => "somewhere"
         expect {
           @submission = @assignment.grade_student(@user, grade: 10, grader: @teacher)[0]
@@ -1559,7 +1553,6 @@ describe Submission do
       end
 
       it "should show hidden stream_item_instances when unmuted" do
-        submission_spec_model
         @cc = @user.communication_channels.create :path => "somewhere"
         @assignment.mute!
         expect {
@@ -1574,7 +1567,6 @@ describe Submission do
       end
 
       it "should not create hidden stream_item_instances for instructors when muted, graded, and published" do
-        submission_spec_model
         @cc = @teacher.communication_channels.create :path => "somewhere"
         @assignment.mute!
         expect {
@@ -1584,7 +1576,6 @@ describe Submission do
       end
 
       it "should not hide any existing stream_item_instances for instructors when muted" do
-        submission_spec_model
         @cc = @teacher.communication_channels.create :path => "somewhere"
         expect {
           @submission.add_comment(:author => @student, :comment => "some comment")
@@ -2928,7 +2919,7 @@ describe Submission do
 
   describe "late" do
     before :once do
-      submission_spec_model
+      submission_spec_model(submit_homework: true)
     end
 
     it 'should be false if not past due' do
@@ -2969,111 +2960,95 @@ describe Submission do
   end
 
   describe "scope: missing" do
-    before :once do
-      @now = Time.zone.now
-      submission_spec_model(cached_due_date: 1.day.ago(@now), submission_type: nil, submit_homework: true)
-      @submission.assignment.update!(submission_types: "on_paper")
+    context "not submitted" do
+      before :once do
+        @now = Time.zone.now
+        submission_spec_model(cached_due_date: 1.day.ago(@now), submission_type: nil)
+        @submission.assignment.update!(submission_types: "online_upload")
+      end
+
+      it 'includes submission when due date has passed with no submission, late_policy_status is nil, excused is nil' do
+        expect(Submission.missing).to include @submission
+      end
+
+      it 'includes submission when late_policy_status is "missing"' do
+        @submission.update(late_policy_status: 'missing')
+
+        expect(Submission.missing).to include @submission
+      end
+
+      it 'includes submission when late_policy_status is not nil, not missing' do
+        @submission.update(late_policy_status: 'foo')
+
+        expect(Submission.missing).to include @submission
+      end
+
+      it 'excludes submission when past due and excused' do
+        @submission.update(excused: true)
+
+        expect(Submission.missing).to be_empty
+      end
+
+      it 'excludes submission when past due and assignment does not expect a submission' do
+        @submission.assignment.update(submission_types: 'none')
+
+        expect(Submission.missing).to be_empty
+      end
+
+      it 'excludes submission when it is excused and late_policy_status is missing' do
+        @submission.update_attributes(excused: true, late_policy_status: 'missing')
+
+        expect(Submission.missing).to be_empty
+      end
+
+      it 'includes submission when late_policy_status is missing and assignment does not expect a submission' do
+        @submission.update_attributes(late_policy_status: 'missing')
+        @submission.assignment.update(submission_types: 'none')
+
+        expect(Submission.missing).to include @submission
+      end
+
+      it 'excludes submission when due date has not passed' do
+        @submission.update_attributes(cached_due_date: 1.day.from_now(@now))
+
+        expect(Submission.missing).to be_empty
+      end
     end
 
-    it 'excludes submission when late_policy_status is nil' do
-      expect(Submission.missing).to be_empty
-    end
+    context "submitted" do
+      before :once do
+        @now = Time.zone.now
+        submission_spec_model(cached_due_date: 1.day.ago(@now), submission_type: nil, submit_homework: true)
+        @submission.assignment.update!(submission_types: "online_upload")
+      end
 
-    it 'includes submission when late_policy_status is "missing"' do
-      @submission.update(late_policy_status: 'missing')
+      it 'excludes submission when late_policy_status is nil' do
+        expect(Submission.missing).to be_empty
+      end
 
-      expect(Submission.missing).not_to be_empty
-    end
+      it 'includes submission when late_policy_status is "missing"' do
+        @submission.update(late_policy_status: 'missing')
 
-    it 'excludes submission when late_policy_status is not nil, not missing' do
-      @submission.update(late_policy_status: 'foo')
+        expect(Submission.missing).not_to be_empty
+      end
 
-      expect(Submission.missing).to be_empty
-    end
+      it 'excludes submission when late_policy_status is not nil, not missing' do
+        @submission.update(late_policy_status: 'foo')
 
-    it 'excludes submission when not past due' do
-      @submission.update(submitted_at: 2.days.ago(@now))
+        expect(Submission.missing).to be_empty
+      end
 
-      expect(Submission.missing).to be_empty
-    end
+      it 'excludes submission when submitted before the due date' do
+        @submission.update(submitted_at: 2.days.ago(@now))
 
-    it 'excludes submission when past due and submitted' do
-      @submission.update(submitted_at: @now)
+        expect(Submission.missing).to be_empty
+      end
 
-      expect(Submission.missing).to be_empty
-    end
+      it 'excludes submission when submitted after the due date' do
+        @submission.update(submitted_at: @now)
 
-    it 'excludes submission when past due, not submitted, and excused' do
-      @submission.assignment.update(submission_types: 'online_text_entry')
-      @submission.update(excused: true)
-      @submission.update_columns(submission_type: nil, submitted_at: nil)
-
-      expect(Submission.missing).to be_empty
-    end
-
-    it 'excludes submission when past due, not submitted, assignment does not expect a submission, not excused, and no score' do
-      @submission.assignment.update(submission_types: 'none')
-      @submission.update_columns(submission_type: nil)
-
-      expect(Submission.missing).to be_empty
-    end
-
-    it 'excludes submission when assignment does not expect a submission and late_policy_status is not "missing"' do
-      @submission.update(score: 1)
-      @submission.update_columns(submission_type: nil)
-
-      expect(Submission.missing).to be_empty
-    end
-  end
-
-  describe "scope: not_missing" do
-    before :once do
-      @now = Time.zone.now
-      submission_spec_model(cached_due_date: 1.day.ago(@now), submission_type: nil, submit_homework: true)
-      @submission.assignment.update!(submission_types: "on_paper")
-    end
-
-    it 'includes submission when late_policy_status is nil' do
-      expect(Submission.not_missing).not_to be_empty
-    end
-
-    it 'excludes submission when late_policy_status is "missing"' do
-      @submission.update(late_policy_status: 'missing')
-
-      expect(Submission.not_missing).to be_empty
-    end
-
-    it 'includes submission when late_policy_status is not nil, not missing' do
-      @submission.update(late_policy_status: 'foo')
-
-      expect(Submission.not_missing).not_to be_empty
-    end
-
-    it 'includes submission when not past due' do
-      @submission.update(submitted_at: 2.days.ago(@now))
-
-      expect(Submission.not_missing).not_to be_empty
-    end
-
-    it 'includes submission when past due and submitted' do
-      @submission.update(submitted_at: @now)
-
-      expect(Submission.not_missing).not_to be_empty
-    end
-
-    it 'includes submission when past due, not submitted, assignment does not expect a submission, is excused' do
-      @submission.assignment.update(submission_types: 'none')
-      @submission.update(excused: true)
-      @submission.update_columns(submission_type: nil)
-
-      expect(Submission.not_missing).not_to be_empty
-    end
-
-    it 'includes submission when past due, not submitted, assignment does not expect a submission, not excused, and no score' do
-      @submission.assignment.update(submission_types: 'none')
-      @submission.update_columns(submission_type: nil)
-
-      expect(Submission.not_missing).not_to be_empty
+        expect(Submission.missing).to be_empty
+      end
     end
   end
 
@@ -5901,10 +5876,10 @@ describe Submission do
   end
 
   def submission_spec_model(opts={})
-    opts = @valid_attributes.merge(opts)
+    submit_homework = opts.delete(:submit_homework)
+    opts = submit_homework ? @valid_attributes.merge(opts) : @valid_attributes.except(:workflow_state, :url).merge(opts)
     assignment = opts.delete(:assignment) || Assignment.find(opts.delete(:assignment_id))
     user = opts.delete(:user) || User.find(opts.delete(:user_id))
-    submit_homework = opts.delete(:submit_homework)
 
     @submission = if submit_homework
                     assignment.submit_homework(user)
