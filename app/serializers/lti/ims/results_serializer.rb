@@ -26,7 +26,7 @@ module Lti::Ims
       {
         id: "#{li_url}/results/#{result.id}",
         scoreOf: li_url,
-        userId: result.user_id.to_s,
+        userId: result.user.lti_id,
         resultScore: result.result_score,
         resultMaximum: result.result_maximum,
         comment:result.comment

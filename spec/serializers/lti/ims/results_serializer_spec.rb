@@ -26,7 +26,7 @@ describe Lti::Ims::ResultsSerializer do
     {
       id: "#{url}/results/#{result.id}",
       scoreOf: url,
-      userId: result.user_id.to_s,
+      userId: result.user.lti_id,
       resultScore: result.result_score,
       resultMaximum: result.result_maximum
     }.compact
