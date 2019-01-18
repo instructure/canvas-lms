@@ -73,8 +73,9 @@ module Canvas::Security
       return if errors?
       iat_time = Time.zone.at(@jwt.iat)
       max_iat_age = Setting.get("oauth2_jwt_iat_ago_in_seconds", 5.minutes.to_s).to_i.seconds
+      iat_future_buffer = Setting.get("oauth2_jwt_iat_future_buffer", 30.seconds.to_s).to_i.seconds
       errors.add(:base, "the 'iat' must be less than #{max_iat_age} seconds old") if iat_time < max_iat_age.ago
-      errors.add(:base, "the 'iat' must not be in the future") if iat_time > Time.zone.now
+      errors.add(:base, "the 'iat' must not be in the future") if iat_time > Time.zone.now + iat_future_buffer
     end
 
     def jti

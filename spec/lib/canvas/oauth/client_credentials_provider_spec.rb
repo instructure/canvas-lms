@@ -53,6 +53,17 @@ module Canvas::Oauth
           expect(subject).to have_key key
         end
       end
+
+      context 'with iat in the future by a small amount' do
+        let(:future_iat_time) { 5.seconds.from_now }
+        let(:iat) { future_iat_time.to_i }
+
+        it 'returns an access token' do
+          Timecop.freeze(future_iat_time - 5.seconds) do
+            expect(subject).to be_a Hash
+          end
+        end
+      end
     end
 
     describe '#error_message' do

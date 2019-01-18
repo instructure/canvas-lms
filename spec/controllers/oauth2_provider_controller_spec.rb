@@ -580,6 +580,17 @@ describe Oauth2ProviderController do
           it { is_expected.to have_http_status 400 }
         end
 
+        context 'with iat in the future by a small amount' do
+          let(:future_iat_time) { 5.seconds.from_now }
+          let(:iat) { future_iat_time.to_i }
+
+          it 'returns an access token' do
+            Timecop.freeze(future_iat_time - 5.seconds) do
+              expect(subject).to have_http_status 200
+            end
+          end
+        end
+
         context 'with bad iat' do
           let(:iat) { 1.minute.from_now.to_i }
 
