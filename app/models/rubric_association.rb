@@ -48,6 +48,7 @@ class RubricAssociation < ActiveRecord::Base
   after_save :update_alignments
 
   before_create :touch_association
+  before_update :touch_association, :if => :will_save_change_to_rubric_id? # apparently we change the rubric sometimes
   before_destroy :touch_association
   serialize :summary_data
 
