@@ -1784,6 +1784,13 @@ nn:
   allows_user_to_access_the_student_progress_page_aca95197: "Gir ein brukar løyve til å sjå sida for studentprogresjon."
   allows_user_to_access_the_theme_editor_26691f9a: "Gir ein brukar tilgang til temaeditoren."
   allows_user_to_access_the_users_link_in_account_na_d77e46de: "Gir ein brukar løyve til å gå inn på menyvalet Personar i kontonavigeringsmenyen. "
+  allows_user_to_access_the_view_notifications_tab_i_71995596: "Gir ein brukar løyve til å gå inn på fana Sjå varsel i Adminverktøy."
+  allows_user_to_act_as_other_users_in_the_account_195628ae: "Gir ein brukar løyve til å opptre på vegner av andre brukarar innafor kontoen."
+  allows_user_to_add_and_remove_other_account_admins_7834ea9a: "Gir ein brukar løyve til å legge til eller fjerne andre kontoadministratorar."
+  allows_user_to_add_discussions_in_the_discussions__1b3d9a53: "Gir ein brukar løyve til å legge til diskusjonar frå diskusjonssida."
+  allows_user_to_add_discussions_in_the_discussions__f5479e2c: |-
+      Gir ein brukar løyve til å legge til diskusjonar frå diskusjonssida.
+      Gir ein brukar løyve til å slå av moglegheit for kommentarar, flytte, feste/fjerne, endre og slette diskusjonsemne som er oppretta av andre brukarar.
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Gjer at brukarar med internasjonale telefonnummer kan ta imot tekstmeldingar frå Canvas."
   always_3a59e701: Alltid
   always_load_the_rce_and_sidebar_from_a_canvas_rich_1495e3fd: "Last alltid RCE og sidestolpe fra Canvas sin rikt innhald-teneste"
