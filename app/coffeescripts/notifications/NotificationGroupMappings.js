@@ -53,8 +53,8 @@ export default class NotificationGroupMappings {
       ],
       Parent: [],
       Groups: ['membership_update'],
-      Alerts: ['other'],
       Conferences: ['recording_ready'],
+      Alerts: ['other', 'content_link_error'],
     }
   }
 

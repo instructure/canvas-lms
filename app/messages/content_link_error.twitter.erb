@@ -1,0 +1,19 @@
+<% define_content :link do %>
+  <%= course_link_validator_url(asset.context) %>
+<% end %>
+
+<% bad_link = "\"#{data.anchor}\" (#{data.url})" %>
+<% asset_link = data.location %>
+<% if data.error_type == :unpublished_item %>
+  <% display_text = I18n.t("Canvas Alert - Students are attempting to access unpublished content, %{bad_link}, in %{asset_link}.", bad_link: bad_link, asset_link: asset_link) %>
+<% elsif data.error_type == :deleted %>
+  <% display_text = I18n.t("Canvas Alert - Students are clicking on %{bad_link} to content that has been removed in %{asset_link}.", bad_link: bad_link, asset_link: asset_link) %>
+<% elsif data.error_type == :course_mismatch %>
+  <% display_text = I18n.t("Canvas Alert - In %{asset_link}, students are clicking %{bad_link} to content in a different course.", bad_link: bad_link, asset_link: asset_link) %>
+<% else %>
+  <% display_text = I18n.t("Canvas Alert - In %{asset_link}, students are clicking %{bad_link} to a non-existent page in your course.", bad_link: bad_link, asset_link: asset_link) %>
+<% end %>
+
+<%= display_text %>
+
+<%= I18n.t("To check for other broken links, visit the Course Link Validator") %>

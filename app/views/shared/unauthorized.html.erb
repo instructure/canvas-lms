@@ -44,7 +44,10 @@
         <% if @context.try_rescue(:is_public) %>
           <%= mt 'public_course', 'This page is part of the content for the course, **%{course}**.', :course => @context.name %>
         <% end %>
-      <%= t("You don't have access to view this resource.") %>
+        <%= t("You don't have access to view this resource.") %>
       </p>
+      <% if send_broken_content! %>
+        <p><%= I18n.t("We've let your instructor know to review this link as soon as possible.") %></p>
+      <% end %>
     <% end %>
 </div>

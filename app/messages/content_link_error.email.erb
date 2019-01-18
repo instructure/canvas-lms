@@ -1,0 +1,29 @@
+<% if asset.is_a? Quizzes::Quiz %>
+  <% define_content :link do %>
+    <%= course_quiz_url(asset.context, asset) %>
+  <% end %>
+<% else %>
+  <% define_content :link do %>
+    <%= polymorphic_url([asset.context, asset]) %>
+  <% end %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= I18n.t("Content Link Error - %{assignment_name}, %{course_name}", assignment_name: asset.title, course_name: asset.context.name) %>
+<% end %>
+
+<% bad_link = "\"#{data.anchor}\" (#{data.url})" %>
+<% asset_link = data.location %>
+<% if data.error_type == :unpublished_item %>
+  <% display_text = I18n.t("Students are attempting to access unpublished content, %{bad_link}, in %{asset_link}.", bad_link: bad_link, asset_link: asset_link) %>
+<% elsif data.error_type == :deleted %>
+  <% display_text = I18n.t("Students are clicking on %{bad_link} to content that has been removed in %{asset_link}.", bad_link: bad_link, asset_link: asset_link) %>
+<% elsif data.error_type == :course_mismatch %>
+  <% display_text = I18n.t("In %{asset_link}, students are clicking %{bad_link} to content in a different course.", bad_link: bad_link, asset_link: asset_link) %>
+<% else %>
+  <% display_text = I18n.t("In %{asset_link}, students are clicking %{bad_link} to a non-existent page in your course.", bad_link: bad_link, asset_link: asset_link) %>
+<% end %>
+<%= display_text %>
+
+<% validator_link = "#{course_link_validator_url(asset.context)}" %>
+<%= I18n.t("To check for other broken links, visit %{validator_link}", validator_link: validator_link) %>

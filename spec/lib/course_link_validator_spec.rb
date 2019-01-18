@@ -352,4 +352,41 @@ describe CourseLinkValidator do
     issues = CourseLinkValidator.current_progress(@course).results[:issues]
     expect(issues).to be_empty
   end
+
+  context '#check_object_status' do
+    before :once do
+      course_model
+      @course_link_validator = CourseLinkValidator.new(@course)
+      assignment_model(course: @course)
+    end
+
+    it "should return :missing_item if the link doesn't point to course content" do
+      expect(@course_link_validator.check_object_status("/test_error")).to eq :missing_item
+    end
+
+    it 'should return :unpublished_item for unpublished content' do
+      @assignment.unpublish!
+      expect(@course_link_validator.check_object_status("/courses/#{@course.id}/assignments/#{@assignment.id}")).to eq :unpublished_item
+
+      quiz_model(course: @course).update_attributes(workflow_state: 'created')
+      expect(@course_link_validator.check_object_status("/courses/#{@course.id}/quizzes/#{@quiz.id}")).to eq :unpublished_item
+
+      quiz_model(course: @course).unpublish!
+      expect(@course_link_validator.check_object_status("/courses/#{@course.id}/quizzes/#{@quiz.id}")).to eq :unpublished_item
+
+      attachment_model(context: @course).update_attributes(locked: true)
+      expect(@course_link_validator.check_object_status("/courses/#{@course.id}/files/#{@attachment.id}/download")).to eq :unpublished_item
+    end
+
+    it 'should return :deleted for deleted content' do
+      @assignment.destroy
+      expect(@course_link_validator.check_object_status("/courses/#{@course.id}/assignments/#{@assignment.id}")).to eq :deleted
+
+      quiz_model(course: @course).destroy
+      expect(@course_link_validator.check_object_status("/courses/#{@course.id}/quizzes/#{@quiz.id}")).to eq :deleted
+
+      attachment_model(context: @course).destroy
+      expect(@course_link_validator.check_object_status("/courses/#{@course.id}/files/#{@attachment.id}/download")).to eq :deleted
+    end
+  end
 end

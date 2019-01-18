@@ -206,21 +206,6 @@ class CourseLinkValidator
     yield links if links.any?
   end
 
-  ITEM_CLASSES = {
-    'assignments' => Assignment,
-    'announcements' => Announcement,
-    'calendar_events' => CalendarEvent,
-    'discussion_topics' => DiscussionTopic,
-    'collaborations' => Collaboration,
-    'files' => Attachment,
-    'quizzes' => Quizzes::Quiz,
-    'groups' => Group,
-    'wiki' => WikiPage,
-    'pages' => WikiPage,
-    'modules' => ContextModule,
-    'items' => ContentTag
-  }
-
   # yields a hash containing the url and an error type if the url is invalid
   def find_invalid_link(url)
     return if url.start_with?('mailto:')
@@ -264,45 +249,29 @@ class CourseLinkValidator
   end
 
   # makes sure that links to course objects exist and are in a visible state
-  def check_object_status(url)
-    result = nil
-    case url
-    when /\/courses\/\d+\/file_contents\/(.*)/
-      rel_path = CGI.unescape($1)
-      unless (att = Folder.find_attachment_in_context_with_path(self.course, rel_path)) && !att.deleted?
-        result = :missing_item
-      end
-    when /\/courses\/\d+\/(pages|wiki)\/([^\s"<'\?\/#]*)/
-      if obj = self.course.wiki.find_page(CGI.unescape($2))
-        if obj.workflow_state == 'unpublished'
-          result = :unpublished_item
-        end
-      else
-        result = :missing_item
-      end
-    when /\/courses\/\d+\/(.*)\/(\d+)/
-      obj_type =  $1
-      obj_id = $2
-
-      if obj_class = ITEM_CLASSES[obj_type]
-        if (obj_class == Attachment) && (obj = self.course.attachments.find_by_id(obj_id)) # attachments.find_by_id uses the replacement hackery
-          if obj.file_state == 'deleted'
-            result = :missing_item
-          elsif obj.locked?
-            result = :unpublished_item
-          end
-        elsif (obj = obj_class.where(:id => obj_id).first)
-          if obj.workflow_state == 'deleted'
-            result = :missing_item
-          elsif obj.workflow_state == 'unpublished'
-            result = :unpublished_item
-          end
-        else
-          result = :missing_item
-        end
-      end
+  def check_object_status(url, object: nil)
+    return :missing_item unless valid_route?(url)
+    return :missing_item if url =~ /\/test_error/
+    object ||= Context.find_asset_by_url(url)
+    unless object
+      return :missing_item unless [nil, 'syllabus'].include?(url.match(/\/courses\/\d+\/\w+\/(.+)/)&.[](1))
+      return nil
     end
-    result
+    if object.deleted?
+      return :deleted
+    end
+
+    case object
+    when Attachment
+      return :unpublished_item if object.locked?
+    when Quizzes::Quiz
+      return :unpublished_item if object.workflow_state == 'created' || object.workflow_state == 'unpublished'
+    else
+      return :unpublished_item if object.workflow_state == 'unpublished'
+    end
+    nil
+  rescue => e
+    :missing_item
   end
 
   # ping the url and make sure we get a 200
