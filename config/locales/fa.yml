@@ -8524,7 +8524,7 @@ fa:
   gradezilla: 
     alerts: 
       scores_updated: 
-        one: "%{count} نمره دانشجو به روز شد."
+        one: "%{count} نمره دانشجو به روز شد"
         other: "%{count} نمره دانشجو به روز شد"
     course_average: "میانگین درس"
     course_median: "میانه درس"
