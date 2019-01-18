@@ -155,6 +155,8 @@ module SeleniumDriverSetup
 
       focus_viewport if run_headless?
 
+      resize_screen_to_normal
+
       set_timeouts(TIMEOUTS)
 
       puts "Browser: #{browser_name} - #{browser_version}"
