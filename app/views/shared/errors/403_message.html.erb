@@ -22,16 +22,16 @@
       instance_variable_set(name, nil)
     end
   end
+  (@body_classes ||= []) << 'full-width'
 %>
-<% content_for :page_title, t('title', 'Page Error') %>
+<% content_for :page_title, t("Access Denied") %>
 
-<div style="width: 410px; margin-left: auto; margin-right: auto; margin-top: 50px;">
-  <h2><%= t('headings.page', %{Page Error}) %></h2>
-  <p><%= t('description', %{Huh.  It doesn't look like you're supposed to be here.}) %></p>
+<div class="ic-Error-page">
+  <img class="ic-Error-img" role="presentation" alt="" aria-hidden="true" src="/images/401_permissions.svg">
+  <h2><%= t("Access Denied") %></h2>
+  <p><%= t("You don't have permission to access this resource.") %></p>
   <% if (defined? message) && message %>
     <p><%= t('error', 'Error:') %> <%= message %></p>
   <% end %>
-  <a href="#" style="font-size: 1.2em;" class="icon-discussion submit_error_link discussion-topic"><%= t('#links.errors.4xx_feedback', %{Click here to tell us what you were looking for.}) %></a>
-  <%= render :partial => "shared/errors/error_form.html", :locals => {:status => response.status, :error_category => '403'} %>
 </div>
 

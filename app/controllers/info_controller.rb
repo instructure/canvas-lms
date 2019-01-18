@@ -81,6 +81,22 @@ class InfoController < ApplicationController
   end
 
   def test_error
+    @context = Course.find(params[:course_id]) if params[:course_id].present?
+
+    if params[:status].present?
+      case params[:status].to_i
+      when 401
+        @unauthorized_reason = :unpublished if params[:reason] == 'unpublished'
+        @needs_cookies = true if params[:reason] == 'needs_cookies'
+        return render_unauthorized_action
+      when 422
+        raise ActionController::InvalidAuthenticityToken.new('test_error')
+      else
+        @not_found_message = '(test_error message details)' if params[:message].present?
+        raise RequestError.new('test_error', params[:status].to_i)
+      end
+    end
+
     render status: 404, template: "shared/errors/404_message"
   end
 end

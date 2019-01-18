@@ -391,7 +391,7 @@ module GroupsCommon
     # User.create! creates a course user, who won't be able to access the page
     user_session(User.create!(name: 'course student'))
     get path
-    expect(f('.ui-state-error')).to be_displayed
+    expect(f('#unauthorized_message')).to be_displayed
   end
 
   def edit_group_announcement

@@ -21,22 +21,22 @@
 <% end %>
 <% @show_left_side = false %>
 <% @show_embedded_chat = false %>
-<div id="unauthorized_holder">
-  <% css_bundle("unauthorized_message") %>
-  <div id="unauthorized_message">
-    <h2 class="ui-state-error">
-      <% if @needs_cookies -%>
-        <%= t('headings.needs_cookies', %{Cookies Required}) %>
-      <% elsif @unauthorized_reason == :unpublished %>
-        <%= t('headings.unpublished', %{Not Yet Available}) %>
-      <% else -%>
-        <%= t('headings.unauthorized_action', %{Unauthorized}) %>
-      <% end -%>
-    </h2>
+<% (@body_classes ||= []) << 'full-width' %>
+<div id="unauthorized_message" class="ic-Error-page">
+    <% if @needs_cookies %>
+      <img class="ic-Error-img" role="presentation" alt="" aria-hidden="true" src="/images/500_pageerror.svg">
+      <h2><%= t('headings.needs_cookies', %{Cookies Required}) %></h2>
+    <% elsif @unauthorized_reason == :unpublished %>
+      <img class="ic-Error-img" role="presentation" alt="" aria-hidden="true" src="/images/401_unpublished.svg">
+      <h2><%= t('headings.unpublished', %{Not Yet Available}) %></h2>
+    <% else %>
+      <img class="ic-Error-img" role="presentation" alt="" aria-hidden="true" src="/images/401_permissions.svg">
+      <h2><%= t("Access Denied") %></h2>
+    <% end %>
     <% if @unauthorized_message %>
       <p><%= @unauthorized_message %></p>
     <% elsif @needs_cookies %>
-      <p><%= t('needs_cookies', %{Cookies are not enabled on your browser. Please adjust this in your security preferences before continuing.}) %></p>
+      <p><%= t('Please adjust your security preferences before continuing.') %></p>
     <% elsif @files_domain %>
       <p><%= t('needs_login', %{Access to this page is limited to authorized users.  You do not currently have permission to view this page.}) %></p>
     <% elsif @context %>
@@ -44,11 +44,7 @@
         <% if @context.try_rescue(:is_public) %>
           <%= mt 'public_course', 'This page is part of the content for the course, **%{course}**.', :course => @context.name %>
         <% end %>
-      <%= t('unauthorized_1', %{It appears that you don't have permission to access this page.  Please make sure you're authorized to view this content.}) %>
-      <% if Setting.get("show_feedback_link", "false") == "true" %>
-        <%= t('unauthorized_2', %{If you think you should be able to view this page, please use the "Help" link to notify support of the problem.}) %>
-      <% end %>
+      <%= t("You don't have access to view this resource.") %>
       </p>
     <% end %>
-  </div>
 </div>

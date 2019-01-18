@@ -123,7 +123,7 @@ describe "assignments" do
       new_course.enroll_user(@user, 'StudentEnrollment')
       get "/courses/#{new_course.id}/assignments/#{assignment.id}"
 
-      expect(f('.ui-state-error')).to be_displayed
+      expect(f('#unauthorized_message')).to be_displayed
       expect(f("#content")).not_to contain_css('#assignment_show')
     end
 
