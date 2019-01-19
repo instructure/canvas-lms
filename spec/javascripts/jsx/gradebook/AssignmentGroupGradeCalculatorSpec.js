@@ -922,3 +922,47 @@ test('does not drop any high score submissions when all assignments are listed a
   notOk(grades.final.submissions[2].drop)
   notOk(grades.final.submissions[3].drop)
 })
+
+QUnit.module('AssignmentGroupGradeCalculator', () => {
+  QUnit.module('.calculate', hooks => {
+    hooks.beforeEach(() => {
+      submissions = [
+        {id: 101, assignment_id: 201, score: 100},
+        {id: 102, assignment_id: 202, score: null}
+      ]
+      assignments = [
+        {id: 201, points_possible: 100, workflow_state: 'published'},
+        {id: 202, points_possible: 100, workflow_state: 'unpublished'}
+      ]
+      assignmentGroup = {id: 301, rules: {}, assignments}
+    })
+
+    test('does not include unpublished assignments in points possible for final score', () => {
+      const {
+        final: {possible: finalPossible}
+      } = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
+      strictEqual(finalPossible, 100)
+    })
+
+    test('does not include unpublished assignments in points possible for current score', () => {
+      const {
+        current: {possible: currentPossible}
+      } = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
+      strictEqual(currentPossible, 100)
+    })
+
+    test('does not include unpublished assignment in submission_count for final score', () => {
+      const {
+        final: {submission_count: finalSubmissionCount}
+      } = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
+      strictEqual(finalSubmissionCount, 1)
+    })
+
+    test('does not include unpublished assignment in submission_count for current score', () => {
+      const {
+        current: {submission_count: currentSubmissionCount}
+      } = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
+      strictEqual(currentSubmissionCount, 1)
+    })
+  })
+})

@@ -205,13 +205,12 @@ function calculateGroupGrade(group, allSubmissions, includeUngraded) {
     .filter('hidden')
     .indexBy('assignment_id')
     .value()
-  const gradeableAssignments = _.reject(
-    group.assignments,
-    assignment =>
-      assignment.omit_from_final_grade ||
-      hiddenAssignmentsById[assignment.id] ||
-      _.isEqual(assignment.submission_types, ['not_graded'])
-  )
+  const ungradeableCriteria = assignment =>
+    assignment.omit_from_final_grade ||
+    hiddenAssignmentsById[assignment.id] ||
+    _.isEqual(assignment.submission_types, ['not_graded']) ||
+    assignment.workflow_state === 'unpublished'
+  const gradeableAssignments = _.reject(group.assignments, ungradeableCriteria)
   const assignments = _.indexBy(gradeableAssignments, 'id')
 
   // Remove submissions from other assignment groups.
