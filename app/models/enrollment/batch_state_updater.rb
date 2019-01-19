@@ -56,9 +56,9 @@ class Enrollment::BatchStateUpdater
       # touch users after removing group_memberships to invalidate the cache.
       cancel_future_appointments(@courses, @user_ids)
       disassociate_cross_shard_users(@user_ids)
-      update_linked_enrollments(@students)
-      update_assignment_overrides(batch, @courses, @user_ids)
     end
+    update_linked_enrollments(@students)
+    update_assignment_overrides(batch, @courses, @user_ids)
     touch_and_update_associations(@user_ids)
     clear_email_caches(@invited_user_ids) unless @invited_user_ids.empty?
     needs_grading_count_updated(@courses)
@@ -76,7 +76,7 @@ class Enrollment::BatchStateUpdater
     updates[sis_batch_id: sis_batch.id] if sis_batch
     Enrollment.where(id: batch).update_all(updates)
     EnrollmentState.where(enrollment_id: batch).update_all(state: 'deleted', state_valid_until: nil)
-    Score.where(enrollment_id: batch).update_all(workflow_state: 'deleted', updated_at: Time.zone.now)
+    Score.where(enrollment_id: batch).order(:id).update_all(workflow_state: 'deleted', updated_at: Time.zone.now)
     data
   end
 

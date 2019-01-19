@@ -649,7 +649,7 @@ describe "assignment rubrics" do
       expect(f(".ui-dialog div.long_description").text).to eq "This is awesome."
     end
 
-    it "should show criterion comments", priority: "2", test_id: 220333 do
+    it "should show criterion comments and only render when necessary", priority: "2", test_id: 220333 do
       # given
       comment = 'a comment'
       teacher_in_course(course: @course)
@@ -671,9 +671,9 @@ describe "assignment rubrics" do
       get "/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{@student.id}"
       f('.assess_submission_link').click
       # expect
-      comments = ff('.description-header')
-      expect(comments.first).to include_text('Instructor Comments').and include_text(comment)
-      expect(comments.second).not_to include_text('Instructor Comments')
+      comments = ff('.rubric-freeform')
+      expect(comments.length).to eq 1
+      expect(comments.first).to include_text(comment)
     end
 
     it "shouldn't show 'update description' button in long description dialog", priority: "2", test_id: 220334 do

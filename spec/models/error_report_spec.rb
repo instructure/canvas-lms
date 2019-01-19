@@ -41,6 +41,11 @@ describe ErrorReport do
       expect(report.category).to eq(e.class.name)
     end
 
+    it "should ignore category 404" do
+      count = ErrorReport.count
+      ErrorReport.log_error('404', {})
+      expect(ErrorReport.count).to eq(count)
+    end
 
     it "ignores error classes that it's configured to overlook" do
       class ErrorReportSpecException < StandardError; end

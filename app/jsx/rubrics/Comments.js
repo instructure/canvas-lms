@@ -113,12 +113,23 @@ FreeFormComments.defaultProps = {
   saveLater: false
 }
 
-const commentElement = (assessment) => (
-  assessment.comments_html ?
-    // eslint-disable-next-line react/no-danger
-    <div dangerouslySetInnerHTML={{ __html: assessment.comments_html }} />
-    : assessment.comments
-)
+const commentElement = (assessment) => {
+  if (assessment.comments_html || assessment.comments) {
+    return (
+      <div>
+        <Text size="small" weight="bold">{I18n.t("Comments")}</Text>
+        { assessment.comments_html ?
+          // eslint-disable-next-line react/no-danger
+          <div dangerouslySetInnerHTML={{ __html: assessment.comments_html }} />
+          : assessment.comments }
+      </div>
+    )
+  }
+  else {
+    return null
+  }
+}
+
 
 export const CommentText = ({ assessment, placeholder, weight }) => (
   <span className="react-rubric-break-words">
