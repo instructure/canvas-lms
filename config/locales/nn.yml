@@ -1791,6 +1791,51 @@ nn:
   allows_user_to_add_discussions_in_the_discussions__f5479e2c: |-
       Gir ein brukar løyve til å legge til diskusjonar frå diskusjonssida.
       Gir ein brukar løyve til å slå av moglegheit for kommentarar, flytte, feste/fjerne, endre og slette diskusjonsemne som er oppretta av andre brukarar.
+  allows_user_to_add_edit_and_delete_course_files_an_2cbdc89a: |-
+      Gir ein brukar løyve til å legge til, endre og slette emnefiler og -mapper.
+      Gir ein brukar løyve til å laste ned og pakke ein ZIP-fil, importere ein ZIP-fil og låse/låse opp filer.
+  allows_user_to_add_edit_and_delete_course_sections_91e4c96f: |-
+      Gir ein brukar løyve til å legge til, endre og slette emneseksjonar.
+      Gir ein brukar løyve til å kryssliste seksjonar.
+  allows_user_to_add_edit_and_delete_events_in_the_c_14413268: "Gir ein brukar løyve til å legge til, endre og slette hendingar i emnekalenderen."
+  allows_user_to_add_edit_and_delete_global_announce_8463e383: "Gir ein brukar løyve til å legge til, endre og slette globale kunngjeringar."
+  allows_user_to_add_edit_and_update_grades_in_the_g_29a4068e: |-
+      Gir ein brukar løyve til å legge til, endre og oppdatere karakterer i karakterboka.
+      Gir ein brukar løyve til å sjå karakterbokhistorikk.
+      Gir ein brukar løyve til å sjå karakterbok for meistringsbasert læring (dersom funksjonsvalet for den er slått på).
+  allows_user_to_add_edit_delete_and_publish_unpubli_bc6374cf: "Gir ein brukar løyve til å legge til, endre, slette og publisere/avpublisere quizzar."
+  allows_user_to_add_edit_delete_and_publish_unpubli_f1906287: |-
+      Gir ein brukar løyve til å legge til, endre, slette og publisere/avpublisere oppgåver.
+      Gir ein brukar løyve til å administrere oppgåveinnstillingar.
+      Gir ein brukar løyve til å legge til oppgåvegrupper i eit emne.
+      Gir ein brukar løyve til å slå på og endre vektinga for oppgåvegrupper i eit emne.
+  allows_user_to_add_new_assignments_to_a_module_51ae198c: "Gir ein brukar løyve til å legge til nye oppgåver i ein modul."
+  allows_user_to_add_remove_other_teachers_course_de_702821d4: |-
+      Gir ein brukar løyve til å legge til/fjerne faglærarar, kursdesignarar eller undervisingsassistentar.
+      Gir ein brukar løyve til å legge til/fjerne observatørar på emnet.
+      Gir ein brukar løyve til å sjå login-ID for faglærarar, kursdesignarar og undervisingsassistentar.
+      Gir ein brukar løyve til å sjå innstillingar for faglærarar, kursdesignarar og undervisingsassistentar.
+      Gir ein brukar løyve til å sjå brukardetaljar for faglærarar, kursdesignarar og undervisingsassistentar.
+      Gir ein brukar løyve til å avgrense studenter til kun å sjå medstudentar i eigen seksjon.
+  allows_user_to_add_remove_other_teachers_course_de_b29d680: |-
+      Gir ein brukar løyve til å legge til/fjerne faglærarar, kursdesignarar og undervisingsassistentar.
+      Gir ein brukar løyve til å legge til/fjerne observatørar.
+      Gir ein brukar løyve til å sjå login-ID for faglærarar, kursdesignarar og undervisingsassistentar.
+      Gir ein brukar løyve til å sjå brukardetaljar for alle brukarar.
+      Gir ein brukar løyve til å endre seksjonen eller rolla til ein brukar.
+  allows_user_to_add_remove_students_allows_user_to__44718712: "Gir ein brukar løyve til å legge til/fjerne studentar. Gir ein brukar løyve til å legge til/fjerne observatørar. Gir ein brukar løyve til å sjå login-ID til studentane. Gir ein brukar løyve til sjå tidlegare påmeldingar. Gir ein brukar løyve til å sjå brukarinnstillingar og -detaljar til andre brukarar. Gir ein brukar løyve til å endre seksjonen eller rolla til ein student. Gir ein brukar løyve til å sende ut emneinvitasjonar på nytt frå personsida til emnet. "
+  allows_user_to_add_remove_students_to_the_course_a_f5b48d9: |-
+      Gir ein brukar løyve til å legge til/fjerne studentar på eit emne.
+      Gir ein brukar løyve til å legge til/fjerne observatørar på eit emne.
+      Gir ein brukar løyve til å slå login-ID til studentar.
+      Gir ein brukar løyve til å sjå tidlegare påmeldingar.
+      Gir ein person løyve til å sjå brukarinnstillingar og -detaljar for andre brukarar.
+      Gir ein brukar løyve til å merke ein påmelding som fullført eller sletta frå studentanes brukardetaljar.
+      Gir ein brukar løyve til å sende emneinvitasjonar på nytt.
+  allows_user_to_add_students_to_a_course_from_the_a_3b752dd2: "Gir ein brukar løyve til å legge studentar til emne frå emneoversikta på kontonivå."
+  allows_user_to_add_teachers_course_designers_or_ta_a7fdaceb: "Gir ein brukar løyve til å legge faglærarar, kursdesignarar eller undervisingsassistentar til eit emne frå emneoversikta på kontonivå."
+  allows_user_to_configure_alerts_in_course_settings_40a81b1d: "Gi ein brukar løyve til å konfigurere varsel i emneinnstillingar. Varsel er ein sjeldan brukt funksjon som er laga for å sende eit varsel til studentar, faglærarar eller administratorar på grunnlag av spesifikke triggarar (t.d. ingen student/faglærar-interaksjon på ei veke). Dei sjekkast kvar dag, og varsel sendast til studenten og/eller faglæraren fram til det ikkje lenger er grunnlag for varsel."
+  allows_user_to_configure_alerts_in_course_settings_806397b5: "Gi ein brukar løyve til å konfigurere varsel i emneinnstillingar. Varsel er ein sjeldan brukt funksjon som er laga for å sende eit varsel til studentar, faglærarar eller administratorar på grunnlag av spesifikke triggarar (t.d. ingen student/faglærar-interaksjon på ei veke). Dei sjekkast kvar dag, og varsel sendast til studenten og/eller faglæraren inntil det ikkje lenger er grunnlag for varsel."
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Gjer at brukarar med internasjonale telefonnummer kan ta imot tekstmeldingar frå Canvas."
   always_3a59e701: Alltid
   always_load_the_rce_and_sidebar_from_a_canvas_rich_1495e3fd: "Last alltid RCE og sidestolpe fra Canvas sin rikt innhald-teneste"
