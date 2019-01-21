@@ -1040,7 +1040,7 @@ class Attachment < ActiveRecord::Base
         data = { :count => count }
         DelayedNotification.send_later_if_production_enqueue_args(
             :process,
-            { :priority => Delayed::LOW_PRIORITY },
+            { :priority => 30},
             record, notification, recipient_keys, data)
       end
     end
