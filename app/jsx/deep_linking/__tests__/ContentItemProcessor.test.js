@@ -63,6 +63,15 @@ describe('processContentItemsForEditor', () => {
     }
   }
 
+  describe('static', () => {
+    it('closes the dialog', async () => {
+      const ev = {data: {content_items: contentItems}}
+      const dialog = {close: jest.fn()}
+      await processContentItemsForEditor(ev, editor, dialog)
+      expect(dialog.close).toHaveBeenCalled()
+    })
+  })
+
   describe('when there is no editor selection', () => {
     beforeEach(() => {
       send.mockClear()
