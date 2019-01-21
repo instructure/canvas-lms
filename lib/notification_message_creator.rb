@@ -297,6 +297,7 @@ class NotificationMessageCreator
       by_name(@notification.name).
       for_user(@to_users + @to_channels).
       cancellable.
+      where("created_at BETWEEN ? AND ?", Setting.get("pending_duplicate_message_window_hours", "6").to_i.hours.ago, Time.now.utc).
       update_all(:workflow_state => 'cancelled')
   end
 
