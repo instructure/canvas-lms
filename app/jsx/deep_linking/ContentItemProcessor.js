@@ -24,9 +24,9 @@ import ImageContentItem from './models/ImageContentItem'
 import I18n from 'i18n!external_content.success'
 import HtmlFragmentContentItem from './models/HtmlFragmentContentItem'
 
-export function processContentItemsForEditor(event, editor, dialogId) {
+export function processContentItemsForEditor(event, editor, dialog) {
   const {content_items, msg, log, errormsg, errorlog, ltiEndpoint} = event.data
-  new ContentItemProcessor(
+  return new ContentItemProcessor(
     content_items,
     {
       msg,
@@ -41,9 +41,7 @@ export function processContentItemsForEditor(event, editor, dialogId) {
     .processContentItemsForEditor(editor)
     .finally(() => {
       // Remove "unsaved changes" warnings and close modal
-      const dialog = $(`#${dialogId}`)
-      dialog.off()
-      dialog.dialog('close')
+      dialog.close()
     })
     .catch(() => {
       $.flashError(I18n.t('Error retrieving content'))
