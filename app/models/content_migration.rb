@@ -65,6 +65,23 @@ class ContentMigration < ActiveRecord::Base
     can :manage_files and can :read
   end
 
+  def trigger_live_events!
+    # Trigger live events for the source course and migration
+    Canvas::LiveEventsCallbacks.after_update(context, context.saved_changes)
+    Canvas::LiveEventsCallbacks.after_update(self, self.saved_changes)
+
+    # Trigger live events for all updated/created records
+    imported_migration_items.each do |imported_item|
+      next unless LiveEventsObserver.observed_classes.include? imported_item.class
+      next if started_at.blank? || imported_item.created_at.blank?
+      if imported_item.created_at > started_at
+        Canvas::LiveEventsCallbacks.after_create(imported_item)
+      else
+        Canvas::LiveEventsCallbacks.after_update(imported_item, imported_item.saved_changes)
+      end
+    end
+  end
+
   def set_started_at_and_finished_at
     if workflow_state_changed?
       if pre_processing? || exporting? || importing?

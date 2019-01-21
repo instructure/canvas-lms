@@ -35,7 +35,7 @@ describe Course do
       data['all_files_export'] = {
         'file_path' => File.join(IMPORT_JSON_DIR, 'import_from_migration_small.zip')
       }
-      migration = ContentMigration.create!(:context => @course)
+      migration = ContentMigration.create!(:context => @course, started_at: Time.zone.now)
       allow(migration).to receive(:canvas_import?).and_return(true)
 
       params = {:copy => {
@@ -61,6 +61,8 @@ describe Course do
         :new_end_date=>"Apr 13, 2011"
       }}.with_indifferent_access
       migration.migration_ids_to_import = params
+
+      expect(migration).to receive(:trigger_live_events!).once
 
       # tool profile tests
       expect(Importers::ToolProfileImporter).to receive(:process_migration)
