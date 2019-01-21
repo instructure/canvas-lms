@@ -24,7 +24,6 @@ describe 'Audit Trail' do
 
   before(:once) do
     @account = Account.default
-    @account.enable_feature!(:anonymous_moderated_marking_audit_trail)
     role1 = @account.roles.create!(name: "Auditor", base_role_type: "TeacherEnrollment")
     @account.role_overrides.create!(role: role1, permission: :view_audit_trail, enabled: true)
 
