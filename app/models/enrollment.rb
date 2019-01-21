@@ -662,7 +662,6 @@ class Enrollment < ActiveRecord::Base
 
   def accept(force = false)
     return false unless force || invited?
-    self.user.dashboard_messages.where(:context_id => self, :context_type => 'Enrollment').delete_all if self.user
     update_attribute(:workflow_state, 'active')
     if self.type == 'StudentEnrollment'
       Enrollment.recompute_final_score_in_singleton(self.user_id, self.course_id)
