@@ -127,6 +127,7 @@ describe "groups" do
       end
     end
 
+    #-------------------------------------------------------------------------------------------------------------------
     describe "announcements page v2" do
       # will fix the below shared tests in a separate commit
       # it_behaves_like 'announcements_page_v2', :student
@@ -229,7 +230,136 @@ describe "groups" do
     end
 
     #-------------------------------------------------------------------------------------------------------------------
+    describe "people page" do
+      it_behaves_like 'people_page', :student
+
+      it "should display and show a list of group members", priority: "1", test_id: 273614 do
+        get people_page
+        # Checks that all students and teachers created in setup are listed on page
+        expect(ff('.student_roster .user_name').size).to eq 5
+        expect(ff('.teacher_roster .user_name').size).to eq 1
+      end
+
+      it "shows only active members in groups to students", priority: "2", test_id: 840142 do
+        get people_page
+        student_enrollment = StudentEnrollment.last
+        student = User.find(student_enrollment.user_id)
+        expect(f('.student_roster')).to contain_css("a[href*='#{student.id}']")
+        student_enrollment.workflow_state = "inactive"
+        student_enrollment.save!
+        refresh_page
+        expect(f('.student_roster')).not_to contain_css("a[href*='#{student.id}']")
+      end
+
+      it "should allow access to people page only within the scope of a group", priority: "1", test_id: 319906 do
+        get people_page
+        expect(f('.roster.student_roster')).to be_displayed
+        verify_no_course_user_access(people_page)
+      end
+    end
+
+    #-------------------------------------------------------------------------------------------------------------------
+    describe "discussions page" do
+      # will fix the below shared tests in a separate commit
+      # it_behaves_like 'discussions_page', :student
+
+      it "should allow discussions to be created within a group", priority: "1", test_id: 273615, ignore_js_errors: true do
+        get discussions_page
+        expect_new_page_load { f('#add_discussion').click }
+        # This creates the discussion and also tests its creation
+        edit_topic('from a student', 'tell me a story')
+      end
+
+      it "should allow group members to access a discussion", priority: "1", test_id: 273616, ignore_js_errors: true do
+        dt = DiscussionTopic.create!(context: @testgroup.first, user: @teacher,
+                                     title: 'Discussion Topic', message: 'hi dudes')
+        get discussions_page
+        # Verifies group member can access the teacher's group discussion & that it's the correct discussion
+        expect_new_page_load { f('.discussion-title').click }
+        expect(f('.message.user_content')).to include_text(dt.message)
+      end
+
+      it "should have two options when creating a discussion", priority: "1", test_id: 273617, ignore_js_errors: true do
+        get discussions_page
+        expect_new_page_load { f('#add_discussion').click }
+        expect(f('#threaded')).to be_displayed
+        expect(f('#allow_rating')).to be_displayed
+        # Shouldn't be Enable Podcast Feed option
+        expect(f("#content")).not_to contain_css('#podcast_enabled')
+      end
+
+      it "should only allow group members to access discussions", priority: "1", test_id: 315332, ignore_js_errors: true do
+        get discussions_page
+        expect(f('#add_discussion')).to be_displayed
+        verify_no_course_user_access(discussions_page)
+      end
+
+      it "should allow discussions to be deleted by their creator", priority: "1", test_id: 329626, ignore_js_errors: true do
+        DiscussionTopic.create!(context: @testgroup.first, user: @user, title: 'Delete Me', message: 'Discussion text')
+        get discussions_page
+        expect(ff('.discussion-title').size).to eq 1
+        f('.discussions-index-manage-menu').click
+        wait_for_animations
+        f('#delete-discussion-menu-option').click
+        f('#confirm_delete_discussions').click
+        wait_for_ajaximations
+        expect(f(".discussions-container__wrapper")).not_to contain_css('.discussion-title')
+      end
+
+      it "should not be able to delete a discussion by a different creator", priority: "1", test_id: 420009, ignore_js_errors: true do
+        DiscussionTopic.create!(context: @testgroup.first,
+                                user: @students.first,
+                                title: 'Back to the Future day',
+                                message: 'There are no hover boards!')
+        get discussions_page
+        expect(ff('.discussion-title').size).to eq 1
+        expect(f(".discussions-container__wrapper")).not_to contain_css('#discussions-index-manage-menu')
+      end
+
+      it "should allow group members to edit their discussions", priority: "1", test_id: 312866, ignore_js_errors: true do
+        DiscussionTopic.create!(context: @testgroup.first,
+                                user: @user,
+                                title: 'White Snow',
+                                message: 'Where are my skis?')
+        get discussions_page
+        f('.discussion-title').click
+        f('.edit-btn').click
+        expect(driver.title).to eq 'Edit Discussion Topic'
+        type_in_tiny('textarea[name=message]','The slopes are ready,')
+        f('.btn-primary').click
+        wait_for_ajaximations
+        expect(f('.user_content')).to include_text('The slopes are ready,')
+      end
+
+      it "should not allow group member to edit discussions by other creators", priority: "1", test_id: 323327, ignore_js_errors: true do
+        DiscussionTopic.create!(context: @testgroup.first,
+                                user: @students.first,
+                                title: 'White Snow',
+                                message: 'Where are my skis?')
+        get discussions_page
+        f('.discussion-title').click
+        expect(f("#content")).not_to contain_css('.edit-btn')
+      end
+    end
+
+    #-------------------------------------------------------------------------------------------------------------------
     describe "pages page" do
+      # will fix the below shared tests in a separate commit
+      # it_behaves_like 'pages_page', :student
+
+      it "should allow group members to create a page", priority: "1", test_id: 273611 do
+        get pages_page
+        manually_create_wiki_page('yo','this be a page')
+      end
+
+      it "should allow all group members to access a page", priority: "1", test_id: 273612 do
+        @page = @testgroup.first.wiki_pages.create!(title: "Page", user: @teacher)
+        # Verifying with a few different group members should be enough to ensure all group members can see it
+        verify_member_sees_group_page
+
+        user_session(@students.first)
+        verify_member_sees_group_page
+      end
       it "should only allow group members to access pages", priority: "1", test_id: 315331 do
         get pages_page
         expect(f('.new_page')).to be_displayed
