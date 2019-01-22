@@ -111,7 +111,7 @@ SQL
         match = table_regex.match(name)
         return nil unless match
         if base_class.partitioning_interval == :weeks
-          Time.utc(match[:year]).beginning_of_week + (match[:weeks].to_i - 1).weeks
+          Time.utc(match[:year]).beginning_of_week + (match[:week].to_i - 1).weeks
         else
           Time.utc(*match[1..-1])
         end
