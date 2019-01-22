@@ -1836,6 +1836,36 @@ nn:
   allows_user_to_add_teachers_course_designers_or_ta_a7fdaceb: "Gir ein brukar løyve til å legge faglærarar, kursdesignarar eller undervisingsassistentar til eit emne frå emneoversikta på kontonivå."
   allows_user_to_configure_alerts_in_course_settings_40a81b1d: "Gi ein brukar løyve til å konfigurere varsel i emneinnstillingar. Varsel er ein sjeldan brukt funksjon som er laga for å sende eit varsel til studentar, faglærarar eller administratorar på grunnlag av spesifikke triggarar (t.d. ingen student/faglærar-interaksjon på ei veke). Dei sjekkast kvar dag, og varsel sendast til studenten og/eller faglæraren fram til det ikkje lenger er grunnlag for varsel."
   allows_user_to_configure_alerts_in_course_settings_806397b5: "Gi ein brukar løyve til å konfigurere varsel i emneinnstillingar. Varsel er ein sjeldan brukt funksjon som er laga for å sende eit varsel til studentar, faglærarar eller administratorar på grunnlag av spesifikke triggarar (t.d. ingen student/faglærar-interaksjon på ei veke). Dei sjekkast kvar dag, og varsel sendast til studenten og/eller faglæraren inntil det ikkje lenger er grunnlag for varsel."
+  allows_user_to_create_accounts_for_new_users_with__37a233d7: |-
+      Gir ein brukar løyve til å opprette kontoar for nye brukarar med knappen Legg til personar på kontonivå.
+      Gir ein brukar løyve til å fjerne og slå saman brukarar innafor ein konto.
+      Gir ein brukar løyve til å modifisere brukarkontodetaljar, som for eksempel namn, e-post og tidssone. Gir ein brukar løyve til å sjå og modifisere påloggingsinformasjon for ein annan brukar.
+  allows_user_to_create_and_manage_appointments_on_t_393e9e84: "Gir ein brukar løyve til å opprette og administrere kalenderavtalar ved å bruke planleggaren. "
+  allows_user_to_create_and_modify_grading_schemes_e4433a19: "Gir ein brukar løyve til å opprette og modifisere oppsett for karaktersetjing."
+  allows_user_to_create_collaborations_allows_user_t_96f8c3be: "Gir ein brukar løyve til å opprette samarbeid. Gir ein bruker løyve til å sjå, endre og slette konferansar som dei har oppretta sjølve."
+  allows_user_to_create_collaborations_allows_user_t_eff2a175: "Gir ein brukar løyve til å opprette samarbeid. Gir ein brukar løyve til å sjå, endre og slette samarbeid dei har oppretta sjølve."
+  allows_user_to_create_developer_keys_for_accounts_76bedd2b: "Gir ein brukar løyve til å opprette utviklarnøklar for kontonivå."
+  allows_user_to_create_edit_and_delete_account_grou_abc8c12: "Gir ein brukar løyve til å opprette, endre og slette kontogruppar."
+  allows_user_to_create_edit_and_delete_course_group_36097d72: "Gir ein brukar løyve til å opprette, endre og slette emnegrupper. Gir ein brukar løyve til å opprette, endre og slette emnegrupper som er oppretta av studentar."
+  allows_user_to_create_edit_and_delete_course_group_cbac4c96: |-
+      Gir ein brukar løyve til å opprette, endre og slette emnegrupper.
+      Gir ein brukar løyve til å opprette, endre og slette emnegrupper som er oppretta av studentar.
+  allows_user_to_create_edit_and_delete_course_rubri_92b58f29: "Gir ein brukar løyve til å opprette, endre og slette vurderingsskjema i eit emne via lenka for vurderingsskjema. "
+  allows_user_to_create_edit_and_delete_rubrics_1c0acc08: "Gir ein brukar løyve til å opprette, endre og slette vurderingsskjema."
+  allows_user_to_create_import_edit_and_delete_outco_472c842e: |-
+      Gir ein brukar løyve til å opprette, importere, endre og slette læringsmål og læringsmålgrupper på
+      emnenivå.
+  allows_user_to_create_new_conferences_allows_user__89cebec2: "Gir ein brukar løyve til å opprette nye konferansar. Gir ein brukar løyve til å starte konferansar dei har oppretta sjølve."
+  allows_user_to_designate_a_course_as_a_blueprint_c_bc5ff9bc: |-
+      Gir ein brukar løyve til å definere eit emne som eit Blueprint-emne.
+      Gir ein brukar løyve til å administrere innstillingar for Blueprint-emne i emneinnstillingar.
+      Gir ein brukar løyve til å legge til tilknytta emne.
+  allows_user_to_differentiate_assignments_to_indivi_37f701a5: "Gir ein brukar løyve til å gi differensierte oppgåver til individuelle studentar."
+  allows_user_to_download_all_comments_in_a_student__33b36d0a: "Gi ein brukar løyve til å laste ned alle kommentarar knytta til ein innlevering frå ein student."
+  allows_user_to_edit_assignment_details_on_individu_3e50993a: "Gir ein brukar løyve til å endre oppgåvedetaljar for individuelle diskusjonar. Modular: Gir ein brukar løyve til å legge til nye oppgåver til ein modul."
+  allows_user_to_edit_assignment_details_on_individu_ecf19e63: "Gir ein brukar løyve til å endre oppgåvedetaljar på individuelle diskusjonar."
+  allows_user_to_edit_blueprint_content_lock_setting_25128c82: "Gir ein brukar løyve til å endre låseinnstillingane for Blueprint-innhald på individuelle diskusjonar."
+  allows_user_to_edit_blueprint_content_lock_setting_fd580fab: "Gir ein brukar løyve til å endre låseinnstillingane for Blueprint-innhald på individuelle innstillingar dersom brukaren er påmeldt i eit Blueprint-masteremne."
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Gjer at brukarar med internasjonale telefonnummer kan ta imot tekstmeldingar frå Canvas."
   always_3a59e701: Alltid
   always_load_the_rce_and_sidebar_from_a_canvas_rich_1495e3fd: "Last alltid RCE og sidestolpe fra Canvas sin rikt innhald-teneste"
