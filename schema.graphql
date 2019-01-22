@@ -1580,6 +1580,27 @@ type Submission implements Node & Timestamped {
   """
   _id: ID!
   assignment: Assignment
+  commentsConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): SubmissionCommentConnection
   createdAt: DateTime
 
   """
@@ -1612,6 +1633,52 @@ type Submission implements Node & Timestamped {
   submittedAt: DateTime
   updatedAt: DateTime
   user: User
+}
+
+type SubmissionComment implements Timestamped {
+  """
+  legacy canvas id
+  """
+  _id: ID
+  author: User
+  comment: String
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+"""
+The connection type for SubmissionComment.
+"""
+type SubmissionCommentConnection {
+  """
+  A list of edges.
+  """
+  edges: [SubmissionCommentEdge]
+
+  """
+  A list of nodes.
+  """
+  nodes: [SubmissionComment]
+
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+}
+
+"""
+An edge in a connection.
+"""
+type SubmissionCommentEdge {
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge.
+  """
+  node: SubmissionComment
 }
 
 """

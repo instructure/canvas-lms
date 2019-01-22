@@ -123,6 +123,9 @@
             "name": "Submission"
           },
           {
+            "name": "SubmissionComment"
+          },
+          {
             "name": "User"
           }
         ]
