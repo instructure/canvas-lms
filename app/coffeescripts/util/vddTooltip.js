@@ -23,7 +23,12 @@ export default function vddTooltip () {
     position: {my: 'center bottom', at: 'center top-10', collision: 'fit fit'},
     tooltipClass: 'center bottom vertical',
     content () {
-      return $($(this).data('tooltipSelector')).html()
+      const selector = $(this).data('tooltipSelector')
+      try {
+        const el = document.querySelector(selector)
+        return $(el).html()
+      } catch(err) {
+      }
     }
   })
 }
