@@ -32,7 +32,10 @@ const assignmentRubricDialog = {
     if ($trigger) {
       this.noRubricExists = $trigger.data('noRubricExists')
       this.url = $trigger.data('url')
-      this.$focusReturnsTo = $($trigger.data('focusReturnsTo'))
+      const selector = $trigger.data('focusReturnsTo')
+      try {
+        this.$focusReturnsTo = $(document.querySelector(selector))
+      } catch(err) {}
 
       $trigger.click((event) => {
         event.preventDefault()
