@@ -129,6 +129,12 @@ what's described in this document. Those fields are subject to change.
 | `is_announcement` | `true` if this topic was posted as an announcement, `false` otherwise. |
 | `title` | Title of the topic (possibly truncated). |
 | `body` | Body of the topic (possibly truncated). |
+| `assignment_id` | The Canvas id of the topic's associated assignment |
+| `context_id` | The Canvas id of the topic's context |
+| `context_type` | The type of the topic's context (usually 'Assignment') |
+| `workflow_state` | The state of the topic |
+| `lock_at` | The lock date (discussion is locked after this date) |
+| `updated_at` | The time at which this topic was last modified in any way |
 
 #### `discussion_topic_updated`
 

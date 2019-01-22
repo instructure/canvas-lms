@@ -101,7 +101,13 @@ module Canvas::LiveEvents
       discussion_topic_id: topic.global_id,
       is_announcement: topic.is_announcement,
       title: LiveEvents.truncate(topic.title),
-      body: LiveEvents.truncate(topic.message)
+      body: LiveEvents.truncate(topic.message),
+      assignment_id: topic.assignment_id,
+      context_id: topic.context_id,
+      context_type: topic.context_type,
+      workflow_state: topic.workflow_state,
+      lock_at: topic.lock_at,
+      updated_at: topic.updated_at
     }
   end
 
