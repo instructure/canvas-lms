@@ -319,7 +319,9 @@ class NotificationMessageCreator
     else
       user_id = id
       messages = Rails.cache.fetch(['recent_messages_for', id].cache_key, :expires_in => 1.hour) do
-        Message.where("dispatch_at>? AND created_at>? AND user_id=? AND to_email=?", 24.hours.ago, 24.hours.ago, user_id, true).count
+        Shackles.activate(:slave) do
+          Message.where("dispatch_at>? AND created_at>? AND user_id=? AND to_email=?", 24.hours.ago, 24.hours.ago, user_id, true).count
+        end
       end
     end
   end
