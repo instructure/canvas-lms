@@ -74,9 +74,6 @@
   "close_opportunity_center_popup_9907d981": {
     "message": "Loka sprettiglugga Tækifærismiðstöðvar"
   },
-  "count_plural_0_opportunities_one_opportunity_other_bb1698f6": {
-    "message": "{ count, plural,\n     =0 {# tækifæri}\n    one {# tækifæri}\n  other {# tækifæri}\n}. Smelltu til að opna sprettiglugga Tækifærismiðstöðvar"
-  },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Sýna # fullklárað atriði}\n  other {Sýna # fullkláruð atriði}\n}"
   },

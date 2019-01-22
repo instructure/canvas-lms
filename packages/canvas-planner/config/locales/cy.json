@@ -74,9 +74,6 @@
   "close_opportunity_center_popup_9907d981": {
     "message": "Cau neidlen y Ganolfan Gyfleoedd"
   },
-  "count_plural_0_opportunities_one_opportunity_other_bb1698f6": {
-    "message": "{ count, plural,\n     =0 {# cyfle}\n    one {# cyfle}\n  other {# cyfle. }\n}. Cliciwch i agor neidlen y Ganolfan Gyfleoedd."
-  },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Dangos # eitem wedi’i chwblhau }\n  other {Dangos # eitem wedi’u cwblhau}\n}"
   },

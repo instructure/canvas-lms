@@ -74,9 +74,6 @@
   "close_opportunity_center_popup_9907d981": {
     "message": "Zamknij wyskakujące okienko Opportunity Center"
   },
-  "count_plural_0_opportunities_one_opportunity_other_bb1698f6": {
-    "message": "{ count, plural,\n     =0 {# okazje}\n    one {# okazja}\n  other {# okazji}\n}. Kliknij, aby otworzyć wyskakujące okienko Opportunity Center."
-  },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Pokaż # ukończony element}\n  other {Pokaż # ukończone elementy }\n}"
   },

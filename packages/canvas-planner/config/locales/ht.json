@@ -74,9 +74,6 @@
   "close_opportunity_center_popup_9907d981": {
     "message": "Fèmen fenèt Sant Opòtinite ki monte a"
   },
-  "count_plural_0_opportunities_one_opportunity_other_bb1698f6": {
-    "message": "{ count, plural,\n     =0 {# opòtinite}\n    one {# opòtinite}\n  other {# opòtinite}\n}. Klike pou ouvri fenèt Sant Opòtinite ki monte a"
-  },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Afiche # eleman konplete}\n  other {Afiche # eleman konplete}\n}"
   },
