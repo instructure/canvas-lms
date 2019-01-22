@@ -297,6 +297,7 @@ class NotificationMessageCreator
       by_name(@notification.name).
       for_user(@to_users + @to_channels).
       cancellable.
+      where("created_at BETWEEN ? AND ?", Setting.get("pending_duplicate_message_window_hours", "6").to_i.hours.ago, Time.now.utc).
       update_all(:workflow_state => 'cancelled')
   end
 
@@ -318,7 +319,9 @@ class NotificationMessageCreator
     else
       user_id = id
       messages = Rails.cache.fetch(['recent_messages_for', id].cache_key, :expires_in => 1.hour) do
-        Message.where("dispatch_at>? AND user_id=? AND to_email=?", 24.hours.ago, user_id, true).count
+        Shackles.activate(:slave) do
+          Message.where("dispatch_at>? AND created_at>? AND user_id=? AND to_email=?", 24.hours.ago, 24.hours.ago, user_id, true).count
+        end
       end
     end
   end
