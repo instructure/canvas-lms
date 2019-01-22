@@ -34,60 +34,47 @@ const props = {
   onExpansionChange: jest.fn()
 }
 
-// TODO: Unskip and fix these with OUT-2934
-it.skip('renders the component', () => {
+it('renders the component', () => {
   const wrapper = shallow(<IndividualStudentMastery {...props}/>)
   expect(wrapper).toMatchSnapshot()
 })
 
-// TODO: Unskip and fix these with OUT-2934
-it.skip('attempts to load when mounted', () => {
+it('attempts to load when mounted', () => {
   mount(<IndividualStudentMastery {...props} />)
   expect(fetchOutcomes).toBeCalled()
 })
 
-// TODO: Unskip and fix these with OUT-2934
-it.skip('renders loading before promise resolves', () => {
+it('renders loading before promise resolves', () => {
   fetchOutcomes.mockImplementation(() => new Promise((() => {}))) // unresolved promise
   const wrapper = mount(<IndividualStudentMastery {...props} />)
   expect(wrapper.find('Spinner')).toHaveLength(1)
 })
 
-// TODO: Unskip and fix these with OUT-2934
-it.skip('renders error when error occurs during fetch', (done) => {
+it('renders error when error occurs during fetch', async () => {
   fetchOutcomes.mockImplementation(() => Promise.reject(new Error('foo')))
   const wrapper = mount(<IndividualStudentMastery {...props} />)
-  setTimeout(() => {
-    expect(wrapper.text()).toMatch('An error occurred')
-    done()
-  }, 1)
+  await wrapper.instance().componentDidMount()
+  expect(wrapper.text()).toMatch('An error occurred')
 })
 
-// TODO: Unskip and fix these with OUT-2934
-it.skip('renders empty if no groups are returned', (done) => {
+it('renders empty if no groups are returned', async () => {
   fetchOutcomes.mockImplementation(() => Promise.resolve({ outcomeGroups: [], outcomes: [] }))
   const wrapper = mount(<IndividualStudentMastery {...props} />)
-  setTimeout(() => {
-    expect(wrapper.text()).toMatch('There are no outcomes')
-    done()
-  }, 1)
+  await wrapper.instance().componentDidMount()
+  expect(wrapper.text()).toMatch('There are no outcomes in the course')
 })
 
-// TODO: Unskip and fix these with OUT-2934
-it.skip('renders outcome groups if they are returned', (done) => {
+it('renders outcome groups if they are returned', async () => {
   fetchOutcomes.mockImplementation(() => Promise.resolve({
     outcomeGroups: [{ id: 1, title: 'Group' }],
     outcomes: []
   }))
-  const wrapper = mount(<IndividualStudentMastery {...props} />)
-  setTimeout(() => {
-    expect(wrapper.update().find('OutcomeGroup')).toHaveLength(1)
-    done()
-  }, 1)
+  const wrapper = shallow(<IndividualStudentMastery {...props} />)
+  await wrapper.instance().componentDidMount()
+  expect(wrapper.update().find('OutcomeGroup')).toHaveLength(1)
 })
 
-// TODO: Unskip and fix these with OUT-2934
-describe.skip('expand and contract', () => {
+describe('expand and contract', () => {
   beforeEach(() => {
     fetchOutcomes.mockImplementation(() => Promise.resolve({
       outcomeGroups: [{ id: 1, title: 'Group' }],
@@ -109,73 +96,55 @@ describe.skip('expand and contract', () => {
     }))
   })
 
-  it('toggles elements to expanded when event fired', (done) => {
+  it('toggles elements to expanded when event fired', async () => {
     const wrapper = mount(<IndividualStudentMastery {...props} />)
-    setTimeout(() => {
-      wrapper.instance().onElementExpansionChange('outcome', 100, true)
-      expect(wrapper.state('expandedOutcomes').equals(Set.of(100))).toBe(true)
-      wrapper.instance().onElementExpansionChange('outcome', 100, false)
-      expect(wrapper.state('expandedOutcomes').equals(Set())).toBe(true)
-      done()
-    })
+    await wrapper.instance().componentDidMount()
+    wrapper.instance().onElementExpansionChange('outcome', 100, true)
+    expect(wrapper.state('expandedOutcomes').equals(Set.of(100))).toBe(true)
+    wrapper.instance().onElementExpansionChange('outcome', 100, false)
+    expect(wrapper.state('expandedOutcomes').equals(Set())).toBe(true)
   })
 
-  // OUT-2927: Skipped because it is regularly timing out on jenkins, but not locally
-  it.skip('contracts child outcomes when a group is contracted', (done) => {
+  it('contracts child outcomes when a group is contracted', async () => {
     const wrapper = mount(<IndividualStudentMastery {...props} />)
-    setTimeout(() => {
-      wrapper.setState({ expandedGroups: Set.of(1), expandedOutcomes: Set.of(100) }, () => {
-        wrapper.instance().onElementExpansionChange('group', 1, false)
-        setTimeout(() => {
-          expect(wrapper.state('expandedOutcomes').equals(Set())).toBe(true)
-          done()
-        })
-      })
+    await wrapper.instance().componentDidMount()
+    wrapper.setState({ expandedGroups: Set.of(1), expandedOutcomes: Set.of(100) }, () => {
+      wrapper.instance().onElementExpansionChange('group', 1, false)
     })
+    expect(wrapper.state('expandedOutcomes').equals(Set())).toBe(true)
   })
 
-  it('expands all when expand() is called', (done) => {
+  it('expands all when expand() is called', async () => {
     const wrapper = mount(<IndividualStudentMastery {...props} />)
-    setTimeout(() => {
-      wrapper.instance().expand()
-      setTimeout(() => {
-        expect(wrapper.state('expandedGroups').equals(Set.of(1))).toBe(true)
-        expect(wrapper.state('expandedOutcomes').equals(Set.of(100))).toBe(true)
-        done()
-      })
-    })
+    await wrapper.instance().componentDidMount()
+    wrapper.instance().expand()
+    expect(wrapper.state('expandedGroups').equals(Set.of(1))).toBe(true)
+    expect(wrapper.state('expandedOutcomes').equals(Set.of(100))).toBe(true)
   })
 
-  it('contracts all when contract() is called', (done) => {
+  it('contracts all when contract() is called', async () => {
     const wrapper = mount(<IndividualStudentMastery {...props} />)
-    setTimeout(() => {
-      wrapper.setState({ expandedOutcomes: Set.of(100), expandedGroups: Set.of(1) }, () => {
-        wrapper.instance().contract()
-        setTimeout(() => {
-          expect(wrapper.state('expandedGroups').equals(Set())).toBe(true)
-          expect(wrapper.state('expandedOutcomes').equals(Set())).toBe(true)
-          done()
-        })
-      })
-    })
-  })
-
-  it('notifies when expansion is changed', (done) => {
-    const wrapper = mount(<IndividualStudentMastery {...props} />)
-    setTimeout(() => {
-      wrapper.instance().onElementExpansionChange('outcome', 100, true)
-      expect(props.onExpansionChange).lastCalledWith(true, true)
-      wrapper.instance().onElementExpansionChange('group', 1, true)
-      expect(props.onExpansionChange).lastCalledWith(true, false)
+    await wrapper.instance().componentDidMount()
+    wrapper.setState({ expandedOutcomes: Set.of(100), expandedGroups: Set.of(1) }, () => {
       wrapper.instance().contract()
-      expect(props.onExpansionChange).lastCalledWith(false, true)
-      done()
     })
+    expect(wrapper.state('expandedGroups').equals(Set())).toBe(true)
+    expect(wrapper.state('expandedOutcomes').equals(Set())).toBe(true)
+  })
+
+  it('notifies when expansion is changed', async () => {
+    const wrapper = mount(<IndividualStudentMastery {...props} />)
+    await wrapper.instance().componentDidMount()
+    wrapper.instance().onElementExpansionChange('outcome', 100, true)
+    expect(props.onExpansionChange).lastCalledWith(true, true)
+    wrapper.instance().onElementExpansionChange('group', 1, true)
+    expect(props.onExpansionChange).lastCalledWith(true, false)
+    wrapper.instance().contract()
+    expect(props.onExpansionChange).lastCalledWith(false, true)
   })
 })
 
-// TODO: Unskip and fix these with OUT-2934
-it.skip('renders outcome groups in alphabetical order by title', (done) => {
+it('renders outcome groups in alphabetical order by title', async () => {
   fetchOutcomes.mockImplementation(() => Promise.resolve({
     outcomeGroups: [
       { id: 1, title: 'ZZ Top Albums' },
@@ -186,13 +155,11 @@ it.skip('renders outcome groups in alphabetical order by title', (done) => {
     outcomes: []
   }))
   const wrapper = shallow(<IndividualStudentMastery {...props} />)
-  setTimeout(() => {
-    const groups = wrapper.find('OutcomeGroup')
-    expect(groups).toHaveLength(4)
-    expect(groups.get(0).props.outcomeGroup.title).toEqual('Aardvark Albums')
-    expect(groups.get(1).props.outcomeGroup.title).toEqual('abba Albums')
-    expect(groups.get(2).props.outcomeGroup.title).toEqual('Aerosmith Albums')
-    expect(groups.get(3).props.outcomeGroup.title).toEqual('ZZ Top Albums')
-    done()
-  })
+  await wrapper.instance().componentDidMount()
+  const groups = wrapper.find('OutcomeGroup')
+  expect(groups).toHaveLength(4)
+  expect(groups.get(0).props.outcomeGroup.title).toEqual('Aardvark Albums')
+  expect(groups.get(1).props.outcomeGroup.title).toEqual('abba Albums')
+  expect(groups.get(2).props.outcomeGroup.title).toEqual('Aerosmith Albums')
+  expect(groups.get(3).props.outcomeGroup.title).toEqual('ZZ Top Albums')
 })
