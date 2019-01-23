@@ -155,7 +155,7 @@ module DashboardHelper
       presenter.to_h
     end
 
-    mapped.sort_by {|h| h[:position] || ::CanvasSort::Last}
+    mapped.sort_by {|h| Integer(h[:position] || ::CanvasSort::Last)}
   end
 
 end
