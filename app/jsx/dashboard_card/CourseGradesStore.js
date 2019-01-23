@@ -37,14 +37,9 @@ import 'compiled/fn/parseLinkHeader'
     }
   }
 
-  function studentEnrollments(enrollments) {
-    return _.where(enrollments, {"type": "student", "enrollment_state": "active"});
-  }
-
   function getActiveStudentGrade(course){
-    var courseEnrollments = course.enrollments;
-    if (courseEnrollments && studentEnrollments(courseEnrollments).length === 1) {
-      return studentEnrollments(courseEnrollments)[0];
+    if (course.enrollments) {
+      return _.findWhere(course.enrollments, {"type": "student", "enrollment_state": "active"})  || {}
     } else {
       return {}
     }
