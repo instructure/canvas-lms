@@ -4969,7 +4969,7 @@ mi:
         upload_to: "Tukuake ki"
       import_quizzes_next_view: 
         import_quizzesNext_help_label: "Ko te aromatawai kawemai ihirangi ko Quizzes.Next Icon"
-        import_quizzesNext_help_text: "Ko te Quizzes.Āwhi i muri mai ko te mīhini aromatawai hou mo Canvas.%{p_p}Ki te ako nui atu tēnā koa whakapā atu ki to kaiwhakahaere pūnaha, toro atu rānei"
+        import_quizzesNext_help_text: "Ko te Quizzes.Next ko te mīhini aromatawai hou mo Canvas.%{p_p}Ki te ako nui atu tēnā koa whakapā atu ki to kaiwhakahaere pūnaha, toro atu rānei"
         import_quizzesNext_help_title: Quizzes.Next
         import_quizzesNext_help_title_icon: "Ko te aromatawai kawemai ko Quizzes.Next Icon"
         import_quizzes_Next: "Ko te aromatawai kawemai ihirangi ko Quizzes.Next Icon"
@@ -21813,11 +21813,11 @@ mi:
       Āptihia te %{callback_url} hei OAuth 2.0 mana tohutohu nohoanga kē, ka tohua kia noho te tūranga tono ki te huarahi kia tukuna-ā-wātia
       Kia oti tō rēhita, tohua te Tatai Kiritaki me te Muna Kiritaki ka tuhia ki konei.
   you_will_need_to_register_an_application_on_twitte_5ff04bee: |-
-      Ka hiahia koe ki te [rēhita i tētahi tono i rung i Twitter](%{twitter_url}).
+      Ka hiahia koe ki te [rēhita i tētahi tono i runga i Twitter](%{twitter_url}).
       Me whirihora e koe %{callback_url} rite te Hokiwaea URL.
       I muri te hanga e koe i tō tono, te hanga i tētahi tuhipoka o te Kaihoko Kī me Kaihoko huna, ka whakauru rātou ki konei.
   you_will_need_to_register_an_application_on_twitte_95e7b621: |-
-      Ka hiahia koe ki te  [rēhita i tētahi tono i runga i Twitter](%{twitter_url}).
+      Ka hiahia koe ki te [rēhita i tētahi tono i runga i Twitter](%{twitter_url}).
       Me whirihora e koe %{callback_url} rite te Hokiwaea URL, me te whakatauria whakauru Taumata ki
       Pānui, Tuhituhia, me te Uru karere hāngai
       I muri te hanga e koe i tō tono, te hanga i tētahi tuhipoka o te Kaihoko Kī me Kaihoko huna, ka whakauru rātou ki konei.
