@@ -236,5 +236,155 @@ describe "groups" do
         verify_no_course_user_access(pages_page)
       end
     end
+
+    #-------------------------------------------------------------------------------------------------------------------
+    describe "Files page" do
+      it_behaves_like 'files_page', :student
+
+      it "should allow group members to add a new folder", priority: "1", test_id: 273625 do
+        get files_page
+        add_folder
+        expect(ff('.ef-name-col__text').first.text).to eq 'new folder'
+      end
+
+      it "should allow group members to delete a folder", priority: "1", test_id: 273631 do
+        skip_if_safari(:alert)
+        get files_page
+        add_folder
+        delete(0, :cog_icon)
+        expect(f("body")).not_to contain_css('.ef-item-row')
+      end
+
+      it "should allow group members to move a folder", priority: "1", test_id: 273632 do
+        get files_page
+        create_folder_structure
+        move_folder(@inner_folder)
+      end
+
+      it "should only allow group members to access files", priority: "1", test_id: 273626 do
+        expect_new_page_load { get files_page }
+        verify_no_course_user_access(files_page)
+      end
+
+      it "should allow a group member to delete a file", priority: "1", test_id: 273630 do
+        skip_if_safari(:alert)
+        add_test_files(false)
+        get files_page
+        delete(0, :cog_icon)
+        wait_for_ajaximations
+        expect(all_files_folders.count).to eq 1
+        # Now try to delete the other one using toolbar menu
+        delete(0, :toolbar_menu)
+        expect(f("body")).not_to contain_css('.ef-item-row')
+      end
+
+      it "should allow group members to move a file", priority: "1", test_id: 273633 do
+        add_test_files
+        get files_page
+        add_folder('destination_folder')
+        move_file_to_folder('example.pdf','destination_folder')
+      end
+
+      it "should hide the publish cloud", priority: "1", test_id: 273628 do
+        add_test_files
+        get files_page
+        expect(f('#content')).not_to contain_css('.btn-link.published-status')
+      end
+
+      it "does not allow group members to restrict access to a file", priority: "1", test_id: 304672 do
+        add_test_files
+        get files_page
+        f('.ef-item-row .ef-date-created-col').click
+        expect(f('.ef-header')).to contain_css('.ef-header__secondary')
+        expect(f('.ef-header__secondary')).not_to contain_css('.btn-restrict')
+      end
+    end
+
+    #-------------------------------------------------------------------------------------------------------------------
+    describe "conferences page" do
+      before :once do
+        PluginSetting.create!(name: "wimba", settings: {"domain" => "wimba.instructure.com"})
+      end
+
+      it_behaves_like 'conferences_page', :student
+
+      it "should allow access to conferences only within the scope of a group", priority: "1", test_id: 273638 do
+        get conferences_page
+        expect(f('.new-conference-btn')).to be_displayed
+        verify_no_course_user_access(conferences_page)
+      end
+
+      it "should not allow inviting users with inactive enrollments" do
+        inactive_student = @students.first
+        inactive_student.update_attribute(:name, "inactivee")
+        inactive_student.enrollments.first.deactivate
+        active_student = @students.last
+        active_student.update_attribute(:name, "imsoactive")
+
+        get conferences_page
+        f('.new-conference-btn').click
+        f('.all_users_checkbox').click
+
+        expect(f('#members_list')).to_not include_text(inactive_student.name)
+        expect(f('#members_list')).to include_text(active_student.name)
+      end
+    end
+    
+    #-------------------------------------------------------------------------------------------------------------------
+    describe "collaborations page" do
+      before :each do
+        setup_google_drive
+        unless PluginSetting.where(name: 'google_drive').exists?
+          PluginSetting.create!(name: 'google_drive', settings: {})
+        end
+      end
+
+      it 'lets student in group create a collaboration', priority: "1", test_id: 273641 do
+        get collaborations_page
+        replace_content(find('#collaboration_title'), "c1")
+        replace_content(find('#collaboration_description'), "c1 description")
+        fj('.available-users li:contains("1, Test Student") .icon-user').click
+        fj('.btn:contains("Start Collaborating")').click
+        # verifies collaboration will be displayed on main window
+        tab1 = driver.window_handles.first
+        driver.switch_to.window(tab1)
+        expect(fj('.collaboration .title:contains("c1")')).to be_present
+        expect(fj('.collaboration .description:contains("c1 description")')).to be_present
+      end
+
+      it 'can invite people within your group', priority: "1", test_id: 273642 do
+        students_in_group = @students
+        seed_students(2, 'non-group student')
+        get collaborations_page
+        students_in_group.each do |student|
+          expect(fj(".available-users li:contains(#{student.sortable_name}) .icon-user")).to be_present
+        end
+      end
+
+      it 'cannot invite people not in your group', priority: "1", test_id: 588010 do
+        # overriding '@students' array with new students not included in the group
+        seed_students(2, 'non-group Student')
+        get collaborations_page
+        users = f(".available-users")
+        @students.each do |student|
+          expect(users).not_to contain_jqcss("li:contains(#{student.sortable_name}) .icon-user")
+        end
+      end
+
+      it 'cannot invite students with inactive enrollments' do
+        inactive_student = @students.first
+        inactive_student.update_attribute(:name, "inactivee")
+        inactive_student.enrollments.first.deactivate
+
+        get collaborations_page
+        expect(f(".available-users")).not_to contain_jqcss("li:contains(#{inactive_student.sortable_name}) .icon-user")
+      end
+
+      it "should only allow group members to access the group collaborations page", priority: "1", test_id: 319904 do
+        get collaborations_page
+        expect(find('#breadcrumbs').text).to include('Collaborations')
+        verify_no_course_user_access(collaborations_page)
+      end
+    end
   end
 end
