@@ -453,7 +453,6 @@ class Enrollment < ActiveRecord::Base
   def linked_enrollment_for(observer)
     observer.observer_enrollments.where(
       :associated_user_id => user_id,
-      :course_id => course_id,
       :course_section_id => course_section_id_before_last_save || course_section_id).
         shard(Shard.shard_for(course_id)).first
   end
