@@ -48,17 +48,17 @@ import '../jquery/fixDialogButtons'
 
 function updateTextToState (newStateOfRegion) {
   return function () {
-    let newHtml
+    let newText
     const $this = $(this)
-    if (!(newHtml = $this.data(`htmlWhileTarget${newStateOfRegion}`))) return
+    if (!(newText = $this.data(`textWhileTarget${newStateOfRegion}`))) return
 
     // save the old state as the current html unless it has already been set
-    const oldStateKey = `htmlWhileTarget${newStateOfRegion === 'Hidden' ? 'Shown' : 'Hidden'}`
-    const savedHtml = $this.data(oldStateKey)
-    if (!savedHtml) $this.data(oldStateKey, $this.html())
+    const oldStateKey = `textWhileTarget${newStateOfRegion === 'Hidden' ? 'Shown' : 'Hidden'}`
+    const savedText = $this.data(oldStateKey)
+    if (!savedText) $this.data(oldStateKey, $this.text())
 
     // update the element with the new text
-    $this.html(newHtml)
+    $this.text(newText)
   }
 }
 
