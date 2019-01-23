@@ -1866,6 +1866,7 @@ nn:
   allows_user_to_edit_assignment_details_on_individu_ecf19e63: "Gir ein brukar løyve til å endre oppgåvedetaljar på individuelle diskusjonar."
   allows_user_to_edit_blueprint_content_lock_setting_25128c82: "Gir ein brukar løyve til å endre låseinnstillingane for Blueprint-innhald på individuelle diskusjonar."
   allows_user_to_edit_blueprint_content_lock_setting_fd580fab: "Gir ein brukar løyve til å endre låseinnstillingane for Blueprint-innhald på individuelle innstillingar dersom brukaren er påmeldt i eit Blueprint-masteremne."
+  allows_user_to_edit_blueprint_lock_settings_on_the_371aeb2a: "Gir ein brukar løyve til å endre Blueprint-låseinnstillingar på sideoversikten i eit Blueprint-masteremne."
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Gjer at brukarar med internasjonale telefonnummer kan ta imot tekstmeldingar frå Canvas."
   always_3a59e701: Alltid
   always_load_the_rce_and_sidebar_from_a_canvas_rich_1495e3fd: "Last alltid RCE og sidestolpe fra Canvas sin rikt innhald-teneste"
