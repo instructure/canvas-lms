@@ -60,6 +60,8 @@ class LiveEventsObserver < ActiveRecord::Observer
         Canvas::LiveEvents.course_syllabus_updated(obj, changes["syllabus_body"].first)
       end
       Canvas::LiveEvents.course_updated(obj)
+    when DiscussionTopic
+      Canvas::LiveEvents.discussion_topic_updated(obj)
     when Enrollment
       Canvas::LiveEvents.enrollment_updated(obj)
     when EnrollmentState

@@ -89,12 +89,20 @@ module Canvas::LiveEvents
   end
 
   def self.discussion_topic_created(topic)
-    post_event_stringified('discussion_topic_created', {
+    post_event_stringified('discussion_topic_created', get_discussion_topic_data(topic))
+  end
+
+  def self.discussion_topic_updated(topic)
+    post_event_stringified('discussion_topic_updated', get_discussion_topic_data(topic))
+  end
+
+  def self.get_discussion_topic_data(topic)
+    {
       discussion_topic_id: topic.global_id,
       is_announcement: topic.is_announcement,
       title: LiveEvents.truncate(topic.title),
       body: LiveEvents.truncate(topic.message)
-    })
+    }
   end
 
   def self.account_notification_created(notification)

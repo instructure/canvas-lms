@@ -130,6 +130,15 @@ what's described in this document. Those fields are subject to change.
 | `title` | Title of the topic (possibly truncated). |
 | `body` | Body of the topic (possibly truncated). |
 
+#### `discussion_topic_updated`
+
+| Field | Description |
+| ----- | ----------- |
+| `discussion_topic_id` | The Canvas id of the new discussion topic. |
+| `is_announcement` | `true` if this topic was posted as an announcement, `false` otherwise. |
+| `title` | Title of the topic (possibly truncated). |
+| `body` | Body of the topic (possibly truncated). |
+
 
 #### `group_category_created`
 

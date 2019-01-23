@@ -33,6 +33,20 @@ describe LiveEvents do
       course_with_teacher_logged_in(:active_all => true)
     end
 
+    context 'Discussion Topics' do
+      let(:discussion_topic) { DiscussionTopic.create!(context: @course) }
+
+      it 'should trigger a live event on topic created' do
+        expect(Canvas::LiveEvents).to receive(:discussion_topic_created).once
+        discussion_topic
+      end
+
+      it 'should trigger a live event on topic updated' do
+        expect(Canvas::LiveEvents).to receive(:discussion_topic_updated).once
+        discussion_topic.update!(title: 'New topic')
+      end
+    end
+
     context 'Wiki Pages' do
 
       def create_page(attrs)
