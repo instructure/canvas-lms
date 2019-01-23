@@ -163,12 +163,17 @@ class CourseProgress
     @user.observed_users.any? ? @user.observed_users[0] : nil
   end
 
+  def count_observed_enrollments
+    return 0 unless @observed_user
+    Enrollment.where(type: 'ObserverEnrollment', course: @course, user: @user).count
+  end
+
   def set_user_id
     @observed_user ? @observed_user.id : @user.id
   end
 
   def allow_course_progress?
     (course.module_based? && course.user_is_student?(user, include_all: true)) ||
-    (course.module_based? && @observed_user && course.user_is_student?(@observed_user, include_all: true))
+    (course.module_based? && @observed_user && count_observed_enrollments == 1 && course.user_is_student?(@observed_user, include_all: true))
   end
 end
