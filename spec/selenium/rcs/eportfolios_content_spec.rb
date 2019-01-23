@@ -80,7 +80,7 @@ describe "add content box" do
 
   context "adding html content" do
     before(:each) do
-      @html_content="<b>student</b>"
+      @html_content="<strong>student</strong>"
       f(".add_html_link").click
       wait_for_ajaximations
       f("#edit_page_section_0").send_keys(@html_content)
@@ -99,7 +99,7 @@ describe "add content box" do
       expect(is_checked(comment_public)).to be_truthy
       submit_form(".form_content")
       wait_for_ajaximations
-      expect(f(".section_content b").text).to eq "student"
+      expect(f(".section_content strong").text).to eq "student"
       entry_verifier({:section_type => "html", :content => @html_content})
       refresh_page
       f("#page_comment_message").send_keys("hi student")
@@ -111,7 +111,7 @@ describe "add content box" do
 
     it "should verify that the html is there" do
       add_html
-      expect(f(".section_content b").text).to eq "student"
+      expect(f(".section_content strong").text).to eq "student"
       entry_verifier({:section_type => "html", :content => @html_content})
     end
 
