@@ -136,6 +136,15 @@ what's described in this document. Those fields are subject to change.
 | `lock_at` | The lock date (discussion is locked after this date) |
 | `updated_at` | The time at which this topic was last modified in any way |
 
+#### `discussion_topic_updated`
+
+| Field | Description |
+| ----- | ----------- |
+| `discussion_topic_id` | The Canvas id of the new discussion topic. |
+| `is_announcement` | `true` if this topic was posted as an announcement, `false` otherwise. |
+| `title` | Title of the topic (possibly truncated). |
+| `body` | Body of the topic (possibly truncated). |
+
 
 #### `group_category_created`
 
