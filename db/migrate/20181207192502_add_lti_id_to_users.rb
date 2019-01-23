@@ -17,9 +17,10 @@
 
 class AddLtiIdToUsers < ActiveRecord::Migration[5.1]
   tag :predeploy
+  disable_ddl_transaction!
 
   def change
     add_column :users, :lti_id, :text
-    add_index :users, :lti_id
+    add_index :users, :lti_id, algorithm: :concurrently
   end
 end
