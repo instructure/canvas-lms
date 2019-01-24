@@ -48,7 +48,7 @@ import 'compiled/fn/parseLinkHeader'
   CourseGradesStore._fetchForCourse = function(courseId) {
     var state
     // console.log()
-    $.getJSON('/api/v1/courses/' + courseId + '/?include=total_scores', function(grades) {
+    $.getJSON('/api/v1/courses/' + courseId + '/?include[]=total_scores&include[]=observed_users', function(grades) {
       state = CourseGradesStore.getState()
       state['grades'][courseId] = {
         grades: getActiveStudentGrade(grades)
