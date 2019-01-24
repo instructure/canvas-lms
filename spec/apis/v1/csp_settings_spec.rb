@@ -181,6 +181,29 @@ describe "CSP Settings API", type: :request do
     end
   end
 
+  describe "POST add_multiple_domains" do
+    def add_domains(account, domains, expected_status=200)
+      api_call(:post, "/api/v1/accounts/#{account.id}/csp_settings/domains/batch_create",
+        {:controller => "csp_settings", :action => "add_multiple_domains", :format => "json",
+          :account_id => "#{account.id}", :domains => domains},
+        {}, {}, {:expected_status => expected_status})
+    end
+
+    it "should add domains even if csp isn't enabled yet" do
+      domains = ["custom.example.com", "custom2.example.com"]
+      json = add_domains(@sub, domains)
+      expect(@sub.reload.csp_domains.active.pluck(:domain)).to match_array(domains)
+      expect(json["current_account_whitelist"]).to eq domains
+    end
+
+    it "should try to parse all the domains before adding any" do
+      bad_domain = "domain*$&#(@*&#($*"
+      json = add_domains(@sub, [bad_domain, "agoodone.example.com"], 400)
+      expect(@sub.reload.csp_domains.active.pluck(:domain)).to be_empty
+      expect(json["message"]).to eq "invalid domains: #{bad_domain}"
+    end
+  end
+
   describe "DELETE remove_domain" do
     def remove_domain(account, domain, expected_status=200)
       api_call(:delete, "/api/v1/accounts/#{account.id}/csp_settings/domains",

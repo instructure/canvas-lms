@@ -94,6 +94,33 @@ class CspSettingsController < ApplicationController
     end
   end
 
+  # @API Add multiple domains to account whitelist
+  #
+  # Adds multiple domains to the whitelist for the current account. Note: this will not take effect
+  # unless CSP is explicitly enabled on this account.
+  #
+  # @argument domains [Required, Array]
+  def add_multiple_domains
+    domains = params.require(:domains)
+
+    invalid_domains = domains.reject{|domain| URI.parse(domain) rescue nil}
+    unless invalid_domains.empty?
+      render :json => {:message => "invalid domains: #{invalid_domains.join(", ")}"}, :status => :bad_request
+      return false
+    end
+
+    unsuccessful_domains = []
+    domains.each do |domain|
+      unsuccessful_domains << domain unless @context.add_domain!(domain)
+    end
+
+    if unsuccessful_domains.empty?
+      render :json => {:current_account_whitelist => @context.csp_domains.active.pluck(:domain).sort}
+    else
+      render :json => {:message => "failed adding some domains: #{unsuccessful_domains.join(", ")}"}, :status => :bad_request
+    end
+  end
+
   # @API Remove a domain from account whitelist
   #
   # Removes a domain from the whitelist for the current account.
