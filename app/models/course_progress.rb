@@ -25,7 +25,6 @@ class CourseProgress
   def initialize(course, user, read_only: false)
     @course = course
     @user = user
-    @observed_user = find_observed_user
     @read_only = read_only
   end
 
@@ -49,7 +48,7 @@ class CourseProgress
 
   def module_progressions
     @_module_progressions ||= course.context_module_progressions.
-                                  where(user_id: User.find(set_user_id), context_module_id: modules).to_a
+                                  where(user_id: user, context_module_id: modules).to_a
   end
 
   def current_position
@@ -85,7 +84,7 @@ class CourseProgress
           []
         else
           fm = modules.first # the visibilites are the same for all the modules - load them all now and reuse them
-          user_ids = [set_user_id]
+          user_ids = [@user.id]
           opts = {
             :is_teacher => false,
             :assignment_visibilities => true, # fm.assignment_visibilities_for_users(user_ids),
@@ -93,7 +92,7 @@ class CourseProgress
             :page_visibilities => true, # fm.page_visibilities_for_users(user_ids),
             :quiz_visibilities => true # fm.quiz_visibilities_for_users(user_ids)
           }
-          modules.flat_map { |m| m.completion_requirements_visible_to(User.find(set_user_id), opts) }.uniq
+          modules.flat_map { |m| m.completion_requirements_visible_to(@user, opts) }.uniq
         end
       end
   end
@@ -144,7 +143,7 @@ class CourseProgress
   end
 
   def to_json
-    if allow_course_progress?
+    if course.module_based? && course.user_is_student?(user, include_all: true)
       {
         requirement_count: requirement_count,
         requirement_completed_count: requirement_completed_count,
@@ -157,18 +156,5 @@ class CourseProgress
       }
     end
   end
-
-  private
-  def find_observed_user
-    @user.observed_users.any? ? @user.observed_users[0] : nil
-  end
-
-  def set_user_id
-    @observed_user ? @observed_user.id : @user.id
-  end
-
-  def allow_course_progress?
-    (course.module_based? && course.user_is_student?(user, include_all: true)) ||
-    (course.module_based? && @observed_user && course.user_is_student?(@observed_user, include_all: true))
-  end
+  include CanvasShim::CourseProgress
 end
