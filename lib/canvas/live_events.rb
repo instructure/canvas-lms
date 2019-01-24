@@ -205,6 +205,28 @@ module Canvas::LiveEvents
     post_event_stringified('assignment_updated', get_assignment_data(assignment))
   end
 
+  def self.assignment_group_created(assignment_group)
+    post_event_stringified('assignment_group_created', get_assignment_group_data(assignment_group))
+  end
+
+  def self.assignment_group_updated(assignment_group)
+    post_event_stringified('assignment_group_updated', get_assignment_group_data(assignment_group))
+  end
+
+  def self.get_assignment_group_data(assignment_group)
+    {
+      assignment_group_id: assignment_group.id,
+      context_id: assignment_group.context_id,
+      context_type: assignment_group.context_type,
+      name: assignment_group.name,
+      position: assignment_group.position,
+      group_weight: assignment_group.group_weight,
+      sis_source_id: assignment_group.sis_source_id,
+      integration_data: assignment_group.integration_data,
+      rules: assignment_group.rules
+    }
+  end
+
   def self.assignments_bulk_updated(assignment_ids)
     Assignment.where(:id => assignment_ids).each{|a| assignment_updated(a)}
   end

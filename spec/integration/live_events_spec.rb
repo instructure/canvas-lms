@@ -47,6 +47,20 @@ describe LiveEvents do
       end
     end
 
+    context 'Assignment Groups' do
+      let(:assignment_group) { AssignmentGroup.create!(name: 'test', context: @course) }
+
+      it 'should trigger a live event on group created' do
+        expect(Canvas::LiveEvents).to receive(:assignment_group_created).once
+        assignment_group
+      end
+
+      it 'should trigger a live event on topic updated' do
+        expect(Canvas::LiveEvents).to receive(:assignment_group_updated).once
+        assignment_group.update!(name: 'changed name')
+      end
+    end
+
     context 'Wiki Pages' do
 
       def create_page(attrs)

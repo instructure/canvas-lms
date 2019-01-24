@@ -333,6 +333,33 @@ by `asset_type` and `asset_id`.
 | `points_possible` | The maximum points possible for the assignment |
 | `lti_assignment_id` | The LTI assignment guid for the assignment |
 
+#### `assignment_group_created`
+
+| Field | Description |
+| ----- | ----------- |
+| `assignment_group_id` | The Canvas id of the new assignment group. |
+| `context_id` | The Canvas context id of the new assignment group. |
+| `context_type` | The context type of the new assignment group. |
+| `name` | The name of the new assignment group. |
+| `position` | The position of the new assignment group. |
+| `group_weight` | The group weight of the new assignment grou. |
+| `sis_source_id` | The SIS source id of the new assignment group. |
+| `integration_data` | Integration data for the new assignment group. |
+| `rules` | Rules for the new assignment group. |
+
+#### `assignment_group_updated`
+
+| Field | Description |
+| ----- | ----------- |
+| `assignment_group_id` | The Canvas id of the updated assignment group. |
+| `context_id` | The Canvas context id of the updated assignment group. |
+| `context_type` | The context type of the updated assignment group. |
+| `name` | The name of the updated assignment group. |
+| `position` | The position of the updated assignment group. |
+| `group_weight` | The group weight of the updated assignment group. |
+| `sis_source_id` | The SIS source id of the updated assignment group. |
+| `integration_data` | Integration data for the updated assignment group. |
+| `rules` | Rules for the updated assignment group. |
 
 #### `submission_created`
 
