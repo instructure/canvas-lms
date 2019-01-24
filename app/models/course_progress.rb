@@ -156,4 +156,5 @@ class CourseProgress
       }
     end
   end
+  include CanvasShim::CourseProgress
 end
