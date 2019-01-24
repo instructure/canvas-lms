@@ -98,7 +98,10 @@ body.dashboard-is-planner {
 .ic-Dashboard-header__layout {
   display: flex;
   align-items: center;
-  padding: 0 0 ($ic-sp * 0.75);
+  padding: .5rem;
+  background: #eeeeee;
+  opacity: .75;
+  z-index: 3;
 }
 
 .ic-Dashboard-Activity { padding: $ic-sp; }
