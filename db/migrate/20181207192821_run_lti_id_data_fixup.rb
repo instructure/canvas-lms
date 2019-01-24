@@ -23,7 +23,7 @@ class RunLtiIdDataFixup < ActiveRecord::Migration[5.1]
       :run,
       priority: Delayed::LOW_PRIORITY,
       max_attempts: 1,
-      n_strand: 'long_datafixups'
+      n_strand: ['add_lti_id_datafixup', Shard.current.database_server.id]
     )
   end
 end
