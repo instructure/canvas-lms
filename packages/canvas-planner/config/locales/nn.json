@@ -266,6 +266,9 @@
   "only_most_recent_grading_period_shown_f1ad6458": {
     "message": "*Kun nyaste karaktersetjingsperiode viser."
   },
+  "opportunities_popup_f6703842": {
+    "message": "popup-menyen med val"
+  },
   "optional_add_course_ef0d70fc": {
     "message": "Valfri: Legg til emne"
   },
