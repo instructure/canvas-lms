@@ -1867,6 +1867,15 @@ nn:
   allows_user_to_edit_blueprint_content_lock_setting_25128c82: "Gir ein brukar løyve til å endre låseinnstillingane for Blueprint-innhald på individuelle diskusjonar."
   allows_user_to_edit_blueprint_content_lock_setting_fd580fab: "Gir ein brukar løyve til å endre låseinnstillingane for Blueprint-innhald på individuelle innstillingar dersom brukaren er påmeldt i eit Blueprint-masteremne."
   allows_user_to_edit_blueprint_lock_settings_on_the_371aeb2a: "Gir ein brukar løyve til å endre Blueprint-låseinnstillingar på sideoversikten i eit Blueprint-masteremne."
+  allows_user_to_edit_blueprint_lock_settings_on_the_3a90958b: "Gir ein brukar løyve til å endre låseinnstillingane på oversiktssidene til oppgåver og quizer i eit  Blueprint-masteremne."
+  allows_user_to_edit_blueprint_lock_settings_on_the_94a44495: "Gir ein brukar løyve til å endre låseinnstillingane på diskusjonsoversikta i eit Blueprint-masteremne."
+  allows_user_to_edit_blueprint_lock_settings_on_the_9f51663c: "Gir ein brukar løyve til å endre låseinnstillingane for filer i eit Blueprint-masteremne. "
+  allows_user_to_edit_configurations_for_manually_ad_7e0f496c: "Gir ein brukar løyve til å endre konfigurasjonar for eksterne appar som er lagt til manuelt. "
+  allows_user_to_edit_grades_and_add_comments_in_spe_dc18e3c0: "Gir ein brukar løyve til å endre karakterar og legge til kommentarar i SpeedGrader."
+  allows_user_to_edit_grades_in_the_gradebook_allows_74c2723: |-
+      Gir ein brukar løyve til å endre karakterer i karakterboka.
+      Gir ein brukar løyve til å sjå karakterbokhistorikken.
+      Gir ein brukar løyve til å sjå karakterboka for meistringslæring (dersom den er aktivert).
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Gjer at brukarar med internasjonale telefonnummer kan ta imot tekstmeldingar frå Canvas."
   always_3a59e701: Alltid
   always_load_the_rce_and_sidebar_from_a_canvas_rich_1495e3fd: "Last alltid RCE og sidestolpe fra Canvas sin rikt innhald-teneste"
