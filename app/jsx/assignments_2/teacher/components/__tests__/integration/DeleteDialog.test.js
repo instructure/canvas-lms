@@ -21,6 +21,7 @@ import {mockAssignment, waitForNoElement} from '../../../test-utils'
 import {renderTeacherView} from './integration-utils'
 import {setWorkflow} from '../../../api'
 
+jest.mock('jsx/shared/rce/RichContentEditor') // jest cannot deal with jquery as loded from here
 jest.mock('../../../api')
 
 async function openDeleteDialog(assignment = mockAssignment()) {

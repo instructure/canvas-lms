@@ -18,11 +18,17 @@
 
 import React from 'react'
 import {render} from 'react-testing-library'
-import {mockAssignment} from '../../test-utils'
-import ContentTabs from '../ContentTabs'
+import apiUserContent from 'compiled/str/apiUserContent'
+import AssignmentDescription from '../AssignmentDescription'
 
-jest.mock('jsx/shared/rce/RichContentEditor')
+jest.mock('jsx/shared/rce/RichContentEditor') // jest cannot deal with jquery as loded from here
 
-it('renders', () => {
-  render(<ContentTabs assignment={mockAssignment()} />)
+jest.mock('compiled/str/apiUserContent')
+apiUserContent.convert = jest.fn(arg => `converted ${arg}`)
+
+it('renders readOnly', () => {
+  const text = 'Hello world'
+  const {getByText, getByTestId} = render(<AssignmentDescription text={text} readOnly />)
+  expect(getByTestId('AssignmentDescription')).toBeInTheDocument()
+  expect(getByText(`converted ${text}`)).toBeInTheDocument()
 })

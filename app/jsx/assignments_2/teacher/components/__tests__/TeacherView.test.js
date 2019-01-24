@@ -21,6 +21,7 @@ import {mockAssignment, findInputForLabel} from '../../test-utils'
 import {setWorkflow} from '../../api'
 import {renderTeacherView} from './integration/integration-utils'
 
+jest.mock('jsx/shared/rce/RichContentEditor')
 jest.mock('../../api')
 
 it('shows the message students who dialog when the unsubmitted button is clicked', async () => {

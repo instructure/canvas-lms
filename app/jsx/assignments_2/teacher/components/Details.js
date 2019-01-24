@@ -19,8 +19,8 @@
 import React from 'react'
 import {bool} from 'prop-types'
 
-import apiUserContent from 'compiled/str/apiUserContent'
 import {TeacherAssignmentShape} from '../assignmentData'
+import AssignmentDescription from './AssignmentDescription'
 import Overrides from './Overrides/Overrides'
 import AddOverride from './Overrides/AddOverride'
 
@@ -35,15 +35,10 @@ Details.defaultProps = {
 }
 
 export default function Details(props) {
-  const convertedHtml = apiUserContent.convert(props.assignment.description)
-
   // html is sanitized on the server side
-  // TODO: when readOnly=false, render the rce
   return (
     <View as="div" margin="0">
-      <View as="div" margin="small 0">
-        <div dangerouslySetInnerHTML={{__html: convertedHtml}} />
-      </View>
+      <AssignmentDescription text={props.assignment.description} readOnly={props.readOnly} />
       <Overrides assignment={props.assignment} readOnly={props.readOnly} />
       {props.readOnly ? null : <AddOverride onAddOverride={addOverride} />}
     </View>

@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {render} from 'react-testing-library'
-import {mockAssignment} from '../../test-utils'
-import ContentTabs from '../ContentTabs'
-
-jest.mock('jsx/shared/rce/RichContentEditor')
-
-it('renders', () => {
-  render(<ContentTabs assignment={mockAssignment()} />)
-})
+const RichContentEditor = {
+  preloadRemoteModule() {},
+  loadNewEditor() {},
+  destroyRCE() {},
+  callOnRCE(textarea, opName) {
+    if (opName === 'get_code')
+    return textarea.innerHTML
+  }
+}
+export default RichContentEditor
