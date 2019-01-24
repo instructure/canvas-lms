@@ -25,6 +25,7 @@ import './jquery.ajaxJSON'
 import './jquery.google-analytics' /* trackEvent */
 import './jquery.instructure_misc_helpers' /*  /\$\.uniq/, capitalize */
 import './jquery.loadingImg'
+import sanitizeUrl from '../../app/jsx/shared/helpers/sanitizeUrl';
 
   // first element in array is if scribd can handle it, second is if google can.
   var previewableMimeTypes = {
@@ -88,8 +89,9 @@ import './jquery.loadingImg'
       }
 
       if (!INST.disableCrocodocPreviews && opts.crocodoc_session_url) {
+        const sanitizedUrl = sanitizeUrl(opts.crocodoc_session_url)
         var iframe = $('<iframe/>', {
-            src: opts.crocodoc_session_url,
+            src: sanitizedUrl,
             width: opts.width,
             height: opts.height,
             allowfullscreen: "1",
@@ -108,8 +110,9 @@ import './jquery.loadingImg'
         canvadocWrapper.appendTo($this)
 
         const minHeight = opts.iframe_min_height !== undefined ? opts.iframe_min_height : '800px'
+        const sanitizedUrl = sanitizeUrl(opts.canvadoc_session_url)
         var iframe = $('<iframe/>', {
-          src: opts.canvadoc_session_url,
+          src: sanitizedUrl,
           width: opts.width,
           allowfullscreen: '1',
           css: {border: 0, overflow: 'auto', height: '99%', 'min-height': minHeight},
