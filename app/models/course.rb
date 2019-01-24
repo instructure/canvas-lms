@@ -3264,7 +3264,9 @@ class Course < ActiveRecord::Base
   # to identify the user can't move backwards, such as feature flags
   def gradebook_backwards_incompatible_features_enabled?
     # The old gradebook can't deal with late policies at all
-    return true if late_policy&.missing_submission_deduction_enabled? || late_policy&.late_submission_deduction_enabled?
+    return true if late_policy&.missing_submission_deduction_enabled? ||
+      late_policy&.late_submission_deduction_enabled? ||
+      feature_enabled?(:final_grades_override)
 
     # If you've used the grade tray status changes at all, you can't
     # go back. Even if set to none, it'll break "Message Students
