@@ -403,6 +403,14 @@ describe Quizzes::QuizzesController do
       expect(assigns[:js_env][:SUBMISSION_VERSIONS_URL]).to include(path)
     end
 
+    it "assigns js_env for quiz details url" do
+      user_session(@teacher)
+      course_quiz
+      get 'show', params: {:course_id => @course.id, :id => @quiz.id}
+      path = "courses/#{@course.id}/quizzes/#{@quiz.id}/managed_quiz_data"
+      expect(assigns[:js_env][:QUIZ_DETAILS_URL]).to include(path)
+    end
+
     it "doesn't show unpublished quizzes to students with draft state" do
       user_session(@student)
       course_quiz(active=true)
