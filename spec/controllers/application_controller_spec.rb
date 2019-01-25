@@ -802,6 +802,14 @@ RSpec.describe ApplicationController do
       end
     end
 
+    it "doesn't return an invalid icon_url" do
+      totallyavalidurl = %{');\"></i>nothing to see here</button><img src=x onerror="alert(document.cookie);alert(document.domain);" />}
+      @tool.settings[:editor_button][:icon_url] = totallyavalidurl
+      @tool.save!
+      hash = controller.external_tool_display_hash(@tool, :editor_button)
+      expect(hash[:icon_url]).to be_nil
+    end
+
     it 'all settings return canvas_icon_class if set' do
       @tool_settings.each do |setting|
         @tool.send("#{setting}=", tool_settings(setting, true))
