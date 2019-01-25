@@ -1876,6 +1876,34 @@ nn:
       Gir ein brukar løyve til å endre karakterer i karakterboka.
       Gir ein brukar løyve til å sjå karakterbokhistorikken.
       Gir ein brukar løyve til å sjå karakterboka for meistringslæring (dersom den er aktivert).
+  allows_user_to_edit_grading_schemes_98c35117: "Gir ein brukar løyve til å endre oppsett for karaktersetjing."
+  allows_user_to_edit_the_course_sis_id_e1eccee3: "Gir ein brukar løyve til å endre SIS-ID for eit emne."
+  allows_user_to_edit_the_course_syllabus_a28ff262: "Gir ein brukar løyve til å endre emneoversikta."
+  allows_user_to_filter_for_blueprint_courses_as_the_a67832c8: |-
+      Gir ein brukar løyve til å filtrere på Blueprint-emne på kontonivå.
+      Gir ein brukar løyve til å legge til tilknytte emne.
+  allows_user_to_generate_a_pairing_code_on_behalf_o_9ea9bb0a: "Gir ein brukar løyve til å generere ein paringskode på vegner av ein student som kan delast med ein observatør. "
+  allows_user_to_generate_login_logout_activity_repo_bba62f2: "Gir ein brukar løyve til å generere ein rapport i administrasjonsverktøy om inn-/utloggingsaktivitet."
+  allows_user_to_import_content_using_the_course_imp_4a4ec4c7: "Gir ein brukar løyve til å importere innhald ved å bruke emneimportverktøyet."
+  allows_user_to_import_learning_outcomes_17fce84a: "Gir ein brukar løyve til å importere læringsmål."
+  allows_user_to_import_learning_outcomes_to_rubrics_45331ded: "Gir ein brukar løyve til å importere læringsmål til vurderingsskjema."
+  allows_user_to_import_resources_from_commons_into__255ad23: |-
+      Gir ein brukar løyve til å importere ressursar frå Commons til eit emne.
+      Gir ein brukar løyve til å eksportere oppgåver til Commons eller endre tidlegare delt innhald.
+  allows_user_to_import_sis_data_583b20a5: "Gir ein brukar løyve til å importere SIS-data."
+  allows_user_to_like_discussion_posts_when_the_only_7390d91c: "Gir ein brukar løyve til å like diskusjonsinnlegg når valet \"Berre dei som set karakterer kan like\" er slått på. "
+  allows_user_to_manage_feature_options_in_account_s_c3c8ee03: "Gir ein brukar løyve til å administrere funksjonsval i kontoinnstillingar."
+  allows_user_to_manage_modules_create_add_items_edi_1afafd65: "Gir ein brukar løyve til å administrere modular (opprette, legge til element, endre modulinnstillingar, publisere/avpublisere, osv.)."
+  allows_user_to_manage_observers_associated_with_st_4b45f2be: "Gir ein brukar løyve til å administrere observatører som er tilknytta studentar innan ein konto."
+  allows_user_to_manage_rubrics_326eedc2: "Gir ein brukar løyve til å administrere vurderingsskjema."
+  allows_user_to_manually_add_and_delete_an_app_in_a_402d3d91: "Gir ein brukar løyve til å legge til og slette ein app manuelt i kontoinnstillingar."
+  allows_user_to_manually_add_and_delete_an_app_in_c_18250cad: "Gir ein brukar løyve til å legge til og slette ein app manuelt i emneinnstillingar."
+  allows_user_to_moderate_a_quiz_6953d369: "Gir ein brukar løyve til å endre ein quiz."
+  allows_user_to_publish_conclude_and_delete_courses_336cf352: "Gir ein brukar løyve til å publisere, fullføre og slette emne."
+  allows_user_to_reply_to_a_discussion_post_83f43e19: "Gir ein brukar løyve til å svare på eit diskusjonsinnlegg."
+  allows_user_to_restore_a_course_32084c5c: "Gir ein brukar løyve til å gjenopprette eit emne."
+  allows_user_to_review_an_audit_trail_in_assignment_9ca5d03d: "Gir ein brukar løyve til å sjå gjennom ein vurderingslogg for oppgåver, både modererte og anonyme."
+  allows_user_to_search_by_assignment_id_in_grade_ch_ae195b94: "Gir ein brukar løyve til å søke på oppgåve-ID i endringsloggar for karakterer."
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Gjer at brukarar med internasjonale telefonnummer kan ta imot tekstmeldingar frå Canvas."
   always_3a59e701: Alltid
   always_load_the_rce_and_sidebar_from_a_canvas_rich_1495e3fd: "Last alltid RCE og sidestolpe fra Canvas sin rikt innhald-teneste"
