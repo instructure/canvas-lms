@@ -203,5 +203,81 @@ describe "groups" do
         expect(ff('.student_roster .user_name').size).to eq 4
       end
     end
+
+    #-------------------------------------------------------------------------------------------------------------------
+    describe "discussions page" do
+      # will fix the below shared tests in a separate commit
+      # it_behaves_like 'discussions_page', :teacher
+
+      it "should allow teachers to create discussions within a group", priority: "1", test_id: 285586, ignore_js_errors: true do
+        get discussions_page
+        expect_new_page_load { f('#add_discussion').click }
+        # This creates the discussion and also tests its creation
+        edit_topic('from a teacher', 'tell me a story')
+      end
+
+      it "should have three options when creating a discussion", priority: "1", test_id: 285584, ignore_js_errors: true do
+        get discussions_page
+        expect_new_page_load { f('#add_discussion').click }
+        expect(f('#threaded')).to be_displayed
+        expect(f('#allow_rating')).to be_displayed
+        expect(f('#podcast_enabled')).to be_displayed
+      end
+
+      it "should allow teachers to access a discussion", priority: "1", test_id: 285585, ignore_js_errors: true do
+        dt = DiscussionTopic.create!(context: @testgroup.first, user: @students.first,
+                                     title: 'Discussion Topic', message: 'hi dudes')
+        get discussions_page
+        # Verifies teacher can access the group discussion & that it's the correct discussion
+        expect_new_page_load { f('.discussion-title').click }
+        expect(f('.message.user_content')).to include_text(dt.message)
+      end
+
+      it "should allow teachers to delete their group discussions", priority: "1", test_id: 329627, ignore_js_errors: true do
+        skip_if_safari(:alert)
+        DiscussionTopic.create!(context: @testgroup.first, user: @teacher,
+                                title: 'Group Discussion', message: 'Group')
+        get discussions_page
+        expect(ff('.discussion-title').size).to eq 1
+        f('.discussions-index-manage-menu').click
+        wait_for_animations
+        f('#delete-discussion-menu-option').click
+        wait_for_ajaximations
+        f('#confirm_delete_discussions').click
+        wait_for_ajaximations
+        expect(f(".discussions-container__wrapper")).not_to contain_css('.discussion-title')
+      end
+    end
+
+    #-------------------------------------------------------------------------------------------------------------------
+    describe "pages page" do
+      # will fix the below shared tests in a separate commit
+      # it_behaves_like 'pages_page', :teacher
+
+      it "should allow teachers to create a page", priority: "1", test_id: 289993 do
+        get pages_page
+        manually_create_wiki_page('stuff','it happens')
+      end
+
+      it "should allow teachers to access a page", priority: "1", test_id: 289992 do
+        @page = @testgroup.first.wiki_pages.create!(title: "Page", user: @students.first)
+        # Verifies teacher can access the group page & that it's the correct page
+        verify_member_sees_group_page
+      end
+
+      it "has unique pages in the cloned groups", priority: "2", test_id: 1041949 do
+        @page = @testgroup.first.wiki_pages.create!(title: "Page", user: @students.first)
+        get pages_page
+        expect(f('.index-content')).to contain_css('.wiki-page-link')
+
+        category = @course.group_categories.create!(:name => "Group Category")
+        @group_category.first.clone_groups_and_memberships(category)
+        category.reload
+        new_group = category.groups.first
+
+        get "/groups/#{new_group.id}/pages"
+        expect(f('.index-content')).not_to contain_css('.wiki-page-link')
+      end
+    end
   end
 end
