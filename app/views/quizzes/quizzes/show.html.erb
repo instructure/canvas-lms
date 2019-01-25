@@ -315,7 +315,7 @@
 
     <div class="row-fluid">
       <% if @quiz.available? %>
-        <div id="quiz_details_wrapper" data-url="<%= course_quiz_managed_quiz_data_url(@context.id, @quiz.id) %>" data-submitted-count="<%= @submitted_student_count %>"></div>
+        <div id="quiz_details_wrapper" data-submitted-count="<%= @submitted_student_count %>"></div>
       <% end %>
     </div>
     <div class="row-fluid">
