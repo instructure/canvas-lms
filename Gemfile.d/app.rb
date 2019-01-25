@@ -163,4 +163,8 @@ gem 'utf8_cleaner', path: 'gems/utf8_cleaner'
 gem 'workflow', path: 'gems/workflow'
 
 # StrongMind
+<<<<<<< HEAD
 gem 'canvas_shim', :git => 'https://github.com/StrongMind/canvas_shim.git', :tag => '0.1.46'
+=======
+gem 'canvas_shim', :git => 'https://github.com/StrongMind/canvas_shim.git', :tag => '0.1.44'
+>>>>>>> parent of 2e91998b02... Revert "Parent access student progress (#172)"
