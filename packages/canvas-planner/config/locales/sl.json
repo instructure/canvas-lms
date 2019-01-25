@@ -275,6 +275,9 @@
   "peer_review_74f26a13": {
     "message": "Ocenjevanje kolegov"
   },
+  "peer_review_for_itemtitle_358cb413": {
+    "message": "Ocenjevanje kolegov za { itemTitle }"
+  },
   "points_bceb5005": {
     "message": "točk"
   },
