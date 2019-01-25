@@ -2535,11 +2535,11 @@ class Assignment < ActiveRecord::Base
   }
 
   scope :duplicating_for_too_long, -> {
-    where("workflow_state = 'duplicating' AND duplication_started_at < ?", 5.minutes.ago)
+    where("workflow_state = 'duplicating' AND duplication_started_at < ?", 15.minutes.ago)
   }
 
   scope :importing_for_too_long, -> {
-    where("workflow_state = 'importing' AND importing_started_at < ?", 5.minutes.ago)
+    where("workflow_state = 'importing' AND importing_started_at < ?", 15.minutes.ago)
   }
 
   def overdue?
