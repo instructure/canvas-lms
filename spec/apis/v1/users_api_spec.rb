@@ -1419,6 +1419,7 @@ describe "Users API", type: :request do
       @path_options = { :controller => 'users', :action => 'update', :format => 'json', :id => @student.id.to_param }
       user_with_pseudonym(:user => @user, :username => 'admin@example.com')
     end
+
     context "an admin user" do
       it "should be able to update a user" do
         birthday = Time.now
@@ -1468,6 +1469,20 @@ describe "Users API", type: :request do
             expect(user.email).to eq new_email
           end
         end
+      end
+
+      it "should be able to update a user's profile" do
+        Account.default.tap{|a| a.settings[:enable_profiles] = true; a.save!}
+        new_title = "Burninator"
+        new_bio = "burninating the countryside"
+        json = api_call(:put, @path, @path_options, {
+          :user => {:title => new_title, :bio => new_bio}
+        })
+        expect(json['title']).to eq new_title
+        expect(json['bio']).to eq new_bio
+        user = User.find(json['id'])
+        expect(user.profile.title).to eq new_title
+        expect(user.profile.bio).to eq new_bio
       end
 
       it "should catch invalid dates" do

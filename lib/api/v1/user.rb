@@ -88,8 +88,9 @@ module Api::V1::User
         json[:email] = user.email
       end
 
-      if includes.include?('bio') && !excludes.include?('personal_info') && @domain_root_account.enable_profiles? && user.profile
-        json[:bio] = user.profile.bio
+      if !excludes.include?('personal_info') && @domain_root_account&.enable_profiles? && user.profile
+        json[:bio] = user.profile.bio if includes.include?('bio')
+        json[:title] = user.profile.title if includes.include?('title')
       end
 
       if includes.include?('sections')
