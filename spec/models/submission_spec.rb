@@ -6077,4 +6077,23 @@ describe Submission do
       end
     end
   end
+
+  describe "posting and unposting" do
+    before(:each) do
+      @assignment.course.enable_feature!(:post_policies)
+    end
+
+    let(:submission) { @assignment.submissions.first }
+
+    describe "#posted?" do
+      it "returns true if the submission's posted_at date is not nil" do
+        submission.update!(posted_at: Time.zone.now)
+        expect(submission).to be_posted
+      end
+
+      it "returns false if the submission's posted_at date is nil" do
+        expect(submission).not_to be_posted
+      end
+    end
+  end
 end

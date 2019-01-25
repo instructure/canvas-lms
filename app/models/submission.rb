@@ -206,6 +206,9 @@ class Submission < ActiveRecord::Base
 
   scope :anonymized, -> { where.not(anonymous_id: nil) }
 
+  scope :posted, -> { where.not(posted_at: nil) }
+  scope :unposted, -> { where(posted_at: nil) }
+
   workflow do
     state :submitted do
       event :grade_it, :transitions_to => :graded
@@ -2420,6 +2423,10 @@ class Submission < ActiveRecord::Base
 
   def muted_assignment?
     self.assignment.muted?
+  end
+
+  def posted?
+    posted_at.present?
   end
 
   def assignment_muted_changed
