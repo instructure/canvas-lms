@@ -703,6 +703,18 @@ END
       applies_to: 'Course',
       state: 'allowed',
       development: true
+    },
+    'post_policies' => {
+      display_name: -> { I18n.t('Post Policies') },
+      description: -> {
+        I18n.t <<~DESCRIPTION
+          Allows teachers to specify post policies for this course or specific assignments, enabling grades to be
+          posted and hidden manually.
+        DESCRIPTION
+      },
+      applies_to: 'Course',
+      state: 'hidden',
+      development: true
     }
   )
 
