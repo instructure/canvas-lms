@@ -279,5 +279,69 @@ describe "groups" do
         expect(f('.index-content')).not_to contain_css('.wiki-page-link')
       end
     end
+
+    #-------------------------------------------------------------------------------------------------------------------
+    describe "Files page" do
+      it_behaves_like 'files_page', :teacher
+
+      it "should allow teacher to add a new folder", priority: "2", test_id: 303703 do
+        get files_page
+        add_folder
+        expect(ff('.ef-name-col__text').first.text).to eq 'new folder'
+      end
+
+      it "should allow teacher to delete a folder", priority: "2", test_id: 304184 do
+        skip_if_safari(:alert)
+        get files_page
+        add_folder
+        delete(0, :toolbar_menu)
+        expect(f("body")).not_to contain_css('.ef-item-row')
+      end
+
+      it "should allow a teacher to delete a file", priority: "2", test_id: 304183 do
+        skip_if_safari(:alert)
+        add_test_files
+        get files_page
+        delete(0, :toolbar_menu)
+        wait_for_ajaximations
+        expect(f("body")).not_to contain_css('.ef-item-row')
+      end
+
+      it "should allow teachers to move a file", priority: "2", test_id: 304185 do
+        add_test_files
+        get files_page
+        add_folder('destination_folder')
+        move_file_to_folder('example.pdf','destination_folder')
+      end
+
+      it "should allow teachers to move a folder", priority: "2", test_id: 304667 do
+        get files_page
+        create_folder_structure
+        move_folder(@inner_folder)
+      end
+
+      it "hides the publish cloud", priority: "1", test_id: 304673 do
+        add_test_files
+        get files_page
+        expect(f('#content')).not_to contain_css('.btn-link.published-status')
+      end
+
+      it "does not allow teachers to restrict access to a file", priority: "1", test_id: 304900 do
+        add_test_files
+        get files_page
+        f('.ef-item-row .ef-date-created-col').click
+        expect(f('.ef-header')).to contain_css('.ef-header__secondary')
+        expect(f('.ef-header__secondary')).not_to contain_css('.btn-restrict')
+      end
+    end
+
+    #-------------------------------------------------------------------------------------------------------------------
+    describe "conferences page" do
+      before(:once) do
+        PluginSetting.create!(name: "wimba", settings: {"domain" => "wimba.instructure.com"})
+      end
+
+      it_behaves_like 'conferences_page', :teacher
+    end
   end
 end
