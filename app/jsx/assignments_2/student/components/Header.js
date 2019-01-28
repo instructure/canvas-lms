@@ -85,9 +85,7 @@ class Header extends React.Component {
           <FlexItem grow>
             <GradeDisplay
               gradingType={this.props.assignment.gradingType}
-              receivedGrade={
-                this.props.assignment.submissionsConnection && submission && submission.grade
-              }
+              receivedGrade={submission.grade}
               pointsPossible={this.props.assignment.pointsPossible}
             />
             <FlexItem as="div" align="end" textAlign="end">
@@ -99,32 +97,14 @@ class Header extends React.Component {
                       <LatePolicyStatusDisplay
                         gradingType={this.props.assignment.gradingType}
                         pointsPossible={this.props.assignment.pointsPossible}
-                        originalGrade={
-                          this.props.assignment.submissionsConnection &&
-                          submission &&
-                          submission.enteredGrade
-                        }
-                        pointsDeducted={
-                          this.props.assignment.submissionsConnection &&
-                          submission &&
-                          submission.deductedPoints
-                        }
-                        grade={
-                          this.props.assignment.submissionsConnection &&
-                          submission &&
-                          submission.grade
-                        }
+                        originalGrade={submission.enteredGrade}
+                        pointsDeducted={submission.deductedPoints}
+                        grade={submission.grade}
                       />
                     </FlexItem>
                   )}
                 <FlexItem grow>
-                  <SubmissionStatusPill
-                    submissionStatus={
-                      this.props.assignment.submissionsConnection &&
-                      submission &&
-                      submission.submissionStatus
-                    }
-                  />
+                  <SubmissionStatusPill submissionStatus={submission.submissionStatus} />
                 </FlexItem>
               </Flex>
             </FlexItem>
