@@ -23,6 +23,21 @@ function pluralize(word) {
   return word
 }
 
+export const SET_DIRTY = 'SET_DIRTY'
+export function setDirtyAction(value) {
+  if (typeof value !== 'boolean') {
+    return {
+      type: SET_DIRTY,
+      payload: new Error('Can only set to Boolean values'),
+      error: true
+    }
+  }
+  return {
+    type: SET_DIRTY,
+    payload: value
+  }
+}
+
 export const SET_CSP_ENABLED = 'SET_CSP_ENABLED'
 export const SET_CSP_ENABLED_OPTIMISTIC = 'SET_CSP_ENABLED_OPTIMISTIC'
 
@@ -84,16 +99,33 @@ export function setCspInheritedAction(value, opts = {}) {
 export function setCspInherited(context, contextId, value) {
   context = pluralize(context)
   return (dispatch, getState, {axios}) => {
+    const {cspEnabled, cspInherited} = getState()
     dispatch(setCspInheritedAction(value, {optimistic: true}))
-    if (value) {
-      return axios
-        .put(`/api/v1/${context}/${contextId}/csp_settings`, {
-          status: 'inherited'
-        })
-        .then(response => {
-          dispatch(setCspInheritedAction(response.data.inherited))
-        })
-    }
+    return axios
+      .put(`/api/v1/${context}/${contextId}/csp_settings`, {
+        status: value ? 'inherited' : cspEnabled ? 'enabled' : 'disabled'
+      })
+      .then(response => {
+        // Set the actual inherited status
+        dispatch(setCspInheritedAction(response.data.inherited))
+        // Because changing if you inherit or not can also affect
+        // the enabled status, we also do an update there as well
+        // to be safe.
+        dispatch(setCspEnabledAction(response.data.enabled))
+        // Likewise changing the inherited status likely has an effect
+        // on what domains are whitelisted, so we update those as well.
+        const addDomainMap = {
+          effective: response.data.effective_whitelist || [],
+          account: response.data.current_account_whitelist || [],
+          tools: response.data.tools_whitelist || {}
+        }
+        dispatch(addDomainBulkAction(addDomainMap, {reset: !cspInherited && value}))
+        // Set the dirty status if needed, this will help us know if
+        // we need to copy their stuff over on add/delete
+        if (cspInherited && !value && addDomainMap.account.length === 0) {
+          dispatch(setDirtyAction(true))
+        }
+      })
   }
 }
 
@@ -132,12 +164,19 @@ export function addDomainAction(domain, domainType, opts = {}) {
   }
 }
 
-export function addDomainBulkAction(domainsMap) {
+export function addDomainBulkAction(domainsMap, opts = {}) {
   if (Object.keys(domainsMap).some(d => !DOMAIN_MAP_KEYS.includes(d))) {
     return {
       type: ADD_DOMAIN_BULK,
       payload: new Error('Invalid domain type key provided in domainsMap'),
       error: true
+    }
+  }
+  if (opts.reset) {
+    return {
+      type: ADD_DOMAIN_BULK,
+      payload: domainsMap,
+      reset: true
     }
   }
   return {
@@ -203,5 +242,45 @@ export function removeDomain(context, contextId, domain) {
         // This isn't really necessary but doesn't hurt
         dispatch(removeDomainAction(domain))
       })
+  }
+}
+
+export const COPY_INHERITED_SUCCESS = 'COPY_INHERITED_SUCCESS'
+export const COPY_INHERITED_FAILURE = 'COPY_INHERITED_FAILURE'
+
+export function copyInheritedAction(newWhitelist, error) {
+  if (error) {
+    return {
+      type: COPY_INHERITED_FAILURE,
+      payload: new Error(error),
+      error: true
+    }
+  }
+  return {
+    type: COPY_INHERITED_SUCCESS,
+    payload: newWhitelist
+  }
+}
+
+export function copyInheritedIfNeeded(context, contextId, modifiedDomainOption = {}) {
+  context = pluralize(context)
+  return (dispatch, getState, {axios}) => {
+    if (getState().isDirty) {
+      let domains = getState().whitelistedDomains.inherited
+      if (modifiedDomainOption.add) {
+        domains.push(modifiedDomainOption.add)
+      }
+      if (modifiedDomainOption.delete) {
+        domains = domains.filter(d => d !== modifiedDomainOption.delete)
+      }
+      return axios
+        .post(`/api/v1/${context}/${contextId}/csp_settings/domains/batch_create`, {
+          domains
+        })
+        .then(response => {
+          dispatch(setDirtyAction(false))
+          dispatch(copyInheritedAction(response.data.current_account_whitelist))
+        })
+    }
   }
 }
