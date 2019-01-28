@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'lodash';
+import _ from 'lodash'
 
-function createStudentPlaceholder (id) {
+function createStudentPlaceholder(id) {
   return {
     enrollments: [],
     id,
@@ -27,48 +27,48 @@ function createStudentPlaceholder (id) {
     isPlaceholder: true,
     loaded: false,
     sections: []
-  };
+  }
 }
 
 export default class StudentDatastore {
-  studentIds = [];
+  studentIds = []
 
-  constructor (userStudentMap, testStudentMap) {
-    this.userStudentMap = userStudentMap;
-    this.testStudentMap = testStudentMap;
+  constructor(userStudentMap, testStudentMap) {
+    this.userStudentMap = userStudentMap
+    this.testStudentMap = testStudentMap
   }
 
-  listStudentIds () {
-    return this.studentIds;
+  listStudentIds() {
+    return this.studentIds
   }
 
-  setStudentIds (studentIds) {
-    this.studentIds = studentIds;
-    const idsOfStoredStudents = Object.keys(this.userStudentMap);
-    _.difference(idsOfStoredStudents, studentIds).forEach((removedStudentId) => {
-      delete this.userStudentMap[removedStudentId];
-    });
-    const idsOfStoredTestStudents = Object.keys(this.testStudentMap);
-    _.difference(idsOfStoredTestStudents, studentIds).forEach((removedStudentId) => {
-      delete this.testStudentMap[removedStudentId];
-    });
+  setStudentIds(studentIds) {
+    this.studentIds = studentIds
+    const idsOfStoredStudents = Object.keys(this.userStudentMap)
+    _.difference(idsOfStoredStudents, studentIds).forEach(removedStudentId => {
+      delete this.userStudentMap[removedStudentId]
+    })
+    const idsOfStoredTestStudents = Object.keys(this.testStudentMap)
+    _.difference(idsOfStoredTestStudents, studentIds).forEach(removedStudentId => {
+      delete this.testStudentMap[removedStudentId]
+    })
   }
 
-  addUserStudents (students) {
-    students.forEach((student) => {
-      this.userStudentMap[student.id] = student;
-    });
+  addUserStudents(students) {
+    students.forEach(student => {
+      this.userStudentMap[student.id] = student
+    })
   }
 
-  addTestStudents (students) {
-    students.forEach((student) => {
-      this.testStudentMap[student.id] = student;
-    });
+  addTestStudents(students) {
+    students.forEach(student => {
+      this.testStudentMap[student.id] = student
+    })
   }
 
-  listStudents () {
-    return this.studentIds.map(id => (
-      this.userStudentMap[id] || this.testStudentMap[id] || createStudentPlaceholder(id)
-    ));
+  listStudents() {
+    return this.studentIds.map(
+      id => this.userStudentMap[id] || this.testStudentMap[id] || createStudentPlaceholder(id)
+    )
   }
 }

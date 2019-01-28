@@ -16,21 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { mount } from 'enzyme';
-import SearchResultsRow from 'jsx/gradebook-history/SearchResultsRow';
+import React from 'react'
+import {mount} from 'enzyme'
+import SearchResultsRow from 'jsx/gradebook-history/SearchResultsRow'
 
-function mountComponent (props = {}) {
-  const tbody = document.getElementById('search-results-tbody');
-  return mount(<SearchResultsRow {...props} />, { attachTo: tbody });
+function mountComponent(props = {}) {
+  const tbody = document.getElementById('search-results-tbody')
+  return mount(<SearchResultsRow {...props} />, {attachTo: tbody})
 }
 
 QUnit.module('SearchResultsRow', {
-  setup () {
+  setup() {
     // can't insert <tr/> into a <div/>, so create a <tbody/> first
-    const tbody = document.createElement('tbody');
-    tbody.id = 'search-results-tbody';
-    document.body.appendChild(tbody);
+    const tbody = document.createElement('tbody')
+    tbody.id = 'search-results-tbody'
+    document.body.appendChild(tbody)
 
     this.item = {
       assignment: {
@@ -51,117 +51,168 @@ QUnit.module('SearchResultsRow', {
       pointsPossibleCurrent: '30',
       student: 'Norval Abbott',
       time: '11:16pm'
-    };
-    this.wrapper = mountComponent({ item: this.item });
+    }
+    this.wrapper = mountComponent({item: this.item})
   },
 
-  teardown () {
-    const tbody = document.getElementById('search-results-tbody');
-    this.wrapper.detach();
-    tbody.remove();
+  teardown() {
+    const tbody = document.getElementById('search-results-tbody')
+    this.wrapper.detach()
+    tbody.remove()
   }
-});
+})
 
-test('displays the history date', function () {
-  const date = this.wrapper.find('td').at(0).instance().innerText;
-  strictEqual(date, 'May 30, 2017 at 11:16pm');
-});
+test('displays the history date', function() {
+  const date = this.wrapper
+    .find('td')
+    .at(0)
+    .instance().innerText
+  strictEqual(date, 'May 30, 2017 at 11:16pm')
+})
 
-test('has text for when not anonymously graded', function () {
-  const anonymous = this.wrapper.find('td').at(1).instance().innerText;
-  strictEqual(anonymous, 'Not anonymously graded');
-});
+test('has text for when not anonymously graded', function() {
+  const anonymous = this.wrapper
+    .find('td')
+    .at(1)
+    .instance().innerText
+  strictEqual(anonymous, 'Not anonymously graded')
+})
 
-test('has text for when anonymously graded', function () {
-  const item = { ...this.item, gradedAnonymously: true };
-  const wrapper = mountComponent({ item });
-  const anonymous = wrapper.find('td').at(1).instance().innerText;
-  strictEqual(anonymous.trim(), 'Anonymously graded');
-});
+test('has text for when anonymously graded', function() {
+  const item = {...this.item, gradedAnonymously: true}
+  const wrapper = mountComponent({item})
+  const anonymous = wrapper
+    .find('td')
+    .at(1)
+    .instance().innerText
+  strictEqual(anonymous.trim(), 'Anonymously graded')
+})
 
-test('displays the history student', function () {
-  const student = this.wrapper.find('td').at(2).instance().innerText;
-  strictEqual(student, this.item.student);
-});
+test('displays the history student', function() {
+  const student = this.wrapper
+    .find('td')
+    .at(2)
+    .instance().innerText
+  strictEqual(student, this.item.student)
+})
 
-test('displays placeholder text if assignment is anonymous and muted', function () {
-  const item = { ...this.item, assignment: { anonymousGrading: true, muted: true } };
-  const wrapper = mountComponent({ item });
-  const text = wrapper.find('td').at(2).instance().textContent;
-  strictEqual(text, 'Not available; assignment is anonymous');
-});
+test('displays placeholder text if assignment is anonymous and muted', function() {
+  const item = {...this.item, assignment: {anonymousGrading: true, muted: true}}
+  const wrapper = mountComponent({item})
+  const text = wrapper
+    .find('td')
+    .at(2)
+    .instance().textContent
+  strictEqual(text, 'Not available; assignment is anonymous')
+})
 
-test('displays placeholder text if student name is missing', function () {
-  const item = { ...this.item };
-  delete item.student;
-  const wrapper = mountComponent({ item });
-  const text = wrapper.find('td').at(2).instance().textContent;
-  strictEqual(text, 'Not available');
-});
+test('displays placeholder text if student name is missing', function() {
+  const item = {...this.item}
+  delete item.student
+  const wrapper = mountComponent({item})
+  const text = wrapper
+    .find('td')
+    .at(2)
+    .instance().textContent
+  strictEqual(text, 'Not available')
+})
 
-test('displays the history grader', function () {
-  const grader = this.wrapper.find('td').at(3).instance().innerText;
-  strictEqual(grader, this.item.grader);
-});
+test('displays the history grader', function() {
+  const grader = this.wrapper
+    .find('td')
+    .at(3)
+    .instance().innerText
+  strictEqual(grader, this.item.grader)
+})
 
-test('displays the history assignment', function () {
-  const assignment = this.wrapper.find('td').at(4).instance().innerText;
-  strictEqual(assignment, this.item.assignment.name.toString());
-});
+test('displays the history assignment', function() {
+  const assignment = this.wrapper
+    .find('td')
+    .at(4)
+    .instance().innerText
+  strictEqual(assignment, this.item.assignment.name.toString())
+})
 
-test('displays the history grade before and points possible before if points based and grade is numeric', function () {
-  const gradeBefore = this.wrapper.find('td').at(5).instance().innerText;
-  strictEqual(gradeBefore, "19/25");
-});
+test('displays the history grade before and points possible before if points based and grade is numeric', function() {
+  const gradeBefore = this.wrapper
+    .find('td')
+    .at(5)
+    .instance().innerText
+  strictEqual(gradeBefore, '19/25')
+})
 
-test('displays only the history grade before if not points based', function () {
-  this.item.displayAsPoints = false;
-  this.wrapper = mountComponent({ item: this.item });
-  const gradeBefore = this.wrapper.find('td').at(5).instance().innerText;
-  strictEqual(gradeBefore, "19");
-});
+test('displays only the history grade before if not points based', function() {
+  this.item.displayAsPoints = false
+  this.wrapper = mountComponent({item: this.item})
+  const gradeBefore = this.wrapper
+    .find('td')
+    .at(5)
+    .instance().innerText
+  strictEqual(gradeBefore, '19')
+})
 
-test('displays only the history grade before if grade cannot be parsed as a number', function () {
-  this.item.gradeBefore = "B";
-  this.wrapper = mountComponent({ item: this.item });
-  const gradeBefore = this.wrapper.find('td').at(5).instance().innerText;
-  strictEqual(gradeBefore, "B");
-});
+test('displays only the history grade before if grade cannot be parsed as a number', function() {
+  this.item.gradeBefore = 'B'
+  this.wrapper = mountComponent({item: this.item})
+  const gradeBefore = this.wrapper
+    .find('td')
+    .at(5)
+    .instance().innerText
+  strictEqual(gradeBefore, 'B')
+})
 
-test('displays the history grade after and points possible after if points based and grade is numeric', function () {
-  const gradeAfter = this.wrapper.find('td').at(6).instance().innerText;
-  strictEqual(gradeAfter, "21/30");
-});
+test('displays the history grade after and points possible after if points based and grade is numeric', function() {
+  const gradeAfter = this.wrapper
+    .find('td')
+    .at(6)
+    .instance().innerText
+  strictEqual(gradeAfter, '21/30')
+})
 
-test('displays only the history grade after if not points based', function () {
-  this.item.displayAsPoints = false;
-  this.wrapper = mountComponent({ item: this.item });
-  const gradeAfter = this.wrapper.find('td').at(6).instance().innerText;
-  strictEqual(gradeAfter, "21");
-});
+test('displays only the history grade after if not points based', function() {
+  this.item.displayAsPoints = false
+  this.wrapper = mountComponent({item: this.item})
+  const gradeAfter = this.wrapper
+    .find('td')
+    .at(6)
+    .instance().innerText
+  strictEqual(gradeAfter, '21')
+})
 
-test('displays only the history grade after if grade cannot be parsed as a number', function () {
-  this.item.gradeAfter = "B";
-  this.wrapper = mountComponent({ item: this.item });
-  const gradeAfter = this.wrapper.find('td').at(6).instance().innerText;
-  strictEqual(gradeAfter, "B");
-});
+test('displays only the history grade after if grade cannot be parsed as a number', function() {
+  this.item.gradeAfter = 'B'
+  this.wrapper = mountComponent({item: this.item})
+  const gradeAfter = this.wrapper
+    .find('td')
+    .at(6)
+    .instance().innerText
+  strictEqual(gradeAfter, 'B')
+})
 
-test('displays the current grade and points possible if points based and grade is numeric', function () {
-  const gradeCurrent = this.wrapper.find('td').at(7).instance().innerText;
-  strictEqual(gradeCurrent, "22/30");
-});
+test('displays the current grade and points possible if points based and grade is numeric', function() {
+  const gradeCurrent = this.wrapper
+    .find('td')
+    .at(7)
+    .instance().innerText
+  strictEqual(gradeCurrent, '22/30')
+})
 
-test('displays only the history grade current if not points based', function () {
-  this.item.displayAsPoints = false;
-  this.wrapper = mountComponent({ item: this.item });
-  const gradeCurrent = this.wrapper.find('td').at(7).instance().innerText;
-  strictEqual(gradeCurrent, "22");
-});
+test('displays only the history grade current if not points based', function() {
+  this.item.displayAsPoints = false
+  this.wrapper = mountComponent({item: this.item})
+  const gradeCurrent = this.wrapper
+    .find('td')
+    .at(7)
+    .instance().innerText
+  strictEqual(gradeCurrent, '22')
+})
 
-test('displays only the history grade current if grade cannot be parsed as a number', function () {
-  this.item.gradeCurrent = "B";
-  this.wrapper = mountComponent({ item: this.item });
-  const gradeCurrent = this.wrapper.find('td').at(7).instance().innerText;
-  strictEqual(gradeCurrent, "B");
-});
+test('displays only the history grade current if grade cannot be parsed as a number', function() {
+  this.item.gradeCurrent = 'B'
+  this.wrapper = mountComponent({item: this.item})
+  const gradeCurrent = this.wrapper
+    .find('td')
+    .at(7)
+    .instance().innerText
+  strictEqual(gradeCurrent, 'B')
+})

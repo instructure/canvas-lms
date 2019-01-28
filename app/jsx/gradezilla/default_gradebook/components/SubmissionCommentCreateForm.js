@@ -16,37 +16,37 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {func} from 'prop-types';
-import I18n from 'i18n!gradebook';
-import SubmissionCommentForm from '../../../gradezilla/default_gradebook/components/SubmissionCommentForm';
+import {func} from 'prop-types'
+import I18n from 'i18n!gradebook'
+import SubmissionCommentForm from '../../../gradezilla/default_gradebook/components/SubmissionCommentForm'
 
 export default class SubmissionCommentCreateForm extends SubmissionCommentForm {
   static propTypes = {
     ...SubmissionCommentForm.propTypes,
     createSubmissionComment: func.isRequired
-  };
-
-  handleCancel (event) {
-    super.handleCancel(event, this.focusTextarea);
   }
 
-  handlePublishComment (event) {
-    super.handlePublishComment(event);
-    this.setState({ comment: '' }, this.focusTextarea);
+  handleCancel(event) {
+    super.handleCancel(event, this.focusTextarea)
   }
 
-  buttonLabels () {
+  handlePublishComment(event) {
+    super.handlePublishComment(event)
+    this.setState({comment: ''}, this.focusTextarea)
+  }
+
+  buttonLabels() {
     return {
       cancelButtonLabel: I18n.t('Cancel Submitting Comment'),
       submitButtonLabel: I18n.t('Submit Comment')
-    };
+    }
   }
 
-  publishComment () {
-    return this.props.createSubmissionComment(this.state.comment);
+  publishComment() {
+    return this.props.createSubmissionComment(this.state.comment)
   }
 
-  showButtons () {
-    return this.commentIsValid();
+  showButtons() {
+    return this.commentIsValid()
   }
 }

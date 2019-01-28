@@ -129,6 +129,21 @@ what's described in this document. Those fields are subject to change.
 | `is_announcement` | `true` if this topic was posted as an announcement, `false` otherwise. |
 | `title` | Title of the topic (possibly truncated). |
 | `body` | Body of the topic (possibly truncated). |
+| `assignment_id` | The Canvas id of the topic's associated assignment |
+| `context_id` | The Canvas id of the topic's context |
+| `context_type` | The type of the topic's context (usually 'Assignment') |
+| `workflow_state` | The state of the topic |
+| `lock_at` | The lock date (discussion is locked after this date) |
+| `updated_at` | The time at which this topic was last modified in any way |
+
+#### `discussion_topic_updated`
+
+| Field | Description |
+| ----- | ----------- |
+| `discussion_topic_id` | The Canvas id of the new discussion topic. |
+| `is_announcement` | `true` if this topic was posted as an announcement, `false` otherwise. |
+| `title` | Title of the topic (possibly truncated). |
+| `body` | Body of the topic (possibly truncated). |
 
 
 #### `group_category_created`
@@ -324,6 +339,33 @@ by `asset_type` and `asset_id`.
 | `points_possible` | The maximum points possible for the assignment |
 | `lti_assignment_id` | The LTI assignment guid for the assignment |
 
+#### `assignment_group_created`
+
+| Field | Description |
+| ----- | ----------- |
+| `assignment_group_id` | The Canvas id of the new assignment group. |
+| `context_id` | The Canvas context id of the new assignment group. |
+| `context_type` | The context type of the new assignment group. |
+| `name` | The name of the new assignment group. |
+| `position` | The position of the new assignment group. |
+| `group_weight` | The group weight of the new assignment grou. |
+| `sis_source_id` | The SIS source id of the new assignment group. |
+| `integration_data` | Integration data for the new assignment group. |
+| `rules` | Rules for the new assignment group. |
+
+#### `assignment_group_updated`
+
+| Field | Description |
+| ----- | ----------- |
+| `assignment_group_id` | The Canvas id of the updated assignment group. |
+| `context_id` | The Canvas context id of the updated assignment group. |
+| `context_type` | The context type of the updated assignment group. |
+| `name` | The name of the updated assignment group. |
+| `position` | The position of the updated assignment group. |
+| `group_weight` | The group weight of the updated assignment group. |
+| `sis_source_id` | The SIS source id of the updated assignment group. |
+| `integration_data` | Integration data for the updated assignment group. |
+| `rules` | Rules for the updated assignment group. |
 
 #### `submission_created`
 

@@ -62,7 +62,7 @@ QUnit.module('GradeSummary AcceptGradesButton', suiteHooks => {
     })
 
     test('is not disabled', () => {
-      strictEqual(wrapper.find('button').prop('aria-disabled'), null)
+      strictEqual(wrapper.find('Button').prop('disabled'), null)
     })
 
     test('calls the onClick prop when clicked', () => {
@@ -89,7 +89,7 @@ QUnit.module('GradeSummary AcceptGradesButton', suiteHooks => {
     })
 
     test('is not disabled', () => {
-      strictEqual(wrapper.find('button').prop('aria-disabled'), null)
+      strictEqual(wrapper.find('Button').prop('disabled'), null)
     })
 
     test('does not call the onClick prop when clicked', () => {
@@ -114,7 +114,7 @@ QUnit.module('GradeSummary AcceptGradesButton', suiteHooks => {
     })
 
     test('is not disabled', () => {
-      strictEqual(wrapper.find('button').prop('aria-disabled'), null)
+      strictEqual(wrapper.find('Button').prop('disabled'), null)
     })
 
     test('does not call the onClick prop when clicked', () => {
@@ -139,7 +139,7 @@ QUnit.module('GradeSummary AcceptGradesButton', suiteHooks => {
     })
 
     test('is disabled', () => {
-      strictEqual(wrapper.find('button').prop('aria-disabled'), 'true')
+      strictEqual(wrapper.find('Button').prop('disabled'), true)
     })
 
     test('does not call the onClick prop when clicked', () => {
@@ -167,7 +167,7 @@ QUnit.module('GradeSummary AcceptGradesButton', suiteHooks => {
     })
 
     test('is not disabled', () => {
-      strictEqual(wrapper.find('button').prop('aria-disabled'), null)
+      equal(wrapper.find('Button').prop('disabled'), null)
     })
 
     test('calls the onClick prop when clicked', () => {
@@ -198,7 +198,7 @@ QUnit.module('GradeSummary AcceptGradesButton', suiteHooks => {
     })
 
     test('is disabled', () => {
-      strictEqual(wrapper.find('button').prop('aria-disabled'), 'true')
+      strictEqual(wrapper.find('Button').prop('disabled'), true)
     })
 
     test('does not call the onClick prop when clicked', () => {

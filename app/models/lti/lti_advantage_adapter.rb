@@ -45,10 +45,14 @@ module Lti
     end
 
     def launch_url
-      resource_type ? @tool.extension_setting(resource_type, :url) : @tool.url
+      @tool.login_or_launch_uri(extension_type: resource_type)
     end
 
     private
+
+    def target_link_uri
+      resource_type ? @tool.extension_setting(resource_type, :url) : @tool.url
+    end
 
     def generate_lti_params
       message_type = @tool.extension_setting(resource_type, :message_type)
@@ -64,7 +68,7 @@ module Lti
       LtiAdvantage::Messages::LoginRequest.new(
         iss: Canvas::Security.config['lti_iss'],
         login_hint: Lti::Asset.opaque_identifier_for(@user),
-        target_link_uri: 'a new endpoint',
+        target_link_uri: target_link_uri,
         lti_message_hint: message_hint
       ).as_json
     end

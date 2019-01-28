@@ -604,6 +604,48 @@ describe SubmissionsController do
       assert_status(200)
     end
 
+    describe "peer reviewers" do
+      let(:course) { Course.create! }
+      let(:assignment) { course.assignments.create!(peer_reviews: true) }
+      let(:reviewer) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
+      let(:reviewer_sub) { assignment.submissions.find_by!(user: reviewer) }
+      let(:student) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
+      let(:student_sub) { assignment.submissions.find_by!(user: student) }
+
+      before(:each) do
+        AssessmentRequest.create!(assessor: reviewer, assessor_asset: reviewer_sub, asset: student_sub, user: student)
+        user_session(student)
+      end
+
+      it "renders okay for peer reviewer of student under view" do
+        get :show, params: {course_id: course.id, assignment_id: assignment.id, id: student.id}
+        expect(response).to have_http_status(:ok)
+      end
+
+      it "renders unauthorized for peer reviewer of a student not under view" do
+        new_student = course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user
+        get :show, params: {course_id: course.id, assignment_id: assignment.id, id: new_student.id}
+        expect(response).to have_http_status(:unauthorized)
+      end
+
+      context "when assignment is anonymous" do
+        before(:each) do
+          assignment.update!(anonymous_grading: true)
+        end
+
+        it "renders okay for peer reviewer of student under view" do
+          get :show, params: {course_id: course.id, assignment_id: assignment.id, id: student.id}
+          expect(response).to have_http_status(:ok)
+        end
+
+        it "renders unauthorized for peer reviewer of a student not under view" do
+          new_student = course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user
+          get :show, params: {course_id: course.id, assignment_id: assignment.id, id: new_student.id}
+          expect(response).to have_http_status(:unauthorized)
+        end
+      end
+    end
+
     it "renders unauthorized for non-submitting student" do
       new_student = User.create!
       @context.enroll_student(new_student, enrollment_state: 'active')

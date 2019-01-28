@@ -16,25 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { Provider } from 'react-redux';
-import I18n from 'i18n!gradebook_history';
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
-import SearchForm from '../gradebook-history/SearchForm';
-import SearchResults from '../gradebook-history/SearchResults';
+import React from 'react'
+import {Provider} from 'react-redux'
+import I18n from 'i18n!gradebook_history'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import SearchForm from '../gradebook-history/SearchForm'
+import SearchResults from '../gradebook-history/SearchResults'
 
-import GradebookHistoryStore from '../gradebook-history/store/GradebookHistoryStore';
+import GradebookHistoryStore from '../gradebook-history/store/GradebookHistoryStore'
 
 const GradebookHistoryApp = () => (
-  (
-    <Provider store={GradebookHistoryStore}>
-      <div>
-        <h1>{I18n.t('Gradebook History')}</h1>
-        <SearchForm />
-        <SearchResults caption={<ScreenReaderContent>{I18n.t('Grade Changes')}</ScreenReaderContent>} />
-      </div>
-    </Provider>
-  )
-);
+  <Provider store={GradebookHistoryStore}>
+    <div>
+      <h1>{I18n.t('Gradebook History')}</h1>
+      <SearchForm />
+      <SearchResults
+        caption={<ScreenReaderContent>{I18n.t('Grade Changes')}</ScreenReaderContent>}
+      />
+    </div>
+  </Provider>
+)
 
-export default GradebookHistoryApp;
+export default GradebookHistoryApp

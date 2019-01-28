@@ -43,7 +43,8 @@ export default class GraderCountNumberInput extends React.Component {
   }
 
   state = {
-    graderCount: this.props.currentGraderCount || Math.min(this.props.maxGraderCount, DEFAULT_GRADER_COUNT),
+    graderCount:
+      this.props.currentGraderCount || Math.min(this.props.maxGraderCount, DEFAULT_GRADER_COUNT),
     messages: []
   }
 
@@ -88,14 +89,16 @@ export default class GraderCountNumberInput extends React.Component {
     return (
       <div className="ModeratedGrading__GraderCountInputContainer">
         <NumberInput
+          id="grader_count"
           value={this.state.graderCount.toString()}
           label={label}
           locale={this.props.locale}
           max={this.props.maxGraderCount.toString()}
           messages={this.state.messages}
           min="1"
-          name="grader_count"
-          onChange={e => { if (e.type !== 'blur') this.handleNumberInputChange(e.target.value)}}
+          onChange={e => {
+            if (e.type !== 'blur') this.handleNumberInputChange(e.target.value)
+          }}
           onBlur={e => this.handleNumberInputBlur(e.target.value)}
           showArrows={false}
           width="5rem"

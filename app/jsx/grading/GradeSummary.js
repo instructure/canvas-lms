@@ -361,11 +361,26 @@ function calculateTotals (calculatedGrades, currentOrFinal, groupWeightingScheme
   const scoreAsPercent = calculateGrade(finalScore, finalPossible)
 
   let finalGrade
+  let letterGrade
   let teaserText
 
-  if (!gradeChanged && ENV.grading_scheme && ENV.effective_final_grade) {
-    finalGrade = formatPercentGrade(gradeToScoreLowerBound(ENV.effective_final_grade, ENV.grading_scheme))
+  if (gradingSchemeEnabled()) {
+    const scoreToUse = overrideScorePresent() ?
+      ENV.effective_final_score :
+      calculatePercentGrade(finalScore, finalPossible)
+
+    letterGrade = scoreToGrade(scoreToUse, ENV.grading_scheme)
+    $('.final_grade .letter_grade').text(letterGrade)
+  }
+
+  if (!gradeChanged && overrideScorePresent()) {
     teaserText = scoreAsPoints
+
+    if (gradingSchemeEnabled()) {
+      finalGrade = formatPercentGrade(gradeToScoreLowerBound(letterGrade, ENV.grading_scheme))
+    } else {
+      finalGrade = formatPercentGrade(ENV.effective_final_score)
+    }
   } else if (showTotalGradeAsPoints && groupWeightingScheme !== 'percent') {
     finalGrade = scoreAsPoints
     teaserText = scoreAsPercent
@@ -391,13 +406,19 @@ function calculateTotals (calculatedGrades, currentOrFinal, groupWeightingScheme
     $.screenReaderFlashMessageExclusive(msg)
   }
 
-  if (ENV.grading_scheme) {
-    $('.final_letter_grade .grade').text(
-      ENV.effective_final_grade || scoreToGrade(calculatePercentGrade(finalScore, finalPossible), ENV.grading_scheme)
-    )
-  }
-
   $('.revert_all_scores').showIf($('#grades_summary .revert_score_link').length > 0)
+}
+
+// This element is only rendered by the erb if the course has enabled grading
+// schemes. We can't rely on only checking for the presence of
+// ENV.grading_scheme as that, in this case, always returns Canvas's default
+// grading scheme even if grading schemes are not enabled.
+function gradingSchemeEnabled() {
+  return $('.final_grade .letter_grade').length > 0 && ENV.grading_scheme
+}
+
+function overrideScorePresent() {
+  return ENV.effective_final_score != null
 }
 
 function updateStudentGrades () {

@@ -79,7 +79,11 @@ export const STUDENT_VIEW_QUERY = gql`
           filter: {states: [unsubmitted, graded, pending_review, submitted]}
         ) {
           nodes {
+            deductedPoints
+            enteredGrade
             grade
+            gradingStatus
+            latePolicyStatus
             submissionStatus
           }
         }
@@ -120,7 +124,12 @@ export const StudentAssignmentShape = shape({
   submissionsConnection: shape({
     nodes: arrayOf(
       shape({
-        grade: string
+        deductedPoints: number,
+        enteredGrade: string,
+        grade: string,
+        gradingStatus: string,
+        latePolicyStatus: string,
+        submissionStatus: string
       })
     ).isRequired
   }).isRequired

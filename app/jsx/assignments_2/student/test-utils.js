@@ -42,7 +42,17 @@ export function mockAssignment(overrides = {}) {
     },
     modules: [],
     submissionsConnection: {
-      nodes: [],
+      nodes: [
+        {
+          deductedPoints: 3,
+          enteredGrade: '9',
+          grade: '6',
+          latePolicyStatus: 'late',
+          submissionStatus: 'late',
+          gradingStatus: 'graded',
+          __typename: 'Sumbission'
+        }
+      ],
       __typename: 'SubmissionConnection'
     },
     __typename: 'Assignment',

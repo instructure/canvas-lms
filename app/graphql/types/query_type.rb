@@ -67,5 +67,14 @@ module Types
             Canvas::ICU.collation_key(enrollment.course.nickname_for(current_user))
           }.map(&:course)
     end
+
+    field :module_item, Types::ModuleItemType, null: true do
+      description "ModuleItem"
+      argument :id, ID, "a graphql or legacy id", required: true,
+        prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("ModuleItem")
+    end
+    def module_item(id:)
+      GraphQLNodeLoader.load("ModuleItem", id, context)
+    end
   end
 end

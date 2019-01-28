@@ -197,6 +197,21 @@ QUnit.module('GradeSummary GradesGrid', suiteHooks => {
     deepEqual(links.map(link => link.prop('href')), expectedUrls)
   })
 
+  test('sorts students by id when students are anonymous', () => {
+    props.students = [
+      {id: 'fp312', displayName: 'Adam Jones'},
+      {id: 'BB811', displayName: 'Betty Ford'},
+      {id: 'x9X23', displayName: 'Charlie Xi'},
+      {id: 'G234a', displayName: 'Dana Smith'}
+    ]
+    props.anonymousStudents = true
+    mountComponent()
+    const links = wrapper.find('th.GradesGrid__BodyRowHeader a')
+    const sortedStudentIds = ['BB811', 'G234a', 'fp312', 'x9X23']
+    const expectedUrls = sortedStudentIds.map(id => speedGraderUrlFor(id, true))
+    deepEqual(links.map(link => link.prop('href')), expectedUrls)
+  })
+
   test('enumerates additional students for names as they are added', () => {
     for (let i = 0; i < props.students.length; i++) {
       props.students[i].displayName = null

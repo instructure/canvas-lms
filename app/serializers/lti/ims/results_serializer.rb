@@ -17,16 +17,16 @@
 #
 module Lti::Ims
   class ResultsSerializer
-    def initialize(result, url)
+    def initialize(result, li_url)
       @result = result
-      @url = url
+      @li_url = li_url
     end
 
     def as_json
       {
-        id: "#{url}/#{result.id}",
-        scoreOf: url,
-        userId: result.user_id.to_s,
+        id: "#{li_url}/results/#{result.id}",
+        scoreOf: li_url,
+        userId: result.user.lti_id,
         resultScore: result.result_score,
         resultMaximum: result.result_maximum,
         comment:result.comment
@@ -35,6 +35,6 @@ module Lti::Ims
 
     private
 
-    attr_reader :result, :url
+    attr_reader :result, :li_url
   end
 end

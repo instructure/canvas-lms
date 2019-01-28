@@ -26,7 +26,7 @@ import safeCloneElement from '@instructure/ui-utils/lib/react/safeCloneElement'
 
 class Steps extends Component {
   static propTypes = {
-    isCollapsed: PropTypes.boolean,
+    isCollapsed: PropTypes.bool,
     children: props => {
       const inProgressArr = []
       for (const child in props.children) {

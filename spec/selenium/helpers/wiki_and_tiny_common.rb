@@ -217,16 +217,68 @@ module WikiAndTinyCommon
     driver.action.key_down(:shift).click(el).key_up(:shift).perform
   end
 
-  def visit_front_page(course)
+  def visit_front_page_edit(course)
     get "/courses/#{course.id}/pages/front-page/edit"
+  end
+
+  def visit_new_announcement_page(course)
+    get "/courses/#{course.id}/discussion_topics/new?is_announcement=true"
+  end
+
+  def visit_new_assignment_page(course)
+    get "/courses/#{course.id}/assignments/new"
+  end
+
+  def visit_new_discussion_page(course)
+    get "/courses/#{course.id}/discussion_topics/new"
+  end
+
+  def visit_new_quiz_page(course, quiz)
+    get "/courses/#{course.id}/quizzes/#{quiz.id}/edit"
+  end
+
+  def visit_syllabus(course)
+    get "/courses/#{course.id}/assignments/syllabus"
+  end
+
+  def click_edit_syllabus
+    f('.edit_syllabus_link').click
   end
 
   def edit_wiki_css
     f("form.edit-form .edit-content")
   end
 
+  def assignment_id_path(course, assignment)
+    "/courses/#{course.id}/assignments/#{assignment.id}"
+  end
+
+  def quiz_id_path(course, quiz)
+    "/courses/#{course.id}/quizzes/#{quiz.id}"
+  end
+
+  def announcement_id_path(course, announcement)
+    "/courses/#{course.id}/discussion_topics/#{announcement.id}"
+  end
+
+  def discussion_id_path(course, discussion)
+    "/courses/#{course.id}/discussion_topics/#{discussion.id}"
+  end
+
+  def module_id_path(course, module_obj)
+    "/courses/#{course.id}/modules/#{module_obj.id}"
+  end
+
+  def course_file_path(course)
+    "/courses/#{course.id}/files"
+  end
+
+  def course_file_id_path(file)
+    "/files/#{file.id}"
+  end
+
   def wysiwyg_state_setup(course, text = "1\n2\n3", val: false, html: false)
-    visit_front_page(course)
+    visit_front_page_edit(course)
     wait_for_tiny(edit_wiki_css)
 
     if val == true

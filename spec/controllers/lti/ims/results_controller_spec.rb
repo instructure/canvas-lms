@@ -76,7 +76,7 @@ describe Lti::Ims::ResultsController do
 
       it 'returns the user result' do
         send_request
-        expect(json.first['userId'].to_i).to eq result.user_id
+        expect(json.first['userId']).to eq result.user.lti_id
       end
 
       context 'with non-existent user' do

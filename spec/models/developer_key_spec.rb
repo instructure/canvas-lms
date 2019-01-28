@@ -315,7 +315,7 @@ describe DeveloperKey do
     context 'sharding' do
       specs_require_sharding
 
-      let(:root_account_shard) { Shard.create! }
+      let(:root_account_shard) { @shard1 }
       let(:root_account) { root_account_shard.activate { account_model } }
       let(:sa_developer_key) { Account.site_admin.shard.activate { DeveloperKey.create!(name: 'SA Key') } }
       let(:root_account_binding) do
@@ -531,7 +531,7 @@ describe DeveloperKey do
 
       describe '#by_cached_vendor_code' do
         let(:vendor_code) { 'tool vendor code' }
-        let(:not_site_admin_shard) { Shard.create! }
+        let(:not_site_admin_shard) { @shard1 }
 
         it 'finds keys in the site admin shard' do
           site_admin_key = nil

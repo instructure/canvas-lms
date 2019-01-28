@@ -52,6 +52,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       account_id: sub_account.id,
       developer_key_id: dev_key_id,
       tool_configuration: {
+        privacy_level: 'public',
         settings: settings
       }
     }.compact
@@ -114,7 +115,8 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
         tool_configuration: {
           settings_url: url,
           disabled_placements: ['course_navigation', 'account_navigation'],
-          custom_fields: "foo=bar\r\nkey=value"
+          custom_fields: "foo=bar\r\nkey=value",
+          privacy_level: 'public'
         }
       }
     end
@@ -246,6 +248,10 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       expect(subject.redirect_uris).to eq dev_key_params[:redirect_uris].split
     end
 
+    it 'sets the developer key oidc_login_uri' do
+      expect(subject.oidc_login_uri).to eq oidc_login_uri
+    end
+
     context 'when scopes are invalid' do
       subject do
         bad_scope_request
@@ -362,6 +368,11 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
         subject
         new_settings = config_from_response.settings
         expect(new_settings['launch_url']).to eq new_url
+      end
+
+      it 'sets the privacy level' do
+        subject
+        expect(config_from_response.privacy_level).to eq 'public'
       end
     end
 

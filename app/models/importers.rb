@@ -27,6 +27,17 @@ module Importers
     klass
   end
 
+  def self.disable_live_events!
+    ActiveRecord::Base.observers.disable LiveEventsObserver
+    yield
+  ensure
+    enable_live_events!
+  end
+
+  def self.enable_live_events!
+    ActiveRecord::Base.observers.enable LiveEventsObserver
+  end
+
   class Importer
     class << self
       attr_accessor :item_class

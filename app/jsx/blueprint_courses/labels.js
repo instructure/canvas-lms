@@ -34,7 +34,8 @@ const itemTypeLabels = {
   rubric: I18n.t('Rubric'),
   context_external_tool: I18n.t('External Tool'),
   folder: I18n.t('Folder'),
-  syllabus: I18n.t('Syllabus')
+  syllabus: I18n.t('Syllabus'),
+  settings: I18n.t('Settings')
 }
 
 const itemTypeLabelPlurals = {

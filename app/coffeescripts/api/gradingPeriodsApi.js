@@ -22,7 +22,7 @@ import 'jquery.instructure_misc_helpers'
 
 const batchUpdateUrl = id => $.replaceTags(ENV.GRADING_PERIODS_UPDATE_URL, 'set_id', id)
 
-const serializePeriods = (periods) => {
+const serializePeriods = periods => {
   const serialized = _.map(periods, period => ({
     id: period.id,
     title: period.title,
@@ -35,7 +35,7 @@ const serializePeriods = (periods) => {
 }
 
 export default {
-  deserializePeriods (periods) {
+  deserializePeriods(periods) {
     return _.map(periods, period => ({
       id: period.id,
       title: period.title,
@@ -44,11 +44,11 @@ export default {
       closeDate: new Date(period.close_date),
       isLast: period.is_last,
       isClosed: period.is_closed,
-      weight: period.weight,
+      weight: period.weight
     }))
   },
 
-  batchUpdate (setId, periods) {
+  batchUpdate(setId, periods) {
     return new Promise((resolve, reject) =>
       axios
         .patch(batchUpdateUrl(setId), serializePeriods(periods))

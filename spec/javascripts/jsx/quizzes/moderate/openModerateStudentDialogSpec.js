@@ -37,12 +37,10 @@ QUnit.module('openModerateStudentDialog', {
   }
 })
 
-test('is a function', () => {
-  ok(typeof openModerateStudentDialog === 'function')
-})
-
 test('focues on close button when opened', () => {
   const dialog = openModerateStudentDialog($('#moderate_student_dialog'), 500)
   const focusButton = dialog.parent().find('.ui-dialog-titlebar-close')[0]
   ok(focusButton === document.activeElement)
+  focusButton.click()
+  $(dialog).remove()
 })

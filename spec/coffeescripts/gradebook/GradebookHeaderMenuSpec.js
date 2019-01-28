@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
 import GradebookHeaderMenu from 'compiled/gradebook/GradebookHeaderMenu'
-import SetDefaultGradeDialog from 'compiled/gradebook/SetDefaultGradeDialog'
+import SetDefaultGradeDialog from 'compiled/shared/SetDefaultGradeDialog'
 import CurveGradesDialog from 'compiled/shared/CurveGradesDialog'
 
 QUnit.module('GradebookHeaderMenu#menuPopupOpenHandler', {
@@ -238,23 +238,44 @@ test('does not disable "Set Default Grade" when isAdmin', function() {
   ENV.current_user_roles = ['admin']
   this.assignment = {inClosedGradingPeriod: true}
   this.disableUnavailableMenuActions(this.menu)
-  strictEqual(this.menu.find('[data-action="setDefaultGrade"]')[0].getAttribute('aria-disabled'), null)
+  strictEqual(
+    this.menu.find('[data-action="setDefaultGrade"]')[0].getAttribute('aria-disabled'),
+    null
+  )
 })
 
-test('disables "Unmute Assignment" when the assignment is moderated and grades have not been published', function () {
-  this.assignment = {moderated_grading: true, grades_published: false, inClosedGradingPeriod: false, muted: true}
+test('disables "Unmute Assignment" when the assignment is moderated and grades have not been published', function() {
+  this.assignment = {
+    moderated_grading: true,
+    grades_published: false,
+    inClosedGradingPeriod: false,
+    muted: true
+  }
   this.disableUnavailableMenuActions(this.menu)
-  strictEqual(this.menu.find('[data-action="toggleMuting"]')[0].getAttribute('aria-disabled'), 'true')
+  strictEqual(
+    this.menu.find('[data-action="toggleMuting"]')[0].getAttribute('aria-disabled'),
+    'true'
+  )
 })
 
-test('does not disable "Unmute Assignment" when grades are published', function () {
-  this.assignment = {moderated_grading: true, grades_published: true, inClosedGradingPeriod: false, muted: true}
+test('does not disable "Unmute Assignment" when grades are published', function() {
+  this.assignment = {
+    moderated_grading: true,
+    grades_published: true,
+    inClosedGradingPeriod: false,
+    muted: true
+  }
   this.disableUnavailableMenuActions(this.menu)
   strictEqual(this.menu.find('[data-action="toggleMuting"]')[0].getAttribute('aria-disabled'), null)
 })
 
-test('does not disable "Mute Assignment" when the assignment can be muted', function () {
-  this.assignment = {moderated_grading: true, grades_published: false, inClosedGradingPeriod: false, muted: false}
+test('does not disable "Mute Assignment" when the assignment can be muted', function() {
+  this.assignment = {
+    moderated_grading: true,
+    grades_published: false,
+    inClosedGradingPeriod: false,
+    muted: false
+  }
   this.disableUnavailableMenuActions(this.menu)
   strictEqual(this.menu.find('[data-action="toggleMuting"]')[0].getAttribute('aria-disabled'), null)
 })

@@ -790,6 +790,14 @@ describe DiscussionTopicsController do
     end
   end
 
+  describe "GET 'new'" do
+    it "creates a default assignment group if none exist" do
+      user_session(@teacher)
+      get :new, params: {course_id: @course.id}
+      expect(@course.assignment_groups.count).not_to eq 0
+    end
+  end
+
   describe "GET 'edit'" do
     before(:once) do
       course_topic

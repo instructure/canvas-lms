@@ -67,7 +67,8 @@ export default class DeveloperKeyModal extends React.Component {
       createLtiKeyState.disabledPlacements,
       createOrEditDeveloperKeyState.developerKey.id,
       createLtiKeyState.toolConfiguration,
-      customFields
+      customFields,
+      createLtiKeyState.privacyLevel
     ))
     this.closeModal()
   }
@@ -195,6 +196,7 @@ export default class DeveloperKeyModal extends React.Component {
       listDeveloperKeyScopesSet={actions.listDeveloperKeyScopesSet}
       setEnabledScopes={actions.ltiKeysSetEnabledScopes}
       setDisabledPlacements={actions.ltiKeysSetDisabledPlacements}
+      setPrivacyLevel={actions.ltiKeysSetPrivacyLevel}
       createLtiKeyState={createLtiKeyState}
     />
   }

@@ -27,6 +27,11 @@ describe Course do
 
   describe 'relationships' do
     it { is_expected.to have_one(:late_policy).dependent(:destroy).inverse_of(:course) }
+
+    it { is_expected.to have_many(:post_policies).dependent(:destroy).inverse_of(:course) }
+    it { is_expected.to have_one(:default_post_policy).inverse_of(:course) }
+    it { is_expected.to have_many(:assignment_post_policies).inverse_of(:course) }
+
     it { is_expected.to have_many(:feature_flags) }
   end
 
@@ -1141,6 +1146,16 @@ describe Course do
 
       expect(@course.uuid).not_to eq @new_course.uuid
       expect(@course.replacement_course_id).to eq @new_course.id
+    end
+
+    it "should transfer favorites with the enrollments" do
+      student_in_course(:course => @course)
+      fav = @student.favorites.create!(:context => @course)
+
+      @course.reload
+
+      @new_course = @course.reset_content
+      expect(fav.reload.context).to eq @new_course
     end
   end
 
@@ -3997,7 +4012,7 @@ describe Course, "section_visibility" do
       limited_teacher = user_factory(:active_all => true)
       @course.enroll_user(limited_teacher, "TeacherEnrollment", :enrollment_state => "active",
         :section => section2, :limit_privileges_to_course_section => true)
-      
+
       observer = user_factory(:active_all => true)
       @course.enroll_user(observer, "ObserverEnrollment", :enrollment_state => "active", :section => section2)
       expect(@course.users_visible_to(limited_student)).not_to include(observer)
@@ -5264,6 +5279,10 @@ describe Course, "#show_total_grade_as_points?" do
   describe Course, "#gradebook_backwards_incompatible_features_enabled?" do
     let(:course) { Course.create! }
 
+    it "returns false if there are no policies nor is final_grade_override enabled" do
+      expect(course).not_to be_gradebook_backwards_incompatible_features_enabled
+    end
+
     it "returns true if a late policy is enabled" do
       course.late_policy = LatePolicy.new(late_submission_deduction_enabled: true)
 
@@ -5276,15 +5295,16 @@ describe Course, "#show_total_grade_as_points?" do
       expect(course.gradebook_backwards_incompatible_features_enabled?).to be true
     end
 
+    it 'is backward incompatible if final_grades_override is enabled' do
+      course.enable_feature!(:final_grades_override)
+      expect(course).to be_gradebook_backwards_incompatible_features_enabled
+    end
+
     it "returns true if both a late and missing policy are enabled" do
       course.late_policy =
         LatePolicy.new(late_submission_deduction_enabled: true, missing_submission_deduction_enabled: true)
 
       expect(course.gradebook_backwards_incompatible_features_enabled?).to be true
-    end
-
-    it "returns false if there are no policies" do
-      expect(course.gradebook_backwards_incompatible_features_enabled?).to be false
     end
 
     it "returns false if both policies are disabled" do

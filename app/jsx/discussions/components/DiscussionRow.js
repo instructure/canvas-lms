@@ -388,13 +388,15 @@ export class DiscussionRow extends Component {
     if (this.props.discussion.pinned) {
       return (
         <span aria-hidden="true">
-          <IconPinLine />&nbsp;&nbsp;{I18n.t('Unpin')}
+          <IconPinLine />
+          &nbsp;&nbsp;{I18n.t('Unpin')}
         </span>
       )
     } else {
       return (
         <span aria-hidden="true">
-          <IconPinSolid />&nbsp;&nbsp;{I18n.t('Pin')}
+          <IconPinSolid />
+          &nbsp;&nbsp;{I18n.t('Pin')}
         </span>
       )
     }
@@ -422,19 +424,22 @@ export class DiscussionRow extends Component {
     if (menuTool.canvas_icon_class) {
       return (
         <span>
-          <i className={menuTool.canvas_icon_class} />&nbsp;&nbsp;{menuTool.title}
+          <i className={menuTool.canvas_icon_class} />
+          &nbsp;&nbsp;{menuTool.title}
         </span>
       )
     } else if (menuTool.icon_url) {
       return (
         <span>
-          <img className="icon" alt="" src={menuTool.icon_url} />&nbsp;&nbsp;{menuTool.title}
+          <img className="icon" alt="" src={menuTool.icon_url} />
+          &nbsp;&nbsp;{menuTool.title}
         </span>
       )
     } else {
       return (
         <span>
-          <IconLtiLine />&nbsp;&nbsp;{menuTool.title}
+          <IconLtiLine />
+          &nbsp;&nbsp;{menuTool.title}
         </span>
       )
     }
@@ -477,7 +482,8 @@ export class DiscussionRow extends Component {
         this.createMenuItem(
           'moveTo',
           <span aria-hidden="true">
-            <IconUpdownLine />&nbsp;&nbsp;{I18n.t('Move To')}
+            <IconUpdownLine />
+            &nbsp;&nbsp;{I18n.t('Move To')}
           </span>,
           I18n.t('Move discussion %{title}', {title: discussionTitle})
         )
@@ -489,7 +495,8 @@ export class DiscussionRow extends Component {
         this.createMenuItem(
           'duplicate',
           <span aria-hidden="true">
-            <IconCopySolid />&nbsp;&nbsp;{I18n.t('Duplicate')}
+            <IconCopySolid />
+            &nbsp;&nbsp;{I18n.t('Duplicate')}
           </span>,
           I18n.t('Duplicate discussion %{title}', {title: discussionTitle})
         )
@@ -532,7 +539,8 @@ export class DiscussionRow extends Component {
         this.createMenuItem(
           'delete',
           <span aria-hidden="true">
-            <IconTrashSolid />&nbsp;&nbsp;{I18n.t('Delete')}
+            <IconTrashSolid />
+            &nbsp;&nbsp;{I18n.t('Delete')}
           </span>,
           I18n.t('Delete discussion %{title}', {title: discussionTitle})
         )
@@ -770,7 +778,7 @@ export class DiscussionRow extends Component {
     const contentWrapper = document.createElement('span')
     contentWrapper.innerHTML = this.props.discussion.message
 
-    return this.props.connectDragPreview(
+    return (
       <div>
         <Grid startAt="medium" vAlign="middle" colSpacing="none">
           <GridRow>

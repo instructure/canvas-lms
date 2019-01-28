@@ -811,6 +811,16 @@ module Lti
     register_expansion 'Canvas.xuser.allRoles', [],
                        -> { lti_helper.all_roles }
 
+    # Same as "Canvas.xuser.allRoles", but uses roles formatted for LTI Advantage
+    # @example
+    #   ```
+    #    "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student",
+    #    "http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor",
+    #    "http://purl.imsglobal.org/vocab/lis/v2/system/person#User"
+    #   ```
+    register_expansion 'com.instructure.User.allRoles', [],
+                       -> { lti_helper.all_roles('lti1_3') }
+
     # Returns the Canvas global user_id of the launching user.
     # @duplicates Canvas.root_account.global_id
     # @example

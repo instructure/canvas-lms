@@ -37,25 +37,25 @@ class AnonymousSpeedGraderAlert extends React.Component {
 
     this.state = {isOpen: false}
 
-    this.open = this.open.bind(this);
-    this.close = this.close.bind(this);
+    this.open = this.open.bind(this)
+    this.close = this.close.bind(this)
 
     this.bindOpenButton = ref => {
-      this.openButton = ref;
-    };
+      this.openButton = ref
+    }
 
     this.bindCancelButton = ref => {
-      this.cancelButton = ref;
-    };
+      this.cancelButton = ref
+    }
   }
 
-  open () {
+  open() {
     this.setState({isOpen: true})
   }
 
-  close () {
+  close() {
     this.setState({isOpen: false})
-    this.props.onClose();
+    this.props.onClose()
   }
 
   renderAlert() {
@@ -77,10 +77,7 @@ class AnonymousSpeedGraderAlert extends React.Component {
 
             <GridRow hAlign="end">
               <GridCol width="auto">
-                <Button
-                  ref={this.bindCancelButton}
-                  onClick={this.close}
-                >
+                <Button ref={this.bindCancelButton} onClick={this.close}>
                   {I18n.t('Cancel')}
                 </Button>
 

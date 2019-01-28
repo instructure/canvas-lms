@@ -89,12 +89,26 @@ module Canvas::LiveEvents
   end
 
   def self.discussion_topic_created(topic)
-    post_event_stringified('discussion_topic_created', {
+    post_event_stringified('discussion_topic_created', get_discussion_topic_data(topic))
+  end
+
+  def self.discussion_topic_updated(topic)
+    post_event_stringified('discussion_topic_updated', get_discussion_topic_data(topic))
+  end
+
+  def self.get_discussion_topic_data(topic)
+    {
       discussion_topic_id: topic.global_id,
       is_announcement: topic.is_announcement,
       title: LiveEvents.truncate(topic.title),
-      body: LiveEvents.truncate(topic.message)
-    })
+      body: LiveEvents.truncate(topic.message),
+      assignment_id: topic.assignment_id,
+      context_id: topic.context_id,
+      context_type: topic.context_type,
+      workflow_state: topic.workflow_state,
+      lock_at: topic.lock_at,
+      updated_at: topic.updated_at
+    }
   end
 
   def self.account_notification_created(notification)
@@ -195,6 +209,28 @@ module Canvas::LiveEvents
 
   def self.assignment_updated(assignment)
     post_event_stringified('assignment_updated', get_assignment_data(assignment))
+  end
+
+  def self.assignment_group_created(assignment_group)
+    post_event_stringified('assignment_group_created', get_assignment_group_data(assignment_group))
+  end
+
+  def self.assignment_group_updated(assignment_group)
+    post_event_stringified('assignment_group_updated', get_assignment_group_data(assignment_group))
+  end
+
+  def self.get_assignment_group_data(assignment_group)
+    {
+      assignment_group_id: assignment_group.id,
+      context_id: assignment_group.context_id,
+      context_type: assignment_group.context_type,
+      name: assignment_group.name,
+      position: assignment_group.position,
+      group_weight: assignment_group.group_weight,
+      sis_source_id: assignment_group.sis_source_id,
+      integration_data: assignment_group.integration_data,
+      rules: assignment_group.rules
+    }
   end
 
   def self.assignments_bulk_updated(assignment_ids)

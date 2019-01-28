@@ -35,7 +35,7 @@ describe Course do
       data['all_files_export'] = {
         'file_path' => File.join(IMPORT_JSON_DIR, 'import_from_migration_small.zip')
       }
-      migration = ContentMigration.create!(:context => @course)
+      migration = ContentMigration.create!(:context => @course, started_at: Time.zone.now)
       allow(migration).to receive(:canvas_import?).and_return(true)
 
       params = {:copy => {
@@ -61,6 +61,8 @@ describe Course do
         :new_end_date=>"Apr 13, 2011"
       }}.with_indifferent_access
       migration.migration_ids_to_import = params
+
+      expect(migration).to receive(:trigger_live_events!).once
 
       # tool profile tests
       expect(Importers::ToolProfileImporter).to receive(:process_migration)
@@ -338,6 +340,37 @@ describe Course do
       expect(new_unlock_at).to eq DateTime.new(2014, 6,  1,  0,  0)
       expect(new_due_at).to    eq DateTime.new(2014, 6,  7, 23, 59)
       expect(new_lock_at).to   eq DateTime.new(2014, 6, 10, 23, 59)
+    end
+
+    it "should return error when removing dates and new_sis_integrations is enabled" do
+      course_factory
+      @course.root_account.enable_feature!(:new_sis_integrations)
+      @course.root_account.settings[:sis_syncing] = true
+      @course.root_account.settings[:sis_require_assignment_due_date] = true
+      @course.root_account.save!
+      @course.account.enable_feature!(:new_sis_integrations)
+      @course.account.settings[:sis_syncing] = true
+      @course.account.settings[:sis_require_assignment_due_date] = true
+      @course.account.save!
+
+      assignment = @course.assignments.create!(due_at: Time.now + 1.day)
+      assignment.post_to_sis = true
+      assignment.due_at = Time.now + 1.day
+      assignment.name = "lalala"
+      assignment.save!
+
+      migration = ContentMigration.create!(:context => @course)
+      migration.migration_ids_to_import = {:copy => { :copy_options => { :all_assignments => "1" } }}.with_indifferent_access
+      migration.migration_settings[:date_shift_options] = Importers::CourseContentImporter.shift_date_options(@course, { remove_dates: true })
+      migration.add_imported_item(assignment)
+      migration.source_course = @course
+      migration.initiated_source = :manual
+      migration.user = @user
+      migration.save!
+
+      Importers::CourseContentImporter.adjust_dates(@course, migration)
+      expect(migration.warnings.length).to eq 1
+      expect(migration.warnings[0]).to eq "Couldn't adjust dates on assignment lalala (ID #{assignment.id})"
     end
   end
 

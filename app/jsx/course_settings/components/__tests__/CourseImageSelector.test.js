@@ -21,7 +21,6 @@ import {mount, shallow} from 'enzyme'
 import CourseImageSelector from '../CourseImageSelector'
 import initialState from '../../store/initialState'
 
-
 describe('CourseImageSelector', () => {
   const fakeStore = () => ({
     subscribe: jest.fn(),
@@ -39,7 +38,9 @@ describe('CourseImageSelector', () => {
     store.getState = jest.fn().mockReturnValue({...initialState, imageUrl: 'http://coolUrl'})
     const wrapper = shallow(<CourseImageSelector store={store} />)
 
-    expect(wrapper.find('.CourseImageSelector').prop('style').backgroundImage).toBe('url(http://coolUrl)')
+    expect(wrapper.find('.CourseImageSelector').prop('style').backgroundImage).toBe(
+      'url(http://coolUrl)'
+    )
   })
 
   it('renders course image edit options when an image is present', () => {
@@ -50,9 +51,4 @@ describe('CourseImageSelector', () => {
     wrapper.setState({gettingImage: false})
     expect(wrapper.find('Menu').exists()).toBeTruthy()
   })
-
 })
-
-
-
-

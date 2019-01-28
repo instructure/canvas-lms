@@ -74,9 +74,6 @@
   "close_opportunity_center_popup_9907d981": {
     "message": "「機会」センターポップアップを閉じる"
   },
-  "count_plural_0_opportunities_one_opportunity_other_bb1698f6": {
-    "message": "{ count, plural,\n     =0 {# 機会}\n    one {# 機会}\n  other {# 機会}\n}。クリックして「機会」センターポップアップを開きます。"
-  },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {表示する# （完了したアイテムを}\n  other {表示する # （完了したアイテムを）}\n}"
   },

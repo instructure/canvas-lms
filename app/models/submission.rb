@@ -256,7 +256,7 @@ class Submission < ActiveRecord::Base
       AND (submissions.excused = 'f' OR submissions.excused IS NULL)
       AND (submissions.workflow_state = 'pending_review'
         OR (submissions.workflow_state IN ('submitted', 'graded')
-          AND (submissions.score IS NULL OR NOT submissions.grade_matches_current_submission)
+          AND (submissions.score IS NULL OR submissions.grade_matches_current_submission =  'f')
         )
       )
     SQL
@@ -464,31 +464,29 @@ class Submission < ActiveRecord::Base
     end
     can :read_grade
 
-    given do |user|
-      self.assignment.published? &&
-        self.assignment.peer_reviews &&
-        self.assignment.context.participating_students.where(id: self.user).exists? &&
-        user &&
-        self.assessment_requests.map(&:assessor_id).include?(user.id)
-    end
+    given { |user| peer_reviewer?(user) }
     can :read and can :comment and can :make_group_comment
 
-    given { |user, session|
-      can_view_plagiarism_report('turnitin', user, session)
-    }
-
+    given { |user, session| can_view_plagiarism_report('turnitin', user, session) }
     can :view_turnitin_report
 
-    given { |user, session|
-      can_view_plagiarism_report('vericite', user, session)
-    }
+    given { |user, session| can_view_plagiarism_report('vericite', user, session) }
     can :view_vericite_report
   end
+
+  def peer_reviewer?(user)
+    self.assignment.published? &&
+      self.assignment.peer_reviews &&
+      self.assignment.context.participating_students.where(id: self.user).exists? &&
+      user &&
+      self.assessment_requests.map(&:assessor_id).include?(user.id)
+  end
+  private :peer_reviewer?
 
   def can_view_details?(user)
     return false unless grants_right?(user, :read)
     return true unless self.assignment.anonymize_students?
-    user == self.user || Account.site_admin.grants_right?(user, :update)
+    user == self.user || peer_reviewer?(user) || Account.site_admin.grants_right?(user, :update)
   end
 
   def can_view_plagiarism_report(type, user, session)
@@ -2086,73 +2084,51 @@ class Submission < ActiveRecord::Base
   end
 
   def submission_comments(*args)
-    res = if @provisional_grade_filter
-            @provisional_grade_filter.submission_comments
-          else
-            super
-          end
-    res = res.select{|sc| sc.grants_right?(@comment_limiting_user, @comment_limiting_session, :read) } if @comment_limiting_user
-    res
+    comments = if @provisional_grade_filter
+      @provisional_grade_filter.submission_comments
+    else
+      super
+    end
+    comments.preload(submission: :assignment)
+
+    if @comment_limiting_user
+      comments.select {|comment| comment.grants_right?(@comment_limiting_user, @comment_limiting_session, :read) }
+    else
+      comments
+    end
   end
 
   def visible_submission_comments(*args)
-    res = if @provisional_grade_filter
-            @provisional_grade_filter.submission_comments.where(hidden: false)
-          else
-            super
-          end
-    res = res.select{|sc| sc.grants_right?(@comment_limiting_user, @comment_limiting_session, :read) } if @comment_limiting_user
-    res
+    comments = if @provisional_grade_filter
+      @provisional_grade_filter.submission_comments.where(hidden: false)
+    else
+      super
+    end
+    comments.preload(submission: :assignment)
+
+    if @comment_limiting_user
+      comments.select {|comment| comment.grants_right?(@comment_limiting_user, @comment_limiting_session, :read) }
+    else
+      comments
+    end
   end
 
   def visible_submission_comments_for(current_user)
-    if assignment.grade_as_group?
-      return all_submission_comments.for_groups.select { |comment| comment.grants_right?(current_user, :read) }
+    displayable_comments = if assignment.grade_as_group?
+      all_submission_comments.for_groups
+    elsif assignment.moderated_grading? && assignment.grades_published?
+      # When grades are published for a moderated assignment, provisional
+      # comments made by the chosen grader are duplicated as non-provisional
+      # comments. Ignore the provisional copies of that grader's comments.
+      all_submission_comments.where.not("author_id = ? AND provisional_grade_id IS NOT NULL", grader_id)
+    else
+      all_submission_comments
     end
 
-    visible_users = users_with_visible_submission_comments(current_user)
-
-    all_submission_comments.select do |submission_comment|
-      if assignment.peer_reviews && !submission_comment.grants_right?(current_user, :read)
-        false
-      elsif assignment.muted? && user == current_user
-        submission_comment.author == user
-      elsif assignment.grades_published? && grader == submission_comment.author
-        submission_comment.provisional_grade_id.nil?
-      else
-        visible_users.include?(submission_comment.author)
-      end
+    displayable_comments.preload(submission: :assignment).select do |submission_comment|
+      submission_comment.grants_right?(current_user, :read)
     end
   end
-
-  def users_with_visible_submission_comments(current_user)
-    comment_authors = all_submission_comments.map(&:author).compact.uniq
-    is_student = current_user == user
-    is_admin = assignment.course.account_membership_allows(current_user)
-
-    # If the user is the final grader or an admin, they see every comment.
-    return comment_authors if current_user == assignment.final_grader || is_admin
-    # Students only see their own comments when assignment is muted.
-    return [user] if is_student && assignment.muted?
-
-    if assignment.moderated_grading?
-      if assignment.grades_published?
-        return [user] if assignment.muted? && is_student
-        return [grader, assignment.final_grader, user].compact.uniq if is_student
-
-        if assignment.grader_comments_visible_to_graders?
-          return comment_authors
-        else
-          return [user, current_user, assignment.final_grader, grader].compact.uniq
-        end
-      end
-
-      return [user, current_user].compact.uniq unless assignment.grader_comments_visible_to_graders?
-    end
-
-    comment_authors
-  end
-  private :users_with_visible_submission_comments
 
   def assessment_request_count
     @assessment_requests_count ||= self.assessment_requests.length

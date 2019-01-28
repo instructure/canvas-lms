@@ -21,21 +21,30 @@ import CurveGradesDialog from 'compiled/shared/CurveGradesDialog'
 import I18n from 'i18n!gradebook'
 import 'compiled/jquery.rails_flash_notifications'
 
-  const CurveGradesDialogManager = {
-    createCurveGradesAction (assignment, students, {isAdmin, contextUrl, submissionsLoaded} = {}) {
-      const { grading_type: gradingType, points_possible: pointsPossible } = assignment;
-      return {
-        isDisabled: !submissionsLoaded || gradingType === 'pass_fail' || pointsPossible == null || pointsPossible === 0,
+const CurveGradesDialogManager = {
+  createCurveGradesAction(assignment, students, {isAdmin, contextUrl, submissionsLoaded} = {}) {
+    const {grading_type: gradingType, points_possible: pointsPossible} = assignment
+    return {
+      isDisabled:
+        !submissionsLoaded ||
+        gradingType === 'pass_fail' ||
+        pointsPossible == null ||
+        pointsPossible === 0,
 
-        onSelect (onClose) { // eslint-disable-line consistent-return
-          if (!isAdmin && assignment.inClosedGradingPeriod) {
-            return $.flashError(I18n.t('Unable to curve grades because this assignment is due in a closed ' +
-              'grading period for at least one student'));
-          }
-          const dialog = new CurveGradesDialog({assignment, students, context_url: contextUrl});
-          dialog.show(onClose);
+      onSelect(onClose) {
+        // eslint-disable-line consistent-return
+        if (!isAdmin && assignment.inClosedGradingPeriod) {
+          return $.flashError(
+            I18n.t(
+              'Unable to curve grades because this assignment is due in a closed ' +
+                'grading period for at least one student'
+            )
+          )
         }
-      };
+        const dialog = new CurveGradesDialog({assignment, students, context_url: contextUrl})
+        dialog.show(onClose)
+      }
     }
   }
+}
 export default CurveGradesDialogManager

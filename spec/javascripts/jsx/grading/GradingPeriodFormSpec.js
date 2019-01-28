@@ -68,8 +68,14 @@ QUnit.module('GradingPeriodForm', suiteHooks => {
 
   function getDateInput(inputLabel) {
     const labels = wrapper.find('label')
-    const $label = labels.filterWhere(label => label.text() === inputLabel).at(0).instance()
-    return wrapper.find(`input[aria-labelledby="${$label.id}"]`).at(0).instance()
+    const $label = labels
+      .filterWhere(label => label.text() === inputLabel)
+      .at(0)
+      .instance()
+    return wrapper
+      .find(`input[aria-labelledby="${$label.id}"]`)
+      .at(0)
+      .instance()
   }
 
   function getDateTimeSuggestions(inputLabel) {
@@ -82,7 +88,10 @@ QUnit.module('GradingPeriodForm', suiteHooks => {
   }
 
   function getInput(id) {
-    return wrapper.find(`input#${id}`).at(0).instance()
+    return wrapper
+      .find(`input#${id}`)
+      .at(0)
+      .instance()
   }
 
   function setDateInputValue(label, value) {

@@ -29,12 +29,12 @@ const wrapper = document.getElementById('fixtures')
 
 const assertDisabled = function(component) {
   const $el = ReactDOM.findDOMNode(component)
-  equal($el.getAttribute('aria-disabled'), 'true')
+  strictEqual($el.getAttribute('disabled'), '')
 }
 
 const assertEnabled = function(component) {
   const $el = ReactDOM.findDOMNode(component)
-  notEqual($el.getAttribute('aria-disabled'), 'true')
+  strictEqual($el.getAttribute('disabled'), null)
 }
 
 const exampleSet = {

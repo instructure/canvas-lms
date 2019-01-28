@@ -23,9 +23,9 @@ import {
   FETCH_HISTORY_NEXT_PAGE_START,
   FETCH_HISTORY_NEXT_PAGE_SUCCESS,
   FETCH_HISTORY_NEXT_PAGE_FAILURE
-} from '../../gradebook-history/actions/HistoryActions';
+} from '../../gradebook-history/actions/HistoryActions'
 
-function history (state = {}, { type, payload }) {
+function history(state = {}, {type, payload}) {
   switch (type) {
     case FETCH_HISTORY_START: {
       return {
@@ -34,7 +34,7 @@ function history (state = {}, { type, payload }) {
         items: null,
         nextPage: null,
         fetchHistoryStatus: 'started'
-      };
+      }
     }
     case FETCH_HISTORY_SUCCESS: {
       return {
@@ -43,7 +43,7 @@ function history (state = {}, { type, payload }) {
         nextPage: payload.link,
         items: payload.items,
         fetchHistoryStatus: 'success'
-      };
+      }
     }
     case FETCH_HISTORY_FAILURE: {
       return {
@@ -51,15 +51,15 @@ function history (state = {}, { type, payload }) {
         loading: false,
         nextPage: null,
         fetchHistoryStatus: 'failure'
-      };
+      }
     }
     case FETCH_HISTORY_NEXT_PAGE_START: {
       return {
         ...state,
         loading: true,
         nextPage: null,
-        fetchNextPageStatus: 'started',
-      };
+        fetchNextPageStatus: 'started'
+      }
     }
     case FETCH_HISTORY_NEXT_PAGE_SUCCESS: {
       return {
@@ -68,7 +68,7 @@ function history (state = {}, { type, payload }) {
         loading: false,
         nextPage: payload.link,
         fetchNextPageStatus: 'success'
-      };
+      }
     }
     case FETCH_HISTORY_NEXT_PAGE_FAILURE: {
       return {
@@ -79,9 +79,9 @@ function history (state = {}, { type, payload }) {
       }
     }
     default: {
-      return state;
+      return state
     }
   }
 }
 
-export default history;
+export default history

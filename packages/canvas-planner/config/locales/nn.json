@@ -71,8 +71,8 @@
   "close_opportunity_center_popup_9907d981": {
     "message": "Lukk popup-menyen med val"
   },
-  "count_plural_0_opportunities_one_opportunity_other_bb1698f6": {
-    "message": "{ count, plural,\n     =0 {# opportunities}\n    one {# opportunity}\n  other {# opportunities}\n}. Klikk for å opne popup-meny med val. "
+  "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
+    "message": "{ count, plural,\n     =0 {# muligheter}\n    one {# mulighet}\n  other {# muligheter}\n}"
   },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Vis # fullført element}\n  other {Vis # fullførte elementer}\n}"
@@ -265,6 +265,9 @@
   },
   "only_most_recent_grading_period_shown_f1ad6458": {
     "message": "*Kun nyaste karaktersetjingsperiode viser."
+  },
+  "opportunities_popup_f6703842": {
+    "message": "popup-menyen med val"
   },
   "optional_add_course_ef0d70fc": {
     "message": "Valfri: Legg til emne"

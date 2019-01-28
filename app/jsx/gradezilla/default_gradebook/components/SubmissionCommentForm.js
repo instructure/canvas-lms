@@ -16,14 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery';
-import 'compiled/jquery.rails_flash_notifications';
-import React from 'react';
-import { bool, func, string } from 'prop-types';
-import I18n from 'i18n!gradebook';
-import TextArea from '@instructure/ui-forms/lib/components/TextArea';
-import Button from '@instructure/ui-buttons/lib/components/Button';
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
+import $ from 'jquery'
+import 'compiled/jquery.rails_flash_notifications'
+import React from 'react'
+import {bool, func, string} from 'prop-types'
+import I18n from 'i18n!gradebook'
+import TextArea from '@instructure/ui-forms/lib/components/TextArea'
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 
 export default class SubmissionCommentForm extends React.Component {
   static propTypes = {
@@ -31,95 +31,106 @@ export default class SubmissionCommentForm extends React.Component {
     comment: string,
     processing: bool.isRequired,
     setProcessing: func.isRequired
-  };
+  }
 
   static defaultProps = {
     comment: ''
-  };
+  }
 
-  constructor (props) {
-    super(props);
+  constructor(props) {
+    super(props)
     const methodsToBind = [
-      'bindTextarea', 'handleCancel', 'handleCommentChange', 'handlePublishComment', 'focusTextarea'
-    ];
-    methodsToBind.forEach((method) => { this[method] = this[method].bind(this); });
-    this.state = { comment: props.comment };
+      'bindTextarea',
+      'handleCancel',
+      'handleCommentChange',
+      'handlePublishComment',
+      'focusTextarea'
+    ]
+    methodsToBind.forEach(method => {
+      this[method] = this[method].bind(this)
+    })
+    this.state = {comment: props.comment}
   }
 
-  focusTextarea () {
-    this.textarea.focus();
-  };
+  focusTextarea() {
+    this.textarea.focus()
+  }
 
-  handleCancel (event, callback) {
-    event.preventDefault();
+  handleCancel(event, callback) {
+    event.preventDefault()
 
-    this.setState({ comment: this.props.comment }, () => {
-      this.props.cancelCommenting();
+    this.setState({comment: this.props.comment}, () => {
+      this.props.cancelCommenting()
       if (callback) {
-        callback();
+        callback()
       }
-    });
+    })
   }
 
-  handleCommentChange (event) {
-    this.setState({ comment: event.target.value });
+  handleCommentChange(event) {
+    this.setState({comment: event.target.value})
   }
 
-  handlePublishComment (event) {
-    event.preventDefault();
-    this.props.setProcessing(true);
-    this.publishComment().catch(() => this.props.setProcessing(false));
+  handlePublishComment(event) {
+    event.preventDefault()
+    this.props.setProcessing(true)
+    this.publishComment().catch(() => this.props.setProcessing(false))
   }
 
-  commentIsValid () {
-    const comment = this.state.comment.trim();
-    return comment.length > 0;
+  commentIsValid() {
+    const comment = this.state.comment.trim()
+    return comment.length > 0
   }
 
-  bindTextarea (ref) {
-    this.textarea = ref;
+  bindTextarea(ref) {
+    this.textarea = ref
   }
 
-  render () {
-    const { cancelButtonLabel, submitButtonLabel } = this.buttonLabels();
+  render() {
+    const {cancelButtonLabel, submitButtonLabel} = this.buttonLabels()
     return (
       <div>
         <div>
           <TextArea
             label={<ScreenReaderContent>{I18n.t('Leave a comment')}</ScreenReaderContent>}
-            placeholder={I18n.t("Leave a comment")}
+            placeholder={I18n.t('Leave a comment')}
             onChange={this.handleCommentChange}
             value={this.state.comment}
             textareaRef={this.bindTextarea}
           />
         </div>
 
-        {
-          this.showButtons() &&
-            <div
-              style={{ textAlign: 'right', marginTop: '0rem', border: 'none', padding: '0rem', background: 'transparent' }}
+        {this.showButtons() && (
+          <div
+            style={{
+              textAlign: 'right',
+              marginTop: '0rem',
+              border: 'none',
+              padding: '0rem',
+              background: 'transparent'
+            }}
+          >
+            <Button
+              disabled={this.props.processing}
+              label={cancelButtonLabel}
+              margin="small small small 0"
+              onClick={this.handleCancel}
             >
-              <Button
-                disabled={this.props.processing}
-                label={cancelButtonLabel}
-                margin="small small small 0"
-                onClick={this.handleCancel}
-              >
-                {I18n.t("Cancel")}
-              </Button>
+              {I18n.t('Cancel')}
+            </Button>
 
-              <Button
-                disabled={this.props.processing || !this.commentIsValid()}
-                label={submitButtonLabel}
-                margin="small 0"
-                onClick={this.handlePublishComment}
-                variant="primary"
-              >
-                {I18n.t("Submit")}
-              </Button>
-            </div>
-        }
+            <Button
+              disabled={this.props.processing || !this.commentIsValid()}
+              label={submitButtonLabel}
+              margin="small 0"
+              onClick={this.handlePublishComment}
+              variant="primary"
+            >
+              {I18n.t('Submit')}
+            </Button>
+          </div>
+        )}
       </div>
-    );
+    )
   }
 }

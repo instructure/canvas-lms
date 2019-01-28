@@ -65,7 +65,7 @@ class ObserverAlert < ActiveRecord::Base
       missing.
       merge(Assignment.submittable).
       merge(Assignment.published).
-      where('cached_due_date > ?', 1.day.ago).
+      where("late_policy_status = 'missing' OR cached_due_date > ?", 1.day.ago).
       where("observer_alerts.id IS NULL")
 
     alerts = []

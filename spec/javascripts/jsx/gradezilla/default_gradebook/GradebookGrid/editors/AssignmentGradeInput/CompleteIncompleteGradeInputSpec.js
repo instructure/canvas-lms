@@ -20,7 +20,7 @@ import React from 'react'
 import {mount} from 'enzyme'
 import AssignmentGradeInput from 'jsx/gradezilla/default_gradebook/GradebookGrid/editors/AssignmentGradeInput'
 
-QUnit.module('GradebookGrid AssignmentGradeInput using CompleteIncompleteGradeInput', suiteHooks => {
+QUnit.module('GradebookGrid CompleteIncompleteGradeInput', suiteHooks => {
   let $container
   let props
   let $menuContent
@@ -149,7 +149,12 @@ QUnit.module('GradebookGrid AssignmentGradeInput using CompleteIncompleteGradeIn
   })
 
   test('sets the value to "Excused" when the submission is excused', () => {
-    props.submission = {...props.submission, enteredScore: null, enteredGrade: null, excused: true}
+    props.submission = {
+      ...props.submission,
+      enteredScore: null,
+      enteredGrade: null,
+      excused: true
+    }
     mountComponent()
     equal(getTextValue(), 'Excused')
   })

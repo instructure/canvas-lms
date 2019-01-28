@@ -28,6 +28,7 @@ import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import splitAssetString from 'compiled/str/splitAssetString'
 import IconOpenFolderSolid from '@instructure/ui-icons/lib/Solid/IconOpenFolder'
+import IconFolderSolid from '@instructure/ui-icons/lib/Solid/IconFolder'
 import IconUploadSolid from '@instructure/ui-icons/lib/Solid/IconUpload'
 import IconImageSolid from '@instructure/ui-icons/lib/Solid/IconImage'
 import PropTypes from 'prop-types'
@@ -229,6 +230,7 @@ class FileBrowser extends React.Component {
     const file = {
       id: apiFile.id,
       name: apiFile.display_name,
+      thumbnail: apiFile.thumbnail_url,
       src: `${context}/files/${apiFile.id}/preview${context.includes('user') ? `?verifier=${apiFile.uuid}` : ''}`,
       alt: apiFile.display_name,
       ...opts
@@ -385,6 +387,7 @@ class FileBrowser extends React.Component {
             showRootCollection={false}
             defaultExpanded={this.state.openFolders}
             collectionIconExpanded={IconOpenFolderSolid}
+            collectionIcon={IconFolderSolid}
             itemIcon={IconImageSolid}
             selectionType="single"
           />

@@ -22,6 +22,8 @@ import {mount} from 'enzyme'
 import GradeSelect from 'jsx/assignments/GradeSummary/components/GradesGrid/GradeSelect'
 import {FAILURE, STARTED, SUCCESS} from 'jsx/assignments/GradeSummary/grades/GradeActions'
 
+import {waitFor} from '../../../../support/Waiters'
+
 function Container(props) {
   /*
    * This class exists because Enzyme does not update props of children, which
@@ -136,7 +138,10 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
   }
 
   function getTextInput() {
-    return wrapper.find('input').at(0).instance()
+    return wrapper
+      .find('input')
+      .at(0)
+      .instance()
   }
 
   async function clickInputToOpenMenu() {
@@ -239,26 +244,6 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
     if (getOptionList()) {
       await waitFor(() => !getOptionList())
     }
-  }
-
-  async function waitFor(conditionFn, timeout = 200) {
-    return new Promise((resolve, reject) => {
-      let timeoutId
-
-      const intervalId = setInterval(() => {
-        const result = conditionFn()
-        if (result) {
-          clearInterval(intervalId)
-          clearTimeout(timeoutId)
-          resolve(result)
-        }
-      }, 10)
-
-      timeoutId = setTimeout(() => {
-        clearInterval(intervalId)
-        reject(new Error('Timeout waiting for condition'))
-      }, timeout)
-    })
   }
 
   test('renders a text input', async () => {
@@ -539,14 +524,12 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
 
     test('enables the input when grade selection was successful', () => {
       wrapper.setProps({selectProvisionalGradeStatus: SUCCESS})
-      const input = wrapper.find('input[type="text"]')
-      strictEqual(input.prop('aria-disabled'), null)
+      strictEqual(wrapper.find('Select').prop('editable'), true)
     })
 
     test('enables the input when grade selection has failed', () => {
       wrapper.setProps({selectProvisionalGradeStatus: FAILURE})
-      const input = wrapper.find('input[type="text"]')
-      strictEqual(input.prop('aria-disabled'), null)
+      strictEqual(wrapper.find('Select').prop('editable'), true)
     })
   })
 

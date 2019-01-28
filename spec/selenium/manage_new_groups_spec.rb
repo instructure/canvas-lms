@@ -195,12 +195,12 @@ describe "manage groups" do
       f(".groups .group .group-user .group-user-actions").click
       scroll_into_view('.edit-group-assignment:first')
       fj(".edit-group-assignment:first").click
-      f("span[aria-label='Move Student']") # wait for element
+      f("div[aria-label='Move Student']") # wait for element
       f(".move-select .move-select__group option:last-child").click
       expect(f('body')).to contain_jqcss(".move-select button[type='submit']:visible")
       f(".move-select button[type='submit']").click
       # wait for tray to not exist
-      keep_trying_until { element_exists?("span[aria-label='Move Student']") == false }
+      keep_trying_until { element_exists?("div[aria-label='Move Student']") == false }
       expect(fj(".group-summary:visible:first").text).to eq "0 students"
       expect(fj(".group-summary:visible:last").text).to eq "1 student"
 
@@ -208,12 +208,12 @@ describe "manage groups" do
       f(".groups .group .group-user .group-user-actions").click
       scroll_into_view('.edit-group-assignment:first')
       fj(".edit-group-assignment:first").click
-      f("span[aria-label='Move Student']") # wait for element
+      f("div[aria-label='Move Student']") # wait for element
       ff(".move-select .move-select__group option").last.click
       expect(f('body')).to contain_jqcss(".move-select button[type='submit']:visible")
       f(".move-select button[type='submit']").click
       # wait for tray to not exist
-      keep_trying_until { element_exists?("span[aria-label='Move Student']") == false }
+      keep_trying_until { element_exists?("div[aria-label='Move Student']") == false }
       expect(fj(".group-summary:visible:first").text).to eq "1 student"
       expect(fj(".group-summary:visible:last").text).to eq "0 students"
     end

@@ -18,12 +18,8 @@
 
 import React from 'react'
 import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
-import IconUpload from '@instructure/ui-icons/lib/Solid/IconUpload'
-import IconComment from '@instructure/ui-icons/lib/Line/IconComment'
-import IconRubric from '@instructure/ui-icons/lib/Line/IconRubric'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import View from '@instructure/ui-layout/lib/components/View'
 
 import {StudentAssignmentShape} from '../assignmentData'
 
@@ -39,10 +35,7 @@ function ContentTabs(props) {
           title={
             <Flex as="header" alignItems="center" justifyItems="center" direction="column">
               <FlexItem>
-                <IconUpload size="small" />
-                <View margin="small">
-                  <Text>Upload</Text>
-                </View>
+                <Text>Upload</Text>
               </FlexItem>
             </Flex>
           }
@@ -59,10 +52,7 @@ function ContentTabs(props) {
           title={
             <Flex as="header" alignItems="center" justifyItems="center" direction="column">
               <FlexItem>
-                <IconComment size="small" />
-                <View margin="small">
-                  <Text>Comments</Text>
-                </View>
+                <Text>Comments</Text>
               </FlexItem>
             </Flex>
           }
@@ -80,10 +70,7 @@ function ContentTabs(props) {
           title={
             <Flex as="header" alignItems="center" justifyItems="center" direction="column">
               <FlexItem>
-                <IconRubric size="small" />
-                <View margin="small">
-                  <Text>Rubric</Text>
-                </View>
+                <Text>Rubric</Text>
               </FlexItem>
             </Flex>
           }

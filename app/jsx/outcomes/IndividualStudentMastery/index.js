@@ -50,7 +50,7 @@ class IndividualStudentMastery extends React.Component {
 
   componentDidMount () {
     const { courseId, studentId } = this.props
-    fetchOutcomes(courseId, studentId)
+    return fetchOutcomes(courseId, studentId)
       .then(({ outcomeGroups, outcomes }) => {
         this.setState({ outcomeGroups, outcomes })
       })

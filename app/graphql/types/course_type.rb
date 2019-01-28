@@ -97,6 +97,12 @@ module Types
         order(CourseSection.best_unicode_collation_key('name'))
     end
 
+    field :modules_connection, ModuleType.connection_type, null: true
+    def modules_connection
+      course.modules_visible_to(current_user).
+        order('name')
+    end
+    
     field :users_connection, UserType.connection_type, null: true do
       argument :user_ids, [ID], <<~DOC,
         Only include users with the given ids.
@@ -194,7 +200,6 @@ module Types
     field :permissions, CoursePermissionsType,
       "returns permission information for the current user in this course",
       null: true
-
     def permissions
       Loaders::CoursePermissionsLoader.for(
         course,
@@ -203,4 +208,3 @@ module Types
     end
   end
 end
-

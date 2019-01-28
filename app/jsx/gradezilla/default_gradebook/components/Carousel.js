@@ -16,81 +16,83 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { Component } from 'react';
-import { bool, func, node, string } from 'prop-types';
-import Button from '@instructure/ui-buttons/lib/components/Button';
-import ArrowOpenStart from '@instructure/ui-icons/lib/Line/IconArrowOpenStart';
-import ArrowOpenEnd from '@instructure/ui-icons/lib/Line/IconArrowOpenEnd';
+import React, {Component} from 'react'
+import {bool, func, node, string} from 'prop-types'
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import ArrowOpenStart from '@instructure/ui-icons/lib/Line/IconArrowOpenStart'
+import ArrowOpenEnd from '@instructure/ui-icons/lib/Line/IconArrowOpenEnd'
 
 export default class Carousel extends Component {
-  componentDidUpdate (prevProps) {
-    const selectedLast = prevProps.displayRightArrow && !this.props.displayRightArrow;
-    const selectedFirst = prevProps.displayLeftArrow && !this.props.displayLeftArrow;
+  componentDidUpdate(prevProps) {
+    const selectedLast = prevProps.displayRightArrow && !this.props.displayRightArrow
+    const selectedFirst = prevProps.displayLeftArrow && !this.props.displayLeftArrow
 
     if (selectedFirst) {
-      this.rightArrow.focus();
+      this.rightArrow.focus()
     } else if (selectedLast) {
-      this.leftArrow.focus();
+      this.leftArrow.focus()
     }
   }
 
   handleLeftArrowClick = () => {
-    this.props.onLeftArrowClick();
-    this.leftArrow.focus();
+    this.props.onLeftArrowClick()
+    this.leftArrow.focus()
   }
 
   handleRightArrowClick = () => {
-    this.props.onRightArrowClick();
-    this.rightArrow.focus();
+    this.props.onRightArrowClick()
+    this.rightArrow.focus()
   }
 
-  render () {
+  render() {
     const leftArrow = (
       <Button
         disabled={this.props.disabled}
-        ref={(button) => { this.leftArrow = button }}
+        ref={button => {
+          this.leftArrow = button
+        }}
         variant="icon"
         onClick={this.handleLeftArrowClick}
         size="small"
       >
         <ArrowOpenStart title={this.props.leftArrowDescription} />
       </Button>
-    );
+    )
 
     const rightArrow = (
       <Button
         disabled={this.props.disabled}
-        ref={(button) => { this.rightArrow = button }}
+        ref={button => {
+          this.rightArrow = button
+        }}
         variant="icon"
         onClick={this.handleRightArrowClick}
         size="small"
       >
         <ArrowOpenEnd title={this.props.rightArrowDescription} />
       </Button>
-    );
+    )
 
     return (
       <div id={this.props.id} className="carousel">
         <div className="left-arrow-button-container">
-          { this.props.displayLeftArrow && leftArrow }
+          {this.props.displayLeftArrow && leftArrow}
         </div>
 
-        <div style={{ flex: 1 }}>
-          {this.props.children}
-        </div>
+        <div style={{flex: 1}}>{this.props.children}</div>
 
         <div className="right-arrow-button-container">
-          { this.props.displayRightArrow && rightArrow }
+          {this.props.displayRightArrow && rightArrow}
         </div>
       </div>
-    );
+    )
   }
 }
 
 Carousel.defaultProps = {
   id: null,
   showBorderBottom: true
-};
+}
 
 Carousel.propTypes = {
   id: string,
@@ -102,4 +104,4 @@ Carousel.propTypes = {
   onRightArrowClick: func.isRequired,
   leftArrowDescription: string.isRequired,
   rightArrowDescription: string.isRequired
-};
+}

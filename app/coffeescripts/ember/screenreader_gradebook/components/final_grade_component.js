@@ -19,7 +19,7 @@ import Ember from 'ember'
 import {scoreToGrade} from 'jsx/gradebook/GradingSchemeHelper'
 import I18n from 'i18n!sr_gradebook'
 
-const FinalGradeGradesComponent = Ember.Component.extend({
+const FinalGradeComponent = Ember.Component.extend({
   percent: function() {
     const percent = this.get('student.total_percent')
     return I18n.n(percent, {percentage: true})
@@ -46,7 +46,13 @@ const FinalGradeGradesComponent = Ember.Component.extend({
     return !!(!this.get('hide_points_possible') && this.get('student.total_grade'))
   }.property('hide_points_possible', 'student.total_grade'),
 
-  showLetterGrade: Ember.computed.bool('gradingStandard')
+  showLetterGrade: Ember.computed.bool('gradingStandard'),
+
+  actions: {
+    onEditFinalGradeOverride(grade) {
+      this.sendAction('onEditFinalGradeOverride', grade)
+    }
+  }
 })
 
-export default FinalGradeGradesComponent
+export default FinalGradeComponent

@@ -1165,6 +1165,14 @@ describe EnrollmentsApiController, type: :request do
           expect(json[0]["user"]["group_ids"]).to eq([@group.id])
         end
 
+        it "should not include a users deleted memberships" do
+          @group.group_memberships.update_all(:workflow_state => "deleted")
+          @path = "/api/v1/courses/#{@course.id}/enrollments"
+          @params = { :controller => "enrollments_api", :action => "index", :course_id => @course.id.to_param, :format => "json", :include => ["group_ids"] }
+          json = api_call(:get, @path, @params)
+          expect(json[0]["user"]["group_ids"]).to be_empty
+        end
+
         it "should not include ids from different contexts" do
           original_course = @course
 

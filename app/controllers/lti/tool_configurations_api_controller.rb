@@ -125,7 +125,8 @@ class Lti::ToolConfigurationsApiController < ApplicationController
       settings: tool_configuration_params[:settings],
       settings_url: tool_configuration_params[:settings_url],
       disabled_placements: tool_configuration_params[:disabled_placements],
-      custom_fields: tool_configuration_params[:custom_fields]
+      custom_fields: tool_configuration_params[:custom_fields],
+      privacy_level: tool_configuration_params[:privacy_level]
     )
     update_developer_key!(tool_config)
 
@@ -152,6 +153,7 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   def update_developer_key!(tool_config)
     developer_key = tool_config.developer_key
     developer_key.public_jwk = tool_config.settings['public_jwk']
+    developer_key.oidc_login_uri = tool_config.settings['oidc_login_uri']
     developer_key.update!(developer_key_params)
   end
 
@@ -174,7 +176,7 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   end
 
   def tool_configuration_params
-    params.require(:tool_configuration).permit(:settings_url, :custom_fields, disabled_placements: []).merge(
+    params.require(:tool_configuration).permit(:settings_url, :custom_fields, :privacy_level, disabled_placements: []).merge(
       {settings: params.require(:tool_configuration)[:settings]&.to_unsafe_h}
     )
   end

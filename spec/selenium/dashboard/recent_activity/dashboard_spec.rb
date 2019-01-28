@@ -17,7 +17,7 @@
 
 require_relative '../../common'
 require_relative '../pages/student_planner_page'
-require_relative '../../announcements/pages/announcements_page'
+require_relative '../../announcements/pages/announcement_index_page'
 
 describe "dashboard" do
   include_context "in-process server selenium tests"
@@ -153,8 +153,6 @@ describe "dashboard" do
   end
 
   context "as a teacher with announcements" do
-    include AnnouncementPageObject
-
     before :once do
       course_with_teacher(active_all: true, new_user: true, user_name: 'Teacher First', course_name: 'Dashboard Course')
       @section1 = @course.course_sections.first
@@ -175,10 +173,10 @@ describe "dashboard" do
     end
 
     it "can delete an announcement", priority: "1", test_id: 215579 do
-      visit_announcements(@course.id)
-      announcement_options_menu(@announcement1.title).click
-      delete_announcement_option.click
-      confirm_delete_alert.click
+      AnnouncementIndex.visit_announcements(@course.id)
+      AnnouncementIndex.announcement_options_menu(@announcement1.title).click
+      AnnouncementIndex.delete_announcement_option.click
+      AnnouncementIndex.confirm_delete_alert.click
       refresh_page
       get "/courses/#{@course.id}"
       expect(course_recent_activity_main_content).to contain_css(".ic-notification__title.no_recent_messages")

@@ -62,6 +62,7 @@ CanvasRails::Application.routes.draw do
   # deprecated
   get 'pseudonyms/:id/register/:nonce' => 'communication_channels#confirm', as: :registration_confirmation_deprecated
   post 'confirmations/:user_id/re_send(/:id)' => 'communication_channels#re_send_confirmation', as: :re_send_confirmation, id: nil
+  get 'confirmations/:user_id/limit_reached(/:id)' => 'communication_channels#confirmation_limit_reached', as: :confirmation_limit_reached, id: nil
   match 'forgot_password' => 'pseudonyms#forgot_password', as: :forgot_password, via: [:get, :post]
   get 'pseudonyms/:pseudonym_id/change_password/:nonce' => 'pseudonyms#confirm_change_password', as: :confirm_change_password
   post 'pseudonyms/:pseudonym_id/change_password/:nonce' => 'pseudonyms#change_password', as: :change_password
@@ -820,8 +821,6 @@ CanvasRails::Application.routes.draw do
 
     resources :pseudonyms, except: :index
     resources :question_banks, only: :index
-    get :assignments_needing_grading
-    get :assignments_needing_submitting
     get :admin_merge
     post :merge
     get :grades
@@ -1170,8 +1169,6 @@ CanvasRails::Application.routes.draw do
         action: :publish, as: 'publish_provisional_grades'
       put "courses/:course_id/assignments/:assignment_id/provisional_grades/:provisional_grade_id/select",
         action: :select, as: 'select_provisional_grade'
-      post "courses/:course_id/assignments/:assignment_id/provisional_grades/:provisional_grade_id/copy_to_final_mark",
-        action: :copy_to_final_mark, as: 'copy_to_final_mark'
     end
 
     post '/courses/:course_id/assignments/:assignment_id/submissions/:user_id/comments/files', action: :create_file, controller: :submission_comments_api
@@ -2161,6 +2158,7 @@ CanvasRails::Application.routes.draw do
         put "#{context.pluralize}/:#{context}_id/csp_settings", :action => :set_csp_setting
       end
       post "accounts/:account_id/csp_settings/domains", :action => :add_domain
+      post "accounts/:account_id/csp_settings/domains/batch_create", :action => :add_multiple_domains
       delete "accounts/:account_id/csp_settings/domains", :action => :remove_domain
     end
   end
@@ -2227,6 +2225,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: 'lti/ims/authentication') do
       post 'authorize_redirect', action: :authorize_redirect
+      get 'authorize_redirect', action: :authorize_redirect
       get 'authorize', action: :authorize, as: :lti_1_3_authorization
     end
 

@@ -253,58 +253,6 @@ describe 'Provisional Grades API', type: :request do
     it_behaves_like 'authorization for provisional final grade selection', :put
   end
 
-  describe "copy_to_final_mark" do
-    before(:once) do
-      course_with_student :active_all => true
-      @course.account.enable_service(:avatars)
-      ta_in_course :active_all => true
-      @assignment = @course.assignments.create!(
-        submission_types: 'online_text_entry',
-        moderated_grading: true,
-        grader_count: 1,
-        final_grader_id: @teacher.id
-      )
-      @submission = @assignment.submit_homework(@student, :submission_type => 'online_text_entry', :body => 'hallo')
-      @pg = @submission.find_or_create_provisional_grade!(@ta, score: 80)
-      @submission.add_comment(:commenter => @ta, :comment => 'huttah!', :provisional => true)
-
-      @path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/provisional_grades/#{@pg.id}/copy_to_final_mark"
-      @params = { :controller => 'provisional_grades', :action => 'copy_to_final_mark',
-                  :format => 'json', :course_id => @course.to_param, :assignment_id => @assignment.to_param,
-                  :provisional_grade_id => @pg.to_param }
-    end
-
-    it "requires moderate_grades permission" do
-      api_call_as_user @student, :post, @path, @params, {}, {}, { :expected_status => 401 }
-    end
-
-    it "fails if the student isn't in the moderation set" do
-      @assignment.moderated_grading_selections.where(student_id: @student).delete_all
-      json = api_call_as_user @teacher, :post, @path, @params, {}, {}, { :expected_status => 400 }
-      expect(json['message']).to eq 'student not in moderation set'
-    end
-
-    it "fails if the mark is already final" do
-      @pg.update_attributes(:final => true)
-      json = api_call_as_user @teacher, :post, @path, @params, {}, {}, { :expected_status => 400 }
-      expect(json['message']).to eq 'provisional grade is already final'
-    end
-
-    it "copies the selected provisional grade" do
-      json = api_call_as_user @teacher, :post, @path, @params
-      final_mark = ModeratedGrading::ProvisionalGrade.find(json['provisional_grade_id'])
-      expect(final_mark.score).to eq 80
-      expect(final_mark.scorer).to eq @teacher
-      expect(final_mark.final).to eq true
-
-      expect(json['score']).to eq 80
-      expect(json['submission_comments'].first['comment']).to eq 'huttah!'
-      expect(json['crocodoc_urls']).to eq([])
-    end
-
-    it_behaves_like 'authorization for provisional final grade selection', :post
-  end
-
   describe "publish" do
     before :once do
       course_with_student :active_all => true

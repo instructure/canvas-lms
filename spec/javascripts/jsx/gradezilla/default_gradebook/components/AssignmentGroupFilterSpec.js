@@ -16,39 +16,36 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { mount } from 'enzyme';
-import AssignmentGroupFilter from 'jsx/gradezilla/default_gradebook/components/AssignmentGroupFilter';
+import React from 'react'
+import {mount} from 'enzyme'
+import AssignmentGroupFilter from 'jsx/gradezilla/default_gradebook/components/AssignmentGroupFilter'
 
-function defaultProps () {
+function defaultProps() {
   return {
-    items: [
-      { id: '1', name: 'Assignment Group 1' },
-      { id: '2', name: 'Assignment Group 2' },
-    ],
+    items: [{id: '1', name: 'Assignment Group 1'}, {id: '2', name: 'Assignment Group 2'}],
     onSelect: () => {},
-    selectedItemId: '0',
+    selectedItemId: '0'
   }
 }
 
 QUnit.module('Assignment Group Filter - subclass functionality', {
-  setup () {
-    const props = defaultProps();
-    this.wrapper = mount(<AssignmentGroupFilter {...props} />);
+  setup() {
+    const props = defaultProps()
+    this.wrapper = mount(<AssignmentGroupFilter {...props} />)
   },
 
-  teardown () {
-    this.wrapper.unmount();
+  teardown() {
+    this.wrapper.unmount()
   }
-});
+})
 
-test('renders a screenreader-friendly label', function () {
-  strictEqual(this.wrapper.find('ScreenReaderContent').at(1).text(), 'Assignment Group Filter');
-});
+test('renders a screenreader-friendly label', function() {
+  strictEqual(this.wrapper.find('ScreenReaderContent').text(), 'Assignment Group Filter')
+})
 
-test('the options are displayed in the same order as they were sent in', function () {
-  const actualOptionIds = this.wrapper.find('option').map(opt => opt.text());
-  const expectedOptionIds = ['All Assignment Groups', 'Assignment Group 1', 'Assignment Group 2'];
+test('the options are displayed in the same order as they were sent in', function() {
+  const actualOptionIds = this.wrapper.find('option').map(opt => opt.text())
+  const expectedOptionIds = ['All Assignment Groups', 'Assignment Group 1', 'Assignment Group 2']
 
-  deepEqual(actualOptionIds, expectedOptionIds);
-});
+  deepEqual(actualOptionIds, expectedOptionIds)
+})

@@ -21,7 +21,6 @@ import React from "react";
 import UploadForm from "../../../src/sidebar/components/UploadForm";
 import sinon from "sinon";
 import sd from "skin-deep";
-import jsdom from "mocha-jsdom";
 
 describe("UploadForm", () => {
   let noop = () => {};
@@ -30,7 +29,6 @@ describe("UploadForm", () => {
   };
   let upload, defaultProps;
 
-  jsdom();
 
   beforeEach(() => {
     upload = {

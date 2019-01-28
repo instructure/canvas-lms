@@ -134,16 +134,14 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   set_policy do
-    given do |user,session|
-      !self.teacher_only_comment && self.submission.user_can_read_grade?(user, session) && !self.hidden? && !self.draft?
-    end
+    given { |user, session| can_view_comment?(user, session) }
     can :read
 
     given {|user| self.author == user}
     can :read and can :delete and can :update
 
-    given {|user, session| self.submission.grants_right?(user, session, :grade) }
-    can :read and can :delete
+    given { |user, session| submission.grants_right?(user, session, :grade) }
+    can :delete
 
     given { |user, session|
         self.can_read_author?(user, session)
@@ -182,6 +180,55 @@ class SubmissionComment < ActiveRecord::Base
       record.provisional_grade_id.nil? &&
       record.submission.user_id == record.author_id
     }
+  end
+
+  def can_view_comment?(user, session)
+    # Users can always view their own comments
+    return true if author_id == user.id
+
+    # A user with the power to moderate the assignment can see all comments.
+    # For moderated assignments, this is the final grader or an admin;
+    # for non-moderated assignments, it's all teachers.
+    assignment = submission.assignment
+    if assignment.moderated_grading?
+      return true if assignment.permits_moderation?(user)
+    elsif assignment.user_can_update?(user, session)
+      return true
+    end
+
+    # Students on the receiving end of an assessment can view assessors' comments
+    return true if assessment_request.present? && assessment_request.user_id == user.id
+
+    # The student who owns the submission can't see drafts or hidden comments (or,
+    # generally, any instructor comments if the assignment is muted)
+    if submission.user_id == user.id
+      return false if draft? || hidden? || assignment.muted?
+
+      # Generally the student should see only non-provisional comments--but they should
+      # also see provisional comments from the final grader if grades are published
+      return !provisional || (assignment.grades_published? && author_id == assignment.final_grader_id)
+    end
+
+    # At this point, deny all non-graders, leaving us with only provisional graders/
+    # moderated assignments
+    return false unless submission.user_can_read_grade?(user, session)
+
+    # We've checked all possible cases for non-moderated assignments at this point, so
+    # anything past here should be moderated
+    return false unless assignment.moderated_grading?
+
+    # If we made it here, the current user is a provisional grader viewing a
+    # moderated assignment, and the comment is by someone else.
+    return true if assignment.grader_comments_visible_to_graders?
+
+    if assignment.grades_published?
+      # If grades are published, show comments from the student, the final grader,
+      # and the chosen grader (and--as checked above--the current user)
+      [submission.user_id, assignment.final_grader_id, submission.grader_id].include?(author_id)
+    else
+      # If not, show comments from the student (and--as checked above--the current user)
+      author_id == submission.user_id
+    end
   end
 
   def can_read_author?(user, session)

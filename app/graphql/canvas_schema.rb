@@ -32,7 +32,7 @@ class CanvasSchema < GraphQL::Schema
     GraphQLNodeLoader.load(type, id, ctx)
   end
 
-  def self.resolve_type(_type, obj, _ctx)
+  def self.resolve_type(type, obj, _ctx)
     case obj
     when Course then Types::CourseType
     when Assignment then Types::AssignmentType
@@ -46,12 +46,22 @@ class CanvasSchema < GraphQL::Schema
     when GradingPeriod then Types::GradingPeriodType
     when ContextModule then Types::ModuleType
     when WikiPage then Types::PageType
+    when Attachment then Types::FileType
     when DiscussionTopic then Types::DiscussionType
     when Quizzes::Quiz then Types::QuizType
+    when ContentTag
+      if !type.nil? && type.name == "ModuleItemInterface"
+        return Types::ExternalUrlType if obj.content_type == "ExternalUrl"
+        return Types::ModuleExternalToolType if obj.content_type == "ContextExternalTool"
+      else
+        Types::ModuleItemType
+      end
+    when ContextExternalTool then Types::ExternalToolType
     end
   end
 
-  orphan_types [Types::ModuleType, Types::PageType]
+  orphan_types [Types::ModuleType, Types::PageType, Types::FileType, Types::ExternalUrlType,
+                Types::ExternalToolType, Types::ModuleExternalToolType]
 
   instrument :field, AssignmentOverrideInstrumenter.new
 end

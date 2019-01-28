@@ -1,4 +1,3 @@
-# encoding: UTF-8
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -19,19 +18,17 @@
 
 require "spec_helper"
 
-require "yaml"
-
 describe Utf8Cleaner do
-  it "should strip out invalid utf-8" do
+  it "strips out invalid utf-8" do
     test_strings = {
-        "hai\xfb" => "hai",
-        "hai\xfb there" => "hai there",
-        "hai\xfba" => "haia",
-        "hai\xfbab" => "haiab",
-        "hai\xfbabc" => "haiabc",
-        "hai\xfbabcd" => "haiabcd",
-        "o\bhai" => "ohai",
-        "\x7Fohai" => "ohai"
+      "hai\xfb" => "hai",
+      "hai\xfb there" => "hai there",
+      "hai\xfba" => "haia",
+      "hai\xfbab" => "haiab",
+      "hai\xfbabc" => "haiabc",
+      "hai\xfbabcd" => "haiabcd",
+      "o\bhai" => "ohai",
+      "\x7Fohai" => "ohai"
     }
 
     test_strings.each do |input, output|
@@ -40,13 +37,19 @@ describe Utf8Cleaner do
     end
   end
 
-  it "can strip non-UTF-8 strings" do
-    input_string = String.new("\x7Fohai", encoding: Encoding::ASCII)
-    expect(Utf8Cleaner.strip_invalid_utf8(input_string)).to eq("ohai")
+  it "strips out invalid characters from non-UTF-8 strings" do
+    ascii = String.new("\x7Fohai", encoding: Encoding::ASCII)
+    expect(Utf8Cleaner.strip_invalid_utf8(ascii)).to eql("ohai")
   end
 
-  it "can strip frozen strings" do
-    input_string = "\x7Fohai".freeze
-    expect(Utf8Cleaner.strip_invalid_utf8(input_string)).to eq("ohai")
+  it "strips out invalid characters from frozen strings" do
+    frozen = "\x7Fohai".freeze
+    expect(Utf8Cleaner.strip_invalid_utf8(frozen)).to eql("ohai")
+  end
+
+  it "strips out invalid characters from frozen non-UTF-8 strings" do
+    frigidus = String.new("\x7Ffrigidus", encoding: Encoding::ISO_8859_1)
+    frigidus.freeze
+    expect(Utf8Cleaner.strip_invalid_utf8(frigidus)).to eql("frigidus")
   end
 end

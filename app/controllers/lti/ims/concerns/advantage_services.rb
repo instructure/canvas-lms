@@ -52,7 +52,8 @@ module Lti::Ims::Concerns
         validator = Canvas::Security::JwtValidator.new(
           jwt: decoded_jwt,
           expected_aud: expected_audience,
-          require_iss: true
+          require_iss: true,
+          skip_jti_check: true
         )
 
         # In this case we know the error message can just be safely shunted into the API response (in other cases
@@ -154,7 +155,7 @@ module Lti::Ims::Concerns
       end
 
       def expected_access_token_audience
-        Rails.application.routes.url_helpers.oauth2_token_url host: host
+        Rails.application.routes.url_helpers.oauth2_token_url(host: host, protocol: 'https://')
       end
 
       delegate :host, to: :request

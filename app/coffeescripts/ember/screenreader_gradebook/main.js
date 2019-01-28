@@ -23,6 +23,7 @@ import AssignmentMuterComponent from './components/assignment_muter_component'
 import CustomColumnCellComponent from './components/custom_column_cell_component'
 import FastSelectComponent from './components/fast_select_component'
 import FinalGradeComponent from './components/final_grade_component'
+import FinalGradeOverrideComponent from './components/final_grade_override_component'
 import GradingCellComponent from './components/grading_cell_component'
 import ScreenreaderGradebookController from './controllers/screenreader_gradebook_controller'
 import ScreenreaderGradebookRoute from './routes/screenreader_gradebook_route'
@@ -38,6 +39,7 @@ import './templates/assignments'
 import './templates/components/assignment-subtotal-grades'
 import './templates/components/custom-column-cell'
 import './templates/components/final-grade'
+import './templates/components/final-grade-override'
 import './templates/components/grading-cell'
 import './templates/content_selection/assignment'
 import './templates/content_selection/header'
@@ -73,6 +75,7 @@ export default App.reopen({
   CustomColumnCellComponent,
   FastSelectComponent,
   FinalGradeComponent,
+  FinalGradeOverrideComponent,
   GradingCellComponent,
   ScreenreaderGradebookController,
   ScreenreaderGradebookRoute,

@@ -457,6 +457,9 @@ define [
       data.published = true if @shouldPublish
       data.points_possible = round(numberHelper.parse(data.points_possible), 2)
       data.peer_review_count = numberHelper.parse(data.peer_review_count) if data.peer_review_count
+      $grader_count = $('#grader_count')
+      if $grader_count.length > 0
+        data.grader_count = numberHelper.parse($grader_count[0].value)
       return data
 
     saveFormData: =>
@@ -539,7 +542,8 @@ define [
 
     fieldSelectors: _.extend(
       AssignmentGroupSelector::fieldSelectors,
-      GroupCategorySelector::fieldSelectors
+      GroupCategorySelector::fieldSelectors,
+      {grader_count: "#grader_count"}
     )
 
     showErrors: (errors) ->

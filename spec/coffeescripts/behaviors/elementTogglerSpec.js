@@ -28,13 +28,13 @@ QUnit.module('elementToggler', {
   }
 })
 
-test('handles data-html-while-target-shown', function() {
+test('handles data-text-while-target-shown', function() {
   this.$trigger = $(`
     <a
       href="#"
       class="element_toggler"
       role="button"
-      data-html-while-target-shown="Hide Thing"
+      data-text-while-target-shown="Hide Thing"
       aria-controls="thing"
     >Show Thing</a>
   `).appendTo('#fixtures')
@@ -42,7 +42,7 @@ test('handles data-html-while-target-shown', function() {
   this.$otherTrigger = $(`
     <a
       class="element_toggler"
-      data-html-while-target-shown="while shown"
+      data-text-while-target-shown="while shown"
       aria-controls="thing"
     >while hidden</a>
   `).appendTo('#fixtures')
@@ -55,7 +55,7 @@ test('handles data-html-while-target-shown', function() {
 
   // click to show it
   this.$trigger.click()
-  const msg = 'Handles `data-html-while-target-shown`'
+  const msg = 'Handles `data-text-while-target-shown`'
   equal(this.$trigger.text(), 'Hide Thing', msg)
   equal(this.$otherTrigger.text(), 'while shown', msg)
   ok(
@@ -102,7 +102,7 @@ test('handles data-hide-while-target-shown', function() {
   `).appendTo('#fixtures')
   this.$trigger.click()
   ok(this.$target.is('[aria-expanded=true]:visible'), 'target is shown')
-  let msg = 'Does not change text unless `data-html-while-target-shown` is specified'
+  let msg = 'Does not change text unless `data-text-while-target-shown` is specified'
   equal($.trim(this.$trigger.text()), 'Show Thing, then hide me', msg)
   msg = 'Handles `data-hide-while-target-shown`'
   ok(this.$trigger.is(':hidden'), msg)

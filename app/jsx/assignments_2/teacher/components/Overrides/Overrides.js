@@ -49,8 +49,9 @@ function renderEveryoneElse(assignment, readOnly) {
 }
 
 function renderOverrides(assignment, readOnly) {
-  if (assignment.assignmentOverrides.nodes.length > 0) {
-    return assignment.assignmentOverrides.nodes.map(override => (
+  const overrides = assignment.assignmentOverrides.nodes
+  if (overrides.length > 0) {
+    return overrides.map(override => (
       // in the existing schema, submissionTypes and allowedExtensions are on the assignment.
       // eventually, they will also be part of each override
       <Override

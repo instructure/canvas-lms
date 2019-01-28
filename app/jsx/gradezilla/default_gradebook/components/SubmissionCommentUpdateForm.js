@@ -16,42 +16,42 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {func, string} from 'prop-types';
-import I18n from 'i18n!gradebook';
-import SubmissionCommentForm from '../../../gradezilla/default_gradebook/components/SubmissionCommentForm';
+import {func, string} from 'prop-types'
+import I18n from 'i18n!gradebook'
+import SubmissionCommentForm from '../../../gradezilla/default_gradebook/components/SubmissionCommentForm'
 
 export default class SubmissionCommentUpdateForm extends SubmissionCommentForm {
   static propTypes = {
     ...SubmissionCommentForm.propTypes,
     id: string.isRequired,
     updateSubmissionComment: func.isRequired
-  };
-
-  componentDidMount () {
-    this.focusTextarea();
   }
 
-  commentHasChanged () {
-    const comment = this.state.comment.trim();
-    return comment !== this.props.comment.trim();
+  componentDidMount() {
+    this.focusTextarea()
   }
 
-  commentIsValid () {
-    return super.commentIsValid() && this.commentHasChanged();
+  commentHasChanged() {
+    const comment = this.state.comment.trim()
+    return comment !== this.props.comment.trim()
   }
 
-  buttonLabels () {
+  commentIsValid() {
+    return super.commentIsValid() && this.commentHasChanged()
+  }
+
+  buttonLabels() {
     return {
       cancelButtonLabel: I18n.t('Cancel Updating Comment'),
       submitButtonLabel: I18n.t('Update Comment')
-    };
+    }
   }
 
-  publishComment () {
-    return this.props.updateSubmissionComment(this.state.comment, this.props.id);
+  publishComment() {
+    return this.props.updateSubmissionComment(this.state.comment, this.props.id)
   }
 
-  showButtons () {
-    return true;
+  showButtons() {
+    return true
   }
 }

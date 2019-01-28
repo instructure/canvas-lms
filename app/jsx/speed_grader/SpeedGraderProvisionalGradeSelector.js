@@ -36,14 +36,16 @@ export default class SpeedGraderProvisionalGradeSelector extends React.Component
     onGradeSelected: func.isRequired,
     pointsPossible: number,
     provisionalGraderDisplayNames: objectOf(string).isRequired,
-    provisionalGrades: arrayOf(shape({
-      anonymous_grader_id: string,
-      grade: string.isRequired,
-      provisional_grade_id: string.isRequired,
-      readonly: bool,
-      scorer_id: string,
-      selected: bool
-    })).isRequired
+    provisionalGrades: arrayOf(
+      shape({
+        anonymous_grader_id: string,
+        grade: string.isRequired,
+        provisional_grade_id: string.isRequired,
+        readonly: bool,
+        scorer_id: string,
+        selected: bool
+      })
+    ).isRequired
   }
 
   static defaultProps = {
@@ -81,14 +83,21 @@ export default class SpeedGraderProvisionalGradeSelector extends React.Component
 
     // A provisional grade isn't *really* a submission object, but it has the
     // two fields ("score" and "grade") relevant to formatting.
-    const formattedScore = GradeFormatHelper.formatSubmissionGrade(grade, {formatType: this.props.gradingType})
+    const formattedScore = GradeFormatHelper.formatSubmissionGrade(grade, {
+      formatType: this.props.gradingType
+    })
 
     return (
       <View>
-        <Text size="small" weight="bold">{formattedScore}</Text>
-        {this.props.gradingType === 'points' &&
-          <Text size="small"> {I18n.t('out of %{pointsPossible}', {pointsPossible: I18n.n(pointsPossible)})}</Text>
-        }
+        <Text size="small" weight="bold">
+          {formattedScore}
+        </Text>
+        {this.props.gradingType === 'points' && (
+          <Text size="small">
+            {' '}
+            {I18n.t('out of %{pointsPossible}', {pointsPossible: I18n.n(pointsPossible)})}
+          </Text>
+        )}
 
         <View padding="none small">
           <Text weight="light" size="small" fontStyle="italic">
@@ -131,12 +140,17 @@ export default class SpeedGraderProvisionalGradeSelector extends React.Component
 
         <RadioInputGroup
           value={selectedValue}
-          description={<ScreenReaderContent>{I18n.t('Select a provisional grade')}</ScreenReaderContent>}
+          description={
+            <ScreenReaderContent>{I18n.t('Select a provisional grade')}</ScreenReaderContent>
+          }
           name="selected_provisional_grade"
           onChange={this.handleGradeSelected}
           size="small"
         >
-          <RadioInput value={this.moderatorGradeId} label={<Text size="small">{I18n.t('Custom')}</Text>} />
+          <RadioInput
+            value={this.moderatorGradeId}
+            label={<Text size="small">{I18n.t('Custom')}</Text>}
+          />
 
           {gradesIssuedByOthers.map(grade => (
             <RadioInput

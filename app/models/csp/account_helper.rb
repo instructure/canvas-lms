@@ -72,6 +72,7 @@ module Csp::AccountHelper
     Csp::Domain.unique_constraint_retry do |retry_count|
       if retry_count > 0 && (record = self.csp_domains.where(:domain => domain).take)
         record.undestroy if record.deleted?
+        record
       else
         record = self.csp_domains.create(:domain => domain)
         record.valid? && record

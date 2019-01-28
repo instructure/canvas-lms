@@ -203,6 +203,19 @@ describe "Api::V1::Assignment" do
         json = api.assignment_json(assignment, user, session)
         expect(json['rubric'][0]['ignore_for_scoring']).to eq true
       end
+
+      it "includes hide_score_total setting in rubric_settings" do
+        json = api.assignment_json(assignment, user, session)
+        expect(json['rubric_settings']['hide_score_total']).to eq false
+      end
+
+      it "returns true for hide_score_total if set to true on the rubric association" do
+        ra = assignment.rubric_association
+        ra.hide_score_total = true
+        ra.save!
+        json = api.assignment_json(assignment, user, session)
+        expect(json['rubric_settings']['hide_score_total']).to eq true
+      end
     end
   end
 

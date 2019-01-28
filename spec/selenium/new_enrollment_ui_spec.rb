@@ -36,7 +36,7 @@ describe "New Enrollment" do
     get "/courses/#{@course.id}/users"
     add_people_button.click
     expect(add_people_modal).to be_displayed
-    expect(next_button).to have_attribute('aria-disabled', 'true')
+    expect(next_button).to have_attribute('disabled', 'true')
   end
 
   it "adds new users", priority: "1", test_id: 3077477 do

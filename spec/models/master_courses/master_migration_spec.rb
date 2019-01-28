@@ -1178,6 +1178,25 @@ describe MasterCourses::MasterMigration do
       expect(@copy_to.conclude_at).to be_nil
     end
 
+    it "should be able to disable grading standard" do
+      gs = @copy_from.grading_standards.create!(:title => "Standard eh", :data => [["Eh", 0.93], ["Eff", 0]])
+      @copy_from.update_attributes(:grading_standard_enabled => true, :grading_standard => gs)
+
+      @copy_to = course_factory
+      @sub = @template.add_child_course!(@copy_to)
+
+      run_master_migration
+      
+      expect(@copy_to.reload.grading_standard.data).to eq gs.data
+      expect(@copy_to.grading_standard_enabled).to eq true
+
+      @copy_from.update_attribute(:grading_standard_enabled, false)
+      run_master_migration(:copy_settings => true)
+
+      expect(@copy_to.reload.grading_standard).to be_nil
+      expect(@copy_to.grading_standard_enabled).to eq false
+    end
+
     it "should copy front wiki pages" do
       @copy_to = course_factory
       @sub = @template.add_child_course!(@copy_to)

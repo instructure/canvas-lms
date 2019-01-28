@@ -39,7 +39,7 @@ export default function generator ({ borders, colors, spacing, typography }) {
 
     metricsPadding: spacing.xxSmall,
 
-    typeMargin: spacing.xxxSmall,
+    typeMargin: spacing.xxSmall,
 
     titleLineHeight: typography.lineHeightFit,
   };

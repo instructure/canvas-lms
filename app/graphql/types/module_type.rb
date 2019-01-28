@@ -16,6 +16,22 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+class ModuleItemsVisibleLoader < GraphQL::Batch::Loader
+  def initialize(user)
+    @user = user
+  end
+
+  def perform(context_modules)
+    Shackles.activate(:slave) do
+      context_modules.each do |context_module|
+        content_tags = context_module.content_tags_visible_to(@user)
+        fulfill(context_module, content_tags)
+      end
+    end
+  end
+end
+
+
 module Types
   class ModuleType < ApplicationObjectType
     graphql_name "Module"
@@ -23,7 +39,7 @@ module Types
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
 
-    alias module object
+    alias context_module object
 
     global_id_field :id
     field :_id, ID, "legacy canvas id", null: false, method: :id
@@ -31,5 +47,10 @@ module Types
     field :name, String, null: true
 
     field :unlock_at, DateTimeType, null: true
+
+    field :module_items, [Types::ModuleItemType], null: true
+    def module_items
+      ModuleItemsVisibleLoader.for(current_user).load(context_module)
+    end
   end
 end

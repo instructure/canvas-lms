@@ -33,15 +33,15 @@ const yarnFile = fs.readFileSync('yarn.lock', 'utf8')
 const yarnJson = lockfile.parse(yarnFile)
 
 let versionToPutInCommitMsg
-console.log('Removing "@instructue" entries from yarn.lock and configuring package.json "resolutions" for all instUI stuff...')
+console.log('Removing "@instructure/ui-" entries from yarn.lock and configuring package.json "resolutions" for all instUI stuff...')
 const promises = Object.keys(yarnJson.object)
-  .filter(k => k.startsWith('@instructure'))
+  .filter(k => k.startsWith('@instructure/ui-'))
   .map(async k => {
     delete yarnJson.object[k]
     const pkgName = `@${k.split('@')[1]}`
     if (!packageJson.resolutions[pkgName]) {
-      const latestRcOnRegistry = versionToPutInCommitMsg = (await exec(`npm view ${pkgName} dist-tags.rc`)).stdout.trim()
-      packageJson.resolutions[pkgName] = `${latestRcOnRegistry}`
+      const latestReleaseOnRegistry = versionToPutInCommitMsg = (await exec(`npm view ${pkgName} dist-tags.latest`)).stdout.trim()
+      packageJson.resolutions[pkgName] = `${latestReleaseOnRegistry}`
     }
   })
 

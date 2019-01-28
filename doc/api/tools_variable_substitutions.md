@@ -734,6 +734,17 @@ System role urns start with "urn:lti:sysrole" and include roles for the entire s
 ```
 urn:lti:instrole:ims/lis/Administrator,urn:lti:instrole:ims/lis/Instructor,urn:lti:sysrole:ims/lis/SysAdmin,urn:lti:sysrole:ims/lis/User
 ```
+## com.instructure.User.allRoles
+Same as "Canvas.xuser.allRoles", but uses roles formatted for LTI Advantage.
+
+**Availability**: *always*  
+
+
+```
+ "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student",
+ "http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor",
+ "http://purl.imsglobal.org/vocab/lis/v2/system/person#User"
+```
 ## Canvas.user.globalId [duplicates Canvas.root_account.global_id]
 Returns the Canvas global user_id of the launching user.
 

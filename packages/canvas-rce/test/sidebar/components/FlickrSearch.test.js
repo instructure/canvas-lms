@@ -21,7 +21,6 @@ import React from "react";
 import FlickrSearch from "../../../src/sidebar/components/FlickrSearch";
 import sinon from "sinon";
 import sd from "skin-deep";
-import jsdom from "mocha-jsdom";
 
 describe("FlickrSearch", () => {
   let noop = () => {};
@@ -30,7 +29,6 @@ describe("FlickrSearch", () => {
   };
   let flickr, defaultProps;
 
-  jsdom();
 
   beforeEach(() => {
     flickr = {

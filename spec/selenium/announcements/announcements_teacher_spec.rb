@@ -17,7 +17,7 @@
 
 require_relative '../common'
 require_relative '../helpers/announcements_common'
-require_relative './announcement_new_edit_page'
+require_relative './pages/announcement_new_edit_page'
 
 describe "announcements" do
   include_context "in-process server selenium tests"

@@ -30,10 +30,12 @@ describe "eportfolios" do
 
   it "should create an eportfolio", priority: "1", test_id: 220018 do
     create_eportfolio
+    validate_eportfolio
   end
 
   it "should create an eportfolio that is public", priority: "2", test_id: 114348 do
     create_eportfolio(true)
+    validate_eportfolio(true)
   end
 
   context "eportfolio created with user" do

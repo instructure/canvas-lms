@@ -41,6 +41,7 @@ describe 'Moderation Page' do
       points_possible: 10,
       moderated_grading: true
     )
+    submissions = @assignment.submissions
 
     # teachers 2 and 3 grade the assignment for students 1 and 2
     (1..2).map do |i|
@@ -57,6 +58,16 @@ describe 'Moderation Page' do
     (17..24).map do |i|
       @assignment.grade_student(@students[i], grade: Random.rand(11), grader: @teachers[2], provisional: true)
     end
+
+    # Modify the anonymous ids so that we are guaranteed any sort order here
+    # will be different from the sort order on the frontend.
+    submissions[2..24].each_with_index do |submission, index|
+      unique_anonymous_id = "#{index}BBBB"[0..4]
+      submission.update!(anonymous_id: unique_anonymous_id)
+    end
+
+    submissions[0].update!(anonymous_id: "ABBBB")
+    submissions[1].update!(anonymous_id: "AAAAA")
   end
 
   before(:each) do
@@ -93,11 +104,10 @@ describe 'Moderation Page' do
   end
 
   it 'navigates to an anonymous student submission in speedgrader', priority: "1", test_id: 3638364 do
-    skip('Skipping this until GRADE-1691 is resolved')
     @assignment.update!(anonymous_grading: true)
     ModeratePage.visit(@moderated_course.id, @assignment.id)
-    ModeratePage.click_student_link("Student 1")
-    expect(Speedgrader.selected_student).to include_text 'Student 1'
+    ModeratePage.click_student_link("Student 2")
+    expect(Speedgrader.selected_student).to include_text 'Student 2'
   end
 
   it 'accepts all grades for provisional grader', priority: "1", test_id: 3513993 do

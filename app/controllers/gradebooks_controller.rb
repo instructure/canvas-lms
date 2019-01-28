@@ -137,7 +137,7 @@ class GradebooksController < ApplicationController
         student_enrollment.find_score(course_score: true)
       end
 
-      js_hash[:effective_final_grade] = total_score.effective_final_grade if total_score.overridden?
+      js_hash[:effective_final_score] = total_score.effective_final_score if total_score.overridden?
     end
 
     js_env(js_hash)
@@ -670,7 +670,6 @@ class GradebooksController < ApplicationController
           outcome_proficiency: outcome_proficiency,
         }
         if grading_role(assignment: @assignment) == :moderator
-          env[:provisional_copy_url] = api_v1_copy_to_final_mark_path(@context.id, @assignment.id, "{{provisional_grade_id}}")
           env[:provisional_select_url] = api_v1_select_provisional_grade_path(@context.id, @assignment.id, "{{provisional_grade_id}}")
         end
 
