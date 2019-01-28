@@ -10,6 +10,7 @@ type Assignment implements ModuleItemInterface & Node & Timestamped {
   legacy canvas id
   """
   _id: ID!
+  allowGoogleDocsSubmission: Boolean
 
   """
   The number of submission attempts a student can make for this assignment. null implies unlimited.
@@ -20,6 +21,9 @@ type Assignment implements ModuleItemInterface & Node & Timestamped {
   permitted uploaded file extensions (e.g. ['doc', 'xls', 'txt'])
   """
   allowedExtensions: [String!]
+  anonymizeStudents: Boolean
+  anonymousGrading: Boolean
+  anonymousInstructorAnnotations: Boolean
   assignmentGroup: AssignmentGroup
   assignmentOverrides(
     """
@@ -42,6 +46,8 @@ type Assignment implements ModuleItemInterface & Node & Timestamped {
     """
     last: Int
   ): AssignmentOverrideConnection
+  canDuplicate: Boolean
+  canUnpublish: Boolean
   course: Course
   createdAt: DateTime
   description: String
@@ -51,22 +57,48 @@ type Assignment implements ModuleItemInterface & Node & Timestamped {
   when this assignment is due
   """
   dueAt: DateTime
+  dueDateRequired: Boolean
+  expectsExternalSubmission: Boolean
+  expectsSubmission: Boolean
+
+  """
+  If this is a group assignment, boolean flag indicating whether or not students will be graded individually.
+  """
+  gradeGroupStudentsIndividually: Boolean
   gradingType: GradingType
   groupSet: GroupSet
+
+  """
+  If true, the assignment has been submitted to by at least one student
+  """
+  hasSubmittedSubmissions: Boolean
   htmlUrl: URL
   id: ID!
+  inClosedGradingPeriod: Boolean
+
+  """
+  the lock date (assignment is locked after this date).
+  """
   lockAt: DateTime
   lockInfo: LockInfo
+  moderatedGrading: ModeratedGrading
   modules: [Module!]
   muted: Boolean!
   name: String
   needsGradingCount: Int
+  nonDigitalSubmission: Boolean
+
+  """
+  If true, the assignment will be omitted from the student's final grade
+  """
+  omitFromFinalGrade: Boolean
 
   """
   specifies that this assignment is only assigned to students for whom an
          `AssignmentOverride` applies.
   """
   onlyVisibleToOverrides: Boolean!
+  peerReviews: PeerReviews
 
   """
   the assignment is out of this many points
@@ -78,7 +110,13 @@ type Assignment implements ModuleItemInterface & Node & Timestamped {
   """
   position: Int
   postPolicy: PostPolicy
+
+  """
+  present if Sync Grades to SIS feature is enabled
+  """
+  postToSis: Boolean
   quiz: Quiz
+  rubric: Rubric
   state: AssignmentState!
   submissionTypes: [SubmissionType!]
 
@@ -107,6 +145,12 @@ type Assignment implements ModuleItemInterface & Node & Timestamped {
     """
     last: Int
   ): SubmissionConnection
+  submissionsDownloads: Int
+  timeZoneEdited: String
+
+  """
+  the unlock date (assignment is unlocked after this date)
+  """
   unlockAt: DateTime
   updatedAt: DateTime
 }
@@ -1142,6 +1186,41 @@ Types that can be locked
 """
 union Lockable = Assignment | Discussion | Module | Page | Quiz
 
+"""
+Settings for Moderated Grading on an Assignment
+"""
+type ModeratedGrading {
+  """
+  Boolean indicating if the assignment is moderated.
+  """
+  enabled: Boolean
+
+  """
+  The user of the grader responsible for choosing final grades for this assignment.
+  """
+  finalGrader: User
+
+  """
+  Boolean indicating if provisional graders' comments are visible to other provisional graders.
+  """
+  graderCommentsVisibleToGraders: Boolean
+
+  """
+  The maximum number of provisional graders who may issue grades for this assignment.
+  """
+  graderCount: Int
+
+  """
+  Boolean indicating if provisional graders' identities are hidden from other provisional graders.
+  """
+  graderNamesVisibleToFinalGrader: Boolean
+
+  """
+  Boolean indicating if provisional grader identities are visible to the final grader.
+  """
+  gradersAnonymousToGraders: Boolean
+}
+
 type Module implements Node & Timestamped {
   """
   legacy canvas id
@@ -1334,6 +1413,43 @@ type PageViewAnalysis {
 }
 
 """
+Settings for Peer Reviews on an Assignment
+"""
+type PeerReviews {
+  """
+  Boolean representing whether or not peer reviews are anonymous
+  """
+  anonymousReviews: Boolean
+
+  """
+  Boolean indicating peer reviews are assigned automatically. If false, the
+  teacher is expected to manually assign peer reviews.
+  """
+  automaticReviews: Boolean
+
+  """
+  Integer representing the amount of reviews each user is assigned.
+  """
+  count: Int
+
+  """
+  Date and Time representing when the peer reviews are due
+  """
+  dueAt: DateTime
+
+  """
+  Boolean indicating if peer reviews are required for this assignment
+  """
+  enabled: Boolean
+
+  """
+  Boolean representing whether or not members from within the same group on a
+  group assignment can be assigned to peer review their own group's work
+  """
+  intraReviews: Boolean
+}
+
+"""
 A PostPolicy sets the policy for whether a Submission's grades are posted
 automatically or manually. A PostPolicy can be set at the Course and/or
 Assignment level.
@@ -1486,6 +1602,15 @@ type Quiz implements ModuleItemInterface & Node & Timestamped {
   id: ID!
   modules: [Module!]
   updatedAt: DateTime
+}
+
+type Rubric {
+  """
+  legacy canvas id
+  """
+  _id: ID!
+  freeFormCriterionComments: Boolean
+  id: ID!
 }
 
 type Section implements Node & Timestamped {

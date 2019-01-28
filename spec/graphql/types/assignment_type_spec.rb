@@ -43,6 +43,14 @@ describe Types::AssignmentType do
     expect(assignment_type.resolve("assignmentGroup { _id }")).to eq assignment.assignment_group.id.to_s
     expect(assignment_type.resolve("muted")).to eq assignment.muted?
     expect(assignment_type.resolve("allowedExtensions")).to eq assignment.allowed_extensions
+    expect(assignment_type.resolve("createdAt").to_datetime).to eq assignment.created_at.to_s.to_datetime
+    expect(assignment_type.resolve("updatedAt").to_datetime).to eq assignment.updated_at.to_s.to_datetime
+    expect(assignment_type.resolve("gradeGroupStudentsIndividually")).to eq assignment.grade_group_students_individually
+    expect(assignment_type.resolve("anonymousGrading")).to eq assignment.anonymous_grading
+    expect(assignment_type.resolve("omitFromFinalGrade")).to eq assignment.omit_from_final_grade
+    expect(assignment_type.resolve("anonymousInstructorAnnotations")).to eq assignment.anonymous_instructor_annotations
+    expect(assignment_type.resolve("postToSis")).to eq assignment.post_to_sis
+    expect(assignment_type.resolve("canUnpublish")).to eq assignment.can_unpublish?
   end
 
   context "top-level permissions" do
@@ -59,6 +67,49 @@ describe Types::AssignmentType do
         GQL
       ).to be_nil
     end
+  end
+
+  it "works with rubric" do
+    rubric = Rubric.create!(title: 'hi', context: course)
+    assignment.build_rubric_association(:rubric => rubric,
+                                         :purpose => 'grading',
+                                         :use_for_grading => true,
+                                         :context => course)
+    assignment.rubric_association.save!
+    expect(assignment_type.resolve("rubric { _id }")).to eq rubric.id.to_s
+    expect(assignment_type.resolve("rubric { freeFormCriterionComments }")).to eq assignment.rubric.free_form_criterion_comments
+    expect(assignment_type.resolve("rubric { freeFormCriterionComments }")).to eq rubric.free_form_criterion_comments
+  end
+
+  it "works with moderated grading" do
+    assignment.moderated_grading = true
+    assignment.grader_count = 1
+    assignment.final_grader_id = teacher.id
+    assignment.save!
+    assignment.update_attributes final_grader_id: teacher.id
+    expect(assignment_type.resolve("moderatedGrading { enabled }")).to eq assignment.moderated_grading
+    expect(assignment_type.resolve("moderatedGrading { finalGrader { _id } }")).to eq teacher.id.to_s
+    expect(assignment_type.resolve("moderatedGrading { gradersAnonymousToGraders }")).to eq assignment.graders_anonymous_to_graders
+    expect(assignment_type.resolve("moderatedGrading { graderCount }")).to eq assignment.grader_count
+    expect(assignment_type.resolve("moderatedGrading { graderCommentsVisibleToGraders }")).to eq assignment.grader_comments_visible_to_graders
+    expect(assignment_type.resolve("moderatedGrading { graderNamesVisibleToFinalGrader }")).to eq assignment.grader_names_visible_to_final_grader
+  end
+
+  it "works with peer review info" do
+    assignment.peer_reviews_due_at = Time.zone.now
+    assignment.save!
+    expect(assignment_type.resolve("peerReviews { enabled }")).to eq assignment.peer_reviews
+    expect(assignment_type.resolve("peerReviews { count }")).to eq assignment.peer_review_count
+    expect(assignment_type.resolve("peerReviews { dueAt }").to_datetime).to eq assignment.peer_reviews_due_at.to_s.to_datetime
+    expect(assignment_type.resolve("peerReviews { intraReviews }")).to eq assignment.intra_group_peer_reviews
+    expect(assignment_type.resolve("peerReviews { anonymousReviews }")).to eq assignment.anonymous_peer_reviews
+    expect(assignment_type.resolve("peerReviews { automaticReviews }")).to eq assignment.automatic_peer_reviews
+  end
+
+  it "works with timezone stuffs" do
+    assignment.time_zone_edited = "Mountain Time (US & Canada)"
+    assignment.save!
+    expect(assignment_type.resolve("timeZoneEdited")).to eq assignment.time_zone_edited
   end
 
   it "returns needsGradingCount" do
@@ -167,7 +218,7 @@ describe Types::AssignmentType do
     module2 = assignment.course.context_modules.create!(name: 'Module 2')
     assignment.context_module_tags.create!(context_module: module1, context: assignment.course, tag_type: 'context_module')
     assignment.context_module_tags.create!(context_module: module2, context: assignment.course, tag_type: 'context_module')
-    expect(assignment_type.resolve("modules { _id }").sort).to eq [module1.id.to_s, module2.id.to_s]
+    expect(assignment_type.resolve("modules { _id }").to_set).to eq [module1.id.to_s, module2.id.to_s].to_set
   end
 
   it "only returns valid submission types" do
