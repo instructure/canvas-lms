@@ -20,6 +20,7 @@ import $ from 'jquery'
 import htmlEscape from 'str/htmlEscape'
 import 'jqueryui/dialog'
 import 'vendor/jquery.ba-tinypubsub'
+import sanitizeHtml from 'jsx/shared/sanitizeHtml'
 
 const assignmentRubricDialog = {
 
@@ -65,7 +66,7 @@ const assignmentRubricDialog = {
 
       // weird hackery because the server returns a <div id="rubrics" style="display:none">
       // as it's root node, so we need to show it before we inject it
-      assignmentRubricDialog.$dialog.html($(html).show())
+      assignmentRubricDialog.$dialog.html($(sanitizeHtml(html)).show())
     })
   },
 
