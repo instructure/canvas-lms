@@ -336,8 +336,8 @@ class BZGrading
       effective_due_at = participation_assignment.due_at if overridden.due_at.nil?
       if !effective_due_at.nil? && effective_due_at < time_answer_given
         response_object["points_reason"] = "past_due"
-        # if it is a wrong mastery, points may be deducted. continue to deduct them even if late
-        response_object["points_amount"] = step > 0 ? 0 : step
+        # past due points aren't worth anything - good or bad.
+        response_object["points_amount"] = 0
 
         response_object["points_given"] = false
       end
