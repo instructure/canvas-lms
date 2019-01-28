@@ -175,9 +175,11 @@ class ApplicationController < ActionController::Base
       if context.name.match(/.*LC Playbook.*/)
         context = Course.active.where(:name => context.name.sub("LC Playbook", "Braven Accelerator")).first
       end
-      current_user.enrollments.active.where(:course_id => context.id).each do |enrollment|
-        enrollment.course_section.students.active.each do |student|
-          res[student.id] = student.name
+      if context
+        current_user.enrollments.active.where(:course_id => context.id).each do |enrollment|
+          enrollment.course_section.students.active.each do |student|
+            res[student.id] = student.name
+          end
         end
       end
     end
