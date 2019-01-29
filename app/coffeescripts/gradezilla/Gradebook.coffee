@@ -1307,9 +1307,8 @@ define [
       selected: showingNotes
 
     getFinalGradeOverridesSettingsModalProps: ->
-      disabled: !@options.final_grade_override_enabled ||
-        @contentLoadStates.overridesColumnUpdating ||
-        @gridReady.state() != 'resolved'
+      featureAvailable: @options.final_grade_override_enabled
+      disabled: @contentLoadStates.overridesColumnUpdating || @gridReady.state() != 'resolved'
       onChange: @toggleOverrides
       defaultChecked: @gridDisplaySettings.showFinalGradeOverrides
 

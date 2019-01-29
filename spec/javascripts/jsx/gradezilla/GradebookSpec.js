@@ -6518,7 +6518,7 @@ QUnit.module('Gradebook', () => {
     })
   })
 
-  QUnit.module('Gradebook#getFinalGradeOverridesSettingsModalProps', () => {
+  QUnit.module('#getFinalGradeOverridesSettingsModalProps', () => {
     test('includes the exact properties that GradebookSettingsModal overrides props require', () => {
       const props = createGradebook().getFinalGradeOverridesSettingsModalProps()
       const {
@@ -6532,9 +6532,15 @@ QUnit.module('Gradebook', () => {
 
     test('`disabled` defaults to true', () => {
       const gradebook = createGradebook()
-      sinon.stub(gradebook.gridReady, 'state').returns('resolved')
       const {disabled} = gradebook.getFinalGradeOverridesSettingsModalProps()
       strictEqual(disabled, true)
+    })
+
+    test('`disabled` is false when gridReady is resolved', () => {
+      const gradebook = createGradebook()
+      sinon.stub(gradebook.gridReady, 'state').returns('resolved')
+      const {disabled} = gradebook.getFinalGradeOverridesSettingsModalProps()
+      strictEqual(disabled, false)
     })
 
     test('`disabled` is false when final grades override is enabled and checked', () => {
@@ -6624,6 +6630,18 @@ QUnit.module('Gradebook', () => {
       sinon.stub(gradebook.gridReady, 'state').returns('resolved')
       const {defaultChecked} = gradebook.getFinalGradeOverridesSettingsModalProps()
       strictEqual(defaultChecked, false)
+    })
+
+    test('`featureAvailable` defaults to false', () => {
+      const gradebook = createGradebook()
+      const {featureAvailable} = gradebook.getFinalGradeOverridesSettingsModalProps()
+      strictEqual(featureAvailable, false)
+    })
+
+    test('`featureAvailable` is true when final_grade_override_enabled is true', () => {
+      const gradebook = createGradebook({final_grade_override_enabled: true})
+      const {featureAvailable} = gradebook.getFinalGradeOverridesSettingsModalProps()
+      strictEqual(featureAvailable, true)
     })
   })
 })
@@ -9521,6 +9539,7 @@ QUnit.module('#renderGradebookSettingsModal', hooks => {
     const expectedProps = {
       defaultChecked: false,
       disabled: true,
+      featureAvailable: false,
       onChange: {}
     }
     propEqual(gradebookSettingsModalProps().overrides, expectedProps)
