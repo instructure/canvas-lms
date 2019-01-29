@@ -709,6 +709,8 @@ class DiscussionTopicsController < ApplicationController
               :ASSIGNMENT_ID => @topic.assignment_id,
               :IS_GROUP => @topic.group_category_id?,
             }
+
+            env_hash[:GRADED_RUBRICS_URL] = context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) if @topic.assignment
             if params[:hide_student_names]
               env_hash[:HIDE_STUDENT_NAMES] = true
               env_hash[:STUDENT_ID] = params[:student_id]
