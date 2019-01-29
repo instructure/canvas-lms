@@ -52,6 +52,9 @@ class Message < ActiveRecord::Base
   before_save :move_dashboard_messages
   before_save :move_messages_for_deleted_users
 
+  # Publish to the pipeline in using CanvasShim
+  after_save { PipelineService.publish(self) }
+
   # Validations
   validates :body, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
   validates :html_body, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true

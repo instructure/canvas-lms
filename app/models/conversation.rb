@@ -26,6 +26,9 @@ class Conversation < ActiveRecord::Base
   has_one :stream_item, :as => :asset
   belongs_to :context, polymorphic: [:account, :course, :group]
 
+  # Pipeline Service lives in canvas_shim
+  after_save { PipelineService.publish(self) }
+
   validates_length_of :subject, :maximum => maximum_string_length, :allow_nil => true
 
   def participants(reload = false)
