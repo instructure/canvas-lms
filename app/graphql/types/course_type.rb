@@ -102,7 +102,7 @@ module Types
       course.modules_visible_to(current_user).
         order('name')
     end
-    
+
     field :users_connection, UserType.connection_type, null: true do
       argument :user_ids, [ID], <<~DOC,
         Only include users with the given ids.
@@ -205,6 +205,22 @@ module Types
         course,
         current_user: current_user, session: session
       )
+    end
+
+    field :post_policy, PostPolicyType, "A course-specific post policy", null: true
+    def post_policy
+      return nil unless course.grants_right?(current_user, :manage_grades)
+      load_association(:default_post_policy)
+    end
+
+    field :assignment_post_policies, PostPolicyType.connection_type,
+      <<~DOC,
+        PostPolicies for assignments within a course
+      DOC
+      null: true
+    def assignment_post_policies
+      return nil unless course.grants_right?(current_user, :manage_grades)
+      course.assignment_post_policies
     end
   end
 end

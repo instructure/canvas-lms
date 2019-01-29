@@ -45,6 +45,9 @@
             "name": "Page"
           },
           {
+            "name": "PostPolicy"
+          },
+          {
             "name": "Quiz"
           },
           {

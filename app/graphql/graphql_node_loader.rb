@@ -94,6 +94,13 @@ module GraphQLNodeLoader
           .load(page)
           .then(check_read_permission)
       end
+    when "PostPolicy"
+      Loaders::IDLoader.for(PostPolicy).load(id).then do |policy|
+        Loaders::AssociationLoader.for(PostPolicy, :course).load(policy).then do
+          next nil unless policy.course.grants_right?(ctx[:current_user], :manage_grades)
+          policy
+        end
+      end
     when "File"
       Loaders::IDLoader.for(Attachment).load(id).then(check_read_permission)
     when "AssignmentGroup"
