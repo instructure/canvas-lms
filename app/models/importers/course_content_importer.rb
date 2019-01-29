@@ -186,8 +186,6 @@ module Importers
           Canvas::Migration::ExternalContent::Migrator.send_imported_content(migration, data['external_content'])
         end
 
-<<<<<<< HEAD
-=======
         adjust_dates(course, migration)
 
         migration.progress=100
@@ -214,7 +212,6 @@ module Importers
     end
 
     def self.adjust_dates(course, migration)
->>>>>>> 39aadb3392... Postpone live events during content migrations
       begin
         #Adjust dates
         if shift_options = migration.date_shift_options
