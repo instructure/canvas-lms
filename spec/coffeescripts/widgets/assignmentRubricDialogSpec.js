@@ -42,42 +42,18 @@
 import $ from 'jquery'
 import assignmentRubricDialog from 'compiled/widget/assignmentRubricDialog'
 
-QUnit.module('assignmentRubricDialog', {
-  setup() {
-    this.server = sinon.createFakeServer({respondImmediately: true})
-    this.server.respondWith([200, {}, '<img src="x" onerror="alert(document.cookie);">'])
-  },
-
-  teardown() {
-    this.server.restore()
-  }
-})
+QUnit.module('assignmentRubricDialog')
 
 test('make sure it picks up the right data attrs', () => {
   const $trigger = $('<div />').addClass('rubric_dialog_trigger')
   $trigger.data('noRubricExists', false)
-  $trigger.data('url', '/example')
   $trigger.data('focusReturnsTo', '.announcement_cog')
   $('#fixtures').append($trigger)
 
   assignmentRubricDialog.initTriggers()
 
   equal(assignmentRubricDialog.noRubricExists, false)
-  equal(assignmentRubricDialog.url, '/example')
   ok(assignmentRubricDialog.$focusReturnsTo)
 
-  $('#fixtures').empty()
-})
-
-test('make sure it sanitizes html in dialog', () => {
-  const $trigger = $('<div />').addClass('rubric_dialog_trigger')
-  $trigger.data('noRubricExists', false)
-  $trigger.data('url', '/example')
-  $trigger.data('focusReturnsTo', '.announcement_cog')
-  $('#fixtures').append($trigger)
-
-  assignmentRubricDialog.initDialog()
-
-  equal(assignmentRubricDialog.$dialog.html(), '<img src="x" style="display: inline;">')
   $('#fixtures').empty()
 })
