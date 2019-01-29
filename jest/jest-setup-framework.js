@@ -23,6 +23,3 @@ import 'react-testing-library/cleanup-after-each'
 // doesn't, we could remove this, though it might make sense to leave it if
 // rendering the actual rce is slow.
 jest.mock('jsx/shared/rce/RichContentEditor')
-
-// silence errors from jsdom
-window.scroll = () => {}

@@ -24,7 +24,11 @@ import produce from 'immer'
 import get from 'lodash/get'
 import set from 'lodash/set'
 
+import Alert from '@instructure/ui-alerts/lib/components/Alert'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import Text from '@instructure/ui-elements/lib/components/Text'
+
+import {showFlashAlert} from 'jsx/shared/FlashAlert'
 
 import {TeacherAssignmentShape, SET_WORKFLOW} from '../assignmentData'
 import Header from './Header'
@@ -32,7 +36,7 @@ import ContentTabs from './ContentTabs'
 import TeacherFooter from './TeacherFooter'
 
 import ConfirmDialog from './ConfirmDialog'
-import MessageStudentsWho from './MessageStudentsWho'
+import MessageStudentsWhoForm from './MessageStudentsWhoForm'
 import TeacherViewContext, {TeacherViewContextDefaults} from './TeacherViewContext'
 
 export default class TeacherView extends React.Component {
@@ -44,6 +48,7 @@ export default class TeacherView extends React.Component {
     super(props)
     this.state = {
       messageStudentsWhoOpen: false,
+      sendingMessageStudentsWhoNow: false,
       confirmDelete: false,
       deletingNow: false,
       workingAssignment: props.assignment, // the assignment with updated fields while editing
@@ -90,8 +95,20 @@ export default class TeacherView extends React.Component {
     this.setState({messageStudentsWhoOpen: true})
   }
 
-  handleDismissMessageStudentsWho = () => {
-    this.setState({messageStudentsWhoOpen: false})
+  handleCloseMessageStudentsWho = () => {
+    this.setState({messageStudentsWhoOpen: false, sendingMessageStudentsWhoNow: false})
+  }
+
+  handleSendMessageStudentsWho = () => {
+    this.setState({sendingMessageStudentsWhoNow: true})
+    showFlashAlert({message: I18n.t('Sending messages'), srOnly: true})
+    window.setTimeout(() => {
+      showFlashAlert({
+        message: 'We only pretended to send messages. Nothing was actually sent.',
+        type: 'error'
+      }) // don't bother translating this
+      this.handleCloseMessageStudentsWho()
+    }, 3000)
   }
 
   handleDeleteButtonPressed = () => {
@@ -102,9 +119,9 @@ export default class TeacherView extends React.Component {
     this.setState({confirmDelete: false})
   }
 
-  handleReallyDelete(mutate) {
+  handleReallyDelete(deleteAssignment) {
     this.setState({deletingNow: true})
-    mutate({
+    deleteAssignment({
       variables: {
         id: this.props.assignment.lid,
         workflow: 'deleted'
@@ -119,9 +136,10 @@ export default class TeacherView extends React.Component {
     window.location.reload()
   }
 
-  handleDeleteError = _apolloErrors => {
-    // TODO: properly handle this error
-    // this.setState({errors, confirmDelete: false, deletingNow: false})
+  handleDeleteError = apolloErrors => {
+    showFlashAlert({message: I18n.t('Unable to delete assignment'), type: 'error'})
+    console.error(apolloErrors) // eslint-disable-line no-console
+    this.setState({confirmDelete: false, deletingNow: false})
   }
 
   handleCancel = () => {
@@ -142,7 +160,27 @@ export default class TeacherView extends React.Component {
     }
   }
 
-  renderConfirmDialog() {
+  deleteDialogButtonProps = deleteAssignment => [
+    {
+      children: I18n.t('Cancel'),
+      onClick: this.handleCancelDelete,
+      'data-testid': 'delete-dialog-cancel-button'
+    },
+    {
+      children: I18n.t('Delete'),
+      variant: 'danger',
+      onClick: () => this.handleReallyDelete(deleteAssignment),
+      'data-testid': 'delete-dialog-confirm-button'
+    }
+  ]
+
+  renderDeleteDialogBody = () => (
+    <Alert variant="warning">
+      <Text size="large">{I18n.t('Are you sure you want to delete this assignment?')}</Text>
+    </Alert>
+  )
+
+  renderDeleteDialog() {
     return (
       <Mutation
         mutation={SET_WORKFLOW}
@@ -153,19 +191,46 @@ export default class TeacherView extends React.Component {
           <ConfirmDialog
             open={this.state.confirmDelete}
             working={this.state.deletingNow}
+            disabled={this.state.deletingNow}
             modalLabel={I18n.t('confirm delete')}
             heading={I18n.t('Delete')}
-            message={I18n.t('Are you sure you want to delete this assignment?')}
-            confirmLabel={I18n.t('Delete')}
-            cancelLabel={I18n.t('Cancel')}
-            closeLabel={I18n.t('close')}
+            body={this.renderDeleteDialogBody}
+            buttons={() => this.deleteDialogButtonProps(deleteAssignment)}
             spinnerLabel={I18n.t('deleting assignment')}
-            onClose={this.handleCancelDelete}
-            onCancel={this.handleCancelDelete}
-            onConfirm={() => this.handleReallyDelete(deleteAssignment)}
+            onDismiss={this.handleCancelDelete}
           />
         )}
       </Mutation>
+    )
+  }
+
+  messageStudentsWhoButtonProps = () => [
+    {
+      children: I18n.t('Cancel'),
+      onClick: this.handleCloseMessageStudentsWho
+    },
+    {
+      children: I18n.t('Send'),
+      variant: 'primary',
+      onClick: this.handleSendMessageStudentsWho
+    }
+  ]
+
+  renderMessageStudentsWhoForm = () => <MessageStudentsWhoForm assignment={this.props.assignment} />
+
+  renderMessageStudentsWhoModal() {
+    return (
+      <ConfirmDialog
+        open={this.state.messageStudentsWhoOpen}
+        working={this.state.sendingMessageStudentsWhoNow}
+        disabled={this.state.sendingMessageStudentsWhoNow}
+        heading={I18n.t('Message Students Who...')}
+        body={this.renderMessageStudentsWhoForm}
+        buttons={this.messageStudentsWhoButtonProps}
+        onDismiss={this.handleCloseMessageStudentsWho}
+        modalProps={{size: 'medium'}}
+        spinnerLabel={I18n.t('sending messages...')}
+      />
     )
   }
 
@@ -176,7 +241,7 @@ export default class TeacherView extends React.Component {
     return (
       <TeacherViewContext.Provider value={this.contextValue}>
         <div className={clazz}>
-          {this.renderConfirmDialog()}
+          {this.renderDeleteDialog()}
           <ScreenReaderContent>
             <h1>{assignment.name}</h1>
           </ScreenReaderContent>
@@ -192,10 +257,7 @@ export default class TeacherView extends React.Component {
             onChangeAssignment={this.handleChangeAssignment}
             readOnly={this.state.readOnly}
           />
-          <MessageStudentsWho
-            open={this.state.messageStudentsWhoOpen}
-            onDismiss={this.handleDismissMessageStudentsWho}
-          />
+          {this.renderMessageStudentsWhoModal()}
           {dirty ? (
             <TeacherFooter
               onCancel={this.handleCancel}

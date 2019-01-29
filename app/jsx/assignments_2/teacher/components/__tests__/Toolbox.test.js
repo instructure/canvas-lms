@@ -47,7 +47,7 @@ describe('assignments 2 teacher view toolbox', () => {
       /\/courses\/course-lid\/gradebook\/speed_grader\?assignment_id=assignment-lid/
     )
     expect(closest(getByText('1 unsubmitted'), 'button')).toBeTruthy()
-    expect(queryByText(/message students who/i)).toBeNull()
+    expect(queryByText(/message students/i)).toBeNull()
     expect(getByTestId('AssignmentPoints')).toBeInTheDocument()
   })
 
@@ -63,13 +63,13 @@ describe('assignments 2 teacher view toolbox', () => {
     expect(sgLink.getAttribute('target')).toEqual('_blank')
   })
 
-  it('renders the message students who button when the assignment does not have an online submission', () => {
+  it('renders the message students button when the assignment does not have an online submission', () => {
     const assignment = mockAssignment({
       submissionTypes: ['on_paper']
     })
     const {queryByText, getByText} = renderToolbox(assignment)
     expect(queryByText('unsubmitted', {exact: false})).toBeNull()
-    expect(getByText(/message students who/i)).toBeInTheDocument()
+    expect(getByText(/message students/i)).toBeInTheDocument()
   })
 })
 
@@ -78,5 +78,5 @@ it('does not render submission and grading links when assignment is not publishe
   const {queryByText} = renderToolbox(assignment)
   expect(queryByText('to grade', {exact: false})).toBeNull()
   expect(queryByText('unsubmitted', {exact: false})).toBeNull()
-  expect(queryByText('message students who', {exact: false})).toBeNull()
+  expect(queryByText('message students', {exact: false})).toBeNull()
 })

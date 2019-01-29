@@ -25,20 +25,6 @@ import {
 
 describe('TeacherView', () => {
   describe('basic TeacherView stuff', () => {
-    it('shows the message students who dialog when the unsubmitted button is clicked', async () => {
-      const {getByText, getByTestId} = await renderTeacherView()
-      fireEvent.click(getByText(/unsubmitted/i))
-      expect(await waitForElement(() => getByTestId('message-students-who'))).toBeInTheDocument()
-    })
-
-    it('shows the message students who dialog when the message students who button is clicked', async () => {
-      const {getByText, getByTestId} = await renderTeacherView(
-        mockAssignment({submissionTypes: ['none']})
-      )
-      fireEvent.click(getByText(/message students who/i))
-      expect(await waitForElement(() => getByTestId('message-students-who'))).toBeInTheDocument()
-    })
-
     it('shows the assignment', async () => {
       const assignment = mockAssignment()
       const {getByText} = await renderTeacherView(assignment)

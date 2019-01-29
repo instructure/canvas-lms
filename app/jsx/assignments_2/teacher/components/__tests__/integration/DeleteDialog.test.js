@@ -41,9 +41,9 @@ describe('assignments 2 delete dialog', () => {
 
   it('allows cancel', async () => {
     const {getByTestId} = await openDeleteDialog()
-    const cancelButton = await waitForElement(() => getByTestId('confirm-dialog-cancel-button'))
+    const cancelButton = await waitForElement(() => getByTestId('delete-dialog-cancel-button'))
     fireEvent.click(cancelButton)
-    expect(await waitForNoElement(() => getByTestId('confirm-dialog-cancel-button'))).toBe(true)
+    expect(await waitForNoElement(() => getByTestId('delete-dialog-cancel-button'))).toBe(true)
   })
 
   it('deletes the assignment and reloads', async () => {
@@ -53,24 +53,21 @@ describe('assignments 2 delete dialog', () => {
       workflowMutationResult(assignment, 'deleted')
     ])
     const reallyDeleteButton = await waitForElement(() =>
-      getByTestId('confirm-dialog-confirm-button')
+      getByTestId('delete-dialog-confirm-button')
     )
     fireEvent.click(reallyDeleteButton)
     await wait(() => expect(reloadSpy).toHaveBeenCalled())
   })
 
-  /* eslint-disable jest/no-disabled-tests */
-  // errors aren't really implemented yet
-  it.skip('reports errors', async () => {
+  it('reports errors', async () => {
     const assignment = mockAssignment()
-    const {getByTestId} = await openDeleteDialog(assignment, [
-      // mutation result with an error
+    const {getByTestId, getByText} = await openDeleteDialog(assignment, [
+      workflowMutationResult(assignment, 'deleted', 'well rats')
     ])
     const reallyDeleteButton = await waitForElement(() =>
-      getByTestId('confirm-dialog-confirm-button')
+      getByTestId('delete-dialog-confirm-button')
     )
     fireEvent.click(reallyDeleteButton)
-    // await waitForElement(() => {getBySomething('some kind of error message alert')})
+    expect(await waitForElement(() => getByText(/unable to delete/i))).toBeInTheDocument()
   })
-  /* eslint-enable jest/no-disabled-tests */
 })

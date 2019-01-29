@@ -53,8 +53,8 @@ export async function waitForNoElement(queryFn) {
   return true
 }
 
-export function workflowMutationResult(assignment, newWorkflowState) {
-  return {
+export function workflowMutationResult(assignment, newWorkflowState, errorMessage) {
+  const result = {
     request: {
       query: SET_WORKFLOW,
       variables: {
@@ -74,6 +74,10 @@ export function workflowMutationResult(assignment, newWorkflowState) {
       }
     }
   }
+  if (errorMessage !== undefined) {
+    result.error = new Error(errorMessage)
+  }
+  return result
 }
 
 export function mockCourse(overrides) {

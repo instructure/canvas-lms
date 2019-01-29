@@ -178,7 +178,7 @@ export default class Toolbox extends React.Component {
       <FlexItem key="message students" padding="xx-small xx-small xxx-small">
         {hasSubmission(this.props.assignment)
           ? this.renderUnsubmittedButton()
-          : this.renderMessageStudentsWhoButton(I18n.t('Message Students Who'))}
+          : this.renderMessageStudentsWhoButton(I18n.t('Message Students'))}
       </FlexItem>
     ]
   }
