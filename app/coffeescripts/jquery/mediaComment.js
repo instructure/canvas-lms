@@ -24,6 +24,7 @@ import MediaElementKeyActionHandler from 'jsx/mediaelement/MediaElementKeyAction
 import $ from 'jquery'
 import kalturaAnalytics from '../util/kalturaAnalytics'
 import htmlEscape from 'str/htmlEscape'
+import sanitizeUrl from 'jsx/shared/helpers/sanitizeUrl';
 
 // #
 // a module for some of the transformation functions pulled out of the middle
@@ -94,10 +95,11 @@ function getSourcesAndTracks (id) {
   $.getJSON(`/media_objects/${id}/info`, (data) => {
     // this 'when ...' is because right now in canvas, none of the mp3 urls actually work.
     // see: CNVS-12998
-    const sources = data.media_sources.filter(source => source.content_type !== 'audio/mp3').map(source =>
-      `<source
+    const sources = data.media_sources.filter(source => source.content_type !== 'audio/mp3').map((source) =>
+    // xsslint safeString.function sanitizeUrl
+    `<source
         type='${htmlEscape(source.content_type)}'
-        src='${htmlEscape(source.url)}'
+        src='${sanitizeUrl(htmlEscape(source.url))}'
         title='${htmlEscape(source.width)}x${htmlEscape(source.height)} ${htmlEscape(Math.floor(source.bitrate / 1024))} kbps'
       />`
     )
