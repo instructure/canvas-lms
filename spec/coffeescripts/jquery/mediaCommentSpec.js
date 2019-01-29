@@ -53,6 +53,25 @@ const mockServerResponse = (server, id, type = 'video') => {
     JSON.stringify(resp)
   ])
 }
+const mockXssServerResponse = (server, id) => {
+  const resp = {
+    media_sources: [
+      {
+        content_type: 'flv',
+        url: 'javascript:alert(document.cookie);//'
+      },
+      {
+        content_type: 'mp4',
+        url: 'javascript:alert(document.cookie);//'
+      }
+    ]
+  }
+  return server.respond('GET', `/media_objects/${id}/info`, [
+    200,
+    {'Content-Type': 'application/json'},
+    JSON.stringify(resp)
+  ])
+}
 test('video player is displayed inline', function() {
   const id = 10 // ID doesn't matter since we mock out the server
   this.$holder.mediaComment('show_inline', id)
@@ -82,6 +101,22 @@ test('video player includes url sources provided by the server', function() {
     this.$holder.find('source[type=mp4]').attr('src'),
     'http://some_mp4_url.com',
     'Video contains the mp4 source'
+  )
+})
+
+test('blocks xss javascript included in url', function() {
+  const id = 10
+  this.$holder.mediaComment('show_inline', id)
+  mockXssServerResponse(this.server, id)
+  equal(
+    this.$holder.find('source[type=flv]').attr('src'),
+    'about:blank',
+    'Blocks javascript url injection through url for flv url'
+  )
+  equal(
+    this.$holder.find('source[type=mp4]').attr('src'),
+    'about:blank',
+    'Blocks javascript url injection through url for mp4 url'
   )
 })
 
