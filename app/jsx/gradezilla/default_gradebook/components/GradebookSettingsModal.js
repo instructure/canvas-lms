@@ -68,6 +68,7 @@ class GradebookSettingsModal extends React.Component {
     gradedLateSubmissionsExist: bool.isRequired,
     onLatePolicyUpdate: func.isRequired,
     overrides: shape({
+      featureAvailable: bool.isRequired,
       disabled: bool.isRequired,
       onChange: func.isRequired,
       defaultChecked: bool.isRequired
@@ -192,9 +193,11 @@ class GradebookSettingsModal extends React.Component {
                 showAlert={this.props.gradedLateSubmissionsExist}
               />
             </TabPanel>
-            <TabPanel title={I18n.t('Advanced')}>
-              <AdvancedTabPanel overrides={overrides} />
-            </TabPanel>
+            {this.props.overrides.featureAvailable && (
+              <TabPanel title={I18n.t('Advanced')}>
+                <AdvancedTabPanel overrides={overrides} />
+              </TabPanel>
+            )}
           </TabList>
         </ModalBody>
 

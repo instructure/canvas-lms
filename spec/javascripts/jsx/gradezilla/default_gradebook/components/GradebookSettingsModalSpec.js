@@ -40,6 +40,7 @@ const defaultProps = {
   overrides: {
     defaultChecked: false,
     disabled: false,
+    featureAvailable: true,
     onChange() {
       return Promise.resolve()
     }
@@ -424,6 +425,56 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
       })
     })
 
+    QUnit.module('given featureAvailable is false', featureAvailableHooks => {
+      let fetchLatePolicyStub
+      let tab
+      const overrides = {
+        defaultChecked: false,
+        disabled: false,
+        featureAvailable: false,
+        onChange() {}
+      }
+
+      featureAvailableHooks.beforeEach(() => {
+        fetchLatePolicyStub = sinon
+          .stub(GradebookSettingsModalApi, 'fetchLatePolicy')
+          .resolves({data: {latePolicy: EXISTING_LATE_POLICY}})
+      })
+
+      featureAvailableHooks.afterEach(() => fetchLatePolicyStub.restore())
+
+      test('Advanced Tab is not present', async () => {
+        await renderAndOpenComponent({overrides})
+        tab = findTab({label: 'Advanced'})
+        strictEqual(tab, undefined)
+      })
+    })
+
+    QUnit.module('given featureAvailable is true', featureAvailableHooks => {
+      let fetchLatePolicyStub
+      let tab
+      const overrides = {
+        defaultChecked: false,
+        disabled: false,
+        featureAvailable: true,
+        onChange() {}
+      }
+
+      featureAvailableHooks.beforeEach(() => {
+        fetchLatePolicyStub = sinon
+          .stub(GradebookSettingsModalApi, 'fetchLatePolicy')
+          .resolves({data: {latePolicy: EXISTING_LATE_POLICY}})
+      })
+
+      featureAvailableHooks.afterEach(() => fetchLatePolicyStub.restore())
+
+      test('Advanced Tab is present', async () => {
+        await renderAndOpenComponent({overrides})
+        tab = findTab({label: 'Advanced'})
+        ok(tab)
+      })
+    })
+
     QUnit.module('given an existing latePolicy', existingLatePolicyHooks => {
       let fetchLatePolicyStub
       let flashAlertSpy
@@ -593,6 +644,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
             const overrides = {
               defaultChecked: false,
               disabled: false,
+              featureAvailable: true,
               onChange
             }
             await renderAndOpenComponent({overrides})
@@ -642,6 +694,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
             const overrides = {
               defaultChecked: false,
               disabled: false,
+              featureAvailable: true,
               onChange
             }
             await renderAndOpenComponent({overrides})
@@ -710,6 +763,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
         const overrides = {
           defaultChecked: false,
           disabled: false,
+          featureAvailable: true,
           onChange
         }
         await renderAndOpenComponent({overrides})
@@ -745,6 +799,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
             const overrides = {
               defaultChecked: false,
               disabled: false,
+              featureAvailable: true,
               onChange
             }
             await renderAndOpenComponent({overrides})
@@ -824,6 +879,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
           const overrides = {
             defaultChecked: false,
             disabled: false,
+            featureAvailable: true,
             onChange
           }
           await renderAndOpenComponent({overrides})
