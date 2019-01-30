@@ -574,8 +574,7 @@ class ContextExternalTool < ActiveRecord::Base
     placements =* options[:placements] || options[:type]
 
     #special LOR feature flag
-    unless (options[:root_account] && options[:root_account].feature_enabled?(:lor_for_account)) ||
-        (options[:current_user] && options[:current_user].feature_enabled?(:lor_for_user))
+    unless (options[:root_account] && options[:root_account].feature_enabled?(:lor_for_account))
       valid_placements = placements.select{|placement| !LOR_TYPES.include?(placement.to_sym)}
       return [] if valid_placements.size == 0 && placements.size > 0
       placements = valid_placements

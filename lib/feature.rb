@@ -378,15 +378,6 @@ END
       state: 'hidden',
       root_opt_in: true
     },
-    'lor_for_user' =>
-    {
-      display_name: -> { I18n.t('features.lor', "LOR External Tools") },
-      description:  -> { I18n.t('allow_lor_tools', <<-END) },
-Allow users to view and use external tools configured for LOR.
-END
-      applies_to: 'User',
-      state: 'hidden'
-    },
     'lor_for_account' =>
     {
       display_name: -> { I18n.t('features.lor', "LOR External Tools") },
