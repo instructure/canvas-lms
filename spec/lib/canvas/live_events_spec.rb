@@ -564,6 +564,7 @@ describe Canvas::LiveEvents do
         hash_including({
           assignment_id: assignment.global_id.to_s,
           context_id: @course.global_id.to_s,
+          context_uuid: @course.uuid,
           context_type: 'Course',
           workflow_state: assignment.workflow_state,
           title: assignment.title,
@@ -590,6 +591,7 @@ describe Canvas::LiveEvents do
         hash_including({
           assignment_id: assignment.global_id.to_s,
           context_id: @course.global_id.to_s,
+          context_uuid: @course.uuid,
           context_type: 'Course',
           workflow_state: assignment.workflow_state,
           title: assignment.title,

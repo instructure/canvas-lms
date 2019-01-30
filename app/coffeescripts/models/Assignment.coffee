@@ -414,6 +414,9 @@ define [
     failedToDuplicate: =>
       @get('workflow_state') == 'failed_to_duplicate'
 
+    originalCourseID: =>
+      @get('original_course_id')
+
     originalAssignmentID: =>
       @get('original_assignment_id')
 
@@ -561,11 +564,24 @@ define [
     disabledMessage: ->
       I18n.t("Can't unpublish %{name} if there are student submissions", name: @get('name'))
 
+    # caller is original assignment
     duplicate: (callback) =>
       course_id = @courseID()
       assignment_id = @id
       $.ajaxJSON "/api/v1/courses/#{course_id}/assignments/#{assignment_id}/duplicate", 'POST',
         {}, callback
+
+    # caller is failed assignment
+    duplicate_failed: (callback) =>
+      target_course_id = @courseID()
+      target_assignment_id = @id
+      original_course_id = @originalCourseID()
+      original_assignment_id = @originalAssignmentID()
+      query_string = "?target_assignment_id=#{target_assignment_id}"
+      if (original_course_id != target_course_id) # when it's a course copy failure
+        query_string += "&target_course_id=#{target_course_id}"
+      $.ajaxJSON "/api/v1/courses/#{original_course_id}/assignments/#{original_assignment_id}/duplicate#{query_string}",
+        'POST', {}, callback
 
     pollUntilFinishedDuplicating: (interval = 3000) =>
       @pollUntilFinished(interval, @isDuplicating)

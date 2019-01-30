@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import 'jquery.ajaxJSON'
 import Assignment from 'compiled/models/Assignment'
 import Submission from 'compiled/models/Submission'
 import DateGroup from 'compiled/models/DateGroup'
@@ -1064,6 +1065,17 @@ test('returns the original assignment id', () => {
   equal(assignment.originalAssignmentID(), originalAssignmentID)
 })
 
+QUnit.module('Assignment#originalCourseID')
+
+test('returns the original assignment id', () => {
+  const originalCourseID = '42'
+  const assignment = new Assignment({
+    name: 'foo',
+    original_course_id: originalCourseID
+  })
+  equal(assignment.originalCourseID(), originalCourseID)
+})
+
 QUnit.module('Assignment#originalAssignmentName')
 
 test('returns the original assignment name', () => {
@@ -1133,6 +1145,26 @@ test('returns true if submission_types are in frozenAttributes', () => {
   equal(assignment.submissionTypesFrozen(), true)
 })
 
+QUnit.module('Assignment#duplicate_failed')
+
+test('make ajax call with right url when duplicate_failed is called', function() {
+  const assignmentID = '200'
+  const originalAssignmentID = '42'
+  const courseID = '123'
+  const originalCourseID = '234'
+  const assignment = new Assignment({
+    name: 'foo',
+    id: assignmentID,
+    original_assignment_id: originalAssignmentID,
+    course_id: courseID,
+    original_course_id: originalCourseID
+  })
+  const spy = sandbox.spy($, 'ajaxJSON')
+  assignment.duplicate_failed()
+  ok(spy.withArgs(
+    `/api/v1/courses/${originalCourseID}/assignments/${originalAssignmentID}/duplicate?target_assignment_id=${assignmentID}&target_course_id=${courseID}`
+  ).calledOnce)
+})
 
 QUnit.module('Assignment#pollUntilFinishedDuplicating', {
   setup() {

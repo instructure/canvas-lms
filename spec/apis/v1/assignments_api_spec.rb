@@ -1300,6 +1300,75 @@ describe AssignmentsApiController, type: :request do
         {},
         { :expected_status => 400 })
     end
+
+    context "Quizzes.Next course copy retry" do
+      let(:assignment) do
+        @course.assignments.create(
+          :title => "some assignment",
+          :assignment_group => @group,
+          :due_at => Time.zone.now + 1.week,
+          submission_types: "external_tool"
+        )
+      end
+
+      let(:course_copied) do
+        course = @course.dup
+        course.name = 'target course'
+        course.workflow_state = 'available'
+        course.save!
+        course
+      end
+
+      let!(:failed_assignment) do
+        course_copied.assignments.create(
+          title: 'failed assignment',
+          workflow_state: 'failed_to_duplicate',
+          duplicate_of_id: assignment.id
+        )
+      end
+
+      before do
+        tool = @course.context_external_tools.create!(
+          name: "bob",
+          url: "http://www.google.com",
+          consumer_key: "bob",
+          shared_secret: "bob",
+          tool_id: 'Quizzes 2',
+          privacy_level: 'public'
+        )
+        tag = ContentTag.create(content: tool, url: tool.url, context: assignment)
+        assignment.external_tool_tag = tag
+        assignment.save!
+      end
+
+      it "creates a new assignment with workflow_state duplicating" do
+        url = "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/duplicate.json" \
+          "?target_assignment_id=#{failed_assignment.id}&target_course_id=#{course_copied.id}"
+
+        expect {
+          api_call_as_user(
+            @teacher, :post,
+            url,
+            {
+              controller: "assignments_api",
+              action: "duplicate",
+              format: "json",
+              course_id: @course.id.to_s,
+              assignment_id: assignment.id.to_s,
+              target_assignment_id: failed_assignment.id,
+              target_course_id: course_copied.id
+            },
+            {},
+            {},
+            { :expected_status => 200 }
+          )
+        }.to change { course_copied.assignments.where(duplicate_of_id: assignment.id).count }.by 1
+        duplicated_assignments = course_copied.assignments.where(duplicate_of_id: assignment.id)
+        expect(duplicated_assignments.count).to eq 2
+        new_assignment = duplicated_assignments.where.not(id: failed_assignment.id).first
+        expect(new_assignment.workflow_state).to eq('duplicating')
+      end
+    end
   end
 
   describe "POST /courses/:course_id/assignments (#create)" do

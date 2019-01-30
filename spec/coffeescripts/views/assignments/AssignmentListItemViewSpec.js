@@ -713,6 +713,19 @@ test('can duplicate when assignment can be duplicated', () => {
   equal(view.$('.duplicate_assignment').length, 1)
 })
 
+test('clicks on Retry button to trigger another duplicating request', () => {
+  const model = buildAssignment({
+    id: 2,
+    title: 'Foo Copy',
+    original_assignment_name: 'Foo',
+    workflow_state: 'failed_to_duplicate'
+  })
+  const view = createView(model)
+  sandbox.spy(model, 'duplicate_failed')
+  view.$(`#assignment_${model.id} .duplicate-failed-retry`).click()
+  ok(model.duplicate_failed.called)
+})
+
 test('cannot duplicate when user is not admin', () => {
   const model = buildAssignment({
     id: 1,
