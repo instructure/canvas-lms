@@ -648,8 +648,10 @@ class AssignmentsApiController < ApplicationController
   end
 
   def duplicate
-    assignment_id = params[:assignment_id]
-    old_assignment = @context.active_assignments.find_by({ id: assignment_id })
+    # see private methods for definitions
+    old_assignment = old_assignment_for_duplicate
+    target_assignment = target_assignment_for_duplicate
+    target_course = target_course_for_duplicate
 
     if !old_assignment || old_assignment.workflow_state == "deleted"
       return render json: { error: t('assignment does not exist') }, status: :bad_request
@@ -661,18 +663,33 @@ class AssignmentsApiController < ApplicationController
 
     return unless authorized_action(old_assignment, @current_user, :create)
 
-    new_assignment = old_assignment.duplicate({ :user => @current_user })
+    new_assignment = old_assignment.duplicate(
+      user: @current_user,
+      # in case of failure retry, just reuse the title of failed assignment
+      # otherwise, we will have "assignment copy copy..." with multiple retries
+      copy_title: failure_retry? ? target_assignment.title : nil,
+      target_context: course_copy_retry? ? target_course : nil
+    )
 
-    new_assignment.insert_at(old_assignment.position + 1)
+    # if duplicated assignment is expected to be in a different course (course copy)
+    # set context and assignment_group
+    if course_copy_retry?
+      new_assignment.context = target_course
+      new_assignment.assignment_group = target_assignment.assignment_group
+    end
+
+    new_assignment.insert_at(target_assignment.position + 1)
     new_assignment.save!
-    positions_in_group = Assignment.active.where(assignment_group_id: old_assignment.assignment_group_id).
-      pluck("id", "position")
+    positions_in_group = Assignment.active.where(
+      assignment_group_id: target_assignment.assignment_group_id
+    ).pluck("id", "position")
     positions_hash = {}
     positions_in_group.each do |id_pos_pair|
       positions_hash[id_pos_pair[0]] = id_pos_pair[1]
     end
+
     if new_assignment
-      assignment_topic = old_assignment.discussion_topic
+      assignment_topic = target_assignment.discussion_topic
       if assignment_topic&.pinned && !assignment_topic&.position.nil?
         new_assignment.discussion_topic.insert_at(assignment_topic.position + 1)
       end
@@ -1191,5 +1208,48 @@ class AssignmentsApiController < ApplicationController
     end
     # self, observer
     authorized_action(@user, @current_user, %i(read_as_parent read))
+  end
+
+  # old_assignment is the assignement we want to copy from
+  def old_assignment_for_duplicate
+    @_old_assignment_for_duplicate ||= begin
+      assignment_id = params[:assignment_id]
+      @context.active_assignments.find_by(id: assignment_id)
+    end
+  end
+
+  # target assignment is:
+  #   - used to postion newly created assignments
+  #   - an assignment(failed to duplicate) in target course (course/assignment copy)
+  #   - different from old_assignment, in case of "Retry" in course/assignment copy
+  #   - same as old_assignment for the initial try of duplicating
+  # in a failure retry, we place a new assignment next to the failed assignments
+  # in an initial dup request, a new assignment will be placed next to old_assignment
+  def target_assignment_for_duplicate
+    @_target_assignment_for_duplicate ||= begin
+      target_assignment_id = params[:target_assignment_id]
+      return old_assignment_for_duplicate if target_assignment_id.blank?
+      target_course_for_duplicate.active_assignments.find_by(id: target_assignment_id)
+    end
+  end
+
+  # target course is:
+  #   - the course in which an assignment is duplicated
+  #   - different from @context, in case of "Retry" in course copy
+  #   - the same @course for assignment copy
+  def target_course_for_duplicate
+    @_target_course_for_duplicate ||= begin
+      target_course_id = params[:target_course_id]
+      return @context if target_course_id.blank?
+      Course.find_by(id: target_course_id)
+    end
+  end
+
+  def failure_retry?
+    target_assignment_for_duplicate != old_assignment_for_duplicate
+  end
+
+  def course_copy_retry?
+    target_course_for_duplicate != @context
   end
 end

@@ -267,10 +267,9 @@ define [
 
     onDuplicateFailedRetry: (e) =>
       e.preventDefault()
-      originalAssignment = @model.collection.get(@model.originalAssignmentID())
       $button = $(e.target)
       $button.prop('disabled', true)
-      originalAssignment.duplicate((response) =>
+      @model.duplicate_failed((response) =>
         @addAssignmentToList(response)
         @delete(silent: true)
       ).always -> $button.prop('disabled', false)

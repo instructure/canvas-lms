@@ -187,6 +187,7 @@ module Canvas::LiveEvents
     {
       assignment_id: assignment.global_id,
       context_id: assignment.global_context_id,
+      context_uuid: assignment.context.uuid,
       context_type: assignment.context_type,
       assignment_group_id: assignment.global_assignment_group_id,
       workflow_state: assignment.workflow_state,
