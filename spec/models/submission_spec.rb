@@ -4676,6 +4676,74 @@ describe Submission do
         }
       end
     end
+
+    describe "submission posting" do
+      let(:course) { Course.create! }
+      let(:assignment) { course.assignments.create!(title: "ok") }
+      let(:student) { course.enroll_student(User.create!, enrollment_state: "active").user }
+      let(:teacher) { course.enroll_teacher(User.create!, enrollment_state: "active").user }
+      let(:submission) { assignment.submissions.find_by!(user: student) }
+      let(:comment_params) { {comment: "oh no", author: teacher} }
+
+      context "when the submission is unposted" do
+        it "posts the submission if the comment is from an instructor in the course" do
+          submission.add_comment(comment_params)
+          expect(submission).to be_posted
+        end
+
+        it "does not post the submission if the comment is not from an instructor" do
+          submission.add_comment(comment_params.merge({author: student}))
+          expect(submission).not_to be_posted
+        end
+
+        it "does not post the submission if the comment is a draft" do
+          submission.add_comment(comment_params.merge({draft_comment: true}))
+          expect(submission).not_to be_posted
+        end
+
+        it "does not post the submission if the comment has no author" do
+          comment_params.delete(:author)
+          submission.add_comment(comment_params)
+          expect(submission).not_to be_posted
+        end
+
+        it "does not post the submission if the comment is provisional" do
+          moderated_assignment = course.assignments.create!(
+            title: "aa",
+            moderated_grading: true,
+            final_grader: teacher,
+            grader_count: 2
+          )
+
+          moderated_submission = moderated_assignment.submission_for_student(student)
+          moderated_submission.add_comment(comment_params.merge({provisional: true}))
+          expect(moderated_submission).not_to be_posted
+        end
+
+        it "does not post the submission if post policies are enabled and the assignment is manually-posted" do
+          course.enable_feature!(:post_policies)
+
+          assignment.ensure_post_policy(post_manually: true)
+          submission.add_comment(comment_params)
+          expect(submission).not_to be_posted
+        end
+
+        it "does not post the submission if post policies are not enabled and the assignment is muted" do
+          assignment.mute!
+          expect(submission).not_to be_posted
+        end
+      end
+
+      it "does not update the posted_at date if a submission is already posted" do
+        submission.update!(posted_at: 1.day.ago)
+
+        expect {
+          submission.add_comment(comment_params)
+        }.not_to change {
+          assignment.submission_for_student(student).posted_at
+        }
+      end
+    end
   end
 
   describe "#last_teacher_comment" do
@@ -6144,6 +6212,70 @@ describe Submission do
 
       it "returns false if the submission's posted_at date is nil" do
         expect(submission).not_to be_posted
+      end
+    end
+
+    describe "#handle_posted_at_changed" do
+      context "when posting an individual submission" do
+        context "when post policies are enabled" do
+          it "calls post_submissions on the assignment with the posted submission" do
+            expect(@assignment).to receive(:post_submissions).with(hash_including(submission_ids: [submission.id]))
+            submission.update!(posted_at: Time.zone.now)
+          end
+
+          it "refrains from re-updating the timestamp of the posted submission" do
+            expect(@assignment).to receive(:post_submissions).with(hash_including(skip_updating_timestamp: true))
+            submission.update!(posted_at: Time.zone.now)
+          end
+
+          it "does not call post_submissions if the submission was already posted" do
+            submission.update!(posted_at: 1.day.ago)
+
+            expect(@assignment).not_to receive(:post_submissions)
+            submission.update!(posted_at: Time.zone.now)
+          end
+        end
+
+        context "when post policies are disabled" do
+          before(:each) { @assignment.course.disable_feature!(:post_policies) }
+
+          it "does not call post_submissions on the assignment" do
+            expect(@assignment).not_to receive(:post_submissions)
+            submission.update!(posted_at: Time.zone.now)
+          end
+        end
+      end
+
+      context "when unposting an individual submission" do
+        before(:each) { submission.update!(posted_at: 1.day.ago) }
+
+        context "when post policies are enabled" do
+          it "calls post_submissions on the assignment with the posted submission" do
+            expect(@assignment).to receive(:hide_submissions).with(hash_including(submission_ids: [submission.id]))
+            submission.update!(posted_at: nil)
+          end
+
+          it "refrains from re-updating the timestamp of the posted submission" do
+            expect(@assignment).to receive(:hide_submissions).with(hash_including(skip_updating_timestamp: true))
+            submission.update!(posted_at: nil)
+          end
+
+          it "does not call hide_submissions if the submission was already posted" do
+            submission.update!(posted_at: nil)
+
+            expect(@assignment).not_to receive(:hide_submissions)
+            submission.update!(posted_at: nil)
+          end
+        end
+
+        context "when post policies are disabled" do
+          before(:each) { @assignment.course.disable_feature!(:post_policies) }
+
+          it "does not call post_submissions on the assignment" do
+            expect(@assignment).not_to receive(:hide_submissions)
+            submission.update!(posted_at: nil)
+          end
+        end
       end
     end
   end

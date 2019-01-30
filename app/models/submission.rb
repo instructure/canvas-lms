@@ -312,6 +312,7 @@ class Submission < ActiveRecord::Base
   after_save :create_alert
   after_save :reset_regraded
   after_save :create_audit_event!
+  after_save :handle_posted_at_changed, if: :saved_change_to_posted_at?
 
   def reset_regraded
     @regraded = false
@@ -2013,8 +2014,11 @@ class Submission < ActiveRecord::Base
       pg = find_or_create_provisional_grade!(opts[:author], final: opts[:final])
       opts[:provisional_grade_id] = pg.id
     end
+
     if self.new_record?
       self.save!
+    elsif comment_causes_posting?(author: opts[:author], draft: opts[:draft], provisional: opts[:provisional])
+      update!(posted_at: Time.zone.now)
     else
       self.touch
     end
@@ -2627,5 +2631,29 @@ class Submission < ActiveRecord::Base
     end
 
     AnonymousOrModerationEvent.create!(event)
+  end
+
+  def comment_causes_posting?(author:, draft:, provisional:)
+    return false if posted? || assignment.post_manually?
+    return false if draft || provisional
+
+    author.present? && assignment.context.instructor_ids.include?(author.id)
+  end
+
+  def handle_posted_at_changed
+    # This method will be called if a posted_at date was changed specifically
+    # on this submission (e.g., if it received a grade or a comment and the
+    # assignment is not manually posted), as opposed to the usual situation
+    # where all submissions in a section are updated. In this case, we call
+    # [un]post_submissions to follow the normal workflow, but skip updating the
+    # posted_at date since that already happened.
+    return unless assignment.course.feature_enabled?(:post_policies)
+
+    previously_posted = posted_at_before_last_save.present?
+    if posted? && !previously_posted
+      assignment.post_submissions(submission_ids: [self.id], skip_updating_timestamp: true)
+    elsif !posted? && previously_posted
+      assignment.hide_submissions(submission_ids: [self.id], skip_updating_timestamp: true)
+    end
   end
 end

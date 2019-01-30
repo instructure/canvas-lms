@@ -1802,6 +1802,8 @@ class Assignment < ActiveRecord::Base
     if did_grade
       submission.grade_matches_current_submission = true
       submission.regraded = true
+      submission.graded_at = Time.zone.now
+      submission.posted_at = submission.graded_at unless submission.posted? || post_manually?
     end
     submission.audit_grade_changes = did_grade || submission.excused_changed?
 
@@ -1811,7 +1813,6 @@ class Assignment < ActiveRecord::Base
       submission.workflow_state = "graded"
     end
     submission.group = group
-    submission.graded_at = Time.zone.now if did_grade
     previously_graded ? submission.with_versioning(:explicit => true) { submission.save! } : submission.save!
     submission.audit_grade_changes = false
 
@@ -3113,11 +3114,18 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  def post_submissions(submissions: self.submissions.active)
+  def post_submissions(submission_ids: nil, skip_updating_timestamp: false)
+    submissions = if submission_ids.nil?
+      self.submissions.active
+    else
+      self.submissions.active.where(id: submission_ids)
+    end
     return if submissions.blank?
 
-    update_time = Time.zone.now
-    submissions.update_all(posted_at: update_time, updated_at: update_time)
+    unless skip_updating_timestamp
+      update_time = Time.zone.now
+      submissions.update_all(posted_at: update_time, updated_at: update_time)
+    end
     submissions.in_workflow_state('graded').each(&:assignment_muted_changed)
 
     show_stream_items(submissions: submissions)
@@ -3125,10 +3133,15 @@ class Assignment < ActiveRecord::Base
     update_muted_status! if course.feature_enabled?(:post_policies)
   end
 
-  def unpost_submissions(submissions: self.submissions.active)
+  def hide_submissions(submission_ids: nil, skip_updating_timestamp: false)
+    submissions = if submission_ids.nil?
+      self.submissions.active
+    else
+      self.submissions.active.where(id: submission_ids)
+    end
     return if submissions.blank?
 
-    submissions.update_all(posted_at: nil, updated_at: Time.zone.now)
+    submissions.update_all(posted_at: nil, updated_at: Time.zone.now) unless skip_updating_timestamp
     submissions.in_workflow_state('graded').each(&:assignment_muted_changed)
 
     hide_stream_items(submissions: submissions)

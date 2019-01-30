@@ -40,7 +40,7 @@ module Mutable
     return if muted?
     self.update_attribute(:muted, true)
     clear_sent_messages
-    unpost_submissions if respond_to?(:unpost_submissions)
+    hide_submissions if respond_to?(:hide_submissions)
     ensure_post_policy(post_manually: true) if respond_to?(:ensure_post_policy)
     true
   end

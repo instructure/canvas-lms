@@ -1962,6 +1962,63 @@ describe Assignment do
         end
       end
     end
+
+    describe "submission posting" do
+      let(:course) { Course.create! }
+
+      let(:student) { course.enroll_student(User.create!, enrollment_state: 'active').user }
+      let(:teacher) { course.enroll_teacher(User.create!, enrollment_state: 'active').user }
+
+      let(:assignment) { course.assignments.create!(title: "hi") }
+      let(:submission) { assignment.submission_for_student(student) }
+
+      context "when the submission is unposted" do
+        it "posts the submission if a grade is assigned" do
+          assignment.grade_student(student, grader: teacher, score: 50)
+          expect(submission).to be_posted
+        end
+
+        it "posts the submission if an excusal is granted" do
+          assignment.grade_student(student, grader: teacher, excused: true)
+          expect(submission).to be_posted
+        end
+
+        it "does not post the submission for a manually-posted assignment when post policies are enabled" do
+          course.enable_feature!(:post_policies)
+
+          assignment.create_post_policy!(course: course, post_manually: true)
+          assignment.grade_student(student, grader: teacher, score: 50)
+          expect(submission).not_to be_posted
+        end
+
+        it "does not post the submission for a muted assignment when post policies are not enabled" do
+          assignment.mute!
+          assignment.grade_student(student, grader: teacher, score: 50)
+          expect(submission).not_to be_posted
+        end
+
+        it "does not post the submission if the grade is provisional" do
+          moderated_assignment = course.assignments.create!(
+            title: "hi",
+            moderated_grading: true,
+            final_grader: teacher,
+            grader_count: 2
+          )
+          moderated_assignment.grade_student(student, grader: teacher, provisional: true, score: 40)
+          expect(moderated_assignment.submission_for_student(student)).not_to be_posted
+        end
+      end
+
+      it "does not update the posted_at date for a previously-posted submission" do
+        submission.update!(posted_at: 1.day.ago)
+
+        expect {
+          assignment.grade_student(student, grader: teacher, score: 50)
+        }.not_to change {
+          assignment.submission_for_student(student).posted_at
+        }
+      end
+    end
   end
 
   describe "#all_context_module_tags" do
@@ -6988,7 +7045,7 @@ describe Assignment do
       end
 
       it "does not update the posted_at field of submissions that were not specified" do
-        assignment.post_submissions(submissions: Submission.where(id: [student1_submission.id]))
+        assignment.post_submissions(submission_ids: [student1_submission.id])
 
         expect(student2_submission).not_to be_posted
       end
@@ -6998,6 +7055,14 @@ describe Assignment do
         assignment.post_submissions
 
         expect(comment.reload).not_to be_hidden
+      end
+
+      it "does not update the posted_at field if skip_updating_timestamp is passed" do
+        expect {
+          assignment.post_submissions(skip_updating_timestamp: true)
+        }.not_to change {
+          assignment.submission_for_student(student1).posted_at
+        }
       end
 
       context "when post policies are enabled" do
@@ -7011,7 +7076,7 @@ describe Assignment do
         it "leaves the assignment muted if some submissions remain unposted" do
           assignment.mute!
 
-          assignment.post_submissions(submissions: Submission.where(id: student1_submission.id))
+          assignment.post_submissions(submission_ids: [student1_submission.id])
           expect(assignment).to be_muted
         end
       end
@@ -7025,17 +7090,17 @@ describe Assignment do
       end
     end
 
-    describe "#unpost_submissions" do
+    describe "#hide_submissions" do
       before(:each) { assignment.post_submissions }
 
       it "nullifies the posted_at field of the specified submissions" do
-        assignment.unpost_submissions
+        assignment.hide_submissions
         expect(student1_submission.reload.posted_at).to be_nil
       end
 
       it "does not nullify the posted_at field of submissions that were not specified" do
         expect {
-          assignment.unpost_submissions(submissions: Submission.where(id: [student1_submission.id]))
+          assignment.hide_submissions(submission_ids: [student1_submission.id])
         }.not_to change {
           student2_submission.posted_at
         }
@@ -7043,26 +7108,36 @@ describe Assignment do
 
       it "hides instructor comments on specified submissions" do
         comment = student1_submission.add_comment(author: teacher, hidden: false, comment: 'ok')
-        assignment.unpost_submissions
+        assignment.hide_submissions
 
         expect(comment.reload).to be_hidden
       end
 
+      it "does not update the posted_at field if skip_updating_timestamp is passed" do
+        student1_submission.update!(posted_at: 1.day.ago)
+
+        expect {
+          assignment.hide_submissions(skip_updating_timestamp: true)
+        }.not_to change {
+          assignment.submission_for_student(student1).posted_at
+        }
+      end
+
       context "when post policies are enabled" do
         it "mutes the assignment if any submissions are now unposted" do
-          assignment.unpost_submissions
+          assignment.hide_submissions
           expect(assignment).to be_muted
         end
 
         it "leaves the assignment unmuted if all submissions remain posted" do
-          assignment.unpost_submissions(submissions: Submission.none)
+          assignment.hide_submissions(submission_ids: [])
           expect(assignment).not_to be_muted
         end
       end
 
       it "does not update the assignment's muted status when post policies are not enabled" do
         @course.disable_feature!(:post_policies)
-        assignment.unpost_submissions
+        assignment.hide_submissions
         expect(assignment).not_to be_muted
       end
     end
