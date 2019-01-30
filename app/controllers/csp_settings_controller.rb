@@ -34,6 +34,7 @@ class CspSettingsController < ApplicationController
   #
   # @response_field enabled Whether CSP is enabled.
   # @response_field inherited Whether the current CSP settings are inherited from a parent account.
+  # @response_field settings_locked Whether current CSP settings can be overridden by sub-accounts and courses.
   # @response_field effective_whitelist If enabled, lists the currently whitelisted domains
   #   (includes domains automatically whitelisted through external tools).
   # @response_field tools_whitelist (Account-only) Lists the automatically whitelisted domains with
@@ -50,6 +51,9 @@ class CspSettingsController < ApplicationController
   # Either explicitly sets CSP to be on or off for courses and sub-accounts,
   # or clear the explicit settings to default to those set by a parent account
   #
+  # Note: If "inherited" and "settings_locked" are both true for this account or course,
+  # then the CSP setting cannot be modified.
+  #
   # @argument status [Required, String, "enabled"|"disabled"|"inherited"]
   #   If set to "enabled" for an account, CSP will be enabled for all its courses and sub-accounts (that
   #   have not explicitly enabled or disabled it), using the domain whitelist set on this account.
@@ -59,6 +63,10 @@ class CspSettingsController < ApplicationController
   #   are inherited from the first parent account to have them explicitly set.
   #
   def set_csp_setting
+    if ["enabled", "disabled"].include?(params[:status]) && @context.csp_inherited? && @context.csp_locked?
+      return render :json => {:message => "cannot set when locked by parent account"}, :status => :bad_request
+    end
+
     case params[:status]
     when "enabled"
       if @context.is_a?(Course)
@@ -76,6 +84,26 @@ class CspSettingsController < ApplicationController
       @context.inherit_csp!
     else
       return render :json => {:message => "invalid setting"}, :status => :bad_request
+    end
+    render :json => csp_settings_json
+  end
+
+  # @API Lock or unlock current CSP settings for sub-accounts and courses
+  #
+  # Can only be set if CSP is explicitly enabled or disabled on this account (i.e. "inherited" is false).
+  #
+  # @argument settings_locked [Required, Boolean]
+  #   Whether sub-accounts and courses will be prevented from overriding settings inherited from this account.
+  #
+  def set_csp_lock
+    if @context.csp_inherited?
+      return render :json => {:message => "CSP must be explicitly set on this account"}, :status => :bad_request
+    end
+
+    if value_to_boolean(params.require(:settings_locked))
+      @context.lock_csp!
+    else
+      @context.unlock_csp!
     end
     render :json => csp_settings_json
   end
@@ -154,6 +182,7 @@ class CspSettingsController < ApplicationController
     json = {
       :enabled => @context.csp_enabled?,
       :inherited => @context.csp_inherited?,
+      :settings_locked => @context.csp_locked?,
     }
     json[:effective_whitelist] = @context.csp_whitelisted_domains if @context.csp_enabled?
     if @context.is_a?(Account)

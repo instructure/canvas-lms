@@ -48,6 +48,16 @@ describe Csp do
       expect(@sub2.csp_enabled?).to eq false
     end
 
+    it "should not override inherited settings if explicitly set down the chain but locked" do
+      @root.enable_csp!
+      @sub1.disable_csp!
+      @root.lock_csp!
+      @accounts.each do |a|
+        expect(a.csp_enabled?).to eq true
+        expect(a.csp_account_id).to eq @root.global_id
+      end
+    end
+
     it "should cache" do
       expect_any_instantiation_of(@sub1).to receive(:calculate_inherited_setting).once
       enable_cache do
@@ -61,6 +71,17 @@ describe Csp do
         expect(@sub2.csp_enabled?).to eq false
         @root.enable_csp!
         expect(Account.find(@sub2.id).csp_enabled?).to eq true
+      end
+    end
+
+    it "should invalidate caches on lock changes" do
+      @root.enable_csp!
+      @sub1.disable_csp!
+      @root.lock_csp!
+      enable_cache do
+        expect(@sub2.csp_enabled?).to eq true
+        @root.unlock_csp!
+        expect(Account.find(@sub2.id).csp_enabled?).to eq false
       end
     end
   end
@@ -86,6 +107,15 @@ describe Csp do
       @course.csp_disabled = true
       @course.save!
       expect(@course.reload.csp_enabled?).to eq false
+    end
+
+    it "should not allow overriding if locked by account" do
+      @root.enable_csp!
+      @course.csp_disabled = true
+      @course.save!
+      @root.lock_csp!
+      expect(@course.reload.csp_enabled?).to eq true
+      expect(@course.csp_locked?).to eq true
     end
   end
 
