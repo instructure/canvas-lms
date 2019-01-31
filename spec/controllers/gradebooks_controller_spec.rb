@@ -843,6 +843,19 @@ describe GradebooksController do
         expect(gradebook_options).not_to have_key :grading_schemes
       end
 
+      it "sets post_policies_enabled to true when Post Policies are enabled" do
+        @course.enable_feature!(:new_gradebook)
+        @course.enable_feature!(:post_policies)
+        get :show, params: { course_id: @course.id }
+        expect(gradebook_options[:post_policies_enabled]).to be(true)
+      end
+
+      it "sets post_policies_enabled to false when Post Policies are not enabled" do
+        @course.enable_feature!(:new_gradebook)
+        get :show, params: { course_id: @course.id }
+        expect(gradebook_options[:post_policies_enabled]).to be(false)
+      end
+
       it 'includes api_max_per_page' do
         Setting.set('api_max_per_page', 50)
         get :show, params: {course_id: @course.id}

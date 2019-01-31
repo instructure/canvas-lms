@@ -36,6 +36,7 @@ import AnonymousSpeedGraderAlert from 'jsx/gradezilla/default_gradebook/componen
 import GradebookApi from 'jsx/gradezilla/default_gradebook/apis/GradebookApi'
 import LatePolicyApplicator from 'jsx/grading/LatePolicyApplicator'
 import SubmissionStateMap from 'jsx/gradezilla/SubmissionStateMap'
+import PostPolicies from 'jsx/gradezilla/default_gradebook/PostPolicies'
 import studentRowHeaderConstants from 'jsx/gradezilla/default_gradebook/constants/studentRowHeaderConstants'
 import {
   darken,
@@ -47,12 +48,14 @@ import GradebookSettingsModal from 'jsx/gradezilla/default_gradebook/components/
 
 import {
   createGradebook,
+  setFixtureHtml,
   stubDataLoader
 } from 'jsx/gradezilla/default_gradebook/__tests__/GradebookSpecHelper'
 import {createCourseGradesWithGradingPeriods as createGrades} from '../gradebook/GradeCalculatorSpecHelper'
 
 const $fixtures = document.getElementById('fixtures')
 
+/* eslint-disable qunit/no-identical-names */
 QUnit.module('Gradebook')
 
 test('normalizes the grading period set from the env', function() {
@@ -9985,3 +9988,63 @@ QUnit.module('Gradebook#handleAssignmentMutingChange', hooks => {
     deepEqual(gradebook.getSortRowsBySetting(), sortSettings)
   })
 })
+
+QUnit.module('Gradebook', () => {
+  QUnit.module('Post Policies', hooks => {
+    let $container
+    let gradebook
+    let options
+
+    hooks.beforeEach(() => {
+      $container = document.body.appendChild(document.createElement('div'))
+      setFixtureHtml($container)
+      stubDataLoader()
+
+      options = {
+        post_policies_enabled: true
+      }
+    })
+
+    hooks.afterEach(() => {
+      gradebook.destroy()
+      $container.remove()
+    })
+
+    QUnit.module('when Post Policies is enabled', contextHooks => {
+      contextHooks.beforeEach(() => {
+        gradebook = createGradebook(options)
+      })
+
+      test('attaches the Post Policies feature module to Gradebook', () => {
+        ok(gradebook.postPolicies instanceof PostPolicies)
+      })
+
+      test('initializes Post Policies when Gradebook initializes', () => {
+        sinon.spy(gradebook.postPolicies, 'initialize')
+        gradebook.initialize()
+        strictEqual(gradebook.postPolicies.initialize.callCount, 1)
+      })
+    })
+
+    QUnit.module('when Post Policies is not enabled', contextHooks => {
+      contextHooks.beforeEach(() => {
+        options.post_policies_enabled = false
+        gradebook = createGradebook(options)
+      })
+
+      test('does not attach the Post Policies feature module to Gradebook', () => {
+        strictEqual(gradebook.postPolicies, null)
+      })
+
+      test('ignores Post Policies when Gradebook initializes', () => {
+        try {
+          gradebook.initialize()
+          ok(true, 'Gradebook does not attempt to initialize absent Post Policies')
+        } catch (error) {
+          notOk(error)
+        }
+      })
+    })
+  })
+})
+/* eslint-enable qunit/no-identical-names */
