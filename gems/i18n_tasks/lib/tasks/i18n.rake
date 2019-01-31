@@ -15,7 +15,6 @@ namespace :i18n do
     puts "\nJS/HBS..."
     js_pid = spawn "./gems/canvas_i18nliner/bin/i18nliner export"
 
-
     puts "\nRuby..."
     require 'i18nliner/commands/check'
 
@@ -81,6 +80,13 @@ namespace :i18n do
     I18n.load_path += Dir[Rails.root.join('config', 'locales', 'locales.yml')]
 
     I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
+
+    require 'i18nliner/extractors/translation_hash'
+    I18nliner::Extractors::TranslationHash.class_eval do
+      def encode_with(coder)
+        coder.represent_map nil, self # make translation hashes encode to yaml like a regular hash
+      end
+    end
   end
 
   desc "Generates JS bundle i18n files (non-en) and adds them to assets.yml"
