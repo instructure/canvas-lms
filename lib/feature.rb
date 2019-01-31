@@ -274,6 +274,18 @@ END
             transitions['off']['warning'] =
               I18n.t("This feature can't be disabled because there is at least one sub-account or course with this feature enabled.")
           end
+
+          if context.feature_enabled?(:final_grades_override)
+            # state is locked to `on`
+            transitions['off'] ||= {}
+            transitions['off']['locked'] = true
+            transitions['allowed'] ||= {}
+            transitions['allowed']['locked'] = true
+          elsif context.feature_allowed?(:final_grades_override, exclude_enabled: true)
+            # Lock `off` since Final Grade Override is set to `allowed`
+            transitions['off'] ||= {}
+            transitions['off']['locked'] = true
+          end
         end
       end
     },
@@ -289,18 +301,41 @@ END
       state: 'allowed',
       beta: true,
       custom_transition_proc: ->(_user, context, from_state, transitions) do
-        # can't go back
-        if context.is_a?(Course) && from_state == 'on'
-          transitions['off'] ||= {}
-          transitions['off']['locked'] = true
-        elsif context.is_a?(Account) && from_state == 'allowed'
-          transitions['off'] ||= {}
-          transitions['off']['locked'] = true
-        elsif context.is_a?(Account) && from_state == 'on'
-          transitions['off'] ||= {}
-          transitions['off']['locked'] = true
+        transitions['off'] ||= {}
+        transitions['on'] ||= {}
+
+        # The goal here is to make Final Grade Override fully dependent upon New Gradebook's status.
+        # In other words this is a "one-way" flag:
+        #  - Once Allowed, it can no longer be set to Off.
+        #  - Once On, it can no longer be Off nor Allowed.
+        #  - For Final Grade Override to be set to `allowed`, New Gradebook must be at least `allowed` or `on`
+        #  - For Final Grade Override to be set to `on`, New Gradebook must be `on`.
+        if context.is_a?(Course)
+          if context.feature_enabled?(:new_gradebook)
+            transitions['off']['locked'] = true if from_state == 'on' # lock off to enforce no take backs
+          else
+            transitions['on']['locked'] = true # feature unavailable without New Gradebook
+          end
+        elsif context.is_a?(Account)
           transitions['allowed'] ||= {}
-          transitions['allowed']['locked'] = true
+          if context.feature_enabled?(:new_gradebook)
+            if from_state == 'allowed'
+              transitions['off']['locked'] = true # lock off to enforce no take backs
+            elsif from_state == 'on'
+              # lock both `off` and `allowed` to enforce no take backs
+              transitions['off']['locked'] = true
+              transitions['allowed']['locked'] = true
+            end
+          elsif context.feature_allowed?(:new_gradebook, exclude_enabled: true)
+            # Locked into `allowed` since Final Grade Override can't go back to `off` and can't
+            # set to `on` without New Gradebook also set to `on`.
+            transitions['off']['locked'] = true
+            transitions['on']['locked'] = true
+          else
+            # feature unavailable without New Gradebook
+            transitions['allowed']['locked'] = true
+            transitions['on']['locked'] = true
+          end
         end
       end
     },
