@@ -3346,6 +3346,12 @@ class Course < ActiveRecord::Base
     count - 1
   end
 
+  def post_manually?
+    return false unless feature_enabled?(:post_policies)
+
+    default_post_policy.present? && default_post_policy.post_manually?
+  end
+
   private
 
   def effective_due_dates

@@ -1442,6 +1442,8 @@ define [
         onLatePolicyUpdate: @onLatePolicyUpdate
         gradedLateSubmissionsExist: @options.graded_late_submissions_exist
         overrides: @getFinalGradeOverridesSettingsModalProps()
+        anonymousAssignmentsPresent: _.any(@assignments, (assignment) => assignment.anonymous_grading)
+        postPolicies: @postPolicies
       @gradebookSettingsModal = renderComponent(
         GradebookSettingsModal,
         gradebookSettingsModalMountPoint,

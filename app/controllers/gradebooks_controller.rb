@@ -816,18 +816,19 @@ class GradebooksController < ApplicationController
   def new_gradebook_env
     graded_late_submissions_exist = @context.submissions.graded.late.exists?
 
-    {
-      GRADEBOOK_OPTIONS: {
-        colors: gradebook_settings.fetch(:colors, {}),
-        final_grade_override_enabled: @context.feature_enabled?(:final_grades_override),
-        graded_late_submissions_exist: graded_late_submissions_exist,
-        gradezilla: true,
-        grading_schemes: GradingStandard.for(@context).as_json(include_root: false),
-        late_policy: @context.late_policy.as_json(include_root: false),
-        new_gradebook_development_enabled: new_gradebook_development_enabled?,
-        post_policies_enabled: @context.feature_enabled?(:post_policies)
-      }
+    new_gradebook_options = {
+      colors: gradebook_settings.fetch(:colors, {}),
+      final_grade_override_enabled: @context.feature_enabled?(:final_grades_override),
+      graded_late_submissions_exist: graded_late_submissions_exist,
+      gradezilla: true,
+      grading_schemes: GradingStandard.for(@context).as_json(include_root: false),
+      late_policy: @context.late_policy.as_json(include_root: false),
+      new_gradebook_development_enabled: new_gradebook_development_enabled?,
+      post_policies_enabled: @context.feature_enabled?(:post_policies)
     }
+    new_gradebook_options[:post_manually] = @context.post_manually? if @context.feature_enabled?(:post_policies)
+
+    {GRADEBOOK_OPTIONS: new_gradebook_options}
   end
 
   def gradebook_version

@@ -25,6 +25,8 @@ import PostAssignmentGradesTray from '../../../grading/PostAssignmentGradesTray'
 export default class PostPolicies {
   constructor(gradebook) {
     this._gradebook = gradebook
+
+    this._coursePostPolicy = {postManually: !!gradebook.options.post_manually}
   }
 
   initialize() {
@@ -62,5 +64,13 @@ export default class PostPolicies {
       assignment: {id, name},
       onExited
     })
+  }
+
+  get coursePostPolicy() {
+    return this._coursePostPolicy
+  }
+
+  setCoursePostPolicy(policy) {
+    this._coursePostPolicy = policy
   }
 }

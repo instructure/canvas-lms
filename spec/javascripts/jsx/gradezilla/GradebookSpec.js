@@ -9576,6 +9576,63 @@ QUnit.module('#renderGradebookSettingsModal', hooks => {
     }
     propEqual(gradebookSettingsModalProps().overrides, expectedProps)
   })
+
+  test('passes the postPolicies object as the prop of the same name', () => {
+    gradebook = createGradebook()
+    gradebook.renderGradebookSettingsModal()
+
+    propEqual(gradebookSettingsModalProps().postPolicies, gradebook.postPolicies)
+  })
+
+  QUnit.module('anonymousAssignmentsPresent prop', () => {
+    const anonymousAssignmentGroup = {
+      assignments: [
+        {
+          anonymous_grading: true,
+          assignment_group_id: '10001',
+          id: '101',
+          name: 'Anonymous',
+          points_possible: 10,
+          published: true
+        }
+      ],
+      group_weight: 1,
+      id: '10001',
+      name: 'An anonymous assignment group'
+    }
+
+    const nonAnonymousAssignmentGroup = {
+      assignments: [
+        {
+          anonymous_grading: false,
+          assignment_group_id: '10002',
+          id: '102',
+          name: 'Not-Anonymous',
+          points_possible: 10,
+          published: true
+        }
+      ],
+      group_weight: 1,
+      id: '10002',
+      name: 'An anonymous assignment group'
+    }
+
+    test('is passed as true if the course has at least one anonymous assignment', () => {
+      gradebook = createGradebook()
+      gradebook.gotAllAssignmentGroups([anonymousAssignmentGroup, nonAnonymousAssignmentGroup])
+      gradebook.renderGradebookSettingsModal()
+
+      strictEqual(gradebookSettingsModalProps().anonymousAssignmentsPresent, true)
+    })
+
+    test('is passed as false if the course has no anonymous assignments', () => {
+      gradebook = createGradebook()
+      gradebook.gotAllAssignmentGroups([nonAnonymousAssignmentGroup])
+      gradebook.renderGradebookSettingsModal()
+
+      strictEqual(gradebookSettingsModalProps().anonymousAssignmentsPresent, false)
+    })
+  })
 })
 
 QUnit.module('Gradebook#renderAnonymousSpeedGraderAlert', hooks => {

@@ -1229,6 +1229,32 @@ describe Course do
       expect(@course.quiz_lti_tool).to be nil
     end
   end
+
+  describe "#post_manually?" do
+    let_once(:course) { Course.create! }
+
+    context "when post policies are enabled" do
+      before(:once) { course.enable_feature!(:post_policies) }
+
+      it "returns true if a policy with manual posting is attached to the course" do
+        course.post_policies.create!(post_manually: true)
+        expect(course).to be_post_manually
+      end
+
+      it "returns false if a policy without manual posting is attached to the course" do
+        course.post_policies.create!(post_manually: false)
+        expect(course).not_to be_post_manually
+      end
+
+      it "returns false if no policy is attached to the course" do
+        expect(course).not_to be_post_manually
+      end
+    end
+
+    it "returns false when post policies are not enabled" do
+      expect(course).not_to be_post_manually
+    end
+  end
 end
 
 describe Course do

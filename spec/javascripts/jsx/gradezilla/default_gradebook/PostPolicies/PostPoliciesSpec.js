@@ -181,4 +181,33 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       strictEqual(onExited, callback)
     })
   })
+
+  QUnit.module('#coursePostPolicy', () => {
+    QUnit.module('.postManually', () => {
+      test('is set to true if gradebook.options.post_manually is true on initialization', () => {
+        gradebookOptions.post_manually = true
+
+        createPostPolicies()
+        strictEqual(postPolicies.coursePostPolicy.postManually, true)
+      })
+
+      test('is set to false if gradebook.options.post_manually is false on initialization', () => {
+        gradebookOptions.post_manually = false
+
+        createPostPolicies()
+        strictEqual(postPolicies.coursePostPolicy.postManually, false)
+      })
+
+      test('is set to false if gradebook.options.post_manually is not present on initialization', () => {
+        createPostPolicies()
+        strictEqual(postPolicies.coursePostPolicy.postManually, false)
+      })
+    })
+
+    test('reflects the value set by setCoursePostPolicy()', () => {
+      createPostPolicies()
+      postPolicies.setCoursePostPolicy({postManually: false})
+      deepEqual(postPolicies.coursePostPolicy, {postManually: false})
+    })
+  })
 })
