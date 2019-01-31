@@ -16,19 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React from 'react'
+import ReactDOM from 'react-dom'
 import AssignmentGroupColumnHeader from './AssignmentGroupColumnHeader'
 
-function getProps (column, gradebook, options) {
-  const columnId = column.id;
-  const sortRowsBySetting = gradebook.getSortRowsBySetting();
-  const assignmentGroup = gradebook.getAssignmentGroup(column.assignmentGroupId);
+function getProps(column, gradebook, options) {
+  const columnId = column.id
+  const sortRowsBySetting = gradebook.getSortRowsBySetting()
+  const assignmentGroup = gradebook.getAssignmentGroup(column.assignmentGroupId)
 
   const gradeSortDataLoaded =
     gradebook.contentLoadStates.assignmentsLoaded &&
     gradebook.contentLoadStates.studentsLoaded &&
-    gradebook.contentLoadStates.submissionsLoaded;
+    gradebook.contentLoadStates.submissionsLoaded
 
   return {
     ref: options.ref,
@@ -39,8 +39,8 @@ function getProps (column, gradebook, options) {
       name: assignmentGroup.name
     },
 
-    onHeaderKeyDown: (event) => {
-      gradebook.handleHeaderKeyDown(event, columnId);
+    onHeaderKeyDown: event => {
+      gradebook.handleHeaderKeyDown(event, columnId)
     },
     onMenuDismiss() {
       setTimeout(gradebook.handleColumnHeaderMenuClose)
@@ -52,29 +52,29 @@ function getProps (column, gradebook, options) {
       disabled: !gradeSortDataLoaded,
       isSortColumn: sortRowsBySetting.columnId === columnId,
       onSortByGradeAscending: () => {
-        gradebook.setSortRowsBySetting(columnId, 'grade', 'ascending');
+        gradebook.setSortRowsBySetting(columnId, 'grade', 'ascending')
       },
       onSortByGradeDescending: () => {
-        gradebook.setSortRowsBySetting(columnId, 'grade', 'descending');
+        gradebook.setSortRowsBySetting(columnId, 'grade', 'descending')
       },
       settingKey: sortRowsBySetting.settingKey
     },
 
     weightedGroups: gradebook.weightedGroups()
-  };
+  }
 }
 
 export default class AssignmentGroupColumnHeaderRenderer {
-  constructor (gradebook) {
-    this.gradebook = gradebook;
+  constructor(gradebook) {
+    this.gradebook = gradebook
   }
 
-  render (column, $container, _gridSupport, options) {
-    const props = getProps(column, this.gradebook, options);
-    ReactDOM.render(<AssignmentGroupColumnHeader {...props} />, $container);
+  render(column, $container, _gridSupport, options) {
+    const props = getProps(column, this.gradebook, options)
+    ReactDOM.render(<AssignmentGroupColumnHeader {...props} />, $container)
   }
 
-  destroy (column, $container, _gridSupport) {
-    ReactDOM.unmountComponentAtNode($container);
+  destroy(column, $container, _gridSupport) {
+    ReactDOM.unmountComponentAtNode($container)
   }
 }

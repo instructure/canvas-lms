@@ -16,42 +16,48 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery';
-import I18n from 'i18n!gradebook';
-import 'jquery.instructure_misc_helpers'; // $.toSentence
+import $ from 'jquery'
+import I18n from 'i18n!gradebook'
+import 'jquery.instructure_misc_helpers' // $.toSentence
 
-function getSecondaryDisplayInfo (student, secondaryInfo, options) {
+function getSecondaryDisplayInfo(student, secondaryInfo, options) {
   if (options.shouldShowSections() && secondaryInfo === 'section') {
-    const sectionNames = student.sections.map(sectionId => options.getSection(sectionId).name);
-    return $.toSentence(sectionNames.sort());
+    const sectionNames = student.sections.map(sectionId => options.getSection(sectionId).name)
+    return $.toSentence(sectionNames.sort())
   }
-  return {login_id: student.login_id, sis_id: student.sis_user_id, integration_id: student.integration_id}[secondaryInfo];
+  return {
+    login_id: student.login_id,
+    sis_id: student.sis_user_id,
+    integration_id: student.integration_id
+  }[secondaryInfo]
 }
 
-function getEnrollmentLabel (student) {
+function getEnrollmentLabel(student) {
   if (student.isConcluded) {
-    return I18n.t('concluded');
+    return I18n.t('concluded')
   }
   if (student.isInactive) {
-    return I18n.t('inactive');
+    return I18n.t('inactive')
   }
 
-  return null;
+  return null
 }
 
 // xsslint safeString.property enrollmentLabel secondaryInfo studentId courseId url displayName
-function render (options) {
-  let enrollmentStatus = '';
-  let secondaryInfo = '';
+function render(options) {
+  let enrollmentStatus = ''
+  let secondaryInfo = ''
 
   if (options.enrollmentLabel) {
-    const title = I18n.t('This user is currently not able to access the course');
+    const title = I18n.t('This user is currently not able to access the course')
     // xsslint safeString.identifier title
-    enrollmentStatus = `&nbsp;<span title="${title}" class="label">${options.enrollmentLabel}</span>`;
+    enrollmentStatus = `&nbsp;<span title="${title}" class="label">${
+      options.enrollmentLabel
+    }</span>`
   }
 
   if (options.secondaryInfo) {
-    secondaryInfo = `<div class="secondary-info">${options.secondaryInfo}</div>`;
+    secondaryInfo = `<div class="secondary-info">${options.secondaryInfo}</div>`
   }
 
   // xsslint safeString.identifier enrollmentStatus secondaryInfo
@@ -66,35 +72,35 @@ function render (options) {
       ${enrollmentStatus}
     </div>
     ${secondaryInfo}
-  `;
+  `
 }
 
 export default class StudentCellFormatter {
-  constructor (gradebook) {
+  constructor(gradebook) {
     this.options = {
       courseId: gradebook.options.context_id,
-      getSection (sectionId) {
-        return gradebook.sections[sectionId];
+      getSection(sectionId) {
+        return gradebook.sections[sectionId]
       },
-      getSelectedPrimaryInfo () {
-        return gradebook.getSelectedPrimaryInfo();
+      getSelectedPrimaryInfo() {
+        return gradebook.getSelectedPrimaryInfo()
       },
-      getSelectedSecondaryInfo () {
-        return gradebook.getSelectedSecondaryInfo();
+      getSelectedSecondaryInfo() {
+        return gradebook.getSelectedSecondaryInfo()
       },
-      shouldShowSections () {
-        return gradebook.showSections();
+      shouldShowSections() {
+        return gradebook.showSections()
       }
-    };
+    }
   }
 
   render = (_row, _cell, _value, _columnDef, student /* dataContext */) => {
     if (student.isPlaceholder) {
-      return '';
+      return ''
     }
 
-    const primaryInfo = this.options.getSelectedPrimaryInfo();
-    const secondaryInfo = this.options.getSelectedSecondaryInfo();
+    const primaryInfo = this.options.getSelectedPrimaryInfo()
+    const secondaryInfo = this.options.getSelectedSecondaryInfo()
 
     const options = {
       courseId: this.options.courseId,
@@ -103,8 +109,8 @@ export default class StudentCellFormatter {
       secondaryInfo: getSecondaryDisplayInfo(student, secondaryInfo, this.options),
       studentId: student.id,
       url: `${student.enrollments[0].grades.html_url}#tab-assignments`
-    };
+    }
 
-    return render(options);
-  };
+    return render(options)
+  }
 }

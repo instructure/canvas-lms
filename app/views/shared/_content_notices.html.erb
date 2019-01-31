@@ -16,15 +16,4 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% @context.content_notices(@current_user).each do |notice| %>
-  <div class="content_notice alert <%= notice.alert_class %>">
-    <% if notice.icon_class %>
-      <i class="<%= notice.icon_class %>"></i>
-    <% end %>
-    <% if notice.template %>
-      <%= render partial: notice.template %>
-    <% else %>
-      <%= notice.text.is_a?(Proc) ? notice.call : notice %>
-    <% end %>
-  </div>
-<% end %>
+<div id="content_notice_container"></div>

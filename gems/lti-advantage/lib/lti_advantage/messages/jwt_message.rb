@@ -60,7 +60,8 @@ module LtiAdvantage::Messages
                   :updated_at,
                   :website,
                   :zoneinfo,
-                  :id
+                  :id,
+                  :lti11_legacy_user_id
 
     def self.create_jws(body, private_key, alg = :RS256)
       JSON::JWT.new(body).sign(private_key, alg).to_s

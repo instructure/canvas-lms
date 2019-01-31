@@ -37,8 +37,10 @@ class User < ActiveRecord::Base
   attr_accessor :previous_id, :menu_data, :gradebook_importer_submissions, :prior_enrollment
 
   before_save :infer_defaults
+  before_validation :ensure_lti_id, on: :update
   after_create :set_default_feature_flags
   after_update :clear_cached_short_name, if: -> (user) {user.saved_change_to_short_name? || (user.read_attribute(:short_name).nil? && user.saved_change_to_name?)}
+  validate :preserve_lti_id, on: :update
 
   serialize :preferences
   include TimeZoneHelper
@@ -754,7 +756,16 @@ class User < ActiveRecord::Base
     self.reminder_time_for_due_dates ||= 48.hours.to_i
     self.reminder_time_for_grading ||= 0
     self.initial_enrollment_type = nil unless ['student', 'teacher', 'ta', 'observer'].include?(initial_enrollment_type)
+    self.lti_id ||= SecureRandom.uuid
     true
+  end
+
+  def preserve_lti_id
+    errors.add(:lti_id, 'Cannot change lti_id!') if lti_id_changed? && lti_id_was != nil
+  end
+
+  def ensure_lti_id
+    self.lti_id ||= SecureRandom.uuid
   end
 
   def set_default_feature_flags

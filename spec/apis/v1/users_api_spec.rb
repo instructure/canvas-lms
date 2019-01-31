@@ -843,6 +843,12 @@ describe "Users API", type: :request do
         { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param },
         { include: ['last_login'], sort: "last_login", order: 'desc'})
       expect(json.first['last_login']).to eq p.current_login_at.iso8601
+
+      # it should include automatically when sorting by
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/users",
+        { :controller => 'users', :action => "index", :format => 'json', :account_id => @account.id.to_param },
+        { sort: "last_login", order: 'desc'})
+      expect(json.first['last_login']).to eq p.current_login_at.iso8601
     end
 
     it "does return a next header on the last page" do

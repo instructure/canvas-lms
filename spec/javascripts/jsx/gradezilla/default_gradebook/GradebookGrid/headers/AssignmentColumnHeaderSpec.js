@@ -23,7 +23,7 @@ import AssignmentColumnHeader from 'jsx/gradezilla/default_gradebook/GradebookGr
 import {blurElement, getMenuContent, getMenuItem} from './ColumnHeaderSpecHelpers'
 
 /* eslint-disable qunit/no-identical-names */
-QUnit.module('AssignmentColumnHeader', suiteHooks => {
+QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
   let $container
   let $menuContent
   let component
@@ -398,13 +398,16 @@ QUnit.module('AssignmentColumnHeader', suiteHooks => {
         })
 
         // TODO: GRADE-____
-        QUnit.skip('does not call the .sortBySetting.onSortByGradeAscending callback when already selected', () => {
-          props.sortBySetting.settingKey = 'grade'
-          props.sortBySetting.direction = 'ascending'
-          mountAndOpenOptionsMenu()
-          getSortByOption('Grade - Low to High').click()
-          strictEqual(props.sortBySetting.onSortByGradeAscending.callCount, 0)
-        })
+        QUnit.skip(
+          'does not call the .sortBySetting.onSortByGradeAscending callback when already selected',
+          () => {
+            props.sortBySetting.settingKey = 'grade'
+            props.sortBySetting.direction = 'ascending'
+            mountAndOpenOptionsMenu()
+            getSortByOption('Grade - Low to High').click()
+            strictEqual(props.sortBySetting.onSortByGradeAscending.callCount, 0)
+          }
+        )
       })
     })
 
@@ -460,13 +463,16 @@ QUnit.module('AssignmentColumnHeader', suiteHooks => {
         })
 
         // TODO: GRADE-____
-        QUnit.skip('does not call the .sortBySetting.onSortByGradeDescending callback when already selected', () => {
-          props.sortBySetting.settingKey = 'grade'
-          props.sortBySetting.direction = 'ascending'
-          mountAndOpenOptionsMenu()
-          getSortByOption('Grade - High to Low').click()
-          strictEqual(props.sortBySetting.onSortByGradeDescending.callCount, 0)
-        })
+        QUnit.skip(
+          'does not call the .sortBySetting.onSortByGradeDescending callback when already selected',
+          () => {
+            props.sortBySetting.settingKey = 'grade'
+            props.sortBySetting.direction = 'ascending'
+            mountAndOpenOptionsMenu()
+            getSortByOption('Grade - High to Low').click()
+            strictEqual(props.sortBySetting.onSortByGradeDescending.callCount, 0)
+          }
+        )
       })
     })
 
@@ -515,13 +521,16 @@ QUnit.module('AssignmentColumnHeader', suiteHooks => {
         })
 
         // TODO: GRADE-____
-        QUnit.skip('does not call the .sortBySetting.onSortByMissing callback when already selected', () => {
-          props.sortBySetting.settingKey = 'grade'
-          props.sortBySetting.direction = 'ascending'
-          mountAndOpenOptionsMenu()
-          getSortByOption('Missing').click()
-          strictEqual(props.sortBySetting.onSortByMissing.callCount, 0)
-        })
+        QUnit.skip(
+          'does not call the .sortBySetting.onSortByMissing callback when already selected',
+          () => {
+            props.sortBySetting.settingKey = 'grade'
+            props.sortBySetting.direction = 'ascending'
+            mountAndOpenOptionsMenu()
+            getSortByOption('Missing').click()
+            strictEqual(props.sortBySetting.onSortByMissing.callCount, 0)
+          }
+        )
       })
     })
 
@@ -570,13 +579,16 @@ QUnit.module('AssignmentColumnHeader', suiteHooks => {
         })
 
         // TODO: GRADE-____
-        QUnit.skip('does not call the .sortBySetting.onSortByLate callback when already selected', () => {
-          props.sortBySetting.settingKey = 'grade'
-          props.sortBySetting.direction = 'ascending'
-          mountAndOpenOptionsMenu()
-          getSortByOption('Late').click()
-          strictEqual(props.sortBySetting.onSortByLate.callCount, 0)
-        })
+        QUnit.skip(
+          'does not call the .sortBySetting.onSortByLate callback when already selected',
+          () => {
+            props.sortBySetting.settingKey = 'grade'
+            props.sortBySetting.direction = 'ascending'
+            mountAndOpenOptionsMenu()
+            getSortByOption('Late').click()
+            strictEqual(props.sortBySetting.onSortByLate.callCount, 0)
+          }
+        )
       })
     })
 
@@ -631,13 +643,16 @@ QUnit.module('AssignmentColumnHeader', suiteHooks => {
         })
 
         // TODO: GRADE-____
-        QUnit.skip('does not call the .sortBySetting.onSortByUnposted callback when already selected', () => {
-          props.sortBySetting.settingKey = 'grade'
-          props.sortBySetting.direction = 'ascending'
-          mountAndOpenOptionsMenu()
-          getSortByOption('Unposted').click()
-          strictEqual(props.sortBySetting.onSortByUnposted.callCount, 0)
-        })
+        QUnit.skip(
+          'does not call the .sortBySetting.onSortByUnposted callback when already selected',
+          () => {
+            props.sortBySetting.settingKey = 'grade'
+            props.sortBySetting.direction = 'ascending'
+            mountAndOpenOptionsMenu()
+            getSortByOption('Unposted').click()
+            strictEqual(props.sortBySetting.onSortByUnposted.callCount, 0)
+          }
+        )
       })
     })
   })
@@ -1258,3 +1273,4 @@ QUnit.module('AssignmentColumnHeader', suiteHooks => {
     })
   })
 })
+/* eslint-enable qunit/no-identical-names */

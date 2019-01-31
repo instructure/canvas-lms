@@ -49,14 +49,12 @@ describe "course" do
       migration.update_attribute(:workflow_state, 'importing')
       get "/courses/#{@course.id}"
       expect(response).to be_successful
-      body = Nokogiri::HTML(response.body)
-      expect(body.css('div.import-in-progress-notice')).not_to be_empty
+      expect(controller.js_env[:CONTENT_NOTICES].map { |cn| cn[:tag] }).to include :import_in_progress
 
       migration.update_attribute(:workflow_state, 'imported')
       get "/courses/#{@course.id}"
       expect(response).to be_successful
-      body = Nokogiri::HTML(response.body)
-      expect(body.css('div.import-in-progress-notice')).to be_empty
+      expect((controller.js_env[:CONTENT_NOTICES] || []).map { |cn| cn[:tag] }).not_to include :import_in_progress
     end
   end
 
@@ -72,8 +70,7 @@ describe "course" do
       migration.update_attribute(:workflow_state, 'importing')
       get "/courses/#{@course.id}"
       expect(response).to be_successful
-      body = Nokogiri::HTML(response.body)
-      expect(body.css('div.import-in-progress-notice')).to be_empty
+      expect((controller.js_env[:CONTENT_NOTICES] || []).map { |cn| cn[:tag] }).not_to include :import_in_progress
     end
   end
 

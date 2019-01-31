@@ -16,50 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!assignments_2_student_points_display'
-
 import PropTypes from 'prop-types'
 import React from 'react'
 
-import Text from '@instructure/ui-elements/lib/components/Text'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-
-import PointsDisplayPoints from './PointsDisplayPoints'
-import PointsDisplayPercent from './PointsDisplayPercent'
-import PointsDisplayComplete from './PointsDisplayComplete'
-import PointsDisplayLetter from './PointsDisplayLetter'
-import PointsDisplayGradingScheme from './PointsDisplayGradingScheme'
-
-function renderPointsPossible(possiblePoints) {
-  return (
-    <div>
-      <Flex direction="row" alignItems="end" justifyItems="end" textAlign="end">
-        <FlexItem padding="0 x-small">
-          <Text size="large" margin="small" data-test-id="points-possible-display">
-            {I18n.t('%{possiblePoints} Points Possible', {possiblePoints})}
-          </Text>
-        </FlexItem>
-      </Flex>
-    </div>
-  )
-}
+import Complete from './Complete'
+import GradingScheme from './GradingScheme'
+import Letter from './Letter'
+import Percent from './Percent'
+import Points from './Points'
+import PossiblePoints from './PossiblePoints'
 
 function PointsDisplay(props) {
   const {displayAs, receivedGrade, possiblePoints} = props
 
   switch (displayAs) {
     case 'points':
-      return <PointsDisplayPoints receivedGrade={receivedGrade} possiblePoints={possiblePoints} />
+      return <Points receivedGrade={receivedGrade} possiblePoints={possiblePoints} />
     case 'percent':
-      return <PointsDisplayPercent receivedGrade={receivedGrade} />
+      return <Percent receivedGrade={receivedGrade} />
     case 'pass_fail':
-      return <PointsDisplayComplete receivedGrade={receivedGrade} />
+      return <Complete receivedGrade={receivedGrade} />
     case 'gpa_scale':
-      return <PointsDisplayGradingScheme receivedGrade={receivedGrade} />
+      return <GradingScheme receivedGrade={receivedGrade} />
     case 'letter_grade':
-      return <PointsDisplayLetter receivedGrade={receivedGrade} />
+      return <Letter receivedGrade={receivedGrade} />
     case 'points_possible':
-      return renderPointsPossible(possiblePoints)
+      return <PossiblePoints possiblePoints={possiblePoints} />
     case 'not_graded':
       return <div />
     default:

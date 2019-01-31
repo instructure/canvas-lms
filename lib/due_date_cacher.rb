@@ -239,11 +239,20 @@ class DueDateCacher
               workflow_state = COALESCE(NULLIF(workflow_state, 'deleted'), (
                 #{INFER_SUBMISSION_WORKFLOW_STATE_SQL}
               )),
-              anonymous_id = COALESCE(submissions.anonymous_id, vals.anonymous_id)
+              anonymous_id = COALESCE(submissions.anonymous_id, vals.anonymous_id),
+              updated_at = now() AT TIME ZONE 'UTC'
             FROM (VALUES #{batch_values.join(',')})
               AS vals(assignment_id, student_id, due_date, grading_period_id, anonymous_id)
             WHERE submissions.user_id = vals.student_id AND
-                  submissions.assignment_id = vals.assignment_id;
+                  submissions.assignment_id = vals.assignment_id AND
+                  (
+                    (submissions.cached_due_date IS DISTINCT FROM vals.due_date::timestamptz) OR
+                    (submissions.grading_period_id IS DISTINCT FROM vals.grading_period_id::integer) OR
+                    (submissions.workflow_state <> COALESCE(NULLIF(submissions.workflow_state, 'deleted'),
+                      (#{INFER_SUBMISSION_WORKFLOW_STATE_SQL})
+                    )) OR
+                    (submissions.anonymous_id IS DISTINCT FROM COALESCE(submissions.anonymous_id, vals.anonymous_id))
+                  );
           INSERT INTO #{Submission.quoted_table_name}
             (assignment_id, user_id, workflow_state, created_at, updated_at, context_code, process_attempts,
             cached_due_date, grading_period_id, anonymous_id)

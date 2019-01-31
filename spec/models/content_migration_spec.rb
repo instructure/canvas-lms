@@ -25,6 +25,106 @@ describe ContentMigration do
     @cm = ContentMigration.create!(context: @course, user: @teacher)
   end
 
+  context '#trigger_live_events!' do
+    subject do
+      content_migration.instance_variable_set(:@imported_migration_items_hash, migration_items)
+      content_migration
+    end
+
+    let(:content_migration) do
+      ContentMigration.create!(
+        context: destination,
+        workflow_state: workflow_state,
+        user: user,
+        migration_type: 'course_copy_importer',
+        source_course: context
+      )
+    end
+    let(:user) do
+      teacher_in_course(course: context)
+      @teacher
+    end
+    let(:context) { course_model }
+    let(:destination) { course_model }
+    let(:workflow_state) { 'started' }
+    let(:migration_items) { {} }
+
+    before do
+      allow(Canvas::LiveEventsCallbacks).to receive(:after_update).and_return(true)
+      allow(Canvas::LiveEventsCallbacks).to receive(:after_create).and_return(true)
+    end
+
+    context 'when the class is not observed by live events observer' do
+      let(:migration_items) do
+        {
+          'ContextExternalTool' => {
+            SecureRandom.uuid => external_tool
+          }
+        }
+      end
+      let(:external_tool) do
+        ContextExternalTool.create!(
+          context: context,
+          url: 'https://www.test.com',
+          name: 'test tool',
+          shared_secret: 'secret',
+          consumer_key: 'key'
+        )
+      end
+
+      it 'does not trigger an event' do
+        expect(Canvas::LiveEventsCallbacks).not_to receive(:after_create).with(external_tool)
+        expect(Canvas::LiveEventsCallbacks).not_to receive(:after_update).with(external_tool)
+        subject.trigger_live_events!
+      end
+    end
+
+    context 'when an item is created after the started_at time' do
+      let(:start_time) { Time.zone.now }
+      let(:assignment) { Assignment.create(course: context, name: 'Test Assignment') }
+      let(:migration_items) do
+        {
+          'Assignment' => {
+            SecureRandom.uuid => assignment
+          }
+        }
+      end
+
+      before do
+        content_migration.update!(started_at: start_time)
+        migration_items
+      end
+
+      it 'triggers a "created" event' do
+        expect(Canvas::LiveEventsCallbacks).to receive(:after_create).with(assignment)
+        expect(Canvas::LiveEventsCallbacks).not_to receive(:after_update).with(assignment)
+        subject.trigger_live_events!
+      end
+    end
+
+    context 'when an item was created before the started_at time' do
+      let(:assignment) { Assignment.create(course: context, name: 'Test Assignment') }
+      let(:migration_items) do
+        {
+          'Assignment' => {
+            SecureRandom.uuid => assignment
+          }
+        }
+      end
+
+      before do
+        migration_items
+        content_migration.update!(started_at: assignment.created_at + 10.seconds)
+      end
+
+      it 'triggers an "updated" event' do
+        expect(Canvas::LiveEventsCallbacks).not_to receive(:after_create).with(assignment)
+        expect(Canvas::LiveEventsCallbacks).to receive(:after_update).with(assignment, anything)
+        subject.trigger_live_events!
+      end
+    end
+  end
+
   context "#prepare_data" do
     it "should strip invalid utf8" do
       data = {

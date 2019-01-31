@@ -37,3 +37,10 @@ it('renders unpublished value checkbox', () => {
   const {getByLabelText} = render(<Toolbox assignment={mockAssignment({state: 'unpublished'})} />)
   expect(getByLabelText('Published').getAttribute('checked')).toBeFalsy()
 })
+
+it('should open speedgrader link in a new tab', () => {
+  const assignment = mockAssignment()
+  const {getByText} = render(<Toolbox assignment={assignment} />)
+  const sgLink = closest(getByText('X to grade'), 'a')
+  expect(sgLink.getAttribute('target')).toEqual('_blank')
+})

@@ -16,23 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React from 'react'
+import ReactDOM from 'react-dom'
 import TotalGradeColumnHeader from './TotalGradeColumnHeader'
 
-function getProps (column, gradebook, gridSupport, options) {
-  const columnId = 'total_grade';
-  const sortRowsBySetting = gradebook.getSortRowsBySetting();
+function getProps(column, gradebook, gridSupport, options) {
+  const columnId = 'total_grade'
+  const sortRowsBySetting = gradebook.getSortRowsBySetting()
 
   const gradeSortDataLoaded =
     gradebook.contentLoadStates.assignmentsLoaded &&
     gradebook.contentLoadStates.studentsLoaded &&
-    gradebook.contentLoadStates.submissionsLoaded;
+    gradebook.contentLoadStates.submissionsLoaded
 
-  const columns = gridSupport.columns.getColumns();
+  const columns = gridSupport.columns.getColumns()
 
-  const isInBack = columns.scrollable[columns.scrollable.length - 1].id === 'total_grade';
-  const isInFront = columns.frozen.some(frozenColumn => frozenColumn.id === 'total_grade');
+  const isInBack = columns.scrollable[columns.scrollable.length - 1].id === 'total_grade'
+  const isInFront = columns.frozen.some(frozenColumn => frozenColumn.id === 'total_grade')
 
   return {
     ref: options.ref,
@@ -46,8 +46,8 @@ function getProps (column, gradebook, gridSupport, options) {
       onSelect: gradebook.togglePointsOrPercentTotals
     },
 
-    onHeaderKeyDown: (event) => {
-      gradebook.handleHeaderKeyDown(event, columnId);
+    onHeaderKeyDown: event => {
+      gradebook.handleHeaderKeyDown(event, columnId)
     },
     onMenuDismiss() {
       setTimeout(gradebook.handleColumnHeaderMenuClose)
@@ -67,29 +67,29 @@ function getProps (column, gradebook, gridSupport, options) {
       disabled: !gradeSortDataLoaded,
       isSortColumn: sortRowsBySetting.columnId === columnId,
       onSortByGradeAscending: () => {
-        gradebook.setSortRowsBySetting(columnId, 'grade', 'ascending');
+        gradebook.setSortRowsBySetting(columnId, 'grade', 'ascending')
       },
       onSortByGradeDescending: () => {
-        gradebook.setSortRowsBySetting(columnId, 'grade', 'descending');
+        gradebook.setSortRowsBySetting(columnId, 'grade', 'descending')
       },
       settingKey: sortRowsBySetting.settingKey
     },
 
     weightedGroups: gradebook.weightedGroups()
-  };
+  }
 }
 
 export default class TotalGradeColumnHeaderRenderer {
-  constructor (gradebook) {
-    this.gradebook = gradebook;
+  constructor(gradebook) {
+    this.gradebook = gradebook
   }
 
-  render (column, $container, gridSupport, options) {
-    const props = getProps(column, this.gradebook, gridSupport, options);
-    ReactDOM.render(<TotalGradeColumnHeader {...props} />, $container);
+  render(column, $container, gridSupport, options) {
+    const props = getProps(column, this.gradebook, gridSupport, options)
+    ReactDOM.render(<TotalGradeColumnHeader {...props} />, $container)
   }
 
-  destroy (_column, $container, _gridSupport) {
-    ReactDOM.unmountComponentAtNode($container);
+  destroy(_column, $container, _gridSupport) {
+    ReactDOM.unmountComponentAtNode($container)
   }
 }

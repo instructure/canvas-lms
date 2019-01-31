@@ -16,16 +16,34 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+##
+# This is just like Loaders::IDLoader, but you can specify a foreign key
+# (IDLoader will always load by the 'id' column)
+#
+# Example:
+#
+#   Loaders::ForeignKeyLoader.for(course.enrollments, :user_id).
+#     load(1).
+#     then do |user|
+#       # user ~ course.enrollments.find_by(user_id: 1)
+#     end
 class Loaders::ForeignKeyLoader < GraphQL::Batch::Loader
+
+  # +scope+ is any active record scope
+  #
+  # +fk+ is the column you want to load by
   def initialize(scope, fk)
     @scope = scope
     @column = fk
   end
 
+  # :nodoc:
+  # Shard-safety
   def load(id)
     super(Shard.global_id_for(id))
   end
 
+  # :nodoc:
   def perform(ids)
     Shard.partition_by_shard(ids) { |sharded_ids|
       @scope.where(@column => sharded_ids).

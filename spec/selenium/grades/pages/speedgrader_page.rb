@@ -531,10 +531,6 @@ class Speedgrader
       f("textarea[data-selenium='criterion_comments_text']")
     end
 
-    def update_comment_button
-      fj("button:contains('Update Comment'):visible")
-    end
-
     def rubric_comment_for_row(row_text)
       row = fj("tr:contains('#{row_text}'):visible")
       f(".react-rubric-break-words", row)

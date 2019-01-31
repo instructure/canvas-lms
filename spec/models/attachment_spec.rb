@@ -959,6 +959,14 @@ describe Attachment do
       expect(@a.display_name).to eq 'a1-1'
     end
 
+    it "rename itself after collision on restoration" do
+      @a1.destroy!
+      @a.display_name = @a1.display_name
+      @a.save!
+      @a1.restore
+      expect(@a1.reload.display_name).to eq "#{@a.display_name}-1"
+    end
+
     it "should update ContentTags when overwriting" do
       mod = @course.context_modules.create!(:name => "some module")
       tag1 = mod.add_item(:id => @a1.id, :type => 'attachment')

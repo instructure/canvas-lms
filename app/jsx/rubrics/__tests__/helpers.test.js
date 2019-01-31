@@ -43,6 +43,19 @@ describe('fillAssessment', () => {
     })
   })
 
+  it('sets editComments to true for all comments existing when the rubric opens', () => {
+    const a = assessments.server.points
+    const oneComment = {
+      ...a,
+      data: [ a.data[0], { ...a.data[1], comments: ''} ]
+    }
+    const filled = fillAssessment(rubrics.points, oneComment)
+    expect(filled.data.map(({ editComments }) => editComments)).toEqual([
+      true,
+      false
+    ])
+  })
+
   it('converts points to editable form for extant assessment', () => {
     const assessment = fillAssessment(rubrics.points, assessments.server.points)
     expect(assessment.data.map(({ points }) => points)).toEqual([

@@ -41,6 +41,7 @@ module Factories
           nil
       )
     }.merge(overrides.except(:assignment, :course, :resource_link, :with_resource_link, :tool))
+    params[:client_id] = DeveloperKey.create!.id unless assignment.external_tool? || overrides[:with_resource_link]
     Lti::LineItem.create!(params)
   end
 end

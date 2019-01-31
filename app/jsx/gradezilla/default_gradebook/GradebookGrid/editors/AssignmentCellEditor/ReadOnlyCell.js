@@ -152,13 +152,13 @@ export default class ReadOnlyCell extends Component {
 
     return (
       <ApplyTheme theme={themeOverrides}>
-        <div className="Grid__AssignmentRowCell Grid__ReadOnlyCell">
-          <div className="Grid__AssignmentRowCell__StartContainer" />
+        <div className="Grid__GradeCell Grid__ReadOnlyCell">
+          <div className="Grid__GradeCell__StartContainer" />
 
-          <div className="Grid__AssignmentRowCell__Content">{gradeIsVisible && content}</div>
+          <div className="Grid__GradeCell__Content">{gradeIsVisible && content}</div>
 
-          <div className="Grid__AssignmentRowCell__EndContainer">
-            <div className="Grid__AssignmentRowCell__Options">
+          <div className="Grid__GradeCell__EndContainer">
+            <div className="Grid__GradeCell__Options">
               <Button
                 buttonRef={this.bindToggleTrayButtonRef}
                 onClick={this.handleToggleTrayButtonClick}

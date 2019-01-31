@@ -22,13 +22,14 @@ module Canvas::Security
 
     validate :assertions, :aud, :exp, :iat, :jti
 
-    def initialize(jwt:, expected_aud:, override_sub: nil, full_errors: false, require_iss: false)
+    def initialize(jwt:, expected_aud:, override_sub: nil, full_errors: false, require_iss: false, skip_jti_check: false)
       @jwt = OpenStruct.new jwt
       @assertions = Set.new(jwt.keys)
       @expected_aud = expected_aud
       @full_errors = full_errors
       @require_iss = require_iss
       @jwt.sub = override_sub if override_sub.present?
+      @skip_jti_check = skip_jti_check
     end
 
     def error_message
@@ -75,7 +76,7 @@ module Canvas::Security
     end
 
     def jti
-      return if errors?
+      return if errors? || @skip_jti_check
       nonce_duration = (@jwt.exp.to_i - @jwt.iat.to_i).seconds
       nonce_key = "nonce:#{@jwt.sub}:#{@jwt.jti}"
       unless Lti::Security.check_and_store_nonce(nonce_key, @jwt.iat, nonce_duration)

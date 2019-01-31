@@ -75,6 +75,7 @@
   content_for :head, include_common_stylesheets
 
   load_blueprint_courses_ui
+  @has_content_notices = load_content_notices
 -%>
 <%= render :partial => "layouts/head" %>
 <body class="<%= (@body_classes).uniq.join(" ") %> lato-font-not-loaded-yet">
@@ -151,7 +152,7 @@
       <% end %>
       <div id="not_right_side" class="ic-app-main-content">
         <div id="content-wrapper" class="ic-Layout-contentWrapper">
-            <%= render :partial => 'shared/content_notices' if @show_left_side && @context && @context.respond_to?(:content_notices) %>
+          <%= render :partial => 'shared/content_notices' if @has_content_notices && @show_left_side %>
           <div id="content" class="ic-Layout-contentMain" role="main">
             <%= yield %>
           </div>

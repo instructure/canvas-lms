@@ -41,6 +41,18 @@ it('should render', async () => {
   expect(element).toHaveLength(1)
 })
 
+it('should not render collapsed class when not collapsed', async () => {
+  ReactDOM.render(<Steps isCollapsed={false} />, document.getElementById('fixtures'))
+  const element = $('[data-test-id="steps-container-collapsed"]')
+  expect(element).toHaveLength(0)
+})
+
+it('should render collapsed class when collapsed', async () => {
+  ReactDOM.render(<Steps isCollapsed />, document.getElementById('fixtures'))
+  const element = $('[data-test-id="steps-container-collapsed"]')
+  expect(element).toHaveLength(1)
+})
+
 it('should render with StepItems', async () => {
   ReactDOM.render(
     <Steps label="Settings">

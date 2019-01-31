@@ -16,20 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { arrayOf, bool, func, oneOf, shape, string } from 'prop-types';
-import IconMoreSolid from '@instructure/ui-icons/lib/Solid/IconMore';
-import Button from '@instructure/ui-buttons/lib/components/Button';
-import View from '@instructure/ui-layout/lib/components/View';
-import Grid, { GridCol, GridRow } from '@instructure/ui-layout/lib/components/Grid';
+import React from 'react'
+import {arrayOf, bool, func, oneOf, shape, string} from 'prop-types'
+import IconMoreSolid from '@instructure/ui-icons/lib/Solid/IconMore'
+import Button from '@instructure/ui-buttons/lib/components/Button'
+import View from '@instructure/ui-layout/lib/components/View'
+import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
 import Menu, {
   MenuItem,
   MenuItemGroup,
   MenuItemSeparator
-} from '@instructure/ui-menu/lib/components/Menu';
-import Text from '@instructure/ui-elements/lib/components/Text';
-import I18n from 'i18n!gradebook';
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
+} from '@instructure/ui-menu/lib/components/Menu'
+import Text from '@instructure/ui-elements/lib/components/Text'
+import I18n from 'i18n!gradebook'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import studentRowHeaderConstants from '../../constants/studentRowHeaderConstants'
 import ColumnHeader from './ColumnHeader'
 
@@ -50,52 +50,77 @@ export default class StudentColumnHeader extends ColumnHeader {
       onSortBySortableNameDescending: func.isRequired,
       settingKey: string.isRequired
     }).isRequired,
-    selectedEnrollmentFilters: arrayOf(oneOf(studentRowHeaderConstants.enrollmentFilterKeys)).isRequired,
+    selectedEnrollmentFilters: arrayOf(oneOf(studentRowHeaderConstants.enrollmentFilterKeys))
+      .isRequired,
     onToggleEnrollmentFilter: func.isRequired,
     disabled: Menu.propTypes.disabled.isRequired,
     onMenuDismiss: Menu.propTypes.onDismiss.isRequired,
     ...ColumnHeader.propTypes
-  };
+  }
 
   static defaultProps = {
     loginHandleName: null,
     sisName: null,
     ...ColumnHeader.defaultProps
-  };
-
-  onShowSectionNames = () => { this.onSelectSecondaryInfo('section'); };
-  onHideSecondaryInfo = () => { this.onSelectSecondaryInfo('none'); };
-  onShowSisId = () => { this.onSelectSecondaryInfo('sis_id'); };
-  onShowIntegrationId = () => { this.onSelectSecondaryInfo('integration_id'); };
-  onShowLoginId = () => { this.onSelectSecondaryInfo('login_id'); };
-
-  onShowFirstLastNames = () => { this.onSelectPrimaryInfo('first_last'); };
-  onShowLastFirstNames = () => { this.onSelectPrimaryInfo('last_first'); };
-
-  onToggleInactive = () => { this.onToggleEnrollmentFilter('inactive'); };
-  onToggleConcluded = () => { this.onToggleEnrollmentFilter('concluded'); };
-
-  onSelectSecondaryInfo (secondaryInfoKey) {
-    this.props.onSelectSecondaryInfo(secondaryInfoKey);
   }
 
-  onSelectPrimaryInfo (primaryInfoKey) {
-    this.props.onSelectPrimaryInfo(primaryInfoKey);
+  onShowSectionNames = () => {
+    this.onSelectSecondaryInfo('section')
   }
 
-  onToggleEnrollmentFilter (enrollmentFilterKey) {
-    this.props.onToggleEnrollmentFilter(enrollmentFilterKey);
+  onHideSecondaryInfo = () => {
+    this.onSelectSecondaryInfo('none')
   }
 
-  bindDisplayAsMenuContent = (ref) => {
-    this.bindFlyoutMenu(ref, 'displayAsMenuContent');
-  };
+  onShowSisId = () => {
+    this.onSelectSecondaryInfo('sis_id')
+  }
 
-  bindSecondaryInfoMenuContent = (ref) => {
-    this.bindFlyoutMenu(ref, 'secondaryInfoMenuContent');
-  };
+  onShowIntegrationId = () => {
+    this.onSelectSecondaryInfo('integration_id')
+  }
 
-  render () {
+  onShowLoginId = () => {
+    this.onSelectSecondaryInfo('login_id')
+  }
+
+  onShowFirstLastNames = () => {
+    this.onSelectPrimaryInfo('first_last')
+  }
+
+  onShowLastFirstNames = () => {
+    this.onSelectPrimaryInfo('last_first')
+  }
+
+  onToggleInactive = () => {
+    this.onToggleEnrollmentFilter('inactive')
+  }
+
+  onToggleConcluded = () => {
+    this.onToggleEnrollmentFilter('concluded')
+  }
+
+  onSelectSecondaryInfo(secondaryInfoKey) {
+    this.props.onSelectSecondaryInfo(secondaryInfoKey)
+  }
+
+  onSelectPrimaryInfo(primaryInfoKey) {
+    this.props.onSelectPrimaryInfo(primaryInfoKey)
+  }
+
+  onToggleEnrollmentFilter(enrollmentFilterKey) {
+    this.props.onToggleEnrollmentFilter(enrollmentFilterKey)
+  }
+
+  bindDisplayAsMenuContent = ref => {
+    this.bindFlyoutMenu(ref, 'displayAsMenuContent')
+  }
+
+  bindSecondaryInfoMenuContent = ref => {
+    this.bindFlyoutMenu(ref, 'secondaryInfoMenuContent')
+  }
+
+  render() {
     const {
       sortBySetting: {
         isSortColumn,
@@ -105,10 +130,10 @@ export default class StudentColumnHeader extends ColumnHeader {
         onSortBySortableNameAscending,
         onSortBySortableNameDescending
       }
-    } = this.props;
-    const selectedSortSetting = isSortColumn && settingKey;
-    const menuShown = this.state.menuShown;
-    const classes = `Gradebook__ColumnHeaderAction ${menuShown ? 'menuShown' : ''}`;
+    } = this.props
+    const selectedSortSetting = isSortColumn && settingKey
+    const menuShown = this.state.menuShown
+    const classes = `Gradebook__ColumnHeaderAction ${menuShown ? 'menuShown' : ''}`
 
     return (
       <div
@@ -116,12 +141,14 @@ export default class StudentColumnHeader extends ColumnHeader {
         onBlur={this.handleBlur}
         onFocus={this.handleFocus}
       >
-        <div style={{ flex: 1, minWidth: '1px' }}>
+        <div style={{flex: 1, minWidth: '1px'}}>
           <Grid colSpacing="none" hAlign="space-between" vAlign="middle">
             <GridRow>
               <GridCol textAlign="start">
                 <View className="Gradebook__ColumnHeaderDetail" padding="0 0 0 small">
-                  <Text fontStyle="normal" size="x-small" weight="bold">{ I18n.t('Student Name') }</Text>
+                  <Text fontStyle="normal" size="x-small" weight="bold">
+                    {I18n.t('Student Name')}
+                  </Text>
                 </View>
               </GridCol>
 
@@ -132,7 +159,7 @@ export default class StudentColumnHeader extends ColumnHeader {
                     shouldFocusTriggerOnClose={false}
                     trigger={
                       <Button
-                        buttonRef={e => this.optionsMenuTrigger = e}
+                        buttonRef={e => (this.optionsMenuTrigger = e)}
                         margin="0"
                         size="small"
                         variant="icon"
@@ -144,10 +171,18 @@ export default class StudentColumnHeader extends ColumnHeader {
                     onToggle={this.onToggle}
                     onDismiss={this.props.onMenuDismiss}
                   >
-                    <Menu label={I18n.t('Sort by')} contentRef={this.bindSortByMenuContent} disabled={this.props.disabled}>
-                      <MenuItemGroup label={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}>
+                    <Menu
+                      label={I18n.t('Sort by')}
+                      contentRef={this.bindSortByMenuContent}
+                      disabled={this.props.disabled}
+                    >
+                      <MenuItemGroup
+                        label={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}
+                      >
                         <MenuItem
-                          selected={selectedSortSetting === 'sortable_name' && direction === 'ascending'}
+                          selected={
+                            selectedSortSetting === 'sortable_name' && direction === 'ascending'
+                          }
                           disabled={disabled}
                           onSelect={onSortBySortableNameAscending}
                         >
@@ -155,7 +190,9 @@ export default class StudentColumnHeader extends ColumnHeader {
                         </MenuItem>
 
                         <MenuItem
-                          selected={selectedSortSetting === 'sortable_name' && direction === 'descending'}
+                          selected={
+                            selectedSortSetting === 'sortable_name' && direction === 'descending'
+                          }
                           disabled={disabled}
                           onSelect={onSortBySortableNameDescending}
                         >
@@ -164,8 +201,14 @@ export default class StudentColumnHeader extends ColumnHeader {
                       </MenuItemGroup>
                     </Menu>
 
-                    <Menu label={I18n.t('Display as')} contentRef={this.bindDisplayAsMenuContent} disabled={this.props.disabled}>
-                      <MenuItemGroup label={<ScreenReaderContent>{I18n.t('Display as')}</ScreenReaderContent>}>
+                    <Menu
+                      label={I18n.t('Display as')}
+                      contentRef={this.bindDisplayAsMenuContent}
+                      disabled={this.props.disabled}
+                    >
+                      <MenuItemGroup
+                        label={<ScreenReaderContent>{I18n.t('Display as')}</ScreenReaderContent>}
+                      >
                         <MenuItem
                           key="first_last"
                           selected={this.props.selectedPrimaryInfo === 'first_last'}
@@ -188,9 +231,12 @@ export default class StudentColumnHeader extends ColumnHeader {
                       disabled={this.props.disabled}
                       label={I18n.t('Secondary info')}
                     >
-                      <MenuItemGroup label={<ScreenReaderContent>{I18n.t('Secondary info')}</ScreenReaderContent>}>
-                        {
-                          this.props.sectionsEnabled &&
+                      <MenuItemGroup
+                        label={
+                          <ScreenReaderContent>{I18n.t('Secondary info')}</ScreenReaderContent>
+                        }
+                      >
+                        {this.props.sectionsEnabled && (
                           <MenuItem
                             key="section"
                             selected={this.props.selectedSecondaryInfo === 'section'}
@@ -198,13 +244,14 @@ export default class StudentColumnHeader extends ColumnHeader {
                           >
                             {studentRowHeaderConstants.secondaryInfoLabels.section}
                           </MenuItem>
-                        }
+                        )}
                         <MenuItem
                           key="sis_id"
                           selected={this.props.selectedSecondaryInfo === 'sis_id'}
                           onSelect={this.onShowSisId}
                         >
-                          {this.props.sisName || studentRowHeaderConstants.secondaryInfoLabels.sis_id}
+                          {this.props.sisName ||
+                            studentRowHeaderConstants.secondaryInfoLabels.sis_id}
                         </MenuItem>
 
                         <MenuItem
@@ -220,7 +267,8 @@ export default class StudentColumnHeader extends ColumnHeader {
                           selected={this.props.selectedSecondaryInfo === 'login_id'}
                           onSelect={this.onShowLoginId}
                         >
-                          {this.props.loginHandleName || studentRowHeaderConstants.secondaryInfoLabels.login_id}
+                          {this.props.loginHandleName ||
+                            studentRowHeaderConstants.secondaryInfoLabels.login_id}
                         </MenuItem>
 
                         <MenuItem
@@ -261,6 +309,6 @@ export default class StudentColumnHeader extends ColumnHeader {
           </Grid>
         </div>
       </div>
-    );
+    )
   }
 }

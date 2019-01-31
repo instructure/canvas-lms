@@ -21,7 +21,7 @@ import ReactDOM from 'react-dom'
 
 import CustomColumnHeader from 'jsx/gradezilla/default_gradebook/GradebookGrid/headers/CustomColumnHeader'
 
-QUnit.module('CustomColumnHeader', suiteHooks => {
+QUnit.module('GradebookGrid CustomColumnHeader', suiteHooks => {
   let $container
   let component
   let props

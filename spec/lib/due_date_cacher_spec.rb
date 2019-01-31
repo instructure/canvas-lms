@@ -358,9 +358,39 @@ describe DueDateCacher do
 
     let(:submission) { submission_model(assignment: @assignment, user: first_student) }
     let(:first_student) { @student }
-    let(:second_student) do
-      student_in_course(active_all: true)
-      @student
+
+    describe "updated_at" do
+      it "updates the updated_at when the workflow_state of a submission changes" do
+        submission.update!(workflow_state: "deleted")
+        expect { cacher.recompute }.to change { submission.reload.updated_at }
+      end
+
+      it "updates the updated_at when the due date of the assignment changed" do
+        allow(DueDateCacher).to receive(:recompute)
+        submission.assignment.update!(due_at: 1.day.from_now)
+        expect { cacher.recompute }.to change { submission.reload.updated_at }
+      end
+
+      it "updates the updated_at when the grading period changed" do
+        allow(DueDateCacher).to receive(:recompute_course)
+        group = @course.grading_period_groups.create!
+        group.grading_periods.create!(
+          close_date: @assignment.due_at + 1.day,
+          end_date: @assignment.due_at + 1.day,
+          start_date: @assignment.due_at - 10.days,
+          title: "gp"
+        )
+        expect { cacher.recompute }.to change { submission.reload.updated_at }
+      end
+
+      it "updates the updated_at when the anonymous id of the submission changed" do
+        submission.update!(anonymous_id: nil)
+        expect { cacher.recompute }.to change { submission.reload.updated_at }
+      end
+
+      it "does not update the updated_at when no attributes changed" do
+        expect { cacher.recompute }.not_to change { submission.reload.updated_at }
+      end
     end
 
     describe "moderated grading" do

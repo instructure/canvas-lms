@@ -17,20 +17,20 @@
 #
 
 module ContentNotices
-  NOTICE_ATTRIBUTES = [:tag, :text, :template, :alert_class, :icon_class, :should_show]
+  NOTICE_ATTRIBUTES = [:tag, :text, :variant, :link_text, :link_target, :should_show]
 
   class ContentNotice
     attr_accessor *NOTICE_ATTRIBUTES
   end
 
   module ClassMethods
-    #  opts must include exactly one of:
-    #    text: string (or Proc that returns string) containing text for the notice
-    #    template: erb partial containing html content for the notice
+    #  opts must include:
+    #    text: string (or Proc that returns string): text for the notice
     #  opts may optionally contain:
-    #    alert_class: CSS class(es) for the notice box (suggestions: 'alert-info', 'alert-success', 'alert-error')
-    #    icon_class: CSS class(es) for the icon (suggestions: 'icon-info', 'icon-check', 'icon-warning')
-    #    should_show: callback that receives the context and user, and returns whether the notice should be displayed
+    #    variant: string: InstUI alert variant ('info', 'success', 'error', 'warning'; default is 'info')
+    #    link_text: string (or Proc that returns string): text for a link that follows the notice
+    #    link_target: string (or Proc that takes the context and returns a string): the target for said link
+    #    should_show: Proc: callback that receives the context and user, and returns whether the notice should be displayed
     # see course.rb for example usage
     def define_content_notice(tag, opts)
       notice = ContentNotice.new

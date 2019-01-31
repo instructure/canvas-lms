@@ -28,6 +28,7 @@ const StudentView = props => (
       // TODO HANDLE ERROR AND LOADING
       if (loading) return null
       if (error) return `Error!: ${error}`
+      document.title = data.assignment.name
       return <StudentContent assignment={data.assignment} />
     }}
   </Query>

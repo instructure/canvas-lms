@@ -18,98 +18,24 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Button from '@instructure/ui-buttons/lib/components/Button'
-import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import TextArea from '@instructure/ui-forms/lib/components/TextArea'
 import IconFeedback from '@instructure/ui-icons/lib/Line/IconFeedback'
-import Modal, {
-  ModalBody,
-  ModalFooter,
-  ModalHeader
-} from '@instructure/ui-overlays/lib/components/Modal'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import I18n from 'i18n!edit_rubric'
 
-class CommentDialog extends React.Component {
-  static propTypes = {
-    comments: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired,
-    finalize: PropTypes.func.isRequired,
-    open: PropTypes.bool.isRequired,
-    setComments: PropTypes.func.isRequired
-  }
-
-  render() {
-    const {comments, description, finalize, open, setComments} = this.props
-    const modalHeader = I18n.t('Additional Comments')
-    const close = () => finalize(false)
-
-    return (
-      <Modal
-        open={open}
-        onDismiss={close}
-        size="medium"
-        label={modalHeader}
-        defaultFocusElement={() => this.textArea}
-        shouldCloseOnDocumentClick
-      >
-        <ModalHeader>
-          <CloseButton placement="end" offset="medium" variant="icon" onClick={close}>
-            {I18n.t('Close')}
-          </CloseButton>
-          <Heading>{modalHeader}</Heading>
-          <Heading level="h3">{description}</Heading>
-        </ModalHeader>
-        <ModalBody>
-          <TextArea
-            data-selenium="criterion_comments_text"
-            label={I18n.t('Comments')}
-            maxHeight="50rem"
-            onChange={e => setComments(e.target.value)}
-            value={comments}
-            ref={node => {
-              this.textArea = node
-            }}
-          />
-        </ModalBody>
-        <ModalFooter>
-          <Button variant="light" margin="0 x-small 0 0" onClick={close}>
-            {I18n.t('Cancel')}
-          </Button>
-          &nbsp;
-          <Button variant="primary" margin="0 x-small 0 0" onClick={() => finalize(true)}>
-            {I18n.t('Update Comment')}
-          </Button>
-        </ModalFooter>
-      </Modal>
-    )
-  }
-}
-
-const CommentButton = ({initialize, ...props}) => (
+const CommentButton = ({ onClick }) => (
   <div>
     <Button
       variant="icon"
       icon={<IconFeedback />}
       margin="0 x-small 0 0"
-      onClick={() => initialize()}
+      onClick={onClick}
     >
-      <ScreenReaderContent>{I18n.t('Additional Comments')}</ScreenReaderContent>
+      <ScreenReaderContent>{I18n.t('Add Additional Comments')}</ScreenReaderContent>
     </Button>
-    <CommentDialog {...props} />
   </div>
 )
 CommentButton.propTypes = {
-  comments: PropTypes.string,
-  description: PropTypes.string.isRequired,
-  finalize: PropTypes.func.isRequired,
-  initialize: PropTypes.func.isRequired,
-  open: PropTypes.bool,
-  setComments: PropTypes.func.isRequired
-}
-CommentButton.defaultProps = {
-  open: false,
-  comments: ''
+  onClick: PropTypes.func.isRequired,
 }
 
 export default CommentButton

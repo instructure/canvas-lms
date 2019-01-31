@@ -229,26 +229,6 @@
 #             },
 #             "$ref": "User"
 #           },
-#           "computed_current_score": {
-#             "description": "optional: The student's score in the course, ignoring ungraded assignments. (applies only to student enrollments, and only available in course endpoints). If an override score exists, a student will receive the override score while a teacher receives the actual computed current score. If a grading standard exists for the course, the returned override score is the lower bound of its grade.",
-#             "example": 90.25,
-#             "type": "number"
-#           },
-#           "computed_final_score": {
-#             "description": "optional: The student's score in the course including ungraded assignments with a score of 0. (applies only to student enrollments, and only available in course endpoints). If an override score exists, a student will receive the override score while a teacher receives the actual computed final score. If a grading standard exists for the course, the returned override score is the lower bound of its grade.",
-#             "example": 80.67,
-#             "type": "number"
-#           },
-#           "computed_current_grade": {
-#             "description": "optional: The letter grade equivalent of computed_current_score, if available. (applies only to student enrollments, and only available in course endpoints). If an override grade exists, a student will receive the override grade while a teacher receives the actual computed current grade.",
-#             "example": "A-",
-#             "type": "string"
-#           },
-#           "computed_final_grade": {
-#             "description": "optional: The letter grade equivalent of computed_final_score, if available. (applies only to student enrollments, and only available in course endpoints). If an override grade exists, a student will receive the override grade while a teacher receives the actual computed final grade.",
-#             "example": "B-",
-#             "type": "string"
-#           },
 #           "override_grade": {
 #             "description": "The user's override grade for the course.",
 #             "example": "A",
@@ -298,26 +278,6 @@
 #             "description": "optional: The id of the currently active grading period, if one exists. If the course the enrollment belongs to does not have grading periods, or if no currently active grading period exists, the value will be null. (applies only to student enrollments, and only available in course endpoints)",
 #             "example": 5,
 #             "type": "integer"
-#           },
-#           "current_period_computed_current_score": {
-#             "description": "optional: The student's score in the course for the current grading period, ignoring ungraded assignments. If the course the enrollment belongs to does not have grading periods, or if no currently active grading period exists, the value will be null. (applies only to student enrollments, and only available in course endpoints).  If an override score exists, a student will receive the override score while a teacher receives the actual computed current score. If a grading standard exists for the course, the returned override score is the lower bound of its grade.",
-#             "example": 95.80,
-#             "type": "number"
-#           },
-#           "current_period_computed_final_score": {
-#             "description": "optional: The student's score in the course for the current grading period, including ungraded assignments with a score of 0. If the course the enrollment belongs to does not have grading periods, or if no currently active grading period exists, the value will be null. (applies only to student enrollments, and only available in course endpoints).  If an override score exists, a student will receive the override score while a teacher receives the actual computed final score. If a grading standard exists for the course, the returned override score is the lower bound of its grade.",
-#             "example": 85.25,
-#             "type": "number"
-#           },
-#           "current_period_computed_current_grade": {
-#             "description": "optional: The letter grade equivalent of current_period_computed_current_score, if available. If the course the enrollment belongs to does not have grading periods, or if no currently active grading period exists, the value will be null. (applies only to student enrollments, and only available in course endpoints). If an override grade exists, a student will receive the override grade while a teacher receives the actual computed current grade.",
-#             "example": "A",
-#             "type": "string"
-#           },
-#           "current_period_computed_final_grade": {
-#             "description": "optional: The letter grade equivalent of current_period_computed_final_score, if available. If the course the enrollment belongs to does not have grading periods, or if no currently active grading period exists, the value will be null. (applies only to student enrollments, and only available in course endpoints). If an override grade exists, a student will receive the override grade while a teacher receives the actual computed final grade.",
-#             "example": "B",
-#             "type": "string"
 #           },
 #           "current_period_override_grade": {
 #             "description": "The user's override grade for the current grading period.",

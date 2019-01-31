@@ -1597,6 +1597,7 @@ pl:
   add_a_new_user_c440d053: "Dodaj nowego użytkownika"
   add_a_reviewer_for_the_selected_students_1c7b5d6f: "Dodaj recenzenta dla wybranych uczniów"
   add_account_admins_99c03c9e: "Dodaj administratorów kont"
+  add_additional_comments_ec34a62f: "Dodaj więcej komentarzy"
   add_alert_b2729c99: "Dodaj alert"
   add_an_assignment_fb73942e: "Dodaj zadanie"
   add_an_identity_provider_to_this_account_c2644478: "Dodaj dostawcę tożsamości do tego konta:"
@@ -1702,6 +1703,7 @@ pl:
   administrator_f325c186: Administrator
   admins_3e1dce15: Administratorzy
   admins_add_remove_26811ce5: "Administratorzy - dodaj / usuń"
+  advanced_36b35b8: Zaawansowane
   affects_viewing_the_publish_course_conclude_course_76d2f601: |-
       Wpływa na wyświetlanie przycisków Opublikuj kurs, Zakończ kurs i Trwale usuń ten kurs.
       Przycisk Trwale usuń ten kurs pojawia się tylko w przypadku kursów utworzonych ręcznie.
@@ -1811,6 +1813,7 @@ pl:
   allow_course_images_to_be_assigned_to_a_course_and_82fb7bdd: "Pozwól aby obrazy kursowe były przypisane do kursu i stosowane na fiszkach."
   allow_course_images_to_be_assigned_to_a_course_and_adb906f4: "Pozwól aby obrazy kursowe były przypisane do kursu i stosowane na fiszkach."
   allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "Zezwalaj na porządkowanie kart panelu nawigacyjnego przez każdego użytkownika."
+  allow_final_grade_override_8cf4336b: "Zezwól na zastąpienie oceny końcowej"
   allow_importing_of_qti_and_common_cartridge_into_q_81b657cd: "Zezwól na importowanie QTI i Common Cartridge do Quizzes.Next."
   allow_in_mastery_paths_5332c786: "Zezwól na ścieżki mistrzowskie"
   allow_intra_group_peer_reviews_53f1e455: "Zezwalaj na wewnątrzgrupowe kontrole"
@@ -2026,6 +2029,7 @@ pl:
   allows_user_to_view_and_insert_data_in_the_sis_id__921967c: "Pozwala użytkownikowi na wyświetlanie i wstawianie danych w polu SIS ID."
   allows_user_to_view_and_link_questions_in_a_quiz_t_b971e002: "Pozwala użytkownikowi na wyświetlanie i wiązanie pytań w teście do banków pytań na poziomie konta. Jeśli jest wyłączone, użytkownik będzie mógł wyświetlać i wiązać pytania tylko do banków pytań kursu. Aktywuje łącze Zarządzaj bankami pytań na stronie Indeks testów"
   allows_user_to_view_and_link_questions_in_a_quiz_t_d312a571: "Pozwala użytkownikowi na wyświetlanie i wiązanie pytań w teście do banków pytań na poziomie konta. Jeśli jest wyłączone, użytkownik będzie mógł wyświetlać i wiązać pytania tylko do banków pytań kursu."
+  allows_user_to_view_and_link_questions_in_a_quiz_t_f6795580: "Pozwala użytkownikowi na wyświetlanie i wiązanie pytań w teście do banków pytań na poziomie konta."
   allows_user_to_view_and_manage_authentication_opti_e1bb0ad3: "Pozwala użytkownikowi na wyświetlanie opcji uwierzytelnienia dla całego konta i zarządzanie nimi."
   allows_user_to_view_and_manage_courses_in_the_acco_12333da2: "Pozwala użytkownikowi na wyświetlanie kursów na koncie i zarządzanie nimi."
   allows_user_to_view_and_manage_permissions_bdc80a1d: "Pozwala użytkownikowi na wyświetlanie uprawnień i zarządzanie nimi."
@@ -2039,7 +2043,7 @@ pl:
   allows_user_to_view_course_sis_id_3a1818a5: "Pozwala użytkownikowi na wyświetlanie SIS ID kursu."
   allows_user_to_view_course_status_choose_home_page_b97cee14: "Pozwala użytkownikowi na wyświetlanie przycisków Status kursu, Wybierz stronę główną i Lista kontrolna konfiguracji kursu na stronie głównej."
   allows_user_to_view_create_edit_delete_and_publish_48716e21: "Pozwala użytkownikowi na wyświetlanie, tworzenie, edytowanie, usuwanie i publikowanie/wycofanie z publikacji stron.\n\
-      Pozwala użytkownikowi na wyświetlanie historii stron i ustawianie strony tytułowej. "
+      \x20     Pozwala użytkownikowi na wyświetlanie historii stron i ustawianie strony tytułowej. "
   allows_user_to_view_create_edit_delete_and_publish_9d6c0bfa: |-
       Pozwala użytkownikowi na wyświetlanie, tworzenie, edytowanie, usuwanie i publikowanie/wycofanie z publikacji stron.
       Pozwala użytkownikowi na wyświetlanie historii stron i ustawianie strony tytułowej.
@@ -2135,6 +2139,7 @@ pl:
   an_error_occurred_while_migrating_405ac0b5: "Wystąpił błąd podczas migrowania."
   an_error_occurred_while_saving_account_proficiency_43e7fb6a: "Wystąpił błąd podczas zapisywani ocen kompetencji na koncie"
   an_error_occurred_while_saving_associations_bd66f3f4: "Wystąpił błąd podczas zapisywania powiązań"
+  an_error_occurred_while_saving_your_settings_b503a31c: "Podczas zapisywania ustawień wystąpił błąd."
   an_error_occurred_while_starting_migration_8e6015e2: "Wystąpił błąd podczas rozpoczynania migracji"
   an_error_occurred_while_updating_announcements_loc_5a1c5dcf: "Wystąpił błąd podczas aktualizowania stanu blokady ogłoszeń."
   an_error_occurred_while_updating_late_policies_a95b707f: "Wystąpił błąd podczas aktualizowania zasad dot. opóźnień"
@@ -3062,11 +3067,15 @@ pl:
     submission_sidebar: 
       comment_signature: "%{author}, %{created_at}"
       labels: 
+        ? "false"
+        : nie
         grade: "Ocena: %{grade} *(możliwych punktów: %{points_possible})*"
         graded_anonymously: "Ocenione anonimowo: %{value}"
         ? "no"
         : nie
         none_assigned: "Nie przypisano żadnego elementu"
+        ? "true"
+        : tak
         ? "yes"
         : tak
       links: 
@@ -3300,6 +3309,8 @@ pl:
     upload_error_unexpected: "Nieznany błąd pojawił się podczas pobierania z adresu url %{url}"
   attachment_deffe5a9: Załącznik
   attempt_3dd42b18: próba
+  attempt_current_attempt_ef626179: "Próba %{current_attempt}"
+  attempt_current_attempt_of_max_attempts_427ed508: "Próba %{current_attempt} z %{max_attempts}"
   attempt_to_detect_an_appropriate_field_separator_i_4e59eb0c: "Próba wykrycia odpowiedniego separatora pół w eksportach dziennika na podstawie formatu liczb w języku użytkownika."
   attendance: 
     options: 
@@ -3456,6 +3467,7 @@ pl:
   available_after_3416802b: "Dostępny od"
   available_after_unlock_at_b5682224: "Dostępne po %{unlock_at}"
   available_after_unlock_at_until_lock_at_499e8092: "Dostępne po %{unlock_at} aż do %{lock_at}"
+  available_d3bb0b5c: "Dostępne "
   available_folders_694d0436: "Dostępne foldery"
   available_from_587ce92f: "Dostępne od"
   available_from_date_43b5e11d: "Dostępne od dnia"
@@ -3543,8 +3555,8 @@ pl:
   blueprint_course_sync_in_progress_a1e2622b: "Synchronizacja Kursu wzorcowego w toku"
   blueprint_courses_9dd321b8: "Kursy wzorcowe"
   blueprint_courses_add_edit_associate_delete_bc26d5c2: "Kursy Blueprint - utwórz / edytuj / powiąż / usuń"
-  blueprint_courses_are_an_account_level_feature_opt_3388f731: "Kursy Blueprint są opcją na poziomie konta.\n\n\
-      Aby edytować ustawienia blokady Blueprint na stronie Indeks dyskusji, należy także włączyć uprawnienia Kursy - Dodaj / edytuj / usuń oraz Dyskusje - moderuj. "
+  blueprint_courses_are_an_account_level_feature_opt_3388f731: "Kursy Blueprint są funkcją na poziomie konta.\n\n\
+      \x20     Aby edytować ustawienia blokady Blueprint na stronie Indeks dyskusji, należy także włączyć opcje Kursy - Dodaj / edytuj / usuń oraz Dyskusje - moderuj. "
   blueprint_courses_create_edit_associate_delete_bf41988e: "Kursy wzorcowe (utwórz / edytuj / powiąż / usuń)"
   blueprint_courses_is_an_account_level_feature_opti_38676924: "Kursy Blueprint są opcją na poziomie konta. Role w kursach mogą zarządzać kursami Blueprint pod warunkiem, że zostaną dodane do tych kursów jako nauczyciel, asystent instruktora lub projektant. Aby uzyskać dostęp do paska bocznego Kursy Blueprint, należy włączyć uprawnienia Kursy - Dodaj / edytuj / usuń. Aby dodać powiązany kurs, należy włączyć także uprawnienia Kursy - wyświetl listę oraz Kursy - Dodaj / edytuj / usuń. Aby edytować ustawienia blokady dla dowolnego typu obiektu Blueprint, należy włączyć uprawnienia Kursy - Dodaj / edytuj / usuń."
   blueprint_courses_is_an_account_level_feature_opti_3bf307d: "Kursy Blueprint są opcją na poziomie konta. Aby edytować ustawienia blokady Blueprint na stronie Indeks dyskusji, należy także włączyć uprawnienia Kursy - Dodaj / edytuj / usuń oraz Dyskusje - wyświetl. Jeśli to uprawnienie nie zostanie włączone, ale uprawnienia Kursy - Dodaj / edytuj / usuń oraz Dyskusje - wyświetl są włączone, ustawienia blokady Blueprint można edytować dla poszczególnych dyskusji."
@@ -4168,9 +4180,9 @@ pl:
   can_interact_with_users_in_their_section_only_48cb8c43: "Może wchodzić w interakcje z użytkownikami tylko w ich części"
   can_t_compute_score_until_an_assignment_has_points_f34dd600: "Wynik będzie można obliczyć, gdy zadanie będzie miało przydzielone punkty"
   can_t_delete_alignments_based_on_rubric_associatio_1a10fcce: "\n\
-      \x20             Nie można usunąć uszeregowań opartych na skojarzeniach kryteriów ocen.\n\
-      \x20             Aby usunąć te skojarzenia, należy usunąć odpowiedni wiersz z kryteriów oceniania Rubric.\n\
-      \x20           "
+      \x20                   Nie można usunąć uszeregowań opartych na skojarzeniach kryteriów ocen.\n\
+      \x20                   Aby usunąć te skojarzenia, należy usunąć odpowiedni wiersz z kryteriów oceniania pozytywnych elementów.\"\n\
+      \x20                 "
   can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "Nie można usunąć uszeregowań opartych na skojarzeniach kryteriów ocen. Aby usunąć te skojarzenia, należy usunąć odpowiedni wiersz z kryteriów oceniania pozytywnych elementów."
   can_t_enable_anonymous_grading_and_group_assignmen_9938416e: "Nie można włączyć anonimowego oceniania i zadań grupowych jednocześnie"
   can_t_perform_diffing_against_more_than_one_file_o_44475c0d: "Nie można diffować więcej niż jednego pliku tego samego typu"
@@ -4254,6 +4266,7 @@ pl:
   canvas_cartridge_name: "Canvas Cartridge Importer"
   canvas_catalog_87f39420: "Katalog Canvas"
   canvas_cloud_information_fdd404f2: "Informacje dot. chmury Canvas"
+  canvas_content_security_policy_c3d7bf2b: "Polityka bezpieczeństwa treści Canvas"
   canvas_course_id_db4de2b8: canvas_course_id
   canvas_dashboard_links_will_navigate_to_the_catalo_4143635e: "Linki w panelu Canvas będą nawigować do panelu Canvas"
   canvas_default_7f81a6b8: "Canvas domyślny"
@@ -4629,6 +4642,8 @@ pl:
         back: Wstecz
         continue: Kontynuuj
         create_account: "Utwórz konto"
+        ? "false"
+        : Nie
         have_account: "Posiadam konto w programie Canvas"
         login_as: "Zaloguj jako %{invited_user}"
         merge: Połącz
@@ -4637,6 +4652,8 @@ pl:
         : Nie
         register: Zarejestruj
         transfer_enrollment: "Przenieś zapisy"
+        ? "true"
+        : Tak
         ? "yes"
         : Tak
       details: 
@@ -5662,6 +5679,11 @@ pl:
     one: "1 zadanie z błędami"
     other: "%{count} zadań z błędami"
     zero: "Brak zadań z błędami; kliknij przycisk Kontynuuj"
+  count_attempts_d23c69a0: 
+    few: "%{count} komentarze"
+    many: "%{count} komentarze"
+    one: "1 próba"
+    other: "%{count} prób(y)"
   count_comments_cb137ab8: 
     few: "%{count} komentarze"
     many: "%{count} komentarze"
@@ -7388,7 +7410,9 @@ pl:
       zostanie obliczona bez tych punktów.
   diigo_993c4646: Diigo
   disable_a5c05db3: Wyłącz
+  disable_all_read_only_scopes_f9ffdd28: "Wyłącz wszystkie zakresy tylko do odczytu."
   disable_and_lock_7d0ef0e8: "Wyłącz i zablokuj"
+  disable_scope_6ba4e4d4: "Wyłącz zakres"
   disable_sync_to_name_10c371dc: "Wyłącz synchronizację z %{name}"
   disable_toolname_44d6397c: "Wyłącz %{toolName}"
   disabled_18c33a73: (wyłączone)
@@ -7407,6 +7431,7 @@ pl:
   disallow_comments_for_title_21f9c653: "Nie zezwalaj na komentarze do %{title}"
   disallow_replies_for_title_ca3806b2: "Blokuj odpowiedzi do %{title}"
   disccussions_515a3a99: Dyskusje
+  discovery_service_url_ca13d3f4: "Adres URL usługi Discovery"
   discovery_url_3dce06d9: "Witryna URL"
   discussion_6719c51d: Dyskusja
   discussion_assignments_cannot_be_section_specific_93d63843: "Zadań do dyskusji nie mogą być powiązane z sekcją"
@@ -7822,6 +7847,7 @@ pl:
   download_as_zip_5dae7f19: "Pobierz w formacie Zip"
   download_assignment_submissions_41e50ee7: "Pobierz przesłane zadania"
   download_associated_files_f35dcb5e: "Pobierz powiązane pliki"
+  download_attachment_filename_8cc17629: "Pobierz %{attachment.filename}"
   download_c7ffdfb9: Pobierz
   download_course_content_7f66edc9: "Pobierz zawartość kursu"
   download_epub_757cf0af: "Pobierz ePub"
@@ -7848,6 +7874,7 @@ pl:
   dropped_38031953: Pominięto
   dropped_for_grading_purposes_46256461: "Opuszczono w celu ocenienia"
   due_5d7267be: "Termin:"
+  due_639f281d: "Termin: "
   due_a73610f6: "Termin dostarczenia"
   due_assignment_due_date_time_5acdf3cf: "Termin dostarczenia: %{assignment_due_date_time}"
   due_assignment_due_date_time_607f2e1d: "termin dostarczenia: %{assignment_due_date_time}"
@@ -8099,9 +8126,11 @@ pl:
   empty_stub_for_testing_only_37aad38: "Pusta końcówka (wyłącznie do testowania)"
   enable_6f5d1328: Uaktywnij
   enable_ability_to_alter_the_final_grade_for_the_en_e120f72d: "Włącz możliwość zmiany oceny końcowej dla całego kursu bez zmiany wyników testów."
+  enable_all_read_only_scopes_3ddc2bb5: "Włącz wszystkie zakresy tylko do odczytu."
   enable_and_lock_e6099cc2: "Uaktywnij i zablokuj"
   enable_anonymous_grading_of_assignments_e18f75be: "Włącz anonimowe ocenianie zadań"
   enable_anonymous_marking_of_assignments_only_relev_792a2a17: "Włącz anonimowe ocenianie zadań. Ma zastosowanie, jeśli włączono flagę anonimowego oceniania moderowanego."
+  enable_content_security_policy_8bd0b492: "Włącz politykę bezpieczeństwa treści"
   enable_course_as_a_blueprint_course_8515ffd5: "Włącz kurs jako kurs Blueprint"
   enable_dashboard_images_for_courses_5af458b0: "Włącz obrazy panelu nawigacyjnego dla kursów"
   enable_feature_title_987d8e9a: "Włącz funkcję: %{title}"
@@ -8117,6 +8146,7 @@ pl:
   enable_new_sis_integration_settings_ab6780a4: "Włącz nowe ustawienia integracji SIS"
   enable_or_condition_for_modules_a16f02d8: "Włącz warunek \"LUB\" dla modułów"
   enable_reregistration_for_lti_2_b2a10444: "Umożliwienie powtórnej rejestracji dla LTI 2"
+  enable_scope_ac28b832: "Włącz zakres"
   enable_student_context_card_links_eba2f2c5: "Włącz odsyłacze do kart kontekstowych dla uczestników"
   enable_the_creation_of_blueprint_courses_79f91c30: "Włącz tworzenie kursów wzorcowych"
   enable_the_creation_of_master_courses_8205b155: "Włącz tworzenie kursów głównych"
@@ -8434,7 +8464,7 @@ pl:
         details1: |-
             ePortfolio to miejsce służące do wyświetlania i omawiania istotnych
             przesłanych zadań i doświadczeń, które mają miejsce się podczas procesu
-            uczenia. ePortfolio może służyć do:
+            uczenia. ePortfolio może służyć do: 
             
             * Udostępniania dokumentów, z których jesteś dumny także innym użytkownikom, a nie tylko instruktorowi
             * Dyskusji na temat wszelkich pomysłów i wysiłków, których wymagała realizacja zadań
@@ -8497,6 +8527,7 @@ pl:
   error_reports_7d6c8b1e: "Raporty o błędach"
   error_retrieving_assignment_configuration_tools_f7d75303: "Błąd pobierania narzędzi konfiguracji zadań"
   error_retrieving_assignment_external_tools_9102d343: "Błąd pobierania zewnętrznych narzędzi do zadań"
+  error_retrieving_content_c07ee76b: "Błąd podczas pobierania treści"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "Błąd pobierania narzędzi do wykrywania podobieństw"
   error_running_quizzes_2_export_cfecedba: "Błąd podczas uruchamiania eksportu Quizy 2."
   error_saving_discussion_settings_3360661d: "Błąd podczas zapisywania ustawień dyskusji"
@@ -8574,6 +8605,7 @@ pl:
   every_665d821e: Każdy
   everyone_854554dd: Wszyscy
   everyone_else_6c6dc7b6: "Wszyscy pozostali"
+  everyone_else_cc5f6888: "Wszyscy pozostali"
   ex_ba24edf6: EX
   exact_value_margin_eae7e67e: "%{exact_value} +/- %{margin}"
   exactly_one_rating_can_have_mastery_c1d87990: "Biegłość można przypisać do jednej oceny"
@@ -8595,6 +8627,7 @@ pl:
   excused_cf8792eb: Usprawiedliwiony!
   exit_d0c7b013: Wyjdź
   exit_theme_editor_9ddd41bb: "Wyjdź z edytora temat"
+  expand_2f2fadbd: Rozwiń
   expand_collapse_title_outcome_group_239f0a9d: "rozwiń/zwiń grupę wyników %{title} "
   expand_collapse_title_outcome_group_student_meets__46ffef48: "Rozwiń/zwiń grupę wyników %{title}, uczestnik wykazuje opanowanie %{mastery_count} z %{count} wyników"
   expand_global_navigation_2c28d5d4: "Rozszerz nawigację globalną"
@@ -8826,6 +8859,8 @@ pl:
     feature_flag: 
       allow: Zezwól
       estimated_release: "Przewidywane opublikowanie:"
+      ? "false"
+      : Wył.
       no_description: "brak opisu"
       ? "off"
       : Wył.
@@ -8833,6 +8868,8 @@ pl:
       : Wł.
       release_notes: "uwagi dotyczące opublikowania"
       toggle_feature_details_screenreader_info: "Przełącz szczegóły funkcji dla tytułu %{title}"
+      ? "true"
+      : Wł.
     feature_flag_admin_view: 
       feature_options: "Opcje funkcji"
       no_features_available: "Obecnie nie są dostępne żadne funkcje."
@@ -9173,6 +9210,7 @@ pl:
       o konieczności odnowienia swojej integracji Google Docs.
   google_docs_preview_9f41b23c: "Podgląd w programie Google Docs"
   google_drive_7cb003c9: "Dysk Google"
+  google_template_29640bc0: "Szablon Google"
   goto_first_page_650f1638: "Przejdź do pierwszej strony"
   goto_last_page_405adce9: "Przejdź do ostatniej strony"
   goto_next_page_e8e1ae6f: "Przejdź do następnej strony"
@@ -9204,6 +9242,7 @@ pl:
   grade_low_to_high_1678b713: "Ocena – Od niskiej do wysokiej"
   grade_out_of_percentage_1972bf52: "Ocena z %{percentage}"
   grade_out_of_points_d401b79d: "Ocena z %{points}"
+  grade_percentage_for_missing_submissions_dc7ccac: "Odsetek ocen dla brakujących materiałów"
   grade_point_average_2976cc59: "Średnia punktowa ocen"
   grade_saved_ab539b53: "Zapisano ocenę."
   grade_selection_table_dcf9d1ea: "Tabela wyboru ocen"
@@ -9501,6 +9540,7 @@ pl:
   gradebook_individual_view_8846598e: "Dziennik ocen: Widok indywidualny"
   gradebook_performance_764d8b3d: "Wykonane dziennika ocen"
   gradebook_settings_b45c6df9: "Ustawienia dziennika ocen"
+  gradebook_settings_updated_fef63d60: "Zaktualizowano ustawienia dziennika ocen"
   gradebook_speedgrader_66cb7a6a: "Dziennik ocen, SpeedGrader"
   gradebook_tutorial_tray_d835c750: "Panel samouczka dziennika ocen"
   gradebook_uploads: 
@@ -10474,7 +10514,7 @@ pl:
       
       Importowanie wyników nie powiodło się z powodu związanego z nim błędu. Sprawdź plik i ponów próbę wysłania – %{url}
       
-      Wystąpił następujący błąd:
+      Wystąpił następujący błąd: 
       %{row}
       
       Aby wyświetlić prawidłowy format importu, otwórz dokumenty Canvas API pod adresem %{doc_url}
@@ -10503,7 +10543,7 @@ pl:
   hello_name_your_outcomes_were_successfully_importe_d0c37335: |-
       Witaj, %{name},
       
-      Zaimportowano Twoje wyniki, ale wystąpiły następujące błędy (maks. pierwsze 100 ostrzeżeń):
+      Zaimportowano Twoje wyniki, ale wystąpiły następujące błędy (maks. pierwsze 100 ostrzeżeń): 
       
       %{rows}
       
@@ -10794,6 +10834,7 @@ pl:
   import_learning_outcomes_36d28a2b: "Importuj wyniki nauki"
   import_outcomes_7dda186b: "Importuj wyniki"
   import_sis_data_428cc803: "Importuj dane z systemu SIS"
+  import_status_b147bd27: "Status Importu"
   import_tutorial_tray_8b92e956: "Panel samouczka importowania"
   important_note_educational_institutions_have_an_ob_c9350304: "*Uwaga: Instytucje edukacyjne mają obowiązek udostępniania swojej treści w jak największym, możliwym stopniu. Instructure zaleca stosunek conajmniej 3:1 tekstu-do-koloru-tła aby tekst był czytelny. Sprawdź współczynnik kontrastu za pomocą **WebAIM Color Contrast Checker***."
   imported_from_posttosisname_f7cc9258: "Zaimportowano z %{postToSISName}"
@@ -11236,8 +11277,13 @@ pl:
   learning_outcome_rating_8143e88c: "wynik nauki - ocena"
   learning_outcome_rating_points_c453bb8a: "wynik nauki - ocena w punktach"
   learning_outcomes_add_edit_delete_b686457a: "Wyniki nauki - dodaj / edytuj / usuń"
-  learning_outcomes_can_be_included_in_assignment_ru_a48bb903: "\n\
-      \x20 Wyniki nauki można uwzględnić w kryteriach ocen dla zadań jako łatwy sposób określenia stopnia opanowania wyników dla określonych testów.  Gdy definiowany jest wynik nauki, należy także podać kryterium używane do tworzenia kryteriów ocen testu.  Zdefiniuj tyle kolumn kryteriów ocen, ile potrzeba, oraz określ punkt graniczny używany do zdefiniowania stopnia opanowania takich wyników.\n"
+  learning_outcomes_can_be_included_in_assignment_ru_a48bb903: |
+      
+      Wyniki nauki można uwzględnić w kryteriach ocen dla zadań jako łatwy sposób określenia stopnia
+      opanowania wyników dla określonych testów.  Gdy definiowany jest wynik nauki, należy
+      także podać kryterium używane do tworzenia
+      kryteriów ocen testu.  Zdefiniuj tyle kolumn kryteriów ocen, ile potrzeba, oraz określ
+      punkt graniczny używany do zdefiniowania stopnia opanowania takich wyników.
   learning_outcomes_import_eca3a09c: "Wyniki nauki - importuj"
   leave_5e852989: Opuść
   leave_a_comment_7991725b: "Pozostaw komentarz"
@@ -11726,6 +11772,7 @@ pl:
   max_membership_bd0ddc68: max_membership
   max_users_groups_per_appointment_867c505b: "Maksymalna liczba użytkowników/grup na spotkanie"
   maximum_number_of_appointments_a_participant_can_a_70dfd6cd: "Maksymalna liczba spotkań, na które może zapisać się uczestnik"
+  media_af190855: Multimedia
   media_comment_e494a952: "Komentarz multimedialny"
   media_comment_submission_14e224dc: "Przesyłane zadanie w formie komentarza multimedialnego"
   media_comments: 
@@ -11821,7 +11868,7 @@ pl:
           url_info: "Odwiedź stronę konta"
         subject: "Powiadomienie dla Administratora konta"
         url_info: |-
-            Odwiedź stronę podanego konta:
+            Odwiedź stronę podanego konta: 
             %{url}
     account_user_registration: 
       email: 
@@ -11838,7 +11885,7 @@ pl:
         name_info: "Nazwa: %{name}"
         subject: "Zaproszenie dla Administratora konta Canvas"
         url_info: |-
-            Aby móc pełnić rolę administratora, należy najpierw zarejestrować się w systemie Canvas.  Rejestrację można dokończyć tutaj:
+            Aby móc pełnić rolę administratora, należy najpierw zarejestrować się w systemie Canvas.  Rejestrację można dokończyć tutaj: 
             %{url}
         username_info: "Nazwa użytkownika: %{username}"
     added_to_conversation: 
@@ -12181,7 +12228,7 @@ pl:
         body: |-
             Zadanie o nazwie „%{title}” dla kursu %{course} zostało zmienione.
             
-            Kliknij tutaj, aby wyświetlić zadanie:
+            Kliknij tutaj, aby wyświetlić zadanie: 
             %{url}
         html: 
           body: "Zadanie o nazwie \"%{title}\" dla kursu %{course} zostało zmienione."
@@ -12359,7 +12406,7 @@ pl:
         body: |-
             Twój instruktor opublikował zmiany ocen i nowe komentarze dla %{title}. Zmiany te można teraz przeglądać.
             
-            Można je zobaczyć tutaj:
+            Można je zobaczyć tutaj: 
             %{url}
         html: 
           body: "Twój instruktor opublikował zmiany ocen i nowe komentarze dla %{title}. Zmiany te można teraz przeglądać."
@@ -12418,7 +12465,7 @@ pl:
             Jeśli nie jest to właściwy adres e-mail dla tego typu współpracy, konieczna będzie
             zmiana ustawień profilu lub rejestracja w usłudze %{service}.
             
-            Szczegóły można zobaczyć tutaj:
+            Szczegóły można zobaczyć tutaj: 
             %{link}
         body_with_user: |-
             Zaproszono Cię do współpracy nad dokumentem %{document} dla
@@ -12428,7 +12475,7 @@ pl:
             Jeśli nie jest to właściwy adres e-mail dla tego typu współpracy, konieczna będzie
             zmiana ustawień profilu lub rejestracja w usłudze %{service}.
             
-            Szczegóły można zobaczyć tutaj:
+            Szczegóły można zobaczyć tutaj: 
             %{link}
         html: 
           body: |-
@@ -13854,6 +13901,7 @@ pl:
   more_info_at_course_name_56dc8c10: "Więcej informacji pod adresem %{course_name}"
   more_information_3dfb76b5: "Więcej informacji"
   more_information_about_ratings_57cdd446: "Więcej informacji o ocenach"
+  more_modules_d9a9f003: "Więcej modułów"
   more_people_options_730e9686: "Więcej opcji dla osób"
   more_results_were_added_at_the_bottom_of_the_page_dc323877: "Dodano więcej wyników na dole strony."
   more_than_999_submissions_need_grading_bc087dd0: "Ponad 999 przesłanych zadań wymaga oceny"
@@ -14152,6 +14200,7 @@ pl:
   no_students_with_that_name_found_f6004da2: "Brak uczestników z taką nazwą"
   no_subject_58b7941c: "Brak tematu"
   no_subject_970aad80: "Brak tematu"
+  no_submission_fb131a40: "Brak przesłanych zadań"
   no_submission_for_assignment_a9cb6fe2: "Brak przesłanych materiałów dla %{assignment}"
   no_submissions_164cea23: "Brak zgłoszeń"
   no_terms_eab5ee7b: "Brak warunków"
@@ -14287,7 +14336,7 @@ pl:
     conversation_message_description: "Nowe wiadomości w skrzynce odbiorczej"
     conversation_message_display: "Wiadomość w rozmowie"
     course_content_description: |-
-        Zmień na zawartość kursu:
+        Zmień na zawartość kursu: 
         
         * Zawartość strony
         * Zawartość testu
@@ -14302,7 +14351,7 @@ pl:
     files_description: "Dodano nowy plik do kursu"
     files_display: Pliki
     grading_description: |-
-        Zawiera:
+        Zawiera: 
         
         * Wprowadzoną/zmienioną ocenę zadania/przesłanego zadania
         * Wyciszoną ocenę zadania
@@ -14312,7 +14361,7 @@ pl:
     grading_policies_description: "Zmiana polityki oceniania na kursie"
     grading_policies_display: "Polityki oceniania"
     invitation_description: |-
-        Zaproszenie do:
+        Zaproszenie do: 
         
         * Konferencja internetowa
         * Grupa
@@ -14546,6 +14595,7 @@ pl:
   number_unsubmitted_145fefae: "%{number} nieprzesłane"
   nummastered_of_numgroup_mastered_b8113c9c: "%{numMastered} z %{numGroup} opanowanych"
   numpoints_points_b1f0666a: "%{numPoints} punkty"
+  o365_template_297a82f6: "Szablon O365"
   o_224cf405: o
   oauth2_provider: 
     auth: 
@@ -14614,6 +14664,7 @@ pl:
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "Po przesłaniu odpowiedzi nie można będzie jej zmienić. Nie będzie można wyświetlić poprzedniego pytania."
   once_you_start_debugging_all_info_about_the_next_a_e871403b: "Po rozpoczęciu debugowania, zostaną zebrane wszystkie informacje o kolejnej próbie logowania. Kliknij Odśwież, aby sprawdzić, czy więcej danych zostało zebranych, lub Zatrzymaj debugowanie, aby wyczyścić zebrane dane i zatrzymać bieżący proces debugowania."
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "Po zmianie odpowiedzi trzeba wybrać jakąś opcję, a następnie zaktualizować pytanie."
+  one_or_more_items_are_currently_being_imported_the_186fe069: "Co najmniej jeden element jest obecnie importowany. Wszystkie dostępne elementy zostaną wyświetlone w kursie poniżej."
   one_per_line_format_name_value_79647700: "Pojedynczo w linii. Format: nazwa=wartość"
   online_submission_type_file_uploads_24910d74: "Przesłanie zadania on-line Rodzaj - Pobieranie plików"
   online_submission_type_file_uploads_restrict_uploa_5ec7b263: "Przesłanie zadania on-line Rodzaj - Pobieranie plików - ogranicz przesłanie rodzajów plików"
@@ -14665,8 +14716,12 @@ pl:
   option_name_ba758e08: "%{option_name}"
   optionally_include_a_byte_order_mark_in_gradebook__555cc605: "Opcjonalnie uwzględniaj w eksportach dziennika oceny wg bajtów, aby można je było importować do programu Excel dla użytkowników w niektórych regionach."
   options: 
+    ? "false"
+    : Nie
     ? "no"
     : Nie
+    ? "true"
+    : Tak
     ? "yes"
     : Tak
   options_3ab0ea65: Opcje
@@ -15297,7 +15352,7 @@ pl:
           **Uwaga** gdy skonfigurujesz Kaltura z programem Canvas,
           musisz udać się do Konsoli Zarządzającej Kalgura i w "Ustawieniach"-
           Ustawienia Integracji" włączyć powiadomienia serwerów z
-          Powiadomienie URL o:
+          Powiadomienie URL o: 
           
           %{notification_url}
           
@@ -15951,6 +16006,11 @@ pl:
       jednocześnie w ramach kursu Canvas.
   provide_a_uri_to_your_idp_s_metadata_to_automatica_38e985bd: "Podaj adres URI do swoich metadanych IdP, aby automatycznie uzupełnić pozostałe pola. Jeśli Twoja szkoła należy do InCommon lub brytyjskiej Access Management Federation, podaj odpowiednio urn:mace:incommon lub http://ukfederation.org.uk jako adres URI metadanych oraz identyfikator obiektu szkoły."
   provide_a_uri_to_your_idp_s_metadata_to_automatica_6f81a3cd: "Podaj adres URI do metadanych IDP aby automatycznie wypełnić pozostałe pola. Jeśli szkoła jest częśćią InCommon określ urn:mace:incommon dla metadanych URI a także podaj identyfikator swojej jednostki szkolnej."
+  provide_the_url_to_your_saml_idp_discovery_service_daa80306: |-
+      Podaj adres URL dla usługi SAML IdP Discovery, która jest zgodna z protokołem 
+      *urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol*.
+      Aby wykorzystać odpowiedź z usługi Discovery, należy także skonfigurować dodatkowych
+      dostawców SAML.
   provide_tutorial_information_for_new_users_in_a_fl_c23462ac: "Podaj informacje szkoleniowe dla nowych użytkownik w wysuwanym menu."
   provider_attribute_b1cad655: "Właściwości dostawcy"
   provider_icon_5064fa6e: "Ikona zastrzeżenia"
@@ -16717,9 +16777,7 @@ pl:
             nie ma żadnych uprzednio zdefiniowanych zmiennych, więc wszyscy uczestnicy otrzymają
             to samo pytanie z tą samą odpowiedzią. Zobacz karta „zmienne”,
             aby uzyskać więcej informacji dotyczących zmiennych.
-        equation_variables2: |-
-            Zmienne również można określić w treści pytania za pomocą nawiasów 
-            („Ile wynosi [a] + [b]?”).  Dla każdej zmiennej widoczne będzie pole „Przykładowa wartość” oparte na ustawieniach zmiennych. Umożliwia to sprawdzenie własnych obliczeń i działania formuł. Na przykład, jeśli pytanie brzmi: „Ile wynosi [a] + 5?”, należy zdefiniować zmienną „a”.  Jeśli wartość zmiennej „a” wynosi na przykład 5,2, można napisać: %{example}. Dzięki tej formule można wygenerować dowolną liczbę zbiorów rozwiązań dla różnych wartości zmiennej „a” w każdym zbiorze.  Jeden z uczestników może otrzymać pytanie „Ile wynosi 5,2 + 5?”, a inny „Ile wynosi 9 + 5?”.
+        equation_variables2: "Można również zdefiniować zmienne w treści pytania, używając nawiasów (\"Ile to jest [a] + [b]?\"). W przypadku każdej zmiennej można sprawdzić \"wartość przykładową\" w oparciu o ustawienia zmiennych. Pozwala to sprawdzić własne obliczenia i upewnić się co do poprawnego działania wzorów. Jeśli na przykład pytanie brzmiało \"Ile wynosi [a] + 5?\", pojawi się prośba o zdefiniowanie zmiennej \"a\". Jeśli wartość przykładowa dla \"a\" wynosi 5,2, można napisać: %{example} Za pomocą tego wzoru można utworzyć dowolną liczbę zbiorów rozwiązań, korzystając z różnych wartości \"a\" w każdym zbiorze. Jeden uczestnik szkolenia może zobaczyć pytanie: \"Ile to jest 5,2 + 5?\", zaś inny: \"Ile to jest 9 + 5?\"."
         links: 
           functions: Funkcje
           intro: Wprowadzenie
@@ -18121,6 +18179,7 @@ pl:
   score_of_score_view_in_speedgrader_a7c1c954: "Wynik %{score}. Zobacz w programie SpeedGrader"
   score_out_of_points_84f44331: "(%{score} z %{points})"
   score_out_of_points_possible_88f370fd: "%{score} na %{points_possible} możliwych"
+  score_out_of_points_possible_points_bbaea991: "%{score} z %{points_possible} pkt"
   score_percent_11941c81: "%{score} procent"
   score_points_3c48e2a8: "%{score} punkty"
   score_pointspossible_bd57ea9e: "%{score}/%{pointsPossible}"
@@ -18580,9 +18639,9 @@ pl:
   set_of_grading_periods_545b37e9: "Zbiór okresów oceniania"
   set_some_up_now_1749bb44: "Ustaw niektóre teraz"
   set_up_how_your_proficiency_ratings_appear_inside__8139bb81: "\n\
-      \x20           Określ sposób wyświetlania ocen kompetencji w dzienniczku poziomu biegłości.\n\
-      \x20           Dostosuj liczbę ocen, poziom biegłości, punkty i kolory.\n\
-      \x20         "
+      \x20                 Skonfiguruj ocenę stopnia opanowania materiału w dzienniku ocen.\n\
+      \x20                 Dostosuj liczbę ocen, poziom opanowania materiału, punkty i kolory.\n\
+      \x20               "
   set_up_how_your_proficiency_ratings_appear_inside__f25d5da8: "Określ sposób wyświetlania ocen kompetencji w dzienniczku poziomu biegłości. Dostosuj liczbę ocen, poziom biegłości, punkty i kolory."
   settings: 
     recaptcha_settings: 
@@ -18924,7 +18983,7 @@ pl:
       mute_dialog: |-
           Czy na pewno chcesz ukryć to zadanie? Gdy zadanie
           jest ukryte, uczestnicy nie otrzymują nowych powiadomień
-          ani nie mogą zobaczyć:
+          ani nie mogą zobaczyć: 
           
           *  Powiadomień o zmianie oceny
           *  Komentarzy do przesłanych zadań
@@ -19356,6 +19415,7 @@ pl:
   show_details_194cf390: "Wyświetl informacje szczegółowe"
   show_exceptions_270ea1c5: "Pokaż wyjątki"
   show_final_grade_a95e14dc: "Pokaż ocenę końcową"
+  show_final_grade_override_8cde5803: "Pokaż zastąpienie oceny końcowej"
   show_groups_navigation_menu_1521d38d: "Pokaż menu nawigacji w grupach"
   show_inactive_enrollments_8f4c4824: "Pokaż nieaktywne zapisy"
   show_key_1fbf0c64: "Pokaż klucz"
@@ -19938,6 +19998,8 @@ pl:
   submissions_11e96106: "Przesłane zadania"
   submissions_base: 
     assignment_submitted: "Zadanie zostało dostarczone."
+    errors: 
+      no_report: "Nie można było odnaleźć raportu dot. przesłanego elementu"
     errors_update_failed: "Aktualizacja nie powiodła się"
   submissions_folder_9db8dadf: "Folder zgłoszonych zadań"
   submissions_folders_must_be_created_in_user_or_gro_aba44f76: "foldery zgłoszonych zadań muszą zostać utworzone w kontekście Użytkownika albo Grupy"
@@ -20080,6 +20142,7 @@ pl:
   take_the_survey_ada59508: "Wypełnij ankietę"
   take_the_survey_again_24ce22c2: "Ponownie wypełnij ankietę"
   teacher_5a73b637: Instruktor
+  teacher_count_teachers_a92f7199: "%{teacher_count} nauczycieli"
   teacher_s_fdefb2c: Nauczyciel(e)
   teacher_view_b2047bc6: "Widok nauczyciela"
   teachers_52e2423f: Instruktorzy
@@ -20168,6 +20231,7 @@ pl:
   test_cluster_only_70e61c19: "Tylko klaster testowy"
   testing_state_effd4a82: "Stan testowania"
   text_document_eacbcdb7: "Dokument tekstowy"
+  text_entry_e1808b2f: "Zapis tekstu"
   text_entry_submission_7b0ae0c5: "Przesłane zadanie w formie wpisu"
   text_entry_submission_cannot_be_empty_3d187cae: "Zgłoszenie z wprowadzonym tekstem nie może być puste"
   text_input_d3480b8c: "Wpisz tekst"
@@ -20207,7 +20271,7 @@ pl:
   the_following_errors_occurred_bdec1e44: "Wystąpiły następujące błędy:"
   the_following_fields_are_invalid_fields_b3565800: "Poniższe pola są nieprawidłowe: %{fields}"
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
-      Następujący uczestnicy nie zapisali zmian w rozwiązanych testach:
+      Następujący uczestnicy nie zapisali zmian w rozwiązanych testach: 
       
       %{users}
       Kontynuować?
@@ -20371,6 +20435,11 @@ pl:
   these_credentials_are_for_academic_benchmark_api_v_952718b1: "Te dane logowania są przeznaczone dla interfejsu Academic Benchmark API v1, który zostanie wycofany w przyszłym wydaniu."
   these_grading_periods_were_created_for_you_by_an_a_e977c2b5: "Poniższe okresy klasyfikacyjne zostały stworzone dla ciebie przez administratora."
   this_action_has_been_disabled_by_your_admin_5e34bfa0: "To działanie zostało wyłączone przez administratora."
+  this_allows_you_to_restrict_custom_javascript_that_e1e61bc3: |-
+      Pozwala to ograniczyć niestandardowy skrypt JavaScript, używany w instancji Canvas użytkownika.
+                   Jego aktywacja nastąpi w wyniku aktualizacji Polityki bezpieczeństwa treści (ang. Content Security Policy, CSP).
+                     Domeny zostaną dodane do białej listy (użytkownik będzie mógł je dodawać także ręcznie).
+                     Biała lista ma limit 100 domen.
   this_area_will_be_used_by_the_assessor_to_leave_co_98a5db8b: "Obszar służy oceniającemu do umieszczania komentarzy dotyczących tego kryterium."
   this_assignment_does_not_count_toward_the_final_gr_29ede05f: "To zadanie nie jest uwzględniane w ocenie końcowej"
   this_assignment_does_not_count_toward_the_final_gr_a5c238e2: "Dane zadanie nie zalicza się do oceny ostatecznej."
@@ -21257,6 +21326,7 @@ pl:
   upper_limit_of_range_c454a8f2: "Wyższy limit zakresu"
   upper_lower_56cad16c: "%{upper} - %{lower}"
   uri_redirect_uri_d4aad2b9: "URI: %{redirect_uri}"
+  url_8c4ff7d2: URL
   url_cc9398ca: "URL:"
   url_is_required_4689ed84: "Wymagany jest adres URL"
   url_preview_5d1f4a4e: "Podgląd adresu URL"
@@ -22219,6 +22289,7 @@ pl:
   you_do_not_have_permission_to_change_this_488c536: "Nie masz uprawnień wymaganych do zmiany tego"
   you_do_not_have_permission_to_invite_users_that_do_b7142404: "Nie masz uprawnień, aby zapraszać użytkowników, którzy jeszcze nie istnieją."
   you_do_not_have_permission_to_publish_this_course_ff361c82: "Nie posiadasz uprawnień do opublikowania tego kursu."
+  you_do_not_have_permissions_to_edit_this_moderated_3195294f: "Nie masz uprawnień wymaganych do edytowania tego moderowanego zadania."
   you_don_t_have_permission_to_manage_grades_for_thi_a9a1be3a: "Nie masz uprawnień do zarządzania ocenami dla tego kursu"
   you_have_been_given_extra_time_on_this_attempt_9d8bff6c: "Użytkownik otrzymał dodatkowy czas w tej próbie"
   you_have_changed_the_progression_requirements_for__6772bc89: "Zmieniono wymagania postępu dotyczące aktywnego kursu. Być może są uczestnicy, którzy już przeszli do tego modułu i do innych, które są z nim powiązane."

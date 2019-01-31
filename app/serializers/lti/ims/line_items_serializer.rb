@@ -29,7 +29,7 @@ module Lti::Ims
         label: @line_item.label,
         resourceId: @line_item.resource_id,
         tag: @line_item.tag,
-        ltiLinkId: @line_item.resource_link&.resource_link_id
+        resourceLinkId: @line_item.resource_link&.resource_link_id
       }.compact
     end
   end

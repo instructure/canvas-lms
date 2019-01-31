@@ -179,6 +179,11 @@
 #           "description": "Extra submission attempts allowed for the given user and assignment.",
 #           "example": 10,
 #           "type": "number"
+#         },
+#         "anonymous_id": {
+#           "description": "A unique short ID identifying this submission without reference to the owning user. Only included if the caller has administrator access for the current account.",
+#           "example": "acJ4Q",
+#           "type": "string"
 #         }
 #       }
 #     }
@@ -463,7 +468,7 @@ class SubmissionsApiController < ApplicationController
     if params[:grouped].present?
       scope = (@section || @context).all_student_enrollments.
         preload(:root_account, :sis_pseudonym, :user => :pseudonyms).
-        where(:user_id => student_ids)
+        where(:user_id => student_ids).order(:user_id)
       student_enrollments = Api.paginate(scope, self, polymorphic_url([:api_v1, @section || @context, :student_submissions]))
 
       submissions_scope = Submission.active.where(user_id: student_enrollments.map(&:user_id), assignment_id: assignments)
@@ -870,9 +875,16 @@ class SubmissionsApiController < ApplicationController
   #
   # A paginated list of students eligible to submit the assignment. The caller must have permission to view grades.
   #
+  # If anonymous grading is enabled for the current assignment and the allow_new_anonymous_id parameter is passed,
+  # the returned data will not include any values identifying the student, but will instead include an
+  # assignment-specific anonymous ID for each student.
+  #
   # Section-limited instructors will only see students in their own sections.
   #
-  # returns [UserDisplay]
+  # @returns [UserDisplay] if anonymous grading is not enabled for the assignment or if the
+  #   allow_new_anonymous_id parameter is not true
+  # @returns [AnonymousUserDisplay] if anonymous grading is enabled for the assignment and the
+  #   allow_new_anonymous_id parameter is true
   def gradeable_students
     if authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
       @assignment = @context.assignments.active.find(params[:assignment_id])

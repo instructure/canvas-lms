@@ -25,6 +25,7 @@ const defaultProps = () => ({
   permission: {enabled: true, locked: false, readonly: false, explicit: true},
   permissionName: 'add',
   permissionLabel: 'add',
+  onFocus: () => {},
   cleanFocus: () => {},
   inTray: false,
   setFocus: false,
@@ -37,6 +38,7 @@ const defaultProps = () => ({
 const disabledProps = () => ({
   permission: {enabled: false, locked: false, readonly: false, explicit: true},
   permissionName: 'add',
+  onFocus: () => {},
   permissionLabel: 'add',
   cleanFocus: () => {},
   inTray: false,
@@ -49,6 +51,7 @@ const disabledProps = () => ({
 
 const enabledAndLockedProps = () => ({
   permission: {enabled: true, locked: true, readonly: false, explicit: true},
+  onFocus: () => {},
   permissionName: 'add',
   permissionLabel: 'add',
   cleanFocus: () => {},
@@ -62,6 +65,7 @@ const enabledAndLockedProps = () => ({
 
 const disabledAndLockedProps = () => ({
   permission: {enabled: false, locked: true, readonly: false, explicit: true},
+  onFocus: () => {},
   permissionName: 'add',
   permissionLabel: 'add',
   cleanFocus: () => {},
@@ -75,6 +79,7 @@ const disabledAndLockedProps = () => ({
 
 const readOnly = () => ({
   permission: {enabled: false, locked: true, readonly: true, explicit: true},
+  onFocus: () => {},
   permissionName: 'add',
   permissionLabel: 'add',
   cleanFocus: () => {},

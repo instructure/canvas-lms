@@ -115,7 +115,6 @@ export default class DeveloperKeyScopes extends React.Component {
             this.props.requireScopes
             ? (
               <GridCol width="auto">
-                <ScreenReaderContent>{I18n.t('Add Scope')}</ScreenReaderContent>
                 <TextInput
                   label={<ScreenReaderContent>{searchEndpoints}</ScreenReaderContent>}
                   placeholder={searchEndpoints}

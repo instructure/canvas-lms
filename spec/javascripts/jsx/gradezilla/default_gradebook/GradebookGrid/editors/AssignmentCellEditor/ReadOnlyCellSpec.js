@@ -20,7 +20,7 @@ import React from 'react'
 import {mount} from 'enzyme'
 import ReadOnlyCell from 'jsx/gradezilla/default_gradebook/GradebookGrid/editors/AssignmentCellEditor/ReadOnlyCell'
 
-QUnit.module('ReadOnlyCell', suiteHooks => {
+QUnit.module('GradebookGrid ReadOnlyCell', suiteHooks => {
   let $container
   let props
   let wrapper
@@ -71,9 +71,9 @@ QUnit.module('ReadOnlyCell', suiteHooks => {
     $container.remove()
   })
 
-  QUnit.module('#render', () => {
+  QUnit.module('#render()', () => {
     function getRenderedGrade() {
-      return wrapper.find('.Grid__AssignmentRowCell__Content').text()
+      return wrapper.find('.Grid__GradeCell__Content').text()
     }
 
     test('sets focus on the tray button', () => {
@@ -138,7 +138,7 @@ QUnit.module('ReadOnlyCell', suiteHooks => {
     })
   })
 
-  QUnit.module('#handleKeyDown', () => {
+  QUnit.module('#handleKeyDown()', () => {
     test('skips SlickGrid default behavior when pressing enter on tray button', () => {
       wrapper = mountComponent()
       const continueHandling = simulateKeyDown(13) // enter on tray button (open tray)
@@ -146,7 +146,7 @@ QUnit.module('ReadOnlyCell', suiteHooks => {
     })
   })
 
-  QUnit.module('#gradeSubmission', () => {
+  QUnit.module('#gradeSubmission()', () => {
     test('has no effect', () => {
       wrapper = mountComponent()
       wrapper.instance().gradeSubmission()
@@ -154,7 +154,7 @@ QUnit.module('ReadOnlyCell', suiteHooks => {
     })
   })
 
-  QUnit.module('#focus', () => {
+  QUnit.module('#focus()', () => {
     test('sets focus on the tray button', () => {
       wrapper = mountComponent()
       wrapper.instance().focus()
@@ -162,7 +162,7 @@ QUnit.module('ReadOnlyCell', suiteHooks => {
     })
   })
 
-  QUnit.module('#isValueChanged', () => {
+  QUnit.module('#isValueChanged()', () => {
     test('returns false', () => {
       wrapper = mountComponent()
       strictEqual(wrapper.instance().isValueChanged(), false)
@@ -173,14 +173,14 @@ QUnit.module('ReadOnlyCell', suiteHooks => {
     test('calls onToggleSubmissionTrayOpen when clicked', () => {
       props.onToggleSubmissionTrayOpen = sinon.stub()
       wrapper = mountComponent()
-      wrapper.find('.Grid__AssignmentRowCell__Options button').simulate('click')
+      wrapper.find('.Grid__GradeCell__Options button').simulate('click')
       strictEqual(props.onToggleSubmissionTrayOpen.callCount, 1)
     })
 
     test('calls onToggleSubmissionTrayOpen with the student id and assignment id', () => {
       props.onToggleSubmissionTrayOpen = sinon.stub()
       wrapper = mountComponent()
-      wrapper.find('.Grid__AssignmentRowCell__Options button').simulate('click')
+      wrapper.find('.Grid__GradeCell__Options button').simulate('click')
       deepEqual(props.onToggleSubmissionTrayOpen.getCall(0).args, ['1101', '2301'])
     })
   })

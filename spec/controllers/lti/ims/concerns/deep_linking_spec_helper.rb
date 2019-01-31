@@ -26,8 +26,10 @@ RSpec.shared_context 'deep_linking_spec_helper' do
   let(:message) { 'some message' }
   let(:error_message) { 'error_message' }
   let(:alg) { :RS256 }
-  let(:iat) { Time.zone.now.to_i  }
+  let(:iat) { Time.zone.now.to_i }
   let(:exp) { 5.minutes.from_now.to_i }
+  let(:log) { 'log' }
+  let(:error_log) { 'error log' }
   let(:deep_linking_jwt) do
     body = {
       "iss" => iss,
@@ -40,7 +42,9 @@ RSpec.shared_context 'deep_linking_spec_helper' do
       "https://purl.imsglobal.org/spec/lti/claim/deployment_id" => deployment_id,
       "https://purl.imsglobal.org/spec/lti-dl/claim/content_items" => content_items,
       "https://purl.imsglobal.org/spec/lti-dl/claim/msg" => message,
-      "https://purl.imsglobal.org/spec/lti-dl/claim/errormsg" => error_message
+      "https://purl.imsglobal.org/spec/lti-dl/claim/errormsg" => error_message,
+      "https://purl.imsglobal.org/spec/lti-dl/claim/log" => log,
+      "https://purl.imsglobal.org/spec/lti-dl/claim/errorlog" => error_log
     }
     JSON::JWT.new(body).sign(private_jwk, alg).to_s
   end

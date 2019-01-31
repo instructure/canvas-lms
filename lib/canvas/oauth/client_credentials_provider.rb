@@ -51,7 +51,13 @@ module Canvas::Oauth
     private
 
     def validator
-      @validator ||= Canvas::Security::JwtValidator.new jwt: decoded_jwt, expected_aud: @expected_aud, full_errors: true, require_iss: true
+      @validator ||= Canvas::Security::JwtValidator.new(
+        jwt: decoded_jwt,
+        expected_aud: @expected_aud,
+        full_errors: true,
+        require_iss: true,
+        skip_jti_check: true
+      )
     end
 
     def allowed_scopes

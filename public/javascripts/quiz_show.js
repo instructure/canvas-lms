@@ -48,7 +48,7 @@ import AssignmentExternalTools from 'jsx/assignments/AssignmentExternalTools'
       if ($('#quiz_details').length) {
         return callback();
       } else {
-        return $.get($("#quiz_details_wrapper").data('url'), function(html) {
+        return $.get(ENV.QUIZ_DETAILS_URL, function(html) {
           $("#quiz_details_wrapper").html(html);
           callback();
         });

@@ -17,44 +17,44 @@
  */
 
 export default class GridHelper {
-  constructor (grid) {
-    this.grid = grid;
+  constructor(grid) {
+    this.grid = grid
   }
 
-  getColumnHeaderNode (columnId) {
-    return document.getElementById(this.grid.getUID() + columnId);
+  getColumnHeaderNode(columnId) {
+    return document.getElementById(this.grid.getUID() + columnId)
   }
 
-  syncScrollPositions () {
+  syncScrollPositions() {
     // The scrollable area of SlickGrid is synced when the body scrolls. The
     // header will be updated to match. However, this step is needed to match
     // the body scroll position to the header when the browser automatically
     // scrolls the header to reveal focused elements.
-    const $gridContainer = this.grid.getContainerNode();
-    const $headerContainer = $gridContainer.querySelector('.headerScroller_1');
-    const $bodyContainer = $gridContainer.querySelector('.viewport_1');
-    $bodyContainer.scrollLeft = $headerContainer.scrollLeft;
+    const $gridContainer = this.grid.getContainerNode()
+    const $headerContainer = $gridContainer.querySelector('.headerScroller_1')
+    const $bodyContainer = $gridContainer.querySelector('.viewport_1')
+    $bodyContainer.scrollLeft = $headerContainer.scrollLeft
   }
 
-  getBeforeGridNode () {
-    return this.grid.getContainerNode().firstChild;
+  getBeforeGridNode() {
+    return this.grid.getContainerNode().firstChild
   }
 
-  getAfterGridNode () {
-    return this.grid.getContainerNode().lastChild;
+  getAfterGridNode() {
+    return this.grid.getContainerNode().lastChild
   }
 
-  beginEdit () {
+  beginEdit() {
     if (this.grid.getOptions().editable) {
-      this.grid.editActiveCell();
+      this.grid.editActiveCell()
     }
   }
 
-  commitCurrentEdit () {
-    return this.grid.getEditorLock().commitCurrentEdit();
+  commitCurrentEdit() {
+    return this.grid.getEditorLock().commitCurrentEdit()
   }
 
-  focus () {
-    this.grid.focus();
+  focus() {
+    this.grid.focus()
   }
 }

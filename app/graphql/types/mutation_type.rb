@@ -24,4 +24,5 @@ class Types::MutationType < Types::ApplicationObjectType
     Sets the overridden final score for the associated enrollment, optionally limited to a specific
     grading period. This will supersede the computed final score/grade if present.
   DESC
+  field :update_assignment, mutation: Mutations::UpdateAssignment
 end

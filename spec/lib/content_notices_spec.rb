@@ -23,7 +23,7 @@ describe ContentNotices do
     def asset_string; "thing_1"; end
     include ContentNotices
     define_content_notice :foo, text: 'foo!'
-    define_content_notice :bar, template: 'some_template', should_show: ->(thing, user) { user == 'bob' }
+    define_content_notice :bar, text: 'baz', should_show: ->(thing, user) { user == 'bob' }
   end
 
   describe "content_notices" do

@@ -95,6 +95,10 @@
     background-color: var(--ic-brand-primary);
     font-weight: bold;
     color: $ic-color-light;
+
+    // offset focus ring so it doesn't blend in with background
+    &:focus { @include ic-focus-variant($offset: 0.0625rem); }
+
     &:hover, &:focus { background-color: var(--ic-brand-primary); }
     .nav-badge {
       background: $ic-color-light;

@@ -93,6 +93,14 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def extension_setting(type, property = nil)
+    val = calclulate_extension_setting(type, property)
+    if val && property == :icon_url
+      val = nil if (URI.parse(val) rescue nil).nil? # make sure it's a valid url
+    end
+    val
+  end
+
+  def calclulate_extension_setting(type, property = nil)
     return settings[property] unless type
     type = type.to_sym
     return settings[type] unless property && settings[type]

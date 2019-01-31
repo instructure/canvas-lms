@@ -101,22 +101,32 @@
 }
 
 .react-rubric .rubric-freeform {
-  padding: 0px 5px;
+  padding: 5px;
 }
 
-.react-rubric .edit-freeform-comments {
+.react-rubric .edit-freeform-comments-large {
   min-width: 15rem;
   padding: 1rem;
+}
+
+.react-rubric .edit-freeform-comments-small {
+  padding: 0.75rem;
+}
+
+.rating-all {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
 }
 
 .react-rubric .ratings .rating-tier-list {
   margin: 0;
   display: flex;
   flex-direction: row;
-  width: 100%;
-  height: 100%;
   margin-#{direction(left)}: -1px;
   border-collapse: collapse;
+  height: 100%;
 }
 
 .react-rubric .rating-tier {
@@ -187,6 +197,10 @@
 .react-rubric .react-assessing .rating-tier:hover {
   background-color: #ad9;
   cursor: pointer;
+}
+
+.rating-all-footer {
+    border-top: 1px solid #C7CDD1;
 }
 
 .react-rubric .graded-points {

@@ -251,7 +251,7 @@ describe "grades" do
       expect(fj('.rubric_assessments:visible .selected')).to include_text('10')
 
       # check rubric comment
-      expect(fj('.assessment-comments:visible div').text).to eq 'cool, yo'
+      expect(fj('.rubric-freeform:visible div')).to include_text 'cool, yo'
 
       # close first rubric
       scroll_into_view("a:contains('Close Rubric'):visible")
@@ -420,7 +420,7 @@ describe "grades" do
       expect(fj("span[data-selenium='rubric_total']:visible")).to include_text('2')
 
       # check rubric comment
-      expect(fj('.assessment-comments:visible div').text).to eq 'not bad, not bad'
+      expect(fj('.rubric-freeform:visible div')).to include_text 'not bad, not bad'
     end
 
     context "with outcome gradebook enabled" do

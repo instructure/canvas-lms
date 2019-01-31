@@ -46,7 +46,7 @@ class Message < ActiveRecord::Base
 
     delegate :deliver, :dispatch_at, :to => :message
     def message
-      @message ||= Message.where(:id => @id, :created_at => @created_at).first
+      @message ||= Message.where(:id => @id, :created_at => @created_at).first || Message.where(:id => @id).first
     end
   end
 

@@ -152,13 +152,13 @@ describe GradebookExporter do
         @teacher.enable_feature!(:autodetect_field_separators_for_gradebook_exports)
         @course.assignments.create!(title: "Verkefni 1", points_possible: 8.5)
         csv = exporter(locale: :is).to_csv
-        expect(csv).to match(/;8,5;/)
+        expect(csv).to match(/;8,50;/)
       end
 
       it "uses comma as the column separator when not asked to autodetect" do
         @course.assignments.create!(title: "Verkefni 1", points_possible: 8.5)
         csv = exporter(locale: :is).to_csv
-        expect(csv).to match(/,"8,5",/)
+        expect(csv).to match(/,"8,50",/)
       end
 
       it "prepends byte order mark with UTF-8 encoding when the user enables it" do
@@ -178,8 +178,8 @@ describe GradebookExporter do
       describe "grades" do
         before :each do
           @assignment = @course.assignments.create!(title: 'Verkefni 1', points_possible: 10, grading_type: 'gpa_scale')
-          student = student_in_course(course: @course, active_all: true).user
-          @assignment.grade_student(student, grader: @teacher, score: 7.5)
+          @student = student_in_course(course: @course, active_all: true).user
+          @assignment.grade_student(@student, grader: @teacher, score: 7.5)
         end
 
         context 'when forcing the field separator to be a semicolon' do
@@ -190,7 +190,7 @@ describe GradebookExporter do
           end
 
           it "localizes numbers" do
-            expect(@icsv[1]['Assignments Current Points']).to eq('7,5')
+            expect(@icsv[1]['Assignments Current Points']).to eq('7,50')
           end
 
           it "does not localize grading scheme grades for assignments" do
@@ -215,7 +215,7 @@ describe GradebookExporter do
             end
 
             it "localizes numbers" do
-              expect(@icsv[1]['Assignments Current Points']).to eq('7,5')
+              expect(@icsv[1]['Assignments Current Points']).to eq('7,50')
             end
 
             it "does not localize grading scheme grades for assignments" do
@@ -235,7 +235,7 @@ describe GradebookExporter do
             end
 
             it "localizes numbers" do
-              expect(@icsv[1]['Assignments Current Points']).to eq('7,5')
+              expect(@icsv[1]['Assignments Current Points']).to eq('7,50')
             end
 
             it "does not localize grading scheme grades for assignments" do
@@ -246,6 +246,15 @@ describe GradebookExporter do
               expect(@icsv[1]["Final Grade"]).to eq('C')
             end
           end
+        end
+
+        it "rounds scores to two decimal places" do
+          @assignment.update!(grading_type: 'points')
+          @assignment.grade_student(@student, grader: @teacher, score: 7.555)
+          csv = exporter.to_csv
+          parsed_csv = CSV.parse(csv, headers: true)
+
+          expect(parsed_csv[1]["#{@assignment.title} (#{@assignment.id})"]).to eq "7.56"
         end
       end
     end
@@ -375,7 +384,7 @@ describe GradebookExporter do
         rows = CSV.parse(csv, headers: true)
         assignment_data_first_student = rows[1].find { |column_info| column_info.first.include? "assmt" }
         assignment_data_second_student = rows[2].find { |column_info| column_info.first.include? "assmt" }
-        expect([assignment_data_first_student.second, assignment_data_second_student.second]).to match_array(["1.0", "2.0"])
+        expect([assignment_data_first_student.second, assignment_data_second_student.second]).to match_array(["1.00", "2.00"])
       end
 
       it "does not include inactive students if show inactive enrollments is set to false" do

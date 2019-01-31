@@ -15,8 +15,19 @@ module Canvas::Oauth
       end
 
       def generate_token
-        @_token.access_token.regenerate_access_token
+        # don't regenerate if recently changed
+        if update_recently_refreshed_tokens? || @_token.access_token.updated_at < recent_refresh_threshold
+          @_token.access_token.regenerate_access_token
+        end
         @_token
+      end
+
+      def update_recently_refreshed_tokens?
+        Rails.env.test? # keep old behavior only for specs
+      end
+
+      def recent_refresh_threshold
+        Setting.get("oauth_refresh_token_spam_interval", "5").to_i.seconds.ago
       end
     end
   end

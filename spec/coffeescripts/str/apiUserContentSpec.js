@@ -35,6 +35,12 @@ test('moves mathml into a screenreader element', () => {
   ok(output.includes('<span class="hidden-readable"><math '))
 })
 
+test('prevents XSS on data-mathml content', () => {
+  const xss_mathml = "<img class='equation_image' data-mathml='<img src=x onerror=prompt(document.cookie); />'>"
+  const output = apiUserContent.convert(xss_mathml)
+  ok(!output.includes('onerror'))
+})
+
 test('mathml need not be screenreadered if editing content (this would start an update loop)', () => {
   const output = apiUserContent.convert(mathml_html, {forEditing: true})
   ok(!output.includes('<span class="hidden-readable"><math '))

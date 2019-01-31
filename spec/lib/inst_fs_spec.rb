@@ -42,11 +42,46 @@ describe InstFS do
         @attachment = attachment_with_context(user_model)
         @attachment.instfs_uuid = 1
         @attachment.filename = "test.txt"
+        @attachment.display_name = nil
       end
 
       it "constructs url properly" do
         expect(InstFS.authenticated_url(@attachment, {}))
-          .to match("#{@app_host}/files/#{@attachment.instfs_uuid}")
+          .to match("#{@app_host}/files/#{@attachment.instfs_uuid}/#{@attachment.filename}")
+      end
+
+      it "prefers the display_name over filename if different" do
+        @attachment.display_name = "renamed.txt"
+        expect(InstFS.authenticated_url(@attachment, {}))
+          .to match("#{@app_host}/files/#{@attachment.instfs_uuid}/#{@attachment.display_name}")
+      end
+
+      it "URI encodes the embedded file name" do
+        @attachment.display_name = "안녕 세상"
+        url = InstFS.authenticated_url(@attachment, {})
+        filename_segment = URI.parse(url).path.split('/').last
+        expect(CGI.unescape(filename_segment)).to eq(@attachment.display_name)
+      end
+
+      it "doesn't use `+` for spaces in encoded file name" do
+        @attachment.display_name = "foo bar.txt"
+        url = InstFS.authenticated_url(@attachment, {})
+        filename_segment = URI.parse(url).path.split('/').last
+        expect(filename_segment).to eq("foo%20bar.txt")
+      end
+
+      it "doesn't leave `+` unencoded in encoded file name" do
+        @attachment.display_name = "foo+bar.txt"
+        url = InstFS.authenticated_url(@attachment, {})
+        filename_segment = URI.parse(url).path.split('/').last
+        expect(filename_segment).to eq("foo%2Bbar.txt")
+      end
+
+      it "doesn't leave `?` unencoded in encoded file name" do
+        @attachment.display_name = "foo?bar.txt"
+        url = InstFS.authenticated_url(@attachment, {})
+        filename_segment = URI.parse(url).path.split('/').last
+        expect(filename_segment).to eq("foo%3Fbar.txt")
       end
 
       it "passes download param" do

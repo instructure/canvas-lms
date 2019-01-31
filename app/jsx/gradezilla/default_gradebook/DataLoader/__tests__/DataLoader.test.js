@@ -20,7 +20,7 @@ import sinon from 'sinon'
 
 import FakeServer, {paramsFromRequest, pathFromRequest} from '../../../../__tests__/FakeServer'
 import DataLoader from '../../../DataLoader'
-import * as FinalGradeOverrideApi from '../../apis/FinalGradeOverrideApi'
+import * as FinalGradeOverrideApi from '../../FinalGradeOverrides/FinalGradeOverrideApi'
 
 describe('Gradebook DataLoader', () => {
   const exampleData = {
@@ -116,7 +116,9 @@ describe('Gradebook DataLoader', () => {
       .returns(Promise.resolve({finalGradeOverrides: exampleData.finalGradeOverrides}))
 
     gradebook = {
-      updateFinalGradeOverrides: sinon.stub()
+      finalGradeOverrides: {
+        setGrades: sinon.stub()
+      }
     }
   })
 
@@ -374,12 +376,12 @@ describe('Gradebook DataLoader', () => {
 
       it('updates Gradebook when the final grade overrides have loaded', async () => {
         await loadGradebookData({getFinalGradeOverrides: true})
-        expect(gradebook.updateFinalGradeOverrides.callCount).toEqual(1)
+        expect(gradebook.finalGradeOverrides.setGrades.callCount).toEqual(1)
       })
 
       it('updates Gradebook with the loaded final grade overrides', async () => {
         await loadGradebookData({getFinalGradeOverrides: true})
-        const [finalGradeOverrides] = gradebook.updateFinalGradeOverrides.lastCall.args
+        const [finalGradeOverrides] = gradebook.finalGradeOverrides.setGrades.lastCall.args
         expect(finalGradeOverrides).toEqual(exampleData.finalGradeOverrides)
       })
     })

@@ -31,6 +31,8 @@ import natcompare from 'compiled/util/natcompare'
 import AssignmentResult from './AssignmentResult'
 import UnassessedAssignment from './UnassessedAssignment'
 import OutcomePopover from './OutcomePopover'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
 import * as shapes from './shapes'
 
 export default class Outcome extends React.Component {
@@ -51,8 +53,12 @@ export default class Outcome extends React.Component {
 
   renderHeader () {
     const { outcome, outcomeProficiency } = this.props
-    const { assignments, mastered, title } = outcome
+    const { assignments, mastered, title, score, points_possible, results } = outcome
     const numAlignments = assignments.length
+    const pillAttributes = {margin: "0 0 0 x-small", text: I18n.t('Not mastered')}
+    if (mastered) {
+        Object.assign(pillAttributes, {text: I18n.t('Mastered'), variant: "success"});
+    }
 
     return (
       <Flex direction="row" justifyItems="space-between" data-selenium="outcome">
@@ -77,8 +83,13 @@ export default class Outcome extends React.Component {
         </FlexItem>
         <FlexItem>
         {
-          mastered ? <Pill text={I18n.t('Mastered')} variant="success" /> : <Pill text={I18n.t('Not mastered')} />
+          (_.isNumber(score) && !_.every(results, ['hide_points', true]) ) &&
+          <span>
+            <PresentationContent><Text size="medium">{score}/{points_possible}</Text></PresentationContent>
+            <ScreenReaderContent>{I18n.t('%{score} out of %{points_possible} points', { score, points_possible})}</ScreenReaderContent>
+          </span>
         }
+        <Pill {...pillAttributes} />
         </FlexItem>
       </Flex>
     )

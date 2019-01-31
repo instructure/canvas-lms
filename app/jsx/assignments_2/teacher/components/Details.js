@@ -17,11 +17,19 @@
  */
 
 import React from 'react'
+import {bool} from 'prop-types'
+
 import apiUserContent from 'compiled/str/apiUserContent'
 import {TeacherAssignmentShape} from '../assignmentData'
+import Overrides from './Overrides/Overrides'
+import View from '@instructure/ui-layout/lib/components/View'
 
 Details.propTypes = {
-  assignment: TeacherAssignmentShape.isRequired
+  assignment: TeacherAssignmentShape.isRequired,
+  readOnly: bool
+}
+Details.defaultProps = {
+  readOnly: true
 }
 
 export default function Details(props) {
@@ -31,5 +39,13 @@ export default function Details(props) {
   const convertedHtml = apiUserContent.convert(description)
 
   // html is sanitized on the server side
-  return <div dangerouslySetInnerHTML={{__html: convertedHtml}} />
+  // TODO: when readOnly=false, render the rce
+  return (
+    <View as="div" margin="0">
+      <View as="div" margin="small 0">
+        <div dangerouslySetInnerHTML={{__html: convertedHtml}} />
+      </View>
+      <Overrides assignment={props.assignment} readOnly={props.readOnly} />
+    </View>
+  )
 }

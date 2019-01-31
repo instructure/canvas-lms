@@ -38,7 +38,8 @@ define [
     @optionProperty 'unpublishText'
 
     # This indicates that the button is disabled specifically because it is
-    # associated with an assignment that the current user cannot moderate
+    # associated with a moderated assignment that the current user does not
+    # have the Select Final Grade permission.
     @optionProperty 'disabledForModeration'
 
     tagName:   'button'
@@ -214,9 +215,10 @@ define [
 
       @$text.html "&nbsp;#{htmlEscape(options.text)}"
 
-      # uneditable because the current user cannot moderate
+      # uneditable because the current user does not have the Select Final
+      # Grade permission.
       if @model.get('disabledForModeration')
-        @disableWithMessage('You are not the selected moderator for this assignment')
+        @disableWithMessage('You do not have permissions to edit this moderated assignment')
 
       # unpublishable (i.e., able to be unpublished)
       else if !@model.get('unpublishable')? or @model.get('unpublishable')

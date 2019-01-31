@@ -28,6 +28,8 @@ import 'jqueryui/dialog'
 import '../../jquery.instructure_misc_plugins'
 import Links from 'tinymce_plugins/instructure_links/links'
 
+  let deepLinkingListener
+
   var TRANSLATIONS = {
     embed_from_external_tool: I18n.t('embed_from_external_tool', '"Embed content from External Tool"'),
     more_external_tools: htmlEscape(I18n.t('more_external_tools', "More External Tools"))
@@ -168,6 +170,14 @@ import Links from 'tinymce_plugins/instructure_links/links'
             $dialog.scrollLeft(0).scrollTop(0)
           });
       }
+
+      // Handle deep linking responses
+      deepLinkingListener = deepLinkingListener || ExternalToolsHelper.createDeepLinkingListener(
+        $dialog.data('editor') || ed,
+        'external_tool_button_dialog'
+      )
+      window.removeEventListener("message", deepLinkingListener)
+      window.addEventListener("message", deepLinkingListener, false)
 
       $(window).unbind("externalContentReady");
       $(window).bind("externalContentReady", function (event, data) {

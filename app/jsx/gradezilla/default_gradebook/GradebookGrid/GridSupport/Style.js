@@ -19,40 +19,40 @@
 import {direction} from '../../../../shared/helpers/rtlHelper'
 
 export default class Style {
-  constructor (grid, gridSupport) {
-    this.grid = grid;
-    this.gridSupport = gridSupport;
+  constructor(grid, gridSupport) {
+    this.grid = grid
+    this.gridSupport = gridSupport
   }
 
-  initialize () {
-    this.$styles = document.createElement('style');
-    this.$styles.id = `GridSupport__Styles--${this.grid.getUID()}`;
-    document.body.appendChild(this.$styles);
+  initialize() {
+    this.$styles = document.createElement('style')
+    this.$styles.id = `GridSupport__Styles--${this.grid.getUID()}`
+    document.body.appendChild(this.$styles)
 
     this.gridSupport.events.onActiveLocationChanged.subscribe((_event, location) => {
-      this.updateClassesForActiveLocation(location);
-    });
+      this.updateClassesForActiveLocation(location)
+    })
   }
 
-  destroy () {
+  destroy() {
     if (this.$styles) {
-      this.$styles.remove();
-      this.$styles = null;
+      this.$styles.remove()
+      this.$styles = null
     }
   }
 
-  updateClassesForActiveLocation (location) {
+  updateClassesForActiveLocation(location) {
     if (location.region === 'header') {
-      this.buildClassesForHeader(location);
+      this.buildClassesForHeader(location)
     } else if (location.region === 'body') {
-      this.buildClassesForBody(location);
+      this.buildClassesForBody(location)
     } else {
-      this.$styles.innerHTML = '';
+      this.$styles.innerHTML = ''
     }
   }
 
-  buildClassesForHeader (location) {
-    const { options } = this.gridSupport;
+  buildClassesForHeader(location) {
+    const {options} = this.gridSupport
     this.$styles.innerHTML = `
       .slick-header .slick-header-column.${location.columnId} {
         border: 1px solid ${options.activeBorderColor};
@@ -65,11 +65,11 @@ export default class Style {
       .slick-row.last-row .slick-cell.${location.columnId} {
         border-bottom: 1px solid ${options.activeBorderColor};
       }
-    `;
+    `
   }
 
-  buildClassesForBody (location) {
-    const { options } = this.gridSupport;
+  buildClassesForBody(location) {
+    const {options} = this.gridSupport
     this.$styles.innerHTML = `
       .slick-header .slick-header-column.${location.columnId}:not(.primary-column) {
         border: 1px solid ${options.activeBorderColor};
@@ -82,6 +82,6 @@ export default class Style {
       .slick-row.last-row .slick-cell.${location.columnId}:not(.primary-column):not(.active) {
         border-bottom: 1px solid ${options.activeBorderColor};
       }
-    `;
+    `
   }
 }

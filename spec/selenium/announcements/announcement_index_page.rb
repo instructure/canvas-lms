@@ -140,6 +140,7 @@ class AnnouncementIndex
 
     def toggle_lock
       lock_button.click
+      wait_for_ajaximations
     end
 
     def click_delete

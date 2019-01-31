@@ -85,7 +85,7 @@ class AssignmentConfigurationTools extends React.Component {
         }
         this.setState({
           tools: data,
-          toolType: this.props.selectedToolType,
+          toolType: this.props.selectedToolType || '',
           toolLaunchUrl: prevToolLaunch || 'about:blank'
         })
       }, self),
@@ -121,7 +121,7 @@ class AssignmentConfigurationTools extends React.Component {
     const selectBox = this.similarityDetectionTool
     this.setState({
       toolLaunchUrl: selectBox[selectBox.selectedIndex].getAttribute('data-launch'),
-      toolType: selectBox[selectBox.selectedIndex].getAttribute('data-type')
+      toolType: selectBox[selectBox.selectedIndex].getAttribute('data-type') || ''
     })
   }
 

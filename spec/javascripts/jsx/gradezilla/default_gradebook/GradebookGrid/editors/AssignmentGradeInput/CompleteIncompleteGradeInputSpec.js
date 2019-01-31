@@ -16,13 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* eslint-disable qunit/no-identical-names */
-
 import React from 'react'
 import {mount} from 'enzyme'
-import GradeInput from 'jsx/gradezilla/default_gradebook/GradebookGrid/editors/AssignmentCellEditor/GradeInput'
+import AssignmentGradeInput from 'jsx/gradezilla/default_gradebook/GradebookGrid/editors/AssignmentGradeInput'
 
-QUnit.module('GradeInput using CompleteIncompleteGradeInput', suiteHooks => {
+QUnit.module('GradebookGrid AssignmentGradeInput using CompleteIncompleteGradeInput', suiteHooks => {
   let $container
   let props
   let $menuContent
@@ -69,7 +67,7 @@ QUnit.module('GradeInput using CompleteIncompleteGradeInput', suiteHooks => {
   })
 
   function mountComponent() {
-    wrapper = mount(<GradeInput {...props} />, {attachTo: $container})
+    wrapper = mount(<AssignmentGradeInput {...props} />, {attachTo: $container})
   }
 
   function clickToOpen() {
@@ -95,7 +93,9 @@ QUnit.module('GradeInput using CompleteIncompleteGradeInput', suiteHooks => {
   function clickMenuItem(optionText) {
     return new Promise(resolve => {
       resolveClose = resolve
-      getRenderedOptions().find($option => $option.textContent === optionText).click()
+      getRenderedOptions()
+        .find($option => $option.textContent === optionText)
+        .click()
     })
   }
 
@@ -104,26 +104,29 @@ QUnit.module('GradeInput using CompleteIncompleteGradeInput', suiteHooks => {
   }
 
   function getTextValue() {
-    const text = wrapper.find('.Grid__AssignmentRowCell__CompleteIncompleteValue').at(0)
+    const text = wrapper.find('.Grid__GradeCell__CompleteIncompleteValue').at(0)
     return text.getDOMNode().textContent
   }
 
   test('adds the CompleteIncompleteInput-suffix class to the container', () => {
     mountComponent()
     const classList = wrapper.getDOMNode().classList
-    strictEqual(classList.contains('Grid__AssignmentRowCell__CompleteIncompleteInput'), true)
+    strictEqual(classList.contains('Grid__GradeCell__CompleteIncompleteInput'), true)
   })
 
   test('renders a text container', () => {
     mountComponent()
-    const container = wrapper.find('.Grid__AssignmentRowCell__CompleteIncompleteValue')
+    const container = wrapper.find('.Grid__GradeCell__CompleteIncompleteValue')
     strictEqual(container.length, 1)
   })
 
   test('optionally disables the menu button', () => {
     props.disabled = true
     mountComponent()
-    const button = wrapper.find('button').at(0).getDOMNode()
+    const button = wrapper
+      .find('button')
+      .at(0)
+      .getDOMNode()
     strictEqual(button.disabled, true)
   })
 
@@ -264,83 +267,70 @@ QUnit.module('GradeInput using CompleteIncompleteGradeInput', suiteHooks => {
         mountComponent()
       })
 
-      test('sets enteredAs to "passFail"', () => (
+      test('sets enteredAs to "passFail"', () =>
         openAndClick('Complete').then(() => {
           equal(getGradeInfo().enteredAs, 'passFail')
-        })
-      ))
+        }))
 
-      test('sets grade to "complete" when "Complete" is clicked', () => (
+      test('sets grade to "complete" when "Complete" is clicked', () =>
         openAndClick('Complete').then(() => {
           equal(getGradeInfo().grade, 'complete')
-        })
-      ))
+        }))
 
-      test('sets score to points possible when "Complete" is clicked', () => (
+      test('sets score to points possible when "Complete" is clicked', () =>
         openAndClick('Complete').then(() => {
           equal(getGradeInfo().score, 10)
-        })
-      ))
+        }))
 
-      test('sets excused to false when "Complete" is clicked', () => (
+      test('sets excused to false when "Complete" is clicked', () =>
         openAndClick('Complete').then(() => {
           equal(getGradeInfo().excused, false)
-        })
-      ))
+        }))
 
-      test('sets grade to "incomplete" when "Incomplete" is clicked', () => (
+      test('sets grade to "incomplete" when "Incomplete" is clicked', () =>
         openAndClick('Incomplete').then(() => {
           equal(getGradeInfo().grade, 'incomplete')
-        })
-      ))
+        }))
 
-      test('sets score to 0 when "Incomplete" is clicked', () => (
+      test('sets score to 0 when "Incomplete" is clicked', () =>
         openAndClick('Incomplete').then(() => {
           equal(getGradeInfo().score, 0)
-        })
-      ))
+        }))
 
-      test('sets excused to false when "Incomplete" is clicked', () => (
+      test('sets excused to false when "Incomplete" is clicked', () =>
         openAndClick('Incomplete').then(() => {
           equal(getGradeInfo().excused, false)
-        })
-      ))
+        }))
 
-      test('sets grade to null when "Ungraded" is clicked', () => (
+      test('sets grade to null when "Ungraded" is clicked', () =>
         openAndClick('Ungraded').then(() => {
           equal(getGradeInfo().grade, null)
-        })
-      ))
+        }))
 
-      test('sets score to null when "Ungraded" is clicked', () => (
+      test('sets score to null when "Ungraded" is clicked', () =>
         openAndClick('Ungraded').then(() => {
           equal(getGradeInfo().score, null)
-        })
-      ))
+        }))
 
-      test('sets excused to false when "Ungraded" is clicked', () => (
+      test('sets excused to false when "Ungraded" is clicked', () =>
         openAndClick('Ungraded').then(() => {
           equal(getGradeInfo().excused, false)
-        })
-      ))
+        }))
 
-      test('sets grade to null when "Excused" is clicked', () => (
+      test('sets grade to null when "Excused" is clicked', () =>
         openAndClick('Excused').then(() => {
           equal(getGradeInfo().grade, null)
-        })
-      ))
+        }))
 
-      test('sets score to null when "Excused" is clicked', () => (
+      test('sets score to null when "Excused" is clicked', () =>
         openAndClick('Excused').then(() => {
           equal(getGradeInfo().score, null)
-        })
-      ))
+        }))
 
-      test('sets excused to true when "Excused" is clicked', () => (
+      test('sets excused to true when "Excused" is clicked', () =>
         openAndClick('Excused').then(() => {
           equal(getGradeInfo().excused, true)
-        })
-      ))
+        }))
     })
   })
 
@@ -348,7 +338,13 @@ QUnit.module('GradeInput using CompleteIncompleteGradeInput', suiteHooks => {
     test('sets focus on the button', () => {
       mountComponent()
       wrapper.instance().focus()
-      strictEqual(document.activeElement, wrapper.find('button').at(0).getDOMNode())
+      strictEqual(
+        document.activeElement,
+        wrapper
+          .find('button')
+          .at(0)
+          .getDOMNode()
+      )
     })
   })
 
@@ -359,7 +355,11 @@ QUnit.module('GradeInput using CompleteIncompleteGradeInput', suiteHooks => {
       mountComponent()
       const handleKeyDown = action => wrapper.instance().handleKeyDown({...action})
       // return false to allow the popover menu to open
-      wrapper.find('button').at(0).getDOMNode().focus()
+      wrapper
+        .find('button')
+        .at(0)
+        .getDOMNode()
+        .focus()
       strictEqual(handleKeyDown(ENTER), false)
     })
   })

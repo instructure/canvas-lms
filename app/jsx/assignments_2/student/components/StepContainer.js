@@ -17,16 +17,23 @@
  */
 
 import I18n from 'i18n!assignments_2_student_header_date_title'
+import {boolean, string} from 'prop-types'
+import Text from '@instructure/ui-elements/lib/components/Text'
 
 import React from 'react'
 import Steps from '../../shared/Steps'
 import StepItem from '../../shared/Steps/StepItem'
 
-function availableStepContainer() {
+function availableStepContainer(props) {
   return (
     <div className="steps-container">
-      <Steps>
-        <StepItem label={I18n.t('Avaible')} status="complete" />
+      {props.isCollapsed && (
+        <div className="steps-main-status-label">
+          <Text weight="bold">{props.collapsedLabel}</Text>
+        </div>
+      )}
+      <Steps isCollapsed={props.isCollapsed}>
+        <StepItem label={I18n.t('Available')} status="complete" />
         <StepItem
           status="in-progress"
           label={status =>
@@ -48,10 +55,20 @@ function availableStepContainer() {
   )
 }
 
-function unavailableStepContainer() {
+availableStepContainer.propTypes = {
+  isCollapsed: boolean,
+  collapsedLabel: string
+}
+
+function unavailableStepContainer(props) {
   return (
     <div className="steps-container">
-      <Steps>
+      {props.isCollapsed && (
+        <div className="steps-main-status-label">
+          <Text weight="bold">{props.collapsedLabel}</Text>
+        </div>
+      )}
+      <Steps isCollapsed={props.isCollapsed}>
         <StepItem label={I18n.t('Unavailable')} status="unavailable" />
         <StepItem label={I18n.t('Upload')} />
         <StepItem label={I18n.t('Submit')} />
@@ -61,14 +78,19 @@ function unavailableStepContainer() {
   )
 }
 
+unavailableStepContainer.propTypes = {
+  isCollapsed: boolean,
+  collapsedLabel: string
+}
+
 function StepContainer(props) {
-  const {assignment} = props
+  const {assignment, isCollapsed, collapsedLabel} = props
 
   // TODO render the step-container based on the actual assignment data.
   if (assignment.lockInfo.isLocked) {
-    return unavailableStepContainer()
+    return unavailableStepContainer({isCollapsed, collapsedLabel})
   } else {
-    return availableStepContainer()
+    return availableStepContainer({isCollapsed, collapsedLabel})
   }
 }
 

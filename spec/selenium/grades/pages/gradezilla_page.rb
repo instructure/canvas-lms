@@ -519,6 +519,24 @@ class Gradezilla
       gradebook_settings_button.click
     end
 
+    def scores_scraped
+      class_names = ff('.total-cell.total_grade').map{ |grade| fxpath('..', grade).attribute("class") }
+      user_ids = class_names.map{|name| name.match('student_([0-9]+)')[1]}
+      total_grades = ff('.total-cell.total_grade .grades').map{ |grade| grade.text.split("%")[0] }
+      total_grades.map.with_index{ |grade, index| { user_id: user_ids[index].to_i, score: grade.to_f } }
+    end
+
+    def scores_api(course)
+      scores = Score.joins(:enrollment).merge(course.student_enrollments).where(course_score: true)
+      enrollments = course.student_enrollments
+      scores.map do |score|
+        {
+          user_id: enrollments.find(score.enrollment_id).user_id,
+          score: score.current_score
+        }
+      end
+    end
+
     # -----------------------NEW-----------------------
 
     # STUDENT COLUMN HEADER OPTIONS

@@ -22,7 +22,7 @@ import 'jquery.ajaxJSON'
 import I18n from 'i18n!gradebook'
 import cheaterDepaginate from '../../../shared/CheatDepaginator'
 import {showFlashAlert} from '../../../shared/FlashAlert'
-import {getFinalGradeOverrides} from '../apis/FinalGradeOverrideApi'
+import {getFinalGradeOverrides} from '../FinalGradeOverrides/FinalGradeOverrideApi'
 
 const submissionsParams = {
   exclude_response_fields: ['preview_url'],
@@ -168,7 +168,7 @@ export default class StudentContentDataLoader {
     if (this.options.getFinalGradeOverrides) {
       finalGradeOverridesRequest = getFinalGradeOverrides(this.options.courseId).then(
         ({finalGradeOverrides}) => {
-          this.options.gradebook.updateFinalGradeOverrides(finalGradeOverrides)
+          this.options.gradebook.finalGradeOverrides.setGrades(finalGradeOverrides)
         }
       )
     }

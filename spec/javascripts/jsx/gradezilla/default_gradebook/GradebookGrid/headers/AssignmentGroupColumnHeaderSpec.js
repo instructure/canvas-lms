@@ -23,7 +23,7 @@ import AssignmentGroupColumnHeader from 'jsx/gradezilla/default_gradebook/Gradeb
 import {blurElement, getMenuContent, getMenuItem} from './ColumnHeaderSpecHelpers'
 
 /* eslint-disable qunit/no-identical-names */
-QUnit.module('AssignmentGroupColumnHeader', suiteHooks => {
+QUnit.module('GradebookGrid AssignmentGroupColumnHeader', suiteHooks => {
   let $container
   let $menuContent
   let component
@@ -253,13 +253,16 @@ QUnit.module('AssignmentGroupColumnHeader', suiteHooks => {
         })
 
         // TODO: GRADE-____
-        QUnit.skip('does not call the .sortBySetting.onSortByGradeAscending callback when already selected', () => {
-          props.sortBySetting.settingKey = 'grade'
-          props.sortBySetting.direction = 'ascending'
-          mountAndOpenOptionsMenu()
-          getSortByOption('Grade - Low to High').click()
-          strictEqual(props.sortBySetting.onSortByGradeAscending.callCount, 0)
-        })
+        QUnit.skip(
+          'does not call the .sortBySetting.onSortByGradeAscending callback when already selected',
+          () => {
+            props.sortBySetting.settingKey = 'grade'
+            props.sortBySetting.direction = 'ascending'
+            mountAndOpenOptionsMenu()
+            getSortByOption('Grade - Low to High').click()
+            strictEqual(props.sortBySetting.onSortByGradeAscending.callCount, 0)
+          }
+        )
       })
     })
 
@@ -315,13 +318,16 @@ QUnit.module('AssignmentGroupColumnHeader', suiteHooks => {
         })
 
         // TODO: GRADE-____
-        QUnit.skip('does not call the .sortBySetting.onSortByGradeDescending callback when already selected', () => {
-          props.sortBySetting.settingKey = 'grade'
-          props.sortBySetting.direction = 'ascending'
-          mountAndOpenOptionsMenu()
-          getSortByOption('Grade - High to Low').click()
-          strictEqual(props.sortBySetting.onSortByGradeDescending.callCount, 0)
-        })
+        QUnit.skip(
+          'does not call the .sortBySetting.onSortByGradeDescending callback when already selected',
+          () => {
+            props.sortBySetting.settingKey = 'grade'
+            props.sortBySetting.direction = 'ascending'
+            mountAndOpenOptionsMenu()
+            getSortByOption('Grade - High to Low').click()
+            strictEqual(props.sortBySetting.onSortByGradeDescending.callCount, 0)
+          }
+        )
       })
     })
   })
@@ -412,3 +418,4 @@ QUnit.module('AssignmentGroupColumnHeader', suiteHooks => {
     })
   })
 })
+/* eslint-enable qunit/no-identical-names */

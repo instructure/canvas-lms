@@ -30,9 +30,6 @@ class Conversation < ActiveRecord::Base
   validates_length_of :subject, :maximum => maximum_string_length, :allow_nil => true
 
   attr_accessor :latest_messages_from_stream_item
-  self.send_to_stream_update_block = lambda { |conversation|
-    User.where(:id => conversation.conversation_message_participants.distinct.except(:order).pluck(:user_id)).to_a
-  }
 
   def participants(reload = false)
     if !@participants || reload

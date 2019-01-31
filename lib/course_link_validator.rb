@@ -223,10 +223,10 @@ class CourseLinkValidator
 
   # yields a hash containing the url and an error type if the url is invalid
   def find_invalid_link(url)
+    return if url.start_with?('mailto:')
     unless result = self.visited_urls[url]
       begin
         if ImportedHtmlConverter.relative_url?(url) || (self.domain_regex && url.match(self.domain_regex))
-
           if valid_route?(url)
             if url.match(/\/courses\/(\d+)/) && self.course.id.to_s != $1
               result = :course_mismatch
@@ -236,7 +236,7 @@ class CourseLinkValidator
           else
             result = :unreachable
           end
-        elsif !url.start_with?('mailto:')
+        else
           unless reachable_url?(url)
             result = :unreachable
           end

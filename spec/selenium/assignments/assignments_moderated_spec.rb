@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../common'
-require_relative 'page_objects/assignment_page'
+require_relative 'page_objects/assignment_create_edit_page'
 
 describe "moderated grading assignments" do
   include_context "in-process server selenium tests"
@@ -58,22 +58,22 @@ describe "moderated grading assignments" do
 
       # visit assignment edit page as first teacher
       user_session(@teacher)
-      AssignmentPage.visit_assignment_edit_page(@course.id, @moderated_assignment.id)
+      AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @moderated_assignment.id)
     end
 
     it "should allow user to select final moderator", priority: "1", test_id: 3482530 do
-      AssignmentPage.select_moderate_checkbox
-      AssignmentPage.select_grader_dropdown.click
+      AssignmentCreateEditPage.select_moderate_checkbox
+      AssignmentCreateEditPage.select_grader_dropdown.click
 
-      expect(AssignmentPage.select_grader_dropdown).to include_text(@teacher_two.name)
+      expect(AssignmentCreateEditPage.select_grader_dropdown).to include_text(@teacher_two.name)
     end
 
     it "should allow user to input number of graders", priority: "1", test_id: 3490818 do
       # default value for the input is 2, or if the class has <= 2 active instructors the default is 1
-      AssignmentPage.select_moderate_checkbox
-      AssignmentPage.add_number_of_graders(2)
-      AssignmentPage.select_grader_from_dropdown(@teacher.name)
-      expect_new_page_load { AssignmentPage.assignment_save_button.click }
+      AssignmentCreateEditPage.select_moderate_checkbox
+      AssignmentCreateEditPage.add_number_of_graders(2)
+      AssignmentCreateEditPage.select_grader_from_dropdown(@teacher.name)
+      AssignmentCreateEditPage.save_assignment
       expect(@moderated_assignment.reload.grader_count).to eq 2
     end
   end
@@ -109,22 +109,23 @@ describe "moderated grading assignments" do
     context "on visiting assignment edit page as the assignment moderator" do
       before do
         user_session(@teacher_two)
-        AssignmentPage.visit_assignment_edit_page(@course.id, @moderated_assignment.id)
+        AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @moderated_assignment.id)
       end
 
       it "allows assignment edits", priority: "1", test_id: 3488596 do
-        expect(AssignmentPage.assignment_save_button).to be_present
+        expect(AssignmentCreateEditPage.assignment_save_button).to be_present
       end
     end
 
-    context "on visiting assignment edit page as non assignment moderator" do
+    context "on visiting assignment edit page as user without Select Final Grade permission" do
       before do
+        @course.account.role_overrides.create!(permission: :select_final_grade, role: teacher_role, enabled: false)
         user_session(@teacher_three)
-        AssignmentPage.visit_assignment_edit_page(@course.id, @moderated_assignment.id)
+        AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @moderated_assignment.id)
       end
 
       it "does not allow assignment edits", priority: "1", test_id: 3488597 do
-        expect(AssignmentPage.assignment_edit_permission_error_text).to be_present
+        expect(AssignmentCreateEditPage.assignment_edit_permission_error_text).to be_present
       end
     end
 
@@ -133,11 +134,11 @@ describe "moderated grading assignments" do
         @account = Account.default
         account_admin_user
         user_session(@admin)
-        AssignmentPage.visit_assignment_edit_page(@course.id, @moderated_assignment.id)
+        AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @moderated_assignment.id)
       end
 
       it "allows admin to edit assignment", priority: "1", test_id: 3488598 do
-        expect(AssignmentPage.assignment_save_button).to be_present
+        expect(AssignmentCreateEditPage.assignment_save_button).to be_present
       end
     end
   end

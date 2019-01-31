@@ -214,9 +214,7 @@ class GradebookImporter
           # Have potentially mixed case excused in grade match case
           # expectations for the compare so it doesn't look changed
           submission['grade'] = 'EX' if submission['grade'].to_s.casecmp('EX') == 0
-          no_change = submission['grade'] == submission['original_grade'] ||
-            (submission['original_grade'].present? && submission['grade'].present? && submission['original_grade'].to_f == submission['grade'].to_f) ||
-            (submission['original_grade'].blank? && submission['grade'].blank?)
+          no_change = no_change_to_submission?(submission)
 
           @warning_messages[:prevented_grading_ungradeable_submission] = true if !submission['gradeable'] && !no_change
 
@@ -569,14 +567,10 @@ class GradebookImporter
     csv_file = attachment.open(need_local_file: true)
     is_semicolon_delimited = semicolon_delimited?(csv_file)
     csv_parse_options = {
-      converters: %i(nil),
+      converters: %i(nil decimal_comma_to_period),
       skip_lines: /^[;, ]*$/,
       col_sep: is_semicolon_delimited ? ";" : ","
     }
-
-    if is_semicolon_delimited
-      csv_parse_options[:converters] << :decimal_comma_to_period
-    end
 
     # using "foreach" rather than "parse" processes a chunk of the
     # file at a time rather than loading the whole file into memory
@@ -663,5 +657,19 @@ class GradebookImporter
 
   def exclude_custom_column_on_import(column:)
     column.deleted? || column.read_only
+  end
+
+  def no_change_to_submission?(submission)
+    return true if submission['grade'] == submission['original_grade']
+    return true if submission['original_grade'].blank? && submission['grade'].blank?
+
+    return false unless submission['original_grade'].present? && submission['grade'].present?
+
+    # The exporter exports scores rounded to two decimal places (which is also
+    # the maximum level of precision shown in the gradebook), so 123.456 will
+    # be exported as 123.46. To avoid false reports that scores have changed,
+    # compare existing values and new values at that same level of precision,
+    # and compare them as strings to match how the exporter outputs them.
+    I18n.n(submission['original_grade'].to_f, precision: 2) == I18n.n(submission['grade'].to_f, precision: 2)
   end
 end

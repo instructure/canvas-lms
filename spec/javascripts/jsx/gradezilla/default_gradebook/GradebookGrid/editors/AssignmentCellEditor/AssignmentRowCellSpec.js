@@ -16,30 +16,29 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { mount } from 'enzyme';
-import AssignmentRowCell
-from 'jsx/gradezilla/default_gradebook/GradebookGrid/editors/AssignmentCellEditor/AssignmentRowCell'
+import React from 'react'
+import {mount} from 'enzyme'
+import AssignmentRowCell from 'jsx/gradezilla/default_gradebook/GradebookGrid/editors/AssignmentCellEditor/AssignmentRowCell'
 
-QUnit.module('AssignmentRowCell', (suiteHooks) => {
-  let $container;
-  let props;
-  let wrapper;
+QUnit.module('GradebookGrid AssignmentRowCell', suiteHooks => {
+  let $container
+  let props
+  let wrapper
 
-  function mountComponent () {
-    return mount(<AssignmentRowCell {...props} />, { attachTo: $container });
+  function mountComponent() {
+    return mount(<AssignmentRowCell {...props} />, {attachTo: $container})
   }
 
-  function simulateKeyDown (keyCode, shiftKey = false) {
-    const event = new Event('keydown');
+  function simulateKeyDown(keyCode, shiftKey = false) {
+    const event = new Event('keydown')
     event.which = keyCode
-    event.shiftKey = shiftKey;
-    return wrapper.instance().handleKeyDown(event);
+    event.shiftKey = shiftKey
+    return wrapper.instance().handleKeyDown(event)
   }
 
   suiteHooks.beforeEach(() => {
-    $container = document.createElement('div');
-    document.body.appendChild($container);
+    $container = document.createElement('div')
+    document.body.appendChild($container)
 
     props = {
       assignment: {
@@ -58,9 +57,11 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
           }
         },
         grid: {},
-        item: { // student row object
+        item: {
+          // student row object
           id: '1101',
-          assignment_2301: { // submission
+          assignment_2301: {
+            // submission
             user_id: '1101'
           }
         }
@@ -79,15 +80,15 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
         userId: '1101'
       },
       submissionIsUpdating: false
-    };
-  });
+    }
+  })
 
   suiteHooks.afterEach(() => {
-    wrapper.unmount();
-    $container.remove();
-  });
+    wrapper.unmount()
+    $container.remove()
+  })
 
-  QUnit.module('#render', () => {
+  QUnit.module('#render()', () => {
     test('assigns a reference to its child SubmissionCell container', () => {
       wrapper = mountComponent()
       const $el = wrapper.getDOMNode()
@@ -102,59 +103,59 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
         props.enterGradesAs = 'points'
       })
 
-      test('renders a GradeInput', () => {
+      test('renders a AssignmentGradeInput', () => {
         wrapper = mountComponent()
-        strictEqual(wrapper.find('GradeInput').length, 1)
+        strictEqual(wrapper.find('AssignmentGradeInput').length, 1)
       })
 
       test('sets focus on the grade input', () => {
         wrapper = mountComponent()
-        const node = wrapper.find('GradeInput input').at(0)
+        const node = wrapper.find('AssignmentGradeInput input').at(0)
         strictEqual(node.getDOMNode(), document.activeElement)
       })
 
-      test('disables the GradeInput when the submission is updating', () => {
+      test('disables the AssignmentGradeInput when the submission is updating', () => {
         props.submissionIsUpdating = true
         wrapper = mountComponent()
-        strictEqual(wrapper.find('GradeInput').prop('disabled'), true)
+        strictEqual(wrapper.find('AssignmentGradeInput').prop('disabled'), true)
       })
 
       test('renders end text', () => {
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell__EndText').length, 1)
+        strictEqual(wrapper.find('.Grid__GradeCell__EndText').length, 1)
       })
 
       test('renders points possible in the end text', () => {
         wrapper = mountComponent()
-        equal(wrapper.find('.Grid__AssignmentRowCell__EndText').text(), '/10')
+        equal(wrapper.find('.Grid__GradeCell__EndText').text(), '/10')
       })
 
       test('renders nothing in the end text when the assignment has no points possible', () => {
         props.assignment.pointsPossible = 0
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell__EndText').text(), '')
+        strictEqual(wrapper.find('.Grid__GradeCell__EndText').text(), '')
       })
 
       test('renders an InvalidGradeIndicator when the pending grade is invalid', () => {
         props.pendingGradeInfo = {excused: false, grade: null, valid: false}
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell__InvalidGrade').length, 1)
+        strictEqual(wrapper.find('.Grid__GradeCell__InvalidGrade').length, 1)
       })
 
       test('does not render an InvalidGradeIndicator when the pending grade is valid', () => {
         props.pendingGradeInfo = {excused: false, grade: null, valid: true}
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell__InvalidGrade').length, 0)
+        strictEqual(wrapper.find('.Grid__GradeCell__InvalidGrade').length, 0)
       })
 
       test('does not render an InvalidGradeIndicator when no pending grade is present', () => {
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell__InvalidGrade').length, 0)
+        strictEqual(wrapper.find('.Grid__GradeCell__InvalidGrade').length, 0)
       })
 
-      test('renders the AssignmentRowCell div with the "points" class', () => {
+      test('renders the GradeCell div with the "points" class', () => {
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell').hasClass('points'), true)
+        strictEqual(wrapper.find('.Grid__GradeCell').hasClass('points'), true)
       })
     })
 
@@ -163,53 +164,53 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
         props.enterGradesAs = 'percent'
       })
 
-      test('renders a GradeInput', () => {
+      test('renders a AssignmentGradeInput', () => {
         wrapper = mountComponent()
-        strictEqual(wrapper.find('GradeInput').length, 1)
+        strictEqual(wrapper.find('AssignmentGradeInput').length, 1)
       })
 
       test('sets focus on the grade input', () => {
         wrapper = mountComponent()
-        const node = wrapper.find('GradeInput input').at(0)
+        const node = wrapper.find('AssignmentGradeInput input').at(0)
         strictEqual(node.getDOMNode(), document.activeElement)
       })
 
-      test('disables the GradeInput when the submission is updating', () => {
+      test('disables the AssignmentGradeInput when the submission is updating', () => {
         props.submissionIsUpdating = true
         wrapper = mountComponent()
-        strictEqual(wrapper.find('GradeInput').prop('disabled'), true)
+        strictEqual(wrapper.find('AssignmentGradeInput').prop('disabled'), true)
       })
 
       test('renders end text', () => {
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell__EndText').length, 1)
+        strictEqual(wrapper.find('.Grid__GradeCell__EndText').length, 1)
       })
 
       test('renders nothing in the end text', () => {
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell__EndText').text(), '')
+        strictEqual(wrapper.find('.Grid__GradeCell__EndText').text(), '')
       })
 
       test('renders an InvalidGradeIndicator when the pending grade is invalid', () => {
         props.pendingGradeInfo = {excused: false, grade: null, valid: false}
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell__InvalidGrade').length, 1)
+        strictEqual(wrapper.find('.Grid__GradeCell__InvalidGrade').length, 1)
       })
 
       test('does not render an InvalidGradeIndicator when the pending grade is valid', () => {
         props.pendingGradeInfo = {excused: false, grade: null, valid: true}
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell__InvalidGrade').length, 0)
+        strictEqual(wrapper.find('.Grid__GradeCell__InvalidGrade').length, 0)
       })
 
       test('does not render an InvalidGradeIndicator when no pending grade is present', () => {
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell__InvalidGrade').length, 0)
+        strictEqual(wrapper.find('.Grid__GradeCell__InvalidGrade').length, 0)
       })
 
-      test('renders the AssignmentRowCell div with the "percent" class', () => {
+      test('renders the GradeCell div with the "percent" class', () => {
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell').hasClass('percent'), true)
+        strictEqual(wrapper.find('.Grid__GradeCell').hasClass('percent'), true)
       })
     })
 
@@ -218,48 +219,48 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
         props.enterGradesAs = 'gradingScheme'
       })
 
-      test('renders a GradeInput', () => {
+      test('renders a AssignmentGradeInput', () => {
         wrapper = mountComponent()
-        strictEqual(wrapper.find('GradeInput').length, 1)
+        strictEqual(wrapper.find('AssignmentGradeInput').length, 1)
       })
 
       test('sets focus on the grade input', () => {
         wrapper = mountComponent()
-        const node = wrapper.find('GradeInput input').at(0)
+        const node = wrapper.find('AssignmentGradeInput input').at(0)
         strictEqual(node.getDOMNode(), document.activeElement)
       })
 
-      test('disables the GradeInput when the submission is updating', () => {
+      test('disables the AssignmentGradeInput when the submission is updating', () => {
         props.submissionIsUpdating = true
         wrapper = mountComponent()
-        strictEqual(wrapper.find('GradeInput').prop('disabled'), true)
+        strictEqual(wrapper.find('AssignmentGradeInput').prop('disabled'), true)
       })
 
       test('does not render end text', () => {
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell__EndText').length, 0)
+        strictEqual(wrapper.find('.Grid__GradeCell__EndText').length, 0)
       })
 
       test('renders an InvalidGradeIndicator when the pending grade is invalid', () => {
         props.pendingGradeInfo = {excused: false, grade: null, valid: false}
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell__InvalidGrade').length, 1)
+        strictEqual(wrapper.find('.Grid__GradeCell__InvalidGrade').length, 1)
       })
 
       test('does not render an InvalidGradeIndicator when the pending grade is valid', () => {
         props.pendingGradeInfo = {excused: false, grade: null, valid: true}
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell__InvalidGrade').length, 0)
+        strictEqual(wrapper.find('.Grid__GradeCell__InvalidGrade').length, 0)
       })
 
       test('does not render an InvalidGradeIndicator when no pending grade is present', () => {
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell__InvalidGrade').length, 0)
+        strictEqual(wrapper.find('.Grid__GradeCell__InvalidGrade').length, 0)
       })
 
-      test('renders the AssignmentRowCell div with the "gradingScheme" class', () => {
+      test('renders the GradeCell div with the "gradingScheme" class', () => {
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell').hasClass('gradingScheme'), true)
+        strictEqual(wrapper.find('.Grid__GradeCell').hasClass('gradingScheme'), true)
       })
     })
 
@@ -268,31 +269,31 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
         props.enterGradesAs = 'passFail'
       })
 
-      test('renders a GradeInput', () => {
+      test('renders a AssignmentGradeInput', () => {
         wrapper = mountComponent()
-        strictEqual(wrapper.find('GradeInput').length, 1)
+        strictEqual(wrapper.find('AssignmentGradeInput').length, 1)
       })
 
       test('sets focus on the button', () => {
         wrapper = mountComponent()
-        const node = wrapper.find('GradeInput button').at(0)
+        const node = wrapper.find('AssignmentGradeInput button').at(0)
         strictEqual(node.getDOMNode(), document.activeElement)
       })
 
       test('does not render end text', () => {
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell__EndText').length, 0)
+        strictEqual(wrapper.find('.Grid__GradeCell__EndText').length, 0)
       })
 
-      test('renders the AssignmentRowCell div with the "passFail" class', () => {
+      test('renders the GradeCell div with the "passFail" class', () => {
         wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__AssignmentRowCell').hasClass('passFail'), true)
+        strictEqual(wrapper.find('.Grid__GradeCell').hasClass('passFail'), true)
       })
-    });
-  });
+    })
+  })
 
-  QUnit.module('#handleKeyDown', () => {
-    QUnit.module('with a GradeInput', hooks => {
+  QUnit.module('#handleKeyDown()', () => {
+    QUnit.module('with a AssignmentGradeInput', hooks => {
       hooks.beforeEach(() => {
         props.assignment.gradingType = 'points'
       })
@@ -314,7 +315,7 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
       test('skips SlickGrid default behavior when the input handles the event', () => {
         wrapper = mountComponent()
         wrapper.instance().gradeInput.focus()
-        sinon.stub(wrapper.find('GradeInput').instance(), 'handleKeyDown').returns(false)
+        sinon.stub(wrapper.find('AssignmentGradeInput').instance(), 'handleKeyDown').returns(false)
         const continueHandling = simulateKeyDown(9) // tab within the grade input
         strictEqual(continueHandling, false)
       })
@@ -374,31 +375,31 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
         })
       })
     })
-  });
+  })
 
-  QUnit.module('#focus', () => {
-    test('sets focus on the text input, if one exists, for a GradeInput', () => {
+  QUnit.module('#focus()', () => {
+    test('sets focus on the text input, if one exists, for a AssignmentGradeInput', () => {
       props.assignment.gradingType = 'points'
       wrapper = mountComponent()
       wrapper.instance().focus()
-      const input = wrapper.find('GradeInput input')
+      const input = wrapper.find('AssignmentGradeInput input')
       strictEqual(input.at(0).getDOMNode(), document.activeElement)
     })
 
-    test('sets focus on the button for a GradeInput if no text input exists', () => {
+    test('sets focus on the button for a AssignmentGradeInput if no text input exists', () => {
       props.enterGradesAs = 'passFail'
       wrapper = mountComponent()
       wrapper.instance().focus()
-      const button = wrapper.find('GradeInput button')
+      const button = wrapper.find('AssignmentGradeInput button')
       strictEqual(button.at(0).getDOMNode(), document.activeElement)
     })
   })
 
-  QUnit.module('#isValueChanged', () => {
-    test('delegates to the "hasGradeChanged" method for a GradeInput', () => {
+  QUnit.module('#isValueChanged()', () => {
+    test('delegates to the "hasGradeChanged" method for a AssignmentGradeInput', () => {
       props.assignment.gradingType = 'points'
       wrapper = mountComponent()
-      sinon.stub(wrapper.find('GradeInput').instance(), 'hasGradeChanged').returns(true)
+      sinon.stub(wrapper.find('AssignmentGradeInput').instance(), 'hasGradeChanged').returns(true)
       strictEqual(wrapper.instance().isValueChanged(), true)
     })
   })
@@ -408,20 +409,35 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
       props.submissionIsUpdating = true
       wrapper = mountComponent()
       wrapper.setProps({submissionIsUpdating: false})
-      strictEqual(document.activeElement, wrapper.find('input').at(0).getDOMNode())
+      strictEqual(
+        document.activeElement,
+        wrapper
+          .find('input')
+          .at(0)
+          .getDOMNode()
+      )
     })
 
     test('does not set focus on the grade input when the submission has not finished updating', () => {
       props.submissionIsUpdating = true
       wrapper = mountComponent()
       wrapper.setProps({submissionIsUpdating: true})
-      notStrictEqual(document.activeElement, wrapper.find('input').at(0).getDOMNode())
+      notStrictEqual(
+        document.activeElement,
+        wrapper
+          .find('input')
+          .at(0)
+          .getDOMNode()
+      )
     })
 
     test('does not set focus on the grade input when the tray button has focus', () => {
       props.submissionIsUpdating = true
       wrapper = mountComponent()
-      const button = wrapper.find('button').at(0).getDOMNode()
+      const button = wrapper
+        .find('button')
+        .at(0)
+        .getDOMNode()
       button.focus()
       wrapper.setProps({submissionIsUpdating: false})
       strictEqual(document.activeElement, button)
@@ -429,7 +445,7 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
   })
 
   QUnit.module('"Toggle Tray" Button', () => {
-    const buttonSelector = '.Grid__AssignmentRowCell__Options button'
+    const buttonSelector = '.Grid__GradeCell__Options button'
 
     test('is rendered when the assignment grading type is "points"', () => {
       props.assignment.gradingType = 'points'
@@ -444,17 +460,17 @@ QUnit.module('AssignmentRowCell', (suiteHooks) => {
     })
 
     test('calls onToggleSubmissionTrayOpen when clicked', () => {
-      props.onToggleSubmissionTrayOpen = sinon.stub();
-      wrapper = mountComponent();
+      props.onToggleSubmissionTrayOpen = sinon.stub()
+      wrapper = mountComponent()
       wrapper.find(buttonSelector).simulate('click')
-      strictEqual(props.onToggleSubmissionTrayOpen.callCount, 1);
-    });
+      strictEqual(props.onToggleSubmissionTrayOpen.callCount, 1)
+    })
 
     test('calls onToggleSubmissionTrayOpen with the student id and assignment id', () => {
-      props.onToggleSubmissionTrayOpen = sinon.stub();
-      wrapper = mountComponent();
+      props.onToggleSubmissionTrayOpen = sinon.stub()
+      wrapper = mountComponent()
       wrapper.find(buttonSelector).simulate('click')
-      deepEqual(props.onToggleSubmissionTrayOpen.getCall(0).args, ['1101', '2301']);
-    });
-  });
-});
+      deepEqual(props.onToggleSubmissionTrayOpen.getCall(0).args, ['1101', '2301'])
+    })
+  })
+})

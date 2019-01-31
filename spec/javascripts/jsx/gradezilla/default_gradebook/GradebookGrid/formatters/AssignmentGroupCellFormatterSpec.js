@@ -16,79 +16,80 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { createGradebook, setFixtureHtml } from '../../GradebookSpecHelper';
+import {createGradebook, setFixtureHtml} from 'jsx/gradezilla/default_gradebook/__tests__/GradebookSpecHelper'
 import AssignmentGroupCellFormatter from 'jsx/gradezilla/default_gradebook/GradebookGrid/formatters/AssignmentGroupCellFormatter'
 
-QUnit.module('AssignmentGroupCellFormatter', function (hooks) {
-  let $fixture;
-  let gradebook;
-  let formatter;
-  let grade;
+QUnit.module('GradebookGrid AssignmentGroupCellFormatter', hooks => {
+  let $fixture
+  let gradebook
+  let formatter
+  let grade
 
-  hooks.beforeEach(function () {
-    $fixture = document.createElement('div');
-    document.body.appendChild($fixture);
-    setFixtureHtml($fixture);
+  hooks.beforeEach(() => {
+    $fixture = document.body.appendChild(document.createElement('div'))
+    setFixtureHtml($fixture)
 
-    gradebook = createGradebook();
+    gradebook = createGradebook()
     sinon.stub(gradebook, 'saveSettings')
-    formatter = new AssignmentGroupCellFormatter(gradebook);
+    formatter = new AssignmentGroupCellFormatter(gradebook)
 
-    grade = { score: 8, possible: 10 };
-  });
+    grade = {score: 8, possible: 10}
+  })
 
-  hooks.afterEach(function () {
-    $fixture.remove();
-  });
+  hooks.afterEach(() => {
+    $fixture.remove()
+  })
 
-  function renderCell () {
+  function renderCell() {
     $fixture.innerHTML = formatter.render(
       0, // row
       0, // cell
       grade, // value
       null, // column definition
       null // dataContext
-    );
-    return $fixture;
+    )
+    return $fixture
   }
 
-  QUnit.module('#render with no grade');
+  function getPercentageGrade() {
+    const $percentageGrade = renderCell().querySelector('.percentage')
+    return $percentageGrade.innerText.trim()
+  }
 
-  test('renders no content', function () {
-    grade = null;
-    strictEqual(renderCell().innerHTML, '');
-  });
+  test('renders no content when the grade is null', () => {
+    grade = null
+    strictEqual(renderCell().innerHTML, '')
+  })
 
-  QUnit.module('#render with a grade');
+  test('renders the percentage of the grade', () => {
+    equal(getPercentageGrade(), '80%')
+  })
 
-  test('renders the percentage of the grade', function () {
-    equal(renderCell().querySelector('.percentage').innerHTML.trim(), '80%');
-  });
+  test('rounds the percentage to two decimal places', () => {
+    grade.score = 8.2345
+    equal(getPercentageGrade(), '82.35%')
+  })
 
-  test('rounds the percentage to two decimal places', function () {
-    grade.score = 8.2345;
-    equal(renderCell().querySelector('.percentage').innerHTML.trim(), '82.35%');
-  });
-
-  test('avoids floating point calculation issues', function () {
-    grade.score = 946.65;
+  test('avoids floating point calculation issues', () => {
+    grade.score = 946.65
     grade.possible = 1000
-    equal(renderCell().querySelector('.percentage').innerHTML.trim(), '94.67%');
-  });
+    equal(getPercentageGrade(), '94.67%')
+  })
 
-  test('renders a dash "-" when the grade has zero points possible', function () {
-    grade.possible = 0;
-    equal(renderCell().querySelector('.percentage').innerHTML.trim(), '-');
-  });
+  test('renders "–" (en dash) when the grade has zero points possible', () => {
+    grade.possible = 0
+    equal(getPercentageGrade(), '–')
+  })
 
-  test('renders a dash "-" when the grade has undefined points possible', function () {
-    grade.possible = null;
-    equal(renderCell().querySelector('.percentage').innerHTML.trim(), '-');
-  });
+  test('renders "–" (en dash) when the grade has undefined points possible', () => {
+    grade.possible = null
+    equal(getPercentageGrade(), '–')
+  })
 
-  test('renders the score and points possible in the tooltip', function () {
-    grade.score = 8.345;
-    grade.possible = 10.345;
-    equal(renderCell().querySelector('.gradebook-tooltip').innerHTML.trim(), '8.35 / 10.35');
-  });
-});
+  test('renders the score and points possible in the tooltip', () => {
+    grade.score = 8.345
+    grade.possible = 10.345
+    const $tooltip = renderCell().querySelector('.gradebook-tooltip')
+    equal($tooltip.innerHTML.trim(), '8.35 / 10.35')
+  })
+})

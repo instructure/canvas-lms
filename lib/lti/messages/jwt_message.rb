@@ -71,7 +71,8 @@ module Lti::Messages
       @message.iat = Time.zone.now.to_i
       @message.iss = Canvas::Security.config['lti_iss']
       @message.nonce = SecureRandom.uuid
-      @message.sub = Lti::Asset.opaque_identifier_for(@user)
+      @message.sub = @user.lti_id
+      @message.lti11_legacy_user_id = Lti::Asset.opaque_identifier_for(@user)
     end
 
     def add_context_claims!

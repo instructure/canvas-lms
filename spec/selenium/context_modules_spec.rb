@@ -181,6 +181,21 @@ describe "context modules" do
       go_to_modules
       expect(f('.context_module_item')).not_to include_text(available_from.to_s)
     end
+
+    it 'should publish assignment on publish module', priority: "2", test_id: 126719 do
+      @unpub_assignment = Assignment.create!(context: @course, title: 'some assignment in a module')
+      @unpub_assignment.workflow_state = 'unpublished'
+      @unpub_assignment.save!
+      @mod.add_item(type: 'assignment', id: @unpub_assignment.id)
+      @mod.workflow_state = 'unpublished'
+      @mod.save!
+      go_to_modules
+      verify_module_title('some assignment in a module')
+      expect(ff('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish').length).to eq(2)
+      ff('.icon-unpublish')[0].click
+      wait_for_ajax_requests
+      expect(ff('span.publish-icon.unpublished.publish-icon-published > i.icon-publish').length).to eq(2)
+    end
   end
 
   context 'edit inline items on module page' do

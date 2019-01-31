@@ -709,6 +709,8 @@ class DiscussionTopicsController < ApplicationController
               :ASSIGNMENT_ID => @topic.assignment_id,
               :IS_GROUP => @topic.group_category_id?,
             }
+
+            env_hash[:GRADED_RUBRICS_URL] = context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) if @topic.assignment
             if params[:hide_student_names]
               env_hash[:HIDE_STUDENT_NAMES] = true
               env_hash[:STUDENT_ID] = params[:student_id]
@@ -1040,7 +1042,13 @@ class DiscussionTopicsController < ApplicationController
   def set_sections
     if params[:specific_sections] != "all"
       @topic.is_section_specific = true
-      @topic.course_sections = CourseSection.find(params[:specific_sections].split(","))
+      section_ids = params[:specific_sections]
+      section_ids = section_ids.split(",") if section_ids.is_a?(String)
+      new_section_ids = section_ids.map{|id| Shard.relative_id_for(id, Shard.current, Shard.current)}.sort
+      if @topic.course_sections.pluck(:id).sort != new_section_ids
+        @topic.course_sections = CourseSection.find(new_section_ids)
+        @topic.sections_changed = true
+      end
     else
       @topic.is_section_specific = false
     end

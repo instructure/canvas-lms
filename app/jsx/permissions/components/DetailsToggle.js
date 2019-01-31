@@ -33,7 +33,7 @@ class DetailsToggle extends React.Component {
 
   renderDetailGroup(item) {
     return (
-      <View margin="small" padding="small">
+      <View key={item.title} margin="small" padding="small">
         <Text weight="bold" as="div">
           {item.title}
         </Text>

@@ -16,17 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import round from 'compiled/util/round';
-import I18n from 'i18nObj';
+import round from 'compiled/util/round'
+import I18n from 'i18nObj'
 import {scoreToPercentage} from '../../../../gradebook/shared/helpers/GradeCalculationHelper'
 
-function getGradePercentage (score, pointsPossible) {
+function getGradePercentage(score, pointsPossible) {
   const grade = scoreToPercentage(score, pointsPossible)
-  return round(grade, round.DEFAULT);
+  return round(grade, round.DEFAULT)
 }
 
-function render (options) {
-  const percentage = options.possible ? options.percentage : '-';
+function render(options) {
+  const percentage = options.possible ? options.percentage : '–'
 
   // xsslint safeString.property score possible
   // xsslint safeString.identifier percentage
@@ -35,27 +35,27 @@ function render (options) {
       <div class="gradebook-tooltip">${options.score} / ${options.possible}</div>
       <span class="percentage">${percentage}</span>
     </div>
-  `;
+  `
 }
 
 export default class AssignmentGroupCellFormatter {
   render = (_row, _cell, value, _columnDef, _dataContext) => {
     if (value == null) {
-      return '';
+      return ''
     }
 
-    let percentage = getGradePercentage(value.score, value.possible);
-    percentage = isFinite(percentage) ? percentage : 0;
+    let percentage = getGradePercentage(value.score, value.possible)
+    percentage = Number.isFinite(percentage) ? percentage : 0
 
-    let possible = round(value.possible, round.DEFAULT);
-    possible = possible ? I18n.n(possible) : possible;
+    let possible = round(value.possible, round.DEFAULT)
+    possible = possible ? I18n.n(possible) : possible
 
     const templateOpts = {
-      percentage: I18n.n(round(percentage, round.DEFAULT), { percentage: true }),
+      percentage: I18n.n(round(percentage, round.DEFAULT), {percentage: true}),
       possible,
       score: I18n.n(round(value.score, round.DEFAULT))
-    };
+    }
 
-    return render(templateOpts);
+    return render(templateOpts)
   }
 }
