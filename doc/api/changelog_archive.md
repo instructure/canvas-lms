@@ -6,6 +6,45 @@ The Change Log Archive page displays previous API changes in the [API Change Log
 The release date indicates the date that the API code was made available in the production environment.
 
 <div class="changelog"></div>
+## 2018-11-17
+
+### Changes
+| API Calls   | Function                   |     |
+|-------------|----------------------------|-----|
+| [Roles API] | Create a New Role Endpoint | Permissions parameter: Updated account- and course-level role names to match roles in the Canvas Permissions page |
+
+  [Roles API]: roles.html
+
+<p></p>
+| API Responses     | Function                        |   |
+|-------------------|---------------------------------|---|
+| [Assignments API] | List Assignments Endpoint       | Clarified that the paginated list of assignments is returned for the current course or assignment group |
+| [Rubrics API]     | Create a Single Rubric Endpoint | Clarified the rubric return value |
+
+  [Assignments API]: assignments.html
+  [Rubrics API]: rubrics.html
+
+### Additions
+| API Calls                    | Function                              |    |
+|------------------------------|---------------------------------------|----|
+| [LTI Variable Substitutions] | com.instructure.Person.name\_sortable | Added variable that returns the sortable name of the launching user. Availability is when launched by a logged in user |
+
+  [LTI Variable Substitutions]: file.tools_variable_substitutions.html
+
+<p></p>
+| API Responses     | Function                                      |   |
+|-------------------|-----------------------------------------------|---|
+| [SIS Imports API] | Get the Current Importing SIS Import Endpoint | Added endpoint to return the SIS imports that are currently processing for an account |
+
+  [SIS Imports API]: sis_imports.html
+
+### Removals
+| API Calls     | Function |                                                            |
+|---------------|----------|------------------------------------------------------------|
+| [Planner API] |          | Removed the beta warning banner from the API documentation |
+
+  [Planner API]: planner.html
+
 ## 2018-10-27
 
 ### Changes
