@@ -17,9 +17,11 @@
  */
 
 import React from 'react'
+import I18n from 'i18n!assignments_2'
 import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
+import Comments from './Comments'
 
 import {StudentAssignmentShape} from '../assignmentData'
 
@@ -31,15 +33,7 @@ function ContentTabs(props) {
   return (
     <div data-test-id="assignment-2-student-content-tabs">
       <TabList defaultSelectedIndex={0} variant="minimal">
-        <TabPanel
-          title={
-            <Flex as="header" alignItems="center" justifyItems="center" direction="column">
-              <FlexItem>
-                <Text>Upload</Text>
-              </FlexItem>
-            </Flex>
-          }
-        >
+        <TabPanel title={I18n.t('Upload')}>
           <Flex as="header" alignItems="center" justifyItems="center" direction="column">
             <FlexItem>
               <Text data-test-id="assignment-2-student-content-tabs-test-text">
@@ -48,33 +42,10 @@ function ContentTabs(props) {
             </FlexItem>
           </Flex>
         </TabPanel>
-        <TabPanel
-          title={
-            <Flex as="header" alignItems="center" justifyItems="center" direction="column">
-              <FlexItem>
-                <Text>Comments</Text>
-              </FlexItem>
-            </Flex>
-          }
-        >
-          <Flex as="header" alignItems="center" justifyItems="center" direction="column">
-            <FlexItem>
-              <Text>
-                {`TODO: Input Comments Content Here... ${props.assignment &&
-                  props.assignment.description}`}
-              </Text>
-            </FlexItem>
-          </Flex>
+        <TabPanel title={I18n.t('Comments')}>
+          <Comments assignment={props.assignment} />
         </TabPanel>
-        <TabPanel
-          title={
-            <Flex as="header" alignItems="center" justifyItems="center" direction="column">
-              <FlexItem>
-                <Text>Rubric</Text>
-              </FlexItem>
-            </Flex>
-          }
-        >
+        <TabPanel title={I18n.t('Rubric')}>
           <Flex as="header" alignItems="center" justifyItems="center" direction="column">
             <FlexItem>
               <Text>`TODO: Input Rubric Content Here...`</Text>

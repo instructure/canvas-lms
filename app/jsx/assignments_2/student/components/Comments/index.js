@@ -16,8 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base/environment";
-@import "pages/assignments2_student/steps.scss";
-@import "pages/assignments2_student/step_items.scss";
-@import "pages/assignments2_student/student_header.scss";
-@import "pages/assignments2_student/students_comments.scss";
+import React from 'react'
+import CommentTextArea from './CommentTextArea'
+
+function Comments() {
+  return (
+    <div data-test-id="comments-container">
+      <CommentTextArea />
+    </div>
+  )
+}
+
+export default React.memo(Comments)
