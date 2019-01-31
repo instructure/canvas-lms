@@ -26,9 +26,9 @@ import Text from '@instructure/ui-elements/lib/components/Text'
 
 import propTypes from '../propTypes'
 
-import pinnedUrl from '../../../../public/images/discussions/pinned.svg' // eslint-disable-line
-import unpinnedUrl from '../../../../public/images/discussions/unpinned.svg' // eslint-disable-line
-import closedForCommentsUrl from '../../../../public/images/discussions/closed-comments.svg' // eslint-disable-line
+import pinnedUrl from '../../../../public/images/discussions/pinned.svg'
+import unpinnedUrl from '../../../../public/images/discussions/unpinned.svg'
+import closedForCommentsUrl from '../../../../public/images/discussions/closed-comments.svg'
 
 const BackgroundSVG = props => (
   <View margin="small auto" size="x-small" display="block">
