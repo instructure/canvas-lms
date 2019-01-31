@@ -34,7 +34,8 @@ afterEach(() => {
   jest.restoreAllMocks()
 })
 
-it('allows close', async () => {
+/* eslint-disable jest/no-disabled-tests */
+it.skip('allows close', async () => {
   const {getByTestId} = await openDeleteDialog()
   const closeButton = await waitForElement(() => getByTestId('confirm-dialog-close-button'))
   fireEvent.click(closeButton)
@@ -42,7 +43,7 @@ it('allows close', async () => {
   expect(setWorkflow).not.toHaveBeenCalled()
 })
 
-it('allows cancel', async () => {
+it.skip('allows cancel', async () => {
   const {getByTestId} = await openDeleteDialog()
   const cancelButton = await waitForElement(() => getByTestId('confirm-dialog-cancel-button'))
   fireEvent.click(cancelButton)
@@ -50,7 +51,7 @@ it('allows cancel', async () => {
   expect(setWorkflow).not.toHaveBeenCalled()
 })
 
-it('deletes the assignment and reloads', async () => {
+it.skip('deletes the assignment and reloads', async () => {
   const reloadSpy = jest.spyOn(window.location, 'reload')
   setWorkflow.mockReturnValueOnce({data: {}})
   const assignment = mockAssignment()
@@ -64,7 +65,6 @@ it('deletes the assignment and reloads', async () => {
   expect(reloadSpy).toHaveBeenCalled()
 })
 
-/* eslint-disable jest/no-disabled-tests */
 // errors aren't really implemented yet
 it.skip('reports errors', async () => {
   setWorkflow.mockReturnValueOnce({
