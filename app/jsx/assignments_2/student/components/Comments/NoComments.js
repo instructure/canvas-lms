@@ -15,24 +15,24 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
+import I18n from 'i18n!assignments_2'
+// import PropTypes from 'prop-types'
 import React from 'react'
-import CommentTextArea from './CommentTextArea'
-import CommentContent from './CommentContent'
-import {StudentAssignmentShape} from '../../assignmentData'
+import View from '@instructure/ui-layout/lib/components/View'
+import Text from '@instructure/ui-elements/lib/components/Text'
+import noComments from '../../../../../../public/images/assignments_2/NoComments.svg'
 
-function Comments(props) {
-  const comments = props.assignment.submissionsConnection.nodes[0].commentsConnection.nodes
+function NoComments() {
   return (
-    <div data-test-id="comments-container">
-      <CommentTextArea />
-      <CommentContent comments={comments} />
-    </div>
+    <React.Fragment>
+      <View margin="small auto" size="x-small" display="block">
+        <img alt="" src={noComments} />
+      </View>
+      <Text weight="bold" as="div" margin="x-small auto">
+        {I18n.t('Send a comment to your instructor about this assignment.')}
+      </Text>
+    </React.Fragment>
   )
 }
 
-Comments.propTypes = {
-  assignment: StudentAssignmentShape
-}
-
-export default React.memo(Comments)
+export default React.memo(NoComments)

@@ -42,7 +42,10 @@ function ContentTabs(props) {
             </FlexItem>
           </Flex>
         </TabPanel>
-        <TabPanel title={I18n.t('Comments')}>
+        <TabPanel
+          data-test-id="assignment-2-student-comments-content-tab"
+          title={I18n.t('Comments')}
+        >
           <Comments assignment={props.assignment} />
         </TabPanel>
         <TabPanel title={I18n.t('Rubric')}>

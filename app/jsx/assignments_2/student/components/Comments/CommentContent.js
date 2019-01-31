@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 - present Instructure, Inc.
+ * Copyright (C) 2018 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,11 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-.textarea-action-button-container {
-  text-align: end;
-  margin: 5px 0;
+import React from 'react'
+import NoComments from './NoComments'
+import {arrayOf} from 'prop-types'
+import {CommentShape} from '../../assignmentData'
+
+function CommentContent(props) {
+  return (
+    <div className="comments-content-container">{!props.comments.length && <NoComments />}</div>
+  )
 }
 
-.comments-content-container {
-  text-align: center;
+CommentContent.propTypes = {
+  comments: arrayOf(CommentShape).isRequired
 }
+
+export default React.memo(CommentContent)

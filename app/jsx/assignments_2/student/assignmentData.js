@@ -79,6 +79,16 @@ export const STUDENT_VIEW_QUERY = gql`
           filter: {states: [unsubmitted, graded, pending_review, submitted]}
         ) {
           nodes {
+            commentsConnection {
+              nodes {
+                comment
+                updatedAt
+                author {
+                  avatarUrl
+                  shortName
+                }
+              }
+            }
             deductedPoints
             enteredGrade
             grade
@@ -91,6 +101,15 @@ export const STUDENT_VIEW_QUERY = gql`
     }
   }
 `
+
+export const CommentShape = shape({
+  comment: string,
+  author: shape({
+    avatarUrl: string,
+    shortName: string
+  }),
+  updatedAt: string
+})
 
 export const StudentAssignmentShape = shape({
   description: string.isRequired,
@@ -124,6 +143,9 @@ export const StudentAssignmentShape = shape({
   submissionsConnection: shape({
     nodes: arrayOf(
       shape({
+        commentsConnection: shape({
+          nodes: arrayOf(CommentShape)
+        }),
         deductedPoints: number,
         enteredGrade: string,
         grade: string,

@@ -72,3 +72,10 @@ it('renders the availability dates if the assignment is locked', () => {
   expect(contentTabs).toHaveLength(0)
   expect(root.text()).toMatch('Availability Dates')
 })
+it('renders Comments', () => {
+  const assignment = mockAssignment({lockInfo: {isLocked: false}})
+  ReactDOM.render(<StudentContent assignment={assignment} />, document.getElementById('fixtures'))
+  $('[data-test-id="assignment-2-student-content-tabs"] div:contains("Comments")')[0].click()
+  const container = $('[data-test-id="comments-container"]')
+  expect(container).toHaveLength(1)
+})

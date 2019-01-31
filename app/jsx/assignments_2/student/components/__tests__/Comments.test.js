@@ -18,6 +18,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
+import {mockAssignment} from '../../test-utils'
 
 import Comments from '../Comments'
 
@@ -36,14 +37,24 @@ describe('Comments', () => {
   })
 
   it('renders Comments', () => {
-    ReactDOM.render(<Comments />, document.getElementById('fixtures'))
+    ReactDOM.render(<Comments assignment={mockAssignment()} />, document.getElementById('fixtures'))
     const container = $('[data-test-id="comments-container"]')
     expect(container).toHaveLength(1)
   })
 
   it('renders CommentTextArea', () => {
-    ReactDOM.render(<Comments />, document.getElementById('fixtures'))
+    ReactDOM.render(<Comments assignment={mockAssignment()} />, document.getElementById('fixtures'))
     const container = $('[data-test-id="comments-text-area-container"]')
+    expect(container).toHaveLength(1)
+  })
+
+  it('renders place holder text when no comments', () => {
+    const assignment = mockAssignment()
+    assignment.submissionsConnection.nodes[0].commentsConnection.nodes = []
+    ReactDOM.render(<Comments assignment={assignment} />, document.getElementById('fixtures'))
+    const container = $(
+      '#fixtures:contains("Send a comment to your instructor about this assignment.")'
+    )
     expect(container).toHaveLength(1)
   })
 })
