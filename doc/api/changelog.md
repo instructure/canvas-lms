@@ -10,19 +10,30 @@ The API Change Log includes adjustments to the Canvas API documentation as part 
 - This page documents API changes for the last four releases. For prior releases, view the [API Change Log archive page](file.changelog_archive.html).
 
 <div class="changelog"></div>
+
+## 2019-02-16
+
+### Additions
+| API Responses | Function |      |
+|----------------------|----------------------|--------------------------|
+| [Users API] | Edit a User Endpoint | Added [user]title and [user]bio parameters
+
+[Users API]: users.html
+
+
 ## 2019-01-26
 
 ### Changes
 | API Calls | Function |      |
 |----------------------|----------------------|--------------------------|
-| [Submissions API]  |  List Gradeable Students endpoint | Added clarification about anonymous grading |
+| [Submissions API]  |  List Gradeable Students Endpoint | Added clarification about anonymous grading |
 
 [Submissions API]: submissions.html
 
 ### Additions
 | API Responses | Function |      |
 |----------------------|----------------------|--------------------------|
-| [Assignments API] | Assignment Object | Returns grader_count, ginal_grader, grader_comments_visible_to_graders, graders_anonymous_to_graders, grader_names_visible_to_final_grader, and anonymous_grading parameters |
+| [Assignments API] | Assignment Object | Returns grader_count, final_grader, grader_comments_visible_to_graders, graders_anonymous_to_graders, grader_names_visible_to_final_grader, and anonymous_grading parameters |
 | [Submissions API] | Submission Object | Returns UserDisplay parameter |
 | [Users API] |      | Added AnonyousUserDisplay Object |
 
@@ -115,42 +126,3 @@ The API Change Log includes adjustments to the Canvas API documentation as part 
 
   [Courses API]: courses.html
 <p></p>
-
-## 2018-11-17
-
-### Changes
-| API Calls   | Function                   |     |
-|-------------|----------------------------|-----|
-| [Roles API] | Create a New Role Endpoint | Permissions parameter: Updated account- and course-level role names to match roles in the Canvas Permissions page |
-
-  [Roles API]: roles.html
-
-<p></p>
-| API Responses     | Function                        |   |
-|-------------------|---------------------------------|---|
-| [Assignments API] | List Assignments Endpoint       | Clarified that the paginated list of assignments is returned for the current course or assignment group |
-| [Rubrics API]     | Create a Single Rubric Endpoint | Clarified the rubric return value |
-
-  [Assignments API]: assignments.html
-  [Rubrics API]: rubrics.html
-
-### Additions
-| API Calls                    | Function                              |    |
-|------------------------------|---------------------------------------|----|
-| [LTI Variable Substitutions] | com.instructure.Person.name\_sortable | Added variable that returns the sortable name of the launching user. Availability is when launched by a logged in user |
-
-  [LTI Variable Substitutions]: file.tools_variable_substitutions.html
-
-<p></p>
-| API Responses     | Function                                      |   |
-|-------------------|-----------------------------------------------|---|
-| [SIS Imports API] | Get the Current Importing SIS Import Endpoint | Added endpoint to return the SIS imports that are currently processing for an account |
-
-  [SIS Imports API]: sis_imports.html
-
-### Removals
-| API Calls     | Function |                                                            |
-|---------------|----------|------------------------------------------------------------|
-| [Planner API] |          | Removed the beta warning banner from the API documentation |
-
-  [Planner API]: planner.html

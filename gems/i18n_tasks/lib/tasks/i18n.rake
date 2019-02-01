@@ -14,7 +14,6 @@ namespace :i18n do
 
     puts "\nJS/HBS..."
     js_pid = spawn "./gems/canvas_i18nliner/bin/i18nliner export"
-    
 
     puts "\nRuby..."
     require 'i18nliner/commands/check'
@@ -39,8 +38,6 @@ namespace :i18n do
 
   desc "Generates a new en.yml file for all translations"
   task :generate => :check do
-    require 'ya2yaml'
-
     yaml_dir = './config/locales/generated'
     FileUtils.mkdir_p(File.join(yaml_dir))
     yaml_file = File.join(yaml_dir, "en.yml")
@@ -55,7 +52,7 @@ namespace :i18n do
     }.freeze
 
     File.open(Rails.root.join(yaml_file), "w") do |file|
-      file.write({'en' => @translations.except(*special_keys)}.ya2yaml(:syck_compatible => true))
+      file.write({'en' => @translations.except(*special_keys)}.to_yaml)
     end
     print "Wrote new #{yaml_file}\n\n"
   end
@@ -83,6 +80,13 @@ namespace :i18n do
     I18n.load_path += Dir[Rails.root.join('config', 'locales', 'locales.yml')]
 
     I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
+
+    require 'i18nliner/extractors/translation_hash'
+    I18nliner::Extractors::TranslationHash.class_eval do
+      def encode_with(coder)
+        coder.represent_map nil, self # make translation hashes encode to yaml like a regular hash
+      end
+    end
   end
 
   desc "Generates JS bundle i18n files (non-en) and adds them to assets.yml"
@@ -169,9 +173,8 @@ namespace :i18n do
     lolz_translations['lolz'] = process_lolz.call(translations['en'])
     puts
 
-    require 'ya2yaml'
     File.open('config/locales/lolz.yml', 'w') do |f|
-      f.write(lolz_translations.ya2yaml(:syck_compatible => true))
+      f.write(lolz_translations.to_yaml)
     end
     print "\nFinished generating LOLZ from #{strings_processed} strings in #{Time.now - t} seconds\n"
 
@@ -186,7 +189,7 @@ namespace :i18n do
       }
 
       File.open('config/locales/locales.yml', 'w') do |f|
-        f.write(locales.ya2yaml(:syck_compatible => true))
+        f.write(locales.to_yaml)
       end
       print "Added LOLZ to locales\n"
     end
@@ -265,7 +268,7 @@ namespace :i18n do
           h
         } :
         current_strings
-      File.open(export_filename, "w"){ |f| f.write new_strings.expand_keys.ya2yaml(:syck_compatible => true) }
+      File.open(export_filename, "w"){ |f| f.write new_strings.expand_keys.to_yaml }
 
       push = 'n'
       begin
@@ -297,7 +300,6 @@ namespace :i18n do
 
   desc "Validates and imports new translations"
   task :import, [:source_file, :translated_file] => :environment do |t, args|
-    require 'ya2yaml'
     require 'open-uri'
     Hash.send(:include, I18nTasks::HashExtensions) unless Hash.new.kind_of?(I18nTasks::HashExtensions)
 
@@ -342,7 +344,7 @@ namespace :i18n do
     next if complete_translations.nil?
 
     File.open("config/locales/#{import.language}.yml", "w") { |f|
-      f.write({import.language => complete_translations}.ya2yaml(:syck_compatible => true))
+      f.write({import.language => complete_translations}.to_yaml)
     }
   end
 
@@ -364,7 +366,6 @@ namespace :i18n do
   end
 
   def autoimport(source_translations, new_translations)
-    require 'ya2yaml'
     Hash.send(:include, I18nTasks::HashExtensions) unless Hash.new.kind_of?(I18nTasks::HashExtensions)
 
     raise "Need source translations" unless source_translations
@@ -391,7 +392,7 @@ namespace :i18n do
 # This YAML file is auto-generated from a Transifex import.
 # Do not edit it by hand, your changes will be overwritten.
 HEADER
-      f.write({import.language => complete_translations}.ya2yaml(:syck_compatible => true))
+      f.write({import.language => complete_translations}.to_yaml)
     }
 
     puts({

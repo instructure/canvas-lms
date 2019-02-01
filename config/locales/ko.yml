@@ -921,7 +921,7 @@ ko:
       add_sis_stickiness_instructions: "이 옵션을 선택하면 SIS 가져오기를 통해 변경된 내용이 UI 변경과 마찬가지로 처리되어 여기에서 변경한 필드를 추후의 재정의하지 않는 SIS 가져오기에서 변경할 수 없습니다."
       add_sis_stickiness_label: "UI 변경으로 처리"
       batch_import_instructions: |-
-          이를 선택하면 위에서 선택한 가져오기 파일에 없는 모든 과목 및 등록을 포함하여 이 학기의 모든 자료를 삭제합니다.
+          이를 선택하면 위에서 선택한 가져오기 파일에 없는 모든 과목 및 등록을 포함하여 이 학기의 모든 자료를 삭제합니다.  
           자세한 내용은 설명서를 참고하십시오.
       batch_mode_label: "전체 일괄 처리임"
       clear_sis_stickiness_instructions: "이 옵션을 선택하면 SIS 가져오기가 변경한 모든 레코드의 모든 필드를 추후의 재정의하지 않는 SIS 가져오기에서 변경할 수 있습니다."
@@ -935,7 +935,7 @@ ko:
       imported_with_messages_message: "SIS 자료를 가져왔으나 다음 메시지가 출력되었습니다:"
       last_batch_title: "마지막 일괄 처리"
       override_sis_stickiness_instructions: |-
-          기본 값으로 UI 변경이 SIS 가져오기 변경에 대해 더 높은 우선 순위를 갖습니다. 필드 수의 경우, 관리자가 UI를 통해 해당 필드를 변경한 경우에 SIS 가져오기는 해당 필드의 자료를 변경하지 않습니다. 이 옵션을 선택하면 SIS 가져오기는 UI 변경을 재정의합니다.
+          기본 값으로 UI 변경이 SIS 가져오기 변경에 대해 더 높은 우선 순위를 갖습니다. 필드 수의 경우, 관리자가 UI를 통해 해당 필드를 변경한 경우에 SIS 가져오기는 해당 필드의 자료를 변경하지 않습니다. 이 옵션을 선택하면 SIS 가져오기는 UI 변경을 재정의합니다.  
           자세한 내용은 설명서를 참고하십시오.
       override_sis_stickiness_label: "UI 변경 재정의"
       page_title: "SIS 가져오기"
@@ -1030,6 +1030,11 @@ ko:
             text: "이는 다음 항목을 하나도 포함하지 않은 모든 과목에 대한 보고서입니다: 과제, 공지, 토론, 모듈, 페이지, 퀴즈."
     update_failed_notice: "계정 설정 업데이트 실패"
     user_access_csv_parameters: 
+      account_reports: 
+        usu: 
+          enrollment_type: 
+            header: "등록 유형"
+    user_access_prospect_education_csv_parameters: 
       account_reports: 
         usu: 
           enrollment_type: 
@@ -1676,7 +1681,7 @@ ko:
     positive_number: "양수를 사용해야 함"
     redirect_page: 
       redirect_message: |-
-          이 제출물은 URL이며 지금 해당 URL 링크로 갈 수 있습니다.
+          이 제출물은 URL이며 지금 해당 URL 링크로 갈 수 있습니다.  
           [제출물로 가려면 여기를 클릭하십시오](%{url})
     rules_text: 
       one: "규칙 %{count}개"
@@ -2450,6 +2455,7 @@ ko:
         invalid_url: "잘못된 URL"
         login_expiration_minimum: "세션 만료는 20분 이상이어야 함"
         need_integer: "재생 목록 캐시를 위한 정수를 입력하시기 바랍니다."
+  canvas_alert_late_submission_user_name_assignment__ee1301ac: "Canvas 알림 - 지연된 과제: %{user_name}, %{assignment_name}"
   canvas_cartridge_description: "Canvas 내보내기를 가져올 수 있는 중재 JSON 형식으로 변환"
   canvas_cartridge_display: "Canvas Common Cartridge"
   canvas_cartridge_file_description: "Canvas 과목 내보내기 패키지"
@@ -2599,8 +2605,8 @@ ko:
             
             **주의**: 여러분의 작업을 확실하게 보존하려면 [EtherPad 삭제 정책](%{etherpad_deletion_policy_url})을 숙지해야 합니다.
         google_docs: |-
-            Google Docs는 그룹 프로젝트에서 협업하기에 좋은 곳입니다. Microsoft Word와 같으면서도 이메일을 주고 받지 않고 다른 사람들과 동시에 작업을 할 수 있게 해줍니다.
-            
+            Google Docs는 그룹 프로젝트에서 협업하기에 좋은 곳입니다. Microsoft Word와 같으면서도 이메일을 주고 받지 않고 다른 사람들과 동시에 작업을 할 수 있게 해줍니다.  
+              
             **주의**: Google Docs 협업에 참여하려면 여러분과 협업자 모두 Google 계정이 필요합니다.
       labels: 
         collaboration_type: "협업에 사용:"
@@ -5350,6 +5356,7 @@ ko:
     grade_display_warning: 
       warning: 경고
   grade_export_title: "평점 내보내기"
+  grade_grade_7e52dd1c: "평점: %{grade}"
   gradebook: 
     alerts: 
       no_active_students: "죄송합니다. 과목에 활동 중인 학생이 없거나 평가할 수 있는 학생이 없습니다."
@@ -6302,6 +6309,7 @@ ko:
     tooltips: 
       enter_search_terms: "검색 용어 입력"
   invalid_content_type_utf_8_required_bd458b78: "유효하지 않은 내용 유형 - UTF-8 필요"
+  invalid_domain_e810c1d: "올바르지 않은 도메인"
   invalid_file_type_881cc9b2: "유효하지 않은 파일 유형"
   invalid_url_in_xml: "XML에 잘못된 URL이 있습니다. 앰퍼샌드는 이스케이프 처리를 해야 합니다."
   invalid_xml_syntax: "유효하지 않은 XML 구문"
@@ -6370,6 +6378,7 @@ ko:
       previous: 이전
   key_name_7311d22: "키 이름:"
   key_settings_44df6a41: "키 설정"
+  late_assignment_user_name_assignment_name_2df32e01: "지연된 과제: %{user_name}, %{assignment_name}"
   latest_f604a75: 최신
   latest_score_905aa87b: "최종 점수"
   layouts: 
@@ -6990,9 +6999,9 @@ ko:
     assignment_changed: 
       email: 
         body: |-
-            %{course}의 "%{title}" 과제가 변경되었습니다.
+            %{course}의 "%{title}" 과제가 변경되었습니다.  
             
-            여기를 클릭하여 과제 보기:
+            여기를 클릭하여 과제 보기: 
             %{url}
         html: 
           body: "%{course}의 \"%{title}\" 과제가 변경되었습니다."
@@ -8380,6 +8389,7 @@ ko:
     must_view_incomplete: "페이지를 봐야 함"
   moodle_dropdown_warning_title: "다시 선다 문제를 올바르게 가져오지 못함"
   more_courses_5ebbe998: "다른 과목"
+  more_info_at_web_address_dba7e187: "자세한 정보는 %{web_address} 참고"
   move_abf00365: 이동
   move_dialog: 
     cancel: 취소
@@ -9116,6 +9126,8 @@ ko:
     labels: 
       requirements_must_be_completed: "이 페이지를 잠금 해제하기 전에 다음 요구 사항이 완료되어야 합니다."
   privacy_290109ea: "개인 정보"
+  privacy_level_f0ec09a3: "개인 정보 보호 수준"
+  private_3883d133: 비공개
   product_name: Canvas
   profile: 
     access_token: 
@@ -12051,6 +12063,7 @@ ko:
     quiz_regrade: 
       got_it: 확인
   truncated_56b1a661: 잘림
+  turned_in_submission_date_e9180b8b: "제출일: %{submission_date}"
   turnitin: 
     error_1007: "업로드한 파일이 너무 큽니다."
     error_1009: "유효하지 않은 파일 유형입니다. (유효한 파일 유형은 MS Word, Acrobat PDF, Postscript, Text, HTML, WordPerfect, RTF 입니다.)"
@@ -12163,7 +12176,9 @@ ko:
       updating_user_details: "사용자 세부 정보 업데이트 중..."
     notices: 
       image_reported: "이미지가 보고되었습니다."
+  user_name_has_just_turned_in_a_late_submission_for_874a9a31: "%{user_name}이(가) %{course_name} 과목의 %{assignment_name} 과제에 대한 제출물을 제출함"
   user_name_just_sent_you_a_message_in_canvas_a2cb3bf4: "%{user_name}이(가) 방금 Canvas에서 메시지를 보냈습니다."
+  user_name_just_turned_in_their_assignment_late_ass_a54b128a: "%{user_name}이(가) %{assignment_name} 과제를 제출함(지연)"
   user_notes: 
     confirms: 
       delete_journal_entry: "이 일지 항목을 삭제하시겠습니까?"

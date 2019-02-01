@@ -16,10 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class BackfillPostedAtOnSubmissions < ActiveRecord::Migration[5.1]
+  disable_ddl_transaction!
   tag :postdeploy
 
   def up
-    Submission.where(posted_at: nil).where.not(graded_at: nil).find_ids_in_ranges do |start_at, end_at|
+    Submission.find_ids_in_ranges(:batch_size => 500_000) do |start_at, end_at|
       DataFixup::BackfillPostedAtOnSubmissions.send_later_if_production_enqueue_args(
         :run,
         {

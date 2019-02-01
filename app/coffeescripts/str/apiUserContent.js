@@ -19,13 +19,46 @@ import $ from 'jquery'
 import _ from 'underscore'
 import htmlEscape from 'str/htmlEscape'
 import I18n from 'i18n!user_content'
+import mathMLTagNames from 'mathml-tag-names'
+import sanitizeHtml from 'sanitize-html'
+
+// From https://developer.mozilla.org/en-US/docs/Web/MathML/Attribute
+const MATHML_ATTRIBUTES = [
+  'accent', 'accentunder', 'actiontype', 'align', 'alignmentscope', 'altimg', 'altimg-width',
+  'altimg-height', 'altimg-valign', 'alttext', 'bevelled', 'charalign', 'close', 'columnalign',
+  'columnlines', 'columnspacing', 'columnspan', 'columnwidth', 'crossout', 'decimalpoint',
+  'denomalign', 'depth', 'dir', 'display', 'displaystyle', 'edge', 'equalcolumns', 'equalrows',
+  'fence', 'form', 'frame', 'framespacing', 'groupalign', 'height', 'id', 'indentalign',
+  'indentalignfirst', 'indentalignlast', 'indentshift', 'indentshiftfirst', 'indentshiftlast',
+  'indenttarget', 'infixlinebreakstyle', 'largeop', 'length', 'linebreak', 'linebreakmultchar',
+  'linebreakstyle', 'lineleading', 'linethickness', 'location', 'longdivstyle', 'lspace',
+  'lquote', 'mathbackground', 'mathcolor', 'mathsize', 'mathvariant', 'maxsize', 'minlabelspacing',
+  'minsize', 'movablelimits', 'notation', 'numalign', 'open', 'overflow', 'position', 'rowalign',
+  'rowlines', 'rowspacing', 'rowspan', 'rspace', 'rquote', 'scriptlevel', 'scriptminsize',
+  'Starting', 'scriptsizemultiplier', 'selection', 'separator', 'separators', 'shift', 'side',
+  'src', 'stackalign', 'stretchy', 'subscriptshift', 'supscriptshift', 'symmetric', 'voffset',
+  'width', 'xmlns'
+]
+
+function sanitizeMathmlHtml(html) {
+  const opts = {
+    allowedTags: mathMLTagNames,
+    allowedAttributes: {
+      '*': MATHML_ATTRIBUTES
+    }
+  }
+  return sanitizeHtml(html, opts)
+}
 
 const apiUserContent = {
+
   /*
   xsslint safeString.identifier mathml
+  xsslint safeString.identifier sanitized
   */
   translateMathmlForScreenreaders ($equationImage) {
-    const mathml = $('<div/>').html($equationImage.data('mathml')).html()
+    const sanitized = sanitizeMathmlHtml($equationImage.data('mathml'))
+    const mathml = $('<div/>').html(sanitized).html()
     const mathmlSpan = $('<span class="hidden-readable"></span>')
     mathmlSpan.html(mathml)
     return mathmlSpan

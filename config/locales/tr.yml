@@ -1322,7 +1322,7 @@ tr:
       add_sis_stickiness_instructions: "Bu tercih seçildiğinde, burada değiştirilen alanlardan gelen sonradan üzerine yazılamayan ÖBS içe aktarmalar engellenerek ÖBS içe aktarma ile yapılan değişiklikler Kullanıcı Arabirimi değişiklikleri gibi işlem görecektir."
       add_sis_stickiness_label: "Arayüz Değişim Süreçleri "
       batch_import_instructions: |-
-          Bu alan seçilirse, yukarıda seçili içe aktarma dosyasında olmayan tüm dersler ve öğrenci kayıtlarını içeren bu ifade ile ilgili herşey silinir.
+          Bu alan seçilirse, yukarıda seçili içe aktarma dosyasında olmayan tüm dersler ve öğrenci kayıtlarını içeren bu ifade ile ilgili herşey silinir. 
           Ayrıntılı bilgi için belgelere bakın.
       batch_mode_label: "Bu, tam bir toplu güncellemedir"
       clear_sis_stickiness_instructions: "Bu tercih seçildiğinde, bu ÖBS içe aktarımından etkilenen kayıtlardaki tüm alanlar ileride ÖBS içe aktarmada üzerine yazılmayarak değiştirilebilecektir."
@@ -1336,7 +1336,7 @@ tr:
       imported_with_messages_message: "ÖBS verileri aktarıldı, fatat şu aktarım mesajı oluşturuldu:"
       last_batch_title: "Son Toplu İşler "
       override_sis_stickiness_instructions: |-
-          Varsayılan olarak Kullanıcı Arabirimindeki değişikliklerin ÖBS içe aktarmadaki değişikliklere göre önceliği vardır; çoğu alan için eğer yönetici bir alanı Kullanıcı Arabiriminden değiştirmişse ÖBS içe aktarımı bu alandaki verileri değiştirmeyecektir. Bu tercihi seçerseniz SIS aktarımındaki değişiklikler Kullanıcı Arabirimindekilerin üzerine yazılır.
+          Varsayılan olarak Kullanıcı Arabirimindeki değişikliklerin ÖBS içe aktarmadaki değişikliklere göre önceliği vardır; çoğu alan için eğer yönetici bir alanı Kullanıcı Arabiriminden değiştirmişse ÖBS içe aktarımı bu alandaki verileri değiştirmeyecektir. Bu tercihi seçerseniz SIS aktarımındaki değişiklikler Kullanıcı Arabirimindekilerin üzerine yazılır. 
           Ayrıntılar için belgelere bakın.
       override_sis_stickiness_label: "Arayüz değişikliklerinin üzerine yaz"
       page_title: "ÖBS İçe Aktarımı"
@@ -1468,6 +1468,17 @@ tr:
             text: "Bu rapor, şu öğelerden hiçbirini içermeyen tüm dersler içindir: ödevler, duyurular, tartışmalar, dosyalar, modüller, sayfalar veya kısa sınavlar."
     update_failed_notice: "Hesap ayarları güncellenemedi"
     user_access_csv_parameters: 
+      account_reports: 
+        usu: 
+          enrollment_type: 
+            header: "Kayıt Türü"
+      all: "Tüm Kayıtlar"
+      designer: "Tasarımcı Kayıtları"
+      observer: "Gözlemci Kayıtları"
+      students: "Öğrenci Kayıtları"
+      ta: "Asistan Öğretmen Kayıtları"
+      teachers: "Öğretmen Kayıtları"
+    user_access_prospect_education_csv_parameters: 
       account_reports: 
         usu: 
           enrollment_type: 
@@ -3616,6 +3627,7 @@ tr:
   canvas_alert_change_assignment_name_course_name_2fc63d9c: "Canvas Uyarısı - Değişiklik: %{assignment_name}, %{course_name}"
   canvas_alert_invited_course_as_role_type_9ed79ce3: "Canvas Uyarısı - %{course} dersine %{role_type} olarak davet edildi"
   canvas_alert_invited_course_as_role_type_ea825937: "Canvas Uyarısı - derse %{role_type} olarak davet edildi"
+  canvas_alert_late_submission_user_name_assignment__ee1301ac: "Canvas Uyarısı - Geç Gönderim : %{user_name}, %{assignment_name}"
   canvas_attribute_eaa7e31a: "Canvas Özelliği"
   canvas_by_instructure_1490381: "Instructure Canvas"
   canvas_cartridge_description: "Bu eklenti ile canvas dışa aktarımı, içe aktarılacak bir aracı json formatına dönüştürülür"
@@ -3840,21 +3852,18 @@ tr:
             Sadece
             Canvas'tan Sil
         delete_from_google_docs: |-
-            Ayrıca Google
+            Ayrıca Google  
             Docs'dan da Sil
         start_collaborating: "İşbirliğini Başlat"
         update: "İşbirliğini Güncelle"
       collaboration_name: "%{course_or_group_name} İşbirliği"
       descriptions: 
         etherpad: |-
-            EtherPad hızlı bir şekilde paylaşılan belgeler oluşturmanızı sağlayan bir açık kaynak projesidir.  Diğerlerinin yazdıklarını onlar yazarken görebileceğiniz kadar hızlıdır. Fakat "pad" ler şifre ile korunmadığından bağlantı adresine sahip herkes düzenleme yapabilir. Herkese açık ve Google hesabı olmadan katılımı sağlamak istiyorsanız EtherPad Google Docs'a göre daha uygun olabilir.
-            
+            EtherPad hızlı bir şekilde paylaşılan belgeler oluşturmanızı sağlayan bir açık kaynak projesidir.  Diğerlerinin yazdıklarını onlar yazarken görebileceğiniz kadar hızlıdır. Fakat "pad" ler şifre ile korunmadığından bağlantı adresine sahip herkes düzenleme yapabilir. Herkese açık ve Google hesabı olmadan katılımı sağlamak istiyorsanız EtherPad Google Docs'a göre daha uygun olabilir.  
+              
             **Uyarı**: çalışmanızın kaydedilmiş olarak saklandığına emin olmak için [EtherPad silme politikası](%{etherpad_deletion_policy_url}) ile ilgili bilginiz olmalı.
-        google_docs: |-
-            Google Docs grup projelerinde işbirliği için güzel bir ortam. Microsoft Word e benzer fakat diğer paylaşılan kişilere eposta ile göndermek zorunda kalmadan aynı belfe üzerinde birlikte çalışabilirsiniz.
-            
-            
-            **Uyarı**: Google Docs da işbirliği yaparak çalışmak için (işbirliği yaptığınız kişilerin) ve sizin Google hesabınız olmalı.
+        google_docs: "Google Docs grup projelerinde işbirliği için güzel bir ortam. Microsoft Word e benzer fakat diğer paylaşılan kişilere eposta ile göndermek zorunda kalmadan aynı belfe üzerinde birlikte çalışabilirsiniz. \n\n\n\
+            **Uyarı**: Google Docs da işbirliği yaparak çalışmak için (işbirliği yaptığınız kişilerin) ve sizin Google hesabınız olmalı. "
       labels: 
         collaboration_type: "Şunu kullanarak işbirliği yap:"
         description: "Açıklama:"
@@ -7869,6 +7878,7 @@ tr:
   grade_distribution_e52c9256: "Not Dağılımı"
   grade_export_title: "Notları Dışa Aktarma"
   grade_for_name_b9df168a: "Şu öğrencinin notu: %{name}"
+  grade_grade_7e52dd1c: "Not: %{grade}"
   grade_summary: 
     graph_title: "Ortalama %{mean}, Yüksek %{high}, Düşük %{low}"
     outcome: 
@@ -9159,6 +9169,7 @@ tr:
   invalid_authenticity_token_b753558c: "Geçersiz Yetkilendirme Anahtarı"
   invalid_content_type_utf_8_required_bd458b78: "Geçersiz içerik türü, UTF-8 gerekiyor"
   invalid_csv_file_grades_could_not_be_updated_6ebdeca4: "Geçersiz csv dosyası, notlar güncellenemedi."
+  invalid_domain_e810c1d: "Hatalı alan adı"
   invalid_file_type_881cc9b2: "Geçersiz dosya türü"
   invalid_points_possible: "Bu ödev için olası puan değerleri sıfır veya üstü bir değer olmalıdır."
   invalid_recipient_name_56b22b86: "Geçersiz alıcı adı."
@@ -9271,6 +9282,7 @@ tr:
   last_modified_by_ca4bb5e1: "Son Düzenleme"
   last_user_access_title: "Son Kullanıcı Erişimi"
   late_2be42b88: Geç
+  late_assignment_user_name_assignment_name_2df32e01: "Geç Gönderilen Ödev:  %{user_name}, %{assignment_name}"
   late_percent_b91d01b3: "Geç : %{percent}"
   latest_assessment_a85280ef: "En son Değerlendirme"
   latest_f604a75: "En Son"
@@ -11640,6 +11652,7 @@ tr:
   moodle_formula_warning_title: "Formül sorusu için olası cevaplar yeniden oluşturulmalı"
   more_courses_5ebbe998: "Daha Fazla Dersler"
   more_info_at_course_name_56dc8c10: "Daha fazla bilgi için %{course_name}"
+  more_info_at_web_address_dba7e187: "Daha fazla bilgi için %{web_address}"
   more_information_3dfb76b5: "Daha fazla bilgi "
   more_than_999_submissions_need_grading_bc087dd0: "999'dan fazla gönderinin notlandırılması gerek"
   more_than_a19b440: "%{more_than}+"
@@ -12909,6 +12922,7 @@ tr:
   previous_time_cc96b361: "Önceki (%{time})"
   previous_timestamp_19343a58: "Önceki (%{timestamp})"
   privacy_290109ea: Gizlilik
+  private_3883d133: Özel
   product_name: Canvas
   profile: 
     access_token: 
@@ -16861,6 +16875,7 @@ tr:
   tree_browser: 
     folder_tree_instructions: "Ağaç üzerinde gezinmek için aşağı ve yukarı ok tuşlarını kullanın. Klasörleri genişletmek için sağ oka, daraltmak için sol oka ve seçmek için enter tuşuna basın."
   truncated_56b1a661: Kesik
+  turned_in_submission_date_e9180b8b: "teslim zamanı: %{submission_date}"
   turnitin: 
     error_1007: "Yüklenen dosya çok büyük."
     error_1009: "Bilinmeyen dosya tipi. (Kabul edilen : MS Word, Acrobat PDF, Postscript, Text, HTML, WordPerfect (WPD) ve Zengin Metin Biçimi )"
@@ -17033,7 +17048,9 @@ tr:
       updating_user_details: "Kullanıcı Ayrıntıları Güncelleniyor..."
     notices: 
       image_reported: "Bu resim raporlandı"
+  user_name_has_just_turned_in_a_late_submission_for_874a9a31: "%{user_name}, %{course_name} dersindeki  %{assignment_name} ödevi için geç bir gönderim yaptı"
   user_name_just_sent_you_a_message_in_canvas_a2cb3bf4: "%{user_name} kullanıcısı Canvas'ta sizlere mesaj yolladı."
+  user_name_just_turned_in_their_assignment_late_ass_a54b128a: "%{user_name},  %{assignment_name} ödevini teslim etti (geç)"
   user_name_you_just_sent_a_message_in_canvas_b1fd4598: "%{user_name}, Canvas üzerinden bir mesaj gönderdiniz."
   user_notes: 
     confirms: 

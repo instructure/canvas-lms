@@ -1454,6 +1454,17 @@ fa:
       students: "ثبت نام دانشجویان"
       ta: "ثبت نام دستیارهای آموزشی"
       teachers: "ثبت نام اساتید"
+    user_access_prospect_education_csv_parameters: 
+      account_reports: 
+        usu: 
+          enrollment_type: 
+            header: "نوع ثبت نام"
+      all: "همه ثبت نام ها"
+      designer: "ثبت نام طراح ها"
+      observer: "ثبت نام های بیننده"
+      students: "ثبت نام دانشجویان"
+      ta: "ثبت نام دستیارهای آموزشی"
+      teachers: "ثبت نام اساتید"
     user_access_tokens_csv_description: 
       account_reports: 
         default: 
@@ -3582,6 +3593,7 @@ fa:
   canvas_alert_change_assignment_name_course_name_2fc63d9c: "هشدار کانواس - تغییر: %{assignment_name}، %{course_name}"
   canvas_alert_invited_course_as_role_type_9ed79ce3: "هشدار کانواس - دعوت شده: %{course} به عنوان %{role_type}"
   canvas_alert_invited_course_as_role_type_ea825937: "هشدار کانواس - دعوت شده: درس به عنوان %{role_type}"
+  canvas_alert_late_submission_user_name_assignment__ee1301ac: "هشدار کانواس - ارسال دارای تأخیر: %{user_name}، %{assignment_name}"
   canvas_attribute_eaa7e31a: "ویژگی کانواس"
   canvas_by_instructure_1490381: "کانواس تهیه شده توسط شرکت Instructure"
   canvas_cartridge_description: "امکان تبدیل یک صدور کانواس به قالب واسط json را برای وارد شدن فراهم می کند"
@@ -9430,6 +9442,7 @@ fa:
   invalid_csv_file_grades_could_not_be_updated_4d5c120c: "فایل csv معتبر نیست، به روز رسانی نمره‌ها امکان پذیر نیست."
   invalid_csv_file_grades_could_not_be_updated_6ebdeca4: "فایل csv معتبر نیست، نمره ها را نمی توان بهنگام سازی کرد."
   invalid_date_or_invalid_datetime_for_attr_6661103f: "تاریخ یا تاریخ زمانی برای %{attr} معتبر نیست"
+  invalid_domain_e810c1d: "دامنه معتبر نیست"
   invalid_file_type_881cc9b2: "نوع فایل معتبر نیست"
   invalid_points_possible: "مقدار امتیازهای ممکن برای این تکلیف باید صفر یا بیشتر باشد."
   invalid_recipient_name_56b22b86: "نام گیرنده معتبر نیست."
@@ -9574,6 +9587,7 @@ fa:
   last_user_access_title: "آخرین دسترسی کاربر"
   late_2be42b88: "با تأخیر"
   late_8bd684b6: "با تأخیر"
+  late_assignment_user_name_assignment_name_2df32e01: "تکلیف دارای تأخیر: %{user_name}، %{assignment_name}"
   late_bd436902: "با تأخیر"
   late_penalty_78099d18: "جریمه تأخیر:"
   late_penalty_817fff4e: "جریمه تأخیر"
@@ -12127,6 +12141,7 @@ fa:
   more_cf9cc661: بیشتر
   more_courses_5ebbe998: "درس های دیگر"
   more_info_at_course_name_56dc8c10: "اطلاعات بیشتر در %{course_name}"
+  more_info_at_web_address_dba7e187: "اطلاعات بیشتر در %{web_address}"
   more_information_3dfb76b5: "اطلاعات بیشتر"
   more_results_were_added_at_the_bottom_of_the_page_dc323877: "نتایج بیشتر در پایین صفحه اضافه شد."
   more_than_999_submissions_need_grading_bc087dd0: "بیش از 999 مورد ارسالی به نمره گذاری نیاز دارد"
@@ -13673,6 +13688,7 @@ fa:
   primary_color_button_b75db628: "دکمه رنگ اولیه"
   primary_color_button_disabled_9081ddff: "دکمه رنگ اولیه غیر فعال شد"
   privacy_290109ea: "حریم خصوصی"
+  private_3883d133: خصوصی
   proceed_f3d33864: "ادامه دادن"
   processing_2fcc9739: "در حال پردازش"
   product_name: کانواس
@@ -14791,7 +14807,7 @@ fa:
           multiple_dropdowns: "پرسش خود را وارد کنید، و تعیین کنید که هر منوی بازشونده باید کجا قرار بگیرد. سپس پاسخ های احتمالی را برای هر منوی بازشونده به همراه یک پاسخ درست برای هر منوی بازشونده تعیین کنید."
           numerical: "پاسخ درست را به عنوان یک عدد در یک محدوده یا یک عدد به اضافه یا منهای قدری حاشیه خطا تعیین کنید. به دانشجو یک کادر متنی خالی  داده می شود تا پاسخ عددی خود را تایپ کند."
           short_answer: |-
-              متن پرسش خود را وارد کنید، سپس همه پاسخ های درست را برای جای خالی تعیین کنید.
+              متن پرسش خود را وارد کنید، سپس همه پاسخ های درست را برای جای خالی تعیین کنید. 
               دانشجویان پرسش را به همراه یک کادر متنی کوچک برای تایپ کردن پاسخ خود مشاهده خواهند کرد.
           text_only: "این «پرسش» نمره گذاری نخواهد شد، اما می تواند برای معرفی مجموعه ای از پرسش های مرتبط مفید باشد."
           true_false: "متن پرسش خود را وارد کنید، سپس تعیین کنید که «درست» یا «غلط» پاسخ صحیح است."
@@ -18369,6 +18385,7 @@ fa:
     folder_tree_instructions: "از کلیدهای پیمایش بالا و پایین برای پیمایش در درخت استفاده کنید. کلید راست را برای باز کردن پوشه ها، کلید چپ را برای جمع کردن و کلید enter را برای انتخاب مورد انتخابی فشار دهید."
   trinidad_and_tobago_1_fc2d8d1c: "ترینیداد و توباگو (+1)"
   truncated_56b1a661: "کوتاه شده"
+  turned_in_submission_date_e9180b8b: "تحویل داده شد: %{submission_date}"
   turning_off_this_tutorial_will_remove_the_tutorial_dfd81b3a: "غیر فعال کردن این آموزش، سینی آموزش را از نمای همه درس‌های شما حذف خواهد کرد. این مورد می‌تواند در زیر قسمت گزینه‌های ویژگی در تنظیمات کاربری شما، دوباره فعال شود. "
   turnitin: 
     error_1007: "فایل بارگذاری شده بزرگ است."
@@ -18655,9 +18672,11 @@ fa:
       updating_user_details: "در حال بهنگام سازی اطلاعات کاربر..."
     notices: 
       image_reported: "این تصویر گزارش شده است"
+  user_name_has_just_turned_in_a_late_submission_for_874a9a31: "%{user_name} یک مورد ارسالی دارای تأخیر را برای %{assignment_name} در درس %{course_name} تحویل داده است"
   user_name_just_added_you_to_a_conversation_in_canv_7b278b51: "%{user_name} شما را به یک گفتگو در کانواس افزود. برای مشاهده گفتگو، روی این پیوند: %{link} کلیک کنید."
   user_name_just_sent_you_a_message_in_canvas_9e911af7: "%{user_name} یک پیام برای شما در کانواس ارسال کرد"
   user_name_just_sent_you_a_message_in_canvas_a2cb3bf4: "%{user_name} یک پیام را در کانواس برای شما ارسال کرده است."
+  user_name_just_turned_in_their_assignment_late_ass_a54b128a: "%{user_name} تکلیف (دارای تأخیر) %{assignment_name} خود را تحویل داد"
   user_name_you_just_sent_a_message_in_canvas_b1fd4598: "%{user_name}، یک پیام در کانواس ارسال کرده اید."
   user_name_you_ll_need_to_log_in_before_you_can_vie_164c8e30: "%{user_name}، قبل از اینکه بتوانید این صفحه را مشاهده کنید، باید *وارد شوید*."
   user_navigation_a097be0f: "پیمایش کاربر"
