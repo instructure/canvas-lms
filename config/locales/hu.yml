@@ -1321,6 +1321,17 @@ hu:
       students: "Hallgatói beiratkozások"
       ta: "Segédoktatói beiratkozások"
       teachers: "Oktatói beiratkozások"
+    user_access_prospect_education_csv_parameters: 
+      account_reports: 
+        usu: 
+          enrollment_type: 
+            header: "Beiratkozás típusa"
+      all: "Összes beiratkozás"
+      designer: "Tervezői beiratkozások"
+      observer: "Megfigyelői beiratkozások"
+      students: "Hallgatói beiratkozások"
+      ta: "Segédoktatói beiratkozások"
+      teachers: "Oktatói beiratkozások"
     user_access_tokens_csv_description: 
       account_reports: 
         default: 
@@ -3258,10 +3269,8 @@ hu:
             Az EtherPad egy nyílt forrású projekt, amivel gyorsan hozhatunk létre megosztott dokumentumokat. Elég gyorsan működik ahhoz, hogy lássuk, mit gépelnek be a többiek.Másrészről, ezek a jegyzettömbök nem védettek jelszóval, ezért bárki, aki ismeri a webcímet, szerkesztheti ezeket. Az EtherPad jobb választás lehet, mint a Google Docs, abban az esetben, ha a névtelenség fontos, vagy Google fiók nélkül nélkül szeretne együttműkődni másokkal.
             
             **Figyelem**: ismerje meg az [EtherPad törlési  irányelveit](%{etherpad_deletion_policy_url}) annak érdekében, hogy a munkája megmaradjon.
-        google_docs: |-
-            A Google Dokumentumok egy nagyszerű szolgáltatás a projektmunkák támogatására. Olyan, mint egy hagyományos szövegszerkesztő, de lehetővé teszi számunkra, hogy ugyanabban az időben másokkal együtt dolgozhassunk ugyanazon a dokumentumon, anélkül, hogy körbe kellene küldeni a dokumentum újabb és újabb változatait.
-            
-            **Figyelem**: Önnek (és minden együttműködőnek) szüksége lesz egy Google fiókra ahhoz, hogy részt vehessen a Google Dokumentumok szerkesztésében.
+        google_docs: "A Google Dokumentumok egy nagyszerű szolgáltatás a projektmunkák támogatására. Olyan, mint egy hagyományos szövegszerkesztő, de lehetővé teszi számunkra, hogy ugyanabban az időben másokkal együtt dolgozhassunk ugyanazon a dokumentumon, anélkül, hogy körbe kellene küldeni a dokumentum újabb és újabb változatait.\n\n\
+            **Figyelem**: Önnek (és minden együttműködőnek) szüksége lesz egy Google fiókra ahhoz, hogy részt vehessen a Google Dokumentumok szerkesztésében. "
       labels: 
         collaboration_type: "Együttműködés ezt használva:"
         description: "Leírás:"
@@ -8631,7 +8640,7 @@ hu:
             hozta létre
             %{service} szolgáltatással és Önt %{email} e-mail címe alapján hívták meg.
             
-            Ha ez az e-mail cím nem felel meg ehhez az együttműködéshez,
+            Ha ez az e-mail cím nem felel meg ehhez az együttműködéshez, 
             meg kell változtatnia a profilbeállításait vagy regisztrálnia kell a %{service} szolgáltatásban.
             
             A részletekről itt tájékozódhat:
