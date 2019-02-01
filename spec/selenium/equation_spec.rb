@@ -26,6 +26,7 @@ describe "equation editor" do
 
 
   it "should remove bookmark when clicking close" do
+    skip('CORE-2434 flakey as of 2/1/2019')
     course_with_teacher_logged_in
     get "/courses/#{@course.id}/quizzes"
     f('.new-quiz-link').click
