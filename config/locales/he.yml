@@ -1317,9 +1317,8 @@ he:
     sis_import: 
       add_sis_stickiness_instructions: "עם בחירת אפשרות זו, שינויים אשר יתבצעו ביבוא זה ממערכת בית ספרית (SIS) זו יעובדו כאילו הם שינויי ממשק משתמש, וימנעו ריצות יבוא של SIS \"בלתי דרסניות\" מלשנות שדות כאן."
       add_sis_stickiness_label: "עבד כשינויי UI"
-      batch_import_instructions: |-
-          אם נבחרה, אפשרות זו תבטל הכל עבור מחצית זו, כולל כל הקורסים וההרשמות אשר אינן בהגדרות הקובץ לייבוא לעיל.
-          לפירוט ניתן לעיין בתיעוד המערכת
+      batch_import_instructions: "אם נבחרה, אפשרות זו תבטל הכל עבור מחצית זו, כולל כל הקורסים וההרשמות אשר אינן בהגדרות הקובץ לייבוא לעיל.\n\
+          לפירוט ניתן לעיין בתיעוד המערכת "
       batch_mode_label: "זהו עדכון אצבה מלא"
       clear_sis_stickiness_instructions: "עם בחירת אפשרות זו, כל השדות בכל הרשומות שריצת היבוא של SIS זו נוגעת בהן תהיינה בנות שינוי בעתיד בריצות \"בלתי דורסניות\" של ייבוא SIS."
       clear_sis_stickiness_label: "ניקוי מצב שינויי UI"
@@ -1470,6 +1469,17 @@ he:
             text: "זהו דוח של כל הקורסים אשר אין להם ממצאים לרכיבים הבאים: משימות, הכרזות, דיונים, קבצים, מודולים, דפים או בחנים."
     update_failed_notice: "עדכון הגדרות החשבון נכשל"
     user_access_csv_parameters: 
+      account_reports: 
+        usu: 
+          enrollment_type: 
+            header: "סוג הרשמה"
+      all: "כל ההרשמות"
+      designer: "הרשמות מעצבים"
+      observer: "הרשמות משקיפים"
+      students: "הרשמות תלמידים"
+      ta: "הרשמת עוזרי הוראה"
+      teachers: "הרשמות מורים"
+    user_access_prospect_education_csv_parameters: 
       account_reports: 
         usu: 
           enrollment_type: 
@@ -10571,9 +10581,9 @@ he:
     assignment_changed: 
       email: 
         body: |-
-            המשימה "%{title}" בקורס %{course} שונתה.
+            המשימה "%{title}" בקורס %{course} שונתה.  
             
-            יש להקליק כאן כדי לעיין בה:
+            יש להקליק כאן כדי לעיין בה: 
             %{url}
         html: 
           body: "המשימה \"%{title}\" בקורס %{course} שונתה."
