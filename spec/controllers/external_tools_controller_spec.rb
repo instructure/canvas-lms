@@ -139,6 +139,11 @@ describe ExternalToolsController do
       it 'caches the the LTI 1.3 launch' do
         expect(cached_launch["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
       end
+
+      it 'sets the "canvas_domain" to the request domain' do
+        message_hint = JSON::JWT.decode(assigns[:lti_launch].params['lti_message_hint'], :skip_verification)
+        expect(message_hint['canvas_domain']).to eq 'localhost'
+      end
     end
 
     context 'basic-lti-launch-request' do

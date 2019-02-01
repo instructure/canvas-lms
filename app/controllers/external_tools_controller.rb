@@ -485,11 +485,10 @@ class ExternalToolsController < ApplicationController
 
   def basic_lti_launch_request(tool, selection_type = nil, opts = {})
     lti_launch = tool.settings['post_only'] ? Lti::Launch.new(post_only: true) : Lti::Launch.new
-
     default_opts = {
         resource_type: selection_type,
         selected_html: params[:selection],
-        domain: @domain_root_account&.domain
+        domain: HostUrl.context_host(@domain_root_account, request.host)
     }
     opts = default_opts.merge(opts)
 
