@@ -2341,6 +2341,8 @@ class ApplicationController < ActionController::Base
     ctx[:real_user_id] = @real_current_user.global_id if @real_current_user
     ctx[:context_type] = @context.class.to_s if @context
     ctx[:context_id] = @context.global_id if @context
+    ctx[:context_sis_source_id] = @context.sis_source_id if @context.respond_to?(:sis_source_id)
+
     if @context_membership
       ctx[:context_role] =
         if @context_membership.respond_to?(:role)
