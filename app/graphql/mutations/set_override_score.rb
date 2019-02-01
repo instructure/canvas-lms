@@ -29,19 +29,36 @@ class Mutations::SetOverrideScore < Mutations::BaseMutation
     enrollment_id = input[:enrollment_id]
     grading_period_id = input[:grading_period_id]
 
-    enrollment = Enrollment.find(enrollment_id)
-    score_params = grading_period_id.present? ? {grading_period_id: grading_period_id} : nil
-    score = enrollment.find_score(score_params)
-    raise ActiveRecord::RecordNotFound if score.blank?
+    # If the relevant user has multiple enrollments in this course, we need
+    # to update them all to prevent inconsistencies
+    requested_enrollment = Enrollment.active.find(enrollment_id)
+    current_enrollments = StudentEnrollment.active.where(
+      course: requested_enrollment.course_id,
+      user: requested_enrollment.user_id
+    )
 
-    if authorized_action?(score.course, :manage_grades)
-      score.override_score = input[:override_score]
-      if score.save
-        {grades: score}
-      else
-        errors_for(score)
+    # Even if we do update multiple enrollments, though, we only want to
+    # return the score for the enrollment that was passed to us
+    return_value = nil
+
+    score_params = grading_period_id.present? ? {grading_period_id: grading_period_id} : nil
+    current_enrollments.each do |enrollment|
+      score = enrollment.find_score(score_params)
+      raise ActiveRecord::RecordNotFound if score.blank?
+
+      if authorized_action?(score.course, :manage_grades)
+        score.update(override_score: input[:override_score])
+        next unless enrollment == requested_enrollment
+
+        return_value = if score.valid?
+          {grades: score}
+        else
+          errors_for(score)
+        end
       end
     end
+
+    return_value
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, "not found"
   end
