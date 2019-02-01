@@ -116,6 +116,11 @@ describe UsersController do
         expect(assigns[:lti_launch].resource_url).to eq tool.url
       end
 
+      it 'sets the "canvas_domain" to the request domain' do
+        message_hint = JSON::JWT.decode(assigns[:lti_launch].params['lti_message_hint'], :skip_verification)
+        expect(message_hint['canvas_domain']).to eq 'localhost'
+      end
+
       context 'when the developer key has an oidc_login_uri' do
         let(:developer_key) { DeveloperKey.create!(oidc_login_uri: oidc_login_uri) }
         let(:oidc_login_uri) { 'https://www.test.com/oidc/login' }

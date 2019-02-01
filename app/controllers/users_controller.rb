@@ -1285,7 +1285,7 @@ class UsersController < ApplicationController
     opts = {
         resource_type: @resource_type,
         link_code: @opaque_id,
-        domain: @domain_root_account&.domain
+        domain: HostUrl.context_host(@domain_root_account, request.host)
     }
     variable_expander = Lti::VariableExpander.new(@domain_root_account, @context, self,{
                                                                         current_user: @current_user,
