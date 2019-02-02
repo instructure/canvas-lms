@@ -57,4 +57,28 @@ describe('Comments', () => {
     )
     expect(container).toHaveLength(1)
   })
+
+  it('renders comment rows when provided', () => {
+    const assignment = mockAssignment()
+    ReactDOM.render(<Comments assignment={assignment} />, document.getElementById('fixtures'))
+    const container = $('.comment-row-container')
+    expect(container).toHaveLength(1)
+  })
+
+  it('renders shortname when shortname is provided', () => {
+    const assignment = mockAssignment()
+    ReactDOM.render(<Comments assignment={assignment} />, document.getElementById('fixtures'))
+    const container = $('#fixtures:contains("bob builder")')
+    expect(container).toHaveLength(1)
+  })
+
+  it('renders Anonymous when shortname is not provided', () => {
+    const assignment = mockAssignment()
+    assignment.submissionsConnection.nodes[0].commentsConnection.nodes[0].author = null
+    ReactDOM.render(<Comments assignment={assignment} />, document.getElementById('fixtures'))
+    let container = $('#fixtures:contains("bob builder")')
+    expect(container).toHaveLength(0)
+    container = $('#fixtures:contains("Anonymous")')
+    expect(container).toHaveLength(1)
+  })
 })

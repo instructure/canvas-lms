@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2019 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -19,11 +19,17 @@
 import React from 'react'
 import NoComments from './NoComments'
 import {arrayOf} from 'prop-types'
+import CommentRow from './CommentRow'
 import {CommentShape} from '../../assignmentData'
 
 function CommentContent(props) {
   return (
-    <div className="comments-content-container">{!props.comments.length && <NoComments />}</div>
+    <div className="comments-content-container">
+      {!props.comments.length && <NoComments />}
+      {props.comments.map(comment => (
+        <CommentRow key={comment._id} comment={comment} />
+      ))}
+    </div>
   )
 }
 

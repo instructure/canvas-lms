@@ -49,9 +49,8 @@ export function mockAssignment(overrides = {}) {
             nodes: [
               {
                 __typename: 'Comment',
+                _id: '1',
                 comment: 'comment comment',
-                title: 'the best comment title',
-
                 updatedAt: '12/13/91',
                 author: {
                   __typename: 'Author',

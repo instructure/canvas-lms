@@ -81,6 +81,7 @@ export const STUDENT_VIEW_QUERY = gql`
           nodes {
             commentsConnection {
               nodes {
+                _id
                 comment
                 updatedAt
                 author {
@@ -103,6 +104,7 @@ export const STUDENT_VIEW_QUERY = gql`
 `
 
 export const CommentShape = shape({
+  _id: string,
   comment: string,
   author: shape({
     avatarUrl: string,

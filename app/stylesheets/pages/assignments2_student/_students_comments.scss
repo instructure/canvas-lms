@@ -24,3 +24,15 @@
 .comments-content-container {
   text-align: center;
 }
+
+.comment-row-container {
+  display: flex;
+  padding-top: 12px;
+}
+
+.comment-text-comment-container {
+  text-align: start;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
