@@ -262,7 +262,9 @@ describe('ConnectedWhitelist', () => {
         }
       )
 
-      const message = getByText(/you need to toggle the inherit setting/)
+      const message = getByText(
+        /Whitelist editing is disabled when security settings are inherited from a parent account/
+      )
       expect(message).toBeInTheDocument()
     })
 

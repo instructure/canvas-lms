@@ -79,10 +79,10 @@ export class SecurityPanel extends Component {
         <View as="div" margin="small 0">
           <Text as="p">
             {I18n.t(
-              `This allows you to restrict custom JavaScript that runs in your instance of Canvas.
-               This will be enabled by an updated Content Security Policy (CSP).
-               Domains will be added to your whitelist with the ability to manually add domains.
-               There is a a %{max_domains} domain limit on the whitelist.`,
+              `The Content Security Policy allows you to restrict custom
+               JavaScript that runs in your instance of Canvas. You can manually add
+               up to %{max_domains} domains to your whitelist. Wild cards are recommended
+               (e.g. *.instructure.com).`,
               {
                 max_domains: CONFIG.max_domains
               }
@@ -96,7 +96,7 @@ export class SecurityPanel extends Component {
                 <View margin="0 xx-small">
                   <Checkbox
                     variant="toggle"
-                    label={I18n.t('Inherit Content Security Policy Settings')}
+                    label={I18n.t('Inherit Content Security Policy')}
                     onChange={this.handleCspInheritChange}
                     checked={this.props.cspInherited}
                   />

@@ -148,7 +148,7 @@ export class Whitelist extends Component {
           {domainLimitReached && (
             <Alert variant="error" margin="small 0">
               {I18n.t(
-                `You have reached the domain limit, if you wish to add more to your whitelist, please remove others first.`
+                `You have reached the domain limit.  You can add more domains by deleting existing domains in your whitelist.`
               )}
             </Alert>
           )}
@@ -156,7 +156,7 @@ export class Whitelist extends Component {
           {this.props.inherited && (
             <Alert variant="info" margin="small 0">
               {I18n.t(
-                `You are currently using settings that have been set by a parent account.  To add or remove domains, you need to toggle the inherit setting.`
+                `Whitelist editing is disabled when security settings are inherited from a parent account.`
               )}
             </Alert>
           )}
@@ -226,8 +226,15 @@ export class Whitelist extends Component {
             </Heading>
             <p>
               {I18n.t(
-                `These domains have automatically been added to your whitelist.
-              If you wish to remove them, you should remove the associated tool.`
+                `The following domains have automatically been added to your
+                 whitelist from tools already existing in your account.
+                 To remove these domains, remove the associated tools.`
+              )}
+            </p>
+            <p>
+              {I18n.t(
+                `NOTE: Associated tools are only listed once, even if they have
+                been installed in multiple subaccounts.`
               )}
             </p>
             <Table

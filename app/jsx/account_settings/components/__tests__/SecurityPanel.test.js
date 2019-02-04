@@ -38,7 +38,7 @@ describe('ConnectedSecurityPanel', () => {
         <ConnectedSecurityPanel context="account" contextId="1" isSubAccount />
       )
 
-      const checkbox = getByLabelText('Inherit Content Security Policy Settings')
+      const checkbox = getByLabelText('Inherit Content Security Policy')
       fireEvent.click(checkbox)
       expect(checkbox.checked).toBeTruthy()
     })
@@ -48,7 +48,7 @@ describe('ConnectedSecurityPanel', () => {
         <ConnectedSecurityPanel context="account" contextId="1" isSubAccount />
       )
 
-      const checkbox = getByLabelText('Inherit Content Security Policy Settings')
+      const checkbox = getByLabelText('Inherit Content Security Policy')
       fireEvent.click(checkbox)
       expect(checkbox.checked).toBeTruthy()
 
