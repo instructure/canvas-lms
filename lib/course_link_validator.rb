@@ -184,7 +184,7 @@ class CourseLinkValidator
   def find_invalid_links(html)
     links = []
     doc = Nokogiri::HTML(html || "")
-    attrs = ['rel', 'href', 'src', 'data', 'value']
+    attrs = ['href', 'src', 'data', 'value']
 
     doc.search("*").each do |node|
       attrs.each do |attr|
