@@ -242,6 +242,7 @@ module Lti
     def attachment_json(attachment)
       attachment_attributes = %w(id display_name filename content-type size created_at updated_at)
       attach = filtered_json(model: attachment, whitelist: attachment_attributes)
+      attach[:upload_status] = AttachmentUploadStatus.upload_status(attachment)
       attach[:url] = attachment_url(attachment)
       attach
     end

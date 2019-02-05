@@ -241,6 +241,7 @@ module SpeedGrader
                     json[:attachment][:crocodoc_url] = a.crocodoc_url(@current_user, url_opts)
                     json[:attachment][:submitted_to_crocodoc] = a.crocodoc_document.present?
                     json[:attachment][:hijack_crocodoc_session] = a.crocodoc_document.present? && @should_migrate_to_canvadocs
+                    json[:attachment][:upload_status] = AttachmentUploadStatus.upload_status(a)
                   end
                 end
               end

@@ -2187,6 +2187,135 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
     })
   })
 
+  QUnit.module('#renderProgressIcon', function(hooks) {
+    const assignment = {}
+    const student = {
+      id: '1',
+      submission_history: []
+    }
+    const enrollment = {user_id: student.id, course_section_id: '1'}
+    const submissionComment = {
+      created_at: new Date().toISOString(),
+      publishable: false,
+      comment: 'a comment',
+      author_id: 1,
+      author_name: 'an author'
+    }
+    const submission = {
+      id: '3',
+      user_id: '1',
+      grade_matches_current_submission: true,
+      workflow_state: 'active',
+      submitted_at: new Date().toISOString(),
+      grade: 'A',
+      assignment_id: '456',
+      submission_comments: [submissionComment]
+    }
+    const windowJsonData = {
+      ...assignment,
+      context_id: '123',
+      context: {
+        students: [student],
+        enrollments: [enrollment],
+        active_course_sections: [],
+        rep_for_student: {}
+      },
+      submissions: [submission],
+      gradingPeriods: []
+    }
+
+    let jsonData
+    let commentToRender
+
+    const commentBlankHtml = `
+      <div class="comment">
+        <span class="comment"></span>
+        <button class="submit_comment_button">
+          <span>Submit</span>
+        </button>
+        <a class="delete_comment_link icon-x">
+          <span class="screenreader-only">Delete comment</span>
+        </a>
+        <div class="comment_attachments"></div>
+      </div>
+    `
+
+    const commentAttachmentBlank = `
+      <div class="comment_attachment">
+        <a href="example.com/{{ submitter_id }}/{{ id }}/{{ comment_id }}"><span class="display_name">&nbsp;</span></a>
+      </div>
+    `
+
+    hooks.beforeEach(() => {
+      ;({jsonData} = window)
+      fakeENV.setup({
+        ...ENV,
+        assignment_id: '17',
+        course_id: '29',
+        grading_role: 'moderator',
+        help_url: 'example.com/support',
+        show_help_menu_item: false,
+        current_user_id: '1',
+        RUBRIC_ASSESSMENT: {}
+      })
+
+      setupFixtures(`
+        <div id="react_pill_container"></div>
+      `)
+      SpeedGrader.setup()
+      window.jsonData = windowJsonData
+      SpeedGrader.EG.jsonReady()
+      setupCurrentStudent()
+      commentToRender = {...submissionComment}
+      commentToRender.draft = true
+
+      commentRenderingOptions = {
+        commentBlank: $(commentBlankHtml),
+        commentAttachmentBlank: $(commentAttachmentBlank)
+      }
+    })
+
+    hooks.afterEach(() => {
+      teardownFixtures()
+      delete SpeedGrader.EG.currentStudent
+      window.jsonData = jsonData
+      SpeedGrader.teardown()
+      document.querySelector('.ui-selectmenu-menu').remove()
+    })
+
+
+    test('mounts the progressIcon when attachment uplod_status is pending', function() {
+      const attachment = {content_type: 'application/rtf', upload_status: 'pending'}
+      SpeedGrader.EG.renderAttachment(attachment)
+
+      strictEqual(
+        document.getElementById('react_pill_container').children.length,
+        0
+      )
+    })
+
+    test('mounts the progressIcon when attachment uplod_status is failed', function() {
+      const attachment = {content_type: 'application/rtf', upload_status: 'failed'}
+      SpeedGrader.EG.renderAttachment(attachment)
+
+      strictEqual(
+        document.getElementById('react_pill_container').children.length,
+        0
+      )
+    })
+
+    test('mounts the file name preview when attachment uplod_status is success', function() {
+      const attachment = {content_type: 'application/rtf', upload_status: 'success'}
+      SpeedGrader.EG.renderAttachment(attachment)
+
+      strictEqual(
+        document.getElementById('react_pill_container').children.length,
+        0
+      )
+    })
+  })
+
+
   QUnit.module('#renderCommentTextArea', function(hooks) {
     hooks.beforeEach(function() {
       setupFixtures('<div id="speed_grader_comment_textarea_mount_point"/>')

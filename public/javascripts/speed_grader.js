@@ -39,8 +39,6 @@ import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
 import IconUpload from '@instructure/ui-icons/lib/Line/IconUpload'
 import IconWarning from '@instructure/ui-icons/lib/Line/IconWarning'
 import IconCheckMarkIndeterminate from '@instructure/ui-icons/lib/Line/IconCheckMarkIndeterminate'
-import FailedUploadTreeKite from 'jsx/speed_grader/FailedUploadTreeKite'
-import WaitingWristWatch from 'jsx/speed_grader/WaitingWristWatch'
 import View from '@instructure/ui-layout/lib/components/View'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import round from 'compiled/util/round'
@@ -679,14 +677,14 @@ function unmountCommentTextArea() {
 function renderProgressIcon(attachment) {
   const mountPoint = document.getElementById('react_pill_container')
   let icon = []
-  switch (attachment.workflow_state) {
-    case 'pending_upload':
+  switch (attachment.upload_status) {
+    case 'pending':
       icon = [<IconUpload />, I18n.t('Uploading Submission')]
       break
-    case 'errored':
+    case 'failed':
       icon = [<IconWarning />, I18n.t('Submission Failed to Submit')]
       break
-    case 'processed':
+    case 'success':
       break
     default:
       icon = [<IconCheckMarkIndeterminate />, I18n.t('No File Submitted')]
@@ -2007,7 +2005,7 @@ EG = {
             [anonymizableSubmissionIdKey]: submission[anonymizableUserId],
             attachmentId: attachment.id,
             display_name: attachment.display_name,
-            attachmentWorkflow: attachment.workflow_state
+            attachmentWorkflow: attachment.upload_status
           },
           hrefValues: [anonymizableSubmissionIdKey, 'attachmentId']
         })
@@ -2280,22 +2278,6 @@ EG = {
     }
   },
 
-  progressSubmissionPreview(attachment) {
-    if (attachment === undefined) {
-      return [
-        <FailedUploadTreeKite />,
-        I18n.t('Upload Failed'),
-        I18n.t('Please have the student submit the file again')
-      ]
-    } else {
-      return [
-        <WaitingWristWatch />,
-        I18n.t('Uploading'),
-        I18n.t('Canvas is attempting to retreive the submissions. Please check back again later.')
-      ]
-    }
-  },
-
   loadSubmissionPreview(attachment, submission) {
     clearInterval(sessionTimer)
     $submissions_container.children().hide()
@@ -2322,36 +2304,9 @@ EG = {
         ENV.lti_retrieve_url,
         submission.external_tool_url || submission.url
       )
-    } else if (this.canDisplaySpeedGraderImagePreview(jsonData.context, attachment, submission)) {
-      this.emptyIframeHolder()
-      const mountPoint = document.getElementById('iframe_holder')
-      mountPoint.style = ''
-      const state = this.progressSubmissionPreview(attachment)
-      ReactDOM.render(
-        <View margin="large" display="block" as="div" textAlign="center">
-          {state[0]}
-          <Text weight="bold" size="large" as="div">
-            {state[1]}
-          </Text>
-          <Text size="medium" as="div">
-            {state[2]}
-          </Text>
-        </View>,
-        mountPoint
-      )
     } else {
       this.renderSubmissionPreview()
     }
-  },
-
-  canDisplaySpeedGraderImagePreview(context, attachment, submission) {
-    const type = submission.submission_type
-    return (
-      !context.quiz &&
-      (type !== 'online_text_entry' && type !== 'media_recording' && type !== 'online_url') &&
-      attachment === undefined &&
-      (submission !== undefined || attachment.workflow_state === 'pending_upload')
-    )
   },
 
   emptyIframeHolder(elem) {
