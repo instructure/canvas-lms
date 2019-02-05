@@ -52,12 +52,19 @@ it('should open speedgrader link in a new tab', () => {
   expect(sgLink.getAttribute('target')).toEqual('_blank')
 })
 
-it('renders only the message students who button when the assignment does not have an online submission', () => {
+it('renders the message students who button when the assignment does not have an online submission', () => {
   const assignment = mockAssignment({
     submissionTypes: ['on_paper']
   })
   const {queryByText, getByText} = render(<Toolbox assignment={assignment} />)
   expect(queryByText('unsubmitted', {exact: false})).toBeNull()
-  expect(queryByText('to grade', {exact: false})).toBeNull()
   expect(getByText(/message students who/i)).toBeInTheDocument()
+})
+
+it('does not render submission and grading links when assignment is not published', () => {
+  const assignment = mockAssignment({state: 'unpublished'})
+  const {queryByText} = render(<Toolbox assignment={assignment} />)
+  expect(queryByText('to grade', {exact: false})).toBeNull()
+  expect(queryByText('unsubmitted', {exact: false})).toBeNull()
+  expect(queryByText('message students who', {exact: false})).toBeNull()
 })

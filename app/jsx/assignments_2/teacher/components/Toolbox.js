@@ -41,6 +41,14 @@ import {
   hasSubmission
 } from '../../../gradezilla/shared/helpers/messageStudentsWhoHelper'
 
+function assignmentIsNew(assignment) {
+  return !assignment.lid
+}
+
+function assignmentIsPublished(assignment) {
+  return assignment.state === 'published'
+}
+
 export default class Toolbox extends React.Component {
   static propTypes = {
     assignment: TeacherAssignmentShape.isRequired,
@@ -131,20 +139,20 @@ export default class Toolbox extends React.Component {
   }
 
   renderSubmissionStats() {
-    return hasSubmission(this.props.assignment) ? (
-      [
-        <FlexItem key="unsubmitted" padding="xx-small xx-small xxx-small">
-          {this.renderSpeedGraderLink()}
-        </FlexItem>,
-        <FlexItem key="to grade" padding="xxx-small xx-small">
-          {this.renderUnsubmittedButton()}
-        </FlexItem>
-      ]
-    ) : (
-      <FlexItem padding="xx-small xx-small xxx-small">
-        {this.renderMessageStudentsWhoButton(I18n.t('Message Students Who'))}
+    if (assignmentIsNew(this.props.assignment) || !assignmentIsPublished(this.props.assignment)) {
+      return null
+    }
+
+    return [
+      <FlexItem key="to grade" padding="xx-small xx-small xxx-small">
+        {this.renderSpeedGraderLink({})}
+      </FlexItem>,
+      <FlexItem key="message students" padding="xx-small xx-small xxx-small">
+        {hasSubmission(this.props.assignment)
+          ? this.renderUnsubmittedButton()
+          : this.renderMessageStudentsWhoButton(I18n.t('Message Students Who'))}
       </FlexItem>
-    )
+    ]
   }
 
   renderPoints() {
