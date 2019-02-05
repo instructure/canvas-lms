@@ -193,12 +193,16 @@ module Api::V1::AssignmentOverride
     [:due_at, :unlock_at, :lock_at].each do |field|
       next unless data.key?(field)
 
-      if data[field].blank?
-        # override value of nil/'' is meaningful
-        override_data[field] = nil
-      elsif value = Time.zone.parse(data[field].to_s)
-        override_data[field] = value
-      else
+      begin
+        if data[field].blank?
+          # override value of nil/'' is meaningful
+          override_data[field] = nil
+        elsif value = Time.zone.parse(data[field].to_s)
+          override_data[field] = value
+        else
+          errors << "invalid #{field} #{data[field].inspect}"
+        end
+      rescue
         errors << "invalid #{field} #{data[field].inspect}"
       end
     end

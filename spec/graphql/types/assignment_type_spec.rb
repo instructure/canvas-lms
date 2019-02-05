@@ -229,6 +229,18 @@ describe Types::AssignmentType do
     end
   end
 
+  xit "validate assignment 404 return correctly with override instrumenter (ADMIN-2407)" do
+    result = CanvasSchema.execute(<<~GQL, context: {current_user: @teacher})
+      query {
+        assignment(id: "987654321") {
+          _id dueAt lockAt unlockAt
+        }
+      }
+    GQL
+    expect(result.dig('errors')).to be_nil
+    expect(result.dig('data', 'assignment')).to be_nil
+  end
+
   it "can access it's parent course" do
     expect(assignment_type.resolve("course { _id }")).to eq course.to_param
   end
@@ -248,6 +260,11 @@ describe Types::AssignmentType do
   it "only returns valid submission types" do
     assignment.update_attribute :submission_types, "none,foodfight"
     expect(assignment_type.resolve("submissionTypes")).to eq ["none"]
+  end
+
+  it "can return multiple submission types" do
+    assignment.update_attribute :submission_types, "discussion_topic,wiki_page"
+    expect(assignment_type.resolve("submissionTypes")).to eq ["discussion_topic", "wiki_page"]
   end
 
   it "returns (valid) grading types" do
