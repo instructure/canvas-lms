@@ -30,8 +30,11 @@ import List, {ListItem} from '@instructure/ui-elements/lib/components/List'
 import Table from '@instructure/ui-elements/lib/components/Table'
 import View from '@instructure/ui-layout/lib/components/View'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import Billboard from '@instructure/ui-billboard/lib/components/Billboard'
 import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
 import isValidDomain from 'is-valid-domain'
+
+import EmptyDesert from '../../shared/EmptyDesert'
 
 import {addDomain, removeDomain, copyInheritedIfNeeded} from '../actions'
 import {CONFIG} from '../index'
@@ -188,37 +191,47 @@ export class Whitelist extends Component {
             </FlexItem>
           </Flex>
         </form>
-        <Table caption={<ScreenReaderContent>{I18n.t('Whitelisted Domains')}</ScreenReaderContent>}>
-          <thead>
-            <tr>
-              <th scope="col">Domain Name</th>
-              <th scope="col">
-                <ScreenReaderContent>{I18n.t('Actions')}</ScreenReaderContent>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {whitelistToShow.map(domain => (
-              <tr key={domain}>
-                <td>{domain}</td>
-                <td style={{textAlign: 'end'}}>
-                  <Button
-                    ref={c => (this.deleteButtons[domain] = c)}
-                    variant="icon"
-                    icon={IconTrash}
-                    onClick={() => this.handleRemoveDomain(domain)}
-                    data-testid={`delete-button-${domain}`}
-                    disabled={this.props.inherited}
-                  >
-                    <ScreenReaderContent>
-                      {I18n.t('Remove %{domain} from the whitelist', {domain})}
-                    </ScreenReaderContent>
-                  </Button>
-                </td>
+        {whitelistToShow.length <= 0 ? (
+          <Billboard
+            size="x-small"
+            heading={I18n.t('No domains whitelisted')}
+            hero={<EmptyDesert />}
+          />
+        ) : (
+          <Table
+            caption={<ScreenReaderContent>{I18n.t('Whitelisted Domains')}</ScreenReaderContent>}
+          >
+            <thead>
+              <tr>
+                <th scope="col">Domain Name</th>
+                <th scope="col">
+                  <ScreenReaderContent>{I18n.t('Actions')}</ScreenReaderContent>
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </Table>
+            </thead>
+            <tbody>
+              {whitelistToShow.map(domain => (
+                <tr key={domain}>
+                  <td>{domain}</td>
+                  <td style={{textAlign: 'end'}}>
+                    <Button
+                      ref={c => (this.deleteButtons[domain] = c)}
+                      variant="icon"
+                      icon={IconTrash}
+                      onClick={() => this.handleRemoveDomain(domain)}
+                      data-testid={`delete-button-${domain}`}
+                      disabled={this.props.inherited}
+                    >
+                      <ScreenReaderContent>
+                        {I18n.t('Remove %{domain} from the whitelist', {domain})}
+                      </ScreenReaderContent>
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        )}
         {toolsWhitelistKeys && toolsWhitelistKeys.length > 0 && (
           <View as="div" margin="large 0">
             <Heading level="h4" as="h3">

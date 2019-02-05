@@ -52,6 +52,12 @@ describe('ConnectedWhitelist', () => {
     expect(domainCellEntry).toBeInTheDocument()
   })
 
+  it('renders the empty state when there are no domains', () => {
+    const {getByText} = renderWithRedux(<ConnectedWhitelist context="account" contextId="1" />)
+    const emptyState = getByText('No domains whitelisted')
+    expect(emptyState).toBeInTheDocument()
+  })
+
   it('renders the tools whitelist when present', () => {
     const {getByText} = renderWithRedux(<ConnectedWhitelist context="account" contextId="1" />, {
       initialState: {
@@ -73,6 +79,7 @@ describe('ConnectedWhitelist', () => {
     const toolDomain = getByText('eduappcenter.com')
     expect(toolDomain).toBeInTheDocument()
   })
+
   it('shows an error message when an invalid domain is entered', () => {
     const {getByLabelText, getByText} = renderWithRedux(
       <ConnectedWhitelist context="account" contextId="1" />

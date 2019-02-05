@@ -82,7 +82,8 @@ export class SecurityPanel extends Component {
               `The Content Security Policy allows you to restrict custom
                JavaScript that runs in your instance of Canvas. You can manually add
                up to %{max_domains} domains to your whitelist. Wild cards are recommended
-               (e.g. *.instructure.com).`,
+               (e.g. *.instructure.com). Canvas and Instructure domains are included
+               automatically and do not count against your 50 domain limit.`,
               {
                 max_domains: CONFIG.max_domains
               }
