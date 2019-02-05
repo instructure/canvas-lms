@@ -271,7 +271,9 @@ class CommunicationChannel < ActiveRecord::Base
   end
 
   def forgot_password!
+    return if Rails.cache.read(['recent_password_reset', self.global_id].cache_key) == true
     @request_password = true
+    Rails.cache.write(['recent_password_reset', self.global_id].cache_key, true, expires_in: Setting.get('resend_password_reset_time', 5).to_f.minutes)
     set_confirmation_code(true, Setting.get('password_reset_token_expiration_minutes', '120').to_i.minutes.from_now)
     self.save!
     @request_password = false
