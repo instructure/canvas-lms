@@ -135,7 +135,7 @@ shared_examples 'announcements_page_v2' do
     expect(f('#add_announcement')).to be_displayed
   end
 
-  it "should list all announcements" do
+  it "should list all announcements", ignore_js_errors: true do
     # Create 5 announcements in the group
     announcements = []
     5.times do |n|
@@ -150,7 +150,7 @@ shared_examples 'announcements_page_v2' do
     expect(ff('.ic-announcement-row').size).to eq 5
   end
 
-  it "should only list in-group announcements in the content right pane" do
+  it "should only list in-group announcements in the content right pane", ignore_js_errors: true do
     # create group and course announcements
     @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group',user: @teacher)
     @course.announcements.create!(title: 'Course Announcement', message: 'Course',user: @teacher)
@@ -158,30 +158,36 @@ shared_examples 'announcements_page_v2' do
     get announcements_page
     expect_new_page_load { f('#add_announcement').click }
     expect(f('#editor_tabs')).to be_displayed
-    fj(".ui-accordion-header a:contains('Announcements')").click
+
+    if Account.default.feature_enabled?(:rich_content_service_high_risk)
+      fj('button:contains("Announcements")').click
+    else
+      fj(".ui-accordion-header a:contains('Announcements')").click
+    end
     expect(fln('Group Announcement')).to be_displayed
     expect(f("#content")).not_to contain_link('Course Announcement')
   end
 
-  it "should only access group files in announcements right content pane" do
+  it "should only access group files in announcements right content pane", ignore_js_errors: true do
     add_test_files
     get announcements_page
     expect_new_page_load { f('#add_announcement').click }
     expand_files_on_content_pane
-    expect(ffj('.file .text:visible').size).to eq 1
+    if Account.default.feature_enabled?(:rich_content_service_high_risk)
+      expect(ff('svg[name=IconDocument]').size).to eq 1
+    else
+      expect(ffj('.file .text:visible').size).to eq 1
+    end
   end
 
-  it "should have an Add External Feed link on announcements" do
+  it "should have an Add External Feed link on announcements", ignore_js_errors: true do
     get announcements_page
     f('#external_feed').click
-    wait_for_ajaximations
-    sleep 0.2 # have to wait for InstUI animations
     f('#external-rss-feed__toggle-button').click
-    wait_for_ajaximations
     expect(f('#external-rss-feed__submit-button-group')).to be_displayed
   end
 
-  it "should have an RSS feed button on announcements" do
+  it "should have an RSS feed button on announcements", ignore_js_errors: true do
     @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group',user: @teacher)
     get announcements_page
     expect(f('button[id="external_feed"]')).to be_displayed

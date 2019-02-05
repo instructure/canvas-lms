@@ -348,14 +348,14 @@ module GroupsCommon
   end
 
   def expand_files_on_content_pane
-    expect(f('#editor_tabs')).to be_displayed
-    Selenium::WebDriver::Wait.new(timeout: 5).until do
+    if Account.default.feature_enabled?(:rich_content_service_high_risk)
+      fj('[role="presentation"]:contains("Files")').click
+    else
+      expect(f('#editor_tabs')).to be_displayed
       fj('.ui-state-default.ui-corner-top:contains("Files")').present?
+      fj('.ui-state-default.ui-corner-top:contains("Files")').click
+      f('.sign.plus').click
     end
-    fj('.ui-state-default.ui-corner-top:contains("Files")').click
-    wait_for_ajaximations
-    f('.sign.plus').click
-    wait_for_ajaximations
   end
 
   def move_file_to_folder(file_name,destination_name)

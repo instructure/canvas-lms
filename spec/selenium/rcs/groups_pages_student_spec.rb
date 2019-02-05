@@ -129,8 +129,7 @@ describe "groups" do
 
     #-------------------------------------------------------------------------------------------------------------------
     describe "announcements page v2" do
-      # will fix the below shared tests in a separate commit
-      # it_behaves_like 'announcements_page_v2', :student
+      it_behaves_like 'announcements_page_v2', :student
 
       it "should allow group members to delete their own announcements", ignore_js_errors: true do
         announcement = @testgroup.first.announcements.create!(
@@ -459,7 +458,7 @@ describe "groups" do
         expect(f('#members_list')).to include_text(active_student.name)
       end
     end
-    
+
     #-------------------------------------------------------------------------------------------------------------------
     describe "collaborations page" do
       before :each do
