@@ -161,9 +161,11 @@ export function mockSubmission(overrides) {
     lid: '1',
     state: 'submitted',
     submissionStatus: 'submitted',
+    grade: 4,
     gradingStatus: 'needs_grading',
     excused: false,
     latePolicyStatus: null,
+    score: 4,
     submittedAt: '2019-01-17T12:21:42Z',
     user: mockUser(),
     assetId: '2',
@@ -179,7 +181,10 @@ export function mockUser(overrides) {
   return {
     lid: 'user_1',
     gid: 'user_1',
-    name: 'User 1',
+    name: 'Juan User',
+    shortName: 'Juan',
+    sortableName: 'User, Juan',
+    email: 'juan_user1@example.com',
     ...overrides
   }
 }

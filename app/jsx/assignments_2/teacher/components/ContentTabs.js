@@ -22,6 +22,7 @@ import I18n from 'i18n!assignments_2'
 import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
 import {TeacherAssignmentShape} from '../assignmentData'
 import Details from './Details'
+import Students from './Students'
 
 ContentTabs.propTypes = {
   assignment: TeacherAssignmentShape.isRequired,
@@ -39,9 +40,11 @@ export default function ContentTabs(props) {
       <TabPanel title="Details">
         <Details assignment={assignment} readOnly={props.readOnly} />
       </TabPanel>
-      <TabPanel title={I18n.t('Students')}>Students</TabPanel>
+      <TabPanel title={I18n.t('Grading')}>Grading</TabPanel>
       <TabPanel title={I18n.t('Rubric')}>Rubric</TabPanel>
-      <TabPanel title={I18n.t('Settings')}>Settings</TabPanel>
+      <TabPanel title={I18n.t('Students')}>
+        <Students assignment={assignment} />
+      </TabPanel>
     </TabList>
   )
 }

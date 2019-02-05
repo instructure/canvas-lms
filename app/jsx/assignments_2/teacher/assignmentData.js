@@ -139,7 +139,9 @@ export const TEACHER_QUERY = gql`
           gid: id
           lid: _id
           submissionStatus
+          grade
           gradingStatus
+          score
           state
           excused
           latePolicyStatus
@@ -148,6 +150,10 @@ export const TEACHER_QUERY = gql`
             gid: id
             lid: _id
             name
+            shortName
+            sortableName
+            avatarUrl
+            email
           }
         }
       }
@@ -206,14 +212,20 @@ export const OverrideShape = shape({
 const UserShape = shape({
   lid: string,
   gid: string,
-  name: string
+  name: string,
+  shortName: string,
+  sortableName: string,
+  avatarUrl: string,
+  email: string
 })
 
 const SubmissionShape = shape({
   gid: string,
   lid: string,
   submissionStatus: oneOf(['resubmitted', 'missing', 'late', 'submitted', 'unsubmitted']),
+  grade: number,
   gradingStatus: oneOf([null, 'excused', 'needs_review', 'needs_grading', 'graded']),
+  score: number,
   state: oneOf(['submitted', 'unsubmitted', 'pending_review', 'graded', 'deleted']),
   excused: bool,
   latePolicyStatus: oneOf([null, 'missing']),
