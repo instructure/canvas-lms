@@ -16,12 +16,54 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# @API Rubrics
+# @subtopic RubricAssociations
+#
 class RubricAssociationsController < ApplicationController
   before_action :require_context
+
+  # @API Create a RubricAssociation
+  #
+  # Returns the rubric with the given id.
+  #
+  # @argument rubric_association[rubric_id] [Integer]
+  #   The id of the Rubric
+  # @argument rubric_association[association_id] [Integer]
+  #   The id of the object with which this rubric is associated
+  # @argument rubric_association[association_type] ["Assignment"|"Course"|"Account"]
+  #   The type of object this rubric is associated with
+  # @argument rubric_association[title] [String]
+  # @argument rubric_association[use_for_grading] [Boolean]
+  # @argument rubric_association[hide_score_total] [Boolean]
+  # @argument rubric_association[purpose] [String]
+  # @argument rubric_association[url] [String]
+  # @argument rubric_association[bookmarked] [Boolean]
+  #
+  # @returns RubricAssociation
   def create
     update
   end
 
+  # @API Update a RubricAssociation
+  #
+  # Returns the rubric with the given id.
+  #
+  # @argument id [Integer]
+  #   The id of the RubricAssociation to update
+  # @argument rubric_association[rubric_id] [Integer]
+  #   The id of the Rubric
+  # @argument rubric_association[association_id] [Integer]
+  #   The id of the object with which this rubric is associated
+  # @argument rubric_association[association_type] ["Assignment"|"Course"|"Account"]
+  #   The type of object this rubric is associated with
+  # @argument rubric_association[title] [String]
+  # @argument rubric_association[use_for_grading] [Boolean]
+  # @argument rubric_association[hide_score_total] [Boolean]
+  # @argument rubric_association[purpose] [String]
+  # @argument rubric_association[url] [String]
+  # @argument rubric_association[bookmarked] [Boolean]
+  #
+  # @returns RubricAssociation
   def update
     association_params = params[:rubric_association] ?
       params[:rubric_association].permit(:use_for_grading, :title, :purpose, :url, :hide_score_total, :bookmarked, :rubric_id) : {}
@@ -51,6 +93,11 @@ class RubricAssociationsController < ApplicationController
     render :json => json_res
   end
 
+  # @API Delete a RubricAssociation
+  #
+  # Delete the RubricAssociation with the given ID
+  #
+  # @returns RubricAssociation
   def destroy
     @association = @context.rubric_associations.find(params[:id])
     @rubric = @association.rubric
