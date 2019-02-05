@@ -48,6 +48,9 @@
             "name": "PostPolicy"
           },
           {
+            "name": "Progress"
+          },
+          {
             "name": "Quiz"
           },
           {
@@ -112,6 +115,9 @@
           },
           {
             "name": "Page"
+          },
+          {
+            "name": "Progress"
           },
           {
             "name": "Quiz"
@@ -205,6 +211,27 @@
           },
           {
             "name": "AdhocStudents"
+          }
+        ]
+      },
+      {
+        "kind": "UNION",
+        "name": "ProgressContext",
+        "possibleTypes": [
+          {
+            "name": "Assignment"
+          },
+          {
+            "name": "Course"
+          },
+          {
+            "name": "File"
+          },
+          {
+            "name": "GroupSet"
+          },
+          {
+            "name": "User"
           }
         ]
       }

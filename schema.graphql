@@ -1264,6 +1264,7 @@ enum NodeType {
   ModuleItem
   Page
   PostPolicy
+  Progress
   Section
   User
 }
@@ -1380,6 +1381,45 @@ type PostPolicyEdge {
   The item at the end of the edge.
   """
   node: PostPolicy
+}
+
+"""
+Returns completion status and progress information about an asynchronous job
+"""
+type Progress implements Node & Timestamped {
+  """
+  legacy canvas id
+  """
+  _id: ID!
+
+  """
+  percent completed
+  """
+  completion: Int
+  context: ProgressContext
+  createdAt: DateTime
+  id: ID!
+
+  """
+  details about the job
+  """
+  message: String
+  state: ProgressState!
+
+  """
+  the type of operation
+  """
+  tag: String!
+  updatedAt: DateTime
+}
+
+union ProgressContext = Assignment | Course | File | GroupSet | User
+
+enum ProgressState {
+  completed
+  failed
+  queued
+  running
 }
 
 type Query {

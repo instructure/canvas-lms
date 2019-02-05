@@ -31,6 +31,7 @@ Types::LegacyNodeType = GraphQL::EnumType.define do
   value "ModuleItem"
   value "Page"
   value "PostPolicy"
+  value "Progress"
   value "Group"
   value "GroupSet"
   value "File"
