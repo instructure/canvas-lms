@@ -102,7 +102,10 @@ module GraphQLNodeLoader
         end
       end
     when "File"
-      Loaders::IDLoader.for(Attachment).load(id).then(check_read_permission)
+      Loaders::IDLoader.for(Attachment).load(id).then do |attachment|
+        next if attachment.deleted?
+        check_read_permission.call(attachment)
+      end
     when "AssignmentGroup"
       Loaders::IDLoader.for(AssignmentGroup).load(id).then(check_read_permission)
     when "Discussion"

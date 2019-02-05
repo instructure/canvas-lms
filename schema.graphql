@@ -854,11 +854,14 @@ type File implements ModuleItemInterface & Node & Timestamped {
   legacy canvas id
   """
   _id: ID!
+  contentType: String
   createdAt: DateTime
   displayName: String
   id: ID!
+  mimeClass: String
   modules: [Module!]
   updatedAt: DateTime
+  url: URL
 }
 
 """
@@ -1810,6 +1813,7 @@ type SubmissionComment implements Timestamped {
   legacy canvas id
   """
   _id: ID
+  attachments: [File!]
   author: User
   comment: String
   createdAt: DateTime

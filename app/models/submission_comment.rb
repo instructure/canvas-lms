@@ -262,6 +262,10 @@ class SubmissionComment < ActiveRecord::Base
     read_attribute(:context) || self.submission.assignment.context rescue nil
   end
 
+  def parse_attachment_ids
+    (self.attachment_ids || "").split(",").map(&:to_i)
+  end
+
   def attachment_ids=(ids)
     # raise "Cannot set attachment id's directly"
   end
@@ -272,7 +276,7 @@ class SubmissionComment < ActiveRecord::Base
     # access to files in another user's comments, since they're all being held
     # on the assignment for now.
     attachments ||= []
-    old_ids = (self.attachment_ids || "").split(",").map{|id| id.to_i}
+    old_ids = parse_attachment_ids
     write_attribute(:attachment_ids, attachments.select { |a|
       old_ids.include?(a.id) ||
       a.recently_created ||
@@ -294,7 +298,7 @@ class SubmissionComment < ActiveRecord::Base
 
   def attachments
     return Attachment.none unless attachment_ids.present?
-    ids = attachment_ids.split(",").map(&:to_i)
+    ids = parse_attachment_ids
     attachments = submission.assignment.attachments.where(id: ids)
   end
 
