@@ -16,14 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {Suspense, lazy} from 'react'
 import I18n from 'i18n!assignments_2'
 import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import Comments from './Comments'
-
 import {StudentAssignmentShape} from '../assignmentData'
+import LoadingIndicator from './LoadingIndicator'
+
+const Comments = lazy(
+  () =>
+    new Promise((resolve, reject) => {
+      import('./Comments')
+        .then(result => resolve(result.default ? result : {default: result}))
+        .catch(reject)
+    })
+)
 
 ContentTabs.propTypes = {
   assignment: StudentAssignmentShape
@@ -46,7 +54,9 @@ function ContentTabs(props) {
           data-test-id="assignment-2-student-comments-content-tab"
           title={I18n.t('Comments')}
         >
-          <Comments assignment={props.assignment} />
+          <Suspense fallback={<LoadingIndicator />}>
+            <Comments assignment={props.assignment} />
+          </Suspense>
         </TabPanel>
         <TabPanel title={I18n.t('Rubric')}>
           <Flex as="header" alignItems="center" justifyItems="center" direction="column">
