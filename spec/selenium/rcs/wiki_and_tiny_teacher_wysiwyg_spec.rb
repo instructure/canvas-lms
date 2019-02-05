@@ -197,6 +197,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
     end
 
     it "should indent and remove indentation for embedded images" do
+      skip('CORE-2444 flakey as of 2/5/2019')
       title = "email.png"
       @root_folder = Folder.root_folders(@course).first
       @image = @root_folder.attachments.build(:context => @course)
