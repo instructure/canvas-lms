@@ -3694,10 +3694,12 @@ nn:
   cannot_change_the_due_date_of_an_override_in_a_clo_4b3a4dcd: "Kan ikkje endre innleveringsfristen etter overstyring i ein lukka karaktersetjingsperiode"
   cannot_change_the_due_date_to_a_date_within_a_clos_61eb0951: "Kan ikkje endre innleveringsfristen til ein dato innanfor ein lukka karaktersetjingsperiode"
   cannot_change_the_due_date_when_due_in_a_closed_gr_965b99cb: "Kan ikkje endre innleveringsfrist når fristen er innanfor ein karaktersetjingsperiode"
+  cannot_create_an_appointment_group_for_a_concluded_f4da02e3: "kan ikkje opprette ei avtalegruppe på eit fullført emne"
   cannot_delete_a_file_that_has_been_submitted_as_pa_fda24c4: "Kan ikkje slette ei fil som er levert inn som del av ei oppgåve"
   cannot_delete_an_override_with_a_due_date_within_a_fa94ca3b: "Kan ikkje slette ei overstyring med ein innleveringsfrist innanfor ein karaktersetjingsperiode"
   cannot_grade_at_this_time_489744b0: "Kan ikkje karaktersetje akkurat no"
   cannot_have_a_blueprint_course_with_students_248e3e76: "Kan ikkje ha eit blåkopiemne med studentar"
+  cannot_move_assignments_due_to_closed_grading_peri_59fc3c4: "Kan ikkje flytte oppgåver fordi karaktersetjingsperiodane er lukka."
   cannot_restrict_by_section_unless_groups_are_empty_662d3144: "Kan ikkje avgrense seksjonvis med mindre gruppene er tomme og ikkje har storleiksgrense"
   cannot_set_only_visible_to_overrides_when_due_in_a_fac518ce: "Kan ikkje setje kun synleg for overstyring når fristen er innanfor ein lukka karaktersetjingsperiode"
   cannot_set_override_due_date_to_a_date_within_a_cl_a3fa90e6: "Kan ikkje setje overstyrt innleveringsfrist til ein dato innanfor ein lukka karaktersetjingsperiode"
@@ -18712,6 +18714,8 @@ nn:
   you_just_sent_a_message_in_canvas_86b4945c: "Du sendte nettopp ei melding i Canvas"
   you_ll_definitely_want_some_of_these_what_s_the_fu_f4f3578b: "Du treng sikkert nokre av desse. Kva er moroa med å undervise på eit emne dersom ingen lyttar?"
   you_ll_need_a_refresh_token_follow_the_steps_at_th_79a3984b: "Du må oppdatere token, følge trinna i denne lenka og kanskje du treng kanskje hjelp frå ein teknisk ekspert"
+  you_ll_need_to_accept_the_enrollment_invitation_be_e3c86b26: "Du må godta invitasjonen til påmelding før du kan delta på emnet fullt ut."
+  you_ll_need_to_accept_the_enrollment_invitation_be_f2ffe13: "Du må godta invitasjonen til påmelding før du kan delta på emnet fullt ut, startdato %{date}."
   you_may_not_reproduce_or_communicate_any_of_the_co_7636b552: |-
       Du kan ikkje reprodusere eller formidle noko av innhaldet i
       emnet, inkludert filer som er eksportert frå emnet, utan skriftleg løyve frå institusjonen din. Sjekk med institusjonen om dei har særskilde retningslinjar
