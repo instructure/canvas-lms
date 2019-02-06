@@ -16,10 +16,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../../common'
+require_relative '../pages/post_grades_tray_page'
+require_relative '../pages/hide_grades_tray_page'
+
 
 module Gradezilla
   module GradeDetailTray
     extend SeleniumDependencies
+    extend PostGradesTray
+    extend HideGradesTray
 
     def self.submission_tray_full_content
       f('#SubmissionTray__Content')
@@ -172,44 +177,6 @@ module Gradezilla
     def self.delete_comment(comment)
       delete_comment_button(comment).click
       accept_alert
-    end
-  end
-
-  module PostGradesTray
-    extend SeleniumDependencies
-
-    def self.full_content
-      # content finder similar to detail tray
-      # f('#SubmissionTray__Content')
-    end
-
-    def self.post_button
-      # TODO: post button locator
-    end
-
-    def self.post_type_radio_button(type)
-      # TODO: locator similar to fj(".SubmissionTray__RadioInput label:contains('#{type}')")
-    end
-
-    def self.select_section(section_name)
-      # TODO: locator for showing sections and for section checkbox
-    end
-  end
-
-  module HideGradesTray
-    extend SeleniumDependencies
-
-    def self.full_content
-      # TODO: content finder similar to detail tray
-      # f('#SubmissionTray__Content')
-    end
-
-    def self.hide_button
-      # TODO: locator for hide button
-    end
-
-    def self.select_section(section_name)
-      # TODO: use section name to select section
     end
   end
 
