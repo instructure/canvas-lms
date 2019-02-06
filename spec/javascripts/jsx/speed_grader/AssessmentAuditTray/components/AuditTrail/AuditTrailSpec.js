@@ -60,17 +60,17 @@ QUnit.module('AssessmentAuditTray AuditTrail', suiteHooks => {
     ReactDOM.render(<AuditTrail {...props} />, $container)
   }
 
-  function getUserEventGroups() {
+  function getCreatorEventGroups() {
     return [...$container.querySelector('#assessment-audit-trail').children]
   }
 
   function getHeaderContents() {
-    return getUserEventGroups().map($group => $group.querySelector('h3').textContent)
+    return getCreatorEventGroups().map($group => $group.querySelector('h3').textContent)
   }
 
   test('displays a user event group for each distinct user', () => {
     mountComponent()
-    strictEqual(getUserEventGroups().length, 4)
+    strictEqual(getCreatorEventGroups().length, 4)
   })
 
   test('displays the name of the user in the header', () => {

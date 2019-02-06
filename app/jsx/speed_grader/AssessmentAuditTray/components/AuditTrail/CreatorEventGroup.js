@@ -39,13 +39,13 @@ const themeOverride = {
   }
 }
 
-export default class UserEventGroup extends PureComponent {
+export default class CreatorEventGroup extends PureComponent {
   static propTypes = {
-    userEventGroup: propTypes.userEventGroup.isRequired
+    creatorEventGroup: propTypes.creatorEventGroup.isRequired
   }
 
   render() {
-    const {anonymousOnly, dateEventGroups, user} = this.props.userEventGroup
+    const {anonymousOnly, dateEventGroups, user} = this.props.creatorEventGroup
     const userName = user.name || I18n.t('Unknown User')
     const roleLabel = roleLabelFor(user)
     const message = !anonymousOnly && I18n.t('This user performed actions while anonymous was off')

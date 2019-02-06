@@ -325,7 +325,7 @@ export default function buildAuditTrail(auditData) {
 
   // sort in ascending order (earliest event to most recent)
   const sortedEvents = [...auditEvents].sort((a, b) => a.createdAt - b.createdAt)
-  const userEventGroupsByUserId = {}
+  const creatorEventGroupsByCreatorId = {}
 
   const featureTracking = trackFeaturesOverall(sortedEvents)
   const anonymityTracker = buildAnonymityTracker()
@@ -342,15 +342,15 @@ export default function buildAuditTrail(auditData) {
 
     currentlyAnonymous = getCurrentAnonymity(auditEvent, currentlyAnonymous)
 
-    userEventGroupsByUserId[userId] = userEventGroupsByUserId[userId] || {
+    creatorEventGroupsByCreatorId[userId] = creatorEventGroupsByCreatorId[userId] || {
       anonymousOnly: currentlyAnonymous,
       dateEventGroups: [],
       user
     }
-    userEventGroupsByUserId[userId].anonymousOnly =
-      userEventGroupsByUserId[userId].anonymousOnly && currentlyAnonymous
+    creatorEventGroupsByCreatorId[userId].anonymousOnly =
+      creatorEventGroupsByCreatorId[userId].anonymousOnly && currentlyAnonymous
 
-    const {dateEventGroups} = userEventGroupsByUserId[userId]
+    const {dateEventGroups} = creatorEventGroupsByCreatorId[userId]
     const lastDateGroup = dateEventGroups[dateEventGroups.length - 1]
 
     const eventDatum = {auditEvent}
@@ -379,7 +379,7 @@ export default function buildAuditTrail(auditData) {
     }
   })
 
-  const userEventGroups = Object.values(userEventGroupsByUserId).sort((groupA, groupB) => {
+  const creatorEventGroups = Object.values(creatorEventGroupsByCreatorId).sort((groupA, groupB) => {
     const rolePositionA = getRolePosition(groupA.user)
     const rolePositionB = getRolePosition(groupB.user)
 
@@ -397,6 +397,6 @@ export default function buildAuditTrail(auditData) {
     anonymityDate: anonymityTracker.getAnonymityDate(),
     finalGradeDate,
     overallAnonymity: anonymityTracker.getOverallAnonymity(),
-    userEventGroups
+    creatorEventGroups
   }
 }

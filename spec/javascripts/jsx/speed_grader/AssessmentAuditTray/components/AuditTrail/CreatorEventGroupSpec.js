@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import UserEventGroup from 'jsx/speed_grader/AssessmentAuditTray/components/AuditTrail/UserEventGroup'
+import CreatorEventGroup from 'jsx/speed_grader/AssessmentAuditTray/components/AuditTrail/CreatorEventGroup'
 import {
   buildAssignmentCreatedEvent,
   buildAssignmentUpdatedEvent,
@@ -27,7 +27,7 @@ import {
 } from 'jsx/speed_grader/AssessmentAuditTray/__tests__/AuditTrailSpecHelpers'
 import buildAuditTrail from 'jsx/speed_grader/AssessmentAuditTray/buildAuditTrail'
 
-QUnit.module('AssessmentAuditTray UserEventGroup', suiteHooks => {
+QUnit.module('AssessmentAuditTray CreatorEventGroup', suiteHooks => {
   let $container
   let auditEvents
   let users
@@ -51,8 +51,8 @@ QUnit.module('AssessmentAuditTray UserEventGroup', suiteHooks => {
 
   function buildAuditTrailAndMountComponent() {
     const auditTrail = buildAuditTrail({auditEvents, users})
-    props = {userEventGroup: auditTrail.userEventGroups[0]}
-    ReactDOM.render(<UserEventGroup {...props} />, $container)
+    props = {creatorEventGroup: auditTrail.creatorEventGroups[0]}
+    ReactDOM.render(<CreatorEventGroup {...props} />, $container)
   }
 
   function getToggleDetailsButton() {

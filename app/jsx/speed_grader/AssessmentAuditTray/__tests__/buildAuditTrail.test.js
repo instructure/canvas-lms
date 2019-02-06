@@ -72,13 +72,13 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
     auditEvents.push(buildAssignmentUpdatedEvent({createdAt, id}, payload))
   }
 
-  function getUserEventGroup(userId) {
+  function getCreatorEventGroup(userId) {
     auditTrail = auditTrail || buildAuditTrail({auditEvents, users})
-    return auditTrail.userEventGroups.find(group => group.user.id === userId)
+    return auditTrail.creatorEventGroups.find(group => group.user.id === userId)
   }
 
   function getAuditEvents() {
-    const {dateEventGroups} = getUserEventGroup('1101')
+    const {dateEventGroups} = getCreatorEventGroup('1101')
     return dateEventGroups.reduce(
       (allEvents, dateEventGroup) => allEvents.concat(dateEventGroup.auditEvents),
       []
@@ -210,7 +210,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
     }
 
     function getUserIds() {
-      return buildAuditTrail({auditEvents, users}).userEventGroups.map(group => group.user.id)
+      return buildAuditTrail({auditEvents, users}).creatorEventGroups.map(group => group.user.id)
     }
 
     describe('students', () => {
@@ -321,7 +321,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         auditEvents: [buildUnknownEvent('4901', '2018-09-01T12:00:00Z')],
         users: [firstUser]
       })
-      expect(getUserEventGroup('1109')).toBeUndefined()
+      expect(getCreatorEventGroup('1109')).toBeUndefined()
     })
 
     it('sets .user with the related user data when the specified user is known', () => {
@@ -329,7 +329,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         auditEvents: [buildEvent()],
         users: [secondUser]
       })
-      expect(getUserEventGroup('1101').user).toEqual(secondUser)
+      expect(getCreatorEventGroup('1101').user).toEqual(secondUser)
     })
 
     it('sets .user with "unknown user" data when the specified user is not known', () => {
@@ -337,7 +337,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         auditEvents: [buildEvent()],
         users: []
       })
-      expect(getUserEventGroup('1101').user).toEqual({
+      expect(getCreatorEventGroup('1101').user).toEqual({
         id: '1101',
         name: 'Unknown User',
         role: 'unknown'
@@ -353,12 +353,12 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       })
 
       it('includes one group of events when the user has only one event', () => {
-        const userEventGroup = getUserEventGroup('1101')
-        expect(userEventGroup.dateEventGroups).toHaveLength(1)
+        const creatorEventGroup = getCreatorEventGroup('1101')
+        expect(creatorEventGroup.dateEventGroups).toHaveLength(1)
       })
 
       it('assigns the event date to the date event group', () => {
-        const {dateEventGroups} = getUserEventGroup('1101')
+        const {dateEventGroups} = getCreatorEventGroup('1101')
         expect(dateEventGroups[0].startDate).toEqual(new Date('2018-09-01T12:00:00Z'))
       })
     })
@@ -376,17 +376,17 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       })
 
       it('includes one group of events', () => {
-        const {dateEventGroups} = getUserEventGroup('1101')
+        const {dateEventGroups} = getCreatorEventGroup('1101')
         expect(dateEventGroups).toHaveLength(1)
       })
 
       it('includes all events in the same group', () => {
-        const {dateEventGroups} = getUserEventGroup('1101')
+        const {dateEventGroups} = getCreatorEventGroup('1101')
         expect(dateEventGroups[0].auditEvents).toHaveLength(3)
       })
 
       it('orders events within the date event group by ascending date', () => {
-        const {dateEventGroups} = getUserEventGroup('1101')
+        const {dateEventGroups} = getCreatorEventGroup('1101')
         const eventIds = getDateGroupEventIds(dateEventGroups[0])
         expect(eventIds).toEqual(['4901', '4902', '4903'])
       })
@@ -405,7 +405,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
 
       function getDateEventGroups() {
         auditTrail = buildAuditTrail({auditEvents, users})
-        return getUserEventGroup('1101').dateEventGroups
+        return getCreatorEventGroup('1101').dateEventGroups
       }
 
       it('includes a date event group for each distinct date', () => {
@@ -1794,34 +1794,34 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
     }
 
     it('sets .anonymousOnly to true when student anonymity was never disabled', () => {
-      expect(getUserEventGroup('1101').anonymousOnly).toBe(true)
+      expect(getCreatorEventGroup('1101').anonymousOnly).toBe(true)
     })
 
     it('sets .anonymousOnly to false when the given user disabled student anonymity', () => {
       buildUpdateEvent('4903', '2018-09-03T12:00:00Z', {anonymous_grading: [true, false]})
       buildUpdateEvent('4904', '2018-09-04T12:00:00Z', {anonymous_grading: [false, true]})
-      expect(getUserEventGroup('1101').anonymousOnly).toBe(false)
+      expect(getCreatorEventGroup('1101').anonymousOnly).toBe(false)
     })
 
     it('sets .anonymousOnly to false when the given user acted while student anonymity was disabled', () => {
       buildUpdateEvent('4903', '2018-09-03T12:00:00Z', {anonymous_grading: [true, false]})
       gradeStudent('4904', '2018-09-03T12:01:00Z', '1103', {grade: 'F', score: 0})
       buildUpdateEvent('4905', '2018-09-04T12:00:00Z', {anonymous_grading: [false, true]})
-      expect(getUserEventGroup('1103').anonymousOnly).toBe(false)
+      expect(getCreatorEventGroup('1103').anonymousOnly).toBe(false)
     })
 
     it('sets .anonymousOnly to true when the given user acted only before student anonymity was disabled', () => {
       gradeStudent('4903', '2018-09-03T11:59:00Z', '1103', {grade: 'F', score: 0})
       buildUpdateEvent('4904', '2018-09-03T12:00:00Z', {anonymous_grading: [true, false]})
       buildUpdateEvent('4905', '2018-09-04T12:00:00Z', {anonymous_grading: [false, true]})
-      expect(getUserEventGroup('1103').anonymousOnly).toBe(true)
+      expect(getCreatorEventGroup('1103').anonymousOnly).toBe(true)
     })
 
     it('sets .anonymousOnly to true when the given user acted only after student anonymity was re-enabled', () => {
       buildUpdateEvent('4903', '2018-09-03T12:00:00Z', {anonymous_grading: [true, false]})
       buildUpdateEvent('4904', '2018-09-04T12:00:00Z', {anonymous_grading: [false, true]})
       gradeStudent('4905', '2018-09-04T12:01:00Z', '1103', {grade: 'F', score: 0})
-      expect(getUserEventGroup('1103').anonymousOnly).toBe(true)
+      expect(getCreatorEventGroup('1103').anonymousOnly).toBe(true)
     })
   })
 
