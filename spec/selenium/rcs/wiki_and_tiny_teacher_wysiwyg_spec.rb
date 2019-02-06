@@ -17,11 +17,13 @@
 
 require_relative '../helpers/wiki_and_tiny_common'
 require_relative 'pages/rcs_sidebar_page'
+require_relative '../test_setup/common_helper_methods/custom_selenium_actions'
 
 describe "Wiki pages and Tiny WYSIWYG editor features" do
   include_context "in-process server selenium tests"
   include WikiAndTinyCommon
   include RCSSidebarPage
+  include CustomSeleniumActions
 
   equation_button_selector = "div[aria-label='Insert Math Equation'] button"
 
@@ -210,9 +212,9 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       click_image_link(title)
 
       select_all_wiki
-      f('.mce-i-indent').click
+      force_click('.mce-i-indent')
       validate_wiki_style_attrib("padding-left", "40px", "p")
-      f('.mce-i-outdent').click
+      force_click('.mce-i-outdent')
       validate_wiki_style_attrib_empty("p")
     end
 
