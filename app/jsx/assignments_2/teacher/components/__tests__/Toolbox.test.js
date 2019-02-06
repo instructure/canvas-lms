@@ -25,7 +25,7 @@ import Toolbox from '../Toolbox'
 function renderToolbox(assignment) {
   return render(
     <MockedProvider>
-      <Toolbox assignment={assignment} />
+      <Toolbox assignment={assignment} onChangeAssignment={() => {}} />
     </MockedProvider>
   )
 }
@@ -39,7 +39,7 @@ describe('assignments 2 teacher view toolbox', () => {
       }
     })
 
-    const {queryByText, getByText, getByLabelText} = renderToolbox(assignment)
+    const {queryByText, getByText, getByLabelText, getByTestId} = renderToolbox(assignment)
     expect(getByLabelText('Published').getAttribute('checked')).toBe('')
     const sgLink = closest(getByText('1 to grade'), 'a')
     expect(sgLink).toBeTruthy()
@@ -48,6 +48,7 @@ describe('assignments 2 teacher view toolbox', () => {
     )
     expect(closest(getByText('1 unsubmitted'), 'button')).toBeTruthy()
     expect(queryByText(/message students who/i)).toBeNull()
+    expect(getByTestId('AssignmentPoints')).toBeInTheDocument()
   })
 
   it('renders unpublished value checkbox', () => {

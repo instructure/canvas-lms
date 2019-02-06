@@ -17,47 +17,48 @@
  */
 
 import React from 'react'
-import {func} from 'prop-types'
-import I18n from 'i18n!asignments_2'
+import {func, string} from 'prop-types'
 
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import IconPlus from '@instructure/ui-icons/lib/Line/IconPlus'
 import theme from '@instructure/ui-themes/lib/canvas/base'
 
-AddOverride.propTypes = {
-  onAddOverride: func.isRequired
+AddHorizontalRuleButton.propTypes = {
+  onClick: func.isRequired,
+  label: string.isRequired
 }
 
-export default function AddOverride(props) {
-  const addOverrideStyle = {
-    boxSizing: 'border-box',
-    position: 'relative',
-    height: theme.variables.forms.inputHeightMedium,
-    textAlign: 'center'
-  }
-  const layoutStyle = {
-    boxSizing: 'border-box',
-    position: 'absolute',
-    width: '100%',
-    left: 0,
-    top: '50%',
-    transform: 'translateY(-50%)'
-  }
-  const ruleStyle = {
-    display: 'block',
-    height: theme.variables.borders.widthSmall,
-    color: theme.variables.colors.borderMedium,
-    margin: 0
-  }
+const addHorizontalRuleButtonStyle = {
+  boxSizing: 'border-box',
+  position: 'relative',
+  height: theme.variables.forms.inputHeightMedium,
+  textAlign: 'center'
+}
+const layoutStyle = {
+  boxSizing: 'border-box',
+  position: 'absolute',
+  width: '100%',
+  left: 0,
+  top: '50%',
+  transform: 'translateY(-50%)'
+}
+const ruleStyle = {
+  display: 'block',
+  height: theme.variables.borders.widthSmall,
+  color: theme.variables.colors.borderMedium,
+  margin: 0
+}
 
+// a horizontal rule with a + icon button in the middle
+export default function AddHorizontalRuleButton(props) {
   return (
-    <div style={addOverrideStyle} data-testid="AddOverride">
+    <div style={addHorizontalRuleButtonStyle} data-testid="AddHorizontalRuleButton">
       <span style={layoutStyle}>
         <hr style={ruleStyle} />
       </span>
-      <Button variant="circle-default" icon={IconPlus} onClick={props.onAddOverride}>
-        <ScreenReaderContent>{I18n.t('Add Override')}</ScreenReaderContent>
+      <Button variant="circle-default" icon={IconPlus} onClick={props.onClick}>
+        <ScreenReaderContent>{props.label}</ScreenReaderContent>
       </Button>
     </div>
   )

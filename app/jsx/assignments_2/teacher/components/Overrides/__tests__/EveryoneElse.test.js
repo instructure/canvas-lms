@@ -23,37 +23,14 @@ import {render} from 'react-testing-library'
 import {mockAssignment, mockOverride} from '../../../test-utils'
 import EveryoneElse from '../EveryoneElse'
 
-it("pulls everyone's dates from the assignment", () => {
-  const dueAt = '2018-11-27T13:00-0500'
-  const unlockAt = '2018-11-26T13:00-0500'
-  const lockAt = '2018-11-28T13:00-0500'
-
-  const assignment = mockAssignment({
-    dueAt,
-    unlockAt,
-    lockAt
-  })
-
-  const {getByText} = render(<EveryoneElse assignment={assignment} />)
-  expect(getByText('Everyone')).toBeInTheDocument()
-
-  const due = `Due: ${tz.format(dueAt, I18n.t('#date.formats.full'))}`
-  expect(getByText(due, {exact: false})).toBeInTheDocument()
-
-  const unlock = `${tz.format(unlockAt, I18n.t('#date.formats.short'))}`
-  const lock = `to ${tz.format(lockAt, I18n.t('#date.formats.full'))}`
-  expect(getByText(unlock)).toBeInTheDocument()
-  expect(getByText(lock)).toBeInTheDocument()
-})
+const aDueAt = '2018-11-27T13:00-0500'
+const aUnlockAt = '2018-11-26T13:00-0500'
+const aLockAt = '2018-11-28T13:00-0500'
+const oDueAt = '2019-11-27T13:00-0500'
+const oUnlockAt = '2019-11-26T13:00-0500'
+const oLockAt = '2019-11-28T13:00-0500'
 
 it("pulls everyone else's dates from the assignment", () => {
-  const aDueAt = '2018-11-27T13:00-0500'
-  const aUnlockAt = '2018-11-26T13:00-0500'
-  const aLockAt = '2018-11-28T13:00-0500'
-  const oDueAt = '2019-11-27T13:00-0500'
-  const oUnlockAt = '2019-11-26T13:00-0500'
-  const oLockAt = '2019-11-28T13:00-0500'
-
   const override = mockOverride({dueAt: oDueAt, unlockAt: oUnlockAt, lockAt: oLockAt})
   const assignment = mockAssignment({
     dueAt: aDueAt,
@@ -64,7 +41,7 @@ it("pulls everyone else's dates from the assignment", () => {
     }
   })
 
-  const {getByText} = render(<EveryoneElse assignment={assignment} />)
+  const {getByText} = render(<EveryoneElse assignment={assignment} onChangeAssignment={() => {}} />)
   expect(getByText('Everyone else')).toBeInTheDocument()
 
   const due = `Due: ${tz.format(aDueAt, I18n.t('#date.formats.full'))}`

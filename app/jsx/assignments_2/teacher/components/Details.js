@@ -17,17 +17,19 @@
  */
 
 import React from 'react'
-import {bool} from 'prop-types'
+import {bool, func} from 'prop-types'
+import I18n from 'i18n!asignments_2'
 
 import {TeacherAssignmentShape} from '../assignmentData'
 import AssignmentDescription from './AssignmentDescription'
 import Overrides from './Overrides/Overrides'
-import AddOverride from './Overrides/AddOverride'
+import AddHorizontalRuleButton from './AddHorizontalRuleButton'
 
 import View from '@instructure/ui-layout/lib/components/View'
 
 Details.propTypes = {
   assignment: TeacherAssignmentShape.isRequired,
+  onChangeAssignment: func.isRequired,
   readOnly: bool
 }
 Details.defaultProps = {
@@ -38,11 +40,25 @@ export default function Details(props) {
   // html is sanitized on the server side
   return (
     <View as="div" margin="0">
-      <AssignmentDescription text={props.assignment.description} readOnly={props.readOnly} />
-      <Overrides assignment={props.assignment} readOnly={props.readOnly} />
-      {props.readOnly ? null : <AddOverride onAddOverride={addOverride} />}
+      <AssignmentDescription
+        text={props.assignment.description}
+        onChange={handleDescriptionChange}
+        readOnly={props.readOnly}
+      />
+      <Overrides
+        assignment={props.assignment}
+        onChangeAssignment={props.onChangeAssignment}
+        readOnly={props.readOnly}
+      />
+      {props.readOnly ? null : (
+        <AddHorizontalRuleButton onClick={addOverride} label={I18n.t('Add Override')} />
+      )}
     </View>
   )
+
+  function handleDescriptionChange(desc) {
+    props.onChangeAssignment('description', desc)
+  }
 }
 
 // TODO: the real deal

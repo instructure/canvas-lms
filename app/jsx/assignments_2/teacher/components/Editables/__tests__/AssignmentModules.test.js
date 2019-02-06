@@ -86,3 +86,52 @@ it('renders the placeholder when not given a value in edit mode', () => {
   // I don't know of any other way to test this w/o peeking into SelectMultiple's impl
   expect(container.querySelectorAll('button')).toHaveLength(0)
 })
+
+it('calls onChange when the selection changes', () => {
+  const onchange = jest.fn()
+  const onchangemode = jest.fn()
+  const moduleList = makeModuleList()
+
+  const {container} = render(
+    <div>
+      <AssignmentModules
+        mode="edit"
+        onChange={onchange}
+        onChangeMode={onchangemode}
+        moduleList={moduleList}
+        selectedModules={moduleList.slice(0, 1)}
+        readOnly={false}
+      />
+      <span id="click-me" tabIndex="-1">
+        just here to get focus
+      </span>
+    </div>
+  )
+
+  const input = container.querySelectorAll('input')[1] // SelectMultiple has 2 inputs
+  input.click()
+  const option = document.querySelectorAll('li[role="option"]')[0]
+  option.click()
+  container.querySelector('#click-me').focus()
+  expect(onchangemode).toHaveBeenCalledWith('view')
+  expect(onchange).not.toHaveBeenCalled()
+
+  // it takes a re-render in view to get onChange called
+  render(
+    <div>
+      <AssignmentModules
+        mode="view"
+        onChange={onchange}
+        onChangeMode={onchangemode}
+        moduleList={moduleList}
+        selectedModules={moduleList.slice(0, 2)}
+        readOnly={false}
+      />
+      <span id="click-me" tabIndex="-1">
+        just here to get focus
+      </span>
+    </div>,
+    {container}
+  )
+  expect(onchange).toHaveBeenCalledWith(moduleList.slice(0, 2))
+})

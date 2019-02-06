@@ -18,17 +18,21 @@
 
 import React from 'react'
 import {render} from 'react-testing-library'
-import apiUserContent from 'compiled/str/apiUserContent'
-import AssignmentDescription from '../AssignmentDescription'
+import AddHorizontalRuleButton from '../AddHorizontalRuleButton'
 
-jest.mock('compiled/str/apiUserContent')
-apiUserContent.convert = jest.fn(arg => `converted ${arg}`)
-
-it('renders readOnly', () => {
-  const text = 'Hello world'
+it('renders', () => {
   const {getByText, getByTestId} = render(
-    <AssignmentDescription text={text} onChange={() => {}} readOnly />
+    <AddHorizontalRuleButton onClick={() => {}} label="click me" />
   )
-  expect(getByTestId('AssignmentDescription')).toBeInTheDocument()
-  expect(getByText(`converted ${text}`)).toBeInTheDocument()
+  expect(getByTestId('AddHorizontalRuleButton')).toBeInTheDocument()
+  expect(getByText('click me')).toBeInTheDocument()
+})
+
+it('calls onClick when clicked', () => {
+  const onclick = jest.fn()
+  const {getByText} = render(<AddHorizontalRuleButton onClick={onclick} label="click me" />)
+
+  const btn = getByText('click me')
+  btn.click()
+  expect(onclick).toHaveBeenCalled()
 })

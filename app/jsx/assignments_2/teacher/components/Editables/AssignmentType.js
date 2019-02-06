@@ -30,6 +30,17 @@ import IconPeerReview from '@instructure/ui-icons/lib/Line/IconPeerReview'
 
 import SelectableText from './SelectableText'
 
+const assignment_type = {value: 'assignment', label: I18n.t('Assignment'), icon: IconAssignment}
+const peer_review_type = {
+  value: 'peer-review',
+  label: I18n.t('Peer Review Assignment'),
+  icon: IconPeerReview
+}
+const group_type = {value: 'group', label: I18n.t('Group Assignment'), icon: IconGroup}
+const quiz_type = {value: 'quiz', label: I18n.t('Quiz'), icon: IconQuiz}
+
+const assignmentTypePlaceholder = I18n.t('Assignment Type')
+
 export default class AssignmentType extends React.Component {
   static propTypes = {
     mode: oneOf(['edit', 'view']).isRequired,
@@ -43,14 +54,14 @@ export default class AssignmentType extends React.Component {
     readOnly: true
   }
 
-  assignmentTypePlaceholder = I18n.t('Assignment Type')
+  constructor(props) {
+    super(props)
 
-  assignmentTypes = [
-    {value: 'assignment', label: I18n.t('Assignment'), icon: IconAssignment},
-    {value: 'peer-review', label: I18n.t('Peer Review Assignment'), icon: IconPeerReview},
-    {value: 'quiz', label: I18n.t('Quiz'), icon: IconQuiz},
-    {value: 'group', label: I18n.t('Group Assignment'), icon: IconGroup}
-  ]
+    this.assignmentTypes = [assignment_type, peer_review_type, group_type]
+    if (window.ENV && window.ENV.QUIZ_LTI_ENABLED) {
+      this.assignmentTypes.splice(2, 0, quiz_type)
+    }
+  }
 
   handleChange = selection => {
     this.props.onChange(selection && selection.value)
@@ -59,7 +70,7 @@ export default class AssignmentType extends React.Component {
   renderTypeView = typeOption => {
     const selectedType = typeOption && this.assignmentTypes.find(t => t.value === typeOption.value)
     if (!selectedType) {
-      return <Text weight="light">{this.assignmentTypePlaceholder}</Text>
+      return <Text weight="light">{assignmentTypePlaceholder}</Text>
     }
 
     return (

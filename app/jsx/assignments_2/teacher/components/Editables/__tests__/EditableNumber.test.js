@@ -20,91 +20,110 @@ import React from 'react'
 import {render, fireEvent} from 'react-testing-library'
 import EditableNumber from '../EditableNumber'
 
-it('renders the value in view mode', () => {
-  const {getByText} = render(
-    <EditableNumber
-      mode="view"
-      onChange={() => {}}
-      onChangeMode={() => {}}
-      label="Pick a number"
-      value="17"
-    />
-  )
-  expect(getByText('17')).toBeInTheDocument()
-  expect(getByText('Pick a number')).toBeInTheDocument()
+describe('EditableNumber', () => {
+  it('renders the value in view mode', () => {
+    const {getByText} = render(
+      <EditableNumber
+        mode="view"
+        onChange={() => {}}
+        onChangeMode={() => {}}
+        label="Pick a number"
+        value="17"
+      />
+    )
+    expect(getByText('17')).toBeInTheDocument()
+    expect(getByText('Pick a number')).toBeInTheDocument()
+  })
+
+  it('renders the value in edit mode', () => {
+    const {container} = render(
+      <EditableNumber
+        mode="edit"
+        onChange={() => {}}
+        onChangeMode={() => {}}
+        label="Pick a number"
+        value="17"
+      />
+    )
+    expect(container.querySelector('input[value="17"]')).toBeInTheDocument()
+  })
+
+  it('does not render edit button when readOnly', () => {
+    const {queryByText} = render(
+      <EditableNumber
+        mode="view"
+        onChange={() => {}}
+        onChangeMode={() => {}}
+        label="Pick a number"
+        value="17"
+        readOnly
+      />
+    )
+    expect(queryByText('Pick a number')).toBeNull()
+  })
+
+  it('exits edit mode on <Enter>', () => {
+    const onChangeMode = jest.fn()
+    const {container} = render(
+      <EditableNumber
+        mode="edit"
+        onChange={() => {}}
+        onChangeMode={onChangeMode}
+        label="Pick a number"
+        value="17"
+      />
+    )
+    const input = container.querySelector('input[value="17"]')
+    fireEvent.keyDown(input, {key: 'Enter', code: 13})
+    expect(onChangeMode).toHaveBeenCalledWith('view')
+  })
+
+  it('does not exit edit mode if value is invalid', () => {
+    const onChangeMode = jest.fn()
+    const {container} = render(
+      <EditableNumber
+        mode="edit"
+        onChange={() => {}}
+        onChangeMode={onChangeMode}
+        isValid={() => false}
+        label="Pick a number"
+        value="17"
+      />
+    )
+    const input = container.querySelector('input[value="17"]')
+    fireEvent.keyDown(input, {key: 'Enter', code: 13})
+    expect(onChangeMode).not.toHaveBeenCalled()
+  })
+
+  // I want to test that the input grows in width as the user
+  // types, but the component isn't acutally rendered into a DOM
+  // where it's given a size. The container and everything w/in
+  // is is 0x0.
+  // it('grows with the value', () => {
+  //   const {container} = render(
+  //     <EditableNumber
+  //       mode="edit"
+  //       onChange={() => {}}
+  //       onChangeMode={() => {}}
+  //       label="Pick a number"
+  //       value="17"
+  //     />
+  //   )
+  //   let input = container.querySelector('input[value="17"]')
+  //   const w0 = input.offsetWidth
+  //   render(
+  //     <EditableNumber
+  //       mode="edit"
+  //       onChange={() => {}}
+  //       onChangeMode={() => {}}
+  //       label="Pick a number"
+  //       value="1777"
+  //     />,
+  //     {container}
+  //   )
+  //   input = container.querySelector('input[value="1777"]')
+  //   const w1 = input.offsetWidth
+
+  //   expect(w1 > w0).toBeTruthy()
+  // })
 })
-
-it('renders the value in edit mode', () => {
-  const {container} = render(
-    <EditableNumber
-      mode="edit"
-      onChange={() => {}}
-      onChangeMode={() => {}}
-      label="Pick a number"
-      value="17"
-    />
-  )
-  expect(container.querySelector('input[value="17"]')).toBeInTheDocument()
-})
-
-it('does not render edit button when readOnly', () => {
-  const {queryByText} = render(
-    <EditableNumber
-      mode="view"
-      onChange={() => {}}
-      onChangeMode={() => {}}
-      label="Pick a number"
-      value="17"
-      readOnly
-    />
-  )
-  expect(queryByText('Pick a number')).toBeNull()
-})
-
-it('exits edit mode on <Enter>', () => {
-  const onChangeMode = jest.fn()
-  const {container} = render(
-    <EditableNumber
-      mode="edit"
-      onChange={() => {}}
-      onChangeMode={onChangeMode}
-      label="Pick a number"
-      value="17"
-    />
-  )
-  const input = container.querySelector('input[value="17"]')
-  fireEvent.keyDown(input, {key: 'Enter', code: 13})
-  expect(onChangeMode).toHaveBeenCalledWith('view')
-})
-
-// I want to test that the input grows in width as the user
-// types, but the component isn't acutally rendered into a DOM
-// where it's given a size. The container and everything w/in
-// is is 0x0.
-// it('grows with the value', () => {
-//   const {container} = render(
-//     <EditableNumber
-//       mode="edit"
-//       onChange={() => {}}
-//       onChangeMode={() => {}}
-//       label="Pick a number"
-//       value="17"
-//     />
-//   )
-//   let input = container.querySelector('input[value="17"]')
-//   const w0 = input.offsetWidth
-//   render(
-//     <EditableNumber
-//       mode="edit"
-//       onChange={() => {}}
-//       onChangeMode={() => {}}
-//       label="Pick a number"
-//       value="1777"
-//     />,
-//     {container}
-//   )
-//   input = container.querySelector('input[value="1777"]')
-//   const w1 = input.offsetWidth
-
-//   expect(w1 > w0).toBeTruthy()
-// })

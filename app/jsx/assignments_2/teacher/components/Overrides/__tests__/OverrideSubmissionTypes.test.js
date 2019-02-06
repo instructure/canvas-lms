@@ -39,7 +39,9 @@ it('renders an OverrideSubmissionType summary', () => {
       'foo'
     ]
   })
-  const {getByText} = render(<OverrideSubmissionTypes variant="summary" override={override} />)
+  const {getByText} = render(
+    <OverrideSubmissionTypes variant="summary" override={override} onChangeOverride={() => {}} />
+  )
 
   const submission_types =
     'Arc & External Tool & File & Google Template & Image & Media & No Submission & O365 Template & On Paper & Student Choice & Text Entry & Url & Other'
@@ -66,7 +68,9 @@ it('renders an OverrideSubmissionType detail', () => {
       'foo'
     ]
   })
-  const {getByText} = render(<OverrideSubmissionTypes variant="detail" override={override} />)
+  const {getByText} = render(
+    <OverrideSubmissionTypes variant="detail" override={override} onChangeOverride={() => {}} />
+  )
 
   expect(getByText('Arc')).toBeInTheDocument()
   expect(getByText('No Submission')).toBeInTheDocument()

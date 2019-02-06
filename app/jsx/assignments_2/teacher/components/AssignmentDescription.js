@@ -17,14 +17,17 @@
  */
 
 import React from 'react'
-import {bool, string} from 'prop-types'
+import {bool, func, string} from 'prop-types'
 import I18n from 'i18n!assignments_2'
 import EditableRichText from './Editables/EditableRichText'
 import View from '@instructure/ui-layout/lib/components/View'
 
+const descriptionPlaceholder = I18n.t('Description')
+
 export default class AssignmentDescription extends React.Component {
   static propTypes = {
-    text: string.isRequired,
+    text: string,
+    onChange: func.isRequired,
     readOnly: bool
   }
 
@@ -36,13 +39,12 @@ export default class AssignmentDescription extends React.Component {
     super(props)
 
     this.state = {
-      mode: 'view',
-      text: props.text
+      mode: 'view'
     }
   }
 
   handleChange = text => {
-    this.setState({text})
+    this.props.onChange(text || null)
   }
 
   handleChangeMode = mode => {
@@ -54,7 +56,8 @@ export default class AssignmentDescription extends React.Component {
       <View as="div" margin="small 0" data-testid="AssignmentDescription">
         <EditableRichText
           mode={this.state.mode}
-          value={this.state.text}
+          value={this.props.text || ''}
+          placeholder={descriptionPlaceholder}
           onChange={this.handleChange}
           onChangeMode={this.handleChangeMode}
           label={I18n.t('Description')}

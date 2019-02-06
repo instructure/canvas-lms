@@ -20,17 +20,21 @@ import React from 'react'
 import {render} from 'react-testing-library'
 import AssignmentType from '../AssignmentType'
 
+beforeAll(() => {
+  global.window.ENV = {}
+})
+
 it('renders the given assignment type in view mode', () => {
   const {getByText, getByTestId} = render(
     <AssignmentType
       mode="view"
       onChange={() => {}}
       onChangeMode={() => {}}
-      selectedAssignmentType="quiz"
+      selectedAssignmentType="group"
     />
   )
   expect(getByTestId('SelectableText')).toBeInTheDocument()
-  expect(getByText('Quiz')).toBeInTheDocument()
+  expect(getByText('Group Assignment')).toBeInTheDocument()
 })
 
 it('renders the given assignment type in edit mode', () => {
@@ -39,11 +43,11 @@ it('renders the given assignment type in edit mode', () => {
       mode="edit"
       onChange={() => {}}
       onChangeMode={() => {}}
-      selectedAssignmentType="quiz"
+      selectedAssignmentType="group"
     />
   )
   expect(getByTestId('SelectableText')).toBeInTheDocument()
-  expect(document.querySelector('input').value).toBe('Quiz')
+  expect(document.querySelector('input').value).toBe('Group Assignment')
 })
 
 it('renders the placeholder when not given a value', () => {
@@ -52,4 +56,78 @@ it('renders the placeholder when not given a value', () => {
   )
   expect(getByTestId('SelectableText')).toBeInTheDocument()
   expect(getByText('Assignment Type')).toBeInTheDocument()
+})
+
+it('has 3 options if quiz.next is not enabled', () => {
+  const {container} = render(
+    <AssignmentType
+      mode="edit"
+      onChange={() => {}}
+      onChangeMode={() => {}}
+      selectedAssignmentType="assignment"
+    />
+  )
+  const input = container.querySelector('input')
+  input.click()
+  expect(document.querySelectorAll('li[role="option"]')).toHaveLength(3)
+})
+
+it('has 4 options if quiz.next is enabled', () => {
+  global.window.ENV.QUIZ_LTI_ENABLED = true
+  const {container} = render(
+    <AssignmentType
+      mode="edit"
+      onChange={() => {}}
+      onChangeMode={() => {}}
+      selectedAssignmentType="assignment"
+      readOnly={false}
+    />
+  )
+  const input = container.querySelector('input')
+  input.click()
+  expect(document.querySelectorAll('li[role="option"]')).toHaveLength(4)
+})
+
+it('calls onChange when the selection changes', () => {
+  const onchange = jest.fn()
+  const onchangemode = jest.fn()
+  const {container} = render(
+    <div>
+      <AssignmentType
+        mode="edit"
+        onChange={onchange}
+        onChangeMode={onchangemode}
+        selectedAssignmentType="assignment"
+        readOnly={false}
+      />
+      <span id="click-me" tabIndex="-1">
+        just here to get focus
+      </span>
+    </div>
+  )
+  const input = container.querySelector('input')
+  input.click()
+  const option = document.querySelectorAll('li[role="option"]')[1]
+  option.click()
+  container.querySelector('#click-me').focus()
+  expect(onchangemode).toHaveBeenCalledWith('view')
+  expect(onchange).not.toHaveBeenCalled()
+
+  // it takes a re-render in view to get onChange called
+  render(
+    <div>
+      <AssignmentType
+        mode="view"
+        onChange={onchange}
+        onChangeMode={onchangemode}
+        selectedAssignmentType="peer-review"
+        readOnly={false}
+      />
+      <span id="click-me" tabIndex="-1">
+        just here to get focus
+      </span>
+    </div>,
+    {container}
+  )
+  expect(onchange).toHaveBeenCalledWith('peer-review')
 })

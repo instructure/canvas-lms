@@ -201,6 +201,7 @@ export const OverrideShape = shape({
   lockAt: string,
   unlockAt: string,
   submissionTypes: arrayOf(string), // currently copied from the asisgnment
+  allowedAttempts: number, // currently copied from the assignment
   allowedExtensions: arrayOf(string), // currently copied from the assignment
   set: shape({
     lid: string,
@@ -240,7 +241,7 @@ export const TeacherAssignmentShape = shape({
   dueAt: string,
   lockAt: string,
   unlockAt: string,
-  description: string.isRequired,
+  description: string,
   state: oneOf(['published', 'unpublished', 'deleted']).isRequired,
   assignmentGroup: AssignmentGroupShape.isRequired,
   modules: arrayOf(ModuleShape).isRequired,
@@ -255,3 +256,14 @@ export const TeacherAssignmentShape = shape({
     nodes: arrayOf(SubmissionShape)
   }).isRequired
 })
+
+// custom proptype validator
+// requires the property if the component's prop.variant === 'detail'
+// this is used in components that have summary and detail renderings
+export function requiredIfDetail(props, propName, componentName) {
+  if (!props[propName] && props.variant === 'detail') {
+    return new Error(
+      `The prop ${propName} is required on ${componentName} if the variant is 'detail'`
+    )
+  }
+}

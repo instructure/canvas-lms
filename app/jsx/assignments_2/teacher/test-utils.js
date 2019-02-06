@@ -145,12 +145,15 @@ export function mockOverride(overrides = {}) {
     allDay: true,
     lockAt: '2018-12-29T23:59:00-05:00',
     unlockAt: '2018-12-23T00:00:00-05:00',
-    allowedAttempts: null,
     set: {
       __typename: 'Section',
       lid: '10',
       name: 'Section A'
     },
+    // copied from assignment
+    allowedAttempts: null,
+    submissionTypes: [],
+    allowedExtensions: [],
     ...overrides
   }
 }

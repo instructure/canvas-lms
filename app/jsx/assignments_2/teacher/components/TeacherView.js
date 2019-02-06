@@ -19,12 +19,17 @@
 import React from 'react'
 import I18n from 'i18n!assignments_2'
 import {Mutation} from 'react-apollo'
+import classnames from 'classnames'
+import produce from 'immer'
+import get from 'lodash/get'
+import set from 'lodash/set'
 
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 
 import {TeacherAssignmentShape, SET_WORKFLOW} from '../assignmentData'
 import Header from './Header'
 import ContentTabs from './ContentTabs'
+import TeacherFooter from './TeacherFooter'
 
 import ConfirmDialog from './ConfirmDialog'
 import MessageStudentsWho from './MessageStudentsWho'
@@ -41,13 +46,43 @@ export default class TeacherView extends React.Component {
       messageStudentsWhoOpen: false,
       confirmDelete: false,
       deletingNow: false,
+      workingAssignment: props.assignment, // the assignment with updated fields while editing
+      isDirty: false, // has the user changed anything?
       // for now, put "#edit" in the URL and it will turn off readOnly
       readOnly: window.location.hash.indexOf('edit') < 0
     }
 
+    // TODO: reevaluate if the context is still needed. <FriendlyDateTime> pulls the data
+    // directly from ENV, so unless its replacement is different, this might be unnecessary.
     this.contextValue = {
       locale: (window.ENV && window.ENV.MOMENT_LOCALE) || TeacherViewContextDefaults.locale,
       timeZone: (window.ENV && window.ENV.TIMEZONE) || TeacherViewContextDefaults.timeZone
+    }
+  }
+
+  // @param value: the new value. may be a scalar, an array, or an object.
+  // @param path: where w/in the assignment it should go. May be a string representing
+  //     the dot-separated path (e.g. 'assignmentOverrides.nodes.0`) or an array
+  //     of steps (e.g. ['assignmentOverrides', 'nodes', 0] (which could also be '0'))
+  updateWorkingAssignment(path, value) {
+    const dottedpath = Array.isArray(path) ? path.join('.') : path
+    const old = get(this.state.workingAssignment, dottedpath)
+    if (old === value) {
+      return this.state.workingAssignment
+    }
+    const updatedAssignment = produce(this.state.workingAssignment, draft => {
+      set(draft, path, value)
+    })
+    return updatedAssignment
+  }
+
+  // if the new value is different from the existing value, update TeacherView's react state
+  handleChangeAssignment = (path, value) => {
+    const updatedAssignment = this.updateWorkingAssignment(path, value)
+    if (updatedAssignment !== this.state.workingAssignment) {
+      // the assignment can be unpublished independent from other changes
+      const isDirty = path !== 'state'
+      this.setState({workingAssignment: updatedAssignment, isDirty})
     }
   }
 
@@ -89,8 +124,22 @@ export default class TeacherView extends React.Component {
     // this.setState({errors, confirmDelete: false, deletingNow: false})
   }
 
-  renderLoading() {
-    return <div>Loading...</div>
+  handleCancel = () => {
+    this.setState({workingAssignment: this.props.assignment, isDirty: false})
+  }
+
+  // TODO: implement save and publish
+  handleSave = () => {
+    window.alert("pretend we're saving")
+    this.setState({isDirty: false})
+  }
+
+  handlePublish = () => {
+    const updatedAssignment = this.updateWorkingAssignment('state', 'published')
+    if (updatedAssignment !== this.state.workingAssignment) {
+      window.alert("pretend we're saving and publishing")
+      this.setState({workingAssignment: updatedAssignment, isDirty: false})
+    }
   }
 
   renderConfirmDialog() {
@@ -121,24 +170,39 @@ export default class TeacherView extends React.Component {
   }
 
   render() {
+    const dirty = this.state.isDirty
+    const assignment = this.state.workingAssignment
+    const clazz = classnames('assignments-teacher', {dirty})
     return (
       <TeacherViewContext.Provider value={this.contextValue}>
-        <div>
+        <div className={clazz}>
           {this.renderConfirmDialog()}
           <ScreenReaderContent>
-            <h1>{this.props.assignment.name}</h1>
+            <h1>{assignment.name}</h1>
           </ScreenReaderContent>
           <Header
-            assignment={this.props.assignment}
+            assignment={assignment}
+            onChangeAssignment={this.handleChangeAssignment}
             onUnsubmittedClick={this.handleUnsubmittedClick}
             onDelete={this.handleDeleteButtonPressed}
             readOnly={this.state.readOnly}
           />
-          <ContentTabs assignment={this.props.assignment} readOnly={this.state.readOnly} />
+          <ContentTabs
+            assignment={assignment}
+            onChangeAssignment={this.handleChangeAssignment}
+            readOnly={this.state.readOnly}
+          />
           <MessageStudentsWho
             open={this.state.messageStudentsWhoOpen}
             onDismiss={this.handleDismissMessageStudentsWho}
           />
+          {dirty ? (
+            <TeacherFooter
+              onCancel={this.handleCancel}
+              onSave={this.handleSave}
+              onPublish={this.handlePublish}
+            />
+          ) : null}
         </div>
       </TeacherViewContext.Provider>
     )

@@ -22,5 +22,8 @@ import {mockAssignment} from '../../test-utils'
 import ContentTabs from '../ContentTabs'
 
 it('renders', () => {
-  render(<ContentTabs assignment={mockAssignment()} />)
+  const {container} = render(
+    <ContentTabs assignment={mockAssignment()} onChangeAssignment={() => {}} />
+  )
+  expect(container.querySelectorAll('[role="tab"]')).toHaveLength(4)
 })

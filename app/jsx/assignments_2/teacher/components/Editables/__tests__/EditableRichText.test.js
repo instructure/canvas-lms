@@ -66,3 +66,35 @@ it('does not render edit button when readOnly', () => {
   )
   expect(queryByText('The Label')).toBeNull()
 })
+
+it('shows the placeholder when value is all whitespace', () => {
+  const {getByText} = render(
+    <EditableRichText
+      mode="view"
+      value="<p>&nbsp; </p>"
+      onChange={() => {}}
+      onChangeMode={() => {}}
+      label="The Label"
+      placeholder="the placeholder"
+    />
+  )
+  expect(getByText('the placeholder')).toBeInTheDocument()
+})
+
+it('shows the content and not the placeholder when value is all whitespace and readOnly=true', () => {
+  const {getByText, queryByText} = render(
+    <EditableRichText
+      mode="view"
+      value="<p>&nbsp;</p>"
+      onChange={() => {}}
+      onChangeMode={() => {}}
+      label="The Label"
+      placeholder="the placeholder"
+      readOnly
+    />
+  )
+  expect(queryByText('the placeholder')).toBeNull()
+  expect(
+    getByText((_content, element) => /<p>&nbsp;<\/p>/.test(element.innerHTML))
+  ).toBeInTheDocument()
+})

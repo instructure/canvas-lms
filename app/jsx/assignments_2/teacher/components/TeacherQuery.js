@@ -34,7 +34,7 @@ TeacherQuery.propTypes = {
 export default function TeacherQuery({assignmentLid}) {
   return (
     <Query query={TEACHER_QUERY} variables={{assignmentLid}}>
-      {({loading, error, data: {assignment}}) => {
+      {({loading, error, data}) => {
         if (loading) {
           return (
             <View as="div" textAlign="center" padding="large 0">
@@ -44,7 +44,7 @@ export default function TeacherQuery({assignmentLid}) {
         } else if (error) {
           return <pre>Error: {JSON.stringify(error, null, 2)}</pre>
         }
-        return <TeacherView assignment={assignment} />
+        return <TeacherView assignment={data.assignment} />
       }}
     </Query>
   )

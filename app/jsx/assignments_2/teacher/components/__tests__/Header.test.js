@@ -26,7 +26,7 @@ it('renders basic assignment information', () => {
   const assignment = mockAssignment()
   const {container, getByTestId} = render(
     <MockedProvider>
-      <Header assignment={assignment} />
+      <Header assignment={assignment} onChangeAssignment={() => {}} />
     </MockedProvider>
   )
 
