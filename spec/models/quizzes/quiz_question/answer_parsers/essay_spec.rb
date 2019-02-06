@@ -26,7 +26,8 @@ describe Quizzes::QuizQuestion::AnswerParsers::Essay do
       [
         {
           answer_text: "Essay Answer",
-          answer_comments: "This is an essay answer"
+          answer_comments: "This is an essay answer",
+          answer_comment_html: '<img src="x" onerror="alert(1)">'
         }
       ]
     end
@@ -39,6 +40,8 @@ describe Quizzes::QuizQuestion::AnswerParsers::Essay do
       question = Quizzes::QuizQuestion::QuestionData.new({})
       essay.parse(question)
       expect(question[:comments]).to eq raw_answers[0][:answer_comments]
+      expect(question[:comments_html]).to include '<img'
+      expect(question[:comments_html]).not_to include 'onerror'
     end
   end
 end
