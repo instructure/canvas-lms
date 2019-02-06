@@ -35,14 +35,14 @@ function AssignmentGroupModuleNav(props) {
     <Flex margin="0 0 large 0" direction="column">
       {modules.slice(0, MAX_DISPLAYED_MODULES).map(module => (
         <FlexItem key={module.id}>
-          <Link data-test-id="module-link" href={env.moduleUrl} theme={{color: '#000000'}}>
+          <Link data-test-id="module-link" href={env.moduleUrl}>
             <Text size="medium">{module.name}</Text>
           </Link>
         </FlexItem>
       ))}
       {modules.length > MAX_DISPLAYED_MODULES && (
         <FlexItem>
-          <Link data-test-id="module-link" href={env.moduleUrl} theme={{color: '#000000'}}>
+          <Link data-test-id="module-link" href={env.moduleUrl}>
             <Text size="medium">{I18n.t('More Modules')}</Text>
           </Link>
         </FlexItem>
@@ -50,11 +50,7 @@ function AssignmentGroupModuleNav(props) {
 
       {assignmentGroup && (
         <FlexItem>
-          <Link
-            data-test-id="assignmentgroup-link"
-            href={env.assignmentUrl}
-            theme={{color: '#000000'}}
-          >
+          <Link data-test-id="assignmentgroup-link" href={env.assignmentUrl}>
             <Text size="medium">{assignmentGroup.name}</Text>
           </Link>
         </FlexItem>

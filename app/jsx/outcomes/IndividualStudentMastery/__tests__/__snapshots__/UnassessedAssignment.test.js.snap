@@ -12,7 +12,7 @@ exports[`properly renders the UnassessedAssignment component 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(Link): Object {
+          Symbol(Link__izUHsI): Object {
             "color": "#68777D",
           },
         }
@@ -20,7 +20,6 @@ exports[`properly renders the UnassessedAssignment component 1`] = `
     >
       <Link
         as="button"
-        ellipsis={false}
         href="www.example.com"
         iconPlacement="start"
         linkRef={[Function]}
