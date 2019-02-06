@@ -61,8 +61,8 @@ describe 'RequestThrottle' do
       expect(throttler.client_identifier(req request_logged_out)).to eq 'session:sess1'
     end
 
-    it "should fall back to nil" do
-      expect(throttler.client_identifier(req request_no_session)).to eq nil
+    it "should fall back to ip" do
+      expect(throttler.client_identifier(req(request_no_session))).to eq "ip:#{request_no_session['REMOTE_ADDR']}"
     end
   end
 
@@ -163,11 +163,13 @@ describe 'RequestThrottle' do
       expect(strip_variable_headers(throttler.call(request_user_1))).to eq response
     end
 
-    it "should skip if no client_identifier found" do
-      if Canvas.redis_enabled?
-        expect_any_instance_of(Redis::Scripting::Module).to receive(:run).never
+    if Canvas.redis_enabled?
+      it "should not skip if no client_identifier found" do
+        expect(strip_variable_headers(throttler.call(request_no_session))).to eq response
+        bucket = RequestThrottle::LeakyBucket.new("ip:#{request_no_session['REMOTE_ADDR']}")
+        count, last_touched = bucket.redis.hmget(bucket.cache_key, 'count', 'last_touched')
+        expect(last_touched.to_f).to be > 0.0
       end
-      expect(throttler.call(request_no_session)).to eq response
     end
 
     def throttled_request
