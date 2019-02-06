@@ -143,6 +143,8 @@ class RequestThrottle
         identifier = "user:#{identifier}"
       elsif identifier = session_id(request).presence
         identifier = "session:#{identifier}"
+      elsif ip = request.ip
+        identifier = "ip:#{ip}"
       end
       identifier
     end
