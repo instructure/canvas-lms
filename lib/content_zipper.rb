@@ -429,7 +429,7 @@ class ContentZipper
 
     uploaded_files.each do |file|
       @logger.debug("  found attachment: #{file.display_name}")
-      full_filename = "#{filename}_#{file.id}_#{file.display_name}"
+      full_filename = "#{filename}_#{file.id}_#{sanitize_attachment_filename(file.display_name)}"
 
       add_file(file, zipfile, full_filename)
     end
@@ -457,6 +457,10 @@ class ContentZipper
 
   def sanitize_file_name(filename)
     filename.gsub(/[^[[:word:]]]/, '').downcase
+  end
+
+  def sanitize_attachment_filename(filename)
+    filename.gsub(/[\x00\/\\:\*\?\"<>\|]+/, '_')
   end
 
   def sanitize_user_name(user_name)

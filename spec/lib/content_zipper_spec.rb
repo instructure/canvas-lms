@@ -208,11 +208,12 @@ describe ContentZipper do
       end
     end
 
-    it 'only includes un-deleted attachments' do
+    it 'excludes deleted attachments' do
       course_with_student(active_all: true)
 
       assignment = assignment_model(course: @course)
       att = attachment_model(uploaded_data: stub_file_data('test.txt', 'asdf', 'text/plain'), context: @student)
+      submission_model(user: @student, assignment: assignment, attachments: [att])
       att.destroy
 
       attachment = Attachment.new(display_name: 'my_download.zip')
@@ -222,15 +223,25 @@ describe ContentZipper do
       attachment.save!
 
       ContentZipper.process_attachment(attachment, @teacher)
+      expect(Zip::File.new(attachment.open).entries.count).to eq 0
+    end
 
-      # assert no submissions
-      submission_count = 0
-      full_filename = attachment.full_filename
-      Zip::File.foreach(full_filename) do
-        submission_count += 1
-      end
+    it 'strips harmful characters from submission filenames' do
+      course_with_student(active_all: true)
 
-      expect(submission_count).to eq 0
+      assignment = assignment_model(course: @course)
+      att = attachment_model(uploaded_data: stub_file_data('A/V??.txt', 'a/v', 'text/plain'), context: @student)
+      submission_model(user: @student, assignment: assignment, attachments: [att])
+
+      attachment = Attachment.new(display_name: 'my_download.zip')
+      attachment.user = @teacher
+      attachment.workflow_state = 'to_be_zipped'
+      attachment.context = assignment
+      attachment.save!
+
+      ContentZipper.process_attachment(attachment, @teacher)
+      entry = Zip::File.new(attachment.open).entries.first
+      expect(entry.name).to end_with 'A_V_.txt'
     end
   end
 
