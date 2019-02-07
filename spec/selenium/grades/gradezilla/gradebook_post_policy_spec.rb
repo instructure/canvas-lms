@@ -24,7 +24,7 @@ describe 'Gradezilla Post Policy' do
   include_context "in-process server selenium tests"
 
   before :once do
-    skip('Unskip in GRADE-1936')
+    skip('Unskip in GRADE-63')
     # course
     course_with_teacher(
       course_name: "Post Policy Course",
@@ -66,12 +66,12 @@ describe 'Gradezilla Post Policy' do
 
     context 'when post everyone' do
       before :each do
-        skip('Unskip in GRADE-1936')
+        skip('Unskip in GRADE-63')
         manually_post_grades('Everyone')
       end
 
       it 'post grades option disabled' do
-        skip('Unskip in GRADE-1936')
+        skip('Unskip in GRADE-63')
         GradezillaPage.click_assignment_header_menu(@assignment)
         # TODO: expect post option to be disabled
       end
@@ -85,7 +85,7 @@ describe 'Gradezilla Post Policy' do
 
     context 'when post everyone for section' do
       before :each do
-        skip('Unskip in GRADE-1936')
+        skip('Unskip in GRADE-63')
         manually_post_grades('Everyone', @section2)
       end
 
@@ -96,7 +96,7 @@ describe 'Gradezilla Post Policy' do
       end
 
       it 'does not post for other section', priority: '1', test_id: 3756681 do
-        skip('Unskip in GRADE-1936')
+        skip('Unskip in ticket to be created for student grades page')
         # open submission tray, check for pill
         Gradezilla::Cells.open_tray(@students2.first, @assignment)
         expect(Gradezilla::GradeDetailTray.not_posted_pill).to be_displayed
@@ -109,7 +109,7 @@ describe 'Gradezilla Post Policy' do
       end
 
       it 'Post tray shows unposted count', priority: '1', test_id: 3756684 do
-        skip('Unskip in GRADE-1937')
+        skip('Unskip in GRADE-63')
         Gradezilla.click_post_grades(@assignment.id)
         # TODO: expect unposted indicator to be displayed and show count 2
       end
@@ -180,7 +180,7 @@ describe 'Gradezilla Post Policy' do
     end
 
     before :each do
-      skip('Unskip in GRADE-1936')
+      skip('Unskip in GRADE-63')
       manually_post_grades('Graded')
     end
 
@@ -191,7 +191,7 @@ describe 'Gradezilla Post Policy' do
     end
 
     it 'does not post for ungraded', priority: '1', test_id: 3756680 do
-      skip('Unskip in GRADE-1936')
+      skip('Unskip in ticket to be created for student grades page')
       # TODO: verify ungraded students still have eyeball icon
       verify_student_grade_displayed(@students[3], '')
       # TODO: expect icon to be displayed
@@ -207,7 +207,7 @@ describe 'Gradezilla Post Policy' do
     end
 
     before :each do
-      skip('Unskip in GRADE-1936')
+      skip('Unskip in GRADE-63')
       manually_post_grades('Graded', @section2)
     end
 
@@ -216,7 +216,7 @@ describe 'Gradezilla Post Policy' do
     end
 
     it 'does not post ungraded for section', priority: '1', test_id: 3756681 do
-      skip('Unskip in GRADE-1936')
+      skip('Unskip in ticket to be created for student grades page')
       # TODO: verify students in section without grades have eyeball icon
       verify_student_grade_displayed(@students2.second, '')
       # TODO: expect eyeball icon to be displayed
