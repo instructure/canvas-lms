@@ -288,6 +288,7 @@ class Submission < ActiveRecord::Base
   after_save :update_quiz_submission
   after_save :update_participation
   after_save -> { PipelineService.publish self }
+  after_destroy -> { PipelineService.publish(self) }
 
   after_save :send_unit_grades_to_pipeline
 
