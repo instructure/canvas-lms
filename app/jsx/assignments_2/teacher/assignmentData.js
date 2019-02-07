@@ -40,6 +40,8 @@ export const EnvShape = shape({
 export const TEACHER_QUERY = gql`
   query GetAssignment($assignmentLid: ID!) {
     assignment(id: $assignmentLid) {
+      __typename
+      id
       lid: _id
       gid: id
       name
@@ -157,7 +159,8 @@ export const SET_WORKFLOW = gql`
   mutation SetWorkflow($id: ID!, $workflow: AssignmentState!) {
     updateAssignment(input: {id: $id, state: $workflow}) {
       assignment {
-        lid: _id
+        __typename
+        id
         state
       }
     }
@@ -226,7 +229,7 @@ export const TeacherAssignmentShape = shape({
   lockAt: string,
   unlockAt: string,
   description: string.isRequired,
-  state: oneOf(['published', 'unpublished']).isRequired,
+  state: oneOf(['published', 'unpublished', 'deleted']).isRequired,
   assignmentGroup: AssignmentGroupShape.isRequired,
   modules: arrayOf(ModuleShape).isRequired,
   course: CourseShape.isRequired,

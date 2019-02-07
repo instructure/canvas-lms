@@ -21,8 +21,6 @@ import {render} from 'react-testing-library'
 import apiUserContent from 'compiled/str/apiUserContent'
 import AssignmentDescription from '../AssignmentDescription'
 
-jest.mock('jsx/shared/rce/RichContentEditor') // jest cannot deal with jquery as loded from here
-
 jest.mock('compiled/str/apiUserContent')
 apiUserContent.convert = jest.fn(arg => `converted ${arg}`)
 

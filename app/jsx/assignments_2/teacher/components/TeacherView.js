@@ -17,12 +17,12 @@
  */
 
 import React from 'react'
-import {string, bool} from 'prop-types'
 import I18n from 'i18n!assignments_2'
+import {Mutation} from 'react-apollo'
 
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 
-import {queryAssignment, setWorkflow} from '../api'
+import {TeacherAssignmentShape, SET_WORKFLOW} from '../assignmentData'
 import Header from './Header'
 import ContentTabs from './ContentTabs'
 
@@ -32,18 +32,15 @@ import TeacherViewContext, {TeacherViewContextDefaults} from './TeacherViewConte
 
 export default class TeacherView extends React.Component {
   static propTypes = {
-    assignmentLid: string
+    assignment: TeacherAssignmentShape
   }
 
   constructor(props) {
     super(props)
     this.state = {
       messageStudentsWhoOpen: false,
-      assignment: {},
       confirmDelete: false,
       deletingNow: false,
-      loading: true,
-      errors: [],
       // for now, put "#edit" in the URL and it will turn off readOnly
       readOnly: window.location.hash.indexOf('edit') < 0
     }
@@ -52,54 +49,6 @@ export default class TeacherView extends React.Component {
       locale: (window.ENV && window.ENV.MOMENT_LOCALE) || TeacherViewContextDefaults.locale,
       timeZone: (window.ENV && window.ENV.TIMEZONE) || TeacherViewContextDefaults.timeZone
     }
-  }
-
-  componentDidMount() {
-    this.loadAssignment()
-  }
-
-  async loadAssignment() {
-    const loadingErrors = []
-    let assignment = {}
-    try {
-      const {errors, data} = await queryAssignment(this.props.assignmentLid)
-      if (errors) loadingErrors.push(...errors)
-      if (data.assignment) assignment = data.assignment
-    } catch (error) {
-      loadingErrors.push(error.message)
-    }
-    this.setState({assignment, loading: false, errors: loadingErrors})
-  }
-
-  assignmentStateUpdate(state, updates) {
-    return {assignment: {...state.assignment, ...updates}}
-  }
-
-  async setWorkflowApiCall(assignment, newAssignmentState) {
-    const errors = []
-    try {
-      const {errors: graphqlErrors} = await setWorkflow(assignment, newAssignmentState)
-      if (graphqlErrors) errors.push(...graphqlErrors)
-    } catch (error) {
-      errors.push(error)
-    }
-    return errors
-  }
-
-  // newAssignmentState is oneOf(['published', 'unpublished']) (but can be set to 'deleted'
-  // to soft-delete the assignmet). This is not TeacherView's React state
-  handlePublishChange = async newAssignmentState => {
-    const oldAssignmentState = this.state.assignment.state
-
-    // be optimistic
-    this.setState(state => this.assignmentStateUpdate(state, {state: newAssignmentState}))
-    const errors = await this.setWorkflowApiCall(this.state.assignment, newAssignmentState)
-    if (errors.length > 0) {
-      this.setState(state => ({
-        errors,
-        ...this.assignmentStateUpdate(state, {state: oldAssignmentState})
-      }))
-    } // else setWorkflow succeeded
   }
 
   handleUnsubmittedClick = () => {
@@ -118,14 +67,14 @@ export default class TeacherView extends React.Component {
     this.setState({confirmDelete: false})
   }
 
-  handleReallyDelete = async () => {
+  handleReallyDelete(mutate) {
     this.setState({deletingNow: true})
-    const errors = await this.setWorkflowApiCall(this.state.assignment, 'deleted')
-    if (errors.length === 0) {
-      this.handleDeleteSuccess()
-    } else {
-      this.handleDeleteError(errors)
-    }
+    mutate({
+      variables: {
+        id: this.props.assignment.lid,
+        workflow: 'deleted'
+      }
+    })
   }
 
   handleDeleteSuccess = () => {
@@ -135,12 +84,9 @@ export default class TeacherView extends React.Component {
     window.location.reload()
   }
 
-  handleDeleteError = errors => {
-    this.setState({errors, confirmDelete: false, deletingNow: false})
-  }
-
-  renderErrors() {
-    return <pre>Error: {JSON.stringify(this.state.errors, null, 2)}</pre>
+  handleDeleteError = _apolloErrors => {
+    // TODO: properly handle this error
+    // this.setState({errors, confirmDelete: false, deletingNow: false})
   }
 
   renderLoading() {
@@ -149,42 +95,46 @@ export default class TeacherView extends React.Component {
 
   renderConfirmDialog() {
     return (
-      <ConfirmDialog
-        open={this.state.confirmDelete}
-        working={this.state.deletingNow}
-        modalLabel={I18n.t('confirm delete')}
-        heading={I18n.t('Delete')}
-        message={I18n.t('Are you sure you want to delete this assignment?')}
-        confirmLabel={I18n.t('Delete')}
-        cancelLabel={I18n.t('Cancel')}
-        closeLabel={I18n.t('close')}
-        spinnerLabel={I18n.t('deleting assignment')}
-        onClose={this.handleCancelDelete}
-        onCancel={this.handleCancelDelete}
-        onConfirm={this.handleReallyDelete}
-      />
+      <Mutation
+        mutation={SET_WORKFLOW}
+        onCompleted={this.handleDeleteSuccess}
+        onError={this.handleDeleteError}
+      >
+        {deleteAssignment => (
+          <ConfirmDialog
+            open={this.state.confirmDelete}
+            working={this.state.deletingNow}
+            modalLabel={I18n.t('confirm delete')}
+            heading={I18n.t('Delete')}
+            message={I18n.t('Are you sure you want to delete this assignment?')}
+            confirmLabel={I18n.t('Delete')}
+            cancelLabel={I18n.t('Cancel')}
+            closeLabel={I18n.t('close')}
+            spinnerLabel={I18n.t('deleting assignment')}
+            onClose={this.handleCancelDelete}
+            onCancel={this.handleCancelDelete}
+            onConfirm={() => this.handleReallyDelete(deleteAssignment)}
+          />
+        )}
+      </Mutation>
     )
   }
 
   render() {
-    if (this.state.loading) return this.renderLoading()
-    if (this.state.errors.length > 0) return this.renderErrors()
-    const assignment = this.state.assignment
     return (
       <TeacherViewContext.Provider value={this.contextValue}>
         <div>
           {this.renderConfirmDialog()}
           <ScreenReaderContent>
-            <h1>{assignment.name}</h1>
+            <h1>{this.props.assignment.name}</h1>
           </ScreenReaderContent>
           <Header
-            assignment={assignment}
+            assignment={this.props.assignment}
             onUnsubmittedClick={this.handleUnsubmittedClick}
-            onPublishChange={this.handlePublishChange}
             onDelete={this.handleDeleteButtonPressed}
             readOnly={this.state.readOnly}
           />
-          <ContentTabs assignment={assignment} readOnly={this.state.readOnly} />
+          <ContentTabs assignment={this.props.assignment} readOnly={this.state.readOnly} />
           <MessageStudentsWho
             open={this.state.messageStudentsWhoOpen}
             onDismiss={this.handleDismissMessageStudentsWho}

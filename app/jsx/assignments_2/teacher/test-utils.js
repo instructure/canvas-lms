@@ -18,6 +18,7 @@
 
 import {TeacherViewContextDefaults} from './components/TeacherViewContext'
 import {wait} from 'react-testing-library'
+import {SET_WORKFLOW} from './assignmentData'
 
 // because our version of jsdom doesn't support elt.closest('a') yet. Should soon.
 export function closest(el, selector) {
@@ -33,10 +34,10 @@ export function findInputForLabel(labelChild, container) {
   return input
 }
 
-export function waitForNoElement(queryFn) {
+export async function waitForNoElement(queryFn) {
   // use wait instead of waitForElement because waitForElement doesn't seem to
   // trigger the callback when elements disappear
-  return wait(() => {
+  await wait(() => {
     let elt = null
     try {
       elt = queryFn()
@@ -47,25 +48,64 @@ export function waitForNoElement(queryFn) {
 
     // fail if the element was found
     if (elt !== null) throw new Error(`element is still present`)
-    // otherwise success
   })
+  // if the above didn't throw, then success
+  return true
+}
+
+export function workflowMutationResult(assignment, newWorkflowState) {
+  return {
+    request: {
+      query: SET_WORKFLOW,
+      variables: {
+        id: assignment.lid,
+        workflow: newWorkflowState
+      }
+    },
+    result: {
+      data: {
+        updateAssignment: {
+          assignment: {
+            __typename: 'Assignment',
+            id: assignment.gid,
+            state: newWorkflowState
+          }
+        }
+      }
+    }
+  }
 }
 
 export function mockCourse(overrides) {
   return {
     lid: 'course-lid',
     assignmentGroupsConnection: {
+      pageInfo: mockPageInfo(),
       nodes: []
     },
     modulesConnection: {
+      pageInfo: mockPageInfo(),
       nodes: []
     },
     ...overrides
   }
 }
 
+export function mockPageInfo(overrides) {
+  return {
+    startCursor: 'startCursor',
+    endCursor: 'endCursor',
+    hasNextPage: false,
+    hasPreviousPage: false,
+    ...overrides
+  }
+}
+
 export function mockAssignment(overrides) {
   return {
+    __typename: 'Assignment',
+    id: 'assignment-gid',
+    gid: 'assignment-gid',
     lid: 'assignment-lid',
     name: 'assignment name',
     pointsPossible: 5,
@@ -85,9 +125,11 @@ export function mockAssignment(overrides) {
     allowedExtensions: [],
     allowedAttempts: null,
     assignmentOverrides: {
+      pageInfo: mockPageInfo(),
       nodes: []
     },
     submissions: {
+      pageInfo: mockPageInfo(),
       nodes: []
     },
     ...overrides

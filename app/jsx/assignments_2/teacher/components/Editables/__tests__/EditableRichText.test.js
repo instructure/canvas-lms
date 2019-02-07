@@ -20,8 +20,6 @@ import React from 'react'
 import {render} from 'react-testing-library'
 import EditableRichText from '../EditableRichText'
 
-jest.mock('jsx/shared/rce/RichContentEditor')
-
 it('renders the value in view mode', () => {
   const {getByText} = render(
     <EditableRichText

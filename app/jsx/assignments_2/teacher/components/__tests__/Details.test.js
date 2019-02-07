@@ -21,8 +21,6 @@ import {render} from 'react-testing-library'
 import {mockAssignment, mockOverride} from '../../test-utils'
 import Details from '../Details'
 
-jest.mock('jsx/shared/rce/RichContentEditor')
-
 const override1 = {lid: '18', title: 'Section A', set: {name: 'Section A'}}
 const override2 = {lid: '19', title: 'Section B', set: {name: 'Section B'}}
 
