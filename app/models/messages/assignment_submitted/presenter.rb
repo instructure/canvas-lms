@@ -16,28 +16,39 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Messages::AssignmentSubmittedLate
-  class SMSPresenter < Presenter
-    def subject
+module Messages::AssignmentSubmitted
+  class Presenter
+    def initialize(message)
+      @message = message
+    end
+
+    def link
       if anonymous?
-        I18n.t(
-          "A student just turned in their anonymous assignment (late), %{assignment_name}",
-          assignment_name: assignment.title
-        )
+        url = message.speed_grader_course_gradebook_url(course.id, assignment_id: assignment.id)
+        "#{url}\#{\"anonymous_id\":\"#{submission.anonymous_id}\"}"
       else
-        I18n.t(
-          "%{user_name} just turned in their assignment (late), %{assignment_name}",
-          assignment_name: assignment.title,
-          user_name: submission.user.name
-        )
+        message.course_assignment_submission_url(course.id, assignment, submission.user_id)
       end
     end
 
-    def body
-      I18n.t(
-        "More info at %{web_address}",
-        web_address: HostUrl.context_host(assignment.context)
-      )
+    protected
+
+    attr_reader :message
+
+    def assignment
+      submission.assignment
+    end
+
+    def anonymous?
+      assignment.anonymize_students?
+    end
+
+    def course
+      assignment.context
+    end
+
+    def submission
+      message.context
     end
   end
 end

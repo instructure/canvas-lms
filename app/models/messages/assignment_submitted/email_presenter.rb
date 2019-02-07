@@ -16,28 +16,38 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Messages::AssignmentSubmittedLate
-  class SMSPresenter < Presenter
+module Messages::AssignmentSubmitted
+  class EmailPresenter < Presenter
     def subject
       if anonymous?
         I18n.t(
-          "A student just turned in their anonymous assignment (late), %{assignment_name}",
-          assignment_name: assignment.title
+          "Anonymous Submission: %{assignment_title}",
+          assignment_title: assignment.title
         )
       else
         I18n.t(
-          "%{user_name} just turned in their assignment (late), %{assignment_name}",
-          assignment_name: assignment.title,
+          "Submission: %{user_name}, %{assignment_title}",
+          assignment_title: assignment.title,
           user_name: submission.user.name
         )
       end
     end
 
     def body
-      I18n.t(
-        "More info at %{web_address}",
-        web_address: HostUrl.context_host(assignment.context)
-      )
+      if anonymous?
+        I18n.t(
+          "A student has just turned in a submission for %{assignment_title} in the course %{course_name}",
+          assignment_title: assignment.title,
+          course_name: course.name
+        )
+      else
+        I18n.t(
+          "%{user_name} has just turned in a submission for %{assignment_title} in the course %{course_name}",
+          assignment_title: assignment.title,
+          course_name: course.name,
+          user_name: submission.user.name
+        )
+      end
     end
   end
 end

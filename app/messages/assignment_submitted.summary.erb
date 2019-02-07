@@ -1,8 +1,10 @@
+<% presenter = ::Messages::AssignmentSubmitted::SummaryPresenter.new(self) %>
+
 <% define_content :link do %>
-  <%= course_assignment_submission_url(asset.assignment.context, asset.assignment, asset.user_id) %>
+  <%= presenter.link %>
 <% end %>
 
 <% define_content :subject do %>
-  <%= t('user_submitted', 'Submission: %{user_name}, %{assignment_name}', :user_name => asset.user.name, :assignment_name => asset.assignment.title) %>
+  <%= presenter.subject %>
 <% end %>
-<%= t('turned_in_at', 'turned in: %{submission_date}', :submission_date => datetime_string(force_zone(asset.submitted_at))) %>
+<%= presenter.body %>

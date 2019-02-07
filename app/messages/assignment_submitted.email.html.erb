@@ -1,20 +1,19 @@
+<% presenter = ::Messages::AssignmentSubmitted::EmailPresenter.new(self) %>
+
 <% define_content :link do %>
-  <%= course_assignment_submission_url(asset.assignment.context, asset.assignment, asset.user_id) %>
+  <%= presenter.link.html_safe %>
 <% end %>
 
 <% define_content :subject do %>
-  <%= t('user_submitted', 'Submission: %{user_name}, %{assignment_name}',
-        :user_name => asset.user.name,
-        :assignment_name => asset.assignment.title) %>
+  <%= presenter.subject %>
 <% end %>
 
 <% define_content :footer_link do %>
   <a href="<%= content(:link) %>">
-    <%= t :link, "Click here to view the submission" %>
+    <%= t "Click here to view the submission" %>
   </a>
 <% end %>
 
-<p><%= t('user_submitted_sentence', '%{user_name} has just turned in a submission for %{assignment_name} in the course %{course_name}',
-         :user_name => asset.user.name,
-         :assignment_name => asset.assignment.title,
-         :course_name => asset.assignment.context.name) %></p>
+<p>
+  <%= presenter.body %>
+</p>
