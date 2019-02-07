@@ -23,7 +23,7 @@ import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReade
 import I18n from 'i18n!assignments_2_student_header'
 
 import AssignmentGroupModuleNav from './AssignmentGroupModuleNav'
-import SubmissionStatusPill from './SubmissionStatusPill'
+import SubmissionStatusPill from '../../shared/SubmissionStatusPill'
 import LatePolicyStatusDisplay from './LatePolicyStatusDisplay'
 import DateTitle from './DateTitle'
 import GradeDisplay from './GradeDisplay'

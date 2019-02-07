@@ -16,32 +16,35 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import I18n from 'i18n!assignments_2'
-import {string} from 'prop-types'
+import {bool, string} from 'prop-types'
 import React from 'react'
 
 import Pill from '@instructure/ui-elements/lib/components/Pill'
 
 function SubmissionStatusPill(props) {
-  if (!props.submissionStatus) {
+  if (!props.excused && !props.submissionStatus) {
     return null
   }
-  return (
-    <React.Fragment>
-      {props.submissionStatus === 'missing' ? (
-        <Pill
-          data-test-id="missing-pill"
-          variant="danger"
-          text={I18n.t('Missing')}
-          margin="x-small 0 0 0"
-        />
-      ) : (
-        <Pill data-test-id="late-pill" text={I18n.t('Late')} margin="x-small 0 0 0" />
-      )}
-    </React.Fragment>
-  )
+  if (props.excused) {
+    return <Pill data-test-id="excused-pill" text={I18n.t('Excused')} margin="x-small 0 0 0" />
+  }
+  if (props.submissionStatus === 'missing') {
+    return (
+      <Pill
+        data-test-id="missing-pill"
+        variant="danger"
+        text={I18n.t('Missing')}
+        margin="x-small 0 0 0"
+      />
+    )
+  }
+  if (props.submissionStatus === 'late') {
+    return <Pill data-test-id="late-pill" text={I18n.t('Late')} margin="x-small 0 0 0" />
+  }
 }
 
 SubmissionStatusPill.propTypes = {
+  excused: bool,
   submissionStatus: string
 }
 
