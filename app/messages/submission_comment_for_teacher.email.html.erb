@@ -1,62 +1,26 @@
-<%
-  submission = asset.submission
-  assignment = submission.assignment
-  comment_author = ""
-  link = ""
-  submission_submittor = ""
-
-  if assignment.anonymize_students?
-    link = speed_grader_course_gradebook_url(assignment.context, assignment_id: assignment.id)
-    link += "##{{"anonymous_id": submission.anonymous_id}.to_json}"
-    submission_submittor = t("Student (%{id})", id: submission.anonymous_id)
-    user_submission = Submission.find_by(user: asset.author, assignment: assignment)
-    comment_author = if user_submission.present?
-      t("Student (%{id})", id: user_submission.anonymous_id)
-    else
-      t("Someone")
-    end
-  else
-    comment_author = asset.author_name
-    link = course_assignment_submission_url(assignment.context, assignment, submission.user_id)
-    submission_submittor = submission.user.short_name
-  end
-%>
+<% presenter = Messages::SubmissionCommentForTeacher::EmailPresenter.new(self) %>
 
 <% define_content :link do %>
-  <%= link.html_safe %>
+  <%= presenter.link.html_safe %>
 <% end %>
 
 <% define_content :subject do %>
-  <%=
-    t(
-      "Submission Comment: %{submission_submittor}, %{assignment}, %{context}",
-      submission_submittor: submission_submittor,
-      assignment: assignment.title,
-      context: assignment.context.name
-    )
-  %>
+  <%= presenter.subject %>
 <% end %>
 
 <% define_content :footer_link do %>
-  <a href="<%= content(:link) %>">
-    <%= t :review_submission, "Click here to review the submission" %>
+  <a href="<%= presenter.link %>">
+    <%= t "Click here to review the submission" %>
   </a>
 <% end %>
 
 <p>
-  <%=
-    t(
-      "%{author} just made a new comment on the submission for %{submission_submittor} for %{assignment}",
-      author: comment_author,
-      submission_submittor: submission_submittor,
-      assignment: assignment.title
-    )
-  %>
+  <%= presenter.body %>
 </p>
 
-<%= format_message(asset.comment).first %>
+<%= format_message(presenter.comment_text).first %>
 
-<% unless assignment.anonymize_students? %>
+<% unless presenter.anonymous? %>
   <% if avatar_enabled? %>
     <table border="0" style="border-collapse: collapse">
       <tr height="30px">
@@ -95,17 +59,17 @@
   <% end %>
 <% end %>
 
-<% if asset.media_comment? %>
-<p><%= t "#messages.conversation_message.email.audio_comment", "This message includes media comments. To listen or reply, click the link below:" %></p>
+<% if presenter.media_comment? %>
+<p><%= t "This message includes media comments. To listen or reply, click the link below:" %></p>
 <% else %>
-<p><%= t :link_message, "You can review the submission details by clicking the link below:" %></p>
+<p><%= t "You can review the submission details by clicking the link below:" %></p>
 <% end %>
 
-<% unless asset.attachments.empty? %>
+<% unless presenter.attachments.empty? %>
 <div style="margin-top: 20px; padding: 10px; border: 1px solid #f1f1f1; background-color: #f3f3f3;">
-  <p style="margin: 0px;"><%= t "#messages.conversation_message.email.attached_files", "Attached Files:" %></p>
+  <p style="margin: 0px;"><%= t "Attached Files:" %></p>
   <ul style="padding-left: 20px;">
-    <% asset.attachments.each do |attachment| %>
+    <% presenter.attachments.each do |attachment| %>
     <li><a href="<%= file_download_url(attachment) %>"><%= attachment.display_name %> - <%= attachment.readable_size %></a></li>
     <% end %>
   </ul>
