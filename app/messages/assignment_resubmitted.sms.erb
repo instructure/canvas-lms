@@ -1,4 +1,5 @@
-<%= asset.user.name %> just turned in their assignment (again), <%= asset.assignment.title %>
-<%= t('user_resubmitted', '%{user_name} just turned in their assignment (again), %{assignment_name}', :user_name => asset.user.name, :assignment_name => asset.assignment.title) %>
+<% presenter = ::Messages::AssignmentResubmitted::SMSPresenter.new(self) %>
 
-<%= t('more_info_at', 'More info at %{web_address}', :web_address => HostUrl.context_host(asset.assignment.context)) %>
+<%= presenter.subject %>
+
+<%= presenter.body %>
