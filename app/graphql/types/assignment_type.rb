@@ -87,13 +87,17 @@ module Types
     field :lock_info, LockInfoType, null: true
 
     def lock_info
+      load_locked_for { |lock_info| lock_info || {} }
+    end
+
+    def load_locked_for
       Loaders::AssociationLoader.for(
         Assignment,
         %i[context discussion_topic quiz wiki_page]
       ).load(assignment).then {
-        assignment.low_level_locked_for?(current_user,
-                                         check_policies: true,
-                                         context: assignment.context) || {}
+        yield assignment.low_level_locked_for?(current_user,
+                                               check_policies: true,
+                                               context: assignment.context)
       }
     end
 
@@ -153,14 +157,18 @@ module Types
     field :description, String, null: true
     def description
       return nil if assignment.description.blank?
-      load_association(:context).then do |course|
-        AttachmentPreloader.for(course).load(assignment.description).then do |preloaded_attachments|
-          GraphQLHelpers::UserContent.process(assignment.description,
-                                              request: context[:request],
-                                              context: assignment.context,
-                                              user: current_user,
-                                              in_app: context[:in_app],
-                                              preloaded_attachments: preloaded_attachments)
+
+      load_locked_for do |lock_info|
+        # some (but not all) locked assignments allow viewing the description
+        next nil unless assignment.include_description?(current_user, lock_info)
+        AttachmentPreloader.for(assignment.context).load(assignment.description).then do |preloaded_attachments|
+
+            GraphQLHelpers::UserContent.process(assignment.description,
+                                                request: context[:request],
+                                                context: assignment.context,
+                                                user: current_user,
+                                                in_app: context[:in_app],
+                                                preloaded_attachments: preloaded_attachments)
         end
       end
     end

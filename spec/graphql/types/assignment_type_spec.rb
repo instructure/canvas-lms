@@ -72,11 +72,30 @@ describe Types::AssignmentType do
     ).to eq "http://test.host/courses/#{assignment.context_id}/assignments/#{assignment.id}"
   end
 
-  it "uses api_user_content for the description" do
-    assignment.update_attributes description: %|Hi <img src="/courses/#{course.id}/files/12/download"<h1>Content</h1>|
-    expect(
-      assignment_type.resolve("description", request: ActionDispatch::TestRequest.create)
-    ).to include "http://test.host/courses/#{course.id}/files/12/download"
+  context "description" do
+    before do
+      assignment.update_attributes description: %|Hi <img src="/courses/#{course.id}/files/12/download"<h1>Content</h1>|
+    end
+
+    it "includes description when lock settings allow" do
+      expect_any_instance_of(Assignment).
+        to receive(:low_level_locked_for?).
+        and_return(can_view: true)
+      expect(assignment_type.resolve("description", request: ActionDispatch::TestRequest.create)).to include "Content"
+    end
+
+    it "returns null when not allowed" do
+      expect_any_instance_of(Assignment).
+        to receive(:low_level_locked_for?).
+        and_return(can_view: false)
+      expect(assignment_type.resolve("description", request: ActionDispatch::TestRequest.create)).to be_nil
+    end
+
+    it "uses api_user_content for the description" do
+      expect(
+        assignment_type.resolve("description", request: ActionDispatch::TestRequest.create)
+      ).to include "http://test.host/courses/#{course.id}/files/12/download"
+    end
   end
 
   it "returns nil when allowed_attempts is unset" do
