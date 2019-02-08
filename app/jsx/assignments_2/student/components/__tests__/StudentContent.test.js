@@ -19,8 +19,27 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
 
-import {mockAssignment} from '../../test-utils'
+import {mockAssignment, mockComments} from '../../test-utils'
 import StudentContent from '../StudentContent'
+import {MockedProvider} from 'react-apollo/test-utils'
+import {SUBMISSION_COMMENT_QUERY} from '../../assignmentData'
+import wait from 'waait'
+
+const mocks = [
+  {
+    request: {
+      query: SUBMISSION_COMMENT_QUERY,
+      variables: {
+        submissionId: mockAssignment().submissionsConnection.nodes[0].id.toString()
+      }
+    },
+    result: {
+      data: {
+        submissionComments: mockComments()
+      }
+    }
+  }
+]
 
 beforeAll(() => {
   const found = document.getElementById('fixtures')
@@ -74,23 +93,34 @@ describe('Assignment Student Content View', () => {
     expect(root.text()).toMatch('Availability Dates')
   })
 
-  it('renders spinner while lazy loading comments', () => {
+  it('renders Comments', async done => {
     const assignment = mockAssignment({lockInfo: {isLocked: false}})
-    ReactDOM.render(<StudentContent assignment={assignment} />, document.getElementById('fixtures'))
+    ReactDOM.render(
+      <MockedProvider mocks={mocks} addTypename>
+        <StudentContent assignment={assignment} />
+      </MockedProvider>,
+      document.getElementById('fixtures')
+    )
     $('[data-test-id="assignment-2-student-content-tabs"] div:contains("Comments")')[0].click()
-    const container = $('[data-test-id="loading-indicator"]')
-    expect(container).toHaveLength(1)
-  })
-
-  it('renders Comments', done => {
-    const assignment = mockAssignment({lockInfo: {isLocked: false}})
-    ReactDOM.render(<StudentContent assignment={assignment} />, document.getElementById('fixtures'))
-    $('[data-test-id="assignment-2-student-content-tabs"] div:contains("Comments")')[0].click()
+    await wait(0) // wait for response
     // We just need to kick an event loop to ensure the js actually is loaded.
     setTimeout(() => {
       const container = $('[data-test-id="comments-container"]')
       expect(container).toHaveLength(1)
       done()
     }, 0)
+  })
+
+  it('renders spinner while lazy loading comments', () => {
+    const assignment = mockAssignment({lockInfo: {isLocked: false}})
+    ReactDOM.render(
+      <MockedProvider mocks={mocks} addTypename>
+        <StudentContent assignment={assignment} />
+      </MockedProvider>,
+      document.getElementById('fixtures')
+    )
+    $('[data-test-id="assignment-2-student-content-tabs"] div:contains("Comments")')[0].click()
+    const container = $('[data-test-id="loading-indicator"]')
+    expect(container).toHaveLength(1)
   })
 })

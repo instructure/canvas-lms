@@ -60,6 +60,7 @@ export function mockAssignment(overrides = {}) {
               }
             ]
           },
+          id: '3',
           deductedPoints: 3,
           enteredGrade: '9',
           grade: '6',
@@ -72,6 +73,29 @@ export function mockAssignment(overrides = {}) {
       __typename: 'SubmissionConnection'
     },
     __typename: 'Assignment',
+    ...overrides
+  }
+}
+
+export function mockComments(overrides = {}) {
+  return {
+    __typename: 'Submission',
+    commentsConnection: {
+      __typename: 'CommentsConnection',
+      nodes: [
+        {
+          __typename: 'Comment',
+          _id: '1',
+          comment: 'comment comment',
+          updatedAt: '12/13/91',
+          author: {
+            __typename: 'Author',
+            avatarUrl: 'example.com',
+            shortName: 'bob builder'
+          }
+        }
+      ]
+    },
     ...overrides
   }
 }
