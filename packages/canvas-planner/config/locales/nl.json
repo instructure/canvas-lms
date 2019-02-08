@@ -74,6 +74,9 @@
   "close_opportunity_center_popup_9907d981": {
     "message": "Popup Opportunity Center sluiten"
   },
+  "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
+    "message": "{ count, plural,\n     =0 {# mogelijkheden}\n    one {# mogelijkheid}\n  other {# mogelijkheden}\n}"
+  },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Toon # voltooid item}\n  other {Toon # voltooide items}\n}"
   },
@@ -265,6 +268,9 @@
   },
   "only_most_recent_grading_period_shown_f1ad6458": {
     "message": "*Alleen meest recente beoordelingsperiode wordt weergegeven."
+  },
+  "opportunities_popup_f6703842": {
+    "message": "mogelijkheden popup"
   },
   "optional_add_course_ef0d70fc": {
     "message": "Optioneel: Cursus toevoegen"

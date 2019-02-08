@@ -74,6 +74,9 @@
   "close_opportunity_center_popup_9907d981": {
     "message": "Fechar o popup Opportunity Center"
   },
+  "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
+    "message": "{ count, plural,\n     =0 {# oportunidades}\n    one {# oportunidade}\n  other {# oportunidades}\n}"
+  },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Mostrar # item completo }\n  other {Mostrar # itens completos}\n}"
   },
@@ -265,6 +268,9 @@
   },
   "only_most_recent_grading_period_shown_f1ad6458": {
     "message": "* Apenas o período de classificação mais recente exibido."
+  },
+  "opportunities_popup_f6703842": {
+    "message": "popup oportunidades"
   },
   "optional_add_course_ef0d70fc": {
     "message": "Opcional: Adicionar Disciplina"
