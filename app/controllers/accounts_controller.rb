@@ -921,7 +921,7 @@ class AccountsController < ApplicationController
           end
         end
 
-        process_external_integration_keys
+        @account.process_external_integration_keys(params[:account][:external_integration_keys], @current_user)
 
         can_edit_email = params[:account][:settings].try(:delete, :edit_institution_email)
         if @account.root_account? && !can_edit_email.nil?
@@ -1338,18 +1338,7 @@ class AccountsController < ApplicationController
   end
 
   def process_external_integration_keys(account = @account)
-    if params_keys = params[:account][:external_integration_keys]
-      ExternalIntegrationKey.indexed_keys_for(account).each do |key_type, key|
-        next unless params_keys.key?(key_type)
-        next unless key.grants_right?(@current_user, :write)
-        unless params_keys[key_type].blank?
-          key.key_value = params_keys[key_type]
-          key.save!
-        else
-          key.delete
-        end
-      end
-    end
+    account.process_external_integration_keys(params[:account][:external_integration_keys], @current_user)
   end
 
   def set_default_dashboard_view(new_view)
