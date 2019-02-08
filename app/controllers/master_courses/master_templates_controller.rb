@@ -292,6 +292,8 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   # Cannot add courses that do not belong to the blueprint course's account. Also cannot add
   # other blueprint courses or courses that already have an association with another blueprint course.
   #
+  # After associating new courses, {api:MasterCourses::MasterTemplatesController#queue_migration start a sync} to populate their contents from the blueprint.
+  #
   # @argument course_ids_to_add [Array]
   #   Courses to add as associated courses
   #
