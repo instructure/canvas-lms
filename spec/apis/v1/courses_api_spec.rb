@@ -763,7 +763,8 @@ describe CoursesController, type: :request do
             'sis_course_id'                        => '12345',
             'public_description'                   => 'Nature is lethal but it doesn\'t hold a candle to man.',
             'course_format'                        => 'online',
-            'time_zone'                            => 'America/Juneau'
+            'time_zone'                            => 'America/Juneau',
+            'license'                              => 'cc_by_sa'
           }
         }
         course_response = post_params['course'].merge({
@@ -832,7 +833,8 @@ describe CoursesController, type: :request do
             'sis_course_id'                        => '12345',
             'sis_import_id'                        => nil,
             'public_description'                   => 'Nature is lethal but it doesn\'t hold a candle to man.',
-            'time_zone'                            => 'America/Chicago'
+            'time_zone'                            => 'America/Chicago',
+            'license'                              => 'cc_by_sa'
           }
         }
         course_response = post_params['course'].merge({
@@ -3302,7 +3304,8 @@ describe CoursesController, type: :request do
         'restrict_enrollments_to_course_dates' => false,
         'time_zone' => 'America/Los_Angeles',
         'uuid' => @course1.uuid,
-        'blueprint' => false
+        'blueprint' => false,
+        'license' => nil
       })
     end
 

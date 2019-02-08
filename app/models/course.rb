@@ -210,6 +210,7 @@ class Course < ActiveRecord::Base
   before_save :update_enrollments_later
   before_save :update_show_total_grade_as_on_weighting_scheme_change
   before_save :set_self_enrollment_code
+  before_save :validate_license
   after_save :update_final_scores_on_weighting_scheme_change
   after_save :update_account_associations_if_changed
   after_save :update_enrollment_states_if_necessary
@@ -1099,6 +1100,13 @@ class Course < ActiveRecord::Base
       self.show_total_grade_as_points = false
     end
     true
+  end
+
+  # set license to "private" if it's present but not recognized
+  def validate_license
+    unless license.nil?
+      self.license = 'private' unless self.class.licenses.key?(self.license)
+    end
   end
 
   # to ensure permissions on the root folder are updated after hiding or showing the files tab

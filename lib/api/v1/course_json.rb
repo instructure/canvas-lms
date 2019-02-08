@@ -19,7 +19,7 @@ module Api::V1
   class CourseJson
 
     BASE_ATTRIBUTES = %w(id name course_code account_id created_at start_at default_view enrollment_term_id is_public
-                         grading_standard_id root_account_id uuid).freeze
+                         grading_standard_id root_account_id uuid license).freeze
 
     INCLUDE_CHECKERS = {grading: 'needs_grading_count', syllabus: 'syllabus_body',
                         url: 'html_url', description: 'public_description', permissions: 'permissions'}.freeze

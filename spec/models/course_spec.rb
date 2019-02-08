@@ -606,6 +606,17 @@ describe Course do
       new_course.integration_id = nil
       expect(new_course).to be_valid
     end
+
+    it "should validate the license" do
+      course = course_factory
+      course.license = 'blah'
+      course.save!
+      expect(course.reload.license).to eq 'private'
+
+      course.license = 'cc_by_sa'
+      course.save!
+      expect(course.reload.license).to eq 'cc_by_sa'
+    end
   end
 
   it "should create a unique course." do
