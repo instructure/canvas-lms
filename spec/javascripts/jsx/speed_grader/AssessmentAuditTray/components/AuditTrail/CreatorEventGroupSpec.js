@@ -30,6 +30,8 @@ import buildAuditTrail from 'jsx/speed_grader/AssessmentAuditTray/buildAuditTrai
 QUnit.module('AssessmentAuditTray CreatorEventGroup', suiteHooks => {
   let $container
   let auditEvents
+  let externalTools
+  let quizzes
   let users
   let props
 
@@ -42,6 +44,8 @@ QUnit.module('AssessmentAuditTray CreatorEventGroup', suiteHooks => {
       buildEvent({id: '4903', userId: '1101', createdAt: '2018-09-02T12:00:00Z'})
     ]
     users = [{id: '1101', name: 'Adam Jones', role: 'final_grader'}]
+    externalTools = [{id: '21', name: 'Bulldog Tool', role: 'grader'}]
+    quizzes = [{id: '123', name: 'Unicorns', role: 'grader'}]
   })
 
   suiteHooks.afterEach(() => {
@@ -50,7 +54,7 @@ QUnit.module('AssessmentAuditTray CreatorEventGroup', suiteHooks => {
   })
 
   function buildAuditTrailAndMountComponent() {
-    const auditTrail = buildAuditTrail({auditEvents, users})
+    const auditTrail = buildAuditTrail({auditEvents, users, externalTools, quizzes})
     props = {creatorEventGroup: auditTrail.creatorEventGroups[0]}
     ReactDOM.render(<CreatorEventGroup {...props} />, $container)
   }
@@ -68,13 +72,13 @@ QUnit.module('AssessmentAuditTray CreatorEventGroup', suiteHooks => {
     return [...$container.querySelectorAll('h4')]
   }
 
-  test('displays the user name', () => {
+  test('displays the creator name', () => {
     buildAuditTrailAndMountComponent()
     const $heading = $container.querySelector('h3')
     ok($heading.textContent.includes('Adam Jones'))
   })
 
-  test('displays the user role', () => {
+  test('displays the creator role', () => {
     buildAuditTrailAndMountComponent()
     const $heading = $container.querySelector('h3')
     ok($heading.textContent.includes('(Final Grader)'))
@@ -90,7 +94,7 @@ QUnit.module('AssessmentAuditTray CreatorEventGroup', suiteHooks => {
       return $trigger && document.querySelector(`#${$trigger.getAttribute('aria-describedby')}`)
     }
 
-    QUnit.module('when the user acted while student anonymity was disabled', contextHooks => {
+    QUnit.module('when the creator acted while student anonymity was disabled', contextHooks => {
       contextHooks.beforeEach(() => {
         const event = buildAssignmentUpdatedEvent(
           {createdAt: '2018-09-01T13:00:00Z', id: '4904'},
@@ -105,11 +109,14 @@ QUnit.module('AssessmentAuditTray CreatorEventGroup', suiteHooks => {
       })
 
       test('displays a tooltip', () => {
-        equal(getTooltip().textContent, 'This user performed actions while anonymous was off')
+        equal(
+          getTooltip().textContent,
+          `${users[0].name} performed actions while anonymous was off`
+        )
       })
     })
 
-    QUnit.module('when the user acted while student anonymity was enabled', () => {
+    QUnit.module('when the creator acted while student anonymity was enabled', () => {
       test('does not display a warning icon', () => {
         buildAuditTrailAndMountComponent()
         notOk(getIcon())
@@ -127,7 +134,7 @@ QUnit.module('AssessmentAuditTray CreatorEventGroup', suiteHooks => {
       buildAuditTrailAndMountComponent()
     })
 
-    test('is labeled with the user name', () => {
+    test('is labeled with the creator name', () => {
       const buttonText = getToggleDetailsButton().textContent
       equal(buttonText, 'Assessment audit events for Adam Jones')
     })

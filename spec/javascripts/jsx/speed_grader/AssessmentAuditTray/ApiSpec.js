@@ -42,6 +42,8 @@ QUnit.module('AssessmentAuditTray Api', suiteHooks => {
 
     let auditEvents
     let users
+    let tools
+    let quizzes
 
     hooks.beforeEach(() => {
       auditEvents = [
@@ -50,16 +52,20 @@ QUnit.module('AssessmentAuditTray Api', suiteHooks => {
           canvadoc_id: null,
           created_at: '2018-08-28T16:46:44Z',
           event_type: 'grades_posted',
+          context_external_tool_id: null,
           id: '4901',
           payload: {
             grades_published_at: [null, '2018-08-28T16:46:43Z']
           },
+          quiz_id: null,
           submission_id: '2501',
           user_id: '1101'
         }
       ]
 
       users = [{id: '1101', name: 'The Greatest Grader', role: 'grader'}]
+      tools = [{id: '25', name: 'Unicorn Tool', role: 'grader'}]
+      quizzes = [{id: '1101', name: 'Accessibility', role: 'grader'}]
     })
 
     async function loadAssessmentAuditTrail() {
@@ -67,14 +73,18 @@ QUnit.module('AssessmentAuditTray Api', suiteHooks => {
     }
 
     test('sends a request to the "assessment audit events" url', async () => {
-      server.for(url).respond({status: 200, body: {audit_events: auditEvents, users}})
+      server
+        .for(url)
+        .respond({status: 200, body: {audit_events: auditEvents, users, tools, quizzes}})
       await loadAssessmentAuditTrail()
       const requests = server.receivedRequests.filter(request => request.url === url)
       strictEqual(requests.length, 1)
     })
 
     test('sends a GET request', async () => {
-      server.for(url).respond({status: 200, body: {audit_events: auditEvents, users}})
+      server
+        .for(url)
+        .respond({status: 200, body: {audit_events: auditEvents, users, tools, quizzes}})
       await loadAssessmentAuditTrail()
       const {method} = server.receivedRequests.find(request => pathFromRequest(request) === url)
       equal(method, 'GET')
@@ -83,13 +93,19 @@ QUnit.module('AssessmentAuditTray Api', suiteHooks => {
     QUnit.module('when the request succeeds', contextHooks => {
       let event
       let user
+      let tool
+      let quiz
 
       contextHooks.beforeEach(async () => {
-        server.for(url).respond({status: 200, body: {audit_events: auditEvents, users}})
+        server
+          .for(url)
+          .respond({status: 200, body: {audit_events: auditEvents, users, tools, quizzes}})
 
         const returnData = await loadAssessmentAuditTrail()
         event = returnData.auditEvents[0]
         user = returnData.users[0]
+        tool = returnData.externalTools[0]
+        quiz = returnData.quizzes[0]
       })
 
       QUnit.module('returned event data', () => {
@@ -120,6 +136,14 @@ QUnit.module('AssessmentAuditTray Api', suiteHooks => {
         test('normalizes the user id', () => {
           strictEqual(event.userId, '1101')
         })
+
+        test('normalizes the external tool id', () => {
+          strictEqual(event.externalToolId, null)
+        })
+
+        test('normalizes the quiz id', () => {
+          strictEqual(event.quizId, null)
+        })
       })
 
       QUnit.module('returned user data', () => {
@@ -133,6 +157,34 @@ QUnit.module('AssessmentAuditTray Api', suiteHooks => {
 
         test('includes the user role', () => {
           strictEqual(user.role, 'grader')
+        })
+      })
+
+      QUnit.module('returned tool data', () => {
+        test('includes the tool id', () => {
+          strictEqual(tool.id, '25')
+        })
+
+        test('includes the tool name', () => {
+          strictEqual(tool.name, 'Unicorn Tool')
+        })
+
+        test('includes the tool role', () => {
+          strictEqual(tool.role, 'grader')
+        })
+      })
+
+      QUnit.module('returned quiz data', () => {
+        test('includes the quiz id', () => {
+          strictEqual(quiz.id, '1101')
+        })
+
+        test('includes the quiz name', () => {
+          strictEqual(quiz.name, 'Accessibility')
+        })
+
+        test('includes the quiz role', () => {
+          strictEqual(quiz.role, 'grader')
         })
       })
     })

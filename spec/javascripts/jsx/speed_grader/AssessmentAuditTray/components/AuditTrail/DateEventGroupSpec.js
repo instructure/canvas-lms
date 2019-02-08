@@ -39,7 +39,9 @@ QUnit.module('AssessmentAuditTray DateEventGroup', suiteHooks => {
       buildEvent({id: '4903', userId: '1101', createdAt: '2018-09-01T16:56:00Z'})
     ]
     const users = [{id: '1101', name: 'A stupefying student', role: 'student'}]
-    const auditTrail = buildAuditTrail({auditEvents, users})
+    const externalTools = []
+    const quizzes = []
+    const auditTrail = buildAuditTrail({auditEvents, users, externalTools, quizzes})
 
     props = {
       dateEventGroup: auditTrail.creatorEventGroups[0].dateEventGroups[0]

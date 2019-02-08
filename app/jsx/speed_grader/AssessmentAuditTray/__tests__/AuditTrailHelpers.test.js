@@ -542,33 +542,70 @@ describe('AuditTrailHelpers', () => {
 
   describe('.roleLabelFor()', () => {
     it('returns a suitable label for a user of type "grader"', () => {
-      const user = {id: '1101', name: 'An unassuming grader', role: 'grader'}
-      expect(AuditTrailHelpers.roleLabelFor(user)).toEqual('Grader')
+      const creator = {id: '1101', name: 'An unassuming grader', role: 'grader'}
+      expect(AuditTrailHelpers.roleLabelFor(creator)).toEqual('Grader')
     })
 
-    it('returns a suitable label for a user of type "student"', () => {
-      const user = {id: '1101', name: 'A froward student', role: 'student'}
-      expect(AuditTrailHelpers.roleLabelFor(user)).toEqual('Student')
+    it('returns a suitable label for a creator of type "student"', () => {
+      const creator = {id: '1101', name: 'A froward student', role: 'student'}
+      expect(AuditTrailHelpers.roleLabelFor(creator)).toEqual('Student')
     })
 
-    it('returns a suitable label for a user of type "final_grader"', () => {
-      const user = {id: '1101', name: 'A grader who brooks no opposition', role: 'final_grader'}
-      expect(AuditTrailHelpers.roleLabelFor(user)).toEqual('Final Grader')
+    it('returns a suitable label for a creator of type "final_grader"', () => {
+      const creator = {id: '1101', name: 'A grader who brooks no opposition', role: 'final_grader'}
+      expect(AuditTrailHelpers.roleLabelFor(creator)).toEqual('Final Grader')
     })
 
-    it('returns a suitable label for a user of type "admin"', () => {
-      const user = {id: '1101', name: 'A pleonectic administrator', role: 'admin'}
-      expect(AuditTrailHelpers.roleLabelFor(user)).toEqual('Administrator')
+    it('returns a suitable label for a creator of type "admin"', () => {
+      const creator = {id: '1101', name: 'A pleonectic administrator', role: 'admin'}
+      expect(AuditTrailHelpers.roleLabelFor(creator)).toEqual('Administrator')
     })
 
-    it('returns a suitable label for a user with an unrecognized role', () => {
-      const user = {id: '1101', name: 'An incorrigible miscreant', role: 'miscreant'}
-      expect(AuditTrailHelpers.roleLabelFor(user)).toEqual('Unknown Role')
+    it('returns a suitable label for a creator with an unrecognized role', () => {
+      const creator = {id: '1101', name: 'An incorrigible miscreant', role: 'miscreant'}
+      expect(AuditTrailHelpers.roleLabelFor(creator)).toEqual('Unknown Role')
     })
 
     it('returns a suitable label if the role field is missing', () => {
-      const user = {id: '1101', name: 'No one, no one at all'}
-      expect(AuditTrailHelpers.roleLabelFor(user)).toEqual('Unknown Role')
+      const creator = {id: '1101', name: 'No one, no one at all'}
+      expect(AuditTrailHelpers.roleLabelFor(creator)).toEqual('Unknown Role')
+    })
+  })
+
+  describe('.creatorNameFor()', () => {
+    it('returns the name of the user', () => {
+      const creator = {id: '1101', name: 'Unicorn Bulldog', type: 'user'}
+      expect(AuditTrailHelpers.creatorNameFor(creator)).toEqual('Unicorn Bulldog')
+    })
+
+    it('returns the name appended with (Quiz) for a quiz', () => {
+      const creator = {id: '1101', name: 'Accessibility', type: 'quiz'}
+      expect(AuditTrailHelpers.creatorNameFor(creator)).toEqual('Accessibility (Quiz)')
+    })
+
+    it('returns the name appended with (LTI Tool) for a externalTool', () => {
+      const creator = {id: '1101', name: 'Pizza', type: 'externalTool'}
+      expect(AuditTrailHelpers.creatorNameFor(creator)).toEqual('Pizza (LTI Tool)')
+    })
+
+    it('returns a suitable name if the name field is missing and its not a quiz or a tool', () => {
+      const creator = {id: '1101', type: 'user'}
+      expect(AuditTrailHelpers.creatorNameFor(creator)).toEqual('Unknown User')
+    })
+
+    it('returns a suitable name if the name and type field are missing and its not a quiz or a tool', () => {
+      const creator = {id: '1101'}
+      expect(AuditTrailHelpers.creatorNameFor(creator)).toEqual('Unknown User')
+    })
+
+    it('returns a suitable name if the name field is missing and its a quiz', () => {
+      const creator = {id: '1101', type: 'quiz'}
+      expect(AuditTrailHelpers.creatorNameFor(creator)).toEqual('Unknown (Quiz)')
+    })
+
+    it('returns a suitable name if the name field is missing and its an externalTool', () => {
+      const creator = {id: '1101', type: 'externalTool'}
+      expect(AuditTrailHelpers.creatorNameFor(creator)).toEqual('Unknown (LTI Tool)')
     })
   })
 })
