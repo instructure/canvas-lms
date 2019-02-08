@@ -234,7 +234,10 @@ class PageView < ActiveRecord::Base
     result = case PageView.page_view_method
     when :log
       Rails.logger.info "PAGE VIEW: #{self.attributes.to_json}"
-    when :db, :cassandra
+    when :db
+      self.shard = user.shard if new_record?
+      self.save
+    when :cassandra
       self.save
     end
 
