@@ -203,6 +203,30 @@ describe Types::AssignmentType do
         GQL
       ).to match_array assignment.submissions.pluck(:id).map(&:to_s)
     end
+
+    context "filtering by section" do
+      let(:assignment) { course.assignments.create! }
+      let(:course) { Course.create! }
+      let(:section1) { course.course_sections.create! }
+      let(:section2) { course.course_sections.create! }
+      let(:teacher) { course.enroll_user(User.create!, "TeacherEnrollment", enrollment_state: "active").user }
+
+      before(:each) do
+        section1_student = section1.enroll_user(User.create!, "StudentEnrollment", "active").user
+        section2_student = section2.enroll_user(User.create!, "StudentEnrollment", "active").user
+        @section1_student_submission = assignment.submit_homework(section1_student, body: "hello world")
+        assignment.submit_homework(section2_student, body: "hello universe")
+      end
+
+      it "returns submissions only for the given section" do
+        section1_submission_ids = assignment_type.resolve(<<~GQL, current_user: teacher)
+          submissionsConnection(filter: {sectionIds: [#{section1.id}]}) {
+            edges { node { _id } }
+          }
+        GQL
+        expect(section1_submission_ids.map(&:to_i)).to contain_exactly(@section1_student_submission.id)
+      end
+    end
   end
 
   it "can access it's parent course" do

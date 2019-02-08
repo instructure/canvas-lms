@@ -99,6 +99,7 @@ module Types
 
     field :submitted_at, DateTimeType, null: true
     field :graded_at, DateTimeType, null: true
+    field :posted_at, DateTimeType, null: true
 
     field :state, SubmissionStateType, method: :workflow_state, null: false
 
