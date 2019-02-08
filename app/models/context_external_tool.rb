@@ -56,7 +56,10 @@ class ContextExternalTool < ActiveRecord::Base
     can :read and can :update and can :delete and can :update_manually
   end
 
-  CUSTOM_EXTENSION_KEYS = {:file_menu => [:accept_media_types].freeze}.freeze
+  CUSTOM_EXTENSION_KEYS = {
+    :file_menu => [:accept_media_types].freeze,
+    :editor_button => [:use_tray].freeze
+  }.freeze
 
   Lti::ResourcePlacement::PLACEMENTS.each do |type|
     class_eval <<-RUBY, __FILE__, __LINE__ + 1
@@ -827,7 +830,8 @@ class ContextExternalTool < ActiveRecord::Base
           :icon_url => tool.editor_button(:icon_url),
           :canvas_icon_class => tool.editor_button(:canvas_icon_class),
           :width => tool.editor_button(:selection_width),
-          :height => tool.editor_button(:selection_height)
+          :height => tool.editor_button(:selection_height),
+          :use_tray => tool.editor_button(:use_tray) == "true"
       }
     end
   end
