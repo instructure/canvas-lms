@@ -1598,9 +1598,7 @@ describe DiscussionTopic do
       expect(sub.attachments.to_a).to eq [@attachment]
 
       entry.destroy
-      entry2 = @topic.reply_from(:user => @student, :text => "entry2")
-      @topic.ensure_submission(@student)
-      expect(sub.reload.attachments.to_a).to eq []
+      expect(sub.reload.attachments.to_a).to eq [] # should update the attachments right away and not depend on another entry being created
     end
 
     it "should associate attachments with graded discussion submissions even with silly deleted topics" do
