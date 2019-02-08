@@ -523,7 +523,7 @@ class AccountsController < ApplicationController
   # @argument search_term [String]
   #   The partial course name, code, or full ID to match and return in the results list. Must be at least 3 characters.
   #
-  # @argument include[] [String, "syllabus_body"|"term"|"course_progress"|"storage_quota_used_mb"|"total_students"|"teachers"|"account_name"]
+  # @argument include[] [String, "syllabus_body"|"term"|"course_progress"|"storage_quota_used_mb"|"total_students"|"teachers"|"account_name"|"concluded"]
   #   - All explanations can be seen in the {api:CoursesController#index Course API index documentation}
   #   - "sections", "needs_grading_count" and "total_scores" are not valid options at the account level
   #
@@ -659,7 +659,7 @@ class AccountsController < ApplicationController
 
     ActiveRecord::Associations::Preloader.new.preload(@courses, [:account, :root_account, course_account_associations: :account])
     preload_teachers(@courses) if includes.include?("teachers")
-    ActiveRecord::Associations::Preloader.new.preload(@courses, [:enrollment_term]) if includes.include?("term")
+    ActiveRecord::Associations::Preloader.new.preload(@courses, [:enrollment_term]) if includes.include?("term") || includes.include?('concluded')
 
     if includes.include?("total_students")
       student_counts = StudentEnrollment.not_fake.where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')").

@@ -1578,7 +1578,7 @@ class Course < ActiveRecord::Base
 
   # Public: Return true if the end date for a course (or its term, if the course doesn't have one) has passed.
   #
-  # Returns boolean or nil.
+  # Returns boolean
   def soft_concluded?(enrollment_type = nil)
     now = Time.now
     return end_at < now if end_at && restrict_enrollments_to_course_dates
@@ -1587,7 +1587,7 @@ class Course < ActiveRecord::Base
       end_at = override.end_at if override
     end
     end_at ||= enrollment_term.end_at
-    end_at && end_at < now
+    end_at ? end_at < now : false
   end
 
   def soft_conclude!
