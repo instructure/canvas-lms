@@ -343,6 +343,13 @@ class BZGrading
       end
     end
 
+    if value.nil? && !answer.nil? && answer == '' && field_type == 'checkbox'
+      # the unanswered master checkbox is correct - give them points for that!
+      response_object["points_reason"] = "mastery"
+      response_object["points_amount"] = original_step
+      response_object["points_changed"] = true
+    end
+
 
     response_object["points_reason_english"] = case response_object["points_reason"]
       when 'wrong'
