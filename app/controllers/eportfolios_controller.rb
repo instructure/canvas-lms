@@ -147,7 +147,8 @@ class EportfoliosController < ApplicationController
     if authorized_action(@portfolio, @current_user, :update)
       @attachments = @portfolio.attachments.not_deleted.
         where(display_name: zip_filename,
-              workflow_state: ['to_be_zipped', 'zipping', 'zipped', 'unattached'])
+              workflow_state: ['to_be_zipped', 'zipping', 'zipped', 'unattached'],
+              user_id: @current_user)
       @attachment = @attachments.order(:created_at).last
       @attachments.where.not(id: @attachment).find_each(&:destroy_permanently_plus)
 
@@ -160,6 +161,7 @@ class EportfoliosController < ApplicationController
         @attachment = @portfolio.attachments.build(:display_name => zip_filename)
         @attachment.workflow_state = 'to_be_zipped'
         @attachment.file_state = '0'
+        @attachment.user = @current_user
         @attachment.save!
         ContentZipper.send_later_enqueue_args(:process_attachment, { :priority => Delayed::LOW_PRIORITY, :max_attempts => 1 }, @attachment)
         render :json => @attachment

@@ -323,6 +323,7 @@ describe EportfoliosController do
       @old_zipfile = @portfolio.attachments.build(:display_name => "eportfolio.zip")
       @old_zipfile.workflow_state = 'to_be_zipped'
       @old_zipfile.file_state = '0'
+      @old_zipfile.user = @user
       @old_zipfile.save!
       Attachment.where(id: @old_zipfile).update_all(created_at: 1.day.ago)
     end
@@ -363,7 +364,7 @@ describe EportfoliosController do
       ee.save!
 
       to_zip = @portfolio.attachments[0]
-      ContentZipper.zip_eportfolio(to_zip, @portfolio)
+      ContentZipper.new.zip_eportfolio(to_zip, @portfolio)
       expect(@portfolio.attachments[0].workflow_state).to include "zipped"
     end
   end

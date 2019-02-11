@@ -109,10 +109,6 @@ class ContentZipper
     end
   end
 
-  def self.zip_eportfolio(*args)
-    ContentZipper.new.zip_eportfolio(*args)
-  end
-
   class StaticAttachment
     attr_accessor :display_name, :filename, :unencoded_filename,
                   :content_type, :uuid, :id, :attachment
@@ -143,7 +139,7 @@ class ContentZipper
     portfolio_entries.each do |entry|
       entry.readonly!
 
-      index = rewrite_eportfolio_richtext_entry(index, rich_text_attachments, entry)
+      index = rewrite_eportfolio_richtext_entry(index, rich_text_attachments, entry, zip_attachment.user)
 
       static_attachments += entry.attachments
       submissions += entry.submissions
@@ -350,7 +346,7 @@ class ContentZipper
   end
 
   private
-  def rewrite_eportfolio_richtext_entry(index, attachments, entry)
+  def rewrite_eportfolio_richtext_entry(index, attachments, entry, user)
     # In each rich_text section, find any referenced images, replace
     # the text with the image name, and add the image to the
     # attachments to be downloaded. If the rich_text attachment
@@ -363,7 +359,7 @@ class ContentZipper
       entry.content.select { |c| c.is_a?(Hash) && c[:section_type] == "rich_text" }.each do |rt|
         rt[:content].gsub!(StaticAttachment::FILES_REGEX) do |match|
           att = Attachment.find_by_id(Regexp.last_match(:obj_id))
-          if att.nil?
+          if att.nil? || !att.grants_right?(user, :read)
             match
           else
             sa = StaticAttachment.new(att, index)
@@ -377,7 +373,6 @@ class ContentZipper
 
     index
   end
-
 
   def add_file(attachment, zipfile, fn)
     if attachment.deleted?
