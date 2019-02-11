@@ -25,6 +25,12 @@ function getSecondaryDisplayInfo(student, secondaryInfo, options) {
     const sectionNames = student.sections.map(sectionId => options.getSection(sectionId).name)
     return $.toSentence(sectionNames.sort())
   }
+
+  if (options.shouldShowGroups() && secondaryInfo === 'group') {
+    const groupNames = student.group_ids.map(groupId => options.getGroup(groupId).name)
+    return $.toSentence(groupNames.sort())
+  }
+
   return {
     login_id: student.login_id,
     sis_id: student.sis_user_id,
@@ -82,6 +88,9 @@ export default class StudentCellFormatter {
       getSection(sectionId) {
         return gradebook.sections[sectionId]
       },
+      getGroup(groupId) {
+        return gradebook.studentGroups[groupId]
+      },
       getSelectedPrimaryInfo() {
         return gradebook.getSelectedPrimaryInfo()
       },
@@ -90,6 +99,9 @@ export default class StudentCellFormatter {
       },
       shouldShowSections() {
         return gradebook.showSections()
+      },
+      shouldShowGroups() {
+        return gradebook.showStudentGroups()
       }
     }
   }

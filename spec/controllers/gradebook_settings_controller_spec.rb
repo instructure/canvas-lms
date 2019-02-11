@@ -38,7 +38,8 @@ RSpec.describe GradebookSettingsController, type: :controller do
             "assignment_group_id" => "888"
           },
           "filter_rows_by" => {
-            "section_id" => "null"
+            "section_id" => "null",
+            "student_group_id" => "null"
           },
           "selected_view_options_filters" => ["assignmentGroups"],
           "show_inactive_enrollments" => "true", # values must be strings
@@ -60,7 +61,7 @@ RSpec.describe GradebookSettingsController, type: :controller do
       end
 
       let(:gradebook_settings_massaged) do
-        gradebook_settings.merge('filter_rows_by' => { 'section_id' => nil })
+        gradebook_settings.merge('filter_rows_by' => { 'section_id' => nil, 'student_group_id' => nil })
       end
 
       let(:valid_params) do
@@ -85,7 +86,7 @@ RSpec.describe GradebookSettingsController, type: :controller do
         it { expect(response).to be_ok }
         it { is_expected.to include 'enter_grades_as' => {'2301' => 'points'} }
         it { is_expected.to include 'filter_columns_by' => {'grading_period_id' => '1401', 'assignment_group_id' => '888'} }
-        it { is_expected.to include 'filter_rows_by' => {'section_id' => nil} }
+        it { is_expected.to include 'filter_rows_by' => {'section_id' => nil, 'student_group_id' => nil} }
         it { is_expected.to include 'selected_view_options_filters' => ['assignmentGroups'] }
         it { is_expected.to include 'show_inactive_enrollments' => 'true' }
         it { is_expected.to include 'show_concluded_enrollments' => 'false' }

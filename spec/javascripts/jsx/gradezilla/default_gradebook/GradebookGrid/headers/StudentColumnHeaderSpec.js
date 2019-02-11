@@ -63,7 +63,8 @@ QUnit.module('GradebookGrid StudentColumnHeader', suiteHooks => {
         onSortBySortableNameAscending() {},
         onSortBySortableNameDescending() {},
         settingKey: 'sortable_name'
-      }
+      },
+      studentGroupsEnabled: true
     }
   })
 
@@ -470,6 +471,68 @@ QUnit.module('GradebookGrid StudentColumnHeader', suiteHooks => {
             props.selectedSecondaryInfo = 'section'
             mountAndOpenOptionsMenu()
             getSecondaryInfoOption('Section').click()
+            strictEqual(props.onSelectSecondaryInfo.callCount, 0)
+          }
+        )
+      })
+    })
+
+    QUnit.module('"Group" option', () => {
+      test('is present when the course has student groups', () => {
+        mountAndOpenOptionsMenu()
+        ok(getSecondaryInfoOption('Group'))
+      })
+
+      test('is not present when the course has no student groups', () => {
+        props.studentGroupsEnabled = false
+        mountAndOpenOptionsMenu()
+        notOk(getSecondaryInfoOption('Group'))
+      })
+
+      test('is selected when displaying student groups for secondary info', () => {
+        props.selectedSecondaryInfo = 'group'
+        mountAndOpenOptionsMenu()
+        strictEqual(getSecondaryInfoOption('Group').getAttribute('aria-checked'), 'true')
+      })
+
+      test('is not selected when displaying different secondary info', () => {
+        props.selectedSecondaryInfo = 'sis_id'
+        mountAndOpenOptionsMenu()
+        strictEqual(getSecondaryInfoOption('Group').getAttribute('aria-checked'), 'false')
+      })
+
+      QUnit.module('when clicked', contextHooks => {
+        contextHooks.beforeEach(() => {
+          props.onSelectSecondaryInfo = sinon.stub()
+        })
+
+        test('calls the .onSelectSecondaryInfo callback', () => {
+          mountAndOpenOptionsMenu()
+          getSecondaryInfoOption('Group').click()
+          strictEqual(props.onSelectSecondaryInfo.callCount, 1)
+        })
+
+        test('includes "group" when calling the .onSelectSecondaryInfo callback', () => {
+          mountAndOpenOptionsMenu()
+          getSecondaryInfoOption('Group').click()
+          const [secondaryInfoType] = props.onSelectSecondaryInfo.lastCall.args
+          equal(secondaryInfoType, 'group')
+        })
+
+        test('returns focus to the "Options" menu trigger', () => {
+          mountAndOpenOptionsMenu()
+          getSecondaryInfoOption('Group').focus()
+          getSecondaryInfoOption('Group').click()
+          strictEqual(document.activeElement, getOptionsMenuTrigger())
+        })
+
+        // TODO: GRADE-____
+        QUnit.skip(
+          'does not call the .onSelectSecondaryInfo callback when already selected',
+          () => {
+            props.selectedSecondaryInfo = 'group'
+            mountAndOpenOptionsMenu()
+            getSecondaryInfoOption('Group').click()
             strictEqual(props.onSelectSecondaryInfo.callCount, 0)
           }
         )

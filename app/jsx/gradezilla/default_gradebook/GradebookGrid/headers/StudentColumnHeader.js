@@ -41,6 +41,7 @@ export default class StudentColumnHeader extends ColumnHeader {
     sisName: string,
     selectedSecondaryInfo: oneOf(studentRowHeaderConstants.secondaryInfoKeys).isRequired,
     sectionsEnabled: bool.isRequired,
+    studentGroupsEnabled: bool.isRequired,
     onSelectSecondaryInfo: func.isRequired,
     sortBySetting: shape({
       direction: string.isRequired,
@@ -82,6 +83,10 @@ export default class StudentColumnHeader extends ColumnHeader {
 
   onShowLoginId = () => {
     this.onSelectSecondaryInfo('login_id')
+  }
+
+  onShowGroup = () => {
+    this.onSelectSecondaryInfo('group')
   }
 
   onShowFirstLastNames = () => {
@@ -270,6 +275,16 @@ export default class StudentColumnHeader extends ColumnHeader {
                           {this.props.loginHandleName ||
                             studentRowHeaderConstants.secondaryInfoLabels.login_id}
                         </MenuItem>
+
+                        {this.props.studentGroupsEnabled && (
+                          <MenuItem
+                            key="group"
+                            selected={this.props.selectedSecondaryInfo === 'group'}
+                            onSelect={this.onShowGroup}
+                          >
+                            {studentRowHeaderConstants.secondaryInfoLabels.group}
+                          </MenuItem>
+                        )}
 
                         <MenuItem
                           key="none"

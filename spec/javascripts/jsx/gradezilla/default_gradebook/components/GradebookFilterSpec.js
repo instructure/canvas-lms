@@ -95,3 +95,31 @@ test('selecting an option while the control is disabled does not call the onSele
 
   strictEqual(props.onSelect.callCount, 0)
 })
+
+test('options containing child options are rendered as optgroups', function() {
+  const itemWithChildItems = {
+    id: '10',
+    name: 'Hierarchical',
+    children: [{id: '1001', name: 'Child 1'}, {id: '1002', name: 'Child 2'}]
+  }
+
+  const props = {...defaultProps(), items: [itemWithChildItems]}
+  this.wrapper = mount(<GradebookFilter {...props} />)
+  ok(this.wrapper.exists('optgroup[label="Hierarchical"]'))
+})
+
+test('child options are rendered within their parent optgroup', function() {
+  const itemWithChildItems = {
+    id: '10',
+    name: 'Hierarchical',
+    children: [{id: '1001', name: 'Child 1'}, {id: '1002', name: 'Child 2'}]
+  }
+  const items = [itemWithChildItems]
+
+  const props = {...defaultProps(), items}
+  this.wrapper = mount(<GradebookFilter {...props} />)
+  deepEqual(
+    this.wrapper.find('optgroup[label="Hierarchical"] option').map(option => option.props().value),
+    ['1001', '1002']
+  )
+})

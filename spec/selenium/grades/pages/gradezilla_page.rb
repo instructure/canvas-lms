@@ -320,6 +320,12 @@ module Gradezilla
     wait_for_ajaximations
   end
 
+  def self.select_student_group(student_group)
+    student_group = student_group.name if student_group.is_a?(Group)
+    click_option(student_group_dropdown, student_group, :text)
+    wait_for_ajaximations
+  end
+
   def self.show_notes
     view_menu = open_gradebook_menu('View')
     select_gradebook_menu_option('Notes', container: view_menu, role: 'menuitemcheckbox')
@@ -515,6 +521,10 @@ module Gradezilla
 
   def self.module_dropdown
     f('#modules-filter-container select')
+  end
+
+  def self.student_group_dropdown
+    f('#student-group-filter-container select')
   end
 
   def self.filter_menu_item(menu_item_name)

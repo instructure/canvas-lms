@@ -63,6 +63,7 @@ export function createGradebook(options = {}) {
     },
     settings_update_url: '/path/to/settingsUpdateUrl',
     speed_grader_enabled: true,
+    student_groups: [],
     ...options
   })
 
@@ -93,6 +94,7 @@ export function setFixtureHtml($fixture) {
         <div id="grading-periods-filter-container"></div>
         <div id="modules-filter-container"></div>
         <div id="sections-filter-container"></div>
+        <div id="student-group-filter-container"></div>
         <div id="search-filter-container">
           <input type="text" />
         </div>
