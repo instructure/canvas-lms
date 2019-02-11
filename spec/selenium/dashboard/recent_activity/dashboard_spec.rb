@@ -51,7 +51,7 @@ describe "dashboard" do
       get '/'
     end
 
-    it "displays notification on todo list sidebar and course dashcard" do
+    it "displays notification on todo list sidebar and course dashcard", :xbrowser do
       # announcement icon is displayed
       expect(todosidebar_item_list).to contain_css(".ToDoSidebarItem [name='IconAnnouncement']")
       # announcement title link is displyed
@@ -118,7 +118,7 @@ describe "dashboard" do
       get "/courses/#{@course.id}"
     end
 
-    it "displays notification on course home page feed and todolist sidebar" do
+    it "displays notification on course home page feed and todolist sidebar", :xbrowser do
       # announcement icon is displayed
       expect(todosidebar_item_list).to contain_css(".ToDoSidebarItem [name='IconAnnouncement']")
       # announcement title link is displyed

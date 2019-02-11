@@ -57,7 +57,7 @@ describe "calendar2" do
         expect(all_agenda_items.length).to eq 1
       end
 
-      it "should display agenda events" do
+      it "should display agenda events", :xbrowser do
         load_agenda_view
         expect(fj('.agenda-wrapper:visible')).to be_present
       end

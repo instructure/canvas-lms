@@ -41,7 +41,7 @@ describe 'creating a quiz' do
         open_quiz_edit_form
       end
 
-      it 'sets availability dates and due dates for each section', priority: 1, test_id: 140670 do
+      it 'sets availability dates and due dates for each section', :xbrowser, priority: 1, test_id: 140670 do
         assign_quiz_to_no_one
 
         # assign to default section
@@ -94,7 +94,7 @@ describe 'creating a quiz' do
         'must have a student or section selected'
     end
 
-    it 'saves and publishes a new quiz', priority: "1", test_id: 193785 do
+    it 'saves and publishes a new quiz', :xbrowser, priority: "1", test_id: 193785 do
       @quiz = course_quiz
       open_quiz_edit_form
 
@@ -119,7 +119,7 @@ describe 'creating a quiz' do
         end
       end
 
-      it 'creates a quiz directly from the index page', priority: "1", test_id: 210055 do
+      it 'creates a quiz directly from the index page', :xbrowser, priority: "1", test_id: 210055 do
         expect do
           create_new_quiz
         end.to change{ Quizzes::Quiz.count }.by(1)

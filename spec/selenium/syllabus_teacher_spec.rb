@@ -50,13 +50,13 @@ describe "course syllabus" do
       wait_for_ajaximations
     end
 
-    it "should confirm existing assignments and dates are correct", priority:"1", test_id: 237016 do
+    it "should confirm existing assignments and dates are correct", :xbrowser, priority:"1", test_id: 237016 do
       assignment_details = ff('td.name')
       expect(assignment_details[0].text).to eq @assignment_1.title
       expect(assignment_details[1].text).to eq @assignment_2.title
     end
 
-    it "should edit the description", priority:"1", test_id: 237017 do
+    it "should edit the description", :xbrowser, priority:"1", test_id: 237017 do
       new_description = "new syllabus description"
       f('.edit_syllabus_link').click
       # check that the wiki sidebar is visible

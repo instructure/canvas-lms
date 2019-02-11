@@ -109,7 +109,7 @@ describe "profile" do
       f('#right-side .add_email_link').click
     end
 
-    it "should add a new email address on profile settings page" do
+    it "should add a new email address on profile settings page", :xbrowser do
       @user.account.enable_feature!(:international_sms)
       notification_model(:category => 'Grading')
       notification_policy_model(:notification_id => @notification.id)

@@ -48,7 +48,7 @@ describe "discussions" do
         user_session(teacher)
       end
 
-      it "should add an attachment to a new topic", priority: "1", test_id: 150466 do
+      it "should add an attachment to a new topic", :xbrowser, priority: "1", test_id: 150466 do
         topic_title = 'new topic with file'
         get url
         wait_for_tiny(f('textarea[name=message]'))
@@ -182,7 +182,7 @@ describe "discussions" do
         expect(f('.discussion-availability').text).to include("Not available until #{unlock_text_index_page}")
       end
 
-      it "should allow a student to create a discussion", priority: "1", test_id: 150471 do
+      it "should allow a student to create a discussion", :xbrowser, priority: "1", test_id: 150471 do
         get url
         wait_for_tiny(f('textarea[name=message]'))
         replace_content(f('input[name=title]'), "Student Discussion")

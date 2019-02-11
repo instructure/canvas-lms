@@ -53,7 +53,7 @@ describe "context modules" do
       wait_for_ajaximations
     end
 
-    it "should show all module items", priority: "1", test_id: 126743 do
+    it "should show all module items", :xbrowser, priority: "1", test_id: 126743 do
       module_with_two_items
       f(".expand_module_link").click
       wait_for_animations
@@ -326,7 +326,7 @@ describe "context modules" do
       expect(page.reload).to be_published
     end
 
-    it "publishes a newly created item" do
+    it "publishes a newly created item", :xbrowser do
       @course.context_modules.create!(name: "Content Page")
       get "/courses/#{@course.id}/modules"
       add_new_module_item('#wiki_pages_select', 'Page', '[ New Page ]', 'New Page Title')

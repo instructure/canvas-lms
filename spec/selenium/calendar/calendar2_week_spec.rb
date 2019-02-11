@@ -37,7 +37,7 @@ describe "calendar2" do
 
     context "week view" do
 
-      it "should navigate to week view when week button is clicked", priority: "2", test_id: 766945 do
+      it "should navigate to week view when week button is clicked", :xbrowser, priority: "2", test_id: 766945 do
         load_week_view
         expect(fj('.fc-agendaWeek-view:visible')).to be_present
       end
