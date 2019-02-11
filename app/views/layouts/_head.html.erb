@@ -78,6 +78,7 @@
     document.addEventListener('click', _earlyClick)
   </script>
   <%= javascript_include_tag(active_brand_config_js_url, defer: true) %>
+
   <%= include_head_js %>
 
   <% if SettingsService.get_settings(object: 'school', id: 1)['fullstory'] == 'on' %>
@@ -99,4 +100,7 @@
       })(window,document,window['_fs_namespace'],'script','user');
   </script>
   <% end %>
+
+  <!-- StrongMind Added -->
+  <%= yield :strongmind_javascript %>
 </head>

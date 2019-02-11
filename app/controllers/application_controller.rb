@@ -1214,7 +1214,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  rescue_from Exception, :with => :rescue_exception
+  rescue_from Exception, :with => :rescue_exception unless Rails.env == 'development'
 
   # analogous to rescue_action_without_handler from ActionPack 2.3
   def rescue_exception(exception)
