@@ -116,8 +116,8 @@ describe SplitUsers do
       it 'should handle user_observers' do
         observer1 = user_model
         observer2 = user_model
-        user1.linked_observers << observer1
-        user2.linked_observers << observer2
+        add_linked_observer(user1, observer1)
+        add_linked_observer(user2, observer2)
         UserMerge.from(user1).into(user2)
 
         SplitUsers.split_db_users(user2)
@@ -148,21 +148,21 @@ describe SplitUsers do
       end
 
       it 'should handle when observing merged user' do
-        user2.linked_observers << user1
+        link = add_linked_observer(user2, user1)
         UserMerge.from(user1).into(user2)
 
         SplitUsers.split_db_users(user2)
 
-        expect(user1.as_observer_observation_links).to eq UserObservationLink.where(user_id: user2, observer_id: user1)
-        expect(user2.as_student_observation_links).to eq UserObservationLink.where(user_id: user2, observer_id: user1)
+        expect(user1.reload.as_observer_observation_links.to_a).to eq [link]
+        expect(user2.reload.as_student_observation_links.to_a).to eq [link]
       end
 
 
       it 'should handle as_observer_observation_links' do
         observee1 = user_model
         observee2 = user_model
-        observee1.linked_observers << user1
-        observee2.linked_observers << user2
+        add_linked_observer(observee1, user1)
+        add_linked_observer(observee2, user2)
         UserMerge.from(user1).into(user2)
 
         SplitUsers.split_db_users(user2)
@@ -174,10 +174,10 @@ describe SplitUsers do
       it 'should handle duplicate user_observers' do
         observer1 = user_model
         observee1 = user_model
-        observee1.linked_observers << user1
-        observee1.linked_observers << user2
-        user1.linked_observers << observer1
-        user2.linked_observers << observer1
+        add_linked_observer(observee1, user1)
+        add_linked_observer(observee1, user2)
+        add_linked_observer(user1, observer1)
+        add_linked_observer(user2, observer1)
         UserMerge.from(user1).into(user2)
         SplitUsers.split_db_users(user2)
 

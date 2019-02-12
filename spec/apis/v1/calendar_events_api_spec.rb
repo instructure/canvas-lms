@@ -2177,9 +2177,7 @@ describe CalendarEventsApiController, type: :request do
         enrollment_state: 'active',
         associated_user_id: @student.id
       )
-      @observer.as_observer_observation_links.create do |uo|
-        uo.user_id = @student.id
-      end
+      add_linked_observer(@student, @observer)
       @contexts = [@course.asset_string]
       @ctx_str = @contexts.join("&context_codes[]=")
       @me = @observer

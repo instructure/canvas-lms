@@ -70,7 +70,7 @@ describe ObserverAlertsApiController, type: :request do
 
     it 'doesnt return alerts for other students' do
       user = user_model
-      link = UserObservationLink.create(observer: @observer, student: user)
+      link = add_linked_observer(user, @observer)
       asg = assignment_model(context: @course)
       observer_alert_model(link: link, observer: @observer, alert_type: 'assignment_grade_high',
         threshold: 90, context: asg)

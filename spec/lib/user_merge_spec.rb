@@ -379,8 +379,9 @@ describe UserMerge do
 
       observer1 = user_with_pseudonym
       observer2 = user_with_pseudonym
-      user1.linked_observers << observer1 << observer2
-      user2.linked_observers << observer2
+      add_linked_observer(user1, observer1)
+      add_linked_observer(user1, observer2)
+      add_linked_observer(user2, observer2)
       expect(ObserverEnrollment.count).to eql 3
       Enrollment.where(user_id: observer2, associated_user_id: user1).update_all(workflow_state: 'completed')
 
@@ -396,8 +397,9 @@ describe UserMerge do
     it "should move and uniquify observers" do
       observer1 = user_model
       observer2 = user_model
-      user1.linked_observers << observer1 << observer2
-      user2.linked_observers << observer2
+      add_linked_observer(user1, observer1)
+      add_linked_observer(user1, observer2)
+      add_linked_observer(user2, observer2)
 
       UserMerge.from(user1).into(user2)
       data = UserMergeData.where(user_id: user2).first
@@ -412,8 +414,9 @@ describe UserMerge do
     it "should move and uniquify observed users" do
       student1 = user_model
       student2 = user_model
-      user1.linked_students << student1 << student2
-      user2.linked_students << student2
+      add_linked_observer(student1, user1)
+      add_linked_observer(student2, user1)
+      add_linked_observer(student2, user2)
 
       UserMerge.from(user1).into(user2)
       user1.reload

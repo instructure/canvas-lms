@@ -21,7 +21,7 @@ describe ObserverAlertThreshold do
   before :once do
     @student = user_model
     @observer = user_model
-    UserObservationLink.create(student: @student, observer: @observer)
+    add_linked_observer(@student, @observer)
   end
 
   it 'can link to an user_observation_link' do

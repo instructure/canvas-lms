@@ -25,7 +25,8 @@ module Factories
     opts[:observer] ||= course_with_observer(opts).user
     @observer = opts[:observer]
 
-    @observation_link = opts[:link] || UserObservationLink.create!(student: @student, observer: @observer)
+    root_account = (@course || opts[:account])&.root_account || Account.default
+    @observation_link = opts[:link] || add_linked_observer(@student, @observer, root_account: (@course || opts[:account])&.root_account)
 
     valid_attrs = [:alert_type, :threshold, :workflow_state, :student, :observer]
     default_attrs = {

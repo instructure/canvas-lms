@@ -617,9 +617,7 @@ describe CoursesController, type: :request do
     end
     it "should return a course list for an observed students" do
       parent = User.create
-      parent.as_observer_observation_links.create! do |uo|
-        uo.user_id = @me.id
-      end
+      add_linked_observer(@me, parent)
       json = api_call_as_user(parent,:get,"/api/v1/users/#{@me.id}/courses",
                               { :user_id => @me.id, :controller => 'courses', :action => 'user_index',
                                 :format => 'json' })
@@ -642,10 +640,7 @@ describe CoursesController, type: :request do
       @shard2.activate do
         a = Account.create
         parent = user_with_pseudonym(name: 'Zombo', username: 'nobody2@example.com', account: a)
-        parent.as_observer_observation_links.create! do |uo|
-          uo.user_id = @me.id
-        end
-        parent.save!
+        add_linked_observer(@me, parent)
       end
       expect(@me.account.id).not_to eq parent.account.id
       json = api_call_as_user(parent,:get,"/api/v1/users/#{@me.id}/courses",

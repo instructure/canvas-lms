@@ -1199,7 +1199,7 @@ describe Enrollment do
       course_with_teacher(:active_all => true)
       student = user_with_pseudonym
       observer = user_with_pseudonym
-      observer.linked_students << student
+      add_linked_observer(student, observer)
 
       @course.enroll_student(student, :no_notify => true)
       expect(student.messages).to be_empty
@@ -1219,7 +1219,7 @@ describe Enrollment do
       course_with_teacher
       student = user_with_pseudonym
       observer = user_with_pseudonym
-      observer.linked_students << student
+      add_linked_observer(student, observer)
 
       @course.enroll_student(student)
       expect(observer.messages).to be_empty
@@ -1283,7 +1283,7 @@ describe Enrollment do
     student = user_with_pseudonym
     observer = user_with_pseudonym
     old_time = observer.updated_at
-    observer.linked_students << student
+    add_linked_observer(student, observer)
     @course.enrollments.create(user: student, skip_touch_user: true, type: 'StudentEnrollment')
     expect(observer.reload.updated_at).to eq old_time
   end
@@ -2748,7 +2748,7 @@ describe Enrollment do
     before :once do
       @student = user_factory(active_all: true)
       @parent = user_with_pseudonym(:active_all => true)
-      @student.linked_observers << @parent
+      add_linked_observer(@student, @parent)
     end
 
     it 'should get new observer enrollments when an observed user gets a new enrollment' do
@@ -2801,10 +2801,11 @@ describe Enrollment do
 
       it "allows enrolling a user that is observed from another shard" do
         se = @shard1.activate do
-          account = Account.create!
+          @other_account = Account.create!
           expect_any_instance_of(User).to receive(:can_be_enrolled_in_course?).and_return(true)
-          course_with_student(account: account, active_all: true, user: @student)
+          course_with_student(account: @other_account, active_all: true, user: @student)
         end
+        add_linked_observer(@student, @parent, root_account: @other_account)
         pe = @parent.observer_enrollments.shard(@shard1).first
 
         expect(pe).not_to be_nil
