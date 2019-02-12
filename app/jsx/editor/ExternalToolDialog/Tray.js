@@ -29,7 +29,14 @@ import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReade
 export default function ExternalToolDialogTray(props) {
   const {open, label, onOpen, onClose, onCloseButton, closeLabel, name, children} = props
   return (
-    <Tray open={open} label={label} onOpen={onOpen} onClose={onClose} placement="end">
+    <Tray
+      open={open}
+      label={label}
+      onOpen={onOpen}
+      onClose={onClose}
+      placement="end"
+      size="regular"
+    >
       <Flex direction="column" height="100vh">
         <FlexItem padding="small">
           <Flex>
