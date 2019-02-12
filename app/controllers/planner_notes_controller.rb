@@ -280,7 +280,7 @@ class PlannerNotesController < ApplicationController
   #
   # @returns PlannerNote
   def destroy
-    note = PlannerNote.find(params[:id])
+    note = @current_user.planner_notes.find(params[:id])
 
     if note.destroy
       Rails.cache.delete(planner_meta_cache_key)
