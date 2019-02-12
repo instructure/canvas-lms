@@ -4980,7 +4980,7 @@ nn:
   correct_answer_5a6a57d1: "Rett svar"
   correct_answer_comments_34ca671f: "Kommentarar til korrekt svar"
   correct_answers_are_available_until_date_df01cc5f: "Korrekte svar er tilgjengelege til %{date}."
-  correct_answers_are_hidden_5d0a0009: "Korrekte svarer skjulte."
+  correct_answers_are_hidden_5d0a0009: "Korrekte svar er skjulte."
   correct_answers_are_no_longer_available_c67dfc28: "Korrekte svar er ikkje lenger tilgjengelege."
   correct_answers_will_be_available_from_to_5762e8c6: "Korrekte svar er tilgjengelege %{from} - %{to}."
   correct_answers_will_be_available_on_date_48137: "Korrekte svar blir tilgjengelege %{date}."
