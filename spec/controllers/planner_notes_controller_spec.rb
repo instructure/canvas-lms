@@ -383,6 +383,13 @@ describe PlannerNotesController do
           expect(Rails.cache).to receive(:delete).with(/#{controller.planner_meta_cache_key}/)
           delete :destroy, params: {id: @student_note.id}
         end
+
+        it "can't delete other people's notes" do
+          user_session(user_factory(:active_all => true))
+          delete :destroy, params: {id: @student_note.id}
+          expect(response).to be_not_found
+          expect(@student_note.reload).to be_active
+        end
       end
     end
 
