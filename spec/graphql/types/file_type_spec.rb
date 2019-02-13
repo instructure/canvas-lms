@@ -38,9 +38,9 @@ describe Types::FileType do
   end
 
   it 'requires read permission' do
-    other_course_student = student_in_course(course: course_factory)
+    other_course_student = student_in_course(course: course_factory).user
     resolver = GraphQLTypeTester.new(file, current_user: other_course_student)
-    expect(resolver.resolve('displayName')).to be_nil
+    expect(resolver.resolve("_id")).to be_nil
   end
 
   it 'requires the file to not be deleted' do
