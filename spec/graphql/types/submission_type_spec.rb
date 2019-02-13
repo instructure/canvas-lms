@@ -121,7 +121,7 @@ describe Types::SubmissionType do
     end
 
     it "requires permission" do
-      other_course_student = student_in_course(course: course_factory)
+      other_course_student = student_in_course(course: course_factory).user
       expect(
         submission_type.resolve("commentsConnection { nodes { _id }}", current_user: other_course_student)
       ).to be nil

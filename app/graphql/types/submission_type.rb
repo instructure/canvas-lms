@@ -47,15 +47,19 @@ module Types
     end
 
     def protect_submission_grades(attr)
-      submission.user_can_read_grade?(current_user, session) ?
-        submission.send(attr) :
-        nil
+      load_association(:assignment) do
+        if submission.user_can_read_grade?(current_user, session)
+          submission.send(attr)
+        end
+      end
     end
     private :protect_submission_grades
 
     field :comments_connection, SubmissionCommentType.connection_type, null: true
     def comments_connection
-      submission.comments_for(current_user)
+      load_association(:assignment) do
+        submission.comments_for(current_user)
+      end
     end
 
     field :score, Float, null: true
