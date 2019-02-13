@@ -213,6 +213,21 @@ describe ContentMigration do
       expect(new_assignment.only_visible_to_overrides).to be_falsey
     end
 
+    it "should unset allowed extensions" do
+      assignment_model(:course => @copy_from, :points_possible => 40, :submission_types => 'file_upload',
+        :grading_type => 'points', :allowed_extensions => ["txt", "doc"])
+
+      run_course_copy
+
+      new_assignment = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
+      expect(new_assignment.allowed_extensions).to eq ["txt", "doc"]
+      @assignment.update_attribute(:allowed_extensions, [])
+
+      run_course_copy
+
+      expect(new_assignment.reload.allowed_extensions).to eq []
+    end
+
     describe "allowed_attempts copying" do
       it "copies nil over properly" do
         assignment_model(course: @copy_from, points_possible: 40, submission_types: 'file_upload', grading_type: 'points')
