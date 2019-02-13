@@ -124,7 +124,7 @@ describe QuizzesNext::ExportService do
         'original_assignment_id': old_assignment2.id
       }
 
-      expect(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated).twice
+      expect(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated).once
       ExportService.send_imported_content(new_course, content_migration, basic_import_content)
     end
 
@@ -141,13 +141,6 @@ describe QuizzesNext::ExportService do
     it 'skips assignments created prior to the current migration' do
       Assignment.where(:id => new_assignment1).update_all(:created_at => 1.day.ago)
       expect(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated).never
-      ExportService.send_imported_content(new_course, content_migration, basic_import_content)
-    end
-
-    it 'includes the new assignment id in the live event payload' do
-      expect(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated).with(
-        hash_including(new_assignment_id: new_assignment1.global_id)
-      )
       ExportService.send_imported_content(new_course, content_migration, basic_import_content)
     end
 
