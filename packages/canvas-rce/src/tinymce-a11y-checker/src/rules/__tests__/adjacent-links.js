@@ -54,12 +54,13 @@ describe("update", () => {
 
   test("returns A element with combined html content if 'combine' set", () => {
     const content = "this is my text"
+    const expected = `${content} ${content}`
     const text1 = document.createTextNode(content)
     a1.appendChild(text1)
     const text2 = document.createTextNode(content)
     a2.appendChild(text2)
     const newA = rule.update(a1, { combine: true })
-    expect(newA.textContent).toBe(content + content)
+    expect(newA.textContent).toBe(expected)
     expect(newA.tagName).toBe("A")
   })
 
