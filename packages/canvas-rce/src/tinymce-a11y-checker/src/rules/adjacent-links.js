@@ -98,7 +98,7 @@ export default {
       }
 
       rootElem.removeChild(next)
-      elem.innerHTML += next.innerHTML
+      elem.innerHTML += ` ${next.innerHTML}`
     }
     return elem
   },
