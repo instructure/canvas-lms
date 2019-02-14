@@ -313,7 +313,7 @@ export const OverrideShape = shape({
   })
 })
 
-const UserShape = shape({
+export const UserShape = shape({
   lid: string,
   gid: string,
   name: string,
