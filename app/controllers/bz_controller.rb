@@ -200,7 +200,9 @@ class BzController < ApplicationController
 
       next if row[0].blank?
 
-      row = row.map(&:strip)
+      row = row.map{ |i|
+        i.nil? ? "" : i.strip
+      }
 
       existing = CohortInfo.where(:course_id => params[:import][:course_id], :section_name => row[0])
       obj = nil
