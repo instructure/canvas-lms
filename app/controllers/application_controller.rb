@@ -20,7 +20,7 @@
 # Likewise, all the methods added will be available for all controllers.
 
 class ApplicationController < ActionController::Base
-  prepend_view_path CanvasShim::Engine.root.join('app', 'views')
+
   class << self
     [:before, :after, :around,
      :skip_before, :skip_after, :skip_around,

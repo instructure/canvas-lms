@@ -3025,4 +3025,4 @@ class CoursesController < ApplicationController
     )
   end
 end
-require File.expand_path('../../app/controllers/courses_controller', CanvasShim::Engine.called_from)
+

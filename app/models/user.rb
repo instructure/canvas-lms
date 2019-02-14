@@ -3005,4 +3005,4 @@ class User < ActiveRecord::Base
     roles
   end
 end
-require File.expand_path('../../app/models/user', CanvasShim::Engine.called_from)
+
