@@ -38,6 +38,7 @@ class ConversationMessage < ActiveRecord::Base
 
   after_create :generate_user_note!
   after_save :update_attachment_associations
+  after_commit { PipelineService.publish(self) }
 
   scope :human, -> { where("NOT generated") }
   scope :with_attachments, -> { where("attachment_ids<>'' OR has_attachments") } # TODO: simplify post-migration
