@@ -54,7 +54,6 @@ class Message < ActiveRecord::Base
 
   # Publish to the pipeline in using CanvasShim
   after_save { PipelineService.publish(self) }
-  after_destroy -> { PipelineService.publish(self) }
 
   # Validations
   validates :body, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
