@@ -6890,7 +6890,8 @@ mi:
       short_with_weekday: "%a, %b %-d"
       weekday: "%A"
     month_names: 
-      - "kore  \"Hānuere\""
+      - ~
+      - Hānuere"
       - Pēpuere
       - Māehe
       - Āperira

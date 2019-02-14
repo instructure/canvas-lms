@@ -180,6 +180,7 @@ module Api::V1::Assignment
 
     hash['is_quiz_assignment'] = assignment.quiz? && assignment.quiz.assignment?
     hash['can_duplicate'] = assignment.can_duplicate?
+    hash['original_course_id'] = assignment.duplicate_of&.course&.id
     hash['original_assignment_id'] = assignment.duplicate_of&.id
     hash['original_assignment_name'] = assignment.duplicate_of&.name
     hash['workflow_state'] = assignment.workflow_state

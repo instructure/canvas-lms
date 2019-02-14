@@ -123,13 +123,18 @@ test("just forwards through target's remoteEditor if set", function() {
   ok(remoteEditor.focus.called)
 })
 
-test('uses wikiSidebar if remoteEditor is not set but rich_text is set', function() {
+test('uses wikiSidebar if remoteEditor is not set but rich_text is set', function(assert) {
+  const done = assert.async()
   sinon.spy(wikiSidebar, 'attachToEditor')
   this.$target.data('remoteEditor', null)
   this.$target.data('rich_text', true)
   RceCommandShim.focus(this.$target)
-  ok(wikiSidebar.attachToEditor.calledWith(this.$target))
-  wikiSidebar.attachToEditor.restore()
+  // wait for the async chunck to load
+  setTimeout(() => {
+    ok(wikiSidebar.attachToEditor.calledWith(this.$target))
+    wikiSidebar.attachToEditor.restore()
+    done()
+  }, 5)
 })
 
 QUnit.module('RceCommandShim - destroy', {

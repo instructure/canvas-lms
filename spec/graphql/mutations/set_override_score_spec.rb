@@ -21,7 +21,8 @@ require_relative "../../spec_helper"
 describe Mutations::SetOverrideScore do
   let!(:account) { Account.create! }
   let!(:course) { account.courses.create! }
-  let!(:student_enrollment) { course.enroll_student(User.create!, enrollment_state: 'active') }
+  let!(:student) { User.create! }
+  let!(:student_enrollment) { course.enroll_student(student, enrollment_state: 'active') }
   let!(:grading_period) do
     group = account.grading_period_groups.create!(title: "a test group")
     group.enrollment_terms << course.enrollment_term
@@ -120,6 +121,29 @@ describe Mutations::SetOverrideScore do
       it "returns an error if passed a valid enrollment ID but an invalid grading period ID" do
         result = CanvasSchema.execute(mutation_str(grading_period_id: 0), context: context)
         expect(result.dig("errors", 0, "message")).to eq "not found"
+      end
+
+      it "returns an error if the passed-in enrollment is deleted" do
+        student_enrollment.update!(workflow_state: "deleted")
+        result = CanvasSchema.execute(mutation_str, context: context)
+        expect(result.dig("errors", 0, "message")).to eq "not found"
+      end
+    end
+
+    context "when the student being updated has multiple enrollments in the course" do
+      let(:second_enrollment) { course.enroll_student(student, enrollment_state: "active") }
+      let(:score_for_second_enrollment) { second_enrollment.find_score }
+
+      it "updates all enrollments for the student, not just the requested one" do
+        second_enrollment
+        CanvasSchema.execute(mutation_str, context: context)
+        expect(score_for_second_enrollment.override_score).to eq 45.0
+      end
+
+      it "ignores deleted enrollments" do
+        second_enrollment.update!(workflow_state: "deleted")
+        CanvasSchema.execute(mutation_str, context: context)
+        expect(score_for_second_enrollment.override_score).to be nil
       end
     end
   end

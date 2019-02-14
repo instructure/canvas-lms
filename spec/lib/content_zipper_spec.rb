@@ -454,7 +454,32 @@ describe ContentZipper do
       end
       attachment.save!
       expect {
-        ContentZipper.zip_eportfolio(attachment, eportfolio)
+        ContentZipper.new.zip_eportfolio(attachment, eportfolio)
+      }.to_not raise_error
+    end
+
+    it "does not process attachments that user cannot see" do
+      course_with_student(active_all: true)
+      folder = Folder.root_folders(@course).first
+      attachment_model(uploaded_data: stub_png_data('hidden.png'),
+                       content_type: 'image/png', folder: folder, display_name: 'hidden.png')
+
+      user = User.create!
+      eportfolio = user.eportfolios.create!(name: 'an name')
+      eportfolio.ensure_defaults
+      entry = eportfolio.eportfolio_entries.first
+      entry.parse_content({:section_count => 1, :section_1 => {:section_type => 'rich_text', :content => "/files/#{@attachment.id}/download"}})
+      entry.save!
+      attachment = eportfolio.attachments.build do |attachment|
+        attachment.display_name = 'an_attachment'
+        attachment.user = user
+        attachment.workflow_state = 'to_be_zipped'
+      end
+      attachment.save!
+      expect(Attachment).to receive(:find_by_id).with(@attachment.id.to_s)
+      expect(ContentZipper::StaticAttachment).to_not receive(:new)
+      expect {
+        ContentZipper.new.zip_eportfolio(attachment, eportfolio)
       }.to_not raise_error
     end
 

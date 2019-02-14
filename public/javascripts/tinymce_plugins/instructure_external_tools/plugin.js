@@ -21,22 +21,22 @@ import initializeExternalTools from './initializeExternalTools'
 import ExternalToolsHelper from './ExternalToolsHelper'
 import INST from '../../INST'
 
-  tinymce.create('tinymce.plugins.InstructureExternalTools', {
-    init : function(ed, url){
-      return initializeExternalTools.init(ed, url, INST)
-    },
-    getInfo : function() {
-      return {
-        longname : 'InstructureExternalTools',
-        author : 'Brian Whitmer',
-        authorurl : 'http://www.instructure.com',
-        infourl : 'http://www.instructure.com',
-        version : tinymce.majorVersion + "." + tinymce.minorVersion
-      };
+tinymce.create('tinymce.plugins.InstructureExternalTools', {
+  init(ed, url) {
+    return initializeExternalTools.init(ed, url, INST)
+  },
+  getInfo() {
+    return {
+      longname: 'InstructureExternalTools',
+      author: 'Brian Whitmer',
+      authorurl: 'http://www.instructure.com',
+      infourl: 'http://www.instructure.com',
+      version: `${tinymce.majorVersion}.${tinymce.minorVersion}`
     }
-  });
+  }
+})
 
-  // Register plugin
-  tinymce.PluginManager.add('instructure_external_tools', tinymce.plugins.InstructureExternalTools);
+// Register plugin
+tinymce.PluginManager.add('instructure_external_tools', tinymce.plugins.InstructureExternalTools)
 
-export default tinymce;
+export default tinymce
