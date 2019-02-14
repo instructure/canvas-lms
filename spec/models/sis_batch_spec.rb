@@ -834,6 +834,11 @@ test_4,TC 104,Test Course 104,,term1,active
       expect(b4.generated_diff_id).to_not be_nil
     end
 
+    it 'should compare files for diffing correctly' do
+      expect(SisBatch.new.file_diff_percent(25, 100)).to eq 75
+      expect(SisBatch.new.file_diff_percent(175, 100)).to eq 75
+    end
+
     it 'should set batch_ids on change_sis_id' do
       course1 = @account.courses.build
       course1.sis_source_id = 'test_1'
