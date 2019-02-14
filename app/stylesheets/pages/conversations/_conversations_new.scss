@@ -585,6 +585,12 @@ i.icon-ok:before {
   overflow: auto;
 }
 
+// This is to override the bootstrap styles that get
+// imported here.  This is a hack and should be fixed better
+div#course-filter-bs.dropdown-menu.open {overflow: inherit !important; }
+div#compose-message-course-bs.dropdown-menu.open {overflow: inherit !important; }
+ul.dropdown-menu.inner {overflow-y: inherit !important; }
+
 .bootstrap-select label {
   margin: 0;
   display: block;

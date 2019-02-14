@@ -115,6 +115,8 @@ class Oauth2ProviderController < ApplicationController
       I18n.set_locale_with_localizer
     end
 
+    increment_request_cost(Setting.get("oauth_token_additional_request_cost", "200").to_i)
+
     render :json => token
   end
 
