@@ -837,6 +837,11 @@ type Grades {
   gradingPeriod: GradingPeriod
 
   """
+  The override grade. Supersedes the computed final grade if set.
+  """
+  overrideGrade: String
+
+  """
   The override score. Supersedes the computed final score if set.
   """
   overrideScore: Float
