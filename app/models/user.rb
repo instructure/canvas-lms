@@ -295,8 +295,6 @@ class User < ActiveRecord::Base
       order_by_sortable_name
   end
 
-  scope :enrolled_in_course_between, lambda { |course_ids, start_at, end_at| joins(:enrollments).where(:enrollments => { :course_id => course_ids, :created_at => start_at..end_at }) }
-
   scope :with_last_login, lambda {
     select("users.*, MAX(current_login_at) as last_login").
       joins("LEFT OUTER JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id = users.id").
