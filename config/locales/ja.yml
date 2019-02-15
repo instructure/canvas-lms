@@ -52,6 +52,9 @@ ja:
   _at_the_bottom__4360f2b4: "-- 下へ --"
   _at_the_bottom__d2cf682a: "-- 下へ --"
   _b4455c8b: "%"
+  _count_points_23dc93e0: 
+    one: "-%{count} ポイント"
+    other: "-%{count} ポイント"
   _section_not_synced_yet_cd07d0dd: "-- セクションはまだ同期されていません"
   _start_from_a_template__a03ea3b3: "-- テンプレートから開始 --"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: この計算メソッドで計算値が使用されていません
@@ -67,8 +70,11 @@ ja:
   a_partner_id_is_required_to_use_academic_benchmark_adba3df0: "Academic Benchmarks を使用するには、パートナーIDが必要です"
   a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: "Academic Benchmarks を使用するには、パートナーキーが必要です"
   a_problem_occurred_adding_reviewers_57b083d9: 評価者を追加中に問題が発生しました。
+  a_public_privacy_level_will_send_the_launching_use_63bdbfaa: 公開プライバシーレベルでは、起動ユーザーの個人識別情報をツールプロバイダに送信します。これをプライベートに設定すると、その情報に依存するツールに悪影響を及ぼす可能性があります。
   a_section_is_required_64103992: セクションは必須です
   a_sis_integration_is_not_configured_and_the_enable_3c560d89: SIS統合が設定されておらず、新しいSIS統合設定を有効にする機能が有効になっていません
+  a_student_has_just_turned_in_a_late_submission_for_23f0ba9e: "受講生がコースの%{assignment_name}の%{course_name}の提出を遅れて行いました"
+  a_student_just_turned_in_their_assignment_late_ass_e991e212: "受講生が提出を遅れて行いました、%{assignment_name}"
   a_table_containing_the_name_of_the_grading_scheme__2c25dc3: 採点スキームの名前とスキームの編集または削除用のアイコンを含む表です。
   a_table_containing_the_name_of_the_grading_scheme__8e6d32f8: 採点スキームの名前とスキームの編集または削除用のボタンを含む表です。
   a_table_of_answers_and_brief_statistics_regarding__f516e98f: 受講生の解答の選択の答えの表と簡単な統計
@@ -1060,14 +1066,16 @@ ja:
             field: "セクション ID"
     settings: 
       about_google_docs: |-
-          Google Docs プレビューは、ダウンロードしたり、対応するプログラム(例、Word や Excel)
-          を開かずに、ユーザーがCanvas内からドキュメントを閲覧することを可能にします。
+          Google Docs プレビューは、ダウンロードしたり、対応するプログラム
+          (例、Word や Excel)を開かずに、ユーザーがCanvas内からドキュメ
+          ントを閲覧することを可能にします。
           
           Google Docsプレビューは、Canvasドキュメント・プレビュワーで
           サポートされていないファイルの種類もレンダーすることができます。
           
           このサービスを使用することで、
-          [Google Docs ビューワーサービス利用規約](%{terms_url})を読み、そして同意することを承認します。
+          [Google Docs ビューワーサービス利用規約](%{terms_url})
+          を読み、そして同意することを承認します。
       about_google_docs_tooltip: "Google ドキュメントのプレビューについて"
       account_admins_title: アカウント管理者
       account_quotas: 
@@ -1598,6 +1606,7 @@ ja:
   add_criterion_eb9587ef: 基準を追加する
   add_custom_link_22059c0: カスタムリンクを追加する
   add_discussion_653dab4c: ディスカッションを追加する
+  add_domain_f15bc6c1: ドメインを追加
   add_email_address_aef3b61: "電子メール アドレスを追加する"
   add_existing_content_7e36da66: 現存のコンテンツを追加する
   add_external_feed_6d437a28: 外部フィードを追加
@@ -1914,7 +1923,9 @@ ja:
       ユーザーが受講生が作成したコースグループを作成、編集、削除することができるようにします。
   allows_user_to_create_edit_and_delete_course_rubri_92b58f29: ユーザーがルーブリックリンクでコースルービックを作成、編集、削除できるようにします。
   allows_user_to_create_edit_and_delete_rubrics_1c0acc08: ユーザーがルービックを作成、編集、削除できるようにします。
-  allows_user_to_create_import_edit_and_delete_outco_472c842e: ユーザーが、コースレベルで結果と成果グループを作成、インポート、編集、および削除できるようにします。
+  allows_user_to_create_import_edit_and_delete_outco_472c842e: |-
+      ユーザーが、コースレベルで結果と成果グループを作成、インポート、編集、
+      および削除できるようにします。
   allows_user_to_create_new_conferences_allows_user__89cebec2: ユーザーが新しい会議を作成できるようにします。ユーザーが作成した会議を開始できるようにします。
   allows_user_to_designate_a_course_as_a_blueprint_c_bc5ff9bc: |-
       ユーザーがコースを Blueprint コースとして指定することができるようにします。
@@ -1927,15 +1938,17 @@ ja:
   allows_user_to_edit_blueprint_content_lock_setting_25128c82: "ユーザーが個々のディスカッションの Blueprint コンテンツのロック設定を編集できるようにします。"
   allows_user_to_edit_blueprint_content_lock_setting_fd580fab: "ユーザーが Blueprintマスターコースに登録されている場合、ユーザーが個々の設定で Blueprint コンテンツのロック設定を編集できるようにします。"
   allows_user_to_edit_blueprint_lock_settings_on_the_371aeb2a: "ユーザーが Blueprint マスターコースのページインデックスページの Blueprint ロックの設定を編集できるようにします。"
-  allows_user_to_edit_blueprint_lock_settings_on_the_3a90958b: "ユーザーが Blueprint マスターコースのクイズインデックスページで 課題とクイズの Blueprint ロック設定を編集できるようにします。"
+  allows_user_to_edit_blueprint_lock_settings_on_the_3a90958b: |-
+      ユーザーが Blueprint マスターコースのクイズインデックスページで 課題とクイズの Blueprint
+      ロック設定を編集できるようにします。
   allows_user_to_edit_blueprint_lock_settings_on_the_94a44495: "ユーザーが Blueprint マスターコースのディスカッションインデックスページの Blueprint ロックの設定を編集できるようにします。"
   allows_user_to_edit_blueprint_lock_settings_on_the_9f51663c: "ユーザーが Blueprint マスターコースのファイルページの Blueprint ロックの設定を編集できるようにします。"
   allows_user_to_edit_configurations_for_manually_ad_7e0f496c: ユーザーが手動で追加された外部アプリの設定を編集できるようにします。
   allows_user_to_edit_grades_and_add_comments_in_spe_dc18e3c0: ユーザーがSpeedGrader内で成績を編集し、コメントを追加できるようにします。
   allows_user_to_edit_grades_in_the_gradebook_allows_74c2723: |-
       ユーザーがグレードブック内で成績を編集できるようにします。
-      ユーザーがグレードブック履歴にアクセスできるようにします。
-      ユーザーが学習習熟グレードブック履歴にアクセスできるようにします（対応している場合）。
+              ユーザーがグレードブック履歴にアクセスできるようにします。
+              ユーザーが学習習熟グレードブック履歴にアクセスできるようにします（対応している場合）。
   allows_user_to_edit_grades_in_the_gradebook_allows_b1e33afc: ユーザーがグレードブック内で成績を編集できるようにします。ユーザーがグレードブック履歴にアクセスできるようにします。
   allows_user_to_edit_grading_schemes_98c35117: ユーザーが採点スキームを編集できるようにします。
   allows_user_to_edit_the_course_sis_id_e1eccee3: "ユーザーがコースの SIS ID を編集できるようにします。"
@@ -1993,12 +2006,12 @@ ja:
   allows_user_to_view_a_link_to_speedgrader_from_ass_8ed9b342: "ユーザーが課題から SpeedGraderへのリンクを表示できるようにします。"
   allows_user_to_view_a_link_to_the_faculty_journal__13b353a8: |-
       ユーザーがユーザー詳細のサイドバーで、学部日誌へのリンクを閲覧できるようにします。
-      ユーザーが個別の受講生の学部日誌を閲覧できるようにします。
-      ユーザーが新規の学部日誌エントリーを作成できるようにします。
+                ユーザーが個別の受講生の学部日誌を閲覧できるようにします。
+               ユーザーが新規の学部日誌エントリーを作成できるようにします。
   allows_user_to_view_a_link_to_the_faculty_journal__61d9560e: |-
       ユーザーがユーザー詳細のサイドバーで、学部日誌へのリンクを閲覧できるようにします。
-      ユーザーが個別の受講生の学部日誌を閲覧できるようにします。
-      ユーザーが新規の学部日誌エントリーを作成できるようにします。
+              ユーザーが個別の受講生の学部日誌を閲覧できるようにします。
+             ユーザーが新規の学部日誌エントリーを作成できるようにします。
   allows_user_to_view_account_analytics_98fbc6ad: ユーザーがアカウント分析を表示できるようにします。
   allows_user_to_view_all_course_groups_not_just_tho_bad6d687: "ユーザーが、自分が登録されているコースグループだけでなく、すべてのコースグループを[共編者]のウィンドウで表示できるようにします。"
   allows_user_to_view_all_student_assignment_submiss_d8ee5830: ユーザーがすべての受講生の課題提出を表示し、コメントを追加できるようにします。
@@ -2009,7 +2022,9 @@ ja:
       ユーザーが人物ページの最後のアクティビティと合計アクティビティ情報を表示できるようにします。
   allows_user_to_view_and_edit_the_sis_id_and_integr_f206fdcb: "ユーザーがユーザーのログイン情報に SIS ID とインテグレーションIDを表示および編集できるようにします"
   allows_user_to_view_and_insert_data_in_the_sis_id__921967c: "ユーザーが SIS ID フィールドにデータを表示して挿入できるようにします。"
-  allows_user_to_view_and_link_questions_in_a_quiz_t_b971e002: ユーザーがクイズ内の質問を表示し、アカウントレベルの質問をバンクにリンクできるようにします。無効にすると、ユーザーはコースの問題バンクを表示してリンクすることしかできません。クイズインデックスページの問題バンクの管理のリンクを有効にします
+  allows_user_to_view_and_link_questions_in_a_quiz_t_b971e002: |-
+      ユーザーがクイズ内の質問を表示し、アカウントレベルの質問をバンクにリンクできるようにします。
+      無効にすると、ユーザーはコースの問題バンクを表示してリンクすることしかできません。クイズインデックスページの問題バンクの管理のリンクを有効にします
   allows_user_to_view_and_link_questions_in_a_quiz_t_d312a571: ユーザーがクイズ内の質問を表示し、アカウントレベルの質問をバンクにリンクできるようにします。無効にすると、ユーザーはコースの問題バンクを表示してリンクすることしかできません。
   allows_user_to_view_and_link_questions_in_a_quiz_t_f6795580: ユーザーがクイズ内の質問を表示し、アカウントレベルの質問をバンクにリンクできるようにします。
   allows_user_to_view_and_manage_authentication_opti_e1bb0ad3: ユーザーがアカウント全体の認証オプションを表示および管理できるようにします。
@@ -2023,8 +2038,11 @@ ja:
   allows_user_to_view_course_analytics_through_the_c_5f24ec08: ユーザーがコースダッシュボードを通じてコース分析を表示できるようにします。ユーザーが受講生の分析を表示できるようにします。
   allows_user_to_view_course_and_student_analytics_f_5e3dca12: ユーザーがコースのホームページや人物のページからコースや受講生の分析を表示できるようにします。
   allows_user_to_view_course_sis_id_3a1818a5: "ユーザーがコースの SIS ID を表示できるようにします。"
-  allows_user_to_view_course_status_choose_home_page_b97cee14: ユーザーがコースステータス、ホームページの選択、およびコース設定チェックリストボタンを表示できるようにします。
-  allows_user_to_view_create_edit_delete_and_publish_48716e21: "ユーザーがページの表示、作成、編集、削除、および公開/非公開できるようにします。 nユーザーがページ履歴の表示およびフロントページを設定できるようにします。 "
+  allows_user_to_view_course_status_choose_home_page_b97cee14: |-
+      ユーザーがコースステータス、ホームページの選択、およびコース設定チェックリ
+      ストボタンを表示できるようにします。
+  allows_user_to_view_create_edit_delete_and_publish_48716e21: "ユーザーがページの表示、作成、編集、削除、および公開/非公開できるようにします。 n\n\
+      \x20　　ユーザーがページ履歴の表示およびフロントページを設定できるようにします。 "
   allows_user_to_view_create_edit_delete_and_publish_9d6c0bfa: |-
       ユーザーがページを表示、作成、編集、削除、公開/非公開できるようにします。
       ユーザーがページの履歴を表示し、フロントページを設定できるようにします。
@@ -2267,6 +2285,7 @@ ja:
   answer_correct_answer_c2c4a20c: "%{answer}, (Correct answer)"
   answer_description_6b353cfd: 回答の説明
   answer_distribution_2a956e3f: 回答の配布
+  answer_field_8c4e7c46: 回答欄
   answer_incorrect_answer_80efe585: "%{answer}, (Incorrect answer)"
   answer_sequence_cfeda025: 解答順序
   answer_text_80_character_limit_2fce1113: 解答テキスト(最大80文字まで)
@@ -3263,6 +3282,8 @@ ja:
     upload_error_too_many_redirects: リダイレクトが多すぎます
     upload_error_unexpected: "%{url} からのダウンロードの際に、不明なエラーが発生しました"
   attachment_deffe5a9: 添付ファイル
+  attempt_1_7ba3c30f: 施行1
+  attempt_1_grade_484b35e4: "施行1：%{grade}"
   attempt_3dd42b18: 試行
   attempt_current_attempt_ef626179: "%{current_attempt} 試行"
   attempt_current_attempt_of_max_attempts_427ed508: "試行 %{current_attempt} / %{max_attempts}"
@@ -3355,8 +3376,9 @@ ja:
       test_ldap_search_label: "LDAP 検索をテストしています..."
     linkedin_fields: 
       description: |-
-          [LinkedIn でアプリ登録](%{linkedin_url})を行う必要があります。
-          OAuth 2.0の承認済みリダイレクトURLとして %{callback_url} を追加し、アプリケーションステータスを「Live」に設定する必要があります。アプリケーションを作成したら、クライアント ID とクライアントシークレットを書き留め、ここに入力します。
+          [LinkedIn でアプリ登録](%{linkedin_url})を行う必要があります。OAuth 2.0の承認済みリダイレクト
+          URLとして %{callback_url} を追加し、アプリケーションステータスを「Live」に設定する必要があります。
+          アプリケーションを作成したら、クライアント ID とクライアントシークレットを書き留め、ここに入力します。
     login_required: 入力が必要です
     no_changing_auth_types: 認証設定の種類は変更できません。削除した後、新しい設定を作成してください。
     password_required: 入力が必要です
@@ -3511,8 +3533,8 @@ ja:
   blueprint_course_sync_in_progress_a1e2622b: 青写真コースの同期が進行中です
   blueprint_courses_9dd321b8: 青写真コース
   blueprint_courses_add_edit_associate_delete_bc26d5c2: "ブループリントコース - 追加/編集/関連/削除"
-  blueprint_courses_are_an_account_level_feature_opt_3388f731: "ブループリントコースはアカウントレベルの機能オプションです。\n\n\
-      ディスカッションインデックスページから Blueprint ロック設定を編集するには、コース - 追加/編集/削除とディスカッション - 調整も有効にしなければなりません。 "
+  blueprint_courses_are_an_account_level_feature_opt_3388f731: "ブループリントコースはアカウントレベルの機能オプションです。\n\
+      \x20 n  n　　ディスカッションインデックスページから Blueprint ロック設定を編集するには、コース - 追加/編集/削除とディスカッション - 調整も有効にしなければなりません。 "
   blueprint_courses_create_edit_associate_delete_bf41988e: ブループリントコース（作成/編集/関連/削除）
   blueprint_courses_is_an_account_level_feature_opti_38676924: "Blueprint コースは、アカウントレベルの機能オプションです。コースの役割は、Blueprint コースを講師、TA、またはデザイナーの役割として Blueprint コースに追加する場合にのみ、Blueprint コースを管理できます。Blueprint コースのサイドバーにアクセスするには、コース - コースの追加/編集/削除が有効でなければなりません。関連するコースを追加するには、コース - 表示リストとコース - 追加/編集/削除も有効でなければなりません。いずれかの Blueprint オブジェクトタイプのロック設定を編集するには、コース - 追加/編集/削除が有効でなければなりません。"
   blueprint_courses_is_an_account_level_feature_opti_3bf307d: "Blueprint コースは、アカウントレベルの機能オプションです。ディスカッションインデックスページの Blueprint ロック設定を編集するには、コース - 追加/編集/削除とディスカッション - 表示も有効でなければなりません。この権限が有効でなく、コース - 追加/編集/削除およびディスカッション - 表示が有効になっている場合、Blueprint ロックの設定は個々のディスカッションで編集できます。"
@@ -3561,11 +3583,11 @@ ja:
   bookmarks_5b5b81c9: ブックマーク
   both_discussions_create_and_discussions_moderate_a_c238f67: |-
       「ディスカッション - 作成」と「ディスカッション - 仲介」のどちらも、ディスカッションページにディスカッションを作成できるようにします。この権限が有効な場合、「ディスカッション - 作成」は必須ではありません。
-      コースでディスカッションを表示するには、ディスカッション - 表示も有効にされていなければなりません。
+              コースでディスカッションを表示するには、ディスカッション - 表示も有効にされていなければなりません。
       ディスカッションに返信するには、ディスカッション - 投稿も有効にされていなければなりません。ディスカッションの課題の詳細を編集するには、課題とクイズ - 追加/編集/削除も有効でなければなりません。
   both_discussions_create_and_discussions_moderate_a_f20cc937: |-
       「ディスカッション - 作成」と「ディスカッション - 仲介」のどちらも、ディスカッションページにディスカッションを作成できるようにします。この権限が有効な場合、「ディスカッション - 作成」は必須ではありません。
-      コースでディスカッションを表示するには、ディスカッション - 表示も有効にされていなければなりません。
+              コースでディスカッションを表示するには、ディスカッション - 表示も有効にされていなければなりません。
       ディスカッションに返信するには、ディスカッション - 投稿も有効にされていなければなりません。
       ディスカッションの課題の詳細を編集するには、課題とクイズ - 追加/編集/削除も有効でなければなりません。
   bottom_15a2a9be: 下
@@ -3577,7 +3599,9 @@ ja:
   breadcrumb_1_cb3c504: ブレッドクラム1
   breadcrumb_2_95ba94be: ブレッドクラム2
   brick_f2656265: ブロック
-  bring_existing_content_from_another_course_or_cour_6e740692: 他のコースまたはコース管理システムの既存のコンテンツをCanvasコースに持ち込みます。
+  bring_existing_content_from_another_course_or_cour_6e740692: |-
+      他のコースまたはコース管理システムの既存のコンテンツを
+                Canvasコースに持ち込みます。
   bring_existing_content_from_another_course_or_cour_9dc6453d: 他のコースまたはコース管理システムの既存のコンテンツをCanvasコースに持ち込みます。
   bring_your_content_into_your_course_c0f3df7e: 自分のコンテンツを自分のコースに持ち込む
   broccoli_cloud: 
@@ -3594,7 +3618,10 @@ ja:
       コンテンツと教育リソースを含むビルドページ
       受講者の学習を支援しますが、課題はありません。テキストを含む、
       マルチメディア、およびファイルと外部リソースへのリンクが含まれます。
-  build_pages_containing_content_and_educational_res_6474319f: コンテンツと教育リソースを含むビルドページ受講者の学習を支援しますが、課題はありません。テキストを含む、マルチメディア、およびファイルと外部リソースへのリンクが含まれます。
+  build_pages_containing_content_and_educational_res_6474319f: |-
+      コンテンツと教育リソースを含むビルドページ受講者の学習を支援しますが、
+                      課題はありません。テキストを含む、マルチメディア、および
+                      ファイルと外部リソースへのリンクが含まれます。
   bulk_course_migration: 
     export_failed: "bb_lcid %{id} のコースを Blackboard からエクスポートする際にエラーが発生しました"
     export_failed_no_id: コースをインポートする際にエラーが発生しました
@@ -3702,7 +3729,9 @@ ja:
     view_account_roster: アカウント名簿の表示
     view_course_roster: コース名簿の表示
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: デフォルトでは、コースのすべてのリンクが有効になっています。受講生はコンテンツのないセクションへのリンクは参照できません。例えば、クイズを作成していない場合は、受講生はクイズへのリンクを参照できません。コース内に受講生にアクセスさせたくない領域がある場合は、このようなリンクを並べ替えて明示的に無効化することができます。
-  by_default_students_are_able_to_create_groups_to_r_ba7f2450: デフォルトで、受講生はグループを作成できます。受講生がグループを作成するのを制限するには、コース設定で受講生が自分のグループを整理するチェックボックスをオフにします。
+  by_default_students_are_able_to_create_groups_to_r_ba7f2450: |-
+      デフォルトで、受講生はグループを作成できます。受講生がグループを作成するのを制限するには、
+      コース設定で受講生が自分のグループを整理するチェックボックスをオフにします。
   by_default_students_can_always_create_groups_in_a__149d08b7: "デフォルトで、受講生はグループを作成できます。受講生がグループを作成するのを制限するには、コース - 追加/編集/削除が有効にされていなければなりません。また、コース設定で受講生が自分のグループを整理するチェックボックスがオフにされていなければなりません。"
   by_lti_2_registration_url_e421e523: "LTI 2 登録 URL"
   by_url_a163275e: "URL ごと"
@@ -4126,9 +4155,9 @@ ja:
   can_edit_this_page_role_selection_6ccec3c7: このページの役割の選択を編集できます
   can_interact_with_users_in_their_section_only_48cb8c43: セクション内のユーザーのみと対話することができます
   can_t_compute_score_until_an_assignment_has_points_f34dd600: 課題に配点を設定するまで、スコアは計算できません
-  can_t_delete_alignments_based_on_rubric_associatio_1a10fcce: "\n\
-      \x20                   ルービックの関連付けに基づく線形を削除することはできません。\n\
-      \x20                   これらの関連付けを削除するには、アセットのルービックから行を削除する必要があります\"\n\
+  can_t_delete_alignments_based_on_rubric_associatio_1a10fcce: "\n\n\
+      \x20                   ルービックの関連付けに基づく線形を削除することはできません。\n\n\
+      \x20                   これらの関連付けを削除するには、アセットのルービックから行を削除する必要があります\"\n\n\
       \x20                 "
   can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: 注釈への関連付けに基づいたアライメントは削除できません。これらの関連付けを削除するには、そのアセットの注釈から当該行を削除する必要があります
   can_t_enable_anonymous_grading_and_group_assignmen_9938416e: 匿名の採点とグループ課題を一緒に使用することはできません
@@ -4205,6 +4234,8 @@ ja:
   canvas_alert_graded_assignment_context_for_name_459fdf31: "Canvas アラート - 採点済み：%{assignment}、（）の %{context}%{name}"
   canvas_alert_invited_course_as_role_type_9ed79ce3: "Canvas アラート - コースに招待されています: %{role_type}として%{course}へ"
   canvas_alert_invited_course_as_role_type_ea825937: "Canvas アラート - コースに招待されています: %{role_type}として"
+  canvas_alert_late_anonymous_submission_assignment__bf9a6452: "Canvas アラート - 匿名提出の遅れ：%{assignment_name}"
+  canvas_alert_late_submission_user_name_assignment__ee1301ac: "Canvas アラート - 提出の遅れ：%{user_name}, %{assignment_name}"
   canvas_attribute_eaa7e31a: "Canvas 属性"
   canvas_by_instructure_1490381: "Canvas by Instructure"
   canvas_cartridge_description: "これは、Canvas のエクスポートを JSON 形式の中間ファイルに変換し、インポートできるようにします。"
@@ -4477,13 +4508,13 @@ ja:
       collaboration_name: "%{course_or_group_name} の共同作業"
       descriptions: 
         etherpad: |-
-            EtherPad は、共有文書を素早くセットアップできるオープンソース プロジェクトです。ほかの人が入力している内容を見るには十分な速度です。一方、"パッド" はパスワードで保護されていないため、アクセスできる人なら誰でも編集できます。匿名性をサポートしたい場合や、Google アカウントを持っていない人でも参加できるようにしたい場合、Google ドキュメントよりも EtherPad の方が適しています。⏎
-            ⏎
+            EtherPad は、共有文書を素早くセットアップできるオープンソース プロジェクトです。ほかの人が入力している内容を見るには十分な速度です。一方、"パッド" はパスワードで保護されていないため、アクセスできる人なら誰でも編集できます。匿名性をサポートしたい場合や、Google アカウントを持っていない人でも参加できるようにしたい場合、Google ドキュメントよりも EtherPad の方が適しています。
+              
             **警告**: 編集内容を誤って削除することのないよう [EtherPad の削除ポリシー](%{etherpad_deletion_policy_url}) を十分に理解する必要があります。
         google_docs: |-
             Google ドキュメントは、グループ プロジェクトで共同作業するための素晴らしい場です。Microsoft Word と似ていますが、電子メールでやりとりしなくても、同じファイルに対して他の人と同時に作業することができます。
-            
-            **警告**:Google ドキュメントの共同作業に参加するためには、ご自分も (すべての共同作業者も) Google アカウントを持つ必要があります。
+              
+            **警告**: Google ドキュメントの共同作業に参加するためには、ご自分も (すべての共同作業者も) Google アカウントを持つ必要があります。
       labels: 
         collaboration_type: "次のものを使用した共同作業:"
         description: "説明:"
@@ -4568,7 +4599,10 @@ ja:
   common_timezones_2b00baba: 共通のタイムゾーン
   commons_ed0252fb: Commons
   communicate_to_your_students_exactly_what_will_be__57a679c5: "受講者に、コース全体を通して正確に何が必要なのかを時系列で伝えます。   作成した課題とイベントに基づいて、ビルトインシラバスを生成します。"
-  communicate_to_your_students_exactly_what_will_be__7312d45d: 受講者に、コース全体を通して正確に何が必要なのかを時系列で伝えます。作成した課題とイベントに基づいて、ビルトインシラバスを生成します。
+  communicate_to_your_students_exactly_what_will_be__7312d45d: |-
+      受講者に、コース全体を通して正確に何が必要なのかを時
+                系列で伝えます。作成した課題とイベントに基
+                づいて、ビルトインシラバスを生成します。
   communication_5255723c: コミュニケーション
   communication_channel: 
     body: "Canvas 検証コードは %{verification_code} です"
@@ -4600,7 +4634,7 @@ ja:
         account_exists: |-
             %{email} に関連付けられたアカウントが既に存在しています。
             
-            **あなたは %{name} ですか?**
+              **あなたは %{name} ですか?**
         account_needed: "**%{course}** に招待されています。この要求を受諾するには、Canvas アカウントが必要です。下のリンクをクリックして、Canvas アカウントを作成してください。"
         add_email: "この電子メール アドレスを現在のアカウントに追加しますか?"
         choose_login: ログイン先を選択してください。
@@ -4655,7 +4689,11 @@ ja:
   conditional_content_b284da8f: 条件付きコンテンツ
   conditional_release_d206e93b: 条件付きのリリース
   conduct_virtual_lectures_virtual_office_hours_and__959d6996: 仮想講義、仮想営業時間、受講者グループを実施する。リアルタイムのオーディオとビデオのブロードキャスト、プレゼンテーションスライドの共有、アプリケーションやオンラインリソースのデモンストレーションなどを行います。
-  conduct_virtual_lectures_virtual_office_hours_and__cc05907b: 仮想講義、仮想営業時間、受講者グループを実施する。リアルタイムのオーディオとビデオのブロードキャスト、プレゼンテーションスライドの共有、アプリケーションやオンラインリソースのデモンストレーションなどを行います。
+  conduct_virtual_lectures_virtual_office_hours_and__cc05907b: |-
+      仮想講義、仮想営業時間、受講者グループを実施する。
+                リアルタイムのオーディオとビデオのブロードキャスト、
+                プレゼンテーションスライドの共有、アプリケーションやオ
+                ンラインリソースのデモンストレーションなどを行います。
   conference_was_deleted_30869390: カンファレンスが削除されました
   conferences: 
     concluded_conference: 
@@ -4668,8 +4706,8 @@ ja:
       view: 表示
     confirm: 
       close: |-
-          この会議を終了してもよろしいですか?⏎
-          ⏎
+          この会議を終了してもよろしいですか?
+          
           もう一度開くことはできません。
       delete: この会議を削除してもよろしいですか?
     disabled_error: "この Canvas サイトでは Web 会議は使用可能になっていません"
@@ -5585,6 +5623,7 @@ ja:
   costa_rica_97d66afe: コスタリカ
   could_not_duplicate_discussion_953ed67f: ディスカッションを複製できませんでした
   could_not_save_chosencolor_741b74ce: "'%{chosenColor}'を保存できませんでした"
+  couldn_t_adjust_dates_on_assignment_name_id_id_eaf1c353: "課題 %{name} (ID %{id}) の日付を調整できませんでした"
   couldn_t_find_an_authority_to_update_44d9407e: 更新する権限が見つかりませんでした
   couldn_t_find_canvas_csv_import_headers_487f1b6c: "Canvas CSV インポート ヘッダが見つかりませんでした"
   couldn_t_generate_diff_message_a0528b20: "差分を作成できませんでした: %{message}"
@@ -6597,14 +6636,19 @@ ja:
   create_an_ba36d171: （）を作成
   create_and_administer_online_quizzes_and_surveys_b_7d2fa85f: 採点対象と非採点対象の両方のオンラインクイズとサーベイを作成し、管理します。
   create_announcements_above_1c36202b: 上記のアナウンスメントを作成する
-  create_as_many_discussion_topics_as_needed_as_assi_45ec1df: 採点対象の課題として、またはアイデアや情報を共有するためのフォーラムとして、必要なだけディスカッショントピックを作成します。
+  create_as_many_discussion_topics_as_needed_as_assi_45ec1df: |-
+      採点対象の課題として、またはアイデアや情報を共有するためのフォ
+                ーラムとして、必要なだけディスカッショントピックを作成します。
   create_as_many_discussion_topics_as_needed_as_assi_f1221307: "採点対象の課題として、またはアイデアや情報を共有するためのフォーラムとして、必要なだけディスカッショントピックを作成します。\n"
   create_assessments_with_quizzes_next_and_migrate_e_eaaee5e6: "クイズでアセスメントを作成し、既存の Canvas クイズを移行します。"
   create_assignment_68532ceb: 課題の作成
   create_assignments_on_the_assignments_page_organiz_8838b18a: |-
       課題ページで課題を作成します。課題を整理する
       宿題、クラスワーク、エッセイ、ディスカッションとクイズなどのグループに分けて。課題グループには比重を付けることができます。
-  create_assignments_on_the_assignments_page_organiz_90c78fdc: 課題ページで課題を作成します。宿題、クラスワーク、エッセイ、ディスカッションとクイズなどのグループに分けて、課題を整理する。課題グループには比重を付けることができます。
+  create_assignments_on_the_assignments_page_organiz_90c78fdc: |-
+      課題ページで課題を作成します。宿題、クラスワーク、
+                      エッセイ、ディスカッションとクイズなどのグループに分けて、
+                      課題を整理する。課題グループには比重を付けることができます。
   create_content_for_your_course_500a7032: あなたのコースのコンテンツを作成する
   create_criterion_6df4d4ad: 作成基準
   create_developer_key_78de8510: 開発者鍵を作成する
@@ -6812,8 +6856,8 @@ ja:
       other: "%{count} 個の課題のお知らせを展開"
     confirm: 
       close: |-
-          この会議を終了してもよろしいですか?⏎
-          ⏎
+          この会議を終了してもよろしいですか?
+          
           もう一度開くことはできません。
     conversations_collapse: 
       one: "%{count} 個の会話メッセージを折りたたむ"
@@ -7248,8 +7292,12 @@ ja:
   disabling_post_to_sis_is_not_available_for_non_pub_ee031373: 公開されていないコースではSISへの投稿を無効にすることはできません
   disabling_sync_to_name_failed_e7521ebb: "%{name} への同期の無効化に失敗しました"
   disabling_this_permission_will_override_if_enabled_8d9c42f5: "この権限を無効にすると、ルーブリック - 追加/編集/削除の権限が無効になり（有効な場合）、個々の課題からのルーブリックの作成や編集を禁止します。ただし、学習成果 - 追加/編集/削除が有効になっている場合でも、ユーザーは成果 - ルーブリックの管理を介してルーブリックを追加できます。"
-  disabling_this_permission_will_override_if_enabled_955dfb03: "この権限を無効にすると、ルーブリック - 追加/編集/削除の権限が無効になり（有効な場合）、個々の課題からのルーブリックの作成や編集を禁止します。ただし、学習成果 - 追加/編集/削除が有効になっている場合でも、ユーザーは成果（ルーブリックの管理ボタン）を介してルーブリックを追加できます。"
-  disabling_this_permission_will_override_if_enabled_9c4fa650: "この権限を無効にすると、ルーブリック - 追加/編集/削除の権限が無効になり（有効な場合）、個々の課題からのルーブリックの作成や編集を禁止します。ただし、学習成果 - 追加/編集/削除が有効になっている場合でも、ユーザーは成果（ルーブリックの管理ボタン）を介してルーブリックを追加できます。"
+  disabling_this_permission_will_override_if_enabled_955dfb03: |-
+      この権限を無効にすると、ルーブリック - 追加/編集/削除の権限が無効になり（有効な場合）、個々の課題からのルーブリックの作成や編集を禁止します。
+      ただし、学習成果 - 追加/編集/削除が有効になっている場合でも、ユーザーは成果（ルーブリックの管理ボタン）を介してルーブリックを追加できます。
+  disabling_this_permission_will_override_if_enabled_9c4fa650: |-
+      この権限を無効にすると、ルーブリック - 追加/編集/削除の権限が無効になり（有効な場合）、個々の課題からのルーブリックの作成や編集を禁止します。
+      ただし、学習成果 - 追加/編集/削除が有効になっている場合でも、ユーザーは成果（ルーブリックの管理ボタン）を介してルーブリックを追加できます。
   disallow_comments_6d04b47a: コメントを却下する
   disallow_comments_for_title_21f9c653: "（）へのコメント許可を取り消す%{title}"
   disallow_replies_for_title_ca3806b2: "（）への返信を却下する%{title}"
@@ -7646,6 +7694,7 @@ ja:
   does_not_meet_expectations_b0736d20: 期待値を満たしていない
   domain_3b54c511: ドメイン
   domain_is_required_1d4c8b25: ドメインは必須項目です
+  domain_name_6c783b0: ドメインネーム
   dominican_republic_1_3cef4021: ドミニカ共和国（+1）
   don_t_add_this_user_for_now_32912974: 今はこのユーザーを追加しないでください。
   don_t_move_lti_query_params_to_post_body_21744487: LTIクエリーパラメーターをポストボディーに移動させないでください。
@@ -8831,6 +8880,7 @@ ja:
   files_toolbar_2f2f0976: "ファイル ツールバー"
   files_tutorial_tray_3ad1eea6: ファイルチュートリアルトレイ
   files_uploaded_519844ed: アップロードされたファイル
+  fill_in_the_blank_answer_d83b83bb: 空欄を埋める回答
   fill_in_the_blank_read_surrounding_text_1a6c73c7: 周りのテキストを読み、空白を埋めてください
   filled_5d8c39e: 塗りつぶされた
   filter_9df28e5b: フィルタ：
@@ -8896,8 +8946,8 @@ ja:
   flash_6afbf65a: Flash
   flickr_displays_safesearch_images_within_the_creat_48835f79: |-
       Flickr は、SafeSearchクリエイティブコモンズパブリックドメイン内に画像を表示します。
-      ただし、安全な検索結果は保証されません。一部の画像には   その所有者によって指定された
-      安全レベルが含まれれない場合があるためです。
+                    ただし、安全な検索結果は保証されません。一部の画像にはその所有者によって指定された
+                    安全レベルが含まれれない場合があるためです。
   folder: 
     course_content_folder_name: コースの内容
     default_folder_name: 新しいフォルダ
@@ -9000,9 +9050,9 @@ ja:
   google_docs_40374e65: "Google ドキュメント"
   google_docs_domain_restriction_description: |-
       Google ドキュメントのドメイン制限を使用すると、Google ドキュメントの提出や共同作業を
-      単一のドメインに制限できます。承認されていないドメインで受講生が課題の提出や共同作業への
-      参加を試みると、Google ドキュメント統合の設定を更新する必要があるというエラー メッセージが
-      表示されます。
+      単一のドメインに制限できます。承認されていないドメインで受講生が課題の提出や共同作
+      業への参加を試みると、Google ドキュメント統合の設定を更新する必要があるというエラー
+      メッセージが表示されます。
   google_docs_preview_9f41b23c: "Google ドキュメントのプレビュー"
   google_drive_7cb003c9: "Google ドライブ"
   google_template_29640bc0: "Google テンプレート"
@@ -9030,6 +9080,7 @@ ja:
   grade_export_title: 成績のエクスポート
   grade_for_name_b9df168a: "成績：%{name}"
   grade_for_studentname_d124b199: "成績：%{studentName}"
+  grade_grade_7e52dd1c: "成績：%{grade}"
   grade_high_to_low_1cea0381: "グレード - 高〜低"
   grade_history_9c51ad49: 採点履歴...
   grade_history_ccc09fde: 採点履歴
@@ -10264,10 +10315,11 @@ ja:
       グループはコースの小型版のようなもので、限られた数の受講生とより狭い範囲のプロジェクト
       で学習を進めることができます。
   groups_are_a_good_place_to_collaborate_on_projects_fdfe57a9: |-
-      グループは、プロジェクトの共同作業や勉強会のスケジュールなどを把握するのに適した場所ですすべてのグループは、
-      予定、ウィキ、ディスカッション、そしてファイル保管用のわずかなスペースを入手します。グループは、ドキュメント上で共同作業を行うことも、
-      ウェブ会議をスケジュールすることもできます。それは本当にミニコースのようなもので、少人数の受講生と一緒により焦点を絞ったプロ
-      ジェクトに取り組めます。
+      グループは、プロジェクトの共同作業や勉強会のスケジュールなどを把握するのに適した場所で
+                    すすべてのグループは、予定、ウィキ、ディスカッション、そしてファイル保管用のわずかなスペース
+                    を入手します。グループは、ドキュメント上で共同作業を行うことも、ウェブ会議をスケジュールする
+                    こともできます。それは本当にミニコースのようなもので、少人数の受講生と一緒により焦点を絞っ
+                    たプロジェクトに取り組めます。
   groups_cannot_have_size_restrictions_to_assign_by__7d36fa32: グループにサイズ制限があると、セクションごとに課題を割り当てることはできません
   groups_course_c73e4c2c: グループ（コース）
   groups_must_be_empty_to_assign_by_section_a9fafa72: セクションごに課題を割り当てるには、グループは空欄でなければなりません
@@ -10286,15 +10338,15 @@ ja:
   hello_name_your_outcomes_import_failed_due_to_an_e_385db5d3: |-
       こんにちは、%{name}さん、
       
-      あなたのインポートのエラーの結果、インポートに失敗しました。ファイルを確認して、 %{url} でアップロードを再試行してください
+            あなたのインポートのエラーの結果、インポートに失敗しました。ファイルを確認して、 %{url} でアップロードを再試行してください
       
-      次のエラーが起こりました：
-      %{row}
+            次のエラーが起こりました：
+            %{row}
       
-      適切なインポートフォーマットを表示するには、Canvas API Docs を %{doc_url} で確認してください
+            適切なインポートフォーマットを表示するには、Canvas API Docs を %{doc_url} で確認してください
       
-      敬具
-      Instructure
+            敬具
+            Instructure
   hello_name_your_outcomes_import_failed_due_to_erro_4c3f236b: |-
       こんにちは、%{name}さん、
       
@@ -10310,21 +10362,21 @@ ja:
   hello_name_your_outcomes_were_successfully_importe_a510e0d: |-
       こんにちは、%{name}さん、
       
-      結果は正常にインポートされました。これにより結果は%{url}で管理できるようになりました
+              結果は正常にインポートされました。これにより結果は%{url}で管理できるようになりました
       
-      敬具
-      Instructure
+              敬具
+              Instructure
   hello_name_your_outcomes_were_successfully_importe_d0c37335: |-
       こんにちは、%{name}さん、
       
-      結果は正常にインポートされましたが、次の問題があります（最初の100件までの警告）。
+              結果は正常にインポートされましたが、次の問題があります（最初の100件までの警告）。
       
-      %{rows}
+              %{rows}
       
-      これにより結果は%{url}で管理できるようになりました
+              これにより結果は%{url}で管理できるようになりました
       
-      敬具
-      Instructure
+              敬具
+              Instructure
   help_4c4968b1: ヘルプ
   help_dialog: 
     Back: 戻る
@@ -10515,9 +10567,11 @@ ja:
   if_disabled_user_will_still_have_access_to_course__6816d525: |-
       無効にしても、ユーザーは引き続きコース設定にアクセスできます。
       
-      ユーザーは、そのコンテンツアイテムに対する適切な許可なしに、個々のコースの内容を管理することはできません。
+              ユーザーは、そのコンテンツアイテムに対する適切な許可なしに、
+              個々のコースの内容を管理することはできません。
       
-      コースの表示がコースに登録されているユーザーに限定されている場合、この権限により、ユーザーはコースに登録されていなくてもコースの内容を表示できるようになります。
+              コースの表示がコースに登録されているユーザーに限定されている場合、この権限により、
+              ユーザーはコースに登録されていなくてもコースの内容を表示できるようになります。
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "有効にすると、LTI 1.3およびLTI Advantage へのアクセスが有効になります。"
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: 有効にすると、結果の最大可能スコア以上がルブリックで許可されます。
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "有効にすると、Common CartridgeインポータがHTMLファイルをページに変換します"
@@ -10537,7 +10591,10 @@ ja:
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: (ユーザが選択されていない場合は、すべてのサブアカウントのユーザに送信されます)
   if_statistics_view_or_users_manage_login_details_i_da650b69: "統計 - 表示またはユーザー - ログインの詳細の管理が有効な場合、ユーザーは管理ツールでログイン/ログアウトアクティビティを生成できます。管理ツールでログイン/ログアウトアクティビティオプションを非表示にするには、これらの権限が両方とも無効にされていなければなりません。"
   if_the_open_registration_account_setting_is_enable_f3b9a75f: "オープン登録アカウント設定を有効にすると、この権限を持つユーザーは、受講生またはオブザーバーに Canvas アカウントがない場合でも、電子メールアドレスまたはログインIDを使用して受講生またはオブザーバーをコースに追加できます。"
-  if_this_permission_is_disabled_and_courses_add_edi_9bafd797: "この権限が無効で、コース - 追加/編集/削除が有効になっている場合、ユーザーはアカウント設定の新しいコースの追加ボタンで新しいコースを追加できます。"
+  if_this_permission_is_disabled_and_courses_add_edi_9bafd797: |-
+      この権限が無効で、コース - 追加/編集/削除が有効になっている場合、
+      ユーザーはアカウント設定の新しいコースの追加ボタンで新しいコースを
+      追加できます。
   if_this_permission_is_disabled_at_the_account_leve_39648abb: "この権限が無効な場合、ユーザーはアカウントレベルでは既存のアカウントグループを表示できません。コースレベルでは、ユーザーは受講生が作成したグループを含め既存のグループを表示できますが、アクセスはできません。グループを表示するには、ユーザー - 表示リストも有効でなければなりません。CSV経由でアカウントレベルのグループを追加するには、SISデータインポートも有効でなければなりません。"
   if_this_permission_is_disabled_users_can_only_view_b68143d5: この権限が無効な場合、ユーザーは受講生が作成したグループを含む既存のグループのみを表示できます。
   if_this_permission_is_disabled_users_can_still_cre_76a2d4b8: "この権限を無効にしても、課題とクイズ - 追加/編集/削除が有効になっている場合、ユーザーは依然として課題にルーブリックを作成または追加できます。"
@@ -10557,10 +10614,10 @@ ja:
   if_you_leave_the_zip_file_download_currently_being_c47c1dfb: "退出すると、現在準備中の zip ファイルのダウンロードはキャンセルされます。"
   if_you_made_changes_to_the_student_submission_file_e006d49b: |-
       以前にダウンロードした、その受講生からの提出ファイルに変更を加えた場合は
-      zip ファイルに圧縮し直して、下のフォームと一緒にアップロードしてください。
-      受講生には、提出用のコメント内に、修正済みのファイルが表示されます。
+        zip ファイルに圧縮し直して、下のフォームと一緒にアップロードしてください。
+        受講生には、提出用のコメント内に、修正済みのファイルが表示されます。
       
-      *ファイル名で区別しますので、提出ファイルのファイル名は変更しないでください。*
+        *ファイル名で区別しますので、提出ファイルのファイル名は変更しないでください。*
   if_you_ve_been_using_another_course_management_sys_67edfab1: "別のコース管理システムをご利用になっていた場合は、そのシステム上のコンテンツを Canvas に移動したいとお考えでしょう。そのようなご希望をお持ちの方のために、コンテンツを簡単に Canvas に移行するためのプロセスを、順を追ってご説明します。"
   if_you_wish_you_can_rename_sis_to_something_more_f_ac9ef13b: ご希望の場合には、「SIS」の名前をスタッフにもっと馴染み深いものに変更することができます
   if_you_would_like_to_keep_your_unsubmitted_comment_b7e349ce: 未送信のコメントを保存したい場合、このページを出る前にそれらを保存して下さい。
@@ -10653,7 +10710,7 @@ ja:
   include_scores_when_alerting_about_grades_89728ae1: 成績に関する通知をする場合は、スコアを含むようにしてください。
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
       成績に関するアラートには、スコアを記載してください。
-      使用している電子メールが教育機関の電子メールでない場合は、機密情報を含むコンテンツが教育機関外部に送信されることになります。
+                使用している電子メールが教育機関の電子メールでない場合は、機密情報を含むコンテンツが教育機関外部に送信されることになります。
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: 学校の受講生情報システムに投稿する際にこの課題の成績を含める
   include_this_assignment_s_grades_when_syncing_to_y_55bfa487: あなたの学校の受講生情報システムと同期するとき、にこの課題の成績を含める
   include_unpublished_assignments_83ebbaec: 未公開の課題を含む
@@ -10684,6 +10741,7 @@ ja:
   information_7f11072: 情報
   information_816d9fa5: 情報
   information_icon_8a514faa: インフォメーションのアイコン
+  inherit_whitelist_will_be_inherited_from_the_paren_fddf0d5c: "継承 - ホワイトリストは親アカウントから継承されます。ドメインを追加することはできますが、この設定をオンに変更するまでドメインは適用されません。"
   inherited_d4d0bc33: 引き継がれた
   inherited_developer_keys_table_e4a65b67: 引き継がれた開発者キーの表
   inner_box_background_6f9092f: インナーボックスの背景
@@ -10692,7 +10750,10 @@ ja:
       受講者の成績を入力し、配布する。成績を次のように表示する
       ポイント、パーセンテージ、完全または不完全、合格または不合格、GPAスケール、
       レター成績。成績比重のグループ課題。
-  input_and_distribute_grades_for_students_display_g_9a2e46a0: 受講者の成績を入力し、配布する。成績を、ポイント、パーセンテージ、完全または不完全、合格または不合格、GPAスケール、レター成績として表示する。成績比重のグループ課題。
+  input_and_distribute_grades_for_students_display_g_9a2e46a0: |-
+      受講者の成績を入力し、配布する。成績を、ポイント、パーセンテージ、
+                完全または不完全、合格または不合格、GPAスケール、レター成績とし
+                て表示する。成績比重のグループ課題。
   insert_equella_links_49a8dacd: "Equella リンクを挿入してください"
   insert_math_equation_57c6e767: 数学数式を挿入
   insert_row_below_25187f89: 下に行を挿入
@@ -10772,6 +10833,7 @@ ja:
       enter_search_terms: 検索語を入力
   instructure_default_73317bb1: 講師デフォルト
   instructure_default_old_66ef6e9b: 講師デフォルト（旧）
+  instructure_legacy_a2cacda7: 構造の継承
   integration_id_8a20b328: "統合 ID"
   integration_id_a6977535: "統合 ID："
   integration_id_int_id_is_already_in_use_f30f03b5: "SIS ID \"%{int_id}\" は既に使用されています"
@@ -10792,6 +10854,7 @@ ja:
   invalid_date_or_invalid_datetime_for_attr_6661103f: "無効な日付または無効な日時%{attr}"
   invalid_datetime_for_graded_since_884cce5: （）の無効な日付graded_since
   invalid_datetime_for_submitted_since_a238f3a6: （）の無効な日付submitted_since
+  invalid_domain_e810c1d: 無効なドメイン
   invalid_field_type_61d31870: "無効な %{field}：\"%{type}\""
   invalid_fields_after_ratings_fields_815ff223: "採点後無効なフィールド：%{fields}"
   invalid_fields_fields_8698284: "無効なフィールド：%{fields}"
@@ -10968,12 +11031,18 @@ ja:
   last_user_access_title: "最終ユーザ アクセス"
   late_2be42b88: 遅れる
   late_8bd684b6: 遅延
+  late_anonymous_assignment_a_student_has_submitted__60158b6a: "遅れた匿名の課題：受講生が、%{assignment_title}を遅れて提出しました"
+  late_anonymous_assignment_assignment_name_b541c517: "遅れた匿名の課題：%{assignment_name}"
   late_anonymous_assignment_user_name_has_submitted__f1ec191d: "遅れた匿名の課題：%{user_name}遅れて提出しました%{assignment_title}"
+  late_assignment_user_name_assignment_name_2df32e01: "遅れた課題：%{user_name}, %{assignment_name}"
   late_assignment_user_name_has_submitted_late_for_a_ce1a2d41: "遅れた課題：%{user_name}遅れて提出しました%{assignment_title}"
   late_bd436902: 遅延
   late_penalty_78099d18: 遅延ペナルティ：
   late_penalty_817fff4e: 遅延ペナルティ：
   late_penalty_9c312b22: 遅延ペナルティ：
+  late_penalty_minus_count_points_810572fe: 
+    one: "遅延ペナルティ： -  マイナス%{count}ポイント"
+    other: "遅延ペナルティ： -  マイナス%{count}ポイント"
   late_penalty_pointsdeducted_7033a095: "遅延ペナルティ：%{pointsDeducted}"
   late_penalty_pointsdeducted_dac023ff: "遅延ペナルティ：*%{pointsDeducted}*"
   late_percent_b91d01b3: "遅延: %{percent}"
@@ -10981,6 +11050,10 @@ ja:
   late_policies_fd5dced6: 遅延ポリシー
   late_policies_updated_2ecf9aff: 遅延ポリシーが更新されました
   late_policy_9d0e76b5: 遅延ポリシー
+  late_policy_d3f95a91: 遅延ポリシー：
+  late_policy_minus_count_points_1a945541: 
+    one: "遅延ペナルティ： -  マイナス%{count}ポイント"
+    other: "遅延ペナルティ： -  マイナス%{count}ポイント"
   late_submission_deduction_interval_b9fca334: 遅延提出控除の間隔
   late_submission_deduction_must_be_between_0_and_10_9cde872d: 遅延提出控除は、0と100の間でなければなりません
   late_submission_deduction_must_be_numeric_5b3f468e: 遅延提出控除は数値でなければなりません
@@ -11020,7 +11093,11 @@ ja:
   learn_more_about_collaborations_2978f66d: コラボレーションについての詳細を確認する
   learning_mastery_5fc34276: 学習の達成度
   learning_mastery_6ed4fd63: 学習マスタリー...
-  learning_mastery_gradebook_description: 講師は、学習の達成度の成績表を使用して、コース学習成果における受講生およびコースの進捗を簡単に表示できます。成果は成績表のような形式で表示され、受講生の進捗が、数字のスコアや達成/ほぼ達成/補習として表示されます。
+  learning_mastery_gradebook_description: |-
+      講師は、学習の達成度の成績表を使用して、コース学習成果における受講生
+      およびコースの進捗を簡単に表示できます。成果は成績表のような形式で表
+      示され、受講生の進捗が、数字のスコアや達成/ほぼ達成/補習として表示さ
+      れます。
   learning_object_1f9e5dd8: 学習オブジェクト
   learning_outcome: 
     no_comment: コメントなし
@@ -11036,10 +11113,10 @@ ja:
   learning_outcomes_add_edit_delete_b686457a: "学習結果 - 追加/編集/削除"
   learning_outcomes_can_be_included_in_assignment_ru_a48bb903: |
       
-      学習成果は、特定の課題に合わせた成果の
-      習熟を評価する簡単な方法として、課題ルーブリックに含めることができます。学習
-      成果を定義する際には、
-      課題ルーブリックビルド時に使用できる基準も定義しなければなりません。必要なだけの数のルーブリック列を定義し、この成果の習得を定義するために使用される
+      学習成果は、特定の課題に合わせた成果の習熟を評価する簡単な方法として、
+      課題ルーブリックに含めることができます。学習成果を定義する際には、課題ル
+      ーブリックビルド時に使用できる基準も定義しなければなりません。必要なだけ
+      の数のルーブリック列を定義し、この成果の習得を定義するために使用される
       ポイントの閾値を指定します。
   learning_outcomes_import_eca3a09c: "学習結果 - インポート"
   leave_5e852989: 退出
@@ -11115,17 +11192,17 @@ ja:
     incoming_message_processor: 
       failure_message: 
         body: |-
-            "%{subject}"というタイトルのメッセージを配信できませんでした。メッセージは、不明なメールボックス アドレスに送信されました。Canvas を通じて誰かに連絡を取ろうとしている場合は、ご自分のアカウントにログインして、受信トレイ ツールを使用してメッセージを送信してみることができます。⏎
-            ⏎
-            今後ともよろしくお願いいたします。⏎
-            Canvas サポート
+            "%{subject}"というタイトルのメッセージを配信できませんでした。メッセージは、不明なメールボックス アドレスに送信されました。Canvas を通じて誰かに連絡を取ろうとしている場合は、ご自分のアカウントにログインして、受信トレイ ツールを使用してメッセージを送信してみることができます。
+            
+                      今後ともよろしくお願いいたします。
+                      Canvas サポート
         subject: "メッセージの返信に失敗: %{subject}"
       locked_topic: 
         body: |-
-            ディスカッション トピックがロックされているため、"%{subject}" というタイトルのメッセージを配信できませんでした。Canvas を通じて誰かに連絡を取ろうとしている場合は、ご自分のアカウントにログインして、受信トレイ ツールからメッセージを送信してみてください。⏎
-            ⏎
-            今後ともよろしくお願いいたします。 ⏎
-            Canvas サポート
+            ディスカッション トピックがロックされているため、"%{subject}" というタイトルのメッセージを配信できませんでした。Canvas を通じて誰かに連絡を取ろうとしている場合は、ご自分のアカウントにログインして、受信トレイ ツールからメッセージを送信してみてください。
+            
+                      今後ともよろしくお願いいたします。 
+                      Canvas サポート
         subject: "メッセージの返信に失敗: %{subject}"
     progress_runner: 
       completed_message: 
@@ -11355,9 +11432,12 @@ ja:
           verify: 検証
         details: 
           mfa_enrollment: |-
-              マルチファクター認証は、Canvas にログインするためにパスワードを知ることに加えて、物理的になにかを所有することを要求することにより、セキュリティを強化します。これには、確認コードを生成できるデバイスや、テキストメッセージを受信できる電話機などがあります。下記のQRコードをスキャンして、[iPhone](%{iphone_url}) または
-              [Android](%{android_url}) の Google 認証システムアプリを設定することができます。他のトークンは、
-              秘密鍵 **%{secret_key}** を入力して設定できます。マルチファクタ認証を設定したらご自分のプロファイルページに進み、通常のマルチファクターデバイスが利用できない場合に備えて、一連のバックアップコードを印刷することをお勧めします。
+              マルチファクター認証は、Canvas にログインするためにパスワードを知ることに加えて、物理的になにかを所有す
+              ることを要求することにより、セキュリティを強化します。これには、確認コードを生成できるデバイスや、テキストメッ
+              セージを受信できる電話機などがあります。下記のQRコードをスキャンして、[iPhone](%{iphone_url})または
+              [Android](%{android_url}) の Google 認証システムアプリを設定することができます。他のトークンは、秘密鍵
+              **%{secret_key}** を入力して設定できます。マルチファクタ認証を設定したらご自分のプロファイルページに進み、
+              通常のマルチファクターデバイスが利用できない場合に備えて、一連のバックアップコードを印刷することをお勧めします。
           mfa_required: マルチファクタ認証を設定する必要があります。
           otp_on_device: トークンによって示される検証コードを入力してください。
           otp_sent_to_phone: 電話機に送信された検証コードをここに入力してください。
@@ -12255,7 +12335,9 @@ ja:
         subject: "登録の確認: %{product_name}"
     confirm_sms_communication_channel: 
       sms: 
-        body: "%{website} から、%{user} さんのCanvas 登録をコード %{confirmation_code} を使い完了してください"
+        body: |-
+            %{website} から、
+            %{user} さんのCanvas 登録をコード %{confirmation_code} を使い完了してください
     content_export_failed: 
       email: 
         body: |-
@@ -13617,6 +13699,7 @@ ja:
   more_courses_5ebbe998: その他のコース
   more_importantly_canvas_allows_you_to_add_outcomes_78822cf: "さらに重要なことに、Canvas では成績表に成果を追加できるため、成績を評価する際に習得を評価することができます。成果を設定したら、[ルーブリックスの管理]をクリックして、成果の採点への使用を開始します。"
   more_info_at_course_name_56dc8c10: "詳細は %{course_name} をご覧ください"
+  more_info_at_web_address_dba7e187: "詳細は%{web_address}まで"
   more_information_3dfb76b5: 詳細
   more_information_about_ratings_57cdd446: 格付け評価に関する詳細情報
   more_modules_d9a9f003: より多くのモジュール
@@ -13690,6 +13773,7 @@ ja:
   multiple_are_marked_current_theme_because_the_same_3bdebbe1: 同じ値が複数の名前の下に保存されている、つまり現在適用されているものと同じ名前なので、複数のものが「現在のテーマ」とマークされています
   multiple_ba5220cd: 複数
   multiple_canvas_accounts_are_associated_with_cleve_c1739660: "複数のCanvasのアカウントは、Clever District %{district_id}に関連しています。"
+  multiple_dropdowns_read_surrounding_text_f61274b3: 複数のドロップダウン、周囲のテキストを読む
   multiple_due_dates_283dd861: 複数の締切日
   multiple_due_dates_6b0d75c6: 複数の期日
   multiple_modules_930713d4: 複数のモジュール
@@ -13836,7 +13920,12 @@ ja:
   new_rating_created_54125331: 新しい評価が作成されました
   new_sis_integrations: |-
       この機能は、既存のSIS Canvas統合を備えた機関に適用されます。
-      現在Canvasでグレードパスバックソリューションまたはパートナー製品を使用しているお客様は、この機能を有効にして課題データ検証ワークフローを強化する必要があります。この機能を有効にすると、アカウント設定内にSIS Sync用の新しいSIS統合設定が表示されます（課題レベルグレードパスバック）。SISへの投稿機能オプションがこの新しい設定に組み入れられ、デフォルトで有効になります。
+      現在Canvasでグレードパスバックソリューションまたはパートナー製品
+      を使用しているお客様は、この機能を有効にして課題データ検証ワ
+      ークフローを強化する必要があります。この機能を有効にすると、
+      アカウント設定内にSIS Sync用の新しいSIS統合設定が表示されます
+      （課題レベルグレードパスバック）。SISへの投稿機能オプションがこの
+      新しい設定に組み入れられ、デフォルトで有効になります。
   new_topic_for_course_3d98222a: "%{course} の新しいトピック:"
   new_typography_4eaeca26: 新しいタイポグラフィー
   new_ui_487a624e: 新しいUI
@@ -14085,14 +14174,14 @@ ja:
         * ピアレビュー＆リマインダ
     invitation_display: 招待
     late_grading_description: |-
-        *インストラクタおよび管理者のみ:*⏎
-        ⏎
+        *インストラクタおよび管理者のみ:*
+        
         課題提出遅延
     late_grading_display: 遅延採点
     membership_update_description: |-
-        *管理者のみ: 保留中登録のアクティブ化*⏎
-        ⏎
-        * グループ登録⏎
+        *管理者のみ: 保留中登録のアクティブ化*
+        
+        * グループ登録
         * 受諾/拒否
     membership_update_display: メンバーシップの更新
     missing_description_description: "%{category} のお知らせに対して"
@@ -14184,8 +14273,8 @@ ja:
     recording_ready_display: 録音準備ができました
     reminder_display: 事前通知
     student_appointment_description: |-
-        *インストラクタおよび管理者のみ:*⏎
-        ⏎
+        *インストラクタおよび管理者のみ:*
+        
         受講生の予定のサインアップ
     student_appointment_display: 受講生の予定のサインアップ
     submission_comment_description: 課題提出物のコメント
@@ -14301,6 +14390,7 @@ ja:
   number_of_scores_to_ignore_for_each_student_fb94e818: 書く受講生の無視するスコア数
   number_to_grade_661b05dd: "%{number}未採点"
   number_unsubmitted_145fefae: "%{number}未提出"
+  numerical_answer_ec7120bf: 数による回答
   nummastered_of_numgroup_mastered_b8113c9c: "%{numMastered}（） %{numGroup} 熟達中"
   numpoints_points_b1f0666a: "%{numPoints} ポイント"
   o365_template_297a82f6: "O365 テンプレート"
@@ -14355,6 +14445,7 @@ ja:
   occurrence_s_c12d1aad: 発生
   of_students_5d1af0d2: 受講生数
   off_5385ef3f: オフ
+  off_policy_will_not_apply_to_this_sub_account_8b12386b: "オフ - このサブアカウントにはポリシーは適用されません"
   offline_web_export_dca67174: オフラインウェブエクスポート
   ok_c47544a2: OK
   ok_ff1b646a: OK
@@ -14368,6 +14459,7 @@ ja:
   on_paper_46d0ba36: 筆記
   on_time_17ca5ad9: 時間通り
   on_time_percent_eebffe38: "時間内: %{percent}"
+  on_whitelist_will_only_be_the_domains_which_have_b_c4c3a861: "オン - ホワイトリストは、このアカウントに明示的に追加されたドメインのみになります。"
   once_this_feature_is_enabled_you_will_not_be_able__ad338dcb: 一旦この機能が有効になると、それを止めることはできません。始める前に必ず提出フォルダを有効にする準備ができているようにしてください。
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: 解答を提出後には、変更することはできません。以前の質問は閲覧できなくなります。
   once_you_start_debugging_all_info_about_the_next_a_e871403b: "デバッグを開始すると、次に試行されるログイン試行に関するすべての情報が収集されます。[更新]をクリックすると、より多くのデータが収集されているかどうか、[デバッグの停止]は収集されたデータをクリアして現在のデバッグ試行を停止します。"
@@ -14448,7 +14540,10 @@ ja:
   orbis_report_header_student_sis_id: "ユーザ SIS"
   orbis_report_header_submission_score: 提出物のスコア
   ordered_by_recent_activity_112d33d5: 最近のアクティビティで並べ替え
-  organize_and_segment_your_course_by_topic_unit_cha_4c38a6b9: あなたのコースをトピック、ユニット、章、または週ごとに整理・セグメント化する。基準と前提条件を定義してモジュールを選択する。
+  organize_and_segment_your_course_by_topic_unit_cha_4c38a6b9: |-
+      あなたのコースをトピック、ユニット、章、または週ごとに整理・
+                        セグメント化する。基準と前提条件を定義してモジュ
+                        ールを選択する。
   organize_and_segment_your_course_by_topic_unit_cha_6ac2de91: |-
       あなたのコースをトピック、ユニット、章、
       または週ごとに整理・セグメント化する。基準と前提条件を定義してモジュールを選択する。
@@ -14460,6 +14555,7 @@ ja:
   other_carrier_45531207: その他の通信事業者
   other_ddacb37d: その他
   other_incorrect_match_options_c1418af5: その他の間違ったマッチのオプション：
+  other_options_d25f199c: 他のオプション
   other_timezones_42530564: 他のタイムゾーン
   out_of_78a76f91: 中
   out_of_formattedoutof_e08e90d5: "中%{formattedOutOf}"
@@ -14854,7 +14950,9 @@ ja:
       description: コピーした課題プロパティを凍結
       name: 課題プロパティ凍結機能
     assignment_freezer_settings: 
-      description: このプラグインを使用すると、管理者は、課題が別のコースにコピーされたときに設定済みプロパティを編集不可能にすることができます。
+      description: |-
+          このプラグインを使用すると、管理者は、課題が別のコースにコピーされたときに
+          設定済みプロパティを編集不可能にすることができます。
       no_copying_frozen: 凍結されている課題のコピーを許可しません。
     banner_grade_exchange_settings: 
       labels: 
@@ -15263,6 +15361,7 @@ ja:
   points_bb475533: 点数
   points_bceb5005: 点数
   points_changed_exceptions_b0c771f7: ポイント変更の例外：
+  points_e63de520: " ポイント"
   points_for_rating_tier_index_not_present_338d94e6: "ティア %{index} の評価ポイントは現在ありません"
   points_for_tier_index_must_be_less_than_points_for_9683c02: "ティア %{index} のポイントは、前のティアより小さくなければなりません (%{points} は %{prior} より大きい)"
   points_highest_to_lowest_87f1b143: "ポイント - 最高から最低"
@@ -15375,6 +15474,8 @@ ja:
   primary_color_button_b75db628: 原色ボタン
   primary_color_button_disabled_9081ddff: 原色ボタンは無効になっています
   privacy_290109ea: プライバシー
+  privacy_level_f0ec09a3: プライバシーレベル
+  private_3883d133: 個人
   proceed_f3d33864: 続行する
   processing_2fcc9739: 処理中
   product_name: Canvas
@@ -15709,7 +15810,9 @@ ja:
   progress_loading_bar_a26b8861: プログレス/ローディングバー
   project_groups_1fa0320b: "プロジェクト グループ"
   provide_a_space_for_users_to_work_on_a_single_goog_604cdf06: "Canvas コースから、ユーザーが単一の Google Doc で同時に作業するためのスペースを提供します。"
-  provide_a_space_for_users_to_work_on_a_single_goog_8edec82b: "Canvas コースから、ユーザーが単一の Google Doc で同時に作業するためのスペースを提供します。"
+  provide_a_space_for_users_to_work_on_a_single_goog_8edec82b: |-
+      Canvas コースから、ユーザーが単一の Google Doc
+                で同時に作業するためのスペースを提供します。
   provide_a_uri_to_your_idp_s_metadata_to_automatica_38e985bd: "他のフィールドに自動的に入力するために、あなたの IdP のメタデータにURIを提供してください。あなたの学校がInCommonまたはUKアクセス管理連盟の一部である場合は、メタデータURIとして urn：mace：incommon または http://ukfederation.org.uk を指定し、学校のエンティティ ID も指定します。"
   provide_a_uri_to_your_idp_s_metadata_to_automatica_6f81a3cd: "自動的に他のフィールドを埋めるために、あなたのIdPのメタデータへURIを提供してください。あなたの学校がCommonの一部である場合、メタデータURIのurn:mace:incommonを指定し、学校の事業体IDも提供してください。"
   provide_the_url_to_your_saml_idp_discovery_service_daa80306: |-
@@ -16026,8 +16129,8 @@ ja:
         truncate: テキストの解答を切り詰め
       page_header: 解答順序
   quiz_log_auditing_desc: |-
-      クイズ提出イベントの追跡を有効にし、提出後にイベントのログを
-      表示できるようにします。
+      クイズ提出イベントの追跡を有効にし、提出後にイ
+            ベントのログを表示できるようにします。
   quiz_lti_plugin_a189607f: クイズLTIプラグイン
   quiz_lti_plugin_a6256549: クイズLTIプラグイン
   quiz_menu_4fcd5e61: クイズメニュー
@@ -17401,6 +17504,7 @@ ja:
   remove_collaborationtitle_c3e81adb: "\"%{collaborationTitle}\"を削除しますか？"
   remove_contact_method_ca890ba3: 連絡方法を削除する
   remove_course_association_name_b760c502: "コース関連付けを削除%{name}"
+  remove_domain_from_the_whitelist_14c7d5e9: "%{domain}をホワイトリストから削除"
   remove_email_address_b1820820: "電子メール アドレスを削除"
   remove_empty_attachment_b2aea632: 空の添付ファイルの削除
   remove_f47dc62a: 削除
@@ -17791,6 +17895,7 @@ ja:
   score_percent_11941c81: "%{score} パーセント"
   score_points_3c48e2a8: "%{score} ポイント"
   score_pointspossible_bd57ea9e: "%{score}/%{pointsPossible}"
+  score_pointspossibletranslated_c1ac019e: "%{score}/%{pointsPossibleTranslated}"
   score_pts_adcb1af3: "%{score} pts"
   score_score_6f81e8c8: "スコア: %{score}"
   scored_less_than_2427896c: "次のスコアに満たない:"
@@ -18238,10 +18343,10 @@ ja:
   set_name_f83b658: 名前を設定する
   set_of_grading_periods_545b37e9: 採点期間のセット
   set_some_up_now_1749bb44: 今、いくつかを設定する
-  set_up_how_your_proficiency_ratings_appear_inside__8139bb81: "\n\
-      \x20                 あなたの熟達評価の学習熟達グレードブック内での表示方法を設定してください。\n\
-      \x20                 評価数、熟達度、ポイントと色を調整してください。\n\
-      \x20               "
+  set_up_how_your_proficiency_ratings_appear_inside__8139bb81: "\n\n\
+      \x20                 あなたの熟達評価の学習熟達グレードブック内での表示方法を設定してください。\n\n\
+      \x20                 評価数、熟達度、ポイントと色を調整してください。\n\n\
+      \x20                 "
   set_up_how_your_proficiency_ratings_appear_inside__f25d5da8: あなたの熟達度が、学習熟達成績ブックの中にどのように表示されるかを設定します。評価、週達ド、ポイント、および色を調整します。
   settings: 
     recaptcha_settings: 
@@ -18280,19 +18385,19 @@ ja:
   setup_checklist_eb8b00b8: 設定チェックリスト
   share_important_information_with_all_users_in_your_bc49ee7f: |-
       あなたのコースのすべてのユーザーと重要な情報を共有する。
-      自分自身のアナウンスのコピーを通知で取得することを選択する。
+                自分自身のアナウンスのコピーを通知で取得することを選択する。
   share_important_information_with_all_users_in_your_f58337e0: |-
       あなたのコースのすべてのユーザーと重要な情報を共有する。
       自分自身のアナウンスのコピーを通知で取得することを選択する。
   share_important_updates_with_users_97ec11ad: 重要な更新をユーザーと共有する
   share_the_following_pairing_code_with_an_observer__44f50f99: |-
       次のペアリングコードをオブザーバーと共有して
-      %{name}とコネクトさせます。このコードは7日間後または1回使用した後に
-      有効期限が切れます。
+          %{name}とコネクトさせます。このコードは7日間後または1回使用した後に
+          有効期限が切れます。
   share_the_following_pairing_code_with_an_observer__9b7c3667: |-
       次のペアリングコードをオブザーバーと共有して
-      あなたとコネクトさせます。このコードは7日間後または1回使用した後に
-      有効期限が切れます。
+          あなたとコネクトさせます。このコードは7日間後または1回使用した後に
+          有効期限が切れます。
   share_the_following_pairing_code_with_an_observer__9cd44f7e: |-
       次のペアリングコードをオブザーバーと共有して
       あなたとコネクトさせます。このコードは24時間後または1回使用した後に
@@ -19352,8 +19457,9 @@ ja:
   student_names_must_be_hidden_because_this_is_an_an_3c82287d: これは匿名アンケートなので、受講者名は非表示である必要があります。
   student_number_db6f06c1: "受講者%{number}"
   student_outcome_gradebook_description: |-
-      受講生は、受講生の学習達成度の成績表を使用して、コース学習成果の進捗を簡単に表示できます。
-      成果は成績表のような形式で表示され、進捗が数字のスコアおよび達成/ほぼ達成/ 補習として
+      受講生は、受講生の学習達成度の成績表を使用して、コース学習
+      成果の進捗を簡単に表示できます。成果は成績表のような形式で
+      表示され、進捗が数字のスコアおよび達成/ほぼ達成/ 補習として
       表示されます。
   student_planner_aee76000: 受講者計画者
   student_planner_date_4cc73abb: 受講生プランナー日付：
@@ -19435,6 +19541,7 @@ ja:
     sub_accounts_count: 
       one: "%{count} 件のサブアカウント"
       other: "%{count} 件のサブアカウント"
+  sub_accounts_can_choose_one_of_three_options_b0dfe46a: サブアカウントは、3つのオプションのうち1つを選択できます：
   subaccount_91f4c279: サブアカウント
   subaccount_settings_8549eff7: サブカウント設定
   subaccounts_efd02bd4: サブカウント
@@ -19838,7 +19945,9 @@ ja:
   the_app_was_deactivated_573520ab: アプリが非アクティブ化されました
   the_app_was_updated_successfully_3d71cd1b: アプリが正常に更新されました
   the_attendance_tool_must_be_enabled_by_your_canvas_108e6dca: "Canvas 管理者により出席ツールが有効にされていなければなりません。"
-  the_canvas_saml_entity_id_is_metadata_url_and_the__af7349ab: "Canvas SAML エンティティ ID は %{metadata_url}で、サービスプロバイダーメタデータはURLにて利用できます。"
+  the_canvas_saml_entity_id_is_metadata_url_and_the__af7349ab: |-
+      Canvas SAML エンティティ ID は %{metadata_url}で、サービスプロバ
+      イダーメタデータはURLにて利用できます。
   the_chat_tool_must_be_enabled_by_your_canvas_admin_e3b26123: "Canvas 管理者によりチャットツールが有効にされていなければなりません。"
   the_course_link_validator_searches_course_content__563fa215: コースリンクバリデータは、コースの内容が無効なリンクまたは到達不能なリンクや画像を検索します。
   the_course_link_validator_searches_through_course__76f0bc63: コースリンク検証ソフトは、コースコンテンツを通して検索し、遭遇するすべての無効、またはフラグのついたリンクを返します。応答がないとするフラグのついたいくつかのリンクは、サーバーからのアクセスが不可能で、受講生はまだ使用することがでるということに注意してください。
@@ -19846,8 +19955,9 @@ ja:
   the_course_status_buttons_unpublished_and_publishe_e2dca595: コースのステータスボタン（公開と非公開）は、受講生の提出物が受理されるまでのみ表示されます。コースは、受講生の提出物をがあると非公開にすることはできません。
   the_download_process_has_started_this_can_take_awh_7e616db1: |-
       ダウンロードプロセスが開始さしました。これは
-      大規模なコースではしばらく時間がかかります。ページを離れても
-      ダウンロード完了時に通知が届きます。
+                大規模なコースではしばらく時間がかかります。
+                ページを離れてもダウンロード完了時に通知が
+                届きます。
   the_engine_that_processes_sis_imports_has_been_ref_69b1c16b: SISのインポートを処理するエンジンは、大規模なSISインポートの安定性をよりよく処理できるよう、リファクタリングされています。SISのインポート機能は変更されていません。
   the_error_stack_trace_if_there_is_one_b7e008a1: 存在する場合のエラースタックトレース
   the_field_field_is_required_56512820: "\"%{field}\" 名前フィールドは必須です"
@@ -19898,13 +20008,13 @@ ja:
   the_message_titled_subject_could_not_be_delivered__f063857e: |-
       ディスカッション トピックがロックされているため、"%{subject}" というタイトルのメッセージを配信できませんでした。Canvas を通じて誰かに連絡を取ろうとしている場合は、ご自分のアカウントにログインして、受信トレイ ツールからメッセージを送信してみてください。
       
-      今後ともよろしくお願いいたします。
-      Canvas サポート
+                今後ともよろしくお願いいたします。
+                Canvas サポート
   the_message_you_sent_with_the_subject_line_subject_c73f92e4: |-
       "%{subject}" の件名で送信したメッセージは、送信されませんでした。このメールからCanvasメッセージに返信するには、最初にCanvasプロファイルの通信チャンネルを確認する必要があります。プロファイルに移動し、このメールアドレス[ https://community.canvaslms.com/docs/DOC-2281 をご覧ください]に確認メールを再送信してください。また、Canvas Inbox [https://community.canvaslms.com/docs/DOC-2670 をご覧ください]を通じ、この人物に連絡することができます。
       
-      宜しくお願いします。
-      Canvasサポート
+                宜しくお願いします。
+                Canvasサポート
   the_module_item_is_locked_27fe420b: "モジュール アイテムはロックされています。"
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "ユーザ %{current_user_name} の最近のスコアと結果 %{outcome_name}。"
   the_next_available_appointment_in_this_course_is_o_da10316c: "このコースの次に利用可能な予約は～です*%{date}*"
@@ -19974,11 +20084,12 @@ ja:
   there_was_a_problem_loading_submissions_39855ff0: 送信を読み込み中、問題がありました。
   there_was_a_problem_loading_the_gradebook_69b2a17: 成績表を読み込み中に問題が発生しました。
   there_was_a_problem_logging_in_at_institution_5a298155: "%{institution} にログインする際に問題が発生しました"
+  there_was_a_problem_overriding_the_grade_f6d83c4d: 成績を上書きする際に問題がありました。
   there_was_a_problem_posting_the_comment_75d15646: コメントを掲示中に問題がありました
   there_was_a_problem_publishing_grades_b0b9202f: 成績を送信する際に問題がありました。
   there_was_a_problem_saving_the_grade_8ea5d2ac: 成績を保存する際に問題がありました。
   there_was_a_problem_saving_the_grades_5e61f9e2: 成績を保存する際に問題がありました。
-  there_was_a_problem_saving_the_grading_period_243bed6c: "採点期間を保存する\b際に問題が発生しました"
+  there_was_a_problem_saving_the_grading_period_243bed6c: 採点期間を保存するb際に問題が発生しました
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: 採点スキームを保存する際に問題が発生しました
   there_was_a_problem_sending_your_message_22b249a5: メッセージを送信する際に問題がありました。
   there_was_a_problem_showing_the_teacher_notes_colu_a6e4a2bc: 講師メモ列を表示中に問題が発生しました。
@@ -20015,8 +20126,16 @@ ja:
   these_backup_codes_can_be_used_if_your_multi_facto_ca30a3df: これらのバックアップコードは、マルチファクター認証デバイスが使用できない場合に使用できます。それらを印刷して、ウォレットのような安全な場所に保管してください。
   these_credentials_are_for_academic_benchmark_api_v_324baaa4: "これらの成績証明書は、Academic Benchmark API v3 用です。パートナーキーを空蘭のままにすると、インポートする者は初期設定で Academic Benchmark API v1 を使用するようになります。"
   these_credentials_are_for_academic_benchmark_api_v_952718b1: "これらの成績証明書は、Academic Benchmark API v1 用のものであり、将来のリリースでは廃止される予定です。"
+  these_domains_have_automatically_been_added_to_you_cef51600: |-
+      これらのドメインが、あなたのホワイトリストに自動的に追加されました。
+                    削除したい場合は、関連するツールを削除する必要があります。
   these_grading_periods_were_created_for_you_by_an_a_e977c2b5: これらの採点期間は、管理者によってあなたのために作製されました。
   this_action_has_been_disabled_by_your_admin_5e34bfa0: このアクションは、事務により無効化されています。
+  this_allows_you_to_restrict_custom_javascript_that_d8495e02: |-
+      これにより、JavaScriptCanvasのインスタンスで実行されるカスタムを制限することができます。
+                     これは、更新されたコンテンツセキュリティポリシー（CSP）によって有効になります。
+                     手動でドメインを追加する機能により、ドメインがホワイトリストに追加されます。
+                     ホワイトリストには%{max_domains}のドメイン制限があります。
   this_allows_you_to_restrict_custom_javascript_that_e1e61bc3: |-
       これにより、JavaScriptCanvasのインスタンスで実行されるカスタムを制限することができます。
                       これは、更新されたコンテンツセキュリティポリシー（CSP）によって有効になります。
@@ -20119,7 +20238,9 @@ ja:
       コースの問題バンクを完全に管理するには、この権限と課題とクイズ - 追加/編集/削除の両方が有効にされていなければなりません。
   this_permission_is_available_for_all_canvas_accoun_25cd5444: "この権限は、すべての Canvas アカウントで使用できますが、Canvas カタログアカウントに関連付けられている機関でのみ使用できます。現在のところ、権限にはフロントエンドの影響はありませんが、エンジニアリングは管理者には権限を有効なままにしておくよう提案しています。他の役割には、権限を無効にすることができます。"
   this_permission_only_affects_course_announcements__6bc2b0a5: "この権限はコースのアナウンスにのみ影響します。グローバルアナウンスを管理するには、グローバルアナウンスメント - 追加/編集/削除が有効にされていなければなりません。"
-  this_permission_only_controls_adding_users_at_the__f33e8ae8: "この権限は、アカウントレベルでのユーザーの追加のみを制御します。コースにユーザーを追加するには、ユーザー - コースまたはユーザーからの受講生の追加/削除 - コースのコースから講師、コースデザイナー、またはTAの追加/削除が有効にされていなければなりません。"
+  this_permission_only_controls_adding_users_at_the__f33e8ae8: |-
+      この権限は、アカウントレベルでのユーザーの追加のみを制御します。コースにユーザーを追加するには、
+      ユーザー - コースまたはユーザーからの受講生の追加/削除 - コースのコースから講師、コースデザイナー、またはTAの追加/削除が有効にされていなければなりません。
   this_question_group_is_set_to_pick_more_questions__2e3552c4: この質問グループは、利用出来る数以上の質問が設定されています。
   this_question_will_show_a_checkbox_next_to_each_an_169cd6d9: この質問は、それぞれの答えの横にチェックボックスを表示します。
   this_quiz_has_been_excused_d89d2b74: このクイズは免除されました
@@ -20408,7 +20529,9 @@ ja:
   to_access_assignment_submissions_through_assignmen_ce438715: |-
       課題とSpeedGraderを介して課題提出にアクセスするには、成績 - 編集も有効にされていなければなりません。
       SpeedGraderで成績を編集、またはグレードブックにコメントを追加するには、成績 - 編集も有効にされていなければなりません。
-  to_access_assignment_submissions_through_assignmen_ecbb8fb7: "課題とグレードブックを介して課題提出にアクセスするには、成績 - すべての成績を表示するも有効にされていなければなりません。"
+  to_access_assignment_submissions_through_assignmen_ecbb8fb7: |-
+      課題とグレードブックを介して課題提出にアクセスするには、
+      成績 - すべての成績を表示するも有効にされていなければなりません。
   to_access_the_account_courses_page_courses_view_li_e1da6165: "アカウントコースページにアクセスするには、コース - 表示リストが有効にされていなければなりません。"
   to_access_the_assignments_index_page_course_conten_a5b00f98: "課題のインデックスページにアクセスするには、コース内容 - 表示が有効有効にされていなければなりません。課題を個々の受講生と差別化するためには、ユーザー - 表示リストも有効有効にされていなければなりません。"
   to_access_the_people_page_and_view_groups_users_vi_43aceac3: "人物ページにアクセスしてグループを表示するには、ユーザー - 表示リストも有効にされていなければなりません。"
@@ -20428,7 +20551,9 @@ ja:
   to_activate_sms_enter_the_four_character_confirmat_3982a3ec: "SMSをアクティブにするには、%{sms_number}に送付した4文字の確認コードを入力してください。"
   to_add_announcements_discussions_moderate_must_als_2496cbd7: "アナウンスを追加するには、ディスカッション - 調整が有効にされていなければなりません。ホームページで最新のアナウンスを表示するには、コース設定でコースのホームページに最新のアナウンスを表示するチェックボックスが選択されていなければなりません。"
   to_add_edit_or_delete_groups_groups_add_edit_delet_b826f547: "グループを追加、編集、または削除するには、グループ - 追加/編集/削除も有効にされていなければなりません。"
-  to_add_users_to_a_course_users_add_remove_students_5036ad25: "コースにユーザーを追加するには、ユーザー - そのコース用にコースから受講生の追加/削除 -コースから講師、コースデザイナー、またはTAの追加/削除も有効にされていなければなりません。"
+  to_add_users_to_a_course_users_add_remove_students_5036ad25: |-
+      コースにユーザーを追加するには、ユーザー - そのコース用にコースから受講生の追加/削除 -コースから講師、コースデザイナー、またはTAの追加/削除も有効にされ
+      ていなければなりません。
   to_add_users_to_a_course_users_add_remove_students_888b391e: |-
       コースにユーザーを追加するには、ユーザー - コースからの受講者の追加/削除、および/またはユーザー - コースからの講師、コースデザイナー、またはTAの追加/削除も有効にされていなければなりません。
       受講生のセクションを編集するには、会話 - 個々のコースメンバーとユーザーにメッセージを送信する - コースから受講生を追加/削除も有効にされていなければなりません。
@@ -20442,9 +20567,9 @@ ja:
   to_allow_a_user_to_review_a_moderated_assignment_i_6aa43d7f: "SpeedGraderでユーザーが調整された課題をレビューできるようにするには、成績 - 編集も有効にされていなければなりません。"
   to_allow_full_management_of_conferences_created_by_902e96e4: |-
       ユーザーまたは他人が作成した会議を完全に管理するには、コースの内容 - 追加/編集/削除も有効にされていなければなりません。
-      長時間にわたる会議を終了するには、コースの内容 - 追加/編集/削除を有効にされていなければなりません。
-      コースの内容 - 追加/編集/削除が有効で、ウェブ会議 - 作成が無効の場合、ユーザーは引き続き会議を管理できます。
-      この権限は、コースおよびグループで会議を作成するユーザーの機能を制御します。
+        長時間にわたる会議を終了するには、コースの内容 - 追加/編集/削除を有効にされていなければなりません。
+        コースの内容 - 追加/編集/削除が有効で、ウェブ会議 - 作成が無効の場合、ユーザーは引き続き会議を管理できます。
+        この権限は、コースおよびグループで会議を作成するユーザーの機能を制御します。
   to_allow_full_management_of_conferences_created_by_feec1984: |-
       ユーザーまたは他人が作成した会議を完全に管理するには、コースの内容 - 追加/編集/削除も有効にされていなければなりません。
       長時間にわたる会議を終了するには、コースの内容 - 追加/編集/削除を有効にされていなければなりません。
@@ -20523,11 +20648,11 @@ ja:
   to_minscore_43e5452e: "%{minScore}% まで"
   to_moderate_a_quiz_assignments_and_quizzes_add_edi_2c7f4c18: |-
       クイズを調整するには、課題とクイズ - 追加/編集/削除も有効にされていなければなりません。
-      クイズアイテム分析 CSV ファイルのユーザー SIS ID 列を表示するには、SIS データ読み取りも有効にでなければなりません。
+              クイズアイテム分析 CSV ファイルのユーザー SIS ID 列を表示するには、SIS データ読み取りも有効にでなければなりません。
   to_moderate_a_quiz_assignments_and_quizzes_add_edi_9747d5fb: "クイズを調整するには、課題とクイズ - 追加/編集/削除も有効にされていなければなりません。"
   to_moderate_a_quiz_assignments_and_quizzes_add_edi_bd8aada1: |-
       クイズを調整するには、課題とクイズ - 追加/編集/削除も有効にされていなければなりません。
-      クイズアイテム分析 CSV ファイルのユーザー SIS ID 列を表示するには、SIS データ読み取りも有効にでなければなりません。
+              クイズアイテム分析 CSV ファイルのユーザー SIS ID 列を表示するには、SIS データ読み取りも有効にでなければなりません。
   to_moderate_a_quiz_assignments_and_quizzes_add_edi_ebdecaf8: "クイズを調整するには、課題とクイズ - 追加/編集/削除も有効にされていなければなりません。"
   to_moderate_a_quiz_grades_edit_must_also_be_enable_72ca6ca1: "クイズを調整するには、成績 - 編集も有効にされていなければなりません。"
   to_moderate_grades_grades_select_final_grade_for_m_8c605763: "成績を管理できるようにするには、成績 - 調整する最終成績の選択も有効にされていなければなりません。"
@@ -20535,7 +20660,7 @@ ja:
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: "テーマエディターブランディングをプレビューするには、*High Contrast UIを切る*必要があります。"
   to_publish_and_unpublish_module_content_courses_ad_4c7fc3c9: |-
       モジュールコンテンツを公開および非公開にするには、コース - 追加/編集/削除およびコースの内容 - 表示も有効にされていなければなりません。
-      受講生の提出物がある場合、モジュール項目は非公開にすることはできません。
+              受講生の提出物がある場合、モジュール項目は非公開にすることはできません。
   to_publish_and_unpublish_module_content_courses_ad_fd53792f: "モジュールコンテンツを公開および非公開にするには、コース - 追加/編集/削除およびコースの内容 - 表示も有効にされていなければなりません。"
   to_publish_unpublish_module_content_course_content_efc294d4: "モジュールコンテンツを公開/非公開するには、コースの内容 - 追加/編集/削除が有効にされていなければなりません。"
   to_restore_a_deleted_course_courses_undelete_and_c_dc2d0470: "削除されたコースを復元するには、コース - 元に戻すとコースの内容 - 表示も両方有効にされていなければなりません。"
@@ -20550,7 +20675,7 @@ ja:
       課題IDのみで検索するには、成績 - すべての成績を表示するも有効にされていなければなりません。
   to_search_for_a_course_in_the_restore_courses_tab__46e75739: |-
       コースの復元のタブでコースを検索するには、コースの内容 - 表示も有効にされていなければなりません。
-      アカウント内の削除されたコースを復元するには、コース - 追加/編集/削除、コースの内容 - 表示、コース - 元に戻す、のすべてが有効にされていなければなりません。
+               アカウント内の削除されたコースを復元するには、コース - 追加/編集/削除、コースの内容 - 表示、コース - 元に戻す、のすべてが有効にされていなければなりません。
   to_search_grade_change_logs_grades_view_change_log_8d2f6d30: "成績変更ログを検索するには、成績 - 表示変更ログも有効にされていなければなりません。"
   to_search_grade_change_logs_grades_view_change_log_d4d40cf2: "成績変更ログを検索するには、成績 - 表示変更ログも有効にされていなければなりません。"
   to_see_the_course_setup_checklist_option_on_the_co_41322a29: コースホームページのコース設定チェックリストのオプションを表示するには、コースの管理（追加/編集/削除）も有効にされていなければなりません。
@@ -20578,7 +20703,7 @@ ja:
       ディスカッションに返信するには、ディスカッション - 投稿も有効にされていなければなりません。ディスカッションの課題の詳細を編集するには、課題とクイズ - 追加/編集/削除も有効でなければなりません。
   to_view_discussions_in_a_course_discussions_view_m_aa57dee7: |-
       コースでディスカッションを表示するには、ディスカッション - 表示も有効にされていなければなりません。
-      「ディスカッション - 作成」と「ディスカッション - 仲介」のどちらも、ディスカッションページにディスカッションを作成できるようにします。ディスカッションを管理するには、ディスカッション - 調整も有効にされていなければなりません。
+              「ディスカッション - 作成」と「ディスカッション - 仲介」のどちらも、ディスカッションページにディスカッションを作成できるようにします。ディスカッションを管理するには、ディスカッション - 調整も有効にされていなければなりません。
   to_view_discussions_in_a_course_discussions_view_m_b7e742bd: |-
       コースでディスカッションを表示するには、ディスカッション - 表示も有効にされていなければなりません。
       「ディスカッション - 作成」と「ディスカッション - 仲介」のどちらも、ディスカッションページにディスカッションを作成できるようにします。ディスカッションを管理するには、ディスカッション - 管理も有効にされていなければなりません。
@@ -20588,7 +20713,7 @@ ja:
   to_view_grades_in_a_course_grades_view_all_grades__acecd649: "コースでディスカッションを表示するには、ディスカッション - 表示も有効にされていなければなりません。"
   to_view_last_activity_and_total_activity_informati_a06859f3: |-
       コースの人物のページの最終アクティビティおよび合計アクティビティ情報を表示するには、ユーザー - 表示リストも有効にされていなければなりません。
-      コースの人物のページにアクセスするには、ユーザー - 表示リストも有効にされていなければなりません。
+              コースの人物のページにアクセスするには、ユーザー - 表示リストも有効にされていなければなりません。
   to_view_module_progression_grades_view_all_grades__b9fc4d6f: "モジュールの進行状況を表示するには、成績 - すべての成績の表示も有効にされていなければなりません。"
   to_view_or_edit_a_user_s_sis_id_or_integration_id__9abfc21d: "ユーザーの SIS ID または統合IDを表示または編集するには、ユーザー - 表示リストとユーザー - 管理ログイン情報の両方が有効にされていなければなりません。"
   to_view_recent_announcements_on_the_home_page_cour_ffc52530: "ホームページで最近のアナウンスを表示するには、コースの内容 - 表示が有効にされていなければなりません。また、コースの設定で、コースのホームページチェックボックスの最新のアナウンスを表示するがオンになっていなければなりません。コースアナウンスを管理するには、ディスカッション - 調整も有効にされていなければなりません。"
@@ -20632,7 +20757,8 @@ ja:
   to_view_users_and_user_account_details_users_view__99807b12: |-
       ユーザーおよびユーザーアカウントの詳細を表示するには、ユーザー - 表示リストも有効にされていなければなりません。
       ユーザーのパスワードを変更するには、ユーザー - 表示リストも有効でなければなりません。
-      ユーザーの SIS ID を表示するには、SISデータ管理またはSISデータ読み取りも有効でなければなりません。ユーザーの統合IDを表示するには、SIS データ - 管理も有効にされていなければなりません。
+      ユーザーの SIS ID を表示するには、SISデータ管理またはSISデータ読み取りも有効でなければなりません。
+      ユーザーの統合IDを表示するには、SIS データ - 管理も有効にされていなければなりません。
   today_76e10f9c: 本日
   toggle_alignment_details_for_title_944f605: "（）の位置調整の詳細を切り替える%{title}"
   toggle_course_card_color_overlays_b5b8137a: トグルコースカードカラーオーバーレイ
@@ -20686,6 +20812,7 @@ ja:
   trinidad_and_tobago_1_fc2d8d1c: トリニダード・トバゴ（+1）
   truncated_56b1a661: 概要
   turn_on_rtl_even_for_non_rtl_languages_8a1a8bc2: "RTL 以外の言語でも RTL を有効にする"
+  turned_in_submission_date_e9180b8b: "提出日：%{submission_date}"
   turning_off_this_tutorial_will_remove_the_tutorial_dfd81b3a: このチュートリアルをオフにすると、すべてのコースのチュートリアルトレイが消去されます。ユーザー設定の機能オプションの下でオンに戻すことができます。
   turnitin: 
     error_1007: アップロードされたファイルが大きすぎます。
@@ -20742,7 +20869,8 @@ ja:
   undelivered_message_459916a9: 送信されなかったメッセージ
   underline_all_links_description: |-
       下線のあるリンクは、ナビゲーションメニュー、ダッシュボード、およびページサイドバーのハイパーリンクを
-      *下線付きテキスト*として表示します。この機能オプションは、Rich Content Editor 内のユーザー作成のコンテンツリンクには適用されません。これはすべてのユーザーのリンクに常に下線を引きます。
+      *下線付きテキスト*として表示します。この機能オプションは、Rich Content Editor 内のユーザー作
+      成のコンテンツリンクには適用されません。これはすべてのユーザーのリンクに常に下線を引きます。
   underline_links_e7cf9b4f: リンクにアンダーラインを引く
   undo_a7be8fef: アンドゥーする
   undo_remove_course_association_name_68eb4037: "コースの関連付けを取り消す%{name}"
@@ -20752,6 +20880,7 @@ ja:
   ungraded_answers_31ef2df7: 未採点の回答
   ungraded_ed0c6f98: 未採点
   ungraded_or_excused_60694bd7: 未採点か実行済み
+  ungraded_out_of_pointspossible_2d6d81da: "%{pointsPossible}から未採点"
   ungraded_submissions_44efb0ec: 未採点の提出物
   ungraded_survey_ad7de790: 未採点のサーベイ
   united_arab_emirates_971_649b3750: "アラブ首長国連邦 (+971)"
@@ -20850,7 +20979,9 @@ ja:
   update_and_view_sections_course_details_navigation_dd10b45e: |-
       セクション、コースの詳細、ナビゲーション、機能の更新と表示
       オプションや外部アプリの統合は、講師のみが見ることができます。
-  update_and_view_sections_course_details_navigation_de248be8: セクションの更新と表示、コースの詳細、ナビゲーション、機能オプションや外部アプリの統合は、講師のみが見ることができます。
+  update_and_view_sections_course_details_navigation_de248be8: |-
+      セクションの更新と表示、コースの詳細、ナビゲーション、
+                      機能オプションや外部アプリの統合は、講師のみが見ることができます。
   update_comment_8cedb4f0: コメントを更新する
   update_comments_21991be0: コメントの更新
   update_criterion_edcbd330: 基準を更新
@@ -20877,7 +21008,8 @@ ja:
     upload: アップロード
   upload_course_files_syllabi_readings_or_other_docu_21f8725f: |-
       コースファイル、シラバス、リーディング、またはその他のドキュメントをアップロードする。
-      フォルダをロックして、受講者から隠しておく。モジュール、課題、ディスカッション、またはページにファイルを追加する。
+                フォルダをロックして、受講者から隠しておく。モジュール、課題、ディスカッション、
+                またはページにファイルを追加する。
   upload_course_files_syllabi_readings_or_other_docu_859d8f02: |-
       コースファイル、シラバス、リーディング、またはその他のドキュメントをアップロードする。
       フォルダをロックして、受講者から隠しておく。モジュールにファイルを追加する、
@@ -20910,7 +21042,7 @@ ja:
   url_type_3ece27d2: "URL タイプ"
   uruguay_1f95051a: ウルグアイ
   uruguay_598_866a5ef3: "ウルグアイ (+598)"
-  usage_right_ff96f3e2: "使用\b権:"
+  usage_right_ff96f3e2: "使用b権:"
   usage_rights_f0960ad6: 使用権
   usage_rights_have_been_set_d1b433c7: 使用権が設定されています。
   usage_rights_will_be_set_for_all_of_the_files_cont_b192336a: "次に含まれるすべてのファイルに使用権が設定されます:"
@@ -21043,10 +21175,12 @@ ja:
       updating_user_details: ユーザの詳細情報を更新しています...
     notices: 
       image_reported: この画像は報告されました
+  user_name_has_just_turned_in_a_late_submission_for_874a9a31: "%{user_name}がコースの%{assignment_name}の%{course_name}の提出を遅れて行いました"
   user_name_just_added_you_to_a_conversation_in_canv_7b278b51: "%{user_name} さんによって Canvas の会話に追加されました。会話を表示するには、下のリンクをクリックしてください: %{link}"
   user_name_just_sent_you_a_message_in_canvas_9e911af7: "%{user_name} さんが、たった今Canvasであなたにメッセージを送信しました。"
   user_name_just_sent_you_a_message_in_canvas_a2cb3bf4: "%{user_name}Canvasであなたにメッセージを送りました。"
   user_name_just_sent_you_a_message_in_canvas_do_not_16b13cf2: "%{user_name}Canvasであなたにメッセージを送りました - 返信しないでください"
+  user_name_just_turned_in_their_assignment_late_ass_a54b128a: "%{user_name}が提出を遅れて行いました、%{assignment_name}"
   user_name_successfully_added_79af8365: "%{user_name} が追加されました！"
   user_name_you_just_sent_a_message_in_canvas_b1fd4598: "%{user_name}、Canvasでメッセージを送信したばかりです。"
   user_name_you_just_sent_a_message_in_canvas_do_not_7c7bc1c6: "%{user_name}、Canvasでメッセージを送信しました - 返信しないでください"
@@ -21245,7 +21379,7 @@ ja:
       titles: 
         all_users: すべてのユーザ
         choose_term: 期間の選択
-        search_results: "\"%{search_term}\\ で検索した結果"
+        search_results: "\"%{search_term}\" で検索した結果"
     linkedin_added: "LinkedIn アカウントは正常に追加されました!"
     linkedin_fail: "LinkedIn の認証に失敗しました。もう一度、試してください"
     logins: 
@@ -21387,11 +21521,15 @@ ja:
     user_not_found: "指定された ID のアクティブなユーザは見つかりませんでした。"
     user_updated: ユーザは正常に更新されました。
     welcome: 
-      no_courses_message: まだコースが登録されていないので、このページにはあまり内容がありません。コースを作成するか、コースを登録すれば、参加するすべてのクラスの会話が表示されるようになります。
+      no_courses_message: |-
+          まだコースが登録されていないので、このページにはあまり内容がありません。
+                  コースを作成するか、コースを登録すれば、参加するすべての
+                  クラスの会話が表示されるようになります。
       unpublished_courses_message: |-
           まだ開始していない1つ以上のコースに登録しています。いったん
-          それらのコースが利用可能となると、ここと左側のナビゲーションにそれらの情報が表示されます。
-          その間、ご自由により多くのコース無料で登録、またはプロフィールを設定してください。
+                  それらのコースが利用可能となると、ここと左側のナビゲーションに
+                  それらの情報が表示されます。その間、ご自由により多くのコース
+                  無料で登録、またはプロフィールを設定してください。
       welcome_to_happiness: "Canvas へようこそ!"
   users_act_as_d922940: "ユーザー - として行動する"
   users_add_remove_observers_d1273d9: "ユーザー - オブザーバーの追加/削除"
@@ -21561,7 +21699,7 @@ ja:
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "メンバーがコースにアクセスすると、このページが表示されます。アクティビティ ストリーム、コース モジュールのリスト、要綱、その他のカスタム ページを表示するように設定できます。デフォルトでは、コースのアクティビティ ストリームが表示されます。"
   when_people_visit_your_course_this_is_the_first_pa_5093ec45: |-
       ユーザーがあなたのコースにアクセスするとき、これが最初に表示されるページになります。
-      ホームページをモジュールに設定しましたが、変更することもできます。
+                ホームページをモジュールに設定しましたが、変更することもできます。
   when_people_visit_your_course_this_is_the_first_pa_af36eac3: ユーザーがあなたのコースにアクセスするとき、これが最初に表示されるページになります。ホームページをモジュールに設定しましたが、変更することもできます。
   when_scope_enforcement_is_disabled_tokens_have_acc_6939182f: 範囲適用を無効にすると、トークンは許可するユーザーが使用できるすべてのエンドポイントにアクセスできます。
   when_selected_the_course_is_in_a_read_only_state_o_5aaeb0d: これを選択すると、コースはこれらの日付以外では読み取り専用状態になります。
@@ -21570,6 +21708,9 @@ ja:
   whenever_b943b119: 指定なし
   where_would_you_like_to_move_title_fabd6e8f: "%{title} をどこに移動しますか?"
   which_course_is_this_question_about_f819a158: これはどのコースについての質問ですか?
+  whitelist_count_max_26a270f: "ホワイトリスト (%{count}/%{max})"
+  whitelisted_domains_faed9e0c: ホワイトリストドメイン
+  whitelisted_tool_domains_7df5e481: ホワイトリストツールドメイン
   who_can_create_new_courses_7a6c1338: 新しいコースを作成できるのは誰か
   widget: 
     upload_media_track_form: 
@@ -21800,7 +21941,9 @@ ja:
   you_can_leave_the_page_and_you_will_get_a_notifica_fefe11e8: ページを離れても、ダウンロード完了時に通知が届きます。
   you_can_log_in_directly_with_this_provider_by_goin_467d7f66: "%{url}へ行って、このプロバイダーから直接ログインすることができます。"
   you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: 既にクイズに回答した受講生のための再評価オプションを設定できます。
-  you_can_publish_your_course_from_the_home_page_whe_a36d49d6: 準備が整ったらいつでもホームページからコースを公開し、れを学生と共有することができます。あなたのコースが公開されるまで、講師のみがそれにアクセスできます。
+  you_can_publish_your_course_from_the_home_page_whe_a36d49d6: |-
+      準備が整ったらいつでもホームページからコースを公開し、れを学生と共有することができます。
+                あなたのコースが公開されるまで、講師のみがそれにアクセスできます。
   you_can_reply_to_this_comment_by_responding_to_thi_3d130e8c: "このメッセージに返信するか、このリンク: %{link} を使用して提出物を評価することで、このコメントに回答できます。"
   you_can_reply_to_this_comment_by_responding_to_thi_4fd1379e: "このメッセージに返信してこのコメントに返信するか、このリンクを使用して提出物の詳細を確認してください：%{link}.  許可されている際には、添付ファイルを含める必要がある場合には、Canvas にログインして提出物に返信してください。"
   you_can_reply_to_this_message_in_canvas_by_clickin_f5f5f7a3: "このリンクをクリックすると、Canvas 内ででこのメッセージに返信することができます：%{link}."
@@ -21848,6 +21991,7 @@ ja:
   you_have_no_ltis_configured_to_create_collaboratio_5cad28dd: コラボレーションを作成するためのLTIの設定がありません。講師に問い合わせ、設定を行ってください。
   you_have_no_outcomes_click_here_to_create_one_ebf262a3: "成果がありません。作成するには *ここをクリック* します。"
   you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: 成果がありません。成果ページに移動するにはここをクリックします。
+  you_have_reached_the_domain_limit_if_you_wish_to_a_587db18: ドメイン制限に達しました。ホワイトリストにさらに追加したい場合は、まず他のユーザーを削除してください。
   you_have_reached_the_limit_of_len_characters_in_th_babea8fe: "通知メッセージの文字数 %{len} に達しました"
   you_have_reached_the_maximum_webhooks_per_account__ae9a7f83: "アカウントあたりの最大 Webhooks 数 (%{max}) に達しました"
   you_have_reached_the_maximum_webhooks_per_user_lim_2af4b256: "ユーザあたりの最大 Webhooks 数 (%{max}) に達しました"
@@ -21859,7 +22003,11 @@ ja:
   you_ll_need_a_refresh_token_follow_the_steps_at_th_79a3984b: このリンクのステップに従い、トークンのリフレッシュが必要となります。テクニカル・エクスパートの助けが必要な可能性があります。
   you_ll_need_to_accept_the_enrollment_invitation_be_e3c86b26: このコースに完全に参加するには、登録の招待状を受け入れる必要があります。
   you_ll_need_to_accept_the_enrollment_invitation_be_f2ffe13: "このコースに完全に参加するにha、%{date}で始まる登録の招待状を受け入れる必要があります。"
-  you_may_not_reproduce_or_communicate_any_of_the_co_7636b552: "あなたは、このコースからエクスポートされたファイルを含め、このコースのコンテンツは事前にあなたの期間から書面にて許可を得ていない限り、複製または伝達することはできません。                  特定のオンラインユーザー合意ガイドラインについては、あなたの期間に問い合わせてください。"
+  you_may_not_reproduce_or_communicate_any_of_the_co_7636b552: |-
+      あなたは、このコースからエクスポートされたファイルを含め、このコースのコ
+                  ンテンツは事前にあなたの期間から書面にて許可を得ていない限り、複製ま
+                  たは伝達することはできません。特定のオンラインユーザー合意ガイドライン
+                  については、あなたの期間に問い合わせてください。
   you_may_not_see_all_comments_right_now_because_the_96cf2051: 課題が現在採点中であるため、今すぐすべてのコメントを表示できない場合があります。
   you_may_want_to_assign_some_tas_to_help_you_with_t_702244aa: "コースをサポートする TA を割り当てることもできます。TA は、あなたに代わって受講生の提出物の採点、ディスカッションの進行サポート、期日や課題の詳細の更新を行うことができます。"
   you_must_agree_to_the_terms_99723f97: 利用規約に同意する必要があります
@@ -21905,7 +22053,8 @@ ja:
   you_will_be_redirected_to_gradebook_while_your_fil_23fab7de: ファイルのアップロード中にグレードブックにリダイレクトされます。CSVファイルが大きいと、変更に数分かかる場合があります。データを上書きしないようにするため、追加の変更を行う前に、アップロードが完了し、グレードブックが正しいことを確認してください。
   you_will_need_to_create_a_new_app_on_facebook_face_8fe85297: |-
       [Facebookに新しいアプリを](%{facebook_url})を作成する必要があり、詳細設定のClient OAuth Login
-      を有効にします。有効なOAuthリダイレクトURIとして、 %{callback_url} を設定する必要があります。アプリを保存した後、アプリIDとシークレットをメモし、それらをここに入力します。
+      を有効にします。有効なOAuthリダイレクトURIとして、 %{callback_url} を設定する必要があります。
+      アプリを保存した後、アプリIDとシークレットをメモし、それらをここに入力します。
   you_will_need_to_create_a_web_application_in_the_g_43f753ec: |-
       [Googleの開発コンソール](%{google_url})にウェブアプリケーションを作成する必要があります。
       リダイレクトURIとして、%{callback_url} を追加する必要があります。
