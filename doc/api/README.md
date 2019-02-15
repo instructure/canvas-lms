@@ -18,7 +18,7 @@ For a summary of all deprecations, view the <a href="file.breaking.html">breakin
 API Terms of Service
 ------
 
-Please carefully review <a href="http://www.instructure.com/policies/api-policy">The Canvas Cloud API Terms of Service</a> before using the API.
+Please carefully review <a href="https://www.canvaslms.com/policies/api-policy">The Canvas Cloud API Terms of Service</a> before using the API.
 
 Schema
 ------
