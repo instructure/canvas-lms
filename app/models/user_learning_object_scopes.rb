@@ -300,6 +300,7 @@ module UserLearningObjectScopes
         joins("INNER JOIN #{Enrollment.quoted_table_name} ON enrollments.course_id = assignments.context_id").
         where(enrollments: {user_id: self}).
         where("EXISTS (#{grader_visible_submissions_sql})").
+        group('assignments.id').
         order('assignments.due_at')
       ActiveRecord::Associations::Preloader.new.preload(as, :context)
       if scope_only

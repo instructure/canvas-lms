@@ -597,6 +597,11 @@ describe UserLearningObjectScopes do
       end
     end
 
+    it 'should not duplicate assignments for teachers in multiple sections' do
+      @course2.enroll_teacher(@teacher, enrollment_state: 'active', section: @section2b, allow_multiple_enrollments: true)
+      expect(@teacher.assignments_needing_grading.count).to eq 2
+    end
+
     it "should count assignments with ungraded submissions across multiple courses" do
       expect(@teacher.assignments_needing_grading.size).to eql(2)
       expect(@teacher.assignments_needing_grading).to be_include(@course1.assignments.first)
