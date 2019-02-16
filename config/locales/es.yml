@@ -10821,7 +10821,7 @@ es:
       searching: Buscando...
     switched_roles_message: 
       designer: "Ha cambiado los roles temporalmente para este curso, y ahora lo está viendo como un diseñador. Puede restaurar su rol y permisos desde la página de inicio de su curso."
-      observer: "Ha cambiado los roles temporalmente para este curso, y ahora lo está viendo como un observador.Puede restaurar su rol y permisos desde la página de inicio de su curso."
+      observer: "Ha cambiado los roles temporalmente para este curso, y ahora lo está viendo como un observador. Puede restaurar su rol y permisos desde la página de inicio de su curso."
       student: "Ha cambiado los roles temporalmente para este curso, ahora lo está viendo como un alumno. Puede restaurar su rol y permisos desde la página de inicio de su curso."
       ta: "Ha cambiado los roles temporalmente para este curso, ahora lo está viendo como un AP. Puede restaurar su rol y permisos desde la página de inicio de su curso."
       teacher: "Ha cambiado los roles temporalmente para este curso, ahora lo está viendo como un profesor. Puede restaurar su rol y permisos desde la página de inicio de su curso."
@@ -17761,7 +17761,7 @@ es:
   root_accounts_cc035dcf: "Cuentas de nivel superior"
   roster: 
     delete_confirm: "¿Está seguro que quiere eliminar este usuario?"
-    error_sending_invitations: "Se ha producido un error al enviar la invitación.Inténtelo de nuevo."
+    error_sending_invitations: "Se ha producido un error al enviar la invitación. Inténtelo de nuevo."
     filter_multiple_users_found: "%{userCount} usuarios encontrados."
     filter_no_users_found: "No se encontró ningún usuario."
     filter_one_user_found: "1 usuario encontrado."
