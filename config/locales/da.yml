@@ -12050,9 +12050,9 @@ da:
         subject: "Opgaven blev ændret: %{title}, %{course}"
       sms: 
         body: |-
-            %{title}, %{course} has changed.
+            %{title}, %{course} er blevet ændret.
             
-            More info at %{website}
+            Yderligere oplysninger på %{website}
       summary: 
         subject: "Opgaven blev ændret: %{title}, %{course}"
       twitter: 
