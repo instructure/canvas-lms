@@ -1803,7 +1803,7 @@ nb:
   allow_course_images_to_be_assigned_to_a_course_and_adb906f4: "Tillat bilder fra kurset å bli tildelt til et kurs og bli brukt på kortene på kontrollpanelet."
   allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "La kort til dashbordet bestilles på nytt til hver bruker."
   allow_final_grade_override_8cf4336b: "Tillat oppheving av avsluttende karakter"
-  allow_importing_of_qti_and_common_cartridge_into_q_81b657cd: "Tillat å importere QTI og Common Cartridge in i tester.Neste."
+  allow_importing_of_qti_and_common_cartridge_into_q_81b657cd: "Tillat å importere QTI og Common Cartridge in i Quizzes.Next."
   allow_in_mastery_paths_5332c786: "Tillat i læringsstier"
   allow_intra_group_peer_reviews_53f1e455: "Tillat hverandrevurdering innad i gruppen"
   allow_lor_tools: "Tillat brukere å vise og bruke eksterne verktøy som er konfigurert for LOR."
@@ -1894,7 +1894,7 @@ nb:
       Lar en bruker vise innloggings-ID-informasjon for lærere, designere og LA-er.
       Lar en bruker vise brukerdetaljer for alle brukere.
       Lar en bruker redigere en brukers seksjon eller rolle.
-  allows_user_to_add_remove_students_allows_user_to__44718712: "Lar en bruker legge til/fjerne studenter. Lar en bruker lege til/fjerne observatører.Lar en bruker vise innloggings-ID-informasjon for studenter. Lar en bruker vise tidligere påmeldinger. Lar en bruker gå inn i en brukers innstillingsmeny og brukerdetaljer. Lar en bruker redigere en students seksjon eller rolle. Lar en bruker sende emneinvitasjoner på nytt fra folk-siden til emnet."
+  allows_user_to_add_remove_students_allows_user_to__44718712: "Lar en bruker legge til/fjerne studenter. Lar en bruker lege til/fjerne observatører. Lar en bruker vise innloggings-ID-informasjon for studenter. Lar en bruker vise tidligere påmeldinger. Lar en bruker gå inn i en brukers innstillingsmeny og brukerdetaljer. Lar en bruker redigere en students seksjon eller rolle. Lar en bruker sende emneinvitasjoner på nytt fra folk-siden til emnet."
   allows_user_to_add_remove_students_to_the_course_a_f5b48d9: |-
       Lar en bruker legge til/fjerne studenter i emnet.
       Lar en bruker legge til/fjerne observatører i emnet.
@@ -4585,7 +4585,7 @@ nb:
     to_now: nå
   comment_by_replying_to_this_message_or_join_the_co_26d42fde: "Kommentere ved å svare på denne meldingen, eller delta i samtalen ved å bruke denne lenken: %{link}."
   comment_by_replying_to_this_message_or_join_the_co_52b5ac1c: "Kommentér ved å svare på denne meldingen, eller bli med i samtalen med denne lenken: %{link}. Når det er tillatt og du må legge til et vedlegg, logg inn i Canvas og svar på samtalen."
-  comment_by_replying_to_this_message_or_join_the_co_886bc612: "Kommentér ved å svare på denne meldingen, eller bli med i samtalen med denne lenken: %{link}.Når det er tillatt og du må legge til et vedlegg, logg inn i Canvas og svar på kunngjøringen."
+  comment_by_replying_to_this_message_or_join_the_co_886bc612: "Kommentér ved å svare på denne meldingen, eller bli med i samtalen med denne lenken: %{link}. Når det er tillatt og du må legge til et vedlegg, logg inn i Canvas og svar på kunngjøringen."
   comments_e07bcbe3: Kommentarer
   commmessages_9fa33faa: CommMessages
   common_cartridge_description: "Dette gjør det mulig å konvertere en standardformat pakke til et midlertidig json format for import"
@@ -4995,11 +4995,11 @@ nb:
         default_select_folder: "Velg mappe"
         upload_to: "Last opp til"
       import_quizzes_next_view: 
-        import_quizzesNext_help_label: "Importer vurdering som tester.Neste. Hjelpeikon"
-        import_quizzesNext_help_text: "Tester.Neste er vurderingsmaskinen til Canvas.%{p_p}For å lære mer kontakt din systemadministrator eller gå til"
-        import_quizzesNext_help_title: Tester.Neste
-        import_quizzesNext_help_title_icon: "Importer vurdering som tester.Neste Hjelpeikon"
-        import_quizzes_Next: "Importer vurderingsinnhold som tester.Neste"
+        import_quizzesNext_help_label: "Importer vurdering som Quizzes.Next. Hjelpeikon"
+        import_quizzesNext_help_text: "Quizzes.Next er vurderingsmaskinen til Canvas.%{p_p}For å lære mer kontakt din systemadministrator eller gå til"
+        import_quizzesNext_help_title: Quizzes.Next
+        import_quizzesNext_help_title_icon: "Importer vurdering som Quizzes.Next Hjelpeikon"
+        import_quizzes_Next: "Importer vurderingsinnhold som Quizzes.Next"
       overwrite_assessment_content: 
         assessment_help_label: "Hjelp med overskriv vurdering ikon"
         assessment_help_text: "Noen systemer resirkulerer ID-ene for hver ny eksportering. På grunn av dette kan to forskjellige spørsmålsbanker ha samme ID om de eksporteres. For ikke å miste vurderingsdata behandler vi disse objektene som forskjellige objekter til tross for at ID-ene er den same. Om du velger dette valget vil denne sikkerhetsfunksjonen slås av, og vurderingsdata kan overskrives på grunn av sammenfallende ID-er."
@@ -6649,7 +6649,7 @@ nb:
   create_as_many_discussion_topics_as_needed_as_assi_f1221307: |-
       Lag så mange diskusjonstemaer som nødvendig, som oppgaver
       for karaktersetting eller som et forum for felles ideer og informasjon.
-  create_assessments_with_quizzes_next_and_migrate_e_eaaee5e6: "Opprett vurderinger med Tester.Neste og flytt eksisterende Canvas Tester."
+  create_assessments_with_quizzes_next_and_migrate_e_eaaee5e6: "Opprett vurderinger med Quizzes.Next og flytt eksisterende Canvas Tester."
   create_assignment_68532ceb: "Lag oppgave"
   create_assignments_on_the_assignments_page_organiz_8838b18a: "Opprett oppgaver på oppgavesiden (Assignments page). Organiser oppgaver i grupper som lekser, klassearbeid, essay, diskusjoner og tester. Oppgavegrupper kan vektes."
   create_assignments_on_the_assignments_page_organiz_90c78fdc: |-
@@ -17314,7 +17314,7 @@ nb:
     submission_action_take_quiz: "Ta %{title}"
   quizzes_7e598f57: Tester
   quizzes_and_question_banks_9b7569e3: "Tester og spørsmålsbanker"
-  quizzes_next_importing_75e63f67: "Importere tester.Neste"
+  quizzes_next_importing_75e63f67: "Importere Quizzes.Next"
   quizzes_next_submission_history_c0f7cd20: "Quizzes.Next innleveringshistorie"
   quizzes_tutorial_tray_6f87cdd3: "Lærebrett (Tutorial Tray) for tester"
   quizzes_view_submission_log_ec105e3e: "Tester - vis innleveringslogg"
@@ -20234,7 +20234,7 @@ nb:
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Dette skjedde sannsynligvis fordi du importerte emneinnhold uten de tilknyttede filene."
   this_name_appears_in_sorted_lists_dccbd84b: "Dette navnet vises i sorterte lister."
   this_name_will_be_used_by_teachers_for_grading_9b6aa8a0: "Dette navnet vil brukes av foreleser for karaktersetting."
-  this_option_is_not_compatible_with_quizzes_next_6dacd0c1: "Dette valget er ikke kompatibelt med tester.Neste"
+  this_option_is_not_compatible_with_quizzes_next_6dacd0c1: "Dette valget er ikke kompatibelt med Quizzes.Next"
   this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: "Dette læringsmålet har blitt brukt til å vurdere en student og kan ikke lenger bli oppdatert"
   this_outcome_has_been_used_to_assess_a_student_and_5a925169: "Dette læringsmålet har blitt brukt til å vurdere en student og kan ikke redigeres eller slettes"
   this_outcome_has_been_used_to_assess_a_student_and_a3a48511: "Dette resultatet har blitt brukt ti å vurdere en student og noen endringer vil påvirke studentens resultater."
@@ -20641,7 +20641,7 @@ nb:
   to_generate_a_pairing_code_from_a_student_s_user_s_e36358b3: |-
       For å generere en paringskode fra en students brukerinnstillinger-side må 'Bruker - opptre som'-tillatelsen også være aktivert.
       For å generere en paringskode fra en students brukerdetaljer-side må 'Brukere - legg til / fjern studenter fra emner'-tillatelsen også være aktivert.
-  to_generate_login_logout_activity_in_admin_tools_u_c5712e03: "For å generere inn/utloggingsaktivitet i administratorverktøyet må 'Brukere - administrer innloggingsdetaljer' eller 'Statistikk - vis' også være aktiverte.For å generere karakterendringslogger i administratorverktøyet må 'Karakterer - vis endringslogger' også være aktivert."
+  to_generate_login_logout_activity_in_admin_tools_u_c5712e03: "For å generere inn/utloggingsaktivitet i administratorverktøyet må 'Brukere - administrer innloggingsdetaljer' eller 'Statistikk - vis' også være aktiverte. For å generere karakterendringslogger i administratorverktøyet må 'Karakterer - vis endringslogger' også være aktivert."
   to_import_assignments_and_quizzes_using_the_course_86c5bdbb: "For å importere oppgaver og tester ved bruk av importeringsverktøyet for emner må 'Emneinnhold - legg til / rediger / slett' være aktivert."
   to_import_files_using_the_course_import_tool_cours_a0c2db0c: "For å importere filer ved bruk av importeringsverktøyet for emner må 'Emneinnhold - legg til / rediger / slett' også være aktivert."
   to_import_sis_data_sis_data_import_must_also_be_en_52bdf01: "For å importere SIS-data må 'SIS-data - importer' også være aktivert."
