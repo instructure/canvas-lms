@@ -1652,8 +1652,8 @@ ht:
       recipients: "Voye yon avètisman pou"
       repetition_description: "Re voye alèt chak %{count} jou jiskaske li rezoud"
     alerts: 
-      alerts_description_account: "Gen yon alèt ki pwodui pou chak elèv ki reponn a tou kritè yo.Yo kontwole yo chak jou, e yo voye yon avètisman bay elèv la, pwofesè a ak/oswa administratè kont lan jiskaske pwoblèm deklanchman an rezoud."
-      alerts_description_course: "Gen yon alèt ki pwodui pou chak elèv ki reponn a tou kritè yo.Yo kontwole yo chak jou, e yo voye yon avètisman bay elèv la ak/oswa pwofesè a jiskaske pwoblèm deklanchman an rezoud."
+      alerts_description_account: "Gen yon alèt ki pwodui pou chak elèv ki reponn a tou kritè yo. Yo kontwole yo chak jou, e yo voye yon avètisman bay elèv la, pwofesè a ak/oswa administratè kont lan jiskaske pwoblèm deklanchman an rezoud."
+      alerts_description_course: "Gen yon alèt ki pwodui pou chak elèv ki reponn a tou kritè yo. Yo kontwole yo chak jou, e yo voye yon avètisman bay elèv la ak/oswa pwofesè a jiskaske pwoblèm deklanchman an rezoud."
       buttons: 
         add_alert: Alèt
       description: "Pa gen pwofesè ki entèaji ak elèv la depi %{count} jou"
@@ -4307,7 +4307,7 @@ ht:
     to_now: "kounye a"
   comment_by_replying_to_this_message_or_join_the_co_26d42fde: "Reponn mesaj sa a pou kòmante, oswa pase pa lyen sa a pou ale nan konvèsasyon an: %{link}."
   comment_by_replying_to_this_message_or_join_the_co_52b5ac1c: "Kòmante ak yon repons nan mesaj sa, oswa itilize lyen sa a pou antre nan konvèsasyon an: %{link}. Lè sa a otorize, si w vle mete yon pyès jwent, tanpri konekte sou Cancas epi reponn nan diskisyon an."
-  comment_by_replying_to_this_message_or_join_the_co_886bc612: "Kòmante ak yon repons nan mesaj sa, oswa itilize lyen sa a pou antre nan konvèsasyon an: %{link}.Lè sa a otorize, si w vle mete yon pyès jwent, tanpri konekte sou Cancas epi reponn a anons lan."
+  comment_by_replying_to_this_message_or_join_the_co_886bc612: "Kòmante ak yon repons nan mesaj sa, oswa itilize lyen sa a pou antre nan konvèsasyon an: %{link}. Lè sa a otorize, si w vle mete yon pyès jwent, tanpri konekte sou Cancas epi reponn a anons lan."
   comments_e07bcbe3: Kòmantè
   commmessages_9fa33faa: CommMessages
   common_cartridge_description: "Sa pèmèt konvèsyon yon pakè Common Cartridge a fòma json entèmedyè pou li ka enpòte"
@@ -14054,7 +14054,7 @@ ht:
           valè.
       generate_access_token_description: |-
           Token Aksè yo se yo menm ki pèmèt tyès aplikasyon yo gen aksè a resous
-          Canvas yo nan plas ou.Nòmalman token sa yo kreye otmatikman pou
+          Canvas yo nan plas ou. Nòmalman token sa yo kreye otmatikman pou
           aplikasyon yo lè sa nesesè, men si [you're developing a new or limited
           project](%{documentation_url}) ou ka jis jenere token nan la a.
       google_drive_description: "Depi w ba nou otorizasyon pou nou wè Google Drive ou, w ap ka soumèt sesyon dirèkteman depi Google Drive, epi kreye yon dokiman pataje ak elèv ki nan klas ou yo."
@@ -16869,7 +16869,7 @@ ht:
         rubric_in_use: 
           one: "Mete nan lespri w ke 1 elèv evalye deja ak ribrik sa a. Si w chanje li l ap afekte evalyasyon yo."
           other: "Mete nan lespri w ke %{count} elèv evalye deja ak ribrik sa a. Si w chanje li l ap afekte evalyasyon yo."
-        rubric_in_use2: "Ou evalye elèv ak ribrik sa a deja.Tout chanjman enpòtan ka afekte rezilta evalyasyon yo."
+        rubric_in_use2: "Ou evalye elèv ak ribrik sa a deja. Tout chanjman enpòtan ka afekte rezilta evalyasyon yo."
       out_of: "%{points} *sou %{total}*"
       rubric: Ribrik
       rubric_title: Tit
