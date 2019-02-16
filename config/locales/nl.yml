@@ -12837,8 +12837,8 @@ nl:
             %{course_name} is geweigerd.
         subject: "Lidmaatschap aan groep geweigerd voor %{group_name}"
       twitter: 
-        account_group: "Canvas waarschuwing - Lidmaatschap aan groep %{group_name}.geweigerd: voor het account %{account_name}."
-        course_group: "Canvas waarschuwing - Lidmaatschap aan groep %{group_name}.geweigerd: voor de cursus %{course_name}."
+        account_group: "Canvas waarschuwing - Lidmaatschap aan groep %{group_name} geweigerd: voor het account %{account_name}."
+        course_group: "Canvas waarschuwing - Lidmaatschap aan groep %{group_name} geweigerd: voor de cursus %{course_name}."
     html_message: 
       html_not_exist: "De HTML-versie van dit bericht is noch gemaakt noch verstuurd"
     index: 
