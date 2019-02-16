@@ -20646,7 +20646,7 @@ pt:
   to_generate_a_pairing_code_from_a_student_s_user_s_e36358b3: |-
       Para gerar um código de pareamento na página de Definições do utilizador do aluno, a permissão Utilizador - atuar como permissão também deve estar ativada.
       Para gerar um código de pareamento na página Detalhes do utilizador do aluno, a permissão Utilizadores - adicionar / remover alunos da disciplina também deve estar ativada.
-  to_generate_login_logout_activity_in_admin_tools_u_c5712e03: "Para gerar atividade de login / logout nas Ferramentas Administrativas, a exibição Utilizadores - gerenciar detalhes de login ou Estatísticas - também deve estar ativada.Para gerar registros de alteração de notas em Ferramentas de Administração, Notas - ver logs de alterações também deve estar ativado."
+  to_generate_login_logout_activity_in_admin_tools_u_c5712e03: "Para gerar atividade de login / logout nas Ferramentas Administrativas, a exibição Utilizadores - gerenciar detalhes de login ou Estatísticas - também deve estar ativada. Para gerar registros de alteração de notas em Ferramentas de Administração, Notas - ver logs de alterações também deve estar ativado."
   to_import_assignments_and_quizzes_using_the_course_86c5bdbb: "Para importar atribuições e questionários usando a Ferramenta de importação da disciplina, o Conteúdo da disciplina - adicionar / editar / eliminar deve estar ativado."
   to_import_files_using_the_course_import_tool_cours_a0c2db0c: "Para importar ficheiros usando a Ferramenta de Importação do Disciplina, o Conteúdo da disciplina - adicionar / editar / eliminar também deve estar ativado."
   to_import_sis_data_sis_data_import_must_also_be_en_52bdf01: "Para importar dados do SIS, a importação de dados do SIS também deve estar ativada."
