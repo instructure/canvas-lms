@@ -48,8 +48,7 @@ function newProps() {
               url: 'https://lti-tool-provider-example.herokuapp.com/messages/blti',
               text: 'LTI 1.3 Test Tool (Course Nav)'
             }
-          },
-          privacy_level: 'public'
+          }
         }
       ]
     },
@@ -62,7 +61,8 @@ function newProps() {
     disabledPlacements: [],
     dispatch: jest.fn(),
     setEnabledScopes: jest.fn(),
-    setDisabledPlacements: jest.fn()
+    setDisabledPlacements: jest.fn(),
+    setPrivacyLevel: jest.fn()
   }
 }
 
@@ -71,9 +71,7 @@ function renderedOptions(table = 0) {
     .find('Table')
     .at(table)
     .find('CustomizationOption')
-    .map(opt => (
-      opt.find('Checkbox').instance().props.name
-    ))
+    .map(opt => opt.find('Checkbox').instance().props.name)
 }
 
 let wrapper = 'empty wrapper'
@@ -85,12 +83,8 @@ afterEach(() => {
 it('renders an option for each valid scope', () => {
   wrapper = mount(<CustomizationForm {...newProps()} />)
   const options = renderedOptions()
-  expect(options).toContain(
-    'Line Item'
-  )
-  expect(options).toContain(
-    'Result'
-  )
+  expect(options).toContain('Line Item')
+  expect(options).toContain('Result')
 })
 
 it('does not render an option for invalid scopes', () => {
@@ -127,7 +121,9 @@ it('enables all valid scopes by default', () => {
 })
 
 it('removes a scope from "selectedScopes" when it is toggled off', () => {
-  const props = Object.assign(newProps(), {enabledScopes: ['https://purl.imsglobal.org/spec/lti-ags/scope/lineitem']})
+  const props = Object.assign(newProps(), {
+    enabledScopes: ['https://purl.imsglobal.org/spec/lti-ags/scope/lineitem']
+  })
   const event = {
     target: {
       value: 'Line Item'
@@ -152,7 +148,7 @@ it('adds a scope to "selectedScopes" when it is toggled on', () => {
   wrapper.instance().handleScopeChange(event)
 
   expect(props.setEnabledScopes).toHaveBeenCalledWith([
-    "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"
+    'https://purl.imsglobal.org/spec/lti-ags/scope/lineitem'
   ])
 })
 
@@ -197,4 +193,17 @@ it('returns null if the placement does not exist', () => {
 it('returns null if the placement have a message type', () => {
   wrapper = mount(<CustomizationForm {...newProps()} />)
   expect(wrapper.instance().messageTypeFor('no_message_type')).toBeFalsy()
+})
+
+it('defaults the privacy level to anonymous', () => {
+  const props = newProps()
+  wrapper = mount(<CustomizationForm {...props} />)
+  expect(props.setPrivacyLevel).toHaveBeenCalledWith('anonymous')
+})
+
+it('sets the privacy level', () => {
+  const props = newProps()
+  wrapper = mount(<CustomizationForm {...props} />)
+  wrapper.instance().setPrivacyLevel({target: {value: 'public'}})
+  expect(props.setPrivacyLevel).toHaveBeenCalledWith('public')
 })

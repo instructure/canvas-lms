@@ -64,6 +64,14 @@ describe Lti::Messages::ResourceLinkRequest do
       expect_assignment_resource_link_id(jws)
     end
 
+    it 'sets the assignment description' do
+      expect(jws.dig('https://purl.imsglobal.org/spec/lti/claim/resource_link', 'description')).to eq assignment.description
+    end
+
+    it 'sets the assignment title' do
+      expect(jws.dig('https://purl.imsglobal.org/spec/lti/claim/resource_link', 'title')).to eq assignment.title
+    end
+
     context 'when assignment and grade service enabled' do
       let(:developer_key_scopes) do
         [
@@ -151,26 +159,6 @@ describe Lti::Messages::ResourceLinkRequest do
     it_behaves_like 'disabled rlid claim group check'
   end
 
-  shared_examples 'assignment common extensions check' do
-    it 'adds the canvas_assignment_id if the tool is public' do
-      tool.update!(workflow_state: 'public')
-      expect(jws['https://www.instructure.com/canvas_assignment_id']).to eq assignment.id
-    end
-
-    it 'does not add the canvas_assignment_id if the tool is not public' do
-      tool.update!(workflow_state: 'private')
-      expect(jws).not_to include 'https://www.instructure.com/canvas_assignment_id'
-    end
-
-    it 'adds the canvas_assignment_title' do
-      expect(jws['https://www.instructure.com/canvas_assignment_title']).to eq assignment.title
-    end
-
-    it 'adds the canvas_assignment_points_possible' do
-      expect(jws['https://www.instructure.com/canvas_assignment_points_possible']).to eq assignment.points_possible
-    end
-  end
-
   describe '#generate_post_payload_for_assignment' do
     let(:outcome_service_url) { 'https://www.outcome-service-url.com' }
     let(:legacy_outcome_service_url) { 'https://www.legacy-outcome-service-url.com' }
@@ -214,22 +202,6 @@ describe Lti::Messages::ResourceLinkRequest do
       expect(jws).not_to include 'https://www.instructure.com/outcomes_tool_placement_url'
     end
 
-    it_behaves_like 'assignment common extensions check'
-    it_behaves_like 'assignment resource link id check'
-  end
-
-  describe '#generate_post_payload_for_homework_submission' do
-    let(:jws) { jwt_message.generate_post_payload_for_homework_submission(assignment) }
-
-    it 'adds the content_return_types' do
-      expect(jws['https://www.instructure.com/content_return_types']).to eq lti_assignment.return_types.join(',')
-    end
-
-    it 'adds the content_file_extensions' do
-      expect(jws['https://www.instructure.com/content_file_extensions']).to eq assignment.allowed_extensions&.join(',')
-    end
-
-    it_behaves_like 'assignment common extensions check'
     it_behaves_like 'assignment resource link id check'
   end
 

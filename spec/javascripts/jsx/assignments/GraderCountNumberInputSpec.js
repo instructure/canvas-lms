@@ -29,7 +29,7 @@ QUnit.module('GraderCountNumberInput', hooks => {
   }
 
   function numberInput() {
-    return numberInputContainer().find('input[name="grader_count"]')
+    return numberInputContainer().find('.ModeratedGrading__GraderCountInputContainer input')
   }
 
   function mountComponent() {
@@ -68,63 +68,79 @@ QUnit.module('GraderCountNumberInput', hooks => {
 
   test('accepts the entered value if it is a positive, whole number', () => {
     mountComponent()
-    numberInput().simulate('change', { target: { value: '5' } })
+    numberInput().simulate('change', {target: {value: '5'}})
     strictEqual(numberInput().instance().value, '5')
   })
 
   test('accepts the entered value if it is the empty string', () => {
     mountComponent()
-    numberInput().simulate('change', { target: { value: '' } })
+    numberInput().simulate('change', {target: {value: ''}})
     strictEqual(numberInput().instance().value, '')
   })
 
   test('ignores the negative sign if a negative number is entered', () => {
     mountComponent()
-    numberInput().simulate('change', { target: { value: '-5' } })
+    numberInput().simulate('change', {target: {value: '-5'}})
     strictEqual(numberInput().instance().value, '5')
   })
 
   test('ignores the numbers after the decimal if a fractional number is entered', () => {
     mountComponent()
-    numberInput().simulate('change', { target: { value: '5.8' } })
+    numberInput().simulate('change', {target: {value: '5.8'}})
     strictEqual(numberInput().instance().value, '5')
   })
 
   test('ignores the input alltogether if the value entered is not numeric', () => {
     mountComponent()
-    numberInput().simulate('change', { target: { value: 'a' } })
+    numberInput().simulate('change', {target: {value: 'a'}})
     strictEqual(numberInput().instance().value, '2')
   })
 
   test('shows an error message if the grader count is 0', () => {
     mountComponent()
-    numberInput().simulate('change', { target: { value: '0' } })
-    ok(numberInputContainer().text().includes('Must have at least 1 grader'))
+    numberInput().simulate('change', {target: {value: '0'}})
+    ok(
+      numberInputContainer()
+        .text()
+        .includes('Must have at least 1 grader')
+    )
   })
 
   test('shows a message if the grader count is > the max', () => {
     mountComponent()
-    numberInput().simulate('change', { target: { value: '11' } })
-    ok(numberInputContainer().text().includes('There are currently 10 available graders'))
+    numberInput().simulate('change', {target: {value: '11'}})
+    ok(
+      numberInputContainer()
+        .text()
+        .includes('There are currently 10 available graders')
+    )
   })
 
   test('shows a message with correct grammar if the grader count is > the max and the max is 1', () => {
     props.maxGraderCount = 1
     mountComponent()
-    numberInput().simulate('change', { target: { value: '2' } })
-    ok(numberInputContainer().text().includes('There is currently 1 available grader'))
+    numberInput().simulate('change', {target: {value: '2'}})
+    ok(
+      numberInputContainer()
+        .text()
+        .includes('There is currently 1 available grader')
+    )
   })
 
   test('shows an error message on blur if the grader count is the empty string', () => {
     mountComponent()
-    numberInput().simulate('change', {target: {value: '' }})
+    numberInput().simulate('change', {target: {value: ''}})
     numberInput().simulate('blur', {type: 'blur', target: {value: ''}})
-    ok(numberInputContainer().text().includes('Must have at least 1 grader'))
+    ok(
+      numberInputContainer()
+        .text()
+        .includes('Must have at least 1 grader')
+    )
   })
 
   test('does not pass any validation error messages to the NumberInput if the input is valid', () => {
     mountComponent()
-    numberInput().simulate('change', { target: { value: '4' } })
+    numberInput().simulate('change', {target: {value: '4'}})
     strictEqual(numberInputContainer().text(), 'Number of graders')
   })
 })

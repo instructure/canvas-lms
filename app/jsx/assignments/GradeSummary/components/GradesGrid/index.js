@@ -45,8 +45,12 @@ function studentToRow(student, pageStart, studentIndex, rowOptions) {
 function studentsToPages(props) {
   const {anonymousStudents, assignment, students} = props
   const rowOptions = {anonymousStudents, assignmentId: assignment.id, courseId: assignment.courseId}
-
   const pages = []
+
+  if (anonymousStudents) {
+    students.sort((a, b) => (a.id > b.id ? 1 : -1))
+  }
+
   for (let pageStart = 0; pageStart < students.length; pageStart += ROWS_PER_PAGE) {
     const pageStudents = students.slice(pageStart, pageStart + ROWS_PER_PAGE)
     pages.push(
@@ -55,6 +59,7 @@ function studentsToPages(props) {
       )
     )
   }
+
   return pages
 }
 

@@ -80,7 +80,8 @@ test('#loadValue escapes html', function() {
 })
 
 test('#class.formatter rounds numbers if they are numbers', function() {
-  sandbox.stub(SubmissionCell.prototype, 'cellWrapper')
+  sandbox
+    .stub(SubmissionCell.prototype, 'cellWrapper')
     .withArgs('0.67')
     .returns('ok')
   const formattedResponse = SubmissionCell.formatter(0, 0, {grade: 0.666}, {}, {})
@@ -88,7 +89,8 @@ test('#class.formatter rounds numbers if they are numbers', function() {
 })
 
 test('#class.formatter gives the value to the formatter if submission.grade isnt a parseable number', function() {
-  sandbox.stub(SubmissionCell.prototype, 'cellWrapper')
+  sandbox
+    .stub(SubmissionCell.prototype, 'cellWrapper')
     .withArgs('happy')
     .returns('ok')
   const formattedResponse = SubmissionCell.formatter(0, 0, {grade: 'happy'}, {}, {})
@@ -96,7 +98,8 @@ test('#class.formatter gives the value to the formatter if submission.grade isnt
 })
 
 test('#class.formatter adds a percent symbol for assignments with a percent grading_type', function() {
-  sandbox.stub(SubmissionCell.prototype, 'cellWrapper')
+  sandbox
+    .stub(SubmissionCell.prototype, 'cellWrapper')
     .withArgs('73%')
     .returns('ok')
   const formattedResponse = SubmissionCell.formatter(
@@ -218,7 +221,8 @@ test("#class.formatter, isConcluded doesn't have grayed-out", () => {
 })
 
 test('#letter_grade.formatter, shows EX when submission is excused', function() {
-  sandbox.stub(SubmissionCell.prototype, 'cellWrapper')
+  sandbox
+    .stub(SubmissionCell.prototype, 'cellWrapper')
     .withArgs('EX')
     .returns('ok')
   const formattedResponse = SubmissionCell.letter_grade.formatter(0, 0, {excused: true}, {}, {})
@@ -226,7 +230,8 @@ test('#letter_grade.formatter, shows EX when submission is excused', function() 
 })
 
 test('#letter_grade.formatter, shows the score and letter grade', function() {
-  sandbox.stub(SubmissionCell.prototype, 'cellWrapper')
+  sandbox
+    .stub(SubmissionCell.prototype, 'cellWrapper')
     .withArgs("F<span class='letter-grade-points'>0</span>")
     .returns('ok')
   const formattedResponse = SubmissionCell.letter_grade.formatter(
@@ -243,7 +248,8 @@ test('#letter_grade.formatter, shows the score and letter grade', function() {
 })
 
 test('#letter_grade.formatter, shows the letter grade', function() {
-  sandbox.stub(SubmissionCell.prototype, 'cellWrapper')
+  sandbox
+    .stub(SubmissionCell.prototype, 'cellWrapper')
     .withArgs('B')
     .returns('ok')
   const formattedResponse = SubmissionCell.letter_grade.formatter(0, 0, {grade: 'B'}, {}, {})
@@ -574,7 +580,10 @@ QUnit.module('SubmissionCell#classesBasedOnSubmission', () => {
 
   test('does not return moderated if anonymize_students is set on the assignment', () => {
     const assignment = {anonymize_students: true}
-    strictEqual(SubmissionCell.classesBasedOnSubmission({}, assignment).includes('moderated'), false)
+    strictEqual(
+      SubmissionCell.classesBasedOnSubmission({}, assignment).includes('moderated'),
+      false
+    )
   })
 
   test('returns muted when muted is set on the assignment', () => {

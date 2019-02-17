@@ -16,31 +16,31 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import AssignmentApi from '../../gradebook-history/api/AssignmentApi';
-import * as HistoryActions from '../../gradebook-history/actions/HistoryActions';
-import HistoryApi from '../../gradebook-history/api/HistoryApi';
-import UserApi from '../../gradebook-history/api/UserApi';
-import environment from '../../gradebook-history/environment';
+import AssignmentApi from '../../gradebook-history/api/AssignmentApi'
+import * as HistoryActions from '../../gradebook-history/actions/HistoryActions'
+import HistoryApi from '../../gradebook-history/api/HistoryApi'
+import UserApi from '../../gradebook-history/api/UserApi'
+import environment from '../../gradebook-history/environment'
 
-const CLEAR_RECORDS = 'CLEAR_RECORDS';
-const FETCH_RECORDS_START = 'FETCH_RECORDS_START';
-const FETCH_RECORDS_SUCCESS = 'FETCH_RECORDS_SUCCESS';
-const FETCH_RECORDS_FAILURE = 'FETCH_RECORDS_FAILURE';
-const FETCH_RECORDS_NEXT_PAGE_START = 'FETCH_RECORDS_NEXT_PAGE_START';
-const FETCH_RECORDS_NEXT_PAGE_SUCCESS = 'FETCH_RECORDS_NEXT_PAGE_SUCCESS';
-const FETCH_RECORDS_NEXT_PAGE_FAILURE = 'FETCH_RECORDS_NEXT_PAGE_FAILURE';
+const CLEAR_RECORDS = 'CLEAR_RECORDS'
+const FETCH_RECORDS_START = 'FETCH_RECORDS_START'
+const FETCH_RECORDS_SUCCESS = 'FETCH_RECORDS_SUCCESS'
+const FETCH_RECORDS_FAILURE = 'FETCH_RECORDS_FAILURE'
+const FETCH_RECORDS_NEXT_PAGE_START = 'FETCH_RECORDS_NEXT_PAGE_START'
+const FETCH_RECORDS_NEXT_PAGE_SUCCESS = 'FETCH_RECORDS_NEXT_PAGE_SUCCESS'
+const FETCH_RECORDS_NEXT_PAGE_FAILURE = 'FETCH_RECORDS_NEXT_PAGE_FAILURE'
 
-const courseId = environment.courseId();
+const courseId = environment.courseId()
 
 const SearchFormActions = {
-  fetchRecordsStart (recordType) {
+  fetchRecordsStart(recordType) {
     return {
       type: FETCH_RECORDS_START,
-      payload: { recordType }
-    };
+      payload: {recordType}
+    }
   },
 
-  fetchRecordsSuccess ({ data, headers }, recordType) {
+  fetchRecordsSuccess({data, headers}, recordType) {
     return {
       type: FETCH_RECORDS_SUCCESS,
       payload: {
@@ -48,24 +48,24 @@ const SearchFormActions = {
         link: headers.link,
         recordType
       }
-    };
+    }
   },
 
-  fetchRecordsFailure (recordType) {
+  fetchRecordsFailure(recordType) {
     return {
       type: FETCH_RECORDS_FAILURE,
-      payload: { recordType }
-    };
+      payload: {recordType}
+    }
   },
 
-  fetchRecordsNextPageStart (recordType) {
+  fetchRecordsNextPageStart(recordType) {
     return {
       type: FETCH_RECORDS_NEXT_PAGE_START,
-      payload: { recordType }
-    };
+      payload: {recordType}
+    }
   },
 
-  fetchRecordsNextPageSuccess ({ data, headers }, recordType) {
+  fetchRecordsNextPageSuccess({data, headers}, recordType) {
     return {
       type: FETCH_RECORDS_NEXT_PAGE_SUCCESS,
       payload: {
@@ -73,75 +73,77 @@ const SearchFormActions = {
         link: headers.link,
         recordType
       }
-    };
+    }
   },
 
-  fetchRecordsNextPageFailure (recordType) {
+  fetchRecordsNextPageFailure(recordType) {
     return {
       type: FETCH_RECORDS_NEXT_PAGE_FAILURE,
-      payload: { recordType }
-    };
+      payload: {recordType}
+    }
   },
 
-  getGradebookHistory (input) {
-    return function (dispatch) {
-      dispatch(HistoryActions.fetchHistoryStart());
+  getGradebookHistory(input) {
+    return function(dispatch) {
+      dispatch(HistoryActions.fetchHistoryStart())
       return HistoryApi.getGradebookHistory(courseId, input)
-        .then((response) => {
-          dispatch(HistoryActions.fetchHistorySuccess(response.data, response.headers));
+        .then(response => {
+          dispatch(HistoryActions.fetchHistorySuccess(response.data, response.headers))
         })
         .catch(() => {
-          dispatch(HistoryActions.fetchHistoryFailure());
-        });
-    };
+          dispatch(HistoryActions.fetchHistoryFailure())
+        })
+    }
   },
 
-  clearSearchOptions (recordType) {
+  clearSearchOptions(recordType) {
     return {
       type: CLEAR_RECORDS,
-      payload: { recordType }
-    };
-  },
-
-  getSearchOptions (recordType, searchTerm) {
-    return function (dispatch) {
-      dispatch(SearchFormActions.fetchRecordsStart(recordType));
-
-      const enrollmentStates = environment.courseIsConcluded() ? ['completed'] : [];
-      const request = recordType === 'assignments' ?
-        AssignmentApi.getAssignmentsByName(courseId, searchTerm) :
-        UserApi.getUsersByName(courseId, recordType, searchTerm, enrollmentStates);
-
-      return request
-        .then((response) => {
-          dispatch(SearchFormActions.fetchRecordsSuccess(response, recordType));
-        })
-        .catch(() => {
-          dispatch(SearchFormActions.fetchRecordsFailure(recordType));
-        });
+      payload: {recordType}
     }
   },
 
-  getSearchOptionsNextPage (recordType, url) {
-    return function (dispatch) {
-      dispatch(SearchFormActions.fetchRecordsNextPageStart(recordType));
+  getSearchOptions(recordType, searchTerm) {
+    return function(dispatch) {
+      dispatch(SearchFormActions.fetchRecordsStart(recordType))
 
-      const request = recordType === 'assignments' ?
-        AssignmentApi.getAssignmentsNextPage(url) :
-        UserApi.getUsersNextPage(url);
+      const enrollmentStates = environment.courseIsConcluded() ? ['completed'] : []
+      const request =
+        recordType === 'assignments'
+          ? AssignmentApi.getAssignmentsByName(courseId, searchTerm)
+          : UserApi.getUsersByName(courseId, recordType, searchTerm, enrollmentStates)
 
       return request
-        .then((response) => {
-          dispatch(SearchFormActions.fetchRecordsNextPageSuccess(response, recordType));
+        .then(response => {
+          dispatch(SearchFormActions.fetchRecordsSuccess(response, recordType))
         })
         .catch(() => {
-          dispatch(SearchFormActions.fetchRecordsNextPageFailure(recordType));
-        });
+          dispatch(SearchFormActions.fetchRecordsFailure(recordType))
+        })
+    }
+  },
+
+  getSearchOptionsNextPage(recordType, url) {
+    return function(dispatch) {
+      dispatch(SearchFormActions.fetchRecordsNextPageStart(recordType))
+
+      const request =
+        recordType === 'assignments'
+          ? AssignmentApi.getAssignmentsNextPage(url)
+          : UserApi.getUsersNextPage(url)
+
+      return request
+        .then(response => {
+          dispatch(SearchFormActions.fetchRecordsNextPageSuccess(response, recordType))
+        })
+        .catch(() => {
+          dispatch(SearchFormActions.fetchRecordsNextPageFailure(recordType))
+        })
     }
   }
-};
+}
 
-export default SearchFormActions;
+export default SearchFormActions
 
 export {
   CLEAR_RECORDS,
@@ -151,4 +153,4 @@ export {
   FETCH_RECORDS_NEXT_PAGE_START,
   FETCH_RECORDS_NEXT_PAGE_SUCCESS,
   FETCH_RECORDS_NEXT_PAGE_FAILURE
-};
+}

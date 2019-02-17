@@ -944,7 +944,7 @@ QUnit.module('GradeInput', suiteHooks => {
     test('shows empty string if the assignment has anonymized students', () => {
       props.assignment.anonymizeStudents = true
       mountComponent()
-      strictEqual(getSelectValue(), '');
+      strictEqual(getSelectValue(), '')
     })
 
     test('sets the select value to "Ungraded" when the submission is not graded', () => {

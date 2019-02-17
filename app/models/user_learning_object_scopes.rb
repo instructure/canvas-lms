@@ -297,8 +297,11 @@ module UserLearningObjectScopes
     # not really any harm in extending the expires_in since we touch the user anyway when grades change
     objects_needing('Assignment', 'grading', :instructor, params, 120.minutes, **params) do |assignment_scope|
       as = assignment_scope.active.
-        expecting_submission.
-        need_grading_info
+        joins("INNER JOIN #{Enrollment.quoted_table_name} ON enrollments.course_id = assignments.context_id").
+        where(enrollments: {user_id: self}).
+        where("EXISTS (#{grader_visible_submissions_sql})").
+        group('assignments.id').
+        order('assignments.due_at')
       ActiveRecord::Associations::Preloader.new.preload(as, :context)
       if scope_only
         as # This needs the below `select` somehow to work
@@ -306,6 +309,22 @@ module UserLearningObjectScopes
         as.lazy.reject{|a| Assignments::NeedsGradingCountQuery.new(a, self).count == 0 }.take(limit).to_a
       end
     end
+  end
+
+  def grader_visible_submissions_sql
+    "SELECT submissions.*
+       FROM #{Submission.quoted_table_name}
+      WHERE submissions.assignment_id = assignments.id
+        AND enrollments.limit_privileges_to_course_section = 'f'
+        AND #{Submission.needs_grading_conditions}
+      UNION
+     SELECT submissions.*
+       FROM #{Submission.quoted_table_name}
+      INNER JOIN #{Enrollment.quoted_table_name} AS student_enrollments ON student_enrollments.user_id = submissions.user_id
+      WHERE submissions.assignment_id = assignments.id
+        AND #{Submission.needs_grading_conditions}
+        AND enrollments.limit_privileges_to_course_section = 't'
+        AND enrollments.course_section_id = student_enrollments.course_section_id"
   end
 
   def assignments_needing_moderation(

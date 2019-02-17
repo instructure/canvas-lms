@@ -39,7 +39,7 @@ gem 'active_model_serializers',   '0.9.0alpha1',
 gem 'authlogic', '4.0.1'
   gem 'scrypt', '3.0.6'
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
-gem 'switchman', '1.12.15'
+gem 'switchman', '1.12.16'
   gem 'open4', '1.3.4', require: false
 gem 'folio-pagination', '0.0.12', require: 'folio/rails'
   # for folio, see the folio README
@@ -132,7 +132,7 @@ gem 'gepub', '0.7.0beta4'
 gem 'imperium', '0.5.0', require: false
 gem 'academic_benchmarks', '0.0.10', require: false
 
-gem 'graphql', '1.8.8'
+gem 'graphql', '1.8.13'
 gem 'graphql-batch', '0.3.9'
 
 gem 'prawn-rails', '1.2.0'

@@ -74,9 +74,6 @@
   "close_opportunity_center_popup_9907d981": {
     "message": "Chiudi finestra a comparsa Centro opportunità"
   },
-  "count_plural_0_opportunities_one_opportunity_other_bb1698f6": {
-    "message": "{ count, plural,\n     =0 {# opportunità}\n    one {# opportunità}\n  other {# opportunità}\n}. Fare clic per aprire la finestra a comparsa Centro opportunità."
-  },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Mostra # elemento completato}\n  other {Mostra # elementi completati}\n}"
   },

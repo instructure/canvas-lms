@@ -17,6 +17,14 @@
 #
 
 module Types
+
+  class LatePolicyStatusType < Types::BaseEnum
+    graphql_name "LatePolicyStatusType"
+    value "late"
+    value "missing"
+    value "none"
+  end
+
   class SubmissionType < ApplicationObjectType
     graphql_name "Submission"
 
@@ -97,5 +105,6 @@ module Types
     end
 
     field :grading_status, String, null: true
+    field :late_policy_status, LatePolicyStatusType, null: true
   end
 end

@@ -20,7 +20,6 @@ import assert from "assert";
 import React from "react";
 import FileTree from "../../../../src/common/components/FileTree/index";
 import sd from "skin-deep";
-import jsdom from "mocha-jsdom";
 import ReactDOM from "react-dom";
 import sinon from "sinon";
 
@@ -73,8 +72,6 @@ describe("FileTree/index", () => {
   });
 
   describe("keyboard navigation", () => {
-    jsdom();
-
     let div,
       component,
       buttons,

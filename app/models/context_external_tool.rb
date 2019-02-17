@@ -379,6 +379,13 @@ class ContextExternalTool < ActiveRecord::Base
     extension_setting(extension_type, :display_type) || 'in_context'
   end
 
+  def login_or_launch_uri(extension_type: nil, content_tag_uri: nil)
+    use_1_3? && developer_key&.oidc_login_uri ||
+    content_tag_uri ||
+    extension_setting(extension_type, :url) ||
+    url
+  end
+
   def extension_default_value(type, property)
     case property
       when :url

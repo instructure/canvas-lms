@@ -18,44 +18,55 @@
 
 import $ from 'jquery'
 import I18n from 'i18n!gradebook'
-import SetDefaultGradeDialog from 'compiled/gradezilla/SetDefaultGradeDialog'
+import SetDefaultGradeDialog from 'compiled/shared/SetDefaultGradeDialog'
 import 'compiled/jquery.rails_flash_notifications'
 
-  class SetDefaultGradeDialogManager {
-    constructor (assignment, students, contextId, selectedSection, isAdmin = false, submissionsLoaded = false) {
-      this.assignment = assignment;
-      this.students = students;
-      this.contextId = contextId;
-      this.selectedSection = selectedSection;
-      this.isAdmin = isAdmin;
-      this.submissionsLoaded = submissionsLoaded;
+class SetDefaultGradeDialogManager {
+  constructor(
+    assignment,
+    students,
+    contextId,
+    selectedSection,
+    isAdmin = false,
+    submissionsLoaded = false
+  ) {
+    this.assignment = assignment
+    this.students = students
+    this.contextId = contextId
+    this.selectedSection = selectedSection
+    this.isAdmin = isAdmin
+    this.submissionsLoaded = submissionsLoaded
 
-      this.showDialog = this.showDialog.bind(this);
-    }
+    this.showDialog = this.showDialog.bind(this)
+  }
 
-    getSetDefaultGradeDialogOptions () {
-      return {
-        assignment: this.assignment,
-        students: this.students,
-        context_id: this.contextId,
-        selected_section: this.selectedSection,
-      };
-    }
-
-    showDialog (cb) {
-      if (this.isAdmin || !this.assignment.inClosedGradingPeriod) {
-        const dialog = new SetDefaultGradeDialog(this.getSetDefaultGradeDialogOptions());
-
-        dialog.show(cb);
-      } else {
-        $.flashError(I18n.t('Unable to set default grade because this ' +
-          'assignment is due in a closed grading period for at least one student'));
-      }
-    }
-
-    isDialogEnabled () {
-      return this.submissionsLoaded;
+  getSetDefaultGradeDialogOptions() {
+    return {
+      assignment: this.assignment,
+      students: this.students,
+      context_id: this.contextId,
+      selected_section: this.selectedSection
     }
   }
+
+  showDialog(cb) {
+    if (this.isAdmin || !this.assignment.inClosedGradingPeriod) {
+      const dialog = new SetDefaultGradeDialog(this.getSetDefaultGradeDialogOptions())
+
+      dialog.show(cb)
+    } else {
+      $.flashError(
+        I18n.t(
+          'Unable to set default grade because this ' +
+            'assignment is due in a closed grading period for at least one student'
+        )
+      )
+    }
+  }
+
+  isDialogEnabled() {
+    return this.submissionsLoaded
+  }
+}
 
 export default SetDefaultGradeDialogManager

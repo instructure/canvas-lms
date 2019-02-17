@@ -274,7 +274,8 @@ DeveloperKey.propTypes = {
     visible: PropTypes.bool,
     name: PropTypes.string,
     user_id: PropTypes.string,
-    workflow_state: PropTypes.string
+    workflow_state: PropTypes.string,
+    is_lti_key: PropTypes.bool
   }).isRequired,
   ctx: PropTypes.shape({
     params: PropTypes.shape({

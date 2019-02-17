@@ -16,55 +16,59 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { bool, func, number, shape, string } from 'prop-types';
-import FormFieldGroup from '@instructure/ui-forms/lib/components/FormFieldGroup';
-import SubmissionTrayRadioInput from '../../../gradezilla/default_gradebook/components/SubmissionTrayRadioInput';
-import { statusesTitleMap } from '../../../gradezilla/default_gradebook/constants/statuses';
-import I18n from 'i18n!gradebook';
+import React from 'react'
+import {bool, func, number, shape, string} from 'prop-types'
+import FormFieldGroup from '@instructure/ui-forms/lib/components/FormFieldGroup'
+import SubmissionTrayRadioInput from '../../../gradezilla/default_gradebook/components/SubmissionTrayRadioInput'
+import {statusesTitleMap} from '../../../gradezilla/default_gradebook/constants/statuses'
+import I18n from 'i18n!gradebook'
 
-function checkedValue (submission) {
+function checkedValue(submission) {
   if (submission.excused) {
-    return 'excused';
+    return 'excused'
   } else if (submission.missing) {
-    return 'missing';
+    return 'missing'
   } else if (submission.late) {
-    return 'late';
+    return 'late'
   }
 
-  return 'none';
+  return 'none'
 }
 
 export default class SubmissionTrayRadioInputGroup extends React.Component {
-  state = { pendingUpdateData: null }
+  state = {pendingUpdateData: null}
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.submissionUpdating && !nextProps.submissionUpdating && this.state.pendingUpdateData) {
+    if (
+      this.props.submissionUpdating &&
+      !nextProps.submissionUpdating &&
+      this.state.pendingUpdateData
+    ) {
       this.props.updateSubmission(this.state.pendingUpdateData)
-      this.setState({ pendingUpdateData: null })
+      this.setState({pendingUpdateData: null})
     }
   }
 
-  handleRadioInputChanged = ({ target: { value } }) => {
-    const alreadyChecked = checkedValue(this.props.submission) === value;
+  handleRadioInputChanged = ({target: {value}}) => {
+    const alreadyChecked = checkedValue(this.props.submission) === value
     if (alreadyChecked && !this.props.submissionUpdating) {
       return
     }
 
-    const data = value === 'excused' ? { excuse: true } : { latePolicyStatus: value };
+    const data = value === 'excused' ? {excuse: true} : {latePolicyStatus: value}
     if (value === 'late') {
-      data.secondsLateOverride = 0;
+      data.secondsLateOverride = 0
     }
 
     if (this.props.submissionUpdating) {
-      this.setState({ pendingUpdateData: data })
+      this.setState({pendingUpdateData: data})
     } else {
       this.props.updateSubmission(data)
     }
   }
 
-  render () {
-    const radioOptions = ['none', 'late', 'missing', 'excused'].map(status =>
+  render() {
+    const radioOptions = ['none', 'late', 'missing', 'excused'].map(status => (
       <SubmissionTrayRadioInput
         key={status}
         checked={checkedValue(this.props.submission) === status}
@@ -78,7 +82,7 @@ export default class SubmissionTrayRadioInputGroup extends React.Component {
         text={statusesTitleMap[status] || I18n.t('None')}
         value={status}
       />
-    );
+    ))
 
     return (
       <FormFieldGroup
@@ -89,7 +93,7 @@ export default class SubmissionTrayRadioInputGroup extends React.Component {
       >
         {radioOptions}
       </FormFieldGroup>
-    );
+    )
   }
 }
 
@@ -112,4 +116,4 @@ SubmissionTrayRadioInputGroup.propTypes = {
   }).isRequired,
   submissionUpdating: bool.isRequired,
   updateSubmission: func.isRequired
-};
+}

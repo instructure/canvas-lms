@@ -96,6 +96,7 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
                   </ScreenReaderContent>
                 }
                 hover={false}
+                layout="auto"
                 size="medium"
               >
                 <thead>
@@ -244,6 +245,7 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
                   </ScreenReaderContent>
                 }
                 hover={false}
+                layout="auto"
                 size="medium"
               >
                 <thead>
@@ -365,6 +367,7 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
                   </ScreenReaderContent>
                 }
                 hover={false}
+                layout="auto"
                 size="medium"
               >
                 <thead>

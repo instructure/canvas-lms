@@ -24,7 +24,7 @@
     "message": "E pono ana koe kei te hiahia koe kia mukua tenei mahere tūemi?"
   },
   "assignment_976578a8": {
-    "message": "Taumahi"
+    "message": "Whakataunga"
   },
   "assignmenttype_title_6612d008": {
     "message": "{ assignmentType } { title }."
@@ -74,9 +74,6 @@
   "close_opportunity_center_popup_9907d981": {
     "message": "Katihia te Mea Angitu Pōkapu Pakūake"
   },
-  "count_plural_0_opportunities_one_opportunity_other_bb1698f6": {
-    "message": "{ count, plural,\n     =0 {# ngā mea angitu}\n    one {# mea angitu}\n  other {# ngā mea angitu}\n}. Pākiri ki te huaki Mea Angitu Pōkapu pakūake."
-  },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Whakātu # tūemi kua oti}\n  other {Whakātu # ngā tūemi kua oti}\n}"
   },
@@ -105,7 +102,7 @@
     "message": "Muku"
   },
   "details_98a31b68": {
-    "message": "taipitopito"
+    "message": "Ngā taipitopito"
   },
   "details_a6f427c3": {
     "message": "Ngā taipitopito:"
@@ -120,10 +117,10 @@
     "message": "Whakakore { opportunityName }"
   },
   "dismissed_8b0b1fc9": {
-    "message": "Kau panaia"
+    "message": "Kau whakakoretia"
   },
   "dismissed_opportunities_f0826640": {
-    "message": "Ngā mea angitu kua panaia"
+    "message": "Ngā mea angitu kua whakakoretia"
   },
   "due_5d7267be": {
     "message": "E tika ana:"
@@ -141,34 +138,34 @@
     "message": "He hapa i te wā e uta ana i ngā kōeke"
   },
   "error_loading_more_items_3f109d9f": {
-    "message": "He hapa i puta i te wā e uta ana nui atu tuemi"
+    "message": "He hapa i puta i te wā e uta ana nui atu tūemi"
   },
   "error_loading_past_items_2881dbb1": {
-    "message": "He hapa i puta i te wā e uta ana ngā tuemi o mua"
+    "message": "He hapa i puta i te wā e uta ana ngā tūemi o mua"
   },
   "excused_cf8792eb": {
     "message": "Whakawātea"
   },
   "failed_to_delete_to_do_64edff49": {
-    "message": "I rāhua ki te muku hei mahi"
+    "message": "I rahua ki te muku hei mahi"
   },
   "failed_to_get_new_activity_17e7ec7c": {
-    "message": "I rāhua ki te tiki mahi hou"
+    "message": "I rahua ki te tiki mahi hou"
   },
   "failed_to_load_opportunities_52ab6404": {
-    "message": "I rāhua i te wā uta"
+    "message": "I rahua i te wā uta"
   },
   "failed_to_save_to_do_ddc7503b": {
-    "message": "I rāhua ki te whakaora hei mahi"
+    "message": "I rahua ki te whakaora hei mahi"
   },
   "feedback_6dcc1991": {
     "message": "Urupare"
   },
   "go_to_card_view_dashboard_9d03970e": {
-    "message": "Haere ki te Kari Titiro Papatuhi "
+    "message": "Haere ki te Kāri Titiro Papatuhi"
   },
   "graded_25cd3fcd": {
-    "message": "mākahia"
+    "message": "Kua kōeketia"
   },
   "grades_are_loading_c899652d": {
     "message": "E uta ana ngā kōeke"
@@ -183,7 +180,7 @@
     "message": "Tūreiti"
   },
   "load_more_a36f9cf9": {
-    "message": "Uta nui atu"
+    "message": "whakawaha a atu"
   },
   "load_prior_dates_f2b0f6f0": {
     "message": "Uta ngā rā o mua"
@@ -255,10 +252,10 @@
     "message": "Kaore he mea hou hei aro atu"
   },
   "nothing_planned_today_selecting_most_recent_item_ffd71bff": {
-    "message": "Kaore he mahi e maheretia ana i tēnei rā. E tīpako ana i te tuemi ou"
+    "message": "Kaore he mahi e maheretia ana i tēnei rā. E tīpako ana i te tūemi ou"
   },
   "nothing_planned_today_selecting_next_item_f6718aa": {
-    "message": "Kaore he mahi e maheretia ana i tēnei rā. E tīpako ana i te tuemi e whai ake nei"
+    "message": "Kaore he mahi e maheretia ana i tēnei rā. E tīpako ana i te tūemi e whai ake nei"
   },
   "nothing_planned_yet_8675ffe9": {
     "message": "Heoi kaore he mahere"
@@ -291,7 +288,7 @@
     "message": "Te marama o muri nei"
   },
   "pts_699bd9aa": {
-    "message": "ira"
+    "message": "ngā koinga"
   },
   "quiz_e0dcce8f": {
     "message": "Quiz"
@@ -309,7 +306,7 @@
     "message": "Panuku ki runga ki te kite i tō hītori"
   },
   "scrolls_up_to_the_previous_item_with_new_activity_99717459": {
-    "message": "Ka pānuku ki runga ki te tuemi o mua me ngā mahi hou."
+    "message": "Ka pānuku ki runga ki te tūemi o mua me ngā mahi hou."
   },
   "show_all_ae37d610": {
     "message": "Whakātu katoa"
@@ -342,7 +339,7 @@
     "message": "Te rā me te wā hei mahi tēnei"
   },
   "there_are_no_points_associated_with_this_item_449c712a": {
-    "message": "Kaore ngā koinga e hono ana ki tenei tūemi"
+    "message": "Kaore ngā koinga e hono ana ki tēnei tūemi"
   },
   "time_2b5aac58": {
     "message": "Wā"

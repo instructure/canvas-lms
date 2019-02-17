@@ -297,6 +297,14 @@ describe PlannerController do
           expect(response_json.length).to be 16
         end
 
+        it "does not restrict user if session has appropriate permissions for public_to_auth course" do
+          @course.update_attribute(:is_public_to_auth_users, true)
+          user_factory(active_all: true)
+          user_session(@user)
+          get :index, params: {context_codes: [@course.asset_string]}
+          assert_status(200)
+        end
+
         it "should only return data from contexted courses if specified" do
           get :index, params: {context_codes: [@course1.asset_string]}
           response_json = json_parse(response.body)

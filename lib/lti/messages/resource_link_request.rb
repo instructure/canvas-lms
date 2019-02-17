@@ -31,30 +31,29 @@ module Lti::Messages
 
     def generate_post_payload_for_assignment(assignment, _outcome_service_url, _legacy_outcome_service_url, _lti_turnitin_outcomes_placement_url)
       @assignment = assignment
-      add_assignment_substitutions!
       generate_post_payload
     end
 
     def generate_post_payload_for_homework_submission(assignment)
       @assignment = assignment
-      lti_assignment = Lti::LtiAssignmentCreator.new(assignment).convert
-      add_extension('content_return_types', lti_assignment.return_types.join(','))
-      add_extension('content_file_extensions', @assignment.allowed_extensions&.join(','))
-      add_assignment_substitutions!
       generate_post_payload
     end
 
     private
 
     def add_resource_link_request_claims!
-      @message.resource_link.id = assignment_resource_link_id || context_resource_link_id
+      resource_link = assignment_resource_link
+      assignment = line_item_for_assignment&.assignment
+      @message.resource_link.id = resource_link&.resource_link_id || context_resource_link_id
+      @message.resource_link.description = resource_link && assignment&.description
+      @message.resource_link.title = resource_link && assignment&.title
     end
 
     def context_resource_link_id
       Lti::Asset.opaque_identifier_for(@context)
     end
 
-    def assignment_resource_link_id
+    def assignment_resource_link
       return if @assignment.nil?
       launch_error = Lti::Ims::AdvantageErrors::InvalidLaunchError
       unless @assignment.external_tool?
@@ -67,7 +66,7 @@ module Lti::Messages
       unless resource_link&.context_external_tool == @tool
         raise launch_error.new(nil, api_message: 'Mismatched assignment vs resource link tool configurations')
       end
-      resource_link.resource_link_id
+      resource_link
     end
 
     def assignment_line_item_url
@@ -84,12 +83,6 @@ module Lti::Messages
 
     def line_item_for_assignment
       @_line_item ||= @assignment&.line_items&.find(&:assignment_line_item?)
-    end
-
-    def add_assignment_substitutions!
-      add_extension('canvas_assignment_id', '$Canvas.assignment.id') if @tool.public?
-      add_extension('canvas_assignment_title', '$Canvas.assignment.title')
-      add_extension('canvas_assignment_points_possible', '$Canvas.assignment.pointsPossible')
     end
 
     def include_assignment_and_grade_service_claims?

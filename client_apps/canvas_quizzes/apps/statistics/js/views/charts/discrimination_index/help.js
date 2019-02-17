@@ -41,7 +41,7 @@ define(function(require) {
           </p>
 
           <p>
-            <a href="%{article_url}" target="_blank">More information is available here.</a>
+            <a href="%{article_url}" target="_blank">Learn more about quiz statistics.</a>
           </p>
         </Text>
       );

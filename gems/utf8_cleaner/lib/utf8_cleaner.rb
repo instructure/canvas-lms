@@ -1,4 +1,3 @@
-# encoding: UTF-8
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -17,16 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'iconv'
-
 module Utf8Cleaner
-  # This doesn't make any attempt to convert other encodings to utf-8, it just
-  # removes invalid bytes from otherwise valid utf-8 strings.
   # Basically, this is a last ditch effort, you probably don't want to use it
   # as part of normal request processing.
   # It's used for things like filtering out ErrorReport data so that we can
   # make sure we won't get an invalid utf-8 error trying to save the error
-  # report to the db.
+  # report to the database.
   def self.strip_invalid_utf8(string)
     return string if string.nil?
     string = String.new(string, encoding: Encoding::UTF_8) unless string.encoding == Encoding::UTF_8
@@ -38,17 +33,17 @@ module Utf8Cleaner
 
   def self.recursively_strip_invalid_utf8!(object, force_utf8 = false)
     case object
-      when Hash
-        object.each_value { |o| self.recursively_strip_invalid_utf8!(o, force_utf8) }
-      when Array
-        object.each { |o| self.recursively_strip_invalid_utf8!(o, force_utf8) }
-      when String
-        if object.encoding == Encoding::ASCII_8BIT && force_utf8
-          object.force_encoding(Encoding::UTF_8)
-        end
-        if !object.valid_encoding?
-          object.replace(self.strip_invalid_utf8(object))
-        end
+    when Hash
+      object.each_value { |o| self.recursively_strip_invalid_utf8!(o, force_utf8) }
+    when Array
+      object.each { |o| self.recursively_strip_invalid_utf8!(o, force_utf8) }
+    when String
+      if object.encoding == Encoding::ASCII_8BIT && force_utf8
+        object.force_encoding(Encoding::UTF_8)
+      end
+      if !object.valid_encoding?
+        object.replace(self.strip_invalid_utf8(object))
+      end
     end
   end
 end

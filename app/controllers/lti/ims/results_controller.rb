@@ -83,8 +83,8 @@ module Lti::Ims
       render(json: [], content_type: MIME_TYPE) and return if user.present? && !context.user_is_student?(user)
 
       results = Lti::Result.where(line_item: line_item)
-      results = results.where(user: user) if params.key?(:user_id)
-      results = Api.paginate(results, self, results_url, pagination_args)
+      results = results.where(user: user).preload(:user) if params.key?(:user_id)
+      results = Api.paginate(results, self, "#{line_item_url}/results", pagination_args)
       render json: results_collection(results), content_type: MIME_TYPE
     end
 
@@ -95,7 +95,7 @@ module Lti::Ims
     #
     # @returns Result
     def show
-      render json: Lti::Ims::ResultsSerializer.new(result, results_url).as_json, content_type: MIME_TYPE
+      render json: Lti::Ims::ResultsSerializer.new(result, line_item_url).as_json, content_type: MIME_TYPE
     end
 
 
@@ -112,10 +112,6 @@ module Lti::Ims
       raise ActiveRecord::RecordNotFound unless result.line_item == line_item
     end
 
-    def results_url
-      "#{line_item_url}/results"
-    end
-
     def line_item_url
       lti_line_item_show_url(course_id: params[:course_id], id: params[:line_item_id])
     end
@@ -126,7 +122,7 @@ module Lti::Ims
 
     def results_collection(results)
       results.map do |result|
-        Lti::Ims::ResultsSerializer.new(result, results_url).as_json
+        Lti::Ims::ResultsSerializer.new(result, line_item_url).as_json
       end
     end
   end

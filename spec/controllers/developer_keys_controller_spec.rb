@@ -345,7 +345,7 @@ describe DeveloperKeysController do
             key
           end
         end
-        let(:root_account_shard) { Shard.create! }
+        let(:root_account_shard) { @shard1 }
         let(:root_account) { root_account_shard.activate { account_model } }
         let(:root_account_key) { root_account_shard.activate { DeveloperKey.create!(account: root_account) } }
 

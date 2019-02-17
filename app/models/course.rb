@@ -199,6 +199,10 @@ class Course < ActiveRecord::Base
   has_many :master_course_subscriptions, :class_name => "MasterCourses::ChildSubscription", :foreign_key => 'child_course_id'
   has_one :late_policy, dependent: :destroy, inverse_of: :course
 
+  has_many :post_policies, dependent: :destroy, inverse_of: :course
+  has_many :assignment_post_policies, -> { where.not(assignment_id: nil) }, class_name: 'PostPolicy', inverse_of: :course
+  has_one :default_post_policy, -> { where(assignment_id: nil) }, class_name: 'PostPolicy', inverse_of: :course
+
   prepend Profile::Association
 
   before_save :assign_uuid
@@ -2079,8 +2083,16 @@ class Course < ActiveRecord::Base
       section.default_section = true
       section.course = self
       section.root_account_id = self.root_account_id
-      Shackles.activate(:master) do
-        section.save unless new_record?
+      unless new_record?
+        Shackles.activate(:master) do
+          CourseSection.unique_constraint_retry do |retry_count|
+            if retry_count > 0
+              section = course_sections.active.where(default_section: true).first
+            else
+              section.save
+            end
+          end
+        end
       end
     end
     section
@@ -2904,6 +2916,7 @@ class Course < ActiveRecord::Base
   end
 
   def reset_content
+    self.shard.activate do
     Course.transaction do
       new_course = Course.new
       self.attributes.delete_if{|k,v| [:id, :created_at, :updated_at, :syllabus_body, :wiki_id, :default_view, :tab_configuration, :lti_context_id, :workflow_state, :latest_outcome_import_id].include?(k.to_sym) }.each do |key, val|
@@ -2925,8 +2938,13 @@ class Course < ActiveRecord::Base
       # we also want to bring along prior enrollments, so don't use the enrollments
       # association
       Enrollment.where(:course_id => self).update_all(:course_id => new_course.id, :updated_at => Time.now.utc)
-      User.where(id: new_course.all_enrollments.select(:user_id)).
-          update_all(updated_at: Time.now.utc)
+      user_ids = new_course.all_enrollments.pluck(:user_id)
+      Shard.partition_by_shard(user_ids) do |sharded_user_ids|
+        User.where(id: sharded_user_ids).touch_all
+        Favorite.where(:user_id => sharded_user_ids, :context_type => "Course", :context_id => self.id).
+          update_all(:context_id => new_course.id, :updated_at => Time.now.utc)
+      end
+
       self.replacement_course_id = new_course.id
       self.workflow_state = 'deleted'
       self.save!
@@ -2935,6 +2953,7 @@ class Course < ActiveRecord::Base
       end
 
       Course.find(new_course.id)
+    end
     end
   end
 
@@ -3245,7 +3264,9 @@ class Course < ActiveRecord::Base
   # to identify the user can't move backwards, such as feature flags
   def gradebook_backwards_incompatible_features_enabled?
     # The old gradebook can't deal with late policies at all
-    return true if late_policy&.missing_submission_deduction_enabled? || late_policy&.late_submission_deduction_enabled?
+    return true if late_policy&.missing_submission_deduction_enabled? ||
+      late_policy&.late_submission_deduction_enabled? ||
+      feature_enabled?(:final_grades_override)
 
     # If you've used the grade tray status changes at all, you can't
     # go back. Even if set to none, it'll break "Message Students

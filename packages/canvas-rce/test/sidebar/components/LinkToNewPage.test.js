@@ -20,7 +20,6 @@ import assert from "assert";
 import React from "react";
 import LinkToNewPage from "../../../src/sidebar/components/LinkToNewPage";
 import sd from "skin-deep";
-import jsdom from "mocha-jsdom";
 import sinon from "sinon";
 import scroll from "../../../src/common/scroll";
 
@@ -31,7 +30,6 @@ describe("LinkToNewPage", () => {
   };
   let defaultProps;
 
-  jsdom();
 
   beforeEach(() => {
     defaultProps = {

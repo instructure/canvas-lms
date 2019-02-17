@@ -298,7 +298,7 @@ import 'compiled/behaviors/quiz_selectmenu'
 
     updateStatusFor: function($scoreInput){
       try{
-        var questionId = $scoreInput.attr('name').split('_')[2];
+        var questionId = $scoreInput.attr('data-question-id');
         var scoreValue = numberHelper.parse($scoreInput.val());
         $('#quiz_nav_' + questionId).toggleClass('complete', (!isNaN(scoreValue)));
       } catch(err) {
@@ -426,7 +426,9 @@ import 'compiled/behaviors/quiz_selectmenu'
 
     $("#fudge_points_entry").change(function() {
       var points = numberHelper.parse($(this).val());
-      $("#fudge_points_input").val(points || '');
+      const parsed = numberHelper.parse($(this).val())
+      const hiddenVal = Number.isNaN(parsed) ? '' : parsed
+      $("#fudge_points_input").val(hiddenVal);
       gradingForm.addFudgePoints(points);
     });
 

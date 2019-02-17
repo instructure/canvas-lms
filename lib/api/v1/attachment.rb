@@ -231,10 +231,14 @@ module Api::V1::Attachment
     # no permission check required to use the preferred folder
 
     folder ||= opts[:folder]
-    progress_context =
-      opts[:assignment] ||
-      (opts[:assignment_id] && Assignment.where(:id => params[:assignment_id]).first) ||
+    progress_context = if opts[:assignment].present?
+      opts[:assignment]
+    elsif params[:assignment_id].present?
+      Assignment.find_by(id: params[:assignment_id])
+    else
       @current_user
+    end
+
     if InstFS.enabled?
       additional_capture_params = {}
       progress_json_result = if params[:url]

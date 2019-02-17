@@ -72,7 +72,7 @@ class PermissionsIndex
     end
 
     def permission_tray_button(permission_name, role_id)
-      f("[data-ui-testable='Portal'] ##{permission_name}_#{role_id}")
+      f("##{permission_name}_#{role_id}")
     end
 
     def permission_menu_item(item_name)
@@ -199,8 +199,6 @@ class PermissionsIndex
       wait_for_ajaximations
     end
 
-    # this may need to be implemented differently depending
-    # on which control is used
     def select_filter(filter)
       filter_control.click
       filter_item(filter).click
@@ -209,6 +207,7 @@ class PermissionsIndex
     # setting in the same format as on the menu items
     def change_permission(permission, role_id, setting)
       permission_cell(permission, role_id).click
+      wait_for(method: nil, timeout: 0.5) { permission_menu_item(setting).displayed? }
       permission_menu_item(setting).click
     end
 

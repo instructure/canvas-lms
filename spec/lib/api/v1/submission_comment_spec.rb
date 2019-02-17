@@ -46,4 +46,47 @@ describe Api::V1::SubmissionComment do
       expect(comment_json[:edited_at]).to be_nil
     end
   end
+
+  describe "#anonymous_moderated_submission_comments_json" do
+    let(:course) { Course.create! }
+    let(:assignment) { course.assignments.create!(anonymous_grading: true) }
+    let(:student) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
+    let(:student_sub) { assignment.submissions.find_by!(user: student) }
+    let(:student2) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
+    let(:student3) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
+    let(:teacher) { course.enroll_user(User.create!, "TeacherEnrollment", enrollment_state: "active").user }
+
+    before(:each) do
+      student_sub.add_comment(author: student, comment: "I'm Student")
+    end
+
+    it "contains anonymous ids for students that have comments on a submission" do
+      student_sub.add_comment(author: student2, comment: "I'm Student2")
+      student2_sub = assignment.submissions.find_by!(user: student2)
+      anonymous_ids = @comment.anonymous_moderated_submission_comments_json(
+        assignment: assignment,
+        avatars: nil,
+        course: course,
+        current_user: teacher,
+        submissions: [student_sub],
+        submission_comments: student_sub.submission_comments
+      ).map { |comment| comment[:anonymous_id] }
+
+      expect(anonymous_ids).to match_array([student_sub.anonymous_id, student2_sub.anonymous_id])
+    end
+
+    it "does not contain entries for students that did not comment on the submission" do
+      student3_sub = assignment.submissions.find_by!(user: student3)
+      student3_comment = @comment.anonymous_moderated_submission_comments_json(
+        assignment: assignment,
+        avatars: nil,
+        course: course,
+        current_user: teacher,
+        submissions: [student_sub],
+        submission_comments: student_sub.submission_comments
+      ).find { |comment| comment[:anonymous_id] == student3_sub.anonymous_id }
+
+      expect(student3_comment).to be nil
+    end
+  end
 end

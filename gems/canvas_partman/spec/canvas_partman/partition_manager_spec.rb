@@ -86,6 +86,23 @@ describe CanvasPartman::PartitionManager do
         expect(subject.base_class.connection).to receive(:drop_table).with('partman_animals_2014_10')
         subject.prune_partitions(6)
       end
+
+      it "prunes weekly partitions too" do
+        expect(Time).to receive(:now).and_return(Time.utc(2015, 02, 05))
+        allow(Animal).to receive(:partitioning_interval).and_return(:weeks)
+        expect(subject).to receive(:partition_tables).and_return(%w{
+          partman_animals_2015_01
+          partman_animals_2015_02
+          partman_animals_2015_03
+          partman_animals_2015_04
+          partman_animals_2015_05
+          partman_animals_2015_06
+        })
+
+        expect(subject.base_class.connection).to receive(:drop_table).with('partman_animals_2015_01')
+        expect(subject.base_class.connection).to receive(:drop_table).with('partman_animals_2015_02')
+        subject.prune_partitions(3)
+      end
     end
   end
 

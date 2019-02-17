@@ -537,29 +537,25 @@ $gradebook_cell_padding_top: 8px;
 
 /* Assignment Cell */
 
-.slick-cell.assignment {
-  .Grid__GradeCell {
-    height: $row-height - 4px;
-  }
-
-  // Inactive Cell
-  &:not(.active) {
+.slick-cell {
+  &.assignment,
+  &.total-grade-override {
     .Grid__GradeCell {
-      padding: 1px;
       height: $row-height - 4px;
     }
-  }
 
-  // Inactive or Active Cell
-  &:not(.editable) {
-    // Inner Elements
-    .Grid__GradeCell__OriginalityScore {
-      padding-bottom: 2px; // match the icon container size from InstUI
+    // Inactive Cell
+    &:not(.active) {
+      .Grid__GradeCell {
+        padding: 1px;
+        height: $row-height - 4px;
+      }
     }
 
-    .Grid__GradeCell__InvalidGrade {
-      i.icon-warning {
-        color: $ic-color-danger;
+    // Inactive or Active Cell
+    &:not(.editable) {
+      // Inner Elements
+      .Grid__GradeCell__OriginalityScore {
         padding-bottom: 2px; // match the icon container size from InstUI
       }
     }
@@ -588,6 +584,11 @@ $gradebook_cell_padding_top: 8px;
   display: flex;
   justify-content: center;
   width: $cell-icon-width;
+
+  i.icon-warning {
+    color: $ic-color-danger;
+    padding-bottom: 2px; // match the icon container size from InstUI
+  }
 }
 
 .Grid__GradeCell__StartContainer,
@@ -772,18 +773,9 @@ $gradebook_checkbox_size: 16px;
     justify-content: center;
     padding: 0;
 
-    .flex-space,
-    .percentage-grade,
-    .scheme-grade {
+    .grade {
       flex: 1 1;
-    }
-
-    .percentage-grade {
-      margin: 0 0.25em;
-    }
-
-    .scheme-grade {
-      text-align: start;
+      text-align: center;
     }
   }
 }

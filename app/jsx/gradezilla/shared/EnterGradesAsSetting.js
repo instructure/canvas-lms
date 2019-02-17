@@ -22,7 +22,7 @@ const gradingTypeOptionMap = {
   pass_fail: ['passFail'],
   percent: ['points', 'percent'],
   points: ['points', 'percent']
-};
+}
 
 const gradingTypeDefaultOptionMap = {
   gpa_scale: 'gradingScheme',
@@ -30,12 +30,12 @@ const gradingTypeDefaultOptionMap = {
   pass_fail: 'passFail',
   percent: 'percent',
   points: 'points'
-};
-
-export function defaultOptionForGradingType (gradingType) {
-  return gradingTypeDefaultOptionMap[gradingType] || null;
 }
 
-export function optionsForGradingType (gradingType) {
-  return gradingTypeOptionMap[gradingType] || [];
+export function defaultOptionForGradingType(gradingType) {
+  return gradingTypeDefaultOptionMap[gradingType] || null
+}
+
+export function optionsForGradingType(gradingType) {
+  return gradingTypeOptionMap[gradingType] || []
 }

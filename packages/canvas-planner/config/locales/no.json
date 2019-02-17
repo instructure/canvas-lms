@@ -74,9 +74,6 @@
   "close_opportunity_center_popup_9907d981": {
     "message": "Lukk boksen «Mulighetsmarked»"
   },
-  "count_plural_0_opportunities_one_opportunity_other_bb1698f6": {
-    "message": "{ count, plural,\n     =0 {# muligheter}\n    one {# mulighet}\n  other {# muligheter}\n}. Klikk på boksen «Mulighetsmarked» for å åpne."
-  },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Vis # ferdig del}\n  other {Vis # ferdige deler}\n}"
   },

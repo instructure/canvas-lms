@@ -109,6 +109,10 @@ describe Lti::LtiAdvantageAdapter do
       expect(login_message['login_hint']).to eq lti_user_id
     end
 
+    it 'sets the "target_link_uri" to the tool launch url' do
+      expect(login_message['target_link_uri']).to eq tool.url
+    end
+
     it 'sets the domain in the message hint' do
       expect(Canvas::Security.decode_jwt(login_message['lti_message_hint'])['canvas_domain']).to eq 'test.com'
     end
@@ -124,22 +128,6 @@ describe Lti::LtiAdvantageAdapter do
       Canvas::Security.decode_jwt(jws)['verifier']
     end
     let(:expander_opts) { super().merge(assignment: assignment) }
-
-    it 'adds assignment specific claims' do
-      expect(params['https://www.instructure.com/canvas_assignment_title']).to eq assignment.title
-    end
-  end
-
-  describe '#generate_post_payload_for_homework_submission' do
-    let(:verifier) do
-      jws = adapter.generate_post_payload_for_homework_submission(assignment)['lti_message_hint']
-      Canvas::Security.decode_jwt(jws)['verifier']
-    end
-    let(:params) { JSON.parse(fetch_and_delete_launch(course, verifier)) }
-
-    it 'adds hoemwork specific claims' do
-      expect(params['https://www.instructure.com/content_file_extensions']).to eq assignment.allowed_extensions&.join(',')
-    end
   end
 
   describe '#launch_url' do
@@ -155,6 +143,16 @@ describe Lti::LtiAdvantageAdapter do
 
     it 'returns the general launch URL if no resource url is set' do
       expect(adapter.launch_url).to eq 'http://www.example.com/basic_lti'
+    end
+
+    context 'when the oidc_login_uri is set' do
+      let(:oidc_login_uri) { 'https://www.test.com/oidc/login' }
+
+      before { tool.developer_key.update!(oidc_login_uri: oidc_login_uri) }
+
+      it 'uses the oidc login uri' do
+        expect(adapter.launch_url).to eq oidc_login_uri
+      end
     end
   end
 end

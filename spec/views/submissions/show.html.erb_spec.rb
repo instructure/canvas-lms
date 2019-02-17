@@ -336,9 +336,9 @@ describe "/submissions/show" do
 
           before(:each) do
             moderated_submission.add_comment(author: student, comment: "I did a great job!")
-            moderated_submission.add_comment(author: teacher, comment: "No, you did not.")
-            moderated_submission.add_comment(author: first_ta, comment: "Maybe they did?")
-            moderated_submission.add_comment(author: second_ta, comment: "Who cares?")
+            moderated_submission.add_comment(author: teacher, comment: "No, you did not.", provisional: true)
+            moderated_submission.add_comment(author: first_ta, comment: "Maybe they did?", provisional: true)
+            moderated_submission.add_comment(author: second_ta, comment: "Who cares?", provisional: true)
             moderated_assignment.grade_student(student, grade: 1, grader: second_ta, provisional: true)
             assign(:assignment, moderated_assignment)
             assign(:submission, moderated_submission)

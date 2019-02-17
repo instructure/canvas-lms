@@ -381,8 +381,8 @@ describe MasterCourses::MasterTemplatesController, type: :request do
     end
   end
 
-  def run_master_migration
-    @migration = MasterCourses::MasterMigration.start_new_migration!(@template, @admin)
+  def run_master_migration(opts={})
+    @migration = MasterCourses::MasterMigration.start_new_migration!(@template, @admin, opts)
     run_jobs
     @migration.reload
   end
@@ -416,7 +416,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       @file.update_attribute :display_name, 'I Can Rename Files Too'
       @assignment.destroy
       @master.syllabus_body = 'syllablah frd'; @master.save!
-      run_master_migration
+      run_master_migration(:copy_settings => true)
     end
 
     it "returns change information from the blueprint side" do
@@ -436,7 +436,9 @@ describe MasterCourses::MasterTemplatesController, type: :request do
           "locked"=>false,"exceptions"=>[{"course_id"=>@minions.first.id, "conflicting_changes"=>["content"]}]},
          {"asset_id"=>@master.id,"asset_type"=>"syllabus","asset_name"=>"Syllabus","change_type"=>"updated",
            "html_url"=>"http://www.example.com/courses/#{@master.id}/assignments/syllabus","locked"=>false,
-           "exceptions"=>[{"course_id"=>@minions.first.id,"conflicting_changes"=>["content"]}]}
+           "exceptions"=>[{"course_id"=>@minions.first.id,"conflicting_changes"=>["content"]}]},
+         {"asset_id"=>@master.id,"asset_type"=>"settings","asset_name"=>"Course Settings","change_type"=>"updated",
+           "html_url"=>"http://www.example.com/courses/#{@master.id}/settings","locked"=>false,"exceptions"=>[]}
       ])
     end
 
@@ -465,7 +467,9 @@ describe MasterCourses::MasterTemplatesController, type: :request do
           "locked"=>false,"exceptions"=>[{"course_id"=>minion.id, "conflicting_changes"=>["content"]}]},
          {"asset_id"=>minion.id,"asset_type"=>"syllabus","asset_name"=>"Syllabus","change_type"=>"updated",
           "html_url"=>"http://www.example.com/courses/#{minion.id}/assignments/syllabus","locked"=>false,
-          "exceptions"=>[{"course_id"=>minion.id,"conflicting_changes"=>["content"]}]}
+          "exceptions"=>[{"course_id"=>minion.id,"conflicting_changes"=>["content"]}]},
+         {"asset_id"=>minion.id,"asset_type"=>"settings","asset_name"=>"Course Settings","change_type"=>"updated",
+          "html_url"=>"http://www.example.com/courses/#{minion.id}/settings","locked"=>false,"exceptions"=>[]}
       ])
     end
 

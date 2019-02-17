@@ -873,7 +873,7 @@ class UsersController < ApplicationController
 
     bookmark = Plannable::Bookmarker.new(Assignment, false, [:due_at, :created_at], :id)
     grading_scope = @current_user.assignments_needing_grading(scope_only: true).
-      reorder(:due_at, :id).preload(:external_tool_tag, :rubric_association, :rubric, :discussion_topic, :quiz).eager_load(:duplicate_of)
+      reorder(:due_at, :id).preload(:external_tool_tag, :rubric_association, :rubric, :discussion_topic, :quiz, :duplicate_of)
     submitting_scope = @current_user.
       assignments_needing_submitting(
         include_ungraded: true,
@@ -1285,7 +1285,7 @@ class UsersController < ApplicationController
     opts = {
         resource_type: @resource_type,
         link_code: @opaque_id,
-        domain: @domain_root_account&.domain
+        domain: HostUrl.context_host(@domain_root_account, request.host)
     }
     variable_expander = Lti::VariableExpander.new(@domain_root_account, @context, self,{
                                                                         current_user: @current_user,
@@ -1305,8 +1305,7 @@ class UsersController < ApplicationController
     end
 
     @lti_launch.params = adapter.generate_post_payload
-
-    @lti_launch.resource_url = @tool.user_navigation(:url)
+    @lti_launch.resource_url = @tool.login_or_launch_uri(extension_type: :user_navigation)
     @lti_launch.link_text = @tool.label_for(:user_navigation, I18n.locale)
     @lti_launch.analytics_id = @tool.tool_id
 
@@ -1820,6 +1819,14 @@ class UsersController < ApplicationController
   #   token and instead pass the url here. Warning: For maximum compatibility,
   #   please use 128 px square images.
   #
+  # @argument user[title] [String]
+  #   Sets a title on the user profile. (See {api:ProfileController#settings Get user profile}.)
+  #   Profiles must be enabled on the root account.
+  #
+  # @argument user[bio] [String]
+  #   Sets a bio on the user profile. (See {api:ProfileController#settings Get user profile}.)
+  #   Profiles must be enabled on the root account.
+  #
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/users/133.json' \
@@ -1843,6 +1850,11 @@ class UsersController < ApplicationController
     managed_attributes.concat [:name, :short_name, :sortable_name, :birthdate] if @user.grants_right?(@current_user, :rename)
     managed_attributes << :terms_of_use if @user == (@real_current_user || @current_user)
     managed_attributes << :email if update_email
+
+    if @domain_root_account.enable_profiles?
+      managed_attributes << :bio if @user.grants_right?(@current_user, :manage_user_details)
+      managed_attributes << :title if @user.grants_right?(@current_user, :rename)
+    end
 
     if @user.grants_right?(@current_user, :manage_user_details)
       managed_attributes.concat([:time_zone, :locale])
@@ -1875,6 +1887,16 @@ class UsersController < ApplicationController
         @user.grants_right?(@current_user, :update_avatar) &&
         @user.grants_right?(@current_user, :manage_user_details)
 
+      includes = %w{locale avatar_url email time_zone}
+      if title = user_params.delete(:title)
+        @user.profile.title = title
+        includes << "title"
+      end
+      if bio = user_params.delete(:bio)
+        @user.profile.bio = bio
+        includes << "bio"
+      end
+
       if admin_avatar_update
         old_avatar_state = @user.avatar_state
         @user.avatar_state = 'submitted'
@@ -1904,7 +1926,7 @@ class UsersController < ApplicationController
           end
           format.html { redirect_to user_url(@user) }
           format.json {
-            render :json => user_json(@user, @current_user, session, %w{locale avatar_url email time_zone},
+            render :json => user_json(@user, @current_user, session, includes,
               @current_user.pseudonym.account) }
         else
           format.html { render :edit }
@@ -1988,21 +2010,6 @@ class UsersController < ApplicationController
       end
 
       render :admin_merge
-    end
-  end
-
-  def assignments_needing_grading
-    @user = User.find(params[:user_id])
-    if authorized_action(@user, @current_user, :read)
-      res = @user.assignments_needing_grading
-      render :json => res
-    end
-  end
-
-  def assignments_needing_submitting
-    @user = User.find(params[:user_id])
-    if authorized_action(@user, @current_user, :read)
-      render :json => @user.assignments_needing_submitting
     end
   end
 
@@ -2569,7 +2576,7 @@ class UsersController < ApplicationController
         role.grants_right?(@current_user, :manage_students)
       end
 
-      if can_manage_students
+      if can_manage_students || use_pairing_code
         skip_confirmation = value_to_boolean(cc_params[:skip_confirmation])
       end
 
@@ -2697,7 +2704,7 @@ class UsersController < ApplicationController
         registration_params = params.fetch(:user, {}).merge(remote_ip: request.remote_ip, cookies: cookies)
         @user.new_registration(registration_params)
       end
-      message_sent = notify_policy.dispatch!(@user, @pseudonym, @cc) if @cc
+      message_sent = notify_policy.dispatch!(@user, @pseudonym, @cc) if @cc && !skip_confirmation
 
       data = if api_request?
         user_json(@user, @current_user, session, includes)

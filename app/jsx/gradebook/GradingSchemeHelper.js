@@ -18,7 +18,7 @@
 
 import round from 'compiled/util/round'
 
-function indexOfGrade(grade, gradingScheme) {
+export function indexOfGrade(grade, gradingScheme) {
   const cleanGrade = `${grade}`.trim().toLowerCase()
   return gradingScheme.findIndex(entry => entry[0].toLowerCase() === cleanGrade)
 }

@@ -16,15 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!gradebook';
+import I18n from 'i18n!gradebook'
 
 const primaryInfoLabels = {
   first_last: I18n.t('First, Last Name'),
-  last_first: I18n.t('Last, First Name'),
-};
+  last_first: I18n.t('Last, First Name')
+}
 
-const primaryInfoKeys = ['first_last', 'last_first'];
-const defaultPrimaryInfo = 'first_last';
+const primaryInfoKeys = ['first_last', 'last_first']
+const defaultPrimaryInfo = 'first_last'
 
 const secondaryInfoLabels = {
   section: I18n.t('Section'),
@@ -32,18 +32,18 @@ const secondaryInfoLabels = {
   integration_id: I18n.t('Integration ID'),
   login_id: I18n.t('Login ID'),
   none: I18n.t('None')
-};
+}
 
-const secondaryInfoKeys = ['section', 'sis_id', 'integration_id', 'login_id', 'none'];
-const defaultSecondaryInfo = 'none';
-const sectionSecondaryInfo = 'section';
+const secondaryInfoKeys = ['section', 'sis_id', 'integration_id', 'login_id', 'none']
+const defaultSecondaryInfo = 'none'
+const sectionSecondaryInfo = 'section'
 
 const enrollmentFilterLabels = {
   inactive: I18n.t('Inactive enrollments'),
   concluded: I18n.t('Concluded enrollments')
-};
+}
 
-const enrollmentFilterKeys = ['inactive', 'concluded'];
+const enrollmentFilterKeys = ['inactive', 'concluded']
 
 export default {
   primaryInfoKeys,
@@ -55,4 +55,4 @@ export default {
   sectionSecondaryInfo,
   enrollmentFilterKeys,
   enrollmentFilterLabels
-};
+}

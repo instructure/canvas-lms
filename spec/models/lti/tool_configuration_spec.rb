@@ -235,6 +235,7 @@ module Lti
       before do
         tool_configuration.developer_key = developer_key
         tool_configuration.custom_fields = "key=value\nfoo=bar"
+        tool_configuration.privacy_level = 'public'
       end
 
       shared_examples_for 'a new context external tool' do
@@ -248,6 +249,18 @@ module Lti
           it 'does set placements that are not disabled' do
             expect(subject.settings.keys).to include 'account_navigation'
           end
+        end
+
+        context 'when no privacy level is set' do
+          before { tool_configuration.privacy_level = nil }
+
+          it 'sets the workflow_state to "anonymous"' do
+            expect(subject.workflow_state).to eq 'anonymous'
+          end
+        end
+
+        it 'sets the correct workflow_state' do
+          expect(subject.workflow_state).to eq 'public'
         end
 
         it 'sets the correct placements' do

@@ -104,10 +104,10 @@ export default class JsUploader {
     if (this.uploader) {
       this.resetUploader()
     }
-    const session = this.kSession.generateUploadOptions(['video', 'audio', 'webm'])
+    const session = this.kSession.generateUploadOptions(['video', 'audio', 'webm', 'video/webm', 'audio/webm'])
     this.uploader = new K5Uploader(session)
     this.uploader.addEventListener('K5.fileError', this.onFileError)
-    this.uploader.addEventListener('K5.complete', this.onUploadComplete)
+    this.uploader.addEventListener('K5.complete', this.onUploadCompleteFileType(this.file.type === "audio/webm" ))
     return this.uploader.addEventListener('K5.ready', this.onUploaderReady)
   }
 
@@ -115,12 +115,16 @@ export default class JsUploader {
     return this.createNeededFields()
   }
 
-  onUploadComplete(e) {
+  onUploadCompleteFileType (isAudioFileType) {
+    return (e) => this.onUploadComplete(e, isAudioFileType);
+  }
+
+  onUploadComplete(e, isAudioFileComplete) {
     this.resetUploader()
     if (!((e.title != null ? e.title.length : undefined) > 0)) {
       e.title = this.file.name
     }
-    this.addEntry(e)
+    this.addEntry(e, isAudioFileComplete)
     return this.dialogManager.hide()
   }
 

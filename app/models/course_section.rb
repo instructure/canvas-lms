@@ -266,6 +266,14 @@ class CourseSection < ActiveRecord::Base
       update_grades: true,
       executing_user: opts[:updating_user]
     )
+
+    # it's possible that some enrollments were created using an old copy of the course section before the crosslist,
+    # so wait a little bit and then make sure they get cleaned up
+    self.send_later_if_production_enqueue_args(:ensure_enrollments_in_correct_section, {:max_attempts => 1, :run_at => 10.seconds.from_now})
+  end
+
+  def ensure_enrollments_in_correct_section
+    self.enrollments.where.not(:course_id => self.course_id).each {|e| e.update_attribute(:course_id, self.course_id)}
   end
 
   def crosslist_to_course(course, **opts)

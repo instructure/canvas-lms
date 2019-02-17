@@ -16,50 +16,50 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { arrayOf, number, oneOf, shape, string } from 'prop-types';
-import Text from '@instructure/ui-elements/lib/components/Text';
-import I18n from 'i18n!gradebook';
-import GradeFormatHelper from '../../../gradebook/shared/helpers/GradeFormatHelper';
+import React from 'react'
+import {arrayOf, number, oneOf, shape, string} from 'prop-types'
+import Text from '@instructure/ui-elements/lib/components/Text'
+import I18n from 'i18n!gradebook'
+import GradeFormatHelper from '../../../gradebook/shared/helpers/GradeFormatHelper'
 
-export default function LatePolicyGrade (props) {
-  const pointsDeducted = I18n.n(-props.submission.pointsDeducted);
+export default function LatePolicyGrade(props) {
+  const pointsDeducted = I18n.n(-props.submission.pointsDeducted)
   const formatOptions = {
     formatType: props.enterGradesAs,
     pointsPossible: props.assignment.pointsPossible,
     gradingScheme: props.gradingScheme,
     version: 'final'
-  };
-  const finalGrade = GradeFormatHelper.formatSubmissionGrade(props.submission, formatOptions);
+  }
+  const finalGrade = GradeFormatHelper.formatSubmissionGrade(props.submission, formatOptions)
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'row' }}>
-      <div style={{ paddingRight: '.5rem' }}>
+    <div style={{display: 'flex', flexDirection: 'row'}}>
+      <div style={{paddingRight: '.5rem'}}>
         <div>
           <Text color="error" as="span">
-            { I18n.t('Late Penalty:') }
+            {I18n.t('Late Penalty:')}
           </Text>
         </div>
         <div>
           <Text color="secondary" as="span">
-            { I18n.t('Final Grade:') }
+            {I18n.t('Final Grade:')}
           </Text>
         </div>
       </div>
-      <div style={{ flex: 1 }}>
+      <div style={{flex: 1}}>
         <div id="late-penalty-value">
           <Text color="error" as="span">
-            { pointsDeducted }
+            {pointsDeducted}
           </Text>
         </div>
         <div id="final-grade-value">
           <Text color="secondary" as="span">
-            { finalGrade }
+            {finalGrade}
           </Text>
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 LatePolicyGrade.propTypes = {
@@ -73,4 +73,4 @@ LatePolicyGrade.propTypes = {
     score: number,
     pointsDeducted: number
   }).isRequired
-};
+}

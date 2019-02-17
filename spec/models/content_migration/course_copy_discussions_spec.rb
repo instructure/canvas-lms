@@ -323,5 +323,31 @@ describe ContentMigration do
       expect(topic2.assignment.lock_at.to_i).to eq @assignment.lock_at.to_i
       expect(topic2.lock_at).to be_nil
     end
+
+    it "should not apply the late policy right away if shifting dates to the future" do
+      graded_discussion_topic
+      @assignment.update_attributes(:due_at => 3.days.ago, :points_possible => 4)
+
+      [@copy_from, @copy_to].each do |course|
+        course.create_late_policy(missing_submission_deduction_enabled: true, missing_submission_deduction: 25.0)
+      end
+      student_in_course(:course => @copy_to)
+
+      @cm.copy_options = {
+        everything: true,
+        shift_dates: true,
+        old_start_date: 4.days.ago.to_s,
+        old_end_date: 2.days.ago.to_s,
+        new_start_date: 6.days.from_now.to_s,
+        new_end_date: 8.days.from_now.to_s
+      }
+      @cm.save!
+
+      run_course_copy
+
+      topic2 = @copy_to.discussion_topics.where(:migration_id => mig_id(@topic)).first
+      sub = topic2.assignment.submissions.where(:user_id => @student).first
+      expect(sub).to be_unsubmitted # should not mark as missing
+    end
   end
 end

@@ -86,7 +86,7 @@ class GradeCalculator
       groups: groups,
       periods: periods
     )
-    user_ids.in_groups_of(1000, false) do |user_ids_group|
+    user_ids.sort.in_groups_of(100, false) do |user_ids_group|
       GradeCalculator.new(user_ids_group, course, opts).compute_and_save_scores
     end
   end

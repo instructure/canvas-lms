@@ -85,6 +85,17 @@ export const TEACHER_QUERY = gql`
   }
 `
 
+export const SET_WORKFLOW = gql`
+  mutation SetWorkflow($id: ID!, $workflow: AssignmentState!) {
+    updateAssignment(input: {id: $id, state: $workflow}) {
+      assignment {
+        lid: _id
+        state
+      }
+    }
+  }
+`
+
 export const CourseShape = shape({
   lid: string.isRequired
 })

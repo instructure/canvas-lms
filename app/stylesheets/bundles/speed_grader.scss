@@ -221,9 +221,6 @@ $icon-size: 1.4rem;
   #{direction(left)}: 0;
   #{direction(right)}: 0;
   min-width: 960px;
-  &.with_moderation_tabs {
-    top: $gradebook_header_height * 2;
-  }
   &.with_enrollment_notice {
     top: $gradebook_header_height + 3.3625em;
   }
@@ -271,75 +268,6 @@ $icon-size: 1.4rem;
   border-bottom: 1px solid $ic-border-light;
   border-radius: 0;
   text-align: center;
-}
-
-#moderation_bar {
-  display: none;
-  width: 100%;
-  border-bottom: 1px solid $ic-border-light;
-
-  #moderation_bar_content {
-    display: flex;
-    align-items: center;
-
-    #new_mark_container {
-      padding-#{direction(left)}: 5px;
-    }
-  }
-}
-
-#moderation_tabs {
-  #dummy_container {
-    height: 0px;
-    padding: 0px;
-  }
-  ul {
-    background: $white;
-    height: $gradebook_header_height - 0.0625em;
-    li {
-      height: $gradebook_header_height;
-      min-width: 275px;
-      &.ui-state-active {
-        background: $ic-bg-light-neutral;
-        button {
-          float: direction(right);
-          margin: 6px 14px;
-          display: inline-block;
-        }
-        &.selected button, &.pending button {
-          display: none;
-        }
-      }
-      &.ui-state-focus .mark_title {
-        text-decoration: underline;
-      }
-      &.selected .selected_icon {
-        display: inline-block;
-        color: var(--ic-brand-primary);
-        padding-#{direction(right)}: 6px;
-      }
-      a {
-        padding: 14px 12px;
-        text-decoration: none;
-        span {
-          padding: 0 8px;
-          &.mark_title {
-            font-weight: bold;
-          }
-        }
-      }
-      .selected_icon, button {
-        display: none;
-      }
-    }
-    #new_mark_container {
-      height: $gradebook_header_height - 0.125em;
-      border: none;
-    }
-    #new_mark_dropdown_link {
-      width: 150px;
-    }
-  }
 }
 
 #left_side {

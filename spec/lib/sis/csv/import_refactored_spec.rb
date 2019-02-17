@@ -47,6 +47,14 @@ describe SIS::CSV::ImportRefactored do
     expect(importer.errors).to be_empty
   end
 
+  it "should work handle empty columns" do
+    importer = process_csv_data(
+      "course_id,short_name,long_name,account_id,term_id,status,,",
+      "test_1,TC 101,Test Course 1,,,active,invalid,"
+    )
+    expect(importer.errors).to be_empty
+  end
+
   it "should error files with invalid CSV headers " do
     importer = process_csv_data(
       "xlist_course_id,\"section_id,status"

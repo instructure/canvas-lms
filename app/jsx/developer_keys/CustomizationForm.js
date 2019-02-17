@@ -22,8 +22,8 @@ import React from 'react'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
 import TextArea from '@instructure/ui-forms/lib/components/TextArea'
 import View from '@instructure/ui-layout/lib/components/View'
-
 import CustomizationTable from './CustomizationTable'
+import OtherOptions from './OtherOptions'
 
 export default class CustomizationForm extends React.Component {
   static propTypes = {
@@ -34,12 +34,20 @@ export default class CustomizationForm extends React.Component {
     disabledPlacements: PropTypes.arrayOf(PropTypes.string).isRequired,
     dispatch: PropTypes.func.isRequired,
     setEnabledScopes: PropTypes.func.isRequired,
-    setDisabledPlacements: PropTypes.func.isRequired
+    setDisabledPlacements: PropTypes.func.isRequired,
+    setPrivacyLevel: PropTypes.func.isRequired
   }
 
   constructor(props) {
     super(props)
+    const {dispatch, setPrivacyLevel} = this.props
     this.invertedScopes = invert(this.props.validScopes)
+    dispatch(setPrivacyLevel(this.privacyLevel))
+  }
+
+  get privacyLevel() {
+    const extension = this.canvasExtension
+    return extension && extension.privacy_level === 'public' ? extension.privacy_level : 'anonymous'
   }
 
   get scopes() {
@@ -64,9 +72,7 @@ export default class CustomizationForm extends React.Component {
     }
 
     // Get Canvas specific extensions from the tool config
-    return toolConfiguration.extensions.find(
-      ext => ext.platform === 'canvas.instructure.com'
-    )
+    return toolConfiguration.extensions.find(ext => ext.platform === 'canvas.instructure.com')
   }
 
   get placements() {
@@ -108,7 +114,12 @@ export default class CustomizationForm extends React.Component {
     dispatch(setDisabledPlacements(this.toggleArrayItem(newDisabledPlacements, value)))
   }
 
-  messageTypeFor = (placement) => {
+  setPrivacyLevel = e => {
+    const {dispatch, setPrivacyLevel} = this.props
+    dispatch(setPrivacyLevel(e.target.value))
+  }
+
+  messageTypeFor = placement => {
     const extension = this.canvasExtension
 
     if (!(extension && extension.settings[placement])) {
@@ -182,6 +193,7 @@ export default class CustomizationForm extends React.Component {
         </Heading>
         {this.scopeTable()}
         {this.placementTable()}
+        <OtherOptions defaultValue={this.privacyLevel} onChange={this.setPrivacyLevel} />
         {this.customFields()}
       </View>
     )

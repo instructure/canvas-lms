@@ -22,7 +22,7 @@
 <div <%= 'class=file-upload-question-holder' if question_type.entry_type == 'file' %> >
   <% value = (@stored_params.present?) ? h(@stored_params["question_#{hash_get(question, :id)}"]) : h(hash_get(user_answer, :text).to_s) %>
 <% if question_type.entry_type == "text_box" %>
-  <input type="text" name="question_<%= hash_get(question, :id) %>" value="<%= value %>" class="question_input" autocomplete='off' <%= 'readonly="readonly"' unless editable %>/>
+  <input type="text" name="question_<%= hash_get(question, :id) %>" value="<%= value %>" class="question_input" autocomplete='off' <%= 'readonly="readonly"' unless editable %> aria-label="<%= label_for_question_type(question_type) %>" />
 <% elsif question_type.entry_type == "numerical_text_box" %>
   <%
     if question[:answers].any?{|answer| answer[:numerical_answer_type] == 'precision_answer' }
@@ -38,6 +38,7 @@
     class="question_input <%= answer_type_class %>"
     autocomplete='off'
     <%= 'readonly="readonly"' unless editable %>
+    aria-label="<%= label_for_question_type(question_type) %>"
   />
 <% elsif question_type.entry_type == "textarea" %>
   <div class="rce_links">
@@ -74,4 +75,3 @@
 <% end %>
 
 </div>
-

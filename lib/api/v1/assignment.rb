@@ -285,7 +285,8 @@ module Api::V1::Assignment
           'id' => rubric.id,
           'title' => rubric.title,
           'points_possible' => rubric.points_possible,
-          'free_form_criterion_comments' => !!rubric.free_form_criterion_comments
+          'free_form_criterion_comments' => !!rubric.free_form_criterion_comments,
+          'hide_score_total' => !!assignment.rubric_association.hide_score_total
         }
       end
     end
@@ -506,7 +507,8 @@ module Api::V1::Assignment
     end
 
     response
-  rescue ActiveRecord::RecordInvalid
+  rescue ActiveRecord::RecordInvalid => e
+    assignment.errors.add('invalid_record', e)
     false
   rescue Lti::AssignmentSubscriptionsHelper::AssignmentSubscriptionError => e
     assignment.errors.add('plagiarism_tool_subscription', e)

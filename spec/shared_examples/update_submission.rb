@@ -268,19 +268,18 @@ RSpec.shared_examples 'a submission update action' do |controller|
           @assignment = @course.assignments.create!(
             name: "moderated assignment",
             moderated_grading: true,
-            grader_count: 2,
+            grader_count: 10,
             final_grader: @teacher
           )
           @assignment.grade_student(@student, grade: 1, grader: @first_ta, provisional: true)
           @assignment.grade_student(@student, grade: 1, grader: @second_ta, provisional: true)
           @assignment.grade_student(@student, grade: 1, grader: @teacher, provisional: true)
           @submission = @assignment.submissions.find_by(user: @student)
-          submission_comments = @submission.submission_comments
-          @student_comment = submission_comments.create!(author: @student, comment: "Student comment")
-          @first_ta_comment = submission_comments.create!(author: @first_ta, comment: "First Ta comment")
-          @second_ta_comment = submission_comments.create!(author: @second_ta, comment: "Second Ta comment")
-          @third_ta_comment = submission_comments.create!(author: @third_ta, comment: "Third Ta comment")
-          @final_grader_comment = submission_comments.create!(author: @teacher, comment: "Final Grader comment")
+          @student_comment = @submission.add_comment(author: @student, comment: "Student comment")
+          @first_ta_comment = @submission.add_comment(author: @first_ta, comment: "First Ta comment", provisional: true)
+          @second_ta_comment = @submission.add_comment(author: @second_ta, comment: "Second Ta comment", provisional: true)
+          @third_ta_comment = @submission.add_comment(author: @third_ta, comment: "Third Ta comment", provisional: true)
+          @final_grader_comment = @submission.add_comment(author: @teacher, comment: "Final Grader comment", provisional: true)
         end
 
         before(:each) { user_session(@first_ta) }
@@ -323,6 +322,7 @@ RSpec.shared_examples 'a submission update action' do |controller|
           end
 
           it "returns all submission comments after grades have posted" do
+            ModeratedGrading::ProvisionalGrade.find_by(submission: @submission, scorer: @second_ta).publish!
             @assignment.update!(grades_published_at: 1.day.ago)
             put :update, params: params, format: :json
             expect(submission_comments).to match_array([

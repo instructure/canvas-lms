@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import parseLinkHeader from '../../shared/parseLinkHeader';
+import parseLinkHeader from '../../shared/parseLinkHeader'
 import {
   CLEAR_RECORDS,
   FETCH_RECORDS_START,
@@ -25,7 +25,7 @@ import {
   FETCH_RECORDS_NEXT_PAGE_START,
   FETCH_RECORDS_NEXT_PAGE_SUCCESS,
   FETCH_RECORDS_NEXT_PAGE_FAILURE
-} from '../../gradebook-history/actions/SearchFormActions';
+} from '../../gradebook-history/actions/SearchFormActions'
 
 const initialState = {
   records: {
@@ -45,9 +45,9 @@ const initialState = {
       nextPage: null
     }
   }
-};
+}
 
-function searchForm (state = initialState, { type, payload }) {
+function searchForm(state = initialState, {type, payload}) {
   switch (type) {
     case FETCH_RECORDS_START: {
       return {
@@ -61,7 +61,7 @@ function searchForm (state = initialState, { type, payload }) {
             nextPage: null
           }
         }
-      };
+      }
     }
     case FETCH_RECORDS_SUCCESS: {
       return {
@@ -75,7 +75,7 @@ function searchForm (state = initialState, { type, payload }) {
             nextPage: parseLinkHeader(payload.link).next
           }
         }
-      };
+      }
     }
     case FETCH_RECORDS_FAILURE: {
       return {
@@ -89,7 +89,7 @@ function searchForm (state = initialState, { type, payload }) {
             nextPage: null
           }
         }
-      };
+      }
     }
     case FETCH_RECORDS_NEXT_PAGE_START: {
       return {
@@ -99,10 +99,10 @@ function searchForm (state = initialState, { type, payload }) {
           [payload.recordType]: {
             ...state.records[payload.recordType],
             fetchStatus: 'started',
-            nextPage: null,
+            nextPage: null
           }
         }
-      };
+      }
     }
     case FETCH_RECORDS_NEXT_PAGE_SUCCESS: {
       return {
@@ -116,7 +116,7 @@ function searchForm (state = initialState, { type, payload }) {
             nextPage: parseLinkHeader(payload.link).next
           }
         }
-      };
+      }
     }
     case FETCH_RECORDS_NEXT_PAGE_FAILURE: {
       return {
@@ -129,7 +129,7 @@ function searchForm (state = initialState, { type, payload }) {
             nextPage: null
           }
         }
-      };
+      }
     }
     case CLEAR_RECORDS: {
       return {
@@ -146,9 +146,9 @@ function searchForm (state = initialState, { type, payload }) {
       }
     }
     default: {
-      return state;
+      return state
     }
   }
 }
 
-export default searchForm;
+export default searchForm

@@ -32,7 +32,7 @@ module ModulesPage
   end
 
   def move_module_sidebar
-    f("span[aria-label='Move Module']")
+    f("div[aria-label='Move Module']")
   end
 
   def move_module_sidebar_header
@@ -48,7 +48,7 @@ module ModulesPage
   end
 
   def move_context_module_item_sidebar
-    f("span[aria-label='Move Module Item']")
+    f("div[aria-label='Move Module Item']")
   end
 
   # Methods & Actions

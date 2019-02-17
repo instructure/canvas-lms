@@ -16,20 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { func, number, shape, string, bool } from 'prop-types';
-import I18n from 'i18n!gradebook';
-import View from '@instructure/ui-layout/lib/components/View';
-import NumberInput from '@instructure/ui-forms/lib/components/NumberInput';
-import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent';
-import Text from '@instructure/ui-elements/lib/components/Text';
-import RadioInput from '@instructure/ui-forms/lib/components/RadioInput';
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
-import classnames from 'classnames';
-import round from 'coffeescripts/util/round';
+import React from 'react'
+import {func, number, shape, string, bool} from 'prop-types'
+import I18n from 'i18n!gradebook'
+import View from '@instructure/ui-layout/lib/components/View'
+import NumberInput from '@instructure/ui-forms/lib/components/NumberInput'
+import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
+import Text from '@instructure/ui-elements/lib/components/Text'
+import RadioInput from '@instructure/ui-forms/lib/components/RadioInput'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import classnames from 'classnames'
+import round from 'coffeescripts/util/round'
 import NumberHelper from '../../../shared/helpers/numberHelper'
 
-function defaultDurationLate (interval, secondsLate) {
+function defaultDurationLate(interval, secondsLate) {
   let durationLate = secondsLate / 3600
 
   if (interval === 'day') {
@@ -39,23 +39,22 @@ function defaultDurationLate (interval, secondsLate) {
   return round(durationLate, 2)
 }
 
-export default function SubmissionTrayRadioInput (props) {
-  const showNumberInput = props.value === 'late' && props.checked;
-  const interval = props.latePolicy.lateSubmissionInterval;
+export default function SubmissionTrayRadioInput(props) {
+  const showNumberInput = props.value === 'late' && props.checked
+  const interval = props.latePolicy.lateSubmissionInterval
   const numberInputDefault = defaultDurationLate(interval, props.submission.secondsLate)
-  const numberInputLabel = interval === 'day' ? I18n.t('Days late') : I18n.t('Hours late');
-  const numberInputText = interval === 'day' ? I18n.t('Day(s)') : I18n.t('Hour(s)');
+  const numberInputLabel = interval === 'day' ? I18n.t('Days late') : I18n.t('Hours late')
+  const numberInputText = interval === 'day' ? I18n.t('Day(s)') : I18n.t('Hour(s)')
   const styles = {
     backgroundColor: props.color,
     height: showNumberInput ? '5rem' : '2rem'
-  };
+  }
 
-  const radioInputClasses = classnames(
-    'SubmissionTray__RadioInput',
-    { 'SubmissionTray__RadioInput-WithBackground': props.color !== 'transparent' }
-  );
+  const radioInputClasses = classnames('SubmissionTray__RadioInput', {
+    'SubmissionTray__RadioInput-WithBackground': props.color !== 'transparent'
+  })
 
-  function handleNumberInputBlur ({ target: { value } }) {
+  function handleNumberInputBlur({target: {value}}) {
     if (!NumberHelper.validate(value)) {
       return
     }
@@ -88,30 +87,29 @@ export default function SubmissionTrayRadioInput (props) {
         value={props.value}
       />
 
-      {
-        showNumberInput &&
-          <span className="NumberInput__Container NumberInput__Container-LeftIndent">
-            <NumberInput
-              defaultValue={numberInputDefault.toString()}
-              disabled={props.disabled}
-              inline
-              label={<ScreenReaderContent>{numberInputLabel}</ScreenReaderContent>}
-              locale={props.locale}
-              min="0"
-              onBlur={handleNumberInputBlur}
-              showArrows={false}
-              width="5rem"
-            />
+      {showNumberInput && (
+        <span className="NumberInput__Container NumberInput__Container-LeftIndent">
+          <NumberInput
+            defaultValue={numberInputDefault.toString()}
+            disabled={props.disabled}
+            inline
+            label={<ScreenReaderContent>{numberInputLabel}</ScreenReaderContent>}
+            locale={props.locale}
+            min="0"
+            onBlur={handleNumberInputBlur}
+            showArrows={false}
+            width="5rem"
+          />
 
-            <PresentationContent>
-              <View as="div" margin="0 small">
-                <Text>{numberInputText}</Text>
-              </View>
-            </PresentationContent>
-          </span>
-      }
+          <PresentationContent>
+            <View as="div" margin="0 small">
+              <Text>{numberInputText}</Text>
+            </View>
+          </PresentationContent>
+        </span>
+      )}
     </div>
-  );
+  )
 }
 
 SubmissionTrayRadioInput.propTypes = {
@@ -129,8 +127,8 @@ SubmissionTrayRadioInput.propTypes = {
   text: string.isRequired,
   updateSubmission: func.isRequired,
   value: string.isRequired
-};
+}
 
 SubmissionTrayRadioInput.defaultProps = {
   color: 'transparent'
-};
+}

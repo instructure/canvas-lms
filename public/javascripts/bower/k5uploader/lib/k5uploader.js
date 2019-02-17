@@ -63,7 +63,7 @@ K5Uploader.prototype.uploadFile = function(file) {
     return
   }
 
-  if (ENV.ARC_RECORDING_FEATURE_ENABLED && this.uiconfig.acceptableFile(file, k5Options.allowedMediaTypes) || file.type === "webm") {
+  if (ENV.ARC_RECORDING_FEATURE_ENABLED && this.uiconfig.acceptableFile(file, k5Options.allowedMediaTypes) || ["webm", "video/webm", "audio/webm"].includes(file.type)) {
     this.uploader = new Uploader();
     this.uploader.send(this.session, file);
   } else if (this.uiconfig.acceptableFile(file, k5Options.allowedMediaTypes)) {

@@ -98,24 +98,34 @@ class DeveloperKeyActionButtons extends React.Component {
     </Tooltip>
   }
 
+  renderEditButton () {
+    const { developerName, developerKey: {is_lti_key} } = this.props;
+
+    if(is_lti_key) return
+
+    return (
+      <Tooltip
+          tip={I18n.t("Edit this key")}
+        >
+        <Button
+          variant="icon"
+          margin="0"
+          size="small"
+          onClick={this.editLinkHandler}
+        >
+          <ScreenReaderContent>{I18n.t("Edit key %{developerName}", {developerName})}</ScreenReaderContent>
+          <IconEditLine />
+        </Button>
+      </Tooltip>
+    )
+  }
+
   render () {
     const { developerName } = this.props;
 
     return (
       <div>
-        <Tooltip
-          tip={I18n.t("Edit this key")}
-        >
-          <Button
-            variant="icon"
-            margin="0"
-            size="small"
-            onClick={this.editLinkHandler}
-          >
-            <ScreenReaderContent>{I18n.t("Edit key %{developerName}", {developerName})}</ScreenReaderContent>
-            <IconEditLine />
-          </Button>
-        </Tooltip>
+        {this.renderEditButton()}
         {this.renderVisibilityIcon()}
         <Tooltip
           tip={I18n.t("Delete this key")}
@@ -146,7 +156,8 @@ DeveloperKeyActionButtons.propTypes = {
   developerKey: PropTypes.shape({
     id: PropTypes.string.isRequired,
     api_key: PropTypes.string,
-    created_at: PropTypes.string.isRequired
+    created_at: PropTypes.string.isRequired,
+    is_lti_key: PropTypes.bool
   }).isRequired,
   visible: PropTypes.bool.isRequired,
   developerName: PropTypes.string.isRequired,

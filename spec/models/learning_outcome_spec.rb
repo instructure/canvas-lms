@@ -999,6 +999,19 @@ describe LearningOutcome do
       end
     end
 
+    it 'should de-dup outcomes linked multiple times' do
+      account = Account.default
+      course_factory
+      lo = LearningOutcome.create!(context: @course, title: "outcome",
+        calculation_method: 'highest', workflow_state: 'active')
+      3.times do |i|
+        group = @course.learning_outcome_groups.create!(:title => "groupage_#{i}")
+        group.add_outcome(lo)
+      end
+      expect(@course.learning_outcome_links.count).to eq(3)
+      expect(@course.linked_learning_outcomes.count).to eq(1) # not 3
+    end
+
     describe '#align' do
       let(:assignment) { assignment_model }
 

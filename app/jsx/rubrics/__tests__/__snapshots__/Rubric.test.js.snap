@@ -12,6 +12,7 @@ exports[`the Rubric component hides the score total when needed 1`] = `
   <Table
     caption="Point Rubric"
     hover={false}
+    layout="auto"
     size="medium"
   >
     <thead>
@@ -180,6 +181,7 @@ exports[`the Rubric component renders as expected 1`] = `
   <Table
     caption="Point Rubric"
     hover={false}
+    layout="auto"
     size="medium"
   >
     <thead>
@@ -371,6 +373,7 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
   <Table
     caption="Point Rubric"
     hover={false}
+    layout="auto"
     size="medium"
   >
     <thead>
@@ -531,6 +534,7 @@ exports[`the Rubric component updates the total score when an individual criteri
   <Table
     caption="Point Rubric"
     hover={false}
+    layout="auto"
     size="medium"
   >
     <thead>

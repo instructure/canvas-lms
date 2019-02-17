@@ -74,9 +74,6 @@
   "close_opportunity_center_popup_9907d981": {
     "message": "关闭机会中心弹出窗口"
   },
-  "count_plural_0_opportunities_one_opportunity_other_bb1698f6": {
-    "message": "{ count, plural,\n     =0 {#个机会}\n    one {#个机会}\n  other {#个机会}\n}。点击以打开机会中心弹出窗口。"
-  },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {显示#个已完成项目}\n  other {显示#个已完成项目}\n}"
   },

@@ -16,84 +16,84 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { shallow } from 'enzyme';
-import Text from '@instructure/ui-elements/lib/components/Text';
-import IconMore from '@instructure/ui-icons/lib/Solid/IconMore';
-import StatusColorListItem from 'jsx/gradezilla/default_gradebook/components/StatusColorListItem';
+import React from 'react'
+import {shallow} from 'enzyme'
+import Text from '@instructure/ui-elements/lib/components/Text'
+import IconMore from '@instructure/ui-icons/lib/Solid/IconMore'
+import StatusColorListItem from 'jsx/gradezilla/default_gradebook/components/StatusColorListItem'
 
-function defaultProps (props = {}) {
+function defaultProps(props = {}) {
   return {
     status: 'late',
     color: '#efefef',
     isColorPickerShown: false,
-    colorPickerOnToggle () {},
-    colorPickerButtonRef () {},
-    colorPickerContentRef () {},
-    colorPickerAfterClose () {},
-    afterSetColor () {},
+    colorPickerOnToggle() {},
+    colorPickerButtonRef() {},
+    colorPickerContentRef() {},
+    colorPickerAfterClose() {},
+    afterSetColor() {},
     ...props
-  };
+  }
 }
 
 QUnit.module('StatusColorListItem', {
-  setup () {
-    this.wrapper = shallow(<StatusColorListItem {...defaultProps()} />);
-    this.instance = this.wrapper.instance();
+  setup() {
+    this.wrapper = shallow(<StatusColorListItem {...defaultProps()} />)
+    this.instance = this.wrapper.instance()
   },
 
-  teardown () {
-    this.wrapper.unmount();
+  teardown() {
+    this.wrapper.unmount()
   }
-});
+})
 
-test('color is passed to ColorPicker', function () {
-  strictEqual(this.wrapper.find('ColorPicker').prop('currentColor'), this.instance.props.color);
-});
+test('color is passed to ColorPicker', function() {
+  strictEqual(this.wrapper.find('ColorPicker').prop('currentColor'), this.instance.props.color)
+})
 
-test('parentCompontent is StatusColorListItem', function () {
-  strictEqual(this.wrapper.find('ColorPicker').prop('parentComponent'), 'StatusColorListItem');
-});
+test('parentCompontent is StatusColorListItem', function() {
+  strictEqual(this.wrapper.find('ColorPicker').prop('parentComponent'), 'StatusColorListItem')
+})
 
-test('status is displayed', function () {
-  ok(this.wrapper.contains(<Text>Late</Text>));
-});
+test('status is displayed', function() {
+  ok(this.wrapper.contains(<Text>Late</Text>))
+})
 
-test('popover trigger is a kabob', function () {
-  ok(this.wrapper.find('PopoverTrigger Button').contains(<IconMore />));
-});
+test('popover trigger is a kabob', function() {
+  ok(this.wrapper.find('PopoverTrigger Button').contains(<IconMore />))
+})
 
-test('setColor sets the ColorPicker color', function () {
-  const color = '#FFFFFF';
-  this.instance.setColor(color);
-  strictEqual(this.wrapper.find('ColorPicker').prop('currentColor'), color);
-});
+test('setColor sets the ColorPicker color', function() {
+  const color = '#FFFFFF'
+  this.instance.setColor(color)
+  strictEqual(this.wrapper.find('ColorPicker').prop('currentColor'), color)
+})
 
-test('setColor sets the ColorPicker color, even with no octothorpe', function () {
-  const color = 'FFFFFF';
-  this.instance.setColor(color);
-  strictEqual(this.wrapper.find('ColorPicker').prop('currentColor'), `#${color}`);
-});
+test('setColor sets the ColorPicker color, even with no octothorpe', function() {
+  const color = 'FFFFFF'
+  this.instance.setColor(color)
+  strictEqual(this.wrapper.find('ColorPicker').prop('currentColor'), `#${color}`)
+})
 
-test('setColor sets li style', function () {
-  const color = '#FFFFFF';
-  this.instance.setColor(color);
-  strictEqual(this.wrapper.find('li').prop('style').backgroundColor, color);
-});
+test('setColor sets li style', function() {
+  const color = '#FFFFFF'
+  this.instance.setColor(color)
+  strictEqual(this.wrapper.find('li').prop('style').backgroundColor, color)
+})
 
-test('setColor sets li style, even with no octothorpe', function () {
-  const color = 'FFFFFF';
-  this.instance.setColor(color);
-  strictEqual(this.wrapper.find('li').prop('style').backgroundColor, `#${color}`);
-});
+test('setColor sets li style, even with no octothorpe', function() {
+  const color = 'FFFFFF'
+  this.instance.setColor(color)
+  strictEqual(this.wrapper.find('li').prop('style').backgroundColor, `#${color}`)
+})
 
-QUnit.module('StatusColorListItem afterSetColor');
+QUnit.module('StatusColorListItem afterSetColor')
 
-test('setColor calls afterSetColor', function () {
-  const afterSetColor = sinon.stub();
-  const wrapper = shallow(<StatusColorListItem {...defaultProps({ afterSetColor })} />);
-  const instance = wrapper.instance();
-  instance.setColor('#FFFFFF');
-  strictEqual(afterSetColor.callCount, 1);
-  wrapper.unmount();
-});
+test('setColor calls afterSetColor', function() {
+  const afterSetColor = sinon.stub()
+  const wrapper = shallow(<StatusColorListItem {...defaultProps({afterSetColor})} />)
+  const instance = wrapper.instance()
+  instance.setColor('#FFFFFF')
+  strictEqual(afterSetColor.callCount, 1)
+  wrapper.unmount()
+})

@@ -41,11 +41,11 @@ test('Grid.Util._toRow', () => {
   Grid.students = {1: {}}
   Grid.sections = {1: {}}
   const rollup = {
-    links: { section: "1", user: "1" },
-    scores: [{ score: "3", hide_points: true, links: { outcome:"2" } }]
+    links: {section: '1', user: '1'},
+    scores: [{score: '3', hide_points: true, links: {outcome: '2'}}]
   }
   ok(
-    isEqual(Grid.Util._toRow([rollup], null).outcome_2, { score: "3", hide_points: true }),
+    isEqual(Grid.Util._toRow([rollup], null).outcome_2, {score: '3', hide_points: true}),
     'correctly returns an object with a score and hide_points for a cell'
   )
 })
@@ -55,17 +55,17 @@ test('Grid.Util.toRows', () => {
   Grid.sections = {1: {}}
   const rollups = [
     {
-      links: { section: "1", user: "3" }
+      links: {section: '1', user: '3'}
     },
     {
-      links: { section: "1", user: "1" }
+      links: {section: '1', user: '1'}
     },
     {
-      links: { section: "1", user: "2" }
+      links: {section: '1', user: '2'}
     }
   ]
   ok(
-    isEqual(Grid.Util.toRows(rollups).map((r) => r.student.id), [3, 1, 2]),
+    isEqual(Grid.Util.toRows(rollups).map(r => r.student.id), [3, 1, 2]),
     'returns rows in the same user order as rollups'
   )
 })
@@ -74,14 +74,11 @@ test('Grid.View.masteryDetails', () => {
   const outcome = {mastery_points: 5, points_possible: 10}
   const spy = sinon.spy(Grid.View, 'legacyMasteryDetails')
   Grid.View.masteryDetails(10, outcome)
-  ok(
-    spy.calledOnce,
-    'calls legacyMasteryDetails when no custom ratings defined'
-  )
+  ok(spy.calledOnce, 'calls legacyMasteryDetails when no custom ratings defined')
   Grid.ratings = [
     {points: 10, color: '00ff00', description: 'great'},
-    {points:  5, color: '0000ff', description: 'OK'},
-    {points:  0, color: 'ff0000', description: 'turrable'}
+    {points: 5, color: '0000ff', description: 'OK'},
+    {points: 0, color: 'ff0000', description: 'turrable'}
   ]
   ok(
     isEqual(Grid.View.masteryDetails(10, outcome), ['rating_0', '#00ff00', 'great']),
@@ -109,8 +106,8 @@ test('Grid.View.masteryDetails with scaling', () => {
   const outcome = {points_possible: 5}
   Grid.ratings = [
     {points: 10, color: '00ff00', description: 'great'},
-    {points:  5, color: '0000ff', description: 'OK'},
-    {points:  0, color: 'ff0000', description: 'turrable'}
+    {points: 5, color: '0000ff', description: 'OK'},
+    {points: 0, color: 'ff0000', description: 'turrable'}
   ]
   ok(
     isEqual(Grid.View.masteryDetails(5, outcome), ['rating_0', '#00ff00', 'great']),
@@ -130,8 +127,8 @@ test('Grid.View.masteryDetails with scaling (points_possible 0)', () => {
   const outcome = {mastery_points: 5, points_possible: 0}
   Grid.ratings = [
     {points: 10, color: '00ff00', description: 'great'},
-    {points:  5, color: '0000ff', description: 'OK'},
-    {points:  0, color: 'ff0000', description: 'turrable'}
+    {points: 5, color: '0000ff', description: 'OK'},
+    {points: 0, color: 'ff0000', description: 'turrable'}
   ]
   ok(
     isEqual(Grid.View.masteryDetails(5, outcome), ['rating_0', '#00ff00', 'great']),
@@ -166,7 +163,11 @@ test('Grid.View.legacyMasteryDetails', () => {
     'returns "near-mastery" if half of mastery score or greater'
   )
   ok(
-    isEqual(Grid.View.legacyMasteryDetails(1, outcome), ['rating_3', '#EE0612', 'Well Below Mastery']),
+    isEqual(Grid.View.legacyMasteryDetails(1, outcome), [
+      'rating_3',
+      '#EE0612',
+      'Well Below Mastery'
+    ]),
     'returns "remedial" if less than half of mastery score'
   )
 })
@@ -188,16 +189,15 @@ test('Grid.Util._studentColumn does not modify default options', () => {
 test('Grid.Util.toColumns hasResults', () => {
   const outcomes = [
     {
-      id: "1"
-
+      id: '1'
     },
     {
-      id: "2"
+      id: '2'
     }
   ]
   const rollup = {
-    links: { section: "1", user: "1" },
-    scores: [{ score: "3", hide_points: true, links: { outcome:"2" } }]
+    links: {section: '1', user: '1'},
+    scores: [{score: '3', hide_points: true, links: {outcome: '2'}}]
   }
   const columns = Grid.Util.toColumns(outcomes, [rollup])
   ok(isEqual(columns[1].hasResults, false))

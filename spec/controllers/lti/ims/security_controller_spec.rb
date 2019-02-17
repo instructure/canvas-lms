@@ -37,6 +37,11 @@ module Lti::Ims
       expect(json['keys']).not_to be_empty
     end
 
+    it 'sets the Cache-control header' do
+      get url
+      expect(response.headers['Cache-Control']).to eq 'max-age=864000'
+    end
+
     it 'returns well-formed public key jwks' do
       get url
       expected_keys = %w(kid kty alg e n use)

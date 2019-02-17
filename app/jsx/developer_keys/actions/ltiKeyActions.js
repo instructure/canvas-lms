@@ -46,6 +46,12 @@ actions.ltiKeysSetDisabledPlacements = payload => ({
   payload
 })
 
+actions.LTI_KEYS_SET_PRIVACY_LEVEL = 'LTI_KEYS_SET_PRIVACY_LEVEL'
+actions.ltiKeysSetPrivacyLevel = payload => ({
+  type: actions.LTI_KEYS_SET_PRIVACY_LEVEL,
+  payload
+})
+
 actions.SET_LTI_TOOL_CONFIGURATION = 'SET_LTI_TOOL_CONFIGURATION'
 actions.setLtiToolConfiguration = payload => ({
   type: actions.SET_LTI_TOOL_CONFIGURATION,
@@ -133,10 +139,9 @@ actions.ltiKeysUpdateCustomizationsSuccessful = payload => ({
 })
 
 actions.LTI_KEYS_UPDATE_CUSTOMIZATIONS = 'LTI_KEYS_UPDATE_CUSTOMIZATIONS'
-actions.ltiKeysUpdateCustomizations = (scopes, disabled_placements, developerKeyId, toolConfiguration, customFields) => dispatch => {
+actions.ltiKeysUpdateCustomizations = (scopes, disabled_placements, developerKeyId, toolConfiguration, customFields, privacyLevel) => dispatch => {
   dispatch(actions.ltiKeysUpdateCustomizationsStart())
   const url = `/api/lti/developer_keys/${developerKeyId}/tool_configuration`
-
   axios
     .put(url, {
       developer_key: {
@@ -145,7 +150,8 @@ actions.ltiKeysUpdateCustomizations = (scopes, disabled_placements, developerKey
       tool_configuration: {
         custom_fields: customFields,
         disabled_placements,
-        settings: toolConfiguration
+        settings: toolConfiguration,
+        privacy_level: privacyLevel
       }
     })
     .then(() => {

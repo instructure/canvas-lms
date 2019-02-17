@@ -20,7 +20,6 @@ import $ from 'jquery'
 import SisButtonView from 'compiled/views/SisButtonView'
 import Backbone from 'Backbone'
 
-
 class AssignmentStub extends Backbone.Model {
   constructor() {
     super(...arguments)

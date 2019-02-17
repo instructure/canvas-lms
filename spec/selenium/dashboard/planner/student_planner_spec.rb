@@ -392,7 +392,7 @@ describe "student planner" do
       view_todo_item
       modal = todo_sidebar_modal(@student_to_do.title)
       title_input = f('input', modal)
-      course_name_dropdown = fj('span:contains("Course")>span>span>span>input', modal)
+      course_name_dropdown = f('#to-do-item-course-select', modal)
 
       expect(title_input[:value]).to eq(@student_to_do.title)
       expect(course_name_dropdown[:value]).to eq("#{@course.name} - #{@course.short_name}")

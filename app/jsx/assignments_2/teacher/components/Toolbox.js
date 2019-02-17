@@ -46,6 +46,11 @@ export default class Toolbox extends React.Component {
     onPublishChange: () => {}
   }
 
+  handlePublishChange = event => {
+    const newState = event.target.checked ? 'published' : 'unpublished'
+    this.props.onPublishChange(newState)
+  }
+
   renderPublished() {
     // TODO: put the label on the left side of the toggle when checkbox supports it
     return (
@@ -55,7 +60,7 @@ export default class Toolbox extends React.Component {
         size="medium"
         inline
         checked={this.props.assignment.state === 'published'}
-        onChange={this.props.onPublishChange}
+        onChange={this.handlePublishChange}
       />
     )
   }

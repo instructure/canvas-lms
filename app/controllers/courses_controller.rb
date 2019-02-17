@@ -935,6 +935,12 @@ class CoursesController < ApplicationController
           users = users.where(id: user_ids)
         end
 
+        user_uuids = params[:user_uuids]
+        if user_uuids.present?
+          user_uuids = user_uuids.split(",") if user_uuids.is_a?(String)
+          users = users.where(uuid: user_uuids)
+        end
+
         users = Api.paginate(users, self, api_v1_course_users_url)
         includes = Array(params[:include]).concat(['sis_user_id', 'email'])
 
@@ -1089,7 +1095,7 @@ class CoursesController < ApplicationController
       bookmark = Plannable::Bookmarker.new(Assignment, false, [:due_at, :created_at], :id)
 
       grading_scope = @current_user.assignments_needing_grading(:contexts => [@context], scope_only: true).
-        reorder(:due_at, :id).preload(:external_tool_tag, :rubric_association, :rubric, :discussion_topic, :quiz).eager_load(:duplicate_of)
+        reorder(:due_at, :id).preload(:external_tool_tag, :rubric_association, :rubric, :discussion_topic, :quiz, :duplicate_of)
       submitting_scope = @current_user.
         assignments_needing_submitting(
           :contexts => [@context],

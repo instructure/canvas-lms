@@ -314,7 +314,7 @@ class PlannerController < ApplicationController
     if params[:context_codes].present?
       @contexts = Context.from_context_codes(Array(params[:context_codes]))
       perms = public_access? ? [:read, :read_syllabus] : [:read]
-      render_json_unauthorized and return false unless @contexts.all? { |c| c.grants_any_right?(@current_user, *perms) }
+      render_json_unauthorized and return false unless @contexts.all? { |c| c.grants_any_right?(@current_user, session, *perms) }
       (@current_user&.shard || Shard.current).activate do
         @course_ids = @contexts.select{ |c| c.is_a? Course }.map(&:id)
         @group_ids = @contexts.select{ |c| c.is_a? Group }.map(&:id)

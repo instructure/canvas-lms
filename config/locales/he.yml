@@ -1317,9 +1317,8 @@ he:
     sis_import: 
       add_sis_stickiness_instructions: "עם בחירת אפשרות זו, שינויים אשר יתבצעו ביבוא זה ממערכת בית ספרית (SIS) זו יעובדו כאילו הם שינויי ממשק משתמש, וימנעו ריצות יבוא של SIS \"בלתי דרסניות\" מלשנות שדות כאן."
       add_sis_stickiness_label: "עבד כשינויי UI"
-      batch_import_instructions: |-
-          אם נבחרה, אפשרות זו תבטל הכל עבור מחצית זו, כולל כל הקורסים וההרשמות אשר אינן בהגדרות הקובץ לייבוא לעיל.
-          לפירוט ניתן לעיין בתיעוד המערכת
+      batch_import_instructions: "אם נבחרה, אפשרות זו תבטל הכל עבור מחצית זו, כולל כל הקורסים וההרשמות אשר אינן בהגדרות הקובץ לייבוא לעיל.\n\
+          לפירוט ניתן לעיין בתיעוד המערכת "
       batch_mode_label: "זהו עדכון אצבה מלא"
       clear_sis_stickiness_instructions: "עם בחירת אפשרות זו, כל השדות בכל הרשומות שריצת היבוא של SIS זו נוגעת בהן תהיינה בנות שינוי בעתיד בריצות \"בלתי דורסניות\" של ייבוא SIS."
       clear_sis_stickiness_label: "ניקוי מצב שינויי UI"
@@ -1470,6 +1469,17 @@ he:
             text: "זהו דוח של כל הקורסים אשר אין להם ממצאים לרכיבים הבאים: משימות, הכרזות, דיונים, קבצים, מודולים, דפים או בחנים."
     update_failed_notice: "עדכון הגדרות החשבון נכשל"
     user_access_csv_parameters: 
+      account_reports: 
+        usu: 
+          enrollment_type: 
+            header: "סוג הרשמה"
+      all: "כל ההרשמות"
+      designer: "הרשמות מעצבים"
+      observer: "הרשמות משקיפים"
+      students: "הרשמות תלמידים"
+      ta: "הרשמת עוזרי הוראה"
+      teachers: "הרשמות מורים"
+    user_access_prospect_education_csv_parameters: 
       account_reports: 
         usu: 
           enrollment_type: 
@@ -3610,6 +3620,7 @@ he:
   canvas_alert_change_assignment_name_course_name_2fc63d9c: "התראת קנבס - יש לשנות:%{assignment_name}, %{course_name}"
   canvas_alert_invited_course_as_role_type_9ed79ce3: "התראת קנבס - הוזמנת: %{course} כ %{role_type}"
   canvas_alert_invited_course_as_role_type_ea825937: "התראת קנבס - הוזמנת: קורס כ %{role_type}"
+  canvas_alert_late_submission_user_name_assignment__ee1301ac: "התראת קנבס - הגשה באיחור: %{user_name}, %{assignment_name}"
   canvas_attribute_eaa7e31a: "מאפיין קנבס"
   canvas_by_instructure_1490381: "קנבס באמצעות Instructure"
   canvas_cartridge_description: "הדבר מאפשר המרה של ייצוא קנבס לפורמט זמני של JSON אשר אותו יש לייבא"
@@ -7951,6 +7962,7 @@ he:
   grade_distribution_e52c9256: "התפלגות ציונים"
   grade_export_title: "ייצוא ציונים"
   grade_for_name_b9df168a: "הערכה של: %{name}"
+  grade_grade_7e52dd1c: "ציון: %{grade}"
   grade_high_to_low_1cea0381: "הערכה - מהגבוה לנמוך"
   grade_history_9c51ad49: "הסטורית הערכות..."
   grade_info_19fb9875: "מידע ציונים"
@@ -9499,6 +9511,7 @@ he:
   invalid_csv_file_grades_could_not_be_updated_4d5c120c: "קובץ CSV לא תקין. ההערכות לא עודכנו"
   invalid_csv_file_grades_could_not_be_updated_6ebdeca4: "קובץ CSV לא תקין, הציונים לא עודכנו."
   invalid_date_or_invalid_datetime_for_attr_6661103f: "תאריך או זמן לא תקינים עבור %{attr}"
+  invalid_domain_e810c1d: "דומיין לא תקין"
   invalid_file_type_881cc9b2: "סוג קובץ לא חוקי"
   invalid_points_possible: "ערך הנקודות האפשריות למשימה זו חייב להיות אפס או יותר."
   invalid_recipient_name_56b22b86: "שם נמען שגוי"
@@ -9642,6 +9655,7 @@ he:
   last_user_access_title: "כניסת משתמש אחרונה"
   late_2be42b88: איחור
   late_8bd684b6: מאוחר
+  late_assignment_user_name_assignment_name_2df32e01: "משימה באיחור: %{user_name}, %{assignment_name}"
   late_bd436902: מאוחר
   late_penalty_78099d18: "קנס פיגור:"
   late_penalty_817fff4e: "קנס פיגור:"
@@ -10567,9 +10581,9 @@ he:
     assignment_changed: 
       email: 
         body: |-
-            המשימה "%{title}" בקורס %{course} שונתה.
+            המשימה "%{title}" בקורס %{course} שונתה.  
             
-            יש להקליק כאן כדי לעיין בה:
+            יש להקליק כאן כדי לעיין בה: 
             %{url}
         html: 
           body: "המשימה \"%{title}\" בקורס %{course} שונתה."
@@ -11997,6 +12011,7 @@ he:
   more_cf9cc661: עוד
   more_courses_5ebbe998: "קורסים נוספים"
   more_info_at_course_name_56dc8c10: "מידע נוסף ב %{course_name}"
+  more_info_at_web_address_dba7e187: "מידע נוסף ב  %{web_address} "
   more_information_3dfb76b5: "מידע נוסף"
   more_results_were_added_at_the_bottom_of_the_page_dc323877: "עוד תוצאות נוספו בתחתית הדף "
   more_than_999_submissions_need_grading_bc087dd0: "יותר מ 999 הגשות ממתינות להערכה"
@@ -17976,6 +17991,7 @@ he:
   tree_browser: 
     folder_tree_instructions: "יש להשתמש בחיצי מעלה מטה כדי לנווט בעץ. לחיצת חץ ימיני כדי להרחיב ענף נבחר בעץ וחץ שמאלי כדי לכווץ ענף נבחר בעץ."
   truncated_56b1a661: מקוצץ
+  turned_in_submission_date_e9180b8b: "הוגש בתאריך: %{submission_date}"
   turnitin: 
     error_1007: "הקובץ שהועלה גדול מדי"
     error_1009: "סוג קובץ שגוי. (הקבצים החוקיים הם MS וורד, אקרובט PDF, פוסטסקריפט, טקסט, HTML, וורד פרפקט (WPD) ופורמט תוכן עשיר RTF)."
@@ -18242,9 +18258,11 @@ he:
       updating_user_details: "עדכון פרטי משתמש..."
     notices: 
       image_reported: "תמונה זו דווחה"
+  user_name_has_just_turned_in_a_late_submission_for_874a9a31: "%{user_name} הגיש/ה באיחור את המשימה %{assignment_name} בקורס %{course_name} "
   user_name_just_added_you_to_a_conversation_in_canv_7b278b51: "%{user_name} הוסיף אותך כרגע לדיון קנבס. להצגת השיחה יש להקליק על הקישור הזה: %{link}."
   user_name_just_sent_you_a_message_in_canvas_9e911af7: "%{user_name} שלח לך זה עתה הודעה דרך קנבס."
   user_name_just_sent_you_a_message_in_canvas_a2cb3bf4: "%{user_name} שלח לך הודעה בקנבס זה עתה."
+  user_name_just_turned_in_their_assignment_late_ass_a54b128a: "%{user_name} הגיש/ה זה עתה את המשימה (באיחור), %{assignment_name}"
   user_name_successfully_added_79af8365: "%{user_name} נתווסף בהצלחה!"
   user_name_you_just_sent_a_message_in_canvas_b1fd4598: "%{user_name}, שלחת הודעה בקנבס. "
   user_name_you_ll_need_to_log_in_before_you_can_vie_164c8e30: "%{user_name}, תצטרך/י  *להתחבר* לפני שתוכל/י לעיין בדף הזה."

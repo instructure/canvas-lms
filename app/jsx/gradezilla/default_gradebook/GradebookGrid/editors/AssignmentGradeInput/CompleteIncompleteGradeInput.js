@@ -145,9 +145,7 @@ export default class CompleteIncompleteGradeInput extends Component {
 
     return (
       <div className="HorizontalFlex">
-        <span className="Grid__GradeCell__CompleteIncompleteValue">
-          {componentForGrade(grade)}
-        </span>
+        <span className="Grid__GradeCell__CompleteIncompleteValue">{componentForGrade(grade)}</span>
 
         <div className="Grid__GradeCell__CompleteIncompleteMenu">
           <Menu

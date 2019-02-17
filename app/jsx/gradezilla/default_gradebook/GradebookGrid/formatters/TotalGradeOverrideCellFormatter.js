@@ -16,42 +16,50 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import round from 'compiled/util/round'
-import I18n from 'i18n!gradebook'
-import {scoreToGrade} from '../../../../gradebook/GradingSchemeHelper'
+import GradeOverrideEntry from '../../../../grading/GradeEntry/GradeOverrideEntry'
 
-// xsslint safeString.property schemeGrade
-function render(options) {
-  const percentage = options.percentage == null ? '–' : options.percentage
-  let flexSpace = ''
-  let schemeGrade = ''
-
-  if (options.schemeGrade) {
-    flexSpace = '<span class="flex-space"></span>'
-    schemeGrade = `<span class="scheme-grade">${options.schemeGrade}</span>`
+function renderStartContainer(gradeInfo) {
+  let content = ''
+  if (!gradeInfo.valid) {
+    content += '<div class="Grid__GradeCell__InvalidGrade"><i class="icon-warning"></i></div>'
   }
+  // xsslint safeString.identifier content
+  return `<div class="Grid__GradeCell__StartContainer">${content}</div>`
+}
 
-  // xsslint safeString.identifier flexSpace percentage schemeGrade
+function render(formattedGrade, gradeInfo) {
+  // xsslint safeString.identifier formattedGrade
+  // xsslint safeString.function renderStartContainer
   return `
     <div class="gradebook-cell">
-      ${flexSpace}
-      <span class="percentage-grade">
-        ${percentage}
-      </span>
-      ${schemeGrade}
+      ${renderStartContainer(gradeInfo)}
+      <div class="Grid__GradeCell__Content">
+        <span class="Grade">${formattedGrade}</span>
+      </div>
+      <div class="Grid__GradeCell__EndContainer"></div>
     </div>
   `
 }
 
 export default class TotalGradeOverrideCellFormatter {
   constructor(gradebook) {
+    const gradeEntry = new GradeOverrideEntry({
+      gradingScheme: gradebook.getCourseGradingScheme()
+    })
+
     this.options = {
-      getFinalGradeOverride(studentId) {
-        return gradebook.finalGradeOverrides.getGradeForUser(studentId)
+      getGradeInfoForUser(studentId) {
+        const pendingGradeInfo = gradebook.finalGradeOverrides.getPendingGradeInfoForUser(studentId)
+        if (pendingGradeInfo) {
+          return pendingGradeInfo
+        }
+
+        const grade = gradebook.finalGradeOverrides.getGradeForUser(studentId)
+        return gradeEntry.gradeInfoFromGrade(grade)
       },
 
-      getCourseGradingScheme() {
-        return gradebook.options.grading_standard
+      formatGradeInfo(gradeInfo) {
+        return gradeEntry.formatGradeInfoForDisplay(gradeInfo)
       }
     }
 
@@ -59,20 +67,8 @@ export default class TotalGradeOverrideCellFormatter {
   }
 
   render(_row, _cell, _value, _columnDef, student /* dataContext */) {
-    const finalGradeOverride = this.options.getFinalGradeOverride(student.id)
-    if (finalGradeOverride == null) {
-      return render({schemeGrade: null, percentage: null})
-    }
-
-    const {percentage} = finalGradeOverride
-    const gradingScheme = this.options.getCourseGradingScheme()
-    const schemeGrade = gradingScheme ? scoreToGrade(percentage, gradingScheme) : null
-
-    const options = {
-      schemeGrade,
-      percentage: I18n.n(round(percentage, round.DEFAULT), {percentage: true})
-    }
-
-    return render(options)
+    const gradeInfo = this.options.getGradeInfoForUser(student.id)
+    const formattedGrade = this.options.formatGradeInfo(gradeInfo)
+    return render(formattedGrade, gradeInfo)
   }
 }

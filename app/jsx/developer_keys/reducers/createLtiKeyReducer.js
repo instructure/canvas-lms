@@ -28,6 +28,7 @@ const initialState = {
   toolConfigurationUrl: '',
   enabledScopes: [],
   disabledPlacements: [],
+  privacyLevel: 'anonymous',
   updateCustomizationsPending: false,
   updateCustomizationsSuccessful: false,
   updateCustomizationsError: null
@@ -49,6 +50,10 @@ const ltiKeysHandlers = {
   [ACTION_NAMES.LTI_KEYS_SET_DISABLED_PLACEMENTS]: (state, action) => ({
     ...state,
     disabledPlacements: action.payload
+  }),
+  [ACTION_NAMES.LTI_KEYS_SET_PRIVACY_LEVEL]: (state, action) => ({
+    ...state,
+    privacyLevel: action.payload
   }),
   [ACTION_NAMES.SET_LTI_TOOL_CONFIGURATION]: (state, action) => ({
     ...state,

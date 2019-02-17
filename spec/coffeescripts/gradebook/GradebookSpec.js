@@ -366,7 +366,14 @@ QUnit.module('Gradebook#getVisibleGradeGridColumns', {
       {object: {assignment_group: {position: 1}, position: 1, name: 'first'}},
       {object: {assignment_group: {position: 1}, position: 2, name: 'second'}},
       {object: {assignment_group: {position: 1}, position: 3, name: 'third'}},
-      {object: {assignment_group: {position: 1}, position: 4, name: 'moderated', moderation_in_progress: true}}
+      {
+        object: {
+          assignment_group: {position: 1},
+          position: 4,
+          name: 'moderated',
+          moderation_in_progress: true
+        }
+      }
     ]
     this.aggregateColumns = []
     this.parentColumns = []
@@ -399,7 +406,10 @@ test('It does not sort columns when gradebookColumnOrderSettings is undefined', 
 })
 
 test('sets cannot_edit if moderation_in_progress is true on the column object', function() {
-  const moderatedColumn = _.find(this.allAssignmentColumns, (column) => column.object.moderation_in_progress)
+  const moderatedColumn = _.find(
+    this.allAssignmentColumns,
+    column => column.object.moderation_in_progress
+  )
   this.getVisibleGradeGridColumns()
   strictEqual(moderatedColumn.cssClass, 'cannot_edit')
 })
@@ -414,16 +424,16 @@ QUnit.module('Gradebook#customColumnDefinitions', {
   setup() {
     this.gradebook = createGradebook()
     this.gradebook.customColumns = [
-      { id: '1', teacher_notes: false, hidden: false, title: 'Read Only', read_only: true },
-      { id: '2', teacher_notes: false, hidden: false, title: 'Not Read Only', read_only: false }
+      {id: '1', teacher_notes: false, hidden: false, title: 'Read Only', read_only: true},
+      {id: '2', teacher_notes: false, hidden: false, title: 'Not Read Only', read_only: false}
     ]
   }
 })
 
-test('includes the cannot_edit class for read_only columns', function () {
+test('includes the cannot_edit class for read_only columns', function() {
   columns = this.gradebook.customColumnDefinitions()
-  equal(columns[0].cssClass, "meta-cell custom_column cannot_edit")
-  equal(columns[1].cssClass, "meta-cell custom_column")
+  equal(columns[0].cssClass, 'meta-cell custom_column cannot_edit')
+  equal(columns[1].cssClass, 'meta-cell custom_column')
 })
 
 QUnit.module('Gradebook#fieldsToExcludeFromAssignments', {
@@ -923,16 +933,18 @@ QUnit.module('Gradebook#gotAllAssignmentGroups', suiteHooks => {
       anonymize_students: true
     }
 
-    assignmentGroups = [{
-      id: 1,
-      assignments: [
-        unmoderatedAssignment,
-        moderatedUnpublishedAssignment,
-        moderatedPublishedAssignment,
-        anonymousUnmoderatedAssignment,
-        anonymousModeratedAssignment
-      ]
-    }]
+    assignmentGroups = [
+      {
+        id: 1,
+        assignments: [
+          unmoderatedAssignment,
+          moderatedUnpublishedAssignment,
+          moderatedPublishedAssignment,
+          anonymousUnmoderatedAssignment,
+          anonymousModeratedAssignment
+        ]
+      }
+    ]
 
     gradebook = createGradebook()
     sinon.stub(gradebook, 'updateAssignmentEffectiveDueDates')
@@ -948,7 +960,8 @@ QUnit.module('Gradebook#gotAllAssignmentGroups', suiteHooks => {
 
   test('sets moderation_in_progress to true for a moderated assignment whose grades are not published', () => {
     gradebook.gotAllAssignmentGroups(assignmentGroups)
-    strictEqual(moderatedUnpublishedAssignment.moderation_in_progress, true) })
+    strictEqual(moderatedUnpublishedAssignment.moderation_in_progress, true)
+  })
 
   test('sets moderation_in_progress to false for a moderated assignment whose grades are published', () => {
     gradebook.gotAllAssignmentGroups(assignmentGroups)
@@ -961,7 +974,7 @@ QUnit.module('Gradebook#gotAllAssignmentGroups', suiteHooks => {
   })
 })
 
-QUnit.module('Gradebook#calculateAndRoundGroupTotalScore', (hooks) => {
+QUnit.module('Gradebook#calculateAndRoundGroupTotalScore', hooks => {
   let gradebook
 
   hooks.beforeEach(() => {
@@ -980,13 +993,13 @@ QUnit.module('Gradebook#calculateAndRoundGroupTotalScore', (hooks) => {
 
   test('avoids floating point calculation issues', () => {
     const score = gradebook.calculateAndRoundGroupTotalScore(946.65, 1000)
-    const floatingPointResult = 946.65 / 1000 * 100
+    const floatingPointResult = (946.65 / 1000) * 100
     strictEqual(floatingPointResult, 94.66499999999999)
     strictEqual(score, 94.67)
   })
 })
 
-QUnit.module('Gradebook#handleAssignmentMutingChange', (hooks) => {
+QUnit.module('Gradebook#handleAssignmentMutingChange', hooks => {
   let gradebook
   let updatedAssignment
 
@@ -998,7 +1011,7 @@ QUnit.module('Gradebook#handleAssignmentMutingChange', (hooks) => {
       getColumns: sinon.stub().returns([{}]),
       invalidateRow() {},
       render() {},
-      setColumns() {},
+      setColumns() {}
     }
     gradebook.students = {4: {id: '4', name: 'fred'}}
     gradebook.studentViewStudents = {6: {id: '6', name: 'fake fred'}}
@@ -1008,7 +1021,10 @@ QUnit.module('Gradebook#handleAssignmentMutingChange', (hooks) => {
 
   test('updates the anonymize_students attribute on the assignment', () => {
     gradebook.handleAssignmentMutingChange(updatedAssignment)
-    strictEqual(gradebook.assignments[updatedAssignment.id].anonymize_students, updatedAssignment.anonymize_students)
+    strictEqual(
+      gradebook.assignments[updatedAssignment.id].anonymize_students,
+      updatedAssignment.anonymize_students
+    )
   })
 
   test('updates the muted attribute on the assignment', () => {

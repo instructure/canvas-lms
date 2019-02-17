@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import wikiSidebar from 'wikiSidebar'
 
 // for each command, there are three possibilities:
 //
@@ -102,9 +101,12 @@ export function focus ($target) {
   if (remoteEditor) {
     remoteEditor.focus()
   } else if ($target.data('rich_text')) {
-    const editor = getTinymce().get($target[0].id)
-    wikiSidebar.attachToEditor($target)
-    editor && editor.focus()
+    require.ensure([], require => {
+      const wikiSidebar = require('wikiSidebar')
+      const editor = getTinymce().get($target[0].id)
+      wikiSidebar.attachToEditor($target)
+      editor && editor.focus()
+    }, 'legacyWikiSidebarAsyncChunk')
   } else {
     console.warn("called focus() on an RCE instance that hasn't fully loaded, ignored")
   }

@@ -16,25 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { arrayOf, shape, string } from 'prop-types';
-import { statuses } from '../../../gradezilla/default_gradebook/constants/statuses';
-import { darken } from '../../../gradezilla/default_gradebook/constants/colors';
+import React from 'react'
+import {arrayOf, shape, string} from 'prop-types'
+import {statuses} from '../../../gradezilla/default_gradebook/constants/statuses'
+import {darken} from '../../../gradezilla/default_gradebook/constants/colors'
 
-function GridColor (props) {
-  const styleRules = props.statuses.map(status =>
-    [
-      `.even .gradebook-cell.${status} { background-color: ${props.colors[status]}; }`,
-      `.odd .gradebook-cell.${status} { background-color: ${darken(props.colors[status], 5)}; }`,
-      `.slick-cell.editable .gradebook-cell.${status} { background-color: white; }`
-    ].join('')
-  ).join('');
+function GridColor(props) {
+  const styleRules = props.statuses
+    .map(status =>
+      [
+        `.even .gradebook-cell.${status} { background-color: ${props.colors[status]}; }`,
+        `.odd .gradebook-cell.${status} { background-color: ${darken(props.colors[status], 5)}; }`,
+        `.slick-cell.editable .gradebook-cell.${status} { background-color: white; }`
+      ].join('')
+    )
+    .join('')
 
-  return (
-    <style type="text/css">
-      {styleRules}
-    </style>
-  );
+  return <style type="text/css">{styleRules}</style>
 }
 
 GridColor.propTypes = {
@@ -46,10 +44,10 @@ GridColor.propTypes = {
     excused: string
   }).isRequired,
   statuses: arrayOf(string)
-};
+}
 
 GridColor.defaultProps = {
   statuses
-};
+}
 
-export default GridColor;
+export default GridColor

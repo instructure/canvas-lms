@@ -17,16 +17,15 @@
  */
 
 import AssignmentCellEditor from './AssignmentCellEditor'
+import TotalGradeOverrideCellEditor from './TotalGradeOverrideCellEditor'
 
-class CellEditorFactory {
-  getEditor(column) {
-    switch (column.type) {
-      case 'assignment':
-        return AssignmentCellEditor
-      default:
-        return undefined
-    }
-  }
+const editorsByColumnType = {
+  assignment: AssignmentCellEditor,
+  total_grade_override: TotalGradeOverrideCellEditor
 }
 
-export default CellEditorFactory
+export default class CellEditorFactory {
+  getEditor(column) {
+    return editorsByColumnType[column.type]
+  }
+}

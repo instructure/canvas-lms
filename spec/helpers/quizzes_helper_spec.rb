@@ -260,7 +260,7 @@ describe QuizzesHelper do
         answer_list: ['val'],
         editable: true
       })
-      expect(html).to eq 'some <select class="question_input" name="question_4"><option value="val" selected>val</option></select>'
+      expect(html).to eq 'some <select class="question_input" name="question_4" aria-label="Multiple dropdowns, read surrounding text"><option value="val" selected>val</option></select>' # rubocop:disable Metrics/LineLength
       expect(html).to be_html_safe
     end
 
@@ -272,7 +272,7 @@ describe QuizzesHelper do
         answer_list: ['val'],
         editable: true
       })
-      expect(html).to eq 'some <select class="question_input" name="question_4"><option value="other_val">val</option></select>'
+      expect(html).to eq 'some <select class="question_input" name="question_4" aria-label="Multiple dropdowns, read surrounding text"><option value="other_val">val</option></select>' # rubocop:disable Metrics/LineLength
       expect(html).to be_html_safe
     end
 

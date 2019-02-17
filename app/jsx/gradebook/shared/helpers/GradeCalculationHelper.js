@@ -50,7 +50,7 @@ export function sumBy(collection, attr) {
 }
 
 export function scoreToPercentage(score, pointsPossible) {
-  const floatingPointResult = score / pointsPossible * 100
+  const floatingPointResult = (score / pointsPossible) * 100
   if (!Number.isFinite(floatingPointResult)) {
     return floatingPointResult
   }
@@ -59,5 +59,9 @@ export function scoreToPercentage(score, pointsPossible) {
 }
 
 export function weightedPercent({score, possible, weight}) {
-  return (score && weight) ? Big(score).div(possible).times(weight) : Big(0)
+  return score && weight
+    ? Big(score)
+        .div(possible)
+        .times(weight)
+    : Big(0)
 }

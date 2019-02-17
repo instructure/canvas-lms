@@ -47,6 +47,9 @@
   "close_d634289d": {
     "message": "Stäng"
   },
+  "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
+    "message": "{ count, plural,\n     =0 {# Möjligheter}\n    one {# möjlighet}\n  other {# möjligheter}\n}"
+  },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Visa # fullgjord post}\n  other {Visa # fullgjorda poster}\n}"
   },

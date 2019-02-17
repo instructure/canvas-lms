@@ -106,10 +106,11 @@ module Mutable
   end
 
   def update_submission_comments_and_count(submission_ids, hidden: false, instructor_ids: nil)
+    update_time = Time.zone.now
     submission_ids.each_slice(100) do |submission_id_slice|
       submission_comment_scope = SubmissionComment.where(hidden: !hidden, submission_id: submission_id_slice)
       submission_comment_scope = submission_comment_scope.where(author_id: instructor_ids) if instructor_ids.present?
-      submission_comment_scope.update_all(:hidden => hidden)
+      submission_comment_scope.update_all(hidden: hidden, updated_at: update_time)
 
       Submission.where(:id => submission_id_slice).
         update_all(["submission_comments_count = (SELECT COUNT(*) FROM #{SubmissionComment.quoted_table_name} WHERE

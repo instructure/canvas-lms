@@ -53,7 +53,6 @@ const testFile = (overrides) => ({
   display_name: 'file 1',
   folder_id: 1,
   'content-type': 'image/jpg',
-
   ...overrides
 })
 
@@ -73,16 +72,10 @@ describe('FileBrowser', () => {
   })
 
   it('only shows images in the tree', (done) => {
-    const subFolders = []
     const files = [
-      testFile({folder_id: 4}),
-      testFile({id: 2, display_name: 'file 2', folder_id: 4, 'content-type': 'text/html'})
+      testFile({folder_id: 4, thumbnail_url: 'thumbnail.jpg'}),
+      testFile({id: 2, display_name: 'file 2', folder_id: 4, thumbnail_url: 'thumbnail.jpg', 'content-type': 'text/html'})
     ]
-    moxios.stubRequest('/api/v1/folders/4/folders', {
-      status: 200,
-      responseText: subFolders,
-      headers: {link: 'url; rel="current"'},
-    })
     moxios.stubRequest('/api/v1/folders/4/files', {
       status: 200,
       responseText: files,
@@ -98,9 +91,36 @@ describe('FileBrowser', () => {
     wrapper.instance().setState({collections})
     wrapper.update()
     wrapper.find('TreeButton').first().simulate('click')
-    wrapper.find('TreeButton').at(1).simulate('click')
     moxios.wait(() => {
-      expect(wrapper.find('TreeButton')).toHaveLength(2)
+      wrapper.find('TreeButton').at(1).simulate('click')
+      expect(wrapper.find('TreeButton')).toHaveLength(3)
+      expect(wrapper.find('Img')).toHaveLength(1)
+      done()
+    })
+  })
+
+  it('shows thumbnails if provided', (done) => {
+    const files = [
+      testFile({folder_id: 4, thumbnail_url: 'thumbnail.jpg'}),
+    ]
+    moxios.stubRequest('/api/v1/folders/4/files', {
+      status: 200,
+      responseText: files,
+      headers: {link: 'url; rel="current"'},
+    })
+
+    const wrapper = mount(<FileBrowser { ...getProps() } />)
+    const collections = {
+      0: {collections: [1]},
+      1: {id: 1, name: 'folder 1', collections: [4], items: [], context: '/courses/1'},
+      4: {id: 4, name: 'folder 4', collections: [], items: [], context: '/users/1'},
+    }
+    wrapper.instance().setState({collections})
+    wrapper.update()
+    wrapper.find('TreeButton').first().simulate('click')
+    moxios.wait(() => {
+      wrapper.find('TreeButton').at(1).simulate('click')
+      expect(wrapper.find('Img')).toHaveLength(1)
       done()
     })
   })
@@ -623,28 +643,28 @@ describe('FileBrowser', () => {
     })
   })
 
-describe('FileBrowser content type filtering', () => {
-  it ('allows all content types by default', () => {
-    const no_type_param = {selectFile: () => {}}
-    const wrapper = shallow(<FileBrowser { ...no_type_param } />)
-    expect(wrapper.instance().contentTypeIsAllowed('image/png')).toBeTruthy()
-    expect(wrapper.instance().contentTypeIsAllowed('some/not-real-thing')).toBeTruthy()
-  })
+  describe('FileBrowser content type filtering', () => {
+    it ('allows all content types by default', () => {
+      const no_type_param = {selectFile: () => {}}
+      const wrapper = shallow(<FileBrowser { ...no_type_param } />)
+      expect(wrapper.instance().contentTypeIsAllowed('image/png')).toBeTruthy()
+      expect(wrapper.instance().contentTypeIsAllowed('some/not-real-thing')).toBeTruthy()
+    })
 
-  it ('can restrict to one content type pattern', () => {
-    const wrapper = shallow(<FileBrowser { ...getProps({contentTypes: ['image/*']}) } />)
-    expect(wrapper.instance().contentTypeIsAllowed('image/png')).toBeTruthy()
-    expect(wrapper.instance().contentTypeIsAllowed('image/jpeg')).toBeTruthy()
-    expect(wrapper.instance().contentTypeIsAllowed('video/mp4')).toBeFalsy()
-    expect(wrapper.instance().contentTypeIsAllowed('not/allowed')).toBeFalsy()
-  })
+    it ('can restrict to one content type pattern', () => {
+      const wrapper = shallow(<FileBrowser { ...getProps({contentTypes: ['image/*']}) } />)
+      expect(wrapper.instance().contentTypeIsAllowed('image/png')).toBeTruthy()
+      expect(wrapper.instance().contentTypeIsAllowed('image/jpeg')).toBeTruthy()
+      expect(wrapper.instance().contentTypeIsAllowed('video/mp4')).toBeFalsy()
+      expect(wrapper.instance().contentTypeIsAllowed('not/allowed')).toBeFalsy()
+    })
 
-  it ('can restrict to multiple content type patterns', () => {
-    const wrapper = shallow(<FileBrowser { ...getProps({contentTypes: ['image/*', 'video/*']}) } />)
-    expect(wrapper.instance().contentTypeIsAllowed('image/png')).toBeTruthy()
-    expect(wrapper.instance().contentTypeIsAllowed('image/jpeg')).toBeTruthy()
-    expect(wrapper.instance().contentTypeIsAllowed('video/mp4')).toBeTruthy()
-    expect(wrapper.instance().contentTypeIsAllowed('not/allowed')).toBeFalsy()
+    it ('can restrict to multiple content type patterns', () => {
+      const wrapper = shallow(<FileBrowser { ...getProps({contentTypes: ['image/*', 'video/*']}) } />)
+      expect(wrapper.instance().contentTypeIsAllowed('image/png')).toBeTruthy()
+      expect(wrapper.instance().contentTypeIsAllowed('image/jpeg')).toBeTruthy()
+      expect(wrapper.instance().contentTypeIsAllowed('video/mp4')).toBeTruthy()
+      expect(wrapper.instance().contentTypeIsAllowed('not/allowed')).toBeFalsy()
+    })
   })
-})
 })

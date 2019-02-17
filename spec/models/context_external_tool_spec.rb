@@ -44,6 +44,64 @@ describe ContextExternalTool do
     end
   end
 
+  describe '#login_or_launch_uri' do
+    let_once(:developer_key) { DeveloperKey.create! }
+    let_once(:tool) do
+      ContextExternalTool.create!(
+        context: @course,
+        consumer_key: 'key',
+        shared_secret: 'secret',
+        name: 'test tool',
+        url: 'http://www.tool.com/launch',
+        developer_key: developer_key
+      )
+    end
+
+    it 'returns the launch url' do
+      expect(tool.login_or_launch_uri).to eq tool.url
+    end
+
+    context 'when a content_tag_uri is specified' do
+      let(:content_tag_uri) { 'https://www.test.com/tool-launch' }
+
+      it 'returns the content tag uri' do
+        expect(tool.login_or_launch_uri(content_tag_uri: content_tag_uri)).to eq content_tag_uri
+      end
+    end
+
+    context 'when the extension url is present' do
+      let(:placement_url) { 'http://www.test.com/editor_button' }
+
+      before do
+        tool.editor_button = {
+          "url" => placement_url,
+          "text" => "LTI 1.3 twoa",
+          "enabled" => true,
+          "icon_url" => "https://static.thenounproject.com/png/131630-200.png",
+          "message_type" => "LtiDeepLinkingRequest",
+          "canvas_icon_class" => "icon-lti"
+        }
+      end
+
+      it 'returns the extension url' do
+        expect(tool.login_or_launch_uri(extension_type: :editor_button)).to eq placement_url
+      end
+    end
+
+    context 'lti_1_3 tool' do
+      let(:oidc_login_uri) { 'http://www.test.com/oidc/login' }
+
+      before do
+        tool.settings['use_1_3'] = true
+        developer_key.update!(oidc_login_uri: oidc_login_uri)
+      end
+
+      it 'returns the oidc login url' do
+        expect(tool.login_or_launch_uri).to eq oidc_login_uri
+      end
+    end
+  end
+
   describe '#deployment_id' do
     let_once(:tool) do
       ContextExternalTool.create!(

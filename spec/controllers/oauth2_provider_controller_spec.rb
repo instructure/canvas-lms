@@ -521,7 +521,7 @@ describe Oauth2ProviderController do
 
     context 'client_credentials' do
       let(:grant_type) { 'client_credentials' }
-      let(:aud) { Rails.application.routes.url_helpers.oauth2_token_url host: 'test.host' }
+      let(:aud) { Rails.application.routes.url_helpers.oauth2_token_url(host: 'test.host', protocol: 'https://') }
       let(:iat) { 1.minute.ago.to_i }
       let(:exp) { 10.minutes.from_now.to_i }
       let(:signing_key) { JSON::JWK.new(key.private_jwk) }
@@ -569,7 +569,7 @@ describe Oauth2ProviderController do
         end
 
         context 'with aud as an array' do
-          let(:aud) { [Rails.application.routes.url_helpers.oauth2_token_url(host: 'test.host'), 'doesnotexist'] }
+          let(:aud) { [Rails.application.routes.url_helpers.oauth2_token_url(host: 'test.host', protocol: 'https://'), 'doesnotexist'] }
 
           it { is_expected.to have_http_status 200 }
         end
@@ -578,6 +578,17 @@ describe Oauth2ProviderController do
           let(:exp) { 1.minute.ago.to_i }
 
           it { is_expected.to have_http_status 400 }
+        end
+
+        context 'with iat in the future by a small amount' do
+          let(:future_iat_time) { 5.seconds.from_now }
+          let(:iat) { future_iat_time.to_i }
+
+          it 'returns an access token' do
+            Timecop.freeze(future_iat_time - 5.seconds) do
+              expect(subject).to have_http_status 200
+            end
+          end
         end
 
         context 'with bad iat' do

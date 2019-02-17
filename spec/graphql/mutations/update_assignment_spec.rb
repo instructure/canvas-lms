@@ -48,8 +48,8 @@ describe Mutations::UpdateAssignment do
         }
       }
     GQL
-    context = {current_user: user_executing, request: ActionDispatch::TestRequest.create}
-    return CanvasSchema.execute(mutation_command, context: context)
+    context = {current_user: user_executing, request: ActionDispatch::TestRequest.create, session: {}}
+    CanvasSchema.execute(mutation_command, context: context)
   end
 
   it "can do basic update on name" do
@@ -235,12 +235,11 @@ describe Mutations::UpdateAssignment do
       id: "#{@assignment_id}"
       state: "deleted"
     GQL
-    errors = result.dig('errors')
-    expect(errors).to_not be_nil
-    expect(errors.length).to be 2
-    # these are not derived or created by our code. so if they change, just replace with the new string
-    expect(errors[0]["message"]).to eq "Argument 'input' on Field 'updateAssignment' has an invalid value. Expected type 'UpdateAssignmentInput!'."
-    expect(errors[1]["message"]).to eq "Argument 'state' on InputObject 'UpdateAssignmentInput' has an invalid value. Expected type 'AssignmentState'."
+    expect(
+      result["errors"].map { |e| e["fields"] }
+    ).to eq [
+      ["mutation", "updateAssignment", "input", "state"]
+    ]
   end
 
   # we cannot force this naturally yet, so lets wait until we have on of the fields that we can.

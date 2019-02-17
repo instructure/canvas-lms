@@ -80,7 +80,6 @@ export default class FindAppointment extends React.Component {
           as="form"
           onSubmit={preventDefault(() => this.handleSubmit())}
           open={this.state.isModalOpen}
-          ref={c => (this.modal = c)}
           size="small"
           onDismiss={() => this.setState({isModalOpen: false})}
           label={I18n.t('Select Course')}

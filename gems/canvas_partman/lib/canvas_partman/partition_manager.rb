@@ -75,16 +75,18 @@ See CanvasPartman::Concerns::Partitioned.
 
       constraint_check = generate_check_constraint(value)
 
-      execute(<<SQL)
-      CREATE TABLE #{base_class.connection.quote_table_name(partition_table)} (
-        LIKE #{base_class.quoted_table_name} INCLUDING ALL,
-        CHECK (#{constraint_check})
-      ) INHERITS (#{base_class.quoted_table_name})
+      base_class.transaction do
+        execute(<<SQL)
+        CREATE TABLE #{base_class.connection.quote_table_name(partition_table)} (
+          LIKE #{base_class.quoted_table_name} INCLUDING ALL,
+          CHECK (#{constraint_check})
+        ) INHERITS (#{base_class.quoted_table_name})
 SQL
 
-      # copy foreign keys, since INCLUDING ALL won't bring them along
-      base_class.connection.foreign_keys(base_class.table_name).each do |foreign_key|
-        base_class.connection.add_foreign_key partition_table, foreign_key.to_table, foreign_key.options.except(:name)
+        # copy foreign keys, since INCLUDING ALL won't bring them along
+        base_class.connection.foreign_keys(base_class.table_name).each do |foreign_key|
+          base_class.connection.add_foreign_key partition_table, foreign_key.to_table, foreign_key.options.except(:name)
+        end
       end
 
       partition_table
@@ -101,7 +103,9 @@ SQL
     def drop_partition(value)
       partition_table = generate_name_for_partition(value)
 
-      base_class.connection.drop_table(partition_table)
+      base_class.transaction do
+        base_class.connection.drop_table(partition_table)
+      end
     end
 
     protected

@@ -17,7 +17,7 @@
  */
 
 import I18n from 'i18n!assignments_2_student_header_date_title'
-import {boolean, string} from 'prop-types'
+import {bool, string} from 'prop-types'
 import Text from '@instructure/ui-elements/lib/components/Text'
 
 import React from 'react'
@@ -56,7 +56,7 @@ function availableStepContainer(props) {
 }
 
 availableStepContainer.propTypes = {
-  isCollapsed: boolean,
+  isCollapsed: bool,
   collapsedLabel: string
 }
 
@@ -79,7 +79,7 @@ function unavailableStepContainer(props) {
 }
 
 unavailableStepContainer.propTypes = {
-  isCollapsed: boolean,
+  isCollapsed: bool,
   collapsedLabel: string
 }
 

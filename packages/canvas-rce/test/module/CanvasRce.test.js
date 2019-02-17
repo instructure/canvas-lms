@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import jsdom from "mocha-jsdom";
 import React from "react";
 import assert from "assert";
 import proxyquire from "proxyquire";
@@ -47,7 +46,6 @@ const CanvasRce = proxyquire("../../src/rce/CanvasRce", {
 }).default;
 
 describe("CanvasRce", () => {
-  jsdom();
 
   let target;
 

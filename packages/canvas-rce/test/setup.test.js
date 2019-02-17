@@ -17,6 +17,11 @@
  */
 
 import { StyleSheetTestUtils } from "aphrodite";
+import jsdom from "jsdom-global"
+
+beforeEach(() => {
+  jsdom()
+})
 
 before(() => {
   StyleSheetTestUtils.suppressStyleInjection();

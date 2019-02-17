@@ -24,7 +24,7 @@ module Canvas::Oauth
   describe ClientCredentialsProvider do
     let(:provider) { described_class.new jws, 'example.com' }
     let(:alg) { :RS256 }
-    let(:aud) { Rails.application.routes.url_helpers.oauth2_token_url }
+    let(:aud) { Rails.application.routes.url_helpers.oauth2_token_url(protocol: 'https://') }
     let(:iat) { 1.minute.ago.to_i }
     let(:exp) { 10.minutes.from_now.to_i }
     let(:signing_key) { JSON::JWK.new(RSA_KEY_PAIR.to_jwk) }
@@ -53,6 +53,17 @@ module Canvas::Oauth
           expect(subject).to have_key key
         end
       end
+
+      context 'with iat in the future by a small amount' do
+        let(:future_iat_time) { 5.seconds.from_now }
+        let(:iat) { future_iat_time.to_i }
+
+        it 'returns an access token' do
+          Timecop.freeze(future_iat_time - 5.seconds) do
+            expect(subject).to be_a Hash
+          end
+        end
+      end
     end
 
     describe '#error_message' do
@@ -77,6 +88,12 @@ module Canvas::Oauth
         let(:aud) { 'doesnotexist' }
 
         it { is_expected.not_to be_empty }
+
+        context 'when aud is not https' do
+          let(:aud) { Rails.application.routes.url_helpers.oauth2_token_url(protocol: 'http://') }
+
+          it { is_expected.not_to be_empty }
+        end
       end
 
       context 'with bad exp' do

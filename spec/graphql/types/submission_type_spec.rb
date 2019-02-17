@@ -94,9 +94,16 @@ describe Types::SubmissionType do
       expect(submission_type.resolve("gradingStatus")).to eq "graded"
     end
 
-    it "should preload quiz type assignments" do 
+    it "should preload quiz type assignments" do
       expect(submission_type_quiz.resolve("submissionStatus")).to eq "submitted"
       expect(submission_type_quiz.resolve("gradingStatus")).to eq "graded"
+    end
+  end
+
+  describe "late policy" do
+    it "should show late policy" do
+      @submission.update!(late_policy_status: :missing)
+      expect(submission_type.resolve("latePolicyStatus")).to eq "missing"
     end
   end
 end

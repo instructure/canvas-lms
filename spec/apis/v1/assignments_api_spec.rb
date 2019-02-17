@@ -400,7 +400,8 @@ describe AssignmentsApiController, type: :request do
         'id' => @rubric.id,
         'title' => 'some rubric',
         'points_possible' => 12,
-        'free_form_criterion_comments' => true
+        'free_form_criterion_comments' => true,
+        'hide_score_total' => false
       })
       expect(json.first['rubric']).to eq [
         {

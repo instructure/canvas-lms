@@ -91,7 +91,7 @@ export class PlannerHeader extends Component {
       allPastItemsLoaded: PropTypes.bool,
       allFutureItemsLoaded: PropTypes.bool,
       allOpportunitiesLoaded: PropTypes.bool,
-      loadingOpportunities:  PropTypes.bool,
+      loadingOpportunities: PropTypes.bool,
       setFocusAfterLoad: PropTypes.bool,
       firstNewDayKey: PropTypes.object,
       futureNextUrl: PropTypes.string,
@@ -199,7 +199,7 @@ export class PlannerHeader extends Component {
   setUpdateItemTray (trayOpen) {
     if (trayOpen) {
       if (this.props.openEditingPlannerItem) {
-        this.props.openEditingPlannerItem();  // tell dynamic-ui we've started editing
+        this.props.openEditingPlannerItem(); // tell dynamic-ui we've started editing
       }
     } else {
       if (this.props.cancelEditingPlannerItem) {
@@ -265,7 +265,7 @@ export class PlannerHeader extends Component {
         =0 {# opportunities}
         one {# opportunity}
         other {# opportunities}
-      }. Click to open Opportunity Center popup.`, { count: this.state.newOpportunities.length })
+      }`, {count: this.state.newOpportunities.length})
     );
   }
 
@@ -335,11 +335,11 @@ export class PlannerHeader extends Component {
     return null;
   }
 
-  renderOpportunitiesBadge () {
-    const props = {}
+  renderOpportunitiesButton (margin) {
+    const badgeProps = {margin, countUntil: 100};
     if (this.props.loading.allOpportunitiesLoaded && this.state.newOpportunities.length) {
-      props.count = this.state.newOpportunities.length;
-      props.formatOutput=(formattedCount) => {
+      badgeProps.count = this.state.newOpportunities.length;
+      badgeProps.formatOutput = (formattedCount) => {
         return (
           <AccessibleContent alt={this.opportunityTitle()}>
             {formattedCount}
@@ -347,15 +347,26 @@ export class PlannerHeader extends Component {
         );
       };
     } else {
-      props.formatOutput=() => {
+      badgeProps.formatOutput = () => {
         return <AccessibleContent alt={this.opportunityTitle()}/>;
-      }
+      };
     }
+
     return (
-      <Badge {...props}>
-        <View>
-          <IconAlertsLine/>
-        </View>
+      <Badge {...badgeProps}>
+        <Button
+          onClick={this.toggleOpportunitiesDropdown}
+          variant="icon"
+          icon={IconAlertsLine}
+          ref={b => {
+            this.opportunitiesButton = b;
+          }}
+          buttonRef={b => {
+            this.opportunitiesHtmlButton = b;
+          }}
+        >
+          <ScreenReaderContent>{formatMessage('opportunities popup')}</ScreenReaderContent>
+        </Button>
       </Badge>
     );
   }
@@ -397,17 +408,7 @@ export class PlannerHeader extends Component {
           constrain="window"
           placement="bottom end"
         >
-          <PopoverTrigger>
-            <Button
-              onClick={this.toggleOpportunitiesDropdown}
-              variant="icon"
-              margin={buttonMargin}
-              ref={(b) => { this.opportunitiesButton = b; }}
-              buttonRef={(b) => { this.opportunitiesHtmlButton = b; }}
-            >
-              {this.renderOpportunitiesBadge()}
-            </Button>
-          </PopoverTrigger>
+          <PopoverTrigger>{this.renderOpportunitiesButton(buttonMargin)}</PopoverTrigger>
           <PopoverContent>
             <Opportunities
               togglePopover={this.closeOpportunitiesDropdown}

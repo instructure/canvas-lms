@@ -42,6 +42,7 @@ export default class ToolConfiguration extends React.Component {
         dispatch={this.props.dispatch}
         setEnabledScopes={this.props.setEnabledScopes}
         setDisabledPlacements={this.props.setDisabledPlacements}
+        setPrivacyLevel={this.props.setPrivacyLevel}
       />
     )
   }
@@ -59,6 +60,7 @@ ToolConfiguration.propTypes = {
   dispatch: PropTypes.func.isRequired,
   setEnabledScopes: PropTypes.func.isRequired,
   setDisabledPlacements: PropTypes.func.isRequired,
+  setPrivacyLevel: PropTypes.func.isRequired,
   createLtiKeyState: PropTypes.shape({
     customizing: PropTypes.bool.isRequired,
     toolConfiguration: PropTypes.object.isRequired,

@@ -16,42 +16,41 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import { arrayOf, bool, func, shape, string } from 'prop-types';
-import Select from '@instructure/ui-core/lib/components/Select';
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
-import I18n from 'i18n!gradebook';
+import React from 'react'
+import {arrayOf, bool, func, shape, string} from 'prop-types'
+import Select from '@instructure/ui-core/lib/components/Select'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import I18n from 'i18n!gradebook'
 
 class GradebookFilter extends React.Component {
   static propTypes = {
     items: arrayOf(
       shape({
         id: string.isRequired,
-        name: string.isRequired,
-      })).isRequired,
+        name: string.isRequired
+      })
+    ).isRequired,
     onSelect: func.isRequired,
     selectedItemId: string.isRequired,
     filterLabel: string,
     allItemsLabel: string,
     disabled: bool
-  };
+  }
 
   static defaultProps = {
     disabled: false,
     filterLabel: I18n.t('Item Filter'),
     allItemsLabel: I18n.t('All Items')
-  };
-
-  onChange = (event) => {
-    this.props.onSelect(event.target.value);
   }
 
-  render () {
+  onChange = event => {
+    this.props.onSelect(event.target.value)
+  }
+
+  render() {
     return (
       <Select
-        label={
-          <ScreenReaderContent>{this.props.filterLabel}</ScreenReaderContent>
-        }
+        label={<ScreenReaderContent>{this.props.filterLabel}</ScreenReaderContent>}
         onChange={this.onChange}
         value={this.props.selectedItemId}
         disabled={this.props.disabled}
@@ -60,16 +59,14 @@ class GradebookFilter extends React.Component {
         <option key="0" value="0">
           {this.props.allItemsLabel}
         </option>
-        {
-          this.props.items.map(item => (
-            <option key={item.id} value={item.id}>
-              {item.name}
-            </option>
-          ))
-        }
+        {this.props.items.map(item => (
+          <option key={item.id} value={item.id}>
+            {item.name}
+          </option>
+        ))}
       </Select>
     )
   }
 }
 
-export default GradebookFilter;
+export default GradebookFilter

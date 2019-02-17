@@ -25,7 +25,7 @@ let iframe
 let info
 
 QUnit.module('PostGradesFrameDialog screenreader only content', {
-  setup () {
+  setup() {
     fakeENV.setup({LTI_LAUNCH_FRAME_ALLOWANCES: ['midi', 'media']})
     dialog = new PostGradesFrameDialog({})
     el = dialog.$dialog
@@ -33,7 +33,7 @@ QUnit.module('PostGradesFrameDialog screenreader only content', {
     dialog.open()
   },
 
-  teardown () {
+  teardown() {
     dialog.close()
     dialog.$dialog.remove()
     fakeENV.teardown()
@@ -71,7 +71,12 @@ test('hides ending info alert and removes class from iframe', () => {
 })
 
 test("doesn't show infos or add border to iframe by default", () => {
-  equal(el.find('.before_external_content_info_alert.screenreader-only, .after_external_content_info_alert.screenreader-only').length, 2)
+  equal(
+    el.find(
+      '.before_external_content_info_alert.screenreader-only, .after_external_content_info_alert.screenreader-only'
+    ).length,
+    2
+  )
   notOk(iframe.hasClass('info_alert_outline'))
 })
 

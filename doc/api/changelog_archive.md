@@ -1,13 +1,53 @@
-# API Change Log Archive
+API Change Log Archive
+======================
 
 The Change Log Archive page displays previous API changes in the [API Change Log](file.changelog.html) older than the last four releases.
 
 The release date indicates the date that the API code was made available in the production environment.
 
+<div class="changelog"></div>
+## 2018-11-17
+
+### Changes
+| API Calls   | Function                   |     |
+|-------------|----------------------------|-----|
+| [Roles API] | Create a New Role Endpoint | Permissions parameter: Updated account- and course-level role names to match roles in the Canvas Permissions page |
+
+  [Roles API]: roles.html
+
+<p></p>
+| API Responses     | Function                        |   |
+|-------------------|---------------------------------|---|
+| [Assignments API] | List Assignments Endpoint       | Clarified that the paginated list of assignments is returned for the current course or assignment group |
+| [Rubrics API]     | Create a Single Rubric Endpoint | Clarified the rubric return value |
+
+  [Assignments API]: assignments.html
+  [Rubrics API]: rubrics.html
+
+### Additions
+| API Calls                    | Function                              |    |
+|------------------------------|---------------------------------------|----|
+| [LTI Variable Substitutions] | com.instructure.Person.name\_sortable | Added variable that returns the sortable name of the launching user. Availability is when launched by a logged in user |
+
+  [LTI Variable Substitutions]: file.tools_variable_substitutions.html
+
+<p></p>
+| API Responses     | Function                                      |   |
+|-------------------|-----------------------------------------------|---|
+| [SIS Imports API] | Get the Current Importing SIS Import Endpoint | Added endpoint to return the SIS imports that are currently processing for an account |
+
+  [SIS Imports API]: sis_imports.html
+
+### Removals
+| API Calls     | Function |                                                            |
+|---------------|----------|------------------------------------------------------------|
+| [Planner API] |          | Removed the beta warning banner from the API documentation |
+
+  [Planner API]: planner.html
+
 ## 2018-10-27
 
 ### Changes
-<div class="changelog"></div>
 | API Calls              | Function                                             |                                                                                                                                                     |
 |------------------------|------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
 | [Conversations API]    | Create a Conversation Endpoint                       | Recipients parameter: Added clarification when the course/group has over 100 enrollments, bulk\_message and group\_conversation must be set to true |
@@ -20,7 +60,6 @@ The release date indicates the date that the API code was made available in the 
 
 <p></p>
 ### Additions
-<div class="changelog"></div>
 | API Responses                                   | Function             |                                                     |
 |-------------------------------------------------|----------------------|-----------------------------------------------------|
 | [Plagiarism Detection Platform Assignments API] | LtiAssignment Object | Added LTI Course ID and Course ID return parameters |
@@ -32,7 +71,6 @@ The release date indicates the date that the API code was made available in the 
 ## 2018-10-06
 
 ### Changes
-<div class="changelog"></div>
 | API Calls      | Function             |                                              |
 |----------------|----------------------|----------------------------------------------|
 | [Accounts API] | Permissions Endpoint | Added links to Course and Group permissions  |
@@ -43,14 +81,12 @@ The release date indicates the date that the API code was made available in the 
 
 <p></p>
 
-<div class="changelog"></div>
 | Basics          | File               |                                                                                            |
 |-----------------|--------------------|--------------------------------------------------------------------------------------------|
 | Uploading Files | Uploading via POST | Step 3: Explains file management system transition and clarifies newer file upload process |
 
 <p></p>
 
-<div class="changelog"></div>
 | OAuth2           | Endpoint              |                                                                     |
 |------------------|-----------------------|---------------------------------------------------------------------|
 | OAuth2 Endpoints | Get login/oauth2/auth | Below parameters table, clarified info on scopes for oath2 endpoint |
@@ -58,7 +94,6 @@ The release date indicates the date that the API code was made available in the 
 <p></p>
 
 ### Additions
-<div class="changelog"></div>
 | API Calls                   | Function             |                    |
 |-----------------------------|----------------------|--------------------|
 | [Assignment External Tools] |                      | Added content page |
@@ -68,7 +103,6 @@ The release date indicates the date that the API code was made available in the 
   [Groups API]: groups.html
 <p></p>
 
-<div class="changelog"></div>
 | API Responses | Function      |                                                                            |
 |---------------|---------------|----------------------------------------------------------------------------|
 | [Courses API] | Course Object | Added created\_at parameter, which returns the date the course was created |
@@ -76,7 +110,6 @@ The release date indicates the date that the API code was made available in the 
   [Courses API]: courses.html
 
 ### Removals
-<div class="changelog"></div>
 | API             | File               |                                                                                                                          |
 |-----------------|--------------------|--------------------------------------------------------------------------------------------------------------------------|
 | Uploading Files | Uploading via POST | Step 3: Identifies deprecated behavior in replacing GET calls with the deprecated POST request, to be removed 2019-04-21 |
@@ -84,7 +117,6 @@ The release date indicates the date that the API code was made available in the 
 ## 2018-09-15
 
 ### Additions
-<div class="changelog"></div>
 | API Calls                      | Function                                                                       |                                                                                                                           |
 |--------------------------------|--------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------|
 | [Custom Gradebook Columns API] | Bulk Update Column Data                                                        | Sets the content of custom columns                                                                                        |
@@ -96,7 +128,6 @@ The release date indicates the date that the API code was made available in the 
   [SIS Imports API]: sis_imports.html
 <p></p>
 
-<div class="changelog"></div>
 | API Responses           | Function                                                           |                                                                                                                                                                                                                    |
 |-------------------------|--------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [Accounts API]          | Get Help Links Endpoint                                            | Returns the help links for that account                                                                                                                                                                            |
@@ -108,7 +139,6 @@ The release date indicates the date that the API code was made available in the 
 ## 2018-08-04
 
 ### Changes
-<div class="changelog"></div>
 | API Calls             | Function                   |                                                                                                                                                                                                                                                                                                                    |
 |-----------------------|----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [Outcome Results API] | Get Outcome Result Rollups | Aggregate parameter: Clarified that the median is a separate parameter |
@@ -116,7 +146,6 @@ The release date indicates the date that the API code was made available in the 
   [Outcome Results API]: Outcome_results.html
 
 <p></p>
-<div class="changelog"></div>
 | CSV Format        | File                   |                                                                                                                                                                                                                                                                                                                    |
 |-----------------------|----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [Outcomes Data Format] | outcomes.csv | Vendor_guid field: Clarified that vendor_guid IDs will prefix “canvas_outcome:” and “canvas_outcome_group:” for outcomes and groups, respectively. In addition, these prefixes are reserved; newly created outcomes and groups may not have vendor_guid fields with these prefixes. |
@@ -125,7 +154,6 @@ The release date indicates the date that the API code was made available in the 
 
 
 ### Additions
-<div class="changelog"></div>
 | API Calls             | Function                   |                                                                                                                                                                                                                                                                                                                    |
 |-----------------------|----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [Outcome Results API] | Get Outcome Result Rollups | Exclude parameter: Specified additional values to exclude. “Missing\_user\_rollups” excludes rollups for users without results. <br><br>Aggregate\_stat parameter: If aggregate rollups requested, then this value determines what statistic is used for the aggregate. Defaults to “mean” if this value is not specified. |
@@ -135,13 +163,11 @@ The release date indicates the date that the API code was made available in the 
 ## 2018-07-14
 
 ### Changes
-<div class="changelog"></div>
 | API Calls                          | Function |                                                                                                                |
 |------------------------------------|----------|----------------------------------------------------------------------------------------------------------------|
 | Plagiarism Detection Platform APIs |          | In the API page sidebar, moved all API documentation for the plagiarism platform to the External Tools section |
 
 ### Additions
-<div class="changelog"></div>
 | API Calls                 | Function |           |
 |---------------------------|----------|-----------|
 | [API Token Scopes]        |          | Added API |
@@ -154,14 +180,12 @@ The release date indicates the date that the API code was made available in the 
 
 ### Changes
 
-<div class="changelog"></div>
 | API Calls   | Function                                                 |                                                                                                                                                                                           |
 |-------------|----------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [Users API] | Get a Pandata JWT Token and its Expiration Date endpoint | Changed endpoint to reflect use for current user only (/api/v1/users/self/pandata\_token) <br><br>Clarified description in that endpoint is currently only available to the mobile developer keys |
 
 <p></p>
 
-<div class="changelog"></div>
 | API Responses | Function    |                                                                                                                   |
 |---------------|-------------|-------------------------------------------------------------------------------------------------------------------|
 | [Files API]   | File Object | Updated file object example and ordering; object returns uuid, folder\_id, display\_name, and modified\_at fields |
@@ -170,7 +194,6 @@ The release date indicates the date that the API code was made available in the 
   [Files API]: files.html
 
 ### Additions
-<div class="changelog"></div>
 | API Calls         | Function                                       |                                 |
 |-------------------|------------------------------------------------|---------------------------------|
 | [SIS Imports API] | Restore workflow\_states of SIS imported items | Restore states for sis\_imports |
@@ -182,7 +205,6 @@ The release date indicates the date that the API code was made available in the 
 ## 2018-06-02
 
 ### Additions
-<div class="changelog"></div>
 
 | API Calls                       | Function                         |                                                                                                                              |
 |---------------------------------|----------------------------------|------------------------------------------------------------------------------------------------------------------------------|
@@ -201,7 +223,6 @@ The release date indicates the date that the API code was made available in the 
 ## 2018-05-12
 
 ### Changes
-<div class="changelog"></div>
 | API Calls            | Function                                   |                                                                                                                                             |
 |----------------------|--------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
 | [Accounts API]       | List Active Courses in an Account endpoint | sort parameter: replaced *subaccount* value with *account\_name* value. Subaccount can still be used as a value for backward compatibility. |
@@ -211,7 +232,6 @@ The release date indicates the date that the API code was made available in the 
   [User Observees API]: user_observees.html
 
 ### Additions
-<div class="changelog"></div>
 | API Calls                    | Function                                                                                       |                                              |
 |------------------------------|------------------------------------------------------------------------------------------------|----------------------------------------------|
 | [Accounts API]               | List Active Courses in an Account endpoint                                                     | Include parameter: Added account\_name value |
@@ -233,7 +253,6 @@ The release date indicates the date that the API code was made available in the 
 ## 2018-04-21
 
 ### Changes
-<div class="changelog"></div>
 | API Calls      | Function                       |                                                                                                                                 |
 |----------------|--------------------------------|---------------------------------------------------------------------------------------------------------------------------------|
 | [Courses API]  | Permissions endpoint           | Includes link to Accounts API Permissions endpoint <br><br>Clarifies that permission names are documented in the Create a Role endpoint |
@@ -243,7 +262,6 @@ The release date indicates the date that the API code was made available in the 
   [Sections API]: sections.html
 
 ###Additions
-<div class="changelog"></div>
 | API Calls               | Function                                                    |                                                                                                            |
 |-------------------------|-------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
 | [Accounts API]          | Permissions endpoint                                        | New endpoint: GET /api/v1/accounts/:account\_id/permissions                                                |
@@ -259,7 +277,6 @@ The release date indicates the date that the API code was made available in the 
   [Users API]: users.html
 
 <p></p>
-<div class="changelog"></div>
 | API Responses           | Function                                                               |                                                                                                                                                                                           |
 |-------------------------|------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [Modules API]           | Module object <br><br>ModuleItem SequenceNode object <br><br>ModuleItemSequence object | Returns the published parameter <br><br>Returns the mastery\_path parameter and includes examples for the current and next items in the course <br><br>Returns full examples for items and modules arrays |
@@ -271,7 +288,6 @@ The release date indicates the date that the API code was made available in the 
   [SIS Imports API]: sis_imports.html
 
 <p></p>
-<div class="changelog"></div>
 | CSV Format       | File                 |                                                                                                                                                                                                                                         |
 |------------------|----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [SIS CSV Format] | changes\_sis\_id.csv | Added group\_category as a type <br><br>old\_integration\_id field: description clarifies that this field does not support group categories <br><br>new\_integration\_id field: description clarifies that this field does not support group categories |

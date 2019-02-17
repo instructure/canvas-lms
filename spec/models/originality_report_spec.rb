@@ -288,7 +288,7 @@ describe OriginalityReport do
     context 'with sharding' do
       specs_require_sharding
 
-      let(:new_shard) { Shard.create! }
+      let(:new_shard) { @shard1 }
       let(:new_shard_attachment) { new_shard.activate { attachment_model(context: user_model) } }
       let(:submission) { submission_model }
 

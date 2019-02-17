@@ -1593,10 +1593,10 @@ class ApplicationController < ActionController::Base
         end
 
         opts = {
-            launch_url: @resource_url,
+            launch_url: @tool.login_or_launch_uri(content_tag_uri: @resource_url),
             link_code: @opaque_id,
             overrides: {'resource_link_title' => @resource_title},
-            domain: @domain_root_account&.domain
+            domain: HostUrl.context_host(@domain_root_account, request.host)
         }
         variable_expander = Lti::VariableExpander.new(@domain_root_account, @context, self,{
                                                         current_user: @current_user,
@@ -1637,7 +1637,7 @@ class ApplicationController < ActionController::Base
           @lti_launch.params = adapter.generate_post_payload
         end
 
-        @lti_launch.resource_url = @resource_url
+        @lti_launch.resource_url = @tool.login_or_launch_uri(content_tag_uri: @resource_url)
         @lti_launch.link_text = @resource_title
         @lti_launch.analytics_id = @tool.tool_id
 

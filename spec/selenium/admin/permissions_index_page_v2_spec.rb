@@ -73,8 +73,7 @@ describe "permissions index" do
       role_name = "no this is the best role name ever"
       PermissionsIndex.add_role(role_name)
       PermissionsIndex.close_role_tray
-      role = Role.last
-      expect(role.name).to eq(role_name)
+      role = Role.find_by(name: role_name)
       check_element_has_focus(PermissionsIndex.role_header_by_id(role))
     end
   end
@@ -184,6 +183,7 @@ describe "permissions index" do
       user_session(@admin)
       PermissionsIndex.visit(Account.default)
     end
+
     it "filter based on role" do
       role_name = "Student"
       PermissionsIndex.select_filter(role_name)

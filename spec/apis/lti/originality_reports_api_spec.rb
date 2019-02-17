@@ -752,7 +752,7 @@ module Lti
       end
 
       it 'allows creating reports for any attachment in submission history' do
-        shard_two = Shard.create!
+        shard_two = @shard1
         a = @course.assignments.create!(
           title: "some assignment",
           assignment_group: @group,

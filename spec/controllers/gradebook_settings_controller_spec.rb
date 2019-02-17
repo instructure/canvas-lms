@@ -19,10 +19,7 @@
 require 'spec_helper'
 
 RSpec.describe GradebookSettingsController, type: :controller do
-  let!(:teacher) do
-    course_with_teacher
-    @teacher
-  end
+  let(:teacher) { course_with_teacher.user }
 
   before do
     user_session(teacher)
@@ -30,10 +27,8 @@ RSpec.describe GradebookSettingsController, type: :controller do
   end
 
   describe "PUT update" do
-    let(:json_response) { JSON.parse(response.body) }
-
     context "given valid params" do
-      let(:show_settings) do
+      let(:gradebook_settings) do
         {
           "enter_grades_as" => {
             "2301" => "points"
@@ -65,122 +60,143 @@ RSpec.describe GradebookSettingsController, type: :controller do
         }
       end
 
-      let(:show_settings_massaged) do
-        show_settings.merge('filter_rows_by' => { 'section_id' => nil })
+      let(:gradebook_settings_massaged) do
+        gradebook_settings.merge('filter_rows_by' => { 'section_id' => nil })
       end
 
       let(:valid_params) do
         {
           "course_id" => @course.id,
-          "gradebook_settings" => show_settings
+          "gradebook_settings" => gradebook_settings
         }
       end
 
-      it "saves new gradebook_settings in preferences" do
-        put :update, params: valid_params
-        expect(response).to be_ok
+      let(:expected_settings) do
+        {
+          @course.id => gradebook_settings_massaged.except("colors"),
+          colors: gradebook_settings_massaged.fetch("colors")
+        }.as_json
+      end
 
-        expected_settings = {
-          @course.id => show_settings_massaged.except("colors"),
-          colors: show_settings_massaged.fetch("colors")
-        }
-        expect(teacher.preferences[:gradebook_settings]).to eq expected_settings
-        expect(json_response["gradebook_settings"]).to eql expected_settings.as_json
+      context 'given a valid PUT request' do
+        subject { json_parse.fetch('gradebook_settings').fetch(@course.id.to_s) }
+
+        before { put :update, params: valid_params }
+
+        it { expect(response).to be_ok }
+        it { is_expected.to include 'enter_grades_as' => {'2301' => 'points'} }
+        it { is_expected.to include 'filter_columns_by' => {'grading_period_id' => '1401', 'assignment_group_id' => '888'} }
+        it { is_expected.to include 'filter_rows_by' => {'section_id' => nil} }
+        it { is_expected.to include 'selected_view_options_filters' => ['assignmentGroups'] }
+        it { is_expected.to include 'show_inactive_enrollments' => 'true' }
+        it { is_expected.to include 'show_concluded_enrollments' => 'false' }
+        it { is_expected.to include 'show_unpublished_assignments' => 'true' }
+        it { is_expected.to include 'show_final_grade_overrides' => 'false' }
+        it { is_expected.to include 'student_column_display_as' => 'last_first' }
+        it { is_expected.to include 'student_column_secondary_info' => 'login_id' }
+        it { is_expected.to include 'sort_rows_by_column_id' => 'student' }
+        it { is_expected.to include 'sort_rows_by_setting_key' => 'sortable_name' }
+        it { is_expected.to include 'sort_rows_by_direction' => 'descending' }
+        it { is_expected.not_to include 'colors' }
+        it { is_expected.to have(13).items } # ensure we add specs for new additions
+
+        context 'colors' do
+          subject { json_parse.fetch('gradebook_settings').fetch('colors') }
+
+          it { is_expected.to have(5).items } # ensure we add specs for new additions
+          it do
+            is_expected.to include({
+              'late' => '#000000',
+              'missing' => '#000001',
+              'resubmitted' => '#000002',
+              'dropped' => '#000003',
+              'excused' => '#000004'
+            })
+          end
+        end
       end
 
       it "transforms 'null' string values to nil" do
         put :update, params: valid_params
 
-        expect(teacher.preferences[:gradebook_settings][@course.id]['filter_rows_by']['section_id']).to be_nil
+        section_id = teacher.preferences.
+          fetch(:gradebook_settings).
+          fetch(@course.id).
+          fetch('filter_rows_by').
+          fetch('section_id')
+
+        expect(section_id).to be_nil
       end
 
       it "allows saving gradebook settings for multiple courses" do
         previous_course = Course.create!(name: 'Previous Course')
-        teacher.preferences[:gradebook_settings] = {
-          previous_course.id => show_settings_massaged.except("colors"),
-          colors: show_settings_massaged.fetch("colors")
-        }
-        teacher.save!
-
+        teacher.update!(preferences: {
+          gradebook_settings: {
+            previous_course.id => gradebook_settings_massaged.except("colors"),
+            colors: gradebook_settings_massaged.fetch("colors")
+          }
+        })
         put :update, params: valid_params
 
-        expected_user_settings = {
-          @course.id => show_settings_massaged.except("colors"),
-          previous_course.id => show_settings_massaged.except("colors"),
-          colors: show_settings_massaged.fetch("colors")
-        }
-        expected_response = {
-          @course.id => show_settings_massaged.except("colors"),
-          colors: show_settings_massaged.fetch("colors")
-        }
-
-        expect(teacher.reload.preferences[:gradebook_settings]).to eq(expected_user_settings)
-        expect(json_response["gradebook_settings"]).to eql(expected_response.as_json)
+        expect(json_parse.fetch('gradebook_settings')).to eql expected_settings
       end
 
       it "is allowed for courses in concluded enrollment terms" do
-        term = teacher.account.enrollment_terms.create!(start_at: 2.months.ago, end_at: 1.month.ago)
-        @course.enrollment_term = term # `update_attribute` with a term has unwanted side effects
-        @course.save!
-
+        @course.update!(enrollment_term: teacher.account.enrollment_terms.create!(start_at: 2.months.ago, end_at: 1.month.ago))
         put :update, params: valid_params
-        expect(response).to be_ok
 
-        expected_settings = {
-          @course.id => show_settings_massaged.except("colors"),
-          colors: show_settings_massaged.fetch("colors")
-        }
-        expect(teacher.preferences[:gradebook_settings]).to eq expected_settings
-        expect(json_response["gradebook_settings"]).to eql expected_settings.as_json
+        expect(json_parse.fetch('gradebook_settings')).to eql expected_settings
       end
 
       it "is allowed for courses with concluded workflow state" do
-        @course.workflow_state = "concluded"
-        @course.save!
-
+        @course.update!(workflow_state: "concluded")
         put :update, params: valid_params
-        expect(response).to be_ok
 
-        expected_settings = {
-          @course.id => show_settings_massaged.except("colors"),
-          colors: show_settings_massaged.fetch("colors")
-        }
-        expect(teacher.preferences[:gradebook_settings]).to eq expected_settings
-        expect(json_response["gradebook_settings"]).to eql expected_settings.as_json
+        expect(json_parse.fetch('gradebook_settings')).to eql expected_settings
+      end
+
+      context "given invalid status colors (but otherwise valid params)" do
+        subject { response }
+
+        let(:malevolent_color) { "; background: url(https://httpbin.org/basic-auth/user/passwd)" }
+        let(:invalid_params) do
+          {
+            "course_id" => @course.id,
+            "gradebook_settings" => {
+              "colors" => {
+                "dropped" => "#FEF0E5",
+                "excused" => "#FEF7E5",
+                "late" => "#cccccc",
+                "missing" => malevolent_color,
+                "resubmitted" => "#E5F7E5"
+              }
+            }
+          }
+        end
+
+        before { put :update, params: invalid_params }
+
+        it { is_expected.to be_ok }
+
+        it "does not store invalid status colors" do
+          colors = json_parse.fetch("gradebook_settings").fetch("colors")
+          expect(colors).not_to have_key "missing"
+        end
       end
     end
 
     context "given invalid params" do
-      it "give an error response" do
+      subject { response }
+
+      before do
         invalid_params = { "course_id" => @course.id }
         put :update, params: invalid_params
-
-        expect(response).not_to be_ok
-        expect(json_response).to include(
-          "errors" => [{
-            "message" => "gradebook_settings is missing"
-          }]
-        )
       end
 
-      it "does not store invalid status colors" do
-        malevolent_color = "; background: url(https://httpbin.org/basic-auth/user/passwd)"
-        invalid_params = {
-          "course_id" => @course.id,
-          "gradebook_settings" => {
-            "colors" => {
-              "dropped" => "#FEF0E5",
-              "excused" => "#FEF7E5",
-              "late" => "#cccccc",
-              "missing" => malevolent_color,
-              "resubmitted" => "#E5F7E5"
-            }
-          }
-        }
-        put :update, params: invalid_params
+      it { is_expected.to have_http_status :bad_request }
 
-        expect(response).to be_ok
-        expect(json_response["gradebook_settings"]["colors"]).not_to have_key("missing")
+      it "gives an error message" do
+        expect(json_parse).to include "errors" => [{"message" => "gradebook_settings is missing"}]
       end
     end
   end

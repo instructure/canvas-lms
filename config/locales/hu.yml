@@ -1321,6 +1321,17 @@ hu:
       students: "Hallgatói beiratkozások"
       ta: "Segédoktatói beiratkozások"
       teachers: "Oktatói beiratkozások"
+    user_access_prospect_education_csv_parameters: 
+      account_reports: 
+        usu: 
+          enrollment_type: 
+            header: "Beiratkozás típusa"
+      all: "Összes beiratkozás"
+      designer: "Tervezői beiratkozások"
+      observer: "Megfigyelői beiratkozások"
+      students: "Hallgatói beiratkozások"
+      ta: "Segédoktatói beiratkozások"
+      teachers: "Oktatói beiratkozások"
     user_access_tokens_csv_description: 
       account_reports: 
         default: 
@@ -3087,6 +3098,7 @@ hu:
   canvas_alert_change_assignment_name_course_name_2fc63d9c: "Canvas-figyelmeztetés - Változás: %{assignment_name}, %{course_name}"
   canvas_alert_invited_course_as_role_type_9ed79ce3: "Canvas-figyelmeztetés - Meghívás: %{course} kurzusra %{role_type} szerepben"
   canvas_alert_invited_course_as_role_type_ea825937: "Canvas-figyelmeztetés - Meghívás: kurzus  %{role_type} szerepben"
+  canvas_alert_late_submission_user_name_assignment__ee1301ac: "Canvas-figyelmeztetés - Határidőn túli beadás: %{user_name}, %{assignment_name}"
   canvas_attribute_eaa7e31a: "Canvas tulajdonságai"
   canvas_by_instructure_1490381: "Canvas az Instructure-től"
   canvas_cartridge_description: "Ez lehetővé teszi egy canvas export közbenső json formátumra történő átalakítását az importáláshoz"
@@ -3257,10 +3269,8 @@ hu:
             Az EtherPad egy nyílt forrású projekt, amivel gyorsan hozhatunk létre megosztott dokumentumokat. Elég gyorsan működik ahhoz, hogy lássuk, mit gépelnek be a többiek.Másrészről, ezek a jegyzettömbök nem védettek jelszóval, ezért bárki, aki ismeri a webcímet, szerkesztheti ezeket. Az EtherPad jobb választás lehet, mint a Google Docs, abban az esetben, ha a névtelenség fontos, vagy Google fiók nélkül nélkül szeretne együttműkődni másokkal.
             
             **Figyelem**: ismerje meg az [EtherPad törlési  irányelveit](%{etherpad_deletion_policy_url}) annak érdekében, hogy a munkája megmaradjon.
-        google_docs: |-
-            A Google Dokumentumok egy nagyszerű szolgáltatás a projektmunkák támogatására. Olyan, mint egy hagyományos szövegszerkesztő, de lehetővé teszi számunkra, hogy ugyanabban az időben másokkal együtt dolgozhassunk ugyanazon a dokumentumon, anélkül, hogy körbe kellene küldeni a dokumentum újabb és újabb változatait.
-            
-            **Figyelem**: Önnek (és minden együttműködőnek) szüksége lesz egy Google fiókra ahhoz, hogy részt vehessen a Google Dokumentumok szerkesztésében.
+        google_docs: "A Google Dokumentumok egy nagyszerű szolgáltatás a projektmunkák támogatására. Olyan, mint egy hagyományos szövegszerkesztő, de lehetővé teszi számunkra, hogy ugyanabban az időben másokkal együtt dolgozhassunk ugyanazon a dokumentumon, anélkül, hogy körbe kellene küldeni a dokumentum újabb és újabb változatait.\n\n\
+            **Figyelem**: Önnek (és minden együttműködőnek) szüksége lesz egy Google fiókra ahhoz, hogy részt vehessen a Google Dokumentumok szerkesztésében. "
       labels: 
         collaboration_type: "Együttműködés ezt használva:"
         description: "Leírás:"
@@ -6592,6 +6602,7 @@ hu:
       warning: Figyelmeztetés
   grade_distribution_e52c9256: Értékeléseloszlás
   grade_export_title: Osztályzatexportálás
+  grade_grade_7e52dd1c: "Osztályzat: %{grade}"
   grade_info_19fb9875: Jegyinformáció
   grade_summary: 
     graph_title: "Átlag %{mean}, legmagasabb %{high}, legalacsonyabb %{low}"
@@ -7508,6 +7519,7 @@ hu:
   invalid_address_book_strategy_904a7ada: "Helytelen címjegyzék stratégia"
   invalid_authenticity_token_b753558c: "Hibás hitelesítő token"
   invalid_content_type_utf_8_required_bd458b78: "Helytelen tartalomtípus, UTF-8 kódolás szükséges"
+  invalid_domain_e810c1d: "Érvénytelen tartomány"
   invalid_file_type_881cc9b2: "Érvénytelen fájltípus"
   invalid_points_possible: "Az elérhető pontok száma ehhez a feladathoz csak nulla vagy annál nagyobb lehet."
   invalid_recipient_name_56b22b86: "Érvénytelen résztvevőnév."
@@ -7641,6 +7653,7 @@ hu:
   last_user_access_title: "Utolsó felhasználói hozzáférés"
   late_2be42b88: Késve
   late_8bd684b6: késői
+  late_assignment_user_name_assignment_name_2df32e01: "Határidőn túli beadás: %{user_name}, %{assignment_name}"
   late_bd436902: KÉSŐI
   late_percent_b91d01b3: "Késve: %{percent}"
   late_policies_42bac80: "Késéssel kapcsolatos irányelvek"
@@ -8627,7 +8640,7 @@ hu:
             hozta létre
             %{service} szolgáltatással és Önt %{email} e-mail címe alapján hívták meg.
             
-            Ha ez az e-mail cím nem felel meg ehhez az együttműködéshez,
+            Ha ez az e-mail cím nem felel meg ehhez az együttműködéshez, 
             meg kell változtatnia a profilbeállításait vagy regisztrálnia kell a %{service} szolgáltatásban.
             
             A részletekről itt tájékozódhat:
@@ -9752,6 +9765,7 @@ hu:
   moodle_formula_warning_title: "A képletkérdéshez újra kell generálni a lehetséges válaszokat"
   more_courses_5ebbe998: "Több kurzus"
   more_info_at_course_name_56dc8c10: "További információ itt: %{course_name}"
+  more_info_at_web_address_dba7e187: "További információ itt: %{web_address}"
   more_information_3dfb76b5: "További információ"
   more_than_999_submissions_need_grading_bc087dd0: "Több mint 999 beadandó értékelésre vár "
   more_than_a19b440: "%{more_than}+"
@@ -14827,6 +14841,7 @@ hu:
   tree_browser: 
     folder_tree_instructions: "Használja a fel és le nyilakat a fán való navigáláshoz. Nyomja meg a jobbrát a kinyitáshoz, a balrát az összecsukáshoz, az entert az elem kiválasztásához."
   truncated_56b1a661: Rövidítve
+  turned_in_submission_date_e9180b8b: "beadás ekkor: %{submission_date}"
   turnitin: 
     error_1007: "A feltöltött fájl túl nagy."
     error_1009: "Érvénytelen fájltípus. (Érvényes fájltípusok: MS Word, Acrobat PDF, Postscript, Text, HTML, WordPerfect (WPD) és Rich Text Format.)"
@@ -15050,9 +15065,11 @@ hu:
       updating_user_details: "Felhasználó részleteinek frissítése..."
     notices: 
       image_reported: "Ezt a képet kifogásolható tartalomnak jelentették."
+  user_name_has_just_turned_in_a_late_submission_for_874a9a31: "%{user_name} határidőn túl beadta a/az: %{assignment_name} feladatot a/az %{course_name} kurzusra"
   user_name_just_added_you_to_a_conversation_in_canv_7b278b51: "%{user_name} hozzáadta Önt egy üzenetváltáshoz a Canvasban. Az üzenet megtekintéséhez kattintson erre a linkre: %{link}."
   user_name_just_sent_you_a_message_in_canvas_9e911af7: "%{user_name} üzentet küldött Önnek a Canvasban"
   user_name_just_sent_you_a_message_in_canvas_a2cb3bf4: "%{user_name} az imént üzenetet küldött Önnek a Canvasban."
+  user_name_just_turned_in_their_assignment_late_ass_a54b128a: "%{user_name} épp (határidőn túl) benyújtotta feladatát, %{assignment_name}"
   user_name_you_just_sent_a_message_in_canvas_b1fd4598: "%{user_name}, Ön az imént üzenetet küldött a Canvasban."
   user_name_you_ll_need_to_log_in_before_you_can_vie_164c8e30: "%{user_name}, Önnek be kell \"jelentkeznie*, mielőtt az oldalt megtekintené."
   user_navigation_a097be0f: "Felhasználói navigáció"

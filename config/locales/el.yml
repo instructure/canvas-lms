@@ -1053,7 +1053,7 @@ el:
       add_sis_stickiness_instructions: "Έχοντας ενεργοποιήσει αυτή την επιλογή, η επεξεργασία των αλλαγών που γίνονται μέσω της εισαγωγής προς το SIS θα γίνεται σαν να επρόκειτο για αλλαγές UI, εμποδίζοντας την αλλαγή των πεδίων που άλλαξαν εδώ σε επόμενες μη υπερισχύουσες εισαγωγές προς το SIS."
       add_sis_stickiness_label: "Επεξεργασία ως αλλαγές UI"
       batch_import_instructions: |-
-          Αν επιλεγεί, θα οδηγήσει στη διαγραφή όλων όσων αφορούν αυτό το εξάμηνο, συμπεριλαμβανομένων όλων των μαθημάτων και των εγγραφών που δεν περιέχονται στο επιλεγμένο αρχείο εισαγωγής παραπάνω.
+          Αν επιλεγεί, θα οδηγήσει στη διαγραφή όλων όσων αφορούν αυτό το εξάμηνο, συμπεριλαμβανομένων όλων των μαθημάτων και των εγγραφών που δεν περιέχονται στο επιλεγμένο αρχείο εισαγωγής παραπάνω.  
           Βλ. τα συνοδευτικά έγγραφα για λεπτομέρειες.
       batch_mode_label: "Πρόκειται για μαζική ενημέρωση των τμημάτων"
       clear_sis_stickiness_instructions: "Αν ενενεργοποιήσετε αυτήν την επιλογή, όλα τα πεδία σε όλες τις καταγραφές που επηρεάζονται από την εισαγωγή προς το SIS θα μπορούν να αλλάξουν σε μελλοντικές μη υπερισχύουσες εισαγωγές προς το SIS."
@@ -1067,7 +1067,7 @@ el:
       imported_with_messages_message: "Τα δεδομένα SIS εισήχθησαν, αλλά με αυτά τα μηνύματα:"
       last_batch_title: "Τελευταίο Τμήμα"
       override_sis_stickiness_instructions: |-
-          Από προεπιλογή, οι αλλαγές στο UI υπερισχύουν έναντι των αλλαγών εισαγωγής προς το SIS. Για ορισμένα πεδία, η εισαγωγή προς το SIS δεν θα αλλάξει τα δεδομένα του πεδίου αν ο διαχειριστής έχει αλλάξει το συγκεκριμένο πεδίο μέσω του UI. Αν ενεργοποιήσετε αυτή την επιλογή, η εισαγωγή προς το SIS θα υπερισχύσει των αλλαγών στο UI.
+          Από προεπιλογή, οι αλλαγές στο UI υπερισχύουν έναντι των αλλαγών εισαγωγής προς το SIS. Για ορισμένα πεδία, η εισαγωγή προς το SIS δεν θα αλλάξει τα δεδομένα του πεδίου αν ο διαχειριστής έχει αλλάξει το συγκεκριμένο πεδίο μέσω του UI. Αν ενεργοποιήσετε αυτή την επιλογή, η εισαγωγή προς το SIS θα υπερισχύσει των αλλαγών στο UI. 
           Βλ. τα συνοδευτικά έγγραφα για λεπτομέρειες.
       override_sis_stickiness_label: "Υπερίσχυση επί των αλλαγών στο UI"
       page_title: "Εισαγωγή SIS"
@@ -1077,7 +1077,7 @@ el:
       pending_batches_title: "Εκκρεμή Τμήματα"
       process_data_button: "Επεξεργασία Δεδομένων"
       select_file_instructions: |-
-          <mrk mid="7790" mtype="seg">Επιλέξτε το αρχείο zip που θέλετε να εισαγάγετε.</mrk>
+          <mrk mid="7790" mtype="seg">Επιλέξτε το αρχείο zip που θέλετε να εισαγάγετε.</mrk>  
           <mrk mid="7791" mtype="seg">Για περιγραφή το τρόπου δημιουργίας αυτών των αρχείων zip, [παρακαλώ δείτε αυτά τα συνοδευτικά έγγραφα](%{url}).</mrk>
       sis_import_crumb: "Εισαγωγή SIS"
       title: "Εισαγωγή SIS"
@@ -1186,6 +1186,17 @@ el:
             text: "Αυτή είναι μια αναφορά για τα μαθήματα που δεν περιέχουν κανένα από τα ακόλουθα στοιχεία: εργασίες, ανακοινώσεις, συζητήσεις, αρχεία, ενότητες, σελίδες ή κουίζ."
     update_failed_notice: "Απέτυχε η ενημέρωση των ρυθμίσεων λογαριασμού"
     user_access_csv_parameters: 
+      account_reports: 
+        usu: 
+          enrollment_type: 
+            header: "Τύπος Εγγραφής"
+      all: "Όλες οι εγγραφές"
+      designer: "Εγγραφές Σχεδιαστών"
+      observer: "Εγγραφές Παρατηρητών"
+      students: "Εγγραφές Φοιτητών/τριών"
+      ta: "Εγγραφές Βοηθών Διδασκαλίας"
+      teachers: "Εγγραφές Καθηγητών"
+    user_access_prospect_education_csv_parameters: 
       account_reports: 
         usu: 
           enrollment_type: 
@@ -2813,6 +2824,7 @@ el:
   canvas_alert_change_assignment_name_course_name_2fc63d9c: "<mrk mid=\"4387\" mtype=\"seg\">Ειδοποίηση Canvas - Αλλαγή:</mrk> <mrk mid=\"4388\" mtype=\"seg\">%{assignment_name}, %{course_name}</mrk>"
   canvas_alert_invited_course_as_role_type_9ed79ce3: "<mrk mid=\"1447\" mtype=\"seg\">Ειδοποίηση Canvas - Προσκλήθηκε:</mrk> <mrk mid=\"1448\" mtype=\"seg\">%{course} ως %{role_type}</mrk>"
   canvas_alert_invited_course_as_role_type_ea825937: "Ειδοποίηση Canvas - Προσκλήθηκε: course ως %{role_type}"
+  canvas_alert_late_submission_user_name_assignment__ee1301ac: "<mrk mid=\"1742\" mtype=\"seg\">Ειδοποίηση Canvas - Εκπρόθεσμη Υποβολή:</mrk> <mrk mid=\"1743\" mtype=\"seg\">%{user_name}, %{assignment_name}</mrk>"
   canvas_by_instructure_1490381: "Canvas από την Instructure"
   canvas_cartridge_description: "Αυτή η επιλογή επιτρέπει τη μετατροπή εξαγωγής του canvas στην ενδιάμεση μορφή json για εισαγωγή"
   canvas_cartridge_display: "Common Cartridge του Canvas"
@@ -2930,8 +2942,8 @@ el:
       collaboration_name: "Συνεργασία %{course_or_group_name} "
       descriptions: 
         google_docs: |-
-            <mrk mid="340" mtype="seg">Τα Google Docs είναι μια πολύ καλή λύση για να συνεργαστείτε σε ομαδικό πρότζεκτ.</mrk>  <mrk mid="341" mtype="seg">Είναι σαν το Microsoft Word, αλλά σας επιτρέπει να εργαστείτε μαζί με άλλους στο ίδιο αρχείο την ίδια στιγμή χωρίς να χρειάζεται να το στέλνετε με email από τον έναν στον άλλον.</mrk>
-            
+            <mrk mid="340" mtype="seg">Τα Google Docs είναι μια πολύ καλή λύση για να συνεργαστείτε σε ομαδικό πρότζεκτ.</mrk>  <mrk mid="341" mtype="seg">Είναι σαν το Microsoft Word, αλλά σας επιτρέπει να εργαστείτε μαζί με άλλους στο ίδιο αρχείο την ίδια στιγμή χωρίς να χρειάζεται να το στέλνετε με email από τον έναν στον άλλον.</mrk>  
+              
             <mrk mid="342" mtype="seg">**Προειδοποίηση**: Εσείς (και όλοι οι συνεργάτες σας) χρειάζεται να έχουν έναν λογαριασμό Google για να μπορέσουν να συμμετάσχουν στις συνεργασίες με Google Docs.</mrk>
       labels: 
         collaboration_type: "Συνεργαστείτε χρησιμοποιώντας:"
@@ -5924,6 +5936,7 @@ el:
       warning: Προειδοποίηση
   grade_distribution_e52c9256: "Κατανομή Βαθμών"
   grade_export_title: "Εξαγωγή Βαθμών"
+  grade_grade_7e52dd1c: "Βαθμός: %{grade}"
   grade_summary: 
     graph_title: "Μέση βαθμολογία %{mean}, Υψηλή βαθμολογία %{high}, Χαμηλή βαθμολογία %{low}"
   gradebook: 
@@ -6762,6 +6775,7 @@ el:
   international_text_messaging_rates_may_apply_d4b4a97a: "Ενδέχεται να εφαρμόζεται χρέωση διεθνών μηνυμάτων κειμένου."
   invalid_authenticity_token_b753558c: "Μη Έγκυρο Token Επαλήθευσης"
   invalid_content_type_utf_8_required_bd458b78: "Μη έγκυρος τύπος περιεχομένου, απαιτείται UTF-8"
+  invalid_domain_e810c1d: "Μη έγκυρο domain"
   invalid_file_type_881cc9b2: "Μη έγκυρος τύπος αρχείου"
   invalid_points_possible: "Η τιμή των πιθανών μορίων για αυτή την εργασία πρέπει να είναι μηδέν ή μεγαλύτερη."
   invalid_recipient_name_56b22b86: "Μη έγκυρο όνομα παραλήπτη."
@@ -6874,6 +6888,7 @@ el:
   last_post_display_last_reply_at_b9896355: "Τελευταία δημοσίευση %{display_last_reply_at}"
   last_user_access_title: "Τελευταία Πρόσβαση Χρήστη"
   late_2be42b88: Πρόσφατο/α
+  late_assignment_user_name_assignment_name_2df32e01: "<mrk mid=\"5564\" mtype=\"seg\">Εκπρόθεσμη Υποβολή:</mrk> <mrk mid=\"5565\" mtype=\"seg\">%{user_name}, %{assignment_name}</mrk>"
   late_percent_b91d01b3: "<mrk mid=\"4316\" mtype=\"seg\">Πρόσφατο/α:</mrk> <mrk mid=\"4317\" mtype=\"seg\">%{percent}</mrk>"
   latest_assessment_a85280ef: "Πιο Πρόσφατη Αξιολόγηση"
   latest_f604a75: "Το/τα πιο πρόσφατο/α"
@@ -7600,9 +7615,9 @@ el:
     assignment_changed: 
       email: 
         body: |-
-            <mrk mid="1691" mtype="seg">Η εργασία «%{title}» για το μάθημα %{course} έχει αλλάξει.</mrk>
+            <mrk mid="1691" mtype="seg">Η εργασία «%{title}» για το μάθημα %{course} έχει αλλάξει.</mrk>  
             
-            <mrk mid="1692" mtype="seg">Πατήστε εδώ να εμφανίσετε την εργασία:</mrk>
+            <mrk mid="1692" mtype="seg">Πατήστε εδώ να εμφανίσετε την εργασία:</mrk> 
             <mrk mid="1693" mtype="seg">%{url}</mrk>
         html: 
           body: "Η εργασία «%{title}» για το μάθημα %{course} έχει αλλάξει."
@@ -8876,6 +8891,7 @@ el:
   moodle_formula_warning_title: "Οι πιθανές ερωτήσεις θα πρέπει να δημιουργηθούν εκ νέου για τις ερωτήσεις Τύπου"
   more_courses_5ebbe998: "Περισσότερα μαθήματα"
   more_info_at_course_name_56dc8c10: "Περισσότερες πληροφορίες στο %{course_name}"
+  more_info_at_web_address_dba7e187: "Περισσότερες πληροφορίες στο %{web_address}"
   more_information_3dfb76b5: "Περισσότερες πληροφορίες"
   more_than_a19b440: "%{more_than}+"
   most_recent_score_13a87e8c: "Πιο Πρόσφατη Βαθμολογία"
@@ -10908,7 +10924,7 @@ el:
           multiple_dropdowns: "Εισαγάγετε την ερώτησή σας, προσδιορίζοντας πού θα τοποθετηθεί κάθε αναπτυσσόμενη λίστα. Στη συνέχεια, ορίστε πιθανές απαντήσεις για κάθε αναπτυσσόμενη λίστα με μία σωστή απάντηση ανά λίστα."
           numerical: "<mrk mid=\"5238\" mtype=\"seg\">Ορίστε τη σωστή απάντηση ως οποιονδήποτε αριθμός εντός κάποιου εύρους ή ως αριθμό συν/πλην κάποιο περιθώριο σφάλματος.</mrk> <mrk mid=\"5239\" mtype=\"seg\">Ο σπουδαστής θα έχει στη διάθεσή τους ένα κενό πεδίο κειμένου για να πληκτρολογήσει την αριθμητική απάντησή του.</mrk>"
           short_answer: |-
-              <mrk mid="5240" mtype="seg">Εισαγάγετε το κείμενο της ερώτησή σας και στη συνέχεια ορίστε όλες τις πιθανές σωστές απαντήσεις για το αντίστοιχο κενό.</mrk>
+              <mrk mid="5240" mtype="seg">Εισαγάγετε το κείμενο της ερώτησή σας και στη συνέχεια ορίστε όλες τις πιθανές σωστές απαντήσεις για το αντίστοιχο κενό.</mrk>  
               <mrk mid="5241" mtype="seg">Οι σπουδαστές θα δουν την ερώτηση μαζί με ένα μικρό πλαίσιο κειμένου για να πληκτρολογήσουν την απάντησή τους.</mrk>
           text_only: "Αυτή η «ερώτηση» δεν θα λάβει κάποια βαθμολογία, αλλά μπορεί να φανεί χρήσιμη για την εισαγωγή μιας σειράς σχετικών ερωτήσεων."
           true_false: "Εισαγάγετε το κείμενο της ερώτησής σας και στη συνέχεια επιλέξτε αν η σωστή απάντηση είναι Σωστό ή Λάθος."
@@ -13440,6 +13456,7 @@ el:
   tree_browser: 
     folder_tree_instructions: "<mrk mid=\"7366\" mtype=\"seg\">Χρησιμοποιήστε τα βελάκια πάνω και κάτω για να πλοηγηθείτε στο δέντρο.</mrk> <mrk mid=\"7367\" mtype=\"seg\">Πατήστε το δεξί βελάκι για ανάπτυξη των φακέλων, το αριστερό για σύμπτυξη και το Enter για να επιλέξετε το επιλεγμένο στοιχείο.</mrk>"
   truncated_56b1a661: Ελλιπές
+  turned_in_submission_date_e9180b8b: "υποβλήθηκε στις: %{submission_date}"
   turnitin: 
     error_1007: "Το αρχείο που μεταφορτώθηκε είναι πολύ μεγάλο."
     error_1009: "<mrk mid=\"3194\" mtype=\"seg\">Μη έγκυρος τύπος αρχείου.</mrk> <mrk mid=\"3195\" mtype=\"seg\">(Έγκυροι τύποι αρχείου είναι οι MS Word, Acrobat PDF, Postscript, Text, HTML, WordPerfect (WPD) και Rich Text Format.)</mrk>"
@@ -13616,8 +13633,10 @@ el:
       updating_user_details: "Γίνεται Ενημέρωση των Λεπτομερειών Χρήστη..."
     notices: 
       image_reported: "Έχει γίνει αναφορά αυτής της εικόνας"
+  user_name_has_just_turned_in_a_late_submission_for_874a9a31: "Ο χρήστης %{user_name} μόλις υπέβαλε εκπρόθεσμα την εργασία %{assignment_name} για το μάθημα %{course_name}"
   user_name_just_added_you_to_a_conversation_in_canv_7b278b51: "<mrk mid=\"1519\" mtype=\"seg\">Ο χρήστης %{user_name} μόλις σας προσέθεσε σε μια συνομιλία στο Canvas.</mrk> <mrk mid=\"1520\" mtype=\"seg\">Για να προβάλετε τη συζήτηση, κάντε κλικ σε αυτόν τον σύνδεσμο:</mrk> <mrk mid=\"1521\" mtype=\"seg\">%{link}.</mrk>"
   user_name_just_sent_you_a_message_in_canvas_a2cb3bf4: "Ο χρήστης %{user_name} μόλις σας έστειλε μήνυμα στο Canvas."
+  user_name_just_turned_in_their_assignment_late_ass_a54b128a: "Ο χρήστης %{user_name} μόλις υπέβαλε την εργασία του (εκπρόθεσμα), %{assignment_name}"
   user_name_you_just_sent_a_message_in_canvas_b1fd4598: "%{user_name}, μόλις στείλατε μήνυμα στο Canvas."
   user_name_you_ll_need_to_log_in_before_you_can_vie_164c8e30: "%{user_name}, πρέπει να *συνδεθείτε* πριν μπορέσετε να δείτε αυτή τη σελίδα."
   user_navigation_a097be0f: "Πλοήγηση Χρήστη"

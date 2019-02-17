@@ -55,6 +55,7 @@ define [
   'jsx/gradezilla/default_gradebook/GradebookGrid'
   'jsx/gradezilla/default_gradebook/constants/studentRowHeaderConstants'
   'jsx/gradezilla/default_gradebook/GradebookGrid/editors/AssignmentCellEditor/AssignmentRowCellPropFactory'
+  'jsx/gradezilla/default_gradebook/GradebookGrid/editors/TotalGradeOverrideCellEditor/TotalGradeOverrideCellPropFactory'
   'jsx/gradezilla/default_gradebook/components/GradebookMenu'
   'jsx/gradezilla/default_gradebook/components/ViewOptionsMenu'
   'jsx/gradezilla/default_gradebook/components/ActionMenu'
@@ -102,10 +103,11 @@ define [
   CourseGradeCalculator, EffectiveDueDates, GradeFormatHelper, UserSettings, Spinner, AssignmentMuter,
   GradeDisplayWarningDialog, PostGradesFrameDialog, NumberCompare, natcompare, ConvertCase, htmlEscape,
   EnterGradesAsSetting, SetDefaultGradeDialogManager, CurveGradesDialogManager, GradebookApi, SubmissionCommentApi,
-  FinalGradeOverrides, GradebookGrid, studentRowHeaderConstants, AssignmentRowCellPropFactory, GradebookMenu, ViewOptionsMenu, ActionMenu,
+  FinalGradeOverrides, GradebookGrid, studentRowHeaderConstants, AssignmentRowCellPropFactory, TotalGradeOverrideCellPropFactory,
+  GradebookMenu, ViewOptionsMenu, ActionMenu,
   AssignmentGroupFilter, GradingPeriodFilter, ModuleFilter, SectionFilter, GridColor, StatusesModal, SubmissionTray,
-  GradebookSettingsModal, AnonymousSpeedGraderAlert, { statusColors }, StudentDatastore, PostGradesStore, PostGradesApp, SubmissionStateMap,
-  DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager, GradebookKeyboardNav,
+  GradebookSettingsModal, AnonymousSpeedGraderAlert, { statusColors }, StudentDatastore, PostGradesStore, PostGradesApp,
+  SubmissionStateMap, DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager, GradebookKeyboardNav,
   AssignmentMuterDialogManager, assignmentHelper, TextMeasure, GradeInputHelper, { default: OutlierScoreHelper },
   LatePolicyApplicator, { default: Button }, { default: IconSettingsSolid }, FlashAlert) ->
 
@@ -178,8 +180,6 @@ define [
       showEnrollments:
         concluded: false
         inactive: false
-      showUnpublishedAssignments: true
-      showFinalGradeOverrides: false
       sortRowsBy:
         columnId: sortRowsByColumnId # the column controlling the sort
         settingKey: sortRowsBySettingKey # the key describing the sort criteria
@@ -206,7 +206,14 @@ define [
     }
 
   getInitialCourseContent = (options) ->
+    courseGradingScheme = null
     defaultGradingScheme = null
+
+    if options.grading_standard
+      courseGradingScheme = {
+        data: options.grading_standard
+      }
+
     if options.default_grading_standard
       defaultGradingScheme = {
         data: options.default_grading_standard
@@ -214,6 +221,7 @@ define [
 
     {
       contextModules: []
+      courseGradingScheme
       defaultGradingScheme
       gradingSchemes: options.grading_schemes.map(ConvertCase.camelize)
       gradingPeriodAssignments: {}
@@ -454,6 +462,7 @@ define [
 
       @gridReady.then () =>
         @renderViewOptionsMenu()
+        @renderGradebookSettingsModal()
 
     # called from app/jsx/bundles/gradezilla.js
     onShow: ->
@@ -1297,11 +1306,11 @@ define [
       onSelect: onSelect
       selected: showingNotes
 
-    getOverridesViewOptionsMenuProps: ->
+    getFinalGradeOverridesSettingsModalProps: ->
+      featureAvailable: @options.final_grade_override_enabled
       disabled: @contentLoadStates.overridesColumnUpdating || @gridReady.state() != 'resolved'
-      label: if @options.grading_period_set then I18n.t('Grading Period Overrides') else I18n.t('Overrides')
-      onSelect: @toggleOverrides
-      selected: @gridDisplaySettings.showFinalGradeOverrides
+      onChange: @toggleOverrides
+      defaultChecked: @gridDisplaySettings.showFinalGradeOverrides
 
     getColumnSortSettingsViewOptionsMenuProps: ->
       storedSortOrder = @getColumnOrder()
@@ -1346,8 +1355,6 @@ define [
 
     getViewOptionsMenuProps: ->
       teacherNotes: @getTeacherNotesViewOptionsMenuProps()
-      overrides: @getOverridesViewOptionsMenuProps()
-      finalGradeOverrideEnabled: @options.final_grade_override_enabled
       columnSortSettings: @getColumnSortSettingsViewOptionsMenuProps()
       filterSettings: @getFilterSettingsViewOptionsMenuProps()
       showUnpublishedAssignments: @gridDisplaySettings.showUnpublishedAssignments
@@ -1422,6 +1429,7 @@ define [
         onClose: => @gradebookSettingsModalButton.focus()
         onLatePolicyUpdate: @onLatePolicyUpdate
         gradedLateSubmissionsExist: @options.graded_late_submissions_exist
+        overrides: @getFinalGradeOverridesSettingsModalProps()
       @gradebookSettingsModal = renderComponent(
         GradebookSettingsModal,
         gradebookSettingsModalMountPoint,
@@ -1648,10 +1656,13 @@ define [
 
       {
         cssClass: 'total-grade-override'
+        getGridSupport: => @gradebookGrid.gridSupport
         headerCssClass: 'total-grade-override'
         id: 'total_grade_override'
         maxWidth: columnWidths.total_grade_override.max
         minWidth: columnWidths.total_grade_override.min
+        propFactory: new TotalGradeOverrideCellPropFactory(@)
+        toolTip: label
         type: 'total_grade_override'
         width: totalWidth
       }
@@ -1799,7 +1810,8 @@ define [
     # The current cell editor has been changed and is valid
     onCellChange: (event, obj) =>
       { item, column } = obj
-      if col_id = column.field.match /^custom_col_(\d+)/
+      if column.type == 'custom_column'
+        col_id = column.field.match /^custom_col_(\d+)/
         url = @options.custom_column_datum_url
           .replace(/:id/, col_id[1])
           .replace(/:user_id/, item.id)
@@ -2102,6 +2114,10 @@ define [
     updateColumnsAndRenderViewOptionsMenu: =>
       @updateColumns()
       @renderViewOptionsMenu()
+
+    updateColumnsAndRenderGradebookSettingsModal: =>
+      @updateColumns()
+      @renderGradebookSettingsModal()
 
     ## React Header Component Ref Methods
 
@@ -2408,15 +2424,15 @@ define [
       @gridDisplaySettings.showUnpublishedAssignments = showUnpublishedAssignments == 'true'
 
     toggleUnpublishedAssignments: =>
-      @gridDisplaySettings.showUnpublishedAssignments = !@gridDisplaySettings.showUnpublishedAssignments
-      @updateColumnsAndRenderViewOptionsMenu()
+      toggleableAction = =>
+        @gridDisplaySettings.showUnpublishedAssignments = !@gridDisplaySettings.showUnpublishedAssignments
+        @updateColumnsAndRenderViewOptionsMenu()
+      toggleableAction()
 
       @saveSettings(
         { showUnpublishedAssignments: @gridDisplaySettings.showUnpublishedAssignments },
         () =>, # on success, do nothing since the render happened earlier
-        () => # on failure, undo
-          @gridDisplaySettings.showUnpublishedAssignments = !@gridDisplaySettings.showUnpublishedAssignments
-          @updateColumnsAndRenderViewOptionsMenu()
+        toggleableAction
       )
 
     initShowOverrides: (showFinalGradeOverrides = 'false') =>
@@ -2425,17 +2441,18 @@ define [
     setShowFinalGradeOverrides: (show) =>
       @gridDisplaySettings.showFinalGradeOverrides = show
 
-    toggleOverrides: =>
-      @setShowFinalGradeOverrides(!@gridDisplaySettings.showFinalGradeOverrides)
-      @updateColumnsAndRenderViewOptionsMenu()
+    toggleOverrides: () =>
+      toggleableAction = =>
+        @setShowFinalGradeOverrides(!@gridDisplaySettings.showFinalGradeOverrides)
+        @updateColumnsAndRenderGradebookSettingsModal()
 
-      @saveSettings(
-        { showFinalGradeOverrides: @gridDisplaySettings.showFinalGradeOverrides },
-        () =>, # on success, do nothing since the render happened earlier
-        () => # on failure, undo
-          @gridDisplaySettings.showFinalGradeOverrides = !@gridDisplaySettings.showFinalGradeOverrides
-          @updateColumnsAndRenderViewOptionsMenu()
-      )
+      toggleableAction()
+      new Promise (resolve, reject) =>
+        @saveSettings(
+          { showFinalGradeOverrides: @gridDisplaySettings.showFinalGradeOverrides },
+          () =>, # on success, do nothing since the render happened earlier
+          toggleableAction
+        ).done(resolve).fail(reject)
 
     setAssignmentsLoaded: (loaded) =>
       @contentLoadStates.assignmentsLoaded = loaded
@@ -2450,14 +2467,17 @@ define [
       @contentLoadStates.submissionsLoaded = loaded
 
     isGradeEditable: (studentId, assignmentId) =>
-      student = @student(studentId)
-      return false if !student || student.isConcluded
+      return false unless @isStudentGradeable(studentId)
       submissionState = @submissionStateMap.getSubmissionState(assignment_id: assignmentId, user_id: studentId)
       submissionState? && !submissionState.locked
 
     isGradeVisible: (studentId, assignmentId) =>
       submissionState = @submissionStateMap.getSubmissionState(assignment_id: assignmentId, user_id: studentId)
       submissionState? && !submissionState.hideGrade
+
+    isStudentGradeable: (studentId) =>
+      student = @student(studentId)
+      not (!student || student.isConcluded)
 
     addPendingGradeInfo: (submission, gradeInfo) =>
       { userId, assignmentId } = submission
@@ -2641,6 +2661,9 @@ define [
       )
 
     ## Course Settings Access Methods
+
+    getCourseGradingScheme: ->
+      @courseContent.courseGradingScheme
 
     getDefaultGradingScheme: ->
       @courseContent.defaultGradingScheme

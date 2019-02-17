@@ -39,7 +39,7 @@ shared_context 'advantage services context' do
     {
       iss: 'https://canvas.instructure.com',
       sub: developer_key.global_id,
-      aud: "http://#{test_request_host}/login/oauth2/token",
+      aud: "https://#{test_request_host}/login/oauth2/token",
       iat: timestamp,
       exp: (timestamp + 1.hour.to_i),
       nbf: (timestamp - 30),
@@ -77,9 +77,11 @@ shared_context 'advantage services context' do
   let(:scope_to_remove) { raise 'Override in spec' }
   let(:http_success_status) { :ok }
   let(:expected_mime_type) { described_class::MIME_TYPE }
+  let(:content_type) { nil }
 
   def apply_headers
     request.headers['Authorization'] = "Bearer #{access_token_jwt}" if access_token_jwt
+    request.headers['Content-Type'] = content_type if content_type.present?
   end
 
   def send_http

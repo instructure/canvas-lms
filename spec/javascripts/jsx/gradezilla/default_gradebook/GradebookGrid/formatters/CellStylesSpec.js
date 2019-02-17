@@ -88,6 +88,13 @@ QUnit.module('GradebookGrid CellStyles', () => {
       deepEqual(classNames, ['dropped'])
     })
 
+    test('does not include "resubmitted" when the submission was also late', () => {
+      submissionData.resubmitted = true
+      submissionData.late = true
+      const classNames = classNamesForAssignmentCell(assignment, submissionData)
+      deepEqual(classNames, ['late'])
+    })
+
     test('includes "missing" when the submission is missing', () => {
       submissionData.missing = true
       const classNames = classNamesForAssignmentCell(assignment, submissionData)
@@ -117,24 +124,17 @@ QUnit.module('GradebookGrid CellStyles', () => {
       deepEqual(classNames, ['dropped'])
     })
 
-    test('includes "late" when the submission is missing', () => {
+    test('does not include "missing" when the submission is also late', () => {
+      submissionData.missing = true
       submissionData.late = true
       const classNames = classNamesForAssignmentCell(assignment, submissionData)
       deepEqual(classNames, ['late'])
     })
 
-    test('does not include "late" when the submission is also missing', () => {
-      submissionData.missing = true
+    test('includes "late" when the submission is late', () => {
       submissionData.late = true
       const classNames = classNamesForAssignmentCell(assignment, submissionData)
-      deepEqual(classNames, ['missing'])
-    })
-
-    test('does not include "late" when the submission was also resubmitted', () => {
-      submissionData.resubmitted = true
-      submissionData.late = true
-      const classNames = classNamesForAssignmentCell(assignment, submissionData)
-      deepEqual(classNames, ['resubmitted'])
+      deepEqual(classNames, ['late'])
     })
 
     test('does not include "late" when the submission was also excused', () => {

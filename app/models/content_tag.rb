@@ -83,7 +83,7 @@ class ContentTag < ActiveRecord::Base
 
   attr_accessor :skip_touch
   def touch_context_module
-    return true if skip_touch.present?
+    return true if skip_touch.present? || self.context_module_id.nil?
     ContentTag.touch_context_modules([self.context_module_id])
   end
 
