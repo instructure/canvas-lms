@@ -16,12 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {Suspense, lazy} from 'react'
+import I18n from 'i18n!assignments_2'
 import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-
 import {StudentAssignmentShape} from '../assignmentData'
+import LoadingIndicator from './LoadingIndicator'
+
+const Comments = lazy(
+  () =>
+    new Promise((resolve, reject) => {
+      import('./Comments')
+        .then(result => resolve(result.default ? result : {default: result}))
+        .catch(reject)
+    })
+)
 
 ContentTabs.propTypes = {
   assignment: StudentAssignmentShape
@@ -31,15 +41,7 @@ function ContentTabs(props) {
   return (
     <div data-test-id="assignment-2-student-content-tabs">
       <TabList defaultSelectedIndex={0} variant="minimal">
-        <TabPanel
-          title={
-            <Flex as="header" alignItems="center" justifyItems="center" direction="column">
-              <FlexItem>
-                <Text>Upload</Text>
-              </FlexItem>
-            </Flex>
-          }
-        >
+        <TabPanel title={I18n.t('Upload')}>
           <Flex as="header" alignItems="center" justifyItems="center" direction="column">
             <FlexItem>
               <Text data-test-id="assignment-2-student-content-tabs-test-text">
@@ -49,32 +51,14 @@ function ContentTabs(props) {
           </Flex>
         </TabPanel>
         <TabPanel
-          title={
-            <Flex as="header" alignItems="center" justifyItems="center" direction="column">
-              <FlexItem>
-                <Text>Comments</Text>
-              </FlexItem>
-            </Flex>
-          }
+          data-test-id="assignment-2-student-comments-content-tab"
+          title={I18n.t('Comments')}
         >
-          <Flex as="header" alignItems="center" justifyItems="center" direction="column">
-            <FlexItem>
-              <Text>
-                {`TODO: Input Comments Content Here... ${props.assignment &&
-                  props.assignment.description}`}
-              </Text>
-            </FlexItem>
-          </Flex>
+          <Suspense fallback={<LoadingIndicator />}>
+            <Comments assignment={props.assignment} />
+          </Suspense>
         </TabPanel>
-        <TabPanel
-          title={
-            <Flex as="header" alignItems="center" justifyItems="center" direction="column">
-              <FlexItem>
-                <Text>Rubric</Text>
-              </FlexItem>
-            </Flex>
-          }
-        >
+        <TabPanel title={I18n.t('Rubric')}>
           <Flex as="header" alignItems="center" justifyItems="center" direction="column">
             <FlexItem>
               <Text>`TODO: Input Rubric Content Here...`</Text>

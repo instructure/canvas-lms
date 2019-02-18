@@ -61,9 +61,9 @@ describe GraphQLController do
 
     context "data dog metrics" do
       it "reports data dog metrics if requested" do
-        expect_any_instance_of(Tracers::DatadogTracer).to receive :trace
+        expect_any_instance_of(Datadog::Statsd).to receive(:increment).with("graphql.ASDF.count", any_args)
         request.headers["GraphQL-Metrics"] = "true"
-        post :execute, params: {query: '{legacyNode(User, 1) { id }'}
+        post :execute, params: {query: 'query ASDF { course(id: "1") { id } }'}
       end
     end
   end

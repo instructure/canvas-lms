@@ -28,8 +28,10 @@ export default class Api {
         canvadocId: auditEvent.canvadoc_id,
         createdAt: timezone.parse(auditEvent.created_at),
         eventType: auditEvent.event_type,
+        externalToolId: auditEvent.context_external_tool_id,
         id: auditEvent.id,
         payload: auditEvent.payload,
+        quizId: auditEvent.quiz_id,
         submissionId: auditEvent.submission_id,
         userId: auditEvent.user_id
       }))
@@ -40,7 +42,19 @@ export default class Api {
         role: user.role
       }))
 
-      return {auditEvents, users}
+      const externalTools = response.data.tools.map(tool => ({
+        id: tool.id,
+        name: tool.name,
+        role: tool.role
+      }))
+
+      const quizzes = response.data.quizzes.map(quiz => ({
+        id: quiz.id,
+        name: quiz.name,
+        role: quiz.role
+      }))
+
+      return {auditEvents, users, externalTools, quizzes}
     })
   }
 }

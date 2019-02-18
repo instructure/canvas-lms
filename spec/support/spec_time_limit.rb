@@ -42,7 +42,7 @@ module SpecTimeLimit
   class << self
     def enforce(example)
       type, timeout = timeout_for(example)
-      Timeout.timeout(timeout, Error.new(Error.message_for(type, timeout))) do
+      Timeout.timeout(timeout, Error, Error.message_for(type, timeout)) do
         example.run
       end
       # no error handling needed, since rspec will catch the error and

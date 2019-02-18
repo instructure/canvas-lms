@@ -16,25 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import {render, fireEvent, wait, waitForElement} from 'react-testing-library'
+import {fireEvent, waitForElement} from 'react-testing-library'
 import {mockAssignment, findInputForLabel} from '../../test-utils'
-import TeacherView from '../TeacherView'
-import {queryAssignment, setWorkflow} from '../../api'
+import {setWorkflow} from '../../api'
+import {renderTeacherView} from './integration/integration-utils'
 
+jest.mock('jsx/shared/rce/RichContentEditor')
 jest.mock('../../api')
 
-async function renderTeacherView(assignment = mockAssignment()) {
-  queryAssignment.mockReturnValueOnce({data: {assignment}})
-  const result = render(<TeacherView assignmentLid={assignment.lid} />)
-  await wait() // wait a tick for the api promise to resolve
-  return result
-}
-
 it('shows the message students who dialog when the unsubmitted button is clicked', async () => {
-  const {getByText} = await renderTeacherView()
-  fireEvent.click(getByText(/unsubmitted/))
-  expect(await waitForElement(() => getByText('Message Students Who'))).toBeInTheDocument()
+  const {getByText, getByTestId} = await renderTeacherView()
+  fireEvent.click(getByText(/unsubmitted/i))
+  expect(await waitForElement(() => getByTestId('message-students-who'))).toBeInTheDocument()
+})
+
+it('shows the message students who dialog when the message students who button is clicked', async () => {
+  const {getByText, getByTestId} = await renderTeacherView(
+    mockAssignment({submissionTypes: ['none']})
+  )
+  fireEvent.click(getByText(/message students who/i))
+  expect(await waitForElement(() => getByTestId('message-students-who'))).toBeInTheDocument()
 })
 
 it('shows the assignment', async () => {

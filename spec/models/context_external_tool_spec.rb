@@ -1501,4 +1501,20 @@ describe ContextExternalTool do
       end
     end
   end
+
+  describe 'editor_button_json' do
+    let(:tool) { @root_account.context_external_tools.new(name: "editor thing", domain: "www.example.com") }
+
+    it 'includes a boolean false for use_tray' do
+      tool.editor_button = { use_tray: "false" }
+      json = ContextExternalTool.editor_button_json([tool], @course, user_with_pseudonym)
+      expect(json[0][:use_tray]).to eq false
+    end
+
+    it 'includes a boolean true for use_tray' do
+      tool.editor_button = { use_tray: "true" }
+      json = ContextExternalTool.editor_button_json([tool], @course, user_with_pseudonym)
+      expect(json[0][:use_tray]).to eq true
+    end
+  end
 end

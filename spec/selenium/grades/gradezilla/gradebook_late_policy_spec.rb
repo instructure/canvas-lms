@@ -17,7 +17,7 @@
 
 require_relative '../pages/gradezilla_page'
 require_relative '../pages/gradezilla_cells_page'
-require_relative '../pages/gradezilla/settings/late_policies'
+require_relative '../pages/gradezilla/settings'
 
 describe 'Late Policies:' do
   include_context "in-process server selenium tests"
@@ -169,7 +169,7 @@ describe 'Late Policies:' do
     it 'saves late policy', test_id: 3196970, priority: '1' do
       percentage = 10
       increment = 'Day'
-      Gradezilla::Settings::LatePolicies.create_late_policy(percentage, increment)
+      Gradezilla::LatePolicies.create_late_policy(percentage, increment)
       Gradezilla::Settings.click_update_button
 
       expect(@course.late_policy.late_submission_deduction_enabled).to be true
@@ -179,7 +179,7 @@ describe 'Late Policies:' do
 
     it 'saves missing policy', test_id: 3196968, priority: '1' do
       percentage = 50
-      Gradezilla::Settings::LatePolicies.create_missing_policy(percentage)
+      Gradezilla::LatePolicies.create_missing_policy(percentage)
       Gradezilla::Settings.click_update_button
 
       expect(@course.late_policy.missing_submission_deduction_enabled).to be true
@@ -191,7 +191,7 @@ describe 'Late Policies:' do
       percentage = 10
       increment = 'Day'
       lowest_percentage = 50
-      Gradezilla::Settings::LatePolicies.create_late_policy(percentage, increment, lowest_percentage)
+      Gradezilla::LatePolicies.create_late_policy(percentage, increment, lowest_percentage)
       Gradezilla::Settings.click_update_button
 
       expect(@course.late_policy.late_submission_minimum_percent_enabled).to be true

@@ -94,6 +94,13 @@ module GraphQLNodeLoader
           .load(page)
           .then(check_read_permission)
       end
+    when "PostPolicy"
+      Loaders::IDLoader.for(PostPolicy).load(id).then do |policy|
+        Loaders::AssociationLoader.for(PostPolicy, :course).load(policy).then do
+          next nil unless policy.course.grants_right?(ctx[:current_user], :manage_grades)
+          policy
+        end
+      end
     when "File"
       Loaders::IDLoader.for(Attachment).load(id).then(check_read_permission)
     when "AssignmentGroup"
@@ -104,6 +111,13 @@ module GraphQLNodeLoader
       Loaders::IDLoader.for(Quizzes::Quiz).load(id).then(check_read_permission)
     when "Submission"
       Loaders::IDLoader.for(Submission).load(id).then(check_read_permission)
+    when "Progress"
+      Loaders::IDLoader.for(Progress).load(id).then do |progress|
+        Loaders::AssociationLoader.for(Progress, :context).load(progress).then do
+          next nil unless progress.context.grants_right?(ctx[:current_user], :read)
+          progress
+        end
+      end
     else
       raise UnsupportedTypeError.new("don't know how to load #{type}")
     end

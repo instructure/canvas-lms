@@ -25,8 +25,9 @@ module Csp::AccountHelper
 
   def load_csp_data
     unless @csp_loaded
-      csp_data = self.settings.dig(:csp_inherited_data, :value) || self.csp_inherited_data&.dig(:value) || [false, nil]
-      @csp_enabled, @csp_account_id = csp_data
+      csp_data = self.csp_inherited_data
+      @csp_enabled, @csp_account_id = csp_data&.dig(:value) || [false, nil]
+      @csp_locked = !!csp_data&.dig(:locked)
       @csp_loaded = true
     end
   end
@@ -45,6 +46,11 @@ module Csp::AccountHelper
     csp_account_id != self.global_id
   end
 
+  def csp_locked?
+    load_csp_data
+    @csp_locked
+  end
+
   def csp_directly_enabled?
     csp_enabled? && !csp_inherited?
   end
@@ -57,8 +63,26 @@ module Csp::AccountHelper
     set_csp_setting!([false, self.global_id])
   end
 
+  def lock_csp!
+    set_csp_locked!(true)
+  end
+
+  def unlock_csp!
+    set_csp_locked!(false)
+  end
+
+  def set_csp_locked!(value)
+    csp_settings = self.settings[:csp_inherited_data].dup
+    raise "csp not explicitly set" unless csp_settings
+    csp_settings[:locked] = !!value
+    self.settings[:csp_inherited_data] = csp_settings
+    self.save!
+  end
+
   def set_csp_setting!(value)
-    self.settings[:csp_inherited_data] = {:value => value}
+    csp_settings = self.settings[:csp_inherited_data].dup || {}
+    csp_settings[:value] = value
+    self.settings[:csp_inherited_data] = csp_settings
     self.save!
   end
 

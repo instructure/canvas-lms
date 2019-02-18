@@ -49,6 +49,7 @@ export const TEACHER_QUERY = gql`
       lockAt
       pointsPossible
       state
+      needsGradingCount
       lockInfo {
         isLocked
       }
@@ -62,8 +63,33 @@ export const TEACHER_QUERY = gql`
       }
       submissionTypes
       allowedExtensions
+      allowedAttempts
       course {
         lid: _id
+        modulesConnection {
+          pageInfo {
+            startCursor
+            endCursor
+            hasNextPage
+            hasPreviousPage
+          }
+          nodes {
+            lid: _id
+            name
+          }
+        }
+        assignmentGroupsConnection {
+          pageInfo {
+            startCursor
+            endCursor
+            hasNextPage
+            hasPreviousPage
+          }
+          nodes {
+            lid: _id
+            name
+          }
+        }
       }
       assignmentOverrides {
         pageInfo {
@@ -79,6 +105,48 @@ export const TEACHER_QUERY = gql`
           dueAt
           lockAt
           unlockAt
+          set {
+            __typename
+            ... on Section {
+              lid: _id
+              name
+            }
+            ... on Group {
+              lid: _id
+              name
+            }
+            ... on AdhocStudents {
+              students {
+                lid: _id
+                name
+              }
+            }
+          }
+        }
+      }
+      submissions: submissionsConnection(
+        filter: {states: [submitted, unsubmitted, graded, pending_review]}
+      ) {
+        pageInfo {
+          startCursor
+          endCursor
+          hasNextPage
+          hasPreviousPage
+        }
+        nodes {
+          gid: id
+          lid: _id
+          submissionStatus
+          gradingStatus
+          state
+          excused
+          latePolicyStatus
+          submittedAt
+          user {
+            gid: id
+            lid: _id
+            name
+          }
         }
       }
     }
@@ -128,30 +196,29 @@ export const OverrideShape = shape({
   set: shape({
     lid: string,
     name: string,
-    __typename: oneOf(['Section', 'Group'])
+    __typename: oneOf(['Section', 'Group', 'AdhocStudents'])
   })
 })
 
-export const TeacherAssignmentShape = shape({
-  lid: string.isRequired,
-  name: string.isRequired,
-  pointsPossible: number.isRequired,
-  dueAt: string,
-  lockAt: string,
-  unlockAt: string,
-  description: string,
-  state: oneOf(['published', 'unpublished']).isRequired,
-  assignmentGroup: AssignmentGroupShape.isRequired,
-  modules: arrayOf(ModuleShape).isRequired,
-  course: CourseShape.isRequired,
-  submissionTypes: arrayOf(string).isRequired,
-  allowedExtensions: arrayOf(string).isRequired,
-  assignmentOverrides: shape({
-    nodes: arrayOf(OverrideShape)
-  }).isRequired
+const UserShape = shape({
+  lid: string,
+  gid: string,
+  name: string
 })
 
-export const AssignmentShape = shape({
+const SubmissionShape = shape({
+  gid: string,
+  lid: string,
+  submissionStatus: oneOf(['resubmitted', 'missing', 'late', 'submitted', 'unsubmitted']),
+  gradingStatus: oneOf([null, 'excused', 'needs_review', 'needs_grading', 'graded']),
+  state: oneOf(['submitted', 'unsubmitted', 'pending_review', 'graded', 'deleted']),
+  excused: bool,
+  latePolicyStatus: oneOf([null, 'missing']),
+  submittedAt: string, // datetime
+  user: UserShape
+})
+
+export const TeacherAssignmentShape = shape({
   lid: string.isRequired,
   name: string.isRequired,
   pointsPossible: number.isRequired,
@@ -168,5 +235,8 @@ export const AssignmentShape = shape({
   allowedExtensions: arrayOf(string).isRequired,
   assignmentOverrides: shape({
     nodes: arrayOf(OverrideShape)
+  }).isRequired,
+  submissions: shape({
+    nodes: arrayOf(SubmissionShape)
   }).isRequired
 })

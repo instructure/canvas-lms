@@ -31,11 +31,15 @@ import {
 describe('AssessmentAuditTray buildAuditTrail()', () => {
   let auditEvents
   let auditTrail
+  let quizzes
   let timezoneSnapshot
+  let externalTools
   let users
 
   const firstUser = {id: '1109', name: 'An extraordinarily prolific user', role: 'grader'}
   const secondUser = {id: '1101', name: 'A somewhat less prolific user', role: 'grader'}
+  const tool = {id: '21', name: 'Bulldog Tool', role: 'grader'}
+  const quiz = {id: '123', name: 'Unicorns', role: 'grader'}
 
   beforeEach(() => {
     timezoneSnapshot = timezone.snapshot()
@@ -43,6 +47,8 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
 
     auditEvents = []
     users = [firstUser, secondUser]
+    externalTools = [tool]
+    quizzes = [quiz]
     auditTrail = null
   })
 
@@ -72,13 +78,13 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
     auditEvents.push(buildAssignmentUpdatedEvent({createdAt, id}, payload))
   }
 
-  function getUserEventGroup(userId) {
-    auditTrail = auditTrail || buildAuditTrail({auditEvents, users})
-    return auditTrail.userEventGroups.find(group => group.user.id === userId)
+  function getCreatorEventGroup(creatorKey) {
+    auditTrail = auditTrail || buildAuditTrail({auditEvents, users, externalTools, quizzes})
+    return auditTrail.creatorEventGroups.find(group => group.creator.key === creatorKey)
   }
 
   function getAuditEvents() {
-    const {dateEventGroups} = getUserEventGroup('1101')
+    const {dateEventGroups} = getCreatorEventGroup('user-1101')
     return dateEventGroups.reduce(
       (allEvents, dateEventGroup) => allEvents.concat(dateEventGroup.auditEvents),
       []
@@ -125,7 +131,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       })
 
       it('is the date of the "provisional_grade_selected" event', () => {
-        auditTrail = buildAuditTrail({auditEvents, users})
+        auditTrail = buildAuditTrail({auditEvents, users, externalTools, quizzes})
         expect(auditTrail.finalGradeDate).toEqual(new Date('2018-09-17T12:00:00Z'))
       })
 
@@ -142,7 +148,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
             id: '4913'
           })
         )
-        auditTrail = buildAuditTrail({auditEvents, users})
+        auditTrail = buildAuditTrail({auditEvents, users, externalTools, quizzes})
         expect(auditTrail.finalGradeDate).toEqual(new Date('2018-09-17T12:08:00Z'))
       })
     })
@@ -168,7 +174,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
 
       it('is the date of the "submission_updated" event where the grade was changed', () => {
         gradeStudent('4912', '2018-09-17T12:00:00Z')
-        auditTrail = buildAuditTrail({auditEvents, users})
+        auditTrail = buildAuditTrail({auditEvents, users, externalTools, quizzes})
         expect(auditTrail.finalGradeDate).toEqual(new Date('2018-09-17T12:00:00Z'))
       })
 
@@ -176,24 +182,24 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         gradeStudent('4912', '2018-09-17T12:00:00Z')
         gradeStudent('4913', '2018-09-17T12:01:00Z')
         gradeStudent('4914', '2018-09-18T13:04:00Z')
-        auditTrail = buildAuditTrail({auditEvents, users})
+        auditTrail = buildAuditTrail({auditEvents, users, externalTools, quizzes})
         expect(auditTrail.finalGradeDate).toEqual(new Date('2018-09-18T13:04:00Z'))
       })
     })
   })
 
-  describe('user event groups', () => {
+  describe('creator event groups', () => {
     let availableUsers
 
     beforeEach(() => {
       availableUsers = {
-        1101: {id: '1101', name: 'Adam Jones'},
-        1102: {id: '1102', name: 'Betty Ford'},
-        1103: {id: '1103', name: 'Charlie Xi'},
-        1104: {id: '1104', name: 'Dana Young'},
-        1105: {id: '1105', name: 'Ed Valiant'},
-        1106: {id: '1106', name: 'Fay Aldrin'},
-        1107: {id: '1107'}
+        1101: {id: '1101', name: 'Adam Jones', key: 'user-1101'},
+        1102: {id: '1102', name: 'Betty Ford', key: 'user-1102'},
+        1103: {id: '1103', name: 'Charlie Xi', key: 'user-1103'},
+        1104: {id: '1104', name: 'Dana Young', key: 'user-1104'},
+        1105: {id: '1105', name: 'Ed Valiant', key: 'user-1105'},
+        1106: {id: '1106', name: 'Fay Aldrin', key: 'user-1107'},
+        1107: {id: '1107', key: 'user-1107'}
       }
 
       users = []
@@ -209,8 +215,30 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       auditEvents.push(event)
     }
 
-    function getUserIds() {
-      return buildAuditTrail({auditEvents, users}).userEventGroups.map(group => group.user.id)
+    function getCreatorKeys() {
+      return buildAuditTrail({auditEvents, users, externalTools, quizzes}).creatorEventGroups.map(
+        group => group.creator.key
+      )
+    }
+
+    function addEventWithExternalTool(day) {
+      const event = buildEvent({
+        createdAt: `2018-09-0${day}T12:00:00Z`,
+        id: `490${auditEvents.length + 1}`,
+        userId: null,
+        externalToolId: tool.id
+      })
+      auditEvents.push(event)
+    }
+
+    function addEventWithQuiz(day) {
+      const event = buildEvent({
+        createdAt: `2018-09-0${day}T12:00:00Z`,
+        id: `490${auditEvents.length + 1}`,
+        userId: null,
+        quizId: quiz.id
+      })
+      auditEvents.push(event)
     }
 
     describe('students', () => {
@@ -225,12 +253,12 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       })
 
       it('are positioned before all other users', () => {
-        const userIds = getUserIds().slice(0, 3)
-        expect(userIds.sort()).toEqual(['1102', '1104', '1106'])
+        const creatorKeys = getCreatorKeys().slice(0, 3)
+        expect(creatorKeys.sort()).toEqual(['user-1102', 'user-1104', 'user-1106'])
       })
 
       it('are ordered by date of their first event', () => {
-        expect(getUserIds().slice(0, 3)).toEqual(['1104', '1106', '1102'])
+        expect(getCreatorKeys().slice(0, 3)).toEqual(['user-1104', 'user-1106', 'user-1102'])
       })
     })
 
@@ -246,12 +274,71 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       })
 
       it('are positioned after students', () => {
-        const userIds = getUserIds().slice(1, 4)
-        expect(userIds.sort()).toEqual(['1102', '1104', '1106'])
+        const creatorKeys = getCreatorKeys().slice(1, 4)
+        expect(creatorKeys.sort()).toEqual(['user-1102', 'user-1104', 'user-1106'])
       })
 
       it('are ordered by date of their first event', () => {
-        expect(getUserIds().slice(1, 4)).toEqual(['1104', '1106', '1102'])
+        expect(getCreatorKeys().slice(1, 4)).toEqual(['user-1104', 'user-1106', 'user-1102'])
+      })
+    })
+
+    describe('external tools', () => {
+      beforeEach(() => {
+        addEventWithUser('1101', 1, 'admin')
+        addEventWithUser('1102', 7, 'grader')
+        addEventWithUser('1103', 5, 'unknown')
+        addEventWithExternalTool(4)
+        addEventWithUser('1104', 3, 'grader')
+        addEventWithUser('1105', 2, 'student')
+        addEventWithUser('1106', 6, 'grader')
+        addEventWithUser('1107', 8, 'final_grader')
+      })
+
+      it('are positioned with graders', () => {
+        const creatorKeys = getCreatorKeys().slice(1, 5)
+        expect(creatorKeys.sort()).toEqual([
+          'externalTool-21',
+          'user-1102',
+          'user-1104',
+          'user-1106'
+        ])
+      })
+
+      it('are ordered by date of their first event', () => {
+        expect(getCreatorKeys().slice(1, 5)).toEqual([
+          'user-1104',
+          'externalTool-21',
+          'user-1106',
+          'user-1102'
+        ])
+      })
+    })
+
+    describe('quizzes', () => {
+      beforeEach(() => {
+        addEventWithUser('1101', 1, 'admin')
+        addEventWithUser('1102', 7, 'grader')
+        addEventWithUser('1103', 5, 'unknown')
+        addEventWithQuiz(4)
+        addEventWithUser('1104', 3, 'grader')
+        addEventWithUser('1105', 2, 'student')
+        addEventWithUser('1106', 6, 'grader')
+        addEventWithUser('1107', 8, 'final_grader')
+      })
+
+      it('are positioned with graders', () => {
+        const creatorKeys = getCreatorKeys().slice(1, 5)
+        expect(creatorKeys.sort()).toEqual(['quiz-123', 'user-1102', 'user-1104', 'user-1106'])
+      })
+
+      it('are ordered by date of their first event', () => {
+        expect(getCreatorKeys().slice(1, 5)).toEqual([
+          'user-1104',
+          'quiz-123',
+          'user-1106',
+          'user-1102'
+        ])
       })
     })
 
@@ -261,7 +348,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       addEventWithUser('1104', 4, 'student')
       addEventWithUser('1105', 1, 'final_grader')
       addEventWithUser('1103', 5, 'grader')
-      expect(getUserIds()[2]).toEqual('1105')
+      expect(getCreatorKeys()[2]).toEqual('user-1105')
     })
 
     describe('admins', () => {
@@ -276,12 +363,12 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       })
 
       it('are positioned after final grader', () => {
-        const userIds = getUserIds().slice(3, 6)
-        expect(userIds.sort()).toEqual(['1102', '1104', '1106'])
+        const creatorKeys = getCreatorKeys().slice(3, 6)
+        expect(creatorKeys.sort()).toEqual(['user-1102', 'user-1104', 'user-1106'])
       })
 
       it('orders admins by date of their first event', () => {
-        expect(getUserIds().slice(3, 6)).toEqual(['1104', '1106', '1102'])
+        expect(getCreatorKeys().slice(3, 6)).toEqual(['user-1104', 'user-1106', 'user-1102'])
       })
     })
 
@@ -297,17 +384,17 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       })
 
       it('are positioned after all other users', () => {
-        const userIds = getUserIds().slice(4)
-        expect(userIds.sort()).toEqual(['1102', '1104', '1106'])
+        const creatorKeys = getCreatorKeys().slice(4)
+        expect(creatorKeys.sort()).toEqual(['user-1102', 'user-1104', 'user-1106'])
       })
 
       it('orders unknown users by date of their first event', () => {
-        expect(getUserIds().slice(4)).toEqual(['1104', '1106', '1102'])
+        expect(getCreatorKeys().slice(4)).toEqual(['user-1104', 'user-1106', 'user-1102'])
       })
     })
   })
 
-  describe('events by user id', () => {
+  describe('events by creator id', () => {
     function buildUnknownEvent(id, createdAt, data = {}) {
       return buildEvent({id, createdAt, ...data})
     }
@@ -319,46 +406,56 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
     it('is undefined when the user has no events', () => {
       auditTrail = buildAuditTrail({
         auditEvents: [buildUnknownEvent('4901', '2018-09-01T12:00:00Z')],
-        users: [firstUser]
+        users: [firstUser],
+        externalTools: [tool],
+        quizzes: [quiz]
       })
-      expect(getUserEventGroup('1109')).toBeUndefined()
+      expect(getCreatorEventGroup('user-1109')).toBeUndefined()
     })
 
-    it('sets .user with the related user data when the specified user is known', () => {
+    it('sets .creator with the related user data when the specified user is known', () => {
       auditTrail = buildAuditTrail({
         auditEvents: [buildEvent()],
-        users: [secondUser]
+        users: [secondUser],
+        externalTools: [tool],
+        quizzes: [quiz]
       })
-      expect(getUserEventGroup('1101').user).toEqual(secondUser)
+      expect(getCreatorEventGroup('user-1101').creator).toEqual(secondUser)
     })
 
-    it('sets .user with "unknown user" data when the specified user is not known', () => {
+    it('sets .creator with "unknown user" data when the specified user is not known', () => {
       auditTrail = buildAuditTrail({
         auditEvents: [buildEvent()],
-        users: []
+        users: [],
+        externalTools: [tool],
+        quizzes: [quiz]
       })
-      expect(getUserEventGroup('1101').user).toEqual({
+      expect(getCreatorEventGroup('user-1101').creator).toEqual({
         id: '1101',
+        key: 'user-1101',
         name: 'Unknown User',
-        role: 'unknown'
+        role: 'unknown',
+        type: 'user'
       })
     })
 
-    describe('when the user has only one event', () => {
+    describe('when the creator has only one event', () => {
       beforeEach(() => {
         auditTrail = buildAuditTrail({
           auditEvents: [buildUnknownEvent('4901', '2018-09-01T12:00:00Z')],
-          users: [firstUser]
+          users: [firstUser],
+          externalTools: [tool],
+          quizzes: [quiz]
         })
       })
 
       it('includes one group of events when the user has only one event', () => {
-        const userEventGroup = getUserEventGroup('1101')
-        expect(userEventGroup.dateEventGroups).toHaveLength(1)
+        const creatorEventGroup = getCreatorEventGroup('user-1101')
+        expect(creatorEventGroup.dateEventGroups).toHaveLength(1)
       })
 
       it('assigns the event date to the date event group', () => {
-        const {dateEventGroups} = getUserEventGroup('1101')
+        const {dateEventGroups} = getCreatorEventGroup('user-1101')
         expect(dateEventGroups[0].startDate).toEqual(new Date('2018-09-01T12:00:00Z'))
       })
     })
@@ -372,21 +469,21 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
         ]
         users = [firstUser, secondUser]
 
-        auditTrail = buildAuditTrail({auditEvents, users})
+        auditTrail = buildAuditTrail({auditEvents, users, externalTools, quizzes})
       })
 
       it('includes one group of events', () => {
-        const {dateEventGroups} = getUserEventGroup('1101')
+        const {dateEventGroups} = getCreatorEventGroup('user-1101')
         expect(dateEventGroups).toHaveLength(1)
       })
 
       it('includes all events in the same group', () => {
-        const {dateEventGroups} = getUserEventGroup('1101')
+        const {dateEventGroups} = getCreatorEventGroup('user-1101')
         expect(dateEventGroups[0].auditEvents).toHaveLength(3)
       })
 
       it('orders events within the date event group by ascending date', () => {
-        const {dateEventGroups} = getUserEventGroup('1101')
+        const {dateEventGroups} = getCreatorEventGroup('user-1101')
         const eventIds = getDateGroupEventIds(dateEventGroups[0])
         expect(eventIds).toEqual(['4901', '4902', '4903'])
       })
@@ -404,8 +501,8 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       })
 
       function getDateEventGroups() {
-        auditTrail = buildAuditTrail({auditEvents, users})
-        return getUserEventGroup('1101').dateEventGroups
+        auditTrail = buildAuditTrail({auditEvents, users, externalTools, quizzes})
+        return getCreatorEventGroup('user-1101').dateEventGroups
       }
 
       it('includes a date event group for each distinct date', () => {
@@ -471,7 +568,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       })
 
       it('sets .anonymousGradingWasUsed to true', () => {
-        auditTrail = buildAuditTrail({auditEvents, users})
+        auditTrail = buildAuditTrail({auditEvents, users, externalTools, quizzes})
         expect(auditTrail.anonymousGradingWasUsed).toBe(true)
       })
 
@@ -524,7 +621,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       })
 
       it('sets .anonymousGradingWasUsed to true', () => {
-        auditTrail = buildAuditTrail({auditEvents, users})
+        auditTrail = buildAuditTrail({auditEvents, users, externalTools, quizzes})
         expect(auditTrail.anonymousGradingWasUsed).toBe(true)
       })
 
@@ -672,7 +769,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       })
 
       it('sets .anonymousGradingWasUsed to false', () => {
-        auditTrail = buildAuditTrail({auditEvents, users})
+        auditTrail = buildAuditTrail({auditEvents, users, externalTools, quizzes})
         expect(auditTrail.anonymousGradingWasUsed).toBe(false)
       })
     })
@@ -682,7 +779,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
     describe('when moderated grading is initially enabled', () => {
       it('sets .moderatedGradingWasUsed to true', () => {
         buildCreateEvent({moderated_grading: true})
-        auditTrail = buildAuditTrail({auditEvents, users})
+        auditTrail = buildAuditTrail({auditEvents, users, externalTools, quizzes})
         expect(auditTrail.moderatedGradingWasUsed).toBe(true)
       })
 
@@ -941,7 +1038,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
 
       it('sets .moderatedGradingWasUsed to true', () => {
         enabledModeratedGradingWith({})
-        auditTrail = buildAuditTrail({auditEvents, users})
+        auditTrail = buildAuditTrail({auditEvents, users, externalTools, quizzes})
         expect(auditTrail.moderatedGradingWasUsed).toBe(true)
       })
 
@@ -1489,7 +1586,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       })
 
       it('sets .moderatedGradingWasUsed to false', () => {
-        auditTrail = buildAuditTrail({auditEvents, users})
+        auditTrail = buildAuditTrail({auditEvents, users, externalTools, quizzes})
         expect(auditTrail.moderatedGradingWasUsed).toBe(false)
       })
 
@@ -1523,7 +1620,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       })
 
       it('sets .mutingWasUsed to true', () => {
-        auditTrail = buildAuditTrail({auditEvents, users})
+        auditTrail = buildAuditTrail({auditEvents, users, externalTools, quizzes})
         expect(auditTrail.mutingWasUsed).toBe(true)
       })
 
@@ -1610,7 +1707,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       })
 
       it('sets .mutingWasUsed to true', () => {
-        auditTrail = buildAuditTrail({auditEvents, users})
+        auditTrail = buildAuditTrail({auditEvents, users, externalTools, quizzes})
         expect(auditTrail.mutingWasUsed).toBe(true)
       })
 
@@ -1688,7 +1785,7 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
       })
 
       it('sets .mutingWasUsed to false', () => {
-        auditTrail = buildAuditTrail({auditEvents, users})
+        auditTrail = buildAuditTrail({auditEvents, users, externalTools, quizzes})
         expect(auditTrail.mutingWasUsed).toBe(false)
       })
 
@@ -1794,34 +1891,34 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
     }
 
     it('sets .anonymousOnly to true when student anonymity was never disabled', () => {
-      expect(getUserEventGroup('1101').anonymousOnly).toBe(true)
+      expect(getCreatorEventGroup('user-1101').anonymousOnly).toBe(true)
     })
 
     it('sets .anonymousOnly to false when the given user disabled student anonymity', () => {
       buildUpdateEvent('4903', '2018-09-03T12:00:00Z', {anonymous_grading: [true, false]})
       buildUpdateEvent('4904', '2018-09-04T12:00:00Z', {anonymous_grading: [false, true]})
-      expect(getUserEventGroup('1101').anonymousOnly).toBe(false)
+      expect(getCreatorEventGroup('user-1101').anonymousOnly).toBe(false)
     })
 
     it('sets .anonymousOnly to false when the given user acted while student anonymity was disabled', () => {
       buildUpdateEvent('4903', '2018-09-03T12:00:00Z', {anonymous_grading: [true, false]})
       gradeStudent('4904', '2018-09-03T12:01:00Z', '1103', {grade: 'F', score: 0})
       buildUpdateEvent('4905', '2018-09-04T12:00:00Z', {anonymous_grading: [false, true]})
-      expect(getUserEventGroup('1103').anonymousOnly).toBe(false)
+      expect(getCreatorEventGroup('user-1103').anonymousOnly).toBe(false)
     })
 
     it('sets .anonymousOnly to true when the given user acted only before student anonymity was disabled', () => {
       gradeStudent('4903', '2018-09-03T11:59:00Z', '1103', {grade: 'F', score: 0})
       buildUpdateEvent('4904', '2018-09-03T12:00:00Z', {anonymous_grading: [true, false]})
       buildUpdateEvent('4905', '2018-09-04T12:00:00Z', {anonymous_grading: [false, true]})
-      expect(getUserEventGroup('1103').anonymousOnly).toBe(true)
+      expect(getCreatorEventGroup('user-1103').anonymousOnly).toBe(true)
     })
 
     it('sets .anonymousOnly to true when the given user acted only after student anonymity was re-enabled', () => {
       buildUpdateEvent('4903', '2018-09-03T12:00:00Z', {anonymous_grading: [true, false]})
       buildUpdateEvent('4904', '2018-09-04T12:00:00Z', {anonymous_grading: [false, true]})
       gradeStudent('4905', '2018-09-04T12:01:00Z', '1103', {grade: 'F', score: 0})
-      expect(getUserEventGroup('1103').anonymousOnly).toBe(true)
+      expect(getCreatorEventGroup('user-1103').anonymousOnly).toBe(true)
     })
   })
 
@@ -1835,11 +1932,11 @@ describe('AssessmentAuditTray buildAuditTrail()', () => {
     }
 
     function getOverallAnonymity() {
-      return buildAuditTrail({auditEvents, users}).overallAnonymity
+      return buildAuditTrail({auditEvents, users, externalTools, quizzes}).overallAnonymity
     }
 
     function getAnonymityDate() {
-      return buildAuditTrail({auditEvents, users}).anonymityDate
+      return buildAuditTrail({auditEvents, users, externalTools, quizzes}).anonymityDate
     }
 
     describe('when only student anonymity was enabled', () => {

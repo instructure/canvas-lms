@@ -74,9 +74,8 @@ CanvasRails::Application.routes.draw do
   get 'mr/:id' => 'info#message_redirect', as: :message_redirect
   get 'help_links' => 'info#help_links'
 
-  # These are just debug routes, but they make working on error pages easier,
-  # and it shouldn't matter if a client stumbles across them
-  get 'test_error' => 'info#test_error'
+  # This is a debug route that makes working on error pages easier
+  get 'test_error' => 'info#test_error' unless Rails.env.production?
 
   concern :question_banks do
     resources :question_banks do
@@ -2157,6 +2156,7 @@ CanvasRails::Application.routes.draw do
         get "#{context.pluralize}/:#{context}_id/csp_settings", :action => :get_csp_settings
         put "#{context.pluralize}/:#{context}_id/csp_settings", :action => :set_csp_setting
       end
+      put "accounts/:account_id/csp_settings/lock", :action => :set_csp_lock
       post "accounts/:account_id/csp_settings/domains", :action => :add_domain
       post "accounts/:account_id/csp_settings/domains/batch_create", :action => :add_multiple_domains
       delete "accounts/:account_id/csp_settings/domains", :action => :remove_domain

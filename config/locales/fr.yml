@@ -1803,7 +1803,7 @@ fr:
   allow_course_images_to_be_assigned_to_a_course_and_adb906f4: "Autoriser les images de cours d'être assignées à un cours et utilisées sur les dashcards."
   allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "Autoriser la réorganisation des cartes du tableau de bord pour chaque utilisateur."
   allow_final_grade_override_8cf4336b: "Permettre le remplacement de la note finale"
-  allow_importing_of_qti_and_common_cartridge_into_q_81b657cd: "Permettre l'importation de QTI et de Common Cartridge dans les questionnaires.Suivant."
+  allow_importing_of_qti_and_common_cartridge_into_q_81b657cd: "Permettre l'importation de QTI et de Common Cartridge dans Quizzes.Next."
   allow_in_mastery_paths_5332c786: "Autoriser dans les parcours de maîtrise"
   allow_intra_group_peer_reviews_53f1e455: "Autoriser les évaluations entre élèves de même groupe"
   allow_lor_tools: "Autoriser les utilisateurs à voir et utiliser des outils externes configurés pour LOR."
@@ -4590,7 +4590,7 @@ fr:
     to_now: maintenant
   comment_by_replying_to_this_message_or_join_the_co_26d42fde: "Laisser un commentaire en répondant à ce message, ou rejoindre la conversation en utilisant ce lien : %{link}."
   comment_by_replying_to_this_message_or_join_the_co_52b5ac1c: "Commentez en répondant à ce message, ou rejoignez la conversation en suivant ce lien : %{link}. Si vous devez inclure une pièce jointe, et si cela vous est permis, veuillez vous identifier à Canvas et répondre directement dans la discussion."
-  comment_by_replying_to_this_message_or_join_the_co_886bc612: "Commentez en répondant à ce message, ou rejoignez la conversation en suivant ce lien : %{link}.Si vous devez inclure une pièce jointe, et si cela vous est permis, veuillez vous identifier à Canvas et répondre directement à l’annonce."
+  comment_by_replying_to_this_message_or_join_the_co_886bc612: "Commentez en répondant à ce message, ou rejoignez la conversation en suivant ce lien : %{link}. Si vous devez inclure une pièce jointe, et si cela vous est permis, veuillez vous identifier à Canvas et répondre directement à l’annonce."
   comments_e07bcbe3: Commentaires
   commmessages_9fa33faa: CommMessages
   common_cartridge_description: "Permet la conversion de packages Common Cartridge au format intermédiaire json pour l’importation"
@@ -5000,11 +5000,11 @@ fr:
         default_select_folder: "Sélectionner le dossier"
         upload_to: "Télécharger vers"
       import_quizzes_next_view: 
-        import_quizzesNext_help_label: "Importer l'évaluation sous forme de questionnaires.Suivant Icône d'Aide"
-        import_quizzesNext_help_text: "Questionnaires. Vous trouverez ensuite le nouveau moteur d'évaluation de Canvas.%{p_p}Pour en savoir plus, veuillez contacter votre administrateur système ou vous rendre sur"
-        import_quizzesNext_help_title: "Questionnaires.Suivant "
-        import_quizzesNext_help_title_icon: "Importer l'évaluation sous forme de questionnaires.Suivant Icône d'Aide"
-        import_quizzes_Next: "Importer le contenu de l'évaluation sous forme de questionnaires.Suivant"
+        import_quizzesNext_help_label: "Importer l'évaluation sous forme de Quizzes.Next Icône d'Aide"
+        import_quizzesNext_help_text: "Quizzes.Next est le nouveau moteur d'évaluation de Canvas.%{p_p}Pour en savoir plus, veuillez contacter votre administrateur système ou vous rendre sur"
+        import_quizzesNext_help_title: "Quizzes.Next "
+        import_quizzesNext_help_title_icon: "Importer l'évaluation sous forme de Quizzes.Next Icône d'Aide"
+        import_quizzes_Next: "Importer le contenu de l'évaluation sous forme de Quizzes.Next"
       overwrite_assessment_content: 
         assessment_help_label: "Remplacer l’icône d’aide aux évaluations"
         assessment_help_text: "Certains systèmes réutilisent leurs ID pour chaque nouvelle exportation. Par conséquent, si vous exportez deux banques de questions distinctes, elles auront le même ID. Afin d’éviter de perdre des données d’évaluation, nous traitons ces objets comme des éléments différents malgré les ID. En choisissant cette option, vous désactivez cette fonction de sécurité et vous laissez les données d’évaluation remplacer les données existantes ayant les mêmes ID."
@@ -17318,7 +17318,7 @@ fr:
     submission_action_take_quiz: "Prendre %{title}"
   quizzes_7e598f57: Questionnaires
   quizzes_and_question_banks_9b7569e3: "Questionnaires et Banques de questions"
-  quizzes_next_importing_75e63f67: "Questionnaires. Importation suivante"
+  quizzes_next_importing_75e63f67: "Quizzes.Next Importation"
   quizzes_next_submission_history_c0f7cd20: "Quizzes.Next historique soumission"
   quizzes_tutorial_tray_6f87cdd3: "Tiroir de didacticiel sur les quiz"
   quizzes_view_submission_log_ec105e3e: "Questionnaires - afficher le journal des soumissions"
@@ -20237,7 +20237,7 @@ fr:
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Cela est très probablement dû au fait que vous avez importé le contenu du cours sans ses fichiers associés."
   this_name_appears_in_sorted_lists_dccbd84b: "Ce nom apparaît dans des listes triées."
   this_name_will_be_used_by_teachers_for_grading_9b6aa8a0: "Ce nom sera utilisé par les enseignants pour la notation."
-  this_option_is_not_compatible_with_quizzes_next_6dacd0c1: "Cette option n'est pas compatible avec les questionnaires.Suivant"
+  this_option_is_not_compatible_with_quizzes_next_6dacd0c1: "Cette option n'est pas compatible avec Quizzes.Next"
   this_outcome_has_been_used_to_assess_a_student_and_376d5ba9: "Cet acquis a été utilisé pour évaluer un étudiant et ne peut plus être mis à jour"
   this_outcome_has_been_used_to_assess_a_student_and_5a925169: "Cet acquis a été utilisé pour évaluer un étudiant et ne peut ni être modifié, ni être supprimé. "
   this_outcome_has_been_used_to_assess_a_student_and_a3a48511: "Ce résultat a été utilisé pour évaluer un élève et certaines révisions auront une incidence sur les résultats des élèves."

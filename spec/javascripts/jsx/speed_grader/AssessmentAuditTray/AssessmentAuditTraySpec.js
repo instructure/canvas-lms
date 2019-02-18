@@ -175,7 +175,9 @@ QUnit.module('AssessmentAuditTray', suiteHooks => {
           }
         ]
         const users = [{id: '1101', name: 'A mildly discomfited grader', role: 'grader'}]
-        resolveAuditTrail({auditEvents, users})
+        const externalTools = [{id: '21', name: 'Bulldog Tool', role: 'grader'}]
+        const quizzes = [{id: '123', name: 'Unicorns', role: 'grader'}]
+        resolveAuditTrail({auditEvents, users, externalTools, quizzes})
       })
 
       test('shows the assessment summary', () => {

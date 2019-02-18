@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% if @domain_root_account.feature_enabled?(:lor_for_account) || (@current_user && @current_user.feature_enabled?(:lor_for_user)) %>
+<% if @domain_root_account.feature_enabled?(:lor_for_account) %>
   <% visibility = ContextExternalTool.global_navigation_visibility_for_user(@domain_root_account, @current_user) %>
 
   <% cache([ContextExternalTool.global_navigation_menu_cache_key(@domain_root_account, visibility)]) do %>

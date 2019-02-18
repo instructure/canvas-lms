@@ -1814,3 +1814,21 @@ form.user_content_post_form {
 .clear {
   clear: both;
 }
+
+.ic-Error-page {
+  text-align: center;
+  h2 {
+    margin-top: 3rem;
+  }
+  .ic-Error-img
+  {
+    margin-top: 2rem;
+    max-width: 350px;
+  }
+  .ic-Error-form {
+    text-align: #{direction(left)};
+    max-width: 410px;
+    margin-#{direction(left)}: auto;
+    margin-#{direction(right)}: auto;
+  }
+}

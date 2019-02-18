@@ -19,7 +19,7 @@
 import _ from 'underscore'
 import I18n from 'i18n!gradebook'
 
-function hasSubmitted(submission) {
+export function hasSubmitted(submission) {
   if (submission.excused) {
     return true
   } else if (submission.latePolicyStatus) {
@@ -27,6 +27,16 @@ function hasSubmitted(submission) {
   }
 
   return !!(submission.submittedAt || submission.submitted_at)
+}
+
+export function hasSubmission(assignment) {
+  const submissionTypes = getSubmissionTypes(assignment)
+  if (submissionTypes.length === 0) return false
+
+  return _.any(
+    submissionTypes,
+    submissionType => submissionType !== 'none' && submissionType !== 'on_paper'
+  )
 }
 
 function getSubmissionTypes(assignment) {
@@ -96,14 +106,9 @@ const MessageStudentsWhoHelper = {
     ]
   },
 
+  // implement this so it can be stubbed in tests
   hasSubmission(assignment) {
-    const submissionTypes = getSubmissionTypes(assignment)
-    if (submissionTypes.length === 0) return false
-
-    return _.any(
-      submissionTypes,
-      submissionType => submissionType !== 'none' && submissionType !== 'on_paper'
-    )
+    return hasSubmission(assignment)
   },
 
   exists(value) {

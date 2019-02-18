@@ -46,13 +46,13 @@ describe 'quizzes with draft state' do
       it 'shows an error', priority: "1", test_id: 209419 do
         open_quiz_edit_form
         wait_for_ajaximations
-        expect(f('.ui-state-error')).to include_text 'Unauthorized'
+        expect(f('#unauthorized_message')).to include_text 'Access Denied'
       end
 
       it 'can\'t take an unpublished quiz', priority: "1", test_id: 209420 do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/take"
         wait_for_ajaximations
-        expect(f('.ui-state-error')).to include_text 'Unauthorized'
+        expect(f('#unauthorized_message')).to include_text 'Access Denied'
       end
     end
 

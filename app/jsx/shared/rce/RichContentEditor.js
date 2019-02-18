@@ -35,9 +35,10 @@ function loadServiceRCE(target, tinyMCEInitOptions, callback) {
   }
 
   serviceRCELoader.loadOnTarget(target, tinyMCEInitOptions, (textarea, remoteEditor) => {
+    const $target = node2jquery(target)
     const $textarea = freshNode($(textarea))
     $textarea.data('remoteEditor', remoteEditor)
-    target.trigger(RCELOADED_EVENT_NAME, remoteEditor)
+    $target.trigger(RCELOADED_EVENT_NAME, remoteEditor)
     if (callback) {
       callback()
     }
@@ -65,43 +66,46 @@ function loadLegacyTinyMCE(callback) {
 }
 
 function hideTextareaWhileLoadingLegacyRCE(target, callback) {
+  const $target = node2jquery(target)
   if (legacyTinyMCELoaded) {
     callback()
     return
   }
 
-  const previousOpacity = target[0].style.opacity
-  target.css('opacity', 0)
+  const previousOpacity = $target[0].style.opacity
+  $target.css('opacity', 0)
   loadLegacyTinyMCE(() => {
-    target.css('opacity', previousOpacity)
+    $target.css('opacity', previousOpacity)
     callback()
   })
 }
 
 function loadLegacyRCE(target, tinyMCEInitOptions, callback) {
-  target.css('display', '')
-  hideTextareaWhileLoadingLegacyRCE(target, () => {
+  const $target = node2jquery(target)
+  $target.css('display', '')
+  hideTextareaWhileLoadingLegacyRCE($target, () => {
     tinyMCEInitOptions.defaultContent
-      ? target
+      ? $target
           .editorBox(tinyMCEInitOptions)
           .editorBox('set_code', tinyMCEInitOptions.defaultContent)
-      : target.editorBox(tinyMCEInitOptions)
+      : $target.editorBox(tinyMCEInitOptions)
     if (callback) callback()
   })
 }
 
 function establishParentNode(target) {
+  const $target = node2jquery(target)
   // some areas would wipe out the whole form
   // if we rendered a new editor into the textarea parent
   // element, so this is some helper functionality to create/reuse
   // a parent element if that's the case
-  const targetId = target.attr('id')
+  const targetId = $target.attr('id')
   // xsslint safeString.identifier targetId parentId
   const parentId = `tinymce-parent-of-${targetId}`
-  if (target.parent().attr('id') == parentId) {
+  if ($target.parent().attr('id') === parentId) {
     // parent wrapper already exits
   } else {
-    return target.wrap(`<div id='${parentId}' style='visibility: hidden'></div>`)
+    return $target.wrap(`<div id='${parentId}' style='visibility: hidden'></div>`)
   }
 }
 
@@ -120,8 +124,9 @@ function nextID() {
  * doesn't, give it a random one.
  * @private
  */
-function ensureID($el) {
-  const id = $el.attr('id')
+function ensureID(el) {
+  const $el = $(el)
+  const id = 'attr' in $el ? $el.attr('id') : $el.id
   if (!id || id == '') {
     $el.attr('id', nextID())
   }
@@ -133,7 +138,8 @@ function ensureID($el) {
  *
  * @private
  */
-function freshNode($target) {
+function freshNode(target) {
+  const $target = node2jquery(target)
   // Try to get the id
   const targetId = $target.attr('id')
   if (!targetId || targetId == '') {
@@ -207,7 +213,8 @@ const RichContentEditor = {
    *
    * @public
    */
-  loadNewEditor($target, tinyMCEInitOptions = {}, cb) {
+  loadNewEditor(target, tinyMCEInitOptions = {}, cb) {
+    let $target = node2jquery(target)
     if ($target.length <= 0) {
       // no actual target, just short circuit out
       return
@@ -253,7 +260,8 @@ const RichContentEditor = {
    *
    * @public
    */
-  callOnRCE($target, methodName, ...args) {
+  callOnRCE(target, methodName, ...args) {
+    let $target = node2jquery(target)
     if (featureFlag()) {
       $target = this.freshNode($target)
     }
@@ -265,7 +273,8 @@ const RichContentEditor = {
    *
    * @public
    */
-  destroyRCE($target) {
+  destroyRCE(target) {
+    let $target = node2jquery(target)
     if (featureFlag()) {
       $target = this.freshNode($target)
     }
@@ -279,7 +288,8 @@ const RichContentEditor = {
    *
    * @private
    */
-  activateRCE($target) {
+  activateRCE(target) {
+    let $target = node2jquery(target)
     if (featureFlag()) {
       $target = this.freshNode($target)
     }
@@ -289,6 +299,12 @@ const RichContentEditor = {
 
   freshNode,
   ensureID
+}
+
+// while the internals work with jquery, let's not
+// require that of our consumer
+function node2jquery(node) {
+  return node.length ? node : $(node)
 }
 
 export default RichContentEditor

@@ -18,6 +18,7 @@
 require "fileutils"
 require 'chromedriver-helper'
 require_relative "common_helper_methods/custom_alert_actions"
+require_relative 'common_helper_methods/custom_screen_actions'
 
 # WebDriver uses port 7054 (the "locking port") as a mutex to ensure
 # that we don't launch two Firefox instances at the same time. Each
@@ -76,6 +77,7 @@ module SeleniumDriverSetup
   class ServerStartupError < RuntimeError; end
 
   class << self
+    include CustomScreenActions
     include CustomAlertActions
     extend Forwardable
 
@@ -149,7 +151,11 @@ module SeleniumDriverSetup
 
       @driver = create_driver
 
+      resize_screen_to_normal
+
       focus_viewport if run_headless?
+
+      resize_screen_to_normal
 
       set_timeouts(TIMEOUTS)
 
@@ -194,6 +200,8 @@ module SeleniumDriverSetup
           chrome_driver
         when :internet_explorer
           ie_driver
+        when :edge
+          edge_driver
         when :safari
           safari_driver
         else
@@ -277,6 +285,11 @@ module SeleniumDriverSetup
       selenium_remote_driver
     end
 
+    def edge_driver
+      puts "using Edge driver"
+      selenium_remote_driver
+    end
+
     def safari_driver
       puts "using safari driver"
       selenium_url ? selenium_remote_driver : ruby_safari_driver
@@ -352,7 +365,9 @@ module SeleniumDriverSetup
       caps = Selenium::WebDriver::Remote::Capabilities.send(browser)
       caps.version = CONFIG[:version] unless CONFIG[:version].nil?
       caps.platform = CONFIG[:platform] unless CONFIG[:platform].nil?
+      caps['name'] = "#{CONFIG[:platform]} - #{CONFIG[:browser]}-#{CONFIG[:version]}" unless CONFIG[:platform].nil?
       caps["tunnel-identifier"] = CONFIG[:tunnel_id] unless CONFIG[:tunnel_id].nil?
+      caps['selenium-version'] = "3.4.0"
       caps[:unexpectedAlertBehaviour] = 'ignore'
       caps
     end
@@ -360,10 +375,10 @@ module SeleniumDriverSetup
     def selenium_url
       case browser
       when :firefox
-        CONFIG[:remote_url_firefox]
+        CONFIG[:remote_url_firefox] || CONFIG[:remote_url]
       when :chrome
-        CONFIG[:remote_url_chrome]
-      when :internet_explorer, :safari
+        CONFIG[:remote_url_chrome] || CONFIG[:remote_url]
+      when :internet_explorer, :safari, :edge
         CONFIG[:remote_url]
       else
         raise "unsupported browser #{browser}"

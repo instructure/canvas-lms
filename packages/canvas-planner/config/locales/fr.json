@@ -74,6 +74,9 @@
   "close_opportunity_center_popup_9907d981": {
     "message": "Fermer la fenêtre pop-up du centre d''opportunités"
   },
+  "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
+    "message": "{ count, plural,\n     =0 {# opportunités}\n    one {# opportunité}\n  other {# opportunités}\n}"
+  },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Afficher # l''élément terminé}\n  other {Afficher # les éléments terminés}\n}"
   },
@@ -265,6 +268,9 @@
   },
   "only_most_recent_grading_period_shown_f1ad6458": {
     "message": "*Seule la période de notation la plus récente est indiquée."
+  },
+  "opportunities_popup_f6703842": {
+    "message": "opportunités pop-up"
   },
   "optional_add_course_ef0d70fc": {
     "message": "Facultatif : Ajouter un cours"

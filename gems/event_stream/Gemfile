@@ -4,7 +4,6 @@ gemspec
 
 gem 'bookmarked_collection', path: '../bookmarked_collection'
 gem 'canvas_cassandra', path: '../canvas_cassandra'
-gem 'canvas_statsd', '1.0.0'
 gem 'json_token', path: '../json_token'
 gem 'paginated_collection', path: '../paginated_collection'
 gem 'simplecov', '0.14.1', :require => false

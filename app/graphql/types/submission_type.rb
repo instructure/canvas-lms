@@ -53,6 +53,11 @@ module Types
     end
     private :protect_submission_grades
 
+    field :comments_connection, SubmissionCommentType.connection_type, null: true
+    def comments_connection
+      submission.comments_for(current_user)
+    end
+
     field :score, Float, null: true
     def score
       protect_submission_grades(:score)

@@ -45,7 +45,7 @@ module CustomScreenActions
         }
     JS
     if w != 1200 || h != 600
-      driver.manage.window.move_to(0, 0)
+      driver.browser.equal? :safari ? driver.execute_script("window.moveTo(0, 0)") : driver.manage.window.move_to(0, 0)
       driver.manage.window.resize_to(1200, 600)
     end
   end
@@ -58,7 +58,7 @@ module CustomScreenActions
     return 0;
     JS
     if h > 0
-      driver.manage.window.move_to(0, 0)
+      driver.browser.equal? :safari ? driver.execute_script("window.moveTo(0, 0)") : driver.manage.window.move_to(0, 0)
       driver.manage.window.resize_to(1024, h)
     end
   end

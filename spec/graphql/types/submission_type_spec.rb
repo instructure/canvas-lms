@@ -106,4 +106,25 @@ describe Types::SubmissionType do
       expect(submission_type.resolve("latePolicyStatus")).to eq "missing"
     end
   end
+
+  describe "submission comments" do
+    before(:once) do
+      student_in_course(active_all: true)
+      @submission.add_comment(author: @teacher, comment: "test3")
+      @submission_comments = @submission.submission_comments
+    end
+
+    it "works" do
+      expect(
+        submission_type.resolve("commentsConnection { nodes { _id }}")
+      ).to eq @submission_comments.map(&:id).map(&:to_s)
+    end
+
+    it "requires permission" do
+      other_course_student = student_in_course(course: course_factory)
+      expect(
+        submission_type.resolve("commentsConnection { nodes { _id }}", current_user: other_course_student)
+      ).to be nil
+    end
+  end
 end

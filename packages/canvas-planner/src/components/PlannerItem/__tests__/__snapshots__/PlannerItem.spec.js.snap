@@ -9,7 +9,7 @@ exports[`does not render end time if the same as start time 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -152,7 +152,7 @@ exports[`prefers to render feedback if it and the location are available 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -298,7 +298,7 @@ exports[`renders Announcement correctly with everything 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -446,7 +446,7 @@ exports[`renders Announcement correctly with just date 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -570,7 +570,7 @@ exports[`renders Announcement correctly with just points 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -718,7 +718,7 @@ exports[`renders Announcement correctly without right side content 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -842,7 +842,7 @@ exports[`renders Assignment correctly with everything 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -990,7 +990,7 @@ exports[`renders Assignment correctly with just date 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -1114,7 +1114,7 @@ exports[`renders Assignment correctly with just points 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -1262,7 +1262,7 @@ exports[`renders Assignment correctly without right side content 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -1386,7 +1386,7 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -1528,7 +1528,7 @@ exports[`renders Calendar Event correctly with everything 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -1694,7 +1694,7 @@ exports[`renders Calendar Event correctly with just date 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -1836,7 +1836,7 @@ exports[`renders Calendar Event correctly with start and end time 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -1979,7 +1979,7 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -2121,7 +2121,7 @@ exports[`renders Discussion correctly with everything 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -2269,7 +2269,7 @@ exports[`renders Discussion correctly with just date 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -2393,7 +2393,7 @@ exports[`renders Discussion correctly with just points 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -2541,7 +2541,7 @@ exports[`renders Discussion correctly without right side content 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -2665,7 +2665,7 @@ exports[`renders Note correctly with Group 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": "#F06291",
             "checkedBackground": "#F06291",
             "checkedBorderColor": "#F06291",
@@ -2789,7 +2789,7 @@ exports[`renders Note correctly with everything 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": undefined,
             "checkedBackground": undefined,
             "checkedBorderColor": undefined,
@@ -2895,7 +2895,7 @@ exports[`renders Note correctly with everything 1`] = `
               immutable={false}
               theme={
                 Object {
-                  Symbol(Button): Object {
+                  Symbol(Button__dUxGkD): Object {
                     "iconColor": undefined,
                   },
                 }
@@ -2951,7 +2951,7 @@ exports[`renders Note correctly without Course 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": undefined,
             "checkedBackground": undefined,
             "checkedBorderColor": undefined,
@@ -3057,7 +3057,7 @@ exports[`renders Note correctly without Course 1`] = `
               immutable={false}
               theme={
                 Object {
-                  Symbol(Button): Object {
+                  Symbol(Button__dUxGkD): Object {
                     "iconColor": undefined,
                   },
                 }
@@ -3113,7 +3113,7 @@ exports[`renders Page correctly with everything 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -3261,7 +3261,7 @@ exports[`renders Page correctly with just date 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -3385,7 +3385,7 @@ exports[`renders Page correctly with just points 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -3533,7 +3533,7 @@ exports[`renders Page correctly without right side content 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -3657,7 +3657,7 @@ exports[`renders Quiz correctly with everything 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -3805,7 +3805,7 @@ exports[`renders Quiz correctly with just date 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -3929,7 +3929,7 @@ exports[`renders Quiz correctly with just points 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -4077,7 +4077,7 @@ exports[`renders Quiz correctly without right side content 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -4201,7 +4201,7 @@ exports[`renders assignment peer reviews correctly 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -4325,7 +4325,7 @@ exports[`renders correctly 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -4473,7 +4473,7 @@ exports[`renders feedback anonymously according to the assignment settings 1`] =
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -4618,7 +4618,7 @@ exports[`renders feedback if available 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -4764,7 +4764,7 @@ exports[`renders media feedback if available 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -4910,7 +4910,7 @@ exports[`renders the end time if available 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -5053,7 +5053,7 @@ exports[`renders the location if available 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": "#d71f85",
             "checkedBackground": "#d71f85",
             "checkedBorderColor": "#d71f85",
@@ -5187,7 +5187,7 @@ exports[`renders user-created Todo correctly 1`] = `
       immutable={false}
       theme={
         Object {
-          Symbol(CheckboxFacade): Object {
+          Symbol(CheckboxFacade__hUzfii): Object {
             "borderColor": null,
             "checkedBackground": null,
             "checkedBorderColor": null,

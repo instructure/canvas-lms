@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+// I18n and tz needed to replicate what FriendlyDatetime does in formatting
 import I18n from 'i18n!assignments_2'
 import tz from 'timezone'
 import {render} from 'react-testing-library'
@@ -32,50 +33,20 @@ it('renders an OverrideSummary', () => {
     dueAt,
     unlockAt,
     lockAt,
-    submissionTypes: ['online_upload', 'online_url']
+    submissionTypes: ['online_upload', 'online_url'],
+    allowedAttempts: 1
   })
-  const {getByText} = render(<OverrideSummary override={override} />)
-  expect(getByText('Section A')).toBeInTheDocument()
+  const {getByText, getByTestId} = render(<OverrideSummary override={override} />)
+  expect(getByTestId('OverrideAssignTo')).toBeInTheDocument()
+  expect(getByTestId('OverrideSubmissionTypes')).toBeInTheDocument()
 
-  const submission_types = 'File & Url'
   const due = `Due: ${tz.format(dueAt, I18n.t('#date.formats.full'))}`
-  const elem = getByText(/^File/)
-  expect(elem.textContent).toContain(`${submission_types} | ${due}`)
+  expect(getByText(due)).toBeInTheDocument()
 
   const unlock = `${tz.format(unlockAt, I18n.t('#date.formats.short'))}`
   const lock = `to ${tz.format(lockAt, I18n.t('#date.formats.full'))}`
   expect(getByText(unlock)).toBeInTheDocument()
   expect(getByText(lock)).toBeInTheDocument()
-})
 
-it('renders an override with no lockAt', () => {
-  const dueAt = '2018-11-27T13:00-0500'
-  const unlockAt = '2018-11-26T13:00-0500'
-  const lockAt = null
-  const override = mockOverride({
-    title: 'Section A',
-    dueAt,
-    unlockAt,
-    lockAt,
-    submissionTypes: []
-  })
-  const {getByText} = render(<OverrideSummary override={override} />)
-  const unlock = `Available after ${tz.format(unlockAt, I18n.t('#date.formats.full'))}`
-  expect(getByText(unlock)).toBeInTheDocument()
-})
-
-it('renders an override with no unlockAt', () => {
-  const dueAt = '2018-11-27T13:00-0500'
-  const unlockAt = null
-  const lockAt = '2018-11-28T13:00-0500'
-  const override = mockOverride({
-    title: 'Section A',
-    dueAt,
-    unlockAt,
-    lockAt,
-    submissionTypes: []
-  })
-  const {getByText} = render(<OverrideSummary override={override} />)
-  const lock = `Available until ${tz.format(lockAt, I18n.t('#date.formats.full'))}`
-  expect(getByText(lock)).toBeInTheDocument()
+  expect(getByTestId('OverrideAttempts-Summary')).toBeInTheDocument()
 })

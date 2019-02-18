@@ -44,6 +44,22 @@ export function mockAssignment(overrides = {}) {
     submissionsConnection: {
       nodes: [
         {
+          commentsConnection: {
+            __typename: 'CommentsConnection',
+            nodes: [
+              {
+                __typename: 'Comment',
+                _id: '1',
+                comment: 'comment comment',
+                updatedAt: '12/13/91',
+                author: {
+                  __typename: 'Author',
+                  avatarUrl: 'example.com',
+                  shortName: 'bob builder'
+                }
+              }
+            ]
+          },
           deductedPoints: 3,
           enteredGrade: '9',
           grade: '6',

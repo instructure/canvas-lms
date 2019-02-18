@@ -20545,7 +20545,7 @@ de:
   to_generate_a_pairing_code_from_a_student_s_user_s_e36358b3: |-
       Um einen Pairing-Code auf der Benutzereinstellungsseite eines Studenten zu generieren, muss „Benutzer – handeln als“ ebenfalls aktiviert sein.
       Um einen Pairing-Code auf der Detailseite eines Studenten zu generieren, muss „Benutzer – Studenten zu Kursen hinzufügen oder daraus entfernen“ ebenfalls aktiviert sein.
-  to_generate_login_logout_activity_in_admin_tools_u_c5712e03: "Um in Admin-Tools An-/Abmeldetätigkeiten zu generieren, muss „Benutzer – Anmeldedetails verwalten“ oder „Statistik – anzeigen“ ebenfalls aktiviert sein.Um in Admin-Tools Notenänderungsprotokolle zu generieren, muss „Noten – Änderungsprotokolle anzeigen“ ebenfalls aktiviert sein."
+  to_generate_login_logout_activity_in_admin_tools_u_c5712e03: "Um in Admin-Tools An-/Abmeldetätigkeiten zu generieren, muss „Benutzer – Anmeldedetails verwalten“ oder „Statistik – anzeigen“ ebenfalls aktiviert sein. Um in Admin-Tools Notenänderungsprotokolle zu generieren, muss „Noten – Änderungsprotokolle anzeigen“ ebenfalls aktiviert sein."
   to_import_assignments_and_quizzes_using_the_course_86c5bdbb: "Um Aufgaben und Quizze mit dem Course Import Tool zu importieren, muss „Kurs-Content – hinzufügen / ändern / löschen“ aktiviert sein."
   to_import_files_using_the_course_import_tool_cours_a0c2db0c: "Um Dateien mit dem Course Import Tool zu importieren, muss „Kurs-Content – hinzufügen / ändern / löschen“ aktiviert sein."
   to_import_sis_data_sis_data_import_must_also_be_en_52bdf01: "Um SIS-Daten zu importieren, muss „SIS-Daten – importieren“ ebenfalls aktiviert sein."

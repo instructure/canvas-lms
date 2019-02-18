@@ -19,15 +19,13 @@
 import {replaceTags} from '../shared/helpers/tags'
 import React from 'react'
 import PropTypes from 'prop-types'
-import Modal from '@instructure/ui-overlays/lib/components/Modal'
-import ModalHeader from '@instructure/ui-overlays/lib/components/Modal/ModalHeader'
-import ModalBody from '@instructure/ui-overlays/lib/components/Modal/ModalBody'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
+import ExternalToolDialogModal from './ExternalToolDialog/Modal'
+import ExternalToolDialogTray from './ExternalToolDialog/Tray'
 import Alert from '@instructure/ui-alerts/lib/components/Alert'
 import I18n from 'i18n!editor'
 import {send} from '../shared/rce/RceCommandShim'
 import TinyMCEContentItem from 'tinymce_plugins/instructure_external_tools/TinyMCEContentItem'
+import FlexItem from '@instructure/ui-layout/lib/components/Flex/FlexItem'
 import {processContentItemsForEditor} from '../deep_linking/ContentItemProcessor'
 
 const EMPTY_BUTTON = {
@@ -144,37 +142,42 @@ export default class ExternalToolDialog extends React.Component {
     const {iframeAllowances, win} = this.props
     const label = I18n.t('embed_from_external_tool', 'Embed content from External Tool')
     const frameHeight = Math.max(Math.min(win.height - 100, 550), 100)
+    const Overlay = button.use_tray ? ExternalToolDialogTray : ExternalToolDialogModal
     return (
-      <Modal open={open} label={label} onOpen={this.handleOpen} onClose={this.handleRemove}>
-        <ModalHeader>
-          <CloseButton placement="end" offset="medium" variant="icon" onClick={this.handleClose}>
-            {I18n.t('Close')}
-          </CloseButton>
-          <Heading>{button.name}</Heading>
-        </ModalHeader>
-        <ModalBody padding="0">
-          <div
-            ref={ref => (this.beforeInfoAlertRef = ref)}
-            tabIndex="0" // eslint-disable-line jsx-a11y/no-noninteractive-tabindex
-            onFocus={this.handleInfoAlertFocus}
-            onBlur={this.handleInfoAlertBlur}
-            className={
-              infoAlert && infoAlert === this.beforeInfoAlertRef ? '' : 'screenreader-only'
-            }
-          >
-            <Alert margin="small">{I18n.t('The following content is partner provided')}</Alert>
-          </div>
-          <form
-            ref={ref => (this.formRef = ref)}
-            method="POST"
-            action={form.url}
-            target="external_tool_launch"
-            style={{margin: 0}}
-          >
-            <input type="hidden" name="editor" value="1" />
-            <input type="hidden" name="selection" value={form.selection} />
-            <input type="hidden" name="editor_contents" value={form.contents} />
-          </form>
+      <React.Fragment>
+        <form
+          ref={ref => (this.formRef = ref)}
+          method="POST"
+          action={form.url}
+          target="external_tool_launch"
+          style={{margin: 0}}
+        >
+          <input type="hidden" name="editor" value="1" />
+          <input type="hidden" name="selection" value={form.selection} />
+          <input type="hidden" name="editor_contents" value={form.contents} />
+        </form>
+        <Overlay
+          open={open}
+          label={label}
+          onOpen={this.handleOpen}
+          onClose={this.handleRemove}
+          onCloseButton={this.handleClose}
+          closeLabel={I18n.t('Close')}
+          name={button.name}
+        >
+          <FlexItem>
+            <div
+              ref={ref => (this.beforeInfoAlertRef = ref)}
+              tabIndex="0" // eslint-disable-line jsx-a11y/no-noninteractive-tabindex
+              onFocus={this.handleInfoAlertFocus}
+              onBlur={this.handleInfoAlertBlur}
+              className={
+                infoAlert && infoAlert === this.beforeInfoAlertRef ? '' : 'screenreader-only'
+              }
+            >
+              <Alert margin="small">{I18n.t('The following content is partner provided')}</Alert>
+            </div>
+          </FlexItem>
           <iframe
             title={label}
             ref={ref => (this.iframeRef = ref)}
@@ -182,24 +185,30 @@ export default class ExternalToolDialog extends React.Component {
             src="/images/ajax-loader-medium-444.gif"
             id="external_tool_button_frame"
             style={{
-              width: button.width || 800,
-              height: button.height || frameHeight,
+              flexGrow: '1',
+              flexShrink: '1',
+              width: button.use_tray ? undefined : button.width || 800,
+              height: button.use_tray ? undefined : button.height || frameHeight,
               border: '0'
             }}
             allow={iframeAllowances}
             borderstyle="0"
           />
-          <div
-            ref={ref => (this.afterInfoAlertRef = ref)}
-            tabIndex="0" // eslint-disable-line jsx-a11y/no-noninteractive-tabindex
-            onFocus={this.handleInfoAlertFocus}
-            onBlur={this.handleInfoAlertBlur}
-            className={infoAlert && infoAlert === this.afterInfoAlertRef ? '' : 'screenreader-only'}
-          >
-            <Alert margin="small">{I18n.t('The preceding content is partner provided')}</Alert>
-          </div>
-        </ModalBody>
-      </Modal>
+          <FlexItem>
+            <div
+              ref={ref => (this.afterInfoAlertRef = ref)}
+              tabIndex="0" // eslint-disable-line jsx-a11y/no-noninteractive-tabindex
+              onFocus={this.handleInfoAlertFocus}
+              onBlur={this.handleInfoAlertBlur}
+              className={
+                infoAlert && infoAlert === this.afterInfoAlertRef ? '' : 'screenreader-only'
+              }
+            >
+              <Alert margin="small">{I18n.t('The preceding content is partner provided')}</Alert>
+            </div>
+          </FlexItem>
+        </Overlay>
+      </React.Fragment>
     )
   }
 }

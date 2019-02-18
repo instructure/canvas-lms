@@ -29,7 +29,7 @@ describe MissingPolicyApplicator do
   end
 
   describe '#apply_missing_deductions' do
-    let(:now) { Time.zone.now }
+    let(:now) { Time.zone.now.change(usec: 0) }
     let :late_policy_missing_enabled do
       LatePolicy.create!(
         course_id: @course.id,
@@ -92,10 +92,10 @@ describe MissingPolicyApplicator do
     end
 
     let(:applicator) { described_class.new }
-    let!(:student) { student_in_course(active_all: true, user_name: 'a student').user }
 
     before(:once) do
       course_with_teacher(active_all: true)
+      @student = @course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user
     end
 
     it 'applies deductions to assignments in a course with a LatePolicy with missing submission deductions enabled' do
@@ -119,6 +119,37 @@ describe MissingPolicyApplicator do
       submission.reload
 
       expect(submission.workflow_state).to eql 'graded'
+    end
+
+    context "updated timestamps" do
+      before(:once) do
+        @frozen_now = now
+        late_policy_missing_enabled
+
+        Timecop.freeze(@frozen_now) do
+          assignment = create_recent_assignment
+          @submission = assignment.submissions.first
+          # Use update_columns to skip callbacks, otherwise apply_late_policy
+          # would apply the policy and cause apply_missing_deductions to have
+          # no effect.
+          @submission.update_columns(
+            grade: nil,
+            graded_at: nil,
+            score: nil,
+            updated_at: nil,
+            workflow_state: "unsubmitted"
+          )
+          applicator.apply_missing_deductions
+        end
+      end
+
+      it "updates the submission graded_at" do
+        expect(@submission.reload.graded_at).to eql @frozen_now
+      end
+
+      it "updates the submission updated_at" do
+        expect(@submission.reload.updated_at).to eql @frozen_now
+      end
     end
 
     it 'does not apply deductions to assignments in a course with missing submission deductions disabled' do
@@ -236,7 +267,7 @@ describe MissingPolicyApplicator do
       create_recent_assignment
       late_policy_missing_enabled
 
-      enrollment = student.enrollments.find_by(course_id: @course.id)
+      enrollment = @student.enrollments.find_by(course_id: @course.id)
       enrollment.scores.first_or_create.update_columns(grading_period_id: nil, final_score: 100, current_score: 100)
       @course.submissions.first.update_columns(score: nil, grade: nil)
 

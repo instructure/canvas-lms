@@ -118,7 +118,7 @@ export default class IndexHeader extends Component {
                       {I18n.t('Search discussion by title')}
                     </ScreenReaderContent>
                   }
-                  placeholder={I18n.t('Search')}
+                  placeholder={I18n.t('Search by title or author...')}
                   icon={() => <IconSearchLine />}
                   onChange={this.onSearchStringChange}
                   name="discussion_search"

@@ -41,14 +41,17 @@ class CanvasSchema < GraphQL::Schema
     when User then Types::UserType
     when Enrollment then Types::EnrollmentType
     when Submission then Types::SubmissionType
+    when SubmissionComment then Types::SubmissionCommentType
     when Group then Types::GroupType
     when GroupCategory then Types::GroupSetType
     when GradingPeriod then Types::GradingPeriodType
     when ContextModule then Types::ModuleType
+    when PostPolicy then Types::PostPolicyType
     when WikiPage then Types::PageType
     when Attachment then Types::FileType
     when DiscussionTopic then Types::DiscussionType
     when Quizzes::Quiz then Types::QuizType
+    when Progress then Types::ProgressType
     when ContentTag
       if !type.nil? && type.name == "ModuleItemInterface"
         return Types::ExternalUrlType if obj.content_type == "ExternalUrl"
@@ -60,8 +63,9 @@ class CanvasSchema < GraphQL::Schema
     end
   end
 
-  orphan_types [Types::ModuleType, Types::PageType, Types::FileType, Types::ExternalUrlType,
-                Types::ExternalToolType, Types::ModuleExternalToolType]
+  orphan_types [Types::PageType, Types::FileType, Types::ExternalUrlType,
+                Types::ExternalToolType, Types::ModuleExternalToolType,
+                Types::ProgressType]
 
   instrument :field, AssignmentOverrideInstrumenter.new
 end

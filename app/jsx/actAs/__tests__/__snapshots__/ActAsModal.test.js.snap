@@ -12,6 +12,7 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
     <ModalBody
       as="div"
       padding="medium"
+      variant="default"
     >
       <div
         className="ActAs__body"

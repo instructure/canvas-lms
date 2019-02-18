@@ -24,5 +24,12 @@ class Types::MutationType < Types::ApplicationObjectType
     Sets the overridden final score for the associated enrollment, optionally limited to a specific
     grading period. This will supersede the computed final score/grade if present.
   DESC
+  field :set_assignment_post_policy, <<~DESC, mutation: Mutations::SetAssignmentPostPolicy
+    Sets the post policy for the assignment.
+  DESC
+  field :set_course_post_policy, <<~DESC, mutation: Mutations::SetCoursePostPolicy
+    Sets the post policy for the course, with an option to override and delete
+    existing assignment post policies.
+  DESC
   field :update_assignment, mutation: Mutations::UpdateAssignment
 end

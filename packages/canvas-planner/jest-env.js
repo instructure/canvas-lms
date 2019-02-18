@@ -38,5 +38,5 @@ document.documentElement.setAttribute('dir', 'ltr');
 
 // set up mocks for native APIs
 if (!('MutationObserver' in window)) {
-  Object.defineProperty(window, 'MutationObserver', { value: require('mutation-observer') });
+  Object.defineProperty(window, 'MutationObserver', { value: require('@sheerun/mutationobserver-shim') });
 }

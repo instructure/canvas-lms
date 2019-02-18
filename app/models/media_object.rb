@@ -199,18 +199,10 @@ class MediaObject < ActiveRecord::Base
     self.title
   end
 
-  def retrieve_details
-    return unless self.media_id
-    # From Kaltura, retrieve the title (if it's not already set)
-    # and the list of valid flavors along with their id's.
-    # Might as well confirm the media type while you're at it.
-    client = CanvasKaltura::ClientV3.new
-    client.startSession(CanvasKaltura::SessionType::ADMIN)
-    self.data ||= {}
-    entry = client.mediaGet(self.media_id)
+  def process_retrieved_details(entry, media_type, assets)
     if entry
-      self.title = entry[:name]
-      self.media_type = client.mediaTypeToSymbol(entry[:mediaType]).to_s
+      self.title = self.title.presence || entry[:name]
+      self.media_type = media_type
       self.duration = entry[:duration].to_i
       self.data[:plays] = entry[:plays].to_i
       self.data[:download_url] = entry[:downloadUrl]
@@ -218,7 +210,6 @@ class MediaObject < ActiveRecord::Base
       old_id = tags.detect{|t| t.match(/old_id_/) }
       self.old_media_id = old_id.sub(/old_id_/, '') if old_id
     end
-    assets = client.flavorAssetGetByEntryId(self.media_id) || []
     self.data[:extensions] ||= {}
     assets.each do |asset|
       asset[:fileExt] = "none" if asset[:fileExt].blank?
@@ -230,6 +221,21 @@ class MediaObject < ActiveRecord::Base
     self.total_size = [self.max_size || 0, assets.map{|a| (a[:size] || 0).to_i }.sum].max
     self.save
     self.data
+  end
+
+  def retrieve_details
+    return unless self.media_id
+    # From Kaltura, retrieve the title (if it's not already set)
+    # and the list of valid flavors along with their id's.
+    # Might as well confirm the media type while you're at it.
+    client = CanvasKaltura::ClientV3.new
+    client.startSession(CanvasKaltura::SessionType::ADMIN)
+    self.data ||= {}
+
+    entry = client.mediaGet(self.media_id)
+    media_type = client.mediaTypeToSymbol(entry[:mediaType]).to_s if entry
+    assets = client.flavorAssetGetByEntryId(self.media_id) || []
+    process_retrieved_details(entry, media_type, assets)
   end
 
   def podcast_format_details

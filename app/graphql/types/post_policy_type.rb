@@ -14,18 +14,31 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
-require_relative '../../../../common'
-require_relative '../settings'
+module Types
+  class PostPolicyType < ApplicationObjectType
+    graphql_name "PostPolicy"
 
-module Gradezilla
-  module Settings
-    module Advanced
-      extend SeleniumDependencies
+    description <<~DOC
+      A PostPolicy sets the policy for whether a Submission's grades are posted
+      automatically or manually. A PostPolicy can be set at the Course and/or
+      Assignment level.
+    DOC
 
-      def self.select_grade_override_checkbox
-        fj('label:contains("Allow final grade override")').click
-      end
+    implements GraphQL::Types::Relay::Node
+
+    field :_id, ID, "legacy canvas id", null: false, method: :id
+    field :post_manually, Boolean, null: false
+
+    field :assignment, Types::AssignmentType, null: true
+    def assignment
+      load_association(:assignment)
+    end
+
+    field :course, Types::CourseType, null: false
+    def course
+      load_association(:course)
     end
   end
 end

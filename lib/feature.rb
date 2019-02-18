@@ -378,15 +378,6 @@ END
       state: 'hidden',
       root_opt_in: true
     },
-    'lor_for_user' =>
-    {
-      display_name: -> { I18n.t('features.lor', "LOR External Tools") },
-      description:  -> { I18n.t('allow_lor_tools', <<-END) },
-Allow users to view and use external tools configured for LOR.
-END
-      applies_to: 'User',
-      state: 'hidden'
-    },
     'lor_for_account' =>
     {
       display_name: -> { I18n.t('features.lor', "LOR External Tools") },
@@ -737,6 +728,18 @@ END
       },
       applies_to: 'Course',
       state: 'allowed',
+      development: true
+    },
+    'post_policies' => {
+      display_name: -> { I18n.t('Post Policies') },
+      description: -> {
+        I18n.t <<~DESCRIPTION
+          Allows teachers to specify post policies for this course or specific assignments, enabling grades to be
+          posted and hidden manually.
+        DESCRIPTION
+      },
+      applies_to: 'Course',
+      state: 'hidden',
       development: true
     }
   )

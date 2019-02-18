@@ -821,7 +821,7 @@ class UsersController < ApplicationController
 
   include Api::V1::TodoItem
   # @API List the TODO items
-  # A paginated list of the current user's list of todo items, as seen on the user dashboard.
+  # A paginated list of the current user's list of todo items.
   #
   # @argument include[] [String, "ungraded_quizzes"]
   #   "ungraded_quizzes":: Optionally include ungraded quizzes (such as practice quizzes and surveys) in the list.
@@ -873,7 +873,7 @@ class UsersController < ApplicationController
 
     bookmark = Plannable::Bookmarker.new(Assignment, false, [:due_at, :created_at], :id)
     grading_scope = @current_user.assignments_needing_grading(scope_only: true).
-      reorder(:due_at, :id).preload(:external_tool_tag, :rubric_association, :rubric, :discussion_topic, :quiz).eager_load(:duplicate_of)
+      reorder(:due_at, :id).preload(:external_tool_tag, :rubric_association, :rubric, :discussion_topic, :quiz, :duplicate_of)
     submitting_scope = @current_user.
       assignments_needing_submitting(
         include_ungraded: true,

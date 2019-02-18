@@ -40,6 +40,7 @@
   "dependencies": {
     "@instructure/ui-a11y": "^5",
     "@instructure/ui-alerts": "^5",
+    "@instructure/ui-babel-preset": "^5.41",
     "@instructure/ui-buttons": "^5",
     "@instructure/ui-elements": "^5",
     "@instructure/ui-forms": "^5",

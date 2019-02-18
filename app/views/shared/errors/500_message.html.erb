@@ -23,12 +23,16 @@
     end
   end
   exception ||= nil
+  (@body_classes ||= []) << 'full-width'
 %>
 <% content_for :page_title, t('title', 'Page Error') %>
 
-<div style="width: 400px; margin-left: auto; margin-right: auto; margin-top: 50px;">
+<div class="ic-Error-page">
+  <img class="ic-Error-img" role="presentation" alt="" aria-hidden="true" src="/images/500_pageerror.svg">
   <h2><%= t('headings.page', %{Page Error}) %></h2>
-  <p><%= t('description', %{Well, it looks like something broke unexpectedly.  Sorry you had to see that.  If you have a second, please let us know what you were doing when the error happened.}) %></p>
-  <a href="#" style="font-size: 1.2em;" class="icon-discussion submit_error_link discussion-topic"><%= t('#links.errors.feedback', %{Click here to tell us what happened}) %></a>
-  <%= render :partial => "shared/errors/error_form", :locals => {:error_category => '500'} %>
+  <p><%= t("Something broke unexpectedly.") %>
+  <br><%= t("If you have a moment, *click here to tell us what happened*.", :wrapper => '<a href="#" class="submit_error_link">\1</a>') %></p>
+  <div class="ic-Error-form">
+    <%= render :partial => "shared/errors/error_form", :locals => {:error_category => '500'} %>
+  </div>
 </div>

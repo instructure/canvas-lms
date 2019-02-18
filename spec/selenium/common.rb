@@ -20,6 +20,7 @@ require "nokogiri"
 require "selenium-webdriver"
 require "socket"
 require "timeout"
+require "sauce_whisk"
 require_relative 'test_setup/custom_selenium_rspec_matchers'
 require_relative 'test_setup/selenium_driver_setup'
 require_relative 'test_setup/selenium_extensions'
@@ -66,6 +67,7 @@ module SeleniumErrorRecovery
       puts "Error: got `#{exception}`, aborting"
       RSpec.world.wants_to_quit = true
     when EOFError, Errno::ECONNREFUSED, Net::ReadTimeout
+      return false if SeleniumDriverSetup.saucelabs_test_run?
       return false if RSpec.world.wants_to_quit
       return false unless exception.backtrace.grep(/selenium-webdriver/).present?
 
@@ -127,7 +129,7 @@ shared_context "in-process server selenium tests" do
     retry_count = 0
     begin
       default_url_options[:host] = app_host_and_port
-      close_modal_if_present { resize_screen_to_normal }
+      close_modal_if_present { resize_screen_to_normal } unless @driver.nil?
     rescue
       if maybe_recover_from_exception($ERROR_INFO) && (retry_count += 1) < 3
         retry
@@ -191,6 +193,13 @@ shared_context "in-process server selenium tests" do
     end
 
     if SeleniumDriverSetup.saucelabs_test_run?
+      job_id = driver.session_id
+      job = SauceWhisk::Jobs.fetch job_id
+      old_name = job.name
+      job.name = old_name.prepend(example.metadata[:full_description].to_s + " - ")
+      job.passed = example.exception.nil?
+      job.save
+
       driver.quit
       SeleniumDriverSetup.reset!
     end
@@ -198,6 +207,10 @@ shared_context "in-process server selenium tests" do
 
   # logs everything that showed up in the browser console during selenium tests
   after(:each) do |example|
+    # safari driver and edge driver do not support driver.manage.logs
+    # don't run for sauce labs smoke tests
+    next if SeleniumDriverSetup.saucelabs_test_run?
+
     if example.exception
       html = f('body').attribute('outerHTML')
       document = Nokogiri::HTML(html)
@@ -236,8 +249,8 @@ shared_context "in-process server selenium tests" do
 
       javascript_errors = browser_logs.select do |e|
         e.level == "SEVERE" &&
-        e.message.present? &&
-        browser_errors_we_dont_care_about.none? {|s| e.message.include?(s)}
+          e.message.present? &&
+          browser_errors_we_dont_care_about.none? {|s| e.message.include?(s)}
       end
 
       if javascript_errors.present?

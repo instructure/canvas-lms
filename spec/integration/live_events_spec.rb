@@ -55,7 +55,7 @@ describe LiveEvents do
         assignment_group
       end
 
-      it 'should trigger a live event on topic updated' do
+      it 'should trigger a live event on group updated' do
         expect(Canvas::LiveEvents).to receive(:assignment_group_updated).once
         assignment_group.update!(name: 'changed name')
       end

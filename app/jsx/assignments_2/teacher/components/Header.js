@@ -17,20 +17,41 @@
  */
 
 import React from 'react'
-import {func} from 'prop-types'
+import {bool, func} from 'prop-types'
 
 import I18n from 'i18n!assignments_2'
 
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import Text from '@instructure/ui-elements/lib/components/Text'
-import TruncateText from '@instructure/ui-elements/lib/components/TruncateText'
 import Grid, {GridRow, GridCol} from '@instructure/ui-layout/lib/components/Grid'
-import AssignmentIcon from '@instructure/ui-icons/lib/Line/IconAssignment'
+import View from '@instructure/ui-layout/lib/components/View'
 
 import {TeacherAssignmentShape} from '../assignmentData'
 import TeacherViewContext from './TeacherViewContext'
 import Toolbox from './Toolbox'
+import EditableHeading from './Editables/EditableHeading'
+import AssignmentModules from './Editables/AssignmentModules'
+import AssignmentType from './Editables/AssignmentType'
+import AssignmentGroup from './Editables/AssignmentGroup'
+
+// TODO: the assignment type and module selection need to be factored out into
+// their own components. too much logic to cram in here
+
+const confirmQuizType = I18n.t(
+  'Quizzes are not yet handled in the new assignments flow. Head to the legacy create quiz page?'
+)
+const confirmPeerReviewType = I18n.t(
+  'Peer reviewed assignments are not yet handled in the new assignments flow. Head to the legacy create assignment page?'
+)
+const confirmGroupType = I18n.t(
+  'Creating a group is not yet handled by the new assignments flow. Head to the legacy assignments page?'
+)
+
+function assignmentIsNew(assignment) {
+  return !assignment.lid
+}
+
+// TODO: if the Header is initially rendered with all items in edit mode
+// because we're creating a new assignment, then the logic for getting the
+// list of available modules and groups will not work
 
 export default class Header extends React.Component {
   static contextType = TeacherViewContext
@@ -38,45 +59,163 @@ export default class Header extends React.Component {
   static propTypes = {
     assignment: TeacherAssignmentShape.isRequired,
     onUnsubmittedClick: func,
-    onPublishChange: func
+    onPublishChange: func,
+    onDelete: func,
+    readOnly: bool
   }
 
   static defaultProps = {
     onUnsubmittedClick: () => {},
-    onPublishChange: () => {}
+    onPublishChange: () => {},
+    onDelete: () => {},
+    readOnly: true
   }
 
-  renderIcon() {
-    return <AssignmentIcon size="x-small" />
-  }
+  constructor(props) {
+    super(props)
 
-  renderType() {
-    return (
-      <Text transform="uppercase" size="x-small" letterSpacing="expanded">
-        {I18n.t('Assignment')}
-      </Text>
-    )
-  }
+    const isNewAssignment = assignmentIsNew(props.assignment)
+    const initialMode = !props.readOnly && isNewAssignment ? 'edit' : 'view'
+    this.state = {
+      assignmentTypeMode: initialMode,
+      selectedAssignmentType: isNewAssignment ? null : 'assignment',
 
-  renderModules() {
-    if (this.props.assignment.modules.length === 0) {
-      return <div />
+      moduleList: props.assignment.course.modulesConnection.nodes,
+      modulesMode: initialMode,
+      selectedModules: props.assignment.modules,
+
+      assignmentGroupList: props.assignment.assignmentGroup && [props.assignment.assignmentGroup],
+      assignmentGroupMode: initialMode,
+      selectedAssignmentGroupId:
+        props.assignment.assignmentGroup && props.assignment.assignmentGroup.lid,
+
+      nameMode: initialMode,
+      name: props.assignment.name
     }
-    return (
-      <Text>
-        <TruncateText>
-          {this.props.assignment.modules.map(module => module.name).join(' | ')}
-        </TruncateText>
-      </Text>
-    )
+
+    this.namePlaceholder = I18n.t('Assignment name')
   }
 
-  renderAssignmentGroup() {
-    return (
-      <Text>
-        <TruncateText>{this.props.assignment.assignmentGroup.name}</TruncateText>
-      </Text>
-    )
+  handleTypeModeChange = mode => {
+    this.setState({assignmentTypeMode: mode})
+  }
+
+  /* eslint-disable no-alert */
+  handleTypeChange = selectedType => {
+    switch (selectedType) {
+      case 'assignment':
+        break
+      case 'quiz':
+        if (window.confirm(confirmQuizType)) {
+          // Still undecided whether we'll even show the quiz option if quizzes.next is not enabled
+          if (ENV.QUIZ_LTI_ENABLED) {
+            window.location.assign(
+              `/courses/${this.props.assignment.course.lid}/assignments/new?quiz_lti`
+            )
+          } else {
+            createLegacyQuiz(this.props.assignment.course.lid)
+          }
+        }
+        break
+      case 'peer-review':
+        if (window.confirm(confirmPeerReviewType)) {
+          window.location.assign(`/courses/${this.props.assignment.course.lid}/assignments/new`)
+        }
+        break
+      case 'group':
+        if (window.confirm(confirmGroupType)) {
+          window.location.assign(`/courses/${this.props.assignment.course.lid}/assignments/new`)
+        }
+        break
+    }
+    // Awkward, but there's a delicate interaction between Header, AssignmentType,
+    // and SelectableText so that we have to update our state to reflect the new
+    // selectedType, even though it's an invalid value, then set it back
+    // to assignment.
+    // Without this, AssignmentType's props don't change, it won't rerender, so
+    // it doesn't rerender SelectableText which still holds the value the user selected.
+    // I was hoping there was a cleaner way of doing this, but I'm stumped.
+    this.setState({selectedAssignmentType: selectedType}, () => {
+      this.forceUpdate()
+      this.setState({
+        selectedAssignmentType: 'assignment' // can't change it yet
+      })
+    })
+
+    function createLegacyQuiz(course_id) {
+      let auth_token = document.cookie.split(/\s*;\s*/).find(c => c.indexOf('_csrf_token') === 0)
+      auth_token = auth_token.split('=')
+      auth_token = auth_token.length === 2 ? auth_token[1] : ''
+      auth_token = decodeURIComponent(auth_token.replace(/\+/g, ' '))
+      const form = document.createElement('form')
+      form.setAttribute('method', 'post')
+      form.setAttribute('action', `/courses/${course_id}/quizzes/new?fresh=1`)
+      const authinput = document.createElement('input')
+      authinput.setAttribute('type', 'hidden')
+      authinput.setAttribute('name', 'authenticity_token')
+      authinput.value = auth_token
+      form.appendChild(authinput)
+      document.body.appendChild(form)
+      form.submit()
+    }
+  }
+  /* eslint-enable no-alert */
+
+  handleModulesChange = selectedModules => {
+    this.setState({selectedModules})
+  }
+
+  handleModulesChangeMode = mode => {
+    this.setState((prevState, props) => {
+      let moduleList = prevState.moduleList
+      if (mode === 'edit') {
+        // TODO: probably shouldn't come from here
+        // or if it does, exhaust all the pages
+        moduleList = props.assignment.course.modulesConnection.nodes
+      }
+      return {
+        modulesMode: mode,
+        moduleList
+      }
+    })
+  }
+
+  // TODO: support +Module
+  // handleAddModule = (newModule, currentSelection) => {
+  //   // get the new module created
+  //   const newlyCreatedModule = {...newModule, lid: '9999'}
+  //   this.setState((prevState, _prevProps) => ({
+  //     selectedModules: currentSelection.concat([newlyCreatedModule]),
+  //     moduleList: prevState.moduleList.concat([newlyCreatedModule])
+  //   }))
+  // }
+
+  handleGroupChange = selectedAssignmentGroupId => {
+    this.setState({selectedAssignmentGroupId})
+  }
+
+  handleGroupChangeMode = mode => {
+    this.setState((prevState, props) => {
+      let assignmentGroupList = prevState.groupList
+      if (mode === 'edit') {
+        // TODO: exhaust all the pages, somehow
+        assignmentGroupList = props.assignment.course.assignmentGroupsConnection.nodes
+      } else {
+        assignmentGroupList = prevState.assignmentGroupList
+      }
+      return {
+        assignmentGroupList,
+        assignmentGroupMode: mode
+      }
+    })
+  }
+
+  handleNameChange = name => {
+    this.setState({name})
+  }
+
+  handleNameChangeMode = mode => {
+    this.setState({nameMode: mode})
   }
 
   render() {
@@ -84,18 +223,53 @@ export default class Header extends React.Component {
       <Grid startAt="large" colSpacing="large">
         <GridRow>
           <GridCol>
-            <Flex direction="column">
-              <FlexItem padding="small 0 medium">
-                {this.renderIcon()} {this.renderType()}
-              </FlexItem>
-              <FlexItem padding="xx-small 0 0">{this.renderModules()}</FlexItem>
-              <FlexItem padding="xx-small 0 0">{this.renderAssignmentGroup()}</FlexItem>
-              <FlexItem padding="medium 0 large">
-                <Heading as="div" level="h1">
-                  {this.props.assignment.name}
-                </Heading>
-              </FlexItem>
-            </Flex>
+            <View display="block" padding="small 0 medium xx-small">
+              <AssignmentType
+                mode={this.state.assignmentTypeMode}
+                selectedAssignmentType={this.state.selectedAssignmentType}
+                onChange={this.handleTypeChange}
+                onChangeMode={this.handleTypeModeChange}
+                readOnly={this.props.readOnly}
+              />
+            </View>
+            <View display="block" padding="xx-small 0 0 xx-small">
+              <AssignmentModules
+                mode={this.state.modulesMode}
+                assignment={this.props.assignment}
+                moduleList={this.state.moduleList}
+                selectedModules={this.state.selectedModules}
+                onChange={this.handleModulesChange}
+                onChangeMode={this.handleModulesChangeMode}
+                onAddModule={this.handleAddModule}
+                readOnly={this.props.readOnly}
+              />
+            </View>
+            <View display="block" padding="xx-small 0 0 xx-small">
+              <AssignmentGroup
+                mode={this.state.assignmentGroupMode}
+                assignmentGroupList={this.state.assignmentGroupList}
+                selectedAssignmentGroupId={this.state.selectedAssignmentGroupId}
+                onChange={this.handleGroupChange}
+                onChangeMode={this.handleGroupChangeMode}
+                onAddGroup={this.handleAddGroup}
+                readOnly={this.props.readOnly}
+              />
+            </View>
+            <View display="block" padding="medium xx-small large xx-small">
+              <EditableHeading
+                mode={this.state.nameMode}
+                viewAs="div"
+                level="h1"
+                value={this.state.name}
+                onChange={this.handleNameChange}
+                onChangeMode={this.handleNameChangeMode}
+                placeholder={this.namePlaceholder}
+                label={I18n.t('Edit title')}
+                required
+                requiredMessage={I18n.t('Assignment name is required')}
+                readOnly={this.props.readOnly}
+              />
+            </View>
           </GridCol>
           <GridCol width="auto" textAlign="end">
             <Toolbox {...this.props} />

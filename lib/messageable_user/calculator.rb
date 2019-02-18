@@ -472,7 +472,7 @@ class MessageableUser
 
       group.shard.activate do
         if options[:admin_context] || fully_visible_group_ids.include?(group.id)
-          group_user_scope.merge(active_users_in_group_context.except(:joins))
+          group_user_scope.where('group_memberships.group_id' => group.id).merge(active_users_in_group_context.except(:joins))
         elsif section_visible_group_ids.include?(group.id)
           # group.context is guaranteed to be a course from
           # section_visible_courses at this point

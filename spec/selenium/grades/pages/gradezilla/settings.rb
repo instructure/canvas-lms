@@ -23,7 +23,7 @@ module Gradezilla
 
     def self.tab(label:)
       # only works if not currently active
-      ff('[data-uid="Tab"][role="presentation"]').find do |el|
+      ff('[data-cid="Tab"][role="presentation"]').find do |el|
         el.text == label
       end
     end
@@ -34,6 +34,10 @@ module Gradezilla
 
     def self.click_late_policy_tab
       tab(label: 'Late Policies').click
+    end
+
+    def self.click_post_policy_tab
+      tab(label: 'Grade Posting Policy').click
     end
 
     def self.cancel_button
@@ -51,6 +55,82 @@ module Gradezilla
     def self.click_update_button
       update_button.click
       wait_for_ajaximations
+    end
+  end
+
+  module LatePolicies
+    extend SeleniumDependencies
+
+    def self.missing_policy_checkbox
+      fj('label:contains("Automatically apply grade for missing submissions")')
+    end
+
+    def self.missing_policy_percent_input
+      f('#missing-submission-grade')
+    end
+
+    def self.late_policy_checkbox
+      fj('label:contains("Automatically apply deduction to late submissions")')
+    end
+
+    def self.late_policy_deduction_input
+      f('#late-submission-deduction')
+    end
+
+    def self.late_policy_increment_combobox(increment)
+      click_option(f('#late-submission-interval'), increment)
+    end
+
+    def self.lowest_grade_percent_input
+      f('#late-submission-minimum-percent')
+    end
+
+    def self.select_late_policy_tab
+      late_policy_tab.click
+    end
+
+    def self.create_missing_policy(percent_per_assignment)
+      unless missing_policy_checkbox.attribute('checked')
+        missing_policy_checkbox.click
+      end
+      set_value(missing_policy_percent_input, percent_per_assignment)
+    end
+
+    def self.disable_missing_policy
+      if missing_policy_checkbox.attribute('checked')
+        missing_policy_checkbox.click
+      end
+    end
+
+    def self.disable_late_policy
+      if late_policy_checkbox.attribute('checked')
+        late_policy_checkbox.click
+      end
+    end
+
+    def self.create_late_policy(percentage, time_increment, lowest_percentage = nil)
+      late_policy_checkbox.click
+      set_value(late_policy_deduction_input, percentage)
+      late_policy_increment_combobox(time_increment)
+      if lowest_percentage
+        set_value(lowest_grade_percent_input, lowest_percentage)
+      end
+    end
+  end
+
+  module Advanced
+    extend SeleniumDependencies
+
+    def self.select_grade_override_checkbox
+      fj('label:contains("Allow final grade override")').click
+    end
+  end
+
+  module PostingPolicies
+    extend SeleniumDependencies
+
+    def select_automatically
+      # TODO: create locator for radio button, select auto here
     end
   end
 end

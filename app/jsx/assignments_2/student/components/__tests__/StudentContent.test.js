@@ -35,40 +35,62 @@ afterEach(() => {
   ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
 })
 
-it('renders the student header if the assignment is unlocked', () => {
-  const assignment = mockAssignment({lockInfo: {isLocked: false}})
-  ReactDOM.render(<StudentContent assignment={assignment} />, document.getElementById('fixtures'))
-  const element = $('[data-test-id="assignments-2-student-header"]')
-  expect(element).toHaveLength(1)
-})
+describe('Assignment Student Content View', () => {
+  it('renders the student header if the assignment is unlocked', () => {
+    const assignment = mockAssignment({lockInfo: {isLocked: false}})
+    ReactDOM.render(<StudentContent assignment={assignment} />, document.getElementById('fixtures'))
+    const element = $('[data-test-id="assignments-2-student-header"]')
+    expect(element).toHaveLength(1)
+  })
 
-it('renders the student header if the assignment is locked', () => {
-  const assignment = mockAssignment({lockInfo: {isLocked: true}})
-  ReactDOM.render(<StudentContent assignment={assignment} />, document.getElementById('fixtures'))
-  const element = $('[data-test-id="assignments-2-student-header"]')
-  expect(element).toHaveLength(1)
-})
+  it('renders the student header if the assignment is locked', () => {
+    const assignment = mockAssignment({lockInfo: {isLocked: true}})
+    ReactDOM.render(<StudentContent assignment={assignment} />, document.getElementById('fixtures'))
+    const element = $('[data-test-id="assignments-2-student-header"]')
+    expect(element).toHaveLength(1)
+  })
 
-it('renders the assignment details and student content tab if the assignment is unlocked', () => {
-  const assignment = mockAssignment({lockInfo: {isLocked: false}})
-  ReactDOM.render(<StudentContent assignment={assignment} />, document.getElementById('fixtures'))
+  it('renders the assignment details and student content tab if the assignment is unlocked', () => {
+    const assignment = mockAssignment({lockInfo: {isLocked: false}})
+    ReactDOM.render(<StudentContent assignment={assignment} />, document.getElementById('fixtures'))
 
-  const contentTabs = $('[data-test-id="assignment-2-student-content-tabs"]')
-  const toggleDetails = $('.a2-toggle-details-container')
-  const root = $('#fixtures')
-  expect(toggleDetails).toHaveLength(1)
-  expect(contentTabs).toHaveLength(1)
-  expect(root.text()).not.toMatch('Availability Dates')
-})
+    const contentTabs = $('[data-test-id="assignment-2-student-content-tabs"]')
+    const toggleDetails = $('.a2-toggle-details-container')
+    const root = $('#fixtures')
+    expect(toggleDetails).toHaveLength(1)
+    expect(contentTabs).toHaveLength(1)
+    expect(root.text()).not.toMatch('Availability Dates')
+  })
 
-it('renders the availability dates if the assignment is locked', () => {
-  const assignment = mockAssignment({lockInfo: {isLocked: true}})
-  ReactDOM.render(<StudentContent assignment={assignment} />, document.getElementById('fixtures'))
+  it('renders the availability dates if the assignment is locked', () => {
+    const assignment = mockAssignment({lockInfo: {isLocked: true}})
+    ReactDOM.render(<StudentContent assignment={assignment} />, document.getElementById('fixtures'))
 
-  const contentTabs = $('[data-test-id="assignment-2-student-content-tabs"]')
-  const toggleDetails = $('.a2-toggle-details-container')
-  const root = $('#fixtures')
-  expect(toggleDetails).toHaveLength(0)
-  expect(contentTabs).toHaveLength(0)
-  expect(root.text()).toMatch('Availability Dates')
+    const contentTabs = $('[data-test-id="assignment-2-student-content-tabs"]')
+    const toggleDetails = $('.a2-toggle-details-container')
+    const root = $('#fixtures')
+    expect(toggleDetails).toHaveLength(0)
+    expect(contentTabs).toHaveLength(0)
+    expect(root.text()).toMatch('Availability Dates')
+  })
+
+  it('renders spinner while lazy loading comments', () => {
+    const assignment = mockAssignment({lockInfo: {isLocked: false}})
+    ReactDOM.render(<StudentContent assignment={assignment} />, document.getElementById('fixtures'))
+    $('[data-test-id="assignment-2-student-content-tabs"] div:contains("Comments")')[0].click()
+    const container = $('[data-test-id="loading-indicator"]')
+    expect(container).toHaveLength(1)
+  })
+
+  it('renders Comments', done => {
+    const assignment = mockAssignment({lockInfo: {isLocked: false}})
+    ReactDOM.render(<StudentContent assignment={assignment} />, document.getElementById('fixtures'))
+    $('[data-test-id="assignment-2-student-content-tabs"] div:contains("Comments")')[0].click()
+    // We just need to kick an event loop to ensure the js actually is loaded.
+    setTimeout(() => {
+      const container = $('[data-test-id="comments-container"]')
+      expect(container).toHaveLength(1)
+      done()
+    }, 0)
+  })
 })

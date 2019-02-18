@@ -56,6 +56,7 @@ define [
   'jsx/gradezilla/default_gradebook/constants/studentRowHeaderConstants'
   'jsx/gradezilla/default_gradebook/GradebookGrid/editors/AssignmentCellEditor/AssignmentRowCellPropFactory'
   'jsx/gradezilla/default_gradebook/GradebookGrid/editors/TotalGradeOverrideCellEditor/TotalGradeOverrideCellPropFactory'
+  'jsx/gradezilla/default_gradebook/PostPolicies'
   'jsx/gradezilla/default_gradebook/components/GradebookMenu'
   'jsx/gradezilla/default_gradebook/components/ViewOptionsMenu'
   'jsx/gradezilla/default_gradebook/components/ActionMenu'
@@ -104,7 +105,7 @@ define [
   GradeDisplayWarningDialog, PostGradesFrameDialog, NumberCompare, natcompare, ConvertCase, htmlEscape,
   EnterGradesAsSetting, SetDefaultGradeDialogManager, CurveGradesDialogManager, GradebookApi, SubmissionCommentApi,
   FinalGradeOverrides, GradebookGrid, studentRowHeaderConstants, AssignmentRowCellPropFactory, TotalGradeOverrideCellPropFactory,
-  GradebookMenu, ViewOptionsMenu, ActionMenu,
+  PostPolicies, GradebookMenu, ViewOptionsMenu, ActionMenu,
   AssignmentGroupFilter, GradingPeriodFilter, ModuleFilter, SectionFilter, GridColor, StatusesModal, SubmissionTray,
   GradebookSettingsModal, AnonymousSpeedGraderAlert, { statusColors }, StudentDatastore, PostGradesStore, PostGradesApp,
   SubmissionStateMap, DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager, GradebookKeyboardNav,
@@ -280,6 +281,11 @@ define [
       })
 
       @finalGradeOverrides = new FinalGradeOverrides(@)
+
+      if @options.post_policies_enabled
+        @postPolicies = new PostPolicies(@)
+      else
+        @postPolicies = null
 
       $.subscribe 'assignment_muting_toggled',        @handleAssignmentMutingChange
       $.subscribe 'submissions_updated',              @updateSubmissionsFromExternal
@@ -459,6 +465,8 @@ define [
         @setSubmissionsLoaded(true)
         @updateColumnHeaders()
         @renderFilters()
+
+      @postPolicies?.initialize()
 
       @gridReady.then () =>
         @renderViewOptionsMenu()
@@ -2942,3 +2950,4 @@ define [
       $(window).unbind('resize.fillWindowWithMe')
       $(document).unbind('gridready')
       @gradebookGrid.destroy()
+      @postPolicies?.destroy()

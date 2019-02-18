@@ -1,0 +1,120 @@
+/*
+ * Copyright (C) 2019 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import React from 'react'
+import {render} from 'react-testing-library'
+import SelectableText from '../SelectableText'
+
+const options = [
+  {label: 'Pancho Sanchez', value: 'pancho'},
+  {label: 'Mongo Santamaria', value: 'mongo'},
+  {label: 'Giovanni Hidalgo', value: 'giovanni'}
+]
+
+describe('SelectableText, single', () => {
+  it('renders the value in view mode', () => {
+    const renderView = selection => <div>{selection.label}</div>
+    const {getByText} = render(
+      <SelectableText
+        mode="view"
+        onChange={() => {}}
+        onChangeMode={() => {}}
+        renderView={renderView}
+        label="Pick one"
+        value={options[1]}
+        options={options}
+      />
+    )
+
+    expect(getByText('Mongo Santamaria')).toBeInTheDocument()
+  })
+
+  it('renders the value in edit mode', () => {
+    const renderView = jest.fn()
+    const {getByDisplayValue} = render(
+      <SelectableText
+        mode="edit"
+        onChange={() => {}}
+        onChangeMode={() => {}}
+        renderView={renderView}
+        label="Pick one"
+        value={options[1]}
+        options={options}
+      />
+    )
+    // Depends on the implementation of SelectMultiple, but
+    // getByText doesn't return anything when the text is in
+    // the DOM via the value of an input
+    expect(getByDisplayValue('Mongo Santamaria')).toBeInTheDocument()
+    expect(renderView).not.toHaveBeenCalled()
+  })
+
+  it('does not render edit button when readOnly', () => {
+    const {queryByText} = render(
+      <SelectableText
+        mode="view"
+        onChange={() => {}}
+        onChangeMode={() => {}}
+        renderView={() => {}}
+        label="Pick one"
+        value={options[1]}
+        options={options}
+        readOnly
+      />
+    )
+    expect(queryByText('Pick one')).toBeNull()
+  })
+})
+
+describe('SelectableText, multiple', () => {
+  it('renders the value in view mode', () => {
+    const renderView = selections => <span>{selections.map(s => s.label).join('|')}</span>
+
+    const {getByText} = render(
+      <SelectableText
+        mode="view"
+        onChange={() => {}}
+        onChangeMode={() => {}}
+        renderView={renderView}
+        label="Pick one"
+        value={[options[1], options[0]]}
+        options={options}
+        multiple
+      />
+    )
+    expect(getByText('Mongo Santamaria|Pancho Sanchez')).toBeInTheDocument()
+  })
+
+  it('renders the value in edit mode', () => {
+    const {getByText, queryByText} = render(
+      <SelectableText
+        mode="edit"
+        onChange={() => {}}
+        onChangeMode={() => {}}
+        renderView={() => {}}
+        label="Pick one"
+        value={[options[1], options[2]]}
+        options={options}
+        multiple
+      />
+    )
+    expect(getByText('Mongo Santamaria')).toBeInTheDocument()
+    expect(getByText('Giovanni Hidalgo')).toBeInTheDocument()
+    expect(queryByText('Pancho Sanchez')).toBeNull()
+  })
+})

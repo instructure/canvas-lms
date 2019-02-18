@@ -31,7 +31,7 @@ import I18n from 'i18n!speed_grader'
 
 import DateEventGroup from './DateEventGroup'
 import * as propTypes from './propTypes'
-import {roleLabelFor} from '../../AuditTrailHelpers'
+import {roleLabelFor, creatorNameFor} from '../../AuditTrailHelpers'
 
 const themeOverride = {
   [View.theme]: {
@@ -39,29 +39,31 @@ const themeOverride = {
   }
 }
 
-export default class UserEventGroup extends PureComponent {
+export default class CreatorEventGroup extends PureComponent {
   static propTypes = {
-    userEventGroup: propTypes.userEventGroup.isRequired
+    creatorEventGroup: propTypes.creatorEventGroup.isRequired
   }
 
   render() {
-    const {anonymousOnly, dateEventGroups, user} = this.props.userEventGroup
-    const userName = user.name || I18n.t('Unknown User')
-    const roleLabel = roleLabelFor(user)
-    const message = !anonymousOnly && I18n.t('This user performed actions while anonymous was off')
+    const {anonymousOnly, dateEventGroups, creator} = this.props.creatorEventGroup
+    const creatorName = creatorNameFor(creator)
+    const roleLabel = roleLabelFor(creator)
+    const message =
+      !anonymousOnly &&
+      I18n.t('%{creatorName} performed actions while anonymous was off', {creatorName})
 
     return (
       <View as="div">
         <ApplyTheme theme={themeOverride}>
           <ToggleDetails
             border={false}
-            id={`user-event-group-${user.id}`}
+            id={`creator-event-group-${creator.key}`}
             summary={
               <Flex as="div" direction="row">
                 <FlexItem grow size="0" padding="none xx-small none none">
                   <Text as="h3">
                     <TruncateText maxLines={1}>
-                      <Text weight="bold">{userName}</Text> ({roleLabel})
+                      <Text weight="bold">{creatorName}</Text> ({roleLabel})
                     </TruncateText>
                   </Text>
                 </FlexItem>
@@ -83,7 +85,7 @@ export default class UserEventGroup extends PureComponent {
                 )}
               </Flex>
             }
-            toggleLabel={I18n.t('Assessment audit events for %{userName}', {userName})}
+            toggleLabel={I18n.t('Assessment audit events for %{creatorName}', {creatorName})}
           >
             <div>
               {dateEventGroups.map(dateEventGroup => (

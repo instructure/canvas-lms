@@ -1478,6 +1478,15 @@ en:
             start:
               parameters:
                 header: 'Activity Date:'
+      faculty_missing_grades:
+        parameters:
+          custom_reports:
+            start:
+              parameters:
+                header: 'Start at:'
+            end:
+              parameters:
+                header: 'End at:'
       no_submissions:
         parameters:
           custom_reports:
@@ -1516,6 +1525,15 @@ en:
             start:
               parameters:
                 header: 'Activity Date:'
+      faculty_missing_grades:
+        parameters:
+          custom_reports:
+            start:
+              parameters:
+                header: 'Start at:'
+            end:
+              parameters:
+                header: 'End at:'
       no_submissions:
         parameters:
           custom_reports:
@@ -1654,7 +1672,6 @@ en:
   links:
     dashboard: My Dashboard
     errors:
-      4xx_feedback: Click here to tell us what you were looking for.
       feedback: Click here to tell us what happened
   application:
     notices:
@@ -3718,10 +3735,6 @@ en:
         canvas_user_id: Canvas User ID
       section:
         remove_user_from_course_section: Remove user from %{name}
-    section:
-      enrollment:
-        links:
-          unenroll_user: Remove User from Course
   invalid_restrictions_316cd740: Invalid restrictions
   there_was_an_error_saving_the_changes_to_the_cours_ed2b1d24: There was an error
     saving the changes to the course
@@ -9374,26 +9387,17 @@ en:
         title: Page Error
         headings:
           page: Page Error
-        description: Huh. Looks like there was a problem loading the page you requested.
         error: 'Error:'
       403_message:
-        title: Page Error
-        headings:
-          page: Page Error
-        description: Huh. It doesn't look like you're supposed to be here.
         error: 'Error:'
       404_message:
         title: Page Not Found
         headings:
           page: Page Not Found
-        generic_description: Oops, we couldn't find that page.
       500_message:
         title: Page Error
         headings:
           page: Page Error
-        description: Well, it looks like something broke unexpectedly. Sorry you had
-          to see that. If you have a second, please let us know what you were doing
-          when the error happened.
       AUT_message:
         title: Session Timeout
         headings:
@@ -9427,16 +9431,9 @@ en:
       headings:
         needs_cookies: Cookies Required
         unpublished: Not Yet Available
-        unauthorized_action: Unauthorized
-      needs_cookies: Cookies are not enabled on your browser. Please adjust this in
-        your security preferences before continuing.
       needs_login: Access to this page is limited to authorized users. You do not
         currently have permission to view this page.
       public_course: This page is part of the content for the course, **%{course}**.
-      unauthorized_1: It appears that you don't have permission to access this page.
-        Please make sure you're authorized to view this content.
-      unauthorized_2: If you think you should be able to view this page, please use
-        the "Help" link to notify support of the problem.
     unauthorized_feed:
       title: Invalid Feed
       bad_params: The parameters for the feed you were trying to access are invalid.
@@ -12286,16 +12283,16 @@ en:
   restrict_students_from_annotating_6c28ab9b: Restrict Students from Annotating
   prevents_students_from_leaving_annotations_in_assi_cb188d2: Prevents students from
     leaving annotations in assignments. Does not apply to peer-reviewed assignments.
+  post_policies_22f09fea: Post Policies
+  allows_teachers_to_specify_post_policies_for_this__a3ef829d: |-
+    Allows teachers to specify post policies for this course or specific assignments, enabling grades to be
+    posted and hidden manually.
   anonymous_moderated_marking_801bbb65: Anonymous Moderated Marking
   anonymous_moderated_marking_allows_teachers_to_sel_af80885d: Anonymous Moderated
     Marking allows teachers to select moderators to anonymously grade assignments.
     After which a moderator can select or supply a custom grade.
   anonymous_grading_ccb5045c: Anonymous Grading
   enable_anonymous_grading_of_assignments_e18f75be: Enable anonymous grading of assignments.
-  anonymous_moderated_marking_audit_trail_e48abbac: Anonymous Moderated Marking Audit
-    Trail
-  allows_assessors_to_view_the_assessment_audit_tray_84c0c4c2: Allows assessors to
-    view the assessment audit tray in SpeedGrader for anonymous or moderated assignments.
   enable_moderated_grading_bacd20d8: Enable moderated grading.
   quiz_log_auditing_desc: |-
     Enable the tracking of events for a quiz submission, and the ability
@@ -12785,7 +12782,6 @@ en:
     embed_external: Embed External Image
     embed_image: Embed Image
     image_not_found: Image not found, please try a new URL
-    embed_from_external_tool: '"Embed content from External Tool"'
     more_external_tools: More External Tools
     done_as_in_finished: Done
     done:
@@ -12804,6 +12800,7 @@ en:
     cannot_render_equation: This equation cannot be rendered in Basic View.
     titles:
       insert_edit_image: Insert / Edit Image
+    embed_from_external_tool: Embed content from External Tool
     screen_reader_tip: 'Screen reader users: The most accessible way to use this editor
       is to switch to the advanced view, and then either enter LaTeX directly, or
       use the toolbar to assist you in doing so. The link to switch to the advanced
@@ -14002,9 +13999,19 @@ en:
     Canvas Theme! Apply or cancel changes from within the *Theme Editor*.
   note_sub_account_themes_are_not_active_during_this_a5dd9da: 'Note: sub-account themes
     are not active during this preview.'
+  something_broke_unexpectedly_6d3720ee: Something broke unexpectedly.
+  if_you_have_a_moment_click_here_to_tell_us_what_ha_d8b578d5: If you have a moment,
+    *click here to tell us what happened*.
+  access_denied_f922a9ff: Access Denied
+  you_don_t_have_permission_to_access_this_resource_447d3a5e: You don't have permission
+    to access this resource.
   either_you_re_a_new_user_or_the_terms_of_use_have__2bbebdef: Either you're a new
     user or the *terms of use* have changed since you last agreed to them. Please
     agree to the *terms of use* before you continue.
+  please_adjust_your_security_preferences_before_con_fd568e8d: Please adjust your
+    security preferences before continuing.
+  you_don_t_have_access_to_view_this_resource_8378e0e8: You don't have access to view
+    this resource.
   sub_accounts:
     sub_accounts:
       show_sub_accounts: Show Sub-Accounts
@@ -17039,10 +17046,23 @@ en:
   to_1126ab55: " to"
   available_until_3278ebe9: Available until
   available_after_3416802b: Available after
+  missing_1a256b3b: Missing
+  late_2be42b88: Late
   more_modules_d9a9f003: More Modules
   attempt_current_attempt_ef626179: Attempt %{current_attempt}
   attempt_current_attempt_of_max_attempts_427ed508: Attempt %{current_attempt} of
     %{max_attempts}
+  at_791460b3: at
+  comment_input_box_b8c7e58b: Comment input box
+  attach_a_file_86a4fc00: Attach a File
+  record_video_70dc8439: Record Video
+  record_audio_14666880: Record Audio
+  send_comment_4e05f2fb: Send Comment
+  send_a_comment_to_your_instructor_about_this_assig_83fd5960: Send a comment to your
+    instructor about this assignment.
+  upload_8b403d05: Upload
+  comments_e07bcbe3: Comments
+  rubric_fc39da76: Rubric
   due_5d7267be: 'Due:'
   ungraded_out_of_pointspossible_2d6d81da: ungraded out of %{pointsPossible}
   ungraded_147a0dce: ungraded
@@ -17069,14 +17089,45 @@ en:
   prerequisite_completion_period_c562d63: Prerequisite Completion Period
   go_to_prerequisite_175c1f3f: Go to Prerequisite
   uploaded_285a2bfb: Uploaded
-  upload_8b403d05: Upload
   unavailable_46d2c344: Unavailable
-  missing_1a256b3b: Missing
-  late_2be42b88: Late
+  settings_5aa0fd0c: Settings
+  no_assignment_group_assigned_8f1cdb9b: No Assignment Group Assigned
+  no_module_assigned_ca183bd7: No Module Assigned
+  modules_b8f6aa9: modules
+  assignment_type_60255aac: Assignment Type
+  peer_review_assignment_7d314c59: Peer Review Assignment
+  group_assignment_7060989f: Group Assignment
+  quizzes_are_not_yet_handled_in_the_new_assignments_3898536a: Quizzes are not yet
+    handled in the new assignments flow. Head to the legacy create quiz page?
+  peer_reviewed_assignments_are_not_yet_handled_in_t_5eef60fb: Peer reviewed assignments
+    are not yet handled in the new assignments flow. Head to the legacy create assignment
+    page?
+  creating_a_group_is_not_yet_handled_by_the_new_ass_3360471d: Creating a group is
+    not yet handled by the new assignments flow. Head to the legacy assignments page?
+  assignment_name_12eadcbd: Assignment name
+  edit_title_4f508e10: Edit title
+  assignment_name_is_required_9d17311b: Assignment name is required
   message_students_who_57f07a41: Message Students Who
+  add_override_da70f198: Add Override
   everyone_else_cc5f6888: Everyone else
   everyone_854554dd: Everyone
   expand_2f2fadbd: Expand
+  assign_to_6b806cd9: 'Assign to:'
+  attempts_allowed_8441aadf: Attempts Allowed
+  limited_322546c5: Limited
+  unlimited_ff19e96d: Unlimited
+  attempts_22baad:
+    one: Attempt
+    other: Attempts
+  score_to_keep_e89e4fa5: Score to keep
+  average_score_15cd7c3c: Average Score
+  most_recent_b2797d2: Most Recent
+  count_attempts_d23c69a0:
+    one: 1 Attempt
+    other: "%{count} Attempts"
+  unlimited_attempts_81a37d4: Unlimited Attempts
+  available_2ed9f226: 'Available:'
+  until_fccd159a: 'Until:'
   no_submission_fb131a40: No Submission
   o365_template_297a82f6: O365 Template
   file_c851020d: File
@@ -17086,13 +17137,26 @@ en:
   media_af190855: Media
   student_choice_b7f46223: Student Choice
   other_1c6d9c79: Other
-  count_attempts_d23c69a0:
-    one: 1 Attempt
-    other: "%{count} Attempts"
+  add_submission_type_8690db4b: Add submission type
+  submission_requirement_8ba1ee08: Submission Requirement
+  student_can_choose_only_one_submission_type_36769093: Student can choose only one
+    submission type
+  student_can_choose_any_combination_of_submission_t_1273b6e8: Student can choose
+    any combination of submission types
+  student_is_required_to_do_all_submission_types_c594d40b: Student is required to
+    do all submission types
+  submission_type_a925fc5f: Submission Type
   due_639f281d: 'Due: '
   available_d3bb0b5c: 'Available '
+  delete_this_submission_type_37a0809c: Delete this submission type
+  confirm_delete_a5239715: confirm delete
+  close_17f50799: close
+  deleting_assignment_22d5851d: deleting assignment
+  delete_assignment_5d3f3f15: delete assignment
   number_to_grade_661b05dd: "%{number} to grade"
   number_unsubmitted_145fefae: "%{number} unsubmitted"
+  edit_points_3a339cd8: Edit Points
+  points_must_be_0_c278c612: Points must be >= 0
   add_an_identity_provider_to_this_account_c2644478: 'Add an identity provider to
     this account:'
   no_attributes_locked_611c5cc: no attributes locked
@@ -17235,9 +17299,7 @@ en:
   question_bank_f6c44d62: Question Bank
   outcome_da397d20: Outcome
   outcome_group_39fae76f: Outcome Group
-  rubric_fc39da76: Rubric
   folder_705fd2d7: Folder
-  settings_5aa0fd0c: Settings
   discussions_a5f96392: Discussions
   created_58b8a75a: Created
   updated_2c1e8615: Updated
@@ -17745,6 +17807,7 @@ en:
   loading_discussions_8ed5fcd7: Loading Discussions
   discussion_filter_5d68de61: Discussion Filter
   search_discussion_by_title_30466604: Search discussion by title
+  search_by_title_or_author_273a8f49: Search by title or author...
   add_discussion_653dab4c: Add discussion
   add_new_set_of_due_dates_e8e240f: Add new set of due dates
   add_8523c19b: Add
@@ -18117,6 +18180,7 @@ en:
   unposted_8d9932ec: Unposted
   curve_grades_b7a75443: Curve Grades
   set_default_grade_a202ebc1: Set Default Grade
+  post_grades_3e692d46: Post grades
   enter_grades_as_e113e606: Enter Grades as
   grading_scheme_f151d195: Grading Scheme
   re_upload_submissions_125e415d: Re-Upload Submissions
@@ -18210,7 +18274,6 @@ en:
   this_student_s_enrollment_has_been_concluded_f135b8e4: This student's enrollment
     has been concluded
   not_calculated_in_final_grade_2b7d5bd1: Not calculated in final grade
-  comments_e07bcbe3: Comments
   loading_comments_32366acf: Loading comments
   submission_tray_429ac3df: Submission tray
   close_submission_tray_c4988fa8: Close submission tray
@@ -18343,6 +18406,7 @@ en:
   successfully_created_a_set_38374719: Successfully created a set
   there_was_a_problem_submitting_your_set_27ca2ed0: There was a problem submitting
     your set
+  post_grades_tray_83f2fb2e: Post grades tray
   search_grading_periods_e947a3e9: Search grading periods...
   missing_d59852a7: missing
   late_8bd684b6: late
@@ -19994,7 +20058,12 @@ en:
   administrator_f325c186: Administrator
   final_grader_1693103c: Final Grader
   unknown_role_cbe9a089: Unknown Role
+  name_quiz_15f55961: "%{name} (Quiz)"
+  name_lti_tool_b61eb0af: "%{name} (LTI Tool)"
+  name_user_e44eebed: "%{name} User"
   unknown_user_1113fcaa: Unknown User
+  unknown_external_tool_c918e9b2: Unknown External Tool
+  unknown_quiz_3892d071: Unknown Quiz
   assessment_audit_d4a76709: Assessment audit
   anonymous_on_c5fa120d: Anonymous On
   partially_anonymous_483a892d: Partially Anonymous
@@ -20005,11 +20074,11 @@ en:
   posted_to_student_861beec9: Posted to student
   action_was_not_anonymous_b5262db1: Action was not anonymous
   anonymous_was_turned_off_300d25ec: Anonymous was turned off
-  monthandday_starting_at_time_769b12c8: "%{monthAndDay} starting at %{time}"
-  this_user_performed_actions_while_anonymous_was_of_2f3c1de1: This user performed
-    actions while anonymous was off
+  creatorname_performed_actions_while_anonymous_was__c2124eca: "%{creatorName} performed
+    actions while anonymous was off"
   toggle_tooltip_d3b7cb86: Toggle tooltip
-  assessment_audit_events_for_username_eb2144ad: Assessment audit events for %{userName}
+  assessment_audit_events_for_creatorname_56e84e8: Assessment audit events for %{creatorName}
+  monthandday_starting_at_time_769b12c8: "%{monthAndDay} starting at %{time}"
   assessment_audit_tray_5dd11721: Assessment audit tray
   loading_assessment_audit_trail_5cf4c10: Loading assessment audit trail
   out_of_pointspossible_c163105a: out of %{pointsPossible}
@@ -20539,6 +20608,7 @@ en:
   re_activate_user_f7d77c9a: Re-activate User
   deactivate_user_86c09036: Deactivate User
   you_cannot_remove_this_enrollment_c87be1cb: You cannot remove this enrollment.
+  remove_user_from_section_5556f465: Remove User from Section
   id_id_4e148481: 'ID: %{id}'
   key_api_key_68bf80ae: 'Key: *%{api_key}*'
   created_6ee36dff: 'Created:'

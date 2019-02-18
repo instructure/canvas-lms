@@ -11827,7 +11827,7 @@ mi:
           dates: "ngā Rā "
           details: "Taipitopito Wāhui"
           link_text: "Tirohia te wāhui"
-          message: "Ngā wāhui mo %{appointment_name}.kua whakakore katoa"
+          message: "Ngā wāhui mo %{appointment_name}kua whakakore katoa."
           no_reason_given: "kahore i homai"
           subject: |-
               Ngā Wāhui mō %{appointment_name} kua whakakorea
@@ -12682,11 +12682,11 @@ mi:
         subject: "Matohi Canvas - tāpaetanga mutunga Rōpū: %{group_name}, %{assignment_name}"
     group_membership_accepted: 
       email: 
-        account_group: "Tō tono ki te uru ki te rōpū %{group_name} mo te pūkete %{account_name}.kua whakāetia"
+        account_group: "Tō tono ki te uru ki te rōpū %{group_name} mo te pūkete %{account_name} kua whakāetia."
         course_group: "Tō tono ki te uru ki te rōpū %{group_name} mo te akoranga %{course_name} kua manakohia."
         group_request_accepted: "Tono Rōpū whakāe: %{group_name}"
         html: 
-          account_group: "To tono ki te uru ki te rōpū %{group_name} mo te pūkete %{account_name}.kua whakāetia"
+          account_group: "To tono ki te uru ki te rōpū %{group_name} mo te pūkete %{account_name} kua whakāetia."
           course_group: "Tō tono ki te uru ki te rōpū %{group_name} mo te akoranga %{course_name} kua manakohia."
           group_request_accepted: "Tono Rōpū whakāe: %{group_name}"
           link: "Pāwhiritia ki te tirohia i roto i te rōpū"
@@ -12695,11 +12695,11 @@ mi:
           click_below: "Ka taea e te tirotiro e koe i roto i te rōpū mā te pāwhiri i te hono i raro"
         subject: "Rōpū Mema whakāetia : %{group_name}"
       sms: 
-        account_group: "To tono ki te uru ki te rōpū %{group_name} mo te pūkete %{account_name}.kua whakāetia"
+        account_group: "To tono ki te uru ki te rōpū %{group_name} mo te pūkete %{account_name} kua whakāetia."
         course_group: "Tō tono ki te uru ki te rōpū %{group_name} mo te akoranga %{course_name} kua manakohia."
         more_info: "Ētahi atu mōhiohio i %{web_address}"
       summary: 
-        account_group: "To tono ki te uru ki te rōpū %{group_name} mo te pūkete %{account_name}.kua whakāetia"
+        account_group: "To tono ki te uru ki te rōpū %{group_name} mo te pūkete %{account_name} kua whakāetia."
         course_group: "Tō tono ki te uru ki te rōpū %{group_name} mo te akoranga %{course_name} kua manakohia."
         subject: "Rōpū Mema whakāetia : %{group_name}"
       twitter: 
@@ -13345,18 +13345,18 @@ mi:
         tweet: "Matohi Canvas - Pōwhiri ki te haere %{title}, %{name}"
     web_conference_recording_ready: 
       email: 
-        body: "Ko te tāhopu o te %{title} mo %{name}.kua reri"
+        body: "Ko te tāhopu o te %{title} mo %{name} kua reri."
         details_link: "Ka taea e koe te kite ngā taipitopito i konei: %{link}"
         html: 
-          body: "Ko te tāhopu o te %{title} mo %{name}.kua reri"
+          body: "Ko te tāhopu o te %{title} mo %{name} kua reri."
           details_link: "Pāwhiri ki konei kia kite i nga kōrero"
           subject: "Tukutuku Huinga Hopu Reri: %{name}"
         subject: "Tukutuku Huinga Hopu Reri: %{name}"
       sms: 
-        body: "Ko te tāhopu o te %{title} mo %{name}.kua reri"
+        body: "Ko te tāhopu o te %{title} mo %{name} kua reri."
         link_message: "Ētahi atu mōhiohio i %{url}"
       summary: 
-        body: "Ko te tāhopu o te %{title} mo %{name}.kua reri"
+        body: "Ko te tāhopu o te %{title} mo %{name} kua reri."
         subject: "Tukutuku Huinga Hopu Reri: %{name}"
       twitter: 
         tweet: "Matohi Canvas -tāhopu reri %{title}, %{name}"
@@ -13453,7 +13453,7 @@ mi:
   module_item_has_been_viewed_and_is_complete_6d180117: "Kua arotakengia te tūemi Kōwae me te oti"
   module_item_is_locked_19fa60b4: "Kei ite raka te kōwae tūemi"
   module_item_marked_as_done_and_is_complete_ad240246: "tūemi Kōwaekua tohua rite me te oti"
-  module_item_module_item_name_was_successfully_dele_8626d846: "Te tūemi Kōwae %{module_item_name}.i momoho te muku"
+  module_item_module_item_name_was_successfully_dele_8626d846: "Te tūemi Kōwae %{module_item_name} i momoho te muku."
   module_item_submitted_and_is_complete_d61a909f: "tūemi kōwae kua tukua me te oti"
   module_item_types: 
     assignment: Taumahi
@@ -14952,7 +14952,7 @@ mi:
         nothing: "Meatia Kahore"
         post: "Tuku ki he URL"
     errors: 
-      plugin_doesnt_exist: "Te mono %{id}.kaor ei te tiarari"
+      plugin_doesnt_exist: "Te mono %{id} kaor ei te tiarari."
       setting_update_failed: "I hapa te tiaki i te tautuhinga mono."
     etherpad: 
       description: " EtherPadtuhinga tuari"
@@ -15105,7 +15105,7 @@ mi:
         subpartner_id: "Sub Hoa ID"
         upload_ui_conf: "Tukuake UI conf ID"
         user_secret_key: Hunakaiwhakamahi
-      ui_conf_ids: "Mo te kiritaki Kaltura-whakahaerehia, ka taea e koe te tono Kaltura ki te whakaratokia koe ki enei ids. Ka taea te kitea ngā wāhanga whaiaro-whakahaerehia ēnei uara i roto i te ui_confs.tēpu"
+      ui_conf_ids: "Mo te kiritaki Kaltura-whakahaerehia, ka taea e koe te tono Kaltura ki te whakaratokia koe ki enei ids. Ka taea te kitea ngā wāhanga whaiaro-whakahaerehia ēnei uara i roto i te ui_confs tēpu."
     linked_in: 
       description: "LinkedIn whakauru"
     linked_in_settings: 
@@ -15635,7 +15635,7 @@ mi:
       contact_not_confirmed: "E kore tēnei whakapā kua whakapumautia. Pāwhiritia te wāhitau mō ētahi atu kōrero"
       email_not_confirmed: "E kore tēnei īmēra kua whakapumautia. Pāwhiritia te wāhitau mō ētahi atu kōrero"
       register_communication: "Rēhita kōrero"
-      unconfirmed_click_to_confirm: "Kua kore e.whaakū. Pāwhiritia ki te whakaū i"
+      unconfirmed_click_to_confirm: "Kua kore e whaakū. Pāwhiritia ki te whakaū i"
     token_never_expires: kore
     twitter_select: 
       twitter: Twitter

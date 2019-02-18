@@ -1097,6 +1097,12 @@ describe ApplicationController do
       expect(LiveEvents.get_context).to eq({user_id: '12345'}.merge(non_conditional_values))
     end
 
+    it 'sets the "context_sis_source_id"' do
+      controller.instance_variable_set(:@context, course_model(sis_source_id: 'banana'))
+      controller.send(:setup_live_events_context)
+      expect(LiveEvents.get_context[:context_sis_source_id]).to eq 'banana'
+    end
+
     context 'when a domain_root_account exists' do
       let(:root_account_attributes) do
         {

@@ -340,7 +340,7 @@ class SisBatch < ActiveRecord::Base
     previous_zip = previous_batch.try(:download_zip)
     return unless previous_zip
 
-    if change_threshold && (1-previous_zip.size.to_f/@data_file.size.to_f).abs > (0.01 * change_threshold)
+    if change_threshold && file_diff_percent(@data_file.size, previous_zip.size) > change_threshold
       SisBatch.add_error(nil, "Diffing not performed because file size difference exceeded threshold", sis_batch: self)
       return
     end
@@ -359,6 +359,10 @@ class SisBatch < ActiveRecord::Base
     # Success, swap out the original update for this new diff and continue.
     @data_file.try(:close)
     @data_file = diffed_data_file
+  end
+
+  def file_diff_percent(current_file_size, previous_zip_size)
+    (1 - current_file_size.to_f / previous_zip_size.to_f).abs * 100
   end
 
   def download_zip

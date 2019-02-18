@@ -1545,7 +1545,7 @@ sv:
   achieve_mastery_count_times_8c9bbcec: 
     one: "Uppnå måluppfyllelse en gång"
     other: "Uppnå måluppfyllelse %{count} gånger"
-  act_as_is_essentially_logging_in_as_this_user_with_6244031c: "Att ”agera som\" loggar i huvudsak in som den här användaren utan lösenord.Du kommer att kunna vidta åtgärder som om du var den här användaren, och från andra användares synpunkter kommer det att upplevas som om den här användaren utförde dem.I historik-loggar registreras dock att du var den som utförde åtgärderna på den här användarens vägnar."
+  act_as_is_essentially_logging_in_as_this_user_with_6244031c: "Att ”agera som\" loggar i huvudsak in som den här användaren utan lösenord. Du kommer att kunna vidta åtgärder som om du var den här användaren, och från andra användares synpunkter kommer det att upplevas som om den här användaren utförde dem. I historik-loggar registreras dock att du var den som utförde åtgärderna på den här användarens vägnar."
   act_as_is_essentially_logging_in_as_this_user_with_7e7a7009: "Att ”agera som\" loggar i huvudsak in som den här användaren utan lösenord. Du kommer att kunna vidta åtgärder som om du var den här användaren, och från andra användares synpunkter kommer det att upplevas som om den här användaren utförde dem."
   act_as_name_16d15bfa: "Agera som %{name}"
   act_as_user_d7ef0e48: "Agera som användare"
@@ -2121,7 +2121,7 @@ sv:
   an_error_occurred_loading_outcomes_data_cfd18b61: "Ett fel inträffade vid inläsning av lärandemål."
   an_error_occurred_making_a_network_request_d1bda348: "Ett fel uppstod vid försök att göra en nätverksförfrågan"
   an_error_occurred_please_post_your_reply_again_lat_b0220ac6: "*Ett fel uppstod*, vänligen skicka in ditt svar igen senare."
-  an_error_occurred_please_try_again_95361e05: "Ett fel inträffade.Vänligen försök igen."
+  an_error_occurred_please_try_again_95361e05: "Ett fel inträffade. Vänligen försök igen."
   an_error_occurred_please_try_again_later_84223241: "Ett fel inträffade. Försök igen senare."
   an_error_occurred_publishing_grades_cfdf7631: "Ett fel uppstod när omdömen publicerades."
   an_error_occurred_selecting_provisional_grades_9d7bcda: "Ett fel uppstod när provisoriska omdömen valdes"
@@ -2367,7 +2367,7 @@ sv:
   applied_cc7be774: Tillämpad
   apply_781a2546: Tillämpa
   apply_changes_b1dffc70: "Tillämpa ändringar"
-  apply_filters_note_clicking_this_button_will_cause_753f04: "Använd filter.Obs: Genom att klicka på den här knappen kommer sidan att laddas om."
+  apply_filters_note_clicking_this_button_will_cause_753f04: "Använd filter. Obs: Genom att klicka på den här knappen kommer sidan att laddas om."
   apply_theme_7af08387: " Tillämpa tema"
   applying_new_styles_to_subaccounts_e8aeeef2: "Lägger till nya stilar för underkonton"
   applying_please_be_patient_f7b5f244: "Tillämpar, vad god vänta"
@@ -4610,8 +4610,8 @@ sv:
     from_beginning: början
     to_now: nu
   comment_by_replying_to_this_message_or_join_the_co_26d42fde: "Kommentera genom att svara på detta meddelandet, eller anslut dig till konversationen via denna länken: %{link}."
-  comment_by_replying_to_this_message_or_join_the_co_52b5ac1c: "Kommentera genom att svara på det här meddelandet, eller gå med i konversationen med den här länken: %{link}.När det är tillåtet, om du behöver inkludera en bilaga, logga in på Canvas och svara på diskussionen."
-  comment_by_replying_to_this_message_or_join_the_co_886bc612: "Kommentera genom att svara på det här meddelandet, eller gå med i konversationen med den här länken: %{link}När det är tillåtet, om du behöver bifoga en bilaga, logga in på Canvas och svara på meddelandet."
+  comment_by_replying_to_this_message_or_join_the_co_52b5ac1c: "Kommentera genom att svara på det här meddelandet, eller gå med i konversationen med den här länken: %{link}. När det är tillåtet, om du behöver inkludera en bilaga, logga in på Canvas och svara på diskussionen."
+  comment_by_replying_to_this_message_or_join_the_co_886bc612: "Kommentera genom att svara på det här meddelandet, eller gå med i konversationen med den här länken: %{link}. När det är tillåtet, om du behöver bifoga en bilaga, logga in på Canvas och svara på meddelandet."
   comments_e07bcbe3: Kommentarer
   commmessages_9fa33faa: CommMessages
   common_cartridge_description: "Det här aktiverar konvertering av Common Cartridge paket i ett förmedlande json format att importeras"
@@ -11865,7 +11865,7 @@ sv:
         discussion_entry_reply_message: "Anslut dig till konversationen med länken nedan, eller kommentera genom att svara på det här meddelandet."
         html: 
           body: "%{user} lämnade en ny kommentar på meddelandet: %{discussion_topic} för %{course}:"
-          discussion_entry_reply_message: "Anslut dig till konversationen med länken nedan, eller kommentera genom att svara på det här meddelandet.När det är tillåtet, om du behöver bifoga en bilaga, logga in på Canvas och svara på meddelandet."
+          discussion_entry_reply_message: "Anslut dig till konversationen med länken nedan, eller kommentera genom att svara på det här meddelandet. När det är tillåtet, om du behöver bifoga en bilaga, logga in på Canvas och svara på meddelandet."
           link: "Klicka här för att ansluta och se meddelandet"
           subject: "Ny kommentar på meddelandet %{discussion_topic}: %{course}"
         subject: "Ny kommentar på meddelandet %{discussion_topic}: %{course}"
@@ -12425,7 +12425,7 @@ sv:
           audio_comment: "Det här meddelandet innehåller mediakommentarer. För att lyssna eller svara, klicka på länken nedan:"
           download: "ladda ner"
           pre_you_can: "Du kan"
-          reply_to_conversation_message: "Du kan svara på det här meddelandet i Canvas genom att svara direkt på e-postmeddelandet.Om du behöver inkludera en bilaga, logga in på Canvas och svara via inkorgen."
+          reply_to_conversation_message: "Du kan svara på det här meddelandet i Canvas genom att svara direkt på e-postmeddelandet. Om du behöver inkludera en bilaga, logga in på Canvas och svara via inkorgen."
           subject: "%{user_name}, du skickade nyss ett meddelande i Canvas."
           unknown_user: "Okänd användare"
           view_message: "Visa det här meddelandet i konversationer"
@@ -12452,7 +12452,7 @@ sv:
           audio_comment: "Det här meddelandet innehåller mediakommentarer. För att lyssna eller svara, klicka på länken nedan:"
           download: "ladda ner"
           pre_you_can: "Du kan"
-          reply_to_conversation_message: "Du kan svara på det här meddelandet i Canvas genom att svara direkt på e-postmeddelandet.Om du behöver inkludera en bilaga, logga in på Canvas och svara via inkorgen."
+          reply_to_conversation_message: "Du kan svara på det här meddelandet i Canvas genom att svara direkt på e-postmeddelandet. Om du behöver inkludera en bilaga, logga in på Canvas och svara via inkorgen."
           subject: "%{user_name} skickade nyss ett meddelande till dig i Canvas."
           unknown_user: "Okänd användare"
           view_message: "Visa det här meddelandet i konversationer"
@@ -13015,7 +13015,7 @@ sv:
         discussion_entry_reply_message: "Anslut dig till konversationen med länken nedan, eller kommentera genom att svara på det här meddelandet."
         html: 
           body: "%{user} lämnade en ny kommentar i tråden %{discussion_topic} för %{course}:"
-          discussion_entry_reply_message: "Anslut dig till konversationen med länken nedan, eller kommentera genom att svara på det här meddelandet.När det är tillåtet, om du behöver inkludera en bilaga, logga in på Canvas och svara på diskussionen."
+          discussion_entry_reply_message: "Anslut dig till konversationen med länken nedan, eller kommentera genom att svara på det här meddelandet. När det är tillåtet, om du behöver inkludera en bilaga, logga in på Canvas och svara på diskussionen."
           link: "Klicka här för att ansluta dig till konversationen"
           subject: "Ny kommentar för %{discussion_topic}: %{course}"
         subject: "Ny kommentar för %{discussion_topic}: %{course}"
@@ -13283,7 +13283,7 @@ sv:
           link_message: "Klicka här för att visa kommentaren"
           someone: Någon
           subject: "Inlämningskommentar: %{user}, %{assignment}, %{context}"
-          submission_comment_link_message: "Du kan se över inlämningsdetaljerna genom att använda länken nedanför, eller svara på kommentaren genom att svara på det här meddelandet.När det är tillåtet, om du behöver bifoga en bilaga, logga in på Canvas och svara på inlämningen."
+          submission_comment_link_message: "Du kan se över inlämningsdetaljerna genom att använda länken nedanför, eller svara på kommentaren genom att svara på det här meddelandet. När det är tillåtet, om du behöver bifoga en bilaga, logga in på Canvas och svara på inlämningen."
         link_message: "Du kan se över inlämningsdetaljerna här:"
         someone: Någon
         subject: "Inlämningskommentar: %{user}, %{assignment}, %{context}"
@@ -20285,7 +20285,7 @@ sv:
   this_may_take_a_bit_48fe4235: "Detta kan ta en stund..."
   this_may_take_a_bit_c061d0f6: "det här kan ta en stund..."
   this_message_includes_media_comments_to_listen_or__5fc98641: "Meddelandet kommer inkludera mediakommentarer. För att lyssna eller svara, klickar du på denna länk: %{link}."
-  this_message_includes_media_comments_to_listen_or__df72d662: "Det här meddelandet innehåller media-kommentarer.För att lyssna eller svara, klicka på den här länken: %{link}.När det är tillåtet, om du behöver bifoga en bilaga, logga in på Canvas och svara på inlämningen."
+  this_message_includes_media_comments_to_listen_or__df72d662: "Det här meddelandet innehåller media-kommentarer. För att lyssna eller svara, klicka på den här länken: %{link}. När det är tillåtet, om du behöver bifoga en bilaga, logga in på Canvas och svara på inlämningen."
   this_module_is_locked_until_completing_all_of_the__ddf06070: "Den här modulen är låst tills alla kraven för följande moduler är färdiga: %{prerequisites}"
   this_module_is_locked_until_datetime_b2486751: "Denna modulen är låst tills %{datetime}"
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Det här hände förmodligen för att du importerade kursinnehåll utan associerade filer."
@@ -22017,9 +22017,9 @@ sv:
       Du kan publicera din kurs från hemsidan när du är redo
       att dela den med dina studenter. Fram till din kurs publiceras kommer endast lärare att få tillgång till den.
   you_can_reply_to_this_comment_by_responding_to_thi_3d130e8c: "Du kan svara på denna kommentaren genom att svara på detta meddelandet, eller granska inlämningsdetaljerna via denna länken: %{link}."
-  you_can_reply_to_this_comment_by_responding_to_thi_4fd1379e: "Du kan svara på den här kommentaren genom att svara på det här meddelandet eller granska inlämningsuppgifterna med den här länken: %{link}.När det är tillåtet, om du behöver bifoga en bilaga, logga in på Canvas och svara på inlämningen"
+  you_can_reply_to_this_comment_by_responding_to_thi_4fd1379e: "Du kan svara på den här kommentaren genom att svara på det här meddelandet eller granska inlämningsuppgifterna med den här länken: %{link}. När det är tillåtet, om du behöver bifoga en bilaga, logga in på Canvas och svara på inlämningen"
   you_can_reply_to_this_message_in_canvas_by_clickin_f5f5f7a3: "Du kan svara på det här meddelandet i Canvas genom att klicka på den här länken: %{link}."
-  you_can_reply_to_this_message_in_canvas_by_replyin_c9f9abb: "Du kan svara på det här meddelandet i Canvas genom att svara direkt på det här e-postmeddelandet eller genom att klicka på den här länken: %{link}.Om du behöver inkludera en bilaga, logga in på Canvas och svara via inkorgen."
+  you_can_reply_to_this_message_in_canvas_by_replyin_c9f9abb: "Du kan svara på det här meddelandet i Canvas genom att svara direkt på det här e-postmeddelandet eller genom att klicka på den här länken: %{link}. Om du behöver inkludera en bilaga, logga in på Canvas och svara via inkorgen."
   you_can_reply_to_this_message_in_canvas_by_replyin_fa33638d: "Du kan svara på detta meddelandet i Canvas genom att svar direkt på detta e-postmeddelandet, eller genom att klicka på denna länken: %{link}"
   you_can_review_the_submission_details_by_clicking__9abc5515: "Du kan granska inlämningsdetaljerna genom att klicka på denna länken: %{link}"
   you_can_review_the_submission_details_using_the_li_c25dd615: "Du kan granska inlämningsuppgifterna med hjälp av länken nedan."
