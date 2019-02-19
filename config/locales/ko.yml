@@ -396,6 +396,15 @@ ko:
         message_date_to: "끝 날짜"
         search_people: "사용자 검색"
     adtalem: 
+      faculty_missing_grades: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "종료일:"
+            start: 
+              parameters: 
+                header: "시작 날짜:"
       no_submissions: 
         parameters: 
           custom_reports: 
@@ -557,6 +566,15 @@ ko:
               parameters: 
                 header: "종료일:"
     devry_u: 
+      faculty_missing_grades: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "종료일:"
+            start: 
+              parameters: 
+                header: "시작 날짜:"
       no_submissions: 
         parameters: 
           custom_reports: 
@@ -1347,6 +1365,7 @@ ko:
     unmute_button: "과제 평점 공개"
     unmute_dialog: "이 과제는 현재 평점 비공개 상태입니다. 이는 학생이 평점과 피드백을 볼 수 없다는 것을 뜻합니다. 지금 평점을 공개하시겠습니까?"
     unmuting_assignment: "과제 평점 공개 중..."
+  assignment_name_12eadcbd: "과제 이름"
   assignment_name_b2d87383: "과제 이름"
   assignments: 
     assignment_count: 
@@ -1960,6 +1979,7 @@ ko:
   available_from_587ce92f: "다음부터 사용 가능"
   available_from_f84e4611: "다음부터 사용 가능"
   avatar_8a8aa935: 아바타
+  average_score_15cd7c3c: "평균 점수"
   back_to_app_center_95420d83: "앱 센터로 돌아가기"
   bb_display: "Blackboard 학습"
   bb_file_description: "Blackboard 6/7/8/9 내보내기 .zip 파일"
@@ -2480,6 +2500,7 @@ ko:
       update_assignment_points: "이 과제는 %{assignmentPoints}점이 가능하지만 이 루브릭과 일치하도록 %{rubricPoints}점이 가능하도록 바꾸시겠습니까?"
   choose_a_course_home_page_8059c7b: "과목 홈 페이지 선택"
   choose_a_csv_file_to_upload_9644480c: "업로드할 CSV 파일 선택:"
+  close_17f50799: 닫기
   close_d634289d: 닫기
   close_for_comments_ce0e5d00: "의견 닫기"
   closed_for_comments_e395b42f: "의견 닫힘"
@@ -10598,6 +10619,7 @@ ko:
   remove_f47dc62a: 제거
   remove_row_c198da5a: "행 삭제"
   remove_these_dates_48453a81: "이 날짜 제거"
+  remove_user_from_section_5556f465: "섹션에서 사용자 제거"
   rename_45608f54: "이름 바꾸기"
   reply_389d6fb9: "답변 작성..."
   reports_1b9ab7a7: 보고서
@@ -11794,6 +11816,7 @@ ko:
     submitted: "제출:"
     this_was_submitted_multiple_times_choose_a_submission_to_view: "여러 번 제출되었습니다. 보려는 것을 선택하십시오:"
     view_rubric_assessment_in_the_speedgrader: "SpeedGrader에서 루브릭 평가 보기"
+  submission_type_a925fc5f: "제출물 유형"
   submissions: 
     assignment_submit_success: "과제를 성공적으로 제출했습니다."
     assignment_submitted: "과제를 제출했습니다."
@@ -12087,6 +12110,8 @@ ko:
   unknown_question_bank: "알 수 없는 문제 은행"
   unknown_quiz: "알 수 없는 퀴즈"
   unknown_user_1113fcaa: "알 수 없는 사용자"
+  unlimited_attempts_81a37d4: "무제한 시도"
+  unlimited_ff19e96d: 무제한
   unlock_date_cannot_be_after_due_date_8829d9ca: "잠금 해제 날짜는 기한 이후일 수 없음"
   unlock_date_cannot_be_after_lock_date_591f7fda: "잠금 해제 날짜는 잠금 날짜 이후일 수 없음"
   unnamed_tool_961cb95b: "이름 없는 도구"
