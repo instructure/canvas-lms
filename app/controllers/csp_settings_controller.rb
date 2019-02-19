@@ -184,7 +184,7 @@ class CspSettingsController < ApplicationController
       :inherited => @context.csp_inherited?,
       :settings_locked => @context.csp_locked?,
     }
-    json[:effective_whitelist] = @context.csp_whitelisted_domains if @context.csp_enabled?
+    json[:effective_whitelist] = @context.csp_whitelisted_domains(request, include_files: false, include_tools: true) if @context.csp_enabled?
     if @context.is_a?(Account)
       tools_whitelist = {}
       @context.csp_tools_grouped_by_domain.each do |domain, tools|

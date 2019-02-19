@@ -45,11 +45,12 @@ module Csp::AccountHelper
 
   def csp_account_id
     load_csp_data
-    @csp_account_id
+    @csp_account_id || self.global_id
   end
 
   def csp_inherited?
-    csp_account_id != self.global_id
+    load_csp_data
+    @csp_account_id != self.global_id
   end
 
   def csp_locked?
@@ -114,13 +115,13 @@ module Csp::AccountHelper
     self.csp_domains.active.where(:domain => domain.downcase).take&.destroy!
   end
 
-
-  def csp_whitelisted_domains
-    return [] unless csp_enabled?
+  def csp_whitelisted_domains(request = nil, include_files:, include_tools:)
     # first, get the whitelist from the enabled csp account
     # then get the list of domains extracted from external tools
-    (::Csp::Domain.get_cached_domains_for_account(self.csp_account_id) +
-      self.cached_tool_domains).uniq.sort
+    domains = ::Csp::Domain.get_cached_domains_for_account(self.csp_account_id)
+    domains += cached_tool_domains if include_tools
+    domains += csp_files_domains(request) if include_files
+    domains.uniq.sort
   end
 
   ACCOUNT_TOOL_CACHE_KEY_PREFIX = "account_tool_domains".freeze
@@ -144,5 +145,19 @@ module Csp::AccountHelper
 
   def clear_tool_domain_cache
     Account.send_later_if_production(:invalidate_inherited_caches, self, [ACCOUNT_TOOL_CACHE_KEY_PREFIX])
+  end
+
+  def csp_files_domains(request)
+    files_host = HostUrl.file_host(root_account, request.host_with_port)
+    config = Canvas::DynamicSettings.find(tree: :private, cluster: root_account.shard.database_server.id)
+    if config['attachment_specific_file_domain'] == 'true'
+      separator = config['attachment_specific_file_domain_separator'] || '.'
+      files_host = if separator != '.'
+        "*.#{files_host[files_host.index('.') + 1..-1]}"
+      else
+        "*.#{files_host}"
+      end
+    end
+    [files_host]
   end
 end

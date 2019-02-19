@@ -2464,10 +2464,12 @@ EG = {
     if (attachment.mime_class === 'image') {
       contents = `<img src="${htmlEscape(src)}" style="max-width:100%;max-height:100%;">`
     } else {
+      const options = {frameborder: 0, allowfullscreen: true}
+      if (attachment.mime_class === 'html') {
+        options.className = 'attachment-html-iframe'
+      }
       contents = SpeedgraderHelpers.buildIframe(
-        htmlEscape(src),
-        {frameborder: 0, allowfullscreen: true},
-        domElement
+        htmlEscape(src), options, domElement
       )
     }
 
