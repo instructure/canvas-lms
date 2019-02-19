@@ -391,12 +391,6 @@ describe Enrollment do
         expect(@enrollment.effective_current_score).to eq 97.0
       end
 
-      it "returns the lower bound of an override score, if a grading standard is enabled" do
-        allow(@course).to receive(:grading_standard_enabled?).and_return(true)
-        @enrollment.scores.create!(current_score: 79.0, override_score: 97.0)
-        expect(@enrollment.effective_current_score).to eq 94.0
-      end
-
       it "does not return the override score if the feature is not enabled" do
         @course.disable_feature!(:final_grades_override)
         @enrollment.scores.create!(current_score: 79.0, override_score: 97.0)
@@ -478,12 +472,6 @@ describe Enrollment do
       it "returns the override score" do
         @enrollment.scores.find_by!(course_score: true).update!(override_score: 97.0)
         expect(@enrollment.effective_current_score).to eq 97.0
-      end
-
-      it "returns the lower bound override score, if a grading standard is enabled" do
-        allow(@course).to receive(:grading_standard_enabled?).and_return true
-        @enrollment.scores.find_by(course_score: true).update!(override_score: 97.0)
-        expect(@enrollment.effective_final_score).to be 94.0
       end
 
       it "does not return the override score if the feature is not enabled" do

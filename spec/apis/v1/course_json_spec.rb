@@ -102,14 +102,8 @@ module Api
             end
 
             it "returns the override score in place of current score if present and feature enabled" do
-              course.update!(grading_standard_enabled: false)
               @course_score.update!(override_score: 99.0)
               expect(json_enrollment.fetch(:computed_current_score)).to be 99.0
-            end
-
-            it "returns the lower bound of override in place of current if present, feature enabled, and standards exist" do
-              @course_score.update!(override_score: 99.0)
-              expect(json_enrollment.fetch(:computed_current_score)).to be 94.0
             end
 
             it "returns the override grade in place of final grade if present and feature enabled" do
@@ -118,14 +112,8 @@ module Api
             end
 
             it "returns the override score in place of final score if present and feature enabled" do
-              course.update!(grading_standard_enabled: false)
               @course_score.update!(override_score: 99.0)
               expect(json_enrollment.fetch(:computed_final_score)).to be 99.0
-            end
-
-            it "returns the lower bound of override in place of final if present, feature enabled, and standards exist" do
-              @course_score.update!(override_score: 99.0)
-              expect(json_enrollment.fetch(:computed_final_score)).to be 94.0
             end
 
             it "does not return an override_grade key" do
@@ -260,14 +248,8 @@ module Api
             end
 
             it "returns the override score in place of current score if present and feature enabled" do
-              course.update!(grading_standard_enabled: false)
               @gp_score.update!(override_score: 99.0)
               expect(json_enrollment.fetch(:current_period_computed_current_score)).to be 99.0
-            end
-
-            it "returns the lower bound of override in place of current if present, feature enabled, and grading standards exist" do
-              @gp_score.update!(override_score: 99.0)
-              expect(json_enrollment.fetch(:current_period_computed_current_score)).to be 94.0
             end
 
             it "returns the override grade in place of final grade if present and feature enabled" do
@@ -276,14 +258,8 @@ module Api
             end
 
             it "returns the override score in place of final score if present and feature enabled" do
-              course.update!(grading_standard_enabled: false)
               @gp_score.update!(override_score: 99.0)
               expect(json_enrollment.fetch(:current_period_computed_final_score)).to be 99.0
-            end
-
-            it "returns the lower bound of override in place of final if present, feature enabled, and grading standards exist" do
-              @gp_score.update!(override_score: 99.0)
-              expect(json_enrollment.fetch(:current_period_computed_final_score)).to be 94.0
             end
 
             it "does not return an override_grade key" do

@@ -1898,14 +1898,8 @@ describe CoursesController, type: :request do
       end
 
       it "returns the override score instead of the current score" do
-        @course2.update!(grading_standard_enabled: false)
         json_response = courses_api_index_call
         expect(enrollment(json_response).fetch("computed_current_score")).to be 89.0
-      end
-
-      it "returns the lower bound of override score instead of the current score" do
-        json_response = courses_api_index_call
-        expect(enrollment(json_response).fetch("computed_current_score")).to be 87.0
       end
 
       it "returns the override grade instead of the current grade" do
@@ -1913,13 +1907,7 @@ describe CoursesController, type: :request do
         expect(enrollment(json_response).fetch("computed_current_grade")).to eq "B+"
       end
 
-      it "returns the lower bound of override score instead of the current final score" do
-        json_response = courses_api_index_call
-        expect(enrollment(json_response).fetch("computed_final_score")).to be 87.0
-      end
-
       it "returns the override score instead of the current final score" do
-        @course2.update!(grading_standard_enabled: false)
         json_response = courses_api_index_call
         expect(enrollment(json_response).fetch("computed_final_score")).to be 89.0
       end
