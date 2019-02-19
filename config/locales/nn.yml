@@ -609,6 +609,15 @@ nn:
             start: 
               parameters: 
                 header: "Dato for aktivitet:"
+      faculty_missing_grades: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "Sluttar den:"
+            start: 
+              parameters: 
+                header: "Startar den:"
       no_submissions: 
         parameters: 
           custom_reports: 
@@ -827,6 +836,15 @@ nn:
             start: 
               parameters: 
                 header: "Dato for aktivitet:"
+      faculty_missing_grades: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "Sluttar den:"
+            start: 
+              parameters: 
+                header: "Startar den:"
       no_submissions: 
         parameters: 
           custom_reports: 
@@ -3070,6 +3088,7 @@ nn:
   avatar_for_author_2eabbf55: "Avatar for %{author}"
   avatar_for_studentname_8ea511ae: "Avatar for %{studentName}"
   average_49c63f9b: Gjennomsnitt
+  average_score_15cd7c3c: "Gjennomsnittleg resultat"
   back_2900f52a: Tilbake
   back_to_announcements_1036e43e: "Tilbake til kunngjeringar"
   back_to_app_center_95420d83: "Tilbake til appsenteret"
@@ -3885,6 +3904,7 @@ nn:
   click_to_view_event_details_b25dc1f3: "Klikk for å vise detaljar"
   clicking_on_the_column_headers_will_sort_the_rows__3a6e9573: "Klikkar du på kolonnenamna blir radene sortert etter valt kolonne"
   clone_group_set_c2a40e15: "Klon gruppesett"
+  close_17f50799: lukk
   close_and_return_to_canvas_80544344: "Lukk og returner til Canvas"
   close_d634289d: Lukk
   close_date_9b52fb9b: "Lukkedato: "
@@ -8543,6 +8563,7 @@ nn:
       pages: Sider
       people: Personar
   group_a8f5ed9c: Gruppe
+  group_assignment_7060989f: Gruppeoppgåve
   group_assignments_can_t_be_anonymously_graded_2dd9be24: "Gruppeoppgåver kan ikkje rettast anonymt"
   group_assignments_cannot_be_enabled_for_moderated__6b2faeef: "Gruppeinnleveringar kan ikkje aktiverast for modererte oppgåver"
   group_categories: 
@@ -15068,6 +15089,7 @@ nn:
   remove_this_item_from_the_module_4b2ceab7: "Fjern elementet frå modulen"
   remove_this_rubric_from_my_list_c7d80704: "Fjern dette vurderingsskjemaet frå lista"
   remove_this_section_9a88ca43: "Fjern denne klassa"
+  remove_user_from_section_5556f465: "Fjern brukaren frå klassa"
   removed_course_association_course_a233342c: "Fjerna emneforbindelse %{course}"
   removed_user_as_group_leader_bb69330f: "Fjern %{user} som gruppeleiar"
   rename_45608f54: "Gi nytt namn"
@@ -16892,6 +16914,7 @@ nn:
   submission_in_another_grading_period_e754b329: "Innlevering i annan karaktersetjingsperiode"
   submission_score_b7a291e8: "resultat innlevering"
   submission_tray_429ac3df: Innleveringsmeny
+  submission_type_a925fc5f: Innleveringstype
   submissions: 
     assignment_submit_success: "Oppgåva er levert."
     assignment_submitted: "Oppgåva er levert."
@@ -17819,6 +17842,8 @@ nn:
   unknown_status_status_message_3a4ed4d5: "Ukjend status, %{status}: %{message}"
   unknown_user_1113fcaa: "Ukjend brukar"
   unknown_user_url_82196ba7: "Ukjent brukar-URL"
+  unlimited_attempts_81a37d4: "Uavgrensa forsøk"
+  unlimited_ff19e96d: Uavgrensa
   unlock_at_bb930b34: "Lås opp"
   unlock_at_time_a0bbfb9: "Lås opp: %{time}"
   unlock_date_cannot_be_after_due_date_8829d9ca: "Opplåsingsdato kan ikkje vere etter innleveringsfrist"
