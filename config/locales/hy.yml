@@ -535,6 +535,15 @@ hy:
         search: "Մարդկանց որոնում ըստ նույնականացուցչի կամ անվան"
         search_people: "Մարդկանց որոնում"
     adtalem: 
+      faculty_missing_grades: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "Ավարտված է՝"
+            start: 
+              parameters: 
+                header: "Սկսված է՝"
       no_submissions: 
         parameters: 
           custom_reports: 
@@ -689,6 +698,15 @@ hy:
     default_account_quotas_not_updated: "Ըստ լռության ընդունված հաշվի քվոտաները չեն թարմացվել"
     default_account_quotas_updated: "Ըստ լռության ընդունված հաշվի քվոտաները թարմացվել են"
     devry_u: 
+      faculty_missing_grades: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "Ավարտված է՝"
+            start: 
+              parameters: 
+                header: "Սկսված է՝"
       no_submissions: 
         parameters: 
           custom_reports: 
@@ -2387,6 +2405,7 @@ hy:
   availableslots_available_87b8b69d: "%{availableSlots} հասանելի"
   avatar_8a8aa935: Ավատար
   average_49c63f9b: "Միջին մեծություն"
+  average_score_15cd7c3c: "Միջին գնահատական"
   back_2900f52a: Վերադառնալ
   back_to_announcements_1036e43e: "Վերադառնալ հայտարարություններին"
   back_to_app_center_95420d83: "Վերադառնալ App Center"
@@ -3012,6 +3031,7 @@ hy:
   click_to_test_dropdown_b950974d: "Սեղմեք ցուցակը ստուգելու համար"
   clicking_on_the_column_headers_will_sort_the_rows__3a6e9573: "Սյունակների վերնագրերի վրա սեղմելիս տողերը կտեսակավորվեն այդ սյունակի մեջ "
   clone_group_set_c2a40e15: "Կլոնավորել խմբերի շարքը"
+  close_17f50799: փակել
   close_and_return_to_canvas_80544344: "Փակել և վերադառնալ Canvas համակարգ"
   close_d634289d: Փակել
   close_for_comments_ce0e5d00: "Մեկնաբանությունների համար փակել"
@@ -7097,6 +7117,7 @@ hy:
       pages: Էջեր
       people: Մարդիկ
   group_a8f5ed9c: Խումբ
+  group_assignment_7060989f: "Խմբային հանձնարարություններ"
   group_assignments_cannot_be_enabled_for_moderated__6b2faeef: "Խմբային հանձնարարությունները չեն կարող ակտիվացվել մոդերացված հանձնարարությունների համար"
   group_categories: 
     notices: 
@@ -13096,6 +13117,7 @@ hy:
   remove_student_from_recipients_4b206e35: "Ջնջել %{student} -ին ստացողների ցանկից"
   remove_these_dates_48453a81: "Հեռացնել այս ամսաթվերը"
   remove_this_section_9a88ca43: "Ջնջել այս բաժինը"
+  remove_user_from_section_5556f465: "Բաժնից ջնջել օգտատիրոջը "
   rename_45608f54: Վերանվանել
   rename_c_name_section_e0e92c97: "Վերանվանել %{c.name} բաժինը"
   rename_this_section_73065edd: "Վերանվանել այս բաժինը"
@@ -14641,6 +14663,7 @@ hy:
     view_rubric_assessment_in_the_speedgrader: "Դիտել ռուբրիկի գնահատումը «Արագ գնահատման համակարգ»-ում"
   submission_in_another_grading_period_e754b329: "Աշխատանքի ուղարկում գնահատման այլ ժամանակահատվածի համար"
   submission_score_b7a291e8: "ուղարկված աշխատանքի գնահատական"
+  submission_type_a925fc5f: "Ուղարկման տեսակ"
   submissions: 
     assignment_submit_success: "Հանձնարարությունը հաջողությամբ ուղարկված է:"
     assignment_submitted: "Հանձնարարությունն ուղարկված է:"
@@ -15266,6 +15289,8 @@ hy:
   unknown_quiz: "Անհայտ թեստ"
   unknown_user_1113fcaa: "Անհայտ օգտատեր"
   unknown_user_url_82196ba7: "Անհայտ օգտատիրոջ URL-հասցե"
+  unlimited_attempts_81a37d4: "Անսահմանափակ փորձեր"
+  unlimited_ff19e96d: Անսահմանափակ
   unlock_at_bb930b34: Արգելազերծել
   unlock_at_time_a0bbfb9: "Արգելազերծել %{time}-ին"
   unlock_date_cannot_be_after_due_date_8829d9ca: "Արգելազերծման ամսաթիվը չի կարող լինել կատարման ամսաթվից հետո"
