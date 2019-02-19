@@ -411,9 +411,8 @@ class MessageableUser
       course.shard.activate do
         # make sure the course is recognized
         return unless options[:admin_context] || course = course_index[course.id]
-
         scope = enrollment_scope(options.merge(
-          :include_concluded_students => false,
+          :include_concluded_students => true,
           :course_workflow_state => course.workflow_state))
         scope =
           case course_visibility(course)

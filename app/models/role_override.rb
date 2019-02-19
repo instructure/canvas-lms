@@ -860,7 +860,8 @@ class RoleOverride < ActiveRecord::Base
         'DesignerEnrollment',
         'TeacherEnrollment',
         'AccountAdmin'
-      ]
+      ],
+      :applies_to_concluded => ['TeacherEnrollment', 'TaEnrollment']
     },
     :send_messages_all => {
       :label => lambda { t('permissions.send_messages_all', "Send messages to the entire class") },
