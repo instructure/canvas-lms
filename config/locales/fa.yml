@@ -595,6 +595,15 @@ fa:
             start: 
               parameters: 
                 header: "تاریخ فعالیت:"
+      faculty_missing_grades: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "پایان در:"
+            start: 
+              parameters: 
+                header: "شروع از:"
       no_submissions: 
         parameters: 
           custom_reports: 
@@ -789,6 +798,15 @@ fa:
             start: 
               parameters: 
                 header: "تاریخ فعالیت:"
+      faculty_missing_grades: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "پایان در:"
+            start: 
+              parameters: 
+                header: "شروع از:"
       no_submissions: 
         parameters: 
           custom_reports: 
@@ -2151,6 +2169,7 @@ fa:
   assignment_selection_6bff05c4: "انتخاب تکلیف"
   assignment_title_82b4422e: "عنوان تکلیف:"
   assignment_title_8a707dd2: "عنوان تکلیف"
+  assignment_type_60255aac: "نوع تکلیف"
   assignment_url_37c849c6: "نشانی اینترنتی تکلیف"
   assignment_was_deleted_8320d26d: "تکلیف حذف شد"
   assignment_weights_d4bcf9ab: "وزن های تکلیف"
@@ -2926,6 +2945,7 @@ fa:
   avatar_for_author_2eabbf55: "آواتار برای %{author}"
   avatar_for_studentname_8ea511ae: "آواتار برای %{studentName}"
   average_49c63f9b: میانگین
+  average_score_15cd7c3c: "میانگین نمره"
   back_2900f52a: بازگشت
   back_to_announcements_1036e43e: "بازگشت به اطلاعیه‌ها"
   back_to_app_center_95420d83: "بازگشت به مرکز برنامه"
@@ -3741,6 +3761,7 @@ fa:
   click_to_view_event_details_b25dc1f3: "برای مشاهده اطلاعات رویداد کلیک کنید"
   clicking_on_the_column_headers_will_sort_the_rows__3a6e9573: "با کلیک کردن روی عنوان ستون ها، ردیف ها بر اساس آن ستون مرتب خواهند شد."
   clone_group_set_c2a40e15: "کپی کردن مجموعه گروه"
+  close_17f50799: بستن
   close_and_return_to_canvas_80544344: "بستن و بازگشتن به کانواس"
   close_d634289d: بستن
   close_date_a2f617b3: "تاریخ اختتام"
@@ -8646,6 +8667,7 @@ fa:
       pages: "صفحه ها"
       people: افراد
   group_a8f5ed9c: گروه
+  group_assignment_7060989f: "تکلیف گروهی"
   group_assignments_cannot_be_enabled_for_moderated__6b2faeef: "تکلیف های گروه را نمی توان برای تکلیف های نظارت شده فعال کرد"
   group_categories: 
     notices: 
@@ -15649,6 +15671,7 @@ fa:
   remove_this_item_from_the_module_4b2ceab7: "حذف این مورد از ماژول"
   remove_this_rubric_from_my_list_c7d80704: "حذف این دستورالعمل ارزیابی از فهرست من"
   remove_this_section_9a88ca43: "حذف این بخش"
+  remove_user_from_section_5556f465: "حذف کاربر از بخش"
   removed_course_association_course_a233342c: "انجمن درس %{course} حذف شد"
   removed_user_as_group_leader_bb69330f: "%{user} به عنوان سرگروه حذف شد"
   rename_45608f54: "تغییر نام"
@@ -17532,6 +17555,7 @@ fa:
   submission_in_another_grading_period_e754b329: "ارسال در دوره دیگر نمره گذاری"
   submission_score_b7a291e8: "نمره مورد ارسالی"
   submission_tray_429ac3df: "سینی موارد ارسالی"
+  submission_type_a925fc5f: "نوع ارسال"
   submissions: 
     assignment_submit_success: "تکلیف با موفقیت ارسال شد."
     assignment_submitted: "تکلیف ارسال شد."
@@ -18461,6 +18485,8 @@ fa:
   unknown_status_status_message_3a4ed4d5: "وضعیت ناشناس، %{status} : %{message}"
   unknown_user_1113fcaa: "کاربر ناشناس"
   unknown_user_url_82196ba7: "نشانی اینترنتی کاربر ناشناس"
+  unlimited_attempts_81a37d4: "تلاش های نامحدود"
+  unlimited_ff19e96d: نامحدود
   unlock_at_bb930b34: "قفل گشایی در"
   unlock_at_time_a0bbfb9: "قفل گشایی در %{time}"
   unlock_date_cannot_be_after_due_date_8829d9ca: "تاریخ قفل گشایی نمی تواند بعد از تاریخ مهلت باشد"
