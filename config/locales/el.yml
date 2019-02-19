@@ -498,6 +498,15 @@ el:
         search: "Εύρευση ατόμων με αριθμό ταυτοποίησης/ID ή όνομα"
         search_people: "Search people"
     adtalem: 
+      faculty_missing_grades: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "Τελειώνει στις:"
+            start: 
+              parameters: 
+                header: "Αρχίζει στις:"
       no_submissions: 
         parameters: 
           custom_reports: 
@@ -656,6 +665,15 @@ el:
     default_account_quotas_not_updated: "Οι προεπιλεγμένες ποσοστώσεις του λογαριασμού δεν έχουν ενημερωθεί"
     default_account_quotas_updated: "Οι ενημερωμένες ποσοστώσεις του λογαριασμού έχουν ενημερωθεί"
     devry_u: 
+      faculty_missing_grades: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "Τελειώνει στις:"
+            start: 
+              parameters: 
+                header: "Αρχίζει στις:"
       no_submissions: 
         parameters: 
           custom_reports: 
@@ -2305,6 +2323,7 @@ el:
   availableslots_available_87b8b69d: "%{availableSlots} Διαθέσιμες"
   avatar_8a8aa935: Avatar
   average_49c63f9b: "Μέσος Όρος"
+  average_score_15cd7c3c: "Μέσος όρος"
   back_2900f52a: Πίσω
   back_to_announcements_1036e43e: "Πίσω στις Ανακοινώσεις"
   back_to_app_center_95420d83: "Πίσω στο Κέντρο Εφαρμογών"
@@ -2894,6 +2913,7 @@ el:
   click_to_test_dropdown_b950974d: "Κάντε κλικ για να δοκιμάσετε το dropdown"
   clicking_on_the_column_headers_will_sort_the_rows__3a6e9573: "Κάνοντας κλικ στις επικεφαλίδες των στηλών θα ταξινομήσετε τις σειρές κατά στήλη."
   clone_group_set_c2a40e15: "Κλωνοποίηση Σετ Ομάδων"
+  close_17f50799: κλείσιμο
   close_and_return_to_canvas_80544344: "Κλείσιμο και επιστροφή στο Canvas"
   close_d634289d: Κλείσιμο
   closed_for_comments_e395b42f: "Κλεισμένο για Σχόλια"
@@ -6263,6 +6283,7 @@ el:
       pages: Σελίδες
       people: Άνθρωποι
   group_a8f5ed9c: Ομάδα
+  group_assignment_7060989f: "Ομαδική Εργασία"
   group_assignments_cannot_be_enabled_for_moderated__6b2faeef: "Δεν είναι δυνατή η ενεργοποίηση ομαδικών εργασιών για εργασίες με βαθμολόγηση από περισσότερους"
   group_categories: 
     notices: 
@@ -11580,6 +11601,7 @@ el:
   remove_student_from_recipients_4b206e35: "Αφαίρεση του/της %{student} από τους παραλήπτες"
   remove_text_8e485c41: "Αφαίρεση %{text}"
   remove_these_dates_48453a81: "Αφαίρεση αυτων των ημερομηνιών"
+  remove_user_from_section_5556f465: "Αφαίρεση Χρήστη από τον Τομέα"
   rename_45608f54: Μετανόμασε
   rename_this_page_554f0583: "Μετονομασία Σελίδας"
   replace_e61834a7: Αντικατάσταση
@@ -12890,6 +12912,7 @@ el:
     update_grade: "Ενημέρωση Βαθμού"
     view_rubric_assessment_in_the_speedgrader: "Προβολή Αξιολόγησης Ρουμπρίκας στο SpeedGrader"
   submission_score_b7a291e8: "βαθμολογία υποβολής"
+  submission_type_a925fc5f: "Είδος υποβολής"
   submissions: 
     assignment_submit_success: "Η εργασία υποβλήθηκε επιτυχώς."
     assignment_submitted: "Η εργασία υποβλήθηκε."
@@ -13496,6 +13519,8 @@ el:
   unknown_quiz: "Άγνωστο κουίζ"
   unknown_user_1113fcaa: "Άγνωστος Χρήστης"
   unknown_user_url_82196ba7: "Άγνωστο URL Χρήστη"
+  unlimited_attempts_81a37d4: "Απεριόριστες Προσπάθειες"
+  unlimited_ff19e96d: "Χωρίς Περιορισμούς"
   unlock_at_bb930b34: "Ξεκλείδωμα σε"
   unlock_at_time_a0bbfb9: "<mrk mid=\"3982\" mtype=\"seg\">Ξεκλείδωμα σε:</mrk> <mrk mid=\"3983\" mtype=\"seg\">%{time}</mrk>"
   unlock_date_cannot_be_after_due_date_8829d9ca: "Η ημερομηνία ξεκλειδώματος δεν μπορεί να είναι μετά την καταληκτική ημερομηνία"
