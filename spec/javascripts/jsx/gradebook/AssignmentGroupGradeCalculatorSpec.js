@@ -53,42 +53,6 @@ test('uses a score unit of "points"', function() {
   equal(grades.scoreUnit, 'points')
 })
 
-QUnit.module('AssignmentGroupGradeCalculator.calculate with no submissions and some assignments', {
-  setup() {
-    submissions = []
-    assignments = [
-      {id: 201, points_possible: 100, omit_from_final_grade: false},
-      {id: 202, points_possible: 91, omit_from_final_grade: false},
-      {id: 203, points_possible: 55, omit_from_final_grade: false},
-      {id: 204, points_possible: 38, omit_from_final_grade: false},
-      {id: 205, points_possible: 1000, omit_from_final_grade: false}
-    ]
-    assignmentGroup = {id: 301, rules: {}, assignments}
-  }
-})
-
-test('returns a current and final score of 0', function() {
-  const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
-  equal(grades.current.score, 0)
-  equal(grades.final.score, 0)
-})
-
-test('include the sum of points possible', function() {
-  const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
-  equal(grades.current.possible, 0)
-  equal(grades.final.possible, 1284)
-})
-
-test('avoids floating point rounding errors', function() {
-  const pointsPossibleValues = [7, 6.1, 7, 6.9, 6.27]
-  pointsPossibleValues.forEach((value, index) => {
-    assignments[index].points_possible = value
-  })
-  const grades = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
-  // 7 + 6.1 + 7 + 6.9 + 6.27 === 33.269999999999996
-  strictEqual(grades.final.possible, 33.27)
-})
-
 QUnit.module('AssignmentGroupGradeCalculator.calculate with some assignments and submissions', {
   setup() {
     submissions = [

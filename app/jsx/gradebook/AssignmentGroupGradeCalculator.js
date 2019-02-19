@@ -216,20 +216,6 @@ function calculateGroupGrade(group, allSubmissions, includeUngraded) {
   // Remove submissions from other assignment groups.
   let submissions = _.filter(allSubmissions, submission => assignments[submission.assignment_id])
 
-  // To calculate grades for assignments to which the student has not yet
-  // submitted, create a submission stub with a score of `null`.
-  if (includeUngraded) {
-    const submissionAssignmentIds = _.map(submissions, ({assignment_id}) =>
-      assignment_id.toString()
-    )
-    const missingAssignmentIds = _.difference(_.keys(assignments), submissionAssignmentIds)
-    const submissionStubs = _.map(missingAssignmentIds, assignmentId => ({
-      assignment_id: assignmentId,
-      score: null
-    }))
-    submissions = [...submissions, ...submissionStubs]
-  }
-
   // Remove excused submissions.
   submissions = _.reject(submissions, 'excused')
 
