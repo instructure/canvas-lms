@@ -3,6 +3,10 @@
 pipeline {
     agent { label 'docker' }
 
+    options {
+      ansiColor('xterm')
+    }
+
     environment {
         NAME = "${env.GERRIT_REFSPEC}".minus('refs/changes/').replaceAll('/','.')
         IMAGE_TAG = "$DOCKER_REGISTRY_FQDN/canvas-lms:$NAME"
