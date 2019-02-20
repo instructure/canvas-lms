@@ -15580,7 +15580,11 @@ es:
           **Copie este autentificador ahora**. Una vez que deje esta página no podrá
           recuperar el autentificador, y tendrá que regenerarlo para obtener
           un valor nuevo.
-      generate_access_token_description: "Autentificadores de acceso son los que permiten que aplicaciones de terceros tengan acceso a recursos de Canvas en su parte. Estos autentificadores de acceso normalmente se crean automáticamente para las aplicaciones según sea necesario, pero si [está desarrollando un proyecto nuevo o limitado](%{documentation_url}) puede generar el autentificador de acceso desde aquí."
+      generate_access_token_description: |-
+          Autentificadores de acceso son los que permiten que aplicaciones de terceros tengan acceso a recursos
+          de Canvas en su parte. Estos autentificadores de acceso normalmente se crean automáticamente
+          para las aplicaciones según sea necesario, pero si [está desarrollando un proyecto nuevo o limitado](%{documentation_url})
+          puede generar el autentificador de acceso desde aquí.
       google_docs_description: "Una vez que nos autoriza el acceso a su cuenta de Google Docs, podrá enviar sus tareas directo desde Google Docs, y podrá crear y compartir documentos con miembros de sus clases. "
       google_drive_description: "Una vez que nos autorice a acceder a su Google Drive, podrá entregar sus tareas directamente desde Google Drive y crear y compartir documentos con otros miembros de sus clases."
       headers: 
