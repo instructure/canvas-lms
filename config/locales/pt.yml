@@ -11443,10 +11443,11 @@ pt:
           verify: Verificar
         details: 
           mfa_enrollment: |-
-              Autenticação multi-fator aumenta a segurança, a exigir que você tenha algo em sua posse física,
-              Além de saber sua palavra passe, para fazer login no Canvas. Este pode ser um dispositivo que pode gerar
-              códigos de verificação ou um telefone que pode receber mensagens de texto. A aplicação Google Authenticator para [iPhone](%{iphone_url}) ou
-              [Android](%{android_url}) pode ser configurada ao digitalizar o código QR abaixo. Outros tokens podem ser configurados ao inserir a chave secreta **%{secret_key}**.. Depois de ter configurado a autenticação multi-fator, recomenda-se que vá para a sua
+              Autenticação multi-fator aumenta a segurança, a exigir que você tenha algo em sua posse física, além de saber sua palavra
+              passe, para fazer login no Canvas. Este pode ser um dispositivo que pode gerar códigos de verificação ou um telefone
+              que pode receber mensagens de texto. A aplicação Google Authenticator para [iPhone](%{iphone_url}) ou [Android](%{android_url})
+              pode ser configurada ao digitalizar o código QR abaixo. Outros tokens podem ser configurados ao inserir
+              a chave secreta **%{secret_key}**. Depois de ter configurado a autenticação multi-fator, recomenda-se que vá para a sua
               página de perfil e imprima um conjunto de códigos de backup, caso seu dispositivo multi-fator normal esteja indisponível.
           mfa_required: "É necessário configurar a autenticação multifatorial."
           otp_on_device: "Introduza o código de verificação mostrado pelo seu identificador."
