@@ -2104,6 +2104,13 @@ CanvasRails::Application.routes.draw do
       get 'courses/:course_id/rubrics/:id', action: :show
       post 'courses/:course_id/rubrics', controller: :rubrics, action: :create
       put 'courses/:course_id/rubrics/:id', controller: :rubrics, action: :update
+      delete 'courses/:course_id/rubrics/:id', controller: :rubrics, action: :destroy
+    end
+
+    scope(controller: :rubric_associations) do
+      post 'courses/:course_id/rubric_associations', action: :create
+      put 'courses/:course_id/rubric_associations/:id', action: :update
+      delete 'courses/:course_id/rubric_associations/:id', action: :destroy
     end
 
     scope(controller: 'master_courses/master_templates') do

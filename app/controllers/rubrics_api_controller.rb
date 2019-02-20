@@ -65,10 +65,77 @@
 #           "example": "true",
 #           "type": "boolean"
 #         },
+#         "data": {
+#           "description": "An array with all of this Rubric's grading Criteria",
+#           "type": "array",
+#           "items": { "$ref": "RubricCriterion" }
+#         },
 #         "assessments": {
 #           "description": "If an assessment type is included in the 'include' parameter, includes an array of rubric assessment objects for a given rubric, based on the assessment type requested. If the user does not request an assessment type this key will be absent.",
 #           "type": "array",
 #           "items": { "$ref": "RubricAssessment" }
+#         },
+#         "associations": {
+#           "description": "If an association type is included in the 'include' parameter, includes an array of rubric association objects for a given rubric, based on the association type requested. If the user does not request an association type this key will be absent.",
+#           "type": "array",
+#           "items": { "$ref": "RubricAssociation" }
+#         }
+#       }
+#     }
+#
+# @model RubricCriterion
+#     {
+#       "id": "RubricCriterion",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "the ID of the criterion",
+#           "example": "_10",
+#           "type": "string"
+#         },
+#         "description": {
+#           "type": "string"
+#         },
+#         "long_description": {
+#           "type": "string"
+#         },
+#         "points": {
+#           "example": "5",
+#           "type": "integer"
+#         },
+#         "criterion_use_range": {
+#           "example": "false",
+#           "type": "boolean"
+#         },
+#         "ratings": {
+#           "description": "the possible ratings for this Criterion",
+#           "type": "array",
+#           "items": { "$ref": "RubricRating" }
+#         }
+#       }
+#     }
+#
+# @model RubricRating
+#     {
+#       "id": "RubricRating",
+#       "properties": {
+#         "id": {
+#           "example": "name_2",
+#           "type": "string"
+#         },
+#         "criterion_id": {
+#           "example": "_10",
+#           "type": "string"
+#         },
+#         "description": {
+#           "type": "string"
+#         },
+#         "long_description": {
+#           "type": "string"
+#         },
+#         "points": {
+#           "example": "5",
+#           "type": "integer"
 #         }
 #       }
 #     }
@@ -134,6 +201,58 @@
 #       }
 #     }
 #
+# @model RubricAssociation
+#     {
+#       "id": "RubricAssociation",
+#       "description": "",
+#       "properties": {
+#         "id": {
+#           "description": "the ID of the association",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "rubric_id": {
+#           "description": "the ID of the rubric",
+#           "example": "1",
+#           "type": "integer"
+#         },
+#         "association_id": {
+#           "description": "the ID of the object this association links to",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "association_type": {
+#           "description": "the type of object this association links to",
+#           "example": "Course",
+#           "type": "string"
+#         },
+#         "use_for_grading": {
+#           "example": "true",
+#           "type": "boolean"
+#         },
+#         "summary_data": {
+#           "example": "",
+#           "type": "string"
+#         },
+#         "purpose": {
+#           "example": "grading",
+#           "type": "string"
+#         },
+#         "hide_score_total": {
+#           "example": "true",
+#           "type": "boolean"
+#         },
+#         "hide_points": {
+#           "example": "true",
+#           "type": "boolean"
+#         },
+#         "hide_outcome_results": {
+#           "example": "true",
+#           "type": "boolean"
+#         }
+#       }
+#     }
+#
 class RubricsApiController < ApplicationController
   include Api::V1::Rubric
   include Api::V1::RubricAssessment
@@ -142,6 +261,11 @@ class RubricsApiController < ApplicationController
   before_action :require_context
   before_action :validate_args
   before_action :find_rubric, only: [:show]
+
+  VALID_ASSESSMENT_SCOPES = %w(assessments graded_assessments peer_assessments).freeze
+  VALID_ASSOCIATION_SCOPES = %w(associations assignment_associations course_associations account_associations).freeze
+
+  VALID_INCLUDE_PARAMS = (VALID_ASSESSMENT_SCOPES + VALID_ASSOCIATION_SCOPES).freeze
 
   # @API List rubrics
   # Returns the paginated list of active rubrics for the current context.
@@ -154,8 +278,8 @@ class RubricsApiController < ApplicationController
 
   # @API Get a single rubric
   # Returns the rubric with the given id.
-  # @argument include [String, "assessments"|"graded_assessments"|"peer_assessments"]
-  #   If included, the type of associated rubric assessments to return. If not included, assessments will be omitted.
+  # @argument include[] [String, "assessments"|"graded_assessments"|"peer_assessments"|"associations"|"assignment_associations"|"course_associations"|"account_associations"]
+  #   Related records to include in the response.
   # @argument style [String, "full"|"comments_only"]
   #   Applicable only if assessments are being returned. If included, returns either all criteria data associated with the assessment, or just the comments. If not included, both data and comments are omitted.
   # @returns Rubric
@@ -164,8 +288,10 @@ class RubricsApiController < ApplicationController
     return unless authorized_action(@context, @current_user, :manage_rubrics)
     if !@context.errors.present?
       assessments = rubric_assessments
+      associations = rubric_associations
       render json: rubric_json(@rubric, @current_user, session,
              assessments: assessments,
+             associations: associations,
              style: params[:style])
     else
       render json: @context.errors, status: :bad_request
@@ -184,7 +310,7 @@ class RubricsApiController < ApplicationController
             else
               RubricAssessment.where(rubric_id: @rubric.id)
             end
-    case params[:include]
+    case (api_includes & VALID_ASSESSMENT_SCOPES)[0]
     when 'assessments'
       scope
     when 'graded_assessments'
@@ -194,20 +320,53 @@ class RubricsApiController < ApplicationController
     end
   end
 
+  def rubric_associations
+    scope = @rubric.rubric_associations
+    case (api_includes & VALID_ASSOCIATION_SCOPES)[0]
+    when 'associations'
+      scope
+    when 'assignment_associations'
+      scope.where(association_type: 'Assignment')
+    when 'course_associations'
+      scope.where(association_type: 'Course')
+    when 'account_associations'
+      scope.where(association_type: 'Account')
+    end
+  end
+
   def validate_args
     errs = {}
-    valid_assessment_args = ['assessments', 'graded_assessments', 'peer_assessments']
+
     valid_style_args = ['full', 'comments_only']
-    if params[:include] && !valid_assessment_args.include?(params[:include])
-      errs['include'] = "invalid assessment type requested. Must be one of the following: #{valid_assessment_args.join(", ")}"
-    end
     if params[:style] && !valid_style_args.include?(params[:style])
-      errs['style'] = "invalid style requested. Must be one of the following: #{valid_style_args.join(", ")}"
+      errs['style'] = "invalid style requested. Must be one of the following: #{valid_style_args.join(', ')}"
     end
-    if params[:style] && !params[:include]
-      errs['style'] = "invalid parameters. Style parameter passed without requesting assessments"
+
+    if (api_includes - VALID_INCLUDE_PARAMS).present?
+      errs['include'] = "invalid include value requested. Must be one of the following: #{VALID_INCLUDE_PARAMS.join(', ')}"
+    else
+      validate_inclusion_category(VALID_ASSOCIATION_SCOPES, errs, 'association')
+      include_assessments = validate_inclusion_category(VALID_ASSESSMENT_SCOPES, errs, 'assessment').present?
+      if params[:style] && !include_assessments
+        errs['style'] = "invalid parameters. Style parameter passed without requesting assessments"
+      end
     end
+
     errs.each{|key, msg| @context.errors.add(key, msg, att_name: key)}
+  end
+
+  def validate_inclusion_category(category_items, errs, name)
+    inclusion_items = api_includes & category_items
+    if inclusion_items.count > 1
+      errs['include'] = "cannot list multiple #{name} includes. Multiple given: #{inclusion_items.join(', ')}"
+    elsif inclusion_items.count == 1
+      return inclusion_items[0]
+    end
+    nil
+  end
+
+  def api_includes
+    @api_includes ||= Array(params[:include])
   end
 end
 
