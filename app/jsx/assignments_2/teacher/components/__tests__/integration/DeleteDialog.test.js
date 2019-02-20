@@ -17,7 +17,7 @@
  */
 
 import {fireEvent, wait, waitForElement} from 'react-testing-library'
-import {mockAssignment, waitForNoElement, workflowMutationResult} from '../../../test-utils'
+import {mockAssignment, itBehavesLikeADialog, workflowMutationResult} from '../../../test-utils'
 import {renderTeacherView} from './integration-utils'
 
 async function openDeleteDialog(assignment = mockAssignment(), apolloMocks = []) {
@@ -32,18 +32,11 @@ afterEach(() => {
 })
 
 describe('assignments 2 delete dialog', () => {
-  it('allows close', async () => {
-    const {getByTestId} = await openDeleteDialog()
-    const closeButton = await waitForElement(() => getByTestId('confirm-dialog-close-button'))
-    fireEvent.click(closeButton)
-    expect(await waitForNoElement(() => getByTestId('confirm-dialog-close-button'))).toBe(true)
-  })
-
-  it('allows cancel', async () => {
-    const {getByTestId} = await openDeleteDialog()
-    const cancelButton = await waitForElement(() => getByTestId('delete-dialog-cancel-button'))
-    fireEvent.click(cancelButton)
-    expect(await waitForNoElement(() => getByTestId('delete-dialog-cancel-button'))).toBe(true)
+  itBehavesLikeADialog({
+    render: renderTeacherView,
+    getOpenDialogElt: fns => fns.getByText('delete assignment'),
+    confirmDialogOpen: fns => fns.getByText(/are you sure/i, {exact: false}),
+    getCancelDialogElt: fns => fns.getByTestId('delete-dialog-cancel-button')
   })
 
   it('deletes the assignment and reloads', async () => {

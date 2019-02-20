@@ -71,12 +71,12 @@ describe('assignments 2 teacher view toolbox', () => {
     expect(queryByText('unsubmitted', {exact: false})).toBeNull()
     expect(getByText(/message students/i)).toBeInTheDocument()
   })
-})
 
-it('does not render submission and grading links when assignment is not published', () => {
-  const assignment = mockAssignment({state: 'unpublished'})
-  const {queryByText} = renderToolbox(assignment)
-  expect(queryByText('to grade', {exact: false})).toBeNull()
-  expect(queryByText('unsubmitted', {exact: false})).toBeNull()
-  expect(queryByText('message students', {exact: false})).toBeNull()
+  it('does not render submission and grading links when assignment is not published', () => {
+    const assignment = mockAssignment({state: 'unpublished'})
+    const {queryByText} = renderToolbox(assignment)
+    expect(queryByText('to grade', {exact: false})).toBeNull()
+    expect(queryByText('unsubmitted', {exact: false})).toBeNull()
+    expect(queryByText('message students', {exact: false})).toBeNull()
+  })
 })

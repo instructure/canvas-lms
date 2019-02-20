@@ -36,7 +36,7 @@ import ContentTabs from './ContentTabs'
 import TeacherFooter from './TeacherFooter'
 
 import ConfirmDialog from './ConfirmDialog'
-import MessageStudentsWhoForm from './MessageStudentsWhoForm'
+import MessageStudentsWhoDialog from './MessageStudentsWhoDialog'
 import TeacherViewContext, {TeacherViewContextDefaults} from './TeacherViewContext'
 
 export default class TeacherView extends React.Component {
@@ -97,18 +97,6 @@ export default class TeacherView extends React.Component {
 
   handleCloseMessageStudentsWho = () => {
     this.setState({messageStudentsWhoOpen: false, sendingMessageStudentsWhoNow: false})
-  }
-
-  handleSendMessageStudentsWho = () => {
-    this.setState({sendingMessageStudentsWhoNow: true})
-    showFlashAlert({message: I18n.t('Sending messages'), srOnly: true})
-    window.setTimeout(() => {
-      showFlashAlert({
-        message: 'We only pretended to send messages. Nothing was actually sent.',
-        type: 'error'
-      }) // don't bother translating this
-      this.handleCloseMessageStudentsWho()
-    }, 3000)
   }
 
   handleDeleteButtonPressed = () => {
@@ -204,35 +192,15 @@ export default class TeacherView extends React.Component {
     )
   }
 
-  messageStudentsWhoButtonProps = () => [
-    {
-      children: I18n.t('Cancel'),
-      onClick: this.handleCloseMessageStudentsWho
-    },
-    {
-      children: I18n.t('Send'),
-      variant: 'primary',
-      onClick: this.handleSendMessageStudentsWho
-    }
-  ]
-
-  renderMessageStudentsWhoForm = () => <MessageStudentsWhoForm assignment={this.props.assignment} />
-
-  renderMessageStudentsWhoModal() {
-    return (
-      <ConfirmDialog
-        open={this.state.messageStudentsWhoOpen}
-        working={this.state.sendingMessageStudentsWhoNow}
-        disabled={this.state.sendingMessageStudentsWhoNow}
-        heading={I18n.t('Message Students Who...')}
-        body={this.renderMessageStudentsWhoForm}
-        buttons={this.messageStudentsWhoButtonProps}
-        onDismiss={this.handleCloseMessageStudentsWho}
-        modalProps={{size: 'medium'}}
-        spinnerLabel={I18n.t('sending messages...')}
-      />
-    )
-  }
+  renderMessageStudentsWhoDialog = () => (
+    <MessageStudentsWhoDialog
+      assignment={this.props.assignment}
+      open={this.state.messageStudentsWhoOpen}
+      busy={this.state.sendingMessageStudentsWhoNow}
+      onClose={this.handleCloseMessageStudentsWho}
+      onSend={this.handleSendMessageStudentsWho}
+    />
+  )
 
   render() {
     const dirty = this.state.isDirty
@@ -257,7 +225,7 @@ export default class TeacherView extends React.Component {
             onChangeAssignment={this.handleChangeAssignment}
             readOnly={this.state.readOnly}
           />
-          {this.renderMessageStudentsWhoModal()}
+          {this.renderMessageStudentsWhoDialog()}
           {dirty ? (
             <TeacherFooter
               onCancel={this.handleCancel}

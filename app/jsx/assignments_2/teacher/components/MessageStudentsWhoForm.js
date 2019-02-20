@@ -17,27 +17,46 @@
  */
 
 import React from 'react'
-import _ from 'lodash'
+import {bool, func, number, string, arrayOf} from 'prop-types'
 import I18n from 'i18n!assignments_2'
 
 import AccessibleContent from '@instructure/ui-a11y/lib/components/AccessibleContent'
 import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldGroup'
+import {NumberInput} from '@instructure/ui-number-input'
 import TextInput from '@instructure/ui-forms/lib/components/TextInput'
 import TextArea from '@instructure/ui-forms/lib/components/TextArea'
+import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Select from '@instructure/ui-forms/lib/components/Select'
 
 import {TeacherAssignmentShape} from '../assignmentData'
+import {hasSubmission} from '../../../gradezilla/shared/helpers/messageStudentsWhoHelper'
 
 export default class MessageStudentsWhoForm extends React.Component {
   static propTypes = {
-    assignment: TeacherAssignmentShape
+    assignment: TeacherAssignmentShape.isRequired,
+    pointsThreshold: number, // may also be null
+    showPointsThreshold: bool,
+    selectedFilter: string,
+    subject: string,
+    body: string,
+    selectedStudents: arrayOf(string),
+    onFilterChange: func,
+    onPointsThresholdChange: func,
+    onSubjectChange: func,
+    onBodyChange: func,
+    onSelectedStudentsChange: func
   }
 
-  constructor(...args) {
-    super(...args)
-    this.state = {
-      selectedStudents: this.getAllStudents()
-    }
+  static defaultProps = {
+    pointsThreshold: null,
+    showPointsThreshold: false,
+    subject: '',
+    body: '',
+    onFilterChange: () => {},
+    onPointsThresholdChange: () => {},
+    onSubjectChange: () => {},
+    onBodyChange: () => {},
+    onSelectedStudentsChange: () => {}
   }
 
   getAllStudents() {
@@ -45,38 +64,94 @@ export default class MessageStudentsWhoForm extends React.Component {
   }
 
   handleFilterChange = (_event, selectedOption) => {
-    if (selectedOption === 'not-submitted') this.handleNotSubmitted()
-    else if (selectedOption === 'not-graded') this.handleNotGraded()
-    else if (selectedOption === 'less-than') this.handleLessThan()
-    else if (selectedOption === 'more-than') this.handleMoreThan()
-    // eslint-disable-next-line no-console
-    else console.error('MessageStudentsWhoForm error: unrecognized filter', selectedOption)
+    this.props.onFilterChange(selectedOption.value)
   }
 
   handleStudentsChange = (_event, selection) => {
-    this.setState(() => ({
-      selectedStudents: _.intersectionWith(
-        this.getAllStudents(),
-        selection,
-        (student, selected) => student.lid === selected.value
+    this.props.onSelectedStudentsChange(selection.map(s => s.value))
+  }
+
+  handlePointsChangeString = (_event, stringValue) => {
+    // special case: allow empty string
+    if (stringValue.length === 0) {
+      this.props.onPointsThresholdChange(null)
+    } else {
+      const newValue = Number.parseInt(stringValue, 10)
+      if (!Number.isNaN(newValue)) {
+        this.props.onPointsThresholdChange(Math.max(newValue, 0))
+      } // else, they typed a non-number, so don't do anything
+    }
+  }
+
+  handlePointsIncrement = () => {
+    if (this.props.pointsThreshold === null) this.props.onPointsThresholdChange(1)
+    else this.props.onPointsThresholdChange(this.props.pointsThreshold + 1)
+  }
+
+  handlePointsDecrement = () => {
+    if (this.props.pointsThreshold === null) this.props.onPointsThresholdChange(0)
+    else this.props.onPointsThresholdChange(Math.max(this.props.pointsThreshold - 1, 0))
+  }
+
+  handleChangeSubject = event => {
+    this.props.onSubjectChange(event.target.value)
+  }
+
+  handleChangeBody = event => {
+    this.props.onBodyChange(event.target.value)
+  }
+
+  renderScoreInput() {
+    if (this.props.showPointsThreshold) {
+      const points =
+        this.props.pointsThreshold === null ? '' : this.props.pointsThreshold.toString()
+      return (
+        <NumberInput
+          label={<ScreenReaderContent>{I18n.t('Points')}</ScreenReaderContent>}
+          placeholder={I18n.t('Points')}
+          value={points}
+          onChange={this.handlePointsChangeString}
+          onIncrement={this.handlePointsIncrement}
+          onDecrement={this.handlePointsDecrement}
+        />
       )
-    }))
+    } else return null
+  }
+
+  renderFilter() {
+    const options = [
+      {key: 'not-submitted', value: 'not-submitted', label: I18n.t("Haven't submitted yet")},
+      {key: 'not-graded', value: 'not-graded', label: I18n.t("Haven't been graded")},
+      {key: 'less-than', value: 'less-than', label: I18n.t('Scored less than')},
+      {key: 'more-than', value: 'more-than', label: I18n.t('Scored more than')}
+    ]
+    // not-submitted is only available if the assignment has an online submission
+    if (!hasSubmission(this.props.assignment)) options.shift()
+    return (
+      <FormFieldGroup description="" layout="columns">
+        <Select
+          label={<ScreenReaderContent>{I18n.t('Filter Students')}</ScreenReaderContent>}
+          selectedOption={this.props.selectedFilter}
+          onChange={this.handleFilterChange}
+          data-testid="filter-students"
+        >
+          {options.map(opt => (
+            <option {...opt} />
+          ))}
+        </Select>
+        {this.renderScoreInput()}
+      </FormFieldGroup>
+    )
   }
 
   render() {
     return (
       <FormFieldGroup description={I18n.t('Message students who')}>
-        <Select label="" onChange={this.handleFilterChange} inline>
-          <option value="not-submitted">{I18n.t("Haven't submitted yet")}</option>
-          <option value="not-graded">{I18n.t("Haven't been graded")}</option>
-          <option value="less-than">{I18n.t('Scored less than')}</option>
-          <option value="more-than">{I18n.t('Scored more than')}</option>
-        </Select>
-
+        {this.renderFilter()}
         <Select
           label={I18n.t('To:')}
           multiple
-          selectedOption={this.state.selectedStudents.map(s => s.lid)}
+          selectedOption={this.props.selectedStudents}
           onChange={this.handleStudentsChange}
           formatSelectedOption={tag => (
             <AccessibleContent alt={I18n.t('Remove %{studentName}', {studentName: tag.label})}>
@@ -91,8 +166,16 @@ export default class MessageStudentsWhoForm extends React.Component {
           ))}
         </Select>
 
-        <TextInput label={I18n.t('Subject:')} />
-        <TextArea label={I18n.t('Body:')} />
+        <TextInput
+          label={I18n.t('Subject:')}
+          value={this.props.subject}
+          onChange={this.handleChangeSubject}
+        />
+        <TextArea
+          label={I18n.t('Body:')}
+          value={this.props.body}
+          onChange={this.handleChangeBody}
+        />
       </FormFieldGroup>
     )
   }

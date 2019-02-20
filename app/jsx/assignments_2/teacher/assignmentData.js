@@ -224,7 +224,7 @@ const SubmissionShape = shape({
   gid: string,
   lid: string,
   submissionStatus: oneOf(['resubmitted', 'missing', 'late', 'submitted', 'unsubmitted']),
-  grade: number,
+  grade: string,
   gradingStatus: oneOf([null, 'excused', 'needs_review', 'needs_grading', 'graded']),
   score: number,
   state: oneOf(['submitted', 'unsubmitted', 'pending_review', 'graded', 'deleted']),

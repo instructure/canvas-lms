@@ -18,12 +18,18 @@
 
 import {fireEvent, waitForElement} from 'react-testing-library'
 import {renderTeacherView} from './integration-utils'
-import {mockAssignment, waitForNoElement} from '../../../test-utils'
+import {mockAssignment, itBehavesLikeADialog} from '../../../test-utils'
 
 jest.mock('jsx/shared/rce/RichContentEditor')
 
-// TODO: some of these tests are essentially duplicates of the delete dialog tests. Should unify somehow.
-describe.skip('MessageStudentsWho integration', () => {
+describe('MessageStudentsWho integration', () => {
+  itBehavesLikeADialog({
+    render: renderTeacherView,
+    getOpenDialogElt: fns => fns.getByText(/unsubmitted/i),
+    confirmDialogOpen: fns => fns.getByText('Message Students Who...'),
+    getCancelDialogElt: fns => fns.getByText(/cancel/i)
+  })
+
   it('shows the message students who dialog when the unsubmitted button is clicked', async () => {
     const {getByText, queryByText} = await renderTeacherView()
     expect(queryByText('Message Students Who...')).toBeNull()
@@ -36,36 +42,4 @@ describe.skip('MessageStudentsWho integration', () => {
     fireEvent.click(getByText(/message students/i))
     expect(await waitForElement(() => getByText('Message Students Who...'))).toBeInTheDocument()
   })
-
-  it('closes message students who when cancel is clicked', async () => {
-    const {getByText} = await renderTeacherView()
-    fireEvent.click(getByText(/unsubmitted/i))
-    await waitForElement(() => getByText('Message Students Who...'))
-    fireEvent.click(getByText(/cancel/i))
-    await waitForNoElement(() => getByText('Message Students Who...'))
-  })
-
-  it('closes message students who when the close button is clicked', async () => {
-    const {getByText, getByTestId} = await renderTeacherView()
-    fireEvent.click(getByText(/unsubmitted/i))
-    await waitForElement(() => getByText('Message Students Who...'))
-    fireEvent.click(getByTestId('confirm-dialog-close-button'))
-    await waitForNoElement(() => getByText('Message Students Who...'))
-  })
-
-  /* eslint-disable jest/no-disabled-tests */
-  describe.skip('sending messages', () => {
-    it('calls api to message remaining students when "send" is clicked', () => {
-      // check set of students, subject, and message parameters
-    })
-
-    it('disables the dialog while sending is in progress', () => {
-      // make the api call wait until we say it can finish
-    })
-
-    it('dismisses the dialog and sr-flashes success when the save finishes successfully', () => {})
-
-    it('renders errors, does not dismiss the dialog, and reenables it when the save fails', () => {})
-  })
-  /* eslint-enable jest/no-disabled-tests */
 })
