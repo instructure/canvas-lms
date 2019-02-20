@@ -1708,7 +1708,17 @@ class Course < ActiveRecord::Base
         "instructure_csv" => {
             :name => t('grade_export_types.instructure_csv', "Instructure formatted CSV"),
             :callback => lambda { |course, enrollments, publishing_user, publishing_pseudonym|
-                course.generate_grade_publishing_csv_output(enrollments, publishing_user, publishing_pseudonym)
+                grade_export_settings = Canvas::Plugin.find!('grade_export').settings || {}
+                include_final_grade_overrides = Canvas::Plugin.value_to_boolean(
+                  grade_export_settings[:include_final_grade_overrides]
+                )
+
+                course.generate_grade_publishing_csv_output(
+                  enrollments,
+                  publishing_user,
+                  publishing_pseudonym,
+                  include_final_grade_overrides: include_final_grade_overrides
+                )
             },
             :requires_grading_standard => false,
             :requires_publishing_pseudonym => false
@@ -1759,7 +1769,6 @@ class Course < ActiveRecord::Base
     all_enrollment_ids = enrollments.map(&:id)
 
     begin
-
       raise "final grade publishing disabled" unless Canvas::Plugin.find!('grade_export').enabled?
       settings = Canvas::Plugin.find!('grade_export').settings
       raise "endpoint undefined" if settings[:publish_endpoint].blank?
@@ -1768,12 +1777,10 @@ class Course < ActiveRecord::Base
       raise "grade publishing requires a grading standard" if !self.grading_standard_enabled? && format_settings[:requires_grading_standard]
 
       publishing_pseudonym = SisPseudonym.for(publishing_user, self)
-      raise "publishing disallowed for this publishing user" if publishing_pseudonym.nil? and format_settings[:requires_publishing_pseudonym]
+      raise "publishing disallowed for this publishing user" if publishing_pseudonym.nil? && format_settings[:requires_publishing_pseudonym]
 
       callback = Course.valid_grade_export_types[settings[:format_type]][:callback]
-
       posts_to_make = callback.call(self, enrollments, publishing_user, publishing_pseudonym)
-
     rescue => e
       Enrollment.where(:id => all_enrollment_ids).update_all(:grade_publishing_status => "error", :grade_publishing_message => e.to_s)
       raise e
@@ -1803,28 +1810,63 @@ class Course < ActiveRecord::Base
     raise errors[0] if errors.size > 0
   end
 
-  def generate_grade_publishing_csv_output(enrollments, publishing_user, publishing_pseudonym)
+  def generate_grade_publishing_csv_output(enrollments, publishing_user, publishing_pseudonym, include_final_grade_overrides: false)
     enrollment_ids = []
+
     res = CSV.generate do |csv|
-      row = ["publisher_id", "publisher_sis_id", "course_id", "course_sis_id", "section_id", "section_sis_id", "student_id", "student_sis_id", "enrollment_id", "enrollment_status", "score"]
-      row << "grade" if self.grading_standard_enabled?
-      csv << row
+      column_names = [
+        "publisher_id",
+        "publisher_sis_id",
+        "course_id",
+        "course_sis_id",
+        "section_id",
+        "section_sis_id",
+        "student_id",
+        "student_sis_id",
+        "enrollment_id",
+        "enrollment_status",
+        "score"
+      ]
+      column_names << "grade" if self.grading_standard_enabled?
+      csv << column_names
+
       enrollments.each do |enrollment|
-        next unless enrollment.computed_final_score
+        next if include_final_grade_overrides && !enrollment.effective_final_score
+        next if !include_final_grade_overrides && !enrollment.computed_final_score
+
         enrollment_ids << enrollment.id
+
+        if include_final_grade_overrides
+          grade = enrollment.effective_final_grade
+          score = enrollment.effective_final_score
+        else
+          grade = enrollment.computed_final_grade
+          score = enrollment.computed_final_score
+        end
+
         pseudonym_sis_ids = enrollment.user.pseudonyms.active.where(account_id: self.root_account_id).pluck(:sis_user_id)
         pseudonym_sis_ids = [nil] if pseudonym_sis_ids.empty?
+
         pseudonym_sis_ids.each do |pseudonym_sis_id|
-          row = [publishing_user.try(:id), publishing_pseudonym.try(:sis_user_id),
-                 enrollment.course.id, enrollment.course.sis_source_id,
-                 enrollment.course_section.id, enrollment.course_section.sis_source_id,
-                 enrollment.user.id, pseudonym_sis_id, enrollment.id,
-                 enrollment.workflow_state, enrollment.computed_final_score]
-          row << enrollment.computed_final_grade if self.grading_standard_enabled?
+          row = [
+            publishing_user.try(:id),
+            publishing_pseudonym.try(:sis_user_id),
+            enrollment.course.id,
+            enrollment.course.sis_source_id,
+            enrollment.course_section.id,
+            enrollment.course_section.sis_source_id,
+            enrollment.user.id,
+            pseudonym_sis_id,
+            enrollment.id,
+            enrollment.workflow_state,
+            score
+          ]
+          row << grade if self.grading_standard_enabled?
           csv << row
         end
       end
     end
+
     if enrollment_ids.any?
       [[enrollment_ids, res, "text/csv"]]
     else
