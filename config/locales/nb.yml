@@ -15590,7 +15590,11 @@ nb:
           **Kopier dette symbolet nå**. Når du forlater denne siden vil du ikke kunne
           hente symbolet lenger, og du vil bli nødt til å generere et nytt symbol for
           å få en ny verdi.
-      generate_access_token_description: "Det er ‘tilgangssymboler’ som lar tredjepartsapplikasjoner få tilgang til Canvas-ressurser på dine vegne. Disse symbolene opprettes normalt automatisk etter behov, men om [du utvikler et nytt eller begrenset prosjekt](%{documentation_url}) kan du generere symbolet herfra."
+      generate_access_token_description: |-
+          Det er ‘tilgangssymboler’ som lar tredjepartsapplikasjoner få tilgang til
+          Canvas-ressurser på dine vegne. Disse symbolene opprettes normalt automatisk
+          etter behov, men om [du utvikler et nytt eller begrenset prosjekt](%{documentation_url})
+          kan du generere symbolet herfra.
       google_docs_description: "Når du har gitt oss tilgang til Google Docs vil du kunne levere oppgaver direkte fra Google Docs, og opprette og dele dokumenter med medlemmer i klassene dine."
       google_drive_description: "Når du gir oss tillatelse å se din Google Drive vil du være i stand til å sende inn oppgaver direkte fra Google Drive, og opprette og dele dokumenter med medlemmer av emnene."
       headers: 
