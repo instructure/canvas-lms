@@ -45,7 +45,7 @@ export default function HelpLinks({links, hasLoaded, onClick}) {
                 {link.text}
               </Link>
               {link.subtext && (
-                <Text as="div" size="small" weight="light">
+                <Text as="div" size="small">
                   {link.subtext}
                 </Text>
               )}
