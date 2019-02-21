@@ -323,4 +323,13 @@ describe "calendar2" do
       assert_views(@quiz.title,@quiz.due_at)
     end
   end
+
+  context "as a user" do
+    it "without enrollment in a course calendar appears" do
+      user = user_factory(name: 'user1', active_user: true)
+      user_session(user)
+      get "/calendar2"
+      expect(f(".navigate_today")).to be_displayed
+    end
+  end
 end
