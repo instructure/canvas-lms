@@ -374,6 +374,12 @@ describe Oauth2ProviderController do
           expect(json.keys.sort).to match_array(success_token_keys)
           expect(json['token_type']).to eq 'Bearer'
         end
+
+        context 'with global_id as client_id' do
+          let(:client_id) { key.global_id }
+
+          it { is_expected.to have_http_status(200) }
+        end
       end
 
       context 'invalid grant_type provided' do
