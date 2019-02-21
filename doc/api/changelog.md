@@ -11,6 +11,23 @@ The API Change Log includes adjustments to the Canvas API documentation as part 
 
 <div class="changelog"></div>
 
+## 2019-03-09
+
+### Changes
+| API Calls | Function |  |
+|----------------------|----------------------|--------------------------|
+| [SIS Imports API] | Imports SIS Data Endpoint | Change_threshold parameter: added clarification for diffing percentage calculation
+
+[SIS Imports API]: sis_imports.html
+
+### Removals
+| API Responses | Function |      |
+|----------------------|----------------------|--------------------------|
+| [Users API] | To Do Items Endpoint | Removed mention of user dashboard, as this API call is not used for the dashboard
+
+[Users API]: users.html
+
+
 ## 2019-02-16
 
 ### Additions
@@ -100,29 +117,3 @@ The API Change Log includes adjustments to the Canvas API documentation as part 
 | [Navigation Tools] |     | Removed incorrect auto-generated links from page |
 
   [Navigation Tools]: file.navigation_tools.html
-
-## 2018-12-08
-
-### Changes
-| API Calls         | Function |   |
-|-------------------|----------|---|
-| [SIS Imports API] | Abort SIS Import Endpoint<br><br> Get SIS Import List Endpoint | Added clarification that aborting a sis batch can take time and subsequent sis batches begin to process 10 minutes after the abort.<br><br> Workflow\_state parameter: added initializing, failed, restoring, partially\_restored, and restored as allowed values |
-
-  [SIS Imports API]: sis_imports.html
-
-### Additions
-| API Calls               | Function                          |   |
-|-------------------------|-----------------------------------|---|
-| [SIS Import Errors API] | SISImportError Object             | Added row\_info parameter, which displays the contents of the line that had the error |
-| [Users API]             | List the Activity Stream Endpoint | Added only\_active\_courses parameter |
-
-  [SIS Import Errors API]: sis_import_errors.html
-  [Users API]: users.html
-
-<p></p>
-| API Responses | Function                   |   |
-|---------------|----------------------------|---|
-| [Courses API] | List Your Courses Endpoint | Include parameter: Added graded period parameters to be returned even if total grades are hidden in the course |
-
-  [Courses API]: courses.html
-<p></p>

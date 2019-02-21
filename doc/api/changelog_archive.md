@@ -6,6 +6,31 @@ The Change Log Archive page displays previous API changes in the [API Change Log
 The release date indicates the date that the API code was made available in the production environment.
 
 <div class="changelog"></div>
+## 2018-12-08
+
+### Changes
+| API Calls         | Function |   |
+|-------------------|----------|---|
+| [SIS Imports API] | Abort SIS Import Endpoint<br><br> Get SIS Import List Endpoint | Added clarification that aborting a sis batch can take time and subsequent sis batches begin to process 10 minutes after the abort.<br><br> Workflow\_state parameter: added initializing, failed, restoring, partially\_restored, and restored as allowed values |
+
+  [SIS Imports API]: sis_imports.html
+
+### Additions
+| API Calls               | Function                          |   |
+|-------------------------|-----------------------------------|---|
+| [SIS Import Errors API] | SISImportError Object             | Added row\_info parameter, which displays the contents of the line that had the error |
+| [Users API]             | List the Activity Stream Endpoint | Added only\_active\_courses parameter |
+
+  [SIS Import Errors API]: sis_import_errors.html
+  [Users API]: users.html
+
+<p></p>
+| API Responses | Function                   |   |
+|---------------|----------------------------|---|
+| [Courses API] | List Your Courses Endpoint | Include parameter: Added graded period parameters to be returned even if total grades are hidden in the course |
+
+  [Courses API]: courses.html
+
 ## 2018-11-17
 
 ### Changes
