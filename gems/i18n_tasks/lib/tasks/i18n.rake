@@ -52,7 +52,7 @@ namespace :i18n do
     }.freeze
 
     File.open(Rails.root.join(yaml_file), "w") do |file|
-      file.write({'en' => @translations.except(*special_keys)}.to_yaml)
+      file.write({'en' => @translations.except(*special_keys)}.to_yaml(line_width: -1))
     end
     print "Wrote new #{yaml_file}\n\n"
   end
@@ -174,7 +174,7 @@ namespace :i18n do
     puts
 
     File.open('config/locales/lolz.yml', 'w') do |f|
-      f.write(lolz_translations.to_yaml)
+      f.write(lolz_translations.to_yaml(line_width: -1))
     end
     print "\nFinished generating LOLZ from #{strings_processed} strings in #{Time.now - t} seconds\n"
 
@@ -189,7 +189,7 @@ namespace :i18n do
       }
 
       File.open('config/locales/locales.yml', 'w') do |f|
-        f.write(locales.to_yaml)
+        f.write(locales.to_yaml(line_width: -1))
       end
       print "Added LOLZ to locales\n"
     end
@@ -268,7 +268,7 @@ namespace :i18n do
           h
         } :
         current_strings
-      File.open(export_filename, "w"){ |f| f.write new_strings.expand_keys.to_yaml }
+      File.open(export_filename, "w"){ |f| f.write new_strings.expand_keys.to_yaml(line_width: -1) }
 
       push = 'n'
       begin
@@ -344,7 +344,7 @@ namespace :i18n do
     next if complete_translations.nil?
 
     File.open("config/locales/#{import.language}.yml", "w") { |f|
-      f.write({import.language => complete_translations}.to_yaml)
+      f.write({import.language => complete_translations}.to_yaml(line_width: -1))
     }
   end
 
@@ -392,7 +392,7 @@ namespace :i18n do
 # This YAML file is auto-generated from a Transifex import.
 # Do not edit it by hand, your changes will be overwritten.
 HEADER
-      f.write({import.language => complete_translations}.to_yaml)
+      f.write({import.language => complete_translations}.to_yaml(line_width: -1))
     }
 
     puts({
