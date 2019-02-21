@@ -21,10 +21,10 @@ require_relative '../spec_helper'
 RSpec.describe SubmissionCommentsController do
   describe "GET 'index'" do
     before :once do
-      course = Account.default.courses.create!
-      @teacher = course_with_teacher(course: course, active_all: true).user
-      @student = course_with_student(course: course, active_all: true).user
-      @assignment = course.assignments.create!
+      @course = Account.default.courses.create!
+      @teacher = course_with_teacher(course: @course, active_all: true).user
+      @student = course_with_student(course: @course, active_all: true).user
+      @assignment = @course.assignments.create!
       @submission = @assignment.submissions.find_by!(user: @student)
       @submission.submission_comments.create!(author: @teacher, comment: 'a comment')
     end
@@ -33,6 +33,20 @@ RSpec.describe SubmissionCommentsController do
       before { user_session(@teacher) }
 
       context 'given a standard request' do
+        before do
+          get :index, params: { submission_id: @submission.id }, format: :pdf
+        end
+
+        specify { expect(response).to have_http_status :ok }
+        specify { expect(response).to render_template(:index) }
+        specify { expect(response.headers.fetch('Content-Type')).to match(/\Aapplication\/pdf/) }
+      end
+
+      context "when course is in a concluded term" do
+        before :once do
+          @course.enrollment_term.update!(end_at: 1.day.ago)
+        end
+
         before do
           get :index, params: { submission_id: @submission.id }, format: :pdf
         end
