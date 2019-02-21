@@ -22,10 +22,13 @@ class GradebookExporter
 
   # You may see a pattern in this file of things that look like `<< nil << nil`
   # to create 'buffer' cells for columns. Let's try to stop using that pattern
-  # and instead define the number of 'buffer' columns here in the COLUMN_COUNTS hash.
-  # Please leave a comment for each entry in COLUMN_COUNTS.
-  COLUMN_COUNTS = {
-    grading_standard: 4 # 'Current Grade', 'Final Grade', 'Unposted Current Grade', 'Unposted Final Grade'
+  # and instead define the 'buffer' columns here in the BUFFER_COLUMN_DEFINITIONS
+  # hash. Use the buffer_columns and buffer_column_headers methods to populate the
+  # relevant rows.
+  BUFFER_COLUMN_DEFINITIONS = {
+    grading_standard: ['Current Grade', 'Unposted Current Grade', 'Final Grade', 'Unposted Final Grade'].freeze,
+    override_score: ['Override Score'].freeze,
+    override_grade: ['Override Grade'].freeze
   }.freeze
 
   def initialize(course, user, options = {})
@@ -58,8 +61,12 @@ class GradebookExporter
     encoding == 'UTF-8' && @user.feature_enabled?(:include_byte_order_mark_in_gradebook_exports)
   end
 
+  def buffer_column_headers(column_name)
+    BUFFER_COLUMN_DEFINITIONS.fetch(column_name).dup
+  end
+
   def buffer_columns(column_name, buffer_value=nil)
-    column_count = COLUMN_COUNTS.fetch(column_name)
+    column_count = BUFFER_COLUMN_DEFINITIONS.fetch(column_name).length
     Array.new(column_count, buffer_value)
   end
 
@@ -137,8 +144,10 @@ class GradebookExporter
         end
         row << "Current Points" << "Final Points" if include_points?
         row << "Current Score" << "Unposted Current Score" << "Final Score" << "Unposted Final Score"
-        if @course.grading_standard_enabled?
-          row << "Current Grade" << "Unposted Current Grade" << "Final Grade" << "Unposted Final Grade"
+        row.concat(buffer_column_headers(:grading_standard)) if @course.grading_standard_enabled?
+        if include_final_grade_override?
+          row.concat(buffer_column_headers(:override_score))
+          row.concat(buffer_column_headers(:override_grade)) if @course.grading_standard_enabled?
         end
       end
       csv << row
@@ -168,6 +177,10 @@ class GradebookExporter
         end
 
         row.concat(buffer_columns(:grading_standard)) if @course.grading_standard_enabled?
+        if include_final_grade_override?
+          row.concat(buffer_columns(:override_score))
+          row.concat(buffer_columns(:override_grade)) if @course.grading_standard_enabled?
+        end
         csv << row
       end
 
@@ -190,6 +203,10 @@ class GradebookExporter
         row << read_only << read_only if include_points?
         row << read_only << read_only << read_only << read_only
         row.concat(buffer_columns(:grading_standard, read_only)) if @course.grading_standard_enabled?
+        if include_final_grade_override?
+          row.concat(buffer_columns(:override_score, read_only))
+          row.concat(buffer_columns(:override_grade, read_only)) if @course.grading_standard_enabled?
+        end
       end
 
       csv << row
@@ -315,6 +332,12 @@ class GradebookExporter
       result << student_enrollment.computed_final_grade(score_opts)
       result << student_enrollment.unposted_final_grade(score_opts)
     end
+
+    if include_final_grade_override?
+      result << student_enrollment.override_score(score_opts)
+      result << student_enrollment.override_grade(score_opts) if @course.grading_standard_enabled?
+    end
+
     result
   end
 
@@ -365,5 +388,8 @@ class GradebookExporter
   def column_count_per_group
     include_points? ? 6 : 4
   end
-  private :column_count_per_group
+
+  def include_final_grade_override?
+    @course.feature_enabled?(:final_grades_override)
+  end
 end

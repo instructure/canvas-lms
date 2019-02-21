@@ -594,6 +594,15 @@ tr:
             start: 
               parameters: 
                 header: "Etkinlik Tarihi:"
+      faculty_missing_grades: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "Bitiş:"
+            start: 
+              parameters: 
+                header: "Başlangıç:"
       no_submissions: 
         parameters: 
           custom_reports: 
@@ -812,6 +821,15 @@ tr:
             start: 
               parameters: 
                 header: "Etkinlik Tarihi:"
+      faculty_missing_grades: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "Bitiş:"
+            start: 
+              parameters: 
+                header: "Başlangıç:"
       no_submissions: 
         parameters: 
           custom_reports: 
@@ -2177,6 +2195,7 @@ tr:
   assignment_selection_6bff05c4: "Ödev Seçimi"
   assignment_title_82b4422e: "Ödev Başlığı:"
   assignment_title_8a707dd2: "ödev başlığı"
+  assignment_type_60255aac: "Değerlendirme Tipi"
   assignment_url_37c849c6: "ödev url'si"
   assignment_was_deleted_8320d26d: "Ödev silindi"
   assignment_weights_d4bcf9ab: "Ödev Ağırlıkları"
@@ -2959,6 +2978,7 @@ tr:
   avatar_for_author_2eabbf55: "%{author}avatarı"
   avatar_for_studentname_8ea511ae: "%{studentName}avatarı"
   average_49c63f9b: Ortalama
+  average_score_15cd7c3c: "Ortalama Puan"
   back_2900f52a: Geri
   back_to_announcements_1036e43e: "Duyurulara Geri Dön"
   back_to_app_center_95420d83: "Uygulama Merkezine Geri Dön"
@@ -3773,6 +3793,7 @@ tr:
   click_to_view_event_details_b25dc1f3: "Etkinlik ayrıntılarını görmek için tıklayın"
   clicking_on_the_column_headers_will_sort_the_rows__3a6e9573: "Sütun başlıklarına tıklamak satırları o sütundaki verilere göre  sıralar"
   clone_group_set_c2a40e15: "Grup Setini Klonla"
+  close_17f50799: kapat
   close_and_return_to_canvas_80544344: "Kapat ve Canvas'a geri dön"
   close_d634289d: Kapat
   close_date_a2f617b3: "Tarihi Kapat"
@@ -8471,6 +8492,7 @@ tr:
       pages: Sayfalar
       people: Katılımcılar
   group_a8f5ed9c: Grup
+  group_assignment_7060989f: "Grup Ödevi"
   group_assignments_cannot_be_enabled_for_moderated__6b2faeef: "Modere edilmiş ödevler için grup ödevleri etkinleştirilemez"
   group_categories: 
     notices: 
@@ -14788,6 +14810,7 @@ tr:
   remove_row_f9d59cba: "Satırı Sil"
   remove_these_dates_48453a81: "Bu Tarihleri Sil"
   remove_this_rubric_from_my_list_c7d80704: "Değerlendirme listesini listemden sil"
+  remove_user_from_section_5556f465: "Kullanıcıyı Bölümden Sil"
   rename_45608f54: "Yeniden adlandır"
   rename_this_section_73065edd: "Bu Bölümü Yeniden Adlandır"
   replace_e61834a7: Değiştir
@@ -16326,6 +16349,7 @@ tr:
     update_grade: "Notu Düzenle"
     view_rubric_assessment_in_the_speedgrader: "SpeedGrader'da Değerlendirme Sınavlarını gör"
   submission_score_b7a291e8: "gönderi puanı"
+  submission_type_a925fc5f: "Gönderi Türü"
   submissions: 
     assignment_submit_success: "Ödev başarıyla gönderildi."
     assignment_submitted: "Sınav gönderildi."
@@ -16913,6 +16937,8 @@ tr:
   unknown_question_bank: "Bilinmeyen soru bankası"
   unknown_quiz: "Bilinmeyen kısa sınav"
   unknown_user_1113fcaa: "Bilinmeyen Kullanıcı"
+  unlimited_attempts_81a37d4: "Sınırsız Hak"
+  unlimited_ff19e96d: Sınırsız
   unlock_at_bb930b34: "Şu tarihte aç"
   unlock_date_cannot_be_after_due_date_8829d9ca: "Kilit açma tarihi bitiş tarihinden önce olamaz"
   unlock_date_cannot_be_after_lock_date_591f7fda: "Kilit açma tarihi bitiş tarihinden önce olamaz"

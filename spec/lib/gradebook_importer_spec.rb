@@ -542,6 +542,22 @@ describe GradebookImporter do
     expect(@gi.missing_assignments).to be_empty
   end
 
+  describe "override columns" do
+    it "does not create assignments for the Override Score or Override Grade column" do
+      course_model
+      @assignment1 = @course.assignments.create!(name: 'Assignment 1', points_possible: 10)
+      importer_with_rows(
+        "Student,ID,Section,Assignment 1,Current Points,Final Points,Override Score,Override Grade",
+        "Points Possible,,,20,,,,"
+      )
+
+      aggregate_failures do
+        expect(@gi.assignments).to eq [@assignment1]
+        expect(@gi.missing_assignments).to be_empty
+      end
+    end
+  end
+
   it "parses new and existing users" do
     course_with_student(active_all: true)
     @student1 = @student

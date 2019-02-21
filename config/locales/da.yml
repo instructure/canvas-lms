@@ -15576,8 +15576,9 @@ da:
           ny værdi.
       generate_access_token_description: |-
           Adgangstoken giver tredjeparts programmer mulighed for at få adgang til Canvas-ressourcer
-          på dine vegne. Disse tokens dannes automatisk for
-          programmer efter behov, men hvis [du er ved at udvikle et nyt eller begrænset projekt](%{documentation_url}), kan du blot  danne dit token herfra.
+          på dine vegne. Disse tokens dannes automatisk for programmer efter behov, 
+          men hvis [du er ved at udvikle et nyt eller begrænset projekt](%{documentation_url}),
+          kan du blot  danne dit token herfra.
       google_docs_description: "Når du autoriserer os til at se dine Google Docs vil du være i stand til at indsende dine opgaver direkte fra Google Docs og oprette og dele dokumenter med medlemmer af dine klasser."
       google_drive_description: "Når du giver os tilladelse til at se din Google Drive, kan du aflevere dine opgaver direkte fra Google Drive, samt oprette og dele dokumenter med medlemmer i din klasse."
       headers: 

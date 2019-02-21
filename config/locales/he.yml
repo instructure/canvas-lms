@@ -610,6 +610,15 @@ he:
             start: 
               parameters: 
                 header: "תאריך פעולה:"
+      faculty_missing_grades: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "סיום ב:"
+            start: 
+              parameters: 
+                header: "התחלה ב:"
       no_submissions: 
         parameters: 
           custom_reports: 
@@ -810,6 +819,15 @@ he:
             start: 
               parameters: 
                 header: "תאריך פעולה:"
+      faculty_missing_grades: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "סיום ב:"
+            start: 
+              parameters: 
+                header: "התחלה ב:"
       no_submissions: 
         parameters: 
           custom_reports: 
@@ -2959,6 +2977,7 @@ he:
   avatar_for_author_2eabbf55: "אווטאר של %{author}"
   avatar_for_studentname_8ea511ae: "אווטאר של %{studentName}"
   average_49c63f9b: ממוצע
+  average_score_15cd7c3c: "ציון ממוצע"
   back_2900f52a: חזרה
   back_to_announcements_1036e43e: "חזרה להכרזות"
   back_to_app_center_95420d83: "חזרה אל מרכז האפליקציות"
@@ -3770,6 +3789,7 @@ he:
   click_to_view_event_details_b25dc1f3: "הקלקה לצפייה בפרטי אירוע"
   clicking_on_the_column_headers_will_sort_the_rows__3a6e9573: "הקלקה על כותרת עמודות תמיין את השורות לפי עמודה זו."
   clone_group_set_c2a40e15: " שכפול של אוסף קבוצות"
+  close_17f50799: סגירה
   close_and_return_to_canvas_80544344: "סגירה וחזרה לקנבס"
   close_d634289d: סגירה
   close_date_a2f617b3: "תאריך סגירה"
@@ -8708,6 +8728,7 @@ he:
       pages: דפים
       people: אנשים
   group_a8f5ed9c: קבוצה
+  group_assignment_7060989f: "משימה קבוצתית"
   group_assignments_cannot_be_enabled_for_moderated__6b2faeef: "אי אפשר להפעיל משימות קבוצתיות במקרה של משימות מונחות"
   group_categories: 
     notices: 
@@ -15410,6 +15431,7 @@ he:
   remove_this_item_from_the_module_4b2ceab7: "הסרת פריט זה מהמודול"
   remove_this_rubric_from_my_list_c7d80704: "הסרת רובריקה זו מהרשימה שלי"
   remove_this_section_9a88ca43: "הסרת הקבצה זו"
+  remove_user_from_section_5556f465: "הסרת תלמיד מהקבצה"
   removed_user_as_group_leader_bb69330f: " %{user} הוסר כמוביל קבוצה"
   rename_45608f54: "שינוי שם"
   rename_c_name_section_e0e92c97: "שינוי שם הקבצה %{c.name} "
@@ -17215,6 +17237,7 @@ he:
     view_rubric_assessment_in_the_speedgrader: "הצגת הערכות רובריקה ב SpeedGrader"
   submission_in_another_grading_period_e754b329: "הגשה בתקופת הערכה אחרת"
   submission_score_b7a291e8: "ציון הגשה"
+  submission_type_a925fc5f: "סוג הגשה"
   submissions: 
     assignment_submit_success: "המשימה הוגשה בהצלחה"
     assignment_submitted: "המשימה הוגשה."
@@ -18058,6 +18081,8 @@ he:
   unknown_quiz: "בוחן לא מוכר"
   unknown_user_1113fcaa: "משתמש לא מוכר "
   unknown_user_url_82196ba7: "כתובת דף משתמש לא מורכת"
+  unlimited_attempts_81a37d4: "מספר נסיונות בלתי מוגבל"
+  unlimited_ff19e96d: "בלתי מוגבל"
   unlock_at_bb930b34: "שחרור נעילה ב-"
   unlock_at_time_a0bbfb9: "שחרור נעילה ב: %{time}"
   unlock_date_cannot_be_after_due_date_8829d9ca: "שחרור נעילת תאריך צריכה להיות לפני תאריך יעד"
