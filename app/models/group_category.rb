@@ -478,7 +478,7 @@ class GroupCategory < ActiveRecord::Base
         new_group_membership = group_membership.dup
         new_group_membership.uuid = nil
         new_group_membership.group = new_group
-        new_group_membership.save!
+        new_group_membership.save
       end
     end
   end
