@@ -22,7 +22,7 @@ require_dependency "lti/substitutions_helper"
 
 module Lti
   describe SubstitutionsHelper do
-    subject { SubstitutionsHelper.new(course, root_account, user) }
+    subject { SubstitutionsHelper.new(course, root_account, user, tool, resource_type) }
 
     specs_require_sharding
 
@@ -37,6 +37,8 @@ module Lti
       Account.create!(root_account: root_account)
     }
     let(:user) { User.create! }
+    let(:tool) { nil }
+    let(:resource_type) { nil }
 
     def set_up_persistance!
       @shard1.activate { user.save! }
@@ -190,6 +192,20 @@ module Lti
         sub_account.destroy!
         roles = subject.all_roles
         expect(roles).not_to include 'urn:lti:instrole:ims/lis/Administrator'
+      end
+
+      context 'with global_navigation as resource_type' do
+        let(:resource_type) { 'global_navigation' }
+
+        it "doesn't include context roles" do
+          allow(subject).to receive(:course_enrollments).and_return([TaEnrollment.new])
+          roles = subject.all_roles('lti1_3')
+          expected_roles = ["http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#TeachingAssistant", # only difference btwn lis2 and lti1_3 modes
+                            "http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor",
+                            "http://purl.imsglobal.org/vocab/lis/v2/system/person#User"]
+          expect(expected_roles - roles.split(',')).to match_array expected_roles
+        end
+
       end
     end
 
