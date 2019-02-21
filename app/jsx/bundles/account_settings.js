@@ -18,8 +18,11 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import I18n from 'i18n!account_settings_jsx_bundle'
 import FeatureFlagAdminView from 'compiled/views/feature_flags/FeatureFlagAdminView'
 import CustomHelpLinkSettings from '../custom_help_link_settings/CustomHelpLinkSettings'
+import Spinner from '@instructure/ui-elements/lib/components/Spinner'
+import View from '@instructure/ui-layout/lib/components/View'
 import 'account_settings'
 import 'compiled/bundles/modules/account_quota_settings'
 
@@ -38,5 +41,17 @@ if (document.getElementById('custom_help_link_settings')) {
     />,
     document.getElementById('custom_help_link_settings')
   )
+}
+
+if (document.getElementById('tab-security')) {
+  ReactDOM.render(
+    <View
+      as="div"
+      margin="large"
+      padding="large"
+      textAlign="center"
+    >
+    <Spinner size="large" title={I18n.t('Loading')} />
+  </View>, document.getElementById('tab-security'))
 }
 

@@ -21,13 +21,20 @@ import {Provider} from 'react-redux'
 import {render} from 'react-testing-library'
 import {configStore} from '../../store'
 
+const fakeAxios = {
+  delete: jest.fn(() => ({then() {}})),
+  get: jest.fn(() => ({then() {}})),
+  post: jest.fn(() => ({then() {}})),
+  put: jest.fn(() => ({then() {}}))
+}
+
 // This is modified from a version by Kent C. Dodds described here:
 // https://github.com/kentcdodds/react-testing-library/blob/master/examples/__tests__/react-redux.js
 export function renderWithRedux(
   ui,
   {
     initialState,
-    store = configStore(initialState, {
+    store = configStore(initialState, fakeAxios, {
       disableLogger: true
     })
   } = {}

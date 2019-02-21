@@ -193,7 +193,7 @@ export class Whitelist extends Component {
         </form>
         {whitelistToShow.length <= 0 ? (
           <Billboard
-            size="x-small"
+            size="small"
             heading={I18n.t('No domains whitelisted')}
             hero={<EmptyDesert />}
           />

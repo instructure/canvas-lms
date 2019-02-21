@@ -986,6 +986,11 @@ class AccountsController < ApplicationController
         MASKED_APP_CENTER_ACCESS_TOKEN: @account.settings[:app_center_access_token].try(:[], 0...5),
         PERMISSIONS: {
           :create_tool_manually => @account.grants_right?(@current_user, session, :create_tool_manually),
+        },
+        CSP: {
+          :enabled => @account.csp_enabled?,
+          :inherited => @account.csp_inherited?,
+          :settings_locked => @account.csp_locked?,
         }
       })
       js_env(edit_help_links_env, true)
