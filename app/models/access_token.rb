@@ -233,11 +233,8 @@ class AccessToken < ActiveRecord::Base
   end
 
   def must_only_include_valid_scopes
-    return true if scopes.nil?
-    errors.add(:scopes, "must match accepted scopes") unless scopes.all? {|scope| TokenScopes.all_scopes.include?(scope)}
-    if developer_key.require_scopes?
-      errors.add(:scopes, 'requested scopes must match scopes on developer key') unless scopes.all? { |scope| developer_key.scopes.include?(scope) }
-    end
+    return true if scopes.nil? || !developer_key.require_scopes?
+    errors.add(:scopes, 'requested scopes must match scopes on developer key') unless scopes.all? { |scope| developer_key.scopes.include?(scope) }
   end
 
   # It's encrypted, but end users still shouldn't see this.
