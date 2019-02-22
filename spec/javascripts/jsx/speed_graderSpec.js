@@ -2177,11 +2177,15 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       })
     })
 
-    QUnit.module('when the assessment is not a peer review assessment', function() {
+    QUnit.module('when the assessment is a peer review assessment', function(contextHooks) {
+      contextHooks.beforeEach(function() {
+        SpeedGrader.EG.currentStudent.rubric_assessments[0].assessment_type = 'peer_review'
+      })
+
       test('populates the rubric without data if the user is not the selected assessor', function() {
         SpeedGrader.EG.refreshFullRubric()
-        const {data} = window.rubricAssessment.populateRubric.getCall(0).args[1]
-        propEqual(data, [])
+        const assessmentData = window.rubricAssessment.populateRubric.getCall(0).args[1]
+        propEqual(assessmentData, {})
       })
 
       test('populates the rubric with data if the user is the selected assessor', function() {

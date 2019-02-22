@@ -903,7 +903,7 @@ function hideMediaRecorderContainer() {
 }
 
 function isAssessmentEditableByMe(assessment) {
-  //if the assessment is mine or I can :manage_course then it is editable
+  // if the assessment is mine or I can :manage_grades then it is editable
   if (
     !assessment ||
     assessment.assessor_id === ENV.RUBRIC_ASSESSMENT.assessor_id ||
@@ -1145,7 +1145,7 @@ function rubricAssessmentToPopulate() {
   const userCanAssess = isAssessmentEditableByMe(assessment)
 
   if (userIsNotAssessor && !userCanAssess) {
-    return {...assessment, data: []}
+    return {}
   }
 
   return assessment
