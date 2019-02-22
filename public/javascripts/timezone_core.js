@@ -317,6 +317,10 @@ const tz = {
     return tz.parse(tz.format(date, '%F 23:59:59'))
   },
 
+  setToEndOfMinute (date) {
+    return tz.parse(tz.format(date, '%F %R:59'))
+  },
+
   // finds the given time of day on the given date ignoring dst conversion and such.
   // e.g. if time is 2016-05-20 14:00:00 and date is 2016-03-17 23:59:59, the result will
   // be 2016-03-17 14:00:00

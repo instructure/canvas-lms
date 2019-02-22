@@ -161,4 +161,27 @@ QUnit.module('DueDateCalendarPicker', suiteHooks => {
     const labelledby = wrapper.find('input').prop('aria-labelledby')
     equal(labelId, labelledby)
   })
+
+  test('sets seconds to 59 when defaultToEndOfMinute is true and seconds value is 0', () => {
+    props.defaultToEndOfMinute = true
+    mountComponent()
+
+    simulateChange('2015-08-31T00:30:00')
+    equal(getEnteredDate().toUTCString(), 'Mon, 31 Aug 2015 00:30:59 GMT')
+  })
+
+  test('does not set seconds value when defaultToEndOfMinute is true and seconds value is not 0', () => {
+    props.defaultToEndOfMinute = true
+    mountComponent()
+
+    simulateChange('2015-08-31T00:30:10')
+    equal(getEnteredDate().toUTCString(), 'Mon, 31 Aug 2015 00:30:10 GMT')
+  })
+
+  test('does not adjust seconds value when defaultToEndOfMinute is not true', () => {
+    mountComponent()
+
+    simulateChange('2015-08-31T00:30:00')
+    equal(getEnteredDate().toUTCString(), 'Mon, 31 Aug 2015 00:30:00 GMT')
+  })
 })
