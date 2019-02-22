@@ -35,7 +35,7 @@ function sortPairsDescending([scoreA, submissionA], [scoreB, submissionB]) {
     return scoreDiff
   }
   // To ensure stable sorting, use the assignment id as a secondary sort.
-  return submissionA.assignment_id - submissionB.assignment_id
+  return submissionA.submission.assignment_id - submissionB.submission.assignment_id
 }
 
 function sortPairsAscending([scoreA, submissionA], [scoreB, submissionB]) {
@@ -44,7 +44,7 @@ function sortPairsAscending([scoreA, submissionA], [scoreB, submissionB]) {
     return scoreDiff
   }
   // To ensure stable sorting, use the assignment id as a secondary sort.
-  return submissionA.assignment_id - submissionB.assignment_id
+  return submissionA.submission.assignment_id - submissionB.submission.assignment_id
 }
 
 function sortSubmissionsAscending(submissionA, submissionB) {
@@ -53,7 +53,7 @@ function sortSubmissionsAscending(submissionA, submissionB) {
     return scoreDiff
   }
   // To ensure stable sorting, use the assignment id as a secondary sort.
-  return submissionA.assignment_id - submissionB.assignment_id
+  return submissionA.submission.assignment_id - submissionB.submission.assignment_id
 }
 
 function getSubmissionGrade({score, total}) {
