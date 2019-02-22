@@ -353,6 +353,7 @@ by `asset_type` and `asset_id`.
 | `sis_source_id` | The SIS source id of the new assignment group. |
 | `integration_data` | Integration data for the new assignment group. |
 | `rules` | Rules for the new assignment group. |
+| `workflow_state` | Workflow state of the assignment group. |
 
 #### `assignment_group_updated`
 
@@ -367,6 +368,7 @@ by `asset_type` and `asset_id`.
 | `sis_source_id` | The SIS source id of the updated assignment group. |
 | `integration_data` | Integration data for the updated assignment group. |
 | `rules` | Rules for the updated assignment group. |
+| `workflow_state` | Workflow state of the assignment group. |
 
 #### `submission_created`
 

@@ -609,6 +609,42 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe 'assignment_group_updated' do
+    let(:course) do
+      course_with_student_submissions
+      @course
+    end
+    let(:assignment_group) { course.assignment_groups.take }
+    let(:expected_data) do
+      {
+        assignment_group_id: assignment_group.id.to_s,
+        context_id: assignment_group.context_id.to_s,
+        context_type: assignment_group.context_type,
+        name: assignment_group.name,
+        position: assignment_group.position,
+        group_weight: assignment_group.group_weight,
+        sis_source_id: assignment_group.sis_source_id,
+        integration_data: assignment_group.integration_data,
+        rules: assignment_group.rules,
+        workflow_state: assignment_group.workflow_state
+      }
+    end
+
+    context 'when updated' do
+      it 'sends the expected data' do
+        expect_event('assignment_group_updated', expected_data).once
+        Canvas::LiveEvents.assignment_group_updated(assignment_group)
+      end
+    end
+
+    context 'when created' do
+      it 'sends the expected data' do
+        expect_event('assignment_group_created', expected_data).once
+        Canvas::LiveEvents.assignment_group_created(assignment_group)
+      end
+    end
+  end
+
   describe '.quiz_export_complete' do
     class FakeExport
       attr_accessor :context
