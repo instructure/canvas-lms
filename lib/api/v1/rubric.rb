@@ -19,6 +19,7 @@
 module Api::V1::Rubric
   include Api::V1::Json
   include Api::V1::RubricAssessment
+  include Api::V1::RubricAssociation
 
   API_ALLOWED_RUBRIC_OUTPUT_FIELDS = {
     only: %w(
@@ -32,6 +33,7 @@ module Api::V1::Rubric
       read_only
       free_form_criterion_comments
       hide_score_total
+      data
     )
   }.freeze
 
@@ -44,7 +46,8 @@ module Api::V1::Rubric
     json_attributes = API_ALLOWED_RUBRIC_OUTPUT_FIELDS
     hash = api_json(rubric, user, session, json_attributes)
     hash['criteria'] = rubric.data if opts[:style] == "full"
-    hash['assessments'] = rubric_assessments_json(opts[:assessments], user, session, opts) if opts[:assessments].present?
+    hash['assessments'] = rubric_assessments_json(opts[:assessments], user, session, opts) unless opts[:assessments].nil?
+    hash['associations'] = rubric_associations_json(opts[:associations], user, session, opts) unless opts[:associations].nil?
     hash
   end
 
