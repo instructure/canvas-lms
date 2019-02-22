@@ -20,6 +20,7 @@
 # Likewise, all the methods added will be available for all controllers.
 
 class ApplicationController < ActionController::Base
+
   class << self
     [:before, :after, :around,
      :skip_before, :skip_after, :skip_around,

@@ -28,3 +28,13 @@ group :development do
     gem 'byebug', '9.0.6', platform: :mri
   end
 end
+
+# StrongMind Added
+group :development, :test do
+  gem 'pry-rails'
+  gem 'pry-byebug'
+  gem 'better_errors'
+  gem 'binding_of_caller'
+  gem 'dotenv-rails'
+  gem 'thin'
+end

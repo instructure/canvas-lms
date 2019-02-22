@@ -399,5 +399,3 @@ to because the assignment has no points possible.
     end
   end
 end
-
-require File.expand_path('../../lib/basic_lti/basic_outcomes', CanvasShim::Engine.called_from)

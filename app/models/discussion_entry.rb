@@ -525,4 +525,3 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
 end
-require File.expand_path('../../app/models/discussion_entry', CanvasShim::Engine.called_from)
