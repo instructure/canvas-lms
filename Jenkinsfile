@@ -40,6 +40,17 @@ def fetchGems = gems.collectEntries { String gem ->
   [ "${gem}" : { fetchFromGerrit(gem, 'gems/plugins') } ]
 }
 
+def getImageTag() {
+  //if (env.GERRIT_EVENT_TYPE == 'patchset-created') {
+    // GERRIT__REFSPEC will be in the form 'refs/changes/63/181863/8'
+    // we want a name in the form '63.181863.8'
+    NAME = "${env.GERRIT_REFSPEC}".minus('refs/changes/').replaceAll('/','.')
+    return "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
+  //} else {
+  //  return "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$GERRIT_BRANCH"
+  //}
+}
+
 pipeline {
   agent { label 'docker' }
 
@@ -49,10 +60,9 @@ pipeline {
   }
 
   environment {
-    NAME = "${env.GERRIT_REFSPEC}".minus('refs/changes/').replaceAll('/','.')
-    IMAGE_TAG = "$DOCKER_REGISTRY_FQDN/canvas-lms:$NAME"
     GERRIT_PORT = "29418"
     GERRIT_URL = "$GERRIT_HOST:$GERRIT_PORT"
+    IMAGE_TAG = getImageTag()
   }
 
   stages {
@@ -106,15 +116,12 @@ pipeline {
       }
     }
 
-    /*
-    stage('Publish Image') {
-      when { environment name: 'GERRIT_EVENT_TYPE', value: 'change-merged' }
+    stage("Publish Image") {
       steps {
         timeout(time: 5, unit: 'MINUTES') {
           sh 'docker push $IMAGE_TAG'
         }
       }
     }
-    */
   }
 }
