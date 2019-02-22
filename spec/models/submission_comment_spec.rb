@@ -504,6 +504,29 @@ This text has a http://www.google.com link in it...
         expect(@submission_comment.grants_any_right?(@student, {}, :read)).to be_falsey
       end
     end
+
+    describe "viewing comments" do
+      context "when the assignment is not moderated" do
+        let(:course) { Course.create! }
+        let(:assignment) { course.assignments.create!(title: "hi") }
+        let(:ta) { course.enroll_ta(User.create!, active_all: true).user }
+        let(:student) { course.enroll_student(User.create!, active_all: true).user }
+        let(:submission) { assignment.submission_for_student(student) }
+        let(:comment) do
+          assignment.update_submission(student, commenter: student, comment: 'ok')
+          submission.submission_comments.first
+        end
+
+        it "submitter comments can be read by an instructor with default permissions" do
+          expect(comment.grants_right?(ta, :read)).to be true
+        end
+
+        it "submitter comments can be read by an instructor who cannot manage assignments but can view the submitter's grades" do
+          RoleOverride.create!(context: course.account, permission: :manage_assignments, role: ta_role, enabled: false)
+          expect(comment.grants_right?(ta, :read)).to be true
+        end
+      end
+    end
   end
 
   describe '#update_submission' do
