@@ -209,13 +209,8 @@ class SubmissionComment < ActiveRecord::Base
       return !provisional || (assignment.grades_published? && author_id == assignment.final_grader_id)
     end
 
-    # At this point, deny all non-graders, leaving us with only provisional graders/
-    # moderated assignments
-    return false unless submission.user_can_read_grade?(user, session)
-
-    # We've checked all possible cases for non-moderated assignments at this point, so
-    # anything past here should be moderated
-    return false unless assignment.moderated_grading?
+    # For non-moderated assignments, check whether the user can view grades
+    return submission.user_can_read_grade?(user, session) unless assignment.moderated_grading?
 
     # If we made it here, the current user is a provisional grader viewing a
     # moderated assignment, and the comment is by someone else.
