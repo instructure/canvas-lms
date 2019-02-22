@@ -1990,6 +1990,7 @@ nn:
   an_export_is_already_in_progress_54270f01: "Ein eksport er allereie i gang."
   an_internal_error_occurred_83b8a685: "Det oppstod ein feil"
   an_item_named_name_already_exists_in_this_location_147b7312: "Eit element med namnet \"%{name}\" finst allereie.\" Vil du erstatte den eksisterande fila?"
+  an_unexpected_error_has_occurred_see_error_report__f20b878d: "Det oppstod ein uventa feil: sjå feilrapport %{id}"
   an_unknown_server_error_occurred_please_try_again_f517eaf3: "Det oppstod ein ukjent feil i tenaren.  Prøv på nytt seinare."
   an_update_is_available_for_toolname_bba3fa2: "Ein oppdatering er tilgjengeleg for %{toolName}"
   analytics: 
@@ -2346,6 +2347,7 @@ nn:
   assignment_id_96baa1b7: oppgåve-ID
   assignment_id_b040cee0: Oppgåve-ID
   assignment_menu_91fe3716: Oppgåvemeny
+  assignment_missing_assignment_name_in_course_code_7f940b35: "Innlevering manglar: %{assignment_name} i %{course_code}"
   assignment_muted_4cb590a4: "Oppgåvene er skjulte"
   assignment_muted_8d74bfa0: "Oppgåvene er skjulte"
   assignment_muter: 
@@ -3059,6 +3061,7 @@ nn:
   authnresponse_from_idp_185037e9: "AuthnResponse frå IdP"
   author_s_name_b35e905a: "Forfattaren sitt namn"
   authorize_e3f25bb4: Autoriser
+  authorize_url_f28167a3: "Godkjenn URL"
   auto_leader_7791c30a: auto_leader
   automatically_apply_deduction_to_late_submissions_2b68166e: "Bruk automatisk resultatutrekning på for seine innleveringar"
   automatically_apply_grade_for_missing_submissions_2b5c1a72: "Bruk automatisk karaktersetjing på manglande innleveringar"
@@ -3719,6 +3722,7 @@ nn:
   cannot_be_present_when_account_id_is_present_f7d9b51f: "kan ikkje vere til stades når account_id er til stades"
   cannot_be_present_when_course_id_is_present_785e6a59: "kan ikkje vere til stades når course_id er til stades"
   cannot_change_an_override_due_date_to_a_date_withi_8b1be496: "Kan ikkje endre ein overstyrt innleveringsfrist til ein dato innanfor ein lukka karaktersetjingsperiode"
+  cannot_change_the_default_term_name_edc2279b: "Kan ikkje endre namn på standardsemester"
   cannot_change_the_due_date_of_an_override_in_a_clo_4b3a4dcd: "Kan ikkje endre innleveringsfristen etter overstyring i ein lukka karaktersetjingsperiode"
   cannot_change_the_due_date_to_a_date_within_a_clos_61eb0951: "Kan ikkje endre innleveringsfristen til ein dato innanfor ein lukka karaktersetjingsperiode"
   cannot_change_the_due_date_when_due_in_a_closed_gr_965b99cb: "Kan ikkje endre innleveringsfrist når fristen er innanfor ein karaktersetjingsperiode"
@@ -3756,6 +3760,7 @@ nn:
   canvas_alert_change_assignment_name_course_name_2fc63d9c: "Canvas-varsel – endring: %{assignment_name}, %{course_name}"
   canvas_alert_invited_course_as_role_type_9ed79ce3: "Canvas-varsel – invitasjon: %{course} som %{role_type}"
   canvas_alert_invited_course_as_role_type_ea825937: "Canvas-varsel – invitasjon: emne som %{role_type}"
+  canvas_alert_late_anonymous_submission_assignment__bf9a6452: "Canvas-varsel - sein anomym innlevering: %{assignment_name}"
   canvas_alert_late_submission_user_name_assignment__ee1301ac: "Canvas-varsel – sein innlevering: %{user_name}, %{assignment_name}"
   canvas_attribute_eaa7e31a: Canvas-attributt
   canvas_by_instructure_1490381: "Canvas by Instructure"
@@ -5008,6 +5013,7 @@ nn:
   costa_rica_506_d63d2ea1: "Costa Rica (+506)"
   could_not_duplicate_discussion_953ed67f: "Kunne ikkje duplisere diskusjon"
   could_not_save_chosencolor_741b74ce: "Kunne ikkje lagre '%{chosenColor}'"
+  couldn_t_adjust_dates_on_assignment_name_id_id_eaf1c353: "Kunne ikkje justere datoar for oppgåve %{name} (ID %{id})"
   couldn_t_find_an_authority_to_update_44d9407e: "Finn ikkje autoritet å oppdatere"
   couldn_t_find_canvas_csv_import_headers_487f1b6c: "Finn ikkje CSV-importerte topptekster i Canvas"
   couldn_t_generate_diff_message_a0528b20: "Kan ikkje generere diff: %{message}"
@@ -6443,6 +6449,7 @@ nn:
   disabling_sync_to_name_failed_e7521ebb: "Slå av synkronisering til %{name} mislukkast"
   discovery_url_3dce06d9: "URL-adresse for søk"
   discussion_6719c51d: Diskusjon
+  discussion_assignments_cannot_be_section_specific_93d63843: "Diskusjonar merka som oppgåve kan ikkje vere seksjonsspesifikk"
   discussion_entries: 
     created_entry_notice: "Registreringa er oppretta."
     deleted_entry_notice: "Registreringa er sletta"
@@ -6754,6 +6761,7 @@ nn:
     unsubscribed_hint: "Du abonnerer ikkje på dette emnet. Klikk her for å abonnere."
   discussions_a5f96392: Diskusjonar
   discussions_tutorial_tray_4ef79bcc: "Diskusjonar opplæringsmeny"
+  discussions_with_groups_cannot_be_section_specific_1146d29: "Gruppediskusjonar kan ikkje vere seksjonsspesifikke"
   dismiss_dacdb625: Forkast
   dismiss_this_5c74dddc: "Forkast dette"
   display_all_text_links_in_canvas_as_underlined_tex_e698e714: "Vis all lenketekst i Canvas som *understreka tekst*"
@@ -7366,6 +7374,8 @@ nn:
   error_deleting_name_reason_11f9d399: "Feil under sletting av %{name}: %{reason}"
   error_duplicating_module_4b023042: "Feil ved duplisering av modul"
   error_exporting_gradebook_msg_6ea31e2f: "Feil ved eksport av karakterbok: %{msg}"
+  error_fetching_access_token_1445a9e3: "feil ved henting av tilgangstoken"
+  error_fetching_user_details_7c85d23: "feil ved henting av brukardetaljar"
   error_in_mastery_paths_range_index_7d17ddac: "%{error} i meistringssti-spenn %{index}"
   error_loading_gradebook_history_try_again_19032437: "Feil ved lasting av karakterhistorikk. Prøv igjen?"
   error_message_2b9d12ee: "Feil: %{message}"
@@ -8980,6 +8990,24 @@ nn:
   has_turnitin_score_3e1cacf6: "Har Turnitin-resultat"
   haven_t_been_graded_d7dee5bb: "Ikkje er karaktersett"
   haven_t_submitted_yet_e63834db: "Ikkje har levert"
+  hello_name_your_outcomes_were_successfully_importe_a510e0d: |-
+      Hei %{name},
+      
+      Læringsmåla dine er importert. Du kan administrere dei her %{url}
+      
+      Takk,
+      Instructure
+  hello_name_your_outcomes_were_successfully_importe_d0c37335: |-
+      Hei %{name},
+      
+      Læringsmåla dine er importert, men med følgjande merknader (viser inntil dei første 100 varsel):
+      
+      %{rows}
+      
+      Du kan administrere dei her %{url}
+      
+      Takk,
+      Instructure
   help_4c4968b1: Hjelp
   help_dialog: 
     Back: Tilbake
@@ -9085,6 +9113,7 @@ nn:
   highest_28ad71e6: Høgast
   highest_score_e080551e: "Høgaste resultat"
   home_351838cd: Heim
+  home_page_is_not_valid_2e8a25ae: "Emneforsida er ikkje gyldig"
   home_tutorial_tray_66826983: "Heim opplæringsmeny"
   homework_submission_172e8354: "Innlevering av heimeoppgåve"
   honduras_44052cf5: Honduras
@@ -9126,12 +9155,17 @@ nn:
   id_ac7afadf: ID
   id_already_in_use_for_this_account_and_authenticat_dc3a7d65: "ID er allereie i bruk for denne kontoen og identitetsleverandøren"
   id_id_4e148481: "ID: %{id}"
+  id_token_fa5f144e: ID-token
   idp_certificate_fingerprint_e530cdd1: "Fingeravtrykk på IdP-sertifikat"
   idp_entity_id_25c51837: "ID for IdP-eining"
   idp_initiated_1e87e621: IdP-initiert
+  idp_inresponseto_c07f028c: "IdP inResponseTo"
   idp_loginresponse_decrypted_2f2674b4: "IdP LoginResponse dekryptert"
   idp_loginresponse_destination_75546c46: "IdP LoginResponse-mål"
   idp_loginresponse_encoded_460dca94: "IdP LoginResponse koda"
+  idp_loginresponse_encrypted_e7c6fe02: "IdP LoginResponse kryptert"
+  idp_logout_inresponseto_e11e1d4a: "IdP avlogging inResponseTo"
+  idp_logoutresponse_destination_1e6220b1: "Idp LogoutResponse-mål"
   idp_logoutresponse_encoded_bac9de6b: "IdP LogoutResponse koda"
   idp_logoutresponse_xml_fe65de19: "IdP LogoutResponse XML"
   idp_metadata_uri_dae5314a: "IdP Metadata URI"
@@ -9481,6 +9515,7 @@ nn:
       Funksjonar, innstillingar og stilar som gir meining i eit spesifikt K-12-miljø. Så langt handlar det
       berre om nokre stilendringar, men fleire spesifikke K-12-element kan leggast til i framtida.
   k_2521301c: k
+  kazakhstan_7_8fe892c: "Kazakhstan (+7)"
   keep_in_mind_this_submission_will_count_for_everyo_bb526d67: "Hugs at denne innleveringa gjeld for alle i %{groupType}-gruppa."
   keep_submissions_anonymous_5cbaf419: "La innleveringane vere anonyme"
   kenya_254_2945663a: "Kenya (+254)"
@@ -9510,7 +9545,10 @@ nn:
   last_user_access_title: "Siste brukartilgang"
   late_2be42b88: Sein
   late_8bd684b6: "for sein"
+  late_anonymous_assignment_a_student_has_submitted__60158b6a: "Sein anonym innlevering: ein student har levert for seint til %{assignment_title}"
+  late_anonymous_assignment_assignment_name_b541c517: "Sein anonym innlevering: %{assignment_name}"
   late_assignment_user_name_assignment_name_2df32e01: "Sein innlevering: %{user_name}, %{assignment_name}"
+  late_assignment_user_name_has_submitted_late_for_a_ce1a2d41: "Sein innlevering: %{user_name} har levert for seint til %{assignment_title}"
   late_bd436902: "FOR SEIN"
   late_penalty_78099d18: "For sein-straff"
   late_penalty_817fff4e: "For sein-straff:"
@@ -11869,6 +11907,7 @@ nn:
     other: "Må oppnå forventa meistringsnivå minst %{count} gonger. Resultat over meistringsnivå vil bli berekna som gjennomsnitt i sluttresultatet. "
   must_be_a_valid_number_59f0069: "Må vere eit gyldig tal"
   must_be_after_start_date_95e251a3: "Må vere etter startdato"
+  must_be_between_availability_dates_ceaca984: "må vere mellom tilgjengelege datoar"
   must_be_on_or_after_end_date_e4dda631: "må vere på eller etter sluttdato"
   must_belong_to_a_root_account_f84323f6: "må høyre til ein rotkonto"
   must_belong_to_an_active_course_9711934: "må høyre til eit aktivt emne"
@@ -12075,6 +12114,7 @@ nn:
   no_users_were_selected_to_add_to_the_course_a51c6083: "Vel brukarar for å leggja til emnet"
   no_way_to_export_gradebooks_provided_b4c2939d: "Det finst ingen måtar å eksportere karakterbøker!"
   no_way_to_monitor_gradebook_exports_provided_b451236a: "Det finns ingen måtar å overvake karakterbok-eksportar!"
+  nonce_77113ba4: Mellombels
   none_3b5e34d2: Ingen
   none_9b6c9bec: ingen
   norway_47_bc598662: "Noreg (+47)"
@@ -12182,7 +12222,7 @@ nn:
     course_content_description: |-
         Endre emneinnhald:
         
-        * Wiki-side
+        * Sideinnhald
         * Quizinnhald
         * Oppgåveinnhald
     course_content_display: Emneinnhald
@@ -12294,7 +12334,7 @@ nn:
       submission_graded: "Innlevering er karaktersett"
       submission_needs_grading: "Innleveringar må karaktersetjast"
       summaries: Samandrag
-      updated_wiki_page: "Oppdatert wiki-side"
+      updated_wiki_page: "Oppdatert side"
       web_conference_invitation: "Invitasjon til webkonferanse"
       web_conference_recording_ready: "Opptak frå webkonferanse er klart"
     no_subject: "Ikkje emne"
@@ -12481,6 +12521,7 @@ nn:
   only_after_their_last_attempt_3593d101: "Berre etter siste forsøk"
   only_announcements_can_be_section_specific_1ff992a: "Berre kunngjeringar kan vere seksjonsspesifikke"
   only_available_to_students_with_link_not_visible_i_b21ec391: "Berre tilgjengeleg for studentar med lenke. Ikkje synleg i studentmapper."
+  only_course_announcements_and_discussions_can_be_s_924d4386: "Berre kunngjeringar og diskusjonar kan vere seksjonsspesifikke"
   only_once_after_each_attempt_cc842738: "Berre ein gong etter kvart forsøk"
   only_teachers_can_see_this_course_until_it_is_publ_6fac97a7: "Berre faglærarar kan sjå dette emnet før det er publisert"
   open_color_picker_f117df0a: "Opne fargeveljar"
@@ -12683,6 +12724,7 @@ nn:
         latest_score: "Siste resultat"
         outcome: Læringsmål
   outcomes_d1b18d33: Læringsmål
+  outcomes_import_completed_baff5cb0: "Import av læringsmål ferdig"
   outcomes_report_8887bd49: Læringsmålrapport
   over_time_bee1a733: "over tid"
   overrides: 
@@ -14981,6 +15023,7 @@ nn:
   read_comments_3fcc7590: "Les kommentarar"
   ready_to_enroll_panel_46f45abb: "Klar til å melde på brukarpanel"
   recaptcha_not_configured_3a6ef9ee: "reCAPTCHA er ikkje konfigurert"
+  received_cas_ticket_ea1bbeb: "CAS-informasjon motteke"
   recent_activity_51239235: "Nyleg aktivitet"
   recent_announcements_8becc59c: "Nylege kunngjeringar"
   recent_student: 
@@ -15312,6 +15355,7 @@ nn:
     observing_user: "Observerer: %{user_name}"
     unknown_error: "Noko gjekk gale med søket. Prøv på nytt seinare."
     updating: Oppdaterer...
+  row_row_message_e369e49e: "Rad %{row}: %{message}"
   rss_feed_cf6286b3: RSS-straum
   rubric: 
     context_name_rubric: "%{course_name}-vurderingsskjema "
@@ -15367,6 +15411,7 @@ nn:
   rubrics_b5ef369b: Vurderingsskjema
   running_c5a4998d: Køyrande
   russia_7_87bc99d5: "Russland (+7)"
+  rwanda_250_1a6b344b: "Rwanda (+250)"
   salesforce_account_id_eb5c78ad: Salesforce-konto-ID
   salesforce_has_a_different_login_host_for_sanbox_a_2d878ae9: "Salesforce brukar ein annan påloggingsvert for sandkassekontoar enn for produksjonskontoar. Dersom du brukar ein Salesforce-sandkassekonto og ikkje merkar av for det feltet, kan den ikkje godkjenne (det same gjeld andre vegen – om du har ein produksjonskonto og merkar av for dette feltet, vil ikkje brukaren bli godkjent)"
   salesforce_ticketing_webtocase_connector_80f75716: "Koplingspunkt for Salesforce Ticketing Web-to-Case"
@@ -18137,12 +18182,14 @@ nn:
       twitter: "Twitter er ein fantastisk ressurs for kommunikasjon utanfor undervisingsrommet."
       yo: "Yo er eit kommunikasjonsverktøy du brukar med berre eit enkelt klikk og utan teikn."
   user_settings_785eed40: Brukarinnstillingar
+  user_succesfully_logged_into_canvas_6cfbe279: "Brukar er logga på Canvas"
   user_successfully_deactivated_9d92d80d: "Brukaren er deaktivert"
   user_successfully_re_activated_b897e35b: "Brukaren er aktivert"
   user_successfully_removed_a366ca5f: "Brukaren er fjerna."
   user_vaildation_issues_panel_66b66945: "Panel for brukarvalideringssaker"
   usercount_respondents_1521244: "%{userCount} respondentar"
   usercount_users_found_8c07f1f2: "Funne %{userCount} brukarar."
+  userinfo_d21114ef: Brukarinformasjon
   username_47bb5bbe: Brukarnamn
   username_could_not_be_found_6c3e8383: "Finn ikkje brukarnamn"
   users: 
@@ -18402,6 +18449,7 @@ nn:
   validate: 
     is_required: "Dette feltet er obligatorisk"
   validate_links_in_content_b1630fba: "Valider lenker i Innhald"
+  validated_service_ticket_20d1fcec: "Validert sørvis-informasjon"
   validated_ticket_for_username_c6c7722f: "Validert informasjon for %{username}"
   validation_error_3b943100: Valideringsfeil
   value_d842f16d: Verdi
