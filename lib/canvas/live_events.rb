@@ -230,7 +230,8 @@ module Canvas::LiveEvents
       group_weight: assignment_group.group_weight,
       sis_source_id: assignment_group.sis_source_id,
       integration_data: assignment_group.integration_data,
-      rules: assignment_group.rules
+      rules: assignment_group.rules,
+      workflow_state: assignment_group.workflow_state
     }
   end
 
