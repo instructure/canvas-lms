@@ -256,6 +256,12 @@ describe "new_gradebook" do
     expect(transitions).to include({ "on" => LOCKED, "off" => LOCKED })
   end
 
+  it "allows teachers without change_course_state permission to enable" do
+    course.account.role_overrides.create!(permission: :change_course_state, role: teacher_role, enabled: false)
+    ngb_trans_proc.call(teacher, course, nil, transitions)
+    expect(transitions).to include({ "on" => {}, "off" => UNLOCKED })
+  end
+
   describe "course-level backwards compatibility" do
     let(:student) { student_in_course(course: course).user }
     let!(:assignment) { course.assignments.create!(title: 'assignment', points_possible: 10) }

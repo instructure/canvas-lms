@@ -251,12 +251,15 @@ END
       beta: true,
       custom_transition_proc: ->(user, context, _from_state, transitions) do
         if context.is_a?(Course)
-          if !context.grants_right?(user, :change_course_state)
-            transitions['on']['locked'] = true if transitions&.dig('on')
-            transitions['off']['locked'] = true if transitions&.dig('off')
-          else
+          is_admin = context.account_membership_allows(user)
+          is_teacher = user.teacher_enrollments.active.where(course_id: context.id).exists?
+
+          if is_admin || is_teacher
             should_lock = context.gradebook_backwards_incompatible_features_enabled?
             transitions['off']['locked'] = should_lock if transitions&.dig('off')
+          else
+            transitions['on']['locked'] = true if transitions&.dig('on')
+            transitions['off']['locked'] = true if transitions&.dig('off')
           end
         elsif context.is_a?(Account)
           backwards_incompatible_feature_flags =
