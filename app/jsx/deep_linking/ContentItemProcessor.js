@@ -25,7 +25,10 @@ import I18n from 'i18n!external_content.success'
 import HtmlFragmentContentItem from './models/HtmlFragmentContentItem'
 
 export function processContentItemsForEditor(event, editor, dialog) {
-  const {content_items, msg, log, errormsg, errorlog, ltiEndpoint} = event.data
+  const {content_items, msg, log, errormsg, errorlog, ltiEndpoint, messageType} = event.data
+  if (messageType !== 'LtiDeepLinkingResponse') {
+    return
+  }
   return new ContentItemProcessor(
     content_items,
     {
