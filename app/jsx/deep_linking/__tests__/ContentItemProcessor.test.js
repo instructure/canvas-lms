@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import ContentItemProcessor, {processContentItemsForEditor} from '../ContentItemProcessor'
+import ContentItemProcessor, {processContentItemsForEditor, validDeepLinkingEvent} from '../ContentItemProcessor'
 import {send} from 'jsx/shared/rce/RceCommandShim'
 
 jest.mock('jsx/shared/rce/RceCommandShim', () => ({
@@ -65,10 +65,17 @@ describe('processContentItemsForEditor', () => {
 
   describe('static', () => {
     it('closes the dialog', async () => {
-      const ev = {data: {content_items: contentItems}}
+      const ev = {data: {content_items: contentItems, messageType: 'LtiDeepLinkingResponse'}}
       const dialog = {close: jest.fn()}
       await processContentItemsForEditor(ev, editor, dialog)
       expect(dialog.close).toHaveBeenCalled()
+    })
+
+    it('ignores non deep linking event types', async () => {
+      const ev = {data: {messageType: 'OtherMessage'}}
+      const dialog = {close: jest.fn()}
+      await processContentItemsForEditor(ev, editor, dialog)
+      expect(dialog.close).not.toHaveBeenCalled()
     })
   })
 
