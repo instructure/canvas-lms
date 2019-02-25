@@ -128,17 +128,8 @@ class RegisterExpansionHandler < YARD::Handlers::Ruby::Base
 end
 
 module DocWriter
-
   def self.append_md(md)
-    markdown_file
-    File.write('doc/api/tools_variable_substitutions.md', md, File.size('doc/api/tools_variable_substitutions.md'), mode: 'a')
+    combined = File.read('doc/api/tools_variable_substitutions.md') + md
+    File.write('doc/api/tools_variable_substitutions.md', combined)
   end
-
-  def self.markdown_file
-    @markdown_file ||= (
-      IO.copy_stream('doc/api/tools_variable_substitutions.head.md', 'doc/api/tools_variable_substitutions.md')
-      true
-    )
-  end
-
 end

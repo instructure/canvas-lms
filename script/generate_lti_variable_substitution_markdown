@@ -1,3 +1,4 @@
 #! /bin/sh
 
+cp doc/api/tools_variable_substitutions.head.md doc/api/tools_variable_substitutions.md
 bundle exec yardoc --verbose --tag launch_parameter:"Launch Parameter" --tag duplicates:"Duplicates" -n -e doc/yard_plugins/lti_variable_expansion_plugin.rb lib/lti/variable_expander.rb
