@@ -72,7 +72,8 @@ const TinyMCEPayloadGenerators = {
           title: tinyMCEContentItem.title,
           allowfullscreen: 'true',
           webkitallowfullscreen: 'true',
-          mozallowfullscreen: 'true'
+          mozallowfullscreen: 'true',
+          allow: 'autoplay *'
         })
           .css({
             width: tinyMCEContentItem.placementAdvice.displayWidth,

@@ -37,7 +37,8 @@ module Lti
             'microphone *',
             'camera *',
             'midi *',
-            'encrypted-media *'
+            'encrypted-media *',
+            'autoplay *'
           ]
         end
       end
@@ -53,7 +54,8 @@ module Lti
             'microphone',
             'camera',
             'midi',
-            'encrypted-media'
+            'encrypted-media',
+            'autoplay'
           ]
         end
       end
