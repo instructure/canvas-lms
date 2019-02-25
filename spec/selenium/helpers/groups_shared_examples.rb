@@ -253,7 +253,7 @@ shared_examples 'discussions_page' do |context|
   include GroupsCommon
   include SharedExamplesCommon
 
-  it "should only list in-group discussions in the content right pane", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273622, teacher: 324930) do
+  it "should only list in-group discussions in the content right pane", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273622, teacher: 324930), ignore_js_errors: true do
     # create group and course announcements
     group_dt = DiscussionTopic.create!(context: @testgroup.first, user: @teacher,
                                        title: 'Group Discussion', message: 'Group')
@@ -263,17 +263,25 @@ shared_examples 'discussions_page' do |context|
     get discussions_page
     expect_new_page_load { f('#add_discussion').click }
     expect(f('#editor_tabs')).to be_displayed
-    fj(".ui-accordion-header a:contains('Discussions')").click
-    expect(fln("#{group_dt.title}")).to be_displayed
-    expect(f("#content")).not_to contain_link("#{course_dt.title}")
+    if Account.default.feature_enabled?(:rich_content_service_high_risk)
+      fj('button:contains("Discussions")').click
+    else
+      fj(".ui-accordion-header a:contains('Discussions')").click
+    end
+    expect(fln(group_dt.title.to_s)).to be_displayed
+    expect(f("#content")).not_to contain_link(course_dt.title.to_s)
   end
 
-  it "should only access group files in discussions right content pane", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 303701, teacher: 324933) do
+  it "should only access group files in discussions right content pane", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 303701, teacher: 324933), ignore_js_errors: true do
     add_test_files
     get discussions_page
     expect_new_page_load { f('#add_discussion').click }
     expand_files_on_content_pane
-    expect(ffj('.file .text:visible').size).to eq 1
+    if Account.default.feature_enabled?(:rich_content_service_high_risk)
+      expect(ff('svg[name=IconDocument]').size).to eq 1
+    else
+      expect(ffj('.file .text:visible').size).to eq 1
+    end
   end
 end
 

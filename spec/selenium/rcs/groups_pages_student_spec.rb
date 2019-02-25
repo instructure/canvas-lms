@@ -259,8 +259,7 @@ describe "groups" do
 
     #-------------------------------------------------------------------------------------------------------------------
     describe "discussions page" do
-      # will fix the below shared tests in a separate commit
-      # it_behaves_like 'discussions_page', :student
+      it_behaves_like 'discussions_page', :student
 
       it "should allow discussions to be created within a group", priority: "1", test_id: 273615, ignore_js_errors: true do
         get discussions_page
