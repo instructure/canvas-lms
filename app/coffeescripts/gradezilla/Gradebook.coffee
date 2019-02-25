@@ -335,7 +335,6 @@ define [
       else
         @gradingPeriodSet = null
       @show_attendance = !!UserSettings.contextGet 'show_attendance'
-      @include_ungraded_assignments = UserSettings.contextGet 'include_ungraded_assignments'
       # preferences serialization causes these to always come
       # from the database as strings
       if @options.course_is_concluded || @options.settings.show_concluded_enrollments == 'true'
@@ -1055,16 +1054,14 @@ define [
         if @isFilteringColumnsByGradingPeriod()
           grades = grades.gradingPeriods[@getGradingPeriodToShow()]
 
-        finalOrCurrent = if @include_ungraded_assignments then 'final' else 'current'
-
         for assignmentGroupId, group of @assignmentGroups
           grade = grades.assignmentGroups[assignmentGroupId]
-          grade = grade?[finalOrCurrent] || { score: 0, possible: 0, submissions: [] }
+          grade = grade?['current'] || { score: 0, possible: 0, submissions: [] }
 
           student["assignment_group_#{assignmentGroupId}"] = grade
           for submissionData in grade.submissions
             submissionData.submission.drop = submissionData.drop
-        student["total_grade"] = grades[finalOrCurrent]
+        student['total_grade'] = grades['current']
 
     ## Grid Styling Methods
 

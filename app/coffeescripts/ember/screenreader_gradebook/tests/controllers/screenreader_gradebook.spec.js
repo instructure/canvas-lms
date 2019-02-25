@@ -1061,6 +1061,111 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
     })
   })
 
+  QUnit.module('includeUngradedAssignments', hooks => {
+    hooks.beforeEach(() => {
+      initializeApp()
+    })
+
+    test('returns true when include_ungraded_assignments is true', () => {
+      userSettings.contextGet.withArgs('include_ungraded_assignments').returns(true)
+      strictEqual(srgb.get('includeUngradedAssignments'), true)
+    })
+
+    test('returns false when include_ungraded_assignments is false', () => {
+      userSettings.contextGet.withArgs('include_ungraded_assignments').returns(false)
+      strictEqual(srgb.get('includeUngradedAssignments'), false)
+    })
+  })
+
+  QUnit.module('updateIncludeUngradedAssignmentsSetting', hooks => {
+    hooks.beforeEach(() => {
+      initializeApp()
+    })
+
+    test('changing includeUngradedAssignments calls updateIncludeUngradedAssignmentsSetting', () => {
+      const updateIncludeUngradedAssignmentsSettingStub = sinon.stub(
+        srgb,
+        'updateIncludeUngradedAssignmentsSetting'
+      )
+      srgb.set('includeUngradedAssignments', false)
+      strictEqual(updateIncludeUngradedAssignmentsSettingStub.callCount, 1)
+      updateIncludeUngradedAssignmentsSettingStub.restore()
+    })
+
+    test('updateIncludeUngradedAssignmentsSetting sets the userSetting for include_ungraded_assignments', () => {
+      srgb.set('includeUngradedAssignments', false)
+      strictEqual(userSettings.contextSet.firstCall.args[0], 'include_ungraded_assignments')
+    })
+
+    test('updateIncludeUngradedAssignmentsSetting updates the setting value', () => {
+      srgb.set('includeUngradedAssignments', false)
+      strictEqual(userSettings.contextSet.firstCall.args[1], false)
+    })
+  })
+
+  QUnit.module('showConcludedEnrollments', hooks => {
+    hooks.beforeEach(() => {
+      window.ENV.GRADEBOOK_OPTIONS.settings = {}
+      initializeApp()
+    })
+
+    test('returns true when show_concluded_enrollments is true', () => {
+      window.ENV.GRADEBOOK_OPTIONS.settings.show_concluded_enrollments = 'true'
+      strictEqual(srgb.get('showConcludedEnrollments'), true)
+    })
+
+    test('returns false when show_concluded_enrollments is false', () => {
+      window.ENV.GRADEBOOK_OPTIONS.settings.show_concluded_enrollments = 'false'
+      strictEqual(srgb.get('showConcludedEnrollments'), false)
+    })
+  })
+
+  QUnit.module('updateShowConcludedEnrollmentsSetting', hooks => {
+    let fetchCorrectEnrollmentsStub
+
+    hooks.beforeEach(() => {
+      window.ENV.GRADEBOOK_OPTIONS.settings = {}
+      window.ENV.GRADEBOOK_OPTIONS.settings.show_concluded_enrollments = 'true'
+      window.ENV.GRADEBOOK_OPTIONS.settings_update_url = 'gradebook_settings'
+      ajax.defineFixture(window.ENV.GRADEBOOK_OPTIONS.settings.settings_update_url, {
+        response: [],
+        textStatus: 'success'
+      })
+      initializeApp()
+      fetchCorrectEnrollmentsStub = sinon.stub(srgb, 'fetchCorrectEnrollments')
+    })
+
+    hooks.afterEach(() => {
+      fetchCorrectEnrollmentsStub.restore()
+    })
+
+    test('changing showConcludedEnrollments calls updateShowConcludedEnrollmentsSetting', () => {
+      const updateShowConcludedEnrollmentsSettingStub = sinon.stub(
+        srgb,
+        'updateShowConcludedEnrollmentsSetting'
+      )
+      srgb.set('showConcludedEnrollments', false)
+      strictEqual(updateShowConcludedEnrollmentsSettingStub.callCount, 1)
+      updateShowConcludedEnrollmentsSettingStub.restore()
+    })
+
+    test('updateShowConcludedEnrollmentsSetting uses the gradebook settings endpoint', () => {
+      const ajaxRequestSpy = sinon.stub(ajax, 'request')
+      srgb.set('showConcludedEnrollments', false)
+      strictEqual(ajaxRequestSpy.firstCall.args[0].url, 'gradebook_settings')
+      ajaxRequestSpy.restore()
+    })
+
+    test('updateShowConcludedEnrollmentsSetting passes the updated setting state', () => {
+      const ajaxRequestSpy = sinon.stub(ajax, 'request')
+      srgb.set('showConcludedEnrollments', false)
+      deepEqual(ajaxRequestSpy.firstCall.args[0].data.gradebook_settings, {
+        show_concluded_enrollments: false
+      })
+      ajaxRequestSpy.restore()
+    })
+  })
+
   QUnit.module('finalGradeOverrideEnabled', hooks => {
     hooks.beforeEach(() => {
       initializeApp()
@@ -1121,14 +1226,14 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
     })
 
     test('updateShowFinalGradeOverride uses the gradebook settings endpoint', () => {
-      const ajaxRequestSpy = sinon.spy(ajax, 'request')
+      const ajaxRequestSpy = sinon.stub(ajax, 'request')
       srgb.set('showFinalGradeOverride', false)
       strictEqual(ajaxRequestSpy.firstCall.args[0].url, 'gradebook_settings')
       ajaxRequestSpy.restore()
     })
 
     test('updateShowFinalGradeOverride passes the updated setting state', () => {
-      const ajaxRequestSpy = sinon.spy(ajax, 'request')
+      const ajaxRequestSpy = sinon.stub(ajax, 'request')
       srgb.set('showFinalGradeOverride', false)
       deepEqual(ajaxRequestSpy.firstCall.args[0].data.gradebook_settings, {
         show_final_grade_overrides: false

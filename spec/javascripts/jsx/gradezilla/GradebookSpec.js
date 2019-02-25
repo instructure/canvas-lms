@@ -485,10 +485,8 @@ test('calculates grades without grading period data when effective due dates are
   equal(typeof args[4], 'undefined')
 })
 
-test('stores the current grade on the student when not including ungraded assignments', function() {
-  const gradebook = this.createGradebook({
-    include_ungraded_assignments: false
-  })
+test('stores the current grade on the student', function() {
+  const gradebook = this.createGradebook()
   sandbox.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades)
   const student = {
     id: '101',
@@ -499,24 +497,8 @@ test('stores the current grade on the student when not including ungraded assign
   equal(student.total_grade, this.exampleGrades.current)
 })
 
-test('stores the final grade on the student when including ungraded assignments', function() {
-  const gradebook = this.createGradebook({
-    include_ungraded_assignments: true
-  })
-  sandbox.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades)
-  const student = {
-    id: '101',
-    loaded: true,
-    initialized: true
-  }
-  gradebook.calculateStudentGrade(student)
-  equal(student.total_grade, this.exampleGrades.final)
-})
-
-test('stores the current grade from the selected grading period when not including ungraded assignments', function() {
-  const gradebook = this.createGradebook({
-    include_ungraded_assignments: false
-  })
+test('stores the current grade from the selected grading period', function() {
+  const gradebook = this.createGradebook()
   gradebook.setFilterColumnsBySetting('gradingPeriodId', '701')
   sandbox.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades)
   const student = {
@@ -526,21 +508,6 @@ test('stores the current grade from the selected grading period when not includi
   }
   gradebook.calculateStudentGrade(student)
   equal(student.total_grade, this.exampleGrades.gradingPeriods[701].current)
-})
-
-test('stores the final grade from the selected grading period when including ungraded assignments', function() {
-  const gradebook = this.createGradebook({
-    include_ungraded_assignments: true
-  })
-  gradebook.setFilterColumnsBySetting('gradingPeriodId', '701')
-  sandbox.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades)
-  const student = {
-    id: '101',
-    loaded: true,
-    initialized: true
-  }
-  gradebook.calculateStudentGrade(student)
-  equal(student.total_grade, this.exampleGrades.gradingPeriods[701].final)
 })
 
 test('does not calculate when the student is not loaded', function() {

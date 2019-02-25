@@ -236,15 +236,26 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
 
   hideStudentNames: false,
 
-  showConcludedEnrollments: (() => userSettings.contextGet('show_concluded_enrollments') || false)
+  showConcludedEnrollments: function() {
+    if (!ENV.GRADEBOOK_OPTIONS.settings) {
+      return false
+    }
+    return ENV.GRADEBOOK_OPTIONS.settings.show_concluded_enrollments === 'true'
+  }
     .property()
     .volatile(),
 
-  updateshowConcludedEnrollmentsSetting: function() {
-    const isChecked = this.get('showConcludedEnrollments')
-    if (isChecked) {
-      userSettings.contextSet('show_concluded_enrollments', isChecked)
-    }
+  updateShowConcludedEnrollmentsSetting: function() {
+    ajax.request({
+      dataType: 'json',
+      type: 'put',
+      url: ENV.GRADEBOOK_OPTIONS.settings_update_url,
+      data: {
+        gradebook_settings: {
+          show_concluded_enrollments: this.get('showConcludedEnrollments')
+        }
+      }
+    })
   }.observes('showConcludedEnrollments'),
 
   finalGradeOverrideEnabled: (() => ENV.GRADEBOOK_OPTIONS.final_grade_override_enabled).property(),
@@ -1191,11 +1202,8 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
 
   showAttendance: (() => userSettings.contextGet('show_attendance')).property().volatile(),
 
-  updateUngradedAssignmentUserSetting: function() {
-    const isChecked = this.get('includeUngradedAssignments')
-    if (isChecked) {
-      return userSettings.contextSet('include_ungraded_assignments', isChecked)
-    }
+  updateIncludeUngradedAssignmentsSetting: function() {
+    userSettings.contextSet('include_ungraded_assignments', this.get('includeUngradedAssignments'))
   }.observes('includeUngradedAssignments'),
 
   assignmentGroupsHash() {
