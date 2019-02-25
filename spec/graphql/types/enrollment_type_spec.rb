@@ -55,6 +55,16 @@ describe Types::EnrollmentType do
       ).to eq @gp2.id.to_s
     end
 
+    it "returns the overall course grade when gradingPeriodId is null" do
+      expect(
+        enrollment_type.resolve(<<~GQL, current_user: @teacher)
+          grades(gradingPeriodId: null) {
+            finalScore
+          }
+        GQL
+      ).to eq enrollment.computed_final_score
+    end
+
     it "works for courses with no grading periods" do
       @course.enrollment_term.update_attribute :grading_period_group, nil
       expect(
