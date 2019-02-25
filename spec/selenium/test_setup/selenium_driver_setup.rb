@@ -151,11 +151,7 @@ module SeleniumDriverSetup
 
       @driver = create_driver
 
-      resize_screen_to_normal
-
       focus_viewport if run_headless?
-
-      resize_screen_to_normal
 
       set_timeouts(TIMEOUTS)
 

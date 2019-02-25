@@ -115,6 +115,7 @@ shared_context "in-process server selenium tests" do
   include Rails.application.routes.url_helpers
 
   prepend_before :each do
+    resize_screen_to_normal
     SeleniumDriverSetup.allow_requests!
     driver.ready_for_interaction = false # need to `get` before we do anything selenium-y in a spec
   end
