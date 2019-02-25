@@ -68,16 +68,9 @@ export const TEACHER_QUERY = gql`
       allowedAttempts
       course {
         lid: _id
-        modulesConnection {
+        modulesConnection(first: 0) {
           pageInfo {
-            startCursor
-            endCursor
             hasNextPage
-            hasPreviousPage
-          }
-          nodes {
-            lid: _id
-            name
           }
         }
         assignmentGroupsConnection(first: 0) {
@@ -192,6 +185,49 @@ export const COURSE_ASSIGNMENT_GROUPS_QUERY_LOCAL = gql`
     }
   }
   ${assignmentGroup}
+`
+
+const assignmentModule = gql`
+  fragment CourseModules on ModuleConnection {
+    nodes {
+      lid: _id
+      gid: id
+      name
+      position
+      __typename
+    }
+  }
+`
+
+// FYI, modules are areturned sorted by position
+export const COURSE_MODULES_QUERY = gql`
+  query GetCourseModules($courseId: ID!, $cursor: String) {
+    course(id: $courseId) {
+      lid: _id
+      gid: id
+      modulesConnection(first: 200, after: $cursor) {
+        pageInfo {
+          endCursor
+          hasNextPage
+        }
+        ...CourseModules
+      }
+    }
+  }
+  ${assignmentModule}
+`
+
+export const COURSE_MODULES_QUERY_LOCAL = gql`
+  query GetCourseModules($courseId: ID!) {
+    course(id: $courseId) @client {
+      lid: _id
+      gid: id
+      modulesConnection(first: 200) {
+        ...CourseModules
+      }
+    }
+  }
+  ${assignmentModule}
 `
 
 export const SET_WORKFLOW = gql`

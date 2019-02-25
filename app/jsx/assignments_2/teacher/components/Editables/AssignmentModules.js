@@ -17,36 +17,55 @@
  */
 
 import React from 'react'
-import {arrayOf, bool, func, oneOf} from 'prop-types'
+import {arrayOf, bool, func, oneOf, string} from 'prop-types'
 import I18n from 'i18n!assignments_2'
+import produce from 'immer'
+import get from 'lodash/get'
+import set from 'lodash/set'
+import {Query, withApollo} from 'react-apollo'
 
 import Text from '@instructure/ui-elements/lib/components/Text'
-import TruncateText from '@instructure/ui-elements/lib/components/TruncateText'
 
 import SelectableText from './SelectableText'
-import {ModuleShape} from '../../assignmentData'
+import {ModuleShape, COURSE_MODULES_QUERY, COURSE_MODULES_QUERY_LOCAL} from '../../assignmentData'
 
-export default class AssignmentModules extends React.Component {
+const AssignmentModulesPropTypes = {
+  mode: oneOf(['edit', 'view']).isRequired,
+  onChange: func.isRequired,
+  onChangeMode: func.isRequired,
+  onAddModule: func, // .isRequired TODO when support +Module,
+  moduleList: arrayOf(ModuleShape),
+  selectedModules: arrayOf(ModuleShape),
+  readOnly: bool
+}
+
+// eslint doesn't deal with the prop types being defined this way
+/* eslint-disable react/default-props-match-prop-types */
+const AssignmentModulesDefaultProps = {
+  moduleList: [],
+  selectedModules: [],
+  readOnly: true
+}
+/* eslint-enable react/default-props-match-prop-types */
+
+class AssignmentModulesUI extends React.Component {
   static propTypes = {
-    mode: oneOf(['edit', 'view']).isRequired,
-    onChange: func.isRequired,
-    onChangeMode: func.isRequired,
-    onAddModule: func, // .isRequired TODO when support +Module,
-    moduleList: arrayOf(ModuleShape),
-    selectedModules: arrayOf(ModuleShape),
-    readOnly: bool
+    ...AssignmentModulesPropTypes,
+    isLoading: bool
   }
 
   static defaultProps = {
-    selectedModules: [],
-    readOnly: true
+    ...AssignmentModulesDefaultProps,
+    isLoading: false
   }
 
   modulePlaceholder = I18n.t('No Module Assigned')
 
   handleModulesChange = selection => {
-    const selectedModuleIds = selection.map(s => s.value)
-    const selectedModules = this.moduleIdsToModules(selectedModuleIds)
+    const selectedModules = selection.map(s => ({
+      lid: s.value,
+      name: s.label
+    }))
     this.props.onChange(selectedModules)
   }
 
@@ -70,31 +89,10 @@ export default class AssignmentModules extends React.Component {
   //   }
   // }
 
-  // given an array of module IDs, return the corresponding array of modules
-  // always returns a (possibly empty) array
-  moduleIdsToModules(moduleIds) {
-    let selectedModules = []
-    if (moduleIds) {
-      selectedModules = this.props.moduleList.reduce((list, currentModule) => {
-        if (moduleIds.find(mid => mid === currentModule.lid)) {
-          list.push(currentModule)
-        }
-        return list
-      }, [])
-    }
-    return selectedModules
-  }
-
   renderModulesView = selectedModuleOptions => {
-    const selectedModuleIds = selectedModuleOptions && selectedModuleOptions.map(m => m.value)
-    const selectedModules = this.moduleIdsToModules(selectedModuleIds)
-
     if (selectedModuleOptions.length) {
-      return (
-        <Text>
-          <TruncateText>{selectedModules.map(module => module.name).join(' | ')}</TruncateText>
-        </Text>
-      )
+      // TODO: this used to use TruncateText but that has perf. issues. Do something else.
+      return <Text>{selectedModuleOptions.map(module => module.label).join(' | ')}</Text>
     }
     return <Text weight="light">{this.modulePlaceholder}</Text>
   }
@@ -105,16 +103,20 @@ export default class AssignmentModules extends React.Component {
   // (see SelectMultiple/index.js in the instui repo)
   // From the outside, lets interact with SelectableText using the {label, value} objects.
   getModuleOptions() {
-    const selected = []
+    let selected = []
     const common = [] // TODO: when support +Module [{label: I18n.t('+ Module'), value: 'add'}]
     let opts = []
-    opts = this.props.moduleList.map(m => {
-      const opt = {label: m.name, value: m.lid}
-      if (this.props.selectedModules.find(mod => mod.lid === m.lid)) {
-        selected.push(opt)
-      }
-      return opt
-    })
+    if (this.props.moduleList && this.props.moduleList.length) {
+      opts = this.props.moduleList.map(m => {
+        const opt = {label: m.name, value: m.lid}
+        if (this.props.selectedModules.find(mod => mod.lid === m.lid)) {
+          selected.push(opt)
+        }
+        return opt
+      })
+    } else if (this.props.selectedModules && this.props.selectedModules.length) {
+      opts = selected = this.props.selectedModules.map(m => ({label: m.name, value: m.lid}))
+    }
     return {allOptions: common.concat(opts), selectedOptions: selected}
   }
 
@@ -134,8 +136,84 @@ export default class AssignmentModules extends React.Component {
           multiple
           options={allOptions}
           readOnly={this.props.readOnly}
+          loadingText={this.props.isLoading ? I18n.t('Loading...') : null}
         />
       </div>
     )
   }
 }
+
+const AssignmentModules = function(props) {
+  const q = props.mode === 'edit' ? COURSE_MODULES_QUERY : COURSE_MODULES_QUERY_LOCAL
+
+  let modules = []
+  let isLoading = false
+  return (
+    <Query query={q} variables={{courseId: props.courseId}}>
+      {({data, loading, fetchMore}) => {
+        if (loading) {
+          isLoading = true
+        } else if (props.mode === 'edit') {
+          isLoading = depaginate(fetchMore, data)
+        } else {
+          isLoading = false
+        }
+        modules = get(data, 'course.modulesConnection.nodes')
+        return (
+          <AssignmentModulesUI
+            key="assignment-modules"
+            mode={props.mode}
+            selectedModules={props.selectedModules}
+            moduleList={isLoading ? null : modules}
+            onChange={props.onChange}
+            onChangeMode={props.onChangeMode}
+            onAddModule={props.onAddModule}
+            readOnly={props.readOnly}
+            isLoading={isLoading}
+          />
+        )
+      }}
+    </Query>
+  )
+}
+
+AssignmentModules.propTypes = {
+  ...AssignmentModulesPropTypes,
+  courseId: string.isRequired
+}
+
+AssignmentModules.defaultProps = AssignmentModulesDefaultProps
+
+// As long as there's another page of data, go get it
+function depaginate(fetchMore, data) {
+  let isLoading = false
+  if (data.course.modulesConnection.pageInfo.hasNextPage) {
+    fetchMore({
+      variables: {cursor: data.course.modulesConnection.pageInfo.endCursor},
+      updateQuery: mergeThePage
+    })
+    isLoading = true
+  }
+  return isLoading
+}
+
+// merge the new result into the existing data
+function mergeThePage(previousResult, {fetchMoreResult}) {
+  const newModules = fetchMoreResult.course.modulesConnection.nodes
+  const pageInfo = fetchMoreResult.course.modulesConnection.pageInfo
+  // using immer.produce let's me base the merge result on
+  // fetchMoreResult w/o having to do a deep copy first
+  const result = produce(fetchMoreResult, draft => {
+    let r = set(draft, 'course.pageInfo', pageInfo)
+    r = set(
+      r,
+      'course.modulesConnection.nodes',
+      previousResult.course.modulesConnection.nodes.concat(newModules)
+    )
+    return r
+  })
+  return result
+}
+
+export default withApollo(AssignmentModules)
+export {AssignmentModulesUI}

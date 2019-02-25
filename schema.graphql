@@ -1313,6 +1313,7 @@ type Module implements Node & Timestamped {
   id: ID!
   moduleItems: [ModuleItem!]
   name: String
+  position: Int
   unlockAt: DateTime
   updatedAt: DateTime
 }
