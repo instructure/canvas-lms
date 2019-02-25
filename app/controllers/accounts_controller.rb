@@ -861,13 +861,14 @@ class AccountsController < ApplicationController
           end
           params[:account].delete :services
         end
-        if @account.grants_right?(@current_user, :manage_site_settings)
-          # If the setting is present (update is called from 2 different settings forms, one for notifications)
-          if params[:account][:settings] && params[:account][:settings][:outgoing_email_default_name_option].present?
-            # If set to default, remove the custom name so it doesn't get saved
-            params[:account][:settings][:outgoing_email_default_name] = '' if params[:account][:settings][:outgoing_email_default_name_option] == 'default'
-          end
 
+        # If the setting is present (update is called from 2 different settings forms, one for notifications)
+        if params[:account][:settings] && params[:account][:settings][:outgoing_email_default_name_option].present?
+          # If set to default, remove the custom name so it doesn't get saved
+          params[:account][:settings][:outgoing_email_default_name] = '' if params[:account][:settings][:outgoing_email_default_name_option] == 'default'
+        end
+
+        if @account.grants_right?(@current_user, :manage_site_settings)
           google_docs_domain = params[:account][:settings].try(:delete, :google_docs_domain)
           if @account.feature_enabled?(:google_docs_domain_restriction) &&
              @account.root_account? &&

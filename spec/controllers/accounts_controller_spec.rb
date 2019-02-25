@@ -591,6 +591,16 @@ describe AccountsController do
         expect(@account.reload.terms_of_service.passive).to eq true
       end
     end
+
+    it "should be set and unset outgoing email name" do
+      account_with_admin_logged_in
+      post 'update', params: {:id => @account.id, :account => {
+        :settings => {:outgoing_email_default_name_option => "custom", :outgoing_email_default_name => "beep"}}}
+      expect(@account.reload.settings[:outgoing_email_default_name]).to eq "beep"
+      post 'update', params: {:id => @account.id, :account => {
+        :settings => {:outgoing_email_default_name_option => "default"}}}
+      expect(@account.reload.settings[:outgoing_email_default_name]).to eq nil
+    end
   end
 
   describe "#settings" do
