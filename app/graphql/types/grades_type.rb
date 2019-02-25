@@ -46,6 +46,14 @@ module Types
       The override score. Supersedes the computed final score if set.
     DESC
 
+    field :override_grade, String, <<~DESC, null: true
+      The override grade. Supersedes the computed final grade if set.
+    DESC
+    def override_grade
+      return nil if override_score.blank?
+      object.effective_final_grade
+    end
+
     field :grading_period, GradingPeriodType, null: true
     def grading_period
       load_association :grading_period
