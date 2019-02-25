@@ -86,3 +86,7 @@ docker-compose.override.yml
 # Local Development only files
 *.dev
 .env
+
+
+# ignore JetBrains IDEs files
+.idea/*
