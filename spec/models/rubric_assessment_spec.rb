@@ -445,6 +445,38 @@ describe RubricAssessment do
         expect{assessment.considered_anonymous?}.not_to raise_error
       end
     end
+
+    describe '#update_artifact' do
+      it 'should set group on submission' do
+        group_category = @course.group_categories.create!(name: "Test Group Set")
+        group = @course.groups.create!(name: "Group A", group_category: group_category)
+        group.add_user @student
+        group.save!
+
+        assignment = @course.assignments.create!(
+          assignment_valid_attributes.merge(
+            group_category: group_category,
+            grade_group_students_individually: false
+          )
+        )
+        submission = assignment.find_or_create_submission(@student)
+        association = @rubric.associate_with(
+          assignment, @course, :purpose => 'grading', :use_for_grading => true
+        )
+        association.assess({
+          :user => @student,
+          :assessor => @teacher,
+          :artifact => submission,
+          :assessment => {
+            :assessment_type => 'grading',
+            :criterion_crit1 => {
+              :points => 5
+            }
+          }
+        })
+        expect(submission.reload.group).to eq group
+      end
+    end
   end
 
   describe "read permissions" do
