@@ -19,9 +19,8 @@
 import React from 'react'
 import {bool, string, func, oneOf} from 'prop-types'
 
-import Heading from '@instructure/ui-elements/lib/components/Heading'
-import InPlaceEdit from '@instructure/ui-editable/lib/components/InPlaceEdit'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {Heading} from '@instructure/ui-elements'
+import {InPlaceEdit} from '@instructure/ui-editable'
 import {omitProps} from '@instructure/ui-utils/lib/react/passthroughProps'
 import createChainedFunction from '@instructure/ui-utils/lib/createChainedFunction'
 
@@ -32,6 +31,7 @@ export default class EditableHeading extends React.Component {
     value: string.isRequired, // the current text string
     onChange: func.isRequired, // when flips from edit to view, notify consumer of the new value
     onChangeMode: func.isRequired, // when mode changes
+    isValid: func, // is the current value valid
     initialMode: oneOf(['view', 'edit']), // what mode should we start in. after that mode is handled internally
     placeholder: string, // the string to display when the text value is empty
     viewAs: string, // <Heading as={viewAs}> when in view mode
@@ -39,7 +39,7 @@ export default class EditableHeading extends React.Component {
     level: oneOf(['h1', 'h2', 'h3', 'h4', 'h5']),
     readOnly: bool,
     required: bool,
-    requiredMessage: string
+    invalidMessage: string
   }
 
   static defaultProps = {
@@ -47,31 +47,20 @@ export default class EditableHeading extends React.Component {
     level: 'h2', // to match instui Heading default
     placeholder: '',
     readOnly: false,
-    required: false
+    required: false,
+    isValid: () => true
   }
 
   constructor(props) {
     super(props)
 
     this.state = {
-      value: props.value,
       initialValue: props.value
     }
-  }
 
-  // this.state.value holds the current value as the user is editing
-  // once the mode flips from edit to view and the new value is
-  // frozen, props.onChange tells our parent, who will re-render us
-  // with this value in our props. This is where we reset our state
-  // to reflect that new value
-  static getDerivedStateFromProps(props, state) {
-    if (state.initialValue !== props.value) {
-      const newState = {...state}
-      newState.value = props.value
-      newState.initialValue = props.value
-      return newState
-    }
-    return null
+    this._inputRef = null
+    this._headingRef = null
+    this._hiddenTextRef = null
   }
 
   getSnapshotBeforeUpdate(prevProps, _prevState) {
@@ -83,30 +72,68 @@ export default class EditableHeading extends React.Component {
     return null
   }
 
-  componentDidUpdate(_prevProps, _prevState, snapshot) {
+  componentDidUpdate(prevProps, _prevState, _snapshot) {
     if (this._inputRef) {
-      if (snapshot) {
-        this._inputRef.style.width = `${snapshot.width}px`
-      } else {
-        const fontSize = this.getFontSize(this._inputRef)
-        let w = Math.min(this._inputRef.scrollWidth, this._inputRef.value.length * fontSize)
-        if (w < 2 * fontSize) w = 2 * fontSize
-        this._inputRef.style.width = `${w}px`
+      this._inputRef.style.width = this.getWidth()
+      // if just flipped to edit, select all the text
+      if (prevProps.mode === 'view' && this.props.mode === 'edit') {
+        this._inputRef.setSelectionRange(0, Number.MAX_SAFE_INTEGER)
       }
     }
   }
 
-  getFontSize(elem) {
+  getFontSize() {
+    let fontSize = 38
     try {
-      return parseInt(window.getComputedStyle(elem).getPropertyValue('font-size'), 10)
+      if (this._inputRef) {
+        fontSize = parseInt(
+          window.getComputedStyle(this._inputRef).getPropertyValue('font-size'),
+          10
+        )
+      }
     } catch (_ignore) {
-      return 16
+      // ignore
+    } finally {
+      if (Number.isNaN(fontSize)) {
+        fontSize = 38
+      }
     }
+    return fontSize
+  }
+
+  // get the space we need to reserve that's not actual text
+  getPadding() {
+    let padding = 6
+    try {
+      if (this._inputRef) {
+        const cs = window.getComputedStyle(this._inputRef)
+        const lp = parseInt(cs.getProperty('padding-left'), 10)
+        const rp = parseInt(cs.getProperty('padding-right'), 10)
+        const lb = parseInt(cs.getProperty('border-left-width'), 10)
+        const rb = parseInt(cs.getProperty('border-right-width'), 10)
+        padding = lp + rp + lb + rb
+      }
+    } catch (_ignore) {
+      // ignore
+    }
+    return padding
+  }
+
+  getWidth() {
+    const fsz = this.getFontSize()
+    let w = this.props.value.length * fsz
+    if (this._hiddenTextRef) {
+      w = Math.min(w, this._hiddenTextRef.offsetWidth + fsz / 2)
+    }
+    return `${w + this.getPadding()}px`
   }
 
   getInputRef = el => {
     this._headingRef = null
     this._inputRef = el
+    if (el) {
+      this._inputRef.style.minWidth = '2em'
+    }
   }
 
   getHeadingRef = el => {
@@ -114,26 +141,23 @@ export default class EditableHeading extends React.Component {
     this._headingRef = el
   }
 
+  getHiddenTextRef = el => {
+    this._hiddenTextRef = el
+  }
+
   renderView = () => {
-    const msg =
-      this.props.required && !this.state.value ? (
-        <div>
-          <Text color="error">{this.props.requiredMessage}</Text>
-        </div>
-      ) : null
     const p = omitProps(this.props, EditableHeading.propTypes, ['mode'])
     return (
       <div>
         <Heading
           {...p}
           level={this.props.level}
-          color={this.state.value ? 'primary' : 'secondary'}
+          color={this.props.value ? 'primary' : 'secondary'}
           as={this.props.viewAs || this.props.level}
           elementRef={this.getHeadingRef}
         >
-          {this.state.value || this.props.placeholder}
+          {this.props.value || this.props.placeholder}
         </Heading>
-        {msg}
       </div>
     )
   }
@@ -151,8 +175,8 @@ export default class EditableHeading extends React.Component {
           {...p}
           level={this.props.level}
           as="input"
-          value={this.state.value}
-          onChange={this.handleChange}
+          value={this.props.value}
+          onChange={this.handleInputChange}
           onKeyDown={this.handleKey}
           aria-label={this.props.label}
           onBlur={onBlur}
@@ -163,13 +187,15 @@ export default class EditableHeading extends React.Component {
   }
 
   renderEditButton = props => {
-    if (!this.props.readOnly) {
+    if (!this.props.readOnly && this.props.isValid(this.props.value)) {
       props.label = this.props.label
       return InPlaceEdit.renderDefaultEditButton(props)
     }
     return null
   }
 
+  // don't have to check what mode is, because
+  // this is the editor's key handler
   handleKey = event => {
     if (event.key === 'Enter') {
       event.preventDefault()
@@ -177,31 +203,65 @@ export default class EditableHeading extends React.Component {
       if (!this.props.readOnly) {
         this.props.onChangeMode('view')
       }
+    } else if (event.key === 'Escape') {
+      // reset to initial value
+      this.props.onChange(this.state.initialValue)
     }
   }
 
-  handleChange = event => {
-    this.setState({value: event.target.value})
+  handleInputChange = event => {
+    this.props.onChange(event.target.value)
+  }
+
+  // InPlaceEdit.onChange is fired when changing from edit to view
+  // mode. Reset the initialValue now.
+  handleChange = newValue => {
+    this.setState(
+      {
+        initialValue: newValue
+      },
+      () => {
+        this.props.onChange(newValue)
+      }
+    )
   }
 
   handleModeChange = mode => {
     if (!this.props.readOnly) {
+      if (mode === 'view') {
+        if (!this.props.isValid(this.props.value)) {
+          // can't leave edit mode with a bad value
+          return
+        }
+      }
       this.props.onChangeMode(mode)
     }
   }
 
   render() {
     return (
-      <div className="EditableHeading">
+      <div data-testid="EditableHeading">
+        <div
+          style={{
+            position: 'absolute',
+            display: 'inline-block',
+            top: '-1000px',
+            fontSize: this.getFontSize()
+          }}
+          ref={this.getHiddenTextRef}
+        >
+          {this.props.value}
+        </div>
         <InPlaceEdit
           mode={this.props.mode}
           onChangeMode={this.handleModeChange}
           renderViewer={this.renderView}
           renderEditor={this.renderEditor}
           renderEditButton={this.renderEditButton}
-          value={this.state.value}
-          onChange={this.props.onChange}
+          value={this.props.value}
+          onChange={this.handleChange}
           editButtonPlacement={this.props.editButtonPlacement}
+          showFocusRing={false}
         />
       </div>
     )

@@ -25,7 +25,7 @@ import Toolbox from '../Toolbox'
 function renderToolbox(assignment) {
   return render(
     <MockedProvider>
-      <Toolbox assignment={assignment} onChangeAssignment={() => {}} />
+      <Toolbox assignment={assignment} onChangeAssignment={() => {}} onSetWorkstate={() => {}} />
     </MockedProvider>
   )
 }

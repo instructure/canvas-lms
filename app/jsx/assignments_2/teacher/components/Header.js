@@ -27,7 +27,7 @@ import View from '@instructure/ui-layout/lib/components/View'
 import {TeacherAssignmentShape} from '../assignmentData'
 import TeacherViewContext from './TeacherViewContext'
 import Toolbox from './Toolbox'
-import EditableHeading from './Editables/EditableHeading'
+import AssignmentName from './Editables/AssignmentName'
 import AssignmentModules from './Editables/AssignmentModules'
 import AssignmentType from './Editables/AssignmentType'
 import AssignmentGroup from './Editables/AssignmentGroup'
@@ -59,6 +59,7 @@ export default class Header extends React.Component {
   static propTypes = {
     assignment: TeacherAssignmentShape.isRequired,
     onChangeAssignment: func.isRequired,
+    onSetWorkstate: func.isRequired,
     onUnsubmittedClick: func,
     onPublishChange: func,
     onDelete: func,
@@ -89,8 +90,6 @@ export default class Header extends React.Component {
 
       nameMode: initialMode
     }
-
-    this.namePlaceholder = I18n.t('Assignment name')
   }
 
   handleTypeModeChange = mode => {
@@ -238,17 +237,11 @@ export default class Header extends React.Component {
               />
             </View>
             <View display="block" padding="medium xx-small large xx-small">
-              <EditableHeading
+              <AssignmentName
                 mode={this.state.nameMode}
-                viewAs="div"
-                level="h1"
-                value={assignment.name}
+                name={assignment.name}
                 onChange={this.handleNameChange}
                 onChangeMode={this.handleNameChangeMode}
-                placeholder={this.namePlaceholder}
-                label={I18n.t('Edit title')}
-                required
-                requiredMessage={I18n.t('Assignment name is required')}
                 readOnly={this.props.readOnly}
               />
             </View>

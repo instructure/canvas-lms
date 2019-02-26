@@ -17,7 +17,7 @@
  */
 
 import {fireEvent, wait, waitForElement} from 'react-testing-library'
-import {mockAssignment, itBehavesLikeADialog, workflowMutationResult} from '../../../test-utils'
+import {mockAssignment, itBehavesLikeADialog, saveAssignmentResult} from '../../../test-utils'
 import {renderTeacherView} from './integration-utils'
 
 async function openDeleteDialog(assignment = mockAssignment(), apolloMocks = []) {
@@ -43,7 +43,7 @@ describe('assignments 2 delete dialog', () => {
     const reloadSpy = jest.spyOn(window.location, 'reload')
     const assignment = mockAssignment()
     const {getByTestId} = await openDeleteDialog(assignment, [
-      workflowMutationResult(assignment, 'deleted')
+      saveAssignmentResult(assignment, {state: 'deleted'}, {state: 'deleted'})
     ])
     const reallyDeleteButton = await waitForElement(() =>
       getByTestId('delete-dialog-confirm-button')
@@ -55,7 +55,7 @@ describe('assignments 2 delete dialog', () => {
   it('reports errors', async () => {
     const assignment = mockAssignment()
     const {getByTestId, getByText} = await openDeleteDialog(assignment, [
-      workflowMutationResult(assignment, 'deleted', 'well rats')
+      saveAssignmentResult(assignment, {state: 'deleted'}, {state: 'deleted'}, 'well rats')
     ])
     const reallyDeleteButton = await waitForElement(() =>
       getByTestId('delete-dialog-confirm-button')

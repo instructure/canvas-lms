@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from 'react-testing-library'
+import {render, fireEvent} from 'react-testing-library'
 import AssignmentPoints from '../AssignmentPoints'
 
 describe('AssignmentPoints', () => {
@@ -58,5 +58,40 @@ describe('AssignmentPoints', () => {
     )
 
     expect(getByText('Points must be a number >= 0')).toBeInTheDocument()
+  })
+
+  it('saves new value on Enter', () => {
+    const onChange = jest.fn()
+    const {container} = render(
+      <AssignmentPoints
+        mode="edit"
+        onChange={onChange}
+        onChangeMode={() => {}}
+        pointsPossible={12}
+      />
+    )
+
+    const input = container.querySelector('input[value="12"]')
+    fireEvent.input(input, {target: {value: '7'}})
+    fireEvent.keyDown(input, {key: 'Enter', code: 13})
+    expect(onChange).toHaveBeenCalledWith(7)
+  })
+
+  it('reverts to the old value on Escape', () => {
+    const onChange = jest.fn()
+    const {container} = render(
+      <AssignmentPoints
+        mode="edit"
+        onChange={onChange}
+        onChangeMode={() => {}}
+        pointsPossible={12}
+      />
+    )
+
+    const input = container.querySelector('input[value="12"]')
+    fireEvent.input(input, {target: {value: '7'}})
+    fireEvent.keyDown(input, {key: 'Escape', code: 27})
+    expect(onChange).toHaveBeenCalledWith(7)
+    expect(onChange).toHaveBeenCalledWith(12)
   })
 })

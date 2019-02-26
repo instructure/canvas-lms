@@ -18,7 +18,7 @@
 
 import {TeacherViewContextDefaults} from './components/TeacherViewContext'
 import {fireEvent, wait, waitForElement} from 'react-testing-library'
-import {SET_WORKFLOW} from './assignmentData'
+import {SAVE_ASSIGNMENT} from './assignmentData'
 
 // because our version of jsdom doesn't support elt.closest('a') yet. Should soon.
 export function closest(el, selector) {
@@ -53,13 +53,13 @@ export async function waitForNoElement(queryFn) {
   return true
 }
 
-export function workflowMutationResult(assignment, newWorkflowState, errorMessage) {
+export function saveAssignmentResult(assignment, updates, response, errorMessage) {
   const result = {
     request: {
-      query: SET_WORKFLOW,
+      query: SAVE_ASSIGNMENT,
       variables: {
         id: assignment.lid,
-        workflow: newWorkflowState
+        ...updates
       }
     },
     result: {
@@ -68,7 +68,13 @@ export function workflowMutationResult(assignment, newWorkflowState, errorMessag
           assignment: {
             __typename: 'Assignment',
             id: assignment.gid,
-            state: newWorkflowState
+            lid: assignment.lid,
+            gid: assignment.gid,
+            dueAt: assignment.dueAt,
+            name: assignment.name,
+            description: assignment.description,
+            state: assignment.state,
+            ...response
           }
         }
       }

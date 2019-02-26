@@ -173,6 +173,40 @@ export const SET_WORKFLOW = gql`
   }
 `
 
+export const SAVE_ASSIGNMENT = gql`
+  mutation SaveAssignment(
+    $id: ID!
+    $name: String
+    $description: String
+    $dueAt: DateTime
+    $pointsPossible: Float
+    $state: AssignmentState
+  ) {
+    updateAssignment(
+      input: {
+        id: $id
+        name: $name
+        description: $description
+        dueAt: $dueAt
+        pointsPossible: $pointsPossible
+        state: $state
+      }
+    ) {
+      assignment {
+        __typename
+        id
+        lid: _id
+        gid: id
+        dueAt
+        name
+        description
+        pointsPossible
+        state
+      }
+    }
+  }
+`
+
 export const CourseShape = shape({
   lid: string.isRequired
 })

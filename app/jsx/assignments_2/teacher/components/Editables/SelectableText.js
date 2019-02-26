@@ -94,9 +94,13 @@ export default class SelectableText extends React.Component {
     }
   }
 
-  handleChangeMode = mode => {
+  handleModeChange = mode => {
     if (!this.props.readOnly) {
       this.props.onChangeMode(mode)
+    }
+    if (mode === 'view' && this._selectInputRef) {
+      this._selectInputRef.removeEventListener('keydown', this.handleKey)
+      this._selectInputRef = null
     }
     this._select = null
   }
@@ -113,6 +117,19 @@ export default class SelectableText extends React.Component {
 
   getInputRef = el => {
     this._selectInputRef = el
+    if (el) {
+      this._selectInputRef.addEventListener('keydown', this.handleKey)
+    }
+  }
+
+  handleKey = event => {
+    if (event.key === 'Enter') {
+      event.preventDefault()
+      event.stopPropagation()
+      this.handleModeChange('view')
+    } else if (this.props.mode === 'edit' && event.key === 'Escape') {
+      this.setState((state, _props) => ({value: state.initialValue}))
+    }
   }
 
   renderView = () => {
@@ -165,7 +182,7 @@ export default class SelectableText extends React.Component {
       <div data-testid="SelectableText">
         <InPlaceEdit
           mode={this.props.mode}
-          onChangeMode={this.handleChangeMode}
+          onChangeMode={this.handleModeChange}
           onChange={this.props.onChange}
           renderViewer={this.renderView}
           renderEditor={this.renderEdit}

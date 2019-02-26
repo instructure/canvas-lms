@@ -16,8 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {fireEvent, wait, waitForElement} from 'react-testing-library'
-import {mockAssignment, findInputForLabel, workflowMutationResult} from '../../test-utils'
+import {fireEvent, waitForElement} from 'react-testing-library'
+import {
+  mockAssignment,
+  findInputForLabel,
+  saveAssignmentResult,
+  waitForNoElement
+} from '../../test-utils'
 import {
   renderTeacherView,
   renderTeacherQueryAndWaitForResult
@@ -40,38 +45,44 @@ describe('TeacherView', () => {
 
   describe('publish toggle', () => {
     // will be re-checked with ADMIN-2345 for flakiness
-    it.skip('unpublishes the assignment', async () => {
+    it('unpublishes the assignment', async () => {
       const assignment = mockAssignment()
       const {getByText, container} = await renderTeacherQueryAndWaitForResult(assignment, [
-        workflowMutationResult(assignment, 'unpublished')
+        saveAssignmentResult(assignment, {state: 'unpublished'}, {state: 'unpublished'})
       ])
       const publish = getByText('publish', {exact: false})
       const publishCheckbox = findInputForLabel(publish, container)
       expect(publishCheckbox.checked).toBe(true)
       fireEvent.click(publishCheckbox)
-      expect(publishCheckbox.getAttribute('disabled')).toBe('')
+      expect(getByText('Saving assignment')).toBeInTheDocument()
       expect(publishCheckbox.checked).toBe(false) // optimistic update
       // make sure the mutation finishes
-      await wait(() => {
-        expect(publishCheckbox.getAttribute('disabled')).toBe(null)
-      })
+      expect(await waitForNoElement(() => getByText('Saving assignment'))).toBe(true)
     })
 
     // will be re-checked with ADMIN-2345 for flakiness
-    it.skip('publishes the assignment', async () => {
+    it('saves the assignment when publishing', async () => {
       const assignment = mockAssignment({state: 'unpublished'})
       const {getByText, container} = await renderTeacherQueryAndWaitForResult(assignment, [
-        workflowMutationResult(assignment, 'published')
+        saveAssignmentResult(
+          assignment,
+          {
+            name: assignment.name,
+            description: assignment.description,
+            state: 'published'
+          },
+          {state: 'published'}
+        )
       ])
       const publish = getByText('publish', {exact: false})
       const publishCheckbox = findInputForLabel(publish, container)
       expect(publishCheckbox.checked).toBe(false)
       fireEvent.click(publishCheckbox)
-      expect(publishCheckbox.getAttribute('disabled')).toBe('')
+      expect(getByText('Saving assignment')).toBeInTheDocument()
       expect(publishCheckbox.checked).toBe(true) // optimistic update
-      await wait(() => {
-        expect(publishCheckbox.getAttribute('disabled')).toBe(null)
-      })
+      // make sure the mutation finishes
+      expect(await waitForNoElement(() => getByText('Saving assignment'))).toBe(true)
+      expect(publishCheckbox.checked).toBe(true) // still
     })
   })
 })

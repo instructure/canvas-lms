@@ -25,6 +25,19 @@ import {Text} from '@instructure/ui-elements'
 
 import EditableNumber from './EditableNumber'
 
+const invalidMessage = I18n.t('Points must be a number >= 0')
+const editLabel = I18n.t('Edit Points')
+const label = I18n.t('Points')
+
+// beause isNan is not the same as Number.isNaN
+/* eslint-disable no-restricted-globals */
+const isPointsValid = strValue => {
+  if (!strValue) return false // it's required
+  if (isNaN(strValue)) return false // must be a number
+  return parseFloat(strValue) >= 0 // must be non-negative
+}
+/* eslint-enable no-restricted-globals */
+
 export default class AssignmentPoints extends React.Component {
   static propTypes = {
     mode: oneOf(['view', 'edit']).isRequired,
@@ -41,32 +54,69 @@ export default class AssignmentPoints extends React.Component {
   constructor(props) {
     super(props)
 
+    // need to track the value so we don't pass
+    // invalid values up to our parent
+    const strValue = `${props.pointsPossible}`
     this.state = {
-      isValid: this.isPointsValid(props.pointsPossible)
+      strValue,
+      isValid: isPointsValid(strValue)
     }
   }
 
-  handlePointsChange = value => {
-    // round to 2 decimal places
-    const val = Math.round(parseFloat(value) * 100) / 100
-    this.props.onChange(val)
+  static getDerivedStateFromProps(props, state) {
+    // if the current state is invalid, don't replace the state
+    // it's there to track invalid values
+    if (state.isValid) {
+      const strValue = `${props.pointsPossible}`
+      return {
+        strValue,
+        isValid: isPointsValid(strValue)
+      }
+    }
+    return null
   }
 
-  handlePointsInputChnage = value => {
-    this.setState({isValid: this.isPointsValid(value)})
+  handlePointsChange = strValue => {
+    const isValid = isPointsValid(strValue)
+    this.setState({isValid, strValue})
+    if (isValid) {
+      // round to 2 decimal places
+      const val = Math.round(parseFloat(strValue) * 100) / 100
+      this.props.onChange(val)
+    }
   }
 
-  // beause isNan is not the same as Number.isNaN
-  /* eslint-disable no-restricted-globals */
-  isPointsValid = strValue => {
-    if (!strValue) return false // it's required
-    if (isNaN(strValue)) return false // must be a number
-    return parseFloat(strValue) >= 0 // must be non-negative
+  handlePointsInputChange = strValue => {
+    const isValid = isPointsValid(strValue)
+    this.setState({isValid, strValue})
+    if (isValid) {
+      this.props.onChange(parseFloat(strValue))
+    }
   }
-  /* eslint-enable no-restricted-globals */
+
+  // since we're updating InPlaceEdit.value as the user types,
+  // it won't call onChange, since the value it has is up to date.
+  // We need to round the value off when changing to view too
+  // We can assume the current value is valid, because EditableNumber
+  // won't leave edit mode unless it is.
+  handleChangeMode = mode => {
+    if (mode === 'view') {
+      // round to 2 decimal places
+      const val = Math.round(parseFloat(this.state.strValue) * 100) / 100
+      this.setState({strValue: `${val}`}, () => {
+        this.props.onChange(val)
+      })
+    }
+    this.props.onChangeMode(mode)
+  }
 
   render() {
     const sty = this.props.mode === 'view' ? {marginTop: '7px'} : {}
+    const msg = this.state.isValid ? null : (
+      <View as="div" textAlign="end" margin="xx-small 0 0 0">
+        <Text color="error">{invalidMessage}</Text>
+      </View>
+    )
     return (
       <div style={sty} data-testid="AssignmentPoints">
         <Flex alignItems="center" justifyItems="end">
@@ -75,26 +125,22 @@ export default class AssignmentPoints extends React.Component {
               mode={this.props.mode}
               inline
               size="large"
-              value={this.props.pointsPossible}
+              value={this.state.strValue}
               onChange={this.handlePointsChange}
-              onChangeMode={this.props.onChangeMode}
-              onInputChange={this.handlePointsInputChnage}
-              isValid={this.isPointsValid}
-              label={I18n.t('Edit Points')}
+              onChangeMode={this.handleChangeMode}
+              onInputChange={this.handlePointsInputChange}
+              isValid={isPointsValid}
+              label={editLabel}
               editButtonPlacement="start"
               required
               readOnly={this.props.readOnly}
             />
           </FlexItem>
           <FlexItem>
-            <Text size="large">{I18n.t('Points')}</Text>
+            <Text size="large">{label}</Text>
           </FlexItem>
         </Flex>
-        {this.state.isValid ? null : (
-          <View as="div" textAlign="end" margin="xx-small 0 0 0">
-            <Text color="error">{I18n.t('Points must be a number >= 0')}</Text>
-          </View>
-        )}
+        {msg}
       </div>
     )
   }
