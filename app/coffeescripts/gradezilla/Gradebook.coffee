@@ -437,14 +437,6 @@ define [
       dataLoader.gotCustomColumns.then @gotCustomColumns
       dataLoader.gotStudents.then @gotAllStudents
 
-      @renderedGrid = $.when(
-        dataLoader.gotStudentIds,
-        dataLoader.gotContextModules,
-        dataLoader.gotCustomColumns,
-        dataLoader.gotAssignmentGroups,
-        dataLoader.gotGradingPeriodAssignments
-      ).then(@doSlickgridStuff)
-
       dataLoader.gotStudents.then () =>
         @setStudentsLoaded(true)
         @updateColumnHeaders()
@@ -467,6 +459,15 @@ define [
         @renderFilters()
 
       @postPolicies?.initialize()
+
+      @renderedGrid = $.when(
+        dataLoader.gotStudentIds,
+        dataLoader.gotContextModules,
+        dataLoader.gotCustomColumns,
+        dataLoader.gotAssignmentGroups,
+        dataLoader.gotGradingPeriodAssignments
+      ).then () =>
+        @finishRenderingUI()
 
       @gridReady.then () =>
         @renderViewOptionsMenu()
@@ -643,7 +644,7 @@ define [
 
     ## Post-Data Load Initialization
 
-    doSlickgridStuff: =>
+    finishRenderingUI: =>
       @initGrid()
       @initHeader()
       @gridReady.resolve()
