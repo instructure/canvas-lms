@@ -71,6 +71,8 @@ module GraphQLNodeLoader
       end
     when "GradingPeriod"
       Loaders::IDLoader.for(GradingPeriod).load(id).then(check_read_permission)
+    when 'MediaObject'
+      Loaders::MediaObjectLoader.load(id)
     when "Module"
       Loaders::IDLoader.for(ContextModule).load(id).then do |mod|
         Loaders::AssociationLoader.for(ContextModule, :context)

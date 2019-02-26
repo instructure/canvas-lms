@@ -1241,6 +1241,34 @@ Types that can be locked
 """
 union Lockable = Assignment | Discussion | Module | Page | Quiz
 
+type MediaObject implements Node {
+  """
+  legacy canvas id
+  """
+  _id: ID!
+  canAddCaptions: Boolean
+  id: ID!
+  mediaSources: [MediaSource!]
+  mediaType: MediaType
+  title: String
+}
+
+type MediaSource {
+  bitrate: String
+  contentType: String
+  fileExt: String
+  height: String
+  isOriginal: String
+  size: String
+  url: URL
+  width: String
+}
+
+enum MediaType {
+  audio
+  video
+}
+
 """
 Settings for Moderated Grading on an Assignment
 """
@@ -1403,6 +1431,7 @@ enum NodeType {
   GradingPeriod
   Group
   GroupSet
+  MediaObject
   Module
   ModuleItem
   Page
@@ -1908,6 +1937,7 @@ type SubmissionComment implements Timestamped {
   author: User
   comment: String
   createdAt: DateTime
+  mediaObject: MediaObject
   updatedAt: DateTime
 }
 

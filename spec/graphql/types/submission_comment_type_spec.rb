@@ -81,4 +81,44 @@ describe Types::SubmissionCommentType do
       submission_type.resolve('commentsConnection { nodes { attachments { _id } }}')
     ).to eq [[a1.id.to_s, a2.id.to_s], [], []]
   end
+
+  describe '#media_object' do
+    context 'with no media object' do
+      it 'returns nil' do
+        expect(submission_type.resolve(
+          'commentsConnection {
+            nodes {
+              mediaObject {
+                title
+              }
+            }
+          }'
+        )).to eq([nil, nil, nil])
+      end
+    end
+
+    context 'with a valid media object' do
+      before do
+        @media_title = SecureRandom.hex
+        @media_object = media_object(
+          title: @media_title,
+        )
+        @submission_comments[0].update!(
+          media_comment_id: @media_object.media_id
+        )
+      end
+
+      it 'returns the media object for the comment' do
+        expect(submission_type.resolve(
+          'commentsConnection {
+            nodes {
+              mediaObject {
+                title
+              }
+            }
+          }'
+        )).to eq([@media_title, nil, nil])
+      end
+    end
+  end
 end

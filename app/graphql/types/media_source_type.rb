@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 - present Instructure, Inc.
+# Copyright (C) 2019 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,16 +14,26 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
-module Factories
-  def media_object(opts={})
-    mo = MediaObject.new
-    mo.context = opts[:context] || @course
-    mo.media_id = opts[:media_id] || '1234'
-    mo.media_type = opts[:media_type] || 'video'
-    mo.title = opts[:title] || 'media_title'
-    mo.user = opts[:user] || @user
-    mo.save!
-    mo
+module Types
+  class MediaSourceType < ApplicationObjectType
+    graphql_name 'MediaSource'
+
+    field :bitrate, String, null:true
+
+    field :content_type, String, null:true
+
+    field :file_ext, String, hash_key: :fileExt, null:true
+
+    field :height, String, null:true
+
+    field :is_original, String, hash_key: :isOriginal, null:true
+
+    field :size, String, null:true
+
+    field :url, Types::UrlType, null:true
+
+    field :width, String, null:true
   end
 end

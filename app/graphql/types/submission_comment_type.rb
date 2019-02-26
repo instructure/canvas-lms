@@ -64,5 +64,10 @@ module Types
         AttachmentsLoader.for(object.submission.assignment).load(object)
       end
     end
+
+    field :media_object, Types::MediaObjectType, null: true
+    def media_object
+      Loaders::MediaObjectLoader.load(object.media_comment_id)
+    end
   end
 end

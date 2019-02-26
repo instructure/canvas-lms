@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 - present Instructure, Inc.
+# Copyright (C) 2019 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,16 +14,18 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
-module Factories
-  def media_object(opts={})
-    mo = MediaObject.new
-    mo.context = opts[:context] || @course
-    mo.media_id = opts[:media_id] || '1234'
-    mo.media_type = opts[:media_type] || 'video'
-    mo.title = opts[:title] || 'media_title'
-    mo.user = opts[:user] || @user
-    mo.save!
-    mo
+class Loaders::MediaObjectLoader < GraphQL::Batch::Loader
+  def perform(media_object_ids)
+    media_objects = MediaObject.by_media_id(media_object_ids)
+
+    hashed_media = media_objects.each_with_object({}) do |media_object, hsh|
+      hsh[media_object.media_id] = media_object
+    end
+
+    media_object_ids.each do |media_id|
+      fulfill(media_id, hashed_media[media_id])
+    end
   end
 end
