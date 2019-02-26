@@ -355,6 +355,11 @@ describe "calendar2" do
       agenda_item.click
       expect(f("#content")).not_to contain_css('.event-details .delete_event_link')
     end
+
+    it "should display agenda events", :xbrowser do
+      load_agenda_view
+      expect(fj('.agenda-wrapper:visible')).to be_present
+    end
   end
 
   context "agenda view with BETTER_SCHEDULER enabled" do
