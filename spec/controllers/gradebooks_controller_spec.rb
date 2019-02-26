@@ -252,6 +252,13 @@ describe GradebooksController do
         expect(assigns[:js_env].key?(:effective_final_score)).to be false
       end
 
+      it "does not include the effective final score in the ENV if there is no score" do
+        invited_student = @course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "invited").user
+        user_session(@teacher)
+        get :grade_summary, params: { course_id: @course.id, id: invited_student.id }
+        expect(assigns[:js_env].key?(:effective_final_score)).to be false
+      end
+
       it "takes the effective final score for the grading period, if present" do
         grading_period_group = @course.grading_period_groups.create!
         grading_period = grading_period_group.grading_periods.create!(

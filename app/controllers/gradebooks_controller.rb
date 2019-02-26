@@ -137,7 +137,7 @@ class GradebooksController < ApplicationController
         student_enrollment.find_score(course_score: true)
       end
 
-      js_hash[:effective_final_score] = total_score.effective_final_score if total_score.overridden?
+      js_hash[:effective_final_score] = total_score.effective_final_score if total_score&.overridden?
     end
 
     js_env(js_hash)
