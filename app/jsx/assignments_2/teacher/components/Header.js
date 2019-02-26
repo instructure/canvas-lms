@@ -85,7 +85,6 @@ export default class Header extends React.Component {
       moduleList: props.assignment.course.modulesConnection.nodes,
       modulesMode: initialMode,
 
-      assignmentGroupList: props.assignment.assignmentGroup && [props.assignment.assignmentGroup],
       assignmentGroupMode: initialMode,
 
       nameMode: initialMode
@@ -167,25 +166,12 @@ export default class Header extends React.Component {
   //   }))
   // }
 
-  handleGroupChange = selectedAssignmentGroupId => {
-    const grp = this.state.assignmentGroupList.find(g => g.lid === selectedAssignmentGroupId)
-    this.props.onChangeAssignment('assignmentGroup', grp)
+  handleGroupChange = selectedAssignmentGroup => {
+    this.props.onChangeAssignment('assignmentGroup', selectedAssignmentGroup)
   }
 
   handleGroupChangeMode = mode => {
-    this.setState((prevState, props) => {
-      let assignmentGroupList = prevState.groupList
-      if (mode === 'edit') {
-        // TODO: exhaust all the pages, somehow
-        assignmentGroupList = props.assignment.course.assignmentGroupsConnection.nodes
-      } else {
-        assignmentGroupList = prevState.assignmentGroupList
-      }
-      return {
-        assignmentGroupList,
-        assignmentGroupMode: mode
-      }
-    })
+    this.setState({assignmentGroupMode: mode})
   }
 
   handleNameChange = name => {
@@ -226,10 +212,8 @@ export default class Header extends React.Component {
             <View display="block" padding="xx-small 0 0 xx-small">
               <AssignmentGroup
                 mode={this.state.assignmentGroupMode}
-                assignmentGroupList={this.state.assignmentGroupList}
-                selectedAssignmentGroupId={
-                  assignment.assignmentGroup && assignment.assignmentGroup.lid
-                }
+                courseId={assignment.course.lid}
+                selectedAssignmentGroup={assignment.assignmentGroup}
                 onChange={this.handleGroupChange}
                 onChangeMode={this.handleGroupChangeMode}
                 onAddGroup={this.handleAddGroup}

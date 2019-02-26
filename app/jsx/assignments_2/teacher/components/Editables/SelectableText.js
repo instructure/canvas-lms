@@ -45,7 +45,8 @@ export default class SelectableText extends React.Component {
     readOnly: bool,
     multiple: bool,
     size: oneOf(['small', 'medium']),
-    options: arrayOf(optShape).isRequired
+    options: arrayOf(optShape).isRequired,
+    loadingText: string
   }
 
   static defaultProps = {
@@ -77,7 +78,14 @@ export default class SelectableText extends React.Component {
       newState.initialValue = props.value
       return newState
     }
-    return state
+    return null
+  }
+
+  // if we render the first time in edit mode, open the select
+  componentDidMount() {
+    if (this._selectInputRef && this.props.mode === 'edit') {
+      this._selectInputRef.click()
+    }
   }
 
   // when we flip from view to edit, automatically open the select
@@ -108,8 +116,8 @@ export default class SelectableText extends React.Component {
   handleOpenSelect = () => {
     if (this.props.multiple) return
     requestAnimationFrame(() => {
-      const w = this._selectInputRef.offsetWidth + 16
-      if (w > this._selectInputRef.offsetWidth) {
+      if (this._selectInputRef) {
+        const w = this._selectInputRef.offsetWidth + 16
         this._selectInputRef.style.width = `${w}px`
       }
     })
@@ -151,6 +159,7 @@ export default class SelectableText extends React.Component {
           size={this.props.size}
           multiple={this.props.multiple}
           onOpen={this.handleOpenSelect}
+          loadingText={this.props.loadingText}
         >
           {this.renderOptions(this.props.options)}
         </Select>

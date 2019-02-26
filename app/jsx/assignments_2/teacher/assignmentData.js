@@ -80,16 +80,9 @@ export const TEACHER_QUERY = gql`
             name
           }
         }
-        assignmentGroupsConnection {
+        assignmentGroupsConnection(first: 0) {
           pageInfo {
-            startCursor
-            endCursor
             hasNextPage
-            hasPreviousPage
-          }
-          nodes {
-            lid: _id
-            name
           }
         }
       }
@@ -159,6 +152,46 @@ export const TEACHER_QUERY = gql`
       }
     }
   }
+`
+
+const assignmentGroup = gql`
+  fragment CourseAssignmentGroups on AssignmentGroupConnection {
+    nodes {
+      lid: _id
+      gid: id
+      name
+      __typename
+    }
+  }
+`
+
+export const COURSE_ASSIGNMENT_GROUPS_QUERY = gql`
+  query GetCourseAssignmentGroups($courseId: ID!, $cursor: String) {
+    course(id: $courseId) {
+      lid: _id
+      gid: id
+      assignmentGroupsConnection(first: 200, after: $cursor) {
+        pageInfo {
+          endCursor
+          hasNextPage
+        }
+        ...CourseAssignmentGroups
+      }
+    }
+  }
+  ${assignmentGroup}
+`
+export const COURSE_ASSIGNMENT_GROUPS_QUERY_LOCAL = gql`
+  query GetCourseAssignmentGroupsLocal($courseId: ID!) {
+    course(id: $courseId) @client {
+      lid: _id
+      gid: id
+      assignmentGroupsConnection(first: 200) {
+        ...CourseAssignmentGroups
+      }
+    }
+  }
+  ${assignmentGroup}
 `
 
 export const SET_WORKFLOW = gql`

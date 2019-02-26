@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from 'react-testing-library'
+import {render, waitForDomChange} from 'react-testing-library'
 import SelectableText from '../SelectableText'
 
 const options = [
@@ -100,8 +100,13 @@ describe('SelectableText, multiple', () => {
     expect(getByText('Mongo Santamaria|Pancho Sanchez')).toBeInTheDocument()
   })
 
-  it('renders the value in edit mode', () => {
-    const {getByText, queryByText} = render(
+  it('renders the value in edit mode', async () => {
+    function findCongero(name) {
+      return (content, element) =>
+        element.parentElement.tagName === 'BUTTON' && content.includes(name)
+    }
+
+    const {container, getByText, queryByText} = render(
       <SelectableText
         mode="edit"
         onChange={() => {}}
@@ -113,8 +118,14 @@ describe('SelectableText, multiple', () => {
         multiple
       />
     )
-    expect(getByText('Mongo Santamaria')).toBeInTheDocument()
-    expect(getByText('Giovanni Hidalgo')).toBeInTheDocument()
-    expect(queryByText('Pancho Sanchez')).toBeNull()
+    await waitForDomChange({container})
+
+    // I can't simply look for the strings for the selected values
+    // because they exist as options in the Select
+    // I lean on internal knowledge of the SelectMultiple that the current
+    // selections are rendered as <button><span>label</span></button>
+    expect(getByText(findCongero('Mongo Santamaria'))).toBeInTheDocument()
+    expect(getByText(findCongero('Giovanni Hidalgo'))).toBeInTheDocument()
+    expect(queryByText(findCongero('Pancho Sanchez'))).toBeNull()
   })
 })
