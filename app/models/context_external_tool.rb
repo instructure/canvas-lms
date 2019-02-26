@@ -36,6 +36,7 @@ class ContextExternalTool < ActiveRecord::Base
   validates_presence_of :config_xml, :if => lambda { |t| t.config_type == "by_xml" }
   validates_length_of :domain, :maximum => 253, :allow_blank => true
   validate :url_or_domain_is_set
+  validate :validate_urls
   serialize :settings
   attr_accessor :config_type, :config_url, :config_xml
 
@@ -182,6 +183,22 @@ class ContextExternalTool < ActiveRecord::Base
       errors.add(:domain, t('url_or_domain_required', "Either the url or domain should be set."))
     end
   end
+
+  def validate_urls
+    (
+      [url] + Lti::ResourcePlacement::PLACEMENTS.map { |p| settings[p]&.with_indifferent_access&.fetch('url', nil) }
+    ).compact.map { |u| validate_url(u) }
+  end
+  private :validate_urls
+
+  def validate_url(u)
+    u = URI.parse(u)
+  rescue
+    errors.add(:url,
+      t('url_or_domain_no_valid', "Incorrect url for %{url}", url: u)
+    )
+  end
+  private :validate_url
 
   def settings
     read_or_initialize_attribute(:settings, {})

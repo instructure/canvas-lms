@@ -362,6 +362,40 @@ describe ContextExternalTool do
     expect(@tool.has_placement?(:course_navigation)).to eq false
   end
 
+  describe 'validate_urls' do
+    subject { tool.valid? }
+
+    let(:tool) do
+      course.context_external_tools.build(
+        :name => "a", :url => url, :consumer_key => '12345', :shared_secret => 'secret', settings: settings
+      )
+    end
+    let(:settings) { {} }
+    let_once(:course) { course_model }
+    let(:url) { 'https://example.com' }
+
+    context 'with bad launch_url' do
+      let(:url) { 'https://example.com>' }
+
+      it { is_expected.to be false }
+    end
+
+    context 'with bad settings_url' do
+      let(:settings) do
+        { course_navigation: {
+            :url => 'https://example.com>',
+            :text => "Example",
+            :icon_url => "http://www.example.com/image.ico",
+            :selection_width => 50,
+            :selection_height => 50
+          }
+        }
+      end
+
+      it { is_expected.to be false }
+    end
+  end
+
   describe "find_external_tool" do
     it "should match on the same domain" do
       @tool = @course.context_external_tools.create!(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
