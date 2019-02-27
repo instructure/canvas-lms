@@ -22,12 +22,10 @@ describe "calendar2" do
   include_context "in-process server selenium tests"
   include Calendar2Common
 
-  before(:once) do
+  before(:each) do
     # or some stuff we need to click is "below the fold"
     make_full_screen
-  end
 
-  before(:each) do
     Account.default.tap do |a|
       a.settings[:show_scheduler] = true
       a.save!
