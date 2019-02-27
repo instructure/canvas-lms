@@ -53,6 +53,7 @@ import 'custom_moment_locales/fr_ca'
 import 'custom_moment_locales/ht_ht'
 import 'custom_moment_locales/mi_nz'
 import 'custom_moment_locales/hy_am'
+import 'custom_moment_locales/sl'
 
 let originalLocale
 let originalFallbacksMap

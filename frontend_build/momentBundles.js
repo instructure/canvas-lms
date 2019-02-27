@@ -20,7 +20,7 @@ const glob = require('glob')
 const path = require('path')
 
 // Put any custom moment locales here:
-const customMomentLocales = ['de', 'fa', 'fr', 'fr-ca', 'he', 'ht-ht', 'hy-am', 'mi-nz', 'pl']
+const customMomentLocales = ['de', 'fa', 'fr', 'fr-ca', 'he', 'ht-ht', 'hy-am', 'mi-nz', 'pl', 'sl']
 
 const momentLocaleBundles = glob
   .sync('moment/locale/**/*.js', {cwd: 'node_modules'})
