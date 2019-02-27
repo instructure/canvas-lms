@@ -53,7 +53,8 @@ describe('TeacherView', () => {
   })
 
   describe('publish toggle', () => {
-    it('unpublishes the assignment', async () => {
+    // will be re-checked with ADMIN-2345 for flakiness
+    it.skip('unpublishes the assignment', async () => {
       const assignment = mockAssignment()
       const {getByText, container} = await renderTeacherQueryAndWaitForResult(assignment, [
         workflowMutationResult(assignment, 'unpublished')
@@ -70,7 +71,8 @@ describe('TeacherView', () => {
       })
     })
 
-    it('publishes the assignment', async () => {
+    // will be re-checked with ADMIN-2345 for flakiness
+    it.skip('publishes the assignment', async () => {
       const assignment = mockAssignment({state: 'unpublished'})
       const {getByText, container} = await renderTeacherQueryAndWaitForResult(assignment, [
         workflowMutationResult(assignment, 'published')
