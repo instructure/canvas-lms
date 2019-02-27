@@ -50,7 +50,7 @@
           </p>
         </div>
       </div>
-      <div id="user_list_no_valid_users" class="ui-widget">
+      <div id="user_list_no_valid_users" class="ui-widget" aria-live="polite">
         <div class="ui-state-highlight ui-corner-all">
           <p><span style="float: <%= direction('left') %>; margin-<%= direction('right') %>: 0 0.3em;" class="ui-icon ui-icon-info"></span>
           <%= t :no_valid_users, "*Sorry,* it does not seem as if there were any valid email addresses or login IDs typed in, please go back and try again.", :wrapper => "<strong>\\1</strong>" %></p>
