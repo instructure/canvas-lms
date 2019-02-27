@@ -182,7 +182,7 @@ describe "speed grader - quiz submissions" do
     end
 
     get "/courses/#{@course.id}/gradebook/speed_grader?" \
-      "assignment_id=#{@assignment.id}#%7B%22student_id%22%3A#{@student.id}%7D"
+      "assignment_id=#{@assignment.id}&student_id=#{@student.id}"
     wait_for_ajaximations
 
     in_frame('speedgrader_iframe', '.quiz-header') do

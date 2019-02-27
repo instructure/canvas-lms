@@ -49,6 +49,7 @@ import INST from './INST'
 import I18n from 'i18n!gradebook'
 import natcompare from 'compiled/util/natcompare'
 import $ from 'jquery'
+import qs from 'qs'
 import tz from 'timezone'
 import userSettings from 'compiled/userSettings'
 import htmlEscape from './str/htmlEscape'
@@ -177,12 +178,15 @@ const anonymousAssignmentDetailedReportTooltip = I18n.t(
   'Cannot view detailed reports for anonymous assignments until grades are unmuted.'
 )
 
-function setupHandleFragmentChanged() {
-  window.addEventListener('hashchange', EG.handleFragmentChanged)
+const HISTORY_PUSH = 'push'
+const HISTORY_REPLACE = 'replace'
+
+function setupHandleStatePopped() {
+  window.addEventListener('popstate', EG.handleStatePopped)
 }
 
-function teardownHandleFragmentChanged() {
-  window.removeEventListener('hashchange', EG.handleFragmentChanged)
+function teardownHandleStatePopped() {
+  window.removeEventListener('popstate', EG.handleStatePopped)
 }
 
 function setupBeforeLeavingSpeedgrader() {
@@ -297,8 +301,6 @@ function mergeStudentsAndSubmission() {
     student.submission = jsonData.submissionsMap[student[anonymizableId]]
     student.submission_state = SpeedgraderHelpers.submissionState(student, ENV.grading_role)
     student.index = index
-
-    jsonData.studentMap[student[anonymizableId]] = student
   })
 
   // handle showing students only in a certain section.
@@ -328,6 +330,8 @@ function mergeStudentsAndSubmission() {
       EG.changeToSection('all')
     }
   }
+
+  jsonData.studentMap = _.indexBy(jsonData.studentsWithSubmissions, anonymizableId)
 
   switch (userSettings.get('eg_sort_by')) {
     case 'submitted_at': {
@@ -374,6 +378,15 @@ function mergeStudentsAndSubmission() {
   }
 }
 
+function handleStudentOrSectionSelected(newStudentOrSection, historyBehavior = null) {
+  if (newStudentOrSection && newStudentOrSection.match(/^section_(\d+|all)$/)) {
+    const sectionId = newStudentOrSection.replace(/^section_/, '')
+    EG.changeToSection(sectionId)
+  } else {
+    EG.handleStudentChanged(historyBehavior)
+  }
+}
+
 function initDropdown() {
   const hideStudentNames = utils.shouldHideStudentNames()
   $('#hide_student_names').attr('checked', hideStudentNames)
@@ -397,14 +410,7 @@ function initDropdown() {
 
   $selectmenu = new SpeedgraderSelectMenu(sectionSelectionOptionList.concat(optionsArray))
   $selectmenu.appendTo('#combo_box_container', event => {
-    const newStudentOrSection = $(event.target).val()
-
-    if (newStudentOrSection && newStudentOrSection.match(/^section_(\d+|all)$/)) {
-      const sectionId = newStudentOrSection.replace(/^section_/, '')
-      EG.changeToSection(sectionId)
-    } else {
-      EG.handleStudentChanged()
-    }
+    handleStudentOrSectionSelected($(event.target).val(), HISTORY_PUSH)
   })
 
   if (
@@ -1249,7 +1255,6 @@ EG = {
         .hide()
     })
 
-    setupHandleFragmentChanged()
     $('#eg_sort_by').val(userSettings.get('eg_sort_by'))
     $('#submit_same_score').click(e => {
       // By passing true as the second argument, we're telling
@@ -1304,15 +1309,37 @@ EG = {
       $('#gradebook_header, #full_width_container').show()
       initDropdown()
       initGroupAssignmentMode()
-      EG.handleFragmentChanged()
+      setupHandleStatePopped()
     }
+  },
+
+  parseDocumentQuery() {
+    return qs.parse(document.location.search, {ignoreQueryPrefix: true})
+  },
+
+  setInitiallyLoadedStudent() {
+    let initialStudentId
+
+    const queryParams = EG.parseDocumentQuery()
+    if (queryParams && queryParams[anonymizableStudentId]) {
+      initialStudentId = queryParams[anonymizableStudentId]
+    } else if (document.location.hash !== '') {
+      initialStudentId = extractStudentIdFromHash(document.location.hash)
+    }
+    document.location.hash = ''
+
+    // Check if this student ID "resolves" to a different one (e.g., it's an
+    // invalid ID, or is in a group with someone else as a representative).
+    const resolvedId = EG.resolveStudentId(initialStudentId)
+
+    EG.goToStudent(resolvedId, HISTORY_REPLACE)
   },
 
   skipRelativeToCurrentIndex(offset) {
     const {length: students} = jsonData.studentsWithSubmissions
     const newIndex = (this.currentIndex() + offset + students) % students
 
-    this.goToStudent(jsonData.studentsWithSubmissions[newIndex][anonymizableId])
+    this.goToStudent(jsonData.studentsWithSubmissions[newIndex][anonymizableId], HISTORY_PUSH)
   },
 
   next() {
@@ -1381,23 +1408,39 @@ EG = {
     $('#grading').height(rubricFull.height())
   },
 
-  handleFragmentChanged() {
-    let hash
-    try {
-      // get rid of the first character "#" of the hash
-      hash = JSON.parse(decodeURIComponent(document.location.hash.substr(1)))
-    } catch (e) {}
-    if (!hash) {
-      hash = {}
+  handleStatePopped(event) {
+    // On page load this will be called with a null state, ignore it
+    if (!event.state) {
+      return
     }
 
-    // if anonymous, don't bother with rep_for_student because group assignments are disabled with anonymous
-    // moderated marking, otherwise use the group representative if possible
-    let representativeOrStudentId = {
-      true: hash[anonymizableStudentId],
-      false:
-        jsonData.context.rep_for_student[hash[anonymizableStudentId]] || hash[anonymizableStudentId]
-    }[isAnonymous]
+    const newStudentId = event.state[anonymizableStudentId]
+    if (EG.currentStudent == null || newStudentId !== EG.currentStudent[anonymizableId]) {
+      EG.goToStudent(EG.resolveStudentId(newStudentId))
+    }
+  },
+
+  updateHistoryForCurrentStudent(behavior) {
+    const studentId = this.currentStudent[anonymizableId]
+    const stateHash = {[anonymizableStudentId]: studentId}
+    const url = encodeURI(
+      `?assignment_id=${ENV.assignment_id}&${anonymizableStudentId}=${studentId}`
+    )
+
+    if (behavior === HISTORY_PUSH) {
+      window.history.pushState(stateHash, '', url)
+    } else {
+      window.history.replaceState(stateHash, '', url)
+    }
+  },
+
+  resolveStudentId(studentId = null) {
+    let representativeOrStudentId = studentId
+
+    // If not anonymous, see if we need to use this student's representative instead
+    if (!isAnonymous && studentId != null && jsonData.context.rep_for_student[studentId] != null) {
+      representativeOrStudentId = jsonData.context.rep_for_student[studentId]
+    }
 
     // choose the first ungraded student if the requested one doesn't exist
     if (!jsonData.studentMap[representativeOrStudentId]) {
@@ -1409,23 +1452,17 @@ EG = {
       ]
     }
 
-    if (hash.provisional_grade_id) {
-      EG.selected_provisional_grade_id = hash.provisional_grade_id
-    } else if (hash.add_review) {
-      EG.add_review = true
-    }
-    EG.goToStudent(representativeOrStudentId)
+    return representativeOrStudentId.toString()
   },
 
-  goToStudent(studentIdentifier) {
+  goToStudent(studentIdentifier, historyBehavior = null) {
     const hideStudentNames = utils.shouldHideStudentNames()
     const student = jsonData.studentMap[studentIdentifier]
 
     if (student) {
       $selectmenu.selectmenu('value', student[anonymizableId])
       if (!this.currentStudent || this.currentStudent[anonymizableId] !== student[anonymizableId]) {
-        // manually tell $selectmenu to fire the change event
-        $selectmenu.change()
+        handleStudentOrSectionSelected(studentIdentifier, historyBehavior)
       }
 
       if (hideStudentNames || isAnonymous || !student.avatar_path) {
@@ -1444,7 +1481,7 @@ EG = {
     return $.inArray(this.currentStudent, jsonData.studentsWithSubmissions)
   },
 
-  handleStudentChanged() {
+  handleStudentChanged(historyBehavior = null) {
     // Save any draft comments before loading the new student
     if ($add_a_comment_textarea.hasClass('ui-state-disabled')) {
       $add_a_comment_textarea.val('')
@@ -1457,8 +1494,9 @@ EG = {
     this.currentStudent =
       jsonData.studentMap[selectMenuValue] || _.values(jsonData.studentsWithSubmissions)[0]
 
-    const hash = {[anonymizableStudentId]: this.currentStudent[anonymizableId]}
-    document.location.hash = `#${encodeURIComponent(JSON.stringify(hash))}`
+    if (historyBehavior) {
+      EG.updateHistoryForCurrentStudent(historyBehavior)
+    }
 
     // On the switch to a new student, clear the state of the last
     // question touched on the previous student.
@@ -3242,7 +3280,7 @@ EG = {
       )
       return e.returnValue
     }
-    teardownHandleFragmentChanged()
+    teardownHandleStatePopped()
     teardownBeforeLeavingSpeedgrader()
     return undefined
   },
@@ -3467,6 +3505,7 @@ function setupSpeedGrader(gradingPeriods, speedGraderJsonResponse) {
   speedGraderJSON.gradingPeriods = _.indexBy(gradingPeriods, 'id')
   window.jsonData = speedGraderJSON
   EG.jsonReady()
+  EG.setInitiallyLoadedStudent()
 }
 
 function speedGraderJSONErrorFn(data, _xhr, _textStatus, _errorThrown) {
@@ -3596,6 +3635,21 @@ function currentStudentProvisionalGrades() {
   return EG.currentStudent.submission.provisional_grades || []
 }
 
+function extractStudentIdFromHash(hashString) {
+  let studentId
+
+  try {
+    // The hash, if present, will be of the form '#{"student_id": "12"}';
+    // remove the first character and parse the rest
+    const hash = JSON.parse(decodeURIComponent(hashString.substr(1)))
+    studentId = hash[anonymizableStudentId].toString()
+  } catch (_error) {
+    studentId = null
+  }
+
+  return studentId
+}
+
 export default {
   setup() {
     setupSelectors()
@@ -3634,7 +3688,7 @@ export default {
       EG.tearDownAssessmentAuditTray()
     }
 
-    teardownHandleFragmentChanged()
+    teardownHandleStatePopped()
     teardownBeforeLeavingSpeedgrader()
   },
 
