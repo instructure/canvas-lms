@@ -39,8 +39,8 @@ export function deepMerge(a, b) {
 }
 
 export const PERMISSION_DETAIL_SECTIONS = [
-  {title: 'What it Does', key: 'what_it_does'},
-  {title: 'Additional Considerations', key: 'additional_considerations'}
+  {title: I18n.t('What it Does'), key: 'what_it_does'},
+  {title: I18n.t('Additional Considerations'), key: 'additional_considerations'}
 ]
 
 export const generateActionTemplates = (
