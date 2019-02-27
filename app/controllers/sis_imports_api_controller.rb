@@ -627,7 +627,7 @@ class SisImportsApiController < ApplicationController
           end
         end
         if params[:diffing_drop_status].present?
-          batch.options[:diffing_drop_status] = (Array(params[:diffing_drop_status])&%w(deleted inactive completed)).first
+          batch.options[:diffing_drop_status] = (Array(params[:diffing_drop_status])&SIS::CSV::DiffGenerator::VALID_ENROLLMENT_DROP_STATUS).first
           return render json: {message: 'Invalid diffing_drop_status'}, status: :bad_request unless batch.options[:diffing_drop_status]
         end
       end
