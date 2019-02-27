@@ -37,23 +37,15 @@ export default class Lti2Iframe extends React.Component {
   }
 
   componentDidMount() {
-    window.addEventListener(
-      'message',
-      e => {
-        let message = e.data
-        if (typeof message !== 'object') {
-          message = JSON.parse(e.data)
-        }
-        if (message.subject === 'lti.lti2Registration') {
-          this.props.handleInstall(message, e)
-        }
-      },
-      false
-    )
+    window.addEventListener('message', this.handleMessage, false)
 
     if (this.iframe) {
       this.iframe.setAttribute('allow', iframeAllowances())
     }
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('message', this.handleMessage, false)
   }
 
   getLaunchUrl = () => {
@@ -85,6 +77,20 @@ export default class Lti2Iframe extends React.Component {
       newState.afterExternalContentAlertClass = 'screenreader-only'
     }
     this.setState(newState)
+  }
+
+  handleMessage = event => {
+    try {
+      let message = event.data
+      if (typeof message !== 'object') {
+        message = JSON.parse(event.data)
+      }
+      if (message.subject === 'lti.lti2Registration') {
+        this.props.handleInstall(message, event)
+      }
+    } catch(_error) {
+      // Something else posted the message.
+    }
   }
 
   render() {
