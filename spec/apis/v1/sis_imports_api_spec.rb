@@ -371,6 +371,26 @@ describe SisImportsApiController, type: :request do
     expect(batch.diffing_data_set_identifier).to eq 'my-users-data'
   end
 
+  it "should allow for other diffing_drop_status" do
+    json = api_call(
+      :post,
+      "/api/v1/accounts/#{@account.id}/sis_imports.json",
+      {controller: 'sis_imports_api', action: 'create',
+       format: 'json', account_id: @account.id.to_s},
+      {import_type: 'instructure_csv',
+       attachment: fixture_file_upload("files/sis/test_user_1.csv", 'text/csv'),
+       diffing_data_set_identifier: 'my-users-data',
+       diffing_drop_status: 'deleted_last_completed',
+       change_threshold: 7,}
+    )
+    batch = SisBatch.find(json["id"])
+    expect(batch.batch_mode).to be_falsey
+    expect(batch.change_threshold).to eq 7
+    expect(batch.options[:diffing_drop_status]).to eq 'deleted_last_completed'
+    expect(json['change_threshold']).to eq 7
+    expect(batch.diffing_data_set_identifier).to eq 'my-users-data'
+  end
+
   it "should error for invalid diffing_drop_status" do
     json = api_call(:post,
       "/api/v1/accounts/#{@account.id}/sis_imports.json",

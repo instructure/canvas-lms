@@ -47,6 +47,8 @@ module SIS
         File.open(output_path, 'rb')
       end
 
+      VALID_ENROLLMENT_DROP_STATUS = %w(deleted inactive completed deleted_last_completed).freeze
+
       def generate_csvs(previous_csvs, current_csvs)
         generated = []
         current_csvs.each do |(import_type, csvs)|
@@ -67,7 +69,7 @@ module SIS
 
           begin
             status = @batch.options && @batch.options[:diffing_drop_status].presence
-            status = 'deleted' unless import_type == :enrollment && %w(deleted inactive completed).include?(status)
+            status = 'deleted' unless import_type == :enrollment && VALID_ENROLLMENT_DROP_STATUS.include?(status)
             io = generate_diff(class_for_importer(import_type), previous_csv[:fullpath], current_csv[:fullpath], status)
             generated << {
               file: current_csv[:file],
