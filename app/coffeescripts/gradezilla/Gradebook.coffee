@@ -112,6 +112,10 @@ define [
   AssignmentMuterDialogManager, assignmentHelper, TextMeasure, GradeInputHelper, { default: OutlierScoreHelper },
   LatePolicyApplicator, { default: Button }, { default: IconSettingsSolid }, FlashAlert) ->
 
+  ensureAssignmentVisibility = (assignment, submission) =>
+    if assignment.only_visible_to_overrides && !assignment.assignment_visibility.includes(submission.user_id)
+      assignment.assignment_visibility.push(submission.user_id)
+
   isAdmin = =>
     _.contains(ENV.current_user_roles, 'admin')
 
@@ -965,10 +969,11 @@ define [
       changedStudentIds = []
       submissions = []
 
-      for data in student_submissions
-        changedStudentIds.push(data.user_id)
-        student = @student(data.user_id)
-        for submission in data.submissions
+      for studentSubmissionGroup in student_submissions
+        changedStudentIds.push(studentSubmissionGroup.user_id)
+        student = @student(studentSubmissionGroup.user_id)
+        for submission in studentSubmissionGroup.submissions
+          ensureAssignmentVisibility(@getAssignment(submission.assignment_id), submission)
           submissions.push(submission)
           @updateSubmission(submission)
 
@@ -989,6 +994,7 @@ define [
       student = @student(submission.user_id)
       submission.submitted_at = tz.parse(submission.submitted_at)
       submission.excused = !!submission.excused
+      submission.hidden = !!submission.hidden
       submission.rawGrade = submission.grade # save the unformatted version of the grade too
       submission.grade = GradeFormatHelper.formatGrade(submission.grade, {
         gradingType: submission.gradingType, delocalize: false
