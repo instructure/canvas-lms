@@ -33,44 +33,44 @@ function checkSendable() {
   )
 }
 
-/*global messageStudents*/
+/* global messageStudents */
 window.messageStudents = function(settings) {
   const $message_students_dialog = messageStudentsDialog()
   currentSettings = settings
   $message_students_dialog.find('.message_types').empty()
-  for (var idx = 0, l = settings.options.length; idx < l; idx++) {
-    var $option = $('<option/>')
-    var option = settings.options[idx]
+  for (let idx = 0, l = settings.options.length; idx < l; idx++) {
+    const $option = $('<option/>')
+    const option = settings.options[idx]
     $option.val(idx).text(option.text)
     $message_students_dialog.find('.message_types').append($option)
   }
 
-  var title = settings.title,
+  const title = settings.title,
     $li = $message_students_dialog.find('ul li.blank:first'),
     $ul = $message_students_dialog.find('ul'),
     students_hash = {}
 
   $message_students_dialog.find('ul li:not(.blank)').remove()
 
-  for (var i = 0; i < settings.students.length; i++) {
-    var $student = $li.clone(true).removeClass('blank')
+  for (let i = 0; i < settings.students.length; i++) {
+    const $student = $li.clone(true).removeClass('blank')
 
     $student.find('.name').text(settings.students[i].name)
     $student.find('.score').text(settings.students[i].score)
-    var remove_text = I18n.t('Remove %{student} from recipients', {
+    const remove_text = I18n.t('Remove %{student} from recipients', {
       student: settings.students[i].name
     })
-    var $remove_button = $student.find('.remove-button')
+    const $remove_button = $student.find('.remove-button')
     $remove_button
       .attr('title', remove_text)
       .append($("<span class='screenreader-only'></span>").text(remove_text))
     $remove_button.click(function(event) {
       event.preventDefault()
       // hide the selected student
-      var $s = $(this).closest('li')
+      const $s = $(this).closest('li')
       $s.hide('fast', checkSendable)
       // focus the next visible student, or the subject field if that was the last one in the list
-      var $next = $s.nextAll(':visible:first')
+      const $next = $s.nextAll(':visible:first')
       if ($next.length) {
         $('button', $next).focus()
       } else {
@@ -123,18 +123,18 @@ window.messageStudents = function(settings) {
     .on('dialogclose', settings.onClose)
 }
 
-$(document).ready(function() {
+$(document).ready(() => {
   const $message_students_dialog = messageStudentsDialog()
-  $message_students_dialog.find('button').click(function(e) {
-    var btn = $(e.target)
+  $message_students_dialog.find('button').click(e => {
+    const btn = $(e.target)
     if (btn.hasClass('disabled')) {
       e.preventDefault()
       e.stopPropagation()
     }
   })
   $('#message_assignment_recipients').formSubmit({
-    processData: function(data) {
-      var ids = []
+    processData(data) {
+      const ids = []
       $(this)
         .find('.student:visible')
         .each(function() {
@@ -143,16 +143,16 @@ $(document).ready(function() {
       if (ids.length == 0) {
         return false
       }
-      data['recipients'] = ids.join(',')
+      data.recipients = ids.join(',')
       return data
     },
-    beforeSubmit: function(data) {
+    beforeSubmit(data) {
       disableButtons(true)
       $(this)
         .find('.send_button')
         .text(I18n.t('Sending Message...'))
     },
-    success: function(data) {
+    success(data) {
       $.flashMessage(I18n.t('Message sent!'))
       disableButtons(false)
       $(this)
@@ -160,7 +160,7 @@ $(document).ready(function() {
         .text(I18n.t('Send Message'))
       $('#message_students_dialog').dialog('close')
     },
-    error: function(data) {
+    error(data) {
       disableButtons(false)
       $(this)
         .find('.send_button')
@@ -168,16 +168,16 @@ $(document).ready(function() {
     }
   })
 
-  var showStudentsMessageSentTo = function() {
+  const showStudentsMessageSentTo = function() {
     var idx = parseInt($message_students_dialog.find('select').val(), 10) || 0
-    var option = currentSettings.options[idx]
-    var students_hash = $message_students_dialog.data('students_hash')
-    var cutoff = numberHelper.parse($message_students_dialog.find('.cutoff_score').val())
+    const option = currentSettings.options[idx]
+    const students_hash = $message_students_dialog.data('students_hash')
+    let cutoff = numberHelper.parse($message_students_dialog.find('.cutoff_score').val())
     if (isNaN(cutoff)) {
       cutoff = null
     }
-    var student_ids = null
-    var students_list = []
+    let student_ids = null
+    const students_list = []
     for (var idx in students_hash) {
       students_list.push(students_hash[idx])
     }
@@ -207,7 +207,7 @@ $(document).ready(function() {
       .toggleClass('show_score', !!(option.cutoff || option.score))
     disableButtons(student_ids.length === 0)
 
-    var student_ids_hash = {}
+    const student_ids_hash = {}
     for (var idx in student_ids) {
       if (student_ids.hasOwnProperty(idx)) {
         student_ids_hash[parseInt(student_ids[idx], 10) || 0] = true
@@ -218,7 +218,7 @@ $(document).ready(function() {
     }
   }
 
-  var closeDialog = function() {
+  const closeDialog = function() {
     $message_students_dialog.dialog('close')
   }
 

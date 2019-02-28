@@ -27,7 +27,7 @@ import Text from '@instructure/ui-elements/lib/components/Text'
 
 import {showFlashError} from '../shared/FlashAlert'
 import I18n from 'i18n!grade_summary'
-import SelectMenu from '../grade_summary/SelectMenu'
+import SelectMenu from "./SelectMenu"
 
 export default class SelectMenuGroup extends React.Component {
   static propTypes = {
@@ -160,7 +160,7 @@ export default class SelectMenuGroup extends React.Component {
 
   render() {
     return (
-      <Flex alignItems="end" wrapItems={true} margin="0 0 small 0">
+      <Flex alignItems="end" wrapItems margin="0 0 small 0">
         <FlexItem>
           {this.props.students.length > 1 && (
             <SelectMenu

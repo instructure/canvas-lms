@@ -18,7 +18,7 @@
 
 import React from 'react'
 import update from 'immutability-helper'
-import GradingStandard from '../grading/gradingStandard'
+import GradingStandard from './gradingStandard'
 import $ from 'jquery'
 import I18n from 'i18n!external_tools'
 import _ from 'underscore'
@@ -168,7 +168,7 @@ class GradingStandardCollection extends React.Component {
   roundToTwoDecimalPlaces = number => Math.round(number * 100) / 100
 
   deleteGradingStandard = (event, uniqueId) => {
-    let self = this,
+    const self = this,
       $standard = $(event.target).parents('.grading_standard')
     $standard.confirmDelete({
       url: `${ENV.GRADING_STANDARDS_URL}/${uniqueId}`,
