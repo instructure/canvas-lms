@@ -23,7 +23,6 @@ import {mockAssignment, mockComments} from '../../test-utils'
 import StudentContent from '../StudentContent'
 import {MockedProvider} from 'react-apollo/test-utils'
 import {SUBMISSION_COMMENT_QUERY} from '../../assignmentData'
-import wait from 'waait'
 
 const mocks = [
   {
@@ -93,7 +92,7 @@ describe('Assignment Student Content View', () => {
     expect(root.text()).toMatch('Availability Dates')
   })
 
-  it('renders Comments', async done => {
+  it('renders Comments', async () => {
     const assignment = mockAssignment({lockInfo: {isLocked: false}})
     ReactDOM.render(
       <MockedProvider mocks={mocks} addTypename>
@@ -102,13 +101,11 @@ describe('Assignment Student Content View', () => {
       document.getElementById('fixtures')
     )
     $('[data-test-id="assignment-2-student-content-tabs"] div:contains("Comments")')[0].click()
-    await wait(0) // wait for response
+    await new Promise(setTimeout) // wait for response
     // We just need to kick an event loop to ensure the js actually is loaded.
-    setTimeout(() => {
-      const container = $('[data-test-id="comments-container"]')
-      expect(container).toHaveLength(1)
-      done()
-    }, 0)
+    await new Promise(setTimeout)
+    const container = $('[data-test-id="comments-container"]')
+    expect(container).toHaveLength(1)
   })
 
   it('renders spinner while lazy loading comments', () => {
