@@ -1121,12 +1121,14 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def ensure_submission(user, only_update=false)
+    topic = self.root_topic? ? self.child_topic_for(user) : self
+
     submission = Submission.active.where(assignment_id: self.assignment_id, user_id: user).first
     unless only_update || (submission && submission.submission_type == 'discussion_topic' && submission.workflow_state != 'unsubmitted')
-      submission = self.assignment.submit_homework(user, :submission_type => 'discussion_topic')
+      submission = self.assignment.submit_homework(user, :submission_type => 'discussion_topic',
+        :submitted_at => topic && topic.discussion_entries.active.where(:user_id => user).minimum(:created_at))
     end
     return unless submission
-    topic = self.root_topic? ? self.child_topic_for(user) : self
     if topic
       attachment_ids = topic.discussion_entries.active.where(:user_id => user).where.not(:attachment_id => nil).pluck(:attachment_id)
       submission.attachment_ids = attachment_ids.sort.map(&:to_s).join(",")
