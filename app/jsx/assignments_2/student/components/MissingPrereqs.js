@@ -24,7 +24,7 @@ import Heading from '@instructure/ui-elements/lib/components/Heading'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 
-import locked1SVG from '../../../../../public/images/assignments_2/Locked1.svg'
+import locked1SVG from '../SVG/Locked1.svg'
 
 function MissingPrereqs(props) {
   return (

@@ -22,7 +22,7 @@ import SVGWithTextPlaceholder from '../SVGWithTextPlaceholder'
 import {arrayOf} from 'prop-types'
 import CommentRow from './CommentRow'
 import {CommentShape} from '../../assignmentData'
-import noComments from '../../../../../../public/images/assignments_2/NoComments.svg'
+import noComments from '../../SVG/NoComments.svg'
 
 function CommentContent(props) {
   return (
