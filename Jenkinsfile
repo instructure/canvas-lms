@@ -58,7 +58,7 @@ pipeline {
   stages {
     stage('Debug') {
       steps {
-        sh 'printenv'
+        sh 'printenv | sort'
       }
     }
 
