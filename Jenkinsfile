@@ -21,13 +21,13 @@ def gems = [
 ]
 
 def withGerritCredentials = { Closure command ->
-  withCredentials([sshUserPrivateKey(credentialsId: '44aa91d6-ab24-498a-b2b4-911bcb17cc35', keyFileVariable: 'SSH_KEY_PATH', usernameVariable: 'SSH_USERNAME')]) {
-    command('$SSH_KEY_PATH', '$SSH_USERNAME')
-  }
+  withCredentials([
+    sshUserPrivateKey(credentialsId: '44aa91d6-ab24-498a-b2b4-911bcb17cc35', keyFileVariable: 'SSH_KEY_PATH', usernameVariable: 'SSH_USERNAME')
+  ]) { command() }
 }
 
 def fetchFromGerrit = { String repo, String path, String customRepoDestination = null ->
-  withGerritCredentials({ String SSH_KEY_PATH, String SSH_USER_NAME ->
+  withGerritCredentials({ ->
     sh """
       mkdir -p ${path}/${customRepoDestination ?: repo}
       GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
@@ -82,7 +82,7 @@ pipeline {
         stage('Vendor QTI Migration Tool') {
           steps {
             script {
-              withGerritCredentials({ String SSH_KEY_PATH, String SSH_USER_NAME ->
+              withGerritCredentials({ ->
                 sh """
                   mkdir -p vendor/QTIMigrationTool
                   GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
@@ -96,7 +96,7 @@ pipeline {
         stage('Config Files') {
           steps {
             script {
-              withGerritCredentials({ String SSH_KEY_PATH, String SSH_USER_NAME ->
+              withGerritCredentials({ ->
                 sh """
                   GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
                     git archive --remote=ssh://$GERRIT_URL/gerrit_builder master canvas-lms/config | tar -x -C config
