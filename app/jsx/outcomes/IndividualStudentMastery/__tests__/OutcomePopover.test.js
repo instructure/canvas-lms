@@ -100,9 +100,9 @@ it('renders correctly with no custom outcomeProficiency', () => {
 it('properly expands details for screenreader users', () => {
   const props = defaultProps()
   const wrapper = shallow(<OutcomePopover {...props}/>)
-  expect(wrapper.state('moreInformation')).toEqual(false)
+  expect(wrapper.state('linkClicked')).toEqual(false)
   wrapper.find('Link').simulate('click')
-  expect(wrapper.state('moreInformation')).toEqual(true)
+  expect(wrapper.state('linkClicked')).toEqual(true)
 })
 
 describe('latestTime', () => {

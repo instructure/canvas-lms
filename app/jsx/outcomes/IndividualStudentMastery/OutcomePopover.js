@@ -28,6 +28,7 @@ import CalculationMethodContent from 'compiled/models/grade_summary/CalculationM
 import Popover, {PopoverTrigger, PopoverContent} from '@instructure/ui-overlays/lib/components/Popover'
 import IconInfo from '@instructure/ui-icons/lib/Line/IconInfo'
 import DatetimeDisplay from '../../shared/DatetimeDisplay'
+import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
 import * as shapes from './shapes'
 
 export default class OutcomePopover extends React.Component {
@@ -42,7 +43,7 @@ export default class OutcomePopover extends React.Component {
 
   constructor () {
     super()
-    this.state = { moreInformation: false }
+    this.state = { linkHover: false, linkClicked: false }
   }
 
   getSelectedRating () {
@@ -80,8 +81,6 @@ export default class OutcomePopover extends React.Component {
     return null
   }
 
-  expandDetails = () => { this.setState({ moreInformation: !this.state.moreInformation }) }
-
   renderPopoverContent () {
     const selectedRating = this.getSelectedRating()
     const latestTime = this.latestTime()
@@ -93,7 +92,10 @@ export default class OutcomePopover extends React.Component {
       exampleResult
     } = popoverContent
     return (
-      <View as='div' padding='small' maxWidth='30rem'>
+      <View as='div' padding='large' maxWidth='30rem'>
+        <CloseButton placement='end' onClick={() => this.setState({linkHover: false, linkClicked: false})}>
+          {I18n.t('Click to close outcome details popover')}
+        </CloseButton>
         <Text size='small'>
           <Flex
             alignItems='stretch'
@@ -138,15 +140,22 @@ export default class OutcomePopover extends React.Component {
     return (
       <span>
         <Popover
+          show={this.state.linkHover || this.state.linkClicked}
+          onDismiss={() => this.setState({linkHover: false, linkClicked: false})}
           placement="bottom"
+          on={['hover', 'click']}
+          shouldContainFocus
         >
           <PopoverTrigger>
-            <Link onClick={() => this.expandDetails()}>
+            <Link
+              onClick={() => this.setState(prevState => ({linkClicked: !prevState.linkClicked}))}
+              onMouseEnter={() => this.setState({linkHover: true})}
+              onMouseLeave={() => this.setState({linkHover: false})}
+            >
               <span style={{color: 'black'}}><IconInfo /></span>
               <span>
-              {!this.state.moreInformation ?
-                <ScreenReaderContent>{I18n.t('Click to expand outcome details')}</ScreenReaderContent> :
-                <ScreenReaderContent>{I18n.t('Click to collapse outcome details')}</ScreenReaderContent>
+              {!this.state.linkClicked &&
+                <ScreenReaderContent>{I18n.t('Click to expand outcome details')}</ScreenReaderContent>
               }
               </span>
             </Link>
@@ -155,11 +164,6 @@ export default class OutcomePopover extends React.Component {
             {popoverContent}
           </PopoverContent>
         </Popover>
-        <FlexItem>
-          {this.state.moreInformation &&
-            <ScreenReaderContent>{popoverContent}</ScreenReaderContent>
-          }
-        </FlexItem>
       </span>
     )
   }
