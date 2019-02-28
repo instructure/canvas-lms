@@ -109,7 +109,7 @@ test('A key press event on the select menu causes the change function to call', 
   ]
   let fired = false
   const selectMenu = new SpeedgraderSelectMenu(optionsArray)
-  selectMenu.appendTo('#test_area', e => (fired = true))
+  selectMenu.appendTo('#test_area', () => (fired = true))
   const event = new Event('keyup')
   event.keyCode = 37
   document.getElementById('students_selectmenu').dispatchEvent(event)

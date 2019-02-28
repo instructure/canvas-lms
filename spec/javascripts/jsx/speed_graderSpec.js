@@ -30,9 +30,9 @@ import numberHelper from 'jsx/shared/helpers/numberHelper'
 import userSettings from 'compiled/userSettings'
 import htmlEscape from 'str/htmlEscape'
 
-const {unescape} = htmlEscape
-
 import 'jquery.ajaxJSON'
+
+const {unescape} = htmlEscape
 
 const fixtures = document.getElementById('fixtures')
 const setupCurrentStudent = () => SpeedGrader.EG.handleStudentChanged()
