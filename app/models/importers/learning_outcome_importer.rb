@@ -44,6 +44,7 @@ module Importers
       context = migration.context
       hash = hash.with_indifferent_access
       outcome = nil
+      previously_imported = false
       if !item && hash[:external_identifier]
         unless migration.cross_institution?
           if hash[:is_global_outcome]
@@ -61,6 +62,14 @@ module Importers
 
         if !outcome
           migration.add_warning(t(:no_context_found, %{The external Learning Outcome couldn't be found for "%{title}", creating a copy.}, :title => hash[:title]))
+        end
+      end
+
+      if hash[:migration_id].present? && (migration.canvas_import? || migration.for_course_copy?)
+        previous_outcome = migration.find_imported_migration_item(LearningOutcome, hash[:migration_id])
+        if previous_outcome
+          previously_imported = true
+          outcome = previous_outcome
         end
       end
 
@@ -121,7 +130,7 @@ module Importers
       log = hash[:learning_outcome_group] || context.root_outcome_group
       log.add_outcome(item)
 
-      if hash[:alignments]
+      if hash[:alignments] && !previously_imported
         alignments = hash[:alignments].sort_by{|a| a[:position].to_i}
         alignments.each do |alignment|
           next unless alignment[:content_type] && alignment[:content_id]
