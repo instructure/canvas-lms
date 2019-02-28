@@ -29,7 +29,7 @@ class SisBatchRollBackData < ActiveRecord::Base
 
   RESTORE_ORDER = %w{Account EnrollmentTerm AbstractCourse Course CourseSection
                      GroupCategory Group Pseudonym CommunicationChannel
-                     Enrollment GroupMembership UserObserver AccountUser}
+                     Enrollment GroupMembership UserObserver AccountUser}.freeze
 
   def self.cleanup_expired_data
     return unless expired_data.exists?

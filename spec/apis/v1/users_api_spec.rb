@@ -1483,6 +1483,12 @@ describe "Users API", type: :request do
         user = User.find(json['id'])
         expect(user.profile.title).to eq new_title
         expect(user.profile.bio).to eq new_bio
+
+        another_title = 'another title'
+        json = api_call(:put, @path, @path_options, {
+          :user => {:title => another_title}
+        })
+        expect(user.profile.reload.title).to eq another_title
       end
 
       it "should catch invalid dates" do
