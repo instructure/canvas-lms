@@ -16,23 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-.textarea-action-button-container {
-  text-align: end;
-  margin: 5px 0;
+import React from 'react'
+import {arrayOf} from 'prop-types'
+import CommentTextArea from './CommentTextArea'
+import CommentContent from './CommentContent'
+import {CommentShape} from '../../assignmentData'
+
+function CommentsContainer(props) {
+  return (
+    <React.Fragment>
+      <CommentTextArea />
+      <CommentContent comments={props.comments} />
+    </React.Fragment>
+  )
 }
 
-.svg-placeholder-container {
-  text-align: center;
+CommentsContainer.propTypes = {
+  comments: arrayOf(CommentShape)
 }
 
-.comment-row-container {
-  display: flex;
-  padding-top: 12px;
-}
-
-.comment-text-comment-container {
-  text-align: start;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
+export default React.memo(CommentsContainer)

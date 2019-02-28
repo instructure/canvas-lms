@@ -17,8 +17,7 @@
  */
 
 import React from 'react'
-import CommentTextArea from './CommentTextArea'
-import CommentContent from './CommentContent'
+import CommentsContainer from './CommentsContainer'
 import {Query} from 'react-apollo'
 import {SUBMISSION_COMMENT_QUERY, StudentAssignmentShape} from '../../assignmentData'
 import LoadingIndicator from '../LoadingIndicator'
@@ -35,8 +34,7 @@ function Comments(props) {
         if (error) return `Error!: ${error}`
         return (
           <div data-test-id="comments-container">
-            <CommentTextArea />
-            <CommentContent comments={data.submissionComments.commentsConnection.nodes} />
+            <CommentsContainer comments={data.submissionComments.commentsConnection.nodes} />
           </div>
         )
       }}

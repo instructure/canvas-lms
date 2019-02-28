@@ -19,10 +19,10 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
 import Comments from '../Comments'
-import {mockAssignment, mockComments} from '../../test-utils'
+import CommentsContainer from '../Comments/CommentsContainer'
+import {mockAssignment, mockComments, singleComment} from '../../test-utils'
 import {MockedProvider} from 'react-apollo/test-utils'
 import {SUBMISSION_COMMENT_QUERY} from '../../assignmentData'
-import wait from 'waait'
 
 const mocks = [
   {
@@ -62,7 +62,7 @@ describe('Comments', () => {
       document.getElementById('fixtures')
     )
 
-    await wait(0) // wait for response
+    await new Promise(setTimeout) // wait for response
     const container = $('[data-test-id="comments-container"]')
     expect(container).toHaveLength(1)
   })
@@ -74,48 +74,8 @@ describe('Comments', () => {
       </MockedProvider>,
       document.getElementById('fixtures')
     )
-    await wait(0) // wait for response
+    await new Promise(setTimeout) // wait for response
     const container = $('[data-test-id="comments-text-area-container"]')
-    expect(container).toHaveLength(1)
-  })
-
-  it('renders place holder text when no comments', async () => {
-    const emptyMock = JSON.parse(JSON.stringify(mocks))
-    emptyMock[0].result.data.submissionComments.commentsConnection.nodes = []
-    ReactDOM.render(
-      <MockedProvider mocks={emptyMock} addTypename>
-        <Comments assignment={mockAssignment()} />
-      </MockedProvider>,
-      document.getElementById('fixtures')
-    )
-    await wait(0) // wait for response
-    const container = $(
-      '#fixtures:contains("Send a comment to your instructor about this assignment.")'
-    )
-    expect(container).toHaveLength(1)
-  })
-
-  it('renders comment rows when provided', async () => {
-    ReactDOM.render(
-      <MockedProvider mocks={mocks} addTypename>
-        <Comments assignment={mockAssignment()} />
-      </MockedProvider>,
-      document.getElementById('fixtures')
-    )
-    await wait(0) // wait for response
-    const container = $('.comment-row-container')
-    expect(container).toHaveLength(1)
-  })
-
-  it('renders shortname when shortname is provided', async () => {
-    ReactDOM.render(
-      <MockedProvider mocks={mocks} addTypename>
-        <Comments assignment={mockAssignment()} />
-      </MockedProvider>,
-      document.getElementById('fixtures')
-    )
-    await wait(0) // wait for response
-    const container = $('#fixtures:contains("bob builder")')
     expect(container).toHaveLength(1)
   })
 
@@ -130,16 +90,37 @@ describe('Comments', () => {
     expect(container).toHaveLength(1)
   })
 
-  it('renders Anonymous when shortname is not provided', async () => {
-    const emptyMock = JSON.parse(JSON.stringify(mocks))
-    emptyMock[0].result.data.submissionComments.commentsConnection.nodes[0].author = null
+  it('renders place holder text when no comments', async () => {
+    ReactDOM.render(<CommentsContainer comments={[]} />, document.getElementById('fixtures'))
+    await new Promise(setTimeout) // wait for response
+    const container = $(
+      '#fixtures:contains("Send a comment to your instructor about this assignment.")'
+    )
+    expect(container).toHaveLength(1)
+  })
+
+  it('renders comment rows when provided', async () => {
     ReactDOM.render(
-      <MockedProvider mocks={emptyMock} addTypename>
-        <Comments assignment={mockAssignment()} />
-      </MockedProvider>,
+      <CommentsContainer comments={[singleComment(), singleComment()]} />,
       document.getElementById('fixtures')
     )
-    await wait(0) // wait for response
+    const container = $('.comment-row-container')
+    expect(container).toHaveLength(2)
+  })
+
+  it('renders shortname when shortname is provided', async () => {
+    ReactDOM.render(
+      <CommentsContainer comments={[singleComment()]} />,
+      document.getElementById('fixtures')
+    )
+    const container = $('#fixtures:contains("bob builder")')
+    expect(container).toHaveLength(1)
+  })
+
+  it('renders Anonymous when author is not provided', async () => {
+    const comment = singleComment()
+    comment.author = null
+    ReactDOM.render(<CommentsContainer comments={[comment]} />, document.getElementById('fixtures'))
     let container = $('#fixtures:contains("bob builder")')
     expect(container).toHaveLength(0)
     container = $('#fixtures:contains("Anonymous")')

@@ -52,6 +52,7 @@ export const STUDENT_VIEW_QUERY = gql`
         dueAt
         lockAt
         name
+        muted
         pointsPossible
         unlockAt
         gradingType
@@ -124,9 +125,10 @@ export const CommentShape = shape({
 })
 
 export const StudentAssignmentShape = shape({
-  description: string.isRequired,
+  description: string,
   dueAt: string,
   lockAt: string,
+  muted: bool.isRequired,
   name: string.isRequired,
   pointsPossible: number.isRequired,
   unlockAt: string,

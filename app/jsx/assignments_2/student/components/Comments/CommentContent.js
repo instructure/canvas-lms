@@ -26,7 +26,7 @@ import noComments from '../../SVG/NoComments.svg'
 
 function CommentContent(props) {
   return (
-    <div className="comments-content-container">
+    <React.Fragment>
       {!props.comments.length && (
         <SVGWithTextPlaceholder
           text={I18n.t('Send a comment to your instructor about this assignment.')}
@@ -36,7 +36,7 @@ function CommentContent(props) {
       {props.comments.map(comment => (
         <CommentRow key={comment._id} comment={comment} />
       ))}
-    </div>
+    </React.Fragment>
   )
 }
 

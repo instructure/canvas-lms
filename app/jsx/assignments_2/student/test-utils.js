@@ -23,6 +23,7 @@ export function mockAssignment(overrides = {}) {
     lockAt: null,
     name: 'Assignment',
     pointsPossible: 10,
+    muted: false,
     unlockAt: null,
     gradingType: 'points',
     allowedAttempts: null,
@@ -95,6 +96,20 @@ export function mockComments(overrides = {}) {
           }
         }
       ]
+    },
+    ...overrides
+  }
+}
+
+export function singleComment(overrides = {}) {
+  return {
+    _id: '1',
+    comment: 'comment comment',
+    updatedAt: '12/13/91',
+    author: {
+      __typename: 'Author',
+      avatarUrl: 'example.com',
+      shortName: 'bob builder'
     },
     ...overrides
   }
