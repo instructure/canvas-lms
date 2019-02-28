@@ -661,7 +661,6 @@ export default class EventDataSource {
   // make planner items readable as calendar events
   transformPlannerItems(items) {
     items.forEach(item => {
-      /* eslint-disable no-param-reassign */
       item.type = 'todo_item'
       if (item.course_id) {
         item.context_code = `course_${item.course_id}`
@@ -671,7 +670,6 @@ export default class EventDataSource {
         item.context_code = `user_${item.user_id}`
       }
       item.all_context_codes = item.context_code
-      /* eslint-enable no-param-reassign */
     })
     return items
   }

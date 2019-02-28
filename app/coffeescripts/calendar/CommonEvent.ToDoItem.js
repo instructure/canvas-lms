@@ -42,7 +42,6 @@ export default function ToDoItem(data, contextInfo, actualContextInfo) {
 }
 
 Object.assign(ToDoItem.prototype, {
-  /* eslint-disable no-param-reassign */
   copyDataFromObject(data) {
     // on original load, data comes from the planner items API
     // but after editing an item, we get the wiki pages / discussion topics API update result

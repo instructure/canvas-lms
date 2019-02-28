@@ -42,7 +42,6 @@ Object.assign(PlannerNote.prototype, {
   // if we get here via a request for the list of notes (see EventDataSource), some of the
   // fields are already filled in, but if we get here because we just edited a planner_note
   // they are not.
-  /* eslint-disable no-param-reassign */
   copyDataFromObject(data) {
     data.type = 'planner_note'
     data.description = data.details

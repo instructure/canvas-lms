@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Note on the eslint-disable no-param-reassign
 // I am transforming the api response. Sometimes to add fields
 // I have from the api input that is not returned in the response,
 // and sometimes to map a response field to a new field name based
@@ -26,7 +25,6 @@ import axios from 'axios'
 import I18n from 'i18n!roster'
 
 export default {
-  /* eslint-disable no-param-reassign */
 
   // @param courseId: id of current course
   // @param users: array of user ids
@@ -101,5 +99,4 @@ export default {
       limit_privileges_to_course_section: limitPrivilege
     });
   }
-  /* eslint-disable no-param-reassign */
 }

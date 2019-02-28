@@ -293,13 +293,11 @@ function mergeStudentsAndSubmission() {
     jsonData.studentsWithSubmissions.sort((a, b) => (a.anonymous_id > b.anonymous_id ? 1 : -1))
 
   jsonData.studentsWithSubmissions.forEach((student, index) => {
-    /* eslint-disable no-param-reassign */
     student.enrollments = jsonData.studentEnrollmentMap[student[anonymizableId]]
     student.section_ids = Object.keys(jsonData.studentSectionIdsMap[student[anonymizableId]])
     student.submission = jsonData.submissionsMap[student[anonymizableId]]
     student.submission_state = SpeedgraderHelpers.submissionState(student, ENV.grading_role)
     student.index = index
-    /* eslint-enable no-param-reassign */
 
     jsonData.studentMap[student[anonymizableId]] = student
   })

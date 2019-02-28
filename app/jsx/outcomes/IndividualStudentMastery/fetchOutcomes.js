@@ -114,10 +114,10 @@ const fetchOutcomes = (courseId, studentId) => {
 
       // add results, assignments
       outcomes.forEach((outcome) => {
-        outcome.assignments = outcomeAssignmentsByOutcomeId[outcome.id] || [] // eslint-disable-line no-param-reassign
-        outcome.results = outcomeResultsByOutcomeId[outcome.id] || [] // eslint-disable-line no-param-reassign
+        outcome.assignments = outcomeAssignmentsByOutcomeId[outcome.id] || []
+        outcome.results = outcomeResultsByOutcomeId[outcome.id] || []
         outcome.results.forEach((result) => {
-          result.assignment = assignmentsByAssignmentId[result.links.assignment] // eslint-disable-line no-param-reassign
+          result.assignment = assignmentsByAssignmentId[result.links.assignment]
         })
       })
       return { outcomeGroups, outcomes }

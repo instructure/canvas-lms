@@ -193,7 +193,7 @@ function dropAssignments(allSubmissionData, rules = {}) {
   submissionsToKeep = [...submissionsToKeep, ...cannotDrop]
 
   _.difference(droppableSubmissionData, submissionsToKeep).forEach(submission => {
-    submission.drop = true // eslint-disable-line no-param-reassign
+    submission.drop = true
   })
 
   return submissionsToKeep

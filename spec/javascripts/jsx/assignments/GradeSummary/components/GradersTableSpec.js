@@ -161,7 +161,7 @@ QUnit.module('GradeSummary GradersTable', suiteHooks => {
 
     test('is not displayed when grades have finished loading and no graders can be bulk-selected', () => {
       provisionalGrades.forEach(grade => {
-        grade.studentId = '1111' // eslint-disable-line no-param-reassign
+        grade.studentId = '1111'
       })
       mountAndFinishLoading()
       notOk(getAcceptGradesColumnHeader().exists())
@@ -169,7 +169,7 @@ QUnit.module('GradeSummary GradersTable', suiteHooks => {
 
     test('is displayed when grades have finished loading and all students have a selected grade', () => {
       provisionalGrades.forEach(grade => {
-        grade.selected = true // eslint-disable-line no-param-reassign
+        grade.selected = true
       })
       mountAndFinishLoading()
       ok(getAcceptGradesColumnHeader().exists())
