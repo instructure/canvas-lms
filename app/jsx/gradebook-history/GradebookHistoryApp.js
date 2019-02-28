@@ -20,10 +20,10 @@ import React from 'react'
 import {Provider} from 'react-redux'
 import I18n from 'i18n!gradebook_history'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import SearchForm from '../gradebook-history/SearchForm'
-import SearchResults from '../gradebook-history/SearchResults'
+import SearchForm from './SearchForm'
+import SearchResults from './SearchResults'
 
-import GradebookHistoryStore from '../gradebook-history/store/GradebookHistoryStore'
+import GradebookHistoryStore from './store/GradebookHistoryStore'
 
 const GradebookHistoryApp = () => (
   <Provider store={GradebookHistoryStore}>

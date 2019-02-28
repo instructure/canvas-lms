@@ -17,7 +17,7 @@
  */
 
 import axios from 'axios'
-import Fixtures from '../../gradebook-history/Fixtures'
+import Fixtures from '../Fixtures'
 import HistoryApi from 'jsx/gradebook-history/api/HistoryApi'
 
 QUnit.module('HistoryApi', {

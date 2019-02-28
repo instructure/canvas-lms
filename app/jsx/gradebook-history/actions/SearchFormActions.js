@@ -16,11 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import AssignmentApi from '../../gradebook-history/api/AssignmentApi'
-import * as HistoryActions from '../../gradebook-history/actions/HistoryActions'
-import HistoryApi from '../../gradebook-history/api/HistoryApi'
-import UserApi from '../../gradebook-history/api/UserApi'
-import environment from '../../gradebook-history/environment'
+import AssignmentApi from '../api/AssignmentApi'
+import * as HistoryActions from './HistoryActions'
+import HistoryApi from '../api/HistoryApi'
+import UserApi from '../api/UserApi'
+import environment from '../environment'
 
 const CLEAR_RECORDS = 'CLEAR_RECORDS'
 const FETCH_RECORDS_START = 'FETCH_RECORDS_START'
