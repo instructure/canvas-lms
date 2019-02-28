@@ -134,6 +134,20 @@ module Lti
 
         it { is_expected.to eq false }
       end
+
+      context 'when extensions have non-Canvas platform' do
+        let(:settings) do
+          sets = super()
+          sets['extensions'].first['platform'] = 'blackboard.bb.com'
+          sets
+        end
+
+        before do
+          tool_configuration.developer_key = developer_key
+        end
+
+        it { is_expected.to eq true }
+      end
     end
 
     describe 'before_validation' do
@@ -343,6 +357,22 @@ module Lti
 
           it 'uses the correct custom fields' do
             expect(subject['custom_fields']).to eq placement_settings['custom_fields']
+          end
+        end
+
+        context 'with non-canvas extensions in settings' do
+          subject{ tool_configuration.new_external_tool(context) }
+
+          let(:settings) do
+            sets = super()
+            sets['extensions'].first['platform'] = 'blackboard.bb.com'
+            sets
+          end
+
+          it 'does not include any placements defined for non-canvas platform' do
+            Lti::ResourcePlacement::PLACEMENTS.each do |p|
+              expect(subject.settings[p]).to be_blank
+            end
           end
         end
       end

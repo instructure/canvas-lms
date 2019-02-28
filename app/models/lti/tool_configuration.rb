@@ -87,7 +87,7 @@ module Lti
 
     def canvas_extensions
       return {} if settings.blank?
-      extension = settings['extensions']&.find { |e| e['platform'] == CANVAS_EXTENSION_LABEL } || {}
+      extension = settings['extensions']&.find { |e| e['platform'] == CANVAS_EXTENSION_LABEL } || { 'settings' => {} }
       extension['settings'].delete_if { |placement| disabled_placements&.include?(placement.to_s) }
       extension
     end
