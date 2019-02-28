@@ -26,12 +26,12 @@ def withGerritCredentials = { Closure command ->
   ]) { command() }
 }
 
-def fetchFromGerrit = { String repo, String path, String customRepoDestination = null ->
+def fetchFromGerrit = { String repo, String path, String customRepoDestination = null, String sourcePath = null ->
   withGerritCredentials({ ->
     sh """
       mkdir -p ${path}/${customRepoDestination ?: repo}
       GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
-        git archive --remote=ssh://$GERRIT_URL/${repo} master | tar -x -C ${path}/${customRepoDestination ?: repo}
+        git archive --remote=ssh://$GERRIT_URL/${repo} master ${sourcePath} | tar -x -C ${path}/${customRepoDestination ?: repo}
     """
   })
 }
@@ -82,12 +82,8 @@ pipeline {
         stage('Vendor QTI Migration Tool') {
           steps {
             script {
-              withGerritCredentials({ ->
-                sh """
-                  mkdir -p vendor/QTIMigrationTool
-                  GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
-                    git archive --remote=ssh://$GERRIT_URL/qti_migration_tool master | tar -x -C vendor/QTIMigrationTool
-                """
+              withGerritCredentials({
+                fetchFromGerrit('qti_migration_tool', 'vendor', 'QTIMigrationTool')
               })
             }
           }
@@ -97,10 +93,7 @@ pipeline {
           steps {
             script {
               withGerritCredentials({ ->
-                sh """
-                  GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
-                    git archive --remote=ssh://$GERRIT_URL/gerrit_builder master canvas-lms/config | tar -x -C config
-                """
+                fetchFromGerrit('gerrit_builder', 'config', '', 'canvas-lms/config')
               })
             }
           }
