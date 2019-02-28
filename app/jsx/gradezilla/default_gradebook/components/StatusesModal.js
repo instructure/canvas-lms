@@ -23,10 +23,9 @@ import update from 'immutability-helper'
 import I18n from 'i18n!gradebook'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import Modal, {ModalBody, ModalFooter} from '../../../shared/components/InstuiModal'
-import Heading from '@instructure/ui-elements/lib/components/Heading'
 import Text from '@instructure/ui-elements/lib/components/Text'
-import {statuses} from '../../../gradezilla/default_gradebook/constants/statuses'
-import StatusColorListItem from '../../../gradezilla/default_gradebook/components/StatusColorListItem'
+import {statuses} from '../constants/statuses'
+import StatusColorListItem from './StatusColorListItem'
 
 class StatusesModal extends React.Component {
   static propTypes = {
@@ -92,6 +91,7 @@ class StatusesModal extends React.Component {
   bindDoneButton = button => {
     this.doneButton = button
   }
+
   bindContentRef = content => {
     this.modalContentRef = content
   }

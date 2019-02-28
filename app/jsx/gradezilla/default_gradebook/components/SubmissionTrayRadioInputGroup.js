@@ -19,8 +19,8 @@
 import React from 'react'
 import {bool, func, number, shape, string} from 'prop-types'
 import FormFieldGroup from '@instructure/ui-forms/lib/components/FormFieldGroup'
-import SubmissionTrayRadioInput from '../../../gradezilla/default_gradebook/components/SubmissionTrayRadioInput'
-import {statusesTitleMap} from '../../../gradezilla/default_gradebook/constants/statuses'
+import SubmissionTrayRadioInput from './SubmissionTrayRadioInput'
+import {statusesTitleMap} from '../constants/statuses'
 import I18n from 'i18n!gradebook'
 
 function checkedValue(submission) {
