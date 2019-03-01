@@ -26,7 +26,7 @@ def withGerritCredentials = { Closure command ->
   ]) { command() }
 }
 
-def fetchFromGerrit = { String repo, String path, String customRepoDestination = null, String sourcePath = null ->
+def fetchFromGerrit = { String repo, String path, String customRepoDestination = null, String sourcePath = '' ->
   withGerritCredentials({ ->
     sh """
       mkdir -p ${path}/${customRepoDestination ?: repo}
