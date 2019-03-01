@@ -468,6 +468,8 @@ describe "context modules" do
       prereq_select = f('.criterion select')
       option = first_selected_option(prereq_select)
       expect(option.text).to eq @module1.name.to_s
+      expect(ff('.prerequisites_list .criteria_list .delete_criterion_link').map{|link|link.attribute('aria-label')}).
+          to eq(['Delete prerequisite First module', 'Delete prerequisite Second module'])
     end
 
     it "does not have a prerequisites section when creating the first module" do
