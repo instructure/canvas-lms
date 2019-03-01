@@ -25,6 +25,7 @@ import Link from '@instructure/ui-elements/lib/components/Link'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import IconAssignment from '@instructure/ui-icons/lib/Line/IconAssignment'
 import IconQuiz from '@instructure/ui-icons/lib/Line/IconQuiz'
+import IconHighlighter from '@instructure/ui-icons/lib/Line/IconHighlighter'
 import * as shapes from './shapes'
 import Ratings from '../../rubrics/Ratings'
 
@@ -37,6 +38,28 @@ const scoreFromPercent = (percent, outcome) => {
   }
 }
 
+const renderLinkedResult = (name, url, isQuiz) => (
+  <Link href={ url }>
+    <Flex alignItems="center">
+      <FlexItem><Text size="medium">
+        {
+          isQuiz ? <IconQuiz /> : <IconAssignment />
+        }
+      </Text></FlexItem>
+      <FlexItem padding="0 x-small"><Text weight="bold">{ name }</Text></FlexItem>
+    </Flex>
+  </Link>
+)
+
+const renderUnlinkedResult = (name) => (
+  <Flex alignItems="center">
+    <FlexItem><Text size="medium">
+      <IconHighlighter />
+    </Text></FlexItem>
+    <FlexItem padding="0 x-small"><Text weight="bold">{ name }</Text></FlexItem>
+  </Flex>
+)
+
 const AssignmentResult = ({ outcome, result, outcomeProficiency }) => {
   const { ratings } = outcome
   const { html_url: url, name, submission_types: types } = result.assignment
@@ -45,16 +68,7 @@ const AssignmentResult = ({ outcome, result, outcomeProficiency }) => {
   return (
     <Flex padding="small" direction="column" alignItems="stretch">
       <FlexItem>
-        <Link href={ url }>
-          <Flex alignItems="center">
-            <FlexItem><Text size="medium">
-              {
-                isQuiz ? <IconQuiz /> : <IconAssignment />
-              }
-            </Text></FlexItem>
-            <FlexItem padding="0 x-small"><Text weight="bold">{ name }</Text></FlexItem>
-          </Flex>
-        </Link>
+        { url.length > 0 ? renderLinkedResult(name, url, isQuiz) : renderUnlinkedResult(name) }
       </FlexItem>
       <FlexItem padding="x-small 0">
         <View padding="x-small 0 0 0">

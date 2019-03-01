@@ -131,8 +131,13 @@
 #           "type": "integer"
 #         },
 #         "assignment_id": {
-#           "description": "the id of the aligned assignment.",
+#           "description": "the id of the aligned assignment (null for live assessments).",
 #           "example": 2,
+#           "type": "integer"
+#         },
+#         "assessment_id": {
+#           "description": "the id of the aligned live assessment (null for assignments).",
+#           "example": 3,
 #           "type": "integer"
 #         },
 #         "submission_types": {
@@ -314,7 +319,21 @@ class OutcomesApiController < ApplicationController
         end
       end.flatten
 
-      alignments.concat(quiz_alignments)
+      live_assessments = LiveAssessments::Assessment.for_context(context).
+        joins(:submissions).
+        preload(:learning_outcome_alignments).
+        where(live_assessments_submissions: {user_id: student_id})
+      magic_marker_alignments = live_assessments.map do |la|
+        la.learning_outcome_alignments.map do |loa|
+          {
+            learning_outcome_id: loa.learning_outcome_id,
+            title: loa.title,
+            submission_types: 'magic_marker',
+            assessment_id: la.id
+          }
+        end
+      end.flatten
+      alignments.concat(quiz_alignments, magic_marker_alignments)
 
       render :json => alignments
     end

@@ -117,7 +117,8 @@ const fetchOutcomes = (courseId, studentId) => {
         outcome.assignments = outcomeAssignmentsByOutcomeId[outcome.id] || []
         outcome.results = outcomeResultsByOutcomeId[outcome.id] || []
         outcome.results.forEach((result) => {
-          result.assignment = assignmentsByAssignmentId[result.links.assignment]
+          const key = result.links.assignment || result.links.alignment
+          result.assignment = assignmentsByAssignmentId[key]
         })
       })
       return { outcomeGroups, outcomes }
