@@ -151,12 +151,12 @@ module Lti
     end
 
     describe 'before_validation' do
-      context 'when "settings_url" is present' do
-        subject do
-          tool_configuration.validate
-          tool_configuration
-        end
+      subject do
+        tool_configuration.validate
+        tool_configuration
+      end
 
+      context 'when "settings_url" is present' do
         let(:url) { 'https://www.mytool.com/config/json' }
         let(:stubbed_response) do
           double(
@@ -174,7 +174,7 @@ module Lti
         end
 
         it 'fetches JSON from the URL' do
-          expect(subject.settings).to eq settings
+          expect(subject.settings['launch_url']).to eq settings['launch_url']
         end
 
         context 'when a timeout occurs' do
@@ -238,6 +238,10 @@ module Lti
             end
           end
         end
+      end
+
+      it 'ensures use_1_3 is set' do
+        expect(subject.settings['use_1_3']).to be true
       end
     end
 

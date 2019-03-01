@@ -23,6 +23,7 @@ module Lti
     belongs_to :developer_key
 
     before_validation :store_settings_from_url
+    before_validation :ensure_use_1_3
     before_save :normalize_settings
 
     validates :developer_key_id, :settings, presence: true
@@ -110,6 +111,11 @@ module Lti
 
     def normalize_settings
       self.settings = JSON.parse(settings) if settings.is_a? String
+    end
+
+    def ensure_use_1_3
+      return if self.settings.blank?
+      self.settings['use_1_3'] = true
     end
   end
 end
