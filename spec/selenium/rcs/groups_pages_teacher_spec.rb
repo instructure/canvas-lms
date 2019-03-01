@@ -251,8 +251,7 @@ describe "groups" do
 
     #-------------------------------------------------------------------------------------------------------------------
     describe "pages page" do
-      # will fix the below shared tests in a separate commit
-      # it_behaves_like 'pages_page', :teacher
+      it_behaves_like 'pages_page', :teacher
 
       it "should allow teachers to create a page", priority: "1", test_id: 289993 do
         get pages_page

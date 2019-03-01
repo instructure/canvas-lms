@@ -216,10 +216,14 @@ shared_examples 'pages_page' do |context|
     get pages_page
     f('.btn-primary').click
     wait_for_ajaximations
-    expect(f("#pages_accordion")).to be_displayed
-    fj(".ui-accordion-header a:contains('Pages')").click
-    expect(fln("#{group_page.title}")).to be_displayed
-    expect(f("#content")).not_to contain_link("#{course_page.title}")
+    if Account.default.feature_enabled?(:rich_content_service_high_risk)
+      fj('button:contains("Pages")').click
+    else
+      expect(f("#pages_accordion")).to be_displayed
+      fj(".ui-accordion-header a:contains('Pages')").click
+    end
+    expect(fln(group_page.title.to_s)).to be_displayed
+    expect(f("#content")).not_to contain_link(course_page.title.to_s)
   end
 
   it "should only access group files in pages right content pane", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 303700, teacher: 324932) do
@@ -228,7 +232,11 @@ shared_examples 'pages_page' do |context|
     f('.btn-primary').click
     wait_for_ajaximations
     expand_files_on_content_pane
-    expect(ffj('.file .text:visible').size).to eq 1
+    if Account.default.feature_enabled?(:rich_content_service_high_risk)
+      expect(ff('svg[name=IconDocument]').size).to eq 1
+    else
+      expect(ffj('.file .text:visible').size).to eq 1
+    end
   end
 end
 
