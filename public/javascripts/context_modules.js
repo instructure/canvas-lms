@@ -1014,6 +1014,10 @@ function scrollTo ($thing, time = 500) {
       } else {
         $option.find(".points_possible_parent").hide();
       }
+
+      const itemName = $option.find('.id option:selected').text()
+      const reqType = $option.find('.type option:selected').text()
+      $option.closest('.criterion').find('.delete_criterion_link').attr('aria-label', I18n.t('Delete requirement %{item} (%{type})', { item: itemName, type: reqType }))
     });
 
     $("#add_context_module_form .requirement-count-radio .ic-Radio input").change(function() {

@@ -181,7 +181,7 @@ describe "context modules" do
       expect(f('#add_context_module_form .assignment_requirement_picker option[value=must_contribute]')).to be_disabled
       click_option('#add_context_module_form .assignment_picker', @assignment.title, :text)
       click_option('#add_context_module_form .assignment_requirement_picker', 'must_submit', :value)
-
+      expect(f('.criteria_list .delete_criterion_link').attribute('aria-label')).to eq 'Delete requirement assignment 1 (submit the assignment)'
       submit_form(edit_form)
       expect(edit_form).not_to be_displayed
       # should show relock warning since we're adding a completion requirement to an active module
