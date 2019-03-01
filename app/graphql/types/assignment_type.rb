@@ -188,14 +188,16 @@ module Types
     end
 
     def load_locked_for
-      Loaders::AssociationLoader.for(
-        Assignment,
-        %i[context discussion_topic quiz wiki_page]
-      ).load(assignment).then {
+      Promise.all([
+        load_association(:context),
+        load_association(:discussion_topic),
+        load_association(:quiz),
+        load_association(:wiki_page),
+      ]).then do
         yield assignment.low_level_locked_for?(current_user,
                                                check_policies: true,
                                                context: assignment.context)
-      }
+      end
     end
 
     field :allowed_attempts, Int,

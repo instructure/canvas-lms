@@ -52,16 +52,23 @@ module Types
       # Not ideal as that could be cached in redis, but in most cases the assignment
       # and submission will already be in the cache, as that's the graphql query
       # path to get to a submission comment, and thus costs us nothing to preload here.
-      Loaders::AssociationLoader.for(SubmissionComment, [:author, {submission: :assignment}]).load(object).then do
-        object.grants_right?(current_user, :read_author) ? object.author : nil
-      end
+      Promise.all([
+        load_association(:author),
+        load_association(:submission).then do |submission|
+          Loaders::AssociationLoader.for(Submission, :assignment).load(submission)
+        end
+      ]).then {
+        object.author if object.grants_right?(current_user, :read_author)
+      }
     end
 
     field :attachments, [Types::FileType], null: true
     def attachments
       return [] if object.attachment_ids.blank?
-      Loaders::AssociationLoader.for(SubmissionComment, {submission: :assignment}).load(object).then do
-        AttachmentsLoader.for(object.submission.assignment).load(object)
+      load_association(:submission).then do |submission|
+        Loaders::AssociationLoader.for(Submission, :assignment).load(submission).then do |assignment|
+          AttachmentsLoader.for(object.submission.assignment).load(object)
+        end
       end
     end
 

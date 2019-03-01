@@ -32,9 +32,7 @@ module Types
     field :url, String, null: true
 
     def modules
-      Loaders::AssociationLoader.for(ContentTag, :context_module).load(object).then do |ct|
-        [ct.context_module]
-      end
+      load_association(:context_module).then { |mod| [mod] }
     end
   end
 end

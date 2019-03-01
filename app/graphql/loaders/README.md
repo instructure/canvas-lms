@@ -42,9 +42,7 @@ end
 
 # good example
 def group_set
-  Loaders::AssociationLoader.for(Assignment, :group_category).
-    load(assignment).
-    then(&:group_category)
+  Loaders::AssociationLoader.for(Assignment, :group_category).load(assignment)
 end
 
 # short (but still good) example

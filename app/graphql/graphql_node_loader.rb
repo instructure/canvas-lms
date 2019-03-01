@@ -67,7 +67,7 @@ module GraphQLNodeLoader
       Loaders::IDLoader.for(GroupCategory).load(id).then do |category|
         Loaders::AssociationLoader.for(GroupCategory, :context)
           .load(category)
-          .then(check_read_permission)
+          .then { check_read_permission.(category) }
       end
     when "GradingPeriod"
       Loaders::IDLoader.for(GradingPeriod).load(id).then(check_read_permission)
@@ -77,14 +77,14 @@ module GraphQLNodeLoader
       Loaders::IDLoader.for(ContextModule).load(id).then do |mod|
         Loaders::AssociationLoader.for(ContextModule, :context)
           .load(mod)
-          .then(check_read_permission)
+          .then { check_read_permission.(mod) }
       end
     when "ModuleItem"
-      Loaders::IDLoader.for(ContentTag).load(id).then do |ct|
-        Loaders::AssociationLoader.for(ContentTag, :context_module).load(ct).then do |ct|
-          next nil unless ct.context_module.grants_right?(ctx[:current_user], :read)
-          next nil unless ct.visible_to_user?(ctx[:current_user]) # Checks context and content
-          ct
+      Loaders::IDLoader.for(ContentTag).load(id).then do |tag|
+        Loaders::AssociationLoader.for(ContentTag, :context_module).load(tag).then do |mod|
+          next nil unless mod.grants_right?(ctx[:current_user], :read)
+          next nil unless tag.visible_to_user?(ctx[:current_user]) # Checks context and content
+          tag
         end
       end
     when "Page"
@@ -92,9 +92,12 @@ module GraphQLNodeLoader
         # This association preload loads the requisite dependencies for
         # checking :read permission.  This might be wasted work due to
         # permissions caching???
-        Loaders::AssociationLoader.for(WikiPage, wiki: [:course, :group])
-          .load(page)
-          .then(check_read_permission)
+        Loaders::AssociationLoader.for(WikiPage, :wiki).load(page).then do |wiki|
+          Promise.all([
+            Loaders::AssociationLoader.for(Wiki, :course).load(wiki),
+            Loaders::AssociationLoader.for(Wiki, :group).load(wiki),
+          ]).then { check_read_permission.(page) }
+        end
       end
     when "PostPolicy"
       Loaders::IDLoader.for(PostPolicy).load(id).then do |policy|
