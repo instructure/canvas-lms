@@ -108,28 +108,30 @@ export default class ConfirmDialog extends React.Component {
 
   render() {
     return (
-      <Modal {...this.props.modalProps} label={this.modalLabel()} open={this.props.open}>
-        <ModalHeader>
-          <Heading level="h2">{this.props.heading}</Heading>
-          <CloseButton
-            placement="end"
-            onClick={this.props.onDismiss}
-            disabled={this.props.disabled}
-            buttonRef={this.closeButtonRef}
-          >
-            {this.props.closeLabel}
-          </CloseButton>
-        </ModalHeader>
-        <ModalBody padding="0">
-          <div style={{position: 'relative'}}>
-            <View as="div" padding="medium">
-              {this.props.body()}
-              {this.props.working ? <Mask>{this.renderBusyMaskBody()}</Mask> : null}
-            </View>
-          </div>
-        </ModalBody>
-        <ModalFooter>{this.props.buttons().map(this.renderButton)}</ModalFooter>
-      </Modal>
+      this.props.open && ( // Don't waste time rendering anything if it is not open
+        <Modal {...this.props.modalProps} label={this.modalLabel()} open={this.props.open}>
+          <ModalHeader>
+            <Heading level="h2">{this.props.heading}</Heading>
+            <CloseButton
+              placement="end"
+              onClick={this.props.onDismiss}
+              disabled={this.props.disabled}
+              buttonRef={this.closeButtonRef}
+            >
+              {this.props.closeLabel}
+            </CloseButton>
+          </ModalHeader>
+          <ModalBody padding="0">
+            <div style={{position: 'relative'}}>
+              <View as="div" padding="medium">
+                {this.props.body()}
+                {this.props.working ? <Mask>{this.renderBusyMaskBody()}</Mask> : null}
+              </View>
+            </div>
+          </ModalBody>
+          <ModalFooter>{this.props.buttons().map(this.renderButton)}</ModalFooter>
+        </Modal>
+      )
     )
   }
 }
