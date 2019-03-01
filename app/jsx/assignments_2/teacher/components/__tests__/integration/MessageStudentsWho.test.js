@@ -23,7 +23,7 @@ import {mockAssignment, waitForNoElement} from '../../../test-utils'
 jest.mock('jsx/shared/rce/RichContentEditor')
 
 // TODO: some of these tests are essentially duplicates of the delete dialog tests. Should unify somehow.
-describe('MessageStudentsWho integration', () => {
+describe.skip('MessageStudentsWho integration', () => {
   it('shows the message students who dialog when the unsubmitted button is clicked', async () => {
     const {getByText, queryByText} = await renderTeacherView()
     expect(queryByText('Message Students Who...')).toBeNull()
