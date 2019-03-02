@@ -26,13 +26,8 @@ import LoadingIndicator from './LoadingIndicator'
 import SVGWithTextPlaceholder from './SVGWithTextPlaceholder'
 import ClosedDiscussionSVG from '../SVG/ClosedDiscussions.svg'
 
-const Comments = lazy(
-  () =>
-    new Promise((resolve, reject) => {
-      import('./Comments')
-        .then(result => resolve(result.default ? result : {default: result}))
-        .catch(reject)
-    })
+const Comments = lazy(() =>
+  import('./Comments').then(result => (result.default ? result : {default: result}))
 )
 
 ContentTabs.propTypes = {

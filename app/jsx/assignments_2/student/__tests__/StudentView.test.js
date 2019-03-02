@@ -17,12 +17,11 @@
  */
 import React from 'react'
 import ReactDOM from 'react-dom'
-import $ from 'jquery'
 import {mockAssignment} from '../test-utils'
 import {MockedProvider} from 'react-apollo/test-utils'
 import StudentView from '../StudentView'
 import {STUDENT_VIEW_QUERY} from '../assignmentData'
-import wait from 'waait'
+import {waitForElement} from 'react-testing-library'
 
 const mocks = [
   {
@@ -60,7 +59,10 @@ it('renders normally', async () => {
     </MockedProvider>,
     document.getElementById('fixtures')
   )
-  await wait(0) // wait for response
-  const element = $('[data-test-id="assignments-2-student-view"]')
-  expect(element).toHaveLength(1)
+
+  expect(
+    await waitForElement(() =>
+      document.querySelector('[data-test-id="assignments-2-student-view"]')
+    )
+  ).toBeInTheDocument()
 })

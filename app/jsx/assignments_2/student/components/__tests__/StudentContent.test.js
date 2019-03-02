@@ -23,6 +23,7 @@ import {mockAssignment, mockComments} from '../../test-utils'
 import StudentContent from '../StudentContent'
 import {MockedProvider} from 'react-apollo/test-utils'
 import {SUBMISSION_COMMENT_QUERY} from '../../assignmentData'
+import {waitForElement} from 'react-testing-library'
 
 const mocks = [
   {
@@ -101,11 +102,10 @@ describe('Assignment Student Content View', () => {
       document.getElementById('fixtures')
     )
     $('[data-test-id="assignment-2-student-content-tabs"] div:contains("Comments")')[0].click()
-    await new Promise(setTimeout) // wait for response
-    // We just need to kick an event loop to ensure the js actually is loaded.
-    await new Promise(setTimeout)
-    const container = $('[data-test-id="comments-container"]')
-    expect(container).toHaveLength(1)
+
+    expect(
+      await waitForElement(() => document.querySelector('[data-test-id="comments-container"]'))
+    ).toBeInTheDocument()
   })
 
   it('renders spinner while lazy loading comments', () => {

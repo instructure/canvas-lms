@@ -23,6 +23,7 @@ import CommentsContainer from '../Comments/CommentsContainer'
 import {mockAssignment, mockComments, singleComment} from '../../test-utils'
 import {MockedProvider} from 'react-apollo/test-utils'
 import {SUBMISSION_COMMENT_QUERY} from '../../assignmentData'
+import {waitForElement} from 'react-testing-library'
 
 const mocks = [
   {
@@ -62,9 +63,9 @@ describe('Comments', () => {
       document.getElementById('fixtures')
     )
 
-    await new Promise(setTimeout) // wait for response
-    const container = $('[data-test-id="comments-container"]')
-    expect(container).toHaveLength(1)
+    expect(
+      await waitForElement(() => document.querySelector('[data-test-id="comments-container"]'))
+    ).toBeInTheDocument()
   })
 
   it('renders CommentTextArea', async () => {
@@ -74,9 +75,12 @@ describe('Comments', () => {
       </MockedProvider>,
       document.getElementById('fixtures')
     )
-    await new Promise(setTimeout) // wait for response
-    const container = $('[data-test-id="comments-text-area-container"]')
-    expect(container).toHaveLength(1)
+
+    expect(
+      await waitForElement(() =>
+        document.querySelector('[data-test-id="comments-text-area-container"]')
+      )
+    ).toBeInTheDocument()
   })
 
   it('renders loading indicator when loading query', async () => {
@@ -92,16 +96,17 @@ describe('Comments', () => {
 
   it('renders place holder text when no comments', async () => {
     ReactDOM.render(<CommentsContainer comments={[]} />, document.getElementById('fixtures'))
-    await new Promise(setTimeout) // wait for response
-    const container = $(
-      '#fixtures:contains("Send a comment to your instructor about this assignment.")'
-    )
-    expect(container).toHaveLength(1)
+
+    expect(
+      await waitForElement(
+        () => $('#fixtures:contains("Send a comment to your instructor about this assignment.")')[0]
+      )
+    ).toBeInTheDocument()
   })
 
   it('renders comment rows when provided', async () => {
     ReactDOM.render(
-      <CommentsContainer comments={[singleComment(), singleComment()]} />,
+      <CommentsContainer comments={[singleComment({_id: '6'}), singleComment()]} />,
       document.getElementById('fixtures')
     )
     const container = $('.comment-row-container')
