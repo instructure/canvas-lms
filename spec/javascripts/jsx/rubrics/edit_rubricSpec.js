@@ -97,3 +97,22 @@ test('clicking hide_points checkbox unchecks totalling_rubric checkbox if checke
   $('.hide_points_checkbox').triggerHandler('change')
   notOk($('.totalling_rubric_checkbox').prop('checked'))
 })
+
+test('clicking hidden hide_points checkbox does not hide grading_rubric and totalling_rubric checkboxes', () => {
+  $(document.body).append($(rubricHtml))
+  rubricEditing.init()
+  $('.hide_points_checkbox').hide()
+  $('.hide_points_checkbox').prop('checked', true)
+  $('.hide_points_checkbox').triggerHandler('change')
+  notOk($('.rubric_grading').is(":hidden"))
+  notOk($('.totalling_rubric').is(":hidden"))
+})
+
+test('clicking hidden grading_rubric checkbox does not hide totalling_rubric checkbox', () => {
+  $(document.body).append($(rubricHtml))
+  rubricEditing.init()
+  $('.grading_rubric_checkbox').hide()
+  $('.grading_rubric_checkbox').prop('checked', true)
+  $('.grading_rubric_checkbox').triggerHandler('change')
+  notStrictEqual($('.totalling_rubric').css('visibility'), 'hidden')
+})
