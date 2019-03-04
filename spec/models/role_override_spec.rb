@@ -117,7 +117,7 @@ describe RoleOverride do
 
   describe "student view permissions" do
     it "should mirror student permissions" do
-      permission = 'comment_on_others_submissions'
+      permission = 'moderate_forum'
 
       course_with_teacher(:active_all => true)
       student_in_course(:active_all => true)
