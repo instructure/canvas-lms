@@ -26,12 +26,12 @@ def withGerritCredentials = { Closure command ->
   ]) { command() }
 }
 
-def fetchFromGerrit = { String repo, String path, String customRepoDestination = null, String sourcePath = '' ->
+def fetchFromGerrit = { String repo, String path, String customRepoDestination = null, String sourcePath = null ->
   withGerritCredentials({ ->
     sh """
       mkdir -p ${path}/${customRepoDestination ?: repo}
       GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
-        git archive --remote=ssh://$GERRIT_URL/${repo} master ${sourcePath} | tar -x -C ${path}/${customRepoDestination ?: repo}
+        git archive --remote=ssh://$GERRIT_URL/${repo} master ${sourcePath == null ? '' : sourcePath} | tar -x -C ${path}/${customRepoDestination ?: repo}
     """
   })
 }
@@ -98,6 +98,17 @@ pipeline {
             }
           }
         }
+      }
+    }
+
+    stage('Rebase') {
+      when { expression { env.GERRIT_EVENT_TYPE == 'patchset-created' } }
+      steps {
+        sh '''
+          git config user.name $GERRIT_EVENT_ACCOUNT_NAME
+          git config user.email $GERRIT_EVENT_ACCOUNT_EMAIL
+          git rebase --preserve-merges origin/$GERRIT_BRANCH
+        '''
       }
     }
 
