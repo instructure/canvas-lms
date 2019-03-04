@@ -1883,6 +1883,7 @@ type Submission implements Node & Timestamped {
     Returns the elements in the list that come before the specified cursor.
     """
     before: String
+    filter: SubmissionCommentFilterInput
 
     """
     Returns the first _n_ elements from the list.
@@ -1935,6 +1936,7 @@ type SubmissionComment implements Timestamped {
   """
   _id: ID
   attachments: [File!]
+  attempt: Int!
   author: User
   comment: String
   createdAt: DateTime
@@ -1975,6 +1977,10 @@ type SubmissionCommentEdge {
   The item at the end of the edge.
   """
   node: SubmissionComment
+}
+
+input SubmissionCommentFilterInput {
+  attempts: [Int!] = null
 }
 
 """

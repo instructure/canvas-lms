@@ -119,14 +119,13 @@ describe Types::SubmissionType do
   describe "submission comments" do
     before(:once) do
       student_in_course(active_all: true)
-      @submission.add_comment(author: @teacher, comment: "test3")
-      @submission_comments = @submission.submission_comments
+      @comment = @submission.add_comment(author: @teacher, comment: "test3")
     end
 
     it "works" do
       expect(
         submission_type.resolve("commentsConnection { nodes { _id }}")
-      ).to eq @submission_comments.map(&:id).map(&:to_s)
+      ).to eq [@comment.id.to_s]
     end
 
     it "requires permission" do
@@ -134,6 +133,29 @@ describe Types::SubmissionType do
       expect(
         submission_type.resolve("commentsConnection { nodes { _id }}", current_user: other_course_student)
       ).to be nil
+    end
+
+    describe "filtering" do
+      before(:once) do
+        @submission.update!(attempt: 2)
+        @comment2 = @submission.add_comment(author: @teacher, comment: "test3", attempt: 2)
+      end
+
+      it "can be done on an attempt number" do
+        expect(
+          submission_type.resolve(
+            "commentsConnection(filter: {attempts: [2]}) { nodes { _id }}",
+          )
+        ).to eq [@comment2.id.to_s]
+      end
+
+      it "translates attempt 0 to attemp nil in the database query" do
+        expect(
+          submission_type.resolve(
+            "commentsConnection(filter: {attempts: [0]}) { nodes { _id }}",
+          )
+        ).to eq [@comment.id.to_s]
+      end
     end
   end
 end
