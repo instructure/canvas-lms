@@ -19,19 +19,27 @@
 import I18n from 'i18n!unread_badge'
 import React from 'react'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import { string, number, oneOfType, node } from 'prop-types'
+import {string, number, oneOfType, node} from 'prop-types'
 import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
 
-export default function UnreadBadge ({ unreadCount, totalCount, unreadLabel, totalLabel }) {
+export default function UnreadBadge({unreadCount, totalCount, unreadLabel, totalLabel}) {
   return (
     <span className="ic-unread-badge">
       <Tooltip tip={unreadLabel} variant="inverse">
-        <ScreenReaderContent>{I18n.t('%{unreadCount} unread replies', {unreadCount})}</ScreenReaderContent>
-        <span aria-hidden="true" className="ic-unread-badge__count ic-unread-badge__unread-count">{unreadCount}</span>
+        <ScreenReaderContent>
+          {I18n.t('%{unreadCount} unread replies', {unreadCount})}
+        </ScreenReaderContent>
+        <span aria-hidden="true" className="ic-unread-badge__count ic-unread-badge__unread-count">
+          {unreadCount}
+        </span>
       </Tooltip>
       <Tooltip tip={totalLabel} variant="inverse">
-        <ScreenReaderContent>{I18n.t('%{totalCount} total replies', {totalCount})}</ScreenReaderContent>
-        <span aria-hidden="true" className="ic-unread-badge__count ic-unread-badge__total-count">{totalCount}</span>
+        <ScreenReaderContent>
+          {I18n.t('%{totalCount} total replies', {totalCount})}
+        </ScreenReaderContent>
+        <span aria-hidden="true" className="ic-unread-badge__count ic-unread-badge__total-count">
+          {totalCount}
+        </span>
       </Tooltip>
     </span>
   )
@@ -41,5 +49,5 @@ UnreadBadge.propTypes = {
   unreadCount: oneOfType([string, number]).isRequired,
   totalCount: oneOfType([string, number]).isRequired,
   unreadLabel: oneOfType([string, node]).isRequired,
-  totalLabel: oneOfType([string, node]).isRequired,
+  totalLabel: oneOfType([string, node]).isRequired
 }

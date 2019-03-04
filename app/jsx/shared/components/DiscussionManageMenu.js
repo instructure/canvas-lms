@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import I18n from 'i18n!shared_components'
-import React, { Component } from 'react'
-import { func, string } from 'prop-types'
+import React, {Component} from 'react'
+import {func, string} from 'prop-types'
 
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import IconMore from '@instructure/ui-icons/lib/Line/IconMore'
@@ -39,7 +39,7 @@ export default class DiscussionManageMenu extends Component {
   }
 
   static defaultProps = {
-    menuRefFn: (_) => {}
+    menuRefFn: _ => {}
   }
 
   state = {
@@ -47,10 +47,10 @@ export default class DiscussionManageMenu extends Component {
   }
 
   toggleManageMenuOpen = (shown, _) => {
-    this.setState({ manageMenuOpen: shown })
+    this.setState({manageMenuOpen: shown})
   }
 
-  render () {
+  render() {
     return (
       <span className="discussions-index-manage-menu">
         <Menu
@@ -58,11 +58,14 @@ export default class DiscussionManageMenu extends Component {
           onSelect={this.props.onSelect}
           onToggle={this.toggleManageMenuOpen}
           trigger={
-            <Button variant="icon" size="small" theme={{smallHeight: "1.25rem"}}>
+            <Button variant="icon" size="small" theme={{smallHeight: '1.25rem'}}>
               <IconMore />
-              <ScreenReaderContent>{I18n.t('Manage options for %{name}', { name: this.props.entityTitle })}</ScreenReaderContent>
+              <ScreenReaderContent>
+                {I18n.t('Manage options for %{name}', {name: this.props.entityTitle})}
+              </ScreenReaderContent>
             </Button>
-          }>
+          }
+        >
           {this.state.manageMenuOpen ? this.props.menuOptions() : null}
         </Menu>
       </span>

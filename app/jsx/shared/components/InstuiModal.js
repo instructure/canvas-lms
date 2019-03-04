@@ -71,7 +71,12 @@ export default function CanvasInstUIModal({
   ...otherPropsToPassOnToModal
 }) {
   return (
-    <Modal liveRegion={getLiveRegion} {...otherPropsToPassOnToModal} label={label} onDismiss={onDismiss}>
+    <Modal
+      liveRegion={getLiveRegion}
+      {...otherPropsToPassOnToModal}
+      label={label}
+      onDismiss={onDismiss}
+    >
       <ModalHeader>
         <CloseButton placement="end" offset="medium" onClick={onDismiss}>
           {closeButtonLabel || I18n.t('Close')}
