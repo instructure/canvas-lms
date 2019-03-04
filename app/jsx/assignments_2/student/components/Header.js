@@ -68,7 +68,7 @@ class Header extends React.Component {
     return (
       <React.Fragment>
         <div
-          data-test-id="assignments-2-student-header"
+          data-testid="assignments-2-student-header"
           id="assignments-2-student-header"
           className={
             this.state.isSticky

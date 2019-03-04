@@ -16,14 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import ReactDOM from 'react-dom'
-import $ from 'jquery'
 import Comments from '../Comments'
 import CommentsContainer from '../Comments/CommentsContainer'
 import {mockAssignment, mockComments, singleComment} from '../../test-utils'
 import {MockedProvider} from 'react-apollo/test-utils'
 import {SUBMISSION_COMMENT_QUERY} from '../../assignmentData'
-import {waitForElement} from 'react-testing-library'
+import {render, waitForElement} from 'react-testing-library'
 
 const mocks = [
   {
@@ -42,93 +40,63 @@ const mocks = [
 ]
 
 describe('Comments', () => {
-  beforeAll(() => {
-    const found = document.getElementById('fixtures')
-    if (!found) {
-      const fixtures = document.createElement('div')
-      fixtures.setAttribute('id', 'fixtures')
-      document.body.appendChild(fixtures)
-    }
-  })
-
-  afterEach(() => {
-    ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
-  })
-
   it('renders Comments', async () => {
-    ReactDOM.render(
+    const {getByTestId} = render(
       <MockedProvider mocks={mocks} addTypename>
         <Comments assignment={mockAssignment()} />
-      </MockedProvider>,
-      document.getElementById('fixtures')
+      </MockedProvider>
     )
 
-    expect(
-      await waitForElement(() => document.querySelector('[data-test-id="comments-container"]'))
-    ).toBeInTheDocument()
+    expect(await waitForElement(() => getByTestId('comments-container'))).toBeInTheDocument()
   })
 
   it('renders CommentTextArea', async () => {
-    ReactDOM.render(
+    const {getByLabelText} = render(
       <MockedProvider mocks={mocks} addTypename>
         <Comments assignment={mockAssignment()} />
-      </MockedProvider>,
-      document.getElementById('fixtures')
+      </MockedProvider>
     )
 
-    expect(
-      await waitForElement(() =>
-        document.querySelector('[data-test-id="comments-text-area-container"]')
-      )
-    ).toBeInTheDocument()
+    expect(await waitForElement(() => getByLabelText('Comment input box'))).toBeInTheDocument()
   })
 
   it('renders loading indicator when loading query', async () => {
-    ReactDOM.render(
+    const {getByTitle} = render(
       <MockedProvider mocks={mocks} addTypename>
         <Comments assignment={mockAssignment()} />
-      </MockedProvider>,
-      document.getElementById('fixtures')
+      </MockedProvider>
     )
-    const container = $('[data-test-id="loading-indicator"]')
-    expect(container).toHaveLength(1)
+    expect(getByTitle('Loading')).toBeInTheDocument()
   })
 
   it('renders place holder text when no comments', async () => {
-    ReactDOM.render(<CommentsContainer comments={[]} />, document.getElementById('fixtures'))
+    const {getByText} = render(<CommentsContainer comments={[]} />)
 
     expect(
-      await waitForElement(
-        () => $('#fixtures:contains("Send a comment to your instructor about this assignment.")')[0]
+      await waitForElement(() =>
+        getByText('Send a comment to your instructor about this assignment.')
       )
     ).toBeInTheDocument()
   })
 
   it('renders comment rows when provided', async () => {
-    ReactDOM.render(
-      <CommentsContainer comments={[singleComment({_id: '6'}), singleComment()]} />,
-      document.getElementById('fixtures')
+    const {container} = render(
+      <CommentsContainer comments={[singleComment({_id: '6'}), singleComment()]} />
     )
-    const container = $('.comment-row-container')
-    expect(container).toHaveLength(2)
+    expect(container.querySelectorAll('.comment-row-container')).toHaveLength(2)
   })
 
   it('renders shortname when shortname is provided', async () => {
-    ReactDOM.render(
-      <CommentsContainer comments={[singleComment()]} />,
-      document.getElementById('fixtures')
-    )
-    const container = $('#fixtures:contains("bob builder")')
-    expect(container).toHaveLength(1)
+    const {getAllByText} = render(<CommentsContainer comments={[singleComment()]} />)
+    expect(getAllByText('bob builder')).toHaveLength(1)
   })
 
   it('renders Anonymous when author is not provided', async () => {
     const comment = singleComment()
     comment.author = null
-    ReactDOM.render(<CommentsContainer comments={[comment]} />, document.getElementById('fixtures'))
-    let container = $('#fixtures:contains("bob builder")')
-    expect(container).toHaveLength(0)
-    container = $('#fixtures:contains("Anonymous")')
-    expect(container).toHaveLength(1)
+    const {getAllByText, queryAllByText} = render(<CommentsContainer comments={[comment]} />)
+
+    expect(queryAllByText('bob builder')).toHaveLength(0)
+    expect(getAllByText('Anonymous')).toHaveLength(1)
   })
 })

@@ -54,7 +54,7 @@ function StudentContent(props) {
         />
       }
     >
-      <div data-test-id="assignments-2-student-view">
+      <div data-testid="assignments-2-student-view">
         <Header scrollThreshold={150} assignment={assignment} />
         {renderContentBaseOnAvailability(assignment)}
       </div>

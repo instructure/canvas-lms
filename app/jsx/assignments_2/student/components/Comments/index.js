@@ -33,7 +33,7 @@ function Comments(props) {
         if (loading) return <LoadingIndicator />
         if (error) return `Error!: ${error}`
         return (
-          <div data-test-id="comments-container">
+          <div data-testid="comments-container">
             <CommentsContainer comments={data.submissionComments.commentsConnection.nodes} />
           </div>
         )

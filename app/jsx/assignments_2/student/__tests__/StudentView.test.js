@@ -16,12 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import ReactDOM from 'react-dom'
 import {mockAssignment} from '../test-utils'
 import {MockedProvider} from 'react-apollo/test-utils'
 import StudentView from '../StudentView'
 import {STUDENT_VIEW_QUERY} from '../assignmentData'
-import {waitForElement} from 'react-testing-library'
+import {render, waitForElement} from 'react-testing-library'
 
 const mocks = [
   {
@@ -39,30 +38,12 @@ const mocks = [
   }
 ]
 
-beforeAll(() => {
-  const found = document.getElementById('fixtures')
-  if (!found) {
-    const fixtures = document.createElement('div')
-    fixtures.setAttribute('id', 'fixtures')
-    document.body.appendChild(fixtures)
-  }
-})
-
-afterEach(() => {
-  ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
-})
-
 it('renders normally', async () => {
-  ReactDOM.render(
+  const {getByTestId} = render(
     <MockedProvider mocks={mocks} removeTypename addTypename>
       <StudentView assignmentLid="7" />
-    </MockedProvider>,
-    document.getElementById('fixtures')
+    </MockedProvider>
   )
 
-  expect(
-    await waitForElement(() =>
-      document.querySelector('[data-test-id="assignments-2-student-view"]')
-    )
-  ).toBeInTheDocument()
+  expect(await waitForElement(() => getByTestId('assignments-2-student-view'))).toBeInTheDocument()
 })

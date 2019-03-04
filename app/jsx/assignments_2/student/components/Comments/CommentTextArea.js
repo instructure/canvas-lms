@@ -26,7 +26,7 @@ import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReade
 
 function CommentTextArea() {
   return (
-    <div data-test-id="comments-text-area-container">
+    <div>
       <div>
         <TextArea
           resize="both"
