@@ -60,8 +60,7 @@ describe "groups" do
     end
 
     describe "announcements page v2" do
-      # will fix the below shared tests in a separate commit
-      # it_behaves_like 'announcements_page_v2', :teacher
+      it_behaves_like 'announcements_page_v2', :teacher
 
       it "should allow teachers to see announcements", ignore_js_errors: true do
         @announcement = @testgroup.first.announcements.create!(
