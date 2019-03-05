@@ -17,7 +17,7 @@
  */
 
 import I18n from 'i18n!blueprint_course_sidebar'
-import React, { Component } from 'react'
+import React, { Component, lazy, Suspense } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -39,9 +39,11 @@ import BlueprintModal from './BlueprintModal'
 import { ConnectedMigrationSync as MigrationSync } from './MigrationSync'
 import { ConnectedMigrationOptions as MigrationOptions } from './MigrationOptions'
 
-let UnsyncedChanges = null
-let SyncHistory = null
-let BlueprintAssociations = null
+const getDefault = module => (module.default ? module : {default: module}) // can go away when we remove the add-module-export babel plugin
+const BlueprintAssociations = lazy(() => import('./ConnectedBlueprintAssociations').then(getDefault))
+const SyncHistory = lazy(() => import('./ConnectedSyncHistory').then(getDefault))
+const UnsyncedChanges = lazy(() => import('./ConnectedUnsyncedChanges').then(getDefault))
+
 
 export default class CourseSidebar extends Component {
   static propTypes = {
@@ -113,7 +115,11 @@ export default class CourseSidebar extends Component {
           this.props.clearAssociations()
         }),
       },
-      children: <BlueprintAssociations />,
+      children: (
+        <Suspense fallback={<div>{I18n.t('Loading assotiations...')}</div>}>
+          <BlueprintAssociations />
+        </Suspense>
+      ),
       onCancel: () => this.closeModal(() => {
         this.asscBtn.focus()
         this.props.clearAssociations()
@@ -126,7 +132,11 @@ export default class CourseSidebar extends Component {
           if (this.syncHistoryBtn) this.syncHistoryBtn.focus()
         }),
       },
-      children: <SyncHistory />,
+      children: (
+        <Suspense fallback={<div>{I18n.t('Loading sync history...')}</div>}>
+          <SyncHistory />
+        </Suspense>
+      ),
     }),
     unsyncedChanges: () => ({
       props: {
@@ -147,7 +157,11 @@ export default class CourseSidebar extends Component {
           })}
         />
       },
-      children: <UnsyncedChanges />,
+      children: (
+        <Suspense fallback={<div>{I18n.t('Loading unsynced changes...')}</div>}>
+        <UnsyncedChanges />
+        </Suspense>
+      ),
     })
   }
 
@@ -157,22 +171,9 @@ export default class CourseSidebar extends Component {
   }
 
   handleAssociationsClick = () => {
-    require.ensure([], (require) => {
-      // lazy load BlueprintAssociations component
-      const BlueprintAssociationsModule = require('./BlueprintAssociations')
-      if (BlueprintAssociations === null) {
-        BlueprintAssociations = BlueprintAssociationsModule.ConnectedBlueprintAssociations
-      }
-
-      this.setState({
-        isModalOpen: true,
-        modalId: 'associations',
-      })
-    }).catch((/* err */) => {
-      showFlashAlert({
-        message: I18n.t('Failed loading Associations component. Is your network connection OK?'),
-        type: 'error'
-      })
+    this.setState({
+      isModalOpen: true,
+      modalId: 'associations',
     })
   }
 
@@ -181,22 +182,9 @@ export default class CourseSidebar extends Component {
   }
 
   handleUnsyncedChangesClick = () => {
-    require.ensure([], (require) => {
-      // lazy load UnsyncedChanges component
-      const UnsyncedChangesModule = require('./UnsyncedChanges')
-      if (UnsyncedChanges === null) {
-        UnsyncedChanges = UnsyncedChangesModule.ConnectedUnsyncedChanges
-      }
-
-      this.setState({
-        isModalOpen: true,
-        modalId: 'unsyncedChanges',
-      })
-    }).catch((/* err */) => {
-      showFlashAlert({
-        message: I18n.t('Failed loading Unsynced Changes component. Is your network connection OK?'),
-        type: 'error'
-      })
+    this.setState({
+      isModalOpen: true,
+      modalId: 'unsyncedChanges',
     })
   }
 
@@ -210,22 +198,9 @@ export default class CourseSidebar extends Component {
   }
 
   openHistoryModal () {
-    require.ensure([], (require) => {
-      // lazy load SyncHistory component
-      const SyncHistoryModule = require('./SyncHistory')
-      if (SyncHistory === null) {
-        SyncHistory = SyncHistoryModule.ConnectedSyncHistory
-      }
-
-      this.setState({
-        isModalOpen: true,
-        modalId: 'syncHistory',
-      })
-    }).catch((/* err */) => {
-      showFlashAlert({
-        message: I18n.t('Failed loading Sync History component. Is your network connection OK?'),
-        type: 'error'
-      })
+    this.setState({
+      isModalOpen: true,
+      modalId: 'syncHistory',
     })
   }
 

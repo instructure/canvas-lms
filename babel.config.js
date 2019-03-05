@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 - present Instructure, Inc.
+ * Copyright (C) 2019 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,11 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const {compile} = require('coffee-script')
-const {transform} = require('@babel/core')
-
-exports.process = coffee => {
-  const amd = compile(coffee, {bare: true})
-  const cjs = transform(amd, {plugins: ['transform-amd-to-commonjs']}).code
-  return cjs
+module.exports = {
+  "presets": [
+    ["@instructure/ui-babel-preset", {
+      // this tells it to transform imports to commonJS in jest
+      "node": !!process.env.JEST_WORKER_ID
+    }]
+  ],
+  "plugins": [
+    "add-module-exports"
+  ],
+  "env": {
+    "production": {
+      "plugins": [
+        "transform-react-remove-prop-types"
+      ]
+    }
+  }
 }

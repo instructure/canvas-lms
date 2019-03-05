@@ -134,6 +134,16 @@ export const AttachmentShape = shape({
   url: string
 })
 
+export const MediaObjectShape = shape({
+  id: string,
+  title: string,
+  mediaType: string,
+  mediaSources: shape({
+    src: string,
+    type: string
+  })
+})
+
 export const CommentShape = shape({
   _id: string,
   attachments: arrayOf(AttachmentShape),
@@ -144,16 +154,6 @@ export const CommentShape = shape({
     shortName: string
   }),
   updatedAt: string
-})
-
-export const MediaObjectShape = shape({
-  id: string,
-  title: string,
-  mediaType: string,
-  mediaSources: shape({
-    src: string,
-    type: string
-  })
 })
 
 export const StudentAssignmentShape = shape({

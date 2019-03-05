@@ -33,7 +33,6 @@ const SelinimumManifestPlugin = require('./SelinimumManifestPlugin')
 const WebpackHooks = require('./webpackHooks')
 const webpackPublicPath = require('./webpackPublicPath')
 const momentLocaleBundles = require('./momentBundles')
-require('babel-polyfill')
 
 const root = path.resolve(__dirname, '..')
 const USE_BABEL_CACHE =

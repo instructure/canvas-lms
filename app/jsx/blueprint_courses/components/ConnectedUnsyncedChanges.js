@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2019 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,5 +16,4 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'jest-dom/extend-expect'
-import 'react-testing-library/cleanup-after-each'
+export {ConnectedUnsyncedChanges as default} from './UnsyncedChanges'

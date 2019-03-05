@@ -37,7 +37,7 @@ export default class WikiPageEditView extends ValidatedFormView {
       // Hack: trick Babel/TypeScript into allowing this before super.
       if (false) { super(); }
       let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.lastIndexOf(';')).trim();
+      let thisName = thisFn.match(/(?:_assertThisInitialized\()*(\w+)\)*;/)[1];
       eval(`${thisName} = this;`);
     }
     this.onUnload = this.onUnload.bind(this)

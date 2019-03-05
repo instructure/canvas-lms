@@ -24,7 +24,6 @@ import DeveloperKeysApp from './App'
 import actions from './actions/developerKeysActions'
 import store from './store/store'
 
-let state = store.getState()
 /**
  * Route Handlers
  */
@@ -41,6 +40,8 @@ function renderShowDeveloperKeys(ctx) {
     store.dispatch(actions.ltiKeysSetLtiKey(false))
   }
 
+  const state = store.getState()
+
   if (!state.listDeveloperKeys.listDeveloperKeysSuccessful) {
     store.dispatch(
       actions.getDeveloperKeys(`/api/v1/accounts/${ctx.params.contextId}/developer_keys`, true)
@@ -51,9 +52,9 @@ function renderShowDeveloperKeys(ctx) {
     }
 
     const view = () => {
-      state = store.getState()
+      const currentState = store.getState()
       ReactDOM.render(
-        <DeveloperKeysApp applicationState={state} actions={actions} store={store} ctx={ctx} />,
+        <DeveloperKeysApp applicationState={currentState} actions={actions} store={store} ctx={ctx} />,
         document.getElementById('reactContent')
       )
     }
