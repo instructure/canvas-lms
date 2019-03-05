@@ -20,7 +20,7 @@ require_relative '../../../spec_helper'
 describe "Api::V1::RubricAssessment" do
   include Api::V1::RubricAssessment
 
-  describe "#rubric_assessment_json" do
+  describe "#indexed_rubric_assessment_json" do
     before :once do
       assignment_model
       @teacher = user_factory(active_all: true)
@@ -43,9 +43,7 @@ describe "Api::V1::RubricAssessment" do
       @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
     end
 
-    it 'rounds the final score to avoid floating-point arithmetic issues' do
-      # in an ideal world these would be stored using the DECIMAL type, but we
-      # don't live in that world
+    it 'includes rating ids for each criterion' do
       assessment = @association.assess({
         :user => @student,
         :assessor => @teacher,
@@ -53,25 +51,30 @@ describe "Api::V1::RubricAssessment" do
         :assessment => {
           :assessment_type => 'grading',
           :criterion_crit1 => {
-            :points => 1.2,
-            :rating_id => 'rat2'
+            :points => 8,
+            :rating_id => 'rat1'
           },
           :criterion_crit2 => {
-            :points => 1.2,
-            :rating_id => 'rat2'
+            :points => 8,
+            :rating_id => 'rat1'
           },
           :criterion_crit3 => {
-            :points => 1.2,
+            :points => 4,
             :rating_id => 'rat2'
           },
           :criterion_crit4 => {
-            :points => 0.4,
-            :rating_id => 'rat2'
+            :points => 0,
+            :rating_id => 'rat3'
           }
         }
       })
 
-      expect(rubric_assessment_json(assessment, @teacher, nil)[:score]).to eq(4.0)
+      expect(indexed_rubric_assessment_json(assessment)).to eq({
+        'crit1' => { points: 8, rating_id: 'rat1', comments: nil },
+        'crit2' => { points: 8, rating_id: 'rat1', comments: nil },
+        'crit3' => { points: 4, rating_id: 'rat2', comments: nil },
+        'crit4' => { points: 0, rating_id: 'rat3', comments: nil }
+      })
     end
   end
 end

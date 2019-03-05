@@ -160,6 +160,53 @@ describe RubricAssessment do
       expect(assessment.artifact.score).to eql(11.0)
     end
 
+    it 'rounds the final score to avoid floating-point arithmetic issues' do
+      def criteria(id)
+        {
+          :description => "Some criterion",
+          :points => 10,
+          :id => id,
+          :ratings => [
+            {:description => "Good", :points => 10, :id => 'rat1', :criterion_id => id},
+            {:description => "Medium", :points => 5, :id => 'rat2', :criterion_id => id},
+            {:description => "Bad", :points => 0, :id => 'rat3', :criterion_id => id}
+          ]
+        }
+      end
+
+      rubric = rubric_model(data: %w[crit1 crit2 crit3 crit4].map { |n| criteria(n) })
+      association = rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
+
+      # in an ideal world these would be stored using the DECIMAL type, but we
+      # don't live in that world
+      assessment = association.assess({
+        :user => @student,
+        :assessor => @teacher,
+        :artifact => @assignment.find_or_create_submission(@student),
+        :assessment => {
+          :assessment_type => 'grading',
+          :criterion_crit1 => {
+            :points => 1.2,
+            :rating_id => 'rat2'
+          },
+          :criterion_crit2 => {
+            :points => 1.2,
+            :rating_id => 'rat2'
+          },
+          :criterion_crit3 => {
+            :points => 1.2,
+            :rating_id => 'rat2'
+          },
+          :criterion_crit4 => {
+            :points => 0.4,
+            :rating_id => 'rat2'
+          }
+        }
+      })
+
+      expect(assessment.score).to eq(4.0)
+    end
+
     context "outcome criterion" do
       before :once do
         assignment_model
