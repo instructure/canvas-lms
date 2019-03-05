@@ -38,6 +38,7 @@ exports[`does not render caveat if no courses have grading periods 1`] = `
     overflowY="visible"
   >
     <div
+      className="GradesDisplay-styles__course"
       style={
         Object {
           "borderBottom": "solid thin",
@@ -197,6 +198,7 @@ exports[`renders some course grades 1`] = `
     overflowY="visible"
   >
     <div
+      className="GradesDisplay-styles__course"
       style={
         Object {
           "borderBottom": "solid thin",
@@ -240,6 +242,7 @@ exports[`renders some course grades 1`] = `
     overflowY="visible"
   >
     <div
+      className="GradesDisplay-styles__course"
       style={
         Object {
           "borderBottom": "solid thin",
@@ -283,6 +286,7 @@ exports[`renders some course grades 1`] = `
     overflowY="visible"
   >
     <div
+      className="GradesDisplay-styles__course"
       style={
         Object {
           "borderBottom": "solid thin",

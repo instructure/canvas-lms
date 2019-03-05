@@ -1,12 +1,20 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`renders the base component correctly 1`] = `
-<div>
-  <div>
-    <div>
+<div
+  className="Opportunity-styles__root"
+>
+  <div
+    className="Opportunity-styles__oppNameAndTitle"
+  >
+    <div
+      className="Opportunity-styles__oppName"
+    >
       course about stuff
     </div>
-    <div>
+    <div
+      className="Opportunity-styles__title"
+    >
       <Link
         as="button"
         href="http://www.non_default_url.com"
@@ -18,21 +26,31 @@ exports[`renders the base component correctly 1`] = `
       </Link>
     </div>
   </div>
-  <div>
-    <div>
+  <div
+    className="Opportunity-styles__footer"
+  >
+    <div
+      className="Opportunity-styles__status"
+    >
       <Pill
         text="Missing"
         variant="danger"
       />
-      <div>
-        <span>
+      <div
+        className="Opportunity-styles__due"
+      >
+        <span
+          className="Opportunity-styles__dueText"
+        >
           Due:
         </span>
          
         March 9, 2017 at 1:40 PM
       </div>
     </div>
-    <div>
+    <div
+      className="Opportunity-styles__points"
+    >
       <ScreenReaderContent
         as="span"
       >
@@ -41,14 +59,18 @@ exports[`renders the base component correctly 1`] = `
       <PresentationContent
         as="span"
       >
-        <span>
+        <span
+          className="Opportunity-styles__pointsNumber"
+        >
           20
         </span>
         points
       </PresentationContent>
     </div>
   </div>
-  <div>
+  <div
+    className="Opportunity-styles__close"
+  >
     <Button
       as="button"
       buttonRef={[Function]}
@@ -73,12 +95,20 @@ exports[`renders the base component correctly 1`] = `
 `;
 
 exports[`renders the base component correctly with 0 points 1`] = `
-<div>
-  <div>
-    <div>
+<div
+  className="Opportunity-styles__root"
+>
+  <div
+    className="Opportunity-styles__oppNameAndTitle"
+  >
+    <div
+      className="Opportunity-styles__oppName"
+    >
       course about stuff
     </div>
-    <div>
+    <div
+      className="Opportunity-styles__title"
+    >
       <Link
         as="button"
         href="http://www.non_default_url.com"
@@ -90,21 +120,31 @@ exports[`renders the base component correctly with 0 points 1`] = `
       </Link>
     </div>
   </div>
-  <div>
-    <div>
+  <div
+    className="Opportunity-styles__footer"
+  >
+    <div
+      className="Opportunity-styles__status"
+    >
       <Pill
         text="Missing"
         variant="danger"
       />
-      <div>
-        <span>
+      <div
+        className="Opportunity-styles__due"
+      >
+        <span
+          className="Opportunity-styles__dueText"
+        >
           Due:
         </span>
          
         March 9, 2017 at 1:40 PM
       </div>
     </div>
-    <div>
+    <div
+      className="Opportunity-styles__points"
+    >
       <ScreenReaderContent
         as="span"
       >
@@ -113,14 +153,18 @@ exports[`renders the base component correctly with 0 points 1`] = `
       <PresentationContent
         as="span"
       >
-        <span>
+        <span
+          className="Opportunity-styles__pointsNumber"
+        >
           0
         </span>
         points
       </PresentationContent>
     </div>
   </div>
-  <div>
+  <div
+    className="Opportunity-styles__close"
+  >
     <Button
       as="button"
       buttonRef={[Function]}
@@ -145,12 +189,20 @@ exports[`renders the base component correctly with 0 points 1`] = `
 `;
 
 exports[`renders the base component correctly without points 1`] = `
-<div>
-  <div>
-    <div>
+<div
+  className="Opportunity-styles__root"
+>
+  <div
+    className="Opportunity-styles__oppNameAndTitle"
+  >
+    <div
+      className="Opportunity-styles__oppName"
+    >
       course about stuff
     </div>
-    <div>
+    <div
+      className="Opportunity-styles__title"
+    >
       <Link
         as="button"
         href="http://www.non_default_url.com"
@@ -162,14 +214,22 @@ exports[`renders the base component correctly without points 1`] = `
       </Link>
     </div>
   </div>
-  <div>
-    <div>
+  <div
+    className="Opportunity-styles__footer"
+  >
+    <div
+      className="Opportunity-styles__status"
+    >
       <Pill
         text="Missing"
         variant="danger"
       />
-      <div>
-        <span>
+      <div
+        className="Opportunity-styles__due"
+      >
+        <span
+          className="Opportunity-styles__dueText"
+        >
           Due:
         </span>
          
@@ -182,7 +242,9 @@ exports[`renders the base component correctly without points 1`] = `
       There are no points associated with this item
     </ScreenReaderContent>
   </div>
-  <div>
+  <div
+    className="Opportunity-styles__close"
+  >
     <Button
       as="button"
       buttonRef={[Function]}

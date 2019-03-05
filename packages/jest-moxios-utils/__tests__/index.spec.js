@@ -17,9 +17,9 @@
  */
 
 
-import axios from 'axios';
-import moxios from 'moxios';
-import {moxiosWait, moxiosRespond} from '../index';
+const axios = require('axios');
+const moxios = require('moxios');
+const {moxiosWait, moxiosRespond} = require('../index');
 
 describe('moxiosWait', () => {
   it('rejects if the passed function throws', () => {

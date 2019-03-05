@@ -2,7 +2,7 @@
 
 exports[`new activity button does not show when there is no new activity 1`] = `
 <div
-  className="undefined PlannerHeader"
+  className="PlannerHeader-styles__root PlannerHeader"
 >
   <Button
     as="button"
@@ -303,7 +303,7 @@ exports[`new activity button does not show when there is no new activity 1`] = `
 
 exports[`new activity button shows when there is new activity 1`] = `
 <div
-  className="undefined PlannerHeader"
+  className="PlannerHeader-styles__root PlannerHeader"
 >
   <Button
     as="button"
@@ -604,7 +604,7 @@ exports[`new activity button shows when there is new activity 1`] = `
 
 exports[`renders the base component correctly with buttons and trays 1`] = `
 <div
-  className="undefined PlannerHeader"
+  className="PlannerHeader-styles__root PlannerHeader"
 >
   <Button
     as="button"

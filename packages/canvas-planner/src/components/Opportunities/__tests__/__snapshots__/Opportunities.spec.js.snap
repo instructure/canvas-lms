@@ -2,6 +2,7 @@
 
 exports[`renders nothing if no opportunities 1`] = `
 <div
+  className="Opportunities-styles__root"
   id="opportunities_parent"
   onKeyDown={[Function]}
   style={
@@ -74,6 +75,7 @@ exports[`renders nothing if no opportunities 1`] = `
 
 exports[`renders the base component correctly with one of each kind of opportunity 1`] = `
 <div
+  className="Opportunities-styles__root"
   id="opportunities_parent"
   onKeyDown={[Function]}
   style={
@@ -115,8 +117,11 @@ exports[`renders the base component correctly with one of each kind of opportuni
       }
       variant="simple"
     >
-      <ol>
+      <ol
+        className="Opportunities-styles__list"
+      >
         <li
+          className="Opportunities-styles__item"
           key="1"
         >
           <Animatable(Opportunity)
@@ -149,8 +154,11 @@ exports[`renders the base component correctly with one of each kind of opportuni
       }
       variant="simple"
     >
-      <ol>
+      <ol
+        className="Opportunities-styles__list"
+      >
         <li
+          className="Opportunities-styles__item"
           key="2"
         >
           <Animatable(Opportunity)
@@ -172,6 +180,7 @@ exports[`renders the base component correctly with one of each kind of opportuni
 
 exports[`renders the right course with the right opportunity 1`] = `
 <div
+  className="Opportunities-styles__root"
   id="opportunities_parent"
   onKeyDown={[Function]}
   style={
@@ -213,8 +222,11 @@ exports[`renders the right course with the right opportunity 1`] = `
       }
       variant="simple"
     >
-      <ol>
+      <ol
+        className="Opportunities-styles__list"
+      >
         <li
+          className="Opportunities-styles__item"
           key="1"
         >
           <Animatable(Opportunity)
@@ -229,6 +241,7 @@ exports[`renders the right course with the right opportunity 1`] = `
           />
         </li>
         <li
+          className="Opportunities-styles__item"
           key="2"
         >
           <Animatable(Opportunity)
@@ -261,8 +274,11 @@ exports[`renders the right course with the right opportunity 1`] = `
       }
       variant="simple"
     >
-      <ol>
+      <ol
+        className="Opportunities-styles__list"
+      >
         <li
+          className="Opportunities-styles__item"
           key="2"
         >
           <Animatable(Opportunity)

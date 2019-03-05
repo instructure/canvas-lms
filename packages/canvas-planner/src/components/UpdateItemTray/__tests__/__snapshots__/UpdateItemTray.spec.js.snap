@@ -1,7 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`renders the item to update if provided 1`] = `
-<div>
+<div
+  className="UpdateItemTray-styles__root"
+>
   <View
     as="div"
     display="auto"
@@ -158,7 +160,9 @@ exports[`renders the item to update if provided 1`] = `
 `;
 
 exports[`updates state when new note is passed in 1`] = `
-<div>
+<div
+  className="UpdateItemTray-styles__root"
+>
   <View
     as="div"
     display="auto"
@@ -321,7 +325,9 @@ exports[`updates state when new note is passed in 1`] = `
 `;
 
 exports[`updates state when new note is passed in 2`] = `
-<div>
+<div
+  className="UpdateItemTray-styles__root"
+>
   <View
     as="div"
     display="auto"
