@@ -107,6 +107,11 @@ export const SUBMISSION_COMMENT_QUERY = gql`
               avatarUrl
               shortName
             }
+            attachments {
+              _id
+              displayName
+              url
+            }
           }
         }
       }
@@ -114,8 +119,15 @@ export const SUBMISSION_COMMENT_QUERY = gql`
   }
 `
 
+export const AttachmentShape = shape({
+  _id: string,
+  displayName: string,
+  url: string
+})
+
 export const CommentShape = shape({
   _id: string,
+  attachments: arrayOf(AttachmentShape),
   comment: string,
   author: shape({
     avatarUrl: string,

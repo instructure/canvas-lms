@@ -18,7 +18,7 @@
 import React from 'react'
 import Comments from '../Comments'
 import CommentsContainer from '../Comments/CommentsContainer'
-import {mockAssignment, mockComments, singleComment} from '../../test-utils'
+import {mockAssignment, mockComments, singleAttachment, singleComment} from '../../test-utils'
 import {MockedProvider} from 'react-apollo/test-utils'
 import {SUBMISSION_COMMENT_QUERY} from '../../assignmentData'
 import {render, waitForElement} from 'react-testing-library'
@@ -145,5 +145,42 @@ describe('Comments', () => {
 
     expect(queryAllByText('bob builder')).toHaveLength(0)
     expect(getAllByText('Anonymous')).toHaveLength(1)
+  })
+
+  it('displays a single attachment', async () => {
+    const comment = singleComment()
+    const attachment = singleAttachment()
+    comment.attachments = [attachment]
+    const {getByText} = render(<CommentsContainer comments={[comment]} />)
+
+    expect(
+      getByText(attachment.displayName, {selector: `a[href*='${attachment.url}']`})
+    ).toBeInTheDocument()
+  })
+
+  it('displays multiple attachments', async () => {
+    const comment = singleComment()
+    const attachment1 = singleAttachment()
+    const attachment2 = singleAttachment({
+      _id: 30,
+      displayName: 'attachment2',
+      url: 'https://second-attachment/url.com'
+    })
+    comment.attachments = [attachment1, attachment2]
+    const {getByText} = render(<CommentsContainer comments={[comment]} />)
+
+    expect(
+      getByText(attachment1.displayName, {selector: `a[href*='${attachment1.url}']`})
+    ).toBeInTheDocument()
+    expect(
+      getByText(attachment2.displayName, {selector: `a[href*='${attachment2.url}']`})
+    ).toBeInTheDocument()
+  })
+
+  it('does not display attachments if there are none', async () => {
+    const comment = singleComment()
+    const {container} = render(<CommentsContainer comments={[comment]} />)
+
+    expect(container.querySelector('a[href]')).toBeNull()
   })
 })

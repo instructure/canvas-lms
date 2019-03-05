@@ -51,6 +51,7 @@ export function mockAssignment(overrides = {}) {
               {
                 __typename: 'Comment',
                 _id: '1',
+                attachments: [],
                 comment: 'comment comment',
                 updatedAt: '12/13/91',
                 author: {
@@ -87,6 +88,7 @@ export function mockComments(overrides = {}) {
         {
           __typename: 'Comment',
           _id: '1',
+          attachments: [],
           comment: 'comment comment',
           updatedAt: '12/13/91',
           author: {
@@ -104,6 +106,7 @@ export function mockComments(overrides = {}) {
 export function singleComment(overrides = {}) {
   return {
     _id: '1',
+    attachments: [],
     comment: 'comment comment',
     updatedAt: '12/13/91',
     author: {
@@ -111,6 +114,15 @@ export function singleComment(overrides = {}) {
       avatarUrl: 'example.com',
       shortName: 'bob builder'
     },
+    ...overrides
+  }
+}
+
+export function singleAttachment(overrides = {}) {
+  return {
+    _id: '20',
+    displayName: 'lookatme.pdf',
+    url: 'https://some-awesome/url/goes/here',
     ...overrides
   }
 }

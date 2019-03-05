@@ -19,6 +19,7 @@ import I18n from 'i18n!assignments_2'
 import React from 'react'
 import {CommentShape} from '../../assignmentData'
 import Avatar from '@instructure/ui-elements/lib/components/Avatar'
+import Link from '@instructure/ui-elements/lib/components/Link'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import FriendlyDatetime from '../../../../shared/FriendlyDatetime'
 
@@ -43,6 +44,11 @@ function CommentRow(props) {
           />
         </Text>
         <Text>{props.comment.comment}</Text>
+        {props.comment.attachments.map(attachment => (
+          <Link key={attachment._id} href={attachment.url}>
+            {attachment.displayName}
+          </Link>
+        ))}
       </div>
     </div>
   )
