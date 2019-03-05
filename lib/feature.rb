@@ -248,7 +248,6 @@ END
       applies_to: 'Course',
       state: 'allowed',
       root_opt_in: true,
-      beta: true,
       custom_transition_proc: ->(user, context, _from_state, transitions) do
         if context.is_a?(Course)
           is_admin = context.account_membership_allows(user)
