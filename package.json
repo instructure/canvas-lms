@@ -177,7 +177,6 @@
     "handlebars": "1.3.0",
     "happypack": "^3.1.0",
     "imports-loader": "^0.8",
-    "inspect-process": "^0.5",
     "istanbul-instrumenter-loader": "^3",
     "istanbul-merge": "^1.1.1",
     "jest": "^23",
@@ -226,6 +225,9 @@
     "wsrun": "^2.2.0",
     "xsslint": "https://github.com/claydiffrient/xsslint.git#master",
     "yaml-loader": "^0.5"
+  },
+  "optionalDependencies": {
+    "inspect-process": "^0.5"
   },
   "jest-junit": {
     "output": "./coverage-js/junit-reports/jest.xml"
