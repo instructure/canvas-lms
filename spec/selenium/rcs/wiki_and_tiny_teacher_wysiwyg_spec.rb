@@ -308,7 +308,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       end
     end
 
-    it "should be able to add links to new wiki pages with special characters in title" do
+    it "should be able to add links to new wiki pages with special characters in title", priority: "2" do
       title = "this/is a weird-a%% page titlé?"
 
       visit_front_page_edit(@course)
@@ -325,7 +325,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
         expect(link.text).to eq title
       end
 
-      expect_new_page_load { f('form.edit-form button.submit').click }
+      expect_new_page_load { force_click('form.edit-form button.submit') }
 
       expect_new_page_load{ f('.user_content a').click }
 
