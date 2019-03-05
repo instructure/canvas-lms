@@ -86,7 +86,7 @@ const dropTarget = {
     if (dragIndex === hoverIndex) {
       return
     }
-    const hoverBoundingRect = findDOMNode(component).getBoundingClientRect() // eslint-disable-line
+    const hoverBoundingRect = findDOMNode(component).getBoundingClientRect()
     const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2
     const clientOffset = monitor.getClientOffset()
     const hoverClientY = clientOffset.y - hoverBoundingRect.top
@@ -129,7 +129,7 @@ export class DiscussionRow extends Component {
     isDragging: bool,
     isMasterCourse: bool.isRequired,
     masterCourseData: masterCourseDataShape,
-    moveCard: func, // eslint-disable-line
+    moveCard: func,
     onMoveDiscussion: func,
     toggleSubscriptionState: func.isRequired,
     updateDiscussion: func.isRequired
@@ -211,11 +211,10 @@ export class DiscussionRow extends Component {
           'manageMenu'
         )
         break
-     case 'masterypaths': // eslint-disable-line
-        const returnTo = encodeURIComponent(window.location.pathname)
+      case 'masterypaths':
         window.location = `discussion_topics/${
           this.props.discussion.id
-        }/edit?return_to=${returnTo}#mastery-paths-editor`
+        }/edit?return_to=${encodeURIComponent(window.location.pathname)}#mastery-paths-editor`
         break
       case 'ltiMenuTool':
         window.location = `${menuTool.base_url}&discussion_topics[]=${id}`
@@ -614,7 +613,7 @@ export class DiscussionRow extends Component {
   }
 
   renderDueDate = () => {
-    const assignment = this.props.discussion.assignment // eslint-disable-line
+    const assignment = this.props.discussion.assignment
     let dueDateString = null
     let className = ''
     if (assignment && assignment.due_at) {
@@ -661,7 +660,7 @@ export class DiscussionRow extends Component {
   }
 
   renderUpperRightBadges = () => {
-    const assignment = this.props.discussion.assignment // eslint-disable-line
+    const assignment = this.props.discussion.assignment
     const peerReview = assignment ? assignment.peer_reviews : false
     const maybeRenderPeerReviewIcon = peerReview ? (
       <span className="ic-item-row__peer_review">

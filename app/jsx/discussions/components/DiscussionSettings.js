@@ -38,7 +38,7 @@ const STUDENT_SETTINGS = [
 
 export default class DiscussionSettings extends Component {
   static propTypes = {
-    courseSettings: propTypes.courseSettings, // eslint-disable-line
+    courseSettings: propTypes.courseSettings, // eslint-disable-line react/no-unused-prop-types
     isSavingSettings: bool.isRequired,
     isSettingsModalOpen: bool.isRequired,
     permissions: propTypes.permissions.isRequired,

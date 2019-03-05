@@ -79,7 +79,7 @@ const fetchOutcomes = (courseId, studentId) => {
     })
     .then(() => (
       Promise.all(outcomeLinks.map((outcomeLink) => (
-        fetchUrl(`/api/v1/courses/${courseId}/outcome_results?user_ids[]=${studentId}&outcome_ids[]=${outcomeLink.outcome.id}&include[]=assignments&per_page=100`) // eslint-disable-line max-len
+        fetchUrl(`/api/v1/courses/${courseId}/outcome_results?user_ids[]=${studentId}&outcome_ids[]=${outcomeLink.outcome.id}&include[]=assignments&per_page=100`)
       )))
     ))
     .then((responses) => {

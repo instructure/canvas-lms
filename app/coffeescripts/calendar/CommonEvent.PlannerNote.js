@@ -54,7 +54,7 @@ Object.assign(PlannerNote.prototype, {
     data.all_context_codes = data.context_code
 
     if (data.calendar_event) data = data.calendar_event
-    this.object = this.calendarEvent = data // eslint-disable-line no-multi-assign
+    this.object = this.calendarEvent = data
     if (data.id) this.id = `planner_note_${data.id}`
     this.title = data.title || 'Untitled'
     this.start = this.parseStartDate()

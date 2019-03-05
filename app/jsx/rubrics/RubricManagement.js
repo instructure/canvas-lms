@@ -30,7 +30,6 @@ export default class RubricManagement extends React.Component {
   }
 
   focusTab = _.memoize((ix) => () => {
-    // eslint-disable-next-line react/no-find-dom-node
     ReactDOM.findDOMNode(this.tabList._tabs[ix]).focus()
   })
 

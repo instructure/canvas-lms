@@ -66,7 +66,7 @@ test('calls checkMigration on mount if it has not been checked already', () => {
   const props = defaultProps()
   props.hasCheckedMigration = false
   props.checkMigration = sinon.spy()
-  const tree = enzyme.shallow(<MigrationSync {...props} />) // eslint-disable-line
+  const tree = enzyme.shallow(<MigrationSync {...props} />)
   equal(props.checkMigration.callCount, 1)
 })
 
@@ -74,6 +74,6 @@ test('does not call checkMigration on mount if it has been checked already', () 
   const props = defaultProps()
   props.hasCheckedMigration = true
   props.checkMigration = sinon.spy()
-  const tree = enzyme.shallow(<MigrationSync {...props} />) // eslint-disable-line
+  const tree = enzyme.shallow(<MigrationSync {...props} />)
   equal(props.checkMigration.callCount, 0)
 })

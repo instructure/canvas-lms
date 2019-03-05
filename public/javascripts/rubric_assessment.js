@@ -29,7 +29,7 @@ import 'jqueryui/dialog'
 import './jquery.instructure_misc_plugins' /* showIf */
 import './jquery.templateData'
 import './vendor/jquery.scrollTo'
-import 'compiled/jquery.rails_flash_notifications' // eslint-disable-line
+import 'compiled/jquery.rails_flash_notifications'
 import Rubric from 'jsx/rubrics/Rubric'
 import { fillAssessment, updateAssociationData } from 'jsx/rubrics/helpers'
 

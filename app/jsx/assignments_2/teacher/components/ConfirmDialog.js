@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {bool, func, string, object} from 'prop-types'
+import {bool, func, string, shape} from 'prop-types'
 import I18n from 'i18n!assignments_2'
 
 import Button from '@instructure/ui-buttons/lib/components/Button'
@@ -60,7 +60,7 @@ export default class ConfirmDialog extends React.Component {
     modalLabel: string, // defaults to heading
 
     // properties to pass to the modal
-    modalProps: object, // eslint-disable-line react/forbid-prop-types
+    modalProps: shape(Modal.propTypes),
 
     closeLabel: string,
 

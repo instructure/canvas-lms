@@ -32,7 +32,6 @@ const CurveGradesDialogManager = {
         pointsPossible === 0,
 
       onSelect(onClose) {
-        // eslint-disable-line consistent-return
         if (!isAdmin && assignment.inClosedGradingPeriod) {
           return $.flashError(
             I18n.t(

@@ -55,8 +55,8 @@ Object.assign(ToDoItem.prototype, {
     data.title = data.plannable.title
     data.url = data.html_url
 
-    this.object = this.calendarEvent = data // eslint-disable-line no-multi-assign
-    this.object.id = this.id = `${data.plannable_type}_${data.plannable_id}` // eslint-disable-line no-multi-assign
+    this.object = this.calendarEvent = data
+    this.object.id = this.id = `${data.plannable_type}_${data.plannable_id}`
     this.title = data.title || 'Untitled'
     this.start = this.parseStartDate()
     this.end = undefined

@@ -60,8 +60,7 @@ test('makePromisePool reports successes and failures correctly', (assert) => {
     if (num % 2 === 0) {
       return Promise.resolve({})
     } else {
-      // eslint-disable-next-line
-      return Promise.reject('odd number')
+      return Promise.reject('odd number') // eslint-disable-line prefer-promise-reject-errors
     }
   }
 
