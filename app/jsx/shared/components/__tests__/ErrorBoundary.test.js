@@ -18,11 +18,9 @@
 
 import '@instructure/ui-themes/lib/canvas'
 import React from 'react'
-import ReactDOM from 'react-dom'
 import ErrorBoundary from '../ErrorBoundary'
 import GenericErrorPage from '../GenericErrorPage'
-
-import $ from 'jquery'
+import {render} from 'react-testing-library'
 
 class ThrowsErrorComponent extends React.Component {
   componentDidMount() {
@@ -34,19 +32,6 @@ class ThrowsErrorComponent extends React.Component {
   }
 }
 
-beforeAll(() => {
-  const found = document.getElementById('fixtures')
-  if (!found) {
-    const fixtures = document.createElement('div')
-    fixtures.setAttribute('id', 'fixtures')
-    document.body.appendChild(fixtures)
-  }
-})
-
-afterEach(() => {
-  ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
-})
-
 const defaultGenericProps = {
   errorCategory: '404'
 }
@@ -57,30 +42,25 @@ const defaultProps = () => ({
 
 describe('ErrorBoundary', () => {
   test('renders the component', () => {
-    ReactDOM.render(
+    const {getByText} = render(
       <ErrorBoundary {...defaultProps()}>
         <div>Making sure this works</div>
-      </ErrorBoundary>,
-      document.getElementById('fixtures')
+      </ErrorBoundary>
     )
-    const element = $('#fixtures')
-    expect(element.text()).toEqual('Making sure this works')
+    expect(getByText('Making sure this works')).toBeInTheDocument()
   })
 
   test('renders the component when error is thrown', () => {
     // eslint-disable-next-line  no-undef
     spyOn(console, 'error') // In tests that you expect errors
-    ReactDOM.render(
+    const {getByText} = render(
       <ErrorBoundary errorComponent={<div>Making sure this does not work</div>}>
         <div>
           <div>Making sure this works</div>
           <ThrowsErrorComponent />
         </div>
-      </ErrorBoundary>,
-      document.getElementById('fixtures')
+      </ErrorBoundary>
     )
-
-    const element = $('#fixtures')
-    expect(element.text()).toEqual('Making sure this does not work')
+    expect(getByText('Making sure this does not work')).toBeInTheDocument()
   })
 })

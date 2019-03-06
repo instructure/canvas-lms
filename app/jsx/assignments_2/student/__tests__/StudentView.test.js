@@ -38,12 +38,47 @@ const mocks = [
   }
 ]
 
-it('renders normally', async () => {
-  const {getByTestId} = render(
-    <MockedProvider mocks={mocks} removeTypename addTypename>
+describe('Comments', () => {
+  it('renders normally', async () => {
+    const {getByTestId} = render(
+      <MockedProvider mocks={mocks} removeTypename addTypename>
+        <StudentView assignmentLid="7" />
+      </MockedProvider>
+    )
+
+    expect(
+      await waitForElement(() => getByTestId('assignments-2-student-view'))
+    ).toBeInTheDocument()
+  })
+
+  it('renders loading', async () => {
+    const {getByTitle} = render(
+      <MockedProvider mocks={mocks} removeTypename addTypename>
+        <StudentView assignmentLid="7" />
+      </MockedProvider>
+    )
+
+    expect(getByTitle('Loading')).toBeInTheDocument()
+  })
+})
+
+it('renders error', async () => {
+  const errorMock = [
+    {
+      request: {
+        query: STUDENT_VIEW_QUERY,
+        variables: {
+          assignmentLid: '7'
+        }
+      },
+      error: new Error('aw shucks')
+    }
+  ]
+  const {getByText} = render(
+    <MockedProvider mocks={errorMock} removeTypename addTypename>
       <StudentView assignmentLid="7" />
     </MockedProvider>
   )
 
-  expect(await waitForElement(() => getByTestId('assignments-2-student-view'))).toBeInTheDocument()
+  expect(await waitForElement(() => getByText('Something broke unexpectedly.'))).toBeInTheDocument()
 })

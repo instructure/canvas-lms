@@ -20,14 +20,25 @@ import React from 'react'
 import StudentContent from './components/StudentContent'
 import {string} from 'prop-types'
 import {Query} from 'react-apollo'
+import GenericErrorPage from '../../shared/components/GenericErrorPage/index'
+import errorShipUrl from './SVG/ErrorShip.svg'
 import {STUDENT_VIEW_QUERY} from './assignmentData'
+import LoadingIndicator from './components/LoadingIndicator'
 
 const StudentView = props => (
   <Query query={STUDENT_VIEW_QUERY} variables={{assignmentLid: props.assignmentLid}}>
     {({loading, error, data}) => {
-      // TODO HANDLE ERROR AND LOADING
-      if (loading) return null
-      if (error) return `Error!: ${error}`
+      if (loading) return <LoadingIndicator />
+      if (error) {
+        return (
+          <GenericErrorPage
+            imageUrl={errorShipUrl}
+            errorSubject="Assignments 2 Student initial query error"
+            errorCategory="Assignments 2 Student Error Page"
+          />
+        )
+      }
+
       document.title = data.assignment.name
       return <StudentContent assignment={data.assignment} />
     }}

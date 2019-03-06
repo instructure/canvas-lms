@@ -69,6 +69,53 @@ describe('Comments', () => {
     expect(getByTitle('Loading')).toBeInTheDocument()
   })
 
+  it('catches error when api returns incorrect data', async () => {
+    const noDataMocks = [
+      {
+        request: {
+          query: SUBMISSION_COMMENT_QUERY,
+          variables: {
+            submissionId: mockAssignment().submissionsConnection.nodes[0].id.toString()
+          }
+        },
+        result: {
+          data: null
+        }
+      }
+    ]
+    const {getByText} = render(
+      <MockedProvider mocks={noDataMocks} addTypename>
+        <Comments assignment={mockAssignment()} />
+      </MockedProvider>
+    )
+    expect(
+      await waitForElement(() => getByText('Something broke unexpectedly.'))
+    ).toBeInTheDocument()
+  })
+
+  it('renders error when query errors', async () => {
+    const errorMock = [
+      {
+        request: {
+          query: SUBMISSION_COMMENT_QUERY,
+          variables: {
+            submissionId: mockAssignment().submissionsConnection.nodes[0].id.toString()
+          }
+        },
+        error: new Error('aw shucks')
+      }
+    ]
+    const {getByText} = render(
+      <MockedProvider mocks={errorMock} removeTypename addTypename>
+        <Comments assignment={mockAssignment()} />
+      </MockedProvider>
+    )
+
+    expect(
+      await waitForElement(() => getByText('Something broke unexpectedly.'))
+    ).toBeInTheDocument()
+  })
+
   it('renders place holder text when no comments', async () => {
     const {getByText} = render(<CommentsContainer comments={[]} />)
 
