@@ -17,10 +17,13 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+require File.expand_path(File.dirname(__FILE__) + '/../../lti_1_3_spec_helper')
 require_dependency 'lti/tool_configuration'
 
 module Lti
   describe ToolConfiguration do
+    include_context 'lti_1_3_spec_helper'
+
     let(:public_jwk) do
       {
         "kty" => "RSA",
@@ -29,48 +32,6 @@ module Lti
         "kid" => "2018-09-18T21:55:18Z",
         "alg" => "RS256",
         "use" => "sig"
-      }
-    end
-    let(:settings) do
-      {
-        'title' => 'LTI 1.3 Tool',
-        'description' => '1.3 Tool',
-        'public_jwk' => public_jwk,
-        'target_link_uri' => 'http://lti13testtool.docker/blti_launch',
-        'custom_fields' => {'has_expansion' => '$Canvas.user.id', 'no_expansion' => 'foo'},
-        'extensions' =>  [
-          {
-            'platform' => 'canvas.instructure.com',
-            'privacy_level' => 'public',
-            'tool_id' => 'LTI 1.3 Test Tool',
-            'domain' => 'http://lti13testtool.docker',
-            'settings' =>  {
-              'icon_url' => 'https://static.thenounproject.com/png/131630-200.png',
-              'selection_height' => 500,
-              'selection_width' => 500,
-              'text' => 'LTI 1.3 Test Tool Extension text',
-              'placements' => [
-                {
-                  'placement' => 'course_navigation',
-                  'message_type' => 'LtiResourceLinkRequest',
-                  'canvas_icon_class' => 'icon-lti',
-                  'icon_url' => 'https://static.thenounproject.com/png/131630-211.png',
-                  'text' => 'LTI 1.3 Test Tool Course Navigation',
-                  'target_link_uri' => 'http://lti13testtool.docker/launch?placement=course_navigation',
-                  'enabled' => true
-                },
-                {
-                  'placement' => 'account_navigation',
-                  'message_type' => 'LtiResourceLinkRequest',
-                  'canvas_icon_class' => 'icon-lti',
-                  'icon_url' => 'https://static.thenounproject.com/png/131630-211.png',
-                  'text' => 'LTI 1.3 Test Tool Course Navigation',
-                  'enabled' => true
-                }
-              ]
-            }
-          }
-        ]
       }
     end
     let(:tool_configuration) { described_class.new(settings: settings) }
@@ -86,6 +47,25 @@ module Lti
         end
 
         it { is_expected.to eq true }
+      end
+
+      context 'with non-matching schema' do
+        let(:settings) do
+          s = super()
+          s.delete('target_link_uri')
+          s
+        end
+
+        before do
+          tool_configuration.developer_key = developer_key
+        end
+
+        it { is_expected.to eq false }
+
+        it 'is contains a message about missing target_link_uri' do
+          tool_configuration.valid?
+          expect(tool_configuration.errors[:configuration].first.message).to include('target_link_uri,')
+        end
       end
 
       context 'when developer_key already has a tool_config' do

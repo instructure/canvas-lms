@@ -69,6 +69,8 @@ module Lti
 
     def valid_configuration?
       errors.add(:configuration, '"public_jwk" must be present') if configuration['public_jwk'].blank?
+      schema_errors = Schemas::Lti::ToolConfiguration.simple_validation_errors(configuration)
+      errors.add(:configuration, schema_errors) if schema_errors.present?
       return if errors[:configuration].present?
 
       tool = new_external_tool(developer_key.owner_account)
