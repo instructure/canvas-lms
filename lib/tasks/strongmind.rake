@@ -62,4 +62,9 @@ namespace :strongmind do
     Setting.find_by_name("enable_page_views").delete
   end
 
+  desc "Truncate Canvas Analytics"
+  task :truncate_analytics => :environment do
+    PageView.connection.truncate(PageView.table_name)
+  end
+
 end
