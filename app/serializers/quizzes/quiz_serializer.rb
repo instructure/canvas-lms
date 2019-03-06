@@ -57,10 +57,9 @@ module Quizzes
       :course_quiz_quiz_submissions_url,
       :course_quiz_submission_versions_url
 
-    def_delegators :@object,
-      :context,
-      :submitted_students_visible_to,
-      :unsubmitted_students_visible_to
+    def context
+      quiz.context
+    end
 
     def_delegators :@quiz, :quiz_questions
 
