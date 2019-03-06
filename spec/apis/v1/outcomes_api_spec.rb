@@ -700,6 +700,44 @@ describe "Outcomes API", type: :request do
       end
     end
 
+    describe 'unpublished assignments and quizzes' do
+      before :once do
+        student_in_course(active_all: true)
+        observer_in_course(active_all: true).tap do |enrollment|
+          enrollment.update_attribute(:associated_user_id, @student.id)
+        end
+        @assignment = assignment_model({:course => @course})
+        @assignment.unpublish
+        outcome_with_rubric
+        @rubric.associate_with(@assignment, @course, purpose: 'grading')
+        quiz_with_submission(true, true)
+        @quiz.unpublish!
+        bank = @quiz.quiz_questions[0].assessment_question.assessment_question_bank
+        @outcome.align(bank, @course, :mastery_score => 6.0)
+      end
+
+      it "should not allow student to return aligned assignments" do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/outcome_alignments?student_id=#{@student.id}",
+                       :controller => 'outcomes_api',
+                       :action => 'outcome_alignments',
+                       :course_id => @course.id.to_s,
+                       :student_id => @student.id.to_s,
+                       :format => 'json')
+        expect(json.map{ |j| j["assignment_id"] }.sort).to eq([])
+      end
+
+      it "should allow teacher to return aligned assignments for a student" do
+        @user = @teacher
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/outcome_alignments?student_id=#{@student.id}",
+                       :controller => 'outcomes_api',
+                       :action => 'outcome_alignments',
+                       :course_id => @course.id.to_s,
+                       :student_id => @student.id.to_s,
+                       :format => 'json')
+        expect(json.map{ |j| j["assignment_id"] }.sort).to eq([@assignment.id, @quiz.assignment_id].sort)
+      end
+    end
+
     describe "alignments_for_student" do
       before :once do
         student_in_course(active_all: true)
