@@ -153,7 +153,7 @@ ar:
     tab_plugins: "مكونات إضافية"
     tab_question_banks: "بنوك الأسئلة"
     tab_root_accounts: "الحسابات الجذرية"
-    tab_rubrics: العناوين
+    tab_rubrics: "مقياس تقييم"
     tab_settings: إعدادات
     tab_sis_import: "استيراد SIS"
     tab_statistics: إحصاءات
@@ -1682,7 +1682,7 @@ ar:
   add_remove_or_rearrange_sections_for_this_portfoli_4628320a: "إضافة الأقسام الخاصة بهذه المحفظة أو إزالتها أو إعادة ترتيبها"
   add_review_2fb1590c: "إضافة مراجعة"
   add_role_3dc4d273: "إضافة دور"
-  add_rubric_3636d9a6: "إضافة عنوان"
+  add_rubric_3636d9a6: "إضافة مقياس تقييم"
   add_scope_a5208f8b: "إضافة نطاق"
   add_section_8b027a1c: "إضافة قسم"
   add_set_of_grading_periods_5b4d6e51: "إضافة مجموعة فترات تقييم الدرجات"
@@ -2843,7 +2843,7 @@ ar:
     edit: 
       edit_assignment: "تحرير التقييم"
       links: 
-        add_rubric: "تقييم روبرك"
+        add_rubric: "مقياس تقييم"
     edit_header_view: 
       buttons: 
         not_published: "غير منشور"
@@ -3102,7 +3102,7 @@ ar:
       due_at: "موعد الاستحقاق"
       for: "بالنسبة لـ"
       links: 
-        add_rubric: العنوان
+        add_rubric: "مقياس تقييم"
         assign_rubric: "تعيين العنوان"
         edit: "تحرير "
       manage: إدارة
@@ -3149,7 +3149,7 @@ ar:
           view_original_page: "عرض الصفحة الأصلية"
           view_quiz: "عرض إرسال الاختبار"
           view_survey: "عرض إرسال الاستبيان"
-        view_rubric_evaluation: "عرض تقييم العنوان"
+        view_rubric_evaluation: "مقياس تقييم العنوان"
       messages: 
         no_comments: "بدون تعليقات"
         submission_late_timestamp: "%{submitted_at} (متأخر)"
@@ -6785,11 +6785,11 @@ ar:
       not_weighted: "لم يتم تقييم مهام المساق."
     statistics: 
       active_students: "الطلاب النشطون"
-      all_rubrics: "كل العناوين"
+      all_rubrics: "كل مقياس تقييم"
       any: أي
       assignment_groups: "مجموعات المهام"
       assignments: المهام
-      course_rubrics: "عناوين المساق"
+      course_rubrics: "مقياس تقييم المساق"
       discussion_posts: "منشورات المناقشة"
       discussion_topic: "موضوع المناقشة"
       discussions: المناقشات
@@ -6962,7 +6962,7 @@ ar:
     quizzes: الاختبارات
     registered_services: "الخدمات المسجّلة"
     revisions: المراجعات
-    rubrics: العناوين
+    rubrics: "مقياس تقييم"
     settings: إعدادات
     site_admin: "مسؤول الموقع"
     stats: إحصاءات
@@ -7392,7 +7392,7 @@ ar:
   delete_rating_24876355: "حذف التصنيف"
   delete_requirement_bce2d943: "حذف متطلب"
   delete_role_label_succeeded_1690aa28: "تم حذف %{label} الدور بنجاح"
-  delete_rubric_9b66412d: "حذف العنوان"
+  delete_rubric_9b66412d: "حذف مقياس التقييم"
   delete_rubric_title_ac3a24e6: "حذف مقياس التقييم: %{title}"
   delete_section_name_a48d9d79: "حذف القسم \"%{name}\""
   delete_selected_a023ccf8: "حذف التحديد"
@@ -7511,8 +7511,8 @@ ar:
       يحدد إمكانية الرؤية والإدارة لعلامة تبويب الحصائل في لوحة تنقل الحساب.
       يسمح للمستخدم بإنشاء واستيراد وتحرير وحذف الحصائل ومجموعات الحصائل على مستويي الحساب والمساق.
   determines_visibility_and_management_of_rubrics_ta_88a65a22: |-
-      يحدد إمكانية الرؤية والإدارة لعلامة تبويب مقاييس التقييم في لوحة تنقل الحساب.
-      يسمح للمستخدم بإدارة مقاييس التقييم.
+      يحدد إمكانية الرؤية والإدارة لعلامة تبويب مقياس تقييم في لوحة تنقل الحساب.
+      يسمح للمستخدم بإدارة مقياس تقييم.
   determines_visibility_and_management_of_sis_import_a91ed255: "يحدد إمكانية الرؤية والإدارة لعلامة تبويب استيراد SIS في لوحة تنقل الحساب."
   determines_visibility_and_management_of_the_questi_fbf70ba9: "يحدد إمكانية الرؤية وإدارة ارتباط لوحة تنقل بنوك الأسئلة."
   determines_visibility_of_sis_import_tab_in_account_5180b8e8: |-
@@ -7818,7 +7818,7 @@ ar:
       other: "%{count} من الردود."
       zero: "لا توجد ردود."
     show: 
-      add_rubric: "إضافة العنوان"
+      add_rubric: "إضافة مقياس تقييم"
       announcement_closed: "هذا الإعلان مغلق للتعليقات"
       announcement_locked: "لن يكون محتوى هذا الإعلان مرئيًا للمستخدمين حتى %{date}"
       announcement_locked_until: "هذا الإعلان مؤمّن حتى %{time}"
@@ -7849,7 +7849,7 @@ ar:
       reply_to_message: "الرد على الرسالة الحالية"
       reply_to_topic: "الرد على الموضوع"
       retrieved_from_feed: "تم الاسترداد من %{feed}"
-      show_rubric: "إظهار العنوان"
+      show_rubric: "إظهار مقياس تقييم"
       speed_grader: SpeedGrader™
       topic: الموضوع
       topic_podcast_feed_link: "موجز Podcast للموضوع"
@@ -8204,8 +8204,8 @@ ar:
   edit_role_1e96ad20: "تحرير الدور"
   edit_rubric: 
     buttons: 
-      create_rubric: "إنشاء عنوان"
-      update_rubric: "تحديث العنوان"
+      create_rubric: "إنشاء مقياس تقييم"
+      update_rubric: "تحديث مقياس تقييم"
     change: تغيير
     discussion_points_possible: 
       few: "%{count} نقطة ممكنة"
@@ -8226,7 +8226,7 @@ ar:
     titles: 
       criterion_long_description: "وصف طويل للمعيار"
       edit_rubric_rating: "تحرير التصنيف"
-      find_existing_rubric: "البحث عن عنوان موجود"
+      find_existing_rubric: "البحث عن مقياس تقييم موجود"
   edit_rubric_title_104d6fd2: "تحرير مقياس التقييم: %{title}"
   edit_section_name_558cc89: "تحرير القسم \"%{name}\""
   edit_survey_b0d6890d: "تحرير الاستطلاع"
@@ -9297,7 +9297,7 @@ ar:
     messages: 
       loading_outcomes: "جارٍ تحميل النتائج..."
       no_outcomes_found: "لم يتم العثور على نتائج"
-      no_rubric_outcomes_found: "لم يتم العثور على نتائج تم تكوينها بواسطة العنوان"
+      no_rubric_outcomes_found: "لم يتم العثور على نتائج تم تكوينها بواسطة مقياس تقييم"
     titles: 
       find_outcome: "العثور على نتيجة"
   find_outcome_746cc57e: "العثور على نتيجة"
@@ -9524,7 +9524,7 @@ ar:
       aria_record: "انقر للتسجيل"
       aria_record_reset: "انقر للتسجيل"
       aria_stop: "اضغط على \"إيقاف\" لإنهاء التسجيل."
-    edit_view_rubric: "عرض العنوان"
+    edit_view_rubric: "عرض مقياس تقييم"
     errors: 
       no_points_possible: "يتعذر الانحناء دون النقاط الممكنة"
       none_to_update: "لا يوجد شيء لتحديثه"
@@ -9841,7 +9841,7 @@ ar:
       click_to_change: "انقر لاختبار درجة مختلفة"
       close_comments: إغلاق
       close_comments_label: "إغلاق التعليقات"
-      close_rubric: "إغلاق العنوان"
+      close_rubric: "إغلاق مقياس تقييم"
       close_score: إغلاق
       close_score_screenreader: "إغلاق تفاصيل الدرجات"
       collapse: "طي جميع مجموعات نتائج إتقان التعلم."
@@ -10017,7 +10017,7 @@ ar:
         leave_comment: "ترك التعليق"
         next_student: "الطالب القادم"
         previous_student: "الطالب السابق"
-        use_rubric: "استخدام عنوان"
+        use_rubric: "استخدام مقياس تقييم"
       keycodes: 
         change_grade: g
         leave_comment: c
@@ -11631,7 +11631,7 @@ ar:
         groups: "مجموعات الطلاب"
         learning_outcomes: "نتائج التعلم"
         quizzes: الاختبارات
-        rubrics: العناوين
+        rubrics: "مقياس تقييم"
         syllabus_body: "محتوى المنهاج"
         tool_profiles: "ملفات تعريف الأدوات"
         wikis: "صفحات Wiki"
@@ -13974,7 +13974,7 @@ ar:
     module_type: الوحدة
     quiz_question_type: "سؤال الاختبار"
     quiz_type: اختبار
-    rubric_type: العنوان
+    rubric_type: "مقياس تقييم"
     webct: 
       course_not_found: "لم يتم العثور على مساق Blackboard."
     wiki_page_type: "صفحة Wiki"
@@ -14537,7 +14537,7 @@ ar:
   no_way_to_export_gradebooks_provided_b4c2939d: "لا توجد طريقة متاحة لتصدير دفاتر الدرجات!"
   no_way_to_monitor_gradebook_exports_provided_b451236a: "لا توجد طريقة متاحة لمراقبة دفاتر الدرجات!"
   non_existent_content_referenced_in_this_resource_d86c6bcb: "تمت الإشارة إلى محتوى غير موجود في هذا المورد:"
-  non_scoring_rubrics_9f2033ad: "معايير تقييم بدون درجات"
+  non_scoring_rubrics_9f2033ad: "مقياس تقييم بدون درجات"
   nonce_77113ba4: الآن
   none_3b5e34d2: بلا
   none_9b6c9bec: بلا
@@ -14764,9 +14764,9 @@ ar:
       pseudonym_registration_done: "تم تسجيل الاسم المستعار"
       report_generated: "تم إنشاء التقرير"
       report_generation_failed: "فشل إنشاء التقرير"
-      rubric_assessment_invitation: "دعوة تقييم العنوان"
-      rubric_assessment_submission_reminder: "تذكير بإرسال تقييم العنوان"
-      rubric_association_created: "تم إنشاء رابطة العنوان"
+      rubric_assessment_invitation: "دعوة تقييم مقياس تقييم"
+      rubric_assessment_submission_reminder: "تذكير بإرسال تقييم مقياس تقييم"
+      rubric_association_created: "تم إنشاء رابطة مقياس تقييم"
       submission_comment: "تعليق الإرسال"
       submission_comment_for_teacher: "تعليق الإرسال للمعلم"
       submission_grade_changed: "تم تغيير درجات الإرسال"
@@ -15252,7 +15252,7 @@ ar:
         latest_score: "النقاط الأخيرة"
         outcome: الناتج
   outcomes_and_rubrics_account_course_68d0bf1d: "الحصائل ومقاييس التقييم (الحساب/المساق)"
-  outcomes_and_rubrics_f893d141: "الحصائل والمقاييس"
+  outcomes_and_rubrics_f893d141: "الحصائل ومقاييس التقييم"
   outcomes_are_created_here_to_track_mastery_in_a_co_2f487549: "يتم إنشاء النواتج هنا لتتبع الإجادة في أي مساق. لبدء العمل، افحص شريط القائمة على طول الجزء العلوي. انقر فوق زر ناتج جديد لإنشاء ناتج جديدة، أو زر مجموعة جديدة لإنشاء مجموعة جديدة لتنظيم النواتج فيها. سيتيح لك الزر \"بحث\" استخدام النواتج التي تم إنشاؤها بواسطة الولاية أو المؤسسة. بينما تقوم بإنشاء واستخدام النواتج، سيكون بإمكانك استخدام اللوحة الموجودة إلى اليسار للتنقل عبر النواتج الخاصة بك. يمكنك سحب وإفلات النواتج بين المستويات المختلفة لإنشاء البنية."
   outcomes_csv_format_9005acfb: "تنسيق CSV للنواتج"
   outcomes_d1b18d33: النتائج
@@ -17733,7 +17733,7 @@ ar:
           preview: المعاينة
           quiz_statistics: "إحصاءات الاختبار"
           see_full_quiz: "رؤية الاختبار الكامل"
-          show_assignment_rubric: "إظهار العنوان"
+          show_assignment_rubric: "إظهار مقياس تقييم"
           show_student_quiz_results: "إظهار نتائج اختبار الطالب"
           show_student_survey_results: "إظهار نتائج استطلاع الطالب"
           survey_statistics: "إحصاءات الاستطلاع"
@@ -17840,7 +17840,7 @@ ar:
     rubric: 
       loading: "جارٍ التحميل..."
       titles: 
-        details: "تفاصيل عنوان المهمة"
+        details: "تفاصيل مقياس تقييم المهمة"
     show: 
       answers: 
         correct: صحيح!
@@ -18242,7 +18242,7 @@ ar:
   remove_text_8e485c41: "إزالة %{text}"
   remove_these_dates_48453a81: "إزالة هذه التواريخ"
   remove_this_item_from_the_module_4b2ceab7: "إزالة هذا العنصر من الوحدة"
-  remove_this_rubric_from_my_list_c7d80704: "إزالة هذا العنوان من قائمتي"
+  remove_this_rubric_from_my_list_c7d80704: "إزالة هذا مقياس تقييم من قائمتي"
   remove_this_section_9a88ca43: "إزالة هذا القسم"
   removed_course_association_course_a233342c: "اقتران المساق الذي تمت إزالته %{course}"
   removed_user_as_group_leader_bb69330f: "تمت إزالة %{user} كقائد مجموعة"
@@ -18497,7 +18497,7 @@ ar:
   rsa_sha256_3d41d605: RSA-SHA256
   rss_feed_cf6286b3: "موجز RSS"
   rubric: 
-    context_name_rubric: "عنوان %{course_name}"
+    context_name_rubric: "مقياس تقييم %{course_name}"
     no_description: "بلا وصف"
     unknown_details: "تفاصيل غير معروفة"
   rubric_assessment: 
@@ -18512,18 +18512,18 @@ ar:
   rubric_created_64980593: "تم إنشاء مقياس تقييم"
   rubric_criterion_range_12499bf1: "نطاق معيار التقييم"
   rubric_deleted_3d9efc18: "تم حذف مقياس تقييم"
-  rubric_fc39da76: "معايير التقييم"
+  rubric_fc39da76: "مقياس تقييم"
   rubric_updated_103e24dc: "تم تحديث مقياس تقييم"
   rubrics: 
     index: 
-      account_rubrics: "عناوين الحساب"
+      account_rubrics: "مقياس تقييم الحساب"
       are_you_sure_prompt: "هل ترغب بالتأكيد في حذف هذا العنوان؟  لا يزال يتعين الوصول إلى العنوان في أي مكان يتم استخدامه حاليًا، لكن لن يستطيع أي شخص آخر استخدامه."
       buttons: 
-        add_rubric: "إضافة عنوان"
-      course_rubrics: "عناوين المساق"
+        add_rubric: "إضافة مقياس تقييم"
+      course_rubrics: "مقياس تقييم المساق"
       delete_rubric: "حذف العنوان"
       edit_rubric: "تحرير العنوان"
-      page_title: العناوين
+      page_title: "مقياس تقييم"
       points_possible: 
         few: "%{count} من النقاط ممكنة"
         many: "%{count} من النقاط ممكنة"
@@ -18531,25 +18531,25 @@ ar:
         other: "%{count} من النقاط ممكنة"
         two: "%{count} من النقاط ممكنة"
         zero: "%{count} من النقاط ممكنة"
-      user_rubrics: "عناوين المستخدمين"
+      user_rubrics: "مقياس تقييم المستخدمين"
     loading: "جارٍ التحميل..."
     show: 
       buttons: 
-        delete: "حذف العنوان"
+        delete: "حذف مقياس تقييم"
       prompts: 
         are_you_sure_delete: "هل ترغب بالتأكيد في حذف هذا العنوان؟  لا يزال يتعين الوصول إلى العنوان في أي مكان يتم استخدامه حاليًا، لكن لن يستطيع أي شخص آخر استخدامه."
-      rubric_can_not_modify: "لا يمكن تعديل العناوين بمجرد استخدامها في أكثر من مكان واحد."
+      rubric_can_not_modify: "لا يمكن تعديل مقياس تقييم بمجرد استخدامها في أكثر من مكان واحد."
       titles: 
-        edit_rubric: "تحرير العنوان"
+        edit_rubric: "تحرير مقياس تقييم"
     titles: 
       assignment_rubric_details: "تفاصيل عنوان المهمة"
     user_index: 
       buttons: 
-        add_rubric: "إضافة العنوان"
-      delete_rubric: "حذف العنوان"
+        add_rubric: "إضافة مقياس تقييم"
+      delete_rubric: "حذف مقياس تقييم"
       headings: 
-        user_rubrics: "عناوين المستخدمين"
-      page_title: العناوين
+        user_rubrics: "مقياس تقييم المستخدمين"
+      page_title: "مقياس تقييم"
       points_possible: 
         few: "%{count} نقاط ممكنة"
         many: "%{count} نقاط ممكنة"
@@ -18560,11 +18560,11 @@ ar:
       prompts: 
         are_you_sure_delete: "هل ترغب بالتأكيد في حذف هذا العنوان؟  أي مكان ما زال يستخدم العنوان حاليًا سيظل قادرًا على الوصول لهذا العنوان، لكن لن يستطيع أي شخص آخر استخدامه."
         are_you_sure_remove: "هل ترغب بالتأكيد في إزالة هذا العنوان من قائمتك؟"
-      remove_rubric: "إزالة هذا العنوان من قائمتي"
-  rubrics_add_edit_delete_8299eff7: "معايير التقدم - إضافة / تحرير / حذف"
+      remove_rubric: "إزالة هذا مقياس تقييم من قائمتي"
+  rubrics_add_edit_delete_8299eff7: "مقياس تقييم - إضافة / تحرير / حذف"
   rubrics_and_speedgrader_ececaed4: "مقاييس التقييم و SpeedGrader"
-  rubrics_b5ef369b: "معايير التقييم"
-  rubrics_speedgrader_a6ebec57: "معايير التقييم، SpeedGrader"
+  rubrics_b5ef369b: "مقياس تقييم"
+  rubrics_speedgrader_a6ebec57: "مقياس تقييم، SpeedGrader"
   running_c5a4998d: "جارٍ التشغيل"
   russia_7_87bc99d5: "روسيا (+7)"
   rwanda_250_1a6b344b: "رواندا (+250)"
@@ -19551,28 +19551,28 @@ ar:
       sidebar_content: "محتوى الشريط الجانبي"
     rubric: 
       buttons: 
-        create: "إنشاء العنوان"
+        create: "إنشاء مقياس تقييم"
       defaults: 
-        rubric_title: "عنوان ما"
+        rubric_title: "مقياس تقييم ما"
       headers: 
         criteria: المعايير
         points: نقاط
         ratings: التصنيفات
       labels: 
         custom_rating: "سأكتب تعليقات بدون نماذج عند تقييم الطلاب"
-        grading_rubric: "استخدام هذا العنوان تقييم درجات المهمة"
+        grading_rubric: "استخدام هذا مقياس تقييم تقييم درجات المهمة"
         total_points: "إجمالي النقاط"
         totallying_rubric: "إخفاء إجمالي النقاط لنتائج التقييم"
       links: 
         add_criterion: المعيار
-        delete: "حذف العنوان"
-        edit: "تحرير العنوان"
-        find_a_rubric: "العثور على عنوان"
-        find_another_rubric: "العثور على عنوان آخر"
+        delete: "حذف مقياس تقييم"
+        edit: "تحرير مقياس تقييم"
+        find_a_rubric: "العثور على مقياس تقييم"
+        find_another_rubric: "العثور على مقياس تقييم آخر"
         find_outcome: "العثور على نتيجة"
-        find_rubric: "العثور على العنوان"
+        find_rubric: "العثور على مقياس تقييم"
       messages: 
-        locked: "لا يمكن تغيير عنوان بمجرد أن تبدأ في استخدامه."
+        locked: "لا يمكن تغيير مقياس تقييم بمجرد أن تبدأ في استخدامه."
         rubric_in_use: 
           few: "ضع في الاعتبار أن %{count} من الطلاب قد تم تقييمهم باستخدام نموذج التقييم هذا. سيؤدي تغييره إلى التأثير على تقييمهم. "
           many: "ضع في الاعتبار أن %{count} من الطلاب قد تم تقييمهم باستخدام نموذج التقييم هذا. سيؤدي تغييره إلى التأثير على تقييمهم. "
@@ -19580,13 +19580,13 @@ ar:
           other: "ضع في الاعتبار أن %{count} من الطلاب قد تم تقييمهم باستخدام نموذج التقييم هذا. سيؤدي تغييره إلى التأثير على تقييمهم. "
           two: "ضع في الاعتبار أن %{count} من الطلاب قد تم تقييمهم باستخدام نموذج التقييم هذا. سيؤدي تغييره إلى التأثير على تقييمهم. "
           zero: "ضع في الاعتبار أن %{count} من الطلاب قد تم تقييمهم باستخدام نموذج التقييم هذا. سيؤدي تغييره إلى التأثير على تقييمهم."
-        rubric_in_use2: "لقد قمت بتصنيف الطلاب بالفعل باستخدام هذا العنوان. وقد تؤثر أي تغييرات رئيسية على نتائج التقييم."
+        rubric_in_use2: "لقد قمت بتصنيف الطلاب بالفعل باستخدام هذا مقياس تقييم. وقد تؤثر أي تغييرات رئيسية على نتائج التقييم."
       out_of: "%{points} *من %{total}*"
-      rubric: العنوان
+      rubric: "مقياس تقييم"
       rubric_title: العنوان
       title: "العنوان:"
       titles: 
-        find_existing_rubric: "بحث عن العنوان الحالي"
+        find_existing_rubric: "بحث عن مقياس تقييم الحالي"
     rubric_criterion: 
       defaults: 
         description: "وصف المعيار"
@@ -19625,13 +19625,13 @@ ar:
         long_description: "الوصف الطويل"
     rubric_dialog: 
       buttons: 
-        use_this_rubric: "استخدام هذا العنوان"
+        use_this_rubric: "استخدام هذا مقياس تقييم"
       criterion_count: "%{count} معيارًا (معايير)"
       links: 
-        manage_rubrics: "إدارة العناوين"
+        manage_rubrics: "إدارة مقياس تقييم"
       points_possible: "%{points} نقطة (نقاط) ممكنة"
       titles: 
-        find_a_rubric: "العثور على عنوان"
+        find_a_rubric: "العثور على مقياس تقييم"
     rubric_forms: 
       criteria_description_label: "وصف المعيار"
       points: "%{points} نقطة (نقاط)"
@@ -19646,7 +19646,7 @@ ar:
       labels: 
         total_points: "إجمالي النقاط"
       points_out_of: "*%{points}* من **%{total}**"
-      rubric: العنوان
+      rubric: "مقياس تقييم"
     rubric_summary_criterion: 
       defaults: 
         description: "وصف المعيار"
@@ -19662,7 +19662,7 @@ ar:
         linked_to_learning_outcome: "يتم ربط هذا المعيار بناتج تعلم"
     rubrics_component: 
       links: 
-        assign_rubric: "تعيين العنوان"
+        assign_rubric: "تعيين مقياس تقييم"
     select_content_dialog: 
       add_to_module: "إضافة %{item} إلى *الوحدة*"
       assignment_item: المهمة
@@ -20382,7 +20382,7 @@ ar:
     submitted: "تم الإرسال:"
     this_was_submitted_multiple_times_choose_a_submission_to_view: "تم الإرسال لعدة مرات، اختر ما تريد عرضه:"
     update_grade: "تحديث الدرجة"
-    view_rubric_assessment_in_the_speedgrader: "عرض تقييم العنوان في SpeedGrader"
+    view_rubric_assessment_in_the_speedgrader: "عرض تقييم مقياس تقييم في SpeedGrader"
   submission_failed_to_submit_8de4efcd: "تعذر إرسال الإرسال"
   submission_in_another_grading_period_e754b329: "الإرسال في مرحلة تقييم أخرى"
   submission_index_e960f9bf: "إرسال %{index}"
@@ -20426,7 +20426,7 @@ ar:
         save_comment: "حفظ التعليق"
       crumbs: 
         assignments: المهام
-      hide_rubric_button: "إخفاء عنوان"
+      hide_rubric_button: "إخفاء مقياس تقييم"
       labels: 
         add_a_comment: "إضافة تعليق"
         grade: الدرجة
@@ -20448,7 +20448,7 @@ ar:
       peer_review_steps_complete: "لقد انتهيت من الخطوات المطلوبة لهذه المراجعة النظيرة."
       see_vericite_results: "عرض نتائج VeriCite"
       sent_to_whole_group: "إرسال تعليق إلى المجموعة بأكملها"
-      show_rubric: "إظهار العنوان"
+      show_rubric: "إظهار مقياس تقييم"
       speedgrader: SpeedGrader™
       student_mute_notification: "تعد الدرجات غير متاحة لأن المعلم يقوم بإعدادها الآن."
       submission_details: "تفاصيل الإرسال"
