@@ -49,22 +49,26 @@ module Lti
               'selection_height' => 500,
               'selection_width' => 500,
               'text' => 'LTI 1.3 Test Tool Extension text',
-              'course_navigation' =>  {
-                'message_type' => 'LtiResourceLinkRequest',
-                'canvas_icon_class' => 'icon-lti',
-                'icon_url' => 'https://static.thenounproject.com/png/131630-211.png',
-                'text' => 'LTI 1.3 Test Tool Course Navigation',
-                'url' =>
-                'http://lti13testtool.docker/launch?placement=course_navigation',
-                'enabled' => true
-              },
-              'account_navigation' =>  {
-                'message_type' => 'LtiResourceLinkRequest',
-                'canvas_icon_class' => 'icon-lti',
-                'icon_url' => 'https://static.thenounproject.com/png/131630-211.png',
-                'text' => 'LTI 1.3 Test Tool Course Navigation',
-                'enabled' => true
-              }
+              'placements' => [
+                {
+                  'placement' => 'course_navigation',
+                  'message_type' => 'LtiResourceLinkRequest',
+                  'canvas_icon_class' => 'icon-lti',
+                  'icon_url' => 'https://static.thenounproject.com/png/131630-211.png',
+                  'text' => 'LTI 1.3 Test Tool Course Navigation',
+                  'url' =>
+                  'http://lti13testtool.docker/launch?placement=course_navigation',
+                  'enabled' => true
+                },
+                {
+                  'placement' => 'account_navigation',
+                  'message_type' => 'LtiResourceLinkRequest',
+                  'canvas_icon_class' => 'icon-lti',
+                  'icon_url' => 'https://static.thenounproject.com/png/131630-211.png',
+                  'text' => 'LTI 1.3 Test Tool Course Navigation',
+                  'enabled' => true
+                }
+              ]
             }
           }
         ]
@@ -116,7 +120,7 @@ module Lti
             settings.delete('launch_url')
             settings['extensions'].first.delete('domain')
             settings['extensions'].first.delete('launch_url')
-            settings['extensions'].first.dig('settings', 'course_navigation').delete('url')
+            settings['extensions'].first['settings']['placements'].first.delete('url')
           end
 
           it { is_expected.to eq false }
@@ -269,6 +273,26 @@ module Lti
           end
         end
 
+        context 'placements in root of settings' do
+          let(:settings) do
+            s = super()
+            s['extensions'].first['settings']['collaboration'] = {
+              'message_type' => 'LtiResourceLinkRequest',
+              'canvas_icon_class' => 'icon-lti',
+              'icon_url' => 'https://static.thenounproject.com/png/131630-211.png',
+              'text' => 'LTI 1.3 Test Tool Course Navigation',
+              'url' =>
+              'http://lti13testtool.docker/launch?placement=collaboration',
+              'enabled' => true
+            }
+            s
+          end
+
+          it 'removes the placement' do
+            expect(subject.settings.keys).not_to include 'collaboration'
+          end
+        end
+
         context 'when no privacy level is set' do
           before { tool_configuration.privacy_level = nil }
 
@@ -333,7 +357,7 @@ module Lti
         context 'placements' do
           subject{ tool_configuration.new_external_tool(context).settings['course_navigation'] }
 
-          let(:placement_settings) { extensions.dig('settings', 'course_navigation') }
+          let(:placement_settings) { extensions['settings']['placements'].first }
 
           it 'uses the correct icon class' do
             expect(subject['canvas_icon_class']).to eq placement_settings['canvas_icon_class']

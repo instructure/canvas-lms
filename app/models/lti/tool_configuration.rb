@@ -89,7 +89,14 @@ module Lti
     def canvas_extensions
       return {} if settings.blank?
       extension = settings['extensions']&.find { |e| e['platform'] == CANVAS_EXTENSION_LABEL } || { 'settings' => {} }
-      extension['settings'].delete_if { |placement| disabled_placements&.include?(placement.to_s) }
+      # remove any placements at the root level
+      extension['settings'].delete_if { |p| Lti::ResourcePlacement::PLACEMENTS.include?(p.to_sym) }
+      # ensure we only have enabled placements being added
+      extension['settings'].fetch('placements', []).delete_if { |placement| disabled_placements&.include?(placement['placement']) }
+      # readd valid placements to root settings hash
+      extension['settings'].fetch('placements', []).each do |p|
+        extension['settings'][p['placement']] = p
+      end
       extension
     end
 
