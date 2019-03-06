@@ -206,8 +206,8 @@ class Notification < ActiveRecord::Base
     end
   end
 
-  def default_frequency(_user = nil)
-    # user arg is used in plugins
+  def default_frequency(user = nil)
+    return FREQ_NEVER if user&.default_notifications_disabled?
     case category
     when 'All Submissions'
       FREQ_NEVER

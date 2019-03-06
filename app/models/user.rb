@@ -1510,6 +1510,16 @@ class User < ActiveRecord::Base
     preferences[:create_announcements_unlocked] = bool
   end
 
+  def default_notifications_disabled=(val)
+    # if this is set then all notifications will be disabled by default
+    # for the user and will need to be explicitly enabled
+    preferences[:default_notifications_disabled] = val
+  end
+
+  def default_notifications_disabled?
+    !!preferences[:default_notifications_disabled]
+  end
+
   def use_new_conversations?
     true
   end
