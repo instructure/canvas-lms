@@ -231,6 +231,10 @@ class RubricAssessment < ActiveRecord::Base
     @serialization_methods || []
   end
 
+  def score
+    self[:score]&.round(4)
+  end
+
   def assessor_name
     self.assessor.short_name rescue t('unknown_user', "Unknown User")
   end
