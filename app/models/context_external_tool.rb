@@ -407,7 +407,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def login_or_launch_uri(extension_type: nil, content_tag_uri: nil)
-    use_1_3? && developer_key&.oidc_login_uri ||
+    use_1_3? && developer_key&.oidc_initiation_url ||
     content_tag_uri ||
     extension_setting(extension_type, :target_link_uri) ||
     url

@@ -89,15 +89,15 @@ describe ContextExternalTool do
     end
 
     context 'lti_1_3 tool' do
-      let(:oidc_login_uri) { 'http://www.test.com/oidc/login' }
+      let(:oidc_initiation_url) { 'http://www.test.com/oidc/login' }
 
       before do
         tool.settings['use_1_3'] = true
-        developer_key.update!(oidc_login_uri: oidc_login_uri)
+        developer_key.update!(oidc_initiation_url: oidc_initiation_url)
       end
 
       it 'returns the oidc login url' do
-        expect(tool.login_or_launch_uri).to eq oidc_login_uri
+        expect(tool.login_or_launch_uri).to eq oidc_initiation_url
       end
     end
   end

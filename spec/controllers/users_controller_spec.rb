@@ -112,7 +112,7 @@ describe UsersController do
         expect(cached_launch["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
       end
 
-      it 'does not use the oidc_login_uri as the resource_url' do
+      it 'does not use the oidc_initiation_url as the resource_url' do
         expect(assigns[:lti_launch].resource_url).to eq tool.url
       end
 
@@ -121,12 +121,12 @@ describe UsersController do
         expect(message_hint['canvas_domain']).to eq 'localhost'
       end
 
-      context 'when the developer key has an oidc_login_uri' do
-        let(:developer_key) { DeveloperKey.create!(oidc_login_uri: oidc_login_uri) }
-        let(:oidc_login_uri) { 'https://www.test.com/oidc/login' }
+      context 'when the developer key has an oidc_initiation_url' do
+        let(:developer_key) { DeveloperKey.create!(oidc_initiation_url: oidc_initiation_url) }
+        let(:oidc_initiation_url) { 'https://www.test.com/oidc/login' }
 
-        it 'uses the oidc_login_uri as the resource_url' do
-          expect(assigns[:lti_launch].resource_url).to eq oidc_login_uri
+        it 'uses the oidc_initiation_url as the resource_url' do
+          expect(assigns[:lti_launch].resource_url).to eq oidc_initiation_url
         end
       end
     end
