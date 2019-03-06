@@ -74,7 +74,7 @@ describe ContextExternalTool do
 
       before do
         tool.editor_button = {
-          "url" => placement_url,
+          "target_link_uri" => placement_url,
           "text" => "LTI 1.3 twoa",
           "enabled" => true,
           "icon_url" => "https://static.thenounproject.com/png/131630-200.png",

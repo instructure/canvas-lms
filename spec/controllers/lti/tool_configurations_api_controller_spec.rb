@@ -367,7 +367,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       it 'updates the tool configuration' do
         subject
         new_settings = config_from_response.settings
-        expect(new_settings['launch_url']).to eq new_url
+        expect(new_settings['target_link_uri']).to eq new_url
       end
 
       it 'sets the privacy level' do

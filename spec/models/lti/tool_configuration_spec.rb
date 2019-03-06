@@ -36,7 +36,7 @@ module Lti
         'title' => 'LTI 1.3 Tool',
         'description' => '1.3 Tool',
         'public_jwk' => public_jwk,
-        'launch_url' => 'http://lti13testtool.docker/blti_launch',
+        'target_link_uri' => 'http://lti13testtool.docker/blti_launch',
         'custom_fields' => {'has_expansion' => '$Canvas.user.id', 'no_expansion' => 'foo'},
         'extensions' =>  [
           {
@@ -56,8 +56,7 @@ module Lti
                   'canvas_icon_class' => 'icon-lti',
                   'icon_url' => 'https://static.thenounproject.com/png/131630-211.png',
                   'text' => 'LTI 1.3 Test Tool Course Navigation',
-                  'url' =>
-                  'http://lti13testtool.docker/launch?placement=course_navigation',
+                  'target_link_uri' => 'http://lti13testtool.docker/launch?placement=course_navigation',
                   'enabled' => true
                 },
                 {
@@ -117,10 +116,10 @@ module Lti
 
         context 'when no URL or domain is set' do
           before do
-            settings.delete('launch_url')
+            settings.delete('target_link_uri')
             settings['extensions'].first.delete('domain')
-            settings['extensions'].first.delete('launch_url')
-            settings['extensions'].first['settings']['placements'].first.delete('url')
+            settings['extensions'].first.delete('target_link_uri')
+            settings['extensions'].first['settings']['placements'].first.delete('target_link_uri')
           end
 
           it { is_expected.to eq false }
@@ -178,14 +177,14 @@ module Lti
         end
 
         it 'fetches JSON from the URL' do
-          expect(subject.settings['launch_url']).to eq settings['launch_url']
+          expect(subject.settings['target_link_uri']).to eq settings['target_link_uri']
         end
 
         context 'when a timeout occurs' do
           before { allow_any_instance_of(Net::HTTP).to receive(:request).and_raise(Timeout::Error) }
 
           it 'raises exception if timeout occurs' do
-            expect(subject.errors[:settings_url]).to include 'Could not retrieve settings, the server response timed out.'
+            expect(subject.errors[:configuration_url]).to include 'Could not retrieve settings, the server response timed out.'
           end
         end
 
@@ -205,7 +204,7 @@ module Lti
             end
 
             it 'adds a "not found error to the model' do
-              expect(subject.errors[:settings_url]).to include 'Not found'
+              expect(subject.errors[:configuration_url]).to include 'Not found'
             end
           end
 
@@ -216,7 +215,7 @@ module Lti
             end
 
             it 'adds a "unauthorized error to the model' do
-              expect(subject.errors[:settings_url]).to include 'Unauthorized'
+              expect(subject.errors[:configuration_url]).to include 'Unauthorized'
             end
           end
 
@@ -227,7 +226,7 @@ module Lti
             end
 
             it 'adds a "internal server error to the model' do
-              expect(subject.errors[:settings_url]).to include 'Internal server error'
+              expect(subject.errors[:configuration_url]).to include 'Internal server error'
             end
           end
 
@@ -238,7 +237,7 @@ module Lti
             end
 
             it 'adds an error to the model' do
-              expect(subject.errors[:settings_url]).to include 'Content type must be "application/json"'
+              expect(subject.errors[:configuration_url]).to include 'Content type must be "application/json"'
             end
           end
         end
@@ -281,7 +280,7 @@ module Lti
               'canvas_icon_class' => 'icon-lti',
               'icon_url' => 'https://static.thenounproject.com/png/131630-211.png',
               'text' => 'LTI 1.3 Test Tool Course Navigation',
-              'url' =>
+              'target_link_uri' =>
               'http://lti13testtool.docker/launch?placement=collaboration',
               'enabled' => true
             }
@@ -311,7 +310,7 @@ module Lti
         end
 
         it 'uses the correct launch url' do
-          expect(subject.url).to eq settings['launch_url']
+          expect(subject.url).to eq settings['target_link_uri']
         end
 
         it 'uses the correct domain' do
@@ -375,8 +374,8 @@ module Lti
             expect(subject['text']).to eq placement_settings['text']
           end
 
-          it 'uses the correct url' do
-            expect(subject['url']).to eq placement_settings['url']
+          it 'uses the correct target_link_uri' do
+            expect(subject['target_link_uri']).to eq placement_settings['target_link_uri']
           end
 
           it 'uses the correct value for enabled' do

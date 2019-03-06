@@ -135,7 +135,8 @@ class ContextExternalTool < ActiveRecord::Base
       :selection_width,
       :text,
       :windowTarget,
-      :url
+      :url,
+      :target_link_uri
     ]
 
     if custom_keys = CUSTOM_EXTENSION_KEYS[type]
@@ -178,7 +179,7 @@ class ContextExternalTool < ActiveRecord::Base
   def url_or_domain_is_set
     placements = Lti::ResourcePlacement::PLACEMENTS
     # url or domain (or url on canvas lti extension) is required
-    if url.blank? && domain.blank? && placements.all?{|k| !settings[k] || settings[k]['url'].blank? }
+    if url.blank? && domain.blank? && placements.all?{|k| !settings[k] || (settings[k]['url'].blank? && settings[k]['target_link_uri'].blank?) }
       errors.add(:url, t('url_or_domain_required', "Either the url or domain should be set."))
       errors.add(:domain, t('url_or_domain_required', "Either the url or domain should be set."))
     end
@@ -186,8 +187,14 @@ class ContextExternalTool < ActiveRecord::Base
 
   def validate_urls
     (
-      [url] + Lti::ResourcePlacement::PLACEMENTS.map { |p| settings[p]&.with_indifferent_access&.fetch('url', nil) }
-    ).compact.map { |u| validate_url(u) }
+      [url] + Lti::ResourcePlacement::PLACEMENTS.map do |p|
+        settings[p]&.with_indifferent_access&.fetch('url', nil) ||
+        settings[p]&.with_indifferent_access&.fetch('target_link_uri', nil)
+
+      end
+    ).
+      compact.
+      map { |u| validate_url(u) }
   end
   private :validate_urls
 
@@ -402,13 +409,15 @@ class ContextExternalTool < ActiveRecord::Base
   def login_or_launch_uri(extension_type: nil, content_tag_uri: nil)
     use_1_3? && developer_key&.oidc_login_uri ||
     content_tag_uri ||
-    extension_setting(extension_type, :url) ||
+    extension_setting(extension_type, :target_link_uri) ||
     url
   end
 
   def extension_default_value(type, property)
     case property
       when :url
+        url
+      when :target_link_uri
         url
       when :selection_width
         800

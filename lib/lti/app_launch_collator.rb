@@ -82,7 +82,7 @@ module Lti
         if tool.has_placement?(p)
           definition[:placements][p.to_sym] = {
             message_type: tool.extension_setting(p, :message_type) || tool.extension_default_value(p, :message_type),
-            url: tool.extension_setting(p, :url) || tool.extension_default_value(p, :url),
+            url: tool.extension_setting(p, :url) || tool.extension_default_value(p, :url) || tool.extension_default_value(p, :target_link_uri),
             title: tool.label_for(p, I18n.locale || I18n.default_locale.to_s),
           }
           if p.to_sym == :resource_selection || definition[:placements][p.to_sym][:message_type] == 'ContentItemSelection'
