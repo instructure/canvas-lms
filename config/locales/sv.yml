@@ -401,8 +401,8 @@ sv:
       enrollment_state: "Inkludera registreringstillstånd: sant;"
       enrollment_states: "Registreringstillstånd: %{states};"
   account_reports_eeb41194: Kontorapporter
-  account_roles_10fea071: "Roller på konto"
-  account_roles_d13f8f75: "Roller på konto"
+  account_roles_10fea071: "Konto roller"
+  account_roles_d13f8f75: "Konto roller"
   account_rubrics_40c190a8: "Matriser på kontot"
   account_settings: 
     account: Konto
@@ -6414,7 +6414,7 @@ sv:
         navigation: Kursnavigering
         sections: Kurssektioner
       help: 
-        edit_navigation: "Dra och släpp föremål för att omorganisera dem i kursnavigeringen."
+        edit_navigation: "Dra och släpp förmål i kursnavigeringen att orgaisera om dem."
       images: 
         alt: 
           delete: Radera
@@ -11060,7 +11060,7 @@ sv:
   keyboard_shortcuts_ed1844bd: Kortkommandon
   kind_7f0a88c4: Sort
   labels: 
-    lock_module_until: "Lås tills"
+    lock_module_until: "Lås till"
   last_assessment_cd5659b6: "Senaste bedömning: "
   last_changed_b544504d: "Senast ändrad:"
   last_changed_date_82f1ce56: "Senast ändrad: %{date}"
@@ -11735,7 +11735,7 @@ sv:
   message_students_dialog: 
     recipients: "Mottagare:"
   message_students_who_369b8488: "Meddela studenter som..."
-  message_students_who_57f07a41: "Meddela stunder som"
+  message_students_who_57f07a41: "Meddela studenter som"
   message_text_5f692459: Meddelandetext
   message_this_student_6d14043d: "Meddela den här studenten"
   message_will_be_sent_to_all_the_teachers_and_teach_1b8d17c1: "Meddelandet kommer skickas till alla lärare och lärarassistenter i kursen."
