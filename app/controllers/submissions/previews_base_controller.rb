@@ -53,10 +53,20 @@ module Submissions
         if redirect?
           redirect_to(named_context_url(@context, redirect_path_name, @assignment.quiz.id, redirect_params))
         else
+          @anonymize_students = anonymize_students?
           render template: 'submissions/show_preview', locals: {
-            anonymize_students: @assignment.anonymize_students?
+            anonymize_students: @anonymize_students
           }
         end
+      end
+    end
+
+    protected
+    def anonymize_students?
+      if current_user_is_student?
+        @submission_for_show.assignment.anonymous_peer_reviews? && @submission_for_show.submission.peer_reviewer?(@current_user)
+      else
+        @submission_for_show.assignment.anonymize_students?
       end
     end
 

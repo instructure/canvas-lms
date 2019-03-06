@@ -76,5 +76,23 @@ describe Submissions::PreviewsController do
         end
       end
     end
+
+    it "returns unauthorized when the viewer is a teacher and the assignment is currently anonymizing students" do
+      assignment = @course.assignments.create!(title: 'shhh', anonymous_grading: true)
+      user_session(@teacher)
+
+      get :show, params: {course_id: @course.id, assignment_id: assignment.id, id: @student.id, preview: true}
+      expect(response).to be_unauthorized
+    end
+
+    it "returns unauthorized when the viewer is a peer reviewer and anonymous peer reviews are enabled" do
+      assignment = @course.assignments.create!(title: 'ok', peer_reviews: true, anonymous_peer_reviews: true)
+      reviewer = @course.enroll_student(User.create!, enrollment_state: 'active').user
+      assignment.assign_peer_review(reviewer, @student)
+      user_session(reviewer)
+
+      get :show, params: {course_id: @course.id, assignment_id: assignment.id, id: @student.id, preview: true}
+      expect(response).to be_unauthorized
+    end
   end
 end

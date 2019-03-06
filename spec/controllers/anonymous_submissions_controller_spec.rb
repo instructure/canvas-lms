@@ -83,15 +83,15 @@ RSpec.describe AnonymousSubmissionsController do
       expect(submission.read?(@teacher)).to be_falsey
     end
 
-    it "renders json with scores for teachers on muted assignments" do
+    it "renders json with a not-found error for teachers when the assignment is anonymous and muted" do
+      @student.update!(name: 'some student')
+      user_session(@teacher)
       @assignment.update!(muted: true)
       request.accept = Mime[:json].to_s
       get :show, params: {course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id}, format: :json
-      expect(body['anonymous_id']).to eq @submission.anonymous_id
-      expect(body['score']).to eq 10
-      expect(body['grade']).to eq '10'
-      expect(body['published_grade']).to eq '10'
-      expect(body['published_score']).to eq 10
+
+      # render_user_not_found attempts to render the passed-in ID param and ignores anonymous_id
+      expect(JSON.parse(response.body)['errors']).to eq "The specified user () is not a student in this course"
     end
 
     it "renders json without scores for students on muted assignments" do
@@ -122,6 +122,19 @@ RSpec.describe AnonymousSubmissionsController do
 
       expect(response).to be_successful
       expect(assigns[:visible_rubric_assessments]).to eq [@assessment]
+    end
+
+    it "redirects to the course page if the viewer may not view details for the submission" do
+      course = Course.create!
+      assignment = course.assignments.create!(title: 'hi')
+      student1 = course.enroll_student(User.create!, active_all: true).user
+      student2 = course.enroll_student(User.create!, active_all: true).user
+
+      student1_submission = assignment.submission_for_student(student1)
+      user_session(student2)
+      get :show, params: {course_id: course.id, assignment_id: assignment.id, anonymous_id: student1_submission.anonymous_id}
+
+      expect(response).to redirect_to(course_assignment_url(course, assignment))
     end
   end
 

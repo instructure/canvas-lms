@@ -122,6 +122,10 @@ class SubmissionsController < SubmissionsBaseController
 
     return render_unauthorized_action unless @submission.can_view_details?(@current_user)
 
+    # If anonymous peer reviews are enabled, submissions must be peer-reviewed
+    # via this controller's anonymous counterpart
+    return render_unauthorized_action if @assignment.anonymous_peer_reviews? && @submission.peer_reviewer?(@current_user)
+
     super
   end
 

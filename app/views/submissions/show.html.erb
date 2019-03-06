@@ -20,22 +20,41 @@
   js_env ga_page_title: "#{@assignment.title} Submission Details"
 %>
 <%
-  currently_peer_reviewing = @assessment_request.try(:assigned?)
+  presenter = Submission::ShowPresenter.new(
+    submission: @submission,
+    current_user: @current_user,
+    assessment_request: @assessment_request
+  )
   submission_comments = @submission.visible_submission_comments_for(@current_user)
+
+  if presenter.anonymize_submission_owner?
+    submission_owner_param = {anonymous_id: @submission.anonymous_id}
+    rubric_assessment_user_param = {anonymous_id: @submission.anonymous_id}
+  else
+    submission_owner_param = {user_id: @submission.user_id}
+    rubric_assessment_user_param = {assessment_user_id: @submission.user_id}
+  end
+
+  assessment_type = if !presenter.currently_peer_reviewing? && can_do(@submission, @current_user, :grade)
+    "grading"
+  else
+    "peer_review"
+  end
+
   js_bundle :submissions
   css_bundle :submission
   js_env({
     :RUBRIC_ASSESSMENT => {
-      :assessment_user_id => @submission.user_id,
-      :assessor_id => @current_user ? @current_user.id : "null",
-      :assessment_type => (!currently_peer_reviewing && can_do(@submission, @current_user, :grade)) ? "grading" : "peer_review"
+      assessment_type: assessment_type,
+      assessor_id: @current_user ? @current_user.id : "null",
+      **rubric_assessment_user_param
     },
 
     :SUBMISSION => {
-      :user_id => @submission.user_id,
-      :assignment_id => @assignment.id,
+      assignment_id: @assignment.id,
       # don't leak grades if assignment is muted
-      :submission => @assignment.muted? ? {} : @submission.attributes.merge(entered_grade: @submission.entered_grade, entered_score: @submission.entered_score)
+      submission: @assignment.muted? ? {} : @submission.attributes.merge(entered_grade: @submission.entered_grade, entered_score: @submission.entered_score),
+      **submission_owner_param
     }
   })
   content_for :page_title, join_title(@assignment.title, submission_author_name_for(@assessment_request))
@@ -244,8 +263,9 @@
         partial: 'shared/rubric',
         object: @assignment.rubric,
         locals: {
-          rubric_association: @assignment.rubric_association,
-          assessing: @submission.grants_right?(@current_user, :grade) || currently_peer_reviewing
+          anonymize_student: presenter.anonymize_submission_owner?,
+          assessing: @submission.grants_right?(@current_user, :grade) || presenter.currently_peer_reviewing?,
+          rubric_association: @assignment.rubric_association
         }}) %>
     <% end %>
     <%= render :partial => "shared/rubric_criterion_dialog" %>
@@ -259,16 +279,12 @@
   <% end %>
 
   <div style="display: none;">
-    <% if !currently_peer_reviewing && can_do(@context, @current_user, :manage_grades) %>
-      <a style="display: none;" title="POST" href="<%= context_url(@context, :update_submission_context_gradebook_url) %>" class="update_submission_url">&nbsp;</a>
-    <% else %>
-      <a style="display: none;" title="PUT" href="<%= context_url(@context, :context_assignment_submission_url, @submission.assignment_id, @submission.user_id) %>" class="update_submission_url">&nbsp;</a>
-    <% end %>
-    <a style="display: none;" href="<%= context_url(@context, :context_assignment_submission_url, @submission.assignment_id, @submission.user_id) %>" class="submission_data_url">&nbsp;</a>
+    <a style="display: none;" title="<%= presenter.add_comment_method %>" href="<%= presenter.add_comment_url %>" class="update_submission_url">&nbsp;</a>
+    <a style="display: none;" href="<%= presenter.submission_data_url %>" class="submission_data_url">&nbsp;</a>
   </div>
   <div class="submission-details-container">
     <div class="submission-details-frame">
-      <iframe id="preview_frame" src="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id, :preview => 1, :rand => rand(999999)) %>" allowfullscreen="true" frameborder="0" style="border: 0; width: 100%; height: 300px; display: block;" title="<%= t('Preview') %>"></iframe>
+      <iframe id="preview_frame" src="<%= presenter.submission_preview_frame_url %>" allowfullscreen="true" frameborder="0" style="border: 0; width: 100%; height: 300px; display: block;" title="<%= t('Preview') %>"></iframe>
     </div>
     <div class="submission-details-comments" style="word-wrap: break-word; min-width: 1%;">
       <div style="background-color: #fff;">
@@ -309,7 +325,7 @@
                 <div class="comment_attachments" style="text-align: <%= direction('right') %>; margin-<%= direction('right') %>: 10px;">
                   <% comment.attachments.each do |attachment| %>
                     <div class="comment_attachment">
-                      <a href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id, :comment_id => comment.id, :download => attachment.id) %>" class="comment_attachment_link <%= attachment.mime_class %>"><%= attachment.display_name %></a>
+                      <a href="<%= presenter.comment_attachment_download_url(submission_comment: comment, attachment: attachment) %>" class="comment_attachment_link <%= attachment.mime_class %>"><%= attachment.display_name %></a>
                     </div>
                   <% end %>
                 </div>
@@ -330,7 +346,7 @@
             </div>
           </div>
           <div class="comment_attachment" id="comment_attachment_blank" style="display: none;">
-            <a class="comment_attachment_link" href="<%= context_url(@context, :context_assignment_submission_url, @assignment.id, @submission.user_id, :comment_id => "{{ comment_id }}", :download => "{{ id }}") %>"><span class="display_name">&nbsp;</span></a>
+            <a class="comment_attachment_link" href="<%= presenter.comment_attachment_template_url %>"><span class="display_name">&nbsp;</span></a>
           </div>
           <div class="comment" id="comment_blank" style="display: none; margin-bottom: 10px;">
             <span class="comment" style="color: #444; white-space: pre-wrap;"></span>

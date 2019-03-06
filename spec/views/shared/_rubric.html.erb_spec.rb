@@ -45,4 +45,32 @@ describe "/shared/_rubric" do
     render partial: "shared/rubric", locals: { rubric: rubric, rubric_association: rubric_association }
     expect(html.css('.rubric .toggle_for_hide_points.hidden')).not_to be_empty
   end
+
+  context "when anonymize_student is false" do
+    it "renders the user_id field" do
+      view_context(context)
+      render partial: "shared/rubric", locals: { rubric: rubric, rubric_association: rubric_association }
+      expect(html.css('.rubric .user_id')).not_to be_empty
+    end
+
+    it "does not render the anonymous_id field" do
+      view_context(context)
+      render partial: "shared/rubric", locals: { rubric: rubric, rubric_association: rubric_association }
+      expect(html.css('.rubric .anonymous_id')).to be_empty
+    end
+  end
+
+  context "when anonymize_student is true" do
+    it "renders the anonymous_id field" do
+      view_context(context)
+      render partial: "shared/rubric", locals: { rubric: rubric, rubric_association: rubric_association, anonymize_student: true }
+      expect(html.css('.rubric .anonymous_id')).not_to be_empty
+    end
+
+    it "does not render the user_id field" do
+      view_context(context)
+      render partial: "shared/rubric", locals: { rubric: rubric, rubric_association: rubric_association, anonymize_student: true }
+      expect(html.css('.rubric .user_id')).to be_empty
+    end
+  end
 end

@@ -233,7 +233,7 @@ describe "assignments" do
       before(:each) { user_logged_in(user: reviewer) }
 
       it 'should show comment reviewer name on submission page', priority: "1", test_id: 216387 do
-        get "/courses/#{review_course.id}/assignments/#{assignment.id}/submissions/#{reviewed.id}"
+        get "/courses/#{review_course.id}/assignments/#{assignment.id}/anonymous_submissions/#{submission.anonymous_id}"
         expect(f("#submission_comment_#{comment.id} .author_name")).to include_text(comment.author_name)
       end
     end
@@ -288,7 +288,7 @@ describe "assignments" do
         submission.save!
       }
       it 'should show the plagiarism report link for reviewer', priority: "1", test_id: 216392 do
-        get "/courses/#{review_course.id}/assignments/#{assignment.id}/submissions/#{reviewed.id}"
+        get "/courses/#{review_course.id}/assignments/#{assignment.id}/anonymous_submissions/#{submission.anonymous_id}"
         expect(f(".turnitin_similarity_score")).to be_displayed
       end
     end

@@ -43,7 +43,11 @@ module AssignmentsHelper
       "<i class='#{icon_class}' aria-hidden='true'></i>".html_safe,
       submission_author_name_for(assessment)
     ]
-    href = context_url(context, :context_assignment_submission_url, assignment.id, assessment.asset.user_id)
+    href = if assignment.anonymous_peer_reviews?
+      context_url(context, :context_assignment_anonymous_submission_url, assignment.id, assessment.asset.anonymous_id)
+    else
+      context_url(context, :context_assignment_submission_url, assignment.id, assessment.asset.user_id)
+    end
     link_to text, href, options
   end
 

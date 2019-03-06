@@ -19,6 +19,7 @@
 import $ from 'jquery'
 import 'compiled/jquery.rails_flash_notifications'
 
+import fakeENV from 'helpers/fakeENV'
 import rubric_assessment from 'rubric_assessment'
 import I18n from 'i18n!rubric_assessment'
 
@@ -117,4 +118,112 @@ test('does not display a flash warning when rawPoints has not been adjusted', fu
   rubric_assessment.checkScoreAdjustment($criterion, rating, rawData)
   equal(flashSpy.callCount, 0)
   flashSpy.restore()
+})
+
+QUnit.module('RubricAssessment', moduleHooks => {
+  moduleHooks.beforeEach(() => {
+    fakeENV.setup()
+    ENV.RUBRIC_ASSESSMENT = {}
+  })
+
+  moduleHooks.afterEach(() => {
+    fakeENV.teardown()
+  })
+
+  QUnit.module('#assessmentData', () => {
+    const createRubric = (contents = "") => $(`<div class="rubric">${contents}</div>`)
+
+    test('returns the user ID if assessment_user_id exists in the environment', () => {
+      ENV.RUBRIC_ASSESSMENT.assessment_user_id = '123'
+      const data = rubric_assessment.assessmentData(createRubric())
+
+      strictEqual(data['rubric_assessment[user_id]'], '123')
+    })
+
+    test('returns the user ID if one exists in the submitted rubric', () => {
+      const rubric = createRubric(`<div class="user_id">234</div>`)
+      const data = rubric_assessment.assessmentData(rubric)
+
+      strictEqual(data['rubric_assessment[user_id]'], '234')
+    })
+
+    test('returns the anonymous ID if anonymous_id exists in the environment', () => {
+      ENV.RUBRIC_ASSESSMENT.anonymous_id = '7a8c1'
+      const data = rubric_assessment.assessmentData(createRubric())
+
+      strictEqual(data['rubric_assessment[anonymous_id]'], '7a8c1')
+    })
+
+    test('returns the anonymous ID if one exists in the submitted rubric', () => {
+      const rubric = createRubric(`<div class="anonymous_id">81bc2</div>`)
+      const data = rubric_assessment.assessmentData(rubric)
+
+      strictEqual(data['rubric_assessment[anonymous_id]'], '81bc2')
+    })
+
+    test('returns the user ID if both flavors of ID are available', () => {
+      const rubric = createRubric(`
+        <div class="user_id">100</div>
+        <div class="anonymous_id">81bc2</div>
+      `)
+      const data = rubric_assessment.assessmentData(rubric)
+
+      strictEqual(data['rubric_assessment[user_id]'], '100')
+    })
+
+    test('omits the anonymous ID if both flavors of ID are available', () => {
+      const rubric = createRubric(`
+        <div class="user_id">100</div>
+        <div class="anonymous_id">81bc2</div>
+      `)
+      const data = rubric_assessment.assessmentData(rubric)
+
+      strictEqual(data['rubric_assessment[anonymous_id]'], undefined)
+    })
+  })
+
+  QUnit.module('#populateRubric', (hooks) => {
+    let $rubric
+
+    hooks.beforeEach(() => {
+      $rubric = $(`
+        <div class="rubric" id="this_is_not_actually_used">
+          <div class="user_id">
+          <div class="anonymous_id">
+        </div>
+      `)
+    })
+
+    test('populates the user_id element of the passed-in rubric with ENV.assessment_user_id if present', () => {
+      ENV.RUBRIC_ASSESSMENT.assessment_user_id = '123'
+      rubric_assessment.populateRubric($rubric, {})
+      strictEqual($rubric.find('.user_id').text(), '123')
+    })
+
+    test('populates the user_id element of the passed-in rubric with the value from the passed-in data if present', () => {
+      rubric_assessment.populateRubric($rubric, {user_id: '432'})
+      strictEqual($rubric.find('.user_id').text(), '432')
+    })
+
+    test('populates the anonymous_id element of the passed-in rubric with ENV.anonymous_id if present', () => {
+      ENV.RUBRIC_ASSESSMENT.anonymous_id = 'vcx12'
+      rubric_assessment.populateRubric($rubric, {})
+      strictEqual($rubric.find('.anonymous_id').text(), 'vcx12')
+    })
+
+    test('populates the anonymous_id element of the passed-in rubric with the value from the passed-in data if present', () => {
+      rubric_assessment.populateRubric($rubric, {anonymous_id: 'vv191'})
+      strictEqual($rubric.find('.anonymous_id').text(), 'vv191')
+    })
+
+    test('populates the user_id element if both flavors of ID are available', () => {
+      rubric_assessment.populateRubric($rubric, {user_id: '77', anonymous_id: 'vv191'})
+      strictEqual($rubric.find('.user_id').text(), '77')
+    })
+
+    test('does not populate the anonymous_id element if both flavors of ID are available', () => {
+      rubric_assessment.populateRubric($rubric, {user_id: '77', anonymous_id: 'vv191'})
+      strictEqual($rubric.find('.anonymous_id').text(), '')
+    })
+  })
 })

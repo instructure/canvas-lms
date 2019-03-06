@@ -462,7 +462,6 @@ class Submission < ActiveRecord::Base
       user &&
       self.assessment_requests.map(&:assessor_id).include?(user.id)
   end
-  private :peer_reviewer?
 
   def can_view_details?(user)
     return false unless grants_right?(user, :read)

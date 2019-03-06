@@ -17,6 +17,8 @@
 #
 
 class AnonymousSubmissionsController < SubmissionsBaseController
+  include Submissions::ShowHelper
+
   before_action :require_context
 
   def show
@@ -25,8 +27,14 @@ class AnonymousSubmissionsController < SubmissionsBaseController
       anonymous_id: params.fetch(:anonymous_id),
       context: @context
     )
-    @assignment = @submission_for_show.assignment
-    @submission = @submission_for_show.submission
+    begin
+      @assignment = @submission_for_show.assignment
+      @submission = @submission_for_show.submission
+    rescue ActiveRecord::RecordNotFound
+      return render_user_not_found
+    end
+
+    return render_user_not_found unless @submission.can_view_details?(@current_user)
 
     super
   end
