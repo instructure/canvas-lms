@@ -89,7 +89,7 @@
     "parse-decimal-number": "1.0.0",
     "parse-link-header": "^1",
     "prop-types": "^15",
-    "qs": "https://github.com/hapijs/qs.git#a341cdf2fadba5ede1ce6c95c7051f6f31f37b81",
+    "qs": "^6.6.0",
     "react": "^16.6.0",
     "react-apollo": "^2.1.1",
     "react-dnd": "^2.5.2",
