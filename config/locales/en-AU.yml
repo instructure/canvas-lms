@@ -111,6 +111,7 @@ en-AU:
   accepted_formats_svg_png_jpg_gif_f793e4bc: "Accepted formats: svg, png, jpg, gif"
   accepted_user_role_type_course_course_2ce91589: "Accepted: %{user}, %{role_type}, course, %{course}"
   accepting_40ba3b70: Accepting
+  access_denied_f922a9ff: "Access Denied"
   access_report_80d28095: "Access Report"
   access_token_3be22221: "Access Token"
   access_token_count_access_token_count_dfb5463c: "Access Token Count: %{access_token_count}"
@@ -1359,7 +1360,7 @@ en-AU:
       add_sis_stickiness_instructions: "With this option selected, changes made through this SIS import will be processed as if they are UI changes, preventing subsequent non-overriding SIS imports from changing the fields changed here."
       add_sis_stickiness_label: "Process as UI changes"
       batch_import_instructions: |-
-          If selected, this will delete everything for this term, which includes all courses and enrolments that are not in the selected import file above.
+          If selected, this will delete everything for this term, which includes all courses and enrolments that are not in the selected import file above.  
           See the documentation for details.
       batch_mode_label: "This is a full batch update"
       clear_sis_stickiness_instructions: "With this option selected, all fields in all records touched by this SIS import will be able to be changed in future non-overriding SIS imports."
@@ -1373,7 +1374,7 @@ en-AU:
       imported_with_messages_message: "The SIS data was imported but with these messages:"
       last_batch_title: "Last Batch"
       override_sis_stickiness_instructions: |-
-          By default, UI changes have priority over SIS import changes; for a number of fields, the SIS import will not change that field's data if an admin has changed that field through the UI. If you select this option, this SIS import will override UI changes.
+          By default, UI changes have priority over SIS import changes; for a number of fields, the SIS import will not change that field's data if an admin has changed that field through the UI. If you select this option, this SIS import will override UI changes.  
           See the documentation for details.
       override_sis_stickiness_label: "Override UI changes"
       page_title: "SIS Import"
@@ -1383,7 +1384,7 @@ en-AU:
       pending_batches_title: "Pending Batches"
       process_data_button: "Process Data"
       select_file_instructions: |-
-          Select the zip file that you want imported.
+          Select the zip file that you want imported.  
           For a description of how to generate these zip files, [please see this documentation](%{url}).
       sis_import_crumb: "SIS Import"
       started_at_message: "Started: %{started_at}"
@@ -1636,6 +1637,7 @@ en-AU:
   add_new_group_7ac49f31: "Add new group"
   add_new_set_of_due_dates_e8e240f: "Add a new set of due dates"
   add_new_term_d2217c0d: "Add New Term"
+  add_override_da70f198: "Add Override"
   add_people_7948b7da: "Add people"
   add_people_7ee4b2ec: "Add People"
   add_people_to_coursename_5ea234e1: "Add People to: %{courseName}"
@@ -1654,6 +1656,7 @@ en-AU:
   add_students_tas_and_observers_to_your_course_e84692dd: "Add Students, TAs, and Observers to your course"
   add_students_to_the_course_874be8fb: "Add Students to the Course"
   add_sub_account_to_account_name_b104db90: "Add Sub-Account to %{account_name}"
+  add_submission_type_8690db4b: "Add submission type"
   add_tas_to_the_course_2aac6e02: "Add TAs to the Course"
   add_theme_32fa3d50: "Add Theme"
   add_to_course_481a51c4: "Add to course..."
@@ -1836,6 +1839,9 @@ en-AU:
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Allows teacher/designer/TA-based roles to access the Chat tool."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Allows teacher/TA-based roles to access the Attendance tool."
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Allows teachers to mark grade data to be exported in bulk to SIS integrations."
+  allows_teachers_to_specify_post_policies_for_this__a3ef829d: |-
+      Allows teachers to specify post policies for this course or specific assignments, enabling grades to be
+      posted and hidden manually.
   allows_the_duplicating_of_modules_in_canvas_2e15b444: "Allows the duplicating of modules in Canvas"
   allows_the_duplicating_of_objects_in_canvas_c86f3665: "Allows the duplicating of objects in Canvas"
   allows_the_duplication_of_calendar_events_7bb0d6c5: "Allows the duplication of Calendar Events"
@@ -2448,6 +2454,7 @@ en-AU:
   ask_your_instructor_a_question_a61ca5e9: "Ask your instructor a question"
   assess_and_survey_your_students_ce8172a9: "Assess and survey your students"
   assessment_audit_d4a76709: "Assessment audit"
+  assessment_audit_events_for_creatorname_56e84e8: "Assessment audit events for %{creatorName}"
   assessment_audit_events_for_username_eb2144ad: "Assessment audit events for %{userName}"
   assessment_audit_tray_5dd11721: "Assessment audit tray"
   assessment_by_name_7b879a2c: "Assessment by %{name}"
@@ -2466,6 +2473,7 @@ en-AU:
   assessment_type_81a73b9c: "assessment type"
   assign_eedf72bb: Assign
   assign_reviews_on_date_7e48ec50: "Assign Reviews on Date"
+  assign_to_6b806cd9: "Assign to:"
   assign_to_c46e21: "Assign to"
   assigned_permissions_6f6fecb6: "Assigned Permissions"
   assigned_roles_ace6c950: "Assigned Roles"
@@ -2593,6 +2601,7 @@ en-AU:
     unmute_button: "Unmute Assignment"
     unmute_dialog: "This assignment is currently muted. That means students can't see their marks and feedback. Would you like to unmute now?"
     unmuting_assignment: "Unmuting Assignment..."
+  assignment_name_12eadcbd: "Assignment name"
   assignment_name_a_z_aeefaa36: "Assignment Name - A-Z"
   assignment_name_b2d87383: "Assignment Name"
   assignment_name_course_name_is_now_due_55613e9b: "%{assignment_name}, %{course_name}, is now due."
@@ -2600,6 +2609,7 @@ en-AU:
   assignment_name_course_name_override_is_now_due_ed5ce1e: "%{assignment_name}, %{course_name} (%{override}) is now due."
   assignment_name_course_name_override_no_longer_has_5a94da2b: "%{assignment_name}, %{course_name} (%{override}) no longer has a due date."
   assignment_name_grade_history_b506426c: "%{assignment_name} grade history"
+  assignment_name_is_required_9d17311b: "Assignment name is required"
   assignment_name_z_a_34f92f4b: "Assignment Name - Z-A"
   assignment_options_1e5b7074: "Assignment Options"
   assignment_override: 
@@ -2612,6 +2622,7 @@ en-AU:
   assignment_title_82b4422e: "Assignment Title:"
   assignment_title_8a707dd2: "assignment title"
   assignment_title_e3192978: "Assignment: %{title}"
+  assignment_type_60255aac: "Assignment Type"
   assignment_unmuted_2cffe4ca: "Assignment unmuted"
   assignment_updated_c7482598: "Assignment updated"
   assignment_url_37c849c6: "assignment url"
@@ -2994,7 +3005,7 @@ en-AU:
     processing_submission: "Canvas is currently processing your submission. You can safely navigate away from this page and we will email you if the submission fails to process."
     redirect_page: 
       redirect_message: |-
-          This submission was a url, we're taking you to the url link now.
+          This submission was a url, we're taking you to the url link now.  
           [Click Here to go to the submission](%{url})
     remove_never_drop_rule: "Remove never drop rule"
     remove_unsaved_never_drop_rule: "Remove unsaved never drop rule"
@@ -3236,6 +3247,8 @@ en-AU:
         originality_report_visible_after_grading: "After the assignment is marked"
         originality_report_visible_immediately: Immediately
   assignments_1e02582c: Assignments
+  assignments_2: 
+    submission_attempts: Attempts
   assignments_2_e88d7a26: "Assignments 2"
   assignments_and_gradebook_37e43d4f: "Assignments and Gradebook"
   assignments_and_quizzes_add_edit_delete_5bac17ed: "Assignments and Quizzes - add / edit / delete"
@@ -3258,12 +3271,14 @@ en-AU:
   associated_courses_1fbc6202: "Associated Courses"
   associations_3fd4abe8: Associations
   associations_saved_successfully_48b9eae3: "Associations saved successfully"
+  at_791460b3: at
   at_least_one_scope_must_be_selected_97d6fce9: "At least one scope must be selected."
   at_least_one_term_must_be_attached_24fd2bf5: "At least one term must be attached."
   at_the_bottom_a109f5c8: "At the bottom"
   at_the_bottom_a6a5f0fe: "At the Bottom"
   at_the_top_c2ce2371: "At the top"
   at_the_top_fa836591: "At the Top"
+  attach_a_file_86a4fc00: "Attach a File"
   attach_files_to_discussions_bd16c245: "Attach files to discussions"
   attach_terms_2b8770a5: "Attach terms"
   attached_display_name_afa00c2e: "Attached: %{display_name}"
@@ -3291,6 +3306,10 @@ en-AU:
   attempt_current_attempt_ef626179: "Attempt %{current_attempt}"
   attempt_current_attempt_of_max_attempts_427ed508: "Attempt %{current_attempt} of %{max_attempts}"
   attempt_to_detect_an_appropriate_field_separator_i_4e59eb0c: "Attempt to detect an appropriate field separator in Gradebook exports based on the number format for your language."
+  attempts_22baad: 
+    one: Attempt
+    other: Attempts
+  attempts_allowed_8441aadf: "Attempts Allowed"
   attendance: 
     options: 
       clear_attendance_marks: "Clear Attendance Marks"
@@ -3442,6 +3461,7 @@ en-AU:
   avaible_daec2e57: Available
   availability_dates_438d71e0: "Availability Dates"
   availability_dates_changed_exceptions_465ba375: "Availability Dates changed exceptions:"
+  available_2ed9f226: "Available:"
   available_8606e40c: Available
   available_after_3416802b: "Available after"
   available_after_unlock_at_b5682224: "Available after %{unlock_at}"
@@ -3470,6 +3490,7 @@ en-AU:
   avatar_for_author_2eabbf55: "Avatar for %{author}"
   avatar_for_studentname_8ea511ae: "Avatar for %{studentName}"
   average_49c63f9b: Average
+  average_score_15cd7c3c: "Average Score"
   back_2900f52a: Back
   back_to_announcements_1036e43e: "Back to Announcements"
   back_to_app_center_95420d83: "Back to App Centre"
@@ -4422,6 +4443,7 @@ en-AU:
   clicking_the_checkbox_will_cause_scopes_table_to_a_fba5886a: "Clicking the checkbox will cause scopes table to appear below"
   clicking_the_checkbox_will_cause_scopes_table_to_d_dbdbffd3: "Clicking the checkbox will cause scopes table to disappear below"
   clone_group_set_c2a40e15: "Clone Group Set"
+  close_17f50799: close
   close_and_return_to_canvas_80544344: "Close and return to Canvas"
   close_d634289d: Close
   close_date_9b52fb9b: "Close Date:"
@@ -4435,6 +4457,7 @@ en-AU:
   close_move_tray_8609e988: "close move tray"
   close_picker_256aca8a: "Close Picker"
   close_sidebar_10b0fbb4: "Close sidebar"
+  close_student_tray_789b656d: "Close student tray"
   close_submission_tray_c4988fa8: "Close submission tray"
   closed_for_comments_e395b42f: "Closed for Comments"
   closes_5c6b4367: "Closes:"
@@ -4501,21 +4524,21 @@ en-AU:
     forms: 
       buttons: 
         delete_from_canvas: |-
-            Just Delete
+            Just Delete  
             from Canvas
         delete_from_google_docs: |-
-            Also Delete From
+            Also Delete From  
             Google Docs
         start_collaborating: "Start Collaborating"
         update: "Update Collaboration"
       collaboration_name: "%{course_or_group_name} Collaboration"
       descriptions: 
         etherpad: |-
-            EtherPad is an open source project that lets you quickly set up shared documents.  It's fast enough that you can see what others are typing as they're typing it. On the other hand, "pads" aren't protected by a password so anyone with a link to them can edit them. EtherPad is better suited than Google Docs if you want to support anonymity and/or allowing people without Google accounts to participate.
+            EtherPad is an open source project that lets you quickly set up shared documents.  It's fast enough that you can see what others are typing as they're typing it. On the other hand, "pads" aren't protected by a password so anyone with a link to them can edit them. EtherPad is better suited than Google Docs if you want to support anonymity and/or allowing people without Google accounts to participate.  
               
             **Warning**: be sure you are familiar with [EtherPad's deletion policy](%{etherpad_deletion_policy_url}) to ensure your work is preserved.
         google_docs: |-
-            Google Docs is a great place to collaborate on a group project.  It's like Microsoft Word, but lets you work together with others on the same file at the same time without having to email it around.
+            Google Docs is a great place to collaborate on a group project.  It's like Microsoft Word, but lets you work together with others on the same file at the same time without having to email it around.  
               
             **Warning**: you (and all your collaborators) will need a Google account in order to participate in any Google Docs collaborations.
       labels: 
@@ -4592,6 +4615,7 @@ en-AU:
   comment_by_replying_to_this_message_or_join_the_co_26d42fde: "Comment by replying to this message, or join the conversation using this link: %{link}."
   comment_by_replying_to_this_message_or_join_the_co_52b5ac1c: "Comment by replying to this message, or join the conversation using this link: %{link}. When allowed, if you need to include an attachment, please log in to Canvas and reply to the discussion."
   comment_by_replying_to_this_message_or_join_the_co_886bc612: "Comment by replying to this message, or join the conversation using this link: %{link}. When allowed, if you need to include an attachment, please log in to Canvas and reply to the announcement."
+  comment_input_box_b8c7e58b: "Comment input box"
   comments_e07bcbe3: Comments
   commmessages_9fa33faa: CommMessages
   common_cartridge_description: "This enables converting a Common Cartridge packages in the intermediary json format to be imported"
@@ -4781,6 +4805,7 @@ en-AU:
   configure_toolname_app_651371be: "Configure %{toolName} App"
   confirm_contact_method_29d6fe4b: "Confirm contact method"
   confirm_delete_6febeafb: "Confirm Delete"
+  confirm_delete_a5239715: "confirm delete"
   confirm_delete_announcements_3d83b69a: "Confirm delete announcements"
   confirm_delete_discussions_1fb0d053: "Confirm Delete Discussions"
   confirm_deletion_b2efe7d4: "Confirm Deletion"
@@ -6701,11 +6726,13 @@ en-AU:
   created_created_at_37c0ec3b: "Created: %{created_at}"
   created_created_bf5714b8: "Created %{created}"
   created_group_group_name_2097306b: "Created Group %{group_name}"
+  creating_a_group_is_not_yet_handled_by_the_new_ass_3360471d: "Creating a group is not yet handled by the new assignments flow. Head to the legacy assignments page?"
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "Creating a Submission Export will allow you to download a zip file of all your assignment submissions in all of your present and past courses. This could be a big file, so it may take a while. You can navigate away from the page and come back later."
   creating_key_8a026e61: "Creating Key"
   creative_commons_714a065f: "Creative Commons"
   creative_commons_license_725584ae: "Creative Commons License:"
   creative_commons_licenses_7d557d9a: "Creative Commons Licenses"
+  creatorname_performed_actions_while_anonymous_was__c2124eca: "%{creatorName} performed actions while anonymous was off"
   criteria_9fac648: Criteria
   criterion_5f0b62f8: Criterion
   criterion_created_42669293: "Criterion Created"
@@ -7065,6 +7092,7 @@ en-AU:
   delete_account_name_96aee330: "Delete %{account_name}"
   delete_alignment_f33c97d5: "Delete alignment"
   delete_announcement_title_756a9d1f: "Delete announcement %{title}"
+  delete_assignment_5d3f3f15: "delete assignment"
   delete_assignment_group_7c3b01c4: "Delete Assignment Group"
   delete_assignment_name_deec56e3: "Delete Assignment %{name}"
   delete_bank_d8f4cb64: "Delete %{bank}"
@@ -7112,6 +7140,7 @@ en-AU:
   delete_this_page_509f2baf: "Delete this Page"
   delete_this_question_8f955ceb: "Delete this Question"
   delete_this_section_380338: "Delete this section"
+  delete_this_submission_type_37a0809c: "Delete this submission type"
   delete_this_theme_46d95edc: "Delete this theme?"
   delete_this_token_f5962a4f: "Delete this Token."
   delete_time_range_e14461a0: "Delete Time Range"
@@ -7124,6 +7153,7 @@ en-AU:
   deleted_ce03674d: deleted
   deleted_content_exceptions_237e809d: "Deleted content exceptions:"
   deleting_6421031e: Deleting...
+  deleting_assignment_22d5851d: "deleting assignment"
   delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "Demo sites require Recaptcha settings to be configured. Please see your site admin for this instance of Canvas."
   demos: 
@@ -7872,6 +7902,7 @@ en-AU:
   edit_permissions_for_count_items_d65e3855: 
     one: "Edit permissions for: %{itemName}"
     other: "Edit permissions for %{count} items"
+  edit_points_3a339cd8: "Edit Points"
   edit_quiz_ededddd8: "Edit Quiz"
   edit_rating_c2ac31e5: "Edit rating"
   edit_role_1e96ad20: "Edit Role"
@@ -7907,6 +7938,7 @@ en-AU:
   edit_this_question_1c82c3cf: "Edit this Question"
   edit_this_theme_in_theme_editor_f8f07ac9: "Edit this theme in Theme Editor."
   edit_title_20a9577: "Edit %{title}"
+  edit_title_4f508e10: "Edit title"
   edit_tool_690c199b: "Edit Tool"
   edit_toolname_app_23cfbb8: "Edit %{toolName} App"
   edit_user_c46cf103: "Edit User"
@@ -8330,7 +8362,7 @@ en-AU:
         details1: |-
             ePortfolios are a place where you can display and discuss the significant
             submissions and experiences that are happening during your learning
-            process. You can use an ePortfolio to:
+            process. You can use an ePortfolio to: 
             
             * Display the papers you're proud of for more than just your instructor to see
             * Talk about all the thought and work that went into your class submissions
@@ -9918,6 +9950,7 @@ en-AU:
       pages: Pages
       people: People
   group_a8f5ed9c: Group
+  group_assignment_7060989f: "Group Assignment"
   group_assignments_can_t_be_anonymously_graded_2dd9be24: "Group assignments can't be anonymously graded"
   group_assignments_cannot_be_enabled_for_anonymousl_ed896b1c: "Group assignments cannot be enabled for anonymously graded assignments"
   group_assignments_cannot_be_enabled_for_moderated__6b2faeef: "Group assignments cannot be enabled for moderated assignments"
@@ -10359,7 +10392,7 @@ en-AU:
       
             Your outcomes import failed due to an error with your import. Please examine your file and attempt the upload again at %{url}
       
-            The following error occurred:
+            The following error occurred: 
             %{row}
       
             To view the proper import format, please review the Canvas API Docs at %{doc_url}
@@ -10388,7 +10421,7 @@ en-AU:
   hello_name_your_outcomes_were_successfully_importe_d0c37335: |-
       Hello %{name},
       
-              Your outcomes were successfully imported, but with the following issues (up to the first 100 warnings):
+              Your outcomes were successfully imported, but with the following issues (up to the first 100 warnings): 
       
               %{rows}
       
@@ -10629,6 +10662,7 @@ en-AU:
   if_you_configure_settings_that_cause_you_to_not_be_13d4cbbf: "If you configure settings that cause you to not be able to log in, you can directly access the regular Canvas login at %{url}"
   if_you_do_not_select_usage_rights_now_this_file_wi_40c42125: "If you do not select usage rights now, this file will be unpublished after it's uploaded."
   if_you_enable_this_feature_be_sure_that_your_sales_566967e6: "If you enable this feature, be sure that your salesforce account has these custom fields added exactly as they appear here, with the names in the left column of the table."
+  if_you_have_a_moment_click_here_to_tell_us_what_ha_d8b578d5: "If you have a moment, *click here to tell us what happened*."
   if_you_keep_having_problems_click_the_link_link_be_a4d695eb: "If you keep having problems, click the \"%{link}\" link below to search the guides or to let us know what's going on."
   if_you_leave_the_zip_file_download_currently_being_c47c1dfb: "If you leave, the zip file download currently being prepared will be cancelled."
   if_you_made_changes_to_the_student_submission_file_e006d49b: |-
@@ -11252,6 +11286,7 @@ en-AU:
   limit_students_to_attend_input_value_slot_s_9a5bf576: "Limit students to attend %{input_value} slot(s). "
   limit_this_slot_to_input_type_number_name_max_part_1580add0: "Limit this slot to %{input_type_number_name_max_parti} groups."
   limit_this_slot_to_input_type_number_name_max_part_8344547a: "Limit this slot to %{input_type_number_name_max_parti} users."
+  limited_322546c5: Limited
   link_7262adec: Link
   link_color_55f8b835: "Link Colour"
   link_description_4355ca82: "Link description"
@@ -11721,7 +11756,7 @@ en-AU:
           url_info: "Visit the account page"
         subject: "Account Admin Notification"
         url_info: |-
-            Visit the account page here:
+            Visit the account page here: 
             %{url}
     account_user_registration: 
       email: 
@@ -11738,7 +11773,7 @@ en-AU:
         name_info: "Name: %{name}"
         subject: "Canvas Account Admin Invitation"
         url_info: |-
-            You'll need to register with Canvas before you can participate as an account admin.  You can finish the registration process here:
+            You'll need to register with Canvas before you can participate as an account admin.  You can finish the registration process here: 
             %{url}
         username_info: "Username: %{username}"
     added_to_conversation: 
@@ -12239,7 +12274,7 @@ en-AU:
         body: |-
             Your instructor has released mark changes and new comments for %{title}. These changes are now viewable.
             
-            Your can view it here:
+            Your can view it here: 
             %{url}
         html: 
           body: "Your instructor has released mark changes and new comments for %{title}. These changes are now viewable."
@@ -12298,7 +12333,7 @@ en-AU:
             If that's the wrong email address for this type of collaboration, you'll need to
             change your profile settings or register with %{service}.
             
-            You can see the details here:
+            You can see the details here: 
             %{link}
         body_with_user: |-
             You've been invited to collaborate on a document, %{document} for
@@ -12499,7 +12534,7 @@ en-AU:
       title: "Send a reply message"
     email: 
       footer: |-
-          You received this email because you are participating in one or more classes using Canvas.  To change or turn off email notifications, visit:
+          You received this email because you are participating in one or more classes using Canvas.  To change or turn off email notifications, visit: 
           %{url}
     enrollment_accepted: 
       email: 
@@ -13694,6 +13729,7 @@ en-AU:
       student_progress: "Student Progress"
     relock_modules: "Re-Lock Modules"
     requirements_changed: "Requirements Changed"
+  modules_b8f6aa9: modules
   modules_c4325335: Modules
   modules_home_page_568c6bb9: "Modules Home Page"
   modules_item_controller: 
@@ -13727,6 +13763,7 @@ en-AU:
   more_than_999_submissions_need_grading_bc087dd0: "More than 999 submissions need marking"
   more_than_9_submissions_need_grading_30157d49: "More than 9 submissions need grading."
   more_than_a19b440: "%{more_than}+"
+  most_recent_b2797d2: "Most Recent"
   most_recent_export_7282b756: "Most recent export"
   most_recent_result_counts_as_calculation_int_of_ma_13628bf0: "Most recent result counts as %{calculation_int}% of mastery weight, average of all other results count as %{remainder}% of weight. There must be at least 2 results before a score is returned."
   most_recent_result_counts_as_calculation_int_of_ma_a734a4db: "Most recent result counts as %{calculation_int}% of mastery weight, average of all other results count as %{remainder}% of weight. If there is only one result, the single score will be returned."
@@ -13875,11 +13912,14 @@ en-AU:
   name_is_too_long_48daa8db: "Name is too long"
   name_is_too_long_must_be_under_length_characters_b8dad44c: "Name is too long, must be under %{length} characters"
   name_is_unlocked_click_to_lock_b8b9a2c8: "%{name} is unlocked. Click to lock."
+  name_lti_tool_b61eb0af: "%{name} (LTI Tool)"
   name_missing_f4f3eb9e: "Name Missing"
   name_only_5f56718e: "Name Only"
   name_options_bc5c95ce: "%{name} Options"
+  name_quiz_15f55961: "%{name} (Quiz)"
   name_unposted_current_score_e98e95fd: "%{name} unposted current score"
   name_unposted_final_score_124708d2: "%{name} unposted final score"
+  name_user_e44eebed: "%{name} User"
   nav_avatar_border_3246beb1: "Nav Avatar Border"
   nav_background_fd299145: "Nav Background"
   nav_badge_3c67de17: "Nav Badge"
@@ -13972,6 +14012,7 @@ en-AU:
   no_74e9b590: "no"
   no_alignments_are_available_for_this_outcome_7f8346f9: "No alignments are available for this outcome."
   no_announcements_280df147: "No announcements"
+  no_assignment_group_assigned_8f1cdb9b: "No Assignment Group Assigned"
   no_assignment_name_adbb215b: "No Assignment Name"
   no_assignments_with_that_name_found_1d7be1: "No assignments with that name found"
   no_associated_terms_13bacefc: "No Associated Terms"
@@ -14008,6 +14049,7 @@ en-AU:
   no_matching_users_found_83889c10: "No matching users found."
   no_message_present_e3af6358: "No message present"
   no_migration_file: "File required for content migration."
+  no_module_assigned_ca183bd7: "No Module Assigned"
   no_more_results_to_load_6774fb1c: "No more results to load."
   no_outcome_file_or_authority_given_c90f9c5f: "No outcome file or authority given"
   no_password_was_given_472222e5: "No password was given"
@@ -14160,7 +14202,7 @@ en-AU:
     conversation_message_description: "New Inbox messages"
     conversation_message_display: "Conversation Message"
     course_content_description: |-
-        Change to course content:
+        Change to course content: 
         
         * Page content
         * Quiz content
@@ -14175,7 +14217,7 @@ en-AU:
     files_description: "New file added to your course"
     files_display: Files
     grading_description: |-
-        Includes:
+        Includes: 
         
         * Assignment/submission grade entered/changed
         * Un-muted assignment grade
@@ -14185,7 +14227,7 @@ en-AU:
     grading_policies_description: "Course grading policy change"
     grading_policies_display: "Grading Policies"
     invitation_description: |-
-        Invitation for:
+        Invitation for: 
         
         * Web conference
         * Group
@@ -14521,6 +14563,7 @@ en-AU:
   open_name_color_picker_a2646a33: "Open %{name} Colour Picker"
   open_sidebar_2852e8c8: "Open sidebar"
   open_speedgrader_11604608: "Open SpeedGrader"
+  open_student_context_tray_24c1b1d6: "Open student context tray"
   open_submission_tray_4eb14e96: "Open submission tray"
   open_the_grade_detail_tray_cea682a5: "Open the grade detail tray"
   open_theme_editor_2d924ebe: "Open Theme Editor"
@@ -14750,6 +14793,7 @@ en-AU:
     overrides: 
       everyone: Everyone
   overrides_e8659a73: Overrides
+  overview_of_student_status_a004bcf3: "Overview of student status"
   overwrite_all_users_existing_default_dashboard_pre_9b2ad7d1: "Overwrite all users' existing default dashboard preferences"
   own_copyright_cc59db55: "Own Copyright"
   owner_email_236d1b2: "Owner Email"
@@ -14844,7 +14888,9 @@ en-AU:
   paypal: 
     exception: "We're sorry, an error has occurred, please try again later."
   pdf_d8236d9a: PDF
+  peer_review_assignment_7d314c59: "Peer Review Assignment"
   peer_review_for_assignment_ce72fc52: "Peer Review for %{assignment}"
+  peer_reviewed_assignments_are_not_yet_handled_in_t_5eef60fb: "Peer reviewed assignments are not yet handled in the new assignments flow. Head to the legacy create assignment page?"
   peer_reviewed_graded_discussion_b339df5b: "Peer-reviewed graded discussion:"
   peer_reviews_api: 
     errors: 
@@ -14922,6 +14968,7 @@ en-AU:
   please_add_a_due_date_1d433d2: "Please add a due date"
   please_add_at_least_one_non_blank_answer_213c2c8e: "Please add at least one non-blank answer."
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Please add at least one non-blank answer for each variable."
+  please_adjust_your_security_preferences_before_con_fd568e8d: "Please adjust your security preferences before continuing."
   please_allow_arc_to_access_your_webcam_e72e4be4: "Please allow Arc to access your webcam."
   please_allow_canvas_to_access_your_webcam_f66bacb1: "Please allow Canvas to access your webcam."
   please_create_a_group_set_8db6e8fe: "Please create a group set"
@@ -15120,17 +15167,20 @@ en-AU:
       name: "Mark Export"
     grade_export_settings: 
       description: |-
-          This plugin allows final grades to be published back to a student information system (SIS).  When enabled, the user will be given an option in the gradebook to publish these grades.  This will occur via a POST request to the specified publish endpoint.  Each type defines it's own content format and mime type.  The response from the endpoint does not matter and is currently ignored.
+          This plugin allows final grades to be published back to a student information system (SIS).  When enabled, the user will be given an option in the gradebook to publish these grades.  This will occur via a POST request to the specified publish endpoint.  Each type defines its own content format and mime type.  The response from the endpoint does not matter and is currently ignored.
           
-          For example, the Instructure formatted CSV will POST a csv file with mime type 'text/csv' to the specified endpoint, containing the following columns:
+          For example, the Instructure formatted CSV will POST a csv file with mime type 'text/csv' to the specified endpoint, containing the following columns: 
           
           "publisher_id", "publisher_sis_id", "course_id", "course_sis_id", "section_id", "section_sis_id", "student_id", "student_sis_id", "enrollment_id", "enrollment_status", "score", "grade"
           
           (Note: the "grade" column is only returned if the course specifies a grading standard)
           
           For each student in the course being published, there will be 1 or more rows in the published csv. Specifically, there will be 1 row for each login that the student has in the course's root account.  Most of the time this will result in 1 row per student, but if the student has multiple logins, there will be a row for each of them.
+          
+          If "Include final grade overrides" is checked, and the feature for Final Grade Override is enabled, students with an override grade/score will receive that in place of the calculated score and grade.
       labels: 
         format_type: "Output format type"
+        include_final_grade_overrides: "Include final grade overrides"
         publish_endpoint: "Endpoint to publish to"
         success_timeout: "Success notification timeout (in seconds)"
         wait_for_success: "Wait for success notifications"
@@ -15177,7 +15227,7 @@ en-AU:
           **Note:** once you have Kaltura configured within Canvas,
           you need to go to the Kaltura Management Console and under "Settings ->
           Integration Settings" enable server notifications with a
-          Notification URL of:
+          Notification URL of: 
           
           %{notification_url}
           
@@ -15389,6 +15439,7 @@ en-AU:
   points_for_tier_index_must_be_less_than_points_for_9683c02: "Points for tier %{index} must be less than points for prior tier (%{points} is greater than %{prior})"
   points_highest_to_lowest_87f1b143: "Points - Highest to Lowest"
   points_lowest_to_highest_45089e82: "Points - Lowest to Highest"
+  points_must_be_0_c278c612: "Points must be >= 0"
   points_must_be_less_than_previous_rating_bc627bec: "Points must be less than previous rating"
   points_n_e0b20623: "Points %{n}"
   points_out_of_total_24f61148: "*%{points}* out of **%{total}**"
@@ -15443,6 +15494,7 @@ en-AU:
   post_grade_to_sis_disabled_click_to_toggle_6ee5ff3: "Post grade to SIS disabled. Click to toggle."
   post_grade_to_sis_enabled_click_to_toggle_82da8ce8: "Post grade to SIS enabled. Click to toggle."
   post_grades_39c52870: "Post Marks"
+  post_grades_3e692d46: "Post grades"
   post_grades_description: |-
       Post Marks allows teachers to post marks back to enabled SIS systems: Powerschool,
       Aspire (SIS2000), JMC, and any other SIF-enabled SIS that accepts the SIF elements GradingCategory,
@@ -15451,6 +15503,8 @@ en-AU:
   post_grades_to_posttosisname_70430da4: "Post Grades to %{postToSISName}"
   post_grades_to_sis_97ece878: "Post Marks to SIS"
   post_grades_to_sis_checkbox_is_enabled_by_default__394a8229: "The \"Post Marks to SIS\" tickbox is enabled by default for assignments, graded discussions and quizzes."
+  post_grades_tray_83f2fb2e: "Post grades tray"
+  post_policies_22f09fea: "Post Policies"
   post_to_961f8937: "Post to"
   posted_at_4cfce2c3: "%{posted_at}"
   posted_on_e1010e1e: "Posted on:"
@@ -16659,7 +16713,7 @@ en-AU:
           multiple_dropdowns: "Enter your question, specifying where each dropdown should go. Then define possible answers for each dropdown, with one correct answer per dropdown."
           numerical: "Define the correct answer as any number within a range, or a number plus or minus some error margin. Student will be given an empty text box to type their numerical answer."
           short_answer: |-
-              Enter your question text, then define all possible correct answers for the blank.
+              Enter your question text, then define all possible correct answers for the blank.  
               Students will see the question followed by a small text box to type their answer.
           text_only: "This \"question\" will not be scored, but can be useful for introducing a set of related questions."
           true_false: "Enter your question text, then select if True or False is the correct answer."
@@ -17321,6 +17375,7 @@ en-AU:
     submission_action_take_quiz: "Take %{title}"
   quizzes_7e598f57: Quizzes
   quizzes_and_question_banks_9b7569e3: "Quizzes and Question Banks"
+  quizzes_are_not_yet_handled_in_the_new_assignments_3898536a: "Quizzes are not yet handled in the new assignments flow. Head to the legacy create quiz page?"
   quizzes_next_importing_75e63f67: "Quizzes.Next Importing"
   quizzes_next_submission_history_c0f7cd20: "Quizzes.Next submission history"
   quizzes_tutorial_tray_6f87cdd3: "Quizzes Tutorial Tray"
@@ -17440,8 +17495,10 @@ en-AU:
     sections_count: 
       one: "1 section"
       other: "%{count} sections"
+  record_audio_14666880: "Record Audio"
   record_media_6637ff19: "Record Media"
   record_upload_media_5fdce166: "Record/Upload Media"
+  record_video_70dc8439: "Record Video"
   record_with_microphone_only_e4ee07aa: "Record with Microphone Only"
   record_with_webcam_af21e07c: "Record with Webcam"
   recording_98da6bda: Recording
@@ -17545,6 +17602,7 @@ en-AU:
   remove_this_item_from_the_module_4b2ceab7: "Remove this item from the module"
   remove_this_rubric_from_my_list_c7d80704: "Remove this Rubric from my list."
   remove_this_section_9a88ca43: "Remove this Section"
+  remove_user_from_section_5556f465: "Remove User from Section"
   removed_course_association_course_a233342c: "Removed course association %{course}"
   removed_user_as_group_leader_bb69330f: "Removed %{user} as group leader"
   rename_45608f54: Rename
@@ -17918,6 +17976,7 @@ en-AU:
   score_pointspossibletranslated_c1ac019e: "%{score}/%{pointsPossibleTranslated}"
   score_pts_adcb1af3: "%{score} pts"
   score_score_6f81e8c8: "Score: %{score}"
+  score_to_keep_e89e4fa5: "Score to keep"
   scored_less_than_2427896c: "Scored less than"
   scored_less_than_cutoff_on_assignment_5f5c4303: "Scored less than %{cutoff} on %{assignment}"
   scored_more_than_cutoff_on_assignment_f422fec: "Scored more than %{cutoff} on %{assignment}"
@@ -18053,6 +18112,7 @@ en-AU:
   search_announcements_by_title_407a998e: "Search announcements by title"
   search_by_99d1ba5f: "Search by"
   search_by_c559efd: "Search By"
+  search_by_title_or_author_273a8f49: "Search by title or author..."
   search_by_title_short_name_or_sis_id_fe84aa12: "Search by title, short name, or SIS ID"
   search_by_user_dd3ad189: "Search by user"
   search_courses_591bc900: "Search courses..."
@@ -18312,10 +18372,12 @@ en-AU:
       not_available_yet: "We'll send you an email shortly before the course begins."
   self_registration_156392d6: "Self Registration"
   self_signup_15b23092: self_signup
+  send_a_comment_to_your_instructor_about_this_assig_83fd5960: "Send a comment to your instructor about this assignment."
   send_a_message_to_student_b2e72576: "Send a message to %{student}"
   send_a_message_to_the_teacher_1ae115b6: "Send a Message to the Teacher."
   send_a_message_to_this_student_ec46b8dd: "Send a message to this student"
   send_authorization_url_in_lti2_registration_287fcb33: "Send Authorisation URL in LTI2 Registration"
+  send_comment_4e05f2fb: "Send Comment"
   send_comment_to_instructor_only_4295a109: "Send comment to instructor only"
   send_comment_to_the_whole_group_8d41e63a: "Send comment to the whole group"
   send_comment_to_this_student_only_e3d9ca1: "Send comment to this student only"
@@ -18716,7 +18778,7 @@ en-AU:
       mute_dialog: |-
           Are you sure you want to mute this assignment? While this assignment
           is muted, students will not receive new notifications about or be
-          able to see:
+          able to see: 
           
           *  Mark change notifications
           *  Submission comments
@@ -19301,6 +19363,7 @@ en-AU:
   some_submissions_are_not_gradeable_grade_changes_f_f8bf44e2: "Some submissions are not able to be graded; grade changes for those submissions have been ignored."
   someone: Someone
   someone_bbbc538b: Someone
+  something_broke_unexpectedly_6d3720ee: "Something broke unexpectedly."
   something_is_broken_but_i_can_work_around_it_for_n_7fcedb9d: "Something is broken, but I can work around it for now"
   something_went_wrong_accessing_your_mic_or_webcam_6e3cad12: "Something went wrong accessing your mic or webcam."
   something_went_wrong_accessing_your_webcam_6643b87e: "Something went wrong accessing your webcam."
@@ -19446,6 +19509,9 @@ en-AU:
   student_5da6bfd1: Student
   student_921b864d: student
   student_assignment_outcome_map_title: "Student Competency"
+  student_can_choose_any_combination_of_submission_t_1273b6e8: "Student can choose any combination of submission types"
+  student_can_choose_only_one_submission_type_36769093: "Student can choose only one submission type"
+  student_choice_b7f46223: "Student Choice"
   student_collaborations_create_b9e312c1: "Student Collaborations - create"
   student_context_card_ad59967e: "Student Context Card"
   student_context_cards_376d2072: "Student Context Cards"
@@ -19464,6 +19530,7 @@ en-AU:
   student_id_a61d78c7: "Student Id"
   student_interaction_report_3f3d2ff1: "Student Interaction Report"
   student_interactions_report_7717b685: "Student Interactions Report"
+  student_is_required_to_do_all_submission_types_c594d40b: "Student is required to do all submission types"
   student_messages_b0a242d: "Student Messages"
   student_must_complete_all_of_these_requirements_656771d6: "Student must complete all of these requirements"
   student_must_complete_one_of_these_requirements_6046eb3a: "Student must complete one of these requirements."
@@ -19484,6 +19551,7 @@ en-AU:
       mastery/remedial.
   student_planner_aee76000: "Student Planner"
   student_planner_date_4cc73abb: "Student Planner Date:"
+  student_points_possible_points_196c7108: "{{student_points}}/{{possible_points}}"
   student_position_6d3b7750: "Student %{position}"
   student_settings_354d9a7e: "Student Settings"
   student_sis_6721040e: "Student Sis"
@@ -19586,6 +19654,7 @@ en-AU:
   submission_comment_submission_submittor_assignment_3302b9af: "Submission Comment: %{submission_submittor}, %{assignment}, %{context}"
   submission_comment_updated_8d917ded: "Submission comment updated"
   submission_comments_4fa03a17: "Submission Comments"
+  submission_date_8f659c0c: "Submission Date"
   submission_date_a7920dac: "submission date"
   submission_detail: 
     go_to_submission_url: "Go to submission URL"
@@ -19612,9 +19681,11 @@ en-AU:
   submission_in_another_grading_period_e754b329: "Submission in another marking period"
   submission_index_e960f9bf: "Submission %{index}"
   submission_options_5184a65b: "Submission Options"
+  submission_requirement_8ba1ee08: "Submission Requirement"
   submission_score_b7a291e8: "submission score"
   submission_status_3079e730: "Submission status"
   submission_tray_429ac3df: "Submission tray"
+  submission_type_a925fc5f: "Submission Type"
   submission_updated_8897f3b7: "Submission updated"
   submissions: 
     assignment_submit_success: "Assignment successfully submitted."
@@ -19990,7 +20061,7 @@ en-AU:
   the_following_errors_occurred_bdec1e44: "The following errors occurred:"
   the_following_fields_are_invalid_fields_b3565800: "The following fields are invalid: %{fields}"
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
-      The following students have unsaved changes to their quiz submissions:
+      The following students have unsaved changes to their quiz submissions: 
       
       %{users}
       Continue anyway?
@@ -20917,14 +20988,18 @@ en-AU:
   unknown_compression_method_b6a850b5: "unknown compression method"
   unknown_content_type_ae6d08e8: "Unknown Content Type"
   unknown_event_7a0bcda3: "Unknown event"
+  unknown_external_tool_c918e9b2: "Unknown External Tool"
   unknown_manage_discussion_action_encountered_92a8dfc0: "Unknown manage discussion action encountered"
   unknown_question_bank: "Unknown question bank"
   unknown_quiz: "Unknown quiz"
+  unknown_quiz_3892d071: "Unknown Quiz"
   unknown_role_cbe9a089: "Unknown Role"
   unknown_status_status_35331e1d: "Unknown status, %{status}"
   unknown_status_status_message_3a4ed4d5: "Unknown status, %{status}: %{message}"
   unknown_user_1113fcaa: "Unknown User"
   unknown_user_url_82196ba7: "Unknown User URL"
+  unlimited_attempts_81a37d4: "Unlimited Attempts"
+  unlimited_ff19e96d: Unlimited
   unlock_562bc4cb: Unlock
   unlock_at_bb930b34: "Unlock at"
   unlock_at_time_a0bbfb9: "Unlock at: %{time}"
@@ -20991,6 +21066,7 @@ en-AU:
   until_6437a827: " until"
   until_8bdea3de: until
   until_date_949017c4: "Until %{date}"
+  until_fccd159a: "Until:"
   untitled_16aa4f2b: Untitled
   untitled_assignment_59354b34: "untitled assignment"
   unused_courses_title: "Unused Courses"
@@ -22002,6 +22078,8 @@ en-AU:
   you_do_not_have_permission_to_invite_users_that_do_b7142404: "You do not have permission to invite users that do not already exist."
   you_do_not_have_permission_to_publish_this_course_ff361c82: "You do not have permission to publish this course."
   you_do_not_have_permissions_to_edit_this_moderated_3195294f: "You do not have permissions to edit this moderated assignment"
+  you_don_t_have_access_to_view_this_resource_8378e0e8: "You don't have access to view this resource."
+  you_don_t_have_permission_to_access_this_resource_447d3a5e: "You don't have permission to access this resource."
   you_don_t_have_permission_to_manage_grades_for_thi_a9a1be3a: "You don't have permission to manage grades for this course"
   you_have_been_given_extra_time_on_this_attempt_9d8bff6c: "You have been given extra time on this attempt."
   you_have_changed_the_progression_requirements_for__6772bc89: "You have changed the progression requirements for an active course. There may be students who have already progressed to this module and to others that depend on it."
