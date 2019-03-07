@@ -33,9 +33,11 @@ function CommentContent(props) {
           url={noComments}
         />
       )}
-      {props.comments.map(comment => (
-        <CommentRow key={comment._id} comment={comment} />
-      ))}
+      {props.comments
+        .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+        .map(comment => (
+          <CommentRow key={comment._id} comment={comment} />
+        ))}
     </React.Fragment>
   )
 }

@@ -53,7 +53,7 @@ export function mockAssignment(overrides = {}) {
                 _id: '1',
                 attachments: [],
                 comment: 'comment comment',
-                updatedAt: '12/13/91',
+                updatedAt: '2019-03-05T23:09:36-07:00',
                 author: {
                   __typename: 'Author',
                   avatarUrl: 'example.com',
@@ -90,7 +90,7 @@ export function mockComments(overrides = {}) {
           _id: '1',
           attachments: [],
           comment: 'comment comment',
-          updatedAt: '12/13/91',
+          updatedAt: '2019-03-05T23:09:36-07:00',
           author: {
             __typename: 'Author',
             avatarUrl: 'example.com',
@@ -108,7 +108,7 @@ export function singleComment(overrides = {}) {
     _id: '1',
     attachments: [],
     comment: 'comment comment',
-    updatedAt: '12/13/91',
+    updatedAt: '2019-03-05T23:09:36-07:00',
     author: {
       __typename: 'Author',
       avatarUrl: 'example.com',

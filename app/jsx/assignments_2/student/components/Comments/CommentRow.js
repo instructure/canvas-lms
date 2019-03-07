@@ -26,7 +26,7 @@ import FriendlyDatetime from '../../../../shared/FriendlyDatetime'
 function CommentRow(props) {
   const author = props.comment.author
   return (
-    <div className="comment-row-container">
+    <div className="comment-row-container" data-testid="comment-row">
       <div className="comment-avatar-container">
         <Avatar
           name={author ? author.shortName : I18n.t('Anonymous')}

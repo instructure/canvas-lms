@@ -183,4 +183,28 @@ describe('Comments', () => {
 
     expect(container.querySelector('a[href]')).toBeNull()
   })
+
+  it('displays the comments in reverse chronological order', async () => {
+    const comments = [
+      ['2019-03-01T14:32:37-07:00', 'last comment'],
+      ['2019-03-03T14:32:37-07:00', 'first comment'],
+      ['2019-03-02T14:32:37-07:00', 'middle comment']
+    ].map(comment =>
+      singleComment({
+        updatedAt: comment[0],
+        comment: comment[1]
+      })
+    )
+    const {getAllByTestId} = render(<CommentsContainer comments={comments} />)
+
+    const rows = getAllByTestId('comment-row')
+
+    expect(rows).toHaveLength(comments.length)
+    expect(rows[0]).toHaveTextContent('first comment')
+    expect(rows[0]).toHaveTextContent('Sun Mar 3, 2019 9:32pm')
+    expect(rows[1]).toHaveTextContent('middle comment')
+    expect(rows[1]).toHaveTextContent('Sat Mar 2, 2019 9:32pm')
+    expect(rows[2]).toHaveTextContent('last comment')
+    expect(rows[2]).toHaveTextContent('Fri Mar 1, 2019 9:32pm')
+  })
 })
