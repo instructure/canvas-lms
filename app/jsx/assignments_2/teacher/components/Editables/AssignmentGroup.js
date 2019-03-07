@@ -43,7 +43,7 @@ const AssignmentGroupPropTypes = {
 /* eslint-disable react/default-props-match-prop-types */
 const AssignmentGroupDefaultProps = {
   assignmentGroupList: [],
-  readOnly: true
+  readOnly: false
 }
 /* eslint-enable react/default-props-match-prop-types */
 const assignmentGroupPlaceholder = I18n.t('No Assignment Group Assigned')

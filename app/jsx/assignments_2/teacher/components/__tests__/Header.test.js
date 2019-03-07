@@ -27,7 +27,12 @@ describe('assignments 2 teacher view header', () => {
     const assignment = mockAssignment()
     const {getByTestId} = render(
       <MockedProvider>
-        <Header assignment={assignment} onChangeAssignment={() => {}} onSetWorkstate={() => {}} />
+        <Header
+          assignment={assignment}
+          onChangeAssignment={() => {}}
+          onSetWorkstate={() => {}}
+          onValidate={() => true}
+        />
       </MockedProvider>
     )
 

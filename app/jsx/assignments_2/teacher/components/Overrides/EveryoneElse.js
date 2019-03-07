@@ -34,7 +34,7 @@ export default class EveryoneElse extends React.Component {
   }
 
   static defaultProps = {
-    readOnly: true
+    readOnly: false
   }
 
   handleChangeOverride = (_index, path, value) => {

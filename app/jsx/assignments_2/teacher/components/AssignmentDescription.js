@@ -32,7 +32,7 @@ export default class AssignmentDescription extends React.Component {
   }
 
   static defaultPropTypes = {
-    readOnly: true
+    readOnly: false
   }
 
   constructor(props) {

@@ -59,6 +59,7 @@ export default class Header extends React.Component {
   static propTypes = {
     assignment: TeacherAssignmentShape.isRequired,
     onChangeAssignment: func.isRequired,
+    onValidate: func.isRequired,
     onSetWorkstate: func.isRequired,
     onUnsubmittedClick: func,
     onPublishChange: func,
@@ -70,7 +71,7 @@ export default class Header extends React.Component {
     onUnsubmittedClick: () => {},
     onPublishChange: () => {},
     onDelete: () => {},
-    readOnly: true
+    readOnly: false
   }
 
   constructor(props) {
@@ -213,6 +214,7 @@ export default class Header extends React.Component {
                 name={assignment.name}
                 onChange={this.handleNameChange}
                 onChangeMode={this.handleNameChangeMode}
+                onValidate={this.props.onValidate}
                 readOnly={this.props.readOnly}
               />
             </View>

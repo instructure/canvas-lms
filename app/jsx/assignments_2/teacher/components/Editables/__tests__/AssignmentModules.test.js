@@ -104,7 +104,7 @@ describe('AssignmentModulesUI', () => {
           selectedModules={moduleList.slice(0, 1)}
           readOnly={false}
         />
-        <span id="click-me" tabIndex="-1">
+        <span id="focus-me" tabIndex="-1">
           just here to get focus
         </span>
       </div>
@@ -114,7 +114,7 @@ describe('AssignmentModulesUI', () => {
     input.click()
     const option = document.querySelectorAll('li[role="option"]')[0]
     option.click()
-    container.querySelector('#click-me').focus()
+    container.querySelector('#focus-me').focus()
     expect(onchangemode).toHaveBeenCalledWith('view')
     expect(onchange).not.toHaveBeenCalled()
 

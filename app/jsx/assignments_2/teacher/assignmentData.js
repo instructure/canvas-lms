@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import gql from 'graphql-tag'
-import {bool, number, oneOf, shape, string, arrayOf} from 'prop-types'
+import {bool, number, oneOf, oneOfType, shape, string, arrayOf} from 'prop-types'
 
 // This ENV shape is for the controller's current show action. We'll have
 // something different when assignments are being created, which is a different
@@ -338,17 +338,17 @@ const SubmissionShape = shape({
 })
 
 export const TeacherAssignmentShape = shape({
-  lid: string.isRequired,
-  name: string.isRequired,
-  pointsPossible: number.isRequired,
+  lid: string,
+  name: string,
+  pointsPossible: oneOfType([number, string]),
   dueAt: string,
   lockAt: string,
   unlockAt: string,
   description: string,
   state: oneOf(['published', 'unpublished', 'deleted']).isRequired,
-  assignmentGroup: AssignmentGroupShape.isRequired,
+  assignmentGroup: AssignmentGroupShape,
   modules: arrayOf(ModuleShape).isRequired,
-  course: CourseShape.isRequired,
+  course: CourseShape.isRequired, // not edited by the teacher
   lockInfo: LockInfoShape.isRequired,
   submissionTypes: arrayOf(string).isRequired,
   allowedExtensions: arrayOf(string).isRequired,

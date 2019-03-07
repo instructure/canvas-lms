@@ -109,13 +109,7 @@ describe('AssignmentGroup', () => {
   it('queries group list on edit', async () => {
     const {getByText} = render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <AssignmentGroup
-          courseId="55"
-          mode="edit"
-          onChange={() => {}}
-          onChangeMode={() => {}}
-          readOnly={false}
-        />
+        <AssignmentGroup courseId="55" mode="edit" onChange={() => {}} onChangeMode={() => {}} />
       </MockedProvider>
     )
     // The groups are loaded when Select removes its spinner

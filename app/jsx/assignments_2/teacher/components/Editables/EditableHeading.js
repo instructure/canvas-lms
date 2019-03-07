@@ -31,15 +31,13 @@ export default class EditableHeading extends React.Component {
     value: string.isRequired, // the current text string
     onChange: func.isRequired, // when flips from edit to view, notify consumer of the new value
     onChangeMode: func.isRequired, // when mode changes
-    isValid: func, // is the current value valid
     initialMode: oneOf(['view', 'edit']), // what mode should we start in. after that mode is handled internally
     placeholder: string, // the string to display when the text value is empty
     viewAs: string, // <Heading as={viewAs}> when in view mode
     editButtonPlacement: oneOf(['start', 'end']), // is the edit button before or after the text?
     level: oneOf(['h1', 'h2', 'h3', 'h4', 'h5']),
     readOnly: bool,
-    required: bool,
-    invalidMessage: string
+    required: bool
   }
 
   static defaultProps = {
@@ -47,8 +45,7 @@ export default class EditableHeading extends React.Component {
     level: 'h2', // to match instui Heading default
     placeholder: '',
     readOnly: false,
-    required: false,
-    isValid: () => true
+    required: false
   }
 
   constructor(props) {
@@ -187,7 +184,7 @@ export default class EditableHeading extends React.Component {
   }
 
   renderEditButton = props => {
-    if (!this.props.readOnly && this.props.isValid(this.props.value)) {
+    if (!this.props.readOnly) {
       props.label = this.props.label
       return InPlaceEdit.renderDefaultEditButton(props)
     }
@@ -228,11 +225,8 @@ export default class EditableHeading extends React.Component {
 
   handleModeChange = mode => {
     if (!this.props.readOnly) {
-      if (mode === 'view') {
-        if (!this.props.isValid(this.props.value)) {
-          // can't leave edit mode with a bad value
-          return
-        }
+      if (this.props.mode === 'edit' && mode === 'view') {
+        this.props.onChange(this.props.value)
       }
       this.props.onChangeMode(mode)
     }

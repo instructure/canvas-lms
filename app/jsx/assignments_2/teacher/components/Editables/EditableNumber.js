@@ -40,7 +40,6 @@ export default class EditableNumber extends React.Component {
     editButtonPlacement: oneOf(['start', 'end']), // is the edit button before or after the text?
     readOnly: bool,
     onInput: func, // called as the user types.
-    isValid: func,
     inline: bool,
     required: bool,
     size: oneOf(['medium', 'large'])
@@ -52,7 +51,6 @@ export default class EditableNumber extends React.Component {
     readOnly: false,
     required: false,
     size: 'medium',
-    isValid: () => true,
     onInputChange: () => {}
   }
 
@@ -173,6 +171,7 @@ export default class EditableNumber extends React.Component {
         showArrows={false}
         onChange={this.handleInputChange}
         onKeyDown={this.handleKey}
+        onKeyUp={this.handleKey}
         label={<ScreenReaderContent>this.props.label</ScreenReaderContent>}
         onBlur={onBlur}
         inputRef={createChainedFunction(this.getInputRef, editorRef)}
@@ -184,28 +183,25 @@ export default class EditableNumber extends React.Component {
   }
 
   renderEditButton = props => {
-    if (!this.props.readOnly && this.props.isValid(this.props.value)) {
+    if (!this.props.readOnly) {
       props.label = this.props.label
       return InPlaceEdit.renderDefaultEditButton(props)
     }
     return null
   }
 
-  // don't have to check what mode is, because
-  // this is the editor's key handler
+  // Notes: if we handle Enter on keyup, we wind here when using enter
+  // to click the edit button, and can't trigger edit via the kb
+  // if we handle Escape via keydown, then Editable never calls onChangeMode
   handleKey = event => {
-    if (event.key === 'Enter') {
+    // don't have to check what mode is, because this is the editor's key handler
+    if (event.key === 'Enter' && event.type === 'keydown') {
       event.preventDefault()
       event.stopPropagation()
       this.handleModeChange('view')
     } else if (event.key === 'Escape') {
       // reset to initial value
       this.props.onChange(this.state.initialValue)
-      // TODO: figure out what's going wrong here, and hopefully get rid of the timeout
-      // need to let the change take effect
-      window.setTimeout(() => {
-        this.props.onChangeMode('view') // I don't know why, but Editable's ESC handler isn't being called
-      }, 1)
     }
   }
 
@@ -228,11 +224,8 @@ export default class EditableNumber extends React.Component {
 
   handleModeChange = mode => {
     if (!this.props.readOnly) {
-      if (mode === 'view') {
-        if (!this.props.isValid(this.props.value)) {
-          // can't leave edit mode with a bad value
-          return
-        }
+      if (this.props.mode === 'edit' && mode === 'view') {
+        this.props.onChange(this.props.value)
       }
       this.props.onChangeMode(mode)
     }
