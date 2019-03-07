@@ -41,6 +41,10 @@ describe('Gradebook FinalGradeOverrides', () => {
     // `gradebook` is a double because CoffeeScript and AMD cannot be imported
     // into Jest specs
     gradebook = {
+      course: {
+        id: '1201'
+      },
+
       getGradingPeriodToShow: sinon.stub().returns('1501'),
 
       gradebookGrid: {
@@ -142,11 +146,11 @@ describe('Gradebook FinalGradeOverrides', () => {
     it('includes the column id when updating column cells', () => {
       finalGradeOverrides.setGrades(grades)
       const calls = [0, 1].map(index => gradebook.gradebookGrid.updateRowCell.getCall(index))
-      const studentIds = calls.map(call => call.args[1])
-      expect(studentIds).toEqual(['total_grade_override', 'total_grade_override'])
+      const columnIds = calls.map(call => call.args[1])
+      expect(columnIds).toEqual(['total_grade_override', 'total_grade_override'])
     })
 
-    it('invalidates grid rows after storing final grade overrides', () => {
+    it('updates row cells after storing final grade overrides', () => {
       gradebook.gradebookGrid.updateRowCell.callsFake(() => {
         // final grade overrides will have already been updated by this time
         expect(finalGradeOverrides.getGradeForUser('1101')).toEqual(grades[1101].courseGrade)
@@ -422,6 +426,74 @@ describe('Gradebook FinalGradeOverrides', () => {
         const [{type}] = FlashAlert.showFlashAlert.lastCall.args
         expect(type).toEqual('error')
       })
+    })
+  })
+
+  describe('#loadFinalGradeOverrides()', () => {
+    beforeEach(() => {
+      grades = {
+        1101: {
+          courseGrade: {
+            percentage: 88.1
+          }
+        },
+        1102: {
+          courseGrade: {
+            percentage: 91.1
+          }
+        }
+      }
+
+      sinon
+        .stub(FinalGradeOverrideApi, 'getFinalGradeOverrides')
+        .returns(Promise.resolve({finalGradeOverrides: grades}))
+    })
+
+    afterEach(() => {
+      FinalGradeOverrideApi.getFinalGradeOverrides.restore()
+    })
+
+    it('optionally requests final grade overrides', async () => {
+      await finalGradeOverrides.loadFinalGradeOverrides()
+      expect(FinalGradeOverrideApi.getFinalGradeOverrides.callCount).toEqual(1)
+    })
+
+    it('uses the course id from Gradebook when loading final grade overrides', async () => {
+      await finalGradeOverrides.loadFinalGradeOverrides()
+      const [courseId] = FinalGradeOverrideApi.getFinalGradeOverrides.lastCall.args
+      expect(courseId).toEqual('1201')
+    })
+
+    it('stores the given final grade overrides in the Gradebook', async () => {
+      await finalGradeOverrides.loadFinalGradeOverrides()
+      expect(finalGradeOverrides.getGradeForUser('1101')).toEqual(grades[1101].courseGrade)
+    })
+
+    it('updates row cells for each related student', async () => {
+      await finalGradeOverrides.loadFinalGradeOverrides()
+      expect(gradebook.gradebookGrid.updateRowCell.callCount).toEqual(2)
+    })
+
+    it('includes the user id when updating column cells', async () => {
+      await finalGradeOverrides.loadFinalGradeOverrides()
+      const calls = [0, 1].map(index => gradebook.gradebookGrid.updateRowCell.getCall(index))
+      const studentIds = calls.map(call => call.args[0])
+      expect(studentIds).toEqual(['1101', '1102'])
+    })
+
+    it('includes the column id when updating column cells', async () => {
+      await finalGradeOverrides.loadFinalGradeOverrides()
+      const calls = [0, 1].map(index => gradebook.gradebookGrid.updateRowCell.getCall(index))
+      const columnIds = calls.map(call => call.args[1])
+      expect(columnIds).toEqual(['total_grade_override', 'total_grade_override'])
+    })
+
+    it('updates row cells after storing final grade overrides', async () => {
+      gradebook.gradebookGrid.updateRowCell.callsFake(() => {
+        // final grade overrides will have already been updated by this time
+        expect(finalGradeOverrides.getGradeForUser('1101')).toEqual(grades[1101].courseGrade)
+      })
+      await finalGradeOverrides.loadFinalGradeOverrides()
     })
   })
 })

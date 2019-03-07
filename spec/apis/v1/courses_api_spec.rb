@@ -3564,6 +3564,7 @@ describe CoursesController, type: :request do
           :format => 'json'
         })
         expect(json).to eq({
+          'allow_final_grade_override' => false,
           'allow_student_discussion_topics' => true,
           'allow_student_forum_attachments' => false,
           'allow_student_discussion_editing' => true,
@@ -3584,6 +3585,8 @@ describe CoursesController, type: :request do
       end
 
       it "should update settings" do
+        @course.enable_feature!(:new_gradebook)
+        @course.enable_feature!(:final_grades_override)
         expect(Auditors::Course).to receive(:record_updated).
           with(anything, anything, anything, source: :api)
 
@@ -3593,6 +3596,7 @@ describe CoursesController, type: :request do
           :course_id => @course.to_param,
           :format => 'json'
         }, {
+          :allow_final_grade_override => true,
           :allow_student_discussion_topics => false,
           :allow_student_forum_attachments => true,
           :allow_student_discussion_editing => false,
@@ -3606,6 +3610,7 @@ describe CoursesController, type: :request do
           :home_page_announcement_limit => nil
         })
         expect(json).to eq({
+          'allow_final_grade_override' => true,
           'allow_student_discussion_topics' => false,
           'allow_student_forum_attachments' => true,
           'allow_student_discussion_editing' => false,
@@ -3624,6 +3629,7 @@ describe CoursesController, type: :request do
           'image' => nil
         })
         @course.reload
+        expect(@course.allow_final_grade_override?).to eq true
         expect(@course.allow_student_discussion_topics).to eq false
         expect(@course.allow_student_forum_attachments).to eq true
         expect(@course.allow_student_discussion_editing).to eq false
@@ -3649,6 +3655,7 @@ describe CoursesController, type: :request do
           :format => 'json'
         })
         expect(json).to eq({
+          'allow_final_grade_override' => false,
           'allow_student_discussion_topics' => true,
           'allow_student_forum_attachments' => false,
           'allow_student_discussion_editing' => true,

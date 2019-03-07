@@ -23,6 +23,7 @@ import {fireEvent, wait} from 'react-testing-library'
 import GradebookSettingsModal from 'jsx/gradezilla/default_gradebook/components/GradebookSettingsModal'
 import * as GradebookSettingsModalApi from 'jsx/gradezilla/default_gradebook/apis/GradebookSettingsModalApi'
 import * as FlashAlert from 'jsx/shared/FlashAlert'
+import CourseSettings from 'jsx/gradezilla/default_gradebook/CourseSettings'
 import PostPolicies from 'jsx/gradezilla/default_gradebook/PostPolicies'
 import * as PostPolicyApi from 'jsx/gradezilla/default_gradebook/PostPolicies/PostPolicyApi'
 import {createGradebook} from 'jsx/gradezilla/default_gradebook/__tests__/GradebookSpecHelper'
@@ -35,6 +36,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
   let props
   let qunitTimeout
 
+  let updatedCourseSettings
   let fetchedLatePolicy
   let existingLatePolicy
   let newLatePolicy
@@ -44,7 +46,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
   let createLatePolicyPromise
   let updateLatePolicyPromise
   let setCoursePostPolicyPromise
-  let onAdvancedSettingsChangePromise
+  let updateCourseSettingsPromise
 
   suiteHooks.beforeEach(() => {
     qunitTimeout = QUnit.config.testTimeout
@@ -55,6 +57,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
 
     gradebook = createGradebook({post_manually: false})
 
+    updatedCourseSettings = {allowFinalGradeOverride: true}
     fetchedLatePolicy = GradebookSettingsModalApi.DEFAULT_LATE_POLICY_DATA
     newLatePolicy = GradebookSettingsModalApi.DEFAULT_LATE_POLICY_DATA
     existingLatePolicy = {
@@ -71,18 +74,17 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
 
     props = {
       anonymousAssignmentsPresent: false,
+      courseFeatures: {
+        finalGradeOverrideEnabled: true
+      },
       courseId: '1201',
+      courseSettings: new CourseSettings(gradebook, {allowFinalGradeOverride: false}),
       gradedLateSubmissionsExist: true,
       locale: 'en',
       onClose: sinon.spy(),
+      onCourseSettingsUpdated: sinon.spy(),
       onEntered: sinon.spy(),
       onLatePolicyUpdate() {},
-      overrides: {
-        defaultChecked: false,
-        disabled: false,
-        featureAvailable: true,
-        onChange: sinon.stub().callsFake(() => onAdvancedSettingsChangePromise.promise)
-      },
       postPolicies: new PostPolicies(gradebook)
     }
 
@@ -100,7 +102,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
     createLatePolicyPromise = {}
     createLatePolicyPromise.promise = new Promise((resolve, reject) => {
       createLatePolicyPromise.resolve = () => {
-        resolve({data: {latePolicy: newLatePolicy}})
+        resolve({data: {latePolicy: existingLatePolicy}})
       }
       createLatePolicyPromise.reject = reject
     })
@@ -128,11 +130,16 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
     })
     sandbox.stub(PostPolicyApi, 'setCoursePostPolicy').returns(setCoursePostPolicyPromise.promise)
 
-    onAdvancedSettingsChangePromise = {}
-    onAdvancedSettingsChangePromise.promise = new Promise((resolve, reject) => {
-      onAdvancedSettingsChangePromise.resolve = resolve
-      onAdvancedSettingsChangePromise.reject = reject
+    updateCourseSettingsPromise = {}
+    updateCourseSettingsPromise.promise = new Promise((resolve, reject) => {
+      updateCourseSettingsPromise.resolve = () => {
+        resolve({data: updatedCourseSettings})
+      }
+      updateCourseSettingsPromise.reject = reject
     })
+    sandbox
+      .stub(GradebookSettingsModalApi, 'updateCourseSettings')
+      .returns(updateCourseSettingsPromise.promise)
   })
 
   suiteHooks.afterEach(async () => {
@@ -295,7 +302,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
     })
 
     test('is not present when "Final Grade Override" is disabled', async () => {
-      props.overrides.featureAvailable = false
+      props.courseFeatures.finalGradeOverrideEnabled = false
       await mountOpenAndLoad()
       notOk(getAdvancedTab())
     })
@@ -402,7 +409,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
         await mountOpenLoadAndSelectTab('Advanced')
         getAllowFinalGradeOverrideCheckbox().click()
         getUpdateButton().click()
-        strictEqual(props.overrides.onChange.callCount, 1)
+        strictEqual(GradebookSettingsModalApi.updateCourseSettings.callCount, 1)
       })
 
       test('does not update advanced settings when unchanged', async () => {
@@ -410,7 +417,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
         getAllowFinalGradeOverrideCheckbox().click()
         getAllowFinalGradeOverrideCheckbox().click()
         getUpdateButton().click()
-        strictEqual(props.overrides.onChange.callCount, 0)
+        strictEqual(GradebookSettingsModalApi.updateCourseSettings.callCount, 0)
       })
 
       QUnit.module('when a late policy change is invalid', contextHooks => {
@@ -421,23 +428,23 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
           fireEvent.change($input, {target: {value: '-1'}})
         })
 
-        test('does not attempt to create the late policy', async () => {
+        test('does not attempt to create the late policy', () => {
           getUpdateButton().click()
           strictEqual(GradebookSettingsModalApi.createLatePolicy.callCount, 0)
         })
 
-        test('updates the course post policy when changed', async () => {
+        test('updates the course post policy when changed', () => {
           getGradePostingPolicyTab().click()
           getManuallyPostGradesOption().click()
           getUpdateButton().click()
           strictEqual(PostPolicyApi.setCoursePostPolicy.callCount, 1)
         })
 
-        test('updates advanced settings when changed', async () => {
+        test('updates advanced settings when changed', () => {
           getAdvancedTab().click()
           getAllowFinalGradeOverrideCheckbox().click()
           getUpdateButton().click()
-          strictEqual(props.overrides.onChange.callCount, 1)
+          strictEqual(GradebookSettingsModalApi.updateCourseSettings.callCount, 1)
         })
       })
     })
@@ -471,7 +478,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
         strictEqual(FlashAlert.showFlashAlert.callCount, 1)
       })
 
-      test('uses the "success" type for the flash alert', async () => {
+      test('uses the "success" type for the flash alert', () => {
         const [{type}] = FlashAlert.showFlashAlert.lastCall.args
         equal(type, 'success')
       })
@@ -484,13 +491,14 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
     QUnit.module('when the request fails', contextHooks => {
       contextHooks.beforeEach(async () => {
         createLatePolicyPromise.reject(new Error('request failed'))
+        await wait(() => FlashAlert.showFlashAlert.callCount > 0)
       })
 
       test('displays a flash alert', () => {
         strictEqual(FlashAlert.showFlashAlert.callCount, 1)
       })
 
-      test('uses the "error" type for the flash alert', async () => {
+      test('uses the "error" type for the flash alert', () => {
         const [{type}] = FlashAlert.showFlashAlert.lastCall.args
         equal(type, 'error')
       })
@@ -530,7 +538,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
         strictEqual(FlashAlert.showFlashAlert.callCount, 1)
       })
 
-      test('uses the "success" type for the flash alert', async () => {
+      test('uses the "success" type for the flash alert', () => {
         const [{type}] = FlashAlert.showFlashAlert.lastCall.args
         equal(type, 'success')
       })
@@ -543,13 +551,14 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
     QUnit.module('when the request fails', contextHooks => {
       contextHooks.beforeEach(async () => {
         updateLatePolicyPromise.reject(new Error('request failed'))
+        await wait(() => FlashAlert.showFlashAlert.callCount > 0)
       })
 
       test('displays a flash alert', () => {
         strictEqual(FlashAlert.showFlashAlert.callCount, 1)
       })
 
-      test('uses the "error" type for the flash alert', async () => {
+      test('uses the "error" type for the flash alert', () => {
         const [{type}] = FlashAlert.showFlashAlert.lastCall.args
         equal(type, 'error')
       })
@@ -588,7 +597,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
         strictEqual(FlashAlert.showFlashAlert.callCount, 1)
       })
 
-      test('uses the "success" type for the flash alert', async () => {
+      test('uses the "success" type for the flash alert', () => {
         const [{type}] = FlashAlert.showFlashAlert.lastCall.args
         equal(type, 'success')
       })
@@ -605,13 +614,14 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
     QUnit.module('when the request fails', contextHooks => {
       contextHooks.beforeEach(async () => {
         setCoursePostPolicyPromise.reject(new Error('request failed'))
+        await wait(() => FlashAlert.showFlashAlert.callCount > 0)
       })
 
       test('displays a flash alert', () => {
         strictEqual(FlashAlert.showFlashAlert.callCount, 1)
       })
 
-      test('uses the "error" type for the flash alert', async () => {
+      test('uses the "error" type for the flash alert', () => {
         const [{type}] = FlashAlert.showFlashAlert.lastCall.args
         equal(type, 'error')
       })
@@ -641,12 +651,12 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
 
     test('disables the "Update" button while the request is pending', () => {
       strictEqual(getUpdateButton().disabled, true)
-      onAdvancedSettingsChangePromise.resolve()
+      updateCourseSettingsPromise.resolve()
     })
 
     QUnit.module('when the request succeeds', contextHooks => {
       contextHooks.beforeEach(async () => {
-        onAdvancedSettingsChangePromise.resolve()
+        updateCourseSettingsPromise.resolve()
         await waitForModalClosed()
       })
 
@@ -654,9 +664,18 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
         strictEqual(FlashAlert.showFlashAlert.callCount, 1)
       })
 
-      test('uses the "success" type for the flash alert', async () => {
+      test('uses the "success" type for the flash alert', () => {
         const [{type}] = FlashAlert.showFlashAlert.lastCall.args
         equal(type, 'success')
+      })
+
+      test('calls the onCourseSettingsUpdated callback prop', () => {
+        strictEqual(props.onCourseSettingsUpdated.callCount, 1)
+      })
+
+      test('includes the updated settings when calling onCourseSettingsUpdated', () => {
+        const [settings] = props.onCourseSettingsUpdated.lastCall.args
+        deepEqual(settings, updatedCourseSettings)
       })
 
       test('closes the modal', () => {
@@ -666,16 +685,21 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
 
     QUnit.module('when the request fails', contextHooks => {
       contextHooks.beforeEach(async () => {
-        onAdvancedSettingsChangePromise.reject(new Error('request failed'))
+        updateCourseSettingsPromise.reject(new Error('request failed'))
+        await wait(() => FlashAlert.showFlashAlert.callCount > 0)
       })
 
       test('displays a flash alert', () => {
         strictEqual(FlashAlert.showFlashAlert.callCount, 1)
       })
 
-      test('uses the "error" type for the flash alert', async () => {
+      test('uses the "error" type for the flash alert', () => {
         const [{type}] = FlashAlert.showFlashAlert.lastCall.args
         equal(type, 'error')
+      })
+
+      test('does not call the onCourseSettingsUpdated callback prop', () => {
+        strictEqual(props.onCourseSettingsUpdated.callCount, 0)
       })
 
       test('does not close the modal', () => {

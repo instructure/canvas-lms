@@ -40,7 +40,7 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellEditor', suiteHooks => {
       }
     }
 
-    gradebook = createGradebook()
+    gradebook = createGradebook({final_grade_override_enabled: true})
     sinon.stub(gradebook, 'isStudentGradeable').callsFake(id => id === '1101')
 
     editorOptions = {

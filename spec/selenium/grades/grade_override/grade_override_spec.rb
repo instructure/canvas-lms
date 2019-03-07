@@ -86,9 +86,7 @@ describe 'Final Grade Override' do
 
     context 'with an overridden grade' do
       before(:each) do
-        @teacher.preferences.deep_merge!({
-          gradebook_settings: { @course.id => { 'show_final_grade_overrides' => 'true' } }
-        })
+        @course.update!(allow_final_grade_override: true)
         @teacher.save
 
         user_session(@teacher)

@@ -178,20 +178,6 @@ QUnit.module('Gradebook Initial Data Loading', suiteHooks => {
       const [options] = DataLoader.loadGradebookData.lastCall.args
       strictEqual(options.customColumnDataParams.include_hidden, true)
     })
-
-    test('requests final grade overrides when the feature is enabled', () => {
-      gradebookOptions.final_grade_override_enabled = true
-      initializeGradebook()
-      const [options] = DataLoader.loadGradebookData.lastCall.args
-      strictEqual(options.getFinalGradeOverrides, true)
-    })
-
-    test('does not request final grade overrides when the feature is not enabled', () => {
-      gradebookOptions.final_grade_override_enabled = false
-      initializeGradebook()
-      const [options] = DataLoader.loadGradebookData.lastCall.args
-      strictEqual(options.getFinalGradeOverrides, false)
-    })
   })
 
   QUnit.module('when student ids finish loading', contextHooks => {

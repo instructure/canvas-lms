@@ -189,19 +189,6 @@ QUnit.module('Gradebook', suiteHooks => {
       })
     })
 
-    QUnit.module('"Show Final Grade Overrides" setting', () => {
-      test('is set using the current setting from Gradebook', async () => {
-        gradebook.setShowFinalGradeOverrides(true)
-        await saveSettings()
-        strictEqual(getSavedSettings().show_final_grade_overrides, 'true')
-      })
-
-      test('can be set using an argument', async () => {
-        await saveSettings({showFinalGradeOverrides: true})
-        strictEqual(getSavedSettings().show_final_grade_overrides, 'true')
-      })
-    })
-
     QUnit.module('"Show Inactive Enrollments" setting', () => {
       test('is set using the current setting from Gradebook', async () => {
         gradebook.getEnrollmentFilters().inactive = true

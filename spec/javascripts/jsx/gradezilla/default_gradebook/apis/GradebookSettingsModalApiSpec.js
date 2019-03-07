@@ -17,13 +17,16 @@
  */
 
 import _ from 'underscore'
+
+import {underscore} from 'convert_case'
+import FakeServer, {jsonBodyFromRequest, pathFromRequest} from 'jsx/__tests__/FakeServer'
 import {
   DEFAULT_LATE_POLICY_DATA,
   fetchLatePolicy,
   createLatePolicy,
+  updateCourseSettings,
   updateLatePolicy
 } from 'jsx/gradezilla/default_gradebook/apis/GradebookSettingsModalApi'
-import {underscore} from 'convert_case'
 
 const latePolicyData = {
   id: '15',
@@ -167,5 +170,69 @@ test('includes data to update a late_policy', function() {
 test('returns a 204 (successfully fulfilled request and no content)', function() {
   return updateLatePolicy('19', this.changes).then(({status}) => {
     equal(status, 204)
+  })
+})
+
+QUnit.module('GradebookSettingsModalApi', suiteHooks => {
+  let qunitTimeout
+  let server
+
+  suiteHooks.beforeEach(() => {
+    qunitTimeout = QUnit.config.testTimeout
+    QUnit.config.testTimeout = 500 // avoid accidental unresolved async
+    server = new FakeServer()
+  })
+
+  suiteHooks.afterEach(() => {
+    server.teardown()
+    QUnit.config.testTimeout = qunitTimeout
+  })
+
+  QUnit.module('.updateCourseSettings()', hooks => {
+    let responseData
+
+    hooks.beforeEach(() => {
+      responseData = {
+        allow_final_grade_override: true
+      }
+
+      server.for('/api/v1/courses/1201/settings').respond({status: 200, body: responseData})
+    })
+
+    test('sends a request to update course settings', async () => {
+      await updateCourseSettings('1201', {allowFinalGradeOverride: true})
+      const request = server.receivedRequests[0]
+      equal(pathFromRequest(request), '/api/v1/courses/1201/settings')
+    })
+
+    test('sends a PUT request', async () => {
+      await updateCourseSettings('1201', {allowFinalGradeOverride: true})
+      const request = server.receivedRequests[0]
+      equal(request.method, 'PUT')
+    })
+
+    test('normalizes the request body with snake case', async () => {
+      await updateCourseSettings('1201', {allowFinalGradeOverride: true})
+      const request = server.receivedRequests[0]
+      deepEqual(jsonBodyFromRequest(request), {allow_final_grade_override: true})
+    })
+
+    test('normalizes the response body with camel case upon success', async () => {
+      const response = await updateCourseSettings('1201', {allowFinalGradeOverride: true})
+      deepEqual(response.data, {allowFinalGradeOverride: true})
+    })
+
+    test('does not catch errors', async () => {
+      // Catching errors is the responsibility of the consumer.
+      server.unsetResponses('/api/v1/courses/1201/settings')
+      server
+        .for('/api/v1/courses/1201/settings')
+        .respond({status: 500, body: {error: 'Server Error'}})
+      try {
+        await updateCourseSettings('1201', {allowFinalGradeOverride: true})
+      } catch (error) {
+        ok(error.message.includes('500'))
+      }
+    })
   })
 })

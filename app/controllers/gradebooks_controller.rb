@@ -818,6 +818,11 @@ class GradebooksController < ApplicationController
 
     new_gradebook_options = {
       colors: gradebook_settings.fetch(:colors, {}),
+
+      course_settings: {
+        allow_final_grade_override: @context.allow_final_grade_override?
+      },
+
       final_grade_override_enabled: @context.feature_enabled?(:final_grades_override),
       graded_late_submissions_exist: graded_late_submissions_exist,
       gradezilla: true,

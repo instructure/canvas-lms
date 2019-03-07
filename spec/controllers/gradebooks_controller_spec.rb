@@ -792,6 +792,37 @@ describe GradebooksController do
         user_session(@teacher)
       end
 
+      describe "course_settings" do
+        let(:course_settings) { gradebook_options.fetch(:course_settings) }
+
+        describe "allow_final_grade_override" do
+          before :once do
+            @course.enable_feature!(:new_gradebook)
+            @course.enable_feature!(:final_grades_override)
+            @course.update!(allow_final_grade_override: true)
+          end
+
+          let(:allow_final_grade_override) { course_settings.fetch(:allow_final_grade_override) }
+
+          it "sets allow_final_grade_override to true when final grade override is allowed" do
+            get :show, params: { course_id: @course.id }
+            expect(allow_final_grade_override).to eq true
+          end
+
+          it "sets allow_final_grade_override to false when final grade override is not allowed" do
+            @course.update!(allow_final_grade_override: false)
+            get :show, params: { course_id: @course.id }
+            expect(allow_final_grade_override).to eq false
+          end
+
+          it "sets allow_final_grade_override to false when 'Final Grade Override' is not enabled" do
+            @course.disable_feature!(:final_grades_override)
+            get :show, params: { course_id: @course.id }
+            expect(allow_final_grade_override).to eq false
+          end
+        end
+      end
+
       describe "default_grading_standard" do
         it "uses the course's grading standard" do
           grading_standard = grading_standard_for(@course)
@@ -946,7 +977,6 @@ describe GradebooksController do
           get :show, params: { course_id: @course.id }
           expect(gradebook_options[:publish_to_sis_enabled]).to be false
         end
-
 
         it "is false when the course is not using a SIS" do
           allow_any_instantiation_of(@course).to receive(:allows_grade_publishing_by).with(@teacher).and_return(true)
