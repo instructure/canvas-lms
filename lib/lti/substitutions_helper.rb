@@ -143,7 +143,13 @@ module Lti
       if @user
         site_admin_roles = Account.site_admin.account_users_for(@user).present? ? [role_map['siteadmin']].flatten : []
         if CONTEXTLESS_LAUNCHES.include?(@resource_type)
-          (site_admin_roles + @user.admin_roles(@root_account)).to_a.compact.uniq.sort.join(',')
+          (site_admin_roles + @user.admin_roles(@root_account))
+            .flat_map { |role| role_map[role] }
+            .to_a
+            .compact
+            .uniq
+            .sort
+            .join(',')
         else
           context_roles = course_enrollments.each_with_object(Set.new) { |role, set| set.add([*role_map[role.class]].join(",")) }
           institution_roles = @user.roles(@root_account, true).flat_map { |role| role_map[role] }

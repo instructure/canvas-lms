@@ -195,17 +195,34 @@ module Lti
       end
 
       context 'with global_navigation as resource_type' do
+        let(:actual_roles) { expected_roles - subject.all_roles('lti1_3').split(',') }
         let(:resource_type) { 'global_navigation' }
-
-        it "doesn't include context roles" do
-          allow(subject).to receive(:course_enrollments).and_return([TaEnrollment.new])
-          roles = subject.all_roles('lti1_3')
-          expected_roles = ["http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#TeachingAssistant", # only difference btwn lis2 and lti1_3 modes
-                            "http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor",
-                            "http://purl.imsglobal.org/vocab/lis/v2/system/person#User"]
-          expect(expected_roles - roles.split(',')).to match_array expected_roles
+        let(:expected_roles) do
+          ["http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#TeachingAssistant", # only difference btwn lis2 and lti1_3 modes
+            "http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor",
+            "http://purl.imsglobal.org/vocab/lis/v2/system/person#User"]
         end
 
+        before { allow(subject).to receive(:course_enrollments).and_return([TaEnrollment.new]) }
+
+        it "doesn't include context roles" do
+          expect(actual_roles).to match_array expected_roles
+        end
+
+        context 'as admin' do
+          let(:expected_roles) do
+            super() + ['urn:lti:instrole:ims/lis/Administrator']
+          end
+
+          before do
+            sub_account = account.sub_accounts.create!
+            sub_account.account_users.create!(user: user, role: admin_role)
+          end
+
+          it 'includes admin instroles' do
+            expect(actual_roles).to match_array expected_roles
+          end
+        end
       end
     end
 
