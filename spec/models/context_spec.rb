@@ -244,6 +244,22 @@ describe Context do
       RubricAssociation.create!(context: context, rubric: r, purpose: :bookmark, association_object: context)
     end
 
+    it 'returns rubric for concluded course enrollment' do
+      c1 = Course.create!(:name => 'c1')
+      c2 = Course.create!(:name => 'c1')
+      r = Rubric.create!(context: c1, title: 'testing')
+      user = user_factory(:active_all => true)
+      RubricAssociation.create!(context: c1, rubric: r, purpose: :bookmark, association_object: c1)
+      enroll = c1.enroll_user(user, "TeacherEnrollment", :enrollment_state => "active")
+      enroll.conclude
+      c2.enroll_user(user, "TeacherEnrollment", :enrollment_state => "active")
+      expect(c2.rubric_contexts(user)).to eq([{
+        rubrics: 1,
+        context_code: c1.asset_string,
+        name: c1.name
+      }])
+    end
+
     it 'returns contexts in alphabetically sorted order' do
       great_grandparent = Account.default
       grandparent = Account.create!(name: 'AAA', parent_account: great_grandparent)

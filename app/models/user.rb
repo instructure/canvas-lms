@@ -1789,6 +1789,12 @@ class User < ActiveRecord::Base
     end
   end
 
+  def participating_instructor_course_with_concluded_ids
+    cached_course_ids('participating_instructor_with_concluded') do |enrollments|
+      enrollments.of_instructor_type.current_and_concluded.not_inactive_by_date
+    end
+  end
+
   def participating_course_ids
     cached_course_ids('participating') do |enrollments|
       enrollments.current.active_by_date

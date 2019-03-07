@@ -90,7 +90,7 @@ module Context
   def rubric_contexts(user)
     associations = []
     course_ids = [self.id]
-    course_ids = (course_ids + user.participating_instructor_course_ids.map{|id| Shard.relative_id_for(id, user.shard, Shard.current)}).uniq if user
+    course_ids = (course_ids + user.participating_instructor_course_with_concluded_ids.map{|id| Shard.relative_id_for(id, user.shard, Shard.current)}).uniq if user
     Shard.partition_by_shard(course_ids) do |sharded_course_ids|
       context_codes = sharded_course_ids.map{|id| "course_#{id}"}
       if Shard.current == self.shard
