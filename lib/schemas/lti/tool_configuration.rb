@@ -71,10 +71,6 @@ module Schemas::Lti
               "settings" => {
                 "type" => "object",
                 "required" => [
-                  "text",
-                  "icon_url",
-                  "selection_width",
-                  "selection_height",
                   "placements"
                 ].freeze,
                 "properties" => {
@@ -89,10 +85,7 @@ module Schemas::Lti
                     "items" => {
                       "type" => "object",
                       "required" => [
-                        "placement",
-                        "target_link_uri",
-                        "enabled",
-                        "message_type"
+                        "placement"
                       ].freeze,
                       "properties" => {
                         "placement" => {
@@ -137,7 +130,7 @@ module Schemas::Lti
                         "message_type" => {
                           "type" => "string",
                           "enum" => [
-                            "LtiDeeplLinkingRequest",
+                            "LtiDeepLinkingRequest",
                             "LtiResourceLinkRequest"
                           ].freeze
                         }.freeze,
@@ -146,7 +139,13 @@ module Schemas::Lti
                           "enum" => [
                             "icon-lti"
                           ].freeze
-                        }.freeze
+                        }.freeze,
+                        "selection_width" => {
+                          "type" => "number"
+                        }.freeze,
+                        "selection_height" => {
+                          "type" => "number"
+                        }.freeze,
                       }.freeze
                     }.freeze
                   }.freeze
