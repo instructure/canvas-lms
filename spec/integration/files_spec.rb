@@ -120,6 +120,23 @@ describe FilesController do
         location = response['Location']
 
         get location
+
+        # the first response will be a redirect to the files host with a return url embedded in the jwt claims
+        expect(response).to be_redirect
+        files_location = response['Location']
+        files_uri = URI.parse(response['Location'])
+        expect(files_uri.host).to eq 'files-test.host'
+
+        get files_location
+
+        # the second response (from the files domain) will set the cookie and return back to the main domain
+        expect(response).to be_redirect
+        return_location = response['Location']
+        return_uri = URI.parse(response['Location'])
+        expect(return_uri.host).to eq 'test.host'
+        expect(return_uri.query).to eq 'fd_cookie_set=1' # with a param so we know not to loop
+
+        get return_location
         # the response will be on the main domain, with an iframe pointing to the files domain and the actual uploaded html file
         expect(response).to be_successful
         expect(response.content_type).to eq 'text/html'
@@ -252,7 +269,7 @@ describe FilesController do
     expect(@module.evaluate_for(@user).state).to eql(:unlocked)
 
     # the response will be on the main domain, with an iframe pointing to the files domain and the actual uploaded html file
-    get "http://test.host/courses/#{@course.id}/files/#{@att.id}"
+    get "http://test.host/courses/#{@course.id}/files/#{@att.id}?fd_cookie_set=1" # just send in the param since other specs test the cookie redirect
     expect(response).to be_successful
     expect(response.content_type).to eq 'text/html'
     doc = Nokogiri::HTML::DocumentFragment.parse(response.body)
