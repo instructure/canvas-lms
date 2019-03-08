@@ -84,14 +84,18 @@ class GenericErrorPage extends React.Component {
       }
     }
     this.setState({submitLoading: true, showingCommentBox: false})
-    const request = await axios.post('/error_reports', postData, {
-      headers: [{'content-type': 'application/json'}]
-    })
-    // Returns json of {logged: boolean, id: string}
-    const logObject = request.data
-    if (logObject.logged) {
-      this.setState({commentPosted: true, submitLoading: false})
-    } else {
+    try {
+      // Returns json of {logged: boolean, id: string}
+      const request = await axios.post('/error_reports', postData, {
+        headers: [{'content-type': 'application/json'}]
+      })
+      const logObject = request.data
+      if (logObject.logged) {
+        this.setState({commentPosted: true, submitLoading: false})
+      } else {
+        this.setState({commentPosted: true, commentPostError: true, submitLoading: false})
+      }
+    } catch (err) {
       this.setState({commentPosted: true, commentPostError: true, submitLoading: false})
     }
   }

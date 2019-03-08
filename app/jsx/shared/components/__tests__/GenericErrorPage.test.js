@@ -24,13 +24,6 @@ import moxios from 'moxios'
 
 beforeEach(() => {
   moxios.install()
-  moxios.stubRequest('/error_reports', {
-    status: 200,
-    response: {
-      logged: true,
-      id: '7'
-    }
-  })
 })
 
 afterEach(() => {
@@ -57,6 +50,13 @@ describe('GenericErrorPage component', () => {
 
   test('show the submitted text when comment is submitted', done => {
     const {getByText} = render(<GenericErrorPage {...defaultProps()} />)
+    moxios.stubRequest('/error_reports', {
+      status: 200,
+      response: {
+        logged: true,
+        id: '7'
+      }
+    })
     fireEvent.click(getByText('click here to tell us what happened'))
     fireEvent.click(getByText('Submit'))
     moxios.wait(async () => {
@@ -73,6 +73,13 @@ describe('GenericErrorPage component', () => {
   })
 
   test('correct info posted to server', done => {
+    moxios.stubRequest('/error_reports', {
+      status: 200,
+      response: {
+        logged: true,
+        id: '7'
+      }
+    })
     const modifiedProps = defaultProps()
     modifiedProps.errorSubject = 'Testing Stuff'
     const {getByText} = render(<GenericErrorPage {...modifiedProps} />)
@@ -83,6 +90,28 @@ describe('GenericErrorPage component', () => {
       const requestData = JSON.parse(moxItem.config.data)
       expect(requestData.error.subject).toEqual(modifiedProps.errorSubject)
       expect(getByText('Comment submitted!')).toBeInTheDocument()
+      done()
+    })
+  })
+
+  test('correctly handles error posted from server', done => {
+    moxios.stubRequest('/error_reports', {
+      status: 503,
+      response: {
+        logged: false,
+        id: '7'
+      }
+    })
+    const modifiedProps = defaultProps()
+    modifiedProps.errorSubject = 'Testing Stuff'
+    const {getByText} = render(<GenericErrorPage {...modifiedProps} />)
+    fireEvent.click(getByText('click here to tell us what happened'))
+    fireEvent.click(getByText('Submit'))
+    moxios.wait(async () => {
+      const moxItem = await moxios.requests.mostRecent()
+      const requestData = JSON.parse(moxItem.config.data)
+      expect(requestData.error.subject).toEqual(modifiedProps.errorSubject)
+      expect(getByText('Comment failed to post! Please try again later.')).toBeInTheDocument()
       done()
     })
   })
