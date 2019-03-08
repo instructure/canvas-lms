@@ -3,14 +3,17 @@
   <fieldset class="pad-box dotted-separator">
     <p>
       {{#t}}
-      Careful! Changes to group membership will apply to groups that already have assignment submissions. Group assignment submissions may not align as a result. Would you like to create a new group set for future assignments?
+      Warning! You are about to adjust this group's membership.
+      <p><b>This change will affect existing group submissions, annotations, and comments and result in data loss for BOTH this group and the student's previous group.</b>
+      <p>
+      To prevent unintended consequences with existing group submissions, create a new group set for future assignments.
       {{/t}}
     </p>
     <div class="controls">
       <label class="radio">
         <input type="radio" class="clone-options-toggle" name="clone_option" id="option_clone_group_set" value="clone" checked>
         {{#t}}
-          New Group Set
+          Create New Group Set
         {{/t}}
       </label>
     </div>
@@ -18,7 +21,7 @@
       <label class="radio">
         <input type="radio" class="clone-options-toggle" name="clone_option" id="option_change_groups" value="do_not_clone">
         {{#t}}
-          Change Groups
+          Change Existing Group
         {{/t}}
       </label>
     </div>
