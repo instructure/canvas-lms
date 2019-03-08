@@ -140,6 +140,16 @@ describe "course settings" do
       show_announcements_on_home_page.click
       expect(home_page_announcement_limit).not_to be_disabled
     end
+
+    it "should not allow teachers to click CSP check" do
+      Account.default.enable_feature!(:javascript_csp)
+      Account.default.enable_csp!
+      get "/courses/#{@course.id}/settings"
+
+      f('.course_form_more_options_link').click
+
+      expect(f("#csp_options input[type='checkbox']")).not_to be_enabled
+    end
   end
 
   describe "course items" do
