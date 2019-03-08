@@ -728,8 +728,8 @@ class DiscussionTopicsController < ApplicationController
               @assignment_presenter.can_view_speed_grader_link?(@current_user)
               env_hash[:SPEEDGRADER_URL_TEMPLATE] = named_context_url(@topic.assignment.context,
                                                                       :speed_grader_context_gradebook_url,
-                                                                      :assignment_id => @topic.assignment.id,
-                                                                      :anchor => {:student_id => ":student_id"}.to_json)
+                                                                      assignment_id: @topic.assignment.id,
+                                                                      student_id: ":student_id")
             end
 
             js_hash = {:DISCUSSION => env_hash}

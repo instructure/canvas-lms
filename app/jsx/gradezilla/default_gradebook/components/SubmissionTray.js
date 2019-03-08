@@ -223,10 +223,10 @@ export default class SubmissionTray extends React.Component {
   render() {
     const {name, avatarUrl} = this.props.student
     const assignmentParam = `assignment_id=${this.props.submission.assignmentId}`
-    const studentParam = `#{"student_id":"${this.props.student.id}"}`
+    const studentParam = `student_id=${this.props.student.id}`
     const speedGraderUrlParams = this.props.assignment.anonymizeStudents
       ? assignmentParam
-      : `${assignmentParam}${studentParam}`
+      : `${assignmentParam}&${studentParam}`
     const speedGraderUrl = encodeURI(
       `/courses/${this.props.courseId}/gradebook/speed_grader?${speedGraderUrlParams}`
     )

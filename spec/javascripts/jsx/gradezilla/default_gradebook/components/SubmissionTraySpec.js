@@ -227,7 +227,7 @@ QUnit.module('SubmissionTray', function(hooks) {
 
   test('shows SpeedGrader link if enabled', function() {
     const speedGraderUrl = encodeURI(
-      '/courses/1/gradebook/speed_grader?assignment_id=30#{"student_id":"27"}'
+      '/courses/1/gradebook/speed_grader?assignment_id=30&student_id=27'
     )
     mountComponent()
     const speedGraderLink = document

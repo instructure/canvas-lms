@@ -179,7 +179,7 @@
       </div>
       <div class="ic-Action-header__Secondary ic-Action-header__Secondary--auto">
         <% if can_do(@context, @current_user, :grade) %>
-          <a class="Button" href="<%= context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => @assignment.id) + "#" + CGI::escape({:student_id => @submission.user_id }.to_json) %>">
+          <a class="Button" href="<%= context_url(@context, :speed_grader_context_gradebook_url, assignment_id: @assignment.id, student_id: @submission.user_id) %>">
             <i class="icon-speed-grader" aria-hidden="true"></i>
             <%= t('speedgrader', 'SpeedGrader™') %>
           </a>

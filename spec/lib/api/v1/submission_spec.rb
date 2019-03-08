@@ -58,8 +58,8 @@ describe Api::V1::Submission do
           current_user: user
         )
         path = "/courses/#{course.id}/gradebook/speed_grader"
-        query = { 'assignment_id' => assignment.id.to_s }
-        fragment = { 'provisional_grade_id' => provisional_grade.id, 'student_id' => user.id }
+        query = { 'assignment_id' => assignment.id.to_s, 'student_id' => user.id }
+        fragment = { 'provisional_grade_id' => provisional_grade.id }
         expect(json.fetch('speedgrader_url')).to match_path(path).and_query(query).and_fragment(fragment)
       end
 
@@ -73,8 +73,8 @@ describe Api::V1::Submission do
           current_user: user
         )
         path = "/courses/#{course.id}/gradebook/speed_grader"
-        query = { 'assignment_id' => assignment.id.to_s }
-        fragment = { 'provisional_grade_id' => provisional_grade.id, 'anonymous_id' => submission.anonymous_id }
+        query = { 'assignment_id' => assignment.id.to_s, 'anonymous_id' => submission.anonymous_id }
+        fragment = { 'provisional_grade_id' => provisional_grade.id }
         expect(json.fetch('speedgrader_url')).to match_path(path).and_query(query).and_fragment(fragment)
       end
     end

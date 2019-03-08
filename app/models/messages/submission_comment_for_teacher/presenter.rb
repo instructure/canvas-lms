@@ -25,11 +25,10 @@ module Messages::SubmissionCommentForTeacher
     def link
       return @link if defined?(@link)
 
-      if anonymous?
-        url = message.speed_grader_course_gradebook_url(course.id, assignment_id: assignment.id)
-        @link = "#{url}\#{\"anonymous_id\":\"#{submission.anonymous_id}\"}"
+      @link = if anonymous?
+        message.speed_grader_course_gradebook_url(course.id, assignment_id: assignment.id, anonymous_id: submission.anonymous_id)
       else
-        @link = message.course_assignment_submission_url(course.id, assignment, submission.user_id)
+        message.course_assignment_submission_url(course.id, assignment, submission.user_id)
       end
     end
 

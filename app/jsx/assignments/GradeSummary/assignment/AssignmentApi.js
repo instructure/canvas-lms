@@ -20,10 +20,9 @@ import axios from 'axios'
 
 export function speedGraderUrl(courseId, assignmentId, options) {
   const path = `/courses/${courseId}/gradebook/speed_grader`
-  const query = `assignment_id=${assignmentId}`
   const studentIdType = options.anonymousStudents ? 'anonymous_id' : 'student_id'
-  const hash = encodeURIComponent(JSON.stringify({[studentIdType]: options.studentId}))
-  return `${path}?${query}#${hash}`
+  const query = `assignment_id=${assignmentId}&${studentIdType}=${options.studentId}`
+  return `${path}?${query}`
 }
 
 export function publishGrades(courseId, assignmentId) {

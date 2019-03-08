@@ -24,8 +24,7 @@ module Messages::AssignmentSubmittedLate
 
     def link
       if anonymous?
-        url = message.speed_grader_course_gradebook_url(course.id, assignment_id: assignment.id)
-        "#{url}\#{\"anonymous_id\":\"#{submission.anonymous_id}\"}"
+        message.speed_grader_course_gradebook_url(course.id, assignment_id: assignment.id, anonymous_id: submission.anonymous_id)
       else
         message.course_assignment_submission_url(course.id, assignment, submission.user_id)
       end
