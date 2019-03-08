@@ -17,27 +17,127 @@
  */
 
 import React from 'react'
-import {render} from 'react-testing-library'
-import {mockOverride} from '../../../test-utils'
+import {render, fireEvent, wait} from 'react-testing-library'
+import {toLocaleString, browserTimeZone} from '@instructure/ui-i18n/lib/DateTime'
+import {mockOverride, closest} from '../../../test-utils'
 import OverrideDates from '../OverrideDates'
 
-import I18n from 'i18n!assignments_2'
-import tz from 'timezone'
+const locale = 'en'
+const timeZone = browserTimeZone()
 
-it('renders readonly override dates', () => {
-  const override = mockOverride()
+describe('OverrideDates', () => {
+  it('renders override dates', () => {
+    const override = mockOverride()
 
-  const {getByText} = render(
-    <OverrideDates dueAt={override.dueAt} unlockAt={override.unlockAt} lockAt={override.lockAt} />
-  )
+    const {getByText, getAllByTestId} = render(
+      <OverrideDates
+        dueAt={override.dueAt}
+        unlockAt={override.unlockAt}
+        lockAt={override.lockAt}
+        onChange={() => {}}
+        onValidate={() => true}
+        invalidMessage={() => undefined}
+      />
+    )
 
-  const due = `${tz.format(override.dueAt, I18n.t('#date.formats.full'))}`
-  const available = `${tz.format(override.unlockAt, I18n.t('#date.formats.full'))}`
-  const until = `${tz.format(override.lockAt, I18n.t('#date.formats.full'))}`
-  expect(getByText('Due:')).toBeInTheDocument()
-  expect(getByText(due)).toBeInTheDocument()
-  expect(getByText('Available:')).toBeInTheDocument()
-  expect(getByText(available)).toBeInTheDocument()
-  expect(getByText('Until:')).toBeInTheDocument()
-  expect(getByText(until)).toBeInTheDocument()
+    expect(getAllByTestId('EditableDateTime')).toHaveLength(3)
+    expect(getByText('Due:')).toBeInTheDocument()
+    expect(getByText('Available:')).toBeInTheDocument()
+    expect(getByText('Until:')).toBeInTheDocument()
+  })
+
+  it('renders missing override dates', () => {
+    const override = mockOverride({unlockAt: null, lockAt: null})
+
+    const {getByText, getAllByTestId} = render(
+      <OverrideDates
+        dueAt={override.dueAt}
+        unlockAt={override.unlockAt}
+        lockAt={null}
+        onChange={() => {}}
+        onValidate={() => true}
+        invalidMessage={() => undefined}
+      />
+    )
+
+    expect(getAllByTestId('EditableDateTime')).toHaveLength(3)
+    expect(getByText('No Until Date')).toBeInTheDocument()
+  })
+
+  // to get 100% test coverage
+  failADate('dueAt')
+  failADate('unlockAt')
+  failADate('lockAt')
 })
+
+function failADate(whichDate) {
+  const editButtonLabel = {
+    dueAt: 'Edit Due',
+    unlockAt: 'Edit Available',
+    lockAt: 'Edit Until'
+  }
+  const errMessages = {}
+
+  it(`renders the error message when ${whichDate} date is invalid`, async () => {
+    const override = mockOverride({
+      dueAt: '2018-12-25T23:59:59-05:00',
+      unlockAt: '2018-12-23T00:00:00-05:00',
+      lockAt: '2018-12-29T23:59:00-05:00'
+    })
+
+    // validate + invalidMessage mock the real deal
+    function validate(which, value) {
+      if (value < '2019-01-01T00:00:00-05:00') {
+        errMessages[which] = `${which} be bad`
+        return false
+      }
+      delete errMessages[which]
+    }
+
+    function invalidMessage(which) {
+      return errMessages[which]
+    }
+    const {container, getByText, getByDisplayValue, queryByTestId} = render(
+      <div>
+        <OverrideDates
+          dueAt={override.dueAt}
+          unlockAt={override.unlockAt}
+          lockAt={override.lockAt}
+          onChange={() => {}}
+          onValidate={validate}
+          invalidMessage={invalidMessage}
+        />
+        <span id="focus-me" tabIndex="-1">
+          focus me
+        </span>
+      </div>
+    )
+
+    // click the edit button
+    const editDueBtn = closest(getByText(editButtonLabel[whichDate]), 'button')
+    editDueBtn.click()
+    const dateDisplay = toLocaleString(override[whichDate], locale, timeZone, 'LL')
+    let dinput
+    // wait for the popup
+    await wait(() => {
+      dinput = getByDisplayValue(dateDisplay)
+    })
+    // focus the date input and change it's value to a date that fails validation
+    dinput.focus()
+    fireEvent.change(dinput, {target: {value: '2019-01-02T00:00:00-05:00'}})
+
+    // blur the DateTimeInput to flip me to view mode.
+    container.querySelector('#focus-me').focus()
+    // wait for the popup to close
+    // (using test-utils' waitForNoElement, I get a
+    // "Warning: Can't perform a React state update on an unmounted component."
+    // though I cannot see the difference in the underlying logic between this
+    // and waitForNoElement)
+    await wait(() => {
+      expect(queryByTestId('EditableDateTime-editor')).toBeNull()
+    })
+
+    // the error message should be in the OverrideDates
+    expect(getByText(`${whichDate} be bad`)).toBeInTheDocument()
+  })
+}

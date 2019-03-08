@@ -16,63 +16,145 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {bool, string} from 'prop-types'
+import {bool, func, oneOf, string} from 'prop-types'
 import I18n from 'i18n!assignments_2'
-import FriendlyDatetime from '../../../../shared/FriendlyDatetime'
-import IconCalendarMonth from '@instructure/ui-icons/lib/Line/IconCalendarMonth'
-import FormField from '@instructure/ui-form-field/lib/components/FormField'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import View from '@instructure/ui-layout/lib/components/View'
-import generateElementId from '@instructure/ui-utils/lib/dom/generateElementId'
+import {Flex, FlexItem} from '@instructure/ui-layout'
+import {FormFieldGroup} from '@instructure/ui-forms'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 
-OverrideDates.propTypes = {
-  dueAt: string,
-  unlockAt: string,
-  lockAt: string,
-  readOnly: bool
-}
+import AssignmentDate from '../Editables/AssignmentDate'
 
-OverrideDates.defaultProps = {
-  readOnly: false
-}
+export default class OverrideDates extends React.Component {
+  static propTypes = {
+    mode: oneOf(['view', 'edit']), // TODO: needs to be isReqired from above
+    onChange: func.isRequired,
+    onValidate: func.isRequired,
+    invalidMessage: func.isRequired,
+    dueAt: string,
+    unlockAt: string,
+    lockAt: string,
+    readOnly: bool
+  }
 
-export default function OverrideDates(props) {
-  return (
-    <Flex
-      as="div"
-      margin="small 0"
-      padding="0"
-      justifyItems="space-between"
-      wrapItems
-      data-testid="OverrideDates"
-    >
-      <FlexItem margin="0 x-small small 0" as="div" grow>
-        {renderDate(I18n.t('Due:'), props.dueAt)}
-      </FlexItem>
-      <FlexItem margin="0 x-small small 0" as="div" grow>
-        {renderDate(I18n.t('Available:'), props.unlockAt)}
-      </FlexItem>
-      <FlexItem margin="0 0 small 0" as="div" grow>
-        {renderDate(I18n.t('Until:'), props.lockAt)}
-      </FlexItem>
-    </Flex>
-  )
-}
+  static defaultProps = {
+    readOnly: false
+  }
 
-function renderDate(label, value) {
-  const id = generateElementId('overidedate')
-  return (
-    <FormField id={id} label={label} layout="stacked">
-      <View id={id} as="div" padding="x-small" borderWidth="small" borderRadius="medium">
-        <Flex justifyItems="space-between">
-          <FlexItem>
-            {value && <FriendlyDatetime dateTime={value} format={I18n.t('#date.formats.full')} />}
+  constructor(props) {
+    super(props)
+
+    const mode = props.mode || 'view'
+    this.state = {
+      dueMode: mode,
+      unlockMode: mode,
+      lockMode: mode
+    }
+  }
+
+  onChangeDue = newValue => this.props.onChange('dueAt', newValue)
+
+  onChangeUnlock = newValue => this.props.onChange('unlockAt', newValue)
+
+  onChangeLock = newValue => this.props.onChange('lockAt', newValue)
+
+  onChangeDueMode = dueMode => this.setState({dueMode})
+
+  onChangeUnlockMode = unlockMode => this.setState({unlockMode})
+
+  onChangeLockMode = lockMode => this.setState({lockMode})
+
+  onValidateDue = value => this.props.onValidate('dueAt', value)
+
+  onValidateUnlock = value => this.props.onValidate('unlockAt', value)
+
+  onValidateLock = value => this.props.onValidate('lockAt', value)
+
+  invalidMessageDue = () => this.props.invalidMessage('dueAt')
+
+  invalidMessageUnlock = () => this.props.invalidMessage('unlockAt')
+
+  invalidMessageLock = () => this.props.invalidMessage('lockAt')
+
+  allDatesAreBeingViewed = () =>
+    this.state.dueMode === 'view' &&
+    this.state.unlockMode === 'view' &&
+    this.state.lockMode === 'view'
+
+  renderDate(field, label, value, mode, onchange, onchangemode, onvalidate, invalidMessage) {
+    return (
+      <AssignmentDate
+        mode={mode}
+        onChange={onchange}
+        onChangeMode={onchangemode}
+        onValidate={onvalidate}
+        invalidMessage={invalidMessage}
+        field={field}
+        value={value}
+        label={label}
+        readOnly={this.props.readOnly}
+      />
+    )
+  }
+
+  render() {
+    // show an error message only when all dates are in view
+    const message =
+      this.allDatesAreBeingViewed() &&
+      (this.invalidMessageDue() || this.invalidMessageUnlock() || this.invalidMessageLock())
+    return (
+      <FormFieldGroup
+        description={
+          <ScreenReaderContent>{I18n.t('Due, available, and until dates')}</ScreenReaderContent>
+        }
+        messages={message ? [{type: 'error', text: message}] : null}
+      >
+        <Flex
+          as="div"
+          margin="small 0"
+          padding="0"
+          justifyItems="space-between"
+          alignItems="start"
+          wrapItems
+          data-testid="OverrideDates"
+        >
+          <FlexItem margin="0 x-small 0 0" as="div" grow width="30%">
+            {this.renderDate(
+              'due_at',
+              I18n.t('Due'),
+              this.props.dueAt,
+              this.state.dueMode,
+              this.onChangeDue,
+              this.onChangeDueMode,
+              this.onValidateDue,
+              this.invalidMessageDue
+            )}
           </FlexItem>
-          <FlexItem padding="0 0 xx-small x-small">
-            <IconCalendarMonth />
+          <FlexItem margin="0 x-small 0 0" as="div" grow width="30%">
+            {this.renderDate(
+              'unlock_at',
+              I18n.t('Available'),
+              this.props.unlockAt,
+              this.state.unlockMode,
+              this.onChangeUnlock,
+              this.onChangeUnlockMode,
+              this.onValidateUnlock,
+              this.invalidMessageUnlock
+            )}
+          </FlexItem>
+          <FlexItem margin="0 0 0 0" as="div" grow width="30%">
+            {this.renderDate(
+              'lock_at',
+              I18n.t('Until'),
+              this.props.lockAt,
+              this.state.lockMode,
+              this.onChangeLock,
+              this.onChangeLockMode,
+              this.onValidateLock,
+              this.invalidMessageLock
+            )}
           </FlexItem>
         </Flex>
-      </View>
-    </FormField>
-  )
+      </FormFieldGroup>
+    )
+  }
 }

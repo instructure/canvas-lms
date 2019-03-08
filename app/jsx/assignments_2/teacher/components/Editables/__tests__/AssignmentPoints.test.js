@@ -19,7 +19,15 @@
 import React from 'react'
 import {render, fireEvent} from 'react-testing-library'
 import AssignmentPoints from '../AssignmentPoints'
-import {validate} from '../../../Validators'
+import AssignmentFieldValidator from '../../../AssignentFieldValidator'
+
+const afv = new AssignmentFieldValidator()
+function validate() {
+  return afv.validate(...arguments)
+}
+function errorMessage() {
+  return afv.errorMessage(...arguments)
+}
 
 function renderAssignmentPoints(props) {
   return render(
@@ -28,6 +36,7 @@ function renderAssignmentPoints(props) {
       onChange={() => {}}
       onChangeMode={() => {}}
       onValidate={validate}
+      invalidMessage={errorMessage}
       pointsPossible={1432}
       {...props}
     />
@@ -73,6 +82,7 @@ describe('AssignmentPoints', () => {
           onChange={onChange}
           onChangeMode={onChangeMode}
           onValidate={() => true}
+          invalidMessage={() => undefined}
           pointsPossible={12}
         />
         <span id="focus-me" tabIndex="-1">
@@ -108,6 +118,7 @@ describe('AssignmentPoints', () => {
           onChange={onChange}
           onChangeMode={() => {}}
           onValidate={validate}
+          invalidMessage={errorMessage}
           pointsPossible="1.247"
         />
         <input data-testid="focusme" />

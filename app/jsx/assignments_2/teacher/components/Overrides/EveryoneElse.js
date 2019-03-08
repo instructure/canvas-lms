@@ -30,6 +30,8 @@ export default class EveryoneElse extends React.Component {
   static propTypes = {
     assignment: TeacherAssignmentShape.isRequired,
     onChangeAssignment: func.isRequired,
+    onValidate: func.isRequired,
+    invalidMessage: func.isRequired,
     readOnly: bool
   }
 
@@ -42,9 +44,19 @@ export default class EveryoneElse extends React.Component {
     this.props.onChangeAssignment(path, value)
   }
 
+  // see
+  // OverrideListPresenter.due_for calling
+  // OverrideListPresenter.multiple_due_dates calling
+  // assignment.has_active_overrides
+  hasActiveOverrides() {
+    return (
+      this.props.assignment.assignmentOverrides.nodes &&
+      this.props.assignment.assignmentOverrides.nodes.length
+    )
+  }
+
   overrideFromAssignment(assignment) {
-    const title =
-      assignment.assignmentOverrides.nodes.length > 0 ? I18n.t('Everyone else') : I18n.t('Everyone')
+    const title = this.hasActiveOverrides() ? I18n.t('Everyone else') : I18n.t('Everyone')
 
     const fauxOverride = {
       gid: `assignment_${assignment.id}`,
@@ -70,6 +82,8 @@ export default class EveryoneElse extends React.Component {
       <Override
         override={fauxOverride}
         onChangeOverride={this.handleChangeOverride}
+        onValidate={this.props.onValidate}
+        invalidMessage={this.props.invalidMessage}
         index={-1}
         readOnly={this.props.readOnly}
       />

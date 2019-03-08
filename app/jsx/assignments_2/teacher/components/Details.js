@@ -31,6 +31,7 @@ Details.propTypes = {
   assignment: TeacherAssignmentShape.isRequired,
   onChangeAssignment: func.isRequired,
   onValidate: func.isRequired,
+  invalidMessage: func.isRequired,
   readOnly: bool
 }
 Details.defaultProps = {
@@ -44,13 +45,13 @@ export default function Details(props) {
       <AssignmentDescription
         text={props.assignment.description}
         onChange={handleDescriptionChange}
-        onValidate={props.onValidate}
         readOnly={props.readOnly}
       />
       <Overrides
         assignment={props.assignment}
         onChangeAssignment={props.onChangeAssignment}
         onValidate={props.onValidate}
+        invalidMessage={props.invalidMessage}
         readOnly={props.readOnly}
       />
       {props.readOnly ? null : (

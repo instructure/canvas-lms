@@ -65,6 +65,7 @@ export const TEACHER_QUERY = gql`
       pointsPossible
       state
       needsGradingCount
+      onlyVisibleToOverrides
       lockInfo {
         isLocked
       }
@@ -288,6 +289,8 @@ export const SAVE_ASSIGNMENT = gql`
     $name: String
     $description: String
     $dueAt: DateTime
+    $unlockAt: DateTime
+    $lockAt: DateTime
     $pointsPossible: Float
     $state: AssignmentState
   ) {
@@ -297,6 +300,8 @@ export const SAVE_ASSIGNMENT = gql`
         name: $name
         description: $description
         dueAt: $dueAt
+        unlockAt: $unlockAt
+        lockAt: $lockAt
         pointsPossible: $pointsPossible
         state: $state
       }
@@ -307,6 +312,8 @@ export const SAVE_ASSIGNMENT = gql`
         lid: _id
         gid: id
         dueAt
+        unlockAt
+        lockAt
         name
         description
         pointsPossible

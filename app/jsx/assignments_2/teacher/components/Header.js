@@ -60,6 +60,7 @@ export default class Header extends React.Component {
     assignment: TeacherAssignmentShape.isRequired,
     onChangeAssignment: func.isRequired,
     onValidate: func.isRequired,
+    invalidMessage: func.isRequired,
     onSetWorkstate: func.isRequired,
     onUnsubmittedClick: func,
     onPublishChange: func,
@@ -215,6 +216,7 @@ export default class Header extends React.Component {
                 onChange={this.handleNameChange}
                 onChangeMode={this.handleNameChangeMode}
                 onValidate={this.props.onValidate}
+                invalidMessage={this.props.invalidMessage}
                 readOnly={this.props.readOnly}
               />
             </View>

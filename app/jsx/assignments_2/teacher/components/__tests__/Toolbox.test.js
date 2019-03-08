@@ -30,6 +30,7 @@ function renderToolbox(assignment) {
         onChangeAssignment={() => {}}
         onSetWorkstate={() => {}}
         onValidate={() => true}
+        invalidMessage={() => undefined}
       />
     </MockedProvider>
   )

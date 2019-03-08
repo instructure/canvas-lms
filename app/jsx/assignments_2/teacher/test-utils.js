@@ -135,6 +135,7 @@ export function mockAssignment(overrides) {
     submissionTypes: ['online_text_entry'],
     allowedExtensions: [],
     allowedAttempts: null,
+    onlyVisibleToOverrides: false,
     assignmentOverrides: {
       pageInfo: mockPageInfo(),
       nodes: []

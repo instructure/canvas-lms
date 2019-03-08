@@ -27,7 +27,6 @@ import {Text} from '@instructure/ui-elements'
 import EditableHeading from './EditableHeading'
 
 const nameLabel = I18n.t('Edit assignment name')
-const invalidMessage = I18n.t('Assignment name is required')
 const namePlaceholder = I18n.t('Assignment name')
 
 export default class AssignmentName extends React.Component {
@@ -37,6 +36,7 @@ export default class AssignmentName extends React.Component {
     onChange: func.isRequired,
     onChangeMode: func.isRequired,
     onValidate: func.isRequired,
+    invalidMessage: func.isRequired,
     readOnly: bool
   }
 
@@ -62,7 +62,7 @@ export default class AssignmentName extends React.Component {
     this.setState({isValid}, () => {
       if (!isValid) {
         showFlashAlert({
-          message: invalidMessage,
+          message: this.props.invalidMessage('name') || I18n.t('Error'),
           type: 'error',
           srOnly: true
         })
@@ -74,7 +74,7 @@ export default class AssignmentName extends React.Component {
   render() {
     const msg = this.state.isValid ? null : (
       <div>
-        <Text color="error">{invalidMessage}</Text>
+        <Text color="error">{this.props.invalidMessage('name')}</Text>
       </div>
     )
     return (

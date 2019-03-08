@@ -28,6 +28,7 @@ ContentTabs.propTypes = {
   assignment: TeacherAssignmentShape.isRequired,
   onChangeAssignment: func.isRequired,
   onValidate: func.isRequired,
+  invalidMessage: func.isRequired,
   readOnly: bool
 }
 
@@ -44,6 +45,7 @@ export default function ContentTabs(props) {
           assignment={assignment}
           onChangeAssignment={props.onChangeAssignment}
           onValidate={props.onValidate}
+          invalidMessage={props.invalidMessage}
           readOnly={props.readOnly}
         />
       </TabPanel>

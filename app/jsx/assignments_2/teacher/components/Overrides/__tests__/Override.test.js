@@ -21,25 +21,36 @@ import {render, fireEvent, waitForElement} from 'react-testing-library'
 import {mockOverride} from '../../../test-utils'
 import Override from '../Override'
 
-it('renders an override', () => {
-  const override = mockOverride()
-  const {getByTestId} = render(
-    <Override override={override} onChangeOverride={() => {}} index={0} />
+function renderOverride(override, props = {}) {
+  return render(
+    <Override
+      override={override}
+      onChangeOverride={() => {}}
+      index={0}
+      onValidate={() => true}
+      invalidMessage={() => undefined}
+      {...props}
+    />
   )
-  expect(getByTestId('OverrideSummary')).toBeInTheDocument()
-})
+}
 
-it('displays OverrideDetail on expanding toggle group', async () => {
-  const override = mockOverride()
-  const {getByText, getByTestId} = render(
-    <Override override={override} onChangeOverride={() => {}} index={0} />
-  )
+describe('Override', () => {
+  it('renders an override', () => {
+    const override = mockOverride()
+    const {getByTestId} = renderOverride(override)
+    expect(getByTestId('OverrideSummary')).toBeInTheDocument()
+  })
 
-  const expandButton = getByText('Expand')
-  fireEvent.click(expandButton)
-  // the detail is now rendered
-  const detail = await waitForElement(() => getByTestId('OverrideDetail'))
-  expect(detail).toBeInTheDocument()
-  // and the summary's still there
-  expect(getByTestId('OverrideSummary')).toBeInTheDocument()
+  it('displays OverrideDetail on expanding toggle group', async () => {
+    const override = mockOverride()
+    const {getByText, getByTestId} = renderOverride(override)
+
+    const expandButton = getByText('Click to show details')
+    fireEvent.click(expandButton)
+    // the detail is now rendered
+    const detail = await waitForElement(() => getByTestId('OverrideDetail'))
+    expect(detail).toBeInTheDocument()
+    // and the summary's still there
+    expect(getByTestId('OverrideSummary')).toBeInTheDocument()
+  })
 })

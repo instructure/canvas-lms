@@ -52,23 +52,45 @@ export default class OverrideSummary extends React.Component {
     return (
       <Text>
         <OverrideSubmissionTypes variant="summary" override={override} />
-        <Text> | </Text>
-        <FriendlyDatetime
-          prefix={I18n.t('Due: ')}
-          dateTime={override.dueAt}
-          format={I18n.t('#date.formats.full')}
-        />
+        <Text>
+          <div style={{display: 'inline-block', padding: '0 .5em'}}>|</div>
+          {override.dueAt ? (
+            <FriendlyDatetime
+              prefix={I18n.t('Due: ')}
+              dateTime={override.dueAt}
+              format={I18n.t('#date.formats.full')}
+            />
+          ) : (
+            I18n.t('No Due Date')
+          )}
+        </Text>
       </Text>
     )
   }
 
+  // it's unfortunate but when both unlock and lock dates exist
+  // AvailabilityDates only prefixes with "Available" if the formatStyle="long"
+  // If I chnage it there, it will alter the Student view
   renderAvailability(override) {
-    return (
-      <Text>
-        {I18n.t('Available ')}
-        <AvailabilityDates assignment={override} formatStyle="short" />
-      </Text>
-    )
+    // both dates exist, manually add Available prefix
+    if (override.unlockAt && override.lockAt) {
+      return (
+        <Text>
+          {I18n.t('Available ')}
+          <AvailabilityDates assignment={override} formatStyle="short" />
+        </Text>
+      )
+    }
+    // only one date exists, AvailabilityDates will include the Available prefix
+    if (override.unlockAt || override.lockAt) {
+      return (
+        <Text>
+          <AvailabilityDates assignment={override} formatStyle="short" />
+        </Text>
+      )
+    }
+    // no dates exist, so the assignment is simply Available
+    return <Text>{I18n.t('Available')}</Text>
   }
 
   render() {

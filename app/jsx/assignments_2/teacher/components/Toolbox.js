@@ -54,6 +54,7 @@ export default class Toolbox extends React.Component {
     assignment: TeacherAssignmentShape.isRequired,
     onChangeAssignment: func.isRequired,
     onValidate: func.isRequired,
+    invalidMessage: func.isRequired,
     onSetWorkstate: func.isRequired,
     onUnsubmittedClick: func,
     onDelete: func,
@@ -166,6 +167,7 @@ export default class Toolbox extends React.Component {
         onChange={this.handlePointsChange}
         onChangeMode={this.handlePointsChangeMode}
         onValidate={this.props.onValidate}
+        invalidMessage={this.props.invalidMessage}
         readOnly={this.props.readOnly}
       />
     )
