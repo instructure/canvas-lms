@@ -129,6 +129,7 @@ gem 'inst_statsd', '2.1.4'
   gem 'statsd-ruby', '1.4.0', require: false
   gem 'aroi', '0.0.6', require: false
   gem 'dogstatsd-ruby', '3.3.0'
+gem 'inst-jobs-statsd', '1.2.3'
 gem 'gepub', '1.0.1'
 gem 'imperium', '0.5.0', require: false
 gem 'academic_benchmarks', '0.0.10', require: false
