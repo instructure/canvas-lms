@@ -1,5 +1,2 @@
-<%= t "New Comment for %{discussion_topic}, %{course}", :discussion_topic => asset.title, :course => asset.context.name %>
+<%= t "New comment: %{discussion_topic} by %{user_name}", :discussion_topic => asset.title, :user_name => asset.user.name %>
 
-<%= HtmlTextHelper.strip_and_truncate(asset.message, :max_length => 50) %>
-
-<%= t :details, "More info at %{url}", :url => HostUrl.context_host(asset.context) %>
