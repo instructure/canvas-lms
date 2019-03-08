@@ -127,10 +127,11 @@ describe('Comments', () => {
   })
 
   it('renders comment rows when provided', async () => {
-    const {container} = render(
-      <CommentsContainer comments={[singleComment({_id: '6'}), singleComment()]} />
-    )
-    expect(container.querySelectorAll('.comment-row-container')).toHaveLength(2)
+    const comments = [singleComment({_id: '6'}), singleComment()]
+    const {getAllByTestId} = render(<CommentsContainer comments={comments} />)
+    const rows = getAllByTestId('comment-row')
+
+    expect(rows).toHaveLength(comments.length)
   })
 
   it('renders shortname when shortname is provided', async () => {
