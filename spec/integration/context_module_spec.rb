@@ -167,14 +167,14 @@ describe ContextModule do
           "/courses/#{@course.id}/modules/#{@mod2.id}/items/first"
         get next_link
         expect(response).to be_redirect
-        expect(response.location.ends_with?(@test_url + "?module_item_id=#{@tag2.id}")).to be_truthy
+        expect(response.location.ends_with?("module_item_id=#{@tag2.id}")).to be_truthy
 
         # verify the second item is accessible
         get @test_url
         expect(response).to be_successful
         html = Nokogiri::HTML(response.body)
         if @is_attachment
-          expect(html.at_css('#file_content')['src']).to match %r{#{@test_url}}
+          expect(html.at_css('#file_content')['src']).to match %r{#{@test_url.split("?").first}}
         elsif @is_wiki_page
           expect(html.css('#wiki_page_show').length).to eq 1
         else
@@ -234,7 +234,7 @@ describe ContextModule do
         progression_testing(progress_type) do |content|
           @is_attachment = true
           att = Attachment.create!(:filename => 'test.html', :display_name => "test.html", :uploaded_data => StringIO.new(content), :folder => Folder.unfiled_folder(@course), :context => @course)
-          @test_url = "/courses/#{@course.id}/files/#{att.id}"
+          @test_url = "/courses/#{@course.id}/files/#{att.id}?fd_cookie_set=1"
           @tag2 = @mod2.add_item(:type => 'attachment', :id => att.id)
           expect(@tag2).to be_published
         end

@@ -280,7 +280,7 @@ RSpec.describe ApplicationController do
     it "should not include :download=>1 in download urls for relative contexts" do
       controller.instance_variable_set(:@context, @attachment.context)
       allow(controller).to receive(:named_context_url).and_return('')
-      url = controller.send(:safe_domain_file_url, @attachment, nil, nil, true)
+      url = controller.send(:safe_domain_file_url, @attachment, download: true)
       expect(url).not_to match(/[\?&]download=1(&|$)/)
     end
 
@@ -288,7 +288,7 @@ RSpec.describe ApplicationController do
       expect(controller).to receive(:file_download_url).
         with(@attachment, @common_params.merge(:download_frd => 1)).
         and_return('')
-      controller.send(:safe_domain_file_url, @attachment, nil, nil, true)
+      controller.send(:safe_domain_file_url, @attachment, download: true)
     end
 
     it "prepends a unique file subdomain if configured" do
@@ -296,7 +296,7 @@ RSpec.describe ApplicationController do
         expect(controller).to receive(:file_download_url).
           with(@attachment, @common_params.merge(:inline => 1)).
           and_return("/files/#{@attachment.id}")
-        expect(controller.send(:safe_domain_file_url, @attachment, ['canvasfiles.com', Shard.default], nil, false)).to eq "a#{@attachment.shard.id}-#{@attachment.id}.canvasfiles.com/files/#{@attachment.id}"
+        expect(controller.send(:safe_domain_file_url, @attachment, host_and_shard: ['canvasfiles.com', Shard.default])).to eq "a#{@attachment.shard.id}-#{@attachment.id}.canvasfiles.com/files/#{@attachment.id}"
       end
     end
   end
