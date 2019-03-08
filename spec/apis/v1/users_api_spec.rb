@@ -1479,6 +1479,30 @@ describe "Users API", type: :request do
         expect(user.profile.reload.title).to eq another_title
       end
 
+      it "should be able to update a user's profile with email" do
+        Account.default.tap{|a| a.settings[:enable_profiles] = true; a.save!}
+        new_title = "Burninator"
+        new_bio = "burninating the countryside"
+        email = 'dudd@example.com'
+        json = api_call(:put, @path, @path_options, {
+          :user => {title: new_title, bio: new_bio, email: email}
+        })
+        expect(json['title']).to eq new_title
+        expect(json['bio']).to eq new_bio
+        expect(json['email']).to eq email
+        user = User.find(json['id'])
+        expect(user.profile.title).to eq new_title
+        expect(user.profile.bio).to eq new_bio
+
+        another_title = 'another title'
+        another_bio = 'another bio'
+        another_email = 'duddett@example.com'
+        json = api_call(:put, @path, @path_options, {
+          :user => {title: another_title, bio: another_bio, email: another_email}
+        })
+        expect(user.profile.reload.title).to eq another_title
+      end
+
       it "should catch invalid dates" do
         birthday = Time.now
         json = api_call(:put, @path, @path_options, {
