@@ -210,7 +210,13 @@ class FilesController < ApplicationController
       session['file_access_root_acocunt_id'] = access_verifier[:root_account]&.global_id
       session['file_access_oauth_host'] = access_verifier[:oauth_host]
       session['file_access_expiration'] = 1.hour.from_now.to_i
+
       session[:permissions_key] = SecureRandom.uuid
+
+      # if this was set we really just wanted to set the session on the files domain and return back to what we were doing before
+      if access_verifier[:return_url]
+        return redirect_to access_verifier[:return_url]
+      end
     end
     # These sessions won't get deleted when the user logs out since this
     # is on a separate domain, so we've added our own (stricter) timeout.
@@ -549,7 +555,21 @@ class FilesController < ApplicationController
         if attachment.content_type && attachment.content_type.match(/\Avideo\/|audio\//)
           attachment.context_module_action(@current_user, :read)
         end
-        format.html { render :show, status: @attachment.locked_for?(@current_user) ? :forbidden : :ok }
+        format.html do
+          if attachment.locked_for?(@current_user)
+            render :show, status: :forbidden
+          else
+            if attachment.inline_content? && !attachment.canvadocable? && safer_domain_available? && !params[:fd_cookie_set]
+              # redirect to the files domain and have the files domain redirect back with the param set
+              # so we know the user session has been set there and relative files from the html will work
+              query = URI.parse(request.url).query
+              return_url = request.url + (query.present? ? '&' : '?') + 'fd_cookie_set=1'
+              redirect_to safe_domain_file_url(attachment, return_url: return_url)
+            else
+              render :show
+            end
+          end
+        end
       end
       format.json do
         json = {
