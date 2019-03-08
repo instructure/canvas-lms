@@ -73,6 +73,5 @@ class CanvasSchema < GraphQL::Schema
                 Types::ExternalToolType, Types::ModuleExternalToolType,
                 Types::ProgressType]
 
-  instrument :field, AssignmentOverrideInstrumenter.new
   instrument :field, MutationTransactionInstrumenter.new
 end

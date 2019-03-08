@@ -131,12 +131,44 @@ module Types
     field :due_at, DateTimeType,
       "when this assignment is due",
       null: true
+    def due_at
+      overridden_field(:due_at)
+    end
+
     field :lock_at, DateTimeType,
       "the lock date (assignment is locked after this date).",
       null: true
+    def lock_at
+      overridden_field(:lock_at)
+    end
+
     field :unlock_at, DateTimeType,
       "the unlock date (assignment is unlocked after this date)",
       null: true
+    def unlock_at
+      overridden_field(:unlock_at)
+    end
+
+    ##
+    # use this method to get overridden dates
+    # (all_day_date/all_day  should use this if/when we add them to gql)
+    def overridden_field(field)
+      load_association(:assignment_overrides).then do
+        OverrideAssignmentLoader.for(current_user).load(assignment).then &field
+      end
+    end
+
+    class OverrideAssignmentLoader < GraphQL::Batch::Loader
+      def initialize(current_user)
+        @current_user = current_user
+      end
+
+      def perform(assignments)
+        assignments.each do |assignment|
+          fulfill(assignment, assignment.overridden_for(@current_user))
+        end
+      end
+    end
 
     field :lock_info, LockInfoType, null: true
 
