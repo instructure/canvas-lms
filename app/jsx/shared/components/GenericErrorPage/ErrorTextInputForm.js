@@ -21,6 +21,7 @@ import {TextArea, TextInput} from '@instructure/ui-forms'
 import View from '@instructure/ui-layout/lib/components/View'
 import {Button} from '@instructure/ui-buttons'
 import {func} from 'prop-types'
+import {Flex, FlexItem} from '@instructure/ui-layout'
 
 function ErrorTextInputForm(props) {
   return (
@@ -30,16 +31,20 @@ function ErrorTextInputForm(props) {
         onChange={props.handleChangeCommentBox}
         label={I18n.t('What happened?')}
       />
-      <View margin="small">
+      <View>
         <TextInput
           display="block"
           onChange={props.handleChangeOptionalEmail}
           label={I18n.t('Email Address (Optional)')}
         />
       </View>
-      <Button margin="small" variant="primary" onClick={props.handleSubmitErrorReport}>
-        {I18n.t('Submit')}
-      </Button>
+      <Flex justifyItems="end">
+        <FlexItem>
+          <Button margin="small 0" variant="primary" onClick={props.handleSubmitErrorReport}>
+            {I18n.t('Submit')}
+          </Button>
+        </FlexItem>
+      </Flex>
     </View>
   )
 }
