@@ -150,6 +150,22 @@ describe "course settings" do
 
       expect(f("#csp_options input[type='checkbox']")).not_to be_enabled
     end
+
+    it "should save CSP check by admin" do
+      course_with_admin_logged_in
+      Account.default.enable_feature!(:javascript_csp)
+      Account.default.enable_csp!
+      get "/courses/#{@course.id}/settings"
+
+      f('.course_form_more_options_link').click
+      expect(f("#csp_options input[type='checkbox']")).to be_enabled
+
+      force_click("#csp_options input[type='checkbox']")
+      wait_for_new_page_load { submit_form('#course_form') }
+
+      f('.course_form_more_options_link').click
+      expect(is_checked(f("#csp_options input[type='checkbox']"))).to be_truthy
+    end
   end
 
   describe "course items" do
