@@ -7021,6 +7021,7 @@ nn:
   editor_button_6647db9c: Editorknapp
   either_the_url_or_domain_should_be_set_c29cf8c1: "Du må oppgi anten URL-en eller domenet."
   either_you_re_a_new_user_or_the_terms_of_use_have__14f0d0d0: "Enten er du ny brukar eller så er *vilkår for bruk* endra sidan siste du godtok dei. Du må samtykke i *vilkår for bruk* og **retningslinjer for personvern** før du kan halde fram."
+  either_you_re_a_new_user_or_the_terms_of_use_have__2bbebdef: "Anten er du ny brukar eller så er \"bruksvilkår\" endra sidan sist du godtok dei. Du må samtykke til \"bruksvilkår\" før du kan halde fram."
   el_salvador_503_b0907d30: "El Salvador (+503)"
   element_option_missing_error_an_element_to_attach__be433478: "alternativ `element` utan feil: Dersom du vel alternativet 'true' for attgjeving i BBTreeBrowserView, må du spesifisere eit element for å feste TreeBrowserView"
   email: 
