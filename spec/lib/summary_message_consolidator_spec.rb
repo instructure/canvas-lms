@@ -33,6 +33,19 @@ describe "SummaryMessageConsolidator" do
     expect(queued.map(&:to_i).sort).to eq messages.map(&:id).sort
   end
 
+  it "should not double-send messages" do
+    all_messages = []
+    u = user_with_communication_channel
+    2.times { all_messages << delayed_message_model(:cc => u.communication_channels.first, :send_at => 1.day.ago) }
+
+    allow_any_instance_of(SummaryMessageConsolidator).to receive(:delayed_message_ids_for_batch).and_return(all_messages.map(&:id)) # search grabs all the ids
+    already_sent_message, message_to_send = all_messages
+    already_sent_message.update_attribute(:workflow_state, "sent") # but one of the messages is already sent
+    track_jobs { SummaryMessageConsolidator.process }
+
+    expect(created_jobs.first.payload_object.args.first).to eq [message_to_send.id]
+  end
+
   it "should send summaries from different accounts in separate messages" do
     users = (0..3).map { user_with_communication_channel }
     dms = []

@@ -16,10 +16,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../helpers/wiki_and_tiny_common'
+require_relative 'pages/rcs_sidebar_page'
+require_relative '../test_setup/common_helper_methods/custom_selenium_actions'
 
 describe "Wiki pages and Tiny WYSIWYG editor features" do
   include_context "in-process server selenium tests"
   include WikiAndTinyCommon
+  include RCSSidebarPage
+  include CustomSeleniumActions
 
   equation_button_selector = "div[aria-label='Insert Math Equation'] button"
 
@@ -172,8 +176,49 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       validate_wiki_style_attrib_empty("p")
     end
 
+    it 'should insert image using embed image widget', priority: "2", test_id: 397971 do
+      @root_folder = Folder.root_folders(@course).first
+      @image = @root_folder.attachments.build(:context => @course)
+      path = File.expand_path(File.dirname(__FILE__) + '/../../../public/images/email.png')
+      @image.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
+      @image.save!
+
+      visit_front_page_edit(@course)
+      f('.mce-ico.mce-i-image').click
+      widget = f('.ui-dialog.ui-widget.ui-widget-content.ui-corner-all.ui-draggable.ui-dialog-buttons')
+      widget.find_element(:link_text, 'Canvas').click
+      fj("button:contains('Course files')").click
+      fj("button:contains('email.png')").click
+      f('.btn-primary.ui-button.ui-widget.ui-state-default.ui-corner-all.ui-button-text-only').click
+      f('.btn.btn-primary.submit').click
+      wait_for_new_page_load
+      main = f('#main')
+      expect(main.find_element(:tag_name, 'img')).to have_attribute('height', '16')
+      expect(main.find_element(:tag_name, 'img')).to have_attribute('width', '16')
+      expect(main.find_element(:tag_name, 'img')).to have_attribute('alt', 'email.png')
+    end
+
+    it "should indent and remove indentation for embedded images" do
+      title = "email.png"
+      @root_folder = Folder.root_folders(@course).first
+      @image = @root_folder.attachments.build(:context => @course)
+      path = File.expand_path(File.dirname(__FILE__) + '/../../../public/images/email.png')
+      @image.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
+      @image.save!
+
+      visit_front_page_edit(@course)
+      click_images_tab
+      click_image_link(title)
+
+      select_all_wiki
+      force_click('.mce-i-indent')
+      validate_wiki_style_attrib("padding-left", "40px", "p")
+      force_click('.mce-i-outdent')
+      validate_wiki_style_attrib_empty("p")
+    end
+
     it "should indent and remove indentation for text" do
-      wysiwyg_state_setup(@course, text = "test")
+      wysiwyg_state_setup(@course, "test")
 
       f('.mce-i-indent').click
       validate_wiki_style_attrib("padding-left", "40px", "p")
@@ -243,7 +288,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       end
     end
 
-    it "should make text subscript in rce", priority: "1", test_id: 306264 do
+    it "should make text subscript in rce", priority: "1", test_id: 306264, ignore_js_errors: true do
       wysiwyg_state_setup(@course)
 
       f('.mce-i-subscript').click
@@ -261,6 +306,33 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       in_frame wiki_page_body_ifr_id do
         expect(f("#tinymce")).not_to contain_css('sub')
       end
+    end
+
+    it "should be able to add links to new wiki pages with special characters in title" do
+      title = "this/is a weird-a%% page titlé?"
+
+      visit_front_page_edit(@course)
+      wait_for_tiny(edit_wiki_css)
+
+      click_pages_accordion
+      click_new_page_link
+      expect(new_page_name_input).to be_displayed
+      new_page_name_input.send_keys(title)
+      click_new_page_submit
+
+      in_frame wiki_page_body_ifr_id do
+        link = f('#tinymce p a')
+        expect(link.text).to eq title
+      end
+
+      expect_new_page_load { f('form.edit-form button.submit').click }
+
+      expect_new_page_load{ f('.user_content a').click }
+
+      # should bring up the creation page for the new page
+
+      new_title = f(".edit-header #title").attribute('value').to_s
+      expect(new_title).to eq title
     end
 
     it "should change paragraph type to preformatted" do
@@ -448,7 +520,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       validate_wiki_style_attrib_empty("p")
     end
 
-    it "should not scroll to the top of the page after using an equation button" do
+    it "should not scroll to the top of the page after using an equation button", ignore_js_errors: true do
       visit_front_page_edit(@course)
       scroll_page_to_bottom
 
@@ -502,7 +574,7 @@ describe "Wiki pages and Tiny WYSIWYG editor features" do
       expect(f('#media_comment_dialog')).not_to be_displayed
     end
 
-    it "should save with an iframe in a list" do
+    it "should save with an iframe in a list", ignore_js_errors: true do
       text = "<ul><li><iframe src=\"about:blank\"></iframe></li></ul>"
       wysiwyg_state_setup(@course, text, html: true)
       wait_for_new_page_load{f('form.edit-form button.submit').click}

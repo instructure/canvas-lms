@@ -17,7 +17,7 @@
 
 require_relative '../../common'
 require_relative '../pages/gradezilla_page'
-require_relative '../pages/gradezilla/settings/advanced'
+require_relative '../pages/gradezilla/settings'
 require_relative '../pages/gradezilla_cells_page'
 require_relative '../pages/srgb_page'
 require_relative '../pages/student_grades_page'
@@ -79,7 +79,7 @@ describe 'Final Grade Override' do
       Gradezilla.visit(@course)
       Gradezilla.settings_cog_select
       Gradezilla::Settings.click_advanced_tab
-      Gradezilla::Settings::Advanced.select_grade_override_checkbox
+      Gradezilla::Advanced.select_grade_override_checkbox
       Gradezilla::Settings.click_update_button
       expect(f(".slick-header-column[title='Override']")).to be_displayed
     end

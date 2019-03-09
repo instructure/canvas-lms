@@ -49,13 +49,13 @@ class DashboardCardAction extends React.Component {
   renderIcon = iconClass => {
     switch (iconClass) {
       case 'icon-announcement':
-        return <IconAnnouncement />
+        return <IconAnnouncement size="x-small" />
       case 'icon-assignment':
-        return <IconAssignment />
+        return <IconAssignment size="x-small" />
       case 'icon-discussion':
-        return <IconDiscussion />
+        return <IconDiscussion size="x-small" />
       case 'icon-folder':
-        return <IconFolder />
+        return <IconFolder size="x-small" />
       default:
         // fallback in case I missed one of the icons
         return <i className={iconClass} />

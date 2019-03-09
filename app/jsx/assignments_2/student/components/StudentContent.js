@@ -34,7 +34,7 @@ function renderContentBaseOnAvailability(assignment) {
     return (
       <React.Fragment>
         <AssignmentToggleDetails description={assignment && assignment.description} />
-        <ContentTabs />
+        <ContentTabs assignment={assignment} />
       </React.Fragment>
     )
   }

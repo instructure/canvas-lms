@@ -401,7 +401,8 @@ describe AssignmentsApiController, type: :request do
         'title' => 'some rubric',
         'points_possible' => 12,
         'free_form_criterion_comments' => true,
-        'hide_score_total' => false
+        'hide_score_total' => false,
+        'hide_points' => false,
       })
       expect(json.first['rubric']).to eq [
         {
@@ -1728,9 +1729,7 @@ describe AssignmentsApiController, type: :request do
           a
         end
         let(:update_response) do
-          put "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}", params: {
-            assignment: { name: 'banana' }
-          }
+          put "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}", params: params
         end
         let(:lookups) { assignment.assignment_configuration_tool_lookups }
 
@@ -1741,7 +1740,31 @@ describe AssignmentsApiController, type: :request do
           user_session(@user)
         end
 
+        context 'when changing the workflow state' do
+          let(:params) do
+            {
+              assignment: {
+                published: true
+              }
+            }
+          end
+
+          it 'does not attempt to clear tool associations' do
+            expect(assignment).not_to receive(:clear_tool_settings_tools)
+            update_response
+          end
+        end
+
         context 'when switching to unsupported submission type' do
+          let(:params) do
+            {
+              assignment: {
+                name: 'banana',
+                submission_types: ['online_upload']
+              }
+            }
+          end
+
           it 'destroys tool associations' do
             expect do
               update_response

@@ -80,7 +80,14 @@ describe "CSP Settings API", type: :request do
         json = get_csp_settings(@sub)
         expect(json["enabled"]).to eq false
         expect(json["inherited"]).to eq true
+        expect(json["settings_locked"]).to eq false
         expect(json["effective_whitelist"]).to be_nil
+      end
+
+      it "should show when settings are locked from above" do
+        Account.default.tap{|a| a.enable_csp!; a.lock_csp!}
+        json = get_csp_settings(@sub)
+        expect(json["settings_locked"]).to eq true
       end
 
       it "should get the whitelist if enabled" do
@@ -120,6 +127,13 @@ describe "CSP Settings API", type: :request do
         expect(json["message"]).to eq "must be enabled on account-level first"
       end
 
+      it "should be blocked by parent account locking" do
+        @sub.enable_csp!
+        @sub.lock_csp!
+        json = set_csp_setting(@course, "disabled", 400)
+        expect(json["message"]).to eq "cannot set when locked by parent account"
+      end
+
       it "should un-disable if enabled on account-level" do
         @sub.enable_csp!
         @course.disable_csp!
@@ -140,6 +154,19 @@ describe "CSP Settings API", type: :request do
     end
 
     context "setting on accounts" do
+      it "should be blocked by parent account locking" do
+        Account.default.tap{|a| a.enable_csp!; a.lock_csp!}
+        json = set_csp_setting(@sub, "disabled", 400)
+        expect(json["message"]).to eq "cannot set when locked by parent account"
+      end
+
+      it "should not be blocked when locked on self" do
+        @sub.enable_csp!
+        @sub.lock_csp!
+        json = set_csp_setting(@sub, "disabled")
+        expect(Account.find(@sub.id).csp_enabled?).to eq false
+      end
+
       it "should enable csp" do
         set_csp_setting(@sub, "enabled")
         expect(@sub.reload.csp_directly_enabled?).to eq true
@@ -156,6 +183,34 @@ describe "CSP Settings API", type: :request do
         @sub.disable_csp!
         set_csp_setting(@sub, "inherited")
         expect(@sub.reload.csp_enabled?).to eq true
+      end
+    end
+  end
+
+  context "PUT set_csp_lock" do
+    def set_csp_lock(context, lock_status, expected_status=200)
+      api_call(:put, "/api/v1/#{context.class.name.pluralize.downcase}/#{context.id}/csp_settings/lock",
+        {:controller => "csp_settings", :action => "set_csp_lock", :format => "json",
+          :"#{context.class.name.downcase}_id" => "#{context.id}", :settings_locked => lock_status},
+        {}, {}, {:expected_status => expected_status})
+    end
+
+    context "setting on accounts" do
+      it "should require explicit setting" do
+        json = set_csp_lock(@sub, true, 400)
+        expect(json["message"]).to eq "CSP must be explicitly set on this account"
+      end
+
+      it "should lock csp" do
+        Account.default.enable_csp!
+        set_csp_lock(Account.default, true)
+        expect(@sub.reload.csp_locked?).to eq true
+      end
+
+      it "should unlock csp" do
+        Account.default.tap{|a| a.enable_csp!; a.lock_csp!}
+        set_csp_lock(Account.default, false)
+        expect(@sub.reload.csp_locked?).to eq false
       end
     end
   end

@@ -21,11 +21,15 @@ module Csp::CourseHelper
   end
 
   def csp_enabled?
-    !self.csp_disabled? && self.account.csp_enabled?
+    self.account.csp_enabled? && csp_inherited?
   end
 
   def csp_inherited?
-    !self.csp_disabled?
+    csp_locked? || !self.csp_disabled?
+  end
+
+  def csp_locked?
+    self.account.csp_locked?
   end
 
   def inherit_csp!

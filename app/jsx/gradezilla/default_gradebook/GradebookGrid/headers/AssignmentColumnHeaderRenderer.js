@@ -94,6 +94,16 @@ function getProps(column, gradebook, options) {
     onMenuDismiss() {
       setTimeout(gradebook.handleColumnHeaderMenuClose)
     },
+
+    postGradesAction: {
+      enabled: gradebook.postPolicies != null,
+      onSelect(onExited) {
+        if (gradebook.postPolicies) {
+          gradebook.postPolicies.showPostAssignmentGradesTray({assignmentId, onExited})
+        }
+      }
+    },
+
     removeGradebookElement: gradebook.keyboardNav.removeGradebookElement,
     reuploadSubmissionsAction: gradebook.getReuploadSubmissionsAction(assignmentId),
     setDefaultGradeAction: gradebook.getSetDefaultGradeAction(assignmentId),

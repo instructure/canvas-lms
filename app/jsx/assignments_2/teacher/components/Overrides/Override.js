@@ -23,6 +23,7 @@ import {OverrideShape} from '../../assignmentData'
 import ToggleGroup from '@instructure/ui-toggle-details/lib/components/ToggleGroup'
 import View from '@instructure/ui-layout/lib/components/View'
 import OverrideSummary from './OverrideSummary'
+import OverrideDetail from './OverrideDetail'
 
 Override.propTypes = {
   override: OverrideShape,
@@ -34,13 +35,13 @@ Override.defaultProps = {
 
 export default function Override(props) {
   return (
-    <View as="div" margin="0 0 small 0">
+    <View as="div" margin="0 0 small 0" data-testid="Override">
       <ToggleGroup
         toggleLabel={I18n.t('Expand')}
         summary={<OverrideSummary override={props.override} />}
         background="default"
       >
-        <div style={{padding: '.5rem'}}>OverrideDetail goes here</div>
+        <OverrideDetail override={props.override} readOnly={props.readOnly} />
       </ToggleGroup>
     </View>
   )

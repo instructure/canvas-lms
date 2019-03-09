@@ -543,6 +543,15 @@ hu:
             start: 
               parameters: 
                 header: "Aktivitás dátuma:"
+      faculty_missing_grades: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "Vége ekkor:"
+            start: 
+              parameters: 
+                header: "Kezdés ekkor:"
       no_submissions: 
         parameters: 
           custom_reports: 
@@ -735,6 +744,15 @@ hu:
             start: 
               parameters: 
                 header: "Aktivitás dátuma:"
+      faculty_missing_grades: 
+        parameters: 
+          custom_reports: 
+            end: 
+              parameters: 
+                header: "Vége ekkor:"
+            start: 
+              parameters: 
+                header: "Kezdés ekkor:"
       no_submissions: 
         parameters: 
           custom_reports: 
@@ -2536,6 +2554,7 @@ hu:
   avatar_for_author_2eabbf55: "%{author}avatárja"
   avatar_for_studentname_8ea511ae: "%{studentName}avatárja"
   average_49c63f9b: Átlag
+  average_score_15cd7c3c: "Átlagpontszám "
   back_2900f52a: Vissza
   back_to_announcements_1036e43e: "Vissza a hirdetményekhez"
   back_to_app_center_95420d83: "Vissza az Alkalmazásközpontba"
@@ -3199,6 +3218,7 @@ hu:
   click_to_view_event_details_b25dc1f3: "Kattintson az esemény részleteinek megtekintéséhez"
   clicking_on_the_column_headers_will_sort_the_rows__3a6e9573: "Az oszlopra kattintva az sorokat fejléc szerint fogja rendezni."
   clone_group_set_c2a40e15: "Csoporthalmaz klónozása"
+  close_17f50799: bezárás
   close_and_return_to_canvas_80544344: "Bezárás és a munka folytatása"
   close_d634289d: Bezárás
   close_for_comments_37783f56: "Megjegyzések lezárása"
@@ -6964,6 +6984,7 @@ hu:
       pages: Oldalak
       people: Résztvevők
   group_a8f5ed9c: Csoport
+  group_assignment_7060989f: "Csoportos feladat"
   group_assignments_cannot_be_enabled_for_moderated__6b2faeef: "A csoportos feladatok nem engedélyezhetők moderált feladatokhoz"
   group_categories: 
     notices: 
@@ -12680,6 +12701,7 @@ hu:
   remove_text_8e485c41: "%{text} eltávolítása"
   remove_these_dates_48453a81: "Ezen dátumok törlése"
   remove_this_rubric_from_my_list_c7d80704: "Értékelőtábla eltávolítása a listámról"
+  remove_user_from_section_5556f465: "Felhasználó eltávolítása a szekcióból"
   removed_user_as_group_leader_bb69330f: "%{user} mint vezető eltávolítása "
   rename_45608f54: Átnevezés
   replace_e61834a7: Csere
@@ -14163,6 +14185,7 @@ hu:
     update_grade: "Értékelés frissítése"
     view_rubric_assessment_in_the_speedgrader: "Értékelőtábla megtekintése a Gyorsértékelőben"
   submission_score_b7a291e8: "beadás pontszáma"
+  submission_type_a925fc5f: "Beadás típusa"
   submissions: 
     assignment_submit_success: "A feladat sikeresen beadva."
     assignment_submitted: "A feladat beadva."
@@ -14900,6 +14923,8 @@ hu:
   unknown_status_status_35331e1d: "Ismeretlen státusz, %{status}"
   unknown_user_1113fcaa: "Ismeretlen felhasználó"
   unknown_user_url_82196ba7: "Ismeretlen felhasználói URL"
+  unlimited_attempts_81a37d4: "Korlátlan számú próbálkozás"
+  unlimited_ff19e96d: Korlátlan
   unlock_at_bb930b34: "Zárolás feloldása ekkor"
   unlock_at_time_a0bbfb9: "Zárolás feloldása ekkor: %{time}"
   unlock_date_cannot_be_after_due_date_8829d9ca: "A zárolás feloldásának ideje nem lehet a határidő dátuma után"

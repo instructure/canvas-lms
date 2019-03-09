@@ -56,7 +56,10 @@ class ContextExternalTool < ActiveRecord::Base
     can :read and can :update and can :delete and can :update_manually
   end
 
-  CUSTOM_EXTENSION_KEYS = {:file_menu => [:accept_media_types].freeze}.freeze
+  CUSTOM_EXTENSION_KEYS = {
+    :file_menu => [:accept_media_types].freeze,
+    :editor_button => [:use_tray].freeze
+  }.freeze
 
   Lti::ResourcePlacement::PLACEMENTS.each do |type|
     class_eval <<-RUBY, __FILE__, __LINE__ + 1
@@ -571,8 +574,7 @@ class ContextExternalTool < ActiveRecord::Base
     placements =* options[:placements] || options[:type]
 
     #special LOR feature flag
-    unless (options[:root_account] && options[:root_account].feature_enabled?(:lor_for_account)) ||
-        (options[:current_user] && options[:current_user].feature_enabled?(:lor_for_user))
+    unless (options[:root_account] && options[:root_account].feature_enabled?(:lor_for_account))
       valid_placements = placements.select{|placement| !LOR_TYPES.include?(placement.to_sym)}
       return [] if valid_placements.size == 0 && placements.size > 0
       placements = valid_placements
@@ -827,7 +829,8 @@ class ContextExternalTool < ActiveRecord::Base
           :icon_url => tool.editor_button(:icon_url),
           :canvas_icon_class => tool.editor_button(:canvas_icon_class),
           :width => tool.editor_button(:selection_width),
-          :height => tool.editor_button(:selection_height)
+          :height => tool.editor_button(:selection_height),
+          :use_tray => tool.editor_button(:use_tray) == "true"
       }
     end
   end

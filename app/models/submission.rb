@@ -156,44 +156,21 @@ class Submission < ActiveRecord::Base
   scope :missing, -> do
     joins(:assignment).
     where("
-      -- if excused is false or null, and...
-      excused IS NOT TRUE AND (
-        -- teacher said it's missing, 'nuff said.
-        late_policy_status = 'missing' OR
-        (
-          -- Otherwise, submission does not have a late policy applied and
-          late_policy_status is null and
-          -- submission is past due and
-          COALESCE(submitted_at, CURRENT_TIMESTAMP) >= cached_due_date +
-            CASE submission_type WHEN 'online_quiz' THEN interval '1 minute' ELSE interval '0 minutes' END and
-          -- submission is not submitted and
-          NULLIF(submission_type, '') is null and
-          -- we expect a digital submission
-          COALESCE(NULLIF(assignments.submission_types, ''), 'none') not similar to '%(none|not\_graded|on\_paper|wiki\_page|external\_tool)%'
-        )
-      )
-    ")
-  end
-
-  scope :not_missing, -> do
-    joins(:assignment).
-    where("
       -- excused submissions cannot be missing
-      excused IS TRUE OR (
-        -- teacher hasn't said it's missing and
-        late_policy_status is distinct from 'missing' and
+      excused IS NOT TRUE AND NOT (
+        -- teacher said it's missing, 'nuff said.
+        -- we're doing a double 'NOT' here to avoid 'ORs' that could slow down the query
+        late_policy_status IS DISTINCT FROM 'missing' AND NOT
         (
-          -- late policy status was overridden but the value is not 'missing', or
-          late_policy_status IS NOT NULL OR
-          -- submission is not past due or
-          cached_due_date is null or
-          COALESCE(submitted_at, CURRENT_TIMESTAMP) < cached_due_date +
-            CASE submission_type WHEN 'online_quiz' THEN interval '1 minute' ELSE interval '0 minutes' END or
-          -- submission is submitted or
-          NULLIF(submission_type, '') is not null or
-          -- we expect an offline submission
-          COALESCE(NULLIF(assignments.submission_types, ''), 'none') similar to
-            '%(none|not\_graded|on\_paper|wiki\_page|external\_tool)%'
+          cached_due_date IS NOT NULL
+          -- submission is past due and
+          AND CURRENT_TIMESTAMP >= cached_due_date +
+            CASE assignments.submission_types WHEN 'online_quiz' THEN interval '1 minute' ELSE interval '0 minutes' END
+          -- submission is not submitted and
+          AND submission_type IS NULL
+          -- we expect a digital submission
+          and assignments.submission_types NOT IN ('', 'none', 'not_graded', 'on_paper', 'wiki_page', 'external_tool')
+          AND assignments.submission_types IS NOT NULL
         )
       )
     ")
@@ -229,6 +206,9 @@ class Submission < ActiveRecord::Base
 
   scope :anonymized, -> { where.not(anonymous_id: nil) }
 
+  scope :posted, -> { where.not(posted_at: nil) }
+  scope :unposted, -> { where(posted_at: nil) }
+
   workflow do
     state :submitted do
       event :grade_it, :transitions_to => :graded
@@ -253,7 +233,7 @@ class Submission < ActiveRecord::Base
   def self.needs_grading_conditions
     conditions = <<-SQL
       submissions.submission_type IS NOT NULL
-      AND (submissions.excused = 'f' OR submissions.excused IS NULL)
+      AND submissions.excused IS NOT TRUE
       AND (submissions.workflow_state = 'pending_review'
         OR (submissions.workflow_state IN ('submitted', 'graded')
           AND (submissions.score IS NULL OR submissions.grade_matches_current_submission =  'f')
@@ -332,6 +312,7 @@ class Submission < ActiveRecord::Base
   after_save :create_alert
   after_save :reset_regraded
   after_save :create_audit_event!
+  after_save :handle_posted_at_changed, if: :saved_change_to_posted_at?
 
   def reset_regraded
     @regraded = false
@@ -2033,8 +2014,11 @@ class Submission < ActiveRecord::Base
       pg = find_or_create_provisional_grade!(opts[:author], final: opts[:final])
       opts[:provisional_grade_id] = pg.id
     end
+
     if self.new_record?
       self.save!
+    elsif comment_causes_posting?(author: opts[:author], draft: opts[:draft], provisional: opts[:provisional])
+      update!(posted_at: Time.zone.now)
     else
       self.touch
     end
@@ -2445,6 +2429,10 @@ class Submission < ActiveRecord::Base
     self.assignment.muted?
   end
 
+  def posted?
+    posted_at.present?
+  end
+
   def assignment_muted_changed
     self.grade_change_audit(true)
   end
@@ -2626,12 +2614,46 @@ class Submission < ActiveRecord::Base
     auditable_changes = saved_changes.slice(*auditable_attributes)
     return if auditable_changes.empty?
 
-    AnonymousOrModerationEvent.create!(
-      assignment: assignment,
-      submission: self,
-      user: grader,
-      event_type: 'submission_updated',
-      payload: auditable_changes
-    )
+    event =
+      {
+        assignment: assignment,
+        submission: self,
+        event_type: 'submission_updated',
+        payload: auditable_changes
+      }
+
+    if !autograded?
+      event[:user] = grader
+    elsif quiz_submission_id
+      event[:quiz_id] = -grader_id
+    else
+      event[:context_external_tool_id] = -grader_id
+    end
+
+    AnonymousOrModerationEvent.create!(event)
+  end
+
+  def comment_causes_posting?(author:, draft:, provisional:)
+    return false if posted? || assignment.post_manually?
+    return false if draft || provisional
+
+    author.present? && assignment.context.instructor_ids.include?(author.id)
+  end
+
+  def handle_posted_at_changed
+    # This method will be called if a posted_at date was changed specifically
+    # on this submission (e.g., if it received a grade or a comment and the
+    # assignment is not manually posted), as opposed to the usual situation
+    # where all submissions in a section are updated. In this case, we call
+    # [un]post_submissions to follow the normal workflow, but skip updating the
+    # posted_at date since that already happened.
+    return unless assignment.course.feature_enabled?(:post_policies)
+
+    previously_posted = posted_at_before_last_save.present?
+    if posted? && !previously_posted
+      assignment.post_submissions(submission_ids: [self.id], skip_updating_timestamp: true)
+    elsif !posted? && previously_posted
+      assignment.hide_submissions(submission_ids: [self.id], skip_updating_timestamp: true)
+    end
   end
 end

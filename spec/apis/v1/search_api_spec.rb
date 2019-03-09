@@ -91,6 +91,16 @@ describe SearchController, type: :request do
       ]
     end
 
+    it "should not duplicate group recipients if users are also in other groups" do
+      @group2 = @course.groups.create(:name => "another group")
+      @group2.users = [@bob]
+      @group2.save!
+
+      json = api_call(:get, "/api/v1/search/recipients.json?context=group_#{@group.id}",
+        { :controller => 'search', :action => 'recipients', :format => 'json', :context => "group_#{@group.id}" })
+      expect(json.map{|h| h["id"]}).to match_array([@joe.id, @me.id, @bob.id])
+    end
+
     it "should return recipients for a given section" do
       json = api_call(:get, "/api/v1/search/recipients.json?context=section_#{@course.default_section.id}",
               { :controller => 'search', :action => 'recipients', :format => 'json', :context => "section_#{@course.default_section.id}" })

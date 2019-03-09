@@ -110,7 +110,7 @@ describe('open', () => {
   test('launches external tool when opened', async () => {
     const instance = await getInstance(container)
     instance.open({name: 'foo', id: 1})
-    expect(document.querySelector('form').action).toBe('http://url/with/1')
+    expect(container.querySelector('form').action).toBe('http://url/with/1')
     expect(submit).toHaveBeenCalled()
   })
 
@@ -120,7 +120,7 @@ describe('open', () => {
     editor.selection.getContent.mockReturnValue(selection)
     const instance = await getInstance(container, {editor})
     instance.open({name: 'foo', id: 1})
-    expect(document.querySelector('input[name="selection"]').value).toBe(selection)
+    expect(container.querySelector('input[name="selection"]').value).toBe(selection)
     expect(submit).toHaveBeenCalled()
   })
 
@@ -130,14 +130,14 @@ describe('open', () => {
     editor.getContent.mockReturnValue(contents)
     const instance = await getInstance(container, {editor})
     instance.open({name: 'foo', id: 1})
-    expect(document.querySelector('input[name="editor_contents"]').value).toBe(contents)
+    expect(container.querySelector('input[name="editor_contents"]').value).toBe(contents)
     expect(submit).toHaveBeenCalled()
   })
 
   it('uses default resource selection url', async () => {
     const instance = await getInstance(container, {resourceSelectionUrl: undefined})
     instance.open({name: 'foo', id: 2})
-    expect(instance.formRef.action).toBe(
+    expect(container.querySelector('form').action).toBe(
       'http://localhost/courses/1/external_tools/2/resource_selection'
     )
   })
@@ -170,6 +170,16 @@ describe('open', () => {
     instance.open({name: 'foo', id: 2})
     expect(win.$).toHaveBeenCalledWith(instance.props.win)
     expect(bind).toHaveBeenCalledWith('externalContentReady', instance.handleExternalContentReady)
+  })
+
+  describe('tray', () => {
+    it('does not set height or width for iframe', async () => {
+      const instance = await getInstance(container)
+      instance.open({name: 'foo', id: 2, use_tray: true})
+      const style = document.querySelector('iframe').style
+      expect(style.height).toBe('')
+      expect(style.width).toBe('')
+    })
   })
 })
 

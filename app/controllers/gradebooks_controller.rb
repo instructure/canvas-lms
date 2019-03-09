@@ -824,7 +824,8 @@ class GradebooksController < ApplicationController
         gradezilla: true,
         grading_schemes: GradingStandard.for(@context).as_json(include_root: false),
         late_policy: @context.late_policy.as_json(include_root: false),
-        new_gradebook_development_enabled: new_gradebook_development_enabled?
+        new_gradebook_development_enabled: new_gradebook_development_enabled?,
+        post_policies_enabled: @context.feature_enabled?(:post_policies)
       }
     }
   end

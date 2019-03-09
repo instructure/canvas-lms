@@ -421,7 +421,7 @@ class Speedgrader
     end
 
     def expand_assessment_audit_user_events(user)
-      f("#user-event-group-#{user.id} button").click
+      f("#creator-event-group-user-#{user.id} button").click
       wait_for_animations
     end
 

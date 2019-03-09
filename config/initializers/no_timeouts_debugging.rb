@@ -35,7 +35,7 @@ if Rails.env.development? || Rails.env.test?
   #
   module NoRaiseTimeoutsWhileDebugging
     def raise(*args)
-      if args.first.is_a?(Timeout::Error)
+      if args.first.is_a?(Class) && args.first < Timeout::Error
         have_ever_run_a_debugger = (
           defined?(Byebug) && Byebug.respond_to?(:started?) ||
           defined?(Pry) && Pry::InputLock.input_locks.any?

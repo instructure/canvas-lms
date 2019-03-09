@@ -367,12 +367,23 @@ class GradebookImporter
     @student_columns += @parsed_custom_column_data.length
   end
 
+  NON_ASSIGNMENT_COLUMN_HEADERS = [
+    "Current Score",
+    "Current Points",
+    "Current Grade",
+    "Final Score",
+    "Final Points",
+    "Final Grade",
+    "Override Score",
+    "Override Grade"
+  ].freeze
+
   def strip_non_assignment_columns(stripped_row)
     drop_student_information_columns(stripped_row)
 
-    # This regex will also include columns for unposted scores, which
+    # This regexp will also include columns for unposted scores, which
     # will be one of these values with "Unposted" prepended.
-    while stripped_row.last =~ /Current Score|Current Points|Current Grade|Final Score|Final Points|Final Grade/
+    while stripped_row.last =~ Regexp.new(NON_ASSIGNMENT_COLUMN_HEADERS.join('|'))
       stripped_row.pop
     end
     stripped_row

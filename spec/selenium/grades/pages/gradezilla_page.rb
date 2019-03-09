@@ -217,6 +217,18 @@ module Gradezilla
     f('#spinner')
   end
 
+  def self.post_grades_option
+    # TODO: locator for post grades option
+  end
+
+  def self.hide_grades_option
+    # TODO: locator for hide grades option
+  end
+
+  def self.grade_posting_policy_option
+    # TODO: locator for grade posting policy
+  end
+
   # actions
   def self.visit(course)
     Account.default.enable_feature!(:new_gradebook)
@@ -754,6 +766,27 @@ module Gradezilla
 
   def self.overlay_info_screen
     fj(".overlay_screen")
+  end
+
+  def self.click_post_grades(assignment_id)
+    click_assignment_header_menu(assignment_id)
+    # TODO: click post grades wait for tray
+    post_grades_option.click
+    Gradezilla::PostGradesTray.full_content
+  end
+
+  def self.click_hide_grades(assignment_id)
+    click_assignment_header_menu(assignment_id)
+    # TODO: click hide grades
+    hide_grades_option.click
+    Gradezilla::HideGradesTray.full_content
+  end
+
+  def self.click_grade_posting_policy(assignment_id)
+    click.assignment_header_menu(assignment_id)
+    # TODO: click poting policy
+    grade_posting_policy_option.click
+    Gradezilla::AssignmentPostingPolicy
   end
 
   delegate :click, to: :save_button, prefix: true

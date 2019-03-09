@@ -35,16 +35,18 @@ export const dateEventGroup = shape({
   startDateKey: string.isRequired
 })
 
-export const user = shape({
+export const creator = shape({
   id: string.isRequired,
+  key: string.isRequired,
   name: string.isRequired,
-  role: string.isRequired
+  role: string.isRequired,
+  type: string.isRequired
 })
 
-export const userEventGroup = shape({
+export const creatorEventGroup = shape({
   anonymousOnly: bool.isRequired,
-  dateEventGroups: arrayOf(dateEventGroup).isRequired,
-  user: user.isRequired
+  creator: creator.isRequired,
+  dateEventGroups: arrayOf(dateEventGroup).isRequired
 })
 
 export const anonymityDate = instanceOf(Date)
@@ -55,5 +57,5 @@ export const auditTrail = shape({
   anonymityDate,
   finalGradeDate: finalGradeDate.isRequired,
   overallAnonymity: overallAnonymity.isRequired,
-  userEventGroups: arrayOf(userEventGroup).isRequired
+  creatorEventGroups: arrayOf(creatorEventGroup).isRequired
 })

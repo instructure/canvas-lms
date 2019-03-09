@@ -21,6 +21,8 @@ import {render} from 'react-testing-library'
 import {mockAssignment} from '../../test-utils'
 import ContentTabs from '../ContentTabs'
 
+jest.mock('jsx/shared/rce/RichContentEditor')
+
 it('renders', () => {
   render(<ContentTabs assignment={mockAssignment()} />)
 })

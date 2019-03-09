@@ -16,33 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import I18n from 'i18n!assignments_2'
-import {string} from 'prop-types'
+// import PropTypes from 'prop-types'
 import React from 'react'
+import View from '@instructure/ui-layout/lib/components/View'
+import Text from '@instructure/ui-elements/lib/components/Text'
+import noComments from '../../../../../../public/images/assignments_2/NoComments.svg'
 
-import Pill from '@instructure/ui-elements/lib/components/Pill'
-
-function SubmissionStatusPill(props) {
-  if (!props.submissionStatus) {
-    return null
-  }
+function NoComments() {
   return (
     <React.Fragment>
-      {props.submissionStatus === 'missing' ? (
-        <Pill
-          data-test-id="missing-pill"
-          variant="danger"
-          text={I18n.t('Missing')}
-          margin="x-small 0 0 0"
-        />
-      ) : (
-        <Pill data-test-id="late-pill" text={I18n.t('Late')} margin="x-small 0 0 0" />
-      )}
+      <View margin="small auto" size="x-small" display="block">
+        <img alt="" src={noComments} />
+      </View>
+      <Text weight="bold" as="div" margin="x-small auto">
+        {I18n.t('Send a comment to your instructor about this assignment.')}
+      </Text>
     </React.Fragment>
   )
 }
 
-SubmissionStatusPill.propTypes = {
-  submissionStatus: string
-}
-
-export default React.memo(SubmissionStatusPill)
+export default React.memo(NoComments)

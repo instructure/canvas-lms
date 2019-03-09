@@ -55,8 +55,9 @@ export default class ExternalToolsTable extends React.Component {
   loader = () => <div className="loadingIndicator" />
 
   setFocusAbove = (tool) => () => {
-    if (tool) {
-      this[`externalTool${tool.app_id}`].focus()
+    const toolRow = tool && this[`externalTool${tool.app_id}`]
+    if (toolRow && toolRow.button) {
+      toolRow.focus()
     } else {
       this.props.setFocusAbove()
     }

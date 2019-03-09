@@ -74,6 +74,9 @@
   "close_opportunity_center_popup_9907d981": {
     "message": "Zamknij wyskakujące okienko Opportunity Center"
   },
+  "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
+    "message": "{ count, plural,\n     =0 {# okazje}\n    one {# okazja}\n  other {# okazji}\n}"
+  },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Pokaż # ukończony element}\n  other {Pokaż # ukończone elementy }\n}"
   },
@@ -265,6 +268,9 @@
   },
   "only_most_recent_grading_period_shown_f1ad6458": {
     "message": "*Pokazano tylko najnowszy okres oceniania."
+  },
+  "opportunities_popup_f6703842": {
+    "message": "okienko wyskakujące z okazjami"
   },
   "optional_add_course_ef0d70fc": {
     "message": "Opcjonalnie: Dodaj kurs"

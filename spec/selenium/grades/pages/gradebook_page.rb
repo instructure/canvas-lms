@@ -123,7 +123,7 @@ module Gradebook
     end
 
     def total_score_for_row(row)
-      f('.total-cell', grade_grid.find_elements(:css, '.slick-row')[row]).text
+      f('.total-cell .percentage', grade_grid.find_elements(:css, '.slick-row')[row]).text
     end
 
     def select_grading_period(grading_period_id)
@@ -225,7 +225,7 @@ module Gradebook
     end
 
     def student_total_grade(student)
-      total_score_for_row(student_row(student))
+      total_score_for_row(student_row(student)).delete("\n").strip
     end
   end
 end

@@ -1186,7 +1186,7 @@ describe MasterCourses::MasterMigration do
       @sub = @template.add_child_course!(@copy_to)
 
       run_master_migration
-      
+
       expect(@copy_to.reload.grading_standard.data).to eq gs.data
       expect(@copy_to.grading_standard_enabled).to eq true
 
@@ -1451,6 +1451,33 @@ describe MasterCourses::MasterMigration do
       Assignment.where(:id => @assmt).update_all(:updated_at => 10.minutes.from_now)
       run_master_migration
       expect(assignment_to.reload.rubric).to eq other_rubric
+    end
+
+    it "should link assignment rubrics when association is pointed to a new rubric" do
+      Timecop.freeze(10.minutes.ago) do
+        @copy_to = course_factory
+        @template.add_child_course!(@copy_to)
+        @assmt = @copy_from.assignments.create!
+        @course = @copy_from
+        @first_rubric = outcome_with_rubric
+        @ra = @first_rubric.associate_with(@assmt, @copy_from, purpose: 'grading')
+      end
+      Timecop.freeze(8.minutes.ago) do
+        run_master_migration
+      end
+
+      assignment_to = @copy_to.assignments.where(:migration_id => mig_id(@assmt)).first
+      rubric_to = @copy_to.rubrics.where(:migration_id => mig_id(@first_rubric)).first
+      expect(assignment_to.reload.rubric).to eq rubric_to
+
+      @second_rubric = outcome_with_rubric
+      @ra.rubric = @second_rubric
+      @ra.save! # change the rubric but don't make a new association
+
+      run_master_migration
+
+      second_rubric_to = @copy_to.rubrics.where(:migration_id => mig_id(@second_rubric)).first
+      expect(assignment_to.reload.rubric).to eq second_rubric_to
     end
 
     it "shouldn't delete module items in associated courses" do

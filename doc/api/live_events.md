@@ -44,6 +44,7 @@ event originated as part of a web request:
 | `root_account_lti_guid` | String | The Canvas lti_guid of the root account associated with the current user. |
 | `context_type` | String | The type of context where the event happened. |
 | `context_id` | String | The Canvas id of the current context. Always use the `context_type` when using this id to lookup the object. |
+| `context_sis_source_id` | String | The Canvas SIS source id of the current context. |
 | `role` | String | The role of the current user in the current context.  |
 | `hostname` | String | The hostname of the current request |
 | `producer` | String | The name of the producer of an event. Will always be 'canvas' when an event is originating in canvas. |

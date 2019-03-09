@@ -30,7 +30,7 @@ class GlobalGrades
     end
 
     def course_link(course)
-      fxpath("//a[text()='#{course.name}']")
+      fj("a:contains('#{course.name}')")
     end
 
     def course_details
@@ -44,11 +44,11 @@ class GlobalGrades
     end
 
     def get_score_for_course(course)
-      score(course).text.split("\n")[0]
+      score(course).text[/\d+\.*\d*+%/]
     end
 
     def get_score_for_course_no_percent(course)
-      get_score_for_course(course).split("%")[0].to_f
+      get_score_for_course(course).delete!("%").to_f
     end
 
     def course_row(course)

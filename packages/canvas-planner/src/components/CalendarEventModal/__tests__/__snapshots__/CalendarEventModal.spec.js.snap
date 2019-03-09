@@ -23,8 +23,11 @@ exports[`renders 1`] = `
   shouldReturnFocus={true}
   size="small"
   transition="fade"
+  variant="default"
 >
-  <ModalHeader>
+  <ModalHeader
+    variant="default"
+  >
     <Heading
       border="none"
       color="inherit"
@@ -33,7 +36,6 @@ exports[`renders 1`] = `
     >
       <Link
         as="button"
-        ellipsis={false}
         href="http://example.com"
         iconPlacement="start"
         linkRef={[Function]}
@@ -57,6 +59,7 @@ exports[`renders 1`] = `
   <ModalBody
     as="div"
     padding="medium"
+    variant="default"
   >
     <List
       as="ul"
@@ -201,8 +204,11 @@ exports[`renders with allDay 1`] = `
   shouldReturnFocus={true}
   size="small"
   transition="fade"
+  variant="default"
 >
-  <ModalHeader>
+  <ModalHeader
+    variant="default"
+  >
     <Heading
       border="none"
       color="inherit"
@@ -211,7 +217,6 @@ exports[`renders with allDay 1`] = `
     >
       <Link
         as="button"
-        ellipsis={false}
         href="http://example.com"
         iconPlacement="start"
         linkRef={[Function]}
@@ -235,6 +240,7 @@ exports[`renders with allDay 1`] = `
   <ModalBody
     as="div"
     padding="medium"
+    variant="default"
   >
     <List
       as="ul"
@@ -379,8 +385,11 @@ exports[`renders with only the startTime 1`] = `
   shouldReturnFocus={true}
   size="small"
   transition="fade"
+  variant="default"
 >
-  <ModalHeader>
+  <ModalHeader
+    variant="default"
+  >
     <Heading
       border="none"
       color="inherit"
@@ -389,7 +398,6 @@ exports[`renders with only the startTime 1`] = `
     >
       <Link
         as="button"
-        ellipsis={false}
         href="http://example.com"
         iconPlacement="start"
         linkRef={[Function]}
@@ -413,6 +421,7 @@ exports[`renders with only the startTime 1`] = `
   <ModalBody
     as="div"
     padding="medium"
+    variant="default"
   >
     <List
       as="ul"
@@ -557,8 +566,11 @@ exports[`renders with user displayName for calendar 1`] = `
   shouldReturnFocus={true}
   size="small"
   transition="fade"
+  variant="default"
 >
-  <ModalHeader>
+  <ModalHeader
+    variant="default"
+  >
     <Heading
       border="none"
       color="inherit"
@@ -567,7 +579,6 @@ exports[`renders with user displayName for calendar 1`] = `
     >
       <Link
         as="button"
-        ellipsis={false}
         href="http://example.com"
         iconPlacement="start"
         linkRef={[Function]}
@@ -591,6 +602,7 @@ exports[`renders with user displayName for calendar 1`] = `
   <ModalBody
     as="div"
     padding="medium"
+    variant="default"
   >
     <List
       as="ul"
@@ -735,8 +747,11 @@ exports[`renders without address 1`] = `
   shouldReturnFocus={true}
   size="small"
   transition="fade"
+  variant="default"
 >
-  <ModalHeader>
+  <ModalHeader
+    variant="default"
+  >
     <Heading
       border="none"
       color="inherit"
@@ -745,7 +760,6 @@ exports[`renders without address 1`] = `
     >
       <Link
         as="button"
-        ellipsis={false}
         href="http://example.com"
         iconPlacement="start"
         linkRef={[Function]}
@@ -769,6 +783,7 @@ exports[`renders without address 1`] = `
   <ModalBody
     as="div"
     padding="medium"
+    variant="default"
   >
     <List
       as="ul"
@@ -891,8 +906,11 @@ exports[`renders without details 1`] = `
   shouldReturnFocus={true}
   size="small"
   transition="fade"
+  variant="default"
 >
-  <ModalHeader>
+  <ModalHeader
+    variant="default"
+  >
     <Heading
       border="none"
       color="inherit"
@@ -901,7 +919,6 @@ exports[`renders without details 1`] = `
     >
       <Link
         as="button"
-        ellipsis={false}
         href="http://example.com"
         iconPlacement="start"
         linkRef={[Function]}
@@ -925,6 +942,7 @@ exports[`renders without details 1`] = `
   <ModalBody
     as="div"
     padding="medium"
+    variant="default"
   >
     <List
       as="ul"
@@ -1050,8 +1068,11 @@ exports[`renders without location 1`] = `
   shouldReturnFocus={true}
   size="small"
   transition="fade"
+  variant="default"
 >
-  <ModalHeader>
+  <ModalHeader
+    variant="default"
+  >
     <Heading
       border="none"
       color="inherit"
@@ -1060,7 +1081,6 @@ exports[`renders without location 1`] = `
     >
       <Link
         as="button"
-        ellipsis={false}
         href="http://example.com"
         iconPlacement="start"
         linkRef={[Function]}
@@ -1084,6 +1104,7 @@ exports[`renders without location 1`] = `
   <ModalBody
     as="div"
     padding="medium"
+    variant="default"
   >
     <List
       as="ul"

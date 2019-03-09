@@ -196,4 +196,35 @@ describe MediaObject do
       expect(MediaObject.add_media_files(attachments, wait_for_completion)).to eq :retval
     end
   end
+
+  describe ".process_retrieved_details" do
+    before :once do
+      @mock_entry = {
+        name: "Kaltura Title",
+        duration: 30,
+        plays: 0,
+        download_url: "https://google.com"
+      }
+      @media_type = "video"
+      @assets = []
+    end
+
+    it "keeps the current title if already set" do
+        mo = media_object
+        mo.title = "Canvas Title"
+        mo.save!
+
+        mo.process_retrieved_details(@mock_entry, @media_type, @assets)
+        expect(mo.title).to eq "Canvas Title"
+    end
+
+    it "uses the kaltura title if no current title" do
+        mo = media_object
+        mo.title = ""
+        mo.save!
+
+        mo.process_retrieved_details(@mock_entry, @media_type, @assets)
+        expect(mo.title).to eq "Kaltura Title"
+    end
+  end
 end

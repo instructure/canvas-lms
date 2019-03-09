@@ -232,23 +232,78 @@ describe Assignment do
       end
     end
 
-    describe "ensure_manual_posting_if_anonymous" do
-      it "sets a newly-created anonymous assignment to post manually" do
-        assignment = @course.assignments.create!(title: 'hi', anonymous_grading: true)
-        expect(assignment.effective_post_policy).to be_post_manually
+    describe "#ensure_manual_posting_if_anonymous" do
+      context "when post policies are enabled" do
+        before(:each) { @course.enable_feature!(:post_policies) }
+
+        it "sets a newly-created anonymous assignment to post manually" do
+          assignment = @course.assignments.create!(title: 'hi', anonymous_grading: true)
+          expect(assignment).to be_post_manually
+        end
+
+        it "sets a pre-existing assignment to post manually if anonymous grading is enabled" do
+          assignment = @course.assignments.create!(title: 'hi')
+          assignment.create_post_policy!(post_manually: false)
+
+          assignment.update!(anonymous_grading: true)
+          expect(assignment).to be_post_manually
+        end
+
+        it "does not set a post policy of a non-anonymous assignment" do
+          assignment = @course.assignments.create!(title: 'hi')
+          expect(assignment.effective_post_policy).to be_nil
+        end
       end
 
-      it "sets a pre-existing assignment to post manually if anonymous grading is enabled" do
-        assignment = @course.assignments.create!(title: 'hi')
-        assignment.create_post_policy!(post_manually: false)
+      context "when post policies are not enabled" do
+        it "does not set a post policy on anonymous assignments" do
+          assignment = @course.assignments.create!(title: 'hi', anonymous_grading: true)
+          expect(assignment.effective_post_policy).to be_nil
+        end
+      end
+    end
 
-        assignment.update!(anonymous_grading: true)
-        expect(assignment.effective_post_policy).to be_post_manually
+    describe "#ensure_manual_posting_if_moderated" do
+      let(:teacher) { @course.enroll_teacher(User.create!, enrollment_state: :active).user }
+
+      context "when post policies are enabled" do
+        before(:each) { @course.enable_feature!(:post_policies) }
+
+        it "sets a newly-created moderated assignment to post manually" do
+          assignment = @course.assignments.create!(
+            final_grader: teacher,
+            grader_count: 5,
+            title: 'hi',
+            moderated_grading: true
+          )
+          expect(assignment).to be_post_manually
+        end
+
+        it "sets a pre-existing assignment to post manually if moderated grading is enabled" do
+          assignment = @course.assignments.create!(title: 'hi')
+          assignment.create_post_policy!(post_manually: false)
+
+          assignment.update!(moderated_grading: true, grader_count: 5, final_grader: teacher)
+          expect(assignment).to be_post_manually
+        end
+
+        it "does not set a post policy of a non-moderated assignment" do
+          assignment = @course.assignments.create!(title: 'hi')
+          expect(assignment.effective_post_policy).to be_nil
+        end
       end
 
-      it "does not set a post policy of a non-anonymous assignment" do
-        assignment = @course.assignments.create!(title: 'hi')
-        expect(assignment.effective_post_policy).to be_nil
+      context "when post policies are not enabled" do
+        it "does not set a post policy on moderated assignments" do
+          assignment = @course.assignments.create!(
+            final_grader: teacher,
+            grader_count: 5,
+            title: 'hi',
+            moderated_grading: true
+          )
+
+          expect(assignment.effective_post_policy).to be_nil
+        end
       end
     end
   end
@@ -1907,6 +1962,63 @@ describe Assignment do
         end
       end
     end
+
+    describe "submission posting" do
+      let(:course) { Course.create! }
+
+      let(:student) { course.enroll_student(User.create!, enrollment_state: 'active').user }
+      let(:teacher) { course.enroll_teacher(User.create!, enrollment_state: 'active').user }
+
+      let(:assignment) { course.assignments.create!(title: "hi") }
+      let(:submission) { assignment.submission_for_student(student) }
+
+      context "when the submission is unposted" do
+        it "posts the submission if a grade is assigned" do
+          assignment.grade_student(student, grader: teacher, score: 50)
+          expect(submission).to be_posted
+        end
+
+        it "posts the submission if an excusal is granted" do
+          assignment.grade_student(student, grader: teacher, excused: true)
+          expect(submission).to be_posted
+        end
+
+        it "does not post the submission for a manually-posted assignment when post policies are enabled" do
+          course.enable_feature!(:post_policies)
+
+          assignment.create_post_policy!(course: course, post_manually: true)
+          assignment.grade_student(student, grader: teacher, score: 50)
+          expect(submission).not_to be_posted
+        end
+
+        it "does not post the submission for a muted assignment when post policies are not enabled" do
+          assignment.mute!
+          assignment.grade_student(student, grader: teacher, score: 50)
+          expect(submission).not_to be_posted
+        end
+
+        it "does not post the submission if the grade is provisional" do
+          moderated_assignment = course.assignments.create!(
+            title: "hi",
+            moderated_grading: true,
+            final_grader: teacher,
+            grader_count: 2
+          )
+          moderated_assignment.grade_student(student, grader: teacher, provisional: true, score: 40)
+          expect(moderated_assignment.submission_for_student(student)).not_to be_posted
+        end
+      end
+
+      it "does not update the posted_at date for a previously-posted submission" do
+        submission.update!(posted_at: 1.day.ago)
+
+        expect {
+          assignment.grade_student(student, grader: teacher, score: 50)
+        }.not_to change {
+          assignment.submission_for_student(student).posted_at
+        }
+      end
+    end
   end
 
   describe "#all_context_module_tags" do
@@ -2756,6 +2868,28 @@ describe Assignment do
       expect { assignment.update!(anonymous_grading: false) }.not_to change {
         assignment.muted?
       }.from(false)
+    end
+
+    context "when post policies are enabled" do
+      before(:once) { @course.enable_feature!(:post_policies) }
+
+      it "ensures an assignment with no previous post policy posts manually when it is muted" do
+        @assignment.mute!
+        expect(@assignment).to be_post_manually
+      end
+
+      it "ensures an auto-posting assignment posts manually when it is muted" do
+        @assignment.create_post_policy!(course: @course, post_manually: false)
+
+        @assignment.mute!
+        expect(@assignment).to be_post_manually
+      end
+
+      it "ensures a muted assignment posts automatically when it is unmuted" do
+        @assignment.mute!
+        @assignment.unmute!
+        expect(@assignment.reload).not_to be_post_manually
+      end
     end
   end
 
@@ -6747,44 +6881,34 @@ describe Assignment do
       @assignment.update!(muted: false)
     end
 
-    context 'when the anonymous_moderated_marking_audit_trail account feature flag is enabled' do
-      before(:each) do
-        @course.account.enable_feature!(:anonymous_moderated_marking_audit_trail)
-      end
-
-      it 'returns true for an auditor when the assignment is moderated, not muted, and grades have been posted' do
-        expect(@assignment.can_view_audit_trail?(@admin)).to be true
-      end
-
-      it 'returns true for an auditor when the assignment is graded anonymously, not muted, and grades have been posted' do
-        @assignment.update!(anonymous_grading: true, moderated_grading: false)
-        @assignment.update!(muted: false)
-        expect(@assignment.can_view_audit_trail?(@admin)).to be true
-      end
-
-      it "returns false when the user's role does not allow viewing the assignment audit trail" do
-        @course.root_account.role_overrides.create!(enabled: false, permission: :view_audit_trail, role: admin_role)
-        expect(@assignment.can_view_audit_trail?(@admin)).to be false
-      end
-
-      it 'returns false when the assignment is neither moderated nor anonymous' do
-        @assignment.update!(moderated_grading: false)
-        @assignment.update!(muted: false)
-        expect(@assignment.can_view_audit_trail?(@admin)).to be false
-      end
-
-      it 'returns false when the assignment is muted' do
-        @assignment.update!(muted: true)
-        expect(@assignment.can_view_audit_trail?(@admin)).to be false
-      end
-
-      it 'returns false when the assignment grades have not been posted' do
-        @assignment.update!(grades_published_at: nil)
-        expect(@assignment.can_view_audit_trail?(@admin)).to be false
-      end
+    it 'returns true for an auditor when the assignment is moderated, not muted, and grades have been posted' do
+      expect(@assignment.can_view_audit_trail?(@admin)).to be true
     end
 
-    it 'returns false when the anonymous_moderated_marking_audit_trail account feature flag is not enabled' do
+    it 'returns true for an auditor when the assignment is graded anonymously, not muted, and grades have been posted' do
+      @assignment.update!(anonymous_grading: true, moderated_grading: false)
+      @assignment.update!(muted: false)
+      expect(@assignment.can_view_audit_trail?(@admin)).to be true
+    end
+
+    it "returns false when the user's role does not allow viewing the assignment audit trail" do
+      @course.root_account.role_overrides.create!(enabled: false, permission: :view_audit_trail, role: admin_role)
+      expect(@assignment.can_view_audit_trail?(@admin)).to be false
+    end
+
+    it 'returns false when the assignment is neither moderated nor anonymous' do
+      @assignment.update!(moderated_grading: false)
+      @assignment.update!(muted: false)
+      expect(@assignment.can_view_audit_trail?(@admin)).to be false
+    end
+
+    it 'returns false when the assignment is muted' do
+      @assignment.update!(muted: true)
+      expect(@assignment.can_view_audit_trail?(@admin)).to be false
+    end
+
+    it 'returns false when the assignment grades have not been posted' do
+      @assignment.update!(grades_published_at: nil)
       expect(@assignment.can_view_audit_trail?(@admin)).to be false
     end
   end
@@ -6842,6 +6966,180 @@ describe Assignment do
       assignment.create_post_policy!(post_manually: false)
 
       expect(assignment.effective_post_policy).to eq(assignment.post_policy)
+    end
+  end
+
+  describe "#post_manually?" do
+    let(:course) { Course.create! }
+    let(:assignment) { course.assignments.create!(title: 'hello') }
+
+    context "when the post_policies feature flag is enabled" do
+      before(:each) { course.enable_feature!(:post_policies) }
+
+      context "when the assignment has a post policy" do
+        it "returns true if the assignment's post policy has manual posting enabled" do
+          assignment.create_post_policy!(post_manually: true)
+          expect(assignment).to be_post_manually
+        end
+
+        it "returns false if the assignment's post policy has manual posting disabled" do
+          assignment.create_post_policy!(post_manually: false)
+          expect(assignment).not_to be_post_manually
+        end
+      end
+
+      context "when the assignment has no post policy but the course does" do
+        it "returns true if the course's post policy has manual posting enabled" do
+          course.post_policies.create!(post_manually: true)
+          expect(assignment).to be_post_manually
+        end
+
+        it "returns false if the course's post policy has manual posting disabled" do
+          course.post_policies.create!(post_manually: false)
+          expect(assignment).not_to be_post_manually
+        end
+      end
+
+      it "returns false if neither the assignment nor the course has a post policy attached" do
+        expect(assignment).not_to be_post_manually
+      end
+    end
+
+    context "when the post_policies feature flag is not enabled" do
+      it "returns true if the assignment is muted" do
+        assignment.mute!
+        expect(assignment).to be_post_manually
+      end
+
+      it "returns false if the assignment is not muted" do
+        expect(assignment).not_to be_post_manually
+      end
+    end
+  end
+
+  describe "posting and unposting submissions" do
+    let(:assignment) { @course.assignments.create!(title: 'hi') }
+
+    let(:student1) { @course.enroll_student(User.create!, active_all: true).user }
+    let(:student2) { @course.enroll_student(User.create!, active_all: true).user }
+    let(:student1_submission) { assignment.submission_for_student(student1) }
+    let(:student2_submission) { assignment.submission_for_student(student2) }
+
+    let(:teacher) { @course.enroll_teacher(User.create!, active_all: true).user }
+
+    before(:each) do
+      student1
+      student2
+
+      @course.enable_feature!(:post_policies)
+    end
+
+    describe "#post_submissions" do
+      it "updates the posted_at field of the specified submissions" do
+        update_time = Time.zone.now
+        Timecop.freeze(update_time) do
+          assignment.post_submissions
+        end
+
+        expect(student1_submission.reload.posted_at).to eq(update_time)
+      end
+
+      it "does not update the posted_at field of submissions that were not specified" do
+        assignment.post_submissions(submission_ids: [student1_submission.id])
+
+        expect(student2_submission).not_to be_posted
+      end
+
+      it "reveals hidden comments on specified submissions" do
+        comment = student1_submission.add_comment(author: teacher, hidden: true, comment: 'ok')
+        assignment.post_submissions
+
+        expect(comment.reload).not_to be_hidden
+      end
+
+      it "does not update the posted_at field if skip_updating_timestamp is passed" do
+        expect {
+          assignment.post_submissions(skip_updating_timestamp: true)
+        }.not_to change {
+          assignment.submission_for_student(student1).posted_at
+        }
+      end
+
+      context "when post policies are enabled" do
+        it "unmutes the assignment if all submissions are now posted" do
+          assignment.mute!
+
+          assignment.post_submissions
+          expect(assignment).not_to be_muted
+        end
+
+        it "leaves the assignment muted if some submissions remain unposted" do
+          assignment.mute!
+
+          assignment.post_submissions(submission_ids: [student1_submission.id])
+          expect(assignment).to be_muted
+        end
+      end
+
+      it "does not update the assignment's muted status when post policies are not enabled" do
+        @course.disable_feature!(:post_policies)
+        assignment.mute!
+
+        assignment.post_submissions
+        expect(assignment).to be_muted
+      end
+    end
+
+    describe "#hide_submissions" do
+      before(:each) { assignment.post_submissions }
+
+      it "nullifies the posted_at field of the specified submissions" do
+        assignment.hide_submissions
+        expect(student1_submission.reload.posted_at).to be_nil
+      end
+
+      it "does not nullify the posted_at field of submissions that were not specified" do
+        expect {
+          assignment.hide_submissions(submission_ids: [student1_submission.id])
+        }.not_to change {
+          student2_submission.posted_at
+        }
+      end
+
+      it "hides instructor comments on specified submissions" do
+        comment = student1_submission.add_comment(author: teacher, hidden: false, comment: 'ok')
+        assignment.hide_submissions
+
+        expect(comment.reload).to be_hidden
+      end
+
+      it "does not update the posted_at field if skip_updating_timestamp is passed" do
+        student1_submission.update!(posted_at: 1.day.ago)
+
+        expect {
+          assignment.hide_submissions(skip_updating_timestamp: true)
+        }.not_to change {
+          assignment.submission_for_student(student1).posted_at
+        }
+      end
+
+      context "when post policies are enabled" do
+        it "mutes the assignment if any submissions are now unposted" do
+          assignment.hide_submissions
+          expect(assignment).to be_muted
+        end
+
+        it "leaves the assignment unmuted if all submissions remain posted" do
+          assignment.hide_submissions(submission_ids: [])
+          expect(assignment).not_to be_muted
+        end
+      end
+
+      it "does not update the assignment's muted status when post policies are not enabled" do
+        @course.disable_feature!(:post_policies)
+        assignment.hide_submissions
+        expect(assignment).not_to be_muted
+      end
     end
   end
 

@@ -69,6 +69,24 @@ it('dispatches scroll event properly when greather than threshold', () => {
   expect(foundClassElement).toHaveLength(1)
 })
 
+it('displays element filler when scroll offset is in correct place', () => {
+  ReactDOM.render(
+    <Header scrollThreshold={150} assignment={mockAssignment()} />,
+    document.getElementById('fixtures')
+  )
+  const scrollEvent = new Event('scroll')
+  window.pageYOffset = 100
+  window.dispatchEvent(scrollEvent)
+  const normalHeader = $('[data-test-id="assignment-student-header-normal"]')
+  expect(normalHeader).toHaveLength(1)
+  window.pageYOffset = 200
+  window.dispatchEvent(scrollEvent)
+  const fillerElement = $('[data-test-id="header-element-filler"]')
+  expect(fillerElement).toHaveLength(1)
+  const stickyHeader = $('.assignment-student-header-sticky')
+  expect(stickyHeader).toHaveLength(1)
+})
+
 it('will not render LatePolicyStatusDisplay if the submission is not late', () => {
   const assignment = mockAssignment()
   assignment.submissionsConnection.nodes[0].latePolicyStatus = null

@@ -40,6 +40,7 @@ group :test do
   gem 'rubocop-rspec', '1.22.2', require: false
 
   gem 'once-ler', '0.1.4'
+  gem 'sauce_whisk', '0.1.0'
 
   # Keep this gem synced with docker-compose/seleniumff/Dockerfile
   gem 'selenium-webdriver', '3.14.0'

@@ -235,4 +235,33 @@ describe Types::AssignmentType do
       expect(assignment_type.resolve("lockInfo { isLocked }")).to eq true
     end
   end
+
+  describe "PostPolicy" do
+    let(:assignment) { course.assignments.create! }
+    let(:course) { Course.create!(workflow_state: "available") }
+    let(:student) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
+    let(:teacher) { course.enroll_user(User.create!, "TeacherEnrollment", enrollment_state: "active").user }
+
+    before(:each) do
+      @post_policy = course.post_policies.create!(assignment: assignment, post_manually: true)
+    end
+
+    context "when user has manage_grades permission" do
+      let(:context) { { current_user: teacher } }
+
+      it "returns the PostPolicy related to the assignment" do
+        resolver = GraphQLTypeTester.new(assignment, context)
+        expect(resolver.resolve("postPolicy {_id}").to_i).to eql @post_policy.id
+      end
+    end
+
+    context "when user does not have manage_grades permission" do
+      let(:context) { { current_user: student } }
+
+      it "returns null in place of the PostPolicy" do
+        resolver = GraphQLTypeTester.new(assignment, context)
+        expect(resolver.resolve("postPolicy {_id}")).to be nil
+      end
+    end
+  end
 end

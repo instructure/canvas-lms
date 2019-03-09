@@ -501,7 +501,8 @@ class Assignment < ActiveRecord::Base
               :apply_late_policy,
               :touch_submissions_if_muted_changed,
               :update_line_items,
-              :ensure_manual_posting_if_anonymous
+              :ensure_manual_posting_if_anonymous,
+              :ensure_manual_posting_if_moderated
 
   with_options if: -> { auditable? && @updating_user.present? } do
     after_create :create_assignment_created_audit_event!
@@ -991,14 +992,11 @@ class Assignment < ActiveRecord::Base
   end
 
   def touch_submissions_if_muted_changed
+    # TODO: (GRADE-1982) implement a version of recalculate_module_progressions
+    # that can operate on an arbitrary set of submissions and call it in
+    # post_submissions. When that's done, this method can be removed.
     if saved_change_to_muted?
       self.class.connection.after_transaction_commit do
-        # this is necessary to generate new permissions cache keys for students
-        submissions.touch_all
-
-        # this ensures live events notifications
-        submissions.in_workflow_state('graded').each(&:assignment_muted_changed)
-
         self.send_later_if_production(:recalculate_module_progressions) unless self.muted?
       end
     end
@@ -1804,6 +1802,8 @@ class Assignment < ActiveRecord::Base
     if did_grade
       submission.grade_matches_current_submission = true
       submission.regraded = true
+      submission.graded_at = Time.zone.now
+      submission.posted_at = submission.graded_at unless submission.posted? || post_manually?
     end
     submission.audit_grade_changes = did_grade || submission.excused_changed?
 
@@ -1813,7 +1813,6 @@ class Assignment < ActiveRecord::Base
       submission.workflow_state = "graded"
     end
     submission.group = group
-    submission.graded_at = Time.zone.now if did_grade
     previously_graded ? submission.with_versioning(:explicit => true) { submission.save! } : submission.save!
     submission.audit_grade_changes = false
 
@@ -3009,7 +3008,6 @@ class Assignment < ActiveRecord::Base
   end
 
   def can_view_audit_trail?(user)
-    return false unless context.account.feature_enabled?(:anonymous_moderated_marking_audit_trail)
     auditable? && !muted? && grades_published? && context.grants_right?(user, :view_audit_trail)
   end
 
@@ -3108,6 +3106,56 @@ class Assignment < ActiveRecord::Base
     post_policy || course.default_post_policy
   end
 
+  def post_manually?
+    if course.feature_enabled?(:post_policies)
+      !!effective_post_policy&.post_manually?
+    else
+      muted?
+    end
+  end
+
+  def post_submissions(submission_ids: nil, skip_updating_timestamp: false)
+    submissions = if submission_ids.nil?
+      self.submissions.active
+    else
+      self.submissions.active.where(id: submission_ids)
+    end
+    return if submissions.blank?
+
+    unless skip_updating_timestamp
+      update_time = Time.zone.now
+      submissions.update_all(posted_at: update_time, updated_at: update_time)
+    end
+    submissions.in_workflow_state('graded').each(&:assignment_muted_changed)
+
+    show_stream_items(submissions: submissions)
+
+    update_muted_status! if course.feature_enabled?(:post_policies)
+  end
+
+  def hide_submissions(submission_ids: nil, skip_updating_timestamp: false)
+    submissions = if submission_ids.nil?
+      self.submissions.active
+    else
+      self.submissions.active.where(id: submission_ids)
+    end
+    return if submissions.blank?
+
+    submissions.update_all(posted_at: nil, updated_at: Time.zone.now) unless skip_updating_timestamp
+    submissions.in_workflow_state('graded').each(&:assignment_muted_changed)
+
+    hide_stream_items(submissions: submissions)
+
+    update_muted_status! if course.feature_enabled?(:post_policies)
+  end
+
+  def ensure_post_policy(post_manually:)
+    return unless course.feature_enabled?(:post_policies)
+
+    build_post_policy(course: course) if post_policy.blank?
+    post_policy.update!(post_manually: post_manually)
+  end
+
   private
 
   def anonymous_grader_identities(index_by:)
@@ -3140,10 +3188,13 @@ class Assignment < ActiveRecord::Base
   end
 
   def ensure_manual_posting_if_anonymous
-    return unless saved_change_to_anonymous_grading?(from: false, to: true)
+    return unless course.feature_enabled?(:post_policies) && saved_change_to_anonymous_grading?(from: false, to: true)
+    ensure_post_policy(post_manually: true)
+  end
 
-    self.post_policy ||= PostPolicy.create!(course_id: course.id)
-    self.post_policy.update!(post_manually: true)
+  def ensure_manual_posting_if_moderated
+    return unless course.feature_enabled?(:post_policies) && saved_change_to_moderated_grading?(from: false, to: true)
+    ensure_post_policy(post_manually: true)
   end
 
   def due_date_ok?

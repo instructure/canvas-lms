@@ -19,7 +19,7 @@
 import React, {PureComponent} from 'react'
 import View from '@instructure/ui-layout/lib/components/View'
 
-import UserEventGroup from './UserEventGroup'
+import CreatorEventGroup from './CreatorEventGroup'
 import * as propTypes from './propTypes'
 
 export default class AuditTrail extends PureComponent {
@@ -28,12 +28,12 @@ export default class AuditTrail extends PureComponent {
   }
 
   render() {
-    const {userEventGroups} = this.props.auditTrail
+    const {creatorEventGroups} = this.props.auditTrail
 
     return (
       <View as="div" id="assessment-audit-trail">
-        {userEventGroups.map(group => (
-          <UserEventGroup key={group.user.id} userEventGroup={group} />
+        {creatorEventGroups.map(group => (
+          <CreatorEventGroup key={group.creator.key} creatorEventGroup={group} />
         ))}
       </View>
     )

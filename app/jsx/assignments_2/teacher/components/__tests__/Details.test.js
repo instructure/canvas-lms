@@ -19,16 +19,17 @@
 import React from 'react'
 import {render} from 'react-testing-library'
 import {mockAssignment, mockOverride} from '../../test-utils'
-import apiUserContent from 'compiled/str/apiUserContent'
 import Details from '../Details'
 
-jest.mock('compiled/str/apiUserContent')
-apiUserContent.convert = jest.fn(arg => `converted ${arg}`)
+jest.mock('jsx/shared/rce/RichContentEditor')
 
-it('renders and converts', () => {
+const override1 = {lid: '18', title: 'Section A', set: {name: 'Section A'}}
+const override2 = {lid: '19', title: 'Section B', set: {name: 'Section B'}}
+
+it('renders', () => {
   const assignment = mockAssignment()
-  const {getByText} = render(<Details assignment={assignment} />)
-  getByText(`converted ${assignment.description}`)
+  const {getByText, getByTestId} = render(<Details assignment={assignment} />)
+  expect(getByTestId('AssignmentDescription')).toBeInTheDocument()
   expect(getByText('Everyone')).toBeInTheDocument()
   expect(getByText('Due:', {exact: false})).toBeInTheDocument()
   expect(getByText('Available', {exact: false})).toBeInTheDocument()
@@ -37,7 +38,7 @@ it('renders and converts', () => {
 it('renders an override', () => {
   const assignment = mockAssignment({
     assignmentOverrides: {
-      nodes: [mockOverride({title: 'Section A'})]
+      nodes: [mockOverride()]
     }
   })
   const {getByText} = render(<Details assignment={assignment} />)
@@ -49,14 +50,35 @@ it('renders all the overrides', () => {
   const assignment = mockAssignment({
     dueAt: null,
     assignmentOverrides: {
-      nodes: [
-        mockOverride({lid: '18', title: 'Section A'}),
-        mockOverride({lid: '19', title: 'Section B'})
-      ]
+      nodes: [mockOverride(override1), mockOverride(override2)]
     }
   })
   const {getByText, queryAllByText} = render(<Details assignment={assignment} />)
   expect(getByText('Section A')).toBeInTheDocument()
   expect(getByText('Section B')).toBeInTheDocument()
   expect(queryAllByText('Everyone', {exact: false})).toHaveLength(0)
+})
+
+it('renders the Add Override button if !readOnly', () => {
+  const assignment = mockAssignment({
+    dueAt: null,
+    assignmentOverrides: {
+      nodes: [mockOverride(override1), mockOverride(override2)]
+    }
+  })
+  const {getByTestId} = render(<Details assignment={assignment} readOnly={false} />)
+
+  expect(getByTestId('AddOverride')).toBeInTheDocument()
+})
+
+it('does notrender the Add Override button if readOnly', () => {
+  const assignment = mockAssignment({
+    dueAt: null,
+    assignmentOverrides: {
+      nodes: [mockOverride(override1), mockOverride(override2)]
+    }
+  })
+  const {queryByTestId} = render(<Details assignment={assignment} readOnly />)
+
+  expect(queryByTestId('AddOverride')).toBeNull()
 })

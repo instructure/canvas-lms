@@ -25,8 +25,11 @@ exports[`Free-form Rubric with a custom criterion by default renders the LongDes
   shouldReturnFocus={true}
   size="medium"
   transition="fade"
+  variant="default"
 >
-  <ModalHeader>
+  <ModalHeader
+    variant="default"
+  >
     <CloseButton
       buttonRef={[Function]}
       margin="0"
@@ -50,6 +53,7 @@ exports[`Free-form Rubric with a custom criterion by default renders the LongDes
   <ModalBody
     as="div"
     padding="medium"
+    variant="default"
   >
     <Text
       as="span"
@@ -181,8 +185,11 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the Lon
   shouldReturnFocus={true}
   size="medium"
   transition="fade"
+  variant="default"
 >
-  <ModalHeader>
+  <ModalHeader
+    variant="default"
+  >
     <CloseButton
       buttonRef={[Function]}
       margin="0"
@@ -206,6 +213,7 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the Lon
   <ModalBody
     as="div"
     padding="medium"
+    variant="default"
   >
     <Text
       as="span"
@@ -337,8 +345,11 @@ exports[`Free-form Rubric with a custom criterion without an assessment renders 
   shouldReturnFocus={true}
   size="medium"
   transition="fade"
+  variant="default"
 >
-  <ModalHeader>
+  <ModalHeader
+    variant="default"
+  >
     <CloseButton
       buttonRef={[Function]}
       margin="0"
@@ -362,6 +373,7 @@ exports[`Free-form Rubric with a custom criterion without an assessment renders 
   <ModalBody
     as="div"
     padding="medium"
+    variant="default"
   >
     <Text
       as="span"
@@ -485,8 +497,11 @@ exports[`Free-form Rubric with a outcome criterion by default renders the LongDe
   shouldReturnFocus={true}
   size="medium"
   transition="fade"
+  variant="default"
 >
-  <ModalHeader>
+  <ModalHeader
+    variant="default"
+  >
     <CloseButton
       buttonRef={[Function]}
       margin="0"
@@ -510,6 +525,7 @@ exports[`Free-form Rubric with a outcome criterion by default renders the LongDe
   <ModalBody
     as="div"
     padding="medium"
+    variant="default"
   >
     <Text
       as="span"
@@ -695,8 +711,11 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the Lo
   shouldReturnFocus={true}
   size="medium"
   transition="fade"
+  variant="default"
 >
-  <ModalHeader>
+  <ModalHeader
+    variant="default"
+  >
     <CloseButton
       buttonRef={[Function]}
       margin="0"
@@ -720,6 +739,7 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the Lo
   <ModalBody
     as="div"
     padding="medium"
+    variant="default"
   >
     <Text
       as="span"
@@ -905,8 +925,11 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
   shouldReturnFocus={true}
   size="medium"
   transition="fade"
+  variant="default"
 >
-  <ModalHeader>
+  <ModalHeader
+    variant="default"
+  >
     <CloseButton
       buttonRef={[Function]}
       margin="0"
@@ -930,6 +953,7 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
   <ModalBody
     as="div"
     padding="medium"
+    variant="default"
   >
     <Text
       as="span"
@@ -1061,8 +1085,11 @@ exports[`Point Rubric with a custom criterion by default renders the LongDescrip
   shouldReturnFocus={true}
   size="medium"
   transition="fade"
+  variant="default"
 >
-  <ModalHeader>
+  <ModalHeader
+    variant="default"
+  >
     <CloseButton
       buttonRef={[Function]}
       margin="0"
@@ -1086,6 +1113,7 @@ exports[`Point Rubric with a custom criterion by default renders the LongDescrip
   <ModalBody
     as="div"
     padding="medium"
+    variant="default"
   >
     <Text
       as="span"
@@ -1256,8 +1284,11 @@ exports[`Point Rubric with a custom criterion when assessing renders the LongDes
   shouldReturnFocus={true}
   size="medium"
   transition="fade"
+  variant="default"
 >
-  <ModalHeader>
+  <ModalHeader
+    variant="default"
+  >
     <CloseButton
       buttonRef={[Function]}
       margin="0"
@@ -1281,6 +1312,7 @@ exports[`Point Rubric with a custom criterion when assessing renders the LongDes
   <ModalBody
     as="div"
     padding="medium"
+    variant="default"
   >
     <Text
       as="span"
@@ -1451,8 +1483,11 @@ exports[`Point Rubric with a custom criterion without an assessment renders the 
   shouldReturnFocus={true}
   size="medium"
   transition="fade"
+  variant="default"
 >
-  <ModalHeader>
+  <ModalHeader
+    variant="default"
+  >
     <CloseButton
       buttonRef={[Function]}
       margin="0"
@@ -1476,6 +1511,7 @@ exports[`Point Rubric with a custom criterion without an assessment renders the 
   <ModalBody
     as="div"
     padding="medium"
+    variant="default"
   >
     <Text
       as="span"
@@ -1625,8 +1661,11 @@ exports[`Point Rubric with a outcome criterion by default renders the LongDescri
   shouldReturnFocus={true}
   size="medium"
   transition="fade"
+  variant="default"
 >
-  <ModalHeader>
+  <ModalHeader
+    variant="default"
+  >
     <CloseButton
       buttonRef={[Function]}
       margin="0"
@@ -1650,6 +1689,7 @@ exports[`Point Rubric with a outcome criterion by default renders the LongDescri
   <ModalBody
     as="div"
     padding="medium"
+    variant="default"
   >
     <Text
       as="span"
@@ -1874,8 +1914,11 @@ exports[`Point Rubric with a outcome criterion when assessing renders the LongDe
   shouldReturnFocus={true}
   size="medium"
   transition="fade"
+  variant="default"
 >
-  <ModalHeader>
+  <ModalHeader
+    variant="default"
+  >
     <CloseButton
       buttonRef={[Function]}
       margin="0"
@@ -1899,6 +1942,7 @@ exports[`Point Rubric with a outcome criterion when assessing renders the LongDe
   <ModalBody
     as="div"
     padding="medium"
+    variant="default"
   >
     <Text
       as="span"
@@ -2123,8 +2167,11 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
   shouldReturnFocus={true}
   size="medium"
   transition="fade"
+  variant="default"
 >
-  <ModalHeader>
+  <ModalHeader
+    variant="default"
+  >
     <CloseButton
       buttonRef={[Function]}
       margin="0"
@@ -2148,6 +2195,7 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
   <ModalBody
     as="div"
     padding="medium"
+    variant="default"
   >
     <Text
       as="span"

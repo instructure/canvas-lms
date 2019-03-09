@@ -45,18 +45,18 @@ class MissingPolicyApplicator
   def apply_missing_deduction(assignment, submissions)
     score = assignment.course.late_policy.points_for_missing(assignment.points_possible, assignment.grading_type)
     grade = assignment.score_to_grade(score)
+    now = Time.zone.now
 
-    # We are using update_all here for performance reasons
-    # rubocop:disable SkipsModelValidations
     Submission.active.where(id: submissions).update_all(
       score: score,
       grade: grade,
+      graded_at: now,
       published_score: score,
       published_grade: grade,
       grade_matches_current_submission: true,
+      updated_at: now,
       workflow_state: "graded"
     )
-    # rubocop:enable SkipsModelValidations
 
     assignment.course.recompute_student_scores(submissions.map(&:user_id).uniq)
   end

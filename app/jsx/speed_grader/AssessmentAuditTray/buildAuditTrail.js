@@ -31,7 +31,33 @@ function getRolePosition(user) {
 }
 
 function buildUnknownUser(userId) {
-  return {id: userId, name: I18n.t('Unknown User'), role: 'unknown'}
+  return {
+    id: userId,
+    key: `user-${userId}`,
+    name: I18n.t('Unknown User'),
+    role: 'unknown',
+    type: 'user'
+  }
+}
+
+function buildUnknownExternalTool(externalToolId) {
+  return {
+    id: externalToolId,
+    key: `externalTool-${externalToolId}`,
+    name: I18n.t('Unknown External Tool'),
+    role: 'grader',
+    type: 'externalTool'
+  }
+}
+
+function buildUnknownQuiz(quizId) {
+  return {
+    id: quizId,
+    key: `quiz-${quizId}`,
+    name: I18n.t('Unknown Quiz'),
+    role: 'grader',
+    type: 'quiz'
+  }
 }
 
 function getDateKey(date) {
@@ -313,19 +339,35 @@ function buildAnonymityTracker() {
  * }
  */
 export default function buildAuditTrail(auditData) {
-  const {auditEvents, users} = auditData
+  const {auditEvents, users, externalTools, quizzes} = auditData
   if (!auditEvents) {
     return {}
   }
 
   const usersById = {}
   users.forEach(user => {
+    user.key = `user-${user.id}`
+    user.type = 'user'
     usersById[user.id] = user
+  })
+
+  const externalToolsById = {}
+  externalTools.forEach(tool => {
+    tool.key = `externalTool-${tool.id}`
+    tool.type = 'externalTool'
+    externalToolsById[tool.id] = tool
+  })
+
+  const quizzesById = {}
+  quizzes.forEach(quiz => {
+    quiz.key = `quiz-${quiz.id}`
+    quiz.type = 'quiz'
+    quizzesById[quiz.id] = quiz
   })
 
   // sort in ascending order (earliest event to most recent)
   const sortedEvents = [...auditEvents].sort((a, b) => a.createdAt - b.createdAt)
-  const userEventGroupsByUserId = {}
+  const creatorEventGroupsByCreatorId = {}
 
   const featureTracking = trackFeaturesOverall(sortedEvents)
   const anonymityTracker = buildAnonymityTracker()
@@ -334,23 +376,33 @@ export default function buildAuditTrail(auditData) {
   let finalGradeDate = null
 
   sortedEvents.forEach(auditEvent => {
-    const {createdAt, userId} = auditEvent
-    // In the event we do not have user info loaded for this user id, for
-    // whatever reason, the user still needs to be represented in the UI.
-    // Use an "Unknown User" as a fallback.
-    const user = usersById[userId] || buildUnknownUser(userId)
+    const {createdAt, userId, externalToolId, quizId} = auditEvent
+
+    let creator = null
+    if (externalToolId != null) {
+      creator = externalToolsById[externalToolId] || buildUnknownExternalTool[externalToolId]
+    } else if (quizId != null) {
+      creator = quizzesById[quizId] || buildUnknownQuiz[quizId]
+    } else {
+      // If the key type is unknown, we'll treat it like a user.
+      // In the event we do not have user info loaded for this user id, for
+      // whatever reason, the user still needs to be represented in the UI.
+      // Use an "Unknown User" as a fallback.
+      creator = usersById[userId] || buildUnknownUser(userId)
+    }
+    const creatorKey = creator.key
 
     currentlyAnonymous = getCurrentAnonymity(auditEvent, currentlyAnonymous)
 
-    userEventGroupsByUserId[userId] = userEventGroupsByUserId[userId] || {
+    creatorEventGroupsByCreatorId[creatorKey] = creatorEventGroupsByCreatorId[creatorKey] || {
       anonymousOnly: currentlyAnonymous,
       dateEventGroups: [],
-      user
+      creator
     }
-    userEventGroupsByUserId[userId].anonymousOnly =
-      userEventGroupsByUserId[userId].anonymousOnly && currentlyAnonymous
+    creatorEventGroupsByCreatorId[creatorKey].anonymousOnly =
+      creatorEventGroupsByCreatorId[creatorKey].anonymousOnly && currentlyAnonymous
 
-    const {dateEventGroups} = userEventGroupsByUserId[userId]
+    const {dateEventGroups} = creatorEventGroupsByCreatorId[creatorKey]
     const lastDateGroup = dateEventGroups[dateEventGroups.length - 1]
 
     const eventDatum = {auditEvent}
@@ -379,9 +431,9 @@ export default function buildAuditTrail(auditData) {
     }
   })
 
-  const userEventGroups = Object.values(userEventGroupsByUserId).sort((groupA, groupB) => {
-    const rolePositionA = getRolePosition(groupA.user)
-    const rolePositionB = getRolePosition(groupB.user)
+  const creatorEventGroups = Object.values(creatorEventGroupsByCreatorId).sort((groupA, groupB) => {
+    const rolePositionA = getRolePosition(groupA.creator)
+    const rolePositionB = getRolePosition(groupB.creator)
 
     if (rolePositionA === rolePositionB) {
       const [{auditEvent: auditEventA}] = groupA.dateEventGroups[0].auditEvents
@@ -397,6 +449,6 @@ export default function buildAuditTrail(auditData) {
     anonymityDate: anonymityTracker.getAnonymityDate(),
     finalGradeDate,
     overallAnonymity: anonymityTracker.getOverallAnonymity(),
-    userEventGroups
+    creatorEventGroups
   }
 }

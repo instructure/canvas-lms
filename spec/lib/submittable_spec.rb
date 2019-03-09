@@ -123,4 +123,17 @@ describe "section specific topic" do
     expect(vis_hash[student.id].length).to eq(1)
     expect(vis_hash[student.id].first).to eq(section_specific_topic1.id)
   end
+
+  it "properly filters section specific topics for deleted section visibilities" do
+    course = course_factory(active_course: true)
+    section1 = course.course_sections.create!(name: "section for student")
+    section_specific_topic1 = course.discussion_topics.create!(:title => "section specific topic 1")
+    add_section_to_topic(section_specific_topic1, section1)
+    student = create_users(1, return_type: :record).first
+    course.enroll_student(student, :section => section1)
+    course.reload
+    section_specific_topic1.destroy
+    vis_hash = DiscussionTopic.visible_ids_by_user(course_id: course.id, user_id: [student.id], :item_type => :discussion)
+    expect(vis_hash[student.id].length).to eq(0)
+  end
 end

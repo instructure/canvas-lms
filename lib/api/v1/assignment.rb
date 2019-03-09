@@ -286,7 +286,8 @@ module Api::V1::Assignment
           'title' => rubric.title,
           'points_possible' => rubric.points_possible,
           'free_form_criterion_comments' => !!rubric.free_form_criterion_comments,
-          'hide_score_total' => !!assignment.rubric_association.hide_score_total
+          'hide_score_total' => !!assignment.rubric_association.hide_score_total,
+          'hide_points' => !!assignment.rubric_association.hide_points
         }
       end
     end
@@ -917,7 +918,7 @@ module Api::V1::Assignment
     if plagiarism_capable?(assignment_params)
       tool = assignment_configuration_tool(assignment_params)
       assignment.tool_settings_tool = tool
-    elsif assignment.persisted? && assignment.assignment_configuration_tool_lookups.present?
+    elsif assignment.persisted? && clear_tool_settings_tools?(assignment, assignment_params)
       # Destroy subscriptions and tool associations
       assignment.send_later_if_production(:clear_tool_settings_tools)
     end
@@ -934,6 +935,12 @@ module Api::V1::Assignment
       tool = mh if mh_context == @context || @context.account_chain.include?(mh_context)
     end
     tool
+  end
+
+  def clear_tool_settings_tools?(assignment, assignment_params)
+    assignment.assignment_configuration_tool_lookups.present? &&
+      assignment_params['submission_types']&.present? &&
+      (!assignment_params['submission_types'].include?(assignment.submission_types) || assignment_params['submission_types'].blank?)
   end
 
   def plagiarism_capable?(assignment_params)

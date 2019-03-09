@@ -532,8 +532,11 @@ class SisImportsApiController < ApplicationController
   #   greater than the threshold as a percent. If set to 5 and the file is more
   #   than 5% smaller or more than 5% larger than the file that is being
   #   compared to, diffing will not be performed. If the files are less than 5%,
-  #   diffing will be performed. See the SIS CSV Format documentation for more
-  #   details.
+  #   diffing will be performed. The way the percent is calculated is by taking
+  #   the size of the current import and dividing it by the size of the previous
+  #   import. The formula used is:
+  #   |(1 - current_file_size / previous_file_size)| * 100
+  #   See the SIS CSV Format documentation for more details.
   #   Required for multi_term_batch_mode.
   #
   # @returns SisImport
@@ -624,7 +627,7 @@ class SisImportsApiController < ApplicationController
           end
         end
         if params[:diffing_drop_status].present?
-          batch.options[:diffing_drop_status] = (Array(params[:diffing_drop_status])&%w(deleted inactive completed)).first
+          batch.options[:diffing_drop_status] = (Array(params[:diffing_drop_status])&SIS::CSV::DiffGenerator::VALID_ENROLLMENT_DROP_STATUS).first
           return render json: {message: 'Invalid diffing_drop_status'}, status: :bad_request unless batch.options[:diffing_drop_status]
         end
       end

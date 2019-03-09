@@ -57,7 +57,7 @@ module SIS
       end
 
       def valid_status?
-        status =~ /\Aactive|\Adeleted|\Acompleted|\Ainactive/i
+        status =~ /\Aactive|\Adeleted|\Acompleted|\Ainactive|\Adeleted_last_completed/i
       end
 
       def to_a

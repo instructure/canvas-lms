@@ -46,8 +46,11 @@ QUnit.module('AssessmentAuditTray AuditTrail', suiteHooks => {
       {id: '1103', name: 'A querulous final-grader', role: 'final_grader'}
     ]
 
+    const externalTools = []
+    const quizzes = []
+
     props = {
-      auditTrail: buildAuditTrail({auditEvents, users})
+      auditTrail: buildAuditTrail({auditEvents, users, externalTools, quizzes})
     }
   })
 
@@ -60,27 +63,27 @@ QUnit.module('AssessmentAuditTray AuditTrail', suiteHooks => {
     ReactDOM.render(<AuditTrail {...props} />, $container)
   }
 
-  function getUserEventGroups() {
+  function getCreatorEventGroups() {
     return [...$container.querySelector('#assessment-audit-trail').children]
   }
 
   function getHeaderContents() {
-    return getUserEventGroups().map($group => $group.querySelector('h3').textContent)
+    return getCreatorEventGroups().map($group => $group.querySelector('h3').textContent)
   }
 
-  test('displays a user event group for each distinct user', () => {
+  test('displays a creator event group for each distinct creator', () => {
     mountComponent()
-    strictEqual(getUserEventGroups().length, 4)
+    strictEqual(getCreatorEventGroups().length, 4)
   })
 
-  test('displays the name of the user in the header', () => {
+  test('displays the name of the creator in the header', () => {
     mountComponent()
 
     const firstHeader = getHeaderContents()[0]
     ok(firstHeader.includes('A sedulous pupil'))
   })
 
-  test('displays the role of the user in the header', () => {
+  test('displays the role of the creator in the header', () => {
     mountComponent()
 
     const firstHeader = getHeaderContents()[0]

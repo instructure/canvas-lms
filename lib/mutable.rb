@@ -40,7 +40,8 @@ module Mutable
     return if muted?
     self.update_attribute(:muted, true)
     clear_sent_messages
-    hide_stream_items
+    hide_submissions if respond_to?(:hide_submissions)
+    ensure_post_policy(post_manually: true) if respond_to?(:ensure_post_policy)
     true
   end
 
@@ -48,7 +49,8 @@ module Mutable
     return unless muted?
     self.update_attribute(:muted, false)
     broadcast_unmute_event
-    show_stream_items
+    post_submissions if respond_to?(:post_submissions)
+    ensure_post_policy(post_manually: false) if respond_to?(:ensure_post_policy)
     true
   end
 
@@ -63,11 +65,12 @@ module Mutable
     self.clear_broadcast_messages if self.respond_to? :clear_broadcast_messages
   end
 
-  def hide_stream_items
-    if self.respond_to? :submissions
+  def hide_stream_items(submissions:)
+    if submissions.present?
+      submission_ids = submissions.pluck(:id)
       stream_items = StreamItem.select([:id, :context_type, :context_id]).
-          where(:asset_type => 'Submission', :asset_id => submissions).
-          preload(:context).to_a
+        where(asset_type: 'Submission', asset_id: submission_ids).
+        preload(:context).to_a
       stream_item_contexts = stream_items.map { |si| [si.context_type, si.context_id] }
       user_ids = submissions.map(&:user_id).uniq # hide stream items for submission owners, not instructors
       # note: unfortunately this will hide items for an instructor if instructor (somehow) has a submission too
@@ -87,12 +90,12 @@ module Mutable
     end
   end
 
-  def show_stream_items
-    if self.respond_to? :submissions
-      submission_ids = self.submissions.pluck(:id)
+  def show_stream_items(submissions:)
+    if submissions.present?
+      submission_ids = submissions.pluck(:id)
       stream_items = StreamItem.select([:id, :context_type, :context_id]).
-          where(:asset_type => 'Submission', :asset_id => submission_ids).
-          preload(:context).to_a
+        where(asset_type: 'Submission', asset_id: submission_ids).
+        preload(:context).to_a
       stream_item_contexts = stream_items.map { |si| [si.context_type, si.context_id] }
       associated_shards = stream_items.inject([]) { |result, si| result | si.associated_shards }
       Shard.with_each_shard(associated_shards) do
@@ -117,5 +120,14 @@ module Mutable
             submissions.id = submission_comments.submission_id AND submission_comments.hidden = ? AND
             submission_comments.draft IS NOT TRUE AND submission_comments.provisional_grade_id IS NULL)", false])
     end
+  end
+
+  private
+
+  def update_muted_status!
+    # With post policies active, an assignment is considered "muted" if it has any
+    # unposted submissions.
+    has_unposted_submissions = submissions.active.unposted.exists?
+    update!(muted: has_unposted_submissions) if muted? != has_unposted_submissions
   end
 end

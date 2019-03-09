@@ -52,7 +52,7 @@ namespace :i18n do
     }.freeze
 
     File.open(Rails.root.join(yaml_file), "w") do |file|
-      file.write({'en' => @translations.except(*special_keys)}.to_yaml)
+      file.write({'en' => @translations.except(*special_keys)}.to_yaml(line_width: -1))
     end
     print "Wrote new #{yaml_file}\n\n"
   end
@@ -174,7 +174,7 @@ namespace :i18n do
     puts
 
     File.open('config/locales/lolz.yml', 'w') do |f|
-      f.write(lolz_translations.to_yaml)
+      f.write(lolz_translations.to_yaml(line_width: -1))
     end
     print "\nFinished generating LOLZ from #{strings_processed} strings in #{Time.now - t} seconds\n"
 
@@ -189,7 +189,7 @@ namespace :i18n do
       }
 
       File.open('config/locales/locales.yml', 'w') do |f|
-        f.write(locales.to_yaml)
+        f.write(locales.to_yaml(line_width: -1))
       end
       print "Added LOLZ to locales\n"
     end
@@ -268,7 +268,7 @@ namespace :i18n do
           h
         } :
         current_strings
-      File.open(export_filename, "w"){ |f| f.write new_strings.expand_keys.to_yaml }
+      File.open(export_filename, "w"){ |f| f.write new_strings.expand_keys.to_yaml(line_width: -1) }
 
       push = 'n'
       begin
@@ -344,7 +344,7 @@ namespace :i18n do
     next if complete_translations.nil?
 
     File.open("config/locales/#{import.language}.yml", "w") { |f|
-      f.write({import.language => complete_translations}.to_yaml)
+      f.write({import.language => complete_translations}.to_yaml(line_width: -1))
     }
   end
 
@@ -392,7 +392,7 @@ namespace :i18n do
 # This YAML file is auto-generated from a Transifex import.
 # Do not edit it by hand, your changes will be overwritten.
 HEADER
-      f.write({import.language => complete_translations}.to_yaml)
+      f.write({import.language => complete_translations}.to_yaml(line_width: -1))
     }
 
     puts({
@@ -401,7 +401,7 @@ HEADER
     }.to_json)
   end
 
-  def transifex_languages(languages)
+  def parsed_languages(languages)
     if languages.present?
       if languages.include?('>')
         Hash[languages.split(',').map { |lang| lang.split('>') }]
@@ -413,26 +413,54 @@ HEADER
     end
   end
 
-  def transifex_download(user, password, languages)
+  def import_languages(import_type, args)
     require 'json'
+    languages = parsed_languages(args[:languages])
+    source_file = args[:source_file] || 'config/locales/generated/en.yml'
+    source_translations = YAML.safe_load(open(source_file))
+
+    languages.each do |lang|
+      if lang.is_a?(Array)
+        lang, remote_lang = *lang
+      else
+        lang, remote_lang = lang, lang.sub('-', '_')
+      end
+
+      puts "Downloading #{remote_lang}.yml"
+      yml =
+        case import_type
+        when :transifex
+          json = transifex_download(args[:user], args[:password], remote_lang)
+          JSON.parse(json)['content']
+        when :s3
+          s3_download(args[:s3_bucket], remote_lang)
+        end
+      File.write("tmp/#{lang}.yml", yml)
+      new_translations = {lang => YAML.load(yml)[remote_lang]}
+
+      puts "Importing #{lang}.yml"
+      autoimport(source_translations, new_translations)
+    end
+  end
+
+  def transifex_download(user, password, transifex_lang)
+    require 'open-uri'
 
     transifex_url = "http://www.transifex.com/api/2/project/canvas-lms/"
     translation_url = transifex_url + "resource/canvas-lms/translation"
     userpass = "#{user}:#{Shellwords.escape(password)}"
-    languages.each do |lang|
-      if lang.is_a?(Array)
-        lang, transifex_lang = *lang
-      else
-        lang, transifex_lang = lang, lang.sub('-', '_')
-      end
+    `curl -L --user #{userpass} #{translation_url}/#{transifex_lang}/`
+  end
 
-      puts "Downloading tmp/#{lang}.yml"
-      json = `curl -L --user #{userpass} #{translation_url}/#{transifex_lang}/`
-      parsed = YAML.load(JSON.parse(json)['content'])
-      File.open("tmp/#{lang}.yml", "w") do |file|
-        file.write({ lang => parsed[transifex_lang] }.to_yaml)
-      end
-    end
+  def s3_download(bucket_name, s3_lang)
+    require 'aws-sdk-s3'
+
+    bucket = Aws::S3::Resource.new(
+      access_key_id: ENV["AWS_ACCESS_KEY_ID"],
+      secret_access_key: ENV["AWS_SECRET_ACCESS_KEY"],
+      region: ENV['AWS_REGION']
+    ).bucket(bucket_name)
+    bucket.object("translations/canvas-lms/#{s3_lang}/#{s3_lang}.yml").get.body.read
   end
 
   desc "Download language files from Transifex"
@@ -443,22 +471,12 @@ HEADER
 
   desc "Download language files from Transifex and import them"
   task :transifeximport, [:user, :password, :languages, :source_file] => :environment do |t, args|
-    require 'open-uri'
+    import_languages(:transifex, args)
+  end
 
-    languages = transifex_languages(args[:languages])
-    source_file = args[:source_file] || 'config/locales/generated/en.yml'
-    source_translations = YAML.safe_load(open(source_file))
-
-    transifex_download(args[:user], args[:password], languages)
-
-    languages.each do |lang|
-      lang = lang.first if lang.is_a?(Array)
-      translated_file = "tmp/#{lang}.yml"
-      puts "Importing #{translated_file}"
-      new_translations = YAML.safe_load(open(translated_file))
-
-      autoimport(source_translations, new_translations)
-    end
+  desc "Download language files from s3 and import them"
+  task :s3import, [:s3_bucket, :languages, :source_file] => :environment do |t, args|
+    import_languages(:s3, args)
   end
 
   desc "Lock a key so translators cannot change it"

@@ -993,6 +993,95 @@ describe SubmissionsController do
         expect(returned_users).to include(hash_including({"id" => first_student.id, "role" => "student" }))
       end
     end
+
+    describe "external tool events" do
+      let(:external_tool) do
+        Account.default.context_external_tools.create!(
+          name: "Undertow",
+          url: "http://www.example.com",
+          consumer_key: '12345',
+          shared_secret: 'secret'
+        )
+      end
+      let(:returned_tools) { json_parse(response.body).fetch("tools") }
+      let(:external_tool_events) do
+        json_parse(response.body).fetch("audit_events").select do |event|
+          event.fetch("event_type").include?("submission_") && event.fetch("context_external_tool_id").present?
+        end
+      end
+
+      before(:each) { @assignment.grade_student(first_student, grader_id: -external_tool.id, score: 80) }
+
+      it "returns an event for external tool" do
+        get :audit_events, params: params, format: :json
+        expect(external_tool_events.count).to be 1
+      end
+
+      it "returns the name associated with an external tool" do
+        get :audit_events, params: params, format: :json
+        expect(returned_tools).to include(hash_including({ "id" => external_tool.id, "name" => "Undertow" }))
+      end
+
+      it "returns the role of grader for an external tool" do
+        get :audit_events, params: params, format: :json
+        expect(returned_tools).to include(hash_including({ "id" => external_tool.id, "role" => "grader" }))
+      end
+    end
+
+    describe "quiz events" do
+      let(:quiz) do
+        quiz = @course.quizzes.create!
+        quiz.workflow_state = "available"
+        quiz.quiz_questions.create!({ question_data: test_quiz_data.first })
+        quiz.save!
+        quiz.assignment.updating_user = @teacher
+        quiz.assignment.update_attribute(:anonymous_grading, true)
+
+        qsub = Quizzes::SubmissionManager.new(quiz).find_or_create_submission(first_student)
+        qsub.quiz_data = test_quiz_data
+        qsub.started_at = 1.minute.ago
+        qsub.attempt = 1
+        qsub.submission_data = [{:points=>0, :text=>"7051", :question_id=>128, :correct=>false, :answer_id=>7051}]
+        qsub.score = 0
+        qsub.save!
+        qsub.finished_at = Time.now.utc
+        qsub.workflow_state = 'complete'
+        qsub.submission = quiz.assignment.find_or_create_submission(first_student)
+        qsub.submission.audit_grade_changes = true
+        qsub.with_versioning(true) { qsub.save! }
+
+        quiz
+      end
+      let(:quiz_assignment) { quiz.assignment }
+      let(:quiz_audit_params) do
+        {
+          assignment_id: quiz_assignment.id,
+          course_id: @course.id,
+          submission_id: quiz_assignment.submissions.find_by!(user: first_student).id
+        }
+      end
+      let(:returned_quizzes) { json_parse(response.body).fetch("quizzes") }
+      let(:quiz_events) do
+        json_parse(response.body).fetch("audit_events").select do |event|
+          event.fetch("event_type").include?("submission_") && event.fetch("quiz_id").present?
+        end
+      end
+
+      it "returns an event for a quiz" do
+        get :audit_events, params: quiz_audit_params, format: :json
+        expect(quiz_events.count).to be 1
+      end
+
+      it "returns the name associated with the quiz" do
+        get :audit_events, params: quiz_audit_params, format: :json
+        expect(returned_quizzes).to include(hash_including({ "id" => quiz.id, "name" => "Unnamed Quiz" }))
+      end
+
+      it "returns the role of grader for a quiz" do
+        get :audit_events, params: quiz_audit_params, format: :json
+        expect(returned_quizzes).to include(hash_including({ "id" => quiz.id, "role" => "grader" }))
+      end
+    end
   end
 
   describe "copy_attachments_to_submissions_folder" do

@@ -25,7 +25,7 @@ describe "/eportfolios/show" do
     view_portfolio
     category = assign(:category, @portfolio.eportfolio_categories.create!(:name => "some category"))
     assign(:categories, [category])
-    assign(:recent_submissions, [])
+    assign(:recent_submissions, @portfolio.user.submissions.in_workflow_state(['submitted', 'graded']))
     assign(:folders, [])
     assign(:files, [])
     assign(:page, @portfolio.eportfolio_entries.create!(:name => "some entry", :eportfolio_category => category))

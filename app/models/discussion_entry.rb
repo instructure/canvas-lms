@@ -350,15 +350,14 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def context_module_action_later
-    unless self.deleted?
-      self.send_later_if_production(:context_module_action)
-    end
+    self.send_later_if_production(:context_module_action)
   end
   protected :context_module_action_later
 
   def context_module_action
     if self.discussion_topic && self.user
-      self.discussion_topic.context_module_action(user, :contributed)
+      action = self.deleted? ? :deleted : :contributed
+      self.discussion_topic.context_module_action(user, action)
     end
   end
 

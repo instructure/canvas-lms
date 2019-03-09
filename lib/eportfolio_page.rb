@@ -20,7 +20,8 @@ module EportfolioPage
   def eportfolio_page_attributes
     @categories = @portfolio.eportfolio_categories
     if @portfolio.grants_right?(@current_user, session, :manage)
-      @recent_submissions = @current_user.submissions.order("created_at DESC").to_a if @current_user && @current_user == @portfolio.user
+      @recent_submissions = @current_user.submissions.in_workflow_state(['submitted', 'graded']).
+        order("created_at DESC").to_a if @current_user && @current_user == @portfolio.user
       @files = @current_user.attachments.to_a
       @folders = @current_user.active_folders.preload(:active_sub_folders, :active_file_attachments).to_a
     end

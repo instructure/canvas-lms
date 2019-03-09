@@ -278,30 +278,7 @@ module SIS
             enrollment.limit_privileges_to_course_section = Canvas::Plugin.value_to_boolean(enrollment_info.limit_section_privileges)
           end
 
-          if enrollment_info.status =~ /\Aactive/i
-            message = set_enrollment_workflow_state(enrollment, enrollment_info, pseudo, user)
-            @messages << SisBatch.build_error(enrollment_info.csv, message, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info) if message
-          elsif enrollment_info.status =~ /\Adeleted/i
-            # we support creating deleted enrollments, but we want to preserve
-            # the state for roll_back_data so only set workflow_state for new
-            # objects otherwise delete them in a batch at the end unless it is
-            # already deleted.
-            if enrollment.id.nil?
-              enrollment.workflow_state = 'deleted'
-            else
-              if enrollment.workflow_state != 'deleted'
-                @enrollments_to_delete << enrollment
-              else
-                @success_count += 1
-              end
-              next
-            end
-          elsif enrollment_info.status =~ /\Acompleted/i
-            enrollment.workflow_state = 'completed'
-            enrollment.completed_at ||= Time.zone.now
-          elsif enrollment_info.status =~ /\Ainactive/i
-            enrollment.workflow_state = 'inactive'
-          end
+          next if enrollment_status(associated_user_id, enrollment, enrollment_info, pseudo, role, user)
 
           if (enrollment.stuck_sis_fields & [:start_at, :end_at]).empty?
             enrollment.start_at = enrollment_info.start_date
@@ -383,6 +360,55 @@ module SIS
       end
 
       private
+
+      def enrollment_status(associated_user_id, enrollment, enrollment_info, pseudo, role, user)
+        all_done = false
+        if enrollment_info.status =~ /\Aactive/i
+          message = set_enrollment_workflow_state(enrollment, enrollment_info, pseudo, user)
+          @messages << SisBatch.build_error(enrollment_info.csv, message, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info) if message
+        elsif enrollment_info.status =~ /\Acompleted/i
+          completed_status(enrollment)
+        elsif enrollment_info.status =~ /\Ainactive/i
+          enrollment.workflow_state = 'inactive'
+        elsif enrollment_info.status =~ /\Adeleted_last_completed/i
+          # if any matching enrollment for the same user in the same course
+          # exists, we will mark the enrollment as deleted, but if it is the
+          # last enrollment it gets marked as completed
+          if @course.enrollments.active.where(user: user, associated_user_id: associated_user_id, role: role).where.not(id: enrollment.id).exists?
+            all_done = deleted_status(enrollment)
+          else
+            completed_status(enrollment)
+          end
+        elsif enrollment_info.status =~ /\Adeleted/i
+          # we support creating deleted enrollments, but we want to preserve
+          # the state for roll_back_data so only set workflow_state for new
+          # objects otherwise delete them in a batch at the end unless it is
+          # already deleted.
+          all_done = deleted_status(enrollment)
+        end
+        all_done
+      end
+
+      def completed_status(enrollment)
+        enrollment.workflow_state = 'completed'
+        enrollment.completed_at ||= Time.zone.now
+      end
+
+      def deleted_status(enrollment)
+        if enrollment.id.nil?
+          enrollment.workflow_state = 'deleted'
+          # this will allow the enrollment to continue to be created
+          false
+        else
+          if enrollment.workflow_state != 'deleted'
+            @enrollments_to_delete << enrollment
+          else
+            @success_count += 1
+          end
+          # we are done and we con go to the next enrollment
+          true
+        end
+      end
 
       def set_enrollment_workflow_state(enrollment, enrollment_info, pseudo, user)
         message = nil

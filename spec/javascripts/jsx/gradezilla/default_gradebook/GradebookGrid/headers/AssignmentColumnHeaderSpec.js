@@ -80,6 +80,11 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
         onSelect() {}
       },
 
+      postGradesAction: {
+        enabled: false,
+        onSelect() {}
+      },
+
       onMenuDismiss() {},
 
       removeGradebookElement($el) {
@@ -807,6 +812,12 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
       notOk(getMenuItem($menuContent, 'Mute Assignment'))
     })
 
+    test('is not present when post policies is enabled', () => {
+      props.postGradesAction.enabled = true
+      mountAndOpenOptionsMenu()
+      notOk(getMenuItem($menuContent, 'Mute Assignment'))
+    })
+
     test('is disabled when .muteAssignmentAction.disabled is true', () => {
       props.muteAssignmentAction.disabled = true
       mountAndOpenOptionsMenu()
@@ -863,6 +874,12 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
       notOk(getMenuItem($menuContent, 'Unmute Assignment'))
     })
 
+    test('is not present when post policies is enabled', () => {
+      props.postGradesAction.enabled = true
+      mountAndOpenOptionsMenu()
+      notOk(getMenuItem($menuContent, 'Unmute Assignment'))
+    })
+
     test('is disabled when .muteAssignmentAction.disabled is true', () => {
       props.muteAssignmentAction.disabled = true
       mountAndOpenOptionsMenu()
@@ -897,6 +914,49 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
         mountAndOpenOptionsMenu()
         getMenuItem($menuContent, 'Unmute Assignment').click()
         const [callback] = props.muteAssignmentAction.onSelect.lastCall.args
+        callback()
+        strictEqual(document.activeElement, getOptionsMenuTrigger())
+      })
+    })
+  })
+
+  QUnit.module('"Options" > "Post grades" action', hooks => {
+    hooks.beforeEach(() => {
+      props.postGradesAction.enabled = true
+    })
+
+    test('is present when post policies is enabled', () => {
+      mountAndOpenOptionsMenu()
+      ok(getMenuItem($menuContent, 'Post grades'))
+    })
+
+    test('is not present when post policies is not enabled', () => {
+      props.postGradesAction.enabled = false
+      mountAndOpenOptionsMenu()
+      notOk(getMenuItem($menuContent, 'Post grades'))
+    })
+
+    QUnit.module('when clicked', contextHooks => {
+      contextHooks.beforeEach(() => {
+        props.postGradesAction.onSelect = sinon.stub()
+      })
+
+      test('does not restore focus to the "Options" menu trigger', () => {
+        mountAndOpenOptionsMenu()
+        getMenuItem($menuContent, 'Post grades').click()
+        notEqual(document.activeElement, getOptionsMenuTrigger())
+      })
+
+      test('calls the .postGradesAction.onSelect callback', () => {
+        mountAndOpenOptionsMenu()
+        getMenuItem($menuContent, 'Post grades').click()
+        strictEqual(props.postGradesAction.onSelect.callCount, 1)
+      })
+
+      test('includes a callback for restoring focus upon dialog close', () => {
+        mountAndOpenOptionsMenu()
+        getMenuItem($menuContent, 'Post grades').click()
+        const [callback] = props.postGradesAction.onSelect.lastCall.args
         callback()
         strictEqual(document.activeElement, getOptionsMenuTrigger())
       })
@@ -1246,6 +1306,12 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
       mountComponent()
     })
 
+    function focusElement($element) {
+      const event = document.createEvent('Event')
+      event.initEvent('focus', true, true)
+      $element.dispatchEvent(event)
+    }
+
     test('#focusAtStart() sets focus on the assignment link', () => {
       component.focusAtStart()
       strictEqual(document.activeElement, getAssignmentLink())
@@ -1257,17 +1323,17 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
     })
 
     test('adds the "focused" class to the header when the assignment link receives focus', () => {
-      getAssignmentLink().focus()
+      focusElement(getAssignmentLink())
       ok($container.firstChild.classList.contains('focused'))
     })
 
     test('adds the "focused" class to the header when the "Options" menu trigger receives focus', () => {
-      getOptionsMenuTrigger().focus()
+      focusElement(getOptionsMenuTrigger())
       ok($container.firstChild.classList.contains('focused'))
     })
 
     test('removes the "focused" class from the header when focus leaves', () => {
-      getOptionsMenuTrigger().focus()
+      focusElement(getOptionsMenuTrigger())
       blurElement(getOptionsMenuTrigger())
       notOk($container.firstChild.classList.contains('focused'))
     })

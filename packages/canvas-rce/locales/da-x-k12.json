@@ -176,6 +176,9 @@
   "loading_failed_b3524381": {
     "message": "Indlæsning mislykkedes ..."
   },
+  "loading_folders_8d4d5d5a": {
+    "message": "Indlæser mapper ..."
+  },
   "modules_c4325335": {
     "message": "Forløb"
   },
@@ -190,6 +193,9 @@
   },
   "quizzes_7e598f57": {
     "message": "Quizzer"
+  },
+  "record_upload_media_5fdce166": {
+    "message": "Optag/overfør medier"
   },
   "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
     "message": "Område med RTF. Tryk på ALT+F8 for hjælp"
@@ -206,6 +212,9 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Vælg en mappe at uploade din fil til"
   },
+  "syllabus_f191f65b": {
+    "message": "Fagplan"
+  },
   "text_color_press_down_to_select_8f5ad9b5": {
     "message": "Tekstfarve, tryk ned for at vælge"
   },
@@ -217,6 +226,9 @@
   },
   "the_material_is_subject_to_fair_use_exception_41bc6a4b": {
     "message": "Materialet er underlagt undtagelsen om rimelig brug"
+  },
+  "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
+    "message": "Denne upload overstiger fillagringskvoten. Kontakt din systemadministrator."
   },
   "upload_8b403d05": {
     "message": "Upload"

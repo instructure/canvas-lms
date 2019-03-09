@@ -207,6 +207,20 @@ export function snippetFor({eventType, payload}) {
   return null
 }
 
-export function roleLabelFor(user) {
-  return roleLabels[user.role] || I18n.t('Unknown Role')
+export function roleLabelFor(creator) {
+  return roleLabels[creator.role] || I18n.t('Unknown Role')
+}
+
+export function creatorNameFor(creator) {
+  const creator_name = creator.name
+  const name = creator_name == null ? I18n.t('Unknown') : creator_name
+
+  switch (creator.type) {
+    case 'quiz':
+      return I18n.t('%{name} (Quiz)', {name})
+    case 'externalTool':
+      return I18n.t('%{name} (LTI Tool)', {name})
+    default:
+      return creator_name == null ? I18n.t('%{name} User', {name}) : name
+  }
 }

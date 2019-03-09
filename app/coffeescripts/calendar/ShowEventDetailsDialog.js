@@ -246,9 +246,9 @@ export default class ShowEventDetailsDialog {
     const params = $.extend(true, {}, this.event, {
       can_reserve: this.event.object && this.event.object.reserve_url
     })
-    // For now, assume that if someone has the ability to create appointment groups
-    // in a course, they shouldn't also be able to sign up for them.
-    if (this.event.contextInfo.can_create_appointment_groups) {
+
+    // For now used to eliminate the ability of teachers and tas seeing the excess reserveration link
+    if (!this.event.contextInfo.can_make_reservation) {
       params.can_reserve = false
     }
 

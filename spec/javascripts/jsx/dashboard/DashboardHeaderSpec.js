@@ -110,7 +110,7 @@ test('it renders', () => {
   ok(dashboardHeader)
 })
 
-test('it waits for the erb html to be injected before rendering the ToDoSidebar', assert => {
+QUnit.skip('it waits for the erb html to be injected before rendering the ToDoSidebar', assert => {
   const done = assert.async()
   ENV.STUDENT_PLANNER_ENABLED = true
   ENV.DASHBOARD_SIDEBAR_URL = 'fake-dashboard-sidebar-url'

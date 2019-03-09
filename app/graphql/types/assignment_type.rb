@@ -239,5 +239,14 @@ module Types
         submissions.where(user_id: current_user.id)
       end
     end
+
+    field :post_policy, PostPolicyType, null: true
+    def post_policy
+      load_association(:context).then do |course|
+        if course.grants_right?(current_user, :manage_grades)
+          load_association(:post_policy)
+        end
+      end
+    end
   end
 end

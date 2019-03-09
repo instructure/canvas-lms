@@ -97,6 +97,16 @@ describe CommunicationChannel do
     expect(@cc.confirmation_code).not_to eql(old_cc)
   end
 
+  it "should not send two reset confirmation code" do
+    cc = communication_channel_model
+    enable_cache do
+      expect(cc).to receive(:set_confirmation_code).twice # once from create, once from first forgot
+      cc.forgot_password!
+      cc.forgot_password!
+      cc.forgot_password!
+    end
+  end
+
   it "should use a 15-digit confirmation code for default or email path_type settings" do
     communication_channel_model
     expect(@cc.path_type).to eql('email')

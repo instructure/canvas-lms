@@ -27,8 +27,6 @@ const STUFF_TO_REV = [
   'public/fonts/**/*.{eot,otf,svg,ttf,woff,woff2}',
   'public/images/**/*',
 
-
-
   // These files have links in their css to images from their own dir
   'public/javascripts/vendor/slickgrid/images/*',
 
@@ -152,21 +150,29 @@ function makeIE11Polyfill () {
   const coreJsBuilder = require('core-js-builder')
 
   const FEATURES_TO_POLYFILL = [
-    'es6.promise',
+    'es.promise.finally',
+    'es6.array',
+    'es6.function',
+    'es6.map',
+    'es6.number',
+    'es6.number.is-integer',
     'es6.object.assign',
     'es6.object.is',
-    'es7.object.values',
-    'es7.object.entries',
-    'es6.array',
-    'es7.array.includes',
-    'es6.function',
+    'es6.promise',
+    'es6.set',
+    'es6.string.code-point-at',
     'es6.string.ends-with',
+    'es6.string.from-code-point',
     'es6.string.includes',
-    'es6.string.starts-with',
     'es6.string.iterator',
+    'es6.string.repeat',
+    'es6.string.starts-with',
     'es6.symbol',
-    'es6.map',
-    'es6.number'
+    'es6.weak-set',
+    'es7.array.includes',
+    'es7.object.entries',
+    'es7.object.values',
+    'web.dom.iterable'
   ]
 
   return coreJsBuilder({
@@ -181,3 +187,4 @@ ${FEATURES_TO_POLYFILL}
 ${code}`
   )
 }
+

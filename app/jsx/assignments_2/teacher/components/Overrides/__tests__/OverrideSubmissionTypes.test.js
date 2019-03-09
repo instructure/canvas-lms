@@ -21,7 +21,7 @@ import {render} from 'react-testing-library'
 import {mockOverride} from '../../../test-utils'
 import OverrideSubmissionTypes from '../OverrideSubmissionTypes'
 
-it('renders an override', () => {
+it('renders an OverrideSubmissionType summary', () => {
   const override = mockOverride({
     submissionTypes: [
       'arc',
@@ -39,11 +39,46 @@ it('renders an override', () => {
       'foo'
     ]
   })
-  const {getByText} = render(<OverrideSubmissionTypes variant="simple" override={override} />)
+  const {getByText} = render(<OverrideSubmissionTypes variant="summary" override={override} />)
 
   const submission_types =
-    'Arc & No Submission & External Tool & O365 Template & File & On Paper & Google Template & Text Entry & Image & Url & Media & Student Choice & Other'
+    'Arc & External Tool & File & Google Template & Image & Media & No Submission & O365 Template & On Paper & Student Choice & Text Entry & Url & Other'
 
   const elem = getByText(/^Arc/)
   expect(elem.textContent).toEqual(submission_types)
+})
+
+it('renders an OverrideSubmissionType detail', () => {
+  const override = mockOverride({
+    submissionTypes: [
+      'arc',
+      'none',
+      'external_tool',
+      'o365',
+      'online_upload',
+      'on_paper',
+      'google',
+      'online_text_entry',
+      'image',
+      'online_url',
+      'media_recording',
+      'any',
+      'foo'
+    ]
+  })
+  const {getByText} = render(<OverrideSubmissionTypes variant="detail" override={override} />)
+
+  expect(getByText('Arc')).toBeInTheDocument()
+  expect(getByText('No Submission')).toBeInTheDocument()
+  expect(getByText('External Tool')).toBeInTheDocument()
+  expect(getByText('O365 Template')).toBeInTheDocument()
+  expect(getByText('File')).toBeInTheDocument()
+  expect(getByText('On Paper')).toBeInTheDocument()
+  expect(getByText('Google Template')).toBeInTheDocument()
+  expect(getByText('Text Entry')).toBeInTheDocument()
+  expect(getByText('Image')).toBeInTheDocument()
+  expect(getByText('Url')).toBeInTheDocument()
+  expect(getByText('Media')).toBeInTheDocument()
+  expect(getByText('Student Choice')).toBeInTheDocument()
+  expect(getByText('Other')).toBeInTheDocument()
 })
