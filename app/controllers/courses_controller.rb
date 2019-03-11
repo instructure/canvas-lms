@@ -2239,9 +2239,9 @@ class CoursesController < ApplicationController
   #     in prior-enrollment lists.
   #   * 'delete' completely removes the course from the web site (including course menus and prior-enrollment lists).
   #     All enrollments are deleted. Course content may be physically deleted at a future date.
-  #   * 'undelete' attempts to recover a course that has been deleted. (Recovery is not guaranteed; please conclude
-  #     rather than delete a course if there is any possibility the course will be used again.) The recovered course
-  #     will be unpublished. Deleted enrollments will not be recovered.
+  #   * 'undelete' attempts to recover a course that has been deleted. This action requires account administrative rights.
+  #     (Recovery is not guaranteed; please conclude rather than delete a course if there is any possibility the course
+  #     will be used again.) The recovered course will be unpublished. Deleted enrollments will not be recovered.
   #
   # @argument course[default_view]  [String, "feed"|"wiki"|"modules"|"syllabus"|"assignments"]
   #   The type of page that users will see when they first visit the course
@@ -2321,8 +2321,12 @@ class CoursesController < ApplicationController
     params[:course][:event] = :offer if params[:offer].present?
 
     if params[:course][:event] && params[:course].keys.size == 1
-      if authorized_action(@course, @current_user, :change_course_state) && process_course_event
-        render_update_success
+      if authorized_action(@course, @current_user, :change_course_state)
+        if process_course_event
+          render_update_success
+        else
+          render_update_failure
+        end
       end
       return
     end
@@ -2421,7 +2425,10 @@ class CoursesController < ApplicationController
       end
 
       if params[:course][:event] && @course.grants_right?(@current_user, session, :change_course_state)
-        return unless process_course_event
+        unless process_course_event
+          render_update_failure
+          return
+        end
       end
 
       if params[:course][:image_url] && params[:course][:image_id]
@@ -2516,32 +2523,74 @@ class CoursesController < ApplicationController
         end
         render_update_success
       else
-        respond_to do |format|
-          format.html do
-            flash[:error] = t('There was an error saving the changes to the course')
-            redirect_to course_url(@course)
-          end
-          format.json { render :json => @course.errors, :status => :bad_request }
-        end
+        render_update_failure
       end
+    end
+  end
+
+  def render_update_failure
+    respond_to do |format|
+      format.html do
+        flash[:error] = t('There was an error saving the changes to the course')
+        redirect_to course_url(@course)
+      end
+      format.json { render :json => @course.errors, :status => :bad_request }
+    end
+  end
+
+  # prevent API from failing when a no-op event is given
+  def non_event?(course, event)
+    case event
+    when :offer
+      course.available?
+    when :claim
+      course.claimed?
+    when :complete
+      course.completed?
+    when :delete
+      course.deleted?
+    else
+      false
     end
   end
 
   def process_course_event
     event = params[:course].delete(:event)
     event = event.to_sym
+    event = :complete if event == :conclude
+    return true if non_event?(@course, event)
     if event == :claim && !@course.unpublishable?
-      flash[:error] = t('errors.unpublish', 'Course cannot be unpublished if student submissions exist.')
-      redirect_to(course_url(@course))
+      cant_unpublish_message = t('errors.unpublish', 'Course cannot be unpublished if student submissions exist.')
+      respond_to do |format|
+        format.json do
+          @course.errors.add(:workflow_state, cant_unpublish_message)
+        end
+        format.html do
+          flash[:error] = cant_unpublish_message
+          redirect_to(course_url(@course))
+        end
+      end
       return false
     else
-      @course.process_event(event)
-      logging_source = api_request? ? :api : :manual
-      if event == :offer
-        Auditors::Course.record_published(@course, @current_user, source: logging_source)
-      elsif event == :claim
-        Auditors::Course.record_claimed(@course, @current_user, source: logging_source)
+      result = @course.process_event(event)
+      if result
+        opts = { source: api_request? ? :api : :manual }
+        case event
+        when :offer
+          Auditors::Course.record_published(@course, @current_user, opts)
+        when :claim
+          Auditors::Course.record_claimed(@course, @current_user, opts)
+        when :complete
+          Auditors::Course.record_concluded(@course, @current_user, opts)
+        when :delete
+          Auditors::Course.record_deleted(@course, @current_user, opts)
+        when :undelete
+          Auditors::Course.record_restored(@course, @current_user, opts)
+        end
+      else
+        @course.errors.add(:workflow_state, @course.halted_because)
       end
+      result
     end
   end
 

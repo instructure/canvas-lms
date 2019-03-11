@@ -1263,22 +1263,31 @@ class Course < ActiveRecord::Base
       event :claim, :transitions_to => :claimed
       event :offer, :transitions_to => :available
       event :complete, :transitions_to => :completed
+      event :delete, :transitions_to => :deleted
     end
 
     state :claimed do
       event :offer, :transitions_to => :available
       event :complete, :transitions_to => :completed
+      event :delete, :transitions_to => :deleted
     end
 
     state :available do
       event :complete, :transitions_to => :completed
       event :claim, :transitions_to => :claimed
+      event :delete, :transitions_to => :deleted
     end
 
     state :completed do
       event :unconclude, :transitions_to => :available
+      event :offer, :transitions_to => :available
+      event :claim, :transitions_to => :claimed
+      event :delete, :transitions_to => :deleted
     end
-    state :deleted
+
+    state :deleted do
+      event :undelete, :transitions_to => :claimed
+    end
   end
 
   def api_state
