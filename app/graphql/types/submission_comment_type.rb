@@ -16,27 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AttachmentsLoader < GraphQL::Batch::Loader
-  def initialize(assignment)
-    @assignment = assignment
-  end
-
-  def perform(comments)
-    assignment_attachment_ids = @assignment.attachment_ids.to_set
-    comment_attachments = comments.each_with_object({}) do |comment, hash|
-      comment_attachment_ids = comment.parse_attachment_ids.to_set
-      hash[comment] = comment_attachment_ids & assignment_attachment_ids
-    end
-
-    ids = comment_attachments.values.reduce(:merge).to_a
-    attachments = Attachment.where(id: ids)
-    comment_attachments.each do |comment, attachment_ids|
-      targets = attachments.select { |a|  attachment_ids.include?(a.id) }
-      fulfill(comment, targets)
-    end
-  end
-end
-
 module Types
   class SubmissionCommentType < ApplicationObjectType
     graphql_name 'SubmissionComment'
@@ -64,10 +43,17 @@ module Types
 
     field :attachments, [Types::FileType], null: true
     def attachments
-      return [] if object.attachment_ids.blank?
+      attachment_ids = object.parse_attachment_ids
+      return [] if attachment_ids.empty?
+
       load_association(:submission).then do |submission|
         Loaders::AssociationLoader.for(Submission, :assignment).load(submission).then do |assignment|
-          AttachmentsLoader.for(object.submission.assignment).load(object)
+          scope = assignment.attachments
+          Loaders::ForeignKeyLoader.for(scope, :id).load_many(attachment_ids).then do |attachments|
+            # ForeignKeyLoaders returns results as an array and load_many also returns the values
+            # as an array. Flatten them so we are not returning nested arrays here.
+            attachments.flatten.compact
+          end
         end
       end
     end
