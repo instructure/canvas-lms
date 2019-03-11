@@ -179,6 +179,40 @@ describe Types::AssignmentType do
   describe "submissionsConnection" do
     let_once(:other_student) { student_in_course(course: course, active_all: true).user }
 
+    # This is kind of a catch-all test the assignment.submissionsConnection
+    # graphql plumbing. The submission search specs handle testing the
+    # implementation. This makes sure the graphql inputs are hooked up right.
+    # Other tests below were already here to test specific cases, and I think
+    # they still have value as a sanity check.
+    it "plumbs through filter options to SubmissionSearch" do
+      allow(SubmissionSearch).to receive(:new).and_call_original
+      assignment_type.resolve(<<~GQL, current_user: teacher)
+        submissionsConnection(
+          filter: {
+            states: submitted,
+            sectionIds: 42,
+            enrollmentTypes: StudentEnrollment,
+            userSearch: foo,
+            scoredLessThan: 3
+            scoredMoreThan: 1
+          }
+          orderBy: {field: username, direction: descending}
+        ) { nodes { _id } }
+      GQL
+      expect(SubmissionSearch).to have_received(:new).with(assignment, teacher, nil, {
+        states: ["submitted"],
+        section_ids: ["42"],
+        enrollment_types: ["StudentEnrollment"],
+        user_search: 'foo',
+        scored_less_than: 3.0,
+        scored_more_than: 1.0,
+        order_by: [{
+          field: "username",
+          direction: "descending"
+        }]
+      })
+    end
+
     it "returns 'real' submissions from with permissions" do
       submission1 = assignment.submit_homework(student, {:body => "sub1", :submission_type => "online_text_entry"})
       submission2 = assignment.submit_homework(other_student, {:body => "sub1", :submission_type => "online_text_entry"})

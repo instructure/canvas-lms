@@ -357,28 +357,15 @@ module Types
 
     field :submissions_connection, SubmissionType.connection_type, null: true do
       description "submissions for this assignment"
-      argument :filter, SubmissionFilterInputType, required: false
+      argument :filter, SubmissionSearchFilterInputType, required: false
+      argument :order_by, [SubmissionSearchOrderInputType], required: false
     end
-    def submissions_connection(filter: nil)
-      filter ||= {}
-      course = assignment.context
-
-      submissions = assignment.submissions.where(
-        workflow_state: filter[:states] || DEFAULT_SUBMISSION_STATES
-      )
-
-      if filter[:section_ids].present?
-        sections = course.course_sections.where(id: filter[:section_ids])
-        student_ids = course.student_enrollments.where(course_section: sections).pluck(:user_id)
-        submissions = submissions.where(user_id: student_ids)
-      end
-
-      if course.grants_any_right?(current_user, session, :manage_grades, :view_all_grades)
-        submissions
-      elsif course.grants_right?(current_user, session, :read_grades)
-        # a user can see their own submission
-        submissions.where(user_id: current_user.id)
-      end
+    def submissions_connection(filter: nil, order_by: nil)
+      filter = filter.to_h
+      order_by ||= []
+      filter[:states] ||= DEFAULT_SUBMISSION_STATES
+      filter[:order_by] = order_by.map(&:to_h)
+      SubmissionSearch.new(assignment, current_user, session, filter).search
     end
 
     field :post_policy, PostPolicyType, null: true

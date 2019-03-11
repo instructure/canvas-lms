@@ -17,16 +17,22 @@
 #
 
 module Types
-  DEFAULT_SUBMISSION_STATES = %w[submitted pending_review graded].freeze
+  class SubmissionSearchOrderFieldInputType < Types::BaseEnum
+    graphql_name "SubmissionSearchOrderField"
+    description "The user or submission field to sort by"
+    # user sorts
+    value "username"
 
-  class SubmissionStateType < BaseEnum
-    graphql_name "SubmissionState"
-
-    value "submitted"
-    value "unsubmitted"
-    value "pending_review"
-    value "graded"
-    value "ungraded"
-    value "deleted"
+    # submission sorts
+    value "score"
+    value "submitted_at"
   end
+
+  class SubmissionSearchOrderInputType < Types::BaseInputObject
+    graphql_name "SubmissionSearchOrder"
+    description "Specify a sort for the results"
+    argument :field, SubmissionSearchOrderFieldInputType, required: true
+    argument :direction, OrderDirectionType, required: false
+  end
+
 end

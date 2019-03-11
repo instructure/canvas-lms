@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2018 - present Instructure, Inc.
+# Copyright (C) 2019 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,16 +17,9 @@
 #
 
 module Types
-  DEFAULT_SUBMISSION_STATES = %w[submitted pending_review graded].freeze
-
-  class SubmissionStateType < BaseEnum
-    graphql_name "SubmissionState"
-
-    value "submitted"
-    value "unsubmitted"
-    value "pending_review"
-    value "graded"
-    value "ungraded"
-    value "deleted"
+  class OrderDirectionType < BaseEnum
+    graphql_name "OrderDirection"
+    value :ascending
+    value :descending
   end
 end
