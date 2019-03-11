@@ -18,7 +18,7 @@
 
 import React from 'react'
 import I18n from 'i18n!assignments_2'
-import SVGWithTextPlaceholder from '../SVGWithTextPlaceholder'
+import SVGWithTextPlaceholder from '../../../shared/SVGWithTextPlaceholder'
 import {arrayOf} from 'prop-types'
 import CommentRow from './CommentRow'
 import {CommentShape} from '../../assignmentData'

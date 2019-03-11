@@ -29,6 +29,7 @@ export function GetLinkStateDefaults() {
   }`
   defaults.assignmentUrl = `${baseUrl}/assignments`
   defaults.moduleUrl = `${baseUrl}/modules`
+  defaults.currentUserId = ENV.current_user_id
 
   if (ENV.PREREQS.items && ENV.PREREQS.items.length !== 0 && ENV.PREREQS.items[0].prev) {
     const prereq = ENV.PREREQS.items[0].prev
@@ -63,6 +64,7 @@ export const STUDENT_VIEW_QUERY = gql`
         env @client {
           assignmentUrl
           moduleUrl
+          currentUserId
           modulePrereq {
             title
             link
@@ -154,6 +156,7 @@ export const StudentAssignmentShape = shape({
   env: shape({
     assignmentUrl: string.isRequired,
     moduleUrl: string.isRequired,
+    currentUserId: string,
     modulePrereq: shape({
       title: string.isRequired,
       link: string.isRequired
@@ -183,5 +186,5 @@ export const StudentAssignmentShape = shape({
         submissionStatus: string
       })
     ).isRequired
-  }).isRequired
+  })
 })

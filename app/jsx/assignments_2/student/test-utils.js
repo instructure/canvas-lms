@@ -34,6 +34,7 @@ export function mockAssignment(overrides = {}) {
     env: {
       assignmentUrl: '/test/assignment',
       moduleUrl: '/test/module',
+      currentUserId: '1',
       modulePrereq: null,
       __typename: 'env'
     },

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2019 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,58 +16,34 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Suspense, lazy} from 'react'
-import I18n from 'i18n!assignments_2'
+import React from 'react'
+import I18n from 'i18n!assignments_2_logged_out_tabs'
 import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import {StudentAssignmentShape} from '../assignmentData'
-import LoadingIndicator from '../../shared/LoadingIndicator'
-import SVGWithTextPlaceholder from '../../shared/SVGWithTextPlaceholder'
-import ClosedDiscussionSVG from '../SVG/ClosedDiscussions.svg'
+import LoginActionPrompt from './LoginActionPrompt'
 
-const Comments = lazy(() =>
-  import('./Comments').then(result => (result.default ? result : {default: result}))
-)
-
-ContentTabs.propTypes = {
+LoggedOutTabs.propTypes = {
   assignment: StudentAssignmentShape
 }
 
-function ContentTabs(props) {
+function LoggedOutTabs(props) {
   return (
-    <div data-test-id="assignment-2-student-content-tabs">
+    <div>
       <TabList defaultSelectedIndex={0} variant="minimal">
-        <TabPanel title={I18n.t('Upload')}>
+        <TabPanel title={I18n.t('Attempt 1')}>
           <Flex as="header" alignItems="center" justifyItems="center" direction="column">
             <FlexItem>
-              <Text data-test-id="assignment-2-student-content-tabs-test-text">
-                `TODO: Input Upload Content Here...`
-              </Text>
+              <LoginActionPrompt />
             </FlexItem>
           </Flex>
         </TabPanel>
-        <TabPanel
-          data-test-id="assignment-2-student-comments-content-tab"
-          title={I18n.t('Comments')}
-        >
-          {!props.assignment.muted ? (
-            <Suspense fallback={<LoadingIndicator />}>
-              <Comments assignment={props.assignment} />
-            </Suspense>
-          ) : (
-            <SVGWithTextPlaceholder
-              text={I18n.t(
-                'You may not see all comments right now because the assignment is currently being graded.'
-              )}
-              url={ClosedDiscussionSVG}
-            />
-          )}
-        </TabPanel>
+
         <TabPanel title={I18n.t('Rubric')}>
           <Flex as="header" alignItems="center" justifyItems="center" direction="column">
             <FlexItem>
-              <Text>`TODO: Input Rubric Content Here...`</Text>
+              <Text>{`TODO: Input Rubric Content Here... ${props.assignment.title}`}</Text>
             </FlexItem>
           </Flex>
         </TabPanel>
@@ -76,4 +52,4 @@ function ContentTabs(props) {
   )
 }
 
-export default React.memo(ContentTabs)
+export default React.memo(LoggedOutTabs)

@@ -23,7 +23,7 @@ import {Query} from 'react-apollo'
 import GenericErrorPage from '../../shared/components/GenericErrorPage/index'
 import errorShipUrl from './SVG/ErrorShip.svg'
 import {STUDENT_VIEW_QUERY} from './assignmentData'
-import LoadingIndicator from './components/LoadingIndicator'
+import LoadingIndicator from '../shared/LoadingIndicator'
 
 const StudentView = props => (
   <Query query={STUDENT_VIEW_QUERY} variables={{assignmentLid: props.assignmentLid}}>
