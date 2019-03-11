@@ -66,6 +66,8 @@ export default class UploadMediaTrackForm {
         submitDfd.resolve()
         this.$dialog.dialog('close')
         $.flashMessage(I18n.t('track_uploaded_successfully', 'Track uploaded successfully; please refresh your browser.'))
+      }, () => {
+        submitDfd.reject()
       })
     })
   }
