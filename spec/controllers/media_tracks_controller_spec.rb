@@ -28,6 +28,17 @@ describe MediaTracksController do
     user_session(@teacher)
   end
 
+  let :example_ttml_susceptible_to_xss do
+    %{
+      <tt xml>
+        <img
+          src="x"
+          onerror="alert(document.domain);
+          alert('Cookie must be empty: ' + document.cookie);"
+        />
+    }
+  end
+
   describe "#create" do
     it "should create a track" do
       expect_any_instantiation_of(@mo).to receive(:media_sources).and_return(nil)
@@ -37,6 +48,11 @@ describe MediaTracksController do
       track = @mo.media_tracks.last
       expect(track.content).to eq content
     end
+
+    it "should disallow TTML" do
+      post 'create', params: {:media_object_id => @mo.media_id, :kind => 'subtitles', :locale => 'en', :content => example_ttml_susceptible_to_xss}
+      expect(response).to have_http_status(:unprocessable_entity)
+    end
   end
 
   describe "#show" do
@@ -45,6 +61,13 @@ describe MediaTracksController do
       get 'show', params: {:media_object_id => @mo.media_id, :id => track.id}
       expect(response).to be_successful
       expect(response.body).to eq track.content
+    end
+
+    it "should not show tracks that are in TTML format because it is vulnerable to xss" do
+      track = @mo.media_tracks.create!(kind: 'subtitles', locale: 'en', content: "blah")
+      track.update_attribute(:content, example_ttml_susceptible_to_xss)
+      get 'show', params: {:media_object_id => @mo.media_id, :id => track.id}
+      expect(response).to have_http_status(:unprocessable_entity)
     end
   end
 

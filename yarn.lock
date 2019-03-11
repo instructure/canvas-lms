@@ -12724,7 +12724,7 @@ media-typer@0.3.0:
 
 "mediaelement@https://github.com/instructure/mediaelement.git#master":
   version "2.23.5"
-  resolved "https://github.com/instructure/mediaelement.git#21de73cbc3c8c4281cfbbb4b91b88d250657cadd"
+  resolved "https://github.com/instructure/mediaelement.git#3fde978907f106a38a9692dfc84a9d2610107699"
 
 mem@^1.1.0:
   version "1.1.0"
