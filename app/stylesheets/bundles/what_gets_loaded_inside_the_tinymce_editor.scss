@@ -21,11 +21,11 @@
 @import 'components/ic-typography';
 
 // the first line of public/javascripts/tinymce/jscripts/tiny_mce/themes/advanced/skins/default/content.css
-// sets these to undesireable values, rather than modify that vendor file, we just override them here
+// sets these to undesirable values, rather than modify that vendor file, we just override them here
 // to match the rest of the content in canvas
 body {
   margin: 0;
-  font-family: inherit;
+  font-family: inherit !important;
 }
 
 td {
