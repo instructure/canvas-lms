@@ -32,12 +32,14 @@ module Users
       developer_key = claims[:developer_key]
       root_account = claims[:root_account]
       oauth_host = claims[:oauth_host]
+      return_url = claims[:return_url]
 
       jwt_claims = { user_id: user.global_id.to_s }
       jwt_claims[:real_user_id] = real_user.global_id.to_s if real_user
       jwt_claims[:developer_key_id] = developer_key.global_id.to_s if developer_key
       jwt_claims[:root_account_id] = root_account.global_id.to_s if root_account
       jwt_claims[:oauth_host] = oauth_host if oauth_host
+      jwt_claims[:return_url] = return_url if return_url
 
       expires = TTL_MINUTES.minutes.from_now
       key = nil # use default key
@@ -63,13 +65,15 @@ module Users
       end
 
       oauth_host = claims[:oauth_host]
+      return_url = claims[:return_url]
 
       return {
         user: user,
         real_user: real_user,
         developer_key: developer_key,
         root_account: root_account,
-        oauth_host: oauth_host
+        oauth_host: oauth_host,
+        return_url: return_url
       }
 
     rescue Canvas::Security::TokenExpired, Canvas::Security::InvalidToken

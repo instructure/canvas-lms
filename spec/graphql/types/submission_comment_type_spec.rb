@@ -82,6 +82,28 @@ describe Types::SubmissionCommentType do
     ).to eq [[a1.id.to_s, a2.id.to_s], [], []]
   end
 
+  it 'handles multiple attachments in multiple comments' do
+    a1 = attachment_model
+    a2 = attachment_model
+    a3 = attachment_model
+    @assignment.attachments << a1
+    @assignment.attachments << a2
+    @assignment.attachments << a3
+
+    comment1 = @submission_comments[0]
+    comment1.attachments = [a1]
+    comment1.save!
+
+    comment2 = @submission_comments[1]
+    comment2.attachments = [a2, a3]
+    comment2.save!
+
+    @submission.reload
+    expect(
+      submission_type.resolve('commentsConnection { nodes { attachments { _id } }}')
+    ).to eq [[a1.id.to_s], [a2.id.to_s, a3.id.to_s], []]
+  end
+
   describe '#media_object' do
     context 'with no media object' do
       it 'returns nil' do
