@@ -222,9 +222,8 @@ export function itBehavesLikeADialog({
   confirmDialogOpen,
   getCancelDialogElt
 }) {
-  /* eslint-disable jest/no-disabled-tests */
   // skipped because the close tests regularly timeout in jenkins
-  describe.skip('behaves like a dialog', () => {
+  describe('behaves like a dialog', () => {
     async function openTheDialog() {
       const fns = await render()
       const openDialogTrigger = getOpenDialogElt(fns)
@@ -251,5 +250,4 @@ export function itBehavesLikeADialog({
       expect(await waitForNoElement(() => confirmDialogOpen(fns))).toBe(true)
     })
   })
-  /* eslint-enable jest/no-disabled-tests */
 }
