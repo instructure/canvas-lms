@@ -771,9 +771,10 @@ describe UsersController do
           expect(response).to be_ok
         end
 
-        context "when Final Grade Override is enabled" do
+        context "when Final Grade Override is enabled and allowed" do
           before(:once) do
             course.enable_feature!(:final_grades_override)
+            course.update!(allow_final_grade_override: true)
           end
 
           it "sets the grade to the course override score when one exists" do
@@ -786,6 +787,13 @@ describe UsersController do
             get_grades!(all_grading_periods_id)
             expect(grade).to be 94.55
           end
+        end
+
+        it "sets the grade to the computed course score when Final Grade Override is not allowed" do
+          course.enable_feature!(:final_grades_override)
+          course.update!(allow_final_grade_override: false)
+          get_grades!(all_grading_periods_id)
+          expect(grade).to be 94.55
         end
 
         it "sets the grade to the computed course score when Final Grade Override is not enabled" do
@@ -804,9 +812,10 @@ describe UsersController do
           expect(response).to be_ok
         end
 
-        context "when Final Grade Override is enabled" do
+        context "when Final Grade Override is enabled and allowed" do
           before(:once) do
             course.enable_feature!(:final_grades_override)
+            course.update!(allow_final_grade_override: true)
           end
 
           it "sets the grade to the grading period override score when one exists" do
@@ -819,6 +828,13 @@ describe UsersController do
             get_grades!(grading_period.id)
             expect(grade).to be 40.0
           end
+        end
+
+        it "sets the grade to the computed grading period score when Final Grade Override is not allowed" do
+          course.enable_feature!(:final_grades_override)
+          course.update!(allow_final_grade_override: false)
+          get_grades!(grading_period.id)
+          expect(grade).to be 40.0
         end
 
         it "sets the grade to the computed grading period score when Final Grade Override is not enabled" do
@@ -834,6 +850,7 @@ describe UsersController do
 
       it "shows the computed score, even if override scores exist and feature is enabled" do
         course.enable_feature!(:final_grades_override)
+        course.update!(allow_final_grade_override: true)
         user_session(teacher)
         student_enrollment.scores.find_by!(course_score: true).update!(override_score: 89.2)
         get_grades!(grading_period.id)
@@ -936,9 +953,10 @@ describe UsersController do
           expect(response).to be_ok
         end
 
-        context "when Final Grade Override is enabled" do
+        context "when Final Grade Override is enabled and allowed" do
           before(:once) do
             course.enable_feature!(:final_grades_override)
+            course.update!(allow_final_grade_override: true)
           end
 
           it "sets the grade to the course override score when one exists" do
@@ -951,6 +969,12 @@ describe UsersController do
             get_grades!(all_grading_periods_id)
             expect(grade).to be 94.55
           end
+        end
+
+        it "sets the grade to the computed course score when Final Grade Override is not allowed" do
+          course.enable_feature!(:final_grades_override)
+          get_grades!(all_grading_periods_id)
+          expect(grade).to be 94.55
         end
 
         it "sets the grade to the computed course score when Final Grade Override is not enabled" do
@@ -969,9 +993,10 @@ describe UsersController do
           expect(response).to be_ok
         end
 
-        context "when Final Grade Override is enabled" do
+        context "when Final Grade Override is enabled and allowed" do
           before(:once) do
             course.enable_feature!(:final_grades_override)
+            course.update!(allow_final_grade_override: true)
           end
 
           it "sets the grade to the grading period override score when one exists" do
@@ -984,6 +1009,13 @@ describe UsersController do
             get_grades!(grading_period.id)
             expect(grade).to be 40.0
           end
+        end
+
+        it "sets the grade to the computed grading period score when Final Grade Override is not allowed" do
+          course.enable_feature!(:final_grades_override)
+          course.update!(allow_final_grade_override: false)
+          get_grades!(grading_period.id)
+          expect(grade).to be 40.0
         end
 
         it "sets the grade to the computed grading period score when Final Grade Override is not enabled" do
@@ -1073,9 +1105,10 @@ describe UsersController do
           expect(response).to be_ok
         end
 
-        context "when Final Grade Override is enabled" do
+        context "when Final Grade Override is enabled and allowed" do
           before(:once) do
             course_1.enable_feature!(:final_grades_override)
+            course_1.update!(allow_final_grade_override: true)
           end
 
           it "sets the grade to the grading period override score when one exists" do
@@ -1088,6 +1121,13 @@ describe UsersController do
             get_grades!(grading_period_id: grading_period.id)
             expect(grade).to be 40.0
           end
+        end
+
+        it "sets the grade to the computed grading period score when Final Grade Override is not allowed" do
+          course_1.enable_feature!(:final_grades_override)
+          course_1.update!(allow_final_grade_override: false)
+          get_grades!(grading_period_id: grading_period.id)
+          expect(grade).to be 40.0
         end
 
         it "sets the grade to the computed grading period score when Final Grade Override is not enabled" do
@@ -1112,9 +1152,10 @@ describe UsersController do
           expect(response).to be_ok
         end
 
-        context "when Final Grade Override is enabled" do
+        context "when Final Grade Override is enabled and allowed" do
           before(:once) do
             course_1.enable_feature!(:final_grades_override)
+            course_1.update!(allow_final_grade_override: true)
           end
 
           it "sets the grade to the grading period override score when one exists" do
@@ -1127,6 +1168,13 @@ describe UsersController do
             get_grades!
             expect(grade).to be 40.0
           end
+        end
+
+        it "sets the grade to the computed grading period score when Final Grade Override is not allowed" do
+          course_1.enable_feature!(:final_grades_override)
+          course_1.update!(allow_final_grade_override: false)
+          get_grades!
+          expect(grade).to be 40.0
         end
 
         it "sets the grade to the computed grading period score when Final Grade Override is not enabled" do
@@ -1152,9 +1200,10 @@ describe UsersController do
           expect(response).to be_ok
         end
 
-        context "when Final Grade Override is enabled" do
+        context "when Final Grade Override is enabled and allowed" do
           before(:once) do
             course_1.enable_feature!(:final_grades_override)
+            course_1.update!(allow_final_grade_override: true)
           end
 
           it "sets the grade to the course override score when one exists" do
@@ -1167,6 +1216,13 @@ describe UsersController do
             get_grades!
             expect(grade).to be 94.55
           end
+        end
+
+        it "sets the grade to the computed course score when Final Grade Override is not allowed" do
+          course_1.enable_feature!(:final_grades_override)
+          course_1.update!(allow_final_grade_override: false)
+          get_grades!
+          expect(grade).to be 94.55
         end
 
         it "sets the grade to the computed course score when Final Grade Override is not enabled" do
@@ -1209,9 +1265,10 @@ describe UsersController do
           expect(response).to be_ok
         end
 
-        context "when Final Grade Override is enabled" do
+        context "when Final Grade Override is enabled and allowed" do
           before(:once) do
             course_1.enable_feature!(:final_grades_override)
+            course_1.update!(allow_final_grade_override: true)
           end
 
           it "sets the grade to the grading period override score when one exists" do
@@ -1224,6 +1281,13 @@ describe UsersController do
             get_grades!(grading_period_id: grading_period.id)
             expect(grade).to be 40.0
           end
+        end
+
+        it "sets the grade to the computed grading period score when Final Grade Override is not allowed" do
+          course_1.enable_feature!(:final_grades_override)
+          course_1.update!(allow_final_grade_override: false)
+          get_grades!(grading_period_id: grading_period.id)
+          expect(grade).to be 40.0
         end
 
         it "sets the grade to the computed grading period score when Final Grade Override is not enabled" do
@@ -1248,9 +1312,10 @@ describe UsersController do
           expect(response).to be_ok
         end
 
-        context "when Final Grade Override is enabled" do
+        context "when Final Grade Override is enabled and allowed" do
           before(:once) do
             course_1.enable_feature!(:final_grades_override)
+            course_1.update!(allow_final_grade_override: true)
           end
 
           it "sets the grade to the grading period override score when one exists" do
@@ -1263,6 +1328,13 @@ describe UsersController do
             get_grades!
             expect(grade).to be 40.0
           end
+        end
+
+        it "sets the grade to the computed grading period score when Final Grade Override is not allowed" do
+          course_1.enable_feature!(:final_grades_override)
+          course_1.update!(allow_final_grade_override: false)
+          get_grades!
+          expect(grade).to be 40.0
         end
 
         it "sets the grade to the computed grading period score when Final Grade Override is not enabled" do
@@ -1288,9 +1360,10 @@ describe UsersController do
           expect(response).to be_ok
         end
 
-        context "when Final Grade Override is enabled" do
+        context "when Final Grade Override is enabled and allowed" do
           before(:once) do
             course_1.enable_feature!(:final_grades_override)
+            course_1.update!(allow_final_grade_override: true)
           end
 
           it "sets the grade to the course override score when one exists" do
@@ -1303,6 +1376,13 @@ describe UsersController do
             get_grades!
             expect(grade).to be 94.55
           end
+        end
+
+        it "sets the grade to the computed course score when Final Grade Override is not allowed" do
+          course_1.enable_feature!(:final_grades_override)
+          course_1.update!(allow_final_grade_override: false)
+          get_grades!
+          expect(grade).to be 94.55
         end
 
         it "sets the grade to the computed course score when Final Grade Override is not enabled" do

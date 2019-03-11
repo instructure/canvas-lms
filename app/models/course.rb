@@ -1712,6 +1712,7 @@ class Course < ActiveRecord::Base
                 include_final_grade_overrides = Canvas::Plugin.value_to_boolean(
                   grade_export_settings[:include_final_grade_overrides]
                 )
+                include_final_grade_overrides &= course.allow_final_grade_override?
 
                 course.generate_grade_publishing_csv_output(
                   enrollments,
@@ -2317,7 +2318,7 @@ class Course < ActiveRecord::Base
       :public_syllabus_to_auth, :allow_student_wiki_edits, :show_public_context_messages,
       :syllabus_body, :allow_student_forum_attachments, :lock_all_announcements,
       :default_wiki_editing_roles, :allow_student_organized_groups,
-      :default_view, :show_total_grade_as_points,
+      :default_view, :show_total_grade_as_points, :allow_final_grade_override,
       :open_enrollment,
       :storage_quota, :tab_configuration, :allow_wiki_comments,
       :turnitin_comments, :self_enrollment, :license, :indexed, :locale,
@@ -2912,6 +2913,7 @@ class Course < ActiveRecord::Base
   # course import/export :(
   add_setting :hide_final_grade, :alias => :hide_final_grades, :boolean => true
   add_setting :hide_distribution_graphs, :boolean => true
+  add_setting :allow_final_grade_override, boolean: false, default: false
   add_setting :allow_student_discussion_topics, :boolean => true, :default => true
   add_setting :allow_student_discussion_editing, :boolean => true, :default => true
   add_setting :show_total_grade_as_points, :boolean => true, :default => false
@@ -3329,6 +3331,10 @@ class Course < ActiveRecord::Base
 
   def grading_standard_or_default
     default_grading_standard || GradingStandard.default_instance
+  end
+
+  def allow_final_grade_override?
+    feature_enabled?(:final_grades_override) && allow_final_grade_override == "true"
   end
 
   def moderators

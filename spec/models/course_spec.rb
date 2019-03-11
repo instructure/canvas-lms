@@ -225,6 +225,33 @@ describe Course do
     end
   end
 
+  describe "#allow_final_grade_override?" do
+    before :once do
+      @course = Account.default.courses.create!
+      @course.root_account.enable_feature!(:new_gradebook)
+      @course.enable_feature!(:new_gradebook)
+    end
+
+    before :each do
+      @course.enable_feature!(:final_grades_override)
+      @course.allow_final_grade_override = true
+    end
+
+    it "returns true when the feature is enabled and the setting is allowed" do
+      expect(@course.allow_final_grade_override?).to be true
+    end
+
+    it "returns false when the feature is enabled and the setting is not allowed" do
+      @course.allow_final_grade_override = false
+      expect(@course.allow_final_grade_override?).to be false
+    end
+
+    it "returns false when the feature is disabled" do
+      @course.disable_feature!(:final_grades_override)
+      expect(@course.allow_final_grade_override?).to be false
+    end
+  end
+
   describe "#recompute_student_scores" do
     it "should use all student ids except concluded and deleted if none are passed" do
       @course.save!
@@ -2782,6 +2809,7 @@ describe Course, 'grade_publishing' do
         enrollments = [double(), double()]
         publishing_pseudonym = double()
         publishing_user = double()
+        allow(course).to receive(:allow_final_grade_override?).and_return false
         expect(course).to receive(:generate_grade_publishing_csv_output).with(
           enrollments, publishing_user, publishing_pseudonym, include_final_grade_overrides: false
         ).and_return 42
@@ -3279,6 +3307,7 @@ describe Course, 'grade_publishing' do
 
         before(:each) do
           @course.enable_feature!(:final_grades_override)
+          @course.update!(allow_final_grade_override: true)
         end
 
         def csv_output
@@ -3290,9 +3319,17 @@ describe Course, 'grade_publishing' do
           )
         end
 
-        it "does not use the final grade override if final grades override feature is not enabled" do
-          @course.disable_feature!(:final_grades_override)
+        it "does not use the final grade override if final grades override feature is not allowed" do
           @ase[1].scores.find_by(course_score: true).update!(final_score: 0, override_score: 100)
+          @course.update!(allow_final_grade_override: false)
+          expect(csv_output[0][1]).to include(
+            "#{@user.id},U1,#{@course.id},,#{@ase[1].course_section_id},,#{@ase[1].user.id},,#{@ase[1].id},active,0.0,F\n"
+          )
+        end
+
+        it "does not use the final grade override if final grades override feature is not enabled" do
+          @ase[1].scores.find_by(course_score: true).update!(final_score: 0, override_score: 100)
+          @course.disable_feature!(:final_grades_override)
           expect(csv_output[0][1]).to include(
             "#{@user.id},U1,#{@course.id},,#{@ase[1].course_section_id},,#{@ase[1].user.id},,#{@ase[1].id},active,0.0,F\n"
           )

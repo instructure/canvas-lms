@@ -183,6 +183,48 @@ RSpec.describe GradebookSettingsController, type: :controller do
           expect(colors).not_to have_key "missing"
         end
       end
+
+      describe "allow_final_grade_override" do
+        context "when Final Grade Override is enabled" do
+          before :each do
+            @course.enable_feature!(:final_grades_override)
+          end
+
+          it "optionally updates the course to allow final grade override" do
+            gradebook_settings["show_final_grade_overrides"] = "true"
+            put :update, params: valid_params
+            expect(@course.reload.allow_final_grade_override?).to be(true)
+          end
+
+          it "optionally updates the course to disallow final grade override" do
+            @course.update!(allow_final_grade_override: true)
+            gradebook_settings["show_final_grade_overrides"] = "false"
+            put :update, params: valid_params
+            expect(@course.reload.allow_final_grade_override?).to be(false)
+          end
+
+          it "does not allow final grade override when not specified in the request" do
+            gradebook_settings.delete("show_final_grade_overrides")
+            put :update, params: valid_params
+            expect(@course.reload.allow_final_grade_override?).to be(false)
+          end
+
+          it "does not disallow final grade override when not specified in the request" do
+            gradebook_settings.delete("show_final_grade_overrides")
+            @course.update!(allow_final_grade_override: true)
+            put :update, params: valid_params
+            expect(@course.reload.allow_final_grade_override?).to be(true)
+          end
+        end
+
+        context "when Final Grade Override is disabled" do
+          it "does not allow final grade override" do
+            gradebook_settings["show_final_grade_overrides"] = "true"
+            put :update, params: valid_params
+            expect(@course.reload.allow_final_grade_override?).to be(false)
+          end
+        end
+      end
     end
 
     context "given invalid params" do

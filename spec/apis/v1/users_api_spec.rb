@@ -367,134 +367,234 @@ describe Api::V1::User do
   end
 
   describe "enrollment_json" do
-    let_once(:course) { Course.create! }
+    let(:course) { Course.create! }
+    let(:student_enrollment) { course_with_user("StudentEnrollment", course: course, active_all: true) }
+    let(:student) { student_enrollment.user }
+
+    before(:each) do
+      course.enable_feature!(:final_grades_override)
+      course.update!(allow_final_grade_override: true, grading_standard_enabled: true)
+      @course_score = student_enrollment.scores.create!(course_score: true, current_score: 63, final_score: 73, override_score: 99)
+    end
 
     context "when user is the student" do
-      let_once(:student_enrollment) { course_with_user("StudentEnrollment", course: course, active_all: true) }
-      let_once(:student) { student_enrollment.user }
       let(:grades) { @test_api.enrollment_json(student_enrollment, student, nil).fetch("grades") }
 
-      before(:once) do
-        @course_score = student_enrollment.scores.create!(course_score: true, current_score: 63, final_score: 73)
-        course.update!(grading_standard_enabled: true)
-        course.enable_feature!(:final_grades_override)
+      context "when Final Grade Override is enabled and allowed" do
+        context "when a grade override exists" do
+          it "sets the current_grade to the override grade" do
+            expect(grades.fetch("current_grade")).to eq "A"
+          end
+
+          it "sets the current_score to the override score" do
+            expect(grades.fetch("current_score")).to be 99.0
+          end
+
+          it "sets the final_grade to the override grade" do
+            expect(grades.fetch("final_grade")).to eq "A"
+          end
+
+          it "sets the final_score to the override score" do
+            expect(grades.fetch("final_score")).to be 99.0
+          end
+
+          it "does not include an override_grade key" do
+            expect(grades).not_to have_key :override_grade
+          end
+
+          it "does not include an override_score key" do
+            expect(grades).not_to have_key :override_score
+          end
+        end
+
+        context "when no grade override exists" do
+          before(:each) do
+            @course_score.update!(override_score: nil)
+          end
+
+          it "sets the current_grade to the computed current grade" do
+            expect(grades.fetch("current_grade")).to eq "D-"
+          end
+
+          it "sets the current_score to the computed current score" do
+            expect(grades.fetch("current_score")).to be 63.0
+          end
+
+          it "sets the final_grade to the computed final grade" do
+            expect(grades.fetch("final_grade")).to eq "C-"
+          end
+
+          it "sets the final_score to the computed final score" do
+            expect(grades.fetch("final_score")).to be 73.0
+          end
+        end
       end
 
-      it "returns the current grade" do
-        expect(grades.fetch("current_grade")).to eq "D-"
+      context "when Final Grade Override is not allowed" do
+        before(:each) do
+          course.update!(allow_final_grade_override: false)
+        end
+
+        it "sets the current_grade to the computed current grade" do
+          expect(grades.fetch("current_grade")).to eq "D-"
+        end
+
+        it "sets the current_score to the computed current score" do
+          expect(grades.fetch("current_score")).to be 63.0
+        end
+
+        it "sets the final_grade to the computed final grade" do
+          expect(grades.fetch("final_grade")).to eq "C-"
+        end
+
+        it "sets the final_score to the computed final score" do
+          expect(grades.fetch("final_score")).to be 73.0
+        end
       end
 
-      it "returns the current score" do
-        expect(grades.fetch("current_score")).to be 63.0
-      end
+      context "when Final Grade Override is disabled" do
+        before(:each) do
+          course.disable_feature!(:final_grades_override)
+        end
 
-      it "returns the final grade" do
-        expect(grades.fetch("final_grade")).to eq "C-"
-      end
+        it "sets the current_grade to the computed current grade" do
+          expect(grades.fetch("current_grade")).to eq "D-"
+        end
 
-      it "returns the final score" do
-        expect(grades.fetch("final_score")).to be 73.0
-      end
+        it "sets the current_score to the computed current score" do
+          expect(grades.fetch("current_score")).to be 63.0
+        end
 
-      it "returns the override grade in place of current grade if present and feature enabled" do
-        @course_score.update!(override_score: 99.0)
-        expect(grades.fetch("current_grade")).to eq "A"
-      end
+        it "sets the final_grade to the computed final grade" do
+          expect(grades.fetch("final_grade")).to eq "C-"
+        end
 
-      it "returns the override score in place of current score if present and feature enabled" do
-        @course_score.update!(override_score: 99.0)
-        expect(grades.fetch("current_score")).to be 99.0
-      end
-
-      it "returns the override grade in place of final grade if present and feature enabled" do
-        @course_score.update!(override_score: 99.0)
-        expect(grades.fetch("final_grade")).to eq "A"
-      end
-
-      it "returns the override score in place of final score if present and feature enabled" do
-        @course_score.update!(override_score: 99.0)
-        expect(grades.fetch("final_score")).to be 99.0
-      end
-
-      it "does not return an override_grade key" do
-        @course_score.update!(override_score: 99.0)
-        expect(grades.keys).not_to include :override_grade
-      end
-
-      it "does not return an override_score key" do
-        @course_score.update!(override_score: 99.0)
-        expect(grades.keys).not_to include :override_score
+        it "sets the final_score to the computed final score" do
+          expect(grades.fetch("final_score")).to be 73.0
+        end
       end
     end
 
     context "when user is a teacher" do
-      let_once(:student_enrollment) { course_with_user("StudentEnrollment", course: course, active_all: true) }
-      let_once(:student) { student_enrollment.user }
-      let_once(:teacher) { course_with_user("TeacherEnrollment", course: course, active_all: true).user }
+      let(:teacher) { course_with_user("TeacherEnrollment", course: course, active_all: true).user }
       let(:grades) { @test_api.enrollment_json(student_enrollment, teacher, nil).fetch("grades") }
 
-      before(:once) do
-        @course_score = student_enrollment.scores.create!(course_score: true, current_score: 63, final_score: 73)
-        course.update!(grading_standard_enabled: true)
-        course.enable_feature!(:final_grades_override)
+      context "when Final Grade Override is enabled and allowed" do
+        context "when a grade override exists" do
+          it "sets the current_grade to the computed current grade" do
+            expect(grades.fetch("current_grade")).to eq "D-"
+          end
+
+          it "sets the current_score to the computed current score" do
+            expect(grades.fetch("current_score")).to be 63.0
+          end
+
+          it "sets the final_grade to the computed final grade" do
+            expect(grades.fetch("final_grade")).to eq "C-"
+          end
+
+          it "sets the final_score to the computed final score" do
+            expect(grades.fetch("final_score")).to be 73.0
+          end
+
+          it "sets the override_grade to the override grade" do
+            expect(grades.fetch("override_grade")).to eq "A"
+          end
+
+          it "sets the override_score to the override score" do
+            expect(grades.fetch("override_score")).to be 99.0
+          end
+        end
+
+        context "when no grade override exists" do
+          before(:each) do
+            @course_score.update!(override_score: nil)
+          end
+
+          it "sets the current_grade to the computed current grade" do
+            expect(grades.fetch("current_grade")).to eq "D-"
+          end
+
+          it "sets the current_score to the computed current score" do
+            expect(grades.fetch("current_score")).to be 63.0
+          end
+
+          it "sets the final_grade to the computed final grade" do
+            expect(grades.fetch("final_grade")).to eq "C-"
+          end
+
+          it "sets the final_score to the computed final score" do
+            expect(grades.fetch("final_score")).to be 73.0
+          end
+
+          it "does not include an override_grade key" do
+            expect(grades).not_to have_key :override_grade
+          end
+
+          it "does not include an override_score key" do
+            expect(grades).not_to have_key :override_score
+          end
+        end
       end
 
-      it "returns the current grade" do
-        expect(grades.fetch("current_grade")).to eq "D-"
+      context "when Final Grade Override is not allowed" do
+        before(:each) do
+          course.update!(allow_final_grade_override: false)
+        end
+
+        it "sets the current_grade to the computed current grade" do
+          expect(grades.fetch("current_grade")).to eq "D-"
+        end
+
+        it "sets the current_score to the computed current score" do
+          expect(grades.fetch("current_score")).to be 63.0
+        end
+
+        it "sets the final_grade to the computed final grade" do
+          expect(grades.fetch("final_grade")).to eq "C-"
+        end
+
+        it "sets the final_score to the computed final score" do
+          expect(grades.fetch("final_score")).to be 73.0
+        end
+
+        it "does not include an override_grade key" do
+          expect(grades).not_to have_key :override_grade
+        end
+
+        it "does not include an override_score key" do
+          expect(grades).not_to have_key :override_score
+        end
       end
 
-      it "returns the current score" do
-        expect(grades.fetch("current_score")).to be 63.0
-      end
+      context "when Final Grade Override is disabled" do
+        before(:each) do
+          course.disable_feature!(:final_grades_override)
+        end
 
-      it "returns the final grade" do
-        expect(grades.fetch("final_grade")).to eq "C-"
-      end
+        it "sets the current_grade to the computed current grade" do
+          expect(grades.fetch("current_grade")).to eq "D-"
+        end
 
-      it "returns the final score" do
-        expect(grades.fetch("final_score")).to be 73.0
-      end
+        it "sets the current_score to the computed current score" do
+          expect(grades.fetch("current_score")).to be 63.0
+        end
 
-      it "returns the course current grade, even if override is present and feature enabled" do
-        @course_score.update!(override_score: 99.0)
-        expect(grades.fetch("current_grade")).to eq "D-"
-      end
+        it "sets the final_grade to the computed final grade" do
+          expect(grades.fetch("final_grade")).to eq "C-"
+        end
 
-      it "returns the course current score, even if override is present and feature enabled" do
-        @course_score.update!(override_score: 99.0)
-        expect(grades.fetch("current_score")).to be 63.0
-      end
+        it "sets the final_score to the computed final score" do
+          expect(grades.fetch("final_score")).to be 73.0
+        end
 
-      it "returns the course final grade, even if override is present and feature enabled" do
-        @course_score.update!(override_score: 99.0)
-        expect(grades.fetch("final_grade")).to eq "C-"
-      end
+        it "does not include an override_grade key" do
+          expect(grades).not_to have_key :override_grade
+        end
 
-      it "returns the course final score, even if override is present and feature enabled" do
-        @course_score.update!(override_score: 99.0)
-        expect(grades.fetch("final_score")).to be 73.0
-      end
-
-      it "returns the override grade if present and feature enabled" do
-        @course_score.update!(override_score: 99.0)
-        expect(grades.fetch("override_grade")).to eq "A"
-      end
-
-      it "returns the override score if present and feature enabled" do
-        @course_score.update!(override_score: 99.0)
-        expect(grades.fetch("override_score")).to be 99.0
-      end
-
-      it "does not return the override grade if feature disabled" do
-        course.disable_feature!(:final_grades_override)
-        @course_score.update!(override_score: 99.0)
-        expect(grades.keys).not_to include "override_grade"
-      end
-
-      it "does not return the override score if feature disabled" do
-        course.disable_feature!(:final_grades_override)
-        @course_score.update!(override_score: 99.0)
-        expect(grades.keys).not_to include "override_score"
+        it "does not include an override_score key" do
+          expect(grades).not_to have_key :override_score
+        end
       end
     end
   end

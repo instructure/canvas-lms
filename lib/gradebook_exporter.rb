@@ -390,6 +390,6 @@ class GradebookExporter
   end
 
   def include_final_grade_override?
-    @course.feature_enabled?(:final_grades_override)
+    @course.allow_final_grade_override?
   end
 end
