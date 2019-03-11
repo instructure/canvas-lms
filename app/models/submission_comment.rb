@@ -50,7 +50,7 @@ class SubmissionComment < ActiveRecord::Base
   validates_each :attempt do |record, attr, value|
     next if value.nil?
     if record.submission.attempt.nil? || value > record.submission.attempt
-      record.errors.add(attr, 'attempt must not be larger then number of submission attempts')
+      record.errors.add(attr, 'attempt must not be larger than number of submission attempts')
     end
   end
 

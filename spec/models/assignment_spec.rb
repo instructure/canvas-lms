@@ -5917,6 +5917,76 @@ describe Assignment do
     end
   end
 
+  describe '#add_submission_comment' do
+    let(:assignment) { assignment_model(course: @course) }
+
+    it 'raises an error if original_student is nil' do
+      expect {
+        assignment.add_submission_comment(nil)
+      }.to raise_error 'Student Required'
+    end
+
+    context 'when the student is not in a group' do
+      let!(:associate_student_and_submission) {
+        assignment.submissions.find_by user: @student
+      }
+      let(:update_submission_response) {
+        assignment.add_submission_comment(@student, comment: 'WAT?')
+      }
+
+      it 'returns an Array' do
+        expect(update_submission_response.class).to eq Array
+      end
+
+      it 'returns a collection of submission comments' do
+        expect(update_submission_response.first.class).to eq SubmissionComment
+      end
+    end
+
+    context 'when the student is in a group' do
+      let!(:create_a_group_with_a_submitted_assignment) {
+        setup_assignment_with_group
+        @assignment.submit_homework(
+          @u1,
+          submission_type: 'online_text_entry',
+          body: 'Some text for you'
+        )
+      }
+
+      context 'when a comment is submitted' do
+        let(:update_assignment_with_comment) {
+          @assignment.add_submission_comment(
+            @u2,
+            comment: 'WAT?',
+            group_comment: true,
+            user_id: @course.teachers.first.id
+          )
+        }
+
+        it 'returns an Array' do
+          expect(update_assignment_with_comment).to be_an_instance_of Array
+        end
+
+        it 'creates a comment for each student in the group' do
+          expect {
+            update_assignment_with_comment
+          }.to change{ SubmissionComment.count }.by(@u1.groups.first.users.count)
+        end
+
+        it 'creates comments with the same group_comment_id' do
+          comments = update_assignment_with_comment
+          expect(comments.first.group_comment_id).to eq comments.last.group_comment_id
+        end
+      end
+
+      context 'when a comment is not submitted' do
+        it 'returns an Array' do
+          expect(@assignment.add_submission_comment(@u2).class).to eq Array
+        end
+      end
+    end
+  end
+
   describe "#update_submission" do
     let(:assignment) { assignment_model(course: @course) }
 

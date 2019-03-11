@@ -53,4 +53,5 @@ class Types::MutationType < Types::ApplicationObjectType
     existing assignment post policies.
   DESC
   field :update_assignment, mutation: Mutations::UpdateAssignment
+  field :create_submission_comment, mutation: Mutations::CreateSubmissionComment
 end

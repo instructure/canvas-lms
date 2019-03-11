@@ -55,6 +55,11 @@ module Types
     end
     private :protect_submission_grades
 
+    field :attempt, Integer, null: false
+    def attempt
+      submission.attempt || 0 # Nil in database, make it 0 here for easier api
+    end
+
     field :comments_connection, SubmissionCommentType.connection_type, null: true do
       argument :filter, Types::SubmissionCommentFilterInputType, required: false
     end

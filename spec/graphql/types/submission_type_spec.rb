@@ -116,6 +116,18 @@ describe Types::SubmissionType do
     end
   end
 
+  describe '#attempt' do
+    it 'should show the attempt' do
+      @submission.update_column(:attempt, 1) # bypass infer_values callback
+      expect(submission_type.resolve('attempt')).to eq 1
+    end
+
+    it 'should translate nil in the database to 0 in graphql' do
+      @submission.update_column(:attempt, nil) # bypass infer_values callback
+      expect(submission_type.resolve('attempt')).to eq 0
+    end
+  end
+
   describe "submission comments" do
     before(:once) do
       student_in_course(active_all: true)
