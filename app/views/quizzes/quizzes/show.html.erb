@@ -60,9 +60,6 @@
                 </a>
               </li>
             <% end %>
-
-            <%= render :partial => 'download_file_upload_submissions' %>
-
           <% end %>
         <% elsif can_do(@quiz, @current_user, :review_grades) %>
           <% if @submitted_student_count && @submitted_student_count > 0 %>
@@ -79,6 +76,10 @@
               <i class="icon-quiz"><span class="screenreader-only"><%= see_full_quiz_title %></span></i> <%= see_full_quiz_title %>
             </a>
           </li>
+        <% end %>
+
+        <% if can_do(@quiz, @current_user, :grade) %>
+          <%= render :partial => 'download_file_upload_submissions' %>
         <% end %>
 
         <% if (can_do(@quiz, @current_user, :grade) || can_do(@quiz, @current_user, :review_grades)) && @quiz.available? &&
