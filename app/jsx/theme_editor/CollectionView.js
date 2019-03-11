@@ -197,10 +197,13 @@ export default class CollectionView extends React.Component {
                 </li>
                 {['globalThemes', 'accountSpecificThemes'].map(collection =>
                   _.map(thingsToShow[collection], sharedConfig => (
-                    <li>
+                    <li key={sharedConfig.brand_config.md5}>
                       <a
                         role="button"
                         href="javascript:;"
+                        aria-label={I18n.t('Create theme based on %{name}', {
+                          name: sharedConfig.name
+                        })}
                         onClick={() =>
                           this.startEditing({md5ToActivate: sharedConfig.brand_config.md5})
                         }
