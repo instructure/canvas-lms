@@ -17,6 +17,14 @@
 
 module DataFixup::MigrateMessagesToPartitions
   def self.run
+    weeks_to_keep = Setting.get("messages_partitions_keep_weeks", 52).to_i
+    min_date_threshold = Time.now.utc.beginning_of_week - weeks_to_keep.weeks
+
+    # remove all messages that would be inserted into a dropped partition
+    while Message.from("ONLY #{Message.quoted_table_name}").
+      where("created_at < ?", min_date_threshold).limit(1000).delete_all > 0
+    end
+
     partman = CanvasPartman::PartitionManager.create(Message)
 
     partman.migrate_data_to_partitions
