@@ -433,7 +433,8 @@ class UserMerge
       # user_id to the negative user_id and then the user_id, after the
       # conflicting rows have been updated.
       model.connection.execute("SET CONSTRAINTS #{model.connection.quote_table_name(fk)} DEFERRED")
-      model.where(id: move_back).update_all(user_id: -from_user.id)
+      # If the users are on different shards we don't need to dance with the ids
+      model.where(id: move_back).update_all(user_id: -from_user.id) if target_user.shard == from_user.shard
       model.where(id: to_move_ids).update_all(user_id: target_user.id)
       model.where(id: move_back).update_all(user_id: from_user.id)
       update_versions(from_user, target_user, model.where(id: to_move), table, :user_id)
