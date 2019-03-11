@@ -35,13 +35,7 @@ Mime::Type.register 'application/vnd.openxmlformats-officedocument.presentationm
 Mime::Type.register 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', :xlsx
 Mime::Type.register_alias 'text/html', :fbml unless defined? Mime::FBML
 
-# Add new mime type for working with files via the mime-types gem.
-MIME::Types['application/epub+zip'].each do |mime_type|
-  mime_type.url = 'http://www.iana.org/assignments/media-types/application/epub+zip'
-end
-
 # Custom LTI Advantage MIME types
 standard_json_parser = lambda { |body| JSON.parse(body) }
 ActionDispatch::Request.parameter_parsers[:lineitem] = standard_json_parser
 ActionDispatch::Request.parameter_parsers[:score] = standard_json_parser
-

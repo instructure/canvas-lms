@@ -43,7 +43,7 @@ import splitAssetString from 'compiled/str/splitAssetString'
       }
       return (
         <div>
-          <h3 className="ic-Action-header__Heading">{header}</h3>
+          <h2 className="ic-Action-header__Heading">{header}</h2>
           <p>
             {content}
           </p>

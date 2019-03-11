@@ -26,7 +26,9 @@ import {
   REMOVE_DOMAIN,
   REMOVE_DOMAIN_OPTIMISTIC,
   SET_CSP_INHERITED,
-  SET_CSP_INHERITED_OPTIMISTIC
+  SET_CSP_INHERITED_OPTIMISTIC,
+  SET_DIRTY,
+  COPY_INHERITED_SUCCESS
 } from './actions'
 
 export function cspEnabled(state = false, action) {
@@ -49,7 +51,24 @@ export function cspInherited(state = false, action) {
   }
 }
 
-export function whitelistedDomains(state = {account: [], effective: [], tools: {}}, action) {
+export function isDirty(state = false, action) {
+  switch (action.type) {
+    case SET_DIRTY:
+      return action.payload
+    default:
+      return state
+  }
+}
+
+function getInheritedList(toolsWhiteList, effectiveWhitelist) {
+  const toolsKeys = Object.keys(toolsWhiteList)
+  return effectiveWhitelist.filter(domain => !toolsKeys.includes(domain))
+}
+
+export function whitelistedDomains(
+  state = {account: [], effective: [], inherited: [], tools: {}},
+  action
+) {
   switch (action.type) {
     case ADD_DOMAIN:
     case ADD_DOMAIN_OPTIMISTIC: {
@@ -69,11 +88,14 @@ export function whitelistedDomains(state = {account: [], effective: [], tools: {
             newState[domainType][x] = action.payload[domainType][x]
           })
         } else {
-          const uniqueDomains = new Set(state[domainType])
+          const uniqueDomains = action.reset ? new Set() : new Set(state[domainType])
           action.payload[domainType].forEach(x => uniqueDomains.add(x))
           newState[domainType] = Array.from(uniqueDomains)
         }
       })
+      if (newState.tools && newState.effective) {
+        newState.inherited = getInheritedList(newState.tools, newState.effective)
+      }
       return newState
     }
     case REMOVE_DOMAIN:
@@ -82,6 +104,21 @@ export function whitelistedDomains(state = {account: [], effective: [], tools: {
       newState.account = newState.account.filter(domain => domain !== action.payload)
       return newState
     }
+    case SET_CSP_INHERITED:
+    case SET_CSP_INHERITED_OPTIMISTIC: {
+      const newState = {...state}
+      if (!newState.account.length) {
+        newState.account = newState.inherited
+      }
+      return newState
+    }
+
+    case COPY_INHERITED_SUCCESS: {
+      const newState = {...state}
+      newState.account = action.payload
+      return newState
+    }
+
     default:
       return state
   }
@@ -90,5 +127,6 @@ export function whitelistedDomains(state = {account: [], effective: [], tools: {
 export default combineReducers({
   cspEnabled,
   cspInherited,
+  isDirty,
   whitelistedDomains
 })

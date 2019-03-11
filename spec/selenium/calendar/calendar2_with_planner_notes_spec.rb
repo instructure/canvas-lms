@@ -23,9 +23,6 @@ describe "calendar2" do
   include Calendar2Common
 
   before(:once) do
-    # or some stuff we need to click is "below the fold"
-    make_full_screen
-
     Account.default.enable_feature!(:student_planner)
     course_with_teacher(active_all: true, new_user: true)
     @student1 = User.create!(name: 'Student 1')
@@ -34,6 +31,9 @@ describe "calendar2" do
 
   context "as the student" do
     before :each do
+      # or some stuff we need to click is "below the fold"
+      make_full_screen
+
       user_session(@student1)
     end
 
@@ -152,6 +152,9 @@ describe "calendar2" do
 
   context "as the teacher" do
     before :each do
+      # or some stuff we need to click is "below the fold"
+      make_full_screen
+
       user_session(@teacher)
     end
 
@@ -221,6 +224,9 @@ describe "calendar2" do
     end
 
     before :each do
+      # or some stuff we need to click is "below the fold"
+      make_full_screen
+
       user_session(@user)
     end
 

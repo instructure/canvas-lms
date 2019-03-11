@@ -18,11 +18,12 @@
 
 module Types
   # TODO: move this into SubmissionFilterInputType when 1.8 lands
-  DEFAULT_SUBMISSION_STATES = %w[submitted pending_review graded]
+  DEFAULT_SUBMISSION_STATES = %w[submitted pending_review graded].freeze
 
-  SubmissionFilterInputType = GraphQL::InputObjectType.define do
-    name "SubmissionFilter"
+  class SubmissionFilterInputType < Types::BaseInputObject
+    graphql_name "SubmissionFilterInput"
 
-    argument :states, types[!SubmissionStateType], default_value: DEFAULT_SUBMISSION_STATES
+    argument :states, [SubmissionStateType], required: false, default_value: DEFAULT_SUBMISSION_STATES
+    argument :section_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Section")
   end
 end

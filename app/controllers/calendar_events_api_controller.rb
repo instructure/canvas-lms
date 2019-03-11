@@ -555,7 +555,7 @@ class CalendarEventsApiController < ApplicationController
   def participants
     get_event
     if authorized_action(@event, @current_user, :read_child_events)
-      participants = Api.paginate(@event.child_event_participants.order(:id), self, api_v1_calendar_event_participants_url)
+      participants = Api.paginate( @event.child_event_participants_scope.order(:id), self, api_v1_calendar_event_participants_url)
       json = participants.map do |user|
         user_display_json(user)
       end
@@ -1204,7 +1204,7 @@ class CalendarEventsApiController < ApplicationController
 
       if courses_user_has_been_enrolled_in[:student].include?(assignment.context_id)
         assignment = assignment.overridden_for(user)
-        assignment.infer_all_day
+        assignment.infer_all_day(Time.zone)
         assignments << assignment
       else
         dates_list = assignment.all_dates_visible_to(user,

@@ -64,10 +64,9 @@ describe AuthenticationProvidersPresenter do
         expect(presenter.saml_identifiers).to be_empty
       end
 
-      it "is the list from Onelogin::Saml::NameIdentifiers" do
+      it "is the list from the SAML2 gem" do
         allow(AuthenticationProvider::SAML).to receive(:enabled?).and_return(true)
-        expected = Onelogin::Saml::NameIdentifiers::ALL_IDENTIFIERS
-        expect(presenter.saml_identifiers).to eq(expected)
+        expect(presenter.saml_identifiers).to eq(AuthenticationProvider::SAML.name_id_formats)
       end
     end
 
@@ -83,14 +82,7 @@ describe AuthenticationProvidersPresenter do
           allow(AuthenticationProvider::SAML).to receive(:enabled?).and_return(true)
         end
 
-        it "has each value from Onelogin" do
-          contexts = presenter.saml_authn_contexts
-          Onelogin::Saml::AuthnContexts::ALL_CONTEXTS.each do |context|
-            expect(contexts).to include(context)
-          end
-        end
-
-        it "sorts OneLogin values" do
+        it "sorts the gem values" do
           contexts = presenter.saml_authn_contexts(['abc', 'xyz', 'bcd'])
           expect(contexts.index('bcd') < contexts.index('xyz')).to be(true)
         end

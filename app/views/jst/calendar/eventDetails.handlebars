@@ -50,9 +50,9 @@
         </tr>
       {{/if}}
       {{#unless isPlannerNote}}
-          {{#if reservations}}
             <tr id='reservations'>
-              <th scope="row">{{#t "attendees"}}Attendees{{/t}}</th>
+              {{#if reservations}}
+              <th id='attendees_header_text' scope="row">{{#t "attendees"}}Attendees{{/t}}</th>
               <td>
                 {{#if can_edit}}
                   <ul id="attendees">
@@ -74,8 +74,8 @@
                   </ul>
                 {{/if}}
               </td>
+              {{/if}}
             </tr>
-          {{/if}}
       {{/unless}}
       {{#if availableSlotsText}}
         <tr>

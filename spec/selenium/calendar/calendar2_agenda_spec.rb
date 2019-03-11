@@ -22,12 +22,10 @@ describe "calendar2" do
   include_context "in-process server selenium tests"
   include Calendar2Common
 
-  before(:once) do
+  before(:each) do
     # or some stuff we need to click is "below the fold"
     make_full_screen
-  end
 
-  before(:each) do
     Account.default.tap do |a|
       a.settings[:show_scheduler] = true
       a.save!
@@ -57,7 +55,7 @@ describe "calendar2" do
         expect(all_agenda_items.length).to eq 1
       end
 
-      it "should display agenda events" do
+      it "should display agenda events", :xbrowser do
         load_agenda_view
         expect(fj('.agenda-wrapper:visible')).to be_present
       end
@@ -354,6 +352,11 @@ describe "calendar2" do
       # click on the event and rxpect there not to be a delete button
       agenda_item.click
       expect(f("#content")).not_to contain_css('.event-details .delete_event_link')
+    end
+
+    it "should display agenda events", :xbrowser do
+      load_agenda_view
+      expect(fj('.agenda-wrapper:visible')).to be_present
     end
   end
 

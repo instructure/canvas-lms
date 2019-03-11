@@ -402,14 +402,8 @@ describe Api::V1::User do
       end
 
       it "returns the override score in place of current score if present and feature enabled" do
-        course.update!(grading_standard_enabled: false)
         @course_score.update!(override_score: 99.0)
         expect(grades.fetch("current_score")).to be 99.0
-      end
-
-      it "returns the lower bound of override in place of current if present, feature enabled, and standards exist" do
-        @course_score.update!(override_score: 99.0)
-        expect(grades.fetch("current_score")).to be 94.0
       end
 
       it "returns the override grade in place of final grade if present and feature enabled" do
@@ -418,14 +412,8 @@ describe Api::V1::User do
       end
 
       it "returns the override score in place of final score if present and feature enabled" do
-        course.update!(grading_standard_enabled: false)
         @course_score.update!(override_score: 99.0)
         expect(grades.fetch("final_score")).to be 99.0
-      end
-
-      it "returns the lower bound of override in place of final if present, feature enabled, and standards exist" do
-        @course_score.update!(override_score: 99.0)
-        expect(grades.fetch("final_score")).to be 94.0
       end
 
       it "does not return an override_grade key" do
@@ -1491,6 +1479,30 @@ describe "Users API", type: :request do
         expect(user.profile.reload.title).to eq another_title
       end
 
+      it "should be able to update a user's profile with email" do
+        Account.default.tap{|a| a.settings[:enable_profiles] = true; a.save!}
+        new_title = "Burninator"
+        new_bio = "burninating the countryside"
+        email = 'dudd@example.com'
+        json = api_call(:put, @path, @path_options, {
+          :user => {title: new_title, bio: new_bio, email: email}
+        })
+        expect(json['title']).to eq new_title
+        expect(json['bio']).to eq new_bio
+        expect(json['email']).to eq email
+        user = User.find(json['id'])
+        expect(user.profile.title).to eq new_title
+        expect(user.profile.bio).to eq new_bio
+
+        another_title = 'another title'
+        another_bio = 'another bio'
+        another_email = 'duddett@example.com'
+        json = api_call(:put, @path, @path_options, {
+          :user => {title: another_title, bio: another_bio, email: another_email}
+        })
+        expect(user.profile.reload.title).to eq another_title
+      end
+
       it "should catch invalid dates" do
         birthday = Time.now
         json = api_call(:put, @path, @path_options, {
@@ -2273,9 +2285,7 @@ describe "Users API", type: :request do
     before :once do
       course_with_student(active_all: true)
       @observer = user_factory(active_all: true, active_state: 'active')
-      @observer.as_observer_observation_links.create do |uo|
-        uo.user_id = @student.id
-      end
+      add_linked_observer(@student, @observer)
       @user = @observer
       due_date = 2.days.ago
       2.times do

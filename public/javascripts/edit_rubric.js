@@ -1177,17 +1177,21 @@ import 'compiled/jquery/fixDialogButtons'
       }
     });
     $("#edit_rubric_form .hide_points_checkbox").change(function() {
-      const checked = $(this).attr('checked');
-      if (checked) {
-        $(this).parents(".rubric").find(".grading_rubric_checkbox").attr('checked', false);
-        $(this).parents(".rubric").find(".grading_rubric_checkbox").triggerHandler('change');
+      if ($(this).is(":visible")) {
+        const checked = $(this).attr('checked');
+        if (checked) {
+          $(this).parents(".rubric").find(".grading_rubric_checkbox").attr('checked', false);
+          $(this).parents(".rubric").find(".grading_rubric_checkbox").triggerHandler('change');
+        }
+        $(this).parents(".rubric").find(".rubric_grading").css('display', checked ? 'none' : '');
+        $(this).parents(".rubric").find(".totalling_rubric").css('display', checked ? 'none' : '');
       }
-      $(this).parents(".rubric").find(".rubric_grading").css('display', checked ? 'none' : '');
-      $(this).parents(".rubric").find(".totalling_rubric").css('display', checked ? 'none' : '');
     });
     $("#edit_rubric_form .grading_rubric_checkbox").change(function() {
-      $(this).parents(".rubric").find(".totalling_rubric").css('visibility', $(this).attr('checked') ? 'hidden' : 'visible');
-      $(this).parents(".rubric").find(".totalling_rubric_checkbox").attr('checked', false);
+      if ($(this).is(":visible")) {
+        $(this).parents(".rubric").find(".totalling_rubric").css('visibility', $(this).attr('checked') ? 'hidden' : 'visible');
+        $(this).parents(".rubric").find(".totalling_rubric_checkbox").attr('checked', false);
+      }
     }).triggerHandler('change');
     $('.criterion_use_range').change(function () {
       const checked = $(this).attr('checked')

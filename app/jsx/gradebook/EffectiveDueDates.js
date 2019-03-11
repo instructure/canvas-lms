@@ -53,6 +53,6 @@ export function updateWithSubmissions(effectiveDueDates, submissions, gradingPer
       in_closed_grading_period: gradingPeriod ? gradingPeriod.isClosed : false
     }
 
-    effectiveDueDates[submission.assignment_id] = assignmentDueDates // eslint-disable-line no-param-reassign
+    effectiveDueDates[submission.assignment_id] = assignmentDueDates
   })
 }

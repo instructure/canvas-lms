@@ -27,93 +27,96 @@ import SpeedgraderHelpers, {
 } from 'speed_grader_helpers'
 import $ from 'jquery'
 
-QUnit.module('SpeedGrader', {
-  setup() {
-    const fixtures = document.getElementById('fixtures')
-    fixtures.innerHTML = `
+QUnit.module('SpeedGrader', hooks => {
+  let $container
+
+  hooks.beforeEach(() => {
+    $container = document.body.appendChild(document.createElement('div'))
+    $container.innerHTML = `
       <a id="assignment_submission_default_url" href="http://www.default.com"></a>
       <a id="assignment_submission_originality_report_url" href="http://www.report.com"></a>
-      `
-  },
-  teardown() {
-    fixtures.innerHTML = ''
-  }
-})
+    `
+  })
 
-test('setupIsAnonymous is available on main object', () => {
-  strictEqual(SpeedgraderHelpers.setupIsAnonymous, setupIsAnonymous)
-})
+  hooks.afterEach(() => {
+    $container.remove()
+  })
 
-test('setupAnonymizableId is available on main object', () => {
-  strictEqual(SpeedgraderHelpers.setupAnonymizableId, setupAnonymizableId)
-})
+  test('setupIsAnonymous is available on main object', () => {
+    strictEqual(SpeedgraderHelpers.setupIsAnonymous, setupIsAnonymous)
+  })
 
-test('setupAnonymizableUserId is available on main object', () => {
-  strictEqual(SpeedgraderHelpers.setupAnonymizableUserId, setupAnonymizableUserId)
-})
+  test('setupAnonymizableId is available on main object', () => {
+    strictEqual(SpeedgraderHelpers.setupAnonymizableId, setupAnonymizableId)
+  })
 
-test('setupAnonymizableStudentId is available on main object', () => {
-  strictEqual(SpeedgraderHelpers.setupAnonymizableStudentId, setupAnonymizableStudentId)
-})
+  test('setupAnonymizableUserId is available on main object', () => {
+    strictEqual(SpeedgraderHelpers.setupAnonymizableUserId, setupAnonymizableUserId)
+  })
 
-test('setupAnonymizableAuthorId is available on main object', () => {
-  strictEqual(SpeedgraderHelpers.setupAnonymizableAuthorId, setupAnonymizableAuthorId)
-})
+  test('setupAnonymizableStudentId is available on main object', () => {
+    strictEqual(SpeedgraderHelpers.setupAnonymizableStudentId, setupAnonymizableStudentId)
+  })
 
-test('populateTurnitin sets correct URL for OriginalityReports', () => {
-  const submission = {
-    id: '7',
-    anonymous_id: 'zxcvb',
-    grade: null,
-    score: null,
-    submitted_at: '2016-11-29T22:29:44Z',
-    assignment_id: '52',
-    user_id: '2',
-    submission_type: 'online_upload',
-    workflow_state: 'submitted',
-    updated_at: '2016-11-29T22:29:44Z',
-    grade_matches_current_submission: true,
-    graded_at: null,
-    turnitin_data: {
-      attachment_103: {
-        similarity_score: 0.8,
-        state: 'acceptable',
-        report_url: 'http://www.thebrickfan.com',
-        status: 'scored'
-      }
-    },
-    excused: null,
-    versioned_attachments: [
-      {
-        attachment: {
-          id: '103',
-          context_id: '2',
-          context_type: 'User',
-          size: null,
-          content_type: 'text/rtf',
-          filename: '1480456390_119__Untitled.rtf',
-          display_name: 'Untitled-2.rtf',
-          workflow_state: 'pending_upload',
-          viewed_at: null,
-          view_inline_ping_url: '/assignments/52/files/103/inline_view',
-          mime_class: 'doc',
-          currently_locked: false,
-          'crocodoc_available?': null,
-          canvadoc_url: null,
-          crocodoc_url: null,
-          submitted_to_crocodoc: false,
-          provisional_crocodoc_url: null
+  test('setupAnonymizableAuthorId is available on main object', () => {
+    strictEqual(SpeedgraderHelpers.setupAnonymizableAuthorId, setupAnonymizableAuthorId)
+  })
+
+  test('populateTurnitin sets correct URL for OriginalityReports', () => {
+    const submission = {
+      id: '7',
+      anonymous_id: 'zxcvb',
+      grade: null,
+      score: null,
+      submitted_at: '2016-11-29T22:29:44Z',
+      assignment_id: '52',
+      user_id: '2',
+      submission_type: 'online_upload',
+      workflow_state: 'submitted',
+      updated_at: '2016-11-29T22:29:44Z',
+      grade_matches_current_submission: true,
+      graded_at: null,
+      turnitin_data: {
+        attachment_103: {
+          similarity_score: 0.8,
+          state: 'acceptable',
+          report_url: 'http://www.thebrickfan.com',
+          status: 'scored'
         }
-      }
-    ],
-    late: false,
-    external_tool_url: null,
-    has_originality_report: true
-  }
-  const reportContainer = $('#assignment_submission_originality_report_url')
-  const defaultContainer = $('#assignment_submission_default_url')
-  const container = SpeedgraderHelpers.urlContainer(submission, defaultContainer, reportContainer)
-  equal(container, reportContainer)
+      },
+      excused: null,
+      versioned_attachments: [
+        {
+          attachment: {
+            id: '103',
+            context_id: '2',
+            context_type: 'User',
+            size: null,
+            content_type: 'text/rtf',
+            filename: '1480456390_119__Untitled.rtf',
+            display_name: 'Untitled-2.rtf',
+            workflow_state: 'pending_upload',
+            viewed_at: null,
+            view_inline_ping_url: '/assignments/52/files/103/inline_view',
+            mime_class: 'doc',
+            currently_locked: false,
+            'crocodoc_available?': null,
+            canvadoc_url: null,
+            crocodoc_url: null,
+            submitted_to_crocodoc: false,
+            provisional_crocodoc_url: null
+          }
+        }
+      ],
+      late: false,
+      external_tool_url: null,
+      has_originality_report: true
+    }
+    const reportContainer = $('#assignment_submission_originality_report_url')
+    const defaultContainer = $('#assignment_submission_default_url')
+    const container = SpeedgraderHelpers.urlContainer(submission, defaultContainer, reportContainer)
+    equal(container, reportContainer)
+  })
 })
 
 QUnit.module('SpeedgraderHelpers#buildIframe', {

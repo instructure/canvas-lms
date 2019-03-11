@@ -112,7 +112,7 @@ test("Handles LTI link with presentation target of 'iframe' and thumbnail is *NO
   )
   equal(
     contentItem.codePayload,
-    '<iframe src="/courses/1/external_tools/retrieve?display=borderless&amp;url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti" title="Its like sexy for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" width="800" height="600" style="width: 800px; height: 600px;"></iframe>'
+    '<iframe src="/courses/1/external_tools/retrieve?display=borderless&amp;url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti" title="Its like sexy for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="autoplay *" width="800" height="600" style="width: 800px; height: 600px;"></iframe>'
   )
 })
 
@@ -162,7 +162,7 @@ test("Handles File item with presentation target of 'iframe' and thumbnail is se
   equal(contentItem.url, 'http://lti-tool-provider-example.dev/test_file.txt')
   equal(
     contentItem.codePayload,
-    '<iframe src="http://lti-tool-provider-example.dev/test_file.txt" title="Its like sexy for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" width="800" height="600" style="width: 800px; height: 600px;"></iframe>'
+    '<iframe src="http://lti-tool-provider-example.dev/test_file.txt" title="Its like sexy for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="autoplay *" width="800" height="600" style="width: 800px; height: 600px;"></iframe>'
   )
 })
 
@@ -199,7 +199,7 @@ test("Handles File item with presentation target of 'iframe' and thumbnail is *N
   equal(contentItem.url, 'http://lti-tool-provider-example.dev/test_file.txt')
   equal(
     contentItem.codePayload,
-    '<iframe src="http://lti-tool-provider-example.dev/test_file.txt" title="Its like sexy for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" width="800" height="600" style="width: 800px; height: 600px;"></iframe>'
+    '<iframe src="http://lti-tool-provider-example.dev/test_file.txt" title="Its like sexy for your computer" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true" allow="autoplay *" width="800" height="600" style="width: 800px; height: 600px;"></iframe>'
   )
 })
 

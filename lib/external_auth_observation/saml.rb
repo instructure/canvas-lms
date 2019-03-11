@@ -17,50 +17,35 @@
 
 module ExternalAuthObservation
   class Saml
-    attr_accessor :request, :response, :saml_settings, :account_auth_config
+    attr_accessor :request, :response, :account_auth_config
 
     def initialize(account, request, response)
       @request = request
       @response = response
       @account_auth_config = account.authentication_providers.where(parent_registration: true).first
-      @saml_settings = account_auth_config.saml_settings(request.host_with_port)
     end
 
     def logout_url
-      if response.is_a?(SAML2::Response)
-        aac = @account_auth_config
-        idp = aac.idp_metadata.identity_providers.first
-        name_id = response.assertions.first.subject.name_id
+      aac = @account_auth_config
+      idp = aac.idp_metadata.identity_providers.first
+      name_id = response.assertions.first.subject.name_id
 
-        logout_request = SAML2::LogoutRequest.initiate(
-          idp,
-          SAML2::NameID.new(aac.entity_id),
-          SAML2::NameID.new(name_id.id,
-                            name_id.format,
-                            name_qualifier: name_id.name_qualifier,
-                            sp_name_qualifier: name_id.sp_name_qualifier),
-          response.assertions.first.authn_statements.first&.session_index
-        )
+      logout_request = SAML2::LogoutRequest.initiate(
+        idp,
+        SAML2::NameID.new(aac.entity_id),
+        SAML2::NameID.new(name_id.id,
+                          name_id.format,
+                          name_qualifier: name_id.name_qualifier,
+                          sp_name_qualifier: name_id.sp_name_qualifier),
+        response.assertions.first.authn_statements.first&.session_index
+      )
 
-        # sign the request
-        private_key = AuthenticationProvider::SAML.private_key
-        private_key = nil if aac.sig_alg.nil?
-        SAML2::Bindings::HTTPRedirect.encode(logout_request,
-                                             private_key: private_key,
-                                             sig_alg: aac.sig_alg)
-      else
-        saml_request = Onelogin::Saml::LogoutRequest.generate(
-          response.name_qualifier,
-          response.sp_name_qualifier,
-          response.name_id,
-          response.name_identifier_format,
-          response.session_index,
-          saml_settings
-        )
-        forward_url = saml_request.forward_url
-        uri = URI(forward_url)
-        uri.to_s
-      end
+      # sign the request
+      private_key = AuthenticationProvider::SAML.private_key
+      private_key = nil if aac.sig_alg.nil?
+      SAML2::Bindings::HTTPRedirect.encode(logout_request,
+                                           private_key: private_key,
+                                           sig_alg: aac.sig_alg)
     end
   end
 end

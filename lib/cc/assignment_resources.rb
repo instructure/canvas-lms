@@ -236,7 +236,7 @@ module CC
         end
       end
       node.quiz_identifierref key_generator.create_key(assignment.quiz) if assignment.quiz
-      node.allowed_extensions assignment.allowed_extensions.join(',') unless assignment.allowed_extensions.blank?
+      node.allowed_extensions assignment.allowed_extensions&.join(',')
       node.has_group_category assignment.has_group_category?
       node.group_category assignment.group_category.try :name if assignment.group_category
       atts = [:points_possible, :grading_type,

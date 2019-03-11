@@ -209,6 +209,7 @@ class PermissionsIndex
       permission_cell(permission, role_id).click
       wait_for(method: nil, timeout: 0.5) { permission_menu_item(setting).displayed? }
       permission_menu_item(setting).click
+      wait_for_ajaximations
     end
 
     def open_permission_tray(permission_name)

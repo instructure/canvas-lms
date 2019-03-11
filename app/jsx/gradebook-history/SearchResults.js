@@ -27,8 +27,8 @@ import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReade
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import Table from '@instructure/ui-elements/lib/components/Table'
 import Text from '@instructure/ui-elements/lib/components/Text'
-import {getHistoryNextPage} from '../gradebook-history/actions/SearchResultsActions'
-import SearchResultsRow from '../gradebook-history/SearchResultsRow'
+import {getHistoryNextPage} from './actions/SearchResultsActions'
+import SearchResultsRow from './SearchResultsRow'
 
 const colHeaders = [
   I18n.t('Date'),

@@ -393,11 +393,6 @@ body.body--login-confirmation {
   background: $ic-color-light;
   border-bottom-#{direction(left)}-radius: $baseBorderRadius;
   border-bottom-#{direction(right)}-radius: $baseBorderRadius;
-
-  .terms_of_service_link {
-    position: relative;
-    top: -2px; //make the link show on the same alignment as the paragraph
-  }
 }
 
 .ic-Login-confirmation__auth-icon {

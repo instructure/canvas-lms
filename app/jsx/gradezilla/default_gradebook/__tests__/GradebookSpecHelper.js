@@ -49,6 +49,7 @@ export function createGradebook(options = {}) {
     new_gradebook_development_enabled: true,
     outcome_gradebook_enabled: false,
     post_grades_ltis: [],
+    post_policies_enabled: false,
     publish_to_sis_enabled: false,
     sections: [],
     settings: {
@@ -92,6 +93,7 @@ export function setFixtureHtml($fixture) {
         </div>
         <div id="gradebook-settings-modal-button-container"></div>
         <div data-component="GradebookSettingsModal"></div>
+        <div id="hide-assignment-grades-tray"></div>
         <div id="post-assignment-grades-tray"></div>
         <div data-component="StatusesModal"></div>
         <div data-component="AnonymousSpeedGraderAlert"></div>

@@ -23,7 +23,12 @@ class CanvasSchema < GraphQL::Schema
   use GraphQL::Batch
 
   def self.id_from_object(obj, type_def, ctx)
-    GraphQL::Schema::UniqueWithinType.encode(type_def.name, obj.id)
+    case obj
+    when MediaObject
+      GraphQL::Schema::UniqueWithinType.encode(type_def.name, obj.media_id)
+    else
+      GraphQL::Schema::UniqueWithinType.encode(type_def.name, obj.id)
+    end
   end
 
   def self.object_from_id(relay_id, ctx)
@@ -52,6 +57,7 @@ class CanvasSchema < GraphQL::Schema
     when DiscussionTopic then Types::DiscussionType
     when Quizzes::Quiz then Types::QuizType
     when Progress then Types::ProgressType
+    when MediaObject then Types::MediaObjectType
     when ContentTag
       if !type.nil? && type.name == "ModuleItemInterface"
         return Types::ExternalUrlType if obj.content_type == "ExternalUrl"
@@ -68,4 +74,5 @@ class CanvasSchema < GraphQL::Schema
                 Types::ProgressType]
 
   instrument :field, AssignmentOverrideInstrumenter.new
+  instrument :field, MutationTransactionInstrumenter.new
 end

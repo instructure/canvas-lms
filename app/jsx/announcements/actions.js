@@ -21,7 +21,7 @@ import {createActions} from 'redux-actions'
 import isEqual from 'lodash/isEqual'
 import range from 'lodash/range'
 import $ from 'jquery'
-import 'compiled/jquery.rails_flash_notifications' // eslint-disable-line
+import 'compiled/jquery.rails_flash_notifications'
 
 import * as apiClient from './apiClient'
 import {createPaginationActions} from '../shared/reduxPagination'

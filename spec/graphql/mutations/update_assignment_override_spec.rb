@@ -353,4 +353,24 @@ describe Mutations::UpdateAssignment do
     expect(result.dig('data', 'updateAssignment', 'errors', 0, 'message')).to eq "Validation failed: Set has already been taken"
   end
 
+  it "invalid dates cause validation errors" do
+    section1 = @course.course_sections.create!
+    section2 = @course.course_sections.create!
+    result = execute_with_input <<~GQL
+      id: "#{@assignment_id}"
+      assignmentOverrides: [
+        {
+          sectionId: "#{section1.id}"
+          dueAt: "2019-02-28T17:01:00Z-05:00"
+        }
+        {
+          sectionId: "#{section2.id}"
+          dueAt: "2018:02-28T17:02:00Z-05:00"
+        }
+      ]
+    GQL
+    expect(result.dig('errors')).to be_nil
+    expect(result.dig('data', 'updateAssignment', 'errors', 0, 'message')).to eq "invalid due_at \"2018:02-28T17:02:00Z-05:00\""
+  end
+
 end

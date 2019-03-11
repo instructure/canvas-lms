@@ -24,7 +24,7 @@ import $ from 'jquery'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
 import I18n from 'i18n!grading_periods'
-import EnrollmentTermInput from '../grading/EnrollmentTermInput'
+import EnrollmentTermInput from './EnrollmentTermInput'
 import 'compiled/jquery.rails_flash_notifications'
 
 const {array, bool, func, shape, string} = PropTypes

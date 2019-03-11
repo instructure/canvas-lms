@@ -120,9 +120,6 @@ describe "speed grader" do
   end
 
   it "can grade and comment inactive students" do
-    skip "Skipped because this spec fails if not run in foreground\n"\
-      "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
-
     @teacher.preferences = { gradebook_settings: { @course.id => { 'show_inactive_enrollments' => 'true' } } }
     @teacher.save
 
@@ -140,6 +137,19 @@ describe "speed grader" do
     expect { @submission.submission_comments.where(comment: 'srsly').any? }.to become(true)
     # doesn't get inserted into the menu
     expect(f('#students_selectmenu')).not_to contain_css('#section-menu')
+  end
+
+  it "can grade and comment active students", :xbrowser do
+    student_submission(username:'activestudent@example.com')
+
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+
+    replace_content f('#grading-box-extended'), "5", tab_out: true
+    expect { @submission.reload.score }.to become 5
+
+    f('#speed_grader_comment_textarea').send_keys('srsly')
+    f('#add_a_comment button[type="submit"]').click
+    expect { @submission.submission_comments.where(comment: 'srsly').any? }.to become(true)
   end
 
   it "displays concluded students" do

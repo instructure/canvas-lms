@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as HistoryActions from '../../gradebook-history/actions/HistoryActions'
-import HistoryApi from '../../gradebook-history/api/HistoryApi'
+import * as HistoryActions from './HistoryActions'
+import HistoryApi from '../api/HistoryApi'
 
 export function getHistoryNextPage(url) {
   return function(dispatch) {

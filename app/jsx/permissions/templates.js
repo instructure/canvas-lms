@@ -39,8 +39,8 @@ export function deepMerge(a, b) {
 }
 
 export const PERMISSION_DETAIL_SECTIONS = [
-  {title: 'What it Does', key: 'what_it_does'},
-  {title: 'Additional Considerations', key: 'additional_considerations'}
+  {title: I18n.t('What it Does'), key: 'what_it_does'},
+  {title: I18n.t('Additional Considerations'), key: 'additional_considerations'}
 ]
 
 export const generateActionTemplates = (
@@ -2607,56 +2607,6 @@ To add students to a collaboration, Users - view list must also be enabled. To a
   ]
 )
 
-const submissionViewCommentsPermissions = generateActionTemplates(
-  'comment_on_others_submissions',
-  [
-    {
-      title: I18n.t('Assignments'),
-      description: I18n.t(`Allows user to view all student assignment submissions and add comments.`)
-    },
-    {
-      title: I18n.t('SpeedGrader'),
-      description: I18n.t(`Allows user to download all comments in a student’s submission.`)
-    }
-  ],
-  [
-    {
-      title: I18n.t('Assignments, Gradebook'),
-      description: I18n.t(`To access assignment submissions through Assignments and the
-Gradebook, Grades - view all grades​ must also be enabled.`)
-    },
-    {
-      title: I18n.t('Assignments, SpeedGrader'),
-      description: I18n.t(`To access assignment submissions through Assignments and SpeedGrader, Grades - edit​ must also be enabled.
-To edit a grade or add comments in SpeedGrader or the Gradebook, Grades - edit must also be enabled.`)
-    }
-  ],
-  [
-    {
-      title: I18n.t('Assignments'),
-      description: I18n.t(`Allows user to view all student assignment submissions and add comments.`)
-    },
-    {
-      title: I18n.t('SpeedGrader'),
-      description: I18n.t(`Allows user to download all comments in a student’s submission.`)
-    }
-  ],
-  [
-    {
-      title: I18n.t('Assignments, Gradebook'),
-      description: I18n.t(
-        `To access assignment submissions through Assignments or the Gradebook and view in SpeedGrader, Grades - view all grades ​or Grades - edit must also be enabled.`
-      )
-    },
-    {
-      title: I18n.t('Gradebook, SpeedGrader'),
-      description: I18n.t(
-        `To edit a grade or add comments in SpeedGrader or Gradebook, Grades - edit must be enabled.`
-      )
-    }
-  ]
-)
-
 const pairingCodePermissions = generateActionTemplates(
   'generate_observer_pairing_code',
   [
@@ -3098,7 +3048,6 @@ export const PERMISSION_DETAILS_ACCOUNT_TEMPLATES = {
     viewStatisticsPermissions.ACCOUNT,
     storageQuotasPermissions.ACCOUNT,
     studentCollabPermissions.ACCOUNT,
-    submissionViewCommentsPermissions.ACCOUNT,
     usernotesPermissions.ACCOUNT,
     usersActAsPermissions.ACCOUNT,
     usersManageLoginPermissions.ACCOUNT,
@@ -3166,7 +3115,6 @@ export const PERMISSION_DETAILS_COURSE_TEMPLATES = {
     viewStatisticsPermissions.COURSE,
     storageQuotasPermissions.COURSE,
     studentCollabPermissions.COURSE,
-    submissionViewCommentsPermissions.COURSE,
     usernotesPermissions.COURSE,
     usersActAsPermissions.COURSE,
     usersManageLoginPermissions.COURSE,

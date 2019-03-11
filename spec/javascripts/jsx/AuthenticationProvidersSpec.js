@@ -48,7 +48,7 @@ QUnit.module('AuthenticationProviders', () => {
 
     function showAllForms() {
       $container.querySelectorAll('form').forEach($form => {
-        $form.style.display = '' // eslint-disable-line no-param-reassign
+        $form.style.display = ''
       })
     }
 

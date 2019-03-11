@@ -26,7 +26,9 @@ it('renders readonly override details', () => {
     submissionTypes: ['online_text_entry', 'online_url', 'media_recording', 'online_upload']
   })
 
-  const {getByText, getByTestId} = render(<OverrideDetail override={override} readOnly />)
+  const {getByText, getByTestId} = render(
+    <OverrideDetail override={override} onChangeOverride={() => {}} readOnly />
+  )
 
   // the labels
   expect(getByText('Assign to:')).toBeInTheDocument()
@@ -48,7 +50,9 @@ it('renders editable override details', () => {
     submissionTypes: ['online_text_entry', 'online_url', 'media_recording', 'online_upload']
   })
 
-  const {getByText, getByTestId} = render(<OverrideDetail override={override} readOnly={false} />)
+  const {getByText, getByTestId} = render(
+    <OverrideDetail override={override} onChangeOverride={() => {}} readOnly={false} />
+  )
 
   // the labels
   expect(getByText('Assign to:')).toBeInTheDocument()

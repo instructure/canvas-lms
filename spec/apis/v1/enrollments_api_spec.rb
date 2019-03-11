@@ -1806,9 +1806,7 @@ describe EnrollmentsApiController, type: :request do
           @course.enroll_student(@student, enrollment_state: 'active')
         end
         @observer = user_factory(active_all: true, active_state: 'active')
-        @observer.as_observer_observation_links.create do |uo|
-          uo.user_id = @student.id
-        end
+        add_linked_observer(@student, @observer)
         @user = @observer
         @user_path = "/api/v1/users/#{@student.id}/enrollments"
         @user_params = { :controller => "enrollments_api", :action => "index", :user_id => @student.id.to_param, :format => "json" }
@@ -1870,7 +1868,7 @@ describe EnrollmentsApiController, type: :request do
           @other_course.enroll_student(@user, enrollment_state: 'active')
           @student = @user
           @observer = user_factory
-          @student.linked_observers << @observer
+          add_linked_observer(@student, @observer)
           json = api_call_as_user(@observer, :get, "/api/v1/users/#{@student.id}/enrollments",
                           { :controller => "enrollments_api", :action => "index", :user_id => @student.to_param,
                             :format => "json" })

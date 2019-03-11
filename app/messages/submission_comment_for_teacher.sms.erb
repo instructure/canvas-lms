@@ -1,3 +1,5 @@
-<%= t :sms_body, "New comment by %{author} for %{assignment}, %{user}, %{context}.", :author => asset.author.name, :assignment => asset.submission.assignment.title, :user => asset.submission.user.name, :context => asset.submission.assignment.context.name %>
+<% presenter = Messages::SubmissionCommentForTeacher::SMSPresenter.new(self) %>
 
-<%= t :more_info, "More info at %{url}", :url => HostUrl.context_host(asset.submission.assignment.context) %>
+<%= presenter.subject %>
+
+<%= presenter.body %>

@@ -1,6 +1,8 @@
 namespace :graphql do
   desc "Dump GraphQL schema and fragment types"
   task schema: :environment do
+    GraphQLPostgresTimeout.do_not_wrap = true
+
     File.open("#{Rails.root}/schema.graphql", "w") { |f|
       f.puts CanvasSchema.to_definition
     }

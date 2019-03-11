@@ -58,6 +58,7 @@ export default class Header extends React.Component {
 
   static propTypes = {
     assignment: TeacherAssignmentShape.isRequired,
+    onChangeAssignment: func.isRequired,
     onUnsubmittedClick: func,
     onPublishChange: func,
     onDelete: func,
@@ -82,15 +83,11 @@ export default class Header extends React.Component {
 
       moduleList: props.assignment.course.modulesConnection.nodes,
       modulesMode: initialMode,
-      selectedModules: props.assignment.modules,
 
       assignmentGroupList: props.assignment.assignmentGroup && [props.assignment.assignmentGroup],
       assignmentGroupMode: initialMode,
-      selectedAssignmentGroupId:
-        props.assignment.assignmentGroup && props.assignment.assignmentGroup.lid,
 
-      nameMode: initialMode,
-      name: props.assignment.name
+      nameMode: initialMode
     }
 
     this.namePlaceholder = I18n.t('Assignment name')
@@ -107,13 +104,11 @@ export default class Header extends React.Component {
         break
       case 'quiz':
         if (window.confirm(confirmQuizType)) {
-          // Still undecided whether we'll even show the quiz option if quizzes.next is not enabled
+          // must be true, because that's the only way quiz is an option
           if (ENV.QUIZ_LTI_ENABLED) {
             window.location.assign(
               `/courses/${this.props.assignment.course.lid}/assignments/new?quiz_lti`
             )
-          } else {
-            createLegacyQuiz(this.props.assignment.course.lid)
           }
         }
         break
@@ -141,28 +136,11 @@ export default class Header extends React.Component {
         selectedAssignmentType: 'assignment' // can't change it yet
       })
     })
-
-    function createLegacyQuiz(course_id) {
-      let auth_token = document.cookie.split(/\s*;\s*/).find(c => c.indexOf('_csrf_token') === 0)
-      auth_token = auth_token.split('=')
-      auth_token = auth_token.length === 2 ? auth_token[1] : ''
-      auth_token = decodeURIComponent(auth_token.replace(/\+/g, ' '))
-      const form = document.createElement('form')
-      form.setAttribute('method', 'post')
-      form.setAttribute('action', `/courses/${course_id}/quizzes/new?fresh=1`)
-      const authinput = document.createElement('input')
-      authinput.setAttribute('type', 'hidden')
-      authinput.setAttribute('name', 'authenticity_token')
-      authinput.value = auth_token
-      form.appendChild(authinput)
-      document.body.appendChild(form)
-      form.submit()
-    }
   }
   /* eslint-enable no-alert */
 
   handleModulesChange = selectedModules => {
-    this.setState({selectedModules})
+    this.props.onChangeAssignment('modules', selectedModules)
   }
 
   handleModulesChangeMode = mode => {
@@ -191,7 +169,8 @@ export default class Header extends React.Component {
   // }
 
   handleGroupChange = selectedAssignmentGroupId => {
-    this.setState({selectedAssignmentGroupId})
+    const grp = this.state.assignmentGroupList.find(g => g.lid === selectedAssignmentGroupId)
+    this.props.onChangeAssignment('assignmentGroup', grp)
   }
 
   handleGroupChangeMode = mode => {
@@ -211,7 +190,7 @@ export default class Header extends React.Component {
   }
 
   handleNameChange = name => {
-    this.setState({name})
+    this.props.onChangeAssignment('name', name)
   }
 
   handleNameChangeMode = mode => {
@@ -219,6 +198,7 @@ export default class Header extends React.Component {
   }
 
   render() {
+    const assignment = this.props.assignment
     return (
       <Grid startAt="large" colSpacing="large">
         <GridRow>
@@ -235,9 +215,9 @@ export default class Header extends React.Component {
             <View display="block" padding="xx-small 0 0 xx-small">
               <AssignmentModules
                 mode={this.state.modulesMode}
-                assignment={this.props.assignment}
+                assignment={assignment}
                 moduleList={this.state.moduleList}
-                selectedModules={this.state.selectedModules}
+                selectedModules={assignment.modules}
                 onChange={this.handleModulesChange}
                 onChangeMode={this.handleModulesChangeMode}
                 onAddModule={this.handleAddModule}
@@ -248,7 +228,9 @@ export default class Header extends React.Component {
               <AssignmentGroup
                 mode={this.state.assignmentGroupMode}
                 assignmentGroupList={this.state.assignmentGroupList}
-                selectedAssignmentGroupId={this.state.selectedAssignmentGroupId}
+                selectedAssignmentGroupId={
+                  assignment.assignmentGroup && assignment.assignmentGroup.lid
+                }
                 onChange={this.handleGroupChange}
                 onChangeMode={this.handleGroupChangeMode}
                 onAddGroup={this.handleAddGroup}
@@ -260,7 +242,7 @@ export default class Header extends React.Component {
                 mode={this.state.nameMode}
                 viewAs="div"
                 level="h1"
-                value={this.state.name}
+                value={assignment.name}
                 onChange={this.handleNameChange}
                 onChangeMode={this.handleNameChangeMode}
                 placeholder={this.namePlaceholder}

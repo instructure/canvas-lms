@@ -18,7 +18,7 @@
 
 import React from 'react'
 import update from 'immutability-helper'
-import GradingPeriod from '../grading/gradingPeriod'
+import GradingPeriod from './gradingPeriod'
 import $ from 'jquery'
 import I18n from 'i18n!external_tools'
 import _ from 'underscore'

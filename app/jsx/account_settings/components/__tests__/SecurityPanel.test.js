@@ -33,33 +33,27 @@ describe('ConnectedSecurityPanel', () => {
   })
 
   describe('isSubAccount prop', () => {
-    it('renders help text for sub-accounts', () => {
-      const {getByText} = renderWithRedux(
+    it('updates CSP inherited status when the inherit checkbox is clicked', () => {
+      const {getByLabelText} = renderWithRedux(
         <ConnectedSecurityPanel context="account" contextId="1" isSubAccount />
       )
 
-      const helpText = getByText('Sub-accounts can choose one of three options:')
-      expect(helpText).toBeInTheDocument()
+      const checkbox = getByLabelText('Inherit Content Security Policy')
+      fireEvent.click(checkbox)
+      expect(checkbox.checked).toBeTruthy()
     })
-  })
 
-  it('shows a three state toggle with the correct options', () => {
-    const {getByLabelText} = renderWithRedux(
-      <ConnectedSecurityPanel context="account" contextId="1" isSubAccount />
-    )
+    it('disables the enable checkbox when the inherit option is set to true', () => {
+      const {getByLabelText} = renderWithRedux(
+        <ConnectedSecurityPanel context="account" contextId="1" isSubAccount />
+      )
 
-    expect(getByLabelText('Off')).toBeInTheDocument()
-    expect(getByLabelText('Inherit')).toBeInTheDocument()
-    expect(getByLabelText('On')).toBeInTheDocument()
-  })
+      const checkbox = getByLabelText('Inherit Content Security Policy')
+      fireEvent.click(checkbox)
+      expect(checkbox.checked).toBeTruthy()
 
-  test.each(['Off', 'Inherit', 'On'])('selecting %s updates to show it as selected', labelText => {
-    const {getByLabelText} = renderWithRedux(
-      <ConnectedSecurityPanel context="account" contextId="1" isSubAccount />
-    )
-
-    const toggleOption = getByLabelText(labelText)
-    fireEvent.click(toggleOption)
-    expect(toggleOption.checked).toBeTruthy()
+      const enableCheckbox = getByLabelText('Enable Content Security Policy')
+      expect(enableCheckbox).toBeDisabled()
+    })
   })
 })

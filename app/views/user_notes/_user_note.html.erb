@@ -22,40 +22,43 @@
    creator = user_note.creator.try_rescue(:name) || nil
    title = user_note.try_rescue(:title) || '{{ title }}'
 %>
-<div id="<%= id %>" class="user_note communication_message" style="<%= style %>">
-  <div class="header clearfix">
-    <div class="header_title">
-      <div class="title subject">
-        <%= title %>
-      </div>
-      <% if creator || user_note.created_at %>
-        <div class="sub_title creator_name">
-          <% if creator && user_note.created_at %>
-            <%= t 'subheader', "%{creator} on %{created_at}", :creator => creator, :created_at => datetime_string(user_note.created_at) %>
-          <% elsif creator %>
-            <%= creator %>
-          <% elsif user_note.created_at %>
-            <span class="created_at time_ago_date" data-timestamp="<%= user_note.created_at.iso8601 %>"><%= datetime_string user_note.created_at %></span>
-          <% end %>
+<div id="<%= id %>" class="user_note communication_message" style="<%= style %>" role="listitem">
+  <div class="note_left">
+    <div class="header clearfix">
+      <div class="header_title">
+        <div class="title subject">
+          <%= title %>
         </div>
-      <% end %>
+        <% if creator || user_note.created_at %>
+          <div class="sub_title creator_name">
+            <% if creator && user_note.created_at %>
+              <%= t 'subheader', "%{creator} on %{created_at}", :creator => creator, :created_at => datetime_string(user_note.created_at) %>
+            <% elsif creator %>
+              <%= creator %>
+            <% elsif user_note.created_at %>
+              <span class="created_at time_ago_date" data-timestamp="<%= user_note.created_at.iso8601 %>"><%= datetime_string user_note.created_at %></span>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
     </div>
 
-    <div class="post_actions pull-right">
-      <% if user_note.new_record? %>
-        <a href="#" class="delete_user_note_link delete_link no-hover icon-trash" title="<%= t "Delete entry %{title}", :title => title %>"><span class="screenreader-only"><%= t "Delete entry %{title}", :title => title %></span></a>
-      <% else %>
-        <% if can_do(user_note, @current_user, :delete) %>
-          <a href="<%= user_user_note_path(user_note.user, user_note) %>" class="delete_user_note_link delete_link no-hover icon-trash" title="<%= t "Delete entry %{title}", :title => title %>"><span class="screenreader-only"><%= t "Delete entry %{title}", :title => title %></span></a>
-        <% else %>
-          &nbsp;
-        <% end %>
-      <% end %>
+    <div class="content user_note_content">
+      <div class="inner_content user_content formatted_note">
+        <%= user_content(user_note.try_rescue(:formatted_note)) || nbsp %>
+      </div>
     </div>
   </div>
-  <div class="content user_note_content">
-    <div class="inner_content user_content formatted_note">
-      <%= user_content(user_note.try_rescue(:formatted_note)) || nbsp %>
-    </div>
+
+  <div class="note_right">
+    <% if user_note.new_record? %>
+      <a href="#" class="delete_user_note_link delete_link no-hover icon-trash" title="<%= t "Delete entry %{title}", :title => title %>"><span class="screenreader-only"><%= t "Delete entry %{title}", :title => title %></span></a>
+    <% else %>
+      <% if can_do(user_note, @current_user, :delete) %>
+        <a href="<%= user_user_note_path(user_note.user, user_note) %>" class="delete_user_note_link delete_link no-hover icon-trash" title="<%= t "Delete entry %{title}", :title => title %>"><span class="screenreader-only"><%= t "Delete entry %{title}", :title => title %></span></a>
+      <% else %>
+        &nbsp;
+      <% end %>
+    <% end %>
   </div>
 </div>

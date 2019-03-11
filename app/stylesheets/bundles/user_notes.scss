@@ -27,6 +27,11 @@
   margin-bottom: 1em;
   padding-bottom: 1em;
   border-bottom: 1px solid $ic-border-color;
+  display: flex;
+
+  .note_left {
+    flex-grow: 1;
+  }
 
   &:first-child {
     margin-top: 0px;

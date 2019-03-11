@@ -17,97 +17,86 @@
  */
 
 import React from 'react'
-import {string, bool} from 'prop-types'
 import I18n from 'i18n!assignments_2'
+import {Mutation} from 'react-apollo'
+import classnames from 'classnames'
+import produce from 'immer'
+import get from 'lodash/get'
+import set from 'lodash/set'
 
+import Alert from '@instructure/ui-alerts/lib/components/Alert'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import Text from '@instructure/ui-elements/lib/components/Text'
 
-import {queryAssignment, setWorkflow} from '../api'
+import {showFlashAlert} from 'jsx/shared/FlashAlert'
+
+import {TeacherAssignmentShape, SET_WORKFLOW} from '../assignmentData'
 import Header from './Header'
 import ContentTabs from './ContentTabs'
+import TeacherFooter from './TeacherFooter'
 
 import ConfirmDialog from './ConfirmDialog'
-import MessageStudentsWho from './MessageStudentsWho'
+import MessageStudentsWhoDialog from './MessageStudentsWhoDialog'
 import TeacherViewContext, {TeacherViewContextDefaults} from './TeacherViewContext'
 
 export default class TeacherView extends React.Component {
   static propTypes = {
-    assignmentLid: string
+    assignment: TeacherAssignmentShape
   }
 
   constructor(props) {
     super(props)
     this.state = {
       messageStudentsWhoOpen: false,
-      assignment: {},
+      sendingMessageStudentsWhoNow: false,
       confirmDelete: false,
       deletingNow: false,
-      loading: true,
-      errors: [],
+      workingAssignment: props.assignment, // the assignment with updated fields while editing
+      isDirty: false, // has the user changed anything?
       // for now, put "#edit" in the URL and it will turn off readOnly
       readOnly: window.location.hash.indexOf('edit') < 0
     }
 
+    // TODO: reevaluate if the context is still needed. <FriendlyDateTime> pulls the data
+    // directly from ENV, so unless its replacement is different, this might be unnecessary.
     this.contextValue = {
       locale: (window.ENV && window.ENV.MOMENT_LOCALE) || TeacherViewContextDefaults.locale,
       timeZone: (window.ENV && window.ENV.TIMEZONE) || TeacherViewContextDefaults.timeZone
     }
   }
 
-  componentDidMount() {
-    this.loadAssignment()
-  }
-
-  async loadAssignment() {
-    const loadingErrors = []
-    let assignment = {}
-    try {
-      const {errors, data} = await queryAssignment(this.props.assignmentLid)
-      if (errors) loadingErrors.push(...errors)
-      if (data.assignment) assignment = data.assignment
-    } catch (error) {
-      loadingErrors.push(error.message)
+  // @param value: the new value. may be a scalar, an array, or an object.
+  // @param path: where w/in the assignment it should go. May be a string representing
+  //     the dot-separated path (e.g. 'assignmentOverrides.nodes.0`) or an array
+  //     of steps (e.g. ['assignmentOverrides', 'nodes', 0] (which could also be '0'))
+  updateWorkingAssignment(path, value) {
+    const dottedpath = Array.isArray(path) ? path.join('.') : path
+    const old = get(this.state.workingAssignment, dottedpath)
+    if (old === value) {
+      return this.state.workingAssignment
     }
-    this.setState({assignment, loading: false, errors: loadingErrors})
+    const updatedAssignment = produce(this.state.workingAssignment, draft => {
+      set(draft, path, value)
+    })
+    return updatedAssignment
   }
 
-  assignmentStateUpdate(state, updates) {
-    return {assignment: {...state.assignment, ...updates}}
-  }
-
-  async setWorkflowApiCall(assignment, newAssignmentState) {
-    const errors = []
-    try {
-      const {errors: graphqlErrors} = await setWorkflow(assignment, newAssignmentState)
-      if (graphqlErrors) errors.push(...graphqlErrors)
-    } catch (error) {
-      errors.push(error)
+  // if the new value is different from the existing value, update TeacherView's react state
+  handleChangeAssignment = (path, value) => {
+    const updatedAssignment = this.updateWorkingAssignment(path, value)
+    if (updatedAssignment !== this.state.workingAssignment) {
+      // the assignment can be unpublished independent from other changes
+      const isDirty = path !== 'state'
+      this.setState({workingAssignment: updatedAssignment, isDirty})
     }
-    return errors
-  }
-
-  // newAssignmentState is oneOf(['published', 'unpublished']) (but can be set to 'deleted'
-  // to soft-delete the assignmet). This is not TeacherView's React state
-  handlePublishChange = async newAssignmentState => {
-    const oldAssignmentState = this.state.assignment.state
-
-    // be optimistic
-    this.setState(state => this.assignmentStateUpdate(state, {state: newAssignmentState}))
-    const errors = await this.setWorkflowApiCall(this.state.assignment, newAssignmentState)
-    if (errors.length > 0) {
-      this.setState(state => ({
-        errors,
-        ...this.assignmentStateUpdate(state, {state: oldAssignmentState})
-      }))
-    } // else setWorkflow succeeded
   }
 
   handleUnsubmittedClick = () => {
     this.setState({messageStudentsWhoOpen: true})
   }
 
-  handleDismissMessageStudentsWho = () => {
-    this.setState({messageStudentsWhoOpen: false})
+  handleCloseMessageStudentsWho = () => {
+    this.setState({messageStudentsWhoOpen: false, sendingMessageStudentsWhoNow: false})
   }
 
   handleDeleteButtonPressed = () => {
@@ -118,14 +107,14 @@ export default class TeacherView extends React.Component {
     this.setState({confirmDelete: false})
   }
 
-  handleReallyDelete = async () => {
+  handleReallyDelete(deleteAssignment) {
     this.setState({deletingNow: true})
-    const errors = await this.setWorkflowApiCall(this.state.assignment, 'deleted')
-    if (errors.length === 0) {
-      this.handleDeleteSuccess()
-    } else {
-      this.handleDeleteError(errors)
-    }
+    deleteAssignment({
+      variables: {
+        id: this.props.assignment.lid,
+        workflow: 'deleted'
+      }
+    })
   }
 
   handleDeleteSuccess = () => {
@@ -135,60 +124,115 @@ export default class TeacherView extends React.Component {
     window.location.reload()
   }
 
-  handleDeleteError = errors => {
-    this.setState({errors, confirmDelete: false, deletingNow: false})
+  handleDeleteError = apolloErrors => {
+    showFlashAlert({message: I18n.t('Unable to delete assignment'), type: 'error'})
+    console.error(apolloErrors) // eslint-disable-line no-console
+    this.setState({confirmDelete: false, deletingNow: false})
   }
 
-  renderErrors() {
-    return <pre>Error: {JSON.stringify(this.state.errors, null, 2)}</pre>
+  handleCancel = () => {
+    this.setState({workingAssignment: this.props.assignment, isDirty: false})
   }
 
-  renderLoading() {
-    return <div>Loading...</div>
+  // TODO: implement save and publish
+  handleSave = () => {
+    window.alert("pretend we're saving")
+    this.setState({isDirty: false})
   }
 
-  renderConfirmDialog() {
+  handlePublish = () => {
+    const updatedAssignment = this.updateWorkingAssignment('state', 'published')
+    if (updatedAssignment !== this.state.workingAssignment) {
+      window.alert("pretend we're saving and publishing")
+      this.setState({workingAssignment: updatedAssignment, isDirty: false})
+    }
+  }
+
+  deleteDialogButtonProps = deleteAssignment => [
+    {
+      children: I18n.t('Cancel'),
+      onClick: this.handleCancelDelete,
+      'data-testid': 'delete-dialog-cancel-button'
+    },
+    {
+      children: I18n.t('Delete'),
+      variant: 'danger',
+      onClick: () => this.handleReallyDelete(deleteAssignment),
+      'data-testid': 'delete-dialog-confirm-button'
+    }
+  ]
+
+  renderDeleteDialogBody = () => (
+    <Alert variant="warning">
+      <Text size="large">{I18n.t('Are you sure you want to delete this assignment?')}</Text>
+    </Alert>
+  )
+
+  renderDeleteDialog() {
     return (
-      <ConfirmDialog
-        open={this.state.confirmDelete}
-        working={this.state.deletingNow}
-        modalLabel={I18n.t('confirm delete')}
-        heading={I18n.t('Delete')}
-        message={I18n.t('Are you sure you want to delete this assignment?')}
-        confirmLabel={I18n.t('Delete')}
-        cancelLabel={I18n.t('Cancel')}
-        closeLabel={I18n.t('close')}
-        spinnerLabel={I18n.t('deleting assignment')}
-        onClose={this.handleCancelDelete}
-        onCancel={this.handleCancelDelete}
-        onConfirm={this.handleReallyDelete}
-      />
+      <Mutation
+        mutation={SET_WORKFLOW}
+        onCompleted={this.handleDeleteSuccess}
+        onError={this.handleDeleteError}
+      >
+        {deleteAssignment => (
+          <ConfirmDialog
+            open={this.state.confirmDelete}
+            working={this.state.deletingNow}
+            disabled={this.state.deletingNow}
+            modalLabel={I18n.t('confirm delete')}
+            heading={I18n.t('Delete')}
+            body={this.renderDeleteDialogBody}
+            buttons={() => this.deleteDialogButtonProps(deleteAssignment)}
+            spinnerLabel={I18n.t('deleting assignment')}
+            onDismiss={this.handleCancelDelete}
+          />
+        )}
+      </Mutation>
     )
   }
 
+  renderMessageStudentsWhoDialog = () => (
+    <MessageStudentsWhoDialog
+      assignment={this.props.assignment}
+      open={this.state.messageStudentsWhoOpen}
+      busy={this.state.sendingMessageStudentsWhoNow}
+      onClose={this.handleCloseMessageStudentsWho}
+      onSend={this.handleSendMessageStudentsWho}
+    />
+  )
+
   render() {
-    if (this.state.loading) return this.renderLoading()
-    if (this.state.errors.length > 0) return this.renderErrors()
-    const assignment = this.state.assignment
+    const dirty = this.state.isDirty
+    const assignment = this.state.workingAssignment
+    const clazz = classnames('assignments-teacher', {dirty})
     return (
       <TeacherViewContext.Provider value={this.contextValue}>
-        <div>
-          {this.renderConfirmDialog()}
+        <div className={clazz}>
+          {this.renderDeleteDialog()}
           <ScreenReaderContent>
             <h1>{assignment.name}</h1>
           </ScreenReaderContent>
           <Header
             assignment={assignment}
+            onChangeAssignment={this.handleChangeAssignment}
             onUnsubmittedClick={this.handleUnsubmittedClick}
-            onPublishChange={this.handlePublishChange}
             onDelete={this.handleDeleteButtonPressed}
             readOnly={this.state.readOnly}
           />
-          <ContentTabs assignment={assignment} readOnly={this.state.readOnly} />
-          <MessageStudentsWho
-            open={this.state.messageStudentsWhoOpen}
-            onDismiss={this.handleDismissMessageStudentsWho}
+          <ContentTabs
+            assignment={assignment}
+            onChangeAssignment={this.handleChangeAssignment}
+            readOnly={this.state.readOnly}
           />
+          {this.renderMessageStudentsWhoDialog()}
+          {dirty ? (
+            <TeacherFooter
+              onCancel={this.handleCancel}
+              onSave={this.handleSave}
+              onPublish={this.handlePublish}
+            />
+          ) : null}
         </div>
       </TeacherViewContext.Provider>
     )

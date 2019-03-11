@@ -24,14 +24,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
   end
 
   def self.enabled?(_account = nil)
-    @enabled
-  end
-
-  begin
-    require 'onelogin/saml'
-    @enabled = true
-  rescue LoadError
-    @enabled = false
+    true
   end
 
   def self.recognized_params
@@ -84,7 +77,6 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
      }, {
       idp_in_response_to: -> { t("IdP InResponseTo") },
       idp_login_destination: -> { t("IdP LoginResponse destination") },
-      fingerprint_from_idp: -> { t("IdP certificate fingerprint") },
       is_valid_login_response: -> { t("Canvas thinks response is valid") },
       login_response_validation_error: -> { t("Validation Error") },
       login_to_canvas_success: -> { t("User succesfully logged into Canvas") },
@@ -223,6 +215,10 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     settings['sig_alg'] = value
   end
 
+  def self.name_id_formats
+    SAML2::NameID::Format.constants.map { |const| SAML2::NameID::Format.const_get(const, false) }.sort_by(&:downcase)
+  end
+
   def populate_from_metadata(entity)
     idps = entity.identity_providers
     raise "Must provide exactly one IDPSSODescriptor; found #{idps.length}" unless idps.length == 1
@@ -231,7 +227,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     self.log_in_url = idp.single_sign_on_services.find { |ep| ep.binding == SAML2::Bindings::HTTPRedirect::URN }.try(:location)
     self.log_out_url = idp.single_logout_services.find { |ep| ep.binding == SAML2::Bindings::HTTPRedirect::URN }.try(:location)
     self.certificate_fingerprint = idp.signing_keys.map(&:fingerprint).join(' ').presence || idp.keys.first&.fingerprint
-    self.identifier_format = (idp.name_id_formats & Onelogin::Saml::NameIdentifiers::ALL_IDENTIFIERS).first
+    self.identifier_format = (idp.name_id_formats & self.class.name_id_formats).first
     self.settings[:signing_certificates] = idp.signing_keys.map(&:x509)
     case idp.want_authn_requests_signed?
     when true
@@ -264,23 +260,6 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
         populate_from_metadata_xml(response.body)
       end
     end
-  end
-
-  def saml_settings(current_host=nil)
-    return nil unless self.auth_type == 'saml'
-
-    unless @saml_settings
-      @saml_settings = self.class.onelogin_saml_settings_for_account(self.account, current_host)
-
-      @saml_settings.idp_sso_target_url = self.log_in_url
-      @saml_settings.idp_slo_target_url = self.log_out_url
-      @saml_settings.idp_cert_fingerprint = (certificate_fingerprint || '').split.presence
-      @saml_settings.name_identifier_format = self.identifier_format
-      @saml_settings.requested_authn_context = self.requested_authn_context
-      @saml_settings.logger = logger
-    end
-
-    @saml_settings
   end
 
   # construct a metadata doc to represent the IdP
@@ -418,33 +397,6 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
 
   ::Canvas::Reloader.on_reload do
     remove_instance_variable(:@key) if instance_variable_defined?(:@key)
-  end
-
-  def self.onelogin_saml_settings_for_account(account, current_host=nil)
-    app_config = ConfigFile.load('saml') || {}
-    domains = HostUrl.context_hosts(account, current_host)
-
-    settings = Onelogin::Saml::Settings.new
-    settings.sp_slo_url = "#{HostUrl.protocol}://#{domains.first}/login/saml/logout"
-    settings.assertion_consumer_service_url = domains.flat_map do |domain|
-      [
-        "#{HostUrl.protocol}://#{domain}/login/saml"
-      ]
-    end
-    settings.tech_contact_name = app_config[:tech_contact_name] || 'Webmaster'
-    settings.tech_contact_email = app_config[:tech_contact_email] || ''
-
-    settings.issuer = saml_default_entity_id_for_account(account)
-
-    encryption = app_config[:encryption]
-    if encryption.is_a?(Hash)
-      settings.xmlsec_certificate = resolve_saml_key_path(Array.wrap(encryption[:certificate]).first)
-      settings.xmlsec_privatekey = resolve_saml_key_path(encryption[:private_key])
-
-      settings.xmlsec_additional_privatekeys = Array(encryption[:additional_private_keys]).map { |apk| resolve_saml_key_path(apk) }.compact
-    end
-
-    settings
   end
 
   def self.resolve_saml_key_path(path)

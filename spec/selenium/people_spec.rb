@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "people" do
   include_context "in-process server selenium tests"
 
-  before(:once) do
+  before(:each) do
     make_full_screen
   end
 
@@ -539,7 +539,7 @@ describe "people" do
       @section = @course.course_sections.create!(name: "section1")
 
       @teacher = user_with_pseudonym(:active_all => true)
-      @enrollment = @course.enroll_teacher(@teacher)
+      @enrollment = @course.enroll_teacher(@teacher, enrollment_state: 'active')
     end
 
     before :each do

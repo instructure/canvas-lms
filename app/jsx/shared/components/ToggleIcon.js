@@ -19,16 +19,24 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 
-export default function ToggleIcon ({ toggled, OnIcon, OffIcon, onToggleOn,
-                                      onToggleOff, disabled, className }) {
+export default function ToggleIcon({
+  toggled,
+  OnIcon,
+  OffIcon,
+  onToggleOn,
+  onToggleOff,
+  disabled,
+  className
+}) {
   return (
     <span className={className}>
       <button
-        className={disabled ? "disabled-toggle-button" : "toggle-button"}
+        type="button"
+        className={disabled ? 'disabled-toggle-button' : 'toggle-button'}
         disabled={disabled}
         onClick={toggled ? onToggleOff : onToggleOn}
       >
-        {toggled ? OnIcon : OffIcon }
+        {toggled ? OnIcon : OffIcon}
       </button>
     </span>
   )
@@ -41,10 +49,10 @@ ToggleIcon.propTypes = {
   onToggleOn: PropTypes.func.isRequired,
   onToggleOff: PropTypes.func.isRequired,
   disabled: PropTypes.bool,
-  className: PropTypes.string,
+  className: PropTypes.string
 }
 
 ToggleIcon.defaultProps = {
   disabled: false,
-  className: "",
+  className: ''
 }

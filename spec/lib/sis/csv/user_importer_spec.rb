@@ -1194,6 +1194,36 @@ describe SIS::CSV::UserImporter do
     expect(@account.courses.where(sis_source_id: "test_2").first.students.map(&:name).include?("User Uno")).to be_falsey
   end
 
+  it 'should remove linked observer enrollments when a user is deleted' do
+    process_csv_data_cleanly(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,,,active",
+    )
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user@example.com,active",
+      "user_2,user2,User,Dos,user2@example.com,active"
+    )
+    process_csv_data_cleanly(
+      "student_id,observer_id,status",
+      "user_1,user_2,active",
+    )
+    process_csv_data_cleanly(
+      "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
+      "test_1,user_1,student,,active,,,",
+    )
+    course = @account.courses.where(sis_source_id: "test_1").first
+    observer_enrollment = course.observer_enrollments.first
+    expect(observer_enrollment).to be_active
+    expect(observer_enrollment.user.pseudonym.sis_user_id).to eq "user_2"
+
+    process_csv_data_cleanly(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user@example.com,deleted"
+    )
+    expect(observer_enrollment.reload).to be_deleted
+  end
+
   it 'should remove group_memberships when a user is deleted' do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",

@@ -51,7 +51,7 @@ export function setupAnonymizableAuthorId(isAnonymous) {
 }
 
 const speedGraderHelpers = {
-  urlContainer: function(submission, defaultEl, originalityReportEl) {
+  urlContainer(submission, defaultEl, originalityReportEl) {
     if (submission.has_originality_report) {
       return originalityReportEl
     }
@@ -74,34 +74,34 @@ const speedGraderHelpers = {
     return parts.join('')
   },
 
-  determineGradeToSubmit: function(use_existing_score, student, grade) {
+  determineGradeToSubmit(use_existing_score, student, grade) {
     if (use_existing_score) {
-      return student.submission['score'].toString()
+      return student.submission.score.toString()
     }
     return grade.val()
   },
 
-  iframePreviewVersion: function(submission) {
-    //check if the submission object is valid
+  iframePreviewVersion(submission) {
+    // check if the submission object is valid
     if (submission == null) {
       return ''
     }
-    //check if the index is valid (multiple submissions)
-    var currentSelectedIndex = submission.currentSelectedIndex
+    // check if the index is valid (multiple submissions)
+    const currentSelectedIndex = submission.currentSelectedIndex
     if (currentSelectedIndex == null || isNaN(currentSelectedIndex)) {
       return ''
     }
-    var select = '&version='
-    //check if the version is valid, or matches the index
-    var version = submission.submission_history[currentSelectedIndex].submission.version
+    const select = '&version='
+    // check if the version is valid, or matches the index
+    const version = submission.submission_history[currentSelectedIndex].submission.version
     if (version == null || isNaN(version)) {
       return select + currentSelectedIndex
     }
     return select + version
   },
 
-  setRightBarDisabled: function(isDisabled) {
-    var elements = [
+  setRightBarDisabled(isDisabled) {
+    const elements = [
       '#grading-box-extended',
       '#speed_grader_comment_textarea',
       '#add_attachment',
@@ -110,7 +110,7 @@ const speedGraderHelpers = {
       '#speech_recognition_button'
     ]
 
-    _.each(elements, function(element) {
+    _.each(elements, element => {
       if (isDisabled) {
         $(element).addClass('ui-state-disabled')
         $(element).attr('aria-disabled', true)
@@ -125,9 +125,9 @@ const speedGraderHelpers = {
     })
   },
 
-  classNameBasedOnStudent: function(student) {
-    var raw = student.submission_state
-    var formatted
+  classNameBasedOnStudent(student) {
+    const raw = student.submission_state
+    let formatted
     switch (raw) {
       case 'graded':
       case 'not_gradeable':
@@ -145,15 +145,15 @@ const speedGraderHelpers = {
         })
         break
     }
-    return {raw: raw, formatted: formatted}
+    return {raw, formatted}
   },
 
-  submissionState: function(student, grading_role) {
-    var submission = student.submission
+  submissionState(student, grading_role) {
+    const submission = student.submission
     if (
       submission &&
       submission.workflow_state != 'unsubmitted' &&
-      (submission.submitted_at || !(typeof submission.grade == 'undefined'))
+      (submission.submitted_at || !(typeof submission.grade === 'undefined'))
     ) {
       if (
         (grading_role == 'provisional_grader' || grading_role == 'moderator') &&
@@ -165,7 +165,7 @@ const speedGraderHelpers = {
       } else if (
         !(submission.final_provisional_grade && submission.final_provisional_grade.grade) &&
         !submission.excused &&
-        (typeof submission.grade == 'undefined' ||
+        (typeof submission.grade === 'undefined' ||
           submission.grade === null ||
           submission.workflow_state == 'pending_review')
       ) {

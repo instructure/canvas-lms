@@ -480,7 +480,8 @@ describe UsersController, type: :request do
         'restrict_enrollments_to_course_dates' => false,
         'time_zone' => 'America/Denver',
         'uuid' => @course.uuid,
-        'blueprint' => false
+        'blueprint' => false,
+        'license' => nil
       },
 
       'user' => {
@@ -607,7 +608,8 @@ describe UsersController, type: :request do
         'restrict_enrollments_to_course_dates' => false,
         'time_zone' => 'America/Denver',
         'uuid' => @course.uuid,
-        'blueprint' => false
+        'blueprint' => false,
+        'license' => nil
       },
 
       'user' => {

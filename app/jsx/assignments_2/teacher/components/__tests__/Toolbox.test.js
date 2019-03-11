@@ -18,46 +18,65 @@
 
 import React from 'react'
 import {render} from 'react-testing-library'
+import {MockedProvider} from 'react-apollo/test-utils'
 import {closest, mockAssignment, mockSubmission} from '../../test-utils'
 import Toolbox from '../Toolbox'
 
-it('renders basic information', () => {
-  const assignment = mockAssignment({
-    needsGradingCount: 1,
-    submissions: {
-      nodes: [mockSubmission({submittedAt: null}), mockSubmission()]
-    }
-  })
-
-  const {queryByText, getByText, getByLabelText} = render(<Toolbox assignment={assignment} />)
-  expect(getByLabelText('Published').getAttribute('checked')).toBe('')
-  const sgLink = closest(getByText('1 to grade'), 'a')
-  expect(sgLink).toBeTruthy()
-  expect(sgLink.getAttribute('href')).toMatch(
-    /\/courses\/course-lid\/gradebook\/speed_grader\?assignment_id=assignment-lid/
+function renderToolbox(assignment) {
+  return render(
+    <MockedProvider>
+      <Toolbox assignment={assignment} onChangeAssignment={() => {}} />
+    </MockedProvider>
   )
-  expect(closest(getByText('1 unsubmitted'), 'button')).toBeTruthy()
-  expect(queryByText(/message students who/i)).toBeNull()
-})
+}
 
-it('renders unpublished value checkbox', () => {
-  const {getByLabelText} = render(<Toolbox assignment={mockAssignment({state: 'unpublished'})} />)
-  expect(getByLabelText('Published').getAttribute('checked')).toBeFalsy()
-})
+describe('assignments 2 teacher view toolbox', () => {
+  it('renders basic information', () => {
+    const assignment = mockAssignment({
+      needsGradingCount: 1,
+      submissions: {
+        nodes: [mockSubmission({submittedAt: null}), mockSubmission()]
+      }
+    })
 
-it('should open speedgrader link in a new tab', () => {
-  const assignment = mockAssignment()
-  const {getByText} = render(<Toolbox assignment={assignment} />)
-  const sgLink = closest(getByText('0 to grade'), 'a')
-  expect(sgLink.getAttribute('target')).toEqual('_blank')
-})
-
-it('renders only the message students who button when the assignment does not have an online submission', () => {
-  const assignment = mockAssignment({
-    submissionTypes: ['on_paper']
+    const {queryByText, getByText, getByLabelText, getByTestId} = renderToolbox(assignment)
+    expect(getByLabelText('Published').getAttribute('checked')).toBe('')
+    const sgLink = closest(getByText('1 to grade'), 'a')
+    expect(sgLink).toBeTruthy()
+    expect(sgLink.getAttribute('href')).toMatch(
+      /\/courses\/course-lid\/gradebook\/speed_grader\?assignment_id=assignment-lid/
+    )
+    expect(closest(getByText('1 unsubmitted'), 'button')).toBeTruthy()
+    expect(queryByText(/message students/i)).toBeNull()
+    expect(getByTestId('AssignmentPoints')).toBeInTheDocument()
   })
-  const {queryByText, getByText} = render(<Toolbox assignment={assignment} />)
-  expect(queryByText('unsubmitted', {exact: false})).toBeNull()
-  expect(queryByText('to grade', {exact: false})).toBeNull()
-  expect(getByText(/message students who/i)).toBeInTheDocument()
+
+  it('renders unpublished value checkbox', () => {
+    const {getByLabelText} = renderToolbox(mockAssignment({state: 'unpublished'}))
+    expect(getByLabelText('Published').getAttribute('checked')).toBeFalsy()
+  })
+
+  it('should open speedgrader link in a new tab', () => {
+    const assignment = mockAssignment()
+    const {getByText} = renderToolbox(assignment)
+    const sgLink = closest(getByText('0 to grade'), 'a')
+    expect(sgLink.getAttribute('target')).toEqual('_blank')
+  })
+
+  it('renders the message students button when the assignment does not have an online submission', () => {
+    const assignment = mockAssignment({
+      submissionTypes: ['on_paper']
+    })
+    const {queryByText, getByText} = renderToolbox(assignment)
+    expect(queryByText('unsubmitted', {exact: false})).toBeNull()
+    expect(getByText(/message students/i)).toBeInTheDocument()
+  })
+
+  it('does not render submission and grading links when assignment is not published', () => {
+    const assignment = mockAssignment({state: 'unpublished'})
+    const {queryByText} = renderToolbox(assignment)
+    expect(queryByText('to grade', {exact: false})).toBeNull()
+    expect(queryByText('unsubmitted', {exact: false})).toBeNull()
+    expect(queryByText('message students', {exact: false})).toBeNull()
+  })
 })

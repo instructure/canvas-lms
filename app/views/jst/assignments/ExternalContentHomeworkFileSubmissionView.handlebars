@@ -24,6 +24,14 @@
               {{#t }}I agree to the tool's <a href="{{ENV.EULA_URL}}" target="_blank">End-User License Agreement.</a>{{/t}}
             </input>
           </label>
+        {{else}}
+          {{#if ENV.SIMILARITY_PLEDGE}}
+            <label class="checkbox">
+              <input type="checkbox" class="turnitin_pledge external-tool" name="turnitin_pledge">
+                {{ENV.SIMILARITY_PLEDGE}}
+              </input>
+            </label>
+          {{/if}}
         {{/if}}
         <button type="button" class="cancel_button btn">{{#t '#buttons.cancel'}}Cancel{{/t}}</button>
         <button type="submit" class="submit_button btn btn-primary">{{#t 'buttons.submit_assignment'}}Submit Assignment{{/t}}</button>

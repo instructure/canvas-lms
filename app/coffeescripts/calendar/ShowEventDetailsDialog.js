@@ -289,12 +289,15 @@ export default class ShowEventDetailsDialog {
       axios
         .get(`api/v1/calendar_events/${this.event.object.parent_event_id}/participants`)
         .then(response => {
-          if (response.data) {
+          if (response.data && response.data.length) {
             const $ul = $('<ul>')
             response.data.forEach(p => {
               const $li = $('<li>').text(p.display_name)
               $ul.append($li)
             })
+            const $header = $('<th>').attr("id", 'attendees_header_text').attr("scope", 'row').text('Attendees')
+            $('#reservations').empty()
+            $('#reservations').append($header)
             $('#reservations').append($ul)
           } else {
             $('#reservations').remove()

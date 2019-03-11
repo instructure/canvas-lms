@@ -86,6 +86,18 @@ exports[`renders correctly expanded 1`] = `
                         "results": Array [
                           Object {
                             "assignment": Object {
+                              "id": "live_assessments/assessment_1",
+                              "name": "My assessment",
+                              "score": 0,
+                              "submission_types": "magic_marker",
+                            },
+                            "id": 2,
+                            "percent": 0.1,
+                            "score": 1,
+                            "submitted_or_assessed_at": "2019-02-01T07:01:00.000Z",
+                          },
+                          Object {
+                            "assignment": Object {
                               "html_url": "http://foo",
                               "id": "assignment_1",
                               "name": "My assignment",
@@ -95,6 +107,7 @@ exports[`renders correctly expanded 1`] = `
                             "id": 1,
                             "percent": 0.1,
                             "score": 1,
+                            "submitted_or_assessed_at": "2018-02-01T07:01:00.000Z",
                           },
                         ],
                         "score": 1,
@@ -190,6 +203,83 @@ exports[`renders correctly expanded 1`] = `
     variant="unstyled"
   >
     <ListItem
+      key="2"
+    >
+      <AssignmentResult
+        outcome={
+          Object {
+            "assignments": Array [
+              Object {
+                "assignment_id": 1,
+                "learning_outcome_id": 1,
+                "submission_types": "online_quiz",
+                "title": "My assignment",
+                "url": "www.example.com",
+              },
+            ],
+            "calculation_method": "highest",
+            "expansionId": 100,
+            "id": 1,
+            "mastered": false,
+            "mastery_points": 3,
+            "points_possible": 5,
+            "ratings": Array [
+              Object {
+                "description": "My first rating",
+              },
+              Object {
+                "description": "My second rating",
+              },
+            ],
+            "results": Array [
+              Object {
+                "assignment": Object {
+                  "id": "live_assessments/assessment_1",
+                  "name": "My assessment",
+                  "score": 0,
+                  "submission_types": "magic_marker",
+                },
+                "id": 2,
+                "percent": 0.1,
+                "score": 1,
+                "submitted_or_assessed_at": "2019-02-01T07:01:00.000Z",
+              },
+              Object {
+                "assignment": Object {
+                  "html_url": "http://foo",
+                  "id": "assignment_1",
+                  "name": "My assignment",
+                  "score": 0,
+                  "submission_types": "online_quiz",
+                },
+                "id": 1,
+                "percent": 0.1,
+                "score": 1,
+                "submitted_or_assessed_at": "2018-02-01T07:01:00.000Z",
+              },
+            ],
+            "score": 1,
+            "title": "My outcome",
+          }
+        }
+        outcomeProficiency={null}
+        result={
+          Object {
+            "assignment": Object {
+              "id": "live_assessments/assessment_1",
+              "name": "My assessment",
+              "score": 0,
+              "submission_types": "magic_marker",
+            },
+            "id": 2,
+            "percent": 0.1,
+            "score": 1,
+            "submitted_or_assessed_at": "2019-02-01T07:01:00.000Z",
+          }
+        }
+      />
+    </ListItem>
+    <ListItem
       key="1"
     >
       <AssignmentResult
@@ -221,6 +311,18 @@ exports[`renders correctly expanded 1`] = `
             "results": Array [
               Object {
                 "assignment": Object {
+                  "id": "live_assessments/assessment_1",
+                  "name": "My assessment",
+                  "score": 0,
+                  "submission_types": "magic_marker",
+                },
+                "id": 2,
+                "percent": 0.1,
+                "score": 1,
+                "submitted_or_assessed_at": "2019-02-01T07:01:00.000Z",
+              },
+              Object {
+                "assignment": Object {
                   "html_url": "http://foo",
                   "id": "assignment_1",
                   "name": "My assignment",
@@ -230,6 +332,7 @@ exports[`renders correctly expanded 1`] = `
                 "id": 1,
                 "percent": 0.1,
                 "score": 1,
+                "submitted_or_assessed_at": "2018-02-01T07:01:00.000Z",
               },
             ],
             "score": 1,
@@ -249,6 +352,7 @@ exports[`renders correctly expanded 1`] = `
             "id": 1,
             "percent": 0.1,
             "score": 1,
+            "submitted_or_assessed_at": "2018-02-01T07:01:00.000Z",
           }
         }
       />
@@ -423,6 +527,7 @@ exports[`renders correctly expanded with no results 1`] = `
           "url": "www.example.com",
         }
       }
+      key="1"
     />
   </List>
 </ToggleGroup>
@@ -671,6 +776,18 @@ exports[`renders the Outcome component 1`] = `
                         "results": Array [
                           Object {
                             "assignment": Object {
+                              "id": "live_assessments/assessment_1",
+                              "name": "My assessment",
+                              "score": 0,
+                              "submission_types": "magic_marker",
+                            },
+                            "id": 2,
+                            "percent": 0.1,
+                            "score": 1,
+                            "submitted_or_assessed_at": "2019-02-01T07:01:00.000Z",
+                          },
+                          Object {
+                            "assignment": Object {
                               "html_url": "http://foo",
                               "id": "assignment_1",
                               "name": "My assignment",
@@ -680,6 +797,7 @@ exports[`renders the Outcome component 1`] = `
                             "id": 1,
                             "percent": 0.1,
                             "score": 1,
+                            "submitted_or_assessed_at": "2018-02-01T07:01:00.000Z",
                           },
                         ],
                         "score": 1,
@@ -775,6 +893,83 @@ exports[`renders the Outcome component 1`] = `
     variant="unstyled"
   >
     <ListItem
+      key="2"
+    >
+      <AssignmentResult
+        outcome={
+          Object {
+            "assignments": Array [
+              Object {
+                "assignment_id": 1,
+                "learning_outcome_id": 1,
+                "submission_types": "online_quiz",
+                "title": "My assignment",
+                "url": "www.example.com",
+              },
+            ],
+            "calculation_method": "highest",
+            "expansionId": 100,
+            "id": 1,
+            "mastered": false,
+            "mastery_points": 3,
+            "points_possible": 5,
+            "ratings": Array [
+              Object {
+                "description": "My first rating",
+              },
+              Object {
+                "description": "My second rating",
+              },
+            ],
+            "results": Array [
+              Object {
+                "assignment": Object {
+                  "id": "live_assessments/assessment_1",
+                  "name": "My assessment",
+                  "score": 0,
+                  "submission_types": "magic_marker",
+                },
+                "id": 2,
+                "percent": 0.1,
+                "score": 1,
+                "submitted_or_assessed_at": "2019-02-01T07:01:00.000Z",
+              },
+              Object {
+                "assignment": Object {
+                  "html_url": "http://foo",
+                  "id": "assignment_1",
+                  "name": "My assignment",
+                  "score": 0,
+                  "submission_types": "online_quiz",
+                },
+                "id": 1,
+                "percent": 0.1,
+                "score": 1,
+                "submitted_or_assessed_at": "2018-02-01T07:01:00.000Z",
+              },
+            ],
+            "score": 1,
+            "title": "My outcome",
+          }
+        }
+        outcomeProficiency={null}
+        result={
+          Object {
+            "assignment": Object {
+              "id": "live_assessments/assessment_1",
+              "name": "My assessment",
+              "score": 0,
+              "submission_types": "magic_marker",
+            },
+            "id": 2,
+            "percent": 0.1,
+            "score": 1,
+            "submitted_or_assessed_at": "2019-02-01T07:01:00.000Z",
+          }
+        }
+      />
+    </ListItem>
+    <ListItem
       key="1"
     >
       <AssignmentResult
@@ -806,6 +1001,18 @@ exports[`renders the Outcome component 1`] = `
             "results": Array [
               Object {
                 "assignment": Object {
+                  "id": "live_assessments/assessment_1",
+                  "name": "My assessment",
+                  "score": 0,
+                  "submission_types": "magic_marker",
+                },
+                "id": 2,
+                "percent": 0.1,
+                "score": 1,
+                "submitted_or_assessed_at": "2019-02-01T07:01:00.000Z",
+              },
+              Object {
+                "assignment": Object {
                   "html_url": "http://foo",
                   "id": "assignment_1",
                   "name": "My assignment",
@@ -815,6 +1022,7 @@ exports[`renders the Outcome component 1`] = `
                 "id": 1,
                 "percent": 0.1,
                 "score": 1,
+                "submitted_or_assessed_at": "2018-02-01T07:01:00.000Z",
               },
             ],
             "score": 1,
@@ -834,6 +1042,7 @@ exports[`renders the Outcome component 1`] = `
             "id": 1,
             "percent": 0.1,
             "score": 1,
+            "submitted_or_assessed_at": "2018-02-01T07:01:00.000Z",
           }
         }
       />

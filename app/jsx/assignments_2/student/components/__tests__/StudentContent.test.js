@@ -16,81 +16,79 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import ReactDOM from 'react-dom'
-import $ from 'jquery'
 
-import {mockAssignment} from '../../test-utils'
+import {mockAssignment, mockComments} from '../../test-utils'
 import StudentContent from '../StudentContent'
+import {MockedProvider} from 'react-apollo/test-utils'
+import {SUBMISSION_COMMENT_QUERY} from '../../assignmentData'
+import {waitForElement, render, fireEvent} from 'react-testing-library'
 
-beforeAll(() => {
-  const found = document.getElementById('fixtures')
-  if (!found) {
-    const fixtures = document.createElement('div')
-    fixtures.setAttribute('id', 'fixtures')
-    document.body.appendChild(fixtures)
+const mocks = [
+  {
+    request: {
+      query: SUBMISSION_COMMENT_QUERY,
+      variables: {
+        submissionId: mockAssignment().submissionsConnection.nodes[0].id.toString()
+      }
+    },
+    result: {
+      data: {
+        submissionComments: mockComments()
+      }
+    }
   }
-})
-
-afterEach(() => {
-  ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
-})
+]
 
 describe('Assignment Student Content View', () => {
   it('renders the student header if the assignment is unlocked', () => {
     const assignment = mockAssignment({lockInfo: {isLocked: false}})
-    ReactDOM.render(<StudentContent assignment={assignment} />, document.getElementById('fixtures'))
-    const element = $('[data-test-id="assignments-2-student-header"]')
-    expect(element).toHaveLength(1)
+    const {getByTestId} = render(<StudentContent assignment={assignment} />)
+    expect(getByTestId('assignments-2-student-view')).toBeInTheDocument()
   })
 
   it('renders the student header if the assignment is locked', () => {
     const assignment = mockAssignment({lockInfo: {isLocked: true}})
-    ReactDOM.render(<StudentContent assignment={assignment} />, document.getElementById('fixtures'))
-    const element = $('[data-test-id="assignments-2-student-header"]')
-    expect(element).toHaveLength(1)
+    const {getByTestId} = render(<StudentContent assignment={assignment} />)
+    expect(getByTestId('assignments-2-student-header')).toBeInTheDocument()
   })
 
   it('renders the assignment details and student content tab if the assignment is unlocked', () => {
     const assignment = mockAssignment({lockInfo: {isLocked: false}})
-    ReactDOM.render(<StudentContent assignment={assignment} />, document.getElementById('fixtures'))
+    const {getByRole, getByText, queryByText} = render(<StudentContent assignment={assignment} />)
 
-    const contentTabs = $('[data-test-id="assignment-2-student-content-tabs"]')
-    const toggleDetails = $('.a2-toggle-details-container')
-    const root = $('#fixtures')
-    expect(toggleDetails).toHaveLength(1)
-    expect(contentTabs).toHaveLength(1)
-    expect(root.text()).not.toMatch('Availability Dates')
+    expect(getByRole('tablist')).toHaveTextContent('Upload')
+    expect(getByText('Details')).toBeInTheDocument()
+    expect(queryByText('Availability Dates')).not.toBeInTheDocument()
   })
 
   it('renders the availability dates if the assignment is locked', () => {
     const assignment = mockAssignment({lockInfo: {isLocked: true}})
-    ReactDOM.render(<StudentContent assignment={assignment} />, document.getElementById('fixtures'))
+    const {queryByRole, getByText, queryByText} = render(<StudentContent assignment={assignment} />)
 
-    const contentTabs = $('[data-test-id="assignment-2-student-content-tabs"]')
-    const toggleDetails = $('.a2-toggle-details-container')
-    const root = $('#fixtures')
-    expect(toggleDetails).toHaveLength(0)
-    expect(contentTabs).toHaveLength(0)
-    expect(root.text()).toMatch('Availability Dates')
+    expect(queryByRole('tablist')).not.toBeInTheDocument()
+    expect(queryByText('Details')).not.toBeInTheDocument()
+    expect(getByText('Availability Dates')).toBeInTheDocument()
+  })
+
+  it('renders Comments', async () => {
+    const {getByText} = render(
+      <MockedProvider mocks={mocks} addTypename>
+        <StudentContent assignment={mockAssignment({lockInfo: {isLocked: false}})} />
+      </MockedProvider>
+    )
+    fireEvent.click(getByText('Comments', {selector: '[role=tab]'}))
+
+    expect(await waitForElement(() => getByText('Send Comment'))).toBeInTheDocument()
   })
 
   it('renders spinner while lazy loading comments', () => {
     const assignment = mockAssignment({lockInfo: {isLocked: false}})
-    ReactDOM.render(<StudentContent assignment={assignment} />, document.getElementById('fixtures'))
-    $('[data-test-id="assignment-2-student-content-tabs"] div:contains("Comments")')[0].click()
-    const container = $('[data-test-id="loading-indicator"]')
-    expect(container).toHaveLength(1)
-  })
-
-  it('renders Comments', done => {
-    const assignment = mockAssignment({lockInfo: {isLocked: false}})
-    ReactDOM.render(<StudentContent assignment={assignment} />, document.getElementById('fixtures'))
-    $('[data-test-id="assignment-2-student-content-tabs"] div:contains("Comments")')[0].click()
-    // We just need to kick an event loop to ensure the js actually is loaded.
-    setTimeout(() => {
-      const container = $('[data-test-id="comments-container"]')
-      expect(container).toHaveLength(1)
-      done()
-    }, 0)
+    const {getByTitle, getByText} = render(
+      <MockedProvider mocks={mocks} addTypename>
+        <StudentContent assignment={assignment} />
+      </MockedProvider>
+    )
+    fireEvent.click(getByText('Comments', {selector: '[role=tab]'}))
+    expect(getByTitle('Loading')).toBeInTheDocument()
   })
 })

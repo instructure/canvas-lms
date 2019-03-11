@@ -118,13 +118,6 @@ describe GradingStandard do
     end
   end
 
-  describe "#lower_bound" do
-    it "returns the lower bound of a score" do
-      standard = GradingStandard.new(data: @default_standard_v1)
-      expect(standard.lower_bound(82)).to eq 79
-    end
-  end
-
   context "#for" do
     it "should return standards that match the context" do
       grading_standard_for @course

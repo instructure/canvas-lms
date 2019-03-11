@@ -296,9 +296,9 @@ module UserLearningObjectScopes
     params = _params_hash(binding)
     # not really any harm in extending the expires_in since we touch the user anyway when grades change
     objects_needing('Assignment', 'grading', :instructor, params, 120.minutes, **params) do |assignment_scope|
-      as = assignment_scope.active.
+      as = assignment_scope.
         joins("INNER JOIN #{Enrollment.quoted_table_name} ON enrollments.course_id = assignments.context_id").
-        where(enrollments: {user_id: self}).
+        where(enrollments: {user_id: self, workflow_state: 'active'}).
         where("EXISTS (#{grader_visible_submissions_sql})").
         group('assignments.id').
         order('assignments.due_at')
@@ -324,7 +324,8 @@ module UserLearningObjectScopes
       WHERE submissions.assignment_id = assignments.id
         AND #{Submission.needs_grading_conditions}
         AND enrollments.limit_privileges_to_course_section = 't'
-        AND enrollments.course_section_id = student_enrollments.course_section_id"
+        AND enrollments.course_section_id = student_enrollments.course_section_id
+        AND student_enrollments.workflow_state = 'active'"
   end
 
   def assignments_needing_moderation(

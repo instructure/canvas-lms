@@ -38,7 +38,7 @@ describe "threaded discussions" do
     expect(f('.discussion-title').text).to eq @topic_title
   end
 
-  it "should reply to the threaded discussion", priority: "2", test_id: 222519 do
+  it "should reply to the threaded discussion", :xbrowser, priority: "2", test_id: 222519 do
     entry_text = 'new entry'
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
 

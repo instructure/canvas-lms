@@ -135,7 +135,7 @@ describe Lti::LtiAdvantageAdapter do
       tool.course_navigation = {
         enabled: true,
         message_type: 'ResourceLinkRequest',
-        url: 'https://www.launch.com/course-navigation'
+        target_link_uri: 'https://www.launch.com/course-navigation'
       }
       tool.save!
       expect(adapter.launch_url).to eq 'https://www.launch.com/course-navigation'

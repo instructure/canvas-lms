@@ -76,16 +76,19 @@ module Types
     end
     DEFAULT_GRADING_PERIOD = "default_grading_period"
     def grades(grading_period_id: DEFAULT_GRADING_PERIOD)
-      Loaders::AssociationLoader.for(Enrollment, [:scores, :user, :course]).
-        load(enrollment).then do
-          if grading_period_id == DEFAULT_GRADING_PERIOD
-            Loaders::CurrentGradingPeriodLoader.load(enrollment.course).then { |gp, _|
-              load_grades(gp&.id)
-            }
-          else
-            load_grades(grading_period_id)
-          end
+      Promise.all([
+        load_association(:scores),
+        load_association(:user),
+        load_association(:course)
+      ]).then do
+        if grading_period_id == DEFAULT_GRADING_PERIOD
+          Loaders::CurrentGradingPeriodLoader.load(enrollment.course).then { |gp, _|
+            load_grades(gp&.id)
+          }
+        else
+          load_grades(grading_period_id)
         end
+      end
     end
 
     def load_grades(grading_period_id)

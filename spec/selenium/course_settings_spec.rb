@@ -155,7 +155,7 @@ describe "course settings" do
       expect(admin_cog('#nav_edit_tab_id_0')).to be_falsey
     end
 
-    it "should change course details" do
+    it "should change course details", :xbrowser do
       course_name = 'new course name'
       course_code = 'new course-101'
       locale_text = 'English (US)'

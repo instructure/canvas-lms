@@ -284,7 +284,7 @@ export default class ProficiencyTable extends React.Component {
         <Billboard
           headingAs="h2"
           headingLevel="h2"
-          ref={(d) => { this.triggerRoot = d }} // eslint-disable-line immutable/no-mutation
+          ref={(d) => { this.triggerRoot = d }}
           hero={<div style={styles}><PresentationContent><SVGWrapper url="/images/trophy.svg"/></PresentationContent></div>}
           heading={I18n.t('Customize Learning Mastery Ratings')}
           message={I18n.t(`

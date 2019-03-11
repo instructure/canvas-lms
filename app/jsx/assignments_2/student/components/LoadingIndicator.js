@@ -22,7 +22,7 @@ import View from '@instructure/ui-layout/lib/components/View'
 
 function LoadingIndicator() {
   return (
-    <View data-test-id="loading-indicator" as="div" height="100%" width="100%" textAlign="center">
+    <View as="div" height="100%" width="100%" textAlign="center">
       <Spinner title={I18n.t('Loading')} size="large" margin="0 0 0 medium" />
     </View>
   )

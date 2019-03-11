@@ -17,45 +17,62 @@
  */
 
 import React from 'react'
-import {bool} from 'prop-types'
+import {bool, func} from 'prop-types'
 import I18n from 'i18n!assignments_2'
 import {TeacherAssignmentShape} from '../../assignmentData'
 import Override from './Override'
-
-EveryoneElse.propTypes = {
-  assignment: TeacherAssignmentShape.isRequired,
-  readOnly: bool
-}
-EveryoneElse.defaultProps = {
-  readOnly: true
-}
 
 // When all the students are not included in the assignment
 // overrides, those that are left out (e.g. everyone else,
 // though it could be everyone if there are no overrides)
 // get their data from the assignment itself.
-export default function EveryoneElse(props) {
-  return OverrideFromAssignment(props.assignment, props.readOnly)
-}
-
-function OverrideFromAssignment(assignment, readOnly) {
-  const title =
-    assignment.assignmentOverrides.nodes.length > 0 ? I18n.t('Everyone else') : I18n.t('Everyone')
-
-  const fauxOverride = {
-    gid: `assignment_${assignment.id}`,
-    lid: `assignment_${assignment._id}`,
-    dueAt: assignment.dueAt,
-    lockAt: assignment.lockAt,
-    unlockAt: assignment.unlockAt,
-    title,
-    submissionTypes: assignment.submissionTypes,
-    allowedExtensions: assignment.allowedExtensions,
-    set: {
-      lid: null,
-      name: title
-    },
-    readOnly
+export default class EveryoneElse extends React.Component {
+  static propTypes = {
+    assignment: TeacherAssignmentShape.isRequired,
+    onChangeAssignment: func.isRequired,
+    readOnly: bool
   }
-  return <Override override={fauxOverride} readOnly={readOnly} />
+
+  static defaultProps = {
+    readOnly: true
+  }
+
+  handleChangeOverride = (_index, path, value) => {
+    // everyone else's values go right on the assignment
+    this.props.onChangeAssignment(path, value)
+  }
+
+  overrideFromAssignment(assignment) {
+    const title =
+      assignment.assignmentOverrides.nodes.length > 0 ? I18n.t('Everyone else') : I18n.t('Everyone')
+
+    const fauxOverride = {
+      gid: `assignment_${assignment.id}`,
+      lid: `assignment_${assignment._id}`,
+      dueAt: assignment.dueAt,
+      lockAt: assignment.lockAt,
+      unlockAt: assignment.unlockAt,
+      title,
+      submissionTypes: assignment.submissionTypes,
+      allowedAttempts: assignment.allowedAttempts,
+      allowedExtensions: assignment.allowedExtensions,
+      set: {
+        lid: null,
+        name: title
+      }
+    }
+    return fauxOverride
+  }
+
+  render() {
+    const fauxOverride = this.overrideFromAssignment(this.props.assignment)
+    return (
+      <Override
+        override={fauxOverride}
+        onChangeOverride={this.handleChangeOverride}
+        index={-1}
+        readOnly={this.props.readOnly}
+      />
+    )
+  }
 }

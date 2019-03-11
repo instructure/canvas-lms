@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+const {defaults} = require('jest-config')
+
 module.exports = {
   moduleNameMapper: {
     '^i18n!(.*$)': '<rootDir>/jest/i18nTransformer.js',
@@ -24,7 +26,7 @@ module.exports = {
     "^timezone$": "<rootDir>/public/javascripts/timezone_core.js",
     "\\.svg$": "<rootDir>/jest/imageMock.js"
   },
-  roots: ['app/jsx'],
+  roots: ['app/jsx', 'app/coffeescripts'],
   moduleDirectories: [
     'node_modules',
     'public/javascripts',
@@ -46,8 +48,11 @@ module.exports = {
 
   coverageDirectory: '<rootDir>/coverage-jest/',
 
+  moduleFileExtensions: [...defaults.moduleFileExtensions, 'coffee'],
+
   transform: {
     '^i18n': '<rootDir>/jest/i18nTransformer.js',
+    '^.+\\.coffee': '<rootDir>/jest/coffeeTransformer.js',
     '^.+\\.jsx?$': 'babel-jest'
   },
 }

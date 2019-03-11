@@ -25,7 +25,7 @@ import {
   FETCH_RECORDS_NEXT_PAGE_START,
   FETCH_RECORDS_NEXT_PAGE_SUCCESS,
   FETCH_RECORDS_NEXT_PAGE_FAILURE
-} from '../../gradebook-history/actions/SearchFormActions'
+} from '../actions/SearchFormActions'
 
 const initialState = {
   records: {

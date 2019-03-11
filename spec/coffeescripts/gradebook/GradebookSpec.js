@@ -877,7 +877,7 @@ QUnit.module('Gradebook#gotSubmissionsChunk', function(hooks) {
 })
 
 QUnit.module('Gradebook#gotAllAssignmentGroups', suiteHooks => {
-  let studentSubmissions = null
+  const studentSubmissions = null
   let gradebook = null
 
   let unmoderatedAssignment

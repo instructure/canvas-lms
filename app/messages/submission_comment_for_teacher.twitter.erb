@@ -1,8 +1,7 @@
+<% presenter = Messages::SubmissionCommentForTeacher::TwitterPresenter.new(self) %>
+
 <% define_content :link do -%>
-  <%= polymorphic_url([asset.submission.assignment.context, asset.submission.assignment, :submission], id: asset.submission.user) %>
+  <%= presenter.link %>
 <% end -%>
-<%= t :tweet, "Canvas Alert - Comment: %{author} for %{assignment}, %{user}, %{context}.", 
-        :author => asset.author.name, 
-        :assignment => asset.submission.assignment.title, 
-        :user => asset.submission.user.name, 
-        :context => asset.submission.assignment.context.name %>
+
+<%= presenter.body %>

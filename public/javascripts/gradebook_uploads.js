@@ -29,27 +29,27 @@ import './jquery.instructure_forms' /* errorBox */
 import './jquery.instructure_misc_helpers' /* /\.detect/ */
 import './jquery.templateData' /* fillTemplateData */
 
-var GradebookUploader = {
-  createGeneralFormatter: function(attribute) {
+const GradebookUploader = {
+  createGeneralFormatter(attribute) {
     return function(row, cell, value) {
       return value ? value[attribute] : ''
     }
   },
 
-  createNumberFormatter: function(attribute) {
+  createNumberFormatter(attribute) {
     return function(row, cell, value) {
       return value ? GradeFormatHelper.formatGrade(value[attribute]) : ''
     }
   },
 
-  init: function(uploadedGradebook) {
-    var gradebookGrid,
-      $gradebook_grid = $('#gradebook_grid'),
-      $gradebook_grid_header = $('#gradebook_grid_header'),
-      rowsToHighlight = [],
-      self = this
+  init(uploadedGradebook) {
+    const $gradebook_grid = $('#gradebook_grid')
+    const $gradebook_grid_header = $('#gradebook_grid_header')
+    const rowsToHighlight = []
 
-    var gridData = {
+    let gradebookGrid
+
+    const gridData = {
       columns: [
         {
           id: 'student',
@@ -57,7 +57,7 @@ var GradebookUploader = {
           field: 'student',
           width: 250,
           cssClass: 'cell-title',
-          formatter: self.createGeneralFormatter('name')
+          formatter: GradebookUploader.createGeneralFormatter('name')
         }
       ],
       options: {
@@ -70,7 +70,7 @@ var GradebookUploader = {
       data: []
     }
 
-    var labelData = {
+    const labelData = {
       columns: [
         {
           id: 'assignmentGrouping',
@@ -91,14 +91,14 @@ var GradebookUploader = {
     delete uploadedGradebook.original_submissions
 
     $.each(uploadedGradebook.assignments, function() {
-      var newGrade = {
+      const newGrade = {
         id: this.id,
         type: 'assignments',
         name: htmlEscape(I18n.t('To')),
         field: this.id,
         width: 125,
         editor: Slick.Editors.UploadGradeCellEditor,
-        formatter: self.createNumberFormatter('grade'),
+        formatter: GradebookUploader.createNumberFormatter('grade'),
         active: true,
         previous_id: this.previous_id,
         cssClass: 'new-grade'
@@ -111,16 +111,16 @@ var GradebookUploader = {
         newGrade.editorParser = GradeFormatHelper.delocalizeGrade
       }
 
-      var conflictingGrade = {
+      const conflictingGrade = {
         id: `${this.id}_conflicting`,
         width: 125,
-        formatter: self.createNumberFormatter('original_grade'),
+        formatter: GradebookUploader.createNumberFormatter('original_grade'),
         field: `${this.id}_conflicting`,
         name: htmlEscape(I18n.t('From')),
         cssClass: 'conflicting-grade'
       }
 
-      var assignmentHeaderColumn = {
+      const assignmentHeaderColumn = {
         id: this.id,
         width: 250,
         name: htmlEscape(this.title),
@@ -141,7 +141,7 @@ var GradebookUploader = {
         field: `custom_col_${column.id}`,
         width: 125,
         editor: Slick.Editors.UploadGradeCellEditor,
-        formatter: self.createGeneralFormatter('new_content'),
+        formatter: GradebookUploader.createGeneralFormatter('new_content'),
         editorFormatter: 'custom_column',
         editorParser: 'custom_column',
         active: true,
@@ -151,7 +151,7 @@ var GradebookUploader = {
       const conflictingCustomColumn = {
         id: `custom_col_${column.id}_conflicting`,
         width: 125,
-        formatter: self.createGeneralFormatter('current_content'),
+        formatter: GradebookUploader.createGeneralFormatter('current_content'),
         field: `custom_col_${column.id}_conflicting`,
         name: htmlEscape(I18n.t('From')),
         cssClass: 'conflicting-grade'
@@ -170,7 +170,7 @@ var GradebookUploader = {
     })
 
     $.each(uploadedGradebook.students, function(index) {
-      var row = {
+      const row = {
         student: this,
         id: this.id
       }
@@ -207,18 +207,18 @@ var GradebookUploader = {
         $('#assignments_without_changes_alert').show()
       }
 
-      var $gradebookGridForm = $('#gradebook_grid_form')
+      const $gradebookGridForm = $('#gradebook_grid_form')
       $gradebookGridForm
-        .submit(function(e) {
+        .submit(e => {
           e.preventDefault()
           $gradebookGridForm.disableWhileLoading(ProcessGradebookUpload.upload(uploadedGradebook))
         })
         .show()
 
       $(window)
-        .resize(function() {
+        .resize(() => {
           $gradebook_grid.height($(window).height() - $gradebook_grid.offset().top - 150)
-          var width = (gridData.columns.length - 1) * 125 + 250
+          const width = (gridData.columns.length - 1) * 125 + 250
           $gradebook_grid.parent().width(width)
         })
         .triggerHandler('resize')
@@ -230,17 +230,13 @@ var GradebookUploader = {
         gridData.options
       )
       new Slick.Grid($gradebook_grid_header, labelData.data, labelData.columns, labelData.options)
-      gradebookGrid.onColumnHeaderClick = function(columnDef) {
-        /*do nothing*/
-      }
 
-      var gradeReviewRow = {}
+      const gradeReviewRow = {}
 
-      for (var i = 0; i < rowsToHighlight.length; i++) {
-        var id = rowsToHighlight[i].id,
-          rowIndex = rowsToHighlight[i].rowIndex,
-          rowIndex = rowsToHighlight[i].rowIndex,
-          conflictingId = id + '_conflicting'
+      for (let i = 0; i < rowsToHighlight.length; i++) {
+        const id = rowsToHighlight[i].id
+        const rowIndex = rowsToHighlight[i].rowIndex
+        const conflictingId = `${id}_conflicting`
 
         gradeReviewRow[rowIndex] = gradeReviewRow[rowIndex] || {}
         gradeReviewRow[rowIndex][id] = 'right-highlight'
@@ -267,24 +263,23 @@ var GradebookUploader = {
     }
   },
 
-  handleThingsNeedingToBeResolved: function() {
-    var processingDfd = waitForProcessing(ENV.progress)
-    processingDfd.fail(function(msg) {
+  handleThingsNeedingToBeResolved() {
+    const processingDfd = waitForProcessing(ENV.progress)
+    processingDfd.fail(msg => {
       alert(msg)
       window.location = ENV.new_gradebook_upload_path
     })
-    processingDfd.done(function(uploadedGradebook) {
-      var needingReview = {},
-        possibilitiesToMergeWith = {}
+    processingDfd.done(uploadedGradebook => {
+      const needingReview = {}
 
       // first, figure out if there is anything that needs to be resolved
-      $.each(['student', 'assignment'], function(i, thing) {
-        var $template = $('#' + thing + '_resolution_template').remove(),
+      $.each(['student', 'assignment'], (i, thing) => {
+        const $template = $(`#${thing}_resolution_template`).remove(),
           $select = $template.find('select')
 
         needingReview[thing] = []
 
-        $.each(uploadedGradebook[thing + 's'], function() {
+        $.each(uploadedGradebook[`${thing}s`], function() {
           if (!this.previous_id) {
             needingReview[thing].push(this)
           }
@@ -296,13 +291,13 @@ var GradebookUploader = {
               .next('.points_possible_section')
               .css({opacity: 0})
             if ($(this).val() > 0) {
-              //if the thing that was selected is an id( not ignore or add )
-              $('#' + thing + '_resolution_template select option').removeAttr('disabled')
-              $('#' + thing + '_resolution_template select').each(function() {
+              // if the thing that was selected is an id( not ignore or add )
+              $(`#${thing}_resolution_template select option`).removeAttr('disabled')
+              $(`#${thing}_resolution_template select`).each(function() {
                 if ($(this).val() != 'ignore') {
-                  $('#' + thing + '_resolution_template select')
+                  $(`#${thing}_resolution_template select`)
                     .not(this)
-                    .find("option[value='" + $(this).val() + "']")
+                    .find(`option[value='${$(this).val()}']`)
                     .attr('disabled', true)
                 }
               })
@@ -313,17 +308,13 @@ var GradebookUploader = {
             }
           })
 
-          $.each(uploadedGradebook.missing_objects[thing + 's'], function() {
+          $.each(uploadedGradebook.missing_objects[`${thing}s`], function() {
             $(
-              '<option value="' +
-                this.id +
-                '" >' +
-                htmlEscape(this.name || this.title) +
-                '</option>'
+              `<option value="${this.id}" >${htmlEscape(this.name || this.title)}</option>`
             ).appendTo($select)
           })
 
-          $.each(needingReview[thing], function(i, record) {
+          $.each(needingReview[thing], (i, record) => {
             $template
               .clone(true)
               .fillTemplateData({
@@ -334,19 +325,17 @@ var GradebookUploader = {
                   points_possible: I18n.n(record.points_possible)
                 }
               })
-              .appendTo('#gradebook_importer_resolution_section .' + thing + '_section table tbody')
+              .appendTo(`#gradebook_importer_resolution_section .${thing}_section table tbody`)
               .show()
               .find('input.points_possible')
               .change(function() {
-                var $this = $(this)
+                const $this = $(this)
                 record.points_possible = numberHelper.parse($this.val())
                 $this.val(I18n.n(record.points_possible))
               })
           })
           $(
-            '#gradebook_importer_resolution_section, #gradebook_importer_resolution_section .' +
-              thing +
-              '_section'
+            `#gradebook_importer_resolution_section, #gradebook_importer_resolution_section .${thing}_section`
           ).show()
         }
       })
@@ -355,7 +344,7 @@ var GradebookUploader = {
       if (needingReview.student.length || needingReview.assignment.length) {
         // if there are things that need to be resolved, set up stuff for that form
         $('#gradebook_importer_resolution_section').submit(function(e) {
-          var returnFalse = false
+          let returnFalse = false
           e.preventDefault()
 
           $(this)
@@ -372,7 +361,7 @@ var GradebookUploader = {
           $(this)
             .find('select')
             .each(function() {
-              var $select = $(this),
+              const $select = $(this),
                 parts = $select.attr('name').split('_'),
                 thing = parts[0],
                 id = parts[1],
@@ -380,36 +369,33 @@ var GradebookUploader = {
 
               switch (val) {
                 case 'new':
-                  //do nothing
+                  // do nothing
                   break
                 case 'ignore':
-                  //remove the entry from the uploaded gradebook
-                  for (var i in uploadedGradebook[thing + 's']) {
-                    if (id == uploadedGradebook[thing + 's'][i].id) {
-                      uploadedGradebook[thing + 's'].splice(i, 1)
+                  // remove the entry from the uploaded gradebook
+                  for (const i in uploadedGradebook[`${thing}s`]) {
+                    if (id == uploadedGradebook[`${thing}s`][i].id) {
+                      uploadedGradebook[`${thing}s`].splice(i, 1)
                       break
                     }
                   }
                   break
                 default:
-                  //merge
-                  var obj = _.detect(uploadedGradebook[thing + 's'], function(thng) {
-                    return id == thng.id
-                  })
+                  // merge
+                  const obj = _.detect(uploadedGradebook[`${thing}s`], thng => id == thng.id)
                   obj.id = obj.previous_id = val
                   if (thing === 'assignment') {
                     // find the original grade for this assignment for each student
-                    $.each(uploadedGradebook['students'], function() {
-                      var student = this
-                      var submission = _.detect(student.submissions, function(thng) {
-                        return thng.assignment_id == id
-                      })
+                    $.each(uploadedGradebook.students, function() {
+                      const student = this
+                      const submission = _.detect(
+                        student.submissions,
+                        thng => thng.assignment_id == id
+                      )
                       submission.assignment_id = val
-                      var original_submission = _.detect(
+                      const original_submission = _.detect(
                         uploadedGradebook.original_submissions,
-                        function(sub) {
-                          return sub.user_id == student.id && sub.assignment_id == val
-                        }
+                        sub => sub.user_id == student.id && sub.assignment_id == val
                       )
                       if (original_submission) {
                         submission.original_grade =
@@ -419,14 +405,11 @@ var GradebookUploader = {
                   } else if (thing === 'student') {
                     // find the original grade for each assignment for this student
                     $.each(obj.submissions, function() {
-                      var submission = this
-                      var original_submission = _.detect(
+                      const submission = this
+                      const original_submission = _.detect(
                         uploadedGradebook.original_submissions,
-                        function(sub) {
-                          return (
-                            sub.user_id == obj.id && sub.assignment_id == submission.assignment_id
-                          )
-                        }
+                        sub =>
+                          sub.user_id == obj.id && sub.assignment_id == submission.assignment_id
                       )
                       if (original_submission) {
                         submission.original_grade =
@@ -438,12 +421,12 @@ var GradebookUploader = {
             })
 
           // remove assignments that have no changes
-          var indexes_to_delete = []
-          $.each(uploadedGradebook.assignments, function(index) {
+          const indexes_to_delete = []
+          $.each(uploadedGradebook.assignments, index => {
             if (
               uploadedGradebook.assignments[index].previous_id &&
-              _.all(uploadedGradebook.students, function(student) {
-                var submission = student.submissions[index]
+              _.all(uploadedGradebook.students, student => {
+                const submission = student.submissions[index]
 
                 return (
                   parseFloat(submission.original_grade) == parseFloat(submission.grade) ||
@@ -454,7 +437,7 @@ var GradebookUploader = {
               indexes_to_delete.push(index)
             }
           })
-          _.each(indexes_to_delete.reverse(), function(index) {
+          _.each(indexes_to_delete.reverse(), index => {
             uploadedGradebook.assignments.splice(index, 1)
             $.each(uploadedGradebook.students, function() {
               this.submissions.splice(index, 1)

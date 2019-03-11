@@ -108,7 +108,7 @@ UsageRightsDialog.renderFolderMessage = function() {
     <div>
       {this.renderFolderList(folders)}
       {this.renderFolderTooltip(folders)}
-      <hr />
+      <hr aria-hidden="true" />
     </div>
   )
 }
@@ -134,7 +134,7 @@ UsageRightsDialog.renderAccessManagement = function() {
   if (this.props.userCanRestrictFilesForContext) {
     return (
       <div>
-        <hr />
+        <hr aria-hidden="true" />
         <div className="form-horizontal">
           <p className="manage-access">{I18n.t('You can also manage access at this time:')}</p>
           <RestrictedRadioButtons

@@ -17,27 +17,22 @@
  */
 
 import React from 'react'
+import {render} from 'react-testing-library'
+import AddHorizontalRuleButton from '../AddHorizontalRuleButton'
 
-import I18n from 'i18n!assignments_2'
-
-import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
-import Modal, {
-  ModalHeader,
-  ModalBody
-  // ModalFooter
-} from '@instructure/ui-overlays/lib/components/Modal'
-
-export default function MessageStudentsWho(props) {
-  return (
-    <Modal label={I18n.t('Message Students Who')} {...props}>
-      <ModalHeader>
-        <CloseButton placement="end" variant="icon" onClick={props.onDismiss}>
-          {I18n.t('Close')}
-        </CloseButton>
-      </ModalHeader>
-      <ModalBody>
-        <div data-testid="message-students-who">Message Students Who</div>
-      </ModalBody>
-    </Modal>
+it('renders', () => {
+  const {getByText, getByTestId} = render(
+    <AddHorizontalRuleButton onClick={() => {}} label="click me" />
   )
-}
+  expect(getByTestId('AddHorizontalRuleButton')).toBeInTheDocument()
+  expect(getByText('click me')).toBeInTheDocument()
+})
+
+it('calls onClick when clicked', () => {
+  const onclick = jest.fn()
+  const {getByText} = render(<AddHorizontalRuleButton onClick={onclick} label="click me" />)
+
+  const btn = getByText('click me')
+  btn.click()
+  expect(onclick).toHaveBeenCalled()
+})

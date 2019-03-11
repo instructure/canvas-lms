@@ -22,7 +22,7 @@ import {bool, func} from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import $ from 'jquery'
-import 'compiled/jquery.rails_flash_notifications' // eslint-disable-line
+import 'compiled/jquery.rails_flash_notifications'
 
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import View from '@instructure/ui-layout/lib/components/View'
@@ -47,7 +47,7 @@ const verbosityTypes = [
 export default class AddExternalFeed extends React.Component {
   static propTypes = {
     defaultOpen: bool,
-    isSaving: bool.isRequired, // eslint-disable-line
+    isSaving: bool.isRequired,
     addExternalFeed: func.isRequired
   }
 

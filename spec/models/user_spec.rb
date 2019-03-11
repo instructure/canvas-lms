@@ -1120,19 +1120,6 @@ describe User do
         expect(search_messageable_users(@student).map(&:id)).to include @this_section_user.id
       end
 
-      it "should not return concluded student enrollments in the course" do # when browsing a course you should not see concluded enrollments
-        @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
-        @course.complete!
-
-        expect(search_messageable_users(@this_section_user, :context => "course_#{@course.id}").map(&:id)).not_to include @this_section_user.id
-        # if the course was a concluded, a student should be able to browse it and message an admin (if if the admin's enrollment concluded too)
-        expect(search_messageable_users(@this_section_user, :context => "course_#{@course.id}").map(&:id)).to include @this_section_teacher.id
-        expect(@this_section_user.count_messageable_users_in_course(@course)).to eql 2 # just the admins
-        expect(search_messageable_users(@student, :context => "course_#{@course.id}").map(&:id)).not_to include @this_section_user.id
-        expect(search_messageable_users(@student, :context => "course_#{@course.id}").map(&:id)).to include @this_section_teacher.id
-        expect(@student.count_messageable_users_in_course(@course)).to eql 2
-      end
-
       it "users with concluded enrollments should not be messageable" do
         @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
         expect(search_messageable_users(@student, :context => "group_#{@group.id}").map(&:id)).to eql [@this_section_user.id]

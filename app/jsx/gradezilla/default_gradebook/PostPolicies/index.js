@@ -19,32 +19,58 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
+import HideAssignmentGradesTray from '../../../grading/HideAssignmentGradesTray'
 import PostAssignmentGradesTray from '../../../grading/PostAssignmentGradesTray'
 
 export default class PostPolicies {
   constructor(gradebook) {
     this._gradebook = gradebook
+
+    this._coursePostPolicy = {postManually: !!gradebook.options.post_manually}
   }
 
   initialize() {
-    const $container = document.getElementById('post-assignment-grades-tray')
-    const bindRef = ref => {
-      this._tray = ref
+    const $hideContainer = document.getElementById('hide-assignment-grades-tray')
+    const bindHideTray = ref => {
+      this._hideAssignmentGradesTray = ref
     }
-    ReactDOM.render(<PostAssignmentGradesTray ref={bindRef} />, $container)
+    ReactDOM.render(<HideAssignmentGradesTray ref={bindHideTray} />, $hideContainer)
+
+    const $postContainer = document.getElementById('post-assignment-grades-tray')
+    const bindPostTray = ref => {
+      this._postAssignmentGradesTray = ref
+    }
+    ReactDOM.render(<PostAssignmentGradesTray ref={bindPostTray} />, $postContainer)
   }
 
   destroy() {
-    const $container = document.getElementById('post-assignment-grades-tray')
-    ReactDOM.unmountComponentAtNode($container)
+    ReactDOM.unmountComponentAtNode(document.getElementById('hide-assignment-grades-tray'))
+    ReactDOM.unmountComponentAtNode(document.getElementById('post-assignment-grades-tray'))
+  }
+
+  showHideAssignmentGradesTray({assignmentId, onExited}) {
+    const {id, name} = this._gradebook.getAssignment(assignmentId)
+
+    this._hideAssignmentGradesTray.show({
+      assignment: {id, name},
+      onExited
+    })
   }
 
   showPostAssignmentGradesTray({assignmentId, onExited}) {
     const {id, name} = this._gradebook.getAssignment(assignmentId)
 
-    this._tray.show({
+    this._postAssignmentGradesTray.show({
       assignment: {id, name},
       onExited
     })
+  }
+
+  get coursePostPolicy() {
+    return this._coursePostPolicy
+  }
+
+  setCoursePostPolicy(policy) {
+    this._coursePostPolicy = policy
   }
 }

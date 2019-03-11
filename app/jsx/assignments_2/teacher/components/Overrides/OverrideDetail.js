@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import {bool} from 'prop-types'
+import {bool, func} from 'prop-types'
 import OverrideAssignTo from './OverrideAssignTo'
 import OverrideAttempts from './OverrideAttempts'
 import OverrideSubmissionTypes from './OverrideSubmissionTypes'
@@ -27,6 +27,7 @@ import View from '@instructure/ui-layout/lib/components/View'
 export default class OverrideDetail extends React.Component {
   static propTypes = {
     override: OverrideShape.isRequired,
+    onChangeOverride: func.isRequired,
     readOnly: bool
   }
 
@@ -53,6 +54,7 @@ export default class OverrideDetail extends React.Component {
       <View as="div" margin="small 0">
         <OverrideSubmissionTypes
           override={this.props.override}
+          onChangeOverride={this.props.onChangeOverride}
           variant="detail"
           readOnly={this.props.readOnly}
         />
@@ -65,6 +67,7 @@ export default class OverrideDetail extends React.Component {
       <OverrideAttempts
         variant="detail"
         override={this.props.override}
+        onChangeOverride={this.props.onChangeOverride}
         readOnly={this.props.readOnly}
       />
     )

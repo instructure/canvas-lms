@@ -98,10 +98,14 @@ export default class Outcome extends React.Component {
   renderDetails () {
     const { outcome, outcomeProficiency } = this.props
     const { assignments, results } = outcome
-    const assignmentsWithResults = results.map((r) => r.assignment.id.split('_')[1])
-    const unassessedAssignments = _.reject(assignments, (a) => (
-      _.includes(assignmentsWithResults, a.assignment_id.toString()
-    )))
+    const assignmentsWithResults = _.filter(results,
+      (r) => r.assignment.id.startsWith('assignment_')).map((r) => r.assignment.id.split('_')[1])
+    const assessmentsWithResults = _.filter(results,
+      (r) => r.assignment.id.startsWith('live_assessments/assessment_')).map((r) => r.assignment.id.split('_')[2])
+    const unassessed = _.filter(assignments, (a) => (
+      a.assignment_id && !_.includes(assignmentsWithResults, a.assignment_id.toString()) ||
+      a.assessment_id && !_.includes(assessmentsWithResults, a.assessment_id.toString())
+    ))
     return (
       <List variant="unstyled" delimiter="dashed">
       {
@@ -112,8 +116,10 @@ export default class Outcome extends React.Component {
         ))
       }
       {
-        unassessedAssignments.map((assignment) => (
-          <UnassessedAssignment assignment={assignment}/>
+        unassessed.map((assignment) => (
+          <UnassessedAssignment
+            key={assignment.assessment_id ? `a${assignment.assessment_id}` : assignment.assignment_id}
+            assignment={assignment}/>
         ))
       }
       </List>

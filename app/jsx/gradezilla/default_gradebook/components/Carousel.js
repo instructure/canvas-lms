@@ -90,8 +90,7 @@ export default class Carousel extends Component {
 }
 
 Carousel.defaultProps = {
-  id: null,
-  showBorderBottom: true
+  id: null
 }
 
 Carousel.propTypes = {

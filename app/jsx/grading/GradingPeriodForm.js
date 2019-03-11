@@ -244,6 +244,7 @@ class GradingPeriodForm extends React.Component {
                   rowKey="end-date"
                   labelledBy="end-date-label"
                   isFancyMidnight
+                  defaultToEndOfMinute
                 />
               </div>
 
@@ -261,6 +262,7 @@ class GradingPeriodForm extends React.Component {
                   rowKey="close-date"
                   labelledBy="close-date-label"
                   isFancyMidnight
+                  defaultToEndOfMinute
                 />
               </div>
 

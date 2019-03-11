@@ -1336,8 +1336,9 @@ class Attachment < ActiveRecord::Base
 
   scope :not_hidden, -> { where("attachments.file_state<>'hidden'") }
   scope :not_locked, -> {
-    where("(attachments.locked IS NULL OR attachments.locked=?) AND ((attachments.lock_at IS NULL) OR
-      (attachments.lock_at>? OR (attachments.unlock_at IS NOT NULL AND attachments.unlock_at<?)))", false, Time.now.utc, Time.now.utc)
+    where("attachments.locked IS NOT TRUE
+      AND (attachments.lock_at IS NULL OR attachments.lock_at>?)
+      AND (attachments.unlock_at IS NULL OR attachments.unlock_at<?)", Time.now.utc, Time.now.utc)
   }
   scope :by_content_types, lambda { |types|
     clauses = []

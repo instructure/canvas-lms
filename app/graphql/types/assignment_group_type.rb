@@ -39,7 +39,7 @@ module Types
 
     implements Interfaces::AssignmentsConnectionInterface
     def assignments_connection(filter: {})
-      load_association(:context) { |course|
+      load_association(:context).then { |course|
         super(course: course, filter: filter)
       }
     end

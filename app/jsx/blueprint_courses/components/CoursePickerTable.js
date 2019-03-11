@@ -87,7 +87,7 @@ export default class CoursePickerTable extends React.Component {
       : I18n.t('Unselected all courses'))
 
     const selected = this.props.courses.reduce((selectedMap, course) => {
-      selectedMap[course.id] = e.target.checked // eslint-disable-line
+      selectedMap[course.id] = e.target.checked
       return selectedMap
     }, {})
     this.updateSelected(selected, e.target.checked)
@@ -107,7 +107,7 @@ export default class CoursePickerTable extends React.Component {
 
   parseSelectedCourses (courses = []) {
     return courses.reduce((selected, courseId) => {
-      selected[courseId] = true // eslint-disable-line
+      selected[courseId] = true
       return selected
     }, {})
   }

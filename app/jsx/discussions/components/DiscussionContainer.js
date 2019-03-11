@@ -63,13 +63,13 @@ export const discussionTarget = {
 export class DiscussionsContainer extends Component {
   static propTypes = {
     cleanDiscussionFocus: func.isRequired,
-    closedState: bool, // eslint-disable-line
+    closedState: bool, // eslint-disable-line react/no-unused-prop-types this IS really used
     connectDropTarget: func,
     deleteDiscussion: func.isRequired,
     deleteFocusDone: func.isRequired,
-    deleteFocusPending: bool.isRequired, // eslint-disable-line
+    deleteFocusPending: bool.isRequired, // eslint-disable-line react/no-unused-prop-types this IS really used
     discussions: discussionList.isRequired,
-    handleDrop: func, // eslint-disable-line
+    handleDrop: func, // eslint-disable-line react/no-unused-prop-types this IS really used
     onMoveDiscussion: func,
     permissions: propTypes.permissions.isRequired,
     pinned: bool,

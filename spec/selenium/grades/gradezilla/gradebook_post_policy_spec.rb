@@ -17,6 +17,7 @@
 
 require_relative '../../common'
 require_relative '../pages/gradezilla_page'
+require_relative '../pages/gradezilla/settings'
 require_relative '../pages/student_grades_page'
 require_relative '../pages/gradezilla_cells_page'
 
@@ -24,7 +25,7 @@ describe 'Gradezilla Post Policy' do
   include_context "in-process server selenium tests"
 
   before :once do
-    skip('Unskip in GRADE-63')
+    preload_graphql_schema
     # course
     course_with_teacher(
       course_name: "Post Policy Course",
@@ -34,7 +35,8 @@ describe 'Gradezilla Post Policy' do
       active_user: true
     )
     @course.enable_feature!(:new_gradebook)
-    # TODO: turn on post policy course setting to manual
+    @course.enable_feature!(:post_policies)
+    @course.post_policies.create!(post_manually: true)
 
     # sections
     @section1 = @course.course_sections.first
@@ -231,12 +233,12 @@ describe 'Gradezilla Post Policy' do
 
   context 'when Post Policy set to Automatically' do
     before :each do
-      skip('Unskip in GRADE-40')
-      # TODO: set course post policy to auto
+      skip('Unskip in GRADE-1995')
       Gradezilla.settings_cog_select
       Gradezilla::Settings.click_post_policy_tab
       Gradezilla::PostingPolicies.select_automatically
       Gradezilla::Settings.click_update_button
+      wait_for_ajaximations
 
       Gradezilla::Cells.edit_grade(@students1.first, @assignment, '9')
     end

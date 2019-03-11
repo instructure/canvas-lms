@@ -59,3 +59,51 @@ it('renders the placeholder when not given a value', () => {
   expect(getByTestId('SelectableText')).toBeInTheDocument()
   expect(getByText('No Assignment Group Assigned')).toBeInTheDocument()
 })
+
+it('calls onChange when the selection changes', () => {
+  const onchange = jest.fn()
+  const onchangemode = jest.fn()
+  const groupList = makeGroupList()
+
+  const {container} = render(
+    <div>
+      <AssignmentGroup
+        mode="edit"
+        onChange={onchange}
+        onChangeMode={onchangemode}
+        assignmentGroupList={groupList}
+        selectedAssignmentGroupId="1"
+        readOnly={false}
+      />
+      <span id="click-me" tabIndex="-1">
+        just here to get focus
+      </span>
+    </div>
+  )
+  const input = container.querySelector('input')
+  input.click()
+  const option = document.querySelectorAll('li[role="option"]')[1]
+  option.click()
+  container.querySelector('#click-me').focus()
+  expect(onchangemode).toHaveBeenCalledWith('view')
+  expect(onchange).not.toHaveBeenCalled()
+
+  // it takes a re-render in view to get onChange called
+  render(
+    <div>
+      <AssignmentGroup
+        mode="view"
+        onChange={onchange}
+        onChangeMode={onchangemode}
+        assignmentGroupList={groupList}
+        selectedAssignmentGroupId="2"
+        readOnly={false}
+      />
+      <span id="click-me" tabIndex="-1">
+        just here to get focus
+      </span>
+    </div>,
+    {container}
+  )
+  expect(onchange).toHaveBeenCalledWith('2')
+})

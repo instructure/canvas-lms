@@ -35,11 +35,11 @@ describe "better_file_browsing, folders" do
       expect(f("form.ef-edit-name-form")).to be_displayed
     end
 
-    it "should create a new folder", priority: "1", test_id: 133121 do
+    it "should create a new folder", :xbrowser, priority: "1", test_id: 133121 do
       expect(fln("new test folder")).to be_present
     end
 
-    it "should display all cog icon options", priority: "1", test_id: 133124 do
+    it "should display all cog icon options", :xbrowser, priority: "1", test_id: 133124 do
       create_new_folder
       ff('.al-trigger')[0].click
       expect(fln("Download")).to be_displayed
@@ -129,7 +129,7 @@ describe "better_file_browsing, folders" do
        expect(new_folder.text).to match(/New Folder/)
      end
 
-     it "should handle duplicate folder names", priority: "1", test_id: 133130 do
+     it "should handle duplicate folder names", :xbrowser, priority: "1", test_id: 133130 do
        create_new_folder
        add_folder("New Folder")
        expect(all_files_folders.last.text).to match(/New Folder 2/)

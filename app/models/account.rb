@@ -1756,4 +1756,18 @@ class Account < ActiveRecord::Base
   end
   handle_asynchronously :update_user_dashboards, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1
 
+  def process_external_integration_keys(params_keys, current_user)
+    return unless params_keys
+
+    ExternalIntegrationKey.indexed_keys_for(self).each do |key_type, key|
+      next unless params_keys.key?(key_type)
+      next unless key.grants_right?(current_user, :write)
+      unless params_keys[key_type].blank?
+        key.key_value = params_keys[key_type]
+        key.save!
+      else
+        key.delete
+      end
+    end
+  end
 end

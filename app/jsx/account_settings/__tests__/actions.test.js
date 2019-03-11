@@ -273,9 +273,10 @@ describe('setCspInheritedAction', () => {
 })
 
 describe('setCspInherited', () => {
-  it('dispatches a optimistic value followed by the actual result if the value is true', () => {
+  it('dispatches a optimistic value followed by the actual result', () => {
     const thunk = Actions.setCspInherited('account', 1, true)
     const fakeDispatch = jest.fn()
+    const fakeGetState = () => ({})
     const fakeAxios = {
       put: jest.fn(() => ({
         then(func) {
@@ -288,7 +289,7 @@ describe('setCspInherited', () => {
         }
       }))
     }
-    thunk(fakeDispatch, null, {axios: fakeAxios})
+    thunk(fakeDispatch, fakeGetState, {axios: fakeAxios})
     expect(fakeDispatch).toHaveBeenNthCalledWith(1, {
       payload: true,
       type: 'SET_CSP_INHERITED_OPTIMISTIC'
@@ -299,27 +300,57 @@ describe('setCspInherited', () => {
     })
   })
 
-  it('only dispatches an optimistic action if the value is false', () => {
+  it('updates the enabled status and domain list when successful', () => {
     const thunk = Actions.setCspInherited('account', 1, false)
     const fakeDispatch = jest.fn()
+    const fakeGetState = () => ({})
     const fakeAxios = {
       put: jest.fn(() => ({
         then(func) {
           const fakeResponse = {
             data: {
-              inherited: true
+              inherited: true,
+              enabled: true
             }
           }
           func(fakeResponse)
         }
       }))
     }
-    thunk(fakeDispatch, null, {axios: fakeAxios})
-    expect(fakeDispatch).toHaveBeenNthCalledWith(1, {
-      payload: false,
-      type: 'SET_CSP_INHERITED_OPTIMISTIC'
+    thunk(fakeDispatch, fakeGetState, {axios: fakeAxios})
+    expect(fakeDispatch).toHaveBeenCalledWith({
+      payload: true,
+      type: 'SET_CSP_ENABLED'
     })
-    expect(fakeDispatch).toHaveBeenCalledTimes(1)
+    expect(fakeDispatch).toHaveBeenCalledWith({
+      payload: {effective: [], account: [], tools: {}},
+      type: 'ADD_DOMAIN_BULK'
+    })
+  })
+
+  it('sets the dirty status when cspInherited is true but then switches to false with no account whitelist', () => {
+    const thunk = Actions.setCspInherited('account', 1, false)
+    const fakeDispatch = jest.fn()
+    const fakeGetState = () => ({cspInherited: true})
+    const fakeAxios = {
+      put: jest.fn(() => ({
+        then(func) {
+          const fakeResponse = {
+            data: {
+              inherited: false,
+              enabled: true,
+              current_account_whitelist: []
+            }
+          }
+          func(fakeResponse)
+        }
+      }))
+    }
+    thunk(fakeDispatch, fakeGetState, {axios: fakeAxios})
+    expect(fakeDispatch).toHaveBeenCalledWith({
+      payload: true,
+      type: 'SET_DIRTY'
+    })
   })
 })
 
@@ -340,5 +371,101 @@ describe('getCspInherited', () => {
       payload: true,
       type: 'SET_CSP_INHERITED'
     })
+  })
+})
+
+describe('setDirtyAction', () => {
+  it('creates a SET_DIRTY action when passed a boolean value', () => {
+    expect(Actions.setDirtyAction(true)).toMatchSnapshot()
+  })
+  it('creates an error action if passed a non-boolean value', () => {
+    expect(Actions.setDirtyAction('yes')).toMatchSnapshot()
+  })
+})
+
+describe('copyInheritedAction', () => {
+  it('creates a COPY_INHERITED_SUCCESS action', () => {
+    expect(Actions.copyInheritedAction([])).toMatchSnapshot()
+  })
+  it('creates an error action if passed an error param', () => {
+    expect(Actions.copyInheritedAction([], new Error('something happened'))).toMatchSnapshot()
+  })
+})
+
+describe('copyInheritedIfNeeded', () => {
+  it('does does nothing if isDirty state is false', () => {
+    const thunk = Actions.copyInheritedIfNeeded('account', 1)
+    const fakeDispatch = jest.fn()
+    const fakeGetState = () => ({
+      isDirty: false,
+      whitelistedDomains: {inherited: ['canvaslms.com']}
+    })
+    const fakeAxios = {}
+    thunk(fakeDispatch, fakeGetState, {axios: fakeAxios})
+    expect(fakeDispatch).not.toHaveBeenCalled()
+  })
+
+  it('dispatches a setDirtyAction and a copyInherited action when the request completes', () => {
+    const thunk = Actions.copyInheritedIfNeeded('account', 1)
+    const fakeDispatch = jest.fn()
+    const fakeGetState = () => ({isDirty: true, whitelistedDomains: {inherited: ['canvaslms.com']}})
+    const fakeAxios = {
+      post: jest.fn(() => ({
+        then(func) {
+          const fakeResponse = {
+            data: {
+              inherited: false,
+              enabled: true,
+              current_account_whitelist: ['canvaslms.com']
+            }
+          }
+          func(fakeResponse)
+        }
+      }))
+    }
+    thunk(fakeDispatch, fakeGetState, {axios: fakeAxios})
+    expect(fakeDispatch).toHaveBeenCalledWith({
+      payload: false,
+      type: 'SET_DIRTY'
+    })
+    expect(fakeDispatch).toHaveBeenCalledWith({
+      payload: ['canvaslms.com'],
+      type: 'COPY_INHERITED_SUCCESS'
+    })
+  })
+
+  it('adds the modifiedDomainOption.add domain to the list of domains to be copied', () => {
+    const thunk = Actions.copyInheritedIfNeeded('account', 1, {add: 'instructure.com'})
+    const fakeDispatch = jest.fn()
+    const fakeGetState = () => ({isDirty: true, whitelistedDomains: {inherited: ['canvaslms.com']}})
+    const fakeAxios = {
+      post: jest.fn(() => ({
+        then: jest.fn()
+      }))
+    }
+    thunk(fakeDispatch, fakeGetState, {axios: fakeAxios})
+    expect(fakeAxios.post).toHaveBeenCalledWith(
+      '/api/v1/accounts/1/csp_settings/domains/batch_create',
+      {domains: ['canvaslms.com', 'instructure.com']}
+    )
+  })
+
+  it('removes the modifiedDomainOption.delete domain from the list of domains to be copied', () => {
+    const thunk = Actions.copyInheritedIfNeeded('account', 1, {delete: 'instructure.com'})
+    const fakeDispatch = jest.fn()
+    const fakeGetState = () => ({
+      isDirty: true,
+      whitelistedDomains: {inherited: ['canvaslms.com', 'instructure.com']}
+    })
+    const fakeAxios = {
+      post: jest.fn(() => ({
+        then: jest.fn()
+      }))
+    }
+    thunk(fakeDispatch, fakeGetState, {axios: fakeAxios})
+    expect(fakeAxios.post).toHaveBeenCalledWith(
+      '/api/v1/accounts/1/csp_settings/domains/batch_create',
+      {domains: ['canvaslms.com']}
+    )
   })
 })

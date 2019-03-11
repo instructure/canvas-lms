@@ -1321,10 +1321,10 @@ class Assignment < ActiveRecord::Base
     self.lock_at = CanvasTime.fancy_midnight(self.lock_at)
   end
 
-  def infer_all_day
+  def infer_all_day(tz = nil)
     # make the comparison to "fancy midnight" and the date-part extraction in
     # the time zone that was active during editing
-    time_zone = (ActiveSupport::TimeZone.new(self.time_zone_edited) rescue nil) || Time.zone
+    time_zone = tz || (ActiveSupport::TimeZone.new(self.time_zone_edited) rescue nil) || Time.zone
     self.all_day, self.all_day_date = Assignment.all_day_interpretation(
       :due_at => self.due_at ? self.due_at.in_time_zone(time_zone) : nil,
       :due_at_was => self.due_at_was,
@@ -1372,7 +1372,7 @@ class Assignment < ActiveRecord::Base
 
   def include_description?(user, lock_info=nil)
     return unless user
-    lock_info ||= self.locked_for?(user, :check_policies => true)
+    lock_info = locked_for?(user, :check_policies => true) if lock_info.nil?
     !lock_info || (lock_info[:can_view] && !lock_info[:context_module])
   end
 

@@ -156,9 +156,14 @@ class RubricsController < ApplicationController
     end
   end
 
+  # @API Delete a single rubric
+  #
+  # Deletes a Rubric and removes all RubricAssociations.
+  #
+  # @returns Rubric
   def destroy
     @rubric = RubricAssociation.where(rubric_id: params[:id], context_id: @context, context_type: @context.class.to_s).first.rubric
-    if authorized_action(@rubric, @current_user, :delete_associations)
+    if authorized_action(@rubric, @current_user, :delete_associations) && authorized_action(@context, @current_user, :manage_rubrics)
       @rubric.destroy_for(@context, current_user: @current_user)
       render :json => @rubric
     end

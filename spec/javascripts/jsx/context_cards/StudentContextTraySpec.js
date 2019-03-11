@@ -49,7 +49,6 @@ QUnit.module('StudentContextTray', (hooks) => {
 
   test('tray should set focus back to the result of the returnFocusTo prop', () => {
     $('#fixtures').append('<button id="someButton"><button>')
-    // eslint-disable-next-line react/no-render-return-value
     const component = TestUtils.renderIntoDocument(
       <StudentContextTray
         courseId={courseId}

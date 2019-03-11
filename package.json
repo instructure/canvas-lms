@@ -69,6 +69,7 @@
     "i18n-js": "^3",
     "ic-ajax": "~2.0.1",
     "ic-tabs": "0.1.3",
+    "immer": "^2.0.0",
     "immutability-helper": "^2",
     "immutable": "^3.8.2",
     "is-valid-domain": "^0.0.6",
@@ -88,7 +89,7 @@
     "parse-decimal-number": "1.0.0",
     "parse-link-header": "^1",
     "prop-types": "^15",
-    "qs": "https://github.com/hapijs/qs.git#a341cdf2fadba5ede1ce6c95c7051f6f31f37b81",
+    "qs": "^6.6.0",
     "react": "^16.6.0",
     "react-apollo": "^2.1.1",
     "react-dnd": "^2.5.2",
@@ -126,6 +127,7 @@
     "babel-loader": "^7",
     "babel-plugin-add-module-exports": "0.2.1",
     "babel-plugin-dynamic-import-node": "^2.2.0",
+    "babel-plugin-transform-amd-to-commonjs": "^1.4.0",
     "babel-plugin-transform-react-remove-prop-types": "^0.4",
     "babel-plugin-transform-runtime": "^6",
     "babel-polyfill": "^6",
@@ -179,6 +181,7 @@
     "istanbul-merge": "^1.1.1",
     "jest": "^23",
     "jest-canvas-mock": "^1",
+    "jest-config": "^24",
     "jest-dom": "^2",
     "jest-junit": "^5",
     "jest-localstorage-mock": "^2",
@@ -223,6 +226,9 @@
     "xsslint": "https://github.com/claydiffrient/xsslint.git#master",
     "yaml-loader": "^0.5"
   },
+  "optionalDependencies": {
+    "inspect-process": "^0.5"
+  },
   "jest-junit": {
     "output": "./coverage-js/junit-reports/jest.xml"
   },
@@ -233,7 +239,7 @@
     "test:watch": "concurrently --names \"jest,karma\" \"jest --watch .\" \"yarn test:karma:watch\"",
     "test:jest": "jest --color",
     "test:jest:coverage": "yarn run test:jest --coverage",
-    "test:jest:debug": "node --inspect node_modules/.bin/jest --runInBand --watch",
+    "test:jest:debug": "inspect node_modules/.bin/jest --runInBand",
     "test:karma": "yarn run test:karma:watch --single-run",
     "test:karma:concurrently": "DISABLE_HAPPYPACK=1 concurrently --names \"coffee,js1,js2\" \"JSPEC_GROUP=coffee yarn test:karma:headless\" \"JSPEC_GROUP=js1 yarn test:karma:headless\" \"JSPEC_GROUP=js2 yarn test:karma:headless\"",
     "test:karma:headless": "yarn run test:karma --browsers ChromeHeadlessNoSandbox",
@@ -266,8 +272,6 @@
     "canvas-quizzes/grunt-contrib-jasmine/jasmine-core": "2.6.4",
     "graphael": "this is just here so yarn.lock looks the same whether the analytics plugin is checked out or not",
     "graphael": "https://github.com/ryankshaw/graphael.git",
-    "node-sass": "if we let node-sass upgrade to recent versions, it causes: SIS-3125",
-    "node-sass": "4.7.2",
     "format-message-cli": "These are all because format-message-* 6.1+ use babel 7 and it screws up canvas-planner until @instructure/ui-presets also uses babel 7",
     "format-message-cli": "6.0.4",
     "babel-plugin-transform-format-message": "6.0.4",

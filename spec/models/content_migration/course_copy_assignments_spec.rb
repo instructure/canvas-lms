@@ -213,6 +213,21 @@ describe ContentMigration do
       expect(new_assignment.only_visible_to_overrides).to be_falsey
     end
 
+    it "should unset allowed extensions" do
+      assignment_model(:course => @copy_from, :points_possible => 40, :submission_types => 'file_upload',
+        :grading_type => 'points', :allowed_extensions => ["txt", "doc"])
+
+      run_course_copy
+
+      new_assignment = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
+      expect(new_assignment.allowed_extensions).to eq ["txt", "doc"]
+      @assignment.update_attribute(:allowed_extensions, [])
+
+      run_course_copy
+
+      expect(new_assignment.reload.allowed_extensions).to eq []
+    end
+
     describe "allowed_attempts copying" do
       it "copies nil over properly" do
         assignment_model(course: @copy_from, points_possible: 40, submission_types: 'file_upload', grading_type: 'points')
@@ -245,7 +260,7 @@ describe ContentMigration do
       end
     end
 
-    it "should copy other feature-dependent assignment attributes" do
+    it "should copy other feature-dependent assignment attributes (if enabled downstream)" do
       assignment_model(:course => @copy_from)
       @assignment.moderated_grading = true
       @assignment.grader_count = 2
@@ -259,6 +274,16 @@ describe ContentMigration do
       run_course_copy
 
       new_assignment = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
+      [:moderated_grading, :anonymous_grading].each do |attr|
+        expect(new_assignment.send(attr)).to eq false
+      end
+
+      @copy_to.enable_feature!(:moderated_grading)
+      @copy_to.enable_feature!(:anonymous_marking)
+
+      run_course_copy
+
+      new_assignment.reload
       [:moderated_grading, :grader_count, :grader_comments_visible_to_graders,
         :anonymous_grading, :graders_anonymous_to_graders, :grader_names_visible_to_final_grader,
         :anonymous_instructor_annotations].each do |attr|

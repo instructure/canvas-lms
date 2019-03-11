@@ -18,12 +18,17 @@
 
 import React from 'react'
 import {render} from 'react-testing-library'
+import {MockedProvider} from 'react-apollo/test-utils'
 import {mockAssignment} from '../../test-utils'
 import Header from '../Header'
 
 it('renders basic assignment information', () => {
   const assignment = mockAssignment()
-  const {container, getByTestId} = render(<Header assignment={assignment} />)
+  const {container, getByTestId} = render(
+    <MockedProvider>
+      <Header assignment={assignment} onChangeAssignment={() => {}} />
+    </MockedProvider>
+  )
 
   expect(getByTestId('AssignmentType')).toBeInTheDocument()
   expect(getByTestId('AssignmentModules')).toBeInTheDocument()

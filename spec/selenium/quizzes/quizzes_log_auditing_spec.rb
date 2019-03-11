@@ -25,9 +25,13 @@ describe "quizzes log auditing" do
   include GroupsCommon
 
   context 'as a teacher' do
-    before do
-      course_with_teacher_logged_in
+    before :once do
+      course_with_teacher(active_user: true, active_enrollment: true, active_course: true)
       Account.default.enable_feature!(:quiz_log_auditing)
+    end
+
+    before :each do
+      user_session(@teacher)
     end
 
     context 'attempt numbers' do
@@ -41,7 +45,7 @@ describe "quizzes log auditing" do
       end
 
       context 'multiple attempts' do
-        before do
+        before :each do
           student = student_in_course(course: @course, name: 'student', active_all: true).user
           quiz_create
           @quiz.allowed_attempts = 2
@@ -69,7 +73,7 @@ describe "quizzes log auditing" do
     end
 
     context 'should list the attempt count for multiple attempts' do
-      before do
+      before :each do
         @quiz = @course.quizzes.create!(title: 'new quiz')
         @quiz.quiz_questions.create!(
             question_data: {

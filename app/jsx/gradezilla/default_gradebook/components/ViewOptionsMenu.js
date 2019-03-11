@@ -28,7 +28,7 @@ import Menu, {
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import I18n from 'i18n!gradebook'
-import {filterLabels} from '../../../gradezilla/default_gradebook/constants/ViewOptions'
+import {filterLabels} from '../constants/ViewOptions'
 
 function renderTriggerButton(bindButton) {
   return (
@@ -75,18 +75,23 @@ class ViewOptionsMenu extends React.Component {
   onFilterSelect = (_event, filters) => {
     this.props.filterSettings.onSelect(filters)
   }
+
   bindMenuContent = menuContent => {
     this.menuContent = menuContent
   }
+
   bindButton = button => {
     this.button = button
   }
+
   bindStatusesMenuItem = menuItem => {
     this.statusesMenuItem = menuItem
   }
+
   bindArrangeByMenuContent = menuContent => {
     this.arrangeByMenuContent = menuContent
   }
+
   bindFiltersMenuContent = menuContent => {
     this.filtersMenuContent = menuContent
   }

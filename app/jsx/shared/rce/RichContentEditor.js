@@ -26,7 +26,7 @@ function loadServiceRCE(target, tinyMCEInitOptions, callback) {
   target.css('display', 'none')
 
   const originalOnFocus = tinyMCEInitOptions.onFocus
-  // eslint-disable-next-line no-param-reassign
+
   tinyMCEInitOptions.onFocus = (...args) => {
     RichContentEditor.showSidebar()
     if (originalOnFocus instanceof Function) {

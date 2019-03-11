@@ -20,6 +20,10 @@ class Types::MutationType < Types::ApplicationObjectType
   graphql_name "Mutation"
 
   field :create_group_in_set, mutation: Mutations::CreateGroupInSet
+  field :hide_assignment_grades, mutation: Mutations::HideAssignmentGrades
+  field :hide_assignment_grades_for_sections, mutation: Mutations::HideAssignmentGradesForSections
+  field :post_assignment_grades, mutation: Mutations::PostAssignmentGrades
+  field :post_assignment_grades_for_sections, mutation: Mutations::PostAssignmentGradesForSections
   field :set_override_score, <<~DESC, mutation: Mutations::SetOverrideScore
     Sets the overridden final score for the associated enrollment, optionally limited to a specific
     grading period. This will supersede the computed final score/grade if present.

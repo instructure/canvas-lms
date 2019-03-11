@@ -53,7 +53,7 @@ describe "context modules" do
       wait_for_ajaximations
     end
 
-    it "should show all module items", priority: "1", test_id: 126743 do
+    it "should show all module items", :xbrowser, priority: "1", test_id: 126743 do
       module_with_two_items
       f(".expand_module_link").click
       wait_for_animations
@@ -181,7 +181,7 @@ describe "context modules" do
       expect(f('#add_context_module_form .assignment_requirement_picker option[value=must_contribute]')).to be_disabled
       click_option('#add_context_module_form .assignment_picker', @assignment.title, :text)
       click_option('#add_context_module_form .assignment_requirement_picker', 'must_submit', :value)
-
+      expect(f('.criteria_list .delete_criterion_link').attribute('aria-label')).to eq 'Delete requirement assignment 1 (submit the assignment)'
       submit_form(edit_form)
       expect(edit_form).not_to be_displayed
       # should show relock warning since we're adding a completion requirement to an active module
@@ -326,7 +326,7 @@ describe "context modules" do
       expect(page.reload).to be_published
     end
 
-    it "publishes a newly created item" do
+    it "publishes a newly created item", :xbrowser do
       @course.context_modules.create!(name: "Content Page")
       get "/courses/#{@course.id}/modules"
       add_new_module_item('#wiki_pages_select', 'Page', '[ New Page ]', 'New Page Title')
@@ -468,6 +468,8 @@ describe "context modules" do
       prereq_select = f('.criterion select')
       option = first_selected_option(prereq_select)
       expect(option.text).to eq @module1.name.to_s
+      expect(ff('.prerequisites_list .criteria_list .delete_criterion_link').map{|link|link.attribute('aria-label')}).
+          to eq(['Delete prerequisite First module', 'Delete prerequisite Second module'])
     end
 
     it "does not have a prerequisites section when creating the first module" do

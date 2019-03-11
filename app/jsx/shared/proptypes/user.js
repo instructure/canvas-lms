@@ -19,7 +19,6 @@
 import { shape, string } from 'prop-types'
 
 // we might add more comprehensive user shapes in the future
-// eslint-disable-next-line
 export const author = shape({
   id: string.isRequired,
   display_name: string.isRequired,

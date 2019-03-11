@@ -23,7 +23,7 @@ import Button from '@instructure/ui-buttons/lib/components/Button'
 import DateInput from '@instructure/ui-forms/lib/components/DateInput'
 import FormFieldGroup from '@instructure/ui-forms/lib/components/FormFieldGroup'
 import {destroyContainer} from 'jsx/shared/FlashAlert'
-import Fixtures from '../gradebook-history/Fixtures'
+import Fixtures from './Fixtures'
 
 const defaultProps = () => ({
   fetchHistoryStatus: 'started',
@@ -156,7 +156,8 @@ test('disables the submit button if the From date DateInput conversion failed', 
 test('does not disable the submit button when there are no dates selected', function() {
   const {from, to} = this.wrapper.state().selected
   const button = this.wrapper.find(Button)
-  ok(!from.value && !to.value)
+  notOk(from.value)
+  notOk(to.value)
   notOk(button.props().disabled)
 })
 

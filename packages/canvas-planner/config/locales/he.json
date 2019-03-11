@@ -170,6 +170,9 @@
   "grades_loaded_5056277c": {
     "message": "הציונים נטענו"
   },
+  "items_completed_items_plural_1_item_other_items_717d579f": {
+    "message": "{ items } completed { items, plural,\n     =1 {item}\n  other {items}\n}"
+  },
   "late_2be42b88": {
     "message": "איחור"
   },

@@ -260,3 +260,6 @@
       delay_for: 0
     - name: Blueprint Sync Complete
       delay_for: 0
+- category: Content Link Error
+  notifications:
+    - name: Content Link Error

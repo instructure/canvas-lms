@@ -51,7 +51,6 @@ class CalendarEvent < ActiveRecord::Base
   belongs_to :user
   belongs_to :parent_event, :class_name => 'CalendarEvent', :foreign_key => :parent_calendar_event_id, :inverse_of => :child_events
   has_many :child_events, -> { where("calendar_events.workflow_state <> 'deleted'") }, class_name: 'CalendarEvent', foreign_key: :parent_calendar_event_id, inverse_of: :parent_event
-  has_many :child_event_participants, :through => :child_events, :source => :user
   validates_presence_of :context, :workflow_state
   validates_associated :context, :if => lambda { |record| record.validate_context }
   validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
@@ -218,6 +217,14 @@ class CalendarEvent < ActiveRecord::Base
       when AppointmentGroup
         context.context&.root_account
       end
+    end
+  end
+
+  def child_event_participants_scope
+    self.shard.activate do
+      User.where("id IN (?) OR id IN (?)",
+        child_events.where.not(:user_id => nil).select(:user_id), # user is set directly
+        child_events.where(:user_id => nil, :context_type => "User").select(:context_id)) # or context is user
     end
   end
 

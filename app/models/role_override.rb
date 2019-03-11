@@ -320,25 +320,6 @@ class RoleOverride < ActiveRecord::Base
        :true_for => %w(AccountAdmin TeacherEnrollment DesignerEnrollment),
        :available_to => %w(AccountAdmin AccountMembership TeacherEnrollment TaEnrollment DesignerEnrollment),
      },
-     :comment_on_others_submissions => {
-       :label => lambda { t('permissions.comment_on_others_submissions', "View all students' submissions and make comments on them") },
-       :label_v2 => lambda { t("Submissions - view and make comments") },
-       :available_to => [
-          'StudentEnrollment',
-          'TaEnrollment',
-          'DesignerEnrollment',
-          'TeacherEnrollment',
-          'TeacherlessStudentEnrollment',
-          'AccountAdmin',
-          'AccountMembership'
-        ],
-        :true_for => [
-           'TaEnrollment',
-          'DesignerEnrollment',
-          'TeacherEnrollment',
-          'AccountAdmin'
-        ]
-      },
       :create_collaborations => {
         :label => lambda { t('permissions.create_collaborations', "Create student collaborations") },
         :label_v2 => lambda { t("Student Collaborations - create") },
@@ -860,7 +841,8 @@ class RoleOverride < ActiveRecord::Base
         'DesignerEnrollment',
         'TeacherEnrollment',
         'AccountAdmin'
-      ]
+      ],
+      :applies_to_concluded => ['TeacherEnrollment', 'TaEnrollment']
     },
     :send_messages_all => {
       :label => lambda { t('permissions.send_messages_all', "Send messages to the entire class") },

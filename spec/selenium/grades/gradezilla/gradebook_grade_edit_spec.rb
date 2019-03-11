@@ -40,7 +40,7 @@ describe "Gradezilla editing grades" do
     clear_local_storage
   end
 
-  it "updates a graded quiz and have the points carry over to the quiz attempts page", priority: "1", test_id: 220310 do
+  it "updates a graded quiz and have the points carry over to the quiz attempts page", :xbrowser, priority: "1", test_id: 220310 do
     points = 50
     q = factory_with_protected_attributes(@course.quizzes, title: "new quiz", points_possible: points, quiz_type: 'assignment', workflow_state: 'available')
     q.save!
@@ -63,7 +63,7 @@ describe "Gradezilla editing grades" do
     expect(final_score_for_row(1)).to eq @student_2_total_ignoring_ungraded
   end
 
-  it "changes grades and validate course total is correct", priority: "1", test_id: 220312 do
+  it "changes grades and validate course total is correct", :xbrowser, priority: "1", test_id: 220312 do
     expected_edited_total = "33.33%"
     Gradezilla.visit(@course)
 

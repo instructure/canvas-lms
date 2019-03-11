@@ -95,6 +95,14 @@ function getProps(column, gradebook, options) {
       setTimeout(gradebook.handleColumnHeaderMenuClose)
     },
 
+    hideGradesAction: {
+      onSelect(onExited) {
+        if (gradebook.postPolicies) {
+          gradebook.postPolicies.showHideAssignmentGradesTray({assignmentId, onExited})
+        }
+      }
+    },
+
     postGradesAction: {
       enabled: gradebook.postPolicies != null,
       onSelect(onExited) {

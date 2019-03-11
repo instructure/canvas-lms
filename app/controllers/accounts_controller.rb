@@ -523,7 +523,7 @@ class AccountsController < ApplicationController
   # @argument search_term [String]
   #   The partial course name, code, or full ID to match and return in the results list. Must be at least 3 characters.
   #
-  # @argument include[] [String, "syllabus_body"|"term"|"course_progress"|"storage_quota_used_mb"|"total_students"|"teachers"|"account_name"]
+  # @argument include[] [String, "syllabus_body"|"term"|"course_progress"|"storage_quota_used_mb"|"total_students"|"teachers"|"account_name"|"concluded"]
   #   - All explanations can be seen in the {api:CoursesController#index Course API index documentation}
   #   - "sections", "needs_grading_count" and "total_scores" are not valid options at the account level
   #
@@ -659,7 +659,7 @@ class AccountsController < ApplicationController
 
     ActiveRecord::Associations::Preloader.new.preload(@courses, [:account, :root_account, course_account_associations: :account])
     preload_teachers(@courses) if includes.include?("teachers")
-    ActiveRecord::Associations::Preloader.new.preload(@courses, [:enrollment_term]) if includes.include?("term")
+    ActiveRecord::Associations::Preloader.new.preload(@courses, [:enrollment_term]) if includes.include?("term") || includes.include?('concluded')
 
     if includes.include?("total_students")
       student_counts = StudentEnrollment.not_fake.where("enrollments.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')").
@@ -711,11 +711,7 @@ class AccountsController < ApplicationController
       unless account_settings.empty?
         if @account.grants_right?(@current_user, session, :manage_account_settings)
           if account_settings[:settings]
-            account_settings[:settings].slice!(:restrict_student_past_view,
-                                               :restrict_student_future_view,
-                                               :restrict_student_future_listing,
-                                               :lock_all_announcements,
-                                               :sis_assignment_name_length_input)
+            account_settings[:settings].slice!(*permitted_api_account_settings)
             ensure_sis_max_name_length_value!(account_settings)
           end
           @account.errors.add(:name, t(:account_name_required, 'The account name cannot be blank')) if account_params.has_key?(:name) && account_params[:name].blank?
@@ -865,13 +861,14 @@ class AccountsController < ApplicationController
           end
           params[:account].delete :services
         end
-        if @account.grants_right?(@current_user, :manage_site_settings)
-          # If the setting is present (update is called from 2 different settings forms, one for notifications)
-          if params[:account][:settings] && params[:account][:settings][:outgoing_email_default_name_option].present?
-            # If set to default, remove the custom name so it doesn't get saved
-            params[:account][:settings][:outgoing_email_default_name] = '' if params[:account][:settings][:outgoing_email_default_name_option] == 'default'
-          end
 
+        # If the setting is present (update is called from 2 different settings forms, one for notifications)
+        if params[:account][:settings] && params[:account][:settings][:outgoing_email_default_name_option].present?
+          # If set to default, remove the custom name so it doesn't get saved
+          params[:account][:settings][:outgoing_email_default_name] = '' if params[:account][:settings][:outgoing_email_default_name_option] == 'default'
+        end
+
+        if @account.grants_right?(@current_user, :manage_site_settings)
           google_docs_domain = params[:account][:settings].try(:delete, :google_docs_domain)
           if @account.feature_enabled?(:google_docs_domain_restriction) &&
              @account.root_account? &&
@@ -924,7 +921,7 @@ class AccountsController < ApplicationController
           end
         end
 
-        process_external_integration_keys
+        @account.process_external_integration_keys(params[:account][:external_integration_keys], @current_user)
 
         can_edit_email = params[:account][:settings].try(:delete, :edit_institution_email)
         if @account.root_account? && !can_edit_email.nil?
@@ -1341,18 +1338,7 @@ class AccountsController < ApplicationController
   end
 
   def process_external_integration_keys(account = @account)
-    if params_keys = params[:account][:external_integration_keys]
-      ExternalIntegrationKey.indexed_keys_for(account).each do |key_type, key|
-        next unless params_keys.key?(key_type)
-        next unless key.grants_right?(@current_user, :write)
-        unless params_keys[key_type].blank?
-          key.key_value = params_keys[key_type]
-          key.save!
-        else
-          key.delete
-        end
-      end
-    end
+    account.process_external_integration_keys(params[:account][:external_integration_keys], @current_user)
   end
 
   def set_default_dashboard_view(new_view)
@@ -1435,6 +1421,14 @@ class AccountsController < ApplicationController
       :default_user_storage_quota_mb, :default_group_storage_quota_mb, :integration_id, :brand_config_md5,
       :settings => PERMITTED_SETTINGS_FOR_UPDATE, :ip_filters => strong_anything
     ]
+  end
+
+  def permitted_api_account_settings
+    [:restrict_student_past_view,
+      :restrict_student_future_view,
+      :restrict_student_future_listing,
+      :lock_all_announcements,
+      :sis_assignment_name_length_input]
   end
 
   def strong_account_params

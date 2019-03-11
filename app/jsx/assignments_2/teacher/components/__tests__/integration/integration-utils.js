@@ -18,16 +18,48 @@
 
 import React from 'react'
 import {render, waitForElement} from 'react-testing-library'
+import TeacherQuery from '../../TeacherQuery'
 import TeacherView from '../../TeacherView'
 
-// api module should be mocked by the test file
-import {queryAssignment} from '../../../api'
 import {mockAssignment} from '../../../test-utils'
 
-export async function renderTeacherView(assignment = mockAssignment()) {
-  queryAssignment.mockReturnValueOnce({data: {assignment}})
-  const result = render(<TeacherView assignmentLid={assignment.lid} />)
-  // wait for the queryAssignment promise to resolve and the view to render in response
-  await waitForElement(() => result.getByText(assignment.name))
-  return result
+import {MockedProvider} from 'react-apollo/test-utils'
+import {TEACHER_QUERY} from '../../../assignmentData'
+
+export function renderTeacherQuery(assignment, additionalApolloMocks = []) {
+  const mocks = [
+    {
+      request: {
+        query: TEACHER_QUERY,
+        variables: {
+          assignmentLid: assignment.lid
+        }
+      },
+      result: {
+        data: {assignment}
+      }
+    },
+    ...additionalApolloMocks
+  ]
+  const fns = render(
+    <MockedProvider mocks={mocks} addTypename={false}>
+      <TeacherQuery assignmentLid={assignment.lid} />
+    </MockedProvider>
+  )
+  return fns
+}
+
+export async function renderTeacherQueryAndWaitForResult(assignment, additionalApolloMocks) {
+  const fns = renderTeacherQuery(assignment, additionalApolloMocks)
+  await waitForElement(() => fns.getByText(assignment.name))
+  return fns
+}
+
+export function renderTeacherView(assignment = mockAssignment(), additionalApolloMocks = []) {
+  const fns = render(
+    <MockedProvider mocks={additionalApolloMocks} addTypename={false}>
+      <TeacherView assignment={assignment} />
+    </MockedProvider>
+  )
+  return fns
 }

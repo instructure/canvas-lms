@@ -81,6 +81,23 @@ All Jest matchers are [extensively documented here](http://facebook.github.io/je
 You can replace `it()` with `xit()` to temporarily exclude a test from being executed.<br>
 Similarly, `fit()` lets you focus on a specific test without running any other tests.
 
+### Running Tests
+
+To run all tests:
+```
+yarn test:jest
+```
+
+To run a subset of files or directories:
+```
+yarn test:jest path/to/components/__tests__/spec.js path/to/other_component/ ...
+```
+
+To rerun tests on a file change and/or debug remotely:
+```
+yarn test:jest:debug path/to/components/__tests__/spec.js
+```
+
 ### Coverage Reporting
 
 Jest has an integrated coverage reporter that works well with ES6 and requires no configuration.<br>

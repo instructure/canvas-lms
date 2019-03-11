@@ -62,6 +62,21 @@ Object {
 }
 `;
 
+exports[`copyInheritedAction creates a COPY_INHERITED_SUCCESS action 1`] = `
+Object {
+  "payload": Array [],
+  "type": "COPY_INHERITED_SUCCESS",
+}
+`;
+
+exports[`copyInheritedAction creates an error action if passed an error param 1`] = `
+Object {
+  "error": true,
+  "payload": [Error: Error: something happened],
+  "type": "COPY_INHERITED_FAILURE",
+}
+`;
+
 exports[`removeDomainAction creates a REMOVE_DOMAIN_OPTIMISTIC action when optimistic option is given 1`] = `
 Object {
   "error": true,
@@ -126,5 +141,20 @@ Object {
   "error": true,
   "payload": [Error: Can only set to Boolean values],
   "type": "SET_CSP_INHERITED",
+}
+`;
+
+exports[`setDirtyAction creates a SET_DIRTY action when passed a boolean value 1`] = `
+Object {
+  "payload": true,
+  "type": "SET_DIRTY",
+}
+`;
+
+exports[`setDirtyAction creates an error action if passed a non-boolean value 1`] = `
+Object {
+  "error": true,
+  "payload": [Error: Can only set to Boolean values],
+  "type": "SET_DIRTY",
 }
 `;

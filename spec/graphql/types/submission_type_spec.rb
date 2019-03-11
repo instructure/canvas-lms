@@ -39,6 +39,15 @@ describe Types::SubmissionType do
     expect(submission_type.resolve("_id", current_user: other_student)).to be_nil
   end
 
+  describe "posted_at" do
+    it "returns the posted_at of the submission" do
+      now = Time.zone.now.change(usec: 0)
+      @submission.update!(posted_at: now)
+      posted_at = Time.zone.parse(submission_type.resolve("postedAt"))
+      expect(posted_at).to eq now
+    end
+  end
+
   describe "score and grade" do
     context "muted assignment" do
       before { @assignment.update_attribute(:muted, true) }
@@ -121,7 +130,7 @@ describe Types::SubmissionType do
     end
 
     it "requires permission" do
-      other_course_student = student_in_course(course: course_factory)
+      other_course_student = student_in_course(course: course_factory).user
       expect(
         submission_type.resolve("commentsConnection { nodes { _id }}", current_user: other_course_student)
       ).to be nil

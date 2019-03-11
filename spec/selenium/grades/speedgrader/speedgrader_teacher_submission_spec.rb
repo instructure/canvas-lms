@@ -41,7 +41,7 @@ describe "speed grader submissions" do
       @course.enroll_user(@student_2, "StudentEnrollment", enrollment_state: 'active')
       @submission_2 = @assignment.submit_homework(@student_2, body: 'second student submission text')
 
-      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}#%7B%22student_id%22%3A#{@submission.student.id}%7D"
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}&student_id=#{@submission.student.id}"
 
       # check for assignment title
       expect(f('#assignment_url')).to include_text(@assignment.title)

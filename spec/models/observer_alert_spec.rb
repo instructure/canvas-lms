@@ -25,7 +25,7 @@ describe ObserverAlert do
     before :once do
       @student = user_model
       @observer = user_model
-      UserObservationLink.create(student: @student, observer: @observer)
+      add_linked_observer(@student, @observer)
       @threshold = ObserverAlertThreshold.create!(student: @student, observer: @observer, alert_type: 'assignment_missing')
       @assignment = assignment_model
     end
@@ -200,7 +200,7 @@ describe ObserverAlert do
 
       @student2 = student_in_course(active_all: true, course: @course).user
       @observer2 = course_with_observer(course: @course, associated_user_id: @student2.id, active_all: true).user
-      @link2 = UserObservationLink.create!(student: @student2, observer: @observer2, root_account: @account)
+      @link2 = add_linked_observer(@student2, @observer2)
 
       assignment_model(context: @course, due_at: 5.minutes.ago, submission_types: 'online_text_entry')
       @student3 = student_in_course(active_all: true, course: @course).user

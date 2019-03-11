@@ -19,7 +19,7 @@
 import React from 'react'
 import {bool, oneOf} from 'prop-types'
 import I18n from 'i18n!assignments_2'
-import {OverrideShape} from '../../assignmentData'
+import {OverrideShape, requiredIfDetail} from '../../assignmentData'
 import TeacherViewContext from '../TeacherViewContext'
 import SubmitAny from './SubmissionTypes/SubmitAny'
 import Button from '@instructure/ui-buttons/lib/components/Button'
@@ -46,6 +46,7 @@ export default class OverrideSubmissionTypes extends React.Component {
 
   static propTypes = {
     override: OverrideShape,
+    onChangeOverride: requiredIfDetail,
     readOnly: bool,
     variant: oneOf(['summary', 'detail'])
   }
@@ -78,7 +79,6 @@ export default class OverrideSubmissionTypes extends React.Component {
     super(props)
 
     this.state = {
-      currentSubmissionTypes: props.override.submissionTypes || [],
       currentSubmissionRequirement: 'any'
     }
   }
@@ -98,28 +98,19 @@ export default class OverrideSubmissionTypes extends React.Component {
     }
   }
 
-  // TODo: the on* funcs work, but are incomplete edit functionality
-  onSelectSubmissionType = (event, value) => {
-    this.setState((state, _props) => {
-      const currentSubmissionTypes = [...state.currentSubmissionTypes]
-      currentSubmissionTypes.push(value)
-      return {
-        showSubmissionTypesPopup: false,
-        currentSubmissionTypes
-      }
-    })
+  onSelectSubmissionType = (_event, value) => {
+    const currentSubmissionTypes = [...this.props.override.submissionTypes]
+    currentSubmissionTypes.push(value)
+    this.props.onChangeOverride('submissionTypes', currentSubmissionTypes)
   }
 
   onDeleteSubmissionType = type => {
-    this.setState((prevState, _prevProps) => {
-      const index = prevState.currentSubmissionTypes.findIndex(t => t === type)
-      if (index >= 0) {
-        const currentSubmissionTypes = [...prevState.currentSubmissionTypes]
-        currentSubmissionTypes.splice(index, 1)
-        return {currentSubmissionTypes}
-      }
-      return null
-    })
+    const index = this.props.override.submissionTypes.findIndex(t => t === type)
+    if (index >= 0) {
+      const currentSubmissionTypes = [...this.props.override.submissionTypes]
+      currentSubmissionTypes.splice(index, 1)
+      this.props.onChangeOverride('submissionTypes', currentSubmissionTypes)
+    }
   }
 
   // TODO: this is wrong. it doesn't manage focus like we want
@@ -137,11 +128,29 @@ export default class OverrideSubmissionTypes extends React.Component {
   }
 
   getSortedCurrentTypes() {
-    return this.state.currentSubmissionTypes
+    return this.props.override.submissionTypes
       .map(typeSelection =>
         OverrideSubmissionTypes.submissionTypes.find(t => typeSelection === t.value)
       )
       .sort(this.sortTypeByName)
+  }
+
+  getOverrideSubmissionTypeItems() {
+    const currentSubmissionTypes = this.props.override.submissionTypes
+
+    return OverrideSubmissionTypes.submissionTypes.map(t => {
+      const Icon = t.icon
+      const alreadySelected =
+        currentSubmissionTypes.findIndex(currentType => t.value === currentType) >= 0
+      return (
+        <MenuItem key={t.value} value={t.value} disabled={alreadySelected}>
+          <div>
+            <Icon />
+            <View margin="0 0 0 x-small">{t.name}</View>
+          </div>
+        </MenuItem>
+      )
+    })
   }
 
   renderSummary() {
@@ -170,19 +179,7 @@ export default class OverrideSubmissionTypes extends React.Component {
           </Button>
         }
       >
-        {OverrideSubmissionTypes.submissionTypes.map(t => {
-          const Icon = t.icon
-          const alreadySelected =
-            this.state.currentSubmissionTypes.findIndex(currentType => t.value === currentType) >= 0
-          return (
-            <MenuItem key={t.value} value={t.value} disabled={alreadySelected}>
-              <div>
-                <Icon />
-                <View margin="0 0 0 x-small">{t.name}</View>
-              </div>
-            </MenuItem>
-          )
-        })}
+        {this.getOverrideSubmissionTypeItems()}
       </Menu>
     )
   }
@@ -235,6 +232,7 @@ export default class OverrideSubmissionTypes extends React.Component {
   }
 
   renderDetail() {
+    const currentSubmissionTypes = this.props.override.submissionTypes
     return (
       <View as="div" margin="0 0 small 0" data-testid="OverrideSubmissionTypes">
         <FormFieldGroup description={I18n.t('Submission Type')} layout="columns">
@@ -243,7 +241,7 @@ export default class OverrideSubmissionTypes extends React.Component {
             {this.renderAddSubmissionTypeButton()}
           </div>
         </FormFieldGroup>
-        {this.state.currentSubmissionTypes.length > 1 ? this.renderSubmissionRequirement() : null}
+        {currentSubmissionTypes.length > 1 ? this.renderSubmissionRequirement() : null}
       </View>
     )
   }

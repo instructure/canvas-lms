@@ -20,7 +20,7 @@ import tz from 'timezone'
 import React from 'react'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
-import GradingPeriodTemplate from '../grading/gradingPeriodTemplate'
+import GradingPeriodTemplate from './gradingPeriodTemplate'
 import DateHelper from '../shared/helpers/dateHelper'
 
 class GradingPeriod extends React.Component {

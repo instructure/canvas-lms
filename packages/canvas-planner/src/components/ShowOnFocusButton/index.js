@@ -50,7 +50,6 @@ class ShowOnFocusButton extends Component {
     this.setState({
       visible: true
     }, () => {
-      // eslint-disable-next-line react/no-find-dom-node
       findDOMNode(this.btnRef).focus();
     });
   }

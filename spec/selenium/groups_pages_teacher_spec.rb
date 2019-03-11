@@ -253,7 +253,7 @@ describe "groups" do
     describe "pages page" do
       it_behaves_like 'pages_page', :teacher
 
-      it "should allow teachers to create a page", priority: "1", test_id: 289993 do
+      it "should allow teachers to create a page", :xbrowser, priority: "1", test_id: 289993 do
         get pages_page
         manually_create_wiki_page('stuff','it happens')
       end

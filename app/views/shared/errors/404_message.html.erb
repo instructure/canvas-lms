@@ -33,4 +33,7 @@
   <% if @not_found_message %>
     <p><%= @not_found_message %></p>
   <% end %>
+  <% if send_broken_content! %>
+    <p><%= I18n.t("We've let your instructor know to review this link as soon as possible.") %></p>
+  <% end %>
 </div>

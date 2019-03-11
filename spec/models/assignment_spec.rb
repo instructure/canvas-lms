@@ -3829,6 +3829,31 @@ describe Assignment do
       expect(res.match(/DTSTAMP:20080903T120500Z/)).not_to be_nil
     end
 
+    it ".to_ics should return correct dates even with different time_zone_edited" do
+      Time.zone = 'UTC'
+      assignment_model(:due_at => "Sep 3 2008 11:55am", :course => @course, :time_zone_edited => 'EST')
+      # force known value so we can check serialization
+      @assignment.updated_at = Time.at(1220443500) # 3 Sep 2008 12:05pm (UTC)
+      res = @assignment.to_ics
+      expect(res).not_to be_nil
+      expect(res.match(/DTEND:20080903T115500Z/)).not_to be_nil
+      expect(res.match(/DTSTART:20080903T115500Z/)).not_to be_nil
+      expect(res.match(/DTSTAMP:20080903T120500Z/)).not_to be_nil
+    end
+
+    it ".to_ics should return correct dates even with different timezone on call midnight" do
+      Time.zone = 'UTC'
+      assignment_model(:due_at => "Sep 3 2008 11:59pm", :course => @course, :time_zone_edited => 'EST')
+      # force known value so we can check serialization
+      @assignment.updated_at = Time.at(1220443500) # 3 Sep 2008 12:05pm (UTC)
+      Time.zone = 'HST'
+      res = @assignment.to_ics
+      expect(res).not_to be_nil
+      expect(res.match(/DTEND:20080903T235900Z/)).not_to be_nil
+      expect(res.match(/DTSTART:20080903T235900Z/)).not_to be_nil
+      expect(res.match(/DTSTAMP:20080903T120500Z/)).not_to be_nil
+    end
+
     it ".to_ics should return string data for assignments with due dates in correct tz" do
       Time.zone = 'Alaska' # -0800
       assignment_model(:due_at => "Sep 3 2008 11:55am", :course => @course)

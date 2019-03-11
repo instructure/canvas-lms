@@ -27,12 +27,14 @@ describe UserObservationLink do
   end
 
   it "should not allow a user to observe oneself" do
-    expect { student.linked_observers << student }.to raise_error(ActiveRecord::RecordInvalid)
+    expect {
+      UserObservationLink.create_or_restore(observer: student, student: student, root_account: Account.default)
+    }.to raise_error(ActiveRecord::RecordInvalid)
   end
 
   it 'should restore deleted observees instead of creating a new one' do
     observer = user_with_pseudonym
-    student.linked_observers << observer
+    UserObservationLink.create_or_restore(observer: observer, student: student, root_account: Account.default)
     observee = observer.as_observer_observation_links.first
     observee.destroy
 
@@ -46,7 +48,7 @@ describe UserObservationLink do
     student_enroll = student_in_course(:user => student)
 
     observer = user_with_pseudonym
-    student.linked_observers << observer
+    UserObservationLink.create_or_restore(observer: observer, student: student, root_account: Account.default)
     observer_enroll = observer.observer_enrollments.first
     observer_enroll.destroy
 
@@ -84,7 +86,7 @@ describe UserObservationLink do
     e3.complete!
 
     observer = user_with_pseudonym
-    student.linked_observers << observer
+    UserObservationLink.create_or_restore(observer: observer, student: student, root_account: Account.default)
 
     enrollments = observer.observer_enrollments.order(:course_id)
     expect(enrollments.size).to eql 2
@@ -107,7 +109,7 @@ describe UserObservationLink do
     e1 = student_in_course(:course => c1, :user => student)
 
     observer = user_with_pseudonym
-    student.linked_observers << observer
+    UserObservationLink.create_or_restore(observer: observer, student: student, root_account: Account.default)
 
     preloaded_student = User.where(:id => student).preload(:linked_observers).first
     expect(preloaded_student.association(:linked_observers).loaded?).to be_truthy
@@ -123,7 +125,7 @@ describe UserObservationLink do
     enroll.deactivate
 
     observer = user_with_pseudonym
-    student.linked_observers << observer
+    UserObservationLink.create_or_restore(observer: observer, student: student, root_account: Account.default)
 
     o_enroll = observer.observer_enrollments.first
     expect(o_enroll).to be_inactive
@@ -139,7 +141,7 @@ describe UserObservationLink do
     c1 = course_factory(active_all: true)
 
     observer = user_with_pseudonym
-    student.linked_observers << observer
+    UserObservationLink.create_or_restore(observer: observer, student: student, root_account: Account.default)
 
     uo = student.as_student_observation_links.first
     uo.destroy!
@@ -168,7 +170,9 @@ describe UserObservationLink do
     observer = user_with_pseudonym(account: a2)
     allow(@pseudonym).to receive(:works_for_account?).and_return(false)
     allow(@pseudonym).to receive(:works_for_account?).with(a2, true).and_return(true)
-    student.linked_observers << observer
+    [a1, a2].each do |account|
+      UserObservationLink.create_or_restore(observer: observer, student: student, root_account: account)
+    end
 
     enrollments = observer.observer_enrollments
     expect(enrollments.size).to eql 1
@@ -181,7 +185,7 @@ describe UserObservationLink do
       @course = course_factory active_all: true
       @student_enrollment = student_in_course(course: @course, user: student, active_all: true)
       @observer = user_with_pseudonym
-      student.linked_observers << @observer
+      UserObservationLink.create_or_restore(observer: @observer, student: student, root_account: Account.default)
       @observer_enrollment = @observer.enrollments.where(type: 'ObserverEnrollment', course_id: @course, associated_user_id: student).first
     end
 
@@ -225,6 +229,22 @@ describe UserObservationLink do
       allow_any_instantiation_of(Account.default).to receive(:trusted_account_ids).and_return([@other_account.id])
       course_factory(active_all: true)
       student_in_course(course: @course, user: student, active_all: true)
+      expect(@parent.enrollments.shard(@parent).first.course).to eq @course
+    end
+
+    it "creates enrollments for existing students in trusted accounts after the link is created" do
+      @shard2.activate do
+        @other_account = Account.create!
+        @parent = user_with_pseudonym(account: @other_account, active_all: true)
+      end
+      pseudonym(@parent, :account => Account.default)
+      course_factory(active_all: true)
+      student_in_course(course: @course, user: student, active_all: true)
+
+      allow_any_instantiation_of(@other_account).to receive(:trusted_account_ids).and_return([Account.default.id])
+      @shard2.activate do
+        UserObservationLink.create_or_restore(observer: @parent, student: student, root_account: @other_account)
+      end
       expect(@parent.enrollments.shard(@parent).first.course).to eq @course
     end
   end

@@ -100,6 +100,10 @@ export default class AssignmentColumnHeader extends ColumnHeader {
       onSelect: func.isRequired
     }).isRequired,
 
+    hideGradesAction: shape({
+      onSelect: func.isRequired
+    }).isRequired,
+
     postGradesAction: shape({
       enabled: bool.isRequired,
       onSelect: func.isRequired
@@ -171,6 +175,10 @@ export default class AssignmentColumnHeader extends ColumnHeader {
 
   curveGrades = () => {
     this.invokeAndSkipFocus(this.props.curveGradesAction)
+  }
+
+  hideGrades = () => {
+    this.invokeAndSkipFocus(this.props.hideGradesAction)
   }
 
   postGrades = () => {
@@ -374,6 +382,10 @@ export default class AssignmentColumnHeader extends ColumnHeader {
                 : I18n.t('Mute Assignment')}
             </span>
           </MenuItem>
+        )}
+
+        {this.props.postGradesAction.enabled && (
+          <MenuItem onSelect={this.hideGrades}>{I18n.t('Hide grades')}</MenuItem>
         )}
 
         {!this.props.enterGradesAsSetting.hidden && <MenuItemSeparator />}

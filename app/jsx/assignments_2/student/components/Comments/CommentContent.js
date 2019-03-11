@@ -17,19 +17,26 @@
  */
 
 import React from 'react'
-import NoComments from './NoComments'
+import I18n from 'i18n!assignments_2'
+import SVGWithTextPlaceholder from '../SVGWithTextPlaceholder'
 import {arrayOf} from 'prop-types'
 import CommentRow from './CommentRow'
 import {CommentShape} from '../../assignmentData'
+import noComments from '../../SVG/NoComments.svg'
 
 function CommentContent(props) {
   return (
-    <div className="comments-content-container">
-      {!props.comments.length && <NoComments />}
+    <React.Fragment>
+      {!props.comments.length && (
+        <SVGWithTextPlaceholder
+          text={I18n.t('Send a comment to your instructor about this assignment.')}
+          url={noComments}
+        />
+      )}
       {props.comments.map(comment => (
         <CommentRow key={comment._id} comment={comment} />
       ))}
-    </div>
+    </React.Fragment>
   )
 }
 

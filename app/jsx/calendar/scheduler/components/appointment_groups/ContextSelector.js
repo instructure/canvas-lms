@@ -218,9 +218,7 @@ import Grid, { GridCol, GridRow } from '@instructure/ui-layout/lib/components/Gr
                     checked={this.isSubContextChecked(context.asset_string, section.asset_string)}
                     disabled={this.isSubContextDisabled(context.asset_string, section.asset_string)}
                   />
-                  {
-                    // eslint-disable-next-line
-                  }<label
+                  { }<label
                     className="ContextLabel CourseListItem-section-item"
                     htmlFor={`${section.asset_string}_checkbox`}>{section.name}</label>
                 </div>
@@ -256,9 +254,7 @@ import Grid, { GridCol, GridRow } from '@instructure/ui-layout/lib/components/Gr
                       checked={this.isContextChecked(context.asset_string)}
                       disabled={this.isContextDisabled(context.asset_string)}
                     />
-                    {
-                      // eslint-disable-next-line
-                    }<label className="ContextLabel CourseListItem-item" htmlFor={inputId}>{context.name}</label>
+                    { }<label className="ContextLabel CourseListItem-item" htmlFor={inputId}>{context.name}</label>
                   </div>
                   {this.renderSections(context)}
                 </div>

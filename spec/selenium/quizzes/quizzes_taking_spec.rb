@@ -60,7 +60,7 @@ describe "quiz taking" do
     expect(links[2]).to be_displayed
   end
 
-  it "should allow to take the quiz as long as there are attempts left", priority: "1", test_id: 140606 do
+  it "should allow to take the quiz as long as there are attempts left", :xbrowser, priority: "1", test_id: 140606 do
     @quiz.allowed_attempts = 2
     @quiz.save!
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"

@@ -263,7 +263,6 @@ class RoleOverridesController < ApplicationController
   #            A missing letter indicates the permission cannot be enabled for the role
   #            or any derived custom roles.
   #     change_course_state              -- [ TaD ] Course State - manage
-  #     comment_on_others_submissions    -- [sTAD ] Submissions - view and make comments
   #     create_collaborations            -- [STADo] Student Collaborations - create
   #     create_conferences               -- [STADo] Web conferences - create
   #     create_forum                     -- [STADo] Discussions - create

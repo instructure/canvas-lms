@@ -25,8 +25,7 @@ import {PERMISSIONS, ROLES} from './examples'
 import {moxiosWait} from 'jest-moxios-utils'
 
 // This is needed for $.screenReaderFlashMessageExclusive to work.
-// TODO: This is terrible, make it unterrible
-import 'compiled/jquery.rails_flash_notifications' // eslint-disable-line
+import 'compiled/jquery.rails_flash_notifications'
 
 it('searchPermissions dispatches updatePermissionsSearch', done => {
   const state = {contextId: 1, permissions: PERMISSIONS, roles: []}

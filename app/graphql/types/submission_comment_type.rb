@@ -16,14 +16,34 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+class AttachmentsLoader < GraphQL::Batch::Loader
+  def initialize(assignment)
+    @assignment = assignment
+  end
+
+  def perform(comments)
+    assignment_attachment_ids = @assignment.attachment_ids.to_set
+    comment_attachments = comments.each_with_object({}) do |comment, hash|
+      comment_attachment_ids = comment.parse_attachment_ids.to_set
+      hash[comment] = comment_attachment_ids & assignment_attachment_ids
+    end
+
+    ids = comment_attachments.values.reduce(:merge).to_a
+    attachments = Attachment.where(id: ids)
+    comment_attachments.each do |comment, attachment_ids|
+      targets = attachments.select { |a|  attachment_ids.include?(a.id) }
+      fulfill(comment, targets)
+    end
+  end
+end
+
 module Types
   class SubmissionCommentType < ApplicationObjectType
-    graphql_name "SubmissionComment"
+    graphql_name 'SubmissionComment'
 
     implements Interfaces::TimestampInterface
 
-    field :_id, ID, "legacy canvas id", null: true, method: :id
-
+    field :_id, ID, 'legacy canvas id', null: true, method: :id
     field :comment, String, null: true
 
     field :author, Types::UserType, null: true
@@ -32,9 +52,29 @@ module Types
       # Not ideal as that could be cached in redis, but in most cases the assignment
       # and submission will already be in the cache, as that's the graphql query
       # path to get to a submission comment, and thus costs us nothing to preload here.
-      Loaders::AssociationLoader.for(SubmissionComment, [:author, {submission: :assignment}]).load(object).then do
-        object.grants_right?(current_user, :read_author) ? object.author : nil
+      Promise.all([
+        load_association(:author),
+        load_association(:submission).then do |submission|
+          Loaders::AssociationLoader.for(Submission, :assignment).load(submission)
+        end
+      ]).then {
+        object.author if object.grants_right?(current_user, :read_author)
+      }
+    end
+
+    field :attachments, [Types::FileType], null: true
+    def attachments
+      return [] if object.attachment_ids.blank?
+      load_association(:submission).then do |submission|
+        Loaders::AssociationLoader.for(Submission, :assignment).load(submission).then do |assignment|
+          AttachmentsLoader.for(object.submission.assignment).load(object)
+        end
       end
+    end
+
+    field :media_object, Types::MediaObjectType, null: true
+    def media_object
+      Loaders::MediaObjectLoader.load(object.media_comment_id)
     end
   end
 end

@@ -131,8 +131,13 @@
 #           "type": "integer"
 #         },
 #         "assignment_id": {
-#           "description": "the id of the aligned assignment.",
+#           "description": "the id of the aligned assignment (null for live assessments).",
 #           "example": 2,
+#           "type": "integer"
+#         },
+#         "assessment_id": {
+#           "description": "the id of the aligned live assessment (null for assignments).",
+#           "example": 3,
 #           "type": "integer"
 #         },
 #         "submission_types": {
@@ -287,14 +292,20 @@ class OutcomesApiController < ApplicationController
       can_manage = course.grants_any_right?(@current_user, session, :manage_grades, :view_all_grades)
       student_id = params[:student_id].to_i
       verify_readable_grade_enrollments([student_id]) unless can_manage
+
+      assignment_states = ['deleted']
+      assignment_states << 'unpublished' unless can_manage
       alignments = ActiveRecord::Base.connection.exec_query(ContentTag.active.for_context(course).learning_outcome_alignments.
         select("content_tags.learning_outcome_id, content_tags.title, content_tags.content_id as assignment_id, assignments.submission_types").
-        joins("INNER JOIN #{Assignment.quoted_table_name} assignments ON assignments.id = content_tags.content_id AND content_tags.content_type = 'Assignment' AND assignments.workflow_state <> 'deleted'").
+        joins("INNER JOIN #{Assignment.quoted_table_name} assignments ON assignments.id = content_tags.content_id AND content_tags.content_type = 'Assignment'").
         joins("INNER JOIN #{Submission.quoted_table_name} submissions ON submissions.assignment_id = assignments.id AND submissions.user_id = #{student_id} AND submissions.workflow_state <> 'deleted'").
+        where('assignments.workflow_state NOT IN (?)', assignment_states).
         to_sql).to_hash
       alignments.each{|a| a[:url] = "#{polymorphic_url([course, :assignments])}/#{a['assignment_id']}"}
 
-      quizzes = Quizzes::Quiz.active.
+      quizzes = Quizzes::Quiz.active
+      quizzes = quizzes.where("quizzes.workflow_state IN ('active', 'available')") unless can_manage
+      quizzes = quizzes.
         select(:title, :id, :assignment_id).preload(:quiz_questions).
         joins(assignment: :submissions).
         where(context: course).
@@ -314,7 +325,21 @@ class OutcomesApiController < ApplicationController
         end
       end.flatten
 
-      alignments.concat(quiz_alignments)
+      live_assessments = LiveAssessments::Assessment.for_context(context).
+        joins(:submissions).
+        preload(:learning_outcome_alignments).
+        where(live_assessments_submissions: {user_id: student_id})
+      magic_marker_alignments = live_assessments.map do |la|
+        la.learning_outcome_alignments.map do |loa|
+          {
+            learning_outcome_id: loa.learning_outcome_id,
+            title: loa.title,
+            submission_types: 'magic_marker',
+            assessment_id: la.id
+          }
+        end
+      end.flatten
+      alignments.concat(quiz_alignments, magic_marker_alignments)
 
       render :json => alignments
     end

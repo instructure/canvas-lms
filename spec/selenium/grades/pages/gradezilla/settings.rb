@@ -129,8 +129,8 @@ module Gradezilla
   module PostingPolicies
     extend SeleniumDependencies
 
-    def select_automatically
-      # TODO: create locator for radio button, select auto here
+    def self.select_automatically
+      fj('label:contains("Automatically Post Grades")').click
     end
   end
 end

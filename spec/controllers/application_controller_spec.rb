@@ -160,7 +160,8 @@ RSpec.describe ApplicationController do
         "microphone *",
         "camera *",
         "midi *",
-        "encrypted-media *"
+        "encrypted-media *",
+        "autoplay *"
       ]
     end
 

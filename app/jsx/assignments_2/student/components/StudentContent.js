@@ -23,6 +23,9 @@ import AssignmentToggleDetails from '../../shared/AssignmentToggleDetails'
 import ContentTabs from './ContentTabs'
 import MissingPrereqs from './MissingPrereqs'
 import LockedAssignment from './LockedAssignment'
+import ErrorBoundary from '../../../shared/components/ErrorBoundary'
+import GenericErrorPage from '../../../shared/components/GenericErrorPage/index'
+import errorShipUrl from '../SVG/ErrorShip.svg'
 
 function renderContentBaseOnAvailability(assignment) {
   if (assignment.env.modulePrereq) {
@@ -43,10 +46,19 @@ function renderContentBaseOnAvailability(assignment) {
 function StudentContent(props) {
   const {assignment} = props
   return (
-    <div data-test-id="assignments-2-student-view">
-      <Header scrollThreshold={150} assignment={assignment} />
-      {renderContentBaseOnAvailability(assignment)}
-    </div>
+    <ErrorBoundary
+      errorComponent={
+        <GenericErrorPage
+          imageUrl={errorShipUrl}
+          errorCategory="Assignments 2 Student Error Page"
+        />
+      }
+    >
+      <div data-testid="assignments-2-student-view">
+        <Header scrollThreshold={150} assignment={assignment} />
+        {renderContentBaseOnAvailability(assignment)}
+      </div>
+    </ErrorBoundary>
   )
 }
 

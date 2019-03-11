@@ -1133,6 +1133,36 @@ describe MasterCourses::MasterMigration do
       expect(copied_topic_assmt.reload.due_at.to_i).to eq new_master_due_at.to_i
     end
 
+    it "allows a minion course's change of the graded status of a discussion topic to stick" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+
+      topic = @copy_from.discussion_topics.new
+      topic.assignment = @copy_from.assignments.build(:due_at => 1.month.from_now)
+      topic.save!
+      run_master_migration
+
+      topic_to = @copy_to.discussion_topics.where(:migration_id => mig_id(topic)).take
+      assignment_to = topic_to.assignment
+      topic_to.assignment = nil
+      topic_to.save!
+
+      expect(assignment_to.reload).to be_deleted
+      topic_tag = MasterCourses::ChildContentTag.where(content_type: 'DiscussionTopic', content_id: topic_to.id).take
+      expect(topic_tag.downstream_changes).to include 'assignment_id'
+      assign_tag = MasterCourses::ChildContentTag.where(content_id: 'Assignment', content_id: assignment_to.id).take
+      expect(assign_tag.downstream_changes).to include 'workflow_state'
+
+      Timecop.travel(1.hour.from_now) do
+        topic.message = 'content updated'
+        topic.save!
+      end
+      run_master_migration
+
+      expect(topic_to.reload.assignment).to be_nil
+      expect(assignment_to.reload).to be_deleted
+    end
+
     it "should ignore course settings on selective export unless requested" do
       @copy_to = course_factory
       @sub = @template.add_child_course!(@copy_to)

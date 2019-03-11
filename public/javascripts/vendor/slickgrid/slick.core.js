@@ -1,25 +1,49 @@
+/*
+ * Copyright (c) 2010 Michael Leibman, http://github.com/mleibman/slickgrid
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
 import $ from 'jquery'
 import 'vendor/slickgrid/lib/jquery.event.drag-2.2'
 
-/***
+/** *
  * Contains core SlickGrid classes.
  * @module Core
  * @namespace Slick
  */
+
 ;(function($) {
   // register namespace
   $.extend(true, window, {
     Slick: {
-      Event: Event,
-      EventData: EventData,
-      EventHandler: EventHandler,
-      Range: Range,
+      Event,
+      EventData,
+      EventHandler,
+      Range,
       NonDataRow: NonDataItem,
-      Group: Group,
-      GroupTotals: GroupTotals,
-      EditorLock: EditorLock,
+      Group,
+      GroupTotals,
+      EditorLock,
 
-      /***
+      /** *
        * A global singleton editor lock.
        * @class GlobalEditorLock
        * @static
@@ -29,17 +53,17 @@ import 'vendor/slickgrid/lib/jquery.event.drag-2.2'
     }
   })
 
-  /***
+  /** *
    * An event object for passing data to event handlers and letting them control propagation.
    * <p>This is pretty much identical to how W3C and jQuery implement events.</p>
    * @class EventData
    * @constructor
    */
   function EventData() {
-    var isPropagationStopped = false
-    var isImmediatePropagationStopped = false
+    let isPropagationStopped = false
+    let isImmediatePropagationStopped = false
 
-    /***
+    /** *
      * Stops event from propagating up the DOM tree.
      * @method stopPropagation
      */
@@ -47,7 +71,7 @@ import 'vendor/slickgrid/lib/jquery.event.drag-2.2'
       isPropagationStopped = true
     }
 
-    /***
+    /** *
      * Returns whether stopPropagation was called on this event object.
      * @method isPropagationStopped
      * @return {Boolean}
@@ -56,7 +80,7 @@ import 'vendor/slickgrid/lib/jquery.event.drag-2.2'
       return isPropagationStopped
     }
 
-    /***
+    /** *
      * Prevents the rest of the handlers from being executed.
      * @method stopImmediatePropagation
      */
@@ -64,7 +88,7 @@ import 'vendor/slickgrid/lib/jquery.event.drag-2.2'
       isImmediatePropagationStopped = true
     }
 
-    /***
+    /** *
      * Returns whether stopImmediatePropagation was called on this event object.\
      * @method isImmediatePropagationStopped
      * @return {Boolean}
@@ -74,15 +98,15 @@ import 'vendor/slickgrid/lib/jquery.event.drag-2.2'
     }
   }
 
-  /***
+  /** *
    * A simple publisher-subscriber implementation.
    * @class Event
    * @constructor
    */
   function Event() {
-    var handlers = []
+    const handlers = []
 
-    /***
+    /** *
      * Adds an event handler to be called when the event is fired.
      * <p>Event handler will receive two arguments - an <code>EventData</code> and the <code>data</code>
      * object the event was fired with.<p>
@@ -93,20 +117,20 @@ import 'vendor/slickgrid/lib/jquery.event.drag-2.2'
       handlers.push(fn)
     }
 
-    /***
+    /** *
      * Removes an event handler added with <code>subscribe(fn)</code>.
      * @method unsubscribe
      * @param fn {Function} Event handler to be removed.
      */
     this.unsubscribe = function(fn) {
-      for (var i = handlers.length - 1; i >= 0; i--) {
+      for (let i = handlers.length - 1; i >= 0; i--) {
         if (handlers[i] === fn) {
           handlers.splice(i, 1)
         }
       }
     }
 
-    /***
+    /** *
      * Fires an event notifying all subscribers.
      * @method notify
      * @param args {Object} Additional data object to be passed to all handlers.
@@ -123,9 +147,9 @@ import 'vendor/slickgrid/lib/jquery.event.drag-2.2'
       e = e || new EventData()
       scope = scope || this
 
-      var returnValue
+      let returnValue
       for (
-        var i = 0;
+        let i = 0;
         i < handlers.length && !(e.isPropagationStopped() || e.isImmediatePropagationStopped());
         i++
       ) {
@@ -137,12 +161,12 @@ import 'vendor/slickgrid/lib/jquery.event.drag-2.2'
   }
 
   function EventHandler() {
-    var handlers = []
+    let handlers = []
 
     this.subscribe = function(event, handler) {
       handlers.push({
-        event: event,
-        handler: handler
+        event,
+        handler
       })
       event.subscribe(handler)
 
@@ -150,7 +174,7 @@ import 'vendor/slickgrid/lib/jquery.event.drag-2.2'
     }
 
     this.unsubscribe = function(event, handler) {
-      var i = handlers.length
+      let i = handlers.length
       while (i--) {
         if (handlers[i].event === event && handlers[i].handler === handler) {
           handlers.splice(i, 1)
@@ -163,7 +187,7 @@ import 'vendor/slickgrid/lib/jquery.event.drag-2.2'
     }
 
     this.unsubscribeAll = function() {
-      var i = handlers.length
+      let i = handlers.length
       while (i--) {
         handlers[i].event.unsubscribe(handlers[i].handler)
       }
@@ -173,7 +197,7 @@ import 'vendor/slickgrid/lib/jquery.event.drag-2.2'
     }
   }
 
-  /***
+  /** *
    * A structure containing a range of cells.
    * @class Range
    * @constructor
@@ -188,31 +212,31 @@ import 'vendor/slickgrid/lib/jquery.event.drag-2.2'
       toCell = fromCell
     }
 
-    /***
+    /** *
      * @property fromRow
      * @type {Integer}
      */
     this.fromRow = Math.min(fromRow, toRow)
 
-    /***
+    /** *
      * @property fromCell
      * @type {Integer}
      */
     this.fromCell = Math.min(fromCell, toCell)
 
-    /***
+    /** *
      * @property toRow
      * @type {Integer}
      */
     this.toRow = Math.max(fromRow, toRow)
 
-    /***
+    /** *
      * @property toCell
      * @type {Integer}
      */
     this.toCell = Math.max(fromCell, toCell)
 
-    /***
+    /** *
      * Returns whether a range represents a single row.
      * @method isSingleRow
      * @return {Boolean}
@@ -221,7 +245,7 @@ import 'vendor/slickgrid/lib/jquery.event.drag-2.2'
       return this.fromRow == this.toRow
     }
 
-    /***
+    /** *
      * Returns whether a range represents a single cell.
      * @method isSingleCell
      * @return {Boolean}
@@ -230,7 +254,7 @@ import 'vendor/slickgrid/lib/jquery.event.drag-2.2'
       return this.fromRow == this.toRow && this.fromCell == this.toCell
     }
 
-    /***
+    /** *
      * Returns whether a range contains a given cell.
      * @method contains
      * @param row {Integer}
@@ -243,23 +267,21 @@ import 'vendor/slickgrid/lib/jquery.event.drag-2.2'
       )
     }
 
-    /***
+    /** *
      * Returns a readable representation of a range.
      * @method toString
      * @return {String}
      */
     this.toString = function() {
       if (this.isSingleCell()) {
-        return '(' + this.fromRow + ':' + this.fromCell + ')'
+        return `(${this.fromRow}:${this.fromCell})`
       } else {
-        return (
-          '(' + this.fromRow + ':' + this.fromCell + ' - ' + this.toRow + ':' + this.toCell + ')'
-        )
+        return `(${this.fromRow}:${this.fromCell} - ${this.toRow}:${this.toCell})`
       }
     }
   }
 
-  /***
+  /** *
    * A base class that all special / non-data rows (like Group and GroupTotals) derive from.
    * @class NonDataItem
    * @constructor
@@ -268,7 +290,7 @@ import 'vendor/slickgrid/lib/jquery.event.drag-2.2'
     this.__nonDataRow = true
   }
 
-  /***
+  /** *
    * Information about a group of rows.
    * @class Group
    * @extends Slick.NonDataItem
@@ -284,35 +306,35 @@ import 'vendor/slickgrid/lib/jquery.event.drag-2.2'
      */
     this.level = 0
 
-    /***
+    /** *
      * Number of rows in the group.
      * @property count
      * @type {Integer}
      */
     this.count = 0
 
-    /***
+    /** *
      * Grouping value.
      * @property value
      * @type {Object}
      */
     this.value = null
 
-    /***
+    /** *
      * Formatted display value of the group.
      * @property title
      * @type {String}
      */
     this.title = null
 
-    /***
+    /** *
      * Whether a group is collapsed.
      * @property collapsed
      * @type {Boolean}
      */
     this.collapsed = false
 
-    /***
+    /** *
      * GroupTotals, if any.
      * @property totals
      * @type {GroupTotals}
@@ -344,7 +366,7 @@ import 'vendor/slickgrid/lib/jquery.event.drag-2.2'
 
   Group.prototype = new NonDataItem()
 
-  /***
+  /** *
    * Compares two Group instances.
    * @method equals
    * @return {Boolean}
@@ -359,7 +381,7 @@ import 'vendor/slickgrid/lib/jquery.event.drag-2.2'
     )
   }
 
-  /***
+  /** *
    * Information about group totals.
    * An instance of GroupTotals will be created for each totals row and passed to the aggregators
    * so that they can store arbitrary data in it.  That data can later be accessed by group totals
@@ -371,7 +393,7 @@ import 'vendor/slickgrid/lib/jquery.event.drag-2.2'
   function GroupTotals() {
     this.__groupTotals = true
 
-    /***
+    /** *
      * Parent Group.
      * @param group
      * @type {Group}
@@ -381,7 +403,7 @@ import 'vendor/slickgrid/lib/jquery.event.drag-2.2'
 
   GroupTotals.prototype = new NonDataItem()
 
-  /***
+  /** *
    * A locking helper to track the active edit controller and ensure that only a single controller
    * can be active at a time.  This prevents a whole class of state and validation synchronization
    * issues.  An edit controller (such as SlickGrid) can query if an active edit is in progress
@@ -390,9 +412,9 @@ import 'vendor/slickgrid/lib/jquery.event.drag-2.2'
    * @constructor
    */
   function EditorLock() {
-    var activeEditController = null
+    let activeEditController = null
 
-    /***
+    /** *
      * Returns true if a specified edit controller is active (has the edit lock).
      * If the parameter is not specified, returns true if any edit controller is active.
      * @method isActive
@@ -405,7 +427,7 @@ import 'vendor/slickgrid/lib/jquery.event.drag-2.2'
         : activeEditController !== null
     }
 
-    /***
+    /** *
      * Sets the specified edit controller as the active edit controller (acquire edit lock).
      * If another edit controller is already active, and exception will be thrown.
      * @method activate
@@ -428,7 +450,7 @@ import 'vendor/slickgrid/lib/jquery.event.drag-2.2'
       activeEditController = editController
     }
 
-    /***
+    /** *
      * Unsets the specified edit controller as the active edit controller (release edit lock).
      * If the specified edit controller is not the active one, an exception will be thrown.
      * @method deactivate
@@ -441,7 +463,7 @@ import 'vendor/slickgrid/lib/jquery.event.drag-2.2'
       activeEditController = null
     }
 
-    /***
+    /** *
      * Attempts to commit the current edit by calling "commitCurrentEdit" method on the active edit
      * controller and returns whether the commit attempt was successful (commit may fail due to validation
      * errors, etc.).  Edit controller's "commitCurrentEdit" must return true if the commit has succeeded
@@ -453,7 +475,7 @@ import 'vendor/slickgrid/lib/jquery.event.drag-2.2'
       return activeEditController ? activeEditController.commitCurrentEdit() : true
     }
 
-    /***
+    /** *
      * Attempts to cancel the current edit by calling "cancelCurrentEdit" method on the active edit
      * controller and returns whether the edit was successfully cancelled.  If no edit controller is
      * active, returns true.

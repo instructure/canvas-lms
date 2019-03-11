@@ -34,6 +34,13 @@ describe "calendar2" do
       course_with_teacher_logged_in
     end
 
+    it "should navigate to month view when month button is clicked", :xbrowser do
+      load_week_view
+      f('#month').click
+      wait_for_ajaximations
+      expect(fj('.fc-month-view:visible')).to be_present
+    end
+
     describe "main month calendar" do
 
       it "should remember the selected calendar view" do
@@ -473,6 +480,13 @@ describe "calendar2" do
 
     before(:each) do
       course_with_student_logged_in
+    end
+
+    it "should navigate to month view when month button is clicked", :xbrowser do
+      load_week_view
+      f('#month').click
+      wait_for_ajaximations
+      expect(fj('.fc-month-view:visible')).to be_present
     end
 
     describe "main month calendar" do

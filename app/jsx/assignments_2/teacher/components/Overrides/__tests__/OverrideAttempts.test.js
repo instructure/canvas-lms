@@ -49,7 +49,7 @@ it('renders unlimited override attempts detail', () => {
   const override = mockOverride({})
 
   const {getByLabelText, getByTestId, queryByTestId} = render(
-    <OverrideAttempts override={override} variant="detail" readOnly />
+    <OverrideAttempts override={override} onChangeOverride={() => {}} variant="detail" readOnly />
   )
   expect(getByTestId('OverrideAttempts-Detail')).toBeInTheDocument()
 
@@ -64,7 +64,7 @@ it('renders unlimited override attempts detail', () => {
 it('renders limited override attempts detail', () => {
   const override = mockOverride({allowedAttempts: 2})
   const {getByLabelText, getByTestId} = render(
-    <OverrideAttempts override={override} variant="detail" readOnly />
+    <OverrideAttempts override={override} onChangeOverride={() => {}} variant="detail" readOnly />
   )
   expect(getByTestId('OverrideAttempts-Detail')).toBeInTheDocument()
 
@@ -73,4 +73,20 @@ it('renders limited override attempts detail', () => {
   expect(getByLabelText('Attempts').value).toBe('2')
 
   expect(getByLabelText('Score to keep').value).toBe('Most Recent')
+})
+
+it('displays the Attempts count when switched from unlimited to limited', () => {
+  const override = mockOverride({})
+
+  const {container, getByTestId, queryByTestId} = render(
+    <OverrideAttempts override={override} onChangeOverride={() => {}} variant="detail" readOnly />
+  )
+  expect(queryByTestId('OverrideAttempts-Attempts')).toBeNull()
+
+  override.allowedAttempts = 1
+  render(
+    <OverrideAttempts override={override} onChangeOverride={() => {}} variant="detail" readOnly />,
+    {container}
+  )
+  expect(getByTestId('OverrideAttempts-Attempts')).toBeInTheDocument()
 })

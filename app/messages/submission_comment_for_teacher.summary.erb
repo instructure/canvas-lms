@@ -1,9 +1,11 @@
+<% presenter = Messages::SubmissionCommentForTeacher::SummaryPresenter.new(self) %>
+
 <% define_content :link do %>
-  <%= polymorphic_url([asset.submission.assignment.context, asset.submission.assignment, :submission], id: asset.submission.user) %>
+  <%= presenter.link %>
 <% end %>
 
 <% define_content :subject do %>
-  <%= t :subject, "Submission Comment: %{user}, %{assignment}, %{context}", :user => asset.submission.user.name, :assignment => asset.submission.assignment.title, :context => asset.submission.assignment.context.name %>
+  <%= presenter.subject %>
 <% end %>
 
-<%= t :body, "%{author} just made a new comment on the submission for %{user} for %{assignment}.", :author => (asset.author.name || t(:someone, "Someone")), :user => asset.submission.user.name, :assignment => asset.submission.assignment.title %>
+<%= presenter.body %>

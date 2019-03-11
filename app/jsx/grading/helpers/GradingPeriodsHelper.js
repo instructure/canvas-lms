@@ -32,7 +32,7 @@ function validateGradingPeriodDates(gradingPeriods) {
 
   const dates = ['startDate', 'endDate', 'closeDate']
   const periods = _.isArray(gradingPeriods) ? gradingPeriods : [gradingPeriods]
-  _.each(periods, function(period) {
+  _.each(periods, period => {
     _.each(dates, date => validateDate(period[date]))
   })
 
@@ -69,9 +69,8 @@ class GradingPeriodsHelper {
     validateDate(dueAt, true)
 
     return (
-      _.find(this.gradingPeriods, period => {
-        return this.isDateInGradingPeriod(dueAt, period.id, false)
-      }) || null
+      _.find(this.gradingPeriods, period => this.isDateInGradingPeriod(dueAt, period.id, false)) ||
+      null
     )
   }
 

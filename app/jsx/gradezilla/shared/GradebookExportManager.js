@@ -21,7 +21,9 @@ import I18n from 'i18n!gradebook'
 
 class GradebookExportManager {
   static DEFAULT_POLLING_INTERVAL = 2000
+
   static DEFAULT_MONITORING_BASE_URL = '/api/v1/progress'
+
   static DEFAULT_ATTACHMENT_BASE_URL = '/api/v1/users'
 
   static exportCompleted(workflowState) {

@@ -19,7 +19,7 @@
 import React, {Component} from 'react'
 import I18n from 'i18n!security_panel'
 import {connect} from 'react-redux'
-import {arrayOf, func, objectOf, oneOf, shape, string} from 'prop-types'
+import {arrayOf, bool, func, objectOf, oneOf, shape, string} from 'prop-types'
 import Alert from '@instructure/ui-alerts/lib/components/Alert'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
 import TextInput from '@instructure/ui-forms/lib/components/TextInput'
@@ -30,10 +30,13 @@ import List, {ListItem} from '@instructure/ui-elements/lib/components/List'
 import Table from '@instructure/ui-elements/lib/components/Table'
 import View from '@instructure/ui-layout/lib/components/View'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import Billboard from '@instructure/ui-billboard/lib/components/Billboard'
 import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
 import isValidDomain from 'is-valid-domain'
 
-import {addDomain, removeDomain} from '../actions'
+import EmptyDesert from '../../shared/EmptyDesert'
+
+import {addDomain, removeDomain, copyInheritedIfNeeded} from '../actions'
 import {CONFIG} from '../index'
 
 const PROTOCOL_REGEX = /^(?:(ht|f)tp(s?)\:\/\/)?/
@@ -44,11 +47,18 @@ export class Whitelist extends Component {
     removeDomain: func.isRequired,
     context: oneOf(['course', 'account']).isRequired,
     contextId: string.isRequired,
+    copyInheritedIfNeeded: func.isRequired,
+    inherited: bool,
     whitelistedDomains: shape({
       account: arrayOf(string),
       effective: arrayOf(string),
+      inherited: arrayOf(string),
       tools: objectOf(arrayOf(shape({id: string, name: string, account_id: string})))
     }).isRequired
+  }
+
+  static defaultProps = {
+    inherited: false
   }
 
   state = {
@@ -75,6 +85,9 @@ export class Whitelist extends Component {
     if (this.validateInput(this.state.addDomainInputValue)) {
       this.setState(curState => {
         this.props.addDomain(this.props.context, this.props.contextId, curState.addDomainInputValue)
+        this.props.copyInheritedIfNeeded(this.props.context, this.props.contextId, {
+          add: curState.addDomainInputValue
+        })
         return {
           errors: [],
           addDomainInputValue: ''
@@ -105,20 +118,29 @@ export class Whitelist extends Component {
     } else {
       this.deleteButtons[newDomainToFocus].focus()
     }
+    this.props.copyInheritedIfNeeded(this.props.context, this.props.contextId, {delete: domain})
   }
 
   render() {
-    const domainLimitReached = this.props.whitelistedDomains.account.length >= CONFIG.max_domains
+    const domainLimitReached =
+      this.props.whitelistedDomains.account.length >= CONFIG.max_domains && !this.props.inherited
     const toolsWhitelistKeys = this.props.whitelistedDomains.tools
       ? Object.keys(this.props.whitelistedDomains.tools)
       : []
+
+    const whitelistToShow = this.props.inherited
+      ? this.props.whitelistedDomains.inherited
+      : this.props.whitelistedDomains.account
+
     return (
       <div>
         <Heading margin="small 0" level="h4" as="h3" border="bottom">
-          {I18n.t('Whitelist (%{count}/%{max})', {
-            count: this.props.whitelistedDomains.account.length,
-            max: CONFIG.max_domains
-          })}
+          {this.props.inherited
+            ? I18n.t('Whitelist')
+            : I18n.t('Whitelist (%{count}/%{max})', {
+                count: this.props.whitelistedDomains.account.length,
+                max: CONFIG.max_domains
+              })}
         </Heading>
         <form
           onSubmit={e => {
@@ -127,9 +149,17 @@ export class Whitelist extends Component {
           }}
         >
           {domainLimitReached && (
-            <Alert variant="error" margin="small">
+            <Alert variant="error" margin="small 0">
               {I18n.t(
-                `You have reached the domain limit, if you wish to add more to your whitelist, please remove others first.`
+                `You have reached the domain limit.  You can add more domains by deleting existing domains in your whitelist.`
+              )}
+            </Alert>
+          )}
+
+          {this.props.inherited && (
+            <Alert variant="info" margin="small 0">
+              {I18n.t(
+                `Whitelist editing is disabled when security settings are inherited from a parent account.`
               )}
             </Alert>
           )}
@@ -141,7 +171,7 @@ export class Whitelist extends Component {
                 placeholder="http://somedomain.com"
                 value={this.state.addDomainInputValue}
                 messages={this.state.errors}
-                disabled={domainLimitReached}
+                disabled={this.props.inherited || domainLimitReached}
                 onChange={e => {
                   this.setState({addDomainInputValue: e.currentTarget.value})
                 }}
@@ -154,43 +184,54 @@ export class Whitelist extends Component {
                 type="submit"
                 margin="0 x-small 0 0"
                 icon={IconPlus}
-                disabled={domainLimitReached}
+                disabled={this.props.inherited || domainLimitReached}
               >
                 {I18n.t('Domain')}
               </Button>
             </FlexItem>
           </Flex>
         </form>
-        <Table caption={<ScreenReaderContent>{I18n.t('Whitelisted Domains')}</ScreenReaderContent>}>
-          <thead>
-            <tr>
-              <th scope="col">Domain Name</th>
-              <th scope="col">
-                <ScreenReaderContent>{I18n.t('Actions')}</ScreenReaderContent>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {this.props.whitelistedDomains.account.map(domain => (
-              <tr key={domain}>
-                <td>{domain}</td>
-                <td style={{textAlign: 'end'}}>
-                  <Button
-                    ref={c => (this.deleteButtons[domain] = c)}
-                    variant="icon"
-                    icon={IconTrash}
-                    onClick={() => this.handleRemoveDomain(domain)}
-                    data-testid={`delete-button-${domain}`}
-                  >
-                    <ScreenReaderContent>
-                      {I18n.t('Remove %{domain} from the whitelist', {domain})}
-                    </ScreenReaderContent>
-                  </Button>
-                </td>
+        {whitelistToShow.length <= 0 ? (
+          <Billboard
+            size="x-small"
+            heading={I18n.t('No domains whitelisted')}
+            hero={<EmptyDesert />}
+          />
+        ) : (
+          <Table
+            caption={<ScreenReaderContent>{I18n.t('Whitelisted Domains')}</ScreenReaderContent>}
+          >
+            <thead>
+              <tr>
+                <th scope="col">Domain Name</th>
+                <th scope="col">
+                  <ScreenReaderContent>{I18n.t('Actions')}</ScreenReaderContent>
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </Table>
+            </thead>
+            <tbody>
+              {whitelistToShow.map(domain => (
+                <tr key={domain}>
+                  <td>{domain}</td>
+                  <td style={{textAlign: 'end'}}>
+                    <Button
+                      ref={c => (this.deleteButtons[domain] = c)}
+                      variant="icon"
+                      icon={IconTrash}
+                      onClick={() => this.handleRemoveDomain(domain)}
+                      data-testid={`delete-button-${domain}`}
+                      disabled={this.props.inherited}
+                    >
+                      <ScreenReaderContent>
+                        {I18n.t('Remove %{domain} from the whitelist', {domain})}
+                      </ScreenReaderContent>
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        )}
         {toolsWhitelistKeys && toolsWhitelistKeys.length > 0 && (
           <View as="div" margin="large 0">
             <Heading level="h4" as="h3">
@@ -198,8 +239,15 @@ export class Whitelist extends Component {
             </Heading>
             <p>
               {I18n.t(
-                `These domains have automatically been added to your whitelist.
-              If you wish to remove them, you should remove the associated tool.`
+                `The following domains have automatically been added to your
+                 whitelist from tools already existing in your account.
+                 To remove these domains, remove the associated tools.`
+              )}
+            </p>
+            <p>
+              {I18n.t(
+                `NOTE: Associated tools are only listed once, even if they have
+                been installed in multiple subaccounts.`
               )}
             </p>
             <Table
@@ -241,7 +289,8 @@ function mapStateToProps(state, ownProps) {
 
 const mapDispatchToProps = {
   addDomain,
-  removeDomain
+  removeDomain,
+  copyInheritedIfNeeded
 }
 
 export const ConnectedWhitelist = connect(

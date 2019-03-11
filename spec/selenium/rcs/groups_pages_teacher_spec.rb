@@ -60,8 +60,7 @@ describe "groups" do
     end
 
     describe "announcements page v2" do
-      # will fix the below shared tests in a separate commit
-      # it_behaves_like 'announcements_page_v2', :teacher
+      it_behaves_like 'announcements_page_v2', :teacher
 
       it "should allow teachers to see announcements", ignore_js_errors: true do
         @announcement = @testgroup.first.announcements.create!(
@@ -206,8 +205,7 @@ describe "groups" do
 
     #-------------------------------------------------------------------------------------------------------------------
     describe "discussions page" do
-      # will fix the below shared tests in a separate commit
-      # it_behaves_like 'discussions_page', :teacher
+      it_behaves_like 'discussions_page', :teacher
 
       it "should allow teachers to create discussions within a group", priority: "1", test_id: 285586, ignore_js_errors: true do
         get discussions_page
@@ -251,8 +249,7 @@ describe "groups" do
 
     #-------------------------------------------------------------------------------------------------------------------
     describe "pages page" do
-      # will fix the below shared tests in a separate commit
-      # it_behaves_like 'pages_page', :teacher
+      it_behaves_like 'pages_page', :teacher
 
       it "should allow teachers to create a page", priority: "1", test_id: 289993 do
         get pages_page

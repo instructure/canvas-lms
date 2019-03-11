@@ -171,7 +171,7 @@
                   download_url = context_url(@context, resource, @assignment.id, submission_id_or_anonymous_id, download: "{{attachmentId}}")
                   preview_url = context_url(@context, resource, @assignment.id, submission_id_or_anonymous_id, download: "{{attachmentId}}", inline: 1)
                 %>
-                <a class="submission-file-download icon-download" title="<%= t("Download this file") %>" href="<%= download_url %>"></a>
+                <a class="submission-file-download icon-download" title="<%= t("Download this file") %>" href="<%= download_url %>" download></a>
                 <span class="turnitin_score_container"></span>
                 <a class="display_name no-hover" href="<%= preview_url %>" title="<%= t('titles.preview_file', "Preview this File") %>">???</a>
                 <span id="react_pill_container"></span>

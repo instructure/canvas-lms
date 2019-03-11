@@ -112,6 +112,10 @@ define [
   AssignmentMuterDialogManager, assignmentHelper, TextMeasure, GradeInputHelper, { default: OutlierScoreHelper },
   LatePolicyApplicator, { default: Button }, { default: IconSettingsSolid }, FlashAlert) ->
 
+  ensureAssignmentVisibility = (assignment, submission) =>
+    if assignment.only_visible_to_overrides && !assignment.assignment_visibility.includes(submission.user_id)
+      assignment.assignment_visibility.push(submission.user_id)
+
   isAdmin = =>
     _.contains(ENV.current_user_roles, 'admin')
 
@@ -335,7 +339,6 @@ define [
       else
         @gradingPeriodSet = null
       @show_attendance = !!UserSettings.contextGet 'show_attendance'
-      @include_ungraded_assignments = UserSettings.contextGet 'include_ungraded_assignments'
       # preferences serialization causes these to always come
       # from the database as strings
       if @options.course_is_concluded || @options.settings.show_concluded_enrollments == 'true'
@@ -437,14 +440,6 @@ define [
       dataLoader.gotCustomColumns.then @gotCustomColumns
       dataLoader.gotStudents.then @gotAllStudents
 
-      @renderedGrid = $.when(
-        dataLoader.gotStudentIds,
-        dataLoader.gotContextModules,
-        dataLoader.gotCustomColumns,
-        dataLoader.gotAssignmentGroups,
-        dataLoader.gotGradingPeriodAssignments
-      ).then(@doSlickgridStuff)
-
       dataLoader.gotStudents.then () =>
         @setStudentsLoaded(true)
         @updateColumnHeaders()
@@ -467,6 +462,15 @@ define [
         @renderFilters()
 
       @postPolicies?.initialize()
+
+      @renderedGrid = $.when(
+        dataLoader.gotStudentIds,
+        dataLoader.gotContextModules,
+        dataLoader.gotCustomColumns,
+        dataLoader.gotAssignmentGroups,
+        dataLoader.gotGradingPeriodAssignments
+      ).then () =>
+        @finishRenderingUI()
 
       @gridReady.then () =>
         @renderViewOptionsMenu()
@@ -643,7 +647,7 @@ define [
 
     ## Post-Data Load Initialization
 
-    doSlickgridStuff: =>
+    finishRenderingUI: =>
       @initGrid()
       @initHeader()
       @gridReady.resolve()
@@ -965,10 +969,11 @@ define [
       changedStudentIds = []
       submissions = []
 
-      for data in student_submissions
-        changedStudentIds.push(data.user_id)
-        student = @student(data.user_id)
-        for submission in data.submissions
+      for studentSubmissionGroup in student_submissions
+        changedStudentIds.push(studentSubmissionGroup.user_id)
+        student = @student(studentSubmissionGroup.user_id)
+        for submission in studentSubmissionGroup.submissions
+          ensureAssignmentVisibility(@getAssignment(submission.assignment_id), submission)
           submissions.push(submission)
           @updateSubmission(submission)
 
@@ -989,6 +994,7 @@ define [
       student = @student(submission.user_id)
       submission.submitted_at = tz.parse(submission.submitted_at)
       submission.excused = !!submission.excused
+      submission.hidden = !!submission.hidden
       submission.rawGrade = submission.grade # save the unformatted version of the grade too
       submission.grade = GradeFormatHelper.formatGrade(submission.grade, {
         gradingType: submission.gradingType, delocalize: false
@@ -1054,16 +1060,14 @@ define [
         if @isFilteringColumnsByGradingPeriod()
           grades = grades.gradingPeriods[@getGradingPeriodToShow()]
 
-        finalOrCurrent = if @include_ungraded_assignments then 'final' else 'current'
-
         for assignmentGroupId, group of @assignmentGroups
           grade = grades.assignmentGroups[assignmentGroupId]
-          grade = grade?[finalOrCurrent] || { score: 0, possible: 0, submissions: [] }
+          grade = grade?['current'] || { score: 0, possible: 0, submissions: [] }
 
           student["assignment_group_#{assignmentGroupId}"] = grade
           for submissionData in grade.submissions
             submissionData.submission.drop = submissionData.drop
-        student["total_grade"] = grades[finalOrCurrent]
+        student['total_grade'] = grades['current']
 
     ## Grid Styling Methods
 
@@ -1438,6 +1442,8 @@ define [
         onLatePolicyUpdate: @onLatePolicyUpdate
         gradedLateSubmissionsExist: @options.graded_late_submissions_exist
         overrides: @getFinalGradeOverridesSettingsModalProps()
+        anonymousAssignmentsPresent: _.any(@assignments, (assignment) => assignment.anonymous_grading)
+        postPolicies: @postPolicies
       @gradebookSettingsModal = renderComponent(
         GradebookSettingsModal,
         gradebookSettingsModalMountPoint,

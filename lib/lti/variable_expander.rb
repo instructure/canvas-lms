@@ -87,7 +87,7 @@ module Lti
     end
 
     def lti_helper
-      @lti_helper ||= Lti::SubstitutionsHelper.new(@context, @root_account, @current_user, @tool)
+      @lti_helper ||= Lti::SubstitutionsHelper.new(@context, @root_account, @current_user, @tool, @resource_type)
     end
 
     def current_user=(current_user)

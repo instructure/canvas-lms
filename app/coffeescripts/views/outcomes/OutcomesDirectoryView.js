@@ -62,7 +62,7 @@ export default class OutcomesDirectoryView extends PaginatedView {
     this.readOnly = opts.readOnly
     this.parent = opts.parent
     const outcomeGroupTitle = opts.outcomeGroup.attributes.title
-    const ariaLabel = `directory ${outcomeGroupTitle}: depth ${opts.directoryDepth},`
+    const ariaLabel = `Listing of child outcomes for ${outcomeGroupTitle}`
     this.$el.attr('aria-label', ariaLabel)
     // the way the event listeners work between OutcomeIconView, OutcomesDirectoryView
     // and SidebarView can cause items to become unselectable following a move. The

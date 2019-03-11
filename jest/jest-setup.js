@@ -21,6 +21,9 @@ import Adapter from 'enzyme-adapter-react-16'
 
 window.fetch = require('unfetch')
 
+window.scroll = () => {}
+window.ENV = {}
+
 Enzyme.configure({ adapter: new Adapter() })
 
 // because InstUI themeable components need an explicit "dir" attribute on the <html> element

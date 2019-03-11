@@ -51,13 +51,11 @@ function changeSubmission(submission, score, grade, pointsDeducted, assignment, 
   const enteredScore = getEnteredScore(score, pointsDeducted)
   const enteredGrade = ScoreToGradeHelper.scoreToGrade(enteredScore, assignment, gradingScheme)
 
-  /* eslint-disable no-param-reassign */
   submission.points_deducted = pointsDeducted
   submission.score = score
   submission.grade = grade
   submission.entered_score = enteredScore
   submission.entered_grade = enteredGrade
-  /* eslint-enable no-param-reassign */
 
   return changed
 }

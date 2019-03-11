@@ -34,12 +34,13 @@ export default class EditableNumber extends React.Component {
     value: oneOfType([string, number]).isRequired, // the current text string
     onChange: func.isRequired, // when flips from edit to view, notify consumer of the new value
     onChangeMode: func.isRequired, // when mode changes
+    onInputChange: func, // called as the user types. Usefull for checking validity
     placeholder: string, // the string to display when the text value is empty
     type: string, // the type attribute on the input element when in edit mode
     editButtonPlacement: oneOf(['start', 'end']), // is the edit button before or after the text?
     readOnly: bool,
     onInput: func, // called as the user types.
-    invalidMessage: string,
+    isValid: func,
     inline: bool,
     required: bool,
     size: oneOf(['medium', 'large'])
@@ -50,26 +51,20 @@ export default class EditableNumber extends React.Component {
     placeholder: '',
     readOnly: false,
     required: false,
-    size: 'medium'
+    size: 'medium',
+    isValid: () => true,
+    onInputChange: () => {}
   }
 
   constructor(props) {
     super(props)
 
+    const strValue = `${props.value}`
     this.state = {
-      value: `${props.value}`,
-      initialValue: props.value
+      value: strValue,
+      initialValue: strValue
     }
   }
-
-  // beause isNan is not the same as Number.isNaN
-  /* eslint-disable no-restricted-globals */
-  isValid(value) {
-    if (this.props.required && !value) return false
-    if (!this.props.required && value === '') return true
-    return !isNaN(value)
-  }
-  /* eslint-enable no-restricted-globals */
 
   // this.state.value holds the current value as the user is editing
   // once the mode flips from edit to view and the new value is
@@ -77,10 +72,11 @@ export default class EditableNumber extends React.Component {
   // with this value in our props. This is where we reset our state
   // to reflect that new value
   static getDerivedStateFromProps(props, state) {
-    if (state.initialValue !== props.value) {
+    const strValue = `${props.value}`
+    if (state.initialValue !== strValue) {
       const newState = {...state}
-      newState.value = props.value
-      newState.initialValue = props.value
+      newState.value = strValue
+      newState.initialValue = strValue
       return newState
     }
     return state
@@ -109,7 +105,11 @@ export default class EditableNumber extends React.Component {
   }
 
   getFontSize(elem) {
-    return parseInt(window.getComputedStyle(elem).getPropertyValue('font-size'), 10)
+    try {
+      return parseInt(window.getComputedStyle(elem).getPropertyValue('font-size'), 10)
+    } catch (_ignore) {
+      return 16
+    }
   }
 
   getInputRef = el => {
@@ -169,18 +169,16 @@ export default class EditableNumber extends React.Component {
         label={<ScreenReaderContent>this.props.label</ScreenReaderContent>}
         onBlur={onBlur}
         inputRef={createChainedFunction(this.getInputRef, editorRef)}
-        messages={
-          this.isValid(this.state.value) ? null : [{type: 'error', text: this.props.invalidMessage}]
-        }
         inline={this.props.inline}
         size={this.props.size}
         width={width}
+        required={this.props.required}
       />
     )
   }
 
   renderEditButton = props => {
-    if (!this.props.readOnly) {
+    if (!this.props.readOnly && this.props.isValid(this.state.value)) {
       props.label = this.props.label
       return InPlaceEdit.renderDefaultEditButton(props)
     }
@@ -196,12 +194,19 @@ export default class EditableNumber extends React.Component {
   }
 
   handleChange = (_event, newValue) => {
-    this.setState({value: newValue})
+    this.setState(
+      {
+        value: newValue
+      },
+      () => {
+        this.props.onInputChange(newValue)
+      }
+    )
   }
 
   handleModeChange = mode => {
     if (!this.props.readOnly) {
-      if (mode === 'view' && !this.isValid(this.state.value)) {
+      if (mode === 'view' && !this.props.isValid(this.state.value)) {
         // can't leave edit mode with a bad value
         return
       }
@@ -211,17 +216,19 @@ export default class EditableNumber extends React.Component {
 
   render() {
     return (
-      <InPlaceEdit
-        mode={this.props.mode}
-        onChangeMode={this.handleModeChange}
-        renderViewer={this.renderView}
-        renderEditor={this.renderEditor}
-        renderEditButton={this.renderEditButton}
-        value={this.state.value}
-        onChange={this.props.onChange}
-        editButtonPlacement={this.props.editButtonPlacement}
-        showFocusRing={false}
-      />
+      <div>
+        <InPlaceEdit
+          mode={this.props.mode}
+          onChangeMode={this.handleModeChange}
+          renderViewer={this.renderView}
+          renderEditor={this.renderEditor}
+          renderEditButton={this.renderEditButton}
+          value={this.state.value}
+          onChange={this.props.onChange}
+          editButtonPlacement={this.props.editButtonPlacement}
+          showFocusRing={false}
+        />
+      </div>
     )
   }
 }

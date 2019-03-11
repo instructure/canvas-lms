@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import { render, shallow } from 'enzyme'
+import { render, mount, shallow } from 'enzyme'
 import AssignmentResult from '../AssignmentResult'
 
 const defaultProps = (props = {}) => (
@@ -109,4 +109,11 @@ it('correctly rounds to two decimal places', () => {
   props.result.percent = 0.257
   const wrapper = render(<AssignmentResult {...props}/>)
   expect(wrapper.text()).toMatch('Your score: 1.29')
+})
+
+it('renders unlinked result', () => {
+  const props = defaultProps()
+  props.result.assignment.html_url = ''
+  const wrapper = mount(<AssignmentResult {...props}/>)
+  expect(wrapper.find('IconHighlighter').exists()).toBe(true)
 })
