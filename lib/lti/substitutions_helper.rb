@@ -86,7 +86,6 @@ module Lti
         'http://purl.imsglobal.org/vocab/lis/v2/membership#Manager'
       ].freeze
     }.freeze
-    CONTEXTLESS_LAUNCHES = %w[global_navigation user_navigation account_navigation].freeze
 
     # Inversion of LIS_V2_LTI_ADVANTAGE_ROLE_MAP, i.e.:
     #
@@ -103,12 +102,11 @@ module Lti
 
     LIS_V2_LTI_ADVANTAGE_ROLE_NONE = 'http://purl.imsglobal.org/vocab/lis/v2/system/person#None'.freeze
 
-    def initialize(context, root_account, user, tool = nil, resource_type = nil)
+    def initialize(context, root_account, user, tool = nil)
       @context = context
       @root_account = root_account
       @user = user
       @tool = tool
-      @resource_type = resource_type
     end
 
     def account
@@ -141,20 +139,13 @@ module Lti
       end
 
       if @user
-        site_admin_roles = Account.site_admin.account_users_for(@user).present? ? [role_map['siteadmin']].flatten : []
-        if CONTEXTLESS_LAUNCHES.include?(@resource_type)
-          (site_admin_roles + @user.admin_roles(@root_account))
-            .flat_map { |role| role_map[role] }
-            .to_a
-            .compact
-            .uniq
-            .sort
-            .join(',')
-        else
-          context_roles = course_enrollments.each_with_object(Set.new) { |role, set| set.add([*role_map[role.class]].join(",")) }
-          institution_roles = @user.roles(@root_account, true).flat_map { |role| role_map[role] }
-          (context_roles + institution_roles + site_admin_roles).to_a.compact.uniq.sort.join(',')
+        context_roles = course_enrollments.each_with_object(Set.new) { |role, set| set.add([*role_map[role.class]].join(",")) }
+
+        institution_roles = @user.roles(@root_account, true).flat_map { |role| role_map[role] }
+        if Account.site_admin.account_users_for(@user).present?
+          institution_roles.push(*role_map['siteadmin'])
         end
+        (context_roles + institution_roles).to_a.compact.uniq.sort.join(',')
       else
         role_none
       end
