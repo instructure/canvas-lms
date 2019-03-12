@@ -116,6 +116,13 @@ module Lti
         expect(parsed_body).to eq expected_assignment
       end
 
+      it 'returns an assignment with an old user lti id' do
+        UserPastLtiIds.create!(user: student, context: course, user_lti_id: student.lti_id, user_lti_context_id: 'old_lti_id', user_uuid: 'old')
+        get "#{endpoint}/#{assignment.id}", params: { user_id: 'old_lti_id' }, headers: request_headers
+        parsed_body = JSON.parse(response.body)
+        expect(parsed_body).to eq expected_assignment
+      end
+
       it 'returns an assignment with user Canvas id' do
         get "#{endpoint}/#{assignment.id}", params: { user_id: student.id }, headers: request_headers
         parsed_body = JSON.parse(response.body)

@@ -45,6 +45,15 @@ describe UserMerge do
       expect(user1.pseudonyms.map(&:unique_id)).to be_include('sam@yahoo.com')
     end
 
+    it "should move lti_id to the new user" do
+      old_lti = user2.lti_id
+      old_lti_context = user2.lti_context_id
+      e = course1.enroll_user(user2)
+      UserMerge.from(user2).into(user1)
+      expect(user1.past_lti_ids.take.user_lti_id).to eq old_lti
+      expect(user1.past_lti_ids.take.user_lti_context_id).to eq old_lti_context
+    end
+
     it "should move admins to the new user" do
       account1 = account_model
       admin = account1.account_users.create(user: user2)
@@ -652,13 +661,13 @@ describe UserMerge do
   context "sharding" do
     specs_require_sharding
 
-    it 'should merge with user_services acorss shards' do
+    it 'should merge with user_services across shards' do
       user1 = user_model
       @shard1.activate do
         @user2 = user_model
         user_service_model(user: @user2)
       end
-      UserMerge.from(@user2).into(user1)
+      expect { UserMerge.from(@user2).into(user1) }.to_not raise_error
     end
 
     it "should merge a user across shards" do

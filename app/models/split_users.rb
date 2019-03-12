@@ -107,6 +107,7 @@ class SplitUsers
           records = check_and_update_local_ids(old_user, records) if merge_data.from_user_id > Shard::IDS_PER_SHARD
           records = records.preload(:context)
           move_records_to_old_user(user, old_user, records)
+          restore_merge_items(old_user)
           # update account associations for each split out user
           users = [old_user, user]
           User.update_account_associations(users, all_shards: (old_user.shard != user.shard))
@@ -114,6 +115,12 @@ class SplitUsers
           User.where(id: users).touch_all
           users
         end
+      end
+    end
+
+    def restore_merge_items(old_user)
+      Shard.with_each_shard(old_user.associated_shards + old_user.associated_shards(:weak) + old_user.associated_shards(:shadow)) do
+        UserPastLtiIds.where(user: old_user, user_lti_id: old_user.lti_id).delete_all
       end
     end
 

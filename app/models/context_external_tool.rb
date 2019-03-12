@@ -775,14 +775,14 @@ class ContextExternalTool < ActiveRecord::Base
     settings[:resource_selection]
   end
 
-  def opaque_identifier_for(asset)
-    ContextExternalTool.opaque_identifier_for(asset, self.shard)
+  def opaque_identifier_for(asset, context: nil)
+    ContextExternalTool.opaque_identifier_for(asset, self.shard, context: context)
   end
 
-  def self.opaque_identifier_for(asset, shard)
+  def self.opaque_identifier_for(asset, shard, context: nil)
     shard.activate do
       lti_context_id = context_id_for(asset, shard)
-      Lti::Asset.set_asset_context_id(asset, lti_context_id)
+      Lti::Asset.set_asset_context_id(asset, lti_context_id, context: context)
     end
   end
 

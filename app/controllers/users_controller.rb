@@ -1272,7 +1272,7 @@ class UsersController < ApplicationController
 
   def external_tool
     @tool = ContextExternalTool.find_for(params[:id], @domain_root_account, :user_navigation)
-    @opaque_id = @tool.opaque_identifier_for(@current_user)
+    @opaque_id = @tool.opaque_identifier_for(@current_user, context: @domain_root_account)
     @resource_type = 'user_navigation'
 
     success_url = user_profile_url(@current_user)

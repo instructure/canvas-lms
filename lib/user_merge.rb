@@ -52,6 +52,8 @@ class UserMerge
       end
     end
 
+    populate_past_lti_ids(target_user)
+
     handle_communication_channels(target_user, user_merge_data)
 
     destroy_conflicting_module_progressions(@from_user, target_user)
@@ -138,6 +140,24 @@ class UserMerge
     from_user.reload
     target_user.touch
     from_user.destroy
+  end
+
+  def populate_past_lti_ids(target_user)
+    Shard.with_each_shard(from_user.associated_shards + from_user.associated_shards(:weak) + from_user.associated_shards(:shadow)) do
+      lti_ids = []
+      {enrollments: :course, group_memberships: :group, account_users: :account}.each do |klass, type|
+        klass.to_s.classify.constantize.where(user_id: from_user).distinct_on(type.to_s + '_id').each do |context|
+          next if UserPastLtiIds.where(user: target_user, context_id: context.send(type.to_s + '_id'), context_type: type.to_s.classify).exists?
+          lti_ids << UserPastLtiIds.new(user: target_user,
+                                        context_id: context.send(type.to_s + '_id'),
+                                        context_type: type.to_s.classify,
+                                        user_uuid: from_user.uuid,
+                                        user_lti_id: from_user.lti_id,
+                                        user_lti_context_id: from_user.lti_context_id)
+        end
+      end
+      UserPastLtiIds.bulk_insert_objects(lti_ids)
+    end
   end
 
   def handle_communication_channels(target_user, user_merge_data)

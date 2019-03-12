@@ -33,7 +33,7 @@ module Lti
       @canvas_root_account = canvas_root_account
       @canvas_tool = canvas_tool
       @canvas_context = canvas_context
-      @opaque_identifier = @canvas_tool.opaque_identifier_for(@canvas_user)
+      @opaque_identifier = @canvas_tool.opaque_identifier_for(@canvas_user, context: @canvas_context)
     end
 
     def convert

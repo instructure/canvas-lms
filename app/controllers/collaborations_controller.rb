@@ -358,7 +358,8 @@ class CollaborationsController < ApplicationController
                                  self,
                                  api_v1_collaboration_members_url)
 
-    render :json => collaborators.map { |c| collaborator_json(c, @current_user, session, options) }
+    UserPastLtiIds.manual_preload_past_lti_ids(collaborators, @context)
+    render(:json => collaborators.map{|c| collaborator_json(c, @current_user, session, options, context: @context)})
   end
 
   # @API List potential members
@@ -414,7 +415,9 @@ class CollaborationsController < ApplicationController
     visibility = content_item['ext_canvas_visibility']
     lti_user_ids = visibility && visibility['users'] || []
     lti_group_ids = visibility && visibility['groups'] || []
-    users = User.where(lti_context_id: lti_user_ids).to_a
+
+    users = User.active.joins(:past_lti_ids).where(user_past_lti_ids: {user_lti_context_id: lti_user_ids}).distinct.to_a
+    users += User.active.where(lti_context_id: lti_user_ids).to_a
     group_ids = Group.where(lti_context_id: lti_group_ids).map(&:id)
     [users, group_ids]
   end

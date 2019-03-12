@@ -21,15 +21,15 @@ describe Api::V1::Collaborator do
   include Api::V1::Collaborator
 
   describe '.collaborator_json' do
-    let(:user) { user_model }
-    let(:group) { group_model }
-    let(:collaboration) { collaboration_model }
+    let(:user) {user_model}
+    let(:group) {group_model}
+    let(:collaboration) {collaboration_model}
 
     context 'group collaborator' do
-      let(:collaborator) { Collaborator.create(collaboration: collaboration, group: group) }
+      let(:collaborator) {Collaborator.create(collaboration: collaboration, group: group)}
 
       it 'serializes' do
-        json = collaborator_json(collaborator, user, nil)
+        json = collaborator_json(collaborator, user, nil, context: group)
         expect(json['id']).to eq collaborator.id
         expect(json['type']).to eq 'group'
         expect(json['name']).to eq group.name
@@ -37,23 +37,23 @@ describe Api::V1::Collaborator do
       end
 
       it 'includes collaborator_lti_id' do
-        json = collaborator_json(collaborator, user, nil, include: ['collaborator_lti_id'])
+        json = collaborator_json(collaborator, user, nil, {include: ['collaborator_lti_id']}, context: group)
         group.reload
         expect(json['collaborator_lti_id']).not_to be_nil
         expect(json['collaborator_lti_id']).to eq group.lti_context_id
       end
 
       it 'includes avatar_image_url' do
-        json = collaborator_json(collaborator, user, nil, include: ['avatar_image_url'])
+        json = collaborator_json(collaborator, user, nil, {include: ['avatar_image_url']}, context: group)
         expect(json['avatar_image_url']).to be_nil
       end
     end
 
     context 'user collaborator' do
-      let(:collaborator) { Collaborator.create(collaboration: collaboration, user: user) }
+      let(:collaborator) {Collaborator.create(collaboration: collaboration, user: user)}
 
       it 'serializes' do
-        json = collaborator_json(collaborator, user, nil)
+        json = collaborator_json(collaborator, user, nil, context: group)
         expect(json['id']).to eq collaborator.id
         expect(json['type']).to eq 'user'
         expect(json['name']).to eq user.sortable_name
@@ -61,7 +61,7 @@ describe Api::V1::Collaborator do
       end
 
       it 'includes collaborator_lti_id' do
-        json = collaborator_json(collaborator, user, nil, include: ['collaborator_lti_id'])
+        json = collaborator_json(collaborator, user, nil, {include: ['collaborator_lti_id']}, context: group)
         user.reload
         expect(json['collaborator_lti_id']).not_to be_nil
         expect(json['collaborator_lti_id']).to eq user.lti_context_id
@@ -69,7 +69,7 @@ describe Api::V1::Collaborator do
 
       it 'includes avatar_image_url' do
         user.avatar_image_url = 'https://www.example.com/awesome-avatar.png'
-        json = collaborator_json(collaborator, user, nil, include: ['avatar_image_url'])
+        json = collaborator_json(collaborator, user, nil, {include: ['avatar_image_url']}, context: group)
         expect(json['avatar_image_url']).not_to be_nil
         expect(json['avatar_image_url']).to eq user.avatar_image_url
       end
