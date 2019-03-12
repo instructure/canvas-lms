@@ -919,6 +919,11 @@ tr:
             check_box: "Bölümler CSV"
           users: 
             check_box: "Kullanıcılar CSV"
+    new_excelsior_activity_report_csv_parameters: 
+      account_reports: 
+        excelsior: 
+          outcome: 
+            text: "Bölüm Yapısı:"
     no_user_message: "Bu kullanıcı id ile hiç kullanıcı bulunanmadı"
     outcome_results_csv_description: 
       account_reports: 
@@ -2810,6 +2815,8 @@ tr:
         originality_report_visible_after_grading: "Ödev notlandırıldıktan sonra"
         originality_report_visible_immediately: Hemen
   assignments_1e02582c: Ödevler
+  assignments_2: 
+    submission_attempts: Girişimler
   assignments_api: 
     invalid_date_time: "%{attribute} için geçersiz tarih"
     invalid_submission_types: "Geçersiz gönderim türü"
@@ -2829,6 +2836,7 @@ tr:
   attach_files_to_discussions_bd16c245: "Tartışmalara dosya ekle"
   attach_terms_2b8770a5: "Dönemleri ekleyin"
   attached_display_name_afa00c2e: "Eklenen: %{display_name}"
+  attached_files_4c1d26cf: "Ekli Dosyalar:"
   attached_files_must_be_greater_than_0_bytes_7f57bee7: "Ekli dosyalar 0 byte'tan büyük olmalı"
   attachment: 
     default_filename: Dosya
@@ -3755,8 +3763,10 @@ tr:
   click_here_on_the_calendar_link_c9965631: "*Takvim* bağlantısı üzerinde buraya tıklayın"
   click_here_to_download_size_of_file_74443988: "İndirmek için tıklayın %{size_of_file}"
   click_here_to_log_in_again_4a6055de: "Yeniden giriş yapmak için buraya tıklayın"
+  click_here_to_review_the_submission_ae017c01: "Gönderimi görmek için tıklayınız"
   click_here_to_see_the_file_79e2b366: "Dosyayı görmek için tıklayınız"
   click_here_to_view_ec8cb2fd: "görmek için buraya tıklayın"
+  click_here_to_view_the_submission_24777a69: "Gönderimi görmek için tıklayınız"
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "Anlık görüntünün alındığı denemenize geri dönmek için bir anlık görüntü üzerine tıklayın. Not: Anlık görüntünün alınmasından sonraki değişiklikleriniz kaybolacak ve bu geri alınamaz!"
   click_to_add_a_name_6cf551b0: "İsim eklemek için tıklayın"
   click_to_change_profile_picture_for_display_name_6a4b41db: "%{display_name}profil resmini değiştirmek için tıklayın"
@@ -6037,6 +6047,7 @@ tr:
       assign_blanks: "Ödev göndermeyen öğrencilere sıfır ver"
     out_of_points_possible: "%{assignment.points_possible} üzerinden"
     this_is_permanent: "Not çan eğrisi oluşturma geri alınamaz. Önceden çan eğrisi oluşturulmuş notların geçmişi kullanılabilir fakat çan eğrisi oluşturma geri alınamaz."
+  curving_assignments_e9479ee3: "Ödevlere çan eğrisi uygulama"
   custom_6979cd81: Özelleştir
   custom_fields_fc3e55af: "Varsayılan Alanlar"
   custom_link_details_35fd38fc: "Özelleştirilmiş bağlantı ayrıntıları"
@@ -7892,6 +7903,7 @@ tr:
   grade_a91e433e: "Not:"
   grade_assignment_7c1abc11: "Not %{assignment}"
   grade_change_activity_75fb525: "Not Değiştirme Etkinliği"
+  grade_change_notifications_98461261: "Değerlendirme bildirimleri değişikliği"
   grade_display_warning_dialog: 
     grade_display_warning: 
       checkbox: "Bu dersi tekrar gösterme."
@@ -9756,7 +9768,7 @@ tr:
     send_message: "Mesaj Gönder"
   message_students_dialog: 
     recipients: "Alıcılar:"
-  message_students_who_369b8488: "... Yapan Öğrencilere Mesaj Gönder"
+  message_students_who_369b8488: "... Yapan Öğrencileri Göster"
   message_this_student_6d14043d: "Bu öğrenciye mesaj gönder"
   messages: 
     account_suspended: 
@@ -11672,6 +11684,7 @@ tr:
   moodle_dropdown_warning_title: "Çoklu Açılır Kutular sorusu doğru içeri aktarılmamış olabilir"
   moodle_formula_many_warning_title: "Bu soru bankasında %{count} sayıda olası cevapları yeniden oluşturulması gereken Formül soruları bulunmaktadır."
   moodle_formula_warning_title: "Formül sorusu için olası cevaplar yeniden oluşturulmalı"
+  more_cf9cc661: "Daha Fazla"
   more_courses_5ebbe998: "Daha Fazla Dersler"
   more_info_at_course_name_56dc8c10: "Daha fazla bilgi için %{course_name}"
   more_info_at_web_address_dba7e187: "Daha fazla bilgi için %{web_address}"
@@ -15066,6 +15079,7 @@ tr:
   saving_d55dd90e: Kaydediliyor...
   schedule_student_availability_332154a: "Öğrenci uygunluğunu ayarla"
   scheduler_65b5ac91: Zamanlayıcı
+  score_change_notifications_6b94f27f: "Puan değişikliği bildirimleri"
   score_f7ac9e08: Puan
   score_muted_82eef66: "Puan: (beklemede)"
   score_out_of_points_possible_88f370fd: "%{points_possible} üzerinden %{score}"
@@ -15571,7 +15585,7 @@ tr:
       close: Kapat
     footer_links: 
       facebook: Facebook
-      privacy_policy: "Gizlilik sözleşmesi"
+      privacy_policy: "Gizlilik Sözleşmesi"
       terms_of_service: "Kullanım koşulları"
       twitter: Twitter
     global_dialogs: 
@@ -16327,6 +16341,8 @@ tr:
   submission_comment: 
     unknown_author: Birisi
   submission_comments_4fa03a17: "Gönderi Yorumları"
+  submission_comments_b6d65841: "Gönderim yorumları"
+  submission_date_8f659c0c: "Gönderim Tarihi"
   submission_date_a7920dac: "gönderim tarihi"
   submission_detail: 
     go_to_submission_url: "Ödev gönderme bağlantısına git"
@@ -16616,6 +16632,7 @@ tr:
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "Belirtilen kullanıcı bu derste öğrenci değildir"
   the_state_parameter_is_required_ffadf213: "Bölge parametresi gereklidir"
   the_top_track_represents_days_on_which_the_student_2a347099: "Üst izleme dersin öğretim elemanına *öğrencinin mesaj gönderdiği* günleri göstermektedir. Alt izleme ise öğrenciye *öğretim elemanından gelen mesajlar* dır. "
+  their_grade_for_the_assignment_c36a60ef: "Ödev için onların notu"
   theme_52404e51: Tema
   theme_editor_b7b00f6b: "Tema Düzenleyici"
   theme_editor_changes_have_been_cancelled_2af5cc5f: "Tema düzenleyicide yapılan değişiklikler iptal edildi."
@@ -16647,6 +16664,7 @@ tr:
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Bu, güvenilir URL'lerin virgülle ayrılmış bir listesidir. Bu listedeki herhangi bir URL'ye güvenmek Canvas'ta oturum açarken CSRF tokenlerını pas geçer"
   this_is_a_concluded_course_so_only_concluded_enrol_e6e3a9d9: "Bu ders bitirilmiştir bu yüzden sadece bitirmiş kayıtlar bulunmaktadır."
   this_is_a_media_comment_click_here_to_view_c297bf62: "Bu bir medya yorumudur, *görmek için tıklayın*."
+  this_message_includes_media_comments_to_listen_or__75ea03a1: "Bu mesaj medya yorumu içermektedir. Dinlemek veya cevaplamak için, bağlantıya tıklayınız:"
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Muhtemelen ders içeriklerini ilgili dosyalar olmadan içe aktardığınız için bu durum oluştu."
   this_name_appears_in_sorted_lists_dccbd84b: "Bu ad sıralama kriteri listelerinde görünür."
   this_name_will_be_used_by_teachers_for_grading_9b6aa8a0: "Bu isim puanlandırmada öğretmenler tarafından kullanılacaktır."
@@ -16869,6 +16887,7 @@ tr:
   to_51406be9: Kime
   to_c4c44f4b: ile
   to_do_1d554f36: Yapılacaklar
+  to_f0e90538: "Kime:"
   to_link_the_course_observer_name_to_a_student_star_f993c826: "Ders gözlemcisi *%{name}* i bir öğrenciye bağlamak için aşağıda öğrencinin adını yazmaya başlayın ve Güncelle'ye tıklayın."
   to_minscore_43e5452e: "to %{minScore}%"
   to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "Sayfanın en üstüne bir tartışma konusu yerleştirmek için tartışmayı buraya sürükleyebilir ya da tartışma ayarları menüsünden Sabitle'yi seçebilirsiniz."
@@ -17647,6 +17666,7 @@ tr:
   you_are_trying_to_launch_insecure_content_from_wit_5c1c692b: "Güvenli bir site (canvas) içinden güvensiz bir içeriğe erişmeye çalışıyorsunuz. Bazı tarayıcılar bu içeriğin yüklenmesine izin vermeyebilir."
   you_can_hide_or_show_a_course_s_assignments_by_tog_ec8bdb8e: "Aç ya da Kapat ı seçerek ders ödevlerini gizleyip gösterebilirsiniz."
   you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: "Kısa sınavı zaten almış öğrenciler için tekrardan değerlendirme seçeneğini ayarladınız."
+  you_can_review_the_submission_details_by_clicking__58a7753: "Aşağıdaki bağlantıya tıklayarak başvuru ayrıntılarını inceleyebilirsiniz:"
   you_can_t_delete_a_root_account_5673c62d: "root_account silemezsiniz."
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: "İçinde dersler bulunan bir alt hesabı silemezsiniz."
   you_can_update_some_of_this_user_s_information_but_8e99a045: "Bu kullanıcının bilgilerinden bazılarını güncelleyebilirsiniz fakat isterlerse kendileri tekrar değiştirebilir."
