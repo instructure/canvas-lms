@@ -917,6 +917,11 @@ he:
             check_box: "קבץ CSV של הקבצות"
           users: 
             check_box: "קבץ CSV של המשתמשים"
+    new_excelsior_activity_report_csv_parameters: 
+      account_reports: 
+        excelsior: 
+          outcome: 
+            text: "תבנית פסקה"
     no_user_message: "לא נמצא משתמש עם מזהה זה"
     outcome_results_csv_description: 
       account_reports: 
@@ -2808,6 +2813,8 @@ he:
         originality_report_visible_after_grading: "לאחר שהמטלה הוערכה"
         originality_report_visible_immediately: מיד
   assignments_1e02582c: משימות
+  assignments_2: 
+    submission_attempts: נסיונות
   assignments_api: 
     invalid_date_time: "מועד לא תקין ל%{attribute}"
     invalid_submission_types: "סוגי הגשה לא תקינים"
@@ -2828,6 +2835,7 @@ he:
   attach_files_to_discussions_bd16c245: "צירוף קבצים לדיונים"
   attach_terms_2b8770a5: "צירוף תקופות"
   attached_display_name_afa00c2e: "מצורף: %{display_name}"
+  attached_files_4c1d26cf: "קבצים מצורפים: "
   attached_files_must_be_greater_than_0_bytes_7f57bee7: "קבצים מצורפים צריכים להיות גדולים יות מ 0 בתים"
   attachment: 
     default_filename: קובץ
@@ -3749,8 +3757,10 @@ he:
   click_here_on_the_calendar_link_c9965631: "הקלק/י כאן על קישור *היומן*"
   click_here_to_download_size_of_file_74443988: "יש להקליק כאן כדי להוריד %{size_of_file}"
   click_here_to_log_in_again_4a6055de: "לחצו כאן להתחברות מחדש"
+  click_here_to_review_the_submission_ae017c01: "הקלק/י כאן כדי לעיין בהגשה"
   click_here_to_see_the_file_79e2b366: "הקלק/י כאן לצפות בקובץ."
   click_here_to_view_ec8cb2fd: "הקש/י כאן כדי לעיין"
+  click_here_to_view_the_submission_24777a69: "יש להקליק כאן כדי לעיין בהגשה "
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "הקלק/י על צילום המצב כדי לחזור חזרה לגירסת הניסוי שלך כפי שהיתה בעת שהצילום נלקח. שימו לב: כל פעולה שהתבצעה מאז צילום המצב תעלם ולא ניתן יהיה לשחזר."
   click_to_add_a_name_6cf551b0: "הקש/י כדי להוסיף שם"
   click_to_change_profile_picture_for_display_name_6a4b41db: "הקש/י כדי לשנות תמונת פרופיל של  %{display_name}"
@@ -5992,6 +6002,7 @@ he:
       assign_blanks: "מתן אפסים לתלמידים שלא הגישו"
     out_of_points_possible: "מתוך %{assignment.points_possible}"
     this_is_permanent: "עקומת הציונים אינה ניתנת לביטול. היסטורית עקומות הציונים תהיה זמינה, אך הפעולה אינה הפיכה."
+  curving_assignments_e9479ee3: "עקומת משימות "
   custom_6979cd81: ידני
   custom_css_and_javascript_may_cause_accessibility__93d2a823: "עדוכנים ידניים של CSS ו Javascript יכולים לגרום לבעיות נגישות או להיות בניגוד עם שינויים עתידיים של קנבס"
   custom_fields_fc3e55af: "שדות להגדרה גמישה"
@@ -7978,6 +7989,7 @@ he:
   grade_a91e433e: "הערכה:"
   grade_assignment_7c1abc11: "הערכת %{assignment}"
   grade_change_activity_75fb525: "מתן ציון לפעילות ששונתה"
+  grade_change_notifications_98461261: "התראות שינוי הערכה"
   grade_changes_cb5a57a8: "שינויי הערכה"
   grade_display_warning_dialog: 
     grade_display_warning: 
@@ -10234,7 +10246,7 @@ he:
   message_students_cecc3f83: "הודע/י לתלמידים "
   message_students_dialog: 
     recipients: "נמענים:"
-  message_students_who_369b8488: "הודעות תלמידים אשר..."
+  message_students_who_369b8488: "הודעות לתלמידים אשר..."
   message_students_who_57f07a41: "הודעות לתלמידים אשר..."
   message_text_5f692459: "תוכן הודעה"
   message_this_student_6d14043d: "הודעה לתלמיד זה"
@@ -15729,6 +15741,7 @@ he:
   scheduler_shown_df77ca6f: "המתזמן שמוצג"
   school_of_rock_4b7b1fd0: "School of Rock"
   score_68107950: "%{score}%"
+  score_change_notifications_6b94f27f: "התראות שינוי ציון"
   score_does_not_include_groups_because_they_have_no_80d12f42: 
     one: "הציון אינו כולל את %{groups} כיון שאין לקבוצה זו נקודות אפשריות"
     other: "הציון אינו כולל את %{groups} כיון שאין לקבוצות אלו נקודות אפשריות"
@@ -17218,6 +17231,7 @@ he:
   submission_comment: 
     unknown_author: מישהו/י
   submission_comments_4fa03a17: "הערות הגשה"
+  submission_comments_b6d65841: "הערות הגשה"
   submission_date_a7920dac: "תאריך הגשה"
   submission_detail: 
     go_to_submission_url: "מעבר אל כתובת דף ההגשה"
@@ -17601,6 +17615,7 @@ he:
   the_unique_id_used_for_representing_the_specific_r_3bdf5870: "המזהה הייחודי המשמש לייצג סבב equest/response שלגביו דוח השגיאה הופק."
   the_url_a_sufficiently_priviledged_user_could_use__e6b02c56: "כתובת הדף בו משתמשים מורשים יכולים להשתמש כדי להתחזות למשתמש המדווח באותו הדף עצמו, כדי לנסות ולשחזר את הבעיה."
   the_url_of_the_page_the_user_was_on_when_they_repo_11dfa92f: "כתובת הדף בו המשתמש היה כאשר דווח על השגיאה"
+  their_grade_for_the_assignment_c36a60ef: "ציוניהם עבור המשימה"
   theme_52404e51: "ערכת נושא"
   theme_editor_b7b00f6b: "עורך ערכות נושא"
   theme_editor_changes_have_been_cancelled_2af5cc5f: "שינויי עורך ערכות נושא בוטלו"
@@ -17690,6 +17705,7 @@ he:
   this_login_is_for_provider_6f17462: "הלוג-אין הזה הנו עבור  %{provider}"
   this_may_take_a_bit_c061d0f6: "הדבר יכול להמשך זמן מה..."
   this_message_includes_media_comments_to_listen_or__5fc98641: "הודעה זו כוללת הערות מדיה. כדי להקשיב או להגיב, יש להקליק ע הקישור: %{link}."
+  this_message_includes_media_comments_to_listen_or__75ea03a1: "הודעה זו כוללת הערות מדיה. להקשיב או להגיב, יש לקליק על הקישור שבהמשך: "
   this_module_is_locked_until_completing_all_of_the__ddf06070: "המודול הזה נעול עד אשר יושלמו כל הדרישות למודולים הבאים: %{prerequisites}"
   this_module_is_locked_until_datetime_b2486751: "המודול הזה נעול עד %{datetime}"
   this_most_likely_happened_because_you_imported_cou_a78ea880: "הדבר קרה ככל הנראה כיון שייבאת תוכן קורס ללא הקבצים הנלווים."
@@ -17975,6 +17991,7 @@ he:
       
       אם הספק יכול לקנפג קריאה חוזרת תקינה או לנתב URIים, אפשר להשתמש ב  %{callback_url}.
   to_do_1d554f36: "מטלות לביצוע"
+  to_f0e90538: "עבור:"
   to_link_the_course_observer_name_to_a_student_star_f993c826: "כדי לקשר את משקיף הקורס *%{name}* לתלמיד, התחל/י להקליד את שם התלמיד מתחת כדי למצאו ואז להקליק עדכון."
   to_minscore_43e5452e: "עד %{minScore}%"
   to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "לנעוץ דיון בראש הדף, יש לגרור את הדיון לכאן או לבחור בנעץ מתפריט הגדרות הדיון"
@@ -18952,6 +18969,7 @@ he:
   you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: "ניתן כעת להגדיר אפשרויות הערכה מחודשת לתלמידים אשר כבר בצעו את הבוחן"
   you_can_reply_to_this_comment_by_responding_to_thi_3d130e8c: "ניתן להשיב להערה זו ע\"י תגובה להודעה זו, או לעיין בפרטי ההגשה בקישור: %{link}."
   you_can_reply_to_this_message_in_canvas_by_replyin_fa33638d: "ניתן להשיב להערה זו בקנבס ע\"י תגובה ישירה להודעה זו, או בהקלקה על הקישור הזה: %{link}."
+  you_can_review_the_submission_details_by_clicking__58a7753: "ניתן לעיין בפרטי ההגשה ע\"י הקלקה על הקישור שבהמשך:"
   you_can_review_the_submission_details_by_clicking__9abc5515: "ניתן לעיין בפרטי ההגשות בהקלקה על הקישור הזה: %{link}."
   you_can_see_details_for_this_group_by_clicking_thi_acaf07e5: "ניתן לעיין בפרטי הקבוצה הזו ע\"י הקלקה על הקישור: %{link}."
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: "אין אפשרות לבטל חשבון משנה הכולל בתוכו קורסים"

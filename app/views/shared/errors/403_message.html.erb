@@ -28,7 +28,7 @@
 
 <div class="ic-Error-page">
   <img class="ic-Error-img" role="presentation" alt="" aria-hidden="true" src="/images/401_permissions.svg">
-  <h2><%= t("Access Denied") %></h2>
+  <h1><%= t("Access Denied") %></h1>
   <p><%= t("You don't have permission to access this resource.") %></p>
   <% if (defined? message) && message %>
     <p><%= t('error', 'Error:') %> <%= message %></p>

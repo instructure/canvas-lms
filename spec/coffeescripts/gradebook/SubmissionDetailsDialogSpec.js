@@ -19,8 +19,7 @@
 import $ from 'jquery'
 import Assignment from 'compiled/models/Assignment'
 import SubmissionDetailsDialog from 'compiled/SubmissionDetailsDialog'
-import _ from 'underscore'
-import tz from 'timezone'
+import qs from 'qs'
 import 'jst/SubmissionDetailsDialog'
 
 QUnit.module('SubmissionDetailsDialog', {
@@ -86,7 +85,7 @@ test('speed_grader_enabled as false does not set speedgrader url', function() {
   equal(dialog.dialog.find('.more-details-link').length, 0)
 })
 
-test('speedgrader url quotes the student id', function() {
+test('speedgrader url includes ID of the user in student_id', function() {
   // Supply a value for context_url so we have a well-formed speedGraderUrl
   this.options.context_url = 'http://localhost'
   const submissionDetailsDialog = new SubmissionDetailsDialog(
@@ -96,7 +95,8 @@ test('speedgrader url quotes the student id', function() {
   )
 
   const urlObject = new URL(submissionDetailsDialog.submission.speedGraderUrl)
-  strictEqual(decodeURI(urlObject.hash), '#{"student_id":"1"}')
+  const urlParams = qs.parse(urlObject.search, {ignoreQueryPrefix: true})
+  strictEqual(urlParams.student_id, '1')
   submissionDetailsDialog.dialog.dialog('destroy')
 })
 
