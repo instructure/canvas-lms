@@ -51,12 +51,14 @@ button::-moz-focus-inner,
   padding: 0;
 }
 
+/**
+ * Correct the inability to style clickable types in iOS and Safari.
+ */
 button,
-html input[type="button"], // Avoid the WebKit bug in Android 4.0.* where (2) destroys native `audio` and `video` controls.
-input[type="reset"],
-input[type="submit"] {
-  -webkit-appearance: button; // Corrects inability to style clickable `input` types in iOS.
-  cursor: pointer;
+[type="button"],
+[type="reset"],
+[type="submit"] {
+  -webkit-appearance: button;
 }
 
 input[type="search"] { // Appearance in Safari/Chrome
