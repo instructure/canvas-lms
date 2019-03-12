@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-def gems = [
+gems = [
   'analytics',
   'banner_grade_export_plugin',
   'canvas_geoip',
@@ -36,19 +36,21 @@ def fetchFromGerrit = { String repo, String path, String customRepoDestination =
   })
 }
 
-def fetchGems = gems.collectEntries { String gem ->
-  [ "${gem}" : { fetchFromGerrit(gem, 'gems/plugins') } ]
+def fetchGems() {
+  gems.collectEntries { String gem ->
+    [ "${gem}" : { fetchFromGerrit(gem, 'gems/plugins') } ]
+  }
 }
 
 def getImageTag() {
-  //if (env.GERRIT_EVENT_TYPE == 'patchset-created') {
-    // GERRIT__REFSPEC will be in the form 'refs/changes/63/181863/8'
-    // we want a name in the form '63.181863.8'
-    NAME = "${env.GERRIT_REFSPEC}".minus('refs/changes/').replaceAll('/','.')
-    return "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
-  //} else {
-  //  return "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$GERRIT_BRANCH"
-  //}
+  // if (env.GERRIT_EVENT_TYPE == 'patchset-created') {
+  //   GERRIT__REFSPEC will be in the form 'refs/changes/63/181863/8'
+  //   we want a name in the form '63.181863.8'
+  NAME = "${env.GERRIT_REFSPEC}".minus('refs/changes/').replaceAll('/','.')
+  return "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
+  // } else {
+  //   return "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$GERRIT_BRANCH"
+  // }
 }
 
 pipeline {
@@ -60,7 +62,7 @@ pipeline {
   }
 
   environment {
-    GERRIT_PORT = "29418"
+    GERRIT_PORT = '29418'
     GERRIT_URL = "$GERRIT_HOST:$GERRIT_PORT"
     IMAGE_TAG = getImageTag()
   }
@@ -68,34 +70,26 @@ pipeline {
   stages {
     stage('Debug') {
       steps {
-        sh 'printenv | sort'
+        timeout(time: 20, unit: 'SECONDS') {
+          sh 'printenv | sort'
+        }
       }
     }
 
-    stage('Other Project Dependencies') {
-      parallel {
-
-        stage('Gems') {
-          steps { script { parallel fetchGems } }
-        }
-
-        stage('Vendor QTI Migration Tool') {
-          steps {
-            script {
-              withGerritCredentials({
-                fetchFromGerrit('qti_migration_tool', 'vendor', 'QTIMigrationTool')
-              })
-            }
-          }
-        }
-
-        stage('Config Files') {
-          steps {
-            script {
-              withGerritCredentials({ ->
-                fetchFromGerrit('gerrit_builder', 'config', '', 'canvas-lms/config')
-              })
-            }
+    stage('Plugins and Config Files') {
+      steps {
+        timeout(time: 3) {
+          script {
+            withGerritCredentials({ ->
+              sh '''
+                gerrit_message="Gerrit Builder Started $JOB_BASE_NAME\nTag: $IMAGE_TAG\nBuild: $BUILD_URL"
+                ssh -i "$SSH_KEY_PATH" -l "$SSH_USERNAME" -p $GERRIT_PORT \
+                  hudson@$GERRIT_HOST gerrit review -m "'$gerrit_message'" $GERRIT_CHANGE_NUMBER,$GERRIT_PATCHSET_NUMBER
+              '''
+            })
+            fetchGems()
+            fetchFromGerrit('qti_migration_tool', 'vendor', 'QTIMigrationTool')
+            fetchFromGerrit('gerrit_builder', 'config', '', 'canvas-lms/config')
           }
         }
       }
@@ -114,17 +108,43 @@ pipeline {
 
     stage('Build Image') {
       steps {
-        timeout(time: 20, unit: 'MINUTES') {
+        timeout(time: 20) {
           sh 'docker build -t $IMAGE_TAG .'
         }
       }
     }
 
-    stage("Publish Image") {
+    stage('Publish Image') {
       steps {
-        timeout(time: 5, unit: 'MINUTES') {
+        timeout(time: 5) {
           sh 'docker push $IMAGE_TAG'
         }
+      }
+    }
+  }
+
+  post {
+    success {
+      script {
+        withGerritCredentials({ ->
+          sh '''
+            gerrit_message="Gerrit Builder $JOB_BASE_NAME Successful.\nTag: $IMAGE_TAG\nBuild: $BUILD_URL"
+            ssh -i "$SSH_KEY_PATH" -l "$SSH_USERNAME" -p $GERRIT_PORT \
+              hudson@$GERRIT_HOST gerrit review -m "'$gerrit_message'" $GERRIT_CHANGE_NUMBER,$GERRIT_PATCHSET_NUMBER
+          '''
+        })
+      }
+    }
+
+    unsuccessful {
+      script {
+        withGerritCredentials({ ->
+          sh '''
+            gerrit_message="Gerrit Builder $JOB_BASE_NAME Failed.\nTag: $IMAGE_TAG\nBuild: $BUILD_URL"
+            ssh -i "$SSH_KEY_PATH" -l "$SSH_USERNAME" -p $GERRIT_PORT \
+              hudson@$GERRIT_HOST gerrit review -m "'$gerrit_message'" $GERRIT_CHANGE_NUMBER,$GERRIT_PATCHSET_NUMBER
+          '''
+        })
       }
     }
   }
