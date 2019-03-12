@@ -27,7 +27,6 @@ import 'jqueryui/dialog'
 import './jquery.instructure_misc_helpers' /* /\$\.h/, /\$\.fileSize/ */
 import './jquery.instructure_misc_plugins' /* .dim, /\.log\(/ */
 import 'jqueryui/progressbar'
-import 'jqueryui/tabs'
 
   "use strict"
   var jsUploader
@@ -549,6 +548,7 @@ import 'jqueryui/tabs'
         if($div.data('ks')) {
           var mediaCommentsTemplate = require('jst/MediaComments');
           $div.html(mediaCommentsTemplate());
+          require('jqueryui/tabs')
           $div.find("#media_record_tabs").tabs({activate: $.mediaComment.video_delegate.expectReady});
           mediaCommentReady();
         } else if($div.data('ks-error')) {
