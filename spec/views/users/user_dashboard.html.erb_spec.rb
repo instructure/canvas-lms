@@ -44,7 +44,7 @@ describe "/users/user_dashboard" do
     assign(:upcoming_events, [])
     assign(:stream_items, [])
     assign(:announcements, [AccountNotification.create(:message => 'hi', :start_at => Date.today - 1.day,
-                                                          :end_at => Date.today + 2.days,
+                                                          :end_at => Date.today + 2.days, :user => User.create!,
                                                           :subject => "My Global Announcement", :account => Account.default)])
     render "users/user_dashboard"
     expect(response.body).to match /My Global Announcement/
