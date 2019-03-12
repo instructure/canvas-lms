@@ -5,12 +5,16 @@ exports[`prioritizes loading complete over currently loading 1`] = `
   <View
     as="div"
     display="auto"
+    overflowX="visible"
+    overflowY="visible"
     padding="small"
     textAlign="center"
   >
     <View
       display="block"
       margin="small"
+      overflowX="visible"
+      overflowY="visible"
     >
       <TV
         aria-hidden="true"
@@ -45,12 +49,16 @@ exports[`renders TV when all past items loaded 1`] = `
   <View
     as="div"
     display="auto"
+    overflowX="visible"
+    overflowY="visible"
     padding="small"
     textAlign="center"
   >
     <View
       display="block"
       margin="small"
+      overflowX="visible"
+      overflowY="visible"
     >
       <TV
         aria-hidden="true"
@@ -85,6 +93,8 @@ exports[`renders spinner while loading 1`] = `
   <View
     as="div"
     display="auto"
+    overflowX="visible"
+    overflowY="visible"
     padding="medium small small small"
     textAlign="center"
   >

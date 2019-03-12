@@ -130,6 +130,7 @@ exports[`renders the ProficiencyRating component 1`] = `
       onToggle={[Function]}
       placement="bottom center"
       positionTarget={null}
+      shadow="resting"
       shouldCloseOnDocumentClick={true}
       shouldCloseOnEscape={true}
       shouldContainFocus={false}
