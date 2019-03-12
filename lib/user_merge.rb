@@ -447,25 +447,27 @@ class UserMerge
       # TODO: This is a hack to support namespacing
       versionable_type = ['QuizSubmission', 'Quizzes::QuizSubmission'] if table.to_s == 'quizzes/quiz_submissions'
       version_ids = []
-      Version.where(:versionable_type => versionable_type, :versionable_id => ids).find_each do |version|
-        begin
-          version_attrs = YAML.load(version.yaml)
-          if version_attrs[column.to_s] == from_user.id
-            version_attrs[column.to_s] = target_user.id
+      Version.where(:versionable_type => versionable_type, :versionable_id => ids).find_in_batches(strategy: :cursor) do |versions|
+        versions.each do |version|
+          begin
+            version_attrs = YAML.load(version.yaml)
+            if version_attrs[column.to_s] == from_user.id
+              version_attrs[column.to_s] = target_user.id
+            end
+            # i'm pretty sure simply_versioned just stores fields as strings, but
+            # i haven't had time to verify that 100% yet, so better safe than sorry
+            if version_attrs[column.to_sym] == from_user.id
+              version_attrs[column.to_sym] = target_user.id
+            end
+            version.yaml = version_attrs.to_yaml
+            version.save!
+            if versionable_type == 'Submission'
+              version_ids << version.id
+            end
+          rescue => e
+            Rails.logger.error "migrating versions for #{table} column #{column} failed: #{e}"
+            raise e unless Rails.env.production?
           end
-          # i'm pretty sure simply_versioned just stores fields as strings, but
-          # i haven't had time to verify that 100% yet, so better safe than sorry
-          if version_attrs[column.to_sym] == from_user.id
-            version_attrs[column.to_sym] = target_user.id
-          end
-          version.yaml = version_attrs.to_yaml
-          version.save!
-          if versionable_type == 'Submission'
-            version_ids << version.id
-          end
-        rescue => e
-          Rails.logger.error "migrating versions for #{table} column #{column} failed: #{e}"
-          raise e unless Rails.env.production?
         end
       end
       if version_ids.present?
