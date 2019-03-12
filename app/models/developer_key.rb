@@ -65,6 +65,8 @@ class DeveloperKey < ActiveRecord::Base
     state :deleted
   end
 
+  self.ignored_columns = %i[oidc_login_uri tool_id]
+
   alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
