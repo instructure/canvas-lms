@@ -103,8 +103,8 @@ class Feature
   def self.register(feature_hash)
     @features ||= {}
     feature_hash.each do |feature_name, attrs|
-      validate_attrs(attrs)
       feature = feature_name.to_s
+      validate_attrs(attrs, feature)
       if attrs[:development] && production_environment?
         @features[feature] = DISABLED_FEATURE
       else
@@ -113,9 +113,9 @@ class Feature
     end
   end
 
-  def self.validate_attrs(attrs)
-    raise 'invalid state' unless VALID_STATES.include? attrs[:state]
-    raise 'invalid applies_to' unless VALID_APPLIES_TO.include? attrs[:applies_to]
+  def self.validate_attrs(attrs, feature)
+    raise "invalid 'state' for feature: #{feature}" unless VALID_STATES.include? attrs[:state]
+    raise "invalid 'applies_to' for feature: #{feature}" unless VALID_APPLIES_TO.include? attrs[:applies_to]
   end
 
   # TODO: register built-in features here
