@@ -18,7 +18,6 @@
 
 # @API Moderated Grading
 # @subtopic Moderation Set
-# @beta
 #
 # API for viewing and adding students to the list of people in moderation
 # for an assignment
