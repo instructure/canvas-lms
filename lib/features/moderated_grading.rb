@@ -27,6 +27,5 @@ Feature.register(
     applies_to: 'Course',
     state: 'allowed',
     root_opt_in: true,
-    beta: true
   }
 )

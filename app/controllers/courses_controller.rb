@@ -208,7 +208,7 @@ require 'securerandom'
 #           "$ref": "Term"
 #         },
 #         "course_progress": {
-#           "description": "optional (beta): information on progress through the course returned only if include[]=course_progress",
+#           "description": "optional: information on progress through the course returned only if include[]=course_progress",
 #           "$ref": "CourseProgress"
 #         },
 #         "apply_assignment_group_weights": {
@@ -2276,7 +2276,7 @@ class CoursesController < ApplicationController
   #   ID are both set to nil
   #
   # @argument course[blueprint] [Boolean]
-  #   Sets the course as a blueprint course. NOTE: The Blueprint Courses feature is in beta
+  #   Sets the course as a blueprint course.
   #
   # @argument course[blueprint_restrictions] [BlueprintRestriction]
   #   Sets a default set to apply to blueprint course objects when restricted,
