@@ -2282,10 +2282,6 @@ class User < ActiveRecord::Base
     end
   end
 
-  def admin_roles(root_account)
-    admin_user_roles(root_account, true)
-  end
-
   def eportfolios_enabled?
     accounts = associated_root_accounts.reject(&:site_admin?)
     accounts.size == 0 || accounts.any?{ |a| a.settings[:enable_eportfolios] != false }
@@ -2841,12 +2837,6 @@ class User < ActiveRecord::Base
     roles << 'student' unless (enrollment_types & %w[StudentEnrollment StudentViewEnrollment]).empty?
     roles << 'teacher' unless (enrollment_types & %w[TeacherEnrollment TaEnrollment DesignerEnrollment]).empty?
     roles << 'observer' unless (enrollment_types & %w[ObserverEnrollment]).empty?
-
-    roles + admin_user_roles(root_account, exclude_deleted_accounts)
-  end
-
-  def admin_user_roles(root_account, exclude_deleted_accounts = nil)
-    roles = []
     account_users = root_account.all_account_users_for(self)
 
     if exclude_deleted_accounts
