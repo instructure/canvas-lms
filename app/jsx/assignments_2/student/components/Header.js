@@ -86,9 +86,9 @@ class Header extends React.Component {
           {!this.state.isSticky && <AssignmentGroupModuleNav assignment={this.props.assignment} />}
           <Flex margin={this.state.isSticky ? '0' : '0 0 medium 0'}>
             <FlexItem shrink>
-              <DateTitle assignment={this.props.assignment} />
+              <DateTitle isSticky={this.state.isSticky} assignment={this.props.assignment} />
             </FlexItem>
-            <FlexItem grow>
+            <FlexItem grow align="start">
               <GradeDisplay
                 gradingType={this.props.assignment.gradingType}
                 receivedGrade={submission.grade}

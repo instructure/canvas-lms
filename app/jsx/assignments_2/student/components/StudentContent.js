@@ -29,7 +29,12 @@ function renderContentBaseOnAvailability(assignment) {
     const prereq = assignment.env.modulePrereq
     return <MissingPrereqs preReqTitle={prereq.title} preReqLink={prereq.link} />
   } else if (assignment && assignment.lockInfo.isLocked) {
-    return <LockedAssignment assignment={assignment} />
+    return (
+      <React.Fragment>
+        <AssignmentToggleDetails description={assignment && assignment.description} />
+        <LockedAssignment assignment={assignment} />
+      </React.Fragment>
+    )
   } else {
     return (
       <React.Fragment>
