@@ -36,12 +36,6 @@ def fetchFromGerrit = { String repo, String path, String customRepoDestination =
   })
 }
 
-def fetchGems() {
-  gems.collectEntries { String gem ->
-    [ "${gem}" : { fetchFromGerrit(gem, 'gems/plugins') } ]
-  }
-}
-
 def getImageTag() {
   // if (env.GERRIT_EVENT_TYPE == 'patchset-created') {
   //   GERRIT__REFSPEC will be in the form 'refs/changes/63/181863/8'
@@ -87,7 +81,7 @@ pipeline {
                   hudson@$GERRIT_HOST gerrit review -m "'$gerrit_message'" $GERRIT_CHANGE_NUMBER,$GERRIT_PATCHSET_NUMBER
               '''
             })
-            fetchGems()
+            gems.each { gem -> fetchFromGerrit(gem, 'gems/plugins') }
             fetchFromGerrit('qti_migration_tool', 'vendor', 'QTIMigrationTool')
             fetchFromGerrit('gerrit_builder', 'config', '', 'canvas-lms/config')
           }
