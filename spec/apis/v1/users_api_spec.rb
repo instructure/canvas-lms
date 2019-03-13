@@ -1648,16 +1648,21 @@ describe "Users API", type: :request do
 
     context "an admin user" do
       it "should be able to view other users' settings" do
+        @student.preferences[:collapse_global_nav] = true; @student.save!
         json = api_call(:get, path, path_options)
-        expect(json['manual_mark_as_read']).to be_falsey
+        expect(json['manual_mark_as_read']).to eq false
+        expect(json['collapse_global_nav']).to eq true
+        expect(json['hide_dashcard_color_overlays']).to eq false
       end
 
       it "should be able to update other users' settings" do
-        json = api_call(:put, path, path_options, manual_mark_as_read: true)
-        expect(json['manual_mark_as_read']).to be_truthy
+        json = api_call(:put, path, path_options, manual_mark_as_read: true, hide_dashcard_color_overlays: false)
+        expect(json['manual_mark_as_read']).to eq true
+        expect(json['hide_dashcard_color_overlays']).to eq false
 
-        json = api_call(:put, path, path_options, manual_mark_as_read: false)
-        expect(json['manual_mark_as_read']).to be_falsey
+        json = api_call(:put, path, path_options, manual_mark_as_read: false, hide_dashcard_color_overlays: true)
+        expect(json['manual_mark_as_read']).to eq false
+        expect(json['hide_dashcard_color_overlays']).to eq true
       end
     end
 

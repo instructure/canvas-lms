@@ -1501,6 +1501,8 @@ class UsersController < ApplicationController
     create_user
   end
 
+  BOOLEAN_PREFS = %i(manual_mark_as_read collapse_global_nav hide_dashcard_color_overlays).freeze
+
   # @API Update user settings.
   # Update an existing user's settings.
   #
@@ -1510,6 +1512,10 @@ class UsersController < ApplicationController
   #
   # @argument collapse_global_nav [Boolean]
   #   If true, the user's page loads with the global navigation collapsed
+  #
+  # @argument hide_dashcard_color_overlays [Boolean]
+  #   If true, images on course cards will be presented without being tinted
+  #   to match the course color.
   #
   # @example_request
   #
@@ -1523,28 +1529,17 @@ class UsersController < ApplicationController
     case
     when request.get?
       return unless authorized_action(user, @current_user, :read)
-      render(json: {
-        manual_mark_as_read: @current_user.manual_mark_as_read?,
-        collapse_global_nav: @current_user.collapse_global_nav?
-      })
+      render json: BOOLEAN_PREFS.each_with_object({}) { |pref, h| h[pref] = !!user.preferences[pref] }
     when request.put?
       return unless authorized_action(user, @current_user, [:manage, :manage_user_details])
-      unless params[:manual_mark_as_read].nil?
-        mark_as_read = value_to_boolean(params[:manual_mark_as_read])
-        user.preferences[:manual_mark_as_read] = mark_as_read
-      end
-      unless params[:collapse_global_nav].nil?
-        collapse_global_nav = value_to_boolean(params[:collapse_global_nav])
-        user.preferences[:collapse_global_nav] = collapse_global_nav
+      BOOLEAN_PREFS.each do |pref|
+       user.preferences[pref] = value_to_boolean(params[pref]) unless params[pref].nil?
       end
 
       respond_to do |format|
         format.json {
           if user.save
-            render(json: {
-              manual_mark_as_read: user.manual_mark_as_read?,
-              collapse_global_nav: user.collapse_global_nav?
-            })
+            render json: BOOLEAN_PREFS.each_with_object({}) { |pref, h| h[pref] = !!user.preferences[pref] }
           else
             render(json: user.errors, status: :bad_request)
           end
