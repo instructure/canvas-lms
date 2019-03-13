@@ -937,13 +937,14 @@ module ApplicationHelper
       @current_user.has_student_enrollment?)
   end
 
-  def generate_access_verifier
+  def generate_access_verifier(return_url: nil)
     Users::AccessVerifier.generate(
       user: @current_user,
       real_user: logged_in_user,
       developer_key: @access_token&.developer_key,
       root_account: @domain_root_account,
-      oauth_host: request.host_with_port
+      oauth_host: request.host_with_port,
+      return_url: return_url
     )
   end
 
