@@ -59,7 +59,7 @@ module Lti
                                  @context.enrollment_term.start_at }
     TERM_NAME_GUARD = -> { @context.is_a?(Course) && @context.enrollment_term&.name }
     USER_GUARD = -> { @current_user }
-    SIS_USER_GUARD = -> { @current_user && @current_user.pseudonym && @current_user.pseudonym.sis_user_id }
+    SIS_USER_GUARD = -> { sis_pseudonym&.sis_user_id }
     PSEUDONYM_GUARD = -> { sis_pseudonym }
     ENROLLMENT_GUARD = -> { @current_user && @context.is_a?(Course) }
     ROLES_GUARD = -> { @current_user && (@context.is_a?(Course) || @context.is_a?(Account)) }
