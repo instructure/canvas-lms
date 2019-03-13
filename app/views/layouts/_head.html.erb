@@ -81,6 +81,7 @@
 
   <%= include_head_js %>
 
+  <!-- StrongMind Added -->
   <% if SettingsService.get_settings(object: 'school', id: 1)['fullstory'] == 'on' %>
     <script>
       window['_fs_debug'] = false;
@@ -102,5 +103,5 @@
   <% end %>
 
   <!-- StrongMind Added -->
-  <%= yield :strongmind_javascript %>
+  <%= yield :strongmind_assets %>
 </head>

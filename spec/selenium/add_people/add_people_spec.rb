@@ -25,7 +25,7 @@ describe "add_people" do
   before(:once) do
     # in the people table, the kyle menu can be off the screen
     # and uninteractable if the window is too small
-    driver.manage.window.maximize
+    # driver.manage.window.maximize
   end
 
   context "as a teacher" do

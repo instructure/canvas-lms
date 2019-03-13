@@ -1215,7 +1215,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  rescue_from Exception, :with => :rescue_exception unless Rails.env == 'development'
+  rescue_from Exception, :with => :rescue_exception unless ENV['BYPASS_EXCEPTION_CATCHING'].present?
 
   # analogous to rescue_action_without_handler from ActionPack 2.3
   def rescue_exception(exception)

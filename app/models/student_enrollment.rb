@@ -39,8 +39,4 @@ class StudentEnrollment < Enrollment
         prog.mark_as_outdated!
       end
   end
-
-  def pipeline_serializer
-    PipelineService::Serializers::Enrollment
-  end
 end

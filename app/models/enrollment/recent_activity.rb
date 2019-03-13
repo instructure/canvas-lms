@@ -53,9 +53,9 @@ class Enrollment
 
     def update_with(options)
       result = all_enrollments_scope.update_all(options)
-
+      
       all_enrollments_scope.ids.each do |id|
-        PipelineService.publish(options.merge(id: id))
+        PipelineService.publish(Enrollment.new(id: id))
       end
 
       result

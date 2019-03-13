@@ -21,7 +21,7 @@ describe "people" do
   include_context "in-process server selenium tests"
 
   before(:once) do
-    driver.manage.window.maximize
+    # driver.manage.window.maximize
   end
 
   def add_user(option_text, username, user_list_selector)

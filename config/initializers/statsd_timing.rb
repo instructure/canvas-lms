@@ -15,8 +15,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-CanvasStatsd::DefaultTracking.track_sql
-CanvasStatsd::DefaultTracking.track_active_record
-CanvasStatsd::DefaultTracking.track_cache
-CanvasStatsd::BlockTracking.logger = CanvasStatsd::RequestLogger.new(Rails.logger)
-CanvasStatsd::RequestTracking.enable logger: Rails.logger
+unless ENV['BYPASS_STATS_LOGGING'].present?
+  CanvasStatsd::DefaultTracking.track_sql
+  CanvasStatsd::DefaultTracking.track_active_record
+  CanvasStatsd::DefaultTracking.track_cache
+  CanvasStatsd::BlockTracking.logger = CanvasStatsd::RequestLogger.new(Rails.logger)
+  CanvasStatsd::RequestTracking.enable logger: Rails.logger
+end

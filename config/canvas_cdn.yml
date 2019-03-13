@@ -10,7 +10,6 @@ development:
   enabled: false
 
 test:
-  <<: *defaults
   enabled: <%= ENV['CDN_ENABLED'] %>
 #
 # production:

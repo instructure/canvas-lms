@@ -1,3 +1,8 @@
+development:
+  workers:
+  - queue: canvas_queue
+    workers: 1
+
 production:
   workers:
   - queue: canvas_queue
@@ -23,3 +28,4 @@ default:
     max_priority: 10
   - queue: canvas_queue
     workers: 4
+

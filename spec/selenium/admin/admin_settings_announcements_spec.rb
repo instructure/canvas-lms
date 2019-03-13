@@ -77,7 +77,7 @@ describe "settings tabs" do
 
     before do
       course_with_admin_logged_in
-      driver.manage.window.maximize
+      # driver.manage.window.maximize
     end
 
     it "should add and delete an announcement" do

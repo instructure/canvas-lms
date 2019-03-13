@@ -1,23 +1,56 @@
-# do not create a queue: section for your test environment
+development:
+  adapter: postgresql
+  host: <%= ENV['DB_HOST'] %>
+  port: <%= ENV['DB_PORT'] %>
+  encoding: utf8
+  username: <%= ENV['DB_USER'] %>
+  database: <%= ENV['DB_NAME'] %>
+  password: <%= ENV['DB_PASS'] %>
+  timeout: 5000
+  prepared_statements: false
+  pool: <%= ENV["DB_POOL"] || 5 %>
+  use_qualified_names: true
+  schema_search_path: "courseware,public"
+
+production:
+  adapter: postgresql
+  host: <%= ENV['DB_HOST'] %>
+  port: <%= ENV['DB_PORT'] %>
+  encoding: utf8
+  username: <%= ENV['DB_USER'] %>
+  database: <%= ENV['DB_NAME'] %>
+  password: <%= ENV['DB_PASS'] %>
+  timeout: 5000
+  prepared_statements: false
+  pool: <%= ENV["DB_POOL"] || 5 %>
+  use_qualified_names: true
+  schema_search_path: "courseware,public"
+
+courseware:
+  adapter: postgresql
+  host: <%= ENV['DB_HOST'] %>
+  port: <%= ENV['DB_PORT'] %>
+  encoding: utf8
+  username: <%= ENV['DB_USER'] %>
+  database: <%= ENV['DB_NAME'] %>
+  password: <%= ENV['DB_PASS'] %>
+  timeout: 5000
+  prepared_statements: false
+  pool: <%= ENV["DB_POOL"] || 5 %>
+  use_qualified_names: true
+  schema_search_path: "courseware,public"
+
 test:
   adapter: postgresql
   encoding: utf8
   database: canvas_test
   host: localhost
-  username: canvas
+  host: <%= ENV['DB_HOST'] %>
+  port: <%= ENV['DB_PORT'] %>
+  username: <%= ENV['DB_USER'] %>
+  password: <%= ENV['DB_PASS'] %>
   timeout: 5000
-
-development:
-  adapter: postgresql
-  encoding: utf8
-  database: canvas_development
-  timeout: 5000
-
-production:
-  adapter: postgresql
-  encoding: utf8
-  database: canvas_production
-  host: localhost
-  username: canvas
-  password: your_password
-  timeout: 5000
+  prepared_statements: false
+  pool: <%= ENV["DB_POOL"] || 5 %>
+  use_qualified_names: true
+  schema_search_path: "courseware,public"

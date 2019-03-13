@@ -75,9 +75,8 @@ class ContextModulesController < ApplicationController
 
       module_file_details = load_module_file_details if @context.grants_right?(@current_user, session, :manage_content)
       sequence_control = true # True by default
-      enrollment = Enrollment.find_by(course_id: @context.id, user_id: @current_user.id)
 
-      if enrollment
+      if @context && @current_user && enrollment = Enrollment.find_by(course_id: @context.id, user_id: @current_user.id)
         settings = SettingsService.get_enrollment_settings(id: enrollment.id)
         sequence_control = false if !settings["sequence_control"].nil? && settings["sequence_control"] == false
       end

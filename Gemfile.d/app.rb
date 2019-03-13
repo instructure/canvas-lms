@@ -162,5 +162,6 @@ gem 'vericite_api', '1.5.1'
 gem 'utf8_cleaner', path: 'gems/utf8_cleaner'
 gem 'workflow', path: 'gems/workflow'
 
-# StrongMind
+# StrongMind Added
 gem 'canvas_shim', :path => 'vendor/canvas_shim'
+gem 'bootsnap', require: false

@@ -30,7 +30,12 @@ require_relative '../lib/canvas_yaml'
 require "active_record/railtie"
 require "action_controller/railtie"
 require "action_mailer/railtie"
-# require "sprockets/railtie" # Do not enable the Rails Asset Pipeline
+
+# StrongMind Added
+# We want the asset pipeline so our Canvas Shim gem/engine can add assets to Canvas LMS
+# without using Webpack.  Webpack does not work with Rails engines by default and without
+# alot of work
+require "sprockets/railtie" # Do not enable the Rails Asset Pipeline <-- Instructure wrote this
 require "rails/test_unit/railtie"
 
 Bundler.require(*Rails.groups)

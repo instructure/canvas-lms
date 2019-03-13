@@ -50,3 +50,7 @@ test:
   username: <%= ENV['DB_USER'] %>
   password: <%= ENV['DB_PASS'] %>
   timeout: 5000
+  prepared_statements: false
+  pool: <%= ENV["DB_POOL"] || 5 %>
+  use_qualified_names: true
+  schema_search_path: "courseware,public"

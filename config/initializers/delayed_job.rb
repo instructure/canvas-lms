@@ -96,7 +96,10 @@ Delayed::Worker.lifecycle.around(:perform) do |worker, job, &block|
 
     LiveEvents.clear_context!
 
-    Rails.logger.info "[STAT] #{starting_mem} #{ending_mem} #{ending_mem - starting_mem} #{user_cpu} #{system_cpu}"
+    # StrongMind Added bypass
+    unless ENV['BYPASS_STATS_LOGGING'].present?
+      Rails.logger.info "[STAT] #{starting_mem} #{ending_mem} #{ending_mem - starting_mem} #{user_cpu} #{system_cpu}"
+    end
 
     Thread.current[:context] = nil
   end

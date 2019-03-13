@@ -306,34 +306,38 @@
   <% end %>
   <%= render :partial => 'layouts/foot', :locals => { :include_common_bundle => true } %>
 </div> <!-- #application -->
-<script>
-  (function(apiKey){
-    (function(p,e,n,d,o){var v,w,x,y,z;o=p[d]=p[d]||{};o._q=[];
-      v=['initialize','identify','updateOptions','pageLoad'];for(w=0,x=v.length;w<x;++w)(function(m){
-      o[m]=o[m]||function(){o._q[m===v[0]?'unshift':'push']([m].concat([].slice.call(arguments,0)));};})(v[w]);
-      y=e.createElement(n);y.async=!0;y.src='https://cdn.pendo.io/agent/static/'+apiKey+'/pendo.js';
-      z=e.getElementsByTagName(n)[0];z.parentNode.insertBefore(y,z);})(window,document,'script','pendo');
 
-    // Call this whenever information about your visitors becomes available
-    // Please use Strings, Numbers, or Bools for value types.
+<% if !Rails.env.development? && !Rails.env.test? %>
+  <script>
+    (function(apiKey){
+      (function(p,e,n,d,o){var v,w,x,y,z;o=p[d]=p[d]||{};o._q=[];
+        v=['initialize','identify','updateOptions','pageLoad'];for(w=0,x=v.length;w<x;++w)(function(m){
+        o[m]=o[m]||function(){o._q[m===v[0]?'unshift':'push']([m].concat([].slice.call(arguments,0)));};})(v[w]);
+        y=e.createElement(n);y.async=!0;y.src='https://cdn.pendo.io/agent/static/'+apiKey+'/pendo.js';
+        z=e.getElementsByTagName(n)[0];z.parentNode.insertBefore(y,z);})(window,document,'script','pendo');
 
-      let visitor = {
-          id:              '<%= lti_opaque_hash_for_current_user %>',
-          name:            '<%= @current_user.name if @current_user%>',
-          email:           '<%= @current_user.email  if @current_user%>',
-          school_name:     '<%= @current_user.school_name if @current_user %>',
-          course_id:       '<%= @context.id if @context%>',
-          is_student:      '<%= @is_student %>',
-          full_path:       '<%= request.try(:fullpath)%>',
-          rails_env:       '<%= Rails.env %>',
-      }
+      // Call this whenever information about your visitors becomes available
+      // Please use Strings, Numbers, or Bools for value types.
 
-      let account = {
-          id:  '<%= ENV["CANVAS_DOMAIN"] %>'
-      }
+        let visitor = {
+            id:              '<%= lti_opaque_hash_for_current_user %>',
+            name:            '<%= @current_user.name if @current_user%>',
+            email:           '<%= @current_user.email  if @current_user%>',
+            school_name:     '<%= @current_user.school_name if @current_user %>',
+            course_id:       '<%= @context.id if @context%>',
+            is_student:      '<%= @is_student %>',
+            full_path:       '<%= request.try(:fullpath)%>',
+            rails_env:       '<%= Rails.env %>',
+        }
 
-      pendo.initialize({ visitor: visitor, account: account }); })('18d9cdc9-0b28-4f89-7c87-e4d3802e665f');
-</script>
+        let account = {
+            id:  '<%= ENV["CANVAS_DOMAIN"] %>'
+        }
+
+        pendo.initialize({ visitor: visitor, account: account }); })('18d9cdc9-0b28-4f89-7c87-e4d3802e665f');
+  </script>
+<% end %>
+
 <script type="text/javascript" async
  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
 </script>

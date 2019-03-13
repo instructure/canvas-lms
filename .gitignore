@@ -67,3 +67,8 @@ event.json
 .DS_store
 
 yarn-error.log
+
+/spec/support/example_failures.txt
+/spec_strongmind/support/example_failures.txt
+/.env.development
+/.env.test

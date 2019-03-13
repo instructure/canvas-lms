@@ -1,0 +1,3 @@
+--color
+--require rails_helper
+--format progress # to keep dots appear

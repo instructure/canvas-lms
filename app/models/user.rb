@@ -321,7 +321,7 @@ class User < ActiveRecord::Base
   before_save :record_acceptance_of_terms
   after_save :update_account_associations_if_necessary
   after_save :self_enroll_if_necessary
-  after_save -> { PipelineService.publish self }
+  after_commit -> { PipelineService.publish self }
 
   def courses_for_enrollments(enrollment_scope)
     Course.active.joins(:all_enrollments).merge(enrollment_scope.except(:joins)).distinct

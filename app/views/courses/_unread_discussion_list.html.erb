@@ -1,4 +1,4 @@
-<% unread_topics = @current_user.get_teacher_unread_discussion_topics(@context) %>
+<% unread_topics = @current_user ? @current_user.get_teacher_unread_discussion_topics(@context) : [] %>
 
 <% if unread_topics.any? %>
 <h2 class="todo-list-header" tabindex="-1">Unread Items</h2>

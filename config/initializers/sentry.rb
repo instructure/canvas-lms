@@ -34,6 +34,7 @@ if settings.present?
     config.release = Canvas.revision
     config.sanitize_fields += Rails.application.config.filter_parameters.map(&:to_s)
     config.sanitize_credit_cards = false
+    config.environments = %w[ production ]
     config.excluded_exceptions += %w{
       AuthenticationMethods::AccessTokenError
       AuthenticationMethods::LoggedOutError

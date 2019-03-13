@@ -19,6 +19,20 @@
 ENV['BUNDLE_GEMFILE'] ||= File.expand_path('../../Gemfile', __FILE__)
 
 require 'bundler/setup' if File.exist?(ENV['BUNDLE_GEMFILE'])
+
+# StrongMind Added
+require 'bootsnap'
+env = ENV['RAILS_ENV'] || "development"
+Bootsnap.setup(
+  cache_dir:            'tmp/cache',
+  development_mode:     env == 'development',
+  disable_trace:        false,
+  load_path_cache:      false,
+  autoload_paths_cache: false,
+  compile_cache_iseq:   true,
+  compile_cache_yaml:   true
+)
+
 require 'rails/commands/server'
 module Rails
   class Server

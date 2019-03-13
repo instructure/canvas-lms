@@ -197,7 +197,10 @@ class RequestThrottle
                  "#{starting_mem} #{ending_mem} #{ending_mem - starting_mem} #{@@last_sample}"
                end
 
-    Rails.logger.info "[STAT] #{mem_stat} #{user_cpu} #{system_cpu}"
+    # StrongMind Added
+    unless ENV['BYPASS_STATS_LOGGING'].present?
+      Rails.logger.info "[STAT] #{mem_stat} #{user_cpu} #{system_cpu}"
+    end
     @@last_sample = ending_mem
   end
 
@@ -297,7 +300,11 @@ class RequestThrottle
       end
 
       current_time = current_time.to_f
-      Rails.logger.debug("request throttling increment: #{([amount, reserve_cost, current_time] + self.as_json.to_a).to_json}")
+
+      # StrongMind Added
+      unless ENV['BYPASS_STATS_LOGGING'].present?
+        Rails.logger.debug("request throttling increment: #{([amount, reserve_cost, current_time] + self.as_json.to_a).to_json}")
+      end
       redis = self.redis
       count, last_touched = LeakyBucket.lua.run(:increment_bucket, [cache_key], [amount + reserve_cost, current_time, outflow, maximum], redis)
       self.count = count.to_f

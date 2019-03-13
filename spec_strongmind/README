@@ -1,0 +1,5 @@
+Run Canvas Spec(s)
+bin/rspec spec/selenium/add_people/add_people_spec.rb
+
+Run StrongMind Spec(s)
+STRONGMIND_SPEC=1 bundle exec rspec spec_strongmind/

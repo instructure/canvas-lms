@@ -109,7 +109,7 @@ class Assignment < ActiveRecord::Base
     true
   end
 
-  after_save -> { PipelineService.publish self }
+  after_commit -> { PipelineService.publish self }
 
   def positive_points_possible?
     return if self.points_possible.to_i >= 0
