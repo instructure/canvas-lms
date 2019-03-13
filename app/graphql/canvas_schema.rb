@@ -17,6 +17,8 @@
 #
 
 class CanvasSchema < GraphQL::Schema
+  use GraphQL::Execution::Interpreter
+
   query Types::QueryType
   mutation Types::MutationType
 

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2018 - present Instructure, Inc.
+# Copyright (C) 2019 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,10 +16,5 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Types
-  AssignmentInput = GraphQL::InputObjectType.define do
-    name "AssignmentInput"
-    argument :name, !types.String
-    argument :courseId, !types.ID
-  end
+class Types::BaseScalar < GraphQL::Schema::Scalar
 end

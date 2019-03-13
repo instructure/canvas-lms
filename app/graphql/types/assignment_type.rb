@@ -367,8 +367,8 @@ module Types
         workflow_state: filter[:states] || DEFAULT_SUBMISSION_STATES
       )
 
-      if filter[:sectionIds].present?
-        sections = course.course_sections.where(id: filter[:sectionIds])
+      if filter[:section_ids].present?
+        sections = course.course_sections.where(id: filter[:section_ids])
         student_ids = course.student_enrollments.where(course_section: sections).pluck(:user_id)
         submissions = submissions.where(user_id: student_ids)
       end
