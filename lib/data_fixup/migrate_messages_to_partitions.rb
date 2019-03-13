@@ -27,6 +27,14 @@ module DataFixup::MigrateMessagesToPartitions
 
     partman = CanvasPartman::PartitionManager.create(Message)
 
-    partman.migrate_data_to_partitions
+    unless partman.migrate_data_to_partitions(timeout: 5.minutes)
+      self.requeue # timed out
+    end
+  end
+
+  def self.requeue
+    self.send_later_if_production_enqueue_args(:run,
+      priority: Delayed::LOWER_PRIORITY,
+      strand: "partition_messages:#{Shard.current.database_server.id}")
   end
 end
