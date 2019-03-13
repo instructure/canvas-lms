@@ -224,18 +224,8 @@ module Lti
     end
 
     def sis_email
-      if @user&.pseudonym&.sis_user_id
-        if @user.communication_channels.loaded? && @user.pseudonyms.loaded?
-          sis_channel_ids = @user.pseudonyms.map { |p| p.sis_communication_channel_id if p.active? }.compact
-          return nil if sis_channel_ids.empty?
-          cc = @user.communication_channels.first { |c| c.active? && sis_channel_ids.include?(c.id) }
-          cc&.path
-        else
-          tablename = Pseudonym.quoted_table_name
-          query = "INNER JOIN #{tablename} ON communication_channels.id=pseudonyms.sis_communication_channel_id"
-          @user.communication_channels.joins(query).limit(1).pluck(:path).first
-        end
-      end
+      sis_ps = SisPseudonym.for(@user, @root_account, type: :trusted, require_sis: true)
+      sis_ps.sis_communication_channel&.path || sis_ps.communication_channels.order(:position).active.first&.path if sis_ps
     end
 
     def email
