@@ -110,7 +110,7 @@ module Csp::AccountHelper
 
 
   def csp_whitelisted_domains
-    reutrn [] unless csp_enabled?
+    return [] unless csp_enabled?
     # first, get the whitelist from the enabled csp account
     # then get the list of domains extracted from external tools
     (::Csp::Domain.get_cached_domains_for_account(self.csp_account_id) +
