@@ -109,9 +109,7 @@ module LtiAdvantage::Messages
           context: LtiAdvantage::Claims::Context.new
         )
         message.validate
-        expect(message.errors.messages[:context].first.messages).to eq(
-          {:id => ["can't be blank"]}
-        )
+        expect(message.errors.messages.keys).to include(:context)
       end
 
       it 'verifies that "resource_link" is an Platform' do

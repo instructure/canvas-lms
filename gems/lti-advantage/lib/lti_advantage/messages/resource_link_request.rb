@@ -3,17 +3,12 @@ module LtiAdvantage::Messages
   class ResourceLinkRequest < JwtMessage
     MESSAGE_TYPE = "LtiResourceLinkRequest"
 
-    # Required claims for this message type
-    REQUIRED_CLAIMS = superclass::REQUIRED_CLAIMS + %i[
-      resource_link
-    ].freeze
-
     # Claims to type check
     TYPED_ATTRIBUTES = superclass::TYPED_ATTRIBUTES.merge(
       resource_link: LtiAdvantage::Claims::ResourceLink
     )
 
-    attr_accessor *REQUIRED_CLAIMS
+    attr_accessor *(REQUIRED_CLAIMS + [:resource_link])
 
     validates_presence_of *REQUIRED_CLAIMS
     validates_with LtiAdvantage::TypeValidator
