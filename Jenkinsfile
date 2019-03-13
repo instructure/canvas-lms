@@ -120,7 +120,7 @@ pipeline {
 
     stage('Build Image') {
       steps {
-        timeout(time: 20) {
+        timeout(time: 36) { /* this timeout is `2 * average build time` which currently: 18m * 2 = 36m */
           sh 'docker build -t $IMAGE_TAG .'
         }
       }
