@@ -49,7 +49,7 @@ def fetchFromGerrit = { String repo, String path, String customRepoDestination =
     sh """
       mkdir -p ${path}/${customRepoDestination ?: repo}
       GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
-        git archive --remote=ssh://$GERRIT_URL/${repo} master ${sourcePath == null ? '' : sourcePath} | tar -x -C ${path}/${customRepoDestination ?: repo}
+        git archive --remote=ssh://$GERRIT_URL/${repo} master ${sourcePath == null ? '' : sourcePath} | tar -x -v -C ${path}/${customRepoDestination ?: repo}
     """
   })
 }
@@ -101,7 +101,9 @@ pipeline {
             })
             gems.each { gem -> fetchFromGerrit(gem, 'gems/plugins') }
             fetchFromGerrit('qti_migration_tool', 'vendor', 'QTIMigrationTool')
-            fetchFromGerrit('gerrit_builder', 'config', '', 'canvas-lms/config')
+            fetchFromGerrit('gerrit_builder', '.', '', 'canvas-lms/config')
+            sh 'mv gerrit_builder/canvas-lms/config/* config/'
+            sh 'rmdir -p gerrit_builder/canvas-lms/config'
           }
         }
       }
