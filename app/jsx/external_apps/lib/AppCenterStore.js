@@ -70,7 +70,7 @@ import 'compiled/jquery.rails_flash_notifications'
   };
 
   store.fetch13Tools = function() {
-    const url = `/api/v1${ENV.CONTEXT_BASE_URL}/lti_apps?lti_1_3_tool_configurations=true`;
+    const url = `/api/v1${ENV.CONTEXT_BASE_URL}/lti_apps?v1p3=true`;
     this.setState({ lti13LoadStatus: true });
     $.ajax({
       url,

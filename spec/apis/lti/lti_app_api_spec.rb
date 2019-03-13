@@ -252,7 +252,7 @@ module Lti
       end
 
       context 'lti 1.3 tools' do
-        let(:params) { super().merge lti_1_3_tool_configurations: true }
+        let(:params) { super().merge v1p3: true }
         let(:dev_key) { DeveloperKey.create! account: account }
         let(:tool_config) { dev_key.create_tool_configuration! settings: settings }
         let(:enable_binding) { dev_key.developer_key_account_bindings.first.update! workflow_state: DeveloperKeyAccountBinding::ON_STATE }
@@ -282,12 +282,12 @@ module Lti
           it { is_expected.to_not be_empty }
           it { is_expected.to have(1).items }
 
-          it 'is not enabled' do
-            expect(subject.first['enabled']).to be false
+          it 'is not installed_for_context' do
+            expect(subject.first['installed_for_context']).to be false
           end
 
-          it 'is not installed in a course' do
-            expect(subject.first['installed_in_current_course']).to eq false
+          it 'is not installed_at_context_level' do
+            expect(subject.first['installed_at_context_level']).to eq false
           end
 
           context 'when a tool is installed in a course' do
@@ -301,8 +301,16 @@ module Lti
               tool.save!
             end
 
-            it 'is installed in a course' do
-              expect(subject.first['installed_in_current_course']).to eq true
+            it 'is installed_at_context_level' do
+              expect(subject.first['installed_at_context_level']).to eq true
+            end
+
+            it 'is installed_for_context' do
+              expect(subject.first['installed_for_context']).to eq true
+            end
+
+            it 'has installed_tool_id' do
+              expect(subject.first['installed_tool_id']).not_to be_blank
             end
           end
 
@@ -317,18 +325,10 @@ module Lti
 
             it { is_expected.to_not be_empty }
             it { is_expected.to have(1).items }
-          end
 
-          context 'with an enabled tool' do
-            before do
-              tool = ContextExternalTool.first
-              tool.use_1_3 = true
-              tool.developer_key = dev_key
-              tool.save!
-            end
 
-            it 'is enabled' do
-              expect(subject.first['enabled']).to be true
+            it 'is not installed_for_context' do
+              expect(subject.first['installed_for_context']).to eq false
             end
           end
         end
