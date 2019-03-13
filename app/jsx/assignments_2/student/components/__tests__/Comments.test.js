@@ -208,4 +208,16 @@ describe('Comments', () => {
     expect(rows[2]).toHaveTextContent('last comment')
     expect(rows[2]).toHaveTextContent('Fri Mar 1, 2019 9:32pm')
   })
+
+  it('includes an icon on an attachment', async () => {
+    const comment = singleComment()
+    const attachment = singleAttachment()
+    comment.attachments = [attachment]
+
+    const {container, getByText} = render(<CommentsContainer comments={[comment]} />)
+
+    expect(
+      getByText(attachment.displayName, {selector: `a[href*='${attachment.url}']`})
+    ).toContainElement(container.querySelector("svg[name='IconPdf']"))
+  })
 })

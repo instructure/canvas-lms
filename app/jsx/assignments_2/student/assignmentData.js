@@ -110,6 +110,7 @@ export const SUBMISSION_COMMENT_QUERY = gql`
             attachments {
               _id
               displayName
+              mimeClass
               url
             }
           }
@@ -122,6 +123,7 @@ export const SUBMISSION_COMMENT_QUERY = gql`
 export const AttachmentShape = shape({
   _id: string,
   displayName: string,
+  mimeClass: string,
   url: string
 })
 

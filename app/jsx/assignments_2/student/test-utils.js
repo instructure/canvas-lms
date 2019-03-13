@@ -122,6 +122,7 @@ export function singleAttachment(overrides = {}) {
   return {
     _id: '20',
     displayName: 'lookatme.pdf',
+    mimeClass: 'pdf',
     url: 'https://some-awesome/url/goes/here',
     ...overrides
   }
