@@ -27,7 +27,12 @@ class UserMergeData < ActiveRecord::Base
     Time.zone.now - Setting.get('user_merge_to_split_time', '180').to_i.days
   end
 
-  def add_more_data(objects, user: nil, workflow_state: nil)
+  def add_more_data(objects, user: nil, workflow_state: nil, data: [])
+    data = build_more_data(objects, user: user, workflow_state: workflow_state, data: data)
+    bulk_insert_merge_data(data)
+  end
+
+  def build_more_data(objects, user: nil, workflow_state: nil, data: [])
     # to get relative ids in previous_user_id, we need to be on the records shard
     self.shard.activate do
       objects.each do |o|
@@ -36,8 +41,15 @@ class UserMergeData < ActiveRecord::Base
         r.previous_workflow_state = o.workflow_state if o.class.columns_hash.key?('workflow_state')
         r.previous_workflow_state = o.file_state if o.class == Attachment
         r.previous_workflow_state = workflow_state if workflow_state
-        r.save!
+        data << r
       end
+    end
+    data
+  end
+
+  def bulk_insert_merge_data(data)
+    self.shard.activate do
+      data.each_slice(1000) {|batch| UserMergeDataRecord.bulk_insert_objects(batch)}
     end
   end
 
