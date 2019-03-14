@@ -653,6 +653,14 @@ class ActiveRecord::Base
     true
   end
 
+  def self.bulk_insert_objects(objects, excluded_columns: ['primary_key'])
+    return if objects.empty?
+    hashed_objects = []
+    excluded_columns << objects.first.class.primary_key if excluded_columns.delete('primary_key')
+    objects.each {|object| hashed_objects << object.attributes.except(excluded_columns.join(','))}
+    objects.first.class.bulk_insert(hashed_objects)
+  end
+
   def self.bulk_insert(records)
     return if records.empty?
     transaction do
