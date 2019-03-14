@@ -105,6 +105,7 @@ class SplitUsers
           old_user = User.find(merge_data.from_user_id)
           old_user = restore_old_user(old_user, records)
           records = check_and_update_local_ids(old_user, records) if merge_data.from_user_id > Shard::IDS_PER_SHARD
+          records = records.preload(:context)
           move_records_to_old_user(user, old_user, records)
           # update account associations for each split out user
           users = [old_user, user]
