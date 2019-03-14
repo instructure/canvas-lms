@@ -162,9 +162,7 @@ module Gradezilla
 
     def self.edit_grade(new_grade)
       grade_input.click
-      set_value(grade_input, new_grade)
-      # focus outside the input to save
-      driver.action.send_keys(:tab).perform
+      replace_content(grade_input, new_grade, tab_out: true)
       wait_for_ajax_requests
     end
 
