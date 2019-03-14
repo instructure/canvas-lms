@@ -126,9 +126,7 @@ class UserMerge
           update_all(context_id: target_user.id, context_code: target_user.asset_string)
       end
 
-      unless Shard.current != target_user.shard
-        move_observees(target_user, user_merge_data)
-      end
+      move_observees(target_user, user_merge_data)
 
       Enrollment.send_later(:recompute_due_dates_and_scores, target_user.id)
       target_user.update_account_associations
