@@ -847,7 +847,8 @@ describe UserMerge do
       UserMerge.from(user1).into(@user2)
       run_jobs
 
-      expect(@user2.attachments.not_deleted.count).to eq 5
+      # 3 from user1, and 3 from @user2
+      expect(@user2.attachments.not_deleted.count).to eq 6
 
       new_user2_attachment1 = @user2.attachments.not_deleted.detect{|a| a.md5 == user1_attachment2.md5 && a.id != @user2_attachment2.id}
       expect(new_user2_attachment1.root_attachment).to eq @user2_attachment2

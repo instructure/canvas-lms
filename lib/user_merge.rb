@@ -32,6 +32,9 @@ class UserMerge
   def into(target_user)
     return unless target_user
     return if target_user == from_user
+    target_user.associate_with_shard(from_user.shard, :shadow)
+    # we also store records for the from_user on the target shard for a split
+    from_user.associate_with_shard(target_user.shard, :shadow)
     user_merge_data = target_user.shard.activate do
       UserMergeData.create!(user: target_user, from_user: from_user)
     end
@@ -250,9 +253,11 @@ class UserMerge
     user_merge_data.add_more_data(target_user.as_observer_observation_links.where(user_id: from_user), user: target_user, data: data)
     @data = []
     target_user.as_observer_observation_links.where(user_id: from_user).destroy_all
+    target_user.associate_with_shard(from_user.shard) if from_user.as_observer_observation_links.exists?
     from_user.as_observer_observation_links.update_all(observer_id: target_user.id)
     xor_observer_ids = UserObservationLink.where(student: [from_user, target_user]).distinct.pluck(:observer_id)
     from_user.as_student_observation_links.where(observer_id: target_user.as_student_observation_links.map(&:observer_id)).destroy_all
+    target_user.associate_with_shard(from_user.shard) if from_user.as_observer_observation_links.exists?
     from_user.as_student_observation_links.update_all(user_id: target_user.id)
     # for any observers not already watching both users, make sure they have
     # any missing observer enrollments added
@@ -377,6 +382,8 @@ class UserMerge
           remove_self_observers(target_user, user_merge_data)
           # move all the enrollments that have not been marked as deleted to the target user
           to_move = Enrollment.active.where(column => from_user)
+          # upgrade to strong association if there are any enrollments
+          target_user.associate_with_shard(from_user.shard) if to_move.exists?
           user_merge_data.build_more_data(to_move, data: data)
           to_move.update_all(column => target_user.id)
         end
