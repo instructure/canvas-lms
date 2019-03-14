@@ -54,17 +54,6 @@ def fetchFromGerrit = { String repo, String path, String customRepoDestination =
   })
 }
 
-def getImageTag() {
-  // if (env.GERRIT_EVENT_TYPE == 'patchset-created') {
-  //   GERRIT__REFSPEC will be in the form 'refs/changes/63/181863/8'
-  //   we want a name in the form '63.181863.8'
-  NAME = "${env.GERRIT_REFSPEC}".minus('refs/changes/').replaceAll('/','.')
-  return "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
-  // } else {
-  //   return "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$GERRIT_BRANCH"
-  // }
-}
-
 pipeline {
   agent { label 'docker' }
 
@@ -76,7 +65,12 @@ pipeline {
   environment {
     GERRIT_PORT = '29418'
     GERRIT_URL = "$GERRIT_HOST:$GERRIT_PORT"
-    IMAGE_TAG = getImageTag()
+
+    // GERRIT__REFSPEC will be in the form 'refs/changes/63/181863/8'
+    // we want a name in the form '63.181863.8'
+    NAME = "${env.GERRIT_REFSPEC}".minus('refs/changes/').replaceAll('/','.')
+    PATCHSET_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$NAME"
+    MERGE_TAG = "$DOCKER_REGISTRY_FQDN/jenkins/canvas-lms:$GERRIT_BRANCH"
   }
 
   stages {
@@ -94,7 +88,7 @@ pipeline {
           script {
             withGerritCredentials({ ->
               sh '''
-                gerrit_message="Gerrit Builder Started $JOB_BASE_NAME\nTag: $IMAGE_TAG\nBuild: $BUILD_URL"
+                gerrit_message="Gerrit Builder Started $JOB_BASE_NAME\nTag: $PATCHSET_TAG\nBuild: $BUILD_URL"
                 ssh -i "$SSH_KEY_PATH" -l "$SSH_USERNAME" -p $GERRIT_PORT \
                   hudson@$GERRIT_HOST gerrit review -m "'$gerrit_message'" $GERRIT_CHANGE_NUMBER,$GERRIT_PATCHSET_NUMBER
               '''
@@ -123,7 +117,7 @@ pipeline {
     stage('Build Image') {
       steps {
         timeout(time: 36) { /* this timeout is `2 * average build time` which currently: 18m * 2 = 36m */
-          sh 'docker build -t $IMAGE_TAG .'
+          sh 'docker build -t $PATCHSET_TAG .'
         }
       }
     }
@@ -131,7 +125,17 @@ pipeline {
     stage('Publish Image') {
       steps {
         timeout(time: 5) {
-          sh 'docker push $IMAGE_TAG'
+          script {
+            if (env.GERRIT_EVENT_TYPE == 'patchset-created') {
+              sh 'docker push $PATCHSET_TAG'
+            } else {
+              // change-merged
+              sh '''
+                docker tag $PATCHSET_TAG $MERGE_TAG
+                docker push $MERGE_TAG
+              '''
+            }
+          }
         }
       }
     }
@@ -142,7 +146,7 @@ pipeline {
       script {
         withGerritCredentials({ ->
           sh '''
-            gerrit_message="Gerrit Builder $JOB_BASE_NAME Successful.\nTag: $IMAGE_TAG\nBuild: $BUILD_URL"
+            gerrit_message="Gerrit Builder $JOB_BASE_NAME Successful.\nTag: $PATCHSET_TAG\nBuild: $BUILD_URL"
             ssh -i "$SSH_KEY_PATH" -l "$SSH_USERNAME" -p $GERRIT_PORT \
               hudson@$GERRIT_HOST gerrit review -m "'$gerrit_message'" $GERRIT_CHANGE_NUMBER,$GERRIT_PATCHSET_NUMBER
           '''
@@ -154,7 +158,7 @@ pipeline {
       script {
         withGerritCredentials({ ->
           sh '''
-            gerrit_message="Gerrit Builder $JOB_BASE_NAME Failed.\nTag: $IMAGE_TAG\nBuild: $BUILD_URL"
+            gerrit_message="Gerrit Builder $JOB_BASE_NAME Failed.\nTag: $PATCHSET_TAG\nBuild: $BUILD_URL"
             ssh -i "$SSH_KEY_PATH" -l "$SSH_USERNAME" -p $GERRIT_PORT \
               hudson@$GERRIT_HOST gerrit review -m "'$gerrit_message'" $GERRIT_CHANGE_NUMBER,$GERRIT_PATCHSET_NUMBER
           '''
