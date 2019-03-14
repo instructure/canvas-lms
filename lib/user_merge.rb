@@ -22,9 +22,11 @@ class UserMerge
   end
 
   attr_reader :from_user
+  attr_accessor :data
 
   def initialize(from_user)
     @from_user = from_user
+    @data = []
   end
 
   def into(target_user)
@@ -149,7 +151,7 @@ class UserMerge
         User.clone_communication_channel(cc, target_user, max_position)
         new_cc = target_user.communication_channels.where.not(id: known_ccs).take
         known_ccs << new_cc.id
-        user_merge_data.add_more_data([new_cc], user: target_user, workflow_state: 'non_existent')
+        user_merge_data.build_more_data([new_cc], user: target_user, workflow_state: 'non_existent', data: data)
       end
 
       next unless target_cc
@@ -173,21 +175,23 @@ class UserMerge
     else
       from_user.shard.activate do
         ccs = CommunicationChannel.where(id: to_retire_ids).where.not(workflow_state: 'retired')
-        user_merge_data.add_more_data(ccs) unless to_retire_ids.empty?
+        user_merge_data.build_more_data(ccs, data: data) unless to_retire_ids.empty?
         ccs.update_all(workflow_state: 'retired') unless to_retire_ids.empty?
       end
       scope = from_user.communication_channels.where.not(workflow_state: 'retired')
       scope = scope.where.not(id: to_retire_ids) unless to_retire_ids.empty?
       unless scope.empty?
-        user_merge_data.add_more_data(scope)
+        user_merge_data.build_more_data(scope, data: data)
         scope.update_all(["user_id=?, position=position+?", target_user, max_position])
       end
     end
+    user_merge_data.bulk_insert_merge_data(data)
+    @data = []
   end
 
   def handle_cross_shard_cc(target_user, user_merge_data)
     ccs = from_user.communication_channels.where.not(workflow_state: 'retired')
-    user_merge_data.add_more_data(ccs) unless ccs.empty?
+    user_merge_data.build_more_data(ccs, data: data) unless ccs.empty?
     ccs.update_all(workflow_state: 'retired') unless ccs.empty?
 
     from_user.user_services.each do |us|
@@ -195,9 +199,9 @@ class UserMerge
       new_us.shard = target_user.shard
       new_us.user = target_user
       new_us.save!
-      user_merge_data.add_more_data([new_us], user: target_user, workflow_state: 'non_existent')
+      user_merge_data.build_more_data([new_us], user: target_user, workflow_state: 'non_existent', data: data)
     end
-    user_merge_data.add_more_data(from_user.user_services)
+    user_merge_data.build_more_data(from_user.user_services, data: data)
     from_user.user_services.delete_all
   end
 
@@ -240,12 +244,13 @@ class UserMerge
   def move_observees(target_user, user_merge_data)
     # record all the records before destroying them
     # pass the from_user since user_id will be the observer
-    user_merge_data.add_more_data(from_user.as_observer_observation_links, user: from_user)
-    user_merge_data.add_more_data(from_user.as_student_observation_links)
+    user_merge_data.build_more_data(from_user.as_observer_observation_links, user: from_user, data: data)
+    user_merge_data.build_more_data(from_user.as_student_observation_links, data: data)
     # delete duplicate or invalid observers/observees, move the rest
     from_user.as_observer_observation_links.where(user_id: target_user.as_observer_observation_links.map(&:user_id)).destroy_all
     from_user.as_observer_observation_links.where(user_id: target_user).destroy_all
-    user_merge_data.add_more_data(target_user.as_observer_observation_links.where(user_id: from_user), user: target_user)
+    user_merge_data.add_more_data(target_user.as_observer_observation_links.where(user_id: from_user), user: target_user, data: data)
+    @data = []
     target_user.as_observer_observation_links.where(user_id: from_user).destroy_all
     from_user.as_observer_observation_links.update_all(observer_id: target_user.id)
     xor_observer_ids = UserObservationLink.where(student: [from_user, target_user]).distinct.pluck(:observer_id)
@@ -316,11 +321,8 @@ class UserMerge
                           END, updated_at DESC")).first
   end
 
-  def update_enrollment_state(scope, keeper, user_merge_data)
-    # record both records state sicne both will change
-    user_merge_data.add_more_data(scope)
+  def update_enrollment_state(scope, keeper)
     # update the record on the target user to the better state of the from users enrollment
-
     enrollment_ids = Enrollment.where(id: scope).where.not(id: keeper).pluck(:id)
     Enrollment.where(:id => enrollment_ids).update_all(workflow_state: keeper.workflow_state)
     EnrollmentState.force_recalculation(enrollment_ids)
@@ -344,12 +346,16 @@ class UserMerge
       to_update = scope.where.not(id: keeper).where(column => target_user)
       # if the target_users enrollment state will be updated pass the scope so
       # both target and from users records will be recorded in case of a split.
-      update_enrollment_state(scope, keeper, user_merge_data) if to_update.exists?
+      if to_update.exists?
+        # record both records state since both will change
+        user_merge_data.build_more_data(scope, data: data)
+        update_enrollment_state(scope, keeper)
+      end
 
       # identify if the from users records are worse states than target user
       to_delete = scope.active.where.not(id: keeper).where(column => from_user)
       # record the current state in case of split
-      user_merge_data.add_more_data(to_delete)
+      user_merge_data.build_more_data(to_delete, data: data)
       # mark all conflicts on from_user as deleted so they will not be moved later
       to_delete.destroy_all
     end
@@ -361,7 +367,7 @@ class UserMerge
                                                    (associated_user_id = :target_user AND user_id = :from_user OR
                                                    associated_user_id = :from_user AND user_id = :target_user)",
                                                   {target_user: target_user, from_user: from_user})
-    user_merge_data.add_more_data(to_delete)
+    user_merge_data.build_more_data(to_delete, data: data)
     to_delete.destroy_all
   end
 
@@ -371,14 +377,15 @@ class UserMerge
         Enrollment.transaction do
           handle_conflicts(column, target_user, user_merge_data)
           remove_self_observers(target_user, user_merge_data)
-
           # move all the enrollments that have not been marked as deleted to the target user
           to_move = Enrollment.active.where(column => from_user)
-          user_merge_data.add_more_data(to_move)
+          user_merge_data.build_more_data(to_move, data: data)
           to_move.update_all(column => target_user.id)
         end
       end
     end
+    user_merge_data.bulk_insert_merge_data(data)
+    @data = []
   end
 
   def handle_submissions(target_user, user_merge_data)
@@ -405,8 +412,8 @@ class UserMerge
           to_move_ids += scope.having_submission.select(unique_id).where.not(unique_id => already_scope.having_submission.select(unique_id), id: to_move_ids).pluck(:id)
           to_move = scope.where(id: to_move_ids).to_a
           move_back = already_scope.where(unique_id => to_move.map(&unique_id)).to_a
-          user_merge_data.add_more_data(to_move)
-          user_merge_data.add_more_data(move_back)
+          user_merge_data.build_more_data(to_move, data: data)
+          user_merge_data.build_more_data(move_back, data: data)
           swap_submission(model, move_back, table, target_user, to_move, to_move_ids, 'fk_rails_8d85741475')
         elsif model.name == "Quizzes::QuizSubmission"
           subscope = already_scope.to_a
@@ -415,14 +422,16 @@ class UserMerge
 
           to_move += scope.where("#{unique_id} NOT IN (?)", [subscope.map(&unique_id), move_back.map(&unique_id)].flatten).to_a
           move_back += already_scope.where(unique_id => to_move.map(&unique_id)).to_a
-          user_merge_data.add_more_data(to_move)
-          user_merge_data.add_more_data(move_back)
+          user_merge_data.build_more_data(to_move, data: data)
+          user_merge_data.build_more_data(move_back, data: data)
           swap_submission(model, move_back, table, target_user, to_move, to_move, 'fk_rails_04850db4b4')
         end
       rescue => e
         Rails.logger.error "migrating #{table} column user_id failed: #{e}"
       end
     end
+    user_merge_data.bulk_insert_merge_data(data)
+    @data = []
   end
 
   def swap_submission(model, move_back, table, target_user, to_move, to_move_ids, fk)
