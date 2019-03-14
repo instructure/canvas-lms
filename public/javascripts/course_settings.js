@@ -340,6 +340,28 @@ import 'jqueryui/tabs'
       var $moreOptions = $(".course_form_more_options");
       var optionText = $moreOptions.is(':visible') ? I18n.t('links.more_options', 'more options') : I18n.t('links.fewer_options', 'fewer options');
       $(this).text(optionText);
+      const csp = document.getElementById('csp_options')
+      if (csp)  {
+        Promise.all([
+          import('axios'),
+          import('react-dom'),
+          import('react'),
+          import('jsx/course_settings/components/CSPSelectionBox')
+        ])
+        .then(([axios, ReactDOM, React, CSPSelectionBox]) => {
+          ReactDOM.render(
+            <CSPSelectionBox
+              courseId={ENV.COURSE_ID}
+              canManage={ENV.PERMISSIONS.manage_account_settings}
+              apiLibrary={axios}
+            />, csp
+          )
+        }).catch(()=> {
+          // We shouldn't get here, but if we do... do something.
+          const $message = $('<div />').text(I18n.t('Setting failed to load, try refreshing.'))
+          $(csp).append($message)
+        })
+      }
       $moreOptions.slideToggle();
     });
    $enrollment_dialog.find(".cancel_button").click(function() {

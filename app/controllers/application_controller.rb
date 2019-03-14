@@ -1971,7 +1971,7 @@ class ApplicationController < ActionController::Base
   end
 
   def json_cast(obj)
-    obj = obj.as_json if obj.respond_to?(:as_json) unless obj.is_a?(Hash) || obj.is_a?(Array)
+    obj = obj.as_json if obj.respond_to?(:as_json)
     stringify_json_ids? ? StringifyIds.recursively_stringify_ids(obj) : obj
   end
 
@@ -1980,8 +1980,7 @@ class ApplicationController < ActionController::Base
     if options.is_a?(Hash) && options.key?(:json)
       json = options.delete(:json)
       unless json.is_a?(String)
-        json_cast(json)
-        json = ActiveSupport::JSON.encode(json)
+        json = ActiveSupport::JSON.encode(json_cast(json))
       end
 
       # prepend our CSRF protection to the JSON response, unless this is an API

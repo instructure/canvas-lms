@@ -33,8 +33,11 @@ module CanvasPartman
         ensure_partitions(advance_partitions)
       end
 
-      def migrate_data_to_partitions(batch_size: 1000)
+      def migrate_data_to_partitions(batch_size: 1000, timeout: nil)
+        start_time = Time.now
         loop do
+          return false if timeout && (start_time + timeout) < Time.now
+
           id_dates = base_class.from("ONLY #{base_class.quoted_table_name}").
             order(base_class.partitioning_field).
             limit(batch_size).
@@ -51,6 +54,7 @@ module CanvasPartman
             SQL
           end
         end
+        true
       end
 
       def ensure_partitions(advance = 1)

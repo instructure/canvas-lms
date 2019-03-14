@@ -151,7 +151,6 @@ END
       applies_to: 'Course',
       state: 'allowed',
       root_opt_in: true,
-      beta: true
     },
     'high_contrast' =>
     {
@@ -174,7 +173,6 @@ Rich Content Editor, which always underlines links for all users.
 END
       applies_to: 'User',
       state: 'allowed',
-      beta: true
     },
     'new_user_tutorial_on_off' =>
     {
@@ -229,7 +227,6 @@ END
       applies_to: 'Course',
       state: 'hidden',
       root_opt_in: true,
-      beta: true
     },
     'anonymous_instructor_annotations' =>
     {
@@ -360,7 +357,6 @@ END
       applies_to: 'Course',
       state: 'hidden',
       root_opt_in: true,
-      beta: true
     },
     'duplicate_modules' =>
     {
@@ -397,7 +393,6 @@ Show a searchable list of courses in this root account with the "Include this co
 END
       applies_to: 'RootAccount',
       state: 'allowed',
-      beta: true,
       root_opt_in: true
     },
     'gradebook_list_students_by_sortable_name' =>
@@ -412,7 +407,7 @@ END
     'usage_rights_required' =>
     {
       display_name: -> { I18n.t('Require Usage Rights for Uploaded Files') },
-      description: -> { I18n.t('If enabled, content designers must provide copyright and license information for files before they are published. Only applies if Better File Browsing is also enabled.') },
+      description: -> { I18n.t('If enabled, copyright and license information must be provided for files before they are published.') },
       applies_to: 'Course',
       state: 'hidden',
       root_opt_in: true
@@ -483,7 +478,6 @@ END
       description: -> { I18n.t('Allow the ability to send notifications through our dispatch queue') },
       applies_to: 'RootAccount',
       state: 'hidden',
-      beta: true,
       development: false,
       root_opt_in: false
     },
@@ -493,7 +487,6 @@ END
       description: -> { I18n.t('Uses the new scheduler and its functionality') },
       applies_to: 'RootAccount',
       state: 'hidden',
-      beta: true,
       development: false,
       root_opt_in: false
     },
@@ -504,7 +497,6 @@ END
       applies_to: 'Course',
       state: 'allowed',
       root_opt_in: true,
-      beta: true
     },
     'responsive_layout' =>
     {
@@ -589,7 +581,6 @@ END
       description: -> { I18n.t('Configure individual learning paths for students based on assessment results.') },
       applies_to: 'Course',
       state: 'allowed',
-      beta: true,
       development: false,
       root_opt_in: true,
       after_state_change_proc:  ->(user, context, _old_state, new_state) {

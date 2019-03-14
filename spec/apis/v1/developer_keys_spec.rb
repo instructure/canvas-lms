@@ -56,6 +56,16 @@ describe DeveloperKeysController, type: :request do
       confirm_valid_key_in_json(json, key)
     end
 
+    it 'should stringify the nested stuff' do
+      admin_session
+      key = DeveloperKey.create!
+      json = api_call(:get, "/api/v1/accounts/#{sa_id}/developer_keys.json", {
+        controller: 'developer_keys', action: 'index', format: 'json', account_id: sa_id.to_s
+      }, {}, { 'Accept' => 'application/json+canvas-string-ids' })
+      row = json.detect{|r| r["id"] == key.global_id.to_s}
+      expect(row["developer_key_account_binding"]["developer_key_id"]).to eq key.global_id.to_s
+    end
+
     it 'should only include a subset of attributes if inherited is set' do
       a = Account.create!
       allow_any_instance_of(DeveloperKeysController).to receive(:context_is_domain_root_account?).and_return(true)

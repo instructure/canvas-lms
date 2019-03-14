@@ -1022,7 +1022,7 @@ ko:
             text: "과목 ID"
           parameters: 
             note1: "해당 학기의 모든 과목에 대해 보고서를 생성하려면 과목 ID가 공란일 수 없습니다."
-            note2: " "
+            note2: "음소거 된 과제가 있는 코스는 이 보고서의 점수를 정확하게 반영하지 않을 수 있습니다."
     terms_parameters: 
       account_reports: 
         default: 
@@ -4278,7 +4278,13 @@ ko:
       - 12월
     datepicker: 
       column_headings: 
-        - ""
+        - 일
+        - 월
+        - 화
+        - 수
+        - 목
+        - 금
+        - 토
     day_names: 
       - 일요일
       - 월요일
@@ -4295,12 +4301,17 @@ ko:
     formats: 
       date_at_time: "%b %-d at %l:%M%P"
       default: "%Y-%m-%d"
+      full: "%b %-d, %Y %-l:%M%P"
+      full_with_weekday: "%a %b %-d, %Y %-l:%M%P"
+      long: "%B %-d, %Y"
+      long_with_weekday: "%A, %B %-d"
       medium: "%b %-d, %Y"
       medium_month: "%b %Y"
       medium_with_weekday: "%a %b %-d, %Y"
       short: "%b %-d"
       short_month: "%b"
       short_weekday: "%a"
+      short_with_weekday: "%a, %b %-d"
       weekday: "%A"
     month_names: 
       - ~
@@ -5107,7 +5118,7 @@ ko:
     messages: 
       accepted: "동의해야 함"
       blank: "값이 있어야 함"
-      confirmation: "확인과 일치하지 않음"
+      confirmation: "미일치 %{attribute}"
       empty: "값이 있어야 함"
       equal_to: "%{count}와(과) 같아야 함"
       even: "짝수여야 함"
@@ -5118,13 +5129,26 @@ ko:
       invalid: "올바르지 않음"
       less_than: "%{count}보다 작아야 함"
       less_than_or_equal_to: "%{count}보다 작거나 같아야 함"
+      model_invalid: "검증 실패: %{errors}"
       not_a_number: "숫자가 아님"
+      not_an_integer: "정수여야 함"
       odd: "홀수여야 함"
-      too_long: "너무 긺 (최대 %{count} 글자)"
-      too_short: "너무 짧음 (최소 %{count} 글자)"
-      wrong_length: "길이가 잘못됨 (%{count} 글자여야 함)"
+      other_than: "%{count} 이외의 값이여야 함"
+      present: "반드시 공란"
+      required: 존재해야함
+      taken: "이미 잡힘"
+      too_long: 
+        one: "너무 길다 (최대 %{count} 글자)"
+        other: "너무 길다 (최대 %{count} 글자)"
+      too_short: 
+        one: "너무 짧음 (최소 %{count} 글자)"
+        other: "너무 짧음 (최소 %{count} 글자)"
+      wrong_length: 
+        one: "길이가 잘못됨 (%{count} 글자여야 함)"
+        other: "길이가 잘못됨 (%{count} 글자여야 함)"
     no_attached_file: "이 과제에 하나 이상의 파일을 첨부해야 함"
-    notices: ~
+    notices: 
+      error_reported: "당신이 도움을 주셔서 감사합니다! 우리는 이 일을 바로 잡을 것입니다."
     registration_incomplete: "이 페이지를 보기 전에 이메일 주소를 확인해야 함"
     required: "필수 사항"
     sis_id_in_use: "SIS ID \"%{sis_id}\"이(가) 이미 사용 중임"
@@ -8676,6 +8700,12 @@ ko:
     human: 
       decimal_units: 
         format: "%n %u"
+        units: 
+          billion: 십억
+          million: 백만
+          quadrillion: 사치
+          thousand: 천
+          trillion: 일조
       format: 
         precision: 3
         significant: true
@@ -8686,10 +8716,15 @@ ko:
           byte: 
             one: 바이트
             other: 바이트
+          eb: EB
           gb: GB
           kb: KB
           mb: MB
+          pb: PB
           tb: TB
+    percentage: 
+      format: 
+        format: "%n%"
   oauth2_provider: 
     auth: 
       oauth2_complete: "응용 프로그램이 로그인 워크플로를 마쳤으며 곧 다시 활성화됩니다."
@@ -11921,14 +11956,19 @@ ko:
       two_words_connector: " 와(과) "
       words_connector: ", "
     help_menu: 
+      cisco_netacad_facebook: "지원 커뮤니티"
+      cisco_netacad_facebook_description: "커뮤니티 지원에 대해서는 Networking Academy Facebook 페이지를 방문하거나 강사에게 문의하십시오."
       community_support_description: "동료와 교류하고 도움을 받을 수 있습니다."
       community_support_forums: "커뮤니티 사용자 지원 포럼"
       contact_support: "지원팀에 문의"
       contact_support_sub_text: "시간이 중요한 이슈에 대해 지원을 받습니다."
       curriculum_assessment_errata: "교과 과정/평가 정오표"
       curriculum_assessment_errata_description: "이미 보고된 평가와 교과 과정 오류를 봅니다. \"정오표\"를 검색하십시오."
+      global_support_desk: "NetAcad 지원"
+      global_support_desk_description: "우리의 ASC는 귀하의 첫 번째 지원 라인이며, 귀하를 글로벌 지원 데스크와 연결하여 추가 지원이 필요한 문제를 해결할 수 있습니다."
       networking_academy_description: "대부분의 자주 묻는 질문에 대해서는 Cisco의 답변을 보십시오."
       networking_academy_faqs: "Networking Academy FAQ"
+      support_desk_livechat: "지원 데스크 라이브 채팅"
   syllabus: "과목 요강"
   table_headings: 
     name: 이름
@@ -12680,6 +12720,9 @@ ko:
     invalid_editing_roles: "제공된 편집 역할이 올바르지 않음"
   will_keep_the_highest_of_all_your_scores_6ae5bbd1: "가장 높은 점수를 보관"
   will_keep_the_latest_of_all_your_scores_431d23f9: "가장 마지막 점수를 보관"
+  will_paginate: 
+    next_label: "다음 &#8594;"
+    previous_label: "&#8592; 이전"
   wimba_conference: 
     external_urls: 
       archive: 저장소

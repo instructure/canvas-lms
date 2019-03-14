@@ -18,7 +18,6 @@
 
 # @API Moderated Grading
 # @subtopic Provisional Grades
-# @beta
 #
 # API for manipulating provisional grades
 #
