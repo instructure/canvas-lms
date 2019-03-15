@@ -29,11 +29,7 @@ namespace :strongmind do
   end
 
   desc "Re-enqueue orphaned jobs after deploy on ECS"
-<<<<<<< HEAD
-  task :enqueue_jobs_ecs => :environment do
-=======
   task :enqueue_jobs_ecs => :environment do |task, args|
->>>>>>> orphans
     Delayed::Job.where.not(locked_by: nil, locked_at: nil).update(run_at: Time.now, locked_by: nil, locked_at: nil)
   end
 
