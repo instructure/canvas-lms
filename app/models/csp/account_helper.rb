@@ -21,6 +21,12 @@ module Csp::AccountHelper
 
     # the setting (and id of the account to search) that will be passed down to sub-accounts e.g. ([true, 2])
     account_class.add_setting :csp_inherited_data, :inheritable => true
+
+    account_class.after_save :unload_csp_data
+  end
+
+  def unload_csp_data
+    @csp_loaded = false
   end
 
   def load_csp_data
