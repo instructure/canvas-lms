@@ -254,6 +254,7 @@ describe "groups" do
       it_behaves_like 'pages_page', :teacher
 
       it "should allow teachers to create a page", :xbrowser, priority: "1", test_id: 289993 do
+        skip_if_firefox('known issue with firefox https://bugzilla.mozilla.org/show_bug.cgi?id=1335085')
         get pages_page
         manually_create_wiki_page('stuff','it happens')
       end

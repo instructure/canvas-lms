@@ -57,6 +57,7 @@ describe "course syllabus" do
     end
 
     it "should edit the description", :xbrowser, priority:"1", test_id: 237017 do
+      skip_if_firefox('known issue with firefox https://bugzilla.mozilla.org/show_bug.cgi?id=1335085')
       new_description = "new syllabus description"
       f('.edit_syllabus_link').click
       # check that the wiki sidebar is visible

@@ -333,6 +333,7 @@ describe "groups" do
       it_behaves_like 'pages_page', :student
 
       it "should allow group members to create a page", :xbrowser, priority: "1", test_id: 273611 do
+        skip_if_firefox('known issue with firefox https://bugzilla.mozilla.org/show_bug.cgi?id=1335085')
         get pages_page
         manually_create_wiki_page('yo','this be a page')
       end

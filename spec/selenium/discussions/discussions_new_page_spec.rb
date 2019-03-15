@@ -183,6 +183,7 @@ describe "discussions" do
       end
 
       it "should allow a student to create a discussion", :xbrowser, priority: "1", test_id: 150471 do
+        skip_if_firefox('known issue with firefox https://bugzilla.mozilla.org/show_bug.cgi?id=1335085')
         get url
         wait_for_tiny(f('textarea[name=message]'))
         replace_content(f('input[name=title]'), "Student Discussion")
