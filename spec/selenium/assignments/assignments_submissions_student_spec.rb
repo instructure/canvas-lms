@@ -42,6 +42,7 @@ describe "submissions" do
     end
 
     it "should let a student submit a text entry", :xbrowser, priority: "1", test_id: 56015 do
+      skip_if_firefox('known issue with firefox https://bugzilla.mozilla.org/show_bug.cgi?id=1335085')
       @assignment.update_attributes(submission_types: "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
