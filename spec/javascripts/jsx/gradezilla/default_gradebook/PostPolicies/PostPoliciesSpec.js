@@ -110,6 +110,7 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       const assignment = {
         anonymize_students: false,
         course_id: '1201',
+        grades_published: true,
         html_url: 'http://localhost/assignments/2301',
         id: '2301',
         invalid: false,
@@ -141,6 +142,12 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       postPolicies.showHideAssignmentGradesTray({assignmentId: '2301'})
       const [{assignment}] = postPolicies._hideAssignmentGradesTray.show.lastCall.args
       strictEqual(assignment.name, 'Math 1.1')
+    })
+
+    test('includes the assignment grades_published', () => {
+      postPolicies.showHideAssignmentGradesTray({assignmentId: '2301'})
+      const [{assignment}] = postPolicies._hideAssignmentGradesTray.show.lastCall.args
+      strictEqual(assignment.gradesPublished, true)
     })
 
     test('includes the `onExited` callback when showing the "Hide Assignment Grades" tray', () => {
