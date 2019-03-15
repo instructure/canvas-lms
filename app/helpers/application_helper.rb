@@ -1010,6 +1010,13 @@ module ApplicationHelper
       @current_user.has_student_enrollment?)
   end
 
+  def will_paginate(collection, options = {})
+    unless options[:renderer]
+      options = options.merge :renderer => WillPaginateHelper::AccessibleLinkRenderer
+    end
+    super
+  end
+
   def generate_access_verifier(return_url: nil)
     Users::AccessVerifier.generate(
       user: @current_user,
