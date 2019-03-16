@@ -98,16 +98,9 @@ class Notification < ActiveRecord::Base
   # options - a hash of extra options to merge with the options used to build the Message
   #
   def create_message(asset, to_list, options={})
-    messages = [] if Rails.env.test?
-
     preload_asset_roles_if_needed(asset)
 
-    to_list.each do |to|
-      msgs = NotificationMessageCreator.new(self, asset, options.merge(:to_list => to)).create_message
-      messages.concat msgs if Rails.env.test?
-      to.send(:clear_association_cache) if to.is_a?(User)
-    end
-    messages
+    NotificationMessageCreator.new(self, asset, options.merge(:to_list => to_list)).create_message
   end
 
   TYPES_TO_PRELOAD_CONTEXT_ROLES = ["Assignment Created", "Assignment Due Date Changed"].freeze
