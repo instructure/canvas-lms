@@ -18,7 +18,14 @@
 import React from 'react'
 import Comments from '../Comments'
 import CommentsContainer from '../Comments/CommentsContainer'
-import {mockAssignment, mockComments, singleAttachment, singleComment} from '../../test-utils'
+import {
+  commentGraphqlMock,
+  mockAssignment,
+  mockComments,
+  singleAttachment,
+  singleComment,
+  singleMediaObject
+} from '../../test-utils'
 import {MockedProvider} from 'react-apollo/test-utils'
 import {SUBMISSION_COMMENT_QUERY} from '../../assignmentData'
 import {render, waitForElement} from 'react-testing-library'
@@ -116,6 +123,47 @@ describe('Comments', () => {
     ).toBeInTheDocument()
   })
 
+  it('renders a media Comment', async () => {
+    const mediaComments = mockComments()
+    mediaComments.commentsConnection.nodes[0].mediaObject = singleMediaObject()
+    const mediaCommentMocks = commentGraphqlMock(SUBMISSION_COMMENT_QUERY, mediaComments)
+
+    const {getByTitle} = render(
+      <MockedProvider mocks={mediaCommentMocks} addTypename>
+        <Comments assignment={mockAssignment()} />
+      </MockedProvider>
+    )
+
+    expect(
+      await waitForElement(() =>
+        getByTitle(mediaComments.commentsConnection.nodes[0].mediaObject.title)
+      )
+    ).toBeInTheDocument()
+  })
+
+  it('renders an audio only media Comment', async () => {
+    const mediaComment = singleMediaObject({
+      title: 'audio only media comment',
+      mediaType: 'audio/mp4',
+      mediaSources: {
+        __typename: 'MediaSource',
+        type: 'audio/mp4',
+        src: 'http://some-awesome-url/goes/here'
+      }
+    })
+    const audioOnlyComments = mockComments()
+    audioOnlyComments.commentsConnection.nodes[0].mediaObject = mediaComment
+    const audioOnlyMocks = commentGraphqlMock(SUBMISSION_COMMENT_QUERY, audioOnlyComments)
+
+    const {getByTitle} = render(
+      <MockedProvider mocks={audioOnlyMocks} addTypename>
+        <Comments assignment={mockAssignment()} />
+      </MockedProvider>
+    )
+
+    expect(await waitForElement(() => getByTitle(mediaComment.title))).toBeInTheDocument()
+  })
+
   it('renders place holder text when no comments', async () => {
     const {getByText} = render(<CommentsContainer comments={[]} />)
 
@@ -163,7 +211,7 @@ describe('Comments', () => {
     const comment = singleComment()
     const attachment1 = singleAttachment()
     const attachment2 = singleAttachment({
-      _id: 30,
+      _id: '30',
       displayName: 'attachment2',
       url: 'https://second-attachment/url.com'
     })
@@ -190,8 +238,9 @@ describe('Comments', () => {
       ['2019-03-01T14:32:37-07:00', 'last comment'],
       ['2019-03-03T14:32:37-07:00', 'first comment'],
       ['2019-03-02T14:32:37-07:00', 'middle comment']
-    ].map(comment =>
+    ].map((comment, index) =>
       singleComment({
+        _id: index.toString(),
         updatedAt: comment[0],
         comment: comment[1]
       })

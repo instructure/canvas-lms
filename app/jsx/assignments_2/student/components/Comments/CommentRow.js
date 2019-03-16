@@ -17,6 +17,7 @@
  */
 import I18n from 'i18n!assignments_2'
 import React from 'react'
+import ReactPlayer from 'react-player'
 import {CommentShape} from '../../assignmentData'
 import Avatar from '@instructure/ui-elements/lib/components/Avatar'
 import Link from '@instructure/ui-elements/lib/components/Link'
@@ -26,6 +27,7 @@ import {getIconByType} from '../../../../shared/helpers/mimeClassIconHelper'
 
 function CommentRow(props) {
   const author = props.comment.author
+  const mediaObject = props.comment.mediaObject
   return (
     <div className="comment-row-container" data-testid="comment-row">
       <div className="comment-avatar-container">
@@ -54,6 +56,14 @@ function CommentRow(props) {
             {attachment.displayName}
           </Link>
         ))}
+        {mediaObject && (
+          <ReactPlayer
+            height={mediaObject.mediaType !== 'audio' ? '360px' : '70px'}
+            url={mediaObject.mediaSources}
+            config={{file: {attributes: {title: mediaObject.title}}}}
+            controls
+          />
+        )}
       </div>
     </div>
   )

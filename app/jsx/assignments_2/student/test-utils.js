@@ -91,6 +91,7 @@ export function mockComments(overrides = {}) {
           _id: '1',
           attachments: [],
           comment: 'comment comment',
+          mediaObject: null,
           updatedAt: '2019-03-05T23:09:36-07:00',
           author: {
             __typename: 'Author',
@@ -99,6 +100,21 @@ export function mockComments(overrides = {}) {
           }
         }
       ]
+    },
+    ...overrides
+  }
+}
+
+export function singleMediaObject(overrides = {}) {
+  return {
+    __typename: 'MediaObject',
+    id: '9',
+    title: 'video media comment',
+    mediaType: 'video/mp4',
+    mediaSources: {
+      __typename: 'MediaSource',
+      src: 'www.blah.com',
+      type: 'video/mp4'
     },
     ...overrides
   }
@@ -127,4 +143,22 @@ export function singleAttachment(overrides = {}) {
     url: 'https://some-awesome/url/goes/here',
     ...overrides
   }
+}
+
+export function commentGraphqlMock(query, comments) {
+  return [
+    {
+      request: {
+        query,
+        variables: {
+          submissionId: mockAssignment().submissionsConnection.nodes[0].id.toString()
+        }
+      },
+      result: {
+        data: {
+          submissionComments: comments
+        }
+      }
+    }
+  ]
 }

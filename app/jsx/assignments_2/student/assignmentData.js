@@ -105,6 +105,15 @@ export const SUBMISSION_COMMENT_QUERY = gql`
             _id
             comment
             updatedAt
+            mediaObject {
+              id
+              title
+              mediaType
+              mediaSources {
+                src: url
+                type: contentType
+              }
+            }
             author {
               avatarUrl
               shortName
@@ -133,11 +142,22 @@ export const CommentShape = shape({
   _id: string,
   attachments: arrayOf(AttachmentShape),
   comment: string,
+  mediaObject: MediaObjectShape,
   author: shape({
     avatarUrl: string,
     shortName: string
   }),
   updatedAt: string
+})
+
+export const MediaObjectShape = shape({
+  id: string,
+  title: string,
+  mediaType: string,
+  mediaSources: shape({
+    src: string,
+    type: string
+  })
 })
 
 export const StudentAssignmentShape = shape({
