@@ -95,6 +95,7 @@ export function setFixtureHtml($fixture) {
         <div data-component="GradebookSettingsModal"></div>
         <div id="hide-assignment-grades-tray"></div>
         <div id="post-assignment-grades-tray"></div>
+        <div id="assignment-posting-policy-tray"></div>
         <div data-component="StatusesModal"></div>
         <div data-component="AnonymousSpeedGraderAlert"></div>
         <div id="StudentTray__Container"></div>

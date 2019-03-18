@@ -406,6 +406,38 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       })
     })
 
+    QUnit.module('"Grade Posting Policy" action', hooks => {
+      let onSelectCallback
+
+      hooks.beforeEach(() => {
+        gradebookOptions.post_policies_enabled = true
+        onSelectCallback = sinon.spy()
+        buildGradebook()
+        render()
+
+        sinon.stub(gradebook.postPolicies, 'showAssignmentPostingPolicyTray')
+      })
+
+      test('includes a callback to show the "Grade Posting Policy" tray', () => {
+        component.props.showGradePostingPolicyAction.onSelect(onSelectCallback)
+        strictEqual(gradebook.postPolicies.showAssignmentPostingPolicyTray.callCount, 1)
+      })
+
+      test('includes the assignment id when showing the "Grade Posting Policy" tray', () => {
+        component.props.showGradePostingPolicyAction.onSelect(onSelectCallback)
+        const [
+          {assignmentId}
+        ] = gradebook.postPolicies.showAssignmentPostingPolicyTray.lastCall.args
+        strictEqual(assignmentId, '2301')
+      })
+
+      test('includes the `onSelect` callback when showing the "Grade Posting Policy" tray', () => {
+        component.props.showGradePostingPolicyAction.onSelect(onSelectCallback)
+        const [{onExited}] = gradebook.postPolicies.showAssignmentPostingPolicyTray.lastCall.args
+        strictEqual(onExited, onSelectCallback)
+      })
+    })
+
     test('student submissions for the assignment include "excused"', () => {
       buildGradebook()
       submission.excused = true

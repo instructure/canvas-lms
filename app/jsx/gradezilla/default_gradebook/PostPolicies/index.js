@@ -19,6 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
+import AssignmentPostingPolicyTray from '../../../grading/AssignmentPostingPolicyTray'
 import HideAssignmentGradesTray from '../../../grading/HideAssignmentGradesTray'
 import PostAssignmentGradesTray from '../../../grading/PostAssignmentGradesTray'
 
@@ -41,11 +42,30 @@ export default class PostPolicies {
       this._postAssignmentGradesTray = ref
     }
     ReactDOM.render(<PostAssignmentGradesTray ref={bindPostTray} />, $postContainer)
+
+    const $assignmentPolicyContainer = document.getElementById('assignment-posting-policy-tray')
+    const bindAssignmentPolicyTray = ref => {
+      this._assignmentPolicyTray = ref
+    }
+    ReactDOM.render(
+      <AssignmentPostingPolicyTray ref={bindAssignmentPolicyTray} />,
+      $assignmentPolicyContainer
+    )
   }
 
   destroy() {
+    ReactDOM.unmountComponentAtNode(document.getElementById('assignment-posting-policy-tray'))
     ReactDOM.unmountComponentAtNode(document.getElementById('hide-assignment-grades-tray'))
     ReactDOM.unmountComponentAtNode(document.getElementById('post-assignment-grades-tray'))
+  }
+
+  showAssignmentPostingPolicyTray({assignmentId, onExited}) {
+    const {id, name, postManually} = this._gradebook.getAssignment(assignmentId)
+
+    this._assignmentPolicyTray.show({
+      assignment: {id, name, postManually},
+      onExited
+    })
   }
 
   showHideAssignmentGradesTray({assignmentId, onExited}) {
