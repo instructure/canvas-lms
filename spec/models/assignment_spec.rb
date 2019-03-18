@@ -5775,16 +5775,17 @@ describe Assignment do
       @assignment.update!(anonymous_grading: true)
 
       s1 = @students.first
-      sub = submit_homework(s1)
+      att = submit_homework(s1)
+      sub = @assignment.submissions.where(:user_id => s1).first
 
       zip = zip_submissions
       filename = Zip::File.new(zip.open).entries.map(&:name).first
-      expect(filename).to eq "#{s1.id}_#{sub.id}_homework.pdf"
+      expect(filename).to eq "anon_#{sub.anonymous_id}_#{att.id}_homework.pdf"
 
       comments, ignored = @assignment.generate_comments_from_files(
         zip.open.path,
         @teacher)
-
+      
       expect(comments.map { |g| g.map { |c| c.submission.user } }).to eq [[s1]]
       expect(ignored).to be_empty
     end
