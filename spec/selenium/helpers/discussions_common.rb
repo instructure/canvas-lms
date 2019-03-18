@@ -166,7 +166,7 @@ module DiscussionsCommon
     yield if block_given?
     expect_new_page_load { submit_form('.form-actions') }
     wait_for_ajaximations
-    expect(f('.zip')).to include_text(filename)
+    expect(fxpath('//a[contains(text(), ".zip")]')).to include_text(filename)
   end
 
   def edit(title, message)

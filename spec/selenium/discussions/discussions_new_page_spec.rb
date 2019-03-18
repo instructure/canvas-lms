@@ -49,6 +49,7 @@ describe "discussions" do
       end
 
       it "should add an attachment to a new topic", :xbrowser, priority: "1", test_id: 150466 do
+        skip_if_firefox('known issue with firefox https://bugzilla.mozilla.org/show_bug.cgi?id=1335085')
         topic_title = 'new topic with file'
         get url
         wait_for_tiny(f('textarea[name=message]'))
