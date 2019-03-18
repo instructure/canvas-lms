@@ -88,7 +88,7 @@ module Lti
       lookups.each do |l|
         subscription_helper.send_later_enqueue_args(
           :destroy_subscription,
-          { strand: AssignmentConfigurationToolLookup::SUBSCRIPTION_MANAGEMENT_STRAND },
+          { n_strand: AssignmentConfigurationToolLookup::SUBSCRIPTION_MANAGEMENT_STRAND },
           l.subscription_id
         )
       end
