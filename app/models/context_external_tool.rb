@@ -82,7 +82,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def deployment_id
-    "#{self.id}:#{Lti::Asset.opaque_identifier_for(self.context)}"
+    "#{self.id}:#{Lti::Asset.opaque_identifier_for(self.context)}"[0..254]
   end
 
   def content_migration_configured?
