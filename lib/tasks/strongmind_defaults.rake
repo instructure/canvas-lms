@@ -6,6 +6,16 @@ namespace :strongmind_defaults do
     puts "Api page limit set to: #{limit}"
   end
 
+  desc "set default api throttling"
+  task :set_api_throttling_defaults => :environment do
+    Setting.set('request_throttle.maximum', '8000')
+    maximum = Setting.get('request_throttle.maximum', 0)
+    puts "Api throttle maximum set to: #{maximum}"
+    Setting.set('request_throttle.hwm', '6000')
+    hwm = Setting.get('request_throttle.hwm', 0)
+    puts "Api throttle HWM set to: #{maximum}"
+  end
+
   desc "create dynamo db tables"
   task :create_dynamo_db_tables => :environment do
     ['assignment', 'user', 'enrollment', 'student_assignment'].each do |obj|
