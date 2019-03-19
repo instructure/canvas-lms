@@ -89,6 +89,7 @@ class GradebookSettingsModal extends React.Component {
     courseId: string.isRequired,
     locale: string.isRequired,
     onClose: func.isRequired,
+    onEntered: func,
     gradedLateSubmissionsExist: bool.isRequired,
     onLatePolicyUpdate: func.isRequired,
     overrides: shape({
@@ -98,6 +99,10 @@ class GradebookSettingsModal extends React.Component {
       defaultChecked: bool.isRequired
     }),
     postPolicies: instanceOf(PostPolicies)
+  }
+
+  static defaultProps = {
+    onEntered() {}
   }
 
   state = {
@@ -229,6 +234,7 @@ class GradebookSettingsModal extends React.Component {
         label={I18n.t('Gradebook Settings')}
         onOpen={this.fetchLatePolicy}
         onDismiss={this.close}
+        onEntered={this.props.onEntered}
         onExited={this.props.onClose}
       >
         <ModalBody>
