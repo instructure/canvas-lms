@@ -587,7 +587,7 @@ module Lti
           cc = user.communication_channels.email.create!(path: sis_email)
           cc.user = user
           cc.save!
-          pseudonym = cc.user.pseudonyms.build(:unique_id => cc.path, :account => Account.default)
+          pseudonym = cc.user.pseudonyms.build(:unique_id => cc.path, :account => root_account)
           pseudonym.sis_communication_channel_id=cc.id
           pseudonym.communication_channel_id=cc.id
           pseudonym.sis_user_id="some_sis_id"
@@ -635,7 +635,7 @@ module Lti
           cc = user.communication_channels.email.create!(path: sis_email)
           cc.user = user
           cc.save!
-          pseudonym = cc.user.pseudonyms.build(:unique_id => cc.path, :account => Account.default)
+          pseudonym = cc.user.pseudonyms.build(:unique_id => cc.path, :account => root_account)
           pseudonym.sis_communication_channel_id=cc.id
           pseudonym.communication_channel_id=cc.id
           pseudonym.sis_user_id="some_sis_id"
