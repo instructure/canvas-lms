@@ -1331,7 +1331,14 @@ class BzController < ApplicationController
       part = part_id == '' ? CoursePart.new : CoursePart.find(part_id.to_i)
 
       part.title = params[:part_title][idx]
-      next if part.title == ''
+      if part.title == ''
+        if part_id == ''
+          next # skip since no need to create a new one if it is empty
+        else
+          part.destroy # but if it already exists, delete the existing one since this is an edit to remove it
+          next
+        end
+      end
       part.intro = params[:part_intro][idx]
       # The task box is removed for now, but I'm keeping the code
       # in case we want a custom section in it later.
