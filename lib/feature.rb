@@ -708,8 +708,7 @@ END
       display_name: -> { I18n.t('Content Security Policy')},
       description: -> { I18n.t('Enable the Security tab on the settings page to adjust CSP settings')},
       applies_to: 'RootAccount',
-      state: 'hidden',
-      development: true,
+      state: 'hidden_in_prod',
       beta: true
     },
     'restrict_students_from_annotating' => {
