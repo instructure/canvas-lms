@@ -16,31 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import ReactDOM from 'react-dom'
-
-import {mockAssignment} from '../../test-utils'
 import ContentTabs from '../ContentTabs'
-import $ from 'jquery'
+import {mockAssignment} from '../../test-utils'
+import React from 'react'
+import {render} from 'react-testing-library'
 
-beforeAll(() => {
-  const found = document.getElementById('fixtures')
-  if (!found) {
-    const fixtures = document.createElement('div')
-    fixtures.setAttribute('id', 'fixtures')
-    document.body.appendChild(fixtures)
-  }
+it('renders the content tabs', () => {
+  const {getAllByTestId} = render(<ContentTabs assignment={mockAssignment()} />)
+  expect(getAllByTestId('assignment-2-student-content-tabs')).toHaveLength(1)
 })
 
-afterEach(() => {
-  ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
-})
+it('renders the tabs in the correct order', () => {
+  const {getAllByRole, getByText} = render(<ContentTabs assignment={mockAssignment()} />)
+  const tabs = getAllByRole('tab')
 
-it('renders normally', () => {
-  ReactDOM.render(
-    <ContentTabs assignment={mockAssignment()} />,
-    document.getElementById('fixtures')
-  )
-  const element = $('[data-test-id="assignment-2-student-content-tabs-test-text"]')
-  expect(element).toHaveLength(1)
+  expect(tabs).toHaveLength(3)
+  expect(tabs[0]).toContainElement(getByText('Upload'))
+  expect(tabs[1]).toContainElement(getByText('Comments'))
+  expect(tabs[2]).toContainElement(getByText('Rubric'))
 })
