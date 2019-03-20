@@ -125,8 +125,10 @@ gem 'useragent', '0.16.10', require: false
 gem 'crocodoc-ruby', '0.0.1', require: false
 gem 'sentry-raven', '2.7.2', require: false
 gem 'canvas_statsd', '2.0.4'
+gem 'inst_statsd', '2.1.4'
   gem 'statsd-ruby', '1.4.0', require: false
   gem 'aroi', '0.0.6', require: false
+  gem 'dogstatsd-ruby', '3.3.0'
 gem 'gepub', '1.0.1'
 gem 'imperium', '0.5.0', require: false
 gem 'academic_benchmarks', '0.0.10', require: false
@@ -178,4 +180,3 @@ gem 'twitter', path: 'gems/twitter'
 gem 'vericite_api', '1.5.3'
 gem 'utf8_cleaner', path: 'gems/utf8_cleaner'
 gem 'workflow', path: 'gems/workflow'
-gem 'dogstatsd-ruby', '3.3.0'

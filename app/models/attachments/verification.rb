@@ -75,18 +75,18 @@ class Attachments::Verification
     begin
       body = Canvas::Security.decode_jwt(verifier)
       if body[:id] != attachment.global_id
-        CanvasStatsd::Statsd.increment("attachments.token_verifier_id_mismatch")
+        InstStatsd::Statsd.increment("attachments.token_verifier_id_mismatch")
         Rails.logger.warn("Attachment verifier token id mismatch. token id: #{body[:id]}, attachment id: #{attachment.global_id}, token: #{verifier}")
         return nil
       end
 
-      CanvasStatsd::Statsd.increment("attachments.token_verifier_success")
+      InstStatsd::Statsd.increment("attachments.token_verifier_success")
     rescue Canvas::Security::TokenExpired
-      CanvasStatsd::Statsd.increment("attachments.token_verifier_expired")
+      InstStatsd::Statsd.increment("attachments.token_verifier_expired")
       Rails.logger.warn("Attachment verifier token expired: #{verifier}")
       return nil
     rescue Canvas::Security::InvalidToken
-      CanvasStatsd::Statsd.increment("attachments.token_verifier_invalid")
+      InstStatsd::Statsd.increment("attachments.token_verifier_invalid")
       Rails.logger.warn("Attachment verifier token invalid: #{verifier}")
       return nil
     end
@@ -104,7 +104,7 @@ class Attachments::Verification
   def valid_verifier_for_permission?(verifier, permission, session = {})
     # Support for legacy verifiers.
     if verifier == attachment.uuid
-      CanvasStatsd::Statsd.increment("attachments.legacy_verifier_success")
+      InstStatsd::Statsd.increment("attachments.legacy_verifier_success")
       return true
     end
 

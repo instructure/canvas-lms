@@ -50,7 +50,7 @@ class BounceNotificationProcessor
       if bounce_notification
         process_bounce_notification(bounce_notification)
       else
-        CanvasStatsd::Statsd.increment('bounce_notification_processor.processed.no_bounce')
+        InstStatsd::Statsd.increment('bounce_notification_processor.processed.no_bounce')
       end
     end
   end
@@ -71,13 +71,13 @@ class BounceNotificationProcessor
 
   def process_bounce_notification(bounce_notification)
     type = if is_suppression_bounce?(bounce_notification)
-             'suppression'
-           elsif is_permanent_bounce?(bounce_notification)
-             'permanent'
-           else
-             'transient'
-           end
-    CanvasStatsd::Statsd.increment("bounce_notification_processor.processed.#{type}")
+      'suppression'
+    elsif is_permanent_bounce?(bounce_notification)
+      'permanent'
+    else
+      'transient'
+    end
+    InstStatsd::Statsd.increment("bounce_notification_processor.processed.#{type}")
 
     bouncy_addresses(bounce_notification).each do |address|
       CommunicationChannel.bounce_for_path(

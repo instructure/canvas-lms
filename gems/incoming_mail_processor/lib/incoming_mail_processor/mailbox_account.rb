@@ -37,7 +37,7 @@ module IncomingMailProcessor
     end
 
     def escaped_address
-      CanvasStatsd::Statsd.escape(address) unless address.nil?
+      InstStatsd::Statsd.escape(address) unless address.nil?
     end
   end
 end

@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'canvas_statsd'
+require 'inst_statsd'
 
 module LiveEvents
   class << self

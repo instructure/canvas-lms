@@ -26,7 +26,6 @@ class Login::SamlController < ApplicationController
   before_action :fix_ms_office_redirects, only: :new
 
   def new
-    increment_saml_stat("login_attempt")
     redirect_to delegated_auth_redirect_uri(aac.generate_authn_request_redirect(host: request.host_with_port,
                                                                                 parent_registration: session[:parent_registration],
                                                                                 relay_state: Rails.env.development? && params[:RelayState]))
@@ -37,8 +36,6 @@ class Login::SamlController < ApplicationController
                             institution: @domain_root_account.display_name)
 
     response, relay_state = SAML2::Bindings::HTTP_POST.decode(request.request_parameters)
-
-    increment_saml_stat('login_response_received')
 
     aac = @domain_root_account.authentication_providers.active.
       where(auth_type: 'saml').
@@ -95,7 +92,6 @@ class Login::SamlController < ApplicationController
     logger.info "Attempting SAML2 login for #{aac.login_attribute} #{unique_id} in account #{@domain_root_account.id}"
 
     unless response.errors.empty?
-      increment_saml_stat("errors.invalid_response")
       if debugging
         aac.debug_set(:is_valid_login_response, 'false')
         aac.debug_set(:login_response_validation_error, response.errors.join("\n"))
@@ -136,7 +132,6 @@ class Login::SamlController < ApplicationController
         aac.debug_set(:login_to_canvas_success, 'true')
         aac.debug_set(:logged_in_user_id, user.id)
       end
-      increment_saml_stat("normal.login_success")
 
       session[:saml_unique_id] = unique_id
       session[:name_id] = subject_name_id&.id
@@ -168,7 +163,6 @@ class Login::SamlController < ApplicationController
       successful_login(user, pseudonym)
     else
       unknown_user_url = @domain_root_account.unknown_user_url.presence || login_url
-      increment_saml_stat("errors.unknown_user")
       message = "Received SAML login request for unknown user: #{unique_id} redirecting to: #{unknown_user_url}."
       logger.warn message
       aac.debug_set(:canvas_login_fail_message, message) if debugging
@@ -213,7 +207,6 @@ class Login::SamlController < ApplicationController
 
     case message
     when SAML2::LogoutResponse
-      increment_saml_stat("logout_response_received")
 
       if aac.debugging? && aac.debug_get(:logout_request_id) == message.in_response_to
         aac.debug_set(:idp_logout_response_encoded, params[:SAMLResponse])
@@ -266,7 +259,6 @@ class Login::SamlController < ApplicationController
 
       return redirect_to saml_login_url(id: aac.id)
     when SAML2::LogoutRequest
-      increment_saml_stat("logout_request_received")
 
       if aac.debugging? && aac.debug_get(:logged_in_user_id) == @current_user.id
         aac.debug_set(:idp_logout_request_encoded, params[:SAMLRequest])
@@ -315,12 +307,11 @@ class Login::SamlController < ApplicationController
     render xml: metadata.to_xml
   end
 
-
   def observee_validation
-    increment_saml_stat("login_attempt")
     redirect_to delegated_auth_redirect_uri(
-                  @domain_root_account.parent_registration_aac.generate_authn_request_redirect(host: request.host_with_port,
-                                                                                               parent_registration: session[:parent_registration]))
+      @domain_root_account.parent_registration_aac.generate_authn_request_redirect(host: request.host_with_port,
+                                                                                   parent_registration: session[:parent_registration])
+    )
   end
 
   protected
@@ -336,10 +327,6 @@ class Login::SamlController < ApplicationController
         scope.find(id)
       end
     end
-  end
-
-  def increment_saml_stat(key)
-    CanvasStatsd::Statsd.increment("saml.#{CanvasStatsd::Statsd.escape(request.host)}.#{key}")
   end
 
   def complete_observee_addition(registration_data)

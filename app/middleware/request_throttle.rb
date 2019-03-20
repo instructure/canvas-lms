@@ -102,11 +102,11 @@ class RequestThrottle
       return true
     elsif blacklisted?(request)
       Rails.logger.info("blocking request due to blacklist, client id: #{client_identifier(request)} ip: #{request.remote_ip}")
-      CanvasStatsd::Statsd.increment("request_throttling.blacklisted")
+      InstStatsd::Statsd.increment("request_throttling.blacklisted")
       return false
     else
       if bucket.full?
-        CanvasStatsd::Statsd.increment("request_throttling.throttled")
+        InstStatsd::Statsd.increment("request_throttling.throttled")
         if Setting.get("request_throttle.enabled", "true") == "true"
           Rails.logger.info("blocking request due to throttling, client id: #{client_identifier(request)} bucket: #{bucket.to_json}")
           return false
@@ -189,9 +189,13 @@ class RequestThrottle
     RequestContextGenerator.add_meta_header("y", "%.2f" % [system_cpu])
     RequestContextGenerator.add_meta_header("d", "%.2f" % [db_runtime])
 
-    if account && account.shard.respond_to?(:database_server)
-      CanvasStatsd::Statsd.timing("requests_system_cpu.cluster_#{account.shard.database_server.id}", system_cpu)
-      CanvasStatsd::Statsd.timing("requests_user_cpu.cluster_#{account.shard.database_server.id}", user_cpu)
+    if account&.shard&.database_server
+      InstStatsd::Statsd.timing("requests_system_cpu.cluster_#{account.shard.database_server.id}", system_cpu,
+                                short_stat: 'requests_system_cpu',
+                                tags: {cluster: account.shard.database_server.id})
+      InstStatsd::Statsd.timing("requests_user_cpu.cluster_#{account.shard.database_server.id}", user_cpu,
+                                short_stat: 'requests_user_cpu',
+                                tags: {cluster: account.shard.database_server.id})
     end
 
     mem_stat = if starting_mem == 0 || ending_mem == 0

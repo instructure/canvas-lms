@@ -71,7 +71,7 @@ describe "Canvas::Redis" do
     end
 
     it "should pass through other command errors" do
-      expect(CanvasStatsd::Statsd).to receive(:increment).never
+      expect(InstStatsd::Statsd).to receive(:increment).never
 
       expect(Canvas.redis._client).to receive(:write).and_raise(Redis::CommandError.new("NOSCRIPT No matching script. Please use EVAL.")).once
       expect { Canvas.redis.evalsha('xxx') }.to raise_error(Redis::CommandError)

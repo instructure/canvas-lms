@@ -86,8 +86,14 @@ module Canvas::Twilio
     end
 
     # Ping StatsD about sending from this number
-    CanvasStatsd::Statsd.increment("notifications.twilio.message_sent_from_number.#{outbound_country}.#{outbound_number}")
-    CanvasStatsd::Statsd.increment("notifications.twilio.no_outbound_numbers_for.#{country}") unless country == outbound_country
+    InstStatsd::Statsd.increment("notifications.twilio.message_sent_from_number.#{outbound_country}.#{outbound_number}",
+                                 short_stat: 'notifications.twilio.message_sent',
+                                 tags: {country: outbound_country, number: outbound_number})
+    unless country == outbound_country
+      InstStatsd::Statsd.increment("notifications.twilio.no_outbound_numbers_for.#{country}",
+                                   short_stat: 'notifications.twilio.no_outbound_numbers',
+                                   tags: {country: country})
+    end
 
     # Then send the message.
     client.api.account.messages.create(from: outbound_number, to: recipient_number, body: body)

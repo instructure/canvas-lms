@@ -70,21 +70,21 @@ describe Attachments::Verification do
 
   context "verifying a verifier" do
     it "should verify a legacy verifier for read and download" do
-      expect(CanvasStatsd::Statsd).to receive(:increment).with("attachments.legacy_verifier_success").twice
+      expect(InstStatsd::Statsd).to receive(:increment).with("attachments.legacy_verifier_success").twice
       expect(v.valid_verifier_for_permission?(attachment.uuid, :read)).to eq(true)
       expect(v.valid_verifier_for_permission?(attachment.uuid, :download)).to eq(true)
     end
 
     it "should return false on an expired verifier" do
       expect(Canvas::Security).to receive(:decode_jwt).with("token").and_raise(Canvas::Security::TokenExpired)
-      expect(CanvasStatsd::Statsd).to receive(:increment).with("attachments.token_verifier_expired")
+      expect(InstStatsd::Statsd).to receive(:increment).with("attachments.token_verifier_expired")
 
       expect(v.valid_verifier_for_permission?("token", :read)).to eq(false)
     end
 
     it "should return false on an invalid verifier" do
       expect(Canvas::Security).to receive(:decode_jwt).with("token").and_raise(Canvas::Security::InvalidToken)
-      expect(CanvasStatsd::Statsd).to receive(:increment).with("attachments.token_verifier_invalid")
+      expect(InstStatsd::Statsd).to receive(:increment).with("attachments.token_verifier_invalid")
 
       expect(v.valid_verifier_for_permission?("token", :read)).to eq(false)
     end
@@ -93,7 +93,7 @@ describe Attachments::Verification do
       expect(Canvas::Security).to receive(:decode_jwt).with("token").and_return({
         id: attachment.global_id + 1
       })
-      expect(CanvasStatsd::Statsd).to receive(:increment).with("attachments.token_verifier_id_mismatch")
+      expect(InstStatsd::Statsd).to receive(:increment).with("attachments.token_verifier_id_mismatch")
 
       expect(v.valid_verifier_for_permission?("token", :read)).to eq(false)
     end
@@ -105,7 +105,7 @@ describe Attachments::Verification do
       expect(Canvas::Security).to receive(:decode_jwt).with("token").and_return({
         id: att2.global_id, user_id: student.global_id
       }).twice
-      expect(CanvasStatsd::Statsd).to receive(:increment).with("attachments.token_verifier_success").twice
+      expect(InstStatsd::Statsd).to receive(:increment).with("attachments.token_verifier_success").twice
 
       expect(v2.valid_verifier_for_permission?("token", :read)).to eq(true)
       expect(v2.valid_verifier_for_permission?("token", :download)).to eq(false)
