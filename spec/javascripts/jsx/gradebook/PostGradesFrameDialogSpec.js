@@ -43,14 +43,14 @@ QUnit.module('PostGradesFrameDialog screenreader only content', {
 test('shows beginning info alert and adds class to iframe', () => {
   const info = el.find('.before_external_content_info_alert')
   info.focus()
-  notOk(info.hasClass('screenreader-only'))
+  notOk(info.children().hasClass('screenreader-only'))
   ok(iframe.hasClass('info_alert_outline'))
 })
 
 test('shows ending info alert and adds class to iframe', () => {
   info = el.find('.after_external_content_info_alert')
   info.focus()
-  notOk(info.hasClass('screenreader-only'))
+  notOk(info.children().hasClass('screenreader-only'))
   ok(iframe.hasClass('info_alert_outline'))
 })
 
@@ -58,7 +58,7 @@ test('hides beginning info alert and removes class from iframe', () => {
   info = el.find('.before_external_content_info_alert')
   info.focus()
   info.blur()
-  ok(info.hasClass('screenreader-only'))
+  ok(info.children().hasClass('screenreader-only'))
   notOk(iframe.hasClass('info_alert_outline'))
 })
 
@@ -66,14 +66,14 @@ test('hides ending info alert and removes class from iframe', () => {
   info = el.find('.after_external_content_info_alert')
   info.focus()
   info.blur()
-  ok(info.hasClass('screenreader-only'))
+  ok(info.children().hasClass('screenreader-only'))
   notOk(iframe.hasClass('info_alert_outline'))
 })
 
 test("doesn't show infos or add border to iframe by default", () => {
   equal(
     el.find(
-      '.before_external_content_info_alert.screenreader-only, .after_external_content_info_alert.screenreader-only'
+      '.before_external_content_info_alert > .screenreader-only, .after_external_content_info_alert > .screenreader-only'
     ).length,
     2
   )
