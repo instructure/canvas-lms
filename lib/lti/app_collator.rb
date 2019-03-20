@@ -48,14 +48,14 @@ module Lti
         when ToolProxy
           tool_proxy_definition(o)
         when Hash
-          tool_config_definition(o)
+          lti13_tool_definition(o)
         end
       end.compact
     end
 
     private
 
-    def tool_config_definition(tool_configuration)
+    def lti13_tool_definition(tool_configuration)
       config = tool_configuration[:config]
       {
         app_type: "LTI 1.3 Tool",
