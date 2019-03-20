@@ -55,7 +55,7 @@ describe "conversations new" do
       expect(f('.message_subject_ro').text).to eq @convo.subject
     end
 
-    it "should add new messages to the conversation", :xbrowser, priority: "1", test_id: 197537 do
+    it "should add new messages to the conversation", priority: "1", test_id: 197537 do
       initial_message_count = @convo.conversation_messages.length
       go_to_inbox_and_select_message
       f('#reply-btn').click

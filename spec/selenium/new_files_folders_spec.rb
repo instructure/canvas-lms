@@ -41,7 +41,7 @@ describe "better_file_browsing, folders" do
       expect(fj("a:contains('new test folder')")).to be_present
     end
 
-    it "should display all cog icon options", :xbrowser, priority: "1", test_id: 133124 do
+    it "should display all cog icon options", priority: "1", test_id: 133124 do
       # locators were changed from fln in this test due to an issue with edgedriver
       # We can not use fln here
       create_new_folder
@@ -135,7 +135,7 @@ describe "better_file_browsing, folders" do
        expect(new_folder.text).to match(/New Folder/)
      end
 
-     it "should handle duplicate folder names", :xbrowser, priority: "1", test_id: 133130 do
+     it "should handle duplicate folder names", priority: "1", test_id: 133130 do
        create_new_folder
        add_folder("New Folder")
        expect(all_files_folders.last.text).to match(/New Folder 2/)

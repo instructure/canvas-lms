@@ -76,7 +76,7 @@ describe 'Grade Detail Tray:' do
       expect(late_policy_status).to eq 'none'
     end
 
-    it 'grade input is saved', :xbrowser, priority: "1", test_id: 3369723 do
+    it 'grade input is saved', priority: "1", test_id: 3369723 do
       Gradezilla::Cells.open_tray(@course.students.second, @a3)
       Gradezilla::GradeDetailTray.edit_grade(7)
 

@@ -53,7 +53,7 @@ describe "context modules" do
       wait_for_ajaximations
     end
 
-    it "should show all module items", :xbrowser, priority: "1", test_id: 126743 do
+    it "should show all module items", priority: "1", test_id: 126743 do
       module_with_two_items
       f(".expand_module_link").click
       wait_for_animations

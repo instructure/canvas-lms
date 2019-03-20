@@ -482,7 +482,7 @@ describe "calendar2" do
       course_with_student_logged_in
     end
 
-    it "should navigate to month view when month button is clicked", :xbrowser do
+    it "should navigate to month view when month button is clicked" do
       load_week_view
       f('#month').click
       wait_for_ajaximations
