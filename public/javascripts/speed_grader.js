@@ -31,6 +31,7 @@ import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
 import AssessmentAuditButton from 'jsx/speed_grader/AssessmentAuditTray/components/AssessmentAuditButton'
 import AssessmentAuditTray from 'jsx/speed_grader/AssessmentAuditTray'
 import SpeedGraderProvisionalGradeSelector from 'jsx/speed_grader/SpeedGraderProvisionalGradeSelector'
+import SpeedGraderPostGradesMenu from 'jsx/speed_grader/SpeedGraderPostGradesMenu'
 import SpeedGraderSettingsMenu from 'jsx/speed_grader/SpeedGraderSettingsMenu'
 import studentViewedAtTemplate from 'jst/speed_grader/student_viewed_at'
 import submissionsDropdownTemplate from 'jst/speed_grader/submissions_dropdown'
@@ -90,6 +91,7 @@ const selectors = new JQuerySelectorCache()
 const SPEED_GRADER_COMMENT_TEXTAREA_MOUNT_POINT = 'speed_grader_comment_textarea_mount_point'
 const SPEED_GRADER_SUBMISSION_COMMENTS_DOWNLOAD_MOUNT_POINT =
   'speed_grader_submission_comments_download_mount_point'
+const SPEED_GRADER_POST_GRADES_MENU_MOUNT_POINT = 'speed_grader_post_grades_menu_mount_point'
 const SPEED_GRADER_SETTINGS_MOUNT_POINT = 'speed_grader_settings_mount_point'
 const ASSESSMENT_AUDIT_BUTTON_MOUNT_POINT = 'speed_grader_assessment_audit_button_mount_point'
 const ASSESSMENT_AUDIT_TRAY_MOUNT_POINT = 'speed_grader_assessment_audit_tray_mount_point'
@@ -485,32 +487,42 @@ function initDropdown() {
   }
 }
 
-function setupHeader() {
-  return {
-    elements: {
+function setupHeader({showMuteButton = true}) {
+  const elements = {
+    nav: $gradebook_header.find('#prev-student-button, #next-student-button'),
+    settings: {form: $('#settings_form')}
+  }
+
+  if (showMuteButton) {
+    Object.assign(elements, {
       mute: {
         icon: $('#mute_link i'),
         label: $('#mute_link .mute_label'),
         link: $('#mute_link'),
         modal: $('#mute_dialog')
       },
-      unmute: {
-        modal: $('#unmute_dialog')
-      },
-      nav: $gradebook_header.find('#prev-student-button, #next-student-button'),
-      settings: {form: $('#settings_form')}
-    },
+      unmute: {modal: $('#unmute_dialog')}
+    })
+  }
+
+  return {
+    elements,
     courseId: utils.getParam('courses'),
     assignmentId: utils.getParam('assignment_id'),
     init() {
-      this.muted = this.elements.mute.link.data('muted')
+      if (showMuteButton) {
+        this.muted = this.elements.mute.link.data('muted')
+      }
+
       this.addEvents()
       this.createModals()
       return this
     },
     addEvents() {
       this.elements.nav.click($.proxy(this.toAssignment, this))
-      this.elements.mute.link.click($.proxy(this.onMuteClick, this))
+      if (showMuteButton) {
+        this.elements.mute.link.click($.proxy(this.onMuteClick, this))
+      }
 
       this.elements.settings.form.submit(this.submitSettingsForm.bind(this))
     },
@@ -527,52 +539,54 @@ function setupHeader() {
       // button. So here we'll manually re-enable it.
       this.elements.settings.form.find('.submit_button').removeAttr('disabled')
 
-      this.elements.mute.modal.dialog({
-        autoOpen: false,
-        buttons: [
-          {
-            text: I18n.t('cancel_button', 'Cancel'),
-            click: $.proxy(function() {
-              this.elements.mute.modal.dialog('close')
-            }, this)
-          },
-          {
-            text: I18n.t('mute_assignment', 'Mute Assignment'),
-            class: 'btn-primary btn-mute',
-            click: $.proxy(function() {
-              this.toggleMute()
-              this.elements.mute.modal.dialog('close')
-            }, this)
-          }
-        ],
-        modal: true,
-        resizable: false,
-        title: this.elements.mute.modal.data('title'),
-        width: 400
-      })
-      this.elements.unmute.modal.dialog({
-        autoOpen: false,
-        buttons: [
-          {
-            text: I18n.t('Cancel'),
-            click: $.proxy(function() {
-              this.elements.unmute.modal.dialog('close')
-            }, this)
-          },
-          {
-            text: I18n.t('Unmute Assignment'),
-            class: 'btn-primary btn-unmute',
-            click: $.proxy(function() {
-              this.toggleMute()
-              this.elements.unmute.modal.dialog('close')
-            }, this)
-          }
-        ],
-        modal: true,
-        resizable: false,
-        title: this.elements.unmute.modal.data('title'),
-        width: 400
-      })
+      if (showMuteButton) {
+        this.elements.mute.modal.dialog({
+          autoOpen: false,
+          buttons: [
+            {
+              text: I18n.t('cancel_button', 'Cancel'),
+              click: $.proxy(function() {
+                this.elements.mute.modal.dialog('close')
+              }, this)
+            },
+            {
+              text: I18n.t('mute_assignment', 'Mute Assignment'),
+              class: 'btn-primary btn-mute',
+              click: $.proxy(function() {
+                this.toggleMute()
+                this.elements.mute.modal.dialog('close')
+              }, this)
+            }
+          ],
+          modal: true,
+          resizable: false,
+          title: this.elements.mute.modal.data('title'),
+          width: 400
+        })
+        this.elements.unmute.modal.dialog({
+          autoOpen: false,
+          buttons: [
+            {
+              text: I18n.t('Cancel'),
+              click: $.proxy(function() {
+                this.elements.unmute.modal.dialog('close')
+              }, this)
+            },
+            {
+              text: I18n.t('Unmute Assignment'),
+              class: 'btn-primary btn-unmute',
+              click: $.proxy(function() {
+                this.toggleMute()
+                this.elements.unmute.modal.dialog('close')
+              }, this)
+            }
+          ],
+          modal: true,
+          resizable: false,
+          title: this.elements.unmute.modal.data('title'),
+          width: 400
+        })
+      }
     },
 
     toAssignment(e) {
@@ -1308,6 +1322,10 @@ EG = {
       initDropdown()
       initGroupAssignmentMode()
       setupHandleStatePopped()
+
+      if (ENV.post_policies_enabled) {
+        renderPostGradesMenu()
+      }
     }
   },
 
@@ -2468,9 +2486,7 @@ EG = {
       if (attachment.mime_class === 'html') {
         options.className = 'attachment-html-iframe'
       }
-      contents = SpeedgraderHelpers.buildIframe(
-        htmlEscape(src), options, domElement
-      )
+      contents = SpeedgraderHelpers.buildIframe(htmlEscape(src), options, domElement)
     }
 
     return $.raw(contents)
@@ -3557,7 +3573,7 @@ function setupSelectors() {
   isAdmin = _.include(ENV.current_user_roles, 'admin')
   snapshotCache = {}
   studentLabel = I18n.t('student', 'Student')
-  header = setupHeader()
+  header = setupHeader({showMuteButton: !ENV.post_policies_enabled})
 }
 
 function renderSettingsMenu() {
@@ -3583,6 +3599,25 @@ function renderSettingsMenu() {
 
   const settingsMenu = <SpeedGraderSettingsMenu {...props} />
   ReactDOM.render(settingsMenu, document.getElementById(SPEED_GRADER_SETTINGS_MOUNT_POINT))
+}
+
+function renderPostGradesMenu() {
+  const submissions = window.jsonData.studentsWithSubmissions.map(student => student.submission)
+  const allowHidingGrades = submissions.some(submission => submission.posted_at != null)
+  const allowPostingGrades = submissions.some(submission => submission.posted_at == null)
+
+  const props = {
+    allowHidingGrades,
+    allowPostingGrades,
+    onHideGrades: () => {},
+    onPostGrades: () => {}
+  }
+
+  const postGradesMenu = <SpeedGraderPostGradesMenu {...props} />
+  ReactDOM.render(
+    postGradesMenu,
+    document.getElementById(SPEED_GRADER_POST_GRADES_MENU_MOUNT_POINT)
+  )
 }
 
 // Helper function that guard against provisional_grades being null, allowing

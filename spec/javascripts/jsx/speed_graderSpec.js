@@ -2358,18 +2358,61 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         show_help_menu_item: false
       })
 
-      setupFixtures()
+      setupFixtures(`
+        <span id="mute_dialog"></span>
+        <span id="unmute_dialog"></span>
+      `)
     })
 
     hooks.afterEach(function() {
       SpeedGrader.teardown()
       teardownFixtures()
+
+      $('.ui-dialog').remove()
     })
 
     test('populates the settings mount point', () => {
       SpeedGrader.setup()
       const mountPoint = document.getElementById('speed_grader_settings_mount_point')
       strictEqual(mountPoint.textContent, 'SpeedGrader Settings')
+    })
+
+    QUnit.module('when post policies are not enabled', () => {
+      test('sets up the "Mute Assignment" dialog', () => {
+        SpeedGrader.setup()
+        SpeedGrader.EG.domReady()
+
+        // There's no easy way to distinguish between dialogs, so look for
+        // their individual buttons instead
+        ok(document.querySelector('.btn-mute'))
+      })
+
+      test('sets up the "Unmute Assignment" dialog', () => {
+        SpeedGrader.setup()
+        SpeedGrader.EG.domReady()
+
+        ok(document.querySelector('.btn-unmute'))
+      })
+    })
+
+    QUnit.module('when post policies are enabled', postPolicyHooks => {
+      postPolicyHooks.beforeEach(() => {
+        ENV.post_policies_enabled = true
+      })
+
+      test('does not set up the "Mute Assignment" dialog', () => {
+        SpeedGrader.setup()
+        SpeedGrader.EG.domReady()
+
+        notOk(document.querySelectorAll('.btn-mute').length)
+      })
+
+      test('does not set up the "Unmute Assignment" dialog', () => {
+        SpeedGrader.setup()
+        SpeedGrader.EG.domReady()
+
+        notOk(document.querySelectorAll('.btn-unmute').length)
+      })
     })
   })
 
@@ -2837,6 +2880,7 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       grade_matches_current_submission: true,
       workflow_state: 'active',
       submitted_at: new Date().toISOString(),
+      posted_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       grade: 'A',
       assignment_id: '456',
@@ -3215,6 +3259,89 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
             el => el.value
           )
           deepEqual(anonymousIds, studentAnonymousIds)
+        })
+      })
+
+      QUnit.module('#renderPostGradesMenu', hooks => {
+        const findRenderCall = () => ReactDOM.render.args.find(
+          argsForCall => argsForCall[1].id === 'speed_grader_post_grades_menu_mount_point'
+        )
+
+        hooks.beforeEach(() => {
+          setupFixtures('<div id="speed_grader_post_grades_menu_mount_point"></div>')
+        })
+
+        hooks.afterEach(() => {
+          teardownFixtures()
+        })
+
+        QUnit.module('when ENV.post_policies_enabled is true', postPolicyHooks => {
+          postPolicyHooks.beforeEach(() => {
+            ENV.post_policies_enabled = true
+            sinon.spy(ReactDOM, 'render')
+          })
+
+          postPolicyHooks.afterEach(() => {
+            ReactDOM.render.restore()
+          })
+
+          test('renders the "Post Grades" menu', () => {
+            SpeedGrader.EG.jsonReady()
+
+            ok(findRenderCall())
+          })
+
+          test('passes the allowHidingGrades prop as true if any submissions are posted', () => {
+            SpeedGrader.EG.jsonReady()
+
+            const [SpeedGraderPostGradesMenu] = findRenderCall()
+            strictEqual(SpeedGraderPostGradesMenu.props.allowHidingGrades, true)
+          })
+
+          test('passes the allowHidingGrades prop as false if no submissions are posted', () => {
+            const alphaSubmissionPostedAt = alphaSubmission.posted_at
+            const omegaSubmissionPostedAt = omegaSubmission.posted_at
+            alphaSubmission.posted_at = null
+            omegaSubmission.posted_at = null
+
+            SpeedGrader.EG.jsonReady()
+
+            const [SpeedGraderPostGradesMenu] = findRenderCall()
+            strictEqual(SpeedGraderPostGradesMenu.props.allowHidingGrades, false)
+
+            alphaSubmission.posted_at = alphaSubmissionPostedAt
+            omegaSubmission.posted_at = omegaSubmissionPostedAt
+          })
+
+          test('passes the allowPostingGrades prop as true if any submissions are unposted', () => {
+            const alphaSubmissionPostedAt = alphaSubmission.posted_at
+            alphaSubmission.posted_at = null
+
+            SpeedGrader.EG.jsonReady()
+
+            const [SpeedGraderPostGradesMenu] = findRenderCall()
+            strictEqual(SpeedGraderPostGradesMenu.props.allowPostingGrades, true)
+
+            alphaSubmission.posted_at = alphaSubmissionPostedAt
+          })
+
+          test('passes the allowPostingGrades prop as false if all submissions are posted', () => {
+            SpeedGrader.EG.jsonReady()
+
+            const [SpeedGraderPostGradesMenu] = findRenderCall()
+            strictEqual(SpeedGraderPostGradesMenu.props.allowPostingGrades, false)
+          })
+        })
+
+        test('is not called if ENV.post_policies_enabled is not true', () => {
+          ENV.post_policies_enabled = false
+          sinon.spy(ReactDOM, 'render')
+
+          SpeedGrader.EG.jsonReady()
+
+          notOk(findRenderCall())
+
+          ReactDOM.render.restore()
         })
       })
     })

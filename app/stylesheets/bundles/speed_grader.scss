@@ -64,6 +64,17 @@ $gradebook_header_height: 3.5em;
       z-index: 100;
     }
   }
+
+  /*
+   * InstUI icons determine their size from the font-size of the parent
+   * element. Have the post/hide grades icon match its non-InstUI siblings.
+   */
+  #speed_grader_post_grades_menu_mount_point {
+    cursor: pointer;
+    @include fontSize(22px);
+
+    padding: 2px 6px 2px 4px;
+  }
 }
 .subheadContent {
   display: flex;

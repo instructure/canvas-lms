@@ -679,6 +679,7 @@ class GradebooksController < ApplicationController
 
         if new_gradebook_enabled?
           env[:selected_section_id] = gradebook_settings.dig(@context.id, 'filter_rows_by', 'section_id')
+          env[:post_policies_enabled] = true if @context.feature_enabled?(:post_policies)
         end
 
         if @assignment.quiz
@@ -689,7 +690,10 @@ class GradebooksController < ApplicationController
         append_sis_data(env)
         js_env(env)
 
-        render :speed_grader, locals: { anonymize_students: @assignment.anonymize_students? }
+        render :speed_grader, locals: {
+          anonymize_students: @assignment.anonymize_students?,
+          post_policies_enabled: env[:post_policies_enabled]
+        }
       end
 
       format.json do

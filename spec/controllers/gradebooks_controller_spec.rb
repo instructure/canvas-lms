@@ -2065,6 +2065,29 @@ describe GradebooksController do
         expect(assigns[:js_env]).not_to include(:current_anonymous_id)
       end
     end
+
+    describe "post_policies_enabled" do
+      context "when New Gradebook is enabled" do
+        before(:each) { @course.enable_feature!(:new_gradebook) }
+
+        it "is set to true if the Post Policies feature is enabled" do
+          @course.enable_feature!(:post_policies)
+
+          get "speed_grader", params: {course_id: @course, assignment_id: @assignment}
+          expect(assigns[:js_env][:post_policies_enabled]).to be true
+        end
+
+        it "is not set if the Post Policies feature is not enabled" do
+          get "speed_grader", params: {course_id: @course, assignment_id: @assignment}
+          expect(assigns[:js_env]).not_to include(:post_policies_enabled)
+        end
+      end
+
+      it "is not set if New Gradebook is not enabled" do
+        get "speed_grader", params: {course_id: @course, assignment_id: @assignment}
+        expect(assigns[:js_env]).not_to include(:post_policies_enabled)
+      end
+    end
   end
 
   describe "POST 'speed_grader_settings'" do
