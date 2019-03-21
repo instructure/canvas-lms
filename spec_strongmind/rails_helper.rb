@@ -33,16 +33,34 @@ require 'capybara-screenshot/rspec'
 # require only the support files necessary.
 #
 
+Dir[Rails.root.join('spec', 'factories', '*.rb')].each { |f| require f }
+Dir[Rails.root.join('spec_strongmind/support/helpers/common_helper_methods/*.rb')].each { |f| require f }
+require Rails.root.join('spec/support/discourage_slow_specs.rb')
+require Rails.root.join('spec/selenium/test_setup/custom_selenium_rspec_matchers')
+
+module SeleniumDependencies
+  # Why are these modules commented out here? Because there is Canvas testing gold in these files
+  # but they need slight tweaks to work with Capbyara instead of Selenium Webdriver directly.
+  # The intent here is to put them more in your face, you may not know they exists or can be
+  # leverage for making canvas testing easier.  CI
+
+  # include OtherHelperMethods
+  # include CustomSeleniumActions
+  # include CustomAlertActions
+  # include CustomScreenActions
+  # include CustomValidators
+  # include CustomWaitMethods
+  # include CustomDateHelpers
+  include LoginAndSessionMethods
+  # include CustomPageLoaders
+  # include SeleniumErrorRecovery
+end
+
 # Load spec helper modules first
 Dir[Rails.root.join('spec_strongmind', 'support', 'helpers', '**', '*.rb')].each { |f| require f }
-
+# Then the rest
 Dir[Rails.root.join('spec_strongmind', 'support', '**', '*.rb')].each { |f| require f }
-
-Dir[Rails.root.join('spec', 'factories', '*.rb')].each { |f| require f }
-
-Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
 # Checks for pending migration and applies them before tests are run.
 # If you are not using ActiveRecord, you can remove this line.
-# binding.pry
 # ActiveRecord::Migration.maintain_test_schema!
