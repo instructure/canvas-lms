@@ -19,7 +19,26 @@
 import Enzyme from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 
+const errorsToIgnore = ["Warning: [Focusable] Exactly one tabbable child is required (0 found)."];
+
 window.fetch = require('unfetch')
+
+/* eslint-disable no-console */
+global.console = {
+    log: console.log,
+    error: (message) => {
+      if(errorsToIgnore.includes(message)) {
+        return
+      }
+      console.err(message)
+    },
+    err: console.error,
+    warn: console.warn,
+    info: console.info,
+    debug: console.debug
+}
+ /* eslint-enable no-console */
+
 
 window.scroll = () => {}
 window.ENV = {}
