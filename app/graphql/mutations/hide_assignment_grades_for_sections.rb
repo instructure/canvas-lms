@@ -41,7 +41,7 @@ class Mutations::HideAssignmentGradesForSections < Mutations::BaseMutation
     unless assignment.grades_published?
       raise GraphQL::ExecutionError, "Assignments under moderation cannot be hidden by section before grades are published"
     end
-    raise GraphQL::ExecutionError, "Anonymous assignments cannot be hidden by section" if assignment.anonymous_grading?
+    raise GraphQL::ExecutionError, "Anonymous assignments cannot be hidden by section" if assignment.anonymize_students?
 
     if sections.empty? || sections.count != input[:section_ids].size
       raise GraphQL::ExecutionError, "Invalid section ids"

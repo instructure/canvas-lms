@@ -17,7 +17,7 @@
  */
 
 import React, {Fragment} from 'react'
-import {bool, func, shape} from 'prop-types'
+import {arrayOf, bool, func, shape, string} from 'prop-types'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
@@ -26,18 +26,42 @@ import View from '@instructure/ui-layout/lib/components/View'
 import I18n from 'i18n!hide_assignment_grades_tray'
 
 import Description from './Description'
+import HideBySections from './HideBySections'
 
 export default function Layout(props) {
-  const {assignment, dismiss, hidingGrades, onHideClick} = props
+  const {
+    assignment,
+    dismiss,
+    hideBySections,
+    hideBySectionsChanged,
+    hidingGrades,
+    onHideClick,
+    sections,
+    sectionSelectionChanged,
+    selectedSectionIds
+  } = props
   const {gradesPublished} = assignment
 
   return (
     <Fragment>
-      <View as="div" padding="0 medium">
+      <View as="div" margin="0 0 small" padding="0 medium">
         <Heading as="h3" level="h4">
           {I18n.t('Hide Grades')}
         </Heading>
       </View>
+
+      {sections.length > 0 && (
+        <HideBySections
+          assignment={assignment}
+          hideBySections={hideBySections}
+          hideBySectionsChanged={event => {
+            hideBySectionsChanged(event.target.checked)
+          }}
+          sections={sections}
+          sectionSelectionChanged={sectionSelectionChanged}
+          selectedSectionIds={selectedSectionIds}
+        />
+      )}
 
       <View as="div" margin="0 medium" className="hr" />
 
@@ -80,9 +104,20 @@ export default function Layout(props) {
 
 Layout.propTypes = {
   assignment: shape({
+    anonymizeStudents: bool.isRequired,
     gradesPublished: bool.isRequired
   }).isRequired,
   dismiss: func.isRequired,
+  hideBySections: bool.isRequired,
+  hideBySectionsChanged: func.isRequired,
   hidingGrades: bool.isRequired,
-  onHideClick: func.isRequired
+  onHideClick: func.isRequired,
+  sections: arrayOf(
+    shape({
+      id: string.isRequired,
+      name: string.isRequired
+    })
+  ).isRequired,
+  sectionSelectionChanged: func.isRequired,
+  selectedSectionIds: arrayOf(string).isRequired
 }

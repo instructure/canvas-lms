@@ -21,15 +21,18 @@ module HideGradesTray
   include SeleniumDependencies
 
   def full_content
-    # TODO: content finder similar to detail tray
-    # f('#SubmissionTray__Content')
+    fj("h3:contains('Hide Grades')")
   end
 
   def hide_button
-    # TODO: locator for hide button
+    fj("label:contains('Hide')")
+  end
+
+  def specific_sections_toggle
+    fj("label:contains('Specific Sections')")
   end
 
   def select_section(section_name)
-    # TODO: use section name to select section
+    fj("label:contains(#{section_name})")
   end
 end

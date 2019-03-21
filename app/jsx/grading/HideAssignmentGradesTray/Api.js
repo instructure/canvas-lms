@@ -30,6 +30,17 @@ export const HIDE_ASSIGNMENT_GRADES = gql`
   }
 `
 
+export const HIDE_ASSIGNMENT_GRADES_FOR_SECTIONS = gql`
+  mutation($assignmentId: ID!, $sectionIds: [ID!]!) {
+    hideAssignmentGradesForSections(input: {assignmentId: $assignmentId, sectionIds: $sectionIds}) {
+      progress {
+        _id
+        state
+      }
+    }
+  }
+`
+
 export function hideAssignmentGrades(assignmentId) {
   return createClient()
     .mutate({
@@ -39,6 +50,18 @@ export function hideAssignmentGrades(assignmentId) {
     .then(({data}) => ({
       id: data.hideAssignmentGrades.progress._id,
       workflowState: data.hideAssignmentGrades.progress.state
+    }))
+}
+
+export function hideAssignmentGradesForSections(assignmentId, sectionIds = []) {
+  return createClient()
+    .mutate({
+      mutation: HIDE_ASSIGNMENT_GRADES_FOR_SECTIONS,
+      variables: {assignmentId, sectionIds}
+    })
+    .then(({data}) => ({
+      id: data.hideAssignmentGradesForSections.progress._id,
+      workflowState: data.hideAssignmentGradesForSections.progress.state
     }))
 }
 

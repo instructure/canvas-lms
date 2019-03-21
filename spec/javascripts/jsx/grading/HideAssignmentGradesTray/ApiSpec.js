@@ -23,6 +23,7 @@ QUnit.module('HideAssignmentGradesTray Api', suiteHooks => {
   const ASSIGNMENT_ID = '23'
   const BAD_ASSIGNMENT_ID = '24'
   const PROGRESS_ID = 7331
+  const SECTION_IDS = ['2001', '2002', '2003']
 
   suiteHooks.beforeEach(() => {
     MockCanvasClient.install([
@@ -53,6 +54,34 @@ QUnit.module('HideAssignmentGradesTray Api', suiteHooks => {
           data: null,
           errors: [{message: 'a graphql error'}]
         }
+      },
+      {
+        request: {
+          query: Api.HIDE_ASSIGNMENT_GRADES_FOR_SECTIONS,
+          variables: {assignmentId: ASSIGNMENT_ID, sectionIds: SECTION_IDS}
+        },
+        result: {
+          data: {
+            hideAssignmentGradesForSections: {
+              __typename: 'hideAssignmentGradesForSections',
+              progress: {
+                __typename: 'Progress',
+                _id: PROGRESS_ID,
+                state: 'queued'
+              }
+            }
+          }
+        }
+      },
+      {
+        request: {
+          query: Api.HIDE_ASSIGNMENT_GRADES_FOR_SECTIONS,
+          variables: {assignmentId: BAD_ASSIGNMENT_ID, sectionIds: SECTION_IDS}
+        },
+        result: {
+          data: null,
+          errors: [{message: 'a graphql error'}]
+        }
       }
     ])
   })
@@ -71,6 +100,22 @@ QUnit.module('HideAssignmentGradesTray Api', suiteHooks => {
     test('consumers are required to handle when mutating rejects', async () => {
       try {
         await Api.hideAssignmentGrades(BAD_ASSIGNMENT_ID)
+      } catch (error) {
+        strictEqual(error.message, 'GraphQL error: a graphql error')
+      }
+    })
+  })
+
+  QUnit.module('.hideAssignmentGradesForSections()', () => {
+    test('returns the Progress', async () => {
+      const progress = await Api.hideAssignmentGradesForSections(ASSIGNMENT_ID, SECTION_IDS)
+      const expectedProgress = {id: PROGRESS_ID, workflowState: 'queued'}
+      deepEqual(progress, expectedProgress)
+    })
+
+    test('consumers are required to handle when mutating rejects', async () => {
+      try {
+        await Api.hideAssignmentGradesForSections(BAD_ASSIGNMENT_ID, SECTION_IDS)
       } catch (error) {
         strictEqual(error.message, 'GraphQL error: a graphql error')
       }

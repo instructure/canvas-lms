@@ -222,7 +222,7 @@ module Gradezilla
   end
 
   def self.hide_grades_option
-    # TODO: locator for hide grades option
+    assignment_menu_selector("Hide Grades")
   end
 
   def self.grade_posting_policy_option

@@ -2701,6 +2701,9 @@ define [
 
     ## Gradebook Content Access Methods
 
+    getSections: () =>
+      Object.values(@sections)
+
     setSections: (sections) =>
       @sections = _.indexBy(sections, 'id')
       @sections_enabled = sections.length > 1

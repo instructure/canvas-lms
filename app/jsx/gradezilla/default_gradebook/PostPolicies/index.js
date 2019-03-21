@@ -70,15 +70,18 @@ export default class PostPolicies {
 
   showHideAssignmentGradesTray({assignmentId, onExited}) {
     const assignment = this._gradebook.getAssignment(assignmentId)
-    const {grades_published, id, name} = assignment
+    const {anonymize_students, grades_published, id, name} = assignment
+    const sections = this._gradebook.getSections()
 
     this._hideAssignmentGradesTray.show({
       assignment: {
+        anonymizeStudents: anonymize_students,
         gradesPublished: grades_published,
         id,
         name
       },
-      onExited
+      onExited,
+      sections
     })
   }
 
