@@ -94,7 +94,7 @@ module Lti
             end
         q.pluck(:developer_key_id, :context_id, :context_type, :id).each_with_object({}) do |key, memo|
           memo[key.first] ||= {}
-          memo[key.first]["#{key.second}#{key[2]}"] = key[3]
+          memo[key.first]["#{key.second}#{key.third}"] = key.fourth
         end
       end
     end

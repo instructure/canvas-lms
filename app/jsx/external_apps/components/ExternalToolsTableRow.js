@@ -44,8 +44,7 @@ export default class ExternalToolsTableRow extends React.Component {
       filteredApps: PropTypes.func,
       installTool: PropTypes.func,
       removeTool: PropTypes.func
-    }).isRequired,
-    contextType: PropTypes.string.isRequired
+    }).isRequired
   }
 
   get is13Tool () {
