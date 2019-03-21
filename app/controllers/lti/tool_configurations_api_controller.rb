@@ -79,8 +79,9 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   #
   # @returns ToolConfiguration
   def create
+    developer_key_redirect_uris
     tool_config = Lti::ToolConfiguration.create_tool_and_key!(account, tool_configuration_params)
-    update_developer_key!(tool_config)
+    update_developer_key!(tool_config, developer_key_redirect_uris)
     render json: Lti::ToolConfigurationSerializer.new(tool_config)
   end
 
@@ -150,8 +151,9 @@ class Lti::ToolConfigurationsApiController < ApplicationController
 
   private
 
-  def update_developer_key!(tool_config)
+  def update_developer_key!(tool_config, redirect_uris = nil)
     developer_key = tool_config.developer_key
+    developer_key.redirect_uris = redirect_uris unless redirect_uris.nil?
     developer_key.public_jwk = tool_config.settings['public_jwk']
     developer_key.oidc_initiation_url = tool_config.settings['oidc_initiation_url']
     developer_key.update!(developer_key_params)
@@ -184,5 +186,9 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   def developer_key_params
     return {} unless params.key? :developer_key
     params.require(:developer_key).permit(:name, :email, :notes, :redirect_uris, :test_cluster_only, :require_scopes, scopes: [])
+  end
+
+  def developer_key_redirect_uris
+    params.require(:developer_key).require(:redirect_uris)
   end
 end

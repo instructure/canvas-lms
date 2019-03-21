@@ -348,6 +348,14 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       let(:make_request) { post :create, params: params.merge({developer_key: dev_key_params}) }
       let(:bad_scope_request) { post :create, params: params.merge(bad_scope_params) }
     end
+
+    context 'without a redirect_uri present' do
+      let(:dev_key_params) { super().merge(redirect_uris: nil) }
+
+      it 'returns a 400' do
+        expect(post :create, params: params).to have_http_status :bad_request
+      end
+    end
   end
 
   describe '#update' do
