@@ -18,6 +18,9 @@
 
 @import "base/environment";
 
+// Strongmind Added
+@import "../strongmind/speed_grader";
+
 .submission_details {
   .bold { font-weight: 500; }
   .error { color: $ic-color-danger; }

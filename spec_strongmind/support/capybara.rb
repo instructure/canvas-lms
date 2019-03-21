@@ -100,17 +100,22 @@ Capybara.register_server :strongmind do |app, port, host|
   Rack::Handler::Thin.run(app, :Port => port, :Host => host)
 end
 
+Capybara.register_server :thin do |app, port, host|
+  require 'rack/handler/thin'
+  Rack::Handler::Thin.run(app, :Port => port, :Host => host)
+end
+
 ## Capy Configuration Defaults
 Capybara.configure do |config|
-  config.server                = :strongmind # or :puma/:webrick
+  config.server                = :thin # :strongmind # or :puma/:webrick
   config.javascript_driver     = ENV['HEADLESS'] ? :headless_chrome : :chrome
   config.default_max_wait_time = 7
 end
 
 ## Capy Screenshot Help
 Capybara::Screenshot.prune_strategy      = { keep: 10 }
-Capybara::Screenshot.autosave_on_failure = true
-Capybara::Screenshot.append_timestamp = false
+Capybara::Screenshot.autosave_on_failure = false
+Capybara::Screenshot.append_timestamp    = false
 Capybara::Screenshot.register_driver(:chrome) do |driver, path|
   driver.browser.save_screenshot(path)
 end

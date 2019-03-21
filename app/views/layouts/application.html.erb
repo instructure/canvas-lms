@@ -111,7 +111,7 @@
             <div class="TutorialToggleHolder"></div>
           <% end %>
       <% end %>
-      <% if @current_user && @current_user.pseudonym.unique_id.downcase != 'teastudent'  %>
+      <% if @current_user && @current_user&.pseudonym&.unique_id&.downcase != 'teastudent'  %>
           <div class="sm-user-name">
              <%= @current_user.name %>
           </div>

@@ -1,0 +1,8 @@
+
+// Only if we're rendered into the SpeedGrader iframe
+.is-inside-submission-frame {
+  .strongmind_discussion_topic_speed_grader {
+    background-color: white;
+    padding: 10px;
+  }
+}
