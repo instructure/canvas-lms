@@ -1039,40 +1039,40 @@ class UsersController < ApplicationController
   #
   # @returns [Assignment]
   def missing_submissions
-    user = api_find(User, params[:user_id])
-    return render_unauthorized_action unless @current_user && user.grants_right?(@current_user, :read)
-
-    submissions = []
-
-    filter = Array(params[:filter])
-    only_submittable = filter.include?('submittable')
-
     Shackles.activate(:slave) do
+      user = api_find(User, params[:user_id])
+      return render_unauthorized_action unless @current_user && user.grants_right?(@current_user, :read)
+
+      submissions = []
+
+      filter = Array(params[:filter])
+      only_submittable = filter.include?('submittable')
+
       course_ids = user.participating_student_course_ids
       Shard.partition_by_shard(course_ids) do |shard_course_ids|
         subs = Submission.active.preload(:assignment).
           missing.
           where(user_id: user.id,
-          assignments: {context_id: shard_course_ids}).
+                assignments: {context_id: shard_course_ids}).
           merge(Assignment.published)
         subs = subs.merge(Assignment.not_locked) if only_submittable
         submissions = subs.order(:cached_due_date, :id)
       end
+      assignments = Api.paginate(submissions, self, api_v1_user_missing_submissions_url).map(&:assignment)
+
+      includes = Array(params[:include])
+      planner_overrides = includes.include?('planner_overrides')
+      include_course = includes.include?('course')
+      ActiveRecord::Associations::Preloader.new.preload(assignments, :context) if include_course
+
+      json = assignments.map do |as|
+        assmt_json = assignment_json(as, user, session, include_planner_override: planner_overrides)
+        assmt_json['course'] = course_json(as.context, user, session, [], nil) if include_course
+        assmt_json
+      end
+
+      render json: json
     end
-    assignments = Api.paginate(submissions, self, api_v1_user_missing_submissions_url).map(&:assignment)
-
-    includes = Array(params[:include])
-    planner_overrides = includes.include?('planner_overrides')
-    include_course = includes.include?('course')
-    ActiveRecord::Associations::Preloader.new.preload(assignments, :context) if include_course
-
-    json = assignments.map do |as|
-      assmt_json = assignment_json(as, user, session, include_planner_override: planner_overrides)
-      assmt_json['course'] = course_json(as.context, user, session, [], nil) if include_course
-      assmt_json
-    end
-
-    render json: json
   end
 
   def ignore_item
@@ -1204,40 +1204,42 @@ class UsersController < ApplicationController
   end
 
   def show
-    get_context
-    @context_account = @context.is_a?(Account) ? @context : @domain_root_account
-    @user = params[:id] && params[:id] != 'self' ? User.find(params[:id]) : @current_user
-    if authorized_action(@user, @current_user, :read_full_profile)
-      add_crumb(t('crumbs.profile', "%{user}'s profile", :user => @user.short_name), @user == @current_user ? user_profile_path(@current_user) : user_path(@user) )
+    Shackles.activate(:slave) do
+      get_context
+      @context_account = @context.is_a?(Account) ? @context : @domain_root_account
+      @user = params[:id] && params[:id] != 'self' ? User.find(params[:id]) : @current_user
+      if authorized_action(@user, @current_user, :read_full_profile)
+        add_crumb(t('crumbs.profile', "%{user}'s profile", :user => @user.short_name), @user == @current_user ? user_profile_path(@current_user) : user_path(@user) )
 
-      @group_memberships = @user.current_group_memberships
+        @group_memberships = @user.current_group_memberships
 
-      # course_section and enrollment term will only be used if the enrollment dates haven't been cached yet;
-      # maybe should just look at the first enrollment and check if it's cached to decide if we should include
-      # them here
-      @enrollments = @user.enrollments.
-        shard(@user).
-        where("enrollments.workflow_state<>'deleted' AND courses.workflow_state<>'deleted'").
-        eager_load(:course).
-        preload(:associated_user, :course_section, :enrollment_state, course: { enrollment_term: :enrollment_dates_overrides }).to_a
+        # course_section and enrollment term will only be used if the enrollment dates haven't been cached yet;
+        # maybe should just look at the first enrollment and check if it's cached to decide if we should include
+        # them here
+        @enrollments = @user.enrollments.
+          shard(@user).
+          where("enrollments.workflow_state<>'deleted' AND courses.workflow_state<>'deleted'").
+          eager_load(:course).
+          preload(:associated_user, :course_section, :enrollment_state, course: { enrollment_term: :enrollment_dates_overrides }).to_a
 
-      # restrict view for other users
-      if @user != @current_user
-        @enrollments = @enrollments.select{|e| e.grants_right?(@current_user, session, :read)}
-      end
-
-      @enrollments = @enrollments.sort_by {|e| [e.state_sortable, e.rank_sortable, e.course.name] }
-      # pre-populate the reverse association
-      @enrollments.each { |e| e.user = @user }
-
-      respond_to do |format|
-        format.html do
-          js_env(CONTEXT_USER_DISPLAY_NAME: @user.short_name,
-                 USER_ID: @user.id)
+        # restrict view for other users
+        if @user != @current_user
+          @enrollments = @enrollments.select{|e| e.grants_right?(@current_user, session, :read)}
         end
-        format.json do
-          render :json => user_json(@user, @current_user, session, %w{locale avatar_url},
-                                    @current_user.pseudonym.account)
+
+        @enrollments = @enrollments.sort_by {|e| [e.state_sortable, e.rank_sortable, e.course.name] }
+        # pre-populate the reverse association
+        @enrollments.each { |e| e.user = @user }
+
+        respond_to do |format|
+          format.html do
+            js_env(CONTEXT_USER_DISPLAY_NAME: @user.short_name,
+                   USER_ID: @user.id)
+          end
+          format.json do
+            render :json => user_json(@user, @current_user, session, %w{locale avatar_url},
+                                      @current_user.pseudonym.account)
+          end
         end
       end
     end
