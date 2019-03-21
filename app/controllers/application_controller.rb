@@ -716,77 +716,79 @@ class ApplicationController < ActionController::Base
   # Also assigns @context_membership to the membership type of @current_user
   # if @current_user is a member of the context.
   def get_context
-    unless @context
-      if params[:course_id]
-        @context = api_find(Course.active, params[:course_id])
-        @context.root_account = @domain_root_account if @context.root_account_id == @domain_root_account.id # no sense in refetching it
-        params[:context_id] = params[:course_id]
-        params[:context_type] = "Course"
-        if @context && @current_user
-          @context_enrollment = @context.enrollments.where(user_id: @current_user).joins(:enrollment_state).
-            order(Enrollment.state_by_date_rank_sql, Enrollment.type_rank_sql).readonly(false).first
+    Shackles.activate(:slave) do
+      unless @context
+        if params[:course_id]
+          @context = api_find(Course.active, params[:course_id])
+          @context.root_account = @domain_root_account if @context.root_account_id == @domain_root_account.id # no sense in refetching it
+          params[:context_id] = params[:course_id]
+          params[:context_type] = "Course"
+          if @context && @current_user
+            @context_enrollment = @context.enrollments.where(user_id: @current_user).joins(:enrollment_state).
+              order(Enrollment.state_by_date_rank_sql, Enrollment.type_rank_sql).readonly(false).first
+          end
+          @context_membership = @context_enrollment
+          check_for_readonly_enrollment_state
+        elsif params[:account_id] || (self.is_a?(AccountsController) && params[:account_id] = params[:id])
+          @context = api_find(Account, params[:account_id])
+          params[:context_id] = @context.id
+          params[:context_type] = "Account"
+          @context_enrollment = @context.account_users.active.where(user_id: @current_user.id).first if @context && @current_user
+          @context_membership = @context_enrollment
+          @account = @context
+        elsif params[:group_id]
+          @context = api_find(Group.active, params[:group_id])
+          params[:context_id] = params[:group_id]
+          params[:context_type] = "Group"
+          @context_enrollment = @context.group_memberships.where(user_id: @current_user).first if @context && @current_user
+          @context_membership = @context_enrollment
+        elsif params[:user_id] || (self.is_a?(UsersController) && params[:user_id] = params[:id])
+          @context = api_find(User, params[:user_id])
+          params[:context_id] = params[:user_id]
+          params[:context_type] = "User"
+          @context_membership = @context if @context == @current_user
+        elsif params[:course_section_id] || (self.is_a?(SectionsController) && params[:course_section_id] = params[:id])
+          params[:context_id] = params[:course_section_id]
+          params[:context_type] = "CourseSection"
+          @context = api_find(CourseSection, params[:course_section_id])
+        elsif request.path.match(/\A\/profile/) || request.path == '/' || request.path.match(/\A\/dashboard\/files/) || request.path.match(/\A\/calendar/) || request.path.match(/\A\/assignments/) || request.path.match(/\A\/files/) || request.path == '/api/v1/calendar_events/visible_contexts'
+          # ^ this should be split out into things on the individual controllers
+          @context_is_current_user = true
+          @context = @current_user
+          @context_membership = @context
         end
-        @context_membership = @context_enrollment
-        check_for_readonly_enrollment_state
-      elsif params[:account_id] || (self.is_a?(AccountsController) && params[:account_id] = params[:id])
-        @context = api_find(Account, params[:account_id])
-        params[:context_id] = @context.id
-        params[:context_type] = "Account"
-        @context_enrollment = @context.account_users.active.where(user_id: @current_user.id).first if @context && @current_user
-        @context_membership = @context_enrollment
-        @account = @context
-      elsif params[:group_id]
-        @context = api_find(Group.active, params[:group_id])
-        params[:context_id] = params[:group_id]
-        params[:context_type] = "Group"
-        @context_enrollment = @context.group_memberships.where(user_id: @current_user).first if @context && @current_user
-        @context_membership = @context_enrollment
-      elsif params[:user_id] || (self.is_a?(UsersController) && params[:user_id] = params[:id])
-        @context = api_find(User, params[:user_id])
-        params[:context_id] = params[:user_id]
-        params[:context_type] = "User"
-        @context_membership = @context if @context == @current_user
-      elsif params[:course_section_id] || (self.is_a?(SectionsController) && params[:course_section_id] = params[:id])
-        params[:context_id] = params[:course_section_id]
-        params[:context_type] = "CourseSection"
-        @context = api_find(CourseSection, params[:course_section_id])
-      elsif request.path.match(/\A\/profile/) || request.path == '/' || request.path.match(/\A\/dashboard\/files/) || request.path.match(/\A\/calendar/) || request.path.match(/\A\/assignments/) || request.path.match(/\A\/files/) || request.path == '/api/v1/calendar_events/visible_contexts'
-        # ^ this should be split out into things on the individual controllers
-        @context_is_current_user = true
-        @context = @current_user
-        @context_membership = @context
-      end
 
-      assign_localizer if @context.present?
+        assign_localizer if @context.present?
 
-      if request.format.html?
-        if @context.is_a?(Account) && !@context.root_account?
-          account_chain = @context.account_chain.to_a.select {|a| a.grants_right?(@current_user, session, :read) }
-          account_chain.slice!(0) # the first element is the current context
-          count = account_chain.length
-          account_chain.reverse.each_with_index do |a, idx|
-            if idx == 1 && count >= MAX_ACCOUNT_LINEAGE_TO_SHOW_IN_CRUMBS
-              add_crumb(I18n.t('#lib.text_helper.ellipsis', '...'), nil)
-            elsif count >= MAX_ACCOUNT_LINEAGE_TO_SHOW_IN_CRUMBS && idx > 0 && idx <= count - MAX_ACCOUNT_LINEAGE_TO_SHOW_IN_CRUMBS
-              next
-            else
-              add_crumb(a.short_name, account_url(a.id), :id => "crumb_#{a.asset_string}")
+        if request.format.html?
+          if @context.is_a?(Account) && !@context.root_account?
+            account_chain = @context.account_chain.to_a.select {|a| a.grants_right?(@current_user, session, :read) }
+            account_chain.slice!(0) # the first element is the current context
+            count = account_chain.length
+            account_chain.reverse.each_with_index do |a, idx|
+              if idx == 1 && count >= MAX_ACCOUNT_LINEAGE_TO_SHOW_IN_CRUMBS
+                add_crumb(I18n.t('#lib.text_helper.ellipsis', '...'), nil)
+              elsif count >= MAX_ACCOUNT_LINEAGE_TO_SHOW_IN_CRUMBS && idx > 0 && idx <= count - MAX_ACCOUNT_LINEAGE_TO_SHOW_IN_CRUMBS
+                next
+              else
+                add_crumb(a.short_name, account_url(a.id), :id => "crumb_#{a.asset_string}")
+              end
             end
           end
-        end
 
-        if @context && @context.respond_to?(:short_name)
-          crumb_url = named_context_url(@context, :context_url) if @context.grants_right?(@current_user, session, :read)
-          add_crumb(@context.nickname_for(@current_user, :short_name), crumb_url)
-        end
+          if @context && @context.respond_to?(:short_name)
+            crumb_url = named_context_url(@context, :context_url) if @context.grants_right?(@current_user, session, :read)
+            add_crumb(@context.nickname_for(@current_user, :short_name), crumb_url)
+          end
 
-        @set_badge_counts = true
+          @set_badge_counts = true
+        end
       end
-    end
 
-    # There is lots of interesting information set up in here, that we want
-    # to place into the live events context.
-    setup_live_events_context
+      # There is lots of interesting information set up in here, that we want
+      # to place into the live events context.
+      setup_live_events_context
+    end
   end
 
   # This is used by a number of actions to retrieve a list of all contexts
