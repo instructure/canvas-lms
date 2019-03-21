@@ -878,7 +878,9 @@ class Assignment < ActiveRecord::Base
     assignment_groups = self.context.assignment_groups.active
     if !assignment_groups.map(&:id).include?(self.assignment_group_id)
       self.assignment_group = assignment_groups.first
-      save! if do_save
+      Shackles.activate(:master) do
+        save! if do_save
+      end
     end
   end
 
