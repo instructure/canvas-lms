@@ -20,10 +20,13 @@ RSpec.describe 'PageViewReporter', type: :model do
       @page_view.created_at = Time.now
       @page_view.updated_at = Time.now
       @page_view.save!
+
+      student_in_course(:active_all => 1)
+      course_with_teacher_logged_in
     end
 
     it "can run some spec-age" do
-
+      skip 'Id like to be tested at some point'
     end
   end
 end

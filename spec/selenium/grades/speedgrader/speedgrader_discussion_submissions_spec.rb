@@ -61,7 +61,7 @@ describe "speed grader - discussion submissions" do
   end
 
   it "displays discussion entries for only one student", priority: "1", test_id: 283745 do
-    visit "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+    get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     sleep 2
     # check for correct submissions in speed grader iframe
     in_frame 'speedgrader_iframe' do
@@ -82,7 +82,7 @@ describe "speed grader - discussion submissions" do
 
   context "when student names hidden" do
     it "hides the name of student on discussion iframe", priority: "2", test_id: 283746 do
-      visit "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       f("#settings_link").click
       f('#hide_student_names').click
@@ -104,7 +104,7 @@ describe "speed grader - discussion submissions" do
       teacher_entry.update_topic
       teacher_entry.context_module_action
 
-      visit "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       f("#settings_link").click
       f('#hide_student_names').click
@@ -124,7 +124,7 @@ describe "speed grader - discussion submissions" do
     end
 
     it "hides avatars on entries on both discussion links", priority: "2", test_id: 283748 do
-      visit "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       f("#settings_link").click
       f('#hide_student_names').click
@@ -136,7 +136,7 @@ describe "speed grader - discussion submissions" do
         expect(f("body")).not_to contain_css('.avatar')
       end
 
-      visit "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       sleep 2
       in_frame 'speedgrader_iframe' do
         f('.header_title a').click

@@ -61,9 +61,9 @@ Capybara.add_selector :record do
   match { |record| record.is_a?(ActiveRecord::Base) }
 end
 
-# port and url to webpack server
+# Webpack: port and url
 WEB_TEST_PORT = '5005'.freeze
-WEB_TEST_URL = "http://localhost:#{WEB_TEST_PORT}".freeze
+WEB_TEST_URL  = "http://localhost:#{WEB_TEST_PORT}".freeze
 
 def capybara_wait_for_webpack_server
   10.times.each do |_|
@@ -76,7 +76,8 @@ def capybara_wait_for_webpack_server
   end
 end
 
-# server strongmind will run the webpack server and the rails server
+# Server 'strongmind' will run webpack before the specs run, and wait for it to finish,
+# then starts the rails server
 Capybara.register_server :strongmind do |app, port, host|
   require 'rack/handler/thin'
 
@@ -100,6 +101,7 @@ Capybara.register_server :strongmind do |app, port, host|
   Rack::Handler::Thin.run(app, :Port => port, :Host => host)
 end
 
+# Server 'thin' does not run webpack and I feel it's faster than puma.  CI
 Capybara.register_server :thin do |app, port, host|
   require 'rack/handler/thin'
   Rack::Handler::Thin.run(app, :Port => port, :Host => host)
@@ -107,7 +109,7 @@ end
 
 ## Capy Configuration Defaults
 Capybara.configure do |config|
-  config.server                = :thin # :strongmind # or :puma/:webrick
+  config.server                = :thin # :strongmind/:puma/:webrick
   config.javascript_driver     = ENV['HEADLESS'] ? :headless_chrome : :chrome
   config.default_max_wait_time = 7
 end
@@ -127,7 +129,7 @@ Capybara::Screenshot.register_filename_prefix_formatter(:rspec) do |example|
 end
 
 # if ENV['CI_RUNNING']
-#   # don't attempt to generate on Codeship, not currently using Codeship/CI
+#   # don't attempt to generate on CI
 #   Capybara::Screenshot::RSpec.add_link_to_screenshot_for_failed_examples = false
 # else
   # better looking screenshots (fixes relative paths when desired)

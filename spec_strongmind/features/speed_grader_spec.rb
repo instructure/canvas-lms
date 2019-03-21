@@ -48,20 +48,14 @@ RSpec.describe 'Speedgrader improvements for teacher productivity', type: :featu
 
   it "displays discussion topic title and content to give the teacher more context when grading discussion boards responses" do
     visit "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
-    sleep 2
+
     expect(page).to have_selector('#speedgrader_iframe')
+    sleep 2
 
-    switch_to_frame(find('#speedgrader_iframe'))
-    sleep 1
     # check for discussion topic content above replies in speed grader iframe
-    # within '#main' do
-    expect(page).to have_selector('.discussion-title', text: @discussion_topic.title)
-    expect(page).to have_selector('.discussion-section', text: @discussion_topic.message)
-    # end
-    binding.pry
-    switch_to_frame(:top)
-
-    expect(page).to have_selector('speedgrader_iframe')
+    within_frame(find('#speedgrader_iframe')) do
+      expect(page).to have_selector('.discussion-title', text: @discussion_topic.title)
+      expect(page).to have_selector('.discussion-section', text: @discussion_topic.message)
+    end
   end
-
 end
