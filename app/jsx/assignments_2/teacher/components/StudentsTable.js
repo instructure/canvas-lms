@@ -17,14 +17,15 @@
  */
 
 import React from 'react'
+import {arrayOf, func, string} from 'prop-types'
 import I18n from 'i18n!assignments_2'
 
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 
-import {TeacherAssignmentShape} from '../assignmentData'
+import {TeacherAssignmentShape, SubmissionShape} from '../assignmentData'
 
 import View from '@instructure/ui-layout/lib/components/View'
-import {Table} from '@instructure/ui-elements'
+import {Table} from '@instructure/ui-table'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import IconExpandStart from '@instructure/ui-icons/lib/Line/IconExpandStart'
 import Avatar from '@instructure/ui-elements/lib/components/Avatar'
@@ -33,9 +34,32 @@ import FriendlyDatetime from '../../../shared/FriendlyDatetime'
 import Link from '@instructure/ui-elements/lib/components/Link'
 import StudentTray from './StudentTray'
 
-export default class Students extends React.Component {
+const {Head, Body, ColHeader, Row, Cell} = Table
+
+const HEADERS = [
+  {id: 'username', label: I18n.t('Name')},
+  {id: 'attempts', label: I18n.t('submission_attempts', 'Attempts')},
+  {id: 'score', label: I18n.t('Score')},
+  {id: 'submitted_at', label: I18n.t('Submission Date')},
+  {id: 'status', label: I18n.t('Status')},
+  {id: 'more', label: I18n.t('More')}
+]
+
+export default class StudentsTable extends React.Component {
   static propTypes = {
-    assignment: TeacherAssignmentShape.isRequired
+    assignment: TeacherAssignmentShape.isRequired,
+    submissions: arrayOf(SubmissionShape).isRequired,
+    sortableColumns: arrayOf(string),
+    sortId: string, // id of column above, or ''
+    sortDirection: string, // 'ascending', 'descending', or 'none'
+    onRequestSort: func
+  }
+
+  static defaultProps = {
+    sortableColumns: [],
+    sortId: '',
+    sortDirection: 'none',
+    onRequestSort: () => {}
   }
 
   constructor(props) {
@@ -43,13 +67,16 @@ export default class Students extends React.Component {
     this.state = {
       trayOpen: false,
       trayStudentIndex: null,
-      studentData: this.prepareStudentData()
+      studentData: StudentsTable.prepareStudentData(props)
     }
   }
 
-  prepareStudentData() {
-    // Another story will deal with student pagination and sorting
-    return this.props.assignment.submissions.nodes.map(submission => ({
+  static getDerivedStateFromProps(props) {
+    return {studentData: StudentsTable.prepareStudentData(props)}
+  }
+
+  static prepareStudentData(props) {
+    return props.submissions.map(submission => ({
       ...submission.user,
       ...{submission}
     }))
@@ -118,14 +145,14 @@ export default class Students extends React.Component {
 
   renderStudent(student) {
     return (
-      <tr key={student.lid}>
-        <td>{this.renderNameColumn(student)}</td>
-        <td>{this.renderAttemptsColumn(student)}</td>
-        <td>{this.renderScoreColumn(student)}</td>
-        <td>{this.renderSubmittedAtColumn(student)}</td>
-        <td>{this.renderSubmissionStatusColumn(student)}</td>
-        <td>{this.renderTrayButton(student)}</td>
-      </tr>
+      <Row key={student.lid}>
+        <Cell>{this.renderNameColumn(student)}</Cell>
+        <Cell>{this.renderAttemptsColumn(student)}</Cell>
+        <Cell>{this.renderScoreColumn(student)}</Cell>
+        <Cell>{this.renderSubmittedAtColumn(student)}</Cell>
+        <Cell>{this.renderSubmissionStatusColumn(student)}</Cell>
+        <Cell>{this.renderTrayButton(student)}</Cell>
+      </Row>
     )
   }
 
@@ -187,6 +214,21 @@ export default class Students extends React.Component {
     )
   }
 
+  renderHeader = ({id, label}) => {
+    const sortProps = {}
+    if (this.props.sortableColumns.includes(id)) {
+      sortProps.onRequestSort = this.props.onRequestSort
+    }
+    if (this.props.sortId === id) {
+      sortProps.sortDirection = this.props.sortDirection
+    }
+    return (
+      <ColHeader key={id} id={id} {...sortProps}>
+        {label}
+      </ColHeader>
+    )
+  }
+
   render() {
     return (
       <View as="div">
@@ -196,18 +238,10 @@ export default class Students extends React.Component {
             <ScreenReaderContent>{I18n.t('Overview of student status')}</ScreenReaderContent>
           }
         >
-          <thead>
-            <tr>
-              <th scope="col">{I18n.t('Name')}</th>
-              <th scope="col">{I18n.t('submission_attempts', 'Attempts')}</th>
-              <th scope="col">{I18n.t('Score')}</th>
-              <th scope="col">{I18n.t('Submission Date')}</th>
-              <th scope="col">{I18n.t('Status')}</th>
-              <th scope="col">{I18n.t('More')}</th>
-            </tr>
-          </thead>
-
-          <tbody>{this.renderStudents()}</tbody>
+          <Head>
+            <Row>{HEADERS.map(this.renderHeader)}</Row>
+          </Head>
+          <Body>{this.renderStudents()}</Body>
         </Table>
       </View>
     )

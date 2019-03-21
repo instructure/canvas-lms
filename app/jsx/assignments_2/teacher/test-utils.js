@@ -195,12 +195,14 @@ export function mockSubmission(overrides) {
 
 export function mockUser(overrides) {
   return {
+    __typename: 'User',
     lid: 'user_1',
     gid: 'user_1',
     name: 'Juan User',
     shortName: 'Juan',
     sortableName: 'User, Juan',
     email: 'juan_user1@example.com',
+    avatarUrl: 'http://host.test',
     ...overrides
   }
 }

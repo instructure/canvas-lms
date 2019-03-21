@@ -20,7 +20,7 @@ import React from 'react'
 import {render} from 'react-testing-library'
 import {closest, mockAssignment, mockUser, mockSubmission} from '../../test-utils'
 import apiUserContent from 'compiled/str/apiUserContent'
-import Students from '../Students'
+import StudentsTable from '../StudentsTable'
 
 import I18n from 'i18n!assignments_2'
 import tz from 'timezone'
@@ -31,14 +31,10 @@ apiUserContent.convert = jest.fn(arg => `converted ${arg}`)
 it('renders basic information', () => {
   const user = mockUser()
   const submission = mockSubmission({nodes: [user]})
-  const assignment = mockAssignment({
-    submissions: {
-      nodes: [submission]
-    }
-  })
+  const assignment = mockAssignment()
   const submittedAt = `${tz.format(submission.submittedAt, I18n.t('#date.formats.full'))}`
 
-  const {getByText} = render(<Students assignment={assignment} />)
+  const {getByText} = render(<StudentsTable assignment={assignment} submissions={[submission]} />)
   expect(getByText('Name')).toBeInTheDocument()
   expect(getByText(user.shortName)).toBeInTheDocument()
   expect(getByText('Attempts')).toBeInTheDocument()
@@ -58,21 +54,31 @@ it('renders basic information', () => {
 })
 
 it('renders submission status pill', () => {
-  const user = mockUser()
   const submission = mockSubmission({
     submittedAt: null,
-    submissionStatus: 'late',
-    nodes: [user]
+    submissionStatus: 'late'
   })
-  const assignment = mockAssignment({
-    submissions: {
-      nodes: [submission]
-    }
-  })
+  const assignment = mockAssignment()
   const submittedAt = `${tz.format(submission.submittedAt, I18n.t('#date.formats.full'))}`
 
-  const {queryByText, getByText} = render(<Students assignment={assignment} />)
+  const {queryByText, getByText} = render(
+    <StudentsTable assignment={assignment} submissions={[submission]} />
+  )
   expect(queryByText('View Submission', {exact: false})).toBeNull()
   expect(queryByText(submittedAt)).toBeNull()
   expect(getByText('Late')).toBeInTheDocument()
+})
+
+it('renders the specified sort direction', () => {
+  const {getByText} = render(
+    <StudentsTable
+      assignment={mockAssignment()}
+      submissions={[mockSubmission()]}
+      sortableColumns={['username']}
+      sortId="username"
+      sortDirection="descending"
+    />
+  )
+  const nameButton = closest(getByText('Name'), 'button')
+  expect(nameButton.querySelector('[name="IconMiniArrowDown"]')).not.toBe(null)
 })

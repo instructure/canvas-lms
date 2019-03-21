@@ -1554,6 +1554,21 @@
     classnames "^2"
     prop-types "^15"
 
+"@instructure/ui-table@^5":
+  version "5.48.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-table/-/ui-table-5.48.0.tgz#e31a26c0c0cd0a9a673c2ceba5743e687c0a4109"
+  integrity sha512-wXf2XFtg6nLzmRdBGqm2KdVG7jmoURx4ChS7FQxDW+c/8bLuUnTRb/snf+JnXKo4kttQJnvVy8PY0Ta2uRfgrg==
+  dependencies:
+    "@babel/runtime" "^7"
+    "@instructure/ui-icons" "^5"
+    "@instructure/ui-layout" "^5"
+    "@instructure/ui-testable" "^5"
+    "@instructure/ui-themeable" "^5"
+    "@instructure/ui-utils" "^5"
+    classnames "^2"
+    prop-types "^15"
+    react "^0.14.9 || ^15 || ^16"
+
 "@instructure/ui-tabs@^5":
   version "5.48.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-tabs/-/ui-tabs-5.48.0.tgz#6b45454140e0d501a1238e708ca4209f6bf18f1f"
@@ -14515,7 +14530,7 @@ react@0.14.9:
     envify "^3.0.0"
     fbjs "^0.6.1"
 
-"react@^0.14.7 || ^15 || 16", "react@^0.14.8 || ^15.0.0 || ^16", react@^16.6.0:
+"react@^0.14.7 || ^15 || 16", "react@^0.14.8 || ^15.0.0 || ^16", "react@^0.14.9 || ^15 || ^16", react@^16.6.0:
   version "16.8.4"
   resolved "https://registry.yarnpkg.com/react/-/react-16.8.4.tgz#fdf7bd9ae53f03a9c4cd1a371432c206be1c4768"
   integrity sha512-0GQ6gFXfUH7aZcjGVymlPOASTuSjlQL4ZtVC5YKH+3JL6bBLCVO21DknzmaPlI90LN253ojj02nsapy+j7wIjg==
