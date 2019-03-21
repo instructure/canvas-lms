@@ -23,22 +23,13 @@ const errorsToIgnore = ["Warning: [Focusable] Exactly one tabbable child is requ
 
 window.fetch = require('unfetch')
 
-/* eslint-disable no-console */
-global.console = {
-    log: console.log,
-    error: (message) => {
-      if(errorsToIgnore.includes(message)) {
-        return
-      }
-      console.err(message)
-    },
-    err: console.error,
-    warn: console.warn,
-    info: console.info,
-    debug: console.debug
-}
- /* eslint-enable no-console */
-
+/* eslint-disable-next-line */
+const _consoleDotError = console.error
+/* eslint-disable-next-line */
+console.error = function (message) {
+      if(errorsToIgnore.includes(message)) return
+      _consoleDotError.apply(this, arguments)
+    }
 
 window.scroll = () => {}
 window.ENV = {}
