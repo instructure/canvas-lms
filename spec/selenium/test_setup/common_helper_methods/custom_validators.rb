@@ -81,6 +81,10 @@ module CustomValidators
     expect(f("#flash_message_holder")).not_to contain_jqcss(selector)
   end
 
+  def expect_no_instui_flash_message
+    expect(f('body')).not_to contain_css('#flashalert_message_holder')
+  end
+
   def assert_flash_notice_message(okay_message)
     expect_flash_message :success, okay_message
   end

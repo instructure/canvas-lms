@@ -37,5 +37,21 @@ describe "content security policy" do
       expect_instui_flash_message "Content on this page violates the security policy, contact your admin for assistance."
     end
 
+    it "should NOT display a flash alert for whitelisted iframe" do
+      Account.default.enable_feature!(:javascript_csp)
+      Account.default.enable_csp!
+      Account.default.add_domain!('www.youtube.com')
+
+      course_with_teacher_logged_in
+      @course.wiki_pages.create!(title: 'Page1', body: "<iframe width=\"560\" height=\"315\""\
+      " src=\"https://www.youtube.com/embed/dQw4w9WgXcQ\" frameborder=\"0\""\
+      " allow=\"accelerometer; autoplay; encrypted-media; gyroscope;"\
+      " picture-in-picture\" allowfullscreen></iframe>")
+
+      get "/courses/#{@course.id}/pages/Page1/"
+
+      expect_no_instui_flash_message
+    end
+
   end
 end
