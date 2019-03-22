@@ -34,6 +34,14 @@ describe "report helper" do
   let(:account_report) { AccountReport.new(report_type: 'test_report', account: account, user: user) }
   let(:report) { AccountReports::TestReport.new(account_report) }
 
+  it 'should handle basic math' do
+    expect(report.number_of_items_per_runner(1)).to eq 25
+    expect(report.number_of_items_per_runner(13001)).to eq 130
+    expect(report.number_of_items_per_runner(1801308213)).to eq 1000
+    expect(report.number_of_items_per_runner(100, min: 10)).to eq 10
+    expect(report.number_of_items_per_runner(109213081, max: 100)).to eq 100
+  end
+
   describe "#send_report" do
     before do
       allow(AccountReports).to receive(:available_reports).and_return(account_report.report_type => {title: 'test_report'})
