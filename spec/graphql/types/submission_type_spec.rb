@@ -161,7 +161,17 @@ describe Types::SubmissionType do
         ).to eq [@comment2.id.to_s]
       end
 
-      it "translates attempt 0 to attemp nil in the database query" do
+      it "will only return published drafts" do
+        @comment3 = @submission.add_comment(author: @teacher, comment: "test3", attempt: 1, draft_comment: true)
+        @comment4 = @submission.add_comment(author: @teacher, comment: "test3", attempt: 1, draft_comment: false)
+        expect(
+          submission_type.resolve(
+            "commentsConnection { nodes { _id }}",
+          )
+        ).to eq [@comment.id.to_s, @comment2.id.to_s, @comment4.id.to_s]
+      end
+
+      it "translates attempt 0 to attempt nil in the database query" do
         expect(
           submission_type.resolve(
             "commentsConnection(filter: {attempts: [0]}) { nodes { _id }}",

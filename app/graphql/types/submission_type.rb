@@ -66,7 +66,7 @@ module Types
     def comments_connection(filter: nil)
       filter ||= {}
       load_association(:assignment).then do
-        scope = submission.comments_for(current_user)
+        scope = submission.comments_for(current_user).published
         if filter[:attempts].present?
           # Attempt 0 is represented as attempt nil in the database. It proved
           # to be a PITA to try and chagne that, so we are fixing it up at the
