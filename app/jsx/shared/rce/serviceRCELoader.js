@@ -83,7 +83,7 @@ import splitAssetString from 'compiled/str/splitAssetString'
     loadRCE(cb) {
       require.ensure([], (require) => {
         const first = !this.RCE
-        this.RCE = require('canvas-rce/lib/async')
+        this.RCE = require('@instructure/canvas-rce-old/lib/async')
         require('./initA11yChecker')
         if (first) {
           this.loadEventListeners()
