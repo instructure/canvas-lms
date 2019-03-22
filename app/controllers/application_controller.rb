@@ -1175,56 +1175,65 @@ class ApplicationController < ActionController::Base
     return unless user && @context && asset
     return if asset.respond_to?(:new_record?) && asset.new_record?
 
-    code = if asset.is_a?(Array)
-             "#{asset[0]}:#{asset[1].asset_string}"
-           else
-             asset.asset_string
-           end
+    shard = asset.is_a?(Array) ? asset[1].shard : asset.shard
+    shard.activate do
+      code = if asset.is_a?(Array)
+               "#{asset[0]}:#{asset[1].asset_string}"
+             else
+               asset.asset_string
+             end
 
-    membership_type ||= @context_membership && @context_membership.class.to_s
+      membership_type ||= @context_membership && @context_membership.class.to_s
 
-    group_code = if asset_group.is_a?(String)
-                   asset_group
-                 elsif asset_group.respond_to?(:asset_string)
-                   asset_group.asset_string
-                 else
-                   'unknown'
-                 end
+      group_code = if asset_group.is_a?(String)
+                     asset_group
+                   elsif asset_group.respond_to?(:asset_string)
+                     asset_group.asset_string
+                   else
+                     'unknown'
+                   end
 
-    if !@accessed_asset || overwrite
-      @accessed_asset = {
-        :user => user,
-        :code => code,
-        :group_code => group_code,
-        :category => asset_category,
-        :membership_type => membership_type,
-        :level => level
-      }
+      if !@accessed_asset || overwrite
+        @accessed_asset = {
+          :user => user,
+          :code => code,
+          :group_code => group_code,
+          :category => asset_category,
+          :membership_type => membership_type,
+          :level => level,
+          :shard => shard
+        }
+      end
+
+      Canvas::LiveEvents.asset_access(asset, asset_category, membership_type, level)
+
+      @accessed_asset
     end
-
-    Canvas::LiveEvents.asset_access(asset, asset_category, membership_type, level)
-
-    @accessed_asset
   end
 
   def log_page_view
     return true if !page_views_enabled?
 
-    user = @current_user || (@accessed_asset && @accessed_asset[:user])
-    if user && @log_page_views != false
-      add_interaction_seconds
-      log_participation(user)
-      log_gets
-      finalize_page_view
-    else
-      @page_view.destroy if @page_view && !@page_view.new_record?
-    end
+    shard = (@accessed_asset && @accessed_asset[:shard]) || Shard.current
+    shard.activate do
+      begin
+        user = @current_user || (@accessed_asset && @accessed_asset[:user])
+        if user && @log_page_views != false
+          add_interaction_seconds
+          log_participation(user)
+          log_gets
+          finalize_page_view
+        else
+          @page_view.destroy if @page_view && !@page_view.new_record?
+        end
 
-  rescue StandardError, CassandraCQL::Error::InvalidRequestException => e
-    Canvas::Errors.capture_exception(:page_view, e)
-    logger.error "Pageview error!"
-    raise e if Rails.env.development?
-    true
+      rescue StandardError, CassandraCQL::Error::InvalidRequestException => e
+        Canvas::Errors.capture_exception(:page_view, e)
+        logger.error "Pageview error!"
+        raise e if Rails.env.development?
+        true
+      end
+    end
   end
 
   def add_interaction_seconds
