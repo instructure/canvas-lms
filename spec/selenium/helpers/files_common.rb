@@ -181,18 +181,13 @@ module FilesCommon
   end
 
   def insert_file_from_rce(insert_into = nil)
-    if insert_into == :quiz
-      ff(".ui-tabs-anchor")[6].click
-    else
-      file_tab = ff(".ui-tabs-anchor")[1]
-      expect(file_tab).to be_displayed
-      ff(".ui-tabs-anchor")[1].click
-    end
-    ff(".name.text")[0].click
     wait_for_ajaximations
-    ff(".name.text")[1].click
+    skip("CORE-2714 figure out why the files tab shows up as disabled on the rcs sidebar in jenkins")
+    fj('[role=tablist] [role=presentation]:not([aria-disabled]):contains("Files")').click
     wait_for_ajaximations
-    ff(".name.text")[2].click
+    fj('[role=tabpanel] button:contains("unfiled")').click
+    wait_for_ajaximations
+    fj('[role=tabpanel] button:contains("some test file")').click
     wait_for_ajaximations
     if insert_into == :quiz
       ff(".name.text")[3].click

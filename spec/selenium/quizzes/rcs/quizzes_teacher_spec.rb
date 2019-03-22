@@ -42,7 +42,6 @@ describe "quizzes" do
       @course.update_attributes(:name => 'teacher course')
       @course.save!
       @course.reload
-      enable_all_rcs @course.account
     end
 
     before(:each) do

@@ -28,7 +28,6 @@ describe 'quizzes regressions' do
     course_with_teacher_logged_in(course_name: 'teacher course')
     @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwertyuiop')
     @course.enroll_user(@student, "StudentEnrollment", :enrollment_state => 'active')
-    enable_all_rcs @course.account
     stub_rcs_config
   end
 

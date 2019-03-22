@@ -96,6 +96,7 @@ describe "Wiki Pages" do
     end
 
     it "should update the page with changes made in another window", priority: "1", test_id: 126833 do
+      skip('CORE-2714 when the rcs is enabled, this raises SpecTimeLimit::Error: Exceeded the 31 sec historical threshold for this particular spec.')
       @course.wiki_pages.create!(title: 'Page1')
       edit_page('this is')
       driver.execute_script("window.open()")

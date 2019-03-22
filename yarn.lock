@@ -16867,12 +16867,12 @@ tinymce-a11y-checker@^1.11.0:
     react-dom "^0.14.8 || ^15.0.0 || ^16"
     wcag-element-contrast "^1.0.1"
 
-tinymce-light-skin@1.3.1, tinymce-light-skin@~1.3.0:
+tinymce-light-skin@~1.3.0:
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/tinymce-light-skin/-/tinymce-light-skin-1.3.1.tgz#fcce7a8b5761716a381f756e1ac7f47c7a41ea88"
   integrity sha512-NMmaqaZMvHeWcdJvYfNKK3wXkNkdhFjo3xswm7AiQLtU5eQHCL4li4R8+R0BRD8ejHEOG2+Tdf+NzWI4cRsa8w==
 
-tinymce@^4.5.7, tinymce@^4.8.0:
+tinymce@^4.5.7:
   version "4.9.2"
   resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-4.9.2.tgz#c20ba7aa082125f16e0372fbc2f844c83236b75e"
   integrity sha512-ZRoTGG4GAsOI73QPSNkabO7nkoYw9H6cglRB44W2mMkxSiqxYi8WJlgkUphk0fDqo6ZD6r3E+NSP4UHxF2lySg==

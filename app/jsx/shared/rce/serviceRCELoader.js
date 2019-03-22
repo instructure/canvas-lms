@@ -27,8 +27,8 @@ import splitAssetString from 'compiled/str/splitAssetString'
 let loadingPromise
 
   const RCELoader = {
-    preload() {
-      this.loadRCE(function(){})
+    preload(cb) {
+      this.loadRCE(cb)
     },
 
     loadOnTarget(target, tinyMCEInitOptions, callback) {
@@ -181,27 +181,6 @@ let loadingPromise
         mirroredAttrs: this._attrsToMirror(textarea),
         onFocus: tinyMCEInitOptions.onFocus
       }
-    },
-
-    /**
-     * helps with url construction which is different when using a CDN
-     * than when loading directly from an RCE server
-     *
-     * @private
-     * @return {String} ready-to-use URL for loading RCE remotely
-     */
-    buildModuleUrl() {
-      let host, path
-      if (window.ENV.RICH_CONTENT_CDN_HOST) {
-        host = window.ENV.RICH_CONTENT_CDN_HOST
-        path = '/latest'
-      } else {
-        host = window.ENV.RICH_CONTENT_APP_HOST
-        path = '/get_module'
-      }
-      // trim trailing slash if there is one, as we're going to add one below
-      host = host.replace(/\/$/, "")
-      return '//' + host + path
     }
   }
 

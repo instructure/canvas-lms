@@ -29,7 +29,7 @@ class Quizzes::QuizzesController < ApplicationController
   attr_reader :lock_results_if_needed
 
   before_action :require_context
-  before_action :rich_content_service_config, only: [:show, :new, :edit]
+  before_action :rce_js_env, only: [:show, :new, :edit]
 
   add_crumb(proc { t('#crumbs.quizzes', "Quizzes") }) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_quizzes_url }
   before_action { |c| c.active_tab = "quizzes" }
@@ -799,10 +799,6 @@ class Quizzes::QuizzesController < ApplicationController
 
   def can_preview?
     @quiz.grants_right?(@current_user, session, :preview)
-  end
-
-  def rich_content_service_config
-    rce_js_env(:highrisk)
   end
 
   def get_banks(quiz)

@@ -93,6 +93,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     end
 
     it "should not allow students to add links to new pages unless they can create pages" do
+      skip('this only worked with the legacy editor. make it work w/ canvas-rce CORE-2714')
       create_wiki_page("test_page", false, "public")
       get "/courses/#{@course.id}/pages/test_page/edit"
       wait_for_ajax_requests

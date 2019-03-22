@@ -17,14 +17,12 @@
  */
 
 import $ from 'jquery'
-import tinymce from 'compiled/editor/stocktiny'
 import ValidatedMixin from 'compiled/views/ValidatedMixin'
 
 let textarea = null
 
 QUnit.module('ValidatedMixin', {
   setup() {
-    tinymce.remove()
     textarea = $("<textarea id='a42' name='message' data-rich_text='true'></textarea>")
     $('#fixtures').append(textarea)
     ValidatedMixin.$ = $

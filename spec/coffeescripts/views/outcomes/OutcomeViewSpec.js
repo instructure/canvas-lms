@@ -21,7 +21,6 @@ import fakeENV from 'helpers/fakeENV'
 import Outcome from 'compiled/models/Outcome'
 import OutcomeView from 'compiled/views/outcomes/OutcomeView'
 import I18nStubber from 'helpers/I18nStubber'
-import tinymce from 'compiled/editor/stocktiny'
 
 const newOutcome = (outcomeOptions, outcomeLinkOptions) =>
   new Outcome(buildOutcome(outcomeOptions, outcomeLinkOptions), {parse: true})

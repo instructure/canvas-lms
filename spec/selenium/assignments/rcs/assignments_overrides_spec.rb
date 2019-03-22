@@ -32,7 +32,6 @@ describe "assignment groups" do
       allow(ConditionalRelease::Service).to receive(:active_rules).and_return([])
       make_full_screen
       course_with_teacher_logged_in
-      enable_all_rcs @course.account
       stub_rcs_config
     end
 

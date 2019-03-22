@@ -21,7 +21,7 @@ class OutcomesController < ApplicationController
   before_action :require_context, :except => [:build_outcomes]
   add_crumb(proc { t "#crumbs.outcomes", "Outcomes" }, :except => [:destroy, :build_outcomes]) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_outcomes_path }
   before_action { |c| c.active_tab = "outcomes" }
-  before_action :rich_content_service_config, only: [:show, :index]
+  before_action :rce_js_env, only: [:show, :index]
 
   def index
     return unless authorized_action(@context, @current_user, :read)
@@ -304,10 +304,6 @@ class OutcomesController < ApplicationController
   end
 
   protected
-  def rich_content_service_config
-    rce_js_env(:basic)
-  end
-
   def learning_outcome_params
     params.require(:learning_outcome).permit(:description, :short_description, :title, :display_name, :vendor_guid)
   end

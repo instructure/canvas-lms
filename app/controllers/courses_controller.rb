@@ -1814,7 +1814,7 @@ class CoursesController < ApplicationController
           add_crumb(t('#crumbs.modules', "Modules"))
           load_modules
         when 'syllabus'
-          rce_js_env(:sidebar)
+          rce_js_env
           add_crumb(t('#crumbs.syllabus', "Syllabus"))
           @groups = @context.assignment_groups.active.order(
             :position,

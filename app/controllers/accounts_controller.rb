@@ -277,7 +277,7 @@ class AccountsController < ApplicationController
   before_action :require_user, :only => [:index, :terms_of_service, :help_links]
   before_action :reject_student_view_student
   before_action :get_context
-  before_action :rich_content_service_config, only: [:settings]
+  before_action :rce_js_env, only: [:settings]
 
   include Api::V1::Account
   include CustomSidebarLinksHelper
@@ -550,7 +550,7 @@ class AccountsController < ApplicationController
     end
 
     sortable_name_col = User.sortable_name_order_by_clause('users')
-    
+
     order = if params[:sort] == 'course_name'
               "#{Course.best_unicode_collation_key('courses.name')}"
             elsif params[:sort] == 'sis_course_id'
@@ -1361,11 +1361,6 @@ class AccountsController < ApplicationController
     count > 99 ? "99+" : count
   end
   private :format_avatar_count
-
-  protected
-  def rich_content_service_config
-    rce_js_env(:basic)
-  end
 
   private
 

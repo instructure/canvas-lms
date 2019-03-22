@@ -565,16 +565,6 @@ END
       root_opt_in: true,
       touch_context: true
     },
-    'rich_content_service_high_risk' =>
-    {
-      display_name: -> { I18n.t('Rich Content Editor Sidebar Enhancements') },
-      description: -> { I18n.t('Use new rich content editor with enhanced sidebar everywhere') },
-      applies_to: 'RootAccount',
-      state: 'hidden',
-      beta: false,
-      development: false,
-      root_opt_in: false
-    },
     'conditional_release' =>
     {
       display_name: -> { I18n.t('Mastery Paths') },

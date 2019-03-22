@@ -47,7 +47,6 @@ describe "discussions" do
 
       before(:each) do
         user_session(teacher)
-        enable_all_rcs @course.account
         stub_rcs_config
       end
 

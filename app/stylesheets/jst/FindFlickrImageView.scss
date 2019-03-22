@@ -32,17 +32,3 @@
     }
   }
 }
-
-.WikiSidebarView {
-  .flickrResults {
-    max-height: 130px;
-    li {
-      margin-bottom: 10px;
-      margin-#{direction(left)}: 10px;
-    }
-    img { 
-      width: 40px;
-      height: 40px;
-    }
-  }
-}

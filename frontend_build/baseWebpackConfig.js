@@ -160,16 +160,6 @@ module.exports = {
       /i18nliner\/dist\/lib\/i18nliner/ // i18nLiner has a `require('fs')` that it doesn't actually need, ignore it.
     ],
     rules: [
-      // to get tinymce to work. see: https://github.com/tinymce/tinymce/issues/2836
-      {
-        test: require.resolve('tinymce/tinymce'),
-        loaders: ['imports-loader?this=>window', 'exports-loader?window.tinymce']
-      },
-      {
-        test: /tinymce\/(themes|plugins)\//,
-        loaders: ['imports-loader?this=>window']
-      },
-
       {
         test: /\.js$/,
         include: [

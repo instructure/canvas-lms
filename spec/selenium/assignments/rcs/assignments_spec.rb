@@ -30,7 +30,6 @@ describe "assignments" do
   context "as a teacher" do
     before(:each) do
       course_with_teacher_logged_in
-      enable_all_rcs @course.account
       stub_rcs_config
       @course.start_at = nil
       @course.save!
@@ -279,7 +278,6 @@ describe "assignments" do
       account_rcs_model
       @account.set_feature_flag! 'post_grades', 'on'
       course_with_teacher_logged_in(:active_all => true, :account => @account)
-      enable_all_rcs @course.account
       stub_rcs_config
     end
 
@@ -300,7 +298,6 @@ describe "assignments" do
   context 'adding new assignment groups from assignment creation page' do
     before do
       course_with_teacher_logged_in
-      enable_all_rcs @course.account
       stub_rcs_config
       @new_group = 'fine_leather_jacket'
       get "/courses/#{@course.id}/assignments/new"

@@ -16,11 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import htmlEscape from '../../str/htmlEscape'
 import '../../jquery.dropdownList'
 import '../../jquery.instructure_misc_helpers'
-import {processContentItemsForEditor} from '../../../../app/jsx/deep_linking/ContentItemProcessor'
 
 /**
  * A module for holding helper functions pulled out of the instructure_external_tools/plugin.

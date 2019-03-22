@@ -50,7 +50,6 @@ describe "discussions" do
     context "as a teacher" do
       before(:each) do
         user_session(teacher)
-        enable_all_rcs @course.account
       end
 
       it "should add an attachment to a new topic", priority: "1", test_id: 150466 do
@@ -160,7 +159,6 @@ describe "discussions" do
     context "as a student" do
       before(:each) do
         user_session(student)
-        enable_all_rcs @course.account
       end
 
       it "should allow a student to create a discussion", priority: "1", test_id: 150471 do

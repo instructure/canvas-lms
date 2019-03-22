@@ -28,8 +28,6 @@ describe "discussion assignments" do
   before(:each) do
     @domain_root_account = Account.default
     course_with_teacher_logged_in
-    enable_all_rcs @course.account
-    enable_all_rcs @domain_root_account
     stub_rcs_config
   end
 
