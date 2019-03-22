@@ -110,7 +110,7 @@ export class SecurityPanel extends Component {
                 label={I18n.t('Enable Content Security Policy')}
                 onChange={this.handleCspToggleChange}
                 checked={this.props.cspEnabled}
-                disabled={this.props.cspInherited}
+                disabled={this.props.cspInherited && this.props.isSubAccount}
               />
             </GridCol>
           </GridRow>
