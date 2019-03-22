@@ -18,14 +18,13 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {GetLinkStateDefaults} from './student/assignmentData'
 import {ApolloProvider, createClient} from '../canvas-apollo'
 import StudentView from './student/StudentView'
 import ErrorBoundary from '../shared/components/ErrorBoundary'
 import GenericErrorPage from '../shared/components/GenericErrorPage/index'
 import errorShipUrl from './student/SVG/ErrorShip.svg'
 
-const client = createClient({defaults: GetLinkStateDefaults()})
+const client = createClient()
 
 export default function renderAssignmentsApp(env, elt) {
   ReactDOM.render(

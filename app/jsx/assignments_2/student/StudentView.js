@@ -22,7 +22,7 @@ import {string} from 'prop-types'
 import {Query} from 'react-apollo'
 import GenericErrorPage from '../../shared/components/GenericErrorPage/index'
 import errorShipUrl from './SVG/ErrorShip.svg'
-import {STUDENT_VIEW_QUERY} from './assignmentData'
+import {GetAssignmentEnvVariables, STUDENT_VIEW_QUERY} from './assignmentData'
 import LoadingIndicator from '../shared/LoadingIndicator'
 
 const StudentView = props => (
@@ -40,7 +40,14 @@ const StudentView = props => (
       }
 
       document.title = data.assignment.name
-      return <StudentContent assignment={data.assignment} />
+      const assignmentEnv = GetAssignmentEnvVariables()
+      const mergedAssignment = {
+        ...data.assignment,
+        env: {
+          ...assignmentEnv
+        }
+      }
+      return <StudentContent assignment={mergedAssignment} />
     }}
   </Query>
 )

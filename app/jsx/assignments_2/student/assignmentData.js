@@ -18,9 +18,14 @@
 import gql from 'graphql-tag'
 import {bool, number, shape, string, arrayOf} from 'prop-types'
 
-export function GetLinkStateDefaults() {
-  const defaults = {}
-  if (!window.ENV) {
+export function GetAssignmentEnvVariables() {
+  const defaults = {
+    assignmentUrl: '',
+    currentUserId: null,
+    modulePrereq: null,
+    moduleUrl: ''
+  }
+  if (!window.ENV || !Object.keys(window.ENV).length) {
     return defaults
   }
 
@@ -42,7 +47,7 @@ export function GetLinkStateDefaults() {
     defaults.modulePrereq = null
   }
 
-  return {env: {...defaults, __typename: 'env'}}
+  return {...defaults}
 }
 
 export const STUDENT_VIEW_QUERY = gql`
@@ -60,15 +65,6 @@ export const STUDENT_VIEW_QUERY = gql`
         allowedAttempts
         assignmentGroup {
           name
-        }
-        env @client {
-          assignmentUrl
-          moduleUrl
-          currentUserId
-          modulePrereq {
-            title
-            link
-          }
         }
         lockInfo {
           isLocked
