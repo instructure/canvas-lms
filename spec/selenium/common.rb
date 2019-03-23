@@ -246,6 +246,7 @@ shared_context "in-process server selenium tests" do
         "Warning: [Focusable] Exactly one focusable child is required (0 found).",
         # COMMS-1815: Meeseeks should fix this one on the permissions page
         "Warning: [Select] The option 'All Roles' doesn't correspond to an option.",
+        "Warning: [Focusable] Exactly one tabbable child is required (0 found).",
         "Access to Font at 'http://cdnjs.cloudflare.com/ajax/libs/mathjax/"
       ].freeze
 
