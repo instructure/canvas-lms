@@ -46,7 +46,9 @@ function CommentRow(props) {
             dateTime={props.comment.updatedAt}
           />
         </Text>
-        <Text>{props.comment.comment}</Text>
+        <Text color={props.comment._id === 'pending' ? 'secondary' : null}>
+          {props.comment.comment}
+        </Text>
         {props.comment.attachments.map(attachment => (
           <Link
             key={attachment._id}

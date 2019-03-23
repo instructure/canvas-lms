@@ -21,7 +21,7 @@ import {bool, number, shape, string, arrayOf} from 'prop-types'
 export function GetAssignmentEnvVariables() {
   const defaults = {
     assignmentUrl: '',
-    currentUserId: null,
+    currentUser: null,
     modulePrereq: null,
     moduleUrl: ''
   }
@@ -34,7 +34,7 @@ export function GetAssignmentEnvVariables() {
   }`
   defaults.assignmentUrl = `${baseUrl}/assignments`
   defaults.moduleUrl = `${baseUrl}/modules`
-  defaults.currentUserId = ENV.current_user_id
+  defaults.currentUser = ENV.current_user
 
   if (ENV.PREREQS.items && ENV.PREREQS.items.length !== 0 && ENV.PREREQS.items[0].prev) {
     const prereq = ENV.PREREQS.items[0].prev
@@ -48,6 +48,32 @@ export function GetAssignmentEnvVariables() {
   }
 
   return {...defaults}
+}
+
+function submissionCommentQueryParams() {
+  return `
+    _id
+    comment
+    updatedAt
+    mediaObject {
+      id
+      title
+      mediaType
+      mediaSources {
+        src: url
+        type: contentType
+      }
+    }
+    author {
+      avatarUrl
+      shortName
+    }
+    attachments {
+      _id
+      displayName
+      mimeClass
+      url
+    }`
 }
 
 export const STUDENT_VIEW_QUERY = gql`
@@ -78,6 +104,7 @@ export const STUDENT_VIEW_QUERY = gql`
           filter: {states: [unsubmitted, graded, pending_review, submitted]}
         ) {
           nodes {
+            _id
             id
             deductedPoints
             enteredGrade
@@ -98,30 +125,19 @@ export const SUBMISSION_COMMENT_QUERY = gql`
       ... on Submission {
         commentsConnection {
           nodes {
-            _id
-            comment
-            updatedAt
-            mediaObject {
-              id
-              title
-              mediaType
-              mediaSources {
-                src: url
-                type: contentType
-              }
-            }
-            author {
-              avatarUrl
-              shortName
-            }
-            attachments {
-              _id
-              displayName
-              mimeClass
-              url
-            }
+            ${submissionCommentQueryParams()}
           }
         }
+      }
+    }
+  }
+`
+
+export const CREATE_SUBMISSION_COMMENT = gql`
+  mutation CreateSubmissionComment($id: ID!, $comment: String!) {
+    createSubmissionComment(input: {submissionId: $id, comment: $comment}) {
+      submissionComment {
+        ${submissionCommentQueryParams()}
       }
     }
   }
@@ -172,7 +188,10 @@ export const StudentAssignmentShape = shape({
   env: shape({
     assignmentUrl: string.isRequired,
     moduleUrl: string.isRequired,
-    currentUserId: string,
+    currentUser: shape({
+      display_name: string,
+      avatar_image_url: string
+    }),
     modulePrereq: shape({
       title: string.isRequired,
       link: string.isRequired
