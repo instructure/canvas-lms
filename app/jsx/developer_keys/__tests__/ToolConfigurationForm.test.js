@@ -70,3 +70,14 @@ describe('when configuration method is by URL', () => {
     expect(wrapper.state().configurationType).toEqual('json')
   })
 })
+
+describe('when configuration method is manual', () => {
+  beforeEach(() => {
+    wrapper = mount(<ToolConfigurationForm {...newProps()} />)
+    wrapper.setState({configurationType: 'manual'})
+  })
+
+  it('renders the manual configuration form', () => {
+    expect(wrapper.find('ManualConfigurationForm').exists()).toEqual(true)
+  })
+})
