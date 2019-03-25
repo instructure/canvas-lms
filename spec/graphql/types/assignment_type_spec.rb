@@ -142,6 +142,17 @@ describe Types::AssignmentType do
       expect(assignment_type.resolve("description", request: ActionDispatch::TestRequest.create)).to be_nil
     end
 
+    it "works for assignments in public courses" do
+      course.update! is_public: true
+      expect(
+        assignment_type.resolve(
+          "description",
+          request: ActionDispatch::TestRequest.create,
+          current_user: nil
+        )
+      ).to include "Content"
+    end
+
     it "uses api_user_content for the description" do
       expect(
         assignment_type.resolve("description", request: ActionDispatch::TestRequest.create)
