@@ -88,7 +88,7 @@ pipeline {
           script {
             withGerritCredentials({ ->
               sh '''
-                gerrit_message="Gerrit Builder Started $JOB_BASE_NAME\nTag: $PATCHSET_TAG\nBuild: $BUILD_URL"
+                gerrit_message="Gerrit Builder Started $JOB_BASE_NAME: canvas-lms:$NAME\n$BUILD_URL"
                 ssh -i "$SSH_KEY_PATH" -l "$SSH_USERNAME" -p $GERRIT_PORT \
                   hudson@$GERRIT_HOST gerrit review -m "'$gerrit_message'" $GERRIT_CHANGE_NUMBER,$GERRIT_PATCHSET_NUMBER
               '''
@@ -158,7 +158,7 @@ pipeline {
       script {
         withGerritCredentials({ ->
           sh '''
-            gerrit_message="Gerrit Builder $JOB_BASE_NAME Failed.\nTag: $PATCHSET_TAG\nBuild: $BUILD_URL"
+            gerrit_message="Gerrit Builder $JOB_BASE_NAME: canvas-lms:$NAME Failed.\n$BUILD_URL
             ssh -i "$SSH_KEY_PATH" -l "$SSH_USERNAME" -p $GERRIT_PORT \
               hudson@$GERRIT_HOST gerrit review -m "'$gerrit_message'" $GERRIT_CHANGE_NUMBER,$GERRIT_PATCHSET_NUMBER
           '''
