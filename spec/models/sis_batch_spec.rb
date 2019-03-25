@@ -839,6 +839,22 @@ test_4,TC 104,Test Course 104,,term1,active
       expect(SisBatch.new.file_diff_percent(175, 100)).to eq 75
     end
 
+    it "treats role_id as an identifying field for diffs" do
+      course_model(:account => @account, :sis_source_id => 'c1')
+      user_with_managed_pseudonym(:account => @account, :sis_user_id => 'u1')
+      role1 = @account.roles.create!(:base_role_type => "TeacherEnrollment", :name => "some role")
+      role2 = @account.roles.create!(:base_role_type => "TeacherEnrollment", :name => "some other role")
+
+      process_csv_data([%{course_id,user_id,role_id,status}], diffing_data_set_identifier: 'default')
+      process_csv_data(
+        [%{course_id,user_id,role_id,status
+        c1,u1,#{role1.id},active
+        c1,u1,#{role2.id},active}],
+        diffing_data_set_identifier: 'default')
+
+      expect(@user.enrollments.active.pluck(:role_id)).to match_array([role1.id, role2.id])
+    end
+
     it 'should set batch_ids on change_sis_id' do
       course1 = @account.courses.build
       course1.sis_source_id = 'test_1'
