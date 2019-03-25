@@ -160,4 +160,8 @@ module Csp::AccountHelper
     end
     [files_host]
   end
+
+  def csp_logging_config
+    @config ||= YAML.load(Canvas::DynamicSettings.find(tree: :private, cluster: shard.database_server.id)['csp_logging.yml'] || '{}')
+  end
 end

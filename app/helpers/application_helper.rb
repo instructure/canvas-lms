@@ -923,8 +923,7 @@ module ApplicationHelper
 
   def csp_report_uri
     @csp_report_uri ||= begin
-      csplogging_config = YAML.load(Canvas::DynamicSettings.find(tree: :private, cluster: csp_context.shard.database_server.id)['csp_logging.yml'] || '{}')
-      if (host = csplogging_config['host'])
+      if (host = csp_context.root_account.csp_logging_config['host'])
         "; report-uri #{host}report/#{csp_context.root_account.global_id}"
       else
         ""
