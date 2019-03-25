@@ -62,7 +62,7 @@ module Importers
       return unless node[attr].present?
 
       if attr == 'value'
-        return unless node[attr] && node[attr] =~ %r{IMS(?:-|_)CC(?:-|_)FILEBASE}
+        return unless node[attr] && node[attr] =~ %r{IMS(?:-|_)CC(?:-|_)FILEBASE} || node[attr] =~ %r{CANVAS_COURSE_REFERENCE}
       end
 
       url = node[attr].dup
@@ -114,6 +114,8 @@ module Importers
         unresolved(:discussion_topic, :migration_id => $1)
       elsif url =~ %r{\$CANVAS_COURSE_REFERENCE\$/modules/items/([^\?]*)(\?.*)?}
         unresolved(:module_item, :migration_id => $1, :query => $2)
+      elsif url =~ %r{\$CANVAS_COURSE_REFERENCE\$/file_ref/([^/\?#]+)(.*)}
+        unresolved(:file_ref, :migration_id => $1, :rest => $2)
       elsif url =~ %r{(?:\$CANVAS_OBJECT_REFERENCE\$|\$WIKI_REFERENCE\$)/([^/]*)/([^\?]*)(\?.*)?}
         unresolved(:object, :type => $1, :migration_id => $2, :query => $3)
 

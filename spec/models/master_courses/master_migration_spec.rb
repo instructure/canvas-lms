@@ -939,6 +939,42 @@ describe MasterCourses::MasterMigration do
       expect(copied_page.title).to eq new_master_title # even the title
     end
 
+    it "updates links correctly when creating an assignment and moving a file" do
+      @copy_to = course_factory
+
+      sub = @template.add_child_course!(@copy_to)
+
+      folder1 = @copy_from.folders.create!(:name => "folder1")
+      folder2 = folder1.sub_folders.create!(:name => "folder2", :context => @copy_from)
+      folder3 = folder2.sub_folders.create!(:name => "folder3", :context => @copy_from)
+      attachment = folder3.file_attachments.build
+      attachment.context = @copy_from
+      attachment.uploaded_data = default_uploaded_data
+      attachment.display_name = "lalala"
+      attachment.save!
+
+      expect(@copy_to.folders.where(:name => "folder 1").first).to be_nil
+
+      run_master_migration
+
+      folder3.parent_folder = folder1
+      folder3.save!
+
+      assignment = @copy_from.assignments.create!(:title => "hahaha")
+      assignment.description = "<p><a id=\"\" class=\"instructure_file_link instructure_image_thumbnail \" title=\"lalala\" href=\"/courses/#{@copy_from.id}/files/#{attachment.id}/download?wrap=1\" target=\"\">lalala</a></p>"
+      assignment.save!
+
+      run_master_migration
+
+      @copy_to.reload
+      copy_attachment = @copy_to.attachments.first
+      copy_assignments = @copy_to.assignments.all
+      expect(copy_assignments.length).to eq 1
+      copy_assignment = copy_assignments[0]
+      expect(copy_assignment.title).to eq "hahaha"
+      expect(copy_assignment.description).to eq "<p><a id=\"\" class=\"instructure_file_link instructure_image_thumbnail \" title=\"lalala\" href=\"/courses/#{@copy_to.id}/files/#{copy_attachment.id}/download?wrap=1\" target=\"\">lalala</a></p>"
+    end
+
     it "overwrites/removes availability dates and settings when pushing a locked quiz" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
