@@ -55,7 +55,10 @@ export default class ToolConfigurationForm extends React.Component {
       )
     } else if (this.state.configurationType === 'manual') {
       return (
-        <ManualConfigurationForm />
+        <ManualConfigurationForm
+          validScopes={this.props.validScopes}
+          validPlacements={this.props.validPlacements}
+        />
       )
     }
     return (
@@ -91,5 +94,7 @@ export default class ToolConfigurationForm extends React.Component {
 
 ToolConfigurationForm.propTypes = {
   toolConfiguration: PropTypes.object.isRequired,
-  toolConfigurationUrl: PropTypes.string.isRequired
+  toolConfigurationUrl: PropTypes.string.isRequired,
+  validScopes: PropTypes.object.isRequired,
+  validPlacements: PropTypes.arrayOf(PropTypes.string).isRequired
 }

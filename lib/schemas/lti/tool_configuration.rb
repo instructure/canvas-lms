@@ -36,6 +36,9 @@ module Schemas::Lti
         "description" => {
           "type" => "string"
         }.freeze,
+        "icon_url" => {
+          "type" => "string"
+        }.freeze,
         "scopes" => {
           "type" => "array",
           "items" => {

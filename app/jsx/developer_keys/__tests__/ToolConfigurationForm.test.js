@@ -23,7 +23,9 @@ import ToolConfigurationForm from '../ToolConfigurationForm'
 function newProps() {
   return {
     toolConfiguration: {name: 'Test Tool', url: 'https://www.test.com/launch'},
-    toolConfigurationUrl: 'https://www.test.com/config.json'
+    toolConfigurationUrl: 'https://www.test.com/config.json',
+    validScopes: {},
+    validPlacements: []
   }
 }
 
