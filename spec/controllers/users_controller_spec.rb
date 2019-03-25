@@ -238,6 +238,18 @@ describe UsersController do
     expect(courses.map { |c| c['id'] }).to eq [course2.id]
   end
 
+  it "should not include future teacher term courses in manageable courses" do
+    course_with_teacher_logged_in(:course_name => "MyCourse1", :active_all => 1)
+    @course.enrollment_term.enrollment_dates_overrides.create!(:enrollment_type => "TeacherEnrollment",
+      :start_at => 1.week.from_now, :end_at => 2.weeks.from_now)
+
+    get 'manageable_courses', params: {:user_id => @teacher.id, :term => "MyCourse"}
+    expect(response).to be_successful
+
+    courses = json_parse
+    expect(courses).to be_empty
+  end
+
   it "should sort the results of manageable_courses by name" do
     course_with_teacher_logged_in(:course_name => "B", :active_all => 1)
     %w(c d a).each do |name|

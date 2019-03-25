@@ -675,6 +675,7 @@ class Course < ActiveRecord::Base
        UNION SELECT courses.id AS course_id, e.user_id FROM #{Course.quoted_table_name}
          INNER JOIN #{Enrollment.quoted_table_name} AS e ON e.course_id = courses.id AND e.user_id = #{user_id.to_i}
            AND e.workflow_state IN(#{workflow_states}) AND e.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment')
+         INNER JOIN #{EnrollmentState.quoted_table_name} AS es ON es.enrollment_id = e.id AND es.state IN (#{workflow_states})
          WHERE courses.workflow_state <> 'deleted') as course_users
        ON course_users.course_id = courses.id")
   }
