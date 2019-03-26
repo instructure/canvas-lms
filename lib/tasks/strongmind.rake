@@ -21,6 +21,11 @@ namespace :strongmind do
     CanvasShimAssetUploader.new.upload!
   end
 
+  desc "Reset Session Secret"
+  task :reset_session_secret =>  :environment do
+    puts Setting.set("session_secret_key", SecureRandom.hex(64))
+  end
+
   desc "Re-enqueue orphaned jobs after deploy"
   task :enqueue_jobs, [:worker_id] => :environment do |task, args|
     worker_id = args[:worker_id]
