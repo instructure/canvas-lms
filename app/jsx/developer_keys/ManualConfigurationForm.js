@@ -27,22 +27,52 @@ import TextArea from '@instructure/ui-forms/lib/components/TextArea';
 import Checkbox from '@instructure/ui-forms/lib/components/Checkbox';
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
 import { ToggleDetails } from '@instructure/ui-toggle-details';
+import Select from '@instructure/ui-forms/lib/components/Select';
+import { AccessibleContent } from '@instructure/ui-a11y'
+import { capitalizeFirstLetter } from '@instructure/ui-utils'
+import difference from 'lodash/difference'
+import filter from 'lodash/filter'
+import { RadioInputGroup } from '@instructure/ui-forms/lib/components';
+import RadioInput from '@instructure/ui-forms/lib/components/RadioInput';
 
 export default class ManualConfigurationForm extends React.Component {
   state = {
-    toolConfiguration: {
-      extensions: [{settings: {}}]
-    }
+    toolConfiguration: {},
+    additionalSettings: {},
+    placements: [{placement: "account_navigation"}, {placement: "link_selection"}]
   }
 
   get toolConfiguration() {
     return this.state.toolConfiguration
   }
 
+  placements(obj) {
+    return obj.map(o => o.placement);
+  }
+
+  placement(p) {
+    return p.split("_").map(n => capitalizeFirstLetter(n)).join(" ");
+  }
+
+  handlePlacementSelect = (_, opts) => {
+    const { placements } = this.state;
+    const selected = opts.map(o => o.id)
+    const removed = difference(this.placements(placements), selected)
+    const added = difference(selected, this.placements(placements));
+    this.setState({placements: [...filter(placements, p => !removed.includes(p.placement)), ...this.newPlacements(added)]});
+  }
+
+  newPlacements(placements) {
+    return placements.map(p => {
+      return {
+        placement: p
+      }
+    })
+  }
+
   render() {
-    const { toolConfiguration } = this.state;
-    const { validScopes } = this.props;
-    const extension = toolConfiguration.extensions[0]
+    const { toolConfiguration, additionalSettings, placements } = this.state;
+    const { validScopes, validPlacements } = this.props;
 
     return (
       <View>
@@ -131,12 +161,12 @@ export default class ManualConfigurationForm extends React.Component {
             >
               <TextInput
                 name="domain"
-                value={extension["domain"]}
+                value={additionalSettings.domain}
                 label={I18n.t("Domain")}
               />
               <TextInput
                 name="tool_id"
-                value={extension["tool_id"]}
+                value={additionalSettings.tool_id}
                 label={I18n.t("Tool Id")}
               />
             </FormFieldGroup>
@@ -146,26 +176,110 @@ export default class ManualConfigurationForm extends React.Component {
             >
               <TextInput
                 name="settings_icon_url"
-                value={extension["settings"]["icon_url"]}
+                value={additionalSettings.icon_url}
                 label={I18n.t("Icon Url")}
               />
               <TextInput
                 name="text"
-                value={extension["settings"]["text"]}
+                value={additionalSettings.text}
                 label={I18n.t("Text")}
               />
               <TextInput
                 name="selection_height"
-                value={extension["settings"]["selection_height"]}
+                value={additionalSettings.selection_height}
                 label={I18n.t("Selection Height")}
               />
               <TextInput
                 name="selection_width"
-                value={extension["settings"]["selection_width"]}
+                value={additionalSettings.selection_width}
                 label={I18n.t("Selection Width")}
               />
             </FormFieldGroup>
           </ToggleDetails>
+          <Select
+            label={I18n.t("Placements")}
+            editable
+            formatSelectedOption={(tag) => (
+              <AccessibleContent alt={I18n.t("Remove %{placement}", {placement: tag.label})}>{tag.label}</AccessibleContent>
+            )}
+            multiple
+            selectedOption={this.placements(placements)}
+            onChange={this.handlePlacementSelect}
+          >
+            {
+              validPlacements.map(p => {
+                return <option value={p} key={p}>{this.placement(p)}</option>
+              })
+            }
+          </Select>
+          {
+            placements.map(p => {
+              return <ToggleDetails
+                summary={this.placement(p.placement)}
+                fluidWidth
+                key={p.placement}
+              >
+                <FormFieldGroup
+                  description={<ScreenReaderContent>{I18n.t("Placement Values")}</ScreenReaderContent>}
+                >
+                  <FormFieldGroup
+                    description={<ScreenReaderContent>{I18n.t("Request Values")}</ScreenReaderContent>}
+                    layout="columns"
+                  >
+                    <TextInput
+                      name={`${p.placement}_target_link_uri`}
+                      value={p.icon_url}
+                      label={I18n.t("Target Link URI")}
+                    />
+                    <RadioInputGroup
+                      name={`${p.placement}_message_type`}
+                      value={p.message_type}
+                      description={I18n.t("Select Message Type")}
+                    >
+                      <RadioInput
+                        value="LtiDeepLinkingRequest"
+                        label="LtiDeepLinkingRequest"
+                      />
+                      <RadioInput
+                        value="LtiResourceLinkRequest"
+                        label="LtiResourceLinkRequest"
+                      />
+                    </RadioInputGroup>
+                  </FormFieldGroup>
+                  <FormFieldGroup
+                    description={<ScreenReaderContent>{I18n.t("Label Values")}</ScreenReaderContent>}
+                    layout="columns"
+                  >
+                    <TextInput
+                      name={`${p.placement}_icon_url`}
+                      value={p.icon_url}
+                      label={I18n.t("Icon Url")}
+                    />
+                    <TextInput
+                      name={`${p.placement}_text`}
+                      value={p.text}
+                      label={I18n.t("Text")}
+                    />
+                  </FormFieldGroup>
+                  <FormFieldGroup
+                    description={<ScreenReaderContent>{I18n.t("Display Values")}</ScreenReaderContent>}
+                    layout="columns"
+                  >
+                    <TextInput
+                      name={`${p.placement}_selection_height`}
+                      value={p.selection_height}
+                      label={I18n.t("Selection Height")}
+                    />
+                    <TextInput
+                      name={`${p.placement}_selection_width`}
+                      value={p.selection_width}
+                      label={I18n.t("Selection Width")}
+                    />
+                  </FormFieldGroup>
+                </FormFieldGroup>
+              </ToggleDetails>
+            })
+          }
         </FormFieldGroup>
       </View>
     )
