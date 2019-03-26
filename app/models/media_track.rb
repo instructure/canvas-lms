@@ -20,4 +20,10 @@ class MediaTrack < ActiveRecord::Base
   belongs_to :media_object, :touch => true
   validates_presence_of :media_object_id, :content
 
+  RE_LOOKS_LIKE_TTMl = /<tt\s+xml/i
+  validates :content, format: {
+    without: RE_LOOKS_LIKE_TTMl,
+    message: "TTML tracks are not allowed because they are susceptible to xss attacks"
+  }
+
 end

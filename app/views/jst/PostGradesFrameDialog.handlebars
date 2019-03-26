@@ -1,10 +1,12 @@
 <div title="{{#t}}Sync Grades{{/t}}" style="display:none;">
-  <div class="before_external_content_info_alert screenreader-only" tabindex="0">
-    <div class="ic-flash-info">
-      <div class="ic-flash__icon" aria-hidden="true">
-        <i class="icon-info"></i>
+  <div class="before_external_content_info_alert" tabindex="0">
+    <div class="screenreader-only">
+      <div class="ic-flash-info">
+        <div class="ic-flash__icon" aria-hidden="true">
+          <i class="icon-info"></i>
+        </div>
+        {{t 'The following content is partner provided'}}
       </div>
-      {{t 'The following content is partner provided'}}
     </div>
   </div>
   <iframe
@@ -15,12 +17,14 @@
     allow="{{allowances}}"
   >
   </iframe>
-  <div class="after_external_content_info_alert screenreader-only" tabindex="0">
-    <div class="ic-flash-info">
-      <div class="ic-flash__icon" aria-hidden="true">
-        <i class="icon-info"></i>
+  <div class="after_external_content_info_alert" tabindex="0">
+    <div class="screenreader-only">
+      <div class="ic-flash-info">
+        <div class="ic-flash__icon" aria-hidden="true">
+          <i class="icon-info"></i>
+        </div>
+        {{t 'The preceding content is partner provided'}}
       </div>
-      {{t 'The preceding content is partner provided'}}
     </div>
   </div>
 </div>
