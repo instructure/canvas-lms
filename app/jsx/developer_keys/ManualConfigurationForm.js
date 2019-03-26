@@ -26,10 +26,13 @@ import TextInput from '@instructure/ui-forms/lib/components/TextInput';
 import TextArea from '@instructure/ui-forms/lib/components/TextArea';
 import Checkbox from '@instructure/ui-forms/lib/components/Checkbox';
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent';
+import { ToggleDetails } from '@instructure/ui-toggle-details';
 
 export default class ManualConfigurationForm extends React.Component {
   state = {
-    toolConfiguration: {}
+    toolConfiguration: {
+      extensions: [{settings: {}}]
+    }
   }
 
   get toolConfiguration() {
@@ -39,6 +42,8 @@ export default class ManualConfigurationForm extends React.Component {
   render() {
     const { toolConfiguration } = this.state;
     const { validScopes } = this.props;
+    const extension = toolConfiguration.extensions[0]
+
     return (
       <View>
         <FormFieldGroup
@@ -94,11 +99,15 @@ export default class ManualConfigurationForm extends React.Component {
             resize="vertical"
             autoGrow
           />
-          <CheckboxGroup
+          <ToggleDetails
+            summary={I18n.t("LTI Advantage Services")}
+            fluidWidth
+          >
+            <CheckboxGroup
             name="services"
             onChange={() => {}}
             value={toolConfiguration.scopes}
-            description={I18n.t("LTI Advantage Services to enable")}
+            description={<ScreenReaderContent>{I18n.t("Check Services to enable")}</ScreenReaderContent>}
           >
             {
               Object.keys(validScopes).map(key => {
@@ -111,6 +120,52 @@ export default class ManualConfigurationForm extends React.Component {
               })
             }
           </CheckboxGroup>
+          </ToggleDetails>
+          <ToggleDetails
+            summary={I18n.t("Additional Settings")}
+            fluidWidth
+          >
+            <FormFieldGroup
+              description={<ScreenReaderContent>{I18n.t("Identification Values")}</ScreenReaderContent>}
+              layout="columns"
+            >
+              <TextInput
+                name="domain"
+                value={extension["domain"]}
+                label={I18n.t("Domain")}
+              />
+              <TextInput
+                name="tool_id"
+                value={extension["tool_id"]}
+                label={I18n.t("Tool Id")}
+              />
+            </FormFieldGroup>
+            <FormFieldGroup
+              description={<ScreenReaderContent>{I18n.t("Display Values")}</ScreenReaderContent>}
+              layout="columns"
+            >
+              <TextInput
+                name="settings_icon_url"
+                value={extension["settings"]["icon_url"]}
+                label={I18n.t("Icon Url")}
+              />
+              <TextInput
+                name="text"
+                value={extension["settings"]["text"]}
+                label={I18n.t("Text")}
+              />
+              <TextInput
+                name="selection_height"
+                value={extension["settings"]["selection_height"]}
+                label={I18n.t("Selection Height")}
+              />
+              <TextInput
+                name="selection_width"
+                value={extension["settings"]["selection_width"]}
+                label={I18n.t("Selection Width")}
+              />
+            </FormFieldGroup>
+          </ToggleDetails>
         </FormFieldGroup>
       </View>
     )
