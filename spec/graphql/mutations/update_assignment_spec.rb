@@ -17,7 +17,7 @@
 #
 
 require "spec_helper"
-require "helpers/graphql_type_tester"
+require_relative "../graphql_spec_helper"
 
 describe Mutations::UpdateAssignment do
   before do

@@ -17,7 +17,7 @@
 #
 
 require_relative '../../spec_helper'
-require_relative '../../helpers/graphql_type_tester'
+require_relative "../graphql_spec_helper"
 
 describe Types::GradesType do
   let!(:account) { Account.create! }

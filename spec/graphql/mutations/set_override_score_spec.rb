@@ -17,6 +17,7 @@
 #
 
 require_relative "../../spec_helper"
+require_relative "../graphql_spec_helper"
 
 describe Mutations::SetOverrideScore do
   let!(:account) { Account.create! }
