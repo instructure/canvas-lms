@@ -5021,6 +5021,10 @@ describe Course do
   end
 
   describe "re_send_invitations!" do
+    before :once do
+      @notification = Notification.create!(:name => 'Enrollment Invitation')
+    end
+
     it "should send invitations" do
       course_factory(active_all: true)
       user1 = user_with_pseudonym(:active_all => true)
@@ -5030,7 +5034,6 @@ describe Course do
 
       dm_count = DelayedMessage.count
       count1 = DelayedMessage.where(:communication_channel_id => user1.communication_channels.first).count
-      Notification.create!(:name => 'Enrollment Invitation')
       @course.re_send_invitations!(@teacher)
 
       expect(DelayedMessage.count).to eq dm_count + 1
@@ -5047,15 +5050,13 @@ describe Course do
       @course.enroll_student(user2, :section => section2)
       @course.enroll_ta(ta, :active_all => true, :section => section2, :limit_privileges_to_course_section => true)
 
-      notification = Notification.where(:name => 'Enrollment Invitation').first_or_create!
-
-      count1 = user1.communication_channel.delayed_messages.where(notification_id: notification).count
-      count2 = user2.communication_channel.delayed_messages.where(notification_id: notification).count
+      count1 = user1.communication_channel.delayed_messages.where(notification_id: @notification).count
+      count2 = user2.communication_channel.delayed_messages.where(notification_id: @notification).count
 
       @course.re_send_invitations!(ta)
 
-      expect(user1.communication_channel.delayed_messages.where(notification_id: notification).count).to eq count1
-      expect(user2.communication_channel.delayed_messages.where(notification_id: notification).count).to eq count2 + 1
+      expect(user1.communication_channel.delayed_messages.where(notification_id: @notification).count).to eq count1
+      expect(user2.communication_channel.delayed_messages.where(notification_id: @notification).count).to eq count2 + 1
     end
   end
 
@@ -5273,6 +5274,33 @@ describe Course, '#module_items_visible_to' do
   it "shows all items to teachers even when course is concluded" do
     @course.complete!
     expect(@course.module_items_visible_to(@teacher).map(&:title)).to match_array %w(published unpublished)
+  end
+
+  context "with section specific discussions" do
+    before :once do
+      @other_section = @course.course_sections.create!
+      @other_section_student = user_factory(:active_all => true)
+      @course.enroll_user(@other_section_student, "StudentEnrollment", :section => @other_section, :enrollment_state => "active")
+      @topic = @course.discussion_topics.create!(:course_sections => [@other_section], :is_section_specific => true)
+      @topic_tag = @module.add_item(:type => 'discussion_topic', :id => @topic.id)
+    end
+
+    it "should show to student in section" do
+      expect(@course.module_items_visible_to(@other_section_student)).to include(@topic_tag)
+    end
+
+    it "should not show to student not in section" do
+      expect(@course.module_items_visible_to(@student)).to_not include(@topic_tag)
+    end
+
+    it "should not show to student if visibiilty is deleted" do
+      @topic.discussion_topic_section_visibilities.destroy_all
+      expect(@course.module_items_visible_to(@other_section_student)).to_not include(@topic_tag)
+    end
+
+    it "should show to teacher" do
+      expect(@course.module_items_visible_to(@teacher)).to include(@topic_tag)
+    end
   end
 
   context "sharding" do
