@@ -55,7 +55,7 @@ module Types
 
     field :comments_connection, SubmissionCommentType.connection_type, null: true
     def comments_connection
-      submission.comments_for(current_user)
+      submission.comments_for(current_user).published
     end
 
     field :score, Float, null: true
