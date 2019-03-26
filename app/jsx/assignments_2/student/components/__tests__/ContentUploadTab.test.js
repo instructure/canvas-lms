@@ -66,7 +66,6 @@ describe('ContentUploadTab', () => {
     expect(uploadRender).toContainElement(
       container.querySelector('img[alt="awesome-test-image.png preview"]')
     )
-    expect(container.querySelector('svg[name*="Icon"]')).toBeNull()
   })
 
   it('renders an icon if a non-image file is uploaded', async () => {
@@ -79,5 +78,80 @@ describe('ContentUploadTab', () => {
 
     expect(uploadRender).toContainElement(container.querySelector('svg[name="IconPdf"]'))
     expect(container.querySelector('img[alt="awesome-test-file.pdf preview"]')).toBeNull()
+  })
+
+  it('allows uploading multiple files at a time', async () => {
+    const {container, getByTestId, getByText} = render(<ContentUploadTab />)
+    const fileInput = container.querySelector('input[type="file"]')
+    const file = new File(['foo'], 'file1.pdf', {type: 'application/pdf'})
+    const file2 = new File(['foo'], 'file2.pdf', {type: 'application/pdf'})
+
+    uploadFiles(fileInput, [file, file2])
+    const uploadRender = getByTestId('non-empty-upload')
+
+    expect(uploadRender).toContainElement(getByText('file1.pdf'))
+    expect(uploadRender).toContainElement(getByText('file2.pdf'))
+  })
+
+  it('concatenates separate file additions together', async () => {
+    const {container, getByTestId, getByText} = render(<ContentUploadTab />)
+    const fileInput = container.querySelector('input[type="file"]')
+    const file = new File(['foo'], 'file1.pdf', {type: 'application/pdf'})
+    const file2 = new File(['foo'], 'file2.pdf', {type: 'application/pdf'})
+
+    uploadFiles(fileInput, [file])
+    uploadFiles(fileInput, [file2])
+    const uploadRender = getByTestId('non-empty-upload')
+
+    expect(uploadRender).toContainElement(getByText('file1.pdf'))
+    expect(uploadRender).toContainElement(getByText('file2.pdf'))
+  })
+
+  it('renders a button to remove the file', async () => {
+    const {container, getByText} = render(<ContentUploadTab />)
+    const emptyRender = container.querySelector('input[type="file"]')
+    const file = new File(['foo'], 'awesome-test-file.pdf', {type: 'application/pdf'})
+
+    uploadFiles(emptyRender, [file])
+    const button = container.querySelector('button')
+
+    expect(button).toContainElement(getByText('Remove awesome-test-file.pdf'))
+    expect(button).toContainElement(container.querySelector('svg[name="IconTrash"]'))
+  })
+
+  it('removes the correct file when the Remove button is clicked', async () => {
+    const {container, getByText, queryByText} = render(<ContentUploadTab />)
+    const fileInput = container.querySelector('input[type="file"]')
+    const file = new File(['foo'], 'file1.pdf', {type: 'application/pdf'})
+    const file2 = new File(['foo'], 'file2.pdf', {type: 'application/pdf'})
+
+    uploadFiles(fileInput, [file, file2])
+    const button = container.querySelector('button[id="1"]')
+    expect(button).toContainElement(getByText('Remove file1.pdf'))
+    fireEvent.click(button)
+
+    expect(queryByText('Remove file1.pdf')).toBeNull()
+    expect(getByText('Remove file2.pdf')).toBeInTheDocument()
+  })
+
+  it('ellides filenames for files greater than 21 characters', async () => {
+    const {container, getByText} = render(<ContentUploadTab />)
+    const fileInput = container.querySelector('input[type="file"]')
+    const file = new File(['foo'], 'c'.repeat(22), {type: 'application/pdf'})
+
+    uploadFiles(fileInput, [file])
+
+    expect(getByText(/^c+\.{3}c+$/)).toBeInTheDocument()
+  })
+
+  it('does not ellide filenames for files less than or equal to 21 characters', async () => {
+    const filename = 'c'.repeat(21)
+    const {container, getByText} = render(<ContentUploadTab />)
+    const fileInput = container.querySelector('input[type="file"]')
+    const file = new File(['foo'], filename, {type: 'application/pdf'})
+
+    uploadFiles(fileInput, [file])
+
+    expect(getByText(filename)).toBeInTheDocument()
   })
 })
