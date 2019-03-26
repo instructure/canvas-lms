@@ -44,7 +44,7 @@ export default class TotalGradeOverrideCellPropFactory {
       },
 
       pendingGradeInfo,
-      studentIsGradeable: this._gradebook.isStudentGradeable(userId)
+      studentIsGradeable: this._gradebook.studentCanReceiveGradeOverride(userId)
     }
   }
 }
