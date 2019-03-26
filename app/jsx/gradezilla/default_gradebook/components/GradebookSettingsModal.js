@@ -157,7 +157,7 @@ export default class GradebookSettingsModal extends React.Component {
       })
       .catch(error => {
         onSaveSettingsFailure()
-        throw error
+        return Promise.reject(error)
       })
 
   savePostPolicy = () =>
