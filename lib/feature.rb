@@ -733,6 +733,15 @@ END
       applies_to: 'Course',
       state: 'hidden',
       development: true
+    },
+    'rce_enhancements' => {
+      display_name: -> { I18n.t('RCE Enhancements') },
+      description: -> { I18n.t('Allow switching to the enhanced RCE') },
+      applies_to: 'Course',
+      state: 'hidden',
+      root_opt_in: true,
+      development: true,
+      beta: true
     }
   )
 

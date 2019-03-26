@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2019 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export { renderIntoDiv } from "./rce/root";
-export { renderIntoDiv as renderSidebarIntoDiv } from "./sidebar/root";
-
-console.log('Using enhanced RCE')
+export * from '@instructure/canvas-rce-old/lib/async'
+// eslint-disable-next-line import/first
+import './initA11yChecker'

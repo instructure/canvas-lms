@@ -141,6 +141,7 @@ class ApplicationController < ActionController::Base
         DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account.try(:global_id),
         k12: k12?,
         use_responsive_layout: use_responsive_layout?,
+        use_rce_enhancements: @context.try(:feature_enabled?, :rce_enhancements),
         help_link_name: help_link_name,
         help_link_icon: help_link_icon,
         use_high_contrast: @current_user.try(:prefers_high_contrast?),
