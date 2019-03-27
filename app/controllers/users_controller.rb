@@ -169,12 +169,14 @@ class UsersController < ApplicationController
   include I18nUtilities
   include CustomColorHelper
   include DashboardHelper
+  include Api::V1::Submission
 
   before_action :require_user, :only => [:grades, :merge, :kaltura_session,
     :ignore_item, :ignore_stream_item, :close_notification, :mark_avatar_image,
     :user_dashboard, :toggle_hide_dashcard_color_overlays,
     :masquerade, :external_tool, :dashboard_sidebar, :settings, :activity_stream,
-    :activity_stream_summary, :pandata_events_token, :dashboard_cards]
+    :activity_stream_summary, :pandata_events_token, :dashboard_cards,
+    :user_graded_submissions]
   before_action :require_registered_user, :only => [:delete_user_service,
     :create_user_service]
   before_action :reject_student_view_student, :only => [:delete_user_service,
@@ -2344,6 +2346,31 @@ class UsersController < ApplicationController
       props_token: props_token,
       expires_at: expires_at.to_f * 1000
     }
+  end
+
+  # @API Get a users most recently graded submissions
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/users/<user_id>/graded_submissions \
+  #          -X POST \
+  #          -H 'Authorization: Bearer <token>'
+  #
+  # @returns [Submission]
+  #
+  def user_graded_submissions
+    @user = api_find(User, params[:id])
+    if authorized_action(@user, @current_user, :read_grades)
+      collections = []
+      # Plannable Bookmarker enables descending order
+      bookmarker = Plannable::Bookmarker.new(Submission, true, :graded_at, :id)
+      Shard.with_each_shard(@user.associated_shards) do
+        collections << [Shard.current.id, BookmarkedCollection.wrap(bookmarker, Submission.for_user(@user).graded)]
+      end
+
+      scope = BookmarkedCollection.merge(*collections)
+      submissions = Api.paginate(scope, self, api_v1_user_submissions_url)
+      render(json: submissions.map{ |s| submission_json(s, s.assignment, @current_user, session) })
+    end
   end
 
   protected
