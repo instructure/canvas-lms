@@ -69,7 +69,6 @@ export default class AuditEvent extends PureComponent {
                 <Tooltip
                   on={['click', 'focus', 'hover']}
                   placement="start"
-                  size="medium"
                   tip={message}
                   variant="inverse"
                 >

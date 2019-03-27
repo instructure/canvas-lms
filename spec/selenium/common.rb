@@ -220,6 +220,15 @@ shared_context "in-process server selenium tests" do
 
     browser_logs = driver.manage.logs.get(:browser)
 
+    # log INSTUI deprecation warnings
+    if browser_logs.present?
+      spec_file = example.file_path.sub(/.*spec\/selenium\//, '')
+      deprecations =  browser_logs.select {|l| l.message =~ /\[.*deprecated./}.map do |l|
+        ">>> #{spec_file}: \"#{example.description}\": #{driver.current_url}: #{l.message.gsub(/.*Warning/, 'Warning') }"
+      end
+      puts "\n", deprecations.uniq
+    end
+
     if !example.metadata[:ignore_js_errors] && browser_logs.present?
       msg = "browser console logs for \"#{example.description}\":\n" + browser_logs.map(&:message).join("\n\n")
       Rails.logger.info(msg)
