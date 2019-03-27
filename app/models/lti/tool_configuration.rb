@@ -22,7 +22,7 @@ module Lti
 
     belongs_to :developer_key
 
-    before_validation :store_configuration_from_url
+    before_validation :store_configuration_from_url, only: :create
     before_validation :ensure_use_1_3
     before_save :normalize_configuration
 
@@ -48,20 +48,32 @@ module Lti
         false
       )
       tool.developer_key = developer_key
-      tool.custom_fields_string = tool.custom_fields_string + "\n#{custom_fields}"
       tool.workflow_state = privacy_level || DEFAULT_PRIVACY_LEVEL
       tool
     end
 
     def self.create_tool_and_key!(account, tool_configuration_params)
       self.transaction do
-        self.create!(
-          developer_key: DeveloperKey.create!(account: account),
-          configuration: tool_configuration_params[:settings],
-          configuration_url: tool_configuration_params[:settings_url],
-          disabled_placements: tool_configuration_params[:disabled_placements],
-          custom_fields: tool_configuration_params[:custom_fields]
-        )
+        dk = DeveloperKey.create!(account: account)
+        if tool_configuration_params[:settings].present?
+          self.create!(
+            developer_key: dk,
+            configuration: tool_configuration_params[:settings]&.merge(
+              "custom_fields" => ContextExternalTool.find_custom_fields_from_string(tool_configuration_params[:custom_fields])
+            ),
+            disabled_placements: tool_configuration_params[:disabled_placements]
+          )
+        else
+          t = self.create!(
+            developer_key: dk,
+            configuration_url: tool_configuration_params[:settings_url],
+            disabled_placements: tool_configuration_params[:disabled_placements]
+          )
+          t.update! configuration: t.configuration.merge(
+            "custom_fields" => ContextExternalTool.find_custom_fields_from_string(tool_configuration_params[:custom_fields])
+          )
+          t
+        end
       end
     end
 
@@ -108,7 +120,7 @@ module Lti
     end
 
     def store_configuration_from_url
-      return if configuration_url.blank?
+      return if configuration_url.blank? || configuration.present?
 
       response = CC::Importer::BLTIConverter.new.fetch(configuration_url)
 

@@ -129,7 +129,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
 
       it 'sets the "custom_fields"' do
         subject
-        expect(config_from_response.custom_fields).to eq params.dig(:tool_configuration, :custom_fields)
+        expect(config_from_response.settings["custom_fields"]).to eq('foo' => 'bar', 'key' => 'value')
       end
     end
 
@@ -380,10 +380,6 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
         subject
         expect(config_from_response.privacy_level).to eq 'public'
       end
-    end
-
-    it_behaves_like 'an endpoint that accepts a settings_url' do
-      let(:make_request) { post :update, params: params }
     end
 
     it_behaves_like 'an endpoint that validates public_jwk' do

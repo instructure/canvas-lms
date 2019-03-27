@@ -172,6 +172,12 @@ module Schemas::Lti
         "oidc_initiation_url" => {
           "type" => "string"
         }.freeze,
+        "custom_fields" => {
+          "anyOf": [
+            {"type" => "string"}.freeze,
+            {"type" => "object"}.freeze
+          ].freeze
+        }.freeze,
         "public_jwk" => {
           'type' => 'object',
           'required' => %w[kty e n kid alg use].freeze,

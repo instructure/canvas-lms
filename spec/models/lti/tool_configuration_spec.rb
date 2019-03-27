@@ -235,7 +235,6 @@ module Lti
 
       before do
         tool_configuration.developer_key = developer_key
-        tool_configuration.custom_fields = "key=value\nfoo=bar"
         tool_configuration.privacy_level = 'public'
       end
 
@@ -310,7 +309,7 @@ module Lti
         end
 
         it 'uses the correct top-level custom params' do
-          expect(subject.custom_fields).to eq({"has_expansion"=>"$Canvas.user.id", "no_expansion"=>"foo", "key"=>"value", "foo"=>"bar"})
+          expect(subject.custom_fields).to eq({"has_expansion"=>"$Canvas.user.id", "no_expansion"=>"foo"})
         end
 
         it 'uses the correct icon url' do

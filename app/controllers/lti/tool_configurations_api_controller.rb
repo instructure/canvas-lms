@@ -50,7 +50,7 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   # parameter or indirectly through the "settings_url" parameter.
   #
   # If both the "settings" and "settings_url" parameters are set,
-  # the "settings" parameter will be ignored.
+  # the "settings_url" parameter will be ignored.
   #
   # Use of this endpoint will create a new developer_key.
   #
@@ -89,7 +89,7 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   # Update tool configuration with the provided parameters.
   #
   # Settings may be provided directly as JSON through the "settings"
-  # parameter or indirectly through the "settings_url" parameter.
+  # parameter. The settings_url is not used for updates.
   #
   # If both the "settings" and "settings_url" parameters are set,
   # the "settings" parameter will be ignored.
@@ -97,9 +97,6 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   #
   # @argument settings [Object]
   #   JSON representation of the tool configuration
-  #
-  # @argument settings_url [String]
-  #   URL of settings JSON
   #
   # @argument developer_key_id [String]
   #
@@ -123,10 +120,10 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   def update
     tool_config = developer_key.tool_configuration
     tool_config.update!(
-      settings: tool_configuration_params[:settings],
-      settings_url: tool_configuration_params[:settings_url],
+      settings: tool_configuration_params[:settings]&.merge(
+        ContextExternalTool.find_custom_fields_from_string(tool_configuration_params[:custom_fields])
+      ),
       disabled_placements: tool_configuration_params[:disabled_placements],
-      custom_fields: tool_configuration_params[:custom_fields],
       privacy_level: tool_configuration_params[:privacy_level]
     )
     update_developer_key!(tool_config)

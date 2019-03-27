@@ -337,13 +337,16 @@ class ContextExternalTool < ActiveRecord::Base
     settings[:use_1_3] = bool
   end
 
-  def custom_fields_string=(str)
-    hash = {}
-    str.split(/[\r\n]+/).each do |line|
+  def self.find_custom_fields_from_string(str)
+    return {} if str.nil?
+    str.split(/[\r\n]+/).each_with_object({}) do |line, hash|
       key, val = line.split(/=/)
       hash[key] = val if key.present? && val.present?
     end
-    settings[:custom_fields] = hash
+  end
+
+  def custom_fields_string=(str)
+    settings[:custom_fields] = ContextExternalTool.find_custom_fields_from_string(str)
   end
 
   def custom_fields=(hash)
