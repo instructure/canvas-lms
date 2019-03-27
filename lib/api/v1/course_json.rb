@@ -62,6 +62,9 @@ module Api::V1
       @hash['workflow_state'] = @course.api_state
       @hash['course_format'] = @course.course_format if @course.course_format.present?
       @hash['restrict_enrollments_to_course_dates'] = !!@course.restrict_enrollments_to_course_dates
+      if visibility = @course.overridden_course_visibility
+        @hash['overridden_course_visibility'] = visibility
+      end
       if @includes.include?(:current_grading_period_scores)
         @hash['has_grading_periods'] = @course.grading_periods?
         @hash['multiple_grading_periods_enabled'] = @hash['has_grading_periods'] # for backwards compatibility

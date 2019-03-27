@@ -164,6 +164,7 @@ JOKE
           atts.uniq.each do |att|
             c.tag!(att, @course.send(att)) unless @course.send(att).nil? || @course.send(att) == ''
           end
+          c.tag!(:overridden_course_visibility, @course.overridden_course_visibility)
         end
         if @course.grading_standard
           if @course.grading_standard.context_type == "Account"

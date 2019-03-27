@@ -363,6 +363,10 @@ module Importers
         end
       end
 
+      if settings.has_key?('overridden_course_visibility')
+        course.apply_overridden_course_visibility(settings.delete('overridden_course_visibility'))
+      end
+
       if migration.for_master_course_import?
         course.start_at    = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(settings['start_at']) if settings.has_key?('start_at')
         course.conclude_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(settings['conclude_at']) if settings.has_key?('conclude_at')

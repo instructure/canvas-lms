@@ -3059,27 +3059,7 @@ class CoursesController < ApplicationController
   end
 
   def visibility_configuration(params)
-    if params[:course_visibility] == 'institution'
-      @course.is_public_to_auth_users = true
-      @course.is_public = false
-    elsif params[:course_visibility] == 'public'
-      @course.is_public = true
-    else
-      @course.is_public_to_auth_users = false
-      @course.is_public = false
-    end
-    if params[:syllabus_visibility_option].present?
-      customized = params[:syllabus_visibility_option]
-      if @course.is_public || customized == 'public'
-        @course.public_syllabus = true
-      elsif @course.is_public_to_auth_users || customized == 'institution'
-        @course.public_syllabus_to_auth = true
-        @course.public_syllabus = false
-      else
-        @course.public_syllabus = false
-        @course.public_syllabus_to_auth = false
-      end
-    end
+    @course.apply_visibility_configuration(params[:course_visibility], params[:syllabus_visibility_option])
   end
 
   def can_change_group_weighting_scheme?

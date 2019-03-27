@@ -453,7 +453,7 @@ class Course < ActiveRecord::Base
   end
 
   def course_visibility_options
-    ActiveSupport::OrderedHash[
+    options = [
         'course',
         {
             :setting => t('course', 'Course')
@@ -466,7 +466,8 @@ class Course < ActiveRecord::Base
         {
             :setting => t('public', 'Public')
         }
-      ]
+      ] + self.root_account.available_course_visibility_override_options.to_a.flatten
+    ActiveSupport::OrderedHash[*options]
   end
 
   def custom_course_visibility
@@ -497,7 +498,9 @@ class Course < ActiveRecord::Base
   end
 
   def course_visibility
-    if is_public == true
+    if self.overridden_course_visibility.present?
+      self.overridden_course_visibility
+    elsif is_public == true
       'public'
     elsif is_public_to_auth_users == true
       'institution'
@@ -1424,8 +1427,12 @@ class Course < ActiveRecord::Base
     end
   end
 
+  def unenrolled_user_can_read?(user, session)
+    self.is_public || (self.is_public_to_auth_users && session.present? && session.has_key?(:user_id))
+  end
+
   set_policy do
-    given { |user, session| self.available? && (self.is_public || (self.is_public_to_auth_users && session.present? && session.has_key?(:user_id)))  }
+    given { |user, session| self.available? &&  unenrolled_user_can_read?(user, session)}
     can :read and can :read_outcomes and can :read_syllabus
 
     given { |user, session| self.available? && (self.public_syllabus || (self.public_syllabus_to_auth && session.present? && session.has_key?(:user_id)))}
@@ -2937,6 +2944,7 @@ class Course < ActiveRecord::Base
   add_setting :organize_epub_by_content_type, :boolean => true, :default => false
   add_setting :enable_offline_web_export, :boolean => true, :default => lambda { |c| c.account.enable_offline_web_export? }
   add_setting :is_public_to_auth_users, :boolean => true, :default => false
+  add_setting :overridden_course_visibility
 
   add_setting :restrict_student_future_view, :boolean => true, :inherited => true
   add_setting :restrict_student_past_view, :boolean => true, :inherited => true
@@ -3366,6 +3374,40 @@ class Course < ActiveRecord::Base
     return false unless feature_enabled?(:post_policies)
 
     default_post_policy.present? && default_post_policy.post_manually?
+  end
+
+  def apply_overridden_course_visibility(visibility)
+    if !['institution', 'public', 'course'].include?(visibility) &&
+        self.root_account.available_course_visibility_override_options.keys.include?(visibility)
+      self.overridden_course_visibility = visibility
+    else
+      self.overridden_course_visibility = nil
+    end
+  end
+
+  def apply_visibility_configuration(course_visibility, syllabus_visibility)
+    apply_overridden_course_visibility(course_visibility)
+    if course_visibility == 'institution'
+      self.is_public_to_auth_users = true
+      self.is_public = false
+    elsif course_visibility == 'public'
+      self.is_public = true
+    else
+      self.is_public_to_auth_users = false
+      self.is_public = false
+    end
+
+    if syllabus_visibility.present?
+      if self.is_public || syllabus_visibility == 'public'
+        self.public_syllabus = true
+      elsif self.is_public_to_auth_users || syllabus_visibility == 'institution'
+        self.public_syllabus_to_auth = true
+        self.public_syllabus = false
+      else
+        self.public_syllabus = false
+        self.public_syllabus_to_auth = false
+      end
+    end
   end
 
   private
