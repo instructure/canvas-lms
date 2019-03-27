@@ -209,6 +209,8 @@ export default class CreateOrUpdateUserModal extends React.Component {
   render = () => (
     <span>
       <InstuiModal
+        as="form"
+        onSubmit={preventDefault(this.onSubmit)}
         open={this.state.open}
         onDismiss={this.close}
         size="small"
@@ -227,38 +229,36 @@ export default class CreateOrUpdateUserModal extends React.Component {
           )
         }
       >
-        <form onSubmit={preventDefault(this.onSubmit)} style={{marginBottom: 0}}>
-          <ModalBody>
-            <FormFieldGroup layout="stacked" rowSpacing="small" description="">
-              {this.getInputFields().map(({name, label, hint, required, Component = TextInput}) => (
-                <Component
-                  key={name}
-                  label={label}
-                  value={get(this.state.data, name)}
-                  checked={get(this.state.data, name)}
-                  onChange={e =>
-                    this.onChange(
-                      name,
-                      e.target.type === 'checkbox' ? e.target.checked : e.target.value
-                    )
-                  }
-                  required={!!required}
-                  layout="inline"
-                  messages={(this.state.errors[name] || [])
-                    .map(errMsg => ({type: 'error', text: errMsg}))
-                    .concat(hint && {type: 'hint', text: hint})
-                    .filter(Boolean)}
-                />
-              ))}
-            </FormFieldGroup>
-          </ModalBody>
-          <ModalFooter>
-            <Button onClick={this.close}>{I18n.t('Cancel')}</Button> &nbsp;
-            <Button type="submit" variant="primary">
-              {this.props.createOrUpdate === 'create' ? I18n.t('Add User') : I18n.t('Save')}
-            </Button>
-          </ModalFooter>
-        </form>
+        <ModalBody>
+          <FormFieldGroup layout="stacked" rowSpacing="small" description="">
+            {this.getInputFields().map(({name, label, hint, required, Component = TextInput}) => (
+              <Component
+                key={name}
+                label={label}
+                value={get(this.state.data, name)}
+                checked={get(this.state.data, name)}
+                onChange={e =>
+                  this.onChange(
+                    name,
+                    e.target.type === 'checkbox' ? e.target.checked : e.target.value
+                  )
+                }
+                required={!!required}
+                layout="inline"
+                messages={(this.state.errors[name] || [])
+                  .map(errMsg => ({type: 'error', text: errMsg}))
+                  .concat(hint && {type: 'hint', text: hint})
+                  .filter(Boolean)}
+              />
+            ))}
+          </FormFieldGroup>
+        </ModalBody>
+        <ModalFooter>
+          <Button onClick={this.close}>{I18n.t('Cancel')}</Button> &nbsp;
+          <Button type="submit" variant="primary">
+            {this.props.createOrUpdate === 'create' ? I18n.t('Add User') : I18n.t('Save')}
+          </Button>
+        </ModalFooter>
       </InstuiModal>
       {React.Children.map(this.props.children, child =>
         // when you click whatever is the child element to this, open the modal
