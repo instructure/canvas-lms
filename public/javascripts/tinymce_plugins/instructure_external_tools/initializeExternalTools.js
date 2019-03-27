@@ -74,9 +74,9 @@ const ExternalToolsPlugin = {
         ed.addCommand(`instructureExternalButton${current_button.id}`, () => {
           dialog.open(current_button)
         })
-        ed.addButton(
+        ;(ENV.use_rce_enhancements ? ed.ui.registry : ed).addButton(
           `instructure_external_button_${current_button.id}`,
-          ExternalToolsHelper.buttonConfig(current_button)
+          ExternalToolsHelper.buttonConfig(current_button, ed)
         )
       }
     }
@@ -88,17 +88,25 @@ const ExternalToolsPlugin = {
         ExternalToolsHelper.attachClumpedDropdown($(`#${this._id}`), items, ed)
       }
 
-      ed.addButton('instructure_external_button_clump', {
-        title: TRANSLATIONS.more_external_tools,
-        image: '/images/downtick.png',
-        onkeyup(event) {
-          if (event.keyCode === 32 || event.keyCode === 13) {
-            event.stopPropagation()
-            handleClick.call(this)
-          }
-        },
-        onclick: handleClick
-      })
+      if (ENV.use_rce_enhancements) {
+        ed.ui.registry.addButton('instructure_external_button_clump', {
+          title: TRANSLATIONS.more_external_tools,
+          image: '/images/downtick.png',
+          onAction: handleClick
+        })
+      } else {
+        ed.addButton('instructure_external_button_clump', {
+          title: TRANSLATIONS.more_external_tools,
+          image: '/images/downtick.png',
+          onkeyup(event) {
+            if (event.keyCode === 32 || event.keyCode === 13) {
+              event.stopPropagation()
+              handleClick.call(this)
+            }
+          },
+          onclick: handleClick
+        })
+      }
     }
   }
 }

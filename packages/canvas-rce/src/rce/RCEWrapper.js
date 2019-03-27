@@ -21,7 +21,6 @@ import PropTypes from "prop-types";
 import React from "react";
 import ReactDOM from "react-dom";
 import TinyMCE from "react-tinymce";
-import editorAccessibility from "./editorAccessibility";
 import * as contentInsertion from "./contentInsertion";
 import indicatorRegion from "./indicatorRegion";
 import indicate from "../common/indicate";
@@ -209,13 +208,6 @@ export default class RCEWrapper extends React.Component {
     editor.rceWrapper = this;
   }
 
-  accessibilizeEditor(_e, editor) {
-    let accessibleEditor = new editorAccessibility(editor, document);
-    accessibleEditor.addLabels();
-    accessibleEditor.accessibilizeMenubar();
-    accessibleEditor.removeStatusbarFromTabindex();
-  }
-
   componentWillUnmount() {
     if (!this._destroyCalled) {
       this.destroy();
@@ -270,7 +262,6 @@ export default class RCEWrapper extends React.Component {
         tinymce={this.props.tinymce}
         className={this.props.textareaClassName}
         onPreInit={this.annotateEditor.bind(this)}
-        onInit={this.accessibilizeEditor.bind(this)}
         onClick={this.onFocus.bind(this)}
         onKeypress={this.onFocus.bind(this)}
         onActivate={this.onFocus.bind(this)}

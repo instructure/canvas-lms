@@ -29,23 +29,25 @@ tinymce.create("tinymce.plugins.InstructureImagePlugin", {
     );
 
     // Register buttons
-    ed.addButton("instructure_image", {
+    ed.ui.registry.addToggleButton("instructure_image", {
       title: htmlEscape(
         formatMessage({
           default: "Embed Image",
           description: "Title for RCE button to embed an image"
         })
       ),
-      cmd: "mceInstructureImage",
+      onAction: () => ed.execCommand("mceInstructureImage"),
       icon: "image",
-      onPostRender: function() {
+      onSetup: function(buttonApi) {
         // highlight our button when an image is selected
-        var btn = this;
-        ed.on("NodeChange", function(event) {
-          btn.active(
-            event.nodeName == "IMG" && event.className != "equation_image"
+        const toggleActive = eventApi => {
+          buttonApi.setActive(
+            eventApi.element.nodeName.toLowerCase() === "IMG" &&
+              eventApi.element.className !== "equation_image"
           );
-        });
+        };
+        ed.on("NodeChange", toggleActive);
+        return () => ed.off("NodeChange", toggleActive);
       }
     });
   }

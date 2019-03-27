@@ -81,7 +81,7 @@ test('calculating an external button clump', () => {
   INST.maxVisibleEditorButtons = 0
   const config = new EditorConfig(fake_tinymce, INST, largeScreenWidth, dom_id)
   const btns = config.external_buttons()
-  equal(btns, ',instructure_external_button_clump')
+  equal(btns, ' instructure_external_button_clump')
 })
 
 test('default config has static attributes', () => {

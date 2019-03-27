@@ -24,14 +24,14 @@ tinymce.create("tinymce.plugins.InstructureLinks", {
   init(ed) {
     ed.addCommand("instructureLinks", clickCallback.bind(this, ed, document));
 
-    ed.addButton("instructure_links", {
+    ed.ui.registry.addButton("instructure_links", {
       title: htmlEscape(
         formatMessage({
           default: "Link to URL",
           description: "Title for RCE button to insert links to a URL"
         })
       ),
-      cmd: "instructureLinks",
+      onAction: () => ed.execCommand("instructureLinks"),
       icon: "link"
     });
   }

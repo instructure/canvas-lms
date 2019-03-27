@@ -20,7 +20,7 @@ import sanitizeEditorOptions from "./sanitizeEditorOptions";
 import wrapInitCb from "./wrapInitCb";
 import normalizeLocale from "./normalizeLocale";
 import editorLanguage from "./editorLanguage";
-import { contentStyle } from "tinymce-light-skin";
+import defaultContentCssUrl from "!file-loader!tinymce/skins/content/default/content.min.css";
 
 export default function(props, tinymce, MutationObserver) {
   let initialEditorOptions = props.editorOptions(tinymce),
@@ -40,14 +40,24 @@ export default function(props, tinymce, MutationObserver) {
     editorOptions.language_url = "none";
   }
 
-  // needed so brandable_css (which only exists in canvas) can load
+  // if you pass a content_css (like canvas-lms does), it is expected that it
+  // contain *all* styles you want loaded inside the iframe.
+  // if you don't pass a content_css we'll load a sane default for you
   if (props.editorOptions.content_css) {
     editorOptions.content_css =
       window.location.origin + props.editorOptions.content_css;
+  } else {
+    editorOptions.content_css = defaultContentCssUrl;
   }
 
+  // tell tinymce that we already loaded the skin
   editorOptions.skin = false;
-  editorOptions.content_style = contentStyle;
+
+  // force tinyMCE to NOT use the "mobile" theme,
+  // see: https://stackoverflow.com/questions/54579110/is-it-possible-to-disable-the-mobile-ui-features-in-tinymce-5
+  editorOptions.mobile = { theme: "silver" };
+
+  // tell tinyMCE not to put its own branding in the footer of the editor
   editorOptions.branding = false;
 
   return {

@@ -43,19 +43,19 @@ function getProps(textareaId, language = "en", textDirection = "ltr") {
         directionality: textDirection,
         height: "250px",
         plugins:
-          "instructure_equation, instructure_image, instructure_equella, link, textcolor, instructure_external_tools, instructure_record, instructure_links, table",
+          "instructure_equation, instructure_image, instructure_equella, link, instructure_external_tools, instructure_record, instructure_links, table",
         // todo: add "instructure_embed" when the wiki sidebar work is done
         external_plugins: {},
         menubar: true,
         // todo: the toolbar building and automatic splitting functions should come into the service
         toolbar: [
           // basic buttons
-          "bold,italic,underline,forecolor,backcolor,removeformat,alignleft,aligncenter,alignright,outdent,indent,superscript,subscript,bullist,numlist,fontsizeselect,formatselect",
+          "bold italic underline forecolor backcolor removeformat alignleft aligncenter alignright outdent indent superscript subscript bullist numlist fontsizeselect formatselect",
 
           // plugin buttons ("instructure_links" will be changed to "link", but this is how
           //   it's currently sent over from canvas.  Once that's no longer true, the test
           //  page can just use "link" instead)
-          "table, link, unlink, instructure_equation, instructure_image, instructure_equella, instructure_record"
+          "table link unlink instructure_equation instructure_image instructure_equella instructure_record"
         ]
       };
     },
