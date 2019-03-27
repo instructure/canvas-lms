@@ -19,6 +19,7 @@ import I18n from 'i18n!react_developer_keys'
 import PropTypes from 'prop-types'
 import React from 'react'
 
+import { Alert } from '@instructure/ui-alerts'
 import View from '@instructure/ui-layout/lib/components/View'
 import { CheckboxGroup } from '@instructure/ui-forms'
 import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldGroup';
@@ -39,11 +40,16 @@ export default class ManualConfigurationForm extends React.Component {
   state = {
     toolConfiguration: {},
     additionalSettings: {},
-    placements: [{placement: "account_navigation"}, {placement: "link_selection"}]
+    placements: [{placement: "account_navigation"}, {placement: "link_selection"}],
+    custom_fields: {}
   }
 
   get toolConfiguration() {
     return this.state.toolConfiguration
+  }
+
+  get specialTypes() {
+    return ["editor_button"]
   }
 
   placements(obj) {
@@ -71,130 +77,154 @@ export default class ManualConfigurationForm extends React.Component {
   }
 
   render() {
-    const { toolConfiguration, additionalSettings, placements } = this.state;
+    const { toolConfiguration, additionalSettings, placements, custom_fields } = this.state;
     const { validScopes, validPlacements } = this.props;
 
     return (
       <View>
         <FormFieldGroup
-          description={I18n.t('Manual Configuration')}
+          description={<ScreenReaderContent>{I18n.t('Manual Configuration')}</ScreenReaderContent>}
           layout="stacked"
         >
           <FormFieldGroup
-            description={<ScreenReaderContent>{I18n.t("Display Values")}</ScreenReaderContent>}
-            layout="columns"
+            description={I18n.t("Required Values")}
           >
-            <TextInput
-              name="title"
-              value={toolConfiguration.title}
-              label={I18n.t("Title")}
+            <hr />
+            <FormFieldGroup
+              description={<ScreenReaderContent>{I18n.t('Display Values')}</ScreenReaderContent>}
+              layout="columns"
+            >
+              <TextInput
+                name="title"
+                value={toolConfiguration.title}
+                label={I18n.t("Title")}
+                required
+              />
+              <TextArea
+                name="description"
+                value={toolConfiguration.description}
+                label={I18n.t("Description")}
+                maxHeight="5rem"
+                required
+              />
+            </FormFieldGroup>
+            <FormFieldGroup
+              description={<ScreenReaderContent>{I18n.t("Open Id Connect Values")}</ScreenReaderContent>}
+              layout="columns"
+            >
+              <TextInput
+                name="target_link_uri"
+                value={toolConfiguration.target_link_uri}
+                label={I18n.t("Target Link URI")}
+                required
+              />
+              <TextInput
+                name="oidc_initiation_url"
+                value={toolConfiguration.oidc_initiation_url}
+                label={I18n.t("OpenID Connect Initiation Url")}
+                required
+              />
+            </FormFieldGroup>
+            <TextArea
+              name="public_jwk"
+              value={toolConfiguration.public_jwk}
+              label={I18n.t("Public JWK")}
+              maxHeight="10rem"
               required
+              resize="vertical"
+              autoGrow
             />
-            <TextInput
-              name="icon_url"
-              value={toolConfiguration.title}
-              label={I18n.t("Icon Url")}
-            />
+            <hr />
           </FormFieldGroup>
-          <TextArea
-            name="description"
-            value={toolConfiguration.description}
-            label={I18n.t("Description")}
-            maxHeight="5rem"
-            required
-          />
-          <FormFieldGroup
-            description={<ScreenReaderContent>{I18n.t("OIDC Values")}</ScreenReaderContent>}
-            layout="columns"
-          >
-            <TextInput
-              name="target_link_uri"
-              value={toolConfiguration.target_link_uri}
-              label={I18n.t("Target Link URI")}
-              required
-            />
-            <TextInput
-              name="oidc_initiation_url"
-              value={toolConfiguration.oidc_initiation_url}
-              label={I18n.t("OpenID Connect Initiation Url")}
-              required
-            />
-          </FormFieldGroup>
-          <TextArea
-            name="public_jwk"
-            value={toolConfiguration.public_jwk}
-            label={I18n.t("Public JWK")}
-            maxHeight="10rem"
-            required
-            resize="vertical"
-            autoGrow
-          />
           <ToggleDetails
             summary={I18n.t("LTI Advantage Services")}
             fluidWidth
           >
-            <CheckboxGroup
-            name="services"
-            onChange={() => {}}
-            value={toolConfiguration.scopes}
-            description={<ScreenReaderContent>{I18n.t("Check Services to enable")}</ScreenReaderContent>}
-          >
-            {
-              Object.keys(validScopes).map(key => {
-                return <Checkbox
-                  key={key}
-                  label={validScopes[key]}
-                  value={key}
-                  variant="toggle"
-                />
-              })
-            }
-          </CheckboxGroup>
+            <View
+              as="div"
+              margin="small"
+            >
+              <Alert
+                variant="warning"
+                margin="small"
+              >
+                {I18n.t("Services must be supported by the tool in order to work. Check with your Tool Vendor to ensure service capabilities.")}
+              </Alert>
+              <CheckboxGroup
+                name="services"
+                onChange={() => {}}
+                value={toolConfiguration.scopes}
+                description={<ScreenReaderContent>{I18n.t("Check Services to enable")}</ScreenReaderContent>}
+              >
+                {
+                  Object.keys(validScopes).map(key => {
+                    return <Checkbox
+                      key={key}
+                      label={validScopes[key]}
+                      value={key}
+                      variant="toggle"
+                    />
+                  })
+                }
+              </CheckboxGroup>
+            </View>
           </ToggleDetails>
           <ToggleDetails
             summary={I18n.t("Additional Settings")}
             fluidWidth
           >
-            <FormFieldGroup
-              description={<ScreenReaderContent>{I18n.t("Identification Values")}</ScreenReaderContent>}
-              layout="columns"
+            <View
+              as="div"
+              margin="small"
             >
-              <TextInput
-                name="domain"
-                value={additionalSettings.domain}
-                label={I18n.t("Domain")}
+              <FormFieldGroup
+                description={<ScreenReaderContent>{I18n.t("Identification Values")}</ScreenReaderContent>}
+                layout="columns"
+              >
+                <TextInput
+                  name="domain"
+                  value={additionalSettings.domain}
+                  label={I18n.t("Domain")}
+                />
+                <TextInput
+                  name="tool_id"
+                  value={additionalSettings.tool_id}
+                  label={I18n.t("Tool Id")}
+                />
+              </FormFieldGroup>
+              <FormFieldGroup
+                description={<ScreenReaderContent>{I18n.t("Display Values")}</ScreenReaderContent>}
+                layout="columns"
+              >
+                <TextInput
+                  name="settings_icon_url"
+                  value={additionalSettings.icon_url}
+                  label={I18n.t("Icon Url")}
+                />
+                <TextInput
+                  name="text"
+                  value={additionalSettings.text}
+                  label={I18n.t("Text")}
+                />
+                <TextInput
+                  name="selection_height"
+                  value={additionalSettings.selection_height}
+                  label={I18n.t("Selection Height")}
+                />
+                <TextInput
+                  name="selection_width"
+                  value={additionalSettings.selection_width}
+                  label={I18n.t("Selection Width")}
+                />
+              </FormFieldGroup>
+              <TextArea
+                label={I18n.t('Custom Fields')}
+                maxHeight="10rem"
+                messages={[{text: I18n.t('One per line. Format: name=value'), type: 'hint'}]}
+                name="custom_fields"
+                value={Object.keys(custom_fields).map(k => `${k}=${custom_fields[k]}`).join("\n")}
               />
-              <TextInput
-                name="tool_id"
-                value={additionalSettings.tool_id}
-                label={I18n.t("Tool Id")}
-              />
-            </FormFieldGroup>
-            <FormFieldGroup
-              description={<ScreenReaderContent>{I18n.t("Display Values")}</ScreenReaderContent>}
-              layout="columns"
-            >
-              <TextInput
-                name="settings_icon_url"
-                value={additionalSettings.icon_url}
-                label={I18n.t("Icon Url")}
-              />
-              <TextInput
-                name="text"
-                value={additionalSettings.text}
-                label={I18n.t("Text")}
-              />
-              <TextInput
-                name="selection_height"
-                value={additionalSettings.selection_height}
-                label={I18n.t("Selection Height")}
-              />
-              <TextInput
-                name="selection_width"
-                value={additionalSettings.selection_width}
-                label={I18n.t("Selection Width")}
-              />
-            </FormFieldGroup>
+            </View>
           </ToggleDetails>
           <Select
             label={I18n.t("Placements")}
@@ -219,64 +249,80 @@ export default class ManualConfigurationForm extends React.Component {
                 fluidWidth
                 key={p.placement}
               >
-                <FormFieldGroup
-                  description={<ScreenReaderContent>{I18n.t("Placement Values")}</ScreenReaderContent>}
+                <View
+                  as="div"
+                  margin="small"
                 >
                   <FormFieldGroup
-                    description={<ScreenReaderContent>{I18n.t("Request Values")}</ScreenReaderContent>}
-                    layout="columns"
+                    description={<ScreenReaderContent>{I18n.t("Placement Values")}</ScreenReaderContent>}
                   >
-                    <TextInput
-                      name={`${p.placement}_target_link_uri`}
-                      value={p.icon_url}
-                      label={I18n.t("Target Link URI")}
-                    />
-                    <RadioInputGroup
-                      name={`${p.placement}_message_type`}
-                      value={p.message_type}
-                      description={I18n.t("Select Message Type")}
+                    {
+                      this.specialTypes.includes(p.placement)
+                        ? <Alert
+                            variant="warning"
+                            margin="small"
+                          >
+                            {I18n.t("This placement requires Deep Link support by the vendor. Check with your tool vendor to ensure they support this functionality")}
+                          </Alert>
+                        : null
+                    }
+                    <FormFieldGroup
+                      description={<ScreenReaderContent>{I18n.t("Request Values")}</ScreenReaderContent>}
+                      layout="columns"
                     >
-                      <RadioInput
-                        value="LtiDeepLinkingRequest"
-                        label="LtiDeepLinkingRequest"
+                      <TextInput
+                        name={`${p.placement}_target_link_uri`}
+                        value={p.icon_url}
+                        label={I18n.t("Target Link URI")}
                       />
-                      <RadioInput
-                        value="LtiResourceLinkRequest"
-                        label="LtiResourceLinkRequest"
+                      <RadioInputGroup
+                        name={`${p.placement}_message_type`}
+                        value={p.message_type}
+                        description={I18n.t("Select Message Type")}
+                        required
+                      >
+                        <RadioInput
+                          value="LtiDeepLinkingRequest"
+                          label="LtiDeepLinkingRequest"
+                        />
+                        <RadioInput
+                          value="LtiResourceLinkRequest"
+                          label="LtiResourceLinkRequest"
+                        />
+                      </RadioInputGroup>
+                    </FormFieldGroup>
+                    <FormFieldGroup
+                      description={<ScreenReaderContent>{I18n.t("Label Values")}</ScreenReaderContent>}
+                      layout="columns"
+                    >
+                      <TextInput
+                        name={`${p.placement}_icon_url`}
+                        value={p.icon_url}
+                        label={I18n.t("Icon Url")}
                       />
-                    </RadioInputGroup>
+                      <TextInput
+                        name={`${p.placement}_text`}
+                        value={p.text}
+                        label={I18n.t("Text")}
+                      />
+                    </FormFieldGroup>
+                    <FormFieldGroup
+                      description={<ScreenReaderContent>{I18n.t("Display Values")}</ScreenReaderContent>}
+                      layout="columns"
+                    >
+                      <TextInput
+                        name={`${p.placement}_selection_height`}
+                        value={p.selection_height}
+                        label={I18n.t("Selection Height")}
+                      />
+                      <TextInput
+                        name={`${p.placement}_selection_width`}
+                        value={p.selection_width}
+                        label={I18n.t("Selection Width")}
+                      />
+                    </FormFieldGroup>
                   </FormFieldGroup>
-                  <FormFieldGroup
-                    description={<ScreenReaderContent>{I18n.t("Label Values")}</ScreenReaderContent>}
-                    layout="columns"
-                  >
-                    <TextInput
-                      name={`${p.placement}_icon_url`}
-                      value={p.icon_url}
-                      label={I18n.t("Icon Url")}
-                    />
-                    <TextInput
-                      name={`${p.placement}_text`}
-                      value={p.text}
-                      label={I18n.t("Text")}
-                    />
-                  </FormFieldGroup>
-                  <FormFieldGroup
-                    description={<ScreenReaderContent>{I18n.t("Display Values")}</ScreenReaderContent>}
-                    layout="columns"
-                  >
-                    <TextInput
-                      name={`${p.placement}_selection_height`}
-                      value={p.selection_height}
-                      label={I18n.t("Selection Height")}
-                    />
-                    <TextInput
-                      name={`${p.placement}_selection_width`}
-                      value={p.selection_width}
-                      label={I18n.t("Selection Width")}
-                    />
-                  </FormFieldGroup>
-                </FormFieldGroup>
+                </View>
               </ToggleDetails>
             })
           }

@@ -29,7 +29,7 @@ class TokenScopes
   LTI_NRPS_V2_SCOPE = "https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly".freeze
   LTI_SCOPES = {
     LTI_AGS_LINE_ITEM_SCOPE => I18n.t("Can create and view assignment data in the gradebook associated with the tool."),
-    LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE => I18n.t("Can view assignment data in the Gradebook associated with the tool."),
+    LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE => I18n.t("Can view assignment data in the gradebook associated with the tool."),
     LTI_AGS_RESULT_READ_ONLY_SCOPE => I18n.t("Can view submission data for assignments associated with the tool."),
     LTI_AGS_SCORE_SCOPE => I18n.t("Can create and update submission results for assignments associated with the tool."),
     LTI_NRPS_V2_SCOPE => I18n.t("Can retrieve user data associated with the context the tool is installed in.")
