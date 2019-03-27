@@ -1082,6 +1082,18 @@ describe EnrollmentsApiController, type: :request do
             expect(json.first['sis_user_id']).to eq(@teacher.pseudonym.sis_user_id)
           end
 
+          it "filters enrollments not made with sis_user_id" do
+            section = @course.course_sections.create!(name: 'other_section')
+            e = section.enroll_user(@teacher, 'TeacherEnrollment')
+            # generally these are populated from a sis_import
+            Enrollment.where(id: e).update_all(sis_pseudonym_id: @teacher.pseudonyms.where(sis_user_id: '1234').take.id)
+            @params[:sis_user_id] = '1234'
+            @params[:created_for_sis_id] = true
+            json = api_call(:get, @path, @params)
+            expect(json.length).to eq(1)
+            expect(json.first['id']).to eq(e.id)
+          end
+
           it "filters by a list of sis_user_ids" do
             @params[:sis_user_id] = ['1234', '5678']
             json = api_call(:get, @path, @params)
