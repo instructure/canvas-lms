@@ -2549,4 +2549,99 @@ PUBLIC
       expect(json['message']).to eq "Developer key not authorized"
     end
   end
+
+  describe "#user_graded_submissions" do
+    specs_require_sharding
+
+    before :once do
+      teacher1 = course_with_teacher(active_all: true).user
+      @course1 = @course
+      @student1 = student_in_course(course: @course1).user
+      @student1.associate_with_shard(@shard1)
+      @student2 = student_in_course(course: @course1).user
+
+      @shard1.activate do
+        cross_account = account_model(:name => "crossshard", :default_time_zone => 'UTC')
+        teacher2 = course_with_teacher(account: cross_account, active_all: true).user
+        course2 = @course
+        course2.enroll_student(@student1).accept!
+        assignment = assignment_model(course: course2, submission_types: 'online_text_entry')
+        @most_recent_submission = assignment.grade_student(@student1, grader: teacher2, score: 10).first
+        @most_recent_submission.graded_at = 1.day.ago
+        @most_recent_submission.save!
+      end
+
+      assignment = assignment_model(course: @course1, submission_types: 'online_text_entry')
+      @next_submission = assignment.grade_student(@student1, grader: teacher1, score: 10).first
+      @next_submission.graded_at = 2.days.ago
+      @next_submission.save!
+
+      assignment = assignment_model(course: @course1, submission_types: 'online_text_entry')
+      @last_submission = assignment.grade_student(@student1, grader: teacher1, score: 10).first
+      @last_submission.graded_at = 3.days.ago
+      @last_submission.save!
+
+      assignment = assignment_model(course: @course, submission_types: 'online_text_entry')
+      assignment.submit_homework(@student1, submission_type: 'online_text_entry', body: 'done')
+    end
+
+    it 'doesnt allow any user get another users submissions' do
+      api_call_as_user(@student2, :get, "/api/v1/users/#{@student1.id}/graded_submissions", {
+        id: @student1.to_param,
+        controller: 'users',
+        action: 'user_graded_submissions',
+        format: 'json'
+      })
+      assert_status(401)
+    end
+
+    it 'allows a user who can :read_grades to get a users submissions' do
+      api_call_as_user(account_admin_user, :get, "/api/v1/users/#{@student1.id}/graded_submissions", {
+        id: @student1.to_param,
+        controller: 'users',
+        action: 'user_graded_submissions',
+        format: 'json'
+      })
+      assert_status(200)
+    end
+
+    it 'gets the users submissions' do
+      json = api_call_as_user(@student1, :get, "/api/v1/users/#{@student1.id}/graded_submissions", {
+        id: @student1.to_param,
+        controller: 'users',
+        action: 'user_graded_submissions',
+        format: 'json'
+      })
+      expect(json.count).to eq 3
+      expect(json.map { |s| s['id'] }).to eq [@most_recent_submission.id, @next_submission.id, @last_submission.id]
+    end
+
+    it 'paginates' do
+      json = api_call_as_user(@student1, :get, "/api/v1/users/#{@student1.id}/graded_submissions?per_page=2", {
+        id: @student1.to_param,
+        controller: 'users',
+        action: 'user_graded_submissions',
+        format: 'json',
+        per_page: 2
+      })
+      expect(json.count).to eq 2
+
+      response.headers['Link'].split(',').find { |l| l =~ /<([^>]+)>.+next/ }
+      url = $1
+      _, querystring = url.split("?")
+      page = Rack::Utils.parse_nested_query(querystring)['page']
+
+      json = api_call_as_user(@student1, :get, url, {
+        id: @student1.to_param,
+        controller: 'users',
+        action: 'user_graded_submissions',
+        format: 'json',
+        per_page: 2,
+        page: page
+      })
+
+      expect(json.count).to eq 1
+    end
+  end
+
 end
