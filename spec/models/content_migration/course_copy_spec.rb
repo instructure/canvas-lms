@@ -482,7 +482,7 @@ describe ContentMigration do
 
     it "should copy the overridable course visibility setting" do
       visibility_type = "superfunvisibility"
-      allow_any_instance_of(Account).to receive(:available_course_visibility_override_options).
+      allow_any_instantiation_of(@copy_from.root_account).to receive(:available_course_visibility_override_options).
         and_return({visibility_type=> {:setting => "Some label"}})
       @copy_from.apply_visibility_configuration(visibility_type, nil)
       @copy_from.save!
