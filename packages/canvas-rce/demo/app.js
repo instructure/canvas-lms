@@ -31,6 +31,10 @@ import RadioInputGroup from "@instructure/ui-forms/lib/components/RadioInputGrou
 import RadioInput from "@instructure/ui-forms/lib/components/RadioInput";
 import ToggleDetails from "@instructure/ui-toggle-details/lib/components/ToggleDetails";
 
+// This is temporarily here so we have a place to develop the shared
+// infrastructure until we get real plugins built.
+import CanvasContentTray from '../src/rce/plugins/shared/CanvasContentTray';
+
 function getProps(textareaId, language = "en", textDirection = "ltr") {
   return {
     language,
@@ -98,7 +102,8 @@ class DemoOptions extends Component {
     host: "https://rich-content-iad.inscloudgate.net",
     jwt: "",
     contextType: "course",
-    contextId: "1"
+    contextId: "1",
+    contentTrayOpen: false // Temporarily here
   };
 
   handleChange = () => {
@@ -113,6 +118,9 @@ class DemoOptions extends Component {
   render() {
     return (
       <ToggleDetails summary="Configuration Options">
+        {/** This is just temporarily here */}
+        <Button onClick={() => this.setState({ contentTrayOpen: true })}>Open Content Tray</Button>
+        <CanvasContentTray isOpen={this.state.contentTrayOpen} initialContentType="links" handleClose={() => this.setState({ contentTrayOpen: false })} />
         <form
           onSubmit={e => {
             e.preventDefault();
