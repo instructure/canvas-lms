@@ -21,7 +21,7 @@ import PropTypes from 'prop-types'
 import React from 'react'
 
 import Button from '@instructure/ui-buttons/lib/components/Button'
-import Container from '@instructure/ui-layout/lib/components/View'
+import {View} from '@instructure/ui-layout'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import IconArrowOpenStart from '@instructure/ui-icons/lib/Solid/IconArrowOpenStart'
 import Text from '@instructure/ui-elements/lib/components/Text'
@@ -41,7 +41,7 @@ export default function RoleTrayTableRow({
   role
 }) {
   return (
-    <Container as="div">
+    <View as="div">
       <Flex justifyItems="space-between">
         <FlexItem>
           {expandable && (
@@ -81,7 +81,7 @@ export default function RoleTrayTableRow({
           </div>
         </FlexItem>
       </Flex>
-    </Container>
+    </View>
   )
 }
 
