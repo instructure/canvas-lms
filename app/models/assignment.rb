@@ -499,7 +499,6 @@ class Assignment < ActiveRecord::Base
               :delete_empty_abandoned_children,
               :update_cached_due_dates,
               :apply_late_policy,
-              :touch_submissions_if_muted_changed,
               :update_line_items,
               :ensure_manual_posting_if_anonymous,
               :ensure_manual_posting_if_moderated
@@ -975,31 +974,23 @@ class Assignment < ActiveRecord::Base
     all_context_module_tags.each { |tag| tag.context_module_action(user, action, points) }
   end
 
-  def recalculate_module_progressions
+  def recalculate_module_progressions(submission_ids)
     # recalculate the module progressions now that the assignment is unmuted
+    submitted_scope = Submission.having_submission.or(Submission.graded)
+    student_ids = submissions.merge(submitted_scope).where(id: submission_ids).pluck(:user_id)
+    return if student_ids.blank?
+
     tags = all_context_module_tags
     return unless tags.any?
+
     modules = ContextModule.where(:id => tags.map(&:context_module_id)).order(:position).to_a.select do |mod|
       mod.completion_requirements && mod.completion_requirements.any?{|req| req[:type] == 'min_score' && tags.map(&:id).include?(req[:id])}
     end
     return unless modules.any?
-    student_ids = self.submissions.having_submission.or(self.submissions.graded).distinct.pluck(:user_id)
-    return unless student_ids.any?
 
     modules.each do |mod|
       if mod.context_module_progressions.where(current: true, user_id: student_ids).update_all(current: false) > 0
         mod.send_later_if_production_enqueue_args(:evaluate_all_progressions, {:strand => "module_reeval_#{mod.global_context_id}"})
-      end
-    end
-  end
-
-  def touch_submissions_if_muted_changed
-    # TODO: (GRADE-1982) implement a version of recalculate_module_progressions
-    # that can operate on an arbitrary set of submissions and call it in
-    # post_submissions. When that's done, this method can be removed.
-    if saved_change_to_muted?
-      self.class.connection.after_transaction_commit do
-        self.send_later_if_production(:recalculate_module_progressions) unless self.muted?
       end
     end
   end
@@ -3147,6 +3138,8 @@ class Assignment < ActiveRecord::Base
     submissions.in_workflow_state('graded').each(&:assignment_muted_changed)
 
     show_stream_items(submissions: submissions)
+
+    self.send_later_if_production(:recalculate_module_progressions, submissions.map(&:id))
 
     update_muted_status! if course.feature_enabled?(:post_policies)
   end
