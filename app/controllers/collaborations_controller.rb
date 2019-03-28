@@ -352,13 +352,14 @@ class CollaborationsController < ApplicationController
   # @returns [Collaborator]
   def members
     return unless authorized_action(@collaboration, @current_user, :read)
-    options = {:include => params[:include]}
+    includes = Array(params[:include])
+    options = {include: includes}
     collaborators = @collaboration.collaborators.preload(:group, :user)
     collaborators = Api.paginate(collaborators,
                                  self,
                                  api_v1_collaboration_members_url)
 
-    UserPastLtiIds.manual_preload_past_lti_ids(collaborators, @context)
+    UserPastLtiIds.manual_preload_past_lti_ids(collaborators, @context) if includes.include? 'collaborator_lti_id'
     render(:json => collaborators.map{|c| collaborator_json(c, @current_user, session, options, context: @context)})
   end
 
