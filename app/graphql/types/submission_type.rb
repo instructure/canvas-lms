@@ -58,7 +58,7 @@ module Types
     field :comments_connection, SubmissionCommentType.connection_type, null: true
     def comments_connection
       load_association(:assignment).then do
-        submission.comments_for(current_user)
+        submission.comments_for(current_user).published
       end
     end
 
