@@ -98,6 +98,8 @@ Rails.application.config.after_initialize do
     delegate :in_current_region?, to: :database_server
 
     scope :in_region, ->(region) do
+      next in_current_region if region.nil?
+
       servers = DatabaseServer.all.select { |db| db.in_region?(region) }.map(&:id)
       if servers.include?(Shard.default.database_server.id)
         where("database_server_id IN (?) OR database_server_id IS NULL", servers)
