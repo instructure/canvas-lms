@@ -20,12 +20,13 @@ import {bool, oneOf} from 'prop-types'
 import I18n from 'i18n!assignments_2'
 import {OverrideShape, requiredIfDetail} from '../../assignmentData'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import NumberInput from '@instructure/ui-forms/lib/components/NumberInput'
+import {NumberInput} from '@instructure/ui-number-input'
 import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Select from '@instructure/ui-forms/lib/components/Select'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import View from '@instructure/ui-layout/lib/components/View'
+import NumberHelper from '../../../../shared/helpers/numberHelper'
 
 export default class OverrideAttempts extends React.Component {
   static propTypes = {
@@ -53,9 +54,33 @@ export default class OverrideAttempts extends React.Component {
     this.props.onChangeOverride('allowedAttempts', limit)
   }
 
+  /* eslint-disable no-restricted-globals */
   onChangeAttemptLimit = (_event, number) => {
-    this.props.onChangeOverride('allowedAttempts', number)
+    const value = NumberHelper.parse(number)
+    if (isNaN(value)) {
+      return
+    }
+    this.props.onChangeOverride('allowedAttempts', Math.trunc(value))
   }
+
+  onIncrementAttemptLimit = _event => {
+    const value = NumberHelper.parse(this.props.override.allowedAttempts)
+    if (isNaN(value)) {
+      return
+    }
+    this.props.onChangeOverride('allowedAttempts', value + 1)
+  }
+
+  onDecrementAttemptLimit = _event => {
+    const value = NumberHelper.parse(this.props.override.allowedAttempts)
+    if (isNaN(value)) {
+      return
+    }
+    if (value > 1) {
+      this.props.onChangeOverride('allowedAttempts', value - 1)
+    }
+  }
+  /* eslint-enable no-restricted-globals */
 
   onChangeScoreToKeep = (_event, selection) => {
     this.setState({scoreToKeep: selection.value})
@@ -92,8 +117,10 @@ export default class OverrideAttempts extends React.Component {
             width="5.5rem"
             label={<ScreenReaderContent>Attempts</ScreenReaderContent>}
             min={1}
-            value={limit}
+            value={`${limit}`}
             onChange={this.onChangeAttemptLimit}
+            onIncrement={this.onIncrementAttemptLimit}
+            onDecrement={this.onDecrementAttemptLimit}
           />
           <PresentationContent>
             <View display="inline-block" margin="0 0 0 small">

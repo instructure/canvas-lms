@@ -20,7 +20,7 @@ import React from 'react'
 import {bool, string, func, number, oneOf, oneOfType} from 'prop-types'
 
 import Text from '@instructure/ui-elements/lib/components/Text'
-import NumberInput from '@instructure/ui-number-input/lib/components/NumberInput'
+import {NumberInput} from '@instructure/ui-number-input'
 import InPlaceEdit from '@instructure/ui-editable/lib/components/InPlaceEdit'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import View from '@instructure/ui-layout/lib/components/View'

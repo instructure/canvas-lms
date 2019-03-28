@@ -17,76 +17,122 @@
  */
 
 import React from 'react'
-import {render} from 'react-testing-library'
+import {render, fireEvent} from 'react-testing-library'
 import {mockOverride} from '../../../test-utils'
 import OverrideAttempts from '../OverrideAttempts'
 
-it('renders unlimited override attempts summary', () => {
-  const override = mockOverride()
+describe('OverrideAttempts', () => {
+  it('renders unlimited override attempts summary', () => {
+    const override = mockOverride()
 
-  const {getByText, getByTestId} = render(
-    <OverrideAttempts override={override} variant="summary" />
-  )
-  expect(getByTestId('OverrideAttempts-Summary')).toBeInTheDocument()
+    const {getByText, getByTestId} = render(
+      <OverrideAttempts override={override} variant="summary" />
+    )
+    expect(getByTestId('OverrideAttempts-Summary')).toBeInTheDocument()
 
-  // the attempts
-  expect(getByText('Unlimited Attempts')).toBeInTheDocument()
-})
+    // the attempts
+    expect(getByText('Unlimited Attempts')).toBeInTheDocument()
+  })
 
-it('renders limited override attempts summary', () => {
-  const override = mockOverride({allowedAttempts: 2})
+  it('renders limited override attempts summary', () => {
+    const override = mockOverride({allowedAttempts: 2})
 
-  const {getByText, getByTestId} = render(
-    <OverrideAttempts override={override} variant="summary" />
-  )
-  expect(getByTestId('OverrideAttempts-Summary')).toBeInTheDocument()
+    const {getByText, getByTestId} = render(
+      <OverrideAttempts override={override} variant="summary" />
+    )
+    expect(getByTestId('OverrideAttempts-Summary')).toBeInTheDocument()
 
-  // the attempts
-  expect(getByText('2 Attempts')).toBeInTheDocument()
-})
+    // the attempts
+    expect(getByText('2 Attempts')).toBeInTheDocument()
+  })
 
-it('renders unlimited override attempts detail', () => {
-  const override = mockOverride({})
+  it('renders unlimited override attempts detail', () => {
+    const override = mockOverride({})
 
-  const {getByLabelText, getByTestId, queryByTestId} = render(
-    <OverrideAttempts override={override} onChangeOverride={() => {}} variant="detail" readOnly />
-  )
-  expect(getByTestId('OverrideAttempts-Detail')).toBeInTheDocument()
+    const {getByLabelText, getByTestId, queryByTestId} = render(
+      <OverrideAttempts override={override} onChangeOverride={() => {}} variant="detail" readOnly />
+    )
+    expect(getByTestId('OverrideAttempts-Detail')).toBeInTheDocument()
 
-  // the attempts
-  expect(getByLabelText('Attempts Allowed').value).toBe('Unlimited')
-  expect(queryByTestId('OverrideAttempts-Attempts')).toBeNull()
+    // the attempts
+    expect(getByLabelText('Attempts Allowed').value).toBe('Unlimited')
+    expect(queryByTestId('OverrideAttempts-Attempts')).toBeNull()
 
-  // score to keep
-  expect(getByLabelText('Score to keep').value).toBe('Most Recent')
-})
+    // score to keep
+    expect(getByLabelText('Score to keep').value).toBe('Most Recent')
+  })
 
-it('renders limited override attempts detail', () => {
-  const override = mockOverride({allowedAttempts: 2})
-  const {getByLabelText, getByTestId} = render(
-    <OverrideAttempts override={override} onChangeOverride={() => {}} variant="detail" readOnly />
-  )
-  expect(getByTestId('OverrideAttempts-Detail')).toBeInTheDocument()
+  it('renders limited override attempts detail', () => {
+    const override = mockOverride({allowedAttempts: 2})
+    const {getByLabelText, getByTestId} = render(
+      <OverrideAttempts override={override} onChangeOverride={() => {}} variant="detail" readOnly />
+    )
+    expect(getByTestId('OverrideAttempts-Detail')).toBeInTheDocument()
 
-  // the attempts
-  expect(getByLabelText('Attempts Allowed').value).toBe('Limited')
-  expect(getByLabelText('Attempts').value).toBe('2')
+    // the attempts
+    expect(getByLabelText('Attempts Allowed').value).toBe('Limited')
+    expect(getByLabelText('Attempts').value).toBe('2')
 
-  expect(getByLabelText('Score to keep').value).toBe('Most Recent')
-})
+    expect(getByLabelText('Score to keep').value).toBe('Most Recent')
+  })
 
-it('displays the Attempts count when switched from unlimited to limited', () => {
-  const override = mockOverride({})
+  it('displays the Attempts count when switched from unlimited to limited', () => {
+    const override = mockOverride({})
 
-  const {container, getByTestId, queryByTestId} = render(
-    <OverrideAttempts override={override} onChangeOverride={() => {}} variant="detail" readOnly />
-  )
-  expect(queryByTestId('OverrideAttempts-Attempts')).toBeNull()
+    const {container, getByTestId, queryByTestId} = render(
+      <OverrideAttempts override={override} onChangeOverride={() => {}} variant="detail" readOnly />
+    )
+    expect(queryByTestId('OverrideAttempts-Attempts')).toBeNull()
 
-  override.allowedAttempts = 1
-  render(
-    <OverrideAttempts override={override} onChangeOverride={() => {}} variant="detail" readOnly />,
-    {container}
-  )
-  expect(getByTestId('OverrideAttempts-Attempts')).toBeInTheDocument()
+    override.allowedAttempts = 1
+    render(
+      <OverrideAttempts
+        override={override}
+        onChangeOverride={() => {}}
+        variant="detail"
+        readOnly
+      />,
+      {container}
+    )
+    expect(getByTestId('OverrideAttempts-Attempts')).toBeInTheDocument()
+  })
+
+  it('increments the limit', () => {
+    const override = mockOverride({allowedAttempts: 2})
+    const onChange = jest.fn()
+
+    const {getByLabelText} = render(
+      <OverrideAttempts override={override} onChangeOverride={onChange} variant="detail" readOnly />
+    )
+
+    const numberInput = getByLabelText('Attempts')
+    fireEvent.keyDown(numberInput, {key: 'ArrowUp', keyCode: 38})
+    expect(onChange).toHaveBeenCalledWith('allowedAttempts', 3)
+  })
+
+  it('decrements the limit', () => {
+    const override = mockOverride({allowedAttempts: 2})
+    const onChange = jest.fn()
+
+    const {getByLabelText} = render(
+      <OverrideAttempts override={override} onChangeOverride={onChange} variant="detail" readOnly />
+    )
+
+    const numberInput = getByLabelText('Attempts')
+    fireEvent.keyDown(numberInput, {key: 'ArrowDown', keyCode: 40})
+    expect(onChange).toHaveBeenCalledWith('allowedAttempts', 1)
+  })
+
+  it('not to decrements the limit to 0', () => {
+    const override = mockOverride({allowedAttempts: 1})
+    const onChange = jest.fn()
+
+    const {getByLabelText} = render(
+      <OverrideAttempts override={override} onChangeOverride={onChange} variant="detail" readOnly />
+    )
+
+    const numberInput = getByLabelText('Attempts')
+    fireEvent.keyDown(numberInput, {key: 'ArrowDown', keyCode: 40})
+    expect(onChange).not.toHaveBeenCalled()
+  })
 })
