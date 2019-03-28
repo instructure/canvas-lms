@@ -971,10 +971,10 @@
     postcss-modules "^1.4.1"
     postcss-reporter "^6.0.1"
 
-"@instructure/canvas-rce-old@4.1.0":
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/@instructure/canvas-rce-old/-/canvas-rce-old-4.1.0.tgz#b103e30428046779da917b6c63f38e6e4b9f49ec"
-  integrity sha512-lhoMW2qHTcISl2WLcRKipt0k3Yie5ow3663BbvLR3n7Ht321TWIhyyZ7Psd6QJjW1UhvKq8WgvYov/ZjlV6GNw==
+"@instructure/canvas-rce-old@4.1.2":
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/@instructure/canvas-rce-old/-/canvas-rce-old-4.1.2.tgz#a02db0715a2b5f72a342801050b92b0c4a9a9ff2"
+  integrity sha512-r/CRSbvXjLE8ys0gHGVy+wqN7lCMp3p3gRTZd+mr02T/hgJUcCLXJFZ7LSkv504pSZX54DDveDmy9O2ZLdTEGg==
   dependencies:
     "@instructure/ui-a11y" "^5"
     "@instructure/ui-buttons" "^5"
