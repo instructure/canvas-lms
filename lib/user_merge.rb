@@ -22,29 +22,45 @@ class UserMerge
   end
 
   attr_reader :from_user
-  attr_accessor :data
+  attr_accessor :target_user, :data, :merge_data
 
   def initialize(from_user)
     @from_user = from_user
+    @target_user = nil
+    @merge_data = nil
     @data = []
   end
 
   def into(target_user)
     return unless target_user
     return if target_user == from_user
+    @target_user = target_user
     target_user.associate_with_shard(from_user.shard, :shadow)
     # we also store records for the from_user on the target shard for a split
     from_user.associate_with_shard(target_user.shard, :shadow)
-    user_merge_data = target_user.shard.activate do
-      UserMergeData.create!(user: target_user, from_user: from_user)
-    end
+    target_user.shard.activate do
+      @merge_data = UserMergeData.create!(user: target_user, from_user: from_user)
 
-    if target_user.avatar_state == :none && from_user.avatar_state != :none
-      [:avatar_image_source, :avatar_image_url, :avatar_image_updated_at, :avatar_state].each do |attr|
-        target_user[attr] = from_user[attr]
+      items = []
+      if target_user.avatar_state == :none && from_user.avatar_state != :none
+        [:avatar_image_source, :avatar_image_url, :avatar_image_updated_at, :avatar_state].each do |attr|
+          items << merge_data.items.new(user: from_user, item_type: attr.to_s, item: from_user[attr]) if from_user[attr]
+          target_user[attr] = from_user[attr]
+        end
       end
+
+      # record the users names and preferences in case of split.
+      items << merge_data.items.new(user: from_user, item_type: 'user_name', item: from_user.name)
+      items << merge_data.items.new(user: target_user, item_type: 'user_name', item: target_user.name)
+      UserMergeDataItem.bulk_insert_objects(items)
+
+      # bulk insert doesn't play nice with the hash values of preferences.
+      merge_data.items.create!(user: from_user, item_type: 'user_preferences', item: from_user.preferences)
+      merge_data.items.create!(user: target_user, item_type: 'user_preferences', item: target_user.preferences)
+
+      target_user.preferences = target_user.preferences.merge(from_user.preferences)
+      target_user.save if target_user.changed?
     end
-    target_user.save if target_user.changed?
 
     [:strong, :weak, :shadow].each do |strength|
       from_user.associated_shards(strength).each do |shard|
@@ -52,25 +68,22 @@ class UserMerge
       end
     end
 
-    populate_past_lti_ids(target_user)
-
-    handle_communication_channels(target_user, user_merge_data)
-
-    destroy_conflicting_module_progressions(@from_user, target_user)
-
-    move_enrollments(target_user, user_merge_data)
+    populate_past_lti_ids
+    handle_communication_channels
+    destroy_conflicting_module_progressions
+    move_enrollments
 
     Shard.with_each_shard(from_user.associated_shards + from_user.associated_shards(:weak) + from_user.associated_shards(:shadow)) do
       max_position = Pseudonym.where(user_id: target_user).order(:position).last.try(:position) || 0
       pseudonyms_to_move = Pseudonym.where(user_id: from_user)
-      user_merge_data.add_more_data(pseudonyms_to_move)
+      merge_data.add_more_data(pseudonyms_to_move)
       pseudonyms_to_move.update_all(["user_id=?, position=position+?", target_user, max_position])
 
       target_user.communication_channels.email.unretired.each do |cc|
         Rails.cache.delete([cc.path, 'invited_enrollments2'].cache_key)
       end
 
-      handle_submissions(target_user, user_merge_data)
+      handle_submissions
 
       from_user.all_conversations.find_each { |c| c.move_to_user(target_user) }
 
@@ -86,11 +99,11 @@ class UserMerge
       end
 
       account_users = AccountUser.where(user_id: from_user)
-      user_merge_data.add_more_data(account_users)
+      merge_data.add_more_data(account_users)
       account_users.update_all(user_id: target_user.id)
 
       attachments = Attachment.where(user_id: from_user)
-      user_merge_data.add_more_data(attachments)
+      merge_data.add_more_data(attachments)
       Attachment.send_later(:migrate_attachments, from_user, target_user)
 
       updates = {}
@@ -114,7 +127,7 @@ class UserMerge
             scope = klass.where(column => from_user)
             klass.transaction do
               if version_updates.include?(table)
-                update_versions(from_user, target_user, scope, table, column)
+                update_versions(scope, table, column)
               end
               scope.update_all(column => target_user.id)
             end
@@ -131,7 +144,7 @@ class UserMerge
           update_all(context_id: target_user.id, context_code: target_user.asset_string)
       end
 
-      move_observees(target_user, user_merge_data)
+      move_observees
 
       Enrollment.send_later(:recompute_due_dates_and_scores, target_user.id)
       target_user.update_account_associations
@@ -142,7 +155,7 @@ class UserMerge
     from_user.destroy
   end
 
-  def populate_past_lti_ids(target_user)
+  def populate_past_lti_ids
     Shard.with_each_shard(from_user.associated_shards + from_user.associated_shards(:weak) + from_user.associated_shards(:shadow)) do
       lti_ids = []
       {enrollments: :course, group_memberships: :group, account_users: :account}.each do |klass, type|
@@ -160,62 +173,62 @@ class UserMerge
     end
   end
 
-  def handle_communication_channels(target_user, user_merge_data)
+  def handle_communication_channels
     max_position = target_user.communication_channels.last.try(:position) || 0
     to_retire_ids = []
     known_ccs = target_user.communication_channels.pluck(:id)
     from_user.communication_channels.each do |cc|
       # have to find conflicting CCs, and make sure we don't have conflicts
-      target_cc = detect_conflicting_cc(cc, target_user)
+      target_cc = detect_conflicting_cc(cc)
 
       if !target_cc && from_user.shard != target_user.shard
         User.clone_communication_channel(cc, target_user, max_position)
         new_cc = target_user.communication_channels.where.not(id: known_ccs).take
         known_ccs << new_cc.id
-        user_merge_data.build_more_data([new_cc], user: target_user, workflow_state: 'non_existent', data: data)
+        merge_data.build_more_data([new_cc], user: target_user, workflow_state: 'non_existent', data: data)
       end
 
       next unless target_cc
-      to_retire = handle_conflicting_ccs(cc, target_cc, target_user, max_position)
+      to_retire = handle_conflicting_ccs(cc, target_cc, max_position)
       if to_retire
         keeper = ([target_cc, cc] - [to_retire]).first
-        copy_notificaion_policies(to_retire, keeper, user_merge_data)
+        copy_notificaion_policies(to_retire, keeper)
         to_retire_ids << to_retire.id
       end
     end
 
-    finish_ccs(max_position, target_user, to_retire_ids, user_merge_data)
+    finish_ccs(max_position, to_retire_ids)
   end
 
-  def detect_conflicting_cc(source_cc, target_user)
+  def detect_conflicting_cc(source_cc)
     target_user.communication_channels.detect do |c|
       c.path.downcase == source_cc.path.downcase && c.path_type == source_cc.path_type
     end
   end
 
-  def finish_ccs(max_position, target_user, to_retire_ids, user_merge_data)
+  def finish_ccs(max_position, to_retire_ids)
     if from_user.shard != target_user.shard
-      handle_cross_shard_cc(target_user, user_merge_data)
+      handle_cross_shard_cc
     else
       from_user.shard.activate do
         ccs = CommunicationChannel.where(id: to_retire_ids).where.not(workflow_state: 'retired')
-        user_merge_data.build_more_data(ccs, data: data) unless to_retire_ids.empty?
+        merge_data.build_more_data(ccs, data: data) unless to_retire_ids.empty?
         ccs.update_all(workflow_state: 'retired') unless to_retire_ids.empty?
       end
       scope = from_user.communication_channels.where.not(workflow_state: 'retired')
       scope = scope.where.not(id: to_retire_ids) unless to_retire_ids.empty?
       unless scope.empty?
-        user_merge_data.build_more_data(scope, data: data)
+        merge_data.build_more_data(scope, data: data)
         scope.update_all(["user_id=?, position=position+?", target_user, max_position])
       end
     end
-    user_merge_data.bulk_insert_merge_data(data)
+    merge_data.bulk_insert_merge_data(data)
     @data = []
   end
 
-  def handle_cross_shard_cc(target_user, user_merge_data)
+  def handle_cross_shard_cc
     ccs = from_user.communication_channels.where.not(workflow_state: 'retired')
-    user_merge_data.build_more_data(ccs, data: data) unless ccs.empty?
+    merge_data.build_more_data(ccs, data: data) unless ccs.empty?
     ccs.update_all(workflow_state: 'retired') unless ccs.empty?
 
     from_user.user_services.each do |us|
@@ -223,13 +236,13 @@ class UserMerge
       new_us.shard = target_user.shard
       new_us.user = target_user
       new_us.save!
-      user_merge_data.build_more_data([new_us], user: target_user, workflow_state: 'non_existent', data: data)
+      merge_data.build_more_data([new_us], user: target_user, workflow_state: 'non_existent', data: data)
     end
-    user_merge_data.build_more_data(from_user.user_services, data: data)
+    merge_data.build_more_data(from_user.user_services, data: data)
     from_user.user_services.delete_all
   end
 
-  def handle_conflicting_ccs(source_cc, target_cc, target_user, max_position)
+  def handle_conflicting_ccs(source_cc, target_cc, max_position)
     # we prefer keeping the "most" active one, preferring the target user if they're equal
     # the comments inline show all the different cases, with the source cc on the left,
     # target cc on the right.  The * indicates the CC that will be retired in order
@@ -265,7 +278,7 @@ class UserMerge
     to_retire
   end
 
-  def copy_notificaion_policies(to_retire, keeper, user_merge_data)
+  def copy_notificaion_policies(to_retire, keeper)
     # cross shard channels get cloned and so do notification_policies
     return unless to_retire.shard == keeper.shard
     # if the communication_channel is already retired, don't bother.
@@ -282,15 +295,15 @@ class UserMerge
     NotificationPolicy.bulk_insert_objects(new_nps)
   end
 
-  def move_observees(target_user, user_merge_data)
+  def move_observees
     # record all the records before destroying them
     # pass the from_user since user_id will be the observer
-    user_merge_data.build_more_data(from_user.as_observer_observation_links, user: from_user, data: data)
-    user_merge_data.build_more_data(from_user.as_student_observation_links, data: data)
+    merge_data.build_more_data(from_user.as_observer_observation_links, user: from_user, data: data)
+    merge_data.build_more_data(from_user.as_student_observation_links, data: data)
     # delete duplicate or invalid observers/observees, move the rest
     from_user.as_observer_observation_links.where(user_id: target_user.as_observer_observation_links.map(&:user_id)).destroy_all
     from_user.as_observer_observation_links.where(user_id: target_user).destroy_all
-    user_merge_data.add_more_data(target_user.as_observer_observation_links.where(user_id: from_user), user: target_user, data: data)
+    merge_data.add_more_data(target_user.as_observer_observation_links.where(user_id: from_user), user: target_user, data: data)
     @data = []
     target_user.as_observer_observation_links.where(user_id: from_user).destroy_all
     target_user.associate_with_shard(from_user.shard) if from_user.as_observer_observation_links.exists?
@@ -304,7 +317,7 @@ class UserMerge
     target_user.as_student_observation_links.where(observer_id: xor_observer_ids).each(&:create_linked_enrollments)
   end
 
-  def destroy_conflicting_module_progressions(from_user, target_user)
+  def destroy_conflicting_module_progressions
     # there is a unique index on the context_module_progressions table
     # we need to delete all the conflicting context_module_progressions
     # without impacting the users module progress and without having to
@@ -374,7 +387,7 @@ class UserMerge
     keeper.destroy
   end
 
-  def handle_conflicts(column, target_user, user_merge_data)
+  def handle_conflicts(column)
     users = [from_user, target_user]
 
     # get each pair of conflicts and "handle them"
@@ -391,49 +404,49 @@ class UserMerge
       # both target and from users records will be recorded in case of a split.
       if to_update.exists?
         # record both records state since both will change
-        user_merge_data.build_more_data(scope, data: data)
+        merge_data.build_more_data(scope, data: data)
         update_enrollment_state(scope, keeper)
       end
 
       # identify if the from users records are worse states than target user
       to_delete = scope.active.where.not(id: keeper).where(column => from_user)
       # record the current state in case of split
-      user_merge_data.build_more_data(to_delete, data: data)
+      merge_data.build_more_data(to_delete, data: data)
       # mark all conflicts on from_user as deleted so they will not be moved later
       to_delete.destroy_all
     end
   end
 
-  def remove_self_observers(target_user, user_merge_data)
+  def remove_self_observers
     # prevent observing self by marking them as deleted
     to_delete = Enrollment.active.where("type = 'ObserverEnrollment' AND
                                                    (associated_user_id = :target_user AND user_id = :from_user OR
                                                    associated_user_id = :from_user AND user_id = :target_user)",
                                                   {target_user: target_user, from_user: from_user})
-    user_merge_data.build_more_data(to_delete, data: data)
+    merge_data.build_more_data(to_delete, data: data)
     to_delete.destroy_all
   end
 
-  def move_enrollments(target_user, user_merge_data)
+  def move_enrollments
     [:associated_user_id, :user_id].each do |column|
       Shard.with_each_shard(from_user.associated_shards) do
         Enrollment.transaction do
-          handle_conflicts(column, target_user, user_merge_data)
-          remove_self_observers(target_user, user_merge_data)
+          handle_conflicts(column)
+          remove_self_observers
           # move all the enrollments that have not been marked as deleted to the target user
           to_move = Enrollment.active.where(column => from_user)
           # upgrade to strong association if there are any enrollments
           target_user.associate_with_shard(from_user.shard) if to_move.exists?
-          user_merge_data.build_more_data(to_move, data: data)
+          merge_data.build_more_data(to_move, data: data)
           to_move.update_all(column => target_user.id)
         end
       end
     end
-    user_merge_data.bulk_insert_merge_data(data)
+    merge_data.bulk_insert_merge_data(data)
     @data = []
   end
 
-  def handle_submissions(target_user, user_merge_data)
+  def handle_submissions
     [
       [:assignment_id, :submissions],
       [:quiz_id, :'quizzes/quiz_submissions']
@@ -457,9 +470,9 @@ class UserMerge
           to_move_ids += scope.having_submission.select(unique_id).where.not(unique_id => already_scope.having_submission.select(unique_id), id: to_move_ids).pluck(:id)
           to_move = scope.where(id: to_move_ids).to_a
           move_back = already_scope.where(unique_id => to_move.map(&unique_id)).to_a
-          user_merge_data.build_more_data(to_move, data: data)
-          user_merge_data.build_more_data(move_back, data: data)
-          swap_submission(model, move_back, table, target_user, to_move, to_move_ids, 'fk_rails_8d85741475')
+          merge_data.build_more_data(to_move, data: data)
+          merge_data.build_more_data(move_back, data: data)
+          swap_submission(model, move_back, table, to_move, to_move_ids, 'fk_rails_8d85741475')
         elsif model.name == "Quizzes::QuizSubmission"
           subscope = already_scope.to_a
           to_move = model.where(user_id: from_user).joins(:submission).where(submissions: {user_id: target_user}).to_a
@@ -467,19 +480,19 @@ class UserMerge
 
           to_move += scope.where("#{unique_id} NOT IN (?)", [subscope.map(&unique_id), move_back.map(&unique_id)].flatten).to_a
           move_back += already_scope.where(unique_id => to_move.map(&unique_id)).to_a
-          user_merge_data.build_more_data(to_move, data: data)
-          user_merge_data.build_more_data(move_back, data: data)
-          swap_submission(model, move_back, table, target_user, to_move, to_move, 'fk_rails_04850db4b4')
+          merge_data.build_more_data(to_move, data: data)
+          merge_data.build_more_data(move_back, data: data)
+          swap_submission(model, move_back, table, to_move, to_move, 'fk_rails_04850db4b4')
         end
       rescue => e
         Rails.logger.error "migrating #{table} column user_id failed: #{e}"
       end
     end
-    user_merge_data.bulk_insert_merge_data(data)
+    merge_data.bulk_insert_merge_data(data)
     @data = []
   end
 
-  def swap_submission(model, move_back, table, target_user, to_move, to_move_ids, fk)
+  def swap_submission(model, move_back, table, to_move, to_move_ids, fk)
     model.transaction do
       # there is a unique index on assignment_id and user_id. Unique
       # indexes are checked after every row during an update statement
@@ -491,12 +504,12 @@ class UserMerge
       model.where(id: move_back).update_all(user_id: -from_user.id) if target_user.shard == from_user.shard
       model.where(id: to_move_ids).update_all(user_id: target_user.id)
       model.where(id: move_back).update_all(user_id: from_user.id)
-      update_versions(from_user, target_user, model.where(id: to_move), table, :user_id)
-      update_versions(target_user, from_user, model.where(id: move_back), table, :user_id)
+      update_versions(model.where(id: to_move), table, :user_id)
+      update_versions(model.where(id: move_back), table, :user_id)
     end
   end
 
-  def update_versions(from_user, target_user, scope, table, column)
+  def update_versions(scope, table, column)
     scope.find_ids_in_batches do |ids|
       versionable_type = table.to_s.classify
       # TODO: This is a hack to support namespacing

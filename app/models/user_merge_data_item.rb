@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2011 - present Instructure, Inc.
+# Copyright (C) 2019 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -15,11 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-class UserMergeDataRecord < ActiveRecord::Base
-  belongs_to :previous_user, class_name: 'User'
-  belongs_to :merge_data, class_name: 'UserMergeData', inverse_of: :records
-  belongs_to :context, polymorphic: [:account_user, :enrollment, :pseudonym, :user_observer, :user_observation_link,
-                                     :attachment, :communication_channel, :user_service,
-                                     :submission, {quiz_submission: 'Quizzes::QuizSubmission'}]
+class UserMergeDataItem < ActiveRecord::Base
+  belongs_to :user
+  belongs_to :merge_data, class_name: 'UserMergeData', inverse_of: :items
 
+  serialize :item
 end

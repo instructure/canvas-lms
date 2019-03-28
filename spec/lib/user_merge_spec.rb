@@ -38,7 +38,7 @@ describe UserMerge do
       UserMerge.from(user2).into(user1)
       merge_data = UserMergeData.where(user_id: user1).first
       expect(merge_data.from_user_id).to eq user2.id
-      expect(merge_data.user_merge_data_records.pluck(:context_id).sort).to eq [pseudonym.id, pseudonym2.id].sort
+      expect(merge_data.records.pluck(:context_id).sort).to eq [pseudonym.id, pseudonym2.id].sort
       user2.reload
       expect(user2.pseudonyms).to be_empty
       user1.reload
@@ -60,7 +60,7 @@ describe UserMerge do
       UserMerge.from(user2).into(user1)
       merge_data = UserMergeData.where(user_id: user1).first
       expect(merge_data.from_user_id).to eq user2.id
-      expect(merge_data.user_merge_data_records.where(context_type: 'AccountUser').first.context_id).to eq admin.id
+      expect(merge_data.records.where(context_type: 'AccountUser').first.context_id).to eq admin.id
       user1.reload
       expect(user1.account_users.first.id).to eq admin.id
     end
@@ -237,7 +237,7 @@ describe UserMerge do
       UserMerge.from(user1).into(user2)
       user1.reload
       user2.reload
-      records = UserMergeData.where(user_id: user2).take.user_merge_data_records
+      records = UserMergeData.where(user_id: user2).take.records
       expect(records.count).to eq 8
       record = records.where(context_id: cc1).take
       expect(record.previous_user_id).to eq user1.id
@@ -286,12 +286,12 @@ describe UserMerge do
 
       UserMerge.from(user1).into(user2)
       merge_data = UserMergeData.where(user_id: user2).first
-      expect(merge_data.user_merge_data_records.pluck(:context_id).sort).
+      expect(merge_data.records.pluck(:context_id).sort).
         to eq [enrollment1.id, enrollment3.id, enrollment4.id].sort
       enrollment1.reload
       expect(enrollment1.user).to eq user1
       expect(enrollment1).to be_deleted
-      merge_data_record = merge_data.user_merge_data_records.where(context_id: enrollment1).first
+      merge_data_record = merge_data.records.where(context_id: enrollment1).first
       expect(merge_data_record.previous_workflow_state).to eq 'invited'
       enrollment2.reload
       expect(enrollment2).to be_active
@@ -312,20 +312,20 @@ describe UserMerge do
       UserMerge.from(user2).into(user1)
       merge_data = UserMergeData.where(user_id: user1).first
 
-      expect(merge_data.user_merge_data_records.pluck(:context_id).sort).
+      expect(merge_data.records.pluck(:context_id).sort).
         to eq [enrollment1.id, enrollment2.id].sort
       enrollment1.reload
       expect(enrollment1.user).to eq user1
       expect(enrollment1.workflow_state).to eq 'active'
       expect(enrollment1.enrollment_state.state).to eq 'active'
-      merge_data_record = merge_data.user_merge_data_records.where(context_id: enrollment1).first
+      merge_data_record = merge_data.records.where(context_id: enrollment1).first
       expect(merge_data_record.previous_workflow_state).to eq 'invited'
 
       enrollment2.reload
       expect(enrollment2.user).to eq user2
       expect(enrollment2.workflow_state).to eq 'deleted'
       expect(enrollment2.enrollment_state.state).to eq 'deleted'
-      merge_data_record2 = merge_data.user_merge_data_records.where(context_id: enrollment2).first
+      merge_data_record2 = merge_data.records.where(context_id: enrollment2).first
       expect(merge_data_record2.previous_workflow_state).to eq 'active'
     end
 
@@ -366,7 +366,7 @@ describe UserMerge do
 
       UserMerge.from(user1).into(user2)
       merge_data = UserMergeData.where(user_id: user2).first
-      o = merge_data.user_merge_data_records.where(context_id: enrollment2).first
+      o = merge_data.records.where(context_id: enrollment2).first
       expect(o.previous_workflow_state).to eq 'active'
       expect(enrollment1.reload.user).to eql user2
       expect(enrollment2.reload.workflow_state).to eql 'deleted'
@@ -412,7 +412,7 @@ describe UserMerge do
 
       UserMerge.from(user1).into(user2)
       data = UserMergeData.where(user_id: user2).first
-      expect(data.user_merge_data_records.where(context_type: 'UserObservationLink').count).to eq 2
+      expect(data.records.where(context_type: 'UserObservationLink').count).to eq 2
       user1.reload
       expect(user1.linked_observers).to be_empty
       expect(UserObservationLink.where(:student => user1).first.workflow_state).to eq 'deleted'

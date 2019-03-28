@@ -28,6 +28,58 @@ describe SplitUsers do
     let(:account1) { Account.default }
     let(:sub_account) { account1.sub_accounts.create! }
 
+    it 'should restore terms_of use one way' do
+      user1.accept_terms
+      user1.save!
+      UserMerge.from(user2).into(user1)
+      SplitUsers.split_db_users(user1)
+      expect(user2.reload.preferences[:accepted_terms]).to be_nil
+      expect(user1.reload.preferences[:accepted_terms]).to_not be_nil
+    end
+
+    it 'should restore terms_of use other way' do
+      user1.accept_terms
+      user1.save!
+      UserMerge.from(user1).into(user2)
+      expect(user2.reload.preferences[:accepted_terms]).to_not be_nil
+      SplitUsers.split_db_users(user2)
+      expect(user1.reload.preferences[:accepted_terms]).to_not be_nil
+      expect(user2.reload.preferences[:accepted_terms]).to be_nil
+    end
+
+    it 'should restore terms_of use no way' do
+      UserMerge.from(user1).into(user2)
+      user2.accept_terms
+      user2.save!
+      SplitUsers.split_db_users(user2)
+      expect(user2.reload.preferences[:accepted_terms]).to be_nil
+      expect(user1.reload.preferences[:accepted_terms]).to be_nil
+    end
+
+    it 'should restore terms_of use both ways' do
+      user1.accept_terms
+      user1.save!
+      user2.accept_terms
+      user2.save!
+      UserMerge.from(user1).into(user2)
+      SplitUsers.split_db_users(user2)
+      expect(user2.reload.preferences[:accepted_terms]).to_not be_nil
+      expect(user1.reload.preferences[:accepted_terms]).to_not be_nil
+    end
+
+    it 'should restore names' do
+      user1.name = "jimmy one"
+      user1.save!
+      user2.name = "jenny one"
+      user2.save!
+      UserMerge.from(user1).into(user2)
+      user2.name = "other name"
+      user2.save!
+      SplitUsers.split_db_users(user2)
+      expect(user1.reload.name).to eq "jimmy one"
+      expect(user2.reload.name).to eq "jenny one"
+    end
+
     it 'should restore pseudonyms to the original user' do
       pseudonym1 = user1.pseudonyms.create!(unique_id: 'sam1@example.com')
       pseudonym2 = user2.pseudonyms.create!(unique_id: 'sam2@example.com')
