@@ -103,11 +103,11 @@ class SplitUsers
         ActiveRecord::Base.transaction do
           records = merge_data.user_merge_data_records
           old_user = User.find(merge_data.from_user_id)
-          old_user = restore_old_user(old_user, records)
+          old_user, pseudonyms = restore_old_user(old_user, records)
           records = check_and_update_local_ids(old_user, records) if merge_data.from_user_id > Shard::IDS_PER_SHARD
           records = records.preload(:context)
-          move_records_to_old_user(user, old_user, records)
           restore_merge_items(old_user)
+          move_records_to_old_user(user, old_user, records, pseudonyms)
           # update account associations for each split out user
           users = [old_user, user]
           User.update_account_associations(users, all_shards: (old_user.shard != user.shard))
@@ -133,28 +133,50 @@ class SplitUsers
 
     # source_user is the destination user of the user merge
     # user is the old user that is being restored
-    def move_records_to_old_user(source_user, user, records)
+    def move_records_to_old_user(source_user, user, records, pseudonyms)
       fix_communication_channels(source_user, user, records.where(context_type: 'CommunicationChannel'))
       move_user_observers(source_user, user, records.where(context_type: ['UserObserver', 'UserObservationLink'], previous_user_id: user))
       move_attachments(source_user, user, records.where(context_type: 'Attachment'))
       enrollment_ids = records.where(context_type: 'Enrollment', previous_user_id: user).pluck(:context_id)
       Shard.partition_by_shard(enrollment_ids) do |enrollments|
-        enrollments = Enrollment.where(id: enrollments).where.not(user: user)
-        enrollments_to_update = enrollments.reject do |e|
-          # skip conflicting enrollments
-          Enrollment.where(user_id: user,
-                           course_section_id: e.course_section_id,
-                           type: e.type,
-                           role_id: e.role_id).where.not(id: e).shard(e.shard).exists?
-        end
-        Enrollment.where(id: enrollments_to_update).update_all(user_id: user.id, updated_at: Time.now.utc)
-        courses = enrollments_to_update.map(&:course_id)
-        transfer_enrollment_data(source_user, user, Course.where(id: courses))
+        restore_enrollments(enrollments, source_user, user)
+      end
+      Shard.partition_by_shard(pseudonyms) do |pseudonyms|
+        move_new_enrollments(enrollment_ids, pseudonyms, source_user, user)
       end
       handle_submissions(source_user, user, records)
       account_users_ids = records.where(context_type: 'AccountUser').pluck(:context_id)
       AccountUser.where(id: account_users_ids).update_all(user_id: user.id)
       restore_workflow_states_from_records(records)
+    end
+
+    def restore_enrollments(enrollments, source_user, user)
+      enrollments = Enrollment.where(id: enrollments).where.not(user: user)
+      move_enrollments(enrollments, source_user, user)
+    end
+
+    def move_new_enrollments(enrollment_ids, pseudonyms, source_user, user)
+      new_enrollments = Enrollment.where.not(id: enrollment_ids, user: user).
+        where(sis_pseudonym_id: pseudonyms).shard(pseudonyms.first.shard)
+      move_enrollments(new_enrollments, source_user, user)
+    end
+
+    def move_enrollments(enrollments, source_user, user)
+      enrollments_to_update = filter_enrollments(enrollments, user)
+      Enrollment.where(id: enrollments_to_update).update_all(user_id: user.id, updated_at: Time.now.utc)
+      courses = enrollments_to_update.map(&:course_id)
+      transfer_enrollment_data(source_user, user, Course.where(id: courses))
+      move_submissions(source_user, user, enrollments_to_update)
+    end
+
+    def filter_enrollments(enrollments, user)
+      enrollments.reject do |e|
+        # skip conflicting enrollments
+        Enrollment.where(user_id: user,
+                         course_section_id: e.course_section_id,
+                         type: e.type,
+                         role_id: e.role_id).where.not(id: e).shard(e.shard).exists?
+      end
     end
 
     # source_user is the destination user of the user merge
@@ -200,7 +222,7 @@ class SplitUsers
       user.workflow_state = 'registered'
       user.save!
       move_pseudonyms_to_user(pseudonyms, user)
-      user
+      return user, pseudonyms
     end
 
     def move_pseudonyms_to_user(pseudonyms, target_user)
@@ -225,6 +247,24 @@ class SplitUsers
             update_all((update[:foreign_key] || :user_id) => target_user_id)
         end
       end
+    end
+
+    # source_user is the destination user of the user merge
+    # user is the old user that is being restored
+    # enrollments are enrollments that have been created since the merge event,
+    # but for a pseudonym that was moved back to the old user.
+    # Also work that has happened since the merge event should moved if the
+    # enrollment is moved.
+    def move_submissions(source_user, user, enrollments)
+      # there should be no conflicts here because this is only called for
+      # enrollments that were updated which already excluded conflicts, but we
+      # will add the scope to protect against a FK violation.
+      source_user.submissions.where(assignment_id: Assignment.where(context_id: enrollments.map(&:course_id))).
+        where.not(assignment_id: user.all_submissions.select(:assignment_id)).
+        update_all(user_id: user.id)
+      source_user.quiz_submissions.where(quiz_id: Quizzes::Quiz.where(context_id: enrollments.map(&:course_id))).
+        where.not(quiz_id: user.quiz_submissions.select(:quiz_id)).
+        update_all(user_id: user.id)
     end
 
     def handle_submissions(source_user, user, records)

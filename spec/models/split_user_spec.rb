@@ -295,6 +295,25 @@ describe SplitUsers do
       expect(submission.reload.user).to eq user1
     end
 
+    it 'should move submissions from new courses post merge when appropriate' do
+      pseudonym1 = user1.pseudonyms.create!(unique_id: 'sam1@example.com')
+      UserMerge.from(user1).into(user2)
+      e = course1.enroll_student(user2, enrollment_state: 'active')
+      Enrollment.where(id: e).update_all(sis_pseudonym_id: pseudonym1.id)
+      assignment = course1.assignments.new(title: "some assignment")
+      assignment.workflow_state = "published"
+      assignment.save
+      valid_attributes = {
+        grade: "1.5",
+        grader: @teacher,
+        url: "www.instructure.com"
+      }
+      submission = assignment.submissions.find_by!(user: user2)
+      submission.update!(valid_attributes)
+      SplitUsers.split_db_users(user2)
+      expect(submission.reload.user).to eq user1
+    end
+
     it 'should handle conflicting submissions' do
       course1.enroll_student(user1, enrollment_state: 'active')
       course1.enroll_student(user2, enrollment_state: 'active')
