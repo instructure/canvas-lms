@@ -217,15 +217,17 @@ describe SplitUsers do
       end
 
       it "should move ccs to the new user (but only if they don't already exist)" do
+        notification = Notification.where(name: "Report Generated").first_or_create
         # unconfirmed: active conflict
         user1.communication_channels.create!(path: 'a@instructure.com')
         user2.communication_channels.create!(path: 'A@instructure.com') { |cc| cc.workflow_state = 'active' }
         # active: unconfirmed conflict
         user1.communication_channels.create!(path: 'b@instructure.com') { |cc| cc.workflow_state = 'active' }
         cc = user2.communication_channels.create!(path: 'B@instructure.com')
-        # active: active conflict
-        user1.communication_channels.create!(path: 'c@instructure.com') { |cc| cc.workflow_state = 'active' }
-        user2.communication_channels.create!(path: 'C@instructure.com') { |cc| cc.workflow_state = 'active' }
+        # active: active conflict + notification policy copy
+        np_cc = user1.communication_channels.create!(path: 'c@instructure.com') { |cc| cc.workflow_state = 'active' }
+        np_cc.notification_policies.create!(notification_id: notification.id, frequency: 'weekly')
+        needs_np = user2.communication_channels.create!(path: 'C@instructure.com') { |cc| cc.workflow_state = 'active' }
         # unconfirmed: unconfirmed conflict
         user1.communication_channels.create!(path: 'd@instructure.com')
         user2.communication_channels.create!(path: 'D@instructure.com')
@@ -264,6 +266,7 @@ describe SplitUsers do
           map { |cc| [cc.path, cc.workflow_state] }.sort
 
         UserMerge.from(user1).into(user2)
+        expect(needs_np.notification_policies.take.frequency).to eq 'weekly'
         SplitUsers.split_db_users(user2)
         user1.reload
         user2.reload
