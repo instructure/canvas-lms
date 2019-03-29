@@ -1204,7 +1204,7 @@ class CalendarEventsApiController < ApplicationController
 
       if courses_user_has_been_enrolled_in[:student].include?(assignment.context_id)
         assignment = assignment.overridden_for(user)
-        assignment.infer_all_day
+        assignment.infer_all_day(Time.zone)
         assignments << assignment
       else
         dates_list = assignment.all_dates_visible_to(user,

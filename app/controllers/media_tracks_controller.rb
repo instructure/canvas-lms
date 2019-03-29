@@ -33,7 +33,7 @@ class MediaTracksController < ApplicationController
   #   Language code of the track being uploaded, examples: ["en", "es", "ru"]
   #
   # @argument content [String]
-  #   The contets of the track, in SRT or WebVTT format
+  #   The contents of the track, in SRT or WebVTT format
   #
   # @example_request
   #     curl https://<canvas>/media_objects/<media_object_id>/media_tracks \
@@ -62,6 +62,7 @@ class MediaTracksController < ApplicationController
   #
   def show
     @media_track = MediaTrack.find params[:id]
+    @media_track.validate! # in case this somehow got saved to the database in the xss-vulnerable TTML format
     if stale? :etag => @media_track, :last_modified => @media_track.updated_at.utc
       render :plain => @media_track.content
     end
