@@ -23,7 +23,6 @@ module Lti
     belongs_to :developer_key
 
     before_validation :store_configuration_from_url, only: :create
-    before_validation :ensure_use_1_3
     before_save :normalize_configuration
 
     validates :developer_key_id, :settings, presence: true
@@ -49,6 +48,7 @@ module Lti
       )
       tool.developer_key = developer_key
       tool.workflow_state = privacy_level || DEFAULT_PRIVACY_LEVEL
+      tool.use_1_3 = true
       tool
     end
 
@@ -59,7 +59,7 @@ module Lti
           self.create!(
             developer_key: dk,
             configuration: tool_configuration_params[:settings]&.merge(
-              "custom_fields" => ContextExternalTool.find_custom_fields_from_string(tool_configuration_params[:custom_fields])
+              'custom_fields' => ContextExternalTool.find_custom_fields_from_string(tool_configuration_params[:custom_fields])
             ),
             disabled_placements: tool_configuration_params[:disabled_placements]
           )
@@ -70,8 +70,8 @@ module Lti
             disabled_placements: tool_configuration_params[:disabled_placements]
           )
           t.update! configuration: t.configuration.merge(
-            "custom_fields" => ContextExternalTool.find_custom_fields_from_string(tool_configuration_params[:custom_fields])
-          )
+            'custom_fields' => ContextExternalTool.find_custom_fields_from_string(tool_configuration_params[:custom_fields])
+            )
           t
         end
       end
@@ -137,11 +137,6 @@ module Lti
 
     def normalize_configuration
       self.configuration = JSON.parse(configuration) if configuration.is_a? String
-    end
-
-    def ensure_use_1_3
-      return if self.configuration.blank?
-      self.configuration['use_1_3'] = true
     end
   end
 end

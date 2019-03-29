@@ -222,10 +222,6 @@ module Lti
           end
         end
       end
-
-      it 'ensures use_1_3 is set' do
-        expect(subject.settings['use_1_3']).to be true
-      end
     end
 
     describe '#new_external_tool' do
