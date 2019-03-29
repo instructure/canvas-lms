@@ -110,7 +110,7 @@ en-AU:
   accept_2fdd362e: Accept
   accept_grades_4d56a3dd: "Accept Grades"
   accept_grades_by_gradername_7a98b969: "Accept grades by %{graderName}"
-  acceptable_use_policy_29a28124: "Acceptable use Policy"
+  acceptable_use_policy_29a28124: "Acceptable Use Policy"
   accepted_c9f8ab87: Accepted
   accepted_formats_hex_rgba_rgb_hsl_42a37ef7: "accepted formats: hex, rgba, rgb, hsl"
   accepted_formats_svg_png_jpg_gif_f793e4bc: "Accepted formats: svg, png, jpg, gif"
@@ -20483,7 +20483,7 @@ en-AU:
   this_submission_is_not_being_autograded_4fd68d32: "This submission is not being autograded"
   this_submission_is_not_in_any_grading_period_cbbd2f8: "This submission is not in any grading period"
   this_submission_is_not_in_any_grading_period_d4c728db: "This submission is not in any grading period."
-  this_tool_has_already_been_installed_in_this_conte_b73ea29c: "This tool has already been installed in this context. Would you like to instal it anyway?"
+  this_tool_has_already_been_installed_in_this_conte_b73ea29c: "This tool has already been installed in this context. Would you like to install it anyway?"
   this_topic_is_closed_for_comments_3dd10c00: "This topic is closed for comments."
   this_topic_is_closed_for_comments_5bacad6: "This topic is closed for comments"
   this_topic_is_used_for_grading_efc6ca89: "This topic is used for grading"
