@@ -32,6 +32,7 @@ QUnit.module('PostPolicyApi', () => {
             query: PostPolicyApi.SET_COURSE_POST_POLICY_MUTATION,
             variables: {courseId: VALID_COURSE_ID, postManually: true}
           },
+
           result: {
             data: {
               setCoursePostPolicy: {
@@ -45,11 +46,13 @@ QUnit.module('PostPolicyApi', () => {
             }
           }
         },
+
         {
           request: {
             query: PostPolicyApi.SET_COURSE_POST_POLICY_MUTATION,
             variables: {courseId: ERROR_COURSE_ID, postManually: true}
           },
+
           result: {
             data: {
               setCoursePostPolicy: {
@@ -63,12 +66,16 @@ QUnit.module('PostPolicyApi', () => {
             }
           }
         },
+
         {
           request: {
             query: PostPolicyApi.SET_COURSE_POST_POLICY_MUTATION,
             variables: {courseId: BAD_RESPONSE_COURSE_ID, postManually: true}
           },
-          result: {}
+
+          result: {
+            data: {}
+          }
         }
       ])
     })
