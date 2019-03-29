@@ -212,6 +212,13 @@ describe('Gradebook StudentContentDataLoader', () => {
         expect(params.response_fields).toContain('cached_due_date')
       })
 
+      it('includes "posted_at" in response fields', async () => {
+        await load()
+        const submissionsRequest = server.findRequest(urls.submissions)
+        const params = paramsFromRequest(submissionsRequest)
+        expect(params.response_fields).toContain('posted_at')
+      })
+
       it('calls the submissions chunk callback for each chunk of submissions', async () => {
         const submissionChunks = []
         options.onSubmissionsChunkLoaded = submissionChunks.push.bind(submissionChunks)

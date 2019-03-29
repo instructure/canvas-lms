@@ -83,6 +83,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       assignment_id: '2301',
       excused: false,
       late_policy_status: null,
+      posted_at: null,
       score: null,
       submitted_at: null,
       user_id: '441'
@@ -341,38 +342,59 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
           gradebookOptions.post_policies_enabled = true
           onSelectCallback = sinon.spy()
           buildGradebook()
-          render()
 
           sinon.stub(gradebook.postPolicies, 'showPostAssignmentGradesTray')
         })
 
-        test('is enabled', () => {
-          strictEqual(component.props.postGradesAction.enabled, true)
+        test('sets featureEnabled to true', () => {
+          gradebook.gotChunkOfStudents([student])
+          render()
+          strictEqual(component.props.postGradesAction.featureEnabled, true)
+        })
+
+        test('sets hasGradesToPost to true if at least one submission has no posted_at date', () => {
+          gradebook.gotChunkOfStudents([student])
+          render()
+          strictEqual(component.props.postGradesAction.hasGradesToPost, true)
+        })
+
+        test('sets hasGradesToPost to false if all submissions have a posted_at date', () => {
+          submission.posted_at = new Date('Wed Oct 1 1997')
+
+          gradebook.gotChunkOfStudents([student])
+          render()
+          strictEqual(component.props.postGradesAction.hasGradesToPost, false)
         })
 
         test('includes a callback to show the "Post Assignment Grades" tray', () => {
+          gradebook.gotChunkOfStudents([student])
+          render()
           component.props.postGradesAction.onSelect(onSelectCallback)
           strictEqual(gradebook.postPolicies.showPostAssignmentGradesTray.callCount, 1)
         })
 
         test('includes the assignment id when showing the "Post Assignment Grades" tray', () => {
+          gradebook.gotChunkOfStudents([student])
+          render()
           component.props.postGradesAction.onSelect(onSelectCallback)
           const [{assignmentId}] = gradebook.postPolicies.showPostAssignmentGradesTray.lastCall.args
           strictEqual(assignmentId, '2301')
         })
 
         test('includes the `onSelect` callback when showing the "Post Assignment Grades" tray', () => {
+          gradebook.gotChunkOfStudents([student])
+          render()
           component.props.postGradesAction.onSelect(onSelectCallback)
           const [{onExited}] = gradebook.postPolicies.showPostAssignmentGradesTray.lastCall.args
           strictEqual(onExited, onSelectCallback)
         })
       })
 
-      test('is not enabled when Post Policies is not enabled', () => {
+      test('sets featureEnabled to false when Post Policies is not enabled', () => {
         gradebookOptions.post_policies_enabled = false
         buildGradebook()
         render()
-        strictEqual(component.props.postGradesAction.enabled, false)
+        strictEqual(component.props.postGradesAction.featureEnabled, false)
       })
     })
 
@@ -383,23 +405,42 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
         gradebookOptions.post_policies_enabled = true
         onSelectCallback = sinon.spy()
         buildGradebook()
-        render()
+        submission.posted_at = new Date('Wed Oct 1 1997')
 
         sinon.stub(gradebook.postPolicies, 'showHideAssignmentGradesTray')
       })
 
+      test('sets hasGradesToHide to true if at least one submission has a posted_at date', () => {
+        gradebook.gotChunkOfStudents([student])
+        render()
+        strictEqual(component.props.hideGradesAction.hasGradesToHide, true)
+      })
+
+      test('sets hasGradesToHide to false if no submission has a posted_at date', () => {
+        submission.posted_at = null
+        gradebook.gotChunkOfStudents([student])
+        render()
+        strictEqual(component.props.hideGradesAction.hasGradesToHide, false)
+      })
+
       test('includes a callback to show the "Hide Assignment Grades" tray', () => {
+        gradebook.gotChunkOfStudents([student])
+        render()
         component.props.hideGradesAction.onSelect(onSelectCallback)
         strictEqual(gradebook.postPolicies.showHideAssignmentGradesTray.callCount, 1)
       })
 
       test('includes the assignment id when showing the "Hide Assignment Grades" tray', () => {
+        gradebook.gotChunkOfStudents([student])
+        render()
         component.props.hideGradesAction.onSelect(onSelectCallback)
         const [{assignmentId}] = gradebook.postPolicies.showHideAssignmentGradesTray.lastCall.args
         strictEqual(assignmentId, '2301')
       })
 
       test('includes the `onSelect` callback when showing the "Hide Assignment Grades" tray', () => {
+        gradebook.gotChunkOfStudents([student])
+        render()
         component.props.hideGradesAction.onSelect(onSelectCallback)
         const [{onExited}] = gradebook.postPolicies.showHideAssignmentGradesTray.lastCall.args
         strictEqual(onExited, onSelectCallback)
@@ -513,6 +554,26 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       render()
       const studentProp = component.props.students.find(s => s.id === student.id)
       strictEqual(studentProp.submission.submittedAt, null)
+    })
+
+    test('student submissions for the assignment include "postedAt"', () => {
+      buildGradebook()
+      const postedAt = new Date('Mon Nov 3 2016')
+      submission.posted_at = postedAt
+      gradebook.gotChunkOfStudents([student])
+      render()
+      const studentProp = component.props.students.find(s => s.id === student.id)
+      strictEqual(studentProp.submission.postedAt, postedAt)
+    })
+
+    test('"postedAt" is null if the student does not have a submission', () => {
+      buildGradebook()
+      submission.postedAt = new Date('Mon Nov 3 2016')
+      delete student.assignment_2301
+      gradebook.gotChunkOfStudents([student])
+      render()
+      const studentProp = component.props.students.find(s => s.id === student.id)
+      strictEqual(studentProp.submission.postedAt, null)
     })
 
     test('includes a callback for keyDown events', () => {

@@ -40,6 +40,7 @@ const submissionsParams = {
     'late_policy_status',
     'missing',
     'points_deducted',
+    'posted_at',
     'score',
     'seconds_late',
     'submission_type',
