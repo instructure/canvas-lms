@@ -44,7 +44,7 @@ describe ContextExternalTool do
     end
   end
 
-  describe '#login_or_launch_uri' do
+  describe '#login_or_launch_url' do
     let_once(:developer_key) { DeveloperKey.create! }
     let_once(:tool) do
       ContextExternalTool.create!(
@@ -58,14 +58,14 @@ describe ContextExternalTool do
     end
 
     it 'returns the launch url' do
-      expect(tool.login_or_launch_uri).to eq tool.url
+      expect(tool.login_or_launch_url).to eq tool.url
     end
 
     context 'when a content_tag_uri is specified' do
       let(:content_tag_uri) { 'https://www.test.com/tool-launch' }
 
       it 'returns the content tag uri' do
-        expect(tool.login_or_launch_uri(content_tag_uri: content_tag_uri)).to eq content_tag_uri
+        expect(tool.login_or_launch_url(content_tag_uri: content_tag_uri)).to eq content_tag_uri
       end
     end
 
@@ -84,7 +84,7 @@ describe ContextExternalTool do
       end
 
       it 'returns the extension url' do
-        expect(tool.login_or_launch_uri(extension_type: :editor_button)).to eq placement_url
+        expect(tool.login_or_launch_url(extension_type: :editor_button)).to eq placement_url
       end
     end
 
@@ -97,7 +97,7 @@ describe ContextExternalTool do
       end
 
       it 'returns the oidc login url' do
-        expect(tool.login_or_launch_uri).to eq oidc_initiation_url
+        expect(tool.login_or_launch_url).to eq oidc_initiation_url
       end
     end
   end

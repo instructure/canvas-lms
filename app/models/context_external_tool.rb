@@ -409,7 +409,7 @@ class ContextExternalTool < ActiveRecord::Base
     extension_setting(extension_type, :display_type) || 'in_context'
   end
 
-  def login_or_launch_uri(extension_type: nil, content_tag_uri: nil)
+  def login_or_launch_url(extension_type: nil, content_tag_uri: nil)
     use_1_3? && developer_key&.oidc_initiation_url ||
     content_tag_uri ||
     extension_setting(extension_type, :target_link_uri) ||

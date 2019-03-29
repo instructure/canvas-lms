@@ -1305,7 +1305,7 @@ class UsersController < ApplicationController
     end
 
     @lti_launch.params = adapter.generate_post_payload
-    @lti_launch.resource_url = @tool.login_or_launch_uri(extension_type: :user_navigation)
+    @lti_launch.resource_url = @tool.login_or_launch_url(extension_type: :user_navigation)
     @lti_launch.link_text = @tool.label_for(:user_navigation, I18n.locale)
     @lti_launch.analytics_id = @tool.tool_id
 
