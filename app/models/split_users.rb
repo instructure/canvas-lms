@@ -128,6 +128,13 @@ class SplitUsers
     Shard.with_each_shard(restored_user.associated_shards + restored_user.associated_shards(:weak) + restored_user.associated_shards(:shadow)) do
       UserPastLtiIds.where(user: restored_user, user_lti_id: restored_user.lti_id).delete_all
     end
+    source_user.shard.activate do
+      ConversationParticipant.where(id: merge_data.items.where(item_type: 'conversation_ids').take&.item).find_each {|c| c.move_to_user(restored_user)}
+      {access_token: :user_id, conversation_message: :author_id, favorite: :user_id, ignore: :user_id, 'Polling::Poll': :user_id}.each do |klass, user_attr|
+        ids = merge_data.items.where(item_type: klass.to_s + '_ids').take&.item
+        klass.to_s.classify.constantize.where(id: ids).update_all(user_attr => restored_user.id) if ids
+      end
+    end
   end
 
   def check_and_update_local_ids(records)

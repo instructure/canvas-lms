@@ -60,6 +60,16 @@ class UserMerge
 
       target_user.preferences = target_user.preferences.merge(from_user.preferences)
       target_user.save if target_user.changed?
+
+      {'access_token_ids': from_user.access_tokens.shard(from_user).pluck(:id),
+       'conversation_messages_ids': ConversationMessage.where(author_id: from_user, conversation_id: nil).shard(from_user).pluck(:id),
+       'conversation_ids': from_user.all_conversations.shard(from_user).pluck(:id),
+       'ignore_ids': from_user.ignores.shard(from_user).pluck(:id),
+       'favorite_ids': from_user.favorites.shard(from_user).pluck(:id),
+       'Polling::Poll_ids': from_user.polls.shard(from_user).pluck(:id)
+      }.each do |k, ids|
+        merge_data.items.create!(user: from_user, item_type: k, item: ids) unless ids.empty?
+      end
     end
 
     [:strong, :weak, :shadow].each do |strength|
@@ -107,13 +117,10 @@ class UserMerge
       Attachment.send_later(:migrate_attachments, from_user, target_user)
 
       updates = {}
-      ['access_tokens', 'asset_user_accesses',
-       'calendar_events', 'collaborations',
-       'context_module_progressions',
-       'group_memberships', 'page_comments',
-       'rubric_assessments',
-       'user_services', 'web_conferences',
-       'web_conference_participants', 'wiki_pages'].each do |key|
+      %w(access_tokens asset_user_accesses calendar_events collaborations
+         context_module_progressions favorites group_memberships ignores
+         page_comments Polling::Poll rubric_assessments user_services
+         web_conference_participants web_conferences wiki_pages).each do |key|
         updates[key] = "user_id"
       end
       updates['submission_comments'] = 'author_id'

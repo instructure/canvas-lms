@@ -178,6 +178,53 @@ describe SplitUsers do
         expect(user2.linked_observers).to eq [observer2]
       end
 
+      it 'should handle access tokens' do
+        at = AccessToken.create!(user: user1, :developer_key => DeveloperKey.default)
+        UserMerge.from(user1).into(user2)
+        expect(at.reload.user_id).to eq user2.id
+        SplitUsers.split_db_users(user2)
+        expect(at.reload.user_id).to eq user1.id
+      end
+
+      it 'should handle polls' do
+        poll = Polling::Poll.create!(user: user1, question: 'A Test Poll', description: 'A test description.')
+        UserMerge.from(user1).into(user2)
+        expect(poll.reload.user_id).to eq user2.id
+        SplitUsers.split_db_users(user2)
+        expect(poll.reload.user_id).to eq user1.id
+      end
+
+
+      it 'should handle favorites' do
+        course1.enroll_user(user1)
+        fav = Favorite.create!(user: user1, context: course1)
+        UserMerge.from(user1).into(user2)
+        expect(fav.reload.user_id).to eq user2.id
+        SplitUsers.split_db_users(user2)
+        expect(fav.reload.user_id).to eq user1.id
+      end
+
+
+      it 'should handle ignores' do
+        course1.enroll_user(user1)
+        assignment2 = assignment_model(course: course1)
+        ignore = Ignore.create!(asset: assignment2, user: user1, purpose: 'submitting')
+        UserMerge.from(user1).into(user2)
+        expect(ignore.reload.user_id).to eq user2.id
+        SplitUsers.split_db_users(user2)
+        expect(ignore.reload.user_id).to eq user1.id
+      end
+
+      it 'should handle conversations' do
+          sender = user1
+          recipient = user3
+          convo = sender.initiate_conversation([recipient])
+          UserMerge.from(user1).into(user2)
+          expect(convo.reload.user_id).to eq user2.id
+          SplitUsers.split_db_users(user2)
+          expect(convo.reload.user_id).to eq user1.id
+      end
+
       it 'should handle attachments' do
         attachment1 = Attachment.create!(user: user1,
           context: user1,
