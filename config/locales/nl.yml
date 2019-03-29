@@ -3093,7 +3093,7 @@ nl:
         no_comments: "Geen opmerkingen"
         submission_late_timestamp: "%{submitted_at} (te laat)"
       titles: 
-        assigned_peer_reviews: "Peerbeoordelingen toewijzen"
+        assigned_peer_reviews: "Peerbeoordelingen toegewezen"
         comments: "Reacties:"
         submission: Inzending
         submission_not_turned_in: "Niet ingeleverd!"
@@ -10291,7 +10291,7 @@ nl:
         message_all_unassigned_option: "Bericht naar alle niet toegewezen cursisten inleveren"
         randomly_assign_students_option: "Cursisten willekeurig toewijzen"
         restricted_self_signup_blurb: "Alle cursisten in een groep moeten in dezelfde sectie zitten."
-        self_organized_warning: "Deze groepen zijn door cursisten zelf ingedeeld. Cursisten kunnen niet tegelijkertijd, zoals in andere typen groepen, deel uit maken van meer dan één van deze groepen, dus deze groepen zijn niet geschikt voor het beoordelen van opdrachten"
+        self_organized_warning: "Deze groepen zijn door studenten zelf ingedeeld. In tegenstelling tot andere soorten groepen kunnen studenten deel uitmaken van meer dan één van deze groepen, dus deze groepen zijn niet geschikt voor het beoordelen van opdrachten."
         self_signup_blurb: "Zelfinschrijven is voor deze groepen ingeschakeld."
         settings: Instellingen
         uncategorized_groups: "Deze groepen worden niet aan één enkele andere groepsreeks gekoppeld. Omdat ze via SIS geïmporteerd zijn, kunnen ze alleen via SIS bijgewerkt of verwijderd worden."
@@ -15574,7 +15574,7 @@ nl:
   posted_on_e1010e1e: "Geplaatst op:"
   posted_to_student_861beec9: "Gepost naar cursist"
   powerschool_a30f0bfc: PowerSchool
-  practice_quiz_19a8505d: Practicumtoets
+  practice_quiz_19a8505d: Oefentoets
   pre_processing_92865c1d: "Wordt voorverwerkt"
   prerequisite_completion_period_c562d63: "Periode voor voltooiing voorwaarde"
   prerequisites_49659f16: "Eerste vereisten"
