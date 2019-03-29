@@ -23,11 +23,12 @@ import PropTypes from 'prop-types'
 import I18n from 'i18n!appointment_groups'
 import TimeBlockListManager from 'compiled/calendar/TimeBlockListManager'
 import 'jquery.instructure_date_and_time'
-import FormFieldGroup from '@instructure/ui-forms/lib/components/FormFieldGroup'
-import NumberInput from '@instructure/ui-forms/lib/components/NumberInput'
+import {FormFieldGroup} from '@instructure/ui-form-field'
+import {NumberInput} from '@instructure/ui-number-input'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import TimeBlockSelectRow from './TimeBlockSelectRow'
+import NumberHelper from '../../../../shared/helpers/numberHelper'
 
 const uniqueId = (() => {
   let count = 0
@@ -49,12 +50,14 @@ export default class TimeBlockSelector extends React.Component {
           slotEventId: uniqueId(),
           timeData: {}
         }
-      ]
+      ],
+      slotValue: "30",
+      slotMessage: null
     }
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevState !== this.state) {
+    if (prevState.timeBlockRows !== this.state.timeBlockRows) {
       this.props.onChange(this.state.timeBlockRows)
     }
   }
@@ -112,6 +115,9 @@ export default class TimeBlockSelector extends React.Component {
   handleSlotDivision = () => {
     const node = ReactDOM.findDOMNode(this)
     const minuteValue = $('#TimeBlockSelector__DivideSection-Input', node).val()
+    if (!NumberHelper.validate(minuteValue)) {
+      return
+    }
     const timeManager = new TimeBlockListManager(this.getNewSlotData())
     timeManager.split(minuteValue)
     const newBlocks = timeManager.blocks.map(block => ({
@@ -128,6 +134,42 @@ export default class TimeBlockSelector extends React.Component {
     rowToUpdate.timeData = data
     this.setState({
       timeBlockRows: newRows
+    })
+  }
+
+  isSlotValueValid(value) {
+    const val = NumberHelper.parse(value)
+    return value.trim().length === 0 || !Number.isNaN(val) && val > 0
+  }
+
+  handleSlotValueChange = (_event, slotValue) => {
+    const slotMessage =  this.isSlotValueValid(slotValue) ? null : [{type: 'error', text: I18n.t('Must be a number > 0')}]
+    this.setState({slotValue, slotMessage})
+  }
+
+  handleSlotValueIncrement = () => {
+    this.setState((state, _props) => {
+      const val = NumberHelper.parse(state.slotValue)
+      if (Number.isNaN(val)) { // current value can't be incremented, do nothing
+        return null
+      }
+      return {
+        slotValue: val + 1,
+        slotMessage: null
+      }
+    })
+  }
+
+  handleSlotValueDecrement = () => {
+    this.setState((state, _props) => {
+      const val = NumberHelper.parse(state.slotValue)
+      if (Number.isNaN(val)) { // current value can't be decremented, do nothing
+        return null
+      }
+      return {
+        slotValue: val > 1 ? val - 1 : val,
+        slotMessage: null
+      }
     })
   }
 
@@ -152,10 +194,14 @@ export default class TimeBlockSelector extends React.Component {
           layout="columns"
           vAlign="bottom"
           description={<ScreenReaderContent>{I18n.t('Divide into equal time slots (in minutes')}</ScreenReaderContent>}
+          messages={this.state.slotMessage}
         >
           <NumberInput
             label={I18n.t('Divide into equal slots (value is in minutes)')}
-            defaultValue="30"
+            value={this.state.slotValue}
+            onChange={this.handleSlotValueChange}
+            onIncrement={this.handleSlotValueIncrement}
+            onDecrement={this.handleSlotValueDecrement}
             id="TimeBlockSelector__DivideSection-Input"
           />
           <Button onClick={this.handleSlotDivision}>
