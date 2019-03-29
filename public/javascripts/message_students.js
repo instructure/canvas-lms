@@ -18,6 +18,7 @@
 
 import I18n from 'i18n!message_students'
 import $ from 'jquery'
+import natcompare from 'compiled/util/natcompare'
 import numberHelper from 'jsx/shared/helpers/numberHelper'
 import './jquery.instructure_forms' /* formSubmit */
 import 'jqueryui/dialog'
@@ -52,13 +53,17 @@ window.messageStudents = function(settings) {
 
   $message_students_dialog.find('ul li:not(.blank)').remove()
 
-  for (let i = 0; i < settings.students.length; i++) {
+  const sortedStudents = settings.students.slice()
+  sortedStudents.sort(natcompare.byKey('sortableName'))
+
+  for (let i = 0; i < sortedStudents.length; i++) {
+    const student = sortedStudents[i]
     const $student = $li.clone(true).removeClass('blank')
 
-    $student.find('.name').text(settings.students[i].name)
-    $student.find('.score').text(settings.students[i].score)
+    $student.find('.name').text(student.name)
+    $student.find('.score').text(student.score)
     const remove_text = I18n.t('Remove %{student} from recipients', {
-      student: settings.students[i].name
+      student: student.name
     })
     const $remove_button = $student.find('.remove-button')
     $remove_button
@@ -78,11 +83,11 @@ window.messageStudents = function(settings) {
       }
     })
 
-    $student.data('id', settings.students[i].id)
-    $student.user_data = settings.students[i]
+    $student.data('id', student.id)
+    $student.user_data = student
 
     $ul.append($student.show())
-    students_hash[settings.students[i].id] = $student
+    students_hash[student.id] = $student
   }
 
   $ul.show()

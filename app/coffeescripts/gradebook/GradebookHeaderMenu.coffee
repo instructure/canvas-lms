@@ -133,6 +133,8 @@ define [
         id: student.id
         name: student.name
         score: sub?.score
+        # Both gradebooks share the Message Students dialog; prefer New Gradebook's casing
+        sortableName: student.sortable_name
         submitted_at: sub?.submitted_at
 
       settings = MessageStudentsWhoHelper.settings(assignment, students)

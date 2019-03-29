@@ -132,6 +132,7 @@ export default class AssignmentColumnHeader extends ColumnHeader {
         isInactive: bool.isRequired,
         id: string.isRequired,
         name: string.isRequired,
+        sortableName: string.isRequired,
         submission: shape({
           excused: bool.isRequired,
           latePolicyStatus: string,
@@ -267,6 +268,7 @@ export default class AssignmentColumnHeader extends ColumnHeader {
         latePolicyStatus,
         name: student.name,
         score,
+        sortableName: student.sortableName,
         submittedAt
       }
     })
