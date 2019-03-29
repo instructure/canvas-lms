@@ -34,8 +34,7 @@ module LtiAdvantage::Messages
         nonce: '5a234202-6f0e-413d-8793-809db7a95930',
         resource_link: LtiAdvantage::Claims::ResourceLink.new(id: 1),
         roles: ['foo'],
-        target_link_uri: 'https://www.example.com',
-        lti11_legacy_user_id: 'aaaaa'
+        target_link_uri: 'https://www.example.com'
       )
     end
 
