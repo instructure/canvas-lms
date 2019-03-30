@@ -239,7 +239,7 @@
     "test:coverage": "script/generate_js_coverage",
     "test:watch": "concurrently --names \"jest,karma\" \"jest --watch .\" \"yarn test:karma:watch\"",
     "test:jest": "jest --color",
-    "test:jest:coverage": "yarn run test:jest --coverage",
+    "test:jest:coverage": "node --max-old-space-size=4096 ./node_modules/.bin/jest --color --coverage",
     "test:jest:debug": "inspect node_modules/.bin/jest --runInBand",
     "test:karma": "yarn run test:karma:watch --single-run",
     "test:karma:concurrently": "DISABLE_HAPPYPACK=1 concurrently --names \"coffee,js1,js2\" \"JSPEC_GROUP=coffee yarn test:karma:headless\" \"JSPEC_GROUP=js1 yarn test:karma:headless\" \"JSPEC_GROUP=js2 yarn test:karma:headless\"",
