@@ -186,6 +186,12 @@ QUnit.module('Gradebook Submissions', suiteHooks => {
       gradebook.gotSubmissionsChunk(studentSubmissions)
       deepEqual(getAssignment('2301').assignment_visibility, [])
     })
+
+    test('does nothing when the assignment is not loaded in Gradebook', () => {
+      studentSubmissions[0].submissions[1].assignment_id = '2309'
+      gradebook.gotSubmissionsChunk(studentSubmissions)
+      equal(getAssignment('2309'), null)
+    })
   })
 
   QUnit.module('#submissionsForStudent()', hooks => {
