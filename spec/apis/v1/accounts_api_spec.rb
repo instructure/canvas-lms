@@ -675,10 +675,18 @@ describe "Accounts API", type: :request do
     it "should include enrollment term information for each course" do
       @c1 = course_model(:name => 'c1', :account => @a1, :root_account => @a1)
       @a1.account_users.create!(user: @user)
-      json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?include[]=term",
+      json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?include[]=term&include[]=concluded",
                       { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param,
-                        :format => 'json', :include => ['term'] })
-      expect(json[0].has_key?('term')).to be_truthy
+                        :format => 'json', :include => ['term', 'concluded'] })
+      expect(json[0]).to have_key('term')
+      expect(json[0]['concluded']).to eq false
+
+      @c1.enrollment_term.update_attribute :end_at, 1.week.ago
+      json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?include[]=term&include[]=concluded",
+                      { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param,
+                        :format => 'json', :include => ['term', 'concluded'] })
+      expect(json[0]).to have_key('term')
+      expect(json[0]['concluded']).to eq true
     end
 
     it "should return a teacher count if too many teachers are found" do

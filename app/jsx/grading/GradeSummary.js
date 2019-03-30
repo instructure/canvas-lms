@@ -35,7 +35,7 @@ import round from 'compiled/util/round'
 import numberHelper from '../shared/helpers/numberHelper'
 import CourseGradeCalculator from '../gradebook/CourseGradeCalculator'
 import {scopeToUser} from '../gradebook/EffectiveDueDates'
-import {gradeToScoreLowerBound, scoreToGrade} from '../gradebook/GradingSchemeHelper'
+import {scoreToGrade} from '../gradebook/GradingSchemeHelper'
 import GradeFormatHelper from '../gradebook/shared/helpers/GradeFormatHelper'
 import StatusPill from '../grading/StatusPill'
 import SelectMenuGroup from '../grade_summary/SelectMenuGroup'
@@ -361,7 +361,6 @@ function calculateTotals (calculatedGrades, currentOrFinal, groupWeightingScheme
   const scoreAsPercent = calculateGrade(finalScore, finalPossible)
 
   let finalGrade
-  let letterGrade
   let teaserText
 
   if (gradingSchemeEnabled()) {
@@ -369,18 +368,13 @@ function calculateTotals (calculatedGrades, currentOrFinal, groupWeightingScheme
       ENV.effective_final_score :
       calculatePercentGrade(finalScore, finalPossible)
 
-    letterGrade = scoreToGrade(scoreToUse, ENV.grading_scheme)
+    const letterGrade = scoreToGrade(scoreToUse, ENV.grading_scheme)
     $('.final_grade .letter_grade').text(letterGrade)
   }
 
   if (!gradeChanged && overrideScorePresent()) {
+    finalGrade = formatPercentGrade(ENV.effective_final_score)
     teaserText = scoreAsPoints
-
-    if (gradingSchemeEnabled()) {
-      finalGrade = formatPercentGrade(gradeToScoreLowerBound(letterGrade, ENV.grading_scheme))
-    } else {
-      finalGrade = formatPercentGrade(ENV.effective_final_score)
-    }
   } else if (showTotalGradeAsPoints && groupWeightingScheme !== 'percent') {
     finalGrade = scoreAsPoints
     teaserText = scoreAsPercent

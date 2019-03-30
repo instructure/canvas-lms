@@ -17,9 +17,10 @@
  */
 
 import React from 'react'
-import {func} from 'prop-types'
+import {bool, func} from 'prop-types'
 
 import I18n from 'i18n!assignments_2'
+import {Mutation} from 'react-apollo'
 
 import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
@@ -32,8 +33,8 @@ import IconEmail from '@instructure/ui-icons/lib/Line/IconEmail'
 import IconSpeedGrader from '@instructure/ui-icons/lib/Line/IconSpeedGrader'
 import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
 
-import EditableNumber from './Editables/EditableNumber'
-import {TeacherAssignmentShape} from '../assignmentData'
+import {TeacherAssignmentShape, SET_WORKFLOW} from '../assignmentData'
+import AssignmentPoints from './Editables/AssignmentPoints'
 
 // let's use these helpers from the gradebook so we're consistent
 import {
@@ -41,18 +42,35 @@ import {
   hasSubmission
 } from '../../../gradezilla/shared/helpers/messageStudentsWhoHelper'
 
+function assignmentIsNew(assignment) {
+  return !assignment.lid
+}
+
+function assignmentIsPublished(assignment) {
+  return assignment.state === 'published'
+}
+
 export default class Toolbox extends React.Component {
   static propTypes = {
     assignment: TeacherAssignmentShape.isRequired,
+    onChangeAssignment: func.isRequired,
     onUnsubmittedClick: func,
-    onPublishChange: func,
-    onDelete: func
+    onDelete: func,
+    onPublishChangeComplete: func,
+    onError: func,
+    readOnly: bool
   }
 
   static defaultProps = {
     onUnsubmittedClick: () => {},
-    onPublishChange: () => {},
-    onDelete: () => {}
+    onDelete: () => {},
+    onPublishChangeComplete: () => {},
+    onError: () => {},
+    readOnly: true
+  }
+
+  state = {
+    pointsMode: 'view'
   }
 
   submissions() {
@@ -64,31 +82,49 @@ export default class Toolbox extends React.Component {
     return this.submissions().reduce((memo, submission) => memo + (fn(submission) ? 1 : 0), 0)
   }
 
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      pointsMode: 'view',
-      pointsValue: this.props.assignment.pointsPossible
-    }
-  }
-
-  handlePublishChange = event => {
+  // TODO: publish => save all pending edits, including state
+  //     unpublish => just update state
+  // so if event.target.checked, we need to call back up to whatever will
+  // do the save.
+  handlePublishChange = (mutateAssignmentWorkflow, event) => {
     const newState = event.target.checked ? 'published' : 'unpublished'
-    this.props.onPublishChange(newState)
+    mutateAssignmentWorkflow({
+      variables: {id: this.props.assignment.lid, workflow: newState},
+      optimisticResponse: {
+        updateAssignment: {
+          __typename: 'UpdateAssignmentPayload',
+          assignment: {
+            __typename: 'Assignment',
+            id: this.props.assignment.gid,
+            state: newState
+          }
+        }
+      }
+    })
+    this.props.onChangeAssignment('state', newState)
   }
 
   renderPublished() {
     // TODO: put the label on the left side of the toggle when checkbox supports it
+    // TODO: handle error when updating published
     return (
-      <Checkbox
-        label={I18n.t('Published')}
-        variant="toggle"
-        size="medium"
-        inline
-        checked={this.props.assignment.state === 'published'}
-        onChange={this.handlePublishChange}
-      />
+      <Mutation
+        mutation={SET_WORKFLOW}
+        onCompleted={this.props.onPublishChangeComplete}
+        onError={this.props.onError}
+      >
+        {(mutateAssignmentWorkflow, {loading, _error}) => (
+          <Checkbox
+            label={I18n.t('Published')}
+            variant="toggle"
+            size="medium"
+            inline
+            disabled={loading}
+            checked={this.props.assignment.state === 'published'}
+            onChange={event => this.handlePublishChange(mutateAssignmentWorkflow, event)}
+          />
+        )}
+      </Mutation>
     )
   }
 
@@ -131,51 +167,36 @@ export default class Toolbox extends React.Component {
   }
 
   renderSubmissionStats() {
-    return hasSubmission(this.props.assignment) ? (
-      [
-        <FlexItem key="unsubmitted" padding="xx-small xx-small xxx-small">
-          {this.renderSpeedGraderLink()}
-        </FlexItem>,
-        <FlexItem key="to grade" padding="xxx-small xx-small">
-          {this.renderUnsubmittedButton()}
-        </FlexItem>
-      ]
-    ) : (
-      <FlexItem padding="xx-small xx-small xxx-small">
-        {this.renderMessageStudentsWhoButton(I18n.t('Message Students Who'))}
+    if (assignmentIsNew(this.props.assignment) || !assignmentIsPublished(this.props.assignment)) {
+      return null
+    }
+
+    return [
+      <FlexItem key="to grade" padding="xx-small xx-small xxx-small">
+        {this.renderSpeedGraderLink({})}
+      </FlexItem>,
+      <FlexItem key="message students" padding="xx-small xx-small xxx-small">
+        {hasSubmission(this.props.assignment)
+          ? this.renderUnsubmittedButton()
+          : this.renderMessageStudentsWhoButton(I18n.t('Message Students'))}
       </FlexItem>
-    )
+    ]
   }
 
   renderPoints() {
-    const sty = this.state.pointsMode === 'view' ? {marginTop: '7px'} : {}
     return (
-      <div style={sty}>
-        <Flex alignItems="center">
-          <FlexItem margin="0 x-small 0 0">
-            <EditableNumber
-              mode={this.state.pointsMode}
-              inline
-              size="large"
-              value={this.state.pointsValue}
-              onChange={this.handlePointsChange}
-              onChangeMode={this.handlePointsChangeMode}
-              label={I18n.t('Edit Points')}
-              editButtonPlacement="start"
-              invalidMessage={I18n.t('Points must be >= 0')}
-              required
-            />
-          </FlexItem>
-          <FlexItem>
-            <Text size="large">{I18n.t('Points')}</Text>
-          </FlexItem>
-        </Flex>
-      </div>
+      <AssignmentPoints
+        mode={this.state.pointsMode}
+        pointsPossible={this.props.assignment.pointsPossible}
+        onChange={this.handlePointsChange}
+        onChangeMode={this.handlePointsChangeMode}
+        readOnly={this.props.readOnly}
+      />
     )
   }
 
   handlePointsChange = value => {
-    this.setState({pointsValue: value})
+    this.props.onChangeAssignment('pointsPossible', value)
   }
 
   handlePointsChangeMode = mode => {

@@ -47,7 +47,7 @@ import {parseNameList, findEmailInEntry} from './helpers'
   ];
 
   export const actionTypes = actionDefs.reduce((types, action) => {
-    types[action] = action;   // eslint-disable-line no-param-reassign
+    types[action] = action;
     return types;
   }, {});
 

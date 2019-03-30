@@ -25,6 +25,7 @@ import {setupCache} from 'axios-cache-adapter'
 export const defaultState = {
   cspEnabled: false,
   cspInherited: false,
+  isDirty: false,
   whitelistedDomains: {
     account: [],
     effective: [],

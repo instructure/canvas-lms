@@ -212,21 +212,21 @@ export default class EditPlannerNoteDetails extends ValidatedFormView {
   }
 
   validateBeforeSave(data, errors) {
-    errors = this._validateTitle(data, errors)  // eslint-disable-line no-param-reassign
-    errors = this._validateDate(data, errors)   // eslint-disable-line no-param-reassign
+    errors = this._validateTitle(data, errors)
+    errors = this._validateDate(data, errors)
     return errors
   }
 
   _validateTitle(data, errors) {
     if (!data.title || $.trim(data.title.toString()).length === 0) {
-      errors.title = [{message: I18n.t('Title is required!')}]  // eslint-disable-line no-param-reassign
+      errors.title = [{message: I18n.t('Title is required!')}]
     }
     return errors
   }
 
   _validateDate(data, errors) {
     if (!data.todo_date || $.trim(data.todo_date.toString()).length === 0) {
-      errors.date = [{message: I18n.t('Date is required!')}]  // eslint-disable-line no-param-reassign
+      errors.date = [{message: I18n.t('Date is required!')}]
     }
     return errors
   }

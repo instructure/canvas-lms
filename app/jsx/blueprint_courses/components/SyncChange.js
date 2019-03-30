@@ -68,7 +68,7 @@ class SyncChange extends Component {
   renderExceptions () {
     const exGroups = this.props.change.exceptions.reduce((groups, ex) => {
       ex.conflicting_changes.forEach((conflict) => {
-        groups[conflict] = groups[conflict] || [] // eslint-disable-line
+        groups[conflict] = groups[conflict] || []
         groups[conflict].push(ex)
       })
       return groups

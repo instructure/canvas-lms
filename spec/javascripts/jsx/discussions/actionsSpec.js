@@ -19,7 +19,7 @@
 import actions from 'jsx/discussions/actions'
 import * as apiClient from 'jsx/discussions/apiClient'
 import $ from 'jquery';
-import 'compiled/jquery.rails_flash_notifications' // eslint-disable-line
+import 'compiled/jquery.rails_flash_notifications'
 
 function getState() {
   return ([{ id: 1 }, { id: 2, shouldGetFocus: true }] )

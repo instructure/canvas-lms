@@ -151,11 +151,7 @@ module SeleniumDriverSetup
 
       @driver = create_driver
 
-      resize_screen_to_normal
-
       focus_viewport if run_headless?
-
-      resize_screen_to_normal
 
       set_timeouts(TIMEOUTS)
 
@@ -354,11 +350,19 @@ module SeleniumDriverSetup
 
     def selenium_remote_driver
       puts "Thread: provisioning remote #{browser} driver"
-      Selenium::WebDriver.for(
+      driver = Selenium::WebDriver.for(
         :remote,
         :url => selenium_url,
         :desired_capabilities => desired_capabilities
       )
+
+      driver.file_detector = lambda do |args|
+        # args => ["/path/to/file"]
+        str = args.first.to_s
+        str if File.exist?(str)
+      end
+
+      driver
     end
 
     def desired_capabilities

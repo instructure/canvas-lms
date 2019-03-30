@@ -79,9 +79,7 @@ class MessageStudents extends React.Component {
   composeRequestData() {
     return {
       ...this.state.data,
-      recipients: this.state.data.recipients.map(recipient => {
-        return recipient.id
-      }),
+      recipients: this.state.data.recipients.map(recipient => recipient.id),
       bulk_message: this.props.bulkMessage,
       context_code: this.props.contextCode,
       group_conversation: this.props.groupConversation,
@@ -120,11 +118,11 @@ class MessageStudents extends React.Component {
 
   validationErrors(data) {
     const fields = ['subject', 'body']
-    let errors = {}
+    const errors = {}
     fields.forEach(field => {
       if (data[field].length === 0) {
         errors[field] = I18n.t('Please provide a %{field}', {
-          field: field
+          field
         })
       }
     })
@@ -150,7 +148,7 @@ class MessageStudents extends React.Component {
     newData[field] = value
     data = {...data, ...newData}
     delete errors[field]
-    this.setState({data, errors: errors})
+    this.setState({data, errors})
   }
 
   handleClose = e => {
@@ -169,7 +167,7 @@ class MessageStudents extends React.Component {
     const errors = this.validationErrors(data)
     if (Object.keys(errors).length > 0) {
       this.setState({
-        errors: errors,
+        errors,
         hideAlert: false
       })
     } else {
@@ -180,14 +178,14 @@ class MessageStudents extends React.Component {
   // Request handlers
 
   handleResponseError = error => {
-    let serverErrors = {}
+    const serverErrors = {}
     if (error.response) {
       const errorData = error.response.data
       errorData.forEach(error => {
         serverErrors[error.attribute] = error.message
       })
     } else {
-      serverErrors['request'] = error.message
+      serverErrors.request = error.message
     }
     this.setState({
       errors: serverErrors,
@@ -257,15 +255,21 @@ class MessageStudents extends React.Component {
           onExited={this.props.onExited}
         >
           <ModalBody>
-            {this.renderAlert(I18n.t('Your message was sent!'), 'success', () => {
-              return this.state.success
-            })}
-            {this.renderAlert(I18n.t("We're sending your message..."), 'info', () => {
-              return this.state.sending
-            })}
-            {this.renderAlert(I18n.t('There was a problem sending your message.'), 'error', () => {
-              return Object.keys(this.state.errors).length > 0
-            })}
+            {this.renderAlert(
+              I18n.t('Your message was sent!'),
+              'success',
+              () => this.state.success
+            )}
+            {this.renderAlert(
+              I18n.t("We're sending your message..."),
+              'info',
+              () => this.state.sending
+            )}
+            {this.renderAlert(
+              I18n.t('There was a problem sending your message.'),
+              'error',
+              () => Object.keys(this.state.errors).length > 0
+            )}
             <form onSubmit={this.handleSubmit} className="MessageStudents__Form">
               <div className="MessageStudents__FormField">
                 <div className="ac">

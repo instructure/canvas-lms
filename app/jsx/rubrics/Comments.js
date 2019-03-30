@@ -119,7 +119,6 @@ const commentElement = (assessment) => {
       <div>
         <Text size="small" weight="bold">{I18n.t("Comments")}</Text>
         { assessment.comments_html ?
-          // eslint-disable-next-line react/no-danger
           <div dangerouslySetInnerHTML={{ __html: assessment.comments_html }} />
           : assessment.comments }
       </div>

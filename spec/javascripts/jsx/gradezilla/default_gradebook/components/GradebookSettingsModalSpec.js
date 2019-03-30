@@ -23,6 +23,9 @@ import {mount} from 'enzyme'
 import GradebookSettingsModal from 'jsx/gradezilla/default_gradebook/components/GradebookSettingsModal'
 import * as GradebookSettingsModalApi from 'jsx/gradezilla/default_gradebook/apis/GradebookSettingsModalApi'
 import * as FlashAlert from 'jsx/shared/FlashAlert'
+import PostPolicies from 'jsx/gradezilla/default_gradebook/PostPolicies'
+import * as PostPolicyApi from 'jsx/gradezilla/default_gradebook/PostPolicies/PostPolicyApi'
+import {createGradebook} from 'jsx/gradezilla/default_gradebook/__tests__/GradebookSpecHelper'
 
 import {waitFor} from '../../../support/Waiters'
 
@@ -44,7 +47,8 @@ const defaultProps = {
     onChange() {
       return Promise.resolve()
     }
-  }
+  },
+  postPolicies: new PostPolicies(createGradebook({post_manually: true}))
 }
 
 const EXISTING_LATE_POLICY = {
@@ -337,6 +341,34 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
             strictEqual(button.disabled, true)
           })
         })
+
+        QUnit.module('given the Grade Posting Policy Panel', postPolicyPanelHooks => {
+          postPolicyPanelHooks.beforeEach(() => findTab({label: 'Grade Posting Policy'}).click())
+          postPolicyPanelHooks.afterEach(() => findTab({label: 'Late Policies'}).click())
+
+          test('update button is disabled if posting type is unchanged', () => {
+            const automaticallyPost = findCheckbox({label: 'Automatically Post Grades'})
+            automaticallyPost.click()
+            const manuallyPost = findCheckbox({label: 'Manually Post Grades'})
+            manuallyPost.click()
+
+            const button = findButton({label: 'Update'})
+            strictEqual(button.disabled, true)
+          })
+        })
+      })
+
+      QUnit.module('given post policy form edits', postPolicyPanelHooks => {
+        postPolicyPanelHooks.beforeEach(() => findTab({label: 'Grade Posting Policy'}).click())
+        postPolicyPanelHooks.afterEach(() => findTab({label: 'Late Policies'}).click())
+
+        test('update button is enabled if the posting type has changed', () => {
+          const automaticallyPost = findCheckbox({label: 'Automatically Post Grades'})
+          automaticallyPost.click()
+
+          const button = findButton({label: 'Update'})
+          strictEqual(button.disabled, false)
+        })
       })
 
       QUnit.module('given late policy form edits', latePolicyFormEditsHooks => {
@@ -425,7 +457,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
       })
     })
 
-    QUnit.module('given featureAvailable is false', featureAvailableHooks => {
+    QUnit.module('given overrides.featureAvailable is false', featureAvailableHooks => {
       let fetchLatePolicyStub
       let tab
       const overrides = {
@@ -450,7 +482,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
       })
     })
 
-    QUnit.module('given featureAvailable is true', featureAvailableHooks => {
+    QUnit.module('given overrides.featureAvailable is true', featureAvailableHooks => {
       let fetchLatePolicyStub
       let tab
       const overrides = {
@@ -471,6 +503,44 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
       test('Advanced Tab is present', async () => {
         await renderAndOpenComponent({overrides})
         tab = findTab({label: 'Advanced'})
+        ok(tab)
+      })
+    })
+
+    QUnit.module('given the postPolicies prop is null', featureAvailableHooks => {
+      let fetchLatePolicyStub
+      let tab
+
+      featureAvailableHooks.beforeEach(() => {
+        fetchLatePolicyStub = sinon
+          .stub(GradebookSettingsModalApi, 'fetchLatePolicy')
+          .resolves({data: {latePolicy: EXISTING_LATE_POLICY}})
+      })
+
+      featureAvailableHooks.afterEach(() => fetchLatePolicyStub.restore())
+
+      test('Grade Posting Policy tab is not present', async () => {
+        await renderAndOpenComponent({postPolicies: null})
+        tab = findTab({label: 'Grade Posting Policy'})
+        strictEqual(tab, undefined)
+      })
+    })
+
+    QUnit.module('given the postPolicies prop exists', featureAvailableHooks => {
+      let fetchLatePolicyStub
+      let tab
+
+      featureAvailableHooks.beforeEach(() => {
+        fetchLatePolicyStub = sinon
+          .stub(GradebookSettingsModalApi, 'fetchLatePolicy')
+          .resolves({data: {latePolicy: EXISTING_LATE_POLICY}})
+      })
+
+      featureAvailableHooks.afterEach(() => fetchLatePolicyStub.restore())
+
+      test('Grade Posting Policy tab is present', async () => {
+        await renderAndOpenComponent()
+        tab = findTab({label: 'Grade Posting Policy'})
         ok(tab)
       })
     })
@@ -937,6 +1007,84 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
 
           const button = findButton({label: 'Update'})
           strictEqual(button.disabled, false)
+        })
+      })
+    })
+
+    QUnit.module('given changes to Grade Posting Policy settings', postPolicyHooks => {
+      let fetchLatePolicyStub
+      let createLatePolicyStub
+      let flashAlertSpy
+      let setCoursePostPolicyStub
+
+      const performUpdate = () => {
+        findTab({label: 'Grade Posting Policy'}).click()
+        findCheckbox({label: 'Automatically Post Grades'}).click()
+        findButton({label: 'Update'}).click()
+      }
+
+      const successMessagePresent = () =>
+        document.body.innerText.includes('Gradebook Settings updated')
+
+      const errorMessagePresent = () =>
+        document.body.innerText.includes('An error occurred while saving the course post policy')
+
+      postPolicyHooks.beforeEach(async () => {
+        fetchLatePolicyStub = sinon
+          .stub(GradebookSettingsModalApi, 'fetchLatePolicy')
+          .resolves({data: {latePolicy: NEW_LATE_POLICY}})
+        createLatePolicyStub = sinon.stub(GradebookSettingsModalApi, 'createLatePolicy').resolves()
+        flashAlertSpy = sinon.spy(FlashAlert, 'showFlashAlert')
+      })
+
+      postPolicyHooks.afterEach(() => {
+        ReactDOM.unmountComponentAtNode(fixtures)
+        flashAlertSpy.restore()
+        FlashAlert.destroyContainer()
+        createLatePolicyStub.restore()
+        fetchLatePolicyStub.restore()
+      })
+
+      test('postPolicies.setCoursePostPolicy() is called if setting the course policy is successful', async () => {
+        await renderAndOpenComponent()
+        const setCoursePostPolicy = sandbox
+          .stub(PostPolicyApi, 'setCoursePostPolicy')
+          .resolves({postManually: true})
+        performUpdate()
+
+        await waitFor(successMessagePresent)
+
+        strictEqual(setCoursePostPolicy.callCount, 1)
+
+        setCoursePostPolicy.restore()
+      })
+
+      QUnit.module('when setting the course policy fails', failureHooks => {
+        failureHooks.beforeEach(() => {
+          setCoursePostPolicyStub = sandbox.stub(PostPolicyApi, 'setCoursePostPolicy').rejects()
+        })
+
+        failureHooks.afterEach(() => {
+          setCoursePostPolicyStub.restore()
+        })
+
+        test('a flash alert is displayed', async () => {
+          await renderAndOpenComponent()
+          performUpdate()
+
+          await waitFor(errorMessagePresent)
+
+          strictEqual(flashAlertSpy.callCount, 1)
+        })
+
+        test('the flash alert is of type "error"', async () => {
+          await renderAndOpenComponent()
+          performUpdate()
+
+          await waitFor(errorMessagePresent)
+
+          const [{type}] = flashAlertSpy.firstCall.args
+          strictEqual(type, 'error')
         })
       })
     })

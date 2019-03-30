@@ -49,6 +49,14 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
   }
 
   QUnit.module('#initialize()', () => {
+    test('renders the "Hide Assignment Grades" tray', () => {
+      createPostPolicies()
+      postPolicies.initialize()
+      const $trayContainer = document.getElementById('hide-assignment-grades-tray')
+      const unmounted = ReactDOM.unmountComponentAtNode($trayContainer)
+      strictEqual(unmounted, true)
+    })
+
     test('renders the "Post Assignment Grades" tray', () => {
       createPostPolicies()
       postPolicies.initialize()
@@ -59,6 +67,15 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
   })
 
   QUnit.module('#destroy()', () => {
+    test('unmounts the "Hide Assignment Grades" tray', () => {
+      createPostPolicies()
+      postPolicies.initialize()
+      postPolicies.destroy()
+      const $trayContainer = document.getElementById('hide-assignment-grades-tray')
+      const unmounted = ReactDOM.unmountComponentAtNode($trayContainer)
+      strictEqual(unmounted, false)
+    })
+
     test('unmounts the "Post Assignment Grades" tray', () => {
       createPostPolicies()
       postPolicies.initialize()
@@ -66,6 +83,54 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       const $trayContainer = document.getElementById('post-assignment-grades-tray')
       const unmounted = ReactDOM.unmountComponentAtNode($trayContainer)
       strictEqual(unmounted, false)
+    })
+  })
+
+  QUnit.module('#showHideAssignmentGradesTray()', hooks => {
+    hooks.beforeEach(() => {
+      createPostPolicies()
+
+      const assignment = {
+        anonymize_students: false,
+        course_id: '1201',
+        html_url: 'http://localhost/assignments/2301',
+        id: '2301',
+        invalid: false,
+        muted: false,
+        name: 'Math 1.1',
+        omit_from_final_grade: false,
+        points_possible: 10,
+        published: true,
+        submission_types: ['online_text_entry']
+      }
+      gradebook.setAssignments({2301: assignment})
+
+      postPolicies.initialize()
+      sinon.stub(postPolicies._hideAssignmentGradesTray, 'show')
+    })
+
+    test('shows the "Hide Assignment Grades" tray', () => {
+      postPolicies.showHideAssignmentGradesTray({assignmentId: '2301'})
+      strictEqual(postPolicies._hideAssignmentGradesTray.show.callCount, 1)
+    })
+
+    test('includes the assignment id when showing the "Hide Assignment Grades" tray', () => {
+      postPolicies.showHideAssignmentGradesTray({assignmentId: '2301'})
+      const [{assignment}] = postPolicies._hideAssignmentGradesTray.show.lastCall.args
+      strictEqual(assignment.id, '2301')
+    })
+
+    test('includes the assignment name when showing the "Hide Assignment Grades" tray', () => {
+      postPolicies.showHideAssignmentGradesTray({assignmentId: '2301'})
+      const [{assignment}] = postPolicies._hideAssignmentGradesTray.show.lastCall.args
+      strictEqual(assignment.name, 'Math 1.1')
+    })
+
+    test('includes the `onExited` callback when showing the "Hide Assignment Grades" tray', () => {
+      const callback = sinon.stub()
+      postPolicies.showHideAssignmentGradesTray({assignmentId: '2301', onExited: callback})
+      const [{onExited}] = postPolicies._hideAssignmentGradesTray.show.lastCall.args
+      strictEqual(onExited, callback)
     })
   })
 
@@ -89,31 +154,60 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       gradebook.setAssignments({2301: assignment})
 
       postPolicies.initialize()
-      sinon.stub(postPolicies._tray, 'show')
+      sinon.stub(postPolicies._postAssignmentGradesTray, 'show')
     })
 
     test('shows the "Post Assignment Grades" tray', () => {
       postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
-      strictEqual(postPolicies._tray.show.callCount, 1)
+      strictEqual(postPolicies._postAssignmentGradesTray.show.callCount, 1)
     })
 
     test('includes the assignment id when showing the "Post Assignment Grades" tray', () => {
       postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
-      const [{assignment}] = postPolicies._tray.show.lastCall.args
+      const [{assignment}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
       strictEqual(assignment.id, '2301')
     })
 
     test('includes the assignment name when showing the "Post Assignment Grades" tray', () => {
       postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
-      const [{assignment}] = postPolicies._tray.show.lastCall.args
+      const [{assignment}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
       strictEqual(assignment.name, 'Math 1.1')
     })
 
     test('includes the `onExited` callback when showing the "Post Assignment Grades" tray', () => {
       const callback = sinon.stub()
       postPolicies.showPostAssignmentGradesTray({assignmentId: '2301', onExited: callback})
-      const [{onExited}] = postPolicies._tray.show.lastCall.args
+      const [{onExited}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
       strictEqual(onExited, callback)
+    })
+  })
+
+  QUnit.module('#coursePostPolicy', () => {
+    QUnit.module('.postManually', () => {
+      test('is set to true if gradebook.options.post_manually is true on initialization', () => {
+        gradebookOptions.post_manually = true
+
+        createPostPolicies()
+        strictEqual(postPolicies.coursePostPolicy.postManually, true)
+      })
+
+      test('is set to false if gradebook.options.post_manually is false on initialization', () => {
+        gradebookOptions.post_manually = false
+
+        createPostPolicies()
+        strictEqual(postPolicies.coursePostPolicy.postManually, false)
+      })
+
+      test('is set to false if gradebook.options.post_manually is not present on initialization', () => {
+        createPostPolicies()
+        strictEqual(postPolicies.coursePostPolicy.postManually, false)
+      })
+    })
+
+    test('reflects the value set by setCoursePostPolicy()', () => {
+      createPostPolicies()
+      postPolicies.setCoursePostPolicy({postManually: false})
+      deepEqual(postPolicies.coursePostPolicy, {postManually: false})
     })
   })
 })

@@ -26,7 +26,7 @@ const reducerMap = {
   [actionTypes.GET_DISCUSSIONS_SUCCESS]: (state, action) => {
     const allDiscussions = action.payload.data
     return allDiscussions.reduce((obj, discussion) => {
-      obj[discussion.id] = {...discussion, filtered: false} // eslint-disable-line no-param-reassign
+      obj[discussion.id] = {...discussion, filtered: false}
       return obj
     }, {})
   },
@@ -42,7 +42,7 @@ const reducerMap = {
       const filterMatch =
         filter === 'unread' ? discussion.read_state !== 'read' || discussion.unread_count > 0 : true
       const filtered = !searchMatch || !filterMatch
-      obj[id] = {...discussion, filtered} // eslint-disable-line no-param-reassign
+      obj[id] = {...discussion, filtered}
       return obj
     }, {})
   },
@@ -51,9 +51,9 @@ const reducerMap = {
     return Object.keys(state).reduce((obj, key) => {
       const discussion = state[key]
       if (discussion.id === id) {
-        obj[discussion.id] = {...discussion, subscribed} // eslint-disable-line no-param-reassign
+        obj[discussion.id] = {...discussion, subscribed}
       } else {
-        obj[discussion.id] = discussion // eslint-disable-line no-param-reassign
+        obj[discussion.id] = discussion
       }
       return obj
     }, {})
@@ -68,7 +68,7 @@ const reducerMap = {
     Object.keys(state).reduce((obj, id) => {
       const newDiscussion = Object.assign(state[id])
       delete newDiscussion.focusOn
-      obj[id] = newDiscussion // eslint-disable-line no-param-reassign
+      obj[id] = newDiscussion
       return obj
     }, {}),
   [actionTypes.DRAG_AND_DROP_START]: (state, action) => {

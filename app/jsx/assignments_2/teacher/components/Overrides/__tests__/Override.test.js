@@ -23,13 +23,17 @@ import Override from '../Override'
 
 it('renders an override', () => {
   const override = mockOverride()
-  const {getByTestId} = render(<Override override={override} />)
+  const {getByTestId} = render(
+    <Override override={override} onChangeOverride={() => {}} index={0} />
+  )
   expect(getByTestId('OverrideSummary')).toBeInTheDocument()
 })
 
 it('displays OverrideDetail on expanding toggle group', async () => {
   const override = mockOverride()
-  const {getByText, getByTestId} = render(<Override override={override} />)
+  const {getByText, getByTestId} = render(
+    <Override override={override} onChangeOverride={() => {}} index={0} />
+  )
 
   const expandButton = getByText('Expand')
   fireEvent.click(expandButton)

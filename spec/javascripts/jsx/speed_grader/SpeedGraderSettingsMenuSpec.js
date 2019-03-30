@@ -72,9 +72,9 @@ QUnit.module('SpeedGraderSettingsMenu', hooks => {
   }
 
   function getMenuItem(text) {
-    return [...$menuContent.querySelectorAll('[role="menuitem"]')].find($option => {
-      return $option.textContent === text
-    })
+    return [...$menuContent.querySelectorAll('[role="menuitem"]')].find(
+      $option => $option.textContent === text
+    )
   }
 
   test('includes an "Options" menu item', () => {

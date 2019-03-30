@@ -17,8 +17,6 @@
 
 Rails.configuration.to_prepare do
   require 'saml2'
-  require 'onelogin/saml'
 
-  Onelogin::Saml.config[:max_message_size] =
-    SAML2.config[:max_message_size] = 1.megabyte
+  SAML2.config[:max_message_size] = 1.megabyte
 end

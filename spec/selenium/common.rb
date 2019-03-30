@@ -115,6 +115,7 @@ shared_context "in-process server selenium tests" do
   include Rails.application.routes.url_helpers
 
   prepend_before :each do
+    resize_screen_to_normal
     SeleniumDriverSetup.allow_requests!
     driver.ready_for_interaction = false # need to `get` before we do anything selenium-y in a spec
   end
@@ -244,7 +245,8 @@ shared_context "in-process server selenium tests" do
         # For InstUI upgrade to 5.36. These should probably be fixed eventually.
         "Warning: [Focusable] Exactly one focusable child is required (0 found).",
         # COMMS-1815: Meeseeks should fix this one on the permissions page
-        "Warning: [Select] The option 'All Roles' doesn't correspond to an option."
+        "Warning: [Select] The option 'All Roles' doesn't correspond to an option.",
+        "Access to Font at 'http://cdnjs.cloudflare.com/ajax/libs/mathjax/"
       ].freeze
 
       javascript_errors = browser_logs.select do |e|

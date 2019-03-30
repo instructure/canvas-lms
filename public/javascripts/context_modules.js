@@ -320,7 +320,7 @@ function scrollTo ($thing, time = 500) {
           var pre = prerequisites[idx];
           $form.find(".add_prerequisite_link:first").click();
           if(pre.type == 'context_module') {
-            $form.find(".prerequisites_list .criteria_list .criterion:last select").val(pre.id);
+            $form.find(".prerequisites_list .criteria_list .criterion:last select").val(pre.id).trigger('change');
           }
         }
         $form.find(".completion_entry .criteria_list").empty();
@@ -933,6 +933,13 @@ function scrollTo ($thing, time = 500) {
       $('<label for="module_list_prereq" class="screenreader-only" />').text(I18n.t('Select prerequisite module')).insertBefore($select);
       $form.find(".prerequisites_list .criteria_list").append($pre).show();
       $pre.show();
+      $select.change(event => {
+        const $target = $(event.target)
+        const title = $target.val() ? $target.find('option:selected').text() : ''
+        const $prereq = $target.closest('.criterion')
+        const $deleteBtn = $prereq.find('.delete_criterion_link')
+        $deleteBtn.attr('aria-label', I18n.t('Delete prerequisite %{title}', { title }))
+      })
       $select.focus();
     });
 
@@ -1014,6 +1021,10 @@ function scrollTo ($thing, time = 500) {
       } else {
         $option.find(".points_possible_parent").hide();
       }
+
+      const itemName = $option.find('.id option:selected').text()
+      const reqType = $option.find('.type option:selected').text()
+      $option.closest('.criterion').find('.delete_criterion_link').attr('aria-label', I18n.t('Delete requirement %{item} (%{type})', { item: itemName, type: reqType }))
     });
 
     $("#add_context_module_form .requirement-count-radio .ic-Radio input").change(function() {

@@ -23,6 +23,7 @@ export function mockAssignment(overrides = {}) {
     lockAt: null,
     name: 'Assignment',
     pointsPossible: 10,
+    muted: false,
     unlockAt: null,
     gradingType: 'points',
     allowedAttempts: null,
@@ -60,6 +61,7 @@ export function mockAssignment(overrides = {}) {
               }
             ]
           },
+          id: '3',
           deductedPoints: 3,
           enteredGrade: '9',
           grade: '6',
@@ -72,6 +74,43 @@ export function mockAssignment(overrides = {}) {
       __typename: 'SubmissionConnection'
     },
     __typename: 'Assignment',
+    ...overrides
+  }
+}
+
+export function mockComments(overrides = {}) {
+  return {
+    __typename: 'Submission',
+    commentsConnection: {
+      __typename: 'CommentsConnection',
+      nodes: [
+        {
+          __typename: 'Comment',
+          _id: '1',
+          comment: 'comment comment',
+          updatedAt: '12/13/91',
+          author: {
+            __typename: 'Author',
+            avatarUrl: 'example.com',
+            shortName: 'bob builder'
+          }
+        }
+      ]
+    },
+    ...overrides
+  }
+}
+
+export function singleComment(overrides = {}) {
+  return {
+    _id: '1',
+    comment: 'comment comment',
+    updatedAt: '12/13/91',
+    author: {
+      __typename: 'Author',
+      avatarUrl: 'example.com',
+      shortName: 'bob builder'
+    },
     ...overrides
   }
 }

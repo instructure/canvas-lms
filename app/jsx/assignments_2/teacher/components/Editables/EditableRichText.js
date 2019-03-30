@@ -23,6 +23,7 @@ import apiUserContent from 'compiled/str/apiUserContent'
 import InPlaceEdit from '@instructure/ui-editable/lib/components/InPlaceEdit'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import Text from '@instructure/ui-elements/lib/components/Text'
 import View from '@instructure/ui-layout/lib/components/View'
 import ArrowDown from '@instructure/ui-icons/lib/Line/IconArrowOpenDown'
 import {omitProps} from '@instructure/ui-utils/lib/react/passthroughProps'
@@ -89,14 +90,23 @@ export default class EditableRichText extends React.Component {
     }
   }
 
+  testDiv = null
+
   renderView = () => {
     const html = this.state.htmlValue
+    // if the htmlValue is nothing but whitespace,
+    // show the placeholder
+    if (!this.testDiv) {
+      this.testDiv = document.createElement('div')
+    }
+    this.testDiv.innerHTML = html
+    const hasContent = !!this.testDiv.textContent.trim()
     return (
       <View as="div" margin="small 0">
-        {html ? (
+        {hasContent || this.props.readOnly ? (
           <div dangerouslySetInnerHTML={{__html: html}} />
         ) : (
-          <div>{this.props.placeholder}</div>
+          <Text color="secondary">{this.props.placeholder}</Text>
         )}
       </View>
     )

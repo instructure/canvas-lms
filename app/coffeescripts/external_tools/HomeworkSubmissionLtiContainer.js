@@ -103,7 +103,7 @@ export default class HomeworkSubmissionLtiContainer {
         _this.renderedViews[tool.get('id')].push(homeworkSubmissionView);
         homeworkSubmissionView.render();
         return $('input.turnitin_pledge').click(function(e) {
-          return SubmitAssignmentHelper.recordEulaAgreement('#eula_agreement_timestamp', e.target.checked);
+          return recordEulaAgreement('#eula_agreement_timestamp', e.target.checked);
         });
       };
     })(this));

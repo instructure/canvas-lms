@@ -79,7 +79,7 @@ const fetchOutcomes = (courseId, studentId) => {
     })
     .then(() => (
       Promise.all(outcomeLinks.map((outcomeLink) => (
-        fetchUrl(`/api/v1/courses/${courseId}/outcome_results?user_ids[]=${studentId}&outcome_ids[]=${outcomeLink.outcome.id}&include[]=assignments&per_page=100`) // eslint-disable-line max-len
+        fetchUrl(`/api/v1/courses/${courseId}/outcome_results?user_ids[]=${studentId}&outcome_ids[]=${outcomeLink.outcome.id}&include[]=assignments&per_page=100`)
       )))
     ))
     .then((responses) => {
@@ -114,10 +114,11 @@ const fetchOutcomes = (courseId, studentId) => {
 
       // add results, assignments
       outcomes.forEach((outcome) => {
-        outcome.assignments = outcomeAssignmentsByOutcomeId[outcome.id] || [] // eslint-disable-line no-param-reassign
-        outcome.results = outcomeResultsByOutcomeId[outcome.id] || [] // eslint-disable-line no-param-reassign
+        outcome.assignments = outcomeAssignmentsByOutcomeId[outcome.id] || []
+        outcome.results = outcomeResultsByOutcomeId[outcome.id] || []
         outcome.results.forEach((result) => {
-          result.assignment = assignmentsByAssignmentId[result.links.assignment] // eslint-disable-line no-param-reassign
+          const key = result.links.assignment || result.links.alignment
+          result.assignment = assignmentsByAssignmentId[key]
         })
       })
       return { outcomeGroups, outcomes }

@@ -308,84 +308,6 @@ QUnit.module('Gradebook#initialize', () => {
   })
 })
 
-QUnit.module('Gradebook#gotChunkOfStudents', {
-  setup() {
-    const placeholderStudent = {id: '1101'}
-    this.gradebook = createGradebook()
-    this.gradebook.courseContent.students.addUserStudents([placeholderStudent])
-    this.gradebook.gridData.rows.push(placeholderStudent)
-    sandbox.stub(this.gradebook.gradebookGrid, 'render')
-    this.students = [
-      {
-        id: '1101',
-        name: 'Adam Jones',
-        enrollments: [{type: 'StudentEnrollment', grades: {html_url: 'http://example.url/'}}]
-      },
-      {
-        id: '1102',
-        name: 'Betty Ford',
-        enrollments: [{type: 'StudentEnrollment', grades: {html_url: 'http://example.url/'}}]
-      },
-      {
-        id: '1199',
-        name: 'Test Student',
-        enrollments: [{type: 'StudentViewEnrollment', grades: {html_url: 'http://example.url/'}}]
-      }
-    ]
-  }
-})
-
-test('updates the student map with each student', function() {
-  this.gradebook.gotChunkOfStudents(this.students)
-  ok(this.gradebook.students[1101], 'student map includes Adam Jones')
-  ok(this.gradebook.students[1102], 'student map includes Betty Ford')
-})
-
-test('replaces matching students in the student map', function() {
-  this.gradebook.gotChunkOfStudents(this.students)
-  equal(this.gradebook.students[1101].name, 'Adam Jones')
-})
-
-test('updates the test student map with each test student', function() {
-  this.gradebook.gotChunkOfStudents(this.students)
-  ok(this.gradebook.studentViewStudents[1199], 'test student map includes Test Student')
-})
-
-test('replaces matching students in the test student map', function() {
-  this.gradebook.courseContent.students.addTestStudents([{id: '1199'}])
-  this.gradebook.gotChunkOfStudents(this.students)
-  equal(this.gradebook.studentViewStudents[1199].name, 'Test Student')
-})
-
-test('updates attributes of each student', function() {
-  this.gradebook.gotChunkOfStudents(this.students)
-  strictEqual(this.gradebook.students[1101].isConcluded, false, 'isConcluded is set to false')
-  strictEqual(this.gradebook.students[1101].isInactive, false, 'isInactive is set to false')
-})
-
-test('updates the row for each student', function() {
-  this.gradebook.gotChunkOfStudents(this.students)
-  strictEqual(this.gradebook.gridData.rows[0], this.students[0])
-})
-
-test('builds rows when filtering with search', function() {
-  this.gradebook.userFilterTerm = 'searching'
-  sandbox.stub(this.gradebook, 'buildRows')
-  this.gradebook.gotChunkOfStudents(this.students)
-  strictEqual(this.gradebook.buildRows.callCount, 1)
-})
-
-test('does not build rows when not filtering with search', function() {
-  sandbox.stub(this.gradebook, 'buildRows')
-  this.gradebook.gotChunkOfStudents(this.students)
-  strictEqual(this.gradebook.buildRows.callCount, 0)
-})
-
-test('renders the grid when not filtering with search', function() {
-  this.gradebook.gotChunkOfStudents(this.students)
-  strictEqual(this.gradebook.gradebookGrid.render.callCount, 1)
-})
-
 QUnit.module('Gradebook#calculateStudentGrade', {
   createGradebook(options = {}) {
     const gradebook = createGradebook({
@@ -485,10 +407,8 @@ test('calculates grades without grading period data when effective due dates are
   equal(typeof args[4], 'undefined')
 })
 
-test('stores the current grade on the student when not including ungraded assignments', function() {
-  const gradebook = this.createGradebook({
-    include_ungraded_assignments: false
-  })
+test('stores the current grade on the student', function() {
+  const gradebook = this.createGradebook()
   sandbox.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades)
   const student = {
     id: '101',
@@ -499,24 +419,8 @@ test('stores the current grade on the student when not including ungraded assign
   equal(student.total_grade, this.exampleGrades.current)
 })
 
-test('stores the final grade on the student when including ungraded assignments', function() {
-  const gradebook = this.createGradebook({
-    include_ungraded_assignments: true
-  })
-  sandbox.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades)
-  const student = {
-    id: '101',
-    loaded: true,
-    initialized: true
-  }
-  gradebook.calculateStudentGrade(student)
-  equal(student.total_grade, this.exampleGrades.final)
-})
-
-test('stores the current grade from the selected grading period when not including ungraded assignments', function() {
-  const gradebook = this.createGradebook({
-    include_ungraded_assignments: false
-  })
+test('stores the current grade from the selected grading period', function() {
+  const gradebook = this.createGradebook()
   gradebook.setFilterColumnsBySetting('gradingPeriodId', '701')
   sandbox.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades)
   const student = {
@@ -526,21 +430,6 @@ test('stores the current grade from the selected grading period when not includi
   }
   gradebook.calculateStudentGrade(student)
   equal(student.total_grade, this.exampleGrades.gradingPeriods[701].current)
-})
-
-test('stores the final grade from the selected grading period when including ungraded assignments', function() {
-  const gradebook = this.createGradebook({
-    include_ungraded_assignments: true
-  })
-  gradebook.setFilterColumnsBySetting('gradingPeriodId', '701')
-  sandbox.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades)
-  const student = {
-    id: '101',
-    loaded: true,
-    initialized: true
-  }
-  gradebook.calculateStudentGrade(student)
-  equal(student.total_grade, this.exampleGrades.gradingPeriods[701].final)
 })
 
 test('does not calculate when the student is not loaded', function() {
@@ -3256,66 +3145,6 @@ test('sends all students when calling setupGrading', function() {
   strictEqual(students, allStudents)
 })
 
-QUnit.module('Gradebook#updateStudentAttributes', {
-  setup() {
-    this.gradebook = createGradebook()
-    this.student = {id: '1101', enrollments: [{grades: {html_url: 'http://example.url/'}}]}
-  }
-})
-
-test('sets .computed_current_score to 0', function() {
-  this.gradebook.updateStudentAttributes(this.student)
-  strictEqual(this.student.computed_current_score, 0)
-})
-
-test('sets .computed_final_score to 0', function() {
-  this.gradebook.updateStudentAttributes(this.student)
-  strictEqual(this.student.computed_final_score, 0)
-})
-
-test('sets .isConcluded to true when all enrollments are "completed"', function() {
-  this.student.enrollments[0].enrollment_state = 'completed'
-  this.student.enrollments.push({
-    enrollment_state: 'completed',
-    grades: {html_url: 'http://example.url/'}
-  })
-  this.gradebook.updateStudentAttributes(this.student)
-  strictEqual(this.student.isConcluded, true)
-})
-
-test('sets .isConcluded to false when any enrollments are not "completed"', function() {
-  this.student.enrollments.push({
-    enrollment_state: 'completed',
-    grades: {html_url: 'http://example.url/'}
-  })
-  this.gradebook.updateStudentAttributes(this.student)
-  strictEqual(this.student.isConcluded, false)
-})
-
-test('sets .isInactive to true when all enrollments are "inactive"', function() {
-  this.student.enrollments[0].enrollment_state = 'inactive'
-  this.student.enrollments.push({
-    enrollment_state: 'inactive',
-    grades: {html_url: 'http://example.url/'}
-  })
-  this.gradebook.updateStudentAttributes(this.student)
-  strictEqual(this.student.isInactive, true)
-})
-
-test('sets .isInactive to false when any enrollments are not "inactive"', function() {
-  this.student.enrollments.push({
-    enrollment_state: 'inactive',
-    grades: {html_url: 'http://example.url/'}
-  })
-  this.gradebook.updateStudentAttributes(this.student)
-  strictEqual(this.student.isInactive, false)
-})
-
-test('sets .cssClass using the id of the student', function() {
-  this.gradebook.updateStudentAttributes(this.student)
-  equal(this.student.cssClass, 'student_1101')
-})
-
 QUnit.module('Gradebook#updateStudentRow', {
   setup() {
     this.gradebook = createGradebook()
@@ -4437,10 +4266,11 @@ QUnit.module('Gradebook Rows', function() {
   })
 })
 
-QUnit.module('Gradebook#gotSubmissionsChunk', function(hooks) {
+QUnit.module('Gradebook#gotSubmissionsChunk', hooks => {
   let studentSubmissions
+  let gradebook
 
-  hooks.beforeEach(function() {
+  hooks.beforeEach(() => {
     $fixtures.innerHTML = `
       <div id="application">
         <div id="wrapper">
@@ -4451,8 +4281,8 @@ QUnit.module('Gradebook#gotSubmissionsChunk', function(hooks) {
       </div>
     `
 
-    this.gradebook = createGradebook()
-    this.gradebook.initGrid()
+    gradebook = createGradebook()
+    gradebook.initGrid()
 
     const students = [
       {
@@ -4466,9 +4296,9 @@ QUnit.module('Gradebook#gotSubmissionsChunk', function(hooks) {
         enrollments: [{type: 'StudentEnrollment', grades: {html_url: 'http://example.url/'}}]
       }
     ]
-    this.gradebook.gotChunkOfStudents(students)
-    sinon.stub(this.gradebook, 'updateSubmission')
-    sinon.spy(this.gradebook, 'setupGrading')
+    gradebook.gotChunkOfStudents(students)
+    sinon.stub(gradebook, 'updateSubmission')
+    sinon.spy(gradebook, 'setupGrading')
 
     studentSubmissions = [
       {
@@ -4503,42 +4333,74 @@ QUnit.module('Gradebook#gotSubmissionsChunk', function(hooks) {
         user_id: '1102'
       }
     ]
-    this.gradebook.setAssignmentGroups({
+    gradebook.setAssignmentGroups({
       9000: {group_weight: 100}
     })
-    this.gradebook.setAssignments({
+    gradebook.setAssignments({
       201: {id: '201', assignment_group_id: '9000', name: 'Math Assignment', published: true},
       202: {id: '202', assignment_group_id: '9000', name: 'English Assignment', published: false}
     })
   })
 
-  hooks.afterEach(function() {
-    this.gradebook.destroy()
+  hooks.afterEach(() => {
+    gradebook.destroy()
     $fixtures.innerHTML = ''
   })
 
-  test('updates effectiveDueDates with the submissions', function() {
-    this.gradebook.gotSubmissionsChunk(studentSubmissions)
-    deepEqual(Object.keys(this.gradebook.effectiveDueDates), ['201', '202'])
-    deepEqual(Object.keys(this.gradebook.effectiveDueDates[201]), ['1101', '1102'])
-    deepEqual(Object.keys(this.gradebook.effectiveDueDates[202]), ['1101'])
+  function getAssignment() {
+    return gradebook.getAssignment('201')
+  }
+
+  QUnit.module('when the assignment is only visible to overrides', contextHooks => {
+    contextHooks.beforeEach(() => {
+      const assignment = getAssignment()
+      assignment.only_visible_to_overrides = true
+      assignment.assignment_visibility = []
+    })
+
+    test('updates the assignment visibility when the student submitted to the assignment', () => {
+      gradebook.gotSubmissionsChunk(studentSubmissions)
+      deepEqual(getAssignment().assignment_visibility, ['1101', '1102'])
+    })
+
+    test('does not add duplicate students to assignment visibility', () => {
+      const assignment = getAssignment()
+      assignment.assignment_visibility = ['1101', '1102']
+      gradebook.gotSubmissionsChunk(studentSubmissions)
+      deepEqual(getAssignment().assignment_visibility, ['1101', '1102'])
+    })
   })
 
-  test('updates effectiveDueDates on related assignments', function() {
-    this.gradebook.gotSubmissionsChunk(studentSubmissions)
-    deepEqual(Object.keys(this.gradebook.getAssignment('201').effectiveDueDates), ['1101', '1102'])
-    deepEqual(Object.keys(this.gradebook.getAssignment('202').effectiveDueDates), ['1101'])
+  test('does not update assignment visibility when not only visible to overrides', () => {
+    const assignment = getAssignment()
+    assignment.only_visible_to_overrides = false
+    assignment.assignment_visibility = []
+    gradebook.gotSubmissionsChunk(studentSubmissions)
+    deepEqual(getAssignment().assignment_visibility, [])
   })
 
-  test('updates inClosedGradingPeriod on related assignments', function() {
-    this.gradebook.gotSubmissionsChunk(studentSubmissions)
-    strictEqual(this.gradebook.getAssignment('201').inClosedGradingPeriod, false)
-    strictEqual(this.gradebook.getAssignment('202').inClosedGradingPeriod, false)
+  test('updates effectiveDueDates with the submissions', () => {
+    gradebook.gotSubmissionsChunk(studentSubmissions)
+    deepEqual(Object.keys(gradebook.effectiveDueDates), ['201', '202'])
+    deepEqual(Object.keys(gradebook.effectiveDueDates[201]), ['1101', '1102'])
+    deepEqual(Object.keys(gradebook.effectiveDueDates[202]), ['1101'])
   })
 
-  test('sets up grading for the related students', function() {
-    this.gradebook.gotSubmissionsChunk(studentSubmissions)
-    const [students] = this.gradebook.setupGrading.lastCall.args
+  test('updates effectiveDueDates on related assignments', () => {
+    gradebook.gotSubmissionsChunk(studentSubmissions)
+    deepEqual(Object.keys(gradebook.getAssignment('201').effectiveDueDates), ['1101', '1102'])
+    deepEqual(Object.keys(gradebook.getAssignment('202').effectiveDueDates), ['1101'])
+  })
+
+  test('updates inClosedGradingPeriod on related assignments', () => {
+    gradebook.gotSubmissionsChunk(studentSubmissions)
+    strictEqual(gradebook.getAssignment('201').inClosedGradingPeriod, false)
+    strictEqual(gradebook.getAssignment('202').inClosedGradingPeriod, false)
+  })
+
+  test('sets up grading for the related students', () => {
+    gradebook.gotSubmissionsChunk(studentSubmissions)
+    const [students] = gradebook.setupGrading.lastCall.args
     deepEqual(students.map(student => student.id), ['1101', '1102'])
   })
 })
@@ -5894,45 +5756,74 @@ test('passes toggleUnpublishedAssignments as onSelectShowUnpublishedAssignments 
   )
 })
 
-QUnit.module('Gradebook#updateSubmission', {
-  setup() {
-    this.gradebook = createGradebook()
-    this.gradebook.students = {1101: {id: '1101'}}
-    this.submission = {
-      assignment_id: '201',
-      grade: '123.45',
-      gradingType: 'percent',
-      submitted_at: '2015-05-04T12:00:00Z',
-      user_id: '1101'
+QUnit.module('Gradebook', () => {
+  let gradebook
+
+  QUnit.module('#updateSubmission()', hooks => {
+    let submission
+
+    hooks.beforeEach(() => {
+      gradebook = createGradebook()
+      gradebook.students = {1101: {id: '1101'}}
+
+      submission = {
+        assignment_id: '2301',
+        grade: '123.45',
+        gradingType: 'percent',
+        submitted_at: '2015-05-04T12:00:00Z',
+        user_id: '1101'
+      }
+    })
+
+    function getSubmission() {
+      return gradebook.getSubmission('1101', '2301')
     }
-  }
-})
 
-test('formats the grade for the submission', function() {
-  sandbox.spy(GradeFormatHelper, 'formatGrade')
-  this.gradebook.updateSubmission(this.submission)
-  equal(GradeFormatHelper.formatGrade.callCount, 1)
-})
+    test('formats the grade for the submission', () => {
+      sandbox.spy(GradeFormatHelper, 'formatGrade')
+      gradebook.updateSubmission(submission)
+      equal(GradeFormatHelper.formatGrade.callCount, 1)
+    })
 
-test('includes submission attributes when formatting the grade', function() {
-  sandbox.spy(GradeFormatHelper, 'formatGrade')
-  this.gradebook.updateSubmission(this.submission)
-  const [grade, options] = GradeFormatHelper.formatGrade.getCall(0).args
-  equal(grade, '123.45', 'parameter 1 is the submission grade')
-  equal(options.gradingType, 'percent', 'options.gradingType is the submission gradingType')
-  strictEqual(options.delocalize, false, 'submission grades from the server are not localized')
-})
+    test('includes submission attributes when formatting the grade', () => {
+      sandbox.spy(GradeFormatHelper, 'formatGrade')
+      gradebook.updateSubmission(submission)
+      const [grade, options] = GradeFormatHelper.formatGrade.getCall(0).args
+      equal(grade, '123.45', 'parameter 1 is the submission grade')
+      equal(options.gradingType, 'percent', 'options.gradingType is the submission gradingType')
+      strictEqual(options.delocalize, false, 'submission grades from the server are not localized')
+    })
 
-test('sets the formatted grade on submission', function() {
-  sandbox.stub(GradeFormatHelper, 'formatGrade').returns('123.45%')
-  this.gradebook.updateSubmission(this.submission)
-  equal(this.submission.grade, '123.45%')
-})
+    test('sets the formatted grade on submission', () => {
+      sandbox.stub(GradeFormatHelper, 'formatGrade').returns('123.45%')
+      gradebook.updateSubmission(submission)
+      equal(getSubmission().grade, '123.45%')
+    })
 
-test('sets the raw grade on submission', function() {
-  sandbox.stub(GradeFormatHelper, 'formatGrade').returns('123.45%')
-  this.gradebook.updateSubmission(this.submission)
-  equal(this.submission.rawGrade, '123.45')
+    test('sets the raw grade on submission', () => {
+      sandbox.stub(GradeFormatHelper, 'formatGrade').returns('123.45%')
+      gradebook.updateSubmission(submission)
+      strictEqual(getSubmission().rawGrade, '123.45')
+    })
+
+    test('sets the submission as not hidden when implicitly not hidden', () => {
+      delete submission.hidden
+      gradebook.updateSubmission(submission)
+      strictEqual(getSubmission().hidden, false)
+    })
+
+    test('keeps the submission hidden when previously hidden', () => {
+      submission.hidden = true
+      gradebook.updateSubmission(submission)
+      strictEqual(getSubmission().hidden, true)
+    })
+
+    test('keeps the submission as not hidden when previously not hidden', () => {
+      submission.hidden = false
+      gradebook.updateSubmission(submission)
+      strictEqual(getSubmission().hidden, false)
+    })
+  })
 })
 
 QUnit.module('Gradebook#arrangeColumnsBy', hooks => {
@@ -8529,27 +8420,6 @@ QUnit.module('Gradebook', () => {
     })
   })
 
-  QUnit.module('#isStudentGradeable()', hooks => {
-    hooks.beforeEach(() => {
-      gradebook = createGradebook()
-      gradebook.students = {1101: {id: '1101', isConcluded: false}}
-    })
-
-    test('returns true when the student enrollment is active', () => {
-      strictEqual(gradebook.isStudentGradeable('1101'), true)
-    })
-
-    test('returns false when the student enrollment is concluded', () => {
-      gradebook.students[1101].isConcluded = true
-      strictEqual(gradebook.isStudentGradeable('1101'), false)
-    })
-
-    test('returns false when the student is not loaded', () => {
-      delete gradebook.students[1101]
-      strictEqual(gradebook.isStudentGradeable('1101'), false)
-    })
-  })
-
   QUnit.module('#addPendingGradeInfo()', hooks => {
     let pendingGradeInfo
     let submission
@@ -9546,6 +9416,63 @@ QUnit.module('#renderGradebookSettingsModal', hooks => {
       onChange: {}
     }
     propEqual(gradebookSettingsModalProps().overrides, expectedProps)
+  })
+
+  test('passes the postPolicies object as the prop of the same name', () => {
+    gradebook = createGradebook()
+    gradebook.renderGradebookSettingsModal()
+
+    propEqual(gradebookSettingsModalProps().postPolicies, gradebook.postPolicies)
+  })
+
+  QUnit.module('anonymousAssignmentsPresent prop', () => {
+    const anonymousAssignmentGroup = {
+      assignments: [
+        {
+          anonymous_grading: true,
+          assignment_group_id: '10001',
+          id: '101',
+          name: 'Anonymous',
+          points_possible: 10,
+          published: true
+        }
+      ],
+      group_weight: 1,
+      id: '10001',
+      name: 'An anonymous assignment group'
+    }
+
+    const nonAnonymousAssignmentGroup = {
+      assignments: [
+        {
+          anonymous_grading: false,
+          assignment_group_id: '10002',
+          id: '102',
+          name: 'Not-Anonymous',
+          points_possible: 10,
+          published: true
+        }
+      ],
+      group_weight: 1,
+      id: '10002',
+      name: 'An anonymous assignment group'
+    }
+
+    test('is passed as true if the course has at least one anonymous assignment', () => {
+      gradebook = createGradebook()
+      gradebook.gotAllAssignmentGroups([anonymousAssignmentGroup, nonAnonymousAssignmentGroup])
+      gradebook.renderGradebookSettingsModal()
+
+      strictEqual(gradebookSettingsModalProps().anonymousAssignmentsPresent, true)
+    })
+
+    test('is passed as false if the course has no anonymous assignments', () => {
+      gradebook = createGradebook()
+      gradebook.gotAllAssignmentGroups([nonAnonymousAssignmentGroup])
+      gradebook.renderGradebookSettingsModal()
+
+      strictEqual(gradebookSettingsModalProps().anonymousAssignmentsPresent, false)
+    })
   })
 })
 

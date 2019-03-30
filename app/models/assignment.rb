@@ -1372,7 +1372,7 @@ class Assignment < ActiveRecord::Base
 
   def include_description?(user, lock_info=nil)
     return unless user
-    lock_info ||= self.locked_for?(user, :check_policies => true)
+    lock_info = locked_for?(user, :check_policies => true) if lock_info.nil?
     !lock_info || (lock_info[:can_view] && !lock_info[:context_module])
   end
 

@@ -21,7 +21,7 @@ module Messages::AssignmentSubmittedLate
     def subject
       if anonymous?
         I18n.t(
-          "A student just turned in their assignment (late), %{assignment_name}",
+          "A student just turned in their anonymous assignment (late), %{assignment_name}",
           assignment_name: assignment.title
         )
       else

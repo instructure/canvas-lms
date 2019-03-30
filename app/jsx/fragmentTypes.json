@@ -36,6 +36,9 @@
             "name": "GroupSet"
           },
           {
+            "name": "MediaObject"
+          },
+          {
             "name": "Module"
           },
           {

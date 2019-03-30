@@ -20,6 +20,11 @@ $borderColorActive: hsl(207, 74%, 45%);
 $bgColorActive: hsl(198, 96%, 47%);
 $gradientTopActive: hsl(196, 100%, 52%);
 $gradientBottomActive: adjust-hue($gradientTopActive, 10%);
+@if $use_high_contrast {
+  $bgColorActive:  var(--ic-brand-button--primary-bgd);
+  $gradientTopActive: transparent;
+  $gradientBottomActive: transparent;
+}
 
 $fcActive: #fff;
 

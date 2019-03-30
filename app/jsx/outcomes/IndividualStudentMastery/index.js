@@ -29,7 +29,6 @@ import fetchOutcomes from './fetchOutcomes'
 import { Set } from 'immutable'
 import * as shapes from './shapes'
 
-// eslint-disable-next-line
 class IndividualStudentMastery extends React.Component {
   static propTypes = {
     courseId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,

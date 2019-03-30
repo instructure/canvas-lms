@@ -513,13 +513,30 @@ describe AssignmentsController do
       expect(assigns[:unlocked]).not_to be_nil
     end
 
-    it "should assign 'similarity_pledge'" do
-      user_session(@student)
-      a = @course.assignments.create(:title => "some assignment")
-      pledge = 'I made this'
-      @course.account.update_attributes(turnitin_pledge: pledge)
-      get 'show', params: {:course_id => @course.id, :id => a.id}
-      expect(assigns[:similarity_pledge]).to eq pledge
+    context 'when the assignment uses the plagiarism platform' do
+      include_context 'lti2_spec_helper'
+
+      let(:assignment) { @course.assignments.create(:title => "some assignment") }
+
+      before do
+        allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:create_subscription).and_return true
+
+        user_session(@student)
+
+        AssignmentConfigurationToolLookup.create!(
+          assignment: assignment,
+          tool: message_handler,
+          tool_type: 'Lti::MessageHandler',
+          tool_id: message_handler.id
+        )
+      end
+
+      it "should assign 'similarity_pledge'" do
+        pledge = 'I made this'
+        @course.account.update_attributes(turnitin_pledge: pledge)
+        get 'show', params: {:course_id => @course.id, :id => assignment.id}
+        expect(assigns[:similarity_pledge]).to eq pledge
+      end
     end
 
     it 'uses the vericite pledge if vericite is enabled' do

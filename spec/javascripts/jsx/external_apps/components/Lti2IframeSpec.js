@@ -16,80 +16,131 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
-import TestUtils from 'react-dom/test-utils'
+
+import fakeENV from 'helpers/fakeENV'
 import Lti2Iframe from 'jsx/external_apps/components/Lti2Iframe'
 
-const {Simulate} = TestUtils
-const wrapper = document.getElementById('fixtures')
-const createElement = data => (
-  <Lti2Iframe
-    registrationUrl={data.registrationUrl}
-    handleInstall={data.handleInstall}
-    reregistration={data.reregistration}
-  />
-)
-const renderComponent = data => ReactDOM.render(createElement(data), wrapper)
+QUnit.module('ExternalApps Lti2Iframe', suiteHooks => {
+  let $container
+  let props
 
-QUnit.module('ExternalApps.Lti2Iframe', {
-  setup() {
-    this.allowances = ['midi', 'media']
-    ENV.LTI_LAUNCH_FRAME_ALLOWANCES = this.allowances
-  },
-  teardown() {
-    ReactDOM.unmountComponentAtNode(wrapper)
-    ENV.LTI_LAUNCH_FRAME_ALLOWANCES = undefined
+  suiteHooks.beforeEach(() => {
+    fakeENV.setup()
+    ENV.LTI_LAUNCH_FRAME_ALLOWANCES = ['media', 'midi']
+
+    $container = document.body.appendChild(document.createElement('div'))
+
+    props = {
+      handleInstall() {},
+      registrationUrl: 'http://localhost/register',
+      reregistration: false
+    }
+  })
+
+  suiteHooks.afterEach(() => {
+    ReactDOM.unmountComponentAtNode($container)
+    $container.remove()
+    fakeENV.teardown()
+  })
+
+  function renderComponent() {
+    ReactDOM.render(<Lti2Iframe {...props} />, $container)
   }
-})
 
-test('renders', () => {
-  const data = {
-    registrationUrl: 'http://example.com',
-    handleInstall() {}
+  async function postMessage(message) {
+    await new Promise(resolve => {
+      const listen = () => {
+        window.removeEventListener('message', listen, false)
+        resolve()
+      }
+
+      window.addEventListener('message', listen, false)
+      window.postMessage(message, '*')
+    })
   }
-  const component = renderComponent(data)
-  ok(component)
-  ok(TestUtils.isCompositeComponentWithType(component, Lti2Iframe))
-})
 
-test('renders any children after the iframe', () => {
-  const element = (
-    <Lti2Iframe registrationUrl="http://www.test.com" handleInstall={function() {}}>
-      <div id="test-child" />
-    </Lti2Iframe>
-  )
-  const component = TestUtils.renderIntoDocument(element)
-  ok($(ReactDOM.findDOMNode(component)).find('#test-child').length === 1)
-})
+  test('renders the given children', () => {
+    props.children = <div id="test-child" />
+    renderComponent()
+    strictEqual($container.querySelectorAll('#test-child').length, 1)
+  })
 
-test('getLaunchUrl returns the launch url if doing reregistration', () => {
-  const data = {
-    registrationUrl: 'http://example.com',
-    handleInstall() {},
-    reregistration: true
-  }
-  const component = renderComponent(data)
-  equal(component.getLaunchUrl(), 'http://example.com')
-})
+  QUnit.module('iframe', () => {
+    function getIframe() {
+      return $container.querySelector('iframe')
+    }
 
-test('getLaunchUrl returns about:blank if not doing reregistration', () => {
-  const data = {
-    registrationUrl: 'http://example.com',
-    handleInstall() {},
-    reregistration: false
-  }
-  const component = renderComponent(data)
-  equal(component.getLaunchUrl(), 'about:blank')
-})
+    test('uses the registration url as src when doing reregistration', () => {
+      props.reregistration = true
+      renderComponent()
+      equal(getIframe().getAttribute('src'), 'http://localhost/register')
+    })
 
-test('renders any children after the iframe', function() {
-  const element = (
-    <Lti2Iframe registrationUrl="http://www.test.com" handleInstall={function() {}}>
-      <div id="test-child" />
-    </Lti2Iframe>
-  )
-  const component = TestUtils.renderIntoDocument(element)
-  equal(component.iframe.getAttribute('allow'), this.allowances.join('; '))
+    test('uses "about:blank" as src when not doing reregistration', () => {
+      props.reregistration = false
+      renderComponent()
+      equal(getIframe().getAttribute('src'), 'about:blank')
+    })
+
+    test('allows the items given in the ENV', () => {
+      renderComponent()
+      equal(getIframe().getAttribute('allow'), 'media; midi')
+    })
+  })
+
+  QUnit.module('"handleInstall" prop', hooks => {
+    hooks.beforeEach(() => {
+      props.handleInstall = sinon.spy()
+      renderComponent()
+    })
+
+    QUnit.module('when a "message" event for registration is triggered on the window', () => {
+      test('is called', async () => {
+        const message = {subject: 'lti.lti2Registration'}
+        await postMessage(JSON.stringify(message))
+        strictEqual(props.handleInstall.callCount, 1)
+      })
+
+      test('is called with the parsed message', async () => {
+        const message = {subject: 'lti.lti2Registration'}
+        await postMessage(JSON.stringify(message))
+        const [messageReceived] = props.handleInstall.lastCall.args
+        deepEqual(messageReceived, message)
+      })
+
+      test('is called with the message event', async () => {
+        const message = {subject: 'lti.lti2Registration'}
+        await postMessage(JSON.stringify(message))
+        const [, event] = props.handleInstall.lastCall.args
+        equal(event.constructor, MessageEvent)
+      })
+    })
+
+    test('skips parsing when the message is already an object', async () => {
+      await postMessage({subject: 'lti.lti2Registration'})
+      strictEqual(props.handleInstall.callCount, 1)
+    })
+
+    test('is not called when a "message" event not for registration is triggered', async () => {
+      const message = {subject: 'not lti2Registration'}
+      await postMessage(JSON.stringify(message))
+      strictEqual(props.handleInstall.callCount, 0)
+    })
+
+    test('is not called when a "message" event does not have parsable data', async () => {
+      await postMessage('not a JSON string')
+      strictEqual(props.handleInstall.callCount, 0)
+    })
+  })
+
+  test('removes the "message" event listener when unmounting', async () => {
+    props.handleInstall = sinon.spy()
+    renderComponent()
+    ReactDOM.unmountComponentAtNode($container)
+    const message = {subject: 'lti.lti2Registration'}
+    await postMessage(JSON.stringify(message))
+    strictEqual(props.handleInstall.callCount, 0)
+  })
 })

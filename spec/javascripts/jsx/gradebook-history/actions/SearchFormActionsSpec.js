@@ -30,7 +30,7 @@ import SearchFormActions, {
   FETCH_RECORDS_NEXT_PAGE_FAILURE
 } from 'jsx/gradebook-history/actions/SearchFormActions'
 import UserApi from 'jsx/gradebook-history/api/UserApi'
-import Fixtures from '../../gradebook-history/Fixtures'
+import Fixtures from '../Fixtures'
 
 QUnit.module('SearchFormActions', function() {
   const response = {

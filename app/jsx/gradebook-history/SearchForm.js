@@ -27,9 +27,8 @@ import View from '@instructure/ui-layout/lib/components/View'
 import DateInput from '@instructure/ui-forms/lib/components/DateInput'
 import FormFieldGroup from '@instructure/ui-forms/lib/components/FormFieldGroup'
 import {GridCol} from '@instructure/ui-layout/lib/components/Grid'
-import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-import SearchFormActions from '../gradebook-history/actions/SearchFormActions'
+import SearchFormActions from './actions/SearchFormActions'
 import {showFlashAlert} from '../shared/FlashAlert'
 
 const recordShape = shape({

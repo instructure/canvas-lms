@@ -34,7 +34,7 @@ module Factories
     }
   end
 
-  def quiz_with_submission(complete_quiz = true)
+  def quiz_with_submission(complete_quiz = true, skip_submission = false)
     @course ||= course_model(:reusable => true)
     @student ||= user_model
     @course.enroll_student(@student).accept
@@ -42,6 +42,7 @@ module Factories
     @quiz.workflow_state = "available"
     @quiz.quiz_questions.create!({ question_data: test_quiz_data.first })
     @quiz.save!
+    return if skip_submission
 
     @qsub = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student)
     @qsub.quiz_data = test_quiz_data

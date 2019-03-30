@@ -783,8 +783,8 @@ module Gradezilla
   end
 
   def self.click_grade_posting_policy(assignment_id)
-    click.assignment_header_menu(assignment_id)
-    # TODO: click poting policy
+    click_assignment_header_menu(assignment_id)
+    # TODO: click posting policy
     grade_posting_policy_option.click
     Gradezilla::AssignmentPostingPolicy
   end

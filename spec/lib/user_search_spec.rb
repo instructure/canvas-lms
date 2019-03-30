@@ -121,7 +121,7 @@ describe UserSearch do
               ObserverEnrollment.create!(:user => ta, :course => course, :workflow_state => 'active')
               ta2 = User.create!(:name => 'Tyler Observer 2')
               ObserverEnrollment.create!(:user => ta2, :course => course, :workflow_state => 'active')
-              student.linked_observers << ta2
+              add_linked_observer(student, ta2)
             end
 
             it { is_expected.not_to include('Tyler Observer 2') }

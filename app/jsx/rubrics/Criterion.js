@@ -43,7 +43,6 @@ const OutcomeIcon = () => (
 )
 
 const LongDescription = ({ showLongDescription }) => (
-  // eslint-disable-next-line jsx-a11y/anchor-is-valid
   <Button fluidWidth variant="link" onClick={() => showLongDescription()}>
     <Text size="x-small">{I18n.t('view longer description')}</Text>
   </Button>
@@ -54,7 +53,6 @@ LongDescription.propTypes = {
 
 const LongDescriptionDialog = ({ open, close, longDescription }) => {
   const modalHeader = I18n.t('Criterion Long Description')
-  /* eslint-disable react/no-danger */
   return (
     <Modal
        open={open}

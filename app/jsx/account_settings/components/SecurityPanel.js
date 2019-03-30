@@ -25,9 +25,6 @@ import Text from '@instructure/ui-elements/lib/components/Text'
 import View from '@instructure/ui-layout/lib/components/View'
 import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
 import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
-import RadioInput from '@instructure/ui-forms/lib/components/RadioInput'
-import RadioInputGroup from '@instructure/ui-forms/lib/components/RadioInputGroup'
-import List, {ListItem} from '@instructure/ui-elements/lib/components/List'
 import {
   getCspEnabled,
   setCspEnabled,
@@ -38,7 +35,6 @@ import {
 import {ConnectedWhitelist} from './Whitelist'
 
 import {CONFIG} from '../index'
-import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 
 export class SecurityPanel extends Component {
   static propTypes = {
@@ -62,27 +58,8 @@ export class SecurityPanel extends Component {
     this.props.setCspEnabled(this.props.context, this.props.contextId, e.currentTarget.checked)
   }
 
-  handleSubAccountCspToggleChange = e => {
-    if (e.currentTarget.value === 'inherit') {
-      this.props.setCspInherited(this.props.context, this.props.contextId, true)
-    } else {
-      this.props.setCspEnabled(
-        this.props.context,
-        this.props.contextId,
-        e.currentTarget.value === 'on'
-      )
-      this.props.setCspInherited(this.props.context, this.props.contextId, false)
-    }
-  }
-
-  getSubAccountStatus = () => {
-    if (this.props.cspInherited) {
-      return 'inherit'
-    }
-    if (this.props.cspEnabled) {
-      return 'on'
-    }
-    return 'off'
+  handleCspInheritChange = e => {
+    this.props.setCspInherited(this.props.context, this.props.contextId, e.currentTarget.checked)
   }
 
   componentDidMount() {
@@ -102,60 +79,37 @@ export class SecurityPanel extends Component {
         <View as="div" margin="small 0">
           <Text as="p">
             {I18n.t(
-              `This allows you to restrict custom JavaScript that runs in your instance of Canvas.
-               This will be enabled by an updated Content Security Policy (CSP).
-               Domains will be added to your whitelist with the ability to manually add domains.
-               There is a a %{max_domains} domain limit on the whitelist.`,
+              `The Content Security Policy allows you to restrict custom
+               JavaScript that runs in your instance of Canvas. You can manually add
+               up to %{max_domains} domains to your whitelist. Wild cards are recommended
+               (e.g. *.instructure.com). Canvas and Instructure domains are included
+               automatically and do not count against your 50 domain limit.`,
               {
                 max_domains: CONFIG.max_domains
               }
             )}
           </Text>
-          {this.props.isSubAccount && (
-            <React.Fragment>
-              <Text as="p">{I18n.t('Sub-accounts can choose one of three options:')}</Text>
-              <List>
-                <ListItem>{I18n.t('Off - Policy will not apply to this sub-account')}</ListItem>
-                <ListItem>
-                  {I18n.t(
-                    'Inherit - Whitelist will be inherited from the parent account.  Domains can be added but will not be enforced until you change this setting to On.'
-                  )}
-                </ListItem>
-                <ListItem>
-                  {I18n.t(
-                    'On - Whitelist will only be the domains which have been added explicitly to this account.'
-                  )}
-                </ListItem>
-              </List>
-            </React.Fragment>
-          )}
         </View>
         <Grid>
           <GridRow>
             <GridCol>
-              {this.props.isSubAccount ? (
-                <RadioInputGroup
-                  name="csp_subaccount_toggle"
-                  description={
-                    <ScreenReaderContent>Content Security Policy Selection</ScreenReaderContent>
-                  }
-                  variant="toggle"
-                  size="large"
-                  value={this.getSubAccountStatus()}
-                  onChange={this.handleSubAccountCspToggleChange}
-                >
-                  <RadioInput label="Off" value="off" context="off" />
-                  <RadioInput label="Inherit" value="inherit" />
-                  <RadioInput label="On" value="on" />
-                </RadioInputGroup>
-              ) : (
-                <Checkbox
-                  variant="toggle"
-                  label={I18n.t('Enable Content Security Policy')}
-                  onChange={this.handleCspToggleChange}
-                  checked={this.props.cspEnabled}
-                />
+              {this.props.isSubAccount && (
+                <View margin="0 xx-small">
+                  <Checkbox
+                    variant="toggle"
+                    label={I18n.t('Inherit Content Security Policy')}
+                    onChange={this.handleCspInheritChange}
+                    checked={this.props.cspInherited}
+                  />
+                </View>
               )}
+              <Checkbox
+                variant="toggle"
+                label={I18n.t('Enable Content Security Policy')}
+                onChange={this.handleCspToggleChange}
+                checked={this.props.cspEnabled}
+                disabled={this.props.cspInherited}
+              />
             </GridCol>
           </GridRow>
           <GridRow>
@@ -164,6 +118,7 @@ export class SecurityPanel extends Component {
                 context={this.props.context}
                 contextId={this.props.contextId}
                 isSubAccount={this.props.isSubAccount}
+                inherited={this.props.cspInherited}
               />
             </GridCol>
           </GridRow>

@@ -20,7 +20,7 @@ import tz from 'timezone'
 
 const {Handlebars} = Ember
 
-//#
+// #
 // Formats a parsable date with normal strftime formats
 //
 // ```html

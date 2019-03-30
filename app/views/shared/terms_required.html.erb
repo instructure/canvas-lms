@@ -17,7 +17,7 @@
 %>
 
 <%
-  content_for :page_title, t('updated_terms_of_use', 'Updated Terms of Use')
+  content_for :page_title, t('updated_terms_of_use', 'Updated Acceptable Use Policy')
 
   js_bundle :terms_of_use
   css_bundle :login_confirm
@@ -42,7 +42,7 @@
     <p>
       <p>
         <div class="terms-of-service__link" id=terms_of_service_link></div>
-        <%= t "Either you're a new user or the *terms of use* have changed since you last agreed to them.  Please agree to the *terms of use* before you continue.",
+        <%= t "Either you're a new user or the *terms of use* has changed since you last agreed to it.  Please agree to the *terms of use* before you continue.",
               wrapper: {
                   '*' => link_to('\1', "#", class: 'terms_of_service_link'),
               }

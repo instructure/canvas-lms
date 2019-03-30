@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import 'compiled/jquery.rails_flash_notifications' // eslint-disable-line
+import 'compiled/jquery.rails_flash_notifications'
 
 import rubric_assessment from 'rubric_assessment'
 import I18n from 'i18n!rubric_assessment'

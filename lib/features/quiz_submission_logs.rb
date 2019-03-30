@@ -26,6 +26,5 @@ Feature.register('quiz_log_auditing' => {
     TEXT
   },
   applies_to: 'Course',
-  state: 'allowed',
-  beta: true
+  state: 'allowed'
 })

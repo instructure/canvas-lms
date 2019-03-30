@@ -64,7 +64,7 @@ const roles = handleActions(
         return state
       }
       const selectedRolesObject = selectedRoles.reduce((obj, role) => {
-        obj[role.id] = true // eslint-disable-line
+        obj[role.id] = true
         return obj
       }, {})
       return state.map(role => {

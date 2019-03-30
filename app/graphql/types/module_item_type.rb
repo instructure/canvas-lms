@@ -62,12 +62,12 @@ module Types
 
    field :next, Types::ModuleItemType, null: true
    def next
-     Loaders::AssociationLoader.for(ContentTag, :context).load(content_tag).then do |ct|
-       ModuleProgressionVisibleLoader.for(current_user).load(ct.context).then do |visable_tag_ids|
-         index = visable_tag_ids.index(content_tag.id)
+     Loaders::AssociationLoader.for(ContentTag, :context).load(content_tag).then do |context|
+       ModuleProgressionVisibleLoader.for(current_user).load(context).then do |visible_tag_ids|
+         index = visible_tag_ids.index(content_tag.id)
          next nil if index.nil?
-         next nil if index == visable_tag_ids.size - 1
-         next_id = visable_tag_ids[index + 1]
+         next nil if index == visible_tag_ids.size - 1
+         next_id = visible_tag_ids[index + 1]
          Loaders::IDLoader.for(ContentTag).load(next_id)
        end
      end
@@ -75,12 +75,12 @@ module Types
 
    field :previous, Types::ModuleItemType, null: true
    def previous
-     Loaders::AssociationLoader.for(ContentTag, :context).load(content_tag).then do |ct|
-       ModuleProgressionVisibleLoader.for(current_user).load(ct.context).then do |visable_tag_ids|
-         index = visable_tag_ids.index(content_tag.id)
+     Loaders::AssociationLoader.for(ContentTag, :context).load(content_tag).then do |context|
+       ModuleProgressionVisibleLoader.for(current_user).load(context).then do |visible_tag_ids|
+         index = visible_tag_ids.index(content_tag.id)
          next nil if index.nil?
          next nil if index == 0
-         previous_id = visable_tag_ids[index - 1]
+         previous_id = visible_tag_ids[index - 1]
          Loaders::IDLoader.for(ContentTag).load(previous_id)
        end
      end
@@ -94,7 +94,7 @@ module Types
       if content_tag.content_id == 0 || content_tag.content_id.nil?
         content_tag
       else
-        Loaders::AssociationLoader.for(ContentTag, :content).load(content_tag).then(&:content)
+        Loaders::AssociationLoader.for(ContentTag, :content).load(content_tag)
       end
     end
   end

@@ -18,27 +18,28 @@
 
 import _ from 'underscore'
 import I18n from 'i18n!gradebook'
-var MessageStudentsWhoHelper = {
-  settings: function(assignment, students) {
+
+const MessageStudentsWhoHelper = {
+  settings(assignment, students) {
     return {
       options: this.options(assignment),
       title: assignment.name,
       points_possible: assignment.points_possible,
-      students: students,
-      context_code: 'course_' + assignment.course_id,
+      students,
+      context_code: `course_${assignment.course_id}`,
       callback: this.callbackFn.bind(this),
       subjectCallback: this.generateSubjectCallbackFn(assignment)
     }
   },
 
-  options: function(assignment) {
-    var options = this.allOptions()
-    var noSubmissions = !this.hasSubmission(assignment)
+  options(assignment) {
+    const options = this.allOptions()
+    const noSubmissions = !this.hasSubmission(assignment)
     if (noSubmissions) options.splice(0, 1)
     return options
   },
 
-  allOptions: function() {
+  allOptions() {
     return [
       {
         text: I18n.t('students_who.havent_submitted_yet', "Haven't submitted yet"),
@@ -81,37 +82,38 @@ var MessageStudentsWhoHelper = {
     ]
   },
 
-  hasSubmission: function(assignment) {
-    var submissionTypes = assignment.submission_types
+  hasSubmission(assignment) {
+    const submissionTypes = assignment.submission_types
     if (submissionTypes.length === 0) return false
 
-    return _.any(submissionTypes, submissionType => {
-      return submissionType !== 'none' && submissionType !== 'on_paper'
-    })
+    return _.any(
+      submissionTypes,
+      submissionType => submissionType !== 'none' && submissionType !== 'on_paper'
+    )
   },
 
-  exists: function(value) {
+  exists(value) {
     return !_.isUndefined(value) && !_.isNull(value)
   },
 
-  scoreWithCutoff: function(student, cutoff) {
+  scoreWithCutoff(student, cutoff) {
     return this.exists(student.score) && student.score !== '' && this.exists(cutoff)
   },
 
-  callbackFn: function(selected, cutoff, students) {
-    var criteriaFn = this.findOptionByText(selected).criteriaFn
-    var students = _.filter(students, student => criteriaFn(student.user_data, cutoff))
-    return _.map(students, student => student.user_data.id)
+  callbackFn(selected, cutoff, students) {
+    const criteriaFn = this.findOptionByText(selected).criteriaFn
+    const filteredStudents = _.filter(students, student => criteriaFn(student.user_data, cutoff))
+    return _.map(filteredStudents, student => student.user_data.id)
   },
 
-  findOptionByText: function(text) {
+  findOptionByText(text) {
     return _.find(this.allOptions(), option => option.text === text)
   },
 
-  generateSubjectCallbackFn: function(assignment) {
+  generateSubjectCallbackFn(assignment) {
     return (selected, cutoff) => {
-      var cutoffString = cutoff || ''
-      var subjectFn = this.findOptionByText(selected).subjectFn
+      const cutoffString = cutoff || ''
+      const subjectFn = this.findOptionByText(selected).subjectFn
       return subjectFn(assignment, cutoffString)
     }
   }

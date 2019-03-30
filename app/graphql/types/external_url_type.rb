@@ -30,9 +30,7 @@ module Types
     # Override the default module item interface implementation. External URLs
     # do not have a separate content table in the database.
     def modules
-      Loaders::AssociationLoader.for(ContentTag, :context_module).load(object).then do |ct|
-        [ct.context_module]
-      end
+      load_association(:context_module).then { |mod| [mod] }
     end
   end
 end

@@ -29,8 +29,11 @@
 
 <div class="ic-Error-page">
   <img class="ic-Error-img" role="presentation" alt="" aria-hidden="true" src="/images/404_notfound.svg">
-  <h2><%= t('headings.page', %{Page Not Found}) %></h2>
+  <h1><%= t('headings.page', %{Page Not Found}) %></h1>
   <% if @not_found_message %>
     <p><%= @not_found_message %></p>
+  <% end %>
+  <% if send_broken_content! %>
+    <p><%= I18n.t("We've let your instructor know to review this link as soon as possible.") %></p>
   <% end %>
 </div>

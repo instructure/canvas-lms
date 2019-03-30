@@ -18,6 +18,18 @@
 
     <div class="control-group">
       <div class="controls">
+        {{#if ENV.SIMILARITY_PLEDGE}}
+          <label class="checkbox">
+            <input type="checkbox" class="turnitin_pledge external-tool" name="turnitin_pledge">
+              {{ENV.SIMILARITY_PLEDGE}}
+            </input>
+          </label>
+        {{/if}}
+      </div>
+    </div>
+
+    <div class="control-group">
+      <div class="controls">
         <button type="button" class="cancel_button btn">{{#t '#buttons.cancel'}}Cancel{{/t}}</button>
         <button type="submit" class="submit_button btn btn-primary">{{#t 'buttons.submit_assignment'}}Submit Assignment{{/t}}</button>
       </div>

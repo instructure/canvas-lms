@@ -22,12 +22,10 @@ describe "calendar2" do
   include_context "in-process server selenium tests"
   include Calendar2Common
 
-  before(:once) do
+  before(:each) do
     # or some stuff we need to click is "below the fold"
     make_full_screen
-  end
 
-  before(:each) do
     Account.default.tap do |a|
       a.settings[:show_scheduler] = true
       a.save!
@@ -321,6 +319,15 @@ describe "calendar2" do
       create_quiz
 
       assert_views(@quiz.title,@quiz.due_at)
+    end
+  end
+
+  context "as a user" do
+    it "without enrollment in a course calendar appears" do
+      user = user_factory(name: 'user1', active_user: true)
+      user_session(user)
+      get "/calendar2"
+      expect(f(".navigate_today")).to be_displayed
     end
   end
 end

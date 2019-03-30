@@ -1077,7 +1077,7 @@ class Enrollment < ActiveRecord::Base
     score = find_score(id_opts)
 
     if score&.overridden? && course.feature_enabled?(:final_grades_override)
-      score.effective_final_score_lower_bound
+      score.effective_final_score
     else
       computed_current_score(id_opts)
     end
@@ -1097,7 +1097,7 @@ class Enrollment < ActiveRecord::Base
     score = find_score(id_opts)
 
     if score&.overridden? && course.feature_enabled?(:final_grades_override)
-      score.effective_final_score_lower_bound
+      score.effective_final_score
     else
       computed_final_score(id_opts)
     end

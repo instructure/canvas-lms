@@ -16,19 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var jQuery = require('jquery')
+const jQuery = require('jquery')
 // this gets the full handlebars.js file, instead of just handlebars.runtime that we alias 'handlebars' to in baseWebpackConfig.js
-var Handlebars = require('handlebars/dist/cjs/handlebars').default
+const Handlebars = require('handlebars/dist/cjs/handlebars').default
 
 window.Ember = {
   imports: {
-    Handlebars: Handlebars,
-    jQuery: jQuery
+    Handlebars,
+    jQuery
   }
 }
 
 window.Handlebars = Handlebars
 
-var Ember = require('exports-loader?Ember!bower/ember/ember')
+const Ember = require('exports-loader?Ember!bower/ember/ember')
 
 module.exports = Ember

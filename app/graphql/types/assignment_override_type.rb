@@ -27,10 +27,9 @@ module Types
     field :students, [UserType], null: true
 
     def students
-      Loaders::AssociationLoader.for(AssignmentOverride,
-                                     assignment_override_students: :user)
-      .load(override)
-      .then { override.assignment_override_students.map(&:user) }
+      load_association(:assignment_override_students).then do |override_students|
+        Loaders::AssociationLoader.for(AssignmentOverrideStudent, :user).load_many(override_students)
+      end
     end
   end
 

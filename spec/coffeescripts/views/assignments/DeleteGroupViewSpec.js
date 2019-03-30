@@ -89,12 +89,33 @@ test('assignment and ag counts should update', () => {
 })
 
 test('it should delete a group with assignments', function() {
-  const destroy_stub = sandbox.stub(DeleteGroupView.prototype, 'destroy')
   const view = createView(true, true)
+  const destroy_spy = sandbox.stub(view, 'destroyModel').returns($.Deferred().resolve())
   view.render()
   view.open()
   view.$('.delete_group').click()
-  ok(destroy_stub.called)
+  ok(destroy_spy.called)
+  return view.close()
+})
+
+test('it validates that an assignment group to move to is selected', function() {
+  const view = createView(true, true)
+  view.render()
+  view.open()
+  view.$('.assignment_group_move').click()
+  const errors = view.validateFormData(view.getFormData())
+  equal(errors.move_assignments_to[0].type, 'required')
+})
+
+test('it should move assignments to another group', function() {
+  const view = createView(true, true)
+  const destroy_spy = sandbox.stub(view, 'destroyModel').returns($.Deferred().resolve())
+  view.render()
+  view.open()
+  view.$('.assignment_group_move').click()
+  view.$('select').val(2)
+  view.$('.delete_group').click()
+  ok(destroy_spy.called)
   return view.close()
 })
 

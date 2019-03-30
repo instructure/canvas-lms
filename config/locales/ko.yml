@@ -1022,7 +1022,7 @@ ko:
             text: "과목 ID"
           parameters: 
             note1: "해당 학기의 모든 과목에 대해 보고서를 생성하려면 과목 ID가 공란일 수 없습니다."
-            note2: " "
+            note2: "음소거 된 과제가 있는 코스는 이 보고서의 점수를 정확하게 반영하지 않을 수 있습니다."
     terms_parameters: 
       account_reports: 
         default: 
@@ -1877,7 +1877,10 @@ ko:
     undated_assignments: "날짜 없는 과제"
     upcoming_assignments: "예정된 과제"
   assignments_1e02582c: 과제
+  assignments_2: 
+    submission_attempts: 시도
   attach_files_to_discussions_bd16c245: "토론에 파일 첨부하기"
+  attached_files_4c1d26cf: "첨부 파일:"
   attachment: 
     default_filename: 파일
     errors: 
@@ -4209,6 +4212,7 @@ ko:
       assign_blanks: "제출하지 않은 학생에게 0점 할당"
     out_of_points_possible: "/ %{assignment.points_possible}"
     this_is_permanent: "상대 평가를 실행 취소할 수 없습니다. 상대 평가 이전의 평점 이력은 사용할 수 있으나 상대 평가 동작은 되돌릴 수 없습니다."
+  curving_assignments_e9479ee3: "과제 상대 평가"
   custom_fields_fc3e55af: "사용자 정의 필드"
   d2l_display: Desire2Learn
   d2l_file_description: "D2L 내보내기 .zip 형식"
@@ -4274,7 +4278,13 @@ ko:
       - 12월
     datepicker: 
       column_headings: 
-        - ""
+        - 일
+        - 월
+        - 화
+        - 수
+        - 목
+        - 금
+        - 토
     day_names: 
       - 일요일
       - 월요일
@@ -4291,12 +4301,17 @@ ko:
     formats: 
       date_at_time: "%b %-d at %l:%M%P"
       default: "%Y-%m-%d"
+      full: "%b %-d, %Y %-l:%M%P"
+      full_with_weekday: "%a %b %-d, %Y %-l:%M%P"
+      long: "%B %-d, %Y"
+      long_with_weekday: "%A, %B %-d"
       medium: "%b %-d, %Y"
       medium_month: "%b %Y"
       medium_with_weekday: "%a %b %-d, %Y"
       short: "%b %-d"
       short_month: "%b"
       short_weekday: "%a"
+      short_with_weekday: "%a, %b %-d"
       weekday: "%A"
     month_names: 
       - ~
@@ -5103,7 +5118,7 @@ ko:
     messages: 
       accepted: "동의해야 함"
       blank: "값이 있어야 함"
-      confirmation: "확인과 일치하지 않음"
+      confirmation: "미일치 %{attribute}"
       empty: "값이 있어야 함"
       equal_to: "%{count}와(과) 같아야 함"
       even: "짝수여야 함"
@@ -5114,13 +5129,26 @@ ko:
       invalid: "올바르지 않음"
       less_than: "%{count}보다 작아야 함"
       less_than_or_equal_to: "%{count}보다 작거나 같아야 함"
+      model_invalid: "검증 실패: %{errors}"
       not_a_number: "숫자가 아님"
+      not_an_integer: "정수여야 함"
       odd: "홀수여야 함"
-      too_long: "너무 긺 (최대 %{count} 글자)"
-      too_short: "너무 짧음 (최소 %{count} 글자)"
-      wrong_length: "길이가 잘못됨 (%{count} 글자여야 함)"
+      other_than: "%{count} 이외의 값이여야 함"
+      present: "반드시 공란"
+      required: 존재해야함
+      taken: "이미 잡힘"
+      too_long: 
+        one: "너무 길다 (최대 %{count} 글자)"
+        other: "너무 길다 (최대 %{count} 글자)"
+      too_short: 
+        one: "너무 짧음 (최소 %{count} 글자)"
+        other: "너무 짧음 (최소 %{count} 글자)"
+      wrong_length: 
+        one: "길이가 잘못됨 (%{count} 글자여야 함)"
+        other: "길이가 잘못됨 (%{count} 글자여야 함)"
     no_attached_file: "이 과제에 하나 이상의 파일을 첨부해야 함"
-    notices: ~
+    notices: 
+      error_reported: "당신이 도움을 주셔서 감사합니다! 우리는 이 일을 바로 잡을 것입니다."
     registration_incomplete: "이 페이지를 보기 전에 이메일 주소를 확인해야 함"
     required: "필수 사항"
     sis_id_in_use: "SIS ID \"%{sis_id}\"이(가) 이미 사용 중임"
@@ -5373,6 +5401,7 @@ ko:
   go_back_ed239e69: "뒤로 가기"
   google_docs_40374e65: "Google Docs"
   google_docs_domain_restriction_description: "Google Docs 도메인 제한을 이용하면 Google Docs 제출물과 협업을 단일 도메인으로 제한할 수 있습니다. 승인되지 않은 도메인에서 과제를 제출하거나 협업에 참여하려는 학생은 Google Docs 통합을 업데이트할 필요가 있다는 것을 알리는 오류 메시지를 받게 됩니다."
+  grade_change_notifications_98461261: "평점 변경 알림"
   grade_display_warning_dialog: 
     grade_display_warning: 
       warning: 경고
@@ -6689,6 +6718,7 @@ ko:
     send_message: "메시지 보내기"
   message_students_dialog: 
     recipients: "수신인:"
+  message_students_who_369b8488: "다음 학생에게 메시지 보내기"
   message_this_student_6d14043d: "이 학생에게 메시지 보내기"
   messages: 
     account_suspended: 
@@ -8409,6 +8439,7 @@ ko:
     must_view_complete: "페이지를 봄"
     must_view_incomplete: "페이지를 봐야 함"
   moodle_dropdown_warning_title: "다시 선다 문제를 올바르게 가져오지 못함"
+  more_cf9cc661: "외부 도구"
   more_courses_5ebbe998: "다른 과목"
   more_info_at_web_address_dba7e187: "자세한 정보는 %{web_address} 참고"
   move_abf00365: 이동
@@ -8669,6 +8700,12 @@ ko:
     human: 
       decimal_units: 
         format: "%n %u"
+        units: 
+          billion: 십억
+          million: 백만
+          quadrillion: 사치
+          thousand: 천
+          trillion: 일조
       format: 
         precision: 3
         significant: true
@@ -8679,10 +8716,15 @@ ko:
           byte: 
             one: 바이트
             other: 바이트
+          eb: EB
           gb: GB
           kb: KB
           mb: MB
+          pb: PB
           tb: TB
+    percentage: 
+      format: 
+        format: "%n%"
   oauth2_provider: 
     auth: 
       oauth2_complete: "응용 프로그램이 로그인 워크플로를 마쳤으며 곧 다시 활성화됩니다."
@@ -10816,6 +10858,7 @@ ko:
   save_settings_cafe79a5: "설정 저장"
   saving_d55dd90e: "저장 중..."
   scheduler_65b5ac91: "일정 관리"
+  score_change_notifications_6b94f27f: "점수 변경 알림"
   score_out_of_points_possible_88f370fd: "%{score} / %{points_possible}"
   screenreader_gradebook: 
     assignment_information: 
@@ -11798,6 +11841,7 @@ ko:
   submission_comment: 
     unknown_author: 아무개
   submission_comments_4fa03a17: "제출물 의견"
+  submission_comments_b6d65841: "제출물 의견"
   submission_detail: 
     go_to_submission_url: "제출물 URL로 가기"
     no_submission: "제출물 없음"
@@ -11912,14 +11956,19 @@ ko:
       two_words_connector: " 와(과) "
       words_connector: ", "
     help_menu: 
+      cisco_netacad_facebook: "지원 커뮤니티"
+      cisco_netacad_facebook_description: "커뮤니티 지원에 대해서는 Networking Academy Facebook 페이지를 방문하거나 강사에게 문의하십시오."
       community_support_description: "동료와 교류하고 도움을 받을 수 있습니다."
       community_support_forums: "커뮤니티 사용자 지원 포럼"
       contact_support: "지원팀에 문의"
       contact_support_sub_text: "시간이 중요한 이슈에 대해 지원을 받습니다."
       curriculum_assessment_errata: "교과 과정/평가 정오표"
       curriculum_assessment_errata_description: "이미 보고된 평가와 교과 과정 오류를 봅니다. \"정오표\"를 검색하십시오."
+      global_support_desk: "NetAcad 지원"
+      global_support_desk_description: "우리의 ASC는 귀하의 첫 번째 지원 라인이며, 귀하를 글로벌 지원 데스크와 연결하여 추가 지원이 필요한 문제를 해결할 수 있습니다."
       networking_academy_description: "대부분의 자주 묻는 질문에 대해서는 Cisco의 답변을 보십시오."
       networking_academy_faqs: "Networking Academy FAQ"
+      support_desk_livechat: "지원 데스크 라이브 채팅"
   syllabus: "과목 요강"
   table_headings: 
     name: 이름
@@ -12013,11 +12062,13 @@ ko:
   text_entry_e1808b2f: "텍스트 항목"
   that_user_account_has_been_deleted_please_contact__350e0e0: "해당 사용자 계정은 삭제되었습니다.  계정을 다시 활성화하려면 시스템 관리자에게 문의하시기 바랍니다."
   the_institution_you_logged_in_from_is_not_configur_5ceac41: "이 계정에 구성되어 있지 않은 기관에서 로그인했습니다."
+  their_grade_for_the_assignment_c36a60ef: "과제에 대한 평점"
   themes_89bfe9c4: 테마
   there_was_a_problem_logging_in_at_institution_5a298155: "%{institution}에 로그인하는 데 문제가 있습니다."
   there_was_an_error_in_processing_your_request_6513a49a: "요청을 처리하는 중 오류 발생"
   this_field_is_required_fa58c4a: "이 필드가 필요함"
   this_is_a_media_comment_click_here_to_view_c297bf62: "미디어 의견입니다. *보려면 여기를 클릭하십시오*."
+  this_message_includes_media_comments_to_listen_or__75ea03a1: "이 메시지는 미디어 설명을 포함하고 있습니다. 청취하거나 재생하려면 아래 링크를 클릭하십시오:"
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*이 퀴즈를 게시하지 않았습니다.* 게시하기 전까지 교사만 이 퀴즈를 볼 수 있습니다."
   time: 
     am: 오전
@@ -12076,6 +12127,7 @@ ko:
     view_in_separate_window: "별도 창에 보기"
   to_51406be9: "받는 사람"
   to_c4c44f4b: "다음 요일로"
+  to_f0e90538: "수신:"
   too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: "로그인을 너무 많이 실패했습니다. 다시 시도하시거나 시스템 관리자에게 문의하십시오."
   tooltips: 
     finished: 완료됨
@@ -12668,6 +12720,9 @@ ko:
     invalid_editing_roles: "제공된 편집 역할이 올바르지 않음"
   will_keep_the_highest_of_all_your_scores_6ae5bbd1: "가장 높은 점수를 보관"
   will_keep_the_latest_of_all_your_scores_431d23f9: "가장 마지막 점수를 보관"
+  will_paginate: 
+    next_label: "다음 &#8594;"
+    previous_label: "&#8592; 이전"
   wimba_conference: 
     external_urls: 
       archive: 저장소

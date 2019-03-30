@@ -653,6 +653,20 @@ describe UserLearningObjectScopes do
       expect(@ta.assignments_needing_grading).to be_include(@course2.assignments.first)
     end
 
+    it "should not count submissions for users with a deleted enrollment in the graders's section" do
+      @course1.enroll_student(@student_b, allow_multiple_enrollments: true).update_attributes(workflow_state: 'deleted')
+      assignment = @course1.assignments.first
+      assignment.grade_student(@student_a, grade: "1", grader: @teacher)
+      expect(@ta.assignments_needing_grading(scope_only: true)).not_to include assignment
+    end
+
+    it 'should not count submissions for sections where the grader has a deleted enrollment' do
+      @course1.enroll_user(@ta, 'TaEnrollment', allow_multiple_enrollments: true, section: @section1b).update_attributes(workflow_state: 'deleted')
+      assignment = @course1.assignments.first
+      assignment.grade_student(@student_a, grade: "1", grader: @teacher)
+      expect(@ta.assignments_needing_grading(scope_only: true)).not_to include assignment
+    end
+
     it "should limit the number of returned assignments" do
       assignment_ids = create_records(Assignment, Array.new(20) do |x|
         {

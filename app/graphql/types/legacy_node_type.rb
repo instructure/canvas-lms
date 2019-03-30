@@ -27,6 +27,7 @@ Types::LegacyNodeType = GraphQL::EnumType.define do
   value "User"
   value "Enrollment"
   value "GradingPeriod"
+  value 'MediaObject'
   value "Module"
   value "ModuleItem"
   value "Page"

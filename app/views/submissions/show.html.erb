@@ -59,9 +59,9 @@
 <% end %>
   <div class="submission-details-header submission_details">
     <div class="submission-details-header__heading-and-grades">
-      <h2 class="submission-details-header__heading submission_header">
+      <h1 class="submission-details-header__heading submission_header">
         <%= @assessment_request ? t('peer_review', "Peer Review") : t('submission_details', "Submission Details") %>
-      </h2>
+      </h1>
       <div class="submission-details-header__grade-summary">
         <% if @assignment.muted? %>
           <p style="width: 200px"><%= t(:student_mute_notification, "Grades are unavailable because the instructor is working on them.") %></p>
@@ -69,7 +69,7 @@
         <table class="grade-values">
           <tbody>
             <tr>
-              <th><%= I18n.t('Grade:') %></td>
+              <th><%= I18n.t('Grade:') %></th>
               <td class="bold">
                 <% if can_do(@assignment, @current_user, :grade) %>
                   <%= render :partial => "gradebooks/grading_box", :object => @assignment, :locals => {:submission => @submission} %>
@@ -93,11 +93,11 @@
                 grade_breakdown_style = hidden unless points_deducted && !@submission.excused?
             %>
               <tr class="error late-penalty-display" style="<%= grade_breakdown_style %>">
-                <th><%= I18n.t('Late penalty:') %></td>
+                <th><%= I18n.t('Late penalty:') %></th>
                 <td class="late_penalty bold"><%= points_deducted %></td>
               </tr>
               <tr class="late-penalty-display" style="<%= grade_breakdown_style %>">
-                <th><%= I18n.t('Final grade:') %></td>
+                <th><%= I18n.t('Final grade:') %></th>
                 <td class="bold">
                   <% if can_do(@assignment, @current_user, :grade) %>
                     <span class="published_grade"><%= i18n_grade(round_if_whole(@submission.grade), @submission.grading_type) %></span>
@@ -153,7 +153,7 @@
     </div>
     <div class="ic-Action-header">
       <div class="ic-Action-header__Primary">
-        <h3 class="submission-details-header__heading"><%= @assignment.title %></h3>
+        <h2 class="submission-details-header__heading h3"><%= @assignment.title %></h2>
         <div class="submission-details-header__info">
           <span class="submission-details-header__time <%='late' if @submission.late? %> <%= 'hidden' unless @submission.submitted_at %>">
             <%= submission_author_name_for @assessment_request %> <%= t('submitted_at', 'submitted %{submit_date}', :submit_date => datetime_string(@submission.submitted_at)) %>
@@ -179,7 +179,7 @@
       </div>
       <div class="ic-Action-header__Secondary ic-Action-header__Secondary--auto">
         <% if can_do(@context, @current_user, :grade) %>
-          <a class="Button" href="<%= context_url(@context, :speed_grader_context_gradebook_url, :assignment_id => @assignment.id) + "#" + CGI::escape({:student_id => @submission.user_id }.to_json) %>">
+          <a class="Button" href="<%= context_url(@context, :speed_grader_context_gradebook_url, assignment_id: @assignment.id, student_id: @submission.user_id) %>">
             <i class="icon-speed-grader" aria-hidden="true"></i>
             <%= t('speedgrader', 'SpeedGrader™') %>
           </a>

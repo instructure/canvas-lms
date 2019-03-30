@@ -37,7 +37,7 @@ function createConsoleErrorReportLink() {
   })
 }
 
-function createContextLink() {
+function setHeadersLink() {
   return new ApolloLink((operation, forward) => {
     operation.setContext({
       headers: {
@@ -57,10 +57,6 @@ function createHttpLink() {
   })
 }
 
-function createHttpOnlyLink() {
-  return ApolloLink.from([createConsoleErrorReportLink(), createContextLink(), createHttpLink()])
-}
-
 function createClient(opts = {}) {
   const cache = new InMemoryCache({
     addTypename: true,
@@ -78,17 +74,17 @@ function createClient(opts = {}) {
     defaults
   })
 
+  const links =
+    createClient.mockLink == null
+      ? [createConsoleErrorReportLink(), setHeadersLink(), stateLink, createHttpLink()]
+      : [createConsoleErrorReportLink(), stateLink, createClient.mockLink]
+
   const client = new ApolloClient({
-    link: ApolloLink.from([
-      createConsoleErrorReportLink(),
-      createContextLink(),
-      stateLink,
-      createHttpLink()
-    ]),
+    link: ApolloLink.from(links),
     cache
   })
 
   return client
 }
 
-export {createClient, createHttpOnlyLink, gql, ApolloProvider, Query}
+export {createClient, gql, ApolloProvider, Query}

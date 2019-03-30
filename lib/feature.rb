@@ -151,7 +151,6 @@ END
       applies_to: 'Course',
       state: 'allowed',
       root_opt_in: true,
-      beta: true
     },
     'high_contrast' =>
     {
@@ -174,7 +173,6 @@ Rich Content Editor, which always underlines links for all users.
 END
       applies_to: 'User',
       state: 'allowed',
-      beta: true
     },
     'new_user_tutorial_on_off' =>
     {
@@ -229,7 +227,6 @@ END
       applies_to: 'Course',
       state: 'hidden',
       root_opt_in: true,
-      beta: true
     },
     'anonymous_instructor_annotations' =>
     {
@@ -248,15 +245,17 @@ END
       applies_to: 'Course',
       state: 'allowed',
       root_opt_in: true,
-      beta: true,
       custom_transition_proc: ->(user, context, _from_state, transitions) do
         if context.is_a?(Course)
-          if !context.grants_right?(user, :change_course_state)
-            transitions['on']['locked'] = true if transitions&.dig('on')
-            transitions['off']['locked'] = true if transitions&.dig('off')
-          else
+          is_admin = context.account_membership_allows(user)
+          is_teacher = user.teacher_enrollments.active.where(course_id: context.id).exists?
+
+          if is_admin || is_teacher
             should_lock = context.gradebook_backwards_incompatible_features_enabled?
             transitions['off']['locked'] = should_lock if transitions&.dig('off')
+          else
+            transitions['on']['locked'] = true if transitions&.dig('on')
+            transitions['off']['locked'] = true if transitions&.dig('off')
           end
         elsif context.is_a?(Account)
           backwards_incompatible_feature_flags =
@@ -358,7 +357,6 @@ END
       applies_to: 'Course',
       state: 'hidden',
       root_opt_in: true,
-      beta: true
     },
     'duplicate_modules' =>
     {
@@ -395,7 +393,6 @@ Show a searchable list of courses in this root account with the "Include this co
 END
       applies_to: 'RootAccount',
       state: 'allowed',
-      beta: true,
       root_opt_in: true
     },
     'gradebook_list_students_by_sortable_name' =>
@@ -410,7 +407,7 @@ END
     'usage_rights_required' =>
     {
       display_name: -> { I18n.t('Require Usage Rights for Uploaded Files') },
-      description: -> { I18n.t('If enabled, content designers must provide copyright and license information for files before they are published. Only applies if Better File Browsing is also enabled.') },
+      description: -> { I18n.t('If enabled, copyright and license information must be provided for files before they are published.') },
       applies_to: 'Course',
       state: 'hidden',
       root_opt_in: true
@@ -481,7 +478,6 @@ END
       description: -> { I18n.t('Allow the ability to send notifications through our dispatch queue') },
       applies_to: 'RootAccount',
       state: 'hidden',
-      beta: true,
       development: false,
       root_opt_in: false
     },
@@ -491,7 +487,6 @@ END
       description: -> { I18n.t('Uses the new scheduler and its functionality') },
       applies_to: 'RootAccount',
       state: 'hidden',
-      beta: true,
       development: false,
       root_opt_in: false
     },
@@ -502,7 +497,6 @@ END
       applies_to: 'Course',
       state: 'allowed',
       root_opt_in: true,
-      beta: true
     },
     'responsive_layout' =>
     {
@@ -587,7 +581,6 @@ END
       description: -> { I18n.t('Configure individual learning paths for students based on assessment results.') },
       applies_to: 'Course',
       state: 'allowed',
-      beta: true,
       development: false,
       root_opt_in: true,
       after_state_change_proc:  ->(user, context, _old_state, new_state) {
@@ -700,8 +693,8 @@ END
       display_name: -> { I18n.t('LTI 1.3 and LTI Advantage')},
       description: -> { I18n.t('If enabled, access to LTI 1.3 and LTI Advantage will be enabled.') },
       applies_to: 'RootAccount',
-      development: true,
-      state: 'allowed'
+      beta: true,
+      state: 'hidden'
     },
     'assignments_2' => {
       display_name: -> { I18n.t('Assignments 2') },

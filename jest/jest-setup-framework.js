@@ -18,3 +18,8 @@
 
 import 'jest-dom/extend-expect'
 import 'react-testing-library/cleanup-after-each'
+
+// Because the RCE tries to pull in coffeescript files through jquery. Once it
+// doesn't, we could remove this, though it might make sense to leave it if
+// rendering the actual rce is slow.
+jest.mock('jsx/shared/rce/RichContentEditor')

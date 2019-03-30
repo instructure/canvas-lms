@@ -21,3 +21,5 @@ echo '========== Merging all coverage reports =========='
 ./node_modules/.bin/istanbul-merge --out .nyc_output/total-coverage.json "{coverage-karma,coverage-jest,packages/*/coverage}/**/coverage*.json"
 echo '============= Generating HTML Report ============='
 ./node_modules/.bin/nyc report --reporter=html --report-dir coverage-js
+echo '============= Generating JSON Summary ============='
+./node_modules/.bin/nyc report --reporter=json-summary --report-dir coverage-js

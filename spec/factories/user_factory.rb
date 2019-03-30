@@ -165,4 +165,8 @@ module Factories
 
     user_data
   end
+
+  def add_linked_observer(student, observer, root_account: nil)
+    UserObservationLink.create_or_restore(student: student, observer: observer, root_account: root_account || Account.default)
+  end
 end

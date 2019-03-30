@@ -55,13 +55,9 @@ describe Messages::AssignmentSubmittedLate::TwitterPresenter do
         end
 
         it "#link is a url to SpeedGrader" do
-          expect(presenter.link).to start_with(
-            message.speed_grader_course_gradebook_url(course, assignment_id: assignment.id)
+          expect(presenter.link).to eq(
+            message.speed_grader_course_gradebook_url(course, assignment_id: assignment.id, anonymous_id: submission.anonymous_id)
           )
-        end
-
-        it "#link includes the anonymous id for the student" do
-          expect(presenter.link).to end_with("\#{\"anonymous_id\":\"#{submission.anonymous_id}\"}")
         end
       end
 

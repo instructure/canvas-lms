@@ -42,7 +42,6 @@ export default function ToDoItem(data, contextInfo, actualContextInfo) {
 }
 
 Object.assign(ToDoItem.prototype, {
-  /* eslint-disable no-param-reassign */
   copyDataFromObject(data) {
     // on original load, data comes from the planner items API
     // but after editing an item, we get the wiki pages / discussion topics API update result
@@ -56,8 +55,8 @@ Object.assign(ToDoItem.prototype, {
     data.title = data.plannable.title
     data.url = data.html_url
 
-    this.object = this.calendarEvent = data // eslint-disable-line no-multi-assign
-    this.object.id = this.id = `${data.plannable_type}_${data.plannable_id}` // eslint-disable-line no-multi-assign
+    this.object = this.calendarEvent = data
+    this.object.id = this.id = `${data.plannable_type}_${data.plannable_id}`
     this.title = data.title || 'Untitled'
     this.start = this.parseStartDate()
     this.end = undefined

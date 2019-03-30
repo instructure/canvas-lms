@@ -6,6 +6,59 @@ The Change Log Archive page displays previous API changes in the [API Change Log
 The release date indicates the date that the API code was made available in the production environment.
 
 <div class="changelog"></div>
+## 2019-01-05
+
+### Changes
+| API Calls            | Function             |                          |
+|----------------------|----------------------|--------------------------|
+| [Developer Keys API] |                      | Verified and corrected all links in document               |
+| [Files API]          | Delete File Endpoint | Clarified endpoint usage and added permanent deletion warning |
+
+  [Developer Keys API]: file.developer_keys.html
+  [Files API]: files.html
+
+### Additions
+| API Calls  | Function  |           |
+|------------|-----------|-----------|
+| [Assignments API]   | Create an Assignment Endpoint<br><br>Edit an Assignment Endpoint  | Added assignment\[allowed\_attempts\] parameter |
+| [Conversations API] | Create a Conversations Endpoint | Added force\_new parameter |
+| [Courses API]       | Get a Single Course Endpoint    | Added teacher\_limit parameter                                               |
+| [Roles API]         | Create a New Role Endpoint      | Permissions\_enabled parameter: Added view\_audit\_trail in permissions list |
+
+  [Assignments API]: assignments.html
+  [Conversations API]: conversations.html
+  [Courses API]: courses.html
+  [Roles API]: roles.html
+
+<p></p>
+| API Responses     | Function   |   |
+|-------------------|------------|---|
+| [Assignments API] | Assignment Object  | Added allowed\_attempts parameter |
+| [Enrollments API] | Enrollment Object  | Added override\_grade, override\_score, current\_period\_override\_grade, and current\_period\_override\_score parameters<br><br>Added override score clarifications in computed\_current\_score, computed\_final\_score, computed\_final\_grade, current\_period\_computed\_current\_score, current\_period\_computed\_final\_score, current\_period\_computed\_current\_grade, and current\_period\_computed\_final\_grade parameters |
+| [SIS Imports API] | SIS Import Statistic Object <br><br>SIS Import Statistic Objects | Added object examples |
+| [SIS Imports API] | SIS Import Object  | Workflow\_state parameter: Added initializing and failed descriptions <br><br>Added statistics parameter                           |
+| [Submissions API] | Submission Object  | Added extra\_attempts parameter  |
+
+  [Assignments API]: assignments.html
+  [Enrollments API]: enrollments.html
+  [SIS Imports API]: sis_imports.html
+  [Submissions API]: submissions.html
+
+
+### Removals
+| API Calls     | Function  |   |
+|---------------|-----------|---|
+| [Courses API] | List Users in Course Endpoint | Include parameter: Removed email as an optional parameter |
+
+  [Courses API]: courses.html
+
+<p></p>
+| Content       | Function |   |
+|---------------|----------|---|
+| [Navigation Tools] |     | Removed incorrect auto-generated links from page |
+
+  [Navigation Tools]: file.navigation_tools.html
+
 ## 2018-12-08
 
 ### Changes

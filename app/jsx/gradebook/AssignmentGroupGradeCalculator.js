@@ -35,7 +35,7 @@ function sortPairsDescending([scoreA, submissionA], [scoreB, submissionB]) {
     return scoreDiff
   }
   // To ensure stable sorting, use the assignment id as a secondary sort.
-  return submissionA.assignment_id - submissionB.assignment_id
+  return submissionA.submission.assignment_id - submissionB.submission.assignment_id
 }
 
 function sortPairsAscending([scoreA, submissionA], [scoreB, submissionB]) {
@@ -44,7 +44,7 @@ function sortPairsAscending([scoreA, submissionA], [scoreB, submissionB]) {
     return scoreDiff
   }
   // To ensure stable sorting, use the assignment id as a secondary sort.
-  return submissionA.assignment_id - submissionB.assignment_id
+  return submissionA.submission.assignment_id - submissionB.submission.assignment_id
 }
 
 function sortSubmissionsAscending(submissionA, submissionB) {
@@ -53,7 +53,7 @@ function sortSubmissionsAscending(submissionA, submissionB) {
     return scoreDiff
   }
   // To ensure stable sorting, use the assignment id as a secondary sort.
-  return submissionA.assignment_id - submissionB.assignment_id
+  return submissionA.submission.assignment_id - submissionB.submission.assignment_id
 }
 
 function getSubmissionGrade({score, total}) {
@@ -193,7 +193,7 @@ function dropAssignments(allSubmissionData, rules = {}) {
   submissionsToKeep = [...submissionsToKeep, ...cannotDrop]
 
   _.difference(droppableSubmissionData, submissionsToKeep).forEach(submission => {
-    submission.drop = true // eslint-disable-line no-param-reassign
+    submission.drop = true
   })
 
   return submissionsToKeep
@@ -215,20 +215,6 @@ function calculateGroupGrade(group, allSubmissions, includeUngraded) {
 
   // Remove submissions from other assignment groups.
   let submissions = _.filter(allSubmissions, submission => assignments[submission.assignment_id])
-
-  // To calculate grades for assignments to which the student has not yet
-  // submitted, create a submission stub with a score of `null`.
-  if (includeUngraded) {
-    const submissionAssignmentIds = _.map(submissions, ({assignment_id}) =>
-      assignment_id.toString()
-    )
-    const missingAssignmentIds = _.difference(_.keys(assignments), submissionAssignmentIds)
-    const submissionStubs = _.map(missingAssignmentIds, assignmentId => ({
-      assignment_id: assignmentId,
-      score: null
-    }))
-    submissions = [...submissions, ...submissionStubs]
-  }
 
   // Remove excused submissions.
   submissions = _.reject(submissions, 'excused')

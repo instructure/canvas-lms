@@ -41,7 +41,7 @@ it('renders normally', () => {
     <Header scrollThreshold={150} assignment={mockAssignment()} />,
     document.getElementById('fixtures')
   )
-  const element = $('[data-test-id="assignments-2-student-header"]')
+  const element = $('[data-testid="assignments-2-student-header"]')
   expect(element).toHaveLength(1)
 })
 

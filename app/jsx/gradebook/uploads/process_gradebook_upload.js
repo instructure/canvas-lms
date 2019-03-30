@@ -51,7 +51,7 @@ const ProcessGradebookUpload = {
     const customColumnData = gradebook.students.reduce((accumulator, student) => {
       const student_id = Number.parseInt(student.id, 10)
       if (!(student_id in accumulator)) {
-        accumulator[student_id] = student.custom_column_data // eslint-disable-line no-param-reassign
+        accumulator[student_id] = student.custom_column_data
       }
       return accumulator
     }, {})
@@ -176,13 +176,12 @@ const ProcessGradebookUpload = {
     if (assignmentId <= 0) return // unrecognized and ignored assignments
     if (submission.original_grade === submission.grade) return // no change
 
-    gradeData[assignmentId] = gradeData[assignmentId] || {} // eslint-disable-line no-param-reassign
+    gradeData[assignmentId] = gradeData[assignmentId] || {}
 
     if (String(submission.grade || '').toUpperCase() === 'EX') {
-      gradeData[assignmentId][studentId] = {excuse: true} // eslint-disable-line no-param-reassign
+      gradeData[assignmentId][studentId] = {excuse: true}
     } else {
       gradeData[assignmentId][studentId] = {
-        // eslint-disable-line no-param-reassign
         posted_grade: submission.grade
       }
     }

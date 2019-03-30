@@ -67,6 +67,16 @@ function fakeContentItem(text) {
   }
 }
 
+function fakeRCEReplaceContentItem(text) {
+  return {
+    placementAdvice: {
+      presentationDocumentTarget: 'embed'
+    },
+    '@type': 'lti_replace',
+    text
+  }
+}
+
 function getInstance(_container, overrides) {
   return new Promise(resolve => {
     const props = {
@@ -298,6 +308,23 @@ describe('handleExternalContentReady', () => {
     expect(win.$).toHaveBeenCalledWith('#editor-id')
     expect(send).toHaveBeenCalledWith(jqObj, 'insert_code', 'foo')
     expect(send).toHaveBeenCalledWith(jqObj, 'insert_code', 'bar')
+  })
+
+  it('replaces content items in the editor', async () => {
+    const win = fakeWindow()
+    const jqObj = {
+      unbind: noop
+    }
+    win.$.mockReturnValue(jqObj)
+    const instance = await getInstance(container, {
+      win
+    })
+    const data = {
+      contentItems: [fakeRCEReplaceContentItem('foo')]
+    }
+    instance.handleExternalContentReady({}, data)
+    expect(win.$).toHaveBeenCalledWith('#editor-id')
+    expect(send).toHaveBeenCalledWith(jqObj, 'set_code', 'foo')
   })
 
   it('removes beforeunload handler', async () => {

@@ -36,6 +36,7 @@ class DueDateCalendarPicker extends React.Component {
     inputClasses: string.isRequired,
     disabled: bool.isRequired,
     isFancyMidnight: bool.isRequired,
+    defaultToEndOfMinute: bool,
     dateValue: oneOfType([instanceOf(Date), string]).isRequired,
     labelText: string.isRequired,
     labelClasses: string,
@@ -45,6 +46,7 @@ class DueDateCalendarPicker extends React.Component {
 
   static defaultProps = {
     readonly: false,
+    defaultToEndOfMinute: false,
     labelClasses: ''
   }
 
@@ -69,6 +71,7 @@ class DueDateCalendarPicker extends React.Component {
         let newDate = $(dateInput).data('unfudged-date')
         newDate = trimmedInput === '' ? null : newDate
         newDate = this.changeToFancyMidnightIfNeeded(newDate)
+        newDate = this.setToEndOfMinuteIfNeeded(newDate)
 
         this.props.handleUpdate(newDate)
       })
@@ -83,6 +86,14 @@ class DueDateCalendarPicker extends React.Component {
   changeToFancyMidnightIfNeeded = date => {
     if (this.props.isFancyMidnight && tz.isMidnight(date)) {
       return tz.changeToTheSecondBeforeMidnight(date)
+    }
+
+    return date
+  }
+
+  setToEndOfMinuteIfNeeded = date => {
+    if (this.props.defaultToEndOfMinute && tz.format(date, '%S') === '00') {
+      return tz.setToEndOfMinute(date)
     }
 
     return date

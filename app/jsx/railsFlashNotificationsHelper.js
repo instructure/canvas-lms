@@ -27,6 +27,9 @@ function updateAriaLive({polite} = {polite: false}) {
   if (this.screenreaderHolderReady()) {
     const value = polite ? 'polite' : 'assertive'
     $(this.screenreader_holder).attr('aria-live', value)
+    // instui FocusRegionManager throws aria-hidden on everything outside a Dialog when opened
+    // removing it here sees that it's done whenever screenreader alerts are displayed
+    $(this.screenreader_holder).removeAttr('aria-hidden')
   }
 }
 

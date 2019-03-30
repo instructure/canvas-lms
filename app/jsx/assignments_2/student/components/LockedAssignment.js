@@ -22,7 +22,7 @@ import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import Text from '@instructure/ui-elements/lib/components/Text'
 
 import AvailabilityDates from '../../shared/AvailabilityDates'
-import lockedSVG from '../../../../../public/images/assignments_2/Locked.svg'
+import lockedSVG from '../SVG/Locked.svg'
 import {StudentAssignmentShape} from '../assignmentData'
 
 function LockedAssignment(props) {

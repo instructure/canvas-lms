@@ -23,7 +23,7 @@ import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import {array, func, string, shape, oneOf} from 'prop-types'
 import I18n from 'i18n!account_course_user_search'
 import View from '@instructure/ui-layout/lib/components/View'
-import EmptyDesert from './EmptyDesert'
+import EmptyDesert from '../../shared/EmptyDesert'
 
 const linkPropType = shape({
   url: string.isRequired,

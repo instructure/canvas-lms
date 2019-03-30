@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {render, fireEvent} from 'react-testing-library'
+import '../../test-utils'
 
 import ConfirmDialog from '../ConfirmDialog'
 
@@ -25,10 +26,10 @@ function renderConfirmDialog(overrideProps = {}) {
   const props = {
     open: true,
     working: false,
+    disabled: false,
     heading: 'the thing',
-    message: 'do you want to do the thing?',
-    confirmLabel: 'do the thing',
-    cancelLabel: 'refrain from doing the thing',
+    body: () => 'do you want to do the thing?',
+    buttons: () => [{children: 'a button', 'data-testid': 'the-button'}],
     closeLabel: 'close the dialog',
     spinnerLabel: 'doing the thing',
     ...overrideProps
@@ -36,31 +37,46 @@ function renderConfirmDialog(overrideProps = {}) {
   return render(<ConfirmDialog {...props} />)
 }
 
+it('renders the body', () => {
+  const {getByText} = renderConfirmDialog()
+  expect(getByText('do you want to do the thing?')).toBeInTheDocument()
+})
+
 it('triggers close', () => {
-  const onClose = jest.fn()
-  const {getByTestId} = renderConfirmDialog({onClose})
-  fireEvent.click(getByTestId('confirm-dialog-close-button'))
-  expect(onClose).toHaveBeenCalled()
+  const onDismiss = jest.fn()
+  const {getByText} = renderConfirmDialog({onDismiss})
+  fireEvent.click(getByText('close the dialog'))
+  expect(onDismiss).toHaveBeenCalled()
 })
 
-it('triggers cancel', () => {
-  const onCancel = jest.fn()
-  const {getByTestId} = renderConfirmDialog({onCancel})
-  fireEvent.click(getByTestId('confirm-dialog-cancel-button'))
-  expect(onCancel).toHaveBeenCalled()
+it('creates buttons and passes through button properties', () => {
+  const clicked = jest.fn()
+  const {getByTestId} = renderConfirmDialog({
+    buttons: () => [
+      {children: 'click me', onClick: clicked, 'data-testid': 'test-button'},
+      {children: 'other button', disabled: true, 'data-testid': 'disabled-button'}
+    ]
+  })
+  fireEvent.click(getByTestId('test-button'))
+  expect(clicked).toHaveBeenCalled()
+  expect(getByTestId('disabled-button').getAttribute('disabled')).toBe('')
 })
 
-it('triggers confirm', () => {
-  const onConfirm = jest.fn()
-  const {getByTestId} = renderConfirmDialog({onConfirm})
-  fireEvent.click(getByTestId('confirm-dialog-confirm-button'))
-  expect(onConfirm).toHaveBeenCalled()
-})
-
-it('shows the spinner and disabled buttons when working', () => {
+it('shows the spinner with enabled buttons when working', () => {
   const {getByText, getByTestId} = renderConfirmDialog({working: true})
   expect(getByText('doing the thing')).toBeInTheDocument()
+  expect(getByTestId('confirm-dialog-close-button').getAttribute('disabled')).toBe(null)
+  expect(getByTestId('the-button').getAttribute('disabled')).toBe(null)
+})
+
+it('shows custom mask body', () => {
+  const {getByText} = renderConfirmDialog({busyMaskBody: () => 'I am busy', working: true})
+  expect(getByText('I am busy')).toBeInTheDocument()
+})
+
+it('shows disabled buttons when disabled', () => {
+  const {getByText, getByTestId} = renderConfirmDialog({disabled: true})
+  expect(() => getByText('doing the thing')).toThrow()
   expect(getByTestId('confirm-dialog-close-button').getAttribute('disabled')).toBe('')
-  expect(getByTestId('confirm-dialog-cancel-button').getAttribute('disabled')).toBe('')
-  expect(getByTestId('confirm-dialog-confirm-button').getAttribute('disabled')).toBe('')
+  expect(getByTestId('the-button').getAttribute('disabled')).toBe('')
 })

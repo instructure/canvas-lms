@@ -18,7 +18,6 @@
 
 # @API Moderated Grading
 # @subtopic Anonymous Provisional Grades
-# @beta
 #
 class AnonymousProvisionalGradesController < ProvisionalGradesBaseController
   # @API Show provisional grade status for a student

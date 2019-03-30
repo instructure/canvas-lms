@@ -209,10 +209,11 @@ class NotificationMessageCreator
       policies += unretired_policies_for(user).for(@notification).by(['daily', 'weekly']).where("communication_channels.path_type='email'")
     elsif channel &&
           channel.active? &&
-          channel.path_type == 'email' &&
-        ['daily', 'weekly'].include?(@notification.default_frequency)
-      policies << channel.notification_policies.create!(:notification => @notification,
-                                            :frequency => @notification.default_frequency)
+          channel.path_type == 'email'
+      frequency = @notification.default_frequency(user)
+      if ['daily', 'weekly'].include?(frequency)
+        policies << channel.notification_policies.create!(:notification => @notification, :frequency => frequency)
+      end
     end
     policies
   end
@@ -284,7 +285,7 @@ class NotificationMessageCreator
     immediate_channel_scope = user.communication_channels.active.for_notification_frequency(@notification, 'immediately')
 
     user_has_a_policy = active_channel_scope.where.not(path_type: 'push').exists?
-    if !user_has_a_policy && @notification.default_frequency == 'immediately'
+    if !user_has_a_policy && @notification.default_frequency(user) == 'immediately'
       return [user.email_channel, *immediate_channel_scope.where(path_type: 'push')].compact
     end
     immediate_channel_scope

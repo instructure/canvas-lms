@@ -32,48 +32,48 @@ function roundedNumber(val) {
   return I18n.n(round(val, round.DEFAULT))
 }
 
-$(document).ready(function() {
-  $('.add_standard_link').click(function(event) {
+$(document).ready(() => {
+  $('.add_standard_link').click(event => {
     event.preventDefault()
-    var $standard = $('#grading_standard_blank')
+    const $standard = $('#grading_standard_blank')
       .clone(true)
       .attr('id', 'grading_standard_new')
     $('#standards').append($standard.show())
     $standard.find('.edit_grading_standard_link').click()
   })
-  $('.edit_letter_grades_link').click(function(event) {
+  $('.edit_letter_grades_link').click(event => {
     event.preventDefault()
     $('#edit_letter_grades_form').dialog({
       title: I18n.t('titles.grading_scheme_info', 'View/Edit Grading Scheme'),
       width: 600,
       dialogClass: 'form-inline grading-standard-dialog',
       resizable: false,
-      open: function() {
+      open() {
         $('.grading-standard-dialog')
           .find('.ui-dialog-titlebar-close')[0]
           .focus()
       },
-      close: function() {
+      close() {
         $(event.target).focus()
       }
     })
   })
   $('.grading_standard .delete_grading_standard_link').click(function(event) {
     event.preventDefault()
-    var $standard = $(this).parents('.grading_standard')
-    var url = $standard.find('.update_grading_standard_url').attr('href')
+    const $standard = $(this).parents('.grading_standard')
+    const url = $standard.find('.update_grading_standard_url').attr('href')
     $standard.confirmDelete({
-      url: url,
+      url,
       message: I18n.t(
         'confirm.delete_grading_scheme',
         'Are you sure you want to delete this grading scheme?'
       ),
-      success: function(data) {
+      success(data) {
         $(this).slideUp(function() {
           $(this).remove()
         })
       },
-      error: function() {
+      error() {
         $.flashError(
           I18n.t(
             'errors.cannot_delete_grading_scheme',
@@ -83,13 +83,13 @@ $(document).ready(function() {
       }
     })
   })
-  $('.grading_standard .done_button').click(function(event) {
+  $('.grading_standard .done_button').click(event => {
     event.preventDefault()
     $('#edit_letter_grades_form').dialog('close')
   })
   $('.grading_standard .remove_grading_standard_link').click(function(event) {
     event.preventDefault()
-    var result = confirm(
+    const result = confirm(
       I18n.t(
         'confirm.unlink_grading_scheme',
         'Are you sure you want to unlink this grading scheme?'
@@ -98,13 +98,13 @@ $(document).ready(function() {
     if (!result) {
       return false
     }
-    var $standard = $(this).parents('.grading_standard')
+    const $standard = $(this).parents('.grading_standard')
     $standard.dim()
-    var put_data = {
+    let put_data = {
       'assignment[grading_standard_id]': '',
       'assignment[grading_type]': 'points'
     }
-    var url = $('#edit_assignment_form').attr('action')
+    let url = $('#edit_assignment_form').attr('action')
     if ($('#update_course_url').length) {
       put_data = {
         'course[grading_standard_id]': ''
@@ -126,8 +126,8 @@ $(document).ready(function() {
       $standard
         .find('.update_grading_standard_url')
         .attr('href', $('#update_grading_standard_url').attr('href'))
-      var data = $.parseJSON($('#default_grading_standard_data').val())
-      var standard = {title: '', id: null, data: data}
+      const data = $.parseJSON($('#default_grading_standard_data').val())
+      const standard = {title: '', id: null, data}
       $standard
         .fillTemplateData({
           data: standard,
@@ -142,7 +142,7 @@ $(document).ready(function() {
       $standard.undim()
     }
     if (url) {
-      $.ajaxJSON(url, 'PUT', put_data, removed, function() {
+      $.ajaxJSON(url, 'PUT', put_data, removed, () => {
         $.flashError(
           I18n.t(
             'errors.cannot_remove_grading_scheme',
@@ -156,14 +156,14 @@ $(document).ready(function() {
   })
   $('.grading_standard .edit_grading_standard_link').click(function(event) {
     event.preventDefault()
-    var $standard = $(this).parents('.grading_standard')
+    const $standard = $(this).parents('.grading_standard')
     $standard.addClass('editing')
     $standard.find('.max_score_cell').attr('tabindex', '0')
     if ($(this).hasClass('read_only')) {
       $standard.attr('id', 'grading_standard_blank')
     }
     $standard.find('.grading_standard_row').each(function() {
-      var data = $(this).getTemplateData({textValues: ['min_score', 'name']})
+      const data = $(this).getTemplateData({textValues: ['min_score', 'name']})
       $(this)
         .find('.standard_value')
         .val(data.min_score)
@@ -171,7 +171,7 @@ $(document).ready(function() {
         .find('.standard_name')
         .val(data.name)
     })
-    $('#standards').ifExists(function() {
+    $('#standards').ifExists(() => {
       $('html,body').scrollTo($standard)
     })
     $standard
@@ -184,19 +184,19 @@ $(document).ready(function() {
     .find('.collapse_data_link,.expand_data_link')
     .click(function(event) {
       event.preventDefault()
-      var $brief = $(this).parents('.grading_standard_brief')
+      const $brief = $(this).parents('.grading_standard_brief')
       $brief.find('.collapse_data_link,.expand_data_link').toggle()
       $brief.find('.details').slideToggle()
     })
   $('.grading_standard_select').live('click', function(event) {
     event.preventDefault()
-    var id = $(this).getTemplateData({textValues: ['id']}).id
+    const id = $(this).getTemplateData({textValues: ['id']}).id
     $('.grading_standard .grading_standards_select .grading_standard_select').removeClass(
       'selected_side_tab'
     )
     $(this).addClass('selected_side_tab')
     $('.grading_standard .grading_standards .grading_standard_brief').hide()
-    $('#grading_standard_brief_' + id).show()
+    $(`#grading_standard_brief_${id}`).show()
   })
   $('.grading_standard')
     .find('.find_grading_standard_link,.cancel_find_grading_standard_link')
@@ -206,29 +206,29 @@ $(document).ready(function() {
         .parents('.grading_standard')
         .find('.display_grading_standard,.find_grading_standard')
         .toggle()
-      var $find = $(this)
+      const $find = $(this)
         .parents('.grading_standard')
         .find('.find_grading_standard:visible')
       if ($find.length > 0 && !$find.hasClass('loaded')) {
         $find
           .find('.loading_message')
           .text(I18n.t('status.loading_grading_standards', 'Loading Grading Standards...'))
-        var url = $find.find('.grading_standards_url').attr('href')
+        const url = $find.find('.grading_standards_url').attr('href')
         $.ajaxJSON(
           url,
           'GET',
           {},
-          function(data) {
+          data => {
             if (data.length === 0) {
               $find
                 .find('.loading_message')
                 .text(I18n.t('no_grading_standards', 'No grading schemes found'))
             } else {
               $find.find('.loading_message').remove()
-              for (var idx in data) {
-                var standard = data[idx].grading_standard
+              for (const idx in data) {
+                const standard = data[idx].grading_standard
                 standard.user_name = standard.display_name
-                var $standard_select = $find
+                const $standard_select = $find
                   .find('.grading_standards_select .grading_standard_select.blank:first')
                   .clone(true)
                 $standard_select
@@ -238,24 +238,24 @@ $(document).ready(function() {
                   .data('context_code', standard.context_code)
                   .removeClass('blank')
                 $find.find('.grading_standards_select').append($standard_select.show())
-                var $standard = $find.find('.grading_standard_brief.blank:first').clone(true)
+                const $standard = $find.find('.grading_standard_brief.blank:first').clone(true)
                 $standard
                   .fillTemplateData({
                     data: standard,
-                    id: 'grading_standard_brief_' + standard.id
+                    id: `grading_standard_brief_${standard.id}`
                   })
                   .data('context_code', standard.context_code)
                 $standard.removeClass('blank')
-                for (var jdx = 0; jdx < standard.data.length; jdx++) {
-                  var row = {
+                for (let jdx = 0; jdx < standard.data.length; jdx++) {
+                  const row = {
                     name: standard.data[jdx][0],
                     value:
                       jdx === 0
                         ? roundedNumber(100)
-                        : '< ' + roundedNumber(standard.data[jdx - 1][1] * 100),
+                        : `< ${roundedNumber(standard.data[jdx - 1][1] * 100)}`,
                     next_value: roundedNumber(standard.data[jdx][1] * 100)
                   }
-                  var $row = $standard.find('.details_row.blank:first').clone(true)
+                  const $row = $standard.find('.details_row.blank:first').clone(true)
                   $row.removeClass('blank')
                   $row.fillTemplateData({data: row})
                   $standard.find('.details > table').append($row.show())
@@ -269,7 +269,7 @@ $(document).ready(function() {
             $find.addClass('loaded')
             $find.find('.grading_standards_holder').slideDown()
           },
-          function(data) {
+          data => {
             $find
               .find('.loading_message')
               .text(
@@ -286,19 +286,22 @@ $(document).ready(function() {
     event
   ) {
     event.preventDefault()
-    var $brief = $(this).parents('.grading_standard_brief')
-    var brief = $brief.getTemplateData({textValues: ['id', 'title'], dataValues: ['context_code']})
-    var id = brief.id
-    var title = brief.title
-    var data = []
+    const $brief = $(this).parents('.grading_standard_brief')
+    const brief = $brief.getTemplateData({
+      textValues: ['id', 'title'],
+      dataValues: ['context_code']
+    })
+    const id = brief.id
+    const title = brief.title
+    const data = []
     $(this)
       .parents('.grading_standard_brief')
       .find('.details_row:not(.blank)')
       .each(function() {
-        var name = $(this)
+        const name = $(this)
           .find('.name')
           .text()
-        var val =
+        let val =
           numberHelper.parse(
             $(this)
               .find('.next_value')
@@ -312,11 +315,11 @@ $(document).ready(function() {
     $(this)
       .parents('.grading_standard')
       .triggerHandler('grading_standard_updated', {
-        id: id,
-        data: data,
-        title: title
+        id,
+        data,
+        title
       })
-    var current_context_code = $('#edit_letter_grades_form').data().context_code
+    const current_context_code = $('#edit_letter_grades_form').data().context_code
     $(this)
       .parents('.grading_standard')
       .find('.edit_grading_standard_link')
@@ -332,7 +335,7 @@ $(document).ready(function() {
       .removeClass('editing')
       .find('.insert_grading_standard')
       .hide()
-    var $standard = $(this).parents('.grading_standard')
+    const $standard = $(this).parents('.grading_standard')
     $standard.find('.max_score_cell').removeAttr('tabindex')
     $standard.find('.to_add').remove()
     $standard
@@ -344,7 +347,7 @@ $(document).ready(function() {
     }
   })
   $('.grading_standard').bind('grading_standard_updated', function(event, standard) {
-    var $standard = $(this)
+    const $standard = $(this)
     $standard.addClass('editing')
     $standard
       .find('.update_grading_standard_url')
@@ -352,33 +355,33 @@ $(document).ready(function() {
     $standard
       .fillTemplateData({
         data: standard,
-        id: 'grading_standard_' + (standard.id || 'blank'),
+        id: `grading_standard_${standard.id || 'blank'}`,
         avoid: '.find_grading_standard',
         hrefValues: ['id']
       })
       .fillFormData(standard, {object_name: 'grading_standard'})
-    var $link = $standard.find('.insert_grading_standard:first').clone(true)
-    var $row = $standard
+    const $link = $standard.find('.insert_grading_standard:first').clone(true)
+    const $row = $standard
       .find('.grading_standard_row:first')
       .clone(true)
       .removeClass('blank')
-    var $table = $standard.find('.grading_standard_data')
-    var $thead = $table.find('thead')
+    const $table = $standard.find('.grading_standard_data')
+    const $thead = $table.find('thead')
     $table.empty()
     $table.append($thead)
     $table.append($link.clone(true).show())
-    for (var idx in standard.data) {
-      var $row_instance = $row.clone(true)
-      var row = standard.data[idx]
+    for (const idx in standard.data) {
+      const $row_instance = $row.clone(true)
+      const row = standard.data[idx]
       $row_instance.removeClass('to_delete').removeClass('to_add')
       $row_instance
         .find('.standard_name')
         .val(row[0])
-        .attr('name', 'grading_standard[standard_data][scheme_' + idx + '][name]')
+        .attr('name', `grading_standard[standard_data][scheme_${idx}][name]`)
         .end()
         .find('.standard_value')
         .val(I18n.n(round(row[1] * 100, 2)))
-        .attr('name', 'grading_standard[standard_data][scheme_' + idx + '][value]')
+        .attr('name', `grading_standard[standard_data][scheme_${idx}][value]`)
       $table.append($row_instance.show())
       $table.append($link.clone(true).show())
     }
@@ -412,11 +415,11 @@ $(document).ready(function() {
     $standard.find('.insert_grading_standard').hide()
     if (standard.id) {
       $standard.find('.remove_grading_standard_link').removeClass('read_only')
-      var put_data = {
+      let put_data = {
         'assignment[grading_standard_id]': standard.id,
         'assignment[grading_type]': 'letter_grade'
       }
-      var url = $('#edit_assignment_form').attr('action')
+      let url = $('#edit_assignment_form').attr('action')
       $('input.grading_standard_id, ').val(standard.id)
       if ($('#update_course_url').length) {
         put_data = {
@@ -431,13 +434,13 @@ $(document).ready(function() {
           url,
           'PUT',
           put_data,
-          function(data) {
+          data => {
             $('#course_form .grading_scheme_set').text(
               (data && data.course && data.course.grading_standard_title) ||
                 I18n.t('grading_scheme_currently_set', 'Currently Set')
             )
           },
-          function() {}
+          () => {}
         )
       }
     } else {
@@ -445,11 +448,11 @@ $(document).ready(function() {
     }
   })
   $('.grading_standard .save_button').click(function(event) {
-    var $standard = $(this).parents('.grading_standard')
-    var url = $(
+    const $standard = $(this).parents('.grading_standard')
+    let url = $(
       '#edit_letter_grades_form .create_grading_standard_url,#create_grading_standard_url'
     ).attr('href')
-    var method = 'POST'
+    let method = 'POST'
     if (
       $standard.attr('id') != 'grading_standard_blank' &&
       $standard.attr('id') != 'grading_standard_new'
@@ -460,9 +463,9 @@ $(document).ready(function() {
         .attr('href')
       method = 'PUT'
     }
-    var data = $standard.find('.standard_title,.grading_standard_row:visible').getFormData()
-    Object.keys(data).forEach(function(key) {
-      var parsedValue
+    const data = $standard.find('.standard_title,.grading_standard_row:visible').getFormData()
+    Object.keys(data).forEach(key => {
+      let parsedValue
       if (/^grading_standard\[.*\]\[value\]$/.test(key)) {
         parsedValue = numberHelper.parse(data[key])
         if (!isNaN(parsedValue)) {
@@ -479,8 +482,8 @@ $(document).ready(function() {
       url,
       method,
       data,
-      function(data) {
-        var standard = data.grading_standard
+      data => {
+        const standard = data.grading_standard
         $standard
           .find('button')
           .attr('disabled', false)
@@ -488,7 +491,7 @@ $(document).ready(function() {
           .text(I18n.t('buttons.save', 'Save'))
         $standard.triggerHandler('grading_standard_updated', standard)
       },
-      function() {
+      () => {
         $standard
           .find('button')
           .attr('disabled', false)
@@ -526,9 +529,9 @@ $(document).ready(function() {
       .parents('.grading_standard')
       .find('.insert_grading_standard')
       .hide()
-    var y = event.pageY
-    var offset = $(this).offset()
-    var height = $(this).height()
+    const y = event.pageY
+    const offset = $(this).offset()
+    const height = $(this).height()
     if (y > offset.top + height / 2) {
       $(this)
         .next('.insert_grading_standard')
@@ -558,27 +561,27 @@ $(document).ready(function() {
     ) {
       return
     }
-    var $standard = $(this).parents('.grading_standard')
-    var $row = $standard
+    const $standard = $(this).parents('.grading_standard')
+    const $row = $standard
       .find('.grading_standard_row:first')
       .clone(true)
       .removeClass('blank')
-    var $link = $standard.find('.insert_grading_standard:first').clone(true)
-    var temp_id = null
+    const $link = $standard.find('.insert_grading_standard:first').clone(true)
+    let temp_id = null
     while (
       !temp_id ||
-      $(".standard_name[name='grading_standard[standard_data][scheme_" + temp_id + "][name]']")
-        .length > 0
+      $(`.standard_name[name='grading_standard[standard_data][scheme_${temp_id}][name]']`).length >
+        0
     ) {
       temp_id = Math.round(Math.random() * 10000)
     }
     $row
       .find('.standard_name')
       .val('-')
-      .attr('name', 'grading_standard[standard_data][scheme_' + temp_id + '][name]')
+      .attr('name', `grading_standard[standard_data][scheme_${temp_id}][name]`)
     $row
       .find('.standard_value')
-      .attr('name', 'grading_standard[standard_data][scheme_' + temp_id + '][value]')
+      .attr('name', `grading_standard[standard_data][scheme_${temp_id}][value]`)
     $(this)
       .parents('.insert_grading_standard')
       .after($row.show())
@@ -599,7 +602,7 @@ $(document).ready(function() {
     ) {
       return
     }
-    var $standard = $(this).parents('.grading_standard_row')
+    const $standard = $(this).parents('.grading_standard_row')
     if ($standard.prev('.insert_grading_standard').length > 0) {
       $standard.prev('.insert_grading_standard').remove()
     } else {
@@ -612,8 +615,8 @@ $(document).ready(function() {
     })
   })
   $(".grading_standard input[type='text']").bind('blur change', function() {
-    var $standard = $(this).parents('.grading_standard')
-    var val = numberHelper.parse(
+    const $standard = $(this).parents('.grading_standard')
+    let val = numberHelper.parse(
       $(this)
         .parents('.grading_standard_row')
         .find('.standard_value')
@@ -627,9 +630,9 @@ $(document).ready(function() {
     if (isNaN(val)) {
       val = null
     }
-    var lastVal = val || 100
-    var prevVal = val || 0
-    var $list = $standard.find('.grading_standard_row:not(.blank,.to_delete)')
+    let lastVal = val || 100
+    let prevVal = val || 0
+    const $list = $standard.find('.grading_standard_row:not(.blank,.to_delete)')
     for (
       var idx = $list.index($(this).parents('.grading_standard_row')) + 1;
       idx < $list.length;
@@ -664,7 +667,7 @@ $(document).ready(function() {
     }
     lastVal = 100
     $list.each(function(idx) {
-      var points = numberHelper.parse(
+      let points = numberHelper.parse(
         $(this)
           .find('.standard_value')
           .val()
@@ -699,8 +702,8 @@ $(document).ready(function() {
       $row.find('.standard_value').val(I18n.n(points))
     }
     $list.each(function(idx) {
-      var $prev = $list.eq(idx - 1)
-      var min_score = 0
+      const $prev = $list.eq(idx - 1)
+      let min_score = 0
       if ($prev && $prev.length > 0) {
         min_score = numberHelper.parse($prev.find('.standard_value').val())
         if (isNaN(min_score)) {
@@ -708,7 +711,7 @@ $(document).ready(function() {
         }
         $(this)
           .find('.edit_max_score')
-          .text('< ' + I18n.n(min_score))
+          .text(`< ${I18n.n(min_score)}`)
       }
     })
     $list
@@ -719,15 +722,12 @@ $(document).ready(function() {
       if (!$(this).data('label')) {
         $(this).data('label', $(this).attr('aria-label'))
       }
-      var label = $(this).data('label')
+      const label = $(this).data('label')
       $(this).attr(
         'aria-label',
-        label +
-          ' ' +
-          $(this)
-            .find('.edit_max_score')
-            .text() +
-          '%'
+        `${label} ${$(this)
+          .find('.edit_max_score')
+          .text()}%`
       )
     })
   })

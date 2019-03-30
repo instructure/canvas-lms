@@ -16,69 +16,87 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import ReactDOM from 'react-dom'
-import $ from 'jquery'
-import {mockAssignment} from '../../test-utils'
-
 import Comments from '../Comments'
+import CommentsContainer from '../Comments/CommentsContainer'
+import {mockAssignment, mockComments, singleComment} from '../../test-utils'
+import {MockedProvider} from 'react-apollo/test-utils'
+import {SUBMISSION_COMMENT_QUERY} from '../../assignmentData'
+import {render, waitForElement} from 'react-testing-library'
+
+const mocks = [
+  {
+    request: {
+      query: SUBMISSION_COMMENT_QUERY,
+      variables: {
+        submissionId: mockAssignment().submissionsConnection.nodes[0].id.toString()
+      }
+    },
+    result: {
+      data: {
+        submissionComments: mockComments()
+      }
+    }
+  }
+]
 
 describe('Comments', () => {
-  beforeAll(() => {
-    const found = document.getElementById('fixtures')
-    if (!found) {
-      const fixtures = document.createElement('div')
-      fixtures.setAttribute('id', 'fixtures')
-      document.body.appendChild(fixtures)
-    }
-  })
-
-  afterEach(() => {
-    ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
-  })
-
-  it('renders Comments', () => {
-    ReactDOM.render(<Comments assignment={mockAssignment()} />, document.getElementById('fixtures'))
-    const container = $('[data-test-id="comments-container"]')
-    expect(container).toHaveLength(1)
-  })
-
-  it('renders CommentTextArea', () => {
-    ReactDOM.render(<Comments assignment={mockAssignment()} />, document.getElementById('fixtures'))
-    const container = $('[data-test-id="comments-text-area-container"]')
-    expect(container).toHaveLength(1)
-  })
-
-  it('renders place holder text when no comments', () => {
-    const assignment = mockAssignment()
-    assignment.submissionsConnection.nodes[0].commentsConnection.nodes = []
-    ReactDOM.render(<Comments assignment={assignment} />, document.getElementById('fixtures'))
-    const container = $(
-      '#fixtures:contains("Send a comment to your instructor about this assignment.")'
+  it('renders Comments', async () => {
+    const {getByTestId} = render(
+      <MockedProvider mocks={mocks} addTypename>
+        <Comments assignment={mockAssignment()} />
+      </MockedProvider>
     )
-    expect(container).toHaveLength(1)
+
+    expect(await waitForElement(() => getByTestId('comments-container'))).toBeInTheDocument()
   })
 
-  it('renders comment rows when provided', () => {
-    const assignment = mockAssignment()
-    ReactDOM.render(<Comments assignment={assignment} />, document.getElementById('fixtures'))
-    const container = $('.comment-row-container')
-    expect(container).toHaveLength(1)
+  it('renders CommentTextArea', async () => {
+    const {getByLabelText} = render(
+      <MockedProvider mocks={mocks} addTypename>
+        <Comments assignment={mockAssignment()} />
+      </MockedProvider>
+    )
+
+    expect(await waitForElement(() => getByLabelText('Comment input box'))).toBeInTheDocument()
   })
 
-  it('renders shortname when shortname is provided', () => {
-    const assignment = mockAssignment()
-    ReactDOM.render(<Comments assignment={assignment} />, document.getElementById('fixtures'))
-    const container = $('#fixtures:contains("bob builder")')
-    expect(container).toHaveLength(1)
+  it('renders loading indicator when loading query', async () => {
+    const {getByTitle} = render(
+      <MockedProvider mocks={mocks} addTypename>
+        <Comments assignment={mockAssignment()} />
+      </MockedProvider>
+    )
+    expect(getByTitle('Loading')).toBeInTheDocument()
   })
 
-  it('renders Anonymous when shortname is not provided', () => {
-    const assignment = mockAssignment()
-    assignment.submissionsConnection.nodes[0].commentsConnection.nodes[0].author = null
-    ReactDOM.render(<Comments assignment={assignment} />, document.getElementById('fixtures'))
-    let container = $('#fixtures:contains("bob builder")')
-    expect(container).toHaveLength(0)
-    container = $('#fixtures:contains("Anonymous")')
-    expect(container).toHaveLength(1)
+  it('renders place holder text when no comments', async () => {
+    const {getByText} = render(<CommentsContainer comments={[]} />)
+
+    expect(
+      await waitForElement(() =>
+        getByText('Send a comment to your instructor about this assignment.')
+      )
+    ).toBeInTheDocument()
+  })
+
+  it('renders comment rows when provided', async () => {
+    const {container} = render(
+      <CommentsContainer comments={[singleComment({_id: '6'}), singleComment()]} />
+    )
+    expect(container.querySelectorAll('.comment-row-container')).toHaveLength(2)
+  })
+
+  it('renders shortname when shortname is provided', async () => {
+    const {getAllByText} = render(<CommentsContainer comments={[singleComment()]} />)
+    expect(getAllByText('bob builder')).toHaveLength(1)
+  })
+
+  it('renders Anonymous when author is not provided', async () => {
+    const comment = singleComment()
+    comment.author = null
+    const {getAllByText, queryAllByText} = render(<CommentsContainer comments={[comment]} />)
+
+    expect(queryAllByText('bob builder')).toHaveLength(0)
+    expect(getAllByText('Anonymous')).toHaveLength(1)
   })
 })

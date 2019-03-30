@@ -649,21 +649,27 @@ li.quiz {
           padding-#{direction(left)}: 0;
           font-weight: bold;
         }
+        .answer_row {
+          display: flex;
+          align-items: flex-start;
+        }
         .answer_input {
           width: 12px;
           vertical-align: top;
+          padding-top: 2px;
           input[type="radio"], input[type="checkbox"] {
             margin-top: 0;
           }
         }
         .answer_label {
-          padding-#{direction(left)}: 0.5em;
+          padding-#{direction(left)}: 0.5rem;
           padding-top: 2px;
+          width: 100%;
         }
-        .answer_label > label > *:first-child, .answer_label > label + * {
+        .answer_label > *:first-child, .answer_label + * {
           margin-top: 0;
         }
-        .answer_label > label > p:last-child {
+        .answer_label > p:last-child {
           margin-bottom: 0;
         }
         .answer_html > p:last-child {

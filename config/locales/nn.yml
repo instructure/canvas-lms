@@ -935,6 +935,11 @@ nn:
             check_box: "CSV-fil over seksjonar"
           users: 
             check_box: "CSV-fil over brukarar"
+    new_excelsior_activity_report_csv_parameters: 
+      account_reports: 
+        excelsior: 
+          outcome: 
+            text: "Seksjonsmønster:"
     no_user_message: "Finn ikkje brukar med denne ID-en"
     outcome_results_csv_description: 
       account_reports: 
@@ -2929,6 +2934,8 @@ nn:
         originality_report_visible_after_grading: "Etter at oppgåva er karaktersett"
         originality_report_visible_immediately: "Med ein gong"
   assignments_1e02582c: Oppgåver
+  assignments_2: 
+    submission_attempts: Forsøk
   assignments_api: 
     invalid_date_time: "Ugyldig dato og klokkeslett for %{attribute}"
     invalid_submission_types: "Ugyldige innleveringstypar"
@@ -2949,6 +2956,7 @@ nn:
   attach_files_to_discussions_bd16c245: "Legg filer til diskusjonar"
   attach_terms_2b8770a5: "Legg ved semester"
   attached_display_name_afa00c2e: "Lagt ved: %{display_name}"
+  attached_files_4c1d26cf: "Vedlagde filer:"
   attached_files_must_be_greater_than_0_bytes_7f57bee7: "Vedlagde filer skal vere større enn 0 byte"
   attachment: 
     default_filename: Fil
@@ -3076,6 +3084,7 @@ nn:
   availability_dates_438d71e0: "Tilgjengelege datoar"
   availability_dates_changed_exceptions_465ba375: "Unntak: tilgjengelege datoar endra:"
   available_8606e40c: Tilgjengeleg
+  available_after_3416802b: "Tilgjengeleg frå"
   available_after_unlock_at_b5682224: "Tilgjengeleg etter %{unlock_at}"
   available_after_unlock_at_until_lock_at_499e8092: "Tilgjengeleg etter %{unlock_at} til %{lock_at}"
   available_from_587ce92f: "Tilgjengeleg frå"
@@ -3880,8 +3889,10 @@ nn:
   click_here_it_s_free_eeccb9cb: "Klikk her. Det er gratis."
   click_here_to_download_size_of_file_74443988: "Klikk her for å laste ned %{size_of_file}"
   click_here_to_log_in_again_4a6055de: "Klikk her for å logge inn igjen"
+  click_here_to_review_the_submission_ae017c01: "Klikk her for å gå gjennom innleveringa"
   click_here_to_see_the_file_79e2b366: "Klikk her og vis fila."
   click_here_to_view_ec8cb2fd: "klikk her for å vise"
+  click_here_to_view_the_submission_24777a69: "Klikk her for å sjå innleveringa"
   click_on_a_snapshot_to_revert_back_to_your_trial_a_39250fdb: "Klikk på eit snapshot for å gå tilbake til forsøket ditt slik det var når snapshotet blei tatt. Merk! Du vil mista alt arbeidet du har gjort i tida etter at snapshotet blei tatt og det kan ikkje gjerast om! "
   click_to_add_a_name_6cf551b0: "Klikk for å legge til eit namn"
   click_to_change_profile_picture_for_display_name_6a4b41db: "Klikk for å endre profilbilde for %{display_name}"
@@ -6048,6 +6059,7 @@ nn:
       assign_blanks: "Gi nullkarakter til studentar som ikkje har levert"
     out_of_points_possible: "av  %{assignment.points_possible}"
     this_is_permanent: "Kan ikkje angre justering av karakter. Historikk om karakterar før justeringa er tilgjengeleg, men justeringa er endeleg."
+  curving_assignments_e9479ee3: "Justere oppgåver"
   custom_6979cd81: Eigendefinert
   custom_css_and_javascript_may_cause_accessibility__93d2a823: "Custom CSS og Javascript kan føre til problem med tilgangar eller skape konflikt ved framtidige   oppdateringar av Canvas! "
   custom_fields_fc3e55af: "Eigendefinerte felt"
@@ -7852,6 +7864,7 @@ nn:
   grade_a91e433e: "Karakter:"
   grade_assignment_7c1abc11: "Sett karakter på %{assignment}"
   grade_change_activity_75fb525: Karakterendringsaktivitet
+  grade_change_notifications_98461261: Karakterendringsvarsel
   grade_changes_cb5a57a8: Karakterendringar
   grade_display_warning_dialog: 
     grade_display_warning: 
@@ -8987,6 +9000,7 @@ nn:
     unassigned_students: "Studentar som ikkje er tilordna (%{count})"
     unassigned_users: "Brukarar som ikkje er tilordna (%{count})"
   groups_6c90e26a: Grupper
+  groups_add_edit_delete_1536bbb4: "Grupper - legg til/endre/slett"
   groups_are_a_good_place_to_collaborate_on_projects_7386830f: |-
       Grupper fungerer flott for prosjektsamarbeid eller for planlegging av studiegrupper
       og liknande. Kvar gruppe har kalender, wiki, diskusjonar og litt plass
@@ -9236,6 +9250,7 @@ nn:
   immediately_c128ede6: "Med ein gong"
   import_1b31507: Importer
   import_content_b2fd6620: "Importer innhald"
+  import_outcomes_7dda186b: "Importer læringsmål"
   import_sis_data_428cc803: "Importer SIS-data"
   import_status_b147bd27: Importstatus
   import_tutorial_tray_8b92e956: "Importer opplæringsmeny"
@@ -9967,11 +9982,13 @@ nn:
     register_tool: "Registrer verktøyet"
   lti_2_reregistration_afabde25: "Ny registrering av LTI 2"
   lti_add_and_edit_a359d8da: "LTI legg til og rediger"
+  lti_key_14ad02b1: LTI-nøkkel
   lti_report_2b6193ab: LTI-rapport
   luxembourg_352_85f4124d: "Luxembourg (+352)"
   luxembourg_3bc645af: Luxembourg
   m2c_file_description: "Moodle 1.9/2.x"
   m2c_name: Moodle-import
+  magenta_4a65993c: Magenta
   main_navigation_3f080c80: Hovednavigasjon
   main_text_color_7d65ab1b: Hovudtekstfarge
   make_new_settings_for_sis_integrations_visible_and_875039ca: "Gjer nye innstillingar for SIS-integrasjonar synlege og aktive"
@@ -10763,6 +10780,7 @@ nn:
           attached_files: "Vedlagde filer:"
           audio_comment: "Meldinga inneheld mediekommentarar. Om du vil lytte eller svare, kan du klikke på lenka nedanfor:"
           download: "last ned"
+          pre_you_can: "Du kan"
           reply_to_conversation_message: "Du kan sende svar på denne meldinga til Canvas ved å svare direkte på denne e-posten. Om du vil inkludere eit vedlegg i svarmeldinga, må du logge inn i Canvas og svare på meldinga frå meldingsinnboksen."
           subject: "%{user_name}, du sende nettopp ei melding i Canvas."
           unknown_user: "Ukjend brukar"
@@ -10788,6 +10806,7 @@ nn:
           attached_files: "Vedlagde filer:"
           audio_comment: "Meldinga inneheld mediekommentarar. Om du vil lytte eller svare, kan du klikke på lenka nedanfor:"
           download: "last ned"
+          pre_you_can: "Du kan"
           reply_to_conversation_message: "Du kan sende svar på denne meldinga til Canvas ved å svare direkte på denne e-posten. Om du vil inkludere eit vedlegg i svarmeldinga, må du logge inn i Canvas og svare på meldinga frå meldingsinnboksen."
           subject: "%{user_name} sende deg nettopp ei melding i Canvas."
           unknown_user: "Ukjend brukar"
@@ -11615,7 +11634,7 @@ nn:
         not_applicable: "Gjeld ikkje"
         score: "resultat:  %{score} av %{total}"
         score_pending_review: "resultat ventar på gjennomgang av faglærar"
-        sms_body: "%{assignment}, %{context} er karaktersett."
+        sms_body: "%{assignment} er vurdert."
       summary: 
         graded_date: "karaktersett: %{date}"
         no_date_set: "Innleveringsfrist er ikkje fastsett"
@@ -11849,6 +11868,7 @@ nn:
   moodle_dropdown_warning_title: "Fleire spørsmål i rullegardinmenyar kan vere importert feil"
   moodle_formula_many_warning_title: "Det finst %{count} formelspørsmål i denne banken der moglege svar må genererast på nytt"
   moodle_formula_warning_title: "Moglege svar må genererast på nytt for formelspørsmål"
+  more_cf9cc661: Meir
   more_courses_5ebbe998: "Fleire emne"
   more_info_at_course_name_56dc8c10: "Meir info i %{course_name}"
   more_info_at_web_address_dba7e187: "Meir informasjon på %{web_address}"
@@ -12551,6 +12571,7 @@ nn:
   open_message_d7b12975: "Opne melding"
   open_name_color_picker_a2646a33: "Opne %{name} fargeveljar"
   open_sidebar_2852e8c8: "Opne sidestolpe"
+  open_speedgrader_11604608: "Opne SpeedGrader"
   open_submission_tray_4eb14e96: "Opne innleveringsmeny"
   open_the_grade_detail_tray_cea682a5: "Opne karakterdetalj-menyen"
   open_this_keyboard_shortcuts_dialog_9658b83a: "Opne denne hurtigtastar-dialogen"
@@ -12848,6 +12869,7 @@ nn:
   pending_3e506a5b: Ventar
   pending_message_2d9a8796: "Ventar: %{message}"
   people_b4ebb13c: Personar
+  people_course_ddd9a66: "Personar (Emne)"
   people_options_cfb419a6: Personval
   people_tutorial_tray_a87a6c48: "Personar opplæringsmeny"
   people_will_see_this_name_in_discussions_messages__fca9ebb2: "Namnet vil vere synleg for alle i diskusjonar, meldingar og kommentarar."
@@ -14042,6 +14064,7 @@ nn:
     item_analysis: Elementanalyse
     non_generatable_report_notice: "Rapporten kan ikkje genererast for spørjeundersøkingar."
     student_analysis: Studentanalyse
+  quiz_reports_ef7ddf1c: Quizrapportar
   quiz_restrictions_5db831c5: "Restriksjonar for quizar"
   quiz_results_are_protected_for_this_quiz_and_are_n_1ea03502: "Resultata for denne quizen er beskytta, og er ikkje synleg for studentar."
   quiz_results_are_protected_for_this_quiz_and_are_n_c85bd56e: "Resultata for denne quizen er beskytta, og er synlege for studentar etter siste innlevering."
@@ -15095,6 +15118,7 @@ nn:
         cancel: Avbryt
         start_participating: "Begynn å delta"
       labels: 
+        confirm_password: "Gjenta passordet"
         email: "E-posten din"
         name: "Namnet ditt"
         password: Passord
@@ -15460,6 +15484,7 @@ nn:
   scheduler_shown_df77ca6f: "Planleggar vist"
   school_of_rock_4b7b1fd0: "School of Rock"
   score_68107950: "%{score}%"
+  score_change_notifications_6b94f27f: "Varsel om resultatendring"
   score_does_not_include_groups_because_they_have_no_80d12f42: 
     one: "Resultatet omfattar ikkje %{groups}fordi den ikkje har moglege poeng"
     other: "Resultatet omfattar ikkje %{groups}fordi dei ikkje har moglege poeng"
@@ -15857,6 +15882,7 @@ nn:
   sending_bf324366: Sender...
   sending_message_8ac5bc90: "Sender melding..."
   sending_message_failed_please_try_again_b53cc904: "Sending av melding mislukkast, prøv på nytt seinare"
+  sending_messages_f8f41998: "sender meldingar..."
   sent_fe0a1eb4: Sendt
   sequence_footer: 
     next_module: "Neste modul:"
@@ -16845,6 +16871,7 @@ nn:
   student_5da6bfd1: Student
   student_921b864d: student
   student_assignment_outcome_map_title: Studentkompetanse
+  student_collaborations_create_b9e312c1: "Studentsamarbeid - opprett"
   student_context_card_ad59967e: Studentkontekstkort
   student_details_49901ceb: Studentdetaljar
   student_extensions_d35a907: "Utvidingar for studentar"
@@ -16943,6 +16970,7 @@ nn:
       one: "1 underkonto"
       other: "%{count} underkontoar"
   subaccount_91f4c279: Underkonto
+  subaccounts_efd02bd4: Underkontoar
   subdomain_url_1e43b6f0: Underdomene-URL
   subject_114b2e98: Emne
   subject_must_contain_fewer_than_255_characters_2e72cd02: "Emne må innehalde færre enn 255 teikn"
@@ -16959,6 +16987,7 @@ nn:
   submission_comment: 
     unknown_author: Nokon
   submission_comments_4fa03a17: "Kommentarar til innlevering"
+  submission_comments_b6d65841: "Kommentarar til innlevering"
   submission_date_a7920dac: innleveringsdato
   submission_detail: 
     go_to_submission_url: "Gå til innleverings-URL"
@@ -17366,6 +17395,7 @@ nn:
   the_unique_id_used_for_representing_the_specific_r_3bdf5870: "ID-en som blir brukt for å vise den spesifikke syklusen for førespurnad/respons som feilrapporten oppstod i"
   the_url_a_sufficiently_priviledged_user_could_use__e6b02c56: "URL-adressa ein privilegert brukar kan bruke til å opptre som rapporteringsbrukaren på same sida, for å prøve å gjenskape problemet"
   the_url_of_the_page_the_user_was_on_when_they_repo_11dfa92f: "URL-adressa til sida brukaren var på då feilen blei rapportert"
+  their_grade_for_the_assignment_c36a60ef: "Deira karakter for oppgåva"
   theme_52404e51: Tema
   theme_editor_b7b00f6b: Temaredigeringsprogram
   theme_editor_changes_have_been_cancelled_2af5cc5f: "Endringar i temaredigeringsprogram er avbrotne."
@@ -17482,6 +17512,7 @@ nn:
   this_may_take_a_bit_48fe4235: "Dette kan ta ei stund..."
   this_may_take_a_bit_c061d0f6: "dette kan ta ei stund..."
   this_message_includes_media_comments_to_listen_or__5fc98641: "Meldinga inneheld mediekommentarar. Om du vil lytte eller svare, kan du klikke på lenka: %{link}."
+  this_message_includes_media_comments_to_listen_or__75ea03a1: "Meldinga inneheld mediekommentarar. Om du vil lytte eller svare, kan du klikke på lenka nedanfor:"
   this_message_includes_media_comments_to_listen_or__df72d662: "Meldinga inkluderer multimediainnhald og -kommentarar. For å høyre på eller svare, klikk på lenka: %{link}.  Om du vil sende med eit vedlegg, må du logge inn i Canvas og kommentere innleveringa der. "
   this_module_is_locked_until_completing_all_of_the__ddf06070: "Modulen er låst til alle krav for følgande modular er fullførte: %{prerequisites}"
   this_module_is_locked_until_datetime_b2486751: "Modulen er låst til %{datetime}"
@@ -17770,6 +17801,7 @@ nn:
     people: Personar
     view_in_separate_window: "Vis i eit anna vindauge"
   tls_7a2eaba5: TLS
+  to_1126ab55: til
   to_35c6baa2: "til "
   to_51406be9: Til
   to_activate_sms_enter_the_four_character_confirmat_3982a3ec: "For å aktivere SMS må du leggje inn den firesifra koden som blei sendt til %{sms_number}."
@@ -17965,6 +17997,7 @@ nn:
   untitled_assignment_59354b34: "oppgåve utan tittel"
   unused_courses_title: "Emne som ikkje er i bruk"
   up_c553575d: Opp
+  update_374eb54: oppdater
   update_4d8ee62: Oppdatering
   update_and_view_sections_course_details_navigation_de248be8: |-
       Oppdater og vis klassar, emnedetaljar, navigasjon, funksjons-
@@ -18821,6 +18854,7 @@ nn:
   you_can_reply_to_this_message_in_canvas_by_clickin_f5f5f7a3: "Du kan svare på meldinga i Canvas ved å klikke på denne lenka: %{link}. "
   you_can_reply_to_this_message_in_canvas_by_replyin_c9f9abb: "Du kan sende svar på denne meldinga til Canvas ved å svare direkte på denne e-posten, eller ved å klikke på lenka: %{link}. Om du vil inkludere eit vedlegg i svarmeldinga, må du logge inn i Canvas og svare på meldinga frå meldingsinnboksen.  "
   you_can_reply_to_this_message_in_canvas_by_replyin_fa33638d: "Du kan svare på meldinga i Canvas ved å svare direkte på denne e-postmeldinga eller ved å klikke på denne lenka: %{link}."
+  you_can_review_the_submission_details_by_clicking__58a7753: "Du kan sjå nærare på innleveringsdetaljane ved å klikke på lenka nedanfor:"
   you_can_review_the_submission_details_by_clicking__9abc5515: "Du kan sjå nærare på innleveringsdetaljane ved å klikke på lenka: %{link}."
   you_can_review_the_submission_details_using_the_li_c25dd615: "Du kan sjå nærare på innleveringsdetaljane ved å bruke lenka nedanfor. "
   you_can_review_the_submission_details_using_this_l_c7f51917: "Du kan sjå nærare på innleveringsdetaljane ved å bruke lenka: %{link}. "

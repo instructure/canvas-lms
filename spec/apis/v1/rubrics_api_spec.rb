@@ -215,6 +215,8 @@ describe "Rubrics API", type: :request do
           course_with_student(user: @user, active_all: true)
           course_with_teacher active_all: true
           create_rubric(@course)
+          RubricAssociation.generate(@teacher, @rubric, @course, association_object: @course)
+          RubricAssociation.generate(@teacher, @rubric, @course, association_object: @account)
           ['grading', 'peer_review'].each.with_index do |type, index|
             create_rubric_assessment({type: type, comments: "comment #{index}"})
           end
@@ -243,12 +245,55 @@ describe "Rubrics API", type: :request do
           expect(response["assessments"].length).to eq 1
         end
 
+        it "does not return rubric associations by default" do
+          response = rubric_api_call(@course)
+          expect(response).not_to have_key "associations"
+        end
+
+        it "returns rubric associations when passed 'associations'" do
+          response = rubric_api_call(@course, {include: "associations"})
+          expect(response).to have_key "associations"
+          expect(response["associations"].length).to eq 4
+        end
+
+        it "returns any course associations used for grading when passed 'course_associations'" do
+          response = rubric_api_call(@course, {include: "course_associations"})
+          expect(response["associations"][0]["association_type"]).to eq "Course"
+          expect(response["associations"].length).to eq 1
+        end
+
+        it "returns any account associations when passed 'account_associations'" do
+          response = rubric_api_call(@course, {include: "account_associations"})
+          expect(response["associations"][0]["association_type"]).to eq "Account"
+          expect(response["associations"].length).to eq 1
+        end
+
+        it "returns assignment associations when passed 'assignment_associations'" do
+          response = rubric_api_call(@course, {include: "assignment_associations"})
+          expect(response["associations"][0]["association_type"]).to eq "Assignment"
+          expect(response["associations"].length).to eq 2
+        end
+
         it "returns an error if passed an invalid argument" do
           raw_rubric_call(@course, {include: "cheez"})
 
           expect(response).not_to be_success
           json = JSON.parse response.body
-          expect(json["errors"]["include"].first["message"]).to eq "invalid assessment type requested. Must be one of the following: assessments, graded_assessments, peer_assessments"
+          expect(json["errors"]["include"].first["message"]).to start_with "invalid include value requested. Must be one of the following:"
+        end
+
+        it "returns an error if passed mutually-exclusive include options" do
+          raw_rubric_call(@course, {include: ["assessments", "peer_assessments"]})
+
+          expect(response).not_to be_success
+          json = JSON.parse response.body
+          expect(json["errors"]["include"].first["message"]).to start_with "cannot list multiple assessment includes."
+
+          raw_rubric_call(@course, {include: ["associations", "assignment_associations"]})
+
+          expect(response).not_to be_success
+          json = JSON.parse response.body
+          expect(json["errors"]["include"].first["message"]).to start_with "cannot list multiple association includes."
         end
 
         context "style argument" do
@@ -461,7 +506,7 @@ describe "Rubrics API", type: :request do
           ra_params = rubric_association_params_for_assignment(assignment)
           RubricAssociation.generate(@teacher, @rubric, @course, ra_params)
           response = rubric_api_call(@course, {include: "assessments"})
-          expect(response).not_to have_key "assessments"
+          expect(response["assessments"].length).to eq 0
         end
 
         it "returns any rubric assessments used for grading when passed 'graded_assessments'" do
@@ -481,7 +526,21 @@ describe "Rubrics API", type: :request do
 
           expect(response).not_to be_success
           json = JSON.parse response.body
-          expect(json["errors"]["include"].first["message"]).to eq "invalid assessment type requested. Must be one of the following: assessments, graded_assessments, peer_assessments"
+          expect(json["errors"]["include"].first["message"]).to start_with "invalid include value requested. Must be one of the following:"
+        end
+
+        it "returns an error if passed mutually-exclusive include options" do
+          raw_rubric_call(@account, {include: ["assessments", "peer_assessments"]}, 'account')
+
+          expect(response).not_to be_success
+          json = JSON.parse response.body
+          expect(json["errors"]["include"].first["message"]).to start_with "cannot list multiple assessment includes."
+
+          raw_rubric_call(@account, {include: ["associations", "assignment_associations"]}, 'account')
+
+          expect(response).not_to be_success
+          json = JSON.parse response.body
+          expect(json["errors"]["include"].first["message"]).to start_with "cannot list multiple association includes."
         end
 
         context "style argument" do

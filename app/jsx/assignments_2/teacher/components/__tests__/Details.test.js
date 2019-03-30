@@ -21,14 +21,14 @@ import {render} from 'react-testing-library'
 import {mockAssignment, mockOverride} from '../../test-utils'
 import Details from '../Details'
 
-jest.mock('jsx/shared/rce/RichContentEditor')
-
 const override1 = {lid: '18', title: 'Section A', set: {name: 'Section A'}}
 const override2 = {lid: '19', title: 'Section B', set: {name: 'Section B'}}
 
 it('renders', () => {
   const assignment = mockAssignment()
-  const {getByText, getByTestId} = render(<Details assignment={assignment} />)
+  const {getByText, getByTestId} = render(
+    <Details assignment={assignment} onChangeAssignment={() => {}} />
+  )
   expect(getByTestId('AssignmentDescription')).toBeInTheDocument()
   expect(getByText('Everyone')).toBeInTheDocument()
   expect(getByText('Due:', {exact: false})).toBeInTheDocument()
@@ -41,7 +41,7 @@ it('renders an override', () => {
       nodes: [mockOverride()]
     }
   })
-  const {getByText} = render(<Details assignment={assignment} />)
+  const {getByText} = render(<Details assignment={assignment} onChangeAssignment={() => {}} />)
   expect(getByText('Section A')).toBeInTheDocument()
   expect(getByText('Everyone else')).toBeInTheDocument()
 })
@@ -53,7 +53,9 @@ it('renders all the overrides', () => {
       nodes: [mockOverride(override1), mockOverride(override2)]
     }
   })
-  const {getByText, queryAllByText} = render(<Details assignment={assignment} />)
+  const {getByText, queryAllByText} = render(
+    <Details assignment={assignment} onChangeAssignment={() => {}} />
+  )
   expect(getByText('Section A')).toBeInTheDocument()
   expect(getByText('Section B')).toBeInTheDocument()
   expect(queryAllByText('Everyone', {exact: false})).toHaveLength(0)
@@ -66,9 +68,11 @@ it('renders the Add Override button if !readOnly', () => {
       nodes: [mockOverride(override1), mockOverride(override2)]
     }
   })
-  const {getByTestId} = render(<Details assignment={assignment} readOnly={false} />)
+  const {getByTestId} = render(
+    <Details assignment={assignment} onChangeAssignment={() => {}} readOnly={false} />
+  )
 
-  expect(getByTestId('AddOverride')).toBeInTheDocument()
+  expect(getByTestId('AddHorizontalRuleButton')).toBeInTheDocument()
 })
 
 it('does notrender the Add Override button if readOnly', () => {
@@ -78,7 +82,9 @@ it('does notrender the Add Override button if readOnly', () => {
       nodes: [mockOverride(override1), mockOverride(override2)]
     }
   })
-  const {queryByTestId} = render(<Details assignment={assignment} readOnly />)
+  const {queryByTestId} = render(
+    <Details assignment={assignment} onChangeAssignment={() => {}} readOnly />
+  )
 
-  expect(queryByTestId('AddOverride')).toBeNull()
+  expect(queryByTestId('AddHorizontalRuleButton')).toBeNull()
 })

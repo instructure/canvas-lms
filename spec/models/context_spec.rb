@@ -138,6 +138,47 @@ describe Context do
     end
   end
 
+  context 'find_asset_by_url' do
+    before :once do
+      course_factory
+    end
+
+    it 'should find files' do
+      attachment_model(context: @course).update_attributes(locked: true)
+      expect(Context.find_asset_by_url("/courses/#{@course.id}/files?preview=#{@attachment.id}")).to eq @attachment
+      expect(Context.find_asset_by_url("/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1")).to eq @attachment
+      expect(Context.find_asset_by_url("/courses/#{@course.id}/file_contents/course%20files//#{@attachment.name}")).to eq @attachment
+    end
+
+    it 'should find assignments' do
+      assignment_model(course: @course)
+      expect(Context.find_asset_by_url("/courses/#{@course.id}/assignments/#{@assignment.id}")).to eq @assignment
+    end
+
+    it 'should find wiki pages' do
+      wiki_page_model(context: @course, title: 'hi')
+      expect(Context.find_asset_by_url("/courses/#{@course.id}/pages/hi")).to eq @page
+      expect(Context.find_asset_by_url("/courses/#{@course.id}/wiki/hi")).to eq @page
+      group_model
+      wiki_page_model(context: @group, title: 'yo')
+      expect(Context.find_asset_by_url("/groups/#{@group.id}/pages/yo")).to eq @page
+      expect(Context.find_asset_by_url("/groups/#{@group.id}/wiki/yo")).to eq @page
+    end
+
+    it 'should find discussion_topics' do
+      discussion_topic_model(context: @course)
+      expect(Context.find_asset_by_url("/courses/#{@course.id}/discussion_topics/#{@topic.id}")).to eq @topic
+      group_model
+      discussion_topic_model(context: @group)
+      expect(Context.find_asset_by_url("/groups/#{@group.id}/discussion_topics/#{@topic.id}")).to eq @topic
+    end
+
+    it 'should find quizzes' do
+      quiz_model(course: @course)
+      expect(Context.find_asset_by_url("/courses/#{@course.id}/quizzes/#{@quiz.id}")).to eq @quiz
+    end
+  end
+
   context "self.names_by_context_types_and_ids" do
     it "should find context names" do
       contexts = []
@@ -201,6 +242,22 @@ describe Context do
     def add_rubric(context)
       r = Rubric.create!(context: context, title: 'testing')
       RubricAssociation.create!(context: context, rubric: r, purpose: :bookmark, association_object: context)
+    end
+
+    it 'returns rubric for concluded course enrollment' do
+      c1 = Course.create!(:name => 'c1')
+      c2 = Course.create!(:name => 'c1')
+      r = Rubric.create!(context: c1, title: 'testing')
+      user = user_factory(:active_all => true)
+      RubricAssociation.create!(context: c1, rubric: r, purpose: :bookmark, association_object: c1)
+      enroll = c1.enroll_user(user, "TeacherEnrollment", :enrollment_state => "active")
+      enroll.conclude
+      c2.enroll_user(user, "TeacherEnrollment", :enrollment_state => "active")
+      expect(c2.rubric_contexts(user)).to eq([{
+        rubrics: 1,
+        context_code: c1.asset_string,
+        name: c1.name
+      }])
     end
 
     it 'returns contexts in alphabetically sorted order' do

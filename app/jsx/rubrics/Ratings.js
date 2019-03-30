@@ -221,7 +221,7 @@ const Ratings = (props) => {
 
     return (
       <Rating
-        key={index} // eslint-disable-line react/no-array-index-key
+        key={index}
         assessing={assessing}
         classes={classes}
         endOfRangePoints={useRange ? getRangePoints(tier.points, tiers[index + 1]) : null}

@@ -23,14 +23,11 @@ import Text from '@instructure/ui-elements/lib/components/Text'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import {StudentAssignmentShape} from '../assignmentData'
 import LoadingIndicator from './LoadingIndicator'
+import SVGWithTextPlaceholder from './SVGWithTextPlaceholder'
+import ClosedDiscussionSVG from '../SVG/ClosedDiscussions.svg'
 
-const Comments = lazy(
-  () =>
-    new Promise((resolve, reject) => {
-      import('./Comments')
-        .then(result => resolve(result.default ? result : {default: result}))
-        .catch(reject)
-    })
+const Comments = lazy(() =>
+  import('./Comments').then(result => (result.default ? result : {default: result}))
 )
 
 ContentTabs.propTypes = {
@@ -54,9 +51,18 @@ function ContentTabs(props) {
           data-test-id="assignment-2-student-comments-content-tab"
           title={I18n.t('Comments')}
         >
-          <Suspense fallback={<LoadingIndicator />}>
-            <Comments assignment={props.assignment} />
-          </Suspense>
+          {!props.assignment.muted ? (
+            <Suspense fallback={<LoadingIndicator />}>
+              <Comments assignment={props.assignment} />
+            </Suspense>
+          ) : (
+            <SVGWithTextPlaceholder
+              text={I18n.t(
+                'You may not see all comments right now because the assignment is currently being graded.'
+              )}
+              url={ClosedDiscussionSVG}
+            />
+          )}
         </TabPanel>
         <TabPanel title={I18n.t('Rubric')}>
           <Flex as="header" alignItems="center" justifyItems="center" direction="column">

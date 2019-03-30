@@ -185,7 +185,7 @@ RSpec.describe AnonymousSubmissionsController do
         redirect_url = speed_grader_course_gradebook_url(
           assignment.course,
           assignment_id: assignment.id,
-          anchor: "{\"anonymous_id\":\"#{submission.anonymous_id}\"}"
+          anonymous_id: submission.anonymous_id
         )
         expect(response).to redirect_to(redirect_url)
       end
@@ -335,7 +335,7 @@ RSpec.describe AnonymousSubmissionsController do
       speed_grader_url = speed_grader_course_gradebook_url(
         course,
         assignment_id: assignment.id,
-        anchor: "{\"anonymous_id\":\"#{submission.anonymous_id}\"}"
+        anonymous_id: submission.anonymous_id
       )
       expect(response).to redirect_to(speed_grader_url)
     end

@@ -64,4 +64,17 @@ describe SIS::CSV::UserObserverImporter do
     )
     expect(UserObservationLink.active.count).to eq before_count
   end
+
+  it "should be able to disable notifications by default for observers" do
+    @account.settings[:default_notifications_disabled_for_observers] = true
+    @account.save!
+    observer = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
+    user_with_managed_pseudonym(account: @account, sis_user_id: 'U002')
+    before_count = UserObservationLink.active.count
+    process_csv_data_cleanly(
+      "observer_id,student_id,status",
+      "U001,U002,ACTIVE"
+    )
+    expect(observer.reload.default_notifications_disabled?).to eq true
+  end
 end

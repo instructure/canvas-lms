@@ -451,7 +451,7 @@ class OutcomeResultsController < ApplicationController
   end
 
   def include_assignments
-    assignments = @results.map(&:assignment)
+    assignments = @results.map { |result| result.assignment || result.alignment&.content }
     outcome_results_assignments_json(assignments)
   end
 

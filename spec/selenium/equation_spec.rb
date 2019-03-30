@@ -25,11 +25,11 @@ describe "equation editor" do
   let(:equation_selector){ "div[aria-label='Insert Math Equation'] button" }
 
 
-  it "should remove bookmark when clicking close" do
-    skip('CORE-2434 flakey as of 2/1/2019')
+  it "should keep cursor position when clicking close" do
     course_with_teacher_logged_in
-    get "/courses/#{@course.id}/quizzes"
-    f('.new-quiz-link').click
+
+    quiz_model(course: @course)
+    get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
 
     wait_for_tiny(f("#quiz_description"))
     type_in_tiny 'textarea#quiz_description', 'foo'

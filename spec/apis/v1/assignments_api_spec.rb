@@ -1109,11 +1109,8 @@ describe AssignmentsApiController, type: :request do
 
     it "returns assignments for authorized observer" do
       course_with_student_submissions(:active_all => true)
-      parent = User.create
-      parent.as_observer_observation_links.create! do |uo|
-        uo.user_id = @student.id
-      end
-      parent.save!
+      parent = User.create!
+      add_linked_observer(@student, parent)
       json = api_get_assignments_user_index(@student, @course, parent)
       expect(json[0]['course_id']).to eq @course.id
     end

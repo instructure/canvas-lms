@@ -29,8 +29,8 @@ import IconMore from '@instructure/ui-icons/lib/Solid/IconMore'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Grid, {GridRow, GridCol} from '@instructure/ui-layout/lib/components/Grid'
 import ColorPicker from '../../../shared/ColorPicker'
-import {statusesTitleMap} from '../../../gradezilla/default_gradebook/constants/statuses'
-import {defaultColors} from '../../../gradezilla/default_gradebook/constants/colors'
+import {statusesTitleMap} from '../constants/statuses'
+import {defaultColors} from '../constants/colors'
 
 const colorPickerColors = Object.keys(defaultColors).reduce((obj, key) => {
   obj.push({hexcode: defaultColors[key], name: key})

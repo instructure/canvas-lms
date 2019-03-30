@@ -167,32 +167,32 @@ describe UserObserveesController, type: :request do
   context 'GET #index' do
     specs_require_sharding
     it 'should list observees' do
-      parent.linked_students << student
+      add_linked_observer(student, parent)
       expect(index_call).to eq [student.id]
     end
 
     it 'should list observees (for self managed users)' do
-      parent.linked_students << student
+      add_linked_observer(student, parent)
       expect(index_call(api_user: parent)).to eq [student.id]
     end
 
     it 'should list observees (for external accounts)' do
-      external_parent.linked_students << external_student
+      add_linked_observer(external_student, external_parent, root_account: external_account)
       json = index_call(user_id: external_parent.id, api_user: multi_admin, domain_root_account: external_account)
       expect(json).to eq [external_student.id]
     end
 
     it 'should paginate' do
-      parent.linked_students << student
-      parent.linked_students << student2
+      add_linked_observer(student, parent)
+      add_linked_observer(student2, parent)
 
       expect(index_call(page: 1)).to eq [student2.id]
       expect(index_call(page: 2)).to eq [student.id]
     end
 
     it 'should not include deleted observers' do
-      parent.linked_students << student
-      parent.linked_students << student2
+      add_linked_observer(student, parent)
+      add_linked_observer(student2, parent)
       parent.as_observer_observation_links.where(user_id: student2).destroy_all
 
       expect(index_call).to eq [student.id]
@@ -203,7 +203,7 @@ describe UserObserveesController, type: :request do
     end
 
     it 'should not allow admins from an external account' do
-      external_parent.linked_students << external_student
+      add_linked_observer(external_student, external_parent, root_account: external_account)
       index_call(user_id: external_parent.id, domain_root_account: external_account, expected_status: 401)
     end
 
@@ -217,7 +217,7 @@ describe UserObserveesController, type: :request do
       student.avatar_image_source = 'attachment'
       student.avatar_image_url = "/relative/canvas/path"
       student.save!
-      parent.linked_students << student
+      add_linked_observer(student, parent)
       opts = {:avatars=>true}
       json = raw_index_call(opts )
       expect(json.map{|o| o['id'] }).to eq [student.id]
@@ -234,7 +234,7 @@ describe UserObserveesController, type: :request do
       student.avatar_image_source = 'attachment'
       student.avatar_image_url = "/relative/canvas/path"
       student.save!
-      parent.linked_students << student
+      add_linked_observer(student, parent)
       parent.account.set_service_availability(:avatars, false)
       opts = {:avatars=>true}
       json = raw_index_call(opts )
@@ -351,17 +351,17 @@ describe UserObserveesController, type: :request do
 
   context 'GET #show' do
     it 'should show an observee' do
-      parent.linked_students << student
+      add_linked_observer(student, parent)
       expect(show_call).to eq student.id
     end
 
     it 'should show an observee (for self managed users)' do
-      parent.linked_students << student
+      add_linked_observer(student, parent)
       expect(show_call(api_user: parent)).to eq student.id
     end
 
     it 'should show an observee (for external accounts)' do
-      external_parent.linked_students << external_student
+      add_linked_observer(external_student, external_parent, root_account: external_account)
       json = show_call(user_id: external_parent.id, observee_id: external_student.id, api_user: multi_admin, domain_root_account: external_account)
       expect(json).to eq external_student.id
     end
@@ -371,17 +371,17 @@ describe UserObserveesController, type: :request do
     end
 
     it 'should not accept a non-observed user' do
-      parent.linked_students << student
+      add_linked_observer(student, parent)
       show_call(observee_id: student2.id, expected_status: 404)
     end
 
     it 'should not allow admins from an external account' do
-      external_parent.linked_students << external_student
+      add_linked_observer(external_student, external_parent, root_account: external_account)
       show_call(user_id: external_parent.id, observee_id: external_student.id, domain_root_account: external_account, expected_status: 401)
     end
 
     it 'should not allow unauthorized admins' do
-      parent.linked_students << student
+      add_linked_observer(student, parent)
       show_call(api_user: disallowed_admin, expected_status: 401)
     end
   end
@@ -393,7 +393,7 @@ describe UserObserveesController, type: :request do
     end
 
     it 'should not error if the observee already exists' do
-      parent.linked_students << student
+      add_linked_observer(student, parent)
       expect(update_call).to eq student.id
       expect(parent.reload.linked_students).to eq [student]
     end
@@ -460,7 +460,7 @@ describe UserObserveesController, type: :request do
 
   context 'DELETE #destroy' do
     it 'should remove an observee by id' do
-      parent.linked_students << student
+      add_linked_observer(student, parent)
       course_factory.enroll_user(student)
       observer_enrollment = parent.observer_enrollments.first
 
@@ -470,7 +470,7 @@ describe UserObserveesController, type: :request do
     end
 
     it 'should remove an observee by id (for external accounts)' do
-      external_parent.linked_students << external_student
+      add_linked_observer(external_student, external_parent, root_account: external_account)
       course_factory(:account => external_account).enroll_user(external_student)
       observer_enrollment = external_parent.observer_enrollments.first
 
@@ -481,7 +481,7 @@ describe UserObserveesController, type: :request do
     end
 
     it 'should not succeed if the observee is not found' do
-      parent.linked_students << student
+      add_linked_observer(student, parent)
       delete_call(observee_id: student2.id, expected_status: 404)
       expect(parent.reload.linked_students).to eq [student]
     end
@@ -499,13 +499,13 @@ describe UserObserveesController, type: :request do
     end
 
     it 'should not allow unauthorized admins' do
-      parent.linked_students << student
+      add_linked_observer(student, parent)
       delete_call(api_user: disallowed_admin, expected_status: 401)
       expect(parent.reload.linked_students).to eq [student]
     end
 
     it 'should allow observer to remove observee' do
-      parent.linked_students << student
+      add_linked_observer(student, parent)
       delete_call(api_user: parent, expected_status: 200)
       expect(parent.reload.linked_students).to eq []
       expect(UserObservationLink.where(:observer_id => parent).first.workflow_state).to eq 'deleted'

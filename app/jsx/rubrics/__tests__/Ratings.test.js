@@ -22,7 +22,7 @@ import sinon from 'sinon'
 import Ratings, { Rating } from '../Ratings'
 
 // This is needed for $.screenReaderFlashMessageExclusive to work.
-import 'compiled/jquery.rails_flash_notifications' // eslint-disable-line
+import 'compiled/jquery.rails_flash_notifications'
 
 describe('The Ratings component', () => {
   const props = {

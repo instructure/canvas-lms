@@ -555,7 +555,7 @@ class CalendarEventsApiController < ApplicationController
   def participants
     get_event
     if authorized_action(@event, @current_user, :read_child_events)
-      participants = Api.paginate(@event.child_event_participants.order(:id), self, api_v1_calendar_event_participants_url)
+      participants = Api.paginate( @event.child_event_participants_scope.order(:id), self, api_v1_calendar_event_participants_url)
       json = participants.map do |user|
         user_display_json(user)
       end

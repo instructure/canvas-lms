@@ -36,9 +36,9 @@ module Types
     #       types (:assignment_menu, :quiz_menu, et al), and whatever else.
 
     def modules
-      Loaders::AssociationLoader.for(ContextExternalTool, :content_tags).load(object).then do |tools|
-        Loaders::AssociationLoader.for(ContentTag, :context_module).load_many(tools.content_tags).then do |cts|
-          cts.map(&:context_module).uniq
+      load_association(:content_tags).then do |tags|
+        Loaders::AssociationLoader.for(ContentTag, :context_module).load_many(tags).then do |modules|
+          modules.uniq
         end
       end
     end

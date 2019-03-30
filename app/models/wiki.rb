@@ -195,14 +195,13 @@ class Wiki < ActiveRecord::Base
     end
   end
 
-  def find_page(param)
+  def find_page(param, include_deleted: false)
     # to allow linking to a WikiPage by id (to avoid needing to hit the database to pull its url)
     if (match = param.match(/\Apage_id:(\d+)\z/))
       return self.wiki_pages.where(id: match[1].to_i).first
     end
-    self.wiki_pages.not_deleted.where(url: param.to_s).first ||
-      self.wiki_pages.not_deleted.where(url: param.to_url).first ||
-      self.wiki_pages.not_deleted.where(id: param.to_i).first
+    scope = include_deleted ? self.wiki_pages : self.wiki_pages.not_deleted
+    scope.where(url: [param.to_s, param.to_url]).first || scope.where(id: param.to_i).first
   end
 
   def path

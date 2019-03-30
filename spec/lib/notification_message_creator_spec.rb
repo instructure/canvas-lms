@@ -196,6 +196,22 @@ describe NotificationMessageCreator do
       expect(DelayedMessage.last.send_at).to be > Time.now.utc
     end
 
+    it "should be able to set default policies to never for a specific user" do
+      notification_model(:category => 'TestImmediately', :name => "New notification")
+      expect(@notification.default_frequency).to eql("immediately")
+
+      u1 = user_model(:name => "user 1", :workflow_state => "registered")
+      u1.default_notifications_disabled = true
+      u1.save!
+      cc = u1.communication_channels.create(:path => "active@example.com", :workflow_state => 'active')
+      u2 = user_model(:name => "user 2", :workflow_state => "registered")
+      cc2 = u2.communication_channels.create(:path => "active2@example.com", :workflow_state => 'active')
+
+      @a = assignment_model
+      messages = NotificationMessageCreator.new(@notification, @a, :to_list => [u1, u2]).create_message
+      expect(messages.map(&:communication_channel).compact).to eq [cc2] # doesn't include u1's cc
+    end
+
     it "should make a delayed message for each user policy with a delayed frequency" do
       notification_set
       NotificationPolicy.delete_all

@@ -18,12 +18,11 @@
 
 module Types
   class SubmissionCommentType < ApplicationObjectType
-    graphql_name "SubmissionComment"
+    graphql_name 'SubmissionComment'
 
     implements Interfaces::TimestampInterface
 
-    field :_id, ID, "legacy canvas id", null: true, method: :id
-
+    field :_id, ID, 'legacy canvas id', null: true, method: :id
     field :comment, String, null: true
 
     field :author, Types::UserType, null: true
@@ -32,9 +31,36 @@ module Types
       # Not ideal as that could be cached in redis, but in most cases the assignment
       # and submission will already be in the cache, as that's the graphql query
       # path to get to a submission comment, and thus costs us nothing to preload here.
-      Loaders::AssociationLoader.for(SubmissionComment, [:author, {submission: :assignment}]).load(object).then do
-        object.grants_right?(current_user, :read_author) ? object.author : nil
+      Promise.all([
+        load_association(:author),
+        load_association(:submission).then do |submission|
+          Loaders::AssociationLoader.for(Submission, :assignment).load(submission)
+        end
+      ]).then {
+        object.author if object.grants_right?(current_user, :read_author)
+      }
+    end
+
+    field :attachments, [Types::FileType], null: true
+    def attachments
+      attachment_ids = object.parse_attachment_ids
+      return [] if attachment_ids.empty?
+
+      load_association(:submission).then do |submission|
+        Loaders::AssociationLoader.for(Submission, :assignment).load(submission).then do |assignment|
+          scope = assignment.attachments
+          Loaders::ForeignKeyLoader.for(scope, :id).load_many(attachment_ids).then do |attachments|
+            # ForeignKeyLoaders returns results as an array and load_many also returns the values
+            # as an array. Flatten them so we are not returning nested arrays here.
+            attachments.flatten.compact
+          end
+        end
       end
+    end
+
+    field :media_object, Types::MediaObjectType, null: true
+    def media_object
+      Loaders::MediaObjectLoader.load(object.media_comment_id)
     end
   end
 end

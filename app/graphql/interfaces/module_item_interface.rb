@@ -21,8 +21,8 @@ module Interfaces::ModuleItemInterface
   field :modules, [Types::ModuleType], null: true
   def modules
     Loaders::IDLoader.for(ContentTag).load_many(@object.context_module_tag_ids).then do |cts|
-      Loaders::AssociationLoader.for(ContentTag, :context_module).load_many(cts).then do |res|
-        res.map(&:context_module).sort_by(&:position)
+      Loaders::AssociationLoader.for(ContentTag, :context_module).load_many(cts).then do |modules|
+        modules.sort_by(&:position)
       end
     end
   end

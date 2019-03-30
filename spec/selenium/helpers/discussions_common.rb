@@ -87,9 +87,8 @@ module DiscussionsCommon
       wait_for_ajaximations
       @last_entry.find_element(:css, '.discussion-reply-attachments input').send_keys(fullpath)
     end
-
-    scroll_to_submit_button_and_click(@last_entry.find_element(:css, ".discussion-reply-form"))
-    wait_for_ajaximations
+    fj('button:contains("Post Reply"):visible').click
+    wait_for(method: nil, timeout: 5) { f('#discussion_subentries .discussion_entry').displayed? }
     id = DiscussionEntry.last.id
     @last_entry = f "#entry-#{id}"
   end

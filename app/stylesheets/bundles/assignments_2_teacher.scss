@@ -16,6 +16,5 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
  
- .EditableHeading input:focus {
-  outline-style: none
-}
+ @import "base/environment";
+ @import "pages/assignments_2_teacher/teacher_view.scss";

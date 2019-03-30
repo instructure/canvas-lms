@@ -422,19 +422,41 @@ describe AccessToken do
 
     describe 'adding scopes' do
       let(:dev_key) { DeveloperKey.create! require_scopes: true, scopes: TokenScopes.all_scopes.slice(0,10)}
+      let(:access_token) { AccessToken.new(user: user_model, developer_key: dev_key, scopes: scopes) }
+      let(:scopes) { [TokenScopes.all_scopes[12]] }
 
       before do
         allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
       end
 
       it 'is invalid when scopes requested are not included on dev key' do
-        access_token = AccessToken.new(user: user_model, developer_key: dev_key, scopes: [TokenScopes.all_scopes[12]])
         expect(access_token).not_to be_valid
       end
 
-      it 'is valid when scopes requested are included on dev key' do
-        access_token = AccessToken.new(user: user_model, developer_key: dev_key, scopes: [TokenScopes.all_scopes[8], TokenScopes.all_scopes[7]])
-        expect(access_token).to be_valid
+      context do
+        let(:scopes) { [TokenScopes.all_scopes[8], TokenScopes.all_scopes[7]] }
+
+        it 'is valid when scopes requested are included on dev key' do
+          expect(access_token).to be_valid
+        end
+      end
+
+      context 'with bad scopes' do
+        let(:scopes) { ['bad/scope'] }
+
+        it 'is invalid' do
+          expect(access_token).not_to be_valid
+        end
+
+        context 'with require_scopes off' do
+          before do
+            dev_key.update! require_scopes: false
+          end
+
+          it 'is valid' do
+            expect(access_token).to be_valid
+          end
+        end
       end
     end
   end

@@ -21,24 +21,44 @@ require File.expand_path(File.dirname(__FILE__) + '/../../helpers/graphql_type_t
 
 describe Types::FileType do
   let_once(:course) { course_with_teacher(active_all: true); @course }
+  let_once(:student) { student_in_course(course: @course) }
   let_once(:file) { attachment_with_context(course) }
   let(:file_type) { GraphQLTypeTester.new(file, current_user: @teacher) }
 
-  it "works" do
-    expect(file_type.resolve("displayName")).to eq file.display_name
+  it 'works' do
+    expect(file_type.resolve('displayName')).to eq file.display_name
   end
 
-  it "has modules" do
+  it 'has modules' do
     module1 = course.context_modules.create!(name: 'Module 1')
     module2 = course.context_modules.create!(name: 'Module 2')
     file.context_module_tags.create!(context_module: module1, context: course, tag_type: 'context_module')
     file.context_module_tags.create!(context_module: module2, context: course, tag_type: 'context_module')
-    expect(file_type.resolve("modules { _id }").sort).to eq [module1.id.to_s, module2.id.to_s]
+    expect(file_type.resolve('modules { _id }').sort).to eq [module1.id.to_s, module2.id.to_s]
   end
 
-  it "requires read permission" do
+  it 'requires read permission' do
     other_course_student = student_in_course(course: course_factory)
     resolver = GraphQLTypeTester.new(file, current_user: other_course_student)
-    expect(resolver.resolve("displayName")).to be_nil
+    expect(resolver.resolve('displayName')).to be_nil
+  end
+
+  it 'requires the file to not be deleted' do
+    file.destroy
+    expect(file_type.resolve('displayName')).to be_nil
+  end
+
+  it 'return the url if the file is not locked' do
+    expect(
+      file_type.resolve('url', request: ActionDispatch::TestRequest.create, current_user: @student)
+    ).to eq "http://test.host/files/#{file.id}/download?download_frd=1"
+  end
+
+  it 'returns nil for the url if the file is locked' do
+    file.locked = true
+    file.save!
+    expect(
+      file_type.resolve('url', request: ActionDispatch::TestRequest.create, current_user: @student)
+    ).to be_nil
   end
 end

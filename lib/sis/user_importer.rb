@@ -373,13 +373,26 @@ module SIS
         return false if @root_account.pseudonyms.active.where(user_id: user).where("sis_user_id != ? OR sis_user_id IS NULL", user_id).exists?
 
         enrollments = @root_account.enrollments.active.where(user_id: user).
-          where.not(workflow_state: 'deleted').select(:id, :workflow_state).to_a
+          where.not(workflow_state: 'deleted').select(:id, :type, :course_id, :course_section_id, :user_id, :workflow_state).to_a
         if enrollments.any?
           Enrollment.where(id: enrollments.map(&:id)).update_all(updated_at: Time.now.utc, workflow_state: 'deleted')
           EnrollmentState.where(enrollment_id: enrollments.map(&:id)).update_all(state: 'deleted', state_is_current: true)
           e_data = SisBatchRollBackData.build_dependent_data(sis_batch: @batch, contexts: enrollments, updated_state: 'deleted')
           @roll_back_data.push(*e_data) if e_data
         end
+
+        student_enrollments = enrollments.select(&:student?)
+        if student_enrollments.any?
+          observers = user.linked_observers.active.linked_through_root_account(@root_account).to_a
+          observer_enrollments = observers.map{|o| student_enrollments.map{|se| se.linked_enrollment_for(o) }}.flatten.compact
+          if observer_enrollments.any?
+            Enrollment.where(id: observer_enrollments.map(&:id)).update_all(updated_at: Time.now.utc, workflow_state: 'deleted')
+            EnrollmentState.where(enrollment_id: observer_enrollments.map(&:id)).update_all(state: 'deleted', state_is_current: true)
+            oe_data = SisBatchRollBackData.build_dependent_data(sis_batch: @batch, contexts: observer_enrollments, updated_state: 'deleted')
+            @roll_back_data.push(*oe_data) if oe_data
+          end
+        end
+
         gms = @root_account.all_group_memberships.active.where(user_id: user).select(:id, :workflow_state).to_a
         gm_data = SisBatchRollBackData.build_dependent_data(sis_batch: @batch, contexts: gms, updated_state: 'deleted')
         @roll_back_data.push(*gm_data) if gm_data

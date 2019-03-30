@@ -129,8 +129,7 @@ describe "groups" do
 
     #-------------------------------------------------------------------------------------------------------------------
     describe "announcements page v2" do
-      # will fix the below shared tests in a separate commit
-      # it_behaves_like 'announcements_page_v2', :student
+      it_behaves_like 'announcements_page_v2', :student
 
       it "should allow group members to delete their own announcements", ignore_js_errors: true do
         announcement = @testgroup.first.announcements.create!(
@@ -260,8 +259,7 @@ describe "groups" do
 
     #-------------------------------------------------------------------------------------------------------------------
     describe "discussions page" do
-      # will fix the below shared tests in a separate commit
-      # it_behaves_like 'discussions_page', :student
+      it_behaves_like 'discussions_page', :student
 
       it "should allow discussions to be created within a group", priority: "1", test_id: 273615, ignore_js_errors: true do
         get discussions_page
@@ -344,8 +342,7 @@ describe "groups" do
 
     #-------------------------------------------------------------------------------------------------------------------
     describe "pages page" do
-      # will fix the below shared tests in a separate commit
-      # it_behaves_like 'pages_page', :student
+      it_behaves_like 'pages_page', :student
 
       it "should allow group members to create a page", priority: "1", test_id: 273611 do
         get pages_page
@@ -459,7 +456,7 @@ describe "groups" do
         expect(f('#members_list')).to include_text(active_student.name)
       end
     end
-    
+
     #-------------------------------------------------------------------------------------------------------------------
     describe "collaborations page" do
       before :each do

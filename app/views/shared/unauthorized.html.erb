@@ -25,13 +25,13 @@
 <div id="unauthorized_message" class="ic-Error-page">
     <% if @needs_cookies %>
       <img class="ic-Error-img" role="presentation" alt="" aria-hidden="true" src="/images/500_pageerror.svg">
-      <h2><%= t('headings.needs_cookies', %{Cookies Required}) %></h2>
+      <h1><%= t('headings.needs_cookies', %{Cookies Required}) %></h1>
     <% elsif @unauthorized_reason == :unpublished %>
       <img class="ic-Error-img" role="presentation" alt="" aria-hidden="true" src="/images/401_unpublished.svg">
-      <h2><%= t('headings.unpublished', %{Not Yet Available}) %></h2>
+      <h1><%= t('headings.unpublished', %{Not Yet Available}) %></h1>
     <% else %>
       <img class="ic-Error-img" role="presentation" alt="" aria-hidden="true" src="/images/401_permissions.svg">
-      <h2><%= t("Access Denied") %></h2>
+      <h1><%= t("Access Denied") %></h1>
     <% end %>
     <% if @unauthorized_message %>
       <p><%= @unauthorized_message %></p>
@@ -44,7 +44,10 @@
         <% if @context.try_rescue(:is_public) %>
           <%= mt 'public_course', 'This page is part of the content for the course, **%{course}**.', :course => @context.name %>
         <% end %>
-      <%= t("You don't have access to view this resource.") %>
+        <%= t("You don't have access to view this resource.") %>
       </p>
+      <% if send_broken_content! %>
+        <p><%= I18n.t("We've let your instructor know to review this link as soon as possible.") %></p>
+      <% end %>
     <% end %>
 </div>

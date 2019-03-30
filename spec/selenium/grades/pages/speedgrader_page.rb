@@ -14,10 +14,14 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+require_relative '../pages/post_grades_tray_page'
+require_relative '../pages/hide_grades_tray_page'
 
 class Speedgrader
   class << self
     include SeleniumDependencies
+    include PostGradesTray
+    include HideGradesTray
 
     # components/elements
     def right_inner_panel
@@ -44,6 +48,14 @@ class Speedgrader
       f('#grading-box-extended')
     end
 
+    def red_dot_grade_not_posted
+      # TODO: add locator for red dot
+    end
+
+    def hidden_pill
+      # TODO: add locator for hidden pill
+    end
+
     def grading_enabled?
       grade_input.enabled?
     end
@@ -68,8 +80,21 @@ class Speedgrader
       fxpath('//ul[@role = "menu"]//span[text() = "Keyboard Shortcuts"]')
     end
 
+    # TODO: This (mute/unmute) probably needs to go away as post policy gets implemented per invisions
     def mute_button
       f('button#mute_link')
+    end
+
+    def post_grades_link
+      # TODO: post button locator
+    end
+
+    def hide_grades_link
+      # TODO: hide button locator
+    end
+
+    def grades_not_posted_icon
+      # TODO: grades not posted (crossed eyeball?) locator
     end
 
     def hide_students_chkbox
@@ -317,6 +342,14 @@ class Speedgrader
       else
         previous_student.click
       end
+    end
+
+    def click_post_link
+      post_grades_link.click
+    end
+
+    def click_hide_link
+      hide_grades_link.click
     end
 
     def click_settings_link

@@ -16,10 +16,44 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# @API Rubrics
+# @subtopic RubricAssessments
+#
+
 class RubricAssessmentsController < ApplicationController
   before_action :require_context
   before_action :require_user
 
+
+  # @API Create a single rubric assessment
+  #
+  # Returns the rubric assessment with the given id.
+  # The returned object also provides the information of
+  #   :ratings, :assessor_name, :related_group_submissions_and_assessments, :artifact
+  #
+  #
+  # @argument course_id [Integer]
+  #   The id of the course
+  # @argument rubric_association_id [Integer]
+  #   The id of the object with which this rubric assessment is associated
+  # @argument provisional [String]
+  #   (optional) Indicates whether this assessment is provisional, defaults to false.
+  # @argument final [String]
+  #   (optional) Indicates a provisional grade will be marked as final. It only takes effect if the provisional param is passed as true. Defaults to false.
+  # @argument graded_anonymously [Boolean]
+  #   (optional) Defaults to false
+  # @argument rubric_assessment [Hash]
+  #   A Hash of data to complement the rubric assessment:
+  #   The user id that refers to the person being assessed
+  #     rubric_assessment[user_id]
+  #   Assessment type. There are only three valid types:  'grading', 'peer_review', or 'provisional_grade'
+  #     rubric_assessment[assessment_type]
+  #   The points awarded for this row.
+  #     rubric_assessment[criterion_id][points]
+  #   Comments to add for this row.
+  #     rubric_assessment[criterion_id][comments]
+  #   For each criterion_id, change the id by the criterion number, ex: criterion_123
+  #   If the criterion_id is not specified it defaults to false, and nothing is updated.
   def create
     update
   end
@@ -34,6 +68,37 @@ class RubricAssessmentsController < ApplicationController
     end
   end
 
+  # @API Update a single rubric assessment
+  #
+  # Returns the rubric assessment with the given id.
+  # The returned object also provides the information of
+  #   :ratings, :assessor_name, :related_group_submissions_and_assessments, :artifact
+  #
+  #
+  # @argument id [Integer]
+  #   The id of the rubric assessment
+  # @argument course_id [Integer]
+  #   The id of the course
+  # @argument rubric_association_id [Integer]
+  #   The id of the object with which this rubric assessment is associated
+  # @argument provisional [String]
+  #   (optional) Indicates whether this assessment is provisional, defaults to false.
+  # @argument final [String]
+  #   (optional) Indicates a provisional grade will be marked as final. It only takes effect if the provisional param is passed as true. Defaults to false.
+  # @argument graded_anonymously [Boolean]
+  #   (optional) Defaults to false
+  # @argument rubric_assessment [Hash]
+  #   A Hash of data to complement the rubric assessment:
+  #   The user id that refers to the person being assessed
+  #     rubric_assessment[user_id]
+  #   Assessment type. There are only three valid types:  'grading', 'peer_review', or 'provisional_grade'
+  #     rubric_assessment[assessment_type]
+  #   The points awarded for this row.
+  #     rubric_assessment[criterion_id][points]
+  #   Comments to add for this row.
+  #     rubric_assessment[criterion_id][comments]
+  #   For each criterion_id, change the id by the criterion number, ex: criterion_123
+  #   If the criterion_id is not specified it defaults to false, and nothing is updated.
   def update
     @association = @context.rubric_associations.find(params[:rubric_association_id])
     @assessment = @association.rubric_assessments.where(id: params[:id]).first
@@ -109,6 +174,11 @@ class RubricAssessmentsController < ApplicationController
     end
   end
 
+  # @API Delete a single rubric assessment
+  #
+  # Deletes a rubric assessment
+  #
+  # @returns RubricAssessment
   def destroy
     @association = @context.rubric_associations.find(params[:rubric_association_id])
     @rubric = @association.rubric

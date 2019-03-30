@@ -918,7 +918,7 @@ describe UsersController do
       let(:observer) { user_with_pseudonym(active_all: true) }
 
       before(:each) do
-        student.linked_observers << observer
+        add_linked_observer(student, observer)
       end
 
       it "returns the grade and the total for a student, filtered by grading period" do
@@ -994,8 +994,8 @@ describe UsersController do
       let_once(:student2) { course_with_user("StudentEnrollment", course: course, active_all: true).user }
       let_once(:observer) do
         user = user_with_pseudonym(active_all: true)
-        student1.linked_observers << user
-        student2.linked_observers << user
+        add_linked_observer(student1, user)
+        add_linked_observer(student2, user)
         user
       end
       let(:enrollment) { course.enrollments.find_by(user: student1) }
@@ -1071,8 +1071,8 @@ describe UsersController do
           observer = user_with_pseudonym(active_all: true)
           course_with_user('StudentEnrollment', course: test_course, user: student1, active_all: true)
           course_with_user('StudentEnrollment', course: test_course, user: student2, active_all: true)
-          student1.linked_observers << observer
-          student2.linked_observers << observer
+          add_linked_observer(student1, observer)
+          add_linked_observer(student2, observer)
           observer
         end
 

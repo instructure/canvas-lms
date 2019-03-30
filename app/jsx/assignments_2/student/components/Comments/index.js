@@ -17,17 +17,28 @@
  */
 
 import React from 'react'
-import CommentTextArea from './CommentTextArea'
-import CommentContent from './CommentContent'
-import {StudentAssignmentShape} from '../../assignmentData'
+import CommentsContainer from './CommentsContainer'
+import {Query} from 'react-apollo'
+import {SUBMISSION_COMMENT_QUERY, StudentAssignmentShape} from '../../assignmentData'
+import LoadingIndicator from '../LoadingIndicator'
 
 function Comments(props) {
-  const comments = props.assignment.submissionsConnection.nodes[0].commentsConnection.nodes
   return (
-    <div data-test-id="comments-container">
-      <CommentTextArea />
-      <CommentContent comments={comments} />
-    </div>
+    <Query
+      query={SUBMISSION_COMMENT_QUERY}
+      variables={{submissionId: props.assignment.submissionsConnection.nodes[0].id.toString()}}
+    >
+      {({loading, error, data}) => {
+        // TODO HANDLE ERROR
+        if (loading) return <LoadingIndicator />
+        if (error) return `Error!: ${error}`
+        return (
+          <div data-testid="comments-container">
+            <CommentsContainer comments={data.submissionComments.commentsConnection.nodes} />
+          </div>
+        )
+      }}
+    </Query>
   )
 }
 

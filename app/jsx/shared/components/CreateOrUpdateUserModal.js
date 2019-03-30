@@ -117,27 +117,35 @@ export default class CreateOrUpdateUserModal extends React.Component {
   onSubmit = () => {
     if (!isEmpty(this.state.errors)) return
     const method = {create: 'POST', update: 'PUT'}[this.props.createOrUpdate]
-    axios({url: this.props.url, method, data:this.state.data}).then(response => {
-      const getUserObj = o => o.user ? getUserObj(o.user) : o
-      const user = getUserObj(response.data)
-      const userName = user.name
-      const wrapper = `<a href='/users/${user.id}'>$1</a>`
-      $.flashMessage(response.data.message_sent
-        ? I18n.t('*%{userName}* saved successfully! They should receive an email confirmation shortly.', {userName, wrapper})
-        : I18n.t('*%{userName}* saved successfully!', {userName, wrapper})
-      )
+    axios({url: this.props.url, method, data: this.state.data}).then(
+      response => {
+        const getUserObj = o => (o.user ? getUserObj(o.user) : o)
+        const user = getUserObj(response.data)
+        const userName = user.name
+        const wrapper = `<a href='/users/${user.id}'>$1</a>`
+        $.flashMessage(
+          response.data.message_sent
+            ? I18n.t(
+                '*%{userName}* saved successfully! They should receive an email confirmation shortly.',
+                {userName, wrapper}
+              )
+            : I18n.t('*%{userName}* saved successfully!', {userName, wrapper})
+        )
 
-      this.setState({...initialState})
-      if (this.props.afterSave) this.props.afterSave(response)
-    }, ({response}) => {
-      const errors = registrationErrors(response.data.errors)
-      $.flashError('Something went wrong saving user details.')
-      this.setState({errors})
-    })
+        this.setState({...initialState})
+        if (this.props.afterSave) this.props.afterSave(response)
+      },
+      ({response}) => {
+        const errors = registrationErrors(response.data.errors)
+        $.flashError('Something went wrong saving user details.')
+        this.setState({errors})
+      }
+    )
   }
 
   getInputFields = () => {
-    const showCustomizedLoginId = (this.props.customized_login_handle_name || this.props.delegated_authentication)
+    const showCustomizedLoginId =
+      this.props.customized_login_handle_name || this.props.delegated_authentication
     return [
       {
         name: 'user[name]',
@@ -155,39 +163,47 @@ export default class CreateOrUpdateUserModal extends React.Component {
         label: I18n.t('Sortable Name'),
         hint: I18n.t('This name appears in sorted lists.')
       }
-    ].concat(this.props.createOrUpdate === 'create' ? [
-      {
-        name: 'pseudonym[unique_id]',
-        label: this.props.customized_login_handle_name || I18n.t('Email'),
-        required: this.props.customized_login_handle_name
-          ? I18n.t('%{login_handle} is required', {login_handle: this.props.customized_login_handle_name})
-          : I18n.t('Email is required')
-      },
-      (showCustomizedLoginId && {
-        name: 'pseudonym[path]',
-        label: I18n.t('Email'),
-        required: I18n.t('Email is required')
-      }),
-      (this.props.showSIS && {
-        name: 'pseudonym[sis_user_id]',
-        label: I18n.t('SIS ID'),
-      }),
-      {
-        name: 'pseudonym[send_confirmation]',
-        label: I18n.t('Email the user about this account creation'),
-        Component: Checkbox
-      }
-    ] : [
-      {
-        name: 'user[email]',
-        label: I18n.t('Default Email')
-      },
-      {
-        name: 'user[time_zone]',
-        label: I18n.t('Time Zone'),
-        Component: TimeZoneSelect
-      }
-    ]).filter(Boolean)
+    ]
+      .concat(
+        this.props.createOrUpdate === 'create'
+          ? [
+              {
+                name: 'pseudonym[unique_id]',
+                label: this.props.customized_login_handle_name || I18n.t('Email'),
+                required: this.props.customized_login_handle_name
+                  ? I18n.t('%{login_handle} is required', {
+                      login_handle: this.props.customized_login_handle_name
+                    })
+                  : I18n.t('Email is required')
+              },
+              showCustomizedLoginId && {
+                name: 'pseudonym[path]',
+                label: I18n.t('Email'),
+                required: I18n.t('Email is required')
+              },
+              this.props.showSIS && {
+                name: 'pseudonym[sis_user_id]',
+                label: I18n.t('SIS ID')
+              },
+              {
+                name: 'pseudonym[send_confirmation]',
+                label: I18n.t('Email the user about this account creation'),
+                Component: Checkbox
+              }
+            ]
+          : [
+              {
+                name: 'user[email]',
+                label: I18n.t('Default Email')
+              },
+              {
+                name: 'user[time_zone]',
+                label: I18n.t('Time Zone'),
+                Component: TimeZoneSelect
+              }
+            ]
+      )
+      .filter(Boolean)
   }
 
   render = () => (
@@ -196,16 +212,16 @@ export default class CreateOrUpdateUserModal extends React.Component {
         open={this.state.open}
         onDismiss={this.close}
         size="small"
-        label={this.props.createOrUpdate === 'create'
-          ? I18n.t('Add a New User')
-          : (
+        label={
+          this.props.createOrUpdate === 'create' ? (
+            I18n.t('Add a New User')
+          ) : (
             <span>
               <Avatar
                 size="small"
                 name={this.state.data.user.name}
                 src={this.props.user.avatar_url}
-              />
-              {' '}
+              />{' '}
               {I18n.t('Edit User Details')}
             </span>
           )
@@ -220,10 +236,12 @@ export default class CreateOrUpdateUserModal extends React.Component {
                   label={label}
                   value={get(this.state.data, name)}
                   checked={get(this.state.data, name)}
-                  onChange={e => this.onChange(name, e.target.type === 'checkbox'
-                    ? e.target.checked
-                    : e.target.value
-                  )}
+                  onChange={e =>
+                    this.onChange(
+                      name,
+                      e.target.type === 'checkbox' ? e.target.checked : e.target.value
+                    )
+                  }
                   required={!!required}
                   layout="inline"
                   messages={(this.state.errors[name] || [])
@@ -237,10 +255,7 @@ export default class CreateOrUpdateUserModal extends React.Component {
           <ModalFooter>
             <Button onClick={this.close}>{I18n.t('Cancel')}</Button> &nbsp;
             <Button type="submit" variant="primary">
-              {this.props.createOrUpdate === 'create'
-                ? I18n.t('Add User')
-                : I18n.t('Save')
-              }
+              {this.props.createOrUpdate === 'create' ? I18n.t('Add User') : I18n.t('Save')}
             </Button>
           </ModalFooter>
         </form>

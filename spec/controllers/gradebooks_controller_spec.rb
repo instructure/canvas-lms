@@ -252,6 +252,13 @@ describe GradebooksController do
         expect(assigns[:js_env].key?(:effective_final_score)).to be false
       end
 
+      it "does not include the effective final score in the ENV if there is no score" do
+        invited_student = @course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "invited").user
+        user_session(@teacher)
+        get :grade_summary, params: { course_id: @course.id, id: invited_student.id }
+        expect(assigns[:js_env].key?(:effective_final_score)).to be false
+      end
+
       it "takes the effective final score for the grading period, if present" do
         grading_period_group = @course.grading_period_groups.create!
         grading_period = grading_period_group.grading_periods.create!(
@@ -861,6 +868,54 @@ describe GradebooksController do
         get :show, params: {course_id: @course.id}
         api_max_per_page = assigns[:js_env][:GRADEBOOK_OPTIONS][:api_max_per_page]
         expect(api_max_per_page).to eq(50)
+      end
+
+      describe "post_policies_enabled" do
+        it "is set to true if New Gradebook is enabled and post policies are enabled" do
+          @course.enable_feature!(:new_gradebook)
+          @course.enable_feature!(:post_policies)
+
+          get :show, params: {course_id: @course.id}
+          expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:post_policies_enabled]).to be true
+        end
+
+        it "is set to false if New Gradebook is enabled and post policies are disabled" do
+          @course.enable_feature!(:new_gradebook)
+
+          get :show, params: {course_id: @course.id}
+          expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:post_policies_enabled]).to be false
+        end
+
+        it "is not included if New Gradebook is not enabled" do
+          get :show, params: {course_id: @course.id}
+          expect(assigns[:js_env][:GRADEBOOK_OPTIONS]).not_to have_key(:post_policies_enabled)
+        end
+      end
+
+      describe "post_manually" do
+        it "is set to true if post policies are enabled and the course is manually-posted" do
+          @course.enable_feature!(:new_gradebook)
+          @course.enable_feature!(:post_policies)
+
+          @course.post_policies.create!(post_manually: true)
+          get :show, params: {course_id: @course.id}
+          expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:post_manually]).to be true
+        end
+
+        it "is set to false if post policies are enabled and the course is not manually-posted" do
+          @course.enable_feature!(:new_gradebook)
+          @course.enable_feature!(:post_policies)
+
+          get :show, params: {course_id: @course.id}
+          expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:post_manually]).to be false
+        end
+
+        it "is not included if post policies are not enabled" do
+          @course.enable_feature!(:new_gradebook)
+
+          get :show, params: {course_id: @course.id}
+          expect(assigns[:js_env][:GRADEBOOK_OPTIONS]).not_to have_key(:post_manually)
+        end
       end
 
       context "publish_to_sis_enabled" do

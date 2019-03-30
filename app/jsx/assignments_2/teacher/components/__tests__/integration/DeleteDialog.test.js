@@ -17,15 +17,11 @@
  */
 
 import {fireEvent, wait, waitForElement} from 'react-testing-library'
-import {mockAssignment, waitForNoElement} from '../../../test-utils'
+import {mockAssignment, itBehavesLikeADialog, workflowMutationResult} from '../../../test-utils'
 import {renderTeacherView} from './integration-utils'
-import {setWorkflow} from '../../../api'
 
-jest.mock('jsx/shared/rce/RichContentEditor') // jest cannot deal with jquery as loded from here
-jest.mock('../../../api')
-
-async function openDeleteDialog(assignment = mockAssignment()) {
-  const fns = await renderTeacherView(assignment)
+async function openDeleteDialog(assignment = mockAssignment(), apolloMocks = []) {
+  const fns = await renderTeacherView(assignment, apolloMocks)
   const openDeleteButton = await waitForElement(() => fns.getByText('delete assignment'))
   fireEvent.click(openDeleteButton)
   return fns
@@ -35,49 +31,36 @@ afterEach(() => {
   jest.restoreAllMocks()
 })
 
-/* eslint-disable jest/no-disabled-tests */
-it.skip('allows close', async () => {
-  const {getByTestId} = await openDeleteDialog()
-  const closeButton = await waitForElement(() => getByTestId('confirm-dialog-close-button'))
-  fireEvent.click(closeButton)
-  await waitForNoElement(() => getByTestId('confirm-dialog-close-button'))
-  expect(setWorkflow).not.toHaveBeenCalled()
-})
-
-it.skip('allows cancel', async () => {
-  const {getByTestId} = await openDeleteDialog()
-  const cancelButton = await waitForElement(() => getByTestId('confirm-dialog-cancel-button'))
-  fireEvent.click(cancelButton)
-  await waitForNoElement(() => getByTestId('confirm-dialog-cancel-button'))
-  expect(setWorkflow).not.toHaveBeenCalled()
-})
-
-it.skip('deletes the assignment and reloads', async () => {
-  const reloadSpy = jest.spyOn(window.location, 'reload')
-  setWorkflow.mockReturnValueOnce({data: {}})
-  const assignment = mockAssignment()
-  const {getByText, getByTestId} = await openDeleteDialog(assignment)
-  const reallyDeleteButton = await waitForElement(() =>
-    getByTestId('confirm-dialog-confirm-button')
-  )
-  fireEvent.click(reallyDeleteButton)
-  await waitForElement(() => getByText('deleting assignment')) // the spinner
-  await wait(() => expect(setWorkflow).toHaveBeenCalledWith(assignment, 'deleted'))
-  expect(reloadSpy).toHaveBeenCalled()
-})
-
-// errors aren't really implemented yet
-it.skip('reports errors', async () => {
-  setWorkflow.mockReturnValueOnce({
-    errors: [
-      /* errors data structures go here */
-    ]
+describe('assignments 2 delete dialog', () => {
+  itBehavesLikeADialog({
+    render: renderTeacherView,
+    getOpenDialogElt: fns => fns.getByText('delete assignment'),
+    confirmDialogOpen: fns => fns.getByText(/are you sure/i, {exact: false}),
+    getCancelDialogElt: fns => fns.getByTestId('delete-dialog-cancel-button')
   })
-  const {getByTestId} = await openDeleteDialog()
-  const reallyDeleteButton = await waitForElement(() =>
-    getByTestId('confirm-dialog-confirm-button')
-  )
-  fireEvent.click(reallyDeleteButton)
-  // waitForElement(() => {getBySomething('some kind of error message alert')})
+
+  it('deletes the assignment and reloads', async () => {
+    const reloadSpy = jest.spyOn(window.location, 'reload')
+    const assignment = mockAssignment()
+    const {getByTestId} = await openDeleteDialog(assignment, [
+      workflowMutationResult(assignment, 'deleted')
+    ])
+    const reallyDeleteButton = await waitForElement(() =>
+      getByTestId('delete-dialog-confirm-button')
+    )
+    fireEvent.click(reallyDeleteButton)
+    await wait(() => expect(reloadSpy).toHaveBeenCalled())
+  })
+
+  it('reports errors', async () => {
+    const assignment = mockAssignment()
+    const {getByTestId, getByText} = await openDeleteDialog(assignment, [
+      workflowMutationResult(assignment, 'deleted', 'well rats')
+    ])
+    const reallyDeleteButton = await waitForElement(() =>
+      getByTestId('delete-dialog-confirm-button')
+    )
+    fireEvent.click(reallyDeleteButton)
+    expect(await waitForElement(() => getByText(/unable to delete/i))).toBeInTheDocument()
+  })
 })
-/* eslint-enable jest/no-disabled-tests */

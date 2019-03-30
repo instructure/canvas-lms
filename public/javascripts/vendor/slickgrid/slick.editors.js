@@ -1,11 +1,35 @@
+/*
+ * Copyright (c) 2010 Michael Leibman, http://github.com/mleibman/slickgrid
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to
+ * the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+ * LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+ * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
 import jQuery from 'jquery'
 import 'vendor/slickgrid/slick.core'
 
-/***
+/** *
  * Contains basic SlickGrid editors.
  * @module Editors
  * @namespace Slick
  */
+
 ;(function($) {
   // register namespace
   $.extend(true, window, {
@@ -18,20 +42,20 @@ import 'vendor/slickgrid/slick.core'
         Checkbox: CheckboxEditor,
         PercentComplete: PercentCompleteEditor,
         LongText: LongTextEditor,
-        UploadGradeCellEditor: UploadGradeCellEditor
+        UploadGradeCellEditor
       }
     }
   })
 
   function TextEditor(args) {
-    var $input
-    var defaultValue
-    var scope = this
+    let $input
+    let defaultValue
+    const scope = this
 
     this.init = function() {
       $input = $("<INPUT type=text class='editor-text' />")
         .appendTo(args.container)
-        .bind('keydown.nav', function(e) {
+        .bind('keydown.nav', e => {
           if (e.keyCode === $.ui.keyCode.LEFT || e.keyCode === $.ui.keyCode.RIGHT) {
             e.stopImmediatePropagation()
           }
@@ -77,7 +101,7 @@ import 'vendor/slickgrid/slick.core'
 
     this.validate = function() {
       if (args.column.validator) {
-        var validationResults = args.column.validator($input.val())
+        const validationResults = args.column.validator($input.val())
         if (!validationResults.valid) {
           return validationResults
         }
@@ -93,14 +117,14 @@ import 'vendor/slickgrid/slick.core'
   }
 
   function IntegerEditor(args) {
-    var $input
-    var defaultValue
-    var scope = this
+    let $input
+    let defaultValue
+    const scope = this
 
     this.init = function() {
       $input = $("<INPUT type=text class='editor-text' />")
 
-      $input.bind('keydown.nav', function(e) {
+      $input.bind('keydown.nav', e => {
         if (e.keyCode === $.ui.keyCode.LEFT || e.keyCode === $.ui.keyCode.RIGHT) {
           e.stopImmediatePropagation()
         }
@@ -155,10 +179,10 @@ import 'vendor/slickgrid/slick.core'
   }
 
   function DateEditor(args) {
-    var $input
-    var defaultValue
-    var scope = this
-    var calendarOpen = false
+    let $input
+    let defaultValue
+    const scope = this
+    let calendarOpen = false
 
     this.init = function() {
       $input = $("<INPUT type=text class='editor-text' />")
@@ -168,10 +192,10 @@ import 'vendor/slickgrid/slick.core'
         showOn: 'button',
         buttonImageOnly: true,
         buttonImage: '../images/calendar.gif',
-        beforeShow: function() {
+        beforeShow() {
           calendarOpen = true
         },
-        onClose: function() {
+        onClose() {
           calendarOpen = false
         }
       })
@@ -238,9 +262,9 @@ import 'vendor/slickgrid/slick.core'
   }
 
   function YesNoSelectEditor(args) {
-    var $select
-    var defaultValue
-    var scope = this
+    let $select
+    let defaultValue
+    const scope = this
 
     this.init = function() {
       $select = $(
@@ -286,9 +310,9 @@ import 'vendor/slickgrid/slick.core'
   }
 
   function CheckboxEditor(args) {
-    var $select
-    var defaultValue
-    var scope = this
+    let $select
+    let defaultValue
+    const scope = this
 
     this.init = function() {
       $select = $("<INPUT type=checkbox value='true' class='editor-checkbox' hideFocus>")
@@ -336,9 +360,9 @@ import 'vendor/slickgrid/slick.core'
   }
 
   function PercentCompleteEditor(args) {
-    var $input, $picker
-    var defaultValue
-    var scope = this
+    let $input, $picker
+    let defaultValue
+    const scope = this
 
     this.init = function() {
       $input = $("<INPUT type=text class='editor-percentcomplete' />")
@@ -362,7 +386,7 @@ import 'vendor/slickgrid/slick.core'
         orientation: 'vertical',
         range: 'min',
         value: defaultValue,
-        slide: function(event, ui) {
+        slide(event, ui) {
           $input.val(ui.value)
         }
       })
@@ -425,12 +449,12 @@ import 'vendor/slickgrid/slick.core'
    * KeyDown events are also handled to provide handling for Tab, Shift-Tab, Esc and Ctrl-Enter.
    */
   function LongTextEditor(args) {
-    var $input, $wrapper
-    var defaultValue
-    var scope = this
+    let $input, $wrapper
+    let defaultValue
+    const scope = this
 
     this.init = function() {
-      var $container = $('body')
+      const $container = $('body')
 
       $wrapper = $(
         "<DIV style='z-index:10000;position:absolute;background:white;padding:5px;border:3px solid gray; -moz-border-radius:10px; border-radius:10px;'/>"
@@ -524,7 +548,7 @@ import 'vendor/slickgrid/slick.core'
   }
 
   function UploadGradeCellEditor(args) {
-    var $container = args.container,
+    let $container = args.container,
       columnDef = args.column,
       value = args.item[columnDef.id]
 
@@ -539,7 +563,7 @@ import 'vendor/slickgrid/slick.core'
         defaultValue = value.grade
       }
 
-      var scope = this
+      const scope = this
 
       this.init = function() {
         switch (columnDef.grading_type) {
@@ -560,25 +584,20 @@ import 'vendor/slickgrid/slick.core'
             ]
             var outputString = ''
             $.each(letterGrades, function() {
-              outputString +=
-                '<option value="' +
-                this.value +
-                '" ' +
-                (this.value === value.grade ? 'selected' : '') +
-                '>' +
-                this.text +
-                '</option>'
+              outputString += `<option value="${this.value}" ${
+                this.value === value.grade ? 'selected' : ''
+              }>${this.text}</option>`
             })
-            $input = $('<select>' + outputString + '</select>')
+            $input = $(`<select>${outputString}</select>`)
             break
 
           default:
             $input = $("<INPUT type=text class='editor-text' />")
         }
 
-        //if there is something typed in to the grade,
-        //can't do if (value.grade) because if they had a grade of 0 it would break.
-        if (typeof value.grade !== 'undefined' && value.grade + '' !== '') {
+        // if there is something typed in to the grade,
+        // can't do if (value.grade) because if they had a grade of 0 it would break.
+        if (typeof value.grade !== 'undefined' && `${value.grade}` !== '') {
           if (typeof columnDef.editorFormatter === 'function') {
             $input[0].defaultValue = columnDef.editorFormatter(value.grade)
             $input.val($input[0].defaultValue)
@@ -632,7 +651,7 @@ import 'vendor/slickgrid/slick.core'
 
       this.validate = function() {
         if (columnDef.validator) {
-          var validationResults = columnDef.validator(scope.getValue())
+          const validationResults = columnDef.validator(scope.getValue())
           if (!validationResults.valid) return validationResults
         }
 
@@ -646,7 +665,7 @@ import 'vendor/slickgrid/slick.core'
     } else {
       var $input
       this.init = function() {
-        var html = value ? value.grade : ''
+        const html = value ? value.grade : ''
         $container.removeClass('selected editable').html(html)
       }
 

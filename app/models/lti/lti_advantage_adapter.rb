@@ -51,7 +51,7 @@ module Lti
     private
 
     def target_link_uri
-      resource_type ? @tool.extension_setting(resource_type, :url) : @tool.url
+      resource_type ? @tool.extension_setting(resource_type, :target_link_uri) : @tool.url
     end
 
     def generate_lti_params

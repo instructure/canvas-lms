@@ -62,7 +62,7 @@ class AnonymousSubmissionsController < SubmissionsBaseController
     speed_grader_course_gradebook_url(
       @context,
       assignment_id: @assignment.id,
-      anchor: "{\"anonymous_id\":\"#{@submission.anonymous_id}\"}"
+      anonymous_id: @submission.anonymous_id
     )
   end
 end

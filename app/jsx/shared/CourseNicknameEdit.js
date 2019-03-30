@@ -43,6 +43,12 @@ class CourseNicknameEdit extends React.Component {
     this.state = {nickname, originalNickname: nickname}
   }
 
+  componentDidMount() {
+    if (this.nicknameInput) {
+      this.nicknameInput.setAttribute('maxLength', '59')
+    }
+  }
+
   // ===============
   //     ACTIONS
   // ===============

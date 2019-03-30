@@ -32,7 +32,7 @@ const ApiClient = {
             return this._depaginate(links.next, remainingPages, results)
           }
         }
-        res.data = results // eslint-disable-line
+        res.data = results
         return res
       })
   },
@@ -100,7 +100,7 @@ const ApiClient = {
           status = res.data[0].workflow_state
         }
 
-        res.data = status // eslint-disable-line
+        res.data = status
         return res
       })
   },

@@ -351,13 +351,6 @@ QUnit.module('GradeSummary.calculateTotals', (suiteHooks) => {
       ENV.grading_scheme = [['A', 0.90], ['B', 0.80], ['C', 0.70], ['D', 0.60], ['F', 0]]
     })
 
-    test('sets the percent grade to the corresponding lower bound of the effective grade', () => {
-      ENV.effective_final_score = 72
-      GradeSummary.calculateTotals(exampleGrades, 'current', 'percent')
-      const $grade = $fixtures.find('.final_grade .grade').first()
-      strictEqual($grade.text(), '70%')
-    })
-
     test('sets the letter grade to the effective grade', () => {
       ENV.effective_final_score = 72
       GradeSummary.calculateTotals(exampleGrades, 'current', 'percent')

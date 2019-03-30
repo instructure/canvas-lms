@@ -17,7 +17,8 @@
  */
 
 import {TeacherViewContextDefaults} from './components/TeacherViewContext'
-import {wait} from 'react-testing-library'
+import {fireEvent, wait, waitForElement} from 'react-testing-library'
+import {SET_WORKFLOW} from './assignmentData'
 
 // because our version of jsdom doesn't support elt.closest('a') yet. Should soon.
 export function closest(el, selector) {
@@ -33,10 +34,10 @@ export function findInputForLabel(labelChild, container) {
   return input
 }
 
-export function waitForNoElement(queryFn) {
+export async function waitForNoElement(queryFn) {
   // use wait instead of waitForElement because waitForElement doesn't seem to
   // trigger the callback when elements disappear
-  return wait(() => {
+  await wait(() => {
     let elt = null
     try {
       elt = queryFn()
@@ -47,25 +48,68 @@ export function waitForNoElement(queryFn) {
 
     // fail if the element was found
     if (elt !== null) throw new Error(`element is still present`)
-    // otherwise success
   })
+  // if the above didn't throw, then success
+  return true
+}
+
+export function workflowMutationResult(assignment, newWorkflowState, errorMessage) {
+  const result = {
+    request: {
+      query: SET_WORKFLOW,
+      variables: {
+        id: assignment.lid,
+        workflow: newWorkflowState
+      }
+    },
+    result: {
+      data: {
+        updateAssignment: {
+          assignment: {
+            __typename: 'Assignment',
+            id: assignment.gid,
+            state: newWorkflowState
+          }
+        }
+      }
+    }
+  }
+  if (errorMessage !== undefined) {
+    result.error = new Error(errorMessage)
+  }
+  return result
 }
 
 export function mockCourse(overrides) {
   return {
     lid: 'course-lid',
     assignmentGroupsConnection: {
+      pageInfo: mockPageInfo(),
       nodes: []
     },
     modulesConnection: {
+      pageInfo: mockPageInfo(),
       nodes: []
     },
     ...overrides
   }
 }
 
+export function mockPageInfo(overrides) {
+  return {
+    startCursor: 'startCursor',
+    endCursor: 'endCursor',
+    hasNextPage: false,
+    hasPreviousPage: false,
+    ...overrides
+  }
+}
+
 export function mockAssignment(overrides) {
   return {
+    __typename: 'Assignment',
+    id: 'assignment-gid',
+    gid: 'assignment-gid',
     lid: 'assignment-lid',
     name: 'assignment name',
     pointsPossible: 5,
@@ -85,9 +129,11 @@ export function mockAssignment(overrides) {
     allowedExtensions: [],
     allowedAttempts: null,
     assignmentOverrides: {
+      pageInfo: mockPageInfo(),
       nodes: []
     },
     submissions: {
+      pageInfo: mockPageInfo(),
       nodes: []
     },
     ...overrides
@@ -103,12 +149,15 @@ export function mockOverride(overrides = {}) {
     allDay: true,
     lockAt: '2018-12-29T23:59:00-05:00',
     unlockAt: '2018-12-23T00:00:00-05:00',
-    allowedAttempts: null,
     set: {
       __typename: 'Section',
       lid: '10',
       name: 'Section A'
     },
+    // copied from assignment
+    allowedAttempts: null,
+    submissionTypes: [],
+    allowedExtensions: [],
     ...overrides
   }
 }
@@ -119,9 +168,11 @@ export function mockSubmission(overrides) {
     lid: '1',
     state: 'submitted',
     submissionStatus: 'submitted',
+    grade: '4',
     gradingStatus: 'needs_grading',
     excused: false,
     latePolicyStatus: null,
+    score: 4,
     submittedAt: '2019-01-17T12:21:42Z',
     user: mockUser(),
     assetId: '2',
@@ -137,7 +188,10 @@ export function mockUser(overrides) {
   return {
     lid: 'user_1',
     gid: 'user_1',
-    name: 'User 1',
+    name: 'Juan User',
+    shortName: 'Juan',
+    sortableName: 'User, Juan',
+    email: 'juan_user1@example.com',
     ...overrides
   }
 }
@@ -153,3 +207,43 @@ window.matchMedia =
     addListener: () => {},
     removeListener: () => {}
   }))
+
+export function itBehavesLikeADialog({
+  // render may be async.
+  render,
+  // other functions will be wrapped in a wait* method and should not be async
+  getOpenDialogElt,
+  confirmDialogOpen,
+  getCancelDialogElt
+}) {
+  /* eslint-disable jest/no-disabled-tests */
+  // skipped because the close tests regularly timeout in jenkins
+  describe.skip('behaves like a dialog', () => {
+    async function openTheDialog() {
+      const fns = await render()
+      const openDialogTrigger = getOpenDialogElt(fns)
+      fireEvent.click(openDialogTrigger)
+      expect(await waitForElement(() => confirmDialogOpen(fns))).toBeInTheDocument()
+      return fns
+    }
+
+    it('is initially not open', async () => {
+      // test with a throw just so they don't have to pass both a get* and a query* function
+      const fns = await render()
+      expect(() => confirmDialogOpen(fns)).toThrow()
+    })
+
+    it('closes when close is clicked', async () => {
+      const fns = await openTheDialog()
+      fireEvent.click(fns.getByTestId('confirm-dialog-close-button'))
+      expect(await waitForNoElement(() => confirmDialogOpen(fns))).toBe(true)
+    })
+
+    it('closes when cancel is clicked', async () => {
+      const fns = await openTheDialog()
+      fireEvent.click(getCancelDialogElt(fns))
+      expect(await waitForNoElement(() => confirmDialogOpen(fns))).toBe(true)
+    })
+  })
+  /* eslint-enable jest/no-disabled-tests */
+}

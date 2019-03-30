@@ -41,12 +41,7 @@ class GraphQLController < ApplicationController
 
     overall_timeout = Setting.get('graphql_overall_timeout', '300').to_i.seconds
     Timeout.timeout(overall_timeout) do
-      ActiveRecord::Base.transaction do
-        statement_timeout = Integer(Setting.get('graphql_statement_timeout', '60_000'))
-        ActiveRecord::Base.connection.execute "SET statement_timeout = #{statement_timeout}"
-
-        result = CanvasSchema.execute(query, variables: variables, context: context)
-      end
+      result = CanvasSchema.execute(query, variables: variables, context: context)
     end
 
     render json: result

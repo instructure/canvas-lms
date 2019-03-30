@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Fixtures from '../../gradebook-history/Fixtures'
+import Fixtures from '../Fixtures'
 import {
   FETCH_HISTORY_START,
   FETCH_HISTORY_SUCCESS,

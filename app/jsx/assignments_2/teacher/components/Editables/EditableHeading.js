@@ -97,7 +97,11 @@ export default class EditableHeading extends React.Component {
   }
 
   getFontSize(elem) {
-    return parseInt(window.getComputedStyle(elem).getPropertyValue('font-size'), 10)
+    try {
+      return parseInt(window.getComputedStyle(elem).getPropertyValue('font-size'), 10)
+    } catch (_ignore) {
+      return 16
+    }
   }
 
   getInputRef = el => {

@@ -84,12 +84,6 @@ class Score < ActiveRecord::Base
     override_score || final_score
   end
 
-  def effective_final_score_lower_bound
-    score = effective_final_score
-    return score unless course.grading_standard_enabled?
-    course.grading_standard_or_default.lower_bound(score)
-  end
-
   def effective_final_grade
     score_to_grade(effective_final_score)
   end

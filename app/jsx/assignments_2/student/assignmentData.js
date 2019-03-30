@@ -52,6 +52,7 @@ export const STUDENT_VIEW_QUERY = gql`
         dueAt
         lockAt
         name
+        muted
         pointsPossible
         unlockAt
         gradingType
@@ -79,23 +80,33 @@ export const STUDENT_VIEW_QUERY = gql`
           filter: {states: [unsubmitted, graded, pending_review, submitted]}
         ) {
           nodes {
-            commentsConnection {
-              nodes {
-                _id
-                comment
-                updatedAt
-                author {
-                  avatarUrl
-                  shortName
-                }
-              }
-            }
+            id
             deductedPoints
             enteredGrade
             grade
             gradingStatus
             latePolicyStatus
             submissionStatus
+          }
+        }
+      }
+    }
+  }
+`
+
+export const SUBMISSION_COMMENT_QUERY = gql`
+  query GetSubmissionComments($submissionId: ID!) {
+    submissionComments: node(id: $submissionId) {
+      ... on Submission {
+        commentsConnection {
+          nodes {
+            _id
+            comment
+            updatedAt
+            author {
+              avatarUrl
+              shortName
+            }
           }
         }
       }
@@ -114,9 +125,10 @@ export const CommentShape = shape({
 })
 
 export const StudentAssignmentShape = shape({
-  description: string.isRequired,
+  description: string,
   dueAt: string,
   lockAt: string,
+  muted: bool.isRequired,
   name: string.isRequired,
   pointsPossible: number.isRequired,
   unlockAt: string,
@@ -148,6 +160,7 @@ export const StudentAssignmentShape = shape({
         commentsConnection: shape({
           nodes: arrayOf(CommentShape)
         }),
+        id: string,
         deductedPoints: number,
         enteredGrade: string,
         grade: string,

@@ -48,7 +48,7 @@ describe "assignments" do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
       end
 
-      it "can save and publish an assignment", priority: "1", test_id: 193784 do
+      it "can save and publish an assignment", :xbrowser, priority: "1", test_id: 193784 do
         create_assignment false
 
         expect(f("#assignment-draft-state")).to be_displayed
@@ -122,7 +122,7 @@ describe "assignments" do
       expect(f('#assignment_description')).to have_value('<p>Testing HTML- RCE Toggle</p>')
     end
 
-    it "should edit an assignment", priority: "1", test_id: 56012 do
+    it "should edit an assignment", :xbrowser, priority: "1", test_id: 56012 do
       assignment_name = 'first test assignment'
       due_date = Time.now.utc + 2.days
       group = @course.assignment_groups.create!(:name => "default")
@@ -168,7 +168,7 @@ describe "assignments" do
       expect(driver.title).to include(assignment_name + ' edit')
     end
 
-    it "should create an assignment using main add button", priority: "1", test_id: 132582 do
+    it "should create an assignment using main add button", :xbrowser, priority: "1", test_id: 132582 do
       assignment_name = 'first assignment'
       # freeze for a certain time, so we don't get unexpected ui complications
       time = DateTime.new(Time.now.year,1,7,2,13)
@@ -975,7 +975,7 @@ describe "assignments" do
     it "should not show the moderation page if it is not a moderated assignment ", priority: "2", test_id: 609653 do
       @assignment.update_attribute(:moderated_grading, false)
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/moderate"
-      expect(f('#content h2').text).to eql "Page Not Found"
+      expect(f('#content h1').text).to eql "Page Not Found"
     end
   end
 

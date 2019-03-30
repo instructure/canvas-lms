@@ -54,7 +54,7 @@ RSpec.shared_context "lti_1_3_spec_helper", shared_context: :metadata do
     {
       'title' => 'LTI 1.3 Tool',
       'description' => '1.3 Tool',
-      'launch_url' => launch_url,
+      'target_link_uri' => launch_url,
       'custom_fields' => {'has_expansion' => '$Canvas.user.id', 'no_expansion' => 'foo'},
       'public_jwk' => public_jwk,
       'oidc_login_uri' => oidc_login_uri,
@@ -74,7 +74,7 @@ RSpec.shared_context "lti_1_3_spec_helper", shared_context: :metadata do
               'canvas_icon_class' => 'icon-lti',
               'icon_url' => 'https://static.thenounproject.com/png/131630-211.png',
               'text' => 'LTI 1.3 Test Tool Course Navigation',
-              'url' =>
+              'target_link_uri' =>
               'http://lti13testtool.docker/launch?placement=course_navigation',
               'enabled' => true
             }

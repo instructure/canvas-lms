@@ -276,6 +276,9 @@ module Api::V1::Submission
       stale = (attachment.locked != anonymous)
       stale ||= (attachment.created_at < Setting.get('submission_zip_ttl_minutes', '60').to_i.minutes.ago)
       stale ||= (attachment.created_at < (updated_at || assignment.submissions.maximum(:submitted_at)))
+      stale ||= (@current_user &&
+        (enrollment_updated_at = assignment.context.enrollments.for_user(@current_user).maximum(:updated_at)) &&
+        (attachment.created_at < enrollment_updated_at))
       if stale
         attachment.destroy_permanently_plus
         attachment = nil
@@ -366,17 +369,18 @@ module Api::V1::Submission
   end
 
   def speed_grader_url(submission, assignment, provisional_grade, current_user)
-    anchor = { provisional_grade_id: provisional_grade.id }
-    if assignment.can_view_student_names?(current_user)
-      anchor[:student_id] = submission.user_id
-    else
-      anchor[:anonymous_id] = submission.anonymous_id
-    end
-    speed_grader_course_gradebook_url(
+    url_params = {
       course_id: assignment.context.id,
       assignment_id: assignment.id,
-      anchor: anchor.to_json
-    )
+      anchor: { provisional_grade_id: provisional_grade.id }.to_json
+    }
+    if assignment.can_view_student_names?(current_user)
+      url_params[:student_id] = submission.user_id
+    else
+      url_params[:anonymous_id] = submission.anonymous_id
+    end
+
+    speed_grader_course_gradebook_url(**url_params)
   end
 
   def quizzes_next_submission?(submission)

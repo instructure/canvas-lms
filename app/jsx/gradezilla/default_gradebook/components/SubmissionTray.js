@@ -29,14 +29,14 @@ import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import Tray from '@instructure/ui-overlays/lib/components/Tray'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import IconSpeedGraderLine from '@instructure/ui-icons/lib/Line/IconSpeedGrader'
-import Carousel from '../../../gradezilla/default_gradebook/components/Carousel'
-import GradeInput from '../../../gradezilla/default_gradebook/components/GradeInput'
-import LatePolicyGrade from '../../../gradezilla/default_gradebook/components/LatePolicyGrade'
-import CommentPropTypes from '../../../gradezilla/default_gradebook/propTypes/CommentPropTypes'
-import SubmissionCommentListItem from '../../../gradezilla/default_gradebook/components/SubmissionCommentListItem'
-import SubmissionCommentCreateForm from '../../../gradezilla/default_gradebook/components/SubmissionCommentCreateForm'
-import SubmissionStatus from '../../../gradezilla/default_gradebook/components/SubmissionStatus'
-import SubmissionTrayRadioInputGroup from '../../../gradezilla/default_gradebook/components/SubmissionTrayRadioInputGroup'
+import Carousel from './Carousel'
+import GradeInput from './GradeInput'
+import LatePolicyGrade from './LatePolicyGrade'
+import CommentPropTypes from '../propTypes/CommentPropTypes'
+import SubmissionCommentListItem from './SubmissionCommentListItem'
+import SubmissionCommentCreateForm from './SubmissionCommentCreateForm'
+import SubmissionStatus from './SubmissionStatus'
+import SubmissionTrayRadioInputGroup from './SubmissionTrayRadioInputGroup'
 
 function renderAvatar(name, avatarUrl) {
   return (
@@ -223,10 +223,10 @@ export default class SubmissionTray extends React.Component {
   render() {
     const {name, avatarUrl} = this.props.student
     const assignmentParam = `assignment_id=${this.props.submission.assignmentId}`
-    const studentParam = `#{"student_id":"${this.props.student.id}"}`
+    const studentParam = `student_id=${this.props.student.id}`
     const speedGraderUrlParams = this.props.assignment.anonymizeStudents
       ? assignmentParam
-      : `${assignmentParam}${studentParam}`
+      : `${assignmentParam}&${studentParam}`
     const speedGraderUrl = encodeURI(
       `/courses/${this.props.courseId}/gradebook/speed_grader?${speedGraderUrlParams}`
     )

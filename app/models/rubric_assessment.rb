@@ -161,6 +161,8 @@ class RubricAssessment < ActiveRecord::Base
       Submission.where(:id => self.artifact).update_all(:has_rubric_assessment => true)
       if self.rubric_association && self.rubric_association.use_for_grading && self.artifact.score != self.score
         if self.rubric_association.association_object.grants_right?(self.assessor, nil, :grade)
+          group, _students = self.rubric_association.association_object.group_students(self.artifact.student)
+          Submission.find(self.artifact.id).update_column(:group_id, group.id) if group && !self.artifact.group
           # TODO: this should go through assignment.grade_student to
           # handle group assignments.
           self.artifact.workflow_state = 'graded'
@@ -227,6 +229,10 @@ class RubricAssessment < ActiveRecord::Base
 
   def serialization_methods
     @serialization_methods || []
+  end
+
+  def score
+    self[:score]&.round(4)
   end
 
   def assessor_name

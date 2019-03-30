@@ -17,21 +17,20 @@
  */
 
 import Backbone from 'Backbone'
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'
 import I18n from 'i18n!conversations'
-import { decodeQueryString } from 'jsx/shared/queryString'
+import {decodeQueryString} from 'jsx/shared/queryString'
 import React from 'react'
 import Select from '@instructure/ui-core/lib/components/Select'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
-
 
 export default class ConversationStatusFilter extends React.Component {
   static propTypes = {
     defaultFilter: PropTypes.string.isRequired,
     initialFilter: PropTypes.string.isRequired,
     router: PropTypes.instanceOf(Backbone.Router).isRequired,
-    filters: PropTypes.objectOf( (obj, key) => {
-      if (typeof(key) !== 'string' || typeof(obj[key]) !== 'string') {
+    filters: PropTypes.objectOf((obj, key) => {
+      if (typeof key !== 'string' || typeof obj[key] !== 'string') {
         return new Error("Keys and values of 'filter' prop must be strings")
       }
     }).isRequired
@@ -44,11 +43,11 @@ export default class ConversationStatusFilter extends React.Component {
   }
 
   componentWillMount() {
-    this.props.router.on("route", this.handleBackboneHistory)
+    this.props.router.on('route', this.handleBackboneHistory)
   }
 
   componentWillUnmount() {
-    this.props.router.off("route", this.handleBackboneHistory)
+    this.props.router.off('route', this.handleBackboneHistory)
   }
 
   getUrlFilter(params) {
@@ -77,7 +76,8 @@ export default class ConversationStatusFilter extends React.Component {
 
   handleBackboneHistory = (route, params) => {
     const filterParam = params[0]
-    const newState = filterParam === null ? this.props.defaultFilter : this.getUrlFilter(filterParam)
+    const newState =
+      filterParam === null ? this.props.defaultFilter : this.getUrlFilter(filterParam)
 
     // We don't need to update the backbone state if the state hasn't actually
     // changed. This occurs due to the state changing on the select option
@@ -94,9 +94,9 @@ export default class ConversationStatusFilter extends React.Component {
         layout="inline"
         width="211"
         id="conversation_filter_select"
-        label={<ScreenReaderContent>{ I18n.t("Filter conversations by type") }</ScreenReaderContent>}
+        label={<ScreenReaderContent>{I18n.t('Filter conversations by type')}</ScreenReaderContent>}
         value={this.state.selected}
-        onChange={(e) => this.updateBackboneState(e.target.value)}
+        onChange={e => this.updateBackboneState(e.target.value)}
       >
         {Object.keys(this.props.filters).map(key => (
           <option value={key} key={key}>
@@ -107,4 +107,3 @@ export default class ConversationStatusFilter extends React.Component {
     )
   }
 }
-

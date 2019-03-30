@@ -16,31 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {TEACHER_QUERY, SET_WORKFLOW} from './assignmentData'
-import {execute, makePromise} from 'apollo-link'
-import {createHttpOnlyLink} from '../../canvas-apollo'
+import axios from 'axios'
 
-// make this lazy to support testing
-let _link = null
-function link() {
-  if (_link) return _link
-  return (_link = createHttpOnlyLink())
-}
+export function sendMesssageStudentsWho({recipientLids, subject, body, contextCode}) {
+  const apiParams = {
+    recipients: recipientLids,
+    subject,
+    body,
+    context_code: contextCode,
+    mode: 'async',
+    group_conversation: true,
+    bulk_message: true
+  }
 
-export function queryAssignment(assignmentLid) {
-  return makePromise(
-    execute(link(), {
-      query: TEACHER_QUERY,
-      variables: {assignmentLid}
-    })
-  )
-}
-
-export function setWorkflow(assignment, newWorkflow) {
-  return makePromise(
-    execute(link(), {
-      query: SET_WORKFLOW,
-      variables: {id: assignment.lid, workflow: newWorkflow}
-    })
-  )
+  return axios.post('/api/v1/conversations', apiParams)
 }

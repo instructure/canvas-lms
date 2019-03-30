@@ -30,12 +30,12 @@ import numberHelper from 'jsx/shared/helpers/numberHelper'
 import userSettings from 'compiled/userSettings'
 import htmlEscape from 'str/htmlEscape'
 
-const {unescape} = htmlEscape
-
 import 'jquery.ajaxJSON'
 
+const {unescape} = htmlEscape
+
 const fixtures = document.getElementById('fixtures')
-const setupCurrentStudent = () => SpeedGrader.EG.handleStudentChanged()
+const setupCurrentStudent = (historyBehavior = null) => SpeedGrader.EG.handleStudentChanged(historyBehavior)
 const requiredDOMFixtures = `
   <div id="speed_grader_assessment_audit_tray_mount_point"></div>
   <span id="speed_grader_settings_mount_point"></span>
@@ -781,14 +781,12 @@ QUnit.module('SpeedGrader#handleGradeSubmit', {
     teardownFixtures()
     window.jsonData = this.originalWindowJSONData
     SpeedGrader.teardown()
-    window.location.hash = ''
     fakeENV.teardown()
     SpeedGraderHelpers.reloadPage.restore()
   }
 })
 
 test('hasWarning and flashWarning are called', function() {
-  sinon.stub(SpeedGrader.EG, 'handleFragmentChanged')
   SpeedGrader.EG.jsonReady()
   const flashWarningStub = sandbox.stub($, 'flashWarning')
   sandbox.stub(SpeedGraderHelpers, 'determineGradeToSubmit').returns('15')
@@ -805,11 +803,9 @@ test('hasWarning and flashWarning are called', function() {
   ]
   callback(submissions)
   ok(flashWarningStub.calledOnce)
-  SpeedGrader.EG.handleFragmentChanged.restore()
 })
 
 test('handleGradeSubmit should submit score if using existing score', () => {
-  sinon.stub(SpeedGrader.EG, 'handleFragmentChanged')
   SpeedGrader.EG.jsonReady()
   SpeedGrader.EG.handleGradeSubmit(null, true)
   equal($.ajaxJSON.getCall(2).args[0], 'my_url.com')
@@ -818,11 +814,9 @@ test('handleGradeSubmit should submit score if using existing score', () => {
   equal(formData['submission[score]'], '7')
   equal(formData['submission[grade]'], undefined)
   equal(formData['submission[user_id]'], 4)
-  SpeedGrader.EG.handleFragmentChanged.restore()
 })
 
 test('handleGradeSubmit should submit grade if not using existing score', function() {
-  sinon.stub(SpeedGrader.EG, 'handleFragmentChanged')
   SpeedGrader.EG.jsonReady()
   sandbox.stub(SpeedGraderHelpers, 'determineGradeToSubmit').returns('56')
   SpeedGrader.EG.handleGradeSubmit(null, false)
@@ -833,11 +827,9 @@ test('handleGradeSubmit should submit grade if not using existing score', functi
   equal(formData['submission[grade]'], '56')
   equal(formData['submission[user_id]'], 4)
   SpeedGraderHelpers.determineGradeToSubmit.restore()
-  SpeedGrader.EG.handleFragmentChanged.restore()
 })
 
 test('unexcuses the submission if the grade is blank and the assignment is complete/incomplete', function() {
-  sinon.stub(SpeedGrader.EG, 'handleFragmentChanged')
   SpeedGrader.EG.jsonReady()
   sandbox.stub(SpeedGraderHelpers, 'determineGradeToSubmit').returns('')
   window.jsonData.grading_type = 'pass_fail'
@@ -846,7 +838,6 @@ test('unexcuses the submission if the grade is blank and the assignment is compl
   const [, , formData] = $.ajaxJSON.getCall(2).args
   strictEqual(formData['submission[excuse]'], false)
   SpeedGraderHelpers.determineGradeToSubmit.restore()
-  SpeedGrader.EG.handleFragmentChanged.restore()
 })
 
 QUnit.module('attachmentIframeContents', {
@@ -1153,7 +1144,6 @@ QUnit.module('handleSubmissionSelectionChange', hooks => {
       help_url: 'helpUrl',
       show_help_menu_item: false
     })
-    sinon.stub(SpeedGrader.EG, 'handleFragmentChanged')
     originalWindowJSONData = window.jsonData
     originalStudent = SpeedGrader.EG.currentStudent
     courses = `/courses/${ENV.course_id}`
@@ -1270,8 +1260,6 @@ QUnit.module('handleSubmissionSelectionChange', hooks => {
     SpeedGrader.EG.currentStudent = originalStudent
     $.ajaxJSON.restore()
     SpeedGrader.teardown()
-    window.location.hash = ''
-    SpeedGrader.EG.handleFragmentChanged.restore()
     fakeENV.teardown()
     teardownFixtures()
   })
@@ -1471,11 +1459,9 @@ QUnit.module('SpeedGrader', suiteHooks => {
     })
 
     sandbox.stub(userSettings, 'get')
-    sandbox.stub(SpeedGrader.EG, 'handleFragmentChanged')
   })
 
   suiteHooks.afterEach(() => {
-    window.location.hash = ''
     fakeENV.teardown()
     teardownFixtures()
   })
@@ -1524,6 +1510,7 @@ QUnit.module('SpeedGrader', suiteHooks => {
             grade_matches_current_submission: false,
             id: '2501',
             score: null,
+            submission_history: [],
             submitted_at: '2015-05-05T12:00:00Z',
             user_id: '1101',
             workflow_state: 'submitted'
@@ -1534,6 +1521,7 @@ QUnit.module('SpeedGrader', suiteHooks => {
             grade_matches_current_submission: false,
             id: '2502',
             score: null,
+            submission_history: [],
             submitted_at: null,
             user_id: '1102',
             workflow_state: 'unsubmitted'
@@ -1544,6 +1532,7 @@ QUnit.module('SpeedGrader', suiteHooks => {
             grade_matches_current_submission: false,
             id: '2503',
             score: 0,
+            submission_history: [],
             submitted_at: '2015-05-06T12:00:00Z',
             user_id: '1103',
             workflow_state: 'resubmitted'
@@ -1554,6 +1543,7 @@ QUnit.module('SpeedGrader', suiteHooks => {
             grade_matches_current_submission: true,
             id: '2504',
             score: 10,
+            submission_history: [],
             submitted_at: '2015-05-04T12:00:00Z',
             user_id: '1104',
             workflow_state: 'graded'
@@ -1634,6 +1624,7 @@ QUnit.module('SpeedGrader', suiteHooks => {
             grade_matches_current_submission: false,
             id: '2501',
             score: null,
+            submission_history: [],
             submitted_at: '2015-05-05T12:00:00Z',
             workflow_state: 'submitted',
             ...beta
@@ -1643,6 +1634,7 @@ QUnit.module('SpeedGrader', suiteHooks => {
             grade_matches_current_submission: false,
             id: '2502',
             score: null,
+            submission_history: [],
             submitted_at: null,
             workflow_state: 'unsubmitted',
             ...alpha
@@ -1652,6 +1644,7 @@ QUnit.module('SpeedGrader', suiteHooks => {
             grade_matches_current_submission: false,
             id: '2503',
             score: 0,
+            submission_history: [],
             submitted_at: '2015-05-06T12:00:00Z',
             workflow_state: 'resubmitted',
             ...delta
@@ -1661,6 +1654,7 @@ QUnit.module('SpeedGrader', suiteHooks => {
             grade_matches_current_submission: true,
             id: '2504',
             score: 10,
+            submission_history: [],
             submitted_at: '2015-05-04T12:00:00Z',
             workflow_state: 'graded',
             ...gamma
@@ -1919,7 +1913,6 @@ QUnit.module('SpeedGrader - clicking save rubric button', function(hooks) {
     fakeENV.teardown()
     disableWhileLoadingStub.restore()
     SpeedGrader.teardown()
-    window.location.hash = ''
     $.ajaxJSON.restore()
     $.fn.ready.restore()
   })
@@ -1962,7 +1955,6 @@ QUnit.module('SpeedGrader - clicking save rubric button for an anonymous assignm
       }
     })
 
-    sinon.stub(SpeedGrader.EG, 'handleFragmentChanged')
     rubricAssessmentDataStub = sinon
       .stub(window.rubricAssessment, 'assessmentData')
       .returns({'rubric_assessment[user_id]': 'abcde'})
@@ -2022,12 +2014,10 @@ QUnit.module('SpeedGrader - clicking save rubric button for an anonymous assignm
     SpeedGrader.EG.currentStudent = originalSpeedGraderEGCurrentStudent
     teardownFixtures()
     rubricAssessmentDataStub.restore()
-    SpeedGrader.EG.handleFragmentChanged.restore()
     fakeENV.teardown()
     disableWhileLoadingStub.restore()
     $.ajaxJSON.restore()
     SpeedGrader.teardown()
-    window.location.hash = ''
   })
 
   test('sends the anonymous submission ID in rubric_assessment[anonymous_id] if the assignment is anonymous', () => {
@@ -2177,11 +2167,15 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       })
     })
 
-    QUnit.module('when the assessment is not a peer review assessment', function() {
+    QUnit.module('when the assessment is a peer review assessment', function(contextHooks) {
+      contextHooks.beforeEach(function() {
+        SpeedGrader.EG.currentStudent.rubric_assessments[0].assessment_type = 'peer_review'
+      })
+
       test('populates the rubric without data if the user is not the selected assessor', function() {
         SpeedGrader.EG.refreshFullRubric()
-        const {data} = window.rubricAssessment.populateRubric.getCall(0).args[1]
-        propEqual(data, [])
+        const assessmentData = window.rubricAssessment.populateRubric.getCall(0).args[1]
+        propEqual(assessmentData, {})
       })
 
       test('populates the rubric with data if the user is the selected assessor', function() {
@@ -2200,7 +2194,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
 
     hooks.afterEach(function() {
       SpeedGrader.teardown()
-      window.location.hash = ''
       teardownFixtures()
     })
 
@@ -2241,7 +2234,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
 
     hooks.afterEach(function() {
       SpeedGrader.teardown()
-      window.location.hash = ''
       teardownFixtures()
     })
 
@@ -2346,7 +2338,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       delete SpeedGrader.EG.currentStudent
       window.jsonData = jsonData
       SpeedGrader.teardown()
-      window.location.hash = ''
       document.querySelector('.ui-selectmenu-menu').remove()
     })
 
@@ -2546,7 +2537,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         SpeedGrader.teardown()
         teardownFixtures()
         fakeENV.teardown()
-        window.location.hash = ''
       })
 
       QUnit.module('download submission comments link', hooks => {
@@ -2638,7 +2628,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         SpeedGrader.teardown()
         teardownFixtures()
         fakeENV.teardown()
-        window.location.hash = ''
       })
 
       QUnit.module('given a non-concluded enrollment', () => {
@@ -2757,7 +2746,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
     })
 
     anonymousHooks.afterEach(() => {
-      window.location.hash = ''
       window.jsonData = originalJsonData
     })
 
@@ -2790,7 +2778,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
         SpeedGrader.teardown()
-        window.location.hash = ''
       })
 
       test('when students are anonymized no link is shown', () => {
@@ -2860,7 +2847,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
         SpeedGrader.teardown()
-        window.location.hash = ''
       })
 
       test('renderComment adds the comment text to the submit button for draft comments', () => {
@@ -3115,7 +3101,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
           show_help_menu_item: false
         })
         setupFixtures()
-        sinon.stub(SpeedGrader.EG, 'handleFragmentChanged')
         sinon.stub(SpeedGrader.EG, 'goToStudent')
         SpeedGrader.setup()
         window.jsonData = windowJsonData // setup() resets jsonData
@@ -3125,29 +3110,27 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       hooks.afterEach(function() {
         teardownFixtures()
         SpeedGrader.teardown()
-        window.location.hash = ''
         SpeedGrader.EG.goToStudent.restore()
-        SpeedGrader.EG.handleFragmentChanged.restore()
         window.jsonData = originalJsonData
       })
 
       test('goToStudent is called with next student anonymous_id', () => {
         SpeedGrader.EG.skipRelativeToCurrentIndex(1)
-        deepEqual(SpeedGrader.EG.goToStudent.firstCall.args, [alphaStudent.anonymous_id])
+        deepEqual(SpeedGrader.EG.goToStudent.firstCall.args, [alphaStudent.anonymous_id, 'push'])
       })
 
       test('goToStudent loops back around to previous student anonymous_id', () => {
         SpeedGrader.EG.skipRelativeToCurrentIndex(-1)
-        deepEqual(SpeedGrader.EG.goToStudent.firstCall.args, [alphaStudent.anonymous_id])
+        deepEqual(SpeedGrader.EG.goToStudent.firstCall.args, [alphaStudent.anonymous_id, 'push'])
       })
 
       test('goToStudent is called with the current (first) student anonymous_id', () => {
         SpeedGrader.EG.skipRelativeToCurrentIndex(0)
-        deepEqual(SpeedGrader.EG.goToStudent.firstCall.args, [omegaStudent.anonymous_id])
+        deepEqual(SpeedGrader.EG.goToStudent.firstCall.args, [omegaStudent.anonymous_id, 'push'])
       })
     })
 
-    QUnit.module('#handleFragmentChanged', hooks => {
+    QUnit.module('#handleStatePopped', hooks => {
       hooks.beforeEach(function() {
         fakeENV.setup({
           ...ENV,
@@ -3158,38 +3141,39 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
           show_help_menu_item: false
         })
         setupFixtures()
-        sinon.stub(SpeedGrader.EG, 'goToStudent')
         SpeedGrader.setup()
-        sinon.stub(SpeedGrader.EG, 'handleFragmentChanged')
         window.jsonData = windowJsonData // setup() resets jsonData
         SpeedGrader.EG.jsonReady()
-        document.location.hash = `#${encodeURIComponent(JSON.stringify(omegaStudent))}`
-        SpeedGrader.EG.handleFragmentChanged.restore()
+        sinon.stub(SpeedGrader.EG, 'goToStudent')
       })
 
       hooks.afterEach(function() {
+        SpeedGrader.EG.goToStudent.restore()
         teardownFixtures()
         SpeedGrader.teardown()
-        window.location.hash = ''
-        SpeedGrader.EG.goToStudent.restore()
         window.jsonData = originalJsonData
       })
 
       test('goToStudent is called with student anonymous_id', () => {
-        SpeedGrader.EG.handleFragmentChanged()
+        SpeedGrader.EG.handleStatePopped({state: {anonymous_id: omegaStudent.anonymous_id}})
         deepEqual(SpeedGrader.EG.goToStudent.firstCall.args, [omegaStudent.anonymous_id])
       })
 
       test('goToStudent is called with the first available student if the requested student does not exist in studentMap', () => {
         delete window.jsonData.studentMap[omegaStudent.anonymous_id]
-        SpeedGrader.EG.handleFragmentChanged()
+        SpeedGrader.EG.handleStatePopped({state: {anonymous_id: omegaStudent.anonymous_id}})
         deepEqual(SpeedGrader.EG.goToStudent.firstCall.args, [alphaStudent.anonymous_id])
       })
 
       test('goToStudent is never called with rep_for_student id', () => {
         window.jsonData.context.rep_for_student = {[omegaStudent.anonymous_id]: {}}
-        SpeedGrader.EG.handleFragmentChanged()
+        SpeedGrader.EG.handleStatePopped({state: {anonymous_id: omegaStudent.anonymous_id}})
         deepEqual(SpeedGrader.EG.goToStudent.firstCall.args, [omegaStudent.anonymous_id])
+      })
+
+      test('goToStudent is not called if no state is specified', () => {
+        SpeedGrader.EG.handleStatePopped({})
+        equal(SpeedGrader.EG.goToStudent.callCount, 0)
       })
     })
 
@@ -3211,7 +3195,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
 
       hooks.afterEach(() => {
         SpeedGrader.teardown()
-        window.location.hash = ''
         teardownFixtures()
         window.jsonData = originalJsonData
         document.querySelector('.ui-selectmenu-menu').remove()
@@ -3268,20 +3251,31 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         setupFixtures()
         SpeedGrader.setup()
         window.jsonData = windowJsonData
+        sinon.stub(SpeedGrader.EG, 'updateHistoryForCurrentStudent')
         SpeedGrader.EG.jsonReady()
       })
 
       hooks.afterEach(() => {
         teardownFixtures()
+        SpeedGrader.EG.updateHistoryForCurrentStudent.restore()
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
         SpeedGrader.teardown()
-        window.location.hash = ''
       })
 
-      test('updates the location hash with the anonymous id object', () => {
+      test('pushes the current student onto the browser history if "push" is specified as the behavior', () => {
+        setupCurrentStudent('push')
+        deepEqual(SpeedGrader.EG.updateHistoryForCurrentStudent.firstCall.args, ['push'])
+      })
+
+      test('replaces the current history entry with the current student if  "replace" is specified as the behavior', () => {
+        setupCurrentStudent('replace')
+        deepEqual(SpeedGrader.EG.updateHistoryForCurrentStudent.firstCall.args, ['replace'])
+      })
+
+      test('does not attempt to manipulate the history if no behavior is specified', () => {
         setupCurrentStudent()
-        deepEqual(JSON.parse(decodeURIComponent(document.location.hash.substr(1))), alpha)
+        equal(SpeedGrader.EG.updateHistoryForCurrentStudent.callCount, 0)
       })
 
       test('url fetches the anonymous_provisional_grades', () => {
@@ -3299,6 +3293,94 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
           url,
           `/api/v1/courses/${courseId}/assignments/${assignmentId}/anonymous_provisional_grades/status?${params}`
         )
+      })
+    })
+
+    QUnit.module('#updateHistoryForCurrentStudent', hooks => {
+      let currentStudentUrl
+      let currentStudentState
+
+      hooks.beforeEach(() => {
+        fakeENV.setup({
+          ...ENV,
+          assignment_id: '17',
+          course_id: '29',
+          grading_role: 'moderator',
+          help_url: 'example.com/support',
+          show_help_menu_item: false
+        })
+        setupFixtures()
+        SpeedGrader.setup()
+        window.jsonData = windowJsonData
+        SpeedGrader.EG.jsonReady()
+        setupCurrentStudent()
+
+        const currentStudent = SpeedGrader.EG.currentStudent
+        currentStudentUrl = `?assignment_id=${ENV.assignment_id}&anonymous_id=${currentStudent.anonymous_id}`
+        currentStudentState = {anonymous_id: currentStudent.anonymous_id}
+      })
+
+      hooks.afterEach(() => {
+        teardownFixtures()
+        window.jsonData = originalJsonData
+        delete SpeedGrader.EG.currentStudent
+        SpeedGrader.teardown()
+      })
+
+      QUnit.module('when a behavior of "push" is specified', pushHooks => {
+        pushHooks.beforeEach(() => {
+          sinon.stub(window.history, 'pushState')
+        })
+
+        pushHooks.afterEach(() => {
+          window.history.pushState.restore()
+        })
+
+        test('pushes a URL containing the current assignment and student IDs', () => {
+          SpeedGrader.EG.updateHistoryForCurrentStudent('push')
+          const url = window.history.pushState.firstCall.args[2]
+          strictEqual(url, currentStudentUrl)
+        })
+
+        test('pushes an empty string for the title', () => {
+          SpeedGrader.EG.updateHistoryForCurrentStudent('push')
+          const title = window.history.pushState.firstCall.args[1]
+          strictEqual(title, '')
+        })
+
+        test('pushes a state hash containing the current student ID', () => {
+          SpeedGrader.EG.updateHistoryForCurrentStudent('push')
+          const hash = window.history.pushState.firstCall.args[0]
+          deepEqual(hash, currentStudentState)
+        })
+      })
+
+      QUnit.module('when a behavior of "replace" is specified', replaceHooks => {
+        replaceHooks.beforeEach(() => {
+          sinon.stub(window.history, 'replaceState')
+        })
+
+        replaceHooks.afterEach(() => {
+          window.history.replaceState.restore()
+        })
+
+        test('sets a URL containing the current assignment and student IDs', () => {
+          SpeedGrader.EG.updateHistoryForCurrentStudent('replace')
+          const url = window.history.replaceState.firstCall.args[2]
+          strictEqual(url, currentStudentUrl)
+        })
+
+        test('sets an empty string for the title', () => {
+          SpeedGrader.EG.updateHistoryForCurrentStudent('replace')
+          const title = window.history.replaceState.firstCall.args[1]
+          strictEqual(title, '')
+        })
+
+        test('sets a state hash containing the current student ID', () => {
+          SpeedGrader.EG.updateHistoryForCurrentStudent('replace')
+          const hash = window.history.replaceState.firstCall.args[0]
+          deepEqual(hash, currentStudentState)
+        })
       })
     })
 
@@ -3415,7 +3497,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
 
       hooks.afterEach(() => {
         SpeedGrader.teardown()
-        window.location.hash = ''
         window.jsonData = originalJsonData
         SpeedGrader.EG.showSubmission.restore()
         teardownFixtures()
@@ -3452,7 +3533,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
 
       hooks.afterEach(() => {
         SpeedGrader.teardown()
-        window.location.hash = ''
         window.jsonData = originalJsonData
         teardownFixtures()
       })
@@ -3481,7 +3561,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
 
       hooks.afterEach(() => {
         SpeedGrader.teardown()
-        window.location.hash = ''
         teardownFixtures()
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
@@ -3543,7 +3622,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
         SpeedGrader.teardown()
-        window.location.hash = ''
       })
 
       test('assessment_user_id is set via anonymous id', () => {
@@ -3596,7 +3674,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
         SpeedGrader.teardown()
-        window.location.hash = ''
       })
 
       test('attachmentElement has submitter_id set to anonymous id', () => {
@@ -3629,7 +3706,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
         SpeedGrader.teardown()
-        window.location.hash = ''
       })
 
       test('calls isStudentConcluded with student looked up by anonymous id', () => {
@@ -3672,7 +3748,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
         SpeedGrader.teardown()
-        window.location.hash = ''
       })
 
       test('calls ajaxJSON with anonymous submission url with anonymous id', () => {
@@ -3755,7 +3830,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
         SpeedGrader.teardown()
-        window.location.hash = ''
       })
 
       test('calls isStudentConcluded with student looked up by anonymous id', () => {
@@ -3878,7 +3952,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
         SpeedGrader.teardown()
-        window.location.hash = ''
         document.querySelector('.ui-selectmenu-menu').remove()
       })
 
@@ -3923,7 +3996,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
         SpeedGrader.teardown()
-        window.location.hash = ''
       })
 
       test("the iframe src points to a user's submission by anonymous_id", () => {
@@ -3971,7 +4043,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         window.jsonData = originalJsonData
         delete SpeedGrader.EG.currentStudent
         SpeedGrader.teardown()
-        window.location.hash = ''
       })
 
       test('attachment src points to the submission download url', () => {
@@ -4100,7 +4171,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       EG.setupProvisionalGraderDisplayNames.restore()
 
       SpeedGrader.teardown()
-      window.location.hash = ''
       teardownFixtures()
     })
 
@@ -4195,7 +4265,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       EG.selectProvisionalGrade.restore()
 
       SpeedGrader.teardown()
-      window.location.hash = ''
       teardownFixtures()
     })
 
@@ -4267,7 +4336,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
 
     hooks.afterEach(() => {
       SpeedGrader.teardown()
-      window.location.hash = ''
       teardownFixtures()
     })
 
@@ -4360,7 +4428,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
     hooks.afterEach(() => {
       EG.onProvisionalGradesFetched.restore()
       SpeedGrader.teardown()
-      window.location.hash = ''
       teardownFixtures()
     })
 
@@ -4433,7 +4500,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       EG.showStudent.restore()
 
       SpeedGrader.teardown()
-      window.location.hash = ''
       teardownFixtures()
     })
 
@@ -4515,7 +4581,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       EG.renderProvisionalGradeSelector.restore()
       EG.fetchProvisionalGrades.restore()
       SpeedGrader.teardown()
-      window.location.hash = ''
 
       teardownFixtures()
     })
@@ -4560,7 +4625,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
     hooks.afterEach(() => {
       teardownFixtures()
       SpeedGrader.teardown()
-      window.location.hash = ''
     })
 
     QUnit.module('when a submission is unsubmitted', () => {
@@ -4576,6 +4640,174 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         EG.loadSubmissionPreview()
 
         strictEqual($('#iframe_holder').html(), '')
+      })
+    })
+  })
+
+  QUnit.module('#setInitiallyLoadedStudent', hooks => {
+    let windowJsonData
+    let queryParamsStub
+
+    hooks.beforeEach(() => {
+      fakeENV.setup({
+        ...ENV,
+        assignment_id: '17',
+        course_id: '29',
+        help_url: 'example.com/support',
+        new_gradebook_enabled: true,
+        selected_section_id: '1',
+        show_help_menu_item: false,
+        RUBRIC_ASSESSMENT: {}
+      })
+
+      windowJsonData = {
+        context: {
+          active_course_sections: ['1'],
+          enrollments: [
+            {course_section_id: '1', user_id: '10', anonymous_id: 'fffff', workflow_state: 'active'},
+            {course_section_id: '1', user_id: '20', anonymous_id: 'zzzzz', workflow_state: 'active'},
+            {course_section_id: '1', user_id: '30', anonymous_id: 'rrrrr', workflow_state: 'active'},
+            {course_section_id: '2', user_id: '40', anonymous_id: 'vvvvv', workflow_state: 'active'}
+          ],
+          rep_for_student: {},
+          students: [
+            {anonymous_id: 'fffff', id: '10', name: 'Fredegarius, the Default'},
+            {anonymous_id: 'zzzzz', id: '20', name: 'Zedegarius, the Ungraded'},
+            {anonymous_id: 'rrrrr', id: '30', name: 'Dredegarius, the Representative'},
+            {anonymous_id: 'vvvvv', id: '40', name: 'Vedegarius, the Inactive'}
+          ]
+        },
+        gradingPeriods: {},
+        id: '17',
+        submissions: [
+          {user_id: '10', anonymous_id: 'fffff', score: 10, workflow_state: 'graded'},
+          {user_id: '20', anonymous_id: 'zzzzz', submission_type: 'online_text_entry'},
+          {user_id: '30', anonymous_id: 'rrrrr', score: 20, workflow_state: 'graded'},
+          {user_id: '40', anonymous_id: 'vvvvv', score: 20, workflow_state: 'graded'}
+        ]
+      }
+      setupFixtures(`
+        <div id="combo_box_container"></div>
+      `)
+      SpeedGrader.setup()
+      sinon.stub(SpeedGrader.EG, 'showStudent')
+      queryParamsStub = sinon.stub(SpeedGrader.EG, 'parseDocumentQuery').returns({})
+      window.jsonData = windowJsonData
+    })
+
+    hooks.afterEach(() => {
+      queryParamsStub.restore()
+      SpeedGrader.EG.showStudent.restore()
+      delete SpeedGrader.EG.currentStudent
+      SpeedGrader.teardown()
+      teardownFixtures()
+    })
+
+    QUnit.module('when anonymous grading is not active', nonAnonymousHooks => {
+      nonAnonymousHooks.beforeEach(() => {
+        SpeedGrader.EG.jsonReady()
+      })
+
+      nonAnonymousHooks.afterEach(() => {
+      })
+
+      test('selects the student specified in the query if one is given', () => {
+        queryParamsStub.returns({student_id: '10'})
+        SpeedGrader.EG.setInitiallyLoadedStudent()
+        strictEqual(SpeedGrader.EG.currentStudent.id, '10')
+      })
+
+      test('selects the student given in the hash fragment if specified', () => {
+        document.location.hash = '#{"student_id":"10"}'
+        SpeedGrader.EG.setInitiallyLoadedStudent()
+        strictEqual(SpeedGrader.EG.currentStudent.id, '10')
+      })
+
+      test('accepts non-string student IDs in the hash', () => {
+        document.location.hash = '#{"student_id":10}'
+        SpeedGrader.EG.setInitiallyLoadedStudent()
+        strictEqual(SpeedGrader.EG.currentStudent.id, '10')
+      })
+
+      test('clears the hash fragment if it is non-empty', () => {
+        document.location.hash = '#not_actually_a_hash'
+        SpeedGrader.EG.setInitiallyLoadedStudent()
+        strictEqual(document.location.hash, '')
+      })
+
+      test('selects the representative for the specified student if one exists', () => {
+        queryParamsStub.returns({student_id: '10'})
+        window.jsonData.context.rep_for_student['10'] = '30'
+        // rep for student
+        SpeedGrader.EG.setInitiallyLoadedStudent()
+        strictEqual(SpeedGrader.EG.currentStudent.id, '30')
+
+        delete window.jsonData.context.rep_for_student['10']
+      })
+
+      test('defaults to the first ungraded student if no student is specified', () => {
+        SpeedGrader.EG.setInitiallyLoadedStudent()
+        strictEqual(SpeedGrader.EG.currentStudent.id, '20')
+      })
+
+      test('defaults to the first ungraded student if an invalid student is specified', () => {
+        queryParamsStub.returns({student_id: '-12121212'})
+        SpeedGrader.EG.setInitiallyLoadedStudent()
+        strictEqual(SpeedGrader.EG.currentStudent.id, '20')
+      })
+
+      test('defaults to the first ungraded student in the section if given a student not in section', () => {
+        queryParamsStub.returns({student_id: '40'})
+        SpeedGrader.EG.setInitiallyLoadedStudent()
+        strictEqual(SpeedGrader.EG.currentStudent.id, '20')
+      })
+    })
+
+    QUnit.module('when anonymous grading is active', anonymousHooks => {
+      anonymousHooks.beforeEach(() => {
+        window.jsonData.anonymize_students = true
+        SpeedGrader.EG.jsonReady()
+      })
+
+      anonymousHooks.afterEach(() => {
+        delete window.jsonData.anonymize_students
+      })
+
+      test('selects the student specified in the query if there is one', () => {
+        queryParamsStub.returns({anonymous_id: 'fffff'})
+        SpeedGrader.EG.setInitiallyLoadedStudent()
+        strictEqual(SpeedGrader.EG.currentStudent.anonymous_id, 'fffff')
+      })
+
+      test('selects the student given in the hash fragment if specified', () => {
+        document.location.hash = '#{"anonymous_id":"fffff"}'
+        SpeedGrader.EG.setInitiallyLoadedStudent()
+        strictEqual(SpeedGrader.EG.currentStudent.anonymous_id, 'fffff')
+      })
+
+      test('does not attempt to select a representative', () => {
+        queryParamsStub.returns({anonymous_id: 'fffff'})
+        window.jsonData.context.rep_for_student['fffff'] = 'rrrrr'
+        SpeedGrader.EG.setInitiallyLoadedStudent()
+        strictEqual(SpeedGrader.EG.currentStudent.anonymous_id, 'fffff')
+        delete window.jsonData.context.rep_for_student['fffff']
+      })
+
+      test('defaults to the first ungraded student if no student is specified', () => {
+        SpeedGrader.EG.setInitiallyLoadedStudent()
+        strictEqual(SpeedGrader.EG.currentStudent.anonymous_id, 'zzzzz')
+      })
+
+      test('defaults to the first ungraded student if an invalid student is specified', () => {
+        queryParamsStub.returns({anonymous_id: '!FRED'})
+        SpeedGrader.EG.setInitiallyLoadedStudent()
+        strictEqual(SpeedGrader.EG.currentStudent.anonymous_id, 'zzzzz')
+      })
+
+      test('selects the first ungraded student in the section if a student not in section is given', () => {
+        queryParamsStub.returns({anonymous_id: 'vvvvv'})
+        SpeedGrader.EG.setInitiallyLoadedStudent()
+        strictEqual(SpeedGrader.EG.currentStudent.anonymous_id, 'zzzzz')
       })
     })
   })
@@ -4662,7 +4894,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
 
       sandbox.stub($, 'post').yields()
       sandbox.stub(SpeedGraderHelpers, 'reloadPage')
-      sandbox.stub(SpeedGrader.EG, 'handleFragmentChanged')
       sandbox.stub(userSettings, 'contextSet')
       sandbox.stub(userSettings, 'contextRemove')
       sandbox.stub(userSettings, 'contextGet').returns('3')
@@ -4672,7 +4903,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       userSettings.contextGet.restore()
       userSettings.contextRemove.restore()
       userSettings.contextSet.restore()
-      SpeedGrader.EG.handleFragmentChanged.restore()
       SpeedGraderHelpers.reloadPage.restore()
       $.post.restore()
       delete $.fn.menu
@@ -4681,7 +4911,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         element.remove()
       })
 
-      window.location.hash = ''
       teardownFixtures()
       SpeedGrader.teardown()
       window.jsonData = originalWindowJSONData
@@ -4879,7 +5108,8 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
           moderatorProvisionalGrade,
           otherGraderProvisionalGrade,
           provisionalGraderProvisionalGrade
-        ]
+        ],
+        submission_history: [],
       }
 
       student = {
@@ -4924,17 +5154,13 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       const getFromCache = sinon.stub(JQuerySelectorCache.prototype, 'get')
       getFromCache.withArgs('#rubric_full').returns($('#rubric_full'))
       getFromCache.withArgs('#rubric_assessments_select').returns($('#rubric_assessments_select'))
-
-      sandbox.stub(SpeedGrader.EG, 'handleFragmentChanged')
     })
 
     hooks.afterEach(() => {
-      SpeedGrader.EG.handleFragmentChanged.restore()
       JQuerySelectorCache.prototype.get.restore()
 
       window.jsonData = originalJsonData
       SpeedGrader.teardown()
-      window.location.hash = ''
       teardownFixtures()
     })
 
@@ -5151,7 +5377,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         submissions: [submission]
       }
 
-      sinon.stub(SpeedGrader.EG, 'handleFragmentChanged')
       sinon.stub(SpeedGrader.EG, 'loadSubmissionPreview')
 
       SpeedGrader.setup()
@@ -5159,11 +5384,9 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
 
     originalityHooks.afterEach(() => {
       SpeedGrader.EG.loadSubmissionPreview.restore()
-      SpeedGrader.EG.handleFragmentChanged.restore()
 
       fakeENV.teardown()
       SpeedGrader.teardown()
-      window.location.hash = ''
       teardownFixtures()
     })
 

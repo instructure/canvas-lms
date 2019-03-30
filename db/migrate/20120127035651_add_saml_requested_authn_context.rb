@@ -27,7 +27,7 @@ class AddSamlRequestedAuthnContext < ActiveRecord::Migration[4.2]
 
     AuthenticationProvider.where(auth_type: "saml").each do |aac|
       # This was the hard-coded value before
-      aac.requested_authn_context = Onelogin::Saml::AuthnContexts::PASSWORD_PROTECTED_TRANSPORT
+      aac.requested_authn_context = SAML2::AuthnStatement::Classes::PASSWORD_PROTECTED_TRANSPORT
       aac.save!
     end
     AuthenticationProvider.reset_column_information

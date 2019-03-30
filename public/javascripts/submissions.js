@@ -304,6 +304,11 @@ import './rubric_assessment' /*global rubricAssessment*/
           $("#rubric_assessment_option_" + assessment.id).text(assessment.assessor_name);
           $("#new_rubric_assessment_option").remove();
           $("#rubric_assessments_list").show();
+
+          if(assessment.assessment_type === 'peer_review') {
+            $('.save_rubric_button').remove()
+          }
+
           /* the 500 timeout is due to the fadeOut in the closeRubric function, which defaults to 400.
           We need to ensure any warning messages are read out after the fadeOut manages the page focus
           so that any messages are not interrupted in voiceover utilities */

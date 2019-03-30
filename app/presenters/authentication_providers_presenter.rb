@@ -100,14 +100,14 @@ class AuthenticationProvidersPresenter
 
   def saml_identifiers
     return [] unless saml_enabled?
-    Onelogin::Saml::NameIdentifiers::ALL_IDENTIFIERS
+    AuthenticationProvider::SAML.name_id_formats
   end
 
   def login_attribute_for(config)
     saml_login_attributes.invert[config.login_attribute]
   end
 
-  def saml_authn_contexts(base = Onelogin::Saml::AuthnContexts::ALL_CONTEXTS)
+  def saml_authn_contexts(base = SAML2::AuthnStatement::Classes.constants.map { |const| SAML2::AuthnStatement::Classes.const_get(const, false) })
     return [] unless saml_enabled?
     [["No Value", nil]] + base.sort
   end

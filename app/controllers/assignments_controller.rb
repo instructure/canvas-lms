@@ -151,12 +151,16 @@ class AssignmentsController < ApplicationController
         context: @context.rights_status(@current_user, session, :read_as_admin, :manage_assignments),
         assignment: @assignment.rights_status(@current_user, session, :update, :submit),
       }
+
+      @similarity_pledge = pledge_text
+
       js_env({
         :ROOT_OUTCOME_GROUP => outcome_group_json(@context.root_outcome_group, @current_user, session),
         :COURSE_ID => @context.id,
         :ASSIGNMENT_ID => @assignment.id,
         :EXTERNAL_TOOLS => external_tools_json(@external_tools, @context, @current_user, session),
         :EULA_URL => tool_eula_url,
+        :SIMILARITY_PLEDGE => @similarity_pledge,
         PERMISSIONS: permissions,
         PREREQS: assignment_prereqs
       })
@@ -179,8 +183,6 @@ class AssignmentsController < ApplicationController
       @assignment_menu_tools = external_tools_display_hashes(:assignment_menu)
 
       @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @assignment)
-
-      @similarity_pledge = pledge_text
 
       respond_to do |format|
         format.html do
@@ -655,9 +657,11 @@ class AssignmentsController < ApplicationController
   end
 
   def pledge_text
-    pledge = @context.turnitin_pledge if @context.turnitin_pledge.present? && @assignment.turnitin_enabled?
-    pledge ||= @context.vericite_pledge if @context.vericite_pledge.present? && @assignment.vericite_enabled?
-    pledge || @assignment.course.account.closest_turnitin_pledge
+    closest_pledge = @assignment.course.account.closest_turnitin_pledge
+    pledge = @context.turnitin_pledge.presence || closest_pledge if @assignment.turnitin_enabled?
+    pledge ||= @context.vericite_pledge.presence || closest_pledge if @assignment.vericite_enabled?
+
+    pledge || (@assignment.course.account.closest_turnitin_pledge if @assignment.tool_settings_tool.present?)
   end
 
   def quiz_lti_tool_enabled?

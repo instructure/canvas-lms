@@ -450,8 +450,7 @@ describe "Roles API", type: :request do
         # make sure all the expected keys are there, but don't assert on a
         # *only* the expected keys, since plugins may have added more.
         expect([
-          "become_user", "change_course_state",
-          "comment_on_others_submissions", "create_collaborations",
+          "become_user", "change_course_state", "create_collaborations",
           "create_conferences", "manage_account_memberships",
           "manage_account_settings", "manage_admin_users", "manage_alerts",
           "manage_assignments", "manage_calendar", "manage_content",

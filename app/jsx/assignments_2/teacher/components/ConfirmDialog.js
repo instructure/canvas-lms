@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {bool, func, string} from 'prop-types'
+import {bool, func, string, shape} from 'prop-types'
+import I18n from 'i18n!assignments_2'
 
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
@@ -30,98 +31,107 @@ import Modal, {
   ModalFooter
 } from '@instructure/ui-overlays/lib/components/Modal'
 import Spinner from '@instructure/ui-elements/lib/components/Spinner'
-import Text from '@instructure/ui-elements/lib/components/Text'
 import View from '@instructure/ui-layout/lib/components/View'
 
 export default class ConfirmDialog extends React.Component {
   static propTypes = {
     open: bool,
+
+    // set to true to disable the close buttons and the footer buttons
+    disabled: bool,
+
+    // set to true to show the busy mask
     working: bool,
 
-    modalLabel: string, // defaults to heading
-    heading: string,
-    message: string.isRequired,
-    confirmLabel: string.isRequired,
-    cancelLabel: string.isRequired,
-    closeLabel: string.isRequired,
-    spinnerLabel: string.isRequired,
+    // return what should be in the body of the dialog
+    body: func.isRequired,
 
-    onClose: func,
-    onConfirm: func,
-    onCancel: func
+    // return array of property objects to create buttons in the footer.
+    // pass the children of the Button (usually the display text) as a `children` property
+    buttons: func,
+
+    // returns what should be on the mask when the dialog is busy. Defaults to a small spinner.
+    busyMaskBody: func,
+
+    // label to use if using the default spinner busy mask
+    spinnerLabel: string,
+
+    heading: string.isRequired,
+    modalLabel: string, // defaults to heading
+
+    // properties to pass to the modal
+    modalProps: shape(Modal.propTypes),
+
+    closeLabel: string,
+
+    // invoked when the close button is clicked
+    onDismiss: func
   }
 
   static defaultProps = {
     open: false,
-    heading: '',
-    onClose: () => {},
-    onConfirm: () => {},
-    onCancel: () => {}
+    working: false,
+    disabled: false,
+    buttons: () => [],
+
+    modalProps: {},
+    closeLabel: I18n.t('close'),
+    spinnerLabel: I18n.t('working...'),
+    onDismiss: () => {}
   }
 
-  setTestIdCloseButton(buttonElt) {
-    if (!buttonElt) return
-    buttonElt.setAttribute('data-testid', 'confirm-dialog-close-button')
-  }
-
-  setTestIdCancelButton(buttonElt) {
-    if (!buttonElt) return
-    buttonElt.setAttribute('data-testid', 'confirm-dialog-cancel-button')
-  }
-
-  setTestIdConfirmButton(buttonElt) {
-    if (!buttonElt) return
-    buttonElt.setAttribute('data-testid', 'confirm-dialog-confirm-button')
+  closeButtonRef(elt) {
+    // because data-testid ends up on the wrong element if we just pass it through to the close button
+    if (elt) {
+      elt.setAttribute('data-testid', 'confirm-dialog-close-button')
+    }
   }
 
   modalLabel() {
     return this.props.modalLabel ? this.props.modalLabel : this.props.heading
   }
 
+  renderBusyMaskBody() {
+    if (this.props.busyMaskBody) return this.props.busyMaskBody()
+    return <Spinner size="small" title={this.props.spinnerLabel} />
+  }
+
+  renderButton = (buttonProps, index) => {
+    const defaultProps = {
+      key: index,
+      disabled: this.props.disabled,
+      margin: '0 x-small 0 0'
+    }
+    const props = {...defaultProps, ...buttonProps}
+    return <Button {...props} />
+  }
+
   render() {
     return (
-      <Modal label={this.modalLabel()} open={this.props.open}>
-        <ModalHeader>
-          <Heading level="h2">{this.props.heading}</Heading>
-          <CloseButton
-            placement="end"
-            onClick={this.props.onClose}
-            buttonRef={this.setTestIdCloseButton}
-            disabled={this.props.working}
-          >
-            {this.props.closeLabel}
-          </CloseButton>
-        </ModalHeader>
-        <ModalBody padding="0">
-          <View as="div" padding="medium" style={{position: 'relative'}}>
-            <Text size="large">{this.props.message}</Text>
-            {this.props.working ? (
-              <Mask>
-                <Spinner size="small" title={this.props.spinnerLabel} />
-              </Mask>
-            ) : null}
-          </View>
-        </ModalBody>
-        <ModalFooter>
-          <Button
-            onClick={this.props.onCancel}
-            margin="0 x-small 0 0"
-            disabled={this.props.working}
-            buttonRef={this.setTestIdCancelButton}
-          >
-            {this.props.cancelLabel}
-          </Button>
-          <Button
-            variant="danger"
-            onClick={this.props.onConfirm}
-            margin="0 x-small 0 0"
-            disabled={this.props.working}
-            buttonRef={this.setTestIdConfirmButton}
-          >
-            {this.props.confirmLabel}
-          </Button>
-        </ModalFooter>
-      </Modal>
+      this.props.open && ( // Don't waste time rendering anything if it is not open
+        <Modal {...this.props.modalProps} label={this.modalLabel()} open={this.props.open}>
+          <ModalHeader>
+            <Heading level="h2">{this.props.heading}</Heading>
+            <CloseButton
+              placement="end"
+              onClick={this.props.onDismiss}
+              disabled={this.props.disabled}
+              buttonRef={this.closeButtonRef}
+            >
+              {this.props.closeLabel}
+            </CloseButton>
+          </ModalHeader>
+          <ModalBody padding="0">
+            <div style={{position: 'relative'}}>
+              <View as="div" padding="medium">
+                {this.props.body()}
+                {this.props.working ? <Mask>{this.renderBusyMaskBody()}</Mask> : null}
+              </View>
+            </div>
+          </ModalBody>
+          <ModalFooter>{this.props.buttons().map(this.renderButton)}</ModalFooter>
+        </Modal>
+      )
     )
   }
 }

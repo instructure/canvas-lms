@@ -22,7 +22,7 @@ describe "add_people" do
   include_context "in-process server selenium tests"
   let(:enrollee_count){0}
 
-  before(:once) do
+  before(:each) do
     # in the people table, the kyle menu can be off the screen
     # and uninteractable if the window is too small
     make_full_screen

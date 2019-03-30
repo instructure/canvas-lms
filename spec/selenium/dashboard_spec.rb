@@ -333,7 +333,7 @@ describe "dashboard" do
       wait_for_ajaximations
 
       # submission page should load
-      expect(f('h2').text).to eq "Submission Details"
+      expect(f('h1').text).to eq "Submission Details"
     end
 
     it "should validate the functionality of soft concluded courses on courses page", priority: "1", test_id: 216374 do

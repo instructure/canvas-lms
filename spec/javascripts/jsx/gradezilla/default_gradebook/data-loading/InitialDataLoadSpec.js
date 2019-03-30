@@ -37,6 +37,41 @@ QUnit.module('Gradebook Initial Data Loading', suiteHooks => {
     setFixtureHtml($container)
 
     initialData = {
+      assignmentGroups: [
+        {
+          assignments: [
+            {
+              anonymize_students: false,
+              anonymous_grading: false,
+              course_id: '1201',
+              grading_type: 'letter_grade',
+              html_url: 'http://canvas/courses/1201/assignments/2301',
+              id: '2301',
+              muted: false,
+              name: 'Math Assignment',
+              points_possible: 10,
+              published: true,
+              submission_types: ['online_text_entry']
+            },
+            {
+              anonymize_students: false,
+              anonymous_grading: false,
+              course_id: '1201',
+              grading_type: 'letter_grade',
+              html_url: 'http://canvas/courses/1201/assignments/2302',
+              id: '2302',
+              muted: false,
+              name: 'English Assignment',
+              points_possible: 5,
+              published: false,
+              submission_types: ['online_text_entry']
+            }
+          ],
+          id: '2201',
+          name: 'Assignments',
+          position: 1
+        }
+      ],
       contextModules: [
         {id: '2601', position: 3, name: 'English'},
         {id: '2602', position: 1, name: 'Math'},
@@ -195,11 +230,34 @@ QUnit.module('Gradebook Initial Data Loading', suiteHooks => {
 
   QUnit.module('when essential grid data finishes loading', () => {
     function loadEssentialGridData() {
-      dataLoadingWrapper.loadAssignmentGroups([])
-      dataLoadingWrapper.loadContextModules([])
+      dataLoadingWrapper.loadAssignmentGroups(initialData.assignmentGroups)
+      dataLoadingWrapper.loadContextModules(initialData.contextModules)
       dataLoadingWrapper.loadCustomColumns()
       dataLoadingWrapper.loadStudentIds(initialData.studentIds)
     }
+
+    test('finishes rendering the UI', () => {
+      initializeGradebook()
+      sinon.spy(gradebook, 'finishRenderingUI')
+      loadEssentialGridData()
+      strictEqual(gradebook.finishRenderingUI.callCount, 1)
+    })
+
+    test('finishes rendering the UI after storing the loaded assignment groups', () => {
+      initializeGradebook()
+      sinon.stub(gradebook, 'finishRenderingUI').callsFake(() => {
+        deepEqual(gradebook.assignmentGroupList().map(group => group.id), ['2201'])
+      })
+      loadEssentialGridData()
+    })
+
+    test('finishes rendering the UI after storing the loaded context modules', () => {
+      initializeGradebook()
+      sinon.stub(gradebook, 'finishRenderingUI').callsFake(() => {
+        equal(gradebook.listContextModules(), initialData.contextModules)
+      })
+      loadEssentialGridData()
+    })
 
     test('adds grid rows for the loaded student ids', () => {
       initializeGradebook()
@@ -219,8 +277,8 @@ QUnit.module('Gradebook Initial Data Loading', suiteHooks => {
     hooks.beforeEach(() => {
       initializeGradebook()
       dataLoadingWrapper.loadStudentIds(initialData.studentIds)
-      dataLoadingWrapper.loadAssignmentGroups([])
-      dataLoadingWrapper.loadContextModules([])
+      dataLoadingWrapper.loadAssignmentGroups(initialData.assignmentGroups)
+      dataLoadingWrapper.loadContextModules(initialData.contextModules)
       dataLoadingWrapper.loadCustomColumns()
     })
 

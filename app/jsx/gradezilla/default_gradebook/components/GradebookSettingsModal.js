@@ -17,13 +17,14 @@
  */
 
 import React from 'react'
-import {bool, func, shape, string} from 'prop-types'
+import {bool, func, instanceOf, shape, string} from 'prop-types'
 import _ from 'underscore'
 import I18n from 'i18n!gradebook'
 
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import Modal, {ModalBody, ModalFooter} from '@instructure/ui-overlays/lib/components/Modal'
 import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
+import View from '@instructure/ui-layout/lib/components/View'
 
 import AdvancedTabPanel from './AdvancedTabPanel'
 import {
@@ -31,7 +32,10 @@ import {
   createLatePolicy,
   updateLatePolicy
 } from '../apis/GradebookSettingsModalApi'
+import PostPolicies from '../PostPolicies'
+import {setCoursePostPolicy} from '../PostPolicies/PostPolicyApi'
 import LatePoliciesTabPanel from './LatePoliciesTabPanel'
+import GradePostingPolicyTabPanel from './GradePostingPolicyTabPanel'
 import {showFlashAlert} from '../../../shared/FlashAlert'
 
 function isLatePolicySaveable({latePolicy: {changes, validationErrors}}) {
@@ -47,8 +51,25 @@ function isOverridesChanged({
   return defaultChecked !== overrides
 }
 
+function isPostPolicyChanged({props, state}) {
+  if (props.postPolicies == null) {
+    return false
+  }
+
+  const {postManually: oldPostManually} = props.postPolicies.coursePostPolicy
+  const {postManually: newPostManually} = state.coursePostPolicy
+
+  return oldPostManually !== newPostManually
+}
+
 function onSaveSettingsFailure() {
   const message = I18n.t('An error occurred while saving your settings')
+  showFlashAlert({message, type: 'error'})
+  return Promise.reject(new Error(message))
+}
+
+function onSavePostPolicyFailure() {
+  const message = I18n.t('An error occurred while saving the course post policy')
   showFlashAlert({message, type: 'error'})
   return Promise.reject(new Error(message))
 }
@@ -60,8 +81,11 @@ function onUpdateSuccess({close}) {
   return Promise.resolve()
 }
 
+const MODAL_CONTENTS_HEIGHT = 550
+
 class GradebookSettingsModal extends React.Component {
   static propTypes = {
+    anonymousAssignmentsPresent: bool,
     courseId: string.isRequired,
     locale: string.isRequired,
     onClose: func.isRequired,
@@ -72,13 +96,17 @@ class GradebookSettingsModal extends React.Component {
       disabled: bool.isRequired,
       onChange: func.isRequired,
       defaultChecked: bool.isRequired
-    })
+    }),
+    postPolicies: instanceOf(PostPolicies)
   }
 
   state = {
     isOpen: false,
     latePolicy: {changes: {}, validationErrors: {}},
     overrides: this.props.overrides.defaultChecked,
+    coursePostPolicy: {
+      postManually: this.props.postPolicies && this.props.postPolicies.coursePostPolicy.postManually
+    },
     processingRequests: false
   }
 
@@ -119,6 +147,19 @@ class GradebookSettingsModal extends React.Component {
 
   saveSettings = () => this.props.overrides.onChange().catch(onSaveSettingsFailure)
 
+  savePostPolicy = () =>
+    setCoursePostPolicy({
+      courseId: this.props.courseId,
+      postManually: this.state.coursePostPolicy.postManually
+    })
+      .then(response => {
+        if (response !== null) {
+          const {postManually} = response
+          this.props.postPolicies.setCoursePostPolicy({postManually})
+        }
+      })
+      .catch(onSavePostPolicyFailure)
+
   handleUpdateButtonClicked = () => {
     const promises = []
 
@@ -128,6 +169,9 @@ class GradebookSettingsModal extends React.Component {
       }
       if (isOverridesChanged(this)) {
         promises.push(this.saveSettings())
+      }
+      if (isPostPolicyChanged(this)) {
+        promises.push(this.savePostPolicy())
       }
 
       // can't use finally() to remove the duplication because we need to
@@ -149,9 +193,13 @@ class GradebookSettingsModal extends React.Component {
     this.setState({overrides: checked})
   }
 
+  changePostPolicy = coursePostPolicy => {
+    this.setState({coursePostPolicy})
+  }
+
   isUpdateButtonEnabled = () => {
     if (this.state.processingRequests) return false
-    return isOverridesChanged(this) || isLatePolicySaveable(this.state)
+    return isOverridesChanged(this) || isLatePolicySaveable(this.state) || isPostPolicyChanged(this)
   }
 
   open = () => {
@@ -184,21 +232,32 @@ class GradebookSettingsModal extends React.Component {
         onExited={this.props.onClose}
       >
         <ModalBody>
-          <TabList defaultSelectedIndex={0}>
-            <TabPanel title={I18n.t('Late Policies')}>
-              <LatePoliciesTabPanel
-                latePolicy={this.state.latePolicy}
-                changeLatePolicy={this.changeLatePolicy}
-                locale={this.props.locale}
-                showAlert={this.props.gradedLateSubmissionsExist}
-              />
-            </TabPanel>
-            {this.props.overrides.featureAvailable && (
-              <TabPanel title={I18n.t('Advanced')}>
-                <AdvancedTabPanel overrides={overrides} />
+          <View as="div" height={MODAL_CONTENTS_HEIGHT}>
+            <TabList defaultSelectedIndex={0}>
+              <TabPanel title={I18n.t('Late Policies')}>
+                <LatePoliciesTabPanel
+                  latePolicy={this.state.latePolicy}
+                  changeLatePolicy={this.changeLatePolicy}
+                  locale={this.props.locale}
+                  showAlert={this.props.gradedLateSubmissionsExist}
+                />
               </TabPanel>
-            )}
-          </TabList>
+              {this.props.postPolicies != null && (
+                <TabPanel title={I18n.t('Grade Posting Policy')}>
+                  <GradePostingPolicyTabPanel
+                    anonymousAssignmentsPresent={this.props.anonymousAssignmentsPresent}
+                    onChange={this.changePostPolicy}
+                    settings={this.state.coursePostPolicy}
+                  />
+                </TabPanel>
+              )}
+              {this.props.overrides.featureAvailable && (
+                <TabPanel title={I18n.t('Advanced')}>
+                  <AdvancedTabPanel overrides={overrides} />
+                </TabPanel>
+              )}
+            </TabList>
+          </View>
         </ModalBody>
 
         <ModalFooter>

@@ -117,7 +117,9 @@ class LatePoliciesTabPanel extends React.Component {
   }
 
   state = {showAlert: this.props.showAlert}
+
   missingPolicyMessages = messages.bind(this, ['missingSubmissionDeduction'])
+
   latePolicyMessages = messages.bind(this, [
     'lateSubmissionDeduction',
     'lateSubmissionMinimumPercent'

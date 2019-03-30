@@ -65,12 +65,14 @@ describe('fetchOutcomes', () => {
       1: {
         outcome_results: [
           { id: 1, score: 3.0, links: { assignment: 'assignment_1' } },
-          { id: 2, score: 2.0, links: { assignment: 'assignment_2' } }
+          { id: 2, score: 2.0, links: { assignment: 'assignment_2' } },
+          { id: 3, score: 2.0, links: { alignment: 'live_assessments/assessment_1' } }
         ],
         linked: {
           assignments: [
             { id: 'assignment_1', name: 'Assignment 1' },
-            { id: 'assignment_2', name: 'Assignment 2' }
+            { id: 'assignment_2', name: 'Assignment 2' },
+            { id: 'live_assessments/assessment_1', name: 'Test' }
           ]
         }
       },
@@ -123,6 +125,10 @@ describe('fetchOutcomes', () => {
         },
         {
           assignment: { id: 'assignment_2', name: 'Assignment 2' },
+          score: 2
+        },
+        {
+          assignment: { id: 'live_assessments/assessment_1', name: 'Test' },
           score: 2
         }
       ]
@@ -179,7 +185,7 @@ describe('fetchOutcomes', () => {
     mockAll(responses)
     fetchOutcomes(1, 2)
       .then(({ outcomes }) => {
-        expect(outcomes[0].results).toHaveLength(1)
+        expect(outcomes[0].results).toHaveLength(2)
         done()
       })
   })

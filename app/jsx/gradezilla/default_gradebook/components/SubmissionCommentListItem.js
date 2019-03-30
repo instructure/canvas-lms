@@ -27,8 +27,8 @@ import IconTrashLine from '@instructure/ui-icons/lib/Line/IconTrash'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import DateHelper from '../../../shared/helpers/dateHelper'
 import TextHelper from 'compiled/str/TextHelper'
-import CommentPropTypes from '../../../gradezilla/default_gradebook/propTypes/CommentPropTypes'
-import SubmissionCommentUpdateForm from '../../../gradezilla/default_gradebook/components/SubmissionCommentUpdateForm'
+import CommentPropTypes from '../propTypes/CommentPropTypes'
+import SubmissionCommentUpdateForm from './SubmissionCommentUpdateForm'
 
 function submissionCommentDate(date) {
   return DateHelper.formatDatetimeForDisplay(date, 'short')

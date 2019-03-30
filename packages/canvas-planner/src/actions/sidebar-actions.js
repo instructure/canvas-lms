@@ -70,7 +70,6 @@ export const sidebarLoadNextItems = identifiableThunk(() => (dispatch, getState)
       order: 'asc',
     };
     if (getState().sidebar.course_id) {
-      // eslint-disable-next-line
       params.context_codes = [`course_${getState().sidebar.course_id}`, `user_${ENV.current_user_id}`];
     }
     return axios.get(getState().sidebar.nextUrl, { params }).then((response) => {
@@ -88,7 +87,6 @@ export const sidebarLoadInitialItems = (currentMoment, course_id) => (
       order: 'asc',
     };
     if (course_id) {
-      // eslint-disable-next-line
       params.context_codes = [`course_${course_id}`, `user_${ENV.current_user_id}`];
     }
     return axios.get('/api/v1/planner/items', { params }).then((response) => {

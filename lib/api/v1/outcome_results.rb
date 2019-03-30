@@ -131,8 +131,8 @@ module Api::V1::OutcomeResults
       {
         id: a.asset_string,
         name: a.title,
-        html_url: polymorphic_url([a.context, a]),
-        submission_types: a.submission_types
+        html_url: a.is_a?(LiveAssessments::Assessment) ? "" : polymorphic_url([a.context, a]),
+        submission_types: a.try(:submission_types) || "magic_marker"
       }
     end
   end

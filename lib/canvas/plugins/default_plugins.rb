@@ -239,7 +239,8 @@ Canvas::Plugin.register('grade_export', :sis, {
   :author_website => 'http://www.instructure.com',
   :version => '1.0.0',
   :settings_partial => 'plugins/grade_export_settings',
-  :settings => { :publish_endpoint => "",
+  :settings => { :include_final_grade_overrides => "no",
+                 :publish_endpoint => "",
                  :wait_for_success => "no",
                  :success_timeout => "600",
                  :format_type => "instructure_csv" }

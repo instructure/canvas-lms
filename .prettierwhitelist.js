@@ -36,6 +36,7 @@ const PRETTIER_WHITELIST = module.exports =  [
   appAndSpecDirsFor('help_dialog'),
   appAndSpecDirsFor('login'),
   appAndSpecDirsFor('permissions'),
+  appAndSpecDirsFor('shared/components'),
   appAndSpecDirsFor('speed_grader'),
   appAndSpecDirsFor('theme_editor')
 ]

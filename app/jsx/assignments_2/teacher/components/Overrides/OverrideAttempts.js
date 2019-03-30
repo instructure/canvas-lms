@@ -18,7 +18,7 @@
 import React from 'react'
 import {bool, oneOf} from 'prop-types'
 import I18n from 'i18n!assignments_2'
-import {OverrideShape} from '../../assignmentData'
+import {OverrideShape, requiredIfDetail} from '../../assignmentData'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import NumberInput from '@instructure/ui-forms/lib/components/NumberInput'
 import PresentationContent from '@instructure/ui-a11y/lib/components/PresentationContent'
@@ -30,6 +30,7 @@ import View from '@instructure/ui-layout/lib/components/View'
 export default class OverrideAttempts extends React.Component {
   static propTypes = {
     override: OverrideShape.isRequired,
+    onChangeOverride: requiredIfDetail,
     variant: oneOf(['summary', 'detail']).isRequired,
     readOnly: bool
   }
@@ -38,51 +39,36 @@ export default class OverrideAttempts extends React.Component {
     readOnly: true
   }
 
+  // TODO: need the scoreToKeep data
   constructor(props) {
     super(props)
-    const limit = props.override.allowedAttempts === null ? 'unlimited' : 'limited'
-    let attempts = null
-    if (limit === 'limited') {
-      attempts = Number.isInteger(props.override.allowedAttempts)
-        ? props.override.allowedAttempts
-        : 1
-    }
 
     this.state = {
-      limit,
-      attempts,
       scoreToKeep: 'most_recent' // TODO: need the data
     }
   }
 
   onChangeAttemptsAllowed = (_event, selection) => {
-    const limit = selection.value
-    if (this.state.limit === limit) return
-
-    this.setState((prevState, _prevProps) => {
-      let attempts = prevState.attempts
-      if (limit === 'limited' && !attempts) {
-        attempts = 1
-      }
-      return {limit, attempts}
-    })
+    const limit = selection.value === 'unlimited' ? null : 1
+    this.props.onChangeOverride('allowedAttempts', limit)
   }
 
-  onChangeAttemptLimit = (event, number) => {
-    this.setState({attempts: number})
+  onChangeAttemptLimit = (_event, number) => {
+    this.props.onChangeOverride('allowedAttempts', number)
   }
 
-  onChangeScoreToKeep = (event, selection) => {
+  onChangeScoreToKeep = (_event, selection) => {
     this.setState({scoreToKeep: selection.value})
   }
 
   renderLimit() {
+    const attempts = this.props.override.allowedAttempts === null ? 'unlimited' : 'limited'
     return (
       <FlexItem data-testid="OverrideAttempts-Limit">
         <Select
           readOnly={this.props.readOnly}
           label={I18n.t('Attempts Allowed')}
-          selectedOption={this.state.limit}
+          selectedOption={attempts}
           onChange={this.onChangeAttemptsAllowed}
           allowEmpty={false}
         >
@@ -94,8 +80,9 @@ export default class OverrideAttempts extends React.Component {
   }
 
   renderAttempts() {
-    if (this.state.limit === 'limited') {
-      const label = I18n.t({one: 'Attempt', other: 'Attempts'}, {count: this.state.attempts})
+    if (this.props.override.allowedAttempts !== null) {
+      const limit = this.props.override.allowedAttempts
+      const label = I18n.t({one: 'Attempt', other: 'Attempts'}, {count: limit})
 
       return (
         <FlexItem margin="0 small" data-testid="OverrideAttempts-Attempts">
@@ -105,7 +92,7 @@ export default class OverrideAttempts extends React.Component {
             width="5.5rem"
             label={<ScreenReaderContent>Attempts</ScreenReaderContent>}
             min={1}
-            value={this.state.attempts}
+            value={limit}
             onChange={this.onChangeAttemptLimit}
           />
           <PresentationContent>
@@ -152,9 +139,12 @@ export default class OverrideAttempts extends React.Component {
   renderSummary() {
     return (
       <Text data-testid="OverrideAttempts-Summary">
-        {this.state.attempts
-          ? I18n.t({one: '1 Attempt', other: '%{count} Attempts'}, {count: this.state.attempts})
-          : I18n.t('Unlimited Attempts')}
+        {this.props.override.allowedAttempts === null
+          ? I18n.t('Unlimited Attempts')
+          : I18n.t(
+              {one: '1 Attempt', other: '%{count} Attempts'},
+              {count: this.props.override.allowedAttempts}
+            )}
       </Text>
     )
   }

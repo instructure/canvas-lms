@@ -45,7 +45,7 @@ function selectGradeInProvisionalGrades(gradeInfo, provisionalGrades) {
     }
   })
   studentGrades[gradeInfo.graderId] = {...gradeInfo, selected: true}
-  provisionalGrades[gradeInfo.studentId] = studentGrades // eslint-disable-line no-param-reassign
+  provisionalGrades[gradeInfo.studentId] = studentGrades
 }
 
 function setSelectedProvisionalGrade(state, gradeInfo) {

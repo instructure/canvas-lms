@@ -23,7 +23,7 @@ import {
   createGradebook,
   setFixtureHtml
 } from 'jsx/gradezilla/default_gradebook/__tests__/GradebookSpecHelper'
-import SlickGridSpecHelper from '../../gradezilla/default_gradebook/GradebookGrid/GridSupport/SlickGridSpecHelper'
+import SlickGridSpecHelper from './GradebookGrid/GridSupport/SlickGridSpecHelper'
 
 QUnit.module('Gradebook Grid Column Filtering', function(suiteHooks) {
   let $fixture

@@ -27,13 +27,7 @@ module Types
     end
 
     def load_association(assoc)
-      Loaders::AssociationLoader.for(object.class, assoc).load(object).then do
-        if block_given?
-          yield object.send(assoc)
-        else
-          object.send(assoc)
-        end
-      end
+      Loaders::AssociationLoader.for(object.class, assoc).load(object)
     end
   end
 end

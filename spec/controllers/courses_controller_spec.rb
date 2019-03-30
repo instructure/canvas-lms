@@ -273,7 +273,7 @@ describe CoursesController do
         expect(assigns[:future_enrollments]).to be_empty
 
         observer = user_with_pseudonym(active_all: true)
-        o = @student.as_student_observation_links.build; o.observer = observer; o.save!
+        add_linked_observer(@student, observer)
         user_session(observer)
         get 'index'
         expect(response).to be_successful
@@ -407,7 +407,7 @@ describe CoursesController do
         expect(assigns[:future_enrollments].map(&:course_id)).to eq [course1.id, course2.id]
 
         observer = user_with_pseudonym(active_all: true)
-        o = @student.as_student_observation_links.build; o.observer = observer; o.save!
+        add_linked_observer(@student, observer)
         user_session(observer)
         get 'index'
         expect(response).to be_successful
@@ -441,7 +441,7 @@ describe CoursesController do
         expect(assigns[:future_enrollments]).to eq [enrollment1]
 
         observer = user_with_pseudonym(active_all: true)
-        o = @student.as_student_observation_links.build; o.observer = observer; o.save!
+        add_linked_observer(@student, observer)
         user_session(observer)
         get 'index'
         expect(response).to be_successful

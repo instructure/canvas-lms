@@ -29,7 +29,8 @@ define [
   class DeleteGroupView extends DialogFormView
     defaults:
       width: 500
-      height: 275
+      height: 350
+      title: I18n.t('Delete Assignment Group')
 
     els:
       '.assignment_count': '$assignmentCount'
@@ -37,7 +38,6 @@ define [
 
     events: _.extend({}, @::events,
       'click .dialog_closer': 'close'
-      'click .delete_group': 'destroy'
       'change .group_select': 'selectMove'
     )
 
@@ -78,15 +78,20 @@ define [
       id = model.get('id')
       @$groupSelect.find("move_to_ag_#{id}").remove()
 
-    destroy: ->
-      data = @getFormData()
-      if data.action == "move" && data.move_assignments_to
-        @destroyModel(data.move_assignments_to).then =>
-          @close()
+    validateFormData: (data) ->
+      errors = {}
+      if data.action == "move" && !data.move_assignments_to
+        errors.move_assignments_to = [
+          type: 'required'
+          message: I18n.t('You must select an assignment group.')
+        ]
+      errors
 
-      if data.action == "delete"
-        @destroyModel().then =>
-          @close()
+    saveFormData: (data) ->
+      if data.action == "move" && data.move_assignments_to
+        @destroyModel(data.move_assignments_to)
+      else if data.action == "delete"
+        @destroyModel()
 
     destroyModel: (moveTo=null) ->
       @collection = @model.collection

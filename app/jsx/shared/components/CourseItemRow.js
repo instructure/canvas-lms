@@ -16,12 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
- // TODO: Get rid of this component.  AnnouncementRow should manage its own layout
- // with the shared utilities created in g/something.
+// TODO: Get rid of this component.  AnnouncementRow should manage its own layout
+// with the shared utilities created in g/something.
 import I18n from 'i18n!shared_components'
-import React, { Component } from 'react'
-import { bool, node, string, func, shape, arrayOf, oneOf } from 'prop-types'
+import React, {Component} from 'react'
+import {bool, node, string, func, shape, arrayOf, oneOf} from 'prop-types'
 import cx from 'classnames'
 
 import Heading from '@instructure/ui-elements/lib/components/Heading'
@@ -38,7 +37,7 @@ import IconMore from '@instructure/ui-icons/lib/Line/IconMore'
 import IconDragHandleLine from '@instructure/ui-icons/lib/Line/IconDragHandle'
 import IconPeerReviewLine from '@instructure/ui-icons/lib/Line/IconPeerReview'
 import LockIconView from 'compiled/views/LockIconView'
-import { author as authorShape } from '../proptypes/user'
+import {author as authorShape} from '../proptypes/user'
 import masterCourseDataShape from '../proptypes/masterCourseData'
 
 export default class CourseItemRow extends Component {
@@ -47,7 +46,7 @@ export default class CourseItemRow extends Component {
     metaContent: node,
     masterCourse: shape({
       courseData: masterCourseDataShape,
-      getLockOptions: func.isRequired,
+      getLockOptions: func.isRequired
     }),
     author: authorShape,
     title: string.isRequired,
@@ -73,7 +72,7 @@ export default class CourseItemRow extends Component {
     replyButton: node,
     focusOn: oneOf(['title', 'manageMenu', 'toggleButton']),
     clearFocusDirectives: func, // Required if focusOn is provided
-    hasReadBadge: bool,
+    hasReadBadge: bool
   }
 
   static defaultProps = {
@@ -85,7 +84,7 @@ export default class CourseItemRow extends Component {
       id: null,
       display_name: '',
       html_url: '',
-      avatar_image_url: null,
+      avatar_image_url: null
     },
     id: null,
     className: '',
@@ -98,12 +97,12 @@ export default class CourseItemRow extends Component {
     isRead: true,
     icon: null,
     showAvatar: false,
-    connectDragSource: (component) => component,
-    connectDropTarget: (component) => component,
-    onSelectedChanged () {},
+    connectDragSource: component => component,
+    connectDropTarget: component => component,
+    onSelectedChanged() {},
     showManageMenu: false,
     manageMenuOptions: () => [],
-    onManageMenuSelect () {},
+    onManageMenuSelect() {},
     sectionToolTip: null,
     replyButton: null,
     focusOn: null,
@@ -116,7 +115,7 @@ export default class CourseItemRow extends Component {
     manageMenuShown: false
   }
 
-  componentDidMount () {
+  componentDidMount() {
     this.onFocusManage(this.props)
   }
 
@@ -124,7 +123,7 @@ export default class CourseItemRow extends Component {
     this.onFocusManage(nextProps)
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     this.unmountMasterCourseLock()
   }
 
@@ -133,12 +132,12 @@ export default class CourseItemRow extends Component {
       switch (props.focusOn) {
         case 'title':
           this._titleElement.focus()
-          break;
+          break
         case 'manageMenu':
           this._manageMenu.focus()
-          break;
+          break
         case 'toggleButton':
-          break;
+          break
         default:
           throw new Error(I18n.t('Illegal element focus request'))
       }
@@ -146,38 +145,38 @@ export default class CourseItemRow extends Component {
     }
   }
 
-  onSelectChanged = (e) => {
-    this.setState({ isSelected: e.target.checked }, () => {
-      this.props.onSelectedChanged({ selected: this.state.isSelected, id: this.props.id })
+  onSelectChanged = e => {
+    this.setState({isSelected: e.target.checked}, () => {
+      this.props.onSelectedChanged({selected: this.state.isSelected, id: this.props.id})
     })
   }
 
   toggleManageMenuShown = (shown, _) => {
-    this.setState({ manageMenuShown: shown })
+    this.setState({manageMenuShown: shown})
   }
 
-  initializeMasterCourseIcon = (container) => {
-    const { courseData = {}, getLockOptions } = this.props.masterCourse || {}
+  initializeMasterCourseIcon = container => {
+    const {courseData = {}, getLockOptions} = this.props.masterCourse || {}
     if (container && (courseData.isMasterCourse || courseData.isChildCourse)) {
       this.unmountMasterCourseLock()
       const opts = getLockOptions()
 
       // initialize master course lock icon, which is a Backbone view
       // I know, I know, backbone in react is grosssss but wachagunnado
-      this.masterCourseLock = new LockIconView({ ...opts, el: container })
+      this.masterCourseLock = new LockIconView({...opts, el: container})
       this.masterCourseLock.render()
     }
   }
 
-  unmountMasterCourseLock () {
+  unmountMasterCourseLock() {
     if (this.masterCourseLock) {
       this.masterCourseLock.remove()
       this.masterCourseLock = null
     }
   }
 
-  renderClickableDiv (component, refName = undefined) {
-    const refFn = (c) => {
+  renderClickableDiv(component, refName = undefined) {
+    const refFn = c => {
       if (refName) {
         this[refName] = c
       }
@@ -185,27 +184,29 @@ export default class CourseItemRow extends Component {
 
     return (
       <a className="ic-item-row__content-link" ref={refFn} href={this.props.itemUrl}>
-        <div className="ic-item-row__content-link-container">
-          {component}
-        </div>
+        <div className="ic-item-row__content-link-container">{component}</div>
       </a>
     )
   }
 
-  render () {
+  render() {
     const classes = cx('ic-item-row')
-    return (
-      this.props.connectDropTarget(this.props.connectDragSource(
-      <div style={{ opacity: (this.props.isDragging) ? 0 : 1 }} className={`${classes} ${this.props.className}`}>
-        {(this.props.draggable && this.props.connectDragSource && <div className="ic-item-row__drag-col">
-          <span>
-            <Text color="secondary" size="large">
-              <IconDragHandleLine />
-            </Text>
-          </span>
-        </div>)}
-        {
-          !this.props.isRead ? (
+    return this.props.connectDropTarget(
+      this.props.connectDragSource(
+        <div
+          style={{opacity: this.props.isDragging ? 0 : 1}}
+          className={`${classes} ${this.props.className}`}
+        >
+          {this.props.draggable && this.props.connectDragSource && (
+            <div className="ic-item-row__drag-col">
+              <span>
+                <Text color="secondary" size="large">
+                  <IconDragHandleLine />
+                </Text>
+              </span>
+            </div>
+          )}
+          {!this.props.isRead ? (
             <View display="block" margin="0 medium 0 0">
               <Badge margin="0 0 0 0" standalone type="notification" />
             </View>
@@ -213,65 +214,75 @@ export default class CourseItemRow extends Component {
             <View display="block" margin="0 small 0 0">
               <View display="block" margin="0 medium 0 0" />
             </View>
-          ) : null
-        }
-        {this.props.icon}
-        {(this.props.selectable && <div className="ic-item-row__select-col">
-          <Checkbox
-            defaultChecked={this.props.defaultSelected}
-            onChange={this.onSelectChanged}
-            label={<ScreenReaderContent>{this.props.title}</ScreenReaderContent>}
-          />
-        </div>)}
-        {(this.props.showAvatar && <div className="ic-item-row__author-col">
-          <Avatar
-            size="small"
-            name={this.props.author.display_name || I18n.t('Unknown')}
-            src={this.props.author.avatar_image_url}
-          />
-        </div>)}
-        <div className="ic-item-row__content-col">
-          {!this.props.isRead && <ScreenReaderContent>{I18n.t('Unread')}</ScreenReaderContent>}
-          {this.renderClickableDiv(<Heading level="h3">{this.props.title}</Heading>, "_titleElement")}
-          {this.props.sectionToolTip}
-          {this.props.body ? this.renderClickableDiv(this.props.body) : null}
-          {this.props.replyButton ? this.renderClickableDiv(this.props.replyButton) : null}
-        </div>
-        <div className="ic-item-row__meta-col">
-          <div className="ic-item-row__meta-actions">
-            { this.props.peerReview ? (
-              <span className="ic-item-row__peer_review">
-                <Text color="success" size="medium">
-                  <IconPeerReviewLine />
-                </Text>
-              </span>
-              ) : null
-            }
-            {this.props.actionsContent}
-            <span ref={this.initializeMasterCourseIcon} className="ic-item-row__master-course-lock lock-icon" />
-            {this.props.showManageMenu && (
-              <span className="ic-item-row__manage-menu">
-                <Menu
-                  ref={c => this._manageMenu = c}
-                  onSelect={this.props.onManageMenuSelect}
-                  onToggle={this.toggleManageMenuShown}
-                  trigger={
-                    <Button variant="icon" size="small">
-                      <IconMore />
-                      <ScreenReaderContent>{I18n.t('Manage options for %{name}', { name: this.props.title })}</ScreenReaderContent>
-                    </Button>
-                  }
-                >
-                  {this.state.manageMenuShown ? this.props.manageMenuOptions() : null}
-                </Menu>
-              </span>
+          ) : null}
+          {this.props.icon}
+          {this.props.selectable && (
+            <div className="ic-item-row__select-col">
+              <Checkbox
+                defaultChecked={this.props.defaultSelected}
+                onChange={this.onSelectChanged}
+                label={<ScreenReaderContent>{this.props.title}</ScreenReaderContent>}
+              />
+            </div>
+          )}
+          {this.props.showAvatar && (
+            <div className="ic-item-row__author-col">
+              <Avatar
+                size="small"
+                name={this.props.author.display_name || I18n.t('Unknown')}
+                src={this.props.author.avatar_image_url}
+              />
+            </div>
+          )}
+          <div className="ic-item-row__content-col">
+            {!this.props.isRead && <ScreenReaderContent>{I18n.t('Unread')}</ScreenReaderContent>}
+            {this.renderClickableDiv(
+              <Heading level="h3">{this.props.title}</Heading>,
+              '_titleElement'
             )}
+            {this.props.sectionToolTip}
+            {this.props.body ? this.renderClickableDiv(this.props.body) : null}
+            {this.props.replyButton ? this.renderClickableDiv(this.props.replyButton) : null}
           </div>
-          <div className="ic-item-row__meta-content">
-            {this.props.metaContent}
+          <div className="ic-item-row__meta-col">
+            <div className="ic-item-row__meta-actions">
+              {this.props.peerReview ? (
+                <span className="ic-item-row__peer_review">
+                  <Text color="success" size="medium">
+                    <IconPeerReviewLine />
+                  </Text>
+                </span>
+              ) : null}
+              {this.props.actionsContent}
+              <span
+                ref={this.initializeMasterCourseIcon}
+                className="ic-item-row__master-course-lock lock-icon"
+              />
+              {this.props.showManageMenu && (
+                <span className="ic-item-row__manage-menu">
+                  <Menu
+                    ref={c => (this._manageMenu = c)}
+                    onSelect={this.props.onManageMenuSelect}
+                    onToggle={this.toggleManageMenuShown}
+                    trigger={
+                      <Button variant="icon" size="small">
+                        <IconMore />
+                        <ScreenReaderContent>
+                          {I18n.t('Manage options for %{name}', {name: this.props.title})}
+                        </ScreenReaderContent>
+                      </Button>
+                    }
+                  >
+                    {this.state.manageMenuShown ? this.props.manageMenuOptions() : null}
+                  </Menu>
+                </span>
+              )}
+            </div>
+            <div className="ic-item-row__meta-content">{this.props.metaContent}</div>
           </div>
-        </div>
-      </div>, {dropEffect: 'copy'}))
+        </div>,
+        {dropEffect: 'copy'}
+      )
     )
   }
 }

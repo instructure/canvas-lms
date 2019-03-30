@@ -376,6 +376,36 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       })
     })
 
+    QUnit.module('"Hide grades" action', hooks => {
+      let onSelectCallback
+
+      hooks.beforeEach(() => {
+        gradebookOptions.post_policies_enabled = true
+        onSelectCallback = sinon.spy()
+        buildGradebook()
+        render()
+
+        sinon.stub(gradebook.postPolicies, 'showHideAssignmentGradesTray')
+      })
+
+      test('includes a callback to show the "Hide Assignment Grades" tray', () => {
+        component.props.hideGradesAction.onSelect(onSelectCallback)
+        strictEqual(gradebook.postPolicies.showHideAssignmentGradesTray.callCount, 1)
+      })
+
+      test('includes the assignment id when showing the "Hide Assignment Grades" tray', () => {
+        component.props.hideGradesAction.onSelect(onSelectCallback)
+        const [{assignmentId}] = gradebook.postPolicies.showHideAssignmentGradesTray.lastCall.args
+        strictEqual(assignmentId, '2301')
+      })
+
+      test('includes the `onSelect` callback when showing the "Hide Assignment Grades" tray', () => {
+        component.props.hideGradesAction.onSelect(onSelectCallback)
+        const [{onExited}] = gradebook.postPolicies.showHideAssignmentGradesTray.lastCall.args
+        strictEqual(onExited, onSelectCallback)
+      })
+    })
+
     test('student submissions for the assignment include "excused"', () => {
       buildGradebook()
       submission.excused = true
