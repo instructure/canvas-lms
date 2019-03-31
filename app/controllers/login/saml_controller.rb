@@ -37,16 +37,18 @@ class Login::SamlController < ApplicationController
 
     response, relay_state = SAML2::Bindings::HTTP_POST.decode(request.request_parameters)
 
+    issuer = response.issuer&.id || response.assertions.first&.issuer&.id
+
     aac = @domain_root_account.authentication_providers.active.
       where(auth_type: 'saml').
-      where(idp_entity_id: response.issuer&.id).
+      where(idp_entity_id: issuer).
       first
     if aac.nil?
-      logger.error "Attempted SAML login for #{response.issuer&.id} on account without that IdP"
+      logger.error "Attempted SAML login for #{issuer} on account without that IdP"
       flash[:delegated_message] = if @domain_root_account.auth_discovery_url
         t("Canvas did not recognize your identity provider")
       elsif response.issuer
-        t("Canvas is not configured to receive logins from %{issuer}.", issuer: response.issuer.id)
+        t("Canvas is not configured to receive logins from %{issuer}.", issuer: issuer)
       else
         t("The institution you logged in from is not configured on this account.")
       end
