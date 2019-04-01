@@ -47,10 +47,8 @@ module Lti
       end
 
       def import_completed?
-        response = Canvas.retriable(on: Timeout::Error) do
-          CanvasHttp.get(@status_url, base_request_headers)
-        end
-        if response.code.to_i == 200
+        response = Canvas.retriable(on: Timeout::Error) {CanvasHttp.get(@status_url, base_request_headers)} if @status_url
+        if response&.code.to_i == 200
           parsed_response = JSON.parse(response.body)
           @export_status = parsed_response['status']
           case @export_status
