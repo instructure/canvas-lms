@@ -57,14 +57,27 @@ module CanvasPartman
         true
       end
 
-      def ensure_partitions(advance = 1)
+      def ensure_partitions(advance=1)
+        ensure_or_check_partitions(advance, true)
+      end
+
+      def partitions_created?(advance=1)
+        ensure_or_check_partitions(advance, false)
+      end
+
+      def ensure_or_check_partitions(advance, create_partitions)
         current = Time.now.utc.send("beginning_of_#{base_class.partitioning_interval.to_s.singularize}")
         (advance + 1).times do
           unless partition_exists?(current)
-            create_partition(current)
+            if create_partitions
+              create_partition(current)
+            else
+              return false
+            end
           end
           current += 1.send(base_class.partitioning_interval)
         end
+        true
       end
 
       def prune_partitions(number_to_keep = 6)

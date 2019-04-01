@@ -904,6 +904,7 @@ CanvasRails::Application.routes.draw do
   resources :errors, only: [:show, :index, :create], path: :error_reports
 
   get 'health_check' => 'info#health_check'
+  get 'health_prognosis' => 'info#health_prognosis'
 
   get 'browserconfig.xml', to: 'info#browserconfig', defaults: { format: 'xml' }
 
