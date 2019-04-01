@@ -49,7 +49,35 @@ const userFields = gql`
     email
   }
 `
-
+const assignmentOverridesNodes = gql`
+  fragment AssignmentOverrides on AssignmentOverrideConnection {
+    nodes {
+      gid: id
+      lid: _id
+      title
+      dueAt
+      lockAt
+      unlockAt
+      set {
+        __typename
+        ... on Section {
+          lid: _id
+          sectionName: name
+        }
+        ... on Group {
+          lid: _id
+          groupName: name
+        }
+        ... on AdhocStudents {
+          students {
+            lid: _id
+            studentName: name
+          }
+        }
+      }
+    }
+  }
+`
 export const TEACHER_QUERY = gql`
   query GetAssignment($assignmentLid: ID!) {
     assignment(id: $assignmentLid) {
@@ -100,31 +128,7 @@ export const TEACHER_QUERY = gql`
           hasNextPage
           hasPreviousPage
         }
-        nodes {
-          gid: id
-          lid: _id
-          title
-          dueAt
-          lockAt
-          unlockAt
-          set {
-            __typename
-            ... on Section {
-              lid: _id
-              sectionName: name
-            }
-            ... on Group {
-              lid: _id
-              groupName: name
-            }
-            ... on AdhocStudents {
-              students {
-                lid: _id
-                studentName: name
-              }
-            }
-          }
-        }
+        ...AssignmentOverrides
       }
       submissions: submissionsConnection(
         filter: {states: [submitted, unsubmitted, graded, ungraded, pending_review]}
@@ -155,6 +159,7 @@ export const TEACHER_QUERY = gql`
     }
   }
   ${userFields}
+  ${assignmentOverridesNodes}
 `
 
 const assignmentGroup = gql`
@@ -311,6 +316,7 @@ export const SAVE_ASSIGNMENT = gql`
     $lockAt: DateTime
     $pointsPossible: Float
     $state: AssignmentState
+    $assignmentOverrides: [AssignmentOverrideCreateOrUpdate!]
   ) {
     updateAssignment(
       input: {
@@ -322,6 +328,7 @@ export const SAVE_ASSIGNMENT = gql`
         lockAt: $lockAt
         pointsPossible: $pointsPossible
         state: $state
+        assignmentOverrides: $assignmentOverrides
       }
     ) {
       assignment {
@@ -336,9 +343,13 @@ export const SAVE_ASSIGNMENT = gql`
         description
         pointsPossible
         state
+        assignmentOverrides {
+          ...AssignmentOverrides
+        }
       }
     }
   }
+  ${assignmentOverridesNodes}
 `
 
 export const CourseShape = shape({

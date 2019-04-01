@@ -64,15 +64,21 @@ describe('TeacherView', () => {
     })
 
     // will be re-checked with ADMIN-2345 for flakiness
-    it('saves the assignment when publishing', async () => {
+    it('saves the entire assignment when publishing via the toggle', async () => {
       const assignment = mockAssignment({state: 'unpublished'})
       const {getByText, container} = await renderTeacherQueryAndWaitForResult(assignment, [
         saveAssignmentResult(
           assignment,
           {
+            id: assignment.lid,
             name: assignment.name,
             description: assignment.description,
-            state: 'published'
+            state: 'published',
+            pointsPossible: assignment.pointsPossible,
+            dueAt: assignment.dueAt && new Date(assignment.dueAt).toISOString(),
+            unlockAt: assignment.unlockAt && new Date(assignment.unlockAt).toISOString(),
+            lockAt: assignment.lockAt && new Date(assignment.lockAt).toISOString(),
+            assignmentOverrides: []
           },
           {state: 'published'}
         )
@@ -86,6 +92,37 @@ describe('TeacherView', () => {
       // make sure the mutation finishes
       expect(await waitForNoElement(() => getByText('Saving assignment'))).toBe(true)
       expect(publishCheckbox.checked).toBe(true) // still
+    })
+
+    it('resets publish toggle when save assignment fails', async () => {
+      const assignment = mockAssignment({state: 'unpublished'})
+      const {getByText, container} = await renderTeacherQueryAndWaitForResult(assignment, [
+        saveAssignmentResult(
+          assignment,
+          {
+            id: assignment.lid,
+            name: assignment.name,
+            description: assignment.description,
+            state: 'published',
+            pointsPossible: assignment.pointsPossible,
+            dueAt: assignment.dueAt && new Date(assignment.dueAt).toISOString(),
+            unlockAt: assignment.unlockAt && new Date(assignment.unlockAt).toISOString(),
+            lockAt: assignment.lockAt && new Date(assignment.lockAt).toISOString(),
+            assignmentOverrides: []
+          },
+          {},
+          'this failed!'
+        )
+      ])
+      const publish = getByText('publish', {exact: false})
+      const publishCheckbox = findInputForLabel(publish, container)
+      expect(publishCheckbox.checked).toBe(false)
+      fireEvent.click(publishCheckbox)
+      expect(getByText('Saving assignment')).toBeInTheDocument()
+      expect(publishCheckbox.checked).toBe(true) // optimistic update
+      // make sure the mutation finishes
+      expect(await waitForNoElement(() => getByText('Saving assignment'))).toBe(true)
+      expect(publishCheckbox.checked).toBe(false) // reset
     })
   })
 

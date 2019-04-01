@@ -196,6 +196,8 @@ export default class EditableDateTime extends React.Component {
                 onBlur={onBlur}
                 dateInputRef={editorRef}
                 required={this.props.required}
+                locale={this.props.locale}
+                timezone={this.props.timeZone}
               />
             </View>
           </FocusableView>

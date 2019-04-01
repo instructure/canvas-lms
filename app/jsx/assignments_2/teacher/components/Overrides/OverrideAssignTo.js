@@ -26,7 +26,6 @@ import I18n from 'i18n!assignments_2'
 import FormField from '@instructure/ui-form-field/lib/components/FormField'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import View from '@instructure/ui-layout/lib/components/View'
-import generateElementId from '@instructure/uid/lib/uid'
 import {OverrideShape} from '../../assignmentData'
 
 OverrideAssignTo.propTypes = {
@@ -70,11 +69,10 @@ function renderSummary(assignedTo) {
 
 // TODO: replace with the real deal with the popup and tabs etc. from the mockup
 function renderDetail(assignedTo) {
-  const id = generateElementId('assignto')
   return (
     <View as="div" margin="small 0" data-testid="OverrideAssignTo">
-      <FormField id={id} label={I18n.t('Assign to:')} layout="stacked">
-        <View id={id} as="div" borderWidth="small">
+      <FormField label={I18n.t('Assign to:')} layout="stacked">
+        <View as="div" borderWidth="small">
           {assignedTo.map(a => (
             <div key={a.lid} style={pillStyle}>
               {renderOverrideName(a)}
