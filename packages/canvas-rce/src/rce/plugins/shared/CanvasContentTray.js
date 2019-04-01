@@ -20,8 +20,10 @@ import React, {Suspense, useState} from 'react'
 import {bool, oneOf, func} from 'prop-types'
 import {Tray} from '@instructure/ui-overlays'
 import {CloseButton} from '@instructure/ui-buttons'
-import {Spinner} from '@instructure/ui-elements'
+import {Heading, Spinner} from '@instructure/ui-elements'
+import {Flex, FlexItem, View} from '@instructure/ui-layout'
 import formatMessage from '../../../format-message'
+import Filter from './Filter'
 
 /**
  * Returns the translated tray label
@@ -53,6 +55,7 @@ function loadTrayContent(activeContentType) {
     case 'images':
     case 'media':
     case 'documents':
+    default:
       return React.lazy(() => import('./FakeComponent'))
   }
 }
@@ -62,14 +65,34 @@ function loadTrayContent(activeContentType) {
  * from Canvas.  It is essentially the main component.
  */
 export default function CanvasContentTray(props) {
-  const [activeContentType, _setActiveContentType] = useState(props.initialContentType)
+  const [activeContentType, setActiveContentType] = useState(props.initialContentType)
   const ContentComponent = loadTrayContent(activeContentType)
   return (
-    <Tray label={getTrayLabel(activeContentType)} open={props.isOpen} placement="end">
-      <CloseButton placement="end" offset="medium" variant="icon" onClick={props.handleClose}>
-        Close
-      </CloseButton>
-      <div>Add Stuff</div>
+    <Tray
+      label={getTrayLabel(activeContentType)}
+      open={props.isOpen}
+      placement="end"
+      size="regular"
+    >
+      <View as="div" margin="small 0">
+        <Flex margin="small">
+          <FlexItem>
+            <CloseButton placement="static" variant="icon" onClick={props.handleClose}>
+              {formatMessage('Close')}
+            </CloseButton>
+          </FlexItem>
+          <FlexItem grow shrink>
+            <Heading margin="0 0 0 small">{formatMessage('Add')}</Heading>
+          </FlexItem>
+        </Flex>
+        <Filter
+          onChange={state =>
+            state.contentType === 'files'
+              ? setActiveContentType(state.subContentType)
+              : setActiveContentType(state.contentType)
+          }
+        />
+      </View>
       <Suspense fallback={<Spinner title={formatMessage('Loading')} size="large" />}>
         <ContentComponent />
       </Suspense>
