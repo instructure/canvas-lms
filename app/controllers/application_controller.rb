@@ -909,15 +909,17 @@ class ApplicationController < ActionController::Base
     badge_counts = {}
     ['Submission'].each do |type|
       participation_count = context.content_participation_counts.
-          where(:user_id => user.id, :content_type => type).first
-      participation_count ||= ContentParticipationCount.create_or_update({
-        :context => context,
-        :user => user,
-        :content_type => type,
-      })
+          where(:user_id => user.id, :content_type => type).take
+      participation_count ||= content_participation_count(context, type, user)
       badge_counts[type.underscore.pluralize] = participation_count.unread_count
     end
     badge_counts
+  end
+
+  def content_participation_count(context, type, user)
+    Shackles.activate(:master) do
+      ContentParticipationCount.create_or_update({context: context, user: user, content_type: type})
+    end
   end
 
   def get_upcoming_assignments(course)
