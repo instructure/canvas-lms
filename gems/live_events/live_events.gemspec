@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
 
 
   spec.add_dependency "aws-sdk-kinesis"
-  spec.add_dependency "canvas_statsd"
+  spec.add_dependency "inst_statsd"
   spec.add_dependency "activesupport"
 
   spec.add_development_dependency "bundler", "~> 1.5"

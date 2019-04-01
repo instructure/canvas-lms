@@ -18,78 +18,89 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+
 import AdvancedTabPanel from 'jsx/gradezilla/default_gradebook/components/AdvancedTabPanel'
 
-const fixtures = document.getElementById('fixtures')
-const overridesOnChangeStub = sinon.stub()
+QUnit.module('GradebookSettingsModal AdvancedTabPanel', suiteHooks => {
+  let $container
+  let props
 
-function renderComponent({overrides, props} = {}) {
-  const componentProps = {
-    overrides: {
-      defaultChecked: true,
-      disabled: false,
-      onChange: overridesOnChangeStub,
-      ...overrides
-    },
-    ...props
+  suiteHooks.beforeEach(() => {
+    $container = document.body.appendChild(document.createElement('div'))
+
+    props = {
+      courseSettings: {
+        allowFinalGradeOverride: false
+      },
+
+      onCourseSettingsChange: sinon.spy()
+    }
+  })
+
+  suiteHooks.afterEach(() => {
+    ReactDOM.unmountComponentAtNode($container)
+  })
+
+  function mountComponent() {
+    ReactDOM.render(<AdvancedTabPanel {...props} />, $container)
   }
-  ReactDOM.render(<AdvancedTabPanel {...componentProps} />, fixtures)
-  return fixtures.children[0]
-}
 
-function findCheckBox(label, scope = fixtures) {
-  const labels = []
-  scope.querySelectorAll('label').forEach(node => labels.push(node))
-  const labelFor = labels.find(node => node.innerText.trim() === label).getAttribute('for')
-  return scope.querySelector(`#${labelFor}`)
-}
+  function findCheckbox(label) {
+    const $label = [...$container.querySelectorAll('label')].find(
+      $el => $el.innerText.trim() === label
+    )
+    return $container.querySelector(`#${$label.getAttribute('for')}`)
+  }
 
-function overridesCheckbox() {
-  return findCheckBox('Allow final grade override')
-}
+  function getAllowFinalGradeOverridesCheckbox() {
+    return findCheckbox('Allow final grade override')
+  }
 
-QUnit.module('AdvancedTabPanel', moduleHooks => {
-  moduleHooks.beforeEach(() => {})
+  QUnit.module('"Allow final grade override" option', () => {
+    QUnit.module('when "allow final grade override" is enabled', contextHooks => {
+      contextHooks.beforeEach(() => {
+        props.courseSettings.allowFinalGradeOverride = true
+        mountComponent()
+      })
 
-  moduleHooks.afterEach(() => {
-    ReactDOM.unmountComponentAtNode(fixtures)
-  })
+      test('is checked', () => {
+        const {checked} = getAllowFinalGradeOverridesCheckbox()
+        strictEqual(checked, true)
+      })
 
-  test('it renders', () => {
-    renderComponent()
-    const container = fixtures.querySelectorAll('#AdvancedTabPanel__Container')
-    equal(container.length, 1)
-  })
+      test('calls the .onCourseSettingsChange callback when changed', () => {
+        getAllowFinalGradeOverridesCheckbox().click()
+        strictEqual(props.onCourseSettingsChange.callCount, 1)
+      })
 
-  QUnit.module('Overrides', () => {
-    test('checkbox is checked', () => {
-      renderComponent()
-      const {checked} = overridesCheckbox()
-      strictEqual(checked, true)
+      test('includes the new setting when calling the .onCourseSettingsChange callback', () => {
+        getAllowFinalGradeOverridesCheckbox().click()
+        const [{allowFinalGradeOverride}] = props.onCourseSettingsChange.lastCall.args
+        strictEqual(allowFinalGradeOverride, false)
+      })
     })
 
-    test('checkbox is not checked when `overrides.defaultChecked` is false', () => {
-      renderComponent({overrides: {defaultChecked: false}})
-      const {checked} = overridesCheckbox()
-      strictEqual(checked, false)
-    })
+    QUnit.module('when "allow final grade override" is disabled', contextHooks => {
+      contextHooks.beforeEach(() => {
+        props.courseSettings.allowFinalGradeOverride = false
+        mountComponent()
+      })
 
-    test('checkbox is not disabled', () => {
-      renderComponent()
-      const {disabled} = overridesCheckbox()
-      strictEqual(disabled, false)
-    })
+      test('is checked', () => {
+        const {checked} = getAllowFinalGradeOverridesCheckbox()
+        strictEqual(checked, false)
+      })
 
-    test('checkbox is disabled when `overrides.disabled` is true', () => {
-      renderComponent({overrides: {disabled: true}})
-      const {disabled} = overridesCheckbox()
-      strictEqual(disabled, true)
-    })
+      test('calls the .onCourseSettingsChange callback when changed', () => {
+        getAllowFinalGradeOverridesCheckbox().click()
+        strictEqual(props.onCourseSettingsChange.callCount, 1)
+      })
 
-    test('onChange is called when checkbox is clicked', () => {
-      renderComponent()
-      overridesCheckbox().click()
-      strictEqual(overridesOnChangeStub.callCount, 1)
+      test('includes the new setting when calling the .onCourseSettingsChange callback', () => {
+        getAllowFinalGradeOverridesCheckbox().click()
+        const [{allowFinalGradeOverride}] = props.onCourseSettingsChange.lastCall.args
+        strictEqual(allowFinalGradeOverride, true)
+      })
     })
   })
 })

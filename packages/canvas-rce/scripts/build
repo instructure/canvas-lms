@@ -5,7 +5,7 @@
 set -e
 rm -rf lib
 
-# build the commonjs version 
+# build the commonjs version
 NODE_ENV=transpile babel --out-dir lib src &
 
 # build an es modules version
@@ -17,6 +17,6 @@ echo "building pretranslated output in lib/translated $CPUS at a time ..."
 ls locales/*.json | \
   xargs basename -s .json | \
   xargs -t -n 1 -P $CPUS -I % env \
-    BUILD_LOCALE=% yarn run babel --out-dir lib/translated/%/modules --ignore locales* --quiet src
+    BUILD_LOCALE=% ./node_modules/.bin/babel --out-dir lib/translated/%/modules --ignore locales* src
 
 wait # wait for the default untranslated builds that we backgrounded above with an "&"

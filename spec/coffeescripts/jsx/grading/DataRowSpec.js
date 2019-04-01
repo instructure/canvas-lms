@@ -29,10 +29,11 @@ QUnit.module('DataRow not being edited, without a sibling', {
       uniqueId: 0,
       row: ['A', 92.346],
       editing: false,
-      round: number => Math.round(number * 100) / 100
+      round: number => Math.round(number * 100) / 100,
+      onRowMinScoreChange() {}
     }
     const DataRowElement = <DataRow {...props} />
-    this.dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
+    this.dataRow = ReactDOM.render(DataRowElement, $('<tbody>').appendTo('#fixtures')[0])
   },
   teardown() {
     ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.dataRow).parentNode)
@@ -73,7 +74,7 @@ QUnit.module('DataRow being edited', {
       onDeleteRow() {}
     }
     const DataRowElement = <DataRow {...this.props} />
-    this.dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
+    this.dataRow = ReactDOM.render(DataRowElement, $('<tbody>').appendTo('#fixtures')[0])
   },
   teardown() {
     ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.dataRow).parentNode)
@@ -88,7 +89,7 @@ test('renders in "edit" mode (as opposed to "view" mode)', function() {
 test('on change, accepts arbitrary input and saves to state', function() {
   const changeMinScore = sandbox.spy(this.props, 'onRowMinScoreChange')
   const DataRowElement = <DataRow {...this.props} />
-  this.dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
+  this.dataRow = ReactDOM.render(DataRowElement, $('<tbody>').appendTo('#fixtures')[0])
   Simulate.change(this.dataRow.minScoreInput, {target: {value: 'A'}})
   deepEqual(this.dataRow.renderMinScore(), 'A')
   Simulate.change(this.dataRow.minScoreInput, {target: {value: '*&@%!'}})
@@ -99,10 +100,20 @@ test('on change, accepts arbitrary input and saves to state', function() {
   changeMinScore.restore()
 })
 
+test('screenreader text contains contextual label describing inserting row', function() {
+  const screenreaderTexts = [...document.getElementsByClassName('screenreader-only')]
+  ok(screenreaderTexts.find(screenreaderText => screenreaderText.textContent === 'Insert row below A'))
+})
+
+test('screenreader text contains contextual label describing removing row', function() {
+  const screenreaderTexts = [...document.getElementsByClassName('screenreader-only')]
+  ok(screenreaderTexts.find(screenreaderText => screenreaderText.textContent === 'Remove row A'))
+})
+
 test('on blur, does not call onRowMinScoreChange if the input parsed value is less than 0', function() {
   const changeMinScore = sandbox.spy(this.props, 'onRowMinScoreChange')
   const DataRowElement = <DataRow {...this.props} />
-  this.dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
+  this.dataRow = ReactDOM.render(DataRowElement, $('<tbody>').appendTo('#fixtures')[0])
   Simulate.change(this.dataRow.minScoreInput, {target: {value: '-1'}})
   Simulate.blur(this.dataRow.minScoreInput)
   ok(changeMinScore.notCalled)
@@ -112,7 +123,7 @@ test('on blur, does not call onRowMinScoreChange if the input parsed value is le
 test('on blur, does not call onRowMinScoreChange if the input parsed value is greater than 100', function() {
   const changeMinScore = sandbox.spy(this.props, 'onRowMinScoreChange')
   const DataRowElement = <DataRow {...this.props} />
-  this.dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
+  this.dataRow = ReactDOM.render(DataRowElement, $('<tbody>').appendTo('#fixtures')[0])
   Simulate.change(this.dataRow.minScoreInput, {target: {value: '101'}})
   Simulate.blur(this.dataRow.minScoreInput)
   ok(changeMinScore.notCalled)
@@ -122,7 +133,7 @@ test('on blur, does not call onRowMinScoreChange if the input parsed value is gr
 test('on blur, calls onRowMinScoreChange when input parsed value is between 0 and 100', function() {
   const changeMinScore = sandbox.spy(this.props, 'onRowMinScoreChange')
   const DataRowElement = <DataRow {...this.props} />
-  this.dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
+  this.dataRow = ReactDOM.render(DataRowElement, $('<tbody>').appendTo('#fixtures')[0])
   Simulate.change(this.dataRow.minScoreInput, {target: {value: '88.'}})
   Simulate.blur(this.dataRow.minScoreInput)
   Simulate.change(this.dataRow.minScoreInput, {target: {value: ''}})
@@ -142,7 +153,7 @@ test('on blur, calls onRowMinScoreChange when input parsed value is between 0 an
 test('on blur, does not call onRowMinScoreChange when input has not changed', function() {
   const changeMinScore = sandbox.spy(this.props, 'onRowMinScoreChange')
   const DataRowElement = <DataRow {...this.props} />
-  this.dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
+  this.dataRow = ReactDOM.render(DataRowElement, $('<tbody>').appendTo('#fixtures')[0])
   Simulate.blur(this.dataRow.minScoreInput)
   ok(changeMinScore.notCalled)
   changeMinScore.restore()
@@ -151,7 +162,7 @@ test('on blur, does not call onRowMinScoreChange when input has not changed', fu
 test('calls onRowNameChange when input changes', function() {
   const changeMinScore = sandbox.spy(this.props, 'onRowNameChange')
   const DataRowElement = <DataRow {...this.props} />
-  this.dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
+  this.dataRow = ReactDOM.render(DataRowElement, $('<tbody>').appendTo('#fixtures')[0])
   Simulate.change(this.dataRow.refs.nameInput, {target: {value: 'F'}})
   ok(changeMinScore.calledOnce)
   changeMinScore.restore()
@@ -160,7 +171,7 @@ test('calls onRowNameChange when input changes', function() {
 test('calls onDeleteRow when the delete button is clicked', function() {
   const deleteRow = sandbox.spy(this.props, 'onDeleteRow')
   const DataRowElement = <DataRow {...this.props} />
-  this.dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
+  this.dataRow = ReactDOM.render(DataRowElement, $('<tbody>').appendTo('#fixtures')[0])
   Simulate.click(this.dataRow.refs.deleteButton)
   ok(deleteRow.calledOnce)
 })
@@ -171,11 +182,13 @@ QUnit.module('DataRow with a sibling', {
       key: 1,
       row: ['A-', 90],
       siblingRow: ['A', 92.346],
+      uniqueId: 1,
       editing: false,
-      round: number => Math.round(number * 100) / 100
+      round: number => Math.round(number * 100) / 100,
+      onRowMinScoreChange() {}
     }
     const DataRowElement = <DataRow {...props} />
-    this.dataRow = ReactDOM.render(DataRowElement, $('<table>').appendTo('#fixtures')[0])
+    this.dataRow = ReactDOM.render(DataRowElement, $('<tbody>').appendTo('#fixtures')[0])
   },
   teardown() {
     ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.dataRow).parentNode)

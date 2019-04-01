@@ -40,7 +40,7 @@ it('renders basic information', () => {
 
   const {getByText} = render(<Students assignment={assignment} />)
   expect(getByText('Name')).toBeInTheDocument()
-  expect(getByText('Juan User')).toBeInTheDocument()
+  expect(getByText(user.shortName)).toBeInTheDocument()
   expect(getByText('Attempts')).toBeInTheDocument()
   expect(getByText('View Submission')).toBeInTheDocument()
   expect(getByText('Score')).toBeInTheDocument()

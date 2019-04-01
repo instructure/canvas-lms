@@ -69,9 +69,9 @@ class Quizzes::QuizQuestion::QuestionData
     question[:incorrect_comments] = fields.fetch_with_enforced_length(:incorrect_comments, max_size: 5.kilobyte)
     question[:neutral_comments] = fields.fetch_with_enforced_length(:neutral_comments, max_size: 5.kilobyte)
 
-    question[:correct_comments_html] = fields.fetch_with_enforced_length(:correct_comments_html, max_size: 5.kilobyte)
-    question[:incorrect_comments_html] = fields.fetch_with_enforced_length(:incorrect_comments_html, max_size: 5.kilobyte)
-    question[:neutral_comments_html] = fields.fetch_with_enforced_length(:neutral_comments_html, max_size: 5.kilobyte)
+    question[:correct_comments_html] = fields.sanitize(fields.fetch_with_enforced_length(:correct_comments_html, max_size: 5.kilobyte))
+    question[:incorrect_comments_html] = fields.sanitize(fields.fetch_with_enforced_length(:incorrect_comments_html, max_size: 5.kilobyte))
+    question[:neutral_comments_html] = fields.sanitize(fields.fetch_with_enforced_length(:neutral_comments_html, max_size: 5.kilobyte))
 
     question[:question_type] = fields.fetch_any(:question_type, "text_only_question")
     question[:question_name] = fields.fetch_any(:question_name, I18n.t(:default_question_name, "Question"))
@@ -79,7 +79,7 @@ class Quizzes::QuizQuestion::QuestionData
     question[:name] = question[:question_name]
     question[:question_text] = fields.sanitize(fields.fetch_with_enforced_length(:question_text, default: I18n.t(:default_question_text, "Question text")))
     question[:answers] = fields.fetch_any(:answers, [])
-    question[:text_after_answers] = fields.fetch_any(:text_after_answers)
+    question[:text_after_answers] = fields.sanitize(fields.fetch_any(:text_after_answers))
 
     if question.is_type?(:calculated)
       question[:formulas] = fields.fetch_any(:formulas, [])

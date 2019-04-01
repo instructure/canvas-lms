@@ -1,6 +1,6 @@
 {
   "name": "canvas-rce",
-  "version": "4.0.1",
+  "version": "4.1.0",
   "description": "A component wrapping canvas's common tinymce usage",
   "main": "lib/index.js",
   "module": "lib/modules/index.js",
@@ -9,10 +9,10 @@
     "integration-test": "nightwatch --env integration",
     "lint": "eslint \"src/**/*.js\" \"test/**/*.js\"",
     "lint:fix": "eslint --fix \"src/**/*.js\" \"app/**/*.js\" \"test/**/*.js\" \"shared/**/*.js\"",
-    "test": "BABEL_ENV=test-node mocha 'test/**/*.test.js' --require @instructure/ui-themes/lib/canvas --compilers js:babel-core/register --timeout 5000 --reporter mocha-multi-reporters --reporter-options configFile=mocha-reporter-config.json",
-    "test:watch": "BABEL_ENV=test-node mocha 'test/**/*.test.js' --require @instructure/ui-themes/lib/canvas --compilers js:babel-core/register --watch",
-    "test:coverage": "cross-env BABEL_ENV=test-node nyc -r html -r json node_modules/.bin/mocha -- 'test/**/*.test.js'",
-    "debug": "BABEL_ENV=test-node inspect _mocha --no-timeouts --debug-brk 'test/**/*.test.js' --require @instructure/ui-themes/lib/canvas --compilers js:babel-core/register",
+    "test": "BABEL_ENV=test-node mocha 'test/**/*.test.js' --require @instructure/ui-themes/lib/canvas --require @babel/register --timeout 5000 --reporter mocha-multi-reporters --reporter-options configFile=mocha-reporter-config.json",
+    "test:watch": "BABEL_ENV=test-node mocha 'test/**/*.test.js' --require @instructure/ui-themes/lib/canvas --require @babel/register --watch",
+    "test:coverage": "cross-env BABEL_ENV=test-node nyc -r html -r json node_modules/.bin/mocha 'test/**/*.test.js'",
+    "debug": "BABEL_ENV=test-node inspect _mocha --no-timeouts --debug-brk 'test/**/*.test.js' --require @instructure/ui-themes/lib/canvas --require @babel/register",
     "demo": "webpack -p",
     "dev": "webpack-dev-server -d --content-base github-pages/",
     "build:all": "scripts/build",
@@ -26,7 +26,7 @@
   "license": "AGPL-3.0",
   "babel": {
     "presets": [
-      "@instructure/ui-presets/babel",
+      "@instructure/ui-babel-preset",
       [
         "@instructure/babel-preset-pretranslated-format-message",
         {
@@ -64,7 +64,7 @@
     ],
     "exclude": [],
     "require": [
-      "babel-register",
+      "@babel/register",
       "@instructure/ui-themes/lib/canvas"
     ],
     "sourceMap": false,
@@ -150,20 +150,20 @@
     "tinymce-light-skin": "~1.3.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7",
+    "@babel/core": "^7",
+    "@babel/register": "7",
     "@instructure/babel-preset-pretranslated-format-message": "^1",
-    "@instructure/ui-presets": "^5",
-    "babel-cli": "^6.22.2",
-    "babel-core": "^6.26.3",
-    "babel-eslint": "^8.2.2",
-    "babel-loader": "^7.1.4",
+    "@instructure/ui-babel-preset": "^5",
+    "babel-loader": "^8.0.0",
     "babel-plugin-inline-json-import": "^0.2.0",
-    "babel-plugin-minify-constant-folding": "^0.4.1",
-    "babel-plugin-minify-dead-code-elimination": "^0.4.1",
-    "babel-plugin-minify-guarded-expressions": "^0.4.1",
-    "babel-plugin-transform-inline-environment-variables": "^0.4.1",
+    "babel-plugin-minify-constant-folding": "^0.5.0",
+    "babel-plugin-minify-dead-code-elimination": "^0.5.0",
+    "babel-plugin-minify-guarded-expressions": "^0.4.3",
+    "babel-plugin-transform-inline-environment-variables": "^0.4.3",
     "cross-env": "^5.0.0",
     "eslint": "^5",
-    "eslint-config-prettier": "^2.9.0",
+    "eslint-config-prettier": "^4",
     "eslint-plugin-mocha": "^5",
     "eslint-plugin-notice": "^0.7.7",
     "eslint-plugin-react": "^7",
@@ -173,19 +173,16 @@
     "jsdom": "^13.0.0",
     "jsdom-global": "^3.0.2",
     "jsdomify": "^3",
-    "mocha": "^5",
+    "mocha": "^6",
     "mocha-junit-reporter": "^1.18.0",
     "mocha-multi-reporters": "^1.1.7",
-    "nyc": "^12",
+    "nyc": "^13",
     "prettier": "^1.12.1",
     "proxyquire": "1.7.4",
-    "sinon": "^6",
+    "sinon": "^7",
     "skin-deep": "^1",
     "webpack": "^4",
     "webpack-cli": "^3.0.8",
     "webpack-dev-server": "^3"
-  },
-  "resolutions": {
-    "babel-helper-evaluate-path": "0.4.1"
   }
 }

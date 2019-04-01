@@ -15,8 +15,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-CanvasStatsd::DefaultTracking.track_sql
-CanvasStatsd::DefaultTracking.track_active_record
-CanvasStatsd::DefaultTracking.track_cache
-CanvasStatsd::BlockTracking.logger = CanvasStatsd::RequestLogger.new(Rails.logger)
-CanvasStatsd::RequestTracking.enable logger: Rails.logger
+InstStatsd::DefaultTracking.track_sql
+InstStatsd::DefaultTracking.track_active_record
+InstStatsd::DefaultTracking.track_cache
+InstStatsd::DefaultTracking.track_jobs
+InstJobsStatsd::Naming.configure(strand_filter: ->(job) { DelayedJobConfig.strands_to_send_to_statsd.include?(job.strand) })
+InstStatsd::BlockTracking.logger = InstStatsd::RequestLogger.new(Rails.logger)
+InstStatsd::RequestTracking.enable logger: Rails.logger

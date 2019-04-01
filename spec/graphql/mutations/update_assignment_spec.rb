@@ -17,7 +17,7 @@
 #
 
 require "spec_helper"
-require "helpers/graphql_type_tester"
+require_relative "../graphql_spec_helper"
 
 describe Mutations::UpdateAssignment do
   before do
@@ -556,7 +556,7 @@ describe Mutations::UpdateAssignment do
       state: "deleted"
     GQL
     expect(
-      result["errors"].map { |e| e["fields"] }
+      result["errors"].map { |e| e["path"] }
     ).to eq [
       ["mutation", "updateAssignment", "input", "state"]
     ]

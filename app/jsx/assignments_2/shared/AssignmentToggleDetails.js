@@ -17,14 +17,15 @@
  */
 
 import React from 'react'
-import I18n from 'i18n!assignment_2'
+import I18n from 'i18n!assignment_2_assignment_toggle_details'
 
 import Text from '@instructure/ui-elements/lib/components/Text'
 import View from '@instructure/ui-layout/lib/components/View'
 import ToggleDetails from '@instructure/ui-toggle-details/lib/components/ToggleDetails'
 import apiUserContent from 'compiled/str/apiUserContent'
-
+import noContent from './SVG/NoReportsClipboard.svg'
 import {string} from 'prop-types'
+import SVGWithTextPlaceholder from './SVGWithTextPlaceholder'
 
 AssignmentToggleDetails.propTypes = {
   description: string
@@ -37,16 +38,20 @@ function AssignmentToggleDetails(props) {
         data-test-id="assignments-2-assignment-toggle-details"
         summary={<Text weight="bold">{I18n.t('Details')}</Text>}
       >
-        <View margin="0" padding="0">
-          <Text
-            weight="normal"
-            as="div"
-            data-test-id="assignments-2-assignment-toggle-details-text"
-          >
-            {/* html is sanitized on the server side */}
-            <div dangerouslySetInnerHTML={{__html: apiUserContent.convert(props.description)}} />
-          </Text>
-        </View>
+        {props.description ? (
+          <View margin="0" padding="0">
+            <Text
+              weight="normal"
+              as="div"
+              data-test-id="assignments-2-assignment-toggle-details-text"
+            >
+              {/* html is sanitized on the server side */}
+              <div dangerouslySetInnerHTML={{__html: apiUserContent.convert(props.description)}} />
+            </Text>
+          </View>
+        ) : (
+          <SVGWithTextPlaceholder text={I18n.t('No Content')} url={noContent} />
+        )}
       </ToggleDetails>
     </div>
   )

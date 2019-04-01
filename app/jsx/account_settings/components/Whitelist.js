@@ -49,6 +49,7 @@ export class Whitelist extends Component {
     contextId: string.isRequired,
     copyInheritedIfNeeded: func.isRequired,
     inherited: bool,
+    isSubAccount: bool,
     whitelistedDomains: shape({
       account: arrayOf(string),
       effective: arrayOf(string),
@@ -156,7 +157,7 @@ export class Whitelist extends Component {
             </Alert>
           )}
 
-          {this.props.inherited && (
+          {this.props.inherited && this.props.isSubAccount && (
             <Alert variant="info" margin="small 0">
               {I18n.t(
                 `Whitelist editing is disabled when security settings are inherited from a parent account.`
@@ -171,7 +172,7 @@ export class Whitelist extends Component {
                 placeholder="http://somedomain.com"
                 value={this.state.addDomainInputValue}
                 messages={this.state.errors}
-                disabled={this.props.inherited || domainLimitReached}
+                disabled={(this.props.inherited && this.props.isSubAccount) || domainLimitReached}
                 onChange={e => {
                   this.setState({addDomainInputValue: e.currentTarget.value})
                 }}
@@ -184,7 +185,7 @@ export class Whitelist extends Component {
                 type="submit"
                 margin="0 x-small 0 0"
                 icon={IconPlus}
-                disabled={this.props.inherited || domainLimitReached}
+                disabled={(this.props.inherited && this.props.isSubAccount) || domainLimitReached}
               >
                 {I18n.t('Domain')}
               </Button>
@@ -193,7 +194,7 @@ export class Whitelist extends Component {
         </form>
         {whitelistToShow.length <= 0 ? (
           <Billboard
-            size="x-small"
+            size="small"
             heading={I18n.t('No domains whitelisted')}
             hero={<EmptyDesert />}
           />
@@ -220,7 +221,7 @@ export class Whitelist extends Component {
                       icon={IconTrash}
                       onClick={() => this.handleRemoveDomain(domain)}
                       data-testid={`delete-button-${domain}`}
-                      disabled={this.props.inherited}
+                      disabled={this.props.inherited && this.props.isSubAccount}
                     >
                       <ScreenReaderContent>
                         {I18n.t('Remove %{domain} from the whitelist', {domain})}

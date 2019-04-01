@@ -121,7 +121,7 @@ module Lti::Ims
             claim_group_whitelist: [ :public, :i18n, :custom_params ],
             extension_whitelist: [ :canvas_user_id, :canvas_user_login_id ]
           }
-        ).generate_post_payload_message
+        ).generate_post_payload_message(validate_launch: false)
       ensure
         I18n.locale = orig_locale
         Time.zone = orig_time_zone

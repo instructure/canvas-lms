@@ -19,17 +19,17 @@
 import React from 'react'
 import {bool, func, instanceOf, shape, string} from 'prop-types'
 import _ from 'underscore'
-import I18n from 'i18n!gradebook'
-
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import Modal, {ModalBody, ModalFooter} from '@instructure/ui-overlays/lib/components/Modal'
 import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
 import View from '@instructure/ui-layout/lib/components/View'
+import I18n from 'i18n!gradebook'
 
 import AdvancedTabPanel from './AdvancedTabPanel'
 import {
   fetchLatePolicy,
   createLatePolicy,
+  updateCourseSettings,
   updateLatePolicy
 } from '../apis/GradebookSettingsModalApi'
 import PostPolicies from '../PostPolicies'
@@ -42,13 +42,10 @@ function isLatePolicySaveable({latePolicy: {changes, validationErrors}}) {
   return !_.isEmpty(changes) && _.isEmpty(validationErrors)
 }
 
-function isOverridesChanged({
-  props: {
-    overrides: {defaultChecked}
-  },
-  state: {overrides}
-}) {
-  return defaultChecked !== overrides
+function haveCourseSettingsChanged({props, state}) {
+  return Object.keys(state.courseSettings).some(
+    key => props.courseSettings[key] !== state.courseSettings[key]
+  )
 }
 
 function isPostPolicyChanged({props, state}) {
@@ -83,27 +80,35 @@ function onUpdateSuccess({close}) {
 
 const MODAL_CONTENTS_HEIGHT = 550
 
-class GradebookSettingsModal extends React.Component {
+export default class GradebookSettingsModal extends React.Component {
   static propTypes = {
     anonymousAssignmentsPresent: bool,
+    courseFeatures: shape({
+      finalGradeOverrideEnabled: bool.isRequired
+    }).isRequired,
     courseId: string.isRequired,
+    courseSettings: shape({
+      allowFinalGradeOverride: bool.isRequired
+    }).isRequired,
     locale: string.isRequired,
     onClose: func.isRequired,
+    onEntered: func,
     gradedLateSubmissionsExist: bool.isRequired,
+    onCourseSettingsUpdated: func.isRequired,
     onLatePolicyUpdate: func.isRequired,
-    overrides: shape({
-      featureAvailable: bool.isRequired,
-      disabled: bool.isRequired,
-      onChange: func.isRequired,
-      defaultChecked: bool.isRequired
-    }),
     postPolicies: instanceOf(PostPolicies)
   }
 
+  static defaultProps = {
+    onEntered() {}
+  }
+
   state = {
+    courseSettings: {
+      allowFinalGradeOverride: this.props.courseSettings.allowFinalGradeOverride
+    },
     isOpen: false,
     latePolicy: {changes: {}, validationErrors: {}},
-    overrides: this.props.overrides.defaultChecked,
     coursePostPolicy: {
       postManually: this.props.postPolicies && this.props.postPolicies.coursePostPolicy.postManually
     },
@@ -145,7 +150,15 @@ class GradebookSettingsModal extends React.Component {
       .catch(this.onSaveLatePolicyFailure)
   }
 
-  saveSettings = () => this.props.overrides.onChange().catch(onSaveSettingsFailure)
+  saveCourseSettings = () =>
+    updateCourseSettings(this.props.courseId, this.state.courseSettings)
+      .then(response => {
+        this.props.onCourseSettingsUpdated(response.data)
+      })
+      .catch(error => {
+        onSaveSettingsFailure()
+        throw error
+      })
 
   savePostPolicy = () =>
     setCoursePostPolicy({
@@ -167,9 +180,11 @@ class GradebookSettingsModal extends React.Component {
       if (isLatePolicySaveable(this.state)) {
         promises.push(this.saveLatePolicy())
       }
-      if (isOverridesChanged(this)) {
-        promises.push(this.saveSettings())
+
+      if (haveCourseSettingsChanged(this)) {
+        promises.push(this.saveCourseSettings())
       }
+
       if (isPostPolicyChanged(this)) {
         promises.push(this.savePostPolicy())
       }
@@ -189,17 +204,23 @@ class GradebookSettingsModal extends React.Component {
     this.setState({latePolicy})
   }
 
-  changeOverrides = ({target: {checked}}) => {
-    this.setState({overrides: checked})
-  }
-
   changePostPolicy = coursePostPolicy => {
     this.setState({coursePostPolicy})
   }
 
+  handleCourseSettingsChange = courseSettings => {
+    this.setState({
+      courseSettings: {...this.state.courseSettings, ...courseSettings}
+    })
+  }
+
   isUpdateButtonEnabled = () => {
     if (this.state.processingRequests) return false
-    return isOverridesChanged(this) || isLatePolicySaveable(this.state) || isPostPolicyChanged(this)
+    return (
+      haveCourseSettingsChanged(this) ||
+      isLatePolicySaveable(this.state) ||
+      isPostPolicyChanged(this)
+    )
   }
 
   open = () => {
@@ -216,20 +237,17 @@ class GradebookSettingsModal extends React.Component {
   }
 
   render() {
-    const overrides = {
-      disabled: this.props.overrides.disabled,
-      onChange: this.changeOverrides,
-      defaultChecked: this.state.overrides
-    }
+    const includeAdvancedTab = this.props.courseFeatures.finalGradeOverrideEnabled
 
     return (
       <Modal
-        size="large"
-        open={this.state.isOpen}
         label={I18n.t('Gradebook Settings')}
-        onOpen={this.fetchLatePolicy}
         onDismiss={this.close}
+        onEntered={this.props.onEntered}
         onExited={this.props.onClose}
+        onOpen={this.fetchLatePolicy}
+        open={this.state.isOpen}
+        size="large"
       >
         <ModalBody>
           <View as="div" height={MODAL_CONTENTS_HEIGHT}>
@@ -242,6 +260,7 @@ class GradebookSettingsModal extends React.Component {
                   showAlert={this.props.gradedLateSubmissionsExist}
                 />
               </TabPanel>
+
               {this.props.postPolicies != null && (
                 <TabPanel title={I18n.t('Grade Posting Policy')}>
                   <GradePostingPolicyTabPanel
@@ -251,9 +270,13 @@ class GradebookSettingsModal extends React.Component {
                   />
                 </TabPanel>
               )}
-              {this.props.overrides.featureAvailable && (
+
+              {includeAdvancedTab && (
                 <TabPanel title={I18n.t('Advanced')}>
-                  <AdvancedTabPanel overrides={overrides} />
+                  <AdvancedTabPanel
+                    courseSettings={this.state.courseSettings}
+                    onCourseSettingsChange={this.handleCourseSettingsChange}
+                  />
                 </TabPanel>
               )}
             </TabList>
@@ -278,5 +301,3 @@ class GradebookSettingsModal extends React.Component {
     )
   }
 }
-
-export default GradebookSettingsModal

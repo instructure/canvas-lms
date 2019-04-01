@@ -21,9 +21,11 @@ class MissingPolicyApplicator
   end
 
   def apply_missing_deductions
-    recently_missing_submissions.find_in_batches do |submissions|
-      filtered_submissions = submissions.reject { |s| s.grading_period&.closed? }
-      filtered_submissions.group_by(&:assignment).each(&method(:apply_missing_deduction))
+    Shackles.activate(:slave) do
+      recently_missing_submissions.find_in_batches do |submissions|
+        filtered_submissions = submissions.reject { |s| s.grading_period&.closed? }
+        filtered_submissions.group_by(&:assignment).each(&method(:apply_missing_deduction))
+      end
     end
   end
 
@@ -47,17 +49,19 @@ class MissingPolicyApplicator
     grade = assignment.score_to_grade(score)
     now = Time.zone.now
 
-    Submission.active.where(id: submissions).update_all(
-      score: score,
-      grade: grade,
-      graded_at: now,
-      published_score: score,
-      published_grade: grade,
-      grade_matches_current_submission: true,
-      updated_at: now,
-      workflow_state: "graded"
-    )
+    Shackles.activate(:master) do
+      Submission.active.where(id: submissions).update_all(
+        score: score,
+        grade: grade,
+        graded_at: now,
+        published_score: score,
+        published_grade: grade,
+        grade_matches_current_submission: true,
+        updated_at: now,
+        workflow_state: "graded"
+      )
 
-    assignment.course.recompute_student_scores(submissions.map(&:user_id).uniq)
+      assignment.course.recompute_student_scores(submissions.map(&:user_id).uniq)
+    end
   end
 end

@@ -86,6 +86,45 @@ describe Quizzes::QuizQuestion do
       expect(question_regrade).to be
       expect(question_regrade.regrade_option).to eq 'full_credit'
     end
+
+    it "sanitizes all the html" do
+      question_data = {
+        "id"=>nil,
+        "regrade_option"=>"",
+        "points_possible"=>1.0,
+        "correct_comments_html"=>"<img src=\"x\" onerror=\"alert(1)\">",
+        "incorrect_comments_html"=>"<img src=\"x\" onerror=\"alert(2)\">",
+        "neutral_comments_html"=>"<img src=\"x\" onerror=\"alert(3)\">",
+        "question_type"=>"multiple_choice_question",
+        "question_name"=>"Question",
+        "name"=>"Question",
+        "question_text"=>"<img src=\"x\" onerror=\"alert(4)\">",
+        "answers"=>
+        [
+          {
+            "id"=>8206,
+            "html"=>"<img src=\"x\" onerror=\"alert(5)\">",
+            "comments_html"=>"<img src=\"x\" onerror=\"alert(6)\">",
+            "weight"=>100.0
+          },
+          {
+            "id"=>6973,
+            "html"=>"<img src=\"x\" onerror=\"alert(7)\">",
+            "comments_html"=>"<img src=\"x\" onerror=\"alert(8)\">",
+            "weight"=>0.0
+          }
+        ]
+      }
+      qq = @quiz.quiz_questions.create(:question_data => question_data)
+      expect(qq.question_data['correct_comments_html']).not_to include('onerror')
+      expect(qq.question_data['incorrect_comments_html']).not_to include('onerror')
+      expect(qq.question_data['neutral_comments_html']).not_to include('onerror')
+      expect(qq.question_data['question_text']).not_to include('onerror')
+      expect(qq.question_data['answers'][0]['html']).not_to include('onerror')
+      expect(qq.question_data['answers'][0]['comments_html']).not_to include('onerror')
+      expect(qq.question_data['answers'][1]['html']).not_to include('onerror')
+      expect(qq.question_data['answers'][1]['comments_html']).not_to include('onerror')
+    end
   end
 
   describe ".update_all_positions" do

@@ -2,17 +2,19 @@
 
 exports[`renders desert when completely empty 1`] = `
 <div
-  className="planner-empty-state"
+  className="PlannerEmptyState-styles__root planner-empty-state"
 >
   <DesertSvg
     aria-hidden="true"
-    className="desert"
+    className="PlannerEmptyState-styles__desert desert"
     height="220"
     viewBox="0 0 465 220"
     width="465"
     xmlns="http://www.w3.org/2000/svg"
   />
-  <div>
+  <div
+    className="PlannerEmptyState-styles__title"
+  >
     <Heading
       border="none"
       color="inherit"
@@ -22,8 +24,12 @@ exports[`renders desert when completely empty 1`] = `
       No Due Dates Assigned
     </Heading>
   </div>
-  <div>
-    <div>
+  <div
+    className="PlannerEmptyState-styles__subtitlebox"
+  >
+    <div
+      className="PlannerEmptyState-styles__subtitle"
+    >
       Looks like there isn't anything here
     </div>
     <Link

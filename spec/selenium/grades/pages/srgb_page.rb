@@ -121,8 +121,8 @@ class SRGB
       f('#show_notes')
     end
 
-    def show_final_grade_override_option
-      f('#show_final_grade_override')
+    def allow_final_grade_override_option
+      f('#allow_final_grade_override')
     end
 
     def all_content

@@ -77,7 +77,13 @@ document.body.appendChild(fixturesDiv)
 if (!window.ENV) window.ENV = {}
 
 // setup the inst-ui default theme
-canvas.use()
+canvas.use({
+  overrides: {
+    transitions: {
+      duration: '0ms'
+    }
+  }
+})
 
 const requireAll = context => context.keys().map(context)
 

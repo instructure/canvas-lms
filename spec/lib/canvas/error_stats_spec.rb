@@ -22,27 +22,27 @@ module Canvas
   describe ErrorStats do
     describe ".capture" do
       before(:each) do
-        allow(CanvasStatsd::Statsd).to receive(:increment)
+        allow(InstStatsd::Statsd).to receive(:increment)
       end
       let(:data){ {} }
 
       it "increments errors.all always" do
-        expect(CanvasStatsd::Statsd).to receive(:increment).with("errors.all")
+        expect(InstStatsd::Statsd).to receive(:increment).with("errors.all")
         described_class.capture("something", data)
       end
 
       it "increments the message name for a string" do
-        expect(CanvasStatsd::Statsd).to receive(:increment).with("errors.something")
+        expect(InstStatsd::Statsd).to receive(:increment).with("errors.something")
         described_class.capture("something", data)
       end
 
       it "increments the message name for a symbol" do
-        expect(CanvasStatsd::Statsd).to receive(:increment).with("errors.something")
+        expect(InstStatsd::Statsd).to receive(:increment).with("errors.something")
         described_class.capture(:something, data)
       end
 
       it "bumps the exception name for anything else" do
-        expect(CanvasStatsd::Statsd).to receive(:increment).with("errors.StandardError")
+        expect(InstStatsd::Statsd).to receive(:increment).with("errors.StandardError")
         described_class.capture(StandardError.new, data)
       end
     end

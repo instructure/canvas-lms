@@ -55,10 +55,14 @@ export async function renderTeacherQueryAndWaitForResult(assignment, additionalA
   return fns
 }
 
-export function renderTeacherView(assignment = mockAssignment(), additionalApolloMocks = []) {
+export function renderTeacherView(
+  assignment = mockAssignment(),
+  additionalApolloMocks = [],
+  teacherViewProps = {}
+) {
   const fns = render(
     <MockedProvider mocks={additionalApolloMocks} addTypename={false}>
-      <TeacherView assignment={assignment} />
+      <TeacherView assignment={assignment} {...teacherViewProps} />
     </MockedProvider>
   )
   return fns

@@ -21,7 +21,7 @@ module LtiAdvantage::Messages
     ].freeze
 
     TYPED_ATTRIBUTES = {
-      aud: Array,
+      aud: [Array, String],
       context: LtiAdvantage::Claims::Context,
       custom: Hash,
       extensions: Hash,

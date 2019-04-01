@@ -67,7 +67,9 @@ import 'jquery.cookie'
     // original code (now the else block) always returns 0.
     // if chrome > 60, force it to return documentElement.scrollTop
     const chromeVer = window.navigator.userAgent.match(/Chrome\/(\d+)/)
-    if (chromeVer && parseInt(chromeVer[1], 10) > 60) {
+    // edge 42+ also reports as chrome 64+, so exclude it explicitly. yay user agent sniffing.
+    const edgeVer = window.navigator.userAgent.match(/Edge\/(\d+)/)
+    if (!edgeVer && chromeVer && parseInt(chromeVer[1], 10) > 60) {
       return $("html").scrollTop()
     } else {
       return ($.browser.safari ? $("body") : $("html")).scrollTop();

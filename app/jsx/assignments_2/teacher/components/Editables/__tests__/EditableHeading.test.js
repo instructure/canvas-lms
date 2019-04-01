@@ -37,7 +37,7 @@ it('renders the value in view mode', () => {
 })
 
 it('renders the value in edit mode', () => {
-  const {container} = render(
+  const {getByDisplayValue} = render(
     <EditableHeading
       mode="edit"
       onChange={() => {}}
@@ -48,7 +48,7 @@ it('renders the value in edit mode', () => {
     />
   )
 
-  expect(container.querySelector('input[value="Still Life with Woodpecker"]')).toBeInTheDocument()
+  expect(getByDisplayValue('Still Life with Woodpecker')).toBeInTheDocument()
 })
 
 it('does not render edit button when readOnly', () => {
@@ -68,7 +68,7 @@ it('does not render edit button when readOnly', () => {
 
 it('exits edit mode on <Enter>', () => {
   const onChangeMode = jest.fn()
-  const {container} = render(
+  const {getByDisplayValue} = render(
     <EditableHeading
       mode="edit"
       onChange={() => {}}
@@ -78,7 +78,7 @@ it('exits edit mode on <Enter>', () => {
       level="h3"
     />
   )
-  const input = container.querySelector('input[value="Jitterbug Perfume"]')
+  const input = getByDisplayValue('Jitterbug Perfume')
   fireEvent.keyDown(input, {key: 'Enter', code: 13})
   expect(onChangeMode).toHaveBeenCalledWith('view')
 })

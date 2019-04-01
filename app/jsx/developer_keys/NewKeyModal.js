@@ -103,6 +103,10 @@ export default class DeveloperKeyModal extends React.Component {
 
   saveLtiToolConfiguration = () => {
     const formData = new FormData(this.submissionForm)
+    if (formData.get("developer_key[redirect_uris]").trim().length === 0) {
+      $.flashError(I18n.t('A redirect_uri is required, please supply one.'))
+      return
+    }
     let settings
     try {
       settings = JSON.parse(formData.get("tool_configuration"))

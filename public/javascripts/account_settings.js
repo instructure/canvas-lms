@@ -21,6 +21,8 @@ import I18n from 'i18n!account_settings'
 import $ from 'jquery'
 import htmlEscape from 'str/htmlEscape'
 import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
+import axios from 'axios'
+import {setupCache} from 'axios-cache-adapter'
 import 'jqueryui/tabs'
 import globalAnnouncements from './global_announcements'
 import './jquery.ajaxJSON'
@@ -117,25 +119,53 @@ import './vendor/jquery.scrollTo'
     globalAnnouncements.augmentView()
     globalAnnouncements.bindDomEvents()
 
-    $("#account_settings_tabs").tabs({
+    $('#account_settings_tabs')
+    .tabs({
       beforeActivate: (event, ui) => {
         if (ui.newTab.context.id === 'tab-security-link') {
-          import('jsx/account_settings')
-            .then(({start}) => {
-              const splitContext = window.ENV.context_asset_string.split('_')
-              start(document.getElementById('tab-security'), {
-                context: splitContext[0],
-                contextId: splitContext[1],
-                isSubAccount: !ENV.ACCOUNT.root_account
-              });
-          }).catch(() => {
-            // We really should never get here... but if we do... do something.
-            const $message = $('<div />').text('Security Tab failed to load')
-            $('tab-security').append($message)
+          // Set up axios and send a prefetch request to get the data we need,
+          // this should make things appear to be much quicker once the bundle
+          // loads in.
+          const cache = setupCache({
+            maxAge: 0.5 * 60 * 1000, // Hold onto the data for 30 seconds
+            debug: true
           })
+
+          const api = axios.create({
+            adapter: cache.adapter
+          })
+
+          const splitContext = window.ENV.context_asset_string.split('_')
+
+          api
+            .get(`/api/v1/${splitContext[0]}s/${splitContext[1]}/csp_settings`)
+            .then(() => {
+              // Bring in the actual bundle of files to use
+              import('jsx/account_settings')
+                .then(({ start }) => {
+                  start(document.getElementById('tab-security'), {
+                    context: splitContext[0],
+                    contextId: splitContext[1],
+                    isSubAccount: !ENV.ACCOUNT.root_account,
+                    initialCspSettings: ENV.CSP,
+                    api
+                  })
+                })
+                .catch(() => {
+                  // We really should never get here... but if we do... do something.
+                  $('#tab-security').text(I18n.t('Security Tab failed to load'))
+                })
+            })
+            .catch(() => {
+              // We really should never get here... but if we do... do something.
+              $('#tab-security').text(I18n.t('Security Tab failed to load'))
+            })
         }
       }
-    }).show();
+    })
+    .show()
+
+
     $(".add_ip_filter_link").click(function(event) {
       event.preventDefault();
       var $filter = $(".ip_filter.blank:first").clone(true).removeClass('blank');

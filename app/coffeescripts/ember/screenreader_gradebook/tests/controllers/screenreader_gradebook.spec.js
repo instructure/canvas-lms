@@ -1182,61 +1182,54 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
     })
   })
 
-  QUnit.module('showFinalGradeOverride', hooks => {
+  QUnit.module('allowFinalGradeOverride', hooks => {
     hooks.beforeEach(() => {
-      window.ENV.GRADEBOOK_OPTIONS.settings = {}
+      window.ENV.GRADEBOOK_OPTIONS.course_settings = {}
       initializeApp()
-      srgb.set('finalGradeOverrideEnabled', true)
     })
 
-    test('returns true when show_final_grade_overrides is true', () => {
-      window.ENV.GRADEBOOK_OPTIONS.settings.show_final_grade_overrides = 'true'
-      strictEqual(srgb.get('showFinalGradeOverride'), true)
+    test('returns true when allow_final_grade_override is true', () => {
+      window.ENV.GRADEBOOK_OPTIONS.course_settings.allow_final_grade_override = true
+      strictEqual(srgb.get('allowFinalGradeOverride'), true)
     })
 
-    test('returns false when finalGradeOverrideEnabled is false', () => {
-      srgb.set('finalGradeOverrideEnabled', false)
-      window.ENV.GRADEBOOK_OPTIONS.settings.show_final_grade_overrides = 'true'
-      strictEqual(srgb.get('showFinalGradeOverride'), false)
-    })
-
-    test('returns false when show_final_grade_overrides is false', () => {
-      window.ENV.GRADEBOOK_OPTIONS.settings.show_final_grade_overrides = 'false'
-      strictEqual(srgb.get('showFinalGradeOverride'), false)
+    test('returns false when allow_final_grade_override is false', () => {
+      window.ENV.GRADEBOOK_OPTIONS.course_settings.allow_final_grade_override = false
+      strictEqual(srgb.get('allowFinalGradeOverride'), false)
     })
   })
 
-  QUnit.module('updateShowFinalGradeOverride', hooks => {
+  QUnit.module('updateAllowFinalGradeOverride', hooks => {
     hooks.beforeEach(() => {
-      window.ENV.GRADEBOOK_OPTIONS.settings = {}
-      window.ENV.GRADEBOOK_OPTIONS.settings.show_final_grade_overrides = 'true'
-      window.ENV.GRADEBOOK_OPTIONS.settings_update_url = 'gradebook_settings'
-      ajax.defineFixture(window.ENV.GRADEBOOK_OPTIONS.settings.settings_update_url, {
+      window.ENV.GRADEBOOK_OPTIONS.course_settings = {}
+      window.ENV.GRADEBOOK_OPTIONS.course_settings.allow_final_grade_override = true
+      ajax.defineFixture(`/api/v1/courses/${ENV.GRADEBOOK_OPTIONS.context_id}/settings`, {
         response: [],
         textStatus: 'success'
       })
       initializeApp()
     })
 
-    test('changing showFinalGradeOverride calls updateShowFinalGradeOverride', () => {
-      const updateShowFinalGradeOverrideStub = sinon.stub(srgb, 'updateShowFinalGradeOverride')
-      srgb.set('showFinalGradeOverride', false)
-      strictEqual(updateShowFinalGradeOverrideStub.callCount, 1)
-      updateShowFinalGradeOverrideStub.restore()
+    test('changing allowFinalGradeOverride calls updateAllowFinalGradeOverride', () => {
+      const updateAllowFinalGradeOverrideStub = sinon.stub(srgb, 'updateAllowFinalGradeOverride')
+      srgb.set('allowFinalGradeOverride', false)
+      strictEqual(updateAllowFinalGradeOverrideStub.callCount, 1)
+      updateAllowFinalGradeOverrideStub.restore()
     })
 
-    test('updateShowFinalGradeOverride uses the gradebook settings endpoint', () => {
+    test('updateAllowFinalGradeOverride uses the course settings endpoint', () => {
       const ajaxRequestSpy = sinon.stub(ajax, 'request')
-      srgb.set('showFinalGradeOverride', false)
-      strictEqual(ajaxRequestSpy.firstCall.args[0].url, 'gradebook_settings')
+      const url = `/api/v1/courses/${ENV.GRADEBOOK_OPTIONS.context_id}/settings`
+      srgb.set('allowFinalGradeOverride', false)
+      strictEqual(ajaxRequestSpy.firstCall.args[0].url, url)
       ajaxRequestSpy.restore()
     })
 
-    test('updateShowFinalGradeOverride passes the updated setting state', () => {
+    test('updateAllowFinalGradeOverride passes the updated setting state', () => {
       const ajaxRequestSpy = sinon.stub(ajax, 'request')
-      srgb.set('showFinalGradeOverride', false)
-      deepEqual(ajaxRequestSpy.firstCall.args[0].data.gradebook_settings, {
-        show_final_grade_overrides: false
+      srgb.set('allowFinalGradeOverride', false)
+      deepEqual(ajaxRequestSpy.firstCall.args[0].data, {
+        allow_final_grade_override: false
       })
       ajaxRequestSpy.restore()
     })

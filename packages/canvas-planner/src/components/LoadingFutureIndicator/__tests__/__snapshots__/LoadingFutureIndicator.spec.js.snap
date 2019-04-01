@@ -5,6 +5,8 @@ exports[`renders all future items loaded regardless of other props 1`] = `
   <View
     as="div"
     display="auto"
+    overflowX="visible"
+    overflowY="visible"
     padding="x-large"
     textAlign="center"
   >
@@ -25,6 +27,8 @@ exports[`renders load more by default 1`] = `
   <View
     as="div"
     display="auto"
+    overflowX="visible"
+    overflowY="visible"
     padding="x-large"
     textAlign="center"
   >
@@ -50,11 +54,15 @@ exports[`renders loading when indicated 1`] = `
   <View
     as="div"
     display="auto"
+    overflowX="visible"
+    overflowY="visible"
     padding="x-large"
     textAlign="center"
   >
     <View
       display="auto"
+      overflowX="visible"
+      overflowY="visible"
     >
       <Spinner
         as="div"
@@ -81,6 +89,8 @@ exports[`shows an Alert when there's a query error 1`] = `
   <View
     as="div"
     display="auto"
+    overflowX="visible"
+    overflowY="visible"
     padding="x-large"
     textAlign="center"
   >

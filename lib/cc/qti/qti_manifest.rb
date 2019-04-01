@@ -21,7 +21,7 @@ module QTI
     include CC::CCHelper
 
     attr_accessor :exporter
-    delegate :add_error, :set_progress, :export_object?, :add_exported_asset, :qti_export?, :course, :user, :create_key, :to => :exporter
+    delegate :add_error, :set_progress, :export_object?, :add_exported_asset, :for_course_copy, :qti_export?, :course, :user, :create_key, :to => :exporter
     delegate :referenced_files, :to => :@html_exporter
 
     def initialize(exporter)
@@ -95,6 +95,11 @@ module QTI
             end
           end
 
+          begin
+            Resource.new(self, manifest_node, resources).add_media_objects(@html_exporter)
+          rescue
+            add_error(I18n.t('course_exports.errors.resources', "Failed to link some resources."), $!)
+          end
         end
       end #manifest
 

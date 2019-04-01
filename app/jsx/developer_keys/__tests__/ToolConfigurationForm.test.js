@@ -23,7 +23,9 @@ import ToolConfigurationForm from '../ToolConfigurationForm'
 function newProps() {
   return {
     toolConfiguration: {name: 'Test Tool', url: 'https://www.test.com/launch'},
-    toolConfigurationUrl: 'https://www.test.com/config.json'
+    toolConfigurationUrl: 'https://www.test.com/config.json',
+    validScopes: {},
+    validPlacements: []
   }
 }
 
@@ -68,5 +70,16 @@ describe('when configuration method is by URL', () => {
     const select = wrapper.find('Select')
     select.instance().props.onChange({}, {value: 'json'})
     expect(wrapper.state().configurationType).toEqual('json')
+  })
+})
+
+describe('when configuration method is manual', () => {
+  beforeEach(() => {
+    wrapper = mount(<ToolConfigurationForm {...newProps()} />)
+    wrapper.setState({configurationType: 'manual'})
+  })
+
+  it('renders the manual configuration form', () => {
+    expect(wrapper.find('ManualConfigurationForm').exists()).toEqual(true)
   })
 })

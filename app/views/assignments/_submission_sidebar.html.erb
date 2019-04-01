@@ -72,7 +72,7 @@
           </a>
         </div>
         <% js_bundle 'progress_pill' %>
-        <span class="assignment_presenter_for_submission" style="display: none;"><%= attachment.workflow_state %></span>
+        <span class="assignment_presenter_for_submission" style="display: none;"><%= AttachmentUploadStatus.upload_status(attachment) %></span>
         <span class="react_pill_container"></span>
       <% end %>
     <% elsif @current_user_submission.submission_type == "online_quiz" %>

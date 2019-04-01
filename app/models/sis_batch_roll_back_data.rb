@@ -71,8 +71,7 @@ class SisBatchRollBackData < ActiveRecord::Base
 
   def self.bulk_insert_roll_back_data(datum)
     datum.each_slice(1000) do |batch|
-      data_hash = batch.map {|data| data.attributes.except('id')}
-      SisBatchRollBackData.bulk_insert(data_hash)
+      SisBatchRollBackData.bulk_insert_objects(batch)
     end
   end
 

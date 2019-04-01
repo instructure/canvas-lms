@@ -99,13 +99,13 @@ module AssignmentOverridesSeleniumHelper
   def select_last_override_section(override_name)
     fj('.ic-tokeninput-input:last').send_keys(override_name)
     fj(".ic-tokeninput-option:visible:last").click
-    driver.action.send_keys(:tab).perform # hide the menu so it doesn't interfere with later actions
+    fj('.ic-tokeninput-input:last').send_keys(:tab) # hide the menu so it doesn't interfere with later actions
   end
 
   def select_first_override_section(override_name)
     fj('.ic-tokeninput-input:first').send_keys(override_name)
     fj(".ic-tokeninput-option:visible:first").click
-    driver.action.send_keys(:tab).perform # hide the menu so it doesn't interfere with later actions
+    fj('.ic-tokeninput-input:first').send_keys(:tab) # hide the menu so it doesn't interfere with later actions
   end
 
   def select_first_override_header(override_name)

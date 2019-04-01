@@ -28,6 +28,11 @@ export function createGradebook(options = {}) {
     context_allows_gradebook_uploads: true,
     context_id: '1',
     context_url: '/courses/1/',
+
+    course_settings: {
+      allow_final_grade_override: false
+    },
+
     currentUserId: '1',
     default_grading_standard: [['A', 0.9], ['B', 0.8], ['C', 0.7], ['D', 0.6], ['F', 0.0]],
     editable: true,
@@ -95,6 +100,7 @@ export function setFixtureHtml($fixture) {
         <div data-component="GradebookSettingsModal"></div>
         <div id="hide-assignment-grades-tray"></div>
         <div id="post-assignment-grades-tray"></div>
+        <div id="assignment-posting-policy-tray"></div>
         <div data-component="StatusesModal"></div>
         <div data-component="AnonymousSpeedGraderAlert"></div>
         <div id="StudentTray__Container"></div>

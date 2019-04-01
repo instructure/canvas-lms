@@ -92,8 +92,11 @@ class SubAccountsController < ApplicationController
   def show
     @sub_account = subaccount_or_self(params[:id])
     ActiveRecord::Associations::Preloader.new.preload(@sub_account, [{:sub_accounts => [:parent_account, :root_account]}])
-    render :json => @sub_account.as_json(:only => [:id, :name], :methods => [:course_count, :sub_account_count],
-                                         :include => [:sub_accounts => {:only => [:id, :name], :methods => [:course_count, :sub_account_count]}])
+    sub_account_json = @sub_account.as_json(:only => [:id, :name], :methods => [:course_count, :sub_account_count])
+    sort_key = Account.best_unicode_collation_key('accounts.name')
+    sub_accounts = @sub_account.sub_accounts.order(sort_key).as_json(only: [:id, :name], methods: [:course_count, :sub_account_count])
+    sub_account_json[:account][:sub_accounts] = sub_accounts
+    render json: sub_account_json
   end
 
   # @API Create a new sub-account

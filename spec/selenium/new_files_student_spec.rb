@@ -44,7 +44,7 @@ describe "better_file_browsing" do
         end
       end
 
-      it "should search for a file", :xbrowser, priority: "1", test_id: 220355 do
+      it "should search for a file", priority: "1", test_id: 220355 do
         get "/courses/#{@course.id}/files"
         f("input[type='search']").send_keys "b_fi", :return
         expect(all_files_folders).to have_size 1

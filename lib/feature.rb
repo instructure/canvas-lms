@@ -103,8 +103,8 @@ class Feature
   def self.register(feature_hash)
     @features ||= {}
     feature_hash.each do |feature_name, attrs|
-      validate_attrs(attrs)
       feature = feature_name.to_s
+      validate_attrs(attrs, feature)
       if attrs[:development] && production_environment?
         @features[feature] = DISABLED_FEATURE
       else
@@ -113,9 +113,9 @@ class Feature
     end
   end
 
-  def self.validate_attrs(attrs)
-    raise 'invalid state' unless VALID_STATES.include? attrs[:state]
-    raise 'invalid applies_to' unless VALID_APPLIES_TO.include? attrs[:applies_to]
+  def self.validate_attrs(attrs, feature)
+    raise "invalid 'state' for feature: #{feature}" unless VALID_STATES.include? attrs[:state]
+    raise "invalid 'applies_to' for feature: #{feature}" unless VALID_APPLIES_TO.include? attrs[:applies_to]
   end
 
   # TODO: register built-in features here
@@ -708,8 +708,7 @@ END
       display_name: -> { I18n.t('Content Security Policy')},
       description: -> { I18n.t('Enable the Security tab on the settings page to adjust CSP settings')},
       applies_to: 'RootAccount',
-      state: 'hidden',
-      development: true,
+      state: 'hidden_in_prod',
       beta: true
     },
     'restrict_students_from_annotating' => {
@@ -734,6 +733,15 @@ END
       applies_to: 'Course',
       state: 'hidden',
       development: true
+    },
+    'rce_enhancements' => {
+      display_name: -> { I18n.t('RCE Enhancements') },
+      description: -> { I18n.t('Allow switching to the enhanced RCE') },
+      applies_to: 'Course',
+      state: 'hidden',
+      root_opt_in: true,
+      development: true,
+      beta: true
     }
   )
 

@@ -687,7 +687,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   scope :visible_to_student_sections, -> (student) {
-    visibility_scope = DiscussionTopicSectionVisibility.
+    visibility_scope = DiscussionTopicSectionVisibility.active.
       where("discussion_topic_section_visibilities.discussion_topic_id = discussion_topics.id").
       where("EXISTS (?)", Enrollment.active_or_pending.where(:user_id => student).
         where("enrollments.course_section_id = discussion_topic_section_visibilities.course_section_id")

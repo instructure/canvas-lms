@@ -35,12 +35,11 @@ export default class EditableNumber extends React.Component {
     onChange: func.isRequired, // when flips from edit to view, notify consumer of the new value
     onChangeMode: func.isRequired, // when mode changes
     onInputChange: func, // called as the user types. Usefull for checking validity
-    placeholder: string, // the string to display when the text value is empty
+    placeholder: string, // the sting to display when the text value is empty
     type: string, // the type attribute on the input element when in edit mode
     editButtonPlacement: oneOf(['start', 'end']), // is the edit button before or after the text?
     readOnly: bool,
     onInput: func, // called as the user types.
-    isValid: func,
     inline: bool,
     required: bool,
     size: oneOf(['medium', 'large'])
@@ -52,7 +51,6 @@ export default class EditableNumber extends React.Component {
     readOnly: false,
     required: false,
     size: 'medium',
-    isValid: () => true,
     onInputChange: () => {}
   }
 
@@ -61,79 +59,88 @@ export default class EditableNumber extends React.Component {
 
     const strValue = `${props.value}`
     this.state = {
-      value: strValue,
       initialValue: strValue
     }
+
+    this._inputRef = null
+    this._hiddenTextRef = null
   }
 
-  // this.state.value holds the current value as the user is editing
-  // once the mode flips from edit to view and the new value is
-  // frozen, props.onChange tells our parent, who will re-render us
-  // with this value in our props. This is where we reset our state
-  // to reflect that new value
-  static getDerivedStateFromProps(props, state) {
-    const strValue = `${props.value}`
-    if (state.initialValue !== strValue) {
-      const newState = {...state}
-      newState.value = strValue
-      newState.initialValue = strValue
-      return newState
-    }
-    return state
-  }
-
-  getSnapshotBeforeUpdate(prevProps, _prevState) {
-    if (prevProps.mode === 'view' && this._textRef) {
-      const fontSize = this.getFontSize(this._textRef)
-      // we'll set the width of the <input> to the width of the text + 1 char
-      return {width: this._textRef.offsetWidth + fontSize}
-    }
-    return null
-  }
-
-  componentDidUpdate(_prevProps, _prevState, snapshot) {
+  componentDidUpdate(prevProps, _prevState, _snapshot) {
     if (this._inputRef) {
-      if (snapshot) {
-        this._inputRef.style.width = `${snapshot.width}px`
-      } else {
-        const fontSize = this.getFontSize(this._inputRef)
-        let w = Math.min(this._inputRef.scrollWidth, this._inputRef.value.length * fontSize)
-        if (w < 2 * fontSize) w = 2 * fontSize
-        this._inputRef.style.width = `${w}px`
+      this._inputRef.style.width = this.getWidth()
+      if (prevProps.mode === 'view' && this.props.mode === 'edit') {
+        this._inputRef.setSelectionRange(0, Number.MAX_SAFE_INTEGER)
       }
     }
   }
 
-  getFontSize(elem) {
+  getFontSize() {
+    let fontSize = 22
     try {
-      return parseInt(window.getComputedStyle(elem).getPropertyValue('font-size'), 10)
+      if (this._inputRef) {
+        fontSize = parseInt(
+          window.getComputedStyle(this._inputRef).getPropertyValue('font-size'),
+          10
+        )
+      }
     } catch (_ignore) {
-      return 16
+      // ignore
+    } finally {
+      if (Number.isNaN(fontSize)) {
+        fontSize = 22
+      }
     }
+    return fontSize
+  }
+
+  getPadding() {
+    let padding = 23
+    try {
+      if (this._inputRef) {
+        const cs = window.getComputedStyle(this._inputRef)
+        const lp = parseInt(cs.getProperty('padding-left'), 10)
+        const rp = parseInt(cs.getProperty('padding-right'), 10)
+        padding = lp + rp
+      }
+    } catch (_ignore) {
+      // ignore
+    }
+    return padding
+  }
+
+  getWidth() {
+    const fsz = this.getFontSize()
+    let w = `${this.props.value}`.length * fsz
+    if (this._hiddenTextRef) {
+      w = Math.min(w, this._hiddenTextRef.offsetWidth + fsz)
+    }
+    return `${w + this.getPadding()}px`
   }
 
   getInputRef = el => {
     this._textRef = null
     this._inputRef = el
+    if (el) {
+      this._inputRef.style.minWidth = '2em'
+    }
   }
 
-  getTextRef = el => {
-    this._inputRref = null
-    this._textRef = el
+  getHiddenTextRef = el => {
+    this._hiddenTextRef = el
   }
 
   renderView = () => {
     const p = omitProps(this.props, EditableNumber.propTypes, ['mode'])
-    const color = this.state.value ? 'primary' : 'secondary'
+    const color = this.props.value ? 'primary' : 'secondary'
     return (
       <Text
         {...p}
         color={color}
-        weight={this.state.value ? 'normal' : 'light'}
-        elementRef={this.getTextRef}
+        weight={this.props.value ? 'normal' : 'light'}
         size={this.props.size}
       >
-        {getViewText(this.state.value || this.props.placeholder)}
+        {getViewText(this.props.value || this.props.placeholder)}
       </Text>
     )
 
@@ -156,59 +163,69 @@ export default class EditableNumber extends React.Component {
 
   renderEditor = ({onBlur, editorRef}) => {
     const p = omitProps(this.props, EditableNumber.propTypes, ['mode'])
-    const len = this.state.value ? this.state.value.length + 1 : 3
-    const width = `${Math.max(len, 3)}rem`
     return (
       <NumberInput
         {...p}
-        value={this.state.value}
+        value={`${this.props.value}`}
         placeholder={this.props.placeholder}
         showArrows={false}
-        onChange={this.handleChange}
+        onChange={this.handleInputChange}
         onKeyDown={this.handleKey}
+        onKeyUp={this.handleKey}
         label={<ScreenReaderContent>this.props.label</ScreenReaderContent>}
         onBlur={onBlur}
         inputRef={createChainedFunction(this.getInputRef, editorRef)}
         inline={this.props.inline}
         size={this.props.size}
-        width={width}
         required={this.props.required}
       />
     )
   }
 
   renderEditButton = props => {
-    if (!this.props.readOnly && this.props.isValid(this.state.value)) {
+    if (!this.props.readOnly) {
       props.label = this.props.label
       return InPlaceEdit.renderDefaultEditButton(props)
     }
     return null
   }
 
+  // Notes: if we handle Enter on keyup, we wind here when using enter
+  // to click the edit button, and can't trigger edit via the kb
+  // if we handle Escape via keydown, then Editable never calls onChangeMode
   handleKey = event => {
-    if (event.key === 'Enter') {
+    // don't have to check what mode is, because this is the editor's key handler
+    if (event.key === 'Enter' && event.type === 'keydown') {
       event.preventDefault()
       event.stopPropagation()
       this.handleModeChange('view')
+    } else if (event.key === 'Escape') {
+      // reset to initial value
+      this.props.onChange(this.state.initialValue)
     }
   }
 
-  handleChange = (_event, newValue) => {
+  handleInputChange = (_event, newValue) => {
+    this.props.onInputChange(newValue)
+  }
+
+  // InPlaceEdit.onChange is fired when changing from edit to view
+  // mode. Reset the initialValue now.
+  handleChange = newValue => {
     this.setState(
       {
-        value: newValue
+        initialValue: newValue
       },
       () => {
-        this.props.onInputChange(newValue)
+        this.props.onChange(newValue)
       }
     )
   }
 
   handleModeChange = mode => {
     if (!this.props.readOnly) {
-      if (mode === 'view' && !this.props.isValid(this.state.value)) {
-        // can't leave edit mode with a bad value
-        return
+      if (this.props.mode === 'edit' && mode === 'view') {
+        this.props.onChange(this.props.value)
       }
       this.props.onChangeMode(mode)
     }
@@ -217,6 +234,17 @@ export default class EditableNumber extends React.Component {
   render() {
     return (
       <div>
+        <div
+          style={{
+            position: 'absolute',
+            display: 'inline-block',
+            top: '-1000px',
+            fontSize: this.getFontSize()
+          }}
+          ref={this.getHiddenTextRef}
+        >
+          {this.props.value}
+        </div>
         <InPlaceEdit
           mode={this.props.mode}
           onChangeMode={this.handleModeChange}
@@ -224,7 +252,7 @@ export default class EditableNumber extends React.Component {
           renderEditor={this.renderEditor}
           renderEditButton={this.renderEditButton}
           value={this.state.value}
-          onChange={this.props.onChange}
+          onChange={this.handleChange}
           editButtonPlacement={this.props.editButtonPlacement}
           showFocusRing={false}
         />

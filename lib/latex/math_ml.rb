@@ -25,13 +25,12 @@ module Latex
     attr_reader :latex
 
     def parse
-      CanvasStatsd::Statsd.time("#{strategy}.parse_attempt") do
-        CanvasStatsd::Statsd.increment("#{strategy}.parse_attempt.count")
+      InstStatsd::Statsd.time("#{strategy}.parse_attempt") do
+        InstStatsd::Statsd.increment("#{strategy}.parse_attempt.count")
         begin
           send(:"#{strategy}_parse")
-        rescue Racc::ParseError, Ritex::LexError, Ritex::Error,
-          CanvasHttp::Error, Timeout::Error
-          CanvasStatsd::Statsd.increment("#{strategy}.parse_failure.count")
+        rescue Racc::ParseError, Ritex::LexError, Ritex::Error, CanvasHttp::Error, Timeout::Error
+          InstStatsd::Statsd.increment("#{strategy}.parse_failure.count")
           return ""
         end
       end

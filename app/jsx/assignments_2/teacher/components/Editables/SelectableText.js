@@ -45,7 +45,8 @@ export default class SelectableText extends React.Component {
     readOnly: bool,
     multiple: bool,
     size: oneOf(['small', 'medium']),
-    options: arrayOf(optShape).isRequired
+    options: arrayOf(optShape).isRequired,
+    loadingText: string
   }
 
   static defaultProps = {
@@ -77,7 +78,14 @@ export default class SelectableText extends React.Component {
       newState.initialValue = props.value
       return newState
     }
-    return state
+    return null
+  }
+
+  // if we render the first time in edit mode, open the select
+  componentDidMount() {
+    if (this._selectInputRef && this.props.mode === 'edit') {
+      this._selectInputRef.click()
+    }
   }
 
   // when we flip from view to edit, automatically open the select
@@ -94,9 +102,13 @@ export default class SelectableText extends React.Component {
     }
   }
 
-  handleChangeMode = mode => {
+  handleModeChange = mode => {
     if (!this.props.readOnly) {
       this.props.onChangeMode(mode)
+    }
+    if (mode === 'view' && this._selectInputRef) {
+      this._selectInputRef.removeEventListener('keydown', this.handleKey)
+      this._selectInputRef = null
     }
     this._select = null
   }
@@ -104,8 +116,8 @@ export default class SelectableText extends React.Component {
   handleOpenSelect = () => {
     if (this.props.multiple) return
     requestAnimationFrame(() => {
-      const w = this._selectInputRef.offsetWidth + 16
-      if (w > this._selectInputRef.offsetWidth) {
+      if (this._selectInputRef) {
+        const w = this._selectInputRef.offsetWidth + 16
         this._selectInputRef.style.width = `${w}px`
       }
     })
@@ -113,6 +125,19 @@ export default class SelectableText extends React.Component {
 
   getInputRef = el => {
     this._selectInputRef = el
+    if (el) {
+      this._selectInputRef.addEventListener('keydown', this.handleKey)
+    }
+  }
+
+  handleKey = event => {
+    if (event.key === 'Enter') {
+      event.preventDefault()
+      event.stopPropagation()
+      this.handleModeChange('view')
+    } else if (this.props.mode === 'edit' && event.key === 'Escape') {
+      this.setState((state, _props) => ({value: state.initialValue}))
+    }
   }
 
   renderView = () => {
@@ -134,6 +159,7 @@ export default class SelectableText extends React.Component {
           size={this.props.size}
           multiple={this.props.multiple}
           onOpen={this.handleOpenSelect}
+          loadingText={this.props.loadingText}
         >
           {this.renderOptions(this.props.options)}
         </Select>
@@ -165,7 +191,7 @@ export default class SelectableText extends React.Component {
       <div data-testid="SelectableText">
         <InPlaceEdit
           mode={this.props.mode}
-          onChangeMode={this.handleChangeMode}
+          onChangeMode={this.handleModeChange}
           onChange={this.props.onChange}
           renderViewer={this.renderView}
           renderEditor={this.renderEdit}

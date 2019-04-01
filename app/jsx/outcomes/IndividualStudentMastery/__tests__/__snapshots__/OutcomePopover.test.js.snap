@@ -32,6 +32,7 @@ exports[`renders correctly with no custom outcomeProficiency 1`] = `
     onToggle={[Function]}
     placement="bottom"
     positionTarget={null}
+    shadow="resting"
     shouldCloseOnDocumentClick={true}
     shouldCloseOnEscape={true}
     shouldContainFocus={true}
@@ -77,6 +78,8 @@ exports[`renders correctly with no custom outcomeProficiency 1`] = `
         as="div"
         display="auto"
         maxWidth="30rem"
+        overflowX="visible"
+        overflowY="visible"
         padding="large"
       >
         <CloseButton
@@ -224,6 +227,7 @@ exports[`renders correctly with no results 1`] = `
     onToggle={[Function]}
     placement="bottom"
     positionTarget={null}
+    shadow="resting"
     shouldCloseOnDocumentClick={true}
     shouldCloseOnEscape={true}
     shouldContainFocus={true}
@@ -269,6 +273,8 @@ exports[`renders correctly with no results 1`] = `
         as="div"
         display="auto"
         maxWidth="30rem"
+        overflowX="visible"
+        overflowY="visible"
         padding="large"
       >
         <CloseButton
@@ -413,6 +419,7 @@ exports[`renders the OutcomePopover component 1`] = `
     onToggle={[Function]}
     placement="bottom"
     positionTarget={null}
+    shadow="resting"
     shouldCloseOnDocumentClick={true}
     shouldCloseOnEscape={true}
     shouldContainFocus={true}
@@ -458,6 +465,8 @@ exports[`renders the OutcomePopover component 1`] = `
         as="div"
         display="auto"
         maxWidth="30rem"
+        overflowX="visible"
+        overflowY="visible"
         padding="large"
       >
         <CloseButton

@@ -26,14 +26,13 @@ module BasicLTI
     def handle_replaceResult(tool, _course, assignment, user)
       self.body = "<replaceResultResponse />"
       return true unless valid_request?(assignment)
-
       quiz_lti_submission = QuizzesNextVersionedSubmission.new(assignment, user)
       quiz_lti_submission.
         with_params(
           submission_type: 'basic_lti_launch',
           submitted_at: submitted_at_date
         ).
-        commit_history(result_data_launch_url, grade, -tool.id)
+        commit_history(result_url, grade, -tool.id)
     end
     # rubocop:enable Naming/MethodName
 
@@ -44,9 +43,15 @@ module BasicLTI
       self.description = message
     end
 
+    def result_url
+      result_data_launch_url || result_data_url
+    end
+
     def submitted_at_date
-      return nil if submission_submitted_at.blank?
-      @_submitted_at_date ||= Time.zone.parse(submission_submitted_at)
+      # we store submitted_at date in the resultData node because
+      # the IMS LTI gem does not have a method to put it elsewhere
+      return nil if result_data_text.blank?
+      @_submitted_at_date ||= Time.zone.parse(result_data_text)
     end
 
     def grade

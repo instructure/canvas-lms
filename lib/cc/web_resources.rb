@@ -203,7 +203,7 @@ module CC
       # check to make sure we don't export more than 4 gigabytes of media objects
       total_size = 0
       html_content_exporter.used_media_objects.each do |obj|
-        next if @added_attachment_ids.include?(obj.attachment_id)
+        next if @added_attachment_ids&.include?(obj.attachment_id)
 
         info = html_content_exporter.media_object_infos[obj.id]
         next unless info && info[:asset] && info[:asset][:size]
@@ -221,7 +221,7 @@ module CC
 
       tracks = {}
       html_content_exporter.used_media_objects.each do |obj|
-        next if @added_attachment_ids.include?(obj.attachment_id)
+        next if @added_attachment_ids&.include?(obj.attachment_id)
         begin
           migration_id = create_key(obj)
           info = html_content_exporter.media_object_infos[obj.id]
@@ -256,7 +256,7 @@ module CC
         end
       end
 
-      add_tracks(tracks)
+      add_tracks(tracks) if @canvas_resource_dir
     end
   end
 end

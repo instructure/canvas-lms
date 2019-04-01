@@ -49,7 +49,7 @@ function devKeyList(numKeys = 10) {
 }
 
 function disabledDevKeyList(numKeys = 10) {
-  return [...Array(numKeys).keys()].map(n => ({id: `${n}`, api_key: "abc12345678", created_at: "2012-06-07T20:36:50Z", 
+  return [...Array(numKeys).keys()].map(n => ({id: `${n}`, api_key: "abc12345678", created_at: "2012-06-07T20:36:50Z",
   developer_key_account_binding: {workflow_state: "off", account_owns_binding: false}}))
 }
 
@@ -90,7 +90,7 @@ test('does render the "Owner Email" heading if not inherited', () => {
 
 test('does not render the "Stats" heading if inherited', () => {
   const node = componentNode(devKeyList(), true)
-  notOk(node.querySelectorAll('th')[3])
+  notOk(node.querySelectorAll('th')[4])
 })
 
 test('does render the "Stats" heading if not inherited', () => {

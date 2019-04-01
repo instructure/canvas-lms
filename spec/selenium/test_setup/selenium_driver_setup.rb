@@ -373,6 +373,8 @@ module SeleniumDriverSetup
       caps["tunnel-identifier"] = CONFIG[:tunnel_id] unless CONFIG[:tunnel_id].nil?
       caps['selenium-version'] = "3.4.0"
       caps[:unexpectedAlertBehaviour] = 'ignore'
+      caps[:elementScrollBehavior] = 1
+      caps['screen-resolution'] = "1280x1024"
       caps
     end
 

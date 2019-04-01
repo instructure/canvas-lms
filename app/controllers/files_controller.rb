@@ -231,21 +231,23 @@ class FilesController < ApplicationController
   def index
     # This is only used by the old wiki sidebar, see
     # public/javascripts/wikiSidebar.js#loadFolders
-    if request.format == :json
-      if authorized_action(@context.attachments.build, @current_user, :read)
-        root_folder = Folder.root_folders(@context).first
-        if authorized_action(root_folder, @current_user, :read)
-          file_structure = {
-            :folders => @context.active_folders.
-              reorder(Arel.sql("COALESCE(parent_folder_id, 0), COALESCE(position, 0), COALESCE(name, ''), created_at")).
-              select(:id, :parent_folder_id, :name)
-          }
+    Shackles.activate(:slave) do
+      if request.format == :json
+        if authorized_action(@context.attachments.build, @current_user, :read)
+          root_folder = Folder.root_folders(@context).first
+          if authorized_action(root_folder, @current_user, :read)
+            file_structure = {
+              :folders => @context.active_folders.
+                reorder(Arel.sql("COALESCE(parent_folder_id, 0), COALESCE(position, 0), COALESCE(name, ''), created_at")).
+                select(:id, :parent_folder_id, :name)
+            }
 
-          render :json => file_structure
+            render :json => file_structure
+          end
         end
+      else
+        return react_files
       end
-    else
-      return react_files
     end
   end
 
@@ -284,55 +286,57 @@ class FilesController < ApplicationController
   #
   # @returns [File]
   def api_index
-    get_context
-    verify_api_id unless @context.present?
-    @folder = Folder.from_context_or_id(@context, params[:id])
+    Shackles.activate(:slave) do
+      get_context
+      verify_api_id unless @context.present?
+      @folder = Folder.from_context_or_id(@context, params[:id])
 
-    if authorized_action(@folder, @current_user, :read_contents)
-      params[:sort] ||= params[:sort_by] # :sort_by was undocumented; :sort is more consistent with other APIs such as wikis
-      params[:include] = Array(params[:include])
-      params[:include] << 'user' if params[:sort] == 'user'
+      if authorized_action(@folder, @current_user, :read_contents)
+        params[:sort] ||= params[:sort_by] # :sort_by was undocumented; :sort is more consistent with other APIs such as wikis
+        params[:include] = Array(params[:include])
+        params[:include] << 'user' if params[:sort] == 'user'
 
-      scope = Attachments::ScopedToUser.new(@context || @folder, @current_user).scope
-      scope = scope.preload(:user) if params[:include].include?('user') && params[:sort] != 'user'
-      scope = scope.preload(:usage_rights) if params[:include].include?('usage_rights')
-      scope = Attachment.search_by_attribute(scope, :display_name, params[:search_term])
+        scope = Attachments::ScopedToUser.new(@context || @folder, @current_user).scope
+        scope = scope.preload(:user) if params[:include].include?('user') && params[:sort] != 'user'
+        scope = scope.preload(:usage_rights) if params[:include].include?('usage_rights')
+        scope = Attachment.search_by_attribute(scope, :display_name, params[:search_term])
 
-      order_clause = case params[:sort]
-        when 'position' # undocumented; kept for compatibility
-          "attachments.position, #{Attachment.display_name_order_by_clause('attachments')}"
-        when 'size'
-          "attachments.size"
-        when 'created_at'
-          "attachments.created_at"
-        when 'updated_at'
-          "attachments.updated_at"
-        when 'content_type'
-          "attachments.content_type"
-        when 'user'
-        scope.primary_shard.activate do
-            scope = scope.joins("LEFT OUTER JOIN #{User.quoted_table_name} ON attachments.user_id=users.id")
-          end
-          "users.sortable_name IS NULL, #{User.sortable_name_order_by_clause('users')}"
-        else
-          Attachment.display_name_order_by_clause('attachments')
+        order_clause = case params[:sort]
+                       when 'position' # undocumented; kept for compatibility
+                         "attachments.position, #{Attachment.display_name_order_by_clause('attachments')}"
+                       when 'size'
+                         "attachments.size"
+                       when 'created_at'
+                         "attachments.created_at"
+                       when 'updated_at'
+                         "attachments.updated_at"
+                       when 'content_type'
+                         "attachments.content_type"
+                       when 'user'
+                         scope.primary_shard.activate do
+                           scope = scope.joins("LEFT OUTER JOIN #{User.quoted_table_name} ON attachments.user_id=users.id")
+                         end
+                         "users.sortable_name IS NULL, #{User.sortable_name_order_by_clause('users')}"
+                       else
+                         Attachment.display_name_order_by_clause('attachments')
+                       end
+        order_clause += ' DESC' if params[:order] == 'desc'
+        scope = scope.order(Arel.sql(order_clause))
+
+        if params[:content_types].present?
+          scope = scope.by_content_types(Array(params[:content_types]))
+        end
+
+        url = @context ? context_files_url : api_v1_list_files_url(@folder)
+        @files = Api.paginate(scope, self, url)
+        render json: attachments_json(@files, @current_user, {}, {
+          can_view_hidden_files: can_view_hidden_files?(@context || @folder, @current_user, session),
+          context: @context || @folder.context,
+          include: params[:include],
+          only: params[:only],
+          omit_verifier_in_app: !value_to_boolean(params[:use_verifiers])
+        })
       end
-      order_clause += ' DESC' if params[:order] == 'desc'
-      scope = scope.order(Arel.sql(order_clause))
-
-      if params[:content_types].present?
-        scope = scope.by_content_types(Array(params[:content_types]))
-      end
-
-      url = @context ? context_files_url : api_v1_list_files_url(@folder)
-      @files = Api.paginate(scope, self, url)
-      render json: attachments_json(@files, @current_user, {}, {
-        can_view_hidden_files: can_view_hidden_files?(@context || @folder, @current_user, session),
-        context: @context || @folder.context,
-        include: params[:include],
-        only: params[:only],
-        omit_verifier_in_app: !value_to_boolean(params[:use_verifiers])
-      })
     end
   end
 
@@ -473,72 +477,74 @@ class FilesController < ApplicationController
   end
 
   def show
-    original_params = params.dup
-    params[:id] ||= params[:file_id]
-    get_context
-    # note that the /files/XXX URL implicitly uses the current user as the
-    # context, even though it doesn't search for the file using
-    # @current_user.attachments.find , since it might not actually be a user
-    # attachment.
-    # this implicit context magic happens in ApplicationController#get_context
-    if @context.nil? || @current_user.nil? || @context == @current_user
-      @attachment = Attachment.find(params[:id])
-      @skip_crumb = true unless @context
-    else
-      # note that Attachment#find has special logic to find overwriting files; see FindInContextAssociation
-      @attachment = @context.attachments.find(params[:id])
-    end
+    Shackles.activate(:slave) do
+      original_params = params.dup
+      params[:id] ||= params[:file_id]
+      get_context
+      # note that the /files/XXX URL implicitly uses the current user as the
+      # context, even though it doesn't search for the file using
+      # @current_user.attachments.find , since it might not actually be a user
+      # attachment.
+      # this implicit context magic happens in ApplicationController#get_context
+      if @context.nil? || @current_user.nil? || @context == @current_user
+        @attachment = Attachment.find(params[:id])
+        @skip_crumb = true unless @context
+      else
+        # note that Attachment#find has special logic to find overwriting files; see FindInContextAssociation
+        @attachment = @context.attachments.find(params[:id])
+      end
 
-    params[:download] ||= params[:preview]
-    add_crumb(t('#crumbs.files', "Files"), named_context_url(@context, :context_files_url)) unless @skip_crumb
-    if @attachment.deleted?
-      if @current_user.nil? || @attachment.user_id != @current_user.id
-        @not_found_message = t('could_not_find_file', "This file has been deleted")
-        render status: 404, template: "shared/errors/404_message", formats: [:html]
+      params[:download] ||= params[:preview]
+      add_crumb(t('#crumbs.files', "Files"), named_context_url(@context, :context_files_url)) unless @skip_crumb
+      if @attachment.deleted?
+        if @current_user.nil? || @attachment.user_id != @current_user.id
+          @not_found_message = t('could_not_find_file', "This file has been deleted")
+          render status: 404, template: "shared/errors/404_message", formats: [:html]
+          return
+        end
+        flash[:notice] = t 'notices.deleted', "The file %{display_name} has been deleted", display_name: @attachment.display_name
+        if params[:preview] && @attachment.mime_class == 'image'
+          redirect_to '/images/blank.png'
+        elsif request.format == :json
+          render :json => {:deleted => true}
+        else
+          redirect_to named_context_url(@context, :context_files_url)
+        end
         return
       end
-      flash[:notice] = t 'notices.deleted', "The file %{display_name} has been deleted", display_name: @attachment.display_name
-      if params[:preview] && @attachment.mime_class == 'image'
-        redirect_to '/images/blank.png'
-      elsif request.format == :json
-        render :json => {:deleted => true}
-      else
-        redirect_to named_context_url(@context, :context_files_url)
-      end
-      return
-    end
 
-    if read_allowed(@attachment, @current_user, session, params)
-      @attachment.ensure_media_object
-      verifier_checker = Attachments::Verification.new(@attachment)
+      if read_allowed(@attachment, @current_user, session, params)
+        @attachment.ensure_media_object
+        verifier_checker = Attachments::Verification.new(@attachment)
 
-      if params[:download]
-        if (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download, session)) ||
+        if params[:download]
+          if (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download, session)) ||
             (@attachment.grants_right?(@current_user, session, :download))
-          disable_page_views if params[:preview]
-          begin
-            send_attachment(@attachment)
-          rescue => e
-            @headers = false if params[:ts] && params[:verifier]
-            @not_found_message = t 'errors.not_found', "It looks like something went wrong when this file was uploaded, and we can't find the actual file.  You may want to notify the owner of the file and have them re-upload it."
-            logger.error "Error downloading a file: #{e} - #{e.backtrace}"
-            render 'shared/errors/404_message',
-              status: :bad_request,
-              formats: [:html]
+            disable_page_views if params[:preview]
+            begin
+              send_attachment(@attachment)
+            rescue => e
+              @headers = false if params[:ts] && params[:verifier]
+              @not_found_message = t 'errors.not_found', "It looks like something went wrong when this file was uploaded, and we can't find the actual file.  You may want to notify the owner of the file and have them re-upload it."
+              logger.error "Error downloading a file: #{e} - #{e.backtrace}"
+              render 'shared/errors/404_message',
+                     status: :bad_request,
+                     formats: [:html]
+            end
+            return
+          elsif authorized_action(@attachment, @current_user, :read)
+            render_attachment(@attachment)
           end
-          return
-        elsif authorized_action(@attachment, @current_user, :read)
+          # This action is a callback used in our system to help record when
+          # a user views an inline preview of a file instead of downloading
+          # it, since this should also count as an access.
+        elsif params[:inline]
+          @attachment.context_module_action(@current_user, :read) if @current_user
+          log_asset_access(@attachment, 'files', 'files')
+          render :json => {:ok => true}
+        else
           render_attachment(@attachment)
         end
-      # This action is a callback used in our system to help record when
-      # a user views an inline preview of a file instead of downloading
-      # it, since this should also count as an access.
-      elsif params[:inline]
-        @attachment.context_module_action(@current_user, :read) if @current_user
-        log_asset_access(@attachment, 'files', 'files')
-        render :json => {:ok => true}
-      else
-        render_attachment(@attachment)
       end
     end
   end
@@ -889,26 +895,20 @@ class FilesController < ApplicationController
     if params[:progress_id]
       progress = Progress.find(params[:progress_id])
 
-      # If the upload is for an Assignment, submit it
+      # If the attachment is for an Assignment's upload_via_url, submit it
       if progress.tag == 'upload_via_url' && progress.context.is_a?(Assignment)
-        assignment = progress.context
-        homework_service = Services::SubmitHomeworkService.new(@attachment, assignment)
-        begin
-          homework_service.submit(progress.created_at, params[:eula_agreement_timestamp])
-          homework_service.deliver_email
+        homework_service = Services::SubmitHomeworkService.new(@attachment, progress)
 
-          progress.complete unless progress.failed?
+        begin
+          homework_service.submit(params[:eula_agreement_timestamp])
+          homework_service.success!
         rescue => error
           error_id = Canvas::Errors.capture_exception(self.class.name, error)[:error_report]
-          progress.message = "Unexpected error, ID: #{error_id || 'unknown'}"
-          progress.save
-          progress.fail
+          message = "Unexpected error, ID: #{error_id || 'unknown'}"
           logger.error "Error submitting a file: #{error} - #{error.backtrace}"
-          homework_service.failure_email
+          homework_service.failed!(message)
         end
-      end
-
-      if progress.running?
+      elsif progress.running?
         progress.set_results('id' => @attachment.id)
         progress.complete!
       end

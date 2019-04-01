@@ -26,11 +26,13 @@ import PropTypes from 'prop-types'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
 import Flex, { FlexItem } from '@instructure/ui-layout/lib/components/Flex'
+import IconLti from '@instructure/ui-icons/lib/Line/IconLti'
 import Popover, { PopoverTrigger, PopoverContent } from '@instructure/ui-overlays/lib/components/Popover'
 import Image from '@instructure/ui-elements/lib/components/Img'
 import Link from '@instructure/ui-elements/lib/components/Link'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import View from '@instructure/ui-layout/lib/components/View'
+import { Tooltip } from '@instructure/ui-overlays'
 
 import DeveloperKeyActionButtons from './ActionButtons'
 import DeveloperKeyStateControl from './InheritanceStateControl'
@@ -143,7 +145,7 @@ class DeveloperKey extends React.Component {
         <td>
           <Flex>
             {this.makeImage(developerKey)}
-            <FlexItem shrink="true">
+            <FlexItem shrink>
             {this.getToolName(developerKey)}
             </FlexItem>
           </Flex>
@@ -225,7 +227,18 @@ class DeveloperKey extends React.Component {
             </div>
           </td>
         }
-
+        <td>
+          {developerKey.is_lti_key
+            ?  <Tooltip
+                tip={I18n.t("Developer key is an external tool.")}
+                on={['click', 'hover', 'focus']}
+              >
+                <Button variant="icon" icon={IconLti}>
+                  <ScreenReaderContent>{I18n.t("Toggle ToolTip")}</ScreenReaderContent>
+                </Button>
+              </Tooltip>
+            : null}
+        </td>
         <td>
           <DeveloperKeyStateControl
             ref={this.refToggleGroup}

@@ -34,6 +34,7 @@ export function mockAssignment(overrides = {}) {
     env: {
       assignmentUrl: '/test/assignment',
       moduleUrl: '/test/module',
+      currentUserId: '1',
       modulePrereq: null,
       __typename: 'env'
     },
@@ -51,8 +52,9 @@ export function mockAssignment(overrides = {}) {
               {
                 __typename: 'Comment',
                 _id: '1',
+                attachments: [],
                 comment: 'comment comment',
-                updatedAt: '12/13/91',
+                updatedAt: '2019-03-05T23:09:36-07:00',
                 author: {
                   __typename: 'Author',
                   avatarUrl: 'example.com',
@@ -87,8 +89,10 @@ export function mockComments(overrides = {}) {
         {
           __typename: 'Comment',
           _id: '1',
+          attachments: [],
           comment: 'comment comment',
-          updatedAt: '12/13/91',
+          mediaObject: null,
+          updatedAt: '2019-03-05T23:09:36-07:00',
           author: {
             __typename: 'Author',
             avatarUrl: 'example.com',
@@ -101,11 +105,27 @@ export function mockComments(overrides = {}) {
   }
 }
 
+export function singleMediaObject(overrides = {}) {
+  return {
+    __typename: 'MediaObject',
+    id: '9',
+    title: 'video media comment',
+    mediaType: 'video/mp4',
+    mediaSources: {
+      __typename: 'MediaSource',
+      src: 'www.blah.com',
+      type: 'video/mp4'
+    },
+    ...overrides
+  }
+}
+
 export function singleComment(overrides = {}) {
   return {
     _id: '1',
+    attachments: [],
     comment: 'comment comment',
-    updatedAt: '12/13/91',
+    updatedAt: '2019-03-05T23:09:36-07:00',
     author: {
       __typename: 'Author',
       avatarUrl: 'example.com',
@@ -113,4 +133,32 @@ export function singleComment(overrides = {}) {
     },
     ...overrides
   }
+}
+
+export function singleAttachment(overrides = {}) {
+  return {
+    _id: '20',
+    displayName: 'lookatme.pdf',
+    mimeClass: 'pdf',
+    url: 'https://some-awesome/url/goes/here',
+    ...overrides
+  }
+}
+
+export function commentGraphqlMock(query, comments) {
+  return [
+    {
+      request: {
+        query,
+        variables: {
+          submissionId: mockAssignment().submissionsConnection.nodes[0].id.toString()
+        }
+      },
+      result: {
+        data: {
+          submissionComments: comments
+        }
+      }
+    }
+  ]
 }

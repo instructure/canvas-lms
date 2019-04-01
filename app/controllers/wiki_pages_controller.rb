@@ -71,41 +71,45 @@ class WikiPagesController < ApplicationController
   end
 
   def index
-    if authorized_action(@context.wiki, @current_user, :read) && tab_enabled?(@context.class::TAB_PAGES)
-      log_asset_access([ "pages", @context ], "pages", "other")
-      js_env((ConditionalRelease::Service.env_for(@context)))
-      wiki_pages_js_env(@context)
-      set_tutorial_js_env
-      @padless = true
+    Shackles.activate(:slave) do
+      if authorized_action(@context.wiki, @current_user, :read) && tab_enabled?(@context.class::TAB_PAGES)
+        log_asset_access([ "pages", @context ], "pages", "other")
+        js_env((ConditionalRelease::Service.env_for(@context)))
+        wiki_pages_js_env(@context)
+        set_tutorial_js_env
+        @padless = true
+      end
     end
   end
 
   def show
-    if @page.new_record?
-      if @page.grants_any_right?(@current_user, session, :update, :update_content)
-        flash[:info] = t('notices.create_non_existent_page', 'The page "%{title}" does not exist, but you can create it below', :title => @page.title)
-        encoded_name = @page_name && CGI.escape(@page_name).gsub("+", " ")
-        redirect_to polymorphic_url([@context, :wiki_page], id: encoded_name || @page, titleize: params[:titleize], action: :edit)
-      else
-        wiki_page = @context.wiki_pages.deleted_last.where(url: @page.url).first
-        if wiki_page && wiki_page.deleted?
-          flash[:warning] = t('notices.page_deleted', 'The page "%{title}" has been deleted.', :title => @page.title)
+    Shackles.activate(:slave) do
+      if @page.new_record?
+        if @page.grants_any_right?(@current_user, session, :update, :update_content)
+          flash[:info] = t('notices.create_non_existent_page', 'The page "%{title}" does not exist, but you can create it below', :title => @page.title)
+          encoded_name = @page_name && CGI.escape(@page_name).gsub("+", " ")
+          redirect_to polymorphic_url([@context, :wiki_page], id: encoded_name || @page, titleize: params[:titleize], action: :edit)
         else
-          flash[:warning] = t('notices.page_does_not_exist', 'The page "%{title}" does not exist.', :title => @page.title)
+          wiki_page = @context.wiki_pages.deleted_last.where(url: @page.url).first
+          if wiki_page && wiki_page.deleted?
+            flash[:warning] = t('notices.page_deleted', 'The page "%{title}" has been deleted.', :title => @page.title)
+          else
+            flash[:warning] = t('notices.page_does_not_exist', 'The page "%{title}" does not exist.', :title => @page.title)
+          end
+          redirect_to polymorphic_url([@context, :wiki_pages])
         end
-        redirect_to polymorphic_url([@context, :wiki_pages])
+        return
       end
-      return
-    end
 
-    if authorized_action(@page, @current_user, :read)
-      if !@context.feature_enabled?(:conditional_release) || enforce_assignment_visible(@page)
-        add_crumb(@page.title)
-        log_asset_access(@page, 'wiki', @wiki)
-        wiki_pages_js_env(@context)
-        set_master_course_js_env_data(@page, @context)
-        @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @page)
-        @padless = true
+      if authorized_action(@page, @current_user, :read)
+        if !@context.feature_enabled?(:conditional_release) || enforce_assignment_visible(@page)
+          add_crumb(@page.title)
+          log_asset_access(@page, 'wiki', @wiki)
+          wiki_pages_js_env(@context)
+          set_master_course_js_env_data(@page, @context)
+          @mark_done = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @page)
+          @padless = true
+        end
       end
     end
   end

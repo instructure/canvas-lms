@@ -2,13 +2,13 @@
 
 exports[`grouping contains link pointing to course url 1`] = `
 <div
-  className="planner-grouping"
+  className="Grouping-styles__root planner-grouping"
 >
   <NotificationBadge
     responsiveSize="large"
   />
   <a
-    className="undefined undefined"
+    className="Grouping-styles__hero Grouping-styles__heroHover"
     href="example.com"
     style={
       Object {
@@ -17,18 +17,21 @@ exports[`grouping contains link pointing to course url 1`] = `
     }
   >
     <span
-      className=""
+      className="Grouping-styles__overlay"
       style={
         Object {
           "backgroundColor": "#5678",
         }
       }
     />
-    <span>
+    <span
+      className="Grouping-styles__title"
+    >
       Board Games
     </span>
   </a>
   <ol
+    className="Grouping-styles__items"
     style={
       Object {
         "borderColor": "#5678",
@@ -98,13 +101,13 @@ exports[`grouping contains link pointing to course url 1`] = `
 
 exports[`renders a CompletedItemsFacade when completed items are present by default 1`] = `
 <div
-  className="planner-grouping"
+  className="Grouping-styles__root planner-grouping"
 >
   <NotificationBadge
     responsiveSize="large"
   />
   <a
-    className="undefined undefined"
+    className="Grouping-styles__hero Grouping-styles__heroHover"
     href="example.com"
     style={
       Object {
@@ -113,18 +116,21 @@ exports[`renders a CompletedItemsFacade when completed items are present by defa
     }
   >
     <span
-      className=""
+      className="Grouping-styles__overlay"
       style={
         Object {
           "backgroundColor": "#5678",
         }
       }
     />
-    <span>
+    <span
+      className="Grouping-styles__title"
+    >
       Board Games
     </span>
   </a>
   <ol
+    className="Grouping-styles__items"
     style={
       Object {
         "borderColor": "#5678",
@@ -188,13 +194,13 @@ exports[`renders a CompletedItemsFacade when completed items are present by defa
 
 exports[`renders the base component with required props 1`] = `
 <div
-  className="planner-grouping"
+  className="Grouping-styles__root planner-grouping"
 >
   <NotificationBadge
     responsiveSize="large"
   />
   <a
-    className="undefined undefined"
+    className="Grouping-styles__hero Grouping-styles__heroHover"
     href="example.com"
     style={
       Object {
@@ -203,18 +209,21 @@ exports[`renders the base component with required props 1`] = `
     }
   >
     <span
-      className=""
+      className="Grouping-styles__overlay"
       style={
         Object {
           "backgroundColor": "#5678",
         }
       }
     />
-    <span>
+    <span
+      className="Grouping-styles__title"
+    >
       Board Games
     </span>
   </a>
   <ol
+    className="Grouping-styles__items"
     style={
       Object {
         "borderColor": "#5678",
@@ -284,25 +293,30 @@ exports[`renders the base component with required props 1`] = `
 
 exports[`renders to do items correctly 1`] = `
 <div
-  className="planner-grouping"
+  className="Grouping-styles__root planner-grouping"
 >
   <NotificationBadge
     responsiveSize="large"
   />
-  <span>
+  <span
+    className="Grouping-styles__hero"
+  >
     <span
-      className=""
+      className="Grouping-styles__overlay"
       style={
         Object {
           "backgroundColor": null,
         }
       }
     />
-    <span>
+    <span
+      className="Grouping-styles__title"
+    >
       To Do
     </span>
   </span>
   <ol
+    className="Grouping-styles__items"
     style={
       Object {
         "borderColor": null,

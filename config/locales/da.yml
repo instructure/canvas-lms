@@ -13381,14 +13381,14 @@ da:
           not_applicable: N/A
           regraded_date: "Ny karakter: %{date}"
           score: "resultat: %{score} ud af %{total}"
-          score_pending: "resultat  afventer lærerens evaluering"
+          score_pending: "resultat afventer lærerens evaluering"
           subject: "Karakter ændret: %{assignment}, %{context}"
         link_message: "Du kan gennemse opgaven her:"
         no_date_set: "Ingen indstillet dato"
         not_applicable: N/A
         regraded_date: "Ny karakter: %{date}"
         score: "resultat:  %{score} ud af %{total}"
-        score_pending: "resultat  afventer lærerens evaluering"
+        score_pending: "resultat afventer lærerens evaluering"
         subject: "Karakter ændret: %{assignment}, %{context}"
       sms: 
         body_sms: "Din karakter for %{title} i %{context} blev lige ændret."
@@ -13397,13 +13397,13 @@ da:
         not_applicable: N/A
         regraded_date: "Ny karakter: %{date}"
         score: "resultat:  %{score} ud af %{total}"
-        score_pending: "resultat  afventer lærerens evaluering"
+        score_pending: "resultat afventer lærerens evaluering"
       summary: 
         no_date_set: "Ingen indstillet dato"
         not_applicable: N/A
         regraded_date: "Ny karakter: %{date}"
         score: "resultat:  %{score} ud af %{total}"
-        score_pending: "resultat  afventer lærerens evaluering"
+        score_pending: "resultat afventer lærerens evaluering"
         subject: "Karakter ændret: %{title}, %{context}"
       twitter: 
         no_date_set: "Ingen indstillet dato"
@@ -13424,13 +13424,13 @@ da:
           no_date_set: "Ingen indstillet dato"
           not_applicable: N/A
           score: "resultat: %{score} ud af %{total}"
-          score_pending_review: "resultat  afventer lærerens evaluering"
+          score_pending_review: "resultat afventer lærerens evaluering"
           subject: "Opgave bedømt: %{assignment}, %{context}"
         link_message: "Du kan gennemse opgaven her:"
         no_date_set: "Ingen indstillet dato"
         not_applicable: N/A
         score: "resultat:  %{score} ud af %{total}"
-        score_pending_review: "resultat  afventer lærerens evaluering"
+        score_pending_review: "resultat afventer lærerens evaluering"
         subject: "Opgave bedømt: %{assignment}, %{context}"
       sms: 
         graded_date: "bedømt: %{date}"
@@ -13445,7 +13445,7 @@ da:
         no_date_set: "Ingen indstillet dato"
         not_applicable: N/A
         score: "resultat:  %{score} ud af %{total}"
-        score_pending_review: "resultat  afventer lærerens evaluering"
+        score_pending_review: "resultat afventer lærerens evaluering"
         subject: "Opgave bedømt: %{assignment}, %{context}"
       twitter: 
         no_date_set: "Ingen indstillet dato"
@@ -13471,7 +13471,7 @@ da:
         not_applicable: N/A
         regraded_date: "Ny karakter: %{date}"
         score: "resultat:  %{score} ud af %{total}"
-        score_pending: "resultat  afventer lærerens evaluering"
+        score_pending: "resultat afventer lærerens evaluering"
       summary: 
         body: "Der er blevet indsendt en aflevering for din test, *%{title}*, og den kræver manuel karaktergivning."
         subject: "Test indsendt: %{quiz}, %{context}"
@@ -19650,6 +19650,7 @@ da:
     other: "%{studentCount} studerende får %{num} point"
   students_1b8cd07b: Studerende
   students_are_attempting_to_access_unpublished_cont_be329862: "Studerende forsøger at få adgang til ikke offentliggjort indhold, %{bad_link}, i %{asset_link}."
+  students_are_clicking_on_bad_link_to_content_that__d9c51d0d: "Studerende klikker på %{bad_link} til indhold, der er blevet fjernet i %{asset_link}."
   students_are_loading_206c5246: "Studerende indlæses"
   students_are_not_allowed_to_access_test_installati_11b9078: "Studerende får ikke adgang til testinstallationer."
   students_being_observed_4de3e520: "Studerende der observeres"

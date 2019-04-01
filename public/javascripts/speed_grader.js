@@ -31,6 +31,7 @@ import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
 import AssessmentAuditButton from 'jsx/speed_grader/AssessmentAuditTray/components/AssessmentAuditButton'
 import AssessmentAuditTray from 'jsx/speed_grader/AssessmentAuditTray'
 import SpeedGraderProvisionalGradeSelector from 'jsx/speed_grader/SpeedGraderProvisionalGradeSelector'
+import SpeedGraderPostGradesMenu from 'jsx/speed_grader/SpeedGraderPostGradesMenu'
 import SpeedGraderSettingsMenu from 'jsx/speed_grader/SpeedGraderSettingsMenu'
 import studentViewedAtTemplate from 'jst/speed_grader/student_viewed_at'
 import submissionsDropdownTemplate from 'jst/speed_grader/submissions_dropdown'
@@ -39,8 +40,6 @@ import Tooltip from '@instructure/ui-overlays/lib/components/Tooltip'
 import IconUpload from '@instructure/ui-icons/lib/Line/IconUpload'
 import IconWarning from '@instructure/ui-icons/lib/Line/IconWarning'
 import IconCheckMarkIndeterminate from '@instructure/ui-icons/lib/Line/IconCheckMarkIndeterminate'
-import FailedUploadTreeKite from 'jsx/speed_grader/FailedUploadTreeKite'
-import WaitingWristWatch from 'jsx/speed_grader/WaitingWristWatch'
 import View from '@instructure/ui-layout/lib/components/View'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import round from 'compiled/util/round'
@@ -92,6 +91,7 @@ const selectors = new JQuerySelectorCache()
 const SPEED_GRADER_COMMENT_TEXTAREA_MOUNT_POINT = 'speed_grader_comment_textarea_mount_point'
 const SPEED_GRADER_SUBMISSION_COMMENTS_DOWNLOAD_MOUNT_POINT =
   'speed_grader_submission_comments_download_mount_point'
+const SPEED_GRADER_POST_GRADES_MENU_MOUNT_POINT = 'speed_grader_post_grades_menu_mount_point'
 const SPEED_GRADER_SETTINGS_MOUNT_POINT = 'speed_grader_settings_mount_point'
 const ASSESSMENT_AUDIT_BUTTON_MOUNT_POINT = 'speed_grader_assessment_audit_button_mount_point'
 const ASSESSMENT_AUDIT_TRAY_MOUNT_POINT = 'speed_grader_assessment_audit_tray_mount_point'
@@ -487,32 +487,42 @@ function initDropdown() {
   }
 }
 
-function setupHeader() {
-  return {
-    elements: {
+function setupHeader({showMuteButton = true}) {
+  const elements = {
+    nav: $gradebook_header.find('#prev-student-button, #next-student-button'),
+    settings: {form: $('#settings_form')}
+  }
+
+  if (showMuteButton) {
+    Object.assign(elements, {
       mute: {
         icon: $('#mute_link i'),
         label: $('#mute_link .mute_label'),
         link: $('#mute_link'),
         modal: $('#mute_dialog')
       },
-      unmute: {
-        modal: $('#unmute_dialog')
-      },
-      nav: $gradebook_header.find('#prev-student-button, #next-student-button'),
-      settings: {form: $('#settings_form')}
-    },
+      unmute: {modal: $('#unmute_dialog')}
+    })
+  }
+
+  return {
+    elements,
     courseId: utils.getParam('courses'),
     assignmentId: utils.getParam('assignment_id'),
     init() {
-      this.muted = this.elements.mute.link.data('muted')
+      if (showMuteButton) {
+        this.muted = this.elements.mute.link.data('muted')
+      }
+
       this.addEvents()
       this.createModals()
       return this
     },
     addEvents() {
       this.elements.nav.click($.proxy(this.toAssignment, this))
-      this.elements.mute.link.click($.proxy(this.onMuteClick, this))
+      if (showMuteButton) {
+        this.elements.mute.link.click($.proxy(this.onMuteClick, this))
+      }
 
       this.elements.settings.form.submit(this.submitSettingsForm.bind(this))
     },
@@ -529,52 +539,54 @@ function setupHeader() {
       // button. So here we'll manually re-enable it.
       this.elements.settings.form.find('.submit_button').removeAttr('disabled')
 
-      this.elements.mute.modal.dialog({
-        autoOpen: false,
-        buttons: [
-          {
-            text: I18n.t('cancel_button', 'Cancel'),
-            click: $.proxy(function() {
-              this.elements.mute.modal.dialog('close')
-            }, this)
-          },
-          {
-            text: I18n.t('mute_assignment', 'Mute Assignment'),
-            class: 'btn-primary btn-mute',
-            click: $.proxy(function() {
-              this.toggleMute()
-              this.elements.mute.modal.dialog('close')
-            }, this)
-          }
-        ],
-        modal: true,
-        resizable: false,
-        title: this.elements.mute.modal.data('title'),
-        width: 400
-      })
-      this.elements.unmute.modal.dialog({
-        autoOpen: false,
-        buttons: [
-          {
-            text: I18n.t('Cancel'),
-            click: $.proxy(function() {
-              this.elements.unmute.modal.dialog('close')
-            }, this)
-          },
-          {
-            text: I18n.t('Unmute Assignment'),
-            class: 'btn-primary btn-unmute',
-            click: $.proxy(function() {
-              this.toggleMute()
-              this.elements.unmute.modal.dialog('close')
-            }, this)
-          }
-        ],
-        modal: true,
-        resizable: false,
-        title: this.elements.unmute.modal.data('title'),
-        width: 400
-      })
+      if (showMuteButton) {
+        this.elements.mute.modal.dialog({
+          autoOpen: false,
+          buttons: [
+            {
+              text: I18n.t('cancel_button', 'Cancel'),
+              click: $.proxy(function() {
+                this.elements.mute.modal.dialog('close')
+              }, this)
+            },
+            {
+              text: I18n.t('mute_assignment', 'Mute Assignment'),
+              class: 'btn-primary btn-mute',
+              click: $.proxy(function() {
+                this.toggleMute()
+                this.elements.mute.modal.dialog('close')
+              }, this)
+            }
+          ],
+          modal: true,
+          resizable: false,
+          title: this.elements.mute.modal.data('title'),
+          width: 400
+        })
+        this.elements.unmute.modal.dialog({
+          autoOpen: false,
+          buttons: [
+            {
+              text: I18n.t('Cancel'),
+              click: $.proxy(function() {
+                this.elements.unmute.modal.dialog('close')
+              }, this)
+            },
+            {
+              text: I18n.t('Unmute Assignment'),
+              class: 'btn-primary btn-unmute',
+              click: $.proxy(function() {
+                this.toggleMute()
+                this.elements.unmute.modal.dialog('close')
+              }, this)
+            }
+          ],
+          modal: true,
+          resizable: false,
+          title: this.elements.unmute.modal.data('title'),
+          width: 400
+        })
+      }
     },
 
     toAssignment(e) {
@@ -679,14 +691,14 @@ function unmountCommentTextArea() {
 function renderProgressIcon(attachment) {
   const mountPoint = document.getElementById('react_pill_container')
   let icon = []
-  switch (attachment.workflow_state) {
-    case 'pending_upload':
+  switch (attachment.upload_status) {
+    case 'pending':
       icon = [<IconUpload />, I18n.t('Uploading Submission')]
       break
-    case 'errored':
+    case 'failed':
       icon = [<IconWarning />, I18n.t('Submission Failed to Submit')]
       break
-    case 'processed':
+    case 'success':
       break
     default:
       icon = [<IconCheckMarkIndeterminate />, I18n.t('No File Submitted')]
@@ -1310,6 +1322,10 @@ EG = {
       initDropdown()
       initGroupAssignmentMode()
       setupHandleStatePopped()
+
+      if (ENV.post_policies_enabled) {
+        renderPostGradesMenu()
+      }
     }
   },
 
@@ -2007,7 +2023,7 @@ EG = {
             [anonymizableSubmissionIdKey]: submission[anonymizableUserId],
             attachmentId: attachment.id,
             display_name: attachment.display_name,
-            attachmentWorkflow: attachment.workflow_state
+            attachmentWorkflow: attachment.upload_status
           },
           hrefValues: [anonymizableSubmissionIdKey, 'attachmentId']
         })
@@ -2280,22 +2296,6 @@ EG = {
     }
   },
 
-  progressSubmissionPreview(attachment) {
-    if (attachment === undefined) {
-      return [
-        <FailedUploadTreeKite />,
-        I18n.t('Upload Failed'),
-        I18n.t('Please have the student submit the file again')
-      ]
-    } else {
-      return [
-        <WaitingWristWatch />,
-        I18n.t('Uploading'),
-        I18n.t('Canvas is attempting to retreive the submissions. Please check back again later.')
-      ]
-    }
-  },
-
   loadSubmissionPreview(attachment, submission) {
     clearInterval(sessionTimer)
     $submissions_container.children().hide()
@@ -2322,36 +2322,9 @@ EG = {
         ENV.lti_retrieve_url,
         submission.external_tool_url || submission.url
       )
-    } else if (this.canDisplaySpeedGraderImagePreview(jsonData.context, attachment, submission)) {
-      this.emptyIframeHolder()
-      const mountPoint = document.getElementById('iframe_holder')
-      mountPoint.style = ''
-      const state = this.progressSubmissionPreview(attachment)
-      ReactDOM.render(
-        <View margin="large" display="block" as="div" textAlign="center">
-          {state[0]}
-          <Text weight="bold" size="large" as="div">
-            {state[1]}
-          </Text>
-          <Text size="medium" as="div">
-            {state[2]}
-          </Text>
-        </View>,
-        mountPoint
-      )
     } else {
       this.renderSubmissionPreview()
     }
-  },
-
-  canDisplaySpeedGraderImagePreview(context, attachment, submission) {
-    const type = submission.submission_type
-    return (
-      !context.quiz &&
-      (type !== 'online_text_entry' && type !== 'media_recording' && type !== 'online_url') &&
-      attachment === undefined &&
-      (submission !== undefined || attachment.workflow_state === 'pending_upload')
-    )
   },
 
   emptyIframeHolder(elem) {
@@ -2509,11 +2482,11 @@ EG = {
     if (attachment.mime_class === 'image') {
       contents = `<img src="${htmlEscape(src)}" style="max-width:100%;max-height:100%;">`
     } else {
-      contents = SpeedgraderHelpers.buildIframe(
-        htmlEscape(src),
-        {frameborder: 0, allowfullscreen: true},
-        domElement
-      )
+      const options = {frameborder: 0, allowfullscreen: true}
+      if (attachment.mime_class === 'html') {
+        options.className = 'attachment-html-iframe'
+      }
+      contents = SpeedgraderHelpers.buildIframe(htmlEscape(src), options, domElement)
     }
 
     return $.raw(contents)
@@ -3600,7 +3573,7 @@ function setupSelectors() {
   isAdmin = _.include(ENV.current_user_roles, 'admin')
   snapshotCache = {}
   studentLabel = I18n.t('student', 'Student')
-  header = setupHeader()
+  header = setupHeader({showMuteButton: !ENV.post_policies_enabled})
 }
 
 function renderSettingsMenu() {
@@ -3626,6 +3599,25 @@ function renderSettingsMenu() {
 
   const settingsMenu = <SpeedGraderSettingsMenu {...props} />
   ReactDOM.render(settingsMenu, document.getElementById(SPEED_GRADER_SETTINGS_MOUNT_POINT))
+}
+
+function renderPostGradesMenu() {
+  const submissions = window.jsonData.studentsWithSubmissions.map(student => student.submission)
+  const allowHidingGrades = submissions.some(submission => submission.posted_at != null)
+  const allowPostingGrades = submissions.some(submission => submission.posted_at == null)
+
+  const props = {
+    allowHidingGrades,
+    allowPostingGrades,
+    onHideGrades: () => {},
+    onPostGrades: () => {}
+  }
+
+  const postGradesMenu = <SpeedGraderPostGradesMenu {...props} />
+  ReactDOM.render(
+    postGradesMenu,
+    document.getElementById(SPEED_GRADER_POST_GRADES_MENU_MOUNT_POINT)
+  )
 }
 
 // Helper function that guard against provisional_grades being null, allowing

@@ -42,6 +42,7 @@ describe "submissions" do
     end
 
     it "should let a student submit a text entry", :xbrowser, priority: "1", test_id: 56015 do
+      skip_if_firefox('known issue with firefox https://bugzilla.mozilla.org/show_bug.cgi?id=1335085')
       @assignment.update_attributes(submission_types: "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
@@ -104,7 +105,7 @@ describe "submissions" do
       driver.switch_to.alert.accept
     end
 
-    it "should allow you to submit a file", :xbrowser, priority: "1", test_id: 237022 do
+    it "should allow you to submit a file", priority: "1", test_id: 237022 do
       @assignment.submission_types = 'online_upload'
       @assignment.save!
       filename, fullpath, data = get_file("testfile1.txt")
@@ -354,7 +355,7 @@ describe "submissions" do
         driver.execute_script("$('.folder_item').addClass('folder_item_hover')")
       end
 
-      it "should allow uploaded files to be used for submission", :xbrowser, priority: "1", test_id: 237030 do
+      it "should allow uploaded files to be used for submission", priority: "1", test_id: 237030 do
         local_storage!
 
         add_file(fixture_file_upload('files/html-editing-test.html', 'text/html'),

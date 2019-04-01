@@ -17,7 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../helpers/graphql_type_tester')
+require_relative "../graphql_spec_helper"
 
 describe Types::FileType do
   let_once(:course) { course_with_teacher(active_all: true); @course }
@@ -38,9 +38,9 @@ describe Types::FileType do
   end
 
   it 'requires read permission' do
-    other_course_student = student_in_course(course: course_factory)
+    other_course_student = student_in_course(course: course_factory).user
     resolver = GraphQLTypeTester.new(file, current_user: other_course_student)
-    expect(resolver.resolve('displayName')).to be_nil
+    expect(resolver.resolve("_id")).to be_nil
   end
 
   it 'requires the file to not be deleted' do

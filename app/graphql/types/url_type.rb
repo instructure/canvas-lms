@@ -16,9 +16,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-Types::UrlType = GraphQL::ScalarType.define do
-  name "URL"
+class Types::UrlType < Types::BaseScalar
+  graphql_name "URL"
 
-  coerce_input ->(url_str, _) { url_str }
-  coerce_result ->(url, _) { url.to_s }
+  def self.coerce_input(url_str, _)
+    url_str
+  end
+
+  def self.coerce_result(url, _)
+    url.to_s
+  end
 end

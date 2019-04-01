@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {wait} from 'dom-testing-library'
 import RichContentEditor from 'jsx/shared/rce/RichContentEditor'
 import RCELoader from 'jsx/shared/rce/serviceRCELoader'
 import $ from 'jquery'
@@ -51,23 +52,36 @@ QUnit.module('Rce Abstraction - integration', {
   teardown() {
     fakeENV.teardown()
     $('#fixtures').empty()
-    return editorUtils.resetRCE()
+    editorUtils.resetRCE()
   }
 })
 
-test('instatiating a remote editor', () => {
+async function loadNewEditor() {
+  const $target = $('#big_rce_text')
+  await new Promise(resolve => {
+    const tinyMCEInitOptions = {
+      manageParent: true,
+      tinyOptions: {
+        init_instance_callback: resolve
+      }
+    }
+    RichContentEditor.loadNewEditor($target, tinyMCEInitOptions)
+  })
+}
+
+test('instatiating a remote editor', async () => {
   ENV.RICH_CONTENT_SERVICE_ENABLED = true
   RichContentEditor.preloadRemoteModule()
   const target = $('#big_rce_text')
-  RichContentEditor.loadNewEditor(target, {manageParent: true})
+  loadNewEditor()
+  await wait(() => RCELoader.loadRCE.callCount > 0)
   equal(target.parent().attr('id'), 'tinymce-parent-of-big_rce_text')
   equal(target.parent().find('#fake-editor').length, 1)
 })
 
-test('instatiating a local editor', () => {
+test('instatiating a local editor', async () => {
   ENV.RICH_CONTENT_SERVICE_ENABLED = false
   RichContentEditor.preloadRemoteModule()
-  const target = $('#big_rce_text')
-  RichContentEditor.loadNewEditor(target, {manageParent: true})
+  await loadNewEditor()
   equal($('#fake-editor').length, 0)
 })

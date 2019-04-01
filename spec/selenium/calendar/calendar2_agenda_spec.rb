@@ -354,7 +354,7 @@ describe "calendar2" do
       expect(f("#content")).not_to contain_css('.event-details .delete_event_link')
     end
 
-    it "should display agenda events", :xbrowser do
+    it "should display agenda events" do
       load_agenda_view
       expect(fj('.agenda-wrapper:visible')).to be_present
     end

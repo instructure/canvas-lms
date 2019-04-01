@@ -18,6 +18,7 @@
 
 require_relative '../api_spec_helper'
 require_relative '../../lti_spec_helper'
+require_relative '../../lti_1_3_spec_helper'
 require_dependency "lti/lti_apps_controller"
 
 module Lti
@@ -201,51 +202,14 @@ module Lti
     describe '#index' do
       subject { api_call(:get, "/api/v1/courses/#{@course.id}/lti_apps", params) }
 
+      include_context 'lti_1_3_spec_helper'
+
       let(:params) do
         {
           controller: 'lti/lti_apps',
           action: 'index',
           format: 'json',
           course_id: @course.id.to_s
-        }
-      end
-      let(:settings) do
-        {
-          'title' => 'LTI 1.3 Tool',
-          'description' => '1.3 Tool',
-          'launch_url' => 'http://lti13testtool.docker/blti_launch',
-          'custom_fields' => {'has_expansion' => '$Canvas.user.id', 'no_expansion' => 'foo'},
-          'public_jwk' => {
-            "kty" => "RSA",
-            "e" => "AQAB",
-            "n" => "2YGluUtCi62Ww_TWB38OE6wTaN...",
-            "kid" => "2018-09-18T21:55:18Z",
-            "alg" => "RS256",
-            "use" => "sig"
-          },
-          'extensions' =>  [
-            {
-              'platform' => 'canvas.instructure.com',
-              'privacy_level' => 'public',
-              'tool_id' => 'LTI 1.3 Test Tool',
-              'domain' => 'http://lti13testtool.docker',
-              'settings' =>  {
-                'icon_url' => 'https://static.thenounproject.com/png/131630-200.png',
-                'selection_height' => 500,
-                'selection_width' => 500,
-                'text' => 'LTI 1.3 Test Tool Extension text',
-                'course_navigation' =>  {
-                  'message_type' => 'LtiResourceLinkRequest',
-                  'canvas_icon_class' => 'icon-lti',
-                  'icon_url' => 'https://static.thenounproject.com/png/131630-211.png',
-                  'text' => 'LTI 1.3 Test Tool Course Navigation',
-                  'url' =>
-                  'http://lti13testtool.docker/launch?placement=course_navigation',
-                  'enabled' => true
-                }
-              }
-            }
-          ]
         }
       end
 
@@ -288,7 +252,7 @@ module Lti
       end
 
       context 'lti 1.3 tools' do
-        let(:params) { super().merge lti_1_3_tool_configurations: true }
+        let(:params) { super().merge v1p3: true }
         let(:dev_key) { DeveloperKey.create! account: account }
         let(:tool_config) { dev_key.create_tool_configuration! settings: settings }
         let(:enable_binding) { dev_key.developer_key_account_bindings.first.update! workflow_state: DeveloperKeyAccountBinding::ON_STATE }
@@ -318,12 +282,12 @@ module Lti
           it { is_expected.to_not be_empty }
           it { is_expected.to have(1).items }
 
-          it 'is not enabled' do
-            expect(subject.first['enabled']).to be false
+          it 'is not installed_for_context' do
+            expect(subject.first['installed_for_context']).to be false
           end
 
-          it 'is not installed in a course' do
-            expect(subject.first['installed_in_current_course']).to eq false
+          it 'is not installed_at_context_level' do
+            expect(subject.first['installed_at_context_level']).to eq false
           end
 
           context 'when a tool is installed in a course' do
@@ -337,8 +301,16 @@ module Lti
               tool.save!
             end
 
-            it 'is installed in a course' do
-              expect(subject.first['installed_in_current_course']).to eq true
+            it 'is installed_at_context_level' do
+              expect(subject.first['installed_at_context_level']).to eq true
+            end
+
+            it 'is installed_for_context' do
+              expect(subject.first['installed_for_context']).to eq true
+            end
+
+            it 'has installed_tool_id' do
+              expect(subject.first['installed_tool_id']).not_to be_blank
             end
           end
 
@@ -353,18 +325,10 @@ module Lti
 
             it { is_expected.to_not be_empty }
             it { is_expected.to have(1).items }
-          end
 
-          context 'with an enabled tool' do
-            before do
-              tool = ContextExternalTool.first
-              tool.use_1_3 = true
-              tool.developer_key = dev_key
-              tool.save!
-            end
 
-            it 'is enabled' do
-              expect(subject.first['enabled']).to be true
+            it 'is not installed_for_context' do
+              expect(subject.first['installed_for_context']).to eq false
             end
           end
         end

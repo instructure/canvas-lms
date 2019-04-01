@@ -23,6 +23,11 @@ function pluralize(word) {
   return word
 }
 
+export const WHITELISTS_LOADED = 'WHITELISTS_LOADED'
+export function setWhitelistsLoaded(value) {
+  return {type: WHITELISTS_LOADED, payload: value}
+}
+
 export const SET_DIRTY = 'SET_DIRTY'
 export function setDirtyAction(value) {
   if (typeof value !== 'boolean') {
@@ -211,6 +216,7 @@ export function getCurrentWhitelist(context, contextId) {
         tools: response.data.tools_whitelist || {}
       }
       dispatch(addDomainBulkAction(addDomainMap))
+      dispatch(setWhitelistsLoaded(true))
     })
 }
 

@@ -42,6 +42,7 @@ import 'compiled/jquery.rails_flash_notifications'
   const store = createStore({
     externalTools: [],
     links: {},
+    lti13LoadStatus: 'pending',
     isLoading: false,    // flag to indicate fetch is in progress
     isLoaded: false,     // flag to indicate data has loaded
     hasMore: false       // flag to indicate if there are more pages of external tools
@@ -258,13 +259,53 @@ import 'compiled/jquery.rails_flash_notifications'
     return params;
   };
 
+  store.fetch13Tools = function() {
+    const url = `/api/v1${ENV.CONTEXT_BASE_URL}/lti_apps?v1p3=true`;
+    this.setState({ lti13LoadStatus: true });
+    $.ajax({
+      url,
+      type: 'GET',
+      success: this._fetch13ToolsSuccessHandler.bind(this),
+      error: this._fetch13ToolsErrorHandler.bind(this)
+    });
+  };
+
+  store.installTool = function (developerKeyId) {
+    const toggleValue = store._toggle_lti_1_3_tool_enabled(developerKeyId).bind(this)
+    toggleValue(true)
+    const url = `/api/v1${ENV.CONTEXT_BASE_URL}/developer_keys/${developerKeyId}/create_tool`;
+    $.ajax({
+      url,
+      type: 'POST',
+      success: () => {},
+      error: () => {
+        $.flashError('Failed to install tool.')
+        toggleValue(false)
+      }
+    });
+  }
+
+  store.removeTool = function (developerKeyId) {
+    const toggleValue = store._toggle_lti_1_3_tool_enabled(developerKeyId).bind(this)
+    toggleValue(false)
+    const url = `/api/v1${ENV.CONTEXT_BASE_URL}/developer_keys/${developerKeyId}/delete_tool`;
+    $.ajax({
+      url,
+      type: 'DELETE',
+      success: () => {},
+      error: () => {
+        $.flashError('Failed to remove tool.')
+        toggleValue(true)
+      }
+    });
+  }
+
+
   //*** CALLBACK HANDLERS ***/
 
   store._fetchSuccessHandler = function(tools, status, xhr) {
     var links = parseLinkHeader(xhr);
-    if (links.current !== links.first) {
-      tools = this.getState().externalTools.concat(tools);
-    }
+    tools = this.getState().externalTools.concat(tools);
 
     this.setState({
       links: links,
@@ -302,5 +343,34 @@ import 'compiled/jquery.rails_flash_notifications'
     $.flashError(I18n.t('Unable to dismiss update'));
     this.fetch({ force: true });
   };
+
+  store._fetch13ToolsSuccessHandler = function(tools, _status, _xhr) {
+    this.setState({
+      lti13LoadStatus: 'success',
+      externalTools: sort(this.getState().externalTools.concat(tools))
+    });
+  };
+
+  store._fetch13ToolsErrorHandler = function() {
+    $.flashError(I18n.t('Unable to load Lti 1.3 Tools'));
+    this.setState({
+      lti13LoadStatus: 'error'
+    });
+  };
+
+  store._toggle_lti_1_3_tool_enabled = function(developerKeyId) {
+    return (value) => {
+      const oldTools = this.getState().externalTools
+      const installedToolIndex = oldTools.findIndex((tool) => tool.app_id === developerKeyId)
+      const tool = Object.assign(
+        {},
+        oldTools[installedToolIndex],
+        {installed_for_context: value, installed_at_context_level: value}
+      )
+      const externalTools = oldTools.slice()
+      externalTools.splice(installedToolIndex, 1, tool)
+      this.setState({externalTools})
+    }
+  }
 
 export default store

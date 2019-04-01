@@ -223,8 +223,22 @@ table.criterion {
   margin: 2em 0;
 }
 
+table.criterion th {
+  border-top: 1px solid $borderColor;
+  border-#{direction(left)}: 1px solid $borderColor;
+  border-#{direction(right)}: 1px solid $borderColor;
+  padding: 5px;
+  text-align: center;
+  vertical-align: top;
+  &.total {
+    background-color: $lightBackground;
+  }
+}
+
 table.criterion td {
-  border: 1px solid $borderColor;
+  border-bottom: 1px solid $borderColor;
+  border-#{direction(left)}: 1px solid $borderColor;
+  border-#{direction(right)}: 1px solid $borderColor;
   padding: 5px;
   text-align: center;
   vertical-align: top;

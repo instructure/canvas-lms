@@ -113,20 +113,7 @@ class SisBatch < ActiveRecord::Base
 
   def self.bulk_insert_sis_errors(errors)
     errors.each_slice(1000) do |batch|
-      errors_hash = batch.map do |error|
-        {
-          root_account_id: error.root_account_id,
-          created_at: error.created_at,
-          sis_batch_id: error.sis_batch_id,
-          failure: error.failure,
-          file: error.file,
-          message: error.message,
-          backtrace: error.backtrace,
-          row: error.row,
-          row_info: error.row_info
-        }
-      end
-      SisBatchError.bulk_insert(errors_hash)
+      SisBatchError.bulk_insert_objects(batch)
     end
   end
 
@@ -240,7 +227,7 @@ class SisBatch < ActiveRecord::Base
   end
 
   def abort_batch
-    SisBatch.not_completed.where(id: self).update_all(workflow_state: 'aborted')
+    SisBatch.not_completed.where(id: self).update_all(workflow_state: 'aborted', updated_at: Time.zone.now)
     self.class.queue_job_for_account(account, 10.minutes.from_now) if self.account.sis_batches.needs_processing.exists?
   end
 

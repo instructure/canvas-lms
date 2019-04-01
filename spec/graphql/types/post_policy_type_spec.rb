@@ -17,7 +17,7 @@
 #
 
 require "spec_helper"
-require_relative "../../helpers/graphql_type_tester"
+require_relative "../graphql_spec_helper"
 
 describe Types::PostPolicyType do
   let(:assignment) { course.assignments.create! }

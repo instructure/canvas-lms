@@ -16,10 +16,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-Types::DateTimeType = GraphQL::ScalarType.define do
-  name "DateTime"
+class Types::DateTimeType < Types::BaseScalar
+  graphql_name "DateTime"
   description "an ISO8601 formatted time string"
 
-  coerce_input ->(time_str, _) { time_str }
-  coerce_result ->(time, _) { time.iso8601 }
+  def self.coerce_input(time_str, _)
+    time_str
+  end
+
+  def self.coerce_result(time, _)
+    time.iso8601
+  end
 end

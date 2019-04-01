@@ -17,6 +17,8 @@
 #
 
 class CanvasSchema < GraphQL::Schema
+  use GraphQL::Execution::Interpreter
+
   query Types::QueryType
   mutation Types::MutationType
 
@@ -72,7 +74,4 @@ class CanvasSchema < GraphQL::Schema
   orphan_types [Types::PageType, Types::FileType, Types::ExternalUrlType,
                 Types::ExternalToolType, Types::ModuleExternalToolType,
                 Types::ProgressType]
-
-  instrument :field, AssignmentOverrideInstrumenter.new
-  instrument :field, MutationTransactionInstrumenter.new
 end

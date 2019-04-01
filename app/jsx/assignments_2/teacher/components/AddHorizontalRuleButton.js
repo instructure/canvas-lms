@@ -54,7 +54,7 @@ const ruleStyle = {
 export default function AddHorizontalRuleButton(props) {
   return (
     <div style={addHorizontalRuleButtonStyle} data-testid="AddHorizontalRuleButton">
-      <span style={layoutStyle}>
+      <span style={layoutStyle} aria-hidden="true">
         <hr style={ruleStyle} />
       </span>
       <Button variant="circle-default" icon={IconPlus} onClick={props.onClick}>

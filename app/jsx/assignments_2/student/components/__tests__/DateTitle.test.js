@@ -17,10 +17,10 @@
  */
 import React from 'react'
 import ReactDOM from 'react-dom'
-import $ from 'jquery'
 
 import {mockAssignment} from '../../test-utils'
 import DateTitle from '../DateTitle'
+import {render} from 'react-testing-library'
 
 beforeAll(() => {
   const found = document.getElementById('fixtures')
@@ -37,24 +37,46 @@ afterEach(() => {
 
 it('renders title correctly', () => {
   const assignment = mockAssignment({name: 'Egypt Economy Research'})
-  ReactDOM.render(<DateTitle assignment={assignment} />, document.getElementById('fixtures'))
-  const title = $('[data-test-id="title"]')
-  expect(title.text()).toEqual('Egypt Economy Research')
+  const {getAllByText} = render(<DateTitle assignment={assignment} isSticky={false} />)
+  expect(getAllByText('Egypt Economy Research')).toHaveLength(1)
+})
+
+it('renders title correctly when sticky', () => {
+  const assignment = mockAssignment({name: 'Egypt Economy Research'})
+  const {getAllByText} = render(<DateTitle assignment={assignment} isSticky />)
+  expect(getAllByText('Egypt Economy Research')).toHaveLength(1)
+})
+
+it('does not render AvailabilityDates when sticky', () => {
+  const assignment = mockAssignment({
+    unlockAt: '2016-07-11T18:00:00-01:00',
+    lockAt: '2016-11-11T18:00:00-01:00'
+  })
+  const {queryAllByText} = render(<DateTitle assignment={assignment} isSticky />)
+  expect(queryAllByText('Available Jul 11, 2016 7:00pm')).toHaveLength(0)
+})
+
+it('renders AvailabilityDates when not sticky', () => {
+  const assignment = mockAssignment({
+    unlockAt: '2016-07-11T18:00:00-01:00',
+    lockAt: '2016-11-11T18:00:00-01:00'
+  })
+  const {queryAllByText} = render(<DateTitle assignment={assignment} isSticky={false} />)
+  // Reason why this is showing up twice is once for screenreader content and again for regular content
+  expect(queryAllByText('Available Jul 11, 2016 7:00pm')).toHaveLength(2)
 })
 
 it('renders date correctly', () => {
   const assignment = mockAssignment({dueAt: '2016-07-11T18:00:00-01:00'})
-  ReactDOM.render(<DateTitle assignment={assignment} />, document.getElementById('fixtures'))
-  const title = $('[data-test-id="due-date-display"]')
-
+  const {queryAllByText} = render(<DateTitle assignment={assignment} isSticky={false} />)
   // Reason why this is showing up twice is once for screenreader content and again for regular content
   // Also, notice that it handles timezone differences here, with the `-01:00` offset
-  expect(title.text()).toEqual('Due: Mon Jul 11, 2016 7:00pmDue: Mon Jul 11, 2016 7:00pm2016-7-11')
+  expect(queryAllByText('Due: Mon Jul 11, 2016 7:00pm')).toHaveLength(2)
+  expect(queryAllByText('7/11/2016')).toHaveLength(1)
 })
 
 it('does not render a date if there is no dueAt set', () => {
   const assignment = mockAssignment({dueAt: null})
-  ReactDOM.render(<DateTitle assignment={assignment} />, document.getElementById('fixtures'))
-  const title = $('[data-test-id="due-date-display"]')
-  expect(title).toHaveLength(0)
+  const {queryAllByText} = render(<DateTitle assignment={assignment} isSticky={false} />)
+  expect(queryAllByText('Available Jul 11, 2016 7:00pm')).toHaveLength(0)
 })

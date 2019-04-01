@@ -43,7 +43,7 @@ describe "profile communication settings" do
     fj("td.comm-event-option[data-category='#{category}'][data-channelid=#{channel_id}]")
   end
 
-  it "should render", :xbrowser do
+  it "should render" do
     get "/profile/communication"
     # Page title should match expected
     expect(driver.execute_script("return document.title")).to eq 'Notification Preferences'
@@ -53,7 +53,7 @@ describe "profile communication settings" do
     expect(f('#content > h1').text).to eq 'Notification Preferences'
   end
 
-  it "should display the users email address as channel", :xbrowser do
+  it "should display the users email address as channel" do
     get "/profile/communication"
     wait_for_ajaximations
     expect(fj('th.comm-channel:first')).to include_text('Email Address')
@@ -101,7 +101,7 @@ describe "profile communication settings" do
     expect(buttons[1]).to have_attribute('value', 'never')
   end
 
-  it "should load the initial state of a user-pref checkbox", :xbrowser do
+  it "should load the initial state of a user-pref checkbox" do
     # set the user's initial user preference and verify checked or unchecked
     @user.preferences[:send_scores_in_emails] = false
     @user.save!
@@ -110,7 +110,7 @@ describe "profile communication settings" do
     expect(is_checked('.user-pref-check[name=send_scores_in_emails]')).to be_falsey
   end
 
-  it "should save a user-pref checkbox change", :xbrowser do
+  it "should save a user-pref checkbox change" do
     # Enable the setting to be changed first...
     Account.default.settings[:allow_sending_scores_in_emails] = true
     Account.default.save!

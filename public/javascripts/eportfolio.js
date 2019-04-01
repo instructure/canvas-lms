@@ -485,6 +485,21 @@ import 'jqueryui/sortable'
         $section.formErrors(data.errors || data);
       }
     });
+    $("#recent_submissions .submission").keydown(function(event) {
+      const count = $(event.target).closest('a').length
+      if (count === 0 || count === 1) {
+        const code = event.which;
+        if ((code === 13) || (code === 32)) {
+          if (count === 0) {
+            // Add Submission
+            $(this).click();
+          } else if (count === 1) {
+            // Open Submission
+            $(event.target).closest('a')[0].click();
+          }
+        }
+      }
+    });
     $("#recent_submissions .submission").click(function(event) {
       if($(event.target).closest('a').length === 0) {
         event.preventDefault();

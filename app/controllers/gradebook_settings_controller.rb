@@ -24,6 +24,14 @@ class GradebookSettingsController < ApplicationController
   def update
     deep_merge_gradebook_settings
 
+    # TODO: remove this code in GRADE-2035
+    show_final_grade_overrides = gradebook_settings_params[:show_final_grade_overrides]
+    if show_final_grade_overrides.present? && @context.feature_enabled?(:final_grades_override)
+      if @context.allow_final_grade_override? != show_final_grade_overrides
+        @context.update_attributes!(allow_final_grade_override: gradebook_settings_params[:show_final_grade_overrides])
+      end
+    end
+
     respond_to do |format|
       if @current_user.save
         format.json { render json: updated_settings, status: :ok }
@@ -51,7 +59,7 @@ class GradebookSettingsController < ApplicationController
       :enter_grades_as,
       :show_concluded_enrollments,
       :show_inactive_enrollments,
-      :show_final_grade_overrides,
+      :show_final_grade_overrides, # TODO: remove in GRADE-2035
       :show_unpublished_assignments,
       :student_column_display_as,
       :student_column_secondary_info,

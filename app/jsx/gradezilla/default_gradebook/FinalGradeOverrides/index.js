@@ -19,7 +19,7 @@
 import I18n from 'i18n!gradebook'
 
 import {showFlashAlert} from '../../../shared/FlashAlert'
-import {updateFinalGradeOverride} from './FinalGradeOverrideApi'
+import {getFinalGradeOverrides, updateFinalGradeOverride} from './FinalGradeOverrideApi'
 import FinalGradeOverrideDatastore from './FinalGradeOverrideDatastore'
 
 export default class FinalGradeOverrides {
@@ -91,5 +91,11 @@ export default class FinalGradeOverrides {
         type: 'error'
       })
     }
+  }
+
+  async loadFinalGradeOverrides() {
+    return getFinalGradeOverrides(this._gradebook.course.id).then(({finalGradeOverrides}) => {
+      this.setGrades(finalGradeOverrides)
+    })
   }
 }

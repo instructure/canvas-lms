@@ -75,9 +75,14 @@ module AttachmentHelper
       send_file(attachment.full_filename, :type => attachment.content_type_with_encoding, :disposition => (inline ? 'inline' : 'attachment'), :filename => attachment.display_name)
     elsif inline && attachment.can_be_proxied?
       body = attachment.open.read
+      add_csp_for_file if attachment.mime_class == 'html'
       send_file_headers!(length: body.length, filename: attachment.filename, disposition: 'inline', type: attachment.content_type_with_encoding)
       render body: body
     elsif inline
+      if attachment.mime_class == 'html' && csp_enforced?
+        return render 400, text: t("It's not allowed to redirect to HTML files that can't be proxied while Content-Security-Policy is being enforced")
+      end
+
       redirect_to authenticated_inline_url(attachment)
     else
       redirect_to authenticated_download_url(attachment)

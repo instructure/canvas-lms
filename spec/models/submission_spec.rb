@@ -4521,6 +4521,12 @@ describe Submission do
       expect(comment.author).to be_nil
     end
 
+    it 'allows you to specify submission attempt for the comment' do
+      @submission.update!(attempt: 4)
+      comment = @submission.add_comment(author: @teacher, comment: '42', attempt: 3)
+      expect(comment.attempt).to eq 3
+    end
+
     describe 'audit event logging' do
       let(:course) { Course.create! }
       let(:assignment) { course.assignments.create!(title: 'ok', anonymous_grading: true) }
@@ -6194,6 +6200,39 @@ describe Submission do
         @assignment.save!
         expect(submission.attempts_left).to be_nil
       end
+    end
+  end
+
+  describe '#attempt' do
+    it 'is nil when homework has not been submitted' do
+      submission = Submission.find_by(user: @student)
+      expect(submission.attempt).to eq nil
+    end
+
+    it 'is 1 when homework is submitted' do
+      submission = @assignment.submit_homework(
+        @student,
+        submission_type: 'online_text_entry',
+        body: 'body'
+      )
+      expect(submission.attempt).to eq 1
+    end
+
+    it 'is incremented when homework is resubmitted' do
+      submission = @assignment.submit_homework(
+        @student,
+        submission_type: 'online_text_entry',
+        body: 'body',
+        submitted_at: 1.hour.ago
+      )
+
+      # Due to unit tests being ran in a transaction and not actually committed
+      # to the database, we can't call submit_homework multiple times. We are
+      # instead just updating the submitted_at time, which triggers the before_save
+      # callback.
+      submission.update!(submitted_at: 2.hour.ago)
+      submission.update!(submitted_at: 1.hour.ago)
+      expect(submission.attempt).to eq 3
     end
   end
 

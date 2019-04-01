@@ -63,10 +63,9 @@ describe('Assignment Student Content View', () => {
 
   it('renders the availability dates if the assignment is locked', () => {
     const assignment = mockAssignment({lockInfo: {isLocked: true}})
-    const {queryByRole, getByText, queryByText} = render(<StudentContent assignment={assignment} />)
+    const {queryByRole, getByText} = render(<StudentContent assignment={assignment} />)
 
     expect(queryByRole('tablist')).not.toBeInTheDocument()
-    expect(queryByText('Details')).not.toBeInTheDocument()
     expect(getByText('Availability Dates')).toBeInTheDocument()
   })
 

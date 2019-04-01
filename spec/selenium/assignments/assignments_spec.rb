@@ -48,7 +48,7 @@ describe "assignments" do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
       end
 
-      it "can save and publish an assignment", :xbrowser, priority: "1", test_id: 193784 do
+      it "can save and publish an assignment", priority: "1", test_id: 193784 do
         create_assignment false
 
         expect(f("#assignment-draft-state")).to be_displayed
@@ -122,7 +122,7 @@ describe "assignments" do
       expect(f('#assignment_description')).to have_value('<p>Testing HTML- RCE Toggle</p>')
     end
 
-    it "should edit an assignment", :xbrowser, priority: "1", test_id: 56012 do
+    it "should edit an assignment", priority: "1", test_id: 56012 do
       assignment_name = 'first test assignment'
       due_date = Time.now.utc + 2.days
       group = @course.assignment_groups.create!(:name => "default")
@@ -176,22 +176,20 @@ describe "assignments" do
         due_at = format_time_for_view(time)
 
         get "/courses/#{@course.id}/assignments"
-        wait_for_ajaximations
         #create assignment
-        f(".new_assignment").click
-        wait_for_ajaximations
+        wait_for_new_page_load { f(".new_assignment").click }
         f('#assignment_name').send_keys(assignment_name)
         f('#assignment_points_possible').send_keys('10')
         ['#assignment_text_entry', '#assignment_online_url', '#assignment_online_upload'].each do |element|
           f(element).click
         end
-        f('.DueDateInput').send_keys(due_at)
+        replace_content(f('.DueDateInput'), due_at)
+
 
         submit_assignment_form
         #confirm all our settings were saved and are now displayed
-        wait_for_ajaximations
         expect(f('h1.title')).to include_text(assignment_name)
-        expect(fj('#assignment_show .points_possible')).to include_text('10')
+        expect(f('#assignment_show .points_possible')).to include_text('10')
         expect(f('#assignment_show fieldset')).to include_text('a text entry box, a website url, or a file upload')
 
         expect(f('.assignment_dates')).to include_text(due_at)

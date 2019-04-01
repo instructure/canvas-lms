@@ -31,7 +31,6 @@ import * as FlashAlert from 'jsx/shared/FlashAlert'
 import ActionMenu from 'jsx/gradezilla/default_gradebook/components/ActionMenu'
 import CourseGradeCalculator from 'jsx/gradebook/CourseGradeCalculator'
 import DataLoader from 'jsx/gradezilla/DataLoader'
-import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
 import AnonymousSpeedGraderAlert from 'jsx/gradezilla/default_gradebook/components/AnonymousSpeedGraderAlert'
 import GradebookApi from 'jsx/gradezilla/default_gradebook/apis/GradebookApi'
 import LatePolicyApplicator from 'jsx/grading/LatePolicyApplicator'
@@ -44,7 +43,6 @@ import {
   defaultColors
 } from 'jsx/gradezilla/default_gradebook/constants/colors'
 import ViewOptionsMenu from 'jsx/gradezilla/default_gradebook/components/ViewOptionsMenu'
-import GradebookSettingsModal from 'jsx/gradezilla/default_gradebook/components/GradebookSettingsModal'
 
 import {
   createGradebook,
@@ -126,11 +124,6 @@ test('when zero sections are loaded and there is secondary info configured, do n
   const gradebook = createGradebook({sections, settings})
 
   strictEqual(gradebook.getSelectedSecondaryInfo(), 'login_id')
-})
-
-test('initializes content load state for context modules to false', function() {
-  const gradebook = createGradebook()
-  strictEqual(gradebook.contentLoadStates.contextModulesLoaded, false)
 })
 
 test('initializes a submission state map', function() {
@@ -287,24 +280,6 @@ QUnit.module('Gradebook#initialize', () => {
       const gradebook = createInitializedGradebook({late_policy: null})
       strictEqual(gradebook.courseContent.latePolicy, undefined)
     })
-
-    test('sets assignmentGroupsLoaded to false', function() {
-      const gradebook = createInitializedGradebook()
-      strictEqual(gradebook.contentLoadStates.assignmentGroupsLoaded, false)
-    })
-  })
-
-  test('calls DataLoader.loadGradebookData with getFinalGradeOverrides', () => {
-    const gradebook = createGradebook()
-    const loadGradebookDataStub = stubDataLoader()
-    gradebook.initialize()
-    const {
-      firstCall: {
-        args: [{getFinalGradeOverrides}]
-      }
-    } = loadGradebookDataStub
-    strictEqual(getFinalGradeOverrides, false)
-    loadGradebookDataStub.restore()
   })
 })
 
@@ -1683,52 +1658,6 @@ test('disables the input when submissions are not loaded', function() {
   strictEqual(input.getAttribute('aria-disabled'), 'true', 'input is aria-disabled')
 })
 
-QUnit.module('Gradebook#submissionsForStudent', {
-  setup() {
-    this.student = {
-      id: '1',
-      assignment_1: {
-        assignment_id: '1',
-        user_id: '1',
-        name: 'yolo'
-      },
-      assignment_2: {
-        assignment_id: '2',
-        user_id: '1',
-        name: 'froyo'
-      }
-    }
-    this.gradebook = createGradebook()
-    this.gradebook.effectiveDueDates = {
-      1: {
-        1: {grading_period_id: '1'}
-      },
-      2: {
-        1: {grading_period_id: '2'}
-      }
-    }
-  }
-})
-
-test('returns all submissions for the student when there are no grading periods', function() {
-  const submissions = this.gradebook.submissionsForStudent(this.student)
-  propEqual(_.pluck(submissions, 'assignment_id'), ['1', '2'])
-})
-
-test('returns all submissions if "All Grading Periods" is selected', function() {
-  this.gradebook.gradingPeriodSet = {id: '1', gradingPeriods: [{id: '1'}, {id: '2'}]}
-  this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '0') // value indicates "All Grading Periods"
-  const submissions = this.gradebook.submissionsForStudent(this.student)
-  propEqual(_.pluck(submissions, 'assignment_id'), ['1', '2'])
-})
-
-test('only returns submissions due for the student in the selected grading period', function() {
-  this.gradebook.gradingPeriodSet = {id: '1', gradingPeriods: [{id: '1'}, {id: '2'}]}
-  this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '2')
-  const submissions = this.gradebook.submissionsForStudent(this.student)
-  propEqual(_.pluck(submissions, 'assignment_id'), ['2'])
-})
-
 QUnit.module('Gradebook#studentsParams', {
   setup() {
     this.gradebook = createGradebook()
@@ -1878,7 +1807,7 @@ QUnit.module('Gradebook', () => {
 
     QUnit.module('when the "total grade override" column is used', () => {
       test('includes both "total grade" column ids when updating column headers', () => {
-        gradebook.setShowFinalGradeOverrides(true)
+        gradebook.courseSettings.setAllowFinalGradeOverride(true)
         gradebook.switchTotalDisplay({dontWarnAgain: false})
         const [
           columnIds
@@ -1889,7 +1818,7 @@ QUnit.module('Gradebook', () => {
 
     QUnit.module('when the "total grade override" column is not used', () => {
       test('includes only the "total grade" column id when updating column headers', () => {
-        gradebook.setShowFinalGradeOverrides(false)
+        gradebook.courseSettings.setAllowFinalGradeOverride(false)
         gradebook.switchTotalDisplay({dontWarnAgain: false})
         const [
           columnIds
@@ -4266,145 +4195,6 @@ QUnit.module('Gradebook Rows', function() {
   })
 })
 
-QUnit.module('Gradebook#gotSubmissionsChunk', hooks => {
-  let studentSubmissions
-  let gradebook
-
-  hooks.beforeEach(() => {
-    $fixtures.innerHTML = `
-      <div id="application">
-        <div id="wrapper">
-          <div id="StudentTray__Container"></div>
-          <span data-component="GridColor"></span>
-          <div id="gradebook_grid"></div>
-        </div>
-      </div>
-    `
-
-    gradebook = createGradebook()
-    gradebook.initGrid()
-
-    const students = [
-      {
-        id: '1101',
-        name: 'Adam Jones',
-        enrollments: [{type: 'StudentEnrollment', grades: {html_url: 'http://example.url/'}}]
-      },
-      {
-        id: '1102',
-        name: 'Betty Ford',
-        enrollments: [{type: 'StudentEnrollment', grades: {html_url: 'http://example.url/'}}]
-      }
-    ]
-    gradebook.gotChunkOfStudents(students)
-    sinon.stub(gradebook, 'updateSubmission')
-    sinon.spy(gradebook, 'setupGrading')
-
-    studentSubmissions = [
-      {
-        submissions: [
-          {
-            assignment_id: '201',
-            assignment_visible: true,
-            cached_due_date: '2015-02-01T12:00:00Z',
-            score: 10,
-            user_id: '1101'
-          },
-          {
-            assignment_id: '202',
-            assignment_visible: true,
-            cached_due_date: '2015-02-02T12:00:00Z',
-            score: 9,
-            user_id: '1101'
-          }
-        ],
-        user_id: '1101'
-      },
-      {
-        submissions: [
-          {
-            assignment_id: '201',
-            assignment_visible: true,
-            cached_due_date: '2015-02-03T12:00:00Z',
-            score: 8,
-            user_id: '1102'
-          }
-        ],
-        user_id: '1102'
-      }
-    ]
-    gradebook.setAssignmentGroups({
-      9000: {group_weight: 100}
-    })
-    gradebook.setAssignments({
-      201: {id: '201', assignment_group_id: '9000', name: 'Math Assignment', published: true},
-      202: {id: '202', assignment_group_id: '9000', name: 'English Assignment', published: false}
-    })
-  })
-
-  hooks.afterEach(() => {
-    gradebook.destroy()
-    $fixtures.innerHTML = ''
-  })
-
-  function getAssignment() {
-    return gradebook.getAssignment('201')
-  }
-
-  QUnit.module('when the assignment is only visible to overrides', contextHooks => {
-    contextHooks.beforeEach(() => {
-      const assignment = getAssignment()
-      assignment.only_visible_to_overrides = true
-      assignment.assignment_visibility = []
-    })
-
-    test('updates the assignment visibility when the student submitted to the assignment', () => {
-      gradebook.gotSubmissionsChunk(studentSubmissions)
-      deepEqual(getAssignment().assignment_visibility, ['1101', '1102'])
-    })
-
-    test('does not add duplicate students to assignment visibility', () => {
-      const assignment = getAssignment()
-      assignment.assignment_visibility = ['1101', '1102']
-      gradebook.gotSubmissionsChunk(studentSubmissions)
-      deepEqual(getAssignment().assignment_visibility, ['1101', '1102'])
-    })
-  })
-
-  test('does not update assignment visibility when not only visible to overrides', () => {
-    const assignment = getAssignment()
-    assignment.only_visible_to_overrides = false
-    assignment.assignment_visibility = []
-    gradebook.gotSubmissionsChunk(studentSubmissions)
-    deepEqual(getAssignment().assignment_visibility, [])
-  })
-
-  test('updates effectiveDueDates with the submissions', () => {
-    gradebook.gotSubmissionsChunk(studentSubmissions)
-    deepEqual(Object.keys(gradebook.effectiveDueDates), ['201', '202'])
-    deepEqual(Object.keys(gradebook.effectiveDueDates[201]), ['1101', '1102'])
-    deepEqual(Object.keys(gradebook.effectiveDueDates[202]), ['1101'])
-  })
-
-  test('updates effectiveDueDates on related assignments', () => {
-    gradebook.gotSubmissionsChunk(studentSubmissions)
-    deepEqual(Object.keys(gradebook.getAssignment('201').effectiveDueDates), ['1101', '1102'])
-    deepEqual(Object.keys(gradebook.getAssignment('202').effectiveDueDates), ['1101'])
-  })
-
-  test('updates inClosedGradingPeriod on related assignments', () => {
-    gradebook.gotSubmissionsChunk(studentSubmissions)
-    strictEqual(gradebook.getAssignment('201').inClosedGradingPeriod, false)
-    strictEqual(gradebook.getAssignment('202').inClosedGradingPeriod, false)
-  })
-
-  test('sets up grading for the related students', () => {
-    gradebook.gotSubmissionsChunk(studentSubmissions)
-    const [students] = gradebook.setupGrading.lastCall.args
-    deepEqual(students.map(student => student.id), ['1101', '1102'])
-  })
-})
-
 QUnit.module('Gradebook Assignment Student Visibility', function(moduleHooks) {
   let gradebook
   let allStudents
@@ -5081,196 +4871,6 @@ QUnit.module('Gradebook Grading Schemes', suiteHooks => {
   })
 })
 
-QUnit.module('Gradebook#saveSettings', {
-  setup() {
-    this.server = sinon.fakeServer.create({respondImmediately: true})
-    this.options = {settings_update_url: '/course/1/gradebook_settings'}
-  },
-
-  teardown() {
-    this.server.restore()
-  }
-})
-
-test('calls ajaxJSON with the settings_update_url', function() {
-  const options = {settings_update_url: 'http://someUrl/'}
-  const gradebook = createGradebook({...options})
-  const ajaxJSONStub = sandbox.stub($, 'ajaxJSON')
-  gradebook.saveSettings()
-  equal(ajaxJSONStub.firstCall.args[0], options.settings_update_url)
-})
-
-test('calls ajaxJSON as a PUT request', function() {
-  const gradebook = createGradebook()
-  const ajaxJSONStub = sandbox.stub($, 'ajaxJSON')
-  gradebook.saveSettings()
-  equal(ajaxJSONStub.firstCall.args[1], 'PUT')
-})
-
-test('calls ajaxJSON with default gradebook_settings', function() {
-  const expectedSettings = {
-    colors: {
-      dropped: '#FEF0E5',
-      excused: '#FEF7E5',
-      late: '#E5F3FC',
-      missing: '#FFE8E5',
-      resubmitted: '#E5F7E5'
-    },
-    enter_grades_as: {},
-    filter_columns_by: {
-      assignment_group_id: null,
-      context_module_id: null,
-      grading_period_id: null
-    },
-    filter_rows_by: {
-      section_id: null
-    },
-    selected_view_options_filters: ['assignmentGroups'],
-    show_concluded_enrollments: true,
-    show_inactive_enrollments: true,
-    show_unpublished_assignments: true,
-    show_final_grade_overrides: false,
-    sort_rows_by_column_id: 'student',
-    sort_rows_by_direction: 'ascending',
-    sort_rows_by_setting_key: 'sortable_name',
-    student_column_display_as: 'first_last',
-    student_column_secondary_info: 'none'
-  }
-  const gradebook = createGradebook({
-    settings: {
-      selected_view_options_filters: ['assignmentGroups'],
-      show_concluded_enrollments: 'true',
-      show_inactive_enrollments: 'true',
-      show_unpublished_assignments: 'true',
-      sort_rows_by_column_id: 'student',
-      sort_rows_by_direction: 'ascending',
-      sort_rows_by_setting_key: 'sortable_name',
-      student_column_display_as: 'first_last',
-      student_column_secondary_info: 'none'
-    }
-  })
-  const ajaxJSONStub = sandbox.stub($, 'ajaxJSON')
-  gradebook.saveSettings()
-  deepEqual(ajaxJSONStub.firstCall.args[2], {gradebook_settings: {...expectedSettings}})
-})
-
-test('ensures selected_view_options_filters is not empty in order to force the stored value to change', function() {
-  // an empty array will be excluded from the request, which is ignored in the
-  // update, which means the previous setting remains persisted
-  const gradebook = createGradebook({
-    settings: {
-      selected_view_options_filters: [],
-      show_concluded_enrollments: 'true',
-      show_inactive_enrollments: 'true',
-      show_unpublished_assignments: 'true',
-      sort_rows_by_column_id: 'student',
-      sort_rows_by_direction: 'ascending',
-      sort_rows_by_setting_key: 'sortable_name',
-      student_column_display_as: 'first_last',
-      student_column_secondary_info: 'none'
-    }
-  })
-  const ajaxJSONStub = sandbox.stub($, 'ajaxJSON')
-  gradebook.saveSettings()
-  const settings = ajaxJSONStub.firstCall.args[2]
-  deepEqual(settings.gradebook_settings.selected_view_options_filters, [''])
-})
-
-test('calls ajaxJSON with parameters', function() {
-  const gradebook = createGradebook({
-    settings: {
-      filter_columns_by: {
-        assignment_group_id: '2201',
-        context_module_id: '2601',
-        grading_period_id: '1401'
-      },
-      filter_rows_by: {
-        section_id: '2001'
-      },
-      show_concluded_enrollments: 'true',
-      show_inactive_enrollments: 'true',
-      show_unpublished_assignments: 'true',
-      show_final_grade_overrides: 'true'
-    }
-  })
-  const ajaxJSONStub = sandbox.stub($, 'ajaxJSON')
-  gradebook.saveSettings({
-    selected_view_options_filters: [],
-    showConcludedEnrollments: false,
-    showInactiveEnrollments: false,
-    showUnpublishedAssignments: false,
-    showFinalGradeOverrides: false,
-    studentColumnDisplayAs: 'last_first',
-    studentColumnSecondaryInfo: 'login_id',
-    sortRowsBy: {
-      columnId: 'assignment_1',
-      settingKey: 'late',
-      direction: 'ascending'
-    }
-  })
-
-  deepEqual(ajaxJSONStub.firstCall.args[2], {
-    gradebook_settings: {
-      colors: {
-        dropped: '#FEF0E5',
-        excused: '#FEF7E5',
-        late: '#E5F3FC',
-        missing: '#FFE8E5',
-        resubmitted: '#E5F7E5'
-      },
-      enter_grades_as: {},
-      filter_columns_by: {
-        assignment_group_id: '2201',
-        context_module_id: '2601',
-        grading_period_id: '1401'
-      },
-      filter_rows_by: {
-        section_id: '2001'
-      },
-      selected_view_options_filters: [''],
-      show_concluded_enrollments: false,
-      show_inactive_enrollments: false,
-      show_unpublished_assignments: false,
-      show_final_grade_overrides: false,
-      sort_rows_by_column_id: 'assignment_1',
-      sort_rows_by_direction: 'ascending',
-      sort_rows_by_setting_key: 'late',
-      student_column_display_as: 'last_first',
-      student_column_secondary_info: 'login_id'
-    }
-  })
-})
-
-test('calls successFn when response is successful', function() {
-  // The request is sent as a PUT but ajaxJSON does not play nice with
-  // sinon.fakeServer's fakeHTTPMethods setting.
-  this.server.respondWith('POST', this.options.settings_update_url, [
-    200,
-    {'Content-Type': 'application/json'},
-    '{}'
-  ])
-  const successFn = sinon.stub()
-  const gradebook = createGradebook(this.options)
-  gradebook.saveSettings({}, successFn, null)
-
-  strictEqual(successFn.callCount, 1)
-})
-
-test('calls errorFn when response is not successful', function() {
-  // The requests is sent as a PUT but ajaxJSON does not play nice with
-  // sinon.fakeServer's fakeHTTPMethods setting.
-  this.server.respondWith('POST', this.options.settings_update_url, [
-    401,
-    {'Content-Type': 'application/json'},
-    '{}'
-  ])
-  const errorFn = sinon.stub()
-  const gradebook = createGradebook(this.options)
-  gradebook.saveSettings({}, null, errorFn)
-
-  strictEqual(errorFn.callCount, 1)
-})
-
 QUnit.module('Gradebook#updateColumns', function(hooks) {
   let gradebook
 
@@ -5404,106 +5004,6 @@ test('sets to false if passed "false"', function() {
   strictEqual(gradebook.gridDisplaySettings.showUnpublishedAssignments, false)
 })
 
-QUnit.module('Gradebook#initShowOverrides', () => {
-  const truthyMap = {
-    undefined: false,
-    true: true,
-    false: false
-  }
-
-  test('defaults to false', () => {
-    const gradebook = createGradebook()
-    const showFinalGradeOverrides = undefined
-    gradebook.initShowOverrides(showFinalGradeOverrides)
-    strictEqual(
-      gradebook.gridDisplaySettings.showFinalGradeOverrides,
-      truthyMap[showFinalGradeOverrides]
-    )
-    gradebook.destroy()
-  })
-
-  QUnit.module('given final_grade_override_enabled is false', hooks => {
-    let gradebook
-
-    hooks.beforeEach(() => {
-      gradebook = createGradebook({final_grade_override_enabled: false})
-    })
-
-    hooks.afterEach(() => {
-      gradebook.destroy()
-    })
-
-    test('defaults to false', () => {
-      gradebook = createGradebook()
-      const showFinalGradeOverrides = undefined
-      gradebook.initShowOverrides(showFinalGradeOverrides)
-      strictEqual(
-        gradebook.gridDisplaySettings.showFinalGradeOverrides,
-        truthyMap[showFinalGradeOverrides]
-      )
-    })
-
-    test('cannot be set to true', () => {
-      gradebook = createGradebook()
-      const showFinalGradeOverrides = 'true'
-      gradebook.initShowOverrides(showFinalGradeOverrides)
-      strictEqual(
-        gradebook.gridDisplaySettings.showFinalGradeOverrides,
-        !truthyMap[showFinalGradeOverrides]
-      )
-    })
-
-    test('can be set to false', () => {
-      gradebook = createGradebook()
-      const showFinalGradeOverrides = 'false'
-      gradebook.initShowOverrides(showFinalGradeOverrides)
-      strictEqual(
-        gradebook.gridDisplaySettings.showFinalGradeOverrides,
-        truthyMap[showFinalGradeOverrides]
-      )
-    })
-  })
-
-  QUnit.module('given final_grade_override_enabled is true', hooks => {
-    let gradebook
-
-    hooks.beforeEach(() => {
-      gradebook = createGradebook({final_grade_override_enabled: true})
-    })
-
-    hooks.afterEach(() => {
-      gradebook.destroy()
-    })
-
-    test('defaults to false', () => {
-      const showFinalGradeOverrides = undefined
-      gradebook.initShowOverrides(showFinalGradeOverrides)
-      strictEqual(
-        gradebook.gridDisplaySettings.showFinalGradeOverrides,
-        truthyMap[showFinalGradeOverrides]
-      )
-    })
-
-    test('can be set to true', () => {
-      const showFinalGradeOverrides = 'true'
-      gradebook.initShowOverrides(showFinalGradeOverrides)
-      strictEqual(
-        gradebook.gridDisplaySettings.showFinalGradeOverrides,
-        truthyMap[showFinalGradeOverrides]
-      )
-    })
-
-    test('can be set to false', () => {
-      const showFinalGradeOverrides = 'false'
-      gradebook.initShowOverrides(showFinalGradeOverrides)
-      strictEqual(
-        gradebook.gridDisplaySettings.showFinalGradeOverrides,
-        truthyMap[showFinalGradeOverrides]
-      )
-    })
-  })
-})
-
 QUnit.module('Gradebook#toggleUnpublishedAssignments', () => {
   test('toggles showUnpublishedAssignments to true when currently false', function() {
     const gradebook = createGradebook()
@@ -5605,129 +5105,6 @@ QUnit.module('Gradebook#toggleUnpublishedAssignments', () => {
   })
 })
 
-QUnit.module('Gradebook', () => {
-  QUnit.module('#toggleOverrides()', hooks => {
-    let gradebook
-    let saveSettingsDeferred
-
-    hooks.beforeEach(() => {
-      gradebook = createGradebook({final_grade_override_enabled: 'true'})
-      sandbox.stub(gradebook, 'updateColumnsAndRenderGradebookSettingsModal')
-
-      saveSettingsDeferred = $.Deferred()
-      sandbox.stub(gradebook, 'saveSettings').returns(saveSettingsDeferred.promise())
-    })
-
-    test('sets .showFinalGradeOverrides to true when currently false', () => {
-      gradebook.toggleOverrides()
-      strictEqual(gradebook.gridDisplaySettings.showFinalGradeOverrides, true)
-    })
-
-    test('sets .showFinalGradeOverrides to false when currently true', () => {
-      gradebook.setShowFinalGradeOverrides(true)
-      gradebook.toggleOverrides()
-      strictEqual(gradebook.gridDisplaySettings.showFinalGradeOverrides, false)
-    })
-
-    test('updates columns and renders the gradebook settings modal', () => {
-      gradebook.toggleOverrides()
-      strictEqual(gradebook.updateColumnsAndRenderGradebookSettingsModal.callCount, 1)
-    })
-
-    test('updates columns after setting .showFinalGradeOverrides', () => {
-      gradebook.updateColumnsAndRenderGradebookSettingsModal.callsFake(() => {
-        strictEqual(gradebook.gridDisplaySettings.showFinalGradeOverrides, true)
-      })
-      gradebook.toggleOverrides()
-    })
-
-    test('saves gradebook settings', () => {
-      gradebook.toggleOverrides()
-      strictEqual(gradebook.saveSettings.callCount, 1)
-    })
-
-    test('includes .showFinalGradeOverrides when saving gradebook settings', () => {
-      gradebook.toggleOverrides()
-      const [{showFinalGradeOverrides}] = gradebook.saveSettings.lastCall.args
-      strictEqual(showFinalGradeOverrides, true)
-    })
-
-    QUnit.module('when saving gradebook settings succeeds', () => {
-      async function toggleAndResolve() {
-        const promise = gradebook.toggleOverrides()
-        const [, onSuccess] = gradebook.saveSettings.lastCall.args
-        onSuccess({})
-        saveSettingsDeferred.resolve({})
-        await promise
-      }
-
-      test('resolves the returned promise', async () => {
-        await toggleAndResolve()
-        ok('promise has resolved')
-      })
-
-      test('preserves the new .showFinalGradeOverrides setting', async () => {
-        await toggleAndResolve()
-        strictEqual(gradebook.gridDisplaySettings.showFinalGradeOverrides, true)
-      })
-    })
-
-    QUnit.module('when saving gradebook settings fails', () => {
-      let promise
-      let rejected
-
-      function toggle() {
-        rejected = false
-        promise = gradebook.toggleOverrides().catch(() => {
-          rejected = true
-        })
-      }
-
-      async function reject() {
-        const [, , onError] = gradebook.saveSettings.lastCall.args
-        const error = new Error('example failure')
-        onError(error)
-        saveSettingsDeferred.reject(error)
-        await promise
-      }
-
-      async function toggleAndReject() {
-        toggle()
-        await reject()
-      }
-
-      test('rejects the returned promise', async () => {
-        await toggleAndReject()
-        strictEqual(rejected, true)
-      })
-
-      test('resets .showFinalGradeOverrides to false when previously false', async () => {
-        await toggleAndReject()
-        strictEqual(gradebook.gridDisplaySettings.showFinalGradeOverrides, false)
-      })
-
-      test('resets .showFinalGradeOverrides to true when previously true', async () => {
-        gradebook.setShowFinalGradeOverrides(true)
-        await toggleAndReject()
-        strictEqual(gradebook.gridDisplaySettings.showFinalGradeOverrides, true)
-      })
-
-      test('again updates columns and renders the gradebook settings modal', async () => {
-        await toggleAndReject()
-        strictEqual(gradebook.updateColumnsAndRenderGradebookSettingsModal.callCount, 2)
-      })
-
-      test('updates columns after resetting .showFinalGradeOverrides', async () => {
-        toggle()
-        gradebook.updateColumnsAndRenderGradebookSettingsModal.callsFake(() => {
-          strictEqual(gradebook.gridDisplaySettings.showFinalGradeOverrides, false)
-        })
-        await reject()
-      })
-    })
-  })
-})
-
 QUnit.module('Gradebook#renderViewOptionsMenu')
 
 test('passes showUnpublishedAssignments to props', function() {
@@ -5754,76 +5131,6 @@ test('passes toggleUnpublishedAssignments as onSelectShowUnpublishedAssignments 
     createElementStub.firstCall.args[1].toggleUnpublishedAssignments,
     gradebook.onSelectShowUnpublishedAssignments
   )
-})
-
-QUnit.module('Gradebook', () => {
-  let gradebook
-
-  QUnit.module('#updateSubmission()', hooks => {
-    let submission
-
-    hooks.beforeEach(() => {
-      gradebook = createGradebook()
-      gradebook.students = {1101: {id: '1101'}}
-
-      submission = {
-        assignment_id: '2301',
-        grade: '123.45',
-        gradingType: 'percent',
-        submitted_at: '2015-05-04T12:00:00Z',
-        user_id: '1101'
-      }
-    })
-
-    function getSubmission() {
-      return gradebook.getSubmission('1101', '2301')
-    }
-
-    test('formats the grade for the submission', () => {
-      sandbox.spy(GradeFormatHelper, 'formatGrade')
-      gradebook.updateSubmission(submission)
-      equal(GradeFormatHelper.formatGrade.callCount, 1)
-    })
-
-    test('includes submission attributes when formatting the grade', () => {
-      sandbox.spy(GradeFormatHelper, 'formatGrade')
-      gradebook.updateSubmission(submission)
-      const [grade, options] = GradeFormatHelper.formatGrade.getCall(0).args
-      equal(grade, '123.45', 'parameter 1 is the submission grade')
-      equal(options.gradingType, 'percent', 'options.gradingType is the submission gradingType')
-      strictEqual(options.delocalize, false, 'submission grades from the server are not localized')
-    })
-
-    test('sets the formatted grade on submission', () => {
-      sandbox.stub(GradeFormatHelper, 'formatGrade').returns('123.45%')
-      gradebook.updateSubmission(submission)
-      equal(getSubmission().grade, '123.45%')
-    })
-
-    test('sets the raw grade on submission', () => {
-      sandbox.stub(GradeFormatHelper, 'formatGrade').returns('123.45%')
-      gradebook.updateSubmission(submission)
-      strictEqual(getSubmission().rawGrade, '123.45')
-    })
-
-    test('sets the submission as not hidden when implicitly not hidden', () => {
-      delete submission.hidden
-      gradebook.updateSubmission(submission)
-      strictEqual(getSubmission().hidden, false)
-    })
-
-    test('keeps the submission hidden when previously hidden', () => {
-      submission.hidden = true
-      gradebook.updateSubmission(submission)
-      strictEqual(getSubmission().hidden, true)
-    })
-
-    test('keeps the submission as not hidden when previously not hidden', () => {
-      submission.hidden = false
-      gradebook.updateSubmission(submission)
-      strictEqual(getSubmission().hidden, false)
-    })
-  })
 })
 
 QUnit.module('Gradebook#arrangeColumnsBy', hooks => {
@@ -6411,133 +5718,6 @@ QUnit.module('Gradebook', () => {
       strictEqual(gradebook.getFilterRowsBySetting('sectionId'), null)
     })
   })
-
-  QUnit.module('#getFinalGradeOverridesSettingsModalProps', () => {
-    test('includes the exact properties that GradebookSettingsModal overrides props require', () => {
-      const props = createGradebook().getFinalGradeOverridesSettingsModalProps()
-      const {
-        propTypes: {overrides}
-      } = GradebookSettingsModal
-      const consoleSpy = sinon.spy(console, 'error')
-      PropTypes.checkPropTypes({overrides}, props, 'prop', 'GradebookSettingsModal')
-      strictEqual(consoleSpy.called, false)
-      consoleSpy.restore()
-    })
-
-    test('`disabled` defaults to true', () => {
-      const gradebook = createGradebook()
-      const {disabled} = gradebook.getFinalGradeOverridesSettingsModalProps()
-      strictEqual(disabled, true)
-    })
-
-    test('`disabled` is false when gridReady is resolved', () => {
-      const gradebook = createGradebook()
-      sinon.stub(gradebook.gridReady, 'state').returns('resolved')
-      const {disabled} = gradebook.getFinalGradeOverridesSettingsModalProps()
-      strictEqual(disabled, false)
-    })
-
-    test('`disabled` is false when final grades override is enabled and checked', () => {
-      const final_grade_override_enabled = true
-      const gradebook = createGradebook({final_grade_override_enabled})
-      sinon.stub(gradebook.gridReady, 'state').returns('resolved')
-      const {disabled} = gradebook.getFinalGradeOverridesSettingsModalProps()
-      strictEqual(disabled, !final_grade_override_enabled)
-    })
-
-    test('`disabled` is true when overrides column is updating', () => {
-      const gradebook = createGradebook({final_grade_override_enabled: true})
-      sinon.stub(gradebook.gridReady, 'state').returns('resolved')
-      const overridesColumnUpdating = true
-      gradebook.setOverridesColumnUpdating(overridesColumnUpdating)
-      const {disabled} = gradebook.getFinalGradeOverridesSettingsModalProps()
-      strictEqual(disabled, overridesColumnUpdating)
-    })
-
-    test('`onChange` calls `toggleOverrides`', () => {
-      const gradebook = createGradebook({final_grade_override_enabled: true})
-      sinon.stub(gradebook.gridReady, 'state').returns('resolved')
-      sinon.stub(gradebook, 'toggleOverrides')
-      const props = gradebook.getFinalGradeOverridesSettingsModalProps()
-      props.onChange()
-      strictEqual(gradebook.toggleOverrides.callCount, 1)
-    })
-
-    test('`defaultChecked` defaults to false', () => {
-      const gradebook = createGradebook()
-      sinon.stub(gradebook.gridReady, 'state').returns('resolved')
-      const {defaultChecked} = gradebook.getFinalGradeOverridesSettingsModalProps()
-      strictEqual(defaultChecked, false)
-    })
-
-    test('`defaultChecked` is false when final grades override is enabled', () => {
-      const final_grade_override_enabled = true
-      const gradebook = createGradebook({final_grade_override_enabled})
-      sinon.stub(gradebook.gridReady, 'state').returns('resolved')
-      const {defaultChecked} = gradebook.getFinalGradeOverridesSettingsModalProps()
-      strictEqual(defaultChecked, !final_grade_override_enabled)
-    })
-
-    test('`defaultChecked` is false when show final override setting is enabled', () => {
-      const show_final_grade_overrides = 'true'
-      const gradebook = createGradebook({settings: {show_final_grade_overrides}})
-      sinon.stub(gradebook.gridReady, 'state').returns('resolved')
-      const {defaultChecked} = gradebook.getFinalGradeOverridesSettingsModalProps()
-      strictEqual(defaultChecked, !show_final_grade_overrides)
-    })
-
-    test('`defaultChecked` is true when show final grades is enabled and the setting to show final grades is enabled', () => {
-      const gradebook = createGradebook({
-        final_grade_override_enabled: true,
-        settings: {show_final_grade_overrides: 'true'}
-      })
-      sinon.stub(gradebook.gridReady, 'state').returns('resolved')
-      const {defaultChecked} = gradebook.getFinalGradeOverridesSettingsModalProps()
-      strictEqual(defaultChecked, true)
-    })
-
-    test('`defaultChecked` is false when final grades is disabled and the setting to show final grades is enabled', () => {
-      const gradebook = createGradebook({
-        final_grade_override_enabled: false,
-        settings: {show_final_grade_overrides: 'true'}
-      })
-      sinon.stub(gradebook.gridReady, 'state').returns('resolved')
-      const {defaultChecked} = gradebook.getFinalGradeOverridesSettingsModalProps()
-      strictEqual(defaultChecked, false)
-    })
-
-    test('`defaultChecked` is false when final grades is enabled and the setting to show final grades is disabled', () => {
-      const gradebook = createGradebook({
-        final_grade_override_enabled: true,
-        settings: {show_final_grade_overrides: 'false'}
-      })
-      sinon.stub(gradebook.gridReady, 'state').returns('resolved')
-      const {defaultChecked} = gradebook.getFinalGradeOverridesSettingsModalProps()
-      strictEqual(defaultChecked, false)
-    })
-
-    test('`defaultChecked` is false when final grades is disabled and the setting to show final grades is disabled', () => {
-      const gradebook = createGradebook({
-        final_grade_override_enabled: false,
-        settings: {show_final_grade_overrides: 'false'}
-      })
-      sinon.stub(gradebook.gridReady, 'state').returns('resolved')
-      const {defaultChecked} = gradebook.getFinalGradeOverridesSettingsModalProps()
-      strictEqual(defaultChecked, false)
-    })
-
-    test('`featureAvailable` defaults to false', () => {
-      const gradebook = createGradebook()
-      const {featureAvailable} = gradebook.getFinalGradeOverridesSettingsModalProps()
-      strictEqual(featureAvailable, false)
-    })
-
-    test('`featureAvailable` is true when final_grade_override_enabled is true', () => {
-      const gradebook = createGradebook({final_grade_override_enabled: true})
-      const {featureAvailable} = gradebook.getFinalGradeOverridesSettingsModalProps()
-      strictEqual(featureAvailable, true)
-    })
-  })
 })
 
 QUnit.module('Gradebook#getInitialGridDisplaySettings', () => {
@@ -6659,13 +5839,6 @@ QUnit.module('Gradebook#getInitialGridDisplaySettings', () => {
       gridDisplaySettings: {showUnpublishedAssignments}
     } = createGradebook()
     strictEqual(showUnpublishedAssignments, true)
-  })
-
-  test('sets showFinalGradeOverrides to a default value', function() {
-    const {
-      gridDisplaySettings: {showFinalGradeOverrides}
-    } = createGradebook()
-    strictEqual(showFinalGradeOverrides, false)
   })
 })
 
@@ -7010,94 +6183,6 @@ test('is rendered on renderGridColor', function() {
     ].join('')
   )
   $fixtures.innerHTML = ''
-})
-
-QUnit.module('Gradebook#updateSubmissionsFromExternal', {
-  setup() {
-    const columns = [
-      {id: 'student', type: 'student'},
-      {id: 'assignment_232', type: 'assignment'},
-      {id: 'total_grade', type: 'total_grade'},
-      {id: 'assignment_group_12', type: 'assignment'}
-    ]
-    this.gradebook = createGradebook()
-    this.gradebook.students = {
-      1101: {id: '1101', assignment_201: {}, assignment_202: {}},
-      1102: {id: '1102', assignment_201: {}}
-    }
-    this.gradebook.assignments = []
-    this.gradebook.submissionStateMap = {
-      setSubmissionCellState() {},
-      getSubmissionState() {
-        return {locked: false}
-      }
-    }
-    this.gradebook.gradebookGrid.grid = {
-      updateCell: sinon.stub(),
-      getColumns() {
-        return columns
-      }
-    }
-    this.gradebook.gradebookGrid.gridSupport = {
-      columns: {
-        updateColumnHeaders: sinon.stub()
-      }
-    }
-    sandbox.stub(this.gradebook, 'updateSubmission')
-  }
-})
-
-test('updates row cells', function() {
-  const submissions = [
-    {assignment_id: '201', user_id: '1101', score: 10, assignment_visible: true},
-    {assignment_id: '201', user_id: '1102', score: 8, assignment_visible: true}
-  ]
-  sandbox.stub(this.gradebook, 'updateRowCellsForStudentIds')
-  this.gradebook.updateSubmissionsFromExternal(submissions)
-  strictEqual(this.gradebook.updateRowCellsForStudentIds.callCount, 1)
-})
-
-test('updates row cells only once for each student', function() {
-  const submissions = [
-    {assignment_id: '201', user_id: '1101', score: 10, assignment_visible: true},
-    {assignment_id: '202', user_id: '1101', score: 9, assignment_visible: true},
-    {assignment_id: '201', user_id: '1102', score: 8, assignment_visible: true}
-  ]
-  sandbox.stub(this.gradebook, 'updateRowCellsForStudentIds')
-  this.gradebook.updateSubmissionsFromExternal(submissions)
-  const [studentIds] = this.gradebook.updateRowCellsForStudentIds.lastCall.args
-  deepEqual(studentIds, ['1101', '1102'])
-})
-
-test('ignores submissions for students not currently loaded', function() {
-  const submissions = [
-    {assignment_id: '201', user_id: '1101', score: 10, assignment_visible: true},
-    {assignment_id: '201', user_id: '1103', score: 9, assignment_visible: true},
-    {assignment_id: '201', user_id: '1102', score: 8, assignment_visible: true}
-  ]
-  sandbox.stub(this.gradebook, 'updateRowCellsForStudentIds')
-  this.gradebook.updateSubmissionsFromExternal(submissions)
-  const [studentIds] = this.gradebook.updateRowCellsForStudentIds.lastCall.args
-  deepEqual(studentIds, ['1101', '1102'])
-})
-
-test('updates column headers', function() {
-  const submissions = [{assignment_id: '201', user_id: '1101', score: 10, assignment_visible: true}]
-  this.gradebook.updateSubmissionsFromExternal(submissions)
-  strictEqual(this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount, 1)
-})
-
-test('includes the column ids for related assignments when updating column headers', function() {
-  const submissions = [
-    {assignment_id: '201', user_id: '1101', score: 10, assignment_visible: true},
-    {assignment_id: '202', user_id: '1101', score: 9, assignment_visible: true},
-    {assignment_id: '201', user_id: '1102', score: 8, assignment_visible: true}
-  ]
-  this.gradebook.updateSubmissionsFromExternal(submissions)
-  const [
-    columnIds
-  ] = this.gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.lastCall.args
-  deepEqual(columnIds.sort(), ['assignment_201', 'assignment_202'])
 })
 
 QUnit.module('Gradebook#getSubmissionTrayProps', function(suiteHooks) {
@@ -9389,6 +8474,18 @@ QUnit.module('#renderGradebookSettingsModal', hooks => {
     strictEqual(componentName, 'GradebookSettingsModal')
   })
 
+  test('sets the .courseFeatures prop to #courseFeatures from Gradebook', () => {
+    gradebook = createGradebook()
+    gradebook.renderGradebookSettingsModal()
+    strictEqual(gradebookSettingsModalProps().courseFeatures, gradebook.courseFeatures)
+  })
+
+  test('sets the .courseSettings prop to #courseSettings from Gradebook', () => {
+    gradebook = createGradebook()
+    gradebook.renderGradebookSettingsModal()
+    strictEqual(gradebookSettingsModalProps().courseSettings, gradebook.courseSettings)
+  })
+
   test('passes graded_late_submissions_exist option to the modal as a prop', function() {
     gradebook = createGradebook({graded_late_submissions_exist: true})
     gradebook.renderGradebookSettingsModal()
@@ -9407,22 +8504,31 @@ QUnit.module('#renderGradebookSettingsModal', hooks => {
     strictEqual(gradebookSettingsModalProps().locale, 'de')
   })
 
-  test('passes override props', () => {
-    gradebook = createGradebook().renderGradebookSettingsModal()
-    const expectedProps = {
-      defaultChecked: false,
-      disabled: true,
-      featureAvailable: false,
-      onChange: {}
-    }
-    propEqual(gradebookSettingsModalProps().overrides, expectedProps)
-  })
-
   test('passes the postPolicies object as the prop of the same name', () => {
     gradebook = createGradebook()
     gradebook.renderGradebookSettingsModal()
-
     propEqual(gradebookSettingsModalProps().postPolicies, gradebook.postPolicies)
+  })
+
+  QUnit.module('.onCourseSettingsUpdated prop', propHooks => {
+    propHooks.beforeEach(() => {
+      gradebook = createGradebook()
+      gradebook.renderGradebookSettingsModal()
+      sinon.stub(gradebook.courseSettings, 'handleUpdated')
+    })
+
+    test('updates the course settings when called', () => {
+      const settings = {allowFinalGradeOverride: true}
+      gradebookSettingsModalProps().onCourseSettingsUpdated(settings)
+      strictEqual(gradebook.courseSettings.handleUpdated.callCount, 1)
+    })
+
+    test('updates the course settings using the given course settings data', () => {
+      const settings = {allowFinalGradeOverride: true}
+      gradebookSettingsModalProps().onCourseSettingsUpdated(settings)
+      const [givenSettings] = gradebook.courseSettings.handleUpdated.lastCall.args
+      strictEqual(givenSettings, settings)
+    })
   })
 
   QUnit.module('anonymousAssignmentsPresent prop', () => {
@@ -9703,7 +8809,7 @@ QUnit.module('Gradebook', () => {
     QUnit.module('when the "Total Grade Override" column is used', contextHooks => {
       contextHooks.beforeEach(() => {
         createAndInitGradebook({final_grade_override_enabled: true})
-        gradebook.setShowFinalGradeOverrides(true)
+        gradebook.courseSettings.setAllowFinalGradeOverride(true)
       })
 
       test('adds total_grade_override to scrollable columns', () => {
@@ -9720,7 +8826,7 @@ QUnit.module('Gradebook', () => {
     QUnit.module('when the "Total Grade Override" column is not used', contextHooks => {
       contextHooks.beforeEach(() => {
         createAndInitGradebook({final_grade_override_enabled: true})
-        gradebook.setShowFinalGradeOverrides(false)
+        gradebook.courseSettings.setAllowFinalGradeOverride(false)
       })
 
       test('does not add total_grade_override to scrollable columns', () => {
@@ -9806,37 +8912,6 @@ QUnit.module('Gradebook#gotAllAssignmentGroups', hooks => {
     sinon.stub(gradebook, 'setAssignmentGroupsLoaded')
     gradebook.gotAllAssignmentGroups([])
     strictEqual(gradebook.setAssignmentGroupsLoaded.getCall(0).args[0], true)
-  })
-})
-
-QUnit.module('Gradebook#setAssignmentGroupsLoaded', hooks => {
-  let server
-  let options
-  let gradebook
-
-  hooks.beforeEach(() => {
-    server = sinon.fakeServer.create({respondImmediately: true})
-    options = {settings_update_url: '/course/1/gradebook_settings'}
-    server.respondWith('POST', options.settings_update_url, [
-      200,
-      {'Content-Type': 'application/json'},
-      '{}'
-    ])
-    gradebook = createGradebook(options)
-  })
-
-  hooks.afterEach(() => {
-    server.restore()
-  })
-
-  test('sets contentLoadStates.assignmentGroupsLoaded to true when passed true', () => {
-    gradebook.setAssignmentGroupsLoaded(true)
-    strictEqual(gradebook.contentLoadStates.assignmentGroupsLoaded, true)
-  })
-
-  test('sets contentLoadStates.assignmentGroupsLoaded to false when passed false', () => {
-    gradebook.setAssignmentGroupsLoaded(false)
-    strictEqual(gradebook.contentLoadStates.assignmentGroupsLoaded, false)
   })
 })
 

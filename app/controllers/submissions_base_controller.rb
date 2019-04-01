@@ -42,7 +42,8 @@ class SubmissionsBaseController < ApplicationController
           rubricAssociation: rubric_association_json ? rubric_association_json['rubric_association'] : nil,
           outcome_proficiency: outcome_proficiency
         })
-         render 'submissions/show'
+
+        render 'submissions/show'
       end
       format.json do
         @submission.limit_comments(@current_user, session)

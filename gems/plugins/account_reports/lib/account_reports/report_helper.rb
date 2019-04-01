@@ -307,6 +307,11 @@ module AccountReports::ReportHelper
     end
   end
 
+  def number_of_items_per_runner(item_count, min: 25, max: 1000)
+    # use 100 jobs for the report, but no fewer than 25, and no more than 1000 per job
+    [[item_count/100.to_f.round(0), min].max, max].min
+  end
+
   def run_account_report_runner(report_runner, headers)
     return if report_runner.reload.workflow_state == 'aborted'
     @account_report = report_runner.account_report

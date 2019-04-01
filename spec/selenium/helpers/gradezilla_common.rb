@@ -71,7 +71,7 @@ module GradezillaCommon
   def final_score_for_row(row)
     grade_grid = f('#gradebook_grid .container_1')
     cells = find_slick_cells(row, grade_grid)
-    cells[4].find_element(:css, '.percentage').text
+    cells[4].find_element(:css, '.percentage').text.strip
   end
 
   def switch_to_section(section=nil)

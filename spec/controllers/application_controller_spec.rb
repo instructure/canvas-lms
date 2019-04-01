@@ -659,7 +659,7 @@ RSpec.describe ApplicationController do
               expect(assigns[:lti_launch].params['login_hint']).to eq Lti::Asset.opaque_identifier_for(user)
             end
 
-            it 'does not use the oidc_login_uri as the resource_url' do
+            it 'does not use the oidc_initiation_url as the resource_url' do
               expect(assigns[:lti_launch].resource_url).to eq tool.url
             end
 
@@ -668,16 +668,16 @@ RSpec.describe ApplicationController do
               expect(message_hint['canvas_domain']).to eq 'localhost'
             end
 
-            context 'when the developer key has an oidc_login_uri' do
+            context 'when the developer key has an oidc_initiation_url' do
               before do
-                tool.developer_key.update!(oidc_login_uri: oidc_login_uri)
+                tool.developer_key.update!(oidc_initiation_url: oidc_initiation_url)
                 controller.send(:content_tag_redirect, course, content_tag, nil)
               end
 
-              let(:oidc_login_uri) { 'https://www.test.com/oidc/login' }
+              let(:oidc_initiation_url) { 'https://www.test.com/oidc/login' }
 
-              it 'does use the oidc_login_uri as the resource_url' do
-                expect(assigns[:lti_launch].resource_url).to eq oidc_login_uri
+              it 'does use the oidc_initiation_url as the resource_url' do
+                expect(assigns[:lti_launch].resource_url).to eq oidc_initiation_url
               end
             end
           end
@@ -699,7 +699,7 @@ RSpec.describe ApplicationController do
           expect(assigns[:lti_launch].params["lti_message_type"]).to eq "basic-lti-launch-request"
         end
 
-        it 'does not use the oidc_login_uri as the resource_url' do
+        it 'does not use the oidc_initiation_url as the resource_url' do
           controller.send(:content_tag_redirect, course, content_tag, nil)
           expect(assigns[:resource_url]).to eq tool.url
         end

@@ -480,6 +480,21 @@ describe ContentMigration do
       expect(@copy_to.tab_configuration).to eq @copy_from.tab_configuration
     end
 
+    it "should copy the overridable course visibility setting" do
+      visibility_type = "superfunvisibility"
+      allow_any_instantiation_of(@copy_from.root_account).to receive(:available_course_visibility_override_options).
+        and_return({visibility_type=> {:setting => "Some label"}})
+      @copy_from.apply_visibility_configuration(visibility_type, nil)
+      @copy_from.save!
+      run_course_copy
+      expect(@copy_to.reload.overridden_course_visibility).to eq visibility_type
+
+      @copy_from.apply_visibility_configuration('public', nil)
+      @copy_from.save!
+      run_course_copy
+      expect(@copy_to.reload.overridden_course_visibility).to be_blank
+    end
+
     it "should copy dashboard images" do
       att = attachment_model(:context => @copy_from, :uploaded_data => stub_png_data, :filename => "homework.png")
       @copy_from.image_id = att.id

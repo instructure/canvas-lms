@@ -29,6 +29,8 @@ export default class ToolConfiguration extends React.Component {
         <ToolConfigurationForm
           toolConfiguration={this.props.createLtiKeyState.toolConfiguration}
           toolConfigurationUrl={this.props.createLtiKeyState.toolConfigurationUrl}
+          validScopes={ENV.validLtiScopes}
+          validPlacements={ENV.validLtiPlacements}
         />
       )
     }

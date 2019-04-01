@@ -1282,8 +1282,9 @@ describe FilesController do
         assert_status(201)
       end
 
-      context 'with an Assignment' do
+      context 'with Submission, Assignment, and Progress' do
         let(:assignment) { course.assignments.create! }
+        let(:submission) { assignment.submissions.create!(user: @student) }
         let(:assignment_params) do
           params.merge(
             context_type: "Assignment",
@@ -1298,7 +1299,13 @@ describe FilesController do
             uploaded_data: StringIO.new('meow?')
           )
         end
-        let!(:homework_service) { Services::SubmitHomeworkService.new(attachment, assignment) }
+        let(:progress) do
+          ::Progress.
+            new(context: assignment, user: user, tag: :test).
+            tap(&:start).
+            tap(&:save!)
+        end
+        let!(:homework_service) { Services::SubmitHomeworkService.new(attachment, progress) }
 
         before do
           allow(Mailer).to receive(:deliver)
@@ -1310,13 +1317,7 @@ describe FilesController do
           assert_status(201)
         end
 
-        context 'with a Progress' do
-          let(:progress) do
-            ::Progress.
-              new(context: assignment, user: user, tag: :test).
-              tap(&:start).
-              tap(&:save!)
-          end
+        context 'with progress_id param' do
           let(:progress_params) do
             assignment_params.merge(
               progress_id: progress.id
@@ -1369,10 +1370,7 @@ describe FilesController do
           end
 
           it 'should submit the attachment' do
-            expect(homework_service).to receive(:submit).with(
-              progress.created_at,
-              eula_agreement_timestamp
-            )
+            expect(homework_service).to receive(:submit).with(eula_agreement_timestamp)
             request
           end
 
@@ -1387,8 +1385,13 @@ describe FilesController do
             assert_status(201)
           end
 
+          it "marks the progress as completed" do
+            request
+            expect(progress.reload.workflow_state).to eq 'completed'
+          end
+
           it 'should send a failure email' do
-            allow(homework_service).to receive(:submit).and_raise('error')
+            expect(homework_service).to receive(:submit).and_raise('error')
             expect(homework_service).to receive(:failure_email)
             request
 

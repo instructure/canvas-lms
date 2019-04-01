@@ -20,7 +20,6 @@ import React from 'react'
 import {bool, func} from 'prop-types'
 
 import I18n from 'i18n!assignments_2'
-import {Mutation} from 'react-apollo'
 
 import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
@@ -33,7 +32,7 @@ import IconEmail from '@instructure/ui-icons/lib/Line/IconEmail'
 import IconSpeedGrader from '@instructure/ui-icons/lib/Line/IconSpeedGrader'
 import IconTrash from '@instructure/ui-icons/lib/Line/IconTrash'
 
-import {TeacherAssignmentShape, SET_WORKFLOW} from '../assignmentData'
+import {TeacherAssignmentShape} from '../assignmentData'
 import AssignmentPoints from './Editables/AssignmentPoints'
 
 // let's use these helpers from the gradebook so we're consistent
@@ -54,19 +53,17 @@ export default class Toolbox extends React.Component {
   static propTypes = {
     assignment: TeacherAssignmentShape.isRequired,
     onChangeAssignment: func.isRequired,
+    onValidate: func.isRequired,
+    onSetWorkstate: func.isRequired,
     onUnsubmittedClick: func,
     onDelete: func,
-    onPublishChangeComplete: func,
-    onError: func,
     readOnly: bool
   }
 
   static defaultProps = {
     onUnsubmittedClick: () => {},
     onDelete: () => {},
-    onPublishChangeComplete: () => {},
-    onError: () => {},
-    readOnly: true
+    readOnly: false
   }
 
   state = {
@@ -86,45 +83,23 @@ export default class Toolbox extends React.Component {
   //     unpublish => just update state
   // so if event.target.checked, we need to call back up to whatever will
   // do the save.
-  handlePublishChange = (mutateAssignmentWorkflow, event) => {
+  handlePublishChange = event => {
     const newState = event.target.checked ? 'published' : 'unpublished'
-    mutateAssignmentWorkflow({
-      variables: {id: this.props.assignment.lid, workflow: newState},
-      optimisticResponse: {
-        updateAssignment: {
-          __typename: 'UpdateAssignmentPayload',
-          assignment: {
-            __typename: 'Assignment',
-            id: this.props.assignment.gid,
-            state: newState
-          }
-        }
-      }
-    })
-    this.props.onChangeAssignment('state', newState)
+    this.props.onSetWorkstate(newState)
   }
 
   renderPublished() {
     // TODO: put the label on the left side of the toggle when checkbox supports it
     // TODO: handle error when updating published
     return (
-      <Mutation
-        mutation={SET_WORKFLOW}
-        onCompleted={this.props.onPublishChangeComplete}
-        onError={this.props.onError}
-      >
-        {(mutateAssignmentWorkflow, {loading, _error}) => (
-          <Checkbox
-            label={I18n.t('Published')}
-            variant="toggle"
-            size="medium"
-            inline
-            disabled={loading}
-            checked={this.props.assignment.state === 'published'}
-            onChange={event => this.handlePublishChange(mutateAssignmentWorkflow, event)}
-          />
-        )}
-      </Mutation>
+      <Checkbox
+        label={I18n.t('Published')}
+        variant="toggle"
+        size="medium"
+        inline
+        checked={this.props.assignment.state === 'published'}
+        onChange={this.handlePublishChange}
+      />
     )
   }
 
@@ -190,6 +165,7 @@ export default class Toolbox extends React.Component {
         pointsPossible={this.props.assignment.pointsPossible}
         onChange={this.handlePointsChange}
         onChangeMode={this.handlePointsChangeMode}
+        onValidate={this.props.onValidate}
         readOnly={this.props.readOnly}
       />
     )

@@ -109,10 +109,12 @@ module Factories
   end
 
   def create_attachment_for_file_upload_submission!(submission, opts={})
-    submission.attachments.create! opts.merge({
+    defaults = {
       :filename => "doc.doc",
-      :display_name => "doc.doc", :user => @user,
-      :uploaded_data => dummy_io
-    })
+      :display_name => "doc.doc",
+      :user => @user,
+      :uploaded_data => dummy_io,
+    }
+    submission.attachments.create! defaults.merge(opts)
   end
 end

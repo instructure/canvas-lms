@@ -18,7 +18,7 @@
 
 import React from 'react'
 import I18n from 'i18n!assignments_2'
-import SVGWithTextPlaceholder from '../SVGWithTextPlaceholder'
+import SVGWithTextPlaceholder from '../../../shared/SVGWithTextPlaceholder'
 import {arrayOf} from 'prop-types'
 import CommentRow from './CommentRow'
 import {CommentShape} from '../../assignmentData'
@@ -33,9 +33,11 @@ function CommentContent(props) {
           url={noComments}
         />
       )}
-      {props.comments.map(comment => (
-        <CommentRow key={comment._id} comment={comment} />
-      ))}
+      {props.comments
+        .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+        .map(comment => (
+          <CommentRow key={comment._id} comment={comment} />
+        ))}
     </React.Fragment>
   )
 }

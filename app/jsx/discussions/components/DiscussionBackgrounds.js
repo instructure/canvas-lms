@@ -31,7 +31,7 @@ import unpinnedUrl from '../../../../public/images/discussions/unpinned.svg'
 import closedForCommentsUrl from '../../../../public/images/discussions/closed-comments.svg'
 
 const BackgroundSVG = props => (
-  <View margin="small auto" size="x-small" display="block">
+  <View margin="small auto" maxWidth="16rem" display="block">
     <img alt="" src={props.url} />
   </View>
 )

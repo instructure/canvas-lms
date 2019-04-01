@@ -48,6 +48,8 @@ module Types
 
     field :unlock_at, DateTimeType, null: true
 
+    field :position, Integer, null: true
+
     field :module_items, [Types::ModuleItemType], null: true
     def module_items
       ModuleItemsVisibleLoader.for(current_user).load(context_module)

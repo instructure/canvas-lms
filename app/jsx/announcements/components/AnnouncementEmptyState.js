@@ -29,7 +29,7 @@ import AnnouncementHornSVGURL from '../../../../public/images/announcements/anno
 const AnnouncementEmptyState = props => (
   <View margin="large auto" textAlign="center" display="block">
     <PresentationContent>
-      <View margin="small auto" size="x-small" display="block">
+      <View margin="small auto" maxWidth="16rem" display="block">
         <img alt="" src={AnnouncementHornSVGURL} />
       </View>
     </PresentationContent>

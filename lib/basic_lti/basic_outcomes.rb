@@ -247,7 +247,7 @@ module BasicLTI
           self.description = error_message
         elsif assignment.grading_type != "pass_fail" && (assignment.points_possible.nil?)
 
-          unless submission = Submission.where(user_id: user.id, assignment_id: assignment).first
+          unless submission = existing_submission
             submission = Submission.create!(submission_hash.merge(:user => user,
                                                                   :assignment => assignment))
           end

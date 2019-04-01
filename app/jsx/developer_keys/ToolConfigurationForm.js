@@ -25,6 +25,8 @@ import TextArea from '@instructure/ui-forms/lib/components/TextArea'
 import TextInput from '@instructure/ui-forms/lib/components/TextInput'
 import View from '@instructure/ui-layout/lib/components/View'
 
+import ManualConfigurationForm from './ManualConfigurationForm'
+
 export default class ToolConfigurationForm extends React.Component {
   state = {
     configurationType: 'json'
@@ -51,6 +53,13 @@ export default class ToolConfigurationForm extends React.Component {
           maxHeight="20rem"
         />
       )
+    } else if (this.state.configurationType === 'manual') {
+      return (
+        <ManualConfigurationForm
+          validScopes={this.props.validScopes}
+          validPlacements={this.props.validPlacements}
+        />
+      )
     }
     return (
       <TextInput
@@ -68,12 +77,13 @@ export default class ToolConfigurationForm extends React.Component {
           {I18n.t('Configure')}
         </Heading>
         <Select
-          label="Medium"
-          assistiveText={I18n.t('2 options available. Use arrow keys to navigate options.')}
+          label="Method"
+          assistiveText={I18n.t('3 options available. Use arrow keys to navigate options.')}
           onChange={this.handleConfigTypeChange}
         >
           <option value="json">{I18n.t('Paste JSON')}</option>
           <option value="url">{I18n.t('Enter URL')}</option>
+          <option value="manual">{I18n.t('Manual Entry')}</option>
         </Select>
         <br />
         {this.configurationInput()}
@@ -84,5 +94,7 @@ export default class ToolConfigurationForm extends React.Component {
 
 ToolConfigurationForm.propTypes = {
   toolConfiguration: PropTypes.object.isRequired,
-  toolConfigurationUrl: PropTypes.string.isRequired
+  toolConfigurationUrl: PropTypes.string.isRequired,
+  validScopes: PropTypes.object.isRequired,
+  validPlacements: PropTypes.arrayOf(PropTypes.string).isRequired
 }

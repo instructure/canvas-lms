@@ -49,6 +49,8 @@ describe BasicLTI::QuizzesNextLtiResponse do
 
   let(:launch_url) { 'https://abcdef.com/uuurrrlll00' }
 
+  let(:timestamp) { 1.day.ago.iso8601(3) }
+
   let(:xml) do
     request_xml(source_id, launch_url, "0.12")
   end
@@ -82,7 +84,8 @@ describe BasicLTI::QuizzesNextLtiResponse do
                   <textString>#{grade}</textString>
                 </resultScore>
                 <resultData>
-                  <ltiLaunchUrl>#{launch_url}</ltiLaunchUrl>
+                  <text>#{timestamp}</text>
+                  <url>#{launch_url}</url>
                 </resultData>
               </result>
             </resultRecord>
@@ -143,24 +146,24 @@ describe BasicLTI::QuizzesNextLtiResponse do
       expect(request.body).to eq '<replaceResultResponse />'
     end
 
-    it "sets 'submitted_at' to the current time" do
-      Timecop.freeze do
-        BasicLTI::BasicOutcomes.process_request(tool, xml)
-        submission = assignment.submissions.where(user_id: @user.id).first
-        expect(submission.submitted_at).to eq Time.zone.now
-      end
+    it "reads 'submitted_at' from resultData" do
+      BasicLTI::BasicOutcomes.process_request(tool, xml)
+      submission = assignment.submissions.where(user_id: @user.id).first
+      expect(submission.submitted_at).to eq timestamp
     end
 
-    context 'with submitted_at details' do
-      let(:timestamp) { 1.day.ago.iso8601(3) }
-
-      it "sets submitted_at to submitted_at details if resultData is present" do
-        xml.at_css('imsx_POXBody > replaceResultRequest').add_child(
-          "<submissionDetails><submittedAt>#{timestamp}</submittedAt></submissionDetails>"
-        )
+    context "result url" do
+      it "reads the result_data_url when set" do
         BasicLTI::BasicOutcomes.process_request(tool, xml)
         submission = assignment.submissions.where(user_id: @user.id).first
-        expect(submission.submitted_at.iso8601(3)).to eq timestamp
+        expect(submission.url).to eq launch_url
+      end
+
+      it "reads the result_data_launch_url when set" do
+        xml.at_css('text').replace('<ltiLaunchUrl>http://example.com/launch</ltiLaunchUrl>')
+        BasicLTI::BasicOutcomes.process_request(tool, xml)
+        submission = assignment.submissions.where(user_id: @user.id).first
+        expect(submission.url).to eq 'http://example.com/launch'
       end
     end
 

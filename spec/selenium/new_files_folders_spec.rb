@@ -36,16 +36,22 @@ describe "better_file_browsing, folders" do
     end
 
     it "should create a new folder", :xbrowser, priority: "1", test_id: 133121 do
-      expect(fln("new test folder")).to be_present
+      # locator was changed from fln in this test due to an issue with edgedriver
+      # We can not use fln here
+      expect(fj("a:contains('new test folder')")).to be_present
     end
 
-    it "should display all cog icon options", :xbrowser, priority: "1", test_id: 133124 do
+    it "should display all cog icon options", priority: "1", test_id: 133124 do
+      # locators were changed from fln in this test due to an issue with edgedriver
+      # We can not use fln here
       create_new_folder
-      ff('.al-trigger')[0].click
-      expect(fln("Download")).to be_displayed
-      expect(fln("Rename")).to be_displayed
-      expect(fln("Move")).to be_displayed
-      expect(fln("Delete")).to be_displayed
+      row = ff('.ef-item-row')[0] # get row of newly created folder
+      f('.al-trigger', row).click
+      id = f('.al-trigger', row).attribute("aria-owns") # get id of ul of options that should be displayed
+      expect(fj("a:contains('Download')", f("##{id}"))).to be_displayed
+      expect(fj("a:contains('Rename')", f("##{id}"))).to be_displayed
+      expect(fj("a:contains('Move')", f("##{id}"))).to be_displayed
+      expect(fj("a:contains('Delete')", f("##{id}"))).to be_displayed
     end
 
     it "should edit folder name", priority: "1", test_id: 223501 do
@@ -129,7 +135,7 @@ describe "better_file_browsing, folders" do
        expect(new_folder.text).to match(/New Folder/)
      end
 
-     it "should handle duplicate folder names", :xbrowser, priority: "1", test_id: 133130 do
+     it "should handle duplicate folder names", priority: "1", test_id: 133130 do
        create_new_folder
        add_folder("New Folder")
        expect(all_files_folders.last.text).to match(/New Folder 2/)

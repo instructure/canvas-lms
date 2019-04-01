@@ -17,18 +17,23 @@
 #
 
 module Types
-  SubmissionOrderInputType = GraphQL::InputObjectType.define do
-    name "SubmissionOrderCriteria"
-    argument :field, !GraphQL::EnumType.define {
-      name "SubmissionOrderField"
-      value "_id", value: "id"
-      value "gradedAt", value: "graded_at"
-    }
-    argument :direction, GraphQL::EnumType.define {
-      name "OrderDirection"
-      value "ascending", value: "ASC"
-      value "descending", value: "DESC NULLS LAST"
-    }
+  class SubmissionOrderFieldType < BaseEnum
+    graphql_name "SubmissionOrderField"
+    value :_id, value: :id
+    value :gradedAt, value: :graded_at
+  end
+
+  class OrderDirectionType < BaseEnum
+    graphql_name "OrderDirection"
+    value :ascending, value: "ASC"
+    value :descending, value: "DESC NULLS LAST"
+  end
+
+  class SubmissionOrderInputType < BaseInputObject
+    graphql_name "SubmissionOrderCriteria"
+
+    argument :field, SubmissionOrderFieldType, required: true
+    argument :direction, OrderDirectionType, required: false
   end
 
   class CourseType < ApplicationObjectType
@@ -36,8 +41,8 @@ module Types
 
     alias :course :object
 
-    CourseWorkflowState = GraphQL::EnumType.define do
-      name "CourseWorkflowState"
+    class CourseWorkflowState < BaseEnum
+      graphql_name "CourseWorkflowState"
       description "States that Courses can be in"
       value "created"
       value "claimed"
@@ -46,8 +51,8 @@ module Types
       value "deleted"
     end
 
-    CourseFilterableEnrollmentWorkflowState = GraphQL::EnumType.define do
-      name "CourseFilterableEnrollmentState"
+    class CourseFilterableEnrollmentWorkflowState < BaseEnum
+      graphql_name "CourseFilterableEnrollmentState"
       description "Users in a course can be returned based on these enrollment states"
       value "invited"
       value "creation_pending"

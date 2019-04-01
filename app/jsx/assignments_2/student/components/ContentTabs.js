@@ -16,15 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Suspense, lazy} from 'react'
+import ClosedDiscussionSVG from '../SVG/ClosedDiscussions.svg'
+import ContentUploadTab from './ContentUploadTab'
+import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import I18n from 'i18n!assignments_2'
+import LoadingIndicator from '../../shared/LoadingIndicator'
+import React, {lazy, Suspense} from 'react'
+import {StudentAssignmentShape} from '../assignmentData'
+import SVGWithTextPlaceholder from '../../shared/SVGWithTextPlaceholder'
 import TabList, {TabPanel} from '@instructure/ui-tabs/lib/components/TabList'
 import Text from '@instructure/ui-elements/lib/components/Text'
-import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
-import {StudentAssignmentShape} from '../assignmentData'
-import LoadingIndicator from './LoadingIndicator'
-import SVGWithTextPlaceholder from './SVGWithTextPlaceholder'
-import ClosedDiscussionSVG from '../SVG/ClosedDiscussions.svg'
 
 const Comments = lazy(() =>
   import('./Comments').then(result => (result.default ? result : {default: result}))
@@ -36,21 +37,12 @@ ContentTabs.propTypes = {
 
 function ContentTabs(props) {
   return (
-    <div data-test-id="assignment-2-student-content-tabs">
+    <div data-testid="assignment-2-student-content-tabs">
       <TabList defaultSelectedIndex={0} variant="minimal">
         <TabPanel title={I18n.t('Upload')}>
-          <Flex as="header" alignItems="center" justifyItems="center" direction="column">
-            <FlexItem>
-              <Text data-test-id="assignment-2-student-content-tabs-test-text">
-                `TODO: Input Upload Content Here...`
-              </Text>
-            </FlexItem>
-          </Flex>
+          <ContentUploadTab />
         </TabPanel>
-        <TabPanel
-          data-test-id="assignment-2-student-comments-content-tab"
-          title={I18n.t('Comments')}
-        >
+        <TabPanel title={I18n.t('Comments')}>
           {!props.assignment.muted ? (
             <Suspense fallback={<LoadingIndicator />}>
               <Comments assignment={props.assignment} />

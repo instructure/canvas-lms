@@ -22,8 +22,8 @@ module Types
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
 
-    AssignmentGroupState = GraphQL::EnumType.define do
-      name "AssignmentGroupState"
+    class AssignmentGroupState < BaseEnum
+      graphql_name "AssignmentGroupState"
       description "States that Assignment Group can be in"
       value "available"
       value "deleted"

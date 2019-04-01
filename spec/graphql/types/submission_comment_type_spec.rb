@@ -17,7 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../helpers/graphql_type_tester')
+require_relative "../graphql_spec_helper"
 
 describe Types::SubmissionCommentType do
   before(:once) do
@@ -27,9 +27,10 @@ describe Types::SubmissionCommentType do
     @student2 = @student
     @assignment = @course.assignments.create! name: 'asdf', points_possible: 10, anonymous_peer_reviews: true
     @submission = @assignment.grade_student(@student1, score: 8, grader: @teacher)[0]
-    @submission.add_comment(author: @student1, comment: 'test')
-    @submission.add_comment(author: @student2, comment: 'test2')
-    @submission.add_comment(author: @teacher, comment: 'test3')
+    @submission.update!(attempt: 2)
+    @comment1 = @submission.add_comment(author: @student1, comment: 'test', attempt: nil)
+    @comment2 = @submission.add_comment(author: @student2, comment: 'test2', attempt: 1)
+    @comment3 = @submission.add_comment(author: @teacher, comment: 'test3', attempt: 2)
     @submission_comments = @submission.submission_comments
   end
 
@@ -141,6 +142,14 @@ describe Types::SubmissionCommentType do
           }'
         )).to eq([@media_title, nil, nil])
       end
+    end
+  end
+
+  describe '#attempt' do
+    it 'translates nil to zero' do
+      expect(
+        submission_type.resolve('commentsConnection { nodes { attempt }}')
+      ).to eq [0, 1, 2]
     end
   end
 end

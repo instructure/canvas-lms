@@ -677,6 +677,8 @@ exports[`renders correctly expanded with no results or assignments 1`] = `
   <View
     as="div"
     display="auto"
+    overflowX="visible"
+    overflowY="visible"
     padding="small"
   >
     <Text

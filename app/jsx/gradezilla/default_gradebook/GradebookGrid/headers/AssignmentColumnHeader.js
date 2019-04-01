@@ -109,6 +109,10 @@ export default class AssignmentColumnHeader extends ColumnHeader {
       onSelect: func.isRequired
     }).isRequired,
 
+    showGradePostingPolicyAction: shape({
+      onSelect: func.isRequired
+    }).isRequired,
+
     sortBySetting: shape({
       direction: string.isRequired,
       disabled: bool.isRequired,
@@ -199,6 +203,10 @@ export default class AssignmentColumnHeader extends ColumnHeader {
 
   reuploadSubmissions = () => {
     this.invokeAndSkipFocus(this.props.reuploadSubmissionsAction)
+  }
+
+  showGradePostingPolicy = () => {
+    this.invokeAndSkipFocus(this.props.showGradePostingPolicyAction)
   }
 
   invokeAndSkipFocus(action) {
@@ -421,6 +429,14 @@ export default class AssignmentColumnHeader extends ColumnHeader {
         {!this.props.reuploadSubmissionsAction.hidden && (
           <MenuItem onSelect={this.reuploadSubmissions}>
             <span data-menu-item-id="reupload-submissions">{I18n.t('Re-Upload Submissions')}</span>
+          </MenuItem>
+        )}
+
+        {this.props.postGradesAction.enabled && <MenuItemSeparator />}
+
+        {this.props.postGradesAction.enabled && (
+          <MenuItem onSelect={this.showGradePostingPolicy}>
+            {I18n.t('Grade Posting Policy')}
           </MenuItem>
         )}
       </Menu>

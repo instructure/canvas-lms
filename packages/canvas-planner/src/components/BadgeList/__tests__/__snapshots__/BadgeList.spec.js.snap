@@ -1,8 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`renders Pill components as list items 1`] = `
-<ul>
+<ul
+  className="BadgeList-styles__root"
+>
   <li
+    className="BadgeList-styles__item"
     key="null/.0"
   >
     <Pill
@@ -11,6 +14,7 @@ exports[`renders Pill components as list items 1`] = `
     />
   </li>
   <li
+    className="BadgeList-styles__item"
     key="null/.1"
   >
     <Pill
@@ -19,6 +23,7 @@ exports[`renders Pill components as list items 1`] = `
     />
   </li>
   <li
+    className="BadgeList-styles__item"
     key="null/.2"
   >
     <Pill

@@ -17,18 +17,32 @@
  */
 
 import $ from 'jquery'
-// for legacy pathways
 import serviceRCELoader from './serviceRCELoader'
 import featureFlag from './featureFlag'
-import wikiSidebar from 'wikiSidebar'
 
 function loadServiceSidebar (callback) {
   serviceRCELoader.loadSidebarOnTarget($('#editor_tabs').get(0), callback)
 }
 
 function loadLegacySidebar (callback) {
-  wikiSidebar.init()
-  callback(wikiSidebar)
+  // This is a little bit weird because we don't want to have an:
+  // `import wikiSidebar from 'wikiSidebar'` at the top of this file
+  // because this file is included in the vendor bundle and we don't want to
+  // include `wikiSidebar` and all of it's deps in that bundle
+  // (since it would slow down loading every page).
+  //
+  // But by the time we get here it *will* have been already loaded in
+  // `legacyWikiSidebarAsyncChunk` so it will be in the webpack modules cache.
+  // by getting it from the cache, it doesn't force it to be included the vendor bundle
+  const previouslyLoadedWikiSidebarModule = require.cache[require.resolveWeak('wikiSidebar')]
+  if (previouslyLoadedWikiSidebarModule) {
+    const wikiSidebar = previouslyLoadedWikiSidebarModule.exports
+    wikiSidebar.init()
+    callback(wikiSidebar)
+  } else {
+    // just in case for whatever reason wikiSidebar was not loaded yet
+    import('wikiSidebar').then(() => loadLegacySidebar(callback)).catch(console.error)
+  }
 }
 
 const Sidebar = {

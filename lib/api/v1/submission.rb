@@ -24,6 +24,7 @@ module Api::V1::Submission
   include Api::V1::Course
   include Api::V1::User
   include Api::V1::SubmissionComment
+  include Api::V1::RubricAssessment
   include CoursesHelper
 
   # TODO: yikes
@@ -70,7 +71,7 @@ module Api::V1::Submission
     end
 
     if includes.include?("rubric_assessment") && submission.rubric_assessment && submission.user_can_read_grade?(current_user)
-      hash['rubric_assessment'] = rubric_assessment_json(submission.rubric_assessment)
+      hash['rubric_assessment'] = indexed_rubric_assessment_json(submission.rubric_assessment)
     end
 
     if includes.include?("assignment")
@@ -300,14 +301,6 @@ module Api::V1::Submission
     end
 
     attachment
-  end
-
-  def rubric_assessment_json(rubric_assessment)
-    hash = {}
-    rubric_assessment.data&.each do |rating|
-      hash[rating[:criterion_id]] = rating.slice(:points, :comments)
-    end
-    hash
   end
 
   def provisional_grade_json(course:, assignment:, submission:, provisional_grade:, current_user:, avatars: false, includes: [])

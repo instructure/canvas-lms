@@ -52,7 +52,7 @@ module Gradezilla
       end
 
       def get_grade(student, assignment)
-        grading_cell(student, assignment).text
+        grading_cell(student, assignment).text.strip
       end
 
       def edit_grade(student, assignment, grade)
@@ -95,6 +95,10 @@ module Gradezilla
       end
 
       def open_tray(student, assignment)
+        # ie has narrow columns hiding the grade_tray_button
+        if driver.browser == :internet_explorer
+          driver.execute_script("arguments[0].setAttribute('style', 'width: 150px')", grading_cell(student, assignment))
+        end
         grading_cell(student, assignment).click
         grade_tray_button.click
         Gradezilla::GradeDetailTray.submission_tray_full_content

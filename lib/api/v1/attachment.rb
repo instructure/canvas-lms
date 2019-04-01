@@ -43,7 +43,8 @@ module Api::V1::Attachment
       'folder_id' => attachment.folder_id,
       'display_name' => attachment.display_name,
       'filename' => attachment.filename,
-      'workflow_state' => attachment.workflow_state
+      'workflow_state' => attachment.workflow_state,
+      'upload_status' => AttachmentUploadStatus.upload_status(attachment)
     }
     return hash if options[:only] && options[:only].include?('names')
 
@@ -242,13 +243,15 @@ module Api::V1::Attachment
     if InstFS.enabled?
       additional_capture_params = {}
       progress_json_result = if params[:url]
-        progress = ::Progress.new(context: progress_context, user_id: @current_user, tag: :upload_via_url)
+        progress = ::Progress.new(context: progress_context, user: @current_user, tag: :upload_via_url)
         progress.start
         progress.save!
 
-        additional_capture_params = {
-          eula_agreement_timestamp: params[:eula_agreement_timestamp]
-        }
+        if progress_context.is_a? Assignment
+          additional_capture_params = {
+            eula_agreement_timestamp: params[:eula_agreement_timestamp]
+          }
+        end
 
         progress_json(progress, @current_user, session)
       end
@@ -286,14 +289,16 @@ module Api::V1::Attachment
 
       on_duplicate = infer_on_duplicate(params)
       if params[:url]
-
         progress = ::Progress.new(context: progress_context, user: @current_user, tag: :upload_via_url)
         progress.reset!
 
         executor = Services::SubmitHomeworkService.create_clone_url_executor(
           params[:url], on_duplicate, opts[:check_quota], progress: progress
         )
-        Services::SubmitHomeworkService.submit_job(progress, @attachment, params[:eula_agreement_timestamp], executor)
+
+        Services::SubmitHomeworkService.submit_job(
+          @attachment, progress, params[:eula_agreement_timestamp], executor
+        )
 
         json = { progress: progress_json(progress, @current_user, session) }
       else

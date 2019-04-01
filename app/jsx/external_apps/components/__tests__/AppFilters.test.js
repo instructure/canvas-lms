@@ -129,10 +129,3 @@ it('changes the filter to installed on Installed tab click', () => {
   wrapper.find('a[children="Installed"]').simulate('click')
   expect(store.getState().filter).toEqual('installed')
 })
-
-it('changes the filter to lti_1_3_tools on LTI 1.3 tab click', () => {
-  wrapper = mount(<AppFilters />)
-
-  wrapper.find('a[children="LTI 1.3"]').simulate('click')
-  expect(store.getState().filter).toEqual('lti_1_3_tools')
-})

@@ -26,7 +26,7 @@ describe Lti::LtiAdvantageAdapter do
   let(:return_url) { 'http://www.platform.com/return_url' }
   let(:user) { @student }
   let(:opts) { { resource_type: 'course_navigation', domain: 'test.com' } }
-  let(:controller_double) { double(polymorphic_url: '') }
+  let(:controller_double) { double(polymorphic_url: 'test.com') }
   let(:expander_opts) { { current_user: user, tool: tool, controller: controller_double } }
   let(:expander) do
     Lti::VariableExpander.new(
@@ -145,13 +145,13 @@ describe Lti::LtiAdvantageAdapter do
       expect(adapter.launch_url).to eq 'http://www.example.com/basic_lti'
     end
 
-    context 'when the oidc_login_uri is set' do
-      let(:oidc_login_uri) { 'https://www.test.com/oidc/login' }
+    context 'when the oidc_initiation_url is set' do
+      let(:oidc_initiation_url) { 'https://www.test.com/oidc/login' }
 
-      before { tool.developer_key.update!(oidc_login_uri: oidc_login_uri) }
+      before { tool.developer_key.update!(oidc_initiation_url: oidc_initiation_url) }
 
       it 'uses the oidc login uri' do
-        expect(adapter.launch_url).to eq oidc_login_uri
+        expect(adapter.launch_url).to eq oidc_initiation_url
       end
     end
   end

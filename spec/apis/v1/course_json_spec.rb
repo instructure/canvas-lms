@@ -75,55 +75,99 @@ module Api
             let(:json_enrollment) { json_enrollments.detect { |enrollment| enrollment.fetch(:user_id) == student.id } }
 
             before(:once) do
-              @course_score = student_enrollment.scores.create!(course_score: true, current_score: 63, final_score: 73)
-              course.update!(grading_standard_enabled: true)
               course.enable_feature!(:final_grades_override)
+              course.update!(allow_final_grade_override: true, grading_standard_enabled: true)
+              @course_score = student_enrollment.scores.create!(
+                course_score: true, current_score: 63, final_score: 73, override_score: 99.0
+              )
             end
 
-            it "returns the course current grade" do
-              expect(json_enrollment.fetch(:computed_current_grade)).to eq "D-"
+            context "when Final Grade Override is enabled and allowed" do
+              context "when a grade override exists" do
+                it "sets computed_current_grade to the override grade" do
+                  expect(json_enrollment.fetch(:computed_current_grade)).to eq "A"
+                end
+
+                it "sets computed_current_score to the override score" do
+                  expect(json_enrollment.fetch(:computed_current_score)).to be 99.0
+                end
+
+                it "sets computed_final_grade to the override grade" do
+                  expect(json_enrollment.fetch(:computed_final_grade)).to eq "A"
+                end
+
+                it "sets computed_final_score to the override score" do
+                  expect(json_enrollment.fetch(:computed_final_score)).to be 99.0
+                end
+
+                it "does not include an override_grade key" do
+                  expect(json_enrollment).not_to have_key :override_grade
+                end
+
+                it "does not include an override_score key" do
+                  expect(json_enrollment).not_to have_key :override_score
+                end
+              end
+
+              context "when no grade override exists" do
+                before(:each) { @course_score.update!(override_score: nil) }
+
+                it "sets computed_current_grade to the computed current grade" do
+                  expect(json_enrollment.fetch(:computed_current_grade)).to eq "D-"
+                end
+
+                it "sets computed_current_score to the computed current score" do
+                  expect(json_enrollment.fetch(:computed_current_score)).to be 63.0
+                end
+
+                it "sets computed_final_grade to the computed final grade" do
+                  expect(json_enrollment.fetch(:computed_final_grade)).to eq "C-"
+                end
+
+                it "sets computed_final_score to the computed final score" do
+                  expect(json_enrollment.fetch(:computed_final_score)).to be 73.0
+                end
+              end
             end
 
-            it "returns the course current score" do
-              expect(json_enrollment.fetch(:computed_current_score)).to be 63.0
+            context "when Final Grade Override is not allowed" do
+              before(:each) { course.update!(allow_final_grade_override: false) }
+
+              it "sets computed_current_grade to the computed current grade" do
+                expect(json_enrollment.fetch(:computed_current_grade)).to eq "D-"
+              end
+
+              it "sets computed_current_score to the computed current score" do
+                expect(json_enrollment.fetch(:computed_current_score)).to be 63.0
+              end
+
+              it "sets computed_final_grade to the computed final grade" do
+                expect(json_enrollment.fetch(:computed_final_grade)).to eq "C-"
+              end
+
+              it "sets computed_final_score to the computed final score" do
+                expect(json_enrollment.fetch(:computed_final_score)).to be 73.0
+              end
             end
 
-            it "returns the course final grade" do
-              expect(json_enrollment.fetch(:computed_final_grade)).to eq "C-"
-            end
+            context "when Final Grade Override is disabled" do
+              before(:each) { course.disable_feature!(:final_grades_override) }
 
-            it "returns the course final score" do
-              expect(json_enrollment.fetch(:computed_final_score)).to be 73.0
-            end
+              it "sets computed_current_grade to the computed current grade" do
+                expect(json_enrollment.fetch(:computed_current_grade)).to eq "D-"
+              end
 
-            it "returns the override grade in place of current grade if present and feature enabled" do
-              @course_score.update!(override_score: 99.0)
-              expect(json_enrollment.fetch(:computed_current_grade)).to eq "A"
-            end
+              it "sets computed_current_score to the computed current score" do
+                expect(json_enrollment.fetch(:computed_current_score)).to be 63.0
+              end
 
-            it "returns the override score in place of current score if present and feature enabled" do
-              @course_score.update!(override_score: 99.0)
-              expect(json_enrollment.fetch(:computed_current_score)).to be 99.0
-            end
+              it "sets computed_final_grade to the computed final grade" do
+                expect(json_enrollment.fetch(:computed_final_grade)).to eq "C-"
+              end
 
-            it "returns the override grade in place of final grade if present and feature enabled" do
-              @course_score.update!(override_score: 99.0)
-              expect(json_enrollment.fetch(:computed_final_grade)).to eq "A"
-            end
-
-            it "returns the override score in place of final score if present and feature enabled" do
-              @course_score.update!(override_score: 99.0)
-              expect(json_enrollment.fetch(:computed_final_score)).to be 99.0
-            end
-
-            it "does not return an override_grade key" do
-              @course_score.update!(override_score: 99.0)
-              expect(json_enrollment.keys).not_to include :override_grade
-            end
-
-            it "does not return an override_score key" do
-              @course_score.update!(override_score: 99.0)
-              expect(json_enrollment.keys).not_to include :override_score
+              it "sets computed_final_score to the computed final score" do
+                expect(json_enrollment.fetch(:computed_final_score)).to be 73.0
+              end
             end
           end
 
@@ -136,67 +180,75 @@ module Api
             let(:json_enrollment) { json_enrollments.detect { |enrollment| enrollment.fetch(:user_id) == student.id } }
 
             before(:once) do
-              @course_score = student_enrollment.scores.create!(course_score: true, current_score: 63, final_score: 73)
-              course.update!(grading_standard_enabled: true)
               course.enable_feature!(:final_grades_override)
+              course.update!(allow_final_grade_override: true, grading_standard_enabled: true)
+              @course_score = student_enrollment.scores.create!(
+                course_score: true, current_score: 63, final_score: 73, override_score: 99
+              )
             end
 
-            it "returns the course current grade" do
-              expect(json_enrollment.fetch(:computed_current_grade)).to eq "D-"
+            context "when Final Grade Override is enabled and allowed" do
+              context "when a grade override exists" do
+                it "sets computed_current_grade to the computed current grade" do
+                  expect(json_enrollment.fetch(:computed_current_grade)).to eq "D-"
+                end
+
+                it "sets computed_current_score to the computed current score" do
+                  expect(json_enrollment.fetch(:computed_current_score)).to be 63.0
+                end
+
+                it "sets computed_final_grade to the computed final grade" do
+                  expect(json_enrollment.fetch(:computed_final_grade)).to eq "C-"
+                end
+
+                it "sets computed_final_score to the computed final score" do
+                  expect(json_enrollment.fetch(:computed_final_score)).to be 73.0
+                end
+
+                it "sets override_grade to the override grade" do
+                  expect(json_enrollment.fetch(:override_grade)).to eq "A"
+                end
+
+                it "sets override_score to the override score" do
+                  expect(json_enrollment.fetch(:override_score)).to be 99.0
+                end
+              end
+
+              context "when no grade override exists" do
+                before(:each) { @course_score.update!(override_score: nil) }
+
+                it "does not include an override_grade key" do
+                  expect(json_enrollment).not_to have_key :override_grade
+                end
+
+                it "does not include an override_score key" do
+                  expect(json_enrollment).not_to have_key :override_score
+                end
+              end
             end
 
-            it "returns the course current score" do
-              expect(json_enrollment.fetch(:computed_current_score)).to be 63.0
+            context "when Final Grade Override is not allowed" do
+              before(:each) { course.update!(allow_final_grade_override: false) }
+
+              it "does not include an override_grade key" do
+                expect(json_enrollment).not_to have_key :override_grade
+              end
+
+              it "does not include an override_score key" do
+                expect(json_enrollment).not_to have_key :override_score
+              end
             end
 
-            it "returns the course final grade" do
-              expect(json_enrollment.fetch(:computed_final_grade)).to eq "C-"
-            end
+            context "when Final Grade Override is disabled" do
+              before(:each) { course.disable_feature!(:final_grades_override) }
 
-            it "returns the course final score" do
-              expect(json_enrollment.fetch(:computed_final_score)).to be 73.0
-            end
+              it "does not include an override_grade key" do
+                expect(json_enrollment).not_to have_key :override_grade
+              end
 
-            it "returns the course current grade, even if override is present and feature enabled" do
-              @course_score.update!(override_score: 99.0)
-              expect(json_enrollment.fetch(:computed_current_grade)).to eq "D-"
-            end
-
-            it "returns the course current score, even if override is present and feature enabled" do
-              @course_score.update!(override_score: 99.0)
-              expect(json_enrollment.fetch(:computed_current_score)).to be 63.0
-            end
-
-            it "returns the course final grade, even if override is present and feature enabled" do
-              @course_score.update!(override_score: 99.0)
-              expect(json_enrollment.fetch(:computed_final_grade)).to eq "C-"
-            end
-
-            it "returns the course final score, even if override is present and feature enabled" do
-              @course_score.update!(override_score: 99.0)
-              expect(json_enrollment.fetch(:computed_final_score)).to be 73.0
-            end
-
-            it "returns the override grade if present and feature enabled" do
-              @course_score.update!(override_score: 99.0)
-              expect(json_enrollment.fetch(:override_grade)).to eq "A"
-            end
-
-            it "returns the override score if present and feature enabled" do
-              @course_score.update!(override_score: 99.0)
-              expect(json_enrollment.fetch(:override_score)).to be 99.0
-            end
-
-            it "does not return the override grade if feature disabled" do
-              course.disable_feature!(:final_grades_override)
-              @course_score.update!(override_score: 99.0)
-              expect(json_enrollment.keys).not_to include :override_grade
-            end
-
-            it "does not return the override score if feature disabled" do
-              course.disable_feature!(:final_grades_override)
-              @course_score.update!(override_score: 99.0)
-              expect(json_enrollment.keys).not_to include :override_score
+              it "does not include an override_score key" do
+                expect(json_enrollment).not_to have_key :override_score
+              end
             end
           end
         end
@@ -221,55 +273,97 @@ module Api
                 title: "gp1"
               )
               @gp_score = student_enrollment.scores.find_by!(grading_period: gp1)
-              @gp_score.update!(current_score: 63, final_score: 73)
-              course.update!(grading_standard_enabled: true)
+              @gp_score.update!(current_score: 63, final_score: 73, override_score: 99)
               course.enable_feature!(:final_grades_override)
+              course.update!(allow_final_grade_override: true, grading_standard_enabled: true)
             end
 
-            it "returns the grading period current grade" do
-              expect(json_enrollment.fetch(:current_period_computed_current_grade)).to eq "D-"
+            context "when Final Grade Override is enabled and allowed" do
+              context "when a grade override exists" do
+                it "sets current_period_computed_current_grade to the override grade" do
+                  expect(json_enrollment.fetch(:current_period_computed_current_grade)).to eq "A"
+                end
+
+                it "sets current_period_computed_current_score to the override score" do
+                  expect(json_enrollment.fetch(:current_period_computed_current_score)).to be 99.0
+                end
+
+                it "sets current_period_computed_final_grade to the override grade" do
+                  expect(json_enrollment.fetch(:current_period_computed_final_grade)).to eq "A"
+                end
+
+                it "sets current_period_computed_final_score to the override score" do
+                  expect(json_enrollment.fetch(:current_period_computed_final_score)).to be 99.0
+                end
+
+                it "does not include a current_period_override_grade key" do
+                  expect(json_enrollment).not_to have_key :current_period_override_grade
+                end
+
+                it "does not include a current_period_override_score key" do
+                  expect(json_enrollment).not_to have_key :current_period_override_score
+                end
+              end
+
+              context "when no grade override exists" do
+                before(:each) { @gp_score.update!(override_score: nil) }
+
+                it "sets current_period_computed_current_grade to the computed current grade" do
+                  expect(json_enrollment.fetch(:current_period_computed_current_grade)).to eq "D-"
+                end
+
+                it "sets current_period_computed_current_score to the computed current score" do
+                  expect(json_enrollment.fetch(:current_period_computed_current_score)).to be 63.0
+                end
+
+                it "sets current_period_computed_final_grade to the computed final grade" do
+                  expect(json_enrollment.fetch(:current_period_computed_final_grade)).to eq "C-"
+                end
+
+                it "sets current_period_computed_final_score to the computed final score" do
+                  expect(json_enrollment.fetch(:current_period_computed_final_score)).to be 73.0
+                end
+              end
             end
 
-            it "returns the grading period current score" do
-              expect(json_enrollment.fetch(:current_period_computed_current_score)).to be 63.0
+            context "when Final Grade Override is not allowed" do
+              before(:each) { course.update!(allow_final_grade_override: false) }
+
+              it "sets current_period_computed_current_grade to the computed current grade" do
+                expect(json_enrollment.fetch(:current_period_computed_current_grade)).to eq "D-"
+              end
+
+              it "sets current_period_computed_current_score to the computed current score" do
+                expect(json_enrollment.fetch(:current_period_computed_current_score)).to be 63.0
+              end
+
+              it "sets current_period_computed_final_grade to the computed final grade" do
+                expect(json_enrollment.fetch(:current_period_computed_final_grade)).to eq "C-"
+              end
+
+              it "sets current_period_computed_final_score to the computed final score" do
+                expect(json_enrollment.fetch(:current_period_computed_final_score)).to be 73.0
+              end
             end
 
-            it "returns the grading period final grade" do
-              expect(json_enrollment.fetch(:current_period_computed_final_grade)).to eq "C-"
-            end
+            context "when Final Grade Override is disabled" do
+              before(:each) { course.disable_feature!(:final_grades_override) }
 
-            it "returns the grading period final score" do
-              expect(json_enrollment.fetch(:current_period_computed_final_score)).to be 73.0
-            end
+              it "sets current_period_computed_current_grade to the computed current grade" do
+                expect(json_enrollment.fetch(:current_period_computed_current_grade)).to eq "D-"
+              end
 
-            it "returns the override grade in place of current grade if present and feature enabled" do
-              @gp_score.update!(override_score: 99.0)
-              expect(json_enrollment.fetch(:current_period_computed_current_grade)).to eq "A"
-            end
+              it "sets current_period_computed_current_score to the computed current score" do
+                expect(json_enrollment.fetch(:current_period_computed_current_score)).to be 63.0
+              end
 
-            it "returns the override score in place of current score if present and feature enabled" do
-              @gp_score.update!(override_score: 99.0)
-              expect(json_enrollment.fetch(:current_period_computed_current_score)).to be 99.0
-            end
+              it "sets current_period_computed_final_grade to the computed final grade" do
+                expect(json_enrollment.fetch(:current_period_computed_final_grade)).to eq "C-"
+              end
 
-            it "returns the override grade in place of final grade if present and feature enabled" do
-              @gp_score.update!(override_score: 99.0)
-              expect(json_enrollment.fetch(:current_period_computed_final_grade)).to eq "A"
-            end
-
-            it "returns the override score in place of final score if present and feature enabled" do
-              @gp_score.update!(override_score: 99.0)
-              expect(json_enrollment.fetch(:current_period_computed_final_score)).to be 99.0
-            end
-
-            it "does not return an override_grade key" do
-              @gp_score.update!(override_score: 99.0)
-              expect(json_enrollment.keys).not_to include :override_grade
-            end
-
-            it "does not return an override_score key" do
-              @gp_score.update!(override_score: 99.0)
-              expect(json_enrollment.keys).not_to include :override_score
+              it "sets current_period_computed_final_score to the computed final score" do
+                expect(json_enrollment.fetch(:current_period_computed_final_score)).to be 73.0
+              end
             end
           end
 
@@ -289,10 +383,10 @@ module Api
                 start_date: 1.day.ago,
                 title: "gp1"
               )
-              @gp_score = student_enrollment.scores.find_by!(grading_period: @gp1)
-              @gp_score.update!(current_score: 63, final_score: 73)
-              course.update!(grading_standard_enabled: true)
               course.enable_feature!(:final_grades_override)
+              course.update!(allow_final_grade_override: true, grading_standard_enabled: true)
+              @gp_score = student_enrollment.scores.find_by!(grading_period: @gp1)
+              @gp_score.update!(current_score: 63, final_score: 73, override_score: 99)
             end
 
             it "doesn't error when there is no grading period" do
@@ -300,62 +394,68 @@ module Api
               expect { json_enrollment.fetch(:current_period_computed_current_score) }.to_not raise_error
             end
 
-            it "returns the grading period current grade" do
-              expect(json_enrollment.fetch(:current_period_computed_current_grade)).to eq "D-"
+            context "when Final Grade Override is enabled and allowed" do
+              context "when a grade override exists" do
+                it "sets computed_current_grade to the computed current grade" do
+                  expect(json_enrollment.fetch(:current_period_computed_current_grade)).to eq "D-"
+                end
+
+                it "sets computed_current_score to the computed current score" do
+                  expect(json_enrollment.fetch(:current_period_computed_current_score)).to be 63.0
+                end
+
+                it "sets computed_final_grade to the computed final grade" do
+                  expect(json_enrollment.fetch(:current_period_computed_final_grade)).to eq "C-"
+                end
+
+                it "sets computed_final_score to the computed final score" do
+                  expect(json_enrollment.fetch(:current_period_computed_final_score)).to be 73.0
+                end
+
+                it "sets override_grade to the override grade" do
+                  expect(json_enrollment.fetch(:current_period_override_grade)).to eq "A"
+                end
+
+                it "sets override_score to the override score" do
+                  expect(json_enrollment.fetch(:current_period_override_score)).to be 99.0
+                end
+              end
+
+              context "when no grade override exists" do
+                before(:each) { @gp_score.update!(override_score: nil) }
+
+                it "does not include a current_period_override_grade key" do
+                  expect(json_enrollment).not_to have_key :current_period_override_grade
+                end
+
+                it "does not include a current_period_override_score key" do
+                  expect(json_enrollment).not_to have_key :current_period_override_score
+                end
+              end
             end
 
-            it "returns the grading period current score" do
-              expect(json_enrollment.fetch(:current_period_computed_current_score)).to be 63.0
+            context "when Final Grade Override is not allowed" do
+              before(:each) { course.update!(allow_final_grade_override: false) }
+
+              it "does not include a current_period_override_grade key" do
+                expect(json_enrollment).not_to have_key :current_period_override_grade
+              end
+
+              it "does not include a current_period_override_score key" do
+                expect(json_enrollment).not_to have_key :current_period_override_score
+              end
             end
 
-            it "returns the grading period final grade" do
-              expect(json_enrollment.fetch(:current_period_computed_final_grade)).to eq "C-"
-            end
+            context "when Final Grade Override is disabled" do
+              before(:each) { course.disable_feature!(:final_grades_override) }
 
-            it "returns the grading period final score" do
-              expect(json_enrollment.fetch(:current_period_computed_final_score)).to be 73.0
-            end
+              it "does not include a current_period_override_grade key" do
+                expect(json_enrollment).not_to have_key :current_period_override_grade
+              end
 
-            it "returns the grading period current grade, even if override is present and feature enabled" do
-              @gp_score.update!(override_score: 99.0)
-              expect(json_enrollment.fetch(:current_period_computed_current_grade)).to eq "D-"
-            end
-
-            it "returns the grading period current score, even if override is present and feature enabled" do
-              @gp_score.update!(override_score: 99.0)
-              expect(json_enrollment.fetch(:current_period_computed_current_score)).to be 63.0
-            end
-
-            it "returns the grading period final grade, even if override is present and feature enabled" do
-              @gp_score.update!(override_score: 99.0)
-              expect(json_enrollment.fetch(:current_period_computed_final_grade)).to eq "C-"
-            end
-
-            it "returns the grading period final score, even if override is present and feature enabled" do
-              @gp_score.update!(override_score: 99.0)
-              expect(json_enrollment.fetch(:current_period_computed_final_score)).to be 73.0
-            end
-
-            it "returns the override score if present and feature enabled" do
-              @gp_score.update!(override_score: 99.0)
-              expect(json_enrollment.fetch(:current_period_override_score)).to be 99.0
-            end
-
-            it "returns the override grade if present and feature enabled" do
-              @gp_score.update!(override_score: 99.0)
-              expect(json_enrollment.fetch(:current_period_override_grade)).to eq "A"
-            end
-
-            it "does not return the override grade if feature disabled" do
-              course.disable_feature!(:final_grades_override)
-              @gp_score.update!(override_score: 99.0)
-              expect(json_enrollment.keys).not_to include :current_period_override_grade
-            end
-
-            it "does not return the override score if feature disabled" do
-              course.disable_feature!(:final_grades_override)
-              @gp_score.update!(override_score: 99.0)
-              expect(json_enrollment.keys).not_to include :current_period_override_score
+              it "does not include a current_period_override_score key" do
+                expect(json_enrollment).not_to have_key :current_period_override_score
+              end
             end
           end
         end

@@ -68,10 +68,10 @@ module LtiAdvantage::Models
       end
 
       it 'verifies "accept_media_types" is an array' do
-        setting.accept_media_types = 'foo'
+        setting.accept_media_types = ['foo']
         setting.validate
         expect(setting.errors[:accept_media_types]).to match_array [
-          "accept_media_types must be an instance of Array"
+          "accept_media_types must be an instance of String"
         ]
       end
 

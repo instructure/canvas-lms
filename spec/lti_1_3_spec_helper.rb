@@ -28,14 +28,16 @@ RSpec.shared_context "lti_1_3_spec_helper", shared_context: :metadata do
 
   let(:developer_key) { DeveloperKey.create!(account: account) }
 
-  let(:launch_url) { 'http://lti13testtool.docker/blti_launch' }
+  let(:target_link_uri) { 'http://lti13testtool.docker/blti_launch' }
 
   let(:tool_configuration) do
     Lti::ToolConfiguration.create!(
       developer_key: developer_key,
-      settings: settings
+      settings: settings.merge(public_jwk: tool_config_public_jwk)
     )
   end
+
+  let(:tool_config_public_jwk) { public_jwk }
 
   let(:public_jwk) do
     {
@@ -48,16 +50,18 @@ RSpec.shared_context "lti_1_3_spec_helper", shared_context: :metadata do
     }
   end
 
-  let(:oidc_login_uri) { 'https://www.test.com/oidc/login' }
+  let(:oidc_initiation_url) { 'http://lti13testtool.docker/blti_launch' }
+  let(:scopes) { [] }
 
   let(:settings) do
     {
       'title' => 'LTI 1.3 Tool',
       'description' => '1.3 Tool',
-      'target_link_uri' => launch_url,
+      'target_link_uri' => target_link_uri,
       'custom_fields' => {'has_expansion' => '$Canvas.user.id', 'no_expansion' => 'foo'},
       'public_jwk' => public_jwk,
-      'oidc_login_uri' => oidc_login_uri,
+      'oidc_initiation_url' => oidc_initiation_url,
+      'scopes' => scopes,
       'extensions' =>  [
         {
           'platform' => 'canvas.instructure.com',
@@ -69,15 +73,27 @@ RSpec.shared_context "lti_1_3_spec_helper", shared_context: :metadata do
             'selection_height' => 500,
             'selection_width' => 500,
             'text' => 'LTI 1.3 Test Tool Extension text',
-            'course_navigation' =>  {
-              'message_type' => 'LtiResourceLinkRequest',
-              'canvas_icon_class' => 'icon-lti',
-              'icon_url' => 'https://static.thenounproject.com/png/131630-211.png',
-              'text' => 'LTI 1.3 Test Tool Course Navigation',
-              'target_link_uri' =>
-              'http://lti13testtool.docker/launch?placement=course_navigation',
-              'enabled' => true
-            }
+            'placements' => [
+              {
+                'placement' => 'course_navigation',
+                'message_type' => 'LtiResourceLinkRequest',
+                'canvas_icon_class' => 'icon-lti',
+                'icon_url' => 'https://static.thenounproject.com/png/131630-211.png',
+                'text' => 'LTI 1.3 Test Tool Course Navigation',
+                'target_link_uri' =>
+                'http://lti13testtool.docker/launch?placement=course_navigation',
+                'enabled' => true
+              },
+              {
+                'placement' => 'account_navigation',
+                'message_type' => 'LtiResourceLinkRequest',
+                'canvas_icon_class' => 'icon-lti',
+                'icon_url' => 'https://static.thenounproject.com/png/131630-211.png',
+                'target_link_uri' => 'http://lti13testtool.docker/launch?placement=account_navigation',
+                'text' => 'LTI 1.3 Test Tool Course Navigation',
+                'enabled' => true
+              }
+            ]
           }
         }
       ]

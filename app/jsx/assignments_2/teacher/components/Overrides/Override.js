@@ -32,7 +32,7 @@ Override.propTypes = {
   readOnly: bool
 }
 Override.defaultProps = {
-  readOnly: true
+  readOnly: false
 }
 
 export default function Override(props) {

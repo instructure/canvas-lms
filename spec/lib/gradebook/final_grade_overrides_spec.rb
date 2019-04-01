@@ -23,6 +23,7 @@ describe Gradebook::FinalGradeOverrides do
   before(:once) do
     @course = Course.create!
     @course.enable_feature!(:final_grades_override)
+    @course.update!(allow_final_grade_override: true)
 
     grading_period_group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
     @course.enrollment_term.grading_period_group = grading_period_group

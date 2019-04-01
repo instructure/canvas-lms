@@ -41,7 +41,7 @@ describe "conversations new" do
       expect(errors[1].text).to include('Required field')
     end
 
-    it "should start a group conversation when there is only one recipient", :xbrowser, priority: "2", test_id: 201499 do
+    it "should start a group conversation when there is only one recipient", priority: "2", test_id: 201499 do
       skip_if_chrome('fragile in chrome')
       conversations
       compose course: @course, to: [@s1], subject: 'single recipient', body: 'hallo!'
@@ -50,7 +50,7 @@ describe "conversations new" do
       expect(c.private?).to be_falsey
     end
 
-    it "should start a group conversation when there is more than one recipient", :xbrowser, priority: "2", test_id: 201500 do
+    it "should start a group conversation when there is more than one recipient", priority: "2", test_id: 201500 do
       skip_if_chrome('fragile in chrome')
       conversations
       compose course: @course, to: [@s1, @s2], subject: 'multiple recipients', body: 'hallo!'

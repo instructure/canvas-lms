@@ -18,120 +18,123 @@
 
 import React from 'react'
 import {render} from 'react-testing-library'
-import AssignmentModules from '../AssignmentModules'
+import {AssignmentModulesUI as AssignmentModules} from '../AssignmentModules'
 
 function makeModuleList() {
   return [{lid: '1', name: 'Module 1'}, {lid: '2', name: 'Module 2'}, {lid: '3', name: 'Module 3'}]
 }
-it('renders the given assignment modules in view mode', () => {
-  const moduleList = makeModuleList()
 
-  const {getByText, getByTestId} = render(
-    <AssignmentModules
-      mode="view"
-      onChange={() => {}}
-      onChangeMode={() => {}}
-      moduleList={moduleList}
-      selectedModules={moduleList.slice(0, 2)}
-    />
-  )
-  expect(getByTestId('SelectableText')).toBeInTheDocument()
-  expect(getByText('Module 1 | Module 2')).toBeInTheDocument()
-})
+describe('AssignmentModulesUI', () => {
+  it('renders the given assignment modules in view mode', () => {
+    const moduleList = makeModuleList()
 
-it('renders the given assignment modules in edit mode', () => {
-  const moduleList = makeModuleList()
-
-  const {getByText, getByTestId} = render(
-    <AssignmentModules
-      mode="edit"
-      onChange={() => {}}
-      onChangeMode={() => {}}
-      moduleList={moduleList}
-      selectedModules={moduleList.slice(1, 3)}
-    />
-  )
-  expect(getByTestId('SelectableText')).toBeInTheDocument()
-  expect(getByText(moduleList[1].name)).toBeInTheDocument()
-  expect(getByText(moduleList[2].name)).toBeInTheDocument()
-})
-
-it('renders the placeholder when not given a value in view mode', () => {
-  const moduleList = makeModuleList()
-
-  const {getByText, getByTestId} = render(
-    <AssignmentModules
-      mode="view"
-      onChange={() => {}}
-      onChangeMode={() => {}}
-      moduleList={moduleList}
-    />
-  )
-  expect(getByTestId('SelectableText')).toBeInTheDocument()
-  expect(getByText('No Module Assigned')).toBeInTheDocument()
-})
-
-it('renders the placeholder when not given a value in edit mode', () => {
-  const moduleList = makeModuleList()
-
-  const {container, getByTestId} = render(
-    <AssignmentModules
-      mode="view"
-      onChange={() => {}}
-      onChangeMode={() => {}}
-      moduleList={moduleList}
-    />
-  )
-  expect(getByTestId('SelectableText')).toBeInTheDocument()
-  // I don't know of any other way to test this w/o peeking into SelectMultiple's impl
-  expect(container.querySelectorAll('button')).toHaveLength(0)
-})
-
-it('calls onChange when the selection changes', () => {
-  const onchange = jest.fn()
-  const onchangemode = jest.fn()
-  const moduleList = makeModuleList()
-
-  const {container} = render(
-    <div>
-      <AssignmentModules
-        mode="edit"
-        onChange={onchange}
-        onChangeMode={onchangemode}
-        moduleList={moduleList}
-        selectedModules={moduleList.slice(0, 1)}
-        readOnly={false}
-      />
-      <span id="click-me" tabIndex="-1">
-        just here to get focus
-      </span>
-    </div>
-  )
-
-  const input = container.querySelectorAll('input')[1] // SelectMultiple has 2 inputs
-  input.click()
-  const option = document.querySelectorAll('li[role="option"]')[0]
-  option.click()
-  container.querySelector('#click-me').focus()
-  expect(onchangemode).toHaveBeenCalledWith('view')
-  expect(onchange).not.toHaveBeenCalled()
-
-  // it takes a re-render in view to get onChange called
-  render(
-    <div>
+    const {getByText, getByTestId} = render(
       <AssignmentModules
         mode="view"
-        onChange={onchange}
-        onChangeMode={onchangemode}
+        onChange={() => {}}
+        onChangeMode={() => {}}
         moduleList={moduleList}
         selectedModules={moduleList.slice(0, 2)}
-        readOnly={false}
       />
-      <span id="click-me" tabIndex="-1">
-        just here to get focus
-      </span>
-    </div>,
-    {container}
-  )
-  expect(onchange).toHaveBeenCalledWith(moduleList.slice(0, 2))
+    )
+    expect(getByTestId('SelectableText')).toBeInTheDocument()
+    expect(getByText('Module 1 | Module 2')).toBeInTheDocument()
+  })
+
+  it('renders the given assignment modules in edit mode', () => {
+    const moduleList = makeModuleList()
+
+    const {getByText, getByTestId} = render(
+      <AssignmentModules
+        mode="edit"
+        onChange={() => {}}
+        onChangeMode={() => {}}
+        moduleList={moduleList}
+        selectedModules={moduleList.slice(1, 3)}
+      />
+    )
+    expect(getByTestId('SelectableText')).toBeInTheDocument()
+    expect(getByText(moduleList[1].name)).toBeInTheDocument()
+    expect(getByText(moduleList[2].name)).toBeInTheDocument()
+  })
+
+  it('renders the placeholder when not given a value in view mode', () => {
+    const moduleList = makeModuleList()
+
+    const {getByText, getByTestId} = render(
+      <AssignmentModules
+        mode="view"
+        onChange={() => {}}
+        onChangeMode={() => {}}
+        moduleList={moduleList}
+      />
+    )
+    expect(getByTestId('SelectableText')).toBeInTheDocument()
+    expect(getByText('No Module Assigned')).toBeInTheDocument()
+  })
+
+  it('renders the placeholder when not given a value in edit mode', () => {
+    const moduleList = makeModuleList()
+
+    const {container, getByTestId} = render(
+      <AssignmentModules
+        mode="view"
+        onChange={() => {}}
+        onChangeMode={() => {}}
+        moduleList={moduleList}
+      />
+    )
+    expect(getByTestId('SelectableText')).toBeInTheDocument()
+    // I don't know of any other way to test this w/o peeking into SelectMultiple's impl
+    expect(container.querySelectorAll('button')).toHaveLength(0)
+  })
+
+  it('calls onChange when the selection changes', () => {
+    const onchange = jest.fn()
+    const onchangemode = jest.fn()
+    const moduleList = makeModuleList()
+
+    const {container} = render(
+      <div>
+        <AssignmentModules
+          mode="edit"
+          onChange={onchange}
+          onChangeMode={onchangemode}
+          moduleList={moduleList}
+          selectedModules={moduleList.slice(0, 1)}
+          readOnly={false}
+        />
+        <span id="focus-me" tabIndex="-1">
+          just here to get focus
+        </span>
+      </div>
+    )
+
+    const input = container.querySelectorAll('input')[1] // SelectMultiple has 2 inputs
+    input.click()
+    const option = document.querySelectorAll('li[role="option"]')[0]
+    option.click()
+    container.querySelector('#focus-me').focus()
+    expect(onchangemode).toHaveBeenCalledWith('view')
+    expect(onchange).not.toHaveBeenCalled()
+
+    // it takes a re-render in view to get onChange called
+    render(
+      <div>
+        <AssignmentModules
+          mode="view"
+          onChange={onchange}
+          onChangeMode={onchangemode}
+          moduleList={moduleList}
+          selectedModules={moduleList.slice(0, 2)}
+          readOnly={false}
+        />
+        <span id="click-me" tabIndex="-1">
+          just here to get focus
+        </span>
+      </div>,
+      {container}
+    )
+    expect(onchange).toHaveBeenCalledWith(moduleList.slice(0, 2))
+  })
 })

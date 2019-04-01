@@ -17,23 +17,34 @@
 #
 
 module Types
-  CoursePermissionsType = GraphQL::ObjectType.define do
-    name "CoursePermissions"
+  class CoursePermissionsType < ApplicationObjectType
+    graphql_name "CoursePermissions"
 
-    field :manageGrades, types.Boolean, resolve: ->(perm_loader, _, ctx) {
+    alias perm_loader object
+
+    field :manage_grades, Boolean, null: true
+    def manage_grades
       perm_loader.load(:manage_grades)
-    }
-    field :sendMessages, types.Boolean, resolve: ->(perm_loader, _, ctx) {
+    end
+
+    field :send_messages, Boolean, null: true
+    def send_messages
       perm_loader.load(:send_messages)
-    }
-    field :viewAllGrades, types.Boolean, resolve: ->(perm_loader, _, ctx) {
+    end
+
+    field :view_all_grades, Boolean, null: true
+    def view_all_grades
       perm_loader.load(:view_all_grades)
-    }
-    field :viewAnalytics, types.Boolean, resolve: ->(perm_loader, _, ctx) {
+    end
+
+    field :view_analytics, Boolean, null: true
+    def view_analytics
       perm_loader.load(:view_analytics)
-    }
-    field :becomeUser, types.Boolean, resolve: ->(perm_loader, _, ctx) {
+    end
+
+    field :become_user, Boolean, null: true
+    def become_user
       perm_loader.load(:become_user)
-    }
+    end
   end
 end

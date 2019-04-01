@@ -217,7 +217,7 @@ describe Quizzes::QuizzesApiController, type: :request do
     context "unpublished quiz" do
       before do
         @quiz = @course.quizzes.create! :title => 'title'
-        @quiz.quiz_questions.create!(:question_data => { :name => "test 1" })
+        @quiz.quiz_questions.create!(:question_data => { :name => "test 1", :question_type => "essay_question" })
         @quiz.save!
 
         @json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}",

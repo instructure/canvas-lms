@@ -708,6 +708,9 @@ class SubmissionsApiController < ApplicationController
   #   The points awarded for this row.
   #     rubric_assessment[criterion_id][points]
   #
+  #   The rating id for the row.
+  #     rubric_assessment[criterion_id][rating_id]
+  #
   #   Comments to add for this row.
   #     rubric_assessment[criterion_id][comments]
   #
@@ -721,8 +724,8 @@ class SubmissionsApiController < ApplicationController
   #         'description': 'Criterion 1',
   #         'ratings':
   #         [
-  #           { 'description': 'Good', 'points': 10 },
-  #           { 'description': 'Poor', 'points': 3 }
+  #           { 'id': 'rat1', 'description': 'Good', 'points': 10 },
+  #           { 'id': 'rat2', 'description': 'Poor', 'points': 3 }
   #         ]
   #       },
   #       {
@@ -731,14 +734,15 @@ class SubmissionsApiController < ApplicationController
   #         'description': 'Criterion 2',
   #         'ratings':
   #         [
-  #           { 'description': 'Complete', 'points': 5 },
-  #           { 'description': 'Incomplete', 'points': 0 }
+  #           { 'id': 'rat1', 'description': 'Exemplary', 'points': 5 },
+  #           { 'id': 'rat2', 'description': 'Complete', 'points': 5 },
+  #           { 'id': 'rat3', 'description': 'Incomplete', 'points': 0 }
   #         ]
   #       }
   #     ]
   #
   #   Then a possible set of values for rubric_assessment would be:
-  #       rubric_assessment[crit1][points]=3&rubric_assessment[crit2][points]=5&rubric_assessment[crit2][comments]=Well%20Done.
+  #       rubric_assessment[crit1][points]=3&rubric_assessment[crit1][rating_id]=rat1&rubric_assessment[crit2][points]=5&rubric_assessment[crit2][rating_id]=rat2&rubric_assessment[crit2][comments]=Well%20Done.
   def update
     @assignment = @context.assignments.active.find(params[:assignment_id])
 

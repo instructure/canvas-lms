@@ -32,13 +32,13 @@ module CC
     delegate :add_error, :set_progress, :export_object?, :export_symbol?, :for_course_copy, :add_item_to_export, :add_exported_asset, :create_key, :to => :@manifest
     delegate :referenced_files, :to => :@html_exporter
 
-    def initialize(manifest, manifest_node)
+    def initialize(manifest, manifest_node, resources=nil)
       @manifest = manifest
       @manifest_node = manifest_node
       @course = @manifest.course
       @user = @manifest.user
       @export_dir = @manifest.export_dir
-      @resources = nil
+      @resources = resources
       @zip_file = manifest.zip_file
       # if set to "flash video", this'll export the smaller, post-conversion
       # flv files rather than the larger original files.

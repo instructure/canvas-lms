@@ -127,30 +127,9 @@ Delayed::Worker.lifecycle.around(:perform) do |worker, job, &block|
 
   starting_mem = Canvas.sample_memory()
   starting_cpu = Process.times()
-  lag = ((Time.now - job.run_at) * 1000).round
-  obj_tag, method_tag = job.tag.split(/[\.#]/, 2).map do |v|
-    CanvasStatsd::Statsd.escape(v).gsub("::", "-")
-  end
-  method_tag ||= "unknown"
-  shard_id = job.current_shard.try(:id).to_i
-  strand = job.strand && DelayedJobConfig.strands_to_send_to_statsd.include?(job.strand) && job.strand.gsub('/', '-')
-  stats = []
-  # don't count stranded jobs in global queued stats; they're likely waiting for each other, and not
-  # indicative of overall jobs health
-  unless job.strand
-    stats = ["delayedjob.queue", "delayedjob.queue.shard.#{shard_id}", "delayedjob.queue.jobshard.#{job.shard.id}"]
-  end
-  stats << "delayedjob.queue.tag.#{obj_tag}.#{method_tag}"
-  stats << "delayedjob.queue.strand.#{strand}" if strand
-  CanvasStatsd::Statsd.timing(stats, lag)
 
   begin
-    stats = ["delayedjob.perform", "delayedjob.perform.tag.#{obj_tag}.#{method_tag}", "delayedjob.perform.shard.#{shard_id}"]
-    stats << "delayedjob.perform.jobshard.#{job.shard.id}" if job.respond_to?(:shard)
-    stats << "delayedjob.perform.strand.#{strand}" if strand
-    CanvasStatsd::Statsd.time(stats) do
-      block.call(worker, job)
-    end
+    block.call(worker, job)
   ensure
     ending_cpu = Process.times()
     ending_mem = Canvas.sample_memory()
@@ -167,29 +146,11 @@ Delayed::Worker.lifecycle.around(:perform) do |worker, job, &block|
   end
 end
 
-Delayed::Worker.lifecycle.around(:pop) do |worker, &block|
-  CanvasStatsd::Statsd.time(["delayedjob.pop", "delayedjob.pop.jobshard.#{Shard.current(:delayed_jobs).id}"]) do
-    block.call(worker)
-  end
-end
-
-Delayed::Worker.lifecycle.around(:work_queue_pop) do |worker, config, &block|
-  CanvasStatsd::Statsd.time(["delayedjob.workqueuepop", "delayedjob.workqueuepop.jobshard.#{Shard.current(:delayed_jobs).id}"]) do
-    block.call(worker, config)
-  end
-end
-
 Delayed::Worker.lifecycle.before(:perform) do |_worker, _job|
   # Since AdheresToPolicy::Cache uses an instance variable class cache lets clear
   # it so we start with a clean slate.
   AdheresToPolicy::Cache.clear
   LoadAccount.clear_shard_cache
-end
-
-Delayed::Worker.lifecycle.around(:perform) do |worker, job, &block|
-  CanvasStatsd::Statsd.batch do
-    block.call(worker, job)
-  end
 end
 
 Delayed::Worker.lifecycle.before(:exceptional_exit) do |worker, exception|

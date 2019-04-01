@@ -64,3 +64,8 @@ export function updateLatePolicy(courseId, latePolicyData) {
   const data = {late_policy: underscore(latePolicyData)}
   return axios.patch(url, data)
 }
+
+export function updateCourseSettings(courseId, settings) {
+  const url = `/api/v1/courses/${courseId}/settings`
+  return axios.put(url, underscore(settings)).then(response => ({data: camelize(response.data)}))
+}

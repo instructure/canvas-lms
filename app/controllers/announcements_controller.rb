@@ -25,7 +25,6 @@ class AnnouncementsController < ApplicationController
   before_action { |c| c.active_tab = "announcements" }
 
   def announcements_locked?
-    return true if @context.account.lock_all_announcements[:locked]
     return false unless @context.is_a?(Course)
     @context.lock_all_announcements?
   end

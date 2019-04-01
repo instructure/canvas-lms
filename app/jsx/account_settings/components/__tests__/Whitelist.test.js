@@ -258,7 +258,7 @@ describe('ConnectedWhitelist', () => {
 
     it('shows an information message indicating that switching to custom will allow changes', () => {
       const {getByText} = renderWithRedux(
-        <ConnectedWhitelist context="account" contextId="1" inherited />,
+        <ConnectedWhitelist context="account" contextId="1" inherited isSubAccount />,
         {
           initialState: {
             whitelistedDomains: {
@@ -309,7 +309,7 @@ describe('ConnectedWhitelist', () => {
 
     it('does not allow adding items to the list', () => {
       const {getByLabelText} = renderWithRedux(
-        <ConnectedWhitelist context="account" contextId="1" inherited />,
+        <ConnectedWhitelist context="account" contextId="1" inherited isSubAccount />,
         {
           initialState: {
             whitelistedDomains: {
@@ -326,7 +326,7 @@ describe('ConnectedWhitelist', () => {
 
     it('does not allow removing items from the list', () => {
       const {getByText} = renderWithRedux(
-        <ConnectedWhitelist context="account" contextId="1" inherited />,
+        <ConnectedWhitelist context="account" contextId="1" inherited isSubAccount />,
         {
           initialState: {
             whitelistedDomains: {

@@ -27,10 +27,17 @@ describe('start', () => {
     const fixtures = document.createElement('div')
     fixtures.setAttribute('id', 'fixtures')
     document.body.appendChild(fixtures)
+
+    const fakeAxios = {
+      put: jest.fn(() => ({then() {}})),
+      get: jest.fn(() => ({then() {}}))
+    }
+
     expect(() => {
       start(fixtures, {
         context: 'account',
-        contextId: '1'
+        contextId: '1',
+        api: fakeAxios
       })
     }).not.toThrowError()
   })

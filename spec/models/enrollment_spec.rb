@@ -330,6 +330,7 @@ describe Enrollment do
         @enrollment.scores.create!(course_score: true, current_score: 88.0)
         @enrollment.scores.create!(grading_period_id: period.id, current_score: 82.0)
         @course.enable_feature!(:final_grades_override)
+        @course.update!(allow_final_grade_override: true)
       end
 
       before(:each) do
@@ -349,9 +350,15 @@ describe Enrollment do
         expect(@enrollment.effective_current_grade).to eq "A"
       end
 
-      it "does not return the override grade if the feature is not enabled" do
-        @course.disable_feature!(:final_grades_override)
+      it "does not return the override grade if the feature is not allowed" do
         @enrollment.scores.find_by(course_score: true).update!(override_score: 97.0)
+        @course.update!(allow_final_grade_override: false)
+        expect(@enrollment.effective_current_grade).to eq "B+"
+      end
+
+      it "does not return the override grade if the feature is not enabled" do
+        @enrollment.scores.find_by(course_score: true).update!(override_score: 97.0)
+        @course.disable_feature!(:final_grades_override)
         expect(@enrollment.effective_current_grade).to eq "B+"
       end
 
@@ -374,6 +381,7 @@ describe Enrollment do
       before(:once) do
         @enrollment = StudentEnrollment.create!(valid_enrollment_attributes)
         @course.enable_feature!(:final_grades_override)
+        @course.update!(allow_final_grade_override: true)
       end
 
       it "returns the course current score" do
@@ -391,9 +399,15 @@ describe Enrollment do
         expect(@enrollment.effective_current_score).to eq 97.0
       end
 
-      it "does not return the override score if the feature is not enabled" do
-        @course.disable_feature!(:final_grades_override)
+      it "does not return the override score if the feature is not allowed" do
         @enrollment.scores.create!(current_score: 79.0, override_score: 97.0)
+        @course.update!(allow_final_grade_override: false)
+        expect(@enrollment.effective_current_score).to eq 79.0
+      end
+
+      it "does not return the override score if the feature is not enabled" do
+        @enrollment.scores.create!(current_score: 79.0, override_score: 97.0)
+        @course.disable_feature!(:final_grades_override)
         expect(@enrollment.effective_current_score).to eq 79.0
       end
     end
@@ -413,6 +427,7 @@ describe Enrollment do
         @enrollment.scores.create!(course_score: true, final_score: 88.0)
         @enrollment.scores.create!(grading_period_id: period.id, final_score: 82.0)
         @course.enable_feature!(:final_grades_override)
+        @course.update!(allow_final_grade_override: true)
       end
 
       before(:each) do
@@ -432,9 +447,15 @@ describe Enrollment do
         expect(@enrollment.effective_final_grade).to eq "A"
       end
 
-      it "does not return the override grade if the feature is not enabled" do
-        @course.disable_feature!(:final_grades_override)
+      it "does not return the override grade if the feature is not allowed" do
         @enrollment.scores.find_by(course_score: true).update!(override_score: 97.0)
+        @course.update!(allow_final_grade_override: false)
+        expect(@enrollment.effective_final_grade).to eq "B+"
+      end
+
+      it "does not return the override grade if the feature is not enabled" do
+        @enrollment.scores.find_by(course_score: true).update!(override_score: 97.0)
+        @course.disable_feature!(:final_grades_override)
         expect(@enrollment.effective_final_grade).to eq "B+"
       end
 
@@ -459,6 +480,7 @@ describe Enrollment do
         @enrollment.scores.create!(course_score: true, final_score: 88.0)
         @enrollment.scores.create!(grading_period_id: period.id, final_score: 82.0)
         @course.enable_feature!(:final_grades_override)
+        @course.update!(allow_final_grade_override: true)
       end
 
       it "returns the course final score" do
@@ -474,9 +496,16 @@ describe Enrollment do
         expect(@enrollment.effective_current_score).to eq 97.0
       end
 
-      it "does not return the override score if the feature is not enabled" do
-        @course.disable_feature!(:final_grades_override)
+      it "does not return the override score if the feature is not allowed" do
         @enrollment.scores.find_by(course_score: true).update!(override_score: 97.0)
+        @course.disable_feature!(:final_grades_override)
+        @course.update!(allow_final_grade_override: false)
+        expect(@enrollment.effective_final_score).to be 88.0
+      end
+
+      it "does not return the override score if the feature is not enabled" do
+        @enrollment.scores.find_by(course_score: true).update!(override_score: 97.0)
+        @course.disable_feature!(:final_grades_override)
         expect(@enrollment.effective_final_score).to be 88.0
       end
     end
@@ -487,12 +516,18 @@ describe Enrollment do
         @course = @enrollment.course
         @score = @enrollment.scores.create!(course_score: true, final_score: 19)
         @course.enable_feature!(:final_grades_override)
+        @course.update!(allow_final_grade_override: true)
       end
 
       before(:each) do
         @course.enable_feature!(:final_grades_override)
         @course.update!(grading_standard_enabled: true)
         @score.update!(override_score: 99.0)
+      end
+
+      it "returns nil if final_grades_override is not allowed" do
+        @course.update!(allow_final_grade_override: false)
+        expect(@enrollment.override_grade).to be nil
       end
 
       it "returns nil if final_grades_override is not enabled" do
@@ -533,11 +568,16 @@ describe Enrollment do
         @course = @enrollment.course
         @score = @enrollment.scores.create!(course_score: true, final_score: 19)
         @course.enable_feature!(:final_grades_override)
+        @course.update!(allow_final_grade_override: true)
       end
 
       before(:each) do
-        @course.enable_feature!(:final_grades_override)
         @score.update!(override_score: 99.0)
+      end
+
+      it "returns nil if final_grades_override is not allowed" do
+        @course.update!(allow_final_grade_override: false)
+        expect(@enrollment.override_score).to be nil
       end
 
       it "returns nil if final_grades_override is not enabled" do

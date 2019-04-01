@@ -17,15 +17,19 @@
  */
 import I18n from 'i18n!assignments_2'
 import React from 'react'
+import ReactPlayer from 'react-player'
 import {CommentShape} from '../../assignmentData'
 import Avatar from '@instructure/ui-elements/lib/components/Avatar'
+import Link from '@instructure/ui-elements/lib/components/Link'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import FriendlyDatetime from '../../../../shared/FriendlyDatetime'
+import {getIconByType} from '../../../../shared/helpers/mimeClassIconHelper'
 
 function CommentRow(props) {
   const author = props.comment.author
+  const mediaObject = props.comment.mediaObject
   return (
-    <div className="comment-row-container">
+    <div className="comment-row-container" data-testid="comment-row">
       <div className="comment-avatar-container">
         <Avatar
           name={author ? author.shortName : I18n.t('Anonymous')}
@@ -43,6 +47,23 @@ function CommentRow(props) {
           />
         </Text>
         <Text>{props.comment.comment}</Text>
+        {props.comment.attachments.map(attachment => (
+          <Link
+            key={attachment._id}
+            href={attachment.url}
+            icon={getIconByType(attachment.mimeClass)}
+          >
+            {attachment.displayName}
+          </Link>
+        ))}
+        {mediaObject && (
+          <ReactPlayer
+            height={mediaObject.mediaType !== 'audio' ? '360px' : '70px'}
+            url={mediaObject.mediaSources}
+            config={{file: {attributes: {title: mediaObject.title}}}}
+            controls
+          />
+        )}
       </div>
     </div>
   )

@@ -40,10 +40,9 @@ module Lti::Messages
       @message = LtiAdvantage::Messages::DeepLinkingRequest.new
     end
 
-    def generate_post_payload_message
-      super
+    def generate_post_payload_message(validate_launch: true)
       add_deep_linking_request_claims!
-      @message
+      super(validate_launch: validate_launch)
     end
 
     private

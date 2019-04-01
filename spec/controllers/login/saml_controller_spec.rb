@@ -87,6 +87,28 @@ describe Login::SamlController do
     expect(response).to redirect_to(login_url)
   end
 
+  it "searches for assertion issuer" do
+    unique_id = 'foo@example.com'
+
+    account1 = account_with_saml
+    user1 = user_with_pseudonym({:active_all => true, :username => unique_id})
+    @pseudonym.account = account1
+    @pseudonym.save!
+
+    allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
+      [double('response2',
+              errors: [],
+              issuer: nil,
+              assertions: [double(issuer: double(id: 'such a lie'))]),
+       nil]
+    )
+    allow_any_instance_of(SAML2::Entity).to receive(:valid_response?)
+
+    controller.request.env['canvas.domain_root_account'] = account1
+    post :create, params: {:SAMLResponse => "foo"}
+    expect(response).to redirect_to(login_url)
+  end
+
   it "should redirect when a user is authenticated but is not found in canvas" do
     unique_id = 'foo@example.com'
 

@@ -25,14 +25,27 @@ import TruncateText from '@instructure/ui-elements/lib/components/TruncateText'
 import View from '@instructure/ui-layout/lib/components/View'
 import I18n from 'i18n!hide_assignment_grades_tray'
 
+import Layout from './Layout'
+import {hideAssignmentGrades, resolveHideAssignmentGradesStatus} from './Api'
+import {showFlashAlert} from '../../shared/FlashAlert'
+
+function initialShowState() {
+  return {
+    hidingGrades: false,
+    open: true
+  }
+}
+
 export default class HideAssignmentGradesTray extends PureComponent {
   constructor(props) {
     super(props)
 
     this.dismiss = this.dismiss.bind(this)
     this.show = this.show.bind(this)
+    this.onHideClick = this.onHideClick.bind(this)
 
     this.state = {
+      hidingGrades: false,
       open: false
     }
   }
@@ -44,8 +57,30 @@ export default class HideAssignmentGradesTray extends PureComponent {
   show(context) {
     this.setState({
       ...context,
-      open: true
+      ...initialShowState()
     })
+  }
+
+  async onHideClick() {
+    const {assignment} = this.state
+
+    this.setState({hidingGrades: true})
+
+    try {
+      const progress = await hideAssignmentGrades(assignment.id)
+      await resolveHideAssignmentGradesStatus(progress)
+      showFlashAlert({
+        message: I18n.t('Assignment grades successfully hidden.'),
+        type: 'success'
+      })
+      this.dismiss()
+    } catch (error) {
+      showFlashAlert({
+        message: I18n.t('There was a problem hiding assignment grades.'),
+        type: 'error'
+      })
+      this.setState({hidingGrades: false})
+    }
   }
 
   render() {
@@ -75,6 +110,13 @@ export default class HideAssignmentGradesTray extends PureComponent {
             </FlexItem>
           </Flex>
         </View>
+
+        <Layout
+          assignment={assignment}
+          dismiss={this.dismiss}
+          hidingGrades={this.state.hidingGrades}
+          onHideClick={this.onHideClick}
+        />
       </Tray>
     )
   }

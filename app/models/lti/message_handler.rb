@@ -105,5 +105,18 @@ module Lti
       )
     end
 
+    def recreate_missing_subscriptions
+      # Only attempt to recreate subscriptions for account level plagiarism tools
+      return unless tool_proxy&.context.is_a?(Account) &&
+        capabilities&.include?(Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2)
+
+      AssignmentConfigurationToolLookup.send_later_enqueue_args(
+        :recreate_missing_subscriptions,
+        { n_strand: AssignmentConfigurationToolLookup::SUBSCRIPTION_MANAGEMENT_STRAND },
+        tool_proxy.context,
+        self
+      )
+    end
+
   end
 end

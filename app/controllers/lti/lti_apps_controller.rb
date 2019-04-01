@@ -22,7 +22,7 @@ module Lti
 
     def index
       if authorized_action(@context, @current_user, :read_as_admin)
-        if params.key? :lti_1_3_tool_configurations
+        if params.key? :v1p3
           lti_tools_1_3
         else
           lti_tools_1_1_and_2_0
@@ -60,9 +60,12 @@ module Lti
     def lti_tools_1_3
       collection = tool_configs.each_with_object([]) do |tool, memo|
         config = {}
+        dk_id = tool.developer_key_id
         config[:config] = tool
-        config[:enabled] = dev_key_ids_of_installed_tools.include?(tool.developer_key_id)
-        config[:installed_in_current_course] = context_types_of_installed_tools.include?('Course')
+        config[:installed_for_context] = active_tools_for_key_context_combos.key?(dk_id)
+        config[:installed_tool_id] = active_tools_for_key_context_combos[dk_id]&.first&.last #get the cet id if present
+        # TODO: fix the issue where it shows installed at account when installed at course
+        config[:installed_at_context_level] = active_tools_for_key_context_combos.dig(dk_id, "#{@context.id}#{@context.class.name}").present?
         memo << config
       end
 
@@ -71,20 +74,28 @@ module Lti
       end
     end
 
-    def dev_key_ids_of_installed_tools
-      @installed_tools ||= active_tools_keys_and_contexts.map(&:first)
-    end
-
-    def context_types_of_installed_tools
-      @context_types_of_installed_tools ||= active_tools_keys_and_contexts.map(&:second)
-    end
-
-    def active_tools_keys_and_contexts
+    def active_tools_for_key_context_combos
       @active_tools ||= begin
-        ContextExternalTool.
-          active.
-          where(developer_key: dev_keys, context_id: [@context.id] + @context.account_chain_ids).
-          pluck(:developer_key_id, :context_type)
+        q = if @context.class.name == 'Course'
+              ContextExternalTool.
+                active.
+                where(developer_key: dev_keys, context_id: @context.id, context_type: @context.class.name).
+                or(
+                  ContextExternalTool.
+                  active.
+                  where(developer_key: dev_keys, context_id: @context.account_chain_ids, context_type: 'Account')
+                )
+            else
+              ContextExternalTool.
+                active.
+                where(
+                  developer_key: dev_keys, context_id: [@context.id] + @context.account_chain_ids, context_type: @context.class.name
+                )
+            end
+        q.pluck(:developer_key_id, :context_id, :context_type, :id).each_with_object({}) do |key, memo|
+          memo[key.first] ||= {}
+          memo[key.first]["#{key.second}#{key.third}"] = key.fourth
+        end
       end
     end
 
@@ -114,7 +125,7 @@ module Lti
     end
 
     def app_collator
-      @app_collator = AppCollator.new(@context, method(:reregistration_url_builder))
+      @app_collator ||= AppCollator.new(@context, method(:reregistration_url_builder))
     end
 
     def reregistration_url_builder(context, tool_proxy_id)

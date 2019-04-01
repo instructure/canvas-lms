@@ -24,8 +24,8 @@
 
 class CspSettingsController < ApplicationController
   before_action :require_context, :require_user
-  before_action :require_read_permissions, only: [:get_csp_settings]
-  before_action :require_permissions, except: [:get_csp_settings]
+  before_action :require_read_permissions, only: [:get_csp_settings, :csp_log]
+  before_action :require_permissions, except: [:get_csp_settings, :csp_log]
   before_action :get_domain, :only => [:add_domain, :remove_domain]
 
   # @API Get current settings for account or course
@@ -149,6 +149,16 @@ class CspSettingsController < ApplicationController
     end
   end
 
+  # @API Retrieve reported CSP Violations for account
+  #
+  # Must be called on a root account.
+  def csp_log
+    return render status: 400, json: { message: 'must be called on a root account' } unless @context.root_account?
+    return render status: 503, json: { message: 'CSP logging is not configured on the server' } unless (ss = @context.csp_logging_config['shared_secret'])
+
+    render json: CanvasHttp.get("#{@context.csp_logging_config['host']}report/#{@context.global_id}", 'Authorization' => "Bearer #{ss}").body
+  end
+
   # @API Remove a domain from account whitelist
   #
   # Removes a domain from the whitelist for the current account.
@@ -184,7 +194,7 @@ class CspSettingsController < ApplicationController
       :inherited => @context.csp_inherited?,
       :settings_locked => @context.csp_locked?,
     }
-    json[:effective_whitelist] = @context.csp_whitelisted_domains if @context.csp_enabled?
+    json[:effective_whitelist] = @context.csp_whitelisted_domains(request, include_files: false, include_tools: true) if @context.csp_enabled?
     if @context.is_a?(Account)
       tools_whitelist = {}
       @context.csp_tools_grouped_by_domain.each do |domain, tools|

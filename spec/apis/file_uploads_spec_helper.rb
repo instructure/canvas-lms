@@ -49,6 +49,7 @@ shared_examples_for "file uploads api" do
       'display_name' => attachment.display_name,
       'filename' => attachment.filename,
       'workflow_state' => "processed",
+      'upload_status' => "success",
       'size' => attachment.size,
       'unlock_at' => attachment.unlock_at ? attachment.unlock_at.as_json : nil,
       'locked' => !!attachment.locked,
@@ -124,6 +125,7 @@ shared_examples_for "file uploads api" do
         'hidden_for_user' => false,
         'created_at' => attachment.created_at.as_json,
         'updated_at' => attachment.updated_at.as_json,
+        'upload_status' => "success",
         'thumbnail_url' => attachment.has_thumbnail? ? thumbnail_image_url(attachment, attachment.uuid, host: 'www.example.com') : nil,
         'modified_at' => attachment.modified_at.as_json,
         'mime_class' => attachment.mime_class,
@@ -314,10 +316,9 @@ shared_examples_for "file uploads api" do
   end
 
   def run_download_job
-    expect(Delayed::Job.list_jobs(:tag, 10, 0, 'Services::SubmitHomeworkService::SubmitWorker#perform').length).to be > 0
+    expect(Delayed::Job.where("tag like '#{Services::SubmitHomeworkService}::%'").count).to be > 0
     run_jobs
   end
-
 end
 
 shared_examples_for "file uploads api with folders" do

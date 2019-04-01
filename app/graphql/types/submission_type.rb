@@ -55,10 +55,26 @@ module Types
     end
     private :protect_submission_grades
 
-    field :comments_connection, SubmissionCommentType.connection_type, null: true
-    def comments_connection
+    field :attempt, Integer, null: false
+    def attempt
+      submission.attempt || 0 # Nil in database, make it 0 here for easier api
+    end
+
+    field :comments_connection, SubmissionCommentType.connection_type, null: true do
+      argument :filter, Types::SubmissionCommentFilterInputType, required: false
+    end
+    def comments_connection(filter: nil)
+      filter ||= {}
       load_association(:assignment).then do
-        submission.comments_for(current_user).published
+        scope = submission.comments_for(current_user).published
+        if filter[:attempts].present?
+          # Attempt 0 is represented as attempt nil in the database. It proved
+          # to be a PITA to try and chagne that, so we are fixing it up at the
+          # API boundary instead
+          attempts = filter[:attempts].map{ |i| i == 0 ? nil : i }
+          scope = scope.where(attempt: attempts)
+        end
+        scope
       end
     end
 

@@ -24,6 +24,7 @@ import Heading from '@instructure/ui-elements/lib/components/Heading'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import View from '@instructure/ui-layout/lib/components/View'
 import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
+import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import Grid, {GridCol, GridRow} from '@instructure/ui-layout/lib/components/Grid'
 import {
   getCspEnabled,
@@ -47,7 +48,8 @@ export class SecurityPanel extends Component {
     getCspInherited: func.isRequired,
     setCspInherited: func.isRequired,
     getCurrentWhitelist: func.isRequired,
-    isSubAccount: bool
+    isSubAccount: bool,
+    whitelistsHaveLoaded: bool
   }
 
   static defaultProps = {
@@ -108,18 +110,24 @@ export class SecurityPanel extends Component {
                 label={I18n.t('Enable Content Security Policy')}
                 onChange={this.handleCspToggleChange}
                 checked={this.props.cspEnabled}
-                disabled={this.props.cspInherited}
+                disabled={this.props.cspInherited && this.props.isSubAccount}
               />
             </GridCol>
           </GridRow>
           <GridRow>
             <GridCol>
-              <ConnectedWhitelist
-                context={this.props.context}
-                contextId={this.props.contextId}
-                isSubAccount={this.props.isSubAccount}
-                inherited={this.props.cspInherited}
-              />
+              {!this.props.whitelistsHaveLoaded ? (
+                <View as="div" margin="large" padding="large" textAlign="center">
+                  <Spinner size="large" title={I18n.t('Loading')} />
+                </View>
+              ) : (
+                <ConnectedWhitelist
+                  context={this.props.context}
+                  contextId={this.props.contextId}
+                  isSubAccount={this.props.isSubAccount}
+                  inherited={this.props.cspInherited}
+                />
+              )}
             </GridCol>
           </GridRow>
         </Grid>
@@ -132,7 +140,8 @@ function mapStateToProps(state, ownProps) {
   return {
     ...ownProps,
     cspEnabled: state.cspEnabled,
-    cspInherited: state.cspInherited
+    cspInherited: state.cspInherited,
+    whitelistsHaveLoaded: state.whitelistsHaveLoaded
   }
 }
 

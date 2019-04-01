@@ -32,7 +32,7 @@ class Mutations::HideAssignmentGrades < Mutations::BaseMutation
       raise GraphQL::ExecutionError, "not found"
     end
 
-    return nil unless authorized_action?(assignment, :grade)
+    verify_authorized_action!(assignment, :grade)
     raise GraphQL::ExecutionError, "Post Policies feature not enabled" unless course.feature_enabled?(:post_policies)
 
     unless assignment.grades_published?

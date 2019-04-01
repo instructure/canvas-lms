@@ -64,6 +64,14 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       const unmounted = ReactDOM.unmountComponentAtNode($trayContainer)
       strictEqual(unmounted, true)
     })
+
+    test('renders the assignment "Grade Posting Policy" tray', () => {
+      createPostPolicies()
+      postPolicies.initialize()
+      const $trayContainer = document.getElementById('assignment-posting-policy-tray')
+      const unmounted = ReactDOM.unmountComponentAtNode($trayContainer)
+      strictEqual(unmounted, true)
+    })
   })
 
   QUnit.module('#destroy()', () => {
@@ -84,6 +92,15 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       const unmounted = ReactDOM.unmountComponentAtNode($trayContainer)
       strictEqual(unmounted, false)
     })
+
+    test('unmounts the assignment "Grade Posting Policy" tray', () => {
+      createPostPolicies()
+      postPolicies.initialize()
+      postPolicies.destroy()
+      const $trayContainer = document.getElementById('assignment-posting-policy-tray')
+      const unmounted = ReactDOM.unmountComponentAtNode($trayContainer)
+      strictEqual(unmounted, false)
+    })
   })
 
   QUnit.module('#showHideAssignmentGradesTray()', hooks => {
@@ -93,6 +110,7 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       const assignment = {
         anonymize_students: false,
         course_id: '1201',
+        grades_published: true,
         html_url: 'http://localhost/assignments/2301',
         id: '2301',
         invalid: false,
@@ -124,6 +142,12 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       postPolicies.showHideAssignmentGradesTray({assignmentId: '2301'})
       const [{assignment}] = postPolicies._hideAssignmentGradesTray.show.lastCall.args
       strictEqual(assignment.name, 'Math 1.1')
+    })
+
+    test('includes the assignment grades_published', () => {
+      postPolicies.showHideAssignmentGradesTray({assignmentId: '2301'})
+      const [{assignment}] = postPolicies._hideAssignmentGradesTray.show.lastCall.args
+      strictEqual(assignment.gradesPublished, true)
     })
 
     test('includes the `onExited` callback when showing the "Hide Assignment Grades" tray', () => {
@@ -178,6 +202,54 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       const callback = sinon.stub()
       postPolicies.showPostAssignmentGradesTray({assignmentId: '2301', onExited: callback})
       const [{onExited}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
+      strictEqual(onExited, callback)
+    })
+  })
+
+  QUnit.module('#showAssignmentPostingPolicyTray()', hooks => {
+    hooks.beforeEach(() => {
+      createPostPolicies()
+
+      const assignment = {
+        anonymize_students: false,
+        course_id: '1201',
+        html_url: 'http://localhost/assignments/2301',
+        id: '2301',
+        invalid: false,
+        muted: false,
+        name: 'Math 1.1',
+        omit_from_final_grade: false,
+        points_possible: 10,
+        published: true,
+        submission_types: ['online_text_entry']
+      }
+      gradebook.setAssignments({2301: assignment})
+
+      postPolicies.initialize()
+      sinon.stub(postPolicies._assignmentPolicyTray, 'show')
+    })
+
+    test('shows the assignment "Grade Posting Policy" tray', () => {
+      postPolicies.showAssignmentPostingPolicyTray({assignmentId: '2301'})
+      strictEqual(postPolicies._assignmentPolicyTray.show.callCount, 1)
+    })
+
+    test('includes the assignment id when showing the "Post Assignment Grades" tray', () => {
+      postPolicies.showAssignmentPostingPolicyTray({assignmentId: '2301'})
+      const [{assignment}] = postPolicies._assignmentPolicyTray.show.lastCall.args
+      strictEqual(assignment.id, '2301')
+    })
+
+    test('includes the assignment name when showing the "Post Assignment Grades" tray', () => {
+      postPolicies.showAssignmentPostingPolicyTray({assignmentId: '2301'})
+      const [{assignment}] = postPolicies._assignmentPolicyTray.show.lastCall.args
+      strictEqual(assignment.name, 'Math 1.1')
+    })
+
+    test('includes the `onExited` callback when showing the "Post Assignment Grades" tray', () => {
+      const callback = sinon.stub()
+      postPolicies.showAssignmentPostingPolicyTray({assignmentId: '2301', onExited: callback})
+      const [{onExited}] = postPolicies._assignmentPolicyTray.show.lastCall.args
       strictEqual(onExited, callback)
     })
   })

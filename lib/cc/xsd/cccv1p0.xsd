@@ -59,8 +59,10 @@
         <xs:element name="tab_configuration" type="xs:string" minOccurs="0"/>
         <xs:element name="is_public" type="xs:boolean" minOccurs="0"/>
         <xs:element name="is_public_to_auth_users" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="overridden_course_visibility" type="xs:string" minOccurs="0"/>
         <xs:element name="indexed" type="xs:boolean" minOccurs="0"/>
         <xs:element name="publish_grades_immediately" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="allow_final_grade_override" type="xs:boolean" minOccurs="0"/>
         <xs:element name="allow_student_wiki_edits" type="xs:boolean" minOccurs="0"/>
         <xs:element name="allow_student_assignment_edits" type="xs:boolean" minOccurs="0"/>
         <xs:element name="hashtag" type="xs:string" minOccurs="0"/>

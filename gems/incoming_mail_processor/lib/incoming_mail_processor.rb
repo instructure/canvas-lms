@@ -18,7 +18,7 @@
 require "html_text_helper"
 require "mail"
 require "utf8_cleaner"
-require "canvas_statsd"
+require "inst_statsd"
 
 module IncomingMailProcessor
   require "incoming_mail_processor/pop3_mailbox"

@@ -98,6 +98,8 @@ Rails.application.config.after_initialize do
     delegate :in_current_region?, to: :database_server
 
     scope :in_region, ->(region) do
+      next in_current_region if region.nil?
+
       servers = DatabaseServer.all.select { |db| db.in_region?(region) }.map(&:id)
       if servers.include?(Shard.default.database_server.id)
         where("database_server_id IN (?) OR database_server_id IS NULL", servers)
@@ -107,16 +109,15 @@ Rails.application.config.after_initialize do
     end
 
     scope :in_current_region, -> do
-      @current_region_scope ||=
-        if !default.is_a?(Switchman::Shard)
-          # sharding isn't set up? maybe we're in tests, or a somehow degraded environment
-          # either way there's only one shard, and we always want to see it
-          [default]
-        elsif !ApplicationController.region || DatabaseServer.all.all? { |db| !db.config[:region] }
-          all
-        else
-          in_region(ApplicationController.region)
-        end
+      if !default.is_a?(Switchman::Shard)
+        # sharding isn't set up? maybe we're in tests, or a somehow degraded environment
+        # either way there's only one shard, and we always want to see it
+        [default]
+      elsif !ApplicationController.region || DatabaseServer.all.all? { |db| !db.config[:region] }
+        all
+      else
+        in_region(ApplicationController.region)
+      end
     end
   end
 

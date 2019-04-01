@@ -17,7 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../helpers/graphql_type_tester')
+require_relative "../graphql_spec_helper"
 
 describe Types::ModuleType do
   let_once(:course) { course_with_student(active_all: true); @course }
@@ -45,5 +45,13 @@ describe Types::ModuleType do
     item1 = mod.add_item({type: 'Assignment', id: a1.id}, nil, position: 1)
     item2 = mod.add_item({type: 'Assignment', id: a2.id}, nil, position: 2)
     expect(module_type.resolve("moduleItems { _id }")).to eq [item2.id.to_s]
+  end
+
+  it "orders module items by position" do
+    a1 = assignment_model({context: course, name: 'zzz'})
+    a2 = assignment_model({context: course, name: 'aaa'})
+    item2 = mod.add_item({type: 'Assignment', id: a2.id}, nil, position: 2)
+    item1 = mod.add_item({type: 'Assignment', id: a1.id}, nil, position: 1)
+    expect(module_type.resolve("moduleItems { _id }")).to eq [item1.id.to_s, item2.id.to_s]
   end
 end

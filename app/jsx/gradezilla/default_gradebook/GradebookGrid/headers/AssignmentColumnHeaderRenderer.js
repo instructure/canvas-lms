@@ -115,6 +115,15 @@ function getProps(column, gradebook, options) {
     removeGradebookElement: gradebook.keyboardNav.removeGradebookElement,
     reuploadSubmissionsAction: gradebook.getReuploadSubmissionsAction(assignmentId),
     setDefaultGradeAction: gradebook.getSetDefaultGradeAction(assignmentId),
+
+    showGradePostingPolicyAction: {
+      onSelect(onExited) {
+        if (gradebook.postPolicies) {
+          gradebook.postPolicies.showAssignmentPostingPolicyTray({assignmentId, onExited})
+        }
+      }
+    },
+
     showUnpostedMenuItem: gradebook.options.new_gradebook_development_enabled,
 
     sortBySetting: {

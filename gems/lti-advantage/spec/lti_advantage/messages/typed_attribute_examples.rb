@@ -18,10 +18,10 @@
 RSpec.shared_context 'typed_attribute_examples' do
   shared_examples_for 'validations for a JWT LTI message' do
     it 'verifies that "aud" is an array' do
-      message.aud = 'invalid-claim'
+      message.aud = 1
       message.validate
       expect(message.errors.messages[:aud]).to match_array [
-        'aud must be an instance of Array'
+        'aud must be an instance of one of Array, String'
       ]
     end
 

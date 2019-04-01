@@ -17,6 +17,7 @@
 #
 
 require "spec_helper"
+require_relative "../graphql_spec_helper"
 
 describe Mutations::HideAssignmentGrades do
   let(:assignment) { course.assignments.create! }

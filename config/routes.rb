@@ -2173,6 +2173,7 @@ CanvasRails::Application.routes.draw do
       post "accounts/:account_id/csp_settings/domains", :action => :add_domain
       post "accounts/:account_id/csp_settings/domains/batch_create", :action => :add_multiple_domains
       delete "accounts/:account_id/csp_settings/domains", :action => :remove_domain
+      get "accounts/:account_id/csp_log", action: :csp_log
     end
   end
 

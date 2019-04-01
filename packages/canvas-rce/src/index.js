@@ -18,3 +18,5 @@
 
 export { renderIntoDiv } from "./rce/root";
 export { renderIntoDiv as renderSidebarIntoDiv } from "./sidebar/root";
+
+console.log('Using enhanced RCE')

@@ -19,7 +19,7 @@ require 'active_support'
 require 'active_record'
 require 'bookmarked_collection'
 require 'canvas_cassandra'
-require 'canvas_statsd'
+require 'inst_statsd'
 
 module EventStream
   require 'event_stream/attr_config'

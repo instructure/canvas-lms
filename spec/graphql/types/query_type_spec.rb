@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
+require_relative "../graphql_spec_helper"
 
 describe Types::QueryType do
   it "works" do

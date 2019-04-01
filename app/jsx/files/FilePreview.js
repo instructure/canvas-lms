@@ -219,9 +219,11 @@ export default class FilePreview extends React.PureComponent {
 
   renderPreview = () => {
     if (this.state.displayedItem && this.state.displayedItem.get('preview_url')) {
+      const html = this.state.displayedItem.get('content-type') === 'text/html'
       const iFrameClasses = classnames({
         'ef-file-preview-frame': true,
-        'ef-file-preview-frame-html': this.state.displayedItem.get('content-type') === 'text/html'
+        'ef-file-preview-frame-html': html,
+        'attachment-html-iframe': html
       })
 
       return (
