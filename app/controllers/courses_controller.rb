@@ -1423,8 +1423,10 @@ class CoursesController < ApplicationController
   def accept_enrollment(enrollment)
     if @current_user && enrollment.user == @current_user
       if enrollment.workflow_state == 'invited'
-        DueDateCacher.with_executing_user(@current_user) do
-          enrollment.accept!
+        Shackles.activate(:master) do
+          DueDateCacher.with_executing_user(@current_user) do
+            enrollment.accept!
+          end
         end
         @pending_enrollment = nil
         flash[:notice] = t('notices.invitation_accepted', 'Invitation accepted!  Welcome to %{course}!', :course => @context.name)
@@ -1458,7 +1460,9 @@ class CoursesController < ApplicationController
   # Returns nothing.
   def reject_enrollment(enrollment)
     if enrollment.invited?
-      enrollment.reject!
+      Shackles.activate(:master) do
+        enrollment.reject!
+      end
       flash[:notice] = t('notices.invitation_cancelled', 'Invitation canceled.')
     end
 
