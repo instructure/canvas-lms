@@ -34,7 +34,6 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
   let component
   let gradebook
   let props
-  let qunitTimeout
 
   let updatedCourseSettings
   let fetchedLatePolicy
@@ -49,9 +48,6 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
   let updateCourseSettingsPromise
 
   suiteHooks.beforeEach(() => {
-    qunitTimeout = QUnit.config.testTimeout
-    QUnit.config.testTimeout = 1000 // protect against unresolved async mistakes
-
     $container = document.createElement('div')
     document.body.appendChild($container)
 
@@ -146,8 +142,6 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
     await ensureModalIsClosed()
     ReactDOM.unmountComponentAtNode($container)
     $container.remove()
-
-    QUnit.config.testTimeout = qunitTimeout
   })
 
   function mountComponent() {
