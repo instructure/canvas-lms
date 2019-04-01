@@ -44,10 +44,10 @@ module Messages
         if assignment.anonymize_students? && asset.author != message_recipient
           anonymous_name
         else
-          asset.can_read_author?(asset.recipient, nil) ? source_user.short_name : anonymous_name
+          asset.can_read_author?(asset.recipient, nil) ? source_user&.short_name : anonymous_name
         end
       else
-        source_user.short_name
+        source_user&.short_name
       end
     end
 
