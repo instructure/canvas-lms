@@ -151,7 +151,9 @@ class ContentTag < ActiveRecord::Base
       next unless klass < ActiveRecord::Base
       next if klass < Tableless
       if klass.new.respond_to?(:could_be_locked=)
-        klass.where(:id => ids).update_all(:could_be_locked => true)
+        klass.transaction do
+          klass.where(id: klass.where(id: ids).lock_in_order).update_all(could_be_locked: true)
+        end
       end
     end
   end
