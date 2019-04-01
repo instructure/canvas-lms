@@ -338,4 +338,22 @@ describe EpubExport do
       expect(@ce.messages_sent['Content Export Failed']).to be_blank
     end
   end
+
+  it "should escape html characters in titles" do
+    course_with_student(active_all: true)
+    assignment = @course.assignments.create!({
+      title: 'here you go </html> lol',
+      description: "beep beep"
+    })
+
+    EpubExports::CreateService.new(@course, @student, :epub_export).save
+    run_jobs
+
+    epub_export = @course.epub_exports.where(:user_id => @student).first
+    expect(epub_export).to be_generated
+    path = epub_export.epub_attachment.open(:need_local_file => true).path
+    zip_file = Zip::File.open(path)
+    html = zip_file.read(zip_file.entries.map(&:name).detect{|n| n.include?("assignments")})
+    expect(html).to include("here you go &lt;/html&gt; lol")
+  end
 end

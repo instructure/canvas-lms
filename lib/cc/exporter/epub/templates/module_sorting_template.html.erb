@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title><%= title %></title>
+  <title><%= HtmlTextHelper.escape_html(title) %></title>
   <%= style %>
 </head>
   <body>
-    <h1 id="<%= content[:identifier]%>"><%= title %></h1>
+    <h1 id="<%= content[:identifier]%>"><%= HtmlTextHelper.escape_html(title) %></h1>
     <ol>
     <% content[:items].each do |item| %>
       <li>
         <% if item[:href] %>
-          <a href="#<%= "#{item[:linked_resource_id]}" %>"><%= item[:title] %></a>
+          <a href="#<%= "#{item[:linked_resource_id]}" %>"><%= HtmlTextHelper.escape_html(item[:title]) %></a>
         <% else %>
-          <p><%= item[:title] %></p>
+          <p><%= HtmlTextHelper.escape_html(item[:title]) %></p>
         <% end %>
       </li>
     <% end %>
@@ -43,11 +43,11 @@
       <% content[:items].each do |item| %>
         <%=
           build(item) ||
-          content_tag(:div, I18n.t("%{item_name} is not currently supported", { item_name: item[:title] }))
+          content_tag(:div, I18n.t("%{item_name} is not currently supported", { item_name: HtmlTextHelper.escape_html(item[:title]) }))
         %>
         <hr/>
         <p><a href="<%= "##{reference}.xhtml" %>">
-          <%= I18n.t("Back to %{title}", title: title) %>
+          <%= I18n.t("Back to %{title}", title: HtmlTextHelper.escape_html(title)) %>
         </a></p>
         <p><a href="toc.xhtml"><%= I18n.t("Back to Table of Contents") %></a></p>
         <div style="page-break-before:always;"></div>

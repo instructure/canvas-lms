@@ -11,14 +11,14 @@
       <p><%= I18n.t("There are no announcements for this course.") %></p>
     <% else %>
       <% content.each do |item| %>
-        <li><a href="#<%= "#{item[:identifier]}" %>"><%= item[:title] %></a></li>
+        <li><a href="#<%= "#{item[:identifier]}" %>"><%= HtmlTextHelper.escape_html(item[:title]) %></a></li>
       <% end %>
       </ol>
       <hr/>
       <p><a href="toc.xhtml"><%= I18n.t("Back to Table of Contents") %></a></p>
       <div style="page-break-before:always;"></div>
       <% content.each do |item| %>
-        <h2 id="<%="#{item[:identifier]}"%>"><%= item[:title] %></h2>
+        <h2 id="<%="#{item[:identifier]}"%>"><%= HtmlTextHelper.escape_html(item[:title]) %></h2>
         <p><%= convert_placeholder_paths_from_string!(item[:description]) %></p>
         <hr/>
         <a href="announcements.xhtml"><%= I18n.t("Back to Announcements") %></a>
