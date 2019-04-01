@@ -1,0 +1,38 @@
+version: "3"
+services:
+
+  canvasdb:
+    image: postgres:9.3
+    volumes:
+      - canvas-db:/var/lib/postgresql/data
+    networks:
+      - frontend
+    environment:
+      POSTGRES_USER: canvas
+      POSTGRES_DB: canvas
+  
+  canvasredis:
+    image: redis:2.6
+    networks:
+      - frontend
+
+  canvasweb:
+    build:
+      context: .
+    command: /app/docker-compose/scripts/run.sh
+    ports:
+      - "3000:3000"
+    networks:
+      - frontend
+    depends_on:
+      - canvasdb
+      - canvasredis
+    environment:
+      RACK_ENV: development
+      VIRTUAL_HOST: .canvas.docker
+
+networks:
+  frontend:
+
+volumes:
+  canvas-db:
