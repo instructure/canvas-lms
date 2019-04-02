@@ -46,15 +46,11 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
 
   let $container
   let props
-  let qunitTimeout
   let resolvePositioned
   let selectedGrade
   let wrapper
 
   suiteHooks.beforeEach(() => {
-    qunitTimeout = QUnit.config.testTimeout
-    QUnit.config.testTimeout = 1000 // prevent accidental unresolved async
-
     $container = document.createElement('div')
     document.body.appendChild($container)
 
@@ -115,7 +111,6 @@ QUnit.module('GradeSummary GradeSelect', suiteHooks => {
       await clickOff()
     }
     wrapper.unmount()
-    QUnit.config.testTimeout = qunitTimeout
   })
 
   function mountComponent() {
