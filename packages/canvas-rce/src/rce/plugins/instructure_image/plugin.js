@@ -48,16 +48,6 @@ tinymce.create("tinymce.plugins.InstructureImagePlugin", {
         });
       }
     });
-  },
-
-  getInfo: function() {
-    return {
-      longname: "Instructure image",
-      author: "Instructure",
-      authorurl: "http://instructure.com",
-      infourl: "http://instructure.com",
-      version: "1"
-    };
   }
 });
 

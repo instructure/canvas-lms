@@ -34,16 +34,6 @@ tinymce.create("tinymce.plugins.InstructureLinks", {
       cmd: "instructureLinks",
       icon: "link"
     });
-  },
-
-  getInfo() {
-    return {
-      longname: "InstructureLinks",
-      author: "Brian Whitmer",
-      authorurl: "http://www.instructure.com",
-      infourl: "http://www.instructure.com",
-      version: tinymce.majorVersion + "." + tinymce.minorVersion
-    };
   }
 });
 

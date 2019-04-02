@@ -33,16 +33,6 @@ tinymce.create("tinymce.plugins.InstructureRecord", {
       cmd: "instructureRecord",
       icon: "video icon-video"
     });
-  },
-
-  getInfo: function() {
-    return {
-      longname: "InstructureRecord",
-      author: "Brian Whitmer",
-      authorurl: "http://www.instructure.com",
-      infourl: "http://www.instructure.com",
-      version: tinymce.majorVersion + "." + tinymce.minorVersion
-    };
   }
 });
 

@@ -34,16 +34,6 @@ tinymce.create("tinymce.plugins.InstructureEquella", {
       cmd: "instructureEquella",
       icon: "equella icon-equella"
     });
-  },
-
-  getInfo: function() {
-    return {
-      longname: "InstructureEquella",
-      author: "Brian Whitmer",
-      authorurl: "http://www.instructure.com",
-      infourl: "http://www.instructure.com",
-      version: tinymce.majorVersion + "." + tinymce.minorVersion
-    };
   }
 });
 
