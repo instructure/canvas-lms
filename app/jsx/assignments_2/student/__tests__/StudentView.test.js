@@ -107,5 +107,5 @@ it('renders error', async () => {
     </MockedProvider>
   )
 
-  expect(await waitForElement(() => getByText('Something broke unexpectedly.'))).toBeInTheDocument()
+  expect(await waitForElement(() => getByText('Sorry, Something Broke'))).toBeInTheDocument()
 })

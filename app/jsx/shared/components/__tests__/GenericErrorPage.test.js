@@ -39,12 +39,12 @@ const defaultProps = () => ({
 describe('GenericErrorPage component', () => {
   test('renders component correctly', () => {
     const {getByText} = render(<GenericErrorPage {...defaultProps()} />)
-    expect(getByText('Something broke unexpectedly.')).toBeInTheDocument()
+    expect(getByText('Sorry, Something Broke')).toBeInTheDocument()
   })
 
   test('show the comment box when feedback button is clicked', () => {
     const {getByText} = render(<GenericErrorPage {...defaultProps()} />)
-    fireEvent.click(getByText('click here to tell us what happened'))
+    fireEvent.click(getByText('Report Issue'))
     expect(getByText('Email Address (Optional)')).toBeInTheDocument()
   })
 
@@ -57,7 +57,7 @@ describe('GenericErrorPage component', () => {
         id: '7'
       }
     })
-    fireEvent.click(getByText('click here to tell us what happened'))
+    fireEvent.click(getByText('Report Issue'))
     fireEvent.click(getByText('Submit'))
     moxios.wait(async () => {
       expect(getByText('Comment submitted!')).toBeInTheDocument()
@@ -67,7 +67,7 @@ describe('GenericErrorPage component', () => {
 
   test('show the loading indicator when comment is submitted', () => {
     const {getByText, getByTitle} = render(<GenericErrorPage {...defaultProps()} />)
-    fireEvent.click(getByText('click here to tell us what happened'))
+    fireEvent.click(getByText('Report Issue'))
     fireEvent.click(getByText('Submit'))
     expect(getByTitle('Loading')).toBeInTheDocument()
   })
@@ -83,7 +83,7 @@ describe('GenericErrorPage component', () => {
     const modifiedProps = defaultProps()
     modifiedProps.errorSubject = 'Testing Stuff'
     const {getByText} = render(<GenericErrorPage {...modifiedProps} />)
-    fireEvent.click(getByText('click here to tell us what happened'))
+    fireEvent.click(getByText('Report Issue'))
     fireEvent.click(getByText('Submit'))
     moxios.wait(async () => {
       const moxItem = await moxios.requests.mostRecent()
@@ -105,7 +105,7 @@ describe('GenericErrorPage component', () => {
     const modifiedProps = defaultProps()
     modifiedProps.errorSubject = 'Testing Stuff'
     const {getByText} = render(<GenericErrorPage {...modifiedProps} />)
-    fireEvent.click(getByText('click here to tell us what happened'))
+    fireEvent.click(getByText('Report Issue'))
     fireEvent.click(getByText('Submit'))
     moxios.wait(async () => {
       const moxItem = await moxios.requests.mostRecent()

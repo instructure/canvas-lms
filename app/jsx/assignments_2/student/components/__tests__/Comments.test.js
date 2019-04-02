@@ -136,9 +136,7 @@ describe('Comments', () => {
         <Comments assignment={mockAssignment()} />
       </MockedProvider>
     )
-    expect(
-      await waitForElement(() => getByText('Something broke unexpectedly.'))
-    ).toBeInTheDocument()
+    expect(await waitForElement(() => getByText('Sorry, Something Broke'))).toBeInTheDocument()
   })
 
   it('renders error when query errors', async () => {
@@ -151,9 +149,7 @@ describe('Comments', () => {
       </MockedProvider>
     )
 
-    expect(
-      await waitForElement(() => getByText('Something broke unexpectedly.'))
-    ).toBeInTheDocument()
+    expect(await waitForElement(() => getByText('Sorry, Something Broke'))).toBeInTheDocument()
   })
 
   it('renders a media Comment', async () => {

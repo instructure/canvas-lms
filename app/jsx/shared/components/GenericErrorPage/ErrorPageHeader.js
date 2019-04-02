@@ -17,20 +17,18 @@
  */
 import I18n from 'i18n!assignments_2'
 import React from 'react'
-import View from '@instructure/ui-layout/lib/components/View'
-import Text from '@instructure/ui-elements/lib/components/Text'
+import {View} from '@instructure/ui-layout'
+import {Heading} from '@instructure/ui-elements'
 import {string} from 'prop-types'
 
 function ErrorPageHeader(props) {
   return (
-    <React.Fragment>
-      <View margin="large auto" display="block">
+    <View display="block">
+      <Heading level="h1">{I18n.t('Sorry, Something Broke')}</Heading>
+      <View maxWidth="16rem" margin="large auto" display="block" aria-hidden>
         <img alt="" src={props.imageUrl} />
       </View>
-      <View margin="small" display="block">
-        <Text margin="x-small">{I18n.t('Something broke unexpectedly.')}</Text>
-      </View>
-    </React.Fragment>
+    </View>
   )
 }
 
