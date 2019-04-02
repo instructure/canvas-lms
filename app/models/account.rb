@@ -1771,7 +1771,7 @@ class Account < ActiveRecord::Base
     end
   end
 
-  def available_course_visibility_override_options
+  def available_course_visibility_override_options(_options)
     {}
   end
 end
