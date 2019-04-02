@@ -40,6 +40,7 @@ hu:
   LongTextEditor: 
     cancel: Mégse
     save: Mentés
+  _5a374287: "..."
   _at_the_bottom__4360f2b4: "-- A lap alján --"
   _b4455c8b: "%"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "Egy számítási érték nem kerül használatra ezzel a számítási módszerrel"
@@ -7322,6 +7323,7 @@ hu:
   hide_correct_answers_at_b1a59408: "Helyes válaszok elrejtése ekkor"
   hide_courses_navigation_menu_6f7c4cfd: "Kurzusnavigációs menü elrejtése"
   hide_courses_without_enrollments_6df4dfad: "Beiratkozás nélküli kurzusok elrejtése"
+  hide_e057ff36: Elrejt
   hide_navigation_menu_f0b3e90: "Navigációs menü elrejtése"
   hide_score_total_for_assessment_results_d0ef117f: "Teljes pontszám elrejtése az értékelési eredményekben"
   hide_sidebar_2b5b3776: "Oldalsáv elrejtése"
@@ -7469,6 +7471,7 @@ hu:
   inner_box_background_6f9092f: "Belső doboz háttere"
   inner_box_border_d0524b03: "Belső doboz szegélye"
   insert_equella_links_49a8dacd: "Insert Equella Links"
+  insert_here_ccdb022e: "beszúrás ide"
   insert_math_equation_57c6e767: "Matematikai képlet beszúrása"
   insert_row_below_25187f89: "Sor beszúrása alá"
   installed_7b284a91: Telepített
@@ -7778,7 +7781,7 @@ hu:
         quizzes: Kvízek
         rubrics: Értékelőtáblák
         syllabus_body: "Tematika törzse"
-        wikis: Wikioldalak
+        wikis: Oldalak
     cc: 
       standard: 
         failed_to_convert_qti: "A következő értékelés importálása sikertelen %{file_identifier}"
@@ -9965,6 +9968,7 @@ hu:
   no_assignments_with_that_name_found_1d7be1: "Ezen a néven nem található feladat"
   no_associated_terms_13bacefc: "Nincsenek társított félévek"
   no_collaboration_apps_3bbd30ce: "Nincsenek együttműködési applikációk"
+  no_content_5dbc9acf: "Nincs tartalom"
   no_content_has_been_added_f36bab43: "* nincs tartalom hozzáadva"
   no_courses_found_12d68a74: "Nem található kurzus"
   no_date_bfeb2df7: "Nincs dátum"
@@ -10430,6 +10434,9 @@ hu:
       points: Pont
       pts: pont
       rating_description: "Kritériumértékelés leírása"
+    criterion_header: 
+      insert_criterion_rating: "Kritériumértékelés beszúrása"
+      insert_rating: Beszúrás
     dont_import: "Ez a csoport nem importálható"
     failed_outcome_creation: "A tanulási eredmény létrehozása sikertelen"
     failed_outcome_update: "A tanulási eredmény frissítése sikertelen"
@@ -11063,6 +11070,7 @@ hu:
   possible_combination_count_db651ca4: "Lehetséges kombinációk száma"
   possible_score_5e0a328e: "Elérhető: %{score}"
   post_1e445890: "Bejegyzés közzététele"
+  post_grades_39c52870: "Értékelések közzététele"
   post_grades_description: |-
       Az értékelések küldése lehetővé teszi az oktatók számára, hogy az értékeléseket a SIS rendszerekbe küldjék: Powerschool,
       Aspire (SIS2000), JMC, és más SIF-támogatású SIS, amely támogatja a SIF elements GradingCategory,
@@ -14872,6 +14880,7 @@ hu:
   top_box_background_6db383e9: "Felső doboz háttere"
   top_box_border_94cee4a7: "Felső doboz szegélye"
   total_71a4807: Összesen
+  total_points_44d76792: Összpontszám
   total_range_45c8549a: "Teljes tartomány"
   treat_ungraded_as_0_d38c2b41: "Osztályzat nélküliek kezelése 0-ként"
   tree_browser: 
@@ -15028,6 +15037,7 @@ hu:
   user_accepted_their_invitation_for_the_course_cour_9d600393: "%{user} elfogadta a meghívást %{course} kurzusra."
   user_access_tokens_title: "Felhasználói hozzáférési tokenek"
   user_avatars_e4fc4ed3: "Felhasználói avatárok"
+  user_c95de254: Felhasználó
   user_content_aaf0fb5a: "Felhasználói tartalom"
   user_count_respondents_e30a8593: "%{user_count} válaszadó"
   user_date_range_search: 
