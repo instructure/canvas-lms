@@ -3123,13 +3123,14 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  def post_submissions(submission_ids: nil, skip_updating_timestamp: false)
+  def post_submissions(progress: nil, submission_ids: nil, skip_updating_timestamp: false)
     submissions = if submission_ids.nil?
       self.submissions.active
     else
       self.submissions.active.where(id: submission_ids)
     end
     return if submissions.blank?
+    submission_ids = submissions.pluck(:id)
 
     unless skip_updating_timestamp
       update_time = Time.zone.now
@@ -3138,13 +3139,12 @@ class Assignment < ActiveRecord::Base
     submissions.in_workflow_state('graded').each(&:assignment_muted_changed)
 
     show_stream_items(submissions: submissions)
-
-    self.send_later_if_production(:recalculate_module_progressions, submissions.map(&:id))
-
+    self.send_later_if_production(:recalculate_module_progressions, submission_ids)
     update_muted_status! if course.feature_enabled?(:post_policies)
+    progress.set_results(submission_ids: submission_ids) if progress.present?
   end
 
-  def hide_submissions(submission_ids: nil, skip_updating_timestamp: false)
+  def hide_submissions(progress: nil, submission_ids: nil, skip_updating_timestamp: false)
     submissions = if submission_ids.nil?
       self.submissions.active
     else
@@ -3154,10 +3154,9 @@ class Assignment < ActiveRecord::Base
 
     submissions.update_all(posted_at: nil, updated_at: Time.zone.now) unless skip_updating_timestamp
     submissions.in_workflow_state('graded').each(&:assignment_muted_changed)
-
     hide_stream_items(submissions: submissions)
-
     update_muted_status! if course.feature_enabled?(:post_policies)
+    progress.set_results(submission_ids: submissions.pluck(:id)) if progress.present?
   end
 
   def ensure_post_policy(post_manually:)

@@ -154,6 +154,14 @@ describe Mutations::PostAssignmentGradesForSections do
         expect(result.dig("data", "postAssignmentGradesForSections", "progress", "_id").to_i).to be progress.id
       end
 
+      it "stores the ids of submissions posted on the Progress object" do
+        execute_query(mutation_str(assignment_id: assignment.id, section_ids: [section1.id]), context)
+        post_submissions_job = Delayed::Job.where(tag:"Assignment#post_submissions").order(:id).last
+        post_submissions_job.invoke_job
+        progress = Progress.where(tag: "post_assignment_grades_for_sections").order(:id).last
+        expect(progress.results[:submission_ids]).to match_array [section1_student_submission.id]
+      end
+
       it "returns the sections" do
         result = execute_query(mutation_str(assignment_id: assignment.id, section_ids: [section2.id]), context)
         sections = result.dig("data", "postAssignmentGradesForSections", "sections")

@@ -114,6 +114,14 @@ describe Mutations::HideAssignmentGrades do
         progress = Progress.where(tag: "hide_assignment_grades").order(:id).last
         expect(result.dig("data", "hideAssignmentGrades", "progress", "_id").to_i).to be progress.id
       end
+
+      it "stores the ids of submissions hidden on the Progress object" do
+        execute_query(mutation_str(assignment_id: assignment.id), context)
+        hide_submissions_job = Delayed::Job.where(tag:"Assignment#hide_submissions").order(:id).last
+        hide_submissions_job.invoke_job
+        progress = Progress.where(tag: "hide_assignment_grades").order(:id).last
+        expect(progress.results[:submission_ids]).to match_array [@student_submission.id]
+      end
     end
   end
 

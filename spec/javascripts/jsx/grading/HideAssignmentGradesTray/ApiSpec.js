@@ -134,20 +134,22 @@ QUnit.module('HideAssignmentGradesTray Api', suiteHooks => {
       server.restore()
     })
 
-    test('resolves without problem when job finishes', async () => {
-      const responseData = {url: `/api/v1/progress/${PROGRESS_ID}`, workflow_state: 'completed'}
+    test('returns ids of submissions hidden when job finishes', async () => {
+      const responseData = {
+        results: {submission_ids: ['201', '202', '203']},
+        url: `/api/v1/progress/${PROGRESS_ID}`,
+        workflow_state: 'completed'
+      }
       server.respondWith('GET', `/api/v1/progress/${PROGRESS_ID}`, [
         200,
         {},
         JSON.stringify(responseData)
       ])
-      await Api.resolveHideAssignmentGradesStatus({id: PROGRESS_ID, workflowState: 'queued'})
-      // The code for resolveProgress implies that progress.results is
-      // returned when a Progress object completes, but in actual usage, there
-      // is no results field in the returned Progress objects. To be faithful
-      // to real world usage, I have elected not to assert against a field that
-      // is never returned.
-      ok(true)
+      const results = await Api.resolveHideAssignmentGradesStatus({
+        id: PROGRESS_ID,
+        workflowState: 'queued'
+      })
+      deepEqual(results.submissionIds, ['201', '202', '203'])
     })
 
     test('consumers are required to handle when job fails', async () => {

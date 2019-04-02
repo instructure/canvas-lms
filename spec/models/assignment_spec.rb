@@ -7160,6 +7160,12 @@ describe Assignment do
         }
       end
 
+      it "when given a Progress, sets the submission ids in the results" do
+        progress = @course.progresses.create!(tag: "post_submissions")
+        assignment.post_submissions(progress: progress, submission_ids: [student1_submission.id])
+        expect(progress.results[:submission_ids]).to match_array [student1_submission.id]
+      end
+
       context "when post policies are enabled" do
         it "unmutes the assignment if all submissions are now posted" do
           assignment.mute!
@@ -7256,6 +7262,12 @@ describe Assignment do
         }.not_to change {
           assignment.submission_for_student(student1).posted_at
         }
+      end
+
+      it "when given a Progress, sets the submission ids in the results" do
+        progress = @course.progresses.create!(tag: "hide_submissions")
+        assignment.hide_submissions(progress: progress, submission_ids: [student1_submission.id])
+        expect(progress.results[:submission_ids]).to match_array [student1_submission.id]
       end
 
       context "when post policies are enabled" do
