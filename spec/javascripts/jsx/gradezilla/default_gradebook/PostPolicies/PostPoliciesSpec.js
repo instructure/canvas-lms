@@ -189,6 +189,7 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
         submission_types: ['online_text_entry']
       }
       gradebook.setAssignments({2301: assignment})
+      gradebook.setSections([{id: '2001', name: 'Hogwarts'}, {id: '2002', name: 'Freshmen'}])
 
       postPolicies.initialize()
       sinon.stub(postPolicies._postAssignmentGradesTray, 'show')
@@ -209,6 +210,24 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
       const [{assignment}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
       strictEqual(assignment.name, 'Math 1.1')
+    })
+
+    test('includes the assignment anonymize_students', () => {
+      postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
+      const [{assignment}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
+      strictEqual(assignment.anonymizeStudents, false)
+    })
+
+    test('includes the assignment grades_published', () => {
+      postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
+      const [{assignment}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
+      strictEqual(assignment.gradesPublished, true)
+    })
+
+    test('includes the sections', () => {
+      postPolicies.showPostAssignmentGradesTray({assignmentId: '2301'})
+      const [{sections}] = postPolicies._postAssignmentGradesTray.show.lastCall.args
+      deepEqual(sections, [{id: '2001', name: 'Hogwarts'}, {id: '2002', name: 'Freshmen'}])
     })
 
     test('includes the `onExited` callback when showing the "Post Assignment Grades" tray', () => {

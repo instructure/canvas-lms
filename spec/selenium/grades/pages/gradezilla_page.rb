@@ -218,7 +218,7 @@ module Gradezilla
   end
 
   def self.post_grades_option
-    # TODO: locator for post grades option
+    assignment_menu_selector("Post Grades")
   end
 
   def self.hide_grades_option

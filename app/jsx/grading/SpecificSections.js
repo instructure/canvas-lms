@@ -20,41 +20,26 @@ import React, {Fragment} from 'react'
 import {arrayOf, bool, func, shape, string} from 'prop-types'
 import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
 import List, {ListItem} from '@instructure/ui-elements/lib/components/List'
-import Text from '@instructure/ui-elements/lib/components/Text'
 import View from '@instructure/ui-layout/lib/components/View'
 import I18n from 'i18n!hide_assignment_grades_tray'
 
-export default function HideBySections(props) {
-  const {
-    assignment,
-    hideBySections,
-    hideBySectionsChanged,
-    sections,
-    sectionSelectionChanged,
-    selectedSectionIds
-  } = props
-  const {anonymizeStudents} = assignment
+export default function SpecificSections(props) {
+  const {checked, disabled, onCheck, sections, sectionSelectionChanged, selectedSectionIds} = props
 
   return (
     <Fragment>
-      {anonymizeStudents && (
-        <View as="p" margin="small 0 small" padding="0 medium">
-          <Text>{I18n.t('Anonymous assignments cannot be hidden by section.')}</Text>
-        </View>
-      )}
-
       <View as="div" margin="small 0 small" padding="0 medium">
         <Checkbox
-          checked={hideBySections}
-          disabled={anonymizeStudents}
+          checked={checked}
+          disabled={disabled}
           label={I18n.t('Specific Sections')}
-          onChange={hideBySectionsChanged}
+          onChange={onCheck}
           size="small"
           variant="toggle"
         />
       </View>
 
-      {hideBySections && !anonymizeStudents && (
+      {checked && !disabled && (
         <View
           as="div"
           margin="0 0 small"
@@ -93,13 +78,10 @@ export default function HideBySections(props) {
   )
 }
 
-HideBySections.propTypes = {
-  assignment: shape({
-    anonymizeStudents: bool.isRequired,
-    gradesPublished: bool.isRequired
-  }).isRequired,
-  hideBySections: bool.isRequired,
-  hideBySectionsChanged: func.isRequired,
+SpecificSections.propTypes = {
+  checked: bool.isRequired,
+  disabled: bool.isRequired,
+  onCheck: func.isRequired,
   sections: arrayOf(
     shape({
       id: string.isRequired,

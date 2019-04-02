@@ -26,9 +26,10 @@ describe Mutations::PostAssignmentGradesForSections do
   let(:section2) { course.course_sections.create! }
   let(:teacher) { course.enroll_user(User.create!, "TeacherEnrollment", enrollment_state: "active").user }
 
-  def mutation_str(assignment_id: nil, section_ids: nil)
+  def mutation_str(assignment_id: nil, section_ids: nil, graded_only: nil)
     input_string = assignment_id ? "assignmentId: #{assignment_id}" : ""
-    input_string += " sectionIds: #{section_ids}" unless section_ids.nil?
+    input_string += ", sectionIds: #{section_ids}" unless section_ids.nil?
+    input_string += ", gradedOnly: #{graded_only}" unless graded_only.nil?
 
     <<~GQL
       mutation {
@@ -172,6 +173,47 @@ describe Mutations::PostAssignmentGradesForSections do
       it "does not post the assignment grades for the sections not specified" do
         execute_query(mutation_str(assignment_id: assignment.id, section_ids: [section2.id]), context)
         expect(section1_student_submission).not_to be_posted
+      end
+    end
+
+    describe "graded_only" do
+      let(:section1_user_ids) { section1.enrollments.pluck(:user_id) }
+      let(:section1_submissions) { assignment.submissions.where(user_id: section1_user_ids) }
+
+      before(:each) do
+        section1_student2 = User.create!
+        section1.enroll_user(section1_student2, "StudentEnrollment", "active")
+        @student1_submission = assignment.submissions.find_by(user: @section1_student)
+        @student2_submission = assignment.submissions.find_by(user: section1_student2)
+        assignment.grade_student(@section1_student, grader: teacher, score: 100)
+      end
+
+      it "posts the graded submissions if graded_only is true" do
+        execute_query(mutation_str(assignment_id: assignment.id, section_ids:[section1.id], graded_only: true), context)
+        post_submissions_job = Delayed::Job.where(tag: "Assignment#post_submissions").order(:id).last
+        post_submissions_job.invoke_job
+        expect(@student1_submission.reload).to be_posted
+      end
+
+      it "does not post the ungraded submissions if graded_only is true" do
+        execute_query(mutation_str(assignment_id: assignment.id, section_ids:[section1.id], graded_only: true), context)
+        post_submissions_job = Delayed::Job.where(tag: "Assignment#post_submissions").order(:id).last
+        post_submissions_job.invoke_job
+        expect(@student2_submission.reload).not_to be_posted
+      end
+
+      it "posts all the submissions if graded_only is false" do
+        execute_query(mutation_str(assignment_id: assignment.id, section_ids:[section1.id], graded_only: false), context)
+        post_submissions_job = Delayed::Job.where(tag: "Assignment#post_submissions").order(:id).last
+        post_submissions_job.invoke_job
+        expect(section1_submissions).to all(be_posted)
+      end
+
+      it "posts all the sections' submissions if graded_only is not present" do
+        execute_query(mutation_str(assignment_id: assignment.id, section_ids:[section1.id]), context)
+        post_submissions_job = Delayed::Job.where(tag: "Assignment#post_submissions").order(:id).last
+        post_submissions_job.invoke_job
+        expect(section1_submissions).to all(be_posted)
       end
     end
   end

@@ -20,6 +20,7 @@ class Mutations::PostAssignmentGrades < Mutations::BaseMutation
   graphql_name "PostAssignmentGrades"
 
   argument :assignment_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Assignment")
+  argument :graded_only, Boolean, required: false
 
   field :assignment, Types::AssignmentType, null: true
   field :progress, Types::ProgressType, null: true
@@ -39,7 +40,8 @@ class Mutations::PostAssignmentGrades < Mutations::BaseMutation
       raise GraphQL::ExecutionError, "Assignments under moderation cannot be posted before grades are published"
     end
 
-    submission_ids = assignment.submissions.active.pluck(:id)
+    submissions_scope = input[:graded_only] ? assignment.submissions.graded : assignment.submissions
+    submission_ids = submissions_scope.pluck(:id)
     progress = course.progresses.new(tag: "post_assignment_grades")
 
     if progress.save

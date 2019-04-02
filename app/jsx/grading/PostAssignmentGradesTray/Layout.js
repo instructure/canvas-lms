@@ -23,19 +23,21 @@ import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import View from '@instructure/ui-layout/lib/components/View'
-import I18n from 'i18n!hide_assignment_grades_tray'
+import I18n from 'i18n!post_assignment_grades_tray'
 
-import Description from './Description'
+import PostTypes from './PostTypes'
 import SpecificSections from '../SpecificSections'
 
 export default function Layout(props) {
   const {
     assignment,
     dismiss,
-    hideBySections,
-    hideBySectionsChanged,
-    hidingGrades,
-    onHideClick,
+    postBySections,
+    postBySectionsChanged,
+    postType,
+    postTypeChanged,
+    postingGrades,
+    onPostClick,
     sections,
     sectionSelectionChanged,
     selectedSectionIds
@@ -47,22 +49,28 @@ export default function Layout(props) {
     <Fragment>
       <View as="div" margin="0 0 small" padding="0 medium">
         <Heading as="h3" level="h4">
-          {I18n.t('Hide Grades')}
+          {I18n.t('Post Grades')}
         </Heading>
       </View>
 
+      <View as="div" margin="small 0" padding="0 medium">
+        <PostTypes defaultValue={postType} postTypeChanged={postTypeChanged} />
+      </View>
+
+      <View as="div" margin="0 medium" className="hr" />
+
       {hasSections && anonymizeStudents && (
         <View as="p" margin="small 0 small" padding="0 medium">
-          <Text>{I18n.t('Anonymous assignments cannot be hidden by section.')}</Text>
+          <Text>{I18n.t('Anonymous assignments cannot be posted by section.')}</Text>
         </View>
       )}
 
       {hasSections && (
         <SpecificSections
-          checked={hideBySections}
+          checked={postBySections}
           disabled={assignment.anonymizeStudents}
           onCheck={event => {
-            hideBySectionsChanged(event.target.checked)
+            postBySectionsChanged(event.target.checked)
           }}
           sections={sections}
           sectionSelectionChanged={sectionSelectionChanged}
@@ -72,17 +80,11 @@ export default function Layout(props) {
 
       <View as="div" margin="0 medium" className="hr" />
 
-      <View as="div" margin="medium 0" padding="0 medium">
-        <Description />
-      </View>
-
-      <View as="div" margin="0 medium" className="hr" />
-
       {!gradesPublished && (
         <View as="p" margin="small 0 small" padding="0 medium">
           <Text>
             {I18n.t(
-              'Hiding grades is not allowed because grades have not been released for this assignment.'
+              'Posting grades is not allowed because grades have not been released for this assignment.'
             )}
           </Text>
         </View>
@@ -96,11 +98,11 @@ export default function Layout(props) {
 
           <FlexItem>
             <Button
-              disabled={hidingGrades || !gradesPublished}
-              onClick={onHideClick}
+              disabled={postingGrades || !gradesPublished}
+              onClick={onPostClick}
               variant="primary"
             >
-              {I18n.t('Hide')}
+              {I18n.t('Post')}
             </Button>
           </FlexItem>
         </Flex>
@@ -115,10 +117,12 @@ Layout.propTypes = {
     gradesPublished: bool.isRequired
   }).isRequired,
   dismiss: func.isRequired,
-  hideBySections: bool.isRequired,
-  hideBySectionsChanged: func.isRequired,
-  hidingGrades: bool.isRequired,
-  onHideClick: func.isRequired,
+  postBySections: bool.isRequired,
+  postBySectionsChanged: func.isRequired,
+  postingGrades: bool.isRequired,
+  postType: string.isRequired,
+  postTypeChanged: func.isRequired,
+  onPostClick: func.isRequired,
   sections: arrayOf(
     shape({
       id: string.isRequired,

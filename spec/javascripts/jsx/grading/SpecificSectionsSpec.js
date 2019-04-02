@@ -19,25 +19,11 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import HideBySections from 'jsx/grading/HideAssignmentGradesTray/HideBySections'
+import SpecificSections from 'jsx/grading/SpecificSections'
 
-QUnit.module('HideAssignmentGradesTray HideBySections', suiteHooks => {
+QUnit.module('SpecificSections', suiteHooks => {
   let $container
   let context
-
-  function assignmentFixture() {
-    return {
-      anonymizeStudents: false,
-      gradesPublished: true,
-      id: '2301',
-      name: 'Math 1.1'
-    }
-  }
-
-  function getAnonymousText() {
-    const hideText = 'Anonymous assignments cannot be hidden by section.'
-    return [...$container.querySelectorAll('p')].find($p => $p.textContent === hideText)
-  }
 
   function getLabel(text) {
     return [...$container.querySelectorAll('label')].find($label => $label.textContent === text)
@@ -48,16 +34,16 @@ QUnit.module('HideAssignmentGradesTray HideBySections', suiteHooks => {
   }
 
   function mountComponent() {
-    ReactDOM.render(<HideBySections {...context} />, $container)
+    ReactDOM.render(<SpecificSections {...context} />, $container)
   }
 
   suiteHooks.beforeEach(() => {
     $container = document.body.appendChild(document.createElement('div'))
 
     context = {
-      assignment: assignmentFixture(),
-      hideBySections: false,
-      hideBySectionsChanged: () => {},
+      checked: false,
+      disabled: false,
+      onCheck: () => {},
       sections: [{id: '2001', name: 'Freshmen'}, {id: '2002', name: 'Sophomores'}],
       sectionSelectionChanged: () => {},
       selectedSectionIds: []
@@ -69,18 +55,13 @@ QUnit.module('HideAssignmentGradesTray HideBySections', suiteHooks => {
     $container.remove()
   })
 
-  test('descriptive text is not shown', () => {
-    mountComponent()
-    notOk(getAnonymousText())
-  })
-
   test('section toggle is enabled', () => {
     mountComponent()
     strictEqual(getSectionToggleInput().disabled, false)
   })
 
-  test('section toggle is checked when hideBySections is true', () => {
-    context.hideBySections = true
+  test('section toggle is checked when checked is true', () => {
+    context.checked = true
     mountComponent()
     ok(
       getSectionToggleInput()
@@ -89,37 +70,32 @@ QUnit.module('HideAssignmentGradesTray HideBySections', suiteHooks => {
     )
   })
 
-  test('sections are shown when hideBySections is true', () => {
-    context.hideBySections = true
+  test('sections are shown when checked is true', () => {
+    context.checked = true
     mountComponent()
     ok(getLabel('Sophomores'))
   })
 
-  test('clicking the section toggle calls hideBySectionsChanged', () => {
-    const hideBySectionsChangedSpy = sinon.spy()
-    context.hideBySectionsChanged = hideBySectionsChangedSpy
+  test('clicking the section toggle calls onCheck', () => {
+    const onCheckSpy = sinon.spy()
+    context.onCheck = onCheckSpy
     mountComponent()
     getSectionToggleInput().click()
-    strictEqual(hideBySectionsChangedSpy.callCount, 1)
+    strictEqual(onCheckSpy.callCount, 1)
   })
 
   test('selecting a section calls sectionSelectionChanged', () => {
     const sectionSelectionChangedSpy = sinon.spy()
-    context.hideBySections = true
+    context.checked = true
     context.sectionSelectionChanged = sectionSelectionChangedSpy
     mountComponent()
     document.getElementById(getLabel('Sophomores').htmlFor).click()
     strictEqual(sectionSelectionChangedSpy.callCount, 1)
   })
 
-  QUnit.module('when assignment is anonymized', contextHooks => {
+  QUnit.module('when disabled', contextHooks => {
     contextHooks.beforeEach(() => {
-      context.assignment.anonymizeStudents = true
-    })
-
-    test('anonymous descriptive text is shown', () => {
-      mountComponent()
-      ok(getAnonymousText())
+      context.disabled = true
     })
 
     test('section toggle is disabled', () => {
@@ -128,9 +104,17 @@ QUnit.module('HideAssignmentGradesTray HideBySections', suiteHooks => {
     })
 
     test('sections are not shown', () => {
-      context.hideBySections = true
+      context.checked = true
       mountComponent()
       notOk(getLabel('Sophomores'))
+    })
+
+    test('clicking the section toggle does not call onCheck', () => {
+      const onCheckSpy = sinon.spy()
+      context.onCheck = onCheckSpy
+      mountComponent()
+      getSectionToggleInput().click()
+      strictEqual(onCheckSpy.callCount, 0)
     })
   })
 })

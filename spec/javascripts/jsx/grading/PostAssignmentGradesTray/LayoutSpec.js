@@ -19,9 +19,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import Layout from 'jsx/grading/HideAssignmentGradesTray/Layout'
+import Layout from 'jsx/grading/PostAssignmentGradesTray/Layout'
+import {EVERYONE} from 'jsx/grading/PostAssignmentGradesTray/PostTypes'
 
-QUnit.module('HideAssignmentGradesTray Layout', suiteHooks => {
+QUnit.module('PostAssignmentGradesTray Layout', suiteHooks => {
   let $container
   let context
 
@@ -35,8 +36,8 @@ QUnit.module('HideAssignmentGradesTray Layout', suiteHooks => {
   }
 
   function getAnonymousText() {
-    const hideText = 'Anonymous assignments cannot be hidden by section.'
-    return [...$container.querySelectorAll('p')].find($p => $p.textContent === hideText)
+    const postText = 'Anonymous assignments cannot be posted by section.'
+    return [...$container.querySelectorAll('p')].find($p => $p.textContent === postText)
   }
 
   function getCloseButton() {
@@ -45,20 +46,26 @@ QUnit.module('HideAssignmentGradesTray Layout', suiteHooks => {
     )
   }
 
-  function getHideButton() {
-    return [...$container.querySelectorAll('button')].find(
-      $button => $button.textContent === 'Hide'
+  function getLabel(text) {
+    return [...$container.querySelectorAll('label')].find($label =>
+      $label.textContent.includes(text)
     )
   }
 
-  function getHideText() {
-    const hideText =
-      'Hiding grades is not allowed because grades have not been released for this assignment.'
-    return [...$container.querySelectorAll('p')].find($p => $p.textContent === hideText)
+  function getPostButton() {
+    return [...$container.querySelectorAll('button')].find(
+      $button => $button.textContent === 'Post'
+    )
   }
 
-  function getLabel(text) {
-    return [...$container.querySelectorAll('label')].find($label => $label.textContent === text)
+  function getPostText() {
+    const postText =
+      'Posting grades is not allowed because grades have not been released for this assignment.'
+    return [...$container.querySelectorAll('p')].find($p => $p.textContent === postText)
+  }
+
+  function getPostType(type) {
+    return document.getElementById(getLabel(type).htmlFor)
   }
 
   function mountComponent() {
@@ -70,10 +77,12 @@ QUnit.module('HideAssignmentGradesTray Layout', suiteHooks => {
     context = {
       assignment: assignmentFixture(),
       dismiss: () => {},
-      hideBySections: true,
-      hideBySectionsChanged: () => {},
-      hidingGrades: false,
-      onHideClick: () => {},
+      postBySections: true,
+      postBySectionsChanged: () => {},
+      postingGrades: false,
+      postType: EVERYONE,
+      postTypeChanged: () => {},
+      onPostClick: () => {},
       sections: [{id: '2001', name: 'Freshmen'}, {id: '2002', name: 'Sophomores'}],
       sectionSelectionChanged: () => {},
       selectedSectionIds: []
@@ -93,37 +102,37 @@ QUnit.module('HideAssignmentGradesTray Layout', suiteHooks => {
     strictEqual(dismissSpy.callCount, 1)
   })
 
-  test('"Hide" button is disabled when grades have yet to be published', () => {
+  test('"Post" button is disabled when grades have yet to be published', () => {
     const unpublishedAssignment = {...assignmentFixture(), gradesPublished: false}
     context.assignment = unpublishedAssignment
     mountComponent()
-    strictEqual(getHideButton().disabled, true)
+    strictEqual(getPostButton().disabled, true)
   })
 
   test('descriptive text exists when grades have yet to be published', () => {
     const unpublishedAssignment = {...assignmentFixture(), gradesPublished: false}
     context.assignment = unpublishedAssignment
     mountComponent()
-    ok(getHideText())
+    ok(getPostText())
   })
 
-  test('"Hide" button is disabled when hidingGrades is true', () => {
-    context.hidingGrades = true
+  test('"Post" button is disabled when postingGrades is true', () => {
+    context.postingGrades = true
     mountComponent()
-    strictEqual(getHideButton().disabled, true)
+    strictEqual(getPostButton().disabled, true)
   })
 
   test('descriptive text does not exist when grades have been published', () => {
     mountComponent()
-    notOk(getHideText())
+    notOk(getPostText())
   })
 
-  test('clicking "Hide" button calls the onHideClick prop', () => {
-    const onHideClickSpy = sinon.spy()
-    context.onHideClick = onHideClickSpy
+  test('clicking "Post" button calls the onPostClick prop', () => {
+    const onPostClickSpy = sinon.spy()
+    context.onPostClick = onPostClickSpy
     mountComponent()
-    getHideButton().click()
-    strictEqual(onHideClickSpy.callCount, 1)
+    getPostButton().click()
+    strictEqual(onPostClickSpy.callCount, 1)
   })
 
   QUnit.module('when no sections exist', contextHooks => {
@@ -143,9 +152,24 @@ QUnit.module('HideAssignmentGradesTray Layout', suiteHooks => {
     })
 
     test('sections are not shown', () => {
-      context.hideBySections = false
+      context.postBySections = false
       mountComponent()
       notOk(getLabel('Sophomores'))
+    })
+  })
+
+  QUnit.module('PostTypes', () => {
+    test('"Everyone" is checked by default', () => {
+      mountComponent()
+      strictEqual(getPostType('Everyone').checked, true)
+    })
+
+    test('clicking another post type calls postTypeChanged', () => {
+      const postTypeChangedSpy = sinon.spy()
+      context.postTypeChanged = postTypeChangedSpy
+      mountComponent()
+      getPostType('Graded').click()
+      strictEqual(postTypeChangedSpy.callCount, 1)
     })
   })
 })

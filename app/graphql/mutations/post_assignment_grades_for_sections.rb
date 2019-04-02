@@ -21,6 +21,7 @@ class Mutations::PostAssignmentGradesForSections < Mutations::BaseMutation
 
   argument :assignment_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Assignment")
   argument :section_ids, [ID], required: true, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Section")
+  argument :graded_only, Boolean, required: false
 
   field :assignment, Types::AssignmentType, null: true
   field :progress, Types::ProgressType, null: true
@@ -48,7 +49,14 @@ class Mutations::PostAssignmentGradesForSections < Mutations::BaseMutation
     end
 
     student_ids = course.student_enrollments.where(course_section: sections).pluck(:user_id)
-    submission_ids = assignment.submissions.active.where(user_id: student_ids).pluck(:id)
+
+    submissions_scope = if input[:graded_only]
+      assignment.submissions.where(user_id: student_ids).graded
+    else
+      assignment.submissions.where(user_id: student_ids)
+    end
+
+    submission_ids = submissions_scope.pluck(:id)
     progress = course.progresses.new(tag: "post_assignment_grades_for_sections")
 
     if progress.save
