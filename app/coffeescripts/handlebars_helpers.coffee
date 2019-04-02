@@ -176,7 +176,7 @@ define [
 
     # helper for easily creating icon font markup
     addIcon : (icontype) ->
-      new Handlebars.SafeString "<i class='icon-#{htmlEscape icontype}'></i>"
+      new Handlebars.SafeString "<i role='presentation' class='icon-#{htmlEscape icontype}'></i>"
 
     # helper for using date.js's custom toString method on Date objects
     dateToString : (date = '', format) ->
