@@ -36,6 +36,7 @@ ko:
   LongTextEditor: 
     cancel: 취소
     save: 저장
+  _5a374287: "..."
   _at_the_bottom__4360f2b4: "-- 맨 밑으로 --"
   _b4455c8b: "%"
   academic_benchmark: 
@@ -6237,6 +6238,7 @@ ko:
         other: "토론 *%{count}*개"
     select: 
       prompt: "선택해 주십시오."
+  hide_e057ff36: 숨기기
   hide_score_total_for_assessment_results_d0ef117f: "평가 결과에 대한 총점 숨기기"
   highest_28ad71e6: 최고
   i_ll_write_free_form_comments_when_assessing_stude_5cf50d06: "학생을 평가할 때 자유 형식의 의견을 작성하겠음"
@@ -6298,6 +6300,7 @@ ko:
     styleguide: 
       manage: 관리
   insert_equella_links_49a8dacd: "Insert Equella Links"
+  insert_here_ccdb022e: "여기에 삽입"
   insert_math_equation_57c6e767: "Insert Math Equation"
   installed_7b284a91: 설치됨
   instructions: 
@@ -6499,7 +6502,7 @@ ko:
         quizzes: 퀴즈
         rubrics: 루브릭
         syllabus_body: "강의 계획 내용"
-        wikis: "위키 페이지"
+        wikis: 페이지
     cc: 
       standard: 
         failed_to_convert_qti: "평가 %{file_identifier} 가져오기 실패"
@@ -6565,6 +6568,7 @@ ko:
   locales: 
     ko: 한국말
   lock_date_cannot_be_before_due_date_ac30f54: "잠금 설정 날짜는 기한으로 설정한 날짜보다 이전일 수 없습니다."
+  log_in_c9e240ef: 로그인
   logged_in_user_id_5a54b1ae: "로그인한 사용자 ID"
   logged_out_user: "사용자 %{user_counter} 로그 아웃"
   logged_out_user_index_68a0edb2: "사용자 %{index} 로그아웃"
@@ -8474,6 +8478,7 @@ ko:
   new_outcome_7fba8c7d: "새 성과"
   next_40e12421: 다음
   next_steps_ce0f0d0c: "다음 단계"
+  no_content_5dbc9acf: "내용 없음"
   no_description_c2554c25: "설명 없음"
   no_details_1ee29870: "세부 정보 없음"
   no_due_date_44271c53: "기한 없음"
@@ -8797,6 +8802,9 @@ ko:
       points: 점수
       pts: 점
       rating_description: "기준 등급 설명"
+    criterion_header: 
+      insert_criterion_rating: "기준 등급 삽입"
+      insert_rating: 삽입
     dont_import: "이 그룹은 가져올 수 없습니다."
     failed_outcome_creation: "성과 생성 실패함"
     failed_outcome_update: "성과 업데이트 실패함"
@@ -12134,6 +12142,7 @@ ko:
     incomplete: "완료 안 됨"
     vdd: 
       more_message: "%{count}개 더…"
+  total_points_44d76792: 총점
   tours: 
     quiz_regrade: 
       got_it: 확인
@@ -12190,6 +12199,7 @@ ko:
       too_long: "%{max}글자를 초과할 수 없습니다."
     registration: 
       agree_to_terms_with_code_of_conduct: "*사용 조건*과 **준수 사항**에 동의합니다."
+  user_c95de254: 사용자
   user_date_range_search: 
     cant_be_blank: "Canvas 사용자 ID는 공란일 수 없음"
     cant_come_before_from: "'끝 날짜'는 '시작 날짜' 이전일 수 없습니다."
