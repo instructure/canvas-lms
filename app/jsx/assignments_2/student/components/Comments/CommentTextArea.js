@@ -17,19 +17,22 @@
  */
 import Alert from '@instructure/ui-alerts/lib/components/Alert'
 import Button from '@instructure/ui-buttons/lib/components/Button'
+import {DEFAULT_ICON} from '../../../../shared/helpers/mimeClassIconHelper'
 import I18n from 'i18n!assignments_2'
 import IconAudio from '@instructure/ui-icons/lib/Line/IconAudio'
 import IconMedia from '@instructure/ui-icons/lib/Line/IconMedia'
-import IconPaperclip from '@instructure/ui-icons/lib/Line/IconPaperclip'
+import LoadingIndicator from '../../../shared/LoadingIndicator'
 import React, {Component} from 'react'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
+import {submissionCommentAttachmentsUpload} from '../../../../shared/upload_file'
 import TextArea from '@instructure/ui-forms/lib/components/TextArea'
-import {Mutation} from 'react-apollo'
+
 import {
   CREATE_SUBMISSION_COMMENT,
-  SUBMISSION_COMMENT_QUERY,
-  StudentAssignmentShape
+  StudentAssignmentShape,
+  SUBMISSION_COMMENT_QUERY
 } from '../../assignmentData'
+import {Mutation} from 'react-apollo'
 
 const ALERT_TIMEOUT = 5000
 
@@ -39,7 +42,10 @@ export default class CommentTextArea extends Component {
   }
 
   state = {
-    commentText: ''
+    commentText: '',
+    currentFiles: [],
+    hasError: false,
+    uploadingComments: false
   }
 
   queryVariables() {
@@ -88,13 +94,44 @@ export default class CommentTextArea extends Component {
   }
 
   onSendComment = createSubmissionComment => {
-    createSubmissionComment({
-      variables: {
-        id: this.props.assignment.submissionsConnection.nodes[0]._id,
-        comment: this.state.commentText
+    this.setState({hasError: false, uploadingComments: true}, async () => {
+      let attachmentIds = []
+
+      if (this.state.currentFiles.length) {
+        try {
+          const attachments = await submissionCommentAttachmentsUpload(
+            this.state.currentFiles,
+            this.props.assignment.env.courseId,
+            this.props.assignment._id
+          )
+          attachmentIds = attachments.map(attachment => attachment.id)
+        } catch (err) {
+          this.setState({hasError: true, uploadingComments: false})
+          return
+        }
       }
+
+      await createSubmissionComment({
+        variables: {
+          id: this.props.assignment.submissionsConnection.nodes[0]._id,
+          comment: this.state.commentText,
+          fileIds: attachmentIds
+        }
+      })
+
+      this.setState({commentText: '', currentFiles: [], uploadingComments: false})
     })
-    this.setState({commentText: ''})
+  }
+
+  onFileSelected = event => {
+    let currIndex = this.state.currentFiles.length
+      ? this.state.currentFiles[this.state.currentFiles.length - 1].id
+      : 0
+    const filesArray = [...event.currentTarget.files]
+    filesArray.forEach(file => {
+      file.id = ++currIndex
+    })
+    this.setState(prevState => ({currentFiles: [...prevState.currentFiles, ...filesArray]}))
   }
 
   renderAlert(data, error) {
@@ -118,6 +155,15 @@ export default class CommentTextArea extends Component {
     )
   }
 
+  renderFiles() {
+    // TODO: build file display UI and swap this out for an attachments file display component
+    if (this.state.currentFiles.length && !this.state.uploadingComments) {
+      return this.state.currentFiles.map(file => {
+        return <div key={file.id}>TODO: change this attached file</div>
+      })
+    }
+  }
+
   render() {
     return (
       <Mutation
@@ -127,33 +173,59 @@ export default class CommentTextArea extends Component {
       >
         {(createSubmissionComment, {data, error}) => (
           <div>
-            {this.renderAlert(data, error)}
+            {this.renderAlert(data, error || this.state.hasError)}
             <div>
               <TextArea
+                label={<ScreenReaderContent>{I18n.t('Comment input box')}</ScreenReaderContent>}
                 onChange={this.onTextChange}
-                value={this.state.commentText}
                 placeholder={I18n.t('Submit a Comment')}
                 resize="both"
-                label={<ScreenReaderContent>{I18n.t('Comment input box')}</ScreenReaderContent>}
+                value={this.state.commentText}
               />
+              {this.state.uploadingComments && <LoadingIndicator />}
+              <div data-testid="assignments_2_comment_attachment">{this.renderFiles()}</div>
             </div>
-            <div className="textarea-action-button-container">
-              <Button size="small" margin="0 x-small 0 0" variant="icon" icon={IconPaperclip}>
-                <ScreenReaderContent>{I18n.t('Attach a File')}</ScreenReaderContent>
-              </Button>
-              <Button size="small" margin="0 x-small 0 0" variant="icon" icon={IconMedia}>
-                <ScreenReaderContent>{I18n.t('Record Video')}</ScreenReaderContent>
-              </Button>
-              <Button size="small" margin="0 x-small 0 0" variant="icon" icon={IconAudio}>
-                <ScreenReaderContent>{I18n.t('Record Audio')}</ScreenReaderContent>
-              </Button>
-              <Button
-                disabled={this.state.commentText.length === 0}
-                onClick={() => this.onSendComment(createSubmissionComment)}
-              >
-                {I18n.t('Send Comment')}
-              </Button>
-            </div>
+            {!this.state.uploadingComments && !this.state.hasError && (
+              <div className="textarea-action-button-container">
+                <input
+                  id="attachmentFile"
+                  ref={element => {
+                    this.fileInput = element
+                  }}
+                  multiple
+                  onChange={this.onFileSelected}
+                  style={{
+                    display: 'none'
+                  }}
+                  type="file"
+                />
+                <Button
+                  icon={DEFAULT_ICON}
+                  size="small"
+                  margin="0 x-small 0 0"
+                  onClick={() => {
+                    this.fileInput.click()
+                  }}
+                  variant="icon"
+                >
+                  <ScreenReaderContent>{I18n.t('Attach a File')}</ScreenReaderContent>
+                </Button>
+                <Button icon={IconMedia} margin="0 x-small 0 0" size="small" variant="icon">
+                  <ScreenReaderContent>{I18n.t('Record Video')}</ScreenReaderContent>
+                </Button>
+                <Button icon={IconAudio} margin="0 x-small 0 0" size="small" variant="icon">
+                  <ScreenReaderContent>{I18n.t('Record Audio')}</ScreenReaderContent>
+                </Button>
+                <Button
+                  disabled={
+                    this.state.commentText.length === 0 && this.state.currentFiles.length === 0
+                  }
+                  onClick={() => this.onSendComment(createSubmissionComment)}
+                >
+                  {I18n.t('Send Comment')}
+                </Button>
+              </div>
+            )}
           </div>
         )}
       </Mutation>

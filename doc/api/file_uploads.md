@@ -26,7 +26,9 @@ There are three steps to uploading a file directly via POST:
 The first step is to POST to the relevant API endpoint, depending on where
 you want to create the file. For example, to <a href="courses.html">add a file to a course</a>, you'd
 POST to `/api/v1/courses/:course_id/files`. Or to <a href="submissions.html">upload a file as part of a student homework submission</a>, as the student you'd POST to
-`/api/v1/courses/:course_id/assignments/:assignment_id/submissions/self/files`.
+`/api/v1/courses/:course_id/assignments/:assignment_id/submissions/self/files` or `/api/v1/courses/:course_id/assignments/:assignment_id/submissions/comments/self/files` for submission comments.
+
+Note* The endpoint you choose to post files to will change the permissions set on the file. i.e. only files posted to the submissions comments endpoint can be attached to a submissions comment.
 
 Arguments:
 
