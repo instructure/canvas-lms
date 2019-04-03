@@ -770,7 +770,6 @@ class SisBatch < ActiveRecord::Base
   end
 
   def restore_workflow_states(scope, type, restore_progress, count, total)
-    count = 0
     Shackles.activate(:slave) do
       scope.active.order(:context_id).find_in_batches(batch_size: 5_000) do |data|
         Shackles.activate(:master) do
@@ -780,7 +779,7 @@ class SisBatch < ActiveRecord::Base
               ids = type.constantize.connection.select_values(restore_sql(type, data.map(&:to_restore_array)))
               if type == 'Enrollment'
                 ids.each_slice(1000) do |slice|
-                  Enrollment::BatchStateUpdater.send_later_enqueue_args(:run_call_backs_for, {n_strand: "restore_states_batch_updater:#{account.global_id}}"}, slice)
+                  Enrollment::BatchStateUpdater.send_later_enqueue_args(:run_call_backs_for, {n_strand: ["restore_states_batch_updater", account.global_id]}, slice, self.account)
                 end
               end
               count += update_restore_progress(restore_progress, data, count, total)
@@ -799,7 +798,7 @@ class SisBatch < ActiveRecord::Base
                 end
               end
               successful_ids.each_slice(1000) do |slice|
-                Enrollment::BatchStateUpdater.send_later_enqueue_args(:run_call_backs_for, {n_strand: "restore_states_batch_updater:#{account.global_id}}"}, slice)
+                Enrollment::BatchStateUpdater.send_later_enqueue_args(:run_call_backs_for, {n_strand: ["restore_states_batch_updater", account.global_id]}, slice, self.account)
               end
               count += update_restore_progress(restore_progress, data - failed_data, count, total)
               roll_back_data.active.where(id: failed_data).update_all(workflow_state: 'failed', updated_at: Time.zone.now)
@@ -815,7 +814,7 @@ class SisBatch < ActiveRecord::Base
     self.shard.activate do
       restore_progress = Progress.create! context: self, tag: "sis_batch_state_restore", completion: 0.0
       restore_progress.process_job(self, :restore_states_for_batch,
-                                   {n_strand: "restore_states_for_batch:#{account.global_id}}"},
+                                   {n_strand: ["restore_states_for_batch", account.global_id]},
                                    {batch_mode: batch_mode, undelete_only: undelete_only, unconclude_only: unconclude_only})
       restore_progress
     end

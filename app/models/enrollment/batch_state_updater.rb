@@ -188,20 +188,15 @@ class Enrollment::BatchStateUpdater
 
   # this is to be used for enrollments that just changed workflow_states but are
   # not deleted. This also skips notifying users.
-  def self.run_call_backs_for(batch)
+  def self.run_call_backs_for(batch, root_account=nil)
     raise ArgumentError, 'Cannot call with more than 1000 enrollments' if batch.count > 1_000
+    return if batch.empty?
     Enrollment.transaction do
       students = Enrollment.of_student_type.where(id: batch).preload({user: :linked_observers}, :root_account).to_a
       user_ids = Enrollment.where(id: batch).distinct.pluck(:user_id)
       courses = Course.where(id: Enrollment.where(id: batch).select(:course_id).distinct).to_a
-      root_account = courses.first.root_account
-      EnrollmentState.send_later_if_production_enqueue_args(
-        :force_recalculation,
-        {run_at: 1.minute.from_now,
-         n_strand: "restore_states_enrollment_states:#{root_account.global_id}}",
-         max_attempts: 2},
-        batch
-      )
+      root_account ||= courses.first.root_account
+      return unless root_account
       touch_and_update_associations(user_ids)
       update_linked_enrollments(students)
       needs_grading_count_updated(courses)
@@ -209,5 +204,14 @@ class Enrollment::BatchStateUpdater
       update_cached_due_dates(students, root_account)
       touch_all_graders_if_needed(students)
     end
+    root_account ||= Enrollment.where(id: batch).take&.root_account
+    return unless root_account
+    EnrollmentState.send_later_if_production_enqueue_args(
+      :force_recalculation,
+      {run_at: Setting.get("wait_time_to_calculate_enrollment_state", 1).to_f.minute.from_now,
+       n_strand: ["restore_states_enrollment_states", root_account.global_id],
+       max_attempts: 2},
+      batch
+    )
   end
 end
