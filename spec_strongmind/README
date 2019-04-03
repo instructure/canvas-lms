@@ -1,5 +1,7 @@
 Run Canvas Spec(s)
-bin/rspec spec/selenium/add_people/add_people_spec.rb
+bundle                                                   # make sure Canvas bundle is setup
+bin/rspec spec/selenium/add_people/add_people_spec.rb    # run Canvas core specs
 
 Run StrongMind Spec(s)
-STRONGMIND_SPEC=1 bundle exec rspec spec_strongmind/
+STRONGMIND_SPEC=1 bundle                                 # make sure your bundle is setup
+STRONGMIND_SPEC=1 bundle exec rspec spec_strongmind/     # run StrongMind specs with bundle
