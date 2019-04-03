@@ -673,7 +673,16 @@ Returns the Canvas user_id of the launching user.
 420000000000042
 ```
 ## vnd.instructure.User.uuid [duplicates User.uuid]
-Returns the Canvas user_uuid of the launching user.
+Returns the Canvas user_uuid of the launching user for the context.
+
+**Availability**: *when launched by a logged in user*  
+
+
+```
+N2ST123dQ9zyhurykTkBfXFa3Vn1RVyaw9Os6vu3
+```
+## vnd.instructure.User.current_uuid [duplicates User.uuid]
+Returns the current Canvas user_uuid of the launching user.
 
 **Availability**: *when launched by a logged in user*  
 
