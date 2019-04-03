@@ -336,7 +336,7 @@ module IncomingMailProcessor
     def self.extract_address_tag(message, account)
       addr, domain = account.address.split(/@/)
       regex = Regexp.new("#{Regexp.escape(addr)}\\+([^@]+)@#{Regexp.escape(domain)}")
-      message.to.each do |address|
+      message.to&.each do |address|
         if match = regex.match(address)
           return match[1]
         end

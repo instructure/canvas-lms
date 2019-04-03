@@ -519,7 +519,7 @@ class ContextModulesController < ApplicationController
     @module = @context.context_modules.not_deleted.find(params[:context_module_id])
     if authorized_action(@module, @current_user, :update)
       @tag = @module.add_item(params[:item])
-      unless @tag.valid?
+      unless @tag&.valid?
         return render :json => @tag.errors, :status => :bad_request
       end
       json = @tag.as_json

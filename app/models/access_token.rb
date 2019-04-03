@@ -87,7 +87,7 @@ class AccessToken < ActiveRecord::Base
   end
 
   def self.visible_tokens(tokens)
-    tokens.reject { |token| token.developer_key.internal_service }
+    tokens.reject { |token| token.developer_key&.internal_service }
   end
 
   def usable?(token_key = :crypted_token)

@@ -146,7 +146,7 @@ class MediaObject < ActiveRecord::Base
     client = CanvasKaltura::ClientV3.new
     client.startSession(CanvasKaltura::SessionType::ADMIN)
     info = client.mediaGet(media_id)
-    return !!info[:id]
+    return !!info&.dig(:id)
   end
 
   def self.ensure_media_object(media_id, create_opts = {})

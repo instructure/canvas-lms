@@ -60,7 +60,7 @@
     <td class="percent">
       <% if enrollment.course.hide_final_grades? || (@grading_periods[enrollment.course_id] && @grading_periods[enrollment.course_id][:selected_period_id] == 0) && !enrollment.course.display_totals_for_all_grading_periods?%>
         --
-      <% elsif @grades[:observed_enrollments][enrollment.course_id][enrollment.user_id] %>
+      <% elsif @grades&.dig(:observed_enrollments, enrollment.course_id, enrollment.user_id) %>
         <%= @grades[:observed_enrollments][enrollment.course_id][enrollment.user_id] %>%
       <% else %>
         <%= t('no_grade', 'no grade') %>

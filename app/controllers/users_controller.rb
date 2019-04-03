@@ -645,8 +645,8 @@ class UsersController < ApplicationController
         return render(json: { :message => "Invalid Dashboard View Option" }, status: :bad_request)
       end
 
-      @current_user.dashboard_view = params[:dashboard_view]
-      @current_user.save!
+      @current_user&.dashboard_view = params[:dashboard_view]
+      @current_user&.save!
       render json: {}
     end
   end

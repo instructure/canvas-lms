@@ -17,7 +17,7 @@
 %>
 
 <% content_for :page_title do %>
-  <%= join_title @attachment.display_name, @context.name %>
+  <%= join_title @attachment.display_name, @context&.name %>
 <% end %>
 <% add_crumb @attachment.display_name, context_url(@context, :context_file_url, @attachment) %>
 <% download_url = context_url(@context, :context_file_download_url, @attachment.id, download_frd: 1) %>

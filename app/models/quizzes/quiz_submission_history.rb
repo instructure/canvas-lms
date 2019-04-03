@@ -42,7 +42,7 @@ class Quizzes::QuizSubmissionHistory
   def version_models
     last_versions.map do |version|
       model = version.model
-      model.attempt == @submission.attempt ? @submission : model
+      model&.attempt == @submission.attempt ? @submission : model
     end
   end
 

@@ -189,7 +189,7 @@ class ActiveRecord::Base
 
   # little helper to keep checks concise and avoid a db lookup
   def has_asset?(asset, field = :context)
-    asset.id == send("#{field}_id") && asset.class.base_class.name == send("#{field}_type")
+    asset&.id == send("#{field}_id") && asset.class.base_class.name == send("#{field}_type")
   end
 
   def context_string(field = :context)

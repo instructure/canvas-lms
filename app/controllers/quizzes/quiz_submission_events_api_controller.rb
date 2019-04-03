@@ -75,7 +75,7 @@ class Quizzes::QuizSubmissionEventsApiController < ApplicationController
   #
   def create
     if authorized_action(@quiz_submission, @current_user, :record_events)
-      params["quiz_submission_events"].each do |datum|
+      params["quiz_submission_events"]&.each do |datum|
         Quizzes::QuizSubmissionEvent.create do |event|
           event.quiz_submission_id = @quiz_submission.id
           event.event_type = datum["event_type"]
