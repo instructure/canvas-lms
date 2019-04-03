@@ -692,6 +692,7 @@ class AuthenticationProvidersController < ApplicationController
   def update
     aac_data = params.fetch(:authentication_provider, params)
     aac = @account.authentication_providers.active.find params[:id]
+    aac_data["auth_type"] ||= aac.auth_type
     update_deprecated_account_settings_data(aac_data, aac)
     position = aac_data.delete(:position)
     data = filter_data(aac_data)
