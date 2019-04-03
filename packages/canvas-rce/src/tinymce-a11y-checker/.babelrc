@@ -1,16 +1,11 @@
 {
   "presets": [
+    "@instructure/ui-babel-preset",
     [
-      "quiz-presets/babel-preset-instructure-quizzes",
+      "@instructure/babel-preset-pretranslated-format-message",
       {
         "translationsDir": "locales",
         "extractDefaultTranslations": false
-      }
-    ],
-    [
-      "@instructure/ui-presets/babel",
-      {
-        "themeable": true
       }
     ]
   ]

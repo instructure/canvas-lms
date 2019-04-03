@@ -13,14 +13,14 @@ echo "building pretranslated output in lib/translated $CPUS at a time ..."
 ls locales/*.json | \
   xargs basename -s .json | \
   xargs -t -n 1 -P $CPUS -I % env \
-    BUILD_LOCALE=% $(npm bin)/babel --out-dir lib/%/modules --ignore __*/* --quiet --copy-files src
+    BUILD_LOCALE=% $(npm bin)/babel --out-dir lib/%/modules --ignore __*/* --copy-files src
 
 ls locales/*.json | \
   xargs basename -s .json | \
   xargs -t -n 1 -P $CPUS -I % env \
-    TRANSPILE=true BUILD_LOCALE=% $(npm bin)/babel --out-dir lib/% --ignore __*/* --copy-files --quiet src
+    TRANSPILE=true BUILD_LOCALE=% $(npm bin)/babel --out-dir lib/% --ignore __*/* --copy-files src
 
 node scripts/build-translations.js
 
-$(npm bin)/babel --out-dir lib/modules --ignore __*/* --quiet --copy-files src
-TRANSPILE=true $(npm bin)/babel --out-dir lib/ --ignore __*/* --quiet --copy-files src
+$(npm bin)/babel --out-dir lib/modules --ignore __*/* --copy-files src
+TRANSPILE=true $(npm bin)/babel --out-dir lib/ --ignore __*/* --copy-files src
