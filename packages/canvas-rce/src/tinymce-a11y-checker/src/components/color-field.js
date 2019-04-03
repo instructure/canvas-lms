@@ -13,21 +13,13 @@ export default class ColorField extends React.Component {
     return `rgba(${rgba.r}, ${rgba.g}, ${rgba.b}, ${rgba.a})`
   }
 
-  constructor() {
-    super()
-    this.state = { width: 200 }
-    this.handlePickerChange = this.handlePickerChange.bind(this)
-  }
-
-  static get displayName() {
-    return "ColorField"
-  }
+  state = { width: 200 }
 
   componentDidMount() {
     this.setState({ width: ReactDOM.findDOMNode(this).offsetWidth })
   }
 
-  handlePickerChange(color) {
+  handlePickerChange = color => {
     this.props.onChange({
       target: {
         name: this.props.name,

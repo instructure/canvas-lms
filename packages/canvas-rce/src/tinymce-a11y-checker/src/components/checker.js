@@ -51,10 +51,6 @@ export default class Checker extends React.Component {
     additionalRules: []
   }
 
-  static get displayName() {
-    return "Checker"
-  }
-
   setConfig(config) {
     this.setState({ config })
   }

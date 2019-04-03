@@ -40,7 +40,10 @@ exports[`render matches snapshot with errors 1`] = `
     </CloseButton>
     <View
       as="div"
+      debug={false}
       display="auto"
+      overflowX="visible"
+      overflowY="visible"
       padding="x-large large"
     >
       <Heading
@@ -55,7 +58,10 @@ exports[`render matches snapshot with errors 1`] = `
       </Heading>
       <View
         as="div"
+        debug={false}
         display="auto"
+        overflowX="visible"
+        overflowY="visible"
       >
         <LiveMessage
           aria-live="polite"
@@ -67,8 +73,11 @@ exports[`render matches snapshot with errors 1`] = `
         />
         <View
           as="div"
+          debug={false}
           display="auto"
           margin="large 0 medium 0"
+          overflowX="visible"
+          overflowY="visible"
         >
           <Grid
             colSpacing="none"
@@ -78,8 +87,12 @@ exports[`render matches snapshot with errors 1`] = `
             vAlign="middle"
             visualDebug={false}
           >
-            <GridRow>
+            <GridRow
+              isLastRow={false}
+            >
               <GridCol
+                isLastCol={false}
+                isLastRow={false}
                 textAlign="inherit"
               >
                 <Text
@@ -92,6 +105,8 @@ exports[`render matches snapshot with errors 1`] = `
                 </Text>
               </GridCol>
               <GridCol
+                isLastCol={false}
+                isLastRow={false}
                 textAlign="inherit"
                 width="auto"
               >
@@ -120,6 +135,7 @@ exports[`render matches snapshot with errors 1`] = `
                   onToggle={[Function]}
                   placement="bottom center"
                   positionTarget={null}
+                  shadow="resting"
                   shouldCloseOnDocumentClick={true}
                   shouldCloseOnEscape={true}
                   shouldContainFocus={true}
@@ -155,7 +171,10 @@ exports[`render matches snapshot with errors 1`] = `
                   </PopoverTrigger>
                   <PopoverContent>
                     <View
+                      debug={false}
                       display="block"
+                      overflowX="visible"
+                      overflowY="visible"
                       padding="medium"
                       width="16rem"
                     >
@@ -183,7 +202,7 @@ exports[`render matches snapshot with errors 1`] = `
                             immutable={false}
                             theme={
                               Object {
-                                Symbol(Link): Object {
+                                Symbol(Link__cIcZl): Object {
                                   "textDecoration": "underline",
                                 },
                               }
@@ -191,7 +210,7 @@ exports[`render matches snapshot with errors 1`] = `
                           >
                             <Link
                               as="button"
-                              ellipsis={false}
+                              disabled={false}
                               href="http://some-url"
                               iconPlacement="start"
                               linkRef={[Function]}
@@ -222,9 +241,12 @@ exports[`render matches snapshot with errors 1`] = `
           </Text>
           <View
             as="div"
+            debug={false}
             display="auto"
             key="select"
             margin="medium 0 0"
+            overflowX="visible"
+            overflowY="visible"
           >
             <Select
               disabled={false}
@@ -234,6 +256,7 @@ exports[`render matches snapshot with errors 1`] = `
               messages={Array []}
               name="select"
               onChange={[Function]}
+              required={false}
               selectRef={[Function]}
               size="medium"
               type="text"
@@ -255,9 +278,12 @@ exports[`render matches snapshot with errors 1`] = `
           </View>
           <View
             as="div"
+            debug={false}
             display="auto"
             key="checkbox"
             margin="medium 0 0"
+            overflowX="visible"
+            overflowY="visible"
           >
             <Checkbox
               checked={true}
@@ -267,15 +293,19 @@ exports[`render matches snapshot with errors 1`] = `
               label="Select Field"
               name="checkbox"
               onChange={[Function]}
+              readOnly={false}
               size="medium"
               variant="simple"
             />
           </View>
           <View
             as="div"
+            debug={false}
             display="auto"
             key="color"
             margin="medium 0 0"
+            overflowX="visible"
+            overflowY="visible"
           >
             <ColorField
               label="Select Field"
@@ -286,9 +316,12 @@ exports[`render matches snapshot with errors 1`] = `
           </View>
           <View
             as="div"
+            debug={false}
             display="auto"
             key="text"
             margin="medium 0 0"
+            overflowX="visible"
+            overflowY="visible"
           >
             <TextInput
               disabled={true}
@@ -300,6 +333,7 @@ exports[`render matches snapshot with errors 1`] = `
               name="text"
               onChange={[Function]}
               readOnly={false}
+              required={false}
               size="medium"
               textAlign="start"
               type="text"
@@ -308,9 +342,12 @@ exports[`render matches snapshot with errors 1`] = `
           </View>
           <View
             as="div"
+            debug={false}
             display="auto"
             key="textarea"
             margin="medium 0 0"
+            overflowX="visible"
+            overflowY="visible"
           >
             <TextArea
               autoGrow={true}
@@ -322,6 +359,7 @@ exports[`render matches snapshot with errors 1`] = `
               name="textarea"
               onChange={[Function]}
               readOnly={false}
+              required={false}
               resize="none"
               size="medium"
               textareaRef={[Function]}
@@ -329,8 +367,11 @@ exports[`render matches snapshot with errors 1`] = `
           </View>
           <View
             as="div"
+            debug={false}
             display="auto"
             margin="medium 0"
+            overflowX="visible"
+            overflowY="visible"
           >
             <Grid
               colSpacing="none"
@@ -340,8 +381,12 @@ exports[`render matches snapshot with errors 1`] = `
               vAlign="middle"
               visualDebug={false}
             >
-              <GridRow>
+              <GridRow
+                isLastRow={false}
+              >
                 <GridCol
+                  isLastCol={false}
+                  isLastRow={false}
                   textAlign="inherit"
                 >
                   <Button
@@ -373,6 +418,8 @@ exports[`render matches snapshot with errors 1`] = `
                   </Button>
                 </GridCol>
                 <GridCol
+                  isLastCol={false}
+                  isLastRow={false}
                   textAlign="inherit"
                   width="auto"
                 >
@@ -440,7 +487,10 @@ exports[`render matches snapshot without errors 1`] = `
     </CloseButton>
     <View
       as="div"
+      debug={false}
       display="auto"
+      overflowX="visible"
+      overflowY="visible"
       padding="x-large large"
     >
       <Heading
@@ -454,7 +504,10 @@ exports[`render matches snapshot without errors 1`] = `
          Accessibility Checker
       </Heading>
       <View
+        debug={false}
         display="auto"
+        overflowX="visible"
+        overflowY="visible"
       >
         <Text
           as="span"
