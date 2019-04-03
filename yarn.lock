@@ -1204,7 +1204,7 @@
     classnames "^2"
     prop-types "^15"
 
-"@instructure/ui-buttons@^5", "@instructure/ui-buttons@^5 || rc":
+"@instructure/ui-buttons@^5":
   version "5.48.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-buttons/-/ui-buttons-5.48.0.tgz#7bcf812a4b5844862412b3777ea084af07e2c6a5"
   integrity sha512-fvQARD+EG8r8we1F/h1IpdY0fAyV9ODlFyYBz4G0dKnUaTWf/3d/J2JiC4jlbXwHdZt3qoKp6oYfgS6mX8dn+w==
@@ -1231,7 +1231,7 @@
     classnames "^2"
     prop-types "^15"
 
-"@instructure/ui-core@^5", "@instructure/ui-core@^5 || rc":
+"@instructure/ui-core@^5":
   version "5.48.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-core/-/ui-core-5.48.0.tgz#dd8cf67b4eff1ede75c1296f083b9ec922c28fe2"
   integrity sha512-45dAYjFKvcaTeUIbyw2JfzOVIaJku3rfMOGlNPLD2Wb50T9LEb+UkUpyU0cwTx3ZCIQDK3rKGfKqS58QCGeYzg==
@@ -1285,7 +1285,7 @@
     "@instructure/ui-utils" "^5"
     prop-types "^15"
 
-"@instructure/ui-elements@^5", "@instructure/ui-elements@^5 || rc":
+"@instructure/ui-elements@^5":
   version "5.48.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-elements/-/ui-elements-5.48.0.tgz#53b9376e372a25da94a03901d0216189e6fc7eab"
   integrity sha512-9SGm3Isf9Bu7maa/fe9AZjvqSYgf9OLHTAmqidM5KMB7AvgiToU69H8ZcUNUu5IU+75oKYgB1USvWtV3u0UscQ==
@@ -1336,7 +1336,7 @@
     classnames "^2"
     prop-types "^15"
 
-"@instructure/ui-forms@^5", "@instructure/ui-forms@^5 || rc":
+"@instructure/ui-forms@^5":
   version "5.48.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-forms/-/ui-forms-5.48.0.tgz#1ead8f27dab0001bdc1b4323a60e8a3f1ff6ac18"
   integrity sha512-IWieJghVJU3BOWKAwTuSoMhHYgR9PkoUcOyqlPDIORu89GryqpJvGGA1m5epRN822aqWJADSMDVj0Ke/dsGL4Q==
@@ -1374,7 +1374,7 @@
     moment-timezone "^0.5"
     prop-types "^15"
 
-"@instructure/ui-icons@^5", "@instructure/ui-icons@^5 || rc":
+"@instructure/ui-icons@^5":
   version "5.48.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-icons/-/ui-icons-5.48.0.tgz#c9478a0d74600ddecd2fd5ce347cc0cc8ed8689c"
   integrity sha512-29lEIpph2YwuTu6pR71Xhfd6hbcaJqlsdMLLw5IQQsW0QJiJ7cLK1rkaKkZq7EEX9zJEj2RpUS64RA445Lcb5A==
@@ -1449,7 +1449,7 @@
     keycode "^2"
     prop-types "^15"
 
-"@instructure/ui-overlays@^5", "@instructure/ui-overlays@^5 || rc":
+"@instructure/ui-overlays@^5":
   version "5.48.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-overlays/-/ui-overlays-5.48.0.tgz#5e4cd8f0e9104c2441622f62d69faf0daee0176c"
   integrity sha512-hh1+wOdS/q4TOAtgI2Lu9owVL6ytZdh7yJA8iLSCW/JVzdnH5w2iAKw2hCP+P44XeFgyHtMqHyXWZUHFElZWzQ==
@@ -1591,7 +1591,7 @@
     prop-types "^15"
     tinycolor2 "^1.4.1"
 
-"@instructure/ui-themes@^5", "@instructure/ui-themes@^5 || rc":
+"@instructure/ui-themes@^5":
   version "5.48.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-themes/-/ui-themes-5.48.0.tgz#edde7736b391a4994a6c17ee5e220d62893cef7d"
   integrity sha512-EYG0/0Gub58RZh6hXpUPMB3F3TAI56kyFLeRAAGe+Wg/TyVRSLri9QXx9kIZd/nB11/QKok8ZN/K59uUbIfyMg==
@@ -16844,18 +16844,18 @@ tinycolor2@1.4.1, tinycolor2@^1.4.1:
   resolved "https://registry.yarnpkg.com/tinycolor2/-/tinycolor2-1.4.1.tgz#f4fad333447bc0b07d4dc8e9209d8f39a8ac77e8"
   integrity sha1-9PrTM0R7wLB9TcjpIJ2POaisd+g=
 
-tinymce-a11y-checker@^1.11.0:
-  version "1.11.0"
-  resolved "https://registry.yarnpkg.com/tinymce-a11y-checker/-/tinymce-a11y-checker-1.11.0.tgz#6f8fb784406b35c5e8e42bfc80f8a62cec15cfbc"
-  integrity sha512-+vC7IF6vhn58r39z4ZX0xFMFv01f5g3ptKQDLvgZxwApJhfvHcQyivbhoWX11I0k1IAI2t8fhF5GztaByVQS7w==
+tinymce-a11y-checker@^2:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/tinymce-a11y-checker/-/tinymce-a11y-checker-2.0.0.tgz#ae76c0f59a2504045fab66b354b29c8cfd020e53"
+  integrity sha512-EnkaKM2rqrEdY+LyPavK9ykDmzO1lt69HR8sS1aM4qzq62ZmCxzqoOzAprLnLfe2CcAjWDfo5tezz+0XmwCQ3w==
   dependencies:
-    "@instructure/ui-buttons" "^5 || rc"
-    "@instructure/ui-core" "^5 || rc"
-    "@instructure/ui-elements" "^5 || rc"
-    "@instructure/ui-forms" "^5 || rc"
-    "@instructure/ui-icons" "^5 || rc"
-    "@instructure/ui-overlays" "^5 || rc"
-    "@instructure/ui-themes" "^5 || rc"
+    "@instructure/ui-buttons" "^5"
+    "@instructure/ui-core" "^5"
+    "@instructure/ui-elements" "^5"
+    "@instructure/ui-forms" "^5"
+    "@instructure/ui-icons" "^5"
+    "@instructure/ui-overlays" "^5"
+    "@instructure/ui-themes" "^5"
     axios "^0.18.0"
     bloody-offset "^0.0.0"
     format-message "^6"
