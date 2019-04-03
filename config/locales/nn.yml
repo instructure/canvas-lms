@@ -49,6 +49,7 @@ nn:
     cancel: Avbryt
     save: Lagre
   _2d4c0d31: "..."
+  _5a374287: "..."
   _at_the_bottom__4360f2b4: "-- Nedst --"
   _b4455c8b: "%"
   _count_points_23dc93e0: 
@@ -9127,6 +9128,7 @@ nn:
   hide_course_sections_for_course_name_bd1911af: "Skjul emneklassar for emnet %{name}"
   hide_courses_navigation_menu_6f7c4cfd: "Skjul meny for emnenavigasjon"
   hide_courses_without_enrollments_6df4dfad: "Skjul emne utan påmeldingar"
+  hide_e057ff36: Skjul
   hide_groups_navigation_menu_62e8b3d0: "Skjul meny for gruppenavigasjon"
   hide_navigation_menu_f0b3e90: "Skjul navigeringsmeny"
   hide_notes_column_7749f408: "Skjul kolonne for merknader"
@@ -9339,6 +9341,7 @@ nn:
       poeng, prosent, fullført eller ikkje fullført, godkjent eller ikkje godkjent, GPA-skala
       og bokstavkarakterar. Grupper oppgåver for karaktervekting.
   insert_equella_links_49a8dacd: "Sett inn Equella-lenker"
+  insert_here_ccdb022e: "set inn her"
   insert_math_equation_57c6e767: "Set inn mattelikning"
   insert_row_below_25187f89: "Set inn rad nedanfor"
   installed_7b284a91: Installert
@@ -9702,7 +9705,7 @@ nn:
         rubrics: Vurderingsskjema
         syllabus_body: "Innhald i emneoversikten"
         tool_profiles: Verktøyprofilar
-        wikis: Wiki-sider
+        wikis: Sider
     cc: 
       standard: 
         failed_to_convert_qti: "Kan ikkje importere oppgåve %{file_identifier}"
@@ -12102,6 +12105,7 @@ nn:
   no_broken_links_found_38d951e3: "Finn ikkje brotne lenker"
   no_cancel_installation_db8d12d7: "Nei, avbryt installasjon"
   no_collaboration_apps_3bbd30ce: "Ingen samarbeids-app-er"
+  no_content_5dbc9acf: "Utan innhald"
   no_content_has_been_added_f36bab43: "* Innhald er ikkje lagt til"
   no_courses_found_12d68a74: "Finn ikkje emne"
   no_date_bfeb2df7: "Ingen dato"
@@ -12669,6 +12673,9 @@ nn:
       points: Poeng
       pts: poeng
       rating_description: "Skildring av kriterievurdering"
+    criterion_header: 
+      insert_criterion_rating: "Set inn kriterievurdering"
+      insert_rating: "Set inn"
     dont_import: "Gruppa kan ikkje importerast."
     failed_outcome_creation: "Oppretting av læringsmål mislukkast"
     failed_outcome_update: "Oppdatering av læringsmål mislukkast"
@@ -17856,6 +17863,7 @@ nn:
   total_column_options_4e6a6032: "Kolonnealternativ totalt"
   total_messages_af025be6: "Meldingar totalt"
   total_options_351e2682: "Alle alternativ"
+  total_points_44d76792: Totalpoeng
   total_range_45c8549a: "Totalt spenn"
   total_results_outcomedetails_cnt_30ff1f8d: "Totalresultat: %{outcomeDetails.cnt}"
   track_individual_student_and_class_progress_c13cf2d1: "Spor progresjon til enkeltstudentar og seksjon"
@@ -18082,6 +18090,7 @@ nn:
   user_accepted_their_invitation_for_the_course_cour_9d600393: "%{user} aksepterte invitasjonen til å ta del på emnet %{course}. "
   user_access_tokens_title: "Tokens for brukartilgang"
   user_avatars_e4fc4ed3: "Avatar for brukar"
+  user_c95de254: Brukar
   user_content_aaf0fb5a: Brukarinnhald
   user_count_respondents_e30a8593: "%{user_count} respondentar"
   user_date_range_search: 

@@ -176,11 +176,13 @@ class LearningOutcomeGroup < ActiveRecord::Base
     # do this in a transaction, so parallel calls don't create multiple roots
     # TODO: clean up contexts that already have multiple root outcome groups
     transaction do
-      group = scope.active.root.first
+      group = scope.active.root.take
       if !group && force
         group = scope.build :title => context.try(:name) || 'ROOT'
         group.building_default = true
-        group.save!
+        Shackles.activate(:master) do
+          group.save!
+        end
       end
       group
     end

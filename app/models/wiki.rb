@@ -162,21 +162,23 @@ class Wiki < ActiveRecord::Base
   end
 
   def self.wiki_for_context(context)
-    context.transaction do
-      # otherwise we lose dirty changes
-      context.save! if context.changed?
-      context.lock!
-      return context.wiki if context.wiki_id
-      # TODO i18n
-      t :default_course_wiki_name, "%{course_name} Wiki", :course_name => nil
-      t :default_group_wiki_name, "%{group_name} Wiki", :group_name => nil
+    Shackles.activate(:master) do
+      context.transaction do
+        # otherwise we lose dirty changes
+        context.save! if context.changed?
+        context.lock!
+        return context.wiki if context.wiki_id
+        # TODO i18n
+        t :default_course_wiki_name, "%{course_name} Wiki", :course_name => nil
+        t :default_group_wiki_name, "%{group_name} Wiki", :group_name => nil
 
-      self.extend TextHelper
-      name = CanvasTextHelper.truncate_text(context.name, {:max_length => 200, :ellipsis => ''})
+        self.extend TextHelper
+        name = CanvasTextHelper.truncate_text(context.name, {:max_length => 200, :ellipsis => ''})
 
-      context.wiki = wiki = Wiki.create!(:title => "#{name} Wiki")
-      context.save!
-      wiki
+        context.wiki = wiki = Wiki.create!(:title => "#{name} Wiki")
+        context.save!
+        wiki
+      end
     end
   end
 

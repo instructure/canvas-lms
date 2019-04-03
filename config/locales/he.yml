@@ -55,6 +55,7 @@ he:
     cancel: ביטול
     save: שמירה
   _2d4c0d31: …
+  _5a374287: "..."
   _at_the_bottom__4360f2b4: "-- בתחתית --"
   _b4455c8b: "%"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "בשיטת חישוב זו אין שימוש בערך מחושב"
@@ -9258,6 +9259,7 @@ he:
   hide_course_sections_for_course_name_bd1911af: "הסתרות הקבצות של קורס %{name}"
   hide_courses_navigation_menu_6f7c4cfd: "הסתרת תפריט ניווט קורסים"
   hide_courses_without_enrollments_6df4dfad: "הסתרת קורסים ללא נרשמים"
+  hide_e057ff36: הסתרה
   hide_groups_navigation_menu_62e8b3d0: "הסתרת תפריט ניווט קבוצות"
   hide_navigation_menu_f0b3e90: "הסתרת תפריט ניווט"
   hide_notes_column_7749f408: "הסתרת עמודת ההערות"
@@ -9460,6 +9462,7 @@ he:
       אחוזים או כלא הושלמו, עברו, נכשלו, או בסולם GPA והערכה מילולית
       ההערכה של משימות קבוצתיות ממתינה
   insert_equella_links_49a8dacd: "הוספת קישורי Equella "
+  insert_here_ccdb022e: "הוספה כאן"
   insert_math_equation_57c6e767: "הוספת משוואה מתימטית"
   insert_row_below_25187f89: "הוספת שורה מתחת"
   installed_7b284a91: הותקן
@@ -9813,7 +9816,7 @@ he:
         rubrics: רובריקות
         syllabus_body: "תוכן הסילבוס"
         tool_profiles: "הפרופילים של הכלי"
-        wikis: "דפי וויקי"
+        wikis: דפים
     cc: 
       standard: 
         failed_to_convert_qti: "כשלון בייבוא הערכה %{file_identifier}"
@@ -12248,6 +12251,7 @@ he:
   no_associated_terms_13bacefc: "תקופות לימודים לא שויכו"
   no_broken_links_found_38d951e3: "לא נמצאו קישורים שגויים"
   no_collaboration_apps_3bbd30ce: "אין אפליקציות שיתופי פעולה"
+  no_content_5dbc9acf: "חסר תוכן"
   no_content_has_been_added_f36bab43: "* לא נתווסף כל תוכן"
   no_courses_found_12d68a74: "לא נמצאו קורסים"
   no_date_bfeb2df7: "אין תאריך"
@@ -12775,6 +12779,9 @@ he:
       points: נקודות
       pts: נק'
       rating_description: "תיאור קריטריון דרוג"
+    criterion_header: 
+      insert_criterion_rating: "הוספת קריטריון דרוג"
+      insert_rating: הוספה
     dont_import: "אין אפשרות לייבא קבוצה זו"
     failed_outcome_creation: "יצירת תוצאות למידה נכשלה"
     failed_outcome_update: "עדכון תוצאות למידה נכשל"
@@ -18025,6 +18032,7 @@ he:
   total_71a4807: סה"כ
   total_column_options_4e6a6032: "סך אפשרויות העמודה"
   total_options_351e2682: "סך האפשרויות"
+  total_points_44d76792: "סך ניקוד "
   total_range_45c8549a: "טווח כולל"
   total_results_outcomedetails_cnt_30ff1f8d: "סך התוצאות: %{outcomeDetails.cnt}"
   tours: 
@@ -18215,6 +18223,7 @@ he:
   user_accepted_their_invitation_for_the_course_cour_9d600393: "%{user} קיבלו את ההזמנה לקורס %{course}."
   user_access_tokens_title: "אסימוני גישת משתמש"
   user_avatars_e4fc4ed3: "אוואטארי משתמש"
+  user_c95de254: משתמש
   user_content_aaf0fb5a: "תוכן משתמש"
   user_count_respondents_e30a8593: "%{user_count} משיבים"
   user_date_range_search: 
