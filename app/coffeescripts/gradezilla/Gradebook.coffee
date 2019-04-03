@@ -113,7 +113,7 @@ define [
   LatePolicyApplicator, { default: Button }, { default: IconSettingsSolid }, FlashAlert) ->
 
   ensureAssignmentVisibility = (assignment, submission) =>
-    if assignment.only_visible_to_overrides && !assignment.assignment_visibility.includes(submission.user_id)
+    if assignment?.only_visible_to_overrides && !assignment.assignment_visibility.includes(submission.user_id)
       assignment.assignment_visibility.push(submission.user_id)
 
   isAdmin = =>
