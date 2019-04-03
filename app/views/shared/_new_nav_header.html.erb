@@ -107,8 +107,8 @@
           </li>
           <li class="menu-item ic-app-header__menu-list-item <%= ' ic-app-header__menu-list-item--active' if active_path?('/conversations') %>">
             <a id="global_nav_conversations_link" href="/conversations" class="ic-app-header__menu-list-link">
-              <div class="menu-item-icon-container" aria-hidden="true">
-                <%= svg_icon :inbox %>
+              <div class="menu-item-icon-container">
+                <span aria-hidden="true"><%= svg_icon :inbox %></span>
                 <span class="menu-item__badge" style="display: none">0</span>
               </div>
               <div class="menu-item__text">

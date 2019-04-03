@@ -20,6 +20,8 @@ import _ from 'underscore'
 import $ from 'jquery'
 import I18n from 'i18n!new_nav'
 import React from 'react'
+import ReactDOM from 'react-dom'
+import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y'
 import Tray from '@instructure/ui-overlays/lib/components/Tray'
 import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
 import CoursesTray from './trays/CoursesTray'
@@ -193,7 +195,21 @@ export default class Navigation extends React.Component {
 
   updateUnreadCount(count) {
     count = parseInt(count, 10)
-    this.unreadCountElement().text(I18n.n(count))
+    ReactDOM.render(
+      <React.Fragment>
+        <ScreenReaderContent>
+          {I18n.t(
+            {
+              one: '1 unread message',
+              other: '%{count} unread messages'
+            },
+            {count}
+          )}
+        </ScreenReaderContent>
+        <PresentationContent>{count}</PresentationContent>
+      </React.Fragment>,
+      this.unreadCountElement()[0]
+    )
     this.unreadCountElement().toggle(count > 0)
   }
 
@@ -292,18 +308,18 @@ export default class Navigation extends React.Component {
 
   getTrayLabel() {
     switch (this.state.type) {
-      case "courses":
-        return I18n.t("Courses tray");
-      case "groups":
-        return I18n.t("Groups tray");
-      case "accounts":
-        return I18n.t("Admin tray");
-      case "profile":
-        return I18n.t("Profile tray");
-      case "help":
-        return I18n.t("%{title} tray", { title: window.ENV.help_link_name });
+      case 'courses':
+        return I18n.t('Courses tray')
+      case 'groups':
+        return I18n.t('Groups tray')
+      case 'accounts':
+        return I18n.t('Admin tray')
+      case 'profile':
+        return I18n.t('Profile tray')
+      case 'help':
+        return I18n.t('%{title} tray', {title: window.ENV.help_link_name})
       default:
-        return I18n.t("Global navigation tray");
+        return I18n.t('Global navigation tray')
     }
   }
 
