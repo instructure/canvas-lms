@@ -29,20 +29,19 @@ tinymce.create("tinymce.plugins.AccessibilityChecker", {
       instance.check(...args)
     )
 
-    ed.addButton("check_a11y", {
-      title: formatMessage("Check Accessibility"),
-      cmd: "openAccessibilityChecker",
-      icon: "a11y"
-    })
-  },
-
-  getInfo: function() {
-    return {
-      longname: "Instructure Accessibility Checker",
-      author: "Brent Burgoyne",
-      authorurl: "https://github.com/instructure",
-      infourl: "https://github.com/instructure/tinymce-a11y",
-      version: "1.0"
+    if (tinymce.majorVersion === "4") {
+      // remove this branch when everything is on tinymce 5
+      ed.addButton("check_a11y", {
+        title: formatMessage("Check Accessibility"),
+        cmd: "openAccessibilityChecker",
+        icon: "a11y"
+      })
+    } else {
+      ed.ui.registry.addButton("check_a11y", {
+        title: formatMessage("Check Accessibility"),
+        onAction: _ => ed.execCommand("openAccessibilityChecker"),
+        icon: "a11y"
+      })
     }
   }
 })
