@@ -151,7 +151,7 @@ Rails.application.config.after_initialize do
         next if (regions.include?(db.config[:region]) || !db.config[:region])
         next if db.shards.empty?
         regions << db.config[:region]
-        db.shards.first.delayed_jobs_shard.activate(:delayed_jobs) do
+        db.shards.first.activate do
           klass.send_later_enqueue_args(method, enqueue_args, *args)
         end
       end
@@ -163,7 +163,7 @@ Rails.application.config.after_initialize do
       shard = nil
       all.find { |db| db.config[:region] == region && (shard = db.shards.first) }
       raise "Could not find a shard in region #{region}" unless shard
-      shard.delayed_jobs_shard.activate(:delayed_jobs) do
+      shard.activate do
         klass.send_later_enqueue_args(method, enqueue_args, *args)
       end
     end
