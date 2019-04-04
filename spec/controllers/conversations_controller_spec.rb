@@ -259,15 +259,6 @@ describe ConversationsController do
       expect(assigns[:conversation]).not_to be_nil
     end
 
-    it "should allow sending to students even if course is concluded" do
-      user_session(@teacher)
-      @course.account.role_overrides.create!(:permission => :send_messages, :role => student_role, :enabled => false)
-      @course.soft_conclude!
-      post 'create', params: { recipients: [@student.id.to_s], body: "yo", context_code: @course.asset_string }
-      expect(response).to be_successful
-      expect(assigns[:conversation]).not_to be_nil
-    end
-
     it "should not add the wrong tags in a certain terrible cached edge case" do
       # tl;dr - not including the updated_at when we instantiate the users
       # can cause us to grab stale conversation_context_codes
