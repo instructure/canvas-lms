@@ -21,15 +21,16 @@ class GraphQLController < ApplicationController
 
   before_action :require_user, except: :execute
 
-
   def execute
     query = params[:query]
     variables = params[:variables] || {}
     context = {
       current_user: @current_user,
+      real_current_user: @real_current_user,
       session: session,
       request: request,
       in_app: in_app?,
+      request_id: (Thread.current[:context] || {})[:request_id],
       tracers: [
         Tracers::DatadogTracer.new(
           request.host_with_port.sub(':', '_'),

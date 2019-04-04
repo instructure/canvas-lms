@@ -63,7 +63,7 @@ module CanvasDynamoDB
     end
 
     def prefixed_table_name(table_name)
-      "#{@prefix}#{table_name}"
+      "#{@prefix}-#{table_name}"
     end
 
     def batch_get

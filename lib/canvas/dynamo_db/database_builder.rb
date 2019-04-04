@@ -23,7 +23,7 @@ module Canvas
       def self.configured?(category, environment = default_environment)
         raise ArgumentError, "config name required" if category.blank?
         config = configs(environment)[category]
-        config && config[:table_prefix] && config[:region]
+        !!(config && config[:table_prefix] && config[:region])
       end
 
       def self.from_config(category, environment = default_environment)
