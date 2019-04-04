@@ -48,7 +48,7 @@
     "message": "Rōpū pou"
   },
   "decorative_image_fde98579": {
-    "message": "Whakapaipai pakoko"
+    "message": "Whakapaipai āhua"
   },
   "element_starting_with_start_91bf4c3b": {
     "message": "Te tīmatanga o te kaupapa { start }"
@@ -75,25 +75,22 @@
     "message": "Pane e tīmata ana me { start }"
   },
   "headings_should_not_contain_more_than_120_characte_3c0e0cb3": {
-    "message": "Kia kaua ngā pane e nui atu i te 120 ngā reta.."
+    "message": "Kia kaua ngā pane e nui atu i te 120 ngā reta."
   },
   "image_filenames_should_not_be_used_as_the_alt_attr_bcfd7780": {
-    "message": "Kaua e whakamahia ngā kōnae ingoa ki te whakamahi i te alt huanga e whakaatu ana i te ihirangi pakoko."
+    "message": "Kaua e whakamahia ngā kōnae ingoa ki te whakamahi i te alt huanga e whakātu ana i te ihirangi pakoko."
   },
   "image_with_filename_file_aacd7180": {
-    "message": "Pakoko me te kōnae ingoa { file }"
+    "message": "Āhua me te kōnae ingoa { file }"
   },
   "images_should_include_an_alt_attribute_describing__b86d6a86": {
-    "message": "Ko ngā pakoko me whakauru he alt huanga e whakaahua ana i te ihirangi pakoko."
+    "message": "Ko ngā āhua me whakauru he alt huanga e whakāhua ana i te ihirangi āhua"
   },
   "issue_num_total_f94536cf": {
     "message": "Take { num }/{ total }"
   },
   "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
-    "message": "Ka whakaterehia e ngā papapātuhi ngā hononga ki te whakamahi i Ripa kī. Ngā hononga e rua e tata ana e tika ana ki te haerenga rite ka pōraruraru ki ngā papatuhi kaiwhakamahi."
-  },
-  "learn_more_a79a7918": {
-    "message": "ako atu"
+    "message": "Ka whakaterehia e ngā papa pātuhi ngā hononga ki te whakamahi i Ripa kī. Ngā hononga e rua e tata ana e tika ana ki te haerenga rite ka pōraruraru ki ngā papa pātuhi kaiwhakamahi."
   },
   "leave_as_is_4facfe55": {
     "message": "Waiho ki tēnei"
@@ -135,13 +132,13 @@
     "message": "Rōpū rārangi"
   },
   "screen_readers_cannot_determine_what_is_displayed__6a5842ab": {
-    "message": "Kaore e taea e ngā kaipānui mata te whakatau i ngā mea e whakaatuhia ana i roto i te pakoko me te kore kuputuhi rerekē, a, he maha ngā taura o ngā tau me ngā reta kaore i te whakaahua i te horopaki te tikanga rānei."
+    "message": "Kaore e taea e ngā kaipānui mata te whakatau i ngā mea e whakātuhia ana i roto i te āhua me te kore kuputuhi rerekē, a, he maha ngā taura o ngā tau me ngā reta kaore i te whakāhua i te horopaki te tikanga rānei."
   },
   "screen_readers_cannot_determine_what_is_displayed__6f1ea667": {
-    "message": "Kaore e taea e ngā kaipānui mata te whakatau i ngā mea e whakaatuhia ana i roto i te pakoko me te kore kuputuhi rerekē, e whakaahua ana i te ihirangi me te tikanga o te pakoko. Me ngāwari me te hāngai tōtika te kuputuhi rerekē."
+    "message": "Kaore e taea e ngā kaipānui mata te whakatau i ngā mea e whakāturia ana i roto i te āhua me te kore kuputuhi rerekē, e whakātu ana i te ihirangi me te tikanga o te pakoko. Me ngāwari me te hāngai tōtika te kuputuhi rerekē."
   },
   "screen_readers_cannot_determine_what_is_displayed__a57e6723": {
-    "message": "Kaore e taea e ngā kaipānui mata te whakatau i ngā mea e whakaaturia ana i roto i te pakoko me te kore kuputuhi rerekē, e whakaatu ana i te ihirangi me te tikanga o te pakoko."
+    "message": "Kaore e taea e ngā kaipānui mata te whakatau i ngā mea e whakāturia ana i roto i te āhua me te kore kuputuhi rerekē, e whakātu ana i te ihirangi me te tikanga o te pakoko."
   },
   "screen_readers_cannot_interpret_tables_without_the_bd861652": {
     "message": "Kaore e taea e ngā kaipānui mata ki te whakamāori i ngā papa kaore te hanganga tika. Ko ngā  pane ripanga e whakarato ana i te aronga me te kohinga ihirangi."
@@ -159,10 +156,10 @@
     "message": "Whakatau pane ripanga"
   },
   "sighted_users_browse_web_pages_quickly_looking_for_1d4db0c1": {
-    "message": "Ngā kaiwhakamahi e āhei ana ki te tiro pūtirotiro tere i te whārangi tukutuku, me te rapu i ngā pane nui, maia rānei. Ka whakawhirinaki ngā kaiwhakamahi pānui mata ki ngā pane mo te māramatanga o te horopaki. Me whakamahi ngā pane i te hanganga tika."
+    "message": "Ngā kaiwhakamahi e āhei ana ki te tiro pūtirotiro tere i te ngā whārangi tukutuku, me te rapu i ngā pane nui, maia rānei. Ka whakawhirinaki ngā kaiwhakamahi pānui mata ki ngā pane mo te māramatanga o te horopaki. Me whakamahi ngā pane i te hanganga tika."
   },
   "sighted_users_browse_web_pages_quickly_looking_for_ade806f5": {
-    "message": "Ngā kaiwhakamahi e āhei ana ki te tiro pūtirotiro tere i te whārangi tukutuku, me te rapu i ngā pane nui, maia rānei. Ka whakawhirinaki ngā kaiwhakamahi pānui mata ki ngā pane mo te māramatanga o te horopaki. Me whai kiko ngā pane ki roto i te hanganga tika."
+    "message": "Ngā kaiwhakamahi e āhei ana ki te tiro pūtirotiro tere i te ngā whārangi tukutuku, me te rapu i ngā pane nui, maia rānei. Ka whakawhirinaki ngā kaiwhakamahi pānui mata ki ngā pane mo te māramatanga o te horopaki. Me whai kiko ngā pane ki roto i te hanganga tika."
   },
   "table_header_starting_with_start_ffcabba6": {
     "message": "Ka timata te pane ripanga mei te { start }"
@@ -171,7 +168,7 @@
     "message": "Ripanga e timata ana me { start }"
   },
   "tables_headers_should_specify_scope_5abf3a8e": {
-    "message": "Me tautuhi ngā pane ripanga ki te whakaputa te hōkai.."
+    "message": "Me tautuhi ngā pane ripanga ki te whakaputa te hōkai."
   },
   "tables_should_include_a_caption_describing_the_con_e91e78fc": {
     "message": "Me whakauru ngā ripanga ki tētahi tuhinga e whakaatu ana i ngā ihirangi o te ripanga."
@@ -179,11 +176,14 @@
   "tables_should_include_at_least_one_header_48779eac": {
     "message": "Me whakauru ngā ripanga i te iti rawa o te pane kotahi."
   },
+  "text_is_difficult_to_read_without_sufficient_contr_69e62bd6": {
+    "message": "He uaua te panui, kaore he rerekētanga i waenga i te tuhinga me te papamuri, ina koa mo te hunga e iti ana te kite."
+  },
   "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
-    "message": "Ko te kuputuhi nui ake i te 18pt (me te maia 14pt) me whakaatu i te ōwehenga rerekē iti o te 3: 1."
+    "message": "Ko te kuputuhi nui ake i te 18pt (me te maia 14pt) me whakātu i te ōwehenga rerekē iti o te 3: 1."
   },
   "text_smaller_than_18pt_or_bold_14pt_should_display_aaffb22b": {
-    "message": "Ko te kuputuhi iti atu i te 18pt (me te maia 14pt) me whakaatu i te ōwehenga rerekē iti o te 4.5: 1."
+    "message": "Ko te kuputuhi iti atu i te 18pt (me te maia 14pt) me whakātu i te ōwehenga rerekē iti o te 4.5: 1."
   },
   "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
     "message": "Ina whakamahia te tohu tohu i ngā taonga tautuhi tirohanga hei rārangi, ēngari kaore e tohu i te hononga o te rārangi, he uaua ki ngā kaiwhakamahi te whakawhiti i ngā kōrero."

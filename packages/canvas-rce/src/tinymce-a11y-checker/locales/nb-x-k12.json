@@ -18,7 +18,7 @@
     "message": "Alt-attributter bør ikke inneholde mer enn 120 tegn."
   },
   "apply_781a2546": {
-    "message": "Legg til"
+    "message": "Bruk"
   },
   "change_alt_text_92654906": {
     "message": "Endre alternativ tekst"
@@ -141,7 +141,7 @@
     "message": "Skjermlesere kan ikke avgjøre hva som vises i et bilde uten alternativ tekst som beskriver innholdet og meningen med bildet."
   },
   "screen_readers_cannot_interpret_tables_without_the_bd861652": {
-    "message": "Skjermlesere kan ikke tolke tabeller uten skikkelig struktur. Tabelltitler gir rettledning og indikerer innholdsomfang"
+    "message": "Skjermlesere kan ikke tolke tabeller uten skikkelig struktur. Tabelltitler gir rettledning og indikerer innholdsomfang."
   },
   "screen_readers_cannot_interpret_tables_without_the_e62912d5": {
     "message": "Skjermlesere kan ikke tolke tabeller uten skikkelig struktur. Tabelloverskrifter beskriver konteksten og den generelle forståelsen av tabellen."
@@ -177,7 +177,7 @@
     "message": "Tabeller bør inkludere minst en tittel."
   },
   "text_is_difficult_to_read_without_sufficient_contr_69e62bd6": {
-    "message": "Teksten er vanskelig å lese uten tilstrekkelig kontrast mellom tekst og bakgrunn, spesielt for svaksynte. "
+    "message": "Teksten er vanskelig å lese uten tilstrekkelig kontrast mellom tekst og bakgrunn, spesielt for svaksynte."
   },
   "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
     "message": "Tekst større enn 18pkt (eller tykk 14pkt) bør vises med en minimums kontrastrate på 3:1."
@@ -186,7 +186,7 @@
     "message": "Tekst mindre enn 18pkt (eller tykk 14pkt) bør vises med en minimums kontrastrate på 4,5:1."
   },
   "when_markup_is_used_that_visually_formats_items_as_f941fc1b": {
-    "message": "Når det brukes markering som visuellt formaterer elementer som en liste men ikke indikerer et listeforhold kan brukere finne det vanskelig å navigere informasjonen."
+    "message": "Når det brukes markering som visuelt formaterer elementer som en liste men ikke indikerer et listeforhold kan brukere finne det vanskelig å navigere informasjonen."
   },
   "why_523b3d8c": {
     "message": "Hvorfor"

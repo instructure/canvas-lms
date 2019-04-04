@@ -92,9 +92,6 @@
   "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
     "message": "Gebruik de Tab-toets op het toetsenbord om te navigeren naar koppelingen. Twee aangrenzende koppelingen die naar dezelfde bestemming leiden, kunnen verwarrend werken bij gebruik van het toetsenbord."
   },
-  "learn_more_a79a7918": {
-    "message": "Meer informatie"
-  },
   "leave_as_is_4facfe55": {
     "message": "Ongewijzigd laten"
   },
@@ -178,6 +175,9 @@
   },
   "tables_should_include_at_least_one_header_48779eac": {
     "message": "Tabellen moeten minstens één kop hebben."
+  },
+  "text_is_difficult_to_read_without_sufficient_contr_69e62bd6": {
+    "message": "Tekst is moeilijk te lezen zonder voldoende contrast tussen de tekst en de achtergrond, met name voor slechtzienden."
   },
   "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
     "message": "Voor tekst groter dan 18pt (of vet 14pt) geldt een miinimum contrastverhouding van 3:1."

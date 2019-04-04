@@ -92,9 +92,6 @@
   "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
     "message": "キーボードは Tab キーを使用してリンクにナビゲートします。同じ宛先に向かう2つの隣接リンクがあると、キーボードユーザーに混乱を招く可能性があります。"
   },
-  "learn_more_a79a7918": {
-    "message": "詳しく見る"
-  },
   "leave_as_is_4facfe55": {
     "message": "そのままにする"
   },
@@ -178,6 +175,9 @@
   },
   "tables_should_include_at_least_one_header_48779eac": {
     "message": "表には、少なくとも1つのヘッダーが含まれていなければなりません。"
+  },
+  "text_is_difficult_to_read_without_sufficient_contr_69e62bd6": {
+    "message": "テキストは、テキストと背景との間に十分なコントラストがなければ、特に視力の弱い人にとっては読みにくくなります。"
   },
   "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
     "message": "18pt（または太字14pt）より大きいテキストは、3：1の最小コントラスト比で表示しなければなりません。"

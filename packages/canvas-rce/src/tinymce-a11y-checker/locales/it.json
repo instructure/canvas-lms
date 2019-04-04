@@ -92,9 +92,6 @@
   "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
     "message": "Le tastiere indirizzano ai link utilizzando il tasto TAB. Due link adiacenti che indirizzando alla stessa destinazione possono confondere gli utenti della tastiera."
   },
-  "learn_more_a79a7918": {
-    "message": "Scopri di più"
-  },
   "leave_as_is_4facfe55": {
     "message": "Lascia così"
   },
@@ -178,6 +175,9 @@
   },
   "tables_should_include_at_least_one_header_48779eac": {
     "message": "Le tabelle devono includere almeno un''intestazione."
+  },
+  "text_is_difficult_to_read_without_sufficient_contr_69e62bd6": {
+    "message": "Il testo è difficile da leggere senza un contrasto sufficiente tra il testo e lo sfondo, specialmente per gli ipovedenti."
   },
   "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
     "message": "Il testo con dimensioni maggiori di 18 pt (o in grassetto 14 pt) deve visualizzare un rapporto di contrasto minimo pari a 3:1."

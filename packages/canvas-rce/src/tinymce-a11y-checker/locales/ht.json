@@ -92,9 +92,6 @@
   "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
     "message": "Klavye navige nan lyen yo ak touch Tab la. De lyen adjasan ki dirije nan menm destinasyon an ka pèmèt moun k ap itilize klavye yo twompe yo."
   },
-  "learn_more_a79a7918": {
-    "message": "Aprann plis"
-  },
   "leave_as_is_4facfe55": {
     "message": "Kite tankou"
   },
@@ -178,6 +175,9 @@
   },
   "tables_should_include_at_least_one_header_48779eac": {
     "message": "Tablo yo dwe gen omwen yon antèt."
+  },
+  "text_is_difficult_to_read_without_sufficient_contr_69e62bd6": {
+    "message": "Li difisil pou li tèks la si pa gen ase kontras ant tèks la ak fon an, espesyalman pou moun ki pa wè byen yo."
   },
   "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
     "message": "Tèks ki pi gwo ke 18pt (oswa an gra 14pt) ta dwe afiche yon to kontras de 3:1."

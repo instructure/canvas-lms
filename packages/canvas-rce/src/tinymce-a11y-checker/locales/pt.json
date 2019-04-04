@@ -92,9 +92,6 @@
   "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
     "message": "Os teclados navegam para ligações usando a tecla Tab. Dois links adjacentes que direcionam para o mesmo destino podem confundir os utilizadores de teclado."
   },
-  "learn_more_a79a7918": {
-    "message": "Aprender mais"
-  },
   "leave_as_is_4facfe55": {
     "message": "Deixe como está"
   },
@@ -178,6 +175,9 @@
   },
   "tables_should_include_at_least_one_header_48779eac": {
     "message": "As tabelas devem incluir pelo menos um cabeçalho."
+  },
+  "text_is_difficult_to_read_without_sufficient_contr_69e62bd6": {
+    "message": "O texto é difícil de ler sem contraste suficiente entre o texto e o fundo, especialmente para aqueles com baixa visão."
   },
   "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
     "message": "O texto maior que 18pt (ou em negrito 14pt) deve exibir uma relação mínima de contraste de 3:1."

@@ -92,9 +92,6 @@
   "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
     "message": "Keyboards navigate to links using the Tab key. Two adjacent links that direct to the same destination can be confusing to keyboard users."
   },
-  "learn_more_a79a7918": {
-    "message": "Learn more"
-  },
   "leave_as_is_4facfe55": {
     "message": "Leave as is"
   },
@@ -178,6 +175,9 @@
   },
   "tables_should_include_at_least_one_header_48779eac": {
     "message": "Tables should include at least one header."
+  },
+  "text_is_difficult_to_read_without_sufficient_contr_69e62bd6": {
+    "message": "Text is difficult to read without sufficient contrast between the text and the background, especially for those with low vision."
   },
   "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
     "message": "Text larger than 18pt (or bold 14pt) should display a minimum contrast ratio of 3:1."
