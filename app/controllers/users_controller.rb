@@ -2062,16 +2062,18 @@ class UsersController < ApplicationController
       f.updated = Time.now
       f.id = user_url(@context)
     end
-    @entries = []
-    cutoff = 1.week.ago
-    @context.courses.each do |context|
-      @entries.concat context.assignments.active.where("updated_at>?", cutoff)
-      @entries.concat context.calendar_events.active.where("updated_at>?", cutoff)
-      @entries.concat context.discussion_topics.active.where("updated_at>?", cutoff)
-      @entries.concat context.wiki_pages.not_deleted.where("updated_at>?", cutoff)
-    end
-    @entries.each do |entry|
-      feed.entries << entry.to_atom(:include_context => true, :context => @context)
+    unless Setting.get('public_feed_disabled', 'false') == 'true'
+      @entries = []
+      cutoff = 1.week.ago
+      @context.courses.each do |context|
+        @entries.concat context.assignments.active.where("updated_at>?", cutoff)
+        @entries.concat context.calendar_events.active.where("updated_at>?", cutoff)
+        @entries.concat context.discussion_topics.active.where("updated_at>?", cutoff)
+        @entries.concat context.wiki_pages.not_deleted.where("updated_at>?", cutoff)
+      end
+      @entries.each do |entry|
+        feed.entries << entry.to_atom(:include_context => true, :context => @context)
+      end
     end
     respond_to do |format|
       format.atom { render :plain => feed.to_xml }
