@@ -2668,6 +2668,7 @@ class CoursesController < ApplicationController
 
   def public_feed
     return unless get_feed_context(:only => [:course])
+    return [] if Setting.get('public_feed_disabled', 'false') == 'true'
     feed = Atom::Feed.new do |f|
       f.title = t('titles.rss_feed', "%{course} Feed", :course => @context.name)
       f.links << Atom::Link.new(:href => course_url(@context), :rel => 'self')

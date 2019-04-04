@@ -2055,6 +2055,7 @@ class UsersController < ApplicationController
 
   def public_feed
     return unless get_feed_context(:only => [:user])
+    return [] if Setting.get('public_feed_disabled', 'false') == 'true'
     feed = Atom::Feed.new do |f|
       f.title = "#{@context.name} Feed"
       f.links << Atom::Link.new(:href => dashboard_url, :rel => 'self')
