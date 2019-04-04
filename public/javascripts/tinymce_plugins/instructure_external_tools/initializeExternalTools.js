@@ -21,11 +21,7 @@ import $ from 'jquery'
 import htmlEscape from '../../str/htmlEscape'
 import ExternalToolsHelper from './ExternalToolsHelper'
 import iframeAllowances from 'jsx/external_apps/lib/iframeAllowances'
-import '../../jquery.instructure_misc_helpers'
-import 'jqueryui/dialog'
-import '../../jquery.instructure_misc_plugins'
 import Links from '../instructure_links/links'
-import ExternalToolDialog from 'jsx/editor/ExternalToolDialog'
 import React from 'react'
 import ReactDOM from 'react-dom'
 
@@ -44,22 +40,24 @@ const ExternalToolsPlugin = {
       // if somehow open gets called early, keep trying until it is ready
       open: (...args) => setTimeout(() => dialog.open(...args), 50)
     }
-    const dialogContainer = document.createElement('div')
-    document.body.appendChild(dialogContainer)
-    ReactDOM.render(
-      <ExternalToolDialog
-        win={window}
-        editor={ed}
-        contextAssetString={ENV.context_asset_string}
-        iframeAllowances={iframeAllowances()}
-        resourceSelectionUrl={$('#context_external_tool_resource_selection_url').attr('href')}
-        deepLinkingOrigin={ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN}
-      />,
-      dialogContainer,
-      function() {
-        dialog = this
-      }
-    )
+    import('jsx/editor/ExternalToolDialog').then(ExternalToolDialog => {
+      const dialogContainer = document.createElement('div')
+      document.body.appendChild(dialogContainer)
+      ReactDOM.render(
+        <ExternalToolDialog
+          win={window}
+          editor={ed}
+          contextAssetString={ENV.context_asset_string}
+          iframeAllowances={iframeAllowances()}
+          resourceSelectionUrl={$('#context_external_tool_resource_selection_url').attr('href')}
+          deepLinkingOrigin={ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN}
+        />,
+        dialogContainer,
+        function() {
+          dialog = this
+        }
+      )
+    })
 
     const clumpedButtons = []
     for (let idx = 0; _INST.editorButtons && idx < _INST.editorButtons.length; idx++) {
