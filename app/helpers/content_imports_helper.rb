@@ -34,7 +34,7 @@ module ContentImportsHelper
     end
   end
 
-  def mig_id(obj)
-    CC::CCHelper.create_key(obj)
+  def mig_id(obj, global: false)
+    CC::CCHelper.create_key(obj, global: global)
   end
 end

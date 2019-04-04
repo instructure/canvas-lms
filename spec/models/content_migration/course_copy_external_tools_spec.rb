@@ -110,7 +110,7 @@ describe ContentMigration do
 
       run_course_copy
 
-      tool = @copy_to.context_external_tools.where(migration_id: CC::CCHelper.create_key(@tool_from)).first
+      tool = @copy_to.context_external_tools.where(migration_id: mig_id(@tool_from)).first
       expect(tool.settings[:vendor_extensions]).to eq [{'platform'=>"my.lms.com", 'custom_fields'=>{"key"=>"value"}}]
     end
 
@@ -124,7 +124,7 @@ describe ContentMigration do
 
       run_course_copy
 
-      tool = @copy_to.context_external_tools.where(migration_id: CC::CCHelper.create_key(@tool_from)).first
+      tool = @copy_to.context_external_tools.where(migration_id: mig_id(@tool_from)).first
       expect(tool.course_navigation).not_to be_nil
       expect(tool.course_navigation).to eq @tool_from.course_navigation
       expect(tool.editor_button).not_to be_nil
@@ -143,7 +143,7 @@ describe ContentMigration do
                     :url => "https://www.example.com/launch"
       run_course_copy
 
-      tool_copy = @copy_to.context_external_tools.where(migration_id: CC::CCHelper.create_key(@tool_from)).first
+      tool_copy = @copy_to.context_external_tools.where(migration_id: mig_id(@tool_from)).first
       tag = @copy_to.context_modules.first.content_tags.first
       expect(tag.content_type).to eq 'ContextExternalTool'
       expect(tag.content_id).to eq tool_copy.id
@@ -198,7 +198,7 @@ describe ContentMigration do
 
       run_course_copy
 
-      tool = @copy_to.context_external_tools.where(migration_id: CC::CCHelper.create_key(@tool_from)).first
+      tool = @copy_to.context_external_tools.where(migration_id: mig_id(@tool_from)).first
       expect(tool.settings[:selection_width]).to eq 5000
       expect(tool.course_settings_sub_navigation[:message_type]).to eq "ContentItemSelectionResponse"
     end

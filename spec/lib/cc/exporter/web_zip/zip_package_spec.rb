@@ -27,6 +27,10 @@ describe "ZipPackage" do
     end
   end
 
+  def create_key(obj)
+    CC::CCHelper.create_key(obj)
+  end
+
   before :once do
     course_with_student(active_all: true)
     @cartridge_path = 'spec/fixtures/migration/unicode-filename-test-export.imscc'
@@ -44,7 +48,7 @@ describe "ZipPackage" do
       module_data = zip_package.parse_module_data
       expect(module_data).to eq [{id: @module.id, name: 'first_module', status: 'completed',
         unlockDate: nil, prereqs: [], requirement: nil, sequential: false,
-        exportId: CC::CCHelper.create_key(@module), items: []}]
+        exportId: create_key(@module), items: []}]
     end
 
     it "should show modules locked by prerequisites with status of locked" do
@@ -317,8 +321,8 @@ describe "ZipPackage" do
       zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
       module_item_data = zip_package.parse_module_item_data(@module)
 
-      expect(module_item_data[0][:assignmentExportId]).to eq CC::CCHelper.create_key(graded_discussion_assignment)
-      expect(module_item_data[1][:assignmentExportId]).to eq CC::CCHelper.create_key(quiz.assignment)
+      expect(module_item_data[0][:assignmentExportId]).to eq create_key(graded_discussion_assignment)
+      expect(module_item_data[1][:assignmentExportId]).to eq create_key(quiz.assignment)
     end
 
     it "should parse graded status for not graded assignments, quizzes and discussions" do
@@ -419,7 +423,7 @@ describe "ZipPackage" do
 
       zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
       module_item_data = zip_package.parse_module_item_data(@module)
-      expect(module_item_data[0][:exportId]).to eq CC::CCHelper.create_key(assign)
+      expect(module_item_data[0][:exportId]).to eq create_key(assign)
       expect(module_item_data[1][:exportId]).to eq 'wiki-page-1'
     end
 
@@ -575,8 +579,12 @@ describe "ZipPackage" do
       export.user = @student
       export.save
       export.export_course
-      exporter = CC::Exporter::WebZip::Exporter.new(export.attachment.open, false, :web_zip)
+      exporter = CC::Exporter::WebZip::Exporter.new(export.attachment.open, false, :web_zip, global_identifiers: true)
       CC::Exporter::WebZip::ZipPackage.new(exporter, @course, @student, @cache_key)
+    end
+
+    def create_key(obj)
+      CC::CCHelper.create_key(obj, global: true)
     end
 
     context "with course navigation tabs enabled" do
@@ -600,7 +608,7 @@ describe "ZipPackage" do
         zip_package = create_zip_package
         assignment_data = zip_package.parse_non_module_items(:assignments)
         expect(assignment_data).to eq [{
-          exportId: CC::CCHelper.create_key(assign), title: 'Assignment 1', type: 'Assignment',
+          exportId: create_key(assign), title: 'Assignment 1', type: 'Assignment',
           content: '<p>Hi</p>', submissionTypes: "a text entry box or a file upload", graded: true,
           pointsPossible: 10.0, dueAt: due.in_time_zone(@student.time_zone).iso8601,
           lockAt: lock.in_time_zone(@student.time_zone).iso8601,
@@ -613,7 +621,7 @@ describe "ZipPackage" do
         zip_package = create_zip_package
         disc_data = zip_package.parse_non_module_items(:discussion_topics)
         expect(disc_data).to eq [{
-            exportId: CC::CCHelper.create_key(disc), title: 'Discussion 1', type: 'DiscussionTopic',
+            exportId: create_key(disc), title: 'Discussion 1', type: 'DiscussionTopic',
             graded: false, content: "<h1>Discussion</h1>", lockAt: nil, unlockAt: nil
           }]
       end
@@ -624,9 +632,9 @@ describe "ZipPackage" do
         zip_package = create_zip_package
         quiz_data = zip_package.parse_non_module_items(:quizzes)
         expect(quiz_data).to eq [{
-            exportId: CC::CCHelper.create_key(quiz), title: 'Quiz 1', type: 'Quizzes::Quiz', questionCount: 0,
+            exportId: create_key(quiz), title: 'Quiz 1', type: 'Quizzes::Quiz', questionCount: 0,
             timeLimit: 5, attempts: 2, graded: true, pointsPossible: 0.0, dueAt: nil, lockAt: nil,
-            unlockAt: nil, content: nil, assignmentExportId: CC::CCHelper.create_key(quiz.assignment)
+            unlockAt: nil, content: nil, assignmentExportId: create_key(quiz.assignment)
           }]
       end
 
@@ -693,7 +701,7 @@ describe "ZipPackage" do
         zip_package = create_zip_package
         course_data = zip_package.parse_course_data
         expect(course_data[:assignments]).to eq [{
-            exportId: CC::CCHelper.create_key(assign), title: 'Assignment 1', type: 'Assignment',
+            exportId: create_key(assign), title: 'Assignment 1', type: 'Assignment',
             content: '<p>Hi</p>', submissionTypes: nil, graded: true,
             pointsPossible: nil, dueAt: nil, lockAt: nil, unlockAt: nil
           }]
@@ -707,12 +715,12 @@ describe "ZipPackage" do
         quiz.publish!
         @module.content_tags.create!(content: quiz, context: @course, indent: 0)
         course_data = create_zip_package.parse_course_data
-        expect(course_data[:assignments][0][:exportId]).to eq CC::CCHelper.create_key(assign)
+        expect(course_data[:assignments][0][:exportId]).to eq create_key(assign)
         expect(course_data[:assignments].length).to eq 1
-        expect(course_data[:quizzes][0][:exportId]).to eq CC::CCHelper.create_key(quiz)
-        expected = "<a href=\"assignments/#{CC::CCHelper.create_key(assign)}\">Link</a>"
+        expect(course_data[:quizzes][0][:exportId]).to eq create_key(quiz)
+        expected = "<a href=\"assignments/#{create_key(assign)}\">Link</a>"
         expect(course_data[:quizzes][0][:content]).to eq expected
-        expect(course_data[:quizzes][0][:assignmentExportId]).to eq CC::CCHelper.create_key(quiz.assignment)
+        expect(course_data[:quizzes][0][:assignmentExportId]).to eq create_key(quiz.assignment)
       end
 
       it "should export quizzes linked from module items" do
@@ -722,13 +730,13 @@ describe "ZipPackage" do
           description: "<a href=\"/courses/#{@course.id}/quizzes/#{quiz.id}\">Link</a>")
         @module.content_tags.create!(content: assign, context: @course, indent: 0)
         course_data = create_zip_package.parse_course_data
-        quiz_key = CC::CCHelper.create_key(quiz)
-        expect(course_data[:assignments][0][:exportId]).to eq CC::CCHelper.create_key(assign)
+        quiz_key = create_key(quiz)
+        expect(course_data[:assignments][0][:exportId]).to eq create_key(assign)
         expect(course_data[:assignments][0][:content]).to eq "<a href=\"quizzes/#{quiz_key}\">Link</a>"
         expect(course_data[:assignments].length).to eq 1
         expect(course_data[:quizzes][0][:exportId]).to eq quiz_key
         expect(course_data[:quizzes].length).to eq 1
-        expect(course_data[:quizzes][0][:assignmentExportId]).to eq CC::CCHelper.create_key(quiz.assignment)
+        expect(course_data[:quizzes][0][:assignmentExportId]).to eq create_key(quiz.assignment)
       end
 
       it "should export pages linked from module items" do
@@ -737,7 +745,7 @@ describe "ZipPackage" do
           description: "<a href=\"/courses/#{@course.id}/pages/#{page.id}\">Link</a>")
         @module.content_tags.create!(content: assign, context: @course, indent: 0)
         course_data = create_zip_package.parse_course_data
-        expect(course_data[:assignments][0][:exportId]).to eq CC::CCHelper.create_key(assign)
+        expect(course_data[:assignments][0][:exportId]).to eq create_key(assign)
         expect(course_data[:assignments][0][:content]).to eq "<a href=\"pages/#{page.url}\">Link</a>"
         expect(course_data[:assignments].length).to eq 1
         expect(course_data[:pages][0][:exportId]).to eq page.url
@@ -750,11 +758,11 @@ describe "ZipPackage" do
           description: "<a href=\"/courses/#{@course.id}/discussion_topics/#{discussion.id}\">Link</a>")
         @module.content_tags.create!(content: assign, context: @course, indent: 0)
         course_data = create_zip_package.parse_course_data
-        expect(course_data[:assignments][0][:exportId]).to eq CC::CCHelper.create_key(assign)
-        expected = "<a href=\"discussion_topics/#{CC::CCHelper.create_key(discussion)}\">Link</a>"
+        expect(course_data[:assignments][0][:exportId]).to eq create_key(assign)
+        expected = "<a href=\"discussion_topics/#{create_key(discussion)}\">Link</a>"
         expect(course_data[:assignments][0][:content]).to eq expected
         expect(course_data[:assignments].length).to eq 1
-        expect(course_data[:discussion_topics][0][:exportId]).to eq CC::CCHelper.create_key(discussion)
+        expect(course_data[:discussion_topics][0][:exportId]).to eq create_key(discussion)
         expect(course_data[:discussion_topics].length).to eq 1
       end
 
@@ -764,7 +772,7 @@ describe "ZipPackage" do
           description: "<a href=\"/courses/#{@course.id}/files/#{file.id}/download?wrap=1\">Link</a>")
         @module.content_tags.create!(content: assign, context: @course, indent: 0)
         course_data = create_zip_package.parse_course_data
-        expect(course_data[:assignments][0][:exportId]).to eq CC::CCHelper.create_key(assign)
+        expect(course_data[:assignments][0][:exportId]).to eq create_key(assign)
         expected = "<a href=\"viewer/files/amazing_file.txt?canvas_download=1&amp;canvas_qs_wrap=1\">Link</a>"
         expect(course_data[:assignments][0][:content]).to eq expected
         expect(course_data[:assignments].length).to eq 1
@@ -779,12 +787,12 @@ describe "ZipPackage" do
           body: "<a href=\"/courses/#{@course.id}/assignments/#{assign.id}\">Link</a>")
         @module.content_tags.create!(content: page, context: @course, indent: 0)
         course_data = create_zip_package.parse_course_data
-        expect(course_data[:assignments][0][:exportId]).to eq CC::CCHelper.create_key(assign)
+        expect(course_data[:assignments][0][:exportId]).to eq create_key(assign)
         expect(course_data[:assignments][0][:content]).to eq "<a href=\"viewer/files/amazing_file.txt\">Link</a>"
         expect(course_data[:assignments].length).to eq 1
         page_data = course_data[:pages][0]
         expect(page_data[:exportId]).to eq page.url
-        expect(page_data[:content]).to eq "<a href=\"assignments/#{CC::CCHelper.create_key(assign)}\">Link</a>"
+        expect(page_data[:content]).to eq "<a href=\"assignments/#{create_key(assign)}\">Link</a>"
         expect(course_data[:pages].length).to eq 1
         expect(course_data[:files]).to eq [{type: "file", name: "amazing_file.txt", size: 26, files: nil}]
       end
@@ -797,12 +805,12 @@ describe "ZipPackage" do
         @module.content_tags.create!(content: page, context: @course, indent: 0)
         course_data = create_zip_package.parse_course_data
         expect(course_data[:assignments]).to eq [{
-            exportId: CC::CCHelper.create_key(assign), title: 'Assignment 1', type: 'Assignment',
+            exportId: create_key(assign), title: 'Assignment 1', type: 'Assignment',
             content: "<a href=\"pages/page-1\">Link</a>", submissionTypes: nil, graded: true,
             pointsPossible: nil, dueAt: nil, lockAt: nil, unlockAt: nil
           }]
         expect(course_data[:pages]).to eq [{exportId: 'page-1', title: 'Page 1', type: 'WikiPage',
-          content: "<a href=\"assignments/#{CC::CCHelper.create_key(assign)}\">Link</a>", frontPage: false}]
+          content: "<a href=\"assignments/#{create_key(assign)}\">Link</a>", frontPage: false}]
       end
 
       it "should export items linked as images" do
@@ -814,9 +822,9 @@ describe "ZipPackage" do
         @module.content_tags.create!(content: survey, context: @course, indent: 0)
         course_data = create_zip_package.parse_course_data
         expect(course_data[:quizzes]).to eq [{
-            exportId: CC::CCHelper.create_key(survey), title: 'Survey 1', type: 'Quizzes::Quiz',
+            exportId: create_key(survey), title: 'Survey 1', type: 'Quizzes::Quiz',
             content: "<img src=\"viewer/files/cn_image.jpg\">",
-            assignmentExportId: CC::CCHelper.create_key(survey.assignment), questionCount: 0, timeLimit: nil,
+            assignmentExportId: create_key(survey.assignment), questionCount: 0, timeLimit: nil,
             attempts: 1, graded: false, dueAt: due_at.iso8601, lockAt: nil, unlockAt: nil
           }]
         expect(course_data[:files]).to eq [{type: "file", name: "cn_image.jpg", size: 30339, files: nil}]
@@ -830,13 +838,13 @@ describe "ZipPackage" do
         @module.content_tags.create!(content: assign, context: @course, indent: 0)
         course_data = create_zip_package.parse_course_data
         expect(course_data[:assignments]).to eq [{
-            exportId: CC::CCHelper.create_key(assign), title: 'Assignment 1', type: 'Assignment',
-            content: "<a href=\"assignments/#{CC::CCHelper.create_key(quiz.assignment)}\">Link</a>",
+            exportId: create_key(assign), title: 'Assignment 1', type: 'Assignment',
+            content: "<a href=\"assignments/#{create_key(quiz.assignment)}\">Link</a>",
             submissionTypes: nil, graded: true, pointsPossible: nil, dueAt: nil, lockAt: nil, unlockAt: nil
           }]
         expect(course_data[:quizzes]).to eq [{
-            exportId: CC::CCHelper.create_key(quiz), title: 'Quiz 1', type: 'Quizzes::Quiz',
-            content: nil, assignmentExportId: CC::CCHelper.create_key(quiz.assignment), questionCount: 0,
+            exportId: create_key(quiz), title: 'Quiz 1', type: 'Quizzes::Quiz',
+            content: nil, assignmentExportId: create_key(quiz.assignment), questionCount: 0,
             timeLimit: nil, attempts: 1, graded: true, pointsPossible: 0.0, dueAt: nil, lockAt: nil, unlockAt: nil
           }]
       end
@@ -857,7 +865,7 @@ describe "ZipPackage" do
         @module.content_tags.create!(content: disc, context: @course, indent: 0)
         course_data = create_zip_package.parse_course_data
         expect(course_data[:discussion_topics]).to eq [{
-            exportId: CC::CCHelper.create_key(disc), title: 'Discussion 1', type: 'DiscussionTopic',
+            exportId: create_key(disc), title: 'Discussion 1', type: 'DiscussionTopic',
             content: "<img src=\"viewer/files/folder%231/cn_image.jpg\">",
             lockAt: nil, unlockAt: nil, graded: false
           }]
@@ -911,8 +919,8 @@ describe "ZipPackage" do
         course_data = create_zip_package.parse_course_data
         expect(course_data[:assignments]).to eq []
         expect(course_data[:quizzes]).to eq [{
-            exportId: CC::CCHelper.create_key(quiz), title: 'Quiz 1', type: 'Quizzes::Quiz',
-            content: nil, assignmentExportId: CC::CCHelper.create_key(quiz.assignment), questionCount: 0,
+            exportId: create_key(quiz), title: 'Quiz 1', type: 'Quizzes::Quiz',
+            content: nil, assignmentExportId: create_key(quiz.assignment), questionCount: 0,
             timeLimit: nil, attempts: 1, graded: true, pointsPossible: 0.0, dueAt: nil, lockAt: nil, unlockAt: nil
           }]
       end
@@ -938,7 +946,7 @@ describe "ZipPackage" do
       assign = @course.assignments.create!(title: 'Assignment 1', points_possible: 10, description: '<p>Hi</p>')
       html = %(<a title="Assignment 1" href="/courses/#{@course.id}/assignments/#{assign.id}") +
              %( data-api-returntype="Assignment">Assignment 1</a>)
-      expected_html = %(<a title="Assignment 1" href="assignments/#{CC::CCHelper.create_key(assign)}") +
+      expected_html = %(<a title="Assignment 1" href="assignments/#{create_key(assign)}") +
                     %( data-api-returntype="Assignment">Assignment 1</a>)
       converted_html = @zip_package.convert_html_to_local(html)
       expect(converted_html).to eq expected_html
@@ -949,7 +957,7 @@ describe "ZipPackage" do
         description: '<p>Hi</p>', unlock_at: 5.days.from_now)
       html = %(<a title="Assignment 1" href="/courses/#{@course.id}/assignments/#{assign.id}") +
              %( data-api-returntype="Assignment">Assignment 1</a>)
-      expected_html = %(<a title="Assignment 1" href="assignments/#{CC::CCHelper.create_key(assign)}") +
+      expected_html = %(<a title="Assignment 1" href="assignments/#{create_key(assign)}") +
                     %( data-api-returntype="Assignment">Assignment 1</a>)
       converted_html = @zip_package.convert_html_to_local(html)
       expect(converted_html).to eq expected_html

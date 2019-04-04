@@ -191,6 +191,8 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       @migration = double()
       allow(@migration).to receive(:migration_type).and_return('course_copy_importer')
       allow(@migration).to receive(:source_course).and_return(@course)
+      export = @course.content_exports.create!(:export_type => ContentExport::COURSE_COPY)
+      allow(@migration).to receive(:content_export).and_return(export)
       @course_outcome = outcome_model
       @account_outcome = outcome_model(:outcome_context => @course.account)
     end

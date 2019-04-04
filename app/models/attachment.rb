@@ -307,13 +307,21 @@ class Attachment < ActiveRecord::Base
     excluded_atts = EXCLUDED_COPY_ATTRIBUTES
     excluded_atts += ["locked", "hidden"] if dup == existing && !options[:migration]&.for_master_course_import?
     dup.assign_attributes(self.attributes.except(*excluded_atts))
-
+    dup.context = context
     # avoid cycles (a -> b -> a) and self-references (a -> a) in root_attachment_id pointers
     if dup.new_record? || ![self.id, self.root_attachment_id].include?(dup.id)
-      dup.root_attachment_id = self.root_attachment_id || self.id
+      if self.shard == dup.shard
+        dup.root_attachment_id = self.root_attachment_id || self.id
+      else
+        if existing_attachment = dup.find_existing_attachment_for_md5
+          dup.root_attachment = existing_attachment
+        else
+          dup.write_attribute(:filename, self.filename)
+          Attachments::Storage.store_for_attachment(dup, self.open)
+        end
+      end
     end
-    dup.write_attribute(:filename, self.filename) unless dup.root_attachment_id?
-    dup.context = context
+    dup.write_attribute(:filename, self.filename) unless dup.read_attribute(:filename) || dup.root_attachment_id?
     dup.migration_id = options[:migration_id] || CC::CCHelper.create_key(self)
     dup.mark_as_importing!(options[:migration]) if options[:migration]
     if context.respond_to?(:log_merge_result)

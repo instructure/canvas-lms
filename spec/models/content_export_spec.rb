@@ -175,7 +175,7 @@ describe ContentExport do
       communication_channel_model.confirm!
 
       ['created', 'exporting', 'exported_for_course_copy', 'deleted'].each do |workflow|
-        @ce.workflow_state = workflow 
+        @ce.workflow_state = workflow
         expect { @ce.save! }.to change(DelayedMessage, :count).by 0
         expect(@ce.messages_sent['Content Export Finished']).to be_blank
         expect(@ce.messages_sent['Content Export Failed']).to be_blank
@@ -236,6 +236,35 @@ describe ContentExport do
       Setting.set('content_exports_expire_after_days', '0')
       ContentExport.where(id: @ce.id).update_all(created_at: 35.days.ago)
       expect(ContentExport.expired.pluck(:id)).to be_empty
+    end
+  end
+
+  context "global_identifiers" do
+    it "should be automatically set to true" do
+      cc_export = @course.content_exports.create!(:export_type => ContentExport::COURSE_COPY)
+      expect(cc_export.global_identifiers).to eq true
+    end
+
+    it "should not set if there are any other exports in the context that weren't set" do
+      prev_export = @course.content_exports.create!(:export_type => ContentExport::COURSE_COPY)
+      prev_export.update_attribute(:global_identifiers, false)
+      cc_export = @course.content_exports.create!(:export_type => ContentExport::COURSE_COPY)
+      expect(cc_export.global_identifiers).to eq false
+    end
+
+    it "should use global asset strings for keys if set" do
+      export = @course.content_exports.create!(:export_type => ContentExport::COURSE_COPY)
+      a = @course.assignments.create!
+      expect(a).to receive(:global_asset_string).once.and_call_original
+      export.create_key(a)
+    end
+
+    it "should use local asset strings for keys if not set" do
+      export = @course.content_exports.create!(:export_type => ContentExport::COURSE_COPY)
+      export.update_attribute(:global_identifiers, false)
+      a = @course.assignments.create!
+      expect(a).to receive(:asset_string).once.and_call_original
+      export.create_key(a)
     end
   end
 end

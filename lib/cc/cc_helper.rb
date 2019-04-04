@@ -104,13 +104,14 @@ module CCHelper
     CCHelper.ims_datetime(date, default)
   end
 
-  def self.create_key(object, prepend="")
+  def self.create_key(object, prepend="", global: false)
     if object.is_a? ActiveRecord::Base
-      key = object.asset_string
+      key = global ? object.global_asset_string : object.asset_string
     else
       key = object.to_s
     end
-    "i" + Digest::MD5.hexdigest(prepend + key)
+    # make it obvious if we're using new identifiers now
+    (global ? "g" : "i") + Digest::MD5.hexdigest(prepend + key)
   end
 
   def self.ims_date(date=nil,default=Time.now)
