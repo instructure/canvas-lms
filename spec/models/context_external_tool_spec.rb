@@ -74,7 +74,7 @@ describe ContextExternalTool do
 
       before do
         tool.editor_button = {
-          "target_link_uri" => placement_url,
+          "url" => placement_url,
           "text" => "LTI 1.3 twoa",
           "enabled" => true,
           "icon_url" => "https://static.thenounproject.com/png/131630-200.png",
@@ -86,6 +86,7 @@ describe ContextExternalTool do
       it 'returns the extension url' do
         expect(tool.login_or_launch_url(extension_type: :editor_button)).to eq placement_url
       end
+
     end
 
     context 'lti_1_3 tool' do
