@@ -48,7 +48,6 @@ import 'jqueryui/resizable'
 import 'jqueryui/sortable'
 import 'jqueryui/tabs'
 import 'compiled/behaviors/trackEvent'
-import 'compiled/badge_counts'
 
 function handleYoutubeLink () {
   const $link = $(this)
