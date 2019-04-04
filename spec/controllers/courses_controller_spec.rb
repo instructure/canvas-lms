@@ -2217,10 +2217,11 @@ describe CoursesController do
       expect(feed.entries.all?{|e| e.authors.present?}).to be_truthy
     end
 
-    it "should not include unpublished assignments or discussions" do
+    it "should not include unpublished assignments or discussions or pages" do
       discussion_topic_model(:context => @course)
       @assignment.unpublish
       @topic.unpublish!
+      @course.wiki_pages.create! :title => 'unpublished', :workflow_state => 'unpublished'
       get 'public_feed', params: {:feed_code => @enrollment.feed_code}, :format => 'atom'
       feed = Atom::Feed.load_feed(response.body) rescue nil
       expect(feed).not_to be_nil

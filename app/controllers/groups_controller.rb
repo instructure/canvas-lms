@@ -760,8 +760,8 @@ class GroupsController < ApplicationController
     end
     @entries = []
     @entries.concat @context.calendar_events.active
-    @entries.concat @context.discussion_topics.active
-    @entries.concat @context.wiki_pages
+    @entries.concat @context.discussion_topics.published
+    @entries.concat @context.wiki_pages.published
     @entries = @entries.sort_by{|e| e.updated_at}
     @entries.each do |entry|
       feed.entries << entry.to_atom(:context => @context)

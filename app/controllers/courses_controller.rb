@@ -2679,10 +2679,10 @@ class CoursesController < ApplicationController
       @entries = []
       @entries.concat @context.assignments.published
       @entries.concat @context.calendar_events.active
-      @entries.concat(@context.discussion_topics.active.select{ |dt|
-        dt.published? && !dt.locked_for?(@current_user, :check_policies => true)
+      @entries.concat(@context.discussion_topics.published.select{ |dt|
+        !dt.locked_for?(@current_user, :check_policies => true)
       })
-      @entries.concat @context.wiki_pages
+      @entries.concat @context.wiki_pages.published
       @entries = @entries.sort_by{|e| e.updated_at}
       @entries.each do |entry|
         feed.entries << entry.to_atom(:context => @context)
