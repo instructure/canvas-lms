@@ -156,7 +156,6 @@
     "expose-loader": "^0.7",
     "fetch-mock": "^7",
     "file-loader": "^3",
-    "fontfaceobserver": "^2",
     "gglobby": "0.0.3",
     "glob": "^7",
     "gulp": "^3",

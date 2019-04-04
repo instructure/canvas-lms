@@ -25,9 +25,10 @@
 <head>
   <meta charset="utf-8">
   <title><%= (yield :page_title).presence || @page_title || t('default_page_title', "Canvas LMS") %></title>
+  <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700&amp;subset=latin-ext" rel="stylesheet">
   <!--[if lte IE 9]> <meta http-equiv=refresh content="0; URL=/ie-9-is-not-supported.html" /> <![endif]-->
   <%= browser_performance_monitor_embed %>
-  <link rel="preload" href="<%= font_path("lato/latin/LatoLatin-Regular.woff2") %>" as="font" type="font/woff2" crossorigin>
   <%= favicon_link_tag(favicon) %>
   <%= favicon_link_tag(brand_variable('ic-brand-apple-touch-icon'), rel: 'apple-touch-icon', type: nil) %>
   <%= yield :auto_discovery %>
@@ -57,11 +58,6 @@
 }();
       ))
     end
-  %>
-  <%=
-    # Load the fontface observer for lato async and as fast as possible so it doesn't flicker with fallback font.
-    # That's why we don't load it in a 'require' at the bottom of the page
-    javascript_include_tag("/lato-fontfaceobserver.js", async: true)
   %>
   <%= yield :meta_tags %>
   <%= include_custom_meta_tags %>

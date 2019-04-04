@@ -144,8 +144,7 @@ $contentBoxPadding:         8px;
 // Once all of those have been adjusted to use the new variable we can get rid of this
 $ic-line-height: 1.5;
 
-$ic-font-family: "LatoWeb", "Helvetica Neue", Helvetica, Arial, sans-serif;
-$ic-font-family-fallback: "Helvetica Neue", Helvetica, Arial, sans-serif;
+$ic-font-family: "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
 $ic-font-family-monospace: Monaco, Menlo, Consolas, "Courier New", monospace;
 
 $ic-font-weight: bold; // we can phase this var out now we're on Lato

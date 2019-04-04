@@ -2,14 +2,7 @@
 # so pass I18nable strins from the controller until this is resovled
 
 prawn_document(page_layout: :portrait, page_size: page_size) do |pdf|
-  pdf.font_families.update('LatoWeb' => {
-    normal: "public/fonts/lato/latin/LatoLatin-Regular.ttf",
-    italic: "public/fonts/lato/latin/LatoLatin-Italic.ttf",
-    bold: "public/fonts/lato/latin/LatoLatin-Bold.ttf",
-    light: "public/fonts/lato/latin/LatoLatin-Light.ttf",
-  })
-
-  pdf.font("LatoWeb") do
+  pdf.font("Helvetica") do
     pdf.font_size 8
     pdf.font_size pdf.font_size() * 2.375  do
       pdf.text assignment_title
