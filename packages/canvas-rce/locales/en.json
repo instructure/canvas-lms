@@ -1,4 +1,13 @@
 {
+  "add_8523c19b": {
+    "message": "Add"
+  },
+  "all_4321c3a1": {
+    "message": "All"
+  },
+  "alphabetical_55b5b4e0": {
+    "message": "Alphabetical"
+  },
   "alternative_text_a834dcad": {
     "message": "Alternative text:"
   },
@@ -70,11 +79,20 @@
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "Click to insert a link to this item."
   },
+  "close_d634289d": {
+    "message": "Close"
+  },
   "close_flickr_form_b32e600a": {
     "message": "Close Flickr form"
   },
   "collaborations_5c56c15f": {
     "message": "Collaborations"
+  },
+  "content_subtype_5ce35e88": {
+    "message": "Content Subtype"
+  },
+  "content_type_2cf90d95": {
+    "message": "Content Type"
   },
   "copyright_holder_66ee111": {
     "message": "Copyright Holder:"
@@ -97,6 +115,12 @@
   },
   "creative_commons_license_725584ae": {
     "message": "Creative Commons License:"
+  },
+  "date_added_ed5ad465": {
+    "message": "Date Added"
+  },
+  "date_published_371c4ad0": {
+    "message": "Date Published"
   },
   "decorative_image_fde98579": {
     "message": "Decorative image"
@@ -207,6 +231,9 @@
   "loading_folders_8d4d5d5a": {
     "message": "Loading folders..."
   },
+  "media_af190855": {
+    "message": "Media"
+  },
   "modules_c4325335": {
     "message": "Modules",
     "description": "Title of Sidebar accordion tab containing links to course modules."
@@ -243,6 +270,9 @@
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Select a folder to upload your file into"
+  },
+  "sort_by_e75f9e3e": {
+    "message": "Sort By"
   },
   "syllabus_f191f65b": {
     "message": "Syllabus"
