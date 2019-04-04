@@ -1581,9 +1581,9 @@ describe UsersController do
   describe "GET 'public_feed.atom'" do
     before(:each) do
       course_with_student(:active_all => true)
-      assignment_model(:course => @course)
-      @course.discussion_topics.create!(:title => "hi", :message => "blah", :user => @student)
-      wiki_page_model(:course => @course)
+      @as = assignment_model(:course => @course)
+      @dt = @course.discussion_topics.create!(:title => "hi", :message => "blah", :user => @student)
+      @wp = wiki_page_model(:course => @course)
     end
 
     it "should require authorization" do
@@ -1605,6 +1605,20 @@ describe UsersController do
       expect(feed).not_to be_nil
       expect(feed.entries).not_to be_empty
       expect(feed.entries.all?{|e| e.authors.present?}).to be_truthy
+    end
+
+    it "should exclude unpublished things" do
+      get 'public_feed', params: {:feed_code => @user.feed_code}, format: 'atom'
+      feed = Atom::Feed.load_feed(response.body) rescue nil
+      expect(feed.entries.size).to eq 3
+
+      @as.unpublish
+      @wp.unpublish
+      @dt.unpublish! # yes, you really have to shout to unpublish a discussion topic :(
+
+      get 'public_feed', params: {:feed_code => @user.feed_code}, format: 'atom'
+      feed = Atom::Feed.load_feed(response.body) rescue nil
+      expect(feed.entries.size).to eq 0
     end
   end
 
