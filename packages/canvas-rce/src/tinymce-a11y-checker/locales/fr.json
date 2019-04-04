@@ -92,9 +92,6 @@
   "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
     "message": "Au clavier, on navigue parmi les liens à l’aide de la touche tabulation. Lorsque deux liens adjacents renvoient à la même destination, cela peut porter à confusion pour les utilisateurs au clavier."
   },
-  "learn_more_a79a7918": {
-    "message": "En savoir plus"
-  },
   "leave_as_is_4facfe55": {
     "message": "Laisser en l’état"
   },
@@ -178,6 +175,9 @@
   },
   "tables_should_include_at_least_one_header_48779eac": {
     "message": "Les tableaux devraient comprendre au moins un en-tête."
+  },
+  "text_is_difficult_to_read_without_sufficient_contr_69e62bd6": {
+    "message": "Le texte est difficile à lire sans un contraste suffisant entre le texte et l''arrière-plan, surtout pour ceux qui ont une vue faible."
   },
   "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
     "message": "Les textes d’une taille supérieure à 18pt (ou 14pt en gras) devraient respecter un ratio de contraste d’au moins 3:1."

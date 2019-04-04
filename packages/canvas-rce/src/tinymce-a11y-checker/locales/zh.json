@@ -92,9 +92,6 @@
   "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
     "message": "键盘使用 Tab 键导航至链接。转至相同目的地的两个相邻链接可以对键盘用户造成混淆。"
   },
-  "learn_more_a79a7918": {
-    "message": "了解更多"
-  },
   "leave_as_is_4facfe55": {
     "message": "保持原状"
   },
@@ -178,6 +175,9 @@
   },
   "tables_should_include_at_least_one_header_48779eac": {
     "message": "表格应包括至少一个标题。"
+  },
+  "text_is_difficult_to_read_without_sufficient_contr_69e62bd6": {
+    "message": "文字和背景之间的对比度不足，因此文字阅读困难，尤其是对于视力较弱的人员而言。"
   },
   "text_larger_than_18pt_or_bold_14pt_should_display__5c364db6": {
     "message": "文字大于 18 磅（或粗体 14 磅）时显示的对比度应至少为 3:1。"

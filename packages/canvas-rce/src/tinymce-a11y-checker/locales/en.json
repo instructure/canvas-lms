@@ -92,8 +92,32 @@
   "keyboards_navigate_to_links_using_the_tab_key_two__5fab8c82": {
     "message": "Keyboards navigate to links using the Tab key. Two adjacent links that direct to the same destination can be confusing to keyboard users."
   },
-  "learn_more_a79a7918": {
-    "message": "Learn more"
+  "learn_more_about_adjacent_links_2cb9762c": {
+    "message": "Learn more about adjacent links"
+  },
+  "learn_more_about_color_contrast_c019dfb9": {
+    "message": "Learn more about color contrast"
+  },
+  "learn_more_about_organizing_page_headings_8a7caa2e": {
+    "message": "Learn more about organizing page headings"
+  },
+  "learn_more_about_table_headers_5f5ee13": {
+    "message": "Learn more about table headers"
+  },
+  "learn_more_about_using_alt_text_for_images_5698df9a": {
+    "message": "Learn more about using alt text for images"
+  },
+  "learn_more_about_using_captions_with_tables_36fe496f": {
+    "message": "Learn more about using captions with tables"
+  },
+  "learn_more_about_using_filenames_as_alt_text_264286af": {
+    "message": "Learn more about using filenames as alt text"
+  },
+  "learn_more_about_using_lists_4e6eb860": {
+    "message": "Learn more about using lists"
+  },
+  "learn_more_about_using_scope_attributes_with_table_20df49aa": {
+    "message": "Learn more about using scope attributes with tables"
   },
   "leave_as_is_4facfe55": {
     "message": "Leave as is"
