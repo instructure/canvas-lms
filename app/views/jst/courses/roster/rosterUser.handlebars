@@ -101,7 +101,9 @@
         {{else}}
           <li><a href="#" data-event="deactivateUser"><i class="icon-deactivate-user" aria-hidden="true"></i> {{#t}}Deactivate User{{/t}}</a></li>
         {{/if}}
-        <li><a href="#" data-event="removeFromCourse"><i class="icon-trash" aria-hidden="true"></i> {{#t "links.remove_from_course"}}Remove From Course{{/t}}</a></li>
+        {{#if isAdmin}}
+          <li><a href="#" data-event="removeFromCourse"><i class="icon-trash" aria-hidden="true"></i> {{#t "links.remove_from_course"}}Remove From Course{{/t}}</a></li>
+        {{/if}}
       {{/if}}
       {{#each customLinks}}
         <li><a href="{{url}}"><i class="{{icon_class}}"></i> {{text}}</a></li>

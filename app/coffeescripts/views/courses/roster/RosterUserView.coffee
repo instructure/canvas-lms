@@ -76,6 +76,11 @@ define [
       json.isObserver = @model.hasEnrollmentType('ObserverEnrollment')
       json.isPending = @model.pending(@model.currentRole)
       json.isInactive = @model.inactive()
+
+      # <- ADDED BY STRONGMIND FOR PLAY-896 
+      json.isAdmin = ('admin' in ENV.current_user_roles)
+      # ->
+      
       if !json.isInactive
         json.enrollments = _.reject json.enrollments, (en) -> en.enrollment_state == 'inactive' # if not _completely_ inactive, treat the inactive enrollments as deleted
 
