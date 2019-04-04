@@ -142,6 +142,7 @@ describe "course settings" do
     end
 
     it "should not allow teachers to click CSP check" do
+      skip('Bug ticket created: CORE-2732')
       Account.default.enable_feature!(:javascript_csp)
       Account.default.enable_csp!
       get "/courses/#{@course.id}/settings"
@@ -152,6 +153,7 @@ describe "course settings" do
     end
 
     it "should save CSP check by admin" do
+      skip('Bug ticket created: CORE-2732')
       course_with_admin_logged_in
       Account.default.enable_feature!(:javascript_csp)
       Account.default.enable_csp!
