@@ -39,7 +39,6 @@ class AuthenticationProvider::LinkedIn < AuthenticationProvider::Oauth2
       'emailAddress'.freeze,
       'firstName'.freeze,
       'id'.freeze,
-      'formattedName'.freeze,
       'lastName'.freeze,
     ].freeze
   end
@@ -59,10 +58,35 @@ class AuthenticationProvider::LinkedIn < AuthenticationProvider::Oauth2
   protected
 
   def person(token)
-    token.options[:person] ||= begin
-      attributes = [login_attribute] + federated_attributes.values.map { |v| v['attribute'] }
-      token.get("/v1/people/~:(#{attributes.uniq.join(',')})?format=json").parsed
+    result = me(token)
+    result = result.merge(email(token)) if email_required?
+    result
+  end
+
+  def me(token)
+    token.options[:me] ||= begin
+      data = token.get("/v2/me").parsed
+      {
+        'id' => data['id'],
+        'firstName' => get_localized_field(data['firstName']),
+        'lastName' => get_localized_field(data['lastName'])
+      }
     end
+  end
+
+  def get_localized_field(localized_field)
+    localized_field['localized'].first.last
+  end
+
+  def email(token)
+    token.options[:emailAddress] ||= begin
+      token.get("/v2/emailAddress?q=members&projection=(elements*(handle~))").parsed["elements"].first["handle~"]
+    end
+  end
+
+  def email_required?
+    login_attribute == 'emailAddress'.freeze ||
+      federated_attributes.any? { |(_k, v)| v['attribute'] == 'emailAddress' }
   end
 
   def client_options
@@ -78,11 +102,10 @@ class AuthenticationProvider::LinkedIn < AuthenticationProvider::Oauth2
   end
 
   def scope
-    if login_attribute == 'emailAddress'.freeze ||
-        federated_attributes.any? { |(_k, v)| v['attribute'] == 'emailAddress' }
-      'r_basicprofile r_emailaddress'.freeze
+    if email_required?
+      'r_liteprofile r_emailaddress'.freeze
     else
-      'r_basicprofile'.freeze
+      'r_liteprofile'.freeze
     end
   end
 end
