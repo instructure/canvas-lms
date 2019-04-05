@@ -6447,6 +6447,7 @@ hy:
     restricted_status: "Հասանելի է %{from_date}-ից մինչև %{until_date}"
     unpublished_status: "Հրապարակված չէ"
   file_storage_32477f6: "Ֆայլի պահպանում"
+  filename_has_been_published_with_the_following_usa_fbd8b39f: "%{filemane} հրապարակվել է օգտագործման հետևյալ իրավունքով՝ %{usage_right}"
   filename_progress_percent_uploaded_1f465e66: "%{fileName} - %{progress} տոկոսը բեռնված է"
   filename_uploaded_successfully_edd8e825: "%{fileName} հաջողությամբ բեռնված է."
   files: 
