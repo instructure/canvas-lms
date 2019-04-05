@@ -17,8 +17,10 @@
  */
 
 import $ from 'jquery'
-import cheaterDepaginate from '../shared/CheatDepaginator'
 import _ from 'underscore'
+
+import cheaterDepaginate from '../shared/CheatDepaginator'
+import NaiveRequestDispatch from '../gradezilla/default_gradebook/DataLoader/NaiveRequestDispatch'
 
 function getGradingPeriodAssignments(courseId) {
   const url = `/courses/${courseId}/gradebook/grading_period_assignments`
@@ -26,8 +28,8 @@ function getGradingPeriodAssignments(courseId) {
 }
 
 // loaders
-const getAssignmentGroups = (url, params) => {
-  return cheaterDepaginate(url, params)
+const getAssignmentGroups = (url, params, dispatch) => {
+  return dispatch.getDepaginated(url, params)
 }
 const getCustomColumns = url => {
   return $.ajaxJSON(url, 'GET', {})
@@ -57,17 +59,17 @@ const gotSubmissionsChunk = data => {
   }
 }
 
-const getPendingSubmissions = () => {
+const getPendingSubmissions = dispatch => {
   while (pendingStudentsForSubmissions.length) {
     const studentIds = pendingStudentsForSubmissions.splice(0, submissionChunkSize)
     submissionChunkCount++
-    cheaterDepaginate(submissionURL, {student_ids: studentIds, ...submissionParams}).then(
+    dispatch.getDepaginated(submissionURL, {student_ids: studentIds, ...submissionParams}).then(
       gotSubmissionsChunk
     )
   }
 }
 
-const getSubmissions = (url, params, cb, chunkSize) => {
+const getSubmissions = (url, params, cb, chunkSize, dispatch) => {
   submissionURL = url
   submissionParams = params
   submissionChunkCb = cb
@@ -78,11 +80,11 @@ const getSubmissions = (url, params, cb, chunkSize) => {
   gotSubmissionChunkCount = 0
 
   submissionsLoading = true
-  getPendingSubmissions()
+  getPendingSubmissions(dispatch)
   return submissionsLoaded
 }
 
-const getStudents = (url, params, studentChunkCb) => {
+const getStudents = (url, params, studentChunkCb, dispatch) => {
   pendingStudentsForSubmissions = []
 
   const gotStudentPage = students => {
@@ -92,7 +94,7 @@ const getStudents = (url, params, studentChunkCb) => {
     ;[].push.apply(pendingStudentsForSubmissions, studentIds)
 
     if (submissionsLoading) {
-      getPendingSubmissions()
+      getPendingSubmissions(dispatch)
     }
   }
 
@@ -123,9 +125,12 @@ const getCustomColumnData = (url, params, cb, customColumnsDfd, waitForDfds) => 
 }
 
 const loadGradebookData = opts => {
+  const dispatch = new NaiveRequestDispatch()
+
   const gotAssignmentGroups = getAssignmentGroups(
     opts.assignmentGroupsURL,
-    opts.assignmentGroupsParams
+    opts.assignmentGroupsParams,
+    dispatch
   )
   if (opts.onlyLoadAssignmentGroups) {
     return {gotAssignmentGroups}
@@ -136,12 +141,18 @@ const loadGradebookData = opts => {
     gotGradingPeriodAssignments = getGradingPeriodAssignments(opts.courseId)
   }
   const gotCustomColumns = getCustomColumns(opts.customColumnsURL)
-  const gotStudents = getStudents(opts.studentsURL, opts.studentsParams, opts.studentsPageCb)
+  const gotStudents = getStudents(
+    opts.studentsURL,
+    opts.studentsParams,
+    opts.studentsPageCb,
+    dispatch
+  )
   const gotSubmissions = getSubmissions(
     opts.submissionsURL,
     opts.submissionsParams,
     opts.submissionsChunkCb,
-    opts.submissionsChunkSize
+    opts.submissionsChunkSize,
+    dispatch
   )
   const gotCustomColumnData = getCustomColumnData(
     opts.customColumnDataURL,
