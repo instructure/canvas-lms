@@ -126,22 +126,24 @@ class AssignmentGroupsController < ApplicationController
   #
   # @returns [AssignmentGroup]
   def index
-    if authorized_action(@context.assignment_groups.temp_record, @current_user, :read)
-      groups = Api.paginate(@context.assignment_groups.active, self, api_v1_course_assignment_groups_url(@context))
+    Shackles.activate(:slave) do
+      if authorized_action(@context.assignment_groups.temp_record, @current_user, :read)
+        groups = Api.paginate(@context.assignment_groups.active, self, api_v1_course_assignment_groups_url(@context))
 
-      assignments = if include_params.include?('assignments')
-        visible_assignments(@context, @current_user, groups)
-      else
-        []
-      end
+        assignments = if include_params.include?('assignments')
+                        visible_assignments(@context, @current_user, groups)
+                      else
+                        []
+                      end
 
-      if assignments.any? && include_params.include?('submission')
-        submissions = submissions_hash(['submission'], assignments)
-      end
+        if assignments.any? && include_params.include?('submission')
+          submissions = submissions_hash(['submission'], assignments)
+        end
 
-      respond_to do |format|
-        format.json do
-          render json: index_groups_json(@context, @current_user, groups, assignments, submissions)
+        respond_to do |format|
+          format.json do
+            render json: index_groups_json(@context, @current_user, groups, assignments, submissions)
+          end
         end
       end
     end
