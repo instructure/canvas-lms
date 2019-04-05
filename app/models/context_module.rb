@@ -120,7 +120,7 @@ class ContextModule < ActiveRecord::Base
   end
 
   def check_for_stale_cache_after_unlocking!
-    self.touch if self.unlock_at && self.unlock_at < Time.now && self.updated_at < self.unlock_at
+    Shackles.activate(:master) {self.touch} if self.unlock_at && self.unlock_at < Time.now && self.updated_at < self.unlock_at
   end
 
   def is_prerequisite_for?(mod)
