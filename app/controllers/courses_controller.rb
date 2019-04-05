@@ -2669,25 +2669,22 @@ class CoursesController < ApplicationController
 
   def public_feed
     return unless get_feed_context(:only => [:course])
-    return [] if Setting.get('public_feed_disabled', 'false') == 'true'
     feed = Atom::Feed.new do |f|
       f.title = t('titles.rss_feed', "%{course} Feed", :course => @context.name)
       f.links << Atom::Link.new(:href => course_url(@context), :rel => 'self')
       f.updated = Time.now
       f.id = course_url(@context)
     end
-    unless Setting.get('public_feed_disabled', 'false') == 'true'
-      @entries = []
-      @entries.concat @context.assignments.published
-      @entries.concat @context.calendar_events.active
-      @entries.concat(@context.discussion_topics.published.select{ |dt|
-        !dt.locked_for?(@current_user, :check_policies => true)
-      })
-      @entries.concat @context.wiki_pages.published
-      @entries = @entries.sort_by{|e| e.updated_at}
-      @entries.each do |entry|
-        feed.entries << entry.to_atom(:context => @context)
-      end
+    @entries = []
+    @entries.concat @context.assignments.published
+    @entries.concat @context.calendar_events.active
+    @entries.concat(@context.discussion_topics.published.select{ |dt|
+      !dt.locked_for?(@current_user, :check_policies => true)
+    })
+    @entries.concat @context.wiki_pages.published
+    @entries = @entries.sort_by{|e| e.updated_at}
+    @entries.each do |entry|
+      feed.entries << entry.to_atom(:context => @context)
     end
     respond_to do |format|
       format.atom { render :plain => feed.to_xml }

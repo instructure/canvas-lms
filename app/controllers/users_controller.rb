@@ -2055,25 +2055,22 @@ class UsersController < ApplicationController
 
   def public_feed
     return unless get_feed_context(:only => [:user])
-    return [] if Setting.get('public_feed_disabled', 'false') == 'true'
     feed = Atom::Feed.new do |f|
       f.title = "#{@context.name} Feed"
       f.links << Atom::Link.new(:href => dashboard_url, :rel => 'self')
       f.updated = Time.now
       f.id = user_url(@context)
     end
-    unless Setting.get('public_feed_disabled', 'false') == 'true'
-      @entries = []
-      cutoff = 1.week.ago
-      @context.courses.each do |context|
-        @entries.concat context.assignments.published.where("updated_at>?", cutoff)
-        @entries.concat context.calendar_events.active.where("updated_at>?", cutoff)
-        @entries.concat context.discussion_topics.published.where("updated_at>?", cutoff)
-        @entries.concat context.wiki_pages.published.where("updated_at>?", cutoff)
-      end
-      @entries.each do |entry|
-        feed.entries << entry.to_atom(:include_context => true, :context => @context)
-      end
+    @entries = []
+    cutoff = 1.week.ago
+    @context.courses.each do |context|
+      @entries.concat context.assignments.published.where("updated_at>?", cutoff)
+      @entries.concat context.calendar_events.active.where("updated_at>?", cutoff)
+      @entries.concat context.discussion_topics.published.where("updated_at>?", cutoff)
+      @entries.concat context.wiki_pages.published.where("updated_at>?", cutoff)
+    end
+    @entries.each do |entry|
+      feed.entries << entry.to_atom(:include_context => true, :context => @context)
     end
     respond_to do |format|
       format.atom { render :plain => feed.to_xml }
