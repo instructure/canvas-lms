@@ -38,7 +38,7 @@ class SummaryMessageConsolidator
       update_sql = DelayedMessage.send(:sanitize_sql_array, ["UPDATE #{DelayedMessage.quoted_table_name}
                     SET workflow_state='sent', updated_at=?, batched_at=?
                     WHERE workflow_state='pending' AND id IN (?) RETURNING id", Time.now.utc, Time.now.utc, ids_to_update])
-      updated_ids = DelayedMessage.connection.select_values(update_sql)
+      updated_ids = Shard.current.database_server.unshackle{ DelayedMessage.connection.select_values(update_sql)}
 
       Delayed::Batch.serial_batch do
         batches.each do |dm_ids|
