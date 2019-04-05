@@ -826,7 +826,7 @@ class DiscussionTopicsController < ApplicationController
   #
   # @argument specific_sections [String]
   #   A comma-separated list of sections ids to which the discussion topic
-  #   should be made specific too.  If it is not desired to make the discussion
+  #   should be made specific to.  If it is not desired to make the discussion
   #   topic specific to sections, then this parameter may be omitted or set to
   #   "all".  Can only be present only on announcements and only those that are
   #   for a course (as opposed to a group).
