@@ -16,12 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
 import _ from 'lodash'
-import 'jquery.ajaxJSON'
 import I18n from 'i18n!gradebook'
-import cheaterDepaginate from '../../../shared/CheatDepaginator'
+
 import {showFlashAlert} from '../../../shared/FlashAlert'
+import NaiveRequestDispatch from './NaiveRequestDispatch'
 
 const submissionsParams = {
   exclude_response_fields: ['preview_url'],
@@ -67,36 +66,41 @@ function flashSubmissionLoadError() {
 
 function ignoreFailure() {}
 
-function getStudentsChunk(studentIds, options) {
+function getStudentsChunk(studentIds, options, dispatch) {
   const params = {
     ...options.studentsParams,
     per_page: options.studentsChunkSize,
     user_ids: studentIds
   }
   return new Promise((resolve, reject) => {
-    $.ajaxJSON(options.studentsUrl, 'GET', params, resolve, reject)
+    dispatch.getJSON(options.studentsUrl, params, resolve, reject)
   })
 }
 
-function getSubmissionsForStudents(studentIds, options, allEnqueued) {
+function getSubmissionsForStudents(studentIds, options, allEnqueued, dispatch) {
   return new Promise((resolve, reject) => {
     const params = {student_ids: studentIds, ...submissionsParams}
-    cheaterDepaginate(options.submissionsUrl, params, null, allEnqueued)
+    /* eslint-disable promise/catch-or-return */
+    dispatch
+      .getDepaginated(options.submissionsUrl, params, undefined, allEnqueued)
       .then(resolve)
       .fail(() => {
         flashSubmissionLoadError()
         reject()
       })
+    /* eslint-enable promise/catch-or-return */
   })
 }
 
-function getContentForStudentIdChunk(studentIds, options) {
+function getContentForStudentIdChunk(studentIds, options, dispatch) {
   let resolveEnqueued
   const allEnqueued = new Promise(resolve => {
     resolveEnqueued = resolve
   })
 
-  const studentRequest = getStudentsChunk(studentIds, options).then(options.onStudentsChunkLoaded)
+  const studentRequest = getStudentsChunk(studentIds, options, dispatch).then(
+    options.onStudentsChunkLoaded
+  )
 
   const submissionRequestChunks = _.chunk(studentIds, options.submissionsChunkSize)
   const submissionRequests = []
@@ -106,7 +110,8 @@ function getContentForStudentIdChunk(studentIds, options) {
     const submissionRequest = getSubmissionsForStudents(
       submissionRequestChunkIds,
       options,
-      resolveEnqueued
+      resolveEnqueued,
+      dispatch
     )
       .then(subs => (submissions = subs))
       // within the main Gradebook object, students must be received before
@@ -131,6 +136,7 @@ function getContentForStudentIdChunk(studentIds, options) {
 export default class StudentContentDataLoader {
   constructor(options) {
     this.options = options
+    this.dispatch = new NaiveRequestDispatch()
   }
 
   load(studentIds) {
@@ -150,7 +156,11 @@ export default class StudentContentDataLoader {
       const getNextChunk = () => {
         if (studentIdChunks.length) {
           const nextChunkIds = studentIdChunks.shift()
-          const chunkRequestDatum = getContentForStudentIdChunk(nextChunkIds, this.options)
+          const chunkRequestDatum = getContentForStudentIdChunk(
+            nextChunkIds,
+            this.options,
+            this.dispatch
+          )
 
           // when the current chunk requests are all enqueued
           chunkRequestDatum.allEnqueued.then(() => {
