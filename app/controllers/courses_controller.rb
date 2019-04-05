@@ -2679,13 +2679,14 @@ class CoursesController < ApplicationController
       f.updated = Time.now
       f.id = course_url(@context)
     end
+
     @entries = []
-    @entries.concat @context.assignments.published
+    @entries.concat Assignments::ScopedToUser.new(@context, @current_user, @context.assignments.published).scope
     @entries.concat @context.calendar_events.active
-    @entries.concat(@context.discussion_topics.published.select{ |dt|
+    @entries.concat DiscussionTopic::ScopedToUser.new(@context, @current_user, @context.discussion_topics.published).scope.select{ |dt|
       !dt.locked_for?(@current_user, :check_policies => true)
-    })
-    @entries.concat @context.wiki_pages.published
+    }
+    @entries.concat WikiPages::ScopedToUser.new(@context, @current_user, @context.wiki_pages.published).scope
     @entries = @entries.sort_by{|e| e.updated_at}
     @entries.each do |entry|
       feed.entries << entry.to_atom(:context => @context)

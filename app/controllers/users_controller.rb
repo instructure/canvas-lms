@@ -2064,10 +2064,12 @@ class UsersController < ApplicationController
     @entries = []
     cutoff = 1.week.ago
     @context.courses.each do |context|
-      @entries.concat context.assignments.published.where("updated_at>?", cutoff)
+      @entries.concat Assignments::ScopedToUser.new(context, @current_user, context.assignments.published.where("assignments.updated_at>?", cutoff)).scope
       @entries.concat context.calendar_events.active.where("updated_at>?", cutoff)
-      @entries.concat context.discussion_topics.published.where("updated_at>?", cutoff)
-      @entries.concat context.wiki_pages.published.where("updated_at>?", cutoff)
+      @entries.concat DiscussionTopic::ScopedToUser.new(context, @current_user, context.discussion_topics.published.where("discussion_topics.updated_at>?", cutoff)).scope.select { |dt|
+        !dt.locked_for?(@current_user, :check_policies => true)
+      }
+      @entries.concat WikiPages::ScopedToUser.new(context, @current_user, context.wiki_pages.published.where("wiki_pages.updated_at>?", cutoff)).scope
     end
     @entries.each do |entry|
       feed.entries << entry.to_atom(:include_context => true, :context => @context)

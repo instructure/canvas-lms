@@ -1620,6 +1620,26 @@ describe UsersController do
       feed = Atom::Feed.load_feed(response.body) rescue nil
       expect(feed.entries.size).to eq 0
     end
+
+    it "respects overrides" do
+      @other_section = @course.course_sections.create! :name => 'other section'
+      @as2 = assignment_model(:title => 'not for you', :course => @course, :only_visible_to_overrides => true)
+      create_section_override_for_assignment(@as2, {course_section: @other_section})
+      graded_discussion_topic(context: @course)
+      create_section_override_for_assignment(@topic.assignment, {course_section: @other_section})
+      @topic.assignment.update_attribute :only_visible_to_overrides, true
+
+      get 'public_feed', params: {:feed_code => @user.feed_code}, format: 'atom'
+      feed = Atom::Feed.load_feed(response.body) rescue nil
+      expect(feed.entries.map(&:id).join(" ")).not_to include @as2.asset_string
+      expect(feed.entries.map(&:id).join(" ")).not_to include @topic.asset_string
+
+      @course.enroll_student(@student, section: @other_section, enrollment_state: 'active', allow_multiple_enrollments: true)
+      get 'public_feed', params: {:feed_code => @user.feed_code}, format: 'atom'
+      feed = Atom::Feed.load_feed(response.body) rescue nil
+      expect(feed.entries.map(&:id).join(" ")).to include @as2.asset_string
+      expect(feed.entries.map(&:id).join(" ")).to include @topic.asset_string
+    end
   end
 
   describe "GET 'admin_merge'" do
