@@ -168,7 +168,12 @@ module Api
         mathml = UserContent.latex_to_mathml(equation)
         return if mathml.blank?
 
-        node['data-mathml'] = mathml
+        # NOTE: we use "x-canvaslms-safe-mathml" instead of just "data-mathml"
+        # because canvas_sanitize will strip it out on the way in but it won't
+        # strip out data-mathml. This means we can gaurentee that there is never
+        # user input in x-canvaslms-safe-mathml and we can safely pass it to
+        # $el.html() in translateMathmlForScreenreaders in the js in the frontend
+        node['x-canvaslms-safe-mathml'] = mathml
       end
     end
   end

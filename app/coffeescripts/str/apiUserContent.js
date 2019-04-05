@@ -19,46 +19,17 @@ import $ from 'jquery'
 import _ from 'underscore'
 import htmlEscape from 'str/htmlEscape'
 import I18n from 'i18n!user_content'
-import mathMLTagNames from 'mathml-tag-names'
-import sanitizeHtml from 'sanitize-html'
-
-// From https://developer.mozilla.org/en-US/docs/Web/MathML/Attribute
-const MATHML_ATTRIBUTES = [
-  'accent', 'accentunder', 'actiontype', 'align', 'alignmentscope', 'altimg', 'altimg-width',
-  'altimg-height', 'altimg-valign', 'alttext', 'bevelled', 'charalign', 'close', 'columnalign',
-  'columnlines', 'columnspacing', 'columnspan', 'columnwidth', 'crossout', 'decimalpoint',
-  'denomalign', 'depth', 'dir', 'display', 'displaystyle', 'edge', 'equalcolumns', 'equalrows',
-  'fence', 'form', 'frame', 'framespacing', 'groupalign', 'height', 'id', 'indentalign',
-  'indentalignfirst', 'indentalignlast', 'indentshift', 'indentshiftfirst', 'indentshiftlast',
-  'indenttarget', 'infixlinebreakstyle', 'largeop', 'length', 'linebreak', 'linebreakmultchar',
-  'linebreakstyle', 'lineleading', 'linethickness', 'location', 'longdivstyle', 'lspace',
-  'lquote', 'mathbackground', 'mathcolor', 'mathsize', 'mathvariant', 'maxsize', 'minlabelspacing',
-  'minsize', 'movablelimits', 'notation', 'numalign', 'open', 'overflow', 'position', 'rowalign',
-  'rowlines', 'rowspacing', 'rowspan', 'rspace', 'rquote', 'scriptlevel', 'scriptminsize',
-  'Starting', 'scriptsizemultiplier', 'selection', 'separator', 'separators', 'shift', 'side',
-  'src', 'stackalign', 'stretchy', 'subscriptshift', 'supscriptshift', 'symmetric', 'voffset',
-  'width', 'xmlns'
-]
-
-function sanitizeMathmlHtml(html) {
-  const opts = {
-    allowedTags: mathMLTagNames,
-    allowedAttributes: {
-      '*': MATHML_ATTRIBUTES
-    }
-  }
-  return sanitizeHtml(html, opts)
-}
 
 const apiUserContent = {
-
   /*
   xsslint safeString.identifier mathml
-  xsslint safeString.identifier sanitized
   */
   translateMathmlForScreenreaders ($equationImage) {
-    const sanitized = sanitizeMathmlHtml($equationImage.data('mathml'))
-    const mathml = $('<div/>').html(sanitized).html()
+    // note, it is safe to treat the x-canvaslms-safe-mathml as html because it
+    // only ever gets put there by us (in Api::Html::Content::apply_mathml).
+    // Any user content that gets sent to the server will have the
+    // x-canvaslms-safe-mathml attribute stripped out.
+    const mathml = $('<div/>').html($equationImage.attr('x-canvaslms-safe-mathml')).html()
     const mathmlSpan = $('<span class="hidden-readable"></span>')
     mathmlSpan.html(mathml)
     return mathmlSpan
@@ -148,7 +119,7 @@ const apiUserContent = {
       $dummy.find('img.equation_image').each((index, equationImage) => {
         const $equationImage = $(equationImage)
         const mathmlSpan = apiUserContent.translateMathmlForScreenreaders($equationImage)
-        $equationImage.removeAttr('data-mathml')
+        $equationImage.removeAttr('x-canvaslms-safe-mathml')
         $equationImage.after(mathmlSpan)
       })
     }
