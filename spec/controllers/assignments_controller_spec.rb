@@ -721,6 +721,37 @@ describe AssignmentsController do
       end
     end
 
+    describe "description" do
+      render_views
+
+      let(:description) { <<~HTML }
+        <a href="#{attachment_model.public_download_url}">link</a>
+      HTML
+
+      it "excludes verifiers if course is not public" do
+        user_session(@student)
+        expect(UserContent::FilesHandler).to receive(:new).with(hash_including(in_app: true))
+        assignment = @course.assignments.create(
+          title: 'some assignment',
+          description: description
+        )
+        get 'show', params: {course_id: @course.id, id: assignment.id}, format: 'html'
+      end
+
+      it "includes verifiers if course is public" do
+        expect(UserContent::FilesHandler).to receive(:new).with(hash_including(in_app: false))
+        course = course_factory(
+          active_all: true,
+          is_public: true,
+        )
+        assignment = assignment_model(
+          course: course,
+          submission_types: "online_url",
+          description: description
+        )
+        get 'show', params: {course_id: course.id, id: assignment.id}
+      end
+    end
   end
 
   describe "GET 'syllabus'" do
