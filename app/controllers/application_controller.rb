@@ -1912,6 +1912,7 @@ class ApplicationController < ActionController::Base
         context: context,
         user: user,
         preloaded_attachments: {},
+        in_app: Setting.get("skip_verifier_if_in_app", "true") == "true" && in_app?,
         is_public: is_public
       ).processed_url
     end
