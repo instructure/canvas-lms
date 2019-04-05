@@ -1,4 +1,10 @@
 {
+  "add_8523c19b": {
+    "message": "Πρόσθεση"
+  },
+  "all_4321c3a1": {
+    "message": "Όλα"
+  },
   "announcement_list_da155734": {
     "message": "Λίστα Ανακοινώσεων"
   },
@@ -62,11 +68,17 @@
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "Κάντε κλικ για να εισάγετε σύνδεσμο προς αυτή το αντικείμενο"
   },
+  "close_d634289d": {
+    "message": "Κλείσιμο"
+  },
   "close_flickr_form_b32e600a": {
     "message": "Κλείσιμο φόρμας Flickr"
   },
   "collaborations_5c56c15f": {
     "message": "Συνεργασίες"
+  },
+  "content_type_2cf90d95": {
+    "message": "Τύπος Περιεχομένου"
   },
   "copyright_holder_66ee111": {
     "message": "Κάτοχος Πνευματικών Δικαιωμάτων:"
@@ -160,6 +172,9 @@
   },
   "loading_failed_b3524381": {
     "message": "Η Φόρτωση Απέτυχε"
+  },
+  "media_af190855": {
+    "message": "Δεδομένα"
   },
   "modules_c4325335": {
     "message": "Ενότητες"

@@ -1,4 +1,10 @@
 {
+  "add_8523c19b": {
+    "message": "Ekle"
+  },
+  "all_4321c3a1": {
+    "message": "Tümü"
+  },
   "announcement_list_da155734": {
     "message": "Duyuru Listesi"
   },
@@ -62,11 +68,17 @@
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "Bu öğeye bağlantı eklemek için tıklayınız"
   },
+  "close_d634289d": {
+    "message": "Kapat"
+  },
   "close_flickr_form_b32e600a": {
     "message": "Flickr formunu kapat"
   },
   "collaborations_5c56c15f": {
     "message": "İşbirliğine Yönelik Çalışmalar"
+  },
+  "content_type_2cf90d95": {
+    "message": "İçerik Tipi"
   },
   "copyright_holder_66ee111": {
     "message": "Telif Sahibi:"
@@ -161,6 +173,9 @@
   "loading_failed_b3524381": {
     "message": "Yükleme Başarısız..."
   },
+  "media_af190855": {
+    "message": "Medya"
+  },
   "modules_c4325335": {
     "message": "Modüller"
   },
@@ -187,6 +202,9 @@
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Dosyanızı yükleyeceğiniz bir klasör seçin"
+  },
+  "sort_by_e75f9e3e": {
+    "message": "Sırala"
   },
   "syllabus_f191f65b": {
     "message": "Ders Programı"

@@ -1,4 +1,10 @@
 {
+  "add_8523c19b": {
+    "message": "Додати"
+  },
+  "all_4321c3a1": {
+    "message": "Всі"
+  },
   "alternative_text_a834dcad": {
     "message": "Альтернативний текст:"
   },
@@ -68,11 +74,17 @@
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "Натисніть, щоб вставити посилання на цей елемент."
   },
+  "close_d634289d": {
+    "message": "Закрити"
+  },
   "close_flickr_form_b32e600a": {
     "message": "Закрити форму Flickr"
   },
   "collaborations_5c56c15f": {
     "message": "Сумісна робота"
+  },
+  "content_type_2cf90d95": {
+    "message": "Тип вмісту"
   },
   "copyright_holder_66ee111": {
     "message": "Правовласник:"
@@ -181,6 +193,9 @@
   },
   "loading_folders_8d4d5d5a": {
     "message": "Завантаження папок ..."
+  },
+  "media_af190855": {
+    "message": "Носій інформації"
   },
   "modules_c4325335": {
     "message": "Розділи"

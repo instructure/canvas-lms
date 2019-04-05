@@ -1,4 +1,10 @@
 {
+  "add_8523c19b": {
+    "message": "Legg til"
+  },
+  "all_4321c3a1": {
+    "message": "Alle"
+  },
   "alternative_text_a834dcad": {
     "message": "Alternativ tekst: "
   },
@@ -68,11 +74,17 @@
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "Klikk for å setje inn ei lenke til dette elementet. "
   },
+  "close_d634289d": {
+    "message": "Lukk"
+  },
   "close_flickr_form_b32e600a": {
     "message": "Lukk Flickr-dialog"
   },
   "collaborations_5c56c15f": {
     "message": "Samarbeid"
+  },
+  "content_type_2cf90d95": {
+    "message": "Innhaldstype"
   },
   "copyright_holder_66ee111": {
     "message": "Rettshavar:"
@@ -181,6 +193,9 @@
   },
   "loading_folders_8d4d5d5a": {
     "message": "Lastar mapper..."
+  },
+  "media_af190855": {
+    "message": "Media"
   },
   "modules_c4325335": {
     "message": "Modular"

@@ -1,4 +1,10 @@
 {
+  "add_8523c19b": {
+    "message": "افزودن"
+  },
+  "all_4321c3a1": {
+    "message": "همه"
+  },
   "announcement_list_da155734": {
     "message": "فهرست اطلاعیه"
   },
@@ -62,11 +68,17 @@
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "Click to insert a link to this item."
   },
+  "close_d634289d": {
+    "message": "بستن"
+  },
   "close_flickr_form_b32e600a": {
     "message": "Close Flickr form"
   },
   "collaborations_5c56c15f": {
     "message": "همکاری ها"
+  },
+  "content_type_2cf90d95": {
+    "message": "نوع محتوا"
   },
   "copyright_holder_66ee111": {
     "message": "دارنده حق نشر:"
@@ -161,6 +173,9 @@
   "loading_failed_b3524381": {
     "message": "Loading failed..."
   },
+  "media_af190855": {
+    "message": "رسانه"
+  },
   "modules_c4325335": {
     "message": "ماژول ها"
   },
@@ -187,6 +202,9 @@
   },
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Select a folder to upload your file into"
+  },
+  "sort_by_e75f9e3e": {
+    "message": "مرتب کردن بر اساس"
   },
   "syllabus_f191f65b": {
     "message": "سرفصل"

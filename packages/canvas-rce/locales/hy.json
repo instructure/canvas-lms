@@ -1,4 +1,10 @@
 {
+  "add_8523c19b": {
+    "message": "Ավելացնել"
+  },
+  "all_4321c3a1": {
+    "message": "Բոլորը"
+  },
   "announcement_list_da155734": {
     "message": "Հայտարարությունների ցուցակ"
   },
@@ -62,11 +68,17 @@
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "Click to insert a link to this item."
   },
+  "close_d634289d": {
+    "message": "Փակել"
+  },
   "close_flickr_form_b32e600a": {
     "message": "Close Flickr form"
   },
   "collaborations_5c56c15f": {
     "message": "Համատեղ աշխատանքներ"
+  },
+  "content_type_2cf90d95": {
+    "message": "Բովանդակության տեսակ"
   },
   "copyright_holder_66ee111": {
     "message": "Հեղինակային իրավունք ունեցող անձը՝"
@@ -160,6 +172,9 @@
   },
   "loading_failed_b3524381": {
     "message": "Loading failed..."
+  },
+  "media_af190855": {
+    "message": "Մուլտիմեդիա"
   },
   "modules_c4325335": {
     "message": "Մոդուլներ"

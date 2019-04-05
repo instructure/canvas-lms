@@ -1,4 +1,10 @@
 {
+  "add_8523c19b": {
+    "message": "הוספה"
+  },
+  "all_4321c3a1": {
+    "message": "כל"
+  },
   "alternative_text_a834dcad": {
     "message": "טקסט חלופי:"
   },
@@ -68,11 +74,17 @@
   "click_to_insert_a_link_to_this_item_39794098": {
     "message": "הקלקה להוספת קישור לפריט זה"
   },
+  "close_d634289d": {
+    "message": "סגירה"
+  },
   "close_flickr_form_b32e600a": {
     "message": "סגירת דף פליקר"
   },
   "collaborations_5c56c15f": {
     "message": "שיתופי פעולה"
+  },
+  "content_type_2cf90d95": {
+    "message": "סוג תוכן"
   },
   "copyright_holder_66ee111": {
     "message": "בעלים של זכויות יוצרים:"
@@ -178,6 +190,9 @@
   },
   "loading_failed_b3524381": {
     "message": "טעינה נכשלה..."
+  },
+  "media_af190855": {
+    "message": "מדיה"
   },
   "modules_c4325335": {
     "message": "מודולים"
