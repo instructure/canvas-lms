@@ -16,20 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import "@instructure/ui-themes/lib/canvas";
-import { renderIntoDiv, renderSidebarIntoDiv } from "../src/async";
-import locales from "../src/locales";
-
-import CanvasRce from "../src/rce/CanvasRce";
-import * as fakeSource from "../src/sidebar/sources/fake";
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import Button from "@instructure/ui-buttons/lib/components/Button";
+import RadioInput from "@instructure/ui-forms/lib/components/RadioInput";
+import RadioInputGroup from "@instructure/ui-forms/lib/components/RadioInputGroup";
 import Select from "@instructure/ui-forms/lib/components/Select";
 import TextInput from "@instructure/ui-forms/lib/components/TextInput";
-import RadioInputGroup from "@instructure/ui-forms/lib/components/RadioInputGroup";
-import RadioInput from "@instructure/ui-forms/lib/components/RadioInput";
 import ToggleDetails from "@instructure/ui-toggle-details/lib/components/ToggleDetails";
+import "@instructure/ui-themes/lib/canvas";
+
+import { renderIntoDiv, renderSidebarIntoDiv } from "../src/async";
+import bridge from '../src/bridge'
+import locales from "../src/locales";
+import CanvasRce from "../src/rce/CanvasRce";
+import * as fakeSource from "../src/sidebar/sources/fake";
 
 // This is temporarily here so we have a place to develop the shared
 // infrastructure until we get real plugins built.
@@ -69,10 +70,12 @@ function renderDemos({ host, jwt, lang, contextType, contextId, dir }) {
     document.getElementById("editor1"),
     getProps("textarea1", lang, dir)
   );
+
   renderIntoDiv(
     document.getElementById("editor2"),
     getProps("textarea2", lang, dir)
   );
+
   ReactDOM.render(
     <CanvasRce rceProps={getProps("textarea3", lang, dir)} />,
     document.getElementById("editor3")
@@ -102,8 +105,7 @@ class DemoOptions extends Component {
     host: "https://rich-content-iad.inscloudgate.net",
     jwt: "",
     contextType: "course",
-    contextId: "1",
-    contentTrayOpen: false // Temporarily here
+    contextId: "1"
   };
 
   handleChange = () => {
@@ -117,10 +119,16 @@ class DemoOptions extends Component {
 
   render() {
     return (
-      <ToggleDetails summary="Configuration Options">
-        {/** This is just temporarily here */}
-        <Button onClick={() => this.setState({ contentTrayOpen: true })}>Open Content Tray</Button>
-        <CanvasContentTray isOpen={this.state.contentTrayOpen} initialContentType="links" handleClose={() => this.setState({ contentTrayOpen: false })} />
+      <ToggleDetails expanded summary="Configuration Options">
+        <CanvasContentTray
+          bridge={bridge}
+          contextId={this.state.contextId}
+          contextType={this.state.contextType}
+          host={this.state.host}
+          jwt={this.state.jwt}
+          source={this.state.jwt ? undefined : fakeSource}
+        />
+
         <form
           onSubmit={e => {
             e.preventDefault();
@@ -137,6 +145,7 @@ class DemoOptions extends Component {
             <RadioInput label="LTR" value="ltr" />
             <RadioInput label="RTL" value="rtl" />
           </RadioInputGroup>
+
           <Select
             label="Language"
             value={this.state.lang}
@@ -148,16 +157,19 @@ class DemoOptions extends Component {
               </option>
             ))}
           </Select>
+
           <TextInput
             label="API Host"
             value={this.state.host}
             onChange={e => this.setState({ host: e.target.value })}
           />
+
           <TextInput
             label="Canvas JWT"
             value={this.state.jwt}
             onChange={e => this.setState({ jwt: e.target.value })}
           />
+
           <Select
             label="Context Type"
             selectedOption={this.state.contextType}
@@ -169,11 +181,13 @@ class DemoOptions extends Component {
             <option value="group">Group</option>
             <option value="user">User</option>
           </Select>
+
           <TextInput
             label="Context ID"
             value={this.state.contextId}
             onChange={e => this.setState({ contextId: e.target.value })}
           />
+
           <Button type="submit">Update</Button>
         </form>
       </ToggleDetails>

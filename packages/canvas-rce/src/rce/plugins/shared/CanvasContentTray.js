@@ -16,24 +16,31 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Suspense, useState} from 'react'
-import {bool, oneOf, func} from 'prop-types'
+import React, {Suspense, useEffect, useState} from 'react'
+import {bool, func, instanceOf, oneOf} from 'prop-types'
 import {Tray} from '@instructure/ui-overlays'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Heading, Spinner} from '@instructure/ui-elements'
 import {Flex, FlexItem, View} from '@instructure/ui-layout'
+
+import Bridge from '../../../bridge/Bridge'
 import formatMessage from '../../../format-message'
-import Filter from './Filter'
+import Filter, {useFilterSettings} from './Filter'
+import {StoreProvider} from './StoreContext'
 
 /**
  * Returns the translated tray label
- * @param {string} activeContentType
+ * @param {Object} filterSettings
+ * @param {string} filterSettings.contentSubtype - The current subtype of
+ * content loaded in the tray
  * @returns {string}
  */
-function getTrayLabel(activeContentType) {
-  switch (activeContentType) {
-    case 'links':
-      return formatMessage('Course Links')
+function getTrayLabel({contentType, contentSubtype}) {
+  if (contentType === 'links') {
+    return formatMessage('Course Links')
+  }
+
+  switch (contentSubtype) {
     case 'images':
       return formatMessage('Course Images')
     case 'media':
@@ -46,18 +53,27 @@ function getTrayLabel(activeContentType) {
 }
 
 /**
- * Returns the component lazily for the given active content
- * @param {string} activeContentType
+ * Returns the component lazily for the given filter settings
+ * @param {Object} filterSettings
+ * @param {string} filterSettings.contentSubtype - The current subtype of
+ * content loaded in the tray
  */
-function loadTrayContent(activeContentType) {
-  switch (activeContentType) {
-    case 'links':
+function loadTrayContent({contentType, contentSubtype}) {
+  switch (contentSubtype) {
     case 'images':
-    case 'media':
+      return React.lazy(() => import('../instructure_image/Images'))
     case 'documents':
+    case 'media':
     default:
       return React.lazy(() => import('./FakeComponent'))
   }
+}
+
+const FILTER_SETTINGS_BY_PLUGIN = {
+  documents: {contentType: 'files', contentSubtype: 'documents', sortValue: 'date_added'},
+  images: {contentType: 'files', contentSubtype: 'images', sortValue: 'date_added'},
+  links: {contentType: 'links', contentSubtype: null, sortValue: 'date_added'},
+  media: {contentType: 'files', contentSubtype: 'media', sortValue: 'date_added'}
 }
 
 /**
@@ -65,58 +81,63 @@ function loadTrayContent(activeContentType) {
  * from Canvas.  It is essentially the main component.
  */
 export default function CanvasContentTray(props) {
-  const [activeContentType, setActiveContentType] = useState(props.initialContentType)
-  const ContentComponent = loadTrayContent(activeContentType)
+  const [isOpen, setIsOpen] = useState(false)
+
+  const [filterSettings, setFilterSettings] = useFilterSettings()
+  const ContentComponent = loadTrayContent(filterSettings)
+
+  useEffect(() => {
+    const controller = {
+      showTrayForPlugin(plugin) {
+        setFilterSettings(FILTER_SETTINGS_BY_PLUGIN[plugin])
+        setIsOpen(true)
+      }
+    }
+
+    props.bridge.attachController(controller)
+
+    return () => {
+      props.bridge.detachController(controller)
+    }
+  }, [props.bridge])
+
   return (
     <Tray
-      label={getTrayLabel(activeContentType)}
-      open={props.isOpen}
+      label={getTrayLabel(filterSettings)}
+      open={isOpen}
       placement="end"
       size="regular"
     >
       <View as="div" margin="small 0">
         <Flex margin="small">
           <FlexItem>
-            <CloseButton placement="static" variant="icon" onClick={props.handleClose}>
+            <CloseButton placement="static" variant="icon" onClick={() => setIsOpen(false)}>
               {formatMessage('Close')}
             </CloseButton>
           </FlexItem>
+
           <FlexItem grow shrink>
             <Heading margin="0 0 0 small">{formatMessage('Add')}</Heading>
           </FlexItem>
         </Flex>
+
         <Filter
-          onChange={state =>
-            state.contentType === 'files'
-              ? setActiveContentType(state.subContentType)
-              : setActiveContentType(state.contentType)
-          }
+          {...filterSettings}
+          onChange={setFilterSettings}
         />
       </View>
-      <Suspense fallback={<Spinner title={formatMessage('Loading')} size="large" />}>
-        <ContentComponent />
-      </Suspense>
+
+      <StoreProvider {...props}>
+        {contentProps => (
+          <Suspense fallback={<Spinner title={formatMessage('Loading')} size="large" />}>
+            <ContentComponent {...contentProps} />
+          </Suspense>
+        )}
+      </StoreProvider>
     </Tray>
   )
 }
 
 CanvasContentTray.propTypes = {
-  /**
-   * Is the tray currently open?
-   */
-  isOpen: bool,
-  /**
-   * This dictates the type of content that the tray will load initially
-   * after the initial load, this value is controlled by the activeContentType
-   * state property.
-   */
-  initialContentType: oneOf(['links', 'images', 'media', 'documents']).isRequired,
-  /**
-   * How to handle closing the modal
-   */
-  handleClose: func.isRequired
-}
-
-CanvasContentTray.defaultProps = {
-  isOpen: false
+  bridge: instanceOf(Bridge).isRequired,
 }

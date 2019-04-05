@@ -17,17 +17,79 @@
  */
 
 import React from 'react'
-import {render} from 'react-testing-library'
+import {act, fireEvent, render, waitForElement} from 'react-testing-library'
+
+import Bridge from '../../../../bridge/Bridge'
+import * as fakeSource from '../../../../sidebar/sources/fake'
 import CanvasContentTray from '../CanvasContentTray'
 
-it.each([
-  ['links', 'Course Links'],
-  ['images', 'Course Images'],
-  ['media', 'Course Media'],
-  ['documents', 'Course Documents']
-])('initialContentType prop as %s labels the tray %s', (contentValue, trayAriaLabel) => {
-  const {getByLabelText} = render(
-    <CanvasContentTray isOpen initialContentType={contentValue} handleClose={() => {}} />
-  )
-  expect(getByLabelText(trayAriaLabel)).toBeVisible()
+describe('RCE Plugins > CanvasContentTray', () => {
+  let component
+  let props
+
+  beforeEach(() => {
+    props = {
+      bridge: new Bridge(),
+      source: fakeSource
+    }
+  })
+
+  function renderComponent() {
+    component = render(<CanvasContentTray {...props} />)
+  }
+
+  function getTray() {
+    return component.queryByRole('dialog')
+  }
+
+  async function showTrayForPlugin(plugin) {
+    act(() => {
+      props.bridge.controller.showTrayForPlugin(plugin)
+    })
+    await waitForElement(getTray)
+  }
+
+  function selectContentType(contentTypeLabel) {
+    const contentTypeField = component.getByLabelText('Content Type')
+    fireEvent.click(contentTypeField)
+    fireEvent.click(component.getByText(contentTypeLabel))
+  }
+
+  function getContentSubtypeField() {
+    return component.queryByLabelText('Content Subtype')
+  }
+
+  function selectContentSubtype(contentSubtypeLabel) {
+    const contentTypeField = getContentSubtypeField()
+    fireEvent.click(contentTypeField)
+    fireEvent.click(component.getByText(contentSubtypeLabel))
+  }
+
+  describe('Tray Label', () => {
+    beforeEach(renderComponent)
+
+    function getTrayLabel() {
+      return getTray().getAttribute('aria-label')
+    }
+
+    it('is labeled with "Course Links" when using the "links" content type', async () => {
+      await showTrayForPlugin('links')
+      expect(getTrayLabel()).toEqual('Course Links')
+    })
+
+    it('is labeled with "Course Images" when using the "images" content type', async () => {
+      await showTrayForPlugin('images')
+      expect(getTrayLabel()).toEqual('Course Images')
+    })
+
+    it('is labeled with "Course Media" when using the "media" content type', async () => {
+      await showTrayForPlugin('media')
+      expect(getTrayLabel()).toEqual('Course Media')
+    })
+
+    it('is labeled with "Course Documents" when using the "documents" content type', async () => {
+      await showTrayForPlugin('documents')
+      expect(getTrayLabel()).toEqual('Course Documents')
+    })
+  })
 })

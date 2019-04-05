@@ -17,11 +17,15 @@
  */
 
 import htmlEscape from "escape-html";
+
 import formatMessage from "../../../format-message";
 import clickCallback from "./clickCallback";
+import bridge from '../../../bridge'
+
+const PLUGIN_KEY = 'images'
 
 tinymce.create("tinymce.plugins.InstructureImagePlugin", {
-  init: function(ed) {
+  init(ed) {
     // Register commands
     ed.addCommand(
       "mceInstructureImage",
@@ -36,23 +40,30 @@ tinymce.create("tinymce.plugins.InstructureImagePlugin", {
           description: "Title for RCE button to embed an image"
         })
       ),
+
       icon: "image",
-      fetch: (callback) => {
+
+      fetch(callback) {
         const items = [
           {
             type: 'menuitem',
             text: formatMessage('Upload Image'),
             onAction: () => ed.execCommand("mceInstructureImage"),
           },
+
           {
             type: 'menuitem',
             text: formatMessage('Course Images'), // This item needs to be adjusted to be user/context aware, i.e. User Images
-            onAction: () => alert('A tray should open here :)')
+            onAction() {
+              ed.focus(true) // activate the editor without changing focus
+              bridge.showTrayForPlugin(PLUGIN_KEY)
+            }
           }
         ]
         callback(items);
       },
-      onSetup: function(buttonApi) {
+
+      onSetup(buttonApi) {
         // highlight our button when an image is selected
         const toggleActive = eventApi => {
           buttonApi.setActive(

@@ -17,56 +17,122 @@
  */
 
 import React from 'react'
-import {render, fireEvent} from 'react-testing-library'
+import {fireEvent, render} from 'react-testing-library'
+
 import Filter from '../Filter'
 
-it('shows subtype and sort options when contentType is set to files', () => {
+describe('RCE Plugins > Filter', () => {
+  let props
+  let component
 
-  const {getByLabelText, getByText} = render(
-    <Filter onChange={() => {}} />
-  )
+  beforeEach(() => {
+    props = {
+      contentSubtype: null,
+      contentType: 'links',
+      onChange: jest.fn(),
+      sortValue: 'date_added'
+    }
+  })
 
-  const contentTypeSelect = getByLabelText('Content Type');
-  fireEvent.click(contentTypeSelect)
-  fireEvent.click(getByText('Files'))
-  expect(getByLabelText('Content Subtype')).toBeVisible()
-  expect(getByLabelText('Sort By')).toBeVisible()
+  function renderComponent() {
+    component = render(<Filter {...props} />)
+  }
+
+  function selectContentType(contentTypeLabel) {
+    const contentTypeField = component.getByLabelText('Content Type')
+    fireEvent.click(contentTypeField)
+    fireEvent.click(component.getByText(contentTypeLabel))
+  }
+
+  function getContentSubtypeField() {
+    return component.queryByLabelText('Content Subtype')
+  }
+
+  function selectContentSubtype(contentSubtypeLabel) {
+    const contentTypeField = getContentSubtypeField()
+    fireEvent.click(contentTypeField)
+    fireEvent.click(component.getByText(contentSubtypeLabel))
+  }
+
+  function getSortByField() {
+    return component.queryByLabelText('Sort By')
+  }
+
+  function selectSortBy(sortByLabel) {
+    const sortByField = getSortByField()
+    fireEvent.click(sortByField)
+    fireEvent.click(component.getByText(sortByLabel))
+  }
+
+  describe('"Content Type" field', () => {
+    it('calls the onChange prop when the value is changed', () => {
+      renderComponent()
+      selectContentType('Files')
+      expect(props.onChange).toHaveBeenCalledTimes(1)
+    })
+
+    it('includes the updated filter settings when calling the onChange prop', () => {
+      renderComponent()
+      selectContentType('Files')
+      expect(props.onChange).toHaveBeenCalledWith({contentType: 'files'})
+    })
+  })
+
+  describe('"Content Subtype" field', () => {
+    beforeEach(() => {
+      props.contentType = 'files'
+    })
+
+    it('is visible when the Content Type is "Files"', () => {
+      renderComponent()
+      expect(getContentSubtypeField()).toBeVisible()
+    })
+
+    it('is not visible when the Content Type is "Links"', () => {
+      props.contentType = 'links'
+      renderComponent()
+      expect(getContentSubtypeField()).toBeNull()
+    })
+
+    it('calls the onChange prop when the value is changed', () => {
+      renderComponent()
+      selectContentSubtype('Images')
+      expect(props.onChange).toHaveBeenCalledTimes(1)
+    })
+
+    it('includes the updated filter settings when calling the onChange prop', () => {
+      renderComponent()
+      selectContentSubtype('Images')
+      expect(props.onChange).toHaveBeenCalledWith({contentSubtype: 'images'})
+    })
+  })
+
+  describe('"Sort By" field', () => {
+    beforeEach(() => {
+      props.contentType = 'files'
+    })
+
+    it('is visible when the Content Type is "Files"', () => {
+      renderComponent()
+      expect(getSortByField()).toBeVisible()
+    })
+
+    it('is not visible when the Content Type is "Links"', () => {
+      props.contentType = 'links'
+      renderComponent()
+      expect(getSortByField()).toBeNull()
+    })
+
+    it('calls the onChange prop when the value is changed', () => {
+      renderComponent()
+      selectSortBy('Alphabetical')
+      expect(props.onChange).toHaveBeenCalledTimes(1)
+    })
+
+    it('includes the updated filter settings when calling the onChange prop', () => {
+      renderComponent()
+      selectSortBy('Alphabetical')
+      expect(props.onChange).toHaveBeenCalledWith({sortValue: 'alphabetical'})
+    })
+  })
 })
-
-it('calls the onChange prop when modifying the content type', () => {
-  const fakeChange = jest.fn();
-  const {getByLabelText, getByText} = render(
-    <Filter onChange={fakeChange} />
-  )
-
-  const contentTypeSelect = getByLabelText('Content Type');
-  fireEvent.click(contentTypeSelect)
-  fireEvent.click(getByText('Files'))
-  expect(fakeChange).toHaveBeenCalledWith({"contentSubtype": "", "contentType": "files", "sortValue": "date_added"});
-});
-it('calls the onChange prop when modifying the content subtype', () => {
-  const fakeChange = jest.fn();
-  const {getByLabelText, getByText} = render(
-    <Filter onChange={fakeChange} />
-  )
-
-  const contentTypeSelect = getByLabelText('Content Type');
-  fireEvent.click(contentTypeSelect)
-  fireEvent.click(getByText('Files'))
-  fireEvent.click(getByLabelText('Content Subtype'))
-  fireEvent.click(getByText('Images'))
-  expect(fakeChange).toHaveBeenNthCalledWith(2, {"contentSubtype": "images", "contentType": "files", "sortValue": "date_added"});
-});
-it('calls the onChange prop when modifying the sort value', () => {
-  const fakeChange = jest.fn();
-  const {getByLabelText, getByText} = render(
-    <Filter onChange={fakeChange} />
-  )
-
-  const contentTypeSelect = getByLabelText('Content Type');
-  fireEvent.click(contentTypeSelect)
-  fireEvent.click(getByText('Files'))
-  fireEvent.click(getByLabelText('Sort By'))
-  fireEvent.click(getByText('Alphabetical'))
-  expect(fakeChange).toHaveBeenCalledWith({"contentSubtype": "", "contentType": "files", "sortValue": "alphabetical"});
-});

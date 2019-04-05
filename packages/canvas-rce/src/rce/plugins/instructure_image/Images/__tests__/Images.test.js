@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2019 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,8 +16,33 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*eslint no-console: 0*/
+import React from 'react'
+import {fireEvent, render} from 'react-testing-library'
 
-import Bridge from './Bridge'
+import Images from '..'
 
-export default new Bridge()
+describe('RCE "Image" Plugin > Images', () => {
+  let props
+  let component
+
+  beforeEach(() => {
+    props = {
+      fetchImages() {},
+      images: {
+        hasMore: false,
+        isLoading: false,
+        records: []
+      },
+      onImageEmbed() {}
+    }
+  })
+
+  function renderComponent() {
+    component = render(<Images {...props} />)
+  }
+
+  it('renders', () => {
+    renderComponent()
+    expect(component.container.children).toHaveLength(1)
+  })
+})

@@ -30,10 +30,28 @@ import {
   IconAttachMediaLine
 } from '@instructure/ui-icons'
 
+const DEFAULT_FILTER_SETTINGS = {
+  contentSubtype: null,
+  contentType: 'links',
+  sortValue: 'date_added'
+}
+
+export function useFilterSettings() {
+  const [filterSettings, setFilterSettings] = useState(DEFAULT_FILTER_SETTINGS)
+
+  function updateFilterSettings({contentSubtype, contentType, sortValue} = DEFAULT_FILTER_SETTINGS) {
+    if (contentType === 'links') {
+      setFilterSettings({contentType, contentSubtype: null, sortValue})
+    } else {
+      setFilterSettings({contentType, contentSubtype, sortValue})
+    }
+  }
+
+  return [filterSettings, updateFilterSettings]
+}
+
 export default function Filter(props) {
-  const [contentType, setContentType] = useState('links')
-  const [contentSubtype, setContentSubtype] = useState('')
-  const [sortValue, setSortValue] = useState('date_added')
+  const {contentType, contentSubtype, onChange, sortValue} = props
 
   return (
     <Grid>
@@ -42,8 +60,7 @@ export default function Filter(props) {
           <View as="div" margin="0 small">
             <Select
               onChange={(e, selection) => {
-                setContentType(selection.value)
-                props.onChange({contentType: selection.value, contentSubtype, sortValue})
+                onChange({contentType: selection.value})
               }}
               value={contentType}
               label={<ScreenReaderContent>{formatMessage('Content Type')}</ScreenReaderContent>}
@@ -51,6 +68,7 @@ export default function Filter(props) {
               <option value="links" icon={IconLinkLine}>
                 {formatMessage('Links')}
               </option>
+
               <option value="files" icon={IconFolderLine}>
                 {formatMessage('Files')}
               </option>
@@ -58,14 +76,14 @@ export default function Filter(props) {
           </View>
         </GridCol>
       </GridRow>
+
       {contentType === 'files' && (
         <GridRow>
           <GridCol>
             <View as="div" margin="0 small">
               <Select
                 onChange={(e, selection) => {
-                  setContentSubtype(selection.value)
-                  props.onChange({contentSubtype: selection.value, contentType, sortValue})
+                  onChange({contentSubtype: selection.value})
                 }}
                 value={contentSubtype}
                 label={
@@ -75,28 +93,33 @@ export default function Filter(props) {
                 <option value="images" icon={IconImageLine}>
                   {formatMessage('Images')}
                 </option>
+
                 <option value="documents" icon={IconDocumentLine}>
                   {formatMessage('Files')}
                 </option>
+
                 <option value="media" icon={IconAttachMediaLine}>
                   {formatMessage('Media')}
                 </option>
+
                 <option value="all">{formatMessage('All')}</option>
               </Select>
             </View>
           </GridCol>
+
           <GridCol>
             <View as="div" margin="0 small">
               <Select
                 onChange={(e, selection) => {
-                  setSortValue(selection.value)
-                  props.onChange({sortValue: selection.value, contentType, contentSubtype})
+                  onChange({sortValue: selection.value})
                 }}
                 value={sortValue}
                 label={<ScreenReaderContent>{formatMessage('Sort By')}</ScreenReaderContent>}
               >
                 <option value="date_added">{formatMessage('Date Added')}</option>
+
                 <option value="alphabetical">{formatMessage('Alphabetical')}</option>
+
                 <option value="date_published">{formatMessage('Date Published')}</option>
               </Select>
             </View>
