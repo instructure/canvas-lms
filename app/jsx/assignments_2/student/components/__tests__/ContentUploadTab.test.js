@@ -19,6 +19,7 @@
 import ContentUploadTab from '../ContentUploadTab'
 import {DEFAULT_ICON} from '../../../../shared/helpers/mimeClassIconHelper'
 import {fireEvent, render} from 'react-testing-library'
+import {mockAssignment} from '../../test-utils'
 import React from 'react'
 
 beforeEach(() => {
@@ -35,7 +36,9 @@ describe('ContentUploadTab', () => {
   }
 
   it('renders the empty upload tab by default', async () => {
-    const {container, getByTestId, getByText} = render(<ContentUploadTab />)
+    const {container, getByTestId, getByText} = render(
+      <ContentUploadTab assignment={mockAssignment()} />
+    )
     const emptyRender = getByTestId('empty-upload')
 
     expect(emptyRender).toContainElement(getByText('Upload File'))
@@ -45,7 +48,9 @@ describe('ContentUploadTab', () => {
   })
 
   it('renders the uploaded files if there are any', async () => {
-    const {container, getByTestId, getByText} = render(<ContentUploadTab />)
+    const {container, getByTestId, getByText} = render(
+      <ContentUploadTab assignment={mockAssignment()} />
+    )
     const emptyRender = container.querySelector('input[type="file"]')
     const file = new File(['foo'], 'awesome-test-image.png', {type: 'image/png'})
 
@@ -56,7 +61,7 @@ describe('ContentUploadTab', () => {
   })
 
   it('renders in an img tag if an image is uploaded', async () => {
-    const {container, getByTestId} = render(<ContentUploadTab />)
+    const {container, getByTestId} = render(<ContentUploadTab assignment={mockAssignment()} />)
     const emptyRender = container.querySelector('input[type="file"]')
     const file = new File(['foo'], 'awesome-test-image.png', {type: 'image/png'})
 
@@ -69,7 +74,7 @@ describe('ContentUploadTab', () => {
   })
 
   it('renders an icon if a non-image file is uploaded', async () => {
-    const {container, getByTestId} = render(<ContentUploadTab />)
+    const {container, getByTestId} = render(<ContentUploadTab assignment={mockAssignment()} />)
     const emptyRender = container.querySelector('input[type="file"]')
     const file = new File(['foo'], 'awesome-test-file.pdf', {type: 'application/pdf'})
 
@@ -81,7 +86,9 @@ describe('ContentUploadTab', () => {
   })
 
   it('allows uploading multiple files at a time', async () => {
-    const {container, getByTestId, getByText} = render(<ContentUploadTab />)
+    const {container, getByTestId, getByText} = render(
+      <ContentUploadTab assignment={mockAssignment()} />
+    )
     const fileInput = container.querySelector('input[type="file"]')
     const file = new File(['foo'], 'file1.pdf', {type: 'application/pdf'})
     const file2 = new File(['foo'], 'file2.pdf', {type: 'application/pdf'})
@@ -94,7 +101,9 @@ describe('ContentUploadTab', () => {
   })
 
   it('concatenates separate file additions together', async () => {
-    const {container, getByTestId, getByText} = render(<ContentUploadTab />)
+    const {container, getByTestId, getByText} = render(
+      <ContentUploadTab assignment={mockAssignment()} />
+    )
     const fileInput = container.querySelector('input[type="file"]')
     const file = new File(['foo'], 'file1.pdf', {type: 'application/pdf'})
     const file2 = new File(['foo'], 'file2.pdf', {type: 'application/pdf'})
@@ -108,7 +117,7 @@ describe('ContentUploadTab', () => {
   })
 
   it('renders a button to remove the file', async () => {
-    const {container, getByText} = render(<ContentUploadTab />)
+    const {container, getByText} = render(<ContentUploadTab assignment={mockAssignment()} />)
     const emptyRender = container.querySelector('input[type="file"]')
     const file = new File(['foo'], 'awesome-test-file.pdf', {type: 'application/pdf'})
 
@@ -120,7 +129,9 @@ describe('ContentUploadTab', () => {
   })
 
   it('removes the correct file when the Remove button is clicked', async () => {
-    const {container, getByText, queryByText} = render(<ContentUploadTab />)
+    const {container, getByText, queryByText} = render(
+      <ContentUploadTab assignment={mockAssignment()} />
+    )
     const fileInput = container.querySelector('input[type="file"]')
     const file = new File(['foo'], 'file1.pdf', {type: 'application/pdf'})
     const file2 = new File(['foo'], 'file2.pdf', {type: 'application/pdf'})
@@ -135,7 +146,7 @@ describe('ContentUploadTab', () => {
   })
 
   it('ellides filenames for files greater than 21 characters', async () => {
-    const {container, getByText} = render(<ContentUploadTab />)
+    const {container, getByText} = render(<ContentUploadTab assignment={mockAssignment()} />)
     const fileInput = container.querySelector('input[type="file"]')
     const file = new File(['foo'], 'c'.repeat(22), {type: 'application/pdf'})
 
@@ -146,12 +157,56 @@ describe('ContentUploadTab', () => {
 
   it('does not ellide filenames for files less than or equal to 21 characters', async () => {
     const filename = 'c'.repeat(21)
-    const {container, getByText} = render(<ContentUploadTab />)
+    const {container, getByText} = render(<ContentUploadTab assignment={mockAssignment()} />)
     const fileInput = container.querySelector('input[type="file"]')
     const file = new File(['foo'], filename, {type: 'application/pdf'})
 
     uploadFiles(fileInput, [file])
 
     expect(getByText(filename)).toBeInTheDocument()
+  })
+
+  it('displays allowed extensions in the upload box', async () => {
+    const mockedAssignment = mockAssignment({allowedExtensions: ['jpg, png']})
+    const {getByTestId, getByText} = render(<ContentUploadTab assignment={mockedAssignment} />)
+    const emptyRender = getByTestId('empty-upload')
+
+    expect(emptyRender).toContainElement(getByText('File permitted: JPG, PNG'))
+  })
+
+  it('does not display any allowed extensions if there are none', async () => {
+    const {getByTestId, queryByText} = render(<ContentUploadTab assignment={mockAssignment()} />)
+    const emptyRender = getByTestId('empty-upload')
+
+    expect(emptyRender).not.toContainElement(queryByText('File permitted'))
+  })
+
+  it('renders an error when adding a file that is not an allowed extension', async () => {
+    const mockedAssignment = mockAssignment({allowedExtensions: ['jpg']})
+    const {container, getByText, queryByTestId} = render(
+      <ContentUploadTab assignment={mockedAssignment} />
+    )
+    const fileInput = container.querySelector('input[type="file"]')
+    const file = new File(['foo'], 'file1.pdf', {type: 'application/pdf'})
+
+    uploadFiles(fileInput, [file])
+
+    expect(getByText('Invalid file type')).toBeInTheDocument()
+    expect(queryByTestId('non-empty-upload')).toBeNull()
+  })
+
+  it('does not render an error when adding a file that is an allowed extension', async () => {
+    const mockedAssignment = mockAssignment({allowedExtensions: ['jpg']})
+    const {container, getByTestId, getByText, queryByText} = render(
+      <ContentUploadTab assignment={mockedAssignment} />
+    )
+    const fileInput = container.querySelector('input[type="file"]')
+    const file = new File(['foo'], 'file1.jpg', {type: 'image/jpg'})
+
+    uploadFiles(fileInput, [file])
+    const uploadRender = getByTestId('non-empty-upload')
+
+    expect(uploadRender).toContainElement(getByText('file1.jpg'))
+    expect(queryByText('Invalid file type')).toBeNull()
   })
 })
