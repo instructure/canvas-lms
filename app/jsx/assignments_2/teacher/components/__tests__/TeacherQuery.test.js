@@ -20,7 +20,7 @@ import {waitForElement} from 'react-testing-library'
 import {mockAssignment} from '../../test-utils'
 import {renderTeacherQuery} from './integration/integration-utils'
 
-describe('TeacherQuery', async () => {
+describe('TeacherQuery', () => {
   it('renders a loading spinner and then the assignment with data from the query', async () => {
     const assignment = mockAssignment()
     const {getByText, getByTitle} = renderTeacherQuery(assignment)

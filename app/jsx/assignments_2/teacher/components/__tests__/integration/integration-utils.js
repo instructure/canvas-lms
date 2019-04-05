@@ -23,7 +23,7 @@ import TeacherView from '../../TeacherView'
 
 import {mockAssignment} from '../../../test-utils'
 
-import {MockedProvider} from 'react-apollo/test-utils'
+import CanvasValidatedMockedProvider from 'jsx/__tests__/CanvasValidatedMockedProvider'
 import {TEACHER_QUERY} from '../../../assignmentData'
 
 export function renderTeacherQuery(assignment, additionalApolloMocks = []) {
@@ -42,9 +42,9 @@ export function renderTeacherQuery(assignment, additionalApolloMocks = []) {
     ...additionalApolloMocks
   ]
   const fns = render(
-    <MockedProvider mocks={mocks} addTypename={false}>
+    <CanvasValidatedMockedProvider mocks={mocks} addTypename={false}>
       <TeacherQuery assignmentLid={assignment.lid} />
-    </MockedProvider>
+    </CanvasValidatedMockedProvider>
   )
   return fns
 }
@@ -61,9 +61,9 @@ export function renderTeacherView(
   teacherViewProps = {}
 ) {
   const fns = render(
-    <MockedProvider mocks={additionalApolloMocks} addTypename={false}>
+    <CanvasValidatedMockedProvider mocks={additionalApolloMocks} addTypename={false}>
       <TeacherView assignment={assignment} {...teacherViewProps} />
-    </MockedProvider>
+    </CanvasValidatedMockedProvider>
   )
   return fns
 }

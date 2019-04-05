@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render} from 'react-testing-library'
-import {MockedProvider} from 'react-apollo/test-utils'
+import CanvasValidatedMockedProvider from 'jsx/__tests__/CanvasValidatedMockedProvider'
 import {mockAssignment} from '../../test-utils'
 import Header from '../Header'
 
@@ -26,7 +26,7 @@ describe('assignments 2 teacher view header', () => {
   it('renders basic assignment information', () => {
     const assignment = mockAssignment()
     const {getByTestId} = render(
-      <MockedProvider>
+      <CanvasValidatedMockedProvider>
         <Header
           assignment={assignment}
           onChangeAssignment={() => {}}
@@ -34,7 +34,7 @@ describe('assignments 2 teacher view header', () => {
           onValidate={() => true}
           invalidMessage={() => undefined}
         />
-      </MockedProvider>
+      </CanvasValidatedMockedProvider>
     )
 
     expect(getByTestId('AssignmentType')).toBeInTheDocument()

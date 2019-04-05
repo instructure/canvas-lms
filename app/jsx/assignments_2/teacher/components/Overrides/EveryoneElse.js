@@ -70,7 +70,7 @@ export default class EveryoneElse extends React.Component {
       allowedExtensions: assignment.allowedExtensions,
       set: {
         lid: null,
-        name: title
+        sectionName: title
       }
     }
     return fauxOverride
