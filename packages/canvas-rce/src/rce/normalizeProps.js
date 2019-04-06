@@ -20,7 +20,6 @@ import sanitizeEditorOptions from "./sanitizeEditorOptions";
 import wrapInitCb from "./wrapInitCb";
 import normalizeLocale from "./normalizeLocale";
 import editorLanguage from "./editorLanguage";
-import defaultContentCssUrl from "!file-loader!tinymce/skins/content/default/content.min.css";
 
 export default function(props, tinymce, MutationObserver) {
   let initialEditorOptions = props.editorOptions(tinymce),
@@ -40,14 +39,11 @@ export default function(props, tinymce, MutationObserver) {
     editorOptions.language_url = "none";
   }
 
-  // if you pass a content_css (like canvas-lms does), it is expected that it
-  // contain *all* styles you want loaded inside the iframe.
-  // if you don't pass a content_css we'll load a sane default for you
+  // It is expected that consumers provide their own content_css so that the
+  // styles inside the editor match the styles of the site it is going to be
+  // displayed in.
   if (props.editorOptions.content_css) {
-    editorOptions.content_css =
-      window.location.origin + props.editorOptions.content_css;
-  } else {
-    editorOptions.content_css = defaultContentCssUrl;
+    editorOptions.content_css = props.editorOptions.content_css;
   }
 
   // tell tinymce that we already loaded the skin

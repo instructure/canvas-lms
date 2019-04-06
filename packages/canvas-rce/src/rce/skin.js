@@ -16,4 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export * from "!style-loader/useable!css-loader!tinymce/skins/ui/oxide/skin.min.css";
+import { template } from "../../node_modules/tinymce/skins/ui/oxide/skin.min.css";
+
+let inserted;
+export function use() {
+  if (inserted) return;
+  inserted = true;
+  const style = document.createElement("style");
+  style.appendChild(
+    // the .replace here is because the ui-themeable babel hook adds that prefix to all the class names
+    document.createTextNode(template().replace(/tinymce__oxide--/g, ""))
+  );
+  document.head.appendChild(style);
+}
+

@@ -21,7 +21,6 @@ import assert from "assert";
 import proxyquire from "proxyquire";
 import Bridge from "../../src/bridge";
 import sinon from "sinon";
-import skin from "tinymce-light-skin";
 import ReactDOM from "react-dom";
 
 class fakeRCEWrapper extends React.Component {
@@ -50,7 +49,6 @@ describe("CanvasRce", () => {
   let target;
 
   beforeEach(() => {
-    sinon.stub(skin, "useCanvas");
     target = document.createElement("div");
     document.body.appendChild(target);
   });
@@ -72,7 +70,6 @@ describe("CanvasRce", () => {
   };
 
   afterEach(() => {
-    skin.useCanvas.restore();
     Bridge.focusEditor(null);
   });
 
@@ -82,15 +79,5 @@ describe("CanvasRce", () => {
       done();
     };
     renderCanvasRce({ renderCallback });
-  });
-
-  it("uses the canvas variant of the tinymce light skin by default", () => {
-    renderCanvasRce();
-    sinon.assert.called(skin.useCanvas);
-  });
-
-  it("does not use the bundled skin if skin is passed in props", () => {
-    renderCanvasRce({ skin: "customSkin" });
-    sinon.assert.notCalled(skin.useCanvas);
   });
 });
