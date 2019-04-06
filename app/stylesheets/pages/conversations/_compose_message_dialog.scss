@@ -230,7 +230,7 @@ $subtleBorderColor: #e5e5e5;
     overflow-y: auto;
     border: none;
     box-shadow: none;
-    box-sizing: border-box;
+    box-sizing: content-box;
   }
 
   .token_input {
