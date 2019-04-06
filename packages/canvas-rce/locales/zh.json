@@ -11,9 +11,6 @@
   "assignments_1e02582c": {
     "message": "作业"
   },
-  "background_color_press_down_to_select_ef99fdac": {
-    "message": "背景颜色，按下即可选择"
-  },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
   },
@@ -113,12 +110,6 @@
   "folder_705fd2d7": {
     "message": "文件夹"
   },
-  "font_size_press_down_to_select_6c25dc2d": {
-    "message": "字体大小，按下即可选择"
-  },
-  "formatting_press_down_to_select_df728c30": {
-    "message": "格式，按下即可选择"
-  },
   "grades_a61eba0a": {
     "message": "评分"
   },
@@ -197,9 +188,6 @@
   "record_upload_media_5fdce166": {
     "message": "记录/上传媒体"
   },
-  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
-    "message": "富文本区域。按 ALT+F8 获取帮助"
-  },
   "search_280d00bd": {
     "message": "搜索"
   },
@@ -214,9 +202,6 @@
   },
   "syllabus_f191f65b": {
     "message": "教学大纲"
-  },
-  "text_color_press_down_to_select_8f5ad9b5": {
-    "message": "文本颜色，按下即可选择"
   },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "材料在公开域中"

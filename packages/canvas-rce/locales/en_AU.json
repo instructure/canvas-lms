@@ -11,9 +11,6 @@
   "assignments_1e02582c": {
     "message": "Assignments"
   },
-  "background_color_press_down_to_select_ef99fdac": {
-    "message": "Background Colour, press down to select"
-  },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
   },
@@ -113,12 +110,6 @@
   "folder_705fd2d7": {
     "message": "Folder"
   },
-  "font_size_press_down_to_select_6c25dc2d": {
-    "message": "Font Size, press down to select"
-  },
-  "formatting_press_down_to_select_df728c30": {
-    "message": "Formatting, press down to select"
-  },
   "grades_a61eba0a": {
     "message": "Marks"
   },
@@ -197,9 +188,6 @@
   "record_upload_media_5fdce166": {
     "message": "Record/Upload Media"
   },
-  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
-    "message": "Rich Text Area. Press ALT+F8 for help."
-  },
   "search_280d00bd": {
     "message": "Search"
   },
@@ -214,9 +202,6 @@
   },
   "syllabus_f191f65b": {
     "message": "Syllabus"
-  },
-  "text_color_press_down_to_select_8f5ad9b5": {
-    "message": "Text Colour, press down to select"
   },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "The material is in the public domain"

@@ -17,9 +17,6 @@
   "assignments_1e02582c": {
     "message": "Oppgåver"
   },
-  "background_color_press_down_to_select_ef99fdac": {
-    "message": "Bakgrunnsfarge, klikk for å velje"
-  },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
   },
@@ -125,12 +122,6 @@
   "folder_705fd2d7": {
     "message": "Mappe"
   },
-  "font_size_press_down_to_select_6c25dc2d": {
-    "message": "Skriftstorleik, klikk for å velje"
-  },
-  "formatting_press_down_to_select_df728c30": {
-    "message": "Formatering, klikk for å velje"
-  },
   "grades_a61eba0a": {
     "message": "Karakterar"
   },
@@ -215,9 +206,6 @@
   "record_upload_media_5fdce166": {
     "message": "Ta opp / last opp media"
   },
-  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
-    "message": "Område for rik tekst-format. Trykk ALT+F8 for hjelp"
-  },
   "search_280d00bd": {
     "message": "Søk"
   },
@@ -232,9 +220,6 @@
   },
   "syllabus_f191f65b": {
     "message": "Emneoversikt"
-  },
-  "text_color_press_down_to_select_8f5ad9b5": {
-    "message": "Tekstfarge, klikk for å velje"
   },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Materialet er ikkje opphavsrettbeskytta"

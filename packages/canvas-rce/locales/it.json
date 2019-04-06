@@ -11,9 +11,6 @@
   "assignments_1e02582c": {
     "message": "Compiti"
   },
-  "background_color_press_down_to_select_ef99fdac": {
-    "message": "Colore sfondo, premi per selezionare"
-  },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
   },
@@ -113,12 +110,6 @@
   "folder_705fd2d7": {
     "message": "Cartella"
   },
-  "font_size_press_down_to_select_6c25dc2d": {
-    "message": "Dimensioni carattere, premi per selezionare"
-  },
-  "formatting_press_down_to_select_df728c30": {
-    "message": "Formattazione, premi per selezionare"
-  },
   "grades_a61eba0a": {
     "message": "Voti"
   },
@@ -197,9 +188,6 @@
   "record_upload_media_5fdce166": {
     "message": "Registra/Carica file multimediali"
   },
-  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
-    "message": "Area di testo RTF. Premi ALT+F8 per la guida"
-  },
   "search_280d00bd": {
     "message": "Cerca"
   },
@@ -214,9 +202,6 @@
   },
   "syllabus_f191f65b": {
     "message": "Piano di studio"
-  },
-  "text_color_press_down_to_select_8f5ad9b5": {
-    "message": "Colore testo, premi per selezionare"
   },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Il materiale è nel dominio pubblico"

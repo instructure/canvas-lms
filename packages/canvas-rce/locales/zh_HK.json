@@ -11,9 +11,6 @@
   "assignments_1e02582c": {
     "message": "任務"
   },
-  "background_color_press_down_to_select_ef99fdac": {
-    "message": "背景顏色，按下以選擇"
-  },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
   },
@@ -113,12 +110,6 @@
   "folder_705fd2d7": {
     "message": "文件夾"
   },
-  "font_size_press_down_to_select_6c25dc2d": {
-    "message": "字體大小，按下以選擇"
-  },
-  "formatting_press_down_to_select_df728c30": {
-    "message": "格式化，按下以選擇"
-  },
   "grades_a61eba0a": {
     "message": "成績"
   },
@@ -197,9 +188,6 @@
   "record_upload_media_5fdce166": {
     "message": "錄製/上載媒體"
   },
-  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
-    "message": "富文本區。按 ALT+F8 尋求協助"
-  },
   "search_280d00bd": {
     "message": "搜索"
   },
@@ -214,9 +202,6 @@
   },
   "syllabus_f191f65b": {
     "message": "課程大綱"
-  },
-  "text_color_press_down_to_select_8f5ad9b5": {
-    "message": "文字顏色，按下以選擇"
   },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "該材料位於公用網域中。"

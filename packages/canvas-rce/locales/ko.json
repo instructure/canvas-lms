@@ -14,9 +14,6 @@
   "assignments_1e02582c": {
     "message": "과제"
   },
-  "background_color_press_down_to_select_ef99fdac": {
-    "message": "배경색, 선택하려면 누름"
-  },
   "cancel_file_upload_9903e7b9": {
     "message": "Cancel file upload"
   },
@@ -101,12 +98,6 @@
   "folder_705fd2d7": {
     "message": "폴더"
   },
-  "font_size_press_down_to_select_6c25dc2d": {
-    "message": "글자 크기, 선택하려면 누름"
-  },
-  "formatting_press_down_to_select_df728c30": {
-    "message": "서식, 선택하려면 누름"
-  },
   "grades_a61eba0a": {
     "message": "평점"
   },
@@ -173,9 +164,6 @@
   "quizzes_7e598f57": {
     "message": "퀴즈"
   },
-  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
-    "message": "Rich Text Area. Press ALT+F8 for help"
-  },
   "search_280d00bd": {
     "message": "검색"
   },
@@ -190,9 +178,6 @@
   },
   "syllabus_f191f65b": {
     "message": "요강"
-  },
-  "text_color_press_down_to_select_8f5ad9b5": {
-    "message": "텍스트 색, 선택하려면 누름"
   },
   "upload_8b403d05": {
     "message": "업로드"

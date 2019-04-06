@@ -11,9 +11,6 @@
   "assignments_1e02582c": {
     "message": "Zadania"
   },
-  "background_color_press_down_to_select_ef99fdac": {
-    "message": "Kolor tła; naciskaj do dołu, aby wybrać"
-  },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
   },
@@ -113,12 +110,6 @@
   "folder_705fd2d7": {
     "message": "Folder"
   },
-  "font_size_press_down_to_select_6c25dc2d": {
-    "message": "Rozmiar czcionki; naciskaj do dołu, aby wybrać"
-  },
-  "formatting_press_down_to_select_df728c30": {
-    "message": "Formatowanie; naciskaj do dołu, aby wybrać"
-  },
   "grades_a61eba0a": {
     "message": "Oceny"
   },
@@ -197,9 +188,6 @@
   "record_upload_media_5fdce166": {
     "message": "Utwórz/prześlij pliki multimedialne"
   },
-  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
-    "message": "Obszar Rich Text. Wciśnij ALT+F8 po pomoc"
-  },
   "search_280d00bd": {
     "message": "Wyszukaj"
   },
@@ -214,9 +202,6 @@
   },
   "syllabus_f191f65b": {
     "message": "Program"
-  },
-  "text_color_press_down_to_select_8f5ad9b5": {
-    "message": "Kolor tekstu; naciskaj do dołu, aby wybrać"
   },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Materiał znajduje się w domenie publicznej"

@@ -11,9 +11,6 @@
   "assignments_1e02582c": {
     "message": "المهام"
   },
-  "background_color_press_down_to_select_ef99fdac": {
-    "message": "لون الخلفية، اضغط لأسفل للتحديد"
-  },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
   },
@@ -113,12 +110,6 @@
   "folder_705fd2d7": {
     "message": "مجلد"
   },
-  "font_size_press_down_to_select_6c25dc2d": {
-    "message": "حجم الخط، اضغط لأسفل للتحديد"
-  },
-  "formatting_press_down_to_select_df728c30": {
-    "message": "التنسيق، اضغط لأسفل للتحديد"
-  },
   "grades_a61eba0a": {
     "message": "الدرجات"
   },
@@ -197,9 +188,6 @@
   "record_upload_media_5fdce166": {
     "message": "تسجيل/تحميل الوسائط"
   },
-  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
-    "message": "منطقة نص منسق. اضغط على ALT+F8 للمساعدة"
-  },
   "search_280d00bd": {
     "message": "بحث"
   },
@@ -214,9 +202,6 @@
   },
   "syllabus_f191f65b": {
     "message": "المناهج"
-  },
-  "text_color_press_down_to_select_8f5ad9b5": {
-    "message": "لون النص، اضغط لأسفل للتحديد"
   },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "توجد المادة في المجال العام"

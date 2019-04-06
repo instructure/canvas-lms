@@ -14,9 +14,6 @@
   "assignments_1e02582c": {
     "message": "Ödevler"
   },
-  "background_color_press_down_to_select_ef99fdac": {
-    "message": "Arkaplan rengi, aşağı tuşa basın ve seçin"
-  },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
   },
@@ -113,12 +110,6 @@
   "folder_705fd2d7": {
     "message": "Klasör"
   },
-  "font_size_press_down_to_select_6c25dc2d": {
-    "message": "Yazı büyüklüğü, aşağı tuşa basın ve seçin"
-  },
-  "formatting_press_down_to_select_df728c30": {
-    "message": "Biçimlendirme, aşağı tuşa basın ve seçin"
-  },
   "grades_a61eba0a": {
     "message": "Notlar"
   },
@@ -191,9 +182,6 @@
   "quizzes_7e598f57": {
     "message": "Kısa sınavlar"
   },
-  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
-    "message": "Zengin Metin Alanı. Yardım için ALT+F8 e basın"
-  },
   "search_280d00bd": {
     "message": "Ara"
   },
@@ -208,9 +196,6 @@
   },
   "syllabus_f191f65b": {
     "message": "Ders Programı"
-  },
-  "text_color_press_down_to_select_8f5ad9b5": {
-    "message": "Yazı rengi, aşağı tuşa basın ve seçin"
   },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Bu malzeme genel kullanıma açık"

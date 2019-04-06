@@ -17,9 +17,6 @@
   "assignments_1e02582c": {
     "message": "Завдання"
   },
-  "background_color_press_down_to_select_ef99fdac": {
-    "message": "Колір фону, натисніть, щоб обрати"
-  },
   "c_2001_acme_inc_283f7f80": {
     "message": "(c) 2001 Acme Inc."
   },
@@ -125,12 +122,6 @@
   "folder_705fd2d7": {
     "message": "Папка"
   },
-  "font_size_press_down_to_select_6c25dc2d": {
-    "message": "Розмір шрифту, натисніть, щоб обрати"
-  },
-  "formatting_press_down_to_select_df728c30": {
-    "message": "Форматування, натисніть, щоб вибрати"
-  },
   "grades_a61eba0a": {
     "message": "Оцінки"
   },
@@ -215,9 +206,6 @@
   "record_upload_media_5fdce166": {
     "message": "Запис/завантаження медіа"
   },
-  "rich_text_area_press_alt_f8_for_help_58f0f2c3": {
-    "message": "Багатофункціональна область тексту. Натисніть ALT+F8 для довідки"
-  },
   "search_280d00bd": {
     "message": "Пошук"
   },
@@ -232,9 +220,6 @@
   },
   "syllabus_f191f65b": {
     "message": "Навчальний план"
-  },
-  "text_color_press_down_to_select_8f5ad9b5": {
-    "message": "Колір тексту, натисніть, щоб обрати"
   },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Матеріал в публічному домені"
