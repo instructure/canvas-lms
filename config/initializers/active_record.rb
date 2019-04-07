@@ -1136,7 +1136,12 @@ module UpdateAndDeleteWithJoins
       where_sql = collector.value
     end
     sql.concat('WHERE ' + where_sql)
-    connection.update(sql, "#{name} Update")
+    db = Shard.current(klass.shard_category).database_server
+    if ::Shackles.environment != db.shackles_environment
+      Shard.current.database_server.unshackle {connection.update(sql, "#{name} Update")}
+    else
+      connection.update(sql, "#{name} Update")
+    end
   end
 
   def delete_all
