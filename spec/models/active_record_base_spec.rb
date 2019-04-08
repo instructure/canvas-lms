@@ -338,6 +338,16 @@ describe ActiveRecord::Base do
       expect(names).to be_include("bulk_insert_2")
     end
 
+    it "should handle arrays" do
+      DeveloperKey.bulk_insert [
+        {name: "bulk_insert_1", workflow_state: "registered", redirect_uris: ['1, 2', 3]},
+        {name: "bulk_insert_2", workflow_state: "registered", redirect_uris: ['4', '5', nil]}
+      ]
+      names = DeveloperKey.order(:name).pluck(:redirect_uris)
+      expect(names).to be_include(['1, 2', '3'])
+      expect(names).to be_include(['4', '5', nil])
+    end
+
     it "should not raise an error if there are no records" do
       expect { Course.bulk_insert [] }.to change(Course, :count).by(0)
     end
