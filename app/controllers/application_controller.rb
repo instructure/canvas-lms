@@ -814,6 +814,7 @@ class ApplicationController < ActionController::Base
         .for_user(@context)
         .current
         .active_by_date
+      enrollment_scope = enrollment_scope.where(:course_id => @observed_course_ids) if @observed_course_ids
       include_groups = !!opts[:include_groups]
       group_ids = nil
 
@@ -843,12 +844,14 @@ class ApplicationController < ActionController::Base
 
       groups = []
       if include_groups
+        group_scope = @context.current_groups
+        group_scope = group_scope.where(:context_type => "Course", :context_id => @observed_course_ids) if @observed_course_ids
         if group_ids
           Shard.partition_by_shard(group_ids) do |shard_group_ids|
-            groups += @context.current_groups.shard(Shard.current).where(:id => shard_group_ids).to_a
+            groups += group_scope.shard(Shard.current).where(:id => shard_group_ids).to_a
           end
         else
-          groups = @context.current_groups.shard(opts[:cross_shard] ? @context.in_region_associated_shards : Shard.current).to_a
+          groups = group_scope.shard(opts[:cross_shard] ? @context.in_region_associated_shards : Shard.current).to_a
         end
       end
       groups = @context.filter_visible_groups_for_user(groups)
