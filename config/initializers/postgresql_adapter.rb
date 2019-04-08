@@ -43,9 +43,21 @@ module PostgreSQLAdapterExtensions
   def quote_text(value)
     if value.nil?
       "\\N"
+    elsif value.is_a?(Array)
+      "{#{value.map {|v| quote_string_for_array(v)}.join(',')}}"
     else
       hash = {"\n" => "\\n", "\r" => "\\r", "\t" => "\\t", "\\" => "\\\\"}
       value.to_s.gsub(/[\n\r\t\\]/){ |c| hash[c] }
+    end
+  end
+
+  def quote_string_for_array(value)
+    if value.nil?
+      "NULL"
+    elsif value.is_a? String
+      @connection.quote_ident(value)
+    else
+      quote_text(value)
     end
   end
 
