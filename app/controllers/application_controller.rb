@@ -136,7 +136,7 @@ class ApplicationController < ActionController::Base
       ]
 
       @js_env = {
-        ASSET_HOST: Canvas::Cdn.config.host,
+        ASSET_HOST: Canvas::Cdn.add_brotli_to_host_if_supported(request),
         active_brand_config_json_url: active_brand_config_url('json'),
         url_to_what_gets_loaded_inside_the_tinymce_editor_css: editor_css,
         url_for_high_contrast_tinymce_editor_css: editor_hc_css,

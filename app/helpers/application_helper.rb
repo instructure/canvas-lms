@@ -640,7 +640,7 @@ module ApplicationHelper
   def active_brand_config_url(type, opts={})
     path = active_brand_config(opts).try("public_#{type}_path")
     path ||= BrandableCSS.public_default_path(type, @current_user&.prefers_high_contrast? || opts[:force_high_contrast])
-    "#{Canvas::Cdn.config.host}/#{path}"
+    "#{Canvas::Cdn.add_brotli_to_host_if_supported(request)}/#{path}"
   end
 
   def brand_config_account(opts={})
