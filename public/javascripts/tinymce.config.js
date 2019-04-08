@@ -130,7 +130,7 @@ export default class EditorConfig {
    * @return {String} comma delimited set of non-core buttons
    */
   buildInstructureButtons () {
-    let instructure_buttons = ' instructure_image,instructure_equation'
+    let instructure_buttons = ' instructure_image instructure_equation'
     instructure_buttons += this.external_buttons()
     if (this.instConfig && this.instConfig.allowMediaComments && (this.instConfig.kalturaSettings && !this.instConfig.kalturaSettings.hide_rte_button)) {
       instructure_buttons += ' instructure_record'
