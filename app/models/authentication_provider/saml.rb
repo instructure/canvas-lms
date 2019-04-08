@@ -243,7 +243,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
 
   def populate_from_metadata_xml(xml)
     entity = SAML2::Entity.parse(xml)
-    raise "Invalid schema" unless entity.valid_schema?
+    raise "Invalid schema" unless entity&.valid_schema?
     if entity.is_a?(SAML2::Entity::Group) && idp_entity_id.present?
       entity = entity.find { |e| e.entity_id == idp_entity_id }
     end

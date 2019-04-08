@@ -466,7 +466,8 @@ class Course < ActiveRecord::Base
         {
             :setting => t('public', 'Public')
         }
-      ] + self.root_account.available_course_visibility_override_options.to_a.flatten
+      ]
+    options = self.root_account.available_course_visibility_override_options(options).to_a.flatten
     ActiveSupport::OrderedHash[*options]
   end
 

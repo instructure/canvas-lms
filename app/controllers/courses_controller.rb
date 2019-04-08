@@ -959,6 +959,7 @@ class CoursesController < ApplicationController
         # group memberships. Since we only care about active group
         # memberships for this course, load the data in a more targeted way.
         user_json_preloads(users, includes.include?('email'))
+        UserPastLtiIds.manual_preload_past_lti_ids(users, @context) if ['uuid', 'lti_id'].any? { |id| includes.include? id }
         include_group_ids = includes.delete('group_ids').present?
 
         unless includes.include?('test_student') || Array(params[:enrollment_type]).include?("student_view")
@@ -2674,16 +2675,18 @@ class CoursesController < ApplicationController
       f.updated = Time.now
       f.id = course_url(@context)
     end
-    @entries = []
-    @entries.concat @context.assignments.published
-    @entries.concat @context.calendar_events.active
-    @entries.concat(@context.discussion_topics.active.select{ |dt|
-      dt.published? && !dt.locked_for?(@current_user, :check_policies => true)
-    })
-    @entries.concat @context.wiki_pages
-    @entries = @entries.sort_by{|e| e.updated_at}
-    @entries.each do |entry|
-      feed.entries << entry.to_atom(:context => @context)
+    unless Setting.get('public_feed_disabled', 'false') == 'true'
+      @entries = []
+      @entries.concat @context.assignments.published
+      @entries.concat @context.calendar_events.active
+      @entries.concat(@context.discussion_topics.published.select{ |dt|
+        !dt.locked_for?(@current_user, :check_policies => true)
+      })
+      @entries.concat @context.wiki_pages.published
+      @entries = @entries.sort_by{|e| e.updated_at}
+      @entries.each do |entry|
+        feed.entries << entry.to_atom(:context => @context)
+      end
     end
     respond_to do |format|
       format.atom { render :plain => feed.to_xml }

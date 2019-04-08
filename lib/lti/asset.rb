@@ -33,10 +33,10 @@ module Lti
         elsif asset.lti_context_id?
           lti_context_id = (old_id = old_id_for_user_in_context(asset, context)) ? old_id : asset.lti_context_id
         else
-          asset.reload
+          Shackles.activate(:master) {asset.reload}
           unless asset.lti_context_id
             asset.lti_context_id = global_context_id
-            asset.save!
+            Shackles.activate(:master) {asset.save!}
           end
           lti_context_id = asset.lti_context_id
         end
