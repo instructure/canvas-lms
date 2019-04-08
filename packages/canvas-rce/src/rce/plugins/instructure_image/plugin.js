@@ -29,15 +29,29 @@ tinymce.create("tinymce.plugins.InstructureImagePlugin", {
     );
 
     // Register buttons
-    ed.ui.registry.addToggleButton("instructure_image", {
-      title: htmlEscape(
+    ed.ui.registry.addMenuButton("instructure_image", {
+      tooltip: htmlEscape(
         formatMessage({
-          default: "Embed Image",
+          default: "Images",
           description: "Title for RCE button to embed an image"
         })
       ),
-      onAction: () => ed.execCommand("mceInstructureImage"),
       icon: "image",
+      fetch: (callback) => {
+        const items = [
+          {
+            type: 'menuitem',
+            text: formatMessage('Upload Image'),
+            onAction: () => ed.execCommand("mceInstructureImage"),
+          },
+          {
+            type: 'menuitem',
+            text: formatMessage('Course Images'), // This item needs to be adjusted to be user/context aware, i.e. User Images
+            onAction: () => alert('A tray should open here :)')
+          }
+        ]
+        callback(items);
+      },
       onSetup: function(buttonApi) {
         // highlight our button when an image is selected
         const toggleActive = eventApi => {
