@@ -274,8 +274,7 @@ module AccountReports::ReportHelper
   #    the enrollment_term_id the query could use the id and get the results for
   #    the term.
   # 4. the parallel_#{report_type} will also need to add rows individually with
-  #    add_report_row or a little more efficient way would be to use
-  #    build_report_row, and then add_report_rows at the end of the method.
+  #    add_report_row.
   def write_report_in_batches(headers)
     # we use total_lines to track progress in the normal progress.
     # just use it here to do the same thing here even though it is not really
@@ -298,13 +297,18 @@ module AccountReports::ReportHelper
   end
 
   def add_report_row(row:, row_number: nil, report_runner:, account_report: @account_report)
-    Shackles.activate(:master) do
-      account_report.account_report_rows.create!(row: row,
-                                                 row_number: row_number,
-                                                 account_report: account_report,
-                                                 account_report_runner: report_runner,
-                                                 created_at: Time.zone.now)
+    report_runner.rows << build_report_row(row: row, row_number: row_number, report_runner: report_runner, account_report: account_report)
+    if report_runner.rows.length == 1_000
+      report_runner.write_rows
     end
+  end
+
+  def build_report_row(row:, row_number: nil, report_runner:, account_report: @account_report)
+    account_report.account_report_rows.new(row: row,
+                                           row_number: row_number,
+                                           account_report: account_report,
+                                           account_report_runner: report_runner,
+                                           created_at: Time.zone.now)
   end
 
   def number_of_items_per_runner(item_count, min: 25, max: 1000)
@@ -322,11 +326,11 @@ module AccountReports::ReportHelper
       end
       report_runner.start
       Shackles.activate(:slave) {AccountReports::REPORTS[@account_report.report_type].parallel_proc.call(@account_report, report_runner)}
-      update_parallel_progress(account_report: @account_report,report_runner: report_runner)
     rescue => e
       report_runner.fail
       self.fail_with_error(e)
     ensure
+      update_parallel_progress(account_report: @account_report,report_runner: report_runner)
       if last_account_report_runner?(@account_report)
         write_report headers do |csv|
           @account_report.account_report_rows.order(:account_report_runner_id, :row_number).find_each {|record| csv << record.row}
