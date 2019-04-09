@@ -1274,7 +1274,8 @@ class CoursesController < ApplicationController
         LTI_13_TOOLS_FEATURE_FLAG_ENABLED: @context.root_account.feature_enabled?(:lti_1_3),
         CONTEXT_BASE_URL: "/courses/#{@context.id}",
         PUBLISHING_ENABLED: @publishing_enabled,
-        COURSE_IMAGES_ENABLED: @context.feature_enabled?(:course_card_images)
+        COURSE_IMAGES_ENABLED: @context.feature_enabled?(:course_card_images),
+        COURSE_VISIBILITY_OPTION_DESCRIPTIONS: @context.course_visibility_option_descriptions
       })
 
       set_tutorial_js_env

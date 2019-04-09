@@ -471,6 +471,14 @@ class Course < ActiveRecord::Base
     ActiveSupport::OrderedHash[*options]
   end
 
+  def course_visibility_option_descriptions
+    {
+      'course' => t('All users associated with this course'),
+      'institution' => t('All users associated with this institution'),
+      'public' => t('Anyone with the URL')
+    }
+  end
+
   def custom_course_visibility
     if public_syllabus == is_public && is_public_to_auth_users == public_syllabus_to_auth
       return false
