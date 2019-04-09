@@ -54,7 +54,7 @@ var SHARED_CONFIG = {
   ]
 };
 
-var appNames = [ 'common', 'events', 'statistics' ];
+var appNames = [ 'common', 'events' /*, 'statistics' */];
 var config = appNames.reduce(function(config, appName) {
   var pathTo = function(path) {
     return [ 'apps', appName, path ].join('/');
