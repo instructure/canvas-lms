@@ -104,11 +104,10 @@ module FilesCommon
     elsif permission_type == :unpublish
       driver.find_elements(:name, 'permissions')[1].click
     else
-      driver.find_elements(:name, 'permissions')[2].click
       if restricted_access_option == :available_with_link
-        driver.find_elements(:name, 'restrict_options')[0].click
+        driver.find_elements(:name, 'permissions')[2].click
       else
-        driver.find_elements(:name, 'restrict_options')[1].click
+        driver.find_elements(:name, 'permissions')[3].click
         ff('.ui-datepicker-trigger.btn')[0].click
         fln("15").click
         ff('.ui-datepicker-trigger.btn')[0].send_keys(:enter) # close the calendar
