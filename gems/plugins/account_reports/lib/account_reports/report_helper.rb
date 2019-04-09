@@ -316,6 +316,19 @@ module AccountReports::ReportHelper
     [[item_count/100.to_f.round(0), min].max, max].min
   end
 
+  def create_report_runners(ids, total, min: 25, max: 1000)
+    ids_so_far = 0
+    ids.each_slice(number_of_items_per_runner(total, min: min, max: max)) do |batch|
+      @account_report.add_report_runner(batch)
+      ids_so_far += batch.length
+      if ids_so_far >= Setting.get("ids_per_report_runner_batch", 10_000).to_i
+        @account_report.write_report_runners
+        ids_so_far = 0
+      end
+    end
+    @account_report.write_report_runners
+  end
+
   def run_account_report_runner(report_runner, headers)
     return if report_runner.reload.workflow_state == 'aborted'
     @account_report = report_runner.account_report

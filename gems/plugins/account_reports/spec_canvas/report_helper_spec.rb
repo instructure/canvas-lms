@@ -42,6 +42,25 @@ describe "report helper" do
     expect(report.number_of_items_per_runner(109213081, max: 100)).to eq 100
   end
 
+  it 'should create report runners with a single trip' do
+    account_report.save!
+    expect(AccountReport).to receive(:bulk_insert_objects).once.and_call_original
+    report.create_report_runners((1..50).to_a, 50)
+    expect(account_report.account_report_runners.count).to eq 2
+  end
+
+  it 'should create report runners with few trips to the db' do
+    account_report.save!
+    # lower the setting so we can do more than one trip with less data
+    Setting.set("ids_per_report_runner_batch", 1_000)
+    # once with 1_008 ids and 84 runners and then once with 200 ids and the
+    # other runners
+    expect(AccountReport).to receive(:bulk_insert_objects).twice.and_call_original
+    # also got to pass min so that we get runners with 12 ids instead of 25
+    report.create_report_runners((1..1_200).to_a, 1_200, min: 10)
+    expect(account_report.account_report_runners.count).to eq 100
+  end
+
   describe "#send_report" do
     before do
       allow(AccountReports).to receive(:available_reports).and_return(account_report.report_type => {title: 'test_report'})
