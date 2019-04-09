@@ -345,11 +345,11 @@ describe Login::CanvasController do
     end
 
     before :each do
-      allow_any_instance_of(ActionController::TestRequest).to receive(:remote_ip).and_return('myip')
+      allow_any_instance_of(ActionController::TestRequest).to receive(:remote_ip).and_return('127.0.0.1')
     end
 
     it "should skip otp verification for a valid cookie" do
-      cookies['canvas_otp_remember_me'] = @user.otp_secret_key_remember_me_cookie(Time.now.utc, nil, 'myip')
+      cookies['canvas_otp_remember_me'] = @user.otp_secret_key_remember_me_cookie(Time.now.utc, nil, '127.0.0.1')
       post 'create', params: {:pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwertyuiop' }}
       expect(response).to redirect_to dashboard_url(:login_success => 1)
     end
@@ -361,13 +361,13 @@ describe Login::CanvasController do
     end
 
     it "should ignore an expired cookie" do
-      cookies['canvas_otp_remember_me'] = @user.otp_secret_key_remember_me_cookie(6.months.ago, nil, 'myip')
+      cookies['canvas_otp_remember_me'] = @user.otp_secret_key_remember_me_cookie(6.months.ago, nil, '127.0.0.1')
       post 'create', params: {:pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwertyuiop' }}
       expect(response).to redirect_to(otp_login_url)
     end
 
     it "should ignore a cookie from an old secret_key" do
-      cookies['canvas_otp_remember_me'] = @user.otp_secret_key_remember_me_cookie(6.months.ago, nil, 'myip')
+      cookies['canvas_otp_remember_me'] = @user.otp_secret_key_remember_me_cookie(6.months.ago, nil, '127.0.0.1')
 
       @user.otp_secret_key = ROTP::Base32.random_base32
       @user.save!
@@ -377,7 +377,7 @@ describe Login::CanvasController do
     end
 
     it "should ignore a cookie for a different IP" do
-      cookies['canvas_otp_remember_me'] = @user.otp_secret_key_remember_me_cookie(Time.now.utc, nil, 'otherip')
+      cookies['canvas_otp_remember_me'] = @user.otp_secret_key_remember_me_cookie(Time.now.utc, nil, '127.0.0.2')
       post 'create', params: {:pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwertyuiop' }}
       expect(response).to redirect_to(otp_login_url)
     end
