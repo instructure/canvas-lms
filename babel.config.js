@@ -29,7 +29,8 @@ module.exports = {
   "env": {
     "production": {
       "plugins": [
-        "transform-react-remove-prop-types"
+        "transform-react-remove-prop-types",
+        "@babel/plugin-transform-react-inline-elements"
       ]
     }
   }

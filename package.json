@@ -118,6 +118,7 @@
   "devDependencies": {
     "@babel/cli": "^7.0.0",
     "@babel/core": "^7.0.0",
+    "@babel/plugin-transform-react-inline-elements": "^7.2.0",
     "@instructure/ui-babel-preset": "^5",
     "@sentry/webpack-plugin": "^1.5.2",
     "@sheerun/mutationobserver-shim": "0.3.2",
