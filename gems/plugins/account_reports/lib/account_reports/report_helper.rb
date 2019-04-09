@@ -202,7 +202,7 @@ module AccountReports::ReportHelper
     SisPseudonym.for(u, context, {type: :trusted, require_sis: false, include_deleted: include_deleted})
   end
 
-  def load_cross_shard_logins(users, include_deleted: false)
+  def preload_logins_for_users(users, include_deleted: false)
     shards = root_account.trusted_account_ids.map {|id| Shard.shard_for(id)}
     shards << root_account.shard
     User.preload_shard_associations(users)
@@ -296,19 +296,19 @@ module AccountReports::ReportHelper
     end
   end
 
-  def add_report_row(row:, row_number: nil, report_runner:, account_report: @account_report)
-    report_runner.rows << build_report_row(row: row, row_number: row_number, report_runner: report_runner, account_report: account_report)
+  def add_report_row(row:, row_number: nil, report_runner:, account_report: nil)
+    report_runner.rows << build_report_row(row: row, row_number: row_number, report_runner: report_runner)
     if report_runner.rows.length == 1_000
       report_runner.write_rows
     end
   end
 
-  def build_report_row(row:, row_number: nil, report_runner:, account_report: @account_report)
-    account_report.account_report_rows.new(row: row,
-                                           row_number: row_number,
-                                           account_report: account_report,
-                                           account_report_runner: report_runner,
-                                           created_at: Time.zone.now)
+  def build_report_row(row:, row_number: nil, report_runner:)
+    report_runner.account_report_rows.new(row: row,
+                                          row_number: row_number,
+                                          account_report_id: report_runner.account_report_id,
+                                          account_report_runner: report_runner,
+                                          created_at: Time.zone.now)
   end
 
   def number_of_items_per_runner(item_count, min: 25, max: 1000)
@@ -317,6 +317,7 @@ module AccountReports::ReportHelper
   end
 
   def create_report_runners(ids, total, min: 25, max: 1000)
+    return if ids.empty?
     ids_so_far = 0
     ids.each_slice(number_of_items_per_runner(total, min: min, max: max)) do |batch|
       @account_report.add_report_runner(batch)
