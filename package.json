@@ -197,6 +197,7 @@
     "lint-staged": "^8.1.0",
     "merge-stream": "^1",
     "mockdate": "^2.0.2",
+    "moment-timezone-data-webpack-plugin": "^1.0.3",
     "moxios": "^0.4",
     "nyc": "^13",
     "prettier": "^1",

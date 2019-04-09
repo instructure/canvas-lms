@@ -20,6 +20,7 @@ if (!process.env.NODE_ENV) process.env.NODE_ENV = 'development'
 
 const glob = require('glob')
 const ManifestPlugin = require('webpack-manifest-plugin')
+const MomentTimezoneDataPlugin = require('moment-timezone-data-webpack-plugin')
 const path = require('path')
 const webpack = require('webpack')
 const WebpackCleanupPlugin = require('webpack-cleanup-plugin')
@@ -243,6 +244,13 @@ module.exports = {
       NODE_ENV: null,
       DEPRECATION_SENTRY_DSN: null,
       GIT_COMMIT: null
+    }),
+
+    // Only include timezone data starting from 2011 (canvaseption) to 15 years from now,
+    // so we don't clutter the vendor bundle with a bunch of old timezone data
+    new MomentTimezoneDataPlugin({
+      startYear: 2011,
+      endYear: new Date().getFullYear() + 15
     }),
 
     new WebpackCleanupPlugin({
