@@ -28,18 +28,17 @@ $('.visibility_help_link').live('click', (event) => {
     $dialog = $('<div/>')
       .attr('id', 'visibility_help_dialog')
       .hide()
-      .loadingImage()
       .appendTo('body')
       .dialog({
         autoOpen: false,
         title: '',
         width: 330
       })
-    $.get('/partials/_course_visibility_help.html', html =>
-        $dialog
-          .loadingImage('remove')
-          .html(html)
-      )
+
+    $('#course_course_visibility option').each(function(_i, element) {
+      $dialog.append($("<div/>").append($("<b/>", {text: element.innerText})))
+      $dialog.append($("<div/>", {text: ENV.COURSE_VISIBILITY_OPTION_DESCRIPTIONS[element.value] || ''}))
+    })
   }
   $dialog.dialog('open')
 })
