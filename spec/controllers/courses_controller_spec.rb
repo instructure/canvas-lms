@@ -2592,5 +2592,21 @@ describe CoursesController do
       expect(json.count).to eq(1)
       expect(json[0]).to include({ "id" => student1.id, "uuid" => student1.uuid })
     end
+
+    it 'can sort uesrs' do
+      student1.update!(name: 'Student B')
+      student2.update!(name: 'Student A')
+
+      user_session(teacher)
+      get 'users', params: {
+        course_id: course.id,
+        format: 'json',
+        enrollment_role: 'StudentEnrollment',
+        sort: 'username'
+      }
+      json = json_parse(response.body)
+      expect(json[0]).to include({ 'id' => student2.id })
+      expect(json[1]).to include({ 'id' => student1.id })
+    end
   end
 end

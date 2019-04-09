@@ -40,8 +40,7 @@ const StudentView = createReactClass({
       filter: '',
       loading: false,
       userCollection: new UserCollection(null, {
-        params: {enrollment_type: 'student'},
-        comparator: natcompare.byGet('sortable_name')
+        params: {enrollment_type: 'student', per_page: 15, sort: 'username'}
       }),
       groupCollection: new ContextGroupCollection([], {course_id: ENV.course_id})
     }
