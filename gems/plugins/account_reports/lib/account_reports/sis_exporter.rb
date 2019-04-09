@@ -420,7 +420,7 @@ module AccountReports
           users += batch.map {|e| User.new(id: e.associated_user_id) unless e.associated_user_id.nil?}.compact
           users.uniq!
           users_by_id = users.index_by(&:id)
-          pseudonyms = load_cross_shard_logins(users, include_deleted: @include_deleted)
+          pseudonyms = preload_logins_for_users(users, include_deleted: @include_deleted)
 
           batch.each do |e|
             p = loaded_pseudonym(pseudonyms,
@@ -709,7 +709,7 @@ module AccountReports
         gm.find_in_batches do |batch|
           users = batch.map {|au| User.new(id: au.user_id) }.compact.uniq
           users_by_id = users.index_by(&:id)
-          sis_ids = load_cross_shard_logins(users, include_deleted: @include_deleted)
+          sis_ids = preload_logins_for_users(users, include_deleted: @include_deleted)
 
           batch.each do |m|
             row = []
@@ -871,7 +871,7 @@ module AccountReports
           admins.find_in_batches do |batch|
             users = batch.map {|au| User.new(id: au.user_id) }.compact.uniq
             users_by_id = users.index_by(&:id)
-            sis_ids = load_cross_shard_logins(users, include_deleted: @include_deleted)
+            sis_ids = preload_logins_for_users(users, include_deleted: @include_deleted)
 
             batch.each do |admin|
               row = []

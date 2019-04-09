@@ -88,7 +88,7 @@ module AccountReports
             users = student_chunk.map {|e| User.new(id: e.user_id)}.compact
             users.uniq!
             users_by_id = users.index_by(&:id)
-            pseudonyms = load_cross_shard_logins(users, include_deleted: @include_deleted)
+            pseudonyms = preload_logins_for_users(users, include_deleted: @include_deleted)
             student_chunk.each do |student|
               p = loaded_pseudonym(pseudonyms,
                                    users_by_id[student.user_id],
@@ -184,7 +184,7 @@ module AccountReports
             users = student_chunk.map {|e| User.new(id: e.user_id)}.compact
             users.uniq!
             users_by_id = users.index_by(&:id)
-            pseudonyms = load_cross_shard_logins(users, include_deleted: @include_deleted)
+            pseudonyms = preload_logins_for_users(users, include_deleted: @include_deleted)
             students_by_course = student_chunk.group_by { |x| x.course_id }
             students_by_course.each do |course_id, course_students|
               scores = indexed_scores(course_students, grading_periods)
