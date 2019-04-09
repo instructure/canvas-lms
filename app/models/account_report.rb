@@ -29,6 +29,24 @@ class AccountReport < ActiveRecord::Base
 
   serialize :parameters
 
+  attr_accessor :runners
+
+  def initialize(*)
+    @runners = []
+    super
+  end
+
+  def add_report_runner(batch)
+    @runners ||= []
+    runners << self.account_report_runners.new(batch_items: batch, created_at: Time.zone.now, updated_at: Time.zone.now)
+  end
+
+  def write_report_runners
+    return if runners.empty?
+    self.class.bulk_insert_objects(runners)
+    @runners = []
+  end
+
   workflow do
     state :created
     state :running
