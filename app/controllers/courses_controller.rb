@@ -1630,7 +1630,7 @@ class CoursesController < ApplicationController
     @context = api_find(Course.active, params[:id])
 
     if @context && @current_user
-      current_user_enrollment = @current_user.student_enrollments.find_by(course: @context)
+      current_user_enrollment = @current_user.not_ended_enrollments.where(type: "StudentEnrollment").find_by(course: @context)
       if current_user_enrollment
         current_user_settings = SettingsService.get_enrollment_settings(id: current_user_enrollment.id)
         sequence_control = current_user_settings.fetch('sequence_control', true)
