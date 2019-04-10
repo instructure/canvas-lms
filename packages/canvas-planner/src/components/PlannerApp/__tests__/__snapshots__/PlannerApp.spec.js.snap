@@ -6,6 +6,7 @@ exports[`PlannerApp always renders today and tomorrow when only items are in the
 >
   <View
     as="div"
+    debug={false}
     display="auto"
     overflowX="visible"
     overflowY="visible"
@@ -79,6 +80,7 @@ exports[`PlannerApp empty day calculation always renders yesterday, today and to
 >
   <View
     as="div"
+    debug={false}
     display="auto"
     overflowX="visible"
     overflowY="visible"
@@ -172,6 +174,7 @@ exports[`PlannerApp empty day calculation does not render an empty tomorrow when
 >
   <View
     as="div"
+    debug={false}
     display="auto"
     overflowX="visible"
     overflowY="visible"
@@ -223,6 +226,7 @@ exports[`PlannerApp empty day calculation merges 3 consecutive empty days in the
 >
   <View
     as="div"
+    debug={false}
     display="auto"
     overflowX="visible"
     overflowY="visible"
@@ -308,6 +312,7 @@ exports[`PlannerApp empty day calculation only renders days with items in the pa
 >
   <View
     as="div"
+    debug={false}
     display="auto"
     overflowX="visible"
     overflowY="visible"
@@ -386,6 +391,7 @@ exports[`PlannerApp empty day calculation renders 2 consecutive empty days in th
 >
   <View
     as="div"
+    debug={false}
     display="auto"
     overflowX="visible"
     overflowY="visible"
@@ -477,6 +483,7 @@ exports[`PlannerApp only renders today when the only item is today 1`] = `
 >
   <View
     as="div"
+    debug={false}
     display="auto"
     overflowX="visible"
     overflowY="visible"
@@ -528,6 +535,7 @@ exports[`PlannerApp renders base component 1`] = `
 >
   <View
     as="div"
+    debug={false}
     display="auto"
     overflowX="visible"
     overflowY="visible"
@@ -605,6 +613,7 @@ exports[`PlannerApp renders empty component with no assignments 1`] = `
 >
   <View
     as="div"
+    debug={false}
     display="auto"
     overflowX="visible"
     overflowY="visible"
@@ -636,6 +645,7 @@ exports[`PlannerApp renders loading past spinner when loading past and there are
 >
   <View
     as="div"
+    debug={false}
     display="auto"
     overflowX="visible"
     overflowY="visible"
@@ -668,6 +678,7 @@ exports[`PlannerApp shows only the loading component when the isLoading prop is 
 >
   <View
     as="div"
+    debug={false}
     display="auto"
     overflowX="visible"
     overflowY="visible"
@@ -685,6 +696,7 @@ exports[`PlannerApp shows only the loading component when the isLoading prop is 
     </ShowOnFocusButton>
   </View>
   <View
+    debug={false}
     display="block"
     overflowX="visible"
     overflowY="visible"
@@ -710,6 +722,7 @@ exports[`PlannerApp shows the loading past indicator when loadingPast prop is tr
 >
   <View
     as="div"
+    debug={false}
     display="auto"
     overflowX="visible"
     overflowY="visible"

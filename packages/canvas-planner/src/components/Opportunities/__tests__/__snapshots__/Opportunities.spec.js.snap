@@ -28,6 +28,7 @@ exports[`renders nothing if no opportunities 1`] = `
     variant="minimal"
   >
     <TabPanel
+      disabled={false}
       id={null}
       labelledBy={null}
       maxHeight="auto"
@@ -49,6 +50,7 @@ exports[`renders nothing if no opportunities 1`] = `
       </div>
     </TabPanel>
     <TabPanel
+      disabled={false}
       id={null}
       labelledBy={null}
       maxHeight="auto"
@@ -101,6 +103,7 @@ exports[`renders the base component correctly with one of each kind of opportuni
     variant="minimal"
   >
     <TabPanel
+      disabled={false}
       id={null}
       labelledBy={null}
       maxHeight="auto"
@@ -138,6 +141,7 @@ exports[`renders the base component correctly with one of each kind of opportuni
       </ol>
     </TabPanel>
     <TabPanel
+      disabled={false}
       id={null}
       labelledBy={null}
       maxHeight="auto"
@@ -206,6 +210,7 @@ exports[`renders the right course with the right opportunity 1`] = `
     variant="minimal"
   >
     <TabPanel
+      disabled={false}
       id={null}
       labelledBy={null}
       maxHeight="auto"
@@ -258,6 +263,7 @@ exports[`renders the right course with the right opportunity 1`] = `
       </ol>
     </TabPanel>
     <TabPanel
+      disabled={false}
       id={null}
       labelledBy={null}
       maxHeight="auto"

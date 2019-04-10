@@ -5,6 +5,7 @@ exports[`properly renders the UnassessedAssignment component 1`] = `
   key="1"
 >
   <View
+    debug={false}
     display="auto"
     overflowX="visible"
     overflowY="visible"
@@ -22,6 +23,7 @@ exports[`properly renders the UnassessedAssignment component 1`] = `
     >
       <Link
         as="button"
+        disabled={false}
         href="www.example.com"
         iconPlacement="start"
         linkRef={[Function]}

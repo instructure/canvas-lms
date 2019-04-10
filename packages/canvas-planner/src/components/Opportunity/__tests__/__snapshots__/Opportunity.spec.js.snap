@@ -17,6 +17,7 @@ exports[`renders the base component correctly 1`] = `
     >
       <Link
         as="button"
+        disabled={false}
         href="http://www.non_default_url.com"
         iconPlacement="start"
         linkRef={[Function]}
@@ -111,6 +112,7 @@ exports[`renders the base component correctly with 0 points 1`] = `
     >
       <Link
         as="button"
+        disabled={false}
         href="http://www.non_default_url.com"
         iconPlacement="start"
         linkRef={[Function]}
@@ -205,6 +207,7 @@ exports[`renders the base component correctly without points 1`] = `
     >
       <Link
         as="button"
+        disabled={false}
         href="http://www.non_default_url.com"
         iconPlacement="start"
         linkRef={[Function]}
