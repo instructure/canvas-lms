@@ -262,6 +262,26 @@ describe CourseLinkValidator do
     expect(links).to match_array [unpublished_link, deleted_link]
   end
 
+  it "should ignore links to replaced wiki pages" do
+    course_factory
+    deleted = @course.wiki_pages.create!(:title => "baleeted")
+    deleted.destroy
+    not_really_deleted = @course.wiki_pages.create!(:title => "baleeted")
+    not_really_deleted_link = "/courses/#{@course.id}/pages/#{not_really_deleted.url}"
+
+    message = %{
+      <a href='#{not_really_deleted_link}'>link</a>
+    }
+    @course.syllabus_body = message
+    @course.save!
+
+    CourseLinkValidator.queue_course(@course)
+    run_jobs
+
+    issues = CourseLinkValidator.current_progress(@course).results[:issues]
+    expect(issues).to be_empty
+  end
+
   it "should identify typo'd canvas links" do
     course_factory
     invalid_link1 = "/cupbopourses"
