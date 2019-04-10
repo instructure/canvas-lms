@@ -24,9 +24,7 @@ end
 
 gem 'rack', '2.0.6'
 
-# oauth2-1.4.0 caused issues with google oauth login flow, which needs to be
-# investigated as part of a future gem bump.
-gem 'oauth2', '1.2.0', require: false
+gem 'oauth2', '1.4.1', require: false
 
 gem 'rails-observers', '0.1.5'
 
