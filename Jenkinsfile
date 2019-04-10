@@ -116,6 +116,11 @@ pipeline {
             git config user.name $GERRIT_EVENT_ACCOUNT_NAME
             git config user.email $GERRIT_EVENT_ACCOUNT_EMAIL
             git rebase --preserve-merges origin/$GERRIT_BRANCH
+            rebase_exit_code="$?"
+            if [ $rebase_exit_code != 0 ]; then
+              echo "Warning: Rebase couldn't resolve changes automatically, please resolve these conflicts locally."
+              git rebase --abort
+            fi
           '''
         }
       }
