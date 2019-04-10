@@ -129,10 +129,6 @@
   "discussions_index_6c36ced": {
     "message": "Discussions Index"
   },
-  "embed_image_1080badc": {
-    "message": "Embed Image",
-    "description": "Title for RCE button to embed an image"
-  },
   "enter_search_terms_e397b1f0": {
     "message": "enter search terms"
   },
@@ -173,7 +169,7 @@
   },
   "images_7ce26570": {
     "message": "Images",
-    "description": "Title of Sidebar tab containing uploaded images and image services."
+    "description": "Title for RCE button to embed an image"
   },
   "insert_equella_links_49a8dacd": {
     "message": "Insert Equella Links",
@@ -288,6 +284,9 @@
   },
   "upload_a_new_image_890df275": {
     "message": "Upload a new image"
+  },
+  "upload_image_6120b609": {
+    "message": "Upload Image"
   },
   "usage_right_ff96f3e2": {
     "message": "Usage Right:"
