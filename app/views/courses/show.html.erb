@@ -30,6 +30,27 @@
 
 <% content_for :right_side do %>
   <div id="course_show_secondary">
+    <% if @current_requirement %>
+      <div id="resume-container">
+        <div id="resume-inner-container">
+          <h2>
+            <i class="icon-bookmark"></i>
+            <span id="left-off">Pick up where you left off</span>
+          </h2>
+
+          <div class="resume-text">
+            <b><%= @context.name %></b>
+          </div>
+          <div class="resume-text"><%= @current_requirement.title %></div>
+
+          <%= link_to(course_context_modules_item_redirect_path(@context, @current_requirement), class: 'btn button-sidebar-wide') do %>
+            <i class="icon-play"></i>
+            <span><%= t('Resume Course') %></span>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
     <% @can_manage = can_do(@context, @current_user, :manage) %>
     <% @can_create_announcements = @context.announcements.temp_record.grants_right?(@current_user, session, :create) %>
     <% if can_do(@context, @current_user, :change_course_state) && (@context.unpublished? || @context.unpublishable?) %>

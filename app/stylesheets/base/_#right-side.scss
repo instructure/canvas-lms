@@ -40,6 +40,33 @@
     margin: 0 0 $ic-sp / 2;
     font-weight: 500;
   }
+
+  #resume-container {
+    padding-bottom: .75rem;
+
+    #resume-inner-container {
+      border-bottom: 1px solid $ic-border-light;
+      padding-bottom: .25rem;
+    }
+
+    .icon-bookmark, #left-off {
+      vertical-align: middle;
+    }
+
+    .icon-bookmark {
+      padding-right: 2.5px;
+    }
+
+    .icon-play {
+      padding-right: .5px;
+    }
+
+    .resume-text {
+      overflow-wrap: break-word;
+    }
+  }
+
+
 }
 
 .rs-margin-bottom {
