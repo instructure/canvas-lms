@@ -296,7 +296,7 @@ module AccountReports::ReportHelper
     end
   end
 
-  def add_report_row(row:, row_number: nil, report_runner:, account_report: nil)
+  def add_report_row(row:, row_number: nil, report_runner:)
     report_runner.rows << build_report_row(row: row, row_number: row_number, report_runner: report_runner)
     if report_runner.rows.length == 1_000
       report_runner.write_rows
