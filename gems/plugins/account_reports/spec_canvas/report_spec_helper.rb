@@ -23,6 +23,7 @@ require 'csv'
 module ReportSpecHelper
   def read_report(type = @type, options = {})
     account_report = run_report(type, options)
+    raise ErrorReport.last&.message if account_report.workflow_state == 'error'
     parse_report(account_report, options)
   end
 
