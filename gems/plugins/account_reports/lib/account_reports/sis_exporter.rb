@@ -108,15 +108,7 @@ module AccountReports
 
       generate_and_run_report headers do |csv|
         users.find_in_batches do |batch|
-          emails = Shard.partition_by_shard(batch.map(&:user_id)) do |user_ids|
-            CommunicationChannel.
-              email.
-              unretired.
-              select([:user_id, :path]).
-              where(user_id: user_ids).
-              order('user_id, position ASC').
-              distinct_on(:user_id)
-          end.index_by(&:user_id)
+          emails = emails_by_user_id(batch.map(&:user_id))
 
           batch.each do |u|
             row = []
