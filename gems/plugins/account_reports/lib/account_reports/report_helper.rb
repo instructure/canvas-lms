@@ -217,6 +217,18 @@ module AccountReports::ReportHelper
     pseudonyms.group_by(&:user_id)
   end
 
+  def emails_by_user_id(user_ids)
+    Shard.partition_by_shard(user_ids) do |user_ids|
+      CommunicationChannel.
+        email.
+        unretired.
+        select([:user_id, :path]).
+        where(user_id: user_ids).
+        order('user_id, position ASC').
+        distinct_on(:user_id)
+    end.index_by(&:user_id)
+  end
+
   def include_deleted_objects
     if @account_report.has_parameter? "include_deleted"
       @include_deleted = value_to_boolean(@account_report.parameters["include_deleted"])
