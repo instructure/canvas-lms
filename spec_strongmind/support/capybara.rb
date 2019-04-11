@@ -9,6 +9,10 @@ Capybara.register_driver :chrome do |app|
   options.add_argument('--disable-extensions')
   options.add_argument('--enable-automation')
   options.add_argument('--window-size=1600,1000')
+  if ENV['CI']
+    options.add_argument('--no-sandbox') # To use Chrome in the container-based environment
+    options.add_argument('--disable-dev-shm-usage')
+  end
 
   # This enables access to the JS console logs in your feature specs.
   # You can see the logs during the test by calling (for example):
@@ -38,13 +42,17 @@ Capybara.register_driver :headless_chrome do |app|
   options.add_argument('--disable-extensions')
   options.add_argument('--enable-automation')
   options.add_argument('--window-size=1600,1000')
+  if ENV['CI']
+    options.add_argument('--no-sandbox') # To use Chrome in the container-based environment
+    options.add_argument('--disable-dev-shm-usage')
+  end
 
-   # This enables access to the JS console logs in your feature specs.
-   # You can see the logs during the test by calling (for example):
-   #
-   #   puts page.driver.browser.manage.logs.get(:browser).map(&:inspect).join("\n")
-   #
-   # This will print out each log entry in the JS log
+  # This enables access to the JS console logs in your feature specs.
+  # You can see the logs during the test by calling (for example):
+  #
+  #   puts page.driver.browser.manage.logs.get(:browser).map(&:inspect).join("\n")
+  #
+  # This will print out each log entry in the JS log
   capabilities = Selenium::WebDriver::Remote::Capabilities.chrome(
     logging_prefs: { 'browser' => 'ALL' }
   )
@@ -114,24 +122,5 @@ Capybara.configure do |config|
   config.default_max_wait_time = 7
 end
 
-## Capy Screenshot Help
-Capybara::Screenshot.prune_strategy      = { keep: 10 }
-Capybara::Screenshot.autosave_on_failure = false
-Capybara::Screenshot.append_timestamp    = false
-Capybara::Screenshot.register_driver(:chrome) do |driver, path|
-  driver.browser.save_screenshot(path)
-end
-Capybara::Screenshot.register_driver(:headless_chrome) do |driver, path|
-  driver.browser.save_screenshot(path)
-end
-Capybara::Screenshot.register_filename_prefix_formatter(:rspec) do |example|
-  "screenshot_#{example.description.gsub(' ', '-').gsub(/^.*\/spec\//,'')}"
-end
-
-# if ENV['CI_RUNNING']
-#   # don't attempt to generate on CI
-#   Capybara::Screenshot::RSpec.add_link_to_screenshot_for_failed_examples = false
-# else
-  # better looking screenshots (fixes relative paths when desired)
-  # Capybara.asset_host = 'http://localhost:3000'
-# end
+# better looking screenshots (fixes relative paths when desired)
+Capybara.asset_host = 'http://localhost:3000'

@@ -2005,6 +2005,9 @@ class ApplicationController < ActionController::Base
   end
 
   def browser_supported?
+    # StrongMind Added
+    return true if ENV['CI']
+
     # the user_agent gem likes to (ab)use objects and metaprogramming, so
     # we just do this check once per session. or maybe more than once, if
     # you upgrade your browser and it treats session cookie expiration

@@ -1,3 +1,3 @@
 [submodule "vendor/canvas_shim"]
 	path = vendor/canvas_shim
-	url = git@github.com:StrongMind/canvas_shim.git
+	url = https://github.com/StrongMind/canvas_shim.git

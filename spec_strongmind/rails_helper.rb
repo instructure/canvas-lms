@@ -1,5 +1,8 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
 
+require 'dotenv'
+Dotenv.load('.env.test')
+
 ENV['RAILS_ENV'] ||= 'test'
 ENV['STRONGMIND_SPEC'] = 'true'
 
@@ -15,6 +18,7 @@ require 'rspec/rails'
 require 'factory_bot_rails'
 require 'vcr'
 require 'capybara/rspec'
+require 'capybara-screenshot/rspec'
 require 'shoulda/matchers'
 require 'rake'
 require 'capybara-screenshot/rspec'
