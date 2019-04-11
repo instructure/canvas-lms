@@ -30,19 +30,38 @@ class AccountReportRunner < ActiveRecord::Base
     state :aborted
   end
 
+  attr_accessor :rows
+
+  def initialize(*)
+    @rows = []
+    super
+  end
+
+  def write_rows
+    return if rows.empty?
+    Shackles.activate(:master) do
+      self.class.bulk_insert_objects(rows)
+      @rows = []
+    end
+  end
+
   def start
+    @rows ||= []
     self.update_attributes!(workflow_state: 'running', started_at: Time.now.utc)
   end
 
   def complete
+    write_rows
     self.update_attributes!(workflow_state: 'completed', ended_at: Time.now.utc)
   end
 
   def abort
+    write_rows
     self.update_attributes!(workflow_state: 'aborted', ended_at: Time.now.utc)
   end
 
   def fail
+    write_rows
     self.update_attributes!(workflow_state: 'error', ended_at: Time.now.utc)
   end
 
