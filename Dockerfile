@@ -1,21 +1,19 @@
 FROM ruby:2.1.9
 
+#fix for jessie repo eol issues
+RUN echo "deb [check-valid-until=no] http://cdn-fastly.deb.debian.org/debian jessie main" > /etc/apt/sources.list.d/jessie.list
+RUN echo "deb [check-valid-until=no] http://archive.debian.org/debian jessie-backports main" > /etc/apt/sources.list.d/jessie-backports.list
+RUN sed -i '/deb http:\/\/httpredir.debian.org\/debian jessie-updates main/d' /etc/apt/sources.list
+
 RUN set -ex \
-   && apt-get update \
+   && apt-get -o Acquire::Check-Valid-Until=false update \
    && apt-get install rlwrap \
    && curl -o nodejs.deb https://deb.nodesource.com/node_0.12/pool/main/n/nodejs/nodejs_0.12.14-1nodesource1~jessie1_amd64.deb  \
    && dpkg -i ./nodejs.deb \
    && rm nodejs.deb \
+   && apt-get install -qqy postgresql-client libxmlsec1-dev unzip fontforge \
+   && npm install -g gulp \
    && rm -rf /var/lib/apt/lists/*
-
-RUN  apt-get update -qq \
-  && apt-get install -qqy \
-       postgresql-client \
-       libxmlsec1-dev \
-       unzip \
-       fontforge \
-  && npm install -g gulp \
-  && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir /app
 WORKDIR /app
