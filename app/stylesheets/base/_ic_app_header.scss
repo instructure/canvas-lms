@@ -151,7 +151,6 @@ li.ic-app-header__menu-list-item {
     background-color: $sm-brand-dark;
     @if $use_high_contrast == false {
       text-decoration: none;
-      outline: none;
     }
     .ic-avatar {
       border-color: $ic-brand-global-nav-avatar-border;
