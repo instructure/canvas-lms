@@ -1,4 +1,4 @@
-class AddPrimaryIdColumns < ActiveRecord::Migration[5.2]
+class AddPrimaryIdColumns < ActiveRecord::Migration
   def change
     tables_to_modify = %i(
       assignment_student_visibilities
