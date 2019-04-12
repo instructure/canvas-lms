@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2019 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -17,19 +17,16 @@
  */
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import {render, fireEvent} from 'react-testing-library'
+import {UploadImage} from '../index'
 
-export default function(ed, document) {
-  return import('./UploadImage').then(({UploadImage}) => {
-    let container = document.querySelector('.canvas-rce-image-upload')
-    if (!container) {
-      container = document.createElement('div')
-      container.className = 'canvas-rce-image-upload'
-      document.body.appendChild(container)
-    }
+describe('UploadImage', () => {
+  it('calls onDismiss prop when closing', () => {
+    const handleDismiss = jest.fn()
+    const {getByText} = render(<UploadImage onDismiss={handleDismiss} />)
 
-    const handleDismiss = () => ReactDOM.unmountComponentAtNode(container)
-
-    ReactDOM.render(<UploadImage onDismiss={handleDismiss} />, container)
+    const closeBtn = getByText('Close')
+    fireEvent.click(closeBtn)
+    expect(handleDismiss).toHaveBeenCalled()
   })
-}
+})
