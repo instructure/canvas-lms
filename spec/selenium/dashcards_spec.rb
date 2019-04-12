@@ -309,10 +309,10 @@ describe 'dashcards' do
       get "/courses/#{@course.id}/settings"
       f('#navigation_tab').click
       wait_for_ajaximations
-      items_to_hide = ['announcements', 'assignments', 'discussions', 'files']
-      4.times do |i|
-        drag_and_drop_element(f("#nav_enabled_list .#{items_to_hide[i]}"), f('#nav_disabled_list'))
-        expect(f("#nav_disabled_list .#{items_to_hide[i]}")).to be_present
+      tabs_to_hide = [Course::TAB_ANNOUNCEMENTS, Course::TAB_ASSIGNMENTS, Course::TAB_DISCUSSIONS, Course::TAB_FILES]
+      tabs_to_hide.each do |tab|
+        drag_and_drop_element(f("#nav_enabled_list #nav_edit_tab_id_#{tab}"), f('#nav_disabled_list'))
+        expect(f("#nav_disabled_list #nav_edit_tab_id_#{tab}")).to be_present
       end
       submit_form('#nav_form')
       wait_for_ajaximations
