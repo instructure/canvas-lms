@@ -10,6 +10,7 @@ The API Change Log includes adjustments to the Canvas API documentation as part 
 - This page documents API changes for the last four releases. For prior releases, view the [API Change Log archive page](file.changelog_archive.html).
 
 <div class="changelog"></div>
+
 ## 2019-04-20
 ### Additions
 | API Calls | Function |  |
