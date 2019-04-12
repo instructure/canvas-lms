@@ -129,7 +129,12 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
 
       it 'sets the "custom_fields"' do
         subject
-        expect(config_from_response.settings["custom_fields"]).to eq('foo' => 'bar', 'key' => 'value')
+        expect(config_from_response.settings["custom_fields"]).to eq(
+          'foo' => 'bar',
+          'key' => 'value',
+          'has_expansion' => '$Canvas.user.id',
+          'no_expansion' => 'foo'
+        )
       end
     end
 

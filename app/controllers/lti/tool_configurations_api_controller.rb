@@ -120,9 +120,7 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   def update
     tool_config = developer_key.tool_configuration
     tool_config.update!(
-      settings: tool_configuration_params[:settings]&.merge(
-        ContextExternalTool.find_custom_fields_from_string(tool_configuration_params[:custom_fields])
-      ),
+      settings: tool_configuration_params[:settings]&.to_unsafe_hash&.deep_merge(manual_custom_fields),
       disabled_placements: tool_configuration_params[:disabled_placements],
       privacy_level: tool_configuration_params[:privacy_level]
     )
@@ -147,6 +145,12 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   end
 
   private
+
+  def manual_custom_fields
+    {
+      custom_fields: ContextExternalTool.find_custom_fields_from_string(tool_configuration_params[:custom_fields])
+    }.stringify_keys
+  end
 
   def update_developer_key!(tool_config, redirect_uris = nil)
     developer_key = tool_config.developer_key

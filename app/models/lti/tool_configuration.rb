@@ -55,21 +55,24 @@ module Lti
     def self.create_tool_and_key!(account, tool_configuration_params)
       self.transaction do
         dk = DeveloperKey.create!(account: account)
-        if tool_configuration_params[:settings].present?
+        settings = tool_configuration_params[:settings]&.try(:to_unsafe_hash) || tool_configuration_params[:settings]
+
+        if settings.present?
           self.create!(
             developer_key: dk,
-            configuration: tool_configuration_params[:settings]&.merge(
+            configuration: settings.deep_merge(
               'custom_fields' => ContextExternalTool.find_custom_fields_from_string(tool_configuration_params[:custom_fields])
             ),
             disabled_placements: tool_configuration_params[:disabled_placements]
           )
         else
+          # Creating config via URL
           t = self.create!(
             developer_key: dk,
             configuration_url: tool_configuration_params[:settings_url],
             disabled_placements: tool_configuration_params[:disabled_placements]
           )
-          t.update! configuration: t.configuration.merge(
+          t.update! configuration: t.configuration.deep_merge(
             'custom_fields' => ContextExternalTool.find_custom_fields_from_string(tool_configuration_params[:custom_fields])
             )
           t
