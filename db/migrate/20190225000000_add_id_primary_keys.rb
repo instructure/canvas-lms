@@ -1,4 +1,4 @@
-class AddPrimaryIdColumns < ActiveRecord::Migration
+class AddIdPrimaryKeys < ActiveRecord::Migration
   tag :predeploy
   def change
     tables_to_modify = %i(
