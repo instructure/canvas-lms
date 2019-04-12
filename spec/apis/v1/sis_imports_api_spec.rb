@@ -71,6 +71,7 @@ describe SisImportsApiController, type: :request do
           "clear_sis_stickiness" => opts[:clear_sis_stickiness] ? true : nil,
           "multi_term_batch_mode" => nil,
           "diffing_data_set_identifier" => nil,
+          "diff_row_count_threshold" => nil,
           "diffed_against_import_id" => nil,
           "diffing_drop_status" => nil,
           "skip_deletes" => false,
@@ -116,6 +117,7 @@ describe SisImportsApiController, type: :request do
           "add_sis_stickiness" => nil,
           "clear_sis_stickiness" => nil,
           "diffing_data_set_identifier" => nil,
+          "diff_row_count_threshold" => nil,
           "diffed_against_import_id" => nil,
           "diffing_drop_status" => nil,
           "skip_deletes" => false,
@@ -189,6 +191,7 @@ describe SisImportsApiController, type: :request do
           "add_sis_stickiness" => nil,
           "clear_sis_stickiness" => nil,
           "diffing_data_set_identifier" => nil,
+          "diff_row_count_threshold" => nil,
           "diffed_against_import_id" => nil,
           "skip_deletes" => false,
           "diffing_drop_status" => nil,
@@ -362,6 +365,7 @@ describe SisImportsApiController, type: :request do
         diffing_data_set_identifier: 'my-users-data',
         diffing_drop_status: 'inactive',
         change_threshold: 7,
+        diff_row_count_threshold: 4,
       })
     batch = SisBatch.find(json["id"])
     expect(batch.batch_mode).to be_falsey
@@ -369,6 +373,7 @@ describe SisImportsApiController, type: :request do
     expect(batch.options[:diffing_drop_status]).to eq 'inactive'
     expect(json['change_threshold']).to eq 7
     expect(batch.diffing_data_set_identifier).to eq 'my-users-data'
+    expect(batch.diff_row_count_threshold).to eq 4
   end
 
   it "should allow for other diffing_drop_status" do
@@ -770,6 +775,7 @@ describe SisImportsApiController, type: :request do
           "add_sis_stickiness" => nil,
           "clear_sis_stickiness" => nil,
           "diffing_data_set_identifier" => nil,
+          "diff_row_count_threshold" => nil,
           "diffed_against_import_id" => nil,
           "skip_deletes" => false,
           "diffing_drop_status" => nil,
@@ -814,9 +820,9 @@ describe SisImportsApiController, type: :request do
     expect(json["sis_imports"].count).to eq 1
   end
 
-  it "should not fail when options are nil" do
+  it "should not fail when options are empty" do
     batch = @account.sis_batches.create
-    expect(batch.options).to be_nil
+    expect(batch.options).to be_empty
     json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports.json",
                     { :controller => 'sis_imports_api', :action => 'index',
                       :format => 'json', :account_id => @account.id.to_s })

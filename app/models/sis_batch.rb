@@ -20,7 +20,7 @@ class SisBatch < ActiveRecord::Base
   include Workflow
   belongs_to :account
   serialize :data
-  serialize :options
+  serialize :options, Hash
   serialize :processing_errors, Array
   serialize :processing_warnings, Array
   belongs_to :attachment
@@ -192,7 +192,6 @@ class SisBatch < ActiveRecord::Base
   # can rename this to something more sensible.
   def process_without_send_later
     self.class.transaction do
-      self.options ||= {}
       if self.workflow_state == 'aborted'
         self.progress = 100
         self.save
@@ -255,7 +254,6 @@ class SisBatch < ActiveRecord::Base
   end
 
   def skip_deletes?
-    self.options ||= {}
     !!self.options[:skip_deletes]
   end
 
@@ -332,8 +330,16 @@ class SisBatch < ActiveRecord::Base
       return
     end
 
-    diffed_data_file = SIS::CSV::DiffGenerator.new(self.account, self).generate(previous_zip.path, @data_file.path)
-    return :empty_diff_file unless diffed_data_file # just end if there's nothing to import
+    diff = SIS::CSV::DiffGenerator.new(self.account, self).generate(previous_zip.path, @data_file.path)
+    return :empty_diff_file unless diff # just end if there's nothing to import
+
+    diffed_data_file = diff[:file_io]
+
+    if self.diff_row_count_threshold && diff[:row_count] > self.diff_row_count_threshold
+      diffed_data_file.close
+      SisBatch.add_error(nil, "Diffing not performed because difference row count exceeded threshold", sis_batch: self)
+      return
+    end
 
     self.data[:diffed_against_sis_batch_id] = previous_batch.id
 
@@ -346,6 +352,14 @@ class SisBatch < ActiveRecord::Base
     # Success, swap out the original update for this new diff and continue.
     @data_file.try(:close)
     @data_file = diffed_data_file
+  end
+
+  def diff_row_count_threshold=(val)
+    self.options[:diff_row_count_threshold] = val
+  end
+
+  def diff_row_count_threshold
+    self.options[:diff_row_count_threshold]
   end
 
   def file_diff_percent(current_file_size, previous_zip_size)
@@ -640,7 +654,6 @@ class SisBatch < ActiveRecord::Base
   end
 
   def as_json(options={})
-    self.options ||= {} # set this to empty hash if it does not exist so options[:stuff] doesn't blow up
     data = {
       "id" => self.id,
       "created_at" => self.created_at,
@@ -661,6 +674,7 @@ class SisBatch < ActiveRecord::Base
       "diffing_drop_status" => self.options[:diffing_drop_status],
       "skip_deletes" => self.options[:skip_deletes],
       "change_threshold" => self.change_threshold,
+      "diff_row_count_threshold" => self.options[:diff_row_count_threshold]
     }
     data["processing_errors"] = self.processing_errors if self.processing_errors.present?
     data["processing_warnings"] = self.processing_warnings if self.processing_warnings.present?
