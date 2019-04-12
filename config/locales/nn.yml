@@ -2211,6 +2211,7 @@ nn:
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: "Er du sikker på at du vil slette karaktersetjingsskjemaet?"
   are_you_sure_you_want_to_delete_this_page_2185844: "Er du sikker på at du vil slette denne sida?"
   are_you_sure_you_want_to_delete_this_to_do_item_497016ea: "Er du sikker på at du vil slette dette gjeremålet?"
+  are_you_sure_you_want_to_delete_this_track_f5a16357: "Er du sikker på at vil slette dette sporet?"
   are_you_sure_you_want_to_delete_your_copy_of_these_f04442ed: 
     one: "Er du sikker på at du vil slette din kopi av samtalen? Du kan ikkje angre handlinga."
     other: "Er du sikker på at du vil slette din kopi av meldingane? Du kan ikkje angre handlinga."
@@ -13759,7 +13760,7 @@ nn:
       take_picture: "Ta eit bile"
     upload_file_view: 
       choose_a_picture: "vel eit bilde"
-      crop_instructions: "Om du vil skjere til bildet, flyttar du området du har valt og klikkar deretter på \"Lagre\"-knappen nedanfor."
+      crop_instructions: "Du kan skjere til bildet ved å dra utsnittet med musepeikaren eller bruke piltastane for å flytte det. Bruk shift+piltastar for å endre storleik på utsnittet. Trykk så på Lagre-knappen nedanfor.  "
   progress_for_account_name_ef203250: "Framdrift for %{account_name}"
   progress_loading_bar_a26b8861: Framdriftsfelt
   project_groups_1fa0320b: Prosjektgrupper
@@ -17501,6 +17502,7 @@ nn:
   this_grade_differs_from_the_student_s_view_of_the__56742bd0: "Denne karakteren er ulik den karakteren som er synleg for studentane fordi nokre oppgåver er skjulte"
   this_grade_is_invalid_8ab192c7: "Denne vurderinga er ugyldig"
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "Dette bildet er synleg som eit vassmerke i bakgrunnen på sida di. Godkjende format: .png, .svg, .gif og .jpeg"
+  this_is_a_blueprint_course_5e7b47fe: Blåkopiemne
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Dette er ei kommadelt liste med klarerte URL-adresser. URL-adresser frå denne lista omgår CSRF-token ved pålogging i Canvas."
   this_is_a_concluded_course_so_only_concluded_enrol_e6e3a9d9: "Dette er eit avslutta kurs og difor er berre avslutta påmeldingar tilgjengelege."
   this_is_a_feature_to_allow_the_development_of_a_re_8452eb0d: "Funksjonen tillet utvikling av responsive nettsider "
