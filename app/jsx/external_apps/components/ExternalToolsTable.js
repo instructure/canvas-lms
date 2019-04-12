@@ -45,8 +45,10 @@ export default class ExternalToolsTable extends React.Component {
 
   componentDidMount() {
     store.addChangeListener(this.onChange)
-    store.fetch()
-    if (store.lti13LoadStatus !== 'success') {
+    if (!store.getState().isLoaded) {
+      store.fetch();
+    }
+    if (store.getState().lti13LoadStatus !== 'success') {
       store.fetch13Tools()
     }
   }
