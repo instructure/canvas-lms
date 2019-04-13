@@ -4153,6 +4153,7 @@ nn:
     profile: 
       notices: 
         contact_registered: "Kontaktmetode er registrert."
+  communication_channels_a9abd037: Kommunikasjonskanalar
   complete_4f4efbc: fullført
   complete_all_items_e1779257: "Fullfør alle element"
   complete_fd828dea: Fullført
@@ -5090,6 +5091,9 @@ nn:
   count_people_successfully_enrolled_into_course_nam_db8eed18: 
     one: "%{user_name}har meldt seg på *%{course_name}*."
     other: "%{count}personar har meldt seg på *%{course_name}*."
+  count_permissions_found_1a926f7d: 
+    one: "Eit løyve funne"
+    other: "%{count}løyve funne"
   count_points_4735a2e8: 
     one: "1 poeng"
     other: "%{count} poeng"
@@ -6414,6 +6418,7 @@ nn:
   description_436c48d7: Skildring
   details_98a31b68: Detaljar
   details_a6f427c3: "Detaljar:"
+  determines_whether_a_publish_course_option_is_incl_ac5eed8f: "Avgjer om publiser emne-val er inkludert i sjekklista for emneoppsett og på emneforsida.  "
   developer_key: 
     api_key: "Nøkkel: *%{api_key}*"
     created: "Oppretta:"
@@ -6805,6 +6810,7 @@ nn:
   divide_into_equal_slots_of_num_minutes_minutes_go_52caee81: "Del inn i like tidsluker på %{num_minutes} minutt. *Gå*"
   do_not_count_this_assignment_towards_the_final_gra_4dd92e00: "Ikkje tel med denne oppgåva i sluttresultatet"
   do_nothing_9672b478: "Gjer ingenting"
+  docviewer_highlight_updated_47dc7da2: "Docviewer highlight oppdatert"
   does_not_meet_expectations_b0736d20: "Innfrir ikkje forventningar"
   domain_3b54c511: Domene
   domain_is_required_1d4c8b25: "Domene er obligatorisk"
@@ -6892,6 +6898,7 @@ nn:
   duplicate_modules_8ea35557: "Dupliser modular"
   duplicate_objects_120eda73: "Dupliser objekt"
   duplicate_provider_provider_d9842134: "Dupliser tilbyder %{provider}"
+  duplication_of_title_succeeded_2e0bd645: "Vellukka duplisering av %{title}"
   e_c2991d1b: e
   e_g_doe_jon_fe1d9298: "f.eks. Nordmann, Kari"
   e_g_http_university_edu_helpdesk_acab04d6: "f.eks., http://university.edu/helpdesk"
@@ -12159,6 +12166,7 @@ nn:
   no_users_were_selected_to_add_to_the_course_a51c6083: "Vel brukarar for å leggja til emnet"
   no_way_to_export_gradebooks_provided_b4c2939d: "Det finst ingen måtar å eksportere karakterbøker!"
   no_way_to_monitor_gradebook_exports_provided_b451236a: "Det finns ingen måtar å overvake karakterbok-eksportar!"
+  non_scoring_rubrics_9f2033ad: "Vurderingskriterium utan poeng"
   nonce_77113ba4: Mellombels
   none_3b5e34d2: Ingen
   none_9b6c9bec: ingen
@@ -12923,6 +12931,7 @@ nn:
   please_add_at_least_one_non_blank_answer_213c2c8e: "Legg til minst eit ikkje-blankt svar."
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Legg til minst eit ikkje-blankt svar for kvar variabel."
   please_create_a_group_set_8db6e8fe: "Opprett gruppesett"
+  please_do_not_reply_to_this_email_it_will_not_be_d_1e49982a: "Ikkje svar på denne e-posten, den kan ikkje leverast til avsendar. "
   please_enter_a_due_date_on_or_after_earliestdate_b3fe6d29: "Oppgi ein frist på eller etter %{earliestDate}"
   please_enter_a_name_for_this_link_318f01a4: "Oppgi eit namn for denne lenka."
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "Oppgi eit søkeord med tre eller fleire teikn"
@@ -13108,15 +13117,17 @@ nn:
       name: Karaktereksport
     grade_export_settings: 
       description: |-
-          Dette programtillegget gjer at du kan sende sluttkarakterane tilbake til eit studentsystem (SIS). Når det er aktivert, får brukaren moglegheit til å publisere karakterane i karakterboka. Dette skjer via ein POST-førespurnad til endepunktet for publisering. Kvar type fastset eige innhaldsformat og MIME-type. Responsen frå endepunktet spelar ingen rolle og er ignorert.
+          Dette programtillegget gjer at sluttvurdering kan overførast til eit studentinformasjonssystem (SIS). Når det er slått på får brukaren eit val i karakterboka om å publisere vurderingen. Det vil skje ved eit POST-kall til eit spesifisert publiseringssluttpunkt. Kvar type definerer sitt eige innhaldsformat og mime-type. Responsen frå sluttpunktet er uvesentlig og ignorerast.
           
-          For eksempel vil CSV-fila frå Instructure sende ei csv-fil med mime-type 'text/csv' som inneheld dei følgjande kolonnane til eit spesifisert endepunkt:
+          Eit eksempel: den Instructure-formaterte CSV-fila vil POSTe ein csv-fil med mime-type 'text/csv' til det spesifiserte sluttpunktet med følgande kolonnar:
           
           "publisher_id", "publisher_sis_id", "course_id", "course_sis_id", "section_id", "section_sis_id", "student_id", "student_sis_id", "enrollment_id", "enrollment_status", "score", "grade"
           
-          (Merk: karakterkolonnen blir returnert berre dersom emnet oppgir ein karakterstandard)
+          (Merk: kolonnen "grade" returnerer berre innhald dersom eit emne har spesifisert ein vurderingsstandard)
           
-          For kvar student på emnet som vert publisert er det 1 eller fleire rader i den publiserte CSV-fila. Det er 1 rad for kvar pålogging studenten har, i emnet sin rotkonto. Dette resulterer stort sett i 1 rad per student, men dersom studenten har fleire påloggingar vil det vere ei rad for kvar av dei.
+          For kvar student i emnet som skal overførast blir det produsert 1 eller fleire rader i csv-fila. Meir spesifikt blir det oppretta 1 rad for kvar innlogging studenten gjer til emnet sin rotkonto. Dei fleste gongane resulterer det i 1 rad per student, men dersom studenten har fleire innloggingar, blir det ein rad for kvar innlogging.
+          
+          Dersom "Inkluder overstyring av sluttvurdering" er haka av og funksjonsvalet for Overstyr sluttvurdering er slått på, vil studentar med overstyrt vurderingsresultat få dette resultatet overført istadenfor det utrekna resultatet.
       labels: 
         format_type: "Type utdataformat"
         publish_endpoint: "Endepunkt å publisere til"
@@ -15076,6 +15087,7 @@ nn:
   read_comments_3fcc7590: "Les kommentarar"
   ready_to_enroll_panel_46f45abb: "Klar til å melde på brukarpanel"
   recaptcha_not_configured_3a6ef9ee: "reCAPTCHA er ikkje konfigurert"
+  received_callback_from_identity_provider_80d999f5: "Tilbakekall frå identitetstilbydar motteke"
   received_cas_ticket_ea1bbeb: "CAS-informasjon motteke"
   recent_activity_51239235: "Nyleg aktivitet"
   recent_announcements_8becc59c: "Nylege kunngjeringar"
@@ -17813,6 +17825,7 @@ nn:
   to_1126ab55: til
   to_35c6baa2: "til "
   to_51406be9: Til
+  to_access_the_people_page_users_view_list_must_be__2f01333b: "For å sjå sida Personar må 'Brukarar - sjå liste' vere slått på. Dersom denne løyva er slått på samstundes som 'Brukarar - sjå primær e-postadresse' er slått av, vil brukarane sjå e-postadresser som login-ID. For å sjå login-ID må 'Brukarar - legg til / fjern studentar i emne' og 'Brukarar - legg til / fjern faglærarar, kursdesignarar eller undervisingsassistentar i emne' óg vere slått på."
   to_activate_sms_enter_the_four_character_confirmat_3982a3ec: "For å aktivere SMS må du leggje inn den firesifra koden som blei sendt til %{sms_number}."
   to_be_added_2959cc72: "Skal leggast til"
   to_be_removed_d4b48586: "Skal fjernast"
@@ -17828,6 +17841,9 @@ nn:
   to_do_5526f10a: "Gjeremål: "
   to_do_items_loading_d1cdfcd5: "Lastar innhald i gjeremålslista"
   to_do_list_dashboard_d741f64e: "Dashbord med gjeremålsliste"
+  to_edit_a_student_s_section_users_add_remove_stude_1f188d80: |-
+      For å endre seksjonen til ein student, må 'Brukarar - legg til / fjern studentar i emne' og 'Brukarar - sjå liste' begge vere slått på.
+      For å endre seksjonen til ein faglærar, kursdesigner eller undervisingsassistent må 'Brukarar - legg til / fjern faglærarar, kursdesignere eller undervisingsassistentar i emne' og 'Brukarar - sjå liste' begge vere slått på.
   to_link_the_course_observer_name_to_a_student_star_f993c826: "Om du vil lenke emneobservatøren *%{name}* til ein student, kan du skrive og finne studenten sitt namn nedanfor og deretter klikke på Oppdater."
   to_minscore_43e5452e: "to %{minScore}%"
   to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "Dersom du vil feste ein diskusjon øvst på sida, kan du dra ein diskusjon dit eller velje Fest i innstillingsmenyen."
@@ -17948,6 +17964,7 @@ nn:
   unknown_answers_9688a2bc: "Ukjende svar"
   unknown_compression_method_b6a850b5: "ukjend pakkemetode"
   unknown_content_type_ae6d08e8: "Ukjent innhaldstype"
+  unknown_manage_discussion_action_encountered_92a8dfc0: "Ukjend handsaming av diskusjonar oppdaga"
   unknown_question_bank: "Ukjent spørsmålsbank"
   unknown_quiz: "Ukjent quiz"
   unknown_status_status_35331e1d: "Ukjend status, %{status}"
@@ -18949,6 +18966,7 @@ nn:
   you_ve_been_invited_to_the_course_course_2aac8140: "Du er invitert til emnet %{course}. "
   you_ve_been_invited_to_the_course_course_course_ro_a74d748b: "Du er invitert til emnet %{course}. Emnerolle: %{role_type}"
   you_ve_been_reminded_to_assess_rubric_context_70eeb600: "Hugs å vurdere %{rubric}, %{context}."
+  you_ve_updated_the_scoring_criteria_this_will_affe_ec852671: "Du har oppdatert vurderingskriteria; dette påverkar alle studentar som allereie er vurdert etter dette kriteriet"
   you_will_be_redirected_to_a_login_page_where_you_w_fc8df402: "Du blir omdirigert til ei påloggingsside der du kan logge på med barnets påloggingsdetaljar. "
   you_will_be_redirected_to_gradebook_while_your_fil_23fab7de: "Du vert omdirigert til karakterboka medan fila di vert lasta opp. Om du har ei stor CSV-fil, kan det ta nokre minutt å oppdatere endringane. Om du vil hindre overskriving av data, må du stadfeste at opplastinga er fullført og karakterboka er korrekt før du utfører fleire endringar."
   you_will_need_to_create_a_new_app_on_facebook_face_8fe85297: |-
