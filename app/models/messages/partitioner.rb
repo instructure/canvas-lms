@@ -15,7 +15,7 @@ module Messages
 
         partman.ensure_partitions(precreate_tables)
 
-        partman.prune_partitions(Setting.get("messages_partitions_keep_weeks", 52).to_i)
+        Shard.current.database_server.unshackle {partman.prune_partitions(Setting.get("messages_partitions_keep_weeks", 52).to_i)}
 
         log 'Done. Bye!'
         log '*' * 80

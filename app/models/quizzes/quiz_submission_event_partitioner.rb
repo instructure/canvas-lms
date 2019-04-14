@@ -32,7 +32,7 @@ class Quizzes::QuizSubmissionEventPartitioner
 
         partman.ensure_partitions(precreate_tables)
 
-        partman.prune_partitions(Setting.get("quiz_events_partitions_keep_months", 6).to_i)
+        Shard.current.database_server.unshackle {partman.prune_partitions(Setting.get("quiz_events_partitions_keep_months", 6).to_i)}
 
         log 'Done. Bye!'
         log '*' * 80
