@@ -19,6 +19,7 @@ class SisPseudonym
   # type: :exact, :trusted, or :implicit
   def self.for(user, context, type: :exact, require_sis: true, include_deleted: false)
     raise ArgumentError("type must be :exact, :trusted, or :implicit") unless [:exact, :trusted, :implicit].include?(type)
+    raise ArgumentError("context must respond to .root_account") unless context.respond_to?(:root_account)
     self.new(user, context, type, require_sis, include_deleted).pseudonym
   end
 
