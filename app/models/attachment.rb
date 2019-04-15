@@ -1387,7 +1387,9 @@ class Attachment < ActiveRecord::Base
       att.display_name = new_name
       att.content_type = "application/pdf"
       CrocodocDocument.where(attachment_id: att.children_and_self.select(:id)).delete_all
-      Canvadoc.where(attachment_id: att.children_and_self.select(:id)).delete_all
+      canvadoc_scope = Canvadoc.where(attachment_id: att.children_and_self.select(:id))
+      CanvadocsSubmission.where(:canvadoc_id => canvadoc_scope.select(:id)).delete_all
+      canvadoc_scope.delete_all
       att.save!
     end
   end
