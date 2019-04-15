@@ -224,9 +224,7 @@
             <h2 class="gradebookHeader--rightside"><%= t('headers.assessment', "Assessment") %></h2>
             <% if can_do(@context, @current_user, :manage_grades) || (@context.concluded? && can_do(@context, @current_user, :read_as_admin)) %>
               <div id="grade_container">
-                <%= render partial: "grading_box_extended",
-                  locals: {assignment: @assignment}
-                %>
+                <%= render partial: "grading_box_extended", locals: {assignment: @assignment, post_policies_enabled: post_policies_enabled} %>
                 <span class="turnitin_score_container"></span>
                 <a href="#" id="submit_same_score"><br><%= t('links.submit_same_score', "Use this same grade for the resubmission") %></a>
                 <a style="display: none;" title="POST" href="<%= context_url(@context, :update_submission_context_gradebook_url) %>" class="update_submission_grade_url">&nbsp;</a>

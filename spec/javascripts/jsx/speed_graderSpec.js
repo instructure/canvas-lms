@@ -41,6 +41,7 @@ const requiredDOMFixtures = `
   <span id="speed_grader_settings_mount_point"></span>
   <div id="speed_grader_assessment_audit_button_mount_point"></div>
   <div id="speed_grader_submission_comments_download_mount_point"></div>
+  <div id="speed_grader_hidden_submission_pill_mount_point"></div>
 `
 
 let $div
@@ -621,71 +622,6 @@ test('refreshes provisional grader display names when names are stale after swit
   const renderedComment = SpeedGrader.EG.renderComment(commentToRender, commentRenderingOptions)
   const authorName = renderedComment.find('.author_name').text()
   strictEqual(authorName, 'Grader 1')
-})
-
-QUnit.module('SpeedGrader#showGrade', {
-  setup() {
-    fakeENV.setup()
-    sandbox.stub($, 'ajaxJSON')
-    sandbox.spy($.fn, 'append')
-    this.originalWindowJSONData = window.jsonData
-    window.jsonData = {
-      id: 27,
-      GROUP_GRADING_MODE: false,
-      points_possible: 10,
-      studentsWithSubmissions: []
-    }
-    this.originalStudent = SpeedGrader.EG.currentStudent
-    SpeedGrader.EG.currentStudent = {
-      id: 4,
-      name: 'Guy B. Studying',
-      submission_state: 'not_graded',
-      submission: {
-        score: 7,
-        grade: 'complete',
-        entered_grade: 'A',
-        submission_comments: []
-      }
-    }
-    ENV.SUBMISSION = {
-      grading_role: 'teacher'
-    }
-    ENV.RUBRIC_ASSESSMENT = {
-      assessment_type: 'grading',
-      assessor_id: 1
-    }
-  },
-
-  teardown() {
-    SpeedGrader.EG.currentStudent = this.originalStudent
-    window.jsonData = this.originalWindowJSONData
-    fakeENV.teardown()
-  }
-})
-
-test('uses submission#grade for pass_fail assignments', function() {
-  sandbox.stub(SpeedGrader.EG, 'updateStatsInHeader')
-  const $grade = sandbox.stub($.fn, 'val')
-  SpeedGrader.EG.showGrade()
-  ok($grade.calledWith('complete'))
-})
-
-test('uses submission#entered_grade for other types of assignments', function() {
-  sandbox.stub(SpeedGrader.EG, 'updateStatsInHeader')
-  const $grade = sandbox.stub($.fn, 'val')
-  SpeedGrader.EG.currentStudent.submission.grade = 'B'
-  SpeedGrader.EG.showGrade()
-  ok($grade.calledWith('A'))
-})
-
-test('Does not error out if a user has no submission', function() {
-  sandbox.stub(SpeedGrader.EG, 'updateStatsInHeader')
-
-  SpeedGrader.EG.currentStudent.submission_state = 'unsubmitted'
-  delete SpeedGrader.EG.currentStudent.submission
-
-  SpeedGrader.EG.showGrade()
-  ok(true)
 })
 
 QUnit.module('SpeedGrader#handleGradeSubmit', {
@@ -5758,6 +5694,148 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       SpeedGrader.EG.handleSubmissionSelectionChange()
 
       strictEqual(document.querySelector(gradeSimilaritySelector), null)
+    })
+  })
+
+  QUnit.module('#showGrade', hooks => {
+    hooks.beforeEach(() => {
+      setupFixtures(`
+        <div id='grade_container'>
+          <input type='text' id='grading-box-extended' />
+        </div>
+      `)
+      sandbox.spy($.fn, 'append')
+      this.originalWindowJSONData = window.jsonData
+      window.jsonData = {
+        id: 27,
+        GROUP_GRADING_MODE: false,
+        points_possible: 10,
+        studentsWithSubmissions: []
+      }
+      this.originalStudent = SpeedGrader.EG.currentStudent
+      SpeedGrader.EG.currentStudent = {
+        id: 4,
+        name: 'Guy B. Studying',
+        submission_state: 'not_graded',
+        submission: {
+          score: 7,
+          grade: 'complete',
+          entered_grade: 'A',
+          submission_comments: []
+        }
+      }
+      ENV.SUBMISSION = {
+        grading_role: 'teacher'
+      }
+      ENV.RUBRIC_ASSESSMENT = {
+        assessment_type: 'grading',
+        assessor_id: 1
+      }
+
+      sandbox.stub(SpeedGrader.EG, 'updateStatsInHeader')
+      SpeedGrader.setup()
+    })
+
+    hooks.afterEach(() => {
+      SpeedGrader.EG.currentStudent = this.originalStudent
+      window.jsonData = this.originalWindowJSONData
+      SpeedGrader.EG.updateStatsInHeader.restore()
+      SpeedGrader.teardown()
+    })
+
+    test('uses submission#grade for pass_fail assignments', function() {
+      const $grade = sandbox.stub($.fn, 'val')
+      SpeedGrader.EG.showGrade()
+      ok($grade.calledWith('complete'))
+    })
+
+    test('uses submission#entered_grade for other types of assignments', function() {
+      const $grade = sandbox.stub($.fn, 'val')
+      SpeedGrader.EG.currentStudent.submission.grade = 'B'
+      SpeedGrader.EG.showGrade()
+      ok($grade.calledWith('A'))
+    })
+
+    test('Does not error out if a user has no submission', function() {
+      SpeedGrader.EG.currentStudent.submission_state = 'unsubmitted'
+      delete SpeedGrader.EG.currentStudent.submission
+
+      SpeedGrader.EG.showGrade()
+      ok(true)
+    })
+
+    QUnit.module('"Hidden" submission pill', hiddenPillHooks => {
+      let $grade
+      let mountPoint
+
+      hiddenPillHooks.beforeEach(() => {
+        $grade = sandbox.stub($.fn, 'val')
+        mountPoint = document.getElementById('speed_grader_hidden_submission_pill_mount_point')
+      })
+
+      hiddenPillHooks.afterEach(() => {
+        $grade.restore()
+      })
+
+      QUnit.module('when post policies are enabled', postPolicyHooks => {
+        postPolicyHooks.beforeEach(() => {
+          ENV.post_policies_enabled = true
+        })
+
+        postPolicyHooks.afterEach(() => {
+          delete ENV.post_policies_enabled
+        })
+
+        QUnit.module('when the assignment is manually-posted', manualPostingHooks => {
+          manualPostingHooks.beforeEach(() => {
+            window.jsonData.post_manually = true
+          })
+
+          manualPostingHooks.afterEach(() => {
+            delete window.jsonData.post_manually
+          })
+
+          test('is shown if the selected submission is not posted', () => {
+            SpeedGrader.EG.currentStudent.submission.graded_at = new Date('Jan 1, 2020')
+            SpeedGrader.EG.showGrade()
+
+            ok(mountPoint.innerText.includes('HIDDEN'))
+          })
+
+          test('is not shown if the selected submission is posted', () => {
+            SpeedGrader.EG.currentStudent.submission.graded_at = new Date('Jan 1, 2020')
+            SpeedGrader.EG.currentStudent.submission.posted_at = new Date('Jan 1, 2020')
+            SpeedGrader.EG.showGrade()
+
+            notOk(mountPoint.innerText.includes('HIDDEN'))
+          })
+        })
+
+        QUnit.module('when the assignment is auto-posted', () => {
+          test('is shown if the selected submission is graded but not posted', () => {
+            SpeedGrader.EG.currentStudent.submission.graded_at = new Date('Jan 1, 2020')
+            SpeedGrader.EG.showGrade()
+            ok(mountPoint.innerText.includes('HIDDEN'))
+          })
+
+          test('is not shown if the selected submission is graded and posted', () => {
+            SpeedGrader.EG.currentStudent.submission.graded_at = new Date('Jan 1, 2020')
+            SpeedGrader.EG.currentStudent.submission.posted_at = new Date('Jan 1, 2020')
+            SpeedGrader.EG.showGrade()
+            notOk(mountPoint.innerText.includes('HIDDEN'))
+          })
+
+          test('is not shown if the selected submission is ungraded', () => {
+            SpeedGrader.EG.showGrade()
+            notOk(mountPoint.innerText.includes('HIDDEN'))
+          })
+        })
+      })
+
+      test('is not shown if post policies are not enabled', () => {
+        SpeedGrader.EG.showGrade()
+        notOk(mountPoint.innerText.includes('HIDDEN'))
+      })
     })
   })
 })
