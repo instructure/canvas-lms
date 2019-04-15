@@ -17,9 +17,16 @@
 #
 
 module Types
-  class SubmissionCommentFilterInputType < Types::BaseInputObject
-    graphql_name 'SubmissionCommentFilterInput'
+  class SubmissionHistoryType < ApplicationObjectType
+    graphql_name 'SubmissionHistory'
 
-    argument :all_comments, Boolean, required: false, default_value: false
+    # This does not implement Relay::Node or have an id/_id because all of the
+    # submission histories share the same submission id. There is only one
+    # `Submission` in the database, and it's updated whenever a new submission
+    # is created. Thank versionable and poor database design choice made years
+    # ago for this.
+
+    implements Interfaces::TimestampInterface
+    implements Interfaces::SubmissionInterface
   end
 end

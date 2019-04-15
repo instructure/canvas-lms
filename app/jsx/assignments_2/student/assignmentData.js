@@ -129,7 +129,7 @@ export const SUBMISSION_COMMENT_QUERY = gql`
   query GetSubmissionComments($submissionId: ID!) {
     submissionComments: node(id: $submissionId) {
       ... on Submission {
-        commentsConnection {
+        commentsConnection(filter: {allComments: true}) {
           nodes {
             ${submissionCommentQueryParams()}
           }

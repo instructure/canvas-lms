@@ -1952,7 +1952,7 @@ type StudentSummaryAnalytics {
   tardinessBreakdown: TardinessBreakdown
 }
 
-type Submission implements Node & Timestamped {
+type Submission implements Node & SubmissionInterface & Timestamped {
   """
   legacy canvas id
   """
@@ -2010,6 +2010,27 @@ type Submission implements Node & Timestamped {
   postedAt: DateTime
   score: Float
   state: SubmissionState!
+  submissionHistories(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): SubmissionHistoryConnection
   submissionStatus: String
   submittedAt: DateTime
   updatedAt: DateTime
@@ -2066,7 +2087,7 @@ type SubmissionCommentEdge {
 }
 
 input SubmissionCommentFilterInput {
-  attempts: [Int!] = null
+  allComments: Boolean = false
 }
 
 """
@@ -2107,6 +2128,160 @@ type SubmissionEdge {
 input SubmissionFilterInput {
   sectionIds: [ID!]
   states: [SubmissionState!] = [submitted, pending_review, graded]
+}
+
+type SubmissionHistory implements SubmissionInterface & Timestamped {
+  assignment: Assignment
+  attempt: Int!
+  commentsConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    filter: SubmissionCommentFilterInput
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): SubmissionCommentConnection
+  createdAt: DateTime
+
+  """
+  how many points are being deducted due to late policy
+  """
+  deductedPoints: Float
+
+  """
+  the submission grade *before* late policy deductions were applied
+  """
+  enteredGrade: String
+
+  """
+  the submission score *before* late policy deductions were applied
+  """
+  enteredScore: Float
+
+  """
+  excused assignments are ignored when calculating grades
+  """
+  excused: Boolean
+  grade: String
+  gradedAt: DateTime
+  gradingStatus: String
+  latePolicyStatus: LatePolicyStatusType
+  postedAt: DateTime
+  score: Float
+  state: SubmissionState!
+  submissionStatus: String
+  submittedAt: DateTime
+  updatedAt: DateTime
+  user: User
+}
+
+"""
+The connection type for SubmissionHistory.
+"""
+type SubmissionHistoryConnection {
+  """
+  A list of edges.
+  """
+  edges: [SubmissionHistoryEdge]
+
+  """
+  A list of nodes.
+  """
+  nodes: [SubmissionHistory]
+
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+}
+
+"""
+An edge in a connection.
+"""
+type SubmissionHistoryEdge {
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge.
+  """
+  node: SubmissionHistory
+}
+
+"""
+Types for submission or submission history
+"""
+interface SubmissionInterface {
+  assignment: Assignment
+  attempt: Int!
+  commentsConnection(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    filter: SubmissionCommentFilterInput
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): SubmissionCommentConnection
+
+  """
+  how many points are being deducted due to late policy
+  """
+  deductedPoints: Float
+
+  """
+  the submission grade *before* late policy deductions were applied
+  """
+  enteredGrade: String
+
+  """
+  the submission score *before* late policy deductions were applied
+  """
+  enteredScore: Float
+
+  """
+  excused assignments are ignored when calculating grades
+  """
+  excused: Boolean
+  grade: String
+  gradedAt: DateTime
+  gradingStatus: String
+  latePolicyStatus: LatePolicyStatusType
+  postedAt: DateTime
+  score: Float
+  state: SubmissionState!
+  submissionStatus: String
+  submittedAt: DateTime
+  user: User
 }
 
 input SubmissionOrderCriteria {
