@@ -496,6 +496,9 @@ class ExternalToolsController < ApplicationController
     expander = variable_expander(assignment: assignment, tool: tool, launch: lti_launch, post_message_token: opts[:launch_token])
 
     adapter = if tool.use_1_3?
+      # Prevent attempting OIDC login flow with the target link uri
+      opts.delete(:launch_url)
+
       Lti::LtiAdvantageAdapter.new(
         tool: tool,
         user: @current_user,

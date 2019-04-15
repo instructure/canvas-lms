@@ -15,6 +15,7 @@
 * You should have received a copy of the GNU Affero General Public License along
 * with this program. If not, see <http://www.gnu.org/licenses/>.
 */
+import iframeAllowances from 'jsx/external_apps/lib/iframeAllowances'
 
 export default class ContentItem {
   constructor(json) {
@@ -41,6 +42,9 @@ export default class ContentItem {
       const iframeTag = document.createElement('iframe')
 
       iframeTag.setAttribute('src', iframe.src)
+      iframeTag.setAttribute('title', this.title || "")
+      iframeTag.setAttribute('allowfullscreen', 'true')
+      iframeTag.setAttribute('allow', iframeAllowances())
 
       if (iframe.width) {
         iframeTag.style.width = `${iframe.width}px`

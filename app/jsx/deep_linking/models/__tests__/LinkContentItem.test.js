@@ -100,7 +100,7 @@ describe('toHtmlString', () => {
 
     it('returns markup for an iframe', () => {
       expect(linkContentItem({iframe}).toHtmlString()).toEqual(
-        '<iframe src="http://www.instructure.com" style="width: 500px; height: 200px;"></iframe>'
+        '<iframe src="http://www.instructure.com" title="Title" allowfullscreen="true" allow="" style="width: 500px; height: 200px;"></iframe>'
       )
     })
   })
