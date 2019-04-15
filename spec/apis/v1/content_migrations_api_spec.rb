@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 
 describe ContentMigrationsController, type: :request do
   before :once do
@@ -364,6 +365,23 @@ describe ContentMigrationsController, type: :request do
                       @params.merge(:migration_type => 'course_copy_importer', :settings => {'source_course_id' => 'sis_course_id:booga'}))
       migration = ContentMigration.find json['id']
       expect(migration.migration_settings[:source_course_id]).to eql @course.id
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "can queue a cross-shard course for course copy" do
+        @shard1.activate do
+          @other_account = Account.create
+          @copy_from = @other_account.courses.create!
+          @copy_from.enroll_user(@user, "TeacherEnrollment", :enrollment_state => "active")
+        end
+        json = api_call(:post, @migration_url + "?settings[source_course_id]=#{@copy_from.global_id}&migration_type=course_copy_importer",
+          @params.merge(:migration_type => 'course_copy_importer', :settings => {'source_course_id' => @copy_from.global_id.to_s}))
+
+        migration = ContentMigration.find json['id']
+        expect(migration.source_course).to eq @copy_from
+      end
     end
 
     context "migration file upload" do
