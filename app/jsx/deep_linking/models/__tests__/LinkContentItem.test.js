@@ -90,4 +90,18 @@ describe('toHtmlString', () => {
       )
     })
   })
+
+  describe('when the iframe property is specified', () => {
+    const iframe = {
+      src: 'http://www.instructure.com',
+      width: 500,
+      height: 200
+    }
+
+    it('returns markup for an iframe', () => {
+      expect(linkContentItem({iframe}).toHtmlString()).toEqual(
+        '<iframe src="http://www.instructure.com" style="width: 500px; height: 200px;"></iframe>'
+      )
+    })
+  })
 })

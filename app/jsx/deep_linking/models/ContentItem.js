@@ -35,6 +35,25 @@ export default class ContentItem {
     return this.imageTag(this.thumbnail)
   }
 
+  iframeTag() {
+    const {iframe} = this
+    if (iframe) {
+      const iframeTag = document.createElement('iframe')
+
+      iframeTag.setAttribute('src', iframe.src)
+
+      if (iframe.width) {
+        iframeTag.style.width = `${iframe.width}px`
+      }
+
+      if (iframe.height) {
+        iframeTag.style.height = `${iframe.height}px`
+      }
+
+      return iframeTag.outerHTML
+    }
+  }
+
   imageTag(src, width, height) {
     const imgTag = document.createElement('img')
     imgTag.setAttribute('src', src)
