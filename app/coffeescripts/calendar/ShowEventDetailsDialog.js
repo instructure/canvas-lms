@@ -286,8 +286,9 @@ export default class ShowEventDetailsDialog {
       (params.reservations == null || params.reservations === []) &&
       this.event.object.parent_event_id != null
     ) {
+      const MAX_PAGE_SIZE = 25
       axios
-        .get(`api/v1/calendar_events/${this.event.object.parent_event_id}/participants`)
+        .get(`api/v1/calendar_events/${this.event.object.parent_event_id}/participants?per_page=${MAX_PAGE_SIZE}`)
         .then(response => {
           if (response.data && response.data.length) {
             const $ul = $('<ul>')
@@ -295,13 +296,21 @@ export default class ShowEventDetailsDialog {
               const $li = $('<li>').text(p.display_name)
               $ul.append($li)
             })
+
+            if(response.data.length > (MAX_PAGE_SIZE - 1)) {
+              const $lidot = $('<li>').text("(...)")
+              $ul.append($lidot)
+            }
+
             const $header = $('<th>').attr("id", 'attendees_header_text').attr("scope", 'row').text('Attendees')
             $('#reservations').empty()
             $('#reservations').append($header)
             $('#reservations').append($ul)
+
           } else {
             $('#reservations').remove()
           }
+
         })
         .catch(() => $('#reservations').remove())
     }
