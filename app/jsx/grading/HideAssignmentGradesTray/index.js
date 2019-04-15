@@ -78,6 +78,7 @@ export default class HideAssignmentGradesTray extends PureComponent {
   async onHideClick() {
     const {assignment, selectedSectionIds} = this.state
     let hideRequest
+    let successMessage
 
     if (this.state.hideBySections) {
       if (selectedSectionIds.length === 0) {
@@ -90,8 +91,15 @@ export default class HideAssignmentGradesTray extends PureComponent {
       }
 
       hideRequest = hideAssignmentGradesForSections(assignment.id, selectedSectionIds)
+      successMessage = I18n.t(
+        'Success! Grades have been hidden for the selected sections of %{assignmentName}.',
+        {assignmentName: assignment.name}
+      )
     } else {
       hideRequest = hideAssignmentGrades(assignment.id)
+      successMessage = I18n.t('Success! Grades have been hidden for %{assignmentName}.', {
+        assignmentName: assignment.name
+      })
     }
 
     this.setState({hidingGrades: true})
@@ -100,7 +108,7 @@ export default class HideAssignmentGradesTray extends PureComponent {
       const progress = await hideRequest
       await resolveHideAssignmentGradesStatus(progress)
       showFlashAlert({
-        message: I18n.t('Assignment grades successfully hidden.'),
+        message: successMessage,
         type: 'success'
       })
       this.dismiss()

@@ -239,7 +239,7 @@ QUnit.module('HideAssignmentGradesTray', suiteHooks => {
     })
 
     test('the rendered success alert contains a message', async () => {
-      const successMessage = 'Assignment grades successfully hidden.'
+      const successMessage = 'Success! Grades have been hidden for Math 1.1.'
       await clickHide()
       strictEqual(showFlashAlertStub.firstCall.args[0].message, successMessage)
     })
@@ -329,7 +329,8 @@ QUnit.module('HideAssignmentGradesTray', suiteHooks => {
       })
 
       test('render a success message when sections are selected and hiding is successful', async () => {
-        const successMessage = 'Assignment grades successfully hidden.'
+        const successMessage =
+          'Success! Grades have been hidden for the selected sections of Math 1.1.'
         getSectionInput('Sophomores').click()
         await clickHide()
         strictEqual(showFlashAlertStub.firstCall.args[0].message, successMessage)
