@@ -24,6 +24,7 @@ if existing.any?
 
     found_ta = false
     course.tas.each do |ta|
+      next if row.ta_email.nil?
       if ta.email.downcase == row.ta_email.downcase
         found_ta = true
         break
