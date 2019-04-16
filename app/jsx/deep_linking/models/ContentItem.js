@@ -81,6 +81,7 @@ export default class ContentItem {
     const anchorTag = document.createElement('a')
     anchorTag.setAttribute('href', this.safeUrl())
     anchorTag.setAttribute('title', this.title)
+    anchorTag.setAttribute('target', '_blank')
     anchorTag.innerHTML = innerHTML
     return anchorTag.outerHTML
   }
