@@ -1651,6 +1651,9 @@ define([
         });
       }
       $multiple_submissions.html($.raw(innerHTML));
+
+
+      bzSpeedGraderSubmissionsCallback(submissionHistory);
     },
 
     showSubmissionDetails: function(){
