@@ -29,6 +29,7 @@ QUnit.module('loadRCE', {
     this.originalTinyMCE = window.tinyMCE
     fakeENV.setup()
     ENV.RICH_CONTENT_APP_HOST = 'app-host'
+    ENV.context_asset_string = 'courses_1'
   },
   teardown() {
     // until canvas and canvas-rce are on the same version, restore globals to
@@ -80,6 +81,9 @@ QUnit.module('loadOnTarget', {
     }
     this.rce = {renderIntoDiv: sinon.stub().callsArgWith(2, this.editor)}
     sinon.stub(RCELoader, 'loadRCE').callsArgWith(0, this.rce)
+    fakeENV.setup()
+    ENV.RICH_CONTENT_APP_HOST = 'app-host'
+    ENV.context_asset_string = 'courses_1'
   },
   teardown() {
     fixtures.teardown()

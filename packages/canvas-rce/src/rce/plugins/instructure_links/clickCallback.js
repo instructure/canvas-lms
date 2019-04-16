@@ -18,6 +18,6 @@
 
 export default function(ed, document) {
   const ev = document.createEvent("CustomEvent");
-  ev.initCustomEvent("tinyRCE/initLinks", true, true, { ed: ed });
+  ev.initCustomEvent("tinyRCE/initLinks", true, true, {ed});
   document.dispatchEvent(ev);
 }

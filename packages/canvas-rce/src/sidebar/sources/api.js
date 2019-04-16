@@ -318,7 +318,7 @@ class RceApiSource {
     }
     if (typeof host !== 'string') {
       host = ''
-    } else if (host.substr(0, 4) !== 'http') {
+    } else if (host && host.substr(0, 4) !== 'http') {
       host = `//${host}`
       let windowHandle = windowOverride || (typeof window !== 'undefined' ? window : undefined)
       if (

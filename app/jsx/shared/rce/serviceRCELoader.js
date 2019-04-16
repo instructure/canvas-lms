@@ -65,17 +65,9 @@ let loadingPromise
       if (ENV.RICH_CONTENT_SKIP_SIDEBAR) {
         return
       }
-      let context = splitAssetString(ENV.context_asset_string)
-      let props = {
-        jwt: ENV.JWT,
-        refreshToken: refreshToken(ENV.JWT),
-        host: ENV.RICH_CONTENT_APP_HOST,
-        canUploadFiles: ENV.RICH_CONTENT_CAN_UPLOAD_FILES,
-        filesTabDisabled: ENV.RICH_CONTENT_FILES_TAB_DISABLED,
-        contextType: context[0],
-        contextId: context[1],
-        themeUrl: ENV.active_brand_config_json_url
-      }
+
+      const props = getTrayProps()
+
       this.loadRCE(function (RCE) {
         RCE.renderSidebarIntoDiv(target, props, function(remoteSidebar) {
           callback(polyfill.wrapSidebar(remoteSidebar))

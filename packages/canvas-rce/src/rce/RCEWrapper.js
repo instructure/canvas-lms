@@ -18,7 +18,6 @@
 
 import PropTypes from "prop-types";
 import React from "react";
-import ReactDOM from "react-dom";
 import TinyMCE from "react-tinymce";
 
 import * as contentInsertion from "./contentInsertion";
@@ -146,7 +145,6 @@ export default class RCEWrapper extends React.Component {
   }
 
   onRemove() {
-    ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.refs.rce));
     Bridge.detachEditor(this);
     this.props.onRemove && this.props.onRemove(this);
   }
@@ -261,7 +259,6 @@ export default class RCEWrapper extends React.Component {
     return (
       <>
         <TinyMCE
-          ref="rce"
           id={mceProps.textareaId}
           tinymce={mceProps.tinymce}
           className={mceProps.textareaClassName}

@@ -10,6 +10,19 @@ In order for all features of `canvas-rce` to work you'll also need a running cop
 of `canvas-rce-api`.  You can get it from [canvas-rce-api](https://github.com/instructure/canvas-rce-api).  You'll want to follow the setup instructions for it in that repository as
 they will be the most up to date.
 
+To configure canvas to find the canvas-rce-api, include in `canvas-lms/config/dynamic_settings.yml`:
+
+```
+development:
+  config:
+    canvas:
+      rich-content-service:
+        app-host: "localhost:3001"
+      canvas:
+        encryption-secret: "astringthatisactually32byteslong"
+        signing-secret: "astringthatisactually32byteslong"
+```
+
 ## Developing
 
 Here we'll talk about how to develop on `canvas-rce` without the use of Canvas.

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2019 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -19,20 +19,40 @@
 import htmlEscape from "escape-html";
 import formatMessage from "../../../format-message";
 import clickCallback from "./clickCallback";
+import bridge from '../../../bridge'
 
-tinymce.create("tinymce.plugins.InstructureLinks", {
+const PLUGIN_KEY = 'links'
+
+tinymce.create("tinymce.plugins.InstructureLinksPlugin", {
   init(ed) {
-    ed.addCommand("instructureLinks", clickCallback.bind(this, ed, document));
+    // Register commands
+    ed.addCommand(
+      "instructureLinks",
+      clickCallback.bind(this, ed, document)
+    );
 
-    ed.ui.registry.addButton("instructure_links", {
-      title: htmlEscape(
-        formatMessage({
-          default: "Link to URL",
-          description: "Title for RCE button to insert links to a URL"
-        })
-      ),
-      onAction: () => ed.execCommand("instructureLinks"),
-      icon: "link"
+    // Register button
+    ed.ui.registry.addMenuButton("instructure_links", {
+      tooltip: formatMessage('Links'),
+      icon: "link",
+      fetch(callback) {
+        const items = [
+          {
+            type: 'menuitem',
+            text: formatMessage('External Links'),
+            onAction: () => ed.execCommand("instructureLinks")
+          },
+          {
+            type: 'menuitem',
+            text: formatMessage('Course Links'),
+            onAction() {
+              ed.focus(true) // activate the editor without changing focus
+              bridge.showTrayForPlugin(PLUGIN_KEY)
+            }
+          }
+        ]
+        callback(items)
+      }
     });
   }
 });
@@ -40,5 +60,5 @@ tinymce.create("tinymce.plugins.InstructureLinks", {
 // Register plugin
 tinymce.PluginManager.add(
   "instructure_links",
-  tinymce.plugins.InstructureLinks
+  tinymce.plugins.InstructureLinksPlugin
 );

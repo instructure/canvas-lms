@@ -27,6 +27,8 @@ export default class Bridge {
     this._editorRendered = new Promise(resolve => {
       this.resolveEditorRendered = resolve
     })
+
+    this.insertLink = this.insertLink.bind(this)
   }
 
   get editorRendered() {
@@ -66,12 +68,12 @@ export default class Bridge {
     this._controller = controller
   }
 
-  detachController(controller) {
+  detachController() {
     this._controller = null
   }
 
   showTrayForPlugin(plugin) {
-    this._controller.showTrayForPlugin(plugin)
+    this._controller && this._controller.showTrayForPlugin(plugin)
   }
 
   existingContentToLink() {

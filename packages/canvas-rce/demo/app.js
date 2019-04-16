@@ -52,7 +52,7 @@ function getProps(textareaId, state) {
           // plugin buttons ("instructure_links" will be changed to "link", but this is how
           //   it's currently sent over from canvas.  Once that's no longer true, the test
           //  page can just use "link" instead)
-          "table link unlink instructure_equation instructure_image instructure_equella instructure_record"
+          "table instructure_links unlink instructure_equation instructure_image instructure_equella instructure_record"
         ]
       };
     },
