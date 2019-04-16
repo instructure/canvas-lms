@@ -198,7 +198,6 @@ class AssignmentsController < ApplicationController
               show_moderation_link: @assignment.moderated_grading? && @assignment.permits_moderation?(@current_user)
             }
           end
-          format.json { render :json => @assignment.as_json(:permissions => {:user => @current_user, :session => session}) }
         end
       end
     end
