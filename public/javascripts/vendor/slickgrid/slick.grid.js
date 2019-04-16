@@ -26,6 +26,7 @@ import 'vendor/slickgrid/slick.core'
 import 'vendor/slickgrid/lib/jquery.event.drag-2.2'
 import {isRTL} from 'jsx/shared/helpers/rtlHelper'
 import {getNormalizedScrollLeft, setNormalizedScrollLeft} from 'normalize-scroll-left'
+import 'jqueryui/sortable'
 
 /*
  * These eslint configurations are just becase that's how this file was

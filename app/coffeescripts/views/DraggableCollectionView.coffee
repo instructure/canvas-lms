@@ -20,6 +20,7 @@ define [
   'jquery'
   'underscore'
   './CollectionView'
+  'jqueryui/sortable'
 ], (Backbone, $, _, CollectionView) ->
 
   class DraggableCollectionView extends CollectionView
