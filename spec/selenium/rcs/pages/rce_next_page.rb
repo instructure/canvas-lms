@@ -89,7 +89,7 @@ module RCENextPage
   end
 
   def image_link(title)
-    fj("aside [role='button']:contains('#{title}')")
+    fj("[aria-label='Course Images'] button:contains('#{title}')")
   end
 
   def assignment_published_status
@@ -109,11 +109,11 @@ module RCENextPage
   end
 
   def images_toolbar_button
-    # put new images toolbar locator here
+    f('button[aria-label="Images"]')
   end
 
   def course_images
-    # put course images option in images dropdown here
+    fj('[role="menuitem"]:contains("Course Images")')
   end
 
   # ---------------------- Actions ----------------------
@@ -179,10 +179,11 @@ module RCENextPage
   end
 
   def click_images_toolbar_button
-    # images_toolbar_button.click
+    images_toolbar_button.click
   end
 
   def click_course_images
-    # course_images.click
+    course_images.click
+    wait_for_ajaximations
   end
 end

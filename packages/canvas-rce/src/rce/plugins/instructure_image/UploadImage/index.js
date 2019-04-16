@@ -36,7 +36,7 @@ export function UploadImage(props) {
       shouldCloseOnDocumentClick
     >
       <ModalHeader>
-        <CloseButton onClick={props.onDismiss} offset="none" placement="end">
+        <CloseButton onClick={props.onDismiss} offset="medium" placement="end">
           {formatMessage('Close')}
         </CloseButton>
         <Heading>{formatMessage('Upload Image')}</Heading>

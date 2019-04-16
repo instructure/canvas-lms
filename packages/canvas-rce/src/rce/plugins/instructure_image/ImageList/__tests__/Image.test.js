@@ -16,15 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useRef} from 'react'
 import {fireEvent, render} from 'react-testing-library'
 
 import {renderImage} from '../../../../contentRendering'
 import Image from '../Image'
 
-describe('RCE "Image" Plugin > Image', () => {
-  let props
+describe('RCE "Images" Plugin > Image', () => {
   let component
+  let props
 
   beforeEach(() => {
     props = {
@@ -36,16 +36,23 @@ describe('RCE "Image" Plugin > Image', () => {
         preview_url: 'http://canvas.rce/images/preview/example.png',
         thumbnail_url: 'http://canvas.rce/images/thumbnail/example.png'
       },
-      onImageEmbed: jest.fn()
+      onClick: jest.fn()
     }
   })
 
-  function renderComponent() {
-    component = render(<Image {...props} />)
+  function SpecComponent() {
+    // `useRef()` can only be used within a component render
+    props.focusRef = useRef(null)
+
+    return <Image {...props} />
   }
 
-  function getAnchor() {
-    return component.container.querySelector('a')
+  function renderComponent() {
+    component = render(<SpecComponent />)
+  }
+
+  function getFocusable() {
+    return component.container.querySelector('a,button')
   }
 
   function getImage() {
@@ -72,18 +79,29 @@ describe('RCE "Image" Plugin > Image', () => {
     expect(getImage().getAttribute('title')).toMatch(props.image.display_name)
   })
 
+  it('forwards the .focusRef prop to the anchor component', () => {
+    renderComponent()
+    expect(props.focusRef.current).toEqual(getFocusable())
+  })
+
   describe('when clicked', () => {
-    it('calls the .onImageEmbed prop', () => {
+    it('calls the .onClick prop', () => {
       renderComponent()
       fireEvent.click(getImage())
-      expect(props.onImageEmbed).toHaveBeenCalledTimes(1)
+      expect(props.onClick).toHaveBeenCalledTimes(1)
+    })
+
+    it('includes the .image prop when calling the .onClick prop', () => {
+      renderComponent()
+      fireEvent.click(getImage())
+      expect(props.onClick).toHaveBeenCalledWith(props.image)
     })
 
     it('prevents the default click handler', () => {
       const preventDefault = jest.fn()
       renderComponent()
       // Override preventDefault before event reaches image
-      getAnchor().addEventListener(
+      getFocusable().addEventListener(
         'click',
         event => {
           Object.assign(event, {preventDefault})

@@ -16,51 +16,48 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Component} from 'react'
-import {array, bool, func, shape} from 'prop-types'
+import React from 'react'
+import {arrayOf, func, instanceOf, shape} from 'prop-types'
+import {Flex, FlexItem} from '@instructure/ui-layout'
 
-import LoadMore from '../../../../common/components/LoadMore'
 import Image from './Image'
 
-export default class ImageList extends Component {
-  componentWillMount() {
-    this.props.fetchImages({calledFromRender: true})
-  }
+export default function ImageList({images, lastItemRef, onImageClick}) {
+  return (
+    <Flex
+      justifyItems="start"
+      height="100%"
+      margin="xx-small"
+      padding="small"
+      wrapItems
+    >
+      {images.map((image, index) => {
+        let focusRef = null
+        if (index === images.length - 1) {
+          focusRef = lastItemRef
+        }
 
-  render() {
-    return (
-      <div style={{maxHeight: '300px', overflow: 'auto'}}>
-        <div style={{clear: 'both'}}>
-          <LoadMore
-            focusSelector=".img_link"
-            hasMore={this.props.images.hasMore}
-            isLoading={this.props.images.isLoading}
-            loadMore={this.props.fetchImages}
+        return (
+          <FlexItem
+            as="div"
+            key={'image-' + image.id}
+            margin="xx-small xx-small small xx-small"
+            size="6rem"
           >
-            <div style={{width: '100%'}}>
-              {this.props.images.records.map(image => (
-                <Image
-                  image={image}
-                  key={'image-' + image.id}
-                  onImageEmbed={this.props.onImageEmbed}
-                />
-              ))}
-            </div>
-          </LoadMore>
-        </div>
-      </div>
-    )
-  }
+            <Image focusRef={focusRef} image={image} onClick={onImageClick} />
+          </FlexItem>
+        )
+      })}
+    </Flex>
+  )
 }
 
 ImageList.propTypes = {
-  fetchImages: func.isRequired,
-  images: shape({
-    records: array.isRequired,
-    isLoading: bool.isRequired,
-    hasMore: bool.isRequired
-  }),
-  onImageEmbed: func.isRequired
+  images: arrayOf(Image.propTypes.image),
+  lastItemRef: shape({
+    current: instanceOf(Element)
+  }).isRequired,
+  onImageClick: func.isRequired
 }
 
 ImageList.defaultProps = {
