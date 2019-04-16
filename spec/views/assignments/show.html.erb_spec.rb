@@ -51,14 +51,14 @@ describe "/assignments/show" do
           render 'assignments/show'
           expect(response).to have_tag("div#assignment_show")
           expect(response).not_to have_tag("a#toggle_assignments_2")
-          expect(response).not_to have_tag("div#assignments_2")
+          expect(response).not_to have_tag("div#content")
         end
 
         it "shows the old assignments page even with query parameter" do
           allow(view).to receive(:params).and_return({assignments_2: "1"})
           render 'assignments/show'
           expect(response).to have_tag("div#assignment_show")
-          expect(response).not_to have_tag("div#assignments_2")
+          expect(response).not_to have_tag("div#content")
           expect(response).not_to have_tag("a#toggle_assignments_2")
         end
       end
@@ -72,14 +72,7 @@ describe "/assignments/show" do
           render 'assignments/show'
           expect(response).to have_tag("a#toggle_assignments_2")
           expect(response).to have_tag("div#assignment_show")
-          expect(response).not_to have_tag("div#assignments_2")
-        end
-
-        it "shows the assignments_2 page when the query parameter is present" do
-          allow(view).to receive(:params).and_return({assignments_2: "1"})
-          render 'assignments/show'
-          expect(response).to have_tag("div#assignments_2")
-          expect(response).not_to have_tag("div#assignment_show")
+          expect(response).not_to have_tag("div#content")
         end
       end
     end
@@ -98,15 +91,15 @@ describe "/assignments/show" do
         it "does not show the new assignments toggle button" do
           render 'assignments/show'
           expect(response).to have_tag("div#assignment_show")
-          expect(response).not_to have_tag("a#toggle_assignments_2")
-          expect(response).not_to have_tag("div#assignments_2")
+          expect(response).not_to have_tag("a#toggle_content")
+          expect(response).not_to have_tag("div#content")
         end
 
         it "shows the old assignments page even with query parameter" do
           allow(view).to receive(:params).and_return({assignments_2: "1"})
           render 'assignments/show'
           expect(response).to have_tag("div#assignment_show")
-          expect(response).not_to have_tag("div#assignments_2")
+          expect(response).not_to have_tag("div#content")
           expect(response).not_to have_tag("a#toggle_assignments_2")
         end
       end
@@ -120,14 +113,7 @@ describe "/assignments/show" do
           render 'assignments/show'
           expect(response).to have_tag("a#toggle_assignments_2")
           expect(response).to have_tag("div#assignment_show")
-          expect(response).not_to have_tag("div#assignments_2")
-        end
-
-        it "shows the assignments 2 page when the query parameter is present" do
-          allow(view).to receive(:params).and_return({assignments_2: "1"})
-          render 'assignments/show'
-          expect(response).to have_tag("div#assignments_2")
-          expect(response).not_to have_tag("div#assignment_show")
+          expect(response).not_to have_tag("div#content")
         end
       end
     end
