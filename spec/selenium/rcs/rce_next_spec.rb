@@ -305,5 +305,28 @@ describe "RCE next tests" do
         expect(wiki_body_image.attribute('src')).to include course_file_id_path(@image)
       end
     end
+
+    it "should display assignment publish status in links accordion" do
+      skip('Unskip in CORE-2619')
+      title = "Assignment-Title"
+      @assignment = @course.assignments.create!(:name => title, :status => published)
+
+      visit_new_announcement_page(@course)
+
+      click_links_toolbar_button
+      click_course_links
+      click_assignments_accordion
+
+      expect(assignment_published_status).to be_displayed
+
+      @assignment.save!(:status => unpublished)
+      visit_new_announcement_page(@course)
+
+      click_links_toolbar_button
+      click_course_links
+      click_assignments_accordion
+
+      expect(assignment_unpublished_status).to be_displayed
+    end
   end
 end

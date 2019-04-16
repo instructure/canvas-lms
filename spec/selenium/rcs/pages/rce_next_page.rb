@@ -121,15 +121,15 @@ module RCENextPage
   end
 
   def list_toggle_button
-    
+    # put side arrow to switch list locator here
   end
 
   def bullet_list_button
-
+    # put bullet list button locator here
   end
 
   def numbered_list_button
-
+    # put numbered list button locator here
   end
 
   def editor_window
@@ -231,11 +231,11 @@ module RCENextPage
   end
 
   def click_links_toolbar_button
-    # links_toolbar_button.click
+    links_toolbar_button.click
   end
 
   def click_course_links
-    # course_links.click
+    course_links.click
   end
 
   def click_images_toolbar_button
@@ -264,43 +264,43 @@ module RCENextPage
   end
 
   def click_indent_toggle_button
-    # indent_toggle_button.click
+    indent_toggle_button.click
   end
 
   def click_indent_button
-    # indent_button.click
+    indent_button.click
   end
 
   def click_outdent_button
-    # outdent_button.click
+    outdent_button.click
   end
 
   def click_super_toggle_button
-    # super_toggle_button.click
+    super_toggle_button.click
   end
 
   def click_superscript_button
-    # superscript_button.click
+    superscript_button.click
   end
 
   def click_subscript_button
-    # subscript_button.click
+    subscript_button.click
   end
 
   def click_align_toggle_button
-    # align_toggle_button.click
+    align_toggle_button.click
   end
 
   def click_align_left_button
-    # align_left_button.click
+    align_left_button.click
   end
 
   def click_align_center_button
-    # align_center_button.click
+    align_center_button.click
   end
 
   def click_align_right_button
-    # align_right_button.click
+    align_right_button.click
   end
 
   def click_editor_window
