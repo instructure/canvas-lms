@@ -96,6 +96,7 @@ describe ContextModuleProgression do
       @module.publish
       expect(ContextModuleProgression.prerequisites_satisfied?(@user, @module2)).to eq false
       @module.unpublish
+      @module2.reload
       expect(ContextModuleProgression.prerequisites_satisfied?(@user, @module2)).to eq true
     end
   end

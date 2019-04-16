@@ -375,6 +375,21 @@ class ContextModule < ActiveRecord::Base
     end
   end
 
+  def prerequisites
+    @prerequisites ||= gather_prerequisites(self.context.context_modules.not_deleted)
+  end
+
+  def active_prerequisites
+    @active_prerequisites ||= gather_prerequisites(self.context.context_modules.active)
+  end
+
+  def gather_prerequisites(scope)
+    all_prereqs = read_attribute(:prerequisites)
+    return [] unless all_prereqs&.any?
+    active_ids = scope.where(:id => all_prereqs.pluck(:id)).pluck(:id)
+    all_prereqs.select{|pre| active_ids.member?(pre[:id])}
+  end
+
   def prerequisites=(prereqs)
     if prereqs.is_a?(Array)
       # validate format, skipping invalid ones
@@ -397,6 +412,8 @@ class ContextModule < ActiveRecord::Base
     else
       prereqs = nil
     end
+    @prerequisites = nil
+    @active_prerequisites = nil
     write_attribute(:prerequisites, prereqs)
   end
 
@@ -523,6 +540,8 @@ class ContextModule < ActiveRecord::Base
   end
 
   def reload
+    @prerequisites = nil
+    @active_prerequisites = nil
     clear_cached_lookups
     super
   end
@@ -695,13 +714,6 @@ class ContextModule < ActiveRecord::Base
     else
       nil
     end
-  end
-
-  def active_prerequisites
-    return [] unless self.prerequisites.any?
-    prereq_ids = self.prerequisites.select{|pre|pre[:type] == 'context_module'}.map{|pre| pre[:id] }
-    active_ids = self.context.context_modules.active.where(:id => prereq_ids).pluck(:id)
-    self.prerequisites.select{|pre| pre[:type] == 'context_module' && active_ids.member?(pre[:id])}
   end
 
   def confirm_valid_requirements(do_save=false)

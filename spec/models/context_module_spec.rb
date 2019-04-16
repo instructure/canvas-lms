@@ -154,7 +154,7 @@ describe ContextModule do
     expect(new_module.content_tags[3].url).to eq('http://www.instructure.com')
     expect(new_module.content_tags[3].new_tab).to eq(true)
     expect(new_module.unlock_at).to be_nil
-    expect(new_module.prerequisites).to be_nil
+    expect(new_module.prerequisites).to eq []
   end
 
   describe "available_for?" do
@@ -185,7 +185,8 @@ describe ContextModule do
     it "should reevaluate progressions if a tag is not provided and deep_check_if_needed is given" do
       module1 = course_module
       module1.find_or_create_progression(@student)
-      module2 = course_module
+      module1.save!
+      module2 = @course.context_modules.create!(:name => "some module")
       url_item = module2.content_tags.create!(content_type: 'ExternalUrl', context: @course,
         title: 'url', url: 'https://www.google.com')
       module2.completion_requirements = [{id: url_item.id, type: 'must_view'}]
@@ -256,6 +257,21 @@ describe ContextModule do
       expect(@module2.prerequisites).not_to be_empty
       expect(@module2.prerequisites[0][:id]).to eql(@module.id)
       expect(@module2.prerequisites.length).to eql(1)
+    end
+
+    it "should remove itself as a requirement when deleted" do
+      course_module
+      @module2 = @course.context_modules.build(:name => "next module")
+      @module2.prerequisites = "module_#{@module.id}"
+      @module2.save!
+
+      expect(@module2.prerequisites).to be_is_a(Array)
+      expect(@module2.prerequisites).not_to be_empty
+      expect(@module2.prerequisites[0][:id]).to eq(@module.id)
+      @module.destroy
+      @module2 = ContextModule.find(@module2.id)
+      expect(@module2.prerequisites).to be_is_a(Array)
+      expect(@module2.prerequisites).to be_empty
     end
   end
 
