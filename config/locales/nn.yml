@@ -6459,6 +6459,7 @@ nn:
     no_user: "Ingen brukar"
     unnamed_tool: "Verktøy utan namn"
   developer_keys_d70ba44a: Utviklarnøklar
+  developers_keys_table_69ae6b7e: "Tabell for utviklarnøklar"
   dialog_form_wrapper: 
     cancel: Avbryt
     save_settings: "Lagre innstillingar"
@@ -7066,6 +7067,7 @@ nn:
   enable_feature_title_987d8e9a: "Aktiver funksjon: %{title}"
   enable_gradebook_list_students_by_sortable_name: "Før opp studentane i liste etter sorterte namn i karakterbok. Standard sortering av namn er 'Etternamn, fornamn' og kan endrast i innstillingar."
   enable_gradezilla_name_is_only_a_placeholder_as_it_34afd9f1: "Aktiver Gradezilla (namnet er kun mellombels og skal erstatte karakterbok i framtida)."
+  enable_gravatar_8a865b41: "Slå på Gravatar"
   enable_moderated_grading_bacd20d8: "Slå på moderert vurdering."
   enable_multiple_grading_periods: |-
       Fleire karaktersetjingsperiodar gjer at faglærarar og administratorar kan opprette karaktersetjingsperiodar med fastsette
@@ -9992,6 +9994,7 @@ nn:
       new_tab_loaded: "Verktøyet er lasta opp i eit nytt nettlesarvindu. Om du vil bruke verktøyet, må du laste opp sida på nytt."
   lti2: 
     register_tool: "Registrer verktøyet"
+  lti_1_3_configuration_c3534f3b: "LTI 1.3-konfigurasjon"
   lti_2_reregistration_afabde25: "Ny registrering av LTI 2"
   lti_add_and_edit_a359d8da: "LTI legg til og rediger"
   lti_key_14ad02b1: LTI-nøkkel
@@ -12177,6 +12180,7 @@ nn:
   not_all_sections_will_be_assigned_this_item_4e2b8eaa: "Ikkje alle seksjonane blir tildelte dette elementet."
   not_anonymously_graded_87574f91: "Ikkje anonymt karaktersett"
   not_available_487d3648: "Ikkje tilgjengeleg"
+  not_available_at_the_subaccount_level_3fc74ab: "Ikkje tilgjengeleg på underkontonivå."
   not_available_during_sync_ae645e8c: "Utilgjengeleg under synkronisering"
   not_available_until_next_submission_2175158: "Ikkje tilgjengeleg før neste innlevering"
   not_completed_55fb4c00: "Ikkje fullført"
@@ -12677,7 +12681,7 @@ nn:
       close_rating: OK
       criterion_rating_points: "Poeng for kriterievurdering"
       delete_criterion: Slett
-      edit_criterion_rating_title: "Rediger \"%{description} kriterievurdering"
+      edit_criterion_rating_title: "Rediger \"%{description}\" kriterievurdering"
       insert_criterion_rating: "Set inn kriterievurdering"
       insert_rating: "Set inn"
       points: Poeng
@@ -13476,6 +13480,8 @@ nn:
   proceed_f3d33864: Fortsett
   processing_2fcc9739: Handsamar
   product_name: Canvas
+  proficiency_rating_deleted_77827473: "Ferdigheitsnivå sletta"
+  proficiency_ratings_2bbabdcd: Ferdigheitsnivå
   profile: 
     access_token: 
       default_app_name: "Ingen app"
@@ -13787,6 +13793,7 @@ nn:
   provides_users_with_a_to_do_list_dashboard_option_9334f9fa: "Gi brukarane gjeremålsliste som dashbordval."
   provision_a_catalog_account_8cea67f6: "Klargjer ein Canvas Catalog-konto"
   provision_a_quiz_next_service_c7c6bd87: "Sett opp Quiz.Next-teneste"
+  provisional_grade_selected_416db903: "Mellombels vurdering vald"
   provisioned_catalog_account_26339afd: "Klargjord Canvas Catalog-konto"
   provisioning_only_7c0e5911: "Kun for klargjering"
   provisioning_title: Klargjering
@@ -14098,7 +14105,7 @@ nn:
       discrimination_index: Vurderingsliste
       discrimination_index_dialog_title: Vurderingslistediagram
       discrimination_index_dialog_trigger: "Lær meir om vurderingslista."
-    discrimination_index_help: "* Diagrammet viser i kva grad eit enkelt spørsmål kan seie noko om forskjellen mellom (eller plukke ut) studentar som gjer det bra på eksamen og dei som ikkje gjer det. * ** Studentane er delte inn i tre grupper basert på resultatet for heile quizen, og sorterer gruppene etter kven som har svart rett på spørsmålet. ** *** ****Meir informasjon finn du her.**** ***"
+    discrimination_index_help: "* Diagrammet viser i kva grad eit enkelt spørsmål kan seie noko om forskjellen mellom (eller plukke ut) studentar som gjer det bra på eksamen og dei som ikkje gjer det. * ** Studentane er delte inn i tre grupper basert på resultatet for heile quizen, og sorterer gruppene etter kven som har svart rett på spørsmålet. ** *** ****Lær meir om quizstatistikk.**** ***"
     download_submissions: "Last ned alle filer"
     duration_in_hours: 
       one: "1 time"
@@ -16895,6 +16902,7 @@ nn:
   student_assignment_outcome_map_title: Studentkompetanse
   student_collaborations_create_b9e312c1: "Studentsamarbeid - opprett"
   student_context_card_ad59967e: Studentkontekstkort
+  student_context_cards_must_be_enabled_for_an_accou_f84169cb: "Studentkontekstkort må vere slått på for ein konto av ein admin."
   student_details_49901ceb: Studentdetaljar
   student_extensions_d35a907: "Utvidingar for studentar"
   student_grades_4cbc59a1: Studentkarakterar
@@ -17339,6 +17347,7 @@ nn:
   terms_not_found_terms_must_be_included_with_multi__ca2e5c25: "Finn ikkje semester. Semester må vere inkludert i multi_term_batch_mode"
   terms_of_service_attributes_not_valid_f3f9fca9: "Attributtar knytta til vilkår for bruk er ugyldig"
   terms_of_service_f183ff7f: "Vilkår for bruk"
+  test_cluster_only_70e61c19: "Kun for test"
   testing_state_effd4a82: "Testar status"
   text_document_eacbcdb7: Tekstdokument
   text_entry_e1808b2f: "Tekstinnlegging i editor"
@@ -17846,14 +17855,19 @@ nn:
   to_edit_a_student_s_section_users_add_remove_stude_1f188d80: |-
       For å endre seksjonen til ein student, må 'Brukarar - legg til / fjern studentar i emne' og 'Brukarar - sjå liste' begge vere slått på.
       For å endre seksjonen til ein faglærar, kursdesigner eller undervisingsassistent må 'Brukarar - legg til / fjern faglærarar, kursdesignere eller undervisingsassistentar i emne' og 'Brukarar - sjå liste' begge vere slått på.
+  to_generate_a_pairing_code_from_a_student_s_user_d_9c907ed3: "For å generere ein paringskode frå sida brukardetaljar, må løyva 'Personar - legg til / fjern studentar i emne' òg vere slått på."
   to_link_the_course_observer_name_to_a_student_star_f993c826: "Om du vil lenke emneobservatøren *%{name}* til ein student, kan du skrive og finne studenten sitt namn nedanfor og deretter klikke på Oppdater."
   to_minscore_43e5452e: "to %{minScore}%"
+  to_moderate_a_quiz_assignments_and_quizzes_add_edi_bd8aada1: |-
+      For å moderere ein quiz, må 'Oppgåver og Quizar - legg til / endre / slett' òg vere slått på..
+      For å sjå kolonna for brukar-SIS-ID i CSV-fila til quizelementanalyse, må 'SIS-data - les' òg vere slått på.
   to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "Dersom du vil feste ein diskusjon øvst på sida, kan du dra ein diskusjon dit eller velje Fest i innstillingsmenyen."
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: "For å førehandvise endringar i temaredigeringsprogrammet, må du *slå av høgkontrast-UI*."
   to_restrict_to_users_from_a_specific_clever_distri_dc3b89fb: "For å avgrense tilgangen til brukarar frå eit spesifikt Clever-district, legg inn kvart distrikt sine Clever-ID-ar her. Det er eit krav for at Clever Instant Login kan fungere i eit multi-tenar-miljø. "
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: "For å hindre brukartilgong til spesifikke Google Apps-domene, list domena her."
   to_restrict_to_users_of_your_azure_active_director_df7cdd41: "For å avgrense tilgangen til berre Azure Active Directory-brukarar, registrer tenaren her. "
   to_view_all_notifications_sent_to_a_canvas_user_se_6172daa: "Dersom du vil sjå alle varslingane som er sende til ein Canvas-brukar, må du markere brukaren og datointervallet for søket."
+  to_view_the_account_people_page_users_view_list_mu_f44cef80: "For å sjå sida Personar under konto, må 'Personar - sjå liste' vere slått på. Dersom denne løyva er slått av, men 'Personar - sjå login-ID-ar' er slått på, vil brukarar framleis sjå e-postadressa som login-ID. "
   today_76e10f9c: "I dag"
   toggle_course_card_color_overlays_b5b8137a: "Slå av/på fargelag på emnekort"
   toggle_editing_answer_text_as_html_9a93fe6: "Bytt tekst for redigeringssvar til HTML"
