@@ -17,7 +17,6 @@
 
 import I18n from "i18n!context_modules";
 
-import $ from "jquery";
 import Backbone from "Backbone";
 import template from "jst/modules/ProgressionModuleView";
 

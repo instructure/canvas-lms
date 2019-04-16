@@ -17,11 +17,7 @@
 
 // does Rails-style flash message/error boxes that drop down from the top of the screen
 import $ from 'jquery'
-import _ from 'underscore'
-import preventDefault from './fn/preventDefault'
-import htmlEscape from 'str/htmlEscape'
 import NotificationsHelper from 'jsx/railsFlashNotificationsHelper'
-import 'jqueryui/effects/drop'
 import 'jquery.cookie'
 
 const helper = new NotificationsHelper()

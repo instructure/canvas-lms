@@ -18,8 +18,6 @@
 
 import $ from 'jquery'
 import _ from 'underscore'
-import React from 'react'
-import ReactDOM from 'react-dom'
 import preventDefault from 'compiled/fn/preventDefault'
 import PublishButtonView from 'compiled/views/PublishButtonView'
 import PublishIconView from 'compiled/views/PublishIconView'

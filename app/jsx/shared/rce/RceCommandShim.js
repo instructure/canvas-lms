@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import $ from 'jquery'
-
 // for each command, there are three possibilities:
 //
 //   .data('remoteEditor') is set:

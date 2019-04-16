@@ -17,9 +17,8 @@
  */
 
 import _ from 'underscore'
-import redux from 'redux'
 import { handleActions } from 'redux-actions'
-import {actions, actionTypes} from '../actions'
+import {actionTypes} from '../actions'
 import {defaultState} from '../store'
 
   // helpers -------------------------------

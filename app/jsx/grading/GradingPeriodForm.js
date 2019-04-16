@@ -24,7 +24,6 @@ import _ from 'underscore'
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import I18n from 'i18n!external_tools'
 import DueDateCalendarPicker from '../due_dates/DueDateCalendarPicker'
-import accessibleDateFormat from '../shared/helpers/accessibleDateFormat'
 import numberHelper from '../shared/helpers/numberHelper'
 import round from 'compiled/util/round'
 

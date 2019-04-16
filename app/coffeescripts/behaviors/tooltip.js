@@ -31,7 +31,6 @@
 //     button with tooltip
 //   </button>
 
-import _ from 'underscore'
 import $ from 'jquery'
 import htmlEscape from 'str/htmlEscape'
 import sanitizeHtml from 'jsx/shared/sanitizeHtml'

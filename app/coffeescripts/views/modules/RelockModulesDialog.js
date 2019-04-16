@@ -18,7 +18,6 @@
 import I18n from "i18n!modules";
 
 import $ from "jquery";
-import _ from "underscore";
 import DialogBaseView from "../DialogBaseView";
 import template from "jst/modules/RelockModulesDialog";
 

@@ -17,7 +17,6 @@
 
 import I18n from 'i18n!editor_accessibility'
 import $ from 'jquery'
-import htmlEscape from 'str/htmlEscape'
 
 // #
 // Used to insert accessibility titles into core TinyMCE components

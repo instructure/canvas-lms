@@ -18,8 +18,6 @@
 import $ from 'jquery'
 import {View} from 'Backbone'
 import template from 'jst/groups/manage/group'
-import GroupUsersView from './GroupUsersView'
-import GroupDetailView from './GroupDetailView'
 import GroupCategoryCloneView from './GroupCategoryCloneView'
 import groupHasSubmissions from '../../../util/groupHasSubmissions'
 

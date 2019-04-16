@@ -22,7 +22,6 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import select from '../../shared/select'
-import {showFlashAlert} from '../../shared/FlashAlert'
 
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import Text from '@instructure/ui-elements/lib/components/Text'

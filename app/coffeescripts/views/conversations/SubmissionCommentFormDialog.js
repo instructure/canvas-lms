@@ -23,11 +23,7 @@ import 'Backbone'
 import DialogBaseView from '../DialogBaseView'
 import template from 'jst/conversations/SubmissionCommentFormDialog'
 import composeTitleBarTemplate from 'jst/conversations/composeTitleBar'
-import composeButtonBarTemplate from 'jst/conversations/composeButtonBar'
 import Message from '../../models/Message'
-import AutocompleteView from './AutocompleteView'
-import CourseSelectionView from './CourseSelectionView'
-import ContextMessagesView from './ContextMessagesView'
 import 'jquery.elastic'
 
 // #

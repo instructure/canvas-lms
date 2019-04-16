@@ -26,7 +26,7 @@ import outcomeTemplate from 'jst/outcomes/outcome'
 import outcomeFormTemplate from 'jst/outcomes/outcomeForm'
 import criterionTemplate from 'jst/outcomes/_criterion'
 import criterionHeaderTemplate from 'jst/outcomes/_criterionHeader'
-import confirmOutcomeEditModal, {showConfirmOutcomeEdit} from 'jsx/outcomes/ConfirmOutcomeEditModal'
+import {showConfirmOutcomeEdit} from 'jsx/outcomes/ConfirmOutcomeEditModal'
 import { addCriterionInfoButton } from 'jsx/outcomes/CriterionInfo'
 import 'jqueryui/dialog'
 
