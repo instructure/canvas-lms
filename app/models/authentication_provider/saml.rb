@@ -277,6 +277,11 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
                                                            SAML2::Bindings::HTTPRedirect::URN)
        end
        idp.fingerprints = (certificate_fingerprint || '').split.presence
+       # temporary; no way to set this via UI or API, but some IdPs require it.
+       # TODO: just store the full IdP metadata, but lock out all other fields when we do so
+       Array.wrap(settings[:signing_certificates]).each do |cert|
+         idp.keys << SAML2::KeyDescriptor.new(cert, SAML2::KeyDescriptor::Type::SIGNING)
+       end
        entity.roles << idp
        entity
     end
