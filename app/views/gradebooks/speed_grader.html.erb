@@ -15,6 +15,9 @@
 <% content_for :page_title, t(:page_title, "%{assignment_name}, SpeedGrader, %{course_name}", :assignment_name => @assignment.title, :course_name => @context.name) %>
 
 <script>
+
+var currentlyHighlightedForTime = null;
+
 function highlightSince(timestamp) {
   var innerDocument = document.querySelector("#iframe_holder iframe");
   if(innerDocument == null) {
@@ -23,7 +26,7 @@ function highlightSince(timestamp) {
   }
   innerDocument = innerDocument.contentDocument;
   var list = innerDocument.querySelectorAll("[data-time-updated]");
-  var firstFound;
+  var firstFound = null;
   for(var i = 0; i < list.length; i++) {
     var e = list[i];
 
@@ -32,8 +35,12 @@ function highlightSince(timestamp) {
     else {
       if(e.getAttribute("data-time-updated") >= timestamp) {
         e.classList.add("highlighted-for-time");
-        if(firstFound == null)
+        if(firstFound == null) {
           firstFound = e;
+          try { currentlyHighlightedForTime.classList.remove("currently-highlighted-for-time"); } catch(e) {}
+          currentlyHighlightedForTime = e;
+          currentlyHighlightedForTime.classList.add("currently-highlighted-for-time");
+        }
       } else {
         e.classList.remove("highlighted-for-time");
       }
@@ -42,6 +49,26 @@ function highlightSince(timestamp) {
 
   if(firstFound)
     firstFound.scrollIntoView();
+}
+
+function cycleHighlight() {
+  var innerDocument = document.querySelector("#iframe_holder iframe");
+  if(innerDocument == null) {
+    alert("View the assignment with inline answers first.");
+    return;
+  }
+  innerDocument = innerDocument.contentDocument;
+  var list = innerDocument.querySelectorAll(".highlighted-for-time");
+  for(var i = 0; i < list.length; i++) {
+    if(currentlyHighlightedForTime == null || currentlyHighlightedForTime == list[i]) {
+      var n = ((i + 1) < list.length) ? list[i + 1] : list[0];
+      try { currentlyHighlightedForTime.classList.remove("currently-highlighted-for-time"); } catch(e) {}
+      currentlyHighlightedForTime = n;
+      currentlyHighlightedForTime.classList.add("currently-highlighted-for-time");
+      n.scrollIntoView();
+      break;
+    }
+  }
 }
 
 function viewAssignmentWithInlineAnswers(link) {
@@ -62,7 +89,6 @@ function bzSpeedGraderSubmissionsCallback(submissionHistory) {
   select.innerHTML = "<option value=\"0\">Nothing special</option>";
   for(var i = 0; i < submissionHistory.length; i++) {
     var s = submissionHistory[i].submission;
-console.log(s.submitted_at);
     var d = new Date(s.submitted_at);
     var option = document.createElement("option");
     option.value = d.getTime() / 1000;
@@ -271,8 +297,8 @@ function viewAssignmentAudit(link) {
             Highlight changes since:
               <select id="highlight-changes" onchange="highlightSince(this.value);">
                 <option value="0">Nothing special</option>
-                <option value="1555429032">Another time</option>
               </select>
+              <button type="button" onclick="cycleHighlight();">show next highlight</button>
 
             <% if @assignment.name.starts_with? "Course Participation -" %>
               <%
