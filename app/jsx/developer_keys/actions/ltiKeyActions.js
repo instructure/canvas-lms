@@ -84,6 +84,12 @@ actions.saveLtiToolConfigurationSuccessful = payload => ({
   payload
 })
 
+actions.LTI_CONFIGURATION_METHOD = 'LTI_CONFIGURATION_METHOD'
+actions.setLtiConfigurationMethod = payload => ({
+  type: actions.LTI_CONFIGURATION_METHOD,
+  payload
+})
+
 actions.saveLtiToolConfiguration = ({
   account_id,
   settings,
