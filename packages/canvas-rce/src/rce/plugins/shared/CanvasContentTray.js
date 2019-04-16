@@ -17,7 +17,7 @@
  */
 
 import React, {Suspense, useEffect, useState} from 'react'
-import {bool, func, instanceOf, oneOf} from 'prop-types'
+import {bool, func, instanceOf, shape, string} from 'prop-types'
 import {Tray} from '@instructure/ui-overlays'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Heading, Spinner} from '@instructure/ui-elements'
@@ -58,7 +58,7 @@ function getTrayLabel({contentType, contentSubtype}) {
  * @param {string} filterSettings.contentSubtype - The current subtype of
  * content loaded in the tray
  */
-function loadTrayContent({contentType, contentSubtype}) {
+function loadTrayContent({contentSubtype}) {
   switch (contentSubtype) {
     case 'images':
       return React.lazy(() => import('../instructure_image/Images'))
@@ -88,6 +88,10 @@ export default function CanvasContentTray(props) {
 
   useEffect(() => {
     const controller = {
+      hideTray() {
+        setIsOpen(false)
+      },
+
       showTrayForPlugin(plugin) {
         setFilterSettings(FILTER_SETTINGS_BY_PLUGIN[plugin])
         setIsOpen(true)
@@ -139,6 +143,37 @@ export default function CanvasContentTray(props) {
   )
 }
 
+function requiredWithoutSource(props, propName, componentName) {
+  if (props.source == null && props[propName] == null) {
+    throw new Error(`The prop \`${propName}\` is marked as required in \`${componentName}\`, but its value is \`${props[propName]}\`.`)
+  }
+}
+
+const trayPropsMap = {
+  canUploadFiles: bool.isRequired,
+  contextId: string.isRequired,
+  contextType: string.isRequired,
+  filesTabDisabled: bool,
+  host: requiredWithoutSource,
+  jwt: requiredWithoutSource,
+  refreshToken: func,
+  source: shape({
+    fetchImages: func.isRequired
+  }),
+  themeUrl: string
+}
+
+export const trayProps = shape(trayPropsMap)
+
 CanvasContentTray.propTypes = {
   bridge: instanceOf(Bridge).isRequired,
+  ...trayPropsMap
+}
+
+CanvasContentTray.defaultProps = {
+  canUploadFiles: false,
+  filesTabDisabled: false,
+  refreshToken: null,
+  source: null,
+  themeUrl: null
 }

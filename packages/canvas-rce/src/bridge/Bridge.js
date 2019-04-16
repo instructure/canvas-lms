@@ -98,6 +98,9 @@ export default class Bridge {
         range: selection.getRng()
       };
       this.focusedEditor.insertLink(link);
+      if (this.controller) {
+        this.controller.hideTray()
+      }
     } else {
       console.warn("clicked sidebar link without a focused editor");
     }
@@ -106,6 +109,9 @@ export default class Bridge {
   insertImage(image) {
     if (this.focusedEditor) {
       this.focusedEditor.insertImage(image);
+      if (this.controller) {
+        this.controller.hideTray()
+      }
     } else {
       console.warn("clicked sidebar image without a focused editor");
     }

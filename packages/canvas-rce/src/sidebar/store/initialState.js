@@ -58,7 +58,7 @@ export default function(props = {}) {
   props = { ...props, contextType };
 
   // default to API source
-  if (source === undefined) {
+  if (source == null) {
     source = new RceApiSource({
       jwt: jwt,
       refreshToken: refreshToken,

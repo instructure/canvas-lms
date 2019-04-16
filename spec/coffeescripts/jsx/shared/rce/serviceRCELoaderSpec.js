@@ -64,6 +64,8 @@ test('handles callbacks once module is loaded', assert => {
 
 QUnit.module('loadOnTarget', {
   setup() {
+    fakeENV.setup()
+    ENV.context_asset_string = 'courses_1'
     fixtures.setup()
     this.$div = fixtures.create('<div><textarea id="theTarget" name="elementName" /></div>')
     this.$textarea = fixtures.find('#theTarget')
@@ -82,6 +84,7 @@ QUnit.module('loadOnTarget', {
   teardown() {
     fixtures.teardown()
     RCELoader.loadRCE.restore()
+    fakeENV.teardown()
   }
 })
 

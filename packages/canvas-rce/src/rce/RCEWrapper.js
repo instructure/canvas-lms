@@ -17,14 +17,15 @@
  */
 
 import PropTypes from "prop-types";
-
 import React from "react";
 import ReactDOM from "react-dom";
 import TinyMCE from "react-tinymce";
+
 import * as contentInsertion from "./contentInsertion";
 import indicatorRegion from "./indicatorRegion";
 import indicate from "../common/indicate";
 import Bridge from "../bridge";
+import CanvasContentTray, {trayProps} from './plugins/shared/CanvasContentTray'
 
 const editorWrappers = new WeakMap();
 
@@ -255,32 +256,43 @@ export default class RCEWrapper extends React.Component {
   }
 
   render() {
+    const {trayProps, ...mceProps} = this.props
+
     return (
-      <TinyMCE
-        ref="rce"
-        id={this.props.textareaId}
-        tinymce={this.props.tinymce}
-        className={this.props.textareaClassName}
-        onPreInit={this.annotateEditor.bind(this)}
-        onClick={this.onFocus.bind(this)}
-        onKeypress={this.onFocus.bind(this)}
-        onActivate={this.onFocus.bind(this)}
-        onRemove={this.onRemove.bind(this)}
-        content={this.props.defaultContent}
-        config={this.wrapOptions(this.props.editorOptions)}
-      />
+      <>
+        <TinyMCE
+          ref="rce"
+          id={mceProps.textareaId}
+          tinymce={mceProps.tinymce}
+          className={mceProps.textareaClassName}
+          onPreInit={this.annotateEditor.bind(this)}
+          onClick={this.onFocus.bind(this)}
+          onKeypress={this.onFocus.bind(this)}
+          onActivate={this.onFocus.bind(this)}
+          onRemove={this.onRemove.bind(this)}
+          content={mceProps.defaultContent}
+          config={this.wrapOptions(mceProps.editorOptions)}
+        />
+
+        <CanvasContentTray bridge={Bridge} {...trayProps} />
+      </>
     );
   }
 }
 
 RCEWrapper.propTypes = {
   defaultContent: PropTypes.string,
-  language: PropTypes.string,
-  tinymce: PropTypes.object,
-  textareaId: PropTypes.string,
-  textareaClassName: PropTypes.string,
   editorOptions: PropTypes.object,
+  handleUnmount: PropTypes.func,
+  language: PropTypes.string,
   onFocus: PropTypes.func,
   onRemove: PropTypes.func,
-  handleUnmount: PropTypes.func
+  textareaClassName: PropTypes.string,
+  textareaId: PropTypes.string,
+  tinymce: PropTypes.object,
+  trayProps
 };
+
+RCEWrapper.defaultProps = {
+  trayProps: null
+}
