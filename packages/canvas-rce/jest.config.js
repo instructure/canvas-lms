@@ -18,6 +18,7 @@
 
 module.exports = {
   setupFiles: [
+    'jest-canvas-mock',
     '<rootDir>/jest/jest-setup.js'
   ],
   setupFilesAfterEnv: ['<rootDir>/jest/jest-setup-framework.js'],

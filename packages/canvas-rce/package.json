@@ -178,6 +178,7 @@
     "format-message-cli": "^6",
     "format-message-parse": "^6",
     "jest": "^24",
+    "jest-canvas-mock": "^1",
     "jsdom": "^13.0.0",
     "jsdom-global": "^3.0.2",
     "jsdomify": "^3",
