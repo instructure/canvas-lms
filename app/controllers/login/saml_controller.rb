@@ -305,7 +305,7 @@ class Login::SamlController < ApplicationController
     # This needs to be publicly available since external SAML
     # servers need to be able to access it without being authenticated.
     # It is used to disclose our SAML configuration settings.
-    metadata = AuthenticationProvider::SAML.sp_metadata_for_account(@domain_root_account, request.host_with_port)
+    metadata = AuthenticationProvider::SAML.sp_metadata_for_account(@domain_root_account, request.host_with_port, include_all_encryption_certificates: false)
     render xml: metadata.to_xml
   end
 

@@ -287,7 +287,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     end
   end
 
-  def self.sp_metadata(entity_id, hosts)
+  def self.sp_metadata(entity_id, hosts, include_all_encryption_certificates: true)
     app_config = config
 
     entity = SAML2::Entity.new
@@ -311,12 +311,14 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     encryption = app_config[:encryption]
 
     if encryption.is_a?(Hash)
+      first_cert = true
       Array.wrap(encryption[:certificate]).each do |path|
         cert_path = resolve_saml_key_path(path)
         next unless cert_path
 
         cert = File.read(cert_path)
-        sp.keys << SAML2::Key.new(cert, SAML2::Key::Type::ENCRYPTION, [SAML2::Key::EncryptionMethod.new])
+        sp.keys << SAML2::Key.new(cert, SAML2::Key::Type::ENCRYPTION, [SAML2::Key::EncryptionMethod.new]) if first_cert || include_all_encryption_certificates
+        first_cert = false
         sp.keys << SAML2::Key.new(cert, SAML2::Key::Type::SIGNING)
       end
     end
@@ -356,8 +358,10 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     forward_url
   end
 
-  def self.sp_metadata_for_account(account, current_host = nil)
-    entity = sp_metadata(saml_default_entity_id_for_account(account),HostUrl.context_hosts(account, current_host))
+  def self.sp_metadata_for_account(account, current_host = nil, include_all_encryption_certificates: true)
+    entity = sp_metadata(saml_default_entity_id_for_account(account),
+                         HostUrl.context_hosts(account, current_host),
+                         include_all_encryption_certificates: include_all_encryption_certificates)
     prior_configs = Set.new
     account.authentication_providers.active.where(auth_type: 'saml').each do |ap|
       federated_attributes = ap.federated_attributes
