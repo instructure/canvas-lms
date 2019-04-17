@@ -399,9 +399,14 @@ module Lti
           settings: settings
         }
       end
+      let(:tool_configuration) { described_class.create_tool_and_key!(account, params) }
 
       it 'creates a dev key' do
         expect { described_class.create_tool_and_key! account, params }.to change(DeveloperKey, :count).by(1)
+      end
+
+      it 'correctly sets custom_fields' do
+        expect(tool_configuration.settings['custom_fields']).to eq settings['custom_fields']
       end
 
       context 'when tool_config creation fails' do
