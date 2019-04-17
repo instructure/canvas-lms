@@ -670,6 +670,14 @@ class ActiveRecord::Base
 
   def self.bulk_insert(records)
     return if records.empty?
+    array_columns = records.first.select{|k, v| v.is_a?(Array)}.map(&:first)
+    array_columns.each do |column_name|
+      cast_type = connection.send(:lookup_cast_type_from_column, self.columns_hash[column_name.to_s])
+      records.each do |row|
+        row[column_name] = cast_type.serialize(row[column_name])
+      end
+    end
+
     transaction do
       connection.bulk_insert(table_name, records)
     end

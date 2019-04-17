@@ -339,13 +339,15 @@ describe ActiveRecord::Base do
     end
 
     it "should handle arrays" do
+      arr1 = ['1, 2', 3, 'string with "quotes"', "another 'string'", "a fancy strîng"]
+      arr2 = ['4', '5;', nil, "string with \t tab and \n newline and slash \\"]
       DeveloperKey.bulk_insert [
-        {name: "bulk_insert_1", workflow_state: "registered", redirect_uris: ['1, 2', 3]},
-        {name: "bulk_insert_2", workflow_state: "registered", redirect_uris: ['4', '5', nil]}
+        {name: "bulk_insert_1", workflow_state: "registered", redirect_uris: arr1},
+        {name: "bulk_insert_2", workflow_state: "registered", redirect_uris: arr2}
       ]
       names = DeveloperKey.order(:name).pluck(:redirect_uris)
-      expect(names).to be_include(['1, 2', '3'])
-      expect(names).to be_include(['4', '5', nil])
+      expect(names).to be_include(arr1.map(&:to_s))
+      expect(names).to be_include(arr2)
     end
 
     it "should not raise an error if there are no records" do
