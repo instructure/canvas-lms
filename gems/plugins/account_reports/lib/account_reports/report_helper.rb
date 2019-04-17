@@ -316,7 +316,8 @@ module AccountReports::ReportHelper
   end
 
   def build_report_row(row:, row_number: nil, report_runner:)
-    report_runner.account_report_rows.new(row: row,
+    # force all fields to strings
+    report_runner.account_report_rows.new(row: row.map { |field| field&.to_s&.encode(Encoding::UTF_8) },
                                           row_number: row_number,
                                           account_report_id: report_runner.account_report_id,
                                           account_report_runner: report_runner,
