@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2019 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,208 +16,87 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {bool, func, node, object, string} from "prop-types";
+import React from 'react';
+import {bool, func, string} from 'prop-types';
+import formatMessage from '../../../../format-message';
 
-import React from "react";
-import ToggleDetails from "@instructure/ui-toggle-details/lib/components/ToggleDetails";
-import View from "@instructure/ui-layout/lib/components/View";
-import LinkSet from "./LinkSet";
-import NavigationPanel from "./NavigationPanel";
-import LinkToNewPage from "./LinkToNewPage";
-import formatMessage from "../../../../format-message";
+import {collectionsShape} from './propTypes'
+import NavigationPanel from './NavigationPanel';
+import CollectionPanel from './CollectionPanel'
 
-function AccordionSection({
-  collection,
-  children,
-  onChangeAccordion,
-  selectedAccordionIndex,
-  summary
-}) {
-  return (
-    <View as="div" margin="xx-small none">
-      <ToggleDetails
-        variant="filled"
-        summary={summary}
-        expanded={selectedAccordionIndex === collection}
-        onToggle={(e, expanded) => onChangeAccordion(expanded ? collection : "")}
-      >
-        <div style={{maxHeight: '20em', overflow: 'auto'}}>{children}</div>
-      </ToggleDetails>
-    </View>
-  );
-}
-
-AccordionSection.propTypes = {
-  collection: string.isRequired,
-  children: node.isRequired,
-  onChangeAccordion: func.isRequired,
-  selectedAccordionIndex: string,
-  summary: ToggleDetails.propTypes.summary
-};
-
-function CollectionPanel(props) {
-  return (
-    <AccordionSection {...props}>
-      <LinkSet
-        fetchInitialPage={
-          props.fetchInitialPage &&
-          (() => props.fetchInitialPage(props.collection))
-        }
-        fetchNextPage={
-          props.fetchNextPage && (() => props.fetchNextPage(props.collection))
-        }
-        collection={props.collections[props.collection]}
-        onLinkClick={props.onLinkClick}
-        suppressRenderEmpty={props.suppressRenderEmpty}
-      />
-      {props.renderNewPageLink && (
-        <LinkToNewPage
-          onLinkClick={props.onLinkClick}
-          toggleNewPageForm={props.toggleNewPageForm}
-          newPageLinkExpanded={props.newPageLinkExpanded}
-          contextId={props.contextId}
-          contextType={props.contextType}
-        />
-      )}
-    </AccordionSection>
-  );
-}
-
-CollectionPanel.propTypes = {
-  contextId: string.isRequired,
-  contextType: string.isRequired,
-  collections: object.isRequired,
-  collection: string.isRequired,
-  renderNewPageLink: bool,
-  suppressRenderEmpty: bool,
-  fetchInitialPage: func,
-  fetchNextPage: func,
-  onLinkClick: func,
-  newPageLinkExpanded: bool,
-  toggleNewPageForm: func
-};
-
-CollectionPanel.defaultProps = {
-  renderNewPageLink: false,
-  suppressRenderEmpty: false
-};
+import {View} from '@instructure/ui-layout'
+import {pickProps} from '@instructure/ui-utils/lib/react/passthroughProps'
 
 function LinksPanel(props) {
   const isCourse = props.contextType === "course";
   const isGroup = props.contextType === "group";
 
-  let navigationSummary = ''
-  let panelDescription = ''
-  if(isCourse) {
-    navigationSummary = formatMessage({
-      default: "Course Navigation",
-      description:
-        "Title of Sidebar accordion tab containing links to course pages."
-    })
-    panelDescription = formatMessage("Link to other content in the course.")
-  } else if (isGroup) {
-    navigationSummary =formatMessage({
-      default: "Group Navigation",
-      description:
-        "Title of Sidebar accordion tab containing links to group pages."
-    })
-    panelDescription = formatMessage("Link to other content in the group.")
-  }
+  const collectionProps = pickProps(props, CollectionPanel.propTypes)
 
   return (
-    <div>
-      <p>
-        {panelDescription}
-        {formatMessage("Click any page to insert a link to that page.")}
-      </p>
-      <div>
-        {(isCourse || isGroup) && (
-          <CollectionPanel
-            {...props}
-            collection="wikiPages"
-            summary={formatMessage({
-              default: "Pages",
-              description:
-                "Title of Sidebar accordion tab containing links to wiki pages."
-            })}
-            renderNewPageLink={props.canCreatePages !== false}
-            suppressRenderEmpty={props.canCreatePages !== false}
-          />
-        )}
+    <View
+      as="div"
+      margin="small 0 0 0"
+      data-testid="instructure_links-LinksPanel"
+    >
+      {(isCourse || isGroup) && (
+        <CollectionPanel
+          {...collectionProps}
+          collection="wikiPages"
+          label={formatMessage('Pages')}
+          renderNewPageLink={!props.canCreatePages}
+          suppressRenderEmpty={!props.canCreatePages}
+        />
+      )}
 
-        {isCourse && (
-          <CollectionPanel
-            {...props}
-            collection="assignments"
-            summary={formatMessage({
-              default: "Assignments",
-              description:
-                "Title of Sidebar accordion tab containing links to assignments."
-            })}
-          />
-        )}
+      {isCourse && (
+        <CollectionPanel
+          {...collectionProps}
+          collection="assignments"
+          label={formatMessage("Assignments")}
+        />
+      )}
 
-        {isCourse && (
-          <CollectionPanel
-            {...props}
-            collection="quizzes"
-            summary={formatMessage({
-              default: "Quizzes",
-              description:
-                "Title of Sidebar accordion tab containing links to quizzes."
-            })}
-          />
-        )}
+      {isCourse && (
+        <CollectionPanel
+          {...collectionProps}
+          collection="quizzes"
+          label={formatMessage("Quizzes")}
+        />
+      )}
 
-        {(isCourse || isGroup) && (
-          <CollectionPanel
-            {...props}
-            collection="announcements"
-            summary={formatMessage({
-              default: "Announcements",
-              description:
-                "Title of Sidebar accordion tab containing links to announcements."
-            })}
-          />
-        )}
+      {(isCourse || isGroup) && (
+        <CollectionPanel
+          {...collectionProps}
+          collection="announcements"
+          label={formatMessage("Announcements")}
+        />
+      )}
 
-        {(isCourse || isGroup) && (
-          <CollectionPanel
-            {...props}
-            collection="discussions"
-            summary={formatMessage({
-              default: "Discussions",
-              description:
-                "Title of Sidebar accordion tab containing links to discussions."
-            })}
-          />
-        )}
+      {(isCourse || isGroup) && (
+        <CollectionPanel
+          {...collectionProps}
+          collection="discussions"
+          label={formatMessage("Discussions")}
+        />
+      )}
 
-        {isCourse && (
-          <CollectionPanel
-            {...props}
-            collection="modules"
-            summary={formatMessage({
-              default: "Modules",
-              description:
-                "Title of Sidebar accordion tab containing links to course modules."
-            })}
-          />
-        )}
+      {isCourse && (
+        <CollectionPanel
+          {...collectionProps}
+          collection="modules"
+          label={formatMessage("Modules")}
+        />
+      )}
 
-        <AccordionSection
-          {...props}
-          collection="navigation"
-          summary={navigationSummary}
-        >
-          <NavigationPanel
-            contextType={props.contextType}
-            contextId={props.contextId}
-            onLinkClick={props.onLinkClick}
-          />
-        </AccordionSection>
-      </div>
-    </div>
+      <NavigationPanel
+        contextType={props.contextType}
+        contextId={props.contextId}
+        onLinkClick={props.onLinkClick}
+        onChangeAccordion={props.onChangeAccordion}
+        selectedAccordionIndex={props.selectedAccordionIndex}
+      />
+    </View>
   );
 }
 
@@ -226,12 +105,10 @@ LinksPanel.propTypes = {
   onChangeAccordion: func,
   contextType: string.isRequired,
   contextId: string.isRequired,
-  collections: object.isRequired,
+  collections: collectionsShape.isRequired,
   fetchInitialPage: func,
   fetchNextPage: func,
   onLinkClick: func,
-  toggleNewPageForm: LinkToNewPage.propTypes.toggleNewPageForm,
-  newPageLinkExpanded: bool,
   canCreatePages: bool
 };
 

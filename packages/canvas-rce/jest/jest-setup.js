@@ -16,6 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+ // src/plugins/instructure_links/components/LinkSet uses aphrodite, which
+ // tries to manipulate the dom on a timer which expires after the test
+ // completes and the document no longer exists
+import {StyleSheetTestUtils} from 'aphrodite'
+StyleSheetTestUtils.suppressStyleInjection()
+
 // because InstUI themeable components need an explicit "dir" attribute on the <html> element
 document.documentElement.setAttribute('dir', 'ltr')
 

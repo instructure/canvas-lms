@@ -92,13 +92,12 @@ export default function CanvasContentTray(props) {
 
   useEffect(() => {
     const controller = {
-      hideTray() {
-        setIsOpen(false)
-      },
-
       showTrayForPlugin(plugin) {
         setFilterSettings(FILTER_SETTINGS_BY_PLUGIN[plugin])
         setIsOpen(true)
+      },
+      hideTray() {
+        setIsOpen(false)
       }
     }
 

@@ -16,22 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import PropTypes from "prop-types";
 
 import React, { Component } from "react";
-import { renderLink as renderLinkHtml } from "../../../../rce/contentRendering";
-import dragHtml from "../../../../sidebar/dragHtml";
+import {bool, func} from "prop-types";
+import {linksShape, linkType} from './propTypes'
 import formatMessage from "../../../../format-message";
-import LoadMore from "../../../../common/components/LoadMore";
+import LoadMoreButton from '../../../../common/components/LoadMoreButton'
 import ScreenReaderContent from "@instructure/ui-a11y/lib/components/ScreenReaderContent";
+import {List, ListItem, Spinner} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-layout'
 import uid from '@instructure/uid'
-import { StyleSheet, css } from "aphrodite";
 
+import Link from './Link'
 
 class LinkSet extends Component {
   constructor(props) {
     super(props);
     this.describedByID = `rce-LinkSet-describedBy-${uid()}`;
+    this.loadMoreButtonRef = null
+    this.lastLinkRef = null
+    this.listRef = null
   }
 
   componentWillMount() {
@@ -40,74 +44,68 @@ class LinkSet extends Component {
     }
   }
 
-  handleLinkClick = (e, link) => {
-    if (this.props.onLinkClick) {
-      e.preventDefault();
-      this.props.onLinkClick(link);
-      e.target.focus()
+  componentDidUpdate(prevProps) {
+    if (!this.props.collection.isLoading) {
+      if (this.hasLinks(prevProps) && !this.hasFocus()) {
+        this.lastLinkRef && this.lastLinkRef.focus()
+      }
     }
-  };
-
-  handleDragStart = (ev, link) => {
-    dragHtml(ev, renderLinkHtml(link));
-  };
+  }
 
   handleLoadMoreClick = e => {
     e.preventDefault();
     if (this.props.fetchNextPage) {
       this.props.fetchNextPage();
     }
-  };
-
-  hasLinks() {
-    return this.props.collection.links.length > 0;
   }
 
-  isEmpty() {
+  hasFocus() {
+    return this.listRef.contains(document.activeElemnt)
+  }
+  hasLinks(props) {
+    return props.collection.links.length > 0
+  }
+
+  isEmpty(props) {
     return (
-      !this.hasLinks() &&
-      !this.props.collection.hasMore &&
-      !this.props.collection.isLoading
+      !this.hasLinks(props) &&
+      !props.collection.hasMore &&
+      !props.collection.isLoading
     );
   }
 
-  renderLink(link) {
+  renderLink(link, index, allLinks) {
+    const linkRef = index === allLinks.length-1 ? el => this.lastLinkRef = el : null
+
     return (
-      <li
-        key={link.href}
-        title={formatMessage("Click to insert a link to this item.")}
-        className={css(styles.item)}
-      >
-        <a
-          href={link.href}
-          className={css(styles.link)}
-          role="button"
-          aria-describedby={this.describedByID}
-          onClick={e => this.handleLinkClick(e, link)}
-          onDragStart={e => this.handleDragStart(e, link)}
-        >
-          {link.title}
-        </a>
-      </li>
+      <ListItem key={link.href} spacing="none" padding="0">
+        <Link
+          link={link}
+          type={this.props.type}
+          onClick={this.props.onLinkClick}
+          describedByID={this.describedByID}
+          elementRef={linkRef}
+        />
+      </ListItem>
     );
   }
 
   renderLinks() {
     return (
-      <div>
+      <>
         <ScreenReaderContent id={this.describedByID}>
           {formatMessage("Click to insert a link into the editor.")}
         </ScreenReaderContent>
-        <ul className={css(styles.list)}>
+        <List variant="unstyled" as="ul" margin="0" elementRef={el => this.listRef = el}>
           {this.props.collection.links.map(this.renderLink, this)}
-        </ul>
-      </div>
+        </List>
+      </>
     );
   }
 
   renderEmptyIndicator() {
     return (
-      <span className="rcs-LinkSet-Empty">{formatMessage("No results.")}</span>
+      <View as="div" padding="medium">{formatMessage("No results.")}</View>
     );
   }
 
@@ -126,66 +124,46 @@ class LinkSet extends Component {
     if (this.props.fetchNextPage) {
       let hasMore = this.props.collection.hasMore || false;
       let isLoading = this.props.collection.isLoading || false;
+      const showInitialLoadingIndicator = !this.hasLinks(this.props) && isLoading
+      const showLoadMoreButton = this.hasLinks(this.props) && hasMore
+
       return (
-        <div>
-          <LoadMore
-            hasMore={hasMore}
-            isLoading={isLoading}
-            loadMore={this.props.fetchNextPage}
-            focusSelector="li>a"
-          >
-            {this.hasLinks() && this.renderLinks()}
-            {this.renderLoadingError()}
-          </LoadMore>
-          {this.isEmpty() &&
-            !(this.props.suppressRenderEmpty || false) &&
+        <div data-testid="instructure_links-LinkSet">
+          {showInitialLoadingIndicator && (
+            <View as="div" margin="medium" textAlign="center">
+              <Spinner size="small" title={formatMessage('Loading...')} />
+            </View>
+          )}
+
+          {this.hasLinks(this.props) && this.renderLinks()}
+          {this.renderLoadingError()}
+
+          {showLoadMoreButton && (
+            <View margin="x-small medium medium medium">
+              <LoadMoreButton
+                isLoading={isLoading}
+                onLoadMore={this.props.fetchNextPage}
+              />
+            </View>
+          )}
+
+          {this.isEmpty(this.props) &&
+            !this.props.suppressRenderEmpty &&
             this.renderEmptyIndicator()}
         </div>
       );
     }
-    return (
-      <div>
-        {this.hasLinks() ? this.renderLinks() : this.renderEmptyIndicator()}
-      </div>
-    );
+    return this.hasLinks(this.props) ? this.renderLinks() : this.renderEmptyIndicator()
   }
 }
 
 LinkSet.propTypes = {
-  collection: PropTypes.shape({
-    links: PropTypes.array.isRequired,
-    isLoading: PropTypes.bool,
-    hasMore: PropTypes.bool,
-    lastError: PropTypes.object
-  }).isRequired,
-  fetchInitialPage: PropTypes.func,
-  fetchNextPage: PropTypes.func,
-  onLinkClick: PropTypes.func,
-  suppressRenderEmpty: PropTypes.bool
-};
-
-const styles = StyleSheet.create({
-  list: {
-    margin: 0,
-    padding: 0,
-    listStyle: "none"
-  },
-  item: {
-    margin: 0,
-    padding: 0,
-    display: "block",
-    backgroundPosition: "left center",
-    backgroundRepeat: "no-repeat",
-    width: "100%",
-    ":hover": {
-      backgroundColor: "#eee"
-    }
-  },
-  link: {
-    display: "block",
-    padding: "3px 5px",
-    textAlign: "left"
-  }
-});
+  type: linkType.isRequired,
+  collection: linksShape.isRequired,
+  onLinkClick: func.isRequired,
+  fetchInitialPage: func,
+  fetchNextPage: func,
+  suppressRenderEmpty: bool
+}
 
 export default LinkSet;

@@ -238,7 +238,7 @@ export default class RCEWrapper extends React.Component {
       toolbar: [
         'fontsizeselect formatselect | bold italic underline forecolor backcolor superscript ' +
         'subscript | align bullist outdent indent | ' +
-        'link unlink | instructure_image instructure_record | ' +
+        'instructure_links instructure_image instructure_record | ' +
         'removeformat table instructure_equation instructure_equella'
       ],
 

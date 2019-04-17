@@ -164,7 +164,7 @@ class LinkToNewPage extends Component {
 
 LinkToNewPage.propTypes = {
   onLinkClick: PropTypes.func,
-  toggleNewPageForm: PropTypes.func.isRequired,
+  toggleNewPageForm: PropTypes.func,
   newPageLinkExpanded: PropTypes.bool,
   contextId: PropTypes.string.isRequired,
   contextType: PropTypes.string.isRequired

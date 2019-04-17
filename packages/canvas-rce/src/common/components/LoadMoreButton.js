@@ -53,7 +53,7 @@ export default function LoadMoreButton({buttonRef, isLoading, onLoadMore}) {
 LoadMoreButton.propTypes = {
   buttonRef: shape({
     current: instanceOf(Element)
-  }).isRequired,
+  }),
   isLoading: bool.isRequired,
   onLoadMore: func.isRequired
 }

@@ -22,8 +22,8 @@ const PAGES = {
   // page of announcements
   announcements: {
     links: [
-      { href: "/courses/1/announcements", title: "Announcements List" },
-      { href: "/courses/1/announcements/2", title: "Announcement 2" },
+      { href: "/courses/1/announcements", title: "Announcements List", date: '2018-04-22T13:00:00Z', date_type: 'posted' },
+      { href: "/courses/1/announcements/2", title: "Announcement 2", date: '2018-04-22T13:00:00Z', date_type: 'delayed_post' },
       { href: "/courses/1/announcements/1", title: "Announcement 1" }
     ],
     bookmark: null
@@ -32,11 +32,11 @@ const PAGES = {
   // first page of assignments
   assignments: {
     links: [
-      { href: "/courses/1/assignments", title: "Assignment List" },
-      { href: "/courses/1/assignments/1", title: "Assignment 1" },
-      { href: "/courses/1/assignments/2", title: "Assignment 2" },
-      { href: "/courses/1/assignments/3", title: "Assignment 3" },
-      { href: "/courses/1/assignments/4", title: "Quiz 1" }
+      { href: "/courses/1/assignments", title: "Assignment List", published: true, date: '2018-04-22T13:00:00Z', date_type: 'due' },
+      { href: "/courses/1/assignments/1", title: "Assignment 1", published: false, date: '2018-04-22T13:00:00Z', date_type: 'due' },
+      { href: "/courses/1/assignments/2", title: "Assignment 2", published: false, date: null, date_type: null },
+      { href: "/courses/1/assignments/3", title: "Assignment 3", published: true, date: '2018-04-22T13:00:00Z', date_type: 'due' },
+      { href: "/courses/1/assignments/4", title: "Quiz 1", published: true }
     ],
     // refers to second page of assignments
     bookmark: "assignments2"
@@ -45,8 +45,8 @@ const PAGES = {
   // second page of assignments
   assignments2: {
     links: [
-      { href: "/courses/1/assignments/5", title: "Quiz 2" },
-      { href: "/courses/1/assignments/6", title: "Quiz 3" }
+      { href: "/courses/1/assignments/5", title: "Quiz 2", published: false, date: '2018-04-22T13:00:00Z', date_type: 'due' },
+      { href: "/courses/1/assignments/6", title: "Quiz 3", published: true, date: '2018-04-22T13:00:00Z', date_type: 'due' }
     ],
     bookmark: null
   },
@@ -54,11 +54,11 @@ const PAGES = {
   // page of discussions
   discussions: {
     links: [
-      { href: "/courses/1/discussion_topics", title: "Discussion Index" },
-      { href: "/courses/1/discussion_topics/4", title: "Discussion 2" },
-      { href: "/courses/1/discussion_topics/3", title: "Discussion 1" },
-      { href: "/courses/1/discussion_topics/2", title: "Announcement 2" },
-      { href: "/courses/1/discussion_topics/1", title: "Announcement 1" }
+      { href: "/courses/1/discussion_topics", title: "Discussion Index", published: false, date: '2018-04-22T13:00:00Z', date_type: 'due' },
+      { href: "/courses/1/discussion_topics/4", title: "Discussion 2", published: true, date: '2018-04-22T13:00:00Z', date_type: 'todo' },
+      { href: "/courses/1/discussion_topics/3", title: "Discussion 1", published: true , date: '2018-04-22T13:00:00Z', date_type: 'todo'},
+      { href: "/courses/1/discussion_topics/2", title: "Announcement 2", published: false, date: null, date_type: null },
+      { href: "/courses/1/discussion_topics/1", title: "Announcement 1", published: true, date: '2018-04-22T13:00:00Z', date_type: 'due' }
     ],
     // intentionally referring to page that doesn't exist to test failure mode
     bookmark: "discussions2"
@@ -67,9 +67,9 @@ const PAGES = {
   // page of modules
   modules: {
     links: [
-      { href: "/courses/1/modules", title: "Modules List" },
-      { href: "/courses/1/modules/2", title: "Module 2" },
-      { href: "/courses/1/modules/1", title: "Module 1" }
+      { href: "/courses/1/modules", title: "Modules List", published: true, date: '2018-04-22T13:00:00Z', date_type: 'published' },
+      { href: "/courses/1/modules/2", title: "Module 2", published: false, date: null, date_type: 'published' },
+      { href: "/courses/1/modules/1", title: "Module 1", published: true, date: '2018-04-22T13:00:00Z', date_type: 'published' }
     ],
     bookmark: null
   },
@@ -83,8 +83,8 @@ const PAGES = {
   // page of wiki pages
   wikiPages: {
     links: [
-      { href: "/courses/1/pages/wiki-page-1", title: "Wiki Page 1" },
-      { href: "/courses/1/pages/wiki-page-2", title: "Wiki Page 2" }
+      { href: "/courses/1/pages/wiki-page-1", title: "Wiki Page 1", published: true, date: '2018-04-22T13:00:00Z', date_type: 'todo' },
+      { href: "/courses/1/pages/wiki-page-2", title: "Wiki Page 2", published: false, date: null, date_type: 'todo' }
     ],
     bookmark: null
   },
