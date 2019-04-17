@@ -70,7 +70,7 @@ module Lti
     def group_index
       users = Api.paginate(group.participating_users, self, lti_user_group_index_url)
       user_json_preloads(users)
-      UserPastLtiIds.manual_preload_past_lti_ids(users, group.context)
+      UserPastLtiId.manual_preload_past_lti_ids(users, group.context)
       render json: users.map { |user| user_json(user, user, nil, USER_INCLUDES, group.context) }
     end
 

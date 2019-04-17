@@ -132,7 +132,7 @@ describe Lti::Messages::JwtMessage do
     end
 
     it 'sets the "sub" claim to past lti_id' do
-      UserPastLtiIds.create!(user: user, context: course, user_lti_id: 'old_lti_id', user_lti_context_id: 'old_lti_id', user_uuid: 'old')
+      UserPastLtiId.create!(user: user, context: course, user_lti_id: 'old_lti_id', user_lti_context_id: 'old_lti_id', user_uuid: 'old')
       expect(decoded_jwt['sub']).to eq 'old_lti_id'
     end
 

@@ -126,7 +126,7 @@ class SplitUsers
 
   def restore_merge_items
     Shard.with_each_shard(restored_user.associated_shards + restored_user.associated_shards(:weak) + restored_user.associated_shards(:shadow)) do
-      UserPastLtiIds.where(user: restored_user, user_lti_id: restored_user.lti_id).delete_all
+      UserPastLtiId.where(user: source_user, user_lti_id: restored_user.lti_id).delete_all
     end
     source_user.shard.activate do
       ConversationParticipant.where(id: merge_data.items.where(item_type: 'conversation_ids').take&.item).find_each {|c| c.move_to_user(restored_user)}

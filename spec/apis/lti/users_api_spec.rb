@@ -102,7 +102,7 @@ module Lti
         end
 
         it 'returns a user by old lti id' do
-          UserPastLtiIds.create!(user: student, context: course, user_lti_id: student.lti_id, user_lti_context_id: 'old_lti_id', user_uuid: 'old')
+          UserPastLtiId.create!(user: student, context: course, user_lti_id: student.lti_id, user_lti_context_id: 'old_lti_id', user_uuid: 'old')
           get canvas_id_endpoint, params: {id: 'old_lti_id'}, headers: request_headers
           parsed_body = JSON.parse(response.body)
           new_expected_student = expected_student

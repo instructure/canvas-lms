@@ -84,7 +84,7 @@ module Lti::MembershipService
         it 'sends old_id when present' do
           Lti::Asset.opaque_identifier_for(@teacher)
           collator = CourseLisPersonCollator.new(@course, @teacher)
-          UserPastLtiIds.create!(user: @teacher, context: @course, user_lti_id: @teacher.lti_id, user_lti_context_id: 'old_lti_id', user_uuid: 'old')
+          UserPastLtiId.create!(user: @teacher, context: @course, user_lti_id: @teacher.lti_id, user_lti_context_id: 'old_lti_id', user_uuid: 'old')
           memberships = collator.memberships(context: @course)
           expect(memberships[0].member.user_id).to eq('old_lti_id')
         end

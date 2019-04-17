@@ -728,7 +728,7 @@ class GroupsController < ApplicationController
 
     includes = Array(params[:include])
     users = Api.paginate(users, self, api_v1_group_users_url)
-    UserPastLtiIds.manual_preload_past_lti_ids(users, @context) if ['uuid', 'lti_id'].any? { |id| includes.include? id }
+    UserPastLtiId.manual_preload_past_lti_ids(users, @context) if ['uuid', 'lti_id'].any? { |id| includes.include? id }
     json_users = users_json(users, @current_user, session, includes, @context, nil, Array(params[:exclude]))
 
     if includes.include?('group_submissions') && @context.context_type == "Course"

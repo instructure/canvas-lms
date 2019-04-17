@@ -178,7 +178,7 @@ module Lti
     # Get a list of all attempts made for a submission, based on submission id.
     def history
       submissions = Submission.bulk_load_versioned_attachments(submission.submission_history)
-      UserPastLtiIds.manual_preload_past_lti_ids(submissions, submission.assignment.context)
+      UserPastLtiId.manual_preload_past_lti_ids(submissions, submission.assignment.context)
       render json: submissions.map { |s| api_json(s) }
     end
 

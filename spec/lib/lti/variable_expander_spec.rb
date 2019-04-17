@@ -1308,7 +1308,7 @@ module Lti
 
         it 'has substitution for $vnd.instructure.User.uuid and uses Past uuid' do
           allow(user).to receive(:uuid).and_return('N2ST123dQ9zyhurykTkBfXFa3Vn1RVyaw9Os6vu3')
-          UserPastLtiIds.create!(user: user, context: account, user_lti_id: 'old_lti_id', user_lti_context_id: 'old_lti_id', user_uuid: 'old_uuid')
+          UserPastLtiId.create!(user: user, context: account, user_lti_id: 'old_lti_id', user_lti_context_id: 'old_lti_id', user_uuid: 'old_uuid')
 
           exp_hash = {test: '$vnd.instructure.User.uuid'}
           variable_expander.expand_variables!(exp_hash)
