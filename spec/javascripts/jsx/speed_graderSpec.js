@@ -25,7 +25,6 @@ import SpeedGraderHelpers from 'speed_grader_helpers'
 import _ from 'underscore'
 import JQuerySelectorCache from 'jsx/shared/helpers/JQuerySelectorCache'
 import fakeENV from 'helpers/fakeENV'
-import natcompare from 'compiled/util/natcompare'
 import numberHelper from 'jsx/shared/helpers/numberHelper'
 import userSettings from 'compiled/userSettings'
 import htmlEscape from 'str/htmlEscape'
@@ -37,7 +36,10 @@ const {unescape} = htmlEscape
 const fixtures = document.getElementById('fixtures')
 const setupCurrentStudent = (historyBehavior = null) => SpeedGrader.EG.handleStudentChanged(historyBehavior)
 const requiredDOMFixtures = `
+  <div id="hide-assignment-grades-tray"></div>
+  <div id="post-assignment-grades-tray"></div>
   <div id="speed_grader_assessment_audit_tray_mount_point"></div>
+  <span id="speed_grader_post_grades_menu_mount_point"></span>
   <span id="speed_grader_settings_mount_point"></span>
   <div id="speed_grader_assessment_audit_button_mount_point"></div>
   <div id="speed_grader_submission_comments_download_mount_point"></div>
@@ -1777,6 +1779,74 @@ QUnit.module('SpeedGrader', suiteHooks => {
       test('includes .submission.score in the context', () => {
         strictEqual(context.submission.score, 9.1)
       })
+    })
+  })
+
+  QUnit.module('"Post Grades/Hide Grades"', hooks => {
+    function getPostAndHideGradesButton() {
+      return document.querySelector('span#speed_grader_post_grades_menu_mount_point button')
+    }
+
+    function getHideGradesMenuItem() {
+      return document.querySelector('[name="hideGrades"]')
+    }
+
+    function getPostGradesMenuItem() {
+      return document.querySelector('[name="postGrades"]')
+    }
+
+    let showHideAssignmentGradesTrayStub
+    let showPostAssignmentGradesTrayStub
+
+    const postedSubmission = {
+      id: '3001',
+      posted_at: new Date().toISOString(),
+      user_id: '1101'
+    }
+
+    const unpostedSubmission = {
+      id: '3002',
+      posted_at: null,
+      user_id: '1102'
+    }
+
+    const windowJsonData = {
+      anonymize_students: false,
+      grades_published_at: null,
+      moderated_grading: false,
+      id: '2301',
+      title: 'Assignment 1',
+      context: {
+        students: [{id: '1101'}, {id: '1102'}],
+        enrollments: [{user_id: '1101', course_section_id: '2001'}, {user_id: '1102', course_section_id: '2001'}],
+        active_course_sections: []
+      },
+      submissions: [postedSubmission, unpostedSubmission]
+    }
+
+    hooks.beforeEach(() => {
+      ENV.post_policies_enabled = true
+      window.jsonData = windowJsonData
+      SpeedGrader.EG.jsonReady()
+      showHideAssignmentGradesTrayStub = sinon.stub(SpeedGrader.EG.postPolicies, 'showHideAssignmentGradesTray')
+      showPostAssignmentGradesTrayStub = sinon.stub(SpeedGrader.EG.postPolicies, 'showPostAssignmentGradesTray')
+      getPostAndHideGradesButton().click()
+    })
+
+    hooks.afterEach(() => {
+      showPostAssignmentGradesTrayStub.restore()
+      showHideAssignmentGradesTrayStub.restore()
+      SpeedGrader.teardown()
+    })
+
+    test('shows the Post Assignment Grades Tray', () => {
+      getPostGradesMenuItem().click()
+      strictEqual(showPostAssignmentGradesTrayStub.callCount, 1)
+    })
+
+    test('shows the Hide Assignment Grades Tray', () => {
+      getHideGradesMenuItem().click()
+      strictEqual(showHideAssignmentGradesTrayStub.callCount, 1)
     })
   })
 })

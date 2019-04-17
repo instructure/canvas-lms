@@ -30,6 +30,7 @@ import numberHelper from 'jsx/shared/helpers/numberHelper'
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
 import AssessmentAuditButton from 'jsx/speed_grader/AssessmentAuditTray/components/AssessmentAuditButton'
 import AssessmentAuditTray from 'jsx/speed_grader/AssessmentAuditTray'
+import PostPolicies from 'jsx/speed_grader/PostPolicies'
 import SpeedGraderProvisionalGradeSelector from 'jsx/speed_grader/SpeedGraderProvisionalGradeSelector'
 import SpeedGraderPostGradesMenu from 'jsx/speed_grader/SpeedGraderPostGradesMenu'
 import SpeedGraderSettingsMenu from 'jsx/speed_grader/SpeedGraderSettingsMenu'
@@ -1345,6 +1346,17 @@ EG = {
       setupHandleStatePopped()
 
       if (ENV.post_policies_enabled) {
+        const {jsonData} = window
+
+        EG.postPolicies = new PostPolicies({
+          assignment: {
+            anonymizeStudents: jsonData.anonymize_students,
+            gradesPublished: !jsonData.moderated_grading || jsonData.grades_published_at != null,
+            id: jsonData.id,
+            name: jsonData.title
+          },
+          sections: jsonData.context.active_course_sections
+        })
         renderPostGradesMenu()
       }
     }
@@ -3637,8 +3649,12 @@ function renderPostGradesMenu() {
   const props = {
     allowHidingGrades,
     allowPostingGrades,
-    onHideGrades: () => {},
-    onPostGrades: () => {}
+    onHideGrades: () => {
+      EG.postPolicies.showHideAssignmentGradesTray({onExited: () => {}})
+    },
+    onPostGrades: () => {
+      EG.postPolicies.showPostAssignmentGradesTray({onExited: () => {}})
+    }
   }
 
   const postGradesMenu = <SpeedGraderPostGradesMenu {...props} />
@@ -3706,6 +3722,10 @@ export default {
   teardown() {
     if (ENV.can_view_audit_trail) {
       EG.tearDownAssessmentAuditTray()
+    }
+
+    if (EG.postPolicies) {
+      EG.postPolicies.destroy()
     }
 
     teardownHandleStatePopped()
