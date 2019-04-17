@@ -74,6 +74,18 @@
   "copyright_holder_66ee111": {
     "message": "版权持有者："
   },
+  "course_documents_104d76e0": {
+    "message": "课程文件"
+  },
+  "course_images_f8511d04": {
+    "message": "课程图像"
+  },
+  "course_links_b56959b9": {
+    "message": "课程链接"
+  },
+  "course_media_ec759ad": {
+    "message": "课程媒体"
+  },
   "course_navigation_dd035109": {
     "message": "课程导航"
   },
@@ -161,6 +173,9 @@
   "loading_25990131": {
     "message": "加载中……"
   },
+  "loading_bde52856": {
+    "message": "正在加载"
+  },
   "loading_failed_b3524381": {
     "message": "加载失败……"
   },
@@ -211,6 +226,9 @@
   },
   "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
     "message": "此上传文件超出了文件存储限额。请与您的系统管理员沟通。"
+  },
+  "tray_839df38a": {
+    "message": "托盘"
   },
   "upload_8b403d05": {
     "message": "上传"

@@ -74,6 +74,18 @@
   "copyright_holder_66ee111": {
     "message": "Rettighetshaver:"
   },
+  "course_documents_104d76e0": {
+    "message": "Emnedokumenter"
+  },
+  "course_images_f8511d04": {
+    "message": "Emnebilder"
+  },
+  "course_links_b56959b9": {
+    "message": "Emnelenker"
+  },
+  "course_media_ec759ad": {
+    "message": "Emnemedia"
+  },
   "course_navigation_dd035109": {
     "message": "Emnenavigering"
   },
@@ -161,6 +173,9 @@
   "loading_25990131": {
     "message": "Laster..."
   },
+  "loading_bde52856": {
+    "message": "Laster"
+  },
   "loading_failed_b3524381": {
     "message": "Lasting mislyktes..."
   },
@@ -211,6 +226,9 @@
   },
   "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
     "message": "Opplastingen overskrider kvoten på lagringsplassen. Vennligst kontakt systemadministratoren din."
+  },
+  "tray_839df38a": {
+    "message": "Brett"
   },
   "upload_8b403d05": {
     "message": "Last opp"

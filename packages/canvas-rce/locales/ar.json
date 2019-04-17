@@ -74,6 +74,18 @@
   "copyright_holder_66ee111": {
     "message": "مالك حقوق النشر:"
   },
+  "course_documents_104d76e0": {
+    "message": "مستندات المساق"
+  },
+  "course_images_f8511d04": {
+    "message": "صور المساق"
+  },
+  "course_links_b56959b9": {
+    "message": "روابط المساق"
+  },
+  "course_media_ec759ad": {
+    "message": "وسائط المساق"
+  },
   "course_navigation_dd035109": {
     "message": "التنقل عبر المساق"
   },
@@ -161,6 +173,9 @@
   "loading_25990131": {
     "message": "جارٍ التحميل..."
   },
+  "loading_bde52856": {
+    "message": "جارٍ التحميل"
+  },
   "loading_failed_b3524381": {
     "message": "فشل التحميل..."
   },
@@ -211,6 +226,9 @@
   },
   "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
     "message": "يتجاوز هذا التحميل حصة تخزين الملفات. يرجى التحدث إلى مسؤول النظام لديك."
+  },
+  "tray_839df38a": {
+    "message": "العلبة"
   },
   "upload_8b403d05": {
     "message": "تحميل"

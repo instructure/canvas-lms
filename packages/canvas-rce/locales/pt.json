@@ -74,6 +74,18 @@
   "copyright_holder_66ee111": {
     "message": "Titular dos direitos de autor:"
   },
+  "course_documents_104d76e0": {
+    "message": "Documentos da disciplina"
+  },
+  "course_images_f8511d04": {
+    "message": "Imagens da disciplina"
+  },
+  "course_links_b56959b9": {
+    "message": "Ligações da disciplina"
+  },
+  "course_media_ec759ad": {
+    "message": "Mídia da disciplina"
+  },
   "course_navigation_dd035109": {
     "message": "Navegação da disciplina"
   },
@@ -161,6 +173,9 @@
   "loading_25990131": {
     "message": "Carregando..."
   },
+  "loading_bde52856": {
+    "message": "A carregar"
+  },
   "loading_failed_b3524381": {
     "message": "A carregar falhou..."
   },
@@ -211,6 +226,9 @@
   },
   "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
     "message": "Esse carregamento excede a cota de armazenamento de ficheiro. Por favor, fale com o administrador do sistema."
+  },
+  "tray_839df38a": {
+    "message": "Bandeja"
   },
   "upload_8b403d05": {
     "message": "Upload"

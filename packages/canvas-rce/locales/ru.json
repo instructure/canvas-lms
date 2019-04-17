@@ -74,6 +74,18 @@
   "copyright_holder_66ee111": {
     "message": "Правообладатель:"
   },
+  "course_documents_104d76e0": {
+    "message": "Документы курса"
+  },
+  "course_images_f8511d04": {
+    "message": "Изображения курса"
+  },
+  "course_links_b56959b9": {
+    "message": "Ссылки курса"
+  },
+  "course_media_ec759ad": {
+    "message": "Мультимедиа курса"
+  },
   "course_navigation_dd035109": {
     "message": "Навигация курса"
   },
@@ -161,6 +173,9 @@
   "loading_25990131": {
     "message": "Загрузка..."
   },
+  "loading_bde52856": {
+    "message": "Загрузка"
+  },
   "loading_failed_b3524381": {
     "message": "Загрузка завершилась безрезультатно..."
   },
@@ -211,6 +226,9 @@
   },
   "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
     "message": "Эта загрузка превышает квоту на хранение файлов. Обратитесь к своему системному администратору."
+  },
+  "tray_839df38a": {
+    "message": "Лоток"
   },
   "upload_8b403d05": {
     "message": "Загрузить"

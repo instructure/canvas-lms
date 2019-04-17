@@ -74,6 +74,18 @@
   "copyright_holder_66ee111": {
     "message": "Handhafi höfundarréttar:"
   },
+  "course_documents_104d76e0": {
+    "message": "Skjöl námskeiðs"
+  },
+  "course_images_f8511d04": {
+    "message": "Myndir námskeiðs"
+  },
+  "course_links_b56959b9": {
+    "message": "Tenglar námskeiðs"
+  },
+  "course_media_ec759ad": {
+    "message": "Margmiðlunarefni námskeiðs"
+  },
   "course_navigation_dd035109": {
     "message": "Leiðarnet námskeiðs"
   },
@@ -161,6 +173,9 @@
   "loading_25990131": {
     "message": "Hleður..."
   },
+  "loading_bde52856": {
+    "message": "Sæki"
+  },
   "loading_failed_b3524381": {
     "message": "Mistókst að hlaða..."
   },
@@ -211,6 +226,9 @@
   },
   "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
     "message": "Þetta uppflutta efni er stærra en geymsluhluti skráa. Vinsamlegast hafðu samband við kerfisstjórnanda þinn."
+  },
+  "tray_839df38a": {
+    "message": "Bakki"
   },
   "upload_8b403d05": {
     "message": "Hlaða upp"

@@ -74,6 +74,18 @@
   "copyright_holder_66ee111": {
     "message": "Houder van auteursrecht:"
   },
+  "course_documents_104d76e0": {
+    "message": "Cursusdocumenten"
+  },
+  "course_images_f8511d04": {
+    "message": "Cursusafbeeldingen"
+  },
+  "course_links_b56959b9": {
+    "message": "Cursuslinks"
+  },
+  "course_media_ec759ad": {
+    "message": "Cursusmedia"
+  },
   "course_navigation_dd035109": {
     "message": "Cursusnavigatie"
   },
@@ -161,6 +173,9 @@
   "loading_25990131": {
     "message": "Bezig met laden..."
   },
+  "loading_bde52856": {
+    "message": "Bezig met laden"
+  },
   "loading_failed_b3524381": {
     "message": "Laden mislukt..."
   },
@@ -211,6 +226,9 @@
   },
   "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
     "message": "Met deze upload wordt het quotum voor bestandsopslag overschreden. Neem contact op met je systeembeheerder."
+  },
+  "tray_839df38a": {
+    "message": "Houder"
   },
   "upload_8b403d05": {
     "message": "Uploaden"

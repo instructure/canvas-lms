@@ -74,6 +74,18 @@
   "copyright_holder_66ee111": {
     "message": "Właściciel praw autorskich:"
   },
+  "course_documents_104d76e0": {
+    "message": "Dokumenty kursu"
+  },
+  "course_images_f8511d04": {
+    "message": "Obrazy kursu"
+  },
+  "course_links_b56959b9": {
+    "message": "Łącza kursu"
+  },
+  "course_media_ec759ad": {
+    "message": "Multimedia kursu"
+  },
   "course_navigation_dd035109": {
     "message": "Nawigowanie po kursie"
   },
@@ -161,6 +173,9 @@
   "loading_25990131": {
     "message": "Trwa ładowanie..."
   },
+  "loading_bde52856": {
+    "message": "Wczytywanie"
+  },
   "loading_failed_b3524381": {
     "message": "Niepowodzenie wczytywania..."
   },
@@ -211,6 +226,9 @@
   },
   "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
     "message": "Ta przesyłka przekracza przydział magazynowania plików. Skontaktuj się z administratorem systemu."
+  },
+  "tray_839df38a": {
+    "message": "Zasobnik"
   },
   "upload_8b403d05": {
     "message": "Pobierz"

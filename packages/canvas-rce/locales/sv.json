@@ -74,6 +74,18 @@
   "copyright_holder_66ee111": {
     "message": "Upphovsrättshavare:"
   },
+  "course_documents_104d76e0": {
+    "message": "Kursdokument"
+  },
+  "course_images_f8511d04": {
+    "message": "Kursbilder"
+  },
+  "course_links_b56959b9": {
+    "message": "Kurslänkar"
+  },
+  "course_media_ec759ad": {
+    "message": "Kursmedia"
+  },
   "course_navigation_dd035109": {
     "message": "Kursnavigering"
   },
@@ -161,6 +173,9 @@
   "loading_25990131": {
     "message": "Laddar..."
   },
+  "loading_bde52856": {
+    "message": "Läser in"
+  },
   "loading_failed_b3524381": {
     "message": "Laddning misslyckades..."
   },
@@ -211,6 +226,9 @@
   },
   "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
     "message": "Den här uppladdningen överskrider fillagringskvoten. Kontakta din systemadministratör."
+  },
+  "tray_839df38a": {
+    "message": "Fack"
   },
   "upload_8b403d05": {
     "message": "Ladda upp"

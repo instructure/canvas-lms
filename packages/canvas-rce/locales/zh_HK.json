@@ -74,6 +74,18 @@
   "copyright_holder_66ee111": {
     "message": "版權持有人："
   },
+  "course_documents_104d76e0": {
+    "message": "課程文件"
+  },
+  "course_images_f8511d04": {
+    "message": "課程影像"
+  },
+  "course_links_b56959b9": {
+    "message": "課程連結"
+  },
+  "course_media_ec759ad": {
+    "message": "課程媒體"
+  },
   "course_navigation_dd035109": {
     "message": "課程導覽"
   },
@@ -161,6 +173,9 @@
   "loading_25990131": {
     "message": "載入中……"
   },
+  "loading_bde52856": {
+    "message": "正在載入"
+  },
   "loading_failed_b3524381": {
     "message": "載入失敗……"
   },
@@ -211,6 +226,9 @@
   },
   "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
     "message": "此上傳項目超出檔案儲存空間限額。請聯絡您的系統管理員。"
+  },
+  "tray_839df38a": {
+    "message": "收集箱"
   },
   "upload_8b403d05": {
     "message": "上傳"

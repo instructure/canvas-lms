@@ -74,6 +74,18 @@
   "copyright_holder_66ee111": {
     "message": "Titilè Dwa Otè:"
   },
+  "course_documents_104d76e0": {
+    "message": "Dokiman Kou"
+  },
+  "course_images_f8511d04": {
+    "message": "Imaj Kou"
+  },
+  "course_links_b56959b9": {
+    "message": "Lyen Kou"
+  },
+  "course_media_ec759ad": {
+    "message": "Medya Kou"
+  },
   "course_navigation_dd035109": {
     "message": "Navigasyon Kou"
   },
@@ -161,6 +173,9 @@
   "loading_25990131": {
     "message": "Chajman..."
   },
+  "loading_bde52856": {
+    "message": "Chajman"
+  },
   "loading_failed_b3524381": {
     "message": "Chajman echwe..."
   },
@@ -211,6 +226,9 @@
   },
   "this_upload_exceeds_the_file_storage_quota_please__c3a1b641": {
     "message": "Chajman sa a depase kantite ke w ka estoke a. Tanpri pale a administratè sistèm ou an."
+  },
+  "tray_839df38a": {
+    "message": "Plato"
   },
   "upload_8b403d05": {
     "message": "Chajman"
