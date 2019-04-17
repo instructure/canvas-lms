@@ -321,6 +321,15 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
         first_cert = false
         sp.keys << SAML2::Key.new(cert, SAML2::Key::Type::SIGNING)
       end
+      if include_all_encryption_certificates
+        Array.wrap(encryption[:additional_certificates]).each do |path|
+          cert_path = resolve_saml_key_path(path)
+          next unless cert_path
+
+          cert = File.read(cert_path)
+          sp.keys << SAML2::Key.new(cert, SAML2::Key::Type::ENCRYPTION, [SAML2::Key::EncryptionMethod.new])
+        end
+      end
     end
     sp.private_keys = private_keys.values.map { |key| OpenSSL::PKey::RSA.new(key) }
 
