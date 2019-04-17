@@ -21,7 +21,7 @@ import {bool, func, instanceOf, oneOf} from 'prop-types'
 import {Tray} from '@instructure/ui-overlays'
 import {CloseButton} from '@instructure/ui-buttons'
 import {Heading, Spinner} from '@instructure/ui-elements'
-import {Flex, FlexItem, View} from '@instructure/ui-layout'
+import {Flex, FlexItem} from '@instructure/ui-layout'
 
 import Bridge from '../../../bridge/Bridge'
 import formatMessage from '../../../format-message'
@@ -108,32 +108,33 @@ export default function CanvasContentTray(props) {
       placement="end"
       size="regular"
     >
-      <View as="div" margin="small 0">
-        <Flex margin="small">
-          <FlexItem>
-            <CloseButton placement="static" variant="icon" onClick={() => setIsOpen(false)}>
-              {formatMessage('Close')}
-            </CloseButton>
-          </FlexItem>
+      <Flex direction="column" display="block" height="100vh" overflowY="hidden">
+        <FlexItem padding="medium" shadow="above">
+          <Flex margin="none none medium none">
+            <FlexItem>
+              <CloseButton placement="static" variant="icon" onClick={() => setIsOpen(false)}>
+                {formatMessage('Close')}
+              </CloseButton>
+            </FlexItem>
 
-          <FlexItem grow shrink>
-            <Heading margin="0 0 0 small">{formatMessage('Add')}</Heading>
-          </FlexItem>
-        </Flex>
+            <FlexItem grow shrink>
+              <Heading level="h2" margin="none none none medium">{formatMessage('Add')}</Heading>
+            </FlexItem>
+          </Flex>
 
-        <Filter
-          {...filterSettings}
-          onChange={setFilterSettings}
-        />
-      </View>
+          <Filter {...filterSettings} onChange={setFilterSettings} />
+        </FlexItem>
 
-      <StoreProvider {...props}>
-        {contentProps => (
-          <Suspense fallback={<Spinner title={formatMessage('Loading')} size="large" />}>
-            <ContentComponent {...contentProps} />
-          </Suspense>
-        )}
-      </StoreProvider>
+        <FlexItem grow shrink>
+          <StoreProvider {...props}>
+            {contentProps => (
+              <Suspense fallback={<Spinner title={formatMessage('Loading')} size="large" />}>
+                <ContentComponent {...contentProps} />
+              </Suspense>
+            )}
+          </StoreProvider>
+        </FlexItem>
+      </Flex>
     </Tray>
   )
 }

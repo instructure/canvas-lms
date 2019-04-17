@@ -17,8 +17,8 @@
  */
 
 import React, {useState} from 'react'
-import {func} from 'prop-types'
-import {Grid, GridRow, GridCol, View} from '@instructure/ui-layout'
+import {func, string} from 'prop-types'
+import {Flex, FlexItem, View} from '@instructure/ui-layout'
 import formatMessage from '../../../format-message'
 import {Select} from '@instructure/ui-forms'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
@@ -54,85 +54,91 @@ export default function Filter(props) {
   const {contentType, contentSubtype, onChange, sortValue} = props
 
   return (
-    <Grid>
-      <GridRow hAlign="space-around">
-        <GridCol>
-          <View as="div" margin="0 small">
-            <Select
-              onChange={(e, selection) => {
-                onChange({contentType: selection.value})
-              }}
-              value={contentType}
-              label={<ScreenReaderContent>{formatMessage('Content Type')}</ScreenReaderContent>}
-            >
-              <option value="links" icon={IconLinkLine}>
-                {formatMessage('Links')}
-              </option>
+    <View display="block" direction="column">
+      <Select
+        label={<ScreenReaderContent>{formatMessage('Content Type')}</ScreenReaderContent>}
+        onChange={(e, selection) => {
+          onChange({contentType: selection.value})
+        }}
+        value={contentType}
+      >
+        <option value="links" icon={IconLinkLine}>
+          {formatMessage('Links')}
+        </option>
 
-              <option value="files" icon={IconFolderLine}>
-                {formatMessage('Files')}
-              </option>
-            </Select>
-          </View>
-        </GridCol>
-      </GridRow>
+        <option value="files" icon={IconFolderLine}>
+          {formatMessage('Files')}
+        </option>
+      </Select>
 
       {contentType === 'files' && (
-        <GridRow>
-          <GridCol>
-            <View as="div" margin="0 small">
-              <Select
-                onChange={(e, selection) => {
-                  onChange({contentSubtype: selection.value})
-                }}
-                value={contentSubtype}
-                label={
-                  <ScreenReaderContent>{formatMessage('Content Subtype')}</ScreenReaderContent>
-                }
-              >
-                <option value="images" icon={IconImageLine}>
-                  {formatMessage('Images')}
-                </option>
+        <Flex margin="small none none none">
+          <FlexItem grow shrink margin="none xx-small none none">
+            <Select
+              label={
+                <ScreenReaderContent>{formatMessage('Content Subtype')}</ScreenReaderContent>
+              }
+              onChange={(e, selection) => {
+                onChange({contentSubtype: selection.value})
+              }}
+              value={contentSubtype}
+            >
+              <option value="images" icon={IconImageLine}>
+                {formatMessage('Images')}
+              </option>
 
-                <option value="documents" icon={IconDocumentLine}>
-                  {formatMessage('Files')}
-                </option>
+              <option value="documents" icon={IconDocumentLine}>
+                {formatMessage('Documents')}
+              </option>
 
-                <option value="media" icon={IconAttachMediaLine}>
-                  {formatMessage('Media')}
-                </option>
+              <option value="media" icon={IconAttachMediaLine}>
+                {formatMessage('Media')}
+              </option>
 
-                <option value="all">{formatMessage('All')}</option>
-              </Select>
-            </View>
-          </GridCol>
+              <option value="all">{formatMessage('All')}</option>
+            </Select>
+          </FlexItem>
 
-          <GridCol>
-            <View as="div" margin="0 small">
-              <Select
-                onChange={(e, selection) => {
-                  onChange({sortValue: selection.value})
-                }}
-                value={sortValue}
-                label={<ScreenReaderContent>{formatMessage('Sort By')}</ScreenReaderContent>}
-              >
-                <option value="date_added">{formatMessage('Date Added')}</option>
+          <FlexItem grow shrink margin="none none none xx-small">
+            <Select
+              label={<ScreenReaderContent>{formatMessage('Sort By')}</ScreenReaderContent>}
+              onChange={(e, selection) => {
+                onChange({sortValue: selection.value})
+              }}
+              value={sortValue}
+            >
+              <option value="date_added">{formatMessage('Date Added')}</option>
 
-                <option value="alphabetical">{formatMessage('Alphabetical')}</option>
+              <option value="alphabetical">{formatMessage('Alphabetical')}</option>
 
-                <option value="date_published">{formatMessage('Date Published')}</option>
-              </Select>
-            </View>
-          </GridCol>
-        </GridRow>
+              <option value="date_published">{formatMessage('Date Published')}</option>
+            </Select>
+          </FlexItem>
+        </Flex>
       )}
-    </Grid>
+    </View>
   )
 }
 
 Filter.propTypes = {
   /**
-   * This is called whenever any state is changed inside of the component
+   * `contentSubtype` is the secondary filter setting, currently only used when
+   * `contentType` is set to "files"
    */
-  onChange: func.isRequired
+  contentSubtype: string.isRequired,
+
+  /**
+   * `contentType` is the primary filter setting (e.g. links, files)
+   */
+  contentType: string.isRequired,
+
+  /**
+   * `onChange` is called when any of the Filter settings are changed
+   */
+  onChange: func.isRequired,
+
+  /**
+   * `sortValue` defines how items in the CanvasContentTray are sorted
+   */
+  sortValue: string.isRequired
 }
