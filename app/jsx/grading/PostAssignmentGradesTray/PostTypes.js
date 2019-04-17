@@ -17,11 +17,13 @@
  */
 
 import React, {Fragment} from 'react'
-import {func, oneOf} from 'prop-types'
+import {bool, func, oneOf} from 'prop-types'
+
 import RadioInput from '@instructure/ui-forms/lib/components/RadioInput'
 import RadioInputGroup from '@instructure/ui-forms/lib/components/RadioInputGroup'
 import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReaderContent'
 import Text from '@instructure/ui-elements/lib/components/Text'
+
 import I18n from 'i18n!hide_assignment_grades_tray'
 
 export const EVERYONE = 'everyone'
@@ -36,6 +38,7 @@ export default function PostTypes(props) {
           {I18n.t('Select whether to post for all submissions, or only graded ones.')}
         </ScreenReaderContent>
       }
+      disabled={props.disabled}
       onChange={props.postTypeChanged}
       name={I18n.t('Post types')}
     >
@@ -67,5 +70,6 @@ export default function PostTypes(props) {
 
 PostTypes.propTypes = {
   defaultValue: oneOf([EVERYONE, GRADED]).isRequired,
+  disabled: bool.isRequired,
   postTypeChanged: func.isRequired
 }

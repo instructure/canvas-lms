@@ -18,38 +18,64 @@
 
 import React, {Fragment} from 'react'
 import {arrayOf, bool, func, shape, string} from 'prop-types'
+
 import Button from '@instructure/ui-buttons/lib/components/Button'
 import Flex, {FlexItem} from '@instructure/ui-layout/lib/components/Flex'
 import Heading from '@instructure/ui-elements/lib/components/Heading'
+import Spinner from '@instructure/ui-elements/lib/components/Spinner'
 import Text from '@instructure/ui-elements/lib/components/Text'
 import View from '@instructure/ui-layout/lib/components/View'
+
 import I18n from 'i18n!hide_assignment_grades_tray'
 
 import Description from './Description'
 import SpecificSections from '../SpecificSections'
 
-export default function Layout(props) {
-  const {
-    assignment,
-    dismiss,
-    hideBySections,
-    hideBySectionsChanged,
-    hidingGrades,
-    onHideClick,
-    sections,
-    sectionSelectionChanged,
-    selectedSectionIds
-  } = props
-  const {anonymizeStudents, gradesPublished} = assignment
+export default function Layout({
+  assignment: {anonymizeStudents, gradesPublished},
+  dismiss,
+  hideBySections,
+  hideBySectionsChanged,
+  hidingGrades,
+  onHideClick,
+  sections,
+  sectionSelectionChanged,
+  selectedSectionIds
+}) {
   const hasSections = sections.length > 0
+  const heading = (
+    <View as="div" margin="0 0 small" padding="0 medium">
+      <Heading as="h3" level="h4">
+        {I18n.t('Hide Grades')}
+      </Heading>
+    </View>
+  )
+
+  if (hidingGrades) {
+    return (
+      <Fragment>
+        {heading}
+
+        <View as="div" textAlign="center" padding="large">
+          <Spinner title={I18n.t('Hiding grades')} size="large" />
+        </View>
+      </Fragment>
+    )
+  }
 
   return (
     <Fragment>
-      <View as="div" margin="0 0 small" padding="0 medium">
-        <Heading as="h3" level="h4">
-          {I18n.t('Hide Grades')}
-        </Heading>
-      </View>
+      {heading}
+
+      {!gradesPublished && (
+        <View as="p" margin="small 0 small" padding="0 medium">
+          <Text>
+            {I18n.t(
+              'Hiding grades is not allowed because grades have not been released for this assignment.'
+            )}
+          </Text>
+        </View>
+      )}
 
       {hasSections && anonymizeStudents && (
         <View as="p" margin="small 0 small" padding="0 medium">
@@ -60,7 +86,7 @@ export default function Layout(props) {
       {hasSections && (
         <SpecificSections
           checked={hideBySections}
-          disabled={assignment.anonymizeStudents}
+          disabled={!gradesPublished || anonymizeStudents}
           onCheck={event => {
             hideBySectionsChanged(event.target.checked)
           }}
@@ -78,28 +104,16 @@ export default function Layout(props) {
 
       <View as="div" margin="0 medium" className="hr" />
 
-      {!gradesPublished && (
-        <View as="p" margin="small 0 small" padding="0 medium">
-          <Text>
-            {I18n.t(
-              'Hiding grades is not allowed because grades have not been released for this assignment.'
-            )}
-          </Text>
-        </View>
-      )}
-
       <View as="div" margin="medium 0 0" padding="0 medium">
         <Flex justifyItems="end">
           <FlexItem margin="0 small 0 0">
-            <Button onClick={dismiss}>{I18n.t('Close')}</Button>
+            <Button onClick={dismiss} disabled={!gradesPublished}>
+              {I18n.t('Close')}
+            </Button>
           </FlexItem>
 
           <FlexItem>
-            <Button
-              disabled={hidingGrades || !gradesPublished}
-              onClick={onHideClick}
-              variant="primary"
-            >
+            <Button onClick={onHideClick} disabled={!gradesPublished} variant="primary">
               {I18n.t('Hide')}
             </Button>
           </FlexItem>

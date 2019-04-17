@@ -35,6 +35,12 @@ QUnit.module('PostAssignmentGradesTray PostTypes', suiteHooks => {
     return document.getElementById(getLabel(type).htmlFor)
   }
 
+  function getPostTypeInputs() {
+    const inputs = $container.querySelectorAll('input[type=radio]')
+    if (inputs.length === 0) return undefined
+    return [...inputs]
+  }
+
   function mountComponent() {
     ReactDOM.render(<PostTypes {...context} />, $container)
   }
@@ -43,6 +49,7 @@ QUnit.module('PostAssignmentGradesTray PostTypes', suiteHooks => {
     $container = document.body.appendChild(document.createElement('div'))
     context = {
       defaultValue: 'everyone',
+      disabled: false,
       postTypeChanged: () => {}
     }
   })
@@ -76,5 +83,18 @@ QUnit.module('PostAssignmentGradesTray PostTypes', suiteHooks => {
     mountComponent()
     getPostType('graded').click()
     strictEqual(postTypeChangedSpy.callCount, 1)
+  })
+
+  QUnit.module('"disabled" prop', () => {
+    test('inputs are enabled when false', () => {
+      mountComponent()
+      strictEqual(getPostTypeInputs().every($input => !$input.disabled), true)
+    })
+
+    test('inputs are disabled when true', () => {
+      context.disabled = true
+      mountComponent()
+      strictEqual(getPostTypeInputs().every($input => $input.disabled), true)
+    })
   })
 })
