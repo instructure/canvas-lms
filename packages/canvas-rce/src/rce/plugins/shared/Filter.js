@@ -31,7 +31,7 @@ import {
 } from '@instructure/ui-icons'
 
 const DEFAULT_FILTER_SETTINGS = {
-  contentSubtype: null,
+  contentSubtype: 'all',
   contentType: 'links',
   sortValue: 'date_added'
 }
@@ -39,12 +39,8 @@ const DEFAULT_FILTER_SETTINGS = {
 export function useFilterSettings() {
   const [filterSettings, setFilterSettings] = useState(DEFAULT_FILTER_SETTINGS)
 
-  function updateFilterSettings({contentSubtype, contentType, sortValue} = DEFAULT_FILTER_SETTINGS) {
-    if (contentType === 'links') {
-      setFilterSettings({contentType, contentSubtype: null, sortValue})
-    } else {
-      setFilterSettings({contentType, contentSubtype, sortValue})
-    }
+  function updateFilterSettings(nextSettings) {
+    setFilterSettings({...filterSettings, ...nextSettings})
   }
 
   return [filterSettings, updateFilterSettings]
@@ -60,7 +56,7 @@ export default function Filter(props) {
         onChange={(e, selection) => {
           onChange({contentType: selection.value})
         }}
-        value={contentType}
+        selectedOption={contentType}
       >
         <option value="links" icon={IconLinkLine}>
           {formatMessage('Links')}
@@ -81,7 +77,7 @@ export default function Filter(props) {
               onChange={(e, selection) => {
                 onChange({contentSubtype: selection.value})
               }}
-              value={contentSubtype}
+              selectedOption={contentSubtype}
             >
               <option value="images" icon={IconImageLine}>
                 {formatMessage('Images')}
@@ -105,7 +101,7 @@ export default function Filter(props) {
               onChange={(e, selection) => {
                 onChange({sortValue: selection.value})
               }}
-              value={sortValue}
+              selectedOption={sortValue}
             >
               <option value="date_added">{formatMessage('Date Added')}</option>
 

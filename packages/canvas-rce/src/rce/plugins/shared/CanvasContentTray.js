@@ -72,7 +72,7 @@ function loadTrayContent({contentType, contentSubtype}) {
 const FILTER_SETTINGS_BY_PLUGIN = {
   documents: {contentType: 'files', contentSubtype: 'documents', sortValue: 'date_added'},
   images: {contentType: 'files', contentSubtype: 'images', sortValue: 'date_added'},
-  links: {contentType: 'links', contentSubtype: null, sortValue: 'date_added'},
+  links: {contentType: 'links', contentSubtype: 'all', sortValue: 'date_added'},
   media: {contentType: 'files', contentSubtype: 'media', sortValue: 'date_added'}
 }
 
