@@ -276,7 +276,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
          idp.single_logout_services << SAML2::Endpoint.new(log_out_url,
                                                            SAML2::Bindings::HTTPRedirect::URN)
        end
-       idp.fingerprints = (certificate_fingerprint || '').split.presence
+       idp.fingerprints = (certificate_fingerprint || '').split
        Array.wrap(settings['signing_certificates']).each do |cert|
          idp.keys << SAML2::KeyDescriptor.new(cert, SAML2::KeyDescriptor::Type::SIGNING)
        end
