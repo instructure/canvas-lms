@@ -127,6 +127,16 @@ describe SplitUsers do
 
     describe 'with merge data' do
 
+      it "should move lti_id to the new user" do
+        course1.enroll_user(user1)
+        course2.enroll_user(user2)
+        UserMerge.from(user2).into(user1)
+        UserMerge.from(user1).into(user3)
+        SplitUsers.split_db_users(user3)
+        expect(user3.reload.past_lti_ids.count).to eq 0
+        expect(user1.reload.past_lti_ids.count).to eq 1
+      end
+
       it 'should split multiple users if no merge_data is specified' do
         enrollment1 = course1.enroll_student(user1, enrollment_state: 'active')
         enrollment2 = course1.enroll_student(user2, enrollment_state: 'active')
