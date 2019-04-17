@@ -65,7 +65,7 @@ function getProps(textareaId, language = "en", textDirection = "ltr") {
   };
 }
 
-function renderDemos({ host, jwt, lang, contextType, contextId, dir }) {
+function renderDemos({ host, jwt, lang, contextType, contextId, dir, sourceType }) {
   renderIntoDiv(
     document.getElementById("editor1"),
     getProps("textarea1", lang, dir)
@@ -89,7 +89,7 @@ function renderDemos({ host, jwt, lang, contextType, contextId, dir }) {
   const sidebarEl = document.getElementById("sidebar");
   ReactDOM.render(<div />, sidebarEl);
   renderSidebarIntoDiv(sidebarEl, {
-    source: jwt ? undefined : fakeSource,
+    source: jwt && sourceType === 'real' ? undefined : fakeSource,
     host,
     jwt,
     contextType,
@@ -98,18 +98,30 @@ function renderDemos({ host, jwt, lang, contextType, contextId, dir }) {
   });
 }
 
+function getSetting(settingKey, defaultValue) {
+  return localStorage.getItem(settingKey) || defaultValue
+}
+
+function saveSettings(state) {
+  ['dir', 'sourceType', 'lang', 'host', 'jwt', 'contextType', 'contextId'].forEach(settingKey => {
+    localStorage.setItem(settingKey, state[settingKey])
+  })
+}
+
 class DemoOptions extends Component {
   state = {
-    dir: "ltr",
-    lang: "en",
-    host: "https://rich-content-iad.inscloudgate.net",
-    jwt: "",
-    contextType: "course",
-    contextId: "1"
+    dir: getSetting('dir', 'ltr'),
+    sourceType: getSetting('sourceType', 'fake'),
+    lang: getSetting('lang', 'en'),
+    host: getSetting('host', 'https://rich-content-iad.inscloudgate.net'),
+    jwt: getSetting('jwt', ''),
+    contextType: getSetting('contextType', 'course'),
+    contextId: getSetting('contextId', '1')
   };
 
   handleChange = () => {
     document.documentElement.setAttribute("dir", this.state.dir);
+    saveSettings(this.state)
     renderDemos(this.state);
   };
 
@@ -125,8 +137,8 @@ class DemoOptions extends Component {
           contextId={this.state.contextId}
           contextType={this.state.contextType}
           host={this.state.host}
-          jwt={this.state.jwt}
-          source={this.state.jwt ? undefined : fakeSource}
+          jwt={this.state.sourceType === 'real' ? this.state.jwt : ''}
+          source={this.state.jwt && this.state.sourceType === 'real' ? undefined : fakeSource}
         />
 
         <form
@@ -135,6 +147,18 @@ class DemoOptions extends Component {
             this.handleChange();
           }}
         >
+          <RadioInputGroup
+            description="Source Type"
+            variant="toggle"
+            name="source"
+            onChange={(event, value) => this.setState({ sourceType: value })}
+            value={this.state.sourceType}
+          >
+            <RadioInput label="Fake" value="fake" />
+
+            <RadioInput label="Real" value="real" />
+          </RadioInputGroup>
+
           <RadioInputGroup
             description="Text Direction"
             variant="toggle"
