@@ -167,8 +167,8 @@ class UserMerge
       lti_ids = []
       {enrollments: :course, group_memberships: :group, account_users: :account}.each do |klass, type|
         klass.to_s.classify.constantize.where(user_id: from_user).distinct_on(type.to_s + '_id').each do |context|
-          next if UserPastLtiIds.where(user: target_user, context_id: context.send(type.to_s + '_id'), context_type: type.to_s.classify).exists?
-          lti_ids << UserPastLtiIds.new(user: target_user,
+          next if UserPastLtiId.where(user: [target_user, from_user], context_id: context.send(type.to_s + '_id'), context_type: type.to_s.classify).exists?
+          lti_ids << UserPastLtiId.new(user: target_user,
                                         context_id: context.send(type.to_s + '_id'),
                                         context_type: type.to_s.classify,
                                         user_uuid: from_user.uuid,
@@ -176,7 +176,7 @@ class UserMerge
                                         user_lti_context_id: from_user.lti_context_id)
         end
       end
-      UserPastLtiIds.bulk_insert_objects(lti_ids)
+      UserPastLtiId.bulk_insert_objects(lti_ids)
     end
   end
 

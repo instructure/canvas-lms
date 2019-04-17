@@ -367,7 +367,7 @@ describe Api::V1::User do
 
     it 'outputs uuid and past_uuid in json with includes params present' do
       expect(@test_api.user_json(@student, @admin, {}, ['uuid'], @course)).not_to have_key("past_uuid")
-      UserPastLtiIds.create!(user: @student, context: @course, user_lti_id: 'old_lti_id', user_lti_context_id: 'old_lti_id', user_uuid: 'old_uuid')
+      UserPastLtiId.create!(user: @student, context: @course, user_lti_id: 'old_lti_id', user_lti_context_id: 'old_lti_id', user_uuid: 'old_uuid')
       expect(@test_api.user_json(@student, @admin, {}, ['uuid'], @course)).to have_key("past_uuid")
     end
   end

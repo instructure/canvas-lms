@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-class UserPastLtiIds < ActiveRecord::Base
+class UserPastLtiId < ActiveRecord::Base
   belongs_to :user
   belongs_to :context, polymorphic: [:account, :course, :group]
 
@@ -26,12 +26,12 @@ class UserPastLtiIds < ActiveRecord::Base
   def self.manual_preload_past_lti_ids(objects, object_context)
     # collaborators are allowed to not have a user, so we compact them here.
     users = objects.first.is_a?(User) ? objects : objects.map(&:user).compact
-    past_lti_ids = UserPastLtiIds.where(user_id: users, context: object_context).group_by(&:user_id)
+    past_lti_ids = UserPastLtiId.where(user_id: users, context: object_context).group_by(&:user_id)
     users.each do |user|
       past_lti_id = past_lti_ids[user.id]
       association = user.association(:past_lti_ids)
       association.loaded!
-      past_lti_id = past_lti_id.nil? ? UserPastLtiIds.none : past_lti_id
+      past_lti_id = past_lti_id.nil? ? UserPastLtiId.none : past_lti_id
       association.target.concat(past_lti_id)
       past_lti_id.each {|lti_id| association.set_inverse_instance(lti_id)}
     end

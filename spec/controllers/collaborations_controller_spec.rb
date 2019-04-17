@@ -160,7 +160,7 @@ describe CollaborationsController do
 
       it "should include collaborator old_lti_id" do
         Lti::Asset.opaque_identifier_for(@student)
-        UserPastLtiIds.create!(user: @student, context: @collab.context, user_lti_id: @student.lti_id, user_lti_context_id: 'old_lti_id', user_uuid: 'old')
+        UserPastLtiId.create!(user: @student, context: @collab.context, user_lti_id: @student.lti_id, user_lti_context_id: 'old_lti_id', user_uuid: 'old')
         get 'members', params: {id: @collab.id, include: ['collaborator_lti_id']}
         @student.reload
         hash = JSON.parse(@response.body).first
