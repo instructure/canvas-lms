@@ -108,6 +108,14 @@ module RCENextPage
     # put course links option in links dropdown here
   end
 
+  def images_toolbar_button
+    # put new images toolbar locator here
+  end
+
+  def course_images
+    # put course images option in images dropdown here
+  end
+
   # ---------------------- Actions ----------------------
 
   def click_pages_accordion
@@ -168,5 +176,13 @@ module RCENextPage
 
   def click_course_links
     # course_links.click
+  end
+
+  def click_images_toolbar_button
+    # images_toolbar_button.click
+  end
+
+  def click_course_images
+    # course_images.click
   end
 end

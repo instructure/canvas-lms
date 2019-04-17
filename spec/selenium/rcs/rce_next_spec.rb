@@ -274,5 +274,36 @@ describe "RCE next tests" do
         expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(@course, @assignment)
       end
     end
+
+    it "should click on sidebar images tab" do
+      skip('Unskip in CORE-2629')
+      visit_front_page_edit(@course)
+
+      click_images_toolbar_button
+      click_course_images
+
+      expect(upload_new_image).to be_displayed
+    end
+
+    it "should click on an image in sidebar to display in body" do
+      skip('Unskip in CORE-2629')
+      title = "email.png"
+      @root_folder = Folder.root_folders(@course).first
+      @image = @root_folder.attachments.build(:context => @course)
+      path = File.expand_path(File.dirname(__FILE__) + '/../../../public/images/email.png')
+      @image.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
+      @image.save!
+
+      visit_front_page_edit(@course)
+
+      click_images_toolbar_button
+      click_course_images
+
+      click_image_link(title)
+
+      in_frame wiki_page_body_ifr_id do
+        expect(wiki_body_image.attribute('src')).to include course_file_id_path(@image)
+      end
+    end
   end
 end
