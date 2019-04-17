@@ -377,6 +377,10 @@ export function fetchImages(props) {
   });
 }
 
+export function fetchMediaFolder() {
+  return Promise.resolve(PAGES.folders)
+}
+
 export function preflightUpload() {
   return new Promise(function(resolve) {
     setTimeout(() => {

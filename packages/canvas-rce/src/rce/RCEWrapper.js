@@ -231,6 +231,7 @@ export default class RCEWrapper extends React.Component {
 
       setup: editor => {
         editorWrappers.set(editor, this);
+        Bridge.trayProps.set(editor, this.props.trayProps)
         if (typeof setupCallback === "function") {
           setupCallback(editor);
         }

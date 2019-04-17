@@ -29,6 +29,8 @@ export default class Bridge {
     })
 
     this.insertLink = this.insertLink.bind(this)
+
+    this.trayProps = new WeakMap();
   }
 
   get editorRendered() {

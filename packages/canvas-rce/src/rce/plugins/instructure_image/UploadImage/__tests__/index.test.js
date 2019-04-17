@@ -54,5 +54,22 @@ describe('UploadImage', () => {
       handleSubmit(fakeEditor, PANELS.URL, {imageUrl: 'http://fake/path'})
       expect(fakeEditor.content).toEqual('<img src="http://fake/path" />')
     })
+
+    it('calls contentProps.startMediaUpload when Computer panel is selected', () => {
+      const fakeMediaUpload = jest.fn()
+      const fakeFile = {
+        name: 'foo.png',
+        size: 3000,
+        type: 'image/png'
+      }
+      handleSubmit(fakeEditor, PANELS.COMPUTER, { imageFile: fakeFile}, { startMediaUpload: fakeMediaUpload })
+      expect(fakeMediaUpload).toHaveBeenCalledWith("images", {
+        parentFolderId: 'media',
+        name: 'foo.png',
+        size: 3000,
+        contentType: 'image/png',
+        domObject: fakeFile
+      })
+    })
   })
 })

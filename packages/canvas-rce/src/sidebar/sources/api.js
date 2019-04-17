@@ -152,6 +152,10 @@ class RceApiSource {
     return this.apiFetch(uri, headers)
   }
 
+  fetchMediaFolder(props) {
+    return this.fetchPage(this.uriFor('folders/media', props))
+  }
+
   fetchImages(props) {
     if (props.bookmark) {
       return this.apiFetch(props.bookmark, headerFor(this.jwt))

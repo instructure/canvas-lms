@@ -49,7 +49,8 @@ describe("Upload data actions", () => {
 
     setUsageRights: sinon.spy(),
 
-    getFile: sinon.stub().returns(Promise.resolve(file))
+    getFile: sinon.stub().returns(Promise.resolve(file)),
+    fetchMediaFolder: sinon.stub().returns(Promise.resolve({folders: [{id: 24}]}))
   };
 
   beforeEach(() => {
@@ -175,6 +176,39 @@ describe("Upload data actions", () => {
       sinon.assert.notCalled(successSource.setUsageRights);
     });
   });
+
+  describe('uploadToMediaFolder', () => {
+    const fakeFileMetaData = {
+        parentFolderId: 'media',
+        name: 'foo.png',
+        size: 3000,
+        contentType: 'image/png',
+        domObject: {
+          name: 'foo.png',
+          size: 3000,
+          type: 'image/png'
+        }
+    }
+    it('dispatches a uploadPreflight with the proper parentFolderId set', () => {
+      let baseState = setupState();
+      let store = spiedStore(baseState);
+      return store.dispatch(actions.uploadToMediaFolder('images', fakeFileMetaData)).then(() => {
+        assert.ok(
+          store.spy.calledWith({ type: actions.START_FILE_UPLOAD, file: {
+            parentFolderId: 24,
+            name: 'foo.png',
+            size: 3000,
+            contentType: 'image/png',
+            domObject: {
+              name: 'foo.png',
+              size: 3000,
+              type: 'image/png'
+            }
+        } })
+        );
+      })
+    })
+  })
 
   describe("generateThumbnailUrl", () => {
     it("returns the results if the file is not an image", () => {
