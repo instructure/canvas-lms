@@ -143,7 +143,7 @@ module Api::V1::User
       end
 
       if includes.include?('uuid')
-        past_uuid = UserPastLtiIds.uuid_for_user_in_context(user, context)
+        past_uuid = UserPastLtiId.uuid_for_user_in_context(user, context)
         json[:past_uuid] = past_uuid unless past_uuid == user.uuid
         json[:uuid] = user.uuid
       end

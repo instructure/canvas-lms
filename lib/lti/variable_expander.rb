@@ -749,7 +749,7 @@ module Lti
     #   N2ST123dQ9zyhurykTkBfXFa3Vn1RVyaw9Os6vu3
     #   ```
     register_expansion 'vnd.instructure.User.uuid', [],
-                       -> { UserPastLtiIds.uuid_for_user_in_context(@current_user, @context) },
+                       -> { UserPastLtiId.uuid_for_user_in_context(@current_user, @context) },
                        USER_GUARD
 
     # Returns the current Canvas user_uuid of the launching user.

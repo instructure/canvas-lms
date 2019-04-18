@@ -306,7 +306,10 @@ class Course < ActiveRecord::Base
         (self.saved_change_to_workflow_state? && (completed? || self.workflow_state_before_last_save == 'completed'))
         # a lot of things can change the date logic here :/
 
-      EnrollmentState.send_later_if_production(:invalidate_states_for_course_or_section, self) if self.enrollments.exists?
+      if self.enrollments.exists?
+        EnrollmentState.send_later_if_production_enqueue_args(:invalidate_states_for_course_or_section,
+          {:n_strand => ["invalidate_enrollment_states", self.global_root_account_id]}, self)
+      end
       # if the course date settings have been changed, we'll end up reprocessing all the access values anyway, so no need to queue below for other setting changes
     end
     if saved_change_to_account_id? || @changed_settings

@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class CreateUserPastLtiIds < ActiveRecord::Migration[5.1]
+class CreateUserPastLtiId < ActiveRecord::Migration[5.1]
   tag :predeploy
 
   def change

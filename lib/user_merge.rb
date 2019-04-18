@@ -66,8 +66,8 @@ class UserMerge
        'conversation_ids': from_user.all_conversations.shard(from_user).pluck(:id),
        'ignore_ids': from_user.ignores.shard(from_user).pluck(:id),
        'favorite_ids': from_user.favorites.shard(from_user).pluck(:id),
-       'Polling::Poll_ids': from_user.polls.shard(from_user).pluck(:id)
-      }.each do |k, ids|
+       'user_past_lti_id_ids': from_user.past_lti_ids.shard(from_user).pluck(:id),
+       'Polling::Poll_ids': from_user.polls.shard(from_user).pluck(:id)}.each do |k, ids|
         merge_data.items.create!(user: from_user, item_type: k, item: ids) unless ids.empty?
       end
     end
@@ -163,12 +163,13 @@ class UserMerge
   end
 
   def populate_past_lti_ids
+    move_existing_past_lti_ids
     Shard.with_each_shard(from_user.associated_shards + from_user.associated_shards(:weak) + from_user.associated_shards(:shadow)) do
       lti_ids = []
       {enrollments: :course, group_memberships: :group, account_users: :account}.each do |klass, type|
         klass.to_s.classify.constantize.where(user_id: from_user).distinct_on(type.to_s + '_id').each do |context|
-          next if UserPastLtiIds.where(user: target_user, context_id: context.send(type.to_s + '_id'), context_type: type.to_s.classify).exists?
-          lti_ids << UserPastLtiIds.new(user: target_user,
+          next if UserPastLtiId.where(user: [target_user, from_user], context_id: context.send(type.to_s + '_id'), context_type: type.to_s.classify).exists?
+          lti_ids << UserPastLtiId.new(user: target_user,
                                         context_id: context.send(type.to_s + '_id'),
                                         context_type: type.to_s.classify,
                                         user_uuid: from_user.uuid,
@@ -176,7 +177,19 @@ class UserMerge
                                         user_lti_context_id: from_user.lti_context_id)
         end
       end
-      UserPastLtiIds.bulk_insert_objects(lti_ids)
+      UserPastLtiId.bulk_insert_objects(lti_ids)
+    end
+  end
+
+  def move_existing_past_lti_ids
+    existing_past_ids = target_user.past_lti_ids.select(:context_id, :context_type).group_by(&:context_type)
+    existing_past_ids.default = []
+    if existing_past_ids.present?
+      ['Group', 'Account', 'Course'].each do |klass|
+        from_user.past_lti_ids.where(context_type: klass).where.not(context_id: existing_past_ids[klass].map(&:context_id)).update_all(user_id: target_user.id)
+      end
+    else # there are no possible conflicts just move them over
+      from_user.past_lti_ids.shard(from_user).update_all(user_id: target_user.id)
     end
   end
 

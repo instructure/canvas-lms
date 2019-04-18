@@ -359,7 +359,7 @@ class CollaborationsController < ApplicationController
                                  self,
                                  api_v1_collaboration_members_url)
 
-    UserPastLtiIds.manual_preload_past_lti_ids(collaborators, @context) if includes.include? 'collaborator_lti_id'
+    UserPastLtiId.manual_preload_past_lti_ids(collaborators, @context) if includes.include? 'collaborator_lti_id'
     render(:json => collaborators.map{|c| collaborator_json(c, @current_user, session, options, context: @context)})
   end
 

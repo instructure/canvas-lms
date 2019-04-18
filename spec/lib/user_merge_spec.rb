@@ -45,13 +45,27 @@ describe UserMerge do
       expect(user1.pseudonyms.map(&:unique_id)).to be_include('sam@yahoo.com')
     end
 
-    it "should move lti_id to the new user" do
+    it "should move lti_id to the new users" do
+      user_1_old_lti = user1.lti_id
       old_lti = user2.lti_id
       old_lti_context = user2.lti_context_id
-      e = course1.enroll_user(user2)
+      course1.enroll_user(user1)
+      course2.enroll_user(user2)
       UserMerge.from(user2).into(user1)
-      expect(user1.past_lti_ids.take.user_lti_id).to eq old_lti
+      expect(user1.reload.past_lti_ids.take.user_lti_id).to eq old_lti
       expect(user1.past_lti_ids.take.user_lti_context_id).to eq old_lti_context
+      user3 = user_model
+      UserMerge.from(user1).into(user3)
+      expect(user3.reload.past_lti_ids.where(context_id: course1).take.user_lti_id).to eq user_1_old_lti
+      expect(user3.past_lti_ids.where(context_id: course2).take.user_lti_id).to eq old_lti
+    end
+
+    it "should move past_lti_id to the new user multiple merges with conflict" do
+      course1.enroll_user(user1)
+      course2.enroll_user(user2)
+      UserPastLtiId.create!(user: user2, context: course2, user_uuid: 'fake_uuid', user_lti_id: 'fake_lti_id_from_old_merge')
+      UserMerge.from(user2).into(user1)
+      expect(user1.reload.past_lti_ids.take.user_lti_id).to eq 'fake_lti_id_from_old_merge'
     end
 
     it "should move admins to the new user" do
