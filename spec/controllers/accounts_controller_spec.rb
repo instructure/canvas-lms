@@ -609,7 +609,7 @@ describe AccountsController do
       report_type = AccountReport.available_reports.keys.first
       report = @account.account_reports.create!(report_type: report_type, user: @admin)
 
-      get 'settings', params: {account_id: @account}
+      get 'reports_tab', params: {account_id: @account}
       expect(response).to be_successful
 
       expect(assigns[:last_reports].first.last).to eq report

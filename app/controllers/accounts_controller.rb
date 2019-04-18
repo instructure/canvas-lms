@@ -944,23 +944,28 @@ class AccountsController < ApplicationController
     end
   end
 
+  def reports_tab
+    @available_reports = AccountReport.available_reports if @account.grants_right?(@current_user, @session, :read_reports)
+    if @available_reports
+      @root_account = @account.root_account
+      @account.shard.activate do
+        scope = @account.account_reports.active.where("report_type=name").most_recent
+        @last_complete_reports = AccountReport.from("unnest('{#{@available_reports.keys.join(',')}}'::text[]) report_types (name),
+                LATERAL (#{scope.complete.to_sql}) account_reports ").
+          order("report_types.name").
+          preload(:attachment).
+          index_by(&:report_type)
+        @last_reports = AccountReport.from("unnest('{#{@available_reports.keys.join(',')}}'::text[]) report_types (name),
+                LATERAL (#{scope.to_sql}) account_reports ").
+          order("report_types.name").
+          index_by(&:report_type)
+      end
+    end
+    render :layout => false
+  end
+
   def settings
     if authorized_action(@account, @current_user, :read)
-      @available_reports = AccountReport.available_reports if @account.grants_right?(@current_user, @session, :read_reports)
-      if @available_reports
-        @account.shard.activate do
-          scope = @account.account_reports.active.where("report_type=name").most_recent
-          @last_complete_reports = AccountReport.from("unnest('{#{@available_reports.keys.join(',')}}'::text[]) report_types (name),
-                LATERAL (#{scope.complete.to_sql}) account_reports ").
-              order("report_types.name").
-              preload(:attachment).
-              index_by(&:report_type)
-          @last_reports = AccountReport.from("unnest('{#{@available_reports.keys.join(',')}}'::text[]) report_types (name),
-                LATERAL (#{scope.to_sql}) account_reports ").
-              order("report_types.name").
-              index_by(&:report_type)
-        end
-      end
       load_course_right_side
       @account_users = @account.account_users.active
       ActiveRecord::Associations::Preloader.new.preload(@account_users, user: :communication_channels)
