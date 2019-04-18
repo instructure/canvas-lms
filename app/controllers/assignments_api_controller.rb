@@ -997,6 +997,34 @@ class AssignmentsApiController < ApplicationController
   # @argument assignment[moderated_grading] [Boolean]
   #   Whether this assignment is moderated.
   #
+  # @argument assignment[grader_count] [Integer]
+  #  The maximum number of provisional graders who may issue grades for this
+  #  assignment. Only relevant for moderated assignments. Must be a positive
+  #  value, and must be set to 1 if the course has fewer than two active
+  #  instructors. Otherwise, the maximum value is the number of active
+  #  instructors in the course minus one, or 10 if the course has more than 11
+  #  active instructors.
+  #
+  # @argument assignment[final_grader_id] [Integer]
+  #  The user ID of the grader responsible for choosing final grades for this
+  #  assignment. Only relevant for moderated assignments.
+  #
+  # @argument assignment[grader_comments_visible_to_graders] [Boolean]
+  #  Boolean indicating if provisional graders' comments are visible to other
+  #  provisional graders. Only relevant for moderated assignments.
+  #
+  # @argument assignment[graders_anonymous_to_graders] [Boolean]
+  #  Boolean indicating if provisional graders' identities are hidden from
+  #  other provisional graders. Only relevant for moderated assignments.
+  #
+  # @argument assignment[graders_names_visible_to_final_grader] [Boolean]
+  #  Boolean indicating if provisional grader identities are visible to the
+  #  the final grader. Only relevant for moderated assignments.
+  #
+  # @argument assignment[anonymous_grading] [Boolean]
+  #  Boolean indicating if the assignment is graded anonymously. If true,
+  #  graders cannot see student identities.
+  #
   # @argument assignment[allowed_attempts] [Integer]
   #   The number of submission attempts allowed for this assignment. Set to -1 for unlimited attempts.
   #
@@ -1155,6 +1183,34 @@ class AssignmentsApiController < ApplicationController
   #
   # @argument assignment[moderated_grading] [Boolean]
   #   Whether this assignment is moderated.
+  #
+  # @argument assignment[grader_count] [Integer]
+  #  The maximum number of provisional graders who may issue grades for this
+  #  assignment. Only relevant for moderated assignments. Must be a positive
+  #  value, and must be set to 1 if the course has fewer than two active
+  #  instructors. Otherwise, the maximum value is the number of active
+  #  instructors in the course minus one, or 10 if the course has more than 11
+  #  active instructors.
+  #
+  # @argument assignment[final_grader_id] [Integer]
+  #  The user ID of the grader responsible for choosing final grades for this
+  #  assignment. Only relevant for moderated assignments.
+  #
+  # @argument assignment[grader_comments_visible_to_graders] [Boolean]
+  #  Boolean indicating if provisional graders' comments are visible to other
+  #  provisional graders. Only relevant for moderated assignments.
+  #
+  # @argument assignment[graders_anonymous_to_graders] [Boolean]
+  #  Boolean indicating if provisional graders' identities are hidden from
+  #  other provisional graders. Only relevant for moderated assignments.
+  #
+  # @argument assignment[graders_names_visible_to_final_grader] [Boolean]
+  #  Boolean indicating if provisional grader identities are visible to the
+  #  the final grader. Only relevant for moderated assignments.
+  #
+  # @argument assignment[anonymous_grading] [Boolean]
+  #  Boolean indicating if the assignment is graded anonymously. If true,
+  #  graders cannot see student identities.
   #
   # @argument assignment[allowed_attempts] [Integer]
   #   The number of submission attempts allowed for this assignment. Set to -1 or null for
