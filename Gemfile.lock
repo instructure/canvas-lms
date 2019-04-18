@@ -68,11 +68,6 @@ GIT
       activemodel (>= 3.2)
 
 PATH
-  remote: gems
-  specs:
-    autoextend (1.0.0)
-
-PATH
   remote: gems/activesupport-suspend_callbacks
   specs:
     activesupport-suspend_callbacks (0.0.1)
@@ -424,6 +419,11 @@ PATH
     workflow (0.0.1)
       rails (>= 3.2, < 4.3)
 
+PATH
+  remote: gems
+  specs:
+    autoextend (1.0.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -510,6 +510,8 @@ GEM
       capistrano (~> 3.1)
       sshkit (~> 1.2)
     capistrano-harrow (0.5.3)
+    capistrano-nvm (0.0.7)
+      capistrano (~> 3.1)
     capistrano-passenger (0.2.0)
       capistrano (~> 3.0)
     capistrano-rails (1.2.2)
@@ -974,6 +976,7 @@ DEPENDENCIES
   canvas_unzip!
   canvas_webex (= 0.17)
   capistrano (= 3.5.0)
+  capistrano-nvm
   capistrano-passenger
   capistrano-rails (~> 1.1)
   cassandra-cql (= 1.2.2)!
@@ -1143,3 +1146,6 @@ DEPENDENCIES
   yajl-ruby (= 1.1.0)
   yard (= 0.8.7.6)
   yard-appendix (>= 0.1.8)
+
+BUNDLED WITH
+   1.11.2
