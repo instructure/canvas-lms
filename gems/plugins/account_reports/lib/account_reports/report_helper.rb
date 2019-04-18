@@ -195,11 +195,15 @@ module AccountReports::ReportHelper
     end
   end
 
-  def loaded_pseudonym(pseudonyms, u, include_deleted: false, enrollment: nil)
-    context = enrollment || root_account
-    user_pseudonyms = pseudonyms[u.id] || []
-    u.instance_variable_set(include_deleted ? :@all_pseudonyms : :@all_active_pseudonyms, user_pseudonyms)
-    SisPseudonym.for(u, context, {type: :trusted, require_sis: false, include_deleted: include_deleted})
+  def loaded_pseudonym(pseudonyms, user, include_deleted: false, enrollment: nil)
+    context = root_account
+    user_pseudonyms = pseudonyms[user.id] || []
+    user.instance_variable_set(include_deleted ? :@all_pseudonyms : :@all_active_pseudonyms, user_pseudonyms)
+    if enrollment&.sis_pseudonym_id
+      enrollment_pseudonym = user_pseudonyms.index_by(&:id)[enrollment.sis_pseudonym_id]
+      return enrollment_pseudonym if enrollment_pseudonym
+    end
+    SisPseudonym.for(user, context, {type: :trusted, require_sis: false, include_deleted: include_deleted})
   end
 
   def preload_logins_for_users(users, include_deleted: false)

@@ -66,6 +66,22 @@ describe "report helper" do
     expect(account_report.account_report_runners.count).to eq 100
   end
 
+  describe "load pseudonyms" do
+    it 'should do one query for pseudonyms' do
+      user_with_pseudonym(active_all: true, account: account, user: user)
+      course = account.courses.create!(name: 'reports')
+      role = Enrollment.get_built_in_role_for_type('StudentEnrollment')
+      e = course.enrollments.create!(user: user,
+                                     workflow_state: 'active',
+                                     sis_pseudonym: user.pseudonym,
+                                     type: 'StudentEnrollment',
+                                     role: role)
+      report.preload_logins_for_users([user])
+      expect(SisPseudonym).to receive(:for).never
+      report.loaded_pseudonym({user.id => [user.pseudonym]}, user, enrollment: e)
+    end
+  end
+
   describe "#send_report" do
     before do
       allow(AccountReports).to receive(:available_reports).and_return(account_report.report_type => {title: 'test_report'})
