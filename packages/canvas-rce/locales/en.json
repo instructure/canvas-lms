@@ -85,6 +85,9 @@
   "collaborations_5c56c15f": {
     "message": "Collaborations"
   },
+  "computer_1d7dfa6f": {
+    "message": "Computer"
+  },
   "content_subtype_5ce35e88": {
     "message": "Content Subtype"
   },
@@ -258,6 +261,9 @@
   "sort_by_e75f9e3e": {
     "message": "Sort By"
   },
+  "submit_a3cc6859": {
+    "message": "Submit"
+  },
   "syllabus_f191f65b": {
     "message": "Syllabus"
   },
@@ -276,6 +282,9 @@
   "tray_839df38a": {
     "message": "Tray"
   },
+  "unsplash_ee049fbf": {
+    "message": "Unsplash"
+  },
   "upload_8b403d05": {
     "message": "Upload"
   },
@@ -287,6 +296,9 @@
   },
   "upload_image_6120b609": {
     "message": "Upload Image"
+  },
+  "url_22a5f3b8": {
+    "message": "URL"
   },
   "usage_right_ff96f3e2": {
     "message": "Usage Right:"
