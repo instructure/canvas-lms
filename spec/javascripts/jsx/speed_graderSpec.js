@@ -3393,7 +3393,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
       })
 
       test('default avatar image is hidden', () => {
-        const handleStudentChanged = sinon.stub(SpeedGrader.EG, 'handleStudentChanged')
         SpeedGrader.setup()
         window.jsonData = windowJsonData // setup() resets jsonData
         SpeedGrader.EG.jsonReady()
@@ -3401,7 +3400,6 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         SpeedGrader.EG.goToStudent(omegaStudent.anonymous_id)
         const avatarImageStyles = document.getElementById('avatar_image').style
         strictEqual(avatarImageStyles.display, 'none')
-        handleStudentChanged.restore()
       })
 
       test('selectmenu gets updated with the student anonymous id', () => {
@@ -3416,12 +3414,13 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         handleStudentChanged.restore()
       })
 
-      test('select menu onChange fires', () => {
+      test('handleStudentChanged fires', () => {
         SpeedGrader.setup()
         window.jsonData = windowJsonData // setup() resets jsonData
         sinon.stub(SpeedGrader.EG, 'handleStudentChanged')
         SpeedGrader.EG.jsonReady()
         SpeedGrader.EG.handleStudentChanged.restore()
+        SpeedGrader.EG.currentStudent = null
 
         const handleStudentChanged = sinon.stub(SpeedGrader.EG, 'handleStudentChanged')
         SpeedGrader.EG.goToStudent(omegaStudent.anonymous_id)
@@ -5836,6 +5835,110 @@ QUnit.module('SpeedGrader', function(suiteHooks) {
         SpeedGrader.EG.showGrade()
         notOk(mountPoint.innerText.includes('HIDDEN'))
       })
+    })
+  })
+
+  QUnit.module('student avatar images', handleStudentChangedHooks => {
+    let submissionOne
+    let submissionTwo
+    let studentOne
+    let studentTwo
+    let windowJsonData
+    let userSettingsStub
+
+    handleStudentChangedHooks.beforeEach(() => {
+      studentOne = {id: '1000', avatar_path: '/path/to/an/image'}
+      studentTwo = {id: '1001', avatar_path: '/path/to/a/second/image'}
+      submissionOne = {id: '1000', user_id: '1000', submission_history: []}
+      submissionTwo = {id: '1001', user_id: '1001', submission_history: []}
+
+      windowJsonData = {
+        anonymize_students: false,
+        context_id: '1',
+        context: {
+          students: [studentOne, studentTwo],
+          enrollments: [
+            {user_id: studentOne.id, course_section_id: '1'},
+            {user_id: studentTwo.id, course_section_id: '1'}
+          ],
+          active_course_sections: [],
+          rep_for_student: {}
+        },
+        submissions: [submissionOne, submissionTwo],
+        gradingPeriods: []
+      }
+
+      setupFixtures(`
+        <img id="avatar_image" alt="" />
+        <div id="combo_box_container"></div>
+      `)
+
+      userSettingsStub = sinon.stub(userSettings, 'get')
+      userSettingsStub.returns(false)
+      SpeedGrader.setup()
+    })
+
+    handleStudentChangedHooks.afterEach(() => {
+      SpeedGrader.teardown()
+      userSettingsStub.restore()
+      teardownFixtures()
+      document.querySelector('.ui-selectmenu-menu').remove()
+    })
+
+    test('avatar is shown if the current student has an avatar and student names are not hidden', () => {
+      window.jsonData = windowJsonData
+      SpeedGrader.EG.jsonReady()
+      SpeedGrader.EG.goToStudent(studentOne.id)
+
+      const avatarImageStyles = document.getElementById('avatar_image').style
+      strictEqual(avatarImageStyles.display, 'inline')
+    })
+
+    test('avatar reflects the avatar path for the selected student', () => {
+      window.jsonData = windowJsonData
+      SpeedGrader.EG.jsonReady()
+      SpeedGrader.EG.currentStudent = null
+      SpeedGrader.EG.goToStudent(studentOne.id)
+
+      const avatarImageSrc = document.getElementById('avatar_image').src
+      ok(avatarImageSrc.includes('/path/to/an/image'))
+    })
+
+    test('avatar is hidden if the current student has no avatar_path attribute', () => {
+      delete studentOne.avatar_path
+
+      window.jsonData = windowJsonData
+      SpeedGrader.EG.jsonReady()
+      SpeedGrader.EG.currentStudent = null
+      SpeedGrader.EG.goToStudent(studentOne.id)
+
+      const avatarImageStyles = document.getElementById('avatar_image').style
+      strictEqual(avatarImageStyles.display, 'none')
+    })
+
+    test('avatar is hidden if student names are hidden', () => {
+      userSettingsStub.returns(true)
+
+      window.jsonData = windowJsonData
+      SpeedGrader.EG.jsonReady()
+      SpeedGrader.EG.currentStudent = null
+      SpeedGrader.EG.goToStudent(studentOne.id)
+
+      const avatarImageStyles = document.getElementById('avatar_image').style
+      strictEqual(avatarImageStyles.display, 'none')
+    })
+
+    test('avatar is updated when a new student is selected via the select menu', () => {
+      window.jsonData = windowJsonData
+      SpeedGrader.EG.jsonReady()
+      SpeedGrader.EG.currentStudent = null
+
+      const selectMenu = document.getElementById('students_selectmenu')
+      selectMenu.value = studentTwo.id
+      SpeedGrader.EG.handleStudentChanged()
+
+      const avatarImageSrc = document.getElementById('avatar_image').src
+      ok(avatarImageSrc.includes('/path/to/a/second/image'))
     })
   })
 })

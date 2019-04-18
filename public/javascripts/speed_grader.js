@@ -1493,23 +1493,12 @@ EG = {
   },
 
   goToStudent(studentIdentifier, historyBehavior = null) {
-    const hideStudentNames = utils.shouldHideStudentNames()
     const student = jsonData.studentMap[studentIdentifier]
 
     if (student) {
       $selectmenu.selectmenu('value', student[anonymizableId])
       if (!this.currentStudent || this.currentStudent[anonymizableId] !== student[anonymizableId]) {
-        handleStudentOrSectionSelected(studentIdentifier, historyBehavior)
-      }
-
-      if (hideStudentNames || isAnonymous || !student.avatar_path) {
-        $avatar_image.hide()
-      } else {
-        // If there's any kind of delay in loading the user's avatar, it's
-        // better to show a blank image than the previous student's image.
-        const $new_image = $avatar_image.clone().show()
-        $avatar_image.after($new_image.attr('src', student.avatar_path)).remove()
-        $avatar_image = $new_image
+        EG.handleStudentChanged(historyBehavior)
       }
     }
   },
@@ -1561,6 +1550,20 @@ EG = {
       $full_width_container.disableWhileLoading(this.fetchProvisionalGrades())
     } else {
       this.showStudent()
+    }
+
+    this.setCurrentStudentAvatar()
+  },
+
+  setCurrentStudentAvatar() {
+    if (utils.shouldHideStudentNames() || isAnonymous || !this.currentStudent.avatar_path) {
+      $avatar_image.hide()
+    } else {
+      // If there's any kind of delay in loading the user's avatar, it's
+      // better to show a blank image than the previous student's image.
+      const $new_image = $avatar_image.clone().show()
+      $avatar_image.after($new_image.attr('src', this.currentStudent.avatar_path)).remove()
+      $avatar_image = $new_image
     }
   },
 
