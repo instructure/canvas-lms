@@ -2000,6 +2000,8 @@ EG = {
       }
     }
 
+    let studentViewedAtHTML = ''
+
     // handle the files
     $submission_files_list.empty()
     $turnitinInfoContainer = $('#submission_files_container .turnitin_info_container').empty()
@@ -2028,13 +2030,11 @@ EG = {
         inlineableAttachments.push(attachment)
       }
 
-      let viewedAtHTML = ''
       if (!jsonData.anonymize_students || isAdmin) {
-        viewedAtHTML = studentViewedAtTemplate({
+        studentViewedAtHTML = studentViewedAtTemplate({
           viewed_at: $.datetimeString(attachment.viewed_at)
         })
       }
-      $submission_attachment_viewed_at.html($.raw(viewedAtHTML))
 
       if (browserableCssClasses.test(attachment.mime_class)) {
         browserableAttachments.push(attachment)
@@ -2102,6 +2102,7 @@ EG = {
 
       renderProgressIcon(attachment)
     })
+    $submission_attachment_viewed_at.html($.raw(studentViewedAtHTML))
 
     $submission_files_container.showIf(
       submission.versioned_attachments && submission.versioned_attachments.length

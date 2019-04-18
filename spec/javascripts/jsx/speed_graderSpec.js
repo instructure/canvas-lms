@@ -1070,6 +1070,7 @@ QUnit.module('handleSubmissionSelectionChange', hooks => {
   let submissions
   let params
   let finishSetup
+  let gradedStudentWithNoSubmission
 
   hooks.beforeEach(() => {
     fakeENV.setup({
@@ -1129,16 +1130,18 @@ QUnit.module('handleSubmissionSelectionChange', hooks => {
           submission_history: [
             {
               submission: {
+                external_tool_url: 'foo',
+                id: 1113,
                 user_id: 4,
-                submission_type: 'basic_lti_launch',
-                external_tool_url: 'foo'
+                submission_type: 'basic_lti_launch'
               }
             },
             {
               submission: {
+                external_tool_url: 'bar',
+                id: 1114,
                 user_id: 4,
                 submission_type: 'basic_lti_launch',
-                external_tool_url: 'bar',
                 versioned_attachments: [
                   {
                     attachment: {viewed_at: new Date('Jan 1, 2011').toISOString()}
@@ -1150,6 +1153,12 @@ QUnit.module('handleSubmissionSelectionChange', hooks => {
         }
       }
 
+      gradedStudentWithNoSubmission = {
+        id: 5,
+        name: 'Guy B. Graded Without Having Submitted Anything',
+        submission_state: 'graded',
+      }
+
       window.jsonData = {
         id: 27,
         context: {
@@ -1158,7 +1167,11 @@ QUnit.module('handleSubmissionSelectionChange', hooks => {
             {
               user_id: '4',
               course_section_id: 1
-            }
+            },
+            {
+              user_id: '5',
+              course_section_id: 1
+            },
           ],
           students: [
             {
@@ -1166,6 +1179,10 @@ QUnit.module('handleSubmissionSelectionChange', hooks => {
               id: 4,
               name: 'Guy B. Studying',
               submission_state: 'not_graded'
+            },
+            {
+              index: 1,
+              ...gradedStudentWithNoSubmission
             }
           ]
         },
@@ -1176,7 +1193,8 @@ QUnit.module('handleSubmissionSelectionChange', hooks => {
         GROUP_GRADING_MODE: false,
         points_possible: 10,
         studentMap: {
-          4: SpeedGrader.EG.currentStudent
+          4: SpeedGrader.EG.currentStudent,
+          5: gradedStudentWithNoSubmission
         },
         studentsWithSubmissions: [],
         submissions: []
@@ -1252,6 +1270,20 @@ QUnit.module('handleSubmissionSelectionChange', hooks => {
       .innerHTML
 
     notOk(viewedAtHTML.includes('Jan 1, 2011'))
+  })
+
+  test('clears the previous last-viewed date when navigating to a graded student with no attachments', () => {
+    finishSetup()
+    // View the initial student, who has submissions
+    SpeedGrader.EG.handleSubmissionSelectionChange()
+
+    SpeedGrader.EG.currentStudent = gradedStudentWithNoSubmission
+    SpeedGrader.EG.handleSubmissionSelectionChange()
+
+    const viewedAtHTML = document.getElementById('submission_attachment_viewed_at_container')
+      .innerHTML
+
+    strictEqual(viewedAtHTML, '')
   })
 
   QUnit.skip('disables the complete/incomplete select when grading period is closed', () => {
