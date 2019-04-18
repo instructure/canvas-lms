@@ -15,7 +15,7 @@ set :branch, 'bz-staging'
 #SSHKit.config.command_map[:npm] = '/home/canvasadmin/.nvm/versions/node/v0.12.14/bin/npm'
 set :nvm_node, 'v0.12.14'
 set :nvm_map_bins, %w{node npm}
-set :nvm_custom_path, '/home/canvasadmin/.nvm/versions/node'
+set :nvm_custom_path, '/home/canvasadmin/.nvm'
 
 # Extended Server Syntax
 # ======================
