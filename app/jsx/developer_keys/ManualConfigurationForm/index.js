@@ -30,12 +30,13 @@ import Placements from './Placements';
 
 export default class ManualConfigurationForm extends React.Component {
   generateToolConfiguration = () => {
-    return {
+    const toolConfig = {
       ...this.requiredRef.generateToolConfigurationPart(),
-      ...this.servicesRef.generateToolConfigurationPart(),
-      ...this.additionalRef.generateToolConfigurationPart(),
-      ...this.placementsRef.generateToolConfigurationPart()
+      scopes: this.servicesRef.generateToolConfigurationPart(),
+      ...this.additionalRef.generateToolConfigurationPart()
     }
+    toolConfig.extensions[0].placements = this.placementsRef.generateToolConfigurationPart();
+    return toolConfig
   }
 
   setRequiredRef = node => this.requiredRef = node;
@@ -56,7 +57,7 @@ export default class ManualConfigurationForm extends React.Component {
           layout="stacked"
         >
           <RequiredValues ref={this.setRequiredRef} toolConfiguration={toolConfiguration} />
-          <Services ref={this.setServicesRef}  validScopes={validScopes} toolConfiguration={toolConfiguration} />
+          <Services ref={this.setServicesRef}  validScopes={validScopes} scopes={toolConfiguration.scopes} />
           <AdditionalSettings ref={this.setAdditionalRef}  additionalSettings={this.additionalSettings} custom_fields={this.custom_fields} />
           <Placements ref={this.setPlacementsRef}  validPlacements={validPlacements} placements={this.placements} />
         </FormFieldGroup>

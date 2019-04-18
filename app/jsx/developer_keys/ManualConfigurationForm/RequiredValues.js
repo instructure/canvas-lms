@@ -36,6 +36,31 @@ export default class RequiredValues extends React.Component {
     return this.state.toolConfiguration
   }
 
+  handleTitleChange = e => {
+    const value = e.target.value;
+    this.setState(state => ({toolConfiguration: {...state.toolConfiguration, title: value}}))
+  }
+
+  handleDescriptionChange = e => {
+    const value = e.target.value;
+    this.setState(state => ({toolConfiguration: {...state.toolConfiguration, description: value}}))
+  }
+
+  handleTargetLinkUriChange = e => {
+    const value = e.target.value;
+    this.setState(state => ({toolConfiguration: {...state.toolConfiguration, target_link_uri: value}}))
+  }
+
+  handleOidcInitiationUrlChange = e => {
+    const value = e.target.value;
+    this.setState(state => ({toolConfiguration: {...state.toolConfiguration, oidc_initiation_url: value}}))
+  }
+
+  handlePublicJwkChange = e => {
+    const value = e.target.value;
+    this.setState(state => ({toolConfiguration: {...state.toolConfiguration, public_jwk: value}}))
+  }
+
   render() {
     const { toolConfiguration } = this.state;
 
@@ -53,6 +78,7 @@ export default class RequiredValues extends React.Component {
             value={toolConfiguration.title}
             label={I18n.t("Title")}
             required
+            onChange={this.handleTitleChange}
           />
           <TextArea
             name="description"
@@ -60,6 +86,7 @@ export default class RequiredValues extends React.Component {
             label={I18n.t("Description")}
             maxHeight="5rem"
             required
+            onChange={this.handleDescriptionChange}
           />
         </FormFieldGroup>
         <FormFieldGroup
@@ -71,12 +98,14 @@ export default class RequiredValues extends React.Component {
             value={toolConfiguration.target_link_uri}
             label={I18n.t("Target Link URI")}
             required
+            onChange={this.handleTargetLinkUriChange}
           />
           <TextInput
             name="oidc_initiation_url"
             value={toolConfiguration.oidc_initiation_url}
             label={I18n.t("OpenID Connect Initiation Url")}
             required
+            onChange={this.handleOidcInitiationUrlChange}
           />
         </FormFieldGroup>
         <TextArea
@@ -87,6 +116,7 @@ export default class RequiredValues extends React.Component {
           required
           resize="vertical"
           autoGrow
+          onChange={this.handlePublicJwkChange}
         />
         <hr />
       </FormFieldGroup>

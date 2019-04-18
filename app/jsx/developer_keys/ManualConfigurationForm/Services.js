@@ -30,16 +30,18 @@ export default class Services extends React.Component {
   constructor (props) {
     super(props);
     this.state = {
-      toolConfiguration: this.props.toolConfiguration
+      scopes: this.props.scopes
     }
   }
 
   generateToolConfigurationPart = () => {
-    return this.state.toolConfiguration
+    return this.state.scopes
   }
 
+  handleScopesSelectionChange = scopes => this.setState({scopes})
+
   render() {
-    const { toolConfiguration } = this.state;
+    const { scopes } = this.state;
     const { validScopes } = this.props;
 
     return (
@@ -59,8 +61,8 @@ export default class Services extends React.Component {
             </Alert>
             <CheckboxGroup
               name="services"
-              onChange={() => {}}
-              value={toolConfiguration.scopes}
+              onChange={this.handleScopesSelectionChange}
+              value={scopes}
               description={<ScreenReaderContent>{I18n.t("Check Services to enable")}</ScreenReaderContent>}
             >
               {
@@ -82,7 +84,9 @@ export default class Services extends React.Component {
 
 Services.propTypes = {
   validScopes: PropTypes.object.isRequired,
-  toolConfiguration: PropTypes.shape({
-    scopes: PropTypes.arrayOf(PropTypes.string)
-  })
+  scopes: PropTypes.arrayOf(PropTypes.string)
+}
+
+Services.defaultProps = {
+  scopes: []
 }
