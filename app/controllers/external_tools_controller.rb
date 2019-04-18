@@ -518,7 +518,7 @@ class ExternalToolsController < ApplicationController
       )
     end
 
-    lti_launch.params = if selection_type == 'homework_submission' && assignment
+    lti_launch.params = if selection_type == 'homework_submission' && assignment && !tool.use_1_3?
                           adapter.generate_post_payload_for_homework_submission(assignment)
                         else
                           adapter.generate_post_payload

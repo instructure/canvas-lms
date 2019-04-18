@@ -19,22 +19,26 @@ module Lti::Messages
   class DeepLinkingRequest < JwtMessage
     ACCEPT_TYPES = {
       'editor_button' => %w(link file html ltiResourceLink image).freeze,
-      'assignment_selection' => %w(ltiResourceLink).freeze
+      'assignment_selection' => %w(ltiResourceLink).freeze,
+      'homework_submission' => %w(file).freeze
     }.freeze
 
     DOCUMENT_TARGETS = {
       'editor_button' => %w(embed iframe window).freeze,
-      'assignment_selection' => %w(iframe window).freeze
+      'assignment_selection' => %w(iframe window).freeze,
+      'homework_submission' => %w(iframe).freeze
     }.freeze
 
     MEDIA_TYPES = {
       'editor_button' => %w(image/* text/html application/vnd.ims.lti.v1.ltilink */*).freeze,
-      'assignment_selection' => %w(application/vnd.ims.lti.v1.ltilink).freeze
+      'assignment_selection' => %w(application/vnd.ims.lti.v1.ltilink).freeze,
+      'homework_submission' => %w(*/*).freeze
     }.freeze
 
     AUTO_CREATE = {
       'editor_button' => false,
-      'assignment_selection' => false
+      'assignment_selection' => false,
+      'homework_submission' => false
     }.freeze
 
     MODAL_PLACEMENTS = %w(editor_button assignment_selection).freeze
