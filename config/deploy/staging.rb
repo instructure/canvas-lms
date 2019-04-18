@@ -11,6 +11,9 @@ role :db,  %w{deploy@172.31.3.79}
 
 set :branch, 'bz-staging'
 
+# On staging, we reinstallled npm using nvm. If we do this in prod, we can use this solution: https://stackoverflow.com/questions/27357023/cap-no-such-file-or-directory-usr-bin-env-npm-although-it-is-really-here
+# But as a hack for now, i'm just mapping the npm path
+SSHKit.config.command_map[:npm] = '/home/canvasadmin/.nvm/versions/node/v0.12.14/bin/npm'
 
 # Extended Server Syntax
 # ======================

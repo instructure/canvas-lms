@@ -114,7 +114,12 @@ namespace :canvas do
     build_js = truthy_values.include?(args[:build_js])
 
     log_time('Making sure node_modules are up to date') {
-      raise 'error running npm install' unless `npm install`
+      # TODO: remove me. just troubleshooting
+      puts "PATH="
+      puts ENV['PATH']
+      puts "`npm -v`"
+      raise 'error running npm install' unless `npm install -dd`
+      #raise 'error running npm install' unless `npm install`
     }
 
     # public/dist/brandable_css/brandable_css_bundles_with_deps.json needs
