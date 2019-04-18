@@ -15,12 +15,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  '../collections/PaginatedCollection'
-], (PaginatedCollection) -> 
-  class ContentMigrationIssueCollection extends PaginatedCollection
-    @optionProperty 'course_id'
-    @optionProperty 'content_migration_id'
+import PaginatedCollection from '../collections/PaginatedCollection'
 
-    url: -> "/api/v1/courses/#{@course_id}/content_migrations/#{@content_migration_id}/migration_issues"
+export default class ContentMigrationIssueCollection extends PaginatedCollection
+  @optionProperty 'course_id'
+  @optionProperty 'content_migration_id'
+
+  url: -> "/api/v1/courses/#{@course_id}/content_migrations/#{@content_migration_id}/migration_issues"
 

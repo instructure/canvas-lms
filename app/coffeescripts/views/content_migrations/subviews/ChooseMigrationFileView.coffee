@@ -15,80 +15,79 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone'
-  'jst/content_migrations/subviews/ChooseMigrationFile'
-  'i18n!content_migrations'
-], (Backbone, template, I18n) ->
-  class ChooseMigrationFile extends Backbone.View
-    template: template
+import Backbone from 'Backbone'
+import template from 'jst/content_migrations/subviews/ChooseMigrationFile'
+import I18n from 'i18n!content_migrations'
 
-    els: 
-      '#migrationFileUpload' : '$migrationFileUpload'
+export default class ChooseMigrationFile extends Backbone.View
+  template: template
 
-    events: 
-      'change #migrationFileUpload' : 'setAttributes'
+  els:
+    '#migrationFileUpload' : '$migrationFileUpload'
 
-    @optionProperty 'fileSizeLimit'
+  events:
+    'change #migrationFileUpload' : 'setAttributes'
 
-    setAttributes: (event) -> 
-      filename = event.target.value.replace(/^.*\\/, '')
-      fileElement = @$migrationFileUpload[0]
+  @optionProperty 'fileSizeLimit'
 
-      @model.set('pre_attachment', {
-        file_size: @fileSize(fileElement),
-        name: filename,
-        fileElement: fileElement,
-        no_redirect: true
-      })
-    
-    # TODO 
-    #   Handle cases for file size from IE browsers
-    # @api private
+  setAttributes: (event) ->
+    filename = event.target.value.replace(/^.*\\/, '')
+    fileElement = @$migrationFileUpload[0]
 
-    fileSize: (fileElement) -> fileElement.files?[0].size
+    @model.set('pre_attachment', {
+      file_size: @fileSize(fileElement),
+      name: filename,
+      fileElement: fileElement,
+      no_redirect: true
+    })
 
-    # Validates this form element. This validates method is a convention used 
-    # for all sub views.
-    # ie:
-    #   error_object = {fieldName:[{type:'required', message: 'This is wrong'}]}
-    # -----------------------------------------------------------------------
-    # @expects void
-    # @returns void | object (error)
-    # @api private
+  # TODO
+  #   Handle cases for file size from IE browsers
+  # @api private
 
-    validations: -> 
-      errors = {}
-      preAttachment = @model.get('pre_attachment')
-      fileErrors = []
-      fileElement = preAttachment?.fileElement
+  fileSize: (fileElement) -> fileElement.files?[0].size
 
-      unless preAttachment?.name && fileElement
-        fileErrors.push
-                    type: "required"
-                    message: I18n.t("file_required", "You must select a file to import content from")
+  # Validates this form element. This validates method is a convention used
+  # for all sub views.
+  # ie:
+  #   error_object = {fieldName:[{type:'required', message: 'This is wrong'}]}
+  # -----------------------------------------------------------------------
+  # @expects void
+  # @returns void | object (error)
+  # @api private
 
-      if @fileSize(fileElement) > @fileSizeLimit
-        fileErrors.push
-                    type: "upload_limit_exceeded"
-                    message: I18n.t("file_too_large", "Your migration cannot exceed %{file_size}", file_size: @humanReadableSize(@fileSizeLimit))
+  validations: ->
+    errors = {}
+    preAttachment = @model.get('pre_attachment')
+    fileErrors = []
+    fileElement = preAttachment?.fileElement
 
-      errors.file = fileErrors if fileErrors.length
-      errors
+    unless preAttachment?.name && fileElement
+      fileErrors.push
+                  type: "required"
+                  message: I18n.t("file_required", "You must select a file to import content from")
 
-    # Converts a size to a human readible string. "size" should be in
-    # bytes to stay consistent with the javascript files api. 
-    # --------------------------------------------------------------
-    # @expects size (bytes | string(in bytes))
-    # @returns readableString (string)
-    # @api private
+    if @fileSize(fileElement) > @fileSizeLimit
+      fileErrors.push
+                  type: "upload_limit_exceeded"
+                  message: I18n.t("file_too_large", "Your migration cannot exceed %{file_size}", file_size: @humanReadableSize(@fileSizeLimit))
 
-    humanReadableSize: (size) -> 
-      size = parseFloat size #Ensure we are working with a number
-      units = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
-      i = 0
-      while(size >= 1024) 
-          size /= 1024
-          ++i
+    errors.file = fileErrors if fileErrors.length
+    errors
 
-      size.toFixed(1) + ' ' + units[i]
+  # Converts a size to a human readible string. "size" should be in
+  # bytes to stay consistent with the javascript files api.
+  # --------------------------------------------------------------
+  # @expects size (bytes | string(in bytes))
+  # @returns readableString (string)
+  # @api private
+
+  humanReadableSize: (size) ->
+    size = parseFloat size #Ensure we are working with a number
+    units = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+    i = 0
+    while(size >= 1024)
+        size /= 1024
+        ++i
+
+    size.toFixed(1) + ' ' + units[i]

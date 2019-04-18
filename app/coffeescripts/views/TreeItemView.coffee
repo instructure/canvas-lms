@@ -15,21 +15,18 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone'
-  'underscore'
-  '../fn/preventDefault'
-  'jst/TreeItem'
-], (Backbone, _, preventDefault, template) ->
+import Backbone from 'Backbone'
+import _ from 'underscore'
+import template from 'jst/TreeItem'
 
-  class TreeItemView extends Backbone.View
-    tagName: 'li'
-    template: template
-    @optionProperty 'nestingLevel'
-    attributes: ->
-      role: 'treeitem'
-      id: _.uniqueId 'treenode-'
+export default class TreeItemView extends Backbone.View
+  tagName: 'li'
+  template: template
+  @optionProperty 'nestingLevel'
+  attributes: ->
+    role: 'treeitem'
+    id: _.uniqueId 'treenode-'
 
-    afterRender: ->
-      # We have to do this here, because @nestingLevel isn't available when attributes is run.
-      @$el.attr 'aria-level', @nestingLevel
+  afterRender: ->
+    # We have to do this here, because @nestingLevel isn't available when attributes is run.
+    @$el.attr 'aria-level', @nestingLevel

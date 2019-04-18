@@ -16,10 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-define [
-  '../collections/PaginatedCollection'
-  '../models/User'
-], (PaginatedCollection, User) ->
+import PaginatedCollection from './PaginatedCollection'
+import User from '../models/User'
 
-  class UserCollection extends PaginatedCollection
-    model: User
+export default class UserCollection extends PaginatedCollection
+  model: User

@@ -15,26 +15,23 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone'
-  'jquery'
-  '../collections/ModuleItemCollection'
-], (Backbone, $, ModuleItemCollection) ->
+import Backbone from 'Backbone'
+import ModuleItemCollection from '../collections/ModuleItemCollection'
 
-  class Module extends Backbone.Model
-    resourceName: 'modules'
+export default class Module extends Backbone.Model
+  resourceName: 'modules'
 
-    initialize: ->
-      @course_id = @get('course_id')
-      @course_id ||= @collection.course_id if @collection
+  initialize: ->
+    @course_id = @get('course_id')
+    @course_id ||= @collection.course_id if @collection
 
-      unless @collection?.skip_items
-        items = @get('items')
-        @itemCollection = new ModuleItemCollection items,
-          module_id: @get('id')
-          course_id: @course_id
-        if !items
-          @itemCollection.setParam('per_page', 50)
-          @itemCollection.fetch()
+    unless @collection?.skip_items
+      items = @get('items')
+      @itemCollection = new ModuleItemCollection items,
+        module_id: @get('id')
+        course_id: @course_id
+      if !items
+        @itemCollection.setParam('per_page', 50)
+        @itemCollection.fetch()
 
-      super
+    super

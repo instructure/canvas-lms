@@ -15,16 +15,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  './InputView'
-], (InputView) ->
+import InputView from './InputView'
 
-  class SelectView extends InputView
+export default class SelectView extends InputView
 
-    tagName: 'select'
+  tagName: 'select'
 
-    className: 'select-view'
+  className: 'select-view'
 
-    events:
-      'change': 'updateModel'
+  events:
+    'change': 'updateModel'
 

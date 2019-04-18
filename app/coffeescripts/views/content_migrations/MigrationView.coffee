@@ -15,23 +15,22 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone'
-  'underscore'
-], (Backbone, _) -> 
-  class MigrationView extends Backbone.View
-    
-    # Validations for this view that should be made
-    # on the client side before save.
-    # ---------------------------------------------
-    # @expects void
-    # @returns ErrorMessage
-    # @api private override ValidateFormView
+import Backbone from 'Backbone'
+import _ from 'underscore'
 
-    validateBeforeSave: => 
-      # There might be a better way to do this with reduce
-      validations = {}
-      _.each @children, (child) => 
-        _.extend(validations, child.validations()) if child.validations
+export default class MigrationView extends Backbone.View
 
-      validations
+  # Validations for this view that should be made
+  # on the client side before save.
+  # ---------------------------------------------
+  # @expects void
+  # @returns ErrorMessage
+  # @api private override ValidateFormView
+
+  validateBeforeSave: =>
+    # There might be a better way to do this with reduce
+    validations = {}
+    _.each @children, (child) =>
+      _.extend(validations, child.validations()) if child.validations
+
+    validations

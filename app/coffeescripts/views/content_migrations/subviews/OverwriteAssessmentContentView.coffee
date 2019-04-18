@@ -15,17 +15,16 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone'
-  'jst/content_migrations/subviews/OverwriteAssessmentContent'
-], (Backbone, template) -> 
-  class OverwriteAssessmentContentView extends Backbone.View
-    template: template
+import Backbone from 'Backbone'
+import template from 'jst/content_migrations/subviews/OverwriteAssessmentContent'
 
-    events:
-      "change #overwriteAssessmentContent" : "setAttribute"
+export default class OverwriteAssessmentContentView extends Backbone.View
+  template: template
 
-    setAttribute: =>
-      settings = @model.get('settings') || {}
-      settings.overwrite_quizzes = !!@$el.find('#overwriteAssessmentContent').is(":checked")
-      @model.set('settings', settings)
+  events:
+    "change #overwriteAssessmentContent" : "setAttribute"
+
+  setAttribute: =>
+    settings = @model.get('settings') || {}
+    settings.overwrite_quizzes = !!@$el.find('#overwriteAssessmentContent').is(":checked")
+    @model.set('settings', settings)

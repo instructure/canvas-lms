@@ -15,42 +15,39 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'jquery'
-  'underscore'
-  'Backbone'
-  './ProgressBarView'
-  './OutcomePopoverView'
-  './OutcomeDialogView'
-  'jst/grade_summary/outcome'
-], ($, _, Backbone, ProgressBarView, OutcomePopoverView, OutcomeDialogView, template) ->
+import _ from 'underscore'
+import Backbone from 'Backbone'
+import ProgressBarView from './ProgressBarView'
+import OutcomePopoverView from './OutcomePopoverView'
+import OutcomeDialogView from './OutcomeDialogView'
+import template from 'jst/grade_summary/outcome'
 
-  class OutcomeView extends Backbone.View
-    className: 'outcome'
-    events:
-      'click .more-details' : 'show'
-      'keydown .more-details' : 'show'
-    tagName: 'li'
-    template: template
+export default class OutcomeView extends Backbone.View
+  className: 'outcome'
+  events:
+    'click .more-details' : 'show'
+    'keydown .more-details' : 'show'
+  tagName: 'li'
+  template: template
 
-    initialize: ->
-      super
-      @progress = new ProgressBarView(model: @model)
+  initialize: ->
+    super
+    @progress = new ProgressBarView(model: @model)
 
-    afterRender: ->
-      @popover = new OutcomePopoverView({
-        el: @$('.more-details')
-        model: @model
-      })
-      @dialog = new OutcomeDialogView({
-        model: @model
-      })
+  afterRender: ->
+    @popover = new OutcomePopoverView({
+      el: @$('.more-details')
+      model: @model
+    })
+    @dialog = new OutcomeDialogView({
+      model: @model
+    })
 
-    show: (e) ->
-      @dialog.show e
+  show: (e) ->
+    @dialog.show e
 
-    toJSON: ->
-      json = super
-      _.extend json,
-        progress: @progress
+  toJSON: ->
+    json = super
+    _.extend json,
+      progress: @progress
 

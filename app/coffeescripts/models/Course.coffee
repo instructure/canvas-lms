@@ -16,14 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-define [
-  'underscore'
-  'Backbone'
-], (_, {Model}) ->
+import _ from 'underscore'
+import {Model} from 'Backbone'
 
-  class Course extends Model
-    modelType: 'course'
-    resourceName: 'courses'
+export default class Course extends Model
+  modelType: 'course'
+  resourceName: 'courses'
 
-    toJSON: ->
-      {course: _.omit(@attributes, 'id', 'calendar', 'enrollments', 'workflow_state')}
+  toJSON: ->
+    {course: _.omit(@attributes, 'id', 'calendar', 'enrollments', 'workflow_state')}

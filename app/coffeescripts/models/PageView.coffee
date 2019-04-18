@@ -16,32 +16,29 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-define [
-  'jquery'
-  'underscore'
-  'Backbone'
-  '../str/TextHelper'
-  'jquery.instructure_misc_helpers' # $.parseUserAgentString
-], ($, _, Backbone, {truncateText}) ->
+import $ from 'jquery'
+import Backbone from 'Backbone'
+import TextHelper from '../str/TextHelper'
+import 'jquery.instructure_misc_helpers' # $.parseUserAgentString
 
-  class PageView extends Backbone.Model
+export default class PageView extends Backbone.Model
 
-    computedAttributes: ['summarizedUserAgent', 'readableInteractionTime', 'truncatedURL', 'isLinkable']
+  computedAttributes: ['summarizedUserAgent', 'readableInteractionTime', 'truncatedURL', 'isLinkable']
 
-    isLinkable: ->
-      method = @get 'http_method'
-      return true unless method?
-      method is 'get'
+  isLinkable: ->
+    method = @get 'http_method'
+    return true unless method?
+    method is 'get'
 
-    summarizedUserAgent: ->
-      @get('app_name') || $.parseUserAgentString(@get 'user_agent')
+  summarizedUserAgent: ->
+    @get('app_name') || $.parseUserAgentString(@get 'user_agent')
 
-    readableInteractionTime: ->
-      seconds = @get 'interaction_seconds'
-      if seconds > 5
-        Math.round(seconds)
-      else
-        '--'
+  readableInteractionTime: ->
+    seconds = @get 'interaction_seconds'
+    if seconds > 5
+      Math.round(seconds)
+    else
+      '--'
 
-    truncatedURL: ->
-      truncateText @get('url'), max: 90
+  truncatedURL: ->
+    TextHelper.truncateText @get('url'), max: 90

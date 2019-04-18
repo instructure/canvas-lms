@@ -16,30 +16,28 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-define [
-  'i18n!gradebook'
-  'jquery'
-  'message_students'
-  '../AssignmentDetailsDialog'
-  '../AssignmentMuter'
-  '../shared/SetDefaultGradeDialog'
-  '../shared/CurveGradesDialog'
-  'jst/gradebook/GradebookHeaderMenu'
-  'jst/re_upload_submissions_form'
-  'underscore'
-  '../behaviors/authenticity_token'
-  'jsx/gradebook/shared/helpers/messageStudentsWhoHelper'
-  'jquery.instructure_forms'
-  'jqueryui/dialog'
-  'jquery.instructure_misc_helpers'
-  'jquery.instructure_misc_plugins'
-  '../jquery.kylemenu'
-], (I18n, $, messageStudents, AssignmentDetailsDialog, AssignmentMuter, SetDefaultGradeDialog, CurveGradesDialog, gradebookHeaderMenuTemplate, re_upload_submissions_form, _, authenticity_token, MessageStudentsWhoHelper) ->
+import I18n from 'i18n!gradebook'
+import $ from 'jquery'
+import messageStudents from 'message_students'
+import AssignmentDetailsDialog from '../AssignmentDetailsDialog'
+import AssignmentMuter from '../AssignmentMuter'
+import SetDefaultGradeDialog from '../shared/SetDefaultGradeDialog'
+import CurveGradesDialog from '../shared/CurveGradesDialog'
+import gradebookHeaderMenuTemplate from 'jst/gradebook/GradebookHeaderMenu'
+import re_upload_submissions_form from 'jst/re_upload_submissions_form'
+import _ from 'underscore'
+import authenticity_token from '../behaviors/authenticity_token'
+import MessageStudentsWhoHelper from 'jsx/gradebook/shared/helpers/messageStudentsWhoHelper'
+import 'jquery.instructure_forms'
+import 'jqueryui/dialog'
+import 'jquery.instructure_misc_helpers'
+import 'jquery.instructure_misc_plugins'
+import '../jquery.kylemenu'
 
-  isAdmin = () ->
-    ENV.current_user_roles.includes('admin')
+isAdmin = () ->
+  ENV.current_user_roles.includes('admin')
 
-  class GradebookHeaderMenu
+export default class GradebookHeaderMenu
     constructor: (@assignment, @$trigger, @gradebook) ->
       templateLocals =
         assignmentUrl: "#{@gradebook.options.context_url}/assignments/#{@assignment.id}"

@@ -15,46 +15,43 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'jquery'
-  'underscore'
-  'Backbone'
-  '../models/grade_summary/Outcome'
-  '../collections/WrappedCollection'
-], ($, _, Backbone, Outcome, WrappedCollection) ->
-  class OutcomeResultCollection extends WrappedCollection
-    key: 'outcome_results'
-    model: Outcome
-    @optionProperty 'outcome'
-    url: -> "/api/v1/courses/#{@course_id}/outcome_results?user_ids[]=#{@user_id}&outcome_ids[]=#{@outcome.id}&include[]=alignments&per_page=100"
-    loadAll: true
+import Backbone from 'Backbone'
+import Outcome from '../models/grade_summary/Outcome'
+import WrappedCollection from './WrappedCollection'
 
-    comparator: (model) ->
-      return -1 * model.get('submitted_or_assessed_at').getTime()
+export default class OutcomeResultCollection extends WrappedCollection
+  key: 'outcome_results'
+  model: Outcome
+  @optionProperty 'outcome'
+  url: -> "/api/v1/courses/#{@course_id}/outcome_results?user_ids[]=#{@user_id}&outcome_ids[]=#{@outcome.id}&include[]=alignments&per_page=100"
+  loadAll: true
 
-    initialize: ->
-      super
-      @model = Outcome.extend defaults: {
-        points_possible: @outcome.get('points_possible'),
-        mastery_points: @outcome.get('mastery_points')
-      }
-      @course_id = ENV.context_asset_string?.replace('course_', '')
-      @user_id = ENV.student_id
-      @on('reset', @handleReset)
-      @on('add', @handleAdd)
+  comparator: (model) ->
+    return -1 * model.get('submitted_or_assessed_at').getTime()
 
-    handleReset: =>
-      @each @handleAdd
+  initialize: ->
+    super
+    @model = Outcome.extend defaults: {
+      points_possible: @outcome.get('points_possible'),
+      mastery_points: @outcome.get('mastery_points')
+    }
+    @course_id = ENV.context_asset_string?.replace('course_', '')
+    @user_id = ENV.student_id
+    @on('reset', @handleReset)
+    @on('add', @handleAdd)
 
-    handleAdd: (model) =>
-      alignment_id = model.get('links').alignment
-      model.set('alignment_name', @alignments.get(alignment_id)?.get('name'))
-      if model.get('points_possible') > 0
-        model.set('score', model.get('points_possible') * model.get('percent'))
-      else
-        model.set('score', model.get('mastery_points') * model.get('percent'))
+  handleReset: =>
+    @each @handleAdd
 
-    parse: (response) ->
-      @alignments ?= new Backbone.Collection([])
-      @alignments.add(response?.linked?.alignments || [])
-      response[@key]
+  handleAdd: (model) =>
+    alignment_id = model.get('links').alignment
+    model.set('alignment_name', @alignments.get(alignment_id)?.get('name'))
+    if model.get('points_possible') > 0
+      model.set('score', model.get('points_possible') * model.get('percent'))
+    else
+      model.set('score', model.get('mastery_points') * model.get('percent'))
+
+  parse: (response) ->
+    @alignments ?= new Backbone.Collection([])
+    @alignments.add(response?.linked?.alignments || [])
+    response[@key]

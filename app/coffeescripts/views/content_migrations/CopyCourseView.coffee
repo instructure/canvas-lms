@@ -15,20 +15,17 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone'
-  'underscore'
-  'jst/content_migrations/CopyCourse'
-  './MigrationView'
-],(Backbone, _, template, MigrationView) -> 
-  class CopyCourseView extends MigrationView
-    template: template
+import template from 'jst/content_migrations/CopyCourse'
+import MigrationView from './MigrationView'
 
-    @child 'courseFindSelect', '.courseFindSelect'
-    @child 'dateShift', '.dateShift'
-    @child 'selectContent', '.selectContent'
+export default class CopyCourseView extends MigrationView
+  template: template
 
-    initialize: ->
-      super
-      @courseFindSelect.on 'course_changed', (course) =>
-        @dateShift.updateNewDates(course)
+  @child 'courseFindSelect', '.courseFindSelect'
+  @child 'dateShift', '.dateShift'
+  @child 'selectContent', '.selectContent'
+
+  initialize: ->
+    super
+    @courseFindSelect.on 'course_changed', (course) =>
+      @dateShift.updateNewDates(course)

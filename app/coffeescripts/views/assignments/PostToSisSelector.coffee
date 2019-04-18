@@ -15,30 +15,26 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone'
-  'underscore'
-  'jquery'
-  'jst/assignments/PostToSisSelector'
-  '../../jquery/toggleAccessibly'
-], (Backbone, _, $, template, toggleAccessibly) ->
+import Backbone from 'Backbone'
+import template from 'jst/assignments/PostToSisSelector'
+import '../../jquery/toggleAccessibly'
 
-  class PostToSisSelector extends Backbone.View
+export default class PostToSisSelector extends Backbone.View
 
-    template: template
+  template: template
 
-    POST_TO_SIS              = '#assignment_post_to_sis'
+  POST_TO_SIS              = '#assignment_post_to_sis'
 
-    els: do ->
-      els = {}
-      els[POST_TO_SIS] = '$postToSis'
-      els
+  els: do ->
+    els = {}
+    els[POST_TO_SIS] = '$postToSis'
+    els
 
-    @optionProperty 'parentModel'
-    @optionProperty 'nested'
+  @optionProperty 'parentModel'
+  @optionProperty 'nested'
 
-    toJSON: =>
-      postToSIS: @parentModel.postToSIS()
-      postToSISName: @parentModel.postToSISName()
-      nested: @nested
-      prefix: 'assignment' if @nested
+  toJSON: =>
+    postToSIS: @parentModel.postToSIS()
+    postToSISName: @parentModel.postToSISName()
+    nested: @nested
+    prefix: 'assignment' if @nested

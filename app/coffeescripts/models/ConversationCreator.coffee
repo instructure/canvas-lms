@@ -15,23 +15,21 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'jquery'
-  'lodash'
-  '../models/Conversation'
-], ($, _, Conversation) ->
+import $ from 'jquery'
+import _ from 'lodash'
+import Conversation from './Conversation'
 
-  class ConversationCreator
-    constructor: (opts) ->
-      @chunkSize = opts.chunkSize || 100
+export default class ConversationCreator
+  constructor: (opts) ->
+    @chunkSize = opts.chunkSize || 100
 
-    save: (data, saveOpts) ->
-      data.context_code = ENV.context_asset_string
-      xhrs = _.chunk(data.recipients, @chunkSize).map (chunk) ->
-        chunkData = Object.assign({}, data, { recipients: chunk })
-        (new Conversation).save(chunkData, saveOpts)
-      $.when.apply($, xhrs)
+  save: (data, saveOpts) ->
+    data.context_code = ENV.context_asset_string
+    xhrs = _.chunk(data.recipients, @chunkSize).map (chunk) ->
+      chunkData = Object.assign({}, data, { recipients: chunk })
+      (new Conversation).save(chunkData, saveOpts)
+    $.when.apply($, xhrs)
 
-    # we can validate the full data set in one go
-    validate: (attrs, options) ->
-      (new Conversation).validate(attrs, options)
+  # we can validate the full data set in one go
+  validate: (attrs, options) ->
+    (new Conversation).validate(attrs, options)

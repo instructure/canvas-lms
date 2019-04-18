@@ -15,19 +15,17 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'Backbone'
-], (Backbone) ->
+import Backbone from 'Backbone'
 
-  class SpeedgraderLinkView extends Backbone.View
+export default class SpeedgraderLinkView extends Backbone.View
 
-    initialize: ->
-      super
-      @model.on 'change:published', @toggleSpeedgraderLink
+  initialize: ->
+    super
+    @model.on 'change:published', @toggleSpeedgraderLink
 
-    toggleSpeedgraderLink: =>
-      if @model.get 'published'
-        @$el.removeClass 'hidden'
-      else
-        @$el.addClass 'hidden'
+  toggleSpeedgraderLink: =>
+    if @model.get 'published'
+      @$el.removeClass 'hidden'
+    else
+      @$el.addClass 'hidden'
 

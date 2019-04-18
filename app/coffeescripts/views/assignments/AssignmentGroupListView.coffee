@@ -15,104 +15,101 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-define [
-  'jquery'
-  'underscore'
-  'Backbone'
-  '../SortableCollectionView'
-  './AssignmentGroupListItemView'
-  'jst/assignments/AssignmentGroupList'
-  'jst/assignments/NoAssignmentsListItem'
-], ($, _, Backbone, SortableCollectionView, AssignmentGroupListItemView, template, NoAssignmentsListItem) ->
+import $ from 'jquery'
+import _ from 'underscore'
+import SortableCollectionView from '../SortableCollectionView'
+import AssignmentGroupListItemView from './AssignmentGroupListItemView'
+import template from 'jst/assignments/AssignmentGroupList'
+import NoAssignmentsListItem from 'jst/assignments/NoAssignmentsListItem'
 
-  class AssignmentGroupListView extends SortableCollectionView
-    @optionProperty 'course'
-    @optionProperty 'userIsAdmin'
+export default class AssignmentGroupListView extends SortableCollectionView
+  @optionProperty 'course'
+  @optionProperty 'userIsAdmin'
 
-    template: template
-    itemView: AssignmentGroupListItemView
+  template: template
+  itemView: AssignmentGroupListItemView
 
-    @optionProperty 'assignment_sort_base_url'
+  @optionProperty 'assignment_sort_base_url'
 
-    render: =>
-      super(ENV.PERMISSIONS.manage)
+  render: =>
+    super(ENV.PERMISSIONS.manage)
 
-    renderItem: (model) =>
-      view = super
-      model.groupView.collapseIfNeeded()
-      view
+  renderItem: (model) =>
+    view = super
+    model.groupView.collapseIfNeeded()
+    view
 
-    createItemView: (model) ->
-      options =
-        parentCollection: @collection
-        childKey: 'assignments'
-        groupKey: 'assignment_group_id'
-        groupId: model.id
-        reorderURL: @createReorderURL(model.id)
-        noItemTemplate: NoAssignmentsListItem
-        userIsAdmin: @userIsAdmin
-      new @itemView $.extend {}, (@itemViewOptions || {}), {model}, options
+  createItemView: (model) ->
+    options =
+      parentCollection: @collection
+      childKey: 'assignments'
+      groupKey: 'assignment_group_id'
+      groupId: model.id
+      reorderURL: @createReorderURL(model.id)
+      noItemTemplate: NoAssignmentsListItem
+      userIsAdmin: @userIsAdmin
+    new @itemView $.extend {}, (@itemViewOptions || {}), {model}, options
 
-    createReorderURL: (id) ->
-      @assignment_sort_base_url + "/" + id + "/reorder"
+  createReorderURL: (id) ->
+    @assignment_sort_base_url + "/" + id + "/reorder"
 
-    # TODO: make menu a child view of listitem so that it can be rendered
-    # by itself, and so it can manage all of the dialog stuff,
-    # when that happens, this can be removed
-    attachCollection: ->
-      super
-      @itemViewOptions = course: @course
-      @collection.on 'render', @render
-      @collection.on 'add', @renderIfLoaded
-      @collection.on 'remove', @render
-      @collection.on 'change:groupWeights', @render
+  # TODO: make menu a child view of listitem so that it can be rendered
+  # by itself, and so it can manage all of the dialog stuff,
+  # when that happens, this can be removed
+  attachCollection: ->
+    super
+    @itemViewOptions = course: @course
+    @collection.on 'render', @render
+    @collection.on 'add', @renderIfLoaded
+    @collection.on 'remove', @render
+    @collection.on 'change:groupWeights', @render
 
-    renderIfLoaded: =>
-      if @collection.loadedAll
-        @render()
+  renderIfLoaded: =>
+    if @collection.loadedAll
+      @render()
 
-    renderOnReset: =>
-      @firstResetLanded = true
-      super
+  renderOnReset: =>
+    @firstResetLanded = true
+    super
 
-    toJSON: ->
-      data = super
-      _.extend({}, data,
-        firstResetLanded: @firstResetLanded
-      )
+  toJSON: ->
+    data = super
+    _.extend({}, data,
+      firstResetLanded: @firstResetLanded
+    )
 
-    _initSort: ->
-      super
-      @$list.on('sortstart', @collapse)
-      @$list.on('sortstop', @expand)
+  _initSort: ->
+    super
+    @$list.on('sortstart', @collapse)
+    @$list.on('sortstop', @expand)
 
-    handleExtraClick: (e) =>
-      e.stopImmediatePropagation()
-      $(e.target).off('click', @handleExtraClick)
+  handleExtraClick: (e) =>
+    e.stopImmediatePropagation()
+    $(e.target).off('click', @handleExtraClick)
 
-    collapse: (e, ui) =>
-      item = ui.item
-      id = item.children(":first").attr('data-id')
-      item.find("#assignment_group_#{id}_assignments").slideUp(100)
-      ui.item.css("height", "auto")
-      $toggler = item.find('.element_toggler').first()
+  collapse: (e, ui) =>
+    item = ui.item
+    id = item.children(":first").attr('data-id')
+    item.find("#assignment_group_#{id}_assignments").slideUp(100)
+    ui.item.css("height", "auto")
+    $toggler = item.find('.element_toggler').first()
+    arrow = $toggler.find('i').first()
+    arrow.removeClass('icon-mini-arrow-down').addClass('icon-mini-arrow-right')
+
+  expand: (e, ui) =>
+    item = ui.item
+    $toggler = item.find('.element_toggler').first()
+    # FF triggers an extra click when you drop the item, so we want to handle it here
+    $toggler.on('click', @handleExtraClick)
+
+    # remove the extra click handler for browsers that don't trigger the extra click
+    setTimeout(=>
+      $toggler.off('click', @handleExtraClick)
+    , 50)
+
+    id = item.children(":first").attr('data-id')
+    ag = @collection.findWhere id: id
+    if ag && ag.groupView.shouldBeExpanded()
+      item.find("#assignment_group_#{id}_assignments").slideDown(100)
       arrow = $toggler.find('i').first()
-      arrow.removeClass('icon-mini-arrow-down').addClass('icon-mini-arrow-right')
-
-    expand: (e, ui) =>
-      item = ui.item
-      $toggler = item.find('.element_toggler').first()
-      # FF triggers an extra click when you drop the item, so we want to handle it here
-      $toggler.on('click', @handleExtraClick)
-
-      # remove the extra click handler for browsers that don't trigger the extra click
-      setTimeout(=>
-        $toggler.off('click', @handleExtraClick)
-      , 50)
-
-      id = item.children(":first").attr('data-id')
-      ag = @collection.findWhere id: id
-      if ag && ag.groupView.shouldBeExpanded()
-        item.find("#assignment_group_#{id}_assignments").slideDown(100)
-        arrow = $toggler.find('i').first()
-        arrow.addClass('icon-mini-arrow-down').removeClass('icon-mini-arrow-right')
+      arrow.addClass('icon-mini-arrow-down').removeClass('icon-mini-arrow-right')

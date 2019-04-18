@@ -15,11 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-define [
-  'jst/UserObservee'
-  'Backbone'
-], (template, Backbone) ->
+import template from 'jst/UserObservee'
+import Backbone from 'Backbone'
 
-  class UserObserveeView extends Backbone.View
-    template: template
-    tagName: 'li'
+export default class UserObserveeView extends Backbone.View
+  template: template
+  tagName: 'li'
