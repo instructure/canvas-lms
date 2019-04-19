@@ -27,7 +27,7 @@
     "fleck": "~0.5.1",
     "gglobby": "0.0.2",
     "glob": "^5.0.15",
-    "gulp": "^3.9",
+    "gulp": "^3.9.0",
     "gulp-load-plugins": "^0.10.0",
     "gulp-rev": "^5.0.1",
     "handlebars": "^1.3.0",
