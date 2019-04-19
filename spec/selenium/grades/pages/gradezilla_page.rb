@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../../common'
+require_relative 'post_grades_tray_page'
+require_relative 'hide_grades_tray_page'
 
 module Gradezilla
   extend SeleniumDependencies
@@ -218,15 +220,19 @@ module Gradezilla
   end
 
   def self.post_grades_option
-    assignment_menu_selector("Post Grades")
+    assignment_menu_selector("Post grades")
+  end
+
+  def self.grades_posted_option
+    assignment_menu_selector("All grades posted")
   end
 
   def self.hide_grades_option
-    assignment_menu_selector("Hide Grades")
+    assignment_menu_selector("Hide grades")
   end
 
   def self.grade_posting_policy_option
-    # TODO: locator for grade posting policy
+    assignment_menu_selector("Grade Posting Policy")
   end
 
   # actions
@@ -770,16 +776,16 @@ module Gradezilla
 
   def self.click_post_grades(assignment_id)
     click_assignment_header_menu(assignment_id)
-    # TODO: click post grades wait for tray
     post_grades_option.click
-    Gradezilla::PostGradesTray.full_content
+    PostGradesTray.full_content
   end
 
   def self.click_hide_grades(assignment_id)
     click_assignment_header_menu(assignment_id)
     # TODO: click hide grades
     hide_grades_option.click
-    Gradezilla::HideGradesTray.full_content
+    HideGradesTray.full_content
+    HideGradesTray.hide_button
   end
 
   def self.click_grade_posting_policy(assignment_id)
@@ -787,6 +793,13 @@ module Gradezilla
     # TODO: click posting policy
     grade_posting_policy_option.click
     Gradezilla::AssignmentPostingPolicy
+  end
+
+  def self.manually_post_grades(assignment, type, section = nil)
+    Gradezilla.click_post_grades(assignment.id)
+    PostGradesTray.post_type_radio_button(type).click
+    PostGradesTray.select_section(section.name) unless section.nil?
+    PostGradesTray.post_grades
   end
 
   delegate :click, to: :save_button, prefix: true

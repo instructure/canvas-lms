@@ -16,8 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../../common'
-require_relative '../pages/post_grades_tray_page'
-require_relative '../pages/hide_grades_tray_page'
+require_relative 'post_grades_tray_page'
+require_relative 'hide_grades_tray_page'
 
 
 module Gradezilla
@@ -130,12 +130,8 @@ module Gradezilla
       f('#grade-detail-tray--grade-input')
     end
 
-    def self.not_posted_pill
-      # TODO: locator for not posted pill
-    end
-
-    def self.hidden_pill
-      # TODO: hidden pill locator
+    def self.hidden_pill_locator
+       "//*[@data-cid='Pill'][//span[text() = 'Hidden']]"
     end
 
     # methods

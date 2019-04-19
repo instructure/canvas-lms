@@ -243,8 +243,8 @@ module CustomSeleniumActions
 
   # this is a smell; you should know what's on the page you're testing,
   # so conditionally doing stuff based on elements == :poop:
-  def element_exists?(selector)
-    disable_implicit_wait { f(selector) }
+  def element_exists?(selector, xpath = false)
+    disable_implicit_wait { xpath ? fxpath(selector) : f(selector) }
     true
   rescue Selenium::WebDriver::Error::NoSuchElementError
     false
