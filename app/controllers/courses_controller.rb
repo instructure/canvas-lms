@@ -1507,7 +1507,7 @@ class CoursesController < ApplicationController
 
       if enrollment.rejected?
         enrollment.workflow_state = 'invited'
-        enrollment.save_without_broadcasting
+        Shackles.activate(:master) {enrollment.save_without_broadcasting}
       end
 
       if enrollment.self_enrolled?
