@@ -15,14 +15,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import i18nObj from 'i18nObj'
 import I18n from 'i18n!gradezilla'
 import $ from 'jquery'
 import _ from 'underscore'
-import natcompare from '../util/natcompare'
 import HeaderFilterView from '../views/gradezilla/HeaderFilterView'
 import OutcomeColumnView from '../views/gradezilla/OutcomeColumnView'
-import numberCompare from '../util/NumberCompare'
 import cellTemplate from 'jst/gradezilla/outcome_gradebook_cell'
 import studentCellTemplate from 'jst/gradezilla/outcome_gradebook_student_cell'
 import 'jsx/context_cards/StudentContextCardTrigger'
