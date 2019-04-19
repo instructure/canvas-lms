@@ -17,16 +17,47 @@
  */
 
 import React, {Suspense, useState} from 'react'
-import {func} from 'prop-types'
+import {func, object} from 'prop-types'
 import {Modal, ModalHeader, ModalBody, ModalFooter} from '@instructure/ui-overlays'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading, Spinner} from '@instructure/ui-elements'
 import {Tabs} from '@instructure/ui-tabs'
 import formatMessage from '../../../../format-message'
+import indicatorRegion from "./../../../indicatorRegion";
+import indicate from "../../../../common/indicate";
 
 const UrlPanel = React.lazy(() => import('./UrlPanel'))
 
-export function UploadImage(props) {
+export const PANELS = {
+  COMPUTER: 0,
+  UNSPLASH: 1,
+  URL: 2
+}
+
+/**
+ * Handles uploading data based on what type of data is submitted.
+ */
+export const handleSubmit = (editor, selectedPanel, uploadData, afterInsert = () => {}) => {
+  switch (selectedPanel) {
+    case PANELS.COMPUTER:
+      throw new Error('Not Implemented')
+    case PANELS.UNSPLASH:
+      throw new Error('Not Implemented')
+    case PANELS.URL: {
+      const {imageUrl} = uploadData
+      const editorHtml = editor.dom.createHTML('img', {src: imageUrl})
+      editor.insertContent(editorHtml)
+      break;
+    }
+    default:
+      throw new Error('Selected Panel is invalid') // Should never get here
+  }
+  const element = editor.selection.getEnd();
+  element.addEventListener('load', () => indicate(indicatorRegion(editor, element)))
+  afterInsert();
+}
+
+export function UploadImage({editor, onDismiss, onSubmit = handleSubmit}) {
   const [ imageUrl, setImageUrl ] = useState('');
   const [ selectedPanel, setSelectedPanel ] = useState(0)
 
@@ -35,19 +66,22 @@ export function UploadImage(props) {
       as="form"
       label={formatMessage('Upload Image')}
       size="large"
-      onDismiss={props.onDismiss}
-      onSubmit={() => {}}
+      onDismiss={onDismiss}
+      onSubmit={(e) => {
+        e.preventDefault();
+        onSubmit(editor, selectedPanel, { imageUrl }, onDismiss)
+      }}
       open
       shouldCloseOnDocumentClick
     >
       <ModalHeader>
-        <CloseButton onClick={props.onDismiss} offset="medium" placement="end">
+        <CloseButton onClick={onDismiss} offset="none" placement="end">
           {formatMessage('Close')}
         </CloseButton>
         <Heading>{formatMessage('Upload Image')}</Heading>
       </ModalHeader>
       <ModalBody>
-        <Tabs selectedIndex={selectedPanel} onChange={(newIndex) => setSelectedPanel(newIndex)}>
+        <Tabs focus selectedIndex={selectedPanel} onChange={(newIndex) => setSelectedPanel(newIndex)}>
           <Tabs.Panel title={formatMessage('Computer')}>Computer Panel Here</Tabs.Panel>
           <Tabs.Panel title={formatMessage('Unsplash')}>Unsplash Panel Here</Tabs.Panel>
           <Tabs.Panel title={formatMessage('URL')}>
@@ -58,7 +92,7 @@ export function UploadImage(props) {
         </Tabs>
       </ModalBody>
       <ModalFooter>
-        <Button onClick={props.onDismiss}>{formatMessage('Close')}</Button>&nbsp;
+        <Button onClick={onDismiss}>{formatMessage('Close')}</Button>&nbsp;
         <Button variant="primary" type="submit">
           {formatMessage('Submit')}
         </Button>
@@ -68,5 +102,6 @@ export function UploadImage(props) {
 }
 
 UploadImage.propTypes = {
-  onDismiss: func.isRequired
+  onDismiss: func.isRequired,
+  editor: object.isRequired
 }

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {render, fireEvent} from 'react-testing-library'
-import {UploadImage} from '../index'
+import {UploadImage, PANELS, handleSubmit} from '../index'
 
 describe('UploadImage', () => {
   it('calls onDismiss prop when closing', () => {
@@ -28,5 +28,31 @@ describe('UploadImage', () => {
     const closeBtn = getByText('Close')
     fireEvent.click(closeBtn)
     expect(handleDismiss).toHaveBeenCalled()
+  })
+
+  it('calls handleSubmit on submit', () => {
+    const handleSubmit = jest.fn()
+    const handleDismiss = () => {}
+    const {getByText} = render(<UploadImage onDismiss={handleDismiss} onSubmit={handleSubmit}/>)
+    const submitBtn = getByText('Submit').closest('button')
+    fireEvent.click(submitBtn)
+    expect(handleSubmit).toHaveBeenCalled()
+  })
+
+  describe('handleSubmit', () => {
+
+    const fakeNode = {
+      addEventListener: jest.fn()
+    };
+    const fakeEditor = {
+      content: '',
+      dom: {createHTML: (tag, {src}) => `<img src="${src}" />`},
+      insertContent (content) { fakeEditor.content += content },
+      selection: { getEnd () {return fakeNode  }}
+    }
+    it('inserts image with url source when URL panel is selected', () => {
+      handleSubmit(fakeEditor, PANELS.URL, {imageUrl: 'http://fake/path'})
+      expect(fakeEditor.content).toEqual('<img src="http://fake/path" />')
+    })
   })
 })
