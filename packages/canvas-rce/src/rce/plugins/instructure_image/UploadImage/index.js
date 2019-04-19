@@ -16,15 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {Suspense, useState} from 'react'
 import {func} from 'prop-types'
 import {Modal, ModalHeader, ModalBody, ModalFooter} from '@instructure/ui-overlays'
 import {Button, CloseButton} from '@instructure/ui-buttons'
-import {Heading} from '@instructure/ui-elements'
+import {Heading, Spinner} from '@instructure/ui-elements'
 import {Tabs} from '@instructure/ui-tabs'
 import formatMessage from '../../../../format-message'
 
+const UrlPanel = React.lazy(() => import('./UrlPanel'))
+
 export function UploadImage(props) {
+  const [ imageUrl, setImageUrl ] = useState('');
+  const [ selectedPanel, setSelectedPanel ] = useState(0)
+
   return (
     <Modal
       as="form"
@@ -42,10 +47,14 @@ export function UploadImage(props) {
         <Heading>{formatMessage('Upload Image')}</Heading>
       </ModalHeader>
       <ModalBody>
-        <Tabs defaultSelectedIndex={0}>
+        <Tabs selectedIndex={selectedPanel} onChange={(newIndex) => setSelectedPanel(newIndex)}>
           <Tabs.Panel title={formatMessage('Computer')}>Computer Panel Here</Tabs.Panel>
           <Tabs.Panel title={formatMessage('Unsplash')}>Unsplash Panel Here</Tabs.Panel>
-          <Tabs.Panel title={formatMessage('URL')}>URL Panel Here</Tabs.Panel>
+          <Tabs.Panel title={formatMessage('URL')}>
+          <Suspense fallback={<Spinner title={formatMessage('Loading')} size="large" />}>
+              <UrlPanel imageUrl={imageUrl} setImageUrl={setImageUrl} />
+            </Suspense>
+          </Tabs.Panel>
         </Tabs>
       </ModalBody>
       <ModalFooter>

@@ -1506,6 +1506,24 @@
   dependencies:
     "@instructure/ui-decorator" "^5.52.1"
 
+"@instructure/ui-text-input@^5":
+  version "5.52.1"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-text-input/-/ui-text-input-5.52.1.tgz#60a4e73ca5a5e9732a3925847ccb9c50371a5b63"
+  integrity sha512-SANegvH+uIxEHTVW0DLRVZo61JtGxK1I4igm3Ld6e1UxInpAvQjmLb7cRFcgj3dFQmTkDmJupehkzSSGK+V4fg==
+  dependencies:
+    "@babel/runtime" "^7"
+    "@instructure/ui-form-field" "^5.52.1"
+    "@instructure/ui-icons" "^5.52.1"
+    "@instructure/ui-layout" "^5.52.1"
+    "@instructure/ui-prop-types" "^5.52.1"
+    "@instructure/ui-testable" "^5.52.1"
+    "@instructure/ui-themeable" "^5.52.1"
+    "@instructure/ui-utils" "^5.52.1"
+    "@instructure/uid" "^5.52.1"
+    classnames "^2"
+    prop-types "^15"
+    react "^0.14.9 || ^15 || ^16"
+
 "@instructure/ui-themeable@^5", "@instructure/ui-themeable@^5.52.0", "@instructure/ui-themeable@^5.52.1":
   version "5.52.1"
   resolved "https://registry.yarnpkg.com/@instructure/ui-themeable/-/ui-themeable-5.52.1.tgz#8a35bf4adf06b10811aa8777a28760bc7f6f9d73"
