@@ -47,7 +47,7 @@ class Progress < ActiveRecord::Base
     self.results = nil
     self.workflow_state = 'queued'
     self.completion = 0
-    self.save!
+    Shackles.activate(:master) {self.save!}
   end
 
   def set_results(results)
