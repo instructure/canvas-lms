@@ -150,11 +150,31 @@ namespace :canvas do
       tasks["compile coffee, js 18n, run r.js optimizer, and webpack"] = -> {
         prereqs = ['js:generate', 'i18n:generate_js']
         prereqs.each do |name|
-          log_time(name) { Rake::Task[name].invoke }
+          puts "--> DEBUG: about to run #{name}"
+          log_time(name) { 
+            begin 
+              puts "--> DEBUG: running Rake::Task[#{name}].invoke"
+              Rake::Task[name].invoke 
+              puts "--> DEBUG: done running Rake::Task[#{name}].invoke"
+            rescue => e
+               puts "--> DEBUG: #{e.message}"
+               puts "--> DEBUG: #{e.backtrace.join("\n")}"
+            end
+          }
         end
         # webpack and js:build can run concurrently
+        puts "--> DEBUG: about to run js:build, js:webpack}"
         Parallel.each(['js:build', 'js:webpack'], :in_threads => processes.to_i) do |name|
-          log_time(name) { Rake::Task[name].invoke }
+          log_time(name) { 
+            begin
+              puts "--> DEBUG: running Rake::Task[#{name}].invoke"
+              Rake::Task[name].invoke 
+              puts "--> DEBUG: done running Rake::Task[#{name}].invoke"
+            rescue => e
+               puts "--> DEBUG: #{e.message}"
+               puts "--> DEBUG: #{e.backtrace.join("\n")}"
+            end
+          }
         end
       }
     else
