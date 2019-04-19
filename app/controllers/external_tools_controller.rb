@@ -435,6 +435,8 @@ class ExternalToolsController < ApplicationController
   end
 
   def find_tool(id, selection_type)
+    return unless selection_type == 'editor_button' || verified_user_check
+
     if selection_type.nil? || Lti::ResourcePlacement::PLACEMENTS.include?(selection_type.to_sym)
       @tool = ContextExternalTool.find_for(id, @context, selection_type, false)
     end

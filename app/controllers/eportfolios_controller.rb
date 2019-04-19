@@ -23,6 +23,7 @@ class EportfoliosController < ApplicationController
   include EportfolioPage
   before_action :require_user, :only => [:index, :user_index]
   before_action :reject_student_view_student
+  before_action :verified_user_check, :only => [:index, :user_index, :create]
   before_action :rich_content_service_config
   before_action :get_eportfolio, :except => [:index, :user_index, :create]
 

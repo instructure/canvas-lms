@@ -99,6 +99,17 @@ describe EportfoliosController do
       expect(assigns[:portfolio]).not_to be_nil
       expect(assigns[:portfolio].name).to eql("some portfolio")
     end
+
+    it "should prevent creation for unverified users if account requires it" do
+      Account.default.tap{|a| a.settings[:require_confirmed_email] = true; a.save!}
+
+      user_session(@user)
+      post 'create', params: {:eportfolio => {:name => "some portfolio"}}
+
+      expect(response).to be_redirect
+      expect(response.location).to eq root_url
+      expect(flash[:warning]).to include("Complete registration")
+    end
   end
 
   describe "GET 'show'" do
