@@ -670,6 +670,31 @@ class ApplicationController < ActionController::Base
     set_no_cache_headers
   end
 
+  def verified_user_check
+    if @domain_root_account&.user_needs_verification?(@current_user)
+      render_unverified_error # disable tools before verification
+      false
+    else
+      true
+    end
+  end
+
+  def render_unverified_error
+    respond_to do |format|
+      format.json do
+        render json: {
+          status: 'unverified',
+          errors: [{ message: I18n.t("user not authorized to perform that action until verifying email") }]
+        }, status: :unauthorized
+      end
+      format.all do
+        flash[:warning] = t("Complete registration by clicking the “finish the registration process” link sent to your email.")
+        redirect_to_referrer_or_default(root_url)
+      end
+    end
+    set_no_cache_headers
+  end
+
   # To be used as a before_action, requires controller or controller actions
   # to have their urls scoped to a context in order to be valid.
   # So /courses/5/assignments or groups/1/assignments would be valid, but

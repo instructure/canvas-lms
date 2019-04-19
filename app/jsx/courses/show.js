@@ -40,7 +40,13 @@ const publishCourse = () => {
     course: {event: 'offer'}
   }).then(() => {
     window.location.reload()
-  })
+  }).catch((e) => {
+    if (e.response.status == 401 && e.response.data.status == 'unverified') {
+      $.flashWarning(I18n.t('Complete registration by clicking the “finish the registration process” link sent to your email.'))
+    } else {
+      $.flashError(I18n.t('An error ocurred while publishing course'))
+    }
+  });
 }
 
 
