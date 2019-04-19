@@ -28,4 +28,71 @@ describe 'new_discussion_topic' do
   let(:notification_name) { :new_discussion_topic }
 
   include_examples "a message"
+    context "locked discussions" do
+      it "should send locked notification if availibility date is locked for email" do
+        @topic.update_attributes(
+          unlock_at: Time.zone.now + 3.days,
+          lock_at: Time.zone.now + 6.days,
+          message: "the content here of the discussion body"
+        )
+        enrollment = course_with_student
+        message = generate_message(notification_name, :email, @topic, :user => enrollment.user)
+        expect(message.body).to include("Discussion content is locked or not yet available")
+      end
+
+      it "should send discussion notification with discussions content when unlocked for email" do
+        @topic.update_attributes(
+          unlock_at: nil,
+          lock_at: nil,
+          message: "the content here of the discussion body"
+        )
+        enrollment = course_with_student
+        message = generate_message(notification_name, :email, @topic, :user => enrollment.user)
+        expect(message.body).to include("the content here of the discussion body")
+      end
+
+      it "should send locked notification if availibility date is locked for sms" do
+        @topic.update_attributes(
+          unlock_at: Time.zone.now + 3.days,
+          lock_at: Time.zone.now + 6.days,
+          message: "the content here of the discussion body"
+        )
+        enrollment = course_with_student
+        message = generate_message(notification_name, :sms, @topic, :user => enrollment.user)
+        expect(message.body).to include("Content not available")
+      end
+
+      it "should send discussion notification with discussions content when unlocked sms" do
+        @topic.update_attributes(
+          unlock_at: nil,
+          lock_at: nil,
+          message: "the content here of the discussion body"
+        )
+        enrollment = course_with_student
+        message = generate_message(notification_name, :sms, @topic, :user => enrollment.user)
+        expect(message.body).to include("the content here of the discussion body")
+      end
+
+      it "should send locked notification if availibility date is locked for summary" do
+        @topic.update_attributes(
+          unlock_at: Time.zone.now + 3.days,
+          lock_at: Time.zone.now + 6.days,
+          message: "the content here of the discussion body"
+        )
+        enrollment = course_with_student
+        message = generate_message(notification_name, :summary, @topic, :user => enrollment.user)
+        expect(message.body).to include("Discussion content is locked or not yet available")
+      end
+
+      it "should send discussion notification with discussions content when unlocked summary" do
+        @topic.update_attributes(
+          unlock_at: nil,
+          lock_at: nil,
+          message: "the content here of the discussion body"
+        )
+        enrollment = course_with_student
+        message = generate_message(notification_name, :summary, @topic, :user => enrollment.user)
+        expect(message.body).to include("the content here of the discussion body")
+      end
+    end
 end
