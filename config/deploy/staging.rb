@@ -12,10 +12,11 @@ role :db,  %w{deploy@172.31.3.79}
 set :branch, 'bz-staging'
 
 # On staging, we reinstallled npm using nvm. So use the capistrano-nvm gem
-#SSHKit.config.command_map[:npm] = '/home/canvasadmin/.nvm/versions/node/v0.12.14/bin/npm'
+# We did this under the "deploy" user since that's the user capistrano runs as.
+# We also edited /home/deploy/.bashrc to move the NVM related stuff to the top of 
+# the file so that it would run in non-interactive shells (which capistrano deploys use)
 set :nvm_node, 'v0.12.14'
 set :nvm_map_bins, %w{node npm}
-set :nvm_custom_path, '/home/canvasadmin/.nvm'
 
 # Extended Server Syntax
 # ======================
