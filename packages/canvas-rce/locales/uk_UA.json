@@ -215,6 +215,9 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Виберіть теку, до якої завантажити ваш файл"
   },
+  "submit_a3cc6859": {
+    "message": "Підтвердити"
+  },
   "syllabus_f191f65b": {
     "message": "Навчальний план"
   },
@@ -238,6 +241,9 @@
   },
   "upload_a_new_image_890df275": {
     "message": "Завантажити нове зображення"
+  },
+  "url_22a5f3b8": {
+    "message": "URL"
   },
   "usage_right_ff96f3e2": {
     "message": "Права використання:"

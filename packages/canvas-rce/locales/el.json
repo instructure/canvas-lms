@@ -188,6 +188,9 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Επιλέξτε το φάκελο στον οποίο θέλετε να φορτώσετε το αρχείο "
   },
+  "submit_a3cc6859": {
+    "message": "Υποβολή"
+  },
   "syllabus_f191f65b": {
     "message": "Αναλυτικό Πρόγραμμα"
   },
@@ -208,6 +211,9 @@
   },
   "upload_a_new_image_890df275": {
     "message": "Φόρτωση νέας εικόνας"
+  },
+  "url_22a5f3b8": {
+    "message": "URL"
   },
   "usage_right_ff96f3e2": {
     "message": "Δικαίωμα Χρήσης:"

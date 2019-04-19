@@ -188,6 +188,9 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Select a folder to upload your file into"
   },
+  "submit_a3cc6859": {
+    "message": "Ուղարկել"
+  },
   "syllabus_f191f65b": {
     "message": "Դասընթացի ծրագիր"
   },
@@ -208,6 +211,9 @@
   },
   "upload_a_new_image_890df275": {
     "message": "Բեռնել նոր պատկեր"
+  },
+  "url_22a5f3b8": {
+    "message": "URL"
   },
   "usage_right_ff96f3e2": {
     "message": "Օգտագործման իրավունք՝"

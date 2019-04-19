@@ -215,6 +215,9 @@
   "select_a_folder_to_upload_your_file_into_b82d12b": {
     "message": "Vel ei mappe å laste opp fila til"
   },
+  "submit_a3cc6859": {
+    "message": "Send!"
+  },
   "syllabus_f191f65b": {
     "message": "Emneoversikt"
   },
@@ -238,6 +241,9 @@
   },
   "upload_a_new_image_890df275": {
     "message": "Last opp eit nytt bilde"
+  },
+  "url_22a5f3b8": {
+    "message": "URL-adresse"
   },
   "usage_right_ff96f3e2": {
     "message": "Bruksrett:"
