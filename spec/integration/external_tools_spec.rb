@@ -154,6 +154,20 @@ describe "External Tools" do
     expect(tab['class'].split).to include("active")
   end
 
+  it "should prevent access for unverified users if account requires it" do
+    course_with_teacher_logged_in(:active_all => true)
+
+    @tool = @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'my grade passback test tool', :domain => 'example.com')
+    @tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
+    @tool.save!
+
+    Account.default.tap{|a| a.settings[:require_confirmed_email] = true; a.save!}
+    get "/courses/#{@course.id}/external_tools/#{@tool.id}"
+    expect(response).to be_redirect
+    expect(response.location).to eq root_url
+    expect(flash[:warning]).to include("Complete registration")
+  end
+
   context 'global navigation' do
     before :once do
       Account.default.enable_feature!(:lor_for_account)
