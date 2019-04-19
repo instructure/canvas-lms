@@ -156,13 +156,13 @@ export default class Placement extends React.Component {
             >
               <TextInput
                 name={`${placementName}_selection_height`}
-                value={placement.selection_height}
+                value={placement.selection_height && placement.selection_height.toString()}
                 label={I18n.t("Selection Height")}
                 onChange={this.handleSelectionHeightChange}
               />
               <TextInput
                 name={`${placementName}_selection_width`}
-                value={placement.selection_width}
+                value={placement.selection_width && placement.selection_width.toString()}
                 label={I18n.t("Selection Width")}
                 onChange={this.handleSelectionWidthChange}
               />
