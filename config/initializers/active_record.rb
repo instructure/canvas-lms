@@ -1091,7 +1091,14 @@ module UpdateAndDeleteWithJoins
   end
 
   def update_all(updates, *args)
-    return super if joins_values.empty?
+    db = Shard.current(klass.shard_category).database_server
+    if joins_values.empty?
+      if ::Shackles.environment != db.shackles_environment
+        Shard.current.database_server.unshackle {return super }
+      else
+        return super
+      end
+    end
 
     stmt = Arel::UpdateManager.new
 
@@ -1148,7 +1155,6 @@ module UpdateAndDeleteWithJoins
       where_sql = collector.value
     end
     sql.concat('WHERE ' + where_sql)
-    db = Shard.current(klass.shard_category).database_server
     if ::Shackles.environment != db.shackles_environment
       Shard.current.database_server.unshackle {connection.update(sql, "#{name} Update")}
     else
