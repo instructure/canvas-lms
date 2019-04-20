@@ -1087,7 +1087,7 @@ class Assignment < ActiveRecord::Base
         should_dispatch_assignment_created?
     }
     p.filter_asset_by_recipient { |assignment, user|
-      assignment.overridden_for(user, skip_clone: true)
+      assignment.overridden_for(user)
     }
 
     p.dispatch :assignment_unmuted

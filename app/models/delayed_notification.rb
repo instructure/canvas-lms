@@ -49,12 +49,9 @@ class DelayedNotification < ActiveRecord::Base
   end
 
   def process
-    res = []
-    if asset
-      iterate_to_list do |to_list_slice|
-        slice_res = notification.create_message(self.asset, to_list_slice, data: self.data)
-        res.concat(slice_res) if Rails.env.test?
-      end
+    tos = self.to_list
+    if self.asset && !tos.empty?
+      res = self.notification.create_message(self.asset, tos, data: self.data)
     end
     self.do_process unless self.new_record?
     res
@@ -66,7 +63,8 @@ class DelayedNotification < ActiveRecord::Base
     []
   end
 
-  def iterate_to_list
+  def to_list
+    return @to_list if @to_list
     lookups = {}
     (recipient_keys || []).each do |key|
       pieces = key.split('_')
@@ -75,16 +73,13 @@ class DelayedNotification < ActiveRecord::Base
       lookups[klass] ||= []
       lookups[klass] << id
     end
-
+    res = []
     lookups.each do |klass, ids|
       includes = []
-      includes = [ :notification_policies, { user: :pseudonyms } ] if klass == CommunicationChannel
-      includes = [ :pseudonyms, { communication_channel: :notification_policies } ] if klass == User
-
-      ids.each_slice(100) do |slice|
-        yield klass.where(:id => slice).preload(includes).to_a
-      end
+      includes = [:user] if klass == CommunicationChannel
+      res += klass.where(:id => ids).preload(includes).to_a rescue []
     end
+    @to_list = res.uniq
   end
 
   scope :to_be_processed, lambda { |limit|
