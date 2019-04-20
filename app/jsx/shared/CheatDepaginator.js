@@ -66,7 +66,7 @@ function consumePagesInOrder(callback, data) {
  * @param pageCallback - called for each page of data
  * @returns a jQuery Deferred that will be resolved when all pages have been fetched
  */
-function cheaterDepaginate(url, params, pageCallback, pagesEnqueuedCallback = () => {}, dispatch = null) {
+function cheaterDepaginate(url, params, pageCallback, pagesEnqueuedCallback = () => {}) {
   const gotAllPagesDfd = $.Deferred()
   const data = []
   const errHandler = () => {
@@ -97,29 +97,12 @@ function cheaterDepaginate(url, params, pageCallback, pagesEnqueuedCallback = ()
         return
       }
 
-      // At this point, there are multiple pages
-
-      function paramsForPage(page) {
-        return {page, ...params}
-      }
-
-      function bindPageCallback(page) {
-        return response => orderedPageCallback(response, page)
-      }
+      const fetchPage = page =>
+        $.ajaxJSON(url, 'GET', {page, ...params}, response => orderedPageCallback(response, page))
 
       const dfds = []
-
-      if (dispatch == null) {
-        const fetchPage = page => $.ajaxJSON(url, 'GET', paramsForPage(page), bindPageCallback(page))
-
-        for (let page = 2; page <= lastPage; page++) {
-          dfds.push(fetchPage(page))
-        }
-      } else {
-        for (let page = 2; page <= lastPage; page++) {
-          const deferred = dispatch.getJSON(url, paramsForPage(page), bindPageCallback(page))
-          dfds.push(deferred)
-        }
+      for (let page = 2; page <= lastPage; page++) {
+        dfds.push(fetchPage(page))
       }
       pagesEnqueuedCallback(dfds)
 

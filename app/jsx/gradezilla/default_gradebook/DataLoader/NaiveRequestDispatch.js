@@ -73,7 +73,7 @@ export default class NaiveRequestDispatch {
     /* eslint-disable promise/catch-or-return */
     request.start = () => {
       request.started = true
-      cheaterDepaginate(url, params, perPage, allEnqueued, this)
+      cheaterDepaginate(url, params, perPage, allEnqueued)
         .then((...args) => {
           this.clearRequest(request)
           request.deferred.resolve(...args)
