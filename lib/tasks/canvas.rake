@@ -107,19 +107,14 @@ namespace :canvas do
   desc "Compile javascript and css assets."
   task :compile_assets, :generate_documentation, :check_syntax, :compile_css, :build_js do |t, args|
     args.with_defaults(:generate_documentation => true, :check_syntax => false, :compile_css => true, :build_js => true)
-
-    puts "--> DEBUG: begin compile_assets. args[:generate_documentation = #{args[:generate_documentation]}, :check_syntax = #{args[:check_syntax]}, :compile_css = #{args[:compile_css]}, :build_js = #{args[:build_js]}]"
- 
     truthy_values = [true, 'true', '1']
     generate_documentation = truthy_values.include?(args[:generate_documentation])
     check_syntax = truthy_values.include?(args[:check_syntax])
     compile_css = truthy_values.include?(args[:compile_css])
     build_js = truthy_values.include?(args[:build_js])
 
-    puts "--> DEBUG: effective compile_assets args[:generate_documentation = #{generate_documentation}, :check_syntax = #{check_syntax}, :compile_css = #{compile_css}, :build_js = #{build_js}]"
-
     log_time('Making sure node_modules are up to date') {
-      raise 'error running npm install' unless `npm install`
+      raise 'error running npm install' unless `npm install -dd`
     }
 
     # public/dist/brandable_css/brandable_css_bundles_with_deps.json needs
@@ -133,10 +128,9 @@ namespace :canvas do
 
     tasks = Hash.new
 
-    puts "--> DEBUG: compile_css = #{compile_css}"
     if compile_css
-      log_time('--> Running compile_css') {
-        tasks["css:styleguide"] = -> {
+      tasks["css:styleguide"] = -> {
+        log_time('--> Running compile_css') {
           Rake::Task['css:styleguide'].invoke
         }
       }
@@ -145,17 +139,13 @@ namespace :canvas do
     end
 
     # TODO: Once webpack is the only way, remove js:build
-    puts "--> DEBUG: build_js = #{build_js}"
     if build_js
       tasks["compile coffee, js 18n, run r.js optimizer, and webpack"] = -> {
         prereqs = ['js:generate', 'i18n:generate_js']
         prereqs.each do |name|
-          puts "--> DEBUG: about to run #{name}"
           log_time(name) { 
             begin 
-              puts "--> DEBUG: running Rake::Task[#{name}].invoke"
               Rake::Task[name].invoke 
-              puts "--> DEBUG: done running Rake::Task[#{name}].invoke"
             rescue => e
                puts "--> DEBUG: #{e.message}"
                puts "--> DEBUG: #{e.backtrace.join("\n")}"
@@ -163,13 +153,10 @@ namespace :canvas do
           }
         end
         # webpack and js:build can run concurrently
-        puts "--> DEBUG: about to run js:build, js:webpack}"
         Parallel.each(['js:build', 'js:webpack'], :in_threads => processes.to_i) do |name|
           log_time(name) { 
             begin
-              puts "--> DEBUG: running Rake::Task[#{name}].invoke"
               Rake::Task[name].invoke 
-              puts "--> DEBUG: done running Rake::Task[#{name}].invoke"
             rescue => e
                puts "--> DEBUG: #{e.message}"
                puts "--> DEBUG: #{e.backtrace.join("\n")}"
@@ -197,13 +184,13 @@ namespace :canvas do
       }
     end
 
-    # times = nil
-    # real_time = Benchmark.realtime do
-    #   times = Parallel.map(tasks, :in_processes => processes.to_i) do |name, lamduh|
-    #     log_time(name) { lamduh.call }
-    #   end
-    # end
-    # combined_time = times.reduce(:+)
+    times = nil
+    real_time = Benchmark.realtime do
+      times = Parallel.map(tasks, :in_processes => processes.to_i) do |name, lamduh|
+        log_time(name) { lamduh.call }
+      end
+    end
+    combined_time = times.reduce(:+)
     puts "Finished compiling assets"
     raise "Error reving files" unless system('node_modules/.bin/gulp rev')
   end
