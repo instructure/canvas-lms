@@ -107,7 +107,7 @@ function bzRetainedInfoSetup(readonly) {
     }
   }
 
-  function bzChangeRetainedItem(element, value) {
+  function bzChangeRetainedItem(element, value, timestamp) {
     if(element.tagName == "INPUT" && element.getAttribute("type") == "checkbox"){
       element.checked = (value == "yes") ? true : false;
     } else if(element.tagName == "INPUT" && element.getAttribute("type") == "file"){
@@ -133,6 +133,8 @@ function bzRetainedInfoSetup(readonly) {
     } else {
       element.textContent = value;
     }
+
+    element.dataset.timeUpdated = timestamp;
 
     if(value != "" && element.hasAttribute("data-bz-answer")) {
       element.setAttribute("disabled", "disabled"); // locked since they set an answer already and mastery cannot be reedited
@@ -206,7 +208,7 @@ function bzRetainedInfoSetup(readonly) {
           for(var idx = 0; idx < magicElementsDOM.length; idx++) {
               var item = magicElementsDOM[idx];
               if(item.getAttribute("data-bz-retained") == name)
-                bzChangeRetainedItem(item, value);
+                bzChangeRetainedItem(item, value, Math.round(new Date().getTime()/1000));
           }
         };
 
@@ -336,9 +338,10 @@ function bzRetainedInfoSetup(readonly) {
       var name = names[i];
       var el = magicElements[i];
 
-      var value = obj[name];
+      var value = obj[name].value;
+      var timestamp = obj[name].timestamp;
 
-      bzChangeRetainedItem(el, value);
+      bzChangeRetainedItem(el, value, timestamp);
       pendingMagicFieldLoads -= 1;
       if(pendingMagicFieldLoads == 0 && !pendingMagicFieldLoadEvent) {
         pendingMagicFieldLoadEvent = true;
@@ -396,6 +399,7 @@ function getInnerHtmlWithMagicFieldsReplaced(ele) {
       n.textContent = o.value;
     }
     n.className = "bz-retained-field-replaced";
+    n.dataset.timeUpdated = o.dataset.timeUpdated;
     o.parentNode.replaceChild(n, o);
   }
 
@@ -779,7 +783,7 @@ function BZ_LoadMagicFields(field_names, callback) {
     callback(obj);
   };
 
-  var data = "";
+  var data = "include_timings=true";
   for(var i = 0; i < field_names.length; i++) {
     if(data.length)
       data += "&";
@@ -793,7 +797,6 @@ function BZ_LoadMagicFields(field_names, callback) {
   http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
   http.send(data);
 }
-
 
 function bzWikiPageContentPreload(wikipage, finalize_page_show) {
     var parser = new DOMParser();

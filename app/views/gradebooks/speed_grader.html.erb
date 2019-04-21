@@ -15,6 +15,62 @@
 <% content_for :page_title, t(:page_title, "%{assignment_name}, SpeedGrader, %{course_name}", :assignment_name => @assignment.title, :course_name => @context.name) %>
 
 <script>
+
+var currentlyHighlightedForTime = null;
+
+function highlightSince(timestamp) {
+  var innerDocument = document.querySelector("#iframe_holder iframe");
+  if(innerDocument == null) {
+    alert("View the assignment with inline answers first.");
+    return;
+  }
+  innerDocument = innerDocument.contentDocument;
+  var list = innerDocument.querySelectorAll("[data-time-updated]");
+  var firstFound = null;
+  for(var i = 0; i < list.length; i++) {
+    var e = list[i];
+
+    if(timestamp == 0)
+      e.classList.remove("highlighted-for-time");
+    else {
+      if(e.getAttribute("data-time-updated") >= timestamp) {
+        e.classList.add("highlighted-for-time");
+        if(firstFound == null) {
+          firstFound = e;
+          try { currentlyHighlightedForTime.classList.remove("currently-highlighted-for-time"); } catch(e) {}
+          currentlyHighlightedForTime = e;
+          currentlyHighlightedForTime.classList.add("currently-highlighted-for-time");
+        }
+      } else {
+        e.classList.remove("highlighted-for-time");
+      }
+    }
+  }
+
+  if(firstFound)
+    firstFound.scrollIntoView();
+}
+
+function cycleHighlight() {
+  var innerDocument = document.querySelector("#iframe_holder iframe");
+  if(innerDocument == null) {
+    alert("View the assignment with inline answers first.");
+    return;
+  }
+  innerDocument = innerDocument.contentDocument;
+  var list = innerDocument.querySelectorAll(".highlighted-for-time");
+  for(var i = 0; i < list.length; i++) {
+    if(currentlyHighlightedForTime == null || currentlyHighlightedForTime == list[i]) {
+      var n = ((i + 1) < list.length) ? list[i + 1] : list[0];
+      try { currentlyHighlightedForTime.classList.remove("currently-highlighted-for-time"); } catch(e) {}
+      currentlyHighlightedForTime = n;
+      currentlyHighlightedForTime.classList.add("currently-highlighted-for-time");
+      n.scrollIntoView();
+      break;
+    }
+  }
+}
+
 function viewAssignmentWithInlineAnswers(link) {
     var content = document.getElementById('iframe_holder');
     content.style.display = ''; // ensure visible
@@ -27,6 +83,20 @@ function viewAssignmentWithInlineAnswers(link) {
     content.appendChild(iframe);
     return false;
 }
+
+function bzSpeedGraderSubmissionsCallback(submissionHistory) {
+  var select = document.getElementById("highlight-changes");
+  select.innerHTML = "<option value=\"0\">Nothing special</option>";
+  for(var i = 0; i < submissionHistory.length; i++) {
+    var s = submissionHistory[i].submission;
+    var d = new Date(s.submitted_at);
+    var option = document.createElement("option");
+    option.value = d.getTime() / 1000;
+    option.textContent = d.toLocaleString();
+    select.appendChild(option);
+  }
+}
+
 function viewAssignmentAudit(link) {
     var content = document.getElementById('iframe_holder');
     content.style.display = ''; // ensure visible
@@ -222,6 +292,13 @@ function viewAssignmentAudit(link) {
           <h2>Inline Answers</h2>
           <div class="content_box">
             <a id="view-assignment-with-inline-answers" onclick="return viewAssignmentWithInlineAnswers(this);" href="/bz/assignment_with_magic_fields?course=<%=@context.id%>&amp;assignment=<%=@assignment.id%>">View Assignment with inline answers</a>
+
+            <br />
+            Highlight changes since:
+              <select id="highlight-changes" onchange="highlightSince(this.value);">
+                <option value="0">Nothing special</option>
+              </select>
+              <button type="button" onclick="cycleHighlight();">show next highlight</button>
 
             <% if @assignment.name.starts_with? "Course Participation -" %>
               <%
