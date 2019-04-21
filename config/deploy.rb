@@ -60,7 +60,7 @@ set :linked_dirs, %w{log tmp/pids public/system}
 # set :default_env, { path: "/opt/ruby/bin:$PATH" }
 
 # Default value for keep_releases is 5
-# Set it to 1 to free up space (1.6GB per release, plus about 1GB overhead to compile npm assets on an 8GB server)
+# Set it to 1 to free up space (2-3GB per release, plus 2-3GB overhead to compile npm assets on an 16GB server fills it up fast)
 # and realistically, we don't release until we're sure it's good.  If we mess up, we can just revert in src ctrl and do
 # a new release.
 set :keep_releases, 1
@@ -164,55 +164,50 @@ namespace :deploy do
    on roles(:app) do
       within release_path do
         with rails_env: fetch(:rails_env) do
-# TODO: uncomment. Commented temporarily to force compile assets
-#          begin
-#
-#            # This task only actually does the precompile if any files changed that require it.  Otherwise, it copies
-#            # the file from the previous release.  I used these for inspiration on how to implement:
-#            # https://coderwall.com/p/aridag/only-precompile-assets-when-necessary-rails-4-capistrano-3
-#            # http://www.snip2code.com/Snippet/119715/Skip-asset-compilation-in-Capistrano-3-i
-#
-#            # precompile if this is the first deploy
-#            raise PrecompileRequired unless fetch(:latest_release)
-#
-#            info("Comparing asset changes between revision #{fetch(:latest_release_revision)} and #{fetch(:release_revision)} to see if asset precompile is required.")
-#            fetch(:assets_dependencies).each do |dep|
-#              if should_compile_assets(dep) then raise PrecompileRequired end
-#            end
-#
-#            info("Skipping asset precompile, no asset diff found")
-#
-#            # NOTE: the commented out command below is for a standard Rails 4+ assets, but our version of Canvas uses an older Rails.
-#            #
-#            # copy over all of the assets from the last release
-#            # execute(:sudo, 'cp -a', latest_release_path.join('public', fetch(:assets_prefix)), release_path.join('public', fetch(:assets_prefix)))
-#            latest_release_path=fetch(:latest_release_path)
-#            execute(:sudo, 'cp -a', latest_release_path.join('public/assets'), release_path.join('public'))
-#            execute(:sudo, 'cp -a', latest_release_path.join('public/doc'), release_path.join('public'))
-#            execute(:sudo, 'cp -a', latest_release_path.join('client_apps'), release_path) # some things in public/javascripts are symlinked here
-#            execute(:sudo, 'cp -a', latest_release_path.join('public/javascripts'), release_path.join('public'))
-#            execute(:sudo, 'cp -a', latest_release_path.join('public/optimized'), release_path.join('public'))
-#            execute(:sudo, 'cp -a', latest_release_path.join('public/dist'), release_path.join('public'))
-#            execute(:sudo, 'chmod -R g+w', release_path.join('public')) # For some reason, cp -a is not preserving symlinks in public/javascripts/client_apps.  Let the initializer that fixes it create those links.
-#                                                                        # Also, it db:migrate fails if it has to create new dirs.  E.g. public/plugins
-#
-#          rescue PrecompileRequired
-            # Note: this took me forever to get going because the "deploy" user that it runs as needs rwx permissions on many
-            # files in the config directory, however, we setup those files to only be accessible from canvasuser.
-            # The way it works now is that /var/canvas/config has the master copies of the files owned by "canvasadmin:canvasadmin"
-            # with their permissions set loosely enough on the group so that compile_assets will work since "deploy" is in the 
-            # "canvasadmin" group.
-            # TODO: remove this
-            info("DEBUGINFO: Path = ")
-            execute :printenv
-            info("Compiling assets because a file in #{fetch(:assets_dependencies)} changed.")
-            info("Using npm -v:")
-            execute :npm, '-v'
-            execute :npm, 'cache clean' # Was getting "npm ERR! cb() never called!".
-            #execute :npm, 'install', '--silent'
-            execute :npm, '-dd install' # print debug log of npm install
-            execute :rake, 'canvas:compile_assets', '--trace'
-#          end
+
+          begin
+
+            # This task only actually does the precompile if any files changed that require it.  Otherwise, it copies
+            # the file from the previous release.  I used these for inspiration on how to implement:
+            # https://coderwall.com/p/aridag/only-precompile-assets-when-necessary-rails-4-capistrano-3
+            # http://www.snip2code.com/Snippet/119715/Skip-asset-compilation-in-Capistrano-3-i
+
+            # precompile if this is the first deploy
+            raise PrecompileRequired unless fetch(:latest_release)
+
+            info("Comparing asset changes between revision #{fetch(:latest_release_revision)} and #{fetch(:release_revision)} to see if asset precompile is required.")
+            fetch(:assets_dependencies).each do |dep|
+              if should_compile_assets(dep) then raise PrecompileRequired end
+            end
+
+            info("Skipping asset precompile, no asset diff found")
+
+            # NOTE: the commented out command below is for a standard Rails 4+ assets, but our version of Canvas uses an older Rails.
+            #
+            # copy over all of the assets from the last release
+            # execute(:sudo, 'cp -a', latest_release_path.join('public', fetch(:assets_prefix)), release_path.join('public', fetch(:assets_prefix)))
+            latest_release_path=fetch(:latest_release_path)
+            execute(:sudo, 'cp -a', latest_release_path.join('public/assets'), release_path.join('public'))
+            execute(:sudo, 'cp -a', latest_release_path.join('public/doc'), release_path.join('public'))
+            execute(:sudo, 'cp -a', latest_release_path.join('client_apps'), release_path) # some things in public/javascripts are symlinked here
+            execute(:sudo, 'cp -a', latest_release_path.join('public/javascripts'), release_path.join('public'))
+            execute(:sudo, 'cp -a', latest_release_path.join('public/optimized'), release_path.join('public'))
+            execute(:sudo, 'cp -a', latest_release_path.join('public/dist'), release_path.join('public'))
+            execute(:sudo, 'chmod -R g+w', release_path.join('public')) # For some reason, cp -a is not preserving symlinks in public/javascripts/client_apps.  Let the initializer that fixes it create those links.
+                                                                        # Also, it db:migrate fails if it has to create new dirs.  E.g. public/plugins
+
+          rescue PrecompileRequired
+           # Note: this took me forever to get going because the "deploy" user that it runs as needs rwx permissions on many
+           # files in the config directory, however, we setup those files to only be accessible from canvasuser.
+           # The way it works now is that /var/canvas/config has the master copies of the files owned by "canvasadmin:canvasadmin"
+           # with their permissions set loosely enough on the group so that compile_assets will work since "deploy" is in the 
+           # "canvasadmin" group.
+           info("Compiling assets because a file in #{fetch(:assets_dependencies)} changed.")
+           execute :npm, 'cache clean' # Was getting "npm ERR! cb() never called!".
+           #execute :npm, 'install', '--silent'
+           execute :npm, '-dd install' # print debug log of npm install
+           execute :rake, 'canvas:compile_assets', '--trace'
+          end
         end
       end
     end
