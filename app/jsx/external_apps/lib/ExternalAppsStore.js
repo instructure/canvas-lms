@@ -39,23 +39,19 @@ import 'compiled/jquery.rails_flash_notifications'
     }
   };
 
-  const store = createStore({
+  const defaultState = {
     externalTools: [],
     links: {},
     lti13LoadStatus: 'pending',
     isLoading: false,    // flag to indicate fetch is in progress
     isLoaded: false,     // flag to indicate data has loaded
     hasMore: false       // flag to indicate if there are more pages of external tools
-  });
+  }
+
+  const store = createStore(defaultState);
 
   store.reset = function() {
-    this.setState({
-      externalTools: [],
-      links: {},
-      isLoading: false,
-      isLoaded: false,
-      hasMore: false
-    })
+    this.setState(defaultState)
   };
 
   store.fetch = function() {
