@@ -660,12 +660,14 @@ class Enrollment < ActiveRecord::Base
   end
 
   def accept(force = false)
-    return false unless force || invited?
-    update_attribute(:workflow_state, 'active')
-    if self.type == 'StudentEnrollment'
-      Enrollment.recompute_final_score_in_singleton(self.user_id, self.course_id)
+    Shackles.activate(:master) do
+      return false unless force || invited?
+      update_attribute(:workflow_state, 'active')
+      if self.type == 'StudentEnrollment'
+        Enrollment.recompute_final_score_in_singleton(self.user_id, self.course_id)
+      end
+      touch_user
     end
-    touch_user
   end
 
   def reset_notifications_cache
