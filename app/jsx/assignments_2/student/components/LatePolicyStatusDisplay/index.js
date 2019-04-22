@@ -27,7 +27,7 @@ import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReade
 function LatePolicyStatusDisplay(props) {
   const {gradingType, grade, originalGrade, pointsDeducted, pointsPossible} = props
   return (
-    <div data-test-id="late-policy-container">
+    <div data-testid="late-policy-container">
       <Text size="medium">{I18n.t('Late Policy:')}</Text>
       <Tooltip
         tip={

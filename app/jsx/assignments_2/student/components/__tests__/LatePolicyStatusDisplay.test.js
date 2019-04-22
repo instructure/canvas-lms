@@ -46,7 +46,7 @@ describe('LatePolicyStatusDisplay', () => {
       />,
       document.getElementById('fixtures')
     )
-    const container = $('[data-test-id="late-policy-container"]')
+    const container = $('[data-testid="late-policy-container"]')
     // This is due to the SR content.  One is being rendered for normal text and the other is SR text
     expect(container.text()).toEqual('Late Policy:Late Policy: minus 3 Points-3 Points')
   })
