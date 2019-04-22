@@ -28,11 +28,11 @@ class TokenScopes
   LTI_AGS_SCORE_SCOPE = "https://purl.imsglobal.org/spec/lti-ags/scope/score".freeze
   LTI_NRPS_V2_SCOPE = "https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly".freeze
   LTI_SCOPES = {
-    LTI_AGS_LINE_ITEM_SCOPE => I18n.t("Manage Line Items"),
-    LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE => I18n.t("Read Line Items"),
-    LTI_AGS_RESULT_READ_ONLY_SCOPE => I18n.t("Read Line Item Results"),
-    LTI_AGS_SCORE_SCOPE => I18n.t("Create/Edit Line Item Scores"),
-    LTI_NRPS_V2_SCOPE => I18n.t("Read Context Membership")
+    LTI_AGS_LINE_ITEM_SCOPE => I18n.t("Can create and view assignment data in the gradebook associated with the tool."),
+    LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE => I18n.t("Can view assignment data in the gradebook associated with the tool."),
+    LTI_AGS_RESULT_READ_ONLY_SCOPE => I18n.t("Can view submission data for assignments associated with the tool."),
+    LTI_AGS_SCORE_SCOPE => I18n.t("Can create and update submission results for assignments associated with the tool."),
+    LTI_NRPS_V2_SCOPE => I18n.t("Can retrieve user data associated with the context the tool is installed in.")
   }.freeze
   LTI_AGS_SCOPES = [ LTI_AGS_LINE_ITEM_SCOPE, LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE, LTI_AGS_RESULT_READ_ONLY_SCOPE, LTI_AGS_SCORE_SCOPE ].freeze
 

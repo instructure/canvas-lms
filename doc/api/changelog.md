@@ -10,8 +10,18 @@ The API Change Log includes adjustments to the Canvas API documentation as part 
 - This page documents API changes for the last four releases. For prior releases, view the [API Change Log archive page](file.changelog_archive.html).
 
 <div class="changelog"></div>
-## 2019-03-30
+## 2019-04-20
+### Additions
+| API Calls | Function |  |
+|----------------------|----------------------|--------------------------|
+| [Submissions API] | Grade or Comment on a Submission Endpoint | Rubric_assessment parameter: Added rubric_assessment[criterion_id][rating_id] sub-parameter<br><br>Added rating IDs to example rubric in description
+|  [Users API]         | Update User Settings Endpoint | Hide_dashcard_color_overlays: Added parameter
 
+[Submissions API]: submissions.html
+[Users API]: users.html
+
+
+## 2019-03-30
 ### Changes
 | API Calls | Function |  |
 |----------------------|----------------------|--------------------------|
@@ -29,7 +39,6 @@ The API Change Log includes adjustments to the Canvas API documentation as part 
 
 
 ## 2019-03-09
-
 ### Changes
 | API Calls | Function |  |
 |----------------------|----------------------|--------------------------|
@@ -46,38 +55,9 @@ The API Change Log includes adjustments to the Canvas API documentation as part 
 
 
 ## 2019-02-16
-
 ### Additions
 | API Responses | Function |      |
 |----------------------|----------------------|--------------------------|
 | [Users API] | Edit a User Endpoint | Added [user]title and [user]bio parameters
 
 [Users API]: users.html
-
-
-## 2019-01-26
-
-### Changes
-| API Calls | Function |      |
-|----------------------|----------------------|--------------------------|
-| [Submissions API]  |  List Gradeable Students Endpoint | Added clarification about anonymous grading |
-
-[Submissions API]: submissions.html
-
-### Additions
-| API Responses | Function |      |
-|----------------------|----------------------|--------------------------|
-| [Assignments API] | Assignment Object | Returns grader_count, final_grader, grader_comments_visible_to_graders, graders_anonymous_to_graders, grader_names_visible_to_final_grader, and anonymous_grading parameters |
-| [Submissions API] | Submission Object | Returns UserDisplay parameter |
-| [Users API] |      | Added AnonyousUserDisplay Object |
-
-[Assignments API]: assignments.html
-[Submissions API]: submissions.html
-[Users API]: users.html
-
-### Removals
-| API Responses | Function |      |
-|----------------------|----------------------|--------------------------|
-| [Enrollments API] | Enrollment Object | Removed computed_current_score, computed_final_score, computed_current_grade, computed_final_grade, current_period_computed_current_score, current_period_computed_final_score, current_period_computed_current_grade, and current_period_computed_final_grade parameters |
-
-[Enrollments API]: enrollments.html

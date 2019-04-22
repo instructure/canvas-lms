@@ -47,7 +47,7 @@ class Progress < ActiveRecord::Base
     self.results = nil
     self.workflow_state = 'queued'
     self.completion = 0
-    self.save!
+    Shackles.activate(:master) {self.save!}
   end
 
   def set_results(results)
@@ -78,7 +78,7 @@ class Progress < ActiveRecord::Base
     enqueue_args = enqueue_args.reverse_merge(max_attempts: 1, priority: Delayed::LOW_PRIORITY)
     method_args = method_args.unshift(self) unless enqueue_args.delete(:preserve_method_args)
     work = Progress::Work.new(self, target, method, method_args)
-    Delayed::Job.enqueue(work, enqueue_args)
+    Shackles.activate(:master) {Delayed::Job.enqueue(work, enqueue_args)}
   end
 
   # (private)

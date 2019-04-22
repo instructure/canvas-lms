@@ -22,6 +22,7 @@ define [
   class ContentMigrationIssueView extends Backbone.View
     className: 'clearfix row-fluid top-padding'
     template: template
+    tagName: 'li'
 
     toJSON: -> 
       json = super

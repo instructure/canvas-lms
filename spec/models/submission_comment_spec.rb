@@ -638,4 +638,38 @@ This text has a http://www.google.com link in it...
       expect{ comment.update!(comment: "changing the comment!") }.not_to change{ AnonymousOrModerationEvent.count }
     end
   end
+
+  describe '#attempt' do
+    before(:once) do
+      @submission.update!(attempt: 4)
+      @comment1 = @submission.submission_comments.create!(valid_attributes.merge(attempt: 1))
+      @comment2 = @submission.submission_comments.create!(valid_attributes.merge(attempt: 2))
+      @comment3 = @submission.submission_comments.create!(valid_attributes.merge(attempt: 2))
+      @comment4 = @submission.submission_comments.create!(valid_attributes.merge(attempt: nil))
+    end
+
+    it 'can limit comments to the specific attempt' do
+      expect(@submission.submission_comments.where(attempt: 1)).to eq [@comment1]
+    end
+
+    it 'can have multiple comments' do
+      expect(@submission.submission_comments.where(attempt: 2).sort).to eq [@comment2, @comment3]
+    end
+
+    it 'can limit the comments to attempts that are nil' do
+      expect(@submission.submission_comments.where(attempt: nil)).to eq [@comment4]
+    end
+
+    it 'cannot be present? if submisssion#attempt is nil' do
+      @submission.update_column(:attempt, nil) # bypass infer_values callback
+      @comment1.reload
+      @comment1.attempt = 2
+      expect(@comment1).not_to be_valid
+    end
+
+    it 'cannot be larger then submisssion#attempt' do
+      @comment1.attempt = @submission.attempt + 1
+      expect(@comment1).not_to be_valid
+    end
+  end
 end

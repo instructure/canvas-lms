@@ -22,11 +22,10 @@ module Lti::Messages
       @message = LtiAdvantage::Messages::ResourceLinkRequest.new
     end
 
-    def generate_post_payload_message
-      super
+    def generate_post_payload_message(validate_launch: true)
       add_resource_link_request_claims! if include_claims?(:rlid)
       add_assignment_and_grade_service_claims if include_assignment_and_grade_service_claims?
-      @message
+      super(validate_launch: validate_launch)
     end
 
     def generate_post_payload_for_assignment(assignment, _outcome_service_url, _legacy_outcome_service_url, _lti_turnitin_outcomes_placement_url)

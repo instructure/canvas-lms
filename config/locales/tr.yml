@@ -43,6 +43,7 @@ tr:
   LongTextEditor: 
     cancel: İptal
     save: Kaydet
+  _5a374287: "..."
   _at_the_bottom__4360f2b4: "-- Alt kısımda --"
   _b4455c8b: "%"
   _section_not_synced_yet_cd07d0dd: "-- Bölüm henüz senkronize edilmedi"
@@ -9020,6 +9021,7 @@ tr:
   hide_correct_answers_at_2421b0aa: "Doğru Cevapları Şu zamanda Gizle"
   hide_correct_answers_at_b1a59408: "Doğru Cevapları Şu zamanda Gizle"
   hide_courses_without_enrollments_6df4dfad: "Kayıt olunmamış dersleri gizle"
+  hide_e057ff36: Gizle
   hide_notes_column_7749f408: "Notlar Sütununu Gizle"
   hide_score_total_for_assessment_results_d0ef117f: "Sınav sonuçlarından toplam puanları gizle"
   hide_sidebar_2b5b3776: "Paneli Gizle"
@@ -9153,6 +9155,7 @@ tr:
   inner_box_background_6f9092f: "İçteki Kutu Arkaplanı"
   inner_box_border_d0524b03: "İçteki Kutu Kenarlığı"
   insert_equella_links_49a8dacd: "Equella Bağlantısı Ekle"
+  insert_here_ccdb022e: "buraya ekleyin"
   insert_math_equation_57c6e767: "Matematik Denklemi Ekle"
   insert_row_below_25187f89: "Alta satır ekle"
   installed_7b284a91: Yüklü
@@ -9445,7 +9448,7 @@ tr:
         rubrics: "Değerlendirme Listeleri"
         syllabus_body: "Ders Program Gövdesi"
         tool_profiles: "Araç Profilleri"
-        wikis: "Wiki Sayfaları"
+        wikis: Sayfalar
     cc: 
       standard: 
         failed_to_convert_qti: "Değerlendirme dosyasının içeri aktarımında hata %{file_identifier}"
@@ -11826,6 +11829,7 @@ tr:
   no_74e9b590: hayır
   no_assignment_name_adbb215b: "Ödev Adı Yok"
   no_broken_links_found_38d951e3: "Bozuk Bağlantı Bulunamadı"
+  no_content_5dbc9acf: "İçerik Yok"
   no_content_has_been_added_f36bab43: "* Hiçbir içerik eklenmedi"
   no_courses_found_12d68a74: "Ders bulunamadı"
   no_date_bfeb2df7: "Tarih Yok"
@@ -12327,6 +12331,9 @@ tr:
       points: Puanlar
       pts: not
       rating_description: "Kriter oranı açıklaması"
+    criterion_header: 
+      insert_criterion_rating: "Kriter oranı ekle"
+      insert_rating: Ekle
     dont_import: "Bu grup içeri aktarılamadı."
     failed_outcome_creation: "Öğrenme Çıktısını oluşturma başarısız"
     failed_outcome_update: "Öğrenme Çıktısını güncelleme başarısız"
@@ -16980,6 +16987,7 @@ tr:
     vdd: 
       more_message: "ve %{count} daha fazla..."
   total_71a4807: Toplam
+  total_points_44d76792: "Toplam Puanlar"
   total_range_45c8549a: "Toplam Aralık"
   tours: 
     quiz_regrade: 
@@ -17096,6 +17104,7 @@ tr:
       agree_to_terms_with_code_of_conduct: "*Kullanım Koşulları* ve **davranış kurallarını** Kabul Ediyorsunuz."
   user_696f4d6a: kullanıcı
   user_avatars_e4fc4ed3: "Kullanıcı Avatarları"
+  user_c95de254: Kullanıcı
   user_content_aaf0fb5a: "Kullanıcı İçeriği"
   user_date_range_search: 
     cant_be_blank: "Canvas Kullanıcı Kodu boş bırakılamaz"

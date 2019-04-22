@@ -18,34 +18,34 @@
 import I18n from 'i18n!generic_error_page'
 import React from 'react'
 import {TextArea, TextInput} from '@instructure/ui-forms'
-import Container from '@instructure/ui-core/lib/components/Container'
+import View from '@instructure/ui-layout/lib/components/View'
 import {Button} from '@instructure/ui-buttons'
 import {func} from 'prop-types'
+import {Flex, FlexItem} from '@instructure/ui-layout'
 
 function ErrorTextInputForm(props) {
   return (
-    <Container>
+    <View>
       <TextArea
         margin="small"
         onChange={props.handleChangeCommentBox}
         label={I18n.t('What happened?')}
       />
-      <Container margin="small" data-test-id="generic-error-comment-box-email">
+      <View>
         <TextInput
           display="block"
           onChange={props.handleChangeOptionalEmail}
           label={I18n.t('Email Address (Optional)')}
         />
-      </Container>
-      <Button
-        data-test-id="generic-error-comment-box-submit-button"
-        margin="small"
-        variant="primary"
-        onClick={props.handleSubmitErrorReport}
-      >
-        {I18n.t('Submit')}
-      </Button>
-    </Container>
+      </View>
+      <Flex justifyItems="end">
+        <FlexItem>
+          <Button margin="small 0" variant="primary" onClick={props.handleSubmitErrorReport}>
+            {I18n.t('Submit')}
+          </Button>
+        </FlexItem>
+      </Flex>
+    </View>
   )
 }
 

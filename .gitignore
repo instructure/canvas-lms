@@ -61,7 +61,6 @@ docker-compose.local.*
 
 # sub-packages
 /packages/*/node_modules
-/packages/*/copy-of-what-gets-published-to-npm-registry
 /packages/canvas-planner/lib
 /packages/canvas-planner/es
 /packages/canvas-planner/coverage/

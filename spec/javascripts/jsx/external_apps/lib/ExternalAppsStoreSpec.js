@@ -68,6 +68,19 @@ QUnit.module('ExternalApps.ExternalAppsStore', {
       default_group_storage_quota_mb: 50,
       default_time_zone: 'America/Denver'
     }
+    this.lti13Tools = [
+      {
+        app_type: "Lti 1.3 Tool",
+        app_id: "1",
+        name: "Lti Tool Config",
+        description: "A description",
+        installed_for_context: false,
+        installed_at_context_level: false,
+        installed_tool_id: null,
+        context_id: "1",
+        lti_version: "1.3"
+      }
+    ]
   },
   teardown() {
     this.server.restore()
@@ -341,4 +354,49 @@ test('findById', function() {
   store.setState({externalTools: this.tools})
   const tool = store.findById(3)
   equal(tool.name, 'LinkedIn')
+})
+
+test('fetch13Tools', function() {
+  equal(store.getState().lti13LoadStatus, 'pending')
+  this.server.respondWith('GET', /\/lti_apps/, [
+    200,
+    {'Content-Type': 'application/json'},
+    JSON.stringify(this.lti13Tools)
+  ])
+  store.fetch13Tools()
+  this.server.respond()
+  equal(store.getState().externalTools.length, 1)
+  equal(store.getState().lti13LoadStatus, 'success')
+})
+
+test('installTool', function() {
+  store.setState({externalTools: this.lti13Tools})
+  notOk(store.getState().externalTools.find(tool => tool.app_id === '1').installed_at_context_level)
+  notOk(store.getState().externalTools.find(tool => tool.app_id === '1').installed_for_context)
+
+  this.server.respondWith('POST',  /\/create_tool/, [
+    200,
+    {'Content-Type': 'application/json'},
+    JSON.stringify(this.lti13Tools)
+  ])
+  store.installTool('1')
+  this.server.respond()
+  ok(store.getState().externalTools.find(tool => tool.app_id === '1').installed_at_context_level)
+  ok(store.getState().externalTools.find(tool => tool.app_id === '1').installed_for_context)
+})
+
+test('removeTool', function() {
+  store.setState({externalTools: this.lti13Tools})
+  store._toggle_lti_1_3_tool_enabled('1')(true)
+  ok(store.getState().externalTools.find(tool => tool.app_id === '1').installed_at_context_level)
+  ok(store.getState().externalTools.find(tool => tool.app_id === '1').installed_for_context)
+  this.server.respondWith('DELETE',  /\/delete_tool/, [
+    200,
+    {'Content-Type': 'application/json'},
+    JSON.stringify(this.lti13Tools)
+  ])
+  store.removeTool('1')
+  this.server.respond()
+  notOk(store.getState().externalTools.find(tool => tool.app_id === '1').installed_at_context_level)
+  notOk(store.getState().externalTools.find(tool => tool.app_id === '1').installed_for_context)
 })

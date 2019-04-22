@@ -26,6 +26,8 @@ module Submissions
         preview: params.fetch(:preview, false),
         version: params.fetch(:version, nil)
       )
+
+      return render_unauthorized_action if anonymize_students?
       super
     end
   end

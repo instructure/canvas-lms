@@ -36,7 +36,7 @@ export default class SubmitAny extends React.Component {
   }
 
   static defaultProps = {
-    readOnly: true
+    readOnly: false
   }
 
   onDelete = () => {

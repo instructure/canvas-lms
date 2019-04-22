@@ -43,7 +43,7 @@ describe "permissions index" do
       PermissionsIndex.visit(@account)
     end
 
-    it "updates the role to the new name after editing", :xbrowser do
+    it "updates the role to the new name after editing" do
       PermissionsIndex.edit_role(@custom_student_role, "A Better Kitty")
       expect{PermissionsIndex.role_name(@custom_student_role).text}.to become("A Better Kitty")
       expect{PermissionsIndex.edit_tray_header.text}.to become("Edit A Better Kitty")
@@ -92,7 +92,7 @@ describe "permissions index" do
       user_session(@admin)
     end
 
-    it "permissions enables on grid", :xbrowser do
+    it "permissions enables on grid" do
       PermissionsIndex.visit(@account)
       permission_name = "manage_outcomes"
       PermissionsIndex.change_permission(permission_name, ta_role.id, "enable")
@@ -103,7 +103,7 @@ describe "permissions index" do
       expect(r.locked).to eq(false)
     end
 
-    it "permissions disables on grid", :xbrowser do
+    it "permissions disables on grid" do
       PermissionsIndex.visit(@account)
       permission_name = "read_announcements"
       PermissionsIndex.change_permission(permission_name, student_role.id, "disable")
@@ -136,7 +136,7 @@ describe "permissions index" do
       expect(r.locked).to eq(true)
     end
 
-    it "permissions default on grid works", :xbrowser do
+    it "permissions default on grid works" do
       permission_name = "read_announcements"
       create_role_override(permission_name, student_role, @account,
         :enabled => false, :locked => false)

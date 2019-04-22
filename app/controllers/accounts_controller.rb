@@ -549,30 +549,27 @@ class AccountsController < ApplicationController
       params[:state] -= %w{available}
     end
 
-    name_col = Course.best_unicode_collation_key('name')
-    sortable_name_col = User.sortable_name_order_by_clause(nil)
-
+    sortable_name_col = User.sortable_name_order_by_clause('users')
+    
     order = if params[:sort] == 'course_name'
-              "#{name_col}"
+              "#{Course.best_unicode_collation_key('courses.name')}"
             elsif params[:sort] == 'sis_course_id'
-              "#{Course.quoted_table_name}.sis_source_id"
+              "courses.sis_source_id"
             elsif params[:sort] == 'teacher'
               "(SELECT #{sortable_name_col} FROM #{User.quoted_table_name}
-                JOIN #{Enrollment.quoted_table_name} on #{User.quoted_table_name}.id
-                = #{Enrollment.quoted_table_name}.user_id
-                WHERE #{Enrollment.quoted_table_name}.workflow_state <> 'deleted'
-                AND #{Enrollment.quoted_table_name}.type = 'TeacherEnrollment'
-                AND #{Enrollment.quoted_table_name}.course_id = #{Course.quoted_table_name}.id
+                JOIN #{Enrollment.quoted_table_name} on users.id = enrollments.user_id
+                WHERE enrollments.workflow_state <> 'deleted'
+                AND enrollments.type = 'TeacherEnrollment'
+                AND enrollments.course_id = courses.id
                 ORDER BY #{sortable_name_col} LIMIT 1)"
             # leaving subaccount as an option for backwards compatibility
             elsif params[:sort] == 'subaccount' || params[:sort] == 'account_name'
-              "(SELECT #{name_col} FROM #{Account.quoted_table_name}
-                WHERE #{Account.quoted_table_name}.id
-                = #{Course.quoted_table_name}.account_id)"
+              "(SELECT #{Account.best_unicode_collation_key('accounts.name')} FROM #{Account.quoted_table_name}
+                WHERE accounts.id = courses.account_id)"
             elsif params[:sort] == 'term'
-              "(SELECT #{EnrollmentTerm.quoted_table_name}.name FROM #{EnrollmentTerm.quoted_table_name}
-                WHERE #{EnrollmentTerm.quoted_table_name}.id
-                = #{Course.quoted_table_name}.enrollment_term_id)"
+              "(SELECT #{EnrollmentTerm.best_unicode_collation_key('enrollment_terms.name')}
+                FROM #{EnrollmentTerm.quoted_table_name}
+                WHERE enrollment_terms.id = courses.enrollment_term_id)"
             else
               "id"
             end
@@ -989,6 +986,11 @@ class AccountsController < ApplicationController
         MASKED_APP_CENTER_ACCESS_TOKEN: @account.settings[:app_center_access_token].try(:[], 0...5),
         PERMISSIONS: {
           :create_tool_manually => @account.grants_right?(@current_user, session, :create_tool_manually),
+        },
+        CSP: {
+          :enabled => @account.csp_enabled?,
+          :inherited => @account.csp_inherited?,
+          :settings_locked => @account.csp_locked?,
         }
       })
       js_env(edit_help_links_env, true)

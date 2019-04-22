@@ -62,6 +62,7 @@ exports[`The CriterionInfo component renders the root component as expected 2`] 
     onExiting={[Function]}
     onOpen={[Function]}
     open={true}
+    overflow="scroll"
     shouldCloseOnDocumentClick={true}
     shouldReturnFocus={true}
     size="medium"

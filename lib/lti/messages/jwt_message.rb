@@ -36,7 +36,7 @@ module Lti::Messages
       { id_token: LtiAdvantage::Messages::JwtMessage.create_jws(body, Lti::KeyStorage.present_key) }
     end
 
-    def generate_post_payload_message
+    def generate_post_payload_message(validate_launch: true)
       raise 'Class can only be used once.' if @used
       @used = true
 
@@ -54,6 +54,7 @@ module Lti::Messages
       add_names_and_roles_service_claims! if include_names_and_roles_service_claims?
 
       @expander.expand_variables!(@message.extensions)
+      @message.validate! if validate_launch
       @message
     end
 
@@ -65,14 +66,21 @@ module Lti::Messages
 
     def add_security_claims!
       @message.aud = @tool.developer_key.global_id.to_s
+      @message.azp = @tool.developer_key.global_id.to_s
       @message.deployment_id = @tool.deployment_id
       @message.exp = Setting.get('lti.oauth2.access_token.exp', 1.hour).to_i.seconds.from_now.to_i
       @message.iat = Time.zone.now.to_i
       @message.iss = Canvas::Security.config['lti_iss']
       @message.nonce = SecureRandom.uuid
-      @message.sub = @user.lti_id
-      @message.lti11_legacy_user_id = Lti::Asset.opaque_identifier_for(@user)
+      @message.sub = old_lti_id || @user.lti_id
+      @message.lti11_legacy_user_id = Lti::Asset.opaque_identifier_for(@user, context: @context)
       @message.target_link_uri = @tool.extension_setting(@opts[:resource_type], :target_link_uri) || @tool.url
+    end
+
+    def old_lti_id
+      @context.shard.activate do
+        @user.past_lti_ids.where(context: @context).take&.user_lti_id
+      end
     end
 
     def add_context_claims!

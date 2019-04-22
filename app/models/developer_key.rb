@@ -45,7 +45,7 @@ class DeveloperKey < ActiveRecord::Base
   after_update :invalidate_access_tokens_if_scopes_removed!
   after_create :create_default_account_binding
 
-  validates_as_url :redirect_uri, :oidc_login_uri, allowed_schemes: nil
+  validates_as_url :redirect_uri, :oidc_initiation_url, allowed_schemes: nil
   validate :validate_redirect_uris
   validate :validate_public_jwk
 
@@ -64,6 +64,8 @@ class DeveloperKey < ActiveRecord::Base
     end
     state :deleted
   end
+
+  self.ignored_columns = %i[oidc_login_uri tool_id]
 
   alias_method :destroy_permanently!, :destroy
   def destroy

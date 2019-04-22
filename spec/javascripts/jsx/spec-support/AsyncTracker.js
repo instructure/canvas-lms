@@ -107,6 +107,7 @@ export default class AsyncTracker {
                 tracker
               )
             }
+            throw e
           }
           removeTimeoutTracker(tracker)
         },

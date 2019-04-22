@@ -524,8 +524,7 @@ module QuizzesCommon
   end
 
   def save_settings
-    f('.save_quiz_button').click
-    wait_for_ajaximations
+    wait_for_new_page_load { f('.save_quiz_button').click }
   end
 
   def edit_quiz

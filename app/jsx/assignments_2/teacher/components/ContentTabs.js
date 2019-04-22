@@ -27,11 +27,12 @@ import Students from './Students'
 ContentTabs.propTypes = {
   assignment: TeacherAssignmentShape.isRequired,
   onChangeAssignment: func.isRequired,
+  onValidate: func.isRequired,
   readOnly: bool
 }
 
 ContentTabs.defaultProps = {
-  readOnly: true
+  readOnly: false
 }
 
 export default function ContentTabs(props) {
@@ -42,6 +43,7 @@ export default function ContentTabs(props) {
         <Details
           assignment={assignment}
           onChangeAssignment={props.onChangeAssignment}
+          onValidate={props.onValidate}
           readOnly={props.readOnly}
         />
       </TabPanel>

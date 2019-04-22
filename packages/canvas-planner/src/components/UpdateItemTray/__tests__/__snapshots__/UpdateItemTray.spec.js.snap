@@ -1,10 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`renders the item to update if provided 1`] = `
-<div>
+<div
+  className="UpdateItemTray-styles__root"
+>
   <View
     as="div"
     display="auto"
+    overflowX="visible"
+    overflowY="visible"
     padding="large medium medium"
   >
     <FormFieldGroup
@@ -119,6 +123,8 @@ exports[`renders the item to update if provided 1`] = `
       as="div"
       display="auto"
       margin="small 0 0"
+      overflowX="visible"
+      overflowY="visible"
       textAlign="end"
     >
       <Button
@@ -154,10 +160,14 @@ exports[`renders the item to update if provided 1`] = `
 `;
 
 exports[`updates state when new note is passed in 1`] = `
-<div>
+<div
+  className="UpdateItemTray-styles__root"
+>
   <View
     as="div"
     display="auto"
+    overflowX="visible"
+    overflowY="visible"
     padding="large medium medium"
   >
     <FormFieldGroup
@@ -278,6 +288,8 @@ exports[`updates state when new note is passed in 1`] = `
       as="div"
       display="auto"
       margin="small 0 0"
+      overflowX="visible"
+      overflowY="visible"
       textAlign="end"
     >
       <Button
@@ -313,10 +325,14 @@ exports[`updates state when new note is passed in 1`] = `
 `;
 
 exports[`updates state when new note is passed in 2`] = `
-<div>
+<div
+  className="UpdateItemTray-styles__root"
+>
   <View
     as="div"
     display="auto"
+    overflowX="visible"
+    overflowY="visible"
     padding="large medium medium"
   >
     <FormFieldGroup
@@ -437,6 +453,8 @@ exports[`updates state when new note is passed in 2`] = `
       as="div"
       display="auto"
       margin="small 0 0"
+      overflowX="visible"
+      overflowY="visible"
       textAlign="end"
     >
       <Button

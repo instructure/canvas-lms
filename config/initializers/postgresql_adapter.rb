@@ -43,6 +43,8 @@ module PostgreSQLAdapterExtensions
   def quote_text(value)
     if value.nil?
       "\\N"
+    elsif value.is_a?(ActiveRecord::ConnectionAdapters::PostgreSQL::OID::Array::Data)
+      quote_text(encode_array(value))
     else
       hash = {"\n" => "\\n", "\r" => "\\r", "\t" => "\\t", "\\" => "\\\\"}
       value.to_s.gsub(/[\n\r\t\\]/){ |c| hash[c] }

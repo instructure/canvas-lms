@@ -12,7 +12,7 @@ The first customer of the `canvas-rce` was the `canvas-lms` LMS so documentation
 and references throughout documentation might reflect and assume the use of
 `canvas-lms`.
 
-# Install and setup
+## Install and setup
 
 As a published npm module, you can add canvas-rce to your node project by doing
 the following:
@@ -39,51 +39,6 @@ canvas-rce:
 ```
 (See: https://polyfill.io/v2/docs/ for more info)
 
-# Development
+## Development
 
-## Upgrading TinyMCE
-
-### Language Packs
-
-Translations for TinyMCE are not shipped with the `tinymce` npm package. When
-upgrading to a new version be sure to download the latest language packs. Visit
-https://www.tinymce.com/download/language-packages/ and select all languages. It
-is easier to just download all and only commit the changes to existing files
-than try to only select the locales currently used. Download the file and
-extract all of th `.js` files to `./src/rce/languages/`. After commiting the
-changed locale files you can run `git clean -f ./src/rce/languages/` to remove
-the untracked language files.
-
-## Adding Languages
-
-### TinyMCE Language Pack
-
-Download the new TinyMCE language pack by visiting
-https://www.tinymce.com/download/language-packages/ and select the language.
-Copy the JavaScript file to `./src/rce/languages/`.
-
-### Locale Code Mappings
-
-Since different projects have a hard time agreeing on locale code format, a file
-mapping Canvas locale codes to TinyMCE locale codes needs to be updated. This is
-found in `./src/rce/editorLanguage.js`.
-
-### Recognized Languages
-
-The `./src/rce/normalizeLocale.js` file includes a list of valid locales. The
-new locale should be added here.
-
-### Locale Module
-
-A locale module should be added for each new locale, with a name matching the
-Canvas locale code. This file adds the translations to the `canvas-rce`
-formatMessage namespace, and loads the TinyMCE translations.
-
-#### Example
-
-```js
-import formatMessage from "../format-message";
-import locale from "../../locales/locale-code.json";
-import "../rce/languages/tinymce_locale";
-formatMessage.addLocale({ "locale-code": locale });
-```
+See [DEVELOPMENT.md](./DEVELOPMENT.md)

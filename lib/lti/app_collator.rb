@@ -39,6 +39,7 @@ module Lti
       collection.map do |o|
         case o
         when ContextExternalTool
+          next if o.use_1_3?
           hash = external_tool_definition(o)
           if opts[:master_course_status]
             hash.merge!(o.master_course_api_restriction_data(opts[:master_course_status]))
@@ -47,28 +48,25 @@ module Lti
         when ToolProxy
           tool_proxy_definition(o)
         when Hash
-          tool_config_definition(o)
+          lti13_tool_definition(o)
         end
-      end
+      end.compact
     end
 
     private
 
-    def tool_config_definition(tool_configuration)
+    def lti13_tool_definition(tool_configuration)
       config = tool_configuration[:config]
       {
-        app_type: config.class.name,
+        app_type: "LTI 1.3 Tool",
         app_id: config.developer_key.id,
         name: config[:settings]['title'],
         description: config[:settings]['description'],
-        installed_locally: tool_configuration[:enabled],
-        enabled: tool_configuration[:enabled],
-        installed_in_current_course: tool_configuration[:installed_in_current_course],
-        tool_configuration: nil,
-        context: 'Account',
+        installed_for_context: tool_configuration[:installed_for_context],
+        installed_at_context_level: tool_configuration[:installed_at_context_level],
+        installed_tool_id: tool_configuration[:installed_tool_id],
         context_id: config.developer_key.account_id,
-        reregistration_url: nil,
-        has_update: nil
+        lti_version: '1.3'
       }
     end
 
@@ -85,7 +83,7 @@ module Lti
         context_id: external_tool.context.id,
         reregistration_url: nil,
         has_update: nil,
-        lti_version: external_tool.use_1_3? ? '1.3' : '1.1'
+        lti_version: '1.1'
       }
     end
 

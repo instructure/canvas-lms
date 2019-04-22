@@ -20,16 +20,34 @@ import React from 'react'
 import StudentContent from './components/StudentContent'
 import {string} from 'prop-types'
 import {Query} from 'react-apollo'
-import {STUDENT_VIEW_QUERY} from './assignmentData'
+import GenericErrorPage from '../../shared/components/GenericErrorPage/index'
+import errorShipUrl from './SVG/ErrorShip.svg'
+import {GetAssignmentEnvVariables, STUDENT_VIEW_QUERY} from './assignmentData'
+import LoadingIndicator from '../shared/LoadingIndicator'
 
 const StudentView = props => (
   <Query query={STUDENT_VIEW_QUERY} variables={{assignmentLid: props.assignmentLid}}>
     {({loading, error, data}) => {
-      // TODO HANDLE ERROR AND LOADING
-      if (loading) return null
-      if (error) return `Error!: ${error}`
+      if (loading) return <LoadingIndicator />
+      if (error) {
+        return (
+          <GenericErrorPage
+            imageUrl={errorShipUrl}
+            errorSubject="Assignments 2 Student initial query error"
+            errorCategory="Assignments 2 Student Error Page"
+          />
+        )
+      }
+
       document.title = data.assignment.name
-      return <StudentContent assignment={data.assignment} />
+      const assignmentEnv = GetAssignmentEnvVariables()
+      const mergedAssignment = {
+        ...data.assignment,
+        env: {
+          ...assignmentEnv
+        }
+      }
+      return <StudentContent assignment={mergedAssignment} />
     }}
   </Query>
 )

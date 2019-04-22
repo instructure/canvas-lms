@@ -260,27 +260,26 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
 
   finalGradeOverrideEnabled: (() => ENV.GRADEBOOK_OPTIONS.final_grade_override_enabled).property(),
 
-  showFinalGradeOverride: function() {
-    if (!ENV.GRADEBOOK_OPTIONS.settings || !this.get('finalGradeOverrideEnabled')) {
+  allowFinalGradeOverride: function() {
+    if (!ENV.GRADEBOOK_OPTIONS.course_settings) {
       return false
     }
-    return ENV.GRADEBOOK_OPTIONS.settings.show_final_grade_overrides === 'true'
+
+    return ENV.GRADEBOOK_OPTIONS.course_settings.allow_final_grade_override
   }
     .property()
     .volatile(),
 
-  updateShowFinalGradeOverride: function() {
+  updateAllowFinalGradeOverride: function() {
     ajax.request({
       dataType: 'json',
       type: 'put',
-      url: ENV.GRADEBOOK_OPTIONS.settings_update_url,
+      url: `/api/v1/courses/${ENV.GRADEBOOK_OPTIONS.context_id}/settings`,
       data: {
-        gradebook_settings: {
-          show_final_grade_overrides: this.get('showFinalGradeOverride')
-        }
+        allow_final_grade_override: this.get('allowFinalGradeOverride')
       }
     })
-  }.observes('showFinalGradeOverride'),
+  }.observes('allowFinalGradeOverride'),
 
   selectedStudentFinalGradeOverrideChanged: function() {
     const student = this.get('selectedStudent')

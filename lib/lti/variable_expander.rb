@@ -742,13 +742,23 @@ module Lti
                        -> { @current_user.id },
                        USER_GUARD
 
-    # Returns the Canvas user_uuid of the launching user.
+    # Returns the Canvas user_uuid of the launching user for the context.
     # @duplicates User.uuid
     # @example
     #   ```
     #   N2ST123dQ9zyhurykTkBfXFa3Vn1RVyaw9Os6vu3
     #   ```
     register_expansion 'vnd.instructure.User.uuid', [],
+                       -> { UserPastLtiId.uuid_for_user_in_context(@current_user, @context) },
+                       USER_GUARD
+
+    # Returns the current Canvas user_uuid of the launching user.
+    # @duplicates User.uuid
+    # @example
+    #   ```
+    #   N2ST123dQ9zyhurykTkBfXFa3Vn1RVyaw9Os6vu3
+    #   ```
+    register_expansion 'vnd.instructure.User.current_uuid', [],
                        -> { @current_user.uuid },
                        USER_GUARD
 
@@ -928,7 +938,7 @@ module Lti
     #   da12345678cb37ba1e522fc7c5ef086b7704eff9
     #   ```
     register_expansion 'Canvas.masqueradingUser.userId', [],
-                       -> { @tool.opaque_identifier_for(@controller.logged_in_user) },
+                       -> { @tool.opaque_identifier_for(@controller.logged_in_user, context: @context) },
                        MASQUERADING_GUARD
 
     # Returns the xapi url for the user.

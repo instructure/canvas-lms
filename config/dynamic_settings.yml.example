@@ -72,6 +72,9 @@ development:
       clone_url_strand.yml: |
         lti1.instructure.com: lti1
         lti2.instructure.com: lti2
+      csp_logging.yml |
+        host: https://csplogging.inscloudgate.net/
+        shared_secret: s00p3r_s3cr3t
   store:
     canvas:
       lti-keys:

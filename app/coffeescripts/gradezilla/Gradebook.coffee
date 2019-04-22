@@ -51,6 +51,7 @@ define [
   'jsx/gradezilla/default_gradebook/CurveGradesDialogManager'
   'jsx/gradezilla/default_gradebook/apis/GradebookApi'
   'jsx/gradezilla/default_gradebook/apis/SubmissionCommentApi'
+  'jsx/gradezilla/default_gradebook/CourseSettings'
   'jsx/gradezilla/default_gradebook/FinalGradeOverrides'
   'jsx/gradezilla/default_gradebook/GradebookGrid'
   'jsx/gradezilla/default_gradebook/constants/studentRowHeaderConstants'
@@ -104,8 +105,8 @@ define [
   CourseGradeCalculator, EffectiveDueDates, GradeFormatHelper, UserSettings, Spinner, AssignmentMuter,
   GradeDisplayWarningDialog, PostGradesFrameDialog, NumberCompare, natcompare, ConvertCase, htmlEscape,
   EnterGradesAsSetting, SetDefaultGradeDialogManager, CurveGradesDialogManager, GradebookApi, SubmissionCommentApi,
-  FinalGradeOverrides, GradebookGrid, studentRowHeaderConstants, AssignmentRowCellPropFactory, TotalGradeOverrideCellPropFactory,
-  PostPolicies, GradebookMenu, ViewOptionsMenu, ActionMenu,
+  CourseSettings, FinalGradeOverrides, GradebookGrid, studentRowHeaderConstants, AssignmentRowCellPropFactory,
+  TotalGradeOverrideCellPropFactory, PostPolicies, GradebookMenu, ViewOptionsMenu, ActionMenu,
   AssignmentGroupFilter, GradingPeriodFilter, ModuleFilter, SectionFilter, GridColor, StatusesModal, SubmissionTray,
   GradebookSettingsModal, AnonymousSpeedGraderAlert, { statusColors }, StudentDatastore, PostGradesStore, PostGradesApp,
   SubmissionStateMap, DownloadSubmissionsDialogManager, ReuploadSubmissionsDialogManager, GradebookKeyboardNav,
@@ -145,6 +146,16 @@ define [
       Object.keys(student).forEach (key) =>
         if key.match ASSIGNMENT_KEY_REGEX
           fn(student[key])
+
+  getCourseFromOptions = (options) ->
+    {
+      id: options.context_id
+    }
+
+  getCourseFeaturesFromOptions = (options) ->
+    {
+      finalGradeOverrideEnabled: options.final_grade_override_enabled
+    }
 
   ## Gradebook Display Settings
   getInitialGridDisplaySettings = (settings, colors) ->
@@ -267,6 +278,12 @@ define [
     hasSections: $.Deferred()
 
     constructor: (@options) ->
+      @course = getCourseFromOptions(@options)
+      @courseFeatures = getCourseFeaturesFromOptions(@options)
+      @courseSettings = new CourseSettings(@, {
+        allowFinalGradeOverride: @options.course_settings.allow_final_grade_override
+      })
+
       @gridData = {
         columns: {
           definitions: {}
@@ -284,7 +301,10 @@ define [
         gradebook: @
       })
 
-      @finalGradeOverrides = new FinalGradeOverrides(@)
+      if @courseFeatures.finalGradeOverrideEnabled
+        @finalGradeOverrides = new FinalGradeOverrides(@)
+      else
+        @finalGradeOverrides = null
 
       if @options.post_policies_enabled
         @postPolicies = new PostPolicies(@)
@@ -346,7 +366,6 @@ define [
       if @options.settings.show_inactive_enrollments == 'true'
         @toggleEnrollmentFilter('inactive', true)
       @initShowUnpublishedAssignments(@options.settings.show_unpublished_assignments)
-      @initShowOverrides(@options.settings.show_final_grade_overrides)
       @initSubmissionStateMap()
       @gradebookColumnSizeSettings = @options.gradebook_column_size_settings
       @setColumnOrder(Object.assign(
@@ -412,7 +431,6 @@ define [
           include: @fieldsToIncludeWithAssignments
         contextModulesURL: @options.context_modules_url
         customColumnsURL: @options.custom_columns_url
-        getFinalGradeOverrides: @options.final_grade_override_enabled
         getGradingPeriodAssignments: @gradingPeriodSet?
 
         sectionsURL: @options.sections_url
@@ -1318,12 +1336,6 @@ define [
       onSelect: onSelect
       selected: showingNotes
 
-    getFinalGradeOverridesSettingsModalProps: ->
-      featureAvailable: @options.final_grade_override_enabled
-      disabled: @contentLoadStates.overridesColumnUpdating || @gridReady.state() != 'resolved'
-      onChange: @toggleOverrides
-      defaultChecked: @gridDisplaySettings.showFinalGradeOverrides
-
     getColumnSortSettingsViewOptionsMenuProps: ->
       storedSortOrder = @getColumnOrder()
       criterion = if @isDefaultSortOrder(storedSortOrder.sortType)
@@ -1436,14 +1448,18 @@ define [
     renderGradebookSettingsModal: =>
       gradebookSettingsModalMountPoint = document.querySelector("[data-component='GradebookSettingsModal']")
       gradebookSettingsModalProps =
+        anonymousAssignmentsPresent: _.any(@assignments, (assignment) => assignment.anonymous_grading)
         courseId: @options.context_id
+        courseFeatures: @courseFeatures
+        courseSettings: @courseSettings
+        gradedLateSubmissionsExist: @options.graded_late_submissions_exist
         locale: @options.locale
         onClose: => @gradebookSettingsModalButton.focus()
+        onCourseSettingsUpdated: (settings) =>
+          @courseSettings.handleUpdated(settings)
         onLatePolicyUpdate: @onLatePolicyUpdate
-        gradedLateSubmissionsExist: @options.graded_late_submissions_exist
-        overrides: @getFinalGradeOverridesSettingsModalProps()
-        anonymousAssignmentsPresent: _.any(@assignments, (assignment) => assignment.anonymous_grading)
         postPolicies: @postPolicies
+
       @gradebookSettingsModal = renderComponent(
         GradebookSettingsModal,
         gradebookSettingsModalMountPoint,
@@ -1485,7 +1501,7 @@ define [
       @options.show_total_grade_as_points = not @options.show_total_grade_as_points
       $.ajaxJSON @options.setting_update_url, "PUT", show_total_grade_as_points: @options.show_total_grade_as_points
       @gradebookGrid.invalidate()
-      if @gridDisplaySettings.showFinalGradeOverrides
+      if @courseSettings.allowFinalGradeOverride
         @gradebookGrid.gridSupport.columns.updateColumnHeaders(['total_grade', 'total_grade_override'])
       else
         @gradebookGrid.gridSupport.columns.updateColumnHeaders(['total_grade'])
@@ -1531,7 +1547,7 @@ define [
         else
           scrollableColumns.push(@gridData.columns.definitions['total_grade'])
 
-        if @gridDisplaySettings.showFinalGradeOverrides
+        if @courseSettings.allowFinalGradeOverride
           scrollableColumns.push(@gridData.columns.definitions['total_grade_override'])
 
       if @gradebookColumnOrderSettings?.sortType
@@ -1847,7 +1863,6 @@ define [
       showConcludedEnrollments = @getEnrollmentFilters().concluded,
       showInactiveEnrollments = @getEnrollmentFilters().inactive,
       showUnpublishedAssignments = @gridDisplaySettings.showUnpublishedAssignments,
-      showFinalGradeOverrides = @gridDisplaySettings.showFinalGradeOverrides,
       studentColumnDisplayAs = @getSelectedPrimaryInfo(),
       studentColumnSecondaryInfo = @getSelectedSecondaryInfo(),
       sortRowsBy = @getSortRowsBySetting(),
@@ -1861,8 +1876,8 @@ define [
           selected_view_options_filters: selectedViewOptionsFilters
           show_concluded_enrollments: showConcludedEnrollments
           show_inactive_enrollments: showInactiveEnrollments
+
           show_unpublished_assignments: showUnpublishedAssignments
-          show_final_grade_overrides: showFinalGradeOverrides
           student_column_display_as: studentColumnDisplayAs
           student_column_secondary_info: studentColumnSecondaryInfo
           filter_rows_by: ConvertCase.underscore(@gridDisplaySettings.filterRowsBy)
@@ -2448,25 +2463,6 @@ define [
         () =>, # on success, do nothing since the render happened earlier
         toggleableAction
       )
-
-    initShowOverrides: (showFinalGradeOverrides = 'false') =>
-      @setShowFinalGradeOverrides(@options.final_grade_override_enabled && showFinalGradeOverrides == 'true')
-
-    setShowFinalGradeOverrides: (show) =>
-      @gridDisplaySettings.showFinalGradeOverrides = show
-
-    toggleOverrides: () =>
-      toggleableAction = =>
-        @setShowFinalGradeOverrides(!@gridDisplaySettings.showFinalGradeOverrides)
-        @updateColumnsAndRenderGradebookSettingsModal()
-
-      toggleableAction()
-      new Promise (resolve, reject) =>
-        @saveSettings(
-          { showFinalGradeOverrides: @gridDisplaySettings.showFinalGradeOverrides },
-          () =>, # on success, do nothing since the render happened earlier
-          toggleableAction
-        ).done(resolve).fail(reject)
 
     setAssignmentsLoaded: (loaded) =>
       @contentLoadStates.assignmentsLoaded = loaded

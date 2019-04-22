@@ -394,6 +394,13 @@ class EnrollmentsApiController < ApplicationController
   #   Returns only enrollments for the specified SIS user ID(s). May pass in
   #   array or string.
   #
+  # @argument created_for_sis_id[] [Boolean]
+  #   If sis_user_id is present and created_for_sis_id is true, Returns only
+  #   enrollments for the specified SIS ID(s).
+  #   If a user has two sis_id's, one enrollment may be created using one of the
+  #   two ids. This would limit the enrollments returned from the endpoint to
+  #   enrollments that were created from a sis_import with that sis_user_id
+  #
   # @returns [Enrollment]
   def index
     Shackles.activate(:slave) do
@@ -419,7 +426,11 @@ class EnrollmentsApiController < ApplicationController
 
       if params[:sis_user_id].present?
         pseudonyms = @domain_root_account.pseudonyms.where(sis_user_id: params[:sis_user_id])
-        enrollments = enrollments.where(user_id: pseudonyms.pluck(:user_id))
+        if value_to_boolean(params[:created_for_sis_id])
+          enrollments = enrollments.where(sis_pseudonym: pseudonyms)
+        else
+          enrollments = enrollments.where(user_id: pseudonyms.pluck(:user_id))
+        end
       end
 
       if params[:sis_section_id].present?

@@ -304,7 +304,7 @@ class Folder < ActiveRecord::Base
     context.shard.activate do
       Folder.unique_constraint_retry do
         root_folder = context.folders.active.where(parent_folder_id: nil, name: name).first
-        root_folder ||= context.folders.create!(:name => name, :full_name => name, :workflow_state => "visible")
+        root_folder ||= Shackles.activate(:master) {context.folders.create!(:name => name, :full_name => name, :workflow_state => "visible")}
         root_folders = [root_folder]
       end
     end

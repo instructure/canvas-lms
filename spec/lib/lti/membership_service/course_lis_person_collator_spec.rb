@@ -64,7 +64,7 @@ module Lti::MembershipService
 
         it 'generates a list of IMS::LTI::Models::Membership objects' do
           collator = CourseLisPersonCollator.new(@course, @teacher)
-          memberships = collator.memberships
+          memberships = collator.memberships(context: @course)
           @teacher.reload
           membership = memberships[0]
 
@@ -79,6 +79,14 @@ module Lti::MembershipService
           expect(membership.member.result_sourced_id).to be_nil
           expect(membership.member.sourced_id).to be_nil
           expect(membership.member.user_id).to eq(@teacher.lti_context_id)
+        end
+
+        it 'sends old_id when present' do
+          Lti::Asset.opaque_identifier_for(@teacher)
+          collator = CourseLisPersonCollator.new(@course, @teacher)
+          UserPastLtiId.create!(user: @teacher, context: @course, user_lti_id: @teacher.lti_id, user_lti_context_id: 'old_lti_id', user_uuid: 'old')
+          memberships = collator.memberships(context: @course)
+          expect(memberships[0].member.user_id).to eq('old_lti_id')
         end
       end
 

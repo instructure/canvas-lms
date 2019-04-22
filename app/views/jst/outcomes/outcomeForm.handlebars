@@ -22,18 +22,27 @@
 
   <label>
     <div style="display: flex">
-      <div style="margin-top: 0.65rem">{{#t "criterion"}}Criterion ratings{{/t}}:</div>
+      <div id='criterion_rating_label' style="margin-top: 0.65rem">{{#t "criterion"}}Criterion ratings{{/t}}:</div>
       <div id="react-info-link" />
     </div>
   </label>
-  <table class="criterion">
+  <table class="criterion" aria-labelledby='criterion_rating_label'>
+    <thead>
+      <tr>
+        {{#eachWithIndex ratings}}
+          {{> [outcomes/criterionHeader]}}
+        {{/eachWithIndex}}
+        <th class="total" aria-label='{{#t}}Total Points{{/t}}'>
+          <h5 class="total">{{#t}}Total Points{{/t}}</h5>
+        </th>
+      </tr>
+    </thead>
     <tbody>
       <tr>
         {{#eachWithIndex ratings}}
           {{> [outcomes/criterion]}}
         {{/eachWithIndex}}
        <td class="total">
-         <h5 class="total">{{#t "total_points"}}Total Points{{/t}}</h5>
          <div class="points_possible">
            {{#t}}{{n points_possible precision=2 strip_insignificant_zeros=true}} Points{{/t}}
          </div>

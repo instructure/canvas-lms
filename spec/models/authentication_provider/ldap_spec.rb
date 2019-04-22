@@ -67,33 +67,44 @@ describe AuthenticationProvider::LDAP do
       before do
         @ldap = double()
         allow(@ldap).to receive(:base)
-        expect(@aac).to receive(:ldap_connection).and_return(@ldap)
-        expect(@aac).to receive(:ldap_filter).and_return(nil)
+        allow(@aac).to receive(:ldap_connection).and_return(@ldap)
+        allow(@aac).to receive(:ldap_filter).and_return(nil)
+        allow(@aac).to receive(:account_id).and_return(1)
+        allow(@aac).to receive(:global_id).and_return(2)
+        allow(@aac).to receive(:should_send_to_statsd?).and_return(true)
       end
 
       it "should send to statsd on success" do
         allow(@ldap).to receive(:bind_as).and_return(true)
-        expect(CanvasStatsd::Statsd).to receive(:increment).with("#{@aac.send(:statsd_prefix)}.ldap_success")
+        expect(InstStatsd::Statsd).to receive(:increment).with("#{@aac.send(:statsd_prefix)}.ldap_success",
+                                      short_stat: "ldap_success",
+                                      tags: {account_id: Shard.global_id_for(@aac.account_id), auth_provider_id: @aac.global_id})
         @aac.ldap_bind_result('user', 'pass')
       end
 
       it "should send to statsd on failure" do
         allow(@ldap).to receive(:bind_as).and_return(false)
-        expect(CanvasStatsd::Statsd).to receive(:increment).with("#{@aac.send(:statsd_prefix)}.ldap_failure")
+        expect(InstStatsd::Statsd).to receive(:increment).with("#{@aac.send(:statsd_prefix)}.ldap_failure",
+                                                               short_stat: "ldap_failure",
+                                                               tags: {account_id: Shard.global_id_for(@aac.account_id), auth_provider_id: @aac.global_id})
         @aac.ldap_bind_result('user', 'pass')
       end
 
       it "should send to statsd on timeout" do
         allow(@ldap).to receive(:bind_as).and_raise(Timeout::Error)
-        expect(CanvasStatsd::Statsd).to receive(:increment).with("#{@aac.send(:statsd_prefix)}.ldap_timeout")
-        allow(CanvasStatsd::Statsd).to receive(:increment).with(not_eq("#{@aac.send(:statsd_prefix)}.ldap_timeout"))
+        expect(InstStatsd::Statsd).to receive(:increment).with("#{@aac.send(:statsd_prefix)}.ldap_timeout",
+                                                               short_stat: "ldap_timeout",
+                                                               tags: {account_id: Shard.global_id_for(@aac.account_id), auth_provider_id: @aac.global_id})
+        allow(InstStatsd::Statsd).to receive(:increment).with(not_eq("#{@aac.send(:statsd_prefix)}.ldap_timeout"))
         @aac.ldap_bind_result('user', 'pass')
       end
 
       it "should send to statsd on exception" do
         allow(@ldap).to receive(:bind_as).and_raise(StandardError)
-        expect(CanvasStatsd::Statsd).to receive(:increment).with("#{@aac.send(:statsd_prefix)}.ldap_error")
-        allow(CanvasStatsd::Statsd).to receive(:increment).with(not_eq("#{@aac.send(:statsd_prefix)}.ldap_error"))
+        expect(InstStatsd::Statsd).to receive(:increment).with("#{@aac.send(:statsd_prefix)}.ldap_error",
+                                                               short_stat: "ldap_error",
+                                                               tags: {account_id: Shard.global_id_for(@aac.account_id), auth_provider_id: @aac.global_id})
+        allow(InstStatsd::Statsd).to receive(:increment).with(not_eq("#{@aac.send(:statsd_prefix)}.ldap_error"))
         @aac.ldap_bind_result('user', 'pass')
       end
     end

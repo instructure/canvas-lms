@@ -878,7 +878,9 @@ class Assignment < ActiveRecord::Base
     assignment_groups = self.context.assignment_groups.active
     if !assignment_groups.map(&:id).include?(self.assignment_group_id)
       self.assignment_group = assignment_groups.first
-      save! if do_save
+      Shackles.activate(:master) do
+        save! if do_save
+      end
     end
   end
 
@@ -1906,13 +1908,15 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  # Update at this point is solely used for commenting on the submission
-  def update_submission(original_student, opts={})
+  def update_submission_runner(original_student, opts={})
     raise "Student Required" unless original_student
 
     group, students = group_students(original_student)
     opts[:author] ||= opts[:commenter] || opts[:user_id].present? && User.find_by(id: opts[:user_id])
-    res = []
+    res = {
+      comments: [],
+      submissions: []
+    }
 
     # Only teachers (those who can manage grades) can have hidden comments
     opts[:hidden] = muted? && self.context.grants_right?(opts[:author], :manage_grades) unless opts.key?(:hidden)
@@ -1927,23 +1931,37 @@ class Assignment < ActiveRecord::Base
     ensure_grader_can_adjudicate(grader: opts[:author], provisional: opts[:provisional], occupy_slot: true) do
       if opts[:comment] && Canvas::Plugin.value_to_boolean(opts[:group_comment])
         uuid = CanvasSlug.generate_securish_uuid
-        res = find_or_create_submissions(students) do |submission|
-          save_comment_to_submission(submission, group, opts, uuid)
+        find_or_create_submissions(students) do |submission|
+          res[:comments] << save_comment_to_submission(submission, group, opts, uuid)
+          res[:submissions] << submission
         end
       else
         submission = find_or_create_submission(original_student)
-        res << save_comment_to_submission(submission, group, opts)
+        res[:comments] << save_comment_to_submission(submission, group, opts)
+        res[:submissions] << submission
       end
     end
     res
+  end
+  private :update_submission_runner
+
+  def add_submission_comment(original_student, opts={})
+    comments = update_submission_runner(original_student, opts)[:comments]
+    comments.compact # Possible no comments were added depending on opts
+  end
+
+  # Update at this point is solely used for commenting on the submission
+  def update_submission(original_student, opts={})
+    update_submission_runner(original_student, opts)[:submissions]
   end
 
   def save_comment_to_submission(submission, group, opts, uuid = nil)
     submission.group = group
     submission.save! if submission.changed?
     opts[:group_comment_id] = uuid if group && uuid
-    submission.add_comment(opts)
+    comment = submission.add_comment(opts)
     submission.reload
+    comment
   end
   private :save_comment_to_submission
 

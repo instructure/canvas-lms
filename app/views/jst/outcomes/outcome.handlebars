@@ -13,18 +13,30 @@
   {{{description}}}
 </div>
 <table class="criterion">
-  <tr>
-    {{#each ratings}}
-    <td class="rating">
-      <h3>{{description}}</h3>
-      {{#t}}{{n points precision=2 strip_insignificant_zeros=true}} Points{{/t}}
-    </td>
-    {{/each}}
-    <td class="total">
-      <h3 class="total">{{#t "total_points"}}Total Points{{/t}}</h3>
-      {{#t}}{{n points_possible precision=2 strip_insignificant_zeros=true}} Points{{/t}}
-    </td>
-  </tr>
+  <thead>
+    <tr>
+      {{#each ratings}}
+      <th class="rating" aria-label='{{description}}'>
+        <h3>{{description}}</h3>
+      </th>
+      {{/each}}
+      <th class="total" aria-label='{{#t}}Total Points{{/t}}'>
+        <h3 class="total">{{#t}}Total Points{{/t}}</h3>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      {{#each ratings}}
+      <td class="rating">
+        {{#t}}{{n points precision=2 strip_insignificant_zeros=true}} Points{{/t}}
+      </td>
+      {{/each}}
+      <td class="total">
+        {{#t}}{{n points_possible precision=2 strip_insignificant_zeros=true}} Points{{/t}}
+      </td>
+    </tr>
+  </tbody>
 </table>
 
 {{#if setQuizMastery}}

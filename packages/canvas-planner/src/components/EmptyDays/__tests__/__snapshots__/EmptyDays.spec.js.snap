@@ -2,7 +2,7 @@
 
 exports[`renders the component 1`] = `
 <div
-  className="planner-empty-days"
+  className="EmptyDays-styles__root planner-empty-days"
 >
   <Heading
     border="bottom"
@@ -19,7 +19,9 @@ exports[`renders the component 1`] = `
       April 23 to April 26
     </Text>
   </Heading>
-  <div>
+  <div
+    className="EmptyDays-styles__nothingPlannedContent"
+  >
     <GroupedDates
       aria-hidden="true"
       role="img"
@@ -27,8 +29,12 @@ exports[`renders the component 1`] = `
       xmlns="http://www.w3.org/2000/svg"
       xmlnsXlink="http://www.w3.org/1999/xlink"
     />
-    <div>
-      <div>
+    <div
+      className="EmptyDays-styles__nothingPlannedContainer"
+    >
+      <div
+        className="EmptyDays-styles__nothingPlanned"
+      >
         <Text
           as="span"
           letterSpacing="normal"
@@ -44,7 +50,7 @@ exports[`renders the component 1`] = `
 
 exports[`renders the today className when surrounds Today 1`] = `
 <div
-  className="planner-empty-days planner-today"
+  className="EmptyDays-styles__root planner-empty-days planner-today"
 >
   <Heading
     border="bottom"
@@ -61,7 +67,9 @@ exports[`renders the today className when surrounds Today 1`] = `
       April 22 to April 26
     </Text>
   </Heading>
-  <div>
+  <div
+    className="EmptyDays-styles__nothingPlannedContent"
+  >
     <GroupedDates
       aria-hidden="true"
       role="img"
@@ -69,8 +77,12 @@ exports[`renders the today className when surrounds Today 1`] = `
       xmlns="http://www.w3.org/2000/svg"
       xmlnsXlink="http://www.w3.org/1999/xlink"
     />
-    <div>
-      <div>
+    <div
+      className="EmptyDays-styles__nothingPlannedContainer"
+    >
+      <div
+        className="EmptyDays-styles__nothingPlanned"
+      >
         <Text
           as="span"
           letterSpacing="normal"

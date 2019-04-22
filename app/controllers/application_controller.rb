@@ -141,6 +141,7 @@ class ApplicationController < ActionController::Base
         DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account.try(:global_id),
         k12: k12?,
         use_responsive_layout: use_responsive_layout?,
+        use_rce_enhancements: @context.try(:feature_enabled?, :rce_enhancements),
         help_link_name: help_link_name,
         help_link_icon: help_link_icon,
         use_high_contrast: @current_user.try(:prefers_high_contrast?),
@@ -463,21 +464,17 @@ class ApplicationController < ActionController::Base
   end
 
   def batch_statsd(&block)
-    CanvasStatsd::Statsd.batch(&block)
+    InstStatsd::Statsd.batch(&block)
   end
 
   def report_to_datadog(&block)
     if (metric = params[:datadog_metric]) && metric.present?
-      require 'datadog/statsd'
-      datadog = Datadog::Statsd.new('localhost', 8125)
-      datadog.batch do |statsd|
-        tags = [
-          "domain:#{request.host_with_port.sub(':', '_')}",
-          "action:#{controller_name}.#{action_name}",
-        ]
-        statsd.increment("graphql.rest_comparison.#{metric}.count", tags: tags)
-        statsd.time("graphql.rest_comparison.#{metric}.time", tags: tags, &block)
-      end
+      tags = {
+        domain: request.host_with_port.sub(':', '_'),
+        action: "#{controller_name}.#{action_name}",
+      }
+      InstStatsd::Statsd.increment("graphql.rest_comparison.#{metric}.count", tags: tags)
+      InstStatsd::Statsd.time("graphql.rest_comparison.#{metric}.time", tags: tags, &block)
     else
       yield
     end
@@ -906,15 +903,17 @@ class ApplicationController < ActionController::Base
     badge_counts = {}
     ['Submission'].each do |type|
       participation_count = context.content_participation_counts.
-          where(:user_id => user.id, :content_type => type).first
-      participation_count ||= ContentParticipationCount.create_or_update({
-        :context => context,
-        :user => user,
-        :content_type => type,
-      })
+          where(:user_id => user.id, :content_type => type).take
+      participation_count ||= content_participation_count(context, type, user)
       badge_counts[type.underscore.pluralize] = participation_count.unread_count
     end
     badge_counts
+  end
+
+  def content_participation_count(context, type, user)
+    Shackles.activate(:master) do
+      ContentParticipationCount.create_or_update({context: context, user: user, content_type: type})
+    end
   end
 
   def get_upcoming_assignments(course)
@@ -1175,56 +1174,65 @@ class ApplicationController < ActionController::Base
     return unless user && @context && asset
     return if asset.respond_to?(:new_record?) && asset.new_record?
 
-    code = if asset.is_a?(Array)
-             "#{asset[0]}:#{asset[1].asset_string}"
-           else
-             asset.asset_string
-           end
+    shard = asset.is_a?(Array) ? asset[1].shard : asset.shard
+    shard.activate do
+      code = if asset.is_a?(Array)
+               "#{asset[0]}:#{asset[1].asset_string}"
+             else
+               asset.asset_string
+             end
 
-    membership_type ||= @context_membership && @context_membership.class.to_s
+      membership_type ||= @context_membership && @context_membership.class.to_s
 
-    group_code = if asset_group.is_a?(String)
-                   asset_group
-                 elsif asset_group.respond_to?(:asset_string)
-                   asset_group.asset_string
-                 else
-                   'unknown'
-                 end
+      group_code = if asset_group.is_a?(String)
+                     asset_group
+                   elsif asset_group.respond_to?(:asset_string)
+                     asset_group.asset_string
+                   else
+                     'unknown'
+                   end
 
-    if !@accessed_asset || overwrite
-      @accessed_asset = {
-        :user => user,
-        :code => code,
-        :group_code => group_code,
-        :category => asset_category,
-        :membership_type => membership_type,
-        :level => level
-      }
+      if !@accessed_asset || overwrite
+        @accessed_asset = {
+          :user => user,
+          :code => code,
+          :group_code => group_code,
+          :category => asset_category,
+          :membership_type => membership_type,
+          :level => level,
+          :shard => shard
+        }
+      end
+
+      Canvas::LiveEvents.asset_access(asset, asset_category, membership_type, level)
+
+      @accessed_asset
     end
-
-    Canvas::LiveEvents.asset_access(asset, asset_category, membership_type, level)
-
-    @accessed_asset
   end
 
   def log_page_view
     return true if !page_views_enabled?
 
-    user = @current_user || (@accessed_asset && @accessed_asset[:user])
-    if user && @log_page_views != false
-      add_interaction_seconds
-      log_participation(user)
-      log_gets
-      finalize_page_view
-    else
-      @page_view.destroy if @page_view && !@page_view.new_record?
-    end
+    shard = (@accessed_asset && @accessed_asset[:shard]) || Shard.current
+    shard.activate do
+      begin
+        user = @current_user || (@accessed_asset && @accessed_asset[:user])
+        if user && @log_page_views != false
+          add_interaction_seconds
+          log_participation(user)
+          log_gets
+          finalize_page_view
+        else
+          @page_view.destroy if @page_view && !@page_view.new_record?
+        end
 
-  rescue StandardError, CassandraCQL::Error::InvalidRequestException => e
-    Canvas::Errors.capture_exception(:page_view, e)
-    logger.error "Pageview error!"
-    raise e if Rails.env.development?
-    true
+      rescue StandardError, CassandraCQL::Error::InvalidRequestException => e
+        Canvas::Errors.capture_exception(:page_view, e)
+        logger.error "Pageview error!"
+        raise e if Rails.env.development?
+        true
+      end
+    end
   end
 
   def add_interaction_seconds
@@ -1595,7 +1603,7 @@ class ApplicationController < ActionController::Base
         end
 
         opts = {
-            launch_url: @tool.login_or_launch_uri(content_tag_uri: @resource_url),
+            launch_url: @tool.login_or_launch_url(content_tag_uri: @resource_url),
             link_code: @opaque_id,
             overrides: {'resource_link_title' => @resource_title},
             domain: HostUrl.context_host(@domain_root_account, request.host)
@@ -1639,7 +1647,7 @@ class ApplicationController < ActionController::Base
           @lti_launch.params = adapter.generate_post_payload
         end
 
-        @lti_launch.resource_url = @tool.login_or_launch_uri(content_tag_uri: @resource_url)
+        @lti_launch.resource_url = @tool.login_or_launch_url(content_tag_uri: @resource_url)
         @lti_launch.link_text = @resource_title
         @lti_launch.analytics_id = @tool.tool_id
 
@@ -1904,6 +1912,7 @@ class ApplicationController < ActionController::Base
         context: context,
         user: user,
         preloaded_attachments: {},
+        in_app: Setting.get("skip_verifier_if_in_app", "true") == "true" && in_app?,
         is_public: is_public
       ).processed_url
     end

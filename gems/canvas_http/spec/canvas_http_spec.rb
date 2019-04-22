@@ -193,4 +193,42 @@ describe "CanvasHttp" do
       expect(http.use_ssl?).to eq(true)
     end
   end
+
+  describe ".validate_url" do
+    it "accepts a valid url" do
+      value, _ = CanvasHttp.validate_url('http://example.com')
+      expect(value).to eq 'http://example.com'
+    end
+
+    it "rejects a bad url" do
+      expect { CanvasHttp.validate_url('this is not a url') }.to raise_error(URI::InvalidURIError)
+    end
+
+    it "infers host and scheme" do
+      value, _ = CanvasHttp.validate_url('/whatever', host: 'example.org', scheme: 'https')
+      expect(value).to eq 'https://example.org/whatever'
+    end
+
+    it "enforces allowed schemes" do
+      expect { CanvasHttp.validate_url('ftp://example.com', allowed_schemes: ['ftp']) }.not_to raise_error
+      expect { CanvasHttp.validate_url('ftp://example.com') }.to raise_error(ArgumentError)
+    end
+
+    it "checks for unsafe hosts" do
+      expect(CanvasHttp).to receive(:insecure_host?).with("127.0.0.1").and_return(true)
+      expect { CanvasHttp.validate_url('http://127.0.0.1') }.not_to raise_error
+      expect { CanvasHttp.validate_url('http://127.0.0.1', check_host: true) }.to raise_error(CanvasHttp::InsecureUriError)
+    end
+
+    it "normalizes unicode names" do
+      value, _ = CanvasHttp.validate_url('http://example.com/whät')
+      expect(value).to eq 'http://example.com/wh%C3%A4t'
+    end
+
+    it "does not bypass other checks when normalizing unicode names" do
+      expect(CanvasHttp).to receive(:insecure_host?).with("127.0.0.1").and_return(true)
+      expect { CanvasHttp.validate_url('http://127.0.0.1/嘊', check_host: true) }.to raise_error(CanvasHttp::InsecureUriError)
+      expect { CanvasHttp.validate_url('http://example.com/whät', allowed_schemes: ['https']) }.to raise_error(ArgumentError)
+    end
+  end
 end

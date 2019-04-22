@@ -71,6 +71,8 @@ exports[`renders the AlignmentResult component 1`] = `
   >
     <View
       display="auto"
+      overflowX="visible"
+      overflowY="visible"
       padding="x-small 0 0 0"
     >
       <Text

@@ -26,9 +26,9 @@ import IconWarning from '@instructure/ui-icons/lib/Line/IconWarning'
 const presenter = document.querySelectorAll(".assignment_presenter_for_submission")
 const progressIcon = (presenterObject) => {
   switch (presenterObject.innerText) {
-    case 'pending_upload':
+    case 'pending':
       return [<IconUpload />, I18n.t("Uploading Submission")]
-    case 'errored':
+    case 'failed':
       return [<IconWarning />, I18n.t("Submission Failed to Submit")]
     default:
       return null

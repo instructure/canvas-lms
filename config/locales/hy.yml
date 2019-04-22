@@ -38,6 +38,7 @@ hy:
   LongTextEditor: 
     cancel: "Չեղյալ համարել"
     save: Պահպանել
+  _5a374287: "..."
   _section_not_synced_yet_cd07d0dd: "Բաժինը դեռևս չի սինխրոնացվել"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "Հաշվարկվող մեծությունը չի օգտագործվում հաշվարկման սույն մեթոդում"
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "%{itemName} անվանմամբ ֆայլը արդեն գոյություն ունի սույն թղթապանակում:"
@@ -6446,6 +6447,7 @@ hy:
     restricted_status: "Հասանելի է %{from_date}-ից մինչև %{until_date}"
     unpublished_status: "Հրապարակված չէ"
   file_storage_32477f6: "Ֆայլի պահպանում"
+  filename_has_been_published_with_the_following_usa_fbd8b39f: "%{filemane} հրապարակվել է օգտագործման հետևյալ իրավունքով՝ %{usage_right}"
   filename_progress_percent_uploaded_1f465e66: "%{fileName} - %{progress} տոկոսը բեռնված է"
   filename_uploaded_successfully_edd8e825: "%{fileName} հաջողությամբ բեռնված է."
   files: 
@@ -7598,6 +7600,7 @@ hy:
   hidden_files_inside_will_be_available_with_links_9bdf702b: "Անտեսանելի, ներառված ֆայլերը հասանելի կլինեն հղումներն օգտագործելիս:"
   hide_correct_answers_at_b1a59408: "Թաքցնել ճիշտ պատասխանները _ում"
   hide_courses_without_enrollments_6df4dfad: "Թաքցնել գրանցում չունեցող դասընթացները"
+  hide_e057ff36: Թաքցնել
   hide_notes_column_7749f408: "Թաքցնել նշումների սյունակը"
   hide_score_total_for_assessment_results_d0ef117f: "Անտեսանելի դարձնել ընդհանուր միավորները ստուգման արդյունքների համար"
   hide_student_names_3e59e862: "Թաքցնել ունկնդիրների անունները"
@@ -7714,6 +7717,7 @@ hy:
   info_8f47054a: Տեղեկատվություն
   info_panel_hidden_bf7c3b7b: "Տեղեկատվությունն անտեսանելի է"
   insert_equella_links_49a8dacd: "Insert Equella Links"
+  insert_here_ccdb022e: "տեղադրել այստեղ"
   insert_math_equation_57c6e767: "Զետեղել մաթեմատիկական հավասարում"
   insert_row_below_25187f89: "Տեղադրել տող ներքևում"
   installed_7b284a91: "Տեղադրված է"
@@ -7979,7 +7983,7 @@ hy:
         quizzes: Թեստեր
         rubrics: Ռուբրիկներ
         syllabus_body: "Ուսումնական ծրագիր"
-        wikis: "Wiki էջեր"
+        wikis: Էջեր
     cc: 
       standard: 
         failed_to_convert_qti: "Չհաջողվեց ներմուծել %{file_identifier} գիտելիքների ստուգումը "
@@ -10250,6 +10254,7 @@ hy:
   next_steps_ce0f0d0c: "Հերթական քայլերը"
   no_74e9b590: Ոչ
   no_assignment_name_adbb215b: "Հանձնարարության անվանում չկա"
+  no_content_5dbc9acf: "Բովանդակություն չկա"
   no_content_has_been_added_f36bab43: "* Բովանդակություն չի ավելացվել"
   no_courses_found_12d68a74: "Որեւէ դասընթաց չի գտնվել"
   no_date_bfeb2df7: "Ամսաթիվ չկա"
@@ -10675,6 +10680,9 @@ hy:
       points: Միավորներ
       pts: միավորներ
       rating_description: "Չափանիշի գնահատականի նկարագրությունը"
+    criterion_header: 
+      insert_criterion_rating: "Տեղադրել չափանիշի գնահատականը"
+      insert_rating: Տեղադրել
     dont_import: "Այս խումբը հնարավոր չէ ներմուծել:"
     failed_outcome_creation: "Արդյունքների ստեղծումը խափանվեց:"
     failed_outcome_update: "Արդյունքների թարմացումը խափանվեց:"
@@ -15259,6 +15267,7 @@ hy:
       more_message: "և լրացուցիչ %{count} ..."
   total_71a4807: Ընդհանուր
   total_column_options_4e6a6032: "Ընդհանուր սյունակի օպցիաներ"
+  total_points_44d76792: "Ընդհանուր միավորների քանակը"
   tours: 
     quiz_regrade: 
       got_it: "OK, ստացա դա"
@@ -15377,6 +15386,7 @@ hy:
   user_696f4d6a: օգտատեր
   user_access_tokens_title: "Օգտատիրոջ հասանելության token-ներ"
   user_avatars_e4fc4ed3: "Օգտատերերի ավատարներ"
+  user_c95de254: Օգտատեր
   user_date_range_search: 
     cant_be_blank: "Canvas օգտագործողի նույնականացուցիչը չի կարող դատակ լինել"
     cant_come_before_from: "'Կատարման ամսաթիվը' չի կարող 'Մեկնարկման ամսաթվից' շուտ լինել"

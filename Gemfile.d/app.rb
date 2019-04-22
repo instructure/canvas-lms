@@ -112,7 +112,7 @@ gem 'ritex', '1.0.1', require: false
 gem 'rotp', '3.3.1', require: false
 gem 'net-ldap', '0.16.1', require: false
 gem 'ruby-duration', '3.2.3', require: false
-gem 'saml2', '3.0.5'
+gem 'saml2', '3.0.7'
   gem 'nokogiri-xmlsec-instructure', '0.9.6', require: false
 gem 'rubycas-client', '2.3.9', require: false
 gem 'rubyzip', '1.2.1', require: 'zip'
@@ -124,14 +124,16 @@ gem 'useragent', '0.16.10', require: false
 
 gem 'crocodoc-ruby', '0.0.1', require: false
 gem 'sentry-raven', '2.7.2', require: false
-gem 'canvas_statsd', '2.0.4'
+gem 'inst_statsd', '2.1.4'
   gem 'statsd-ruby', '1.4.0', require: false
   gem 'aroi', '0.0.6', require: false
+  gem 'dogstatsd-ruby', '3.3.0'
+gem 'inst-jobs-statsd', '1.2.3'
 gem 'gepub', '1.0.1'
 gem 'imperium', '0.5.0', require: false
 gem 'academic_benchmarks', '0.0.10', require: false
 
-gem 'graphql', '1.8.13'
+gem 'graphql', '1.9.3'
 gem 'graphql-batch', '0.3.9'
 
 gem 'prawn-rails', '1.2.0'
@@ -178,4 +180,3 @@ gem 'twitter', path: 'gems/twitter'
 gem 'vericite_api', '1.5.3'
 gem 'utf8_cleaner', path: 'gems/utf8_cleaner'
 gem 'workflow', path: 'gems/workflow'
-gem 'dogstatsd-ruby', '3.3.0'

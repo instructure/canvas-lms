@@ -37,7 +37,7 @@ class Mutations::SetCoursePostPolicy < Mutations::BaseMutation
       raise GraphQL::ExecutionError, "A course with that id does not exist"
     end
 
-    return unless authorized_action?(course, :manage_grades)
+    verify_authorized_action!(course, :manage_grades)
 
     policy = PostPolicy.find_or_create_by(course: course, assignment_id: nil)
     policy.update!(post_manually: input[:post_manually])

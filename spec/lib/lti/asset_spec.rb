@@ -33,6 +33,20 @@ describe Lti::Asset do
       expect(@course.lti_context_id).to eq context_id
     end
 
+    it "should use old_id when present" do
+      user = user_model
+      context_id = described_class.opaque_identifier_for(user)
+      UserPastLtiId.create!(user: user, context: @course, user_lti_id: @teacher.lti_id, user_lti_context_id: 'old_lti_id', user_uuid: 'old')
+      expect(described_class.opaque_identifier_for(user, context: @course)).to_not eq context_id
+      expect(described_class.opaque_identifier_for(user, context: @course)).to eq 'old_lti_id'
+    end
+
+    it "should not use old_id when not present" do
+      user = user_model
+      context_id = described_class.opaque_identifier_for(user)
+      expect(described_class.opaque_identifier_for(user, context: @course)).to eq context_id
+    end
+
     it "should not create new lti_context for asset if exists" do
       @course.lti_context_id = 'dummy_context_id'
       @course.save!

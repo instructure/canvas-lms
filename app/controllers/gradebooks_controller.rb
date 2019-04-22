@@ -679,6 +679,7 @@ class GradebooksController < ApplicationController
 
         if new_gradebook_enabled?
           env[:selected_section_id] = gradebook_settings.dig(@context.id, 'filter_rows_by', 'section_id')
+          env[:post_policies_enabled] = true if @context.feature_enabled?(:post_policies)
         end
 
         if @assignment.quiz
@@ -689,7 +690,10 @@ class GradebooksController < ApplicationController
         append_sis_data(env)
         js_env(env)
 
-        render :speed_grader, locals: { anonymize_students: @assignment.anonymize_students? }
+        render :speed_grader, locals: {
+          anonymize_students: @assignment.anonymize_students?,
+          post_policies_enabled: env[:post_policies_enabled]
+        }
       end
 
       format.json do
@@ -816,8 +820,23 @@ class GradebooksController < ApplicationController
   def new_gradebook_env
     graded_late_submissions_exist = @context.submissions.graded.late.exists?
 
+    # Prefer the course setting, but check the user's preferences if the
+    # course setting doesn't exist
+    # TODO: remove the fallback to user preferences (GRADE-2124)
+    allow_final_grade_override = if @context.settings.include?(:allow_final_grade_override)
+      @context.allow_final_grade_override?
+    else
+      user_preference = @current_user.preferences.dig(:gradebook_settings, @context.id, "show_final_grade_overrides")
+      value_to_boolean(user_preference)
+    end
+
     new_gradebook_options = {
       colors: gradebook_settings.fetch(:colors, {}),
+
+      course_settings: {
+        allow_final_grade_override: allow_final_grade_override
+      },
+
       final_grade_override_enabled: @context.feature_enabled?(:final_grades_override),
       graded_late_submissions_exist: graded_late_submissions_exist,
       gradezilla: true,

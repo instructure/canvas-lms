@@ -225,6 +225,33 @@ describe Course do
     end
   end
 
+  describe "#allow_final_grade_override?" do
+    before :once do
+      @course = Account.default.courses.create!
+      @course.root_account.enable_feature!(:new_gradebook)
+      @course.enable_feature!(:new_gradebook)
+    end
+
+    before :each do
+      @course.enable_feature!(:final_grades_override)
+      @course.allow_final_grade_override = true
+    end
+
+    it "returns true when the feature is enabled and the setting is allowed" do
+      expect(@course.allow_final_grade_override?).to be true
+    end
+
+    it "returns false when the feature is enabled and the setting is not allowed" do
+      @course.allow_final_grade_override = false
+      expect(@course.allow_final_grade_override?).to be false
+    end
+
+    it "returns false when the feature is disabled" do
+      @course.disable_feature!(:final_grades_override)
+      expect(@course.allow_final_grade_override?).to be false
+    end
+  end
+
   describe "#recompute_student_scores" do
     it "should use all student ids except concluded and deleted if none are passed" do
       @course.save!
@@ -2782,6 +2809,7 @@ describe Course, 'grade_publishing' do
         enrollments = [double(), double()]
         publishing_pseudonym = double()
         publishing_user = double()
+        allow(course).to receive(:allow_final_grade_override?).and_return false
         expect(course).to receive(:generate_grade_publishing_csv_output).with(
           enrollments, publishing_user, publishing_pseudonym, include_final_grade_overrides: false
         ).and_return 42
@@ -3279,6 +3307,7 @@ describe Course, 'grade_publishing' do
 
         before(:each) do
           @course.enable_feature!(:final_grades_override)
+          @course.update!(allow_final_grade_override: true)
         end
 
         def csv_output
@@ -3290,9 +3319,17 @@ describe Course, 'grade_publishing' do
           )
         end
 
-        it "does not use the final grade override if final grades override feature is not enabled" do
-          @course.disable_feature!(:final_grades_override)
+        it "does not use the final grade override if final grades override feature is not allowed" do
           @ase[1].scores.find_by(course_score: true).update!(final_score: 0, override_score: 100)
+          @course.update!(allow_final_grade_override: false)
+          expect(csv_output[0][1]).to include(
+            "#{@user.id},U1,#{@course.id},,#{@ase[1].course_section_id},,#{@ase[1].user.id},,#{@ase[1].id},active,0.0,F\n"
+          )
+        end
+
+        it "does not use the final grade override if final grades override feature is not enabled" do
+          @ase[1].scores.find_by(course_score: true).update!(final_score: 0, override_score: 100)
+          @course.disable_feature!(:final_grades_override)
           expect(csv_output[0][1]).to include(
             "#{@user.id},U1,#{@course.id},,#{@ase[1].course_section_id},,#{@ase[1].user.id},,#{@ase[1].id},active,0.0,F\n"
           )
@@ -4984,6 +5021,10 @@ describe Course do
   end
 
   describe "re_send_invitations!" do
+    before :once do
+      @notification = Notification.create!(:name => 'Enrollment Invitation')
+    end
+
     it "should send invitations" do
       course_factory(active_all: true)
       user1 = user_with_pseudonym(:active_all => true)
@@ -4993,7 +5034,6 @@ describe Course do
 
       dm_count = DelayedMessage.count
       count1 = DelayedMessage.where(:communication_channel_id => user1.communication_channels.first).count
-      Notification.create!(:name => 'Enrollment Invitation')
       @course.re_send_invitations!(@teacher)
 
       expect(DelayedMessage.count).to eq dm_count + 1
@@ -5010,15 +5050,13 @@ describe Course do
       @course.enroll_student(user2, :section => section2)
       @course.enroll_ta(ta, :active_all => true, :section => section2, :limit_privileges_to_course_section => true)
 
-      notification = Notification.where(:name => 'Enrollment Invitation').first_or_create!
-
-      count1 = user1.communication_channel.delayed_messages.where(notification_id: notification).count
-      count2 = user2.communication_channel.delayed_messages.where(notification_id: notification).count
+      count1 = user1.communication_channel.delayed_messages.where(notification_id: @notification).count
+      count2 = user2.communication_channel.delayed_messages.where(notification_id: @notification).count
 
       @course.re_send_invitations!(ta)
 
-      expect(user1.communication_channel.delayed_messages.where(notification_id: notification).count).to eq count1
-      expect(user2.communication_channel.delayed_messages.where(notification_id: notification).count).to eq count2 + 1
+      expect(user1.communication_channel.delayed_messages.where(notification_id: @notification).count).to eq count1
+      expect(user2.communication_channel.delayed_messages.where(notification_id: @notification).count).to eq count2 + 1
     end
   end
 
@@ -5236,6 +5274,33 @@ describe Course, '#module_items_visible_to' do
   it "shows all items to teachers even when course is concluded" do
     @course.complete!
     expect(@course.module_items_visible_to(@teacher).map(&:title)).to match_array %w(published unpublished)
+  end
+
+  context "with section specific discussions" do
+    before :once do
+      @other_section = @course.course_sections.create!
+      @other_section_student = user_factory(:active_all => true)
+      @course.enroll_user(@other_section_student, "StudentEnrollment", :section => @other_section, :enrollment_state => "active")
+      @topic = @course.discussion_topics.create!(:course_sections => [@other_section], :is_section_specific => true)
+      @topic_tag = @module.add_item(:type => 'discussion_topic', :id => @topic.id)
+    end
+
+    it "should show to student in section" do
+      expect(@course.module_items_visible_to(@other_section_student)).to include(@topic_tag)
+    end
+
+    it "should not show to student not in section" do
+      expect(@course.module_items_visible_to(@student)).to_not include(@topic_tag)
+    end
+
+    it "should not show to student if visibiilty is deleted" do
+      @topic.discussion_topic_section_visibilities.destroy_all
+      expect(@course.module_items_visible_to(@other_section_student)).to_not include(@topic_tag)
+    end
+
+    it "should show to teacher" do
+      expect(@course.module_items_visible_to(@teacher)).to include(@topic_tag)
+    end
   end
 
   context "sharding" do

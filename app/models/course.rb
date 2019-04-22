@@ -306,7 +306,10 @@ class Course < ActiveRecord::Base
         (self.saved_change_to_workflow_state? && (completed? || self.workflow_state_before_last_save == 'completed'))
         # a lot of things can change the date logic here :/
 
-      EnrollmentState.send_later_if_production(:invalidate_states_for_course_or_section, self) if self.enrollments.exists?
+      if self.enrollments.exists?
+        EnrollmentState.send_later_if_production_enqueue_args(:invalidate_states_for_course_or_section,
+          {:n_strand => ["invalidate_enrollment_states", self.global_root_account_id]}, self)
+      end
       # if the course date settings have been changed, we'll end up reprocessing all the access values anyway, so no need to queue below for other setting changes
     end
     if saved_change_to_account_id? || @changed_settings
@@ -453,7 +456,7 @@ class Course < ActiveRecord::Base
   end
 
   def course_visibility_options
-    ActiveSupport::OrderedHash[
+    options = [
         'course',
         {
             :setting => t('course', 'Course')
@@ -467,6 +470,16 @@ class Course < ActiveRecord::Base
             :setting => t('public', 'Public')
         }
       ]
+    options = self.root_account.available_course_visibility_override_options(options).to_a.flatten
+    ActiveSupport::OrderedHash[*options]
+  end
+
+  def course_visibility_option_descriptions
+    {
+      'course' => t('All users associated with this course'),
+      'institution' => t('All users associated with this institution'),
+      'public' => t('Anyone with the URL')
+    }
   end
 
   def custom_course_visibility
@@ -497,7 +510,9 @@ class Course < ActiveRecord::Base
   end
 
   def course_visibility
-    if is_public == true
+    if self.overridden_course_visibility.present?
+      self.overridden_course_visibility
+    elsif is_public == true
       'public'
     elsif is_public_to_auth_users == true
       'institution'
@@ -675,6 +690,7 @@ class Course < ActiveRecord::Base
        UNION SELECT courses.id AS course_id, e.user_id FROM #{Course.quoted_table_name}
          INNER JOIN #{Enrollment.quoted_table_name} AS e ON e.course_id = courses.id AND e.user_id = #{user_id.to_i}
            AND e.workflow_state IN(#{workflow_states}) AND e.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment')
+         INNER JOIN #{EnrollmentState.quoted_table_name} AS es ON es.enrollment_id = e.id AND es.state IN (#{workflow_states})
          WHERE courses.workflow_state <> 'deleted') as course_users
        ON course_users.course_id = courses.id")
   }
@@ -1262,22 +1278,31 @@ class Course < ActiveRecord::Base
       event :claim, :transitions_to => :claimed
       event :offer, :transitions_to => :available
       event :complete, :transitions_to => :completed
+      event :delete, :transitions_to => :deleted
     end
 
     state :claimed do
       event :offer, :transitions_to => :available
       event :complete, :transitions_to => :completed
+      event :delete, :transitions_to => :deleted
     end
 
     state :available do
       event :complete, :transitions_to => :completed
       event :claim, :transitions_to => :claimed
+      event :delete, :transitions_to => :deleted
     end
 
     state :completed do
       event :unconclude, :transitions_to => :available
+      event :offer, :transitions_to => :available
+      event :claim, :transitions_to => :claimed
+      event :delete, :transitions_to => :deleted
     end
-    state :deleted
+
+    state :deleted do
+      event :undelete, :transitions_to => :claimed
+    end
   end
 
   def api_state
@@ -1340,7 +1365,9 @@ class Course < ActiveRecord::Base
     shard.activate do
       return if Rails.cache.read(['has_assignment_group', self].cache_key)
       if self.assignment_groups.active.empty?
-        self.assignment_groups.create(:name => t('#assignment_group.default_name', "Assignments"))
+        Shackles.activate(:master) do
+          self.assignment_groups.create!(name: t('#assignment_group.default_name', "Assignments"))
+        end
       end
       Rails.cache.write(['has_assignment_group', self].cache_key, true)
     end
@@ -1414,8 +1441,12 @@ class Course < ActiveRecord::Base
     end
   end
 
+  def unenrolled_user_can_read?(user, session)
+    self.is_public || (self.is_public_to_auth_users && session.present? && session.has_key?(:user_id))
+  end
+
   set_policy do
-    given { |user, session| self.available? && (self.is_public || (self.is_public_to_auth_users && session.present? && session.has_key?(:user_id)))  }
+    given { |user, session| self.available? &&  unenrolled_user_can_read?(user, session)}
     can :read and can :read_outcomes and can :read_syllabus
 
     given { |user, session| self.available? && (self.public_syllabus || (self.public_syllabus_to_auth && session.present? && session.has_key?(:user_id)))}
@@ -1712,6 +1743,7 @@ class Course < ActiveRecord::Base
                 include_final_grade_overrides = Canvas::Plugin.value_to_boolean(
                   grade_export_settings[:include_final_grade_overrides]
                 )
+                include_final_grade_overrides &= course.allow_final_grade_override?
 
                 course.generate_grade_publishing_csv_output(
                   enrollments,
@@ -2317,7 +2349,7 @@ class Course < ActiveRecord::Base
       :public_syllabus_to_auth, :allow_student_wiki_edits, :show_public_context_messages,
       :syllabus_body, :allow_student_forum_attachments, :lock_all_announcements,
       :default_wiki_editing_roles, :allow_student_organized_groups,
-      :default_view, :show_total_grade_as_points,
+      :default_view, :show_total_grade_as_points, :allow_final_grade_override,
       :open_enrollment,
       :storage_quota, :tab_configuration, :allow_wiki_comments,
       :turnitin_comments, :self_enrollment, :license, :indexed, :locale,
@@ -2912,6 +2944,7 @@ class Course < ActiveRecord::Base
   # course import/export :(
   add_setting :hide_final_grade, :alias => :hide_final_grades, :boolean => true
   add_setting :hide_distribution_graphs, :boolean => true
+  add_setting :allow_final_grade_override, boolean: false, default: false
   add_setting :allow_student_discussion_topics, :boolean => true, :default => true
   add_setting :allow_student_discussion_editing, :boolean => true, :default => true
   add_setting :show_total_grade_as_points, :boolean => true, :default => false
@@ -2925,6 +2958,7 @@ class Course < ActiveRecord::Base
   add_setting :organize_epub_by_content_type, :boolean => true, :default => false
   add_setting :enable_offline_web_export, :boolean => true, :default => lambda { |c| c.account.enable_offline_web_export? }
   add_setting :is_public_to_auth_users, :boolean => true, :default => false
+  add_setting :overridden_course_visibility
 
   add_setting :restrict_student_future_view, :boolean => true, :inherited => true
   add_setting :restrict_student_past_view, :boolean => true, :inherited => true
@@ -3331,6 +3365,10 @@ class Course < ActiveRecord::Base
     default_grading_standard || GradingStandard.default_instance
   end
 
+  def allow_final_grade_override?
+    feature_enabled?(:final_grades_override) && allow_final_grade_override == "true"
+  end
+
   def moderators
     participating_instructors.distinct.select { |user| grants_right?(user, :select_final_grade) }
   end
@@ -3350,6 +3388,40 @@ class Course < ActiveRecord::Base
     return false unless feature_enabled?(:post_policies)
 
     default_post_policy.present? && default_post_policy.post_manually?
+  end
+
+  def apply_overridden_course_visibility(visibility)
+    if !['institution', 'public', 'course'].include?(visibility) &&
+        self.root_account.available_course_visibility_override_options.keys.include?(visibility)
+      self.overridden_course_visibility = visibility
+    else
+      self.overridden_course_visibility = nil
+    end
+  end
+
+  def apply_visibility_configuration(course_visibility, syllabus_visibility)
+    apply_overridden_course_visibility(course_visibility)
+    if course_visibility == 'institution'
+      self.is_public_to_auth_users = true
+      self.is_public = false
+    elsif course_visibility == 'public'
+      self.is_public = true
+    else
+      self.is_public_to_auth_users = false
+      self.is_public = false
+    end
+
+    if syllabus_visibility.present?
+      if self.is_public || syllabus_visibility == 'public'
+        self.public_syllabus = true
+      elsif self.is_public_to_auth_users || syllabus_visibility == 'institution'
+        self.public_syllabus_to_auth = true
+        self.public_syllabus = false
+      else
+        self.public_syllabus = false
+        self.public_syllabus_to_auth = false
+      end
+    end
   end
 
   private

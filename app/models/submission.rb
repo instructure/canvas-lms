@@ -462,7 +462,6 @@ class Submission < ActiveRecord::Base
       user &&
       self.assessment_requests.map(&:assessor_id).include?(user.id)
   end
-  private :peer_reviewer?
 
   def can_view_details?(user)
     return false unless grants_right?(user, :read)
@@ -2024,7 +2023,7 @@ class Submission < ActiveRecord::Base
     end
     valid_keys = [:comment, :author, :media_comment_id, :media_comment_type,
                   :group_comment_id, :assessment_request, :attachments,
-                  :anonymous, :hidden, :provisional_grade_id, :draft]
+                  :anonymous, :hidden, :provisional_grade_id, :draft, :attempt]
     if opts[:comment].present?
       comment = submission_comments.create!(opts.slice(*valid_keys))
     end

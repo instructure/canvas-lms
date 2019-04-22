@@ -409,7 +409,9 @@ class ContentTag < ActiveRecord::Base
   end
 
   def context_module_action(user, action, points=nil)
-    self.context_module.update_for(user, action, self, points) if self.context_module
+    Shackles.activate(:master) do
+      self.context_module.update_for(user, action, self, points) if self.context_module
+    end
   end
 
   def progression_for_user(user)

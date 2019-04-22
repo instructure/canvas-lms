@@ -62,5 +62,14 @@ module Types
     def media_object
       Loaders::MediaObjectLoader.load(object.media_comment_id)
     end
+
+    field :attempt, Integer, null: false
+    def attempt
+      # Attempt is nil in the database, but we are going to return it as 0 instead,
+      # as it ends up being much easier to work with on an api level. Attempting
+      # to fix this in the database is challenging because submission.attempt
+      # should be changed as well in order to keep everything consistent.
+      object.attempt.nil? ? 0 : object.attempt
+    end
   end
 end

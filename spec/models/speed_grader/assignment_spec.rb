@@ -419,6 +419,33 @@ describe SpeedGrader::Assignment do
       end
     end
 
+    describe "submission posting" do
+      let(:submission_json) do
+        json = SpeedGrader::Assignment.new(@assignment, @teacher).json
+        json[:submissions].detect { |submission| submission[:user_id] == @student_1.id.to_s }
+      end
+
+      context "when post policies are enabled" do
+        before(:each) do
+          @course.enable_feature!(:post_policies)
+        end
+
+        it "includes the submission's posted-at date in the posted_at field" do
+          posted_at_time = 1.day.ago
+          @assignment.submission_for_student(@student_1).update!(posted_at: posted_at_time)
+          expect(submission_json["posted_at"]).to eq posted_at_time
+        end
+
+        it "includes nil for the posted_at field if the submission is not posted" do
+          expect(submission_json["posted_at"]).to be nil
+        end
+      end
+
+      it "omits the posted_at field when post policies are not enabled" do
+        expect(submission_json).not_to have_key(:posted_at)
+      end
+    end
+
     describe 'attachment JSON' do
       let(:viewed_at_time) { Time.zone.now }
 

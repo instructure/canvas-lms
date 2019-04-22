@@ -20,7 +20,9 @@ import I18n from 'i18n!theme_editor'
 import React from 'react'
 import {string, func, bool} from 'prop-types'
 import SVGWrapper from '../shared/SVGWrapper'
-import ReactCSSTransitionGroup from 'react-transition-group/CSSTransitionGroup'
+
+import Modal, {ModalBody, ModalFooter} from '../shared/components/InstuiModal'
+import Button from '@instructure/ui-buttons/lib/components/Button'
 
 export default function ThemeCard(props) {
   const getVar = props.getVariable
@@ -132,23 +134,24 @@ export default function ThemeCard(props) {
           )}
         </div>
       </div>
-      <ReactCSSTransitionGroup transitionName="ic-ThemeCard-overlay-transition">
-        {props.isBeingDeleted && (
-          <div className="ic-ThemeCard-overlay">
-            <div className="ic-ThemeCard-overlay__content">
-              <h4 className="ic-ThemeCard-overlay__heading">{I18n.t('Delete this theme?')}</h4>
-              <div className="ic-ThemeCard-overlay__actions">
-                <button type="button" className="Button" onClick={props.cancelDeleting}>
-                  {I18n.t('Cancel')}
-                </button>
-                <button type="button" className="Button Button--danger" onClick={props.onDelete}>
-                  {I18n.t('Delete')}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </ReactCSSTransitionGroup>
+      {props.isBeingDeleted && (
+        <Modal
+          as="form"
+          open
+          onDismiss={props.cancelDeleting}
+          onSubmit={props.onDelete}
+          label={I18n.t('Delete Theme?')}
+        >
+          <ModalBody>{I18n.t('Delete %{themeName}?', {themeName: props.name})}</ModalBody>
+          <ModalFooter>
+            <Button onClick={props.cancelDeleting}>{I18n.t('Cancel')}</Button>
+            &nbsp;
+            <Button variant="primary" type="submit">
+              {I18n.t('Delete')}
+            </Button>
+          </ModalFooter>
+        </Modal>
+      )}
       {props.isActiveBrandConfig && (
         <div
           className="ic-ThemeCard-status ic-ThemeCard-status--is-active-theme"

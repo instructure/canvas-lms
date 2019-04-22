@@ -554,6 +554,28 @@ test('#loadValue sets the value to grade when entered_grade is not available', f
   strictEqual(this.cell.val, 'complete')
 })
 
+QUnit.module('SubmissionCell#submissionIcon', () => {
+  test('returns icon class for an attachment with upload_status of pending', () => {
+    const attachments = [{upload_status: 'pending'}]
+    strictEqual(
+      SubmissionCell.submissionIcon('default', attachments),
+      "<i class='icon-upload' ></i>"
+    )
+  })
+
+  test('returns icon class for an attachment with upload_status of failed', () => {
+    const attachments = [{upload_status: 'failed'}]
+    strictEqual(
+      SubmissionCell.submissionIcon('default', attachments),
+      "<i class='icon-warning' ></i>"
+    )
+  })
+
+  test('returns icon class of document for an attachment with no attachments', () => {
+    strictEqual(SubmissionCell.submissionIcon('document'), "<i class='icon-document' ></i>")
+  })
+})
+
 QUnit.module('SubmissionCell#classesBasedOnSubmission', () => {
   test('returns anonymous when anonymize_students is set on the assignment', () => {
     const assignment = {anonymize_students: true}

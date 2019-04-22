@@ -186,10 +186,10 @@ define [
     @submissionIcon: (submission_type, attachments) ->
       klass = SubmissionCell.iconFromSubmissionType(submission_type)
       if attachments?
-        workflow_state = attachments[0].workflow_state
-        if workflow_state == "pending_upload"
+        upload_status = attachments[0].upload_status
+        if upload_status == "pending"
           klass = "upload"
-        else if workflow_state == "errored"
+        else if upload_status == "failed"
           klass = "warning"
       "<i class='icon-#{htmlEscape klass}' ></i>"
 

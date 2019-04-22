@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import gql from 'graphql-tag'
-import {bool, number, oneOf, shape, string, arrayOf} from 'prop-types'
+import {bool, number, oneOf, oneOfType, shape, string, arrayOf} from 'prop-types'
 
 // This ENV shape is for the controller's current show action. We'll have
 // something different when assignments are being created, which is a different
@@ -68,28 +68,14 @@ export const TEACHER_QUERY = gql`
       allowedAttempts
       course {
         lid: _id
-        modulesConnection {
+        modulesConnection(first: 0) {
           pageInfo {
-            startCursor
-            endCursor
             hasNextPage
-            hasPreviousPage
-          }
-          nodes {
-            lid: _id
-            name
           }
         }
-        assignmentGroupsConnection {
+        assignmentGroupsConnection(first: 0) {
           pageInfo {
-            startCursor
-            endCursor
             hasNextPage
-            hasPreviousPage
-          }
-          nodes {
-            lid: _id
-            name
           }
         }
       }
@@ -161,12 +147,129 @@ export const TEACHER_QUERY = gql`
   }
 `
 
+const assignmentGroup = gql`
+  fragment CourseAssignmentGroups on AssignmentGroupConnection {
+    nodes {
+      lid: _id
+      gid: id
+      name
+      __typename
+    }
+  }
+`
+
+export const COURSE_ASSIGNMENT_GROUPS_QUERY = gql`
+  query GetCourseAssignmentGroups($courseId: ID!, $cursor: String) {
+    course(id: $courseId) {
+      lid: _id
+      gid: id
+      assignmentGroupsConnection(first: 200, after: $cursor) {
+        pageInfo {
+          endCursor
+          hasNextPage
+        }
+        ...CourseAssignmentGroups
+      }
+    }
+  }
+  ${assignmentGroup}
+`
+export const COURSE_ASSIGNMENT_GROUPS_QUERY_LOCAL = gql`
+  query GetCourseAssignmentGroupsLocal($courseId: ID!) {
+    course(id: $courseId) @client {
+      lid: _id
+      gid: id
+      assignmentGroupsConnection(first: 200) {
+        ...CourseAssignmentGroups
+      }
+    }
+  }
+  ${assignmentGroup}
+`
+
+const assignmentModule = gql`
+  fragment CourseModules on ModuleConnection {
+    nodes {
+      lid: _id
+      gid: id
+      name
+      position
+      __typename
+    }
+  }
+`
+
+// FYI, modules are areturned sorted by position
+export const COURSE_MODULES_QUERY = gql`
+  query GetCourseModules($courseId: ID!, $cursor: String) {
+    course(id: $courseId) {
+      lid: _id
+      gid: id
+      modulesConnection(first: 200, after: $cursor) {
+        pageInfo {
+          endCursor
+          hasNextPage
+        }
+        ...CourseModules
+      }
+    }
+  }
+  ${assignmentModule}
+`
+
+export const COURSE_MODULES_QUERY_LOCAL = gql`
+  query GetCourseModules($courseId: ID!) {
+    course(id: $courseId) @client {
+      lid: _id
+      gid: id
+      modulesConnection(first: 200) {
+        ...CourseModules
+      }
+    }
+  }
+  ${assignmentModule}
+`
+
 export const SET_WORKFLOW = gql`
   mutation SetWorkflow($id: ID!, $workflow: AssignmentState!) {
     updateAssignment(input: {id: $id, state: $workflow}) {
       assignment {
         __typename
         id
+        state
+      }
+    }
+  }
+`
+
+export const SAVE_ASSIGNMENT = gql`
+  mutation SaveAssignment(
+    $id: ID!
+    $name: String
+    $description: String
+    $dueAt: DateTime
+    $pointsPossible: Float
+    $state: AssignmentState
+  ) {
+    updateAssignment(
+      input: {
+        id: $id
+        name: $name
+        description: $description
+        dueAt: $dueAt
+        pointsPossible: $pointsPossible
+        state: $state
+      }
+    ) {
+      assignment {
+        __typename
+        id
+        lid: _id
+        gid: id
+        dueAt
+        name
+        description
+        pointsPossible
         state
       }
     }
@@ -210,7 +313,7 @@ export const OverrideShape = shape({
   })
 })
 
-const UserShape = shape({
+export const UserShape = shape({
   lid: string,
   gid: string,
   name: string,
@@ -235,17 +338,17 @@ const SubmissionShape = shape({
 })
 
 export const TeacherAssignmentShape = shape({
-  lid: string.isRequired,
-  name: string.isRequired,
-  pointsPossible: number.isRequired,
+  lid: string,
+  name: string,
+  pointsPossible: oneOfType([number, string]),
   dueAt: string,
   lockAt: string,
   unlockAt: string,
   description: string,
   state: oneOf(['published', 'unpublished', 'deleted']).isRequired,
-  assignmentGroup: AssignmentGroupShape.isRequired,
+  assignmentGroup: AssignmentGroupShape,
   modules: arrayOf(ModuleShape).isRequired,
-  course: CourseShape.isRequired,
+  course: CourseShape.isRequired, // not edited by the teacher
   lockInfo: LockInfoShape.isRequired,
   submissionTypes: arrayOf(string).isRequired,
   allowedExtensions: arrayOf(string).isRequired,

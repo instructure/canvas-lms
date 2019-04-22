@@ -195,14 +195,18 @@ module AccountReports::ReportHelper
     end
   end
 
-  def loaded_pseudonym(pseudonyms, u, include_deleted: false, enrollment: nil)
-    context = enrollment || root_account
-    user_pseudonyms = pseudonyms[u.id] || []
-    u.instance_variable_set(include_deleted ? :@all_pseudonyms : :@all_active_pseudonyms, user_pseudonyms)
-    SisPseudonym.for(u, context, {type: :trusted, require_sis: false, include_deleted: include_deleted})
+  def loaded_pseudonym(pseudonyms, user, include_deleted: false, enrollment: nil)
+    context = root_account
+    user_pseudonyms = pseudonyms[user.id] || []
+    user.instance_variable_set(include_deleted ? :@all_pseudonyms : :@all_active_pseudonyms, user_pseudonyms)
+    if enrollment&.sis_pseudonym_id
+      enrollment_pseudonym = user_pseudonyms.index_by(&:id)[enrollment.sis_pseudonym_id]
+      return enrollment_pseudonym if enrollment_pseudonym
+    end
+    SisPseudonym.for(user, context, {type: :trusted, require_sis: false, include_deleted: include_deleted})
   end
 
-  def load_cross_shard_logins(users, include_deleted: false)
+  def preload_logins_for_users(users, include_deleted: false)
     shards = root_account.trusted_account_ids.map {|id| Shard.shard_for(id)}
     shards << root_account.shard
     User.preload_shard_associations(users)
@@ -215,6 +219,18 @@ module AccountReports::ReportHelper
     preloads = Account.reflections['role_links'] ? {account: :role_links} : :account
     ActiveRecord::Associations::Preloader.new.preload(pseudonyms, preloads)
     pseudonyms.group_by(&:user_id)
+  end
+
+  def emails_by_user_id(user_ids)
+    Shard.partition_by_shard(user_ids) do |user_ids|
+      CommunicationChannel.
+        email.
+        unretired.
+        select([:user_id, :path]).
+        where(user_id: user_ids).
+        order('user_id, position ASC').
+        distinct_on(:user_id)
+    end.index_by(&:user_id)
   end
 
   def include_deleted_objects
@@ -274,8 +290,7 @@ module AccountReports::ReportHelper
   #    the enrollment_term_id the query could use the id and get the results for
   #    the term.
   # 4. the parallel_#{report_type} will also need to add rows individually with
-  #    add_report_row or a little more efficient way would be to use
-  #    build_report_row, and then add_report_rows at the end of the method.
+  #    add_report_row.
   def write_report_in_batches(headers)
     # we use total_lines to track progress in the normal progress.
     # just use it here to do the same thing here even though it is not really
@@ -297,14 +312,39 @@ module AccountReports::ReportHelper
     end
   end
 
-  def add_report_row(row:, row_number: nil, report_runner:, account_report: @account_report)
-    Shackles.activate(:master) do
-      account_report.account_report_rows.create!(row: row,
-                                                 row_number: row_number,
-                                                 account_report: account_report,
-                                                 account_report_runner: report_runner,
-                                                 created_at: Time.zone.now)
+  def add_report_row(row:, row_number: nil, report_runner:, account_report: nil)
+    report_runner.rows << build_report_row(row: row, row_number: row_number, report_runner: report_runner)
+    if report_runner.rows.length == 1_000
+      report_runner.write_rows
     end
+  end
+
+  def build_report_row(row:, row_number: nil, report_runner:)
+    # force all fields to strings
+    report_runner.account_report_rows.new(row: row.map { |field| field&.to_s&.encode(Encoding::UTF_8) },
+                                          row_number: row_number,
+                                          account_report_id: report_runner.account_report_id,
+                                          account_report_runner: report_runner,
+                                          created_at: Time.zone.now)
+  end
+
+  def number_of_items_per_runner(item_count, min: 25, max: 1000)
+    # use 100 jobs for the report, but no fewer than 25, and no more than 1000 per job
+    [[item_count/100.to_f.round(0), min].max, max].min
+  end
+
+  def create_report_runners(ids, total, min: 25, max: 1000)
+    return if ids.empty?
+    ids_so_far = 0
+    ids.each_slice(number_of_items_per_runner(total, min: min, max: max)) do |batch|
+      @account_report.add_report_runner(batch)
+      ids_so_far += batch.length
+      if ids_so_far >= Setting.get("ids_per_report_runner_batch", 10_000).to_i
+        @account_report.write_report_runners
+        ids_so_far = 0
+      end
+    end
+    @account_report.write_report_runners
   end
 
   def run_account_report_runner(report_runner, headers)
@@ -317,11 +357,11 @@ module AccountReports::ReportHelper
       end
       report_runner.start
       Shackles.activate(:slave) {AccountReports::REPORTS[@account_report.report_type].parallel_proc.call(@account_report, report_runner)}
-      update_parallel_progress(account_report: @account_report,report_runner: report_runner)
     rescue => e
       report_runner.fail
       self.fail_with_error(e)
     ensure
+      update_parallel_progress(account_report: @account_report,report_runner: report_runner)
       if last_account_report_runner?(@account_report)
         write_report headers do |csv|
           @account_report.account_report_rows.order(:account_report_runner_id, :row_number).find_each {|record| csv << record.row}

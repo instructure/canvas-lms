@@ -131,6 +131,11 @@ describe Lti::Messages::JwtMessage do
       expect(decoded_jwt['sub']).to eq user.lti_id
     end
 
+    it 'sets the "sub" claim to past lti_id' do
+      UserPastLtiId.create!(user: user, context: course, user_lti_id: 'old_lti_id', user_lti_context_id: 'old_lti_id', user_uuid: 'old')
+      expect(decoded_jwt['sub']).to eq 'old_lti_id'
+    end
+
     it 'sets the "lti11_legacy_user_id" claim' do
       expect(decoded_jwt['https://purl.imsglobal.org/spec/lti/claim/lti11_legacy_user_id']).to eq user.lti_context_id
     end

@@ -50,7 +50,7 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   # parameter or indirectly through the "settings_url" parameter.
   #
   # If both the "settings" and "settings_url" parameters are set,
-  # the "settings" parameter will be ignored.
+  # the "settings_url" parameter will be ignored.
   #
   # Use of this endpoint will create a new developer_key.
   #
@@ -79,8 +79,9 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   #
   # @returns ToolConfiguration
   def create
+    developer_key_redirect_uris
     tool_config = Lti::ToolConfiguration.create_tool_and_key!(account, tool_configuration_params)
-    update_developer_key!(tool_config)
+    update_developer_key!(tool_config, developer_key_redirect_uris)
     render json: Lti::ToolConfigurationSerializer.new(tool_config)
   end
 
@@ -88,7 +89,7 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   # Update tool configuration with the provided parameters.
   #
   # Settings may be provided directly as JSON through the "settings"
-  # parameter or indirectly through the "settings_url" parameter.
+  # parameter. The settings_url is not used for updates.
   #
   # If both the "settings" and "settings_url" parameters are set,
   # the "settings" parameter will be ignored.
@@ -96,9 +97,6 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   #
   # @argument settings [Object]
   #   JSON representation of the tool configuration
-  #
-  # @argument settings_url [String]
-  #   URL of settings JSON
   #
   # @argument developer_key_id [String]
   #
@@ -122,10 +120,8 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   def update
     tool_config = developer_key.tool_configuration
     tool_config.update!(
-      settings: tool_configuration_params[:settings],
-      settings_url: tool_configuration_params[:settings_url],
+      settings: tool_configuration_params[:settings]&.to_unsafe_hash&.deep_merge(manual_custom_fields),
       disabled_placements: tool_configuration_params[:disabled_placements],
-      custom_fields: tool_configuration_params[:custom_fields],
       privacy_level: tool_configuration_params[:privacy_level]
     )
     update_developer_key!(tool_config)
@@ -150,10 +146,17 @@ class Lti::ToolConfigurationsApiController < ApplicationController
 
   private
 
-  def update_developer_key!(tool_config)
+  def manual_custom_fields
+    {
+      custom_fields: ContextExternalTool.find_custom_fields_from_string(tool_configuration_params[:custom_fields])
+    }.stringify_keys
+  end
+
+  def update_developer_key!(tool_config, redirect_uris = nil)
     developer_key = tool_config.developer_key
+    developer_key.redirect_uris = redirect_uris unless redirect_uris.nil?
     developer_key.public_jwk = tool_config.settings['public_jwk']
-    developer_key.oidc_login_uri = tool_config.settings['oidc_login_uri']
+    developer_key.oidc_initiation_url = tool_config.settings['oidc_initiation_url']
     developer_key.update!(developer_key_params)
   end
 
@@ -184,5 +187,9 @@ class Lti::ToolConfigurationsApiController < ApplicationController
   def developer_key_params
     return {} unless params.key? :developer_key
     params.require(:developer_key).permit(:name, :email, :notes, :redirect_uris, :test_cluster_only, :require_scopes, scopes: [])
+  end
+
+  def developer_key_redirect_uris
+    params.require(:developer_key).require(:redirect_uris)
   end
 end

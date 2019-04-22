@@ -17,7 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../helpers/graphql_type_tester')
+require_relative "../graphql_spec_helper"
 
 describe Types::SubmissionType do
   before(:once) do
@@ -116,17 +116,28 @@ describe Types::SubmissionType do
     end
   end
 
+  describe '#attempt' do
+    it 'should show the attempt' do
+      @submission.update_column(:attempt, 1) # bypass infer_values callback
+      expect(submission_type.resolve('attempt')).to eq 1
+    end
+
+    it 'should translate nil in the database to 0 in graphql' do
+      @submission.update_column(:attempt, nil) # bypass infer_values callback
+      expect(submission_type.resolve('attempt')).to eq 0
+    end
+  end
+
   describe "submission comments" do
     before(:once) do
       student_in_course(active_all: true)
-      @submission.add_comment(author: @teacher, comment: "test3")
-      @submission_comments = @submission.submission_comments
+      @comment = @submission.add_comment(author: @teacher, comment: "test3")
     end
 
     it "works" do
       expect(
         submission_type.resolve("commentsConnection { nodes { _id }}")
-      ).to eq @submission_comments.map(&:id).map(&:to_s)
+      ).to eq [@comment.id.to_s]
     end
 
     it "requires permission" do
@@ -134,6 +145,39 @@ describe Types::SubmissionType do
       expect(
         submission_type.resolve("commentsConnection { nodes { _id }}", current_user: other_course_student)
       ).to be nil
+    end
+
+    describe "filtering" do
+      before(:once) do
+        @submission.update!(attempt: 2)
+        @comment2 = @submission.add_comment(author: @teacher, comment: "test3", attempt: 2)
+      end
+
+      it "can be done on an attempt number" do
+        expect(
+          submission_type.resolve(
+            "commentsConnection(filter: {attempts: [2]}) { nodes { _id }}",
+          )
+        ).to eq [@comment2.id.to_s]
+      end
+
+      it "will only return published drafts" do
+        @comment3 = @submission.add_comment(author: @teacher, comment: "test3", attempt: 1, draft_comment: true)
+        @comment4 = @submission.add_comment(author: @teacher, comment: "test3", attempt: 1, draft_comment: false)
+        expect(
+          submission_type.resolve(
+            "commentsConnection { nodes { _id }}",
+          )
+        ).to eq [@comment.id.to_s, @comment2.id.to_s, @comment4.id.to_s]
+      end
+
+      it "translates attempt 0 to attempt nil in the database query" do
+        expect(
+          submission_type.resolve(
+            "commentsConnection(filter: {attempts: [0]}) { nodes { _id }}",
+          )
+        ).to eq [@comment.id.to_s]
+      end
     end
   end
 end

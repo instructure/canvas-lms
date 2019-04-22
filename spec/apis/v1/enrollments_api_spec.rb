@@ -1082,6 +1082,18 @@ describe EnrollmentsApiController, type: :request do
             expect(json.first['sis_user_id']).to eq(@teacher.pseudonym.sis_user_id)
           end
 
+          it "filters enrollments not made with sis_user_id" do
+            section = @course.course_sections.create!(name: 'other_section')
+            e = section.enroll_user(@teacher, 'TeacherEnrollment')
+            # generally these are populated from a sis_import
+            Enrollment.where(id: e).update_all(sis_pseudonym_id: @teacher.pseudonyms.where(sis_user_id: '1234').take.id)
+            @params[:sis_user_id] = '1234'
+            @params[:created_for_sis_id] = true
+            json = api_call(:get, @path, @params)
+            expect(json.length).to eq(1)
+            expect(json.first['id']).to eq(e.id)
+          end
+
           it "filters by a list of sis_user_ids" do
             @params[:sis_user_id] = ['1234', '5678']
             json = api_call(:get, @path, @params)
@@ -1552,32 +1564,53 @@ describe EnrollmentsApiController, type: :request do
       end
 
       context "override scores" do
+        let(:student_grades) do
+          json = api_call(:get, @user_path, @user_params)
+          json.first.fetch("grades")
+        end
+
         before(:once) do
           @enrollment.scores.create!(course_score: true, current_score: 67, override_score: 81)
-        end
-
-        it "shows override scores if exist and feature enabled" do
           @course.enable_feature!(:final_grades_override)
-          json = api_call(:get, @user_path, @user_params)
-          expect(json[0].fetch("grades").fetch("current_score")).to be 81.0
+          @course.update!(allow_final_grade_override: true, grading_standard_enabled: true)
         end
 
-        it "shows override grade if exist and feature enabled" do
-          @course.enable_feature!(:final_grades_override)
-          @course.update!(grading_standard_enabled: true)
-          json = api_call(:get, @user_path, @user_params)
-          expect(json[0].fetch("grades").fetch("current_grade")).to eq "B-"
+        context "when Final Grade Override is enabled and allowed" do
+          it "sets current_score to the override score" do
+            expect(student_grades.fetch("current_score")).to be 81.0
+          end
+
+          it "sets current_grade to the override grade" do
+            expect(student_grades.fetch("current_grade")).to eq "B-"
+          end
         end
 
-        it "does not show override score if feature not enabled" do
-          json = api_call(:get, @user_path, @user_params)
-          expect(json[0].fetch("grades").fetch("current_score")).to be 67.0
+        context "when Final Grade Override is not allowed" do
+          before(:once) do
+            @course.update!(allow_final_grade_override: false)
+          end
+
+          it "sets current_score to the computed score" do
+            expect(student_grades.fetch("current_score")).to be 67.0
+          end
+
+          it "sets current_grade to the computed grade" do
+            expect(student_grades.fetch("current_grade")).to eq "D+"
+          end
         end
 
-        it "does not show override grade if feature not enabled" do
-          @course.update!(grading_standard_enabled: true)
-          json = api_call(:get, @user_path, @user_params)
-          expect(json[0].fetch("grades").fetch("current_grade")).to eq "D+"
+        context "when Final Grade Override is disabled" do
+          before(:once) do
+            @course.disable_feature!(:final_grades_override)
+          end
+
+          it "sets current_score to the computed score" do
+            expect(student_grades.fetch("current_score")).to be 67.0
+          end
+
+          it "sets current_grade to the computed grade" do
+            expect(student_grades.fetch("current_grade")).to eq "D+"
+          end
         end
       end
 
@@ -1717,48 +1750,71 @@ describe EnrollmentsApiController, type: :request do
       end
 
       context "override scores" do
+        let(:student_grades) do
+          json = api_call(:get, @path, @params)
+          json.detect { |enrollment| enrollment.fetch("id") == @enrollment.id }.fetch("grades")
+        end
+
         before(:once) do
           @course.enable_feature!(:final_grades_override)
+          @course.update!(allow_final_grade_override: true, grading_standard_enabled: true)
           @enrollment.scores.create!(course_score: true, current_score: 67, override_score: 81)
         end
 
-        def student_grades(enrollments, enrollment_id)
-          enrollments.detect { |enrollment| enrollment.fetch("id") == enrollment_id }.fetch("grades")
+        context "when Final Grade Override is enabled and allowed" do
+          it "includes the override score" do
+            expect(student_grades.fetch("override_score")).to be 81.0
+          end
+
+          it "includes the override grade" do
+            expect(student_grades.fetch("override_grade")).to eq "B-"
+          end
+
+          it "continues to include the original score as current_score" do
+            expect(student_grades.fetch("current_score")).to be 67.0
+          end
+
+          it "continues to include the original grade as current_grade" do
+            expect(student_grades.fetch("current_grade")).to eq "D+"
+          end
+
+          it "excludes the override score when no override exists" do
+            @enrollment.scores.each(&:destroy!)
+            expect(student_grades).not_to have_key("override_score")
+          end
+
+          it "excludes the override grade when no override exists" do
+            @enrollment.scores.each(&:destroy!)
+            expect(student_grades).not_to have_key("override_grade")
+          end
         end
 
-        it "shows override scores if exist and feature enabled" do
-          json = api_call(:get, @path, @params)
-          expect(student_grades(json, @enrollment.id).fetch("override_score")).to be 81.0
+        context "when Final Grade Override is not allowed" do
+          before(:once) do
+            @course.update!(allow_final_grade_override: false)
+          end
+
+          it "excludes the override score" do
+            expect(student_grades).not_to have_key("override_score")
+          end
+
+          it "excludes the override grade" do
+            expect(student_grades).not_to have_key("override_grade")
+          end
         end
 
-        it "shows override grade if exist and feature enabled" do
-          @course.update!(grading_standard_enabled: true)
-          json = api_call(:get, @path, @params)
-          expect(student_grades(json, @enrollment.id).fetch("override_grade")).to eq "B-"
-        end
+        context "when Final Grade Override is disabled" do
+          before(:once) do
+            @course.disable_feature!(:final_grades_override)
+          end
 
-        it "continues to show the original score as current_score" do
-          json = api_call(:get, @path, @params)
-          expect(student_grades(json, @enrollment.id).fetch("current_score")).to be 67.0
-        end
+          it "excludes the override score" do
+            expect(student_grades).not_to have_key("override_score")
+          end
 
-        it "continues to show the original grade as current_grade" do
-          @course.update!(grading_standard_enabled: true)
-          json = api_call(:get, @path, @params)
-          expect(student_grades(json, @enrollment.id).fetch("current_grade")).to eq "D+"
-        end
-
-        it "does not show override score if feature not enabled" do
-          @course.disable_feature!(:final_grades_override)
-          json = api_call(:get, @path, @params)
-          expect(student_grades(json, @enrollment.id).fetch("current_score")).to be 67.0
-        end
-
-        it "does not show override grade if feature not enabled" do
-          @course.disable_feature!(:final_grades_override)
-          @course.update!(grading_standard_enabled: true)
-          json = api_call(:get, @path, @params)
-          expect(student_grades(json, @enrollment.id).fetch("current_grade")).to eq "D+"
+          it "excludes the override grade" do
+            expect(student_grades).not_to have_key("override_grade")
+          end
         end
       end
     end

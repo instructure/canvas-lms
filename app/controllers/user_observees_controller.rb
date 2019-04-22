@@ -49,7 +49,8 @@ class UserObserveesController < ApplicationController
     observed_users = observer.linked_students.order_by_sortable_name
     observed_users = Api.paginate(observed_users, self, api_v1_user_observees_url)
 
-    data = users_json(observed_users, @current_user, session, includes)
+    UserPastLtiId.manual_preload_past_lti_ids(users, @domain_root_account) if ['uuid', 'lti_id'].any? { |id| includes.include? id }
+    data = users_json(observed_users, @current_user, session, includes, @domain_root_account)
     add_linked_root_account_ids_to_user_json(data)
     render json: data
   end

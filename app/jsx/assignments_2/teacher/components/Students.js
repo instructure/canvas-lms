@@ -26,14 +26,12 @@ import {TeacherAssignmentShape} from '../assignmentData'
 import View from '@instructure/ui-layout/lib/components/View'
 import {Table} from '@instructure/ui-elements'
 import Button from '@instructure/ui-buttons/lib/components/Button'
-import CloseButton from '@instructure/ui-buttons/lib/components/CloseButton'
-import Text from '@instructure/ui-elements/lib/components/Text'
 import IconExpandStart from '@instructure/ui-icons/lib/Line/IconExpandStart'
-import Tray from '@instructure/ui-overlays/lib/components/Tray'
 import Avatar from '@instructure/ui-elements/lib/components/Avatar'
 import SubmissionStatusPill from '../../shared/SubmissionStatusPill'
 import FriendlyDatetime from '../../../shared/FriendlyDatetime'
 import Link from '@instructure/ui-elements/lib/components/Link'
+import StudentTray from './StudentTray'
 
 export default class Students extends React.Component {
   static propTypes = {
@@ -44,7 +42,8 @@ export default class Students extends React.Component {
     super(props)
     this.state = {
       trayOpen: false,
-      studentInTray: null
+      trayStudentIndex: null,
+      studentData: this.prepareStudentData()
     }
   }
 
@@ -57,10 +56,11 @@ export default class Students extends React.Component {
   }
 
   renderNameColumn(student) {
+    const displayName = student.shortName || student.name || I18n.t('User')
     return (
       <React.Fragment>
         <Avatar name={student.name} src={student.avatarUrl} size="small" margin="0 small 0 0" />
-        {student.name}
+        {displayName}
       </React.Fragment>
     )
   }
@@ -108,12 +108,8 @@ export default class Students extends React.Component {
         variant="icon"
         icon={<IconExpandStart rotate="180" />}
         data-student-id={student.lid}
-        onClick={evt => {
-          const selectedStudent = this.prepareStudentData().find(
-            aStudent => aStudent.lid === evt.target.dataset.studentId
-          )
-          this.setState({trayOpen: true, studentInTray: selectedStudent})
-        }}
+        ref={b => (this.trayButton = b)}
+        onClick={this.handleTrayOpen}
       >
         <ScreenReaderContent>{I18n.t('Open student context tray')}</ScreenReaderContent>
       </Button>
@@ -134,47 +130,60 @@ export default class Students extends React.Component {
   }
 
   renderStudents() {
-    return this.prepareStudentData().map(student => this.renderStudent(student))
-  }
-
-  renderTrayCloseButton() {
-    return (
-      <CloseButton placement="start" variant="icon" onClick={this.hideTray}>
-        {I18n.t('Close student tray')}
-      </CloseButton>
-    )
-  }
-
-  renderTrayBody(student) {
-    return (
-      <View as="div">
-        <Avatar name={student.name} src={student.avatarUrl} size="x-large" inline={false} />
-        <Text as="p" lineHeight="double">
-          {student.name}
-        </Text>
-      </View>
-    )
+    return this.state.studentData.map(student => this.renderStudent(student))
   }
 
   hideTray = () => {
     this.setState({trayOpen: false})
   }
 
+  handleTrayOpen = event => {
+    const chosenId = event.target.dataset.studentId
+    this.setState(prevState => {
+      const selectedStudentIndex = prevState.studentData.findIndex(
+        aStudent => aStudent.lid === chosenId
+      )
+      return {
+        trayOpen: true,
+        trayStudentIndex: selectedStudentIndex
+      }
+    })
+  }
+
+  handleTrayPreviousStudent = () => {
+    this.setState(prevState => ({
+      trayStudentIndex:
+        prevState.trayStudentIndex > 0
+          ? prevState.trayStudentIndex - 1
+          : prevState.studentData.length - 1
+    }))
+  }
+
+  handleTrayNextStudent = () => {
+    this.setState(prevState => ({
+      trayStudentIndex:
+        prevState.trayStudentIndex === prevState.studentData.length - 1
+          ? 0
+          : prevState.trayStudentIndex + 1
+    }))
+  }
+
   renderTray() {
-    const student = this.state.studentInTray
+    const student =
+      this.state.trayStudentIndex === null
+        ? null
+        : this.state.studentData[this.state.trayStudentIndex]
     return (
-      <Tray
-        label={I18n.t('Student Details')}
-        open={this.state.trayOpen}
-        onDismiss={this.hideTray}
-        size={this.state.size}
-        placement="end"
-      >
-        <View as="div" padding="medium">
-          {this.renderTrayCloseButton()}
-          {student && this.renderTrayBody(student)}
-        </View>
-      </Tray>
+      student && (
+        <StudentTray
+          assignment={this.props.assignment}
+          student={student}
+          trayOpen={this.state.trayOpen}
+          onHideTray={this.hideTray}
+          onPreviousStudent={this.handleTrayPreviousStudent}
+          onNextStudent={this.handleTrayNextStudent}
+        />
+      )
     )
   }
 

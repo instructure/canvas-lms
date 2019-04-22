@@ -21,6 +21,7 @@ exports[`Free-form Rubric with a custom criterion by default renders the LongDes
   onExiting={[Function]}
   onOpen={[Function]}
   open={false}
+  overflow="scroll"
   shouldCloseOnDocumentClick={true}
   shouldReturnFocus={true}
   size="medium"
@@ -181,6 +182,7 @@ exports[`Free-form Rubric with a custom criterion when assessing renders the Lon
   onExiting={[Function]}
   onOpen={[Function]}
   open={false}
+  overflow="scroll"
   shouldCloseOnDocumentClick={true}
   shouldReturnFocus={true}
   size="medium"
@@ -341,6 +343,7 @@ exports[`Free-form Rubric with a custom criterion without an assessment renders 
   onExiting={[Function]}
   onOpen={[Function]}
   open={false}
+  overflow="scroll"
   shouldCloseOnDocumentClick={true}
   shouldReturnFocus={true}
   size="medium"
@@ -493,6 +496,7 @@ exports[`Free-form Rubric with a outcome criterion by default renders the LongDe
   onExiting={[Function]}
   onOpen={[Function]}
   open={false}
+  overflow="scroll"
   shouldCloseOnDocumentClick={true}
   shouldReturnFocus={true}
   size="medium"
@@ -707,6 +711,7 @@ exports[`Free-form Rubric with a outcome criterion when assessing renders the Lo
   onExiting={[Function]}
   onOpen={[Function]}
   open={false}
+  overflow="scroll"
   shouldCloseOnDocumentClick={true}
   shouldReturnFocus={true}
   size="medium"
@@ -921,6 +926,7 @@ exports[`Free-form Rubric with a outcome criterion without an assessment renders
   onExiting={[Function]}
   onOpen={[Function]}
   open={false}
+  overflow="scroll"
   shouldCloseOnDocumentClick={true}
   shouldReturnFocus={true}
   size="medium"
@@ -1081,6 +1087,7 @@ exports[`Point Rubric with a custom criterion by default renders the LongDescrip
   onExiting={[Function]}
   onOpen={[Function]}
   open={false}
+  overflow="scroll"
   shouldCloseOnDocumentClick={true}
   shouldReturnFocus={true}
   size="medium"
@@ -1280,6 +1287,7 @@ exports[`Point Rubric with a custom criterion when assessing renders the LongDes
   onExiting={[Function]}
   onOpen={[Function]}
   open={false}
+  overflow="scroll"
   shouldCloseOnDocumentClick={true}
   shouldReturnFocus={true}
   size="medium"
@@ -1479,6 +1487,7 @@ exports[`Point Rubric with a custom criterion without an assessment renders the 
   onExiting={[Function]}
   onOpen={[Function]}
   open={false}
+  overflow="scroll"
   shouldCloseOnDocumentClick={true}
   shouldReturnFocus={true}
   size="medium"
@@ -1657,6 +1666,7 @@ exports[`Point Rubric with a outcome criterion by default renders the LongDescri
   onExiting={[Function]}
   onOpen={[Function]}
   open={false}
+  overflow="scroll"
   shouldCloseOnDocumentClick={true}
   shouldReturnFocus={true}
   size="medium"
@@ -1910,6 +1920,7 @@ exports[`Point Rubric with a outcome criterion when assessing renders the LongDe
   onExiting={[Function]}
   onOpen={[Function]}
   open={false}
+  overflow="scroll"
   shouldCloseOnDocumentClick={true}
   shouldReturnFocus={true}
   size="medium"
@@ -2163,6 +2174,7 @@ exports[`Point Rubric with a outcome criterion without an assessment renders the
   onExiting={[Function]}
   onOpen={[Function]}
   open={false}
+  overflow="scroll"
   shouldCloseOnDocumentClick={true}
   shouldReturnFocus={true}
   size="medium"

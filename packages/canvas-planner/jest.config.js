@@ -36,7 +36,6 @@ module.exports = {
   testPathIgnorePatterns: [
     "<rootDir>/node_modues",
     "<rootDir>/lib",
-    "<rootDir>/copy-of-what-gets-published-to-npm-registry",
   ],
   testRegex: "/__tests__/.*\\.(test|spec)\\.js$",
   coverageReporters: [
@@ -48,7 +47,6 @@ module.exports = {
     'src/**/*.js'
   ],
   coveragePathIgnorePatterns: [
-    '<rootDir>/src/demo.js',
     '<rootDir>/src/i18n/flip-message.js'
   ],
   coverageThreshold: {

@@ -59,7 +59,7 @@ module Lti
         oauth_callback: 'about:blank'
       }
 
-      params[:user_id] = Lti::Asset.opaque_identifier_for(user) if user
+      params[:user_id] = Lti::Asset.opaque_identifier_for(user, context: context) if user
       params
     end
 

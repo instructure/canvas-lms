@@ -24,7 +24,7 @@ module Quizzes::QuizQuestion::AnswerParsers
 
       answer = Quizzes::QuizQuestion::RawFields.new({comments: comment, comments_html: comments_html})
       question[:comments] = answer.fetch_with_enforced_length(:comments, max_size: 5.kilobyte)
-      question[:comments_html] = answer.fetch_with_enforced_length(:comments_html, max_size: 5.kilobyte)
+      question[:comments_html] = answer.sanitize(answer.fetch_with_enforced_length(:comments_html, max_size: 5.kilobyte))
 
       question.answers = @answers
       question

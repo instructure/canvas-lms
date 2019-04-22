@@ -24,6 +24,7 @@ import SyllabusCalendarEventsCollection from 'compiled/collections/SyllabusCalen
 import SyllabusAppointmentGroupsCollection from 'compiled/collections/SyllabusAppointmentGroupsCollection'
 import SyllabusPlannerCollection from '../../coffeescripts/collections/SyllabusPlannerCollection'
 import SyllabusView from 'compiled/views/courses/SyllabusView'
+import { monitorLtiMessages } from 'lti/messages'
 
 // Setup the collections
 const collections = [
@@ -92,3 +93,4 @@ $(() => {
   SyllabusBehaviors.bindToMiniCalendar()
 })
 
+monitorLtiMessages()

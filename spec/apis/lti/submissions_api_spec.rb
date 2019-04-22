@@ -144,6 +144,7 @@ module Lti
                        "filename" => attachment.filename,
                        "display_name" => attachment.display_name,
                        "created_at" => now.iso8601,
+                       "upload_status" => "success",
                        "updated_at" => now.iso8601
                      }
                    ]
@@ -200,6 +201,7 @@ module Lti
                        "filename" => attachment.filename,
                        "display_name" => attachment.display_name,
                        "created_at" => now.iso8601,
+                       "upload_status" => "success",
                        "updated_at" => now.iso8601
                      }
                    ]

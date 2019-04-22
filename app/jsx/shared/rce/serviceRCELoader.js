@@ -24,6 +24,8 @@ import loadEventListeners from '../rce/loadEventListeners'
 import polyfill from '../rce/polyfill'
 import splitAssetString from 'compiled/str/splitAssetString'
 
+let loadingPromise
+
   const RCELoader = {
     preload() {
       this.loadRCE(function(){})
@@ -69,32 +71,32 @@ import splitAssetString from 'compiled/str/splitAssetString'
     *
     * @private
     */
-    loadingFlag: false,
     loadingCallbacks: [],
     RCE: null,
-    loadEventListeners,
 
     /**
     * handle accepting new load requests depending on the current state
-    * of the load/cache cycle
+    * of the load/cache cycle.
     *
+    * @return {Promise}
     * @private
     */
-    loadRCE(cb) {
-      require.ensure([], (require) => {
-        const first = !this.RCE
-        this.RCE = require('canvas-rce/lib/async')
-        require('./initA11yChecker')
-        if (first) {
-          this.loadEventListeners()
-          this.loadingFlag = false
-        }
-        this.loadingCallbacks.forEach((loadingCallback) => {
-          loadingCallback(this.RCE)
+    loadRCE(cb = () => {}) {
+      if (!loadingPromise) {
+        loadingPromise = (window.ENV.use_rce_enhancements
+          ? import(/* webpackChunkName: "canvas-rce-async-chunk" */ './canvas-rce-and-a11y-checker')
+          : import(/* webpackChunkName: "canvas-rce-old-async-chunk" */ './canvas-rce-old-and-a11y-checker')
+        ).then(RCE => {
+          this.RCE = RCE
+          loadEventListeners()
+          return RCE
         })
+      }
+      return loadingPromise.then(() => {
+        this.loadingCallbacks.forEach(loadingCallback => loadingCallback(this.RCE))
         this.loadingCallbacks = []
         cb(this.RCE)
-      }, 'CanvasRCEAsyncChunk')
+      })
     },
 
     /**

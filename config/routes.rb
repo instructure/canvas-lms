@@ -1372,6 +1372,8 @@ CanvasRails::Application.routes.draw do
 
       get 'dashboard/dashboard_cards', controller: 'users', action: 'dashboard_cards', as: :dashboard_dashboard_cards
 
+      get 'users/:id/graded_submissions', controller: 'users', action: 'user_graded_submissions', as: :user_submissions
+
       scope(controller: :user_observees) do
         get    'users/:user_id/observees', action: :index, as: 'user_observees'
         post   'users/:user_id/observees', action: :create
@@ -2173,6 +2175,7 @@ CanvasRails::Application.routes.draw do
       post "accounts/:account_id/csp_settings/domains", :action => :add_domain
       post "accounts/:account_id/csp_settings/domains/batch_create", :action => :add_multiple_domains
       delete "accounts/:account_id/csp_settings/domains", :action => :remove_domain
+      get "accounts/:account_id/csp_log", action: :csp_log
     end
   end
 

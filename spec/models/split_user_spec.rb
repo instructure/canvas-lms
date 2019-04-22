@@ -28,6 +28,58 @@ describe SplitUsers do
     let(:account1) { Account.default }
     let(:sub_account) { account1.sub_accounts.create! }
 
+    it 'should restore terms_of use one way' do
+      user1.accept_terms
+      user1.save!
+      UserMerge.from(user2).into(user1)
+      SplitUsers.split_db_users(user1)
+      expect(user2.reload.preferences[:accepted_terms]).to be_nil
+      expect(user1.reload.preferences[:accepted_terms]).to_not be_nil
+    end
+
+    it 'should restore terms_of use other way' do
+      user1.accept_terms
+      user1.save!
+      UserMerge.from(user1).into(user2)
+      expect(user2.reload.preferences[:accepted_terms]).to_not be_nil
+      SplitUsers.split_db_users(user2)
+      expect(user1.reload.preferences[:accepted_terms]).to_not be_nil
+      expect(user2.reload.preferences[:accepted_terms]).to be_nil
+    end
+
+    it 'should restore terms_of use no way' do
+      UserMerge.from(user1).into(user2)
+      user2.accept_terms
+      user2.save!
+      SplitUsers.split_db_users(user2)
+      expect(user2.reload.preferences[:accepted_terms]).to be_nil
+      expect(user1.reload.preferences[:accepted_terms]).to be_nil
+    end
+
+    it 'should restore terms_of use both ways' do
+      user1.accept_terms
+      user1.save!
+      user2.accept_terms
+      user2.save!
+      UserMerge.from(user1).into(user2)
+      SplitUsers.split_db_users(user2)
+      expect(user2.reload.preferences[:accepted_terms]).to_not be_nil
+      expect(user1.reload.preferences[:accepted_terms]).to_not be_nil
+    end
+
+    it 'should restore names' do
+      user1.name = "jimmy one"
+      user1.save!
+      user2.name = "jenny one"
+      user2.save!
+      UserMerge.from(user1).into(user2)
+      user2.name = "other name"
+      user2.save!
+      SplitUsers.split_db_users(user2)
+      expect(user1.reload.name).to eq "jimmy one"
+      expect(user2.reload.name).to eq "jenny one"
+    end
+
     it 'should restore pseudonyms to the original user' do
       pseudonym1 = user1.pseudonyms.create!(unique_id: 'sam1@example.com')
       pseudonym2 = user2.pseudonyms.create!(unique_id: 'sam2@example.com')
@@ -74,6 +126,16 @@ describe SplitUsers do
     end
 
     describe 'with merge data' do
+
+      it "should move lti_id to the new user" do
+        course1.enroll_user(user1)
+        course2.enroll_user(user2)
+        UserMerge.from(user2).into(user1)
+        UserMerge.from(user1).into(user3)
+        SplitUsers.split_db_users(user3)
+        expect(user3.reload.past_lti_ids.count).to eq 0
+        expect(user1.reload.past_lti_ids.count).to eq 1
+      end
 
       it 'should split multiple users if no merge_data is specified' do
         enrollment1 = course1.enroll_student(user1, enrollment_state: 'active')
@@ -124,6 +186,53 @@ describe SplitUsers do
 
         expect(user1.linked_observers).to eq [observer1]
         expect(user2.linked_observers).to eq [observer2]
+      end
+
+      it 'should handle access tokens' do
+        at = AccessToken.create!(user: user1, :developer_key => DeveloperKey.default)
+        UserMerge.from(user1).into(user2)
+        expect(at.reload.user_id).to eq user2.id
+        SplitUsers.split_db_users(user2)
+        expect(at.reload.user_id).to eq user1.id
+      end
+
+      it 'should handle polls' do
+        poll = Polling::Poll.create!(user: user1, question: 'A Test Poll', description: 'A test description.')
+        UserMerge.from(user1).into(user2)
+        expect(poll.reload.user_id).to eq user2.id
+        SplitUsers.split_db_users(user2)
+        expect(poll.reload.user_id).to eq user1.id
+      end
+
+
+      it 'should handle favorites' do
+        course1.enroll_user(user1)
+        fav = Favorite.create!(user: user1, context: course1)
+        UserMerge.from(user1).into(user2)
+        expect(fav.reload.user_id).to eq user2.id
+        SplitUsers.split_db_users(user2)
+        expect(fav.reload.user_id).to eq user1.id
+      end
+
+
+      it 'should handle ignores' do
+        course1.enroll_user(user1)
+        assignment2 = assignment_model(course: course1)
+        ignore = Ignore.create!(asset: assignment2, user: user1, purpose: 'submitting')
+        UserMerge.from(user1).into(user2)
+        expect(ignore.reload.user_id).to eq user2.id
+        SplitUsers.split_db_users(user2)
+        expect(ignore.reload.user_id).to eq user1.id
+      end
+
+      it 'should handle conversations' do
+          sender = user1
+          recipient = user3
+          convo = sender.initiate_conversation([recipient])
+          UserMerge.from(user1).into(user2)
+          expect(convo.reload.user_id).to eq user2.id
+          SplitUsers.split_db_users(user2)
+          expect(convo.reload.user_id).to eq user1.id
       end
 
       it 'should handle attachments' do
@@ -217,15 +326,17 @@ describe SplitUsers do
       end
 
       it "should move ccs to the new user (but only if they don't already exist)" do
+        notification = Notification.where(name: "Report Generated").first_or_create
         # unconfirmed: active conflict
         user1.communication_channels.create!(path: 'a@instructure.com')
         user2.communication_channels.create!(path: 'A@instructure.com') { |cc| cc.workflow_state = 'active' }
         # active: unconfirmed conflict
         user1.communication_channels.create!(path: 'b@instructure.com') { |cc| cc.workflow_state = 'active' }
         cc = user2.communication_channels.create!(path: 'B@instructure.com')
-        # active: active conflict
-        user1.communication_channels.create!(path: 'c@instructure.com') { |cc| cc.workflow_state = 'active' }
-        user2.communication_channels.create!(path: 'C@instructure.com') { |cc| cc.workflow_state = 'active' }
+        # active: active conflict + notification policy copy
+        np_cc = user1.communication_channels.create!(path: 'c@instructure.com') { |cc| cc.workflow_state = 'active' }
+        np_cc.notification_policies.create!(notification_id: notification.id, frequency: 'weekly')
+        needs_np = user2.communication_channels.create!(path: 'C@instructure.com') { |cc| cc.workflow_state = 'active' }
         # unconfirmed: unconfirmed conflict
         user1.communication_channels.create!(path: 'd@instructure.com')
         user2.communication_channels.create!(path: 'D@instructure.com')
@@ -264,6 +375,7 @@ describe SplitUsers do
           map { |cc| [cc.path, cc.workflow_state] }.sort
 
         UserMerge.from(user1).into(user2)
+        expect(needs_np.notification_policies.take.frequency).to eq 'weekly'
         SplitUsers.split_db_users(user2)
         user1.reload
         user2.reload
@@ -291,6 +403,25 @@ describe SplitUsers do
 
       UserMerge.from(user1).into(user2)
       expect(submission.reload.user).to eq user2
+      SplitUsers.split_db_users(user2)
+      expect(submission.reload.user).to eq user1
+    end
+
+    it 'should move submissions from new courses post merge when appropriate' do
+      pseudonym1 = user1.pseudonyms.create!(unique_id: 'sam1@example.com')
+      UserMerge.from(user1).into(user2)
+      e = course1.enroll_student(user2, enrollment_state: 'active')
+      Enrollment.where(id: e).update_all(sis_pseudonym_id: pseudonym1.id)
+      assignment = course1.assignments.new(title: "some assignment")
+      assignment.workflow_state = "published"
+      assignment.save
+      valid_attributes = {
+        grade: "1.5",
+        grader: @teacher,
+        url: "www.instructure.com"
+      }
+      submission = assignment.submissions.find_by!(user: user2)
+      submission.update!(valid_attributes)
       SplitUsers.split_db_users(user2)
       expect(submission.reload.user).to eq user1
     end

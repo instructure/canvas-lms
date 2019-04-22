@@ -20,7 +20,10 @@ import React from 'react'
 import CommentsContainer from './CommentsContainer'
 import {Query} from 'react-apollo'
 import {SUBMISSION_COMMENT_QUERY, StudentAssignmentShape} from '../../assignmentData'
-import LoadingIndicator from '../LoadingIndicator'
+import LoadingIndicator from '../../../shared/LoadingIndicator'
+import GenericErrorPage from '../../../../shared/components/GenericErrorPage/index'
+import ErrorBoundary from '../../../../shared/components/ErrorBoundary'
+import errorShipUrl from '../../SVG/ErrorShip.svg'
 
 function Comments(props) {
   return (
@@ -29,13 +32,29 @@ function Comments(props) {
       variables={{submissionId: props.assignment.submissionsConnection.nodes[0].id.toString()}}
     >
       {({loading, error, data}) => {
-        // TODO HANDLE ERROR
         if (loading) return <LoadingIndicator />
-        if (error) return `Error!: ${error}`
+        if (error) {
+          return (
+            <GenericErrorPage
+              imageUrl={errorShipUrl}
+              errorSubject="Assignments 2 Student initial query error"
+              errorCategory="Assignments 2 Student Error Page"
+            />
+          )
+        }
         return (
-          <div data-testid="comments-container">
-            <CommentsContainer comments={data.submissionComments.commentsConnection.nodes} />
-          </div>
+          <ErrorBoundary
+            errorComponent={
+              <GenericErrorPage
+                imageUrl={errorShipUrl}
+                errorCategory="Assignments 2 Student Comment Error Page"
+              />
+            }
+          >
+            <div data-testid="comments-container">
+              <CommentsContainer comments={data.submissionComments.commentsConnection.nodes} />
+            </div>
+          </ErrorBoundary>
         )
       }}
     </Query>

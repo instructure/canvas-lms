@@ -642,7 +642,8 @@ describe GroupsController do
   describe "GET 'public_feed.atom'" do
     before :once do
       group_with_user(:active_all => true)
-      @group.discussion_topics.create!(:title => "hi", :message => "intros", :user => @user)
+      @dt = @group.discussion_topics.create!(:title => "hi", :message => "intros", :user => @user)
+      @wp = @group.wiki_pages.create! title: 'a page'
     end
 
     it "should require authorization" do
@@ -664,6 +665,19 @@ describe GroupsController do
       expect(feed).not_to be_nil
       expect(feed.entries).not_to be_empty
       expect(feed.entries.all?{|e| e.authors.present?}).to be_truthy
+    end
+
+    it "excludes unpublished things" do
+      get 'public_feed', params: {:feed_code => @group.feed_code}, format: 'atom'
+      feed = Atom::Feed.load_feed(response.body) rescue nil
+      expect(feed.entries.size).to eq 2
+
+      @wp.unpublish
+      @dt.unpublish! # yes, you really have to shout to unpublish a discussion topic :(
+
+      get 'public_feed', params: {:feed_code => @group.feed_code}, format: 'atom'
+      feed = Atom::Feed.load_feed(response.body) rescue nil
+      expect(feed.entries.size).to eq 0
     end
   end
 

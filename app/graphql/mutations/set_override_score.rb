@@ -45,16 +45,15 @@ class Mutations::SetOverrideScore < Mutations::BaseMutation
     current_enrollments.each do |enrollment|
       score = enrollment.find_score(score_params)
       raise ActiveRecord::RecordNotFound if score.blank?
+      verify_authorized_action!(score.course, :manage_grades)
 
-      if authorized_action?(score.course, :manage_grades)
-        score.update(override_score: input[:override_score])
-        next unless enrollment == requested_enrollment
+      score.update(override_score: input[:override_score])
+      next unless enrollment == requested_enrollment
 
-        return_value = if score.valid?
-          {grades: score}
-        else
-          errors_for(score)
-        end
+      return_value = if score.valid?
+        {grades: score}
+      else
+        errors_for(score)
       end
     end
 

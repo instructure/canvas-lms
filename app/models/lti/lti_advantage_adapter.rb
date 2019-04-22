@@ -45,7 +45,7 @@ module Lti
     end
 
     def launch_url
-      @tool.login_or_launch_uri(extension_type: resource_type)
+      @tool.login_or_launch_url(extension_type: resource_type)
     end
 
     private

@@ -17,7 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + "/../../spec_helper")
-require File.expand_path(File.dirname(__FILE__) + "/../../helpers/graphql_type_tester")
+require_relative "../graphql_spec_helper"
 
 describe Types::AssignmentGroupType do
   context "AssignmentGroup" do

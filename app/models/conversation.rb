@@ -544,7 +544,7 @@ class Conversation < ActiveRecord::Base
     return unless private_hash_changed?
     existing = self.shard.activate do
       ConversationParticipant.unscoped do
-        ConversationParticipant.where(private_hash: private_hash).first.try(:conversation)
+        ConversationParticipant.where(private_hash: private_hash).take&.conversation
       end
     end
     if existing

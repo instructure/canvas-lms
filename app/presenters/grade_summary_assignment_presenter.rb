@@ -30,10 +30,12 @@ class GradeSummaryAssignmentPresenter
   def upload_status
     return unless submission
 
+    # The sort here ensures that statuses received are in the failed,
+    # pending and success order. With that security we can just pluck
+    # first one.
     submission.attachments.
-      where(workflow_state: ['errored', 'pending_upload']).
-      order(:workflow_state).
-      pluck(:workflow_state).
+      map { |a| AttachmentUploadStatus.upload_status(a) }.
+      sort.
       first
   end
 

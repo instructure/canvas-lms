@@ -110,7 +110,7 @@ class ContentParticipationCount < ActiveRecord::Base
   def refresh_unread_count
     transaction do
       self.unread_count = ContentParticipationCount.unread_count_for(content_type, context, user)
-      self.save if self.changed?
+      Shackles.activate(:master) {self.save} if self.changed?
     end
   end
 

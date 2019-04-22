@@ -46,7 +46,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
   end
   let(:new_url) { 'https://www.new-url.com/test' }
   let(:dev_key_id) { developer_key.id }
-  let(:valid_parameters) do
+  let(:params) do
     {
       developer_key: dev_key_params,
       account_id: sub_account.id,
@@ -57,18 +57,6 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       }
     }.compact
   end
-  let(:invalid_parameters) do
-    {
-      developer_key_id: dev_key_id,
-      account_id: sub_account.id,
-      developer_key: dev_key_params,
-      tool_configuration: {
-        settings: invalid_settings
-      }
-    }
-  end
-
-  let(:invalid_settings) { settings.merge({ 'public_jwk' => invalid_public_jwk }) }
 
   before { user_session(admin) }
 
@@ -107,7 +95,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       )
     end
     let(:url) { 'https://www.mytool.com/config/json' }
-    let(:valid_parameters) do
+    let(:params) do
       {
         developer_key: dev_key_params,
         account_id: sub_account.id,
@@ -129,19 +117,24 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
 
       it 'uses the tool configuration JSON from the settings_url' do
         subject
-        expect(config_from_response.settings['launch_url']).to eq settings['launch_url']
+        expect(config_from_response.settings['target_link_uri']).to eq settings['target_link_uri']
       end
 
       it 'sets the "disabled_placements"' do
         subject
         expect(config_from_response.disabled_placements).to match_array(
-          valid_parameters.dig(:tool_configuration, :disabled_placements)
+          params.dig(:tool_configuration, :disabled_placements)
         )
       end
 
       it 'sets the "custom_fields"' do
         subject
-        expect(config_from_response.custom_fields).to eq valid_parameters.dig(:tool_configuration, :custom_fields)
+        expect(config_from_response.settings["custom_fields"]).to eq(
+          'foo' => 'bar',
+          'key' => 'value',
+          'has_expansion' => '$Canvas.user.id',
+          'no_expansion' => 'foo'
+        )
       end
     end
 
@@ -248,8 +241,8 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       expect(subject.redirect_uris).to eq dev_key_params[:redirect_uris].split
     end
 
-    it 'sets the developer key oidc_login_uri' do
-      expect(subject.oidc_login_uri).to eq oidc_login_uri
+    it 'sets the developer key oidc_initiation_url' do
+      expect(subject.oidc_initiation_url).to eq oidc_initiation_url
     end
 
     context 'when scopes are invalid' do
@@ -264,6 +257,16 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
 
   shared_examples_for 'an endpoint that validates public_jwk' do
     let(:make_request) { raise 'set in examples' }
+    let(:tool_config_public_jwk) do
+      {
+        "kty" => "RSA",
+        "e" => "AQAB",
+        "n" => "2YGluUtCi62Ww_TWB38OE6wTaN...",
+        "kid" => "2018-09-18T21:55:18Z",
+        "alg" => "RS256",
+        "use" => "sig"
+      }
+    end
 
     subject do
       make_request
@@ -271,13 +274,13 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
     end
 
     context 'when the public jwk is missing' do
-      let(:invalid_public_jwk) { nil }
+      let(:public_jwk) { nil }
 
-      it { is_expected.to eq '"public_jwk" must be present' }
+      it { is_expected.to be_present }
     end
 
     context 'when the public jwk is missing keys' do
-      let(:invalid_public_jwk) do
+      let(:public_jwk) do
         {
           "e" => "AQAB",
           "n" => "2YGluUtCi62Ww_TWB38OE6wTaN...",
@@ -285,11 +288,11 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
         }
       end
 
-      it { is_expected.to eq 'The following fields are required: kty, e, n, kid, alg, use' }
+      it { is_expected.to be_present }
     end
 
     context 'when the public jwk has an invalid alg' do
-      let(:invalid_public_jwk) do
+      let(:public_jwk) do
         {
           "kty" => "RSA",
           "e" => "AQAB",
@@ -300,11 +303,11 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
         }
       end
 
-      it { is_expected.to eq "invalid /alg. Schema: {\"type\"=>\"string\", \"const\"=>\"RS256\"}" }
+      it { is_expected.to be_present }
     end
 
     context 'when the public jwk has an invalid kty' do
-      let(:invalid_public_jwk) do
+      let(:public_jwk) do
         {
           "kty" => "invalid",
           "e" => "AQAB",
@@ -315,12 +318,12 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
         }
       end
 
-      it { is_expected.to eq "invalid /kty. Schema: {\"type\"=>\"string\", \"const\"=>\"RSA\"}" }
+      it { is_expected.to be_present }
     end
   end
 
   describe '#create' do
-    subject { post :create, params: valid_parameters }
+    subject { post :create, params: params }
     let(:dev_key_id) { nil }
 
     it_behaves_like 'an action that requires manage developer keys', true
@@ -338,24 +341,32 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
     end
 
     it_behaves_like 'an endpoint that accepts a settings_url' do
-      let(:make_request) { post :create, params: valid_parameters }
+      let(:make_request) { post :create, params: params }
     end
 
     it_behaves_like 'an endpoint that validates public_jwk' do
-      let(:make_request) { post :create, params: invalid_parameters }
+      let(:make_request) { post :create, params: params }
     end
 
     it_behaves_like 'an endpoint that accepts developer key parameters' do
       let(:bad_scope_params) {{ account_id: sub_account.id, developer_key: dev_key_params.merge(scopes: ['invalid scope']) }}
-      let(:make_request) { post :create, params: valid_parameters.merge({developer_key: dev_key_params}) }
-      let(:bad_scope_request) { post :create, params: valid_parameters.merge(bad_scope_params) }
+      let(:make_request) { post :create, params: params.merge({developer_key: dev_key_params}) }
+      let(:bad_scope_request) { post :create, params: params.merge(bad_scope_params) }
+    end
+
+    context 'without a redirect_uri present' do
+      let(:dev_key_params) { super().merge(redirect_uris: nil) }
+
+      it 'returns a 400' do
+        expect(post :create, params: params).to have_http_status :bad_request
+      end
     end
   end
 
   describe '#update' do
-    subject { put :update, params: valid_parameters }
+    subject { put :update, params: params }
 
-    let(:launch_url) { new_url }
+    let(:target_link_uri) { new_url }
 
     before do
       tool_configuration
@@ -376,25 +387,21 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
       end
     end
 
-    it_behaves_like 'an endpoint that accepts a settings_url' do
-      let(:make_request) { post :update, params: valid_parameters }
-    end
-
     it_behaves_like 'an endpoint that validates public_jwk' do
-      let(:make_request) { put :update, params: invalid_parameters }
+      let(:make_request) { put :update, params: params }
     end
 
     it_behaves_like 'an action that requires manage developer keys'
 
     it_behaves_like 'an endpoint that accepts developer key parameters' do
       let(:bad_scope_params) {{ developer_key: dev_key_params.merge(scopes: ['invalid scope']) }}
-      let(:make_request) { put :update, params: valid_parameters.merge({developer_key: dev_key_params}) }
-      let(:bad_scope_request) { put :update, params: valid_parameters.merge(bad_scope_params) }
+      let(:make_request) { put :update, params: params.merge({developer_key: dev_key_params}) }
+      let(:bad_scope_request) { put :update, params: params.merge(bad_scope_params) }
     end
   end
 
   describe '#show' do
-    subject { get :show, params: valid_parameters.except(:tool_configuration) }
+    subject { get :show, params: params.except(:tool_configuration) }
 
     before do
       tool_configuration
@@ -416,7 +423,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
   end
 
   describe '#destroy' do
-    subject {  delete :destroy, params: valid_parameters.except(:tool_configuration) }
+    subject {  delete :destroy, params: params.except(:tool_configuration) }
 
     before do
       tool_configuration

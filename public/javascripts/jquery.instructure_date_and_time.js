@@ -25,8 +25,6 @@ import renderDatepickerTime from 'jsx/shared/render-datepicker-time'
 import './jquery.keycodes'
 import './vendor/date' /* Date.parse, Date.UTC, Date.today */
 import 'jqueryui/datepicker'
-import 'jqueryui/sortable'
-import 'jqueryui/widget'
 
   // fudgeDateForProfileTimezone is used to apply an offset to the date which represents the
   // difference between the user's configured timezone in their profile, and the timezone

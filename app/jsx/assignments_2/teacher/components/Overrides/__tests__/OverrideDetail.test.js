@@ -51,7 +51,7 @@ it('renders editable override details', () => {
   })
 
   const {getByText, getByTestId} = render(
-    <OverrideDetail override={override} onChangeOverride={() => {}} readOnly={false} />
+    <OverrideDetail override={override} onChangeOverride={() => {}} />
   )
 
   // the labels

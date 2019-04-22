@@ -83,8 +83,10 @@ module Canvas::Redis
       raise
     end
 
-    CanvasStatsd::Statsd.increment("redis.errors.all")
-    CanvasStatsd::Statsd.increment("redis.errors.#{CanvasStatsd::Statsd.escape(redis_name)}")
+    InstStatsd::Statsd.increment("redis.errors.all")
+    InstStatsd::Statsd.increment("redis.errors.#{InstStatsd::Statsd.escape(redis_name)}",
+                                 short_stat: 'redis.errors',
+                                 tags: {redis_name: InstStatsd::Statsd.escape(redis_name)})
     Rails.logger.error "Failure handling redis command on #{redis_name}: #{e.inspect}"
 
     Setting.skip_cache do

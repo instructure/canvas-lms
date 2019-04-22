@@ -16,8 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-Types::LegacyNodeType = GraphQL::EnumType.define do
-  name "NodeType"
+class Types::LegacyNodeType < Types::BaseEnum
+  graphql_name "NodeType"
 
   value "Assignment"
   value "AssignmentGroup"

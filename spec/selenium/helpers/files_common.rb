@@ -170,7 +170,7 @@ module FilesCommon
 
   def create_new_folder
     f('.btn-add-folder').click
-    f('.ef-edit-name-form').submit
+    f("input[aria-label='Folder Name']").send_keys(:return)
     wait_for_ajaximations
     all_files_folders.first
   end

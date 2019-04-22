@@ -80,7 +80,6 @@ it('has 4 options if quiz.next is enabled', () => {
       onChange={() => {}}
       onChangeMode={() => {}}
       selectedAssignmentType="assignment"
-      readOnly={false}
     />
   )
   const input = container.querySelector('input')
@@ -98,9 +97,8 @@ it('calls onChange when the selection changes', () => {
         onChange={onchange}
         onChangeMode={onchangemode}
         selectedAssignmentType="assignment"
-        readOnly={false}
       />
-      <span id="click-me" tabIndex="-1">
+      <span id="focus-me" tabIndex="-1">
         just here to get focus
       </span>
     </div>
@@ -109,7 +107,7 @@ it('calls onChange when the selection changes', () => {
   input.click()
   const option = document.querySelectorAll('li[role="option"]')[1]
   option.click()
-  container.querySelector('#click-me').focus()
+  container.querySelector('#focus-me').focus()
   expect(onchangemode).toHaveBeenCalledWith('view')
   expect(onchange).not.toHaveBeenCalled()
 
@@ -121,7 +119,6 @@ it('calls onChange when the selection changes', () => {
         onChange={onchange}
         onChangeMode={onchangemode}
         selectedAssignmentType="peer-review"
-        readOnly={false}
       />
       <span id="click-me" tabIndex="-1">
         just here to get focus

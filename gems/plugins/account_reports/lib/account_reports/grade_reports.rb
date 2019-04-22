@@ -76,6 +76,7 @@ module AccountReports
       headers << I18n.t('enrollment state')
       headers << I18n.t('unposted current score')
       headers << I18n.t('unposted final score')
+      headers << I18n.t('override score') if include_override_score?
 
       courses = root_account.all_courses
       courses = courses.where(:enrollment_term_id => term) if term
@@ -87,7 +88,7 @@ module AccountReports
             users = student_chunk.map {|e| User.new(id: e.user_id)}.compact
             users.uniq!
             users_by_id = users.index_by(&:id)
-            pseudonyms = load_cross_shard_logins(users, include_deleted: @include_deleted)
+            pseudonyms = preload_logins_for_users(users, include_deleted: @include_deleted)
             student_chunk.each do |student|
               p = loaded_pseudonym(pseudonyms,
                                    users_by_id[student.user_id],
@@ -112,6 +113,7 @@ module AccountReports
               arr << student["enroll_state"]
               arr << student["unposted_current_score"]
               arr << student["unposted_final_score"]
+              arr << student["override_score"] if include_override_score?
               csv << arr
             end
           end
@@ -166,12 +168,14 @@ module AccountReports
         headers << I18n.t('%{name} final score', name: gp.title)
         headers << I18n.t('%{name} unposted current score', name: gp.title)
         headers << I18n.t('%{name} unposted final score', name: gp.title)
+        headers << I18n.t('%{name} override score', name: gp.title) if include_override_score?
       }
       headers << I18n.t('current score')
       headers << I18n.t('final score')
       headers << I18n.t('enrollment state')
       headers << I18n.t('unposted current score')
       headers << I18n.t('unposted final score')
+      headers << I18n.t('override score') if include_override_score?
 
       generate_and_run_report headers do |csv|
         course_ids = root_account.all_courses.where(:enrollment_term_id => term).order(:id).pluck(:id)
@@ -180,7 +184,7 @@ module AccountReports
             users = student_chunk.map {|e| User.new(id: e.user_id)}.compact
             users.uniq!
             users_by_id = users.index_by(&:id)
-            pseudonyms = load_cross_shard_logins(users, include_deleted: @include_deleted)
+            pseudonyms = preload_logins_for_users(users, include_deleted: @include_deleted)
             students_by_course = student_chunk.group_by { |x| x.course_id }
             students_by_course.each do |course_id, course_students|
               scores = indexed_scores(course_students, grading_periods)
@@ -212,12 +216,14 @@ module AccountReports
                   arr << scores_for_student[:final_score]
                   arr << scores_for_student[:unposted_current_score]
                   arr << scores_for_student[:unposted_final_score]
+                  arr << scores_for_student[:override_score] if include_override_score?
                 end
                 arr << student["current_score"]
                 arr << student["final_score"]
                 arr << student["enroll_state"]
                 arr << student["unposted_current_score"]
                 arr << student["unposted_final_score"]
+                arr << student["override_score"] if include_override_score?
                 csv << arr
               end
             end
@@ -238,7 +244,8 @@ module AccountReports
         :current_score,
         :final_score,
         :unposted_current_score,
-        :unposted_final_score
+        :unposted_final_score,
+        :override_score
       ).index_by { |score| "#{score[:enrollment_id]}:#{score[:grading_period_id]}" }
     end
 
@@ -260,6 +267,7 @@ module AccountReports
                 sc.final_score,
                 sc.unposted_current_score,
                 sc.unposted_final_score,
+                sc.override_score,
            CASE WHEN enrollments.workflow_state = 'active' THEN 'active'
                 WHEN enrollments.workflow_state = 'completed' THEN 'concluded'
                 WHEN enrollments.workflow_state = 'inactive' THEN 'inactive'
@@ -290,6 +298,10 @@ module AccountReports
       end
 
       students = add_course_sub_account_scope(students, 'c')
+    end
+
+    def include_override_score?
+      @account.feature_allowed?(:final_grades_override)
     end
   end
 end

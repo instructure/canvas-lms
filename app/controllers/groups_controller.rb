@@ -728,6 +728,7 @@ class GroupsController < ApplicationController
 
     includes = Array(params[:include])
     users = Api.paginate(users, self, api_v1_group_users_url)
+    UserPastLtiId.manual_preload_past_lti_ids(users, @context) if ['uuid', 'lti_id'].any? { |id| includes.include? id }
     json_users = users_json(users, @current_user, session, includes, @context, nil, Array(params[:exclude]))
 
     if includes.include?('group_submissions') && @context.context_type == "Course"
@@ -759,8 +760,8 @@ class GroupsController < ApplicationController
     end
     @entries = []
     @entries.concat @context.calendar_events.active
-    @entries.concat @context.discussion_topics.active
-    @entries.concat @context.wiki_pages
+    @entries.concat @context.discussion_topics.published
+    @entries.concat @context.wiki_pages.published
     @entries = @entries.sort_by{|e| e.updated_at}
     @entries.each do |entry|
       feed.entries << entry.to_atom(:context => @context)

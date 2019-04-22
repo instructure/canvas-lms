@@ -35,13 +35,13 @@ describe "better_file_browsing" do
       user_session @teacher
     end
 
-    it "should display new files UI", :xbrowser, priority: "1", test_id: 133092 do
+    it "should display new files UI", priority: "1", test_id: 133092 do
       get "/courses/#{@course.id}/files"
       expect(f('.btn-upload')).to be_displayed
       expect(all_files_folders.count).to eq 1
     end
 
-    it "should load correct column values on uploaded file", :xbrowser, priority: "1", test_id: 133129 do
+    it "should load correct column values on uploaded file", priority: "1", test_id: 133129 do
       get "/courses/#{@course.id}/files"
       time_current = @course.attachments.first.updated_at.strftime("%l:%M%P").strip
       expect(ff('.ef-name-col__text')[0]).to include_text 'example.pdf'
@@ -186,7 +186,7 @@ describe "better_file_browsing" do
       get "/courses/#{@course.id}/files"
     end
 
-    it "should search for a file", :xbrowser, priority: "2", test_id: 220355 do
+    it "should search for a file", priority: "2", test_id: 220355 do
       expect(all_files_folders).to have_size 3
       f("input[type='search']").send_keys "b_fi", :return
       expect(all_files_folders).to have_size 1

@@ -36,7 +36,7 @@ OverrideAssignTo.propTypes = {
 }
 OverrideAssignTo.defaultProps = {
   variant: 'summary',
-  readOnly: true
+  readOnly: false
 }
 
 // mostly lifted from instui Pill, but that component uppercases

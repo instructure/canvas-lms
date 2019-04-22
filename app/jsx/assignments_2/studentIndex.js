@@ -15,18 +15,30 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {GetLinkStateDefaults} from './student/assignmentData'
 import {ApolloProvider, createClient} from '../canvas-apollo'
 import StudentView from './student/StudentView'
+import ErrorBoundary from '../shared/components/ErrorBoundary'
+import GenericErrorPage from '../shared/components/GenericErrorPage/index'
+import errorShipUrl from './student/SVG/ErrorShip.svg'
 
-const client = createClient({defaults: GetLinkStateDefaults()})
+const client = createClient()
 
 export default function renderAssignmentsApp(env, elt) {
   ReactDOM.render(
     <ApolloProvider client={client}>
-      <StudentView assignmentLid={ENV.ASSIGNMENT_ID.toString()} />
+      <ErrorBoundary
+        errorComponent={
+          <GenericErrorPage
+            imageUrl={errorShipUrl}
+            errorCategory="Assignments 2 Student Error Page"
+          />
+        }
+      >
+        <StudentView assignmentLid={ENV.ASSIGNMENT_ID.toString()} />
+      </ErrorBoundary>
     </ApolloProvider>,
     elt
   )

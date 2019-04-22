@@ -17,7 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + "/../../spec_helper")
-require File.expand_path(File.dirname(__FILE__) + "/../../helpers/graphql_type_tester")
+require_relative "../graphql_spec_helper"
 
 describe Types::AssignmentType do
   let_once(:course) { course_factory(active_all: true) }
@@ -140,6 +140,17 @@ describe Types::AssignmentType do
         to receive(:low_level_locked_for?).
         and_return(can_view: false)
       expect(assignment_type.resolve("description", request: ActionDispatch::TestRequest.create)).to be_nil
+    end
+
+    it "works for assignments in public courses" do
+      course.update! is_public: true
+      expect(
+        assignment_type.resolve(
+          "description",
+          request: ActionDispatch::TestRequest.create,
+          current_user: nil
+        )
+      ).to include "Content"
     end
 
     it "uses api_user_content for the description" do
@@ -272,6 +283,38 @@ describe Types::AssignmentType do
 
     assignment.update_attribute :grading_type, "fakefakefake"
     expect(assignment_type.resolve("gradingType")).to be_nil
+  end
+
+  context "overridden assignments" do
+    before(:once) do
+      @assignment_due_at = 1.month.from_now
+
+      @overridden_due_at = 2.weeks.from_now
+      @overridden_unlock_at = 1.week.from_now
+      @overridden_lock_at = 3.weeks.from_now
+
+      @overridden_assignment = course.assignments.create!(title: "asdf",
+                                                          workflow_state: "published",
+                                                          due_at: @assignment_due_at)
+
+      override = assignment_override_model(assignment: @overridden_assignment,
+                                           due_at: @overridden_due_at,
+                                           unlock_at: @overridden_unlock_at,
+                                           lock_at: @overridden_lock_at)
+
+      override.assignment_override_students.build(user: student)
+      override.save!
+    end
+
+    let(:overridden_assignment_type) { GraphQLTypeTester.new(@overridden_assignment) }
+
+    it "returns overridden assignment dates" do
+      expect(overridden_assignment_type.resolve("dueAt", current_user: teacher)).to eq @assignment_due_at.iso8601
+      expect(overridden_assignment_type.resolve("dueAt", current_user: student)).to eq @overridden_due_at.iso8601
+
+      expect(overridden_assignment_type.resolve("lockAt", current_user: student)).to eq @overridden_lock_at.iso8601
+      expect(overridden_assignment_type.resolve("unlockAt", current_user: student)).to eq @overridden_unlock_at.iso8601
+    end
   end
 
   describe Types::AssignmentOverrideType do

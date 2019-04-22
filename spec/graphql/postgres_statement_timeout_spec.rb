@@ -17,6 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+require_relative "./graphql_spec_helper"
 
 describe "graphql pg statement_timeouts" do
   before(:once) do
@@ -51,7 +52,7 @@ describe "graphql pg statement_timeouts" do
       Setting.set('graphql_statement_timeout', 1)
       expect {
         CanvasSchema.execute(QUERY, context: {current_user: @teacher})
-      }.to raise_error(ActiveRecord::StatementInvalid)
+      }.to raise_error(GraphQLPostgresTimeout::Error)
     end
   end
 
@@ -66,9 +67,9 @@ describe "graphql pg statement_timeouts" do
     it "fails when slow" do
       make_stuff_slow
       Setting.set('graphql_statement_timeout', 1)
-      expect {
-        CanvasSchema.execute(MUTATION, context: {current_user: @teacher})
-      }.to raise_error(ActiveRecord::StatementInvalid)
+      result = CanvasSchema.execute(MUTATION, context: {current_user: @teacher})
+      expect(result.dig("data", "updateAssignment")).to be_nil
+      expect(result.dig("errors", 0, "path")).to eq ["updateAssignment"]
     end
   end
 end

@@ -27,7 +27,7 @@ import View from '@instructure/ui-layout/lib/components/View'
 import {TeacherAssignmentShape} from '../assignmentData'
 import TeacherViewContext from './TeacherViewContext'
 import Toolbox from './Toolbox'
-import EditableHeading from './Editables/EditableHeading'
+import AssignmentName from './Editables/AssignmentName'
 import AssignmentModules from './Editables/AssignmentModules'
 import AssignmentType from './Editables/AssignmentType'
 import AssignmentGroup from './Editables/AssignmentGroup'
@@ -59,6 +59,8 @@ export default class Header extends React.Component {
   static propTypes = {
     assignment: TeacherAssignmentShape.isRequired,
     onChangeAssignment: func.isRequired,
+    onValidate: func.isRequired,
+    onSetWorkstate: func.isRequired,
     onUnsubmittedClick: func,
     onPublishChange: func,
     onDelete: func,
@@ -69,7 +71,7 @@ export default class Header extends React.Component {
     onUnsubmittedClick: () => {},
     onPublishChange: () => {},
     onDelete: () => {},
-    readOnly: true
+    readOnly: false
   }
 
   constructor(props) {
@@ -81,16 +83,12 @@ export default class Header extends React.Component {
       assignmentTypeMode: initialMode,
       selectedAssignmentType: isNewAssignment ? null : 'assignment',
 
-      moduleList: props.assignment.course.modulesConnection.nodes,
       modulesMode: initialMode,
 
-      assignmentGroupList: props.assignment.assignmentGroup && [props.assignment.assignmentGroup],
       assignmentGroupMode: initialMode,
 
       nameMode: initialMode
     }
-
-    this.namePlaceholder = I18n.t('Assignment name')
   }
 
   handleTypeModeChange = mode => {
@@ -144,18 +142,7 @@ export default class Header extends React.Component {
   }
 
   handleModulesChangeMode = mode => {
-    this.setState((prevState, props) => {
-      let moduleList = prevState.moduleList
-      if (mode === 'edit') {
-        // TODO: probably shouldn't come from here
-        // or if it does, exhaust all the pages
-        moduleList = props.assignment.course.modulesConnection.nodes
-      }
-      return {
-        modulesMode: mode,
-        moduleList
-      }
-    })
+    this.setState({modulesMode: mode})
   }
 
   // TODO: support +Module
@@ -168,25 +155,12 @@ export default class Header extends React.Component {
   //   }))
   // }
 
-  handleGroupChange = selectedAssignmentGroupId => {
-    const grp = this.state.assignmentGroupList.find(g => g.lid === selectedAssignmentGroupId)
-    this.props.onChangeAssignment('assignmentGroup', grp)
+  handleGroupChange = selectedAssignmentGroup => {
+    this.props.onChangeAssignment('assignmentGroup', selectedAssignmentGroup)
   }
 
   handleGroupChangeMode = mode => {
-    this.setState((prevState, props) => {
-      let assignmentGroupList = prevState.groupList
-      if (mode === 'edit') {
-        // TODO: exhaust all the pages, somehow
-        assignmentGroupList = props.assignment.course.assignmentGroupsConnection.nodes
-      } else {
-        assignmentGroupList = prevState.assignmentGroupList
-      }
-      return {
-        assignmentGroupList,
-        assignmentGroupMode: mode
-      }
-    })
+    this.setState({assignmentGroupMode: mode})
   }
 
   handleNameChange = name => {
@@ -215,8 +189,7 @@ export default class Header extends React.Component {
             <View display="block" padding="xx-small 0 0 xx-small">
               <AssignmentModules
                 mode={this.state.modulesMode}
-                assignment={assignment}
-                moduleList={this.state.moduleList}
+                courseId={assignment.course.lid}
                 selectedModules={assignment.modules}
                 onChange={this.handleModulesChange}
                 onChangeMode={this.handleModulesChangeMode}
@@ -227,10 +200,8 @@ export default class Header extends React.Component {
             <View display="block" padding="xx-small 0 0 xx-small">
               <AssignmentGroup
                 mode={this.state.assignmentGroupMode}
-                assignmentGroupList={this.state.assignmentGroupList}
-                selectedAssignmentGroupId={
-                  assignment.assignmentGroup && assignment.assignmentGroup.lid
-                }
+                courseId={assignment.course.lid}
+                selectedAssignmentGroup={assignment.assignmentGroup}
                 onChange={this.handleGroupChange}
                 onChangeMode={this.handleGroupChangeMode}
                 onAddGroup={this.handleAddGroup}
@@ -238,17 +209,12 @@ export default class Header extends React.Component {
               />
             </View>
             <View display="block" padding="medium xx-small large xx-small">
-              <EditableHeading
+              <AssignmentName
                 mode={this.state.nameMode}
-                viewAs="div"
-                level="h1"
-                value={assignment.name}
+                name={assignment.name}
                 onChange={this.handleNameChange}
                 onChangeMode={this.handleNameChangeMode}
-                placeholder={this.namePlaceholder}
-                label={I18n.t('Edit title')}
-                required
-                requiredMessage={I18n.t('Assignment name is required')}
+                onValidate={this.props.onValidate}
                 readOnly={this.props.readOnly}
               />
             </View>

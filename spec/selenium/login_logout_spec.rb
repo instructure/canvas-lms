@@ -40,7 +40,7 @@ describe "login logout test" do
     expect(f('[aria-label="Profile tray"] h2').text).to eq @user.primary_pseudonym.unique_id
   end
 
-  it "should show error message if wrong credentials are used", :xbrowser, priority: "2" do
+  it "should show error message if wrong credentials are used", priority: "2" do
     get "/login"
     fill_in_login_form("fake@user.com", "fakepass")
     assert_flash_error_message("Invalid username")

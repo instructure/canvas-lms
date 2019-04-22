@@ -17,22 +17,19 @@
  */
 import I18n from 'i18n!assignments_2'
 import React from 'react'
-import Container from '@instructure/ui-core/lib/components/Container'
 import View from '@instructure/ui-layout/lib/components/View'
-import Text from '@instructure/ui-core/lib/components/Text'
+import Text from '@instructure/ui-elements/lib/components/Text'
 import {string} from 'prop-types'
 
 function ErrorPageHeader(props) {
   return (
     <React.Fragment>
-      <Container margin="large auto" size="small" display="block">
-        <View margin="small auto" size="x-small" display="block">
-          <img alt="" src={props.imageUrl} />
-        </View>
-      </Container>
-      <Container margin="small" display="block">
+      <View margin="large auto" display="block">
+        <img alt="" src={props.imageUrl} />
+      </View>
+      <View margin="small" display="block">
         <Text margin="x-small">{I18n.t('Something broke unexpectedly.')}</Text>
-      </Container>
+      </View>
     </React.Fragment>
   )
 }

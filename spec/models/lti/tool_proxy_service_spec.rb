@@ -407,6 +407,21 @@ module Lti
       end
     end
 
+    describe '#recreate_missing_subscriptions' do
+      before do
+        message_handler.update!(
+          capabilities: [Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2]
+        )
+        message_handler.dup.update!(message_type: 'content-item')
+      end
+
+      it 'recreats subscriptions for each message handler' do
+        expect(AssignmentConfigurationToolLookup).to receive(:send_later_enqueue_args).twice
+
+        ToolProxyService.recreate_missing_subscriptions(tool_proxy)
+      end
+    end
+
     describe '#delete_subscriptions' do
       let(:assignment) { course.assignments.create!(name: 'banana') }
       let(:assignment_two) do

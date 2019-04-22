@@ -628,7 +628,7 @@ describe SubmissionsController do
         expect(response).to have_http_status(:unauthorized)
       end
 
-      context "when assignment is anonymous" do
+      context "when anonymous grading is enabled for the assignment" do
         before(:each) do
           assignment.update!(anonymous_grading: true)
         end
@@ -641,6 +641,30 @@ describe SubmissionsController do
         it "renders unauthorized for peer reviewer of a student not under view" do
           new_student = course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user
           get :show, params: {course_id: course.id, assignment_id: assignment.id, id: new_student.id}
+          expect(response).to have_http_status(:unauthorized)
+        end
+      end
+
+      context "when anonymous peer reviews are enabled for the assignment" do
+        before(:each) do
+          assignment.update!(anonymous_peer_reviews: true)
+        end
+
+        it "returns okay when a student attempts to view their own submission" do
+          get :show, params: {course_id: course.id, assignment_id: assignment.id, id: student.id}
+          expect(response).to have_http_status(:ok)
+        end
+
+        it "returns okay when a teacher attempts to view a student's submission" do
+          teacher = course.enroll_teacher(User.create!, enrollment_state: "active").user
+          user_session(teacher)
+          get :show, params: {course_id: course.id, assignment_id: assignment.id, id: student.id}
+          expect(response).to have_http_status(:ok)
+        end
+
+        it "renders unauthorized when a peer reviewer attempts to view the submission under review non-anonymously" do
+          user_session(reviewer)
+          get :show, params: {course_id: course.id, assignment_id: assignment.id, id: student.id}
           expect(response).to have_http_status(:unauthorized)
         end
       end

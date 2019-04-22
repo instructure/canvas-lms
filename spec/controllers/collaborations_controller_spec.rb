@@ -158,6 +158,16 @@ describe CollaborationsController do
         expect(hash['collaborator_lti_id']).to eq @student.lti_context_id
       end
 
+      it "should include collaborator old_lti_id" do
+        Lti::Asset.opaque_identifier_for(@student)
+        UserPastLtiId.create!(user: @student, context: @collab.context, user_lti_id: @student.lti_id, user_lti_context_id: 'old_lti_id', user_uuid: 'old')
+        get 'members', params: {id: @collab.id, include: ['collaborator_lti_id']}
+        @student.reload
+        hash = JSON.parse(@response.body).first
+
+        expect(hash['collaborator_lti_id']).to eq 'old_lti_id'
+      end
+
       it "should include avatar_image_url" do
         @student.avatar_image_url = 'https://www.example.com/awesome-avatar.png'
         @student.save!

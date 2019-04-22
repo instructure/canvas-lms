@@ -27,7 +27,12 @@ export const CONFIG = {
 }
 
 export function start(element, props = {}, state = defaultState) {
-  const store = configStore(state)
+  const initialState = {...state}
+  if (props.initialCspSettings) {
+    initialState.cspEnabled = props.initialCspSettings.enabled
+    initialState.cspInherited = props.initialCspSettings.inherited
+  }
+  const store = configStore(initialState, props.api)
 
   render(
     <Provider store={store}>

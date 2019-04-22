@@ -25,10 +25,11 @@ let props
 QUnit.module('ThemeCard Component', {
   setup() {
     props = {
-      name: 'Theme Name',
+      name: 'Test Theme',
       isActiveBrandConfig: false,
       isDeleteable: true,
       isBeingDeleted: false,
+      open: sinon.stub(),
       startDeleting: sinon.stub(),
       cancelDelete: sinon.stub(),
       onDelete: sinon.stub(),
@@ -79,20 +80,13 @@ test('Indicates if it is the current theme', () => {
   )
 })
 
-test('Shows delete overlay if isBeingDeleted is true', () => {
+test('Shows delete modal if isBeingDeleted is true', () => {
   let wrapper = shallow(<ThemeCard {...props} />)
-  notOk(
-    wrapper.find('.ic-ThemeCard-overlay__heading').exists(),
-    'does not show delete overlay heading'
-  )
+  notOk(wrapper.find('ModalBody').exists())
 
   props.isBeingDeleted = true
   wrapper = shallow(<ThemeCard {...props} />)
-  equal(
-    wrapper.find('.ic-ThemeCard-overlay__heading').text(),
-    'Delete this theme?',
-    'shows delete overlay heading'
-  )
+  equal(wrapper.find('ModalBody').prop('children'), 'Delete Test Theme?')
 })
 
 test('Shows tooltip if there are multiple cards of the same theme', () => {

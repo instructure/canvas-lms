@@ -21,10 +21,6 @@ import $ from 'jquery'
  * builds and interacts with hidden input file for kaltura uploads
  */
 export default class FileInputManager {
-  constructur() {
-    return (this.allowedMedia = ['audio', 'video'])
-  }
-
   resetFileInput = (callback, id, parentId) => {
     if (!id) id = 'file_upload'
     if (!parentId) parentId = '#media_upload_settings'

@@ -18,9 +18,14 @@
 import gql from 'graphql-tag'
 import {bool, number, shape, string, arrayOf} from 'prop-types'
 
-export function GetLinkStateDefaults() {
-  const defaults = {}
-  if (!window.ENV) {
+export function GetAssignmentEnvVariables() {
+  const defaults = {
+    assignmentUrl: '',
+    currentUserId: null,
+    modulePrereq: null,
+    moduleUrl: ''
+  }
+  if (!window.ENV || !Object.keys(window.ENV).length) {
     return defaults
   }
 
@@ -29,6 +34,7 @@ export function GetLinkStateDefaults() {
   }`
   defaults.assignmentUrl = `${baseUrl}/assignments`
   defaults.moduleUrl = `${baseUrl}/modules`
+  defaults.currentUserId = ENV.current_user_id
 
   if (ENV.PREREQS.items && ENV.PREREQS.items.length !== 0 && ENV.PREREQS.items[0].prev) {
     const prereq = ENV.PREREQS.items[0].prev
@@ -41,7 +47,7 @@ export function GetLinkStateDefaults() {
     defaults.modulePrereq = null
   }
 
-  return {env: {...defaults, __typename: 'env'}}
+  return {...defaults}
 }
 
 export const STUDENT_VIEW_QUERY = gql`
@@ -59,14 +65,6 @@ export const STUDENT_VIEW_QUERY = gql`
         allowedAttempts
         assignmentGroup {
           name
-        }
-        env @client {
-          assignmentUrl
-          moduleUrl
-          modulePrereq {
-            title
-            link
-          }
         }
         lockInfo {
           isLocked
@@ -103,9 +101,24 @@ export const SUBMISSION_COMMENT_QUERY = gql`
             _id
             comment
             updatedAt
+            mediaObject {
+              id
+              title
+              mediaType
+              mediaSources {
+                src: url
+                type: contentType
+              }
+            }
             author {
               avatarUrl
               shortName
+            }
+            attachments {
+              _id
+              displayName
+              mimeClass
+              url
             }
           }
         }
@@ -114,14 +127,33 @@ export const SUBMISSION_COMMENT_QUERY = gql`
   }
 `
 
+export const AttachmentShape = shape({
+  _id: string,
+  displayName: string,
+  mimeClass: string,
+  url: string
+})
+
 export const CommentShape = shape({
   _id: string,
+  attachments: arrayOf(AttachmentShape),
   comment: string,
+  mediaObject: MediaObjectShape,
   author: shape({
     avatarUrl: string,
     shortName: string
   }),
   updatedAt: string
+})
+
+export const MediaObjectShape = shape({
+  id: string,
+  title: string,
+  mediaType: string,
+  mediaSources: shape({
+    src: string,
+    type: string
+  })
 })
 
 export const StudentAssignmentShape = shape({
@@ -140,6 +172,7 @@ export const StudentAssignmentShape = shape({
   env: shape({
     assignmentUrl: string.isRequired,
     moduleUrl: string.isRequired,
+    currentUserId: string,
     modulePrereq: shape({
       title: string.isRequired,
       link: string.isRequired
@@ -169,5 +202,5 @@ export const StudentAssignmentShape = shape({
         submissionStatus: string
       })
     ).isRequired
-  }).isRequired
+  })
 })

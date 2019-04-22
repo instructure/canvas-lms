@@ -23,6 +23,7 @@ import Backbone from 'Backbone'
 import updateSubnavMenuToggle from '../subnav_menu/updateSubnavMenuToggle'
 import splitAssetString from 'compiled/str/splitAssetString'
 import {isMathMLOnPage, loadMathJax} from 'mathml'
+import setupCSP from '../account_settings/alert_enforcement'
 
 // modules that do their own thing on every page that simply need to be required
 import 'translations/_core_en'
@@ -127,6 +128,9 @@ if (!supportsCSSVars) {
   }, 'canvasCssVariablesPolyfill')
 }
 
+
+
 $(() => {
   if (isMathMLOnPage()) loadMathJax('TeX-MML-AM_HTMLorMML')
+  setupCSP(window.document);
 })

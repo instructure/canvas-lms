@@ -246,7 +246,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       if e[:question_points]
         cnt += e[:pick_count]
       else
-        cnt += 1 unless e[:unsupported]
+        cnt += 1 unless e[:unsupported] || e[:question_type] == Quizzes::QuizQuestion::Q_TEXT_ONLY
       end
     end
 

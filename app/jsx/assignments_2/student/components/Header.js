@@ -64,7 +64,9 @@ class Header extends React.Component {
   }
 
   render() {
-    const submission = this.props.assignment.submissionsConnection.nodes[0]
+    const submission = this.props.assignment.submissionsConnection
+      ? this.props.assignment.submissionsConnection.nodes[0]
+      : {}
     return (
       <React.Fragment>
         <div
@@ -86,9 +88,9 @@ class Header extends React.Component {
           {!this.state.isSticky && <AssignmentGroupModuleNav assignment={this.props.assignment} />}
           <Flex margin={this.state.isSticky ? '0' : '0 0 medium 0'}>
             <FlexItem shrink>
-              <DateTitle assignment={this.props.assignment} />
+              <DateTitle isSticky={this.state.isSticky} assignment={this.props.assignment} />
             </FlexItem>
-            <FlexItem grow>
+            <FlexItem grow align="start">
               <GradeDisplay
                 gradingType={this.props.assignment.gradingType}
                 receivedGrade={submission.grade}
@@ -110,7 +112,9 @@ class Header extends React.Component {
                       </FlexItem>
                     )}
                   <FlexItem grow>
-                    <SubmissionStatusPill submissionStatus={submission.submissionStatus} />
+                    {submission.submissionStatus && (
+                      <SubmissionStatusPill submissionStatus={submission.submissionStatus} />
+                    )}
                   </FlexItem>
                 </Flex>
               </FlexItem>
@@ -128,6 +132,7 @@ class Header extends React.Component {
             >
               <StepContainer
                 assignment={this.props.assignment}
+                forceLockStatus={!this.props.assignment.env.currentUserId} // TODO: replace with new 'self' graphql query when ready
                 isCollapsed={this.state.isSticky}
                 collapsedLabel={I18n.t('Submitted')}
               />

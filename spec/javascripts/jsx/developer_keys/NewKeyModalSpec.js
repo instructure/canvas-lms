@@ -48,7 +48,7 @@ const developerKey = {
   name: 'Dev Key Name',
   notes: 'all the notas',
   redirect_uri: 'http://my_redirect_uri.com',
-  redirect_uris: '',
+  redirect_uris: 'http://my_redirect_uri.com',
   user_id: '53532',
   user_name: 'billy bob',
   vendor_code: 'b3w9w9bf',
@@ -427,5 +427,34 @@ test('saves customizations', () => {
   )
   wrapper.instance().saveCustomizations()
   ok(ltiStub.calledWith(['https://www.test.com/lineitem'], ['account_navigation'], 22, {}, null))
+  wrapper.unmount()
+})
+
+test('flashes an error if redirect_uris is empty', () => {
+  const flashStub = sinon.stub($, 'flashError')
+  const createOrEditSpy = sinon.spy()
+  const dispatchSpy = sinon.spy()
+  const fakeActions = { createOrEditDeveloperKey: createOrEditSpy }
+  const fakeStore = { dispatch: dispatchSpy }
+  const developerKey2 = Object.assign({}, developerKey, { require_scopes: true, scopes: [], redirect_uris: '' })
+  const editDeveloperKeyState2 = Object.assign({}, editDeveloperKeyState, { developerKey: developerKey2 })
+  const wrapper = mount(
+    <DeveloperKeyModal
+      createLtiKeyState={createLtiKeyState}
+      availableScopes={{}}
+      availableScopesPending={false}
+      closeModal={() => {}}
+      createOrEditDeveloperKeyState={editDeveloperKeyState2}
+      listDeveloperKeyScopesState={listDeveloperKeyScopesState}
+      actions={fakeActions}
+      store={fakeStore}
+      mountNode={modalMountNode}
+      selectedScopes={[]}
+    />
+  )
+  wrapper.instance().saveLtiToolConfiguration()
+  ok(flashStub.calledWith('A redirect_uri is required, please supply one.'))
+  flashStub.restore()
+
   wrapper.unmount()
 })

@@ -18,1075 +18,709 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {mount} from 'enzyme'
+import {fireEvent, wait} from 'react-testing-library'
 
 import GradebookSettingsModal from 'jsx/gradezilla/default_gradebook/components/GradebookSettingsModal'
 import * as GradebookSettingsModalApi from 'jsx/gradezilla/default_gradebook/apis/GradebookSettingsModalApi'
 import * as FlashAlert from 'jsx/shared/FlashAlert'
+import CourseSettings from 'jsx/gradezilla/default_gradebook/CourseSettings'
 import PostPolicies from 'jsx/gradezilla/default_gradebook/PostPolicies'
 import * as PostPolicyApi from 'jsx/gradezilla/default_gradebook/PostPolicies/PostPolicyApi'
 import {createGradebook} from 'jsx/gradezilla/default_gradebook/__tests__/GradebookSpecHelper'
 
-import {waitFor} from '../../../support/Waiters'
-
-const {
-  config: {testTimeout}
-} = QUnit
-
-const fixtures = document.getElementById('fixtures')
-const defaultProps = {
-  courseId: '1',
-  locale: 'en',
-  onClose() {},
-  gradedLateSubmissionsExist: true,
-  onLatePolicyUpdate() {},
-  overrides: {
-    defaultChecked: false,
-    disabled: false,
-    featureAvailable: true,
-    onChange() {
-      return Promise.resolve()
-    }
-  },
-  postPolicies: new PostPolicies(createGradebook({post_manually: true}))
-}
-
-const EXISTING_LATE_POLICY = {
-  id: '15',
-  missingSubmissionDeductionEnabled: false,
-  missingSubmissionDeduction: 0,
-  lateSubmissionDeductionEnabled: false,
-  lateSubmissionDeduction: 0,
-  lateSubmissionInterval: 'day',
-  lateSubmissionMinimumPercentEnabled: false,
-  lateSubmissionMinimumPercent: 0
-}
-
-const NEW_LATE_POLICY = {
-  ...EXISTING_LATE_POLICY,
-  newRecord: true
-}
-
+/* eslint-disable qunit/no-identical-names */
 QUnit.module('GradebookSettingsModal', suiteHooks => {
+  let $container
+  let component
+  let gradebook
+  let props
+  let qunitTimeout
+
+  let updatedCourseSettings
+  let fetchedLatePolicy
+  let existingLatePolicy
+  let newLatePolicy
+  let postPolicy
+
+  let fetchLatePolicyPromise
+  let createLatePolicyPromise
+  let updateLatePolicyPromise
+  let setCoursePostPolicyPromise
+  let updateCourseSettingsPromise
+
   suiteHooks.beforeEach(() => {
-    QUnit.config.testTimeout = 1000
+    qunitTimeout = QUnit.config.testTimeout
+    QUnit.config.testTimeout = 1000 // protect against unresolved async mistakes
+
+    $container = document.createElement('div')
+    document.body.appendChild($container)
+
+    gradebook = createGradebook({post_manually: false})
+
+    updatedCourseSettings = {allowFinalGradeOverride: true}
+    fetchedLatePolicy = GradebookSettingsModalApi.DEFAULT_LATE_POLICY_DATA
+    newLatePolicy = GradebookSettingsModalApi.DEFAULT_LATE_POLICY_DATA
+    existingLatePolicy = {
+      id: '2901',
+      lateSubmissionDeduction: 0,
+      lateSubmissionDeductionEnabled: false,
+      lateSubmissionInterval: 'day',
+      lateSubmissionMinimumPercent: 0,
+      lateSubmissionMinimumPercentEnabled: false,
+      missingSubmissionDeduction: 0,
+      missingSubmissionDeductionEnabled: false
+    }
+    postPolicy = {postManually: true}
+
+    props = {
+      anonymousAssignmentsPresent: false,
+      courseFeatures: {
+        finalGradeOverrideEnabled: true
+      },
+      courseId: '1201',
+      courseSettings: new CourseSettings(gradebook, {allowFinalGradeOverride: false}),
+      gradedLateSubmissionsExist: true,
+      locale: 'en',
+      onClose: sinon.spy(),
+      onCourseSettingsUpdated: sinon.spy(),
+      onEntered: sinon.spy(),
+      onLatePolicyUpdate() {},
+      postPolicies: new PostPolicies(gradebook)
+    }
+
+    fetchLatePolicyPromise = {}
+    fetchLatePolicyPromise.promise = new Promise((resolve, reject) => {
+      fetchLatePolicyPromise.resolve = () => {
+        resolve({data: {latePolicy: fetchedLatePolicy}})
+      }
+      fetchLatePolicyPromise.reject = reject
+    })
+    sandbox
+      .stub(GradebookSettingsModalApi, 'fetchLatePolicy')
+      .returns(fetchLatePolicyPromise.promise)
+
+    createLatePolicyPromise = {}
+    createLatePolicyPromise.promise = new Promise((resolve, reject) => {
+      createLatePolicyPromise.resolve = () => {
+        resolve({data: {latePolicy: existingLatePolicy}})
+      }
+      createLatePolicyPromise.reject = reject
+    })
+    sandbox
+      .stub(GradebookSettingsModalApi, 'createLatePolicy')
+      .returns(createLatePolicyPromise.promise)
+
+    updateLatePolicyPromise = {}
+    updateLatePolicyPromise.promise = new Promise((resolve, reject) => {
+      updateLatePolicyPromise.resolve = () => {
+        resolve({data: {latePolicy: existingLatePolicy}})
+      }
+      updateLatePolicyPromise.reject = reject
+    })
+    sandbox
+      .stub(GradebookSettingsModalApi, 'updateLatePolicy')
+      .returns(updateLatePolicyPromise.promise)
+
+    setCoursePostPolicyPromise = {}
+    setCoursePostPolicyPromise.promise = new Promise((resolve, reject) => {
+      setCoursePostPolicyPromise.resolve = () => {
+        resolve(postPolicy)
+      }
+      setCoursePostPolicyPromise.reject = reject
+    })
+    sandbox.stub(PostPolicyApi, 'setCoursePostPolicy').returns(setCoursePostPolicyPromise.promise)
+
+    updateCourseSettingsPromise = {}
+    updateCourseSettingsPromise.promise = new Promise((resolve, reject) => {
+      updateCourseSettingsPromise.resolve = () => {
+        resolve({data: updatedCourseSettings})
+      }
+      updateCourseSettingsPromise.reject = reject
+    })
+    sandbox
+      .stub(GradebookSettingsModalApi, 'updateCourseSettings')
+      .returns(updateCourseSettingsPromise.promise)
   })
 
-  suiteHooks.afterEach(() => {
-    QUnit.config.testTimeout = testTimeout
+  suiteHooks.afterEach(async () => {
+    await ensureModalIsClosed()
+    ReactDOM.unmountComponentAtNode($container)
+    $container.remove()
+
+    QUnit.config.testTimeout = qunitTimeout
   })
 
-  QUnit.module('with enzyme', () => {
-    function mountComponent(customProps = {}) {
-      const props = {...defaultProps, ...customProps}
-      return mount(<GradebookSettingsModal {...props} />)
+  function mountComponent() {
+    const bindRef = ref => {
+      component = ref
     }
+    ReactDOM.render(<GradebookSettingsModal ref={bindRef} {...props} />, $container)
+  }
 
-    function stubLatePolicyFetchSuccess(component, customData) {
-      const latePolicy = {
-        ...EXISTING_LATE_POLICY,
-        ...customData
+  function getModalElement() {
+    return document.querySelector('[role="dialog"][aria-label="Gradebook Settings"]')
+  }
+
+  async function openModal() {
+    component.open()
+    await wait(() => {
+      if (props.onEntered.callCount > 0) {
+        return
       }
-      const fetchSuccess = Promise.resolve({data: {latePolicy}})
-      const promise = fetchSuccess.then(component.onFetchLatePolicySuccess)
-      sandbox.stub(component, 'fetchLatePolicy').returns(promise)
-      return promise
-    }
-
-    QUnit.module('modal', moduleHooks => {
-      let clock
-      let wrapper
-
-      moduleHooks.beforeEach(() => {
-        clock = sinon.useFakeTimers()
-        const applicationElement = document.createElement('div')
-        applicationElement.id = 'application'
-        document.getElementById('fixtures').appendChild(applicationElement)
-      })
-
-      moduleHooks.afterEach(() => {
-        wrapper.unmount()
-        FlashAlert.destroyContainer()
-        document.getElementById('fixtures').innerHTML = ''
-        clock.restore()
-      })
-
-      test('is initially closed', () => {
-        wrapper = mountComponent()
-        equal(wrapper.find('Modal').prop('open'), false)
-      })
-
-      test('calling open causes the modal to be rendered', () => {
-        wrapper = mountComponent()
-        const component = wrapper.instance()
-        const fetchLatePolicy = stubLatePolicyFetchSuccess(component)
-        component.open()
-        return fetchLatePolicy.then(() => {
-          wrapper.update()
-          equal(wrapper.find('Modal').prop('open'), true)
-        })
-      })
-
-      test('calling close closes the modal', () => {
-        wrapper = mountComponent()
-        const component = wrapper.instance()
-        const fetchLatePolicy = stubLatePolicyFetchSuccess(component)
-        component.open()
-        return fetchLatePolicy.then(() => {
-          wrapper.update()
-          equal(wrapper.find('Modal').prop('open'), true, 'modal is open')
-          component.close()
-          wrapper.update()
-          equal(wrapper.find('Modal').prop('open'), false, 'modal is closed')
-        })
-      })
-
-      test('clicking cancel closes the modal', () => {
-        wrapper = mountComponent()
-        const component = wrapper.instance()
-        const fetchLatePolicy = stubLatePolicyFetchSuccess(component)
-        component.open()
-        clock.tick(50) // wait for Modal to transition open
-        return fetchLatePolicy.then(() => {
-          wrapper.update()
-          equal(wrapper.find('Modal').prop('open'), true)
-          document.getElementById('gradebook-settings-cancel-button').click()
-          wrapper.update()
-          equal(wrapper.find('Modal').prop('open'), false)
-        })
-      })
-
-      test('the "Update" button is disabled when the modal opens', () => {
-        wrapper = mountComponent()
-        const component = wrapper.instance()
-        const fetchLatePolicy = stubLatePolicyFetchSuccess(component)
-        component.open()
-        clock.tick(50) // wait for Modal to transition open
-        return fetchLatePolicy.then(() => {
-          wrapper.update()
-          const updateButton = document.getElementById('gradebook-settings-update-button')
-          strictEqual(updateButton.getAttribute('disabled'), '')
-        })
-      })
-
-      test('the "Update" button is enabled if a setting is changed', () => {
-        wrapper = mountComponent()
-        const component = wrapper.instance()
-        const fetchLatePolicy = stubLatePolicyFetchSuccess(component)
-        component.open()
-        clock.tick(50) // wait for Modal to transition open
-        return fetchLatePolicy.then(() => {
-          wrapper.update()
-          component.changeLatePolicy({
-            ...component.state.latePolicy,
-            changes: {lateSubmissionDeductionEnabled: true}
-          })
-          const updateButton = document.getElementById('gradebook-settings-update-button')
-          strictEqual(updateButton.getAttribute('disabled'), null)
-        })
-      })
-
-      test('the "Update" button is disabled if a setting is changed, but there are validation errors', () => {
-        wrapper = mountComponent()
-        const component = wrapper.instance()
-        const fetchLatePolicy = stubLatePolicyFetchSuccess(component)
-        component.open()
-        clock.tick(50) // wait for Modal to transition open
-        return fetchLatePolicy.then(() => {
-          wrapper.update()
-          component.changeLatePolicy({
-            ...component.state.latePolicy,
-            changes: {lateSubmissionDeductionEnabled: true},
-            validationErrors: {
-              missingSubmissionDeduction: 'Missing submission percent must be numeric'
-            }
-          })
-          const updateButton = document.getElementById('gradebook-settings-update-button')
-          strictEqual(updateButton.getAttribute('disabled'), '')
-        })
-      })
-
-      test('clicking "Update" sends a request to update the late policy', () => {
-        sandbox.stub(GradebookSettingsModalApi, 'updateLatePolicy').resolves()
-        wrapper = mountComponent()
-        const component = wrapper.instance()
-        const fetchLatePolicy = stubLatePolicyFetchSuccess(component)
-        component.open()
-        clock.tick(50) // wait for Modal to transition open
-        return fetchLatePolicy.then(() => {
-          wrapper.update()
-          const changes = {lateSubmissionDeductionEnabled: true}
-          component.changeLatePolicy({...component.state.latePolicy, changes})
-          const button = document.getElementById('gradebook-settings-update-button')
-          button.click()
-          equal(
-            GradebookSettingsModalApi.updateLatePolicy.callCount,
-            1,
-            'updateLatePolicy is called once'
-          )
-          const changesArg = GradebookSettingsModalApi.updateLatePolicy.getCall(0).args[1]
-          propEqual(changesArg, changes, 'updateLatePolicy is called with the late policy changes')
-        })
-      })
-
-      test('clicking "Update" sends a post request to create a late policy if one does not yet exist', () => {
-        sandbox.stub(GradebookSettingsModalApi, 'createLatePolicy').resolves()
-        // When a late policy does not exist, the API call returns 'Not Found'
-        wrapper = mountComponent()
-        const component = wrapper.instance()
-        const fetchLatePolicy = stubLatePolicyFetchSuccess(component, {newRecord: true})
-        component.open()
-        clock.tick(50) // wait for Modal to transition open
-
-        return fetchLatePolicy.then(() => {
-          wrapper.update()
-          const changes = {lateSubmissionDeductionEnabled: true}
-          component.changeLatePolicy({...component.state.latePolicy, changes})
-          document.getElementById('gradebook-settings-update-button').click()
-          equal(
-            GradebookSettingsModalApi.createLatePolicy.callCount,
-            1,
-            'createLatePolicy is called once'
-          )
-          const changesArg = GradebookSettingsModalApi.createLatePolicy.getCall(0).args[1]
-          propEqual(changesArg, changes, 'createLatePolicy is called with the late policy changes')
-        })
-      })
+      throw new Error('Modal is not yet open')
     })
-  })
+  }
 
-  QUnit.module('without enzyme', () => {
-    function renderComponent(props = {}) {
-      return ReactDOM.render(<GradebookSettingsModal {...defaultProps} {...props} />, fixtures)
-    }
+  async function mountAndOpen() {
+    mountComponent()
+    await openModal()
+  }
 
-    async function renderAndOpenComponent(props = {}) {
-      const component = renderComponent(props)
-      component.open()
-      const isLatePoliciesFormInDOM = () => document.body.innerText.includes('Late Policies')
-      return waitFor(isLatePoliciesFormInDOM)
-    }
+  async function mountOpenAndLoad() {
+    await mountAndOpen()
+    fetchLatePolicyPromise.resolve()
+    await wait(() => !getSpinner())
+  }
 
-    function findTab({label}) {
-      const tabs = []
-      document.querySelectorAll('[role="tab"]').forEach(node => tabs.push(node))
-      return tabs.find(node => node.innerText.includes(label))
-    }
+  async function mountOpenLoadAndSelectTab(tabLabel) {
+    await mountOpenAndLoad()
+    findTab(tabLabel).click()
+  }
 
-    function findCheckbox({label}) {
-      const labels = []
-      document.querySelectorAll('label').forEach(node => labels.push(node))
-      const checkboxId = labels.find(node => node.innerText.includes(label)).getAttribute('for')
-      return document.getElementById(checkboxId)
-    }
-
-    function findButton({label}) {
-      const buttons = []
-      document.querySelectorAll('button').forEach(node => buttons.push(node))
-      return buttons.find(node => node.innerText.includes(label))
-    }
-
-    async function isFormClosed(timeout = 300) {
-      return waitFor(() => !document.body.innerText.includes('Update'), timeout)
-    }
-
-    QUnit.module('given a new latePolicy', newLatePolicyHooks => {
-      let fetchLatePolicyStub
-      let flashAlertSpy
-      let onLatePolicyUpdate
-
-      newLatePolicyHooks.beforeEach(async () => {
-        fetchLatePolicyStub = sinon
-          .stub(GradebookSettingsModalApi, 'fetchLatePolicy')
-          .resolves({data: {latePolicy: NEW_LATE_POLICY}})
-        flashAlertSpy = sinon.spy(FlashAlert, 'showFlashAlert')
-        onLatePolicyUpdate = sinon.stub()
-        await renderAndOpenComponent({onLatePolicyUpdate})
-      })
-
-      newLatePolicyHooks.afterEach(() => {
-        ReactDOM.unmountComponentAtNode(fixtures)
-        FlashAlert.destroyContainer()
-        fetchLatePolicyStub.restore()
-        flashAlertSpy.restore()
-      })
-
-      QUnit.module('given no form edits', () => {
-        test('update button is not enabled', () => {
-          const button = findButton({label: 'Update'})
-          strictEqual(button.disabled, true)
-        })
-
-        test('given deselecting changes on the Late Policy Panel, update button is not enabled', () => {
-          const checkbox = findCheckbox({
-            label: 'Automatically apply grade for missing submissions'
-          })
-          checkbox.click()
-          checkbox.click()
-
-          const button = findButton({label: 'Update'})
-          strictEqual(button.disabled, true)
-        })
-
-        QUnit.module('given the Advanced Panel', advancedPanelHooks => {
-          advancedPanelHooks.beforeEach(() => findTab({label: 'Advanced'}).click())
-          advancedPanelHooks.afterEach(() => findTab({label: 'Late Policies'}).click())
-
-          test('given deselecting changes on the Advanced Panel update button is not enabled', () => {
-            const checkbox = findCheckbox({label: 'Allow final grade override'})
-            checkbox.click()
-            checkbox.click()
-
-            const button = findButton({label: 'Update'})
-            strictEqual(button.disabled, true)
-          })
-        })
-
-        QUnit.module('given the Grade Posting Policy Panel', postPolicyPanelHooks => {
-          postPolicyPanelHooks.beforeEach(() => findTab({label: 'Grade Posting Policy'}).click())
-          postPolicyPanelHooks.afterEach(() => findTab({label: 'Late Policies'}).click())
-
-          test('update button is disabled if posting type is unchanged', () => {
-            const automaticallyPost = findCheckbox({label: 'Automatically Post Grades'})
-            automaticallyPost.click()
-            const manuallyPost = findCheckbox({label: 'Manually Post Grades'})
-            manuallyPost.click()
-
-            const button = findButton({label: 'Update'})
-            strictEqual(button.disabled, true)
-          })
-        })
-      })
-
-      QUnit.module('given post policy form edits', postPolicyPanelHooks => {
-        postPolicyPanelHooks.beforeEach(() => findTab({label: 'Grade Posting Policy'}).click())
-        postPolicyPanelHooks.afterEach(() => findTab({label: 'Late Policies'}).click())
-
-        test('update button is enabled if the posting type has changed', () => {
-          const automaticallyPost = findCheckbox({label: 'Automatically Post Grades'})
-          automaticallyPost.click()
-
-          const button = findButton({label: 'Update'})
-          strictEqual(button.disabled, false)
-        })
-      })
-
-      QUnit.module('given late policy form edits', latePolicyFormEditsHooks => {
-        latePolicyFormEditsHooks.beforeEach(() => {
-          findCheckbox({label: 'Automatically apply grade for missing submissions'}).click()
-        })
-
-        QUnit.module('given a successful response', successfulResponseHooks => {
-          let createLatePolicyStub
-
-          successfulResponseHooks.beforeEach(async () => {
-            createLatePolicyStub = sinon
-              .stub(GradebookSettingsModalApi, 'createLatePolicy')
-              .resolves()
-            findButton({label: 'Update'}).click()
-            const isFlashMessageInDOM = () =>
-              document.body.innerText.includes('Gradebook Settings updated')
-            await waitFor(isFlashMessageInDOM)
-          })
-
-          successfulResponseHooks.afterEach(() => createLatePolicyStub.restore())
-
-          test('onLatePolicyUpdate called', () => {
-            const {callCount} = onLatePolicyUpdate
-            strictEqual(callCount, 1)
-          })
-
-          test('a single flash message is present', () => {
-            const {callCount} = flashAlertSpy
-            strictEqual(callCount, 1)
-          })
-
-          test('a flash message with type success', () => {
-            const {
-              firstCall: {
-                args: [{type}]
-              }
-            } = flashAlertSpy
-            strictEqual(type, 'success')
-          })
-
-          test('the form is closed', async () => {
-            strictEqual(await isFormClosed(), true)
-          })
-        })
-
-        QUnit.module('given an error response', errorResponseHooks => {
-          let createLatePolicyStub
-
-          errorResponseHooks.beforeEach(() => {
-            createLatePolicyStub = sinon
-              .stub(GradebookSettingsModalApi, 'createLatePolicy')
-              .rejects(new Error('Unauthorized'))
-          })
-
-          errorResponseHooks.afterEach(() => createLatePolicyStub.restore())
-
-          QUnit.module('when update is clicked', hooks => {
-            hooks.beforeEach(async () => {
-              findButton({label: 'Update'}).click()
-              const isFlashMessageInDOM = () =>
-                document.body.innerText.includes('An error occurred while updating late policies')
-              await waitFor(isFlashMessageInDOM)
-            })
-
-            test('onLatePolicyUpdate is not called', () => {
-              const {callCount} = onLatePolicyUpdate
-              strictEqual(callCount, 0)
-            })
-
-            test('a single flash message is present', () => {
-              const {callCount} = flashAlertSpy
-              strictEqual(callCount, 1)
-            })
-
-            test('a flash message with type error', () => {
-              const {
-                firstCall: {
-                  args: [{type}]
-                }
-              } = flashAlertSpy
-              strictEqual(type, 'error')
-            })
-          })
-        })
-      })
-    })
-
-    QUnit.module('given overrides.featureAvailable is false', featureAvailableHooks => {
-      let fetchLatePolicyStub
-      let tab
-      const overrides = {
-        defaultChecked: false,
-        disabled: false,
-        featureAvailable: false,
-        onChange() {}
+  async function waitForModalClosed() {
+    await wait(() => {
+      if (props.onClose.callCount > 0) {
+        return
       }
-
-      featureAvailableHooks.beforeEach(() => {
-        fetchLatePolicyStub = sinon
-          .stub(GradebookSettingsModalApi, 'fetchLatePolicy')
-          .resolves({data: {latePolicy: EXISTING_LATE_POLICY}})
-      })
-
-      featureAvailableHooks.afterEach(() => fetchLatePolicyStub.restore())
-
-      test('Advanced Tab is not present', async () => {
-        await renderAndOpenComponent({overrides})
-        tab = findTab({label: 'Advanced'})
-        strictEqual(tab, undefined)
-      })
+      throw new Error('Modal is still open')
     })
+  }
 
-    QUnit.module('given overrides.featureAvailable is true', featureAvailableHooks => {
-      let fetchLatePolicyStub
-      let tab
-      const overrides = {
-        defaultChecked: false,
-        disabled: false,
-        featureAvailable: true,
-        onChange() {}
-      }
+  async function ensureModalIsClosed() {
+    if (getModalElement()) {
+      component.close()
+      await waitForModalClosed()
+    }
+  }
 
-      featureAvailableHooks.beforeEach(() => {
-        fetchLatePolicyStub = sinon
-          .stub(GradebookSettingsModalApi, 'fetchLatePolicy')
-          .resolves({data: {latePolicy: EXISTING_LATE_POLICY}})
-      })
-
-      featureAvailableHooks.afterEach(() => fetchLatePolicyStub.restore())
-
-      test('Advanced Tab is present', async () => {
-        await renderAndOpenComponent({overrides})
-        tab = findTab({label: 'Advanced'})
-        ok(tab)
-      })
-    })
-
-    QUnit.module('given the postPolicies prop is null', featureAvailableHooks => {
-      let fetchLatePolicyStub
-      let tab
-
-      featureAvailableHooks.beforeEach(() => {
-        fetchLatePolicyStub = sinon
-          .stub(GradebookSettingsModalApi, 'fetchLatePolicy')
-          .resolves({data: {latePolicy: EXISTING_LATE_POLICY}})
-      })
-
-      featureAvailableHooks.afterEach(() => fetchLatePolicyStub.restore())
-
-      test('Grade Posting Policy tab is not present', async () => {
-        await renderAndOpenComponent({postPolicies: null})
-        tab = findTab({label: 'Grade Posting Policy'})
-        strictEqual(tab, undefined)
-      })
-    })
-
-    QUnit.module('given the postPolicies prop exists', featureAvailableHooks => {
-      let fetchLatePolicyStub
-      let tab
-
-      featureAvailableHooks.beforeEach(() => {
-        fetchLatePolicyStub = sinon
-          .stub(GradebookSettingsModalApi, 'fetchLatePolicy')
-          .resolves({data: {latePolicy: EXISTING_LATE_POLICY}})
-      })
-
-      featureAvailableHooks.afterEach(() => fetchLatePolicyStub.restore())
-
-      test('Grade Posting Policy tab is present', async () => {
-        await renderAndOpenComponent()
-        tab = findTab({label: 'Grade Posting Policy'})
-        ok(tab)
-      })
-    })
-
-    QUnit.module('given an existing latePolicy', existingLatePolicyHooks => {
-      let fetchLatePolicyStub
-      let flashAlertSpy
-      let onLatePolicyUpdate
-
-      existingLatePolicyHooks.beforeEach(async () => {
-        fetchLatePolicyStub = sinon
-          .stub(GradebookSettingsModalApi, 'fetchLatePolicy')
-          .resolves({data: {latePolicy: EXISTING_LATE_POLICY}})
-        flashAlertSpy = sinon.spy(FlashAlert, 'showFlashAlert')
-        onLatePolicyUpdate = sinon.stub()
-        await renderAndOpenComponent({onLatePolicyUpdate})
-      })
-
-      existingLatePolicyHooks.afterEach(() => {
-        ReactDOM.unmountComponentAtNode(fixtures)
-        FlashAlert.destroyContainer()
-        fetchLatePolicyStub.restore()
-        flashAlertSpy.restore()
-      })
-
-      QUnit.module('given no form edits', () => {
-        test('update button is not enabled', () => {
-          const button = findButton({label: 'Update'})
-          strictEqual(button.disabled, true)
-        })
-
-        test('given deselecting changes on the Late Policy Panel, update button is not enabled', () => {
-          const checkbox = findCheckbox({
-            label: 'Automatically apply grade for missing submissions'
-          })
-          checkbox.click()
-          checkbox.click()
-
-          const button = findButton({label: 'Update'})
-          strictEqual(button.disabled, true)
-        })
-
-        QUnit.module('given the Advanced Panel', advancedPanelHooks => {
-          advancedPanelHooks.beforeEach(() => findTab({label: 'Advanced'}).click())
-          advancedPanelHooks.afterEach(() => findTab({label: 'Late Policies'}).click())
-
-          test('given deselecting changes on the Advanced Panel update button is not enabled', () => {
-            const checkbox = findCheckbox({label: 'Allow final grade override'})
-            checkbox.click()
-            checkbox.click()
-
-            const button = findButton({label: 'Update'})
-            strictEqual(button.disabled, true)
-          })
-        })
-      })
-
-      QUnit.module('given late policy form edits', latePolicyFormEditsHooks => {
-        latePolicyFormEditsHooks.beforeEach(() => {
-          findCheckbox({label: 'Automatically apply grade for missing submissions'}).click()
-        })
-
-        QUnit.module(
-          'given a successful response and given the update button is clicked',
-          successfulResponseHooks => {
-            let updateLatePolicyStub
-
-            successfulResponseHooks.beforeEach(async () => {
-              updateLatePolicyStub = sinon
-                .stub(GradebookSettingsModalApi, 'updateLatePolicy')
-                .resolves()
-              findButton({label: 'Update'}).click()
-              const isFlashMessageInDOM = () =>
-                document.body.innerText.includes('Gradebook Settings updated')
-              await waitFor(isFlashMessageInDOM)
-            })
-
-            successfulResponseHooks.afterEach(() => updateLatePolicyStub.restore())
-
-            test('onLatePolicyUpdate called', () => {
-              const {callCount} = onLatePolicyUpdate
-              strictEqual(callCount, 1)
-            })
-
-            test('a single flash message is present', () => {
-              const {callCount} = flashAlertSpy
-              strictEqual(callCount, 1)
-            })
-
-            test('a flash message with type success', () => {
-              const {
-                firstCall: {
-                  args: [{type}]
-                }
-              } = flashAlertSpy
-              strictEqual(type, 'success')
-            })
-
-            test('the form is closed', async () => {
-              strictEqual(await isFormClosed(), true)
-            })
-          }
-        )
-      })
-
-      QUnit.module('given late policy form edits', latePolicyFormEditsHooks => {
-        latePolicyFormEditsHooks.beforeEach(() => {
-          findCheckbox({label: 'Automatically apply grade for missing submissions'}).click()
-        })
-
-        QUnit.module('given an error response and given update is clicked', errorResponseHooks => {
-          let updateLatePolicyStub
-
-          errorResponseHooks.beforeEach(async () => {
-            updateLatePolicyStub = sinon
-              .stub(GradebookSettingsModalApi, 'updateLatePolicy')
-              .rejects()
-            findButton({label: 'Update'}).click()
-            const isFlashMessageInDOM = () =>
-              document.body.innerText.includes('An error occurred while updating late policies')
-            await waitFor(isFlashMessageInDOM)
-          })
-
-          errorResponseHooks.afterEach(() => updateLatePolicyStub.restore())
-
-          test('onLatePolicyUpdate is not called', () => {
-            const {callCount} = onLatePolicyUpdate
-            strictEqual(callCount, 0)
-          })
-
-          test('a single flash message is present', () => {
-            const {callCount} = flashAlertSpy
-            strictEqual(callCount, 1)
-          })
-
-          test('a flash message with type error', () => {
-            const {
-              firstCall: {
-                args: [{type}]
-              }
-            } = flashAlertSpy
-            strictEqual(type, 'error')
-          })
-        })
-      })
-    })
-
-    QUnit.module(
-      'given a successful onChange response and edits to a Advanced Settings',
-      advancedSettingsEditsHooks => {
-        let fetchLatePolicyStub
-        let flashAlertSpy
-
-        advancedSettingsEditsHooks.beforeEach(() => {
-          fetchLatePolicyStub = sinon
-            .stub(GradebookSettingsModalApi, 'fetchLatePolicy')
-            .resolves({data: {latePolicy: NEW_LATE_POLICY}})
-          flashAlertSpy = sinon.spy(FlashAlert, 'showFlashAlert')
-        })
-
-        advancedSettingsEditsHooks.afterEach(() => {
-          fetchLatePolicyStub.restore()
-          flashAlertSpy.restore()
-        })
-
-        QUnit.module('given onChange resolves', onChangeResolvesHooks => {
-          let onChange
-
-          onChangeResolvesHooks.beforeEach(async () => {
-            onChange = sinon.stub().resolves()
-            const overrides = {
-              defaultChecked: false,
-              disabled: false,
-              featureAvailable: true,
-              onChange
-            }
-            await renderAndOpenComponent({overrides})
-
-            findTab({label: 'Advanced'}).click()
-            findCheckbox({label: 'Allow final grade override'}).click()
-            findButton({label: 'Update'}).click()
-            const isFlashMessageInDOM = () =>
-              document.body.innerText.includes('Gradebook Settings updated')
-            await waitFor(isFlashMessageInDOM)
-          })
-
-          onChangeResolvesHooks.afterEach(() => {
-            ReactDOM.unmountComponentAtNode(fixtures)
-            FlashAlert.destroyContainer()
-          })
-
-          test('calls onChange', () => {
-            const {callCount} = onChange
-            strictEqual(callCount, 1)
-          })
-
-          test('a single flash message is present', () => {
-            const {callCount} = flashAlertSpy
-            strictEqual(callCount, 1)
-          })
-
-          test('a flash message with type success', () => {
-            const {
-              firstCall: {
-                args: [{type}]
-              }
-            } = flashAlertSpy
-            strictEqual(type, 'success')
-          })
-
-          test('the form is closed', async () => {
-            strictEqual(await isFormClosed(), true)
-          })
-        })
-
-        QUnit.module('given onChange rejects', onChangeRejectsHooks => {
-          let onChange
-
-          onChangeRejectsHooks.beforeEach(async () => {
-            onChange = sinon.stub().rejects(new Error('Unknown Error'))
-            const overrides = {
-              defaultChecked: false,
-              disabled: false,
-              featureAvailable: true,
-              onChange
-            }
-            await renderAndOpenComponent({overrides})
-
-            findTab({label: 'Advanced'}).click()
-            findCheckbox({label: 'Allow final grade override'}).click()
-
-            findButton({label: 'Update'}).click()
-            const isFlashMessageInDOM = () =>
-              document.body.innerText.includes('An error occurred while saving your settings')
-            await waitFor(isFlashMessageInDOM)
-          })
-
-          onChangeRejectsHooks.afterEach(() => {
-            ReactDOM.unmountComponentAtNode(fixtures)
-            FlashAlert.destroyContainer()
-          })
-
-          test('calls onChange', () => {
-            const {callCount} = onChange
-            strictEqual(callCount, 1)
-          })
-
-          test('a single flash message is present', () => {
-            const {callCount} = flashAlertSpy
-            strictEqual(callCount, 1)
-          })
-
-          test('a flash message with type error', () => {
-            const {
-              firstCall: {
-                args: [{type}]
-              }
-            } = flashAlertSpy
-            strictEqual(type, 'error')
-          })
-        })
-      }
+  function getSpinner() {
+    return [...getModalElement().querySelectorAll('svg title')].find($title =>
+      $title.textContent.includes('Loading')
     )
+  }
 
-    QUnit.module('given changes to both Late Policy and Advanced', () => {
-      async function editLatePolicyThenAdvancedSettings() {
-        findCheckbox({label: 'Automatically apply grade for missing submissions'}).click()
-        findTab({label: 'Advanced'}).click()
-        findCheckbox({label: 'Allow final grade override'}).click()
-        findButton({label: 'Update'}).click()
-      }
+  function findTab(label) {
+    return [...getModalElement().querySelectorAll('[role="tab"]')].find($tab =>
+      $tab.textContent.includes(label)
+    )
+  }
 
-      async function editAdvancedSettingsThenLatePolicy() {
-        findTab({label: 'Advanced'}).click()
-        findCheckbox({label: 'Allow final grade override'}).click()
-        findTab({label: 'Late Policies'}).click()
-        findCheckbox({label: 'Automatically apply grade for missing submissions'}).click()
-        findButton({label: 'Update'}).click()
-      }
+  function getGradePostingPolicyTab() {
+    return findTab('Grade Posting Policy')
+  }
 
-      test('both promises can resolve successfully and close the form', async () => {
-        const fetchLatePolicyStub = sinon
-          .stub(GradebookSettingsModalApi, 'fetchLatePolicy')
-          .resolves({data: {latePolicy: NEW_LATE_POLICY}})
-        const createLatePolicyStub = sinon
-          .stub(GradebookSettingsModalApi, 'createLatePolicy')
-          .resolves()
+  function getAdvancedTab() {
+    return findTab('Advanced')
+  }
 
-        const onChange = sinon.stub().resolves()
-        const overrides = {
-          defaultChecked: false,
-          disabled: false,
-          featureAvailable: true,
-          onChange
-        }
-        await renderAndOpenComponent({overrides})
+  function findCheckbox(label) {
+    const $modal = getModalElement()
+    const $label = [...$modal.querySelectorAll('label')].find($el =>
+      $el.textContent.includes(label)
+    )
+    return $modal.querySelector(`#${$label.getAttribute('for')}`)
+  }
 
-        editLatePolicyThenAdvancedSettings()
-        const isFlashMessageInDOM = () =>
-          document.body.innerText.includes('Gradebook Settings updated')
-        await waitFor(isFlashMessageInDOM)
+  function getAutomaticallyApplyMissingCheckbox() {
+    return findCheckbox('Automatically apply grade for missing submissions')
+  }
 
-        strictEqual(await isFormClosed(), true)
+  function getManuallyPostGradesOption() {
+    return findCheckbox('Manually Post Grades')
+  }
 
-        ReactDOM.unmountComponentAtNode(fixtures)
-        FlashAlert.destroyContainer()
-        createLatePolicyStub.restore()
-        fetchLatePolicyStub.restore()
+  function getAutomaticallyPostGradesOption() {
+    return findCheckbox('Automatically Post Grades')
+  }
+
+  function getAllowFinalGradeOverrideCheckbox() {
+    return findCheckbox('Allow final grade override')
+  }
+
+  function getUpdateButton() {
+    return getModalElement().querySelector('#gradebook-settings-update-button')
+  }
+
+  QUnit.module('#open()', () => {
+    test('opens the modal', async () => {
+      mountComponent()
+      await openModal()
+      ok(getModalElement())
+    })
+  })
+
+  QUnit.module('#close()', () => {
+    test('closes the modal', async () => {
+      mountComponent()
+      await openModal()
+      component.close()
+      await waitForModalClosed()
+      notOk(getModalElement())
+    })
+  })
+
+  QUnit.module('upon opening', () => {
+    test('sends a request for the course late policy', async () => {
+      await mountOpenAndLoad()
+      strictEqual(GradebookSettingsModalApi.fetchLatePolicy.callCount, 1)
+    })
+
+    test('includes the course id when requesting the course late policy', async () => {
+      await mountOpenAndLoad()
+      const [courseId] = GradebookSettingsModalApi.fetchLatePolicy.lastCall.args
+      strictEqual(courseId, '1201')
+    })
+  })
+
+  QUnit.module('"Grade Posting Policy" tab', () => {
+    test('is present when "Post Policies" is enabled', async () => {
+      await mountOpenAndLoad()
+      ok(getGradePostingPolicyTab())
+    })
+
+    test('is not present when "Post Policies" is disabled', async () => {
+      props.postPolicies = null
+      await mountOpenAndLoad()
+      notOk(getGradePostingPolicyTab())
+    })
+  })
+
+  QUnit.module('"Advanced" tab', () => {
+    test('is present when "Final Grade Override" is enabled', async () => {
+      await mountOpenAndLoad()
+      ok(getAdvancedTab())
+    })
+
+    test('is not present when "Final Grade Override" is disabled', async () => {
+      props.courseFeatures.finalGradeOverrideEnabled = false
+      await mountOpenAndLoad()
+      notOk(getAdvancedTab())
+    })
+  })
+
+  QUnit.module('"Update" button', () => {
+    test('is disabled when no settings have been changed', async () => {
+      await mountOpenAndLoad()
+      strictEqual(getUpdateButton().disabled, true)
+    })
+
+    test('is enabled when the late policy has been changed', async () => {
+      await mountOpenAndLoad()
+      getAutomaticallyApplyMissingCheckbox().click()
+      strictEqual(getUpdateButton().disabled, false)
+    })
+
+    test('is disabled when a late policy change was reverted', async () => {
+      await mountOpenAndLoad()
+      const $checkbox = getAutomaticallyApplyMissingCheckbox()
+      $checkbox.click() // change the setting
+      $checkbox.click() // change it back
+      strictEqual(getUpdateButton().disabled, true)
+    })
+
+    test('is enabled when the grade posting policy has been changed', async () => {
+      props.postPolicies.setCoursePostPolicy({postManually: true})
+      await mountOpenLoadAndSelectTab('Grade Posting Policy')
+      getAutomaticallyPostGradesOption().click()
+      strictEqual(getUpdateButton().disabled, false)
+    })
+
+    test('is disabled when a grade posting policy change was reverted', async () => {
+      props.postPolicies.setCoursePostPolicy({postManually: true})
+      await mountOpenLoadAndSelectTab('Grade Posting Policy')
+      getAutomaticallyPostGradesOption().click()
+      getManuallyPostGradesOption().click()
+      strictEqual(getUpdateButton().disabled, true)
+    })
+
+    test('is enabled when an advanced settings has been changed', async () => {
+      await mountOpenLoadAndSelectTab('Advanced')
+      getAllowFinalGradeOverrideCheckbox().click()
+      strictEqual(getUpdateButton().disabled, false)
+    })
+
+    test('is disabled when an advanced settings change was reverted', async () => {
+      await mountOpenLoadAndSelectTab('Advanced')
+      getAllowFinalGradeOverrideCheckbox().click()
+      getAllowFinalGradeOverrideCheckbox().click()
+      strictEqual(getUpdateButton().disabled, true)
+    })
+
+    test('is disabled when a late policy change is invalid', async () => {
+      await mountOpenAndLoad()
+      getAutomaticallyApplyMissingCheckbox().click()
+      const $input = getModalElement().querySelector('#missing-submission-grade')
+      fireEvent.change($input, {target: {value: '-1'}})
+      strictEqual(getUpdateButton().disabled, true)
+    })
+
+    QUnit.module('when clicked', () => {
+      test('creates a new late policy when none existed', async () => {
+        fetchedLatePolicy = newLatePolicy
+        await mountOpenAndLoad()
+        getAutomaticallyApplyMissingCheckbox().click()
+        getUpdateButton().click()
+        strictEqual(GradebookSettingsModalApi.createLatePolicy.callCount, 1)
       })
 
-      QUnit.module(
-        'given an error response from creating a late policy',
-        createLatePolicyErrorResponseHooks => {
-          let fetchLatePolicyStub
-          let createLatePolicyStub
-          let onChange
+      test('updates the late policy when one exists', async () => {
+        fetchedLatePolicy = existingLatePolicy
+        await mountOpenAndLoad()
+        getAutomaticallyApplyMissingCheckbox().click()
+        getUpdateButton().click()
+        strictEqual(GradebookSettingsModalApi.updateLatePolicy.callCount, 1)
+      })
 
-          createLatePolicyErrorResponseHooks.beforeEach(async () => {
-            fetchLatePolicyStub = sinon
-              .stub(GradebookSettingsModalApi, 'fetchLatePolicy')
-              .resolves({data: {latePolicy: NEW_LATE_POLICY}})
-            createLatePolicyStub = sinon
-              .stub(GradebookSettingsModalApi, 'createLatePolicy')
-              .rejects(new Error('Unauthorized'))
-            onChange = sinon.stub().resolves()
-            const overrides = {
-              defaultChecked: false,
-              disabled: false,
-              featureAvailable: true,
-              onChange
-            }
-            await renderAndOpenComponent({overrides})
-          })
+      test('does not create a late policy when no settings have been changed', async () => {
+        await mountOpenAndLoad()
+        const $checkbox = getAutomaticallyApplyMissingCheckbox()
+        $checkbox.click() // change the setting
+        $checkbox.click() // change it back
+        getUpdateButton().click()
+        strictEqual(GradebookSettingsModalApi.createLatePolicy.callCount, 0)
+      })
 
-          createLatePolicyErrorResponseHooks.afterEach(() => {
-            ReactDOM.unmountComponentAtNode(fixtures)
-            FlashAlert.destroyContainer()
-            createLatePolicyStub.restore()
-            fetchLatePolicyStub.restore()
-          })
+      test('updates the course post policy when changed', async () => {
+        await mountOpenLoadAndSelectTab('Grade Posting Policy')
+        getManuallyPostGradesOption().click()
+        getUpdateButton().click()
+        strictEqual(PostPolicyApi.setCoursePostPolicy.callCount, 1)
+      })
 
-          test('form is still submittable', async () => {
-            await editLatePolicyThenAdvancedSettings()
-            const isFlashMessageInDOM = () =>
-              document.body.innerText.includes('An error occurred while updating late policies')
-            await waitFor(isFlashMessageInDOM)
+      test('does not update the course post policy when unchanged', async () => {
+        await mountOpenLoadAndSelectTab('Grade Posting Policy')
+        getManuallyPostGradesOption().click()
+        getAutomaticallyPostGradesOption().click()
+        getUpdateButton().click()
+        strictEqual(PostPolicyApi.setCoursePostPolicy.callCount, 0)
+      })
 
-            const button = findButton({label: 'Update'})
-            strictEqual(button.disabled, false)
-          })
+      test('updates advanced settings when changed', async () => {
+        await mountOpenLoadAndSelectTab('Advanced')
+        getAllowFinalGradeOverrideCheckbox().click()
+        getUpdateButton().click()
+        strictEqual(GradebookSettingsModalApi.updateCourseSettings.callCount, 1)
+      })
 
-          test('the form data for Advanced Settings updates successfully', async () => {
-            await editLatePolicyThenAdvancedSettings()
-            const isFlashMessageInDOM = () =>
-              document.body.innerText.includes('An error occurred while updating late policies')
-            await waitFor(isFlashMessageInDOM)
+      test('does not update advanced settings when unchanged', async () => {
+        await mountOpenLoadAndSelectTab('Advanced')
+        getAllowFinalGradeOverrideCheckbox().click()
+        getAllowFinalGradeOverrideCheckbox().click()
+        getUpdateButton().click()
+        strictEqual(GradebookSettingsModalApi.updateCourseSettings.callCount, 0)
+      })
 
-            const checkbox = findCheckbox({label: 'Allow final grade override'})
-            strictEqual(checkbox.checked, true)
-          })
-
-          test('the form data for Late Policies is still preset', async () => {
-            // it is necessary to do things in this order because the panels
-            // do not reflect previous changes when switching between tabs
-            editAdvancedSettingsThenLatePolicy()
-            const isFlashMessageInDOM = () =>
-              document.body.innerText.includes('An error occurred while updating late policies')
-            await waitFor(isFlashMessageInDOM)
-
-            const checkbox = findCheckbox({
-              label: 'Automatically apply grade for missing submissions'
-            })
-            strictEqual(checkbox.checked, true)
-          })
-
-          test('the form is not submittable when changes are cleared', async () => {
-            // it is necessary to do things in this order because the panels
-            // do not reflect previous changes when switching between tabs
-            editAdvancedSettingsThenLatePolicy()
-            const isFlashMessageInDOM = () =>
-              document.body.innerText.includes('An error occurred while updating late policies')
-            await waitFor(isFlashMessageInDOM)
-
-            const checkbox = findCheckbox({
-              label: 'Automatically apply grade for missing submissions'
-            })
-            checkbox.click()
-            strictEqual(checkbox.checked, false)
-          })
-        }
-      )
-
-      QUnit.module('given Advanced Settings rejects', advancedSettingsOnChangeRejects => {
-        let fetchLatePolicyStub
-        let createLatePolicyStub
-        let onChange
-
-        advancedSettingsOnChangeRejects.beforeEach(async () => {
-          fetchLatePolicyStub = sinon
-            .stub(GradebookSettingsModalApi, 'fetchLatePolicy')
-            .resolves({data: {latePolicy: NEW_LATE_POLICY}})
-          createLatePolicyStub = sinon
-            .stub(GradebookSettingsModalApi, 'createLatePolicy')
-            .resolves()
-          onChange = sinon.stub().rejects(new Error('Unknown Error'))
-          const overrides = {
-            defaultChecked: false,
-            disabled: false,
-            featureAvailable: true,
-            onChange
-          }
-          await renderAndOpenComponent({overrides})
+      QUnit.module('when a late policy change is invalid', contextHooks => {
+        contextHooks.beforeEach(async () => {
+          await mountOpenAndLoad()
+          getAutomaticallyApplyMissingCheckbox().click()
+          const $input = getModalElement().querySelector('#missing-submission-grade')
+          fireEvent.change($input, {target: {value: '-1'}})
         })
 
-        advancedSettingsOnChangeRejects.afterEach(() => {
-          ReactDOM.unmountComponentAtNode(fixtures)
-          FlashAlert.destroyContainer()
-          createLatePolicyStub.restore()
-          fetchLatePolicyStub.restore()
+        test('does not attempt to create the late policy', () => {
+          getUpdateButton().click()
+          strictEqual(GradebookSettingsModalApi.createLatePolicy.callCount, 0)
         })
 
-        test('the form data is still submittable', async () => {
-          await editLatePolicyThenAdvancedSettings()
-          const isFlashMessageInDOM = () =>
-            document.body.innerText.includes('An error occurred while saving your settings')
-          await waitFor(isFlashMessageInDOM)
-
-          const button = findButton({label: 'Update'})
-          strictEqual(button.disabled, false)
+        test('updates the course post policy when changed', () => {
+          getGradePostingPolicyTab().click()
+          getManuallyPostGradesOption().click()
+          getUpdateButton().click()
+          strictEqual(PostPolicyApi.setCoursePostPolicy.callCount, 1)
         })
 
-        test('advanced settings are still present form', async () => {
-          await editLatePolicyThenAdvancedSettings()
-          const isFlashMessageInDOM = () =>
-            document.body.innerText.includes('An error occurred while saving your settings')
-          await waitFor(isFlashMessageInDOM)
-
-          const checkbox = findCheckbox({label: 'Allow final grade override'})
-          strictEqual(checkbox.checked, true)
-        })
-
-        test('the form data for Late Policies is still preset', async () => {
-          // it is necessary to do things in this order because the panels
-          // do not reflect previous changes when switching between tabs
-          await editAdvancedSettingsThenLatePolicy()
-          const isFlashMessageInDOM = () =>
-            document.body.innerText.includes('An error occurred while saving your settings')
-          await waitFor(isFlashMessageInDOM)
-
-          const checkbox = findCheckbox({
-            label: 'Automatically apply grade for missing submissions'
-          })
-          strictEqual(checkbox.checked, true)
-        })
-
-        test('the form is not submittable when changes are cleared', async () => {
-          // it is necessary to do things in this order because the panels
-          // do not reflect previous changes when switching between tabs
-          await editLatePolicyThenAdvancedSettings()
-          const isFlashMessageInDOM = () =>
-            document.body.innerText.includes('An error occurred while saving your settings')
-          await waitFor(isFlashMessageInDOM)
-          findCheckbox({label: 'Allow final grade override'}).click()
-
-          const button = findButton({label: 'Update'})
-          strictEqual(button.disabled, false)
+        test('updates advanced settings when changed', () => {
+          getAdvancedTab().click()
+          getAllowFinalGradeOverrideCheckbox().click()
+          getUpdateButton().click()
+          strictEqual(GradebookSettingsModalApi.updateCourseSettings.callCount, 1)
         })
       })
     })
+  })
 
-    QUnit.module('given changes to Grade Posting Policy settings', postPolicyHooks => {
-      let fetchLatePolicyStub
-      let createLatePolicyStub
-      let flashAlertSpy
-      let setCoursePostPolicyStub
+  QUnit.module('when creating a new late policy', hooks => {
+    hooks.beforeEach(async () => {
+      sandbox.spy(FlashAlert, 'showFlashAlert')
 
-      const performUpdate = () => {
-        findTab({label: 'Grade Posting Policy'}).click()
-        findCheckbox({label: 'Automatically Post Grades'}).click()
-        findButton({label: 'Update'}).click()
-      }
+      await mountOpenAndLoad()
+      getAutomaticallyApplyMissingCheckbox().click()
+      getUpdateButton().click()
+    })
 
-      const successMessagePresent = () =>
-        document.body.innerText.includes('Gradebook Settings updated')
+    hooks.afterEach(() => {
+      FlashAlert.destroyContainer()
+    })
 
-      const errorMessagePresent = () =>
-        document.body.innerText.includes('An error occurred while saving the course post policy')
+    test('disables the "Update" button while the request is pending', () => {
+      strictEqual(getUpdateButton().disabled, true)
+      createLatePolicyPromise.resolve()
+    })
 
-      postPolicyHooks.beforeEach(async () => {
-        fetchLatePolicyStub = sinon
-          .stub(GradebookSettingsModalApi, 'fetchLatePolicy')
-          .resolves({data: {latePolicy: NEW_LATE_POLICY}})
-        createLatePolicyStub = sinon.stub(GradebookSettingsModalApi, 'createLatePolicy').resolves()
-        flashAlertSpy = sinon.spy(FlashAlert, 'showFlashAlert')
+    QUnit.module('when the request succeeds', contextHooks => {
+      contextHooks.beforeEach(async () => {
+        createLatePolicyPromise.resolve()
+        await waitForModalClosed()
       })
 
-      postPolicyHooks.afterEach(() => {
-        ReactDOM.unmountComponentAtNode(fixtures)
-        flashAlertSpy.restore()
-        FlashAlert.destroyContainer()
-        createLatePolicyStub.restore()
-        fetchLatePolicyStub.restore()
+      test('displays a flash alert', () => {
+        strictEqual(FlashAlert.showFlashAlert.callCount, 1)
       })
 
-      test('postPolicies.setCoursePostPolicy() is called if setting the course policy is successful', async () => {
-        await renderAndOpenComponent()
-        const setCoursePostPolicy = sandbox
-          .stub(PostPolicyApi, 'setCoursePostPolicy')
-          .resolves({postManually: true})
-        performUpdate()
-
-        await waitFor(successMessagePresent)
-
-        strictEqual(setCoursePostPolicy.callCount, 1)
-
-        setCoursePostPolicy.restore()
+      test('uses the "success" type for the flash alert', () => {
+        const [{type}] = FlashAlert.showFlashAlert.lastCall.args
+        equal(type, 'success')
       })
 
-      QUnit.module('when setting the course policy fails', failureHooks => {
-        failureHooks.beforeEach(() => {
-          setCoursePostPolicyStub = sandbox.stub(PostPolicyApi, 'setCoursePostPolicy').rejects()
-        })
+      test('closes the modal', () => {
+        notOk(getModalElement())
+      })
+    })
 
-        failureHooks.afterEach(() => {
-          setCoursePostPolicyStub.restore()
-        })
+    QUnit.module('when the request fails', contextHooks => {
+      contextHooks.beforeEach(async () => {
+        createLatePolicyPromise.reject(new Error('request failed'))
+        await wait(() => FlashAlert.showFlashAlert.callCount > 0)
+      })
 
-        test('a flash alert is displayed', async () => {
-          await renderAndOpenComponent()
-          performUpdate()
+      test('displays a flash alert', () => {
+        strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+      })
 
-          await waitFor(errorMessagePresent)
+      test('uses the "error" type for the flash alert', () => {
+        const [{type}] = FlashAlert.showFlashAlert.lastCall.args
+        equal(type, 'error')
+      })
 
-          strictEqual(flashAlertSpy.callCount, 1)
-        })
+      test('does not close the modal', () => {
+        ok(getModalElement())
+      })
+    })
+  })
 
-        test('the flash alert is of type "error"', async () => {
-          await renderAndOpenComponent()
-          performUpdate()
+  QUnit.module('when updating the late policy', hooks => {
+    hooks.beforeEach(async () => {
+      sandbox.spy(FlashAlert, 'showFlashAlert')
 
-          await waitFor(errorMessagePresent)
+      fetchedLatePolicy = existingLatePolicy
+      await mountOpenAndLoad()
+      getAutomaticallyApplyMissingCheckbox().click()
+      getUpdateButton().click()
+    })
 
-          const [{type}] = flashAlertSpy.firstCall.args
-          strictEqual(type, 'error')
-        })
+    hooks.afterEach(() => {
+      FlashAlert.destroyContainer()
+    })
+
+    test('disables the "Update" button while the request is pending', () => {
+      strictEqual(getUpdateButton().disabled, true)
+      updateLatePolicyPromise.resolve()
+    })
+
+    QUnit.module('when the request succeeds', contextHooks => {
+      contextHooks.beforeEach(async () => {
+        updateLatePolicyPromise.resolve()
+        await waitForModalClosed()
+      })
+
+      test('displays a flash alert', () => {
+        strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+      })
+
+      test('uses the "success" type for the flash alert', () => {
+        const [{type}] = FlashAlert.showFlashAlert.lastCall.args
+        equal(type, 'success')
+      })
+
+      test('closes the modal', () => {
+        notOk(getModalElement())
+      })
+    })
+
+    QUnit.module('when the request fails', contextHooks => {
+      contextHooks.beforeEach(async () => {
+        updateLatePolicyPromise.reject(new Error('request failed'))
+        await wait(() => FlashAlert.showFlashAlert.callCount > 0)
+      })
+
+      test('displays a flash alert', () => {
+        strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+      })
+
+      test('uses the "error" type for the flash alert', () => {
+        const [{type}] = FlashAlert.showFlashAlert.lastCall.args
+        equal(type, 'error')
+      })
+
+      test('does not close the modal', () => {
+        ok(getModalElement())
+      })
+    })
+  })
+
+  QUnit.module('when updating the course post policy', hooks => {
+    hooks.beforeEach(async () => {
+      sandbox.spy(FlashAlert, 'showFlashAlert')
+
+      await mountOpenLoadAndSelectTab('Grade Posting Policy')
+      getManuallyPostGradesOption().click()
+      getUpdateButton().click()
+    })
+
+    hooks.afterEach(() => {
+      FlashAlert.destroyContainer()
+    })
+
+    test('disables the "Update" button while the request is pending', () => {
+      strictEqual(getUpdateButton().disabled, true)
+      setCoursePostPolicyPromise.resolve()
+    })
+
+    QUnit.module('when the request succeeds', contextHooks => {
+      contextHooks.beforeEach(async () => {
+        setCoursePostPolicyPromise.resolve()
+        await waitForModalClosed()
+      })
+
+      test('displays a flash alert', () => {
+        strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+      })
+
+      test('uses the "success" type for the flash alert', () => {
+        const [{type}] = FlashAlert.showFlashAlert.lastCall.args
+        equal(type, 'success')
+      })
+
+      test('updates the Gradebook Post Policies', () => {
+        deepEqual(props.postPolicies.coursePostPolicy, postPolicy)
+      })
+
+      test('closes the modal', () => {
+        notOk(getModalElement())
+      })
+    })
+
+    QUnit.module('when the request fails', contextHooks => {
+      contextHooks.beforeEach(async () => {
+        setCoursePostPolicyPromise.reject(new Error('request failed'))
+        await wait(() => FlashAlert.showFlashAlert.callCount > 0)
+      })
+
+      test('displays a flash alert', () => {
+        strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+      })
+
+      test('uses the "error" type for the flash alert', () => {
+        const [{type}] = FlashAlert.showFlashAlert.lastCall.args
+        equal(type, 'error')
+      })
+
+      test('does not update the Gradebook Post Policies', () => {
+        notDeepEqual(props.postPolicies.coursePostPolicy, postPolicy)
+      })
+
+      test('does not close the modal', () => {
+        ok(getModalElement())
+      })
+    })
+  })
+
+  QUnit.module('when updating advanced settings', hooks => {
+    hooks.beforeEach(async () => {
+      sandbox.spy(FlashAlert, 'showFlashAlert')
+
+      await mountOpenLoadAndSelectTab('Advanced')
+      getAllowFinalGradeOverrideCheckbox().click()
+      getUpdateButton().click()
+    })
+
+    hooks.afterEach(() => {
+      FlashAlert.destroyContainer()
+    })
+
+    test('disables the "Update" button while the request is pending', () => {
+      strictEqual(getUpdateButton().disabled, true)
+      updateCourseSettingsPromise.resolve()
+    })
+
+    QUnit.module('when the request succeeds', contextHooks => {
+      contextHooks.beforeEach(async () => {
+        updateCourseSettingsPromise.resolve()
+        await waitForModalClosed()
+      })
+
+      test('displays a flash alert', () => {
+        strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+      })
+
+      test('uses the "success" type for the flash alert', () => {
+        const [{type}] = FlashAlert.showFlashAlert.lastCall.args
+        equal(type, 'success')
+      })
+
+      test('calls the onCourseSettingsUpdated callback prop', () => {
+        strictEqual(props.onCourseSettingsUpdated.callCount, 1)
+      })
+
+      test('includes the updated settings when calling onCourseSettingsUpdated', () => {
+        const [settings] = props.onCourseSettingsUpdated.lastCall.args
+        deepEqual(settings, updatedCourseSettings)
+      })
+
+      test('closes the modal', () => {
+        notOk(getModalElement())
+      })
+    })
+
+    QUnit.module('when the request fails', contextHooks => {
+      contextHooks.beforeEach(async () => {
+        updateCourseSettingsPromise.reject(new Error('request failed'))
+        await wait(() => FlashAlert.showFlashAlert.callCount > 0)
+      })
+
+      test('displays a flash alert', () => {
+        strictEqual(FlashAlert.showFlashAlert.callCount, 1)
+      })
+
+      test('uses the "error" type for the flash alert', () => {
+        const [{type}] = FlashAlert.showFlashAlert.lastCall.args
+        equal(type, 'error')
+      })
+
+      test('does not call the onCourseSettingsUpdated callback prop', () => {
+        strictEqual(props.onCourseSettingsUpdated.callCount, 0)
+      })
+
+      test('does not close the modal', () => {
+        ok(getModalElement())
+      })
+    })
+  })
+
+  QUnit.module('"Cancel" button', () => {
+    function getCancelButton() {
+      return getModalElement().querySelector('#gradebook-settings-cancel-button')
+    }
+
+    QUnit.module('when clicked', () => {
+      test('closes the modal', async () => {
+        await mountAndOpen()
+        getCancelButton().click()
+        await waitForModalClosed()
+        notOk(getModalElement())
       })
     })
   })
 })
+/* eslint-enable qunit/no-identical-names */

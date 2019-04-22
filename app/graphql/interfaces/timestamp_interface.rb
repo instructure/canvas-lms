@@ -17,11 +17,14 @@
 #
 
 module Interfaces
-  TimestampInterface = GraphQL::InterfaceType.define do
-    name "Timestamped"
+  module TimestampInterface
+    include GraphQL::Schema::Interface
+
+    graphql_name "Timestamped"
+
     description "Contains timestamp metadata"
 
-    field :createdAt, Types::DateTimeType, property: :created_at
-    field :updatedAt, Types::DateTimeType, property: :updated_at
+    field :created_at, Types::DateTimeType, null: true
+    field :updated_at, Types::DateTimeType, null: true
   end
 end

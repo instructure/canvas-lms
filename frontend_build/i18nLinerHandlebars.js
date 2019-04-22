@@ -147,7 +147,7 @@ const buildPartialRequirements = partialPaths => {
   return requirements
 }
 
-module.exports = function i18nLinerHandlebarsLoader(source) {
+function i18nLinerHandlebarsLoader(source) {
   this.cacheable()
   const name = resourceName(this.resourcePath)
   const dependencies = ['handlebars/runtime']
@@ -186,4 +186,14 @@ module.exports = function i18nLinerHandlebarsLoader(source) {
     partialRegistration
   )
   return compiledTemplate
+}
+
+module.exports = i18nLinerHandlebarsLoader
+
+module.exports.compile = (source, path) => {
+  const context = {
+    cacheable: () => {},
+    resourcePath: path
+  }
+  return i18nLinerHandlebarsLoader.call(context, source)
 }

@@ -140,6 +140,32 @@ describe "course settings" do
       show_announcements_on_home_page.click
       expect(home_page_announcement_limit).not_to be_disabled
     end
+
+    it "should not allow teachers to click CSP check" do
+      Account.default.enable_feature!(:javascript_csp)
+      Account.default.enable_csp!
+      get "/courses/#{@course.id}/settings"
+
+      f('.course_form_more_options_link').click
+
+      expect(f("#csp_options input[type='checkbox']")).not_to be_enabled
+    end
+
+    it "should save CSP check by admin" do
+      course_with_admin_logged_in
+      Account.default.enable_feature!(:javascript_csp)
+      Account.default.enable_csp!
+      get "/courses/#{@course.id}/settings"
+
+      f('.course_form_more_options_link').click
+      expect(f("#csp_options input[type='checkbox']")).to be_enabled
+
+      force_click("#csp_options input[type='checkbox']")
+      wait_for_new_page_load { submit_form('#course_form') }
+
+      f('.course_form_more_options_link').click
+      expect(is_checked(f("#csp_options input[type='checkbox']"))).to be_truthy
+    end
   end
 
   describe "course items" do
@@ -155,7 +181,7 @@ describe "course settings" do
       expect(admin_cog('#nav_edit_tab_id_0')).to be_falsey
     end
 
-    it "should change course details", :xbrowser do
+    it "should change course details" do
       course_name = 'new course name'
       course_code = 'new course-101'
       locale_text = 'English (US)'

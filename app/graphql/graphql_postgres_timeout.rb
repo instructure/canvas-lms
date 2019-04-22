@@ -36,9 +36,11 @@ module GraphQLPostgresTimeout
               "GraphQL Operation failed due to postgres statement_timeout:\n#{query.query_string}"
             }
           end
-          raise
+          raise GraphQLPostgresTimeout::Error, "operation timed out"
         end
       end
     end
   end
+
+  Error = Class.new(StandardError)
 end

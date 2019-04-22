@@ -44,7 +44,6 @@ RSpec.describe GradebookSettingsController, type: :controller do
           "show_inactive_enrollments" => "true", # values must be strings
           "show_concluded_enrollments" => "false",
           "show_unpublished_assignments" => "true",
-          "show_final_grade_overrides" => "false",
           "student_column_display_as" => "last_first",
           "student_column_secondary_info" => "login_id",
           "sort_rows_by_column_id" => "student",
@@ -91,14 +90,13 @@ RSpec.describe GradebookSettingsController, type: :controller do
         it { is_expected.to include 'show_inactive_enrollments' => 'true' }
         it { is_expected.to include 'show_concluded_enrollments' => 'false' }
         it { is_expected.to include 'show_unpublished_assignments' => 'true' }
-        it { is_expected.to include 'show_final_grade_overrides' => 'false' }
         it { is_expected.to include 'student_column_display_as' => 'last_first' }
         it { is_expected.to include 'student_column_secondary_info' => 'login_id' }
         it { is_expected.to include 'sort_rows_by_column_id' => 'student' }
         it { is_expected.to include 'sort_rows_by_setting_key' => 'sortable_name' }
         it { is_expected.to include 'sort_rows_by_direction' => 'descending' }
         it { is_expected.not_to include 'colors' }
-        it { is_expected.to have(13).items } # ensure we add specs for new additions
+        it { is_expected.to have(12).items } # ensure we add specs for new additions
 
         context 'colors' do
           subject { json_parse.fetch('gradebook_settings').fetch('colors') }

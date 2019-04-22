@@ -22,7 +22,6 @@ import 'jquery.ajaxJSON'
 import I18n from 'i18n!gradebook'
 import cheaterDepaginate from '../../../shared/CheatDepaginator'
 import {showFlashAlert} from '../../../shared/FlashAlert'
-import {getFinalGradeOverrides} from '../FinalGradeOverrides/FinalGradeOverrideApi'
 
 const submissionsParams = {
   exclude_response_fields: ['preview_url'],
@@ -164,13 +163,10 @@ export default class StudentContentDataLoader {
       getNextChunk()
     })
 
+    const {courseSettings, finalGradeOverrides} = this.options.gradebook
     let finalGradeOverridesRequest
-    if (this.options.getFinalGradeOverrides) {
-      finalGradeOverridesRequest = getFinalGradeOverrides(this.options.courseId).then(
-        ({finalGradeOverrides}) => {
-          this.options.gradebook.finalGradeOverrides.setGrades(finalGradeOverrides)
-        }
-      )
+    if (courseSettings.allowFinalGradeOverride) {
+      finalGradeOverridesRequest = finalGradeOverrides.loadFinalGradeOverrides()
     }
 
     // wait for all student, submission, and final grade override requests to return

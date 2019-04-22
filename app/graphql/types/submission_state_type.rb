@@ -17,8 +17,8 @@
 #
 
 module Types
-  SubmissionStateType = GraphQL::EnumType.define do
-    name "SubmissionState"
+  class SubmissionStateType < BaseEnum
+    graphql_name "SubmissionState"
 
     value "submitted"
     value "unsubmitted"

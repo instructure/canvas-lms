@@ -50,26 +50,6 @@ test('caches the response of get_module when called', assert => {
   })
 })
 
-test('loads event listeners on first load', function(assert) {
-  const done = assert.async()
-  sandbox.stub(RCELoader, 'loadEventListeners')
-  RCELoader.RCE = null
-  return RCELoader.loadRCE(() => {
-    ok(RCELoader.loadEventListeners.called)
-    done()
-  })
-})
-
-test('does not load event listeners once loaded', function(assert) {
-  const done = assert.async()
-  sandbox.stub(RCELoader, 'loadEventListeners')
-  RCELoader.RCE = {}
-  return RCELoader.loadRCE(() => {
-    ok(!RCELoader.loadEventListeners.called)
-    done()
-  })
-})
-
 test('handles callbacks once module is loaded', assert => {
   const done = assert.async()
   RCELoader.loadRCE(() => {})

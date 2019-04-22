@@ -82,7 +82,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def deployment_id
-    "#{self.id}:#{Lti::Asset.opaque_identifier_for(self.context)}"
+    "#{self.id}:#{Lti::Asset.opaque_identifier_for(self.context)}"[0..254]
   end
 
   def content_migration_configured?
@@ -337,13 +337,16 @@ class ContextExternalTool < ActiveRecord::Base
     settings[:use_1_3] = bool
   end
 
-  def custom_fields_string=(str)
-    hash = {}
-    str.split(/[\r\n]+/).each do |line|
+  def self.find_custom_fields_from_string(str)
+    return {} if str.nil?
+    str.split(/[\r\n]+/).each_with_object({}) do |line, hash|
       key, val = line.split(/=/)
       hash[key] = val if key.present? && val.present?
     end
-    settings[:custom_fields] = hash
+  end
+
+  def custom_fields_string=(str)
+    settings[:custom_fields] = ContextExternalTool.find_custom_fields_from_string(str)
   end
 
   def custom_fields=(hash)
@@ -406,10 +409,11 @@ class ContextExternalTool < ActiveRecord::Base
     extension_setting(extension_type, :display_type) || 'in_context'
   end
 
-  def login_or_launch_uri(extension_type: nil, content_tag_uri: nil)
-    use_1_3? && developer_key&.oidc_login_uri ||
+  def login_or_launch_url(extension_type: nil, content_tag_uri: nil)
+    (use_1_3? && developer_key&.oidc_initiation_url) ||
     content_tag_uri ||
-    extension_setting(extension_type, :target_link_uri) ||
+    (use_1_3? && extension_setting(extension_type, :target_link_uri)) ||
+    extension_setting(extension_type, :url) ||
     url
   end
 
@@ -772,14 +776,14 @@ class ContextExternalTool < ActiveRecord::Base
     settings[:resource_selection]
   end
 
-  def opaque_identifier_for(asset)
-    ContextExternalTool.opaque_identifier_for(asset, self.shard)
+  def opaque_identifier_for(asset, context: nil)
+    ContextExternalTool.opaque_identifier_for(asset, self.shard, context: context)
   end
 
-  def self.opaque_identifier_for(asset, shard)
+  def self.opaque_identifier_for(asset, shard, context: nil)
     shard.activate do
       lti_context_id = context_id_for(asset, shard)
-      Lti::Asset.set_asset_context_id(asset, lti_context_id)
+      Lti::Asset.set_asset_context_id(asset, lti_context_id, context: context)
     end
   end
 

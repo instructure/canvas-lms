@@ -50,7 +50,7 @@ module Types
       The override grade. Supersedes the computed final grade if set.
     DESC
     def override_grade
-      return nil if override_score.blank?
+      return nil if object.override_score.blank?
       object.effective_final_grade
     end
 

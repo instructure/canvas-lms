@@ -187,6 +187,14 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
     ::Canvas.timeout_protection_error_ttl("ldap:#{self.global_id}")
   end
 
+  def ldap_account_ids_to_send_to_statsd
+    @ldap_account_ids_to_send_to_statsd ||= (InstStatsd.settings['ldap_account_ids_to_send_to_statsd'] || []).to_set
+  end
+
+  def should_send_to_statsd?
+    ldap_account_ids_to_send_to_statsd.include? Shard.global_id_for(account_id)
+  end
+
   def ldap_bind_result(unique_id, password_plaintext)
     return nil if password_plaintext.blank?
 
@@ -199,16 +207,26 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
       ldap.bind_as(base: ldap.base, filter: filter, password: password_plaintext)
     end
 
-    CanvasStatsd::Statsd.increment("#{statsd_prefix}.ldap_#{result ? 'success' : 'failure'}")
+    if should_send_to_statsd?
+      InstStatsd::Statsd.increment("#{statsd_prefix}.ldap_#{result ? 'success' : 'failure'}",
+                                   short_stat: "ldap_#{result ? 'success' : 'failure'}",
+                                   tags: {account_id: Shard.global_id_for(account_id), auth_provider_id: self.global_id})
+    end
 
     result
   rescue => e
     ::Canvas::Errors.capture(e, type: :ldap, account: self.account)
     if e.is_a?(Timeout::Error)
-      CanvasStatsd::Statsd.increment("#{statsd_prefix}.ldap_timeout")
+      if should_send_to_statsd?
+        InstStatsd::Statsd.increment("#{statsd_prefix}.ldap_timeout",
+                                     short_stat: "ldap_timeout",
+                                     tags: {account_id: Shard.global_id_for(account_id), auth_provider_id: self.global_id})
+      end
       self.update_attribute(:last_timeout_failure, Time.zone.now)
-    else
-      CanvasStatsd::Statsd.increment("#{statsd_prefix}.ldap_error")
+    elsif should_send_to_statsd?
+      InstStatsd::Statsd.increment("#{statsd_prefix}.ldap_error",
+                                   short_stat: "ldap_error",
+                                   tags: {account_id: Shard.global_id_for(account_id), auth_provider_id: self.global_id})
     end
     return nil
   end

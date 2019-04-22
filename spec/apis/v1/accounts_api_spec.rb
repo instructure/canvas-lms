@@ -939,6 +939,14 @@ describe "Accounts API", type: :request do
                           :format => 'json', :completed => "no" })
         expect(json.collect{|row|row['name']}).to eql ['c1']
       end
+
+      it "should filter and sort without asploding" do
+        json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?completed=yes&sort=course_name&order=desc",
+                        { :controller => 'accounts', :action => 'courses_api',
+                          :account_id => @a1.to_param, :format => 'json', :completed => "yes",
+                          :sort => 'course_name', :order => 'desc' })
+        expect(json.collect{|row|row['name']}).to eql ['c4', 'c3', 'c2']
+      end
     end
 
     describe "?by_teachers" do

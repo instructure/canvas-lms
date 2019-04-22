@@ -126,3 +126,4 @@ try {
     filename = ''
   }
 }
+/* eslint-enable no-console */

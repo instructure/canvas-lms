@@ -153,15 +153,24 @@ module OutcomeCommon
     # description
     expect(f(".outcomes-content .description").text).to eq outcome_description
     # ratings
-    ratings = ffj('table.criterion .rating')
+    descriptions = ff('table.criterion th.rating')
+    expect(descriptions.size).to eq 4
+    expect(descriptions.map(&:text)).to eq [
+      "Exceeds Expectations",
+      "almost exceeds",
+      "Meets Expectations",
+      "Does Not Meet Expectations"
+    ]
+    ratings = ff('table.criterion td.rating')
     expect(ratings.size).to eq 4
     expect(ratings.map(&:text)).to eq [
-      "Exceeds Expectations\n5 Points",
-      "almost exceeds\n4 Points",
-      "Meets Expectations\n3 Points",
-      "Does Not Meet Expectations\n0 Points"
+      "5 Points",
+      "4 Points",
+      "3 Points",
+      "0 Points"
     ]
-    expect(f('table.criterion .total').text).to eq "Total Points\n5 Points"
+    expect(f('table.criterion th.total').text).to eq "Total Points"
+    expect(f('table.criterion td.total').text).to eq "5 Points"
     # db
     expect(LearningOutcome.where(short_description: outcome_name).first).to be_present
   end
@@ -241,10 +250,14 @@ module OutcomeCommon
     # title
     expect(f(".outcomes-content .title").text).to eq edited_title
     # ratings
-    ratings = ffj('table.criterion .rating')
+    descriptions = ff('table.criterion th.rating')
+    expect(descriptions.size).to eq 1
+    expect(descriptions.map(&:text)).to eq ["Lame"]
+    ratings = ff('table.criterion td.rating')
     expect(ratings.size).to eq 1
-    expect(ratings.map(&:text)).to eq ["Lame\n1 Points"]
-    expect(f('table.criterion .total').text).to eq "Total Points\n1 Points"
+    expect(ratings.map(&:text)).to eq ["1 Points"]
+    expect(f('table.criterion th.total').text).to eq "Total Points"
+    expect(f('table.criterion td.total').text).to eq "1 Points"
     # db
     expect(LearningOutcome.where(short_description: edited_title).first).to be_present
   end

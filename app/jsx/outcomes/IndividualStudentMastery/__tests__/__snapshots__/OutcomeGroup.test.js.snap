@@ -5,6 +5,8 @@ exports[`renders correctly expanded 1`] = `
   as="div"
   className="outcomeGroup"
   display="auto"
+  overflowX="visible"
+  overflowY="visible"
 >
   <ToggleGroup
     as="span"
@@ -114,6 +116,8 @@ exports[`renders the OutcomeGroup component 1`] = `
   as="div"
   className="outcomeGroup"
   display="auto"
+  overflowX="visible"
+  overflowY="visible"
 >
   <ToggleGroup
     as="span"

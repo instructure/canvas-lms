@@ -22,8 +22,7 @@ module Lti
 
     belongs_to :developer_key
 
-    before_validation :store_configuration_from_url
-    before_validation :ensure_use_1_3
+    before_validation :store_configuration_from_url, only: :create
     before_save :normalize_configuration
 
     validates :developer_key_id, :settings, presence: true
@@ -48,20 +47,36 @@ module Lti
         false
       )
       tool.developer_key = developer_key
-      tool.custom_fields_string = tool.custom_fields_string + "\n#{custom_fields}"
       tool.workflow_state = privacy_level || DEFAULT_PRIVACY_LEVEL
+      tool.use_1_3 = true
       tool
     end
 
     def self.create_tool_and_key!(account, tool_configuration_params)
       self.transaction do
-        self.create!(
-          developer_key: DeveloperKey.create!(account: account),
-          configuration: tool_configuration_params[:settings],
-          configuration_url: tool_configuration_params[:settings_url],
-          disabled_placements: tool_configuration_params[:disabled_placements],
-          custom_fields: tool_configuration_params[:custom_fields]
-        )
+        dk = DeveloperKey.create!(account: account)
+        settings = tool_configuration_params[:settings]&.try(:to_unsafe_hash) || tool_configuration_params[:settings]
+
+        if settings.present?
+          self.create!(
+            developer_key: dk,
+            configuration: settings.deep_merge(
+              'custom_fields' => ContextExternalTool.find_custom_fields_from_string(tool_configuration_params[:custom_fields])
+            ),
+            disabled_placements: tool_configuration_params[:disabled_placements]
+          )
+        else
+          # Creating config via URL
+          t = self.create!(
+            developer_key: dk,
+            configuration_url: tool_configuration_params[:settings_url],
+            disabled_placements: tool_configuration_params[:disabled_placements]
+          )
+          t.update! configuration: t.configuration.deep_merge(
+            'custom_fields' => ContextExternalTool.find_custom_fields_from_string(tool_configuration_params[:custom_fields])
+            )
+          t
+        end
       end
     end
 
@@ -69,6 +84,8 @@ module Lti
 
     def valid_configuration?
       errors.add(:configuration, '"public_jwk" must be present') if configuration['public_jwk'].blank?
+      schema_errors = Schemas::Lti::ToolConfiguration.simple_validation_errors(configuration)
+      errors.add(:configuration, schema_errors) if schema_errors.present?
       return if errors[:configuration].present?
 
       tool = new_external_tool(developer_key.owner_account)
@@ -106,7 +123,7 @@ module Lti
     end
 
     def store_configuration_from_url
-      return if configuration_url.blank?
+      return if configuration_url.blank? || configuration.present?
 
       response = CC::Importer::BLTIConverter.new.fetch(configuration_url)
 
@@ -123,11 +140,6 @@ module Lti
 
     def normalize_configuration
       self.configuration = JSON.parse(configuration) if configuration.is_a? String
-    end
-
-    def ensure_use_1_3
-      return if self.configuration.blank?
-      self.configuration['use_1_3'] = true
     end
   end
 end

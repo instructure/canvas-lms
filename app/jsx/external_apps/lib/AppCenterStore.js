@@ -44,8 +44,6 @@ import 'compiled/jquery.rails_flash_notifications'
     isLoading: false,    // flag to indicate fetch is in progress
     isLoaded: false,     // flag to indicate if fetch should re-pull if already pulled
     apps: [],
-    lti13Tools: [],
-    lti13LoadStatus: 'pending',
     links: {},
     filter: 'all',
     filterText: '',
@@ -66,17 +64,6 @@ import 'compiled/jquery.rails_flash_notifications'
       type: 'GET',
       success: this._fetchSuccessHandler.bind(this),
       error: this._fetchErrorHandler.bind(this)
-    });
-  };
-
-  store.fetch13Tools = function() {
-    const url = `/api/v1${ENV.CONTEXT_BASE_URL}/lti_apps?lti_1_3_tool_configurations=true`;
-    this.setState({ lti13LoadStatus: true });
-    $.ajax({
-      url,
-      type: 'GET',
-      success: this._fetch13ToolsSuccessHandler.bind(this),
-      error: this._fetch13ToolsErrorHandler.bind(this)
     });
   };
 
@@ -115,36 +102,6 @@ import 'compiled/jquery.rails_flash_notifications'
     });
   };
 
-  store.installTool = function (developerKeyId) {
-    const toggleValue = store._toggle_lti_1_3_tool_enabled(developerKeyId).bind(this)
-    toggleValue(true)
-    const url = `/api/v1${ENV.CONTEXT_BASE_URL}/developer_keys/${developerKeyId}/create_tool`;
-    $.ajax({
-      url,
-      type: 'POST',
-      success: () => {},
-      error: () => {
-        $.flashError('Failed to install tool.')
-        toggleValue(false)
-      }
-    });
-  }
-
-  store.removeTool = function (developerKeyId) {
-    const toggleValue = store._toggle_lti_1_3_tool_enabled(developerKeyId).bind(this)
-    toggleValue(false)
-    const url = `/api/v1${ENV.CONTEXT_BASE_URL}/developer_keys/${developerKeyId}/delete_tool`;
-    $.ajax({
-      url,
-      type: 'DELETE',
-      success: () => {},
-      error: () => {
-        $.flashError('Failed to remove tool.')
-        toggleValue(true)
-      }
-    });
-  }
-
   // *** CALLBACK HANDLERS ***/
 
   store._fetchSuccessHandler = function (apps, status, xhr) {
@@ -173,34 +130,5 @@ import 'compiled/jquery.rails_flash_notifications'
       hasMore: true
     });
   };
-
-  store._fetch13ToolsSuccessHandler = function(tools, status, xhr) {
-    this.setState({
-      lti13LoadStatus: 'success',
-      lti13Tools: sort(tools)
-    });
-  };
-
-  store._fetch13ToolsErrorHandler = function() {
-    $.flashError(I18n.t('Unable to load Lti 1.3 Tools'));
-    this.setState({
-      lti13LoadStatus: 'error'
-    });
-  };
-
-  store._toggle_lti_1_3_tool_enabled = function(developerKeyId) {
-    return (value) => {
-      const oldTools = this.getState().lti13Tools
-      const installedToolIndex = oldTools.findIndex((tool) => tool.app_id === developerKeyId)
-      const tool = Object.assign(
-        {},
-        oldTools[installedToolIndex],
-        {installed_locally: value, enabled: value, installed_in_current_course: true}
-      )
-      const lti13Tools = oldTools.slice()
-      lti13Tools.splice(installedToolIndex, 1, tool)
-      this.setState({lti13Tools})
-    }
-  }
 
 export default store

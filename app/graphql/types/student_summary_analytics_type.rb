@@ -17,41 +17,39 @@
 #
 
 module Types
-  StudentSummaryAnalyticsType = GraphQL::ObjectType.define do
-    name "StudentSummaryAnalytics"
-    description "basic information about a students activity in a course"
+  class PageViewAnalysisType < ApplicationObjectType
+    graphql_name "PageViewAnalysis"
 
-    field :pageViews, PageViewAnalysisType, property: :page_views
-    field :participations, PageViewAnalysisType, property: :participations
-    field :tardinessBreakdown, TardinessBreakdownType, property: :tardiness_breakdown
+    field :total, Integer,
+      "The number of views/participations this student has",
+      null: true
+
+    field :max, Integer,
+      "The maximum number of views/participations in this course",
+      null: true
+
+    field :level, Integer,
+      "This number (0-3) is intended to give an idea of how the student is doing relative to others in the course",
+      null: true
   end
 
-  PageViewAnalysisType = GraphQL::ObjectType.define do
-    name "PageViewAnalysis"
-
-    field :total, types.Int do
-      description "The number of views/participations this student has"
-      hash_key :total
-    end
-
-    field :max, types.Int do
-      description "The maximum number of views/participations in this course"
-      hash_key :max
-    end
-
-    field :level, types.Int do
-      description "This number (0-3) is intended to give an idea of how the student is doing relative to others in the course"
-      hash_key :level
-    end
-  end
-
-  TardinessBreakdownType = GraphQL::ObjectType.define do
-    name "TardinessBreakdown"
+  class TardinessBreakdownType < ApplicationObjectType
+    graphql_name "TardinessBreakdown"
     description "statistics based on timeliness of student submissions"
 
-    field :total, types.Int, hash_key: :total
-    field :late, types.Float, hash_key: :late
-    field :missing, types.Float, hash_key: :missing
-    field :onTime, types.Float, hash_key: :on_time
+    field :total, Integer, null: true
+    field :late, Float, null: true
+    field :missing, Float, null: true
+    field :on_time, Float, null: true
   end
+
+  class StudentSummaryAnalyticsType < ApplicationObjectType
+    graphql_name "StudentSummaryAnalytics"
+    description "basic information about a students activity in a course"
+
+    field :page_views, PageViewAnalysisType, null: true
+    field :participations, PageViewAnalysisType, null: true
+    field :tardiness_breakdown, TardinessBreakdownType, null: true
+  end
+
 end

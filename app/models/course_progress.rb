@@ -31,7 +31,7 @@ class CourseProgress
 
   def modules
     @_modules ||= begin
-      result = course.modules_visible_to(user, array_is_okay: true).to_a
+      result = course.modules_visible_to(user)
       ActiveRecord::Associations::Preloader.new.preload(result, :content_tags)
       result
                     end
@@ -53,11 +53,12 @@ class CourseProgress
 
   def module_progressions
     @_module_progressions ||= if @preloaded_progressions
-                                module_ids = modules.map(&:id)
-                                @preloaded_progressions[course.id]&.select { |cmp| module_ids.include?(cmp.context_module_id) } || []
+                                module_ids = modules.pluck(:id)
+                                @preloaded_progressions[course.id]&.select { |cmp| module_ids.include?(cmp.context_module_id) } ||
+                                  ContextModuleProgression.none
                               else
                                 course.context_module_progressions.
-                                  where(user_id: user, context_module_id: modules).to_a
+                                  where(user_id: user, context_module_id: modules)
                               end
   end
 
@@ -128,7 +129,11 @@ class CourseProgress
 
   def most_recent_module_completed_at
     return unless module_progressions
-    module_progressions.map(&:completed_at).compact.max
+    if module_progressions.is_a? Array
+      module_progressions.map(&:completed_at).compact.max
+    else
+      module_progressions.maximum(:completed_at)
+    end
   end
 
   def completed_at

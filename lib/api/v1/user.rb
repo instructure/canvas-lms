@@ -139,10 +139,12 @@ module Api::V1::User
       end
 
       if includes.include?('lti_id')
-        json[:lti_id] = user.lti_context_id
+        json[:lti_id] = Lti::Asset.old_id_for_user_in_context(user, context) || user.lti_context_id
       end
 
       if includes.include?('uuid')
+        past_uuid = UserPastLtiId.uuid_for_user_in_context(user, context)
+        json[:past_uuid] = past_uuid unless past_uuid == user.uuid
         json[:uuid] = user.uuid
       end
     end

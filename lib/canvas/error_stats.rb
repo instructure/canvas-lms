@@ -24,8 +24,8 @@ module Canvas
       unless exception.is_a?(String) || exception.is_a?(Symbol)
         category = exception.class.name
       end
-      CanvasStatsd::Statsd.increment("errors.all")
-      CanvasStatsd::Statsd.increment("errors.#{category}")
+      InstStatsd::Statsd.increment("errors.all")
+      InstStatsd::Statsd.increment("errors.#{category}")
     end
   end
 end

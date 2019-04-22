@@ -18,26 +18,32 @@
 
 import React from 'react'
 import {bool, func, shape} from 'prop-types'
-
 import Checkbox from '@instructure/ui-forms/lib/components/Checkbox'
 import View from '@instructure/ui-layout/lib/components/View'
 
 import I18n from 'i18n!gradebook'
 
-export default function AdvancedTabPanel({overrides}) {
+export default function AdvancedTabPanel(props) {
+  const {courseSettings, onCourseSettingsChange} = props
+
   return (
     <div id="AdvancedTabPanel__Container">
       <View as="div" margin="small">
-        <Checkbox {...overrides} label={I18n.t('Allow final grade override')} />
+        <Checkbox
+          checked={courseSettings.allowFinalGradeOverride}
+          label={I18n.t('Allow final grade override')}
+          onChange={event => {
+            onCourseSettingsChange({allowFinalGradeOverride: event.target.checked})
+          }}
+        />
       </View>
     </div>
   )
 }
 
 AdvancedTabPanel.propTypes = {
-  overrides: shape({
-    defaultChecked: bool.isRequired,
-    disabled: bool.isRequired,
-    onChange: func.isRequired
-  }).isRequired
+  courseSettings: shape({
+    allowFinalGradeOverride: bool.isRequired
+  }).isRequired,
+  onCourseSettingsChange: func.isRequired
 }

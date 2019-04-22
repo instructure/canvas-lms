@@ -155,9 +155,14 @@ export default class EditableRichText extends React.Component {
   }
 
   handleEditorBlur = event => {
-    // HACK: if the user clicked on a toolbar button that opened a dialog,
+    // Focus isn't managed well in the RCE, so a couple hacks
+    // 1. if the user clicked on a toolbar button that opened a dialog,
     // the activeElement will be a child of the body, and not the our page
-    if (document.getElementById('assignments_2').contains(document.activeElement)) {
+    // 2. if focus is on the body, then we've left the editor altogether
+    if (
+      document.getElementById('assignments_2').contains(document.activeElement) ||
+      document.activeElement === document.body
+    ) {
       if (this._textareaRef) {
         const txt = RichContentEditor.callOnRCE(this._textareaRef, 'get_code')
         this.setState({value: txt})

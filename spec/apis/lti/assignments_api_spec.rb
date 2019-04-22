@@ -116,6 +116,13 @@ module Lti
         expect(parsed_body).to eq expected_assignment
       end
 
+      it 'returns an assignment with an old user lti id' do
+        UserPastLtiId.create!(user: student, context: course, user_lti_id: student.lti_id, user_lti_context_id: 'old_lti_id', user_uuid: 'old')
+        get "#{endpoint}/#{assignment.id}", params: { user_id: 'old_lti_id' }, headers: request_headers
+        parsed_body = JSON.parse(response.body)
+        expect(parsed_body).to eq expected_assignment
+      end
+
       it 'returns an assignment with user Canvas id' do
         get "#{endpoint}/#{assignment.id}", params: { user_id: student.id }, headers: request_headers
         parsed_body = JSON.parse(response.body)
@@ -123,7 +130,8 @@ module Lti
       end
 
       it 'returns an assignment that is differentiated by user' do
-        due_at = 3.days.from_now
+        due_at = CanvasTime.fancy_midnight(3.days.from_now.midnight)
+
         create_adhoc_override_for_assignment(assignment, student, due_at: due_at)
 
         get "#{endpoint}/#{assignment.id}", params: { user_id: student.id }, headers: request_headers

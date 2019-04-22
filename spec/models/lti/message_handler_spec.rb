@@ -53,6 +53,33 @@ module Lti
       end
     end
 
+    describe '#recreate_missing_subscriptions' do
+      include_context 'lti2_spec_helper'
+
+      let(:account) { Account.create!(name: 'account') }
+      let(:course) { Course.create!(account: account) }
+      let(:lookup) { assignment.assignment_configuration_tool_lookups.first }
+      let(:assignment) { course.assignments.new(title: 'Test Assignment') }
+
+      before do
+        allow_any_instance_of(AssignmentSubscriptionsHelper).to receive(:create_subscription) { SecureRandom.uuid }
+        allow_any_instance_of(AssignmentSubscriptionsHelper).to receive(:destroy_subscription) { {} }
+        assignment.workflow_state = 'published'
+        assignment.tool_settings_tool = message_handler
+        assignment.save!
+      end
+
+      it 'recreates subscriptions for associated assignments' do
+        message_handler.update!(
+          capabilities: [Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2]
+        )
+        expect do
+          message_handler.recreate_missing_subscriptions
+          run_jobs
+        end.to change { lookup.reload.subscription_id }
+      end
+    end
+
     describe 'scope #message_type' do
 
       it 'returns all message_handlers for a message_type' do

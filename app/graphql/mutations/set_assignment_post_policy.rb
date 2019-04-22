@@ -32,7 +32,7 @@ class Mutations::SetAssignmentPostPolicy < Mutations::BaseMutation
       raise GraphQL::ExecutionError, "An assignment with that id does not exist"
     end
 
-    return unless authorized_action?(course, :manage_grades)
+    verify_authorized_action!(course, :manage_grades)
 
     policy = PostPolicy.find_or_create_by(course: course, assignment: assignment)
     policy.update!(post_manually: input[:post_manually])

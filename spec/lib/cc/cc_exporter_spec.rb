@@ -325,6 +325,65 @@ describe "Common Cartridge exporting" do
       expect(@zip_file.find_entry(path)).not_to be_nil
     end
 
+    it "should include media objects" do
+      @q1 = @course.quizzes.create(:title => 'quiz1')
+      @media_object = @course.media_objects.create!(
+        :media_id => "some-kaltura-id",
+        :media_type => "video"
+      )
+
+      qq = @q1.quiz_questions.create!
+      data = {
+        :correct_comments => "",
+        :question_type => "multiple_choice_question",
+        :question_bank_name => "Quiz",
+        :assessment_question_id => "9270",
+        :migration_id => "QUE_1014",
+        :incorrect_comments => "",
+        :question_name => "test fun",
+        :name => "test fun",
+        :points_possible => 1,
+        :question_text => "<p><a id=\"media_comment_some-kaltura-id\" class=\"instructure_inline_media_comment video_comment\" href=\"/media_objects/some-kaltura-id\"></a></p>",
+        :answers => [{
+          :migration_id => "QUE_1016_A1", :text => "True", :weight => 100, :id => 8080
+        }, {
+          :migration_id => "QUE_1017_A2", :text => "False", :weight => 0, :id => 2279
+        }]
+      }.with_indifferent_access
+      qq.write_attribute(:question_data, data)
+      qq.save!
+
+      @ce.export_type = ContentExport::QTI
+      @ce.selected_content = { :all_quizzes => "1" }
+      @ce.save!
+
+      allow(CC::CCHelper).to receive(:media_object_info).and_return({
+        :asset => { :id => "some-kaltura-id", :size => 1234, :status => '2' },
+        :filename => "some-kaltura-id"
+      })
+      allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
+      allow(CanvasKaltura::ClientV3).to receive(:startSession)
+      allow(CanvasKaltura::ClientV3).to receive(:flavorAssetGetPlaylistUrl).and_return("some-url")
+      mock_http_response = Struct.new(:code) do
+        def read_body(stream)
+          stream.puts("lalala")
+        end
+      end
+      allow(CanvasHttp).to receive(:get).and_yield(mock_http_response.new(200))
+
+      run_export
+
+      check_resource_node(@q1, CC::CCHelper::QTI_ASSESSMENT_TYPE)
+
+      doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(@q1)}/#{mig_id(@q1)}.xml"))
+      expect(doc.at_css("presentation material mattext").text).to eq "<div><p><a id=\"media_comment_some-kaltura-id\" class=\"instructure_inline_media_comment video_comment\" href=\"%24IMS-CC-FILEBASE%24/media_objects/some-kaltura-id\"></a></p></div>"
+
+      resource_node = @manifest_doc.at_css("resource[identifier=#{mig_id(@media_object)}]")
+      expect(resource_node).to_not be_nil
+      path = resource_node['href']
+      expect(@zip_file.find_entry(path)).not_to be_nil
+    end
+
     it "should export web content files properly when display name is changed" do
       @att = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@course), :context => @course)
       @att.display_name = "not_actually_first.png"

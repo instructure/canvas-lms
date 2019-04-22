@@ -91,7 +91,11 @@ module Api::V1::PlannerItem
         hash[:plannable_date] = item.asset.assignment.peer_reviews_due_at || item.assessor_asset.cached_due_date
         title_date = {title: item.asset&.assignment&.title, todo_date: hash[:plannable_date]}
         hash[:plannable] = plannable_json(title_date.merge(item.attributes), extra_fields: ASSESSMENT_REQUEST_FIELDS)
-        hash[:html_url] = course_assignment_submission_url(item.asset.assignment.context_id, item.asset.assignment_id, item.user_id)
+        hash[:html_url] = Submission::ShowPresenter.new(
+          submission: item.asset,
+          current_user: user,
+          assessment_request: item
+        ).submission_data_url
       else
         hash[:plannable_date] = item[:user_due_date] || item.due_at
         hash[:plannable] = plannable_json(item.attributes, extra_fields: GRADABLE_FIELDS)

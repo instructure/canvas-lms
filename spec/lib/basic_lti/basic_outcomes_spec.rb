@@ -235,7 +235,7 @@ describe BasicLTI::BasicOutcomes do
       expect(request.description).to eq 'Assignment has no points possible.'
     end
 
-    it "doesn't explode when an assignment with no points possible receives a grade for an existing submission " do
+    it "doesn't explode when an assignment with no points possible receives a grade for an existing submission" do
       xml.css('resultData').remove
       assignment.points_possible = nil
       assignment.save!
@@ -410,8 +410,14 @@ describe BasicLTI::BasicOutcomes do
         )
       end
 
+      let(:submitted_at_timestamp) { 1.day.ago.iso8601(3) }
+
       it "stores the score and grade for quizzes.next assignments" do
-        xml.at_css('text').replace('<ltiLaunchUrl>http://example.com/launch</ltiLaunchUrl>')
+        xml.css('resultData').remove
+        xml.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result').add_child(
+          "<resultData><text>#{submitted_at_timestamp}</text>
+          <url>http://example.com/launch</url></resultData>"
+        )
         BasicLTI::BasicOutcomes.process_request(tool, xml)
         expect(assignment.submissions.first.grade).to eq "A-"
       end

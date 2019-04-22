@@ -22,7 +22,9 @@ module.exports = {
   moduleNameMapper: {
     '^i18n!(.*$)': '<rootDir>/jest/i18nTransformer.js',
     '^compiled/(.*)$': '<rootDir>/app/coffeescripts/$1',
+    '^coffeescripts/(.*)$': '<rootDir>/app/coffeescripts/$1',
     '^jsx/(.*)$': '<rootDir>/app/jsx/$1',
+    '^jst/(.*)$': '<rootDir>/app/views/jst/$1',
     "^timezone$": "<rootDir>/public/javascripts/timezone_core.js",
     "\\.svg$": "<rootDir>/jest/imageMock.js"
   },
@@ -48,11 +50,12 @@ module.exports = {
 
   coverageDirectory: '<rootDir>/coverage-jest/',
 
-  moduleFileExtensions: [...defaults.moduleFileExtensions, 'coffee'],
+  moduleFileExtensions: [...defaults.moduleFileExtensions, 'coffee', 'handlebars'],
 
   transform: {
     '^i18n': '<rootDir>/jest/i18nTransformer.js',
     '^.+\\.coffee': '<rootDir>/jest/coffeeTransformer.js',
+    '^.+\\.handlebars': '<rootDir>/jest/handlebarsTransformer.js',
     '^.+\\.jsx?$': 'babel-jest'
   },
 }

@@ -18,6 +18,8 @@
 
 module Services
   class SubmitHomeworkService
+    CloneUrlError = Class.new(StandardError)
+
     EmailWorker = Struct.new(:message) do
       def perform
         Mailer.deliver(Mailer.create_message(message))
@@ -34,7 +36,7 @@ module Services
       end
     end
 
-    SubmitWorker = Struct.new(:progress_id, :attachment_id, :eula_agreement_timestamp, :clone_url_executor) do
+    CopyWorker = Struct.new(:attachment_id, :progress_id, :eula_agreement_timestamp, :clone_url_executor) do
       def progress
         @progress ||= Progress.find(progress_id)
       end
@@ -43,28 +45,13 @@ module Services
         @attachment ||= Attachment.find(attachment_id)
       end
 
-      def assignment
-        @assignment ||= begin
-          progress.context if progress.context.is_a? Assignment
-        end
-      end
-
-      def homework_service
-        @homework_service ||= SubmitHomeworkService.new(attachment, assignment)
-      end
-
       def perform
-        progress.start
+        progress.start! unless progress.running?
         clone_url_executor.execute(attachment)
-        progress.reload
 
-        # If the assignment exists, submit it
-        if assignment
-          homework_service.submit(progress.created_at, eula_agreement_timestamp)
-          homework_service.deliver_email
-        end
+        raise(CloneUrlError, attachment.upload_error_message) if attachment.file_state == 'errored'
 
-        progress.complete unless progress.failed?
+        progress.complete! unless progress.failed?
       rescue => error
         mark_as_failure(error)
       end
@@ -76,22 +63,47 @@ module Services
       private
 
       def mark_as_failure(error)
-        progress.reload
-        unless progress.failed?
-          error_id = Canvas::Errors.capture_exception(self.class.name, error)[:error_report]
-          message = "Unexpected error, ID: #{error_id || 'unknown'}"
+        Canvas::Errors.capture_exception(self.class.name, error)[:error_report]
+        progress.message = error
+        progress.save!
+        progress.fail!
+      end
+    end
 
-          attachment.file_state = 'errored'
-          attachment.workflow_state = 'errored'
-          attachment.upload_error_message = message
-          attachment.save
+    SubmitWorker = Struct.new(:attachment_id, :progress_id, :eula_agreement_timestamp, :clone_url_executor) do
+      def progress
+        @progress ||= Progress.find(progress_id)
+      end
 
-          progress.message = message
-          progress.save
-          progress.fail
-        end
+      def attachment
+        @attachment ||= Attachment.find(attachment_id)
+      end
 
-        homework_service.failure_email
+      def homework_service
+        @homework_service ||= SubmitHomeworkService.new(attachment, progress)
+      end
+
+      def perform
+        return unless attachment
+        homework_service.start!
+        clone_url_executor.execute(attachment)
+
+        raise(CloneUrlError, attachment.upload_error_message) if attachment.file_state == 'errored'
+
+        homework_service.submit(eula_agreement_timestamp)
+        homework_service.success!
+      rescue => error
+        mark_as_failure(error)
+      end
+
+      def on_permanent_failure(error)
+        mark_as_failure(error)
+      end
+
+      private
+
+      def mark_as_failure(error)
+        homework_service.failed!(error)
       end
     end
 
@@ -100,53 +112,101 @@ module Services
         CloneUrlExecutor.new(url, duplicate_handling, check_quota, opts)
       end
 
-      def submit_job(progress, attachment, eula_agreement_timestamp, clone_url_executor)
-        SubmitWorker.new(progress.id, attachment.id, eula_agreement_timestamp, clone_url_executor).
-          tap do |worker|
-            Delayed::Job.enqueue(worker,
-                                 priority: Delayed::HIGH_PRIORITY,
-                                 n_strand: Attachment.clone_url_strand(clone_url_executor.url))
-          end
+      def submit_job(attachment, progress, eula_agreement_timestamp, executor)
+        if progress.context.is_a? Assignment
+          SubmitWorker.
+            new(attachment.id, progress.id, eula_agreement_timestamp, executor).
+            tap { |worker| enqueue_attachment_job(worker) }
+        else
+          CopyWorker.
+            new(attachment.id, progress.id, eula_agreement_timestamp, executor).
+            tap { |worker| enqueue_attachment_job(worker) }
+        end
+      end
+
+      def enqueue_attachment_job(worker)
+        Delayed::Job.enqueue(
+          worker,
+          priority: Delayed::HIGH_PRIORITY,
+          n_strand: Attachment.clone_url_strand(worker.clone_url_executor.url)
+        )
       end
     end
 
-    def initialize(attachment, assignment)
+    def initialize(attachment, progress)
       @attachment = attachment
-      @assignment = assignment
+      @progress = progress
     end
 
-    def submit(submitted_at, eula_agreement_timestamp)
-      opts = {
-        submission_type: 'online_upload',
-        submitted_at: submitted_at,
-        attachments: [@attachment],
-        eula_agreement_timestamp: eula_agreement_timestamp
-      }
+    def submit(eula_agreement_timestamp)
+      start!
 
-      @assignment.submit_homework(@attachment.user, opts)
+      if @attachment
+        opts = {
+          submission_type: 'online_upload',
+          submitted_at: @progress.created_at,
+          attachments: [@attachment],
+          eula_agreement_timestamp: eula_agreement_timestamp
+        }
+
+        @progress.context.submit_homework(@progress.user, opts)
+      end
     end
 
-    def deliver_email
-      failure_email if @attachment.errored?
+    def start!
+      progress_start!(@progress)
+      AttachmentUploadStatus.pending!(@attachment)
+    end
+
+    def success!
+      progress_success!(@progress, @attachment)
+      AttachmentUploadStatus.success!(@attachment)
+    end
+
+    def failed!(error)
+      progress_failed!(@progress, error)
+      AttachmentUploadStatus.failed!(@attachment, error)
+      failure_email if @attachment
     end
 
     def failure_email
-      body = "Your file, #{@attachment.display_name}, failed to upload to your "\
-             "Canvas assignment, #{@assignment.name}. Please re-submit to "\
+      display_name = @attachment.display_name
+      assignment_name = @progress.context.name
+      body = "Your file, #{display_name}, failed to upload to your "\
+             "Canvas assignment, #{assignment_name}. Please re-submit to "\
              "the assignment or contact your instructor if you are no "\
              "longer able to do so."
-      user_email = User.where(id: @attachment.user_id).first.email
 
       message = OpenStruct.new(
         from_name: 'notifications@instructure.com',
-        subject: "Submission upload failed: #{@assignment.name}",
-        to: user_email,
+        subject: "Submission upload failed: #{assignment_name}",
+        to: @progress.user.email,
         body: body
       )
       queue_email(message)
     end
 
     private
+
+    def progress_start!(progress)
+      unless progress.running?
+        progress.start
+        progress.save!
+      end
+    end
+
+    def progress_success!(progress, attachment)
+      progress.reload
+      progress.set_results('id' => attachment.id) if attachment
+      progress.complete!
+    end
+
+    def progress_failed!(progress, message)
+      progress.reload
+      progress.message = message
+      progress.save!
+      progress.fail
+    end
 
     def queue_email(message)
       Delayed::Job.enqueue(EmailWorker.new(message))

@@ -108,15 +108,7 @@ module AccountReports
 
       generate_and_run_report headers do |csv|
         users.find_in_batches do |batch|
-          emails = Shard.partition_by_shard(batch.map(&:user_id)) do |user_ids|
-            CommunicationChannel.
-              email.
-              unretired.
-              select([:user_id, :path]).
-              where(user_id: user_ids).
-              order('user_id, position ASC').
-              distinct_on(:user_id)
-          end.index_by(&:user_id)
+          emails = emails_by_user_id(batch.map(&:user_id))
 
           batch.each do |u|
             row = []
@@ -420,7 +412,7 @@ module AccountReports
           users += batch.map {|e| User.new(id: e.associated_user_id) unless e.associated_user_id.nil?}.compact
           users.uniq!
           users_by_id = users.index_by(&:id)
-          pseudonyms = load_cross_shard_logins(users, include_deleted: @include_deleted)
+          pseudonyms = preload_logins_for_users(users, include_deleted: @include_deleted)
 
           batch.each do |e|
             p = loaded_pseudonym(pseudonyms,
@@ -709,7 +701,7 @@ module AccountReports
         gm.find_in_batches do |batch|
           users = batch.map {|au| User.new(id: au.user_id) }.compact.uniq
           users_by_id = users.index_by(&:id)
-          sis_ids = load_cross_shard_logins(users, include_deleted: @include_deleted)
+          sis_ids = preload_logins_for_users(users, include_deleted: @include_deleted)
 
           batch.each do |m|
             row = []
@@ -871,7 +863,7 @@ module AccountReports
           admins.find_in_batches do |batch|
             users = batch.map {|au| User.new(id: au.user_id) }.compact.uniq
             users_by_id = users.index_by(&:id)
-            sis_ids = load_cross_shard_logins(users, include_deleted: @include_deleted)
+            sis_ids = preload_logins_for_users(users, include_deleted: @include_deleted)
 
             batch.each do |admin|
               row = []

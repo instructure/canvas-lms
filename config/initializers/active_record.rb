@@ -653,8 +653,24 @@ class ActiveRecord::Base
     true
   end
 
+  def self.bulk_insert_objects(objects, excluded_columns: ['primary_key'])
+    return if objects.empty?
+    hashed_objects = []
+    excluded_columns << objects.first.class.primary_key if excluded_columns.delete('primary_key')
+    objects.each {|object| hashed_objects << object.attributes.except(excluded_columns.join(','))}
+    objects.first.class.bulk_insert(hashed_objects)
+  end
+
   def self.bulk_insert(records)
     return if records.empty?
+    array_columns = records.first.select{|k, v| v.is_a?(Array)}.map(&:first)
+    array_columns.each do |column_name|
+      cast_type = connection.send(:lookup_cast_type_from_column, self.columns_hash[column_name.to_s])
+      records.each do |row|
+        row[column_name] = cast_type.serialize(row[column_name])
+      end
+    end
+
     transaction do
       connection.bulk_insert(table_name, records)
     end
@@ -670,24 +686,24 @@ class ActiveRecord::Base
 end
 
 module UsefulFindInBatches
-  def find_in_batches(options = {}, &block)
+  def find_in_batches(start: nil, strategy: nil, **kwargs, &block)
     # prefer copy unless we're in a transaction (which would be bad,
     # because we might open a separate connection in the block, and not
     # see the contents of our current transaction)
-    if connection.open_transactions == 0 && !options[:start] && eager_load_values.empty? && !ActiveRecord::Base.in_migration
-      self.activate { |r| r.find_in_batches_with_copy(options, &block) }
-    elsif should_use_cursor? && !options[:start] && eager_load_values.empty?
-      self.activate { |r| r.find_in_batches_with_cursor(options, &block) }
-    elsif find_in_batches_needs_temp_table?
-      if options[:start]
+    if connection.open_transactions == 0 && !start && eager_load_values.empty? && !ActiveRecord::Base.in_migration && !strategy || strategy == :copy
+      self.activate { |r| r.find_in_batches_with_copy(**kwargs, &block) }
+    elsif should_use_cursor? && !start && eager_load_values.empty? && !strategy || strategy == :cursor
+      self.activate { |r| r.find_in_batches_with_cursor(**kwargs, &block) }
+    elsif find_in_batches_needs_temp_table? && !strategy || strategy == :temp_table
+      if start
         raise ArgumentError.new("GROUP and ORDER are incompatible with :start, as is an explicit select without the primary key")
       end
       unless eager_load_values.empty?
         raise ArgumentError.new("GROUP and ORDER are incompatible with `eager_load`, as is an explicit select without the primary key")
       end
-      self.activate { |r| r.find_in_batches_with_temp_table(options, &block) }
+      self.activate { |r| r.find_in_batches_with_temp_table(**kwargs, &block) }
     else
-      super
+      super(start: start, **kwargs, &block)
     end
   end
 end
@@ -1064,7 +1080,14 @@ module UpdateAndDeleteWithJoins
   end
 
   def update_all(updates, *args)
-    return super if joins_values.empty?
+    db = Shard.current(klass.shard_category).database_server
+    if joins_values.empty?
+      if ::Shackles.environment != db.shackles_environment
+        Shard.current.database_server.unshackle {return super }
+      else
+        return super
+      end
+    end
 
     stmt = Arel::UpdateManager.new
 
@@ -1121,7 +1144,11 @@ module UpdateAndDeleteWithJoins
       where_sql = collector.value
     end
     sql.concat('WHERE ' + where_sql)
-    connection.update(sql, "#{name} Update")
+    if ::Shackles.environment != db.shackles_environment
+      Shard.current.database_server.unshackle {connection.update(sql, "#{name} Update")}
+    else
+      connection.update(sql, "#{name} Update")
+    end
   end
 
   def delete_all

@@ -21,6 +21,7 @@ import sinon from 'sinon'
 import FakeServer, {paramsFromRequest} from '../../../../__tests__/FakeServer'
 import * as FlashAlert from '../../../../shared/FlashAlert'
 import * as FinalGradeOverrideApi from '../../FinalGradeOverrides/FinalGradeOverrideApi'
+import CourseSettings from '../../CourseSettings'
 import FinalGradeOverrides from '../../FinalGradeOverrides'
 import StudentContentDataLoader from '../StudentContentDataLoader'
 
@@ -81,8 +82,14 @@ describe('Gradebook StudentContentDataLoader', () => {
       .returns(Promise.resolve({finalGradeOverrides: exampleData.finalGradeOverrides}))
 
     gradebook = {
-      finalGradeOverrides: new FinalGradeOverrides({})
+      course: {
+        id: '1201'
+      }
     }
+
+    gradebook.finalGradeOverrides = new FinalGradeOverrides(gradebook)
+    gradebook.courseSettings = new CourseSettings(gradebook, {allowFinalGradeOverride: true})
+
     sinon.stub(gradebook.finalGradeOverrides, 'setGrades')
 
     options = {
@@ -245,17 +252,13 @@ describe('Gradebook StudentContentDataLoader', () => {
     })
 
     describe('loading final grade overrides', () => {
-      beforeEach(() => {
-        options.getFinalGradeOverrides = true
-      })
-
       it('optionally requests final grade overrides', async () => {
         await load()
         expect(FinalGradeOverrideApi.getFinalGradeOverrides.callCount).toEqual(1)
       })
 
       it('optionally does not request final grade overrides', async () => {
-        options.getFinalGradeOverrides = false
+        gradebook.courseSettings = new CourseSettings(gradebook, {allowFinalGradeOverride: false})
         await load()
         expect(FinalGradeOverrideApi.getFinalGradeOverrides.callCount).toEqual(0)
       })

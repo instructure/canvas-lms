@@ -86,7 +86,7 @@ describe('GradeDisplay', () => {
       document.getElementById('fixtures')
     )
     const textElement = $('[data-test-id="grade-display"]')
-    expect(textElement.text()).toEqual('–%')
+    expect(textElement.text()).toEqual('–')
   })
 
   it('renders grading scheme correcty with grade', () => {

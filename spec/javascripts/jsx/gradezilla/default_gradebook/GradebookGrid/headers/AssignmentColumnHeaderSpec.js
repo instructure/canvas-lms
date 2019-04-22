@@ -105,6 +105,10 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
         onSelect() {}
       },
 
+      showGradePostingPolicyAction: {
+        onSelect() {}
+      },
+
       showUnpostedMenuItem: true,
 
       sortBySetting: {
@@ -1004,6 +1008,49 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
         mountAndOpenOptionsMenu()
         getMenuItem($menuContent, 'Hide grades').click()
         const [callback] = props.hideGradesAction.onSelect.lastCall.args
+        callback()
+        strictEqual(document.activeElement, getOptionsMenuTrigger())
+      })
+    })
+  })
+
+  QUnit.module('"Options" > "Grade Posting Policy" action', hooks => {
+    hooks.beforeEach(() => {
+      props.postGradesAction.enabled = true
+    })
+
+    test('is present when post policies is enabled', () => {
+      mountAndOpenOptionsMenu()
+      ok(getMenuItem($menuContent, 'Grade Posting Policy'))
+    })
+
+    test('is not present when post policies is not enabled', () => {
+      props.postGradesAction.enabled = false
+      mountAndOpenOptionsMenu()
+      notOk(getMenuItem($menuContent, 'Grade Posting Policy'))
+    })
+
+    QUnit.module('when clicked', contextHooks => {
+      contextHooks.beforeEach(() => {
+        props.showGradePostingPolicyAction.onSelect = sinon.stub()
+      })
+
+      test('does not restore focus to the "Options" menu trigger', () => {
+        mountAndOpenOptionsMenu()
+        getMenuItem($menuContent, 'Grade Posting Policy').click()
+        notEqual(document.activeElement, getOptionsMenuTrigger())
+      })
+
+      test('calls the .showGradePostingPolicyAction.onSelect callback', () => {
+        mountAndOpenOptionsMenu()
+        getMenuItem($menuContent, 'Grade Posting Policy').click()
+        strictEqual(props.showGradePostingPolicyAction.onSelect.callCount, 1)
+      })
+
+      test('includes a callback for restoring focus upon dialog close', () => {
+        mountAndOpenOptionsMenu()
+        getMenuItem($menuContent, 'Grade Posting Policy').click()
+        const [callback] = props.showGradePostingPolicyAction.onSelect.lastCall.args
         callback()
         strictEqual(document.activeElement, getOptionsMenuTrigger())
       })

@@ -29,7 +29,7 @@ describe 'Final Grade Override' do
     course_with_teacher(course_name: "Grade Override", active_course: true,active_enrollment: true,name: "Teacher Boss1",active_user: true)
     @course.update!(grading_standard_enabled: true)
     @students = create_users_in_course(@course, 5, return_type: :record, name_prefix: "Purple")
-    Account.default.enable_feature!(:final_grades_override)
+    @course.enable_feature!(:final_grades_override)
     @course.enable_feature!(:new_gradebook)
 
     # create moderated assignment with teacher4 as final grader
@@ -55,7 +55,7 @@ describe 'Final Grade Override' do
     before(:each) do
       user_session(@teacher)
       SRGB.visit(@course.id)
-      SRGB.show_final_grade_override_option.click
+      SRGB.allow_final_grade_override_option.click
       SRGB.select_student(@student)
     end
 
@@ -86,9 +86,7 @@ describe 'Final Grade Override' do
 
     context 'with an overridden grade' do
       before(:each) do
-        @teacher.preferences.deep_merge!({
-          gradebook_settings: { @course.id => { 'show_final_grade_overrides' => 'true' } }
-        })
+        @course.update!(allow_final_grade_override: true)
         @teacher.save
 
         user_session(@teacher)

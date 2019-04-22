@@ -51,7 +51,7 @@ export default class AssignmentType extends React.Component {
   }
 
   static defaultProps = {
-    readOnly: true
+    readOnly: false
   }
 
   constructor(props) {

@@ -22,6 +22,16 @@ module Lti
 
     attr_reader :tc_half_secret
 
+    class << self
+      def delete_subscriptions(tool_proxy)
+        self.new.delete_subscriptions_for(tool_proxy)
+      end
+
+      def recreate_missing_subscriptions(tool_proxy)
+        tool_proxy&.message_handlers&.each(&:recreate_missing_subscriptions)
+      end
+    end
+
     def process_tool_proxy_json(json:, context:, guid:, tool_proxy_to_update: nil, tc_half_shared_secret: nil, developer_key: nil, registration_url: nil)
       @tc_half_secret = tc_half_shared_secret
       tp = IMS::LTI::Models::ToolProxy.new.from_json(json)
@@ -75,11 +85,13 @@ module Lti
       subscription_helper = AssignmentSubscriptionsHelper.new(tool_proxy)
       lookups = AssignmentConfigurationToolLookup.where(tool_product_code: product_family.product_code,
                                                         tool_vendor_code: product_family.vendor_code)
-      lookups.each { |l| subscription_helper.send_later(:destroy_subscription, l.subscription_id) }
-    end
-
-    def self.delete_subscriptions(tool_proxy)
-      self.new.delete_subscriptions_for(tool_proxy)
+      lookups.each do |l|
+        subscription_helper.send_later_enqueue_args(
+          :destroy_subscription,
+          { n_strand: AssignmentConfigurationToolLookup::SUBSCRIPTION_MANAGEMENT_STRAND },
+          l.subscription_id
+        )
+      end
     end
 
     private

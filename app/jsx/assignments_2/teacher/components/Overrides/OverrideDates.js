@@ -33,7 +33,7 @@ OverrideDates.propTypes = {
 }
 
 OverrideDates.defaultProps = {
-  readOnly: true
+  readOnly: false
 }
 
 export default function OverrideDates(props) {

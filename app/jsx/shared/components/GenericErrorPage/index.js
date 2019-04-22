@@ -20,12 +20,12 @@ import I18n from 'i18n!generic_error_page'
 import React from 'react'
 
 import {Button} from '@instructure/ui-buttons'
-import Container from '@instructure/ui-core/lib/components/Container'
-import Text from '@instructure/ui-core/lib/components/Text'
+import View from '@instructure/ui-layout/lib/components/View'
+import Text from '@instructure/ui-elements/lib/components/Text'
 import axios from 'axios'
 import {string} from 'prop-types'
 import {Spinner} from '@instructure/ui-elements'
-import {Flex} from '@instructure/ui-layout'
+import {Flex, FlexItem} from '@instructure/ui-layout'
 import ErrorTextInputForm from './ErrorTextInputForm'
 import ErrorPageHeader from './ErrorPageHeader'
 
@@ -84,64 +84,82 @@ class GenericErrorPage extends React.Component {
       }
     }
     this.setState({submitLoading: true, showingCommentBox: false})
-    const request = await axios.post('/error_reports', postData, {
-      headers: [{'content-type': 'application/json'}]
-    })
-    // Returns json of {logged: boolean, id: string}
-    const logObject = request.data
-    if (logObject.logged) {
-      this.setState({commentPosted: true, submitLoading: false})
-    } else {
+    try {
+      // Returns json of {logged: boolean, id: string}
+      const request = await axios.post('/error_reports', postData, {
+        headers: [{'content-type': 'application/json'}]
+      })
+      const logObject = request.data
+      if (logObject.logged) {
+        this.setState({commentPosted: true, submitLoading: false})
+      } else {
+        this.setState({commentPosted: true, commentPostError: true, submitLoading: false})
+      }
+    } catch (err) {
       this.setState({commentPosted: true, commentPostError: true, submitLoading: false})
     }
   }
 
   render() {
     return (
-      <Container margin="large auto" textAlign="center" display="block">
-        <ErrorPageHeader imageUrl={this.props.imageUrl} />
-        <Container margin="small" display="block">
-          {!this.state.commentPosted && (
-            <Flex justifyItems="center" margin="small" display="block">
-              <Text margin="0">{I18n.t('If you have a moment,')}</Text>
-              <Button
-                padding="0"
-                data-test-id="generic-shared-error-page-button"
-                variant="link"
-                onClick={this.handleOpenCommentBox}
-              >
-                {I18n.t('click here to tell us what happened')}
-              </Button>
-            </Flex>
-          )}
-          {this.state.showingCommentBox && (
-            <ErrorTextInputForm
-              handleChangeCommentBox={this.handleChangeCommentBox}
-              handleChangeOptionalEmail={this.handleChangeOptionalEmail}
-              handleSubmitErrorReport={this.handleSubmitErrorReport}
-            />
-          )}
-          {this.state.submitLoading && (
-            <Spinner
-              data-test-id="generic-error=page-loading-indicator"
-              title={I18n.t('Loading')}
-              margin="0 0 0 medium"
-            />
-          )}
-          {this.state.commentPosted && this.state.commentPostError && (
-            <Container display="block" data-test-id="generic-error-comments-submitted">
-              <Text color="error" margin="x-small">
-                {I18n.t('Comment failed to post! Please try again later.')}
-              </Text>
-            </Container>
-          )}
-          {this.state.commentPosted && !this.state.commentPostError && (
-            <Container display="block" data-test-id="generic-error-comments-submitted">
-              <Text margin="x-small">{I18n.t('Comment submitted!')}</Text>
-            </Container>
-          )}
-        </Container>
-      </Container>
+      <View
+        as="div"
+        width="100%"
+        height="100%"
+        margin="large auto"
+        textAlign="center"
+        display="block"
+      >
+        <Flex
+          direction="column"
+          justifyItems="center"
+          alignItems="center"
+          margin="small"
+          display="block"
+        >
+          <FlexItem>
+            <ErrorPageHeader imageUrl={this.props.imageUrl} />
+          </FlexItem>
+          <FlexItem>
+            <View margin="small" display="block">
+              {!this.state.commentPosted && (
+                <Flex alignItems="center" justifyItems="center" margin="small" display="block">
+                  <FlexItem>
+                    <Text margin="0">{I18n.t('If you have a moment,')}</Text>
+                  </FlexItem>
+                  <FlexItem>
+                    <Button margin="0" variant="link" onClick={this.handleOpenCommentBox}>
+                      {I18n.t('click here to tell us what happened')}
+                    </Button>
+                  </FlexItem>
+                </Flex>
+              )}
+              {this.state.showingCommentBox && (
+                <ErrorTextInputForm
+                  handleChangeCommentBox={this.handleChangeCommentBox}
+                  handleChangeOptionalEmail={this.handleChangeOptionalEmail}
+                  handleSubmitErrorReport={this.handleSubmitErrorReport}
+                />
+              )}
+              {this.state.submitLoading && (
+                <Spinner title={I18n.t('Loading')} margin="0 0 0 medium" />
+              )}
+              {this.state.commentPosted && this.state.commentPostError && (
+                <View display="block" data-test-id="generic-error-comments-submitted">
+                  <Text color="error" margin="x-small">
+                    {I18n.t('Comment failed to post! Please try again later.')}
+                  </Text>
+                </View>
+              )}
+              {this.state.commentPosted && !this.state.commentPostError && (
+                <View display="block" data-test-id="generic-error-comments-submitted">
+                  <Text margin="x-small">{I18n.t('Comment submitted!')}</Text>
+                </View>
+              )}
+            </View>
+          </FlexItem>
+        </Flex>
+      </View>
     )
   }
 }

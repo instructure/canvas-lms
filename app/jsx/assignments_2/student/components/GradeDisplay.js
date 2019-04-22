@@ -33,8 +33,6 @@ function defaultValue(gradingType, pointsPossible, options = {}) {
       return options.content === ACCESSIBLE
         ? I18n.t('ungraded out of %{pointsPossible}', {pointsPossible})
         : `–/${pointsPossible}`
-    case 'percent':
-      return options.content === ACCESSIBLE ? I18n.t('ungraded') : `–%`
     case 'pass_fail':
       return I18n.t('ungraded')
     default:

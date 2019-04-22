@@ -27,6 +27,7 @@ describe Quizzes::QuizQuestion::AnswerParsers::FillInMultipleBlanks do
         {
           answer_text: "Answer 1",
           answer_comments: "This is answer 1",
+          answer_comment_html: '<img src="x" onerror="alert(1)">',
           answer_weight: 100,
           blank_id: "answer1"
         },

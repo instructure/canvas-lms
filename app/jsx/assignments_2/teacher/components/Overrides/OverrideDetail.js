@@ -32,7 +32,7 @@ export default class OverrideDetail extends React.Component {
   }
 
   static defaultProps = {
-    readOnly: true
+    readOnly: false
   }
 
   renderAssignedTo() {

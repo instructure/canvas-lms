@@ -391,7 +391,7 @@ class DiscussionTopicsController < ApplicationController
           },
           discussion_topic_menu_tools: external_tools_display_hashes(:discussion_topic_menu),
         }
-        if @context.is_a?(Course) && @context.grants_right?(@current_user, session, :read) && !@js_env[:COURSE_ID].present?
+        if @context.is_a?(Course) && @context.grants_right?(@current_user, session, :read) && @js_env&.dig(:COURSE_ID).blank?
           hash[:COURSE_ID] = @context.id.to_s
         end
         conditional_release_js_env(includes: :active_rules)
@@ -430,7 +430,6 @@ class DiscussionTopicsController < ApplicationController
   end
 
   def announcements_locked?
-    return true if @context.account.lock_all_announcements[:locked]
     return false unless @context.is_a?(Course)
     @context.lock_all_announcements?
   end

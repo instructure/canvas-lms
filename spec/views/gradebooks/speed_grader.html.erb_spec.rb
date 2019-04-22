@@ -24,7 +24,10 @@ describe "/gradebooks/speed_grader" do
   include GroupsCommon
 
   let(:locals) do
-    { anonymize_students: false }
+    {
+      anonymize_students: false,
+      post_policies_enabled: true
+    }
   end
 
   before(:once) do
@@ -112,23 +115,43 @@ describe "/gradebooks/speed_grader" do
 
   describe 'mute button' do
     it 'is rendered' do
-      render template: 'gradebooks/speed_grader', locals: locals
+      render template: 'gradebooks/speed_grader', locals: locals.merge({post_policies_enabled: false})
       html = Nokogiri::HTML.fragment(response.body)
       expect(html.at_css('#mute_link')).to be_present
     end
 
     it 'is enabled if user can mute assignment' do
       assign(:disable_unmute_assignment, false)
-      render template: 'gradebooks/speed_grader', locals: locals
+      render template: 'gradebooks/speed_grader', locals: locals.merge({post_policies_enabled: false})
       html = Nokogiri::HTML.fragment(response.body)
       expect(html.at_css('#mute_link.disabled')).not_to be_present
     end
 
     it 'is disabled if user cannot mute assignment' do
       assign(:disable_unmute_assignment, true)
-      render template: 'gradebooks/speed_grader', locals: locals
+      render template: 'gradebooks/speed_grader', locals: locals.merge({post_policies_enabled: false})
       html = Nokogiri::HTML.fragment(response.body)
       expect(html.at_css('#mute_link.disabled')).to be_present
+    end
+
+    it "is not rendered if post polices is enabled" do
+      render template: "gradebooks/speed_grader", locals: locals
+      html = Nokogiri::HTML.fragment(response.body)
+      expect(html.at_css('#mute_link')).not_to be_present
+    end
+  end
+
+  describe "'post grades'/'hide grades' menu mount point" do
+    let(:mount_point) { Nokogiri::HTML.fragment(response.body).at_css("#speed_grader_post_grades_menu_mount_point") }
+
+    it "is included when post policies is enabled" do
+      render template: "gradebooks/speed_grader", locals: locals
+      expect(mount_point).to be_present
+    end
+
+    it "is not included when post policies is not enabled" do
+      render template: "gradebooks/speed_grader", locals: locals.merge({post_policies_enabled: false})
+      expect(mount_point).not_to be_present
     end
   end
 

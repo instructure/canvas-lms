@@ -27,6 +27,10 @@ export function paramsFromRequest(request) {
   return qs.parse(request.url.split('?')[1])
 }
 
+export function formBodyFromRequest(request) {
+  return qs.parse(request.requestBody)
+}
+
 export function jsonBodyFromRequest(request) {
   return JSON.parse(request.requestBody)
 }

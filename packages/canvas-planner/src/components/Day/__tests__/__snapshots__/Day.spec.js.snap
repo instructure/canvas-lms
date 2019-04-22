@@ -2,7 +2,7 @@
 
 exports[`groups itemsForDay that come in on prop changes 1`] = `
 <div
-  className="planner-day"
+  className="Day-styles__root planner-day"
 >
   <Heading
     border="none"
@@ -97,7 +97,7 @@ exports[`groups itemsForDay that come in on prop changes 1`] = `
 
 exports[`groups itemsForDay that come in on prop changes 2`] = `
 <div
-  className="planner-day"
+  className="Day-styles__root planner-day"
 >
   <Heading
     border="none"
@@ -226,7 +226,7 @@ exports[`groups itemsForDay that come in on prop changes 2`] = `
 
 exports[`groups itemsForDay that have no context into the "Notes" category 1`] = `
 <div
-  className="planner-day"
+  className="Day-styles__root planner-day"
 >
   <Heading
     border="none"
@@ -355,7 +355,7 @@ exports[`groups itemsForDay that have no context into the "Notes" category 1`] =
 
 exports[`renders grouping correctly when having itemsForDay 1`] = `
 <div
-  className="planner-day"
+  className="Day-styles__root planner-day"
 >
   <Heading
     border="none"
@@ -494,7 +494,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
 
 exports[`renders the base component with required props 1`] = `
 <div
-  className="planner-day"
+  className="Day-styles__root planner-day"
 >
   <Heading
     border="bottom"
@@ -524,6 +524,8 @@ exports[`renders the base component with required props 1`] = `
     <View
       display="block"
       margin="small 0 0 0"
+      overflowX="visible"
+      overflowY="visible"
       textAlign="center"
     >
       Nothing Planned Yet

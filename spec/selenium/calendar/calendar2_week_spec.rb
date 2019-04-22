@@ -346,7 +346,7 @@ describe "calendar2" do
       course_with_student_logged_in
     end
 
-    it "should navigate to week view when week button is clicked", :xbrowser do
+    it "should navigate to week view when week button is clicked" do
       load_week_view
       expect(fj('.fc-agendaWeek-view:visible')).to be_present
     end

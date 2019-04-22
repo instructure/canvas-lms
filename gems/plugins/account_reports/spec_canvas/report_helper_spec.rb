@@ -34,6 +34,49 @@ describe "report helper" do
   let(:account_report) { AccountReport.new(report_type: 'test_report', account: account, user: user) }
   let(:report) { AccountReports::TestReport.new(account_report) }
 
+  it 'should handle basic math' do
+    expect(report.number_of_items_per_runner(1)).to eq 25
+    expect(report.number_of_items_per_runner(13001)).to eq 130
+    expect(report.number_of_items_per_runner(1801308213)).to eq 1000
+    expect(report.number_of_items_per_runner(100, min: 10)).to eq 10
+    expect(report.number_of_items_per_runner(109213081, max: 100)).to eq 100
+  end
+
+  it 'should create report runners with a single trip' do
+    account_report.save!
+    expect(AccountReport).to receive(:bulk_insert_objects).once.and_call_original
+    report.create_report_runners((1..50).to_a, 50)
+    expect(account_report.account_report_runners.count).to eq 2
+  end
+
+  it 'should create report runners with few trips to the db' do
+    account_report.save!
+    # lower the setting so we can do more than one trip with less data
+    Setting.set("ids_per_report_runner_batch", 1_000)
+    # once with 1_008 ids and 84 runners and then once with 200 ids and the
+    # other runners
+    expect(AccountReport).to receive(:bulk_insert_objects).twice.and_call_original
+    # also got to pass min so that we get runners with 12 ids instead of 25
+    report.create_report_runners((1..1_200).to_a, 1_200, min: 10)
+    expect(account_report.account_report_runners.count).to eq 100
+  end
+
+  describe "load pseudonyms" do
+    it 'should do one query for pseudonyms' do
+      user_with_pseudonym(active_all: true, account: account, user: user)
+      course = account.courses.create!(name: 'reports')
+      role = Enrollment.get_built_in_role_for_type('StudentEnrollment')
+      e = course.enrollments.create!(user: user,
+                                     workflow_state: 'active',
+                                     sis_pseudonym: user.pseudonym,
+                                     type: 'StudentEnrollment',
+                                     role: role)
+      report.preload_logins_for_users([user])
+      expect(SisPseudonym).to receive(:for).never
+      report.loaded_pseudonym({user.id => [user.pseudonym]}, user, enrollment: e)
+    end
+  end
+
   describe "#send_report" do
     before do
       allow(AccountReports).to receive(:available_reports).and_return(account_report.report_type => {title: 'test_report'})
