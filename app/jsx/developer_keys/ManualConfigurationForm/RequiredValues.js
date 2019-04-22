@@ -18,6 +18,7 @@
 import I18n from 'i18n!react_developer_keys'
 import PropTypes from 'prop-types'
 import React from 'react'
+import $ from 'jquery'
 
 import FormFieldGroup from '@instructure/ui-form-field/lib/components/FormFieldGroup';
 import TextInput from '@instructure/ui-forms/lib/components/TextInput';
@@ -27,13 +28,37 @@ import ScreenReaderContent from '@instructure/ui-a11y/lib/components/ScreenReade
 export default class RequiredValues extends React.Component {
   constructor (props) {
     super(props);
+    const public_jwk = JSON.stringify(this.props.toolConfiguration.public_jwk || {})
     this.state = {
-      toolConfiguration: this.props.toolConfiguration
+      toolConfiguration: {...this.props.toolConfiguration, public_jwk}
     }
   }
 
+  isMissingValues = () => {
+    return ['target_link_uri', 'oidc_initiation_url', 'public_jwk', 'description', 'title']
+      .some(p => !this.state.toolConfiguration[p])
+  }
+
   generateToolConfigurationPart = () => {
-    return this.state.toolConfiguration
+    const public_jwk = JSON.parse(this.state.toolConfiguration.public_jwk)
+
+    return { ...this.state.toolConfiguration, public_jwk }
+  }
+
+  valid = () => {
+    if (this.isMissingValues()) {
+      this.props.flashError(I18n.t('Missing required fields. Please fill in all required fields.'))
+      return false
+    }
+    try {
+      JSON.parse(this.state.toolConfiguration.public_jwk)
+      return true
+    } catch(e) {
+      if (e instanceof SyntaxError) {
+        this.props.flashError(I18n.t('Public JWK json is not valid. Please submit properly formatted json.'))
+        return false
+      }
+    }
   }
 
   handleTitleChange = e => {
@@ -131,5 +156,12 @@ RequiredValues.propTypes = {
     target_link_uri: PropTypes.string,
     oidc_initiation_url: PropTypes.string,
     public_jwk: PropTypes.string
-  })
+  }),
+  flashError: PropTypes.func
+}
+
+RequiredValues.defaultProps = {
+  flashError: (msg) => {
+    $.flashError(msg)
+  }
 }

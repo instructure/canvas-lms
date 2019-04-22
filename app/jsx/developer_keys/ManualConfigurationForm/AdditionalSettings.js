@@ -58,6 +58,10 @@ export default class AdditionalSettings extends React.Component {
     }
   }
 
+  valid = () => {
+    return true
+  }
+
   handleDomainChange = e => {
     const value = e.target.value;
     this.setState(state => ({additionalSettings: {...state.additionalSettings, domain: value}}))

@@ -37,6 +37,10 @@ export default class ToolConfigurationForm extends React.Component {
     return this.manualConfigRef.generateToolConfiguration();
   }
 
+  valid = () => {
+    return this.manualConfigRef.valid();
+  }
+
   handleConfigTypeChange = (e, option) => {
     this.props.dispatch(this.props.setLtiConfigurationMethod(option.value))
   }
@@ -57,6 +61,7 @@ export default class ToolConfigurationForm extends React.Component {
       return (
         <ManualConfigurationForm
           ref={this.setManualConfigRef}
+          toolConfiguration={this.props.manualToolConfiguration}
           validScopes={this.props.validScopes}
           validPlacements={this.props.validPlacements}
         />
@@ -100,7 +105,8 @@ ToolConfigurationForm.propTypes = {
   validScopes: PropTypes.object.isRequired,
   validPlacements: PropTypes.arrayOf(PropTypes.string).isRequired,
   setLtiConfigurationMethod: PropTypes.func.isRequired,
-  configurationMethod: PropTypes.string
+  configurationMethod: PropTypes.string,
+  manualToolConfiguration: PropTypes.object.isRequired
 }
 
 ToolConfigurationForm.defaultProps = {

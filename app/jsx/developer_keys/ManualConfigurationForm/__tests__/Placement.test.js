@@ -87,3 +87,13 @@ it('changes the output when selection_width changes', () => {
 it('changes the output when message_type changes', () => {
   checkChange(['message_type'], 'handleMessageTypeChange', 'LtiDeepLinkingRequest', [null, 'LtiDeepLinkingRequest'])
 })
+
+it('cleans up invalid inputs', () => {
+  const wrapper = mount(<Placement {...props({placementOverrides: {message_type: undefined}})} />)
+  expect(wrapper.instance().valid()).toEqual(true)
+})
+
+it('is valid when valid', () => {
+  const wrapper = mount(<Placement {...props()} />)
+  expect(wrapper.instance().valid()).toEqual(true)
+})

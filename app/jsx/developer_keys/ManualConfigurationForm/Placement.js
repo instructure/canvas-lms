@@ -51,6 +51,10 @@ export default class Placement extends React.Component {
     return this.state.placement
   }
 
+  valid = () => {
+    return true
+  }
+
   handleTargetLinkUriChange = e => {
     const value = e.target.value;
     this.setState(state => ({placement: {...state.placement, target_link_uri: value}}))

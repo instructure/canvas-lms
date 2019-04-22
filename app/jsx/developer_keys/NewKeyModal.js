@@ -31,6 +31,10 @@ import NewKeyFooter from './NewKeyFooter'
 import LtiKeyFooter from './LtiKeyFooter'
 
 export default class DeveloperKeyModal extends React.Component {
+  state = {
+    toolConfiguration: {}
+  }
+
   developerKeyUrl() {
     if (this.developerKey()) {
       return `/api/v1/developer_keys/${this.developerKey().id}`
@@ -118,7 +122,11 @@ export default class DeveloperKeyModal extends React.Component {
         }
       }
     } else if(this.props.createLtiKeyState.configurationMethod === 'manual') {
+      if (!this.newForm.valid()) {
+        return
+      }
       settings = this.newForm.generateToolConfiguration();
+      this.setState({toolConfiguration: settings})
     }
 
     this.props.store.dispatch(this.props.actions.saveLtiToolConfiguration({
@@ -207,10 +215,12 @@ export default class DeveloperKeyModal extends React.Component {
       setPrivacyLevel={actions.ltiKeysSetPrivacyLevel}
       createLtiKeyState={createLtiKeyState}
       setLtiConfigurationMethod={actions.setLtiConfigurationMethod}
+      toolConfiguration={this.state.toolConfiguration || this.props.toolConfiguration}
     />
   }
 
   setNewFormRef = node => { this.newForm = node }
+
   modalContainerRef = node => { this.modalContainer = node }
 
   modalIsOpen() {
@@ -288,5 +298,8 @@ DeveloperKeyModal.propTypes = {
       contextId: PropTypes.string.isRequired
     })
   }).isRequired,
-  selectedScopes: PropTypes.arrayOf(PropTypes.string).isRequired
+  selectedScopes: PropTypes.arrayOf(PropTypes.string).isRequired,
+  toolConfiguration: PropTypes.shape({
+    oidc_initiation_url: PropTypes.string
+  })
 }

@@ -45,6 +45,7 @@ module Schemas::Lti
             "type" => "string",
             "enum" => [
               "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem",
+              "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly",
               "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly",
               "https://purl.imsglobal.org/spec/lti-ags/scope/score",
               "https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly"
@@ -56,8 +57,6 @@ module Schemas::Lti
           "items" => {
             "type" => "object",
             "required" => [
-              "domain",
-              "tool_id",
               "platform",
               "settings"
             ].freeze,

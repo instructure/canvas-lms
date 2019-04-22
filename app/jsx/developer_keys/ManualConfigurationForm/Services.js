@@ -38,7 +38,11 @@ export default class Services extends React.Component {
     return this.state.scopes
   }
 
-  handleScopesSelectionChange = scopes => this.setState({scopes})
+  valid = () => true
+
+  handleScopesSelectionChange = scopes => {
+    this.setState({scopes})
+  }
 
   render() {
     const { scopes } = this.state;

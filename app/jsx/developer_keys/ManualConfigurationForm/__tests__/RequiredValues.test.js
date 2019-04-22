@@ -29,9 +29,11 @@ const props = (overrides = {}) => {
       description: 'asdfsdf',
       target_link_uri: 'http://example.com',
       oidc_initiation_url: 'http://example.com/initiate',
-      public_jwk: '',
+      public_jwk: '{}',
       ...overrides
-    }
+    },
+    flashError: () => {},
+    ...overrides
   }
 }
 
@@ -45,14 +47,14 @@ const checkToolConfigPart = (toolConfig, path, value) => {
   expect(get(toolConfig, path)).toEqual(value);
 }
 
-const checkChange = (path, funcName, value) => {
+const checkChange = (path, funcName, value, expectedValue = null) => {
   const wrapper = mount(<RequiredValues {...props()} />)
 
   wrapper.instance()[funcName]({target: { value }})
   checkToolConfigPart(
     wrapper.instance().generateToolConfigurationPart(),
     path,
-    value
+    expectedValue || value
   )
 }
 
@@ -73,5 +75,17 @@ it('changes the output when target_link_uri changes', () => {
 })
 
 it('changes the output when public_jwk changes', () => {
-  checkChange(['public_jwk'], 'handlePublicJwkChange', '{}')
+  checkChange(['public_jwk'], 'handlePublicJwkChange', '{}', {})
+})
+
+it('is valid when valid', () => {
+  const wrapper = mount(<RequiredValues {...props()} />)
+  expect(wrapper.instance().valid()).toEqual(true)
+})
+
+it('is invalid when invalid inputs', () => {
+  const flashError = jest.fn()
+  const wrapper = mount(<RequiredValues {...props({target_link_uri: '', flashError})} />)
+  expect(wrapper.instance().valid()).toEqual(false)
+  expect(flashError).toHaveBeenCalled()
 })

@@ -44,6 +44,10 @@ export default class DeveloperKeyFormFields extends React.Component {
     return this.toolConfigRef.generateToolConfiguration()
   }
 
+  valid = () => {
+    return this.toolConfigRef.valid()
+  }
+
   get keyForm () {
     return this.keyFormRef
   }
@@ -112,6 +116,7 @@ export default class DeveloperKeyFormFields extends React.Component {
       setLtiConfigurationMethod={this.props.setLtiConfigurationMethod}
       setPrivacyLevel={this.props.setPrivacyLevel}
       dispatch={this.props.dispatch}
+      toolConfiguration={this.props.toolConfiguration}
     />
   }
 
@@ -216,5 +221,8 @@ DeveloperKeyFormFields.propTypes = {
       scope: PropTypes.string
     })
   )).isRequired,
-  availableScopesPending: PropTypes.bool.isRequired
+  availableScopesPending: PropTypes.bool.isRequired,
+  toolConfiguration: PropTypes.shape({
+    oidc_initiation_url: PropTypes.string
+  })
 }
