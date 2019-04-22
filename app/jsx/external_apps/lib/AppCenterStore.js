@@ -118,8 +118,9 @@ import 'compiled/jquery.rails_flash_notifications'
       hasMore: !!links.next
     });
 
-    // Update the installed app list
-    ExternalAppsStore.fetch();
+    // Update the installed app list in case this is a reload from
+    // installing a tool from the app center
+    ExternalAppsStore.reset();
   };
 
   store._fetchErrorHandler = function () {
