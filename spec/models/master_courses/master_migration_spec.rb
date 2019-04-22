@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'spec_helper'
+require 'sharding_spec_helper'
 
 describe MasterCourses::MasterMigration do
   before :once do
@@ -2035,6 +2035,36 @@ describe MasterCourses::MasterMigration do
       run_master_migration
 
       expect(a_to.reload.external_tool_tag).to eq tag # don't change
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "should translate links to content with module item id" do
+        mod1 = @copy_from.context_modules.create!(:name => "some module")
+        asmnt = @copy_from.assignments.create!(:title => "some assignment")
+        assmt_tag = mod1.add_item({:id => asmnt.id, :type => 'assignment', :indent => 1})
+        page = @copy_from.wiki_pages.create!(:title => "some page")
+        page_tag = mod1.add_item({:id => page.id, :type => 'wiki_page', :indent => 1})
+
+        body = %{<p>Link to assignment module item: <a href="/courses/%s/assignments/%s?module_item_id=%s">some assignment</a></p>
+          <p>Link to page module item: <a href="/courses/%s/pages/%s?module_item_id=%s">some page</a></p>}
+        topic = @copy_from.discussion_topics.create!(:title => "some topic",
+          :message => body % [@copy_from.id, asmnt.id, assmt_tag.id, @copy_from.id, page.url, page_tag.id])
+
+        @copy_to = course_factory
+        @sub = @template.add_child_course!(@copy_to)
+
+        run_master_migration
+
+        mod1_to = @copy_to.context_modules.where(migration_id: mig_id(mod1)).first
+        asmnt_to = @copy_to.assignments.where(migration_id: mig_id(asmnt)).first
+        assmt_tag_to = mod1_to.content_tags.where(:content_type => "Assignment").first
+        page_to = @copy_to.wiki_pages.where(migration_id: mig_id(page)).first
+        page_tag_to = mod1_to.content_tags.where(:content_type => "WikiPage").first
+        topic_to = @copy_to.discussion_topics.where(migration_id: mig_id(topic)).first
+        expect(topic_to.message).to eq body % [@copy_to.id, asmnt_to.id, assmt_tag_to.id, @copy_to.id, page_to.url, page_tag_to.id]
+      end
     end
 
     it "sends notifications", priority: "2", test_id: 3211103 do
