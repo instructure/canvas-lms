@@ -174,7 +174,8 @@ module Api::V1::Course
   def preload_teachers(courses)
     threshold = params[:teacher_limit].presence&.to_i
     if threshold
-      teacher_counts = Course.where(:id => courses).joins(:teacher_enrollments).group("courses.id").count
+      scope = TeacherEnrollment.active_or_pending.where(:course_id => courses).distinct.select(:user_id, :course_id)
+      teacher_counts = Enrollment.from("(#{scope.to_sql}) AS t").group("t.course_id").count
       to_preload = []
       courses.each do |course|
         next unless count = teacher_counts[course.id]
