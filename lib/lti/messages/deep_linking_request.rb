@@ -20,28 +20,32 @@ module Lti::Messages
     ACCEPT_TYPES = {
       'editor_button' => %w(link file html ltiResourceLink image).freeze,
       'assignment_selection' => %w(ltiResourceLink).freeze,
-      'homework_submission' => %w(file).freeze
+      'homework_submission' => %w(file).freeze,
+      'link_selection' => %w(ltiResourceLink).freeze
     }.freeze
 
     DOCUMENT_TARGETS = {
       'editor_button' => %w(embed iframe window).freeze,
       'assignment_selection' => %w(iframe window).freeze,
-      'homework_submission' => %w(iframe).freeze
+      'homework_submission' => %w(iframe).freeze,
+      'link_selection' => %w(iframe window).freeze,
     }.freeze
 
     MEDIA_TYPES = {
       'editor_button' => %w(image/* text/html application/vnd.ims.lti.v1.ltilink */*).freeze,
       'assignment_selection' => %w(application/vnd.ims.lti.v1.ltilink).freeze,
-      'homework_submission' => %w(*/*).freeze
+      'homework_submission' => %w(*/*).freeze,
+      'link_selection' => %w(application/vnd.ims.lti.v1.ltilink).freeze
     }.freeze
 
     AUTO_CREATE = {
       'editor_button' => false,
       'assignment_selection' => false,
-      'homework_submission' => false
+      'homework_submission' => false,
+      'link_selection' => false
     }.freeze
 
-    MODAL_PLACEMENTS = %w(editor_button assignment_selection).freeze
+    MODAL_PLACEMENTS = %w(editor_button assignment_selection link_selection).freeze
 
     def initialize(tool:, context:, user:, expander:, return_url:, opts: {})
       super
