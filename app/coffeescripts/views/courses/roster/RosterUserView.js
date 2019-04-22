@@ -38,7 +38,7 @@ export default class RosterUserView extends Backbone.View {
       // Hack: trick Babel/TypeScript into allowing this before super.
       if (false) { super(); }
       let thisFn = (() => { return this; }).toString();
-      let thisName = thisFn.match(/(?:_assertThisInitialized\()*(\w+)\)*;/)[1];
+      let thisName = thisFn.match(/(?:\(0,\s*_assertThisInitialized\d*.default\)|_assertThisInitialized)\((\w+)\)/)[1];
       eval(`${thisName} = this;`);
     }
     this.handleMenuEvent = this.handleMenuEvent.bind(this)
