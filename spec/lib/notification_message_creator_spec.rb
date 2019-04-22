@@ -237,6 +237,18 @@ describe NotificationMessageCreator do
       expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 3
     end
 
+    it "should make a delayed message for a notification with a set delayed frequency (even if another policy is set to immediate)" do
+      notification_set
+      @notification_policy.update_attribute(:frequency, 'daily')
+
+      other_notification =  Notification.create!(:subject => "yo", :name => "Test Not 2")
+      other_np = NotificationPolicy.create!(:notification => other_notification, :communication_channel => @communication_channel)
+
+      NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
+      expect(Message.where(:communication_channel_id => @communication_channel).exists?).to eq false # no immediate message
+      expect(DelayedMessage.where(:communication_channel_id => @communication_channel).exists?).to eq true
+    end
+
     it "should make a delayed message for the default channel based on the notification's default frequency when there is no policy on any channel for the notification" do
       notification_set # we get one channel here
       communication_channel_model(path: 'yes@example.com').confirm! # this gives us a total of two channels
